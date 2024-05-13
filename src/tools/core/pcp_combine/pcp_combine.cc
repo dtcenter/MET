@@ -205,7 +205,6 @@ static void set_compress(const StringArray &);
 ////////////////////////////////////////////////////////////////////////
 
 int met_main(int argc, char *argv[]) {
-   int i, j;
 
    program_name = get_short_name(argv[0]);
 
@@ -217,7 +216,7 @@ int met_main(int argc, char *argv[]) {
    //
    // Process each requested field
    //
-   for(i=0; i<req_field_list.n(); i++) {
+   for(int i=0; i<req_field_list.n(); i++) {
 
       //
       // Reinitialize for the current loop.
@@ -230,7 +229,7 @@ int met_main(int argc, char *argv[]) {
       //
       if(field_option_used) {
          field_list.clear();
-         for(j=0; j<file_list.n(); j++) field_list.add(field_string);
+         for(int j=0; j<file_list.n(); j++) field_list.add(field_string);
       }
 
       //
@@ -416,7 +415,6 @@ void process_sum_args(const CommandLine & cline) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_add_sub_derive_args(const CommandLine & cline) {
-   int i;
 
    //
    // Check for enough command line arguments
@@ -445,7 +443,7 @@ void process_add_sub_derive_args(const CommandLine & cline) {
            << "files.\n";
 
       StringArray sa;
-      for(i=0; i<(cline.n()-1); i++) sa.add(cline[i]);
+      for(int i=0; i<(cline.n()-1); i++) sa.add(cline[i]);
       file_list = parse_file_list(sa);
    }
    //
@@ -459,7 +457,7 @@ void process_add_sub_derive_args(const CommandLine & cline) {
            << "parsing the command line arguments a list of files, "
            << "each followed by a configuration string.\n";
 
-      for(i=0, n_files=0; i<(cline.n() - 1); i+=2) {
+      for(int i=0, n_files=0; i<(cline.n() - 1); i+=2) {
          file_list.add(cline[i]);
 
          //
@@ -489,13 +487,12 @@ void process_add_sub_derive_args(const CommandLine & cline) {
 void do_sum_command() {
    DataPlane plane;
    Grid grid;
-   int lead_time;
    ConcatString init_time_str;
 
    //
    // Compute the lead time.
    //
-   lead_time = valid_time - init_time;
+   int lead_time = valid_time - init_time;
 
    //
    // Build init time string.
@@ -569,7 +566,7 @@ void do_sum_command() {
 ////////////////////////////////////////////////////////////////////////
 
 void sum_data_files(Grid & grid, DataPlane & plane) {
-   int n_vld;
+   int n_vld = 0;
    DataPlane part;
    double v_sum, v_part;
    Grid cur_grid;
@@ -591,14 +588,14 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
    //
    // Search for each file time.
    //
-   for(int i=0, n_vld=0; i<n_files; i++) {
+   for(int i=0; i<n_files; i++) {
 
       //
       // Define the target valid time and initialize.
       //
-      pcp_times.push_back(valid_time - i*in_accum);
-      pcp_recs.push_back(-1);
-      pcp_files.push_back("");
+      pcp_times.emplace_back(valid_time - i*in_accum);
+      pcp_recs.emplace_back(-1);
+      pcp_files.emplace_back("");
 
       //
       // Search in each directory for the current file time.
@@ -723,7 +720,6 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
 
 int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
                    ConcatString & cur_file) {
-   int i_rec;
    struct dirent *dirp = (struct dirent *) nullptr;
    DIR *dp = (DIR *) nullptr;
 
@@ -741,7 +737,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
    //
    // Initialize the record index to not found.
    //
-   i_rec = -1;
+   int i_rec = -1;
 
    //
    // Process each file contained in the directory.
@@ -836,8 +832,6 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
 void do_sub_command() {
    DataPlane plus, minus, diff;
    Grid grid1, grid2;
-   unixtime nc_init_time, nc_valid_time;
-   int i, nxy, nc_accum;
 
    //
    // Check for exactly two input files.
@@ -882,7 +876,7 @@ void do_sub_command() {
    //
    // Output valid time
    //
-   nc_valid_time = plus.valid();
+   unixtime nc_valid_time = plus.valid();
 
    //
    // Check that the initialization times match.
@@ -905,7 +899,7 @@ void do_sub_command() {
          mlog << Debug(3) << cs << "\n";
       }
    }
-   nc_init_time = plus.init();
+   unixtime nc_init_time = plus.init();
 
    //
    // Output accumulation time
@@ -917,7 +911,7 @@ void do_sub_command() {
            << "second (" << sec_to_hhmmss(plus.accum()) << " < "
            << sec_to_hhmmss(minus.accum()) << ") for subtraction.\n\n";
    }
-   nc_accum = plus.accum() - minus.accum();
+   int nc_accum = plus.accum() - minus.accum();
 
    //
    // Initialize.
@@ -927,7 +921,8 @@ void do_sub_command() {
    //
    // Update value for each grid point.
    //
-   for(i=0, nxy=grid1.nx()*grid1.ny(); i<nxy; i++) {
+   int nxy = grid1.nxy();
+   for(int i=0; i<nxy; i++) {
       if(is_bad_data( diff.data()[i]) ||
          is_bad_data(minus.data()[i])) {
          diff.buf()[i] = bad_data_double;
@@ -954,17 +949,14 @@ void do_derive_command() {
    DataPlane cur_dp, der_dp;
    DataPlane min_dp, max_dp, sum_dp, sum_sq_dp, vld_dp;
    MaskPlane mask;
-   unixtime nc_init_time, nc_valid_time;
-   int nc_accum, nc_accum_sum;
-   int i, j, n_skip, nxy, n_vld;
+   unixtime nc_init_time = (unixtime) 0;
+   unixtime nc_valid_time = (unixtime) 0;
+   int nc_accum = 0;
+   int nc_accum_sum = 0;
+   int n_vld = 0;
+   int nxy = 0;
    ConcatString derive_list_css;
    double v;
-
-   //
-   // Initialize
-   //
-   nc_init_time = nc_valid_time = (unixtime) 0;
-   nc_accum = nc_accum_sum = nxy = 0;
 
    //
    // List of all requested field derivations.
@@ -987,7 +979,7 @@ void do_derive_command() {
    //
    // Loop through the input files.
    //
-   for(i=0, n_vld=0; i<n_files; i++) {
+   for(int i=0; i<n_files; i++) {
 
       //
       // Read the current field.
@@ -1006,7 +998,7 @@ void do_derive_command() {
          // Initialize the grid.
          //
          grid = cur_grid;
-         nxy  = grid.nx() * grid.ny();
+         nxy  = grid.nxy();
 
          //
          // Initialize the timing information.
@@ -1070,7 +1062,7 @@ void do_derive_command() {
       //
       // Update sums and counts.
       //
-      for(j=0; j<nxy; j++) {
+      for(int j=0; j<nxy; j++) {
 
          // Get current data value.
          v = cur_dp.data()[j];
@@ -1106,7 +1098,8 @@ void do_derive_command() {
    // Compute the valid data mask, relative the number of valid inputs.
    //
    mask.set_size(grid.nx(), grid.ny());
-   for(j=0, n_skip=0; j<nxy; j++) {
+   int n_skip = 0;
+   for(int j=0; j<nxy; j++) {
       mask.buf()[j] = ((double) vld_dp.data()[j]/n_vld) >= vld_thresh;
       if(!mask.data()[j]) n_skip++;
    }
@@ -1132,7 +1125,7 @@ void do_derive_command() {
    //
    // Loop through the derived fields.
    //
-   for(i=0; i<derive_list.n(); i++) {
+   for(int i=0; i<derive_list.n(); i++) {
 
       //
       // Write the current derived field.
@@ -1151,7 +1144,7 @@ void do_derive_command() {
       }
       else if(strcasecmp(derive_list[i].c_str(), "range") == 0) {
          der_dp = max_dp;
-         for(j=0; j<nxy; j++) {
+         for(int j=0; j<nxy; j++) {
             if(is_bad_data(max_dp.data()[j]) ||
                is_bad_data(min_dp.data()[j])) {
                der_dp.buf()[j] = bad_data_double;
@@ -1165,7 +1158,7 @@ void do_derive_command() {
       }
       else if(strcasecmp(derive_list[i].c_str(), "mean") == 0) {
          der_dp = sum_dp;
-         for(j=0; j<nxy; j++) {
+         for(int j=0; j<nxy; j++) {
             if(is_bad_data(sum_dp.data()[j]) ||
                is_bad_data(vld_dp.data()[j]) ||
                is_eq(vld_dp.data()[j], 0.0)) {
@@ -1180,7 +1173,7 @@ void do_derive_command() {
       }
       else if(strcasecmp(derive_list[i].c_str(), "stdev") == 0) {
          der_dp = sum_dp;
-         for(j=0; j<nxy; j++) {
+         for(int j=0; j<nxy; j++) {
             double s  = sum_dp.data()[j];
             double sq = sum_sq_dp.data()[j];
             double nd  = vld_dp.data()[j];
