@@ -151,6 +151,7 @@ static ConcatString pcp_reg_exp = (string)default_reg_exp;
 
 // Variables for the derive command
 static StringArray  file_list;
+static GrdFileType  file_list_type = FileType_None;
 static StringArray  field_list;
 static StringArray  derive_list;
 
@@ -478,6 +479,11 @@ void process_add_sub_derive_args(const CommandLine & cline) {
    // Store the number of input files.
    //
    n_files = file_list.n();
+
+   //
+   // Determine the type of input files.
+   //
+   file_list_type = parse_file_list_type(file_list);
 
    return;
 }
@@ -1237,7 +1243,12 @@ bool get_field(const char *filename, const char *cur_field,
    ftype = parse_conf_file_type(&config);
 
    //
-   // Check that the file exists.
+   // If not set by the config string, use the file list type.
+   //
+   if(ftype == FileType_None) ftype = file_list_type;
+
+   //
+   // Check for missing non-python input files.
    //
    if(!file_exists(filename) &&
       !is_python_grdfiletype(ftype)) {
