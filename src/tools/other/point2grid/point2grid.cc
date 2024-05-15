@@ -2706,6 +2706,9 @@ static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
         << "]  QC: [" << qc_min_value << " - " << qc_max_value << "]\n";
    if (has_qc_flags) {
       mlog << Debug(log_debug_level)
+           << "   AOD QC: high=" << cnt_aod_qc_high
+           << " medium=" << cnt_aod_qc_medium << ", low=" << cnt_aod_qc_low
+           << ", no_retrieval=" << cnt_aod_qc_nr
            << "\n   ADP QC: high=" << cnt_adjused_high << " (" << cnt_adp_qc_high
            << "), medium=" << cnt_adjused_medium  << " (" << cnt_adp_qc_medium
            << "), low=" << cnt_adjused_low << " (" << cnt_adp_qc_low
