@@ -144,7 +144,7 @@ static void process_data_file();
 static void process_point_file(NcFile *nc_in, MetConfig &config,
                                VarInfo *, const Grid to_grid);
 #ifdef WITH_PYTHON
-static void process_point_python(string python_command, MetConfig &config,
+static void process_point_python(const string python_command, MetConfig &config,
                                  VarInfo *vinfo, const Grid to_grid, bool use_xarray);
 #endif
 static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
@@ -181,7 +181,7 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
 
 static bool keep_message_type(const int mt_index);
 
-static bool has_lat_lon_vars(NcFile *nc_in);
+static bool has_lat_lon_vars(const NcFile *nc_in);
 static void set_adp_gc_values(NcVar var_adp_qc);
 
 ////////////////////////////////////////////////////////////////////////
@@ -201,16 +201,16 @@ static IntArray qc_flags;
 static void process_goes_file(NcFile *nc_in, MetConfig &config,
             VarInfo *, const Grid fr_grid, const Grid to_grid);
 static unixtime find_valid_time(NcVar time_var);
-static ConcatString get_goes_grid_input(MetConfig config, Grid fr_grid, Grid to_grid);
+static ConcatString get_goes_grid_input(MetConfig config, const Grid fr_grid);
 static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid,
                              IntArray *cellMapping, const ConcatString &geostationary_file);
-static int  get_lat_count(NcFile *);
-static int  get_lon_count(NcFile *);
+static int  get_lat_count(const NcFile *);
+static int  get_lon_count(const NcFile *);
 static NcVar get_goes_nc_var(NcFile *nc, const ConcatString &var_name,
                              bool exit_if_error=true);
 static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp);
-static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid);
-static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
+static ConcatString make_geostationary_filename(Grid fr_grid);
+static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
             DataPlane &fr_dp, DataPlane &to_dp,
             Grid fr_grid, Grid to_grid, IntArray *cellMapping, NcFile *nc_adp);
 static void save_geostationary_data(const ConcatString geostationary_file,
@@ -468,7 +468,7 @@ static void process_data_file() {
 
    if (goes_data) {
       mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
-      ConcatString grid_string = get_goes_grid_input(config, fr_grid, to_grid);
+      ConcatString grid_string = get_goes_grid_input(config, fr_grid);
       if (!grid_string.empty()) run_cs << " with " << grid_string;
    }
    mlog << Debug(2) << "Output grid: " << to_grid.serialize() << "\n";
@@ -1183,8 +1183,8 @@ static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
 #ifdef WITH_PYTHON
 
-static void process_point_python(string python_command, MetConfig &config, VarInfo *vinfo,
-                                 const Grid to_grid, bool use_xarray) {
+static void process_point_python(const string python_command, MetConfig &config,
+                                 VarInfo *vinfo, const Grid to_grid, bool use_xarray) {
    clock_t start_clock =  clock();
    static const char *method_name = "process_point_python() -> ";
 
@@ -1681,7 +1681,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    ConcatString tmp_dir = config.get_tmp_dir();
    ConcatString geostationary_file(tmp_dir);
    geostationary_file.add("/");
-   geostationary_file.add(make_geostationary_filename(fr_grid, to_grid));
+   geostationary_file.add(make_geostationary_filename(fr_grid));
 
    // Open ADP file if exists
    if (!adp_filename.empty() && file_exists(adp_filename.c_str())) {
@@ -1792,11 +1792,9 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    } // end for i
 
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc_in);
-   for (auto itVar = mapVar.begin();
-         itVar != mapVar.end(); ++itVar) {
-      if ((*itVar).first == "t"
-            || string::npos != (*itVar).first.find("time")) {
-         NcVar from_var = (*itVar).second;
+   for (const auto &kv : mapVar) {
+      if (kv.first == "t" || string::npos != kv.first.find("time")) {
+         NcVar from_var = kv.second;
          copy_nc_var(nc_out, &from_var);
       }
    }
@@ -2143,13 +2141,13 @@ static unixtime find_valid_time(NcVar time_var) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static ConcatString get_goes_grid_input(MetConfig config, Grid fr_grid, Grid to_grid) {
+static ConcatString get_goes_grid_input(MetConfig config, const Grid fr_grid) {
    ConcatString run_string;
    ConcatString env_coord_name;
    ConcatString tmp_dir = config.get_tmp_dir();
    ConcatString geostationary_file(tmp_dir);
    geostationary_file.add("/");
-   geostationary_file.add(make_geostationary_filename(fr_grid, to_grid));
+   geostationary_file.add(make_geostationary_filename(fr_grid));
    if (get_env(key_geostationary_data, env_coord_name)
        && env_coord_name.nonempty()
        && file_exists(env_coord_name.c_str())) {
@@ -2331,7 +2329,7 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
 
 ////////////////////////////////////////////////////////////////////////
 
-static int get_lat_count(NcFile *_nc) {
+static int get_lat_count(const NcFile *_nc) {
    int lat_count = 0;
    NcDim dim_lat = get_nc_dim(_nc, dim_name_lat);
    if(IS_INVALID_NC(dim_lat)) dim_lat = get_nc_dim(_nc, "y");
@@ -2341,7 +2339,7 @@ static int get_lat_count(NcFile *_nc) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static int get_lon_count(NcFile *_nc) {
+static int get_lon_count(const NcFile *_nc) {
    int lon_count = 0;
    NcDim dim_lon = get_nc_dim(_nc, dim_name_lon);
    if(IS_INVALID_NC(dim_lon)) dim_lon = get_nc_dim(_nc, "x");
@@ -2373,7 +2371,7 @@ static NcVar get_goes_nc_var(NcFile *nc, const ConcatString &var_name,
 ////////////////////////////////////////////////////////////////////////
 
 
-static ConcatString make_geostationary_filename(Grid fr_grid, Grid to_grid) {
+static ConcatString make_geostationary_filename(Grid fr_grid) {
    ConcatString geo_data_filename;
    GridInfo info = fr_grid.info();
 
@@ -2433,7 +2431,7 @@ static bool is_time_mismatch(NcFile *nc_in, NcFile *nc_adp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
+static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
       DataPlane &fr_dp, DataPlane &to_dp,
       Grid fr_grid, Grid to_grid, IntArray *cellMapping, NcFile *nc_adp) {
 
@@ -2828,7 +2826,7 @@ static bool keep_message_type(const int mt_index) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool has_lat_lon_vars(NcFile *nc) {
+static bool has_lat_lon_vars(const NcFile *nc) {
 
    bool has_lat_var = IS_VALID_NC(get_nc_var_lat(nc));
    bool has_lon_var = IS_VALID_NC(get_nc_var_lon(nc));
@@ -2844,7 +2842,7 @@ static bool has_lat_lon_vars(NcFile *nc) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void usage() {
+__attribute__((noreturn)) static void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
