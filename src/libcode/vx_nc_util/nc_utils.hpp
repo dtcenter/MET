@@ -13,6 +13,10 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include "nc_utils_core.h"
+
+////////////////////////////////////////////////////////////////////////
+
 extern bool get_att_value(const netCDF::NcAtt *att, int &att_val);
 extern bool get_att_value(const netCDF::NcAtt *att, ConcatString &value);
 extern bool get_att_value(const netCDF::NcAtt *att, ncbyte &att_val);
