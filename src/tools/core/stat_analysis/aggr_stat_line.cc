@@ -4215,7 +4215,7 @@ double compute_vif(NumArray &na) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_precip_var_name(const ConcatString &s) {
+static bool is_precip_var_name(const ConcatString &s) {
 
    bool match = has_prefix(pinterp_precipitation_names,
                            n_pinterp_precipitation_names, s.c_str()) ||
@@ -4228,7 +4228,7 @@ bool is_precip_var_name(const ConcatString &s) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_vector_dir_stat(const STATLineType &t, const ConcatString &s) {
+static bool is_vector_dir_stat(const STATLineType &t, const ConcatString &s) {
 
    bool match = (t == STATLineType::vl1l2  ||
                  t == STATLineType::val1l2 ||

@@ -99,7 +99,7 @@ ConcatString append_climo_bin(const ConcatString &mask_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_header_row(const char **cols, int n_cols, int hdr_flag,
+void write_header_row(const char * const * cols, int n_cols, int hdr_flag,
                       AsciiTable &at, int r, int c) {
    int i;
 
