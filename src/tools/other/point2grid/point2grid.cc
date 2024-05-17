@@ -40,6 +40,7 @@
 #include "vx_regrid.h"
 #include "vx_util.h"
 #include "vx_statistics.h"
+#include "var_info_nc_cf.h"
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
@@ -159,6 +160,7 @@ static void set_gaussian_dx(const StringArray &);
 static void set_gaussian_radius(const StringArray &);
 
 static unixtime compute_unixtime(NcVar *time_var, unixtime var_value);
+void clear_cell_mapping(IntArray *cell_mapping);
 static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
                              NcVar var_lat, NcVar var_lon, bool *skip_times);
 static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
@@ -414,7 +416,6 @@ void process_data_file() {
       // Get the obs type before opening NetCDF
       obs_type = get_obs_type(nc_in);
       goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
-
       if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
 
       // Read the input data file
@@ -460,7 +461,7 @@ void process_data_file() {
 
    // Build the run command string
    run_cs << "Point obs (" << fr_grid.serialize() << ") to " << to_grid.serialize();
-   
+
    if (goes_data) {
       mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
       ConcatString grid_string = get_goes_grid_input(config, fr_grid, to_grid);
@@ -591,7 +592,7 @@ int get_obs_type(NcFile *nc) {
    ConcatString att_val_project;
    ConcatString input_type;
    static const char *method_name = "get_obs_type() -> ";
-   
+
    bool has_project = get_global_att(nc, (string)"project", att_val_project);
    bool has_scene_id = get_global_att(nc, (string)"scene_id", att_val_scene_id);
    if( has_scene_id && has_project && att_val_project == "GOES" ) {
@@ -743,18 +744,18 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          prob_mask_dp.set_size(nx, ny);
          prob_mask_dp.set_constant(0);
       }
-      
+
       // Loop through the requested fields
       int obs_count_zero_to, obs_count_non_zero_to;
       int obs_count_zero_from, obs_count_non_zero_from;
-      IntArray *cellMapping = (IntArray *) nullptr;
+      auto cellMapping = (IntArray *) nullptr;
 
       obs_count_zero_to = obs_count_non_zero_to = 0;
       obs_count_zero_from = obs_count_non_zero_from = 0;
       for(int i=0; i<FieldSA.n(); i++) {
 
          var_idx_or_gc = -1;
-   
+
          // Initialize
          vinfo->clear();
 
@@ -929,7 +930,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          }
 
          if (cellMapping) {
-            for (idx=0; idx<(nx*ny); idx++) cellMapping[idx].clear();
+            clear_cell_mapping(cellMapping);
             delete [] cellMapping;
          }
          cellMapping = new IntArray[nx * ny];
@@ -1132,6 +1133,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       } // end for i
 
       if (cellMapping) {
+         clear_cell_mapping(cellMapping);
          delete [] cellMapping;   cellMapping = (IntArray *) nullptr;
       }
    }
@@ -1249,8 +1251,35 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    int from_size = fr_grid.nx() * fr_grid.ny();
    static const char *method_name = "process_point_nccf_file() -> ";
 
-   NcVar var_lat = get_nc_var_lat(nc_in);
-   NcVar var_lon = get_nc_var_lon(nc_in);
+   NcVar var_lat;
+   NcVar var_lon;
+   ConcatString lat_vname;
+   ConcatString lon_vname;
+   // Find lat/lon variables from the coordinates attribue
+   if (0 < FieldSA.n()) {
+      ConcatString coordinates_value;
+      VarInfoNcCF var_info = VarInfoNcCF(*(VarInfoNcCF *)vinfo);
+      // Initialize
+      var_info.clear();
+      // Populate the VarInfo object using the config string
+      config.read_string(FieldSA[0].c_str());
+      var_info.set_dict(config);
+      NcVar var_data = get_nc_var(nc_in, var_info.name().c_str());
+      if (get_nc_att_value(&var_data, coordinates_att_name, coordinates_value)) {
+         StringArray sa = coordinates_value.split(" ");
+         ConcatString units;
+         for (int idx=0; idx<sa.n_elements(); idx++) {
+            NcVar nc_var = get_nc_var(nc_in, sa[idx].c_str());
+            if (get_var_units(&nc_var, units)) {
+               if (is_nc_unit_latitude(units.c_str())) var_lat = nc_var;
+               else if (is_nc_unit_longitude(units.c_str())) var_lon = nc_var;
+            }
+         }
+      }
+   }
+   if (IS_INVALID_NC(var_lat)) var_lat = get_nc_var_lat(nc_in);
+   if (IS_INVALID_NC(var_lon)) var_lon = get_nc_var_lon(nc_in);
+
    if (IS_INVALID_NC(var_lat)) {
       mlog << Error << "\n" << method_name
            << "can not find the latitude variable.\n\n";
@@ -1261,7 +1290,7 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
            << "can not find the longitude variable.\n\n";
       exit(1);
    }
-   
+
    // Check for at least one configuration string
    if(FieldSA.n() < 1) {
       mlog << Error << "\n" << method_name
@@ -1269,9 +1298,14 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       usage();
    }
 
+   lat_vname = GET_NC_NAME(var_lat);
+   lon_vname = GET_NC_NAME(var_lon);
+   mlog << Debug(5) << method_name << "Cell mapping from "
+        << lat_vname << " and " << lon_vname << " variables\n";
+
    unixtime valid_time = bad_data_int;
    valid_beg_ut = valid_end_ut = conf_info.valid_time;
-   
+
    NcVar time_var = get_nc_var_time(nc_in);
    if( IS_VALID_NC(time_var) ) {
       if( 1 < get_dim_count(&time_var) ) {
@@ -1304,6 +1338,7 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       else valid_time = find_valid_time(time_var);
    }
    to_dp.set_size(to_grid.nx(), to_grid.ny());
+   IntArray *var_cell_mapping = nullptr;
    IntArray *cellMapping = new IntArray[to_grid.nx() * to_grid.ny()];
    get_grid_mapping(fr_grid, to_grid, cellMapping, var_lat, var_lon, skip_times);
    if( skip_times ) delete [] skip_times;
@@ -1319,10 +1354,42 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       config.read_string(FieldSA[i].c_str());
       vinfo->set_dict(config);
 
+      NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
+      ConcatString coordinates_value;
+      if (get_nc_att_value(&var_data, coordinates_att_name, coordinates_value)) {
+         StringArray sa = coordinates_value.split(" ");
+         int count = sa.n_elements();
+         if (count >= 2) {
+            bool match_lat = false;
+            bool match_lon = false;
+            for (int idx=0; idx<count; idx++) {
+               if (lat_vname == sa[idx]) match_lat = true;
+               if (lon_vname == sa[idx]) match_lon = true;
+            }
+            if (!match_lat && !match_lon) {
+               NcVar v_lat;
+               NcVar v_lon;
+               ConcatString units;
+               for (int idx=0; idx<count; idx++) {
+                  NcVar nc_var = get_nc_var(nc_in, sa[idx].c_str());
+                  if (get_var_units(&nc_var, units)) {
+                     if (is_nc_unit_latitude(units.c_str())) v_lat = nc_var;
+                     else if (is_nc_unit_longitude(units.c_str())) v_lon = nc_var;
+                  }
+               }
+               var_cell_mapping = new IntArray[to_grid.nx() * to_grid.ny()];
+               get_grid_mapping(fr_grid, to_grid, var_cell_mapping, v_lat, v_lon, skip_times);
+               mlog << Debug(4) << method_name << "Override cell mapping from "
+                    << GET_NC_NAME(v_lat) << " and " << GET_NC_NAME(v_lon) << "\n";
+            }
+         }
+      }
+
       to_dp.erase();
       to_dp.set_init(valid_time);
       to_dp.set_valid(valid_time);
-      regrid_nc_variable(nc_in, fr_mtddf, vinfo, fr_dp, to_dp, to_grid, cellMapping);
+      regrid_nc_variable(nc_in, fr_mtddf, vinfo, fr_dp, to_dp, to_grid,
+                         (nullptr != var_cell_mapping ? var_cell_mapping: cellMapping));
 
       // List range of data values
       if(mlog.verbosity_level() >= 2) {
@@ -1346,7 +1413,6 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       write_nc(to_dp, to_grid, vinfo, vname.c_str());
 
       NcVar to_var = get_nc_var(nc_out, vname.c_str());
-      NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
 
       bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
       if (has_prob_thresh || do_gaussian_filter) {
@@ -1386,8 +1452,15 @@ void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
          }
       }
 
+      if (nullptr != var_cell_mapping) {
+         clear_cell_mapping(var_cell_mapping);
+         delete [] var_cell_mapping;
+         var_cell_mapping = nullptr;
+      }
+
    } // end for i
 
+   clear_cell_mapping(cellMapping);
    delete [] cellMapping;
    cellMapping = (IntArray *) nullptr;
    if( 0 < filtered_by_time ) {
@@ -1409,7 +1482,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                         Grid to_grid, IntArray *cellMapping) {
 
    int to_cell_cnt = 0;
-   clock_t start_clock =  clock();
+   clock_t start_clock = clock();
    Grid fr_grid = fr_mtddf->grid();
    static const char *method_name = "regrid_nc_variable() -> ";
 
@@ -1420,7 +1493,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
            << InputFilename << "\"\n\n";
       exit(1);
    }
-   
+
    int from_lat_cnt = fr_grid.ny();
    int from_lon_cnt = fr_grid.nx();
    int from_data_size = from_lat_cnt * from_lon_cnt;
@@ -1455,10 +1528,10 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       float from_max_value = -10e10;
       int to_lat_cnt = to_grid.ny();
       int to_lon_cnt = to_grid.nx();
-      
+
       missing_cnt = non_missing_cnt = 0;
       to_dp.set_constant(bad_data_double);
-      
+
       for (int xIdx=0; xIdx<to_lon_cnt; xIdx++) {
          for (int yIdx=0; yIdx<to_lat_cnt; yIdx++) {
             int offset = to_dp.two_to_one(xIdx,yIdx);
@@ -1473,7 +1546,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                      missing_cnt++;
                      continue;
                   }
-      
+
                   dataArray.add(data_value);
                   non_missing_cnt++;
                   if(mlog.verbosity_level() >= 4) {
@@ -1495,7 +1568,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                         to_value = (to_value + dataArray[(data_cnt/2)+1])/2;
                   }
                   else to_value = dataArray.sum() / data_cnt;    // UW_Mean
-      
+
                   to_dp.set(to_value, xIdx, yIdx);
                   to_cell_cnt++;
                   if(mlog.verbosity_level() >= 9) {
@@ -1522,9 +1595,9 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
             }
          }
       }
-      
+
       delete [] from_data;
-      
+
       mlog << Debug(4) << method_name << "[Count] data cells: " << to_cell_cnt
            << ", missing: " << missing_cnt << ", non_missing: " << non_missing_cnt
            << ", non mapped cells: " << no_map_cnt
@@ -1534,7 +1607,7 @@ void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    }
 
    if (to_cell_cnt == 0) {
-      mlog << Warning << "\n" << method_name 
+      mlog << Warning << "\n" << method_name
            << " There are no matching cells between input and the target grid.\n\n";
    }
 
@@ -1817,7 +1890,8 @@ void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    }
    //copy_nc_atts(_nc_in, nc_out, opt_all_attrs);
 
-   delete nc_adp; nc_adp = 0;
+   delete nc_adp; nc_adp = nullptr;
+   clear_cell_mapping(cellMapping);
    delete [] cellMapping;   cellMapping = (IntArray *) nullptr;
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
@@ -1863,6 +1937,14 @@ void check_lat_lon(int data_size, float  *latitudes, float  *longitudes) {
         << cnt_bad_lat << ", lon: " << cnt_bad_lon << "\n"
         << method_name << "LAT: " << min_lat << " to " << max_lat << "\n"
         << method_name << "LONG: " << min_lon << " to " << max_lon << "\n";
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void clear_cell_mapping(IntArray *cell_mapping) {
+   if (nullptr != cell_mapping) {
+      for (int idx=0; idx<cell_mapping->n(); idx++) cell_mapping[idx].clear();
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1966,7 +2048,7 @@ static void get_grid_mapping_latlon(
 
    to_grid.xy_to_latlon(0, 0, to_ll_lat, to_ll_lon);
    mlog << Debug(5) << method_name << " to_grid ll corner: (" << to_ll_lon << ", " << to_ll_lat << ")\n";
-   
+
    //Count the number of cells to be mapped to TO_GRID
    //Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
    for (int yIdx=0; yIdx<from_lat_count; yIdx++) {
@@ -2112,7 +2194,7 @@ static unixtime find_valid_time(NcVar time_var) {
 
    if( IS_VALID_NC(time_var) || get_dim_count(&time_var) < 2) {
       int time_count = get_dim_size(&time_var, 0);
-      
+
       double time_values [time_count + 1];
       if (get_nc_data(&time_var, time_values)) {
          valid_time = compute_unixtime(&time_var, time_values[0]);
