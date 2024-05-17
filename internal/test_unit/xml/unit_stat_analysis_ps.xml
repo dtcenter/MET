@@ -38,6 +38,8 @@
       <stat>&OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT_agg_stat_mpr_to_wdir_dump.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT_filter_mpr_sid.stat</stat>
       <stat>&OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT_filter_mpr_fcst_minus_obs.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT_agg_vl1l2.stat</stat>
+      <stat>&OUTPUT_DIR;/stat_analysis_ps/CONFIG_POINT_STAT_agg_stat_vl1l2_to_vcnt.stat</stat>
     </output>
   </test>
 
