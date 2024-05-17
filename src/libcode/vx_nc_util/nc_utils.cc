@@ -877,14 +877,12 @@ void add_att(NcVar *var, const string &att_name, const double att_val) {
 
 int get_var_names(NcFile *nc, StringArray *var_names) {
 
-   NcVar var;
    int i = 0;
    int var_count = nc->getVarCount();
 
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
-   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
-        it_var != mapVar.end(); ++it_var) {
-      var = (*it_var).second;
+   for (auto &kv : mapVar) {
+      NcVar var = kv.second;
       var_names->add(var.getName());
       i++;
    }
@@ -3307,22 +3305,21 @@ bool is_nc_name_time(const ConcatString name) {
 ////////////////////////////////////////////////////////////////////////
 
 bool is_nc_attr_lat(const ConcatString name) {
-   bool is_latitude = (is_nc_name_lat(name) || name == "x" || name == "X");
+   bool is_latitude = (is_nc_name_lat(name) || name == "y" || name == "Y");
    return is_latitude;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool is_nc_attr_lon(const ConcatString name) {
-   bool is_longitude = (is_nc_name_lon(name) || name == "y" || name == "Y");
+   bool is_longitude = (is_nc_name_lon(name) || name == "x" || name == "X");
    return is_longitude;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool is_nc_attr_time(const ConcatString name) {
-   bool is_time = (is_nc_name_time(name) || name == "T");
-   return is_time;
+   return is_nc_name_time(name);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3330,30 +3327,48 @@ bool is_nc_attr_time(const ConcatString name) {
 NcVar get_nc_var_lat(const NcFile *nc) {
    NcVar var;
    bool found = false;
+   int max_dim_cnt = 0;
+   ConcatString att_val;
+   ConcatString coordinates_att;
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
    static const char *method_name = "get_nc_var_lat() ";
 
-   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
-        it_var != mapVar.end(); ++it_var) {
-      ConcatString name = (*it_var).first;
-      //if (is_nc_name_lat(name)) found = true;
-      if (get_var_standard_name(&(*it_var).second, name)) {
-         if (is_nc_name_lat(name)) found = true;
+   for (const auto &kv : mapVar) {
+      ConcatString name = kv.first;
+      if (is_nc_name_lat(name)) found = true;
+      if (!found && get_var_standard_name(&kv.second, att_val)) {
+         if (is_nc_name_lat(att_val)) found = true;
       }
-      if (!found && get_var_units(&(*it_var).second, name)) {
-         if (is_nc_unit_latitude(name.c_str())) {
-            if (get_nc_att_value(&(*it_var).second, axis_att_name, name)) {
-               if (is_nc_attr_lat(name)) found = true;
-            }
-            else if (get_nc_att_value(&(*it_var).second,
-                                      coordinate_axis_type_att_name, name)) {
-               if (is_nc_attr_lat(name)) found = true;
-            }
+      if (!found && get_var_units(&kv.second, att_val)
+          && is_nc_unit_latitude(att_val.c_str())) {
+         if (get_nc_att_value(&kv.second, axis_att_name, att_val)) {
+            if (is_nc_attr_lat(att_val)) found = true;
+         }
+         else if (get_nc_att_value(&kv.second,
+                                   coordinate_axis_type_att_name, att_val)) {
+            if (is_nc_attr_lat(att_val)) found = true;
          }
       }
       if (found) {
-         var = (*it_var).second;
+         var = kv.second;
          break;
+      }
+      int dim_count = GET_NC_DIM_COUNT(kv.second);
+      if (dim_count > max_dim_cnt) {
+         max_dim_cnt = dim_count;
+         if (get_nc_att_value(&kv.second, coordinates_att_name, att_val)) coordinates_att = att_val;
+      }
+   }
+
+   if (!found && !coordinates_att.empty()) {
+      StringArray coord_names = coordinates_att.split(" ");
+      for (int i=0; i< coord_names.n(); i++) {
+         NcVar var_lat = get_nc_var((NcFile *)nc, coord_names[i].c_str());
+         if (get_var_units(&var_lat, att_val) && is_nc_unit_latitude(att_val.c_str())) {
+            found = true;
+            var = var_lat;
+            break;
+         }
       }
    }
 
@@ -3372,30 +3387,49 @@ NcVar get_nc_var_lat(const NcFile *nc) {
 NcVar get_nc_var_lon(const NcFile *nc) {
    NcVar var;
    bool found = false;
+   int max_dim_cnt = 0;
+   ConcatString att_val;
+   ConcatString coordinates_att;
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
    static const char *method_name = "get_nc_var_lon() ";
 
-   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
-        it_var != mapVar.end(); ++it_var) {
-      ConcatString name = (*it_var).first;
-      //if (is_nc_name_lon(name)) found = true;
-      if (get_var_standard_name(&(*it_var).second, name)) {
-         if (is_nc_name_lon(name)) found = true;
+   for (const auto &kv : mapVar) {
+      ConcatString name = kv.first;
+      if (is_nc_name_lon(name)) found = true;
+      if (!found && get_var_standard_name(&kv.second, att_val)) {
+         if (is_nc_name_lon(att_val)) found = true;
       }
-      if (!found && get_var_units(&(*it_var).second, name)) {
-         if (is_nc_unit_longitude(name.c_str())) {
-            if (get_nc_att_value(&(*it_var).second, axis_att_name, name)) {
-               if (is_nc_attr_lon(name)) found = true;
-            }
-            else if (get_nc_att_value(&(*it_var).second,
-                                      coordinate_axis_type_att_name, name)) {
-               if (is_nc_attr_lon(name)) found = true;
-            }
+      if (!found && get_var_units(&kv.second, att_val)
+          && is_nc_unit_longitude(att_val.c_str())) {
+         if (get_nc_att_value(&kv.second, axis_att_name, att_val)) {
+            if (is_nc_attr_lon(att_val)) found = true;
+         }
+         else if (get_nc_att_value(&kv.second,
+                                   coordinate_axis_type_att_name, att_val)) {
+            if (is_nc_attr_lon(att_val)) found = true;
          }
       }
       if (found) {
-         var = (*it_var).second;
+         var = kv.second;
          break;
+      }
+
+      int dim_count = GET_NC_DIM_COUNT(kv.second);
+      if (dim_count > max_dim_cnt) {
+         max_dim_cnt = dim_count;
+         if (get_nc_att_value(&kv.second, coordinates_att_name, att_val)) coordinates_att = att_val;
+      }
+   }
+
+   if (!found && !coordinates_att.empty()) {
+      StringArray coord_names = coordinates_att.split(" ");
+      for (int i=0; i< coord_names.n(); i++) {
+         NcVar var_lon = get_nc_var((NcFile *)nc, coord_names[i].c_str());
+         if (get_var_units(&var_lon, att_val) && is_nc_unit_longitude(att_val.c_str())) {
+            found = true;
+            var = var_lon;
+            break;
+         }
       }
    }
 
@@ -3414,32 +3448,50 @@ NcVar get_nc_var_lon(const NcFile *nc) {
 NcVar get_nc_var_time(const NcFile *nc) {
    NcVar var;
    bool found = false;
+   int max_dim_cnt = 0;
+   ConcatString att_val;
+   ConcatString coordinates_att;
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
    static const char *method_name = "get_nc_var_time() ";
 
-   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
-        it_var != mapVar.end(); ++it_var) {
-      ConcatString name = (*it_var).first;
-      //if (is_nc_name_time(name)) found = true;
-      if (get_var_standard_name(&(*it_var).second, name)) {
-         if (is_nc_name_time(name)) found = true;
+   for (auto &kv : mapVar) {
+      ConcatString name = kv.first;
+      if (!found && is_nc_name_time(name)) found = true;
+      if (get_var_standard_name(&kv.second, att_val)) {
+         if (is_nc_name_time(att_val)) found = true;
          mlog << Debug(7) << method_name << "checked variable \""
            << name << "\"  is_time: " << found << "\n";
       }
-      if (!found && get_var_units(&(*it_var).second, name)) {
-         if (is_nc_unit_time(name.c_str())) {
-            if (get_nc_att_value(&(*it_var).second, axis_att_name, name)) {
-               if (is_nc_attr_time(name)) found = true;
-            }
-            else if (get_nc_att_value(&(*it_var).second,
-                                      coordinate_axis_type_att_name, name)) {
-               if (is_nc_attr_time(name)) found = true;
-            }
+      if (!found && get_var_units(&kv.second, att_val)
+          && is_nc_unit_time(att_val.c_str())) {
+         if (get_nc_att_value(&kv.second, axis_att_name, att_val)) {
+            if (is_nc_attr_time(att_val)) found = true;
+         }
+         else if (get_nc_att_value(&kv.second,
+                                   coordinate_axis_type_att_name, att_val)) {
+            if (is_nc_attr_time(att_val)) found = true;
          }
       }
       if (found) {
-         var = (*it_var).second;
+         var = kv.second;
          break;
+      }
+      int dim_count = GET_NC_DIM_COUNT(kv.second);
+      if (dim_count > max_dim_cnt) {
+         max_dim_cnt = dim_count;
+         if (get_nc_att_value(&kv.second, coordinates_att_name, att_val)) coordinates_att = att_val;
+      }
+   }
+
+   if (!found && !coordinates_att.empty()) {
+      StringArray coord_names = coordinates_att.split(" ");
+      for (int i=0; i< coord_names.n(); i++) {
+         NcVar var_time = get_nc_var((NcFile *)nc, coord_names[i].c_str());
+         if (get_var_units(&var_time, att_val) && is_nc_unit_time(att_val.c_str())) {
+            found = true;
+            var = var_time;
+            break;
+         }
       }
    }
 
@@ -3478,10 +3530,8 @@ NcFile *open_ncfile(const char * nc_name, bool write) {
 // Implement the old API var->num_vals()
 
 int get_data_size(NcVar *var) {
-   int dimCount = 0;
    int data_size = 1;
-
-   dimCount = var->getDimCount();
+   int dimCount = var->getDimCount();
    for (int i=0; i<dimCount; i++) {
       data_size *= var->getDim(i).getSize();
    }
