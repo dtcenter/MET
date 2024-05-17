@@ -674,3 +674,11 @@ long MetNcCFDataFile::convert_value_to_offset(double z_value, string z_dim_name)
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+Grid MetNcCFDataFile::build_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
+                                            const long lat_counts, const long lon_counts) {
+   return (nullptr != _file) ? _file->build_grid_from_lat_lon_vars(lat_var, lon_var, lat_counts, lon_counts) : grid();
+}
+
+
+////////////////////////////////////////////////////////////////////////
