@@ -19,6 +19,8 @@ setenv MET_ROOT $base/$ver
 
 prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/scratch1/BMC/dtc/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin
 
+setenv MET_PYTHON_EXE /scratch1/BMC/dtc/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin/python
+
 #setenv METversion $ver
 #setenv MET_CONFIG $share/config
 #setenv MET_POLY $share/poly

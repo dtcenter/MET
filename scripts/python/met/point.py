@@ -185,7 +185,7 @@ class met_base_point(met_base):
    #   return met_point_tools.convert_to_ndarray(value_list)
 
    def dump(self):
-      met_base_point.print_point_data(self.get_point_data())
+      met_point_tools.print_point_data(self.get_point_data())
 
    def get_count_string(self):
       return f' nobs={self.nobs} nhdr={self.nhdr} ntyp={self.nhdr_typ} nsid={self.nhdr_sid} nvld={self.nhdr_vld} nqty={self.nobs_qty} nvar={self.nobs_var}'

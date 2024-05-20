@@ -192,11 +192,13 @@ static void finish_txt_files();
 static void clean_up();
 
 static void usage();
-static void set_config(const StringArray &);
 static void set_outdir(const StringArray &);
 static void set_compress(const StringArray &);
 static bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
                             const ConcatString &filename);
+#ifdef WITH_UGRID
+static void set_ugrid_config(const StringArray &);
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -248,6 +250,9 @@ void process_command_line(int argc, char **argv) {
    // Add the options function calls
    cline.add(set_outdir,   "-outdir",   1);
    cline.add(set_compress, "-compress", 1);
+#ifdef WITH_UGRID
+   cline.add(set_ugrid_config, "-ugrid_config",        1);
+#endif
 
    // Parse the command line
    cline.parse();
@@ -271,7 +276,9 @@ void process_command_line(int argc, char **argv) {
 
    // Read the config files
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
-   conf_info.read_configs(config_files);
+#ifdef WITH_UGRID
+   conf_info.read_ugrid_configs(ugrid_config_files, config_file.c_str());
+#endif
 
    // Get the forecast and observation file types from config, if present
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
@@ -3094,6 +3101,9 @@ void usage() {
         << "\tfcst_file\n"
         << "\tobs_file\n"
         << "\tconfig_file\n"
+#ifdef WITH_UGRID
+        << "\t[-ugrid_config config_file]\n"
+#endif
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
@@ -3108,8 +3118,10 @@ void usage() {
         << "\t\t\"config_file\" is a GridStatConfig file containing "
         << "the desired configuration settings (required).\n"
 
-        << "\t\t\"-config config_file\" specifies additional PointStatConfig file containing "
-        << "the configuration settings for unstructured grid (optional).\n"
+#ifdef WITH_UGRID
+        << "\t\t\"-ugrid_config ugrid_config_file\" is a UGridConfig file containing "
+        << "the desired configuration settings for unstructured grid (required only for UGrid)\n"
+#endif
 
         << "\t\t\"-outdir path\" overrides the default output directory "
         << "(" << out_dir << ") (optional).\n"
@@ -3128,10 +3140,12 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray & a)
+#ifdef WITH_UGRID
+void set_ugrid_config(const StringArray & a)
 {
-   config_files.add(a[0]);
+   ugrid_config_files.add(a[0]);
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 

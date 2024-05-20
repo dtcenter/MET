@@ -108,7 +108,7 @@ static StringArray  obs_file;
 
 // Input Config file
 static ConcatString      config_file;
-static StringArray       config_files;
+static StringArray       ugrid_config_files;
 static PointStatConfInfo conf_info;
 
 // Optional arguments

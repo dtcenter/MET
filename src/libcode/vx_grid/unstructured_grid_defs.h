@@ -36,14 +36,14 @@ struct UnstructuredData {
 
    const char * name;   //  not allocated
 
-   int Nface;
-   int Nedge;
-   int Nnode;
+   int n_face;
+   int n_edge;
+   int n_node;
    double max_distance_km;  // This should be set after calling set_points()
    double lat_checksum;
    double lon_checksum;
 
-   std::vector<atlas::PointLonLat> pointLonLat;
+   std::vector<atlas::PointLonLat> point_lonlat;
    atlas::util::IndexKDTree *kdtree;
 
    UnstructuredData();
