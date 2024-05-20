@@ -68,7 +68,6 @@ using namespace std;
 static bool  is_precip_var_name(const ConcatString &s);
 static const string case_str = "CASE";
 static bool  is_vector_dir_stat(const STATLineType &t, const ConcatString &s);
-static const string dir_stat_str = "DIR_";
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -4233,7 +4232,9 @@ static bool is_vector_dir_stat(const STATLineType &t, const ConcatString &s) {
    bool match = (t == STATLineType::vl1l2  ||
                  t == STATLineType::val1l2 ||
                  t == STATLineType::vcnt)  &&
-                 s.startswith(dir_stat_str.c_str());
+                (s.startswith("DIR_ME")    ||
+                 s.startswith("DIR_MAE")   ||
+                 s.startswith("DIR_MSE"));
 
    return match;
 }
