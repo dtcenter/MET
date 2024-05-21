@@ -763,7 +763,7 @@ void print_met_data(MetPointObsData *obs_data, MetPointHeader *header_data,
         << header_data->vld_idx_array.n()  << ", lat="
         << header_data->lat_array.n()      << ", lon="
         << header_data->lon_array.n()      << ", elv="
-        << header_data->elv_array.n()      << ",  message_type="
+        << header_data->elv_array.n()      << ", message_type="
         << header_data->typ_array.n()      << ", station_id="
         << header_data->sid_array.n()      << ", valid_time="
         << header_data->vld_array.n()      << ", prpt="
