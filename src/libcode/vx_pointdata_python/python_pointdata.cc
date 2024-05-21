@@ -351,6 +351,7 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
       vld_time = obs.getValidTime();
       if ( !header_data->vld_num_array.has(vld_time, vld_idx) )  {
          header_data->vld_num_array.add(vld_time);
+         header_data->vld_array.add(obs.getValidTimeString());
          header_data->vld_num_array.has(vld_time, vld_idx);
       }
 
@@ -363,7 +364,6 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
          header_data->sid_idx_array.add(sid);
          header_data->typ_idx_array.add(typ_idx);
          header_data->vld_idx_array.add(vld_idx);
-         header_data->vld_array.add(obs.getValidTimeString());
 
          prev_lat = lat;
          prev_lon = lon;
@@ -774,7 +774,7 @@ void print_met_data(MetPointObsData *obs_data, MetPointHeader *header_data,
 
    log_count = (header_data->hdr_count > min_count) ? min_count : header_data->hdr_count;
    mlog << Debug(debug_level) << method_name
-        << "header_data: message_type,station_id,time_time,lat,lon.elv\n";
+        << "header_data: message_type,station_id,time_time,lat,lon,elv\n";
    for (int idx=0; idx<log_count; idx++) {
       mlog << Debug(debug_level)
            << "  header_data[" << idx << "] = "
@@ -869,7 +869,7 @@ void print_met_data(MetPointObsData *obs_data, MetPointHeader *header_data,
 
    log_count = (obs_data->obs_cnt > min_count) ? min_count : obs_data->obs_cnt;
    mlog << Debug(debug_level) << "\n" << method_name
-        << "obs_data: hid,vid.level,height,value,qty\n";
+        << "obs_data: hid,vid,level,height,value,qty\n";
    for (int idx=0; idx<log_count; idx++) {
       mlog << Debug(debug_level)
            << "     obs_data[" << idx << "] = "
