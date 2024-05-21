@@ -1047,6 +1047,8 @@ to be verified. This dictionary may include the following entries:
                                   single model level.
        file_type = NETCDF_NCCF;   NetCDF following the Climate Forecast
                                   (CF) convention.
+       file_type = NETCDF_UGRID;  NetCDF containing data on an
+                                  unstructured grid.
        file_type = PYTHON_NUMPY;  Run a Python script to load data into
                                   a NumPy array.
        file_type = PYTHON_XARRAY; Run a Python script to load data into

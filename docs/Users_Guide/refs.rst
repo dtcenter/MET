@@ -10,6 +10,14 @@ References
 |   Atlantic Basin. *Weather and Forecasting*,  13, 1005-1015.
 |
 
+.. _Adams-2019:
+
+| Adams, S. V., R. W. Ford, M. Hambley, J.M. Hobson, I. Kavčič, C. M. Maynard,
+|   T. Melvin, E. H. Müller, S. Mullerworth, A. R. Porter, M. Rezny, B. J. Shipway,
+|   and R. Wong, 2019: LFRic: Meeting the challenges of scalability and performance
+|   portability in Weather and Climate models. *Journal of Parallel and Distributed Computing*,
+|   **132**, 383-396, doi: https://doi.org/10.1016/j.jpdc.2019.02.007.
+
 .. _Ahijevych-2009:
 
 | Ahijevych, D., E. Gilleland, B.G. Brown, and E.E. Ebert, 2009: Application of
@@ -331,6 +339,14 @@ References
 | Schwartz C. and Sobash R., 2017: Generating Probabilistic Forecasts from
 |   Convection-Allowing Ensembles Using Neighborhood Approaches: A Review
 |   and Recommendations. *Monthly Weather Review*, 145, 3397-3418.
+|
+
+.. _Skamarock-2012:
+
+| Skamarock, W. C., J. B. Klemp, M. G. Duda, L. D. Fowler, S. Park, and 
+|   T. Ringler, 2012: A Multiscale Nonhydrostatic Atmospheric Model Using
+|   Centroidal Voronoi Tesselations and C-Grid Staggering. *Mon. Wea. Rev.*,
+|   **140**, 3090-3105, doi: https://doi.org/10.1175/MWR-D-11-00215.1.
 |
 
 .. _Stephenson-2000:
