@@ -1574,12 +1574,12 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                mlog << Debug(REJECT_DEBUG_LEVEL)
                     << "For " << fcst_info->magic_str() << " versus "
-                    << obs_info->magic_str() << ", "
-                    << pd[i][0][0].msg_typ << " message type, "
-                    << pd[0][j][0].mask_name << " masking region, and "
+                    << obs_info->magic_str() << ", for observation type "
+                    << pd[i][0][0].msg_typ << ", over region "
+                    << pd[0][j][0].mask_name << ", for interpolation method "
                     << interpmthd_to_string(pd[0][0][k].interp_mthd) << "("
                     << pd[0][0][k].interp_wdth * pd[0][0][k].interp_wdth
-                    << ") interpolation method, adding observation:\n"
+                    << "), using observation:\n"
                     << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
                                            hdr_ut, obs_qty, obs_arr, var_name)
                     << "\n";
