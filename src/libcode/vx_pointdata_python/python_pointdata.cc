@@ -351,9 +351,10 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
       // get valid time index
       vld_time = obs.getValidTime();
       if ( !header_data->vld_num_array.has(vld_time, vld_idx) )  {
-         header_data->vld_num_array.add(vld_time);
+         // MET #2897 keep vld_array and vld_num_array in sync
          header_data->vld_array.add(obs.getValidTimeString());
-         header_data->vld_num_array.has(vld_time, vld_idx);
+         header_data->vld_num_array.add(vld_time);
+         vld_idx = header_data->vld_num_array.n() - 1;
       }
 
       if (!is_eq(prev_lat, lat) || !is_eq(prev_lon, lon) || !is_eq(prev_elv, elv)
