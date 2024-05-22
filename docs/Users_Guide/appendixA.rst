@@ -121,6 +121,11 @@ Q. How can I understand the number of matched pairs?
      in the configuration file. So all of the 1166 observations are rejected
      for the same reason.
 
+     In addition, running point_stat with at least verbosity level 9 (-v 9)
+     will result in a log message being printed to explain why each
+     observation is skipped or retained for each verification task.
+     This level of detail is intended only for debugging purposes.
+
 Q. What types of NetCDF files can MET read?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
