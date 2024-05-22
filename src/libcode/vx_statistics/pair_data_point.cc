@@ -29,6 +29,8 @@
 
 using namespace std;
 
+static const int REJECT_DEBUG_LEVEL = 9;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Code for class PairDataPoint
@@ -992,33 +994,88 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Check the station ID inclusion and exclusion lists
    if((sid_inc_filt.n() && !sid_inc_filt.has(hdr_sid_str)) ||
       (sid_exc_filt.n() &&  sid_exc_filt.has(hdr_sid_str))) {
+
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str()
+              << ", skipping observation station id:\n"
+              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                     hdr_ut, obs_qty, obs_arr, var_name)
+              << "\n";
+      }
+
       rej_sid++;
       return;
    }
-   
+
    // Check whether the GRIB code for the observation matches
    // the specified code
    if((var_name != 0) && (0 < strlen(var_name))) {
       if(var_name != obs_info->name()) {
+
+         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+            mlog << Debug(REJECT_DEBUG_LEVEL)
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str()
+                 << ", skipping observation variable name:\n"
+                 << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                        hdr_ut, obs_qty, obs_arr, var_name)
+                 << "\n";
+         }
+
          rej_var++;
          return;
       }
    }
    else if(obs_info->code() != nint(obs_arr[1])) {
+
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str()
+              << ", skipping observation variable GRIB code:\n"
+              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                     hdr_ut, obs_qty, obs_arr, var_name)
+              << "\n";
+      }
+
       rej_var++;
       return;
    }
-   
+
    // Check the observation quality include and exclude options
    if((obs_qty_inc_filt.n() > 0 && !obs_qty_inc_filt.has(obs_qty)) ||
       (obs_qty_exc_filt.n() > 0 &&  obs_qty_exc_filt.has(obs_qty))) {
+
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str()
+              << ", skipping observation quality control string:\n"
+              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                     hdr_ut, obs_qty, obs_arr, var_name)
+              << "\n";
+      }
+
       rej_qty++;
       return;
    }
-   
+
    // Check whether the observation time falls within the valid time
    // window
    if(hdr_ut < beg_ut || hdr_ut > end_ut) {
+
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str()
+              << ", skipping observation valid time:\n"
+              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                     hdr_ut, obs_qty, obs_arr, var_name)
+              << "\n";
+      }
+
       rej_vld++;
       return;
    }
@@ -1043,13 +1100,17 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
    // Check whether the observation value contains valid data
    if(is_bad_data(obs_v)) {
-      mlog << Debug(4)
-           << "For " << fcst_info->magic_str() << " versus "
-           << obs_info->magic_str()
-           << ", skipping observation with bad data value:\n"
-           << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                  hdr_ut, obs_qty, obs_arr, var_name)
-           << "\n";
+
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str()
+              << ", skipping observation with bad data value:\n"
+              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                     hdr_ut, obs_qty, obs_arr, var_name)
+              << "\n";
+      }
+
       rej_obs++;
       return;
    }
@@ -1063,15 +1124,18 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    if(((x < 0 || x >= gr.nx()) && !gr.wrap_lon()) ||
         y < 0 || y >= gr.ny()) {
 
-      mlog << Debug(4)
-           << "For " << fcst_info->magic_str() << " versus "
-           << obs_info->magic_str()
-           << ", skipping observation off the grid where (x, y) = ("
-           << x << ", " << y << ") and grid (nx, ny) = (" << gr.nx()
-           << ", " << gr.ny() << "):\n"
-           << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                  hdr_ut, obs_qty, obs_arr, var_name)
-           << "\n";
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str()
+              << ", skipping observation off the grid where (x, y) = ("
+              << x << ", " << y << ") and grid (nx, ny) = (" << gr.nx()
+              << ", " << gr.ny() << "):\n"
+              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                     hdr_ut, obs_qty, obs_arr, var_name)
+              << "\n";
+      }
+
       rej_grd++;
       return;
    }
@@ -1088,32 +1152,40 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
       // Skip bad topography values
       if(is_bad_data(hdr_elv) || is_bad_data(topo)) {
-         mlog << Debug(4)
-              << "For " << fcst_info->magic_str() << " versus "
-              << obs_info->magic_str()
-              << ", skipping observation due to bad topography values "
-              << "where observation elevation = " << hdr_elv
-              << " and model topography = " << topo << ":\n"
-              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                     hdr_ut, obs_qty, obs_arr, var_name)
-              << "\n";
+
+         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+            mlog << Debug(REJECT_DEBUG_LEVEL)
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str()
+                 << ", skipping observation due to bad topography values "
+                 << "where observation elevation = " << hdr_elv
+                 << " and model topography = " << topo << ":\n"
+                 << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                        hdr_ut, obs_qty, obs_arr, var_name)
+                 << "\n";
+         }
+
          rej_topo++;
          return;
       }
 
       // Check the topography difference threshold
       if(!sfc_info.topo_use_obs_thresh.check(topo - hdr_elv)) {
-         mlog << Debug(4)
-              << "For " << fcst_info->magic_str() << " versus "
-              << obs_info->magic_str()
-              << ", skipping observation due to topography difference "
-              << "where observation elevation (" << hdr_elv
-              << ") minus model topography (" << topo << ") = "
-              << topo - hdr_elv << " is not "
-              << sfc_info.topo_use_obs_thresh.get_str() << ":\n"
-              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                     hdr_ut, obs_qty, obs_arr, var_name)
-              << "\n";
+
+         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+            mlog << Debug(REJECT_DEBUG_LEVEL)
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str()
+                 << ", skipping observation due to topography difference "
+                 << "where observation elevation (" << hdr_elv
+                 << ") minus model topography (" << topo << ") = "
+                 << topo - hdr_elv << " is not "
+                 << sfc_info.topo_use_obs_thresh.get_str() << ":\n"
+                 << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                        hdr_ut, obs_qty, obs_arr, var_name)
+                 << "\n";
+         }
+
          rej_topo++;
          return;
       }
@@ -1125,6 +1197,17 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
       if(obs_lvl < obs_info->level().lower() ||
          obs_lvl > obs_info->level().upper()) {
+
+         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+            mlog << Debug(REJECT_DEBUG_LEVEL)
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str()
+                 << ", skipping observation pressure level value:\n"
+                 << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                        hdr_ut, obs_qty, obs_arr, var_name)
+                 << "\n";
+         }
+
          rej_lvl++;
          return;
       }
@@ -1135,6 +1218,17 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
       if(obs_lvl < obs_info->level().lower() ||
          obs_lvl > obs_info->level().upper()) {
+
+         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+            mlog << Debug(REJECT_DEBUG_LEVEL)
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str()
+                 << ", skipping observation accumulation interval:\n"
+                 << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                        hdr_ut, obs_qty, obs_arr, var_name)
+                 << "\n";
+         }
+
          rej_lvl++;
          return;
       }
@@ -1147,6 +1241,17 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       if(!msg_typ_sfc.reg_exp_match(hdr_typ_str) &&
          (obs_hgt < obs_info->level().lower() ||
           obs_hgt > obs_info->level().upper())) {
+
+         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+            mlog << Debug(REJECT_DEBUG_LEVEL)
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str()
+                 << ", skipping observation level value:\n"
+                 << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                        hdr_ut, obs_qty, obs_arr, var_name)
+                 << "\n";
+         }
+
          rej_lvl++;
          return;
       }
@@ -1218,8 +1323,18 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       //
       // Check for a matching PrepBufr message type
       //
-
       if(!pd[i][0][0].msg_typ_vals.has(hdr_typ_str)) {
+
+         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+            mlog << Debug(REJECT_DEBUG_LEVEL)
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str()
+                 << ", skipping observation message type:\n"
+                 << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                        hdr_ut, obs_qty, obs_arr, var_name)
+                 << "\n";
+         }
+
          inc_count(rej_typ, i);
          continue;
       }
@@ -1230,6 +1345,17 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
          // Check for the obs falling within the masking region
          if(pd[i][j][0].mask_area_ptr != (MaskPlane *) 0) {
             if(!pd[i][j][0].mask_area_ptr->s_is_on(x, y)) {
+
+               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+                  mlog << Debug(REJECT_DEBUG_LEVEL)
+                       << "For " << fcst_info->magic_str() << " versus "
+                       << obs_info->magic_str()
+                       << ", skipping observation based on spatial masking region:\n"
+                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                              hdr_ut, obs_qty, obs_arr, var_name)
+                       << "\n";
+               }
+
                inc_count(rej_mask, i, j);
                continue;
             }
@@ -1238,8 +1364,17 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
          // masking SID list
          else if(pd[i][j][0].mask_sid_ptr != (StringArray *) 0) {
             if(!pd[i][j][0].mask_sid_ptr->has(hdr_sid_str)) {
-               mlog << Debug(9) << "Checking for the obs station id in the masking SID list: rejected hdr_sid_str = "
-                    << hdr_sid_str << "\n";
+
+               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+                  mlog << Debug(REJECT_DEBUG_LEVEL)
+                       << "For " << fcst_info->magic_str() << " versus "
+                       << obs_info->magic_str()
+                       << ", skipping observation based on masking station id list:\n"
+                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                              hdr_ut, obs_qty, obs_arr, var_name)
+                       << "\n";
+               }
+
                inc_count(rej_mask, i, j);
                continue;
             }
@@ -1248,6 +1383,17 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
          else if(pd[i][j][0].mask_llpnt_ptr != (MaskLatLon *) 0) {
             if(!pd[i][j][0].mask_llpnt_ptr->lat_thresh.check(hdr_lat) ||
                !pd[i][j][0].mask_llpnt_ptr->lon_thresh.check(hdr_lon)) {
+
+               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+                  mlog << Debug(REJECT_DEBUG_LEVEL)
+                       << "For " << fcst_info->magic_str() << " versus "
+                       << obs_info->magic_str()
+                       << ", skipping observation based on latitude/longitude thesholds:\n"
+                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                              hdr_ut, obs_qty, obs_arr, var_name)
+                       << "\n";
+               }
+
                inc_count(rej_mask, i, j);
                continue;
             }
@@ -1272,6 +1418,17 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
             // Check for bad data
             if(climo_mn_dpa.n_planes() > 0 && is_bad_data(cmn_v)) {
+
+               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+                  mlog << Debug(REJECT_DEBUG_LEVEL)
+                       << "For " << fcst_info->magic_str() << " versus "
+                       << obs_info->magic_str()
+                       << ", skipping observation based on bad climatological mean value:\n"
+                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                              hdr_ut, obs_qty, obs_arr, var_name)
+                       << "\n";
+               }
+
                inc_count(rej_cmn, i, j, k);
                continue;
             }
@@ -1300,6 +1457,17 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
             // Check for bad data
             if(climo_sd_dpa.n_planes() > 0 && is_bad_data(csd_v)) {
+
+               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+                  mlog << Debug(REJECT_DEBUG_LEVEL)
+                       << "For " << fcst_info->magic_str() << " versus "
+                       << obs_info->magic_str()
+                       << ", skipping observation based on bad climatological standard deviation value:\n"
+                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                              hdr_ut, obs_qty, obs_arr, var_name)
+                       << "\n";
+               }
+
                inc_count(rej_csd, i, j, k);
                continue;
             }
@@ -1336,16 +1504,20 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             }
 
             if(is_bad_data(fcst_v)) {
-               mlog << Debug(4)
-                    << "For " << fcst_info->magic_str() << " versus "
-                    << obs_info->magic_str()
-                    << ", skipping observation due to bad data in the "
-                    << interpmthd_to_string(pd[0][0][k].interp_mthd) << "("
-                    << pd[0][0][k].interp_wdth * pd[0][0][k].interp_wdth
-                    << ") interpolated forecast value:\n"
-                    << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                           hdr_ut, obs_qty, obs_arr, var_name)
-                    << "\n";
+
+               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+                  mlog << Debug(REJECT_DEBUG_LEVEL)
+                       << "For " << fcst_info->magic_str() << " versus "
+                       << obs_info->magic_str()
+                       << ", skipping observation based due to bad data in the " 
+                       << interpmthd_to_string(pd[0][0][k].interp_mthd) << "("
+                       << pd[0][0][k].interp_wdth * pd[0][0][k].interp_wdth
+                       << ") interpolated forecast value:\n"
+                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                              hdr_ut, obs_qty, obs_arr, var_name)
+                       << "\n";
+               }
+
                inc_count(rej_fcst, i, j, k);
                continue;
             }
@@ -1353,14 +1525,18 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             // Check matched pair filtering options
             if(!check_mpr_thresh(fcst_v, obs_v, cmn_v, csd_v,
                                  mpr_column, mpr_thresh, &reason_cs)) {
-               mlog << Debug(4)
-                    << "For " << fcst_info->magic_str() << " versus "
-                    << obs_info->magic_str()
-                    << ", skipping observation due to matched pair filter since "
-                    << reason_cs << ":\n"
-                    << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                           hdr_ut, obs_qty, obs_arr, var_name)
-                    << "\n";
+
+               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+                  mlog << Debug(REJECT_DEBUG_LEVEL)
+                       << "For " << fcst_info->magic_str() << " versus "
+                       << obs_info->magic_str()
+                       << ", skipping observation due to matched pair filter since "
+                       << reason_cs << ":\n"
+                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                              hdr_ut, obs_qty, obs_arr, var_name)
+                       << "\n";
+               }
+
                inc_count(rej_mpr, i, j, k);
                continue;
             }
@@ -1375,13 +1551,17 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                   hdr_lat, hdr_lon, obs_x, obs_y, hdr_ut, obs_lvl,
                   obs_hgt, fcst_v, obs_v, obs_qty, cmn_v, csd_v,
                   wgt_v)) {
-               mlog << Debug(4)
-                    << "For " << fcst_info->magic_str() << " versus "
-                    << obs_info->magic_str()
-                    << ", skipping observation since it is a duplicate:\n"
-                    << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                           hdr_ut, obs_qty, obs_arr, var_name)
-                    << "\n";
+
+               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+                  mlog << Debug(REJECT_DEBUG_LEVEL)
+                       << "For " << fcst_info->magic_str() << " versus "
+                       << obs_info->magic_str()
+                       << ", skipping observation since it is a duplicate:\n"
+                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                              hdr_ut, obs_qty, obs_arr, var_name)
+                       << "\n";
+               }
+
                inc_count(rej_dup, i, j, k);
             }
             seeps = 0;
@@ -1390,6 +1570,21 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             }
             pd[i][j][k].set_seeps_score(seeps);
             if (seeps) delete seeps;
+
+            if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+               mlog << Debug(REJECT_DEBUG_LEVEL)
+                    << "For " << fcst_info->magic_str() << " versus "
+                    << obs_info->magic_str() << ", "
+                    << pd[i][0][0].msg_typ << " message type, "
+                    << pd[0][j][0].mask_name << " masking region, and "
+                    << interpmthd_to_string(pd[0][0][k].interp_mthd) << "("
+                    << pd[0][0][k].interp_wdth * pd[0][0][k].interp_wdth
+                    << ") interpolation method, adding observation:\n"
+                    << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                           hdr_ut, obs_qty, obs_arr, var_name)
+                    << "\n";
+            }
+
          } // end for k
       } // end for j
    } // end for i
@@ -1939,8 +2134,8 @@ ConcatString point_obs_to_string(float *hdr_arr, const char *hdr_typ_str,
                                  const char *var_name) {
    ConcatString obs_cs, name;
 
-   if((var_name != 0) && (0 < m_strlen(var_name))) name = var_name;
-   else                                          name = obs_arr[1];
+   if((var_name != 0) && (0 < m_strlen(var_name))) name << var_name;
+   else                                            name << nint(obs_arr[1]);
 
    //
    // Write the 11-column MET point format:
