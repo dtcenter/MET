@@ -277,10 +277,6 @@ class VL1L2Info {
       // Number of points
       int n;
 
-      // Number of points for which the wind direction difference is undefined
-      int n_dir_undef; 
-      int n_dira_undef; 
-   
       // VL1L2 Quantities
 
       double uf_bar;
@@ -336,7 +332,8 @@ class VL1L2Info {
       CIInfo DIR_MSE;
       CIInfo DIR_RMSE;
 
-      int    vcount;
+      int    vcount; // Vector count
+      int    dcount; // Direction count
 
       // VAL1L2 Quantities
       double ufa_bar;
@@ -355,7 +352,8 @@ class VL1L2Info {
       double absdira_bar; // Average anomalous absolute direction difference
       double dira2_bar;   // Average anomalous squared direction difference
 
-      int    vacount;
+      int    vacount; // Vector anomaly count
+      int    dacount; // Direction anomaly count
 
       // Compute sums
       void set(const PairDataPoint &, const PairDataPoint &);

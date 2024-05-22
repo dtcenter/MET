@@ -1289,12 +1289,15 @@ The first set of header columns are common to all of the output files generated 
     - O_SPEED_BAR
     - Mean observed wind speed
   * - 35
+    - TOTAL_DIR 
+    - Total number of matched pairs for which both the forecast and observation wind directions are well-defined (i.e. non-zero vectors)
+  * - 36
     - DIR_ME
     - Mean wind direction difference, from -180 to 180 degrees
-  * - 36
+  * - 37
     - DIR_MAE
     - Mean absolute wind direction difference
-  * - 37
+  * - 38
     - DIR_MSE
     - Mean squared wind direction difference
 
@@ -1344,12 +1347,15 @@ The first set of header columns are common to all of the output files generated 
     - OA_SPEED_BAR
     - Mean observed wind speed anomaly
   * - 35
+    - TOTAL_DIR 
+    - Total number of matched triplets for which the forecast, observation, and climatological wind directions are well-defined (i.e. non-zero vectors)
+  * - 36
     - DIRA_ME
     - Mean wind direction anomaly difference, from -180 to 180 degrees
-  * - 36
+  * - 37
     - DIRA_MAE
     - Mean absolute wind direction anomaly difference
-  * - 37
+  * - 38
     - DIRA_MSE
     - Mean squared wind direction anomaly difference
 
@@ -1431,16 +1437,19 @@ The first set of header columns are common to all of the output files generated 
   * - 85-87
     - ANOM_CORR_UNCNTR, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCL, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCU
     - Uncentered vector Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
-  * - 88-90
+  * - 88
+    - TOTAL_DIR 
+    - Total number of matched pairs for which both the forecast and observation wind directions are well-defined (i.e. non-zero vectors)
+  * - 89-91
     - DIR_ME, :raw-html:`<br />` DIR_ME_BCL, :raw-html:`<br />` DIR_ME_BCU
     - Mean direction difference, from -180 to 180 degrees, including bootstrap upper and lower confidence limits
-  * - 91-93
+  * - 92-94
     - DIR_MAE, :raw-html:`<br />` DIR_MAE_BCL, :raw-html:`<br />` DIR_MAE_BCU
     - Mean absolute direction difference including bootstrap upper and lower confidence limits
-  * - 94-96
+  * - 95-97
     - DIR_MSE, :raw-html:`<br />` DIR_MSE_BCL, :raw-html:`<br />` DIR_MSE_BCU
     - Mean squared direction difference including bootstrap upper and lower confidence limits
-  * - 97-99
+  * - 98-100
     - DIR_RMSE, :raw-html:`<br />` DIR_RMSE_BCL, :raw-html:`<br />` DIR_RMSE_BCU
     - Root mean squared direction difference including bootstrap upper and lower confidence limits
 
