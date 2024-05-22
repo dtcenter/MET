@@ -103,7 +103,11 @@ jobs = [
     -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_filter_mpr_sid.stat",
    "-job filter -fcst_var TMP -fcst_lev Z2 \
     -line_type MPR -column_thresh abs(fcst-obs) >5 \
-    -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_filter_mpr_fcst_minus_obs.stat"
+    -dump_row ${OUTPUT_DIR}/CONFIG_POINT_STAT_filter_mpr_fcst_minus_obs.stat",
+   "-job aggregate -line_type VL1L2 -by FCST_LEV \
+    -out_stat ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_vl1l2.stat",  
+   "-job aggregate_stat -line_type VL1L2 -out_line_type VCNT -by FCST_LEV \
+    -out_stat ${OUTPUT_DIR}/CONFIG_POINT_STAT_agg_stat_vl1l2_to_vcnt.stat"
 ];
 
 ////////////////////////////////////////////////////////////////////////////////

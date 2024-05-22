@@ -99,7 +99,7 @@ ConcatString append_climo_bin(const ConcatString &mask_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_header_row(const char **cols, int n_cols, int hdr_flag,
+void write_header_row(const char * const * cols, int n_cols, int hdr_flag,
                       AsciiTable &at, int r, int c) {
    int i;
 
@@ -2975,8 +2975,8 @@ void write_vl1l2_cols(const VL1L2Info &vl1l2_info,
    //    TOTAL,       UFBAR,       VFBAR,
    //    UOBAR,       VOBAR,       UVFOBAR,
    //    UVFFBAR,     UVOOBAR      F_SPEED_BAR,
-   //    O_SPEED_BAR, DIR_ME,      DIR_MAE,
-   //    DIR_MSE
+   //    O_SPEED_BAR, TOTAL_DIR,   DIR_ME,
+   //    DIR_MAE,     DIR_MSE
    //
 
    at.set_entry(r, c+0,  // Total Count
@@ -3009,13 +3009,16 @@ void write_vl1l2_cols(const VL1L2Info &vl1l2_info,
    at.set_entry(r, c+9,  // O_SPEED_BAR
       vl1l2_info.o_speed_bar);
 
-   at.set_entry(r, c+10, // DIR_ME
+   at.set_entry(r, c+10, // TOTAL_DIR 
+      vl1l2_info.dcount);
+
+   at.set_entry(r, c+11, // DIR_ME
       vl1l2_info.dir_bar);
 
-   at.set_entry(r, c+11, // DIR_MAE
+   at.set_entry(r, c+12, // DIR_MAE
       vl1l2_info.absdir_bar);
 
-   at.set_entry(r, c+12, // DIR_MSE
+   at.set_entry(r, c+13, // DIR_MSE
       vl1l2_info.dir2_bar);
 
    return;
@@ -3032,8 +3035,8 @@ void write_val1l2_cols(const VL1L2Info &vl1l2_info,
    //    TOTAL,        UFABAR,      VFABAR,
    //    UOABAR,       VOABAR,      UVFOABAR,
    //    UVFFABAR,     UVOOABAR,    FA_SPEED_BAR,
-   //    OA_SPEED_BAR, DIRA_ME,     DIRA_MAE,
-   //    DIRA_MSE
+   //    OA_SPEED_BAR, TOTAL_DIR,   DIRA_ME,
+   //    DIRA_MAE,     DIRA_MSE
    //
 
    at.set_entry(r, c+0,  // Total Anomaly Count
@@ -3066,13 +3069,16 @@ void write_val1l2_cols(const VL1L2Info &vl1l2_info,
    at.set_entry(r, c+9,  // OA_SPEED_BAR
       vl1l2_info.oa_speed_bar);
 
-   at.set_entry(r, c+10, // DIRA_ME
+   at.set_entry(r, c+10, // TOTAL_DIR
+      vl1l2_info.dacount);
+
+   at.set_entry(r, c+11, // DIRA_ME
       vl1l2_info.dira_bar);
 
-   at.set_entry(r, c+11, // DIRA_MAE
+   at.set_entry(r, c+12, // DIRA_MAE
       vl1l2_info.absdira_bar);
 
-   at.set_entry(r, c+12, // DIRA_MSE
+   at.set_entry(r, c+13, // DIRA_MSE
       vl1l2_info.dira2_bar);
 
    return;
@@ -3108,6 +3114,7 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, int i,
    //    ANOM_CORR,        ANOM_CORR_NCL,        ANOM_CORR_NCU,
    //                      ANOM_CORR_BCL,        ANOM_CORR_BCU
    //    ANOM_CORR_UNCNTR, ANOM_CORR_UNCNTR_BCL, ANOM_CORR_UNCNTR_BCU,
+   //    TOTAL_DIR,
    //    DIR_ME,           DIR_ME_BCL,           DIR_ME_BCU,
    //    DIR_MAE,          DIR_MAE_BCL,          DIR_MAE_BCU,
    //    DIR_MSE,          DIR_MSE_BCL,          DIR_MSE_BCU,
@@ -3200,6 +3207,8 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, int i,
    at.set_entry(r, c++, vcnt_info.ANOM_CORR_UNCNTR.v); // ANOM_CORR_UNCNTR
    at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_UNCNTR_BCL
    at.set_entry(r, c++, (string)na_str);               // ANOM_CORR_UNCNTR_BCU
+
+   at.set_entry(r, c++, vcnt_info.dcount);             // TOTAL_DIR 
 
    at.set_entry(r, c++, vcnt_info.DIR_ME.v);           // DIR_ME
    at.set_entry(r, c++, (string)na_str);               // DIR_ME_BCL

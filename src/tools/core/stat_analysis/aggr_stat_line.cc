@@ -65,8 +65,9 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool is_precip_var_name(const ConcatString &s);
-static const std::string case_str = "CASE";
+static bool  is_precip_var_name(const ConcatString &s);
+static const string case_str = "CASE";
+static bool  is_vector_dir_stat(const STATLineType &t, const ConcatString &s);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -834,14 +835,18 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
             }
             else if(line.type() == STATLineType::vl1l2 && lty == STATLineType::vcnt) {
                v = vl1l2_info.get_stat(req_col[i].c_str());
-               w = vl1l2_info.vcount;
+               w = (is_vector_dir_stat(line.type(), req_col[i].c_str()) ?
+                    vl1l2_info.dcount :
+                    vl1l2_info.vcount);
             }
             else if(line.type() != lty) {
                continue;
             }
             else {
                v = job.get_column_double(line, req_col[i]);
-               w = atoi(line.get_item("TOTAL"));
+               w = (is_vector_dir_stat(line.type(), req_col[i].c_str()) ?
+                    atoi(line.get_item("TOTAL_DIR")) :
+                    atoi(line.get_item("TOTAL")));
             }
 
             //
@@ -2150,34 +2155,14 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
                             it->second.pd_u.f_na[i], it->second.pd_v.f_na[i],
                             it->second.pd_u.o_na[i], it->second.pd_v.o_na[i]);
 
-         if(is_bad_data(d_diff)) {
-            v_info.n_dir_undef = 1;
-         }
-         else {
-            v_info.n_dir_undef = 0;
-            v_info.dir_bar     = d_diff;
-            v_info.absdir_bar  = abs(d_diff);
-            v_info.dir2_bar    = d_diff*d_diff;
+         if(!is_bad_data(d_diff)) {
+            v_info.dcount     = 1;
+            v_info.dir_bar    = d_diff;
+            v_info.absdir_bar = abs(d_diff);
+            v_info.dir2_bar   = d_diff*d_diff;
          }
  
          aggr.vl1l2_info += v_info;
-
-         //
-         // Check for vectors of length zero
-         //
-         if((is_eq(it->second.pd_u.f_na[i], 0.0) &&
-             is_eq(it->second.pd_v.f_na[i], 0.0)) ||
-            (is_eq(it->second.pd_u.o_na[i], 0.0) &&
-             is_eq(it->second.pd_v.o_na[i], 0.0))) {
-            mlog << Debug(4) << "aggr_mpr_wind_lines() -> "
-                 << "angle not defined for zero forecast ("
-                 << it->second.pd_u.f_na[i] << ", " << it->second.pd_v.f_na[i]
-                 << ") or observation ("
-                 << it->second.pd_u.o_na[i] << ", " << it->second.pd_v.o_na[i]
-                 << ") vector for header:\n"
-                 << it->second.hdr_sa[i] << "\n";
-            continue;
-         }
 
          //
          // Convert to and append unit vectors
@@ -4229,12 +4214,27 @@ double compute_vif(NumArray &na) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_precip_var_name(const ConcatString &s) {
+static bool is_precip_var_name(const ConcatString &s) {
 
    bool match = has_prefix(pinterp_precipitation_names,
                            n_pinterp_precipitation_names, s.c_str()) ||
                 has_prefix(grib_precipitation_abbr,
                            n_grib_precipitation_abbr, s.c_str());
+
+   return match;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+static bool is_vector_dir_stat(const STATLineType &t, const ConcatString &s) {
+
+   bool match = (t == STATLineType::vl1l2  ||
+                 t == STATLineType::val1l2 ||
+                 t == STATLineType::vcnt)  &&
+                (s.startswith("DIR_ME")    ||
+                 s.startswith("DIR_MAE")   ||
+                 s.startswith("DIR_MSE"));
 
    return match;
 }

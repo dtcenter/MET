@@ -59,7 +59,7 @@ static const char * default_config_filename =
    "MET_BASE/config/TCGenConfig_default";
 
 // Header columns
-static const char **txt_columns[n_txt] = {
+static const char * const * txt_columns[n_txt] = {
    fho_columns, ctc_columns,   cts_columns,
    pct_columns, pstd_columns,  pjc_columns,
    prc_columns, genmpr_columns
@@ -73,7 +73,7 @@ static const int n_txt_columns[n_txt] = {
 };
 
 // Text file abbreviations
-static const char *txt_file_abbr[n_txt] = {
+static const char * const txt_file_abbr[n_txt] = {
    "fho", "ctc", "cts", "pct", "pstd", "pjc", "prc", "genmpr"
 };
 

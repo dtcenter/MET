@@ -13,7 +13,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char * hdr_columns [] = {
+static const char * const hdr_columns [] = {
    "VERSION",        "MODEL",
    "DESC",           "FCST_LEAD",
    "FCST_VALID_BEG", "FCST_VALID_END",
@@ -29,17 +29,17 @@ static const char * hdr_columns [] = {
    "LINE_TYPE"
 };
 
-static const char * fho_columns [] = {
+static const char * const fho_columns [] = {
    "TOTAL",       "F_RATE",      "H_RATE",
    "O_RATE"
 };
 
-static const char * ctc_columns [] = {
+static const char * const ctc_columns [] = {
    "TOTAL",       "FY_OY",       "FY_ON",
    "FN_OY",       "FN_ON",       "EC_VALUE"
 };
 
-static const char * cts_columns [] = {
+static const char * const cts_columns [] = {
    "TOTAL",
    "BASER",       "BASER_NCL",   "BASER_NCU",   "BASER_BCL",   "BASER_BCU",
    "FMEAN",       "FMEAN_NCL",   "FMEAN_NCU",   "FMEAN_BCL",   "FMEAN_BCU",
@@ -64,11 +64,11 @@ static const char * cts_columns [] = {
    "HSS_EC",      "HSS_EC_BCL",  "HSS_EC_BCU",  "EC_VALUE"
 };
 
-static const char * mctc_columns [] = {
+static const char * const mctc_columns [] = {
    "TOTAL",       "N_CAT",       "Fi_Oj",       "EC_VALUE"
 };
 
-static const char * mcts_columns [] = {
+static const char * const mcts_columns [] = {
    "TOTAL",       "N_CAT",
    "ACC",         "ACC_NCL",     "ACC_NCU",     "ACC_BCL",     "ACC_BCU",
    "HK",          "HK_BCL",      "HK_BCU",
@@ -77,7 +77,7 @@ static const char * mcts_columns [] = {
    "HSS_EC",      "HSS_EC_BCL",  "HSS_EC_BCU",  "EC_VALUE"
 };
 
-static const char * cnt_columns [] = {
+static const char * const cnt_columns [] = {
    "TOTAL",
    "FBAR",             "FBAR_NCL",             "FBAR_NCU",          "FBAR_BCL",          "FBAR_BCU",
    "FSTDEV",           "FSTDEV_NCL",           "FSTDEV_NCU",        "FSTDEV_BCL",        "FSTDEV_BCU",
@@ -108,36 +108,36 @@ static const char * cnt_columns [] = {
    "SI",               "SI_BCL",               "SI_BCU" 
 };
 
-static const char * sl1l2_columns [] = {
+static const char * const sl1l2_columns [] = {
    "TOTAL",       "FBAR",        "OBAR",
    "FOBAR",       "FFBAR",       "OOBAR",
    "MAE"
 };
 
-static const char * sal1l2_columns [] = {
+static const char * const sal1l2_columns [] = {
    "TOTAL",       "FABAR",       "OABAR",
    "FOABAR",      "FFABAR",      "OOABAR",
    "MAE"
 };
 
-static const char * vl1l2_columns [] = {
+static const char * const vl1l2_columns [] = {
    "TOTAL",       "UFBAR",       "VFBAR",
    "UOBAR",       "VOBAR",       "UVFOBAR",
    "UVFFBAR",     "UVOOBAR",     "F_SPEED_BAR",
-   "O_SPEED_BAR", "DIR_ME",      "DIR_MAE",
-   "DIR_MSE" 
+   "O_SPEED_BAR", "TOTAL_DIR",    "DIR_ME",
+   "DIR_MAE",     "DIR_MSE"
 };
 
-static const char * val1l2_columns [] = {
+static const char * const val1l2_columns [] = {
    "TOTAL",        "UFABAR",      "VFABAR",
    "UOABAR",       "VOABAR",      "UVFOABAR",
    "UVFFABAR",     "UVOOABAR",    "FA_SPEED_BAR",
-   "OA_SPEED_BAR", "DIRA_ME",     "DIRA_MAE",
-   "DIRA_MSE"
+   "OA_SPEED_BAR", "TOTAL_DIR",   "DIRA_ME",
+   "DIRA_MAE",     "DIRA_MSE"
 };
 
 
-static const char * vcnt_columns [] = {
+static const char * const vcnt_columns [] = {
    "TOTAL",
    "FBAR",             "FBAR_BCL",             "FBAR_BCU",
    "OBAR",             "OBAR_BCL",             "OBAR_BCU",
@@ -160,18 +160,19 @@ static const char * vcnt_columns [] = {
    "ANOM_CORR",        "ANOM_CORR_NCL",        "ANOM_CORR_NCU",
    "ANOM_CORR_BCL",    "ANOM_CORR_BCU",
    "ANOM_CORR_UNCNTR", "ANOM_CORR_UNCNTR_BCL", "ANOM_CORR_UNCNTR_BCU",
+   "TOTAL_DIR",
    "DIR_ME",           "DIR_ME_BCL",           "DIR_ME_BCU",
    "DIR_MAE",          "DIR_MAE_BCL",          "DIR_MAE_BCU",
    "DIR_MSE",          "DIR_MSE_BCL",          "DIR_MSE_BCU",
    "DIR_RMSE",         "DIR_RMSE_BCL",         "DIR_RMSE_BCU"
 };
 
-static const char * pct_columns [] = {
+static const char * const pct_columns [] = {
    "TOTAL",       "N_THRESH",    "THRESH_",
    "OY_",         "ON_"
 };
 
-static const char * pstd_columns [] = {
+static const char * const pstd_columns [] = {
    "TOTAL",       "N_THRESH",    "BASER",
    "BASER_NCL",   "BASER_NCU",   "RELIABILITY",
    "RESOLUTION",  "UNCERTAINTY", "ROC_AUC",
@@ -180,23 +181,23 @@ static const char * pstd_columns [] = {
    "BSS",         "BSS_SMPL",    "THRESH_",
 };
 
-static const char * pjc_columns [] = {
+static const char * const pjc_columns [] = {
    "TOTAL",       "N_THRESH",    "THRESH_",
    "OY_TP_",      "ON_TP_",      "CALIBRATION_",
    "REFINEMENT_", "LIKELIHOOD_", "BASER_"
 };
 
-static const char * prc_columns [] = {
+static const char * const prc_columns [] = {
    "TOTAL",       "N_THRESH",    "THRESH_",
    "PODY_",       "POFD_"
 };
 
-static const char * eclv_columns [] = {
+static const char * const eclv_columns [] = {
    "TOTAL",       "BASER",    "VALUE_BASER",
    "N_PNT",       "CL_",      "VALUE_"
 };
 
-static const char * mpr_columns [] = {
+static const char * const mpr_columns [] = {
    "TOTAL",       "INDEX",       "OBS_SID",
    "OBS_LAT",     "OBS_LON",     "OBS_LVL",
    "OBS_ELV",     "FCST",        "OBS",
@@ -204,12 +205,12 @@ static const char * mpr_columns [] = {
    "CLIMO_CDF"
 };
 
-static const char * nbrctc_columns [] = {
+static const char * const nbrctc_columns [] = {
    "TOTAL",       "FY_OY",       "FY_ON",
    "FN_OY",       "FN_ON"
 };
 
-static const char * nbrcts_columns [] = {
+static const char * const nbrcts_columns [] = {
    "TOTAL",
    "BASER",       "BASER_NCL",   "BASER_NCU",   "BASER_BCL",   "BASER_BCU",
    "FMEAN",       "FMEAN_NCL",   "FMEAN_NCU",   "FMEAN_BCL",   "FMEAN_BCU",
@@ -233,7 +234,7 @@ static const char * nbrcts_columns [] = {
    "BAGSS",       "BAGSS_BCL",   "BAGSS_BCU"
 };
 
-static const char * nbrcnt_columns [] = {
+static const char * const nbrcnt_columns [] = {
    "TOTAL",
    "FBS",         "FBS_BCL",     "FBS_BCU",
    "FSS",         "FSS_BCL",     "FSS_BCU",
@@ -243,14 +244,14 @@ static const char * nbrcnt_columns [] = {
    "O_RATE",      "O_RATE_BCL",  "O_RATE_BCU"
 };
 
-static const char * grad_columns [] = {
+static const char * const grad_columns [] = {
    "TOTAL",
    "FGBAR",       "OGBAR",       "MGBAR",
    "EGBAR",       "S1",          "S1_OG",
    "FGOG_RATIO",  "DX",          "DY"
 };
 
-static const char * dmap_columns [] = {
+static const char * const dmap_columns [] = {
    "TOTAL",       "FY",          "OY",
    "FBIAS",       "BADDELEY",    "HAUSDORFF",
    "MED_FO",      "MED_OF",      "MED_MIN",     "MED_MAX",     "MED_MEAN",
@@ -259,7 +260,7 @@ static const char * dmap_columns [] = {
    "G",           "GBETA",       "BETA_VALUE"
 };
 
-static const char * isc_columns [] = {
+static const char * const isc_columns [] = {
    "TOTAL",
    "TILE_DIM",    "TILE_XLL",    "TILE_YLL",
    "NSCALE",      "ISCALE",      "MSE",
@@ -267,7 +268,7 @@ static const char * isc_columns [] = {
    "BASER",       "FBIAS"
 };
 
-static const char * ecnt_columns [] = {
+static const char * const ecnt_columns [] = {
    "TOTAL",       "N_ENS",         "CRPS",
    "CRPSS",       "IGN",           "ME",
    "RMSE",        "SPREAD",        "ME_OERR",
@@ -279,22 +280,22 @@ static const char * ecnt_columns [] = {
    "ME_LT_OBS",   "IGN_CONV_OERR", "IGN_CORR_OERR"
 };
 
-static const char * rps_columns [] = {
+static const char * const rps_columns [] = {
    "TOTAL",       "N_PROB",      "RPS_REL",
    "RPS_RES",     "RPS_UNC",     "RPS",
    "RPSS",        "RPSS_SMPL",   "RPS_COMP"
 };
 
-static const char * rhist_columns [] = {
+static const char * const rhist_columns [] = {
    "TOTAL",       "N_RANK",      "RANK_"
 };
 
-static const char * phist_columns [] = {
+static const char * const phist_columns [] = {
    "TOTAL",       "BIN_SIZE",    "N_BIN",
    "BIN_"
 };
 
-static const char * orank_columns [] = {
+static const char * const orank_columns [] = {
    "TOTAL",       "INDEX",            "OBS_SID",
    "OBS_LAT",     "OBS_LON",          "OBS_LVL",
    "OBS_ELV",     "OBS",              "PIT",
@@ -304,7 +305,7 @@ static const char * orank_columns [] = {
    "SPREAD_OERR", "SPREAD_PLUS_OERR", "CLIMO_STDEV"
 };
 
-static const char * ssvar_columns [] = {
+static const char * const ssvar_columns [] = {
    "TOTAL",       "N_BIN",       "BIN_i",
    "BIN_N",       "VAR_MIN",     "VAR_MAX",
    "VAR_MEAN",    "FBAR",        "OBAR",
@@ -320,16 +321,16 @@ static const char * ssvar_columns [] = {
    "RMSE"
 };
 
-static const char * relp_columns [] = {
+static const char * const relp_columns [] = {
    "TOTAL",       "N_ENS",       "RELP_"
 };
 
-static const char * ssidx_columns [] = {
+static const char * const ssidx_columns [] = {
    "FCST_MODEL",  "REF_MODEL",   "N_INIT",
    "N_TERM",      "N_VLD",       "SS_INDEX"
 };
 
-static const char * genmpr_columns [] = {
+static const char * const genmpr_columns [] = {
    "TOTAL",       "INDEX",       "STORM_ID",
    "PROB_LEAD",   "PROB_VAL",
    "AGEN_INIT",   "AGEN_FHR",
@@ -339,7 +340,7 @@ static const char * genmpr_columns [] = {
    "DEV_CAT",     "OPS_CAT"
 };
 
-static const char * job_summary_columns [] = {
+static const char * const job_summary_columns [] = {
    "TOTAL",
    "MEAN",        "MEAN_NCL",    "MEAN_NCU",     "MEAN_BCL",    "MEAN_BCU",
    "STDEV",       "STDEV_BCL",   "STDEV_BCU",
@@ -349,12 +350,12 @@ static const char * job_summary_columns [] = {
    "WMO_TYPE",    "WMO_MEAN",    "WMO_WEIGHTED_MEAN"
 };
 
-static const char * job_wdir_columns [] = {
+static const char * const job_wdir_columns [] = {
    "TOTAL",
    "FBAR",        "OBAR",        "ME",           "MAE"
 };
 
-static const char * job_ramp_columns [] = {
+static const char * const job_ramp_columns [] = {
    "TYPE",
    "FCOLUMN",    "OCOLUMN",
    "FTIME",      "OTIME",
@@ -363,7 +364,7 @@ static const char * job_ramp_columns [] = {
    "WINDOW_BEG", "WINDOW_END"
 };
 
-static const char * job_ramp_mpr_columns [] = {
+static const char * const job_ramp_mpr_columns [] = {
    "TOTAL", "INDEX",
    "INIT",  "LEAD", "VALID",
    "FPRV",  "FCUR", "FDLT", "FRAMP",
@@ -371,7 +372,7 @@ static const char * job_ramp_mpr_columns [] = {
    "CATEGORY"
 };
 
-static const char * seeps_mpr_columns [] = {
+static const char * const seeps_mpr_columns [] = {
    "OBS_SID",     "OBS_LAT",     "OBS_LON",
    "FCST",        "OBS",         "OBS_QC",
    "FCST_CAT",    "OBS_CAT",     "P1",
@@ -379,7 +380,7 @@ static const char * seeps_mpr_columns [] = {
    "SEEPS"
 };
 
-static const char * seeps_columns [] = {
+static const char * const seeps_columns [] = {
    "TOTAL",       "S12",         "S13",
    "S21",         "S23",         "S31",
    "S32",         "PF1",         "PF2",
