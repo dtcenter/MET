@@ -12,7 +12,7 @@ on:
 
 jobs:
   update_truth:
-    name: "Update or create truth reference branch"
+    name: "Update reference branch truth data"
     runs-on: ubuntu-latest
     steps:
       - name: Check if branch is develop or main_vX.Y
@@ -31,7 +31,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.METPLUS_BOT_TOKEN }}
-      - name: Resolve conflicts between branch and branch-ref
+      - name: Resolve conflicts with an update branch
         id: resolve_conflicts
         run: |
           branch_name=${{ env.branch_name }}
@@ -49,21 +49,17 @@ jobs:
           echo git checkout ${branch_name}
           git checkout ${branch_name}
 
-          # merge -ref branch into branch (favoring branch changes)
-          echo git merge -s ours origin/${branch_name}-ref
-          git merge -s ours origin/${branch_name}-ref
-
-          # push changes to branch (develop or main_vX.Y)
-          echo git push origin ${branch_name}
-          git push origin ${branch_name}
-
           # create unique branch name to update *-ref branch
           update_branch=update_${branch_name}_$(uuidgen | cut -d "-" -f1)
           echo "update_branch=${update_branch}" >> $GITHUB_OUTPUT
-
-          # create update branch from branch (develop or main_vX.Y)
           echo git checkout -b ${update_branch}
           git checkout -b ${update_branch}
+
+          # merge -ref branch into the update branch (favoring update branch changes)
+          echo git merge -s ours origin/${branch_name}-ref
+          git merge -s ours origin/${branch_name}-ref
+
+          # push update branch to origin
           echo git push origin ${update_branch}
           git push origin ${update_branch}
 
