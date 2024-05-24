@@ -372,8 +372,8 @@ static bool   keep_level_category(int);
 
 static float  derive_grib_code(int, float *, float *, double, float&);
 
-static int    combine_tqz_and_uv(map<float, float*>,
-                                 map<float, float*>, map<float, float*> &);
+static int    combine_tqz_and_uv(map<float, float*>, map<float, float*>,
+                                 vector<float *> &);
 static float  compute_pbl(map<float, float*> pqtzuv_map_tq,
                           map<float, float*> pqtzuv_map_uv);
 static void   copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all=true);
@@ -2958,14 +2958,16 @@ void copy_pqtzuv(float *to_pqtzuv, float *from_pqtzuv, bool copy_all) {
 ////////////////////////////////////////////////////////////////////////
 
 int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
-      map<float, float*> pqtzuv_map_uv, map<float, float*> &pqtzuv_map_merged) {
+      map<float, float*> pqtzuv_map_uv, vector<float *> &pqtzuv_merged_array) {
    static const char *method_name = "combine_tqz_and_uv() ";
    int tq_count = pqtzuv_map_tq.size();
    int uv_count = pqtzuv_map_uv.size();
+   map<float, float*> pqtzuv_map_merged;
+   pqtzuv_merged_array.clear();
    if (tq_count > 0 && uv_count > 0) {
       IntArray common_levels, tq_levels;
       float *pqtzuv_tq, *pqtzuv_uv;
-      float *pqtzuv_merged = (float *) 0;
+      float *pqtzuv_merged = (float *) nullptr;
       float *next_pqtzuv, *prev_pqtzuv;
       float tq_pres_max, tq_pres_min, uv_pres_max, uv_pres_min;
       map<float,float*>::iterator it, it_tq, it_uv;
@@ -3054,15 +3056,22 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
          }
          interpolate_pqtzuv(prev_pqtzuv, pqtzuv_merged, next_pqtzuv);
       }
-      float first_pres = (pqtzuv_merged[0] == 0 ? bad_data_float : pqtzuv_merged[0]);
+      float first_pres = (pqtzuv_merged[0] < 0 || is_eq(pqtzuv_merged[0], 0.)
+                         ? bad_data_float : pqtzuv_merged[0]);
       pqtzuv_map_merged[first_pres] = pqtzuv_merged;
-      mlog << Debug(9) << method_name << "Added " << first_pres << " to merged records\n";
+      mlog << Debug(9) << method_name << "Added " << first_pres << " to merged records (first record)\n";
 
       if (pqtzuv_merged != 0) {
          //Merge UV into TQZ records
          merge_records(pqtzuv_merged, pqtzuv_map_tq, pqtzuv_map_uv, pqtzuv_map_merged);
          //Merge TQZ into UV records
          merge_records(pqtzuv_merged, pqtzuv_map_uv, pqtzuv_map_tq, pqtzuv_map_merged);
+      }
+      for (map<float,float*>::iterator it=pqtzuv_map_merged.begin();
+          it!=pqtzuv_map_merged.end(); ++it) {
+        float *new_pqtzuv = new float[mxr8vt];
+        for (int i=0; i<mxr8vt; i++) new_pqtzuv[i] = it->second[i];
+        pqtzuv_merged_array.push_back(new_pqtzuv);
       }
 
       if(mlog.verbosity_level() >= PBL_DEBUG_LEVEL) {
@@ -3071,7 +3080,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       delete [] pqtzuv_merged;
    }
 
-   return pqtzuv_map_merged.size();
+   return pqtzuv_merged_array.size();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3092,12 +3101,13 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
    mlog << Debug(7) << method_name << "is called: TQZ: "
         << tq_count << "  UV: " << uv_count << "\n";
    if (tq_count > 0 || uv_count > 0) {
+      float *pqtzuv = nullptr;
       int hgt_cnt, spfh_cnt;
       IntArray selected_levels;
 
-      map<float, float*> pqtzuv_map_merged;
+      vector<float*> pqtzuv_merged_array;
       pbl_level = combine_tqz_and_uv(pqtzuv_map_tq, pqtzuv_map_uv,
-                                     pqtzuv_map_merged);
+                                     pqtzuv_merged_array);
       mlog << Debug(7) << method_name << "pbl_level= " << pbl_level
            << " from TQ (" << tq_count << ") and UV (" << uv_count
            << ")\n";
@@ -3111,60 +3121,62 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
               << "Skip CALPBL because of only one available record after combining TQZ and UV\n";
       }
       else {
-         // Order all observations by pressure from bottom to top
-         index = pbl_level - 1;
+         // Reverse the order all observations by pressure from bottom to top
+         index = 0;
          hgt_cnt = spfh_cnt = 0;
-         for (it=pqtzuv_map_merged.begin(); it!=pqtzuv_map_merged.end(); ++it) {
-            if (index < 0) {
-               mlog << Error << "\n" <<  method_name  << "negative index: " << index << "\n\n";
-               break;
-            }
-
-            if (index < MAX_PBL_LEVEL) {
-               float *pqtzuv = it->second;
-               pbl_data_pres[index] = pqtzuv[0];
-               pbl_data_spfh[index] = pqtzuv[1];
-               pbl_data_temp[index] = pqtzuv[2];
-               pbl_data_hgt[index]  = pqtzuv[3];
-               pbl_data_ugrd[index] = pqtzuv[4];
-               pbl_data_vgrd[index] = pqtzuv[5];
-               if (is_valid_pb_data(pbl_data_spfh[index])) spfh_cnt++;
-               if (is_valid_pb_data(pbl_data_hgt[index])) hgt_cnt++;
-               selected_levels.add(nint(it->first));
-            }
-
-            index--;
+         int start_offset = (MAX_PBL_LEVEL >= pbl_level) ? 0 : (pbl_level-MAX_PBL_LEVEL);
+         for (int i=(pbl_level-1); i>=start_offset; i--,index++) {
+            pqtzuv = pqtzuv_merged_array[i];
+            pbl_data_pres[index] = pqtzuv[0];
+            pbl_data_pres[index] = pqtzuv[0];
+            pbl_data_spfh[index] = pqtzuv[1];
+            pbl_data_temp[index] = pqtzuv[2];
+            pbl_data_hgt[index]  = pqtzuv[3];
+            pbl_data_ugrd[index] = pqtzuv[4];
+            pbl_data_vgrd[index] = pqtzuv[5];
+            if (is_valid_pb_data(pbl_data_spfh[index])) spfh_cnt++;
+            if (is_valid_pb_data(pbl_data_hgt[index])) hgt_cnt++;
+            selected_levels.add(nint(pqtzuv[0]));
          }
-         if (index != -1) {
-            mlog << Error << "\n" << method_name  << "Missing some levels (" << index << ")\n";
-         }
-
-         if (pbl_level > MAX_PBL_LEVEL) {
-            it = pqtzuv_map_tq.begin();
+         if (start_offset > 0) {
+            // Replace the interpolated records with common records.
+            mlog << Error << "\n" << method_name  << "Excluded " << start_offset << " records\n";
             // Find vertical levels with both data
             float highest_pressure = bad_data_float;
-            for (; it!=pqtzuv_map_tq.end(); ++it) {
+            for (it = pqtzuv_map_tq.begin(); it!=pqtzuv_map_tq.end(); ++it) {
                if (pqtzuv_map_uv.count(it->first) > 0) {
                   highest_pressure = it->first;
                   break;
                }
             }
             if (!is_bad_data(highest_pressure)) {
+               bool found;
+               int vector_idx = start_offset - 1;
                index = MAX_PBL_LEVEL - 1;
                for (; it!=pqtzuv_map_tq.end(); ++it) {
                   int pres_level = nint(it->first);
+                  // Stop replacing if already exists at input list
                   if (selected_levels.has(pres_level)) break;
 
-                  float *pqtzuv = pqtzuv_map_merged[it->first];
-                  pbl_data_pres[index] = pqtzuv[0];
-                  pbl_data_spfh[index] = pqtzuv[1];
-                  pbl_data_temp[index] = pqtzuv[2];
-                  pbl_data_hgt[index]  = pqtzuv[3];
-                  pbl_data_ugrd[index] = pqtzuv[4];
-                  pbl_data_vgrd[index] = pqtzuv[5];
-                  mlog << Debug(6) << method_name << "Force to add "
-                       << pres_level << " into " << index << "\n";
-                  index--;
+                  found = false;
+                  for (; vector_idx>=0; vector_idx--) {
+                     if (is_eq(pqtzuv_merged_array[vector_idx][0], it->first)) {
+                        pqtzuv = pqtzuv_merged_array[vector_idx];
+                        pbl_data_pres[index] = pqtzuv[0];
+                        pbl_data_spfh[index] = pqtzuv[1];
+                        pbl_data_temp[index] = pqtzuv[2];
+                        pbl_data_hgt[index]  = pqtzuv[3];
+                        pbl_data_ugrd[index] = pqtzuv[4];
+                        pbl_data_vgrd[index] = pqtzuv[5];
+                        mlog << Debug(6) << method_name << "Force to add "
+                          << pres_level << " into " << index << "\n";
+                        vector_idx--;
+                        found = true;
+                        break;
+                     }
+                  }
+                  if (vector_idx < 0) break;
+                  if(found) index--;
                }
             }
          }
@@ -3204,9 +3216,11 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
             if (!is_valid_pb_data(hpbl))
                mlog << Debug(5) << method_name << " fail to compute PBL. TQ records: "
                     << tq_count << " UV records: " << uv_count << " merged records: "
-                    << pqtzuv_map_merged.size() << "\n";
+                    << pqtzuv_merged_array.size() << "\n";
          }
       }
+      for (int i; i<pqtzuv_merged_array.size(); i++) delete pqtzuv_merged_array[i];
+      pqtzuv_merged_array.clear();
    }
    return hpbl;
 }
