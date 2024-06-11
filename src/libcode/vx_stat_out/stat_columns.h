@@ -35,7 +35,7 @@ extern void close_txt_file(std::ofstream *&,  const char *);
 extern ConcatString append_climo_bin(const ConcatString &, int, int);
 
 // Write out the header row for fixed length line types
-extern void write_header_row(const char **, int, int, AsciiTable &, int, int);
+extern void write_header_row(const char * const *, int, int, AsciiTable &, int, int);
 
 // Write out the header row for variable length line types
 extern void write_mctc_header_row  (int, int, AsciiTable &, int, int);

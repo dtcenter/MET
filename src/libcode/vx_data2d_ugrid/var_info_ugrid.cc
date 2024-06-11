@@ -231,61 +231,6 @@ void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr)
                   Level.set_is_offset(as_offset);
                }
             }
-            // Check for a range of times
-            else if ((ptr3 = strchr(ptr2, ':')) != nullptr) {
-               // Check if a range has already been supplied
-               if (Dimension.has(range_flag)) {
-                  mlog << Error << "\n" << method_name
-                       << "only one dimension can have a range for NetCDF variable \""
-                       << MagicStr << "\".\n\n";
-                  exit(1);
-               }
-               else {
-                  int increment = 1;
-                  // Store the dimension of the range and limits
-                  *ptr3++ = 0;
-                  char *ptr_inc = strchr(ptr3, ':');
-                  if (ptr_inc != nullptr) *ptr_inc++ = 0;
-                  mlog << Debug(7) << method_name
-                       << " start: " << ptr2 << ", end: " << ptr3 << "\n";
-
-                  bool datestring_start = is_datestring(ptr2);
-                  bool datestring_end   = is_datestring(ptr3);
-                  if (datestring_start != datestring_end) {
-                     mlog << Error << "\n" << method_name
-                          << "the time value and an index/offset can not be mixed for NetCDF variable \""
-                          << MagicStr << "\".\n\n";
-                     exit(1);
-                  }
-                  if (datestring_start && datestring_end) as_offset = false;
-
-                  unixtime time_lower = datestring_start
-                                        ? timestring_to_unix(ptr2)
-                                        : (as_offset ? atoi(ptr2) : atof(ptr2));
-                  unixtime time_upper = datestring_end
-                                        ? timestring_to_unix(ptr3)
-                                        : (as_offset ? atoi(ptr3) : atof(ptr3));
-                  if (ptr_inc != nullptr) {
-                     if (as_offset) increment = atoi(ptr_inc);
-                     else {
-                        increment = is_float(ptr_inc)
-                                    ? atof(ptr_inc) : timestring_to_sec(ptr_inc);
-                        mlog << Debug(7) << method_name
-                             << " increment: \"" << ptr_inc << "\" to "
-                             << increment << " seconds.\n";
-                     }
-                  }
-
-                  add_dimension(range_flag, as_offset);
-                  Level.set_lower(time_lower);
-                  Level.set_upper(time_upper);
-                  Level.set_increment(increment);
-
-                  // Assume time level type for a range of levels
-                  Level.set_type(LevelType_Time);
-                  Level.set_is_offset(as_offset);
-               }
-            }
             else {
                // Single level
                int level = 0;

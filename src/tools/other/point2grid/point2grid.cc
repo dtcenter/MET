@@ -21,6 +21,7 @@
 //   001    01-25-21  Halley Gotway  MET #1630 Handle zero obs.
 //   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   003    10-03-23  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
+//   004    05-20-24  Howard Soh     MET #2867 Fix -qc ADP bug.
 //
 ////////////////////////////////////////////////////////////////////////
 

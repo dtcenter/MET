@@ -37,7 +37,7 @@
 # The compile_MET_all.sh script will compile and install MET and its
 # external library dependencies, if needed, including:
 # PROJ (with dependency SQLITE >= 3.11), GSL, BUFRLIB, 
-# GRIB2C (with dependencies Z, PNG, JASPER), HDF5, NETCDF (C and CXX), 
+# GRIB2C (with dependencies Z, PNG, JASPER, JPEG), HDF5, NETCDF (C and CXX), 
 # HDF4 (optional for MODIS-Regrid and lidar2nc), HDFEOS (optional for
 # MODIS-Regrid and lidar2nc), FREETYPE (optional for MODE Graphics),
 # and CAIRO (optional for MODE Graphics).
@@ -51,7 +51,7 @@
 # in the input environment configuration file (install_met_env.<machine_name>:
 # MET_GRIB2CLIB, MET_GRIB2CINC, GRIB2CLIB_NAME, MET_BUFRLIB, BUFRLIB_NAME, 
 # MET_HDF5, MET_NETCDF, MET_PROJ, MET_GSL, LIB_JASPER, LIB_LIBPNG, LIB_Z,
-# SQLITE_INCLUDE_DIR, SQLITE_LIB_DIR, TIFF_INCLUDE_DIR, TIFF_LIB_DIR.
+# LIB_JPEG, SQLITE_INCLUDE_DIR, SQLITE_LIB_DIR, TIFF_INCLUDE_DIR, TIFF_LIB_DIR.
 #
 # The optional libraries ecKit and atlas offer support for unstructured
 # grids. The optional libraries HDF4, HDFEOS, FREETYPE, and CAIRO are
@@ -176,11 +176,13 @@ if [[ -z ${MET_GRIB2CLIB} ]] && [[ -z ${MET_GRIB2C} ]]; then
   COMPILE_ZLIB=1
   COMPILE_LIBPNG=1
   COMPILE_JASPER=1
+  COMPILE_JPEG=1
   COMPILE_G2CLIB=1
 else
   COMPILE_ZLIB=0
   COMPILE_LIBPNG=0
   COMPILE_JASPER=0
+  COMPILE_JPEG=0
   COMPILE_G2CLIB=0
 fi
 
@@ -269,6 +271,7 @@ if [ ! -z "${SKIP_LIBS}" ]; then
   COMPILE_ZLIB=0
   COMPILE_LIBPNG=0
   COMPILE_JASPER=0
+  COMPILE_JPEG=0
   COMPILE_G2CLIB=0
   COMPILE_ECKIT=0
   COMPILE_ATLAS=0
@@ -570,6 +573,7 @@ if [[ $COMPILE_LIBPNG -eq 1 && $HOST != ys* ]]; then
   run_cmd "make ${MAKE_ARGS} install > $(pwd)/libpng.make_install.log 2>&1"
 fi
 
+
 # Compile JASPER
 if [ $COMPILE_JASPER -eq 1 ]; then
 
@@ -593,6 +597,24 @@ if [ $COMPILE_JASPER -eq 1 ]; then
   #run_cmd "make ${MAKE_ARGS} test > $(pwd)/jasper.make_test.log 2>&1"
   run_cmd "make ${MAKE_ARGS} install > $(pwd)/jasper.make_install.log 2>&1"
 fi
+
+# Compile JPEG
+if [ $COMPILE_JPEG -eq 1 ]; then
+
+  vrs="9e"
+
+  echo
+  echo "Compiling JPEG at `date`"
+  mkdir -p ${LIB_DIR}/jpeg
+  rm -rf ${LIB_DIR}/jpeg/jpeg*
+  tar -xf ${TAR_DIR}/jpegsrc.v${vrs}.tar.gz -C ${LIB_DIR}/jpeg
+  cd ${LIB_DIR}/jpeg/jpeg-${vrs}
+  echo "cd `pwd`"
+  run_cmd "./configure --prefix=${LIB_DIR} LDFLAGS=-L${LIB_DIR}/lib CPPFLAGS=-I${LIB_DIR}/include > $(pwd)/libjpeg.configure.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} > $(pwd)/libjpeg.make.log 2>&1"
+  run_cmd "make ${MAKE_ARGS} install > $(pwd)/libjpeg.make_install.log 2>&1"
+fi
+
 
 # Compile G2CLIB
 if [ $COMPILE_G2CLIB -eq 1 ]; then

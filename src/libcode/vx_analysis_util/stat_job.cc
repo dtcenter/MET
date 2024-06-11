@@ -2176,6 +2176,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
       if(line_type.n() == 1) {
 
          switch(string_to_statlinetype(line_type[0].c_str())) {
+
             case STATLineType::fho:
                write_header_row(fho_columns, n_fho_columns, 1, dump_at, 0, 0);
                break;
@@ -2198,6 +2199,10 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
 
             case STATLineType::sal1l2:
                write_header_row(sal1l2_columns, n_sal1l2_columns, 1, dump_at, 0, 0);
+               break;
+
+            case STATLineType::vcnt:
+               write_header_row(vcnt_columns, n_vcnt_columns, 1, dump_at, 0, 0);
                break;
 
             case STATLineType::vl1l2:
@@ -2232,6 +2237,10 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
                write_header_row(ecnt_columns, n_ecnt_columns, 1, dump_at, 0, 0);
                break;
 
+            case STATLineType::rps:
+               write_header_row(rps_columns, n_rps_columns, 1, dump_at, 0, 0);
+               break;
+
             case STATLineType::isc:
                write_header_row(isc_columns, n_isc_columns, 1, dump_at, 0, 0);
                break;
@@ -2246,6 +2255,14 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
 
             case STATLineType::seeps_mpr:
                write_header_row(seeps_mpr_columns, n_seeps_mpr_columns, 1, dump_at, 0, 0);
+               break;
+
+            case STATLineType::dmap:
+               write_header_row(dmap_columns, n_dmap_columns, 1, dump_at, 0, 0);
+               break;
+
+            case STATLineType::ssidx:
+               write_header_row(ssidx_columns, n_ssidx_columns, 1, dump_at, 0, 0);
                break;
 
             // Just write a STAT header line for indeterminant line types

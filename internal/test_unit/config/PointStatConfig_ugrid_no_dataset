@@ -47,7 +47,7 @@ fcst = {
    obs_quality_exc  = [];
 
    field = [
-      { name = "temperature";  level = "P925";  message_type = "ADPSFC"; }
+      { name = "theta";  level = "L2";  message_type = "ADPSFC"; }
    ];
 
 }
@@ -119,9 +119,9 @@ hira = {
 ////////////////////////////////////////////////////////////////////////////////
 
 output_flag = {
-   fho    = STAT;
-   ctc    = STAT;
-   cts    = STAT;
+   fho    = NONE;
+   ctc    = NONE;
+   cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
    cnt    = NONE;
@@ -151,8 +151,8 @@ seeps_p1_thresh = NA;
 ////////////////////////////////////////////////////////////////////////////////
 // Unstructured Grid (optional ecept ugrid_dataset)
 
-ugrid_dataset = "mpas";
-//ugrid_max_distance_km = 30;
+//ugrid_dataset = "mpas";
+ugrid_max_distance_km = 35;
 //ugrid_map_config = "";
 ugrid_coordinates_file = "${MET_TEST_INPUT}/ugrid_data/mpas/static.40962_reduced.nc";
 

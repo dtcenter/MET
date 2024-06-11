@@ -244,10 +244,6 @@ class VxPairDataPoint {
                          const char *, float *, Grid &, const char * = 0,
                          const DataPlane * = 0);
 
-      void add_prec_point_obs(float *, const char *, const char *, unixtime,
-                              const char *, float *, Grid &, int month, int hour,
-                              const char * = 0, const DataPlane * = 0);
-
       int  get_n_pair() const;
 
       void set_duplicate_flag(DuplicateType duplicate_flag);

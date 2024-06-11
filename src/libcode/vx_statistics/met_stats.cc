@@ -1363,6 +1363,7 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
    for(int i=0; i<n_alpha; i++) v_info.alpha[i] = alpha[i];
 
    v_info.vcount = vcount + c.vcount;
+   v_info.dcount = dcount + c.dcount;
 
    if(v_info.vcount > 0) {
       v_info.uf_bar      = (uf_bar*vcount      + c.uf_bar*c.vcount)     /v_info.vcount;
@@ -1374,12 +1375,15 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
       v_info.uvoo_bar    = (uvoo_bar*vcount    + c.uvoo_bar*c.vcount)   /v_info.vcount;
       v_info.f_speed_bar = (f_speed_bar*vcount + c.f_speed_bar*c.vcount)/v_info.vcount;
       v_info.o_speed_bar = (o_speed_bar*vcount + c.o_speed_bar*c.vcount)/v_info.vcount;
-      v_info.dir_bar     = (dir_bar*vcount     + c.dir_bar*c.vcount)    /v_info.vcount;
-      v_info.absdir_bar  = (absdir_bar*vcount  + c.absdir_bar*c.vcount) /v_info.vcount;
-      v_info.dir2_bar    = (dir2_bar*vcount    + c.dir2_bar*c.vcount)   /v_info.vcount;
+   }
+   if(v_info.dcount > 0) {
+      v_info.dir_bar     = (dir_bar*dcount     + c.dir_bar*c.dcount)    /v_info.dcount;
+      v_info.absdir_bar  = (absdir_bar*dcount  + c.absdir_bar*c.dcount) /v_info.dcount;
+      v_info.dir2_bar    = (dir2_bar*dcount    + c.dir2_bar*c.dcount)   /v_info.dcount;
    }
 
    v_info.vacount = vacount + c.vacount;
+   v_info.dacount = dacount + c.dacount;
 
    if(v_info.vacount > 0) {
       v_info.ufa_bar      = (ufa_bar*vacount      + c.ufa_bar*c.vacount)     /v_info.vacount;
@@ -1391,9 +1395,11 @@ VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
       v_info.uvooa_bar    = (uvooa_bar*vacount    + c.uvooa_bar*c.vacount)   /v_info.vacount;
       v_info.fa_speed_bar = (fa_speed_bar*vacount + c.fa_speed_bar*c.vacount)/v_info.vacount;
       v_info.oa_speed_bar = (oa_speed_bar*vacount + c.oa_speed_bar*c.vacount)/v_info.vacount;
-      v_info.dira_bar     = (dira_bar*vacount     + c.dira_bar*c.vacount)    /v_info.vacount;
-      v_info.absdira_bar  = (absdira_bar*vacount  + c.absdira_bar*c.vacount) /v_info.vacount;
-      v_info.dira2_bar    = (dira2_bar*vacount    + c.dira2_bar*c.vacount)   /v_info.vacount;
+   }
+   if(v_info.dacount > 0) {
+      v_info.dira_bar     = (dira_bar*dacount     + c.dira_bar*c.dacount)    /v_info.dacount;
+      v_info.absdira_bar  = (absdira_bar*dacount  + c.absdira_bar*c.dacount) /v_info.dacount;
+      v_info.dira2_bar    = (dira2_bar*dacount    + c.dira2_bar*c.dacount)   /v_info.dacount;
    }
 
    v_info.compute_stats();
@@ -1436,6 +1442,7 @@ void VL1L2Info::zero_out() {
    dir2_bar     = 0.0;
 
    vcount       = 0;
+   dcount       = 0;
 
    //
    // VAL1L2 Quantities
@@ -1455,6 +1462,7 @@ void VL1L2Info::zero_out() {
    dira2_bar    = 0.0;
 
    vacount      = 0;
+   dacount      = 0;
 
    return;
 }
@@ -1464,8 +1472,6 @@ void VL1L2Info::zero_out() {
 void VL1L2Info::clear() {
 
    n = 0;
-   n_dir_undef = 0;
-   n_dira_undef = 0;
    n_alpha = 0;
    if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
    
@@ -1515,8 +1521,6 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    logic   = c.logic;
 
    n = c.n;
-   n_dir_undef = c.n_dir_undef;
-   n_dira_undef = c.n_dira_undef;
    allocate_n_alpha(c.n_alpha);
    for(i=0; i<c.n_alpha; i++) { alpha[i] = c.alpha[i]; }
    
@@ -1535,6 +1539,7 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    dir2_bar     = c.dir2_bar;
 
    vcount       = c.vcount;
+   dcount       = c.dcount;
 
    // VAL1L2 Quantities
    ufa_bar      = c.ufa_bar;
@@ -1551,6 +1556,7 @@ void VL1L2Info::assign(const VL1L2Info &c) {
    dira2_bar    = c.dira2_bar;
 
    vacount      = c.vacount;
+   dacount      = c.dacount;
 
    //
    // Statistics
@@ -1662,13 +1668,12 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
       f_speed_bar     += wgt*sqrt(uf*uf + vf*vf);
       o_speed_bar     += wgt*sqrt(uo*uo + vo*vo);
 
-      // Exclude undefined angle differences from the running sums
+      // Compute direction difference
       d_diff = angle_difference(uf, vf, uo, vo);
 
-      if(is_bad_data(d_diff)) {
-         n_dir_undef  += 1;
-      } 
-      else {
+      // Ignore undefined direction differences
+      if(!is_bad_data(d_diff)) {
+         dcount       += 1;
          dir_wgt_sum  += pd_u.wgt_na[i];
          dir_bar      += pd_u.wgt_na[i]*d_diff;
          absdir_bar   += pd_u.wgt_na[i]*abs(d_diff);
@@ -1691,13 +1696,12 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
          fa_speed_bar += wgt*sqrt((uf-uc)*(uf-uc) + (vf-vc)*(vf-vc));
          oa_speed_bar += wgt*sqrt((uo-uc)*(uo-uc) + (vo-vc)*(vo-vc));
 
-         // Exclude undefined angle differences from the running sums
+         // Compute anomalous direction difference
          d_diff = angle_difference(uf-uc, vf-vc, uo-uc, vo-vc);
 
-         if(is_bad_data(d_diff)) {
-            n_dira_undef += 1;
-         }
-         else {
+         // Ignore undefined anomalous direction differences
+         if(!is_bad_data(d_diff)) {
+            dacount      += 1;
             dira_wgt_sum += pd_u.wgt_na[i];
             dira_bar     += pd_u.wgt_na[i]*d_diff;
             absdira_bar  += pd_u.wgt_na[i]*abs(d_diff);
@@ -1882,15 +1886,6 @@ void VL1L2Info::compute_stats() {
 
       DIR_ABSERR.v   = fabs(DIR_ERR.v);
  
-      // Print undefined wind direction warning message
-      if(n_dir_undef > 0) {
-         mlog << Warning << "\nVL1L2Info::compute_stats() -> "
-              << "Skipping " << n_dir_undef << " of " << vcount
-              << " vector pairs for which the direction difference is undefined.\n"
-              << "Set the \"wind_thresh\" and \"wind_logic\" configuration options "
-              << "to exclude zero vectors.\n\n";
-      }
-
       DIR_ME.v       = dir_bar;
       DIR_MAE.v      = absdir_bar;
       DIR_MSE.v      = dir2_bar;
@@ -1912,15 +1907,6 @@ void VL1L2Info::compute_stats() {
       }
 
       ANOM_CORR_UNCNTR.v = compute_anom_corr_uncntr(uvffa_bar, uvooa_bar, uvfoa_bar);
-
-      // Print undefined wind direction warning message
-      if(n_dira_undef > 0) {
-         mlog << Warning << "\nVL1L2Info::compute_stats() -> "
-              << "Skipping " << n_dira_undef << " of " << vacount
-              << " anomaly vector pairs for which the direction difference is undefined.\n"
-              << "Set the \"wind_thresh\" and \"wind_logic\" configuration options "
-              << "to exclude zero vectors.\n\n";
-      }
    }
 
    // Compute parametric confidence intervals
