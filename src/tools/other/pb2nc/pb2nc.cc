@@ -386,6 +386,7 @@ static bool   insert_pbl(float *obs_arr, const float pbl_value, const int pbl_co
 static int    interpolate_by_pressure(int length, float *pres_data, float *var_data);
 static void   interpolate_pqtzuv(float*, float*, float*);
 static bool   is_valid_pb_data(float pb_value);
+static void   check_fortran_file_id(const int unit, const char *method_name);
 static void   log_merged_tqz_uv(map<float, float*> pqtzuv_map_tq,
                                 map<float, float*> pqtzuv_map_uv,
                                 map<float, float*> &pqtzuv_map_merged,
@@ -431,10 +432,7 @@ void dump_pb_data(
       msg_typ_ret[i] = keep_message_type(vld_msg_typ_list[i]);
    }
 
-   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
-      mlog << Error << "\n" << method_name
-           << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
-   }
+   check_fortran_file_id(unit, method_name);
    dumppb_(blk_file.c_str(), &unit, dump_dir.c_str(), &len1,
            prefix.c_str(), &len2, msg_typ_ret);
 }
@@ -661,14 +659,12 @@ ConcatString save_bufr_table_to_file(const char *blk_file, int _file_id) {
    int len;
    ConcatString tbl_filename;
    ConcatString tbl_prefix;
+   const char *method_name = "save_bufr_table_to_file() ";
 
    tbl_prefix << conf_info.tmp_dir << "/" << tmp_pb2nc_base;
    tbl_filename = make_temp_file_name(tbl_prefix.c_str(), "tbl");
    len = tbl_filename.length();
-   if (_file_id > MAX_FORTRAN_FILE_ID || _file_id < MIN_FORTRAN_FILE_ID) {
-      mlog << Error << "\nsave_bufr_table_to_file() -> "
-           << "Invalid file ID [" << _file_id << "] between 1 and 99.\n\n";
-   }
+   check_fortran_file_id(_file_id, method_name);
    openpb_(blk_file, &_file_id);
    dump_tbl_(blk_file, &_file_id, tbl_filename.c_str(), &len);
    closepb_(&_file_id);
@@ -822,6 +818,7 @@ void get_variable_info(ConcatString blk_file, int unit) {
    }
 
    remove_temp_file(tbl_filename);
+
    return;
 }
 
@@ -946,16 +943,12 @@ void process_pbfile(int i_pb) {
 
       unit = dump_unit+i_pb;
       prefix = get_short_name(pbfile[i_pb].c_str());
-      dump_pb_data((dump_unit+i_pb), prefix, blk_file, method_name);
+      dump_pb_data((dump_unit+i_pb), prefix, blk_file, method_name_s);
    }
-
 
    // Open the blocked temp PrepBufr file for reading
    unit = file_unit + i_pb;
-   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
-      mlog << Error << "\n" << method_name
-           << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
-   }
+   check_fortran_file_id(unit, method_name_s);
    openpb_(blk_file.c_str(), &unit);
 
    // Compute the number of PrepBufr records in the current file.
@@ -2143,18 +2136,12 @@ void process_pbfile_metadata(int i_pb) {
    pblock(file_name.c_str(), blk_file.c_str(), Action::block);
 
    unit = dump_unit + i_pb + file_unit;
-   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
-      mlog << Error << "\n" << method_name << " -> "
-           << "Invalid file ID [" << unit << "] between 1 and 99 for BUFR table.\n\n";
-   }
+   check_fortran_file_id(unit, method_name);
    get_variable_info(blk_file, unit);
 
    // The input PrepBufr file is blocked already.
    unit = dump_unit + i_pb;
-   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
-      mlog << Error << "\n" << method_name << " -> "
-           << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
-   }
+   check_fortran_file_id(unit, method_name);
 
    // Compute the number of PrepBufr records in the current file.
    numpbmsg_new_(blk_file.c_str(), &unit, &npbmsg);
@@ -2511,11 +2498,13 @@ void write_netcdf_hdr_data() {
 
    // Check for no messages retained
    if(dim_count <= 0) {
-      mlog << Error << "\n" << method_name << "-> "
-           << "No PrepBufr messages retained.  Nothing to write.\n\n";
+      mlog << Warning << "\n" << method_name << "-> "
+           << "No PrepBufr messages retained.  No output file written.\n\n";
+
       // Delete the NetCDF file
       remove_temp_file(ncfile);
-      exit(1);
+
+      return;
    }
 
    nc_point_obs.get_obs_vars()->attr_pb2nc = true;
@@ -3130,8 +3119,10 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
             selected_levels.add(nint(pqtzuv[0]));
          }
          if (start_offset > 0) {
-            // Replace the interpolated records with common records.
-            mlog << Error << "\n" << method_name  << "Excluded " << start_offset << " records\n";
+
+            // Replace the interpolated records with common records
+            mlog << Debug(5) << method_name  << "Excluded " << start_offset << " records\n";
+
             // Find vertical levels with both data
             float highest_pressure = bad_data_float;
             for (it = pqtzuv_map_tq.begin(); it!=pqtzuv_map_tq.end(); ++it) {
@@ -3318,8 +3309,8 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
    if ((nint(prev_pqtzuv[0]) == nint(cur_pqtzuv[0]))
        || (nint(next_pqtzuv[0]) == nint(cur_pqtzuv[0]))
        || (nint(prev_pqtzuv[0]) == nint(next_pqtzuv[0]))) {
-      mlog << Error << "\n" << method_name
-           << "  Can't interpolate because of same pressure levels. prev: "
+      mlog << Debug(9) << method_name
+           << "  can't interpolate because of same pressure levels. prev: "
            << prev_pqtzuv[0] << ", cur: " << cur_pqtzuv[0]
            << ", next: " <<  prev_pqtzuv[0] << "\n\n";
    }
@@ -3355,6 +3346,16 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
 
 static bool is_valid_pb_data(float pb_value) {
    return (!is_bad_data(pb_value) && pb_value < r8bfms);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void check_fortran_file_id(const int unit, const char *method_name) {
+   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
+      mlog << Error << "\n" << method_name << " -> "
+           << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
+      exit(1);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
