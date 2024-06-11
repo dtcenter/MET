@@ -124,9 +124,9 @@ static NcFile *nc_out  = (NcFile *) nullptr;
 static NcDim  lat_dim ;
 static NcDim  lon_dim ;
 
-static int adp_qc_high;     /* 3 as baseline algorithm, 0 for enterpirse algorithm */
-static int adp_qc_medium;   /* 1 as baseline algorithm, 1 for enterpirse algorithm */
-static int adp_qc_low;      /* 0 as baseline algorithm, 2 for enterpirse algorithm */
+static int adp_qc_high;     /* 3 as baseline algorithm, 0 for enterprise algorithm */
+static int adp_qc_medium;   /* 1 as baseline algorithm, 1 for enterprise algorithm */
+static int adp_qc_low;      /* 0 as baseline algorithm, 2 for enterprise algorithm */
 
 enum class GOES_QC {
    HIGH = 0,
@@ -2458,9 +2458,9 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
    // -99 is arbitrary number as invalid QC value
    memset(qc_data, -99, from_data_size*sizeof(uchar));
 
-   adp_qc_high = 3;     /* 3 as baseline algorithm, 0 for enterpirse algorithm */
-   adp_qc_medium = 1;   /* 1 as baseline algorithm, 1 for enterpirse algorithm */
-   adp_qc_low = 0;      /* 0 as baseline algorithm, 2 for enterpirse algorithm */
+   adp_qc_high = 3;     /* 3 as baseline algorithm, 0 for enterprise algorithm */
+   adp_qc_medium = 1;   /* 1 as baseline algorithm, 1 for enterprise algorithm */
+   adp_qc_low = 0;      /* 0 as baseline algorithm, 2 for enterprise algorithm */
 
    NcVar var_qc;
    NcVar var_adp;
