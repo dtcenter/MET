@@ -9,7 +9,7 @@ import subprocess
 import sys
 import xml.etree.ElementTree as ET
 
-def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, callchk=False):
+def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, callchk=False, log_overwrite=True):
     """
     Parse a unit test xml file, run the associated tests, and display test results.
 
@@ -28,6 +28,9 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
         if true, activate valgrind with memcheck
     callchk : bool, default False
         if true, activate valgrind with callcheck
+    log_overwrite : bool, default True
+        when true, if file_log points to an existing file, that file will be overwritten.
+        when false, new log records will be appended to the existing file.
     """
   
     # initialize logger
@@ -41,7 +44,11 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
 
     # create/add file handler
     if file_log and not cmd_only:
-        fh = logging.FileHandler(file_log)
+        if log_overwrite:
+            file_mode = 'w'
+        else:
+            file_mode = 'a'
+        fh = logging.FileHandler(file_log, mode=file_mode)
         fh.setLevel(logging.DEBUG)
         logger.addHandler(fh)
    
@@ -231,6 +238,13 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
                 if not noexit:
                     sys.exit(1)
 
+    # clean up logger/handlers (to avoid duplicate logging when this function is looped)
+    logger.removeHandler(ch)
+    try:
+        logger.removeHandler(fh)
+    except NameError:
+        pass
+
 
 def build_tests(test_root):
     """
@@ -351,7 +365,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Run a unit test.")
-    parser.add_argument('test_xml', )
+    parser.add_argument('test_xml', nargs='+')
     parser.add_argument('-log', metavar='log_file',
                         help='if present, write output from each test to log_file')
     parser.add_argument('-cmd', action='store_true',
@@ -364,6 +378,12 @@ if __name__ == "__main__":
                         help='if present, the unit tester will continue executing subsequent tests when a test fails')
     args = parser.parse_args()
 
-    unit(test_xml=args.test_xml, file_log=args.log, cmd_only=args.cmd, noexit=args.noexit, memchk=args.memchk, callchk=args.callchk)
+    for i, xml in enumerate(args.test_xml):
+        if i==0:
+            new_log = True
+        else:
+            new_log = False
+        unit(test_xml=xml, file_log=args.log, cmd_only=args.cmd, noexit=args.noexit, memchk=args.memchk, callchk=args.callchk,
+             log_overwrite=new_log)
 
 
