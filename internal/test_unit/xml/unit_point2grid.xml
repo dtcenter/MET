@@ -213,7 +213,7 @@
     </output>
   </test>
 
-  <test name="point2grid_GOES_16_ADP_Enterprise_high">
+  <test name="point2grid_GOES_16_ADP_Enterprise_high_medium">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
       <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
