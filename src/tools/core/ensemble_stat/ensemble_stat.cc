@@ -69,7 +69,11 @@
 //   037    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main.
 //   038    09/06/22  Halley Gotway  MET #1908 Remove ensemble processing logic.
 //   039    09/29/22  Halley Gotway  MET #2286 Refine GRIB1 table lookup logic.
-//   040    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files                                                                                  
+//   040    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from
+//                                   header files.
+//   041    04/16/24  Halley Gotway  MET #2786 Compute RPS from climo bin probs.
+//   042    04/29/24  Halley Gotway  MET #2870 Ignore MISSING keyword.
+//   043    04/29/24  Halley Gotway  MET #2795 Move level mismatch warning.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -203,8 +207,6 @@ void process_command_line(int argc, char **argv) {
    int i;
    CommandLine cline;
    ConcatString default_config_file;
-   Met2dDataFile *ens_mtddf = (Met2dDataFile *) nullptr;
-   Met2dDataFile *obs_mtddf = (Met2dDataFile *) nullptr;
    const char *method_name = "process_command_line() -> ";
 
    // Set default output directory
@@ -358,31 +360,19 @@ void process_command_line(int argc, char **argv) {
 
    // Get the ensemble file type from config, if present
    etype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
-   if(FileType_UGrid == etype) {
-      mlog << Error << "\n" << program_name << " -> filetype "
-           << grdfiletype_to_string(etype) << " from the configuration is not supported\n\n";
 
-      exit(1);
+   // Get the ensemble file type from the files
+   if(etype == FileType_None) {
+      etype = parse_file_list_type(ens_file_list);
    }
 
-   // Read the first input ensemble file
-   if(!(ens_mtddf = mtddf_factory.new_met_2d_data_file(ens_file_list[0].c_str(), etype))) {
+   // UGrid not supported
+   if(etype == FileType_UGrid) {
       mlog << Error << "\n" << method_name
-           << "trouble reading ensemble file \""
-           << ens_file_list[0] << "\"\n\n";
+           << grdfiletype_to_string(etype)
+           << " ensemble files are not supported\n\n";
       exit(1);
    }
-
-   // Store the input ensemble file type
-   etype = ens_mtddf->file_type();
-   if(FileType_UGrid == etype) {
-      mlog << Error << "\n" << program_name << " -> The filetype "
-           << grdfiletype_to_string(etype) << " (" << ens_file_list[0]
-           << ") is not supported\n\n";
-
-      exit(1);
-   }
-
 
    // Observation files are required
    if(!grid_obs_flag && !point_obs_flag) {
@@ -403,28 +393,17 @@ void process_command_line(int argc, char **argv) {
 
       // Get the observation file type from config, if present
       otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
-      if(FileType_UGrid == otype) {
-         mlog << Error << "\n" << program_name << " -> filetype "
-              << grdfiletype_to_string(otype) << " from the configuration is not supported\n\n";
-      
-         exit(1);
+
+      // Get the observation file type from the files
+      if(otype == FileType_None) {
+         otype = parse_file_list_type(grid_obs_file_list);
       }
 
-      // Read the first gridded observation file
-      if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(grid_obs_file_list[0].c_str(), otype))) {
+      // UGrid not supported
+      if(otype == FileType_UGrid) {
          mlog << Error << "\n" << method_name
-              << "trouble reading gridded observation file \""
-              << grid_obs_file_list[0] << "\"\n\n";
-         exit(1);
-      }
-
-      // Store the gridded observation file type
-      otype = obs_mtddf->file_type();
-      if(FileType_UGrid == otype) {
-         mlog << Error << "\n" << program_name << " -> The filetype "
-              << grdfiletype_to_string(etype) << " (" << grid_obs_file_list[0]
-              << ") is not supported\n\n";
-      
+              << grdfiletype_to_string(otype)
+              << " gridded observation files are not supported\n\n";
          exit(1);
       }
    }
@@ -473,9 +452,7 @@ void process_command_line(int argc, char **argv) {
 
       if(!file_exists(ens_file_list[i].c_str()) &&
          !is_python_grdfiletype(etype)) {
-         mlog << Warning << "\n" << method_name
-              << "can't open input ensemble file: "
-              << ens_file_list[i] << "\n\n";
+         log_missing_file(method_name, "input ensemble file", ens_file_list[i]);
          ens_file_vld.add(0);
       }
       else {
@@ -486,9 +463,7 @@ void process_command_line(int argc, char **argv) {
    // User-specified ensemble mean file
    if(ens_mean_file.nonempty()) {
       if(!file_exists(ens_mean_file.c_str())) {
-         mlog << Warning << "\n" << method_name
-              << "can't open input ensemble mean file: "
-              << ens_mean_file << "\n\n";
+         log_missing_file(method_name, "input ensemble mean file", ens_mean_file);
          ens_mean_file = "";
       }
    }
@@ -499,10 +474,6 @@ void process_command_line(int argc, char **argv) {
            << "control_id is set in the config file but "
            << "control file is not provided with -ctrl argument\n\n";
    }
-
-   // Deallocate memory for data files
-   if(ens_mtddf) { delete ens_mtddf; ens_mtddf = (Met2dDataFile *) nullptr; }
-   if(obs_mtddf) { delete obs_mtddf; obs_mtddf = (Met2dDataFile *) nullptr; }
 
    return;
 }
@@ -663,6 +634,9 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
          dp = met_regrid(dp, mtddf->grid(), grid, info->regrid());
       }
 
+      // Rescale probabilities from [0, 100] to [0, 1]
+      if(info->is_prob()) rescale_probability(dp);
+
       // Store the valid time, if not already set
       if(ens_valid_ut == (unixtime) 0) {
          ens_valid_ut = dp.valid();
@@ -722,6 +696,13 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
                                 info->regrid());
          }
       }
+
+      // Rescale probabilities from [0, 100] to [0, 1]
+      if(info->is_prob()) {
+         for(i=0; i<dpa.n_planes(); i++) {
+            rescale_probability(dpa[i]);
+         }
+      } // end for i
 
       // Store the valid time, if not already set
       if(ens_valid_ut == (unixtime) 0) {
@@ -827,6 +808,10 @@ void process_point_vx() {
    // Loop through each of the fields to be verified
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
+      VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info();
+      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
+      bool print_level_mismatch_warning = true;
+
       // Initialize
       emn_dpa.clear();
 
@@ -843,6 +828,23 @@ void process_point_vx() {
          else if(!process_point_ens(i, j, fcst_dpa)) {
             n_miss++;
             continue;
+         }
+
+         // MET #2795, for multiple individual forecast levels, print a
+         // warning if the observations levels are not fully covered.
+         if(print_level_mismatch_warning &&
+            fcst_dpa.n_planes() > 1 &&
+            !is_eq(fcst_info->level().lower(), fcst_info->level().upper()) &&
+            (obs_info->level().lower() < fcst_info->level().lower() ||
+             obs_info->level().upper() > fcst_info->level().upper())) {
+            mlog << Warning << "\nprocess_point_vx() -> "
+                 << "The forecast level range (" << fcst_info->magic_str()
+                 << ") does not fully contain the observation level range ("
+                 << obs_info->magic_str() << "). No vertical interpolation "
+                 << "will be performed for observations falling outside "
+                 << "the range of forecast levels. Instead, they will be "
+                 << "matched to the single nearest forecast level.\n\n";
+            print_level_mismatch_warning = false;
          }
 
          // Store ensemble member data
@@ -863,20 +865,18 @@ void process_point_vx() {
          mlog << Debug(2) << "Processing ensemble mean file: "
               << ens_mean_file << "\n";
 
-         VarInfo *info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info();
-
          // Read the gridded data from the ensemble mean file
-         if(!get_data_plane_array(ens_mean_file.c_str(), info->file_type(), info,
-                                  emn_dpa, true)) {
+         if(!get_data_plane_array(ens_mean_file.c_str(), fcst_info->file_type(),
+                                  fcst_info, emn_dpa, true)) {
             mlog << Error << "\nprocess_point_vx() -> "
                  << "trouble reading the ensemble mean field \""
-                 << info->magic_str() << "\" from file \""
+                 << fcst_info->magic_str() << "\" from file \""
                  << ens_mean_file << "\"\n\n";
             exit(1);
          }
 
          // Dump out the number of levels found
-         mlog << Debug(2) << "For " << info->magic_str()
+         mlog << Debug(2) << "For " << fcst_info->magic_str()
               << " found " << emn_dpa.n_planes() << " forecast levels.\n";
 
       }
@@ -963,10 +963,8 @@ void process_point_obs(int i_nc) {
 #endif
       if(!nc_point_obs.open(point_obs_file_list[i_nc].c_str())) {
          nc_point_obs.close();
-      
-         mlog << Warning << "\n" << method_name
-              << "can't open observation netCDF file: "
-              << point_obs_file_list[i_nc] << "\n\n";
+         log_missing_file(method_name, "observation netCDF file",
+                          point_obs_file_list[i_nc]);
          return;
       }
       
@@ -1752,8 +1750,14 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
       rps_info.set_cdp_thresh(vx_opt.cdf_info.cdf_ta);
    }
 
-   // Compute ensemble RPS statistics
-   rps_info.set(*pd_ptr);
+   // Compute ensemble RPS statistics from pre-computed binned probabilities
+   if(vx_opt.vx_pd.fcst_info->get_var_info()->is_prob()) {
+      rps_info.set_climo_bin_prob(*pd_ptr, vx_opt.ocat_ta);
+   }
+   // Compute ensemble RPS statistics from ensemble member values
+   else {
+      rps_info.set(*pd_ptr);
+   }
 
    // Write out RPS
    if(vx_opt.output_flag[i_rps] != STATOutputType::None &&
@@ -2053,6 +2057,9 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
    int i, j;
    PairDataEnsemble pd;
 
+   // Check for probabilistic input
+   bool is_prob = vx_opt.vx_pd.fcst_info->get_var_info()->is_prob();
+
    // Process each observation filtering threshold
    for(i=0; i<vx_opt.othr_ta.n(); i++) {
 
@@ -2069,17 +2076,19 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       setup_txt_files();
 
       // Compute ECNT scores
-      if(vx_opt.output_flag[i_ecnt] != STATOutputType::None) {
+      if(!is_prob &&
+         vx_opt.output_flag[i_ecnt] != STATOutputType::None) {
          do_ecnt(vx_opt, vx_opt.othr_ta[i], &pd);
       }
 
-      // Compute RPS scores
+      // Compute RPS scores, only support for forecast probabilities
       if(vx_opt.output_flag[i_rps] != STATOutputType::None) {
          do_rps(vx_opt, vx_opt.othr_ta[i], &pd);
       }
 
       // Write RHIST counts
-      if(vx_opt.output_flag[i_rhist] != STATOutputType::None) {
+      if(!is_prob &&
+         vx_opt.output_flag[i_rhist] != STATOutputType::None) {
 
          pd.compute_rhist();
 
@@ -2092,7 +2101,8 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Write PHIST counts if greater than 0
-      if(vx_opt.output_flag[i_phist] != STATOutputType::None) {
+      if(!is_prob &&
+         vx_opt.output_flag[i_phist] != STATOutputType::None) {
 
          pd.phist_bin_size = vx_opt.vx_pd.pd[0][0][0].phist_bin_size;
          pd.compute_phist();
@@ -2106,7 +2116,8 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Write RELP counts
-      if(vx_opt.output_flag[i_relp] != STATOutputType::None) {
+      if(!is_prob &&
+         vx_opt.output_flag[i_relp] != STATOutputType::None) {
 
          pd.compute_relp();
 
@@ -2119,7 +2130,8 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       }
 
       // Write SSVAR scores
-      if(vx_opt.output_flag[i_ssvar] != STATOutputType::None) {
+      if(!is_prob &&
+         vx_opt.output_flag[i_ssvar] != STATOutputType::None) {
 
          pd.ssvar_bin_size = vx_opt.vx_pd.pd[0][0][0].ssvar_bin_size;
          pd.compute_ssvar();
@@ -2149,16 +2161,17 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
    } // end for i
 
    // Write PCT counts and scores
-   if(vx_opt.output_flag[i_pct]  != STATOutputType::None ||
-      vx_opt.output_flag[i_pstd] != STATOutputType::None ||
-      vx_opt.output_flag[i_pjc]  != STATOutputType::None ||
-      vx_opt.output_flag[i_prc]  != STATOutputType::None ||
-      vx_opt.output_flag[i_eclv] != STATOutputType::None) {
+   if(!is_prob &&
+      (vx_opt.output_flag[i_pct]  != STATOutputType::None ||
+       vx_opt.output_flag[i_pstd] != STATOutputType::None ||
+       vx_opt.output_flag[i_pjc]  != STATOutputType::None ||
+       vx_opt.output_flag[i_prc]  != STATOutputType::None ||
+       vx_opt.output_flag[i_eclv] != STATOutputType::None)) {
       do_pct(vx_opt, pd_all);
    }
 
    // Write out the unfiltered ORANK lines for point verification
-   if(is_point_vx &&
+   if(is_point_vx && !is_prob &&
       vx_opt.output_flag[i_orank] != STATOutputType::None) {
 
       // Set the header column

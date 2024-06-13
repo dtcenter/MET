@@ -18,51 +18,19 @@
 
 #include <netcdf>
 
-#ifndef ncbyte
-typedef signed char ncbyte; // from ncvalues.h
-#endif   /*  ncbyte  */
-#ifndef uchar
-typedef unsigned char uchar;
-#endif   /*  uchar  */
-
 #include "concat_string.h"
 #include "int_array.h"
 #include "long_array.h"
 #include "num_array.h"
 #include "nc_var_info.h"
 
+#include "nc_utils.hpp"
+
 ////////////////////////////////////////////////////////////////////////
 
-static const std::string C_unknown_str = std::string("unknown");
-
-#define IS_VALID_NC(ncObj)          (!ncObj.isNull())
-#define IS_VALID_NC_P(ncObjPtr)     ((ncObjPtr != nullptr && !ncObjPtr->isNull()))
-
-#define IS_INVALID_NC(ncObj)        ncObj.isNull()
-#define IS_INVALID_NC_P(ncObjPtr)   (ncObjPtr == nullptr || ncObjPtr->isNull())
-
-#define GET_NC_NAME(ncObj)          ncObj.getName()
-#define GET_NC_NAME_P(ncObjPtr)     ncObjPtr->getName()
-
-#define GET_NC_SIZE(ncObj)          ncObj.getSize()
-#define GET_NC_SIZE_P(ncObjPtr)     ncObjPtr->getSize()
-
-#define GET_SAFE_NC_NAME(ncObj)         (ncObj.isNull() ? C_unknown_str : ncObj.getName())
-#define GET_SAFE_NC_NAME_P(ncObjPtr)    (IS_INVALID_NC_P(ncObjPtr) ? C_unknown_str : ncObjPtr->getName())
-
-#define GET_NC_TYPE_ID(ncObj)           ncObj.getType().getId()
-#define GET_NC_TYPE_ID_P(ncObjPtr)      ncObjPtr->getType().getId()
-#define GET_NC_TYPE_NAME(ncObj)         ncObj.getType().getName()
-#define GET_NC_TYPE_NAME_P(ncObjPtr)    ncObjPtr->getType().getName()
-
-#define GET_NC_DIM_COUNT(ncObj)         ncObj.getDimCount()
-#define GET_NC_DIM_COUNT_P(ncObjPtr)    ncObjPtr->getDimCount()
-
-#define GET_NC_VAR_COUNT(ncObj)         ncObj.getVarCount()
-#define GET_NC_VAR_COUNT_P(ncObjPtr)    ncObjPtr->getVarCount()
-
-#define GET_NC_VARS(ncObj)              ncObj.getVars()
-#define GET_NC_VARS_P(ncObjPtr)         ncObjPtr->getVars()
+#ifndef uchar
+typedef unsigned char uchar;
+#endif   /*  uchar  */
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -135,11 +103,9 @@ static const std::string coordinates_att_name          = "coordinates";
 static const std::string coordinate_axis_type_att_name = "_CoordinateAxisType";
 static const std::string cf_att_name                   = "Conventions";
 static const std::string description_att_name          = "description";
-static const std::string fill_value_att_name           = "_FillValue";
 static const std::string grid_mapping_att_name         = "grid_mapping";
 static const std::string grid_mapping_name_att_name    = "grid_mapping_name";
 static const std::string long_name_att_name            = "long_name";
-static const std::string missing_value_att_name        = "missing_value";
 static const std::string projection_att_name           = "Projection";
 static const std::string scale_factor_att_name         = "scale_factor";
 static const std::string standard_name_att_name        = "standard_name";
@@ -183,9 +149,6 @@ extern bool      get_att_no_leap_year(const netCDF::NcVar *);
 
 extern bool      get_cf_conventions(const netCDF::NcFile *, ConcatString&);
 
-extern netCDF::NcVarAtt   *get_nc_att(const netCDF::NcVar  *, const ConcatString &, bool exit_on_error = false);
-extern netCDF::NcGroupAtt *get_nc_att(const netCDF::NcFile *, const ConcatString &, bool exit_on_error = false);
-
 extern bool get_nc_att_value(const netCDF::NcVarAtt *, std::string &);
 extern bool get_nc_att_value(const netCDF::NcVarAtt *, int          &, bool exit_on_error = true);
 extern bool get_nc_att_value(const netCDF::NcVarAtt *, float        &, bool exit_on_error = true);
@@ -195,6 +158,7 @@ extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, Concat
 extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, int          &, bool exit_on_error = false);
 extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, float        &, bool exit_on_error = false);
 extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, double       &, bool exit_on_error = false);
+extern bool get_nc_att_values(const netCDF::NcVar *, const ConcatString &, unsigned short *, bool exit_on_error = false);
 
 extern bool has_att(netCDF::NcFile *, const ConcatString name, bool exit_on_error=false);
 extern bool has_att(netCDF::NcVar *, const ConcatString name, bool do_log=false);
@@ -257,11 +221,10 @@ extern ConcatString* get_string_val(netCDF::NcVar *var, const int index, const i
 extern bool get_nc_data(netCDF::NcVar *, int    *data);
 extern bool get_nc_data(netCDF::NcVar *, char   *data);
 extern bool get_nc_data(netCDF::NcVar *, char  **data);
-extern bool get_nc_data(netCDF::NcVar *, uchar  *data);
+extern bool get_nc_data(netCDF::NcVar *, uchar  *data, bool allow_conversion=false);
 extern bool get_nc_data(netCDF::NcVar *, float  *data);
 extern bool get_nc_data(netCDF::NcVar *, double *data);
 extern bool get_nc_data(netCDF::NcVar *, time_t *data);
-extern bool get_nc_data(netCDF::NcVar *, ncbyte *data);
 extern bool get_nc_data(netCDF::NcVar *, unsigned short *data);
 
 extern bool get_nc_data(netCDF::NcVar *, int    *data, const LongArray &curs);
@@ -359,14 +322,8 @@ extern netCDF::NcDim  add_dim(netCDF::NcFile *, const std::string &);
 extern netCDF::NcDim  add_dim(netCDF::NcFile *, const std::string &, const size_t);
 extern bool   has_dim(netCDF::NcFile *, const char *dim_name);
 extern bool   get_dim(const netCDF::NcFile *, const ConcatString &, int &, bool error_out = false);
-extern int    get_dim_count(const netCDF::NcVar *);
 extern int    get_dim_count(const netCDF::NcFile *);
-extern int    get_dim_size(const netCDF::NcDim *);
-extern int    get_dim_size(const netCDF::NcVar *, const int dim_offset);
 extern int    get_dim_value(const netCDF::NcFile *, const std::string &, const bool error_out = false);
-extern netCDF::NcDim  get_nc_dim(const netCDF::NcFile *, const std::string &dim_name);
-extern netCDF::NcDim  get_nc_dim(const netCDF::NcVar *, const std::string &dim_name);
-extern netCDF::NcDim  get_nc_dim(const netCDF::NcVar *, const int dim_offset);
 extern bool   get_dim_names(const netCDF::NcVar *var, StringArray *dimNames);
 extern bool   get_dim_names(const netCDF::NcFile *nc, StringArray *dimNames);
 
@@ -376,7 +333,6 @@ extern netCDF::NcVar  get_nc_var_time(const netCDF::NcFile *nc);
 extern int    get_index_at_nc_data(netCDF::NcVar *var, double value, const std::string dim_name, bool is_time=false);
 extern netCDF::NcFile* open_ncfile(const char * nc_name, bool write = false);
 
-extern int get_data_size(netCDF::NcVar *);
 extern unixtime get_reference_unixtime(netCDF::NcVar *time_var, int &sec_per_unit,
                                        bool &no_leap_year);
 
@@ -387,10 +343,6 @@ extern bool is_nc_unit_latitude(const char *units);
 extern void parse_cf_time_string(const char *str, unixtime &ref_ut,
                                  int &sec_per_unit);
 extern void parse_time_string(const char *str, unixtime &ut);
-
-////////////////////////////////////////////////////////////////////////
-
-#include "nc_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////
 

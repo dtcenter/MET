@@ -710,25 +710,6 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       vx_pd.obs_info->dump(cout);
    }
 
-   // Check the levels for the forecast and observation fields.  If the
-   // forecast field is a range of pressure levels, check to see if the
-   // range of observation field pressure levels is wholly contained in the
-   // fcst levels.  If not, print a warning message.
-   if(vx_pd.fcst_info->get_var_info()->level().type() == LevelType_Pres &&
-      !is_eq(vx_pd.fcst_info->get_var_info()->level().lower(), vx_pd.fcst_info->get_var_info()->level().upper()) &&
-      (vx_pd.obs_info->level().lower() < vx_pd.fcst_info->get_var_info()->level().lower() ||
-       vx_pd.obs_info->level().upper() > vx_pd.fcst_info->get_var_info()->level().upper())) {
-
-      mlog << Warning
-           << "\nEnsembleStatVxOpt::process_config() -> "
-           << "The range of requested observation pressure levels "
-           << "is not contained within the range of requested "
-           << "forecast pressure levels.  No vertical interpolation "
-           << "will be performed for observations falling outside "
-           << "the range of forecast levels.  Instead, they will be "
-           << "matched to the single nearest forecast level.\n\n";
-   }
-
    // No support for wind direction
    if(vx_pd.fcst_info->get_var_info()->is_wind_direction() ||
       vx_pd.obs_info->is_wind_direction()) {
@@ -801,13 +782,14 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    fcat_ta = fdict.lookup_thresh_array(conf_key_prob_cat_thresh);
    ocat_ta = odict.lookup_thresh_array(conf_key_prob_cat_thresh);
 
-   // The number of thresholds must match
-   if(fcat_ta.n() != ocat_ta.n()) {
+   // The number of thresholds must match for non-probability forecasts
+   if(!vx_pd.fcst_info->get_var_info()->is_prob() &&
+      fcat_ta.n() != ocat_ta.n()) {
       mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
-           << "The number of forecast (" << fcat_ta.n()
-           << ") and observation (" << ocat_ta.n()
+           << "The number of forecast (" << write_css(fcat_ta)
+           << ") and observation (" << write_css(ocat_ta)
            << ") probability category thresholds in \""
-           << conf_key_prob_cat_thresh << "\" must match.\n\n";
+           << conf_key_prob_cat_thresh << "\" must match!\n\n";
       exit(1);
    }
 

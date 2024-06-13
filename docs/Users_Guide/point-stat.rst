@@ -264,7 +264,7 @@ Practical Information
 
 The Point-Stat tool is used to perform verification of a gridded model field using point observations. The gridded model field to be verified must be in one of the supported file formats. The point observations must be formatted as the NetCDF output of the point reformatting tools described in :numref:`reformat_point`. The Point-Stat tool provides the capability of interpolating the gridded forecast data to the observation points using a variety of methods as described in :numref:`matching-methods`. The Point-Stat tool computes a number of continuous statistics on the matched pair data as well as discrete statistics once the matched pair data have been thresholded.
 
-If no matched pairs are found for a particular verification task, a report listing counts for reasons why the observations were not used is written to the log output at the default verbosity level of 2. If matched pairs are found, this report is written at verbosity level 3. Inspecting these rejection reason counts is the first step in determining why Point-Stat found no matched pairs. The order of the log messages matches the order in which the processing logic is applied. Start from the last log message and work your way up, considering each of the non-zero rejection reason counts.
+If no matched pairs are found for a particular verification task, a report listing counts for reasons why the observations were not used is written to the log output at the default verbosity level of 2. If matched pairs are found, this report is written at verbosity level 3. Inspecting these rejection reason counts is the first step in determining why Point-Stat found no matched pairs. The order of the log messages matches the order in which the processing logic is applied. Start from the last log message and work your way up, considering each of the non-zero rejection reason counts. Verbosity level 9 prints a very detailed explanation about why each observation is used or skipped for each verification task.
 
 point_stat Usage
 ----------------
@@ -277,6 +277,7 @@ The usage statement for the Point-Stat tool is shown below:
          fcst_file
          obs_file
          config_file
+         [-ugrid_config config_file]
          [-point_obs file]
          [-obs_valid_beg time]
          [-obs_valid_end time]
@@ -298,17 +299,19 @@ Required Arguments for point_stat
 Optional Arguments for point_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The **-point_obs** file may be used to pass additional NetCDF point observation files to be used in the verification. Python embedding for point observations is also supported, as described in :numref:`pyembed-point-obs-data`.
+5. The **-ugrid_config** option provides a way for a user to provide a separate config file with metadata about their UGRID.
 
-5. The **-obs_valid_beg** time option in YYYYMMDD[_HH[MMSS]] format sets the beginning of the observation matching time window, overriding the configuration file setting.
+5. The **-point_obs** file may be used to pass additional NetCDF point observation files to be used in the verification. Python embedding for point observations is also supported, as described in :numref:`pyembed-point-obs-data`.
 
-6. The **-obs_valid_end** time option in YYYYMMDD[_HH[MMSS]] format sets the end of the observation matching time window, overriding the configuration file setting.
+6. The **-obs_valid_beg** time option in YYYYMMDD[_HH[MMSS]] format sets the beginning of the observation matching time window, overriding the configuration file setting.
 
-7. The **-outdir path** indicates the directory where output files should be written. 
+7. The **-obs_valid_end** time option in YYYYMMDD[_HH[MMSS]] format sets the end of the observation matching time window, overriding the configuration file setting.
 
-8. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+8. The **-outdir path** indicates the directory where output files should be written. 
 
-9. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+9. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+
+10. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
 An example of the point_stat calling sequence is shown below:
 
@@ -1286,12 +1289,15 @@ The first set of header columns are common to all of the output files generated 
     - O_SPEED_BAR
     - Mean observed wind speed
   * - 35
+    - TOTAL_DIR 
+    - Total number of matched pairs for which both the forecast and observation wind directions are well-defined (i.e. non-zero vectors)
+  * - 36
     - DIR_ME
     - Mean wind direction difference, from -180 to 180 degrees
-  * - 36
+  * - 37
     - DIR_MAE
     - Mean absolute wind direction difference
-  * - 37
+  * - 38
     - DIR_MSE
     - Mean squared wind direction difference
 
@@ -1341,12 +1347,15 @@ The first set of header columns are common to all of the output files generated 
     - OA_SPEED_BAR
     - Mean observed wind speed anomaly
   * - 35
+    - TOTAL_DIR 
+    - Total number of matched triplets for which the forecast, observation, and climatological wind directions are well-defined (i.e. non-zero vectors)
+  * - 36
     - DIRA_ME
     - Mean wind direction anomaly difference, from -180 to 180 degrees
-  * - 36
+  * - 37
     - DIRA_MAE
     - Mean absolute wind direction anomaly difference
-  * - 37
+  * - 38
     - DIRA_MSE
     - Mean squared wind direction anomaly difference
 
@@ -1428,16 +1437,19 @@ The first set of header columns are common to all of the output files generated 
   * - 85-87
     - ANOM_CORR_UNCNTR, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCL, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCU
     - Uncentered vector Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
-  * - 88-90
+  * - 88
+    - TOTAL_DIR 
+    - Total number of matched pairs for which both the forecast and observation wind directions are well-defined (i.e. non-zero vectors)
+  * - 89-91
     - DIR_ME, :raw-html:`<br />` DIR_ME_BCL, :raw-html:`<br />` DIR_ME_BCU
     - Mean direction difference, from -180 to 180 degrees, including bootstrap upper and lower confidence limits
-  * - 91-93
+  * - 92-94
     - DIR_MAE, :raw-html:`<br />` DIR_MAE_BCL, :raw-html:`<br />` DIR_MAE_BCU
     - Mean absolute direction difference including bootstrap upper and lower confidence limits
-  * - 94-96
+  * - 95-97
     - DIR_MSE, :raw-html:`<br />` DIR_MSE_BCL, :raw-html:`<br />` DIR_MSE_BCU
     - Mean squared direction difference including bootstrap upper and lower confidence limits
-  * - 97-99
+  * - 98-100
     - DIR_RMSE, :raw-html:`<br />` DIR_RMSE_BCL, :raw-html:`<br />` DIR_RMSE_BCU
     - Root mean squared direction difference including bootstrap upper and lower confidence limits
 

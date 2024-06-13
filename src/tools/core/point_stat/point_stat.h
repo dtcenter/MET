@@ -61,7 +61,7 @@ static const char * default_config_filename =
    "MET_BASE/config/PointStatConfig_default";
 
 // Header columns
-static const char **txt_columns[n_txt] = {
+static const char * const * txt_columns[n_txt] = {
    fho_columns,    ctc_columns,    cts_columns,
    mctc_columns,   mcts_columns,   cnt_columns,
    sl1l2_columns,  sal1l2_columns, vl1l2_columns,
@@ -85,7 +85,7 @@ static const int n_txt_columns[n_txt] = {
 };
 
 // Text file abbreviations
-static const char *txt_file_abbr[n_txt] = {
+static const char * const txt_file_abbr[n_txt] = {
    "fho",    "ctc",    "cts",
    "mctc",   "mcts",   "cnt",
    "sl1l2",  "sal1l2", "vl1l2",
@@ -108,7 +108,7 @@ static StringArray  obs_file;
 
 // Input Config file
 static ConcatString      config_file;
-static StringArray       config_files;
+static StringArray       ugrid_config_files;
 static PointStatConfInfo conf_info;
 
 // Optional arguments

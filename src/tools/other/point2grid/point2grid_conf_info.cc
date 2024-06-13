@@ -85,7 +85,7 @@ void PointToGridConfInfo::read_config(const char *default_file_name,
 void PointToGridConfInfo::process_config() {
    ConcatString s;
    StringArray sa;
-   Dictionary *dict = (Dictionary *) nullptr;
+   auto dict = (Dictionary *) nullptr;
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
@@ -126,7 +126,7 @@ void PointToGridConfInfo::process_config() {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString PointToGridConfInfo::get_var_id(const ConcatString var_name) {
+ConcatString PointToGridConfInfo::get_var_id(const ConcatString &var_name) {
    ConcatString var_id;
 
    map<ConcatString,ConcatString>::iterator ptr;
@@ -136,7 +136,7 @@ ConcatString PointToGridConfInfo::get_var_id(const ConcatString var_name) {
          break;
       }
    }
-   
+
    if( var_id.empty() ) {
       for (ptr=def_var_name_map.begin(); ptr != def_var_name_map.end(); ptr++) {
          if( ptr->second == var_name ) {
@@ -151,17 +151,14 @@ ConcatString PointToGridConfInfo::get_var_id(const ConcatString var_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString PointToGridConfInfo::get_var_name(const ConcatString var_name) {
+ConcatString PointToGridConfInfo::get_var_name(const ConcatString &var_name) {
    ConcatString out_var;
-   ConcatString t_name;
-   
-   t_name = var_name_map[var_name];
+   ConcatString t_name = var_name_map[var_name];
    if (t_name.empty()) t_name = def_var_name_map[var_name];
    if (t_name.empty()) {
-      ConcatString tmp_key, tmp_value;
-      tmp_key = "grib_code_";
+      ConcatString tmp_key = "grib_code_";
       tmp_key << atoi(var_name.c_str());
-      tmp_value = var_name_map[tmp_key];
+      ConcatString tmp_value = var_name_map[tmp_key];
       if (tmp_value.empty()) tmp_value = def_var_name_map[tmp_key];
       if (!tmp_value.empty()) t_name = tmp_value;
    }

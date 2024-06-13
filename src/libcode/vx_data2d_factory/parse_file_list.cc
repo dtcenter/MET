@@ -37,6 +37,7 @@ using namespace std;
 
 static const char python_str    [] = "python";
 static const char file_list_str [] = "file_list";
+static const char missing_str   [] = "MISSING";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -197,6 +198,77 @@ if ( check_files_exist )  {
 f_in.close();
 
 return a;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+GrdFileType parse_file_list_type(const StringArray& file_list)
+
+{
+
+GrdFileType ftype = FileType_None;
+
+for ( int i=0; i<file_list.n(); i++ )  {
+
+   //
+   //  check for python inputs
+   //
+
+   bool is_python = (file_list[i].find(conf_val_python_xarray) == 0) ||
+                    (file_list[i].find(conf_val_python_numpy)  == 0);
+
+   //
+   //  skip missing files
+   //
+
+   if( !file_exists(file_list[i].c_str()) && !is_python ) continue;
+
+   //
+   //  get the current file type
+   //
+
+   ftype = grd_file_type(file_list[i].c_str());
+
+   if ( ftype != FileType_None ) break;
+
+}
+
+return ftype;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void log_missing_file(const char *method_name,
+                      const char *desc_str,
+                      const string &file_name)
+
+{
+
+ConcatString cs;
+ConcatString missing_cs(missing_str);
+
+cs << method_name << "cannot open "
+   << desc_str << ": " << file_name;
+
+   //
+   //  Write a warning message for missing files or
+   //  a debug message for the MISSING keyword
+   //
+
+if ( file_name.find(missing_cs, 0) == 0 )  {
+   mlog << Debug(3) << cs << "\n";
+}
+else {
+   mlog << Warning << "\n" << cs << "\n\n";
+}
+
+return;
 
 }
 

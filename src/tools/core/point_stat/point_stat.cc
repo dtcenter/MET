@@ -102,7 +102,8 @@
 //   050    02/11/22  Halley Gotway  MET #2045 Fix HiRA output.
 //   051    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   052    09/29/22  Halley Gotway  MET #2286 Refine GRIB1 table lookup logic.
-//   053    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files
+//   053    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files.
+//   054    04/29/24  Halley Gotway  MET #2795 Move level mismatch warning.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -175,12 +176,14 @@ static void finish_txt_files();
 static void clean_up();
 
 static void usage();
-static void set_config(const StringArray &);
 static void set_point_obs(const StringArray &);
 static void set_ncfile(const StringArray &);
 static void set_obs_valid_beg_time(const StringArray &);
 static void set_obs_valid_end_time(const StringArray &);
 static void set_outdir(const StringArray &);
+#ifdef WITH_UGRID
+static void set_ugrid_config(const StringArray &);
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -240,7 +243,9 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_config,             "-config",        1);
+#ifdef WITH_UGRID
+   cline.add(set_ugrid_config,       "-ugrid_config",        1);
+#endif
    cline.add(set_point_obs,          "-point_obs",     1);
    cline.add(set_ncfile,             "-ncfile",        1);
    cline.add(set_obs_valid_beg_time, "-obs_valid_beg", 1);
@@ -283,7 +288,9 @@ void process_command_line(int argc, char **argv) {
 
    // Read the config files
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
-   conf_info.read_configs(config_files);
+#ifdef WITH_UGRID
+   conf_info.read_ugrid_configs(ugrid_config_files, config_file.c_str());
+#endif
 
    // Get the forecast file type from config, if present
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
@@ -600,23 +607,35 @@ void process_fcst_climo_files() {
    // the forecast and climatological fields for verification
    for(int i=0; i<conf_info.get_n_vx(); i++) {
 
+      VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.fcst_info;
+      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
+
       // Read the gridded data from the input forecast file
-      n_fcst = fcst_mtddf->data_plane_array(
-                  *conf_info.vx_opt[i].vx_pd.fcst_info, fcst_dpa);
-      mlog << Debug(2)
-           << "\n" << sep_str << "\n\n"
-           << "Reading data for "
-           << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str()
-           << ".\n";
+      n_fcst = fcst_mtddf->data_plane_array(*fcst_info, fcst_dpa);
+      mlog << Debug(2) << "\n" << sep_str << "\n\n"
+           << "Reading data for " << fcst_info->magic_str() << ".\n";
 
       // Check for zero fields
       if(n_fcst == 0) {
          mlog << Warning << "\nprocess_fcst_climo_files() -> "
-              << "no fields matching "
-              << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str()
-              << " found in file: "
-              << fcst_file << "\n\n";
+              << "no fields matching " << fcst_info->magic_str()
+              << " found in file: " << fcst_file << "\n\n";
          continue;
+      }
+
+      // MET #2795, for multiple individual forecast levels, print a
+      // warning if the observations levels are not fully covered.
+      if(n_fcst > 1 &&
+         !is_eq(fcst_info->level().lower(), fcst_info->level().upper()) &&
+         (obs_info->level().lower() < fcst_info->level().lower() ||
+          obs_info->level().upper() > fcst_info->level().upper())) {
+         mlog << Warning << "\nprocess_fcst_climo_files() -> "
+              << "The forecast level range (" << fcst_info->magic_str()
+              << ") does not fully contain the observation level range ("
+              << obs_info->magic_str() << "). No vertical interpolation "
+              << "will be performed for observations falling outside "
+              << "the range of forecast levels. Instead, they will be "
+              << "matched to the single nearest forecast level.\n\n";
       }
 
       // Setup the first pass through the data
@@ -626,19 +645,18 @@ void process_fcst_climo_files() {
       if(!(fcst_mtddf->grid() == grid)) {
          mlog << Debug(1)
               << "Regridding " << fcst_dpa.n_planes()
-              << " forecast field(s) for "
-              << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str()
+              << " forecast field(s) for " << fcst_info->magic_str()
               << " to the verification grid.\n";
 
          // Loop through the forecast fields
          for(j=0; j<fcst_dpa.n_planes(); j++) {
             fcst_dpa[j] = met_regrid(fcst_dpa[j], fcst_mtddf->grid(), grid,
-                                     conf_info.vx_opt[i].vx_pd.fcst_info->regrid());
+                                     fcst_info->regrid());
          }
       }
 
       // Rescale probabilities from [0, 100] to [0, 1]
-      if(conf_info.vx_opt[i].vx_pd.fcst_info->p_flag()) {
+      if(fcst_info->p_flag()) {
          for(j=0; j<fcst_dpa.n_planes(); j++) {
             rescale_probability(fcst_dpa[j]);
          }
@@ -679,8 +697,8 @@ void process_fcst_climo_files() {
 
       // Dump out the number of levels found
       mlog << Debug(2)
-           << "For " << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str()
-           << " found " << n_fcst << " forecast levels, "
+           << "For " << fcst_info->magic_str() << " found "
+           << n_fcst << " forecast levels, "
            << cmn_dpa.n_planes() << " climatology mean levels, and "
            << csd_dpa.n_planes() << " climatology standard deviation levels.\n";
 
@@ -1819,8 +1837,8 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
                                      conf_info.vx_opt[i_vx].hira_info.width[i],
                                      grid.wrap_lon());
       if (nullptr == gt) {
-         mlog << Warning
-              << "\nPdo_hira_ens() Fail to get GridTemplate for " << i << "-th width.\n\n";
+         mlog << Warning << "\ndo_hira_ens() -> "
+              << "failed to get GridTemplate for " << i << "-th width.\n\n";
          continue;
       }
 
@@ -2203,7 +2221,9 @@ void usage() {
         << "\tfcst_file\n"
         << "\tobs_file\n"
         << "\tconfig_file\n"
-        << "\t[-config config_file]\n"
+#ifdef WITH_UGRID
+        << "\t[-ugrid_config config_file]\n"
+#endif
         << "\t[-point_obs file]\n"
         << "\t[-obs_valid_beg time]\n"
         << "\t[-obs_valid_end time]\n"
@@ -2220,8 +2240,10 @@ void usage() {
         << "\t\t\"config_file\" is a PointStatConfig file containing "
         << "the desired configuration settings (required).\n"
 
-        << "\t\t\"-config config_file\" specifies additional PointStatConfig file containing "
-        << "the configuration settings for unstructured grid (optional).\n"
+#ifdef WITH_UGRID
+        << "\t\t\"-ugrid_config ugrid_config_file\" is a UGridConfig file containing "
+        << "the desired configuration settings for unstructured grid (required only for UGrid)\n"
+#endif
 
         << "\t\t\"-point_obs file\" specifies additional NetCDF point "
         << "observation files to be used (optional).\n"
@@ -2246,10 +2268,12 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray & a)
+#ifdef WITH_UGRID
+void set_ugrid_config(const StringArray & a)
 {
-   config_files.add(a[0]);
+   ugrid_config_files.add(a[0]);
 }
+#endif
 
 ////////////////////////////////////////////////////////////////////////
 

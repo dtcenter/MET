@@ -684,8 +684,8 @@ bool check_prob_thresh(const ThreshArray &ta, bool error_out) {
               << "select at least 3 thresholds which include the range [0, 1] "
               << "(current setting: " << ta.get_str() << ").\n"
               << "Consider using the \"==n\" shorthand notation to specify "
-              << "probability bins of equal width, for n < 1, or the integer "
-              << "number of ensemble members, for n > 1.\n\n";
+              << "probability bins of equal width for n < 1, or the integer "
+              << "number of ensemble members for n > 1.\n\n";
          exit(1);
       }
       else {

@@ -7,13 +7,14 @@ proc ModulesHelp { } {
      *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
 }
 
-module load intel-oneapi/2022.0.2
+prereq intel-oneapi-compilers/2022.2.1
 
-set base /usw/met
-set ver  12.0.0
+set base /apps/contrib/MET
+set ver 12.0.0
 set share $base/$ver/share/met
 set lib_base $base/12.0.0
+setenv MET_ROOT $base/$ver/MET-12.0.0
 
-prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/gpfs/f5/esrl/proj-shared/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin
+prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/work/noaa/ovp/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin
 
-setenv MET_PYTHON_EXE /gpfs/f5/esrl/proj-shared/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin/python
+setenv MET_PYTHON_EXE /work/noaa/ovp/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin/python

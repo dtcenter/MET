@@ -537,6 +537,16 @@ bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
+bool get_nc_att_values(const NcVar *var, const ConcatString &att_name,
+                       unsigned short *att_val, bool exit_on_error) {
+   static const char *method_name = "get_nc_att_value(NcVar,float) -> ";
+   bool status = get_nc_att_values_(var, att_name, att_val, exit_on_error,
+                                    method_name);
+   return status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool get_nc_att_value(const NcVarAtt *att, ConcatString &att_val) {
    bool status = false;
 
@@ -1748,15 +1758,21 @@ bool get_nc_data(NcVar *var, char **data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, uchar *data) {
+bool get_nc_data(NcVar *var, uchar *data, bool allow_conversion) {
    bool return_status = false;
    int cell_count = get_data_size(var);
    int data_type = GET_NC_TYPE_ID_P(var);
    static const char *method_name = "get_nc_data(NcVar *, uchar *) -> ";
    if (NC_UBYTE == data_type) return_status = get_nc_data_t(var, data);
-   else if (NC_BYTE == data_type && has_unsigned_attribute(var)) {
+   else if (NC_BYTE == data_type) {
+      if (!has_unsigned_attribute(var) && !allow_conversion) {
+         mlog << Debug(1) << "\n" << method_name
+              << "INFO: Unexpected conversion from 'ncbyte' for variable \""
+              << GET_NC_NAME_P(var) << "\".\n\n";
+      }
       ncbyte *signed_data = new ncbyte[cell_count];
-      if (return_status = get_nc_data_t(var, signed_data)) {
+      return_status = get_nc_data_t(var, signed_data);
+      if (return_status) {
          for (int idx=0; idx<cell_count; idx++) {
             data[idx] = (uchar)signed_data[idx];
          }

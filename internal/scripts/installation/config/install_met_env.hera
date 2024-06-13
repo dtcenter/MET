@@ -1,6 +1,6 @@
 module load gnu/9.2.0
 module load intel/2022.1.2
-module load cmake/3.26.4
+module load cmake/3.28.1
 
 export FC=ifort
 export F77=ifort
@@ -34,6 +34,8 @@ export COMPILE_ATLAS=1
 #export LIB_JASPER=${EXTERNAL_LIBS}/lib
 #export LIB_LIBPNG=${EXTERNAL_LIBS}/lib
 #export LIB_Z=${EXTERNAL_LIBS}/lib
+#export TIFF_INCLUDE_DIR=${EXTERNAL_LIBS}/include
+#export TIFF_LIB_DIR=${EXTERNAL_LIBS}/lib
 #export SQLITE_INCLUDE_DIR=${EXTERNAL_LIBS}/include
 #export SQLITE_LIB_DIR=${EXTERNAL_LIBS}/lib
 export MAKE_ARGS="-j 5"
