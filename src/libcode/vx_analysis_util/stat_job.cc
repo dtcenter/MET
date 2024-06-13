@@ -1174,12 +1174,12 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(jc_array[i] == "-column_str_exc" ) {
          column_str_exc_map.clear();
       }
+      else if(jc_array[i] == "-by"             ) {
+         by_column.clear();
+      }
       else if(jc_array[i] == "-set_hdr"        ) {
          hdr_name.clear();
          hdr_value.clear();
-      }
-      else if(jc_array[i] == "-by"             ) {
-         by_column.clear();
       }
       else if(jc_array[i] == "-out_line_type"  ) {
          out_line_type.clear();
@@ -1450,14 +1450,14 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          }
          i+=2;
       }
+      else if(jc_array[i] == "-by") {
+         by_column.add_css(to_upper(jc_array[i+1]));
+         i+=1;
+      }
       else if(jc_array[i] == "-set_hdr") {
          hdr_name.add_css(to_upper(jc_array[i+1]));
          hdr_value.add_css(jc_array[i+2]);
          i+=2;
-      }
-      else if(jc_array[i] == "-by") {
-         by_column.add_css(to_upper(jc_array[i+1]));
-         i+=1;
       }
       else if(jc_array[i] == "-dump_row") {
          set_dump_row(jc_array[i+1].c_str());

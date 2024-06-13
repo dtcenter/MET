@@ -546,7 +546,6 @@ ConcatString StatHdrInfo::get_shc_str(const ConcatString &cur_case,
    ConcatString css, shc_str;
    int hdr_index, case_index;
 
-
    // Build comma-separated list of column values
    css = write_css(col_vals);
 
