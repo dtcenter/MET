@@ -99,6 +99,12 @@ class DataLine {
       void dump(std::ostream &, int depth = 0) const;
 
          //
+         //  set stuff
+         //
+
+      void set_item(int, const ConcatString &);
+
+         //
          //  retrieve stuff
          //
 
