@@ -24,14 +24,14 @@ if [[ -z "${MET_TEST_MET_PYTHON_EXE}" ]] ; then
   export MET_TEST_MET_PYTHON_EXE=/usr/local/python3/bin/python3
 fi
 
-PERL_UNIT_OPTS=""
+UNIT_OPTS=""
 for arg in $@; do
-  [ $arg == "-memchk" -o $arg == "memchk" ] && PERL_UNIT_OPTS="$PERL_UNIT_OPTS -memchk"
-  [ $arg == "-callchk" -o $arg == "callchk" ] && PERL_UNIT_OPTS="$PERL_UNIT_OPTS -callchk"
+  [ $arg == "-memchk" -o $arg == "memchk" ] && UNIT_OPTS="$UNIT_OPTS -memchk"
+  [ $arg == "-callchk" -o $arg == "callchk" ] && UNIT_OPTS="$UNIT_OPTS -callchk"
 done
 
 # Unit test script
-PERL_UNIT=${MET_TEST_BASE}/perl/unit.pl
+UNIT=${MET_TEST_BASE}/python/unit.py
 
 # Unit test XML
 UNIT_XML="unit_ascii2nc.xml \
@@ -107,15 +107,15 @@ UNIT_XML="${UNIT_XML} unit_ugrid.xml"
 for CUR_XML in ${UNIT_XML}; do
 
   echo
-  echo "CALLING: ${PERL_UNIT} $PERL_UNIT_OPTS ${MET_TEST_BASE}/xml/${CUR_XML}"
+  echo "CALLING: ${UNIT} $UNIT_OPTS ${MET_TEST_BASE}/xml/${CUR_XML}"
   echo
-  ${PERL_UNIT} $PERL_UNIT_OPTS ${MET_TEST_BASE}/xml/${CUR_XML}
+  ${UNIT} $UNIT_OPTS ${MET_TEST_BASE}/xml/${CUR_XML}
   RET_VAL=$?
 
   # Fail on non-zero return status
   if [ ${RET_VAL} != 0 ]; then
     echo
-    echo "ERROR: ${PERL_UNIT} ${CUR_XML} failed."
+    echo "ERROR: ${UNIT} ${CUR_XML} failed."
     echo
     echo "*** UNIT TESTS FAILED ***"
     echo
