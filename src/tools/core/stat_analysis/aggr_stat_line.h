@@ -80,11 +80,7 @@ struct StatHdrInfo {
                             const StringArray  &hdr_cols,
                             const StringArray  &hdr_vals,
                             const STATLineType lt);
-   ConcatString get_shc_str(const ConcatString &cur_case,
-                            const StringArray  &case_cols,
-                            const StringArray  &case_vals,
-                            const StringArray  &hdr_cols,
-                            const StringArray  &hdr_vals,
+   ConcatString get_col_css(const ConcatString &cur_case,
                             const char         *col_name,
                             const StringArray  &col_vals,
                             bool               warning);

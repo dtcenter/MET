@@ -41,6 +41,7 @@
 //                                      to VL1L2, VAL1L2, and VCNT.
 //   019    02/21/24  Halley Gotway   MET #2583 Add observation error
 //                                      ECNT statistics.
+//   020    06/14/24  Halley Gotway   MET #2911 Call apply_set_hdr_opts().
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -61,7 +62,6 @@
 #include "parse_stat_line.h"
 
 using namespace std;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -350,25 +350,17 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
                                     const StringArray  &hdr_cols,
                                     const StringArray  &hdr_vals,
                                     const STATLineType lt) {
-   ConcatString css;
-   StringArray case_vals;
    ThreshArray ta;
+   ConcatString css;
    double out_alpha;
-   int index, wdth;
+   int wdth;
    StatHdrColumns shc;
 
-   // Split up the current case into values
-   case_vals = cur_case.split(":");
-
    // MODEL
-   shc.set_model(
-      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "MODEL", model, false).c_str());
+   shc.set_model(get_col_css(cur_case, "MODEL", model, false).c_str());
 
    // DESC
-   shc.set_desc(
-      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "DESC", desc, false).c_str());
+   shc.set_desc(get_col_css(cur_case, "DESC", desc, false).c_str());
 
    // FCST_LEAD
    css = write_css_hhmmss(fcst_lead);
@@ -378,26 +370,11 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
            << fcst_lead.n()
            << " unique FCST_LEAD values: " << css << "\n";
    }
-   if(hdr_cols.has("FCST_LEAD", index)) {
-      shc.set_fcst_lead_sec(timestring_to_sec(hdr_vals[index].c_str()));
-   }
-   else {
-      shc.set_fcst_lead_sec(fcst_lead.max());
-   }
+   shc.set_fcst_lead_sec(fcst_lead.max());
 
    // FCST_VALID_BEG, FCST_VALID_END
-   if(hdr_cols.has("FCST_VALID_BEG", index)) {
-      shc.set_fcst_valid_beg(timestring_to_unix(hdr_vals[index].c_str()));
-   }
-   else {
-      shc.set_fcst_valid_beg(fcst_valid_beg);
-   }
-   if(hdr_cols.has("FCST_VALID_END", index)) {
-      shc.set_fcst_valid_end(timestring_to_unix(hdr_vals[index].c_str()));
-   }
-   else {
-      shc.set_fcst_valid_end(fcst_valid_end);
-   }
+   shc.set_fcst_valid_beg(fcst_valid_beg);
+   shc.set_fcst_valid_end(fcst_valid_end);
 
    // OBS_LEAD
    css = write_css_hhmmss(obs_lead);
@@ -407,71 +384,38 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
            << obs_lead.n()
            << " unique OBS_LEAD values: " << css << "\n";
    }
-   if(hdr_cols.has("OBS_LEAD", index)) {
-      shc.set_obs_lead_sec(timestring_to_sec(hdr_vals[index].c_str()));
-   }
-   else {
-      shc.set_obs_lead_sec(obs_lead.max());
-   }
+   shc.set_obs_lead_sec(obs_lead.max());
 
    // OBS_VALID_BEG, OBS_VALID_END
-   if(hdr_cols.has("OBS_VALID_BEG", index)) {
-      shc.set_obs_valid_beg(timestring_to_unix(hdr_vals[index].c_str()));
-   }
-   else {
-      shc.set_obs_valid_beg(obs_valid_beg);
-   }
-   if(hdr_cols.has("OBS_VALID_END", index)) {
-      shc.set_obs_valid_end(timestring_to_unix(hdr_vals[index].c_str()));
-   }
-   else {
-      shc.set_obs_valid_end(obs_valid_end);
-   }
+   shc.set_obs_valid_beg(obs_valid_beg);
+   shc.set_obs_valid_end(obs_valid_end);
 
    // FCST_VAR
-   shc.set_fcst_var(
-      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "FCST_VAR", fcst_var, false));
+   shc.set_fcst_var(get_col_css(cur_case, "FCST_VAR", fcst_var, false));
 
    // FCST_UNITS
-   shc.set_fcst_units(
-      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "FCST_UNITS", fcst_units, false));
+   shc.set_fcst_units(get_col_css(cur_case, "FCST_UNITS", fcst_units, false));
 
    // FCST_LEV
-   shc.set_fcst_lev(
-      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "FCST_LEV", fcst_lev, false).c_str());
+   shc.set_fcst_lev(get_col_css(cur_case, "FCST_LEV", fcst_lev, false).c_str());
 
    // OBS_VAR
-   shc.set_obs_var(
-      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "OBS_VAR", obs_var, false));
+   shc.set_obs_var(get_col_css(cur_case, "OBS_VAR", obs_var, false));
 
    // OBS_UNITS
-   shc.set_obs_units(
-      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "OBS_UNITS", obs_units, false));
+   shc.set_obs_units(get_col_css(cur_case, "OBS_UNITS", obs_units, false));
 
    // OBS_LEV
-   shc.set_obs_lev(
-      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "OBS_LEV", obs_lev, false).c_str());
+   shc.set_obs_lev(get_col_css(cur_case, "OBS_LEV", obs_lev, false).c_str());
 
    // OBTYPE
-   shc.set_obtype(
-      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "OBTYPE", obtype, false).c_str());
+   shc.set_obtype(get_col_css(cur_case, "OBTYPE", obtype, false).c_str());
 
    // VX_MASK
-   shc.set_mask(
-      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "VX_MASK", vx_mask, false).c_str());
+   shc.set_mask(get_col_css(cur_case, "VX_MASK", vx_mask, false).c_str());
 
    // INTERP_MTHD
-   shc.set_interp_mthd(
-      get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                  "INTERP_MTHD", interp_mthd, true));
+   shc.set_interp_mthd(get_col_css(cur_case, "INTERP_MTHD", interp_mthd, true));
 
    // INTERP_PNTS
    css = write_css(interp_pnts);
@@ -485,28 +429,21 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    else {
       wdth = nint(sqrt(interp_pnts[0]));
    }
-
-   if(hdr_cols.has("INTERP_PNTS", index)) {
-      wdth = nint(sqrt(atof(hdr_vals[index].c_str())));
-   }
    shc.set_interp_wdth(wdth);
 
    // FCST_THRESH
    ta.clear();
-   ta.add_css(get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                          "FCST_THRESH", fcst_thresh, true).c_str());
+   ta.add_css(get_col_css(cur_case, "FCST_THRESH", fcst_thresh, true).c_str());
    shc.set_fcst_thresh(ta);
 
    // OBS_THRESH
    ta.clear();
-   ta.add_css(get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                          "OBS_THRESH", obs_thresh, true).c_str());
+   ta.add_css(get_col_css(cur_case, "OBS_THRESH", obs_thresh, true).c_str());
    shc.set_obs_thresh(ta);
 
    // COV_THRESH
    ta.clear();
-   ta.add_css(get_shc_str(cur_case, case_cols, case_vals, hdr_cols, hdr_vals,
-                          "COV_THRESH", cov_thresh, true).c_str());
+   ta.add_css(get_col_css(cur_case, "COV_THRESH", cov_thresh, true).c_str());
    shc.set_cov_thresh(ta);
 
    // ALPHA
@@ -521,33 +458,27 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    else {
       out_alpha = alpha[0];
    }
-
-   if(hdr_cols.has("ALPHA", index)) {
-      out_alpha = atof(hdr_vals[index].c_str());
-   }
    shc.set_alpha(out_alpha);
 
    // LINE_TYPE
    shc.set_line_type(statlinetype_to_string(lt));
+
+   // Apply the -set_hdr options
+   StringArray case_vals = cur_case.split(":");
+   shc.apply_set_hdr_opts(hdr_cols, hdr_vals, case_cols, case_vals);
 
    return shc;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString StatHdrInfo::get_shc_str(const ConcatString &cur_case,
-                                      const StringArray  &case_cols,
-                                      const StringArray  &case_vals,
-                                      const StringArray  &hdr_cols,
-                                      const StringArray  &hdr_vals,
+ConcatString StatHdrInfo::get_col_css(const ConcatString &cur_case,
                                       const char         *col_name,
                                       const StringArray  &col_vals,
-                                      bool               warning) {
-   ConcatString css, shc_str;
-   int hdr_index, case_index;
+                                      bool                warning) {
 
    // Build comma-separated list of column values
-   css = write_css(col_vals);
+   ConcatString css(write_css(col_vals));
 
    // Check for multiple entries
    if(col_vals.n() > 1) {
@@ -559,28 +490,7 @@ ConcatString StatHdrInfo::get_shc_str(const ConcatString &cur_case,
       else        mlog << Debug(2) << msg;
    }
 
-   // Check the header options.
-   if(hdr_cols.has(col_name, hdr_index)) {
-
-      // Check for the full CASE string.
-      if(case_str.compare(hdr_vals[hdr_index]) == 0) {
-         shc_str = cur_case;
-      }
-      // Check for one of the case columns.
-      else if(case_cols.has(hdr_vals[hdr_index], case_index)) {
-         shc_str = case_vals[case_index];
-      }
-      // Otherwise, use the constant header string.
-      else {
-         shc_str = hdr_vals[hdr_index];
-      }
-   }
-   // Otherwise, use the comma-separated list of values.
-   else {
-      shc_str = css;
-   }
-
-   return shc_str;
+   return css;
 }
 
 ////////////////////////////////////////////////////////////////////////
