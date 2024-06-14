@@ -367,13 +367,13 @@ void StatHdrColumns::apply_set_hdr_opts(
 
    // Sanity check lengths
    if(hdr_cols.n() != hdr_vals.n()) {
-      mlog << Error << "\napply_set_hdr_opts() -> "
+      mlog << Error << "\nStatHdrColumns::apply_set_hdr_opts() -> "
            << "the number of -set_hdr columns names (" << hdr_cols.n()
            << " and values (" << hdr_vals.n() << " must match!\n\n";
       exit(1);
    }
    if(case_cols.n()  != case_vals.n()) {
-      mlog << Error << "\napply_set_hdr_opts() -> "
+      mlog << Error << "\nStatHdrColumns::apply_set_hdr_opts() -> "
            << "the number of case columns names (" << case_cols.n()
            << " and values (" << case_vals.n() << " must match!\n\n";
       exit(1);
