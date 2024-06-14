@@ -205,7 +205,7 @@ out_valid_mask = "";
 // Array of TCStat analysis jobs to be performed on the filtered data
 //
 jobs = [
-   "-job filter   -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRIRW_filter_ee.tcst",
+   "-job filter   -set_hdr DESC EVENT_EQUAL -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRIRW_filter_ee.tcst",
    "-job summary  -column TK_ERR -by AMODEL -probrirw_thresh 30 -column_thresh PROBRIRW_PROB >0 -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRIRW_summary_tk_err.tcst",
    "-job probrirw -column_thresh RIRW_WINDOW ==24 -by AMODEL -probrirw_thresh 30 -probrirw_bdelta_thresh >=30 -out_line_type PCT,PSTD,PRC,PJC -dump_row ${MET_TEST_OUTPUT}/tc_stat/PROBRIRW_probrirw.tcst",
    "-job summary  -column TK_ERR -by AMODEL,LEAD -amodel GPMI,GPMN -event_equal TRUE",
