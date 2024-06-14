@@ -83,7 +83,7 @@ struct StatHdrInfo {
    ConcatString get_col_css(const ConcatString &cur_case,
                             const char         *col_name,
                             const StringArray  &col_vals,
-                            bool               warning);
+                            bool               warning) const;
 };
 
 struct AggrSummaryInfo {

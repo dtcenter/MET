@@ -475,7 +475,7 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
 ConcatString StatHdrInfo::get_col_css(const ConcatString &cur_case,
                                       const char         *col_name,
                                       const StringArray  &col_vals,
-                                      bool                warning) {
+                                      bool                warning) const {
 
    // Build comma-separated list of column values
    ConcatString css(write_css(col_vals));

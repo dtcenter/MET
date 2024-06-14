@@ -1230,7 +1230,7 @@ void TCStatJob::close_stat_file() {
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out,
-                          bool do_set_hdr) {
+                          bool do_set_hdr) const {
 
    if(!out || pair.n_points() == 0) return;
 
@@ -1294,7 +1294,7 @@ void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out,
 ////////////////////////////////////////////////////////////////////////
 
 void TCStatJob::dump_line(const TCStatLine &line, ofstream *out,
-                          bool do_set_hdr) {
+                          bool do_set_hdr) const {
 
    if(!out) return;
 

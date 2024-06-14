@@ -157,7 +157,7 @@ class StatHdrColumns {
                               const StringArray &, const StringArray &);
 
       ConcatString get_set_hdr_str(const std::string &,
-                                   const StringArray &, const StringArray &);
+                                   const StringArray &, const StringArray &) const;
 
       // Get functions
       ConcatString get_model             () const;

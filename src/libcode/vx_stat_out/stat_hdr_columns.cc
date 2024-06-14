@@ -526,7 +526,7 @@ void StatHdrColumns::apply_set_hdr_opts(
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString StatHdrColumns::get_set_hdr_str(const std::string &hdr_val,
-                const StringArray &case_cols, const StringArray &case_vals) {
+                const StringArray &case_cols, const StringArray &case_vals) const {
    ConcatString cs;
    int index;
 
