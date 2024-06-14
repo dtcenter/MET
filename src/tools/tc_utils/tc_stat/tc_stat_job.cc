@@ -1229,7 +1229,8 @@ void TCStatJob::close_stat_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out) {
+void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out,
+                          bool do_set_hdr) {
 
    if(!out || pair.n_points() == 0) return;
 
@@ -1281,7 +1282,8 @@ void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out) {
 
    // Write the TrackPairInfo object
    i_row = hdr_row;
-   write_track_pair_info(tchc, pair, out_at, i_row);
+   if(do_set_hdr) write_track_pair_info(tchc, pair, out_at, i_row, HdrName, HdrValue);
+   else           write_track_pair_info(tchc, pair, out_at, i_row);
 
    // Write the AsciiTable to the file
    *out << out_at;
@@ -1291,11 +1293,23 @@ void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::dump_line(const TCStatLine &line, ofstream *out) {
+void TCStatJob::dump_line(const TCStatLine &line, ofstream *out,
+                          bool do_set_hdr) {
 
    if(!out) return;
 
-   *out << line;
+   // Apply -set_hdr options, if requested
+   if(do_set_hdr) {
+      TCStatLine line_set_hdr = line;
+      for(int i=0; i<HdrName.n(); i++) {
+         int offset = line.get_offset(HdrName[i].c_str());
+         if(!is_bad_data(offset)) line_set_hdr.set_item(offset, HdrValue[i]);
+      }
+      *out << line_set_hdr;
+   }
+   else {
+      *out << line;
+   }
 
    return;
 }
@@ -1878,7 +1892,7 @@ void TCStatJobFilter::filter_tracks(TCPointCounts &n) {
             mlog << Debug(4)
                  << "Processing track pair: " << pair.case_info() << "\n";
 
-            if(DumpOut) dump_pair(pair, DumpOut);
+            if(DumpOut) dump_pair(pair, DumpOut, true);
          }
       } // end while
    } // end else
@@ -1915,7 +1929,7 @@ void TCStatJobFilter::filter_lines(TCPointCounts &n) {
          // Check if this line should be kept
          if(!is_keeper_line(line, n)) continue;
 
-         if(DumpOut) dump_line(line, DumpOut);
+         if(DumpOut) dump_line(line, DumpOut, true);
 
       } // end while
    } // end else

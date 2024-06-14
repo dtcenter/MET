@@ -166,6 +166,8 @@ extern void write_prob_rirw_header_row(int, int, AsciiTable &, int, int);
 
 // Write out the data lines
 extern void write_track_pair_info    (TcHdrColumns &, const TrackPairInfo &,    AsciiTable &, int &);
+extern void write_track_pair_info    (TcHdrColumns &, const TrackPairInfo &,    AsciiTable &, int &,
+                                      const StringArray &, const StringArray &);
 extern void write_prob_rirw_pair_info(TcHdrColumns &, const ProbRIRWPairInfo &, AsciiTable &, int &);
 
 // Write out the header entries

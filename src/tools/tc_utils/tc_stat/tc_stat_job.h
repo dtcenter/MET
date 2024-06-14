@@ -239,8 +239,10 @@ class TCStatJob {
       void open_stat_file();
       void close_stat_file();
 
-      void dump_pair(const TrackPairInfo &, std::ofstream *);
-      void dump_line(const TCStatLine &,    std::ofstream *);
+      void dump_pair(const TrackPairInfo &, std::ofstream *,
+                     bool do_set_hdr = false);
+      void dump_line(const TCStatLine &,    std::ofstream *,
+                     bool do_set_hdr = false);
 
       virtual ConcatString serialize() const;
 
