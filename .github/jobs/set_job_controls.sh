@@ -91,6 +91,15 @@ elif [ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]; then
     run_diff=true
   fi
 
+  branch_name=`cut -d "/" -f3 <<< "${GITHUB_REF}"`
+
+  # check for main_vX.Y in the branch name
+  # otherwise, stick with the default settings for develop
+  if [[ "${branch_name}" =~ .*(main_v)([0-9]+\.[0-9]+).* ]]; then
+    truth_data_version=${BASH_REMATCH[1]}${BASH_REMATCH[2]}
+    input_data_version=${BASH_REMATCH[2]}
+  fi
+
 fi
 
 # if updating truth or running diff, run unit tests
