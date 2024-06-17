@@ -91,15 +91,6 @@ elif [ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]; then
     run_diff=true
   fi
 
-  truth_data_version=${force_compare_branch}
-
-  # if main_vX.Y branch, use X.Y input data
-  if [ "${force_ref_branch:0:6}" == "main_v" ]; then
-    input_data_version=${force_compare_branch:6}
-  else
-    input_data_version=${force_compare_branch}
-  fi
-
 fi
 
 # if updating truth or running diff, run unit tests

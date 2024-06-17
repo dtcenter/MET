@@ -37,13 +37,8 @@ on:
     inputs:
       force_tests:
         description: 'Run the unit tests'
-        type: boolean
         default: true
-      force_compare_branch:
-        description: 'Branch name for input data and output comparison'
-        type: string
-        default: develop
-        required: true
+        type: boolean
 
 env:
   DOCKERHUB_REPO: dtcenter/met-dev
@@ -62,7 +57,6 @@ jobs:
         env:
           commit_msg: ${{ github.event.head_commit.message }}
           force_tests: ${{ github.event.inputs.force_tests }}
-          force_compare_branch: ${{ github.event.inputs.force_compare_branch }}
 
     outputs:
       run_compile: ${{ steps.job_status.outputs.run_compile }}
