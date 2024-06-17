@@ -70,7 +70,6 @@
 //   038    09/06/22  Halley Gotway  MET #1908 Remove ensemble processing logic.
 //   039    09/29/22  Halley Gotway  MET #2286 Refine GRIB1 table lookup logic.
 //   040    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files                                                                                  
-//   041    06/17/24  Halley Gotway  MET #2856 Reinitialize climo_cdf pointer
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2222,7 +2221,6 @@ void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
 
       // Re-initialize
       pd_pnt.erase();
-      pd_pnt.set_climo_cdf_info_ptr(&vx_opt.cdf_info);
 
       // Process the observations
       for(i_obs=0; i_obs<pd_ens.n_obs; i_obs++) {
@@ -2321,7 +2319,6 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
 
       // Re-initialize
       pd_pnt.erase();
-      pd_pnt.set_climo_cdf_info_ptr(&vx_opt.cdf_info);
 
       // Process the observations
       for(i_obs=0; i_obs<pd_ens.n_obs; i_obs++) {
