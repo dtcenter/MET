@@ -57,13 +57,11 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
         input_data_version=${branch_name:6}
       fi
 
-      # check for main_vX.Y in the branch name
-      elif [[ "${branch_name}" =~ .*(main_v)([0-9]+\.[0-9]+).* ]]; then
+    # check for main_vX.Y in the branch name
+    elif [[ "${branch_name}" =~ .*(main_v)([0-9]+\.[0-9]+).* ]]; then
 
-        truth_data_version=${BASH_REMATCH[1]}${BASH_REMATCH[2]}
-        input_data_version=${BASH_REMATCH[2]}
-
-      fi
+      truth_data_version=${BASH_REMATCH[1]}${BASH_REMATCH[2]}
+      input_data_version=${BASH_REMATCH[2]}
 
     fi
 
