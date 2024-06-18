@@ -170,7 +170,8 @@ void write_prob_rirw_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
 ////////////////////////////////////////////////////////////////////////
 
 void write_track_pair_info(TcHdrColumns &hdr, const TrackPairInfo &p,
-                           AsciiTable &at, int &i_row) {
+                           AsciiTable &at, int &i_row,
+                           const StringArray &hdr_name, const StringArray &hdr_value) {
 
    // Loop through the TrackPairInfo points
    for(int i=0; i<p.n_points(); i++) {
@@ -189,6 +190,9 @@ void write_track_pair_info(TcHdrColumns &hdr, const TrackPairInfo &p,
       if(p.n_lines() > i) {
          hdr.set_desc((string)p.tcmpr_line(i)->get_item("DESC", false));
       }
+
+      // Apply -set_hdr options
+      if(hdr_name.n() > 0) hdr.apply_set_hdr_opts(hdr_name, hdr_value);
 
       // Write the header columns
       write_tc_header_cols(hdr, at, i_row);
@@ -215,6 +219,19 @@ void write_track_pair_info(TcHdrColumns &hdr, const TrackPairInfo &p,
          i_row++;
       }
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_track_pair_info(TcHdrColumns &hdr, const TrackPairInfo &p,
+                           AsciiTable &at, int &i_row) {
+
+   StringArray hdr_name;
+   StringArray hdr_value;
+
+   write_track_pair_info(hdr, p, at, i_row, hdr_name, hdr_value);
 
    return;
 }

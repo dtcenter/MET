@@ -15,6 +15,9 @@
 
 using namespace std;
 
+////////////////////////////////////////////////////////////////////////
+
+static const string case_str = "CASE";
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -333,6 +336,217 @@ void StatHdrColumns::set_cov_thresh(const ThreshArray t) {
 void StatHdrColumns::set_alpha(const double a) {
    alpha = a;
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void StatHdrColumns::apply_set_hdr_opts(
+        const StringArray &hdr_cols, const StringArray &hdr_vals) {
+   StringArray case_cols;
+   StringArray case_vals;
+
+   // Call other implementation without case information
+   apply_set_hdr_opts(hdr_cols, hdr_vals, case_cols, case_vals);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Use the current -set_hdr options to populate the STAT header columns,
+// substituting in case-specific values, as needed.
+//
+////////////////////////////////////////////////////////////////////////
+
+void StatHdrColumns::apply_set_hdr_opts(
+        const StringArray &hdr_cols, const StringArray &hdr_vals,
+        const StringArray &case_cols, const StringArray &case_vals) {
+
+   // No updates needed
+   if(hdr_cols.n() == 0) return;
+
+   // Sanity check lengths
+   if(hdr_cols.n() != hdr_vals.n()) {
+      mlog << Error << "\nStatHdrColumns::apply_set_hdr_opts() -> "
+           << "the number of -set_hdr columns names (" << hdr_cols.n()
+           << " and values (" << hdr_vals.n() << " must match!\n\n";
+      exit(1);
+   }
+   if(case_cols.n()  != case_vals.n()) {
+      mlog << Error << "\nStatHdrColumns::apply_set_hdr_opts() -> "
+           << "the number of case columns names (" << case_cols.n()
+           << " and values (" << case_vals.n() << " must match!\n\n";
+      exit(1);
+   }
+
+   int index;
+   ConcatString cs;
+   SingleThresh st;
+
+   // MODEL
+   if(hdr_cols.has("MODEL", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_model(cs.c_str());
+   }
+
+   // DESC
+   if(hdr_cols.has("DESC", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_desc(cs.c_str());
+   }
+
+   // FCST_LEAD
+   if(hdr_cols.has("FCST_LEAD", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_fcst_lead_sec(timestring_to_sec(cs.c_str()));
+   }
+
+   // FCST_VALID_BEG, FCST_VALID_END
+   if(hdr_cols.has("FCST_VALID_BEG", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_fcst_valid_beg(timestring_to_unix(cs.c_str()));
+   }
+   if(hdr_cols.has("FCST_VALID_END", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_fcst_valid_end(timestring_to_unix(cs.c_str()));
+   }
+
+   // OBS_LEAD
+   if(hdr_cols.has("OBS_LEAD", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_obs_lead_sec(timestring_to_sec(cs.c_str()));
+   }
+
+   // OBS_VALID_BEG, OBS_VALID_END
+   if(hdr_cols.has("OBS_VALID_BEG", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_obs_valid_beg(timestring_to_unix(cs.c_str()));
+   }
+   if(hdr_cols.has("OBS_VALID_END", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_obs_valid_end(timestring_to_unix(cs.c_str()));
+   }
+
+   // FCST_VAR
+   if(hdr_cols.has("FCST_VAR", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_fcst_var(cs.c_str());
+   }
+
+   // FCST_UNITS
+   if(hdr_cols.has("FCST_UNITS", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_fcst_units(cs.c_str());
+   }
+
+   // FCST_LEV
+   if(hdr_cols.has("FCST_LEV", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_fcst_lev(cs.c_str());
+   }
+
+   // OBS_VAR
+   if(hdr_cols.has("OBS_VAR", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_obs_var(cs.c_str());
+   }
+
+   // OBS_UNITS
+   if(hdr_cols.has("OBS_UNITS", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_obs_units(cs.c_str());
+   }
+
+   // OBS_LEV
+   if(hdr_cols.has("OBS_LEV", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_obs_lev(cs.c_str());
+   }
+
+   // OBTYPE
+   if(hdr_cols.has("OBTYPE", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_obtype(cs.c_str());
+   }
+
+   // VX_MASK
+   if(hdr_cols.has("VX_MASK", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_mask(cs.c_str());
+   }
+
+   // INTERP_MTHD
+   if(hdr_cols.has("INTERP_MTHD", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_interp_mthd(cs.c_str());
+   }
+
+   // INTERP_PNTS
+   if(hdr_cols.has("INTERP_PNTS", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_interp_wdth(nint(sqrt(atof(cs.c_str()))));
+   }
+
+   // FCST_THRESH
+   if(hdr_cols.has("FCST_THRESH", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      st.set(cs.c_str());
+      set_fcst_thresh(st);
+   }
+
+   // OBS_THRESH
+   if(hdr_cols.has("OBS_THRESH", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      st.set(cs.c_str());
+      set_obs_thresh(st);
+   }
+
+   // COV_THRESH
+   if(hdr_cols.has("COV_THRESH", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      st.set(cs.c_str());
+      set_cov_thresh(st);
+   }
+
+   // ALPHA
+   if(hdr_cols.has("ALPHA", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_alpha(atof(cs.c_str()));
+   }
+
+   // LINE_TYPE
+   if(hdr_cols.has("LINE_TYPE", index)) {
+      cs = get_set_hdr_str(hdr_vals[index], case_cols, case_vals);
+      set_line_type(cs.c_str());
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString StatHdrColumns::get_set_hdr_str(const std::string &hdr_val,
+                const StringArray &case_cols, const StringArray &case_vals) const {
+   ConcatString cs;
+   int index;
+
+   // Check for the full CASE string
+   if(case_str.compare(hdr_val) == 0) {
+      cs = case_vals.serialize(":");
+   }
+   // Check for one of the case columns
+   else if(case_cols.has(hdr_val, index)) {
+      cs = case_vals[index];
+   }
+   // Otherwise, use the current header value
+   else {
+      cs = hdr_val;
+   }
+
+   // Sanity check for empty strings
+   if(cs.empty()) cs = na_str;
+
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
