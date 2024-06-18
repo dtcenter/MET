@@ -468,7 +468,12 @@ return ( x );
 
 double Nx2ContingencyTable::baser() const {
 
-   return ( (double) event_col_total()/n() );
+   double v;
+
+   if( n() == 0 ) v = bad_data_double;
+   else           v = (double) event_col_total()/n();
+ 
+   return ( v );
 }
 
 
@@ -476,7 +481,7 @@ double Nx2ContingencyTable::baser() const {
 
 
 double Nx2ContingencyTable::baser_ci(double alpha,
-                                    double &cl, double &cu) const {
+                                     double &cl, double &cu) const {
    double v;
 
    v = baser();
