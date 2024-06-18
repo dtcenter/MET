@@ -74,6 +74,7 @@
 //   041    04/16/24  Halley Gotway  MET #2786 Compute RPS from climo bin probs.
 //   042    04/29/24  Halley Gotway  MET #2870 Ignore MISSING keyword.
 //   043    04/29/24  Halley Gotway  MET #2795 Move level mismatch warning.
+//   044    06/17/24  Halley Gotway  MET #2856 Reinitialize climo_cdf pointer
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2257,6 +2258,7 @@ void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
 
       // Re-initialize
       pd_pnt.erase();
+      pd_pnt.set_climo_cdf_info_ptr(&vx_opt.cdf_info);
 
       // Process the observations
       for(i_obs=0; i_obs<pd_ens.n_obs; i_obs++) {
@@ -2355,6 +2357,7 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
 
       // Re-initialize
       pd_pnt.erase();
+      pd_pnt.set_climo_cdf_info_ptr(&vx_opt.cdf_info);
 
       // Process the observations
       for(i_obs=0; i_obs<pd_ens.n_obs; i_obs++) {
