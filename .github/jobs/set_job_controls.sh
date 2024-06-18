@@ -63,8 +63,6 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
       truth_data_version=${BASH_REMATCH[1]}${BASH_REMATCH[2]}
       input_data_version=${BASH_REMATCH[2]}
 
-    fi      
-
     fi
 
     # check commit messages for skip or force keywords                                                                         
