@@ -301,152 +301,35 @@ bool is_retr(const char *s) {
 void setup_header(StatHdrColumns &shc,
                   const StringArray &name, const StringArray &value,
                   const char *default_line_type) {
-   int index;
-   SingleThresh st;
+   SingleThresh st(na_str);
 
-   // MODEL
-   if(name.has("MODEL", index)) {
-      shc.set_model(value[index].c_str());
-   }
-   else {
-      shc.set_model(default_model);
-   }
-
-   // DESC
-   if(name.has("DESC", index)) {
-      shc.set_desc(value[index].c_str());
-   }
-   else {
-      shc.set_desc(default_desc);
-   }
-
-   // FCST_LEAD
-   if(name.has("FCST_LEAD", index)) {
-      shc.set_fcst_lead_sec(timestring_to_sec(value[index].c_str()));
-   }
-   else {
-      shc.set_fcst_lead_sec(default_lead);
-   }
-
-   // FCST_VALID_BEG, FCST_VALID_END
-   if(name.has("FCST_VALID_BEG", index)) {
-      shc.set_fcst_valid_beg(timestring_to_unix(value[index].c_str()));
-      not_has_FCST_VALID_BEG = false;
-   }
-   if(name.has("FCST_VALID_END", index)) {
-      shc.set_fcst_valid_end(timestring_to_unix(value[index].c_str()));
-      not_has_FCST_VALID_END = false;
-   }
-
-   // OBS_LEAD
-   if(name.has("OBS_LEAD", index)) {
-      shc.set_obs_lead_sec(timestring_to_sec(value[index].c_str()));
-   }
-   else {
-      shc.set_obs_lead_sec(default_lead);
-   }
-
-   // OBS_VALID_BEG, OBS_VALID_END
-   if(name.has("OBS_VALID_BEG", index)) {
-      shc.set_obs_valid_beg(timestring_to_unix(value[index].c_str()));
-      not_has_OBS_VALID_BEG = false;
-   }
-   if(name.has("OBS_VALID_END", index)) {
-      shc.set_obs_valid_end(timestring_to_unix(value[index].c_str()));
-      not_has_OBS_VALID_END = false;
-   }
-
-   // FCST_VAR
-   if(name.has("FCST_VAR", index)) {
-      shc.set_fcst_var(value[index]);
-      not_has_FCST_VAR = false;
-   }
-
-   // FCST_LEV
-   if(name.has("FCST_LEV", index)) {
-      shc.set_fcst_lev(value[index].c_str());
-   }
-   else {
-      shc.set_fcst_lev(default_lev);
-   }
-
-   // OBS_VAR
-   if(name.has("OBS_VAR", index)) {
-      shc.set_obs_var(value[index]);
-      not_has_OBS_VAR = false;
-   }
-
-   // OBS_LEV
-   if(name.has("OBS_LEV", index)) {
-      shc.set_obs_lev(value[index].c_str());
-   }
-   else {
-      shc.set_obs_lev(default_lev);
-   }
-
-   // OBTYPE
-   if(name.has("OBTYPE", index)) {
-      shc.set_obtype(value[index].c_str());
-      not_has_OBTYPE = false;
-   }
-   else {
-      shc.set_obtype(default_obtype);
-   }
-
-   // VX_MASK
-   if(name.has("VX_MASK", index)) {
-      shc.set_mask(value[index].c_str());
-   }
-   else {
-      shc.set_mask(default_vx_mask);
-   }
-
-   // INTERP_MTHD
-   if(name.has("INTERP_MTHD", index)) {
-      shc.set_interp_mthd(value[index]);
-   }
-   else {
-     shc.set_interp_mthd((string)default_interp_mthd);
-   }
-
-   // INTERP_PNTS
-   if(name.has("INTERP_PNTS", index)) {
-      shc.set_interp_wdth(nint(sqrt(atof(value[index].c_str()))));
-   }
-   else {
-      shc.set_interp_wdth(default_interp_wdth);
-   }
-
-   // FCST_THRESH
-   if(name.has("FCST_THRESH", index)) st.set(value[index].c_str());
-   else                                   st.set(default_thresh);
+   // Initialize the header
+   shc.set_model("GSI");
+   shc.set_desc(na_str);
+   shc.set_fcst_lead_sec(0);
+   shc.set_fcst_valid_beg(0);
+   shc.set_fcst_valid_end(0);
+   shc.set_obs_lead_sec(0);
+   shc.set_obs_valid_beg(0);
+   shc.set_obs_valid_end(0);
+   shc.set_fcst_var(na_str);
+   shc.set_fcst_units(na_str);
+   shc.set_fcst_lev(na_str);
+   shc.set_obs_var(na_str);
+   shc.set_obs_units(na_str);
+   shc.set_obs_lev(na_str);
+   shc.set_obtype(na_str);
+   shc.set_mask(na_str);
+   shc.set_interp_mthd(na_str);
+   shc.set_interp_wdth(0);
    shc.set_fcst_thresh(st);
-
-   // OBS_THRESH
-   if(name.has("OBS_THRESH", index))  st.set(value[index].c_str());
-   else                                   st.set(default_thresh);
    shc.set_obs_thresh(st);
-
-   // COV_THRESH
-   if(name.has("COV_THRESH", index))  st.set(value[index].c_str());
-   else                                   st.set(default_thresh);
    shc.set_cov_thresh(st);
+   shc.set_alpha(bad_data_double);
+   shc.set_line_type(default_line_type);
 
-   // ALPHA
-   if(name.has("ALPHA", index)) {
-      shc.set_alpha(atof(value[index].c_str()));
-   }
-   else {
-      shc.set_alpha(default_alpha);
-   }
-
-   // LINE_TYPE
-   if(name.has("LINE_TYPE", index)) {
-      shc.set_line_type(value[index].c_str());
-   }
-   else {
-      shc.set_line_type(default_line_type);
-   }
+   // Apply the -set_hdr options
+   shc.apply_set_hdr_opts(name, value);
 
    return;
 }

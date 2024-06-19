@@ -184,6 +184,8 @@ void TCStatJob::init_from_scratch() {
    ValidMask.set_ignore_case(1);
    LineType.set_ignore_case(1);
    TrackWatchWarn.set_ignore_case(1);
+   ByColumn.set_ignore_case(1);
+   HdrName.set_ignore_case(1);
 
    clear();
 
@@ -229,6 +231,10 @@ void TCStatJob::clear() {
    PrintDiagWarning.clear();
    EventEqualLead.clear();
    EventEqualCases.clear();
+
+   ByColumn.clear();
+   HdrName.clear();
+   HdrValue.clear();
 
    DumpFile.clear();
    close_dump_file();
@@ -314,6 +320,11 @@ void TCStatJob::assign(const TCStatJob & j) {
    DiagThreshMap = j.DiagThreshMap;
    InitDiagThreshMap = j.InitDiagThreshMap;
    PrintDiagWarning = j.PrintDiagWarning;
+
+   ByColumn = j.ByColumn;
+
+   HdrName = j.HdrName;
+   HdrValue = j.HdrValue;
 
    DumpFile = j.DumpFile;
    open_dump_file();
@@ -513,6 +524,15 @@ void TCStatJob::dump(ostream & out, int depth) const {
    out << prefix << "OutInitMask = " << (OutInitMaskName.nonempty() ? OutInitMaskName.text() : na_str) << "\n";
 
    out << prefix << "OutValidMask = " << (OutValidMaskName.nonempty() ? OutValidMaskName.text() : na_str) << "\n";
+
+   out << prefix << "ByColumn ...\n";
+   ByColumn.dump(out, depth + 1);
+
+   out << prefix << "HdrName ...\n";
+   HdrName.dump(out, depth + 1);
+
+   out << prefix << "HdrValue ...\n";
+   HdrValue.dump(out, depth + 1);
 
    out << prefix << "DumpFile = " << (DumpFile.nonempty() ? DumpFile.text() : na_str) << "\n";
 
@@ -1086,6 +1106,9 @@ StringArray TCStatJob::parse_job_command(const char *jobstring) {
       else if(c.compare("-event_equal_lead"  ) == 0) { EventEqualLead.add_css_sec(a[i+1].c_str());        a.shift_down(i, 1); }
       else if(c.compare("-out_init_mask"     ) == 0) { set_out_init_mask(a[i+1].c_str());                 a.shift_down(i, 1); }
       else if(c.compare("-out_valid_mask"    ) == 0) { set_out_valid_mask(a[i+1].c_str());                a.shift_down(i, 1); }
+      else if(c.compare("-by"                ) == 0) { ByColumn.add_css(to_upper(a[i+1]));                a.shift_down(i, 1); }
+      else if(c.compare("-set_hdr"           ) == 0) { HdrName.add(to_upper(a[i+1]));
+                                                       HdrValue.add(a[i+2]);                              a.shift_down(i, 2); }
       else if(c.compare("-dump_row"          ) == 0) { DumpFile = a[i+1]; open_dump_file();               a.shift_down(i, 1); }
       else if(c.compare("-out_stat"          ) == 0) { StatFile = a[i+1]; open_stat_file();               a.shift_down(i, 1); }
       else                                           {                                                    b.add(a[i]);        }
@@ -1206,7 +1229,8 @@ void TCStatJob::close_stat_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out) {
+void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out,
+                          bool do_set_hdr) const {
 
    if(!out || pair.n_points() == 0) return;
 
@@ -1258,7 +1282,8 @@ void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out) {
 
    // Write the TrackPairInfo object
    i_row = hdr_row;
-   write_track_pair_info(tchc, pair, out_at, i_row);
+   if(do_set_hdr) write_track_pair_info(tchc, pair, out_at, i_row, HdrName, HdrValue);
+   else           write_track_pair_info(tchc, pair, out_at, i_row);
 
    // Write the AsciiTable to the file
    *out << out_at;
@@ -1268,11 +1293,23 @@ void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCStatJob::dump_line(const TCStatLine &line, ofstream *out) {
+void TCStatJob::dump_line(const TCStatLine &line, ofstream *out,
+                          bool do_set_hdr) const {
 
    if(!out) return;
 
-   *out << line;
+   // Apply -set_hdr options, if requested
+   if(do_set_hdr) {
+      TCStatLine line_set_hdr = line;
+      for(int i=0; i<HdrName.n(); i++) {
+         int offset = line.get_offset(HdrName[i].c_str());
+         if(!is_bad_data(offset)) line_set_hdr.set_item(offset, HdrValue[i]);
+      }
+      *out << line_set_hdr;
+   }
+   else {
+      *out << line;
+   }
 
    return;
 }
@@ -1431,6 +1468,10 @@ ConcatString TCStatJob::serialize() const {
       s << "-out_init_mask " << OutInitMaskFile << " ";
    if(OutValidMaskFile.nonempty())
       s << "-out_valid_mask " << OutValidMaskFile << " ";
+   for(i=0; i<ByColumn.n(); i++)
+      s << "-by " << ByColumn[i] << " ";
+   for(i=0; i<HdrName.n(); i++)
+      s << "-set_hdr " << HdrName[i] << " " << HdrValue[i] << " ";
    if(DumpFile.length() > 0)
       s << "-dump_row " << DumpFile << " ";
    if(StatFile.length() > 0)
@@ -1851,7 +1892,7 @@ void TCStatJobFilter::filter_tracks(TCPointCounts &n) {
             mlog << Debug(4)
                  << "Processing track pair: " << pair.case_info() << "\n";
 
-            if(DumpOut) dump_pair(pair, DumpOut);
+            if(DumpOut) dump_pair(pair, DumpOut, true);
          }
       } // end while
    } // end else
@@ -1888,7 +1929,7 @@ void TCStatJobFilter::filter_lines(TCPointCounts &n) {
          // Check if this line should be kept
          if(!is_keeper_line(line, n)) continue;
 
-         if(DumpOut) dump_line(line, DumpOut);
+         if(DumpOut) dump_line(line, DumpOut, true);
 
       } // end while
    } // end else
@@ -1955,7 +1996,6 @@ void TCStatJobSummary::init_from_scratch() {
    // Ignore case when performing comparisons
    ReqColumn.set_ignore_case(1);
    Column.set_ignore_case(1);
-   ByColumn.set_ignore_case(1);
 
    clear();
 
@@ -1972,7 +2012,6 @@ void TCStatJobSummary::clear() {
 
    ReqColumn.clear();
    Column.clear();
-   ByColumn.clear();
    SummaryMap.clear();
 
    // Set to default value
@@ -1992,7 +2031,6 @@ void TCStatJobSummary::assign(const TCStatJobSummary & j) {
    ReqColumn   = j.ReqColumn;
    Column      = j.Column;
    ColumnUnion = j.ColumnUnion;
-   ByColumn    = j.ByColumn;
    SummaryMap  = j.SummaryMap;
    OutAlpha    = j.OutAlpha;
    FSPThresh   = j.FSPThresh;
@@ -2026,7 +2064,6 @@ StringArray TCStatJobSummary::parse_job_command(const char *jobstring) {
            if(c.compare("-column"      ) == 0) { ReqColumn.add_css(to_upper(a[i+1]));
                                                  add_column(a[i+1].c_str());                   a.shift_down(i, 1); }
       else if(c.compare("-column_union") == 0) { ColumnUnion = string_to_bool(a[i+1].c_str()); a.shift_down(i, 1); }
-      else if(c.compare("-by"          ) == 0) { ByColumn.add_css(to_upper(a[i+1]));           a.shift_down(i, 1); }
       else if(c.compare("-out_alpha"   ) == 0) { OutAlpha = atof(a[i+1].c_str());              a.shift_down(i, 1); }
       else if(c.compare("-fsp_thresh"  ) == 0) { FSPThresh.set(a[i+1].c_str());                a.shift_down(i, 1); }
       else                                     {                                               b.add(a[i]);        }
@@ -2090,8 +2127,6 @@ ConcatString TCStatJobSummary::serialize() const {
       s << "-column " << ReqColumn[i] << " ";
    if(ColumnUnion != default_column_union)
       s << "-column_union " << bool_to_string(ColumnUnion) << " ";
-   for(i=0; i<ByColumn.n(); i++)
-      s << "-by " << ByColumn[i] << " ";
    if(!(FSPThresh == default_fsp_thresh))
       s << "-fsp_thresh " << FSPThresh.get_str();
 
@@ -2403,7 +2438,7 @@ void TCStatJobSummary::do_output(ostream &out) {
    // Left-justify case info and right-justify summary output
    for(i=0; i<out_at.ncols(); i++) {
       if(i < ByColumn.n()) out_at.set_column_just(i, LeftJust);
-      else                            out_at.set_column_just(i, RightJust);
+      else                 out_at.set_column_just(i, RightJust);
    }
    out_at.set_precision(get_precision());
    out_at.set_bad_data_value(bad_data_double);
@@ -2940,9 +2975,6 @@ void TCStatJobRIRW::init_from_scratch() {
 
    TCStatJob::init_from_scratch();
 
-   // Ignore case when performing comparisons
-   ByColumn.set_ignore_case(1);
-
    clear();
 
    return;
@@ -2960,7 +2992,6 @@ void TCStatJobRIRW::clear() {
    // Disable rapid intensification/weakening filtering logic.
    RIRWTrack = TrackType::None;
 
-   ByColumn.clear();
    RIRWMap.clear();
 
    for(i=0; i<4; i++) DumpFileCTC[i].clear();
@@ -2983,7 +3014,6 @@ void TCStatJobRIRW::assign(const TCStatJobRIRW & j) {
 
    TCStatJob::assign(j);
 
-   ByColumn    = j.ByColumn;
    OutAlpha    = j.OutAlpha;
    OutLineType = j.OutLineType;
    RIRWMap     = j.RIRWMap;
@@ -3017,8 +3047,7 @@ StringArray TCStatJobRIRW::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(c.compare("-by"            ) == 0) { ByColumn.add_css(to_upper(a[i+1]));            a.shift_down(i, 1); }
-      else if(c.compare("-out_alpha"     ) == 0) { OutAlpha = atof(a[i+1].c_str());               a.shift_down(i, 1); }
+           if(c.compare("-out_alpha"     ) == 0) { OutAlpha = atof(a[i+1].c_str());               a.shift_down(i, 1); }
       else if(c.compare("-out_line_type" ) == 0) { OutLineType.add_css(to_upper(a[i+1]).c_str()); a.shift_down(i, 1); }
       else                                       {                                                b.add(a[i]);        }
    }
@@ -3111,9 +3140,6 @@ ConcatString TCStatJobRIRW::serialize() const {
      << sec_to_hhmmss(RIRWWindowEnd) << " ";
 
    // Add RIRW job-specific options
-   for(i=0; i<ByColumn.n(); i++)
-      s << "-by " << ByColumn[i] << " ";
-
    for(i=0; i<OutLineType.n(); i++)
       s << "-out_line_type " << OutLineType[i] << " ";
 
@@ -3846,17 +3872,19 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
       if(OutInitMaskName.nonempty()) {
          cs << OutInitMaskName;
       }
+
       // Add -out_valid_mask name, if specified
       if(OutValidMaskName.nonempty()) {
          if(cs.nonempty()) cs << ",";
          cs << OutValidMaskName;
       }
+
       // If neither are specified, use input mask and/or basin names
       if(cs.empty()) {
          StringArray sa;
          sa.add_uniq(it->second.InitMask);
          sa.add_uniq(it->second.ValidMask);
-	
+
          // Use the basin names instead
          if(sa.n() == 1 && sa[0] == na_str) {
             sa.clear();
@@ -3889,16 +3917,21 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
       //
       c = 0;
 
+      // Split the current map key, eliminating the job name in the first entry
+      StringArray ByValue = it->first.split(":");
+      ByValue.shift_down(0, 1);
+
       //
       // CTC output line
       //
       if(OutLineType.has(stat_ctc_str)) {
          shc.set_alpha(bad_data_double);
          shc.set_line_type(stat_ctc_str);
+         shc.apply_set_hdr_opts(HdrName, HdrValue, ByColumn, ByValue);
          write_header_cols(shc, stat_at, stat_row);
          write_ctc_cols(it->second.Info, stat_at, stat_row++, n_header_columns);
       }
-      
+
       //
       // CTS output line
       //
@@ -3910,12 +3943,12 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
          it->second.Info.allocate_n_alpha(1);
          it->second.Info.alpha[0] = OutAlpha;
          shc.set_alpha(OutAlpha);
-         
+
          //
          // Compute the stats and confidence intervals for this
          // CTSInfo object
          //
-         
+
          it->second.Info.compute_stats();
          it->second.Info.compute_ci();
 
@@ -3923,14 +3956,15 @@ void TCStatJobRIRW::do_stat_output(ostream &out) {
          // Write the data line
          //
          shc.set_line_type(stat_cts_str);
+         shc.apply_set_hdr_opts(HdrName, HdrValue, ByColumn, ByValue);
          write_header_cols(shc, stat_at, stat_row);
          write_cts_cols(it->second.Info, 0, stat_at, stat_row++, n_header_columns);
       }
    } // end for it
-   
+
    // Write the table
    out << stat_at << "\n" << flush;
-   
+
    return;
 }
 
@@ -3981,9 +4015,6 @@ void TCStatJobProbRIRW::init_from_scratch() {
 
    TCStatJob::init_from_scratch();
 
-   // Ignore case when performing comparisons
-   ByColumn.set_ignore_case(1);
-
    clear();
 
    return;
@@ -3997,7 +4028,6 @@ void TCStatJobProbRIRW::clear() {
 
    JobType = TCStatJobType::ProbRIRW;
 
-   ByColumn.clear();
    ProbRIRWMap.clear();
 
    // Set to default values
@@ -4023,7 +4053,6 @@ void TCStatJobProbRIRW::assign(const TCStatJobProbRIRW & j) {
    ProbRIRWExact        = j.ProbRIRWExact;
    ProbRIRWBDeltaThresh = j.ProbRIRWBDeltaThresh;
    ProbRIRWProbThresh   = j.ProbRIRWProbThresh;
-   ByColumn             = j.ByColumn;
    MaxNThresh           = j.MaxNThresh;
    NDumpLines           = j.NDumpLines;
    OutAlpha             = j.OutAlpha;
@@ -4060,8 +4089,7 @@ StringArray TCStatJobProbRIRW::parse_job_command(const char *jobstring) {
       }
 
       // Check job command options
-           if(c.compare("-by"                    ) == 0) { ByColumn.add_css(to_upper(a[i+1]));                            a.shift_down(i, 1); }
-      else if(c.compare("-out_alpha"             ) == 0) { OutAlpha = atof(a[i+1].c_str());                               a.shift_down(i, 1); }
+           if(c.compare("-out_alpha"             ) == 0) { OutAlpha = atof(a[i+1].c_str());                               a.shift_down(i, 1); }
       else if(c.compare("-out_line_type"         ) == 0) { OutLineType.add_css(to_upper(a[i+1]));                         a.shift_down(i, 1); }
       else if(c.compare("-probrirw_exact"        ) == 0) { ProbRIRWExact = string_to_bool(a[i+1].c_str());                a.shift_down(i, 1); }
       else if(c.compare("-probrirw_bdelta_thresh") == 0) { ProbRIRWBDeltaThresh.set(a[i+1].c_str());                      a.shift_down(i, 1); }
@@ -4157,9 +4185,6 @@ ConcatString TCStatJobProbRIRW::serialize() const {
    s << "-probrirw_prob_thresh " << prob_thresh_to_string(ProbRIRWProbThresh) << " ";
 
    // Add ProbRIRW job-specific options
-   for(i=0; i<ByColumn.n(); i++)
-      s << "-by " << ByColumn[i] << " ";
-
    for(i=0; i<OutLineType.n(); i++)
       s << "-out_line_type " << OutLineType[i] << " ";
 

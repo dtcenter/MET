@@ -239,8 +239,10 @@ class TCStatJob {
       void open_stat_file();
       void close_stat_file();
 
-      void dump_pair(const TrackPairInfo &, std::ofstream *);
-      void dump_line(const TCStatLine &,    std::ofstream *);
+      void dump_pair(const TrackPairInfo &, std::ofstream *,
+                     bool do_set_hdr = false) const;
+      void dump_line(const TCStatLine &,    std::ofstream *,
+                     bool do_set_hdr = false) const;
 
       virtual ConcatString serialize() const;
 
@@ -317,6 +319,13 @@ class TCStatJob {
       std::map<ConcatString,ThreshArray> DiagThreshMap;
       std::map<ConcatString,ThreshArray> InitDiagThreshMap;
       StringArray                        PrintDiagWarning;
+
+      // Store the case information
+      StringArray ByColumn;
+
+      // Options for -set_hdr output
+      StringArray HdrName;
+      StringArray HdrValue;
 
       // Variables to the store the analysis job specification
       ConcatString DumpFile;             // Dump TrackPairInfo used to a file
@@ -448,9 +457,6 @@ class TCStatJobSummary : public TCStatJob {
       StringArray Column;
       bool ColumnUnion;
 
-      // Store the case information
-      StringArray ByColumn;
-
       // Confidence interval alpha value
       double OutAlpha;
 
@@ -504,9 +510,6 @@ class TCStatJobRIRW : public TCStatJob {
       void do_cts_output (std::ostream &);
       void do_mpr_output (std::ostream &);
       void do_stat_output(std::ostream &);
-      
-      // Store the case information
-      StringArray ByColumn;
 
       // Confidence interval alpha value
       double OutAlpha;
@@ -554,9 +557,6 @@ class TCStatJobProbRIRW : public TCStatJob {
       bool         ProbRIRWExact;        // True for exact change, false for maximum change
       SingleThresh ProbRIRWBDeltaThresh; // Threshold the BEST track change
       ThreshArray  ProbRIRWProbThresh;   // Array of probabilities for PCT bins
-
-      // Store the case information
-      StringArray ByColumn;
 
       // Maximum number of thresholds encountered
       int MaxNThresh;
