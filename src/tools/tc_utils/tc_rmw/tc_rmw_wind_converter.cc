@@ -147,14 +147,14 @@ void TCRMW_WindConverter::append_nc_output_vars(map<string, vector<string> > &va
   }
   else {
     if (!_foundUInInput) {
-      mlog << Warning << "\nTCWRMW_WindConverter::checkInputs() -> "
+      mlog << Warning << "\nTCWRMW_WindConverter::append_nc_output_vars() -> "
            << "field not found in input \"" << _conf->u_wind_field_name << "\"\n\n";
     }
     if (!_foundVInInput) {
-      mlog << Warning << "\nTCWRMW_WindConverter::checkInputs() -> "
+      mlog << Warning << "\nTCWRMW_WindConverter::append_nc_output_vars() -> "
            << "field not found in input \"" << _conf->v_wind_field_name << "\"\n\n";
     }
-    mlog << Warning << "\nTCWRMW_WindConverter::checkInputs() -> "
+    mlog << Warning << "\nTCWRMW_WindConverter::append_nc_output_vars() -> "
          << "Not computing radial and tangential winds\n\n";
     _computeWinds = false;
   }
