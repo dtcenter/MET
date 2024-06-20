@@ -10,6 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+using namespace std;
+
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -18,8 +20,6 @@
 #include "tcrmw_grid.h"
 
 #include "trig.h"
-
-using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ Ir.set_xyz(1.0, 0.0, 0.0);
 Jr.set_xyz(0.0, 1.0, 0.0);
 Kr.set_xyz(0.0, 0.0, 1.0);
 
-Range_n  = 0;
+Range_n = 0;
 Azimuth_n = 0;
 
 Range_max_km = 0.0;
@@ -324,90 +324,43 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TcrmwGrid::wind_ne_to_ra (const double lat, const double lon, 
-                               const double east_component, const double north_component,
-                               double & radial_component,   double & azimuthal_component) const
+void TcrmwGrid::wind_ne_to_rt (const double azi_deg,
+                               const double u_wind, const double v_wind,
+                               double & radial_wind, double & tangential_wind) const
 
 {
 
-Vector E, N, V;
-Vector B_range, B_azi;
-double azi_deg, range_deg, range_km;
+double rcos = cosd(azi_deg);
+double rsin = sind(azi_deg);
 
+if (is_bad_data(u_wind) || is_bad_data(v_wind)) {
+   radial_wind     = bad_data_double;
+   tangential_wind = bad_data_double;   
+}
+else {
+   radial_wind     =      rcos*u_wind + rsin*v_wind;
+   tangential_wind = -1.0*rsin*u_wind + rcos*v_wind;
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void TcrmwGrid::wind_ne_to_rt (const double lat, const double lon, 
+                               const double u_wind, const double v_wind,
+                               double & radial_wind, double & tangential_wind) const
+
+{
+
+double range_km, azi_deg;
 
 latlon_to_range_azi(lat, lon, range_km, azi_deg);
 
-range_deg = deg_per_km*range_km;
-
-E = latlon_to_east  (lat, lon);
-N = latlon_to_north (lat, lon);
-
-V = east_component*E + north_component*N;
-
-
-range_azi_to_basis(range_deg, azi_deg, B_range, B_azi);
-
-
-
-   radial_component = dot(V, B_range);
-
-azimuthal_component = dot(V, B_azi);
-
-
-
-
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void TcrmwGrid::wind_ne_to_ra_conventional (const double lat, const double lon, 
-                                            const double east_component, const double north_component,
-                                            double & radial_component,   double & azimuthal_component) const
-
-{
-
-wind_ne_to_ra(lat, lon, east_component, north_component, radial_component, azimuthal_component);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void TcrmwGrid::range_azi_to_basis(const double range_deg, const double azi_deg, Vector & B_range, Vector & B_azi) const
-
-{
-
-double u, v, w;
-
-
-u =  cosd(range_deg)*sind(azi_deg);
-
-v =  cosd(range_deg)*cosd(azi_deg);
-
-w = -sind(range_deg);
-
-
-
-B_range = u*Ir + v*Jr + w*Kr;
-
-
-u =  cosd(azi_deg);
-
-v = -sind(azi_deg);
-
-w =  0.0;
-
-
-B_azi = u*Ir + v*Jr + w*Kr;
-
+wind_ne_to_rt(azi_deg, u_wind, v_wind, radial_wind, tangential_wind);
 
 return;
 
@@ -425,8 +378,7 @@ RotatedLatLonGrid::latlon_to_xy(true_lat, true_lon, x, y);
 
 x -= Nx*floor(x/Nx);
 
-x -= Nx*floor(x/Nx);
-
+y -= Ny*floor(y/Ny);
 
 return;
 
@@ -442,7 +394,7 @@ void TcrmwGrid::xy_to_latlon(double x, double y, double & true_lat, double & tru
 
 x -= Nx*floor(x/Nx);
 
-x -= Nx*floor(x/Nx);
+y -= Ny*floor(y/Ny);
 
 RotatedLatLonGrid::xy_to_latlon(x, y, true_lat, true_lon);
 
@@ -499,8 +451,4 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
 
