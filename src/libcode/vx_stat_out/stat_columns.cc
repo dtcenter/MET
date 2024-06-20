@@ -3335,11 +3335,13 @@ void write_pjc_cols(const PCTInfo &pct_info,
       col++;
 
       at.set_entry(r, col, // OY_TP
-         pct_info.pct.event_count_by_row(i)/(double) n);
+         (n == 0 ? bad_data_double :
+          pct_info.pct.event_count_by_row(i)/(double) n));
       col++;
 
       at.set_entry(r, col, // ON_TP
-         pct_info.pct.nonevent_count_by_row(i)/(double) n);
+         (n == 0 ? bad_data_double :
+          pct_info.pct.nonevent_count_by_row(i)/(double) n));
       col++;
 
       at.set_entry(r, col, // CALIBRATION
@@ -3430,7 +3432,7 @@ void write_eclv_cols(const TTContingencyTable &ct,
    //
    // Economic Cost/Loss Value
    // Dump out the ECLV line:
-   //    TOTAL,   BASER,   BASER_VALUE,
+   //    TOTAL,   BASER,   VALUE_BASER,
    //    N_PNT,   [CL_],   [VALUE_] (for each point)
    //
    at.set_entry(r, c+0,  // Total Number of pairs
