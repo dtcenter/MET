@@ -136,7 +136,7 @@ Ir.set_xyz(1.0, 0.0, 0.0);
 Jr.set_xyz(0.0, 1.0, 0.0);
 Kr.set_xyz(0.0, 0.0, 1.0);
 
-Range_n  = 0;
+Range_n = 0;
 Azimuth_n = 0;
 
 Range_max_km = 0.0;
