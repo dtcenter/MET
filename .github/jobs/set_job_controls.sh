@@ -57,6 +57,12 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
         input_data_version=${branch_name:6}
       fi
 
+    # check for main_vX.Y in the branch name
+    elif [[ "${branch_name}" =~ .*(main_v)([0-9]+\.[0-9]+).* ]]; then
+
+      truth_data_version=${BASH_REMATCH[1]}${BASH_REMATCH[2]}
+      input_data_version=${BASH_REMATCH[2]}
+
     fi
 
     # check commit messages for skip or force keywords                                                                         
@@ -87,14 +93,27 @@ elif [ "${GITHUB_EVENT_NAME}" == "push" ]; then
 
 elif [ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]; then
 
+  branch_name=`cut -d "/" -f3 <<< "${GITHUB_REF}"`
+
+  # check for main_vX.Y in the branch name
+  if [[ "${branch_name}" =~ .*(main_v)([0-9]+\.[0-9]+).* ]]; then
+
+    truth_data_version=${BASH_REMATCH[1]}${BASH_REMATCH[2]}
+    input_data_version=${BASH_REMATCH[2]}
+
+  fi
+
   if [ "${force_tests}" == "true" ]; then
+
     run_diff=true
+
   fi
 
 fi
 
 # if updating truth or running diff, run unit tests
-if [ "$run_update_truth" == "true" ] || [ "$run_diff" == "true" ]; then
+if [ "$run_update_truth" == "true" ] ||
+   [ "$run_diff" == "true" ]; then
 
   run_unit_tests=true
 

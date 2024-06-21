@@ -737,6 +737,8 @@ double TTContingencyTable::sedi_ci(double alpha,
 double TTContingencyTable::cost_loss(double r) const {
    double num, den, h, m, f, b, v;
 
+   if(n() == 0) return(bad_data_double);
+
    // Total proportion of hits, misses, false alarms, and observations 
    h = (double) fy_oy() / n();
    m = (double) fn_oy() / n();

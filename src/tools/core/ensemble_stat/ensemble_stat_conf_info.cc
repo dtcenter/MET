@@ -1094,28 +1094,28 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
       case(i_prc):
 
          // Maximum number of PCT, PJC, and PRC lines possible =
-         //    Point Vx: Message Types * Masks * Interpolations * Categorical Thresholds
-         //     Grid Vx:                 Masks * Interpolations * Categorical Thresholds
+         //    Point Vx: Message Types * Masks * Interpolations * Categorical Thresholds * Climo CDF Bins
+         //     Grid Vx:                 Masks * Interpolations * Categorical Thresholds * Climo CDF Bins
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
-              get_n_prob_cat_thresh();
+              max(fcat_ta.n(), 1) * cdf_info.cdf_ta.n();
          break;
 
       case(i_pstd):
 
          // Maximum number of PSTD lines possible =
-         //    Point Vx: Message Types * Masks * Interpolations * Categorical Thresholds * Alphas
-         //     Grid Vx:                 Masks * Interpolations * Categorical Thresholds * Alphas
+         //    Point Vx: Message Types * Masks * Interpolations * Categorical Thresholds * Climo CDF Bins * Alphas
+         //     Grid Vx:                 Masks * Interpolations * Categorical Thresholds * Climo CDF Bins * Alphas
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
-              get_n_prob_cat_thresh() * get_n_ci_alpha();
+              max(fcat_ta.n(), 1) * cdf_info.cdf_ta.n() * get_n_ci_alpha();
          break;
 
       case(i_eclv):
 
          // Maximum number of ECLV lines possible =
-         //    Point Vx: Message Types * Masks * Interpolations * Probability Thresholds
-         //     Grid Vx:                 Masks * Interpolations * Probability Thresholds
+         //    Point Vx: Message Types * Masks * Interpolations * Probability Thresholds * Climo CDF Bins
+         //     Grid Vx:                 Masks * Interpolations * Probability Thresholds * Climo CDF Bins
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
-              get_n_prob_cat_thresh() * get_n_prob_cat_thresh();
+              get_n_prob_cat_thresh() * get_n_prob_cat_thresh() * cdf_info.cdf_ta.n();
          break;
 
       default:
