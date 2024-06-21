@@ -24,9 +24,7 @@ SOUNDING_DATA_NAMES = [
 ]
 
 # Diagnostic names to be skipped
-SKIP_DATA_NAMES = [
-    "850RADIAL", "850DVRG", "200VORT"
-]
+SKIP_DATA_NAMES = []
 
 # Bad data integer value
 BAD_DATA_INT = 9999
