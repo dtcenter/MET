@@ -338,7 +338,7 @@ void def_tc_range_azimuth(NcFile* nc_out,
     add_att(&range_var, "_FillValue", bad_data_double);
 
     add_att(&azimuth_var, "long_name", "azimuth");
-    add_att(&azimuth_var, "units", "degrees_clockwise_from_north");
+    add_att(&azimuth_var, "units", "degrees_clockwise_from_east");
     add_att(&azimuth_var, "standard_name", "azimuth");
     add_att(&azimuth_var, "_FillValue", bad_data_double);
 
