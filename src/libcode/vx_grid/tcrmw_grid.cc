@@ -288,6 +288,7 @@ y = (lat_rot - RData.rot_lat_ll)/(RData.delta_rot_lat);
 
 x = lon_rot/(RData.delta_rot_lon);
 
+x = Nx - x; // MET #2841 switch from counterclockwise to clockwise
 
 RotatedLatLonGrid::xy_to_latlon(x, y, lat, lon);
 
@@ -309,6 +310,8 @@ double x, y;
 const double range_max_deg = deg_per_km*Range_max_km;
 
 RotatedLatLonGrid::latlon_to_xy(lat, lon, x, y);
+
+x = Nx - x; // MET #2841 switch from counterclockwise to clockwise
 
 azi_deg = x*(RData.delta_rot_lon);
 
@@ -378,6 +381,8 @@ RotatedLatLonGrid::latlon_to_xy(true_lat, true_lon, x, y);
 
 x -= Nx*floor(x/Nx);
 
+x = Nx - x; // MET #2841 switch from counterclockwise to clockwise
+
 y -= Ny*floor(y/Ny);
 
 return;
@@ -393,6 +398,8 @@ void TcrmwGrid::xy_to_latlon(double x, double y, double & true_lat, double & tru
 {
 
 x -= Nx*floor(x/Nx);
+
+x = Nx - x; // MET #2841 switch from counterclockwise to clockwise
 
 y -= Ny*floor(y/Ny);
 
