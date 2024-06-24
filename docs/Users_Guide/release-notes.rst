@@ -19,8 +19,8 @@ MET Version 11.1.1 release notes (20240621)
      * Bugfix: Fix the Point-Stat CNT header line typo causing duplicate SI_BCL column names (`#2730 <https://github.com/dtcenter/MET/issues/2730>`_).
      * Bugfix: Fix MET to compile without the optional --enable-python configuration option (`#2760 <https://github.com/dtcenter/MET/issues/2760>`_).
      * Bugfix: Fix the parsing of level values for GRIB2 template 4.48 data (`#2782 <https://github.com/dtcenter/MET/issues/2782>`_).
-     * **Bugfix: Fix the TC-Diag and TC-RMW tools to correctly handle the range and azimuth settings in range/azimuth grids (`#2833 <https://github.com/dtcenter/MET/issues/2833>`_).**
-     * **Bugfix: Fix TC-RMW to correct the tangential and radial wind computations (`#2841 <https://github.com/dtcenter/MET/issues/2841>`_).**
+     * **Bugfix: Fix the TC-Diag and TC-RMW tools to correctly handle the range and azimuth settings in range/azimuth grids** (`#2833 <https://github.com/dtcenter/MET/issues/2833>`_).
+     * **Bugfix: Fix TC-RMW to correct the tangential and radial wind computations** (`#2841 <https://github.com/dtcenter/MET/issues/2841>`_).
      * Bugfix: Fix Ensemble-Stat's handling of climo data when verifying ensemble-derived probabilities (`#2856 <https://github.com/dtcenter/MET/issues/2856>`_).
      * Bugfix: Update the logic of -qc option for ADP at point2grid (`#2867 <https://github.com/dtcenter/MET/issues/2867>`_).
      * Bugfix: Some AOD data was filtered out without -qc option with point2grid (`#2884 <https://github.com/dtcenter/MET/issues/2884>`_).
@@ -29,7 +29,7 @@ MET Version 11.1.1 release notes (20240621)
 
   .. dropdown:: Enhancements 
 
-     * **Eliminate the use of temporary files in the vx_config library (`#2691 <https://github.com/dtcenter/MET/issues/2691>`_).**
+     * **Eliminate the use of temporary files in the vx_config library** (`#2691 <https://github.com/dtcenter/MET/issues/2691>`_).
      * Enhance Point2Grid to support modified quality control settings for smoke/dust AOD data in GOES-16/17 as of April 16, 2024 (`#2853 <https://github.com/dtcenter/MET/issues/2853>`_).
 
 MET Version 11.1.0 release notes (20230731)
