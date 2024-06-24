@@ -179,7 +179,13 @@ M23 =  clat*clon;
 M33 =  slat;
 */
 
-set_np(lat_center, lon_center, lon_center - 180.0);
+   //
+   // MET #2841 define the rotation by subtracting 90 degrees
+   // instead of 180 to define TCRMW grids as pointing east
+   // instead of north.
+   // 
+
+set_np(lat_center, lon_center, lon_center - 90.0);
 
    //
    //

@@ -7,7 +7,7 @@ TC-RMW Tool
 Introduction
 ============
 
-The TC-RMW tool regrids tropical cyclone model data onto a moving range-azimuth grid centered on points along the storm track provided in ATCF format, most likely the adeck generated from the file. The radial grid spacing may be set as a factor of the radius of maximum winds (RMW). If wind fields are specified in the configuration file the radial and tangential wind components will be computed. Any regridding method available in MET can be used to interpolate data on the model output grid to the specified range-azimuth grid. The regridding will be done separately on each vertical level. The model data files must coincide with track points in a user provided ATCF formatted track file.
+The TC-RMW tool regrids tropical cyclone model data onto a moving range-azimuth grid centered on points along the storm track provided in ATCF format, most likely the adeck generated from the file. The radial grid spacing can be defined in kilometers or as a factor of the radius of maximum winds (RMW). The azimuthal grid spacing is defined in degrees clockwise from due east. If wind vector fields are specified in the configuration file the radial and tangential wind components will be computed. Any regridding method available in MET can be used to interpolate data on the model output grid to the specified range-azimuth grid. The regridding will be done separately on each vertical level. The model data files must coincide with track points in a user provided ATCF formatted track file.
 
 Practical information
 =====================

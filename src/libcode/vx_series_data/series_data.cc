@@ -49,7 +49,7 @@ void get_series_entry(int i_series, VarInfo* data_info,
    if(!found) {
       mlog << Error << "\nget_series_entry() -> "
            << "Could not find data for " << data_info->magic_time_str()
-           << " in file list:\n:" << write_css(search_files) << "\n\n";
+           << " in file list:\n" << write_css(search_files) << "\n\n";
       exit(1);
    }
 
