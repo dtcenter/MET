@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
 #include<netcdf>
 
 #include "vx_tc_nc_util.h"
@@ -159,6 +158,21 @@ void write_tc_rmw(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
+bool has_pressure_level(vector<string> levels) {
+
+    bool status = false;
+
+    for (int j = 0; j < levels.size(); j++) {
+        if (levels[j].substr(0, 1) == "P") {
+            status = true;
+            break;
+        }
+    }
+
+    return status;
+}
+    
+////////////////////////////////////////////////////////////////////////
 
 set<string> get_pressure_level_strings(
     map<string, vector<string> > variable_levels) {
@@ -289,7 +303,7 @@ void def_tc_pressure(NcFile* nc_out,
     put_nc_data(&pressure_var, &pressure_data[0]);
 
     // Cleanup
-    if(pressure_data) { delete [] pressure_data; pressure_data = (double *) nullptr; }
+    if(pressure_data) { delete [] pressure_data; pressure_data = (double *) 0; }
 
     return;
 }
@@ -324,7 +338,7 @@ void def_tc_range_azimuth(NcFile* nc_out,
     add_att(&range_var, "_FillValue", bad_data_double);
 
     add_att(&azimuth_var, "long_name", "azimuth");
-    add_att(&azimuth_var, "units", "degrees_clockwise_from_north");
+    add_att(&azimuth_var, "units", "degrees_clockwise_from_east");
     add_att(&azimuth_var, "standard_name", "azimuth");
     add_att(&azimuth_var, "_FillValue", bad_data_double);
 
@@ -342,8 +356,8 @@ void def_tc_range_azimuth(NcFile* nc_out,
     put_nc_data(&azimuth_var, &azimuth_data[0]);
 
     // Cleanup
-    if(range_data)   { delete [] range_data;   range_data   = (double *) nullptr; }
-    if(azimuth_data) { delete [] azimuth_data; azimuth_data = (double *) nullptr; }
+    if(range_data)   { delete [] range_data;   range_data   = (double *) 0; }
+    if(azimuth_data) { delete [] azimuth_data; azimuth_data = (double *) 0; }
 
     return;
 }
@@ -539,7 +553,7 @@ void def_tc_variables(NcFile* nc_out,
         string long_name = variable_long_names[i->first];
         string units = variable_units[i->first];
 
-        if (levels.size() > 1) {
+        if (has_pressure_level(levels)) {
             data_var = nc_out->addVar(
                 var_name, ncDouble, dims_3d);
             add_att(&data_var, "long_name", long_name);
