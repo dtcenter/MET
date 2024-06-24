@@ -22,9 +22,9 @@
 //   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   003    10-03-23  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
 //   004    05-20-24  Howard Soh     MET #2867 Fix -qc ADP bug.
+//   004    06-24-24  Halley Gotway  MET #2880 Filter obs_quality.
 //
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <cstdio>
 #include <cstdlib>
@@ -53,7 +53,6 @@
 
 using namespace std;
 using namespace netCDF;
-
 
 ////////////////////////////////////////////////////////////////////////
 

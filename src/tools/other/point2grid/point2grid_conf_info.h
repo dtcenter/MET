@@ -42,7 +42,8 @@ class PointToGridConfInfo {
       unixtime     valid_time;          // valid time
       int          beg_ds;              // Time range of observations to be retained,
       int          end_ds;              // Defined relative to the PrepBufr center time (seconds)
-      int          quality_mark_thresh; // Quality marks to be retained
+      StringArray  obs_qty_inc;         // Quality mark strings to be included
+      StringArray  obs_qty_exc;         // Quality mark strings to be excluded
       ConcatString version;             // Config file version
 
       PointToGridConfInfo();
