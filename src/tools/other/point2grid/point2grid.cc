@@ -2572,7 +2572,9 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    int cnt_adp_qc_high = 0;
    int cnt_adp_qc_medium = 0;
    int cnt_adp_qc_nr = 0;   // no_retrieval_qf
-   int cnt_adp_qc_adjused = 0;
+   int cnt_adp_qc_high_to_low = 0;
+   int cnt_adp_qc_high_to_medium = 0;
+   int cnt_adp_qc_medium_to_low = 0;
    for (int xIdx=0; xIdx<to_lon_count; xIdx++) {
       for (int yIdx=0; yIdx<to_lat_count; yIdx++) {
          int offset = to_dp.two_to_one(xIdx,yIdx);
@@ -2612,7 +2614,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                }
 
                // Filter by QC flag
-               if (has_qc_var || has_adp_qc_var) {
+               if (has_qc_flags && (has_qc_var || has_adp_qc_var)) {
                   qc_value = qc_data[from_index];
                   if (mlog.verbosity_level() >= log_debug_level) {
                      if (qc_min_value > qc_value) qc_min_value = qc_value;
@@ -2626,8 +2628,6 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                   }
                   if (has_adp_qc_var) {
                      int qc_for_flag = compute_adp_qc_flag(adp_qc_data[from_index], shift_bits);
-                     bool filter_out = is_eq(qc_for_flag, bad_data_int);
-
                      if (mlog.verbosity_level() >= log_debug_level) {
                         switch (qc_for_flag) {
                            case 0:  cnt_adp_qc_high++;      break;
@@ -2637,15 +2637,19 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                         }
                      }
 
+                     bool filter_out = is_eq(qc_for_flag, bad_data_int);
                      if (!filter_out) {
                         /* Adjust the quality by AOD data QC */
-                        if (1 == qc_value && 0 == qc_for_flag) {
-                           qc_for_flag = 1;         /* high to medium quality */
-                           cnt_adp_qc_adjused++;
+                        if (2 == qc_value) {
+                           if (2 > qc_for_flag) {
+                              if (0 == qc_for_flag) cnt_adp_qc_high_to_low++;
+                              else if (1 == qc_for_flag) cnt_adp_qc_medium_to_low++;
+                              qc_for_flag = 2;         /* high/medium to low quality */
+                           }
                         }
-                        else if (2 == qc_value) {
-                           qc_for_flag = 2;         /* high/medium to low quality */
-                           cnt_adp_qc_adjused++;
+                        else if (1 == qc_value && 0 == qc_for_flag) {
+                           qc_for_flag = 1;         /* high to medium quality */
+                           cnt_adp_qc_high_to_medium++;
                         }
                         if (has_qc_flags && !qc_flags.has(qc_for_flag)) filter_out = true;
                      }
@@ -2654,7 +2658,7 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
                         continue;
                      }
                   }
-                  else if (has_qc_var && has_qc_flags && !qc_flags.has(qc_value)) {
+                  else if (has_qc_var && !qc_flags.has(qc_value)) {
                      qc_filtered_count++;
                      continue;
                   }
@@ -2694,6 +2698,10 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
    delete [] from_data;
    delete [] adp_qc_data;
 
+   int cnt_adjused_low = cnt_adp_qc_low + cnt_adp_qc_high_to_low + cnt_adp_qc_medium_to_low;
+   int cnt_adjused_high = cnt_adp_qc_high - cnt_adp_qc_high_to_medium - cnt_adp_qc_high_to_low;
+   int cnt_adjused_medium = cnt_adp_qc_medium + cnt_adp_qc_high_to_medium - cnt_adp_qc_medium_to_low;
+   int cnt_adjused_total = cnt_adp_qc_high_to_medium + cnt_adp_qc_high_to_low + cnt_adp_qc_medium_to_low;
    mlog << Debug(log_debug_level) << method_name << "Count: actual: " << to_cell_count
         << ", missing: " << missing_count << ", non_missing: " << non_missing_count
         << "\n   Filtered: by QC: " << qc_filtered_count
@@ -2701,13 +2709,22 @@ void regrid_goes_variable(NcFile *nc_in, VarInfo *vinfo,
         << ", by absent: " << absent_count
         << ", total: " << (qc_filtered_count + adp_qc_filtered_count + absent_count)
         << "\n   Range:  data: [" << from_min_value << " - " << from_max_value
-        << "]  QC: [" << qc_min_value << " - " << qc_max_value << "]"
-        << "\n   AOD QC: high=" << cnt_aod_qc_high
-        << " medium=" << cnt_aod_qc_medium << ", low=" << cnt_aod_qc_low
-        << ", no_retrieval=" << cnt_aod_qc_nr
-        << "\n   ADP QC: high=" << cnt_adp_qc_high << " medium=" << cnt_adp_qc_medium
-        << ", low=" << cnt_adp_qc_low << ", no_retrieval=" << cnt_adp_qc_nr
-        << ", adjusted=" << cnt_adp_qc_adjused << "\n";
+        << "]  QC: [" << qc_min_value << " - " << qc_max_value << "]\n";
+   if (has_qc_flags)
+      mlog << Debug(log_debug_level)
+           << "   AOD QC: high=" << cnt_aod_qc_high
+           << " medium=" << cnt_aod_qc_medium << ", low=" << cnt_aod_qc_low
+           << ", no_retrieval=" << cnt_aod_qc_nr
+           << "\n   ADP QC: high=" << cnt_adjused_high << " (" << cnt_adp_qc_high
+           << "), medium=" << cnt_adjused_medium  << " (" << cnt_adp_qc_medium
+           << "), low=" << cnt_adjused_low << " (" << cnt_adp_qc_low
+           << "), no_retrieval=" << cnt_adp_qc_nr
+           << "\n   adjusted: high to medium=" << cnt_adp_qc_high_to_medium
+           << ", high to low=" << cnt_adp_qc_high_to_low
+           << ", medium to low=" << cnt_adp_qc_medium_to_low
+           << ", total=" << cnt_adjused_total
+           << "\n";
+
 
    if (to_cell_count == 0) {
       mlog << Warning << "\n" << method_name
@@ -2922,7 +2939,6 @@ void set_adp_gc_values(NcVar var_adp_qc) {
 
       if (get_nc_att_values(&var_adp_qc, att_name_values, flag_values)) {
          int idx;
-         StringArray flag_meanings = to_lower(att_flag_meanings).split(" ");
          if (flag_meanings.has("low_confidence_smoke_detection_qf", idx)) {
             adp_qc_low = (flag_values[idx] >> 2) & 0x03;
          }

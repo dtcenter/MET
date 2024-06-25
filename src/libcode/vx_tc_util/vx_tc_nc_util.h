@@ -35,6 +35,8 @@ extern void write_tc_track_point(netCDF::NcFile*,
 extern void write_tc_rmw(netCDF::NcFile*,
     const netCDF::NcDim&, const TrackInfo&);
 
+extern bool has_pressure_level(std::vector<std::string>);
+
 extern std::set<std::string> get_pressure_level_strings(
     std::map<std::string, std::vector<std::string> >);
 
