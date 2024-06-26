@@ -1267,7 +1267,6 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       }
       else user_defined_latlon = true;
    }
-cout << " DEBUG HS " << method_name << "user_defined_latlon=" << user_defined_latlon << " lat= " << lat_vname  << " lon= " << lon_vname << "\n";
    // Find lat/lon variables from the coordinates attribue
    if (0 < FieldSA.n() && !user_defined_latlon) {
       ConcatString coordinates_value;
@@ -1364,7 +1363,6 @@ cout << " DEBUG HS " << method_name << "user_defined_latlon=" << user_defined_la
       vinfo->clear();
 
       // Populate the VarInfo object using the config string
-cout << " DEBUG HS " << method_name << " FieldSA[" << i << "] = " << FieldSA[i] << "\n";
       config.read_string(FieldSA[i].c_str());
       vinfo->set_dict(config);
 
