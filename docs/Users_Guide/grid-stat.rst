@@ -428,7 +428,7 @@ The **output_flag** array controls the type of output that the Grid-Stat tool ge
 
 Note that the first two line types are easily derived from one another. The user is free to choose which measure is most desired. The output line types are described in more detail in :numref:`grid_stat-output`.
 
-The SEEPS climo file is not distributed with MET tools because of the file size. It should be configured by using the environment variable, MET_SEEPS_GRID_CLIMO_NAME.
+The SEEPS climo file is not distributed with MET tools because of the file size. It should be configured by using the configuration file (seeps_grid_climo_name). It can be overridden by the environment variable, MET_SEEPS_GRID_CLIMO_NAME.
 
 
 _____________________
