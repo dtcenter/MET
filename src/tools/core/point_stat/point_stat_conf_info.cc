@@ -80,6 +80,9 @@ void PointStatConfInfo::clear() {
    ugrid_map_config.clear();
    ugrid_max_distance_km = bad_data_double;
 #endif
+   seeps_climo_name.clear();
+   seeps_p1_thresh.clear();
+
    // Deallocate memory
    if(vx_opt) { delete [] vx_opt; vx_opt = (PointStatVxOpt *) nullptr; }
 
@@ -195,6 +198,12 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
    // Check for consistent number of climatology fields
    check_climo_n_vx(&conf, n_vx);
+
+   // Conf: threshold for SEEPS p1
+   seeps_p1_thresh = conf.lookup_thresh(conf_key_seeps_p1_thresh);
+
+   // Conf: SEEPS climo filename
+   seeps_climo_name = conf.lookup_string(conf_key_seeps_grid_climo_name, false);
 
    // Parse settings for each verification task
    for(i=0; i<n_vx; i++) {
@@ -764,8 +773,6 @@ void PointStatVxOpt::clear() {
 
    msg_typ.clear();
 
-   seeps_p1_thresh.clear();
-
    duplicate_flag = DuplicateType::None;
    obs_summary = ObsSummary::None;
    obs_perc = bad_data_int;
@@ -999,9 +1006,6 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
 
-   // Conf: threshold for SEEPS p1
-   seeps_p1_thresh = odict.lookup_thresh(conf_key_seeps_p1_thresh);
-
    // Conf: message_type
    msg_typ = parse_conf_message_type(&odict);
 
@@ -1161,8 +1165,8 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    vx_pd.set_obs_perc_value(obs_perc);
    if (output_flag[i_seeps_mpr] != STATOutputType::None
        || output_flag[i_seeps] != STATOutputType::None) {
-     vx_pd.load_seeps_climo();
-     vx_pd.set_seeps_thresh(seeps_p1_thresh);
+     vx_pd.load_seeps_climo(conf_info->seeps_climo_name);
+     vx_pd.set_seeps_thresh(conf_info->seeps_p1_thresh);
    }
    return;
 }
