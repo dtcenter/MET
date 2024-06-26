@@ -1547,7 +1547,8 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
 void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &obs_dp,
                                    DataPlane &seeps_dp, DataPlane &seeps_dp_fcat,
                                    DataPlane &seeps_dp_ocat,SeepsAggScore *seeps,
-                                   int month, int hour, const SingleThresh &seeps_p1_thresh) {
+                                   int month, int hour, const SingleThresh &seeps_p1_thresh,
+                                   const ConcatString &seeps_climo_name) {
    int fcst_cat, obs_cat;
    int seeps_count, count_diagonal, nan_count, bad_count;
    int nx = fcst_dp.nx();
@@ -1569,7 +1570,7 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
    c12 = c13 = c21 = c23 = c31 = c32 = 0;
 
    seeps->clear();
-   SeepsClimoGrid *seeps_climo = get_seeps_climo_grid(month);
+   SeepsClimoGrid *seeps_climo = get_seeps_climo_grid(month, seeps_climo_name);
    seeps_climo->set_p1_thresh(seeps_p1_thresh);
    for (int i=0; i<SEEPS_MATRIX_SIZE; i++) {
       pvf[i] = 0.;
