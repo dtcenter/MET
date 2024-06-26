@@ -1153,7 +1153,7 @@ point2grid Configuration File
 
 The default configuration file for the point2grid tool named **Point2GridConfig_default** can be found in the installed *share/met/config* directory. It is recommended that users make a copy of this file prior to modifying its contents.
 
-The point2grid configuration file is optional and only necessary when defining the variable name instead of GRIB code or filtering by time. The contents of the default MADIS2NC configuration file are described below.
+The point2grid configuration file is optional and only necessary when defining the variable name instead of GRIB code or filtering by time. The contents of the default point2grid configuration file are described below.
 
 _____________________
 
@@ -1194,6 +1194,16 @@ The configuration option listed above is common to many MET tools and are descri
 		
 This entry is an array of dictionaries, each containing a **GRIB code** string and mathcing **variable name** string which define a mapping of GRIB code to the output variable names.
 
+.. code-block:: none
+
+   var_name_map = [
+      ...
+      { key = "lat_vname";     val = "NLAT"; },
+      { key = "lon_vname";     val = "NLON"; }
+      ...
+   ]
+
+The latitude and longitude variables for NetCDF input can be overridden by the configurations. There are two special keys, **lat_vname** and **lon_vname** which are applied to the NetCDF input, not for GRIB code.
 
 Point NetCDF to ASCII Python Utility
 ====================================
