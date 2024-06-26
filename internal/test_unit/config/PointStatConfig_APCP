@@ -127,14 +127,9 @@ output_flag = {
    rps    = NONE;
    eclv   = BOTH;
    mpr    = NONE;
-   seeps  = ${SEEPS_FLAG};
-   seeps_mpr = ${SEEPS_FLAG};
+   seeps  = NONE;
+   seeps_mpr = NONE;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Threshold for SEEPS p1 (Probability of being dry)
-
-seeps_p1_thresh = ${SEEPS_P1_THRESH};
 
 ////////////////////////////////////////////////////////////////////////////////
 
