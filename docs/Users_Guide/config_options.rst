@@ -1630,7 +1630,7 @@ seeps_grid_climo_name
 ---------------------
 
 The "seeps_grid_climo_name" option sets the location and the filename of the SEEPS climo file for the gridded data.
-The default setting is the empty string which does not provide the SEEPS climo bame and location. It can be overridden by the environment variable, MET_SEEPS_GRID_CLIMO_NAME.
+The default setting is the empty string. It should be configured by the user. It can be overridden by the environment variable, MET_SEEPS_GRID_CLIMO_NAME.
 
 .. code-block:: none
 
