@@ -151,6 +151,14 @@ class StatHdrColumns {
       void set_cov_thresh    (const ThreshArray);
       void set_alpha         (const double);
 
+      // Apply -set_hdr overrides
+      void apply_set_hdr_opts(const StringArray &, const StringArray &);
+      void apply_set_hdr_opts(const StringArray &, const StringArray &,
+                              const StringArray &, const StringArray &);
+
+      ConcatString get_set_hdr_str(const std::string &,
+                                   const StringArray &, const StringArray &) const;
+
       // Get functions
       ConcatString get_model             () const;
       ConcatString get_desc              () const;

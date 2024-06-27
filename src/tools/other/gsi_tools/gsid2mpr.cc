@@ -47,7 +47,6 @@
 
 using namespace std;
 
-
 ////////////////////////////////////////////////////////////////////////
 
 static void process_conv(const char *conv_filename, const char *output_filename);
@@ -365,13 +364,13 @@ void write_mpr_row_conv(AsciiTable &at, int row, const ConvData &d) {
    int col;
 
    // Update header for current data
-   if(not_has_FCST_VALID_BEG) shc.set_fcst_valid_beg(d.fcst_ut);
-   if(not_has_FCST_VALID_END) shc.set_fcst_valid_end(d.fcst_ut);
-   if(not_has_OBS_VALID_BEG)  shc.set_obs_valid_beg(d.obs_ut);
-   if(not_has_OBS_VALID_END)  shc.set_obs_valid_end(d.obs_ut);
-   if(not_has_FCST_VAR)       shc.set_fcst_var(d.var);
-   if(not_has_OBS_VAR)        shc.set_obs_var(d.var);
-   if(not_has_OBTYPE)         shc.set_obtype(d.obtype.c_str());
+   if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(d.fcst_ut);
+   if(!hdr_name.has("FCST_VALID_END")) shc.set_fcst_valid_end(d.fcst_ut);
+   if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(d.obs_ut);
+   if(!hdr_name.has("OBS_VALID_END"))  shc.set_obs_valid_end(d.obs_ut);
+   if(!hdr_name.has("FCST_VAR"))       shc.set_fcst_var(d.var);
+   if(!hdr_name.has("OBS_VAR"))        shc.set_obs_var(d.var);
+   if(!hdr_name.has("OBTYPE"))         shc.set_obtype(d.obtype.c_str());
 
    // Write header columns
    write_header_cols(shc, at, row);
@@ -420,12 +419,12 @@ void write_mpr_row_rad(AsciiTable &at, int row, const RadData & d) {
    int col;
 
    // Update header for current data
-   if(not_has_FCST_VALID_BEG) shc.set_fcst_valid_beg(d.fcst_ut);
-   if(not_has_FCST_VALID_END) shc.set_fcst_valid_end(d.fcst_ut);
-   if(not_has_OBS_VALID_BEG)  shc.set_obs_valid_beg(d.obs_ut);
-   if(not_has_OBS_VALID_END)  shc.set_obs_valid_end(d.obs_ut);
-   if(not_has_FCST_VAR)       shc.set_fcst_var(d.var);
-   if(not_has_OBS_VAR)        shc.set_obs_var(d.var);
+   if(!hdr_name.has("FCST_VALID_BEG")) shc.set_fcst_valid_beg(d.fcst_ut);
+   if(!hdr_name.has("FCST_VALID_END")) shc.set_fcst_valid_end(d.fcst_ut);
+   if(!hdr_name.has("OBS_VALID_BEG"))  shc.set_obs_valid_beg(d.obs_ut);
+   if(!hdr_name.has("OBS_VALID_END"))  shc.set_obs_valid_end(d.obs_ut);
+   if(!hdr_name.has("FCST_VAR"))       shc.set_fcst_var(d.var);
+   if(!hdr_name.has("OBS_VAR"))        shc.set_obs_var(d.var);
 
    // Write header columns
    write_header_cols(shc, at, row);

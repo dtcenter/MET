@@ -867,7 +867,7 @@ void compute_lat_lon(TcrmwGrid& grid,
             ia * grid.azimuth_delta_deg(),
             lat, lon);
          lat_arr[i] =  lat;
-         lon_arr[i] = -lon; // degrees east to west
+         lon_arr[i] = -lon; // degrees west to east
       }
    }
 
