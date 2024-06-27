@@ -35,10 +35,7 @@ class TcrmwGrid : public RotatedLatLonGrid {
 
       void calc_ijk();   //  calculate rotated basis vectors
 
-      void range_azi_to_basis(const double range_deg, const double azi_deg, Vector & B_range, Vector & B_azi) const;
-
       TcrmwData TData;
-
 
       Vector Ir, Jr, Kr;
 
@@ -89,23 +86,15 @@ class TcrmwGrid : public RotatedLatLonGrid {
 
       void xy_to_latlon(double x, double y, double & true_lat, double & true_lon) const;
 
+      void wind_ne_to_rt(const double azi_deg,
+                         const double u_wind, const double v_wind, 
+                         double & radial_wind, double & tangential_wind) const;
+
+      void wind_ne_to_rt(const double lat, const double lon, 
+                         const double u_wind, const double v_wind, 
+                         double & radial_wind, double & tangential_wind) const;
 
 
-      void wind_ne_to_ra(const double lat, const double lon, 
-                         const double east_component, const double north_component, 
-                         double & radial_component,   double & azimuthal_component) const;
-
-
-         //
-         //  possibly toggles the signs of the radial and/or azimuthal components
-         //
-         //      to align with the conventions used in the TC community
-         //
-
-      void wind_ne_to_ra_conventional (const double lat, const double lon, 
-                                       const double east_component, const double north_component, 
-                                       double & radial_component,   double & azimuthal_component) const;
-  
 };
 
 

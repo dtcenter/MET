@@ -130,7 +130,7 @@
       G212 \
       &OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212_compute.nc \
       -field 'name="AOD";  level="(*,*)";' \
-      -qc 1,2,3 -method MAX \
+      -qc 0,1 -method MAX \
       -v 1
     </param>
     <output>
@@ -167,7 +167,7 @@
       &OUTPUT_DIR;/point2grid/point2grid_GOES_16_ADP.nc \
       -field 'name="AOD_Smoke";  level="(*,*)";' \
       -adp &DATA_DIR_MODEL;/goes_16/OR_ABI-L2-ADPC-M6_G16_s20192662141196_e20192662143569_c20192662144526.nc \
-      -qc 1,2 -method MAX \
+      -qc 0,1 -method MAX \
       -v 1
     </param>
     <output>
@@ -213,7 +213,7 @@
     </output>
   </test>
 
-  <test name="point2grid_GOES_16_ADP_Enterprise_high">
+  <test name="point2grid_GOES_16_ADP_Enterprise_high_medium">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
       <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
@@ -259,7 +259,7 @@
       G212 \
       &OUTPUT_DIR;/point2grid/point2grid_GOES_16_AOD_TO_G212_unsigned.nc \
       -field 'name="AOD";  level="(*,*)";' \
-      -qc 1,2,3 -method MAX \
+      -qc 0,1,2 -method MAX \
       -v 1
     </param>
     <output>

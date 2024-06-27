@@ -71,6 +71,7 @@ fcst = {
 
    field = [
       { name  = "TMP"; level = "Z2";   message_type = [ "ADPSFC" ]; },
+      { name  = "TMP"; level = "Z2";   message_type = [ "ADPSFC" ]; prob_cat_thresh = [ >275, >280, >285 ]; },
       { name  = "TMP"; level = "P850"; message_type = [ "ADPUPA" ]; }
    ];
 }

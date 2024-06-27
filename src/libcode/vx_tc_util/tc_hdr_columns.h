@@ -70,6 +70,9 @@ class TcHdrColumns {
       void set_valid_mask  (const ConcatString &);
       void set_line_type   (const ConcatString &);
 
+      // Apply -set_hdr overrides
+      void apply_set_hdr_opts(const StringArray &, const StringArray &);
+
       // Get functions
       ConcatString adeck_model () const;
       ConcatString bdeck_model () const;

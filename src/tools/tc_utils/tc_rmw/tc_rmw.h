@@ -84,7 +84,6 @@ static TCRMWConfInfo conf_info;
 static GrdFileType   ftype;
 static TCRMW_WindConverter wind_converter;
 
-
 // Optional arguments
 static ConcatString out_dir;
 static ConcatString out_prefix;
@@ -136,11 +135,10 @@ static std::map<std::string, int> pressure_level_indices;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static DataPlane dp;
-static Grid      latlon_arr;
-static TcrmwData grid_data;
+static Grid      grid_in;
+static TcrmwData tcrmw_data;
 static TcrmwGrid tcrmw_grid;
-static Grid      grid;
+static Grid      grid_out;
 
 // Grid coordinate arrays
 static double* lat_arr;

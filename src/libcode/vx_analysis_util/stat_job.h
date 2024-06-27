@@ -234,13 +234,16 @@ class STATAnalysisJob {
       std::map<ConcatString,StringArray> column_str_inc_map;
       std::map<ConcatString,StringArray> column_str_exc_map;
 
-      StringArray hdr_name;
-      StringArray hdr_value;
-
       //
       // Store the case information for the -by option
       //
       StringArray by_column;
+
+      //
+      // Options for -set_hdr output
+      //
+      StringArray hdr_name;
+      StringArray hdr_value;
 
       //
       // Variables used to the store the analysis job specification
