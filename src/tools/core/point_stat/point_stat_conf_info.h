@@ -131,7 +131,6 @@ class PointStatVxOpt {
 
       StringArray     mpr_sa;             // MPR column names
       ThreshArray     mpr_ta;             // MPR column thresholds
-      SingleThresh    seeps_p1_thresh;    // SEESP p1 threshold
 
       // Vector of MaskLatLon objects defining Lat/Lon Point masks
       std::vector<MaskLatLon> mask_llpnt;
@@ -246,6 +245,10 @@ class PointStatConfInfo {
       ConcatString tmp_dir;                 // Directory for temporary files
       ConcatString output_prefix;           // String to customize output file name
       ConcatString version;                 // Config file version
+
+      ConcatString seeps_climo_name;        // SEESP climo filename
+      SingleThresh seeps_p1_thresh;         // SEESP p1 threshold
+
 #ifdef WITH_UGRID
       bool ignore_ugrid_dataset;
       ConcatString ugrid_nc;                // NetCDF for coordinate variables of unstructured grid

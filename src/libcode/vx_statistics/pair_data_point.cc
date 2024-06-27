@@ -183,8 +183,8 @@ bool PairDataPoint::add_point_pair(const char *sid, double lat, double lon,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairDataPoint::load_seeps_climo() {
-   if (nullptr == seeps_climo) seeps_climo = get_seeps_climo();
+void PairDataPoint::load_seeps_climo(const ConcatString &seeps_climo_name) {
+   if (nullptr == seeps_climo) seeps_climo = get_seeps_climo(seeps_climo_name);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1674,11 +1674,11 @@ void VxPairDataPoint::set_obs_perc_value(int percentile) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::load_seeps_climo() {
+void VxPairDataPoint::load_seeps_climo(const ConcatString &seeps_climo_name) {
    for(int i=0; i < n_msg_typ; i++){
       for(int j=0; j < n_mask; j++){
          for(int k=0; k < n_interp; k++){
-            pd[i][j][k].load_seeps_climo();
+            pd[i][j][k].load_seeps_climo(seeps_climo_name);
          }
       }
    }

@@ -162,8 +162,6 @@ class GridStatVxOpt {
       ThreshArray      owind_ta;         // obs wind speed thresholds
       SetLogic         wind_logic;       // wind speed field logic
 
-      SingleThresh     seeps_p1_thresh;    // SEESP p1 threshold
-
       StringArray      mask_grid;        // Masking grid strings
       StringArray      mask_poly;        // Masking polyline strings
 
@@ -283,6 +281,10 @@ class GridStatConfInfo {
       ConcatString   tmp_dir;               // Directory for temporary files
       ConcatString   output_prefix;         // String to customize output file name
       ConcatString   version;               // Config file version
+
+      ConcatString seeps_climo_name;        // SEESP climo filename
+      SingleThresh seeps_p1_thresh;         // SEESP p1 threshold
+
 #ifdef WITH_UGRID
       bool ignore_ugrid_dataset;
       ConcatString ugrid_nc;                // NetCDF for coordinate variables of unstructured grid

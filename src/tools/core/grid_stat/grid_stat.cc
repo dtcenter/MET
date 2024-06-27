@@ -1206,7 +1206,7 @@ void process_scores() {
             compute_aggregated_seeps_grid(fcst_dp_smooth, obs_dp_smooth,
                                           seeps_dp, seeps_dp_fcat, seeps_dp_ocat,
                                           &seeps, month, hour,
-                                          conf_info.vx_opt[i].seeps_p1_thresh);
+                                          conf_info.seeps_p1_thresh, conf_info.seeps_climo_name);
 
             write_nc("SEEPS_MPR_SCORE", seeps_dp, i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);

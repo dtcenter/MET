@@ -59,7 +59,7 @@ class PairDataPoint : public PairBase {
       bool add_point_pair(const char *, double, double, double, double,
                           unixtime, double, double, double, double,
                           const char *, double, double, double);
-      void load_seeps_climo();
+      void load_seeps_climo(const ConcatString &seeps_climo_name);
       void set_seeps_thresh(const SingleThresh &p1_thresh);
       void set_seeps_score(SeepsScore *, int index=-1);
 
@@ -229,7 +229,7 @@ class VxPairDataPoint {
 
       void set_mpr_thresh(const StringArray &, const ThreshArray &);
 
-      void load_seeps_climo();
+      void load_seeps_climo(const ConcatString &seeps_climo_name);
       void set_seeps_thresh(const SingleThresh &p1_thresh);
 
       void set_climo_cdf_info_ptr(const ClimoCDFInfo *);

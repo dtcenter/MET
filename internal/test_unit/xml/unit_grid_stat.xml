@@ -296,7 +296,7 @@
       <pair><name>SEEPS_FLAG</name>      <value>BOTH</value></pair>
       <pair><name>SEEPS_P1_THRESH</name> <value>NA</value></pair>
       <pair><name>OUTPUT_PREFIX</name>   <value>SEEPS</value></pair>
-      <pair><name>MET_SEEPS_GRID_CLIMO_NAME</name><value>&DATA_DIR_CLIMO;/seeps/PPT24_seepsweights_grid.nc</value></pair>
+      <pair><name>SEEPS_GRID_CLIMO_NAME</name><value>&DATA_DIR_CLIMO;/seeps/PPT24_seepsweights_grid.nc</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/seeps/gpm_2021120100_2021120200_trmmgrid.nc \
