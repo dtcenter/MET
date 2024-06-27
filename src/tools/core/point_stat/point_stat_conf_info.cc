@@ -203,7 +203,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    seeps_p1_thresh = conf.lookup_thresh(conf_key_seeps_p1_thresh);
 
    // Conf: SEEPS climo filename
-   seeps_climo_name = conf.lookup_string(conf_key_seeps_grid_climo_name, false);
+   seeps_climo_name = conf.lookup_string(conf_key_seeps_point_climo_name, false);
 
    // Parse settings for each verification task
    for(i=0; i<n_vx; i++) {
