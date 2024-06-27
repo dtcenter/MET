@@ -168,8 +168,6 @@
       <pair><name>FCST_FIELD_NAME</name>  <value>APCP</value></pair>
       <pair><name>FCST_FIELD_LEVEL</name> <value>A3</value></pair>
       <pair><name>OBS_DICT</name>         <value>fcst</value></pair>
-      <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
-      <pair><name>SEEPS_P1_THRESH</name>  <value>NA</value></pair>
       <pair><name>OUTPUT_PREFIX</name>    <value>GRIB1_NAM_TRMM</value></pair>
     </env>
     <param> \
@@ -196,8 +194,6 @@
       <pair><name>FCST_FIELD_NAME</name>  <value>APCP</value></pair>
       <pair><name>FCST_FIELD_LEVEL</name> <value>A3</value></pair>
       <pair><name>OBS_DICT</name>         <value>fcst</value></pair>
-      <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
-      <pair><name>SEEPS_P1_THRESH</name>  <value>NA</value></pair>
       <pair><name>OUTPUT_PREFIX</name>    <value>GRIB2_SREF_TRMM</value></pair>
     </env>
     <param> \
@@ -224,8 +220,6 @@
       <pair><name>FCST_FIELD_NAME</name>  <value>APCP_24</value></pair>
       <pair><name>FCST_FIELD_LEVEL</name> <value>(*,*)</value></pair>
       <pair><name>OBS_DICT</name>         <value>{ field = [ { name  = "APCP"; level = "A24"; } ]; }</value></pair>
-      <pair><name>SEEPS_FLAG</name>       <value>NONE</value></pair>
-      <pair><name>SEEPS_P1_THRESH</name>  <value>NA</value></pair>
       <pair><name>OUTPUT_PREFIX</name>    <value>NCMET_NAM_HMTGAGE</value></pair>
     </env>
     <param> \
@@ -252,14 +246,14 @@
       <pair><name>FCST_FIELD_NAME</name>  <value>APCP_24</value></pair>
       <pair><name>FCST_FIELD_LEVEL</name> <value>(*,*)</value></pair>
       <pair><name>OBS_DICT</name>         <value>{ field = [ { name  = "TP24"; level = "L0"; is_precipitation = TRUE; } ]; }</value></pair>
-      <pair><name>SEEPS_FLAG</name>       <value>BOTH</value></pair>
       <pair><name>SEEPS_P1_THRESH</name>  <value>ge0.1&amp;&amp;le0.85</value></pair>
+      <pair><name>SEEPS_POINT_CLIMO_NAME</name>  <value></value></pair>
       <pair><name>OUTPUT_PREFIX</name>    <value>NCMET_NAM_NDAS_SEEPS</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/met_nc/nam/nam_2012040900_F036_APCP24.nc \
       &OUTPUT_DIR;/pb2nc/ndas.20120410.t12z.prepbufr.tm00.nc \
-      &CONFIG_DIR;/PointStatConfig_APCP \
+      &CONFIG_DIR;/PointStatConfig_SEEPS \
       -outdir &OUTPUT_DIR;/point_stat -v 1
     </param>
     <output>

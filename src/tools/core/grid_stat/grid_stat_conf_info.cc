@@ -84,6 +84,9 @@ void GridStatConfInfo::clear() {
    output_ascii_flag = false;
    output_nc_flag = false;
 
+   seeps_climo_name.clear();
+   seeps_p1_thresh.clear();
+
    // Deallocate memory
    if(vx_opt) { delete [] vx_opt; vx_opt = (GridStatVxOpt *) nullptr; }
 
@@ -161,6 +164,12 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
+
+   // Conf: threshold for SEEPS p1
+   seeps_p1_thresh = conf.lookup_thresh(conf_key_seeps_p1_thresh);
+
+   // Conf: SEEPS climo filename
+   seeps_climo_name = conf.lookup_string(conf_key_seeps_grid_climo_name, false);
 
 #ifdef WITH_UGRID
    // Conf: ugrid_dataset
@@ -618,8 +627,6 @@ void GridStatVxOpt::clear() {
    hss_ec_value = bad_data_double;
    rank_corr_flag = false;
 
-   seeps_p1_thresh.clear();
-
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    nc_info.clear();
@@ -912,9 +919,6 @@ void GridStatVxOpt::process_config(
 
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
-
-   // Conf: threshold for SEEPS p1
-   seeps_p1_thresh = odict.lookup_thresh(conf_key_seeps_p1_thresh);
 
    // Conf: nc_pairs_flag
    parse_nc_info(odict);
