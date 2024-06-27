@@ -1639,7 +1639,7 @@ The default setting is the empty string. It should be configured by the user. It
 seeps_point_climo_name
 ----------------------
 
-The "seeps_point_climo_name" option controls controls the location and the filename of the SEEPS climo file for the point data.
+The "seeps_point_climo_name" option controls the location and the filename of the SEEPS climo file for the point data.
 The default setting is the empty string which does not override the default location and name. It can be overridden by the environment variable, MET_SEEPS_POINT_CLIMO_NAME.
 
 .. code-block:: none
