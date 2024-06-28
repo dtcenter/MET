@@ -392,7 +392,7 @@ static void process_data_file() {
    if (compress_level < 0) compress_level = config.nc_compression();
 
    // Get the gridded file type from config string, if present
-   ftype = parse_conf_file_type(&config);
+   ftype = parse_conf_file_type(&conf_info.conf);
 
    // Open the input file
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
