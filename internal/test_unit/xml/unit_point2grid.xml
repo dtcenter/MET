@@ -249,6 +249,41 @@
     </output>
   </test>
 
+  <test name="point2grid_sea_ice_tripolar">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/point_obs/iceh.2018-01-03.c00.small.nc \
+      G171 \
+      &OUTPUT_DIR;/point2grid/point2grid_sea_ice.nc \
+      -field 'name="uvel_d"; level="(0,*,*)";' -field 'name="hi_d"; level="(0,*,*)";'  \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_sea_ice.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="point2grid_sea_ice_tripolar_config">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/point_obs/iceh.2018-01-03.c00.small.nc \
+      G171 \
+      &OUTPUT_DIR;/point2grid/point2grid_sea_ice_snow.nc \
+      -config &CONFIG_DIR;/Point2GridConfig_lat_lon \
+      -field 'name="hs_d_without_att"; level="(0,*,*)";'  \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_sea_ice_snow.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="point2grid_GOES_16_AOD_TO_G212_unsigned">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
