@@ -2944,7 +2944,7 @@ static bool has_lat_lon_vars(const NcFile *nc) {
         << " has_lat_var: "  << has_lat_var
         << ", has_lon_var: " << has_lon_var
         << ", has_time_var: " << has_time_var << "\n";
-   return (has_lat_var && has_lon_var && has_time_var);
+   return (has_lat_var && has_lon_var);
 }
 
 ////////////////////////////////////////////////////////////////////////
