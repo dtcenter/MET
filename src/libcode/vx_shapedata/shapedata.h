@@ -186,13 +186,13 @@ class ShapeData {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-inline Moments ShapeData::moments() const { return(mom); }
+inline Moments ShapeData::moments() const { return mom; }
 
-inline bool ShapeData::is_valid_xy (int x, int y) const { return ( ! ::is_bad_data(data(x, y)) ); }
-inline bool ShapeData::is_bad_data (int x, int y) const { return (   ::is_bad_data(data(x, y)) ); }
+inline bool ShapeData::is_valid_xy (int x, int y) const { return ! ::is_bad_data(data(x, y) ); }
+inline bool ShapeData::is_bad_data (int x, int y) const { return   ::is_bad_data(data(x, y) ); }
 
-inline bool ShapeData::is_zero    (int x, int y) const { return (   is_eq(data(x, y), 0.0) ); }
-inline bool ShapeData::is_nonzero (int x, int y) const { return ( ! is_eq(data(x, y), 0.0) ); }
+inline bool ShapeData::is_zero    (int x, int y) const { return  is_eq(data(x, y), 0.0); }
+inline bool ShapeData::is_nonzero (int x, int y) const { return !is_eq(data(x, y), 0.0); }
 
 inline void ShapeData::debug_examine() const { data.debug_examine(); }
 inline std::string ShapeData::sdebug_examine() const { return data.sdebug_examine(); }

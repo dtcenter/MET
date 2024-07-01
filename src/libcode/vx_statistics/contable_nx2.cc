@@ -472,7 +472,7 @@ double Nx2ContingencyTable::baser() const {
    if( n() == 0 ) v = bad_data_double;
    else           v = (double) event_col_total()/n();
  
-   return ( v );
+   return v;
 }
 
 

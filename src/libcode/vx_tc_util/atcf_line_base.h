@@ -131,13 +131,13 @@ class ATCFLineBase : public DataLine {
 ////////////////////////////////////////////////////////////////////////
 
 inline void ATCFLineBase::set_basin_map     (const std::map<ConcatString,ConcatString> *m)
-                                                                    { BasinMap = m;         }
-inline void ATCFLineBase::set_best_technique(const StringArray *s)  { BestTechnique = s;    }
-inline void ATCFLineBase::set_oper_technique(const StringArray *s)  { OperTechnique = s;    }
-inline void ATCFLineBase::set_tech_suffix   (const ConcatString *s) { TechSuffix = s;       }
-inline void ATCFLineBase::set_technique     (const ConcatString &s) { Technique = s;        }
-inline bool ATCFLineBase::is_best_track     () const                { return(IsBestTrack);  }
-inline bool ATCFLineBase::is_oper_track     () const                { return(IsOperTrack);  }
+                                                                    { BasinMap = m;        }
+inline void ATCFLineBase::set_best_technique(const StringArray *s)  { BestTechnique = s;   }
+inline void ATCFLineBase::set_oper_technique(const StringArray *s)  { OperTechnique = s;   }
+inline void ATCFLineBase::set_tech_suffix   (const ConcatString *s) { TechSuffix = s;      }
+inline void ATCFLineBase::set_technique     (const ConcatString &s) { Technique = s;       }
+inline bool ATCFLineBase::is_best_track     () const                { return IsBestTrack;  }
+inline bool ATCFLineBase::is_oper_track     () const                { return IsOperTrack;  }
 
 ////////////////////////////////////////////////////////////////////////
 

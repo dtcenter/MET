@@ -1792,15 +1792,15 @@ bool check_fo_thresh(double f, double o, double cmn, double csd,
    }
 
    switch(t) {
-      case(SetLogic::Union):
+      case SetLogic::Union:
          if(!fcheck && !ocheck) status = false;
          break;
 
-      case(SetLogic::Intersection):
+      case SetLogic::Intersection:
          if(!fcheck || !ocheck) status = false;
          break;
 
-      case(SetLogic::SymDiff):
+      case SetLogic::SymDiff:
          if(fcheck == ocheck) status = false;
          break;
 
@@ -1810,7 +1810,7 @@ bool check_fo_thresh(double f, double o, double cmn, double csd,
          exit(1);
    }
 
-   return(status);
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////

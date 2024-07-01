@@ -143,7 +143,7 @@ void Node::add_child(const Polyline * poly) {
          exit(1);
       }
 
-      child->p = *(poly);
+      child->p = *poly;
 
       child->child = nullptr;
       child->sibling = nullptr;
@@ -171,7 +171,7 @@ void Node::add_child(const Polyline * poly) {
          exit(1);
       }
 
-      n_ptr->sibling->p = *(poly);
+      n_ptr->sibling->p = *poly;
 
       n_ptr->sibling->child = nullptr;
       n_ptr->sibling->sibling = nullptr;

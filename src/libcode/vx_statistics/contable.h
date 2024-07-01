@@ -139,11 +139,11 @@ class ContingencyTable {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int ContingencyTable::nrows() const { return ( Nrows ); }
-inline int ContingencyTable::ncols() const { return ( Ncols ); }
+inline int ContingencyTable::nrows() const { return Nrows; }
+inline int ContingencyTable::ncols() const { return Ncols; }
 
-inline double       ContingencyTable::ec_value() const { return ( ECvalue ); }
-inline ConcatString ContingencyTable::name()     const { return ( Name );    }
+inline double       ContingencyTable::ec_value() const { return ECvalue; }
+inline ConcatString ContingencyTable::name()     const { return Name;    }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -252,11 +252,11 @@ class Nx2ContingencyTable : public ContingencyTable {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int Nx2ContingencyTable::event_col_total    () const { return ( col_total(nx2_event_column) ); }
-inline int Nx2ContingencyTable::nonevent_col_total () const { return ( col_total(nx2_nonevent_column) ); }
+inline int Nx2ContingencyTable::event_col_total    () const { return col_total(nx2_event_column); }
+inline int Nx2ContingencyTable::nonevent_col_total () const { return col_total(nx2_nonevent_column); }
 
-inline int Nx2ContingencyTable::event_count_by_row    (int row) const { return ( entry(row, nx2_event_column) ); }
-inline int Nx2ContingencyTable::nonevent_count_by_row (int row) const { return ( entry(row, nx2_nonevent_column) ); }
+inline int Nx2ContingencyTable::event_count_by_row    (int row) const { return entry(row, nx2_event_column); }
+inline int Nx2ContingencyTable::nonevent_count_by_row (int row) const { return entry(row, nx2_nonevent_column); }
 
 
 ////////////////////////////////////////////////////////////////////////

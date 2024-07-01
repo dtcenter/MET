@@ -78,10 +78,10 @@ class ProbRIRWInfo : public ProbInfoBase {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline double               ProbRIRWInfo::value()    const { return(Value);    }
-inline const ConcatString & ProbRIRWInfo::initials() const { return(Initials); }
-inline int                  ProbRIRWInfo::rirw_beg() const { return(RIRWBeg);  }
-inline int                  ProbRIRWInfo::rirw_end() const { return(RIRWEnd);  }
+inline double               ProbRIRWInfo::value()    const { return Value;    }
+inline const ConcatString & ProbRIRWInfo::initials() const { return Initials; }
+inline int                  ProbRIRWInfo::rirw_beg() const { return RIRWBeg;  }
+inline int                  ProbRIRWInfo::rirw_end() const { return RIRWEnd;  }
 
 ////////////////////////////////////////////////////////////////////////
 
