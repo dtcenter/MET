@@ -208,7 +208,7 @@ int met_main(int argc, char * argv []) {
          if(jobs_sa.n() == 0) {
             mlog << Error << "\nmain() -> "
                  << "no jobs defined in \"" << config_file << "\"!\n\n";
-            throw(1);
+            throw 1;
          }
 
          for(i=0; i<jobs_sa.n_elements(); i++) {
@@ -222,7 +222,7 @@ int met_main(int argc, char * argv []) {
          mlog << Error << "\nmain() -> "
               << "at least one job must be specified on the command line "
               << "with \"-job\" or in a configuration file with \"-config\"!\n\n";
-         throw(1);
+         throw 1;
       }
    }
    catch(int j) { // Catch errors
@@ -464,7 +464,7 @@ void process_search_dirs() {
       mlog << Error << "\nprocess_search_dirs() -> "
            << "no STAT files found in the directories specified!\n\n";
 
-      throw(1);
+      throw 1;
    }
 
    //
@@ -556,7 +556,7 @@ void process_stat_file(const char *filename, const STATAnalysisJob &job, int &n_
            << "unable to open input stat file \""
            << filename << "\"\n\n";
 
-      throw(1);
+      throw 1;
    }
 
 
@@ -606,7 +606,7 @@ if ( ! pldf->open(user_script_path.c_str(), user_script_args) )  {
         << "unable to open user script file \""
         << user_script_path << "\"\n\n";
 
-   throw(1);
+   throw 1;
 
 }
 
@@ -887,7 +887,7 @@ void open_temps()
            << "can't open the temporary file \"" << tmp_path
            << "\" for writing!\n\n";
 
-      throw(1);
+      throw 1;
    }
 
 

@@ -630,7 +630,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
               << "trouble parsing \"-column " << job.column[i]
               << "\" option.  Either use \"-line_type\" exactly once "
               << "or use format \"-column LINE_TYPE:COLUMN\".\n\n";
-         throw(1);
+         throw 1;
       }
    }
 
@@ -854,7 +854,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
                     << "line type value of " << statlinetype_to_string(line.type())
                     << " not currently supported for the aggregation job.\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
-               throw(1);
+               throw 1;
          } // end switch
 
          //
@@ -976,7 +976,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_ctc_lines() -> "
                  << "should be no ties in the valid time array.\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -1045,7 +1045,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter multi-category contingency table count "
                  << "(MCTC) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -1087,7 +1087,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
                     << "lines.  Try setting \"-column_eq N_CAT n\", "
                     << m[key].mcts_info.cts.nrows() << " != "
                     << cur.cts.nrows() << "\n\n";
-               throw(1);
+               throw 1;
             }
 
             //
@@ -1172,7 +1172,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_mctc_lines() -> "
                  << "should be no ties in the valid time array.\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -1225,7 +1225,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter probability contingency table (PCT) "
                  << "line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -1266,7 +1266,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
                     << "thresholds must remain the same for all lines, "
                     << m[key].pct_info.pct.nrows() << " != "
                     << cur.pct.nrows() << "\n\n";
-               throw(1);
+               throw 1;
             }
 
             //
@@ -1283,7 +1283,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
                        << "values must remain the same for all lines, "
                        << m[key].pct_info.pct.threshold(i) << " != "
                        << cur.pct.threshold(i) << "\n\n";
-                  throw(1);
+                  throw 1;
                }
 
                oy = m[key].pct_info.pct.event_count_by_row(i);
@@ -1367,7 +1367,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_pct_lines() -> "
                  << "should be no ties in the valid time array.\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -1461,7 +1461,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
                mlog << Error << "\naggr_psum_lines() -> "
                     << "should only encounter partial sum line types.\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
-               throw(1);
+               throw 1;
          } // end switch
 
          //
@@ -1568,7 +1568,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_psum_lines() -> "
                  << "should be no ties in the valid time array.\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -1619,7 +1619,7 @@ void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &job,
             mlog << Error << "\naggr_grad_lines() -> "
                  << "should only encounter gradient (GRAD) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -1659,7 +1659,7 @@ void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &job,
                     << " != " << cur.dx << " and " << cur.dy
                     << ").  Try setting \"-column_eq DX n -column_eq DY n\""
                     << " or \"-by DX,DY\".\n\n";
-               throw(1);
+               throw 1;
             }
 
             //
@@ -1739,7 +1739,7 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
                mlog << Error << "\naggr_wind_lines() -> "
                     << "should only encounter vector partial sum line types.\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
-               throw(1);
+               throw 1;
          } // end switch
 
          //
@@ -2126,7 +2126,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             mlog << Error << "\naggr_mpr_lines() -> "
                  << "should only encounter matched pair (MPR) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2203,7 +2203,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
                     << "remain constant.  Try setting \"-fcst_var\" and/or "
                     << "\"-obs_var\".\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
-               throw(1);
+               throw 1;
             }
          }
 
@@ -2250,7 +2250,7 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
                  << "should only encounter intensity-scale "
                  << "(ISC) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2325,7 +2325,7 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
                  << "filter out only those lines you'd like "
                  << "to aggregate.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2508,7 +2508,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter ensemble continuous statistics "
                  << "(ECNT) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2569,14 +2569,14 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          m[key].me_na.add(cur.me);
          m[key].mae_na.add(cur.mae);
-         m[key].mse_na.add((is_bad_data(cur.rmse) ?
-                            bad_data_double :
-                            cur.rmse * cur.rmse));
+         m[key].mse_na.add(is_bad_data(cur.rmse) ?
+                           bad_data_double :
+                           cur.rmse * cur.rmse);
          m[key].me_oerr_na.add(cur.me_oerr);
          m[key].mae_oerr_na.add(cur.mae_oerr);
-         m[key].mse_oerr_na.add((is_bad_data(cur.rmse_oerr) ?
-                                 bad_data_double :
-                                 cur.rmse_oerr * cur.rmse_oerr));
+         m[key].mse_oerr_na.add(is_bad_data(cur.rmse_oerr) ?
+                                bad_data_double :
+                                cur.rmse_oerr * cur.rmse_oerr);
 
          //
          // Keep track of the unique header column entries
@@ -2659,7 +2659,7 @@ void aggr_rps_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter ranked probability score "
                  << "(RPS) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2699,7 +2699,7 @@ void aggr_rps_lines(LineDataFile &f, STATAnalysisJob &job,
                     << "the \"N_PROB\" column must remain constant ("
                     << m[key].rps_info.n_prob << " != " << cur.n_prob
                     << ").  Try setting \"-column_eq N_PROB n\".\n\n";
-               throw(1);
+               throw 1;
             }
 
             //
@@ -2751,7 +2751,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter ranked histogram "
                  << "(RHIST) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2784,7 +2784,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "the \"N_RANK\" column must remain constant ("
                  << m[key].ens_pd.rhist_na.n() << " != " << cur.n_rank
                  << ").  Try setting \"-column_eq N_RANK n\".\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2841,7 +2841,7 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter probability integral "
                  << "transform histogram (PHIST) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2879,7 +2879,7 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &job,
                     << "the \"BIN_SIZE\" column must remain constant ("
                     << m[key].ens_pd.phist_bin_size << " != " << cur.bin_size
                     << ").  Try setting \"-column_eq BIN_SIZE n\".\n\n";
-               throw(1);
+               throw 1;
             }
 
             //
@@ -2932,7 +2932,7 @@ void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter relative position (RELP) "
                  << "line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2969,7 +2969,7 @@ void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &job,
                     << "the \"N_ENS\" column must remain constant ("
                     << m[key].ens_pd.relp_na.n() << " != " << cur.n_ens
                     << ").  Try setting \"-column_eq N_ENS n\".\n\n";
-               throw(1);
+               throw 1;
             }
 
             //
@@ -3024,7 +3024,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter observation rank "
                  << "(ORANK) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3078,7 +3078,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
             mlog << Error << "\naggr_orank_lines() -> "
                  << "the \"N_ENS\" column must remain constant. "
                  << "Try setting \"-column_eq N_ENS n\".\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3213,7 +3213,7 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter spread-skill variance "
                  << "(SSVAR) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3229,7 +3229,7 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "remain constant.  Try setting \"-fcst_var\" and/or "
                  << "\"-obs_var\".\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3317,7 +3317,7 @@ void aggr_seeps_lines(LineDataFile &f, STATAnalysisJob &job,
             mlog << Error << "\naggr_seeps_lines() -> "
                  << "should only encounter SEEPS line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3333,7 +3333,7 @@ void aggr_seeps_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "remain constant.  Try setting \"-fcst_var\" and/or "
                  << "\"-obs_var\".\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3401,7 +3401,7 @@ void aggr_seeps_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             mlog << Error << "\naggr_seeps_mpr_lines() -> "
                  << "should only encounter SEEPS_MPR line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3417,7 +3417,7 @@ void aggr_seeps_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "remain constant.  Try setting \"-fcst_var\" and/or "
                  << "\"-obs_var\".\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3520,7 +3520,7 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "remain constant for case \"" << key
                  << "\".  Try setting \"-fcst_var\" and/or \"-obs_var\".\n"
                  << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3598,7 +3598,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
            << "this job may only be called when the \"-model\" option "
            << "has been used exactly twice to specify the forecast "
            << "model followed by the reference model.\n\n";
-      throw(1);
+      throw 1;
    }
    else {
       cur.job_info.fcst_model = job.model[0];
@@ -3628,7 +3628,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
            << "you must define the skill score index to be computed "
            << "using the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
            << "\"-line_type\", \"-column\", and \"-weight\" options.\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -3644,7 +3644,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
            << n_term << ") or have length 1!\n"
            << "Check the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
            << "\"-line_type\", \"-column\", and \"-weight\" options.\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -3677,7 +3677,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
                  << "a skill score index can only be computed using "
                  << "statistics derived from SL1L2 or CTC line types."
                  << "\n\n";
-            throw(1);
+            throw 1;
          }
       }
 

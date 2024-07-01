@@ -234,15 +234,15 @@ class GridStatVxOpt {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int  GridStatVxOpt::get_n_mask()        const { return(mask_name.n_elements());         }
-inline int  GridStatVxOpt::get_n_interp()      const { return(interp_info.n_interp);           }
-inline int  GridStatVxOpt::get_n_eclv_points() const { return(eclv_points.n_elements());       }
-inline int  GridStatVxOpt::get_n_cdf_bin()     const { return(cdf_info.n_bin);                 }
-inline int  GridStatVxOpt::get_n_nbrhd_wdth()  const { return(nbrhd_info.width.n_elements());  }
-inline int  GridStatVxOpt::get_n_cov_thresh()  const { return(nbrhd_info.cov_ta.n_elements()); }
-inline int  GridStatVxOpt::get_n_wave_1d()     const { return(wave_1d_beg.n_elements());       }
-inline int  GridStatVxOpt::get_n_grad()        const { return(grad_dx.n_elements());           }
-inline int  GridStatVxOpt::get_n_ci_alpha()    const { return(ci_alpha.n_elements());          }
+inline int  GridStatVxOpt::get_n_mask()        const { return mask_name.n_elements();         }
+inline int  GridStatVxOpt::get_n_interp()      const { return interp_info.n_interp;           }
+inline int  GridStatVxOpt::get_n_eclv_points() const { return eclv_points.n_elements();       }
+inline int  GridStatVxOpt::get_n_cdf_bin()     const { return cdf_info.n_bin;                 }
+inline int  GridStatVxOpt::get_n_nbrhd_wdth()  const { return nbrhd_info.width.n_elements();  }
+inline int  GridStatVxOpt::get_n_cov_thresh()  const { return nbrhd_info.cov_ta.n_elements(); }
+inline int  GridStatVxOpt::get_n_wave_1d()     const { return wave_1d_beg.n_elements();       }
+inline int  GridStatVxOpt::get_n_grad()        const { return grad_dx.n_elements();           }
+inline int  GridStatVxOpt::get_n_ci_alpha()    const { return ci_alpha.n_elements();          }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -333,10 +333,10 @@ class GridStatConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int  GridStatConfInfo::get_n_vx()              const { return(n_vx);                  }
-inline int  GridStatConfInfo::get_compression_level()       { return(conf.nc_compression()); }
-inline bool GridStatConfInfo::get_output_ascii_flag() const { return(output_ascii_flag);     }
-inline bool GridStatConfInfo::get_output_nc_flag()    const { return(output_nc_flag);        }
+inline int  GridStatConfInfo::get_n_vx()              const { return n_vx;                  }
+inline int  GridStatConfInfo::get_compression_level()       { return conf.nc_compression(); }
+inline bool GridStatConfInfo::get_output_ascii_flag() const { return output_ascii_flag;     }
+inline bool GridStatConfInfo::get_output_nc_flag()    const { return output_nc_flag;        }
 
 ////////////////////////////////////////////////////////////////////////
 

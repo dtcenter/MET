@@ -103,10 +103,10 @@ class MM_Engine {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int MM_Engine::n_fcst_simples     () const { return ( graph.n_fcst () ); }
-inline int MM_Engine::n_obs_simples      () const { return ( graph.n_obs  () ); }
+inline int MM_Engine::n_fcst_simples     () const { return graph.n_fcst(); }
+inline int MM_Engine::n_obs_simples      () const { return graph.n_obs (); }
 
-inline int MM_Engine::n_composites       () const { return ( N_Composites ); }
+inline int MM_Engine::n_composites       () const { return N_Composites; }
 
 
 ////////////////////////////////////////////////////////////////////////

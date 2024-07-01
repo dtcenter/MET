@@ -381,7 +381,7 @@ class TCStatJob {
 ////////////////////////////////////////////////////////////////////////
 
 inline void TCStatJob::set_precision (int p)  { Precision = p; return; }
-inline int  TCStatJob::get_precision () const { return(Precision);     }
+inline int  TCStatJob::get_precision () const { return Precision;      }
 
 ////////////////////////////////////////////////////////////////////////
 

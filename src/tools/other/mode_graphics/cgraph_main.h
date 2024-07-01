@@ -265,7 +265,7 @@ inline void CgraphBase::stroke()    { cairo_stroke     (Cr);  return; }
 inline void CgraphBase::fill()      { cairo_fill       (Cr);  return; }
 inline void CgraphBase::clip()      { cairo_clip       (Cr);  return; }
 
-inline const Box & CgraphBase::page() const { return ( PageBox ); }
+inline const Box & CgraphBase::page() const { return PageBox; }
 
 inline void CgraphBase::setlinecap_butt()              { cairo_set_line_cap (Cr, CAIRO_LINE_CAP_BUTT);    return; }
 inline void CgraphBase::setlinecap_round()             { cairo_set_line_cap (Cr, CAIRO_LINE_CAP_ROUND);   return; }
@@ -275,7 +275,7 @@ inline void CgraphBase::setlinejoin_miter() { cairo_set_line_join (Cr, CAIRO_LIN
 inline void CgraphBase::setlinejoin_round() { cairo_set_line_join (Cr, CAIRO_LINE_JOIN_ROUND);  return; }
 inline void CgraphBase::setlinejoin_bevel() { cairo_set_line_join (Cr, CAIRO_LINE_JOIN_BEVEL);  return; }
 
-inline double CgraphBase::c_fudge_y(double __Y__) const { return ( __Y__ ); }
+inline double CgraphBase::c_fudge_y(double __Y__) const { return __Y__; }
 
 
 ////////////////////////////////////////////////////////////////////////

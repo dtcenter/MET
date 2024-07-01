@@ -156,8 +156,8 @@ bool MetNcFile::readFile(const int desired_grib_code,
   float *obs_arr = new float[obs_arr_len];
   float *hdr_arr = new float[hdr_arr_len];
 
-  mlog << Debug(2) << "Processing " << (obs_count) << " observations at "
-       << (hdr_count) << " locations.\n";
+  mlog << Debug(2) << "Processing " << obs_count << " observations at "
+       << hdr_count << " locations.\n";
 
   // Loop through the observations, saving the ones that we are
   // interested in

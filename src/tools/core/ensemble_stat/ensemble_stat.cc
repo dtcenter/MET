@@ -986,11 +986,11 @@ void process_point_obs(int i_nc) {
    int hdr_count = met_point_obs->get_hdr_cnt();
    int obs_count = met_point_obs->get_obs_cnt();
 
-   mlog << Debug(2) << "Searching " << (obs_count)
-        << " observations from " << (hdr_count)
+   mlog << Debug(2) << "Searching " << obs_count
+        << " observations from " << hdr_count
         << " header messages.\n";
 
-   const int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (obs_count));
+   const int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : obs_count);
 
    int   obs_qty_idx_block[buf_size];
    float obs_arr_block[buf_size][OBS_ARRAY_LEN];
@@ -1666,7 +1666,7 @@ void process_grid_scores(int i_vx,
          pd.add_obs_error_entry(e);
 
          // Add the ensemble mean value for this point
-         pd.mn_na.add((emn_flag ? emn_dp(x, y) : bad_data_double));
+         pd.mn_na.add(emn_flag ? emn_dp(x, y) : bad_data_double);
 
       } // end for y
    } // end for x
@@ -1901,39 +1901,39 @@ void setup_txt_files() {
          // Get the maximum number of columns for this line type
          switch(i) {
 
-            case(i_rhist):
+            case i_rhist:
                max_col = get_n_rhist_columns(max_n_ens+1) + n_header_columns + 1;
                break;
 
-            case(i_phist):
+            case i_phist:
                max_col = get_n_phist_columns(n_phist_bin) + n_header_columns + 1;
                break;
 
-            case(i_relp):
+            case i_relp:
                max_col = get_n_relp_columns(max_n_ens) + n_header_columns + 1;
                break;
 
-            case(i_orank):
+            case i_orank:
                max_col = get_n_orank_columns(max_n_ens) + n_header_columns + 1;
                break;
 
-            case(i_pct):
+            case i_pct:
                max_col = get_n_pct_columns(n_prob) + n_header_columns + 1;
                break;
 
-            case(i_pstd):
+            case i_pstd:
                max_col = get_n_pstd_columns(n_prob) + n_header_columns + 1;
                break;
 
-            case(i_pjc):
+            case i_pjc:
                max_col = get_n_pjc_columns(n_prob) + n_header_columns + 1;
                break;
 
-            case(i_prc):
+            case i_prc:
                max_col = get_n_prc_columns(n_prob) + n_header_columns + 1;
                break;
 
-            case(i_eclv):
+            case i_eclv:
                max_col = get_n_eclv_columns(n_eclv) + n_header_columns + 1;
                break;
 
@@ -1949,39 +1949,39 @@ void setup_txt_files() {
          // Write the text header row
          switch(i) {
 
-            case(i_rhist):
+            case i_rhist:
                write_rhist_header_row(1, max_n_ens+1, txt_at[i], 0, 0);
                break;
 
-            case(i_phist):
+            case i_phist:
                write_phist_header_row(1, n_phist_bin, txt_at[i], 0, 0);
                break;
 
-            case(i_relp):
+            case i_relp:
                write_relp_header_row(1, max_n_ens, txt_at[i], 0, 0);
                break;
 
-            case(i_orank):
+            case i_orank:
                write_orank_header_row(1, max_n_ens, txt_at[i], 0, 0);
                break;
 
-            case(i_pct):
+            case i_pct:
                write_pct_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_pstd):
+            case i_pstd:
                write_pstd_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_pjc):
+            case i_pjc:
                write_pjc_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_prc):
+            case i_prc:
                write_prc_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_eclv):
+            case i_eclv:
                write_eclv_header_row(1, n_eclv, txt_at[i], 0, 0);
                break;
 

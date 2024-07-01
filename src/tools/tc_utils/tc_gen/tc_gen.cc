@@ -1750,18 +1750,18 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
 
          // 2x2 contingency table output:
          // 1 header + 2 vx methods * # models * # filters
-         case(i_fho):
-         case(i_ctc):
-         case(i_cts):
+         case i_fho:
+         case i_ctc:
+         case i_cts:
             n_rows = 1 + 2 * n_model * conf_info.n_vx();
             break;
 
          // Nx2 probabilistic contingency table output:
          // 1 header + 1 vx method * # models * # probs * # filters
-         case(i_pct):
-         case(i_pstd):
-         case(i_pjc):
-         case(i_prc):
+         case i_pct:
+         case i_pstd:
+         case i_pjc:
+         case i_prc:
             n_rows = 1 + n_model * max_n_prob * conf_info.n_vx();
             break;
 
@@ -1775,19 +1775,19 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
       // Compute the number of columns for this line type
       switch(i) {
 
-         case(i_pct):
+         case i_pct:
             n_cols = get_n_pct_columns(n_prob)  + n_header_columns + 1;
             break;
 
-         case(i_pstd):
+         case i_pstd:
             n_cols = get_n_pstd_columns(n_prob) + n_header_columns + 1;
             break;
 
-         case(i_pjc):
+         case i_pjc:
             n_cols = get_n_pjc_columns(n_prob)  + n_header_columns + 1;
             break;
 
-         case(i_prc):
+         case i_prc:
             n_cols = get_n_prc_columns(n_prob)  + n_header_columns + 1;
             break;
 
@@ -1823,19 +1823,19 @@ void setup_txt_files(int n_model, int max_n_prob, int n_pair) {
             // Write header row
             switch(i) {
 
-               case(i_pct):
+               case i_pct:
                   write_pct_header_row(1, n_prob, txt_at[i], 0, 0);
                   break;
 
-               case(i_pstd):
+               case i_pstd:
                   write_pstd_header_row(1, n_prob, txt_at[i], 0, 0);
                   break;
 
-               case(i_pjc):
+               case i_pjc:
                   write_pjc_header_row(1, n_prob, txt_at[i], 0, 0);
                   break;
 
-               case(i_prc):
+               case i_prc:
                   write_prc_header_row(1, n_prob, txt_at[i], 0, 0);
                   break;
 

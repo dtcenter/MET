@@ -367,7 +367,7 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.vx_opt[0].vx_pd.fcst_info->regrid(),
-                        &(data_grid), &(data_grid));
+                        &data_grid, &data_grid);
 
    // Process the masks
    conf_info.process_masks(grid);
@@ -464,31 +464,31 @@ void setup_txt_files() {
          // Get the maximum number of columns for this line type
          switch(i) {
 
-            case(i_mctc):
+            case i_mctc:
                max_col = get_n_mctc_columns(n_cat) + n_header_columns + 1;
                break;
 
-            case(i_pct):
+            case i_pct:
                max_col = get_n_pct_columns(n_prob) + n_header_columns + 1;
                break;
 
-            case(i_pstd):
+            case i_pstd:
                max_col = get_n_pstd_columns(n_prob) + n_header_columns + 1;
                break;
 
-            case(i_pjc):
+            case i_pjc:
                max_col = get_n_pjc_columns(n_prob) + n_header_columns + 1;
                break;
 
-            case(i_prc):
+            case i_prc:
                max_col = get_n_prc_columns(n_prob) + n_header_columns + 1;
                break;
 
-            case(i_eclv):
+            case i_eclv:
                max_col = get_n_eclv_columns(n_eclv) + n_header_columns + 1;
                break;
 
-            case(i_orank):
+            case i_orank:
                max_col = get_n_orank_columns(n_ens) + n_header_columns + 1;
                break;
 
@@ -504,31 +504,31 @@ void setup_txt_files() {
          // Write the text header row
          switch(i) {
 
-            case(i_mctc):
+            case i_mctc:
                write_mctc_header_row(1, n_cat, txt_at[i], 0, 0);
                break;
 
-            case(i_pct):
+            case i_pct:
                write_pct_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_pstd):
+            case i_pstd:
                write_pstd_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_pjc):
+            case i_pjc:
                write_pjc_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_prc):
+            case i_prc:
                write_prc_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_eclv):
+            case i_eclv:
                write_eclv_header_row(1, n_eclv, txt_at[i], 0, 0);
                break;
 
-            case(i_orank):
+            case i_orank:
                write_orank_header_row(1, n_ens, txt_at[i], 0, 0);
                break;
 
@@ -810,7 +810,7 @@ void process_obs_file(int i_nc) {
    StringArray obs_qty_array = met_point_obs->get_qty_data();
    if(use_var_id) var_names = met_point_obs->get_var_names();
 
-   const int buf_size = ((obs_count > BUFFER_SIZE) ? BUFFER_SIZE : (obs_count));
+   const int buf_size = (obs_count > BUFFER_SIZE) ? BUFFER_SIZE : obs_count;
    int   obs_qty_idx_block[buf_size];
    float obs_arr_block[buf_size][OBS_ARRAY_LEN];
 

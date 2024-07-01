@@ -492,27 +492,27 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
          // Get the maximum number of columns for this line type
          switch(i) {
 
-            case(i_mctc):
+            case i_mctc:
                max_col = get_n_mctc_columns(n_cat) + n_header_columns + 1;
                break;
 
-            case(i_pct):
+            case i_pct:
                max_col = get_n_pct_columns(n_prob)  + n_header_columns + 1;
                break;
 
-            case(i_pstd):
+            case i_pstd:
                max_col = get_n_pstd_columns(n_prob) + n_header_columns + 1;
                break;
 
-            case(i_pjc):
+            case i_pjc:
                max_col = get_n_pjc_columns(n_prob)  + n_header_columns + 1;
                break;
 
-            case(i_prc):
+            case i_prc:
                max_col = get_n_prc_columns(n_prob)  + n_header_columns + 1;
                break;
 
-            case(i_eclv):
+            case i_eclv:
                max_col = get_n_eclv_columns(n_eclv)  + n_header_columns + 1;
                break;
 
@@ -528,27 +528,27 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
          // Write the text header row
          switch(i) {
 
-            case(i_mctc):
+            case i_mctc:
                write_mctc_header_row(1, n_cat, txt_at[i], 0, 0);
                break;
 
-            case(i_pct):
+            case i_pct:
                write_pct_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_pstd):
+            case i_pstd:
                write_pstd_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_pjc):
+            case i_pjc:
                write_pjc_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_prc):
+            case i_prc:
                write_prc_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_eclv):
+            case i_eclv:
                write_eclv_header_row(1, n_eclv, txt_at[i], 0, 0);
                break;
 

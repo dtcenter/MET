@@ -180,25 +180,25 @@ class RadFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline bool RadFile::get_swap_endian() const { return ( SwapEndian ); }
+inline bool RadFile::get_swap_endian() const { return SwapEndian; }
 
-inline int RadFile::get_rec_pad_size() const { return ( RecPadSize ); }
+inline int RadFile::get_rec_pad_size() const { return RecPadSize; }
 
-inline unixtime RadFile::date() const { return ( Date ); }
+inline unixtime RadFile::date() const { return Date; }
 
-inline int RadFile::n_channels() const { return ( Nchannels ); }
+inline int RadFile::n_channels() const { return Nchannels; }
 
-inline int RadFile::n_diag() const { return ( Ndiag ); }
-inline int RadFile::n_rec()  const { return ( Nrec  ); }
-inline int RadFile::n_pair() const { return ( Npair ); }
+inline int RadFile::n_diag() const { return Ndiag; }
+inline int RadFile::n_rec()  const { return Nrec ; }
+inline int RadFile::n_pair() const { return Npair; }
 
-inline int RadFile::n1() const { return ( N1 ); }
-inline int RadFile::n2() const { return ( N2 ); }
+inline int RadFile::n1() const { return N1; }
+inline int RadFile::n2() const { return N2; }
 
-inline int RadFile::n12() const { return ( N1*N2 ); }
+inline int RadFile::n12() const { return N1*N2; }
 
-inline int RadFile::iextra() const { return ( R_params.iextra ); }
-inline int RadFile::jextra() const { return ( R_params.jextra ); }
+inline int RadFile::iextra() const { return R_params.iextra; }
+inline int RadFile::jextra() const { return R_params.jextra; }
 
 inline bool RadFile::has_extra() const { return ( (R_params.iextra != 0) && (R_params.jextra != 0) ); }
 
@@ -271,12 +271,12 @@ class RadRecord : public GsiRecord {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int RadRecord::n1() const { return ( N1 ); }
-inline int RadRecord::n2() const { return ( N2 ); }
+inline int RadRecord::n1() const { return N1; }
+inline int RadRecord::n2() const { return N2; }
 
 inline bool RadRecord::has_extra() const { return ( extra != 0 ); }
 
-inline unixtime RadRecord::date() const { return ( Date ); }
+inline unixtime RadRecord::date() const { return Date; }
 
 
 ////////////////////////////////////////////////////////////////////////
