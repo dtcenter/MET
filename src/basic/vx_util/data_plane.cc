@@ -435,7 +435,7 @@ bool DataPlane::is_all_bad_data() const {
       }
    }
 
-   return(status);
+   return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -461,7 +461,7 @@ double DataPlane::get(int x, int y) const {
 
    n = two_to_one(x, y);
 
-   return(Data[n]);
+   return Data[n];
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -93,10 +93,10 @@ class ThreshArray {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int                  ThreshArray::n_elements() const { return ( Nelements ); }
-inline int                  ThreshArray::n()          const { return ( Nelements ); }
-inline const SingleThresh * ThreshArray::thresh()     const { return ( t );         }
-inline       SingleThresh * ThreshArray::buf()        const { return ( t );         }
+inline int                  ThreshArray::n_elements() const { return Nelements; }
+inline int                  ThreshArray::n()          const { return Nelements; }
+inline const SingleThresh * ThreshArray::thresh()     const { return t;         }
+inline       SingleThresh * ThreshArray::buf()        const { return t;         }
 
 ////////////////////////////////////////////////////////////////////////
 

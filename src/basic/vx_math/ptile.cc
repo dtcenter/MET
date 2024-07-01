@@ -298,7 +298,7 @@ if(ties_current != 0) {
 if(rank_info)     { delete [] rank_info;     rank_info = (RankInfo *) nullptr; }
 if(ordered_array) { delete [] ordered_array; ordered_array = (double *) nullptr; }
 
-return(ties_total);
+return ties_total;
 
 }
 

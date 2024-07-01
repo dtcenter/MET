@@ -95,9 +95,9 @@ class MaskPoly {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ConcatString MaskPoly::name()      const { return ( Name     ); }
-inline ConcatString MaskPoly::file_name() const { return ( FileName ); }
-inline       int    MaskPoly::n_points()  const { return ( Npoints  ); }
+inline ConcatString MaskPoly::name()      const { return Name    ; }
+inline ConcatString MaskPoly::file_name() const { return FileName; }
+inline       int    MaskPoly::n_points()  const { return Npoints ; }
 
 
 ////////////////////////////////////////////////////////////////////////

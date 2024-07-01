@@ -78,9 +78,9 @@ class LongArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int LongArray::n_elements() const { return ( Nelements ); }
+inline int LongArray::n_elements() const { return Nelements; }
 
-inline LongArray::operator long * () const { return ( e ); }
+inline LongArray::operator long * () const { return e; }
 
 inline void LongArray::erase() { Nelements = 0;  return; }
 
