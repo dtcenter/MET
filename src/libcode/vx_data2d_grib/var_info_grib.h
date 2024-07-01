@@ -116,15 +116,15 @@ class VarInfoGrib : public VarInfo
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline GrdFileType VarInfoGrib::file_type() const { return(FileType_Gb1); }
-inline int         VarInfoGrib::ptv()       const { return(PTV);          }
-inline int         VarInfoGrib::code()      const { return(Code);         }
-inline int         VarInfoGrib::lvl_type()  const { return(LvlType);      }
-inline int         VarInfoGrib::p_code()    const { return(PCode);        }
-inline int         VarInfoGrib::center()    const { return(Center);       }
-inline int         VarInfoGrib::subcenter() const { return(Subcenter);    }
-inline int         VarInfoGrib::field_rec() const { return(FieldRec);     }
-inline int         VarInfoGrib::tri()       const { return(TRI);          }
+inline GrdFileType VarInfoGrib::file_type() const { return FileType_Gb1; }
+inline int         VarInfoGrib::ptv()       const { return PTV;          }
+inline int         VarInfoGrib::code()      const { return Code;         }
+inline int         VarInfoGrib::lvl_type()  const { return LvlType;      }
+inline int         VarInfoGrib::p_code()    const { return PCode;        }
+inline int         VarInfoGrib::center()    const { return Center;       }
+inline int         VarInfoGrib::subcenter() const { return Subcenter;    }
+inline int         VarInfoGrib::field_rec() const { return FieldRec;     }
+inline int         VarInfoGrib::tri()       const { return TRI;          }
 
 ///////////////////////////////////////////////////////////////////////////////
 

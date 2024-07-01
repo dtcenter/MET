@@ -880,7 +880,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   if (dim_count != a.n_elements())
   {
     mlog << Error << "\n" << method_name
-         << "needed " << (dim_count) << " arguments for variable "
+         << "needed " << dim_count << " arguments for variable "
          << (GET_NC_NAME_P(var)) << ", got " << (a.n_elements()) << "\n\n";
     exit(1);
   }
@@ -951,7 +951,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   if (dim_count != a.n_elements())
   {
     mlog << Error << "\n" << method_name
-         << "needed " << (dim_count) << " arguments for variable "
+         << "needed " << dim_count << " arguments for variable "
          << (GET_NC_NAME_P(v)) << ", got " << (a.n_elements()) << "\n\n";
     exit(1);
   }

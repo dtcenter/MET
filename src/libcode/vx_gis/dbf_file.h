@@ -192,9 +192,9 @@ class DbfFile {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline const DbfHeader * DbfFile::header() const { return ( &Header ); }
+inline const DbfHeader * DbfFile::header() const { return &Header; }
 
-inline bool  DbfFile::at_eof() const { return ( At_Eof ); }
+inline bool  DbfFile::at_eof() const { return At_Eof; }
 
 inline bool  DbfFile::is_open() const { return ( fd >= 0 ); }
 

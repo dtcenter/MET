@@ -317,7 +317,7 @@ InitTime = parse_init_time(att_value.c_str());
       dimNames.clear();
       get_dim_names(&v, &dimNames);
       string c;
-      for (k=0; k<(dim_count); ++k)  {
+      for (k=0; k<dim_count; ++k)  {
         c = to_lower(dimNames[k]);
         NcDim dim = get_nc_dim(&v, dimNames[k]);
         Var[j].Dims[k] = &dim;
@@ -522,7 +522,7 @@ int dim_count = var->getDimCount();
 if ( dim_count != a.n_elements() )  {
 
    mlog << Error << "\n" << method_name
-        << "needed " << (dim_count) << " arguments for variable "
+        << "needed " << dim_count << " arguments for variable "
         << (GET_NC_NAME_P(var)) << ", got " << (a.n_elements()) << "\n\n";
 
    exit ( 1 );
@@ -585,7 +585,7 @@ if ( dim_count != a.n_elements() )  {
 
    mlog << Warning << "\n" << method_name
         << "needed " << dim_count << " arguments for variable "
-        << (var_name) << ", got " << (a.n_elements()) << "\n\n";
+        << var_name << ", got " << a.n_elements() << "\n\n";
 
    exit ( 1 );
 
@@ -594,7 +594,7 @@ if ( dim_count != a.n_elements() )  {
 if (dim_count >= max_wrf_args )  {
 
    mlog << Warning << "\n" << method_name
-        << " too may arguments for variable \"" << (var_name) << "\"\n\n";
+        << " too may arguments for variable \"" << var_name << "\"\n\n";
 
    return false;
 
@@ -626,7 +626,7 @@ for (j=0; j<Nvars; ++j)  {
 if ( !found )  {
 
    mlog << Warning << "\n" << method_name
-        << "variable " << (var_name) << " not found!\n\n";
+        << "variable " << var_name << " not found!\n\n";
 
    return false;
 

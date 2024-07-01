@@ -264,7 +264,7 @@ for (j=0; j<Ndims; ++j)  {
       StringArray dimNames;
       get_dim_names(&v, &dimNames);
 
-      for (k=0; k<(dim_count); ++k)  {
+      for (k=0; k<dim_count; ++k)  {
          c = to_lower(dimNames[k]);
          NcDim dim = get_nc_dim(&v, dimNames[k]);
          Var[j].Dims[k] = &dim;
@@ -388,8 +388,8 @@ int dimCount = GET_NC_DIM_COUNT_P(var);
 if ( dimCount != a.n_elements() )  {
 
    mlog << Error << "\n" << method_name
-        << "needed " << (dimCount) << " arguments for variable "
-        << (var->getName()) << ", got " << (a.n_elements()) << "\n\n";
+        << "needed " << dimCount << " arguments for variable "
+        << var->getName() << ", got " << a.n_elements() << "\n\n";
 
    exit ( 1 );
 
@@ -457,7 +457,7 @@ int dimCount = GET_NC_DIM_COUNT_P(v);
 if ( dimCount != a.n_elements() )  {
 
    mlog << Error << "\n" << method_name
-        << "needed " << (dimCount) << " arguments for variable "
+        << "needed " << dimCount << " arguments for variable "
         << (GET_NC_NAME_P(v)) << ", got " << (a.n_elements()) << "\n\n";
 
    exit ( 1 );
