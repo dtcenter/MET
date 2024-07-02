@@ -3458,7 +3458,7 @@ double compute_mean(double sum, int n) {
       v = sum / n;
    }
 
-   return(v);
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3579,7 +3579,7 @@ double compute_ufss(double o_rate) {
    if(is_bad_data(o_rate)) ufss = bad_data_double;
    else                    ufss = 0.5 + o_rate/2.0;
 
-   return(ufss);
+   return ufss;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

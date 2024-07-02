@@ -137,12 +137,12 @@ class ModisFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ConcatString ModisFile::filename() const { return ( Filename ); }
+inline ConcatString ModisFile::filename() const { return Filename; }
 
-inline int ModisFile::file_id() const { return ( FileId ); }
+inline int ModisFile::file_id() const { return FileId; }
 
-inline int ModisFile::dim0() const { return ( Dim0 ); }
-inline int ModisFile::dim1() const { return ( Dim1 ); }
+inline int ModisFile::dim0() const { return Dim0; }
+inline int ModisFile::dim1() const { return Dim1; }
 
 
 ////////////////////////////////////////////////////////////////////////

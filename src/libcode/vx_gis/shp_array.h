@@ -67,11 +67,11 @@ class Shp_Array {
 
       Shp_Array<T>  & operator=(const Shp_Array <T> & _a) {
 
-         if ( this == &_a )  return ( * this );
+         if ( this == &_a )  return *this;
 
          assign(_a);
 
-         return ( * this );
+         return *this;
 
       }
 
@@ -95,9 +95,9 @@ class Shp_Array {
          //  get stuff
          //
 
-      int n() const { return ( Nelements ); }
+      int n() const { return Nelements; }
 
-      int n_elements() const { return ( Nelements ); }
+      int n_elements() const { return Nelements; }
 
          //
          //  do stuff
@@ -371,7 +371,7 @@ if ( (N < 0) || (N >= Nelements) )  {
    exit ( 1 );
 }
 
-return ( E[N] );
+return E[N];
 
 }
 
@@ -385,7 +385,7 @@ T * Shp_Array<T>::buf() const
 
 {
 
-return ( E );
+return E;
 
 }
 

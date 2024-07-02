@@ -90,14 +90,14 @@ class FO_Node {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline bool FO_Node::is_fcst() const { return (   IsFcst ); }
-inline bool FO_Node::is_obs() const  { return ( ! IsFcst ); }
+inline bool FO_Node::is_fcst() const { return  IsFcst; }
+inline bool FO_Node::is_obs() const  { return !IsFcst; }
 
-inline bool FO_Node::is_visited() const  { return ( IsVisited ); }
+inline bool FO_Node::is_visited() const  { return IsVisited; }
 
-inline bool FO_Node::has_edge() const  { return ( HasEdge ); }
+inline bool FO_Node::has_edge() const  { return HasEdge; }
 
-inline int FO_Node::number() const  { return ( Number ); }
+inline int FO_Node::number() const  { return Number; }
 
 inline void FO_Node::set_fcst() { IsFcst = true; }
 inline void FO_Node::set_obs()  { IsFcst = false; }

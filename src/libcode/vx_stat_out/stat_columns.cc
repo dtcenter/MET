@@ -39,7 +39,7 @@ void parse_row_col(const char *col_name, int &r, int &c) {
       mlog << Error << "\nparse_row_col() -> "
            << "unexpected column name specified: \""
            << col_name << "\"\n\n";
-      throw(1);
+      throw 1;
    }
 
    return;

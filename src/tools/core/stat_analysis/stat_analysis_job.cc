@@ -132,7 +132,7 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &job) {
       mlog << Error << "\nset_job_from_config() -> "
            << "\"" << conf_key_ss_index_vld_thresh << "\" ("
            << job.ss_index_vld_thresh << ") must be set between 0 and 1.\n\n";
-      throw(1);
+      throw 1;
    }
 
    job.hss_ec_value    = c.lookup_double(conf_key_hss_ec_value);
@@ -167,7 +167,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
       mlog << Error << "\ndo_job() -> "
            << "can't open the temporary file \"" << tmp_path
            << "\" for reading!\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -255,7 +255,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
       default:
          mlog << Error << "\ndo_job() -> "
               << "Invalid -job type requested!\n\n";
-         throw(1);
+         throw 1;
    }
 
    mlog << Debug(2) << "Job " << n_job << " used " << n_out << " out of "
@@ -305,7 +305,7 @@ void do_job_filter(const ConcatString &jobstring, LineDataFile &f,
            << "this function may only be called when using the "
            << "-dump_row option in the job command line: "
            << jobstring << "\n\n";
-      throw(1);
+      throw 1;
    }
 
    mlog << Debug(3) << "Filter Test jobstring:\n" << jobstring << "\n";
@@ -362,7 +362,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
       mlog << Error << "\ndo_job_summary() -> "
            << "the \"-column\" option must be used at least once: "
            << jobstring << "\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -433,7 +433,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
            << "this function may only be called when the \"-line_type\" "
            << "option has been used exactly once to specify the line "
            << "type for aggregation: " << jobstring << "\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -460,7 +460,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
            << "\tSL1L2, SAL1L2, VL1L2, VAL1L2,\n"
            << "\tPCT, NBRCTC, NBRCNT, GRAD, ISC,\n"
            << "\tECNT, RPS, RHIST, PHIST, RELP, SSVAR, SEEPS\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -640,7 +640,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
            << "the \"-line_type\" option must be used exactly once and "
            << "the \"-out_line_type\" option must be used at least once: "
            << jobstring << "\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -813,7 +813,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
                  << "when \"-out_line_type\" is set to RPS, the "
                  << "\"-out_fcst_thresh\" option must be used to specify "
                  << "monotonically increasing thresholds of interet.\n\n";
-            throw(1);
+            throw 1;
          }
       }
 
@@ -872,7 +872,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
                  << "or SAL1L2, the \"-out_fcst_thresh\" and "
                  << "\"-out_obs_thresh\" options must specify the "
                  << "same number of thresholds.\n\n";
-            throw(1);
+            throw 1;
          }
 
          // Store a single NA threshold
@@ -899,7 +899,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
                  << "\"-out_fcst_thresh\" and \"-out_obs_thresh\" "
                  << "options must specify the same number of thresholds "
                  << "and at least one.\n\n";
-            throw(1);
+            throw 1;
          }
       }
 
@@ -916,7 +916,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
                  << "the \"-out_thresh\" option or \"-out_fcst_thresh\" and "
                  << "\"-out_obs_thresh\" options must specify "
                  << "the same number of thresholds and at least two.\n\n";
-            throw(1);
+            throw 1;
          }
 
          for(i=0; i<job.out_fcst_thresh.n()-1; i++) {
@@ -935,7 +935,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
                     << "the thresholds must be monotonically "
                     << "increasing and be of the same inequality type "
                     << "(lt, le, gt, or ge).\n\n";
-               throw(1);
+               throw 1;
             }
          } // end for
       }
@@ -953,7 +953,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
                  << "when \"-out_line_type\" is set to PCT, PSTD, "
                  << "PJC, or PRC, the \"-out_obs_thresh\" option "
                  << "must be specified exactly once.\n\n";
-            throw(1);
+            throw 1;
          }
 
          // Check for special case of a single probability threshold
@@ -973,7 +973,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
                  << "use the \"-out_fcst_thresh\" option to select "
                  << "at least 3 probability thresholds beginning with "
                  << "0.0 and ending with 1.0.\n\n";
-            throw(1);
+            throw 1;
          }
 
          for(i=0; i<n; i++) {
@@ -985,7 +985,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
                     << "forecast probability thresholds must be set "
                     << "as greater than or equal to with \"ge\" or "
                     << "\"=\".\n\n";
-               throw(1);
+               throw 1;
             }
 
             // Check that all thresholds are in [0, 1].
@@ -996,7 +996,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
                     << "When verifying a probability field, all "
                     << "forecast probability thresholds must be "
                     << "between 0 and 1.\n\n";
-               throw(1);
+               throw 1;
             }
          } // end for i
       }
@@ -1024,7 +1024,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
            << statlinetype_to_string(in_lt) << "\" and "
            << "\"-out_line_type " << statlinetype_to_string(out_lt[0])
            << "\"\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -1435,7 +1435,7 @@ void write_job_aggr_ctc(STATAnalysisJob &job, STATLineType lt,
          mlog << Error << "\nwrite_job_aggr_ctc() -> "
               << "unsupported output line type \""
               << statlinetype_to_string(lt) << "\" requested.\n\n";
-         throw(1);
+         throw 1;
       }
    } // end for it
 
@@ -1554,7 +1554,7 @@ void write_job_aggr_mctc(STATAnalysisJob &job, STATLineType lt,
          mlog << Error << "\nwrite_job_aggr_mctc() -> "
               << "unsupported output line type \""
               << statlinetype_to_string(lt) << "\" requested.\n\n";
-         throw(1);
+         throw 1;
       }
    } // end for it
 
@@ -1732,7 +1732,7 @@ void write_job_aggr_pct(STATAnalysisJob &job, STATLineType lt,
          mlog << Error << "\nwrite_job_aggr_pct() -> "
               << "unsupported output line type \""
               << statlinetype_to_string(lt) << "\" requested.\n\n";
-         throw(1);
+         throw 1;
       }
    } // end for it
 
@@ -1932,7 +1932,7 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
          mlog << Error << "\nwrite_job_aggr_psum() -> "
               << "unsupported output line type \""
               << statlinetype_to_string(lt) << "\" requested.\n\n";
-         throw(1);
+         throw 1;
       }
    } // end for it
 
@@ -2045,7 +2045,7 @@ void write_job_aggr_wind(STATAnalysisJob &job, STATLineType lt,
          mlog << Error << "\nwrite_job_aggr_wind() -> "
               << "the number of U and V forecast and observation points "
               << "must be the same.\n\n";
-         throw(1);
+         throw 1;
       }
 
       //
@@ -3062,7 +3062,7 @@ void write_job_aggr_orank(STATAnalysisJob &job, STATLineType lt,
          mlog << Error << "\nwrite_job_aggr_orank() -> "
               << "unsupported output line type \""
               << statlinetype_to_string(lt) << "\" requested.\n\n";
-         throw(1);
+         throw 1;
       }
    } // end for it
 
@@ -3515,7 +3515,7 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
          mlog << Error << "\nwrite_job_aggr_mpr() -> "
               << "unsupported output line type \""
               << statlinetype_to_string(lt) << "\" requested.\n\n";
-         throw(1);
+         throw 1;
       }
    } // end for it
 
@@ -3615,7 +3615,7 @@ void write_job_aggr_mpr_wind(STATAnalysisJob &job, STATLineType lt,
          mlog << Error << "\nwrite_job_aggr_mpr_wind() -> "
               << "unsupported output line type \""
               << statlinetype_to_string(lt) << "\" requested.\n\n";
-         throw(1);
+         throw 1;
       }
    } // end for it
 
@@ -4292,7 +4292,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
       mlog << Error << "\ndo_job_ramp() -> "
            << "the \"-line_type\" option may be used at most once to "
            << "specify the input line type: " << jobstring << "\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -4307,7 +4307,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
       mlog << Error << "\ndo_job_ramp() -> "
            << "the \"-out_line_type\" option must be set to CTC, CTS, and/or MPR: "
            << jobstring << "\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -4323,7 +4323,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
            << "specify the forecast and observation values for the "
            << "ramp job: " << jobstring
            << "\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -4334,7 +4334,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
       mlog << Error << "\ndo_job_ramp() -> "
            << "unsupported \"-ramp_type\" option: "
            << jobstring << "\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -4345,7 +4345,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
       mlog << Error << "\ndo_job_ramp() -> "
            << "the \"-swing_width\" option is required for \"-ramp_type SWING\": "
            << jobstring << "\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -4357,7 +4357,7 @@ void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
            << "the \"-ramp_thresh\" or \"-ramp_thresh_fcst\" and "
            << "\"-ramp_thresh_obs\" options must be used to define the "
            << "ramp events: " << jobstring << "\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -4423,8 +4423,8 @@ void write_table(AsciiTable &at, ofstream *sa_out) {
    //
    if(at.nrows() == 0 && at.ncols() == 0) return;
 
-   if(sa_out) *(sa_out) << at << "\n" << flush;
-   else       cout      << at << "\n" << flush;
+   if(sa_out) *sa_out << at << "\n" << flush;
+   else       cout    << at << "\n" << flush;
 
    return;
 }
@@ -4445,8 +4445,8 @@ void write_jobstring(const ConcatString &jobstring, ofstream *sa_out) {
 
 void write_line(const ConcatString &str, ofstream *sa_out) {
 
-   if(sa_out) *(sa_out) << str << "\n" << flush;
-   else       cout      << str << "\n" << flush;
+   if(sa_out) *sa_out << str << "\n" << flush;
+   else       cout    << str << "\n" << flush;
 
    return;
 }

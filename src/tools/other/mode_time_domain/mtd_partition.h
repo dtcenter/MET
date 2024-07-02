@@ -92,7 +92,7 @@ class EquivalenceClass {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int EquivalenceClass::n_elements() const { return ( Nelements ); }
+inline int EquivalenceClass::n_elements() const { return Nelements; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -107,12 +107,12 @@ int * e = E;
 
 for (j=0; j<Nelements; ++j, ++e)  {
 
-   if ( *e == k )  return ( true );
+   if ( *e == k )  return true;
 
 }
 
 
-return ( false );
+return false;
 
 }
 
@@ -199,7 +199,7 @@ class Mtd_Partition {   //  disjoint unions of equivalence classes
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int Mtd_Partition::n_elements() const { return ( Nelements ); }
+inline int Mtd_Partition::n_elements() const { return Nelements; }
 
 inline bool Mtd_Partition::has(int k) const
 
@@ -210,12 +210,12 @@ EquivalenceClass ** c = C;
 
 for (j=0; j<Nelements; ++j, ++c)  {
 
-   if ( (*c)->has(k) )  return ( true );
+   if ( (*c)->has(k) )  return true;
 
 }
 
 
-return ( false );
+return false;
 
 }
 

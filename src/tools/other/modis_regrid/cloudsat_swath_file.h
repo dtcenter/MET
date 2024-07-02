@@ -81,9 +81,9 @@ class SatDimension {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ConcatString SatDimension::name() const { return ( Name ); }
+inline ConcatString SatDimension::name() const { return Name; }
 
-inline int SatDimension::size() const { return ( Size ); }
+inline int SatDimension::size() const { return Size; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -167,18 +167,18 @@ class SatAttribute {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ConcatString SatAttribute::name() const { return ( Name ); }
+inline ConcatString SatAttribute::name() const { return Name; }
 
-inline int SatAttribute::number_type() const { return ( Numbertype ); }
+inline int SatAttribute::number_type() const { return Numbertype; }
 
-inline int SatAttribute::bytes() const { return ( Bytes ); }
+inline int SatAttribute::bytes() const { return Bytes; }
 
-inline int SatAttribute::n_values() const { return ( Nvalues ); }
+inline int SatAttribute::n_values() const { return Nvalues; }
 
-inline int    SatAttribute::ival(int n) const { return ( Ival[n] ); }
-inline double SatAttribute::dval(int n) const { return ( Dval[n] ); }
+inline int    SatAttribute::ival(int n) const { return Ival[n]; }
+inline double SatAttribute::dval(int n) const { return Dval[n]; }
 
-inline ConcatString SatAttribute::sval() const { return ( Sval ); }
+inline ConcatString SatAttribute::sval() const { return Sval; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -253,12 +253,12 @@ class SwathDataField {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ConcatString SwathDataField::name() const { return ( Name ); }
+inline ConcatString SwathDataField::name() const { return Name; }
 
-inline int SwathDataField::get_rank     () const { return ( Rank       ); }
-inline int SwathDataField::numbertype   () const { return ( Numbertype ); }
+inline int SwathDataField::get_rank     () const { return Rank       ; }
+inline int SwathDataField::numbertype   () const { return Numbertype ; }
 
-inline int SwathDataField::n_dimensions () const { return ( Ndimensions ); }
+inline int SwathDataField::n_dimensions () const { return Ndimensions; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -374,15 +374,15 @@ class CloudsatSwath {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ConcatString CloudsatSwath::name() const { return ( Name ); }
+inline ConcatString CloudsatSwath::name() const { return Name; }
 
-inline int CloudsatSwath::swath_id() const { return ( SwathId ); }
+inline int CloudsatSwath::swath_id() const { return SwathId; }
 
-inline int CloudsatSwath::n_data_fields() const { return ( Ndatafields ); }
+inline int CloudsatSwath::n_data_fields() const { return Ndatafields; }
 
-inline int CloudsatSwath::n_attributes () const { return ( Nattributes ); }
+inline int CloudsatSwath::n_attributes () const { return Nattributes; }
 
-inline int CloudsatSwath::n_geo_fields () const { return ( Ngeofields ); }
+inline int CloudsatSwath::n_geo_fields () const { return Ngeofields; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -448,11 +448,11 @@ class CloudsatSwathFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ConcatString CloudsatSwathFile::filename() const { return ( Filename ); }
+inline ConcatString CloudsatSwathFile::filename() const { return Filename; }
 
-inline int CloudsatSwathFile::file_id() const { return ( FileId ); }
+inline int CloudsatSwathFile::file_id() const { return FileId; }
 
-inline int CloudsatSwathFile::n_swaths() const { return ( Nswaths ); }
+inline int CloudsatSwathFile::n_swaths() const { return Nswaths; }
 
 
 ////////////////////////////////////////////////////////////////////////

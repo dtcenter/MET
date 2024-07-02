@@ -98,10 +98,10 @@ class MetBuffer {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline unsigned char * MetBuffer::operator()() const { return ( Buf ); }
+inline unsigned char * MetBuffer::operator()() const { return Buf; }
 
-inline bigint MetBuffer::n_bytes() const { return ( Nbytes ); }
-inline bigint MetBuffer::n_alloc() const { return ( Nalloc ); }
+inline bigint MetBuffer::n_bytes() const { return Nbytes; }
+inline bigint MetBuffer::n_alloc() const { return Nalloc; }
 
 
 ////////////////////////////////////////////////////////////////////////

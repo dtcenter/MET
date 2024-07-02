@@ -45,7 +45,7 @@ inline std::ostream & operator<<(std::ostream & __out, const Number & __n)
 if ( __n.is_int )  __out << (__n.i);
 else               __out << (__n.d);
 
-return ( __out );
+return __out;
 
 }
 

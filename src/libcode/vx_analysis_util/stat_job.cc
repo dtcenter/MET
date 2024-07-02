@@ -1216,7 +1216,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
                  << "unrecognized job type specified \"" << jc_array[i]
                  << "\" in job command line: " << jobstring << "\n\n";
             if(line) { delete [] line; line = (char *) nullptr; }
-            throw(1);
+            throw 1;
          }
          i++;
       }
@@ -1638,7 +1638,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
               << "\" in job command line: "
               << jobstring << "\n\n";
          if(line) { delete [] line; line = (char *) nullptr; }
-         throw(1);
+         throw 1;
       } // end if
 
    } // end for
@@ -1660,7 +1660,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
                  << (line_type.n() == 1 ? line_type[0] : "header")
                  << " column named \"" << hdr_name[i] << "\"\n\n";
             if(line) { delete [] line; line = (char *) nullptr; }
-            throw(1);
+            throw 1;
          }
       } // end for
    }
@@ -1897,7 +1897,7 @@ void STATAnalysisJob::open_dump_row_file() {
            << "can't open the output file \"" << dump_row
            << "\" for writing!\n\n";
 
-      throw(1);
+      throw 1;
    }
 
    return;
@@ -1912,7 +1912,7 @@ void STATAnalysisJob::close_dump_row_file() {
       //
       // Write any remaining lines
       //
-      *(dr_out) << dump_at;
+      *dr_out << dump_at;
 
       dr_out->close();
       delete dr_out;
@@ -1941,7 +1941,7 @@ void STATAnalysisJob::open_stat_file() {
            << "can't open the output STAT file \"" << stat_file
            << "\" for writing!\n\n";
 
-      throw(1);
+      throw 1;
    }
 
    return;
@@ -2133,7 +2133,7 @@ void STATAnalysisJob::close_stat_file() {
       //
       // Write any remaining lines
       //
-      *(stat_out) << stat_at;
+      *stat_out << stat_at;
 
       stat_out->close();
       delete stat_out;
@@ -2284,7 +2284,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
             default:
                mlog << Error << "\ndump_stat_line() -> "
                     << "unexpected line type value " << line_type[0] << "\n\n";
-               throw(1);
+               throw 1;
          } // end switch
       }
       //
@@ -2325,7 +2325,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
    // Write the buffer, if full
    //
    if(n_dump%dump_at.nrows() == 0) {
-      *(dr_out) << dump_at;
+      *dr_out << dump_at;
       dump_at.erase();
    }
 

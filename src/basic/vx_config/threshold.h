@@ -221,10 +221,10 @@ class Or_Node : public ThreshNode {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType     Or_Node::type()   const { return ( thresh_complex      ); }
-inline double         Or_Node::value()  const { return ( bad_data_double     ); }
-inline PercThreshType Or_Node::ptype()  const { return ( no_perc_thresh_type ); }
-inline double         Or_Node::pvalue() const { return ( bad_data_double     ); }
+inline ThreshType     Or_Node::type()   const { return thresh_complex      ; }
+inline double         Or_Node::value()  const { return bad_data_double     ; }
+inline PercThreshType Or_Node::ptype()  const { return no_perc_thresh_type ; }
+inline double         Or_Node::pvalue() const { return bad_data_double     ; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -272,10 +272,10 @@ class And_Node : public ThreshNode {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType     And_Node::type()   const { return ( thresh_complex      ); }
-inline double         And_Node::value()  const { return ( bad_data_double     ); }
-inline PercThreshType And_Node::ptype()  const { return ( no_perc_thresh_type ); }
-inline double         And_Node::pvalue() const { return ( bad_data_double     ); }
+inline ThreshType     And_Node::type()   const { return thresh_complex      ; }
+inline double         And_Node::value()  const { return bad_data_double     ; }
+inline PercThreshType And_Node::ptype()  const { return no_perc_thresh_type ; }
+inline double         And_Node::pvalue() const { return bad_data_double     ; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -322,10 +322,10 @@ class Not_Node : public ThreshNode {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType     Not_Node::type()   const { return ( thresh_complex      ); }
-inline double         Not_Node::value()  const { return ( bad_data_double     ); }
-inline PercThreshType Not_Node::ptype()  const { return ( no_perc_thresh_type ); }
-inline double         Not_Node::pvalue() const { return ( bad_data_double     ); }
+inline ThreshType     Not_Node::type()   const { return thresh_complex      ; }
+inline double         Not_Node::value()  const { return bad_data_double     ; }
+inline PercThreshType Not_Node::ptype()  const { return no_perc_thresh_type ; }
+inline double         Not_Node::pvalue() const { return bad_data_double     ; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -394,10 +394,10 @@ class Simple_Node : public ThreshNode {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType     Simple_Node::type()   const { return ( op    ); }
-inline double         Simple_Node::value()  const { return ( T     ); }
-inline PercThreshType Simple_Node::ptype()  const { return ( Ptype ); }
-inline double         Simple_Node::pvalue() const { return ( PT    ); }
+inline ThreshType     Simple_Node::type()   const { return op    ; }
+inline double         Simple_Node::value()  const { return T     ; }
+inline PercThreshType Simple_Node::ptype()  const { return Ptype ; }
+inline double         Simple_Node::pvalue() const { return PT    ; }
 
 
 ////////////////////////////////////////////////////////////////////////

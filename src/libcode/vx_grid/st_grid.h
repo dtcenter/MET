@@ -107,10 +107,10 @@ class StereographicGrid : public GridRep {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline bool StereographicGrid::is_north () const { return (   IsNorthHemisphere ); }
-inline bool StereographicGrid::is_south () const { return ( ! IsNorthHemisphere ); }
+inline bool StereographicGrid::is_north () const { return  IsNorthHemisphere; }
+inline bool StereographicGrid::is_south () const { return !IsNorthHemisphere; }
 
-inline double StereographicGrid::scale_km () const { return ( Data.d_km ); }
+inline double StereographicGrid::scale_km () const { return Data.d_km; }
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -1367,8 +1367,8 @@ if ( is_fcst_toggle_set )  {
 
    i = L.is_fcst();
 
-   if ( ( is_fcst) && ( !i ) )  return 0;
-   if ( (!is_fcst) && (  i ) )  return 0;
+   if ( is_fcst && !i )  return 0;
+   if ( !is_fcst && i )  return 0;
 
 }
 
@@ -1376,8 +1376,8 @@ if ( is_single_toggle_set )  {
 
    i = L.is_single();
 
-   if ( ( is_single) && ( !i ) )  return 0;
-   if ( (!is_single) && (  i ) )  return 0;
+   if (  is_single &&  !i )  return 0;
+   if ( !is_single &&   i )  return 0;
 
 }
 
@@ -1385,8 +1385,8 @@ if ( is_simple_toggle_set )  {
 
    i = L.is_simple();
 
-   if ( ( is_simple) && ( !i ) )  return 0;
-   if ( (!is_simple) && (  i ) )  return 0;
+   if (  is_simple && !i )  return 0;
+   if ( !is_simple &&  i )  return 0;
 
 }
 
@@ -1394,8 +1394,8 @@ if ( is_matched_toggle_set )  {
 
    i = L.is_matched();
 
-   if ( ( is_matched) && ( !i ) )  return 0;
-   if ( (!is_matched) && (  i ) )  return 0;
+   if (  is_matched && !i )  return 0;
+   if ( !is_matched &&  i )  return 0;
 
 }
 

@@ -1051,8 +1051,8 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    // Switch on the index of the line type
    switch(i_txt_row) {
 
-      case(i_ecnt):
-      case(i_rps):
+      case i_ecnt:
+      case i_rps:
 
          // Maximum number of ECNT and RPS lines possible =
          //    Point Vx: Message Types * Masks * Interpolations * Obs Thresholds * Alphas
@@ -1061,9 +1061,9 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_obs_thresh() * get_n_ci_alpha();
          break;
 
-      case(i_rhist):
-      case(i_phist):
-      case(i_relp):
+      case i_rhist:
+      case i_phist:
+      case i_relp:
 
          // Maximum number of RHIST, PHIST, and RELP lines possible =
          //    Point Vx: Message Types * Masks * Interpolations * Obs Thresholds
@@ -1072,7 +1072,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_obs_thresh();
          break;
 
-      case(i_orank):
+      case i_orank:
 
          // Compute the maximum number of matched pairs to be written
          // out by summing the number for each VxPairDataEnsemble object
@@ -1082,16 +1082,16 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          n = vx_pd.get_n_pair() * get_n_obs_thresh();
          break;
 
-      case(i_ssvar):
+      case i_ssvar:
 
          // Just return zero since we'll resize the output AsciiTables
          // to accomodate the SSVAR output
          n = 0;
          break;
 
-      case(i_pct):
-      case(i_pjc):
-      case(i_prc):
+      case i_pct:
+      case i_pjc:
+      case i_prc:
 
          // Maximum number of PCT, PJC, and PRC lines possible =
          //    Point Vx: Message Types * Masks * Interpolations * Categorical Thresholds * Climo CDF Bins
@@ -1100,7 +1100,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
               max(fcat_ta.n(), 1) * cdf_info.cdf_ta.n();
          break;
 
-      case(i_pstd):
+      case i_pstd:
 
          // Maximum number of PSTD lines possible =
          //    Point Vx: Message Types * Masks * Interpolations * Categorical Thresholds * Climo CDF Bins * Alphas
@@ -1109,7 +1109,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
               max(fcat_ta.n(), 1) * cdf_info.cdf_ta.n() * get_n_ci_alpha();
          break;
 
-      case(i_eclv):
+      case i_eclv:
 
          // Maximum number of ECLV lines possible =
          //    Point Vx: Message Types * Masks * Interpolations * Probability Thresholds * Climo CDF Bins

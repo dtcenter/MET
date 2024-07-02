@@ -98,15 +98,15 @@ class LevelInfo
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline LevelType    LevelInfo::type()     const { return(Type);    }
-inline int          LevelInfo::type_num() const { return(TypeNum); }
-inline ConcatString LevelInfo::req_name() const { return(ReqName); }
-inline ConcatString LevelInfo::name()     const { return(Name);    }
-inline ConcatString LevelInfo::units()    const { return(Units);   }
-inline double       LevelInfo::upper()    const { return(Upper);   }
-inline double       LevelInfo::lower()    const { return(Lower);   }
-inline double       LevelInfo::increment()const { return(Increment);}
-inline bool         LevelInfo::is_offset()const { return(Is_offset);}
+inline LevelType    LevelInfo::type()     const { return Type;    }
+inline int          LevelInfo::type_num() const { return TypeNum; }
+inline ConcatString LevelInfo::req_name() const { return ReqName; }
+inline ConcatString LevelInfo::name()     const { return Name;    }
+inline ConcatString LevelInfo::units()    const { return Units;   }
+inline double       LevelInfo::upper()    const { return Upper;   }
+inline double       LevelInfo::lower()    const { return Lower;   }
+inline double       LevelInfo::increment()const { return Increment;}
+inline bool         LevelInfo::is_offset()const { return Is_offset;}
 
 ///////////////////////////////////////////////////////////////////////////////
 

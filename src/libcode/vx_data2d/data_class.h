@@ -174,9 +174,9 @@ inline int Met2dDataFile::ny() const { return ( Dest_Grid ? (Dest_Grid->ny()) : 
 inline int Met2dDataFile::raw_nx() const { return ( Raw_Grid ? (Raw_Grid->nx()) : 0 ); }
 inline int Met2dDataFile::raw_ny() const { return ( Raw_Grid ? (Raw_Grid->ny()) : 0 ); }
 
-inline const char * Met2dDataFile::filename() const { return ( Filename.c_str() ); }
+inline const char * Met2dDataFile::filename() const { return Filename.c_str(); }
 
-inline int Met2dDataFile::shift_right() const { return ( ShiftRight ); }
+inline int Met2dDataFile::shift_right() const { return ShiftRight; }
 
 
 ////////////////////////////////////////////////////////////////////////

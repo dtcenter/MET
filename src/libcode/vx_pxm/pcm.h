@@ -103,9 +103,9 @@ class Pcm : public PxmBase {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int Pcm::n_colors() const { return ( Ncolors ); }
+inline int Pcm::n_colors() const { return Ncolors; }
 
-inline int Pcm::n_data_bytes() const { return ( Nalloc ); }
+inline int Pcm::n_data_bytes() const { return Nalloc; }
 
 ////////////////////////////////////////////////////////////////////////
 

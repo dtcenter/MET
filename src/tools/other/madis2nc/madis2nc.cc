@@ -305,38 +305,38 @@ void process_madis_file(const char *madis_file) {
 
    // Switch on the MADIS type and process accordingly.
    switch(my_mtype) {
-      case(MadisType::metar):
+      case MadisType::metar:
          process_madis_metar(f_in);
          break;
-      case(MadisType::raob):
+      case MadisType::raob:
          process_madis_raob(f_in);
          break;
-      case (MadisType::profiler):
+      case MadisType::profiler:
          process_madis_profiler(f_in);
          break;
-      case(MadisType::maritime):
+      case MadisType::maritime:
          process_madis_maritime(f_in);
          break;
 
-      case(MadisType::mesonet):
+      case MadisType::mesonet:
          process_madis_mesonet(f_in);
          break;
 
-      case(MadisType::acarsProfiles):
+      case MadisType::acarsProfiles:
          process_madis_acarsProfiles(f_in);
          break;
 
-      case(MadisType::coop):
-      case(MadisType::HDW):
-      case(MadisType::HDW1h):
-      case(MadisType::hydro):
-      case(MadisType::POES):
-      case(MadisType::acars):
-      case(MadisType::radiometer):
-      case(MadisType::sao):
-      case(MadisType::satrad):
-      case(MadisType::snow):
-      case(MadisType::none):
+      case MadisType::coop:
+      case MadisType::HDW:
+      case MadisType::HDW1h:
+      case MadisType::hydro:
+      case MadisType::POES:
+      case MadisType::acars:
+      case MadisType::radiometer:
+      case MadisType::sao:
+      case MadisType::satrad:
+      case MadisType::snow:
+      case MadisType::none:
       default:
          mlog << Error << "\nprocess_madis_file() -> "
               << "MADIS type (" << enum_class_as_int(my_mtype)

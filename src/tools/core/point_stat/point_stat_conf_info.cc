@@ -1238,14 +1238,14 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
    // Switch on the index of the line type
    switch(i_txt_row) {
 
-      case(i_fho):
-      case(i_ctc):
+      case i_fho:
+      case i_ctc:
          // Number of FHO or CTC lines =
          //    Message Types * Masks * Interpolations * Thresholds
          n = (prob_flag ? 0 : n_pd * get_n_cat_thresh());
          break;
 
-      case(i_cts):
+      case i_cts:
          // Number of CTS lines =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Alphas
@@ -1253,19 +1253,19 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_ci_alpha());
          break;
 
-      case(i_mctc):
+      case i_mctc:
          // Number of MCTC lines =
          //    Message Types * Masks * Interpolations
          n = (prob_flag ? 0 : n_pd);
          break;
 
-      case(i_mcts):
+      case i_mcts:
          // Number of MCTS lines =
          //    Message Types * Masks * Interpolations * Alphas
          n = (prob_flag ? 0 : n_pd * get_n_ci_alpha());
          break;
 
-      case(i_cnt):
+      case i_cnt:
          // Number of CNT lines =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Climo Bins * Alphas
@@ -1273,23 +1273,23 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_ci_alpha());
          break;
 
-      case(i_sl1l2):
-      case(i_sal1l2):
+      case i_sl1l2:
+      case i_sal1l2:
          // Number of SL1L2 and SAL1L2 lines =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Climo Bins
          n = (prob_flag ? 0 : n_pd * get_n_cnt_thresh() * n_bin);
          break;
 
-      case(i_vl1l2):
-      case(i_val1l2):
+      case i_vl1l2:
+      case i_val1l2:
          // Number of VL1L2 or VAL1L2 lines =
          //    Message Types * Masks * Interpolations * Thresholds
          n = (!vect_flag ? 0 : n_pd *
               get_n_wind_thresh());
          break;
 
-      case(i_vcnt):
+      case i_vcnt:
          // Number of VCNT lines =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Alphas
@@ -1297,9 +1297,9 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_wind_thresh() * get_n_ci_alpha());
          break;
 
-      case(i_pct):
-      case(i_pjc):
-      case(i_prc):
+      case i_pct:
+      case i_pjc:
+      case i_prc:
          // Number of PCT, PJC, or PRC lines possible =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Climo Bins
@@ -1314,7 +1314,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
-      case(i_pstd):
+      case i_pstd:
          // Number of PSTD lines =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Alphas * Climo Bins
@@ -1332,8 +1332,8 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
-      case(i_ecnt):
-      case(i_rps):
+      case i_ecnt:
+      case i_rps:
          // Number of HiRA ECNT and RPS lines =
          //    Message Types * Masks * HiRA widths *
          //    Alphas
@@ -1346,7 +1346,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
-      case(i_orank):
+      case i_orank:
          // Number of HiRA ORANK lines possible =
          //    Number of pairs * Categorical Thresholds *
          //    HiRA widths
@@ -1360,7 +1360,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
-      case(i_eclv):
+      case i_eclv:
          // Number of CTC -> ECLV lines =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Climo Bins
@@ -1375,7 +1375,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
-      case(i_mpr):
+      case i_mpr:
          // Compute the number of matched pairs to be written
          n = vx_pd.get_n_pair();
 
@@ -1390,13 +1390,13 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
-      case(i_seeps_mpr):
+      case i_seeps_mpr:
          // Compute the number of matched pairs to be written
          n = vx_pd.get_n_pair();
 
          break;
 
-      case(i_seeps):
+      case i_seeps:
          // Compute the number of matched pairs to be written
          n = vx_pd.get_n_pair();
 

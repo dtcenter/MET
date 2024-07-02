@@ -327,7 +327,7 @@ void NetcdfObsVars::create_obs_vars (NcFile *f_out) {
 
    add_att(&obs_lvl_var,  "long_name", "pressure level (hPa) or accumulation interval (sec)");
    add_att(&obs_lvl_var, "_FillValue", FILL_VALUE);
-   long_name_str = (attr_agl)
+   long_name_str = attr_agl
          ? "height in meters above sea level or ground level (msl or agl)"
          : "height in meters above sea level (msl)";
    add_att(&obs_hgt_var,  "long_name", long_name_str);
@@ -589,7 +589,7 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
    hdr_data.vld_idx_array.extend(nhdr_count);
 
    int buf_size = ((nhdr_count > NC_BUFFER_SIZE_32K)
-                   ? NC_BUFFER_SIZE_32K : (nhdr_count));
+                   ? NC_BUFFER_SIZE_32K : nhdr_count);
 
    //
    // Allocate space to store the data
@@ -948,7 +948,7 @@ void NetcdfObsVars::read_pb_hdr_data(MetPointHeader &hdr_data) {
 
    // Read PB report type
    int buf_size = ((pb_hdr_count > NC_BUFFER_SIZE_32K)
-         ? NC_BUFFER_SIZE_32K : (pb_hdr_count));
+         ? NC_BUFFER_SIZE_32K : pb_hdr_count);
    int *hdr_prpt_typ_block = new int[buf_size];
    int *hdr_irpt_typ_block = new int[buf_size];
    int *hdr_inst_typ_block = new int[buf_size];

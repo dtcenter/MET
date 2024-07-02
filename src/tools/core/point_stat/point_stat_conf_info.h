@@ -192,13 +192,13 @@ class PointStatVxOpt {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int PointStatVxOpt::get_n_msg_typ()     const { return(msg_typ.n());          }
-inline int PointStatVxOpt::get_n_mask()        const { return(mask_name.n());        }
-inline int PointStatVxOpt::get_n_interp()      const { return(interp_info.n_interp); }
+inline int PointStatVxOpt::get_n_msg_typ()     const { return msg_typ.n();          }
+inline int PointStatVxOpt::get_n_mask()        const { return mask_name.n();        }
+inline int PointStatVxOpt::get_n_interp()      const { return interp_info.n_interp; }
 
-inline int PointStatVxOpt::get_n_eclv_points() const { return(eclv_points.n());      }
-inline int PointStatVxOpt::get_n_cdf_bin()     const { return(cdf_info.n_bin);       }
-inline int PointStatVxOpt::get_n_ci_alpha()    const { return(ci_alpha.n());         }
+inline int PointStatVxOpt::get_n_eclv_points() const { return eclv_points.n();      }
+inline int PointStatVxOpt::get_n_cdf_bin()     const { return cdf_info.n_bin;       }
+inline int PointStatVxOpt::get_n_ci_alpha()    const { return ci_alpha.n();         }
 
 ////////////////////////////////////////////////////////////////////////
 

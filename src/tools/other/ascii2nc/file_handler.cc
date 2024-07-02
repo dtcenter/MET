@@ -380,6 +380,6 @@ bool FileHandler::_keep_valid_time(const time_t &valid_time) const
    else if (valid_beg_ut == (time_t) 0 && valid_end_ut != (time_t) 0) {
       if (valid_time > valid_end_ut) keep = false;
    }
-   return(keep);
+   return keep;
 }
 

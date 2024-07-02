@@ -79,9 +79,9 @@ class Wchar_Argv {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int Wchar_Argv::wargc() const { return ( Argc ); }
+inline int Wchar_Argv::wargc() const { return Argc; }
 
-inline wchar_t ** Wchar_Argv::wargv() const { return ( W_Argv ); }
+inline wchar_t ** Wchar_Argv::wargv() const { return W_Argv; }
 
 
 ////////////////////////////////////////////////////////////////////////
