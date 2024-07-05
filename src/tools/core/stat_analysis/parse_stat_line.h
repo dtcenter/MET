@@ -60,7 +60,9 @@ struct MPRData {
    int total, index;
    ConcatString obs_sid, obs_qc;
    double obs_lat, obs_lon, obs_lvl, obs_elv;
-   double fcst, obs, climo_mean, climo_stdev, climo_cdf;
+   double fcst, obs;
+   double fcst_climo_mean, fcst_climo_stdev, fcst_climo_cdf;
+   double obs_climo_mean, obs_climo_stdev, obs_climo_cdf;
 };
 
 // Ensemble continuous statistics (ECNT) data structure
@@ -101,7 +103,9 @@ struct ORANKData {
    int total, index;
    ConcatString obs_sid, obs_qc;
    double obs_lat, obs_lon, obs_lvl, obs_elv;
-   double obs, pit, climo_mean, climo_stdev;
+   double obs, pit;
+   double fcst_climo_mean, fcst_climo_stdev;
+   double obs_climo_mean, obs_climo_stdev;
    double ens_mean, spread, ens_mean_oerr, spread_oerr;
    double spread_plus_oerr;
    int rank, n_ens_vld, n_ens;

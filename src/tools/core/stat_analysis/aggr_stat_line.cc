@@ -1817,16 +1817,18 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
 
          job.dump_stat_line(line);
 
+         // TODO: Update parsing logic to handle separate forecast and observation climatology data
+
          parse_mpr_line(line, cur);
          is_ugrd = (cur.fcst_var == ugrd_abbr_str);
-         uf      = (is_ugrd ? cur.fcst        : bad_data_double);
-         uo      = (is_ugrd ? cur.obs         : bad_data_double);
-         ucmn    = (is_ugrd ? cur.climo_mean  : bad_data_double);
-         ucsd    = (is_ugrd ? cur.climo_stdev : bad_data_double);
-         vf      = (is_ugrd ? bad_data_double : cur.fcst);
-         vo      = (is_ugrd ? bad_data_double : cur.obs);
-         vcmn    = (is_ugrd ? bad_data_double : cur.climo_mean);
-         vcsd    = (is_ugrd ? bad_data_double : cur.climo_stdev);
+         uf      = (is_ugrd ? cur.fcst            : bad_data_double);
+         uo      = (is_ugrd ? cur.obs             : bad_data_double);
+         ucmn    = (is_ugrd ? cur.obs_climo_mean  : bad_data_double);
+         ucsd    = (is_ugrd ? cur.obs_climo_stdev : bad_data_double);
+         vf      = (is_ugrd ? bad_data_double     : cur.fcst);
+         vo      = (is_ugrd ? bad_data_double     : cur.obs);
+         vcmn    = (is_ugrd ? bad_data_double     : cur.obs_climo_mean);
+         vcsd    = (is_ugrd ? bad_data_double     : cur.obs_climo_stdev);
 
          //
          // Build header string for matching UGRD and VGRD lines
@@ -2159,9 +2161,9 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.pd.n_obs = 1;
             aggr.pd.f_na.add(cur.fcst);
             aggr.pd.o_na.add(cur.obs);
-            aggr.pd.cmn_na.add(cur.climo_mean);
-            aggr.pd.csd_na.add(cur.climo_stdev);
-            aggr.pd.cdf_na.add(cur.climo_cdf);
+            aggr.pd.cmn_na.add(cur.obs_climo_mean);
+            aggr.pd.csd_na.add(cur.obs_climo_stdev);
+            aggr.pd.cdf_na.add(cur.obs_climo_cdf);
             aggr.pd.wgt_na.add(default_grid_weight);
 
             aggr.fcst_var = cur.fcst_var;
@@ -2188,9 +2190,9 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             m[key].pd.n_obs++;
             m[key].pd.f_na.add(cur.fcst);
             m[key].pd.o_na.add(cur.obs);
-            m[key].pd.cmn_na.add(cur.climo_mean);
-            m[key].pd.csd_na.add(cur.climo_stdev);
-            m[key].pd.cdf_na.add(cur.climo_cdf);
+            m[key].pd.cmn_na.add(cur.obs_climo_mean);
+            m[key].pd.csd_na.add(cur.obs_climo_stdev);
+            m[key].pd.cdf_na.add(cur.obs_climo_cdf);
             m[key].pd.wgt_na.add(default_grid_weight);
 
             //
@@ -3086,8 +3088,8 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          // ensemble spread, ensemble member values, and
          // valid ensemble count
          //
-         m[key].ens_pd.add_grid_obs(cur.obs, cur.climo_mean,
-                                    cur.climo_stdev, default_grid_weight);
+         m[key].ens_pd.add_grid_obs(cur.obs, cur.obs_climo_mean,
+                                    cur.obs_climo_stdev, default_grid_weight);
          m[key].ens_pd.skip_ba.add(false);
          m[key].ens_pd.n_pair++;
          m[key].ens_pd.r_na.add(cur.rank);
@@ -3112,7 +3114,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
 
          // Derive ensemble from climo mean and standard deviation
          derive_climo_vals(&m[key].cdf_info,
-                           cur.climo_mean, cur.climo_stdev, climo_vals);
+                           cur.obs_climo_mean, cur.obs_climo_stdev, climo_vals);
 
          // Store empirical CRPS stats and CRPS-Fair
          double crps_emp = compute_crps_emp(cur.obs, cur.ens_na);
@@ -3123,7 +3125,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
 
          // Store Gaussian CRPS stats
          m[key].ens_pd.crps_gaus_na.add(compute_crps_gaus(cur.obs, cur.ens_mean, cur.spread));
-         m[key].ens_pd.crpscl_gaus_na.add(compute_crps_gaus(cur.obs, cur.climo_mean, cur.climo_stdev));
+         m[key].ens_pd.crpscl_gaus_na.add(compute_crps_gaus(cur.obs, cur.obs_climo_mean, cur.obs_climo_stdev));
          m[key].ens_pd.ign_na.add(compute_ens_ign(cur.obs, cur.ens_mean, cur.spread));
          m[key].ens_pd.pit_na.add(compute_ens_pit(cur.obs, cur.ens_mean, cur.spread));
 
