@@ -458,7 +458,7 @@ inline int get_n_eclv_columns  (int n) { return(4  + 2*n);                  } //
 inline int get_n_rhist_columns (int n) { return(2  + n);                    } // n = N_RANK
 inline int get_n_phist_columns (int n) { return(3  + n);                    } // n = N_BINS
 inline int get_n_relp_columns  (int n) { return(2  + n);                    } // n = N_ENS
-inline int get_n_orank_columns (int n) { return(20 + n);                    } // n = N_ENS
+inline int get_n_orank_columns (int n) { return(22 + n);                    } // n = N_ENS
 
 ////////////////////////////////////////////////////////////////////////
 
