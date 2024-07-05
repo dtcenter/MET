@@ -4076,11 +4076,12 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
    //
    // Matched Pairs (MPR)
    // Dump out the MPR line:
-   //    TOTAL,       INDEX,       OBS_SID,
-   //    OBS_LAT,     OBS_LON,     OBS_LVL,
-   //    OBS_ELV,     FCST,        OBS,
-   //    OBS_QC,      CLIMO_MEAN,  CLIMO_STDEV,
-   //    CLIMO_CDF
+   //    TOTAL,           INDEX,            OBS_SID,
+   //    OBS_LAT,         OBS_LON,          OBS_LVL,
+   //    OBS_ELV,         FCST,             OBS,
+   //    OBS_QC,
+   //    OBS_CLIMO_MEAN,  OBS_CLIMO_STDEV,  OBS_CLIMO_CDF,
+   //    FCST_CLIMO_MEAN, FCST_CLIMO_STDEV, FCST_CLIMO_CDF
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       pd_ptr->n_obs);
@@ -4112,13 +4113,24 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
    at.set_entry(r, c+9,  // Observation Quality Control
       (string)pd_ptr->o_qc_sa[i]);
 
-   at.set_entry(r, c+10, // Climatological Mean Value
+   // TODO: Update to write actual observation and forecast climo values
+
+   at.set_entry(r, c+10, // Observation Climatological Mean Value
       pd_ptr->cmn_na[i]);
 
-   at.set_entry(r, c+11, // Climatological Standard Deviation Value
+   at.set_entry(r, c+11, // Obsrevation Climatological Standard Deviation Value
       pd_ptr->csd_na[i]);
 
-   at.set_entry(r, c+12, // Climatological CDF Value
+   at.set_entry(r, c+12, // Observation Climatological CDF Value
+      pd_ptr->cdf_na[i]);
+
+   at.set_entry(r, c+13, // Forecast Climatological Mean Value
+      pd_ptr->cmn_na[i]);
+
+   at.set_entry(r, c+14, // Forecast Climatological Standard Deviation Value
+      pd_ptr->csd_na[i]);
+
+   at.set_entry(r, c+15, // Forecast Climatological CDF Value
       pd_ptr->cdf_na[i]);
 
    return;
@@ -4493,9 +4505,10 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    //    OBS_ELV,          OBS,           PIT,
    //    RANK,             N_ENS_VLD,     N_ENS,
    //    [ENS_] (for each ensemble member)
-   //    OBS_QC,           ENS_MEAN,      CLIMO_MEAN,
-   //    SPREAD,           ENS_MEAN_OERR, SPREAD_OERR,
-   //    SPREAD_PLUS_OERR, CLIMO_STDEV
+   //    OBS_QC,           ENS_MEAN,        OBS_CLIMO_MEAN,
+   //    SPREAD,           ENS_MEAN_OERR,   SPREAD_OERR,
+   //    SPREAD_PLUS_OERR, OBS_CLIMO_STDEV, FCST_CLIMO_MEAN,
+   //    FCST_CLIMO_STDEV
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       pd_ptr->n_obs);    // Use n_obs instead of n_pair to include missing data
@@ -4551,7 +4564,9 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    at.set_entry(r, c+13+pd_ptr->n_ens,
       pd_ptr->mn_na[i]);
 
-   // Climatology mean values
+   // TODO: Update to write actual observation climo values
+
+   // Observation climatology mean values
    at.set_entry(r, c+14+pd_ptr->n_ens,
       pd_ptr->cmn_na[i]);
 
@@ -4571,8 +4586,18 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    at.set_entry(r, c+18+pd_ptr->n_ens,
       square_root(pd_ptr->var_plus_oerr_na[i]));
 
-   // Climatology standard deviation values
+   // TODO: Update to write actual observation and forecast climo values
+
+   // Observation climatology standard deviation values
    at.set_entry(r, c+19+pd_ptr->n_ens,
+      pd_ptr->csd_na[i]);
+
+   // Forecast climatology mean values
+   at.set_entry(r, c+20+pd_ptr->n_ens,
+      pd_ptr->cmn_na[i]);
+
+   // Forecast climatology standard deviation values
+   at.set_entry(r, c+21+pd_ptr->n_ens,
       pd_ptr->csd_na[i]);
 
    return;
