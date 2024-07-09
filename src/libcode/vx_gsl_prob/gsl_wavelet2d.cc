@@ -89,7 +89,7 @@ gsl_wavelet_workspace * wavelet_workspace_set(int n) {
       exit(1);
    }
 
-   return(work);
+   return work;
 }
 
 ////////////////////////////////////////////////////////////////////////

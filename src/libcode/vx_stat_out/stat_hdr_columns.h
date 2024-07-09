@@ -214,55 +214,55 @@ class StatHdrColumns {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline ConcatString StatHdrColumns::get_model             () const { return(model.contents(na_str));              }
-inline ConcatString StatHdrColumns::get_desc              () const { return(desc.contents(na_str));               }
+inline ConcatString StatHdrColumns::get_model             () const { return model.contents(na_str);              }
+inline ConcatString StatHdrColumns::get_desc              () const { return desc.contents(na_str);               }
 
-inline int          StatHdrColumns::get_fcst_lead_sec     () const { return(fcst_lead_sec);                       }
-inline ConcatString StatHdrColumns::get_fcst_lead_str     () const { return(fcst_lead_str.contents(na_str));      }
+inline int          StatHdrColumns::get_fcst_lead_sec     () const { return fcst_lead_sec;                       }
+inline ConcatString StatHdrColumns::get_fcst_lead_str     () const { return fcst_lead_str.contents(na_str);      }
 
-inline unixtime     StatHdrColumns::get_fcst_valid_beg    () const { return(fcst_valid_beg);                      }
-inline ConcatString StatHdrColumns::get_fcst_valid_beg_str() const { return(fcst_valid_beg_str.contents(na_str)); }
+inline unixtime     StatHdrColumns::get_fcst_valid_beg    () const { return fcst_valid_beg;                      }
+inline ConcatString StatHdrColumns::get_fcst_valid_beg_str() const { return fcst_valid_beg_str.contents(na_str); }
 
-inline unixtime     StatHdrColumns::get_fcst_valid_end    () const { return(fcst_valid_end);                      }
-inline ConcatString StatHdrColumns::get_fcst_valid_end_str() const { return(fcst_valid_end_str.contents(na_str)); }
+inline unixtime     StatHdrColumns::get_fcst_valid_end    () const { return fcst_valid_end;                      }
+inline ConcatString StatHdrColumns::get_fcst_valid_end_str() const { return fcst_valid_end_str.contents(na_str); }
 
-inline int          StatHdrColumns::get_obs_lead_sec      () const { return(obs_lead_sec);                        }
-inline ConcatString StatHdrColumns::get_obs_lead_str      () const { return(obs_lead_str.contents(na_str));       }
+inline int          StatHdrColumns::get_obs_lead_sec      () const { return obs_lead_sec;                        }
+inline ConcatString StatHdrColumns::get_obs_lead_str      () const { return obs_lead_str.contents(na_str);       }
 
-inline unixtime     StatHdrColumns::get_obs_valid_beg     () const { return(obs_valid_beg);                       }
-inline ConcatString StatHdrColumns::get_obs_valid_beg_str () const { return(obs_valid_beg_str.contents(na_str));  }
+inline unixtime     StatHdrColumns::get_obs_valid_beg     () const { return obs_valid_beg;                       }
+inline ConcatString StatHdrColumns::get_obs_valid_beg_str () const { return obs_valid_beg_str.contents(na_str);  }
 
-inline unixtime     StatHdrColumns::get_obs_valid_end     () const { return(obs_valid_end);                       }
-inline ConcatString StatHdrColumns::get_obs_valid_end_str () const { return(obs_valid_end_str.contents(na_str));  }
+inline unixtime     StatHdrColumns::get_obs_valid_end     () const { return obs_valid_end;                       }
+inline ConcatString StatHdrColumns::get_obs_valid_end_str () const { return obs_valid_end_str.contents(na_str);  }
 
-inline ConcatString StatHdrColumns::get_fcst_var          () const { return(fcst_var.contents(na_str));           }
-inline ConcatString StatHdrColumns::get_fcst_units        () const { return(fcst_units.contents(na_str));           }
-inline ConcatString StatHdrColumns::get_fcst_lev          () const { return(fcst_lev.contents(na_str));           }
+inline ConcatString StatHdrColumns::get_fcst_var          () const { return fcst_var.contents(na_str);           }
+inline ConcatString StatHdrColumns::get_fcst_units        () const { return fcst_units.contents(na_str);         }
+inline ConcatString StatHdrColumns::get_fcst_lev          () const { return fcst_lev.contents(na_str);           }
 
-inline ConcatString StatHdrColumns::get_obs_var           () const { return(obs_var.contents(na_str));            }
-inline ConcatString StatHdrColumns::get_obs_units         () const { return(obs_units.contents(na_str));            }
-inline ConcatString StatHdrColumns::get_obs_lev           () const { return(obs_lev.contents(na_str));            }
+inline ConcatString StatHdrColumns::get_obs_var           () const { return obs_var.contents(na_str);            }
+inline ConcatString StatHdrColumns::get_obs_units         () const { return obs_units.contents(na_str);          }
+inline ConcatString StatHdrColumns::get_obs_lev           () const { return obs_lev.contents(na_str);            }
 
-inline ConcatString StatHdrColumns::get_obtype            () const { return(obtype.contents(na_str));             }
-inline ConcatString StatHdrColumns::get_mask              () const { return(mask.contents(na_str));               }
+inline ConcatString StatHdrColumns::get_obtype            () const { return obtype.contents(na_str);             }
+inline ConcatString StatHdrColumns::get_mask              () const { return mask.contents(na_str);               }
 
-inline ConcatString StatHdrColumns::get_interp_mthd       () const { return(interp_mthd.contents(na_str));        }
-inline int          StatHdrColumns::get_interp_pnts       () const { return(interp_pnts);                         }
-inline ConcatString StatHdrColumns::get_interp_pnts_str   () const { return(interp_pnts_str.contents(na_str));    }
+inline ConcatString StatHdrColumns::get_interp_mthd       () const { return interp_mthd.contents(na_str);        }
+inline int          StatHdrColumns::get_interp_pnts       () const { return interp_pnts;                         }
+inline ConcatString StatHdrColumns::get_interp_pnts_str   () const { return interp_pnts_str.contents(na_str);    }
 
-inline ConcatString StatHdrColumns::get_line_type         () const { return(line_type.contents(na_str));          }
+inline ConcatString StatHdrColumns::get_line_type         () const { return line_type.contents(na_str);          }
 
-inline ThreshArray  StatHdrColumns::get_fcst_thresh       () const { return(fcst_thresh);                         }
+inline ThreshArray  StatHdrColumns::get_fcst_thresh       () const { return fcst_thresh;                         }
 
-inline ThreshArray  StatHdrColumns::get_obs_thresh        () const { return(obs_thresh);                          }
-inline ConcatString StatHdrColumns::get_obs_thresh_str    () const { return(obs_thresh.get_str());                }
+inline ThreshArray  StatHdrColumns::get_obs_thresh        () const { return obs_thresh;                          }
+inline ConcatString StatHdrColumns::get_obs_thresh_str    () const { return obs_thresh.get_str();                }
 
-inline SetLogic     StatHdrColumns::get_thresh_logic      () const { return(thresh_logic);                        }
+inline SetLogic     StatHdrColumns::get_thresh_logic      () const { return thresh_logic;                        }
 
-inline ThreshArray  StatHdrColumns::get_cov_thresh        () const { return(cov_thresh);                          }
-inline ConcatString StatHdrColumns::get_cov_thresh_str    () const { return(prob_thresh_to_string(cov_thresh));   }
+inline ThreshArray  StatHdrColumns::get_cov_thresh        () const { return cov_thresh;                          }
+inline ConcatString StatHdrColumns::get_cov_thresh_str    () const { return prob_thresh_to_string(cov_thresh);   }
 
-inline double       StatHdrColumns::get_alpha             () const { return(alpha);                               }
+inline double       StatHdrColumns::get_alpha             () const { return alpha;                               }
 
 ////////////////////////////////////////////////////////////////////////
 

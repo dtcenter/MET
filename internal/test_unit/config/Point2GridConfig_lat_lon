@@ -1,0 +1,4 @@
+var_name_map = [
+  { key = "lat_vname";     val = "NLAT"; },
+  { key = "lon_vname";     val = "NLON"; }
+];

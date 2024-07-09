@@ -111,11 +111,11 @@ ConcatString get_grib_level_list_str(int k, int grib_level)
    if(match > 0) {
 
       switch(k) {
-         case(0): // GRIB Level Name
+         case 0: // GRIB Level Name
             str = grib_level_list[match].name;
             break;
 
-         case(1): // GRIB Level Abbreviation
+         case 1: // GRIB Level Abbreviation
             str = grib_level_list[match].abbr;
             break;
 

@@ -164,18 +164,18 @@ class MtdFileBase {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int MtdFileBase::nx() const { return ( Nx ); }
-inline int MtdFileBase::ny() const { return ( Ny ); }
-inline int MtdFileBase::nt() const { return ( Nt ); }
+inline int MtdFileBase::nx() const { return Nx; }
+inline int MtdFileBase::ny() const { return Ny; }
+inline int MtdFileBase::nt() const { return Nt; }
 
-inline int MtdFileBase::nxy  () const { return ( Nx*Ny    ); }
-inline int MtdFileBase::nxyt () const { return ( Nx*Ny*Nt ); }
+inline int MtdFileBase::nxy  () const { return Nx*Ny   ; }
+inline int MtdFileBase::nxyt () const { return Nx*Ny*Nt; }
 
-inline unixtime MtdFileBase::start_valid_time() const { return ( StartValidTime ); }
+inline unixtime MtdFileBase::start_valid_time() const { return StartValidTime; }
 
-inline int MtdFileBase::delta_t() const { return ( DeltaT ); }
+inline int MtdFileBase::delta_t() const { return DeltaT; }
 
-inline MtdFileType MtdFileBase::filetype() const { return ( FileType ); }
+inline MtdFileType MtdFileBase::filetype() const { return FileType; }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -332,13 +332,13 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
 
    // Process the wavelet type
    switch(wvlt_type) {
-      case(WaveletType::Haar):         type = *(gsl_wavelet_haar); break;
-      case(WaveletType::Haar_Cntr):    type = *(gsl_wavelet_haar_centered); break;
-      case(WaveletType::Daub):         type = *(gsl_wavelet_daubechies); break;
-      case(WaveletType::Daub_Cntr):    type = *(gsl_wavelet_daubechies_centered); break;
-      case(WaveletType::BSpline):      type = *(gsl_wavelet_bspline); break;
-      case(WaveletType::BSpline_Cntr): type = *(gsl_wavelet_bspline_centered); break;
-      case(WaveletType::None):
+      case WaveletType::Haar:         type = *gsl_wavelet_haar; break;
+      case WaveletType::Haar_Cntr:    type = *gsl_wavelet_haar_centered; break;
+      case WaveletType::Daub:         type = *gsl_wavelet_daubechies; break;
+      case WaveletType::Daub_Cntr:    type = *gsl_wavelet_daubechies_centered; break;
+      case WaveletType::BSpline:      type = *gsl_wavelet_bspline; break;
+      case WaveletType::BSpline_Cntr: type = *gsl_wavelet_bspline_centered; break;
+      case WaveletType::None:
       default:
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "Unsupported wavelet type value of " << enum_class_as_int(wvlt_type) << ".\n\n";
@@ -350,8 +350,8 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
 
    // Check for valid member number
    switch(wvlt_type) {
-      case(WaveletType::Haar):
-      case(WaveletType::Haar_Cntr):
+      case WaveletType::Haar:
+      case WaveletType::Haar_Cntr:
          if(wvlt_member != 2) {
             mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
                  << "For Haar wavelets, \"" << conf_key_wavelet_member
@@ -360,8 +360,8 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
          }
          break;
 
-      case(WaveletType::Daub):
-      case(WaveletType::Daub_Cntr):
+      case WaveletType::Daub:
+      case WaveletType::Daub_Cntr:
          if(wvlt_member < 4 || wvlt_member > 20 || wvlt_member%2 == 1) {
             mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
                  << "For Daubechies wavelets, \"" << conf_key_wavelet_member
@@ -370,8 +370,8 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
          }
          break;
 
-      case(WaveletType::BSpline):
-      case(WaveletType::BSpline_Cntr):
+      case WaveletType::BSpline:
+      case WaveletType::BSpline_Cntr:
          if(wvlt_member != 103 && wvlt_member != 105 && wvlt_member != 202 &&
             wvlt_member != 204 && wvlt_member != 206 && wvlt_member != 208 &&
             wvlt_member != 301 && wvlt_member != 303 && wvlt_member != 305 &&
@@ -384,7 +384,7 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
          }
          break;
 
-      case(WaveletType::None):
+      case WaveletType::None:
       default:
          mlog << Error << "\nWaveletStatConfInfo::process_config() -> "
               << "Unsupported wavelet type value of " << enum_class_as_int(wvlt_type) << ".\n\n";
@@ -511,7 +511,7 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
       // Tile the input data using tiles of dimension n by n where n
       // is the largest integer power of 2 less than the smallest
       // dimension of the input data and allowing no overlap.
-      case(GridDecompType::Auto):
+      case GridDecompType::Auto:
 
          center_tiles(grid.nx(), grid.ny());
 
@@ -528,7 +528,7 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
          break;
 
       // Apply the tiles specified in the configuration file
-      case(GridDecompType::Tile):
+      case GridDecompType::Tile:
 
          // Number of tiles based on the user-specified locations
          n_tile = tile_xll.n();
@@ -547,7 +547,7 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
 
       // Setup tiles for padding the input fields out to the nearest
       // integer power of two
-      case(GridDecompType::Pad):
+      case GridDecompType::Pad:
 
          pad_tiles(grid.nx(), grid.ny());
 
@@ -562,7 +562,7 @@ void WaveletStatConfInfo::process_tiles(const Grid &grid) {
 
          break;
 
-      case(GridDecompType::None):
+      case GridDecompType::None:
       default:
          mlog << Error << "\nWaveletStatConfInfo::process_tiles() -> "
               << "Unsupported grid decomposition type of "

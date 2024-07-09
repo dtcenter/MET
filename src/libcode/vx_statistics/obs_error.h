@@ -149,8 +149,8 @@ class ObsErrorTable {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int  ObsErrorTable::n()      const { return(N_elements); }
-inline bool ObsErrorTable::is_set() const { return(IsSet);      }
+inline int  ObsErrorTable::n()      const { return N_elements; }
+inline bool ObsErrorTable::is_set() const { return IsSet;      }
 
 ////////////////////////////////////////////////////////////////////////
 

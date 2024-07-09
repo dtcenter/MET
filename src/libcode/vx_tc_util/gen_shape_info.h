@@ -91,11 +91,11 @@ class GenShapeInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline const ConcatString & GenShapeInfo::basin() const { return(Basin); }
+inline const ConcatString & GenShapeInfo::basin() const { return Basin; }
 
-inline unixtime GenShapeInfo::file_time()  const { return(FileTime);  }
-inline unixtime GenShapeInfo::issue_time() const { return(IssueTime); }
-inline int      GenShapeInfo::issue_hour() const { return(unix_to_sec_of_day(IssueTime)); }
+inline unixtime GenShapeInfo::file_time()  const { return FileTime ;  }
+inline unixtime GenShapeInfo::issue_time() const { return IssueTime; }
+inline int      GenShapeInfo::issue_hour() const { return unix_to_sec_of_day(IssueTime); }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -140,7 +140,7 @@ class GenShapeInfoArray {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int GenShapeInfoArray::n() const { return(GenShape.size()); }
+inline int GenShapeInfoArray::n() const { return GenShape.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 

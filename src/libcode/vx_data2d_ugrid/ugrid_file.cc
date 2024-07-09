@@ -664,8 +664,8 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   if (dim_count != a.n_elements())
   {
     mlog << Error << "\n" << method_name
-         << "needed " << (dim_count) << " arguments for variable "
-         << (GET_NC_NAME_P(v)) << ", got " << (a.n_elements()) << "\n\n";
+         << "needed " << dim_count << " arguments for variable "
+         << (GET_NC_NAME_P(v)) << ", got " << a.n_elements() << "\n\n";
     exit(1);
   }
 
@@ -675,7 +675,7 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   if (nullptr == var) {
     mlog << Error << "\n" << method_name
-         << "variable " << (GET_NC_NAME_P(v)) << " not found!\n\n";
+         << "variable " << GET_NC_NAME_P(v) << " not found!\n\n";
     exit(1);
   }
 

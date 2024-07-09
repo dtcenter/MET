@@ -103,14 +103,14 @@ class GridPoint
   bool operator==(const GridPoint &other) const
   {
     return (this->x == other.x &&
-	    this->y == other.y);
+            this->y == other.y);
   }
 
 
   bool operator!=(const GridPoint &other) const
   {
     return (this->x != other.x ||
-	    this->y != other.y);
+            this->y != other.y);
   }
 
 
@@ -134,7 +134,7 @@ class GridPoint
 
   static const char *_className(void)
   {
-    return("GridPoint");
+    return "GridPoint";
   }
 
 };

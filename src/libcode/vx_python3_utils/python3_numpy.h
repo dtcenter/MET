@@ -122,23 +122,23 @@ class Python3_Numpy {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int Python3_Numpy::n_dims() const { return ( N_Dims ); }
+inline int Python3_Numpy::n_dims() const { return N_Dims; }
 
-inline int Python3_Numpy::n_data() const { return ( N_Data ); }
+inline int Python3_Numpy::n_data() const { return N_Data; }
 
-inline long Python3_Numpy::item_size() const { return ( Item_Size ); }
+inline long Python3_Numpy::item_size() const { return Item_Size; }
 
-inline PyObject * Python3_Numpy::object() const { return ( Object ); }
+inline PyObject * Python3_Numpy::object() const { return Object; }
 
-inline PyObject * Python3_Numpy::data_obj() const { return ( Data_Obj ); }
+inline PyObject * Python3_Numpy::data_obj() const { return Data_Obj; }
 
-inline Py_buffer & Python3_Numpy::view() { return ( View ); }
+inline Py_buffer & Python3_Numpy::view() { return View; }
 
-inline void * Python3_Numpy::buffer() const { return ( Buffer ); }
+inline void * Python3_Numpy::buffer() const { return Buffer; }
 
-inline const char * Python3_Numpy::name() const { return ( Name.text() ); }
+inline const char * Python3_Numpy::name() const { return Name.text(); }
 
-inline const char * Python3_Numpy::dtype() const { return ( Dtype.text() ); }
+inline const char * Python3_Numpy::dtype() const { return Dtype.text(); }
 
 
 ////////////////////////////////////////////////////////////////////////

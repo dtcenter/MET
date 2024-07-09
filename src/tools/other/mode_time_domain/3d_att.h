@@ -196,58 +196,58 @@ class SingleAtt3D {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int SingleAtt3D::object_number  () const { return ( ObjectNumber  ); }
-inline int SingleAtt3D::cluster_number () const { return ( ClusterNumber ); }
+inline int SingleAtt3D::object_number  () const { return ObjectNumber ; }
+inline int SingleAtt3D::cluster_number () const { return ClusterNumber; }
 
-inline bool SingleAtt3D::is_fcst () const { return (   IsFcst ); }
-inline bool SingleAtt3D::is_obs  () const { return ( ! IsFcst ); }
+inline bool SingleAtt3D::is_fcst () const { return  IsFcst; }
+inline bool SingleAtt3D::is_obs  () const { return !IsFcst; }
 
-inline bool SingleAtt3D::is_simple  () const { return (   IsSimple ); }
-inline bool SingleAtt3D::is_cluster () const { return ( ! IsSimple ); }
+inline bool SingleAtt3D::is_simple  () const { return  IsSimple; }
+inline bool SingleAtt3D::is_cluster () const { return !IsSimple; }
 
 inline void SingleAtt3D::set_object_number  (int _n) { ObjectNumber  = _n;  return; }
 inline void SingleAtt3D::set_cluster_number (int _n) { ClusterNumber = _n;  return; }
 
-inline int SingleAtt3D::volume() const { return ( Volume ); }
+inline int SingleAtt3D::volume() const { return Volume; }
 
 inline void SingleAtt3D::set_volume(int _v) { Volume = _v;  return; }
 
-inline double SingleAtt3D::complexity() const { return ( Complexity ); }
+inline double SingleAtt3D::complexity() const { return Complexity; }
 
 inline void SingleAtt3D::set_complexity(double _v) { Complexity = _v;  return; }
 
 
-inline double SingleAtt3D::xbar() const { return ( Xbar ); }
-inline double SingleAtt3D::ybar() const { return ( Ybar ); }
-inline double SingleAtt3D::tbar() const { return ( Tbar ); }
+inline double SingleAtt3D::xbar() const { return Xbar; }
+inline double SingleAtt3D::ybar() const { return Ybar; }
+inline double SingleAtt3D::tbar() const { return Tbar; }
 
-inline double SingleAtt3D::centroid_lat() const { return ( Centroid_Lat ); }
-inline double SingleAtt3D::centroid_lon() const { return ( Centroid_Lon ); }
+inline double SingleAtt3D::centroid_lat() const { return Centroid_Lat; }
+inline double SingleAtt3D::centroid_lon() const { return Centroid_Lon; }
 
-inline int SingleAtt3D::xmin() const { return ( Xmin ); }
-inline int SingleAtt3D::xmax() const { return ( Xmax ); }
+inline int SingleAtt3D::xmin() const { return Xmin; }
+inline int SingleAtt3D::xmax() const { return Xmax; }
 
-inline int SingleAtt3D::ymin() const { return ( Ymin ); }
-inline int SingleAtt3D::ymax() const { return ( Ymax ); }
+inline int SingleAtt3D::ymin() const { return Ymin; }
+inline int SingleAtt3D::ymax() const { return Ymax; }
 
-inline int SingleAtt3D::tmin() const { return ( Tmin ); }
-inline int SingleAtt3D::tmax() const { return ( Tmax ); }
+inline int SingleAtt3D::tmin() const { return Tmin; }
+inline int SingleAtt3D::tmax() const { return Tmax; }
 
-inline double SingleAtt3D::xdot() const { return ( Xvelocity ); }
-inline double SingleAtt3D::ydot() const { return ( Yvelocity ); }
+inline double SingleAtt3D::xdot() const { return Xvelocity; }
+inline double SingleAtt3D::ydot() const { return Yvelocity; }
 
-inline double SingleAtt3D::spatial_axis() const { return ( SpatialAxisAngle ); }
+inline double SingleAtt3D::spatial_axis() const { return SpatialAxisAngle; }
 
-inline double SingleAtt3D::cdist_travelled() const { return ( CdistTravelled ); }
+inline double SingleAtt3D::cdist_travelled() const { return CdistTravelled; }
 
-inline double SingleAtt3D::ptile_10() const { return ( Ptile_10 ); }
-inline double SingleAtt3D::ptile_25() const { return ( Ptile_25 ); }
-inline double SingleAtt3D::ptile_50() const { return ( Ptile_50 ); }
-inline double SingleAtt3D::ptile_75() const { return ( Ptile_75 ); }
-inline double SingleAtt3D::ptile_90() const { return ( Ptile_90 ); }
+inline double SingleAtt3D::ptile_10() const { return Ptile_10; }
+inline double SingleAtt3D::ptile_25() const { return Ptile_25; }
+inline double SingleAtt3D::ptile_50() const { return Ptile_50; }
+inline double SingleAtt3D::ptile_75() const { return Ptile_75; }
+inline double SingleAtt3D::ptile_90() const { return Ptile_90; }
 
-inline int  SingleAtt3D::ptile_value()  const { return ( Ptile_Value ); }
-inline double SingleAtt3D::ptile_user() const { return ( Ptile_User  ); }
+inline int  SingleAtt3D::ptile_value()  const { return Ptile_Value; }
+inline double SingleAtt3D::ptile_user() const { return Ptile_User ; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -388,33 +388,33 @@ class PairAtt3D {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int PairAtt3D::fcst_obj_number() const { return ( FcstObjectNumber ); }
-inline int  PairAtt3D::obs_obj_number() const { return ( ObsObjectNumber ); }
+inline int PairAtt3D::fcst_obj_number() const { return FcstObjectNumber; }
+inline int  PairAtt3D::obs_obj_number() const { return ObsObjectNumber; }
 
-inline int PairAtt3D::fcst_cluster_number() const { return ( FcstClusterNumber ); }
-inline int  PairAtt3D::obs_cluster_number() const { return ( ObsClusterNumber ); }
+inline int PairAtt3D::fcst_cluster_number() const { return FcstClusterNumber; }
+inline int  PairAtt3D::obs_cluster_number() const { return ObsClusterNumber; }
 
-inline int PairAtt3D::intersection_vol () const { return ( IntersectionVol ); }
-// inline int PairAtt3D::union_vol        () const { return ( UnionVol ); }
+inline int PairAtt3D::intersection_vol () const { return IntersectionVol; }
+// inline int PairAtt3D::union_vol        () const { return UnionVol; }
 
-inline double PairAtt3D::time_centroid_delta () const { return ( TimeCentroidDelta ); }
-inline double PairAtt3D::space_centroid_dist () const { return ( SpaceCentroidDist ); }
+inline double PairAtt3D::time_centroid_delta () const { return TimeCentroidDelta; }
+inline double PairAtt3D::space_centroid_dist () const { return SpaceCentroidDist; }
 
-inline double PairAtt3D::direction_difference () const { return ( DirectionDifference ); }
-inline double PairAtt3D::speed_delta () const { return ( SpeedDelta ); }
+inline double PairAtt3D::direction_difference () const { return DirectionDifference; }
+inline double PairAtt3D::speed_delta () const { return SpeedDelta; }
 
-inline double PairAtt3D::volume_ratio    () const { return ( VolumeRatio ); }
-inline double PairAtt3D::axis_angle_diff () const { return ( AxisDiff ); }
+inline double PairAtt3D::volume_ratio    () const { return VolumeRatio; }
+inline double PairAtt3D::axis_angle_diff () const { return AxisDiff; }
 
-inline int PairAtt3D::start_time_delta () const { return ( StartTimeDelta ); }
-inline int PairAtt3D::end_time_delta   () const { return ( EndTimeDelta ); }
+inline int PairAtt3D::start_time_delta () const { return StartTimeDelta; }
+inline int PairAtt3D::end_time_delta   () const { return EndTimeDelta; }
 
-inline int PairAtt3D::duration_difference   () const { return ( DurationDifference ); }
+inline int PairAtt3D::duration_difference   () const { return DurationDifference; }
 
-inline double PairAtt3D::total_interest () const { return ( TotalInterest ); }
+inline double PairAtt3D::total_interest () const { return TotalInterest; }
 
-inline bool PairAtt3D::is_simple  () const { return (   IsSimple ); }
-inline bool PairAtt3D::is_cluster () const { return ( ! IsSimple ); }
+inline bool PairAtt3D::is_simple  () const { return  IsSimple; }
+inline bool PairAtt3D::is_cluster () const { return !IsSimple; }
 
 inline void PairAtt3D::set_simple  () { IsSimple = true;   return; }
 inline void PairAtt3D::set_cluster () { IsSimple = false;  return; }

@@ -880,7 +880,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   if (dim_count != a.n_elements())
   {
     mlog << Error << "\n" << method_name
-         << "needed " << (dim_count) << " arguments for variable "
+         << "needed " << dim_count << " arguments for variable "
          << (GET_NC_NAME_P(var)) << ", got " << (a.n_elements()) << "\n\n";
     exit(1);
   }
@@ -914,7 +914,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
 
   if (!status)
   {
-    mlog << Error << "\nNcCfFile::getData(NcVar *, const LongArray &) const -> "
+    mlog << Error << "\n" << method_name
          << "bad status for var->get()\n\n";
     exit(1);
   }
@@ -951,7 +951,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   if (dim_count != a.n_elements())
   {
     mlog << Error << "\n" << method_name
-         << "needed " << (dim_count) << " arguments for variable "
+         << "needed " << dim_count << " arguments for variable "
          << (GET_NC_NAME_P(v)) << ", got " << (a.n_elements()) << "\n\n";
     exit(1);
   }
@@ -1091,8 +1091,8 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
         plane.set(value, x, y_offset);
 
-      }   //  for x
-    }   //  for y
+      } /*  for y */
+    }   /*  for x */
   }
   else {
     for (int x = 0; x< nx; ++x) {
@@ -1108,8 +1108,8 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
         plane.set(value, x, y_offset);
 
-      }   //  for y
-    }   //  for x
+      } /*  for y */
+    }   /*  for x */
   }
 
   delete [] d;
@@ -1130,7 +1130,7 @@ bool NcCfFile::getData(const char *var_name,
                        NcVarInfo *&info) const
 {
   info = find_var_name(var_name);
-  if (info == 0)
+  if (info == nullptr)
     return false;
 
   bool found = getData(info->var, a, plane);
@@ -1469,6 +1469,25 @@ void NcCfFile::read_netcdf_grid()
 
   return;
 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Grid NcCfFile::build_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
+                                            const long lat_counts, const long lon_counts) {
+  Grid grid_ll;
+  bool swap_to_north;
+  LatLonData data = get_data_from_lat_lon_vars(lat_var, lon_var,
+                                               lat_counts, lon_counts,
+                                               swap_to_north);
+
+  data.dump();
+
+  grid_ll.set(data);   // resets swap_to_north to false
+  if (swap_to_north) grid_ll.set_swap_to_north(true);
+  return grid_ll;
 }
 
 
@@ -3180,7 +3199,7 @@ bool NcCfFile::get_grid_from_dimensions()
       }
 
       if (!has_var(_ncFile, dim_name.c_str())) {
-        mlog << Debug(4) << method_name << " -> " << "The coordinate variable \""
+        mlog << Debug(6) << method_name << " -> " << "The coordinate variable \""
              << _dims[dim_num]->getName() << "\" does not exist.\n";
         continue;
       }

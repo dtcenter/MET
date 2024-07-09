@@ -384,7 +384,7 @@ void compute_cts_stats_ci_bca(const gsl_rng *rng_ptr,
             if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     nullptr; }
             if(cts_i_file) { delete [] cts_i_file; cts_i_file = (ConcatString *) nullptr; }
             if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) nullptr; }
-            throw(1);
+            throw 1;
          }
       }
 
@@ -812,7 +812,7 @@ void compute_mcts_stats_ci_bca(const gsl_rng *rng_ptr,
               << "can't open one or more temporary files for writing:\n"
               << mcts_i_file << "\n"
               << mcts_r_file << "\n\n";
-         throw(1);
+         throw 1;
       }
 
       //
@@ -1024,7 +1024,7 @@ void compute_cnt_stats_ci_bca(const gsl_rng *rng_ptr,
               << "can't open one or more temporary files for writing:\n"
               << cnt_i_file << "\n"
               << cnt_r_file << "\n\n";
-         throw(1);
+         throw 1;
       }
 
       //
@@ -1512,7 +1512,7 @@ void compute_cts_stats_ci_perc(const gsl_rng *rng_ptr,
            if(cts_r_out)  { delete [] cts_r_out;  cts_r_out  = (ofstream *)     nullptr; }
            if(cts_r_file) { delete [] cts_r_file; cts_r_file = (ConcatString *) nullptr; }
 
-            throw(1);
+            throw 1;
          }
       }
 
@@ -1897,7 +1897,7 @@ void compute_mcts_stats_ci_perc(const gsl_rng *rng_ptr,
          mlog << Error << "\ncompute_mcts_stats_ci_perc() -> "
               << "can't open the temporary file for writing:\n"
               << mcts_r_file << "\n\n";
-         throw(1);
+         throw 1;
       }
 
       //
@@ -2086,7 +2086,7 @@ void compute_cnt_stats_ci_perc(const gsl_rng *rng_ptr,
          mlog << Error << "\ncompute_cnt_stats_ci_perc() -> "
               << "can't open the temporary file for writing:\n"
               << cnt_r_file << "\n\n";
-         throw(1);
+         throw 1;
       }
 
       //
@@ -2543,7 +2543,7 @@ void compute_nbrcts_stats_ci_bca(const gsl_rng *rng_ptr,
             if(nbrcts_i_file) { delete [] nbrcts_i_file; nbrcts_i_file = (ConcatString *) nullptr; }
             if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) nullptr; }
 
-            throw(1);
+            throw 1;
          }
       }
 
@@ -2943,7 +2943,7 @@ void compute_nbrcnt_stats_ci_bca(const gsl_rng *rng_ptr,
               << "can't open one or more temporary files for writing:\n"
               << nbrcnt_i_file << "\n"
               << nbrcnt_r_file << "\n\n";
-         throw(1);
+         throw 1;
       }
 
       //
@@ -3184,7 +3184,7 @@ void compute_nbrcts_stats_ci_perc(const gsl_rng *rng_ptr,
          if(nbrcts_r_out)  { delete [] nbrcts_r_out;  nbrcts_r_out  = (ofstream *)     nullptr; }
          if(nbrcts_r_file) { delete [] nbrcts_r_file; nbrcts_r_file = (ConcatString *) nullptr; }
 
-            throw(1);
+            throw 1;
          }
       }
 
@@ -3543,7 +3543,7 @@ void compute_nbrcnt_stats_ci_perc(const gsl_rng *rng_ptr,
          mlog << Error << "\ncompute_nbrcnt_stats_ci_perc() -> "
               << "can't open the temporary file for writing:\n"
               << nbrcnt_r_file << "\n\n";
-         throw(1);
+         throw 1;
       }
 
       //
@@ -4009,7 +4009,7 @@ void read_ldf(const ConcatString file_name, int col, NumArray &na) {
       mlog << Error << "\nread_ldf() -> "
            << "can't open file: " << file_name << "\n\n"
           ;
-      throw(1);
+      throw 1;
    }
 
    //

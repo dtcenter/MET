@@ -2032,7 +2032,7 @@ void process_pbfile(int i_pb) {
    if (cal_cape) {
       mlog << Debug(3) << "\nDerived CAPE = " << cape_count
            << "\tZero = " << cape_cnt_zero_values
-           << "\n\tnot derived: No cape inputs = " << (cape_cnt_no_levels)
+           << "\n\tnot derived: No cape inputs = " << cape_cnt_no_levels
            << "\tNo vertical levels = " << cape_cnt_surface_msgs
            << "\n\tfiltered: " << cape_cnt_missing_values << ", "
            << cape_cnt_too_big
@@ -2811,7 +2811,7 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
    switch(gc) {
 
       // Pressure Reduced to Mean Sea Level
-      case(prmsl_grib_code):
+      case prmsl_grib_code:
          p      = (double) pqtzuv[0];
          t      = (double) pqtzuv[2];
          z      = (double) pqtzuv[3];
@@ -2822,14 +2822,14 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
          break;
 
       // Humidity mixing ratio
-      case(mixr_grib_code):
+      case mixr_grib_code:
          q      = (double) pqtzuv[1];
          qty    = pqtzuv_qty[1];
          result = (float) convert_q_to_w(q);
          break;
 
       // Dewpoint temperature: derived from p and q
-      case(dpt_grib_code):
+      case dpt_grib_code:
          p      = (double) pqtzuv[0];
          q      = (double) pqtzuv[1];
          qty    = pqtzuv_qty[0];
@@ -2840,7 +2840,7 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
          break;
 
       // Relative humidity
-      case(rh_grib_code):
+      case rh_grib_code:
          p      = (double) pqtzuv[0];
          q      = (double) pqtzuv[1];
          t      = (double) pqtzuv[2];
@@ -2851,7 +2851,7 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
          break;
 
       // Wind direction (direction wind is coming from): derived from u and v
-      case(wdir_grib_code):
+      case wdir_grib_code:
          u      = (double) pqtzuv[4];
          v      = (double) pqtzuv[5];
          qty    = pqtzuv_qty[4];
@@ -2860,7 +2860,7 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
          break;
 
       // Wind speed: derived from u and v
-      case(wind_grib_code):
+      case wind_grib_code:
          u      = (double) pqtzuv[4];
          v      = (double) pqtzuv[5];
          qty    = pqtzuv_qty[4];

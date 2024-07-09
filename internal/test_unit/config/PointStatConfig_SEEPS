@@ -3,6 +3,7 @@
 // Point-Stat configuration file.
 //
 // For additional information, please see the MET User's Guide.
+// Copied from PointStatConfig_APCP
 //
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -127,9 +128,15 @@ output_flag = {
    rps    = NONE;
    eclv   = BOTH;
    mpr    = NONE;
-   seeps  = NONE;
-   seeps_mpr = NONE;
+   seeps  = BOTH;
+   seeps_mpr = BOTH;
 }
+
+////////////////////////////////////////////////////////////////////////////////
+// Threshold for SEEPS p1 (Probability of being dry)
+
+seeps_p1_thresh = ${SEEPS_P1_THRESH};
+seeps_point_climo_name = "${SEEPS_POINT_CLIMO_NAME}";
 
 ////////////////////////////////////////////////////////////////////////////////
 

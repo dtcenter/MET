@@ -77,8 +77,8 @@ class SingleAtt3DArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int SingleAtt3DArray::n_elements() const { return ( Nelements ); }
-inline int SingleAtt3DArray::n         () const { return ( Nelements ); }
+inline int SingleAtt3DArray::n_elements() const { return Nelements; }
+inline int SingleAtt3DArray::n         () const { return Nelements; }
 
 
 ////////////////////////////////////////////////////////////////////////

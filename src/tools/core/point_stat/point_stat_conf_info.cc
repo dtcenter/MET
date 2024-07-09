@@ -80,6 +80,9 @@ void PointStatConfInfo::clear() {
    ugrid_map_config.clear();
    ugrid_max_distance_km = bad_data_double;
 #endif
+   seeps_climo_name.clear();
+   seeps_p1_thresh.clear();
+
    // Deallocate memory
    if(vx_opt) { delete [] vx_opt; vx_opt = (PointStatVxOpt *) nullptr; }
 
@@ -195,6 +198,12 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
    // Check for consistent number of climatology fields
    check_climo_n_vx(&conf, n_vx);
+
+   // Conf: threshold for SEEPS p1
+   seeps_p1_thresh = conf.lookup_thresh(conf_key_seeps_p1_thresh);
+
+   // Conf: SEEPS climo filename
+   seeps_climo_name = conf.lookup_string(conf_key_seeps_point_climo_name, false);
 
    // Parse settings for each verification task
    for(i=0; i<n_vx; i++) {
@@ -764,8 +773,6 @@ void PointStatVxOpt::clear() {
 
    msg_typ.clear();
 
-   seeps_p1_thresh.clear();
-
    duplicate_flag = DuplicateType::None;
    obs_summary = ObsSummary::None;
    obs_perc = bad_data_int;
@@ -999,9 +1006,6 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
 
-   // Conf: threshold for SEEPS p1
-   seeps_p1_thresh = odict.lookup_thresh(conf_key_seeps_p1_thresh);
-
    // Conf: message_type
    msg_typ = parse_conf_message_type(&odict);
 
@@ -1161,8 +1165,8 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    vx_pd.set_obs_perc_value(obs_perc);
    if (output_flag[i_seeps_mpr] != STATOutputType::None
        || output_flag[i_seeps] != STATOutputType::None) {
-     vx_pd.load_seeps_climo();
-     vx_pd.set_seeps_thresh(seeps_p1_thresh);
+     vx_pd.load_seeps_climo(conf_info->seeps_climo_name);
+     vx_pd.set_seeps_thresh(conf_info->seeps_p1_thresh);
    }
    return;
 }
@@ -1234,14 +1238,14 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
    // Switch on the index of the line type
    switch(i_txt_row) {
 
-      case(i_fho):
-      case(i_ctc):
+      case i_fho:
+      case i_ctc:
          // Number of FHO or CTC lines =
          //    Message Types * Masks * Interpolations * Thresholds
          n = (prob_flag ? 0 : n_pd * get_n_cat_thresh());
          break;
 
-      case(i_cts):
+      case i_cts:
          // Number of CTS lines =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Alphas
@@ -1249,19 +1253,19 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_ci_alpha());
          break;
 
-      case(i_mctc):
+      case i_mctc:
          // Number of MCTC lines =
          //    Message Types * Masks * Interpolations
          n = (prob_flag ? 0 : n_pd);
          break;
 
-      case(i_mcts):
+      case i_mcts:
          // Number of MCTS lines =
          //    Message Types * Masks * Interpolations * Alphas
          n = (prob_flag ? 0 : n_pd * get_n_ci_alpha());
          break;
 
-      case(i_cnt):
+      case i_cnt:
          // Number of CNT lines =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Climo Bins * Alphas
@@ -1269,23 +1273,23 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_ci_alpha());
          break;
 
-      case(i_sl1l2):
-      case(i_sal1l2):
+      case i_sl1l2:
+      case i_sal1l2:
          // Number of SL1L2 and SAL1L2 lines =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Climo Bins
          n = (prob_flag ? 0 : n_pd * get_n_cnt_thresh() * n_bin);
          break;
 
-      case(i_vl1l2):
-      case(i_val1l2):
+      case i_vl1l2:
+      case i_val1l2:
          // Number of VL1L2 or VAL1L2 lines =
          //    Message Types * Masks * Interpolations * Thresholds
          n = (!vect_flag ? 0 : n_pd *
               get_n_wind_thresh());
          break;
 
-      case(i_vcnt):
+      case i_vcnt:
          // Number of VCNT lines =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Alphas
@@ -1293,9 +1297,9 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_wind_thresh() * get_n_ci_alpha());
          break;
 
-      case(i_pct):
-      case(i_pjc):
-      case(i_prc):
+      case i_pct:
+      case i_pjc:
+      case i_prc:
          // Number of PCT, PJC, or PRC lines possible =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Climo Bins
@@ -1310,7 +1314,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
-      case(i_pstd):
+      case i_pstd:
          // Number of PSTD lines =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Alphas * Climo Bins
@@ -1328,8 +1332,8 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
-      case(i_ecnt):
-      case(i_rps):
+      case i_ecnt:
+      case i_rps:
          // Number of HiRA ECNT and RPS lines =
          //    Message Types * Masks * HiRA widths *
          //    Alphas
@@ -1342,7 +1346,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
-      case(i_orank):
+      case i_orank:
          // Number of HiRA ORANK lines possible =
          //    Number of pairs * Categorical Thresholds *
          //    HiRA widths
@@ -1356,7 +1360,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
-      case(i_eclv):
+      case i_eclv:
          // Number of CTC -> ECLV lines =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Climo Bins
@@ -1371,7 +1375,7 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
-      case(i_mpr):
+      case i_mpr:
          // Compute the number of matched pairs to be written
          n = vx_pd.get_n_pair();
 
@@ -1386,13 +1390,13 @@ int PointStatVxOpt::n_txt_row(int i_txt_row) const {
 
          break;
 
-      case(i_seeps_mpr):
+      case i_seeps_mpr:
          // Compute the number of matched pairs to be written
          n = vx_pd.get_n_pair();
 
          break;
 
-      case(i_seeps):
+      case i_seeps:
          // Compute the number of matched pairs to be written
          n = vx_pd.get_n_pair();
 

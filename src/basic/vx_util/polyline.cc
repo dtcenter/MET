@@ -655,7 +655,7 @@ double polyline_dist(const Polyline & a, const Polyline & b) {
    //  done
    //
 
-   return ( min_dist );
+   return min_dist;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -679,9 +679,9 @@ double polyline_pw_ls_mean_dist(const Polyline &a, const Polyline &b) {
 
       for(j=0; j<b.n_points; j++) {
 
-	 d = min_dist_linesegment(b.u[j], b.v[j],
-	                          b.u[(j+1)%b.n_points], b.v[(j+1)%b.n_points],
-				  a.u[i], a.v[i]);
+     d = min_dist_linesegment(b.u[j], b.v[j],
+                              b.u[(j+1)%b.n_points], b.v[(j+1)%b.n_points],
+                              a.u[i], a.v[i]);
 
          if(d < min_d) min_d = d;
       }
@@ -824,7 +824,7 @@ double min_dist_linesegment(double px, double py, double qx, double qy,
       dx = x_test - qx;
       dy = y_test - qy;
 
-      return ( sqrt( dx*dx + dy*dy ) );
+      return sqrt( dx*dx + dy*dy );
    }
    else {
       cx = qmpx/qmp;
@@ -833,20 +833,20 @@ double min_dist_linesegment(double px, double py, double qx, double qy,
 
    t0 = rmpx*cx + rmpy*cy;
 
-   if ( t0 < 0.0 )  return ( rmp );
+   if ( t0 < 0.0 )  return rmp;
 
    if ( t0 > qmp )  {
 
       dx = x_test - qx;
       dy = y_test - qy;
 
-      return ( sqrt( dx*dx + dy*dy ) );
+      return sqrt( dx*dx + dy*dy );
    }
 
    vx = rmpx - t0*cx;
    vy = rmpy - t0*cy;
 
-   return ( sqrt( vx*vx + vy*vy ) );
+   return sqrt( vx*vx + vy*vy );
 
 }
 

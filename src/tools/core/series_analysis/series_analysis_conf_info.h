@@ -100,8 +100,8 @@ class SeriesAnalysisConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int SeriesAnalysisConfInfo::get_n_fcst() const { return(n_fcst); }
-inline int SeriesAnalysisConfInfo::get_n_obs()  const { return(n_obs);  }
+inline int SeriesAnalysisConfInfo::get_n_fcst() const { return n_fcst; }
+inline int SeriesAnalysisConfInfo::get_n_obs()  const { return n_obs;  }
 inline int SeriesAnalysisConfInfo::get_compression_level()  { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////

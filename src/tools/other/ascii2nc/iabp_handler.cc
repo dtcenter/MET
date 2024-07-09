@@ -82,7 +82,7 @@ bool IabpHandler::isFileType(LineDataFile &ascii_file) const {
    if (tokens[6] != "Lat") is_file_type = false;
    if (tokens[7] != "Lon") is_file_type = false;
 
-   return(is_file_type);
+   return is_file_type;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -92,7 +92,7 @@ bool IabpHandler::isFileType(LineDataFile &ascii_file) const {
 bool IabpHandler::_readObservations(LineDataFile &ascii_file)
 {
    // Read and save the header information
-   if(!_readHeaderInfo(ascii_file)) return(false);
+   if(!_readHeaderInfo(ascii_file)) return false;
 
    string header_type = "IABP_STANDARD";
 
@@ -107,7 +107,7 @@ bool IabpHandler::_readObservations(LineDataFile &ascii_file)
               << " != " << _numColumns << ") on line number "
               << dl.line_number() << " of IABP file \""
               << ascii_file.filename() << "\"!\n\n";
-         return(false);
+         return false;
       }
 
       // Extract the valid time from the data line, using POS_DOY (scientist is most
@@ -119,7 +119,7 @@ bool IabpHandler::_readObservations(LineDataFile &ascii_file)
               << "No valid time computed in file, line number "
               << dl.line_number() << " of IABP file \""
               << ascii_file.filename() << "\".  Ignore this line\n\n";
-         return(false);
+         return false;
       }
       
       double lat = stod(dl[_latPtr]);
@@ -139,7 +139,7 @@ bool IabpHandler::_readObservations(LineDataFile &ascii_file)
               << "Latitude/longitude has missing value " << IABP_MISSING_VALUE
               << ", line number " << dl.line_number() << " of IABP file \""
               << ascii_file.filename() << "\".  Ignore this line\n\n";
-         return(false);
+         return false;
       }
       
       if (_bpPtr >= 0) {
@@ -184,7 +184,7 @@ bool IabpHandler::_readObservations(LineDataFile &ascii_file)
       
    } // end while
 
-   return(true);
+   return true;
 }
 
 // ////////////////////////////////////////////////////////////////////////
@@ -207,7 +207,7 @@ bool IabpHandler::_readHeaderInfo(LineDataFile &ascii_file) {
            << dl.n_items() << " < " << MIN_NUM_HDR_COLS
            << ") in IABP file \"" << ascii_file.filename()
            << "\"!\n\n";
-      return(false);
+      return false;
    }
 
    // Map the header information to column numbers

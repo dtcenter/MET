@@ -48,7 +48,7 @@ const int y2 = p2.y - p0.y;
 
 const int k = x1*y2 - x2*y1;
 
-if ( k > 0 )  return ( 1 );
+if ( k > 0 )  return 1;
 
 return ( (k < 0) ? -1 : 0 );
 

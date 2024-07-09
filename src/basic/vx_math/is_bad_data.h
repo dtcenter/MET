@@ -28,23 +28,23 @@
 
 
 inline int is_bad_data(int a)  {
-   if(a == bad_data_int || std::isnan(a)) return(1);
-   else                              return(0);
+   if(a == bad_data_int || std::isnan(a)) return 1;
+   else                                   return 0;
 }
 
 inline int is_bad_data(long long a)  {
-   if(a == bad_data_ll || std::isnan(a)) return(1);
-   else                             return(0);
+   if(a == bad_data_ll || std::isnan(a)) return 1;
+   else                                  return 0;
 }
 
 inline int is_bad_data(double a) {
-   if(fabs(a - bad_data_double) < default_tol || std::isnan(a)) return(1);
-   else                                                    return(0);
+   if(fabs(a - bad_data_double) < default_tol || std::isnan(a)) return 1;
+   else                                                         return 0;
 }
 
 inline int is_bad_data(float a) {
-   if(fabs(a - bad_data_float) < default_tol || std::isnan(a)) return(1);
-   else                                                   return(0);
+   if(fabs(a - bad_data_float) < default_tol || std::isnan(a)) return 1;
+   else                                                        return 0;
 }
 
 inline int is_bad_data(char a) {
@@ -52,12 +52,12 @@ inline int is_bad_data(char a) {
 }
 
 inline int is_eq(double a, double b, double tol) {
-   if(fabs(a - b) < tol) return(1);
-   else                  return(0);
+   if(fabs(a - b) < tol) return 1;
+   else                  return 0;
 }
 
 inline int is_eq(double a, double b) {
-   return(is_eq(a, b, default_tol));
+   return is_eq(a, b, default_tol);
 }
 
 

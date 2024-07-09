@@ -120,7 +120,7 @@ class CLOptionInfoArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int CLOptionInfoArray::n_elements() const { return ( Nelements ); }
+inline int CLOptionInfoArray::n_elements() const { return Nelements; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -219,9 +219,9 @@ class CommandLine {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int CommandLine::n() const { return ( args.n_elements() ); }
+inline int CommandLine::n() const { return args.n_elements(); }
 
-inline int CommandLine::max_length() const { return ( args.max_length() ); }
+inline int CommandLine::max_length() const { return args.max_length(); }
 
 inline void CommandLine::set_usage(UsageFunction f) { Usage = f;  return; }
 

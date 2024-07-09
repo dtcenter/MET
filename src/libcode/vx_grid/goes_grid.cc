@@ -121,22 +121,21 @@ void GoesImagerGrid::latlon_to_xy(double lat, double lon, double & x_idx, double
   float sy = -rc*cos_clat*sin(del_lon_angle);
   float sz = rc*sin(c_lat);
       
-  // // check that point is on disk of the earth
+  // check that point is on disk of the earth
   if((Data.H*(Data.H - sx)) < (sy*sy + Data.radius_ratio2*sz*sz)) {
     x_idx = -1;
     y_idx = -1;
     return;
   }
 
-  float rl = sqrt((sx*sx + sy*sy + sz*sz));
-  float xx = asin((-sy/rl));
-  float yy = atan((sz/sx));
+  float rl = sqrt(sx*sx + sy*sy + sz*sz);
+  float xx = asin(-sy/rl);
+  float yy = atan(sz/sx);
 
   
   x_idx = round((xx - Data.x_image_bounds[0])/Data.dx_rad);
   y_idx = round((Data.y_image_bounds[0] - yy)/Data.dy_rad);
 
-  //  cerr << "lat: " << lat << "  lon: " << lon << "  ximage: " << xx << "  yimage: " << yy << endl;
   return;
 
 }

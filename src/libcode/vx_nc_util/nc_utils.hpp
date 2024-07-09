@@ -221,7 +221,7 @@ bool get_var_fill_value(const netCDF::NcVar *var, T &att_val) {
 
    if (att) delete att;
 
-   return(found);
+   return found;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -294,7 +294,7 @@ bool get_nc_data_t(netCDF::NcVar *var, T *data) {
    if (return_status) {
       var->getVar(data);
    }
-   return(return_status);
+   return return_status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -324,7 +324,7 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, const T met_missing) {
                              "<T>", GET_NC_NAME_P(var).c_str());
       }
    }
-   return(return_status);
+   return return_status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -393,7 +393,7 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const LongArray &dims
                              "<T>", GET_NC_NAME_P(var).c_str());
       }
    }
-   return(return_status);
+   return return_status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -449,7 +449,7 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, T met_missing, const long dim, co
                              "<T>", GET_NC_NAME_P(var).c_str());
       }
    }
-   return(return_status);
+   return return_status;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -472,7 +472,7 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const LongArray &curs
       // Retrieve the NetCDF value from the NetCDF variable.
       return_status = get_nc_data_(var, data, bad_data, dims, curs);
    }
-   return(return_status);
+   return return_status;
 }
 
 ////////////////////////////////////////////////////////////////////////

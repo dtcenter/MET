@@ -89,8 +89,8 @@ class LatLonGrid : public GridRep {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double LatLonGrid::scale_km() const { return ( -1.0 );    }
-inline bool   LatLonGrid::wrap_lon() const { return ( wrapLon ); }
+inline double LatLonGrid::scale_km() const { return -1.0;    }
+inline bool   LatLonGrid::wrap_lon() const { return wrapLon; }
 
 
 ////////////////////////////////////////////////////////////////////////

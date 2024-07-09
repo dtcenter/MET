@@ -103,12 +103,12 @@ inline void QuadInfo::set_se_val(double v) { SEVal = v;     }
 inline void QuadInfo::set_sw_val(double v) { SWVal = v;     }
 inline void QuadInfo::set_nw_val(double v) { NWVal = v;     }
 
-inline int    QuadInfo::intensity() const { return(Intensity); }
-inline double QuadInfo::al_val()    const { return(ALVal);     }
-inline double QuadInfo::ne_val()    const { return(NEVal);     }
-inline double QuadInfo::se_val()    const { return(SEVal);     }
-inline double QuadInfo::sw_val()    const { return(SWVal);     }
-inline double QuadInfo::nw_val()    const { return(NWVal);     }
+inline int    QuadInfo::intensity() const { return Intensity; }
+inline double QuadInfo::al_val()    const { return ALVal;     }
+inline double QuadInfo::ne_val()    const { return NEVal;     }
+inline double QuadInfo::se_val()    const { return SEVal;     }
+inline double QuadInfo::sw_val()    const { return SWVal;     }
+inline double QuadInfo::nw_val()    const { return NWVal;     }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -296,31 +296,31 @@ inline void TrackPoint::set_track_stdev(const double v)  { TrackStdev  = v; }
 inline void TrackPoint::set_v_max_stdev(const double v)  { VmaxStdev   = v; }
 inline void TrackPoint::set_mslp_stdev(const double v)   { MSLPStdev   = v; }
 
-inline unixtime      TrackPoint::valid()      const { return(ValidTime);   }
-inline int           TrackPoint::valid_hour() const { return(unix_to_sec_of_day(ValidTime)); }
-inline int           TrackPoint::lead()       const { return(LeadTime);    }
-inline double        TrackPoint::lat()        const { return(Lat);         }
-inline double        TrackPoint::lon()        const { return(Lon);         }
-inline double        TrackPoint::v_max()      const { return(Vmax);        }
-inline double        TrackPoint::mslp()       const { return(MSLP);        }
-inline CycloneLevel  TrackPoint::level()      const { return(Level);       }
-inline double        TrackPoint::radp()       const { return(RadP);        }
-inline double        TrackPoint::rrp()        const { return(RRP);         }
-inline double        TrackPoint::mrd()        const { return(MRD);         }
-inline double        TrackPoint::gusts()      const { return(Gusts);       }
-inline double        TrackPoint::eye()        const { return(Eye);         }
-inline double        TrackPoint::direction()  const { return(Direction);   }
-inline double        TrackPoint::speed()      const { return(Speed);       }
-inline SystemsDepth  TrackPoint::depth()      const { return(Depth);       }
-inline bool          TrackPoint::warm_core()  const { return(WarmCore);    }
-inline WatchWarnType TrackPoint::watch_warn() const { return(WatchWarn);   }
+inline unixtime      TrackPoint::valid()      const { return ValidTime;   }
+inline int           TrackPoint::valid_hour() const { return unix_to_sec_of_day(ValidTime); }
+inline int           TrackPoint::lead()       const { return LeadTime;    }
+inline double        TrackPoint::lat()        const { return Lat;         }
+inline double        TrackPoint::lon()        const { return Lon;         }
+inline double        TrackPoint::v_max()      const { return Vmax;        }
+inline double        TrackPoint::mslp()       const { return MSLP;        }
+inline CycloneLevel  TrackPoint::level()      const { return Level;       }
+inline double        TrackPoint::radp()       const { return RadP;        }
+inline double        TrackPoint::rrp()        const { return RRP;         }
+inline double        TrackPoint::mrd()        const { return MRD;         }
+inline double        TrackPoint::gusts()      const { return Gusts;       }
+inline double        TrackPoint::eye()        const { return Eye;         }
+inline double        TrackPoint::direction()  const { return Direction;   }
+inline double        TrackPoint::speed()      const { return Speed;       }
+inline SystemsDepth  TrackPoint::depth()      const { return Depth;       }
+inline bool          TrackPoint::warm_core()  const { return WarmCore;    }
+inline WatchWarnType TrackPoint::watch_warn() const { return WatchWarn;   }
 
-inline int           TrackPoint::num_members()  const { return(NumMembers);  }
-inline double        TrackPoint::track_spread() const { return(TrackSpread); }
-inline double        TrackPoint::track_stdev()  const { return(TrackStdev);  }
-inline double        TrackPoint::v_max_stdev()  const { return(VmaxStdev);   }
-inline double        TrackPoint::mslp_stdev()   const { return(MSLPStdev);   }
-inline int           TrackPoint::n_diag()       const { return(DiagVal.n()); }
+inline int           TrackPoint::num_members()  const { return NumMembers;  }
+inline double        TrackPoint::track_spread() const { return TrackSpread; }
+inline double        TrackPoint::track_stdev()  const { return TrackStdev;  }
+inline double        TrackPoint::v_max_stdev()  const { return VmaxStdev;   }
+inline double        TrackPoint::mslp_stdev()   const { return MSLPStdev;   }
+inline int           TrackPoint::n_diag()       const { return DiagVal.n(); }
 
 ////////////////////////////////////////////////////////////////////////
 
