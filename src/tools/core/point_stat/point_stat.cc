@@ -100,10 +100,11 @@
 //                    Added code for obs_qty_exc.
 //   049    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
 //   050    02/11/22  Halley Gotway  MET #2045 Fix HiRA output.
-//   051    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   051    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main.
 //   052    09/29/22  Halley Gotway  MET #2286 Refine GRIB1 table lookup logic.
 //   053    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files.
 //   054    04/29/24  Halley Gotway  MET #2795 Move level mismatch warning.
+//   055    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -672,8 +673,10 @@ void process_fcst_climo_files() {
 
       // Store data for the current verification task
       conf_info.vx_opt[i].vx_pd.set_fcst_dpa(fcst_dpa);
-      conf_info.vx_opt[i].vx_pd.set_climo_mn_dpa(cmn_dpa);
-      conf_info.vx_opt[i].vx_pd.set_climo_sd_dpa(csd_dpa);
+      conf_info.vx_opt[i].vx_pd.set_fcst_climo_mn_dpa(cmn_dpa);
+      conf_info.vx_opt[i].vx_pd.set_fcst_climo_sd_dpa(csd_dpa);
+      conf_info.vx_opt[i].vx_pd.set_obs_climo_mn_dpa(cmn_dpa);
+      conf_info.vx_opt[i].vx_pd.set_obs_climo_sd_dpa(csd_dpa);
 
       // Get the valid time for the first field
       file_ut = fcst_dpa[0].valid();
@@ -1868,8 +1871,10 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          // Check for values
          if(f_ens.n() == 0) continue;
 
+         // TODO: Add has_climo member function instead
+
          // Skip points where climatology has been specified but is bad data
-         if(conf_info.vx_opt[i_vx].vx_pd.climo_mn_dpa.n_planes() > 0 &&
+         if(conf_info.vx_opt[i_vx].vx_pd.fcmn_dpa.n_planes() > 0 &&
             is_bad_data(pd_ptr->cmn_na[j])) continue;
 
          // Store the observation value
@@ -2046,14 +2051,18 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
             // Check for bad data
             if(is_bad_data(f_cov)) continue;
 
+            // TODO: Add has_climo member function
+
             // Compute the fractional coverage for the climatological mean
-            if(conf_info.vx_opt[i_vx].vx_pd.climo_mn_dpa.n_planes() > 0) {
+            if(conf_info.vx_opt[i_vx].vx_pd.fcmn_dpa.n_planes() > 0) {
+
+               // TODO: Handle both fcst and obs climo data
 
                // Interpolate to the observation level
-               find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.climo_mn_dpa,
+               find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.fcmn_dpa,
                              pd_ptr->lvl_na[k], lvl_blw, lvl_abv);
 
-               cmn_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.climo_mn_dpa,
+               cmn_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.fcmn_dpa,
                             pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
                             pd_ptr->cmn_na[k], pd_ptr->csd_na[k],
                             InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],

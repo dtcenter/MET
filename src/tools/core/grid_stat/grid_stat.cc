@@ -109,9 +109,10 @@
 //                    filtering options.
 //   052    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
 //   053    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
-//   054    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
-//   055    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files
-//   056    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings
+//   054    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main.
+//   055    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files.
+//   056    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings.
+//   057    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
 //
 ////////////////////////////////////////////////////////////////////////
 

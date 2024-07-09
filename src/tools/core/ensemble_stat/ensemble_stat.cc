@@ -75,6 +75,7 @@
 //   042    04/29/24  Halley Gotway  MET #2870 Ignore MISSING keyword.
 //   043    04/29/24  Halley Gotway  MET #2795 Move level mismatch warning.
 //   044    06/17/24  Halley Gotway  MET #2856 Reinitialize climo_cdf pointer
+//   045    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
 //
 ////////////////////////////////////////////////////////////////////////
 

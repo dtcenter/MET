@@ -31,6 +31,8 @@ using namespace std;
 
 static const int REJECT_DEBUG_LEVEL = 9;
 
+static void copy_var_info(const VarInfo *info, VarInfo *&copy);
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Code for class PairDataPoint
@@ -420,8 +422,10 @@ VxPairDataPoint & VxPairDataPoint::operator=(const VxPairDataPoint &vx_pd) {
 void VxPairDataPoint::init_from_scratch() {
 
    fcst_info    = (VarInfo *) nullptr;
-   climo_info   = (VarInfo *) nullptr;
    obs_info     = (VarInfoGrib *) nullptr;
+
+   fclm_info    = (VarInfo *) nullptr;
+   oclm_info    = (VarInfo *) nullptr;
 
    pd           = (PairDataPoint ***) nullptr;
    rej_typ      = (int ***) nullptr;
@@ -447,16 +451,20 @@ void VxPairDataPoint::clear() {
    int i, j, k;
 
    if(fcst_info)  { delete fcst_info;  fcst_info  = (VarInfo *)     nullptr; }
-   if(climo_info) { delete climo_info; climo_info = (VarInfo *)     nullptr; }
    if(obs_info)   { delete obs_info;   obs_info   = (VarInfoGrib *) nullptr; }
+
+   if(fclm_info)  { delete fclm_info;  fclm_info  = (VarInfo *)     nullptr; }
+   if(oclm_info)  { delete oclm_info;  oclm_info  = (VarInfo *)     nullptr; }
 
    desc.clear();
 
    interp_thresh = 0;
 
    fcst_dpa.clear();
-   climo_mn_dpa.clear();
-   climo_sd_dpa.clear();
+   fcmn_dpa.clear();
+   fcsd_dpa.clear();
+   ocmn_dpa.clear();
+   ocsd_dpa.clear();
    sid_inc_filt.clear();
    sid_exc_filt.clear();
    obs_qty_inc_filt.clear();
@@ -514,8 +522,10 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
    clear();
 
    set_fcst_info(vx_pd.fcst_info);
-   set_climo_info(vx_pd.climo_info);
    set_obs_info(vx_pd.obs_info);
+
+   set_fcst_climo_info(vx_pd.fclm_info);
+   set_obs_climo_info(vx_pd.oclm_info);
 
    desc = vx_pd.desc;
 
@@ -542,9 +552,11 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
 
    interp_thresh = vx_pd.interp_thresh;
 
-   fcst_dpa     = vx_pd.fcst_dpa;
-   climo_mn_dpa = vx_pd.climo_mn_dpa;
-   climo_sd_dpa = vx_pd.climo_sd_dpa;
+   fcst_dpa = vx_pd.fcst_dpa;
+   fcmn_dpa = vx_pd.fcmn_dpa;
+   fcsd_dpa = vx_pd.fcsd_dpa;
+   ocmn_dpa = vx_pd.ocmn_dpa;
+   ocsd_dpa = vx_pd.ocsd_dpa;
 
    set_pd_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
 
@@ -576,32 +588,12 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataPoint::set_fcst_info(VarInfo *info) {
-   VarInfoFactory f;
 
-   // Deallocate, if necessary
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) nullptr; }
-
-   // Perform a deep copy
-   fcst_info = f.new_var_info(info->file_type());
-   *fcst_info = *info;
+   copy_var_info(info, fcst_info);
 
    return;
 }
 
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_climo_info(VarInfo *info) {
-   VarInfoFactory f;
-
-   // Deallocate, if necessary
-   if(climo_info) { delete climo_info; climo_info = (VarInfo *) nullptr; }
-
-   // Perform a deep copy
-   climo_info = f.new_var_info(info->file_type());
-   *climo_info = *info;
-
-   return;
-}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -613,6 +605,24 @@ void VxPairDataPoint::set_obs_info(VarInfoGrib *info) {
    // Perform a deep copy
    obs_info = new VarInfoGrib;
    *obs_info = *info;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_fcst_climo_info(VarInfo *info) {
+
+   copy_var_info(info, fclm_info);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_obs_climo_info(VarInfo *info) {
+
+   copy_var_info(info, oclm_info);
 
    return;
 }
@@ -646,18 +656,36 @@ void VxPairDataPoint::set_fcst_dpa(const DataPlaneArray &dpa) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_climo_mn_dpa(const DataPlaneArray &dpa) {
+void VxPairDataPoint::set_fcst_climo_mn_dpa(const DataPlaneArray &dpa) {
 
-   climo_mn_dpa = dpa;
+   fcmn_dpa = dpa;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_climo_sd_dpa(const DataPlaneArray &dpa) {
+void VxPairDataPoint::set_fcst_climo_sd_dpa(const DataPlaneArray &dpa) {
 
-   climo_sd_dpa = dpa;
+   fcsd_dpa = dpa;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_obs_climo_mn_dpa(const DataPlaneArray &dpa) {
+
+   ocmn_dpa = dpa;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataPoint::set_obs_climo_sd_dpa(const DataPlaneArray &dpa) {
+
+   ocsd_dpa = dpa;
 
    return;
 }
@@ -981,8 +1009,9 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                                     const DataPlane *wgt_dp) {
    int i, j, k, x, y;
    double hdr_lat, hdr_lon, hdr_elv;
-   double obs_x, obs_y, obs_lvl, obs_hgt, to_lvl;
-   double fcst_v, cmn_v, csd_v, obs_v, wgt_v;
+   double obs_x, obs_y, obs_lvl, obs_hgt, to_lvl, wgt_v;
+   double fcst_v, fcmn_v, fcsd_v;
+   double obs_v, ocmn_v, ocsd_v;
    int f_lvl_blw, f_lvl_abv;
    int cmn_lvl_blw, cmn_lvl_abv;
    int csd_lvl_blw, csd_lvl_abv;
@@ -1271,8 +1300,10 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       find_vert_lvl(fcst_dpa, to_lvl, f_lvl_blw, f_lvl_abv);
    }
 
+   // TODO: Support fcst and obs climos
+
    // For a single climatology mean field
-   if(climo_mn_dpa.n_planes() == 1) {
+   if(fcmn_dpa.n_planes() == 1) {
       cmn_lvl_blw = 0;
       cmn_lvl_abv = 0;
    }
@@ -1282,11 +1313,11 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       // Interpolate using the observation pressure level or height
       to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                 obs_lvl : obs_hgt);
-      find_vert_lvl(climo_mn_dpa, to_lvl, cmn_lvl_blw, cmn_lvl_abv);
+      find_vert_lvl(fcmn_dpa, to_lvl, cmn_lvl_blw, cmn_lvl_abv);
    }
 
    // For a single climatology standard deviation field
-   if(climo_sd_dpa.n_planes() == 1) {
+   if(fcsd_dpa.n_planes() == 1) {
       csd_lvl_blw = 0;
       csd_lvl_abv = 0;
    }
@@ -1296,7 +1327,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       // Interpolate using the observation pressure level or height
       to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                 obs_lvl : obs_hgt);
-      find_vert_lvl(climo_sd_dpa, to_lvl, csd_lvl_blw, csd_lvl_abv);
+      find_vert_lvl(fcsd_dpa, to_lvl, csd_lvl_blw, csd_lvl_abv);
    }
 
    // When verifying a vertical level forecast against a surface message
@@ -1407,23 +1438,49 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                       obs_lvl : obs_hgt);
 
-            // Compute the interpolated climatology mean
-            cmn_v = compute_interp(climo_mn_dpa, obs_x, obs_y, obs_v,
-                       bad_data_double, bad_data_double,
-                       pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                       pd[0][0][k].interp_shape, gr.wrap_lon(),
-                       interp_thresh, spfh_flag,
-                       fcst_info->level().type(),
-                       to_lvl, cmn_lvl_blw, cmn_lvl_abv);
+            // Compute the interpolated forecast climatology mean
+            fcmn_v = compute_interp(fcmn_dpa, obs_x, obs_y, obs_v,
+                        bad_data_double, bad_data_double,
+                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
+                        pd[0][0][k].interp_shape, gr.wrap_lon(),
+                        interp_thresh, spfh_flag,
+                        fcst_info->level().type(),
+                        to_lvl, cmn_lvl_blw, cmn_lvl_abv);
 
             // Check for bad data
-            if(climo_mn_dpa.n_planes() > 0 && is_bad_data(cmn_v)) {
+            if(fcmn_dpa.n_planes() > 0 && is_bad_data(fcmn_v)) {
 
                if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                   mlog << Debug(REJECT_DEBUG_LEVEL)
                        << "For " << fcst_info->magic_str() << " versus "
                        << obs_info->magic_str()
-                       << ", skipping observation based on bad climatological mean value:\n"
+                       << ", skipping observation based on bad forecast climatological mean value:\n"
+                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                              hdr_ut, obs_qty, obs_arr, var_name)
+                       << "\n";
+               }
+
+               inc_count(rej_cmn, i, j, k);
+               continue;
+            }
+
+            // Compute the interpolated observation climatology mean
+            ocmn_v = compute_interp(ocmn_dpa, obs_x, obs_y, obs_v,
+                        bad_data_double, bad_data_double,
+                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
+                        pd[0][0][k].interp_shape, gr.wrap_lon(),
+                        interp_thresh, spfh_flag,
+                        fcst_info->level().type(),
+                        to_lvl, cmn_lvl_blw, cmn_lvl_abv);
+
+            // Check for bad data
+            if(ocmn_dpa.n_planes() > 0 && is_bad_data(ocmn_v)) {
+
+               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+                  mlog << Debug(REJECT_DEBUG_LEVEL)
+                       << "For " << fcst_info->magic_str() << " versus "
+                       << obs_info->magic_str()
+                       << ", skipping observation based on bad observation climatological mean value:\n"
                        << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
                                               hdr_ut, obs_qty, obs_arr, var_name)
                        << "\n";
@@ -1434,7 +1491,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             }
 
             // Check for valid interpolation options
-            if(climo_sd_dpa.n_planes() > 0 &&
+            if(fcsd_dpa.n_planes() > 0 &&
                (pd[0][0][k].interp_mthd == InterpMthd::Min    ||
                 pd[0][0][k].interp_mthd == InterpMthd::Max    ||
                 pd[0][0][k].interp_mthd == InterpMthd::Median ||
@@ -1446,23 +1503,49 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                     << "may cause unexpected results.\n\n";
             }
 
-            // Compute the interpolated climatology standard deviation
-            csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, obs_v,
-                       bad_data_double, bad_data_double,
-                       pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                       pd[0][0][k].interp_shape, gr.wrap_lon(),
-                       interp_thresh, spfh_flag,
-                       fcst_info->level().type(),
-                       to_lvl, csd_lvl_blw, csd_lvl_abv);
+            // Compute the interpolated forecast climatology standard deviation
+            fcsd_v = compute_interp(fcsd_dpa, obs_x, obs_y, obs_v,
+                        bad_data_double, bad_data_double,
+                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
+                        pd[0][0][k].interp_shape, gr.wrap_lon(),
+                        interp_thresh, spfh_flag,
+                        fcst_info->level().type(),
+                        to_lvl, csd_lvl_blw, csd_lvl_abv);
 
             // Check for bad data
-            if(climo_sd_dpa.n_planes() > 0 && is_bad_data(csd_v)) {
+            if(fcsd_dpa.n_planes() > 0 && is_bad_data(fcsd_v)) {
 
                if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                   mlog << Debug(REJECT_DEBUG_LEVEL)
                        << "For " << fcst_info->magic_str() << " versus "
                        << obs_info->magic_str()
-                       << ", skipping observation based on bad climatological standard deviation value:\n"
+                       << ", skipping observation based on bad forecast climatological standard deviation value:\n"
+                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                              hdr_ut, obs_qty, obs_arr, var_name)
+                       << "\n";
+               }
+
+               inc_count(rej_csd, i, j, k);
+               continue;
+            }
+
+            // Compute the interpolated observation climatology standard deviation
+            ocsd_v = compute_interp(ocsd_dpa, obs_x, obs_y, obs_v,
+                        bad_data_double, bad_data_double,
+                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
+                        pd[0][0][k].interp_shape, gr.wrap_lon(),
+                        interp_thresh, spfh_flag,
+                        fcst_info->level().type(),
+                        to_lvl, csd_lvl_blw, csd_lvl_abv);
+
+            // Check for bad data
+            if(ocsd_dpa.n_planes() > 0 && is_bad_data(ocsd_v)) {
+
+               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+                  mlog << Debug(REJECT_DEBUG_LEVEL)
+                       << "For " << fcst_info->magic_str() << " versus "
+                       << obs_info->magic_str()
+                       << ", skipping observation based on bad observation climatological standard deviation value:\n"
                        << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
                                               hdr_ut, obs_qty, obs_arr, var_name)
                        << "\n";
@@ -1495,7 +1578,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             }
             // Otherwise, compute interpolated value
             else {
-               fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v, cmn_v, csd_v,
+               fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v, fcmn_v, fcsd_v,
                            pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
                            pd[0][0][k].interp_shape, gr.wrap_lon(),
                            interp_thresh, spfh_flag,
@@ -1523,7 +1606,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             }
 
             // Check matched pair filtering options
-            if(!check_mpr_thresh(fcst_v, obs_v, cmn_v, csd_v,
+            if(!check_mpr_thresh(fcst_v, obs_v, ocmn_v, ocsd_v,
                                  mpr_column, mpr_thresh, &reason_cs)) {
 
                if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
@@ -1545,12 +1628,14 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             wgt_v = (wgt_dp == (DataPlane *) 0 ?
                      default_grid_weight : wgt_dp->get(x, y));
 
+            // TODO: Pass fcst climo to add_point_pair
+
             // Add the forecast, climatological, and observation data
             // Weight is from the nearest grid point
             if(!pd[i][j][k].add_point_pair(hdr_sid_str,
                   hdr_lat, hdr_lon, obs_x, obs_y, hdr_ut, obs_lvl,
-                  obs_hgt, fcst_v, obs_v, obs_qty, cmn_v, csd_v,
-                  wgt_v)) {
+                  obs_hgt, fcst_v, obs_v, obs_qty,
+                  ocmn_v, ocsd_v, wgt_v)) {
 
                if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                   mlog << Debug(REJECT_DEBUG_LEVEL)
@@ -2153,6 +2238,21 @@ ConcatString point_obs_to_string(float *hdr_arr, const char *hdr_typ_str,
           << obs_qty    << " " << obs_arr[4];
 
    return obs_cs;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void copy_var_info(const VarInfo *info, VarInfo *&copy) {
+   VarInfoFactory f;
+
+   // Deallocate, if necessary
+   if(copy) { delete copy; copy = (VarInfo *) nullptr; }
+
+   // Perform a deep copy
+   copy = f.new_var_info(info->file_type());
+   *copy = *info;
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

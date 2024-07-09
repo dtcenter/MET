@@ -108,8 +108,10 @@ class VxPairDataPoint {
       //////////////////////////////////////////////////////////////////
 
       VarInfo     *fcst_info;    // Forecast field, allocated by VarInfoFactory
-      VarInfo     *climo_info;   // Climatology field, allocated by VarInfoFactory
       VarInfoGrib *obs_info;     // Observation field, allocated by VarInfoFactory
+
+      VarInfo     *fclm_info;    // Forecast climatology field, allocated by VarInfoFactory
+      VarInfo     *oclm_info;    // Observation climatology field, allocated by VarInfoFactory
 
       ConcatString desc;         // User description from config file
 
@@ -120,13 +122,15 @@ class VxPairDataPoint {
       //////////////////////////////////////////////////////////////////
       //
       // Forecast and climatology fields falling between the requested
-      // levels.  Store the fields in a data plane array.
+      // levels. Store the fields in a data plane array.
       //
       //////////////////////////////////////////////////////////////////
 
-      DataPlaneArray fcst_dpa;     // Forecast data plane array
-      DataPlaneArray climo_mn_dpa; // Climatology mean data plane array
-      DataPlaneArray climo_sd_dpa; // Climatology standard deviation data plane array
+      DataPlaneArray fcst_dpa;   // Forecast data plane array
+      DataPlaneArray fcmn_dpa;   // Forecast climatology mean data plane array
+      DataPlaneArray fcsd_dpa;   // Forecast climatology standard deviation data plane array
+      DataPlaneArray ocmn_dpa;   // Observation climatology mean data plane array
+      DataPlaneArray ocsd_dpa;   // Observation climatology standard deviation data plane array
 
       //////////////////////////////////////////////////////////////////
 
@@ -183,8 +187,8 @@ class VxPairDataPoint {
       int ***rej_typ;            // Reject based on message type
       int ***rej_mask;           // Reject based on masking region
       int ***rej_fcst;           // Reject forecast bad data
-      int ***rej_cmn;            // Reject climo mean bad data
-      int ***rej_csd;            // Reject climo stdev bad data
+      int ***rej_cmn;            // Reject fcst or obs climo mean bad data
+      int ***rej_csd;            // Reject fcst or obs climo stdev bad data
       int ***rej_mpr;            // Reject based on MPR filtering logic
       int ***rej_dup;            // Reject based on duplicates logic
 
@@ -193,16 +197,20 @@ class VxPairDataPoint {
       void clear();
 
       void set_fcst_info(VarInfo *);
-      void set_climo_info(VarInfo *);
       void set_obs_info(VarInfoGrib *);
+
+      void set_fcst_climo_info(VarInfo *);
+      void set_obs_climo_info(VarInfo *);
 
       void set_desc(const char *);
 
       void set_interp_thresh(double);
 
       void set_fcst_dpa(const DataPlaneArray &);
-      void set_climo_mn_dpa(const DataPlaneArray &);
-      void set_climo_sd_dpa(const DataPlaneArray &);
+      void set_fcst_climo_mn_dpa(const DataPlaneArray &);
+      void set_fcst_climo_sd_dpa(const DataPlaneArray &);
+      void set_obs_climo_mn_dpa(const DataPlaneArray &);
+      void set_obs_climo_sd_dpa(const DataPlaneArray &);
 
       void set_fcst_ut(const unixtime);
       void set_beg_ut(const unixtime);
