@@ -41,6 +41,7 @@
 #include "vx_regrid.h"
 #include "vx_util.h"
 #include "vx_statistics.h"
+#include "var_info_nc_cf.h"
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
@@ -170,6 +171,7 @@ static void set_gaussian_dx(const StringArray &);
 static void set_gaussian_radius(const StringArray &);
 
 static unixtime compute_unixtime(NcVar *time_var, unixtime var_value);
+void clear_cell_mapping(IntArray *cell_mapping);
 static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping,
                              NcVar var_lat, NcVar var_lon, bool *skip_times);
 static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
@@ -390,7 +392,7 @@ static void process_data_file() {
    if (compress_level < 0) compress_level = config.nc_compression();
 
    // Get the gridded file type from config string, if present
-   ftype = parse_conf_file_type(&config);
+   ftype = parse_conf_file_type(&conf_info.conf);
 
    // Open the input file
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
@@ -422,7 +424,6 @@ static void process_data_file() {
       // Get the obs type before opening NetCDF
       obs_type = get_obs_type(nc_in);
       goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
-
       if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
 
       // Read the input data file
@@ -943,8 +944,9 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       }
 
       if (cellMapping) {
-         for (idx=0; idx<(nx*ny); idx++) cellMapping[idx].clear();
+         clear_cell_mapping(cellMapping);
          delete [] cellMapping;
+         cellMapping = (IntArray *) nullptr;
       }
       cellMapping = new IntArray[nx * ny];
       if( get_grid_mapping(to_grid, cellMapping, var_index_array,
@@ -1139,6 +1141,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
    } // end for i
 
    if (cellMapping) {
+      clear_cell_mapping(cellMapping);
       delete [] cellMapping;   cellMapping = (IntArray *) nullptr;
    }
 
@@ -1237,8 +1240,58 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    int from_size = fr_grid.nx() * fr_grid.ny();
    static const char *method_name = "process_point_nccf_file() -> ";
 
-   NcVar var_lat = get_nc_var_lat(nc_in);
-   NcVar var_lon = get_nc_var_lon(nc_in);
+   NcVar var_lat;
+   NcVar var_lon;
+   bool user_defined_latlon = false;
+   ConcatString lat_vname = conf_info.get_var_name(conf_key_lat_vname);
+   ConcatString lon_vname = conf_info.get_var_name(conf_key_lon_vname);
+
+   if (lat_vname != conf_key_lat_vname && lon_vname != conf_key_lon_vname) {
+      if (lat_vname != conf_key_lat_vname && has_var(nc_in, lat_vname.c_str())) {
+         var_lat = get_nc_var(nc_in, lat_vname.c_str());
+      }
+      if (lon_vname != conf_key_lon_vname && has_var(nc_in, lon_vname.c_str())) {
+         var_lon = get_nc_var(nc_in, lon_vname.c_str());
+      }
+      if (IS_INVALID_NC(var_lat)) {
+         mlog << Error << "\n" << method_name
+              << "can not find the latitude variable (" << lat_vname
+              << ") from the config file (" << config_filename << ").\n\n";
+         exit(1);
+      }
+      else if (IS_INVALID_NC(var_lon)) {
+         mlog << Error << "\n" << method_name
+              << "can not find the longitude variable (" << lon_vname
+              << ") from the config file (" << config_filename << ").\n\n";
+         exit(1);
+      }
+      else user_defined_latlon = true;
+   }
+   // Find lat/lon variables from the coordinates attribue
+   if (0 < FieldSA.n() && !user_defined_latlon) {
+      ConcatString coordinates_value;
+      VarInfoNcCF var_info = VarInfoNcCF(*(VarInfoNcCF *)vinfo);
+      // Initialize
+      var_info.clear();
+      // Populate the VarInfo object using the config string
+      config.read_string(FieldSA[0].c_str());
+      var_info.set_dict(config);
+      NcVar var_data = get_nc_var(nc_in, var_info.name().c_str());
+      if (get_nc_att_value(&var_data, coordinates_att_name, coordinates_value)) {
+         StringArray sa = coordinates_value.split(" ");
+         ConcatString units;
+         for (int idx=0; idx<sa.n_elements(); idx++) {
+            NcVar nc_var = get_nc_var(nc_in, sa[idx].c_str());
+            if (get_var_units(&nc_var, units)) {
+               if (IS_INVALID_NC(var_lat) && is_nc_unit_latitude(units.c_str())) var_lat = nc_var;
+               else if (IS_INVALID_NC(var_lon) && is_nc_unit_longitude(units.c_str())) var_lon = nc_var;
+            }
+         }
+      }
+   }
+   if (IS_INVALID_NC(var_lat)) var_lat = get_nc_var_lat(nc_in);
+   if (IS_INVALID_NC(var_lon)) var_lon = get_nc_var_lon(nc_in);
+
    if (IS_INVALID_NC(var_lat)) {
       mlog << Error << "\n" << method_name
            << "can not find the latitude variable.\n\n";
@@ -1256,6 +1309,11 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
            << "The -field option must be used at least once!\n\n";
       usage();
    }
+
+   lat_vname = GET_NC_NAME(var_lat);
+   lon_vname = GET_NC_NAME(var_lon);
+   mlog << Debug(5) << method_name << "Cell mapping from "
+        << lat_vname << " and " << lon_vname << " variables\n";
 
    unixtime valid_time = bad_data_int;
    valid_beg_ut = valid_end_ut = conf_info.valid_time;
@@ -1292,6 +1350,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       else valid_time = find_valid_time(time_var);
    }
    to_dp.set_size(to_grid.nx(), to_grid.ny());
+   IntArray *var_cell_mapping = nullptr;
    auto cellMapping = new IntArray[to_grid.nx() * to_grid.ny()];
    get_grid_mapping(fr_grid, to_grid, cellMapping, var_lat, var_lon, skip_times);
    if( skip_times ) delete [] skip_times;
@@ -1307,10 +1366,42 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       config.read_string(FieldSA[i].c_str());
       vinfo->set_dict(config);
 
+      NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
+      ConcatString coordinates_value;
+      if (!user_defined_latlon && get_nc_att_value(&var_data, coordinates_att_name, coordinates_value)) {
+         StringArray sa = coordinates_value.split(" ");
+         int count = sa.n_elements();
+         if (count >= 2) {
+            bool match_lat = false;
+            bool match_lon = false;
+            for (int idx=0; idx<count; idx++) {
+               if (lat_vname == sa[idx]) match_lat = true;
+               if (lon_vname == sa[idx]) match_lon = true;
+            }
+            if (!match_lat && !match_lon) {
+               NcVar v_lat;
+               NcVar v_lon;
+               ConcatString units;
+               for (int idx=0; idx<count; idx++) {
+                  NcVar nc_var = get_nc_var(nc_in, sa[idx].c_str());
+                  if (get_var_units(&nc_var, units)) {
+                     if (is_nc_unit_latitude(units.c_str())) v_lat = nc_var;
+                     else if (is_nc_unit_longitude(units.c_str())) v_lon = nc_var;
+                  }
+               }
+               var_cell_mapping = new IntArray[to_grid.nx() * to_grid.ny()];
+               get_grid_mapping(fr_grid, to_grid, var_cell_mapping, v_lat, v_lon, skip_times);
+               mlog << Debug(4) << method_name << "Override cell mapping from "
+                    << GET_NC_NAME(v_lat) << " and " << GET_NC_NAME(v_lon) << "\n";
+            }
+         }
+      }
+
       to_dp.erase();
       to_dp.set_init(valid_time);
       to_dp.set_valid(valid_time);
-      regrid_nc_variable(nc_in, fr_mtddf, vinfo, fr_dp, to_dp, to_grid, cellMapping);
+      regrid_nc_variable(nc_in, fr_mtddf, vinfo, fr_dp, to_dp, to_grid,
+                         (nullptr != var_cell_mapping ? var_cell_mapping: cellMapping));
 
       // List range of data values
       if(mlog.verbosity_level() >= 2) {
@@ -1334,7 +1425,6 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       write_nc(to_dp, to_grid, vinfo, vname.c_str());
 
       NcVar to_var = get_nc_var(nc_out, vname.c_str());
-      NcVar var_data = get_nc_var(nc_in, vinfo->name().c_str());
 
       bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
       if (has_prob_thresh || do_gaussian_filter) {
@@ -1374,8 +1464,15 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
          }
       }
 
+      if (nullptr != var_cell_mapping) {
+         clear_cell_mapping(var_cell_mapping);
+         delete [] var_cell_mapping;
+         var_cell_mapping = nullptr;
+      }
+
    } // end for i
 
+   clear_cell_mapping(cellMapping);
    delete [] cellMapping;
    cellMapping = (IntArray *) nullptr;
    if( 0 < filtered_by_time ) {
@@ -1397,7 +1494,7 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
                                Grid to_grid, IntArray *cellMapping) {
 
    int to_cell_cnt = 0;
-   clock_t start_clock =  clock();
+   clock_t start_clock = clock();
    Grid fr_grid = fr_mtddf->grid();
    static const char *method_name = "regrid_nc_variable() -> ";
 
@@ -1801,6 +1898,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    }
 
    delete nc_adp; nc_adp = nullptr;
+   clear_cell_mapping(cellMapping);
    delete [] cellMapping;   cellMapping = (IntArray *) nullptr;
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
@@ -1865,6 +1963,14 @@ GOES_QC compute_adp_qc_flag(int adp_qc, int shift_bits) {
    return adp_qc_flag;
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+void clear_cell_mapping(IntArray *cell_mapping) {
+   if (nullptr != cell_mapping) {
+      for (int idx=0; idx<cell_mapping->n(); idx++) cell_mapping[idx].clear();
+   }
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -2838,7 +2944,7 @@ static bool has_lat_lon_vars(const NcFile *nc) {
         << " has_lat_var: "  << has_lat_var
         << ", has_lon_var: " << has_lon_var
         << ", has_time_var: " << has_time_var << "\n";
-   return (has_lat_var && has_lon_var && has_time_var);
+   return (has_lat_var && has_lon_var);
 }
 
 ////////////////////////////////////////////////////////////////////////
