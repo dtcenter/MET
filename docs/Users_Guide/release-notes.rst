@@ -9,6 +9,40 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.0.0-beta5 Release Notes (20240710)
+-------------------------------------------------
+
+  .. dropdown:: Repository, build, and test
+
+     * Reimplement and enhance the Perl-based (unit.pl) unit test control script in Python (`#2717 <https://github.com/dtcenter/MET/issues/2717>`_).
+     * Update compilation script and configuration files as needed for supported platforms (`#2753 <https://github.com/dtcenter/MET/issues/2753>`_).
+     * Update tag used for the release checksum action (`#2929 <https://github.com/dtcenter/MET/issues/2929>`_).
+  				
+  .. dropdown:: Bugfixes
+
+     * Bugfix (METbaseimage): Fix the environment to correct the ncdump runtime linker error (`METbaseimage#24 <https://github.com/dtcenter/METbaseimage/issues/24>`_).
+     * Bugfix: Fix the Grid-Stat configuration file to support the MET_SEEPS_GRID_CLIMO_NAME option (`#2601 <https://github.com/dtcenter/MET/issues/2601>`_).
+     * **Bugfix: Fix TC-RMW to correct the tangential and radial wind computations** (`#2841 <https://github.com/dtcenter/MET/issues/#2841>`_).
+     * Bugfix: Fix Ensemble-Stat's handling of climo data when verifying ensemble-derived probabilities (`#2856 <https://github.com/dtcenter/MET/issues/2856>`_).
+     * **Bugfix: Fix Point2Grid's handling of the -qc option for ADP input files** (`#2867 <https://github.com/dtcenter/MET/issues/2867>`_).
+     * Bugfix: Bugfix: Fix Stat-Analysis errors for jobs using the -dump_row option and the -line_type option with VCNT, RPS, DMAP, or SSIDX (`#2888 <https://github.com/dtcenter/MET/issues/2888>`_).
+     * Bugfix: Fix inconsistent handling of point observation valid times processed through Python embedding (`#2897 <https://github.com/dtcenter/MET/issues/2897>`_).
+
+  .. dropdown:: Enhancements
+
+     * **Add new wind direction verification statistics for RMSE, Bias, and MAE** (`#2395 <https://github.com/dtcenter/MET/issues/2395>`_).
+     * Document UGRID configuration options added to Point-Stat and Grid-Stat (`#2748 <https://github.com/dtcenter/MET/issues/2748>`_).
+     * **Add new -ugrid_config command line option for unstructured grid inputs to Grid-Stat and Point-Stat** (`#2842 <https://github.com/dtcenter/MET/issues/2842>`_).
+     * Enhance Point2Grid to support modified quality control settings for smoke/dust AOD data in GOES-16/17 as of April 16, 2024 (`#2853 <https://github.com/dtcenter/MET/issues/2853>`_).
+     * **Enhance Point2Grid to support a wider variety of input tripolar datasets** (`#2857 <https://github.com/dtcenter/MET/issues/2857>`_).
+     * Test NOAA Unstructured grids in MET-12.0.0 (`#2860 <https://github.com/dtcenter/MET/issues/2860>`_).
+     * Enhance Ensemble-Stat and Gen-Ens-Prod to omit warning messages for the MISSING keyword (`#2870 <https://github.com/dtcenter/MET/issues/2870>`_).
+     * Refine Point-Stat Warning message about fcst/obs level mismatch (`#2873 <https://github.com/dtcenter/MET/issues/2873>`_).
+     * Add new Python functionality to convert MET NetCDF observation data to a Pandas DataFrame (`#2877 <https://github.com/dtcenter/MET/issues/2877>`_).
+     * Enhance PCP-Combine to allow missing data (`#2883 <https://github.com/dtcenter/MET/issues/2883>`_).
+     * Enhance TC-Stat to support the -set_hdr job command option (`#2911 <https://github.com/dtcenter/MET/issues/2911>`_).
+     * Refine ERROR messages written by PB2NC (`#2912 <https://github.com/dtcenter/MET/issues/#2912>`_).
+
 MET Version 12.0.0-beta4 Release Notes (20240417)
 -------------------------------------------------
 
