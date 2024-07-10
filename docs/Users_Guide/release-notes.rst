@@ -22,10 +22,10 @@ MET Version 12.0.0-beta5 Release Notes (20240710)
 
      * Bugfix (METbaseimage): Fix the environment to correct the ncdump runtime linker error (`METbaseimage#24 <https://github.com/dtcenter/METbaseimage/issues/24>`_).
      * Bugfix: Fix the Grid-Stat configuration file to support the MET_SEEPS_GRID_CLIMO_NAME option (`#2601 <https://github.com/dtcenter/MET/issues/2601>`_).
-     * **Bugfix: Fix TC-RMW to correct the tangential and radial wind computations** (`#2841 <https://github.com/dtcenter/MET/issues/#2841>`_).
+     * **Bugfix: Fix TC-RMW to correct the tangential and radial wind computations** (`#2841 <https://github.com/dtcenter/MET/issues/2841>`_).
      * Bugfix: Fix Ensemble-Stat's handling of climo data when verifying ensemble-derived probabilities (`#2856 <https://github.com/dtcenter/MET/issues/2856>`_).
      * **Bugfix: Fix Point2Grid's handling of the -qc option for ADP input files** (`#2867 <https://github.com/dtcenter/MET/issues/2867>`_).
-     * Bugfix: Bugfix: Fix Stat-Analysis errors for jobs using the -dump_row option and the -line_type option with VCNT, RPS, DMAP, or SSIDX (`#2888 <https://github.com/dtcenter/MET/issues/2888>`_).
+     * Bugfix: Fix Stat-Analysis errors for jobs using the -dump_row option and the -line_type option with VCNT, RPS, DMAP, or SSIDX (`2888 <https://github.com/dtcenter/MET/issues/2888>`_).
      * Bugfix: Fix inconsistent handling of point observation valid times processed through Python embedding (`#2897 <https://github.com/dtcenter/MET/issues/2897>`_).
 
   .. dropdown:: Enhancements
@@ -38,10 +38,10 @@ MET Version 12.0.0-beta5 Release Notes (20240710)
      * Test NOAA Unstructured grids in MET-12.0.0 (`#2860 <https://github.com/dtcenter/MET/issues/2860>`_).
      * Enhance Ensemble-Stat and Gen-Ens-Prod to omit warning messages for the MISSING keyword (`#2870 <https://github.com/dtcenter/MET/issues/2870>`_).
      * Refine Point-Stat Warning message about fcst/obs level mismatch (`#2873 <https://github.com/dtcenter/MET/issues/2873>`_).
-     * Add new Python functionality to convert MET NetCDF observation data to a Pandas DataFrame (`#2877 <https://github.com/dtcenter/MET/issues/2877>`_).
+     * Add new Python functionality to convert MET NetCDF observation data to a Pandas DataFrame (`#2781 <https://github.com/dtcenter/MET/issues/2781>`_).
      * Enhance PCP-Combine to allow missing data (`#2883 <https://github.com/dtcenter/MET/issues/2883>`_).
      * Enhance TC-Stat to support the -set_hdr job command option (`#2911 <https://github.com/dtcenter/MET/issues/2911>`_).
-     * Refine ERROR messages written by PB2NC (`#2912 <https://github.com/dtcenter/MET/issues/#2912>`_).
+     * Refine ERROR messages written by PB2NC (`#2912 <https://github.com/dtcenter/MET/issues/2912>`_).
 
 MET Version 12.0.0-beta4 Release Notes (20240417)
 -------------------------------------------------
