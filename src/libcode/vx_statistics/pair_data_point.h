@@ -33,7 +33,7 @@ class PairDataPoint : public PairBase {
       void init_from_scratch();
       void assign(const PairDataPoint &);
 
-      SeepsClimo   *seeps_climo;
+      SeepsClimo *seeps_climo;
 
    public:
 
@@ -82,12 +82,11 @@ class PairDataPoint : public PairBase {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Class to store a variety of PairDataPoint objects for each
-// verification task
+// Class to store PairDataPoint objects for point verification
 //
 ////////////////////////////////////////////////////////////////////////
 
-class VxPairDataPoint {
+class VxPairDataPoint : public VxPairBase {
 
    private:
 
@@ -107,90 +106,13 @@ class VxPairDataPoint {
       //
       //////////////////////////////////////////////////////////////////
 
-      VarInfo     *fcst_info;    // Forecast field, allocated by VarInfoFactory
-      VarInfoGrib *obs_info;     // Observation field, allocated by VarInfoFactory
-
-      VarInfo     *fclm_info;    // Forecast climatology field, allocated by VarInfoFactory
-      VarInfo     *oclm_info;    // Observation climatology field, allocated by VarInfoFactory
-
-      ConcatString desc;         // User description from config file
-
-      double interp_thresh;      // Threshold between 0 and 1 used when
-                                 // interpolating the forecasts to the
-                                 // observation location.
-
-      //////////////////////////////////////////////////////////////////
-      //
-      // Forecast and climatology fields falling between the requested
-      // levels. Store the fields in a data plane array.
-      //
-      //////////////////////////////////////////////////////////////////
-
-      DataPlaneArray fcst_dpa;   // Forecast data plane array
-      DataPlaneArray fcmn_dpa;   // Forecast climatology mean data plane array
-      DataPlaneArray fcsd_dpa;   // Forecast climatology standard deviation data plane array
-      DataPlaneArray ocmn_dpa;   // Observation climatology mean data plane array
-      DataPlaneArray ocsd_dpa;   // Observation climatology standard deviation data plane array
+      VarInfo     *fcst_info; // Forecast field, allocated by VarInfoFactory
+      VarInfoGrib *obs_info;  // Observation field, allocated by VarInfoFactory
 
       //////////////////////////////////////////////////////////////////
 
-      unixtime fcst_ut;          // Forecast valid time
-      unixtime beg_ut;           // Beginning of valid time window
-      unixtime end_ut;           // End of valid time window
-
-      //////////////////////////////////////////////////////////////////
-
-      StringArray sid_inc_filt;  // Station ID inclusion list
-      StringArray sid_exc_filt;  // Station ID exclusion list
-      StringArray obs_qty_inc_filt;  // Observation quality include markers
-      StringArray obs_qty_exc_filt;  // Observation quality exclude markers
-      
-      //////////////////////////////////////////////////////////////////
-
-      StringArray mpr_column;    // Names of MPR columns or diffs of columns
-      ThreshArray mpr_thresh;    // Filtering thresholds for the MPR columns
-
-      //////////////////////////////////////////////////////////////////
-
-      StringArray msg_typ_sfc;   // List of surface message types
-      StringArray msg_typ_lnd;   // List of surface land message types
-      StringArray msg_typ_wtr;   // List of surface water message types
-
-      SurfaceInfo sfc_info;      // Land/sea mask and topography info
-
-      //////////////////////////////////////////////////////////////////
-
-      int      n_msg_typ;        // Number of verifying message types
-
-      int      n_mask;           // Total number of masking regions
-                                 // of masking DataPlane fields or SIDs
-
-      int      n_interp;         // Number of interpolation techniques
-
-      //////////////////////////////////////////////////////////////////
-
-      PairDataPoint ***pd;       // 3-Dim Array of PairDataPoint objects
-                                 // as [n_msg_typ][n_mask][n_interp]
-
-      //  Counts for observation rejection reason codes
-      int n_try;                 // Number of observations processed
-      int rej_sid;               // Reject based on SID inclusion and exclusion lists
-      int rej_var;               // Reject based on observation variable name
-      int rej_vld;               // Reject based on valid time
-      int rej_obs;               // Reject observation bad data
-      int rej_grd;               // Reject based on location
-      int rej_topo;              // Reject based on topography
-      int rej_lvl;               // Reject based on vertical level
-      int rej_qty;               // Reject based on obs quality
-
-      //  3-Dim Arrays for observation rejection reason codes
-      int ***rej_typ;            // Reject based on message type
-      int ***rej_mask;           // Reject based on masking region
-      int ***rej_fcst;           // Reject forecast bad data
-      int ***rej_cmn;            // Reject fcst or obs climo mean bad data
-      int ***rej_csd;            // Reject fcst or obs climo stdev bad data
-      int ***rej_mpr;            // Reject based on MPR filtering logic
-      int ***rej_dup;            // Reject based on duplicates logic
+      // 3-Dim vector of PairDataPoint objects [n_msg_typ][n_mask][n_interp]
+      std::vector<PairDataPoint> pd;
 
       //////////////////////////////////////////////////////////////////
 
@@ -198,76 +120,14 @@ class VxPairDataPoint {
 
       void set_fcst_info(VarInfo *);
       void set_obs_info(VarInfoGrib *);
-
-      void set_fcst_climo_info(VarInfo *);
-      void set_obs_climo_info(VarInfo *);
-
-      void set_desc(const char *);
-
-      void set_interp_thresh(double);
-
-      void set_fcst_dpa(const DataPlaneArray &);
-      void set_fcst_climo_mn_dpa(const DataPlaneArray &);
-      void set_fcst_climo_sd_dpa(const DataPlaneArray &);
-      void set_obs_climo_mn_dpa(const DataPlaneArray &);
-      void set_obs_climo_sd_dpa(const DataPlaneArray &);
-
-      void set_fcst_ut(const unixtime);
-      void set_beg_ut(const unixtime);
-      void set_end_ut(const unixtime);
-
-      void set_sid_inc_filt(const StringArray &);
-      void set_sid_exc_filt(const StringArray &);
-      void set_obs_qty_inc_filt(const StringArray &);
-      void set_obs_qty_exc_filt(const StringArray &);
-      
-      // Call set_pd_size before set_msg_typ, set_mask_area, and set_interp
-      void set_pd_size(int, int, int);
-
-      void set_msg_typ(int, const char *);
-      void set_msg_typ_vals(int, const StringArray &);
-      void set_mask_area(int, const char *, MaskPlane *);
-      void set_mask_sid(int, const char *, StringArray *);
-      void set_mask_llpnt(int, const char *, MaskLatLon *);
-
-      void set_interp(int i_interp, const char *interp_mthd_str, int width,
-                      GridTemplateFactory::GridTemplates shape);
-      void set_interp(int i_interp, InterpMthd mthd,
-                      int width, GridTemplateFactory::GridTemplates shape);
-
-      void set_mpr_thresh(const StringArray &, const ThreshArray &);
+      void set_size(int, int, int);
 
       void load_seeps_climo(const ConcatString &seeps_climo_name);
       void set_seeps_thresh(const SingleThresh &p1_thresh);
 
-      void set_climo_cdf_info_ptr(const ClimoCDFInfo *);
-
-      void set_msg_typ_sfc(const StringArray &);
-      void set_msg_typ_lnd(const StringArray &);
-      void set_msg_typ_wtr(const StringArray &);
-
-      void set_sfc_info(const SurfaceInfo &);
-
       void add_point_obs(float *, const char *, const char *, unixtime,
                          const char *, float *, Grid &, const char * = 0,
                          const DataPlane * = 0);
-
-      int  get_n_pair() const;
-
-      void set_duplicate_flag(DuplicateType duplicate_flag);
-
-      void set_obs_summary(ObsSummary obs_summary);
-
-      void set_obs_perc_value(int percentile);
-
-      void print_obs_summary();
-
-      void calc_obs_summary();
-
-      // Member functions for incrementing the counts
-      void inc_count(int ***&, int);
-      void inc_count(int ***&, int, int);
-      void inc_count(int ***&, int, int, int);
 };
 
 
@@ -311,13 +171,6 @@ extern void subset_wind_pairs(const PairDataPoint &,
 // Subset pairs for a specific climatology CDF bin
 extern PairDataPoint subset_climo_cdf_bin(const PairDataPoint &,
                         const ThreshArray &, int i_bin);
-
-// Write the point observation in the MET point format for logging
-extern ConcatString point_obs_to_string(
-                       float *hdr_arr, const char *hdr_typ_str,
-                       const char *hdr_sid_str, unixtime hdr_ut,
-                       const char *obs_qty, float *obs_arr,
-                       const char *var_name);
 
 ////////////////////////////////////////////////////////////////////////
 

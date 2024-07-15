@@ -32,7 +32,6 @@
 
 using namespace std;
 
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Code for class PairDataEnsemble
@@ -992,14 +991,10 @@ VxPairDataEnsemble & VxPairDataEnsemble::operator=(const VxPairDataEnsemble &vx_
 
 void VxPairDataEnsemble::init_from_scratch() {
 
-   fcst_info    = (EnsVarInfo *) nullptr;
-   climo_info   = (VarInfo *) nullptr;
-   obs_info     = (VarInfo *) nullptr;
-   pd           = (PairDataEnsemble ***) nullptr;
+   VxPairBase::init_from_scratch();
 
-   n_msg_typ    = 0;
-   n_mask       = 0;
-   n_interp     = 0;
+   fcst_info = (EnsVarInfo *) nullptr;
+   obs_info  = (VarInfo *) nullptr;
 
    clear();
 
@@ -1009,43 +1004,15 @@ void VxPairDataEnsemble::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::clear() {
-   int i, j, k;
 
-   if(fcst_info)  { delete fcst_info;  fcst_info  = (EnsVarInfo *) nullptr; }
-   if(climo_info) { delete climo_info; climo_info = (VarInfo *) nullptr; }
-   if(obs_info)   { delete obs_info;   obs_info   = (VarInfo *) nullptr; }
+   VxPairBase::clear();
 
-   desc.clear();
+   if(fcst_info) { delete fcst_info; fcst_info = (EnsVarInfo *) nullptr; }
+   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *)    nullptr; }
 
-   interp_thresh = 0;
-   msg_typ_sfc.clear();
-
-   fcst_dpa.clear();
-   climo_mn_dpa.clear();
-   climo_sd_dpa.clear();
-
-   sid_inc_filt.clear();
-   sid_exc_filt.clear();
-   obs_qty_inc_filt.clear();
-   obs_qty_exc_filt.clear();
-   
    obs_error_info = (ObsErrorInfo *) nullptr;
 
-   fcst_ut = (unixtime) 0;
-   beg_ut  = (unixtime) 0;
-   end_ut  = (unixtime) 0;
-
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
-         for(k=0; k<n_interp; k++) {
-            pd[i][j][k].clear();
-         }
-      }
-   }
-
-   n_msg_typ = 0;
-   n_mask    = 0;
-   n_interp  = 0;
+   pd.clear();
 
    return;
 }
@@ -1053,41 +1020,19 @@ void VxPairDataEnsemble::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
-   int i, j, k;
 
    clear();
 
+   VxPairBase::assign(vx_pd);
+
    set_fcst_info(vx_pd.fcst_info);
-   set_climo_info(vx_pd.climo_info);
    set_obs_info(vx_pd.obs_info);
 
-   desc           = vx_pd.desc;
-
-   fcst_ut        = vx_pd.fcst_ut;
-   beg_ut         = vx_pd.beg_ut;
-   end_ut         = vx_pd.end_ut;
-   sid_inc_filt   = vx_pd.sid_inc_filt;
-   sid_exc_filt   = vx_pd.sid_exc_filt;
-   obs_qty_inc_filt = vx_pd.obs_qty_inc_filt;
-   obs_qty_exc_filt = vx_pd.obs_qty_exc_filt;
    obs_error_info = vx_pd.obs_error_info;
 
-   interp_thresh  = vx_pd.interp_thresh;
-   msg_typ_sfc    = vx_pd.msg_typ_sfc;
+   set_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
 
-   fcst_dpa       = vx_pd.fcst_dpa;
-   climo_mn_dpa   = vx_pd.climo_mn_dpa;
-   climo_sd_dpa   = vx_pd.climo_sd_dpa;
-
-   set_pd_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
-
-   for(i=0; i<vx_pd.n_msg_typ; i++) {
-      for(j=0; j<vx_pd.n_mask; j++) {
-         for(k=0; k<vx_pd.n_interp; k++) {
-            pd[i][j][k] = vx_pd.pd[i][j][k];
-         }
-      }
-   }
+   pd = vx_pd.pd;
 
    return;
 }
@@ -1108,284 +1053,24 @@ void VxPairDataEnsemble::set_fcst_info(EnsVarInfo *info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_climo_info(VarInfo *info) {
-   VarInfoFactory f;
-
-   // Deallocate, if necessary
-   if(climo_info) { delete climo_info; climo_info = (VarInfo *) nullptr; }
-
-   // Perform a deep copy
-   climo_info = f.new_var_info(info->file_type());
-   *climo_info = *info;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void VxPairDataEnsemble::set_obs_info(VarInfo *info) {
-   VarInfoFactory f;
 
-   // Deallocate, if necessary
-   if(obs_info) { delete obs_info; obs_info = (VarInfo *) nullptr; }
-
-   // Perform a deep copy
-   obs_info = f.new_var_info(info->file_type());
-   *obs_info = *info;
+   copy_var_info(info, obs_info);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_desc(const char *s) {
+void VxPairDataEnsemble::set_size(int types, int masks, int interps) {
 
-   desc = s;
+   VxPairBase::set_size(types, masks, interps);
 
-   return;
-}
+   // Resize the PairDataPoint vector
+   pd.resize(n_vx);
 
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_interp_thresh(double t) {
-
-   interp_thresh = t;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_msg_typ_sfc(const StringArray &sa) {
-
-   msg_typ_sfc = sa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_fcst_dpa(const DataPlaneArray &dpa) {
-
-   fcst_dpa = dpa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_climo_mn_dpa(const DataPlaneArray &dpa) {
-
-   climo_mn_dpa = dpa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_climo_sd_dpa(const DataPlaneArray &dpa) {
-
-   climo_sd_dpa = dpa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_fcst_ut(const unixtime ut) {
-
-   fcst_ut = ut;
-
-   //  set the fcst_ut for all PairBase instances, used for duplicate logic
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].set_fcst_ut(ut);
-         }
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_beg_ut(const unixtime ut) {
-
-   beg_ut = ut;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_end_ut(const unixtime ut) {
-
-   end_ut = ut;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_sid_inc_filt(const StringArray sa) {
-
-   sid_inc_filt = sa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_sid_exc_filt(const StringArray sa) {
-
-   sid_exc_filt = sa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_obs_qty_inc_filt(const StringArray q) {
-
-   obs_qty_inc_filt = q;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_obs_qty_exc_filt(const StringArray q) {
-
-   obs_qty_exc_filt = q;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_pd_size(int types, int masks, int interps) {
-
-   // Store the dimensions for the PairData array
-   n_msg_typ = types;
-   n_mask    = masks;
-   n_interp  = interps;
-
-   // Allocate space for the PairData array
-   pd = new PairDataEnsemble ** [n_msg_typ];
-
-   for(int i=0; i<n_msg_typ; i++) {
-      pd[i] = new PairDataEnsemble * [n_mask];
-
-      for(int j=0; j<n_mask; j++) {
-         pd[i][j] = new PairDataEnsemble [n_interp];
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_msg_typ(int i_msg_typ, const char *name) {
-
-   for(int i=0; i<n_mask; i++) {
-      for(int j=0; j<n_interp; j++) {
-         pd[i_msg_typ][i][j].set_msg_typ(name);
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_msg_typ_vals(int i_msg_typ, const StringArray &sa) {
-
-   for(int i=0; i<n_mask; i++) {
-      for(int j=0; j<n_interp; j++) {
-         pd[i_msg_typ][i][j].set_msg_typ_vals(sa);
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_mask_area(int i_mask, const char *name,
-                                       MaskPlane *mp_ptr) {
-
-   for(int i=0; i<n_msg_typ; i++) {
-      for(int j=0; j<n_interp; j++) {
-         pd[i][i_mask][j].set_mask_name(name);
-         pd[i][i_mask][j].set_mask_area_ptr(mp_ptr);
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_mask_sid(int i_mask, const char *name,
-                                      StringArray *sid_ptr) {
-
-   for(int i=0; i<n_msg_typ; i++) {
-      for(int j=0; j<n_interp; j++) {
-         pd[i][i_mask][j].set_mask_name(name);
-         pd[i][i_mask][j].set_mask_sid_ptr(sid_ptr);
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_mask_llpnt(int i_mask, const char *name,
-                                        MaskLatLon *llpnt_ptr) {
-
-   for(int i=0; i<n_msg_typ; i++) {
-      for(int j=0; j<n_interp; j++) {
-         pd[i][i_mask][j].set_mask_name(name);
-         pd[i][i_mask][j].set_mask_llpnt_ptr(llpnt_ptr);
-      }
-   }
-
-   return;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_interp(int i_interp,
-                                    const char *interp_mthd_str,
-                                    int width, GridTemplateFactory::GridTemplates shape) {
-
-   for(int i=0; i<n_msg_typ; i++) {
-      for(int j=0; j<n_mask; j++) {
-         pd[i][j][i_interp].set_interp_mthd(interp_mthd_str);
-         pd[i][j][i_interp].set_interp_wdth(width);
-         pd[i][j][i_interp].set_interp_shape(shape);
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_interp(int i_interp, InterpMthd mthd,
-                                    int width, GridTemplateFactory::GridTemplates shape) {
-
-   for(int i=0; i<n_msg_typ; i++) {
-      for(int j=0; j<n_mask; j++) {
-         pd[i][j][i_interp].set_interp_mthd(mthd);
-         pd[i][j][i_interp].set_interp_wdth(width);
-         pd[i][j][i_interp].set_interp_shape(shape);
-      }
-   }
+   // Set PairBase pointers to the PairDataEnsemble objects
+   for(int i=0; i<n_vx; i++) pb_ptr[i] = &pd[i];
 
    return;
 }
@@ -1394,37 +1079,24 @@ void VxPairDataEnsemble::set_interp(int i_interp, InterpMthd mthd,
 
 void VxPairDataEnsemble::set_ens_size(int n) {
 
-   for(int i=0; i<n_msg_typ; i++) {
-      for(int j=0; j<n_mask; j++) {
-         for(int k=0; k<n_interp; k++) {
-
-            // Handle HiRA neighborhoods
-            if(pd[i][j][k].interp_mthd == InterpMthd::HiRA) {
-               GridTemplateFactory gtf;
-               GridTemplate* gt = gtf.buildGT(pd[i][j][k].interp_shape,
-                                              pd[i][j][k].interp_wdth,
-                                              false);
-               pd[i][j][k].set_ens_size(n*gt->size());
-            }
-            else {
-               pd[i][j][k].set_ens_size(n);
-            }
-         }
-      }
+   if(n_vx == 0) {
+      mlog << Warning << "\nVxPairDataEnsemble::set_ens_size() -> "
+           << "set_size() has not been called yet!\n\n";
    }
 
-   return;
-}
+   for(vector<PairDataEnsemble>::iterator it = pd.begin();
+       it != pd.end(); it++) {
 
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_climo_cdf_info_ptr(const ClimoCDFInfo *info) {
-
-   for(int i=0; i<n_msg_typ; i++) {
-      for(int j=0; j<n_mask; j++) {
-         for(int k=0; k<n_interp; k++) {
-            pd[i][j][k].set_climo_cdf_info_ptr(info);
-         }
+      // Handle HiRA neighborhoods
+      if(it->interp_mthd == InterpMthd::HiRA) {
+         GridTemplateFactory gtf;
+         GridTemplate* gt = gtf.buildGT(it->interp_shape,
+                                        it->interp_wdth,
+                                        false);
+         it->set_ens_size(n*gt->size());
+      }
+      else {
+         it->set_ens_size(n);
       }
    }
 
@@ -1435,12 +1107,14 @@ void VxPairDataEnsemble::set_climo_cdf_info_ptr(const ClimoCDFInfo *info) {
 
 void VxPairDataEnsemble::set_ssvar_bin_size(double ssvar_bin_size) {
 
-   for(int i=0; i<n_msg_typ; i++) {
-      for(int j=0; j<n_mask; j++) {
-         for(int k=0; k<n_interp; k++) {
-            pd[i][j][k].ssvar_bin_size = ssvar_bin_size;
-         }
-      }
+   if(n_vx == 0) {
+      mlog << Warning << "\nVxPairDataEnsemble::set_ssvar_bin_size() -> "
+           << "set_size() has not been called yet!\n\n";
+   }
+
+   for(vector<PairDataEnsemble>::iterator it = pd.begin();
+       it != pd.end(); it++) {
+      it->ssvar_bin_size = ssvar_bin_size;
    }
 
    return;
@@ -1450,12 +1124,49 @@ void VxPairDataEnsemble::set_ssvar_bin_size(double ssvar_bin_size) {
 
 void VxPairDataEnsemble::set_phist_bin_size(double phist_bin_size) {
 
-   for(int i=0; i<n_msg_typ; i++) {
-      for(int j=0; j<n_mask; j++) {
-         for(int k=0; k<n_interp; k++) {
-            pd[i][j][k].phist_bin_size = phist_bin_size;
-         }
-      }
+   if(n_vx == 0) {
+      mlog << Warning << "\nVxPairDataEnsemble::set_phist_bin_size() -> "
+           << "set_size() has not been called yet!\n\n";
+   }
+
+   for(vector<PairDataEnsemble>::iterator it = pd.begin();
+       it != pd.end(); it++) {
+      it->phist_bin_size = phist_bin_size;
+   }
+
+   return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_ctrl_index(int index) {
+
+   if(n_vx == 0) {
+      mlog << Warning << "\nVxPairDataEnsemble::set_ctrl_index() -> "
+           << "set_size() has not been called yet!\n\n";
+   }
+
+   for(vector<PairDataEnsemble>::iterator it = pd.begin();
+       it != pd.end(); it++) {
+      it->ctrl_index = index;
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairDataEnsemble::set_skip_const(bool tf) {
+
+   if(n_vx == 0) {
+      mlog << Warning << "\nVxPairDataEnsemble::set_skip_const() -> "
+           << "set_size() has not been called yet!\n\n";
+   }
+
+   for(vector<PairDataEnsemble>::iterator it = pd.begin();
+       it != pd.end(); it++) {
+      it->skip_const = tf;
    }
 
    return;
@@ -1470,13 +1181,6 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
                                        const char *obs_qty, float *obs_arr,
                                        Grid &gr, const char *var_name,
                                        const DataPlane *wgt_dp) {
-   int i, j, k, x, y;
-   double hdr_lat, hdr_lon;
-   double obs_x, obs_y, obs_lvl, obs_hgt, to_lvl;
-   double cmn_v, csd_v, obs_v, wgt_v;
-   int cmn_lvl_blw, cmn_lvl_abv;
-   int csd_lvl_blw, csd_lvl_abv;
-   ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) nullptr;
 
    // Check the observation VarInfo file type
    if(obs_info->file_type() != FileType_Gb1) {
@@ -1489,104 +1193,49 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    // Create VarInfoGrib pointer
    VarInfoGrib *obs_info_grib = (VarInfoGrib *) obs_info;
 
-   // Check the station ID inclusion and exclusion lists
-   if((sid_inc_filt.n() && !sid_inc_filt.has(hdr_sid_str)) ||
-      (sid_exc_filt.n() &&  sid_exc_filt.has(hdr_sid_str))) return;
+   // Increment the number of tries count
+   n_try++;
 
-   // Check whether the observation variable name matches (rej_var)
-   if ((var_name != 0) && (0 < m_strlen(var_name))) {
-      if ( var_name != obs_info->name() ) {
-         return;
-      }
-   }
-   else if(obs_info_grib->code() != nint(obs_arr[1])) {
-      return;
-   }
-   
-   // Check the observation quality include and exclude options
-   if((obs_qty_inc_filt.n() > 0 && !obs_qty_inc_filt.has(obs_qty)) ||
-      (obs_qty_exc_filt.n() > 0 &&  obs_qty_exc_filt.has(obs_qty))) {
-      return;
-   }
-   
-   // Check whether the observation time falls within the valid time
-   // window
-   if(hdr_ut < beg_ut || hdr_ut > end_ut) return;
-
-   hdr_lat = hdr_arr[0];
-   hdr_lon = hdr_arr[1];
-
-   obs_lvl = obs_arr[2];
-   obs_hgt = obs_arr[3];
-
-   // Apply observation processing logic
-   obs_v = pd[0][0][0].process_obs(obs_info, obs_arr[4]);
-
-   // Check whether the observation value contains valid data
-   if(is_bad_data(obs_v)) return;
-
-   // Convert the lat/lon value to x/y
-   gr.latlon_to_xy(hdr_lat, -1.0*hdr_lon, obs_x, obs_y);
-   x = nint(obs_x);
-   y = nint(obs_y);
-
-   // Check if the observation's lat/lon is on the grid
-   if(((x < 0 || x >= gr.nx()) && !gr.wrap_lon()) ||
-        y < 0 || y >= gr.ny()) return;
-
-   // For pressure levels, check if the observation pressure level
-   // falls in the requested range.
-   if(obs_info_grib->level().type() == LevelType_Pres) {
-
-      if(obs_lvl < obs_info_grib->level().lower() ||
-         obs_lvl > obs_info_grib->level().upper()) return;
-   }
-   // For accumulations, check if the observation accumulation interval
-   // matches the requested interval.
-   else if(obs_info_grib->level().type() == LevelType_Accum) {
-
-      if(obs_lvl < obs_info_grib->level().lower() ||
-         obs_lvl > obs_info_grib->level().upper()) return;
-   }
-   // For all other level types (VertLevel, RecNumber, NoLevel),
-   // check for a surface message type or if the observation height
-   // falls within the requested range.
-   else {
-
-      if(!msg_typ_sfc.reg_exp_match(hdr_typ_str) &&
-         (obs_hgt < obs_info_grib->level().lower() ||
-          obs_hgt > obs_info_grib->level().upper())) {
-         return;
-      }
+   // Point observation summary string for rejection log messages
+   ConcatString pnt_obs_str;
+   if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+      pnt_obs_str = point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                        hdr_ut, obs_qty, obs_arr, var_name);
    }
 
-   // For a single climatology mean field
-   if(climo_mn_dpa.n_planes() == 1) {
-      cmn_lvl_blw = 0;
-      cmn_lvl_abv = 0;
-   }
-   // For multiple climatology mean fields, find the levels above and
-   // below the observation point.
-   else {
-      // Interpolate using the observation pressure level or height
-      to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
-                obs_lvl : obs_hgt);
-      find_vert_lvl(climo_mn_dpa, to_lvl, cmn_lvl_blw, cmn_lvl_abv);
-   }
+   // Check the station ID
+   if(!is_keeper_sid(pnt_obs_str.c_str(), hdr_sid_str)) return;
 
-   // For a single climatology standard deviation field
-   if(climo_sd_dpa.n_planes() == 1) {
-      csd_lvl_blw = 0;
-      csd_lvl_abv = 0;
-   }
-   // For multiple climatology standard deviation fields, find the
-   // levels above and below the observation point.
-   else {
-      // Interpolate using the observation pressure level or height
-      to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
-                obs_lvl : obs_hgt);
-      find_vert_lvl(climo_sd_dpa, to_lvl, csd_lvl_blw, csd_lvl_abv);
-   }
+   // Check observation variable
+   if(!is_keeper_var(pnt_obs_str.c_str(), var_name, nint(obs_arr[1]))) return;
+
+   // Check observation quality
+   if(!is_keeper_qty(pnt_obs_str.c_str(), obs_qty)) return;
+
+   // Check valid time
+   if(!is_keeper_vld(pnt_obs_str.c_str(), hdr_ut)) return;
+
+   // Check observation value
+   double obs_v = obs_arr[4];
+   if(!is_keeper_obs(pnt_obs_str.c_str(), obs_v)) return;
+
+   // Check location
+   double hdr_lat = hdr_arr[0];
+   double hdr_lon = hdr_arr[1];
+   double obs_x, obs_y;
+   if(!is_keeper_grd(pnt_obs_str.c_str(), gr, hdr_lat, hdr_lon, obs_x, obs_y)) return;
+
+   // TODO: Add topography filtering to Ensemble-Stat
+
+   // Check topo
+   double hdr_elv = hdr_arr[2];
+   if(!is_keeper_topo(pnt_obs_str.c_str(), gr, obs_x, obs_y,
+                      hdr_typ_str, hdr_elv)) return;
+
+   // Check level
+   double obs_lvl = obs_arr[2];
+   double obs_hgt = obs_arr[3];
+   if(!is_keeper_lvl(pnt_obs_str.c_str(), hdr_typ_str, obs_lvl, obs_hgt)) return;
 
    // When verifying a vertical level forecast against a surface message type,
    // set the observation level value to bad data so that it's not used in the
@@ -1596,11 +1245,12 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
       obs_lvl = bad_data_double;
    }
 
-   // Set flag for specific humidity
+   // Set flags
    bool spfh_flag = fcst_info->get_var_info()->is_specific_humidity() &&
                      obs_info->is_specific_humidity();
 
    // Store pointer to ObsErrorEntry
+   ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) nullptr;
    if(obs_error_info->flag) {
 
       // Use config file setting, if specified
@@ -1637,96 +1287,60 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
                                FieldType::Obs, oerr_ptr, obs_v);
    }
 
-   // Look through all of the PairData objects to see if the observation
-   // should be added.
+   // Loop through the message types
+   for(int i_msg_typ=0; i_msg_typ<n_msg_typ; i_msg_typ++) {
 
-   // Check the message types
-   for(i=0; i<n_msg_typ; i++) {
+      // Check message type
+      if(!is_keeper_typ(pnt_obs_str.c_str(), i_msg_typ, hdr_typ_str)) continue;
 
-      // Check for a matching PrepBufr message type
-      if(!pd[i][0][0].msg_typ_vals.has(hdr_typ_str)) {
-         continue;
-      }
+      int x = nint(obs_x);
+      int y = nint(obs_y);
 
-      // Check the masking areas and points
-      for(j=0; j<n_mask; j++) {
+      // Loop through the masking regions
+      for(int i_mask=0; i_mask<n_mask; i_mask++) {
 
-         // Check for the obs falling within the masking region
-         if(pd[i][j][0].mask_area_ptr != (MaskPlane *) 0) {
-            if(!pd[i][j][0].mask_area_ptr->s_is_on(x, y)) continue;
-         }
-         // Otherwise, check for the obs Station ID's presence in the
-         // masking SID list
-         else if(pd[i][j][0].mask_sid_ptr != (StringArray *) 0) {
-            if(!pd[i][j][0].mask_sid_ptr->has(hdr_sid_str)) continue;
-         }
-         // Otherwise, check observation Lat/Lon thresholds
-         else if(pd[i][j][0].mask_llpnt_ptr != (MaskLatLon *) 0) {
-            if(!pd[i][j][0].mask_llpnt_ptr->lat_thresh.check(hdr_lat) ||
-               !pd[i][j][0].mask_llpnt_ptr->lon_thresh.check(hdr_lon)) {
-               continue;
-            }
-         }
+         // Check masking region
+         if(!is_keeper_mask(pnt_obs_str.c_str(), i_msg_typ, i_mask, x, y,
+                            hdr_sid_str, hdr_lat, hdr_lon)) continue;
 
-         // Add the observation for each interpolation method
-         for(k=0; k<n_interp; k++) {
+         // Loop through the interpolation methods
+         for(int i_interp=0; i_interp<n_interp; i_interp++) {
 
-            // Compute the interpolated climatology values using the
-            // observation pressure level or height
-            to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
-                      obs_lvl : obs_hgt);
-
-            // Compute the interpolated climatology mean
-            cmn_v = compute_interp(climo_mn_dpa, obs_x, obs_y, obs_v,
-                       bad_data_double, bad_data_double,
-                       pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                       pd[0][0][k].interp_shape, gr.wrap_lon(),
-                       interp_thresh, spfh_flag,
-                       fcst_info->get_var_info()->level().type(),
-                       to_lvl, cmn_lvl_blw, cmn_lvl_abv);
-
-            // Check for bad data
-            if(climo_mn_dpa.n_planes() > 0 && is_bad_data(cmn_v)) {
-               continue;
-            }
-
-            // Check for valid interpolation options
-            if(climo_sd_dpa.n_planes() > 0 &&
-               (pd[0][0][k].interp_mthd == InterpMthd::Min    ||
-                pd[0][0][k].interp_mthd == InterpMthd::Max    ||
-                pd[0][0][k].interp_mthd == InterpMthd::Median ||
-                pd[0][0][k].interp_mthd == InterpMthd::Best)) {
-               mlog << Warning << "\nVxPairDataEnsemble::add_point_obs() -> "
-                    << "applying the "
-                    << interpmthd_to_string(pd[0][0][k].interp_mthd)
-                    << " interpolation method to climatological spread "
-                    << "may cause unexpected results.\n\n";
-            }
-
-            // Compute the interpolated climatology standard deviation
-            csd_v = compute_interp(climo_sd_dpa, obs_x, obs_y, obs_v,
-                        bad_data_double, bad_data_double,
-                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                        pd[0][0][k].interp_shape, gr.wrap_lon(),
-                        interp_thresh, spfh_flag,
-                        fcst_info->get_var_info()->level().type(),
-                        to_lvl, csd_lvl_blw, csd_lvl_abv);
-
-            // Check for bad data
-            if(climo_sd_dpa.n_planes() > 0 && is_bad_data(csd_v)) {
-               continue;
-            }
+            // Check climatology values
+            double fcmn_v, ocmn_v;
+            double fcsd_v, ocsd_v;
+            if(!is_keeper_climo(pnt_obs_str.c_str(), i_msg_typ, i_mask, i_interp,
+                                gr, obs_x, obs_y, obs_v, obs_lvl, obs_hgt,
+                                fcmn_v, fcsd_v, ocmn_v, ocsd_v)) return;
 
             // Compute weight for current point
-            wgt_v = (wgt_dp == (DataPlane *) 0 ?
-                     default_grid_weight : wgt_dp->get(x, y));
+            double wgt_v = (wgt_dp == (DataPlane *) 0 ?
+                            default_grid_weight :
+                            wgt_dp->get(x, y));
 
             // Add the observation value
             // Weight is from the nearest grid point
-            pd[i][j][k].add_point_obs(hdr_sid_str, hdr_lat, hdr_lon,
-                           obs_x, obs_y, hdr_ut, obs_lvl, obs_hgt,
-                           obs_v, obs_qty, cmn_v, csd_v, wgt_v);
-            pd[i][j][k].add_obs_error_entry(oerr_ptr);
+            // TODO: Pass fcst climo to add_point_pair
+            int n = three_to_one(i_msg_typ, i_mask, i_interp);
+            if(!pd[n].add_point_obs(hdr_sid_str, hdr_lat, hdr_lon,
+                  obs_x, obs_y, hdr_ut, obs_lvl, obs_hgt,
+                  obs_v, obs_qty, ocmn_v, ocsd_v, wgt_v)) {
+
+               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+                  mlog << Debug(REJECT_DEBUG_LEVEL)
+                       << "For " << fcst_info->get_var_info()->magic_str()
+                       << " versus " << obs_info->magic_str()
+                       << ", skipping observation since it is a duplicate:\n"
+                       << pnt_obs_str << "\n";
+               }
+
+               inc_count(rej_dup, i_msg_typ, i_mask, i_interp);
+               continue;
+            }
+
+            // Store the observation error pointer
+            pd[n].add_obs_error_entry(oerr_ptr);
+
          } // end for k
       } // end for j
    } // end for i
@@ -1737,254 +1351,119 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
-   int i, j, k, l, m;
-   int f_lvl_blw, f_lvl_abv, i_mem;
-   double to_lvl, fcst_v;
-   NumArray fcst_na;
 
    // Set flag for specific humidity
    bool spfh_flag = fcst_info->get_var_info()->is_specific_humidity() &&
                      obs_info->is_specific_humidity();
 
    // Loop through all the PairDataEnsemble objects and interpolate
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
-         for(k=0; k<n_interp; k++) {
+   for(vector<PairDataEnsemble>::iterator it = pd.begin();
+       it != pd.end(); it++) {
 
-            // Only apply HiRA to single levels
-            if(pd[0][0][k].interp_mthd == InterpMthd::HiRA &&
-               fcst_dpa.n_planes() != 1 ) {
+      // Only apply HiRA to single levels
+      if(it->interp_mthd == InterpMthd::HiRA &&
+         fcst_dpa.n_planes() != 1 ) {
 
-               mlog << Warning << "\nVxPairDataEnsemble::add_ens() -> "
-                    << "the \"" << interpmthd_to_string(pd[0][0][k].interp_mthd)
-                    << "\" interpolation method only applies when verifying a "
-                    << "single level, not " << fcst_dpa.n_planes()
-                    << " levels.\n\n";
-               continue;
+         mlog << Warning << "\nVxPairDataEnsemble::add_ens() -> "
+              << "the \"" << interpmthd_to_string(it->interp_mthd)
+              << "\" interpolation method only applies when verifying a "
+              << "single level, not " << fcst_dpa.n_planes()
+              << " levels.\n\n";
+            continue;
+      }
+
+      // Process each of the observations
+      NumArray fcst_na;
+      for(int i_obs=0; i_obs<it->n_obs; i_obs++) {
+
+         // Initialize
+         fcst_na.erase();
+
+         // Interpolate using the observation pressure level or height
+         double to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
+                          it->lvl_na[i_obs] : it->elv_na[i_obs]);
+         int lvl_blw, lvl_abv;
+
+         // For a single forecast field
+         if(fcst_dpa.n_planes() == 1) {
+            lvl_blw = 0;
+            lvl_abv = 0;
+         }
+         // For multiple forecast fields, find the levels above
+         // and below the observation point.
+         else {
+            find_vert_lvl(fcst_dpa, to_lvl, lvl_blw, lvl_abv);
+         }
+
+         // Extract the HiRA neighborhood of values
+         if(it->interp_mthd == InterpMthd::HiRA) {
+
+            // For HiRA, set the ensemble mean to bad data
+            if(mn) {
+               fcst_na.erase();
+               fcst_na.add(bad_data_double);
+            }
+            // Otherwise, retrieve all the neighborhood values
+            // using a valid threshold of 0
+            else {
+               get_interp_points(fcst_dpa,
+                  it->x_na[i_obs], it->y_na[i_obs],
+                  it->interp_mthd, it->interp_wdth, it->interp_shape,
+                  gr.wrap_lon(), 0, spfh_flag,
+                  fcst_info->get_var_info()->level().type(),
+                  to_lvl, lvl_blw, lvl_abv,
+                  fcst_na);
+            }
+         }
+         // Otherwise, get a single interpolated ensemble value
+         else {
+            fcst_na.add(compute_interp(fcst_dpa,
+               it->x_na[i_obs], it->y_na[i_obs], it->o_na[i_obs],
+               it->cmn_na[i_obs], it->csd_na[i_obs],
+               it->interp_mthd, it->interp_wdth, it->interp_shape,
+               gr.wrap_lon(), interp_thresh, spfh_flag,
+               fcst_info->get_var_info()->level().type(),
+               to_lvl, lvl_blw, lvl_abv));
+         }
+
+         // Store the single ensemble value or HiRA neighborhood
+         for(int i_fcst=0; i_fcst<fcst_na.n(); i_fcst++) {
+
+            // Store the ensemble mean
+            if(mn) {
+               it->mn_na.add(fcst_na[i_fcst]);
+            }
+            // Store the ensemble member values
+            else {
+
+               // Track unperturbed ensemble variance sums
+               // Exclude the control member from the variance
+               if(member != it->ctrl_index) {
+                  it->add_ens_var_sums(i_obs, fcst_na[i_fcst]);
+               }
+
+               // Apply observation error perturbation, if requested
+               double fcst_v;
+               if(obs_error_info->flag) {
+                  fcst_v = add_obs_error_inc(
+                              obs_error_info->rng_ptr, FieldType::Fcst,
+                              it->obs_error_entry[i_obs],
+                              it->o_na[i_obs], fcst_na[i_fcst]);
+               }
+               else {
+                  fcst_v = fcst_na[i_fcst];
+               }
+
+               // Determine index of ensemble member
+               int i_mem = member * fcst_na.n() + i_fcst;
+
+               // Store perturbed ensemble member value
+               it->add_ens(i_mem, fcst_v);
             }
 
-            // Process each of the observations
-            for(l=0; l<pd[i][j][k].n_obs; l++) {
-
-               // Initialize
-               fcst_na.erase();
-
-               // Interpolate using the observation pressure level or height
-               to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
-                         pd[i][j][k].lvl_na[l] : pd[i][j][k].elv_na[l]);
-
-               // For a single forecast field
-               if(fcst_dpa.n_planes() == 1) {
-                  f_lvl_blw = 0;
-                  f_lvl_abv = 0;
-               }
-               // For multiple forecast fields, find the levels above
-               // and below the observation point.
-               else {
-                  find_vert_lvl(fcst_dpa, to_lvl, f_lvl_blw, f_lvl_abv);
-               }
-
-               // Extract the HiRA neighborhood of values
-               if(pd[0][0][k].interp_mthd == InterpMthd::HiRA) {
-
-                  // For HiRA, set the ensemble mean to bad data
-                  if(mn) {
-                     fcst_na.erase();
-                     fcst_na.add(bad_data_double);
-                  }
-                  // Otherwise, retrieve all the neighborhood values
-                  // using a valid threshold of 0
-                  else {
-                     get_interp_points(fcst_dpa,
-                        pd[i][j][k].x_na[l],
-                        pd[i][j][k].y_na[l],
-                        pd[0][0][k].interp_mthd,
-                        pd[0][0][k].interp_wdth,
-                        pd[0][0][k].interp_shape,
-                        gr.wrap_lon(),
-                        0, spfh_flag,
-                        fcst_info->get_var_info()->level().type(),
-                        to_lvl, f_lvl_blw, f_lvl_abv,
-                        fcst_na);
-                  }
-               }
-               // Otherwise, get a single interpolated ensemble value
-               else {
-                  fcst_na.add(compute_interp(fcst_dpa,
-                     pd[i][j][k].x_na[l],
-                     pd[i][j][k].y_na[l],
-                     pd[i][j][k].o_na[l],
-                     pd[i][j][k].cmn_na[l],
-                     pd[i][j][k].csd_na[l],
-                     pd[0][0][k].interp_mthd,
-                     pd[0][0][k].interp_wdth,
-                     pd[0][0][k].interp_shape,
-                     gr.wrap_lon(),
-                     interp_thresh, spfh_flag,
-                     fcst_info->get_var_info()->level().type(),
-                     to_lvl, f_lvl_blw, f_lvl_abv));
-               }
-
-               // Store the single ensemble value or HiRA neighborhood
-               for(m=0; m<fcst_na.n(); m++) {
-
-                  // Store the ensemble mean
-                  if(mn) {
-                     pd[i][j][k].mn_na.add(fcst_na[m]);
-                  }
-                  // Store the ensemble member values
-                  else {
-
-                     // Track unperturbed ensemble variance sums
-                     // Exclude the control member from the variance
-                     if(member != pd[i][j][k].ctrl_index) {
-                        pd[i][j][k].add_ens_var_sums(l, fcst_na[m]);
-                     }
-
-                     // Apply observation error perturbation, if requested
-                     if(obs_error_info->flag) {
-                        fcst_v = add_obs_error_inc(
-                                    obs_error_info->rng_ptr, FieldType::Fcst,
-                                    pd[i][j][k].obs_error_entry[l],
-                                    pd[i][j][k].o_na[l], fcst_na[m]);
-                     }
-                     else {
-                        fcst_v = fcst_na[m];
-                     }
-
-                     // Determine index of ensemble member
-                     i_mem = member * fcst_na.n() + m;
-
-                     // Store perturbed ensemble member value
-                     pd[i][j][k].add_ens(i_mem, fcst_v);
-                  }
-
-               } // end for m - fcst_na
-            } // end for l - n_obs
-         } // end for k - n_interp
-      } // end for j - n_mask
-   } // end for i - n_msg_typ
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int VxPairDataEnsemble::get_n_pair() const {
-   int n, i, j, k;
-
-   for(i=0, n=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
-         for(k=0; k<n_interp; k++) {
-            n += pd[i][j][k].n_obs;
-         }
-      }
-   }
-
-   return n;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_duplicate_flag(DuplicateType duplicate_flag) {
-
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].set_check_unique(duplicate_flag == DuplicateType::Unique);
-         }
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_obs_summary(ObsSummary s) {
-
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].set_obs_summary(s);
-         }
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_obs_perc_value(int percentile) {
-
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].set_obs_perc_value(percentile);
-         }
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::print_obs_summary() {
-
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].print_obs_summary();
-         }
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::calc_obs_summary() {
-
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].calc_obs_summary();
-         }
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_ctrl_index(int index) {
-
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].ctrl_index = index;
-         }
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_skip_const(bool tf) {
-
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].skip_const = tf;
-         }
-      }
-   }
+         } // end for i_fcst
+      } // end for i_obs
+   } // end for PairDataEnsemble iterator
 
    return;
 }

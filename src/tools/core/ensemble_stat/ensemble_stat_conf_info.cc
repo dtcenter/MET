@@ -936,7 +936,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
    }
 
    // Define the dimensions
-   vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
+   vx_pd.set_size(n_msg_typ, n_mask, n_interp);
 
    // Store the climo CDF info
    vx_pd.set_climo_cdf_info_ptr(&cdf_info);

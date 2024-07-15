@@ -841,8 +841,8 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    clear();
 
    // Allocate new VarInfo objects
-   vx_pd.fcst_info = info_factory.new_var_info(ftype);
-   vx_pd.obs_info  = new VarInfoGrib;
+   vx_pd.set_fcst_info(info_factory.new_var_info(ftype));
+   vx_pd.set_obs_info(new VarInfoGrib);
 
    // Set the VarInfo objects
    vx_pd.fcst_info->set_dict(fdict);
@@ -1077,7 +1077,7 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    }
 
    // Define the dimensions
-   vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
+   vx_pd.set_size(n_msg_typ, n_mask, n_interp);
 
    // Store the MPR filter threshold
    vx_pd.set_mpr_thresh(mpr_sa, mpr_ta);

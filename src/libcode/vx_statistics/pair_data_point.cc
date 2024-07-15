@@ -29,10 +29,6 @@
 
 using namespace std;
 
-static const int REJECT_DEBUG_LEVEL = 9;
-
-static void copy_var_info(const VarInfo *info, VarInfo *&copy);
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Code for class PairDataPoint
@@ -76,6 +72,7 @@ void PairDataPoint::init_from_scratch() {
    seeps_mpr.clear();
    seeps.clear();
    seeps_climo = nullptr;
+
    clear();
 
    return;
@@ -421,24 +418,10 @@ VxPairDataPoint & VxPairDataPoint::operator=(const VxPairDataPoint &vx_pd) {
 
 void VxPairDataPoint::init_from_scratch() {
 
-   fcst_info    = (VarInfo *) nullptr;
-   obs_info     = (VarInfoGrib *) nullptr;
+   VxPairBase::init_from_scratch();
 
-   fclm_info    = (VarInfo *) nullptr;
-   oclm_info    = (VarInfo *) nullptr;
-
-   pd           = (PairDataPoint ***) nullptr;
-   rej_typ      = (int ***) nullptr;
-   rej_mask     = (int ***) nullptr;
-   rej_fcst     = (int ***) nullptr;
-   rej_cmn      = (int ***) nullptr;
-   rej_csd      = (int ***) nullptr;
-   rej_mpr      = (int ***) nullptr;
-   rej_dup      = (int ***) nullptr;
-
-   n_msg_typ    = 0;
-   n_mask       = 0;
-   n_interp     = 0;
+   fcst_info = (VarInfo *)     nullptr;
+   obs_info  = (VarInfoGrib *) nullptr;
 
    clear();
 
@@ -448,68 +431,13 @@ void VxPairDataPoint::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataPoint::clear() {
-   int i, j, k;
 
-   if(fcst_info)  { delete fcst_info;  fcst_info  = (VarInfo *)     nullptr; }
-   if(obs_info)   { delete obs_info;   obs_info   = (VarInfoGrib *) nullptr; }
+   VxPairBase::clear();
 
-   if(fclm_info)  { delete fclm_info;  fclm_info  = (VarInfo *)     nullptr; }
-   if(oclm_info)  { delete oclm_info;  oclm_info  = (VarInfo *)     nullptr; }
+   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *)     nullptr; }
+   if(obs_info)  { delete obs_info;  obs_info  = (VarInfoGrib *) nullptr; }
 
-   desc.clear();
-
-   interp_thresh = 0;
-
-   fcst_dpa.clear();
-   fcmn_dpa.clear();
-   fcsd_dpa.clear();
-   ocmn_dpa.clear();
-   ocsd_dpa.clear();
-   sid_inc_filt.clear();
-   sid_exc_filt.clear();
-   obs_qty_inc_filt.clear();
-   obs_qty_exc_filt.clear();
-   mpr_column.clear();
-   mpr_thresh.clear();
-
-   fcst_ut     = (unixtime) 0;
-   beg_ut      = (unixtime) 0;
-   end_ut      = (unixtime) 0;
-
-   n_try       = 0;
-   rej_sid     = 0;
-   rej_var     = 0;
-   rej_vld     = 0;
-   rej_obs     = 0;
-   rej_grd     = 0;
-   rej_lvl     = 0;
-   rej_topo    = 0;
-   rej_qty     = 0;
-
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
-         for(k=0; k<n_interp; k++) {
-            pd[i][j][k].clear();
-            rej_typ[i][j][k]  = 0;
-            rej_mask[i][j][k] = 0;
-            rej_fcst[i][j][k] = 0;
-            rej_cmn[i][j][k]  = 0;
-            rej_csd[i][j][k]  = 0;
-            rej_mpr[i][j][k]  = 0;
-            rej_dup[i][j][k]  = 0;
-         }
-      }
-   }
-
-   n_msg_typ     = 0;
-   n_mask        = 0;
-   n_interp      = 0;
-
-   msg_typ_sfc.clear();
-   msg_typ_lnd.clear();
-   msg_typ_wtr.clear();
-
-   sfc_info.clear();
+   pd.clear();
 
    return;
 }
@@ -517,70 +445,17 @@ void VxPairDataPoint::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
-   int i, j, k;
 
    clear();
+
+   VxPairBase::assign(vx_pd);
 
    set_fcst_info(vx_pd.fcst_info);
    set_obs_info(vx_pd.obs_info);
 
-   set_fcst_climo_info(vx_pd.fclm_info);
-   set_obs_climo_info(vx_pd.oclm_info);
+   set_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
 
-   desc = vx_pd.desc;
-
-   sid_inc_filt = vx_pd.sid_inc_filt;
-   sid_exc_filt = vx_pd.sid_exc_filt;
-   obs_qty_inc_filt = vx_pd.obs_qty_inc_filt;
-   obs_qty_exc_filt = vx_pd.obs_qty_exc_filt;
-
-   mpr_column = vx_pd.mpr_column;
-   mpr_thresh = vx_pd.mpr_thresh;
-
-   fcst_ut  = vx_pd.fcst_ut;
-   beg_ut   = vx_pd.beg_ut;
-   end_ut   = vx_pd.end_ut;
-
-   n_try    = vx_pd.n_try;
-   rej_typ  = vx_pd.rej_typ;
-   rej_mask = vx_pd.rej_mask;
-   rej_fcst = vx_pd.rej_fcst;
-   rej_cmn  = vx_pd.rej_cmn;
-   rej_csd  = vx_pd.rej_csd;
-   rej_mpr  = vx_pd.rej_mpr;
-   rej_dup  = vx_pd.rej_dup;
-
-   interp_thresh = vx_pd.interp_thresh;
-
-   fcst_dpa = vx_pd.fcst_dpa;
-   fcmn_dpa = vx_pd.fcmn_dpa;
-   fcsd_dpa = vx_pd.fcsd_dpa;
-   ocmn_dpa = vx_pd.ocmn_dpa;
-   ocsd_dpa = vx_pd.ocsd_dpa;
-
-   set_pd_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
-
-   for(i=0; i<vx_pd.n_msg_typ; i++) {
-      for(j=0; j<vx_pd.n_mask; j++) {
-         for(k=0; k<vx_pd.n_interp; k++) {
-
-            pd[i][j][k]       = vx_pd.pd[i][j][k];
-            rej_typ[i][j][k]  = vx_pd.rej_typ[i][j][k];
-            rej_mask[i][j][k] = vx_pd.rej_mask[i][j][k];
-            rej_fcst[i][j][k] = vx_pd.rej_fcst[i][j][k];
-            rej_cmn[i][j][k]  = vx_pd.rej_cmn[i][j][k];
-            rej_csd[i][j][k]  = vx_pd.rej_csd[i][j][k];
-            rej_mpr[i][j][k]  = vx_pd.rej_mpr[i][j][k];
-            rej_dup[i][j][k]  = vx_pd.rej_dup[i][j][k];
-         }
-      }
-   }
-
-   msg_typ_sfc = vx_pd.msg_typ_sfc;
-   msg_typ_lnd = vx_pd.msg_typ_lnd;
-   msg_typ_wtr = vx_pd.msg_typ_wtr;
-
-   sfc_info = vx_pd.sfc_info;
+   pd = vx_pd.pd;
 
    return;
 }
@@ -591,9 +466,11 @@ void VxPairDataPoint::set_fcst_info(VarInfo *info) {
 
    copy_var_info(info, fcst_info);
 
+   // Set the base pointer
+   finfo_ptr = fcst_info;
+
    return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -606,396 +483,23 @@ void VxPairDataPoint::set_obs_info(VarInfoGrib *info) {
    obs_info = new VarInfoGrib;
    *obs_info = *info;
 
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_fcst_climo_info(VarInfo *info) {
-
-   copy_var_info(info, fclm_info);
+   // Set the base pointer
+   oinfo_ptr = obs_info;
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::set_obs_climo_info(VarInfo *info) {
+void VxPairDataPoint::set_size(int types, int masks, int interps) {
 
-   copy_var_info(info, oclm_info);
+   VxPairBase::set_size(types, masks, interps);
 
-   return;
-}
+   // Resize the PairDataPoint vector
+   pd.resize(n_vx);
 
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_desc(const char *s) {
-
-   desc = s;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_interp_thresh(double t) {
-
-   interp_thresh = t;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_fcst_dpa(const DataPlaneArray &dpa) {
-
-   fcst_dpa = dpa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_fcst_climo_mn_dpa(const DataPlaneArray &dpa) {
-
-   fcmn_dpa = dpa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_fcst_climo_sd_dpa(const DataPlaneArray &dpa) {
-
-   fcsd_dpa = dpa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_obs_climo_mn_dpa(const DataPlaneArray &dpa) {
-
-   ocmn_dpa = dpa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_obs_climo_sd_dpa(const DataPlaneArray &dpa) {
-
-   ocsd_dpa = dpa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_fcst_ut(const unixtime ut) {
-
-   fcst_ut = ut;
-
-   //  set the fcst_ut for all PairBase instances, used for duplicate logic
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].set_fcst_ut(ut);
-         }
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_beg_ut(const unixtime ut) {
-
-   beg_ut = ut;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_end_ut(const unixtime ut) {
-
-   end_ut = ut;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_sid_inc_filt(const StringArray &sa) {
-
-   sid_inc_filt = sa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_sid_exc_filt(const StringArray &sa) {
-
-   sid_exc_filt = sa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_obs_qty_inc_filt(const StringArray &sa) {
-
-   obs_qty_inc_filt = sa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_obs_qty_exc_filt(const StringArray &sa) {
-
-   obs_qty_exc_filt = sa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_pd_size(int types, int masks, int interps) {
-   int i, j, k;
-
-   // Store the dimensions for the PairDataPoint array
-   n_msg_typ = types;
-   n_mask    = masks;
-   n_interp  = interps;
-
-   // Allocate space for the PairDataPoint array
-   pd       = new PairDataPoint ** [n_msg_typ];
-   rej_typ  = new int **           [n_msg_typ];
-   rej_mask = new int **           [n_msg_typ];
-   rej_fcst = new int **           [n_msg_typ];
-   rej_cmn  = new int **           [n_msg_typ];
-   rej_csd  = new int **           [n_msg_typ];
-   rej_mpr  = new int **           [n_msg_typ];
-   rej_dup  = new int **           [n_msg_typ];
-
-   for(i=0; i<n_msg_typ; i++) {
-      pd[i]       = new PairDataPoint * [n_mask];
-      rej_typ[i]  = new int *           [n_mask];
-      rej_mask[i] = new int *           [n_mask];
-      rej_fcst[i] = new int *           [n_mask];
-      rej_cmn[i]  = new int *           [n_mask];
-      rej_csd[i]  = new int *           [n_mask];
-      rej_mpr[i]  = new int *           [n_mask];
-      rej_dup[i]  = new int *           [n_mask];
-
-      for(j=0; j<n_mask; j++) {
-         pd[i][j]       = new PairDataPoint [n_interp];
-         rej_typ[i][j]  = new int           [n_interp];
-         rej_mask[i][j] = new int           [n_interp];
-         rej_fcst[i][j] = new int           [n_interp];
-         rej_cmn[i][j]  = new int           [n_interp];
-         rej_csd[i][j]  = new int           [n_interp];
-         rej_mpr[i][j]  = new int           [n_interp];
-         rej_dup[i][j]  = new int           [n_interp];
-
-         for(k=0; k<n_interp; k++) {
-            rej_typ[i][j][k]  = 0;
-            rej_mask[i][j][k] = 0;
-            rej_fcst[i][j][k] = 0;
-            rej_cmn[i][j][k]  = 0;
-            rej_csd[i][j][k]  = 0;
-            rej_mpr[i][j][k]  = 0;
-            rej_dup[i][j][k]  = 0;
-         } // end for k
-      } // end for j
-   } // end for i
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_msg_typ(int i_msg_typ, const char *name) {
-   int i, j;
-
-   for(i=0; i<n_mask; i++) {
-      for(j=0; j<n_interp; j++) {
-         pd[i_msg_typ][i][j].set_msg_typ(name);
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_msg_typ_vals(int i_msg_typ, const StringArray &sa) {
-   int i, j;
-
-   for(i=0; i<n_mask; i++) {
-      for(j=0; j<n_interp; j++) {
-         pd[i_msg_typ][i][j].set_msg_typ_vals(sa);
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_mask_area(int i_mask, const char *name,
-                                    MaskPlane *mp_ptr) {
-   int i, j;
-
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_interp; j++) {
-         pd[i][i_mask][j].set_mask_name(name);
-         pd[i][i_mask][j].set_mask_area_ptr(mp_ptr);
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_mask_sid(int i_mask, const char *name,
-                                   StringArray *sid_ptr) {
-   int i, j;
-
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_interp; j++) {
-         pd[i][i_mask][j].set_mask_name(name);
-         pd[i][i_mask][j].set_mask_sid_ptr(sid_ptr);
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_mask_llpnt(int i_mask, const char *name,
-                                     MaskLatLon *llpnt_ptr) {
-   int i, j;
-
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_interp; j++) {
-         pd[i][i_mask][j].set_mask_name(name);
-         pd[i][i_mask][j].set_mask_llpnt_ptr(llpnt_ptr);
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_interp(int i_interp,
-                                 const char *interp_mthd_str, int width,
-                                 GridTemplateFactory::GridTemplates shape) {
-   int i, j;
-
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
-         pd[i][j][i_interp].set_interp_mthd(interp_mthd_str);
-         pd[i][j][i_interp].set_interp_wdth(width);
-         pd[i][j][i_interp].set_interp_shape(shape);
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_interp(int i_interp,
-                                 InterpMthd mthd, int width,
-                                 GridTemplateFactory::GridTemplates shape) {
-   int i, j;
-
-   for(i=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
-         pd[i][j][i_interp].set_interp_mthd(mthd);
-         pd[i][j][i_interp].set_interp_wdth(width);
-         pd[i][j][i_interp].set_interp_shape(shape);
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_mpr_thresh(const StringArray &sa, const ThreshArray &ta) {
-
-   // Check for constant length
-   if(sa.n() != ta.n()) {
-      mlog << Error << "\nVxPairDataPoint::set_mpr_thresh() -> "
-           << "the \"" << conf_key_mpr_column << "\" ("
-           << write_css(sa) << ") and \"" << conf_key_mpr_thresh
-           << "\" (" << write_css(ta)
-           << ") config file entries must have the same length!\n\n";
-      exit(1);
-   }
-
-   mpr_column = sa;
-   mpr_thresh = ta;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_climo_cdf_info_ptr(const ClimoCDFInfo *info) {
-
-   for(int i=0; i<n_msg_typ; i++) {
-      for(int j=0; j<n_mask; j++) {
-         for(int k=0; k<n_interp; k++) {
-            pd[i][j][k].set_climo_cdf_info_ptr(info);
-         }
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_msg_typ_sfc(const StringArray &sa) {
-
-   msg_typ_sfc = sa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_msg_typ_lnd(const StringArray &sa) {
-
-   msg_typ_lnd = sa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_msg_typ_wtr(const StringArray &sa) {
-
-   msg_typ_wtr = sa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_sfc_info(const SurfaceInfo &si) {
-
-   sfc_info = si;
+   // Set PairBase pointers to the PairDataPoint objects
+   for(int i=0; i<n_vx; i++) pb_ptr[i] = &pd[i];
 
    return;
 }
@@ -1007,328 +511,62 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                                     const char *obs_qty, float *obs_arr,
                                     Grid &gr, const char *var_name,
                                     const DataPlane *wgt_dp) {
-   int i, j, k, x, y;
-   double hdr_lat, hdr_lon, hdr_elv;
-   double obs_x, obs_y, obs_lvl, obs_hgt, to_lvl, wgt_v;
-   double fcst_v, fcmn_v, fcsd_v;
-   double obs_v, ocmn_v, ocsd_v;
-   int f_lvl_blw, f_lvl_abv;
-   int cmn_lvl_blw, cmn_lvl_abv;
-   int csd_lvl_blw, csd_lvl_abv;
-   ConcatString reason_cs;
 
    // Increment the number of tries count
    n_try++;
 
-   // Check the station ID inclusion and exclusion lists
-   if((sid_inc_filt.n() && !sid_inc_filt.has(hdr_sid_str)) ||
-      (sid_exc_filt.n() &&  sid_exc_filt.has(hdr_sid_str))) {
-
-      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-         mlog << Debug(REJECT_DEBUG_LEVEL)
-              << "For " << fcst_info->magic_str() << " versus "
-              << obs_info->magic_str()
-              << ", skipping observation station id:\n"
-              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                     hdr_ut, obs_qty, obs_arr, var_name)
-              << "\n";
-      }
-
-      rej_sid++;
-      return;
+   // Point observation summary string for rejection log messages
+   ConcatString pnt_obs_str;
+   if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+      pnt_obs_str = point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
+                                        hdr_ut, obs_qty, obs_arr, var_name);
    }
 
-   // Check whether the GRIB code for the observation matches
-   // the specified code
-   if((var_name != 0) && (0 < strlen(var_name))) {
-      if(var_name != obs_info->name()) {
+   // Check the station ID
+   if(!is_keeper_sid(pnt_obs_str.c_str(), hdr_sid_str)) return;
 
-         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-            mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << fcst_info->magic_str() << " versus "
-                 << obs_info->magic_str()
-                 << ", skipping observation variable name:\n"
-                 << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                        hdr_ut, obs_qty, obs_arr, var_name)
-                 << "\n";
-         }
+   // Check observation variable
+   if(!is_keeper_var(pnt_obs_str.c_str(), var_name, nint(obs_arr[1]))) return;
 
-         rej_var++;
-         return;
-      }
-   }
-   else if(obs_info->code() != nint(obs_arr[1])) {
+   // Check observation quality
+   if(!is_keeper_qty(pnt_obs_str.c_str(), obs_qty)) return;
 
-      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-         mlog << Debug(REJECT_DEBUG_LEVEL)
-              << "For " << fcst_info->magic_str() << " versus "
-              << obs_info->magic_str()
-              << ", skipping observation variable GRIB code:\n"
-              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                     hdr_ut, obs_qty, obs_arr, var_name)
-              << "\n";
-      }
+   // Check valid time
+   if(!is_keeper_vld(pnt_obs_str.c_str(), hdr_ut)) return;
 
-      rej_var++;
-      return;
-   }
+   // Check observation value
+   double obs_v = obs_arr[4];
+   if(!is_keeper_obs(pnt_obs_str.c_str(), obs_v)) return;
 
-   // Check the observation quality include and exclude options
-   if((obs_qty_inc_filt.n() > 0 && !obs_qty_inc_filt.has(obs_qty)) ||
-      (obs_qty_exc_filt.n() > 0 &&  obs_qty_exc_filt.has(obs_qty))) {
+   // Check location
+   double hdr_lat = hdr_arr[0];
+   double hdr_lon = hdr_arr[1];
+   double obs_x, obs_y;
+   if(!is_keeper_grd(pnt_obs_str.c_str(), gr, hdr_lat, hdr_lon, obs_x, obs_y)) return;
 
-      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-         mlog << Debug(REJECT_DEBUG_LEVEL)
-              << "For " << fcst_info->magic_str() << " versus "
-              << obs_info->magic_str()
-              << ", skipping observation quality control string:\n"
-              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                     hdr_ut, obs_qty, obs_arr, var_name)
-              << "\n";
-      }
+   // Check topo
+   double hdr_elv = hdr_arr[2];
+   if(!is_keeper_topo(pnt_obs_str.c_str(), gr, obs_x, obs_y,
+                      hdr_typ_str, hdr_elv)) return;
 
-      rej_qty++;
-      return;
-   }
+   // Check level
+   double obs_lvl = obs_arr[2];
+   double obs_hgt = obs_arr[3];
+   if(!is_keeper_lvl(pnt_obs_str.c_str(), hdr_typ_str, obs_lvl, obs_hgt)) return;
 
-   // Check whether the observation time falls within the valid time
-   // window
-   if(hdr_ut < beg_ut || hdr_ut > end_ut) {
-
-      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-         mlog << Debug(REJECT_DEBUG_LEVEL)
-              << "For " << fcst_info->magic_str() << " versus "
-              << obs_info->magic_str()
-              << ", skipping observation valid time:\n"
-              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                     hdr_ut, obs_qty, obs_arr, var_name)
-              << "\n";
-      }
-
-      rej_vld++;
-      return;
-   }
-
+   // Set flags
+   bool spfh_flag   = fcst_info->is_specific_humidity() &&
+                      obs_info->is_specific_humidity();
    bool precip_flag = fcst_info->is_precipitation() &&
                       obs_info->is_precipitation();
    int precip_interval = bad_data_int;
-   if (precip_flag) {
-      if (wgt_dp) precip_interval = wgt_dp->accum();
+   if(precip_flag) {
+      if(wgt_dp) precip_interval = wgt_dp->accum();
       else precip_interval = fcst_dpa[0].accum();
    }
 
-   hdr_lat = hdr_arr[0];
-   hdr_lon = hdr_arr[1];
-   hdr_elv = hdr_arr[2];
-
-   obs_lvl = obs_arr[2];
-   obs_hgt = obs_arr[3];
-
-   // Apply observation processing logic
-   obs_v = pd[0][0][0].process_obs(obs_info, obs_arr[4]);
-
-   // Check whether the observation value contains valid data
-   if(is_bad_data(obs_v)) {
-
-      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-         mlog << Debug(REJECT_DEBUG_LEVEL)
-              << "For " << fcst_info->magic_str() << " versus "
-              << obs_info->magic_str()
-              << ", skipping observation with bad data value:\n"
-              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                     hdr_ut, obs_qty, obs_arr, var_name)
-              << "\n";
-      }
-
-      rej_obs++;
-      return;
-   }
-
-   // Convert the lat/lon value to x/y
-   gr.latlon_to_xy(hdr_lat, -1.0*hdr_lon, obs_x, obs_y);
-   x = nint(obs_x);
-   y = nint(obs_y);
-
-   // Check if the observation's lat/lon is on the grid
-   if(((x < 0 || x >= gr.nx()) && !gr.wrap_lon()) ||
-        y < 0 || y >= gr.ny()) {
-
-      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-         mlog << Debug(REJECT_DEBUG_LEVEL)
-              << "For " << fcst_info->magic_str() << " versus "
-              << obs_info->magic_str()
-              << ", skipping observation off the grid where (x, y) = ("
-              << x << ", " << y << ") and grid (nx, ny) = (" << gr.nx()
-              << ", " << gr.ny() << "):\n"
-              << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                     hdr_ut, obs_qty, obs_arr, var_name)
-              << "\n";
-      }
-
-      rej_grd++;
-      return;
-   }
-
-   // Check for a large topography difference
-   if(sfc_info.topo_ptr && msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
-
-      // Interpolate model topography to observation location
-      double topo = compute_horz_interp(
-                       *sfc_info.topo_ptr, obs_x, obs_y, hdr_elv,
-                        InterpMthd::Bilin, 2,
-                        GridTemplateFactory::GridTemplates::Square,
-                        gr.wrap_lon(), 1.0);
-
-      // Skip bad topography values
-      if(is_bad_data(hdr_elv) || is_bad_data(topo)) {
-
-         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-            mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << fcst_info->magic_str() << " versus "
-                 << obs_info->magic_str()
-                 << ", skipping observation due to bad topography values "
-                 << "where observation elevation = " << hdr_elv
-                 << " and model topography = " << topo << ":\n"
-                 << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                        hdr_ut, obs_qty, obs_arr, var_name)
-                 << "\n";
-         }
-
-         rej_topo++;
-         return;
-      }
-
-      // Check the topography difference threshold
-      if(!sfc_info.topo_use_obs_thresh.check(topo - hdr_elv)) {
-
-         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-            mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << fcst_info->magic_str() << " versus "
-                 << obs_info->magic_str()
-                 << ", skipping observation due to topography difference "
-                 << "where observation elevation (" << hdr_elv
-                 << ") minus model topography (" << topo << ") = "
-                 << topo - hdr_elv << " is not "
-                 << sfc_info.topo_use_obs_thresh.get_str() << ":\n"
-                 << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                        hdr_ut, obs_qty, obs_arr, var_name)
-                 << "\n";
-         }
-
-         rej_topo++;
-         return;
-      }
-   }
-
-   // For pressure levels, check if the observation pressure level
-   // falls in the requested range.
-   if(obs_info->level().type() == LevelType_Pres) {
-
-      if(obs_lvl < obs_info->level().lower() ||
-         obs_lvl > obs_info->level().upper()) {
-
-         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-            mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << fcst_info->magic_str() << " versus "
-                 << obs_info->magic_str()
-                 << ", skipping observation pressure level value:\n"
-                 << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                        hdr_ut, obs_qty, obs_arr, var_name)
-                 << "\n";
-         }
-
-         rej_lvl++;
-         return;
-      }
-   }
-   // For accumulations, check if the observation accumulation interval
-   // matches the requested interval.
-   else if(obs_info->level().type() == LevelType_Accum) {
-
-      if(obs_lvl < obs_info->level().lower() ||
-         obs_lvl > obs_info->level().upper()) {
-
-         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-            mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << fcst_info->magic_str() << " versus "
-                 << obs_info->magic_str()
-                 << ", skipping observation accumulation interval:\n"
-                 << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                        hdr_ut, obs_qty, obs_arr, var_name)
-                 << "\n";
-         }
-
-         rej_lvl++;
-         return;
-      }
-   }
-   // For all other level types (VertLevel, RecNumber, NoLevel),
-   // check for a surface message type or if the observation height
-   // falls within the requested range.
-   else {
-
-      if(!msg_typ_sfc.reg_exp_match(hdr_typ_str) &&
-         (obs_hgt < obs_info->level().lower() ||
-          obs_hgt > obs_info->level().upper())) {
-
-         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-            mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << fcst_info->magic_str() << " versus "
-                 << obs_info->magic_str()
-                 << ", skipping observation level value:\n"
-                 << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                        hdr_ut, obs_qty, obs_arr, var_name)
-                 << "\n";
-         }
-
-         rej_lvl++;
-         return;
-      }
-   }
-
-   // For a single forecast field
-   if(fcst_dpa.n_planes() == 1) {
-      f_lvl_blw = 0;
-      f_lvl_abv = 0;
-   }
-   // For multiple forecast fields, find the levels above and below
-   // the observation point.
-   else {
-      // Interpolate using the observation pressure level or height
-      to_lvl = (fcst_info->level().type() == LevelType_Pres ?
-                obs_lvl : obs_hgt);
-      find_vert_lvl(fcst_dpa, to_lvl, f_lvl_blw, f_lvl_abv);
-   }
-
-   // TODO: Support fcst and obs climos
-
-   // For a single climatology mean field
-   if(fcmn_dpa.n_planes() == 1) {
-      cmn_lvl_blw = 0;
-      cmn_lvl_abv = 0;
-   }
-   // For multiple climatology mean fields, find the levels above and
-   // below the observation point.
-   else {
-      // Interpolate using the observation pressure level or height
-      to_lvl = (fcst_info->level().type() == LevelType_Pres ?
-                obs_lvl : obs_hgt);
-      find_vert_lvl(fcmn_dpa, to_lvl, cmn_lvl_blw, cmn_lvl_abv);
-   }
-
-   // For a single climatology standard deviation field
-   if(fcsd_dpa.n_planes() == 1) {
-      csd_lvl_blw = 0;
-      csd_lvl_abv = 0;
-   }
-   // For multiple climatology standard deviation fields, find the
-   // levels above and below the observation point.
-   else {
-      // Interpolate using the observation pressure level or height
-      to_lvl = (fcst_info->level().type() == LevelType_Pres ?
-                obs_lvl : obs_hgt);
-      find_vert_lvl(fcsd_dpa, to_lvl, csd_lvl_blw, csd_lvl_abv);
-   }
+   bool has_seeps = false;
+   SeepsScore *seeps = 0;
 
    // When verifying a vertical level forecast against a surface message
    // type, set the observation level value to bad data so that it's not
@@ -1338,301 +576,69 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
       obs_lvl = bad_data_double;
    }
 
-   // Set flag for specific humidity
-   bool spfh_flag = fcst_info->is_specific_humidity() &&
-                     obs_info->is_specific_humidity();
+   // Loop through the message types
+   for(int i_msg_typ=0; i_msg_typ<n_msg_typ; i_msg_typ++) {
 
-   // Look through all of the PairDataPoint objects to see if the
-   // observation should be added.
+      // Check message type
+      if(!is_keeper_typ(pnt_obs_str.c_str(), i_msg_typ, hdr_typ_str)) continue;
 
-   bool has_seeps = false;
-   SeepsScore *seeps = 0;
+      int x = nint(obs_x);
+      int y = nint(obs_y);
 
-   // Check the message types
-   for(i=0; i<n_msg_typ; i++) {
+      // Loop through the masking regions
+      for(int i_mask=0; i_mask<n_mask; i_mask++) {
 
-      //
-      // Check for a matching PrepBufr message type
-      //
-      if(!pd[i][0][0].msg_typ_vals.has(hdr_typ_str)) {
+         // Check masking region
+         if(!is_keeper_mask(pnt_obs_str.c_str(), i_msg_typ, i_mask, x, y,
+                            hdr_sid_str, hdr_lat, hdr_lon)) continue;
 
-         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-            mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << fcst_info->magic_str() << " versus "
-                 << obs_info->magic_str()
-                 << ", skipping observation message type:\n"
-                 << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                        hdr_ut, obs_qty, obs_arr, var_name)
-                 << "\n";
-         }
+         // Loop through the interpolation methods
+         for(int i_interp=0; i_interp<n_interp; i_interp++) {
 
-         inc_count(rej_typ, i);
-         continue;
-      }
+            // Check climatology values
+            double fcmn_v, ocmn_v;
+            double fcsd_v, ocsd_v;
+            if(!is_keeper_climo(pnt_obs_str.c_str(), i_msg_typ, i_mask, i_interp,
+                                gr, obs_x, obs_y, obs_v, obs_lvl, obs_hgt,
+                                fcmn_v, fcsd_v, ocmn_v, ocsd_v)) return;
 
-      // Check the masking areas and points
-      for(j=0; j<n_mask; j++) {
-
-         // Check for the obs falling within the masking region
-         if(pd[i][j][0].mask_area_ptr != (MaskPlane *) 0) {
-            if(!pd[i][j][0].mask_area_ptr->s_is_on(x, y)) {
-
-               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-                  mlog << Debug(REJECT_DEBUG_LEVEL)
-                       << "For " << fcst_info->magic_str() << " versus "
-                       << obs_info->magic_str()
-                       << ", skipping observation based on spatial masking region:\n"
-                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                              hdr_ut, obs_qty, obs_arr, var_name)
-                       << "\n";
-               }
-
-               inc_count(rej_mask, i, j);
-               continue;
-            }
-         }
-         // Otherwise, check for the obs Station ID's presence in the
-         // masking SID list
-         else if(pd[i][j][0].mask_sid_ptr != (StringArray *) 0) {
-            if(!pd[i][j][0].mask_sid_ptr->has(hdr_sid_str)) {
-
-               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-                  mlog << Debug(REJECT_DEBUG_LEVEL)
-                       << "For " << fcst_info->magic_str() << " versus "
-                       << obs_info->magic_str()
-                       << ", skipping observation based on masking station id list:\n"
-                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                              hdr_ut, obs_qty, obs_arr, var_name)
-                       << "\n";
-               }
-
-               inc_count(rej_mask, i, j);
-               continue;
-            }
-         }
-         // Otherwise, check observation lat/lon thresholds
-         else if(pd[i][j][0].mask_llpnt_ptr != (MaskLatLon *) 0) {
-            if(!pd[i][j][0].mask_llpnt_ptr->lat_thresh.check(hdr_lat) ||
-               !pd[i][j][0].mask_llpnt_ptr->lon_thresh.check(hdr_lon)) {
-
-               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-                  mlog << Debug(REJECT_DEBUG_LEVEL)
-                       << "For " << fcst_info->magic_str() << " versus "
-                       << obs_info->magic_str()
-                       << ", skipping observation based on latitude/longitude thesholds:\n"
-                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                              hdr_ut, obs_qty, obs_arr, var_name)
-                       << "\n";
-               }
-
-               inc_count(rej_mask, i, j);
-               continue;
-            }
-         }
-
-         // Compute the interpolated values
-         for(k=0; k<n_interp; k++) {
-
-            // Compute the interpolated forecast value using the
-            // observation pressure level or height
-            to_lvl = (fcst_info->level().type() == LevelType_Pres ?
-                      obs_lvl : obs_hgt);
-
-            // Compute the interpolated forecast climatology mean
-            fcmn_v = compute_interp(fcmn_dpa, obs_x, obs_y, obs_v,
-                        bad_data_double, bad_data_double,
-                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                        pd[0][0][k].interp_shape, gr.wrap_lon(),
-                        interp_thresh, spfh_flag,
-                        fcst_info->level().type(),
-                        to_lvl, cmn_lvl_blw, cmn_lvl_abv);
-
-            // Check for bad data
-            if(fcmn_dpa.n_planes() > 0 && is_bad_data(fcmn_v)) {
-
-               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-                  mlog << Debug(REJECT_DEBUG_LEVEL)
-                       << "For " << fcst_info->magic_str() << " versus "
-                       << obs_info->magic_str()
-                       << ", skipping observation based on bad forecast climatological mean value:\n"
-                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                              hdr_ut, obs_qty, obs_arr, var_name)
-                       << "\n";
-               }
-
-               inc_count(rej_cmn, i, j, k);
-               continue;
-            }
-
-            // Compute the interpolated observation climatology mean
-            ocmn_v = compute_interp(ocmn_dpa, obs_x, obs_y, obs_v,
-                        bad_data_double, bad_data_double,
-                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                        pd[0][0][k].interp_shape, gr.wrap_lon(),
-                        interp_thresh, spfh_flag,
-                        fcst_info->level().type(),
-                        to_lvl, cmn_lvl_blw, cmn_lvl_abv);
-
-            // Check for bad data
-            if(ocmn_dpa.n_planes() > 0 && is_bad_data(ocmn_v)) {
-
-               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-                  mlog << Debug(REJECT_DEBUG_LEVEL)
-                       << "For " << fcst_info->magic_str() << " versus "
-                       << obs_info->magic_str()
-                       << ", skipping observation based on bad observation climatological mean value:\n"
-                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                              hdr_ut, obs_qty, obs_arr, var_name)
-                       << "\n";
-               }
-
-               inc_count(rej_cmn, i, j, k);
-               continue;
-            }
-
-            // Check for valid interpolation options
-            if(fcsd_dpa.n_planes() > 0 &&
-               (pd[0][0][k].interp_mthd == InterpMthd::Min    ||
-                pd[0][0][k].interp_mthd == InterpMthd::Max    ||
-                pd[0][0][k].interp_mthd == InterpMthd::Median ||
-                pd[0][0][k].interp_mthd == InterpMthd::Best)) {
-               mlog << Warning << "\nVxPairDataPoint::add_point_obs() -> "
-                    << "applying the "
-                    << interpmthd_to_string(pd[0][0][k].interp_mthd)
-                    << " interpolation method to climatological spread "
-                    << "may cause unexpected results.\n\n";
-            }
-
-            // Compute the interpolated forecast climatology standard deviation
-            fcsd_v = compute_interp(fcsd_dpa, obs_x, obs_y, obs_v,
-                        bad_data_double, bad_data_double,
-                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                        pd[0][0][k].interp_shape, gr.wrap_lon(),
-                        interp_thresh, spfh_flag,
-                        fcst_info->level().type(),
-                        to_lvl, csd_lvl_blw, csd_lvl_abv);
-
-            // Check for bad data
-            if(fcsd_dpa.n_planes() > 0 && is_bad_data(fcsd_v)) {
-
-               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-                  mlog << Debug(REJECT_DEBUG_LEVEL)
-                       << "For " << fcst_info->magic_str() << " versus "
-                       << obs_info->magic_str()
-                       << ", skipping observation based on bad forecast climatological standard deviation value:\n"
-                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                              hdr_ut, obs_qty, obs_arr, var_name)
-                       << "\n";
-               }
-
-               inc_count(rej_csd, i, j, k);
-               continue;
-            }
-
-            // Compute the interpolated observation climatology standard deviation
-            ocsd_v = compute_interp(ocsd_dpa, obs_x, obs_y, obs_v,
-                        bad_data_double, bad_data_double,
-                        pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                        pd[0][0][k].interp_shape, gr.wrap_lon(),
-                        interp_thresh, spfh_flag,
-                        fcst_info->level().type(),
-                        to_lvl, csd_lvl_blw, csd_lvl_abv);
-
-            // Check for bad data
-            if(ocsd_dpa.n_planes() > 0 && is_bad_data(ocsd_v)) {
-
-               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-                  mlog << Debug(REJECT_DEBUG_LEVEL)
-                       << "For " << fcst_info->magic_str() << " versus "
-                       << obs_info->magic_str()
-                       << ", skipping observation based on bad observation climatological standard deviation value:\n"
-                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                              hdr_ut, obs_qty, obs_arr, var_name)
-                       << "\n";
-               }
-
-               inc_count(rej_csd, i, j, k);
-               continue;
-            }
-
-            // For surface verification, apply land/sea and topo masks
-            if((sfc_info.land_ptr || sfc_info.topo_ptr) &&
-               (msg_typ_sfc.reg_exp_match(hdr_typ_str))) {
-
-               bool is_land = msg_typ_lnd.has(hdr_typ_str);
-
-               // Check for a single forecast DataPlane
-               if(fcst_dpa.n_planes() != 1) {
-                  mlog << Error << "\nVxPairDataPoint::add_point_obs() -> "
-                       << "unexpected number of forecast levels ("
-                       << fcst_dpa.n_planes()
-                       << ") for surface verification! Set \"land_mask.flag\" and "
-                       << "\"topo_mask.flag\" to false to disable this check.\n\n";
-                  exit(1);
-               }
-
-               fcst_v = compute_sfc_interp(fcst_dpa[0], obs_x, obs_y, hdr_elv, obs_v,
-                           pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                           pd[0][0][k].interp_shape, gr.wrap_lon(),
-                           interp_thresh, sfc_info, is_land);
-            }
-            // Otherwise, compute interpolated value
-            else {
-               fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v, fcmn_v, fcsd_v,
-                           pd[0][0][k].interp_mthd, pd[0][0][k].interp_wdth,
-                           pd[0][0][k].interp_shape, gr.wrap_lon(),
-                           interp_thresh, spfh_flag,
-                           fcst_info->level().type(),
-                           to_lvl, f_lvl_blw, f_lvl_abv);
-            }
-
-            if(is_bad_data(fcst_v)) {
-
-               if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-                  mlog << Debug(REJECT_DEBUG_LEVEL)
-                       << "For " << fcst_info->magic_str() << " versus "
-                       << obs_info->magic_str()
-                       << ", skipping observation based due to bad data in the " 
-                       << interpmthd_to_string(pd[0][0][k].interp_mthd) << "("
-                       << pd[0][0][k].interp_wdth * pd[0][0][k].interp_wdth
-                       << ") interpolated forecast value:\n"
-                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                              hdr_ut, obs_qty, obs_arr, var_name)
-                       << "\n";
-               }
-
-               inc_count(rej_fcst, i, j, k);
-               continue;
-            }
+            // Check forecast values
+            double fcst_v;
+            if(!is_keeper_fcst(pnt_obs_str.c_str(), i_msg_typ, i_mask, i_interp,
+                               hdr_typ_str, gr, obs_x, obs_y, hdr_elv,
+                               obs_v, obs_lvl, obs_hgt,
+                               fcmn_v, fcsd_v, ocmn_v, ocsd_v,
+                               fcst_v)) return;
 
             // Check matched pair filtering options
+            // TODO: Add fcst climo support
+            ConcatString reason_cs;
             if(!check_mpr_thresh(fcst_v, obs_v, ocmn_v, ocsd_v,
                                  mpr_column, mpr_thresh, &reason_cs)) {
 
                if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                   mlog << Debug(REJECT_DEBUG_LEVEL)
                        << "For " << fcst_info->magic_str() << " versus "
-                       << obs_info->magic_str()
-                       << ", skipping observation due to matched pair filter since "
+                       << obs_info->magic_str() << ", skipping observation"
+                       << "due to matched pair filter since "
                        << reason_cs << ":\n"
-                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                              hdr_ut, obs_qty, obs_arr, var_name)
-                       << "\n";
+                       << pnt_obs_str << "\n";
                }
 
-               inc_count(rej_mpr, i, j, k);
+               inc_count(rej_mpr, i_msg_typ, i_mask, i_interp);
                continue;
             }
 
             // Compute weight for current point
-            wgt_v = (wgt_dp == (DataPlane *) 0 ?
-                     default_grid_weight : wgt_dp->get(x, y));
-
-            // TODO: Pass fcst climo to add_point_pair
+            double wgt_v = (wgt_dp == (DataPlane *) 0 ?
+                            default_grid_weight :
+                            wgt_dp->get(x, y));
 
             // Add the forecast, climatological, and observation data
             // Weight is from the nearest grid point
-            if(!pd[i][j][k].add_point_pair(hdr_sid_str,
+            // TODO: Pass fcst climo to add_point_pair
+            int n = three_to_one(i_msg_typ, i_mask, i_interp);
+            if(!pd[n].add_point_pair(hdr_sid_str,
                   hdr_lat, hdr_lon, obs_x, obs_y, hdr_ut, obs_lvl,
                   obs_hgt, fcst_v, obs_v, obs_qty,
                   ocmn_v, ocsd_v, wgt_v)) {
@@ -1642,117 +648,36 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                        << "For " << fcst_info->magic_str() << " versus "
                        << obs_info->magic_str()
                        << ", skipping observation since it is a duplicate:\n"
-                       << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                              hdr_ut, obs_qty, obs_arr, var_name)
-                       << "\n";
+                       << pnt_obs_str << "\n";
                }
 
-               inc_count(rej_dup, i, j, k);
+               inc_count(rej_dup, i_msg_typ, i_mask, i_interp);
+               continue;
             }
+
+            // Compute seeps
             seeps = 0;
             if (precip_flag && precip_interval == 24*60*60) {  // 24 hour precip only
-               seeps = pd[i][j][k].compute_seeps(hdr_sid_str, fcst_v, obs_v, hdr_ut);
+               seeps = pd[n].compute_seeps(hdr_sid_str, fcst_v, obs_v, hdr_ut);
             }
-            pd[i][j][k].set_seeps_score(seeps);
+            pd[n].set_seeps_score(seeps);
             if (seeps) delete seeps;
 
             if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                mlog << Debug(REJECT_DEBUG_LEVEL)
                     << "For " << fcst_info->magic_str() << " versus "
                     << obs_info->magic_str() << ", for observation type "
-                    << pd[i][0][0].msg_typ << ", over region "
-                    << pd[0][j][0].mask_name << ", for interpolation method "
-                    << interpmthd_to_string(pd[0][0][k].interp_mthd) << "("
-                    << pd[0][0][k].interp_wdth * pd[0][0][k].interp_wdth
+                    << pd[n].msg_typ << ", over region "
+                    << pd[n].mask_name << ", for interpolation method "
+                    << interpmthd_to_string(pd[n].interp_mthd) << "("
+                    << pd[n].interp_wdth * pd[n].interp_wdth
                     << "), using observation:\n"
-                    << point_obs_to_string(hdr_arr, hdr_typ_str, hdr_sid_str,
-                                           hdr_ut, obs_qty, obs_arr, var_name)
-                    << "\n";
+                    << pnt_obs_str << "\n";
             }
 
-         } // end for k
-      } // end for j
-   } // end for i
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int VxPairDataPoint::get_n_pair() const {
-   int n, i, j, k;
-
-   if(n_msg_typ == 0 || n_mask == 0 || n_interp == 0) {
-      mlog << Warning << "\nVxPairDataPoint::get_n_pair() -> "
-           << "set_pd_size() has not been called yet!\n\n";
-   }
-
-   for(i=0, n=0; i<n_msg_typ; i++) {
-      for(j=0; j<n_mask; j++) {
-         for(k=0; k<n_interp; k++) {
-            n += pd[i][j][k].n_obs;
-         }
-      }
-   }
-
-   return n;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_duplicate_flag(DuplicateType duplicate_flag) {
-
-   if(n_msg_typ == 0 || n_mask == 0 || n_interp == 0) {
-      mlog << Warning << "\nVxPairDataPoint::set_duplicate_flag() -> "
-           << "set_pd_size() has not been called yet!\n\n";
-   }
-
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].set_check_unique(duplicate_flag == DuplicateType::Unique);
-         }
-      }
-   }
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_obs_summary(ObsSummary s) {
-
-   if(n_msg_typ == 0 || n_mask == 0 || n_interp == 0) {
-      mlog << Warning << "\nVxPairDataPoint::set_obs_summary() -> "
-           << "set_pd_size() has not been called yet!\n\n";
-   }
-
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].set_obs_summary(s);
-         }
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_obs_perc_value(int percentile) {
-
-   if(n_msg_typ == 0 || n_mask == 0 || n_interp == 0) {
-      mlog << Warning << "\nVxPairDataPoint::set_obs_perc_value() -> "
-           << "set_pd_size() has not been called yet!\n\n";
-   }
-
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].set_obs_perc_value(percentile);
-         }
-      }
-   }
+         } // end for i_interp
+      } // end for i_mask
+   } // end for i_msg_typ
 
    return;
 }
@@ -1760,98 +685,33 @@ void VxPairDataPoint::set_obs_perc_value(int percentile) {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataPoint::load_seeps_climo(const ConcatString &seeps_climo_name) {
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].load_seeps_climo(seeps_climo_name);
-         }
-      }
+
+   if(n_vx == 0) {
+      mlog << Warning << "\nVxPairDataPoint::load_seeps_climo() -> "
+           << "set_size() has not been called yet!\n\n";
    }
+
+   for(vector<PairDataPoint>::iterator it = pd.begin();
+       it != pd.end(); it++) {
+      it->load_seeps_climo(seeps_climo_name);
+   }
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataPoint::set_seeps_thresh(const SingleThresh &p1_thresh) {
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].set_seeps_thresh(p1_thresh);
-         }
-      }
-   }
-}
 
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::print_obs_summary() {
-
-   if(n_msg_typ == 0 || n_mask == 0 || n_interp == 0) {
-      mlog << Warning << "\nVxPairDataPoint::print_obs_summary() -> "
-           << "set_pd_size() has not been called yet!\n\n";
+   if(n_vx == 0) {
+      mlog << Warning << "\nVxPairDataPoint::set_seeps_thresh() -> "
+           << "set_size() has not been called yet!\n\n";
    }
 
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].print_obs_summary();
-         }
-      }
+   for(vector<PairDataPoint>::iterator it = pd.begin();
+       it != pd.end(); it++) {
+      it->set_seeps_thresh(p1_thresh);
    }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::calc_obs_summary() {
-
-   if(n_msg_typ == 0 || n_mask == 0 || n_interp == 0) {
-      mlog << Warning << "\nVxPairDataPoint::calc_obs_summary() -> "
-           << "set_pd_size() has not been called yet!\n\n";
-   }
-
-   for(int i=0; i < n_msg_typ; i++){
-      for(int j=0; j < n_mask; j++){
-         for(int k=0; k < n_interp; k++){
-            pd[i][j][k].calc_obs_summary();
-         }
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::inc_count(int ***&rej, int i) {
-   int j, k;
-
-   for(j=0; j<n_mask; j++) {
-      for(k=0; k<n_interp; k++) {
-         rej[i][j][k]++;
-      }
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::inc_count(int ***&rej, int i, int j) {
-   int k;
-
-   for(k=0; k<n_interp; k++) {
-      rej[i][j][k]++;
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::inc_count(int ***&rej, int i, int j, int k) {
-
-   rej[i][j][k]++;
 
    return;
 }
@@ -2208,51 +1068,6 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
         << " pairs for climatology bin number " << i_bin+1 << ".\n";
 
    return out_pd;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-// Write the point observation in the MET point format for logging
-ConcatString point_obs_to_string(float *hdr_arr, const char *hdr_typ_str,
-                                 const char *hdr_sid_str, unixtime hdr_ut,
-                                 const char *obs_qty, float *obs_arr,
-                                 const char *var_name) {
-   ConcatString obs_cs, name;
-
-   if((var_name != 0) && (0 < m_strlen(var_name))) name << var_name;
-   else                                            name << nint(obs_arr[1]);
-
-   //
-   // Write the 11-column MET point format:
-   //   Message_Type Station_ID Valid_Time(YYYYMMDD_HHMMSS)
-   //   Lat(Deg North) Lon(Deg East) Elevation(msl)
-   //   Var_Name(or GRIB_Code) Level Height(msl or agl)
-   //   QC_String Observation_Value
-   //
-   obs_cs << "   "
-          << hdr_typ_str << " " << hdr_sid_str << " "
-          << unix_to_yyyymmdd_hhmmss(hdr_ut) << " "
-          << hdr_arr[0] << " " << -1.0*hdr_arr[1] << " "
-          << hdr_arr[2] << " " << name << " "
-          << obs_arr[2] << " " << obs_arr[3] << " "
-          << obs_qty    << " " << obs_arr[4];
-
-   return obs_cs;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void copy_var_info(const VarInfo *info, VarInfo *&copy) {
-   VarInfoFactory f;
-
-   // Deallocate, if necessary
-   if(copy) { delete copy; copy = (VarInfo *) nullptr; }
-
-   // Perform a deep copy
-   copy = f.new_var_info(info->file_type());
-   *copy = *info;
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

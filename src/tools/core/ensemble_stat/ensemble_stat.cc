@@ -794,8 +794,11 @@ void process_point_vx() {
            << conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->magic_str() << ".\n";
 
       // Store climatology information
-      conf_info.vx_opt[i].vx_pd.set_climo_mn_dpa(cmn_dpa);
-      conf_info.vx_opt[i].vx_pd.set_climo_sd_dpa(csd_dpa);
+      // TODO: update to handle the fcst/obs climo
+      conf_info.vx_opt[i].vx_pd.set_fcst_climo_mn_dpa(cmn_dpa);
+      conf_info.vx_opt[i].vx_pd.set_fcst_climo_sd_dpa(csd_dpa);
+      conf_info.vx_opt[i].vx_pd.set_obs_climo_mn_dpa(cmn_dpa);
+      conf_info.vx_opt[i].vx_pd.set_obs_climo_sd_dpa(csd_dpa);
    }
 
    // Process each point observation NetCDF file
@@ -1196,7 +1199,9 @@ void process_point_scores() {
                   shc.set_interp_wdth(conf_info.vx_opt[i].interp_info.width[l]);
                }
 
-               pd_ptr = &conf_info.vx_opt[i].vx_pd.pd[j][k][l];
+               int n = conf_info.vx_opt[i].vx_pd.three_to_one(j, k, l);
+
+               pd_ptr = &conf_info.vx_opt[i].vx_pd.pd[n];
 
                mlog << Debug(2)
                     << "Processing point verification "
@@ -1557,8 +1562,8 @@ void process_grid_vx() {
             pd_all.clear();
             pd_all.set_ens_size(n_vx_vld[i]);
             pd_all.set_climo_cdf_info_ptr(&conf_info.vx_opt[i].cdf_info);
-            pd_all.ctrl_index = conf_info.vx_opt[i].vx_pd.pd[0][0][0].ctrl_index;
-            pd_all.skip_const = conf_info.vx_opt[i].vx_pd.pd[0][0][0].skip_const;
+            pd_all.ctrl_index = conf_info.vx_opt[i].vx_pd.pd[0].ctrl_index;
+            pd_all.skip_const = conf_info.vx_opt[i].vx_pd.pd[0].skip_const;
 
             // Apply the current mask to the fields and compute the pairs
             process_grid_scores(i,
@@ -1834,7 +1839,7 @@ void setup_txt_files() {
 
    // Compute the number of PHIST bins
    for(i=n_phist_bin=0; i<conf_info.get_n_vx(); i++) {
-      n = ceil(1.0 / conf_info.vx_opt[i].vx_pd.pd[0][0][0].phist_bin_size);
+      n = ceil(1.0 / conf_info.vx_opt[i].vx_pd.pd[0].phist_bin_size);
       n_phist_bin = (n > n_phist_bin ? n : n_phist_bin);
    }
 
@@ -2106,7 +2111,7 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       if(!is_prob &&
          vx_opt.output_flag[i_phist] != STATOutputType::None) {
 
-         pd.phist_bin_size = vx_opt.vx_pd.pd[0][0][0].phist_bin_size;
+         pd.phist_bin_size = vx_opt.vx_pd.pd[0].phist_bin_size;
          pd.compute_phist();
 
          if(pd.phist_na.sum() > 0) {
@@ -2135,7 +2140,7 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       if(!is_prob &&
          vx_opt.output_flag[i_ssvar] != STATOutputType::None) {
 
-         pd.ssvar_bin_size = vx_opt.vx_pd.pd[0][0][0].ssvar_bin_size;
+         pd.ssvar_bin_size = vx_opt.vx_pd.pd[0].ssvar_bin_size;
          pd.compute_ssvar();
 
          // Make sure there are bins to process
