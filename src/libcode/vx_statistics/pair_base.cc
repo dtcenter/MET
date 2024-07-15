@@ -1531,8 +1531,7 @@ bool VxPairBase::is_keeper_var(
         const char *pnt_obs_str, const char *var_name, int grib_code) {
    bool keep = true;
 
-   // Check whether the GRIB code for the observation matches
-   // the specified code
+   // Check for matching variable name or GRIB code
    if((var_name != 0) && (strlen(var_name) > 0)) {
 
       if(var_name != oinfo_ptr->name()) {
@@ -1639,7 +1638,7 @@ bool VxPairBase::is_keeper_obs(
       keep = false;
    }
 
-   return false;
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
