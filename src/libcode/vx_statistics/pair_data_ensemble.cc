@@ -993,8 +993,8 @@ void VxPairDataEnsemble::init_from_scratch() {
 
    VxPairBase::init_from_scratch();
 
-   fcst_info = (EnsVarInfo *) nullptr;
-   obs_info  = (VarInfo *) nullptr;
+   ens_info = (EnsVarInfo *) nullptr;
+   obs_info = (VarInfo *)    nullptr;
 
    clear();
 
@@ -1007,8 +1007,8 @@ void VxPairDataEnsemble::clear() {
 
    VxPairBase::clear();
 
-   if(fcst_info) { delete fcst_info; fcst_info = (EnsVarInfo *) nullptr; }
-   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *)    nullptr; }
+   if(ens_info) { delete ens_info; ens_info = (EnsVarInfo *) nullptr; }
+   if(obs_info) { delete obs_info; obs_info = (VarInfo *)    nullptr; }
 
    obs_error_info = (ObsErrorInfo *) nullptr;
 
@@ -1025,7 +1025,7 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
 
    VxPairBase::assign(vx_pd);
 
-   set_fcst_info(vx_pd.fcst_info);
+   set_ens_info(vx_pd.ens_info);
    set_obs_info(vx_pd.obs_info);
 
    obs_error_info = vx_pd.obs_error_info;
@@ -1039,23 +1039,17 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_fcst_info(EnsVarInfo *info) {
+void VxPairDataEnsemble::set_ens_info(EnsVarInfo *info) {
    VarInfoFactory f;
 
    // Deallocate, if necessary
-   if(fcst_info) { delete fcst_info; fcst_info = (EnsVarInfo *) nullptr; }
+   if(ens_info) { delete ens_info; ens_info = (EnsVarInfo *) nullptr; }
 
    // Perform a deep copy
-   fcst_info = new EnsVarInfo(*info);
+   ens_info = new EnsVarInfo(*info);
 
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataEnsemble::set_obs_info(VarInfo *info) {
-
-   copy_var_info(info, obs_info);
+   // Set the base pointer
+   if(!fcst_info) set_fcst_info(info->get_var_info());
 
    return;
 }
@@ -1246,8 +1240,8 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    }
 
    // Set flags
-   bool spfh_flag = fcst_info->get_var_info()->is_specific_humidity() &&
-                     obs_info->is_specific_humidity();
+   bool spfh_flag = fcst_info->is_specific_humidity() &&
+                    obs_info->is_specific_humidity();
 
    // Store pointer to ObsErrorEntry
    ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) nullptr;
@@ -1328,7 +1322,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
 
                if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                   mlog << Debug(REJECT_DEBUG_LEVEL)
-                       << "For " << fcst_info->get_var_info()->magic_str()
+                       << "For " << fcst_info->magic_str()
                        << " versus " << obs_info->magic_str()
                        << ", skipping observation since it is a duplicate:\n"
                        << pnt_obs_str << "\n";
@@ -1353,8 +1347,8 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
 void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
 
    // Set flag for specific humidity
-   bool spfh_flag = fcst_info->get_var_info()->is_specific_humidity() &&
-                     obs_info->is_specific_humidity();
+   bool spfh_flag = fcst_info->is_specific_humidity() &&
+                    obs_info->is_specific_humidity();
 
    // Loop through all the PairDataEnsemble objects and interpolate
    for(vector<PairDataEnsemble>::iterator it = pd.begin();
@@ -1380,7 +1374,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
          fcst_na.erase();
 
          // Interpolate using the observation pressure level or height
-         double to_lvl = (fcst_info->get_var_info()->level().type() == LevelType_Pres ?
+         double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                           it->lvl_na[i_obs] : it->elv_na[i_obs]);
          int lvl_blw, lvl_abv;
 
@@ -1410,7 +1404,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                   it->x_na[i_obs], it->y_na[i_obs],
                   it->interp_mthd, it->interp_wdth, it->interp_shape,
                   gr.wrap_lon(), 0, spfh_flag,
-                  fcst_info->get_var_info()->level().type(),
+                  fcst_info->level().type(),
                   to_lvl, lvl_blw, lvl_abv,
                   fcst_na);
             }
@@ -1422,7 +1416,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                it->cmn_na[i_obs], it->csd_na[i_obs],
                it->interp_mthd, it->interp_wdth, it->interp_shape,
                gr.wrap_lon(), interp_thresh, spfh_flag,
-               fcst_info->get_var_info()->level().type(),
+               fcst_info->level().type(),
                to_lvl, lvl_blw, lvl_abv));
          }
 

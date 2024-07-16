@@ -420,8 +420,8 @@ void VxPairDataPoint::init_from_scratch() {
 
    VxPairBase::init_from_scratch();
 
-   fcst_info = (VarInfo *)     nullptr;
-   obs_info  = (VarInfoGrib *) nullptr;
+   fcst_info = (VarInfo *) nullptr;
+   obs_info  = (VarInfo *) nullptr;
 
    clear();
 
@@ -434,8 +434,8 @@ void VxPairDataPoint::clear() {
 
    VxPairBase::clear();
 
-   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *)     nullptr; }
-   if(obs_info)  { delete obs_info;  obs_info  = (VarInfoGrib *) nullptr; }
+   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) nullptr; }
+   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) nullptr; }
 
    pd.clear();
 
@@ -450,41 +450,9 @@ void VxPairDataPoint::assign(const VxPairDataPoint &vx_pd) {
 
    VxPairBase::assign(vx_pd);
 
-   set_fcst_info(vx_pd.fcst_info);
-   set_obs_info(vx_pd.obs_info);
-
    set_size(vx_pd.n_msg_typ, vx_pd.n_mask, vx_pd.n_interp);
 
    pd = vx_pd.pd;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_fcst_info(VarInfo *info) {
-
-   copy_var_info(info, fcst_info);
-
-   // Set the base pointer
-   finfo_ptr = fcst_info;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairDataPoint::set_obs_info(VarInfoGrib *info) {
-
-   // Deallocate, if necessary
-   if(obs_info) { delete obs_info; obs_info = (VarInfoGrib *) nullptr; }
-
-   // Perform a deep copy
-   obs_info = new VarInfoGrib;
-   *obs_info = *info;
-
-   // Set the base pointer
-   oinfo_ptr = obs_info;
 
    return;
 }

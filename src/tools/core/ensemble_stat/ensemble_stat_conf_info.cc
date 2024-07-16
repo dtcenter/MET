@@ -646,7 +646,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    clear();
 
    // Allocate new EnsVarInfo object for fcst
-   vx_pd.fcst_info = new EnsVarInfo();
+   vx_pd.ens_info = new EnsVarInfo();
 
    // Loop over ensemble member IDs to substitute
    for(i=0; i<ens_member_ids.n(); i++) {
@@ -663,7 +663,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       input_info.var_info = next_var;
       input_info.file_index = 0;
       input_info.file_list = ens_files;
-      vx_pd.fcst_info->add_input(input_info);
+      vx_pd.ens_info->add_input(input_info);
 
       // Add InputInfo to fcst info list for each ensemble file provided
       // set var_info to nullptr to note first VarInfo should be used
@@ -672,7 +672,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
          input_info.var_info = nullptr;
          input_info.file_index = j;
          input_info.file_list = ens_files;
-         vx_pd.fcst_info->add_input(input_info);
+         vx_pd.ens_info->add_input(input_info);
       } // end for j
    } // end for i
 
@@ -691,7 +691,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       input_info.var_info = next_var;
       input_info.file_index = ens_files->n() - 1;
       input_info.file_list = ens_files;
-      vx_pd.fcst_info->add_input(input_info);
+      vx_pd.ens_info->add_input(input_info);
    }
 
    // Allocate new VarInfo object for obs
@@ -704,14 +704,14 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << "Parsed forecast field:\n";
-      vx_pd.fcst_info->get_var_info()->dump(cout);
+      vx_pd.ens_info->get_var_info()->dump(cout);
       mlog << Debug(5)
            << "Parsed observation field:\n";
       vx_pd.obs_info->dump(cout);
    }
 
    // No support for wind direction
-   if(vx_pd.fcst_info->get_var_info()->is_wind_direction() ||
+   if(vx_pd.ens_info->get_var_info()->is_wind_direction() ||
       vx_pd.obs_info->is_wind_direction()) {
       mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
            << "wind direction may not be verified using grid_stat.\n\n";
@@ -783,7 +783,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    ocat_ta = odict.lookup_thresh_array(conf_key_prob_cat_thresh);
 
    // The number of thresholds must match for non-probability forecasts
-   if(!vx_pd.fcst_info->get_var_info()->is_prob() &&
+   if(!vx_pd.ens_info->get_var_info()->is_prob() &&
       fcat_ta.n() != ocat_ta.n()) {
       mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
            << "The number of forecast (" << write_css(fcat_ta)

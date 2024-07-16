@@ -222,8 +222,8 @@ class VxPairBase {
       //
       //////////////////////////////////////////////////////////////////
 
-      VarInfo     *finfo_ptr;    // Not Allocated
-      VarInfoGrib *oinfo_ptr;    // Not Allocated
+      VarInfo *fcst_info;        // Forecast field, allocated by VarInfoFactory
+      VarInfo *obs_info;         // Observation field, allocated by VarInfoFactory
 
       VarInfo *fclm_info;        // Forecast climatology field, allocated by VarInfoFactory
       VarInfo *oclm_info;        // Observation climatology field, allocated by VarInfoFactory
@@ -314,6 +314,9 @@ class VxPairBase {
       void clear();
 
       int three_to_one(int, int, int);
+
+      void set_fcst_info(VarInfo *);
+      void set_obs_info(VarInfo *);
 
       void set_fcst_climo_info(VarInfo *);
       void set_obs_climo_info(VarInfo *);

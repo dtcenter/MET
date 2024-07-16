@@ -188,8 +188,7 @@ class VxPairDataEnsemble : public VxPairBase {
       //
       //////////////////////////////////////////////////////////////////
 
-      EnsVarInfo *fcst_info;     // Forecast field, allocated by EnsVarInfo
-      VarInfo    *obs_info;      // Observation field, allocated by VarInfoFactory
+      EnsVarInfo *ens_info;         // Ensemble data, allocated by EnsVarInfo
 
       //////////////////////////////////////////////////////////////////
 
@@ -205,8 +204,7 @@ class VxPairDataEnsemble : public VxPairBase {
 
       void clear();
 
-      void set_fcst_info(EnsVarInfo *);
-      void set_obs_info(VarInfo *);
+      void set_ens_info(EnsVarInfo *);
       void set_size(int, int, int);
 
       // Call set_ens_size before add_ens

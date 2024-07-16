@@ -106,11 +106,6 @@ class VxPairDataPoint : public VxPairBase {
       //
       //////////////////////////////////////////////////////////////////
 
-      VarInfo     *fcst_info; // Forecast field, allocated by VarInfoFactory
-      VarInfoGrib *obs_info;  // Observation field, allocated by VarInfoFactory
-
-      //////////////////////////////////////////////////////////////////
-
       // 3-Dim vector of PairDataPoint objects [n_msg_typ][n_mask][n_interp]
       std::vector<PairDataPoint> pd;
 
@@ -118,8 +113,6 @@ class VxPairDataPoint : public VxPairBase {
 
       void clear();
 
-      void set_fcst_info(VarInfo *);
-      void set_obs_info(VarInfoGrib *);
       void set_size(int, int, int);
 
       void load_seeps_climo(const ConcatString &seeps_climo_name);

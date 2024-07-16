@@ -870,8 +870,8 @@ VxPairBase & VxPairBase::operator=(const VxPairBase &vx_pb) {
 
 void VxPairBase::init_from_scratch() {
 
-   finfo_ptr = (VarInfo *)     nullptr;
-   oinfo_ptr = (VarInfoGrib *) nullptr;
+   fcst_info = (VarInfo *) nullptr;
+   obs_info = (VarInfo *) nullptr;
 
    fclm_info = (VarInfo *) nullptr;
    oclm_info = (VarInfo *) nullptr;
@@ -885,8 +885,8 @@ void VxPairBase::init_from_scratch() {
 
 void VxPairBase::clear() {
 
-   finfo_ptr = (VarInfo *)     nullptr; // not allocated
-   oinfo_ptr = (VarInfoGrib *) nullptr; // not allocated
+   if(fcst_info) { delete fcst_info; fcst_info = (VarInfo *) nullptr; }
+   if(obs_info)  { delete obs_info;  obs_info  = (VarInfo *) nullptr; }
 
    if(fclm_info) { delete fclm_info; fclm_info = (VarInfo *) nullptr; }
    if(oclm_info) { delete oclm_info; oclm_info = (VarInfo *) nullptr; }
@@ -953,8 +953,8 @@ void VxPairBase::assign(const VxPairBase &vx_pb) {
 
    clear();
 
-   finfo_ptr = vx_pb.finfo_ptr;
-   oinfo_ptr = vx_pb.oinfo_ptr;
+   set_fcst_info(vx_pb.fcst_info);
+   set_obs_info(vx_pb.obs_info);
 
    set_fcst_climo_info(vx_pb.fclm_info);
    set_obs_climo_info(vx_pb.oclm_info);
@@ -1042,6 +1042,24 @@ int VxPairBase::three_to_one(int i_msg_typ, int i_mask, int i_interp) {
    }
 
    return n;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairBase::set_fcst_info(VarInfo *info) {
+
+   copy_var_info(info, fcst_info);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairBase::set_obs_info(VarInfo *info) {
+
+   copy_var_info(info, obs_info);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1512,8 +1530,8 @@ bool VxPairBase::is_keeper_sid(
 
       if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
          mlog << Debug(REJECT_DEBUG_LEVEL)
-              << "For " << finfo_ptr->magic_str() << " versus "
-              << oinfo_ptr->magic_str() << ", skipping observation "
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
               << "station id:\n"
               << pnt_obs_str << "\n";
       }
@@ -1531,16 +1549,18 @@ bool VxPairBase::is_keeper_var(
         const char *pnt_obs_str, const char *var_name, int grib_code) {
    bool keep = true;
 
+   VarInfoGrib *obs_info_grib = (VarInfoGrib *) obs_info;
+
    // Check whether the GRIB code for the observation matches
    // the specified code
    if((var_name != 0) && (strlen(var_name) > 0)) {
 
-      if(var_name != oinfo_ptr->name()) {
+      if(var_name != obs_info->name()) {
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << finfo_ptr->magic_str() << " versus "
-                 << oinfo_ptr->magic_str() << ", skipping observation "
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str() << ", skipping observation "
                  << "variable name:\n"
                  << pnt_obs_str << "\n";
          }
@@ -1549,12 +1569,12 @@ bool VxPairBase::is_keeper_var(
          keep = false;
       }
    }
-   else if(oinfo_ptr->code() != nint(grib_code)) {
+   else if(obs_info_grib && obs_info_grib->code() != nint(grib_code)) {
 
       if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
          mlog << Debug(REJECT_DEBUG_LEVEL)
-              << "For " << finfo_ptr->magic_str() << " versus "
-              << oinfo_ptr->magic_str() << ", skipping observation "
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
               << "GRIB code:\n"
               << pnt_obs_str << "\n";
       }
@@ -1578,8 +1598,8 @@ bool VxPairBase::is_keeper_qty(
 
       if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
          mlog << Debug(REJECT_DEBUG_LEVEL)
-              << "For " << finfo_ptr->magic_str() << " versus "
-              << oinfo_ptr->magic_str() << ", skipping observation "
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
               << "quality control string:\n"
               << pnt_obs_str << "\n";
       }
@@ -1602,8 +1622,8 @@ bool VxPairBase::is_keeper_vld(
 
       if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
          mlog << Debug(REJECT_DEBUG_LEVEL)
-              << "For " << finfo_ptr->magic_str() << " versus "
-              << oinfo_ptr->magic_str() << ", skipping observation "
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
               << "valid time:\n"
               << pnt_obs_str << "\n";
       }
@@ -1622,15 +1642,15 @@ bool VxPairBase::is_keeper_obs(
    bool keep = true;
 
    // Apply observation processing logic
-   obs_v = pb_ptr[0]->process_obs(oinfo_ptr, obs_v);
+   obs_v = pb_ptr[0]->process_obs(obs_info, obs_v);
 
    // Check whether the observation value contains valid data
    if(is_bad_data(obs_v)) {
 
       if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
          mlog << Debug(REJECT_DEBUG_LEVEL)
-              << "For " << finfo_ptr->magic_str() << " versus "
-              << oinfo_ptr->magic_str() << ", skipping observation "
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
               << "with bad data value:\n"
               << pnt_obs_str << "\n";
       }
@@ -1661,8 +1681,8 @@ bool VxPairBase::is_keeper_grd(
 
       if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
          mlog << Debug(REJECT_DEBUG_LEVEL)
-              << "For " << finfo_ptr->magic_str() << " versus "
-              << oinfo_ptr->magic_str() << ", skipping observation "
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
               << "off the grid where (x, y) = (" << x << ", " << y
               << ") and grid (nx, ny) = (" << gr.nx() << ", " << gr.ny() << "):\n"
               << pnt_obs_str << "\n";
@@ -1698,8 +1718,8 @@ bool VxPairBase::is_keeper_topo(
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << finfo_ptr->magic_str() << " versus "
-                 << oinfo_ptr->magic_str() << ", skipping observation "
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str() << ", skipping observation "
                  << "due to bad topography values where observation elevation = "
                  << hdr_elv << " and model topography = " << topo << ":\n"
                  << pnt_obs_str << "\n";
@@ -1714,8 +1734,8 @@ bool VxPairBase::is_keeper_topo(
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << finfo_ptr->magic_str() << " versus "
-                 << oinfo_ptr->magic_str() << ", skipping observation "
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str() << ", skipping observation "
                  << "due to topography difference where observation elevation ("
                  << hdr_elv << ") minus model topography (" << topo << ") = "
                  << topo - hdr_elv << " is not "
@@ -1740,15 +1760,15 @@ bool VxPairBase::is_keeper_lvl(
 
    // For pressure levels, check if the observation pressure level
    // falls in the requested range.
-   if(oinfo_ptr->level().type() == LevelType_Pres) {
+   if(obs_info->level().type() == LevelType_Pres) {
 
-      if(obs_lvl < oinfo_ptr->level().lower() ||
-         obs_lvl > oinfo_ptr->level().upper()) {
+      if(obs_lvl < obs_info->level().lower() ||
+         obs_lvl > obs_info->level().upper()) {
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << finfo_ptr->magic_str() << " versus "
-                 << oinfo_ptr->magic_str() << ", skipping observation "
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str() << ", skipping observation "
                  << "pressure level value:\n"
                  << pnt_obs_str << "\n";
          }
@@ -1759,15 +1779,15 @@ bool VxPairBase::is_keeper_lvl(
    }
    // For accumulations, check if the observation accumulation interval
    // matches the requested interval.
-   else if(oinfo_ptr->level().type() == LevelType_Accum) {
+   else if(obs_info->level().type() == LevelType_Accum) {
 
-      if(obs_lvl < oinfo_ptr->level().lower() ||
-         obs_lvl > oinfo_ptr->level().upper()) {
+      if(obs_lvl < obs_info->level().lower() ||
+         obs_lvl > obs_info->level().upper()) {
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << finfo_ptr->magic_str() << " versus "
-                 << oinfo_ptr->magic_str() << ", skipping observation "
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str() << ", skipping observation "
                  << "accumulation interval:\n"
                  << pnt_obs_str << "\n";
          }
@@ -1782,13 +1802,13 @@ bool VxPairBase::is_keeper_lvl(
    else {
 
       if(!msg_typ_sfc.reg_exp_match(hdr_typ_str) &&
-         (obs_hgt < oinfo_ptr->level().lower() ||
-          obs_hgt > oinfo_ptr->level().upper())) {
+         (obs_hgt < obs_info->level().lower() ||
+          obs_hgt > obs_info->level().upper())) {
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << finfo_ptr->magic_str() << " versus "
-                 << oinfo_ptr->magic_str() << ", skipping observation "
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str() << ", skipping observation "
                  << "level value:\n"
                  << pnt_obs_str << "\n";
          }
@@ -1815,8 +1835,8 @@ bool VxPairBase::is_keeper_typ(
 
       if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
          mlog << Debug(REJECT_DEBUG_LEVEL)
-              << "For " << finfo_ptr->magic_str() << " versus "
-              << oinfo_ptr->magic_str() << ", skipping observation "
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
               << "message type:\n"
               << pnt_obs_str << "\n";
       }
@@ -1843,8 +1863,8 @@ bool VxPairBase::is_keeper_mask(
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << finfo_ptr->magic_str() << " versus "
-                 << oinfo_ptr->magic_str() << ", skipping observation "
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str() << ", skipping observation "
                  << "based on spatial masking region:\n"
                  << pnt_obs_str << "\n";
             }
@@ -1859,8 +1879,8 @@ bool VxPairBase::is_keeper_mask(
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << finfo_ptr->magic_str() << " versus "
-                 << oinfo_ptr->magic_str() << ", skipping observation "
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str() << ", skipping observation "
                  << "based on masking station id list:\n"
                  << pnt_obs_str << "\n";
          }
@@ -1876,8 +1896,8 @@ bool VxPairBase::is_keeper_mask(
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << finfo_ptr->magic_str() << " versus "
-                 << oinfo_ptr->magic_str() << ", skipping observation "
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str() << ", skipping observation "
                  << "based on latitude/longitude thesholds:\n"
                  << pnt_obs_str << "\n";
          }
@@ -1902,12 +1922,12 @@ bool VxPairBase::is_keeper_climo(
 
    int n = three_to_one(i_msg_typ, i_mask, i_interp);
 
-   bool spfh_flag = finfo_ptr->is_specific_humidity() &&
-                    oinfo_ptr->is_specific_humidity();
+   bool spfh_flag = fcst_info->is_specific_humidity() &&
+                    obs_info->is_specific_humidity();
 
    // Compute the interpolated forecast value using the
    // observation pressure level or height
-   double to_lvl = (finfo_ptr->level().type() == LevelType_Pres ?
+   double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                     obs_lvl : obs_hgt);
    int lvl_blw, lvl_abv;
 
@@ -1925,7 +1945,7 @@ bool VxPairBase::is_keeper_climo(
                   pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
                   pb_ptr[n]->interp_shape, gr.wrap_lon(),
                   interp_thresh, spfh_flag,
-                  finfo_ptr->level().type(),
+                  fcst_info->level().type(),
                   to_lvl, lvl_blw, lvl_abv);
 
       // Check for bad data
@@ -1933,8 +1953,8 @@ bool VxPairBase::is_keeper_climo(
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << finfo_ptr->magic_str() << " versus "
-                 << oinfo_ptr->magic_str() << ", skipping observation "
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str() << ", skipping observation "
                  << "based on bad forecast climatological mean value:\n"
                  << pnt_obs_str << "\n";
          }
@@ -1954,7 +1974,7 @@ bool VxPairBase::is_keeper_climo(
                   pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
                   pb_ptr[n]->interp_shape, gr.wrap_lon(),
                   interp_thresh, spfh_flag,
-                  finfo_ptr->level().type(),
+                  fcst_info->level().type(),
                   to_lvl, lvl_blw, lvl_abv);
 
       // Check for bad data
@@ -1962,8 +1982,8 @@ bool VxPairBase::is_keeper_climo(
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << finfo_ptr->magic_str() << " versus "
-                 << oinfo_ptr->magic_str() << ", skipping observation "
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str() << ", skipping observation "
                  << "based on bad observation climatological mean value:\n"
                  << pnt_obs_str << "\n";
          }
@@ -1996,7 +2016,7 @@ bool VxPairBase::is_keeper_climo(
                   pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
                   pb_ptr[n]->interp_shape, gr.wrap_lon(),
                   interp_thresh, spfh_flag,
-                  finfo_ptr->level().type(),
+                  fcst_info->level().type(),
                   to_lvl, lvl_blw, lvl_abv);
 
       // Check for bad data
@@ -2004,8 +2024,8 @@ bool VxPairBase::is_keeper_climo(
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << finfo_ptr->magic_str() << " versus "
-                 << oinfo_ptr->magic_str() << ", skipping observation "
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str() << ", skipping observation "
                  << "based on bad forecast climatological spread value:\n"
                  << pnt_obs_str << "\n";
          }
@@ -2025,7 +2045,7 @@ bool VxPairBase::is_keeper_climo(
                   pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
                   pb_ptr[n]->interp_shape, gr.wrap_lon(),
                   interp_thresh, spfh_flag,
-                  finfo_ptr->level().type(),
+                  fcst_info->level().type(),
                   to_lvl, lvl_blw, lvl_abv);
 
       // Check for bad data
@@ -2033,8 +2053,8 @@ bool VxPairBase::is_keeper_climo(
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << finfo_ptr->magic_str() << " versus "
-                 << oinfo_ptr->magic_str() << ", skipping observation "
+                 << "For " << fcst_info->magic_str() << " versus "
+                 << obs_info->magic_str() << ", skipping observation "
                  << "based on bad observation climatological spread value:\n"
                  << pnt_obs_str << "\n";
          }
@@ -2085,12 +2105,12 @@ bool VxPairBase::is_keeper_fcst(
    // Otherwise, compute interpolated value
    else {
 
-      bool spfh_flag = finfo_ptr->is_specific_humidity() &&
-                       oinfo_ptr->is_specific_humidity();
+      bool spfh_flag = fcst_info->is_specific_humidity() &&
+                       obs_info->is_specific_humidity();
 
       // Compute the interpolated forecast value using the
       // observation pressure level or height
-      double to_lvl = (finfo_ptr->level().type() == LevelType_Pres ?
+      double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                        obs_lvl : obs_hgt);
       int lvl_blw, lvl_abv;
 
@@ -2102,7 +2122,7 @@ bool VxPairBase::is_keeper_fcst(
                   pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
                   pb_ptr[n]->interp_shape, gr.wrap_lon(),
                   interp_thresh, spfh_flag,
-                  finfo_ptr->level().type(),
+                  fcst_info->level().type(),
                   to_lvl, lvl_blw, lvl_abv);
    }
 
@@ -2111,8 +2131,8 @@ bool VxPairBase::is_keeper_fcst(
 
       if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
          mlog << Debug(REJECT_DEBUG_LEVEL)
-              << "For " << finfo_ptr->magic_str() << " versus "
-              << oinfo_ptr->magic_str() << ", skipping observation "
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
               << "based on bad data in the "
               << interpmthd_to_string(pb_ptr[n]->interp_mthd) << "("
               << pb_ptr[n]->interp_wdth * pb_ptr[n]->interp_wdth

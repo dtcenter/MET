@@ -487,7 +487,7 @@ void process_grid(const Grid &fcst_grid) {
 
    // Parse regridding logic
    RegridInfo ri;
-   ri = conf_info.vx_opt[0].vx_pd.fcst_info->get_var_info()->regrid();
+   ri = conf_info.vx_opt[0].vx_pd.fcst_info->regrid();
 
    // Read gridded observation data, if necessary
    if(ri.field == FieldType::Obs) {
@@ -553,15 +553,15 @@ void process_n_vld() {
    // Loop through the verification fields to be processed
    for(i_var=0; i_var<conf_info.get_n_vx(); i_var++) {
 
-      n_ens_inputs = conf_info.vx_opt[i_var].vx_pd.fcst_info->inputs_n();
+      n_ens_inputs = conf_info.vx_opt[i_var].vx_pd.ens_info->inputs_n();
 
       // Loop through the forecast inputs
       for(i_ens=n_vld=0; i_ens<n_ens_inputs; i_ens++) {
 
          // Get forecast file and VarInfo to process
-         fcst_file = conf_info.vx_opt[i_var].vx_pd.fcst_info->get_file(i_ens);
-         var_info = conf_info.vx_opt[i_var].vx_pd.fcst_info->get_var_info(i_ens);
-         j = conf_info.vx_opt[i_var].vx_pd.fcst_info->get_file_index(i_ens);
+         fcst_file = conf_info.vx_opt[i_var].vx_pd.ens_info->get_file(i_ens);
+         var_info = conf_info.vx_opt[i_var].vx_pd.ens_info->get_var_info(i_ens);
+         j = conf_info.vx_opt[i_var].vx_pd.ens_info->get_file_index(i_ens);
 
          // Check for valid file
          if(!ens_file_vld[j]) continue;
@@ -593,7 +593,7 @@ void process_n_vld() {
               << n_vld << " of " << n_ens_inputs
               << " (" << (double) n_vld/n_ens_inputs << ")"
               << " forecast fields found for \""
-              << conf_info.vx_opt[i_var].vx_pd.fcst_info->get_var_info()->magic_str()
+              << conf_info.vx_opt[i_var].vx_pd.fcst_info->magic_str()
               << "\" does not meet the threshold specified by \""
               << conf_key_fcst_ens_thresh << "\" (" << conf_info.vld_ens_thresh
               << ") in the configuration file.\n\n";
@@ -791,7 +791,7 @@ void process_point_vx() {
            << "Found " << cmn_dpa.n_planes()
            << " climatology mean field(s) and " << csd_dpa.n_planes()
            << " climatology standard deviation field(s) for forecast "
-           << conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->magic_str() << ".\n";
+           << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str() << ".\n";
 
       // Store climatology information
       // TODO: update to handle the fcst/obs climo
@@ -813,7 +813,7 @@ void process_point_vx() {
    // Loop through each of the fields to be verified
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
-      VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info();
+      VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.fcst_info;
       VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
       bool print_level_mismatch_warning = true;
 
@@ -821,9 +821,9 @@ void process_point_vx() {
       emn_dpa.clear();
 
       // Loop through the ensemble inputs
-      for(j=0, n_miss=0; j<conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n(); j++) {
+      for(j=0, n_miss=0; j<conf_info.vx_opt[i].vx_pd.ens_info->inputs_n(); j++) {
 
-         i_file = conf_info.vx_opt[i].vx_pd.fcst_info->get_file_index(j);
+         i_file = conf_info.vx_opt[i].vx_pd.ens_info->get_file_index(j);
 
          // If the current forecast file is valid, process it
          if(!ens_file_vld[i_file]) {
@@ -890,7 +890,7 @@ void process_point_vx() {
 
          mlog << Debug(2) << "Computing the ensemble mean from the members.\n";
 
-         int n = conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n() - n_miss;
+         int n = conf_info.vx_opt[i].vx_pd.ens_info->inputs_n() - n_miss;
 
          if(n <= 0) {
             mlog << Error << "\nprocess_point_vx() -> "
@@ -1103,13 +1103,13 @@ bool process_point_ens(int i_vx, int i_ens, DataPlaneArray &fcst_dpa) {
    fcst_dpa.clear();
 
    // Get file based on current vx and ensemble index
-   ConcatString ens_file = conf_info.vx_opt[i_vx].vx_pd.fcst_info->get_file(i_ens);
+   ConcatString ens_file = conf_info.vx_opt[i_vx].vx_pd.ens_info->get_file(i_ens);
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n"
         << "Processing ensemble member file: " << ens_file
         << (i_ens == ctrl_file_index ? " (control)\n" : "\n");
 
-   VarInfo *info = conf_info.vx_opt[i_vx].vx_pd.fcst_info->get_var_info(i_ens);
+   VarInfo *info = conf_info.vx_opt[i_vx].vx_pd.ens_info->get_var_info(i_ens);
 
    // Read the gridded data from the input forecast file
    bool status = get_data_plane_array(ens_file.c_str(), info->file_type(), info,
@@ -1151,13 +1151,13 @@ void process_point_scores() {
       shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
 
       // Store the forecast variable name
-      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->name_attr());
+      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name_attr());
 
       // Store the forecast variable units
-      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->units_attr());
+      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->units_attr());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->level_attr().c_str());
+      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_attr().c_str());
 
       // Store the observation variable name
       shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name_attr());
@@ -1205,7 +1205,7 @@ void process_point_scores() {
 
                mlog << Debug(2)
                     << "Processing point verification "
-                    << conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->magic_str()
+                    << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str()
                     << " versus "
                     << conf_info.vx_opt[i].vx_pd.obs_info->magic_str()
                     << ", for observation type " << pd_ptr->msg_typ
@@ -1257,7 +1257,7 @@ void process_grid_vx() {
    shc.set_obtype(conf_info.obtype.c_str());
 
    // Allocate space to store the forecast fields
-   int num_dp = conf_info.vx_opt[0].vx_pd.fcst_info->inputs_n();
+   int num_dp = conf_info.vx_opt[0].vx_pd.ens_info->inputs_n();
    fcst_dp = new DataPlane [num_dp];
    fraw_dp = new DataPlane [num_dp];
 
@@ -1278,13 +1278,13 @@ void process_grid_vx() {
       shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
 
       // Set the forecast variable name
-      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->name_attr());
+      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->name_attr());
 
       // Store the forecast variable units
-      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->units_attr());
+      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->units_attr());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->level_attr().c_str());
+      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->level_attr().c_str());
 
       // Set the ObsErrorEntry pointer
       if(conf_info.vx_opt[i].obs_error.flag) {
@@ -1339,14 +1339,14 @@ void process_grid_vx() {
       }
 
       // Loop through each of the input ensemble files/variables
-      for(j=0, n_miss=0; j < conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n(); j++) {
+      for(j=0, n_miss=0; j < conf_info.vx_opt[i].vx_pd.ens_info->inputs_n(); j++) {
 
          // Initialize
          fcst_dp[j].clear();
 
-         i_file = conf_info.vx_opt[i].vx_pd.fcst_info->get_file_index(j);
-         var_info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info(j);
-         fcst_file = conf_info.vx_opt[i].vx_pd.fcst_info->get_file(j);
+         i_file = conf_info.vx_opt[i].vx_pd.ens_info->get_file_index(j);
+         var_info = conf_info.vx_opt[i].vx_pd.ens_info->get_var_info(j);
+         fcst_file = conf_info.vx_opt[i].vx_pd.ens_info->get_file(j);
 
          // If the current ensemble file is valid, read the field
          if(ens_file_vld[i_file]) {
@@ -1375,7 +1375,7 @@ void process_grid_vx() {
          mlog << Debug(2) << "Processing ensemble mean file: "
               << ens_mean_file << "\n";
 
-         VarInfo *info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info();
+         VarInfo *info = conf_info.vx_opt[i].vx_pd.fcst_info;
 
          // Read the gridded data from the mean file
          found = get_data_plane(ens_mean_file.c_str(), FileType_None,
@@ -1394,7 +1394,7 @@ void process_grid_vx() {
 
          mlog << Debug(2) << "Computing the ensemble mean from the members.\n";
 
-         int n = conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n() - n_miss;
+         int n = conf_info.vx_opt[i].vx_pd.ens_info->inputs_n() - n_miss;
 
          if(n <= 0) {
             mlog << Error << "\nprocess_grid_vx() -> "
@@ -1418,7 +1418,7 @@ void process_grid_vx() {
            << "Found " << (cmn_dp.nx() == 0 ? 0 : 1)
            << " climatology mean field(s) and " << (csd_dp.nx() == 0 ? 0 : 1)
            << " climatology standard deviation field(s) for forecast "
-           << conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->magic_str() << ".\n";
+           << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str() << ".\n";
 
       // If requested in the config file, create a NetCDF file to store
       // the verification matched pairs
@@ -1524,7 +1524,7 @@ void process_grid_vx() {
          }
 
          // Loop through the ensemble members
-         for(k=0; k < conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n(); k++) {
+         for(k=0; k < conf_info.vx_opt[i].vx_pd.ens_info->inputs_n(); k++) {
 
             // Smooth the forecast field, if requested
             if(field == FieldType::Fcst || field == FieldType::Both) {
@@ -1575,7 +1575,7 @@ void process_grid_vx() {
 
             mlog << Debug(2)
                  << "Processing gridded verification "
-                 << conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->magic_str()
+                 << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str()
                  << " versus "
                  << conf_info.vx_opt[i].vx_pd.obs_info->magic_str()
                  << ", for observation type " << shc.get_obtype()
@@ -1684,7 +1684,7 @@ void process_grid_scores(int i_vx,
       y = nint(pd.y_na[i]);
 
       // Loop through each of the ensemble members
-      for(j=0,n_miss=0; j < conf_info.vx_opt[i_vx].vx_pd.fcst_info->inputs_n(); j++) {
+      for(j=0,n_miss=0; j < conf_info.vx_opt[i_vx].vx_pd.ens_info->inputs_n(); j++) {
 
          // Skip missing data
          if(fcst_dp[j].nx() == 0 || fcst_dp[j].ny() == 0) {
@@ -1758,7 +1758,7 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
    }
 
    // Compute ensemble RPS statistics from pre-computed binned probabilities
-   if(vx_opt.vx_pd.fcst_info->get_var_info()->is_prob()) {
+   if(vx_opt.vx_pd.fcst_info->is_prob()) {
       rps_info.set_climo_bin_prob(*pd_ptr, vx_opt.ocat_ta);
    }
    // Compute ensemble RPS statistics from ensemble member values
@@ -2065,7 +2065,7 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
    PairDataEnsemble pd;
 
    // Check for probabilistic input
-   bool is_prob = vx_opt.vx_pd.fcst_info->get_var_info()->is_prob();
+   bool is_prob = vx_opt.vx_pd.fcst_info->is_prob();
 
    // Process each observation filtering threshold
    for(i=0; i<vx_opt.othr_ta.n(); i++) {
@@ -2640,7 +2640,7 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
    nc_var = add_var(nc_out, (string)var_name, ncFloat, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.fcst_info->get_var_info(), &nc_var, false, dp,
+   add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.fcst_info, &nc_var, false, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data
@@ -2702,7 +2702,7 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
    nc_var = add_var(nc_out, (string)var_name, ncInt, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.fcst_info->get_var_info(), &nc_var, true, dp,
+   add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.fcst_info, &nc_var, true, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data
