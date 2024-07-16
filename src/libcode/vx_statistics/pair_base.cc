@@ -871,7 +871,7 @@ VxPairBase & VxPairBase::operator=(const VxPairBase &vx_pb) {
 void VxPairBase::init_from_scratch() {
 
    fcst_info = (VarInfo *) nullptr;
-   obs_info = (VarInfo *) nullptr;
+   obs_info  = (VarInfo *) nullptr;
 
    fclm_info = (VarInfo *) nullptr;
    oclm_info = (VarInfo *) nullptr;

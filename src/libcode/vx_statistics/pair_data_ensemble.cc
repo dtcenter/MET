@@ -1049,7 +1049,7 @@ void VxPairDataEnsemble::set_ens_info(EnsVarInfo *info) {
    ens_info = new EnsVarInfo(*info);
 
    // Set the base pointer
-   if(!fcst_info) set_fcst_info(info->get_var_info());
+   if(!fcst_info) set_fcst_info(ens_info->get_var_info());
 
    return;
 }

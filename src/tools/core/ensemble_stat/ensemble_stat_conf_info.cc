@@ -665,6 +665,9 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       input_info.file_list = ens_files;
       vx_pd.ens_info->add_input(input_info);
 
+      // Set the fcst_info, if needed
+      if(!vx_pd.fcst_info) vx_pd.set_fcst_info(next_var); 
+
       // Add InputInfo to fcst info list for each ensemble file provided
       // set var_info to nullptr to note first VarInfo should be used
       int last_member_index = ens_files->n() - (use_ctrl ? 1 : 0);
@@ -695,7 +698,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    }
 
    // Allocate new VarInfo object for obs
-   vx_pd.obs_info  = info_factory.new_var_info(otype);
+   vx_pd.obs_info = info_factory.new_var_info(otype);
 
    // Set the VarInfo objects
    vx_pd.obs_info->set_dict(odict);
