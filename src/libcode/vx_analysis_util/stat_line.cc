@@ -14,6 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <limits.h>
+#include <map>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -32,6 +33,30 @@
 #include "vx_log.h"
 
 using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   // MET #2924 Rename climatology column names
+   //
+
+static map<const char *,const char *> mpr_rename_map = {
+   { "CLIMO_MEAN",  "OBS_CLIMO_MEAN"  },
+   { "CLIMO_STDEV", "OBS_CLIMO_STDEV" },
+   { "CLIMO_CDF",   "OBS_CLIMO_CDF"   }
+};
+
+static map<const char *,const char *> orank_rename_map = {
+   { "CLIMO_MEAN",  "OBS_CLIMO_MEAN"  },
+   { "CLIMO_STDEV", "OBS_CLIMO_STDEV" }
+};
+
+static map<STATLineType,map<const char *, const char *>> stat_columns_rename_map = {
+   { STATLineType::mpr,   mpr_rename_map   },
+   { STATLineType::orank, orank_rename_map }
+};   
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -442,6 +467,19 @@ offset = HdrLine->col_offset(col_str, dim);
 
 if ( is_bad_data(offset) ) {
    if ( !get_file()->header().has(col_str, offset) ) offset = bad_data_int;
+}
+
+   //
+   // If not found, check renamed columns for backward compatibility
+   //
+
+if ( is_bad_data(offset) ) {
+
+   if ( stat_columns_rename_map.count(Type) ) {
+      if ( stat_columns_rename_map[Type].count(col_str)) {
+         return ( get_item((stat_columns_rename_map[Type])[col_str]) );
+      }
+   }
 }
 
    //
