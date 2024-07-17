@@ -1964,7 +1964,7 @@ void get_mask_points(const GridStatVxOpt &vx_opt,
    if(wgt_ptr) apply_mask(*wgt_ptr, mask_mp, pd.wgt_na);
    else        pd.wgt_na.add_const(default_grid_weight, pd.n_obs);
 
-   if(cmn_ptr && csd_ptr) pd.add_climo_cdf();
+   if(cmn_ptr && csd_ptr) pd.compute_climo_cdf();
 
    return;
 }

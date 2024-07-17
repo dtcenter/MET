@@ -150,14 +150,17 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
                         pd.x_na[i], pd.y_na[i], pd.vld_ta[i],
                         pd.lvl_na[i], pd.elv_na[i],
                         pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
-                        pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i])) {
+                        pd.fcmn_na[i], pd.fcsd_na[i],
+                        pd.ocmn_na[i], pd.ocsd_na[i],
+                        pd.wgt_na[i])) {
             if (i < pd.seeps_mpr.size()) set_seeps_score(seeps_mpr[i], i);
          }
       }
    }
    // Handle gridded data
    else {
-      add_grid_pair(pd.f_na, pd.o_na, pd.cmn_na, pd.csd_na, pd.wgt_na);
+      add_grid_pair(pd.f_na, pd.o_na, pd.fcmn_na, pd.fcsd_na,
+                    pd.ocmn_na, pd.ocsd_na, pd.wgt_na);
    }
 
    return;
@@ -169,10 +172,11 @@ bool PairDataPoint::add_point_pair(const char *sid, double lat, double lon,
                                    double x, double y, unixtime ut,
                                    double lvl, double elv,
                                    double f, double o, const char *qc,
-                                   double cmn, double csd, double wgt) {
+                                   double fcmn, double fcsd,
+                                   double ocmn, double ocsd, double wgt) {
 
    if(!add_point_obs(sid, lat, lon, x, y, ut, lvl, elv, o, qc,
-                     cmn, csd, wgt)) return false;
+                     fcmn, fcsd, ocmn, ocsd, wgt)) return false;
 
    f_na.add(f);
    seeps_mpr.push_back((SeepsScore *)nullptr);
@@ -225,8 +229,9 @@ void PairDataPoint::set_point_pair(int i_obs, const char *sid,
                                    double x, double y, unixtime ut,
                                    double lvl, double elv,
                                    double f, double o, const char *qc,
-                                   double cmn, double csd, double wgt,
-                                   SeepsScore *seeps) {
+                                   double fcmn, double fcsd,
+                                   double ocmn, double ocsd,
+                                   double wgt, SeepsScore *seeps) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
       mlog << Error << "\nPairDataPoint::set_point_pair() -> "
@@ -236,7 +241,7 @@ void PairDataPoint::set_point_pair(int i_obs, const char *sid,
    }
 
    set_point_obs(i_obs, sid, lat, lon, x, y, ut, lvl, elv,
-                 o, qc, cmn, csd, wgt);
+                 o, qc, fcmn, fcsd, ocmn, ocsd, wgt);
 
    f_na.set(i_obs, f);
    *seeps_mpr[i_obs] = *seeps;
@@ -247,9 +252,11 @@ void PairDataPoint::set_point_pair(int i_obs, const char *sid,
 ////////////////////////////////////////////////////////////////////////
 
 bool PairDataPoint::add_grid_pair(double f, double o,
-                                  double cmn, double csd, double wgt) {
+                                  double fcmn, double fcsd,
+                                  double ocmn, double ocsd,
+                                  double wgt) {
 
-   add_grid_obs(o, cmn, csd, wgt);
+   add_grid_obs(o, fcmn, fcsd, ocmn, ocsd, wgt);
 
    f_na.add(f);
    seeps_mpr.push_back(nullptr);
@@ -260,13 +267,16 @@ bool PairDataPoint::add_grid_pair(double f, double o,
 ////////////////////////////////////////////////////////////////////////
 
 bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
-                                  const NumArray &cmn_in, const NumArray &csd_in,
+                                  const NumArray &fcmn_in, const NumArray &fcsd_in,
+                                  const NumArray &ocmn_in, const NumArray &ocsd_in,
                                   const NumArray &wgt_in) {
 
    // Check for constant length
-   if(o_in.n() != f_in.n()   ||
-      o_in.n() != cmn_in.n() ||
-      o_in.n() != csd_in.n() ||
+   if(o_in.n() != f_in.n()    ||
+      o_in.n() != fcmn_in.n() ||
+      o_in.n() != fcsd_in.n() ||
+      o_in.n() != ocmn_in.n() ||
+      o_in.n() != ocsd_in.n() ||
       o_in.n() != wgt_in.n()) {
       mlog << Error << "\nPairDataPoint::add_grid_pair() -> "
            << "arrays must all have the same length!\n\n";
@@ -281,7 +291,7 @@ bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
    wgt_na.add(wgt_in);
 
    for(int i=0; i<o_in.n(); i++) {
-      add_climo(o_in[i], cmn_in[i], csd_in[i]);
+      add_climo(o_in[i], fcmn_in[i], fcsd_in[i], ocmn_in[i], ocsd_in[i]);
    }
 
    // Increment the number of pairs
@@ -333,22 +343,27 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
    out_pd.extend(n_obs);
    out_pd.set_climo_cdf_info_ptr(cdf_info_ptr);
 
-   bool cmn_flag = set_climo_flag(f_na, cmn_na);
-   bool csd_flag = set_climo_flag(f_na, csd_na);
+   bool cmn_flag = set_climo_flag(f_na, fcmn_na) &&
+                   set_climo_flag(f_na, ocmn_na);
+   bool csd_flag = set_climo_flag(f_na, fcsd_na) &&
+                   set_climo_flag(f_na, ocsd_na);
    bool wgt_flag = set_climo_flag(f_na, wgt_na);
 
    // Loop over the pairs
    for(i=0; i<n_obs; i++) {
 
       // Check for bad data
-      if(is_bad_data(f_na[i])                 ||
-         is_bad_data(o_na[i])                 ||
-         (cmn_flag && is_bad_data(cmn_na[i])) ||
-         (csd_flag && is_bad_data(csd_na[i])) ||
+      if(is_bad_data(f_na[i])                    ||
+         is_bad_data(o_na[i])                    ||
+         (cmn_flag && (is_bad_data(fcmn_na[i])   ||
+                       is_bad_data(ocmn_na[i]))) ||
+         (csd_flag && (is_bad_data(ocsd_na[i])   ||
+                       is_bad_data(ocsd_na[i]))) ||
          (wgt_flag && is_bad_data(wgt_na[i]))) continue;
 
       // Keep pairs which meet the threshold criteria
-      if(check_fo_thresh(f_na[i], o_na[i], cmn_na[i], csd_na[i],
+      // TODO: MET#2924
+      if(check_fo_thresh(f_na[i], o_na[i], ocmn_na[i], ocsd_na[i],
                          ft, ot, type)) {
 
          // Handle point data
@@ -357,14 +372,18 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
                       lon_na[i], x_na[i], y_na[i],
                       vld_ta[i], lvl_na[i], elv_na[i],
                       f_na[i], o_na[i], o_qc_sa[i].c_str(),
-                      cmn_na[i], csd_na[i], wgt_na[i])) {
+                      fcmn_na[i], fcsd_na[i],
+                      ocmn_na[i], ocsd_na[i],
+                      wgt_na[i])) {
                out_pd.set_seeps_score(seeps_mpr[i], i);
             }
          }
          // Handle gridded data
          else {
-            out_pd.add_grid_pair(f_na[i], o_na[i], cmn_na[i],
-                      csd_na[i], wgt_na[i]);
+            out_pd.add_grid_pair(f_na[i], o_na[i],
+                                 fcmn_na[i], fcsd_na[i],
+                                 ocmn_na[i], ocsd_na[i],
+                                 wgt_na[i]);
          }
       }
    } // end for
@@ -604,12 +623,13 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
             // Add the forecast, climatological, and observation data
             // Weight is from the nearest grid point
-            // TODO: Pass fcst climo to add_point_pair
             int n = three_to_one(i_msg_typ, i_mask, i_interp);
             if(!pd[n].add_point_pair(hdr_sid_str,
                   hdr_lat, hdr_lon, obs_x, obs_y, hdr_ut, obs_lvl,
                   obs_hgt, fcst_v, obs_v, obs_qty,
-                  ocmn_v, ocsd_v, wgt_v)) {
+                  fcmn_v, fcsd_v,
+                  ocmn_v, ocsd_v,
+                  wgt_v)) {
 
                if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                   mlog << Debug(REJECT_DEBUG_LEVEL)
@@ -899,7 +919,7 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
    }
 
    int i;
-   double fcst_wind, obs_wind, cmn_wind, csd_wind, wgt;
+   double fcst_wind, obs_wind, fcmn_wind, ocmn_wind, fcsd_wind, ocsd_wind, wgt;
 
    // Initialize and allocate memory for output pairs
    out_pd_u.erase();
@@ -909,10 +929,14 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
    out_pd_u.set_climo_cdf_info_ptr(pd_u.cdf_info_ptr);
    out_pd_v.set_climo_cdf_info_ptr(pd_v.cdf_info_ptr);
 
-   bool cmn_flag = set_climo_flag(pd_u.f_na, pd_u.cmn_na) &&
-                   set_climo_flag(pd_v.f_na, pd_v.cmn_na);
-   bool csd_flag = set_climo_flag(pd_u.f_na, pd_u.csd_na) &&
-                   set_climo_flag(pd_v.f_na, pd_v.csd_na);
+   bool cmn_flag = set_climo_flag(pd_u.f_na, pd_u.fcmn_na) &&
+                   set_climo_flag(pd_v.f_na, pd_v.fcmn_na) &&
+                   set_climo_flag(pd_u.f_na, pd_u.ocmn_na) &&
+                   set_climo_flag(pd_v.f_na, pd_v.ocmn_na);
+   bool csd_flag = set_climo_flag(pd_u.f_na, pd_u.fcsd_na) &&
+                   set_climo_flag(pd_v.f_na, pd_v.fcsd_na) &&
+                   set_climo_flag(pd_u.f_na, pd_u.ocsd_na) &&
+                   set_climo_flag(pd_v.f_na, pd_v.ocsd_na);
    bool wgt_flag = set_climo_flag(pd_u.f_na, pd_u.wgt_na);
 
    // Loop over the pairs
@@ -923,23 +947,32 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
       // Compute wind speeds
       fcst_wind = convert_u_v_to_wind(pd_u.f_na[i], pd_v.f_na[i]);
       obs_wind  = convert_u_v_to_wind(pd_u.o_na[i], pd_v.o_na[i]);
-      cmn_wind  = (cmn_flag ?
-                   convert_u_v_to_wind(pd_u.cmn_na[i], pd_v.cmn_na[i]) :
+      fcmn_wind = (cmn_flag ?
+                   convert_u_v_to_wind(pd_u.fcmn_na[i], pd_v.fcmn_na[i]) :
                    bad_data_double);
-      csd_wind  = (csd_flag ?
-                   convert_u_v_to_wind(pd_u.csd_na[i], pd_v.csd_na[i]) :
+      ocmn_wind = (cmn_flag ?
+                   convert_u_v_to_wind(pd_u.ocmn_na[i], pd_v.ocmn_na[i]) :
+                   bad_data_double);
+      fcsd_wind = (csd_flag ?
+                   convert_u_v_to_wind(pd_u.fcsd_na[i], pd_v.fcsd_na[i]) :
+                   bad_data_double);
+      ocsd_wind = (csd_flag ?
+                   convert_u_v_to_wind(pd_u.ocsd_na[i], pd_v.ocsd_na[i]) :
                    bad_data_double);
 
       // Check for bad data
-      if(is_bad_data(fcst_wind)              ||
-         is_bad_data(obs_wind)               ||
-         (cmn_flag && is_bad_data(cmn_wind)) ||
-         (csd_flag && is_bad_data(csd_wind)) ||
+      if(is_bad_data(fcst_wind)                 ||
+         is_bad_data(obs_wind)                  ||
+         (cmn_flag && (is_bad_data(fcmn_wind)   ||
+                       is_bad_data(ocmn_wind))) ||
+         (csd_flag && (is_bad_data(fcsd_wind)   ||
+                       is_bad_data(ocsd_wind))) ||
          (wgt_flag && is_bad_data(wgt))) continue;
 
       // Check wind speed thresholds
+      // TODO: MET#2924
       if(check_fo_thresh(fcst_wind, obs_wind,
-                         cmn_wind,  csd_wind,
+                         ocmn_wind, ocsd_wind,
                          ft, ot, type)) {
 
          // Handle point data
@@ -949,24 +982,29 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
                         pd_u.x_na[i], pd_u.y_na[i], pd_u.vld_ta[i],
                         pd_u.lvl_na[i], pd_u.elv_na[i],
                         pd_u.f_na[i], pd_u.o_na[i],
-                        pd_u.o_qc_sa[i].c_str(), pd_u.cmn_na[i],
-                        pd_u.csd_na[i], pd_u.wgt_na[i]);
+                        pd_u.o_qc_sa[i].c_str(),
+                        pd_u.fcmn_na[i], pd_u.fcsd_na[i],
+                        pd_u.ocmn_na[i], pd_u.ocsd_na[i],
+                        pd_u.wgt_na[i]);
             out_pd_v.add_point_pair(pd_v.sid_sa[i].c_str(),
                         pd_v.lat_na[i], pd_v.lon_na[i],
                         pd_v.x_na[i], pd_v.y_na[i], pd_v.vld_ta[i],
                         pd_v.lvl_na[i], pd_v.elv_na[i],
                         pd_v.f_na[i], pd_v.o_na[i],
                         pd_v.o_qc_sa[i].c_str(),
-                        pd_v.cmn_na[i], pd_v.csd_na[i],
+                        pd_v.fcmn_na[i], pd_v.fcsd_na[i],
+                        pd_v.ocmn_na[i], pd_v.ocsd_na[i],
                         pd_v.wgt_na[i]);
          }
          // Handle gridded data
          else {
             out_pd_u.add_grid_pair(pd_u.f_na[i], pd_u.o_na[i],
-                        pd_u.cmn_na[i], pd_u.csd_na[i],
+                        pd_u.fcmn_na[i], pd_u.fcsd_na[i],
+                        pd_u.ocmn_na[i], pd_u.ocsd_na[i],
                         pd_u.wgt_na[i]);
             out_pd_v.add_grid_pair(pd_v.f_na[i], pd_v.o_na[i],
-                        pd_v.cmn_na[i], pd_v.csd_na[i],
+                        pd_v.fcmn_na[i], pd_v.fcsd_na[i],
+                        pd_v.ocmn_na[i], pd_v.ocsd_na[i],
                         pd_v.wgt_na[i]);
          }
       }
@@ -997,23 +1035,27 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
    out_pd.extend(pd.n_obs);
    out_pd.set_climo_cdf_info_ptr(pd.cdf_info_ptr);
 
-   bool cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
-   bool csd_flag = set_climo_flag(pd.f_na, pd.csd_na);
+   bool cmn_flag = set_climo_flag(pd.f_na, pd.fcmn_na) &&
+                   set_climo_flag(pd.f_na, pd.ocmn_na);
+   bool csd_flag = set_climo_flag(pd.f_na, pd.fcsd_na) &&
+                   set_climo_flag(pd.f_na, pd.ocsd_na);
    bool wgt_flag = set_climo_flag(pd.f_na, pd.wgt_na);
 
    // Loop over the pairs
    for(i=0; i<pd.n_obs; i++) {
 
       // Check for bad data
-      if(is_bad_data(pd.f_na[i])                 ||
-         is_bad_data(pd.o_na[i])                 ||
-         (cmn_flag && is_bad_data(pd.cmn_na[i])) ||
-         (csd_flag && is_bad_data(pd.csd_na[i])) ||
+      if(is_bad_data(pd.f_na[i])                    ||
+         is_bad_data(pd.o_na[i])                    ||
+         (cmn_flag && (is_bad_data(pd.fcmn_na[i])   ||
+                       is_bad_data(pd.ocmn_na[i]))) ||
+         (csd_flag && (is_bad_data(pd.fcsd_na[i]))  ||
+                       is_bad_data(pd.ocsd_na[i]))  ||
          (wgt_flag && is_bad_data(pd.wgt_na[i]))) continue;
 
       // Keep pairs for the current bin.
       // check_bins() returns a 1-based bin value.
-      if(ta.check_bins(pd.cdf_na[i]) == (i_bin + 1)) {
+      if(ta.check_bins(pd.ocdf_na[i]) == (i_bin + 1)) {
 
          // Handle point data
          if(pd.is_point_vx()) {
@@ -1021,12 +1063,16 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
                       pd.lon_na[i], pd.x_na[i], pd.y_na[i],
                       pd.vld_ta[i], pd.lvl_na[i], pd.elv_na[i],
                       pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
-                      pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
+                      pd.fcmn_na[i], pd.fcsd_na[i],
+                      pd.ocmn_na[i], pd.ocsd_na[i],
+                      pd.wgt_na[i]);
          }
          // Handle gridded data
          else {
             out_pd.add_grid_pair(pd.f_na[i], pd.o_na[i],
-                      pd.cmn_na[i], pd.csd_na[i], pd.wgt_na[i]);
+                                 pd.fcmn_na[i], pd.fcsd_na[i],
+                                 pd.ocmn_na[i], pd.ocsd_na[i],
+                                 pd.wgt_na[i]);
          }
       }
    } // end for

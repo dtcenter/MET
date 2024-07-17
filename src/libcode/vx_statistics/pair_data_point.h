@@ -58,19 +58,23 @@ class PairDataPoint : public PairBase {
 
       bool add_point_pair(const char *, double, double, double, double,
                           unixtime, double, double, double, double,
-                          const char *, double, double, double);
+                          const char *, double, double, double,
+                          double, double);
       void load_seeps_climo(const ConcatString &seeps_climo_name);
       void set_seeps_thresh(const SingleThresh &p1_thresh);
       void set_seeps_score(SeepsScore *, int index=-1);
 
       void set_point_pair(int, const char *, double, double, double, double,
                           unixtime, double, double, double, double,
-                          const char *, double, double, double, SeepsScore *);
+                          const char *, double, double, double, double,
+                          double, SeepsScore *);
 
-      bool add_grid_pair(double, double, double, double, double);
+      bool add_grid_pair(double, double, double, double,
+                         double, double, double);
 
       bool add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
-                         const NumArray &cmn_in, const NumArray &csd_in,
+                         const NumArray &fcmn_in, const NumArray &fcsd_in,
+                         const NumArray &ocmn_in, const NumArray &ocsd_in,
                          const NumArray &w_in);
 
       PairDataPoint subset_pairs_cnt_thresh(const SingleThresh &ft,

@@ -103,9 +103,11 @@ class PairBase {
       NumArray    wgt_na;  // Weight [n_obs]
 
       // Point and Grid Climatology Information
-      NumArray    cmn_na;  // Climatology mean [n_obs]
-      NumArray    csd_na;  // Climatology standard deviation [n_obs]
-      NumArray    cdf_na;  // Climatology cumulative distribution function [n_obs]
+      NumArray    fcmn_na; // Forecast climatology mean [n_obs]
+      NumArray    fcsd_na; // Forecast climatology standard deviation [n_obs]
+      NumArray    ocmn_na; // Observation climatology mean [n_obs]
+      NumArray    ocsd_na; // Observation climatology standard deviation [n_obs]
+      NumArray    ocdf_na; // Observation climatology cumulative distribution function [n_obs]
 
       // Point Observation Information
       StringArray sid_sa;  // Station ID [n_obs]
@@ -168,20 +170,23 @@ class PairBase {
 
       bool add_point_obs(const char *, double, double, double, double,
                          unixtime, double, double, double, const char *,
-                         double, double, double);
+                         double, double, double, double, double);
 
       void set_point_obs(int, const char *, double, double, double, double,
                          unixtime, double, double, double,
-                         const char *, double, double, double);
+                         const char *, double, double, double, double, double);
 
-      void add_grid_obs(double, double, double, double);
-      
       void add_grid_obs(double, double, double,
                         double, double, double);
-   
-      void add_climo(double, double, double);
-      void set_climo(int, double, double, double);
-      void add_climo_cdf();
+      
+      void add_grid_obs(double, double, double, double,
+                        double, double, double, double);
+
+      void add_climo(double, double, double, double, double);
+
+      void set_climo(int, double, double, double, double, double);
+
+      void compute_climo_cdf();
 
       double process_obs(const VarInfo *, double);
 

@@ -546,8 +546,8 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
    // Check RPS threshold formatting: monotonically increasing
    fthresh.check_bin_thresh();
 
-   // Flag to process climo
-   cmn_flag = set_climo_flag(pd.o_na, pd.cmn_na);
+   // Flag to process observation climatology data
+   cmn_flag = set_climo_flag(pd.o_na, pd.ocmn_na);
 
    // Setup probability thresholds, equally spaced by ensemble size
    for(i=0; i<=n_prob; i++) p_thresh.add((double) i/n_prob);
@@ -575,7 +575,7 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
 
       // Derive climatological probabilities
       if(cmn_flag) climo_prob = derive_climo_prob(pd.cdf_info_ptr,
-                                                  pd.cmn_na, pd.csd_na,
+                                                  pd.ocmn_na, pd.ocsd_na,
                                                   fthresh[i]);
 
       // Loop over the observations
@@ -583,12 +583,14 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
 
          // Loop over ensemble members and count events
          for(k=0, n_event=0; k<n_prob; k++) {
-            if(fthresh[i].check(pd.e_na[k][j], pd.cmn_na[j], pd.csd_na[j])) n_event++;
+            // TODO: MET#2924
+            if(fthresh[i].check(pd.e_na[k][j], pd.ocmn_na[j], pd.ocsd_na[j])) n_event++;
          }
 
          // Update the forecast PCT counts
          p = (double) n_event/n_prob;
-         if(fthresh[i].check(pd.o_na[j], pd.cmn_na[j], pd.csd_na[j])) {
+         // TODO: MET#2924
+         if(fthresh[i].check(pd.o_na[j], pd.ocmn_na[j], pd.ocsd_na[j])) {
             fcst_pct.inc_event(p);
          }
          else {
@@ -598,7 +600,8 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
          // Update the climatology PCT counts
          if(cmn_flag) {
             p = climo_prob[j];
-            if(fthresh[i].check(pd.o_na[j], pd.cmn_na[j], pd.csd_na[j])) {
+            // TODO: MET#2924
+            if(fthresh[i].check(pd.o_na[j], pd.ocmn_na[j], pd.ocsd_na[j])) {
                climo_pct.inc_event(p);
             }
             else {

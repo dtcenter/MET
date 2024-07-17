@@ -98,9 +98,11 @@ void PairBase::clear() {
    x_na.clear();
    y_na.clear();
    wgt_na.clear();      
-   cmn_na.clear();
-   csd_na.clear();
-   cdf_na.clear();
+   fcmn_na.clear();
+   fcsd_na.clear();
+   ocmn_na.clear();
+   ocsd_na.clear();
+   ocdf_na.clear();
 
    sid_sa.clear();
    lat_na.clear();
@@ -147,9 +149,11 @@ void PairBase::erase() {
    x_na.erase();
    y_na.erase();
    wgt_na.erase();      
-   cmn_na.erase();
-   csd_na.erase();
-   cdf_na.erase();
+   fcmn_na.erase();
+   fcsd_na.erase();
+   ocmn_na.erase();
+   ocsd_na.erase();
+   ocdf_na.erase();
 
    sid_sa.clear();  // no erase option
    lat_na.erase();
@@ -182,9 +186,11 @@ void PairBase::extend(int n) {
    y_na.extend  (n);
    wgt_na.extend(n);
 
-   cmn_na.extend(n);
-   csd_na.extend(n);
-   cdf_na.extend(n);
+   fcmn_na.extend(n);
+   fcsd_na.extend(n);
+   ocmn_na.extend(n);
+   ocsd_na.extend(n);
+   ocdf_na.extend(n);
 
    if(IsPointVx) {
       lat_na.extend(n);
@@ -365,49 +371,57 @@ int PairBase::has_obs_rec(const char *sid, double lat, double lon,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::add_climo(double obs, double cmn, double csd) {
+void PairBase::add_climo(double obs,
+                         double fcmn, double fcsd,
+                         double ocmn, double ocsd) {
 
    // Compute and store the climatology information
-   cmn_na.add(cmn);
-   csd_na.add(csd);
-   cdf_na.add(normal_cdf(obs, cmn, csd));
+   fcmn_na.add(fcmn);
+   fcsd_na.add(fcsd);
+   ocmn_na.add(ocmn);
+   ocsd_na.add(ocsd);
+   ocdf_na.add(normal_cdf(obs, ocmn, ocsd));
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_climo(int i_obs, double obs, double cmn, double csd) {
+void PairBase::set_climo(int i_obs, double obs,
+                         double fcmn, double fcsd,
+                         double ocmn, double ocsd) {
 
    // Compute and store the climatology information
-   cmn_na.set(i_obs, cmn);
-   csd_na.set(i_obs, csd);
-   cdf_na.set(i_obs, normal_cdf(obs, cmn, csd));
+   fcmn_na.set(i_obs, fcmn);
+   fcsd_na.set(i_obs, fcsd);
+   ocmn_na.set(i_obs, ocmn);
+   ocsd_na.set(i_obs, ocsd);
+   ocdf_na.set(i_obs, normal_cdf(obs, ocmn, ocsd));
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::add_climo_cdf() {
+void PairBase::compute_climo_cdf() {
    int i;
 
-   // The o_na, cmn_na, and csd_na have already been populated
-   if(o_na.n() != cmn_na.n() || o_na.n() != csd_na.n()) {
-      mlog << Error << "\nPairBase::add_climo_cdf() -> "
+   // The o_na, ocmn_na, and ocsd_na have already been populated
+   if(o_na.n() != ocmn_na.n() || o_na.n() != ocsd_na.n()) {
+      mlog << Error << "\nPairBase::compute_climo_cdf() -> "
            << "the observation, climo mean, and climo stdev arrays "
            << "must all have the same length (" << o_na.n() << ").\n\n";
       exit(1);
    }
 
-   cdf_na.extend(o_na.n());
+   ocdf_na.extend(o_na.n());
 
    for(i=0; i<o_na.n(); i++) {
-      cdf_na.add(is_bad_data(o_na[i])   ||
-                 is_bad_data(cmn_na[i]) ||
-                 is_bad_data(csd_na[i]) ?
-                 bad_data_double :
-                 normal_cdf(o_na[i], cmn_na[i], csd_na[i]));
+      ocdf_na.add(is_bad_data(o_na[i])   ||
+                  is_bad_data(ocmn_na[i]) ||
+                  is_bad_data(ocsd_na[i]) ?
+                  bad_data_double :
+                  normal_cdf(o_na[i], ocmn_na[i], ocsd_na[i]));
    }
 
    return;
@@ -419,7 +433,9 @@ bool PairBase::add_point_obs(const char *sid,
                              double lat, double lon, double x, double y,
                              unixtime ut, double lvl, double elv,
                              double o, const char *qc,
-                             double cmn, double csd, double wgt) {
+                             double fcmn, double fcsd,
+                             double ocmn, double ocsd,
+                             double wgt) {
 
    //
    // Set or check the IsPointVx flag
@@ -473,11 +489,10 @@ bool PairBase::add_point_obs(const char *sid,
       val.ut  = fcst_ut;
       val.lvl = lvl;
       val.elv = elv;
-      val.fcmn = cmn;
-      val.fcsd = csd;
-      // TODO: Handle ocmn/ocsd
-      val.ocmn = cmn;
-      val.ocsd = csd;
+      val.fcmn = fcmn;
+      val.fcsd = fcsd;
+      val.ocmn = ocmn;
+      val.ocsd = ocsd;
 
       val.obs.push_back(ob_val);
       map_key.add(obs_key.c_str());
@@ -497,8 +512,7 @@ bool PairBase::add_point_obs(const char *sid,
       elv_na.add(elv);
       o_na.add(o);
       o_qc_sa.add(qc);
-      // TODO: Handle ocmn/ocsd
-      add_climo(o, cmn, csd);
+      add_climo(o, fcmn, fcsd, ocmn, ocsd);
 
       // Increment the number of pairs
       n_obs += 1;
@@ -514,7 +528,9 @@ void PairBase::set_point_obs(int i_obs, const char *sid,
                              double lat, double lon, double x, double y,
                              unixtime ut, double lvl, double elv,
                              double o, const char *qc,
-                             double cmn, double csd, double wgt) {
+                             double fcmn, double fcsd,
+                             double ocmn, double ocsd,
+                             double wgt) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
       mlog << Error << "\nPairBase::set_point_obs() -> "
@@ -534,8 +550,7 @@ void PairBase::set_point_obs(int i_obs, const char *sid,
    elv_na.set(i_obs, elv);
    o_na.set(i_obs, o);
    o_qc_sa.set(i_obs, qc);
-   // TODO: Handle ocmn/ocsd
-   set_climo(i_obs, o, cmn, csd);
+   set_climo(i_obs, o, fcmn, fcsd, ocmn, ocsd);
 
    return;
 }
@@ -741,19 +756,18 @@ void PairBase::calc_obs_summary(){
       // Store summarized value in the map
       svt.summary_val = ob.val;
 
-      sid_sa.add (svt.sid.c_str());
-      lat_na.add (svt.lat);
-      lon_na.add (svt.lon);
-      x_na.add   (svt.x);
-      y_na.add   (svt.y);
-      wgt_na.add (svt.wgt);
-      vld_ta.add (ob.ut);
-      lvl_na.add (svt.lvl);
-      elv_na.add (svt.elv);
-      o_na.add   (ob.val);
-      o_qc_sa.add(ob.qc.c_str());
-      // TODO: Add ocmn/ocsd
-      add_climo  (ob.val, svt.ocmn, svt.ocsd);
+      sid_sa.add    (svt.sid.c_str());
+      lat_na.add    (svt.lat);
+      lon_na.add    (svt.lon);
+      x_na.add      (svt.x);
+      y_na.add      (svt.y);
+      wgt_na.add    (svt.wgt);
+      vld_ta.add    (ob.ut);
+      lvl_na.add    (svt.lvl);
+      elv_na.add    (svt.elv);
+      o_na.add      (ob.val);
+      o_qc_sa.add   (ob.qc.c_str());
+      add_climo(ob.val, svt.fcmn, svt.fcsd, svt.ocmn, svt.ocsd);
 
       // Increment the number of pairs
       n_obs += 1;
@@ -765,7 +779,9 @@ void PairBase::calc_obs_summary(){
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::add_grid_obs(double o, double cmn, double csd,
+void PairBase::add_grid_obs(double o,
+                            double fcmn, double fcsd,
+                            double ocmn, double ocsd,
                             double wgt) {
 
    //
@@ -782,7 +798,7 @@ void PairBase::add_grid_obs(double o, double cmn, double csd,
 
    o_na.add(o);
    wgt_na.add(wgt);
-   add_climo(o, cmn, csd);
+   add_climo(o, fcmn, fcsd, ocmn, ocsd);
 
    // Increment the number of observations
    n_obs += 1;
@@ -792,11 +808,12 @@ void PairBase::add_grid_obs(double o, double cmn, double csd,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::add_grid_obs(double x, double y,
-                            double o, double cmn, double csd,
+void PairBase::add_grid_obs(double x, double y, double o,
+                            double fcmn, double fcsd,
+                            double ocmn, double ocsd,
                             double wgt) {
 
-   add_grid_obs(o, cmn, csd, wgt);
+   add_grid_obs(o, fcmn, fcsd, ocmn, ocsd, wgt);
 
    x_na.add(x);
    y_na.add(y);

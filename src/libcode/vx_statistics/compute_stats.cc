@@ -150,11 +150,10 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
                      bool precip_flag, bool rank_flag, bool normal_ci_flag,
                      CNTInfo &cnt_info) {
    int i, j, n;
-   double f, o, c, wgt, wgt_sum;
+   double f, o, fc, oc, wgt, wgt_sum;
    double f_bar, o_bar, ff_bar, oo_bar, fo_bar;
    double fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar;
    double err, err_bar, abs_err_bar, err_sq_bar, den;
-   bool cmn_flag;
 
    //
    // Allocate memory to store the differences
@@ -176,7 +175,8 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    //
    // Flag to process climo
    //
-   cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
+   bool cmn_flag = set_climo_flag(pd.f_na, pd.fcmn_na) &&
+                   set_climo_flag(pd.f_na, pd.ocmn_na);
 
    //
    // Get the sum of the weights
@@ -199,7 +199,8 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
 
       f   = pd.f_na[j];
       o   = pd.o_na[j];
-      c   = (cmn_flag ? pd.cmn_na[j] : bad_data_double);
+      fc  = (cmn_flag ? pd.fcmn_na[j] : bad_data_double);
+      oc  = (cmn_flag ? pd.ocmn_na[j] : bad_data_double);
       wgt = pd.wgt_na[i]/wgt_sum;
 
       //
@@ -207,7 +208,8 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       if(is_bad_data(f) ||
          is_bad_data(o) ||
-         (cmn_flag && is_bad_data(c))) continue;
+         (cmn_flag && is_bad_data(fc)) ||
+         (cmn_flag && is_bad_data(oc))) continue;
 
       //
       // Compute the error
@@ -226,11 +228,11 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       n++;
 
       if(cmn_flag) {
-         fa_bar  += wgt*(f-c);
-         oa_bar  += wgt*(o-c);
-         foa_bar += wgt*(f-c)*(o-c);
-         ffa_bar += wgt*(f-c)*(f-c);
-         ooa_bar += wgt*(o-c)*(o-c);
+         fa_bar  += wgt*(f-fc);
+         oa_bar  += wgt*(o-oc);
+         foa_bar += wgt*(f-fc)*(o-oc);
+         ffa_bar += wgt*(f-fc)*(f-fc);
+         ooa_bar += wgt*(o-oc)*(o-oc);
       }
    } // end for i
 
@@ -587,7 +589,8 @@ void compute_ctsinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       // Add this pair to the contingency table
       //
-      cts_info.add(pd.f_na[j], pd.o_na[j], pd.cmn_na[j], pd.csd_na[j]);
+      // TODO: MET#2924
+      cts_info.add(pd.f_na[j], pd.o_na[j], pd.ocmn_na[j], pd.ocsd_na[j]);
 
    } // end for i
 
@@ -684,7 +687,8 @@ void compute_mctsinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       // Add this pair to the contingency table
       //
-      mcts_info.add(pd.f_na[j], pd.o_na[j], pd.cmn_na[j], pd.csd_na[j]);
+      // TODO: MET#2924
+      mcts_info.add(pd.f_na[j], pd.o_na[j], pd.ocmn_na[j], pd.ocsd_na[j]);
 
    } // end for i
 
@@ -761,14 +765,14 @@ void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
    n_pair = pd.f_na.n();
 
    // Flag to process climo
-   cmn_flag = (set_climo_flag(pd.f_na, pd.cmn_na) ||
-               (cprob_in && cprob_in->n() > 0));
+   cmn_flag = (set_climo_flag(pd.f_na, pd.ocmn_na) ||
+              (cprob_in && cprob_in->n() > 0));
 
    // Use input climatological probabilities or derive them
    if(cmn_flag) {
       if(cprob_in) climo_prob = *cprob_in;
       else         climo_prob = derive_climo_prob(pd.cdf_info_ptr,
-                                                  pd.cmn_na, pd.csd_na,
+                                                  pd.ocmn_na, pd.ocsd_na,
                                                   pct_info.othresh);
    }
 
@@ -800,7 +804,8 @@ void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
       //
       // Check the observation thresholds and increment accordingly
       //
-      if(pct_info.othresh.check(pd.o_na[i], pd.cmn_na[i], pd.csd_na[i])) {
+      // TODO: MET#2924
+      if(pct_info.othresh.check(pd.o_na[i], pd.ocmn_na[i], pd.ocsd_na[i])) {
          pct_info.pct.inc_event(pd.f_na[i]);
          if(cmn_flag) pct_info.climo_pct.inc_event(climo_prob[i]);
       }
