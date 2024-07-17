@@ -15,8 +15,9 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    07/09/15  Halley Gotway   New
-//   001    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
-//   002    10/03/22  Prestopnik      MET #2227 Remove namespace std from header files
+//   001    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main.
+//   002    10/03/22  Prestopnik      MET #2227 Remove namespace std from header files.
+//   003    07/17/24  Halley Gotway   MET #2924 Support forecast climatology.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -630,13 +631,15 @@ void write_orank_row_conv(AsciiTable &at, int row, int i_obs) {
    }
    at.set_entry(row, col++, cs);                                // OBS_QC
    at.set_entry(row, col++, ens_pd.mn_na[i_obs]);               // ENS_MEAN
-   at.set_entry(row, col++, bad_data_double);                   // CLIMO_MEAN
-   at.set_entry(row, col++, square_root(ens_pd.var_na[i_obs])); // ENS_SPREAD
+   at.set_entry(row, col++, bad_data_double);                   // OBS_CLIMO_MEAN
+   at.set_entry(row, col++, square_root(ens_pd.var_na[i_obs])); // SPREAD
 
    at.set_entry(row, col++, bad_data_double);          // ENS_MEAN_OERR
    at.set_entry(row, col++, bad_data_double);          // SPREAD_OERR
    at.set_entry(row, col++, bad_data_double);          // SPREAD_PLUS_OERR
-   at.set_entry(row, col++, bad_data_double);          // CLIMO_STDEV
+   at.set_entry(row, col++, bad_data_double);          // OBS_CLIMO_STDEV
+   at.set_entry(row, col++, bad_data_double);          // FCST_CLIMO_MEAN
+   at.set_entry(row, col++, bad_data_double);          // FCST_CLIMO_STDEV
 
    // Write extra columns
    at.set_entry(row, col++, d->n_use);                 // N_USE
@@ -696,12 +699,15 @@ void write_orank_row_rad(AsciiTable &at, int row, int i_obs) {
    }
    at.set_entry(row, col++, cs);                                // OBS_QC
    at.set_entry(row, col++, ens_pd.mn_na[i_obs]);               // ENS_MEAN
-   at.set_entry(row, col++, bad_data_double);                   // CLIMO
-   at.set_entry(row, col++, square_root(ens_pd.var_na[i_obs])); // ENS_SPREAD
+   at.set_entry(row, col++, bad_data_double);                   // OBS_CLIMO_MEAN
+   at.set_entry(row, col++, square_root(ens_pd.var_na[i_obs])); // SPREAD
 
    at.set_entry(row, col++, bad_data_double);          // ENS_MEAN_OERR
    at.set_entry(row, col++, bad_data_double);          // SPREAD_OERR
    at.set_entry(row, col++, bad_data_double);          // SPREAD_PLUS_OERR
+   at.set_entry(row, col++, bad_data_double);          // OBS_CLIMO_STDEV
+   at.set_entry(row, col++, bad_data_double);          // FCST_CLIMO_MEAN
+   at.set_entry(row, col++, bad_data_double);          // FCST_CLIMO_STDEV
 
    // Write extra columns
    at.set_entry(row, col++, d->n_use);                 // N_USE
