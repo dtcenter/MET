@@ -69,14 +69,14 @@ fcst = {
         desc       = "ABS_OBS_FCST_DIFF";
       },
       { 
-        mpr_column = [ "ABS(OBS-CLIMO_MEAN)" ];
+        mpr_column = [ "ABS(OBS-OBS_CLIMO_MEAN)" ];
         mpr_thresh = [ <=5                   ];
         desc       = "ABS_OBS_CLIMO_MEAN_DIFF";
       },
       { 
-        mpr_column = [ "CLIMO_CDF" ];
+        mpr_column = [ "OBS_CLIMO_CDF" ];
         mpr_thresh = [ >=0.25&&<=0.75 ];
-        desc       = "CLIMO_CDF_IQR";
+        desc       = "OBS_CLIMO_CDF_IQR";
       }
    ];
 }

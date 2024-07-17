@@ -84,7 +84,7 @@
     </env>
     <param> \
       -lookin &OUTPUT_DIR;/climatology_1.5deg/point_stat_WMO_CLIMO_1.5DEG_120000L_20120409_120000V.stat \
-      -job filter -line_type MPR -column_thresh CLIMO_CDF 'lt0.1||gt0.9' \
+      -job filter -line_type MPR -column_thresh OBS_CLIMO_CDF 'lt0.1||gt0.9' \
       -dump_row &OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_FILTER_CDF_dump.stat
     </param>
     <output>
