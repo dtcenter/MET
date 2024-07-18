@@ -147,6 +147,7 @@ extern double get_mpr_column_value(double, double, double, double,
 
 extern void apply_mpr_thresh_mask(DataPlane &, DataPlane &,
                         DataPlane &, DataPlane &,
+                        DataPlane &, DataPlane &,
                         const StringArray &, const ThreshArray &);
 
 extern bool check_seeps_thresh(double, double,

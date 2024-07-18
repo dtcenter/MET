@@ -1031,20 +1031,23 @@ void GridStatVxOpt::set_perc_thresh(const PairDataPoint &pd) {
    //
    // Sort the input arrays
    //
-   NumArray fsort = pd.f_na;
-   NumArray osort = pd.o_na;
-   NumArray csort = pd.cmn_na;
-   fsort.sort_array();
-   osort.sort_array();
-   csort.sort_array();
+   NumArray f_sort    = pd.f_na;
+   NumArray o_sort    = pd.o_na;
+   NumArray fcmn_sort = pd.fcmn_na;
+   NumArray ocmn_sort = pd.ocmn_na;
+   f_sort.sort_array();
+   o_sort.sort_array();
+   fcmn_sort.sort_array();
+   ocmn_sort.sort_array();
 
    //
    // Compute percentiles
    //
-   fcat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
-   ocat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
-   fcnt_ta.set_perc(&fsort, &osort, &csort, &fcnt_ta, &ocnt_ta);
-   ocnt_ta.set_perc(&fsort, &osort, &csort, &fcnt_ta, &ocnt_ta);
+   // TODO: MET #2924
+   fcat_ta.set_perc(&f_sort, &o_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
+   ocat_ta.set_perc(&f_sort, &o_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
+   fcnt_ta.set_perc(&f_sort, &o_sort, &ocmn_sort, &fcnt_ta, &ocnt_ta);
+   ocnt_ta.set_perc(&f_sort, &o_sort, &ocmn_sort, &fcnt_ta, &ocnt_ta);
 
    return;
 }

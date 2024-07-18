@@ -15,11 +15,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    11/11/08  Halley Gotway   New
-//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files
+//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files.
 //
-//
-////////////////////////////////////////////////////////////////////////
-
 ////////////////////////////////////////////////////////////////////////
 
 #ifndef  __POINT_STAT_H__

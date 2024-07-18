@@ -1017,21 +1017,24 @@ void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
    //
    // Sort the input arrays
    //
-   NumArray fsort;
-   for(int i=0; i<pd_ptr->n_ens; i++) fsort.add(pd_ptr->e_na[i]);
-   NumArray osort = pd_ptr->o_na;
-   NumArray csort = pd_ptr->cmn_na;
-   fsort.sort_array();
-   osort.sort_array();
-   csort.sort_array();
+   NumArray f_sort;
+   for(int i=0; i<pd_ptr->n_ens; i++) f_sort.add(pd_ptr->e_na[i]);
+   NumArray o_sort    = pd_ptr->o_na;
+   NumArray fcmn_sort = pd_ptr->fcmn_na;
+   NumArray ocmn_sort = pd_ptr->ocmn_na;
+   f_sort.sort_array();
+   o_sort.sort_array();
+   fcmn_sort.sort_array();
+   ocmn_sort.sort_array();
 
    //
    // Compute percentiles, passing the observation filtering
    // thresholds in for the fcst and obs slots.
    //
-   othr_ta.set_perc(&fsort, &osort, &csort, &othr_ta, &othr_ta);
-   fcat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
-   ocat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
+   // TODO: MET #2924
+   othr_ta.set_perc(&f_sort, &o_sort, &ocmn_sort, &othr_ta, &othr_ta);
+   fcat_ta.set_perc(&f_sort, &o_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
+   ocat_ta.set_perc(&f_sort, &o_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
 
    return;
 }

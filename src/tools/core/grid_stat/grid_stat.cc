@@ -169,6 +169,7 @@ static void get_mask_points(const GridStatVxOpt &,
                             const MaskPlane &, const DataPlane *,
                             const DataPlane *, const DataPlane *,
                             const DataPlane *, const DataPlane *,
+                            const DataPlane *, const DataPlane *,
                             PairDataPoint &);
 
 static void do_cts       (CTSInfo *&,   int, const PairDataPoint *);
@@ -673,8 +674,8 @@ void process_scores() {
    DataPlane fcst_dp_thresh, obs_dp_thresh;
 
    // Climatology mean and standard deviation
-   DataPlane cmn_dp, csd_dp;
-   DataPlane cmn_dp_smooth;
+   DataPlane fcmn_dp, fcsd_dp, ocmn_dp, ocsd_dp;
+   DataPlane fcmn_dp_smooth, ocmn_dp_smooth;
 
    // Paired forecast, observation, climatology, and weight values
    PairDataPoint pd;
@@ -695,7 +696,8 @@ void process_scores() {
    // Objects to handle vector winds
    DataPlane fu_dp, ou_dp;
    DataPlane fu_dp_smooth, ou_dp_smooth;
-   DataPlane cmnu_dp, csdu_dp, cmnu_dp_smooth;
+   DataPlane fcmnu_dp, fcsdu_dp, fcmnu_dp_smooth;
+   DataPlane ocmnu_dp, ocsdu_dp, ocmnu_dp_smooth;
    PairDataPoint pd_u;
 
    DataPlane seeps_dp, seeps_dp_fcat, seeps_dp_ocat;
@@ -785,23 +787,36 @@ void process_scores() {
               << ".\n\n";
       }
 
-      // Read climatology data
-      cmn_dp = read_climo_data_plane(
-                  conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
-                  i, fcst_dp.valid(), grid);
-      csd_dp = read_climo_data_plane(
-                  conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
-                  i, fcst_dp.valid(), grid);
+      // Read forecast climatology data
+      // TODO: MET #2924 parse fcst/obs climo info
+      fcmn_dp = read_climo_data_plane(
+                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                   i, fcst_dp.valid(), grid);
+      fcsd_dp = read_climo_data_plane(
+                   conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                   i, fcst_dp.valid(), grid);
+
+      // Read observation climatology data
+      // TODO: MET #2924 parse fcst/obs climo info
+      ocmn_dp = read_climo_data_plane(
+                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                   i, fcst_dp.valid(), grid);
+      ocsd_dp = read_climo_data_plane(
+                   conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                   i, fcst_dp.valid(), grid);
 
       mlog << Debug(3)
-           << "Found " << (cmn_dp.nx() == 0 ? 0 : 1)
-           << " climatology mean and " << (csd_dp.nx() == 0 ? 0 : 1)
-           << " climatology standard deviation field(s) for forecast "
-           << conf_info.vx_opt[i].fcst_info->magic_str() << ".\n";
+           << "For " << conf_info.vx_opt[i].fcst_info->magic_str() << ", found "
+           << (fcmn_dp.nx() == 0 ? 0 : 1) << " forecast climatology mean and "
+           << (fcsd_dp.nx() == 0 ? 0 : 1) << " standard deviation field(s), and "
+           << (ocmn_dp.nx() == 0 ? 0 : 1) << " observation climatology mean and "
+           << (ocsd_dp.nx() == 0 ? 0 : 1) << " standard deviation field(s).\n";
 
       // Apply MPR threshold filters
       if(conf_info.vx_opt[i].mpr_sa.n() > 0) {
-         apply_mpr_thresh_mask(fcst_dp, obs_dp, cmn_dp, csd_dp,
+         apply_mpr_thresh_mask(fcst_dp, obs_dp,
+                               fcmn_dp, fcsd_dp,
+                               ocmn_dp, ocsd_dp,
                                conf_info.vx_opt[i].mpr_sa,
                                conf_info.vx_opt[i].mpr_ta);
       }
@@ -883,19 +898,29 @@ void process_scores() {
             // Turn off the mask for missing data values
             mask_bad_data(mask_mp, fcst_dp_smooth);
             mask_bad_data(mask_mp, obs_dp_smooth);
-            if(cmn_dp.nx() == fcst_dp_smooth.nx() &&
-               cmn_dp.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_mp, cmn_dp);
+            if(fcmn_dp.nx() == fcst_dp_smooth.nx() &&
+               fcmn_dp.ny() == fcst_dp_smooth.ny()) {
+               mask_bad_data(mask_mp, fcmn_dp);
             }
-            if(csd_dp.nx() == fcst_dp_smooth.nx() &&
-               csd_dp.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_mp, csd_dp);
+            if(fcsd_dp.nx() == fcst_dp_smooth.nx() &&
+               fcsd_dp.ny() == fcst_dp_smooth.ny()) {
+               mask_bad_data(mask_mp, fcsd_dp);
+            }
+            if(ocmn_dp.nx() == fcst_dp_smooth.nx() &&
+               ocmn_dp.ny() == fcst_dp_smooth.ny()) {
+               mask_bad_data(mask_mp, ocmn_dp);
+            }
+            if(ocsd_dp.nx() == fcst_dp_smooth.nx() &&
+               ocsd_dp.ny() == fcst_dp_smooth.ny()) {
+               mask_bad_data(mask_mp, ocsd_dp);
             }
 
             // Apply the current mask to the current fields
             get_mask_points(conf_info.vx_opt[i], mask_mp,
                             &fcst_dp_smooth, &obs_dp_smooth,
-                            &cmn_dp, &csd_dp, &wgt_dp, pd);
+                            &fcmn_dp, &fcsd_dp,
+                            &ocmn_dp, &ocsd_dp,
+                            &wgt_dp, pd);
 
             // Set the mask name
             shc.set_mask(conf_info.vx_opt[i].mask_name[k].c_str());
@@ -1043,13 +1068,23 @@ void process_scores() {
                if(!read_data_plane(conf_info.vx_opt[ui].obs_info,
                                    ou_dp, obs_mtddf, obs_file)) continue;
 
-               // Read climatology data for UGRD
-               cmnu_dp = read_climo_data_plane(
-                           conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
-                           ui, fcst_dp.valid(), grid);
-               csdu_dp = read_climo_data_plane(
-                           conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
-                           ui, fcst_dp.valid(), grid);
+               // TODO: MET #2924
+
+               // Read the forecast climatology data for UGRD
+               fcmnu_dp = read_climo_data_plane(
+                             conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                             ui, fcst_dp.valid(), grid);
+               fcsdu_dp = read_climo_data_plane(
+                             conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                             ui, fcst_dp.valid(), grid);
+
+               // Read the observation climatology data for UGRD
+               ocmnu_dp = read_climo_data_plane(
+                             conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                             ui, fcst_dp.valid(), grid);
+               ocsdu_dp = read_climo_data_plane(
+                             conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                             ui, fcst_dp.valid(), grid);
 
                // If requested in the config file, smooth the forecast
                // and climatology U-wind fields
@@ -1081,7 +1116,9 @@ void process_scores() {
                // Apply the current mask to the U-wind fields
                get_mask_points(conf_info.vx_opt[i], mask_mp,
                                &fu_dp_smooth, &ou_dp_smooth,
-                               &cmnu_dp, &csdu_dp, &wgt_dp, pd_u);
+                               &fcmnu_dp, &fcsdu_dp,
+                               &ocmnu_dp, &ocsdu_dp,
+                               &wgt_dp, pd_u);
 
                // Compute VL1L2
                do_vl1l2(vl1l2_info, i, &pd_u, &pd);
@@ -1154,23 +1191,44 @@ void process_scores() {
          }
          if(conf_info.vx_opt[i].nc_info.do_diff) {
             write_nc((string)"DIFF", subtract(fcst_dp_smooth, obs_dp_smooth),
-                     i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);
-         }
-         if(conf_info.vx_opt[i].nc_info.do_climo && !cmn_dp.is_empty()) {
-            write_nc((string)"CLIMO_MEAN", cmn_dp, i, mthd, pnts,
+                     i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
          }
-         if(conf_info.vx_opt[i].nc_info.do_climo && !csd_dp.is_empty()) {
-            write_nc((string)"CLIMO_STDEV", csd_dp, i, mthd, pnts,
+         if(conf_info.vx_opt[i].nc_info.do_climo &&
+            !fcmn_dp.is_empty()) {
+            write_nc((string)"FCST_CLIMO_MEAN", fcmn_dp,
+                     i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
          }
-         if(conf_info.vx_opt[i].nc_info.do_climo && !cmn_dp.is_empty() && !csd_dp.is_empty()) {
-            write_nc((string)"CLIMO_CDF", normal_cdf(obs_dp, cmn_dp, csd_dp),
-                     i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);
+         if(conf_info.vx_opt[i].nc_info.do_climo &&
+            !fcsd_dp.is_empty()) {
+            write_nc((string)"FCST_CLIMO_STDEV", fcsd_dp,
+                     i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+         }
+         if(conf_info.vx_opt[i].nc_info.do_climo &&
+            !ocmn_dp.is_empty()) {
+            write_nc((string)"OBS_CLIMO_MEAN", ocmn_dp,
+                     i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+         }
+         if(conf_info.vx_opt[i].nc_info.do_climo &&
+            !ocsd_dp.is_empty()) {
+            write_nc((string)"OBS_CLIMO_STDEV", fcsd_dp,
+                     i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+         }
+         if(conf_info.vx_opt[i].nc_info.do_climo &&
+            !ocmn_dp.is_empty() && !ocsd_dp.is_empty()) {
+            write_nc((string)"OBS_CLIMO_CDF", normal_cdf(obs_dp, ocmn_dp, ocsd_dp),
+                     i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
          }
 
          // Write out the fields of requested climo distribution percentile threshold values
-         if(conf_info.vx_opt[i].nc_info.do_climo_cdp && !cmn_dp.is_empty() && !csd_dp.is_empty()) {
+         if(conf_info.vx_opt[i].nc_info.do_climo_cdp     &&
+            (!fcmn_dp.is_empty() && !fcsd_dp.is_empty()) ||
+            (!ocmn_dp.is_empty() && !ocsd_dp.is_empty())) {
 
             // Construct one list of all thresholds
             ThreshArray ta;
@@ -1184,14 +1242,16 @@ void process_scores() {
             ta.get_simple_nodes(simp);
 
             // Process all CDP thresholds except 0 and 100
+            // TODO: MET #2924 handle FCDP and OCDP
             for(vector<Simple_Node>::iterator it = simp.begin();
                 it != simp.end(); it++) {
                if(it->ptype() == perc_thresh_climo_dist &&
                   !is_eq(it->pvalue(), 0.0) &&
                   !is_eq(it->pvalue(), 100.0)) {
                   cs << cs_erase << "CLIMO_CDP" << nint(it->pvalue());
-                  write_nc(cs, normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp),
-                           i, mthd, pnts, conf_info.vx_opt[i].interp_info.field);
+                  write_nc(cs, normal_cdf_inv(it->pvalue()/100.0, ocmn_dp, ocsd_dp),
+                           i, mthd, pnts,
+                           conf_info.vx_opt[i].interp_info.field);
                }
             } // end for it
          }
@@ -1209,11 +1269,14 @@ void process_scores() {
                                           &seeps, month, hour,
                                           conf_info.seeps_p1_thresh, conf_info.seeps_climo_name);
 
-            write_nc("SEEPS_MPR_SCORE", seeps_dp, i, mthd, pnts,
+            write_nc("SEEPS_MPR_SCORE", seeps_dp,
+                     i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
-            write_nc("SEEPS_MPR_FCAT", seeps_dp_fcat, i, mthd, pnts,
+            write_nc("SEEPS_MPR_FCAT", seeps_dp_fcat,
+                     i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
-            write_nc("SEEPS_MPR_OCAT", seeps_dp_ocat, i, mthd, pnts,
+            write_nc("SEEPS_MPR_OCAT", seeps_dp_ocat,
+                     i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
             write_seeps_row(shc, &seeps, conf_info.output_flag[i_seeps],
                             stat_at, i_stat_row, txt_at[i_seeps], i_txt_row[i_seeps]);
@@ -1256,10 +1319,12 @@ void process_scores() {
                   // Apply the current mask to the current fields
                   get_mask_points(conf_info.vx_opt[i], mask_mp,
                                   &fgx_dp, &ogx_dp,
-                                  0, 0, &wgt_dp, pd_gx);
+                                  0, 0, 0, 0,
+                                  &wgt_dp, pd_gx);
                   get_mask_points(conf_info.vx_opt[i], mask_mp,
                                   &fgy_dp, &ogy_dp,
-                                  0, 0, &wgt_dp, pd_gy);
+                                  0, 0, 0, 0,
+                                  &wgt_dp, pd_gy);
 
                   // Set the mask name
                   shc.set_mask(conf_info.vx_opt[i].mask_name[m].c_str());
@@ -1346,7 +1411,8 @@ void process_scores() {
                      // Apply the current mask
                      get_mask_points(conf_info.vx_opt[i], mask_mp,
                                      &fcst_dp_mm, &obs_dp_mm,
-                                     &cmn_dp, 0, 0, pd);
+                                     &fcmn_dp, 0, &ocmn_dp, 0,
+                                     0, pd);
 
                      // Process percentile thresholds
                      conf_info.vx_opt[i].set_perc_thresh(pd);
@@ -1401,10 +1467,12 @@ void process_scores() {
                   // thresholded fields
                   get_mask_points(conf_info.vx_opt[i], mask_mp,
                                   &fcst_dp_dmap, &obs_dp_dmap,
-                                  0, 0, 0, pd);
+                                  0, 0, 0, 0,
+                                  0, pd);
                   get_mask_points(conf_info.vx_opt[i], mask_mp,
                                   &fcst_dp_thresh, &obs_dp_thresh,
-                                  0, 0, 0, pd_thr);
+                                  0, 0, 0, 0,
+                                  0, pd_thr);
 
                   dmap_info.set_options(
                         conf_info.vx_opt[i].baddeley_p,
@@ -1480,7 +1548,9 @@ void process_scores() {
                      // Apply the current mask
                      get_mask_points(conf_info.vx_opt[i], mask_mp,
                                      &fcst_dp, &obs_dp,
-                                     &cmn_dp, 0, 0, pd);
+                                     &fcmn_dp, 0,
+                                     &ocmn_dp, 0,
+                                     0, pd);
 
                      // Process percentile thresholds
                      conf_info.vx_opt[i].set_perc_thresh(pd);
@@ -1495,11 +1565,12 @@ void process_scores() {
                         conf_info.vx_opt[i].fcat_ta[k].need_perc()) {
 
                         // Compute fractional coverage
+                        // TODO: MET #2924
                         fractional_coverage(fcst_dp, fcst_dp_smooth,
                                             nbrhd->width[j], nbrhd->shape,
                                             grid.wrap_lon(),
                                             conf_info.vx_opt[i].fcat_ta[k],
-                                            &cmn_dp, &csd_dp,
+                                            &ocmn_dp, &ocsd_dp,
                                             nbrhd->vld_thresh);
 
                         // Compute the binary threshold field
@@ -1535,11 +1606,12 @@ void process_scores() {
                         conf_info.vx_opt[i].ocat_ta[k].need_perc()) {
 
                         // Compute fractional coverage
+                        // TODO: MET #2924
                         fractional_coverage(obs_dp, obs_dp_smooth,
                                             nbrhd->width[j], nbrhd->shape,
                                             grid.wrap_lon(),
                                             conf_info.vx_opt[i].ocat_ta[k],
-                                            &cmn_dp, &csd_dp,
+                                            &ocmn_dp, &ocsd_dp,
                                             nbrhd->vld_thresh);
 
                         // Compute the binary threshold field
@@ -1584,14 +1656,18 @@ void process_scores() {
                   // and thresholded fields
                   get_mask_points(conf_info.vx_opt[i], mask_mp,
                                   &fcst_dp_smooth, &obs_dp_smooth,
-                                  0, 0, &wgt_dp, pd);
+                                  0, 0, 0, 0,
+                                  &wgt_dp, pd);
                   get_mask_points(conf_info.vx_opt[i], mask_mp,
                                   &fcst_dp_thresh, &obs_dp_thresh,
-                                  0, 0, 0, pd_thr);
+                                  0, 0, 0, 0,
+                                  0, pd_thr);
 
                   // Store climatology values as bad data
-                  pd.cmn_na.add_const(bad_data_double, pd.f_na.n());
-                  pd.csd_na.add_const(bad_data_double, pd.f_na.n());
+                  pd.fcmn_na.add_const(bad_data_double, pd.f_na.n());
+                  pd.fcsd_na.add_const(bad_data_double, pd.f_na.n());
+                  pd.ocmn_na.add_const(bad_data_double, pd.f_na.n());
+                  pd.ocsd_na.add_const(bad_data_double, pd.f_na.n());
 
                   mlog << Debug(2) << "Processing "
                        << conf_info.vx_opt[i].fcst_info->magic_str()
@@ -1692,14 +1768,20 @@ void process_scores() {
       for(j=0; j<conf_info.vx_opt[i].get_n_wave_1d(); j++) {
 
          // Apply Fourier decomposition
-         fcst_dp_smooth = fcst_dp;
-         obs_dp_smooth  = obs_dp;
-         cmn_dp_smooth  = cmn_dp;
+         fcst_dp_smooth  = fcst_dp;
+         obs_dp_smooth   = obs_dp;
+         fcmn_dp_smooth  = fcmn_dp;
+         ocmn_dp_smooth  = ocmn_dp;
 
-         // Reset climo spread since it does not apply to Fourier decomposition
-         if(csd_dp.nx() == fcst_dp_smooth.nx() &&
-            csd_dp.ny() == fcst_dp_smooth.ny()) {
-            csd_dp.set_constant(bad_data_double);
+         // Reset forecast climo spread since it does not apply to Fourier decomposition
+         if(fcsd_dp.nx() == fcst_dp_smooth.nx() &&
+            fcsd_dp.ny() == fcst_dp_smooth.ny()) {
+            fcsd_dp.set_constant(bad_data_double);
+         }
+         // Reset observation climo spread since it does not apply to Fourier decomposition
+         if(ocsd_dp.nx() == fcst_dp_smooth.nx() &&
+            ocsd_dp.ny() == fcst_dp_smooth.ny()) {
+            ocsd_dp.set_constant(bad_data_double);
          }
 
          if(!fcst_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
@@ -1714,16 +1796,30 @@ void process_scores() {
             continue;
          }
 
-         // Decompose the climatology, if provided
-         if(cmn_dp_smooth.nx() == fcst_dp_smooth.nx() &&
-            cmn_dp_smooth.ny() == fcst_dp_smooth.ny()) {
-            if(!cmn_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
-                                        conf_info.vx_opt[i].wave_1d_end[j])) {
+         // Decompose the forecast climatology, if provided
+         if(fcmn_dp_smooth.nx() == fcst_dp_smooth.nx() &&
+            fcmn_dp_smooth.ny() == fcst_dp_smooth.ny()) {
+            if(!fcmn_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
+                                         conf_info.vx_opt[i].wave_1d_end[j])) {
                mlog << Debug(2)
                     << "Skipping Fourier decomposition for waves "
                     << conf_info.vx_opt[i].wave_1d_beg[j] << " to "
                     << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
-                    << "of bad climatology data values.\n";
+                    << "of bad forecast climatology data values.\n";
+               continue;
+            }
+         }
+
+         // Decompose the observation climatology, if provided
+         if(ocmn_dp_smooth.nx() == fcst_dp_smooth.nx() &&
+            ocmn_dp_smooth.ny() == fcst_dp_smooth.ny()) {
+            if(!ocmn_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
+                                         conf_info.vx_opt[i].wave_1d_end[j])) {
+               mlog << Debug(2)
+                    << "Skipping Fourier decomposition for waves "
+                    << conf_info.vx_opt[i].wave_1d_beg[j] << " to "
+                    << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
+                    << "of bad observation climatology data values.\n";
                continue;
             }
          }
@@ -1747,19 +1843,29 @@ void process_scores() {
             // Turn off the mask for missing data values
             mask_bad_data(mask_mp, fcst_dp_smooth);
             mask_bad_data(mask_mp, obs_dp_smooth);
-            if(cmn_dp_smooth.nx() == fcst_dp_smooth.nx() &&
-               cmn_dp_smooth.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_mp, cmn_dp_smooth);
+            if(fcmn_dp_smooth.nx() == fcst_dp_smooth.nx() &&
+               fcmn_dp_smooth.ny() == fcst_dp_smooth.ny()) {
+               mask_bad_data(mask_mp, fcmn_dp_smooth);
             }
-            if(csd_dp.nx() == fcst_dp_smooth.nx() &&
-               csd_dp.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_mp, csd_dp);
+            if(fcsd_dp.nx() == fcst_dp_smooth.nx() &&
+               fcsd_dp.ny() == fcst_dp_smooth.ny()) {
+               mask_bad_data(mask_mp, fcsd_dp);
+            }
+            if(ocmn_dp_smooth.nx() == fcst_dp_smooth.nx() &&
+               ocmn_dp_smooth.ny() == fcst_dp_smooth.ny()) {
+               mask_bad_data(mask_mp, ocmn_dp_smooth);
+            }
+            if(ocsd_dp.nx() == fcst_dp_smooth.nx() &&
+               ocsd_dp.ny() == fcst_dp_smooth.ny()) {
+               mask_bad_data(mask_mp, ocsd_dp);
             }
 
             // Apply the current mask to the current fields
             get_mask_points(conf_info.vx_opt[i], mask_mp,
                             &fcst_dp_smooth, &obs_dp_smooth,
-                            &cmn_dp_smooth, &csd_dp, &wgt_dp, pd);
+                            &fcmn_dp_smooth, &fcsd_dp,
+                            &ocmn_dp_smooth, &ocsd_dp,
+                            &wgt_dp, pd);
 
             // Set the mask name
             shc.set_mask(conf_info.vx_opt[i].mask_name[k].c_str());
@@ -1811,14 +1917,19 @@ void process_scores() {
                                    ou_dp, obs_mtddf, obs_file)) continue;
 
                // Read climatology data for UGRD
-               cmnu_dp = read_climo_data_plane(
-                           conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
-                           ui, fcst_dp.valid(), grid);
+               // TODO: MET #2924
+               fcmnu_dp = read_climo_data_plane(
+                             conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                             ui, fcst_dp.valid(), grid);
+               ocmnu_dp = read_climo_data_plane(
+                             conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                             ui, fcst_dp.valid(), grid);
 
                // Apply Fourier decomposition to the U-wind fields
-               fu_dp_smooth   = fu_dp;
-               ou_dp_smooth   = ou_dp;
-               cmnu_dp_smooth = cmnu_dp;
+               fu_dp_smooth    = fu_dp;
+               ou_dp_smooth    = ou_dp;
+               fcmnu_dp_smooth = fcmnu_dp;
+               ocmnu_dp_smooth = ocmnu_dp;
 
                if(!fu_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
                                           conf_info.vx_opt[i].wave_1d_end[j]) ||
@@ -1832,16 +1943,30 @@ void process_scores() {
                   continue;
                }
 
-               // Decompose the U-wind climatology field, if provided
-               if(cmnu_dp_smooth.nx() == fu_dp_smooth.nx() &&
-                  cmnu_dp_smooth.ny() == fu_dp_smooth.ny()) {
-                  if(!cmnu_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
+               // Decompose the U-wind forecast climatology field, if provided
+               if(fcmnu_dp_smooth.nx() == fu_dp_smooth.nx() &&
+                  fcmnu_dp_smooth.ny() == fu_dp_smooth.ny()) {
+                  if(!fcmnu_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
                                                conf_info.vx_opt[i].wave_1d_end[j])) {
                      mlog << Debug(2)
                           << "Skipping Fourier decomposition for waves "
                           << conf_info.vx_opt[i].wave_1d_beg[j] << " to "
                           << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
-                          << "of bad climatology data values in U-wind.\n";
+                          << "of bad forecast climatology data values in U-wind.\n";
+                     continue;
+                  }
+               }
+
+               // Decompose the U-wind observation climatology field, if provided
+               if(ocmnu_dp_smooth.nx() == fu_dp_smooth.nx() &&
+                  ocmnu_dp_smooth.ny() == fu_dp_smooth.ny()) {
+                  if(!ocmnu_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
+                                               conf_info.vx_opt[i].wave_1d_end[j])) {
+                     mlog << Debug(2)
+                          << "Skipping Fourier decomposition for waves "
+                          << conf_info.vx_opt[i].wave_1d_beg[j] << " to "
+                          << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
+                          << "of bad observation climatology data values in U-wind.\n";
                      continue;
                   }
                }
@@ -1849,7 +1974,9 @@ void process_scores() {
                // Apply the current mask to the U-wind fields
                get_mask_points(conf_info.vx_opt[i], mask_mp,
                                &fu_dp_smooth, &ou_dp_smooth,
-                               &cmnu_dp_smooth, 0, &wgt_dp, pd_u);
+                               &fcmnu_dp_smooth, 0,
+                               &ocmnu_dp_smooth, 0,
+                               &wgt_dp, pd_u);
 
                // Compute VL1L2
                do_vl1l2(vl1l2_info, i, &pd_u, &pd);
@@ -1901,18 +2028,28 @@ void process_scores() {
 
             // Write out the data fields if requested in the config file
             if(conf_info.vx_opt[i].nc_info.do_raw) {
-               write_nc((string)"FCST", fcst_dp_smooth, i, shc.get_interp_mthd(),
+               write_nc((string)"FCST", fcst_dp_smooth,
+                        i, shc.get_interp_mthd(),
                         bad_data_int,  FieldType::Both);
-               write_nc((string)"OBS",  obs_dp_smooth, i, shc.get_interp_mthd(),
+               write_nc((string)"OBS",  obs_dp_smooth,
+                        i, shc.get_interp_mthd(),
                         bad_data_int, FieldType::Both);
             }
             if(conf_info.vx_opt[i].nc_info.do_diff) {
                write_nc((string)"DIFF", subtract(fcst_dp_smooth, obs_dp_smooth),
-                        i, shc.get_interp_mthd(), bad_data_int,
-                        FieldType::Both);
+                        i, shc.get_interp_mthd(),
+                        bad_data_int, FieldType::Both);
             }
-            if(conf_info.vx_opt[i].nc_info.do_climo && !cmn_dp_smooth.is_empty()) {
-               write_nc((string)"CLIMO_MEAN", cmn_dp_smooth, i, shc.get_interp_mthd(),
+            if(conf_info.vx_opt[i].nc_info.do_climo &&
+               !fcmn_dp_smooth.is_empty()) {
+               write_nc((string)"FCST_CLIMO_MEAN", fcmn_dp_smooth,
+                        i, shc.get_interp_mthd(),
+                        bad_data_int,  FieldType::Both);
+            }
+            if(conf_info.vx_opt[i].nc_info.do_climo &&
+               !ocmn_dp_smooth.is_empty()) {
+               write_nc((string)"OBS_CLIMO_MEAN", fcmn_dp_smooth,
+                        i, shc.get_interp_mthd(),
                         bad_data_int,  FieldType::Both);
             }
          } // end if
@@ -1943,7 +2080,8 @@ void process_scores() {
 void get_mask_points(const GridStatVxOpt &vx_opt,
                      const MaskPlane &mask_mp,
                      const DataPlane *fcst_ptr, const DataPlane *obs_ptr,
-                     const DataPlane *cmn_ptr,  const DataPlane *csd_ptr,
+                     const DataPlane *fcmn_ptr, const DataPlane *fcsd_ptr,
+                     const DataPlane *ocmn_ptr, const DataPlane *ocsd_ptr,
                      const DataPlane *wgt_ptr,  PairDataPoint &pd) {
 
    // Initialize
@@ -1957,14 +2095,18 @@ void get_mask_points(const GridStatVxOpt &vx_opt,
    apply_mask(*obs_ptr,  mask_mp, pd.o_na);
    pd.n_obs = pd.o_na.n();
 
-   if(cmn_ptr) apply_mask(*cmn_ptr, mask_mp, pd.cmn_na);
-   else        pd.cmn_na.add_const(bad_data_double, pd.n_obs);
-   if(csd_ptr) apply_mask(*csd_ptr, mask_mp, pd.csd_na);
-   else        pd.csd_na.add_const(bad_data_double, pd.n_obs);
+   if(fcmn_ptr) apply_mask(*fcmn_ptr, mask_mp, pd.fcmn_na);
+   else         pd.fcmn_na.add_const(bad_data_double, pd.n_obs);
+   if(fcsd_ptr) apply_mask(*fcsd_ptr, mask_mp, pd.fcsd_na);
+   else         pd.fcsd_na.add_const(bad_data_double, pd.n_obs);
+   if(ocmn_ptr) apply_mask(*ocmn_ptr, mask_mp, pd.ocmn_na);
+   else         pd.ocmn_na.add_const(bad_data_double, pd.n_obs);
+   if(ocsd_ptr) apply_mask(*ocsd_ptr, mask_mp, pd.ocsd_na);
+   else         pd.ocsd_na.add_const(bad_data_double, pd.n_obs);
    if(wgt_ptr) apply_mask(*wgt_ptr, mask_mp, pd.wgt_na);
    else        pd.wgt_na.add_const(default_grid_weight, pd.n_obs);
 
-   if(cmn_ptr && csd_ptr) pd.compute_climo_cdf();
+   if(ocmn_ptr && ocsd_ptr) pd.compute_climo_cdf();
 
    return;
 }
@@ -2075,9 +2217,9 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    mlog << Debug(2)
         << "Computing Scalar Partial Sums and Continuous Statistics.\n";
 
-   // Determine the number of climo CDF bins
-   n_bin = (pd_ptr->cmn_na.n_valid() > 0 &&
-            pd_ptr->csd_na.n_valid() > 0 ?
+   // Determine the number of observation climo CDF bins
+   n_bin = (pd_ptr->ocmn_na.n_valid() > 0 &&
+            pd_ptr->ocsd_na.n_valid() > 0 ?
             vx_opt.get_n_cdf_bin() : 1);
 
    if(n_bin > 1) {
@@ -2311,8 +2453,9 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    mlog << Debug(2)
         << "Computing Probabilistic Statistics.\n";
 
-   // Determine the number of climo CDF bins
-   n_bin = (pd_ptr->cmn_na.n_valid() > 0 && pd_ptr->csd_na.n_valid() > 0 ?
+   // Determine the number of observation climo CDF bins
+   n_bin = (pd_ptr->ocmn_na.n_valid() > 0 &&
+            pd_ptr->ocsd_na.n_valid() > 0 ?
             vx_opt.get_n_cdf_bin() : 1);
 
    if(n_bin > 1) {

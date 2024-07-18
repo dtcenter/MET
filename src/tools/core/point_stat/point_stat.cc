@@ -601,7 +601,9 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 void process_fcst_climo_files() {
    int j;
    int n_fcst;
-   DataPlaneArray fcst_dpa, cmn_dpa, csd_dpa;
+   DataPlaneArray fcst_dpa;
+   DataPlaneArray fcmn_dpa, fcsd_dpa;
+   DataPlaneArray ocmn_dpa, ocsd_dpa;
    unixtime file_ut, beg_ut, end_ut;
 
    // Loop through each of the fields to be verified and extract
@@ -663,21 +665,30 @@ void process_fcst_climo_files() {
          }
       } // end for j
 
-      // Read climatology data
-      cmn_dpa = read_climo_data_plane_array(
-                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
-                   i, fcst_dpa[0].valid(), grid);
-      csd_dpa = read_climo_data_plane_array(
-                   conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
-                   i, fcst_dpa[0].valid(), grid);
+      // Read forecast climatology data
+      // TODO: MET #2924 parse fcst/obs climo info
+      fcmn_dpa = read_climo_data_plane_array(
+                    conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                    i, fcst_dpa[0].valid(), grid);
+      fcsd_dpa = read_climo_data_plane_array(
+                    conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                    i, fcst_dpa[0].valid(), grid);
+
+      // Read observation climatology data
+      // TODO: MET #2924 parse fcst/obs climo info
+      ocmn_dpa = read_climo_data_plane_array(
+                    conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                    i, fcst_dpa[0].valid(), grid);
+      ocsd_dpa = read_climo_data_plane_array(
+                    conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                    i, fcst_dpa[0].valid(), grid);
 
       // Store data for the current verification task
-      // TODO: update to handle the fcst/obs climo
       conf_info.vx_opt[i].vx_pd.set_fcst_dpa(fcst_dpa);
-      conf_info.vx_opt[i].vx_pd.set_fcst_climo_mn_dpa(cmn_dpa);
-      conf_info.vx_opt[i].vx_pd.set_fcst_climo_sd_dpa(csd_dpa);
-      conf_info.vx_opt[i].vx_pd.set_obs_climo_mn_dpa(cmn_dpa);
-      conf_info.vx_opt[i].vx_pd.set_obs_climo_sd_dpa(csd_dpa);
+      conf_info.vx_opt[i].vx_pd.set_fcst_climo_mn_dpa(fcmn_dpa);
+      conf_info.vx_opt[i].vx_pd.set_fcst_climo_sd_dpa(fcsd_dpa);
+      conf_info.vx_opt[i].vx_pd.set_obs_climo_mn_dpa(ocmn_dpa);
+      conf_info.vx_opt[i].vx_pd.set_obs_climo_sd_dpa(ocsd_dpa);
 
       // Get the valid time for the first field
       file_ut = fcst_dpa[0].valid();
@@ -701,10 +712,12 @@ void process_fcst_climo_files() {
 
       // Dump out the number of levels found
       mlog << Debug(2)
-           << "For " << fcst_info->magic_str() << " found "
+           << "For " << fcst_info->magic_str() << ", found "
            << n_fcst << " forecast levels, "
-           << cmn_dpa.n_planes() << " climatology mean levels, and "
-           << csd_dpa.n_planes() << " climatology standard deviation levels.\n";
+           << fcmn_dpa.n_planes() << " forecast climatology mean and "
+           << fcsd_dpa.n_planes() << " standard deviation level(s), and "
+           << ocmn_dpa.n_planes() << " observation climatology mean and "
+           << ocsd_dpa.n_planes() << " standard deviation level(s).\n";
 
    } // end for i
 
@@ -1475,8 +1488,9 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    mlog << Debug(2)
         << "Computing Scalar Partial Sums and Continuous Statistics.\n";
 
-   // Determine the number of climo CDF bins
-   n_bin = (pd_ptr->cmn_na.n_valid() > 0 && pd_ptr->csd_na.n_valid() > 0 ?
+   // Determine the number of observation climo CDF bins
+   n_bin = (pd_ptr->ocmn_na.n_valid() > 0 &&
+            pd_ptr->ocsd_na.n_valid() > 0 ?
             vx_opt.get_n_cdf_bin() : 1);
 
    if(n_bin > 1) {
@@ -1711,8 +1725,9 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    mlog << Debug(2)
         << "Computing Probabilistic Statistics.\n";
 
-   // Determine the number of climo CDF bins
-   n_bin = (pd_ptr->cmn_na.n_valid() > 0 && pd_ptr->csd_na.n_valid() > 0 ?
+   // Determine the number of observation climo CDF bins
+   n_bin = (pd_ptr->ocmn_na.n_valid() > 0 &&
+            pd_ptr->ocsd_na.n_valid() > 0 ?
             vx_opt.get_n_cdf_bin() : 1);
 
    if(n_bin > 1) {
@@ -1880,8 +1895,10 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          // TODO: Add has_climo member function instead
 
          // Skip points where climatology has been specified but is bad data
-         if(conf_info.vx_opt[i_vx].vx_pd.fcmn_dpa.n_planes() > 0 &&
-            is_bad_data(pd_ptr->cmn_na[j])) continue;
+         if((conf_info.vx_opt[i_vx].vx_pd.fcmn_dpa.n_planes() > 0 &&
+             is_bad_data(pd_ptr->fcmn_na[j]))                     ||
+            (conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa.n_planes() > 0 &&
+             is_bad_data(pd_ptr->ocmn_na[j]))) continue;
 
          // Store the observation value
          hira_pd.add_point_obs(pd_ptr->sid_sa[j].c_str(),
@@ -1889,7 +1906,8 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             pd_ptr->x_na[j], pd_ptr->y_na[j], pd_ptr->vld_ta[j],
             pd_ptr->lvl_na[j], pd_ptr->elv_na[j],
             pd_ptr->o_na[j], pd_ptr->o_qc_sa[j].c_str(),
-            pd_ptr->cmn_na[j], pd_ptr->csd_na[j],
+            pd_ptr->fcmn_na[j], pd_ptr->fcsd_na[j],
+            pd_ptr->ocmn_na[j], pd_ptr->ocsd_na[j],
             pd_ptr->wgt_na[j]);
 
          // Store the ensemble mean and member values
@@ -1957,9 +1975,9 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          // If prob_cat_thresh is empty, try to select other thresholds
          if(rps_info.fthresh.n() == 0) {
 
-            // Use climo data, if avaiable
-            if(hira_pd.cmn_na.n_valid()                   > 0 &&
-               hira_pd.csd_na.n_valid()                   > 0 &&
+            // Use observation climo data, if avaiable
+            if(hira_pd.ocmn_na.n_valid()                  > 0 &&
+               hira_pd.ocsd_na.n_valid()                  > 0 &&
                conf_info.vx_opt[i_vx].cdf_info.cdf_ta.n() > 0) {
                mlog << Debug(3) << "Resetting the empty HiRA \""
                     << conf_key_prob_cat_thresh << "\" thresholds to "
@@ -2006,8 +2024,8 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
    PairDataPoint hira_pd;
    int i, j, k, lvl_blw, lvl_abv;
-   double f_cov, cmn_cov;
-   NumArray cmn_cov_na;
+   double f_cov, ocmn_cov;
+   NumArray ocmn_cov_na;
    SingleThresh cat_thresh;
    PCTInfo pct_info;
 
@@ -2034,7 +2052,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
          // Initialize
          hira_pd.clear();
          pct_info.clear();
-         cmn_cov_na.erase();
+         ocmn_cov_na.erase();
 
          // Loop through matched pairs and replace the forecast value
          // with the HiRA fractional coverage.
@@ -2045,9 +2063,10 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
             find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
                           pd_ptr->lvl_na[k], lvl_blw, lvl_abv);
 
+            // TODO: MET #2924
             f_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
                        pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
-                       pd_ptr->cmn_na[k], pd_ptr->csd_na[k],
+                       pd_ptr->ocmn_na[k], pd_ptr->ocsd_na[k],
                        InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
                        conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
                        conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
@@ -2057,29 +2076,27 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
             // Check for bad data
             if(is_bad_data(f_cov)) continue;
 
-            // TODO: Add has_climo member function
-
-            // Compute the fractional coverage for the climatological mean
-            if(conf_info.vx_opt[i_vx].vx_pd.fcmn_dpa.n_planes() > 0) {
-
-               // TODO: Handle both fcst and obs climo data
+            // Compute the climatological event probability as the fractional
+            // coverage of the observation climatology mean field
+            if(conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa.n_planes() > 0) {
 
                // Interpolate to the observation level
-               find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.fcmn_dpa,
+               find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa,
                              pd_ptr->lvl_na[k], lvl_blw, lvl_abv);
 
-               cmn_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.fcmn_dpa,
-                            pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
-                            pd_ptr->cmn_na[k], pd_ptr->csd_na[k],
-                            InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
-                            conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
-                            conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
-                            conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
-                            pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
+               // TODO: MET #2924
+               ocmn_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa,
+                             pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
+                             pd_ptr->ocmn_na[k], pd_ptr->ocsd_na[k],
+                             InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
+                             conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
+                             conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
+                             conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
+                             pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
 
                // Check for bad data
-               if(is_bad_data(cmn_cov)) continue;
-               else                     cmn_cov_na.add(cmn_cov);
+               if(is_bad_data(ocmn_cov)) continue;
+               else                     ocmn_cov_na.add(ocmn_cov);
             }
 
             // Store the fractional coverage pair
@@ -2088,8 +2105,9 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->vld_ta[k],
                pd_ptr->lvl_na[k], pd_ptr->elv_na[k],
                f_cov, pd_ptr->o_na[k], pd_ptr->o_qc_sa[k].c_str(),
-               pd_ptr->cmn_na[k], pd_ptr->csd_na[k], pd_ptr->wgt_na[k]);
-
+               pd_ptr->fcmn_na[k], pd_ptr->fcsd_na[k],
+               pd_ptr->ocmn_na[k], pd_ptr->ocsd_na[k],
+               pd_ptr->wgt_na[k]);
          } // end for k
 
          mlog << Debug(2)
@@ -2118,8 +2136,8 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
          }
 
          // Compute the probabilistic counts and statistics
-         compute_pctinfo(hira_pd, (STATOutputType::None!=conf_info.vx_opt[i_vx].output_flag[i_pstd]),
-                         pct_info, &cmn_cov_na);
+         bool pstd_flag = conf_info.vx_opt[i_vx].output_flag[i_pstd] != STATOutputType::None;
+         compute_pctinfo(hira_pd, pstd_flag, pct_info, &ocmn_cov_na);
 
          // Set the contents of the output threshold columns
          shc.set_fcst_thresh (conf_info.vx_opt[i_vx].fcat_ta[i]);

@@ -203,7 +203,7 @@ static const char * const mpr_columns [] = {
    "OBS_ELV",         "FCST",             "OBS",
    "OBS_QC",
    "OBS_CLIMO_MEAN",  "OBS_CLIMO_STDEV",  "OBS_CLIMO_CDF",
-   "FCST_CLIMO_MEAN", "FCST_CLIMO_STDEV", "FCST_CLIMO_CDF"
+   "FCST_CLIMO_MEAN", "FCST_CLIMO_STDEV"
 };
 
 static const char * const nbrctc_columns [] = {

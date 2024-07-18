@@ -61,7 +61,7 @@ struct MPRData {
    ConcatString obs_sid, obs_qc;
    double obs_lat, obs_lon, obs_lvl, obs_elv;
    double fcst, obs;
-   double fcst_climo_mean, fcst_climo_stdev, fcst_climo_cdf;
+   double fcst_climo_mean, fcst_climo_stdev;
    double obs_climo_mean, obs_climo_stdev, obs_climo_cdf;
 };
 

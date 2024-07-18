@@ -343,22 +343,22 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
    out_pd.extend(n_obs);
    out_pd.set_climo_cdf_info_ptr(cdf_info_ptr);
 
-   bool cmn_flag = set_climo_flag(f_na, fcmn_na) &&
-                   set_climo_flag(f_na, ocmn_na);
-   bool csd_flag = set_climo_flag(f_na, fcsd_na) &&
-                   set_climo_flag(f_na, ocsd_na);
+   bool fcmn_flag = set_climo_flag(f_na, fcmn_na);
+   bool fcsd_flag = set_climo_flag(f_na, fcsd_na);
+   bool ocmn_flag = set_climo_flag(f_na, ocmn_na);
+   bool ocsd_flag = set_climo_flag(f_na, ocsd_na);
    bool wgt_flag = set_climo_flag(f_na, wgt_na);
 
    // Loop over the pairs
    for(i=0; i<n_obs; i++) {
 
       // Check for bad data
-      if(is_bad_data(f_na[i])                    ||
-         is_bad_data(o_na[i])                    ||
-         (cmn_flag && (is_bad_data(fcmn_na[i])   ||
-                       is_bad_data(ocmn_na[i]))) ||
-         (csd_flag && (is_bad_data(ocsd_na[i])   ||
-                       is_bad_data(ocsd_na[i]))) ||
+      if(is_bad_data(f_na[i])                   ||
+         is_bad_data(o_na[i])                   ||
+         (fcmn_flag && is_bad_data(fcmn_na[i])) ||
+         (fcsd_flag && is_bad_data(fcsd_na[i])) ||
+         (ocmn_flag && is_bad_data(ocmn_na[i])) ||
+         (ocsd_flag && is_bad_data(ocsd_na[i])) ||
          (wgt_flag && is_bad_data(wgt_na[i]))) continue;
 
       // Keep pairs which meet the threshold criteria
@@ -847,7 +847,8 @@ double get_mpr_column_value(double f, double o, double cmn, double csd,
 ////////////////////////////////////////////////////////////////////////
 
 void apply_mpr_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
-                           DataPlane &cmn_dp, DataPlane &csd_dp,
+                           DataPlane &fcmn_dp, DataPlane &fcsd_dp,
+                           DataPlane &ocmn_dp, DataPlane &ocsd_dp,
                            const StringArray &col_sa, const ThreshArray &col_ta) {
 
    // Check for no work to be done
@@ -865,33 +866,42 @@ void apply_mpr_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
 
    int  nxy = fcst_dp.nx() * fcst_dp.ny();
    int  n_skip = 0;
-   bool cmn_flag = !(cmn_dp.is_empty());
-   bool csd_flag = !(csd_dp.is_empty());
+   bool fcmn_flag = !(fcmn_dp.is_empty());
+   bool fcsd_flag = !(fcsd_dp.is_empty());
+   bool ocmn_flag = !(ocmn_dp.is_empty());
+   bool ocsd_flag = !(ocsd_dp.is_empty());
 
    // Loop over the pairs
    for(int i=0; i<nxy; i++) {
 
-      double cmn = (cmn_flag ? cmn_dp.buf()[i] : bad_data_double);
-      double csd = (csd_flag ? csd_dp.buf()[i] : bad_data_double);
+      double fcmn = (fcmn_flag ? fcmn_dp.buf()[i] : bad_data_double);
+      double fcsd = (fcsd_flag ? fcsd_dp.buf()[i] : bad_data_double);
+      double ocmn = (ocmn_flag ? ocmn_dp.buf()[i] : bad_data_double);
+      double ocsd = (ocsd_flag ? ocsd_dp.buf()[i] : bad_data_double);
 
       // Check for bad data
-      if(is_bad_data(fcst_dp.buf()[i])  ||
-         is_bad_data(obs_dp.buf()[i])   ||
-         (cmn_flag && is_bad_data(cmn)) ||
-         (csd_flag && is_bad_data(csd))) continue;
+      if(is_bad_data(fcst_dp.buf()[i])    ||
+         is_bad_data(obs_dp.buf()[i])     ||
+         (fcmn_flag && is_bad_data(fcmn)) ||
+         (fcsd_flag && is_bad_data(fcsd)) ||
+         (ocmn_flag && is_bad_data(ocmn)) ||
+         (ocsd_flag && is_bad_data(ocsd))) continue;
 
       // Discard pairs which do not meet the threshold criteria
-      if(!check_mpr_thresh(fcst_dp.buf()[i], obs_dp.buf()[i], cmn, csd,
+      // TODO: MET #2924
+      if(!check_mpr_thresh(fcst_dp.buf()[i], obs_dp.buf()[i], ocmn, ocsd,
                            col_sa, col_ta)) {
 
          // Increment skip counter
          n_skip++;
 
          // Set point to bad data
-         fcst_dp.buf()[i] = bad_data_double;
-         obs_dp.buf()[i]  = bad_data_double;
-         if(cmn_flag) cmn_dp.buf()[i] = bad_data_double;
-         if(csd_flag) csd_dp.buf()[i] = bad_data_double;
+         fcst_dp.buf()[i]               = bad_data_double;
+         obs_dp.buf()[i]                = bad_data_double;
+         if(fcmn_flag) fcmn_dp.buf()[i] = bad_data_double;
+         if(fcsd_flag) fcsd_dp.buf()[i] = bad_data_double;
+         if(ocmn_flag) ocmn_dp.buf()[i] = bad_data_double;
+         if(ocsd_flag) ocsd_dp.buf()[i] = bad_data_double;
       }
    } // end for i
 
@@ -929,15 +939,15 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
    out_pd_u.set_climo_cdf_info_ptr(pd_u.cdf_info_ptr);
    out_pd_v.set_climo_cdf_info_ptr(pd_v.cdf_info_ptr);
 
-   bool cmn_flag = set_climo_flag(pd_u.f_na, pd_u.fcmn_na) &&
-                   set_climo_flag(pd_v.f_na, pd_v.fcmn_na) &&
-                   set_climo_flag(pd_u.f_na, pd_u.ocmn_na) &&
-                   set_climo_flag(pd_v.f_na, pd_v.ocmn_na);
-   bool csd_flag = set_climo_flag(pd_u.f_na, pd_u.fcsd_na) &&
-                   set_climo_flag(pd_v.f_na, pd_v.fcsd_na) &&
-                   set_climo_flag(pd_u.f_na, pd_u.ocsd_na) &&
-                   set_climo_flag(pd_v.f_na, pd_v.ocsd_na);
-   bool wgt_flag = set_climo_flag(pd_u.f_na, pd_u.wgt_na);
+   bool fcmn_flag = set_climo_flag(pd_u.f_na, pd_u.fcmn_na) &&
+                    set_climo_flag(pd_v.f_na, pd_v.fcmn_na);
+   bool fcsd_flag = set_climo_flag(pd_u.f_na, pd_u.fcsd_na) &&
+                    set_climo_flag(pd_v.f_na, pd_v.fcsd_na);
+   bool ocmn_flag = set_climo_flag(pd_u.f_na, pd_u.ocmn_na) &&
+                    set_climo_flag(pd_v.f_na, pd_v.ocmn_na);
+   bool ocsd_flag = set_climo_flag(pd_u.f_na, pd_u.ocsd_na) &&
+                    set_climo_flag(pd_v.f_na, pd_v.ocsd_na);
+   bool wgt_flag  = set_climo_flag(pd_u.f_na, pd_u.wgt_na);
 
    // Loop over the pairs
    for(i=0; i<pd_u.n_obs; i++) {
@@ -947,26 +957,26 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
       // Compute wind speeds
       fcst_wind = convert_u_v_to_wind(pd_u.f_na[i], pd_v.f_na[i]);
       obs_wind  = convert_u_v_to_wind(pd_u.o_na[i], pd_v.o_na[i]);
-      fcmn_wind = (cmn_flag ?
+      fcmn_wind = (fcmn_flag ?
                    convert_u_v_to_wind(pd_u.fcmn_na[i], pd_v.fcmn_na[i]) :
                    bad_data_double);
-      ocmn_wind = (cmn_flag ?
-                   convert_u_v_to_wind(pd_u.ocmn_na[i], pd_v.ocmn_na[i]) :
-                   bad_data_double);
-      fcsd_wind = (csd_flag ?
+      fcsd_wind = (fcsd_flag ?
                    convert_u_v_to_wind(pd_u.fcsd_na[i], pd_v.fcsd_na[i]) :
                    bad_data_double);
-      ocsd_wind = (csd_flag ?
+      ocmn_wind = (ocmn_flag ?
+                   convert_u_v_to_wind(pd_u.ocmn_na[i], pd_v.ocmn_na[i]) :
+                   bad_data_double);
+      ocsd_wind = (ocsd_flag ?
                    convert_u_v_to_wind(pd_u.ocsd_na[i], pd_v.ocsd_na[i]) :
                    bad_data_double);
 
       // Check for bad data
-      if(is_bad_data(fcst_wind)                 ||
-         is_bad_data(obs_wind)                  ||
-         (cmn_flag && (is_bad_data(fcmn_wind)   ||
-                       is_bad_data(ocmn_wind))) ||
-         (csd_flag && (is_bad_data(fcsd_wind)   ||
-                       is_bad_data(ocsd_wind))) ||
+      if(is_bad_data(fcst_wind)                ||
+         is_bad_data(obs_wind)                 ||
+         (fcmn_flag && is_bad_data(fcmn_wind)) ||
+         (fcsd_flag && is_bad_data(fcsd_wind)) ||
+         (ocmn_flag && is_bad_data(ocmn_wind)) ||
+         (ocsd_flag && is_bad_data(ocsd_wind)) ||
          (wgt_flag && is_bad_data(wgt))) continue;
 
       // Check wind speed thresholds
@@ -1035,22 +1045,22 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
    out_pd.extend(pd.n_obs);
    out_pd.set_climo_cdf_info_ptr(pd.cdf_info_ptr);
 
-   bool cmn_flag = set_climo_flag(pd.f_na, pd.fcmn_na) &&
-                   set_climo_flag(pd.f_na, pd.ocmn_na);
-   bool csd_flag = set_climo_flag(pd.f_na, pd.fcsd_na) &&
-                   set_climo_flag(pd.f_na, pd.ocsd_na);
+   bool fcmn_flag = set_climo_flag(pd.f_na, pd.fcmn_na);
+   bool fcsd_flag = set_climo_flag(pd.f_na, pd.fcsd_na);
+   bool ocmn_flag = set_climo_flag(pd.f_na, pd.ocmn_na);
+   bool ocsd_flag = set_climo_flag(pd.f_na, pd.ocsd_na);
    bool wgt_flag = set_climo_flag(pd.f_na, pd.wgt_na);
 
    // Loop over the pairs
    for(i=0; i<pd.n_obs; i++) {
 
       // Check for bad data
-      if(is_bad_data(pd.f_na[i])                    ||
-         is_bad_data(pd.o_na[i])                    ||
-         (cmn_flag && (is_bad_data(pd.fcmn_na[i])   ||
-                       is_bad_data(pd.ocmn_na[i]))) ||
-         (csd_flag && (is_bad_data(pd.fcsd_na[i]))  ||
-                       is_bad_data(pd.ocsd_na[i]))  ||
+      if(is_bad_data(pd.f_na[i])                   ||
+         is_bad_data(pd.o_na[i])                   ||
+         (fcmn_flag && is_bad_data(pd.fcmn_na[i])) ||
+         (fcsd_flag && is_bad_data(pd.fcsd_na[i])) ||
+         (ocmn_flag && is_bad_data(pd.ocmn_na[i])) ||
+         (ocsd_flag && is_bad_data(pd.ocsd_na[i])) ||
          (wgt_flag && is_bad_data(pd.wgt_na[i]))) continue;
 
       // Keep pairs for the current bin.
@@ -1060,12 +1070,12 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
          // Handle point data
          if(pd.is_point_vx()) {
             out_pd.add_point_pair(pd.sid_sa[i].c_str(), pd.lat_na[i],
-                      pd.lon_na[i], pd.x_na[i], pd.y_na[i],
-                      pd.vld_ta[i], pd.lvl_na[i], pd.elv_na[i],
-                      pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
-                      pd.fcmn_na[i], pd.fcsd_na[i],
-                      pd.ocmn_na[i], pd.ocsd_na[i],
-                      pd.wgt_na[i]);
+                                  pd.lon_na[i], pd.x_na[i], pd.y_na[i],
+                                  pd.vld_ta[i], pd.lvl_na[i], pd.elv_na[i],
+                                  pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
+                                  pd.fcmn_na[i], pd.fcsd_na[i],
+                                  pd.ocmn_na[i], pd.ocsd_na[i],
+                                  pd.wgt_na[i]);
          }
          // Handle gridded data
          else {

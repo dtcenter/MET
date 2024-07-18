@@ -1513,9 +1513,6 @@ The first set of header columns are common to all of the output files generated 
   * - 39
     - FCST_CLIMO_STDEV
     - Forecast climatological standard deviation value
-  * - 40
-    - FCST_CLIMO_CDF
-    - Forecast climatological cumulative distribution function value
 
 .. _table_PS_format_info_SEEPS_MPR:
 

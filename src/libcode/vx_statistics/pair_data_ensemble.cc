@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
 #include <cstdio>
 #include <iostream>
 #include <unistd.h>
@@ -232,9 +231,11 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    cdf_info_ptr   = pd.cdf_info_ptr;
 
-   cmn_na         = pd.cmn_na;
-   csd_na         = pd.csd_na;
-   cdf_na         = pd.cdf_na;
+   fcmn_na        = pd.fcmn_na;
+   fcsd_na        = pd.fcsd_na;
+   ocmn_na        = pd.ocmn_na;
+   ocsd_na        = pd.ocsd_na;
+   ocdf_na        = pd.ocdf_na;
 
    // PairDataEnsemble
    v_na             = pd.v_na;
@@ -379,24 +380,27 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    // Check if the ranks have already been computed
    if(r_na.n() == o_na.n()) return;
 
-   // Print the climo data being used
-   bool cmn_flag = set_climo_flag(o_na, cmn_na);
-   bool csd_flag = set_climo_flag(o_na, csd_na);
+   // Print the observation climo data being used
+   bool ocmn_flag = set_climo_flag(o_na, ocmn_na);
+   bool ocsd_flag = set_climo_flag(o_na, ocsd_na);
 
-   if(cmn_flag && cdf_info_ptr && cdf_info_ptr->cdf_ta.n() == 2) {
+   if(ocmn_flag && cdf_info_ptr && cdf_info_ptr->cdf_ta.n() == 2) {
       mlog << Debug(3)
            << "Computing ensemble statistics relative to the "
-           << "climatological mean.\n";
+           << "observation climatological mean.\n";
    }
-   else if(cmn_flag && csd_flag && cdf_info_ptr && cdf_info_ptr->cdf_ta.n() > 2) {
+   else if(ocmn_flag    &&
+           ocsd_flag    &&
+           cdf_info_ptr &&
+           cdf_info_ptr->cdf_ta.n() > 2) {
       mlog << Debug(3)
            << "Computing ensemble statistics relative to a "
            << cdf_info_ptr->cdf_ta.n() - 2
-           << "-member climatological ensemble.\n";
+           << "-member observation climatological ensemble.\n";
    }
    else {
       mlog << Debug(3)
-           << "No reference climatology data provided.\n";
+           << "No reference observation climatology data provided.\n";
    }
 
    // Compute the rank for each observation
@@ -532,8 +536,8 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             r_na.add(nint(dest_na[0]));
          }
 
-         // Derive ensemble from climo mean and standard deviation
-         derive_climo_vals(cdf_info_ptr, cmn_na[i], csd_na[i], cur_clm);
+         // Derive ensemble from observation climo mean and standard deviation
+         derive_climo_vals(cdf_info_ptr, ocmn_na[i], ocsd_na[i], cur_clm);
 
          // Store empirical CRPS stats
          // For crps_emp use temporary, local variable so we can use it
@@ -551,7 +555,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
 
          // Store Gaussian CRPS stats
          crps_gaus_na.add(compute_crps_gaus(o_na[i], mean, stdev));
-         crpscl_gaus_na.add(compute_crps_gaus(o_na[i], cmn_na[i], csd_na[i]));
+         crpscl_gaus_na.add(compute_crps_gaus(o_na[i], ocmn_na[i], ocsd_na[i]));
          ign_na.add(compute_ens_ign(o_na[i], mean, stdev));
          pit_na.add(compute_ens_pit(o_na[i], mean, stdev));
 
@@ -875,26 +879,31 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
    pd.obs_error_flag  = obs_error_flag;
    pd.cdf_info_ptr    = cdf_info_ptr;
 
-   bool cmn_flag = set_climo_flag(o_na, cmn_na);
-   bool csd_flag = set_climo_flag(o_na, csd_na);
-   bool wgt_flag = set_climo_flag(o_na, wgt_na);
+   bool fcmn_flag = set_climo_flag(o_na, fcmn_na);
+   bool fcsd_flag = set_climo_flag(o_na, fcsd_na);
+   bool ocmn_flag = set_climo_flag(o_na, ocmn_na);
+   bool ocsd_flag = set_climo_flag(o_na, ocsd_na);
+   bool wgt_flag  = set_climo_flag(o_na, wgt_na);
 
    // Loop over the pairs
    for(i=0; i<n_obs; i++) {
 
+      // TODO: MET#2924
       // Check for bad data and apply observation threshold
-      if(is_bad_data(o_na[i])                 ||
-         skip_ba[i]                           ||
-         (cmn_flag && is_bad_data(cmn_na[i])) ||
-         (csd_flag && is_bad_data(csd_na[i])) ||
-         (wgt_flag && is_bad_data(wgt_na[i])) ||
-         !ot.check(o_na[i], cmn_na[i], csd_na[i])) continue;
+      if(is_bad_data(o_na[i])                   ||
+         skip_ba[i]                             ||
+         (fcmn_flag && is_bad_data(fcmn_na[i])) ||
+         (fcsd_flag && is_bad_data(fcsd_na[i])) ||
+         (ocmn_flag && is_bad_data(ocmn_na[i])) ||
+         (ocsd_flag && is_bad_data(ocsd_na[i])) ||
+         (wgt_flag && is_bad_data(wgt_na[i]))   ||
+         !ot.check(o_na[i], ocmn_na[i], ocsd_na[i])) continue;
 
       // Add data for the current observation but only include data
       // required for ensemble output line types.
       //
       // Include in subset:
-      //   wgt_na, o_na, cmn_na, csd_na, v_na, r_na,
+      //   wgt_na, o_na, fcmn_na, fcsd_na, ocmn_na, ocsd_na, ocdf_na, v_na, r_na,
       //   crps_emp_na, crps_emp_fair_na, spread_md_na,
       //   crpscl_emp_na, crps_gaus_na, crpscl_gaus_na,
       //   ign_na, pit_na,
@@ -909,9 +918,11 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
 
       pd.wgt_na.add(wgt_na[i]);
       pd.o_na.add(o_na[i]);
-      pd.cmn_na.add(cmn_na[i]);
-      pd.csd_na.add(csd_na[i]);
-      pd.cdf_na.add(cdf_na[i]);
+      pd.fcmn_na.add(fcmn_na[i]);
+      pd.fcsd_na.add(fcsd_na[i]);
+      pd.ocmn_na.add(ocmn_na[i]);
+      pd.ocsd_na.add(ocsd_na[i]);
+      pd.ocdf_na.add(ocdf_na[i]);
       pd.v_na.add(v_na[i]);
       pd.r_na.add(r_na[i]);
       pd.crps_emp_na.add(crps_emp_na[i]);
@@ -1318,7 +1329,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
             int n = three_to_one(i_msg_typ, i_mask, i_interp);
             if(!pd[n].add_point_obs(hdr_sid_str, hdr_lat, hdr_lon,
                   obs_x, obs_y, hdr_ut, obs_lvl, obs_hgt,
-                  obs_v, obs_qty, ocmn_v, ocsd_v, wgt_v)) {
+                  obs_v, obs_qty, fcmn_v, fcsd_v, ocmn_v, ocsd_v, wgt_v)) {
 
                if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                   mlog << Debug(REJECT_DEBUG_LEVEL)
@@ -1411,9 +1422,10 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
          }
          // Otherwise, get a single interpolated ensemble value
          else {
+            // TODO: MET #2924
             fcst_na.add(compute_interp(fcst_dpa,
                it->x_na[i_obs], it->y_na[i_obs], it->o_na[i_obs],
-               it->cmn_na[i_obs], it->csd_na[i_obs],
+               it->ocmn_na[i_obs], it->ocsd_na[i_obs],
                it->interp_mthd, it->interp_wdth, it->interp_shape,
                gr.wrap_lon(), interp_thresh, spfh_flag,
                fcst_info->level().type(),
