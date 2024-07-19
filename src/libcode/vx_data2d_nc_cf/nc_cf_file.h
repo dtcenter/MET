@@ -61,7 +61,7 @@ class NcCfFile {
 
         return GET_NC_SIZE_P(_xDim);
       }
-      
+
       int getNy() const
       {
         if (_yDim == 0)
@@ -69,9 +69,10 @@ class NcCfFile {
 
         return GET_NC_SIZE_P(_yDim);
       }
-      
+
       NcVarInfo *get_time_var_info() const { return _time_var_info; }
-      
+
+
          //
          //  time
          //
@@ -93,6 +94,7 @@ class NcCfFile {
       int Nvars;
 
       NcVarInfo * Var;    //  allocated
+      StringArray coord_var_names;
 
          //
          //  Grid
@@ -110,13 +112,15 @@ class NcCfFile {
 
       bool getData(const char *, const LongArray &, DataPlane &, NcVarInfo *&) const;
 
+      Grid build_grid_from_lat_lon_vars(netCDF::NcVar *lat_var, netCDF::NcVar *lon_var,
+                                        const long lat_counts, const long lon_counts);
       NcVarInfo* find_var_name(const char * var_name) const;
       NcVarInfo* find_var_by_dim_name(const char *dim_name) const;
 
    private:
 
       static const double DELTA_TOLERANCE;
-      
+
       netCDF::NcFile * _ncFile;      //  allocated
 
          //
@@ -142,7 +146,7 @@ class NcCfFile {
       netCDF::NcVar *_xCoordVar;
       netCDF::NcVar *_yCoordVar;
       NcVarInfo *_time_var_info;
-      
+
       void init_from_scratch();
 
       NcCfFile(const NcCfFile &);
@@ -164,7 +168,7 @@ class NcCfFile {
 
       void read_netcdf_grid();
       void get_grid_from_grid_mapping(const netCDF::NcVarAtt *grid_mapping_att);
-      
+
       void get_grid_mapping_albers_conical_equal_area(const netCDF::NcVar *grid_mapping_var);
       void get_grid_mapping_azimuthal_equidistant(const netCDF::NcVar *grid_mapping_var);
       void get_grid_mapping_lambert_azimuthal_equal_area(const netCDF::NcVar *grid_mapping_var);
@@ -179,7 +183,7 @@ class NcCfFile {
       void get_grid_mapping_transverse_mercator(const netCDF::NcVar *grid_mapping_var);
       void get_grid_mapping_vertical_perspective(const netCDF::NcVar *grid_mapping_var);
       void get_grid_mapping_geostationary(const netCDF::NcVar *grid_mapping_var);
-      
+
       bool get_grid_from_coordinates(const netCDF::NcVar *data_var);
       bool get_grid_from_dimensions();
       void get_grid_from_lat_lon_vars(netCDF::NcVar *lat_var, netCDF::NcVar *lon_var,

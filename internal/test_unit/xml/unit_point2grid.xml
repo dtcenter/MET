@@ -249,6 +249,78 @@
     </output>
   </test>
 
+  <test name="point2grid_tripolar_sea_ice">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/point_obs/iceh.2018-01-03.c00.small.nc \
+      G171 \
+      &OUTPUT_DIR;/point2grid/point2grid_sea_ice.nc \
+      -field 'name="uvel_d"; level="(0,*,*)";' -field 'name="hi_d"; level="(0,*,*)";'  \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_sea_ice.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="point2grid_tripolar_sea_ice_config">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/point_obs/iceh.2018-01-03.c00.small.nc \
+      G171 \
+      &OUTPUT_DIR;/point2grid/point2grid_sea_ice_snow.nc \
+      -config &CONFIG_DIR;/Point2GridConfig_lat_lon \
+      -field 'name="hs_d_without_att"; level="(0,*,*)";'  \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_sea_ice_snow.nc</grid_nc>
+    </output>
+  </test>
+
+<!--
+  <test name="point2grid_tripolar_gfs_ocean">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/point_obs/gfs.ocean.t00z.6hr_avg.f006_SST.nc \
+      "latlon 360 180 -90 -180 1.0 1.0" \
+      &OUTPUT_DIR;/point2grid/point2grid_gfs_ocean_SST.nc \
+      -field 'name="SST"; level="(0,*,*)";' \
+      -config &CONFIG_DIR;/Point2GridConfig_SST \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_gfs_ocean_SST.nc</grid_nc>
+    </output>
+  </test>
+-->
+
+  <test name="point2grid_tripolar_rtofs">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/point_obs/rtofs_glo_2ds_f006_ice_coverage.nc \
+      "latlon 720 360 -80. -60. 0.5 0.5" \
+      &OUTPUT_DIR;/point2grid/point2grid_rtofs_ice_coverage.nc \
+      -field 'name="ice_coverage"; level="(0,*,*)";' \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_rtofs_ice_coverage.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="point2grid_GOES_16_AOD_TO_G212_unsigned">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
@@ -283,4 +355,5 @@
       <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_2D_time_west_bering_sea.nc</grid_nc>
     </output>
   </test>
+
 </met_test>
