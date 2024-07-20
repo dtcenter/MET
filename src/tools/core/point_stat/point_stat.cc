@@ -1900,15 +1900,17 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             (conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa.n_planes() > 0 &&
              is_bad_data(pd_ptr->ocmn_na[j]))) continue;
 
+         // Store climo data
+	 ClimoPntInfo cpi(pd_ptr->fcmn_na[j], pd_ptr->fcsd_na[j],
+                          pd_ptr->ocmn_na[j], pd_ptr->ocsd_na[j]);
+
          // Store the observation value
          hira_pd.add_point_obs(pd_ptr->sid_sa[j].c_str(),
             pd_ptr->lat_na[j], pd_ptr->lon_na[j],
             pd_ptr->x_na[j], pd_ptr->y_na[j], pd_ptr->vld_ta[j],
             pd_ptr->lvl_na[j], pd_ptr->elv_na[j],
             pd_ptr->o_na[j], pd_ptr->o_qc_sa[j].c_str(),
-            pd_ptr->fcmn_na[j], pd_ptr->fcsd_na[j],
-            pd_ptr->ocmn_na[j], pd_ptr->ocsd_na[j],
-            pd_ptr->wgt_na[j]);
+            cpi, pd_ptr->wgt_na[j]);
 
          // Store the ensemble mean and member values
          hira_pd.mn_na.add(f_ens.mean());
@@ -2058,15 +2060,17 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
          // with the HiRA fractional coverage.
          for(k=0; k<pd_ptr->n_obs; k++) {
 
+            // Store climo data
+            ClimoPntInfo cpi(pd_ptr->fcmn_na[k], pd_ptr->fcsd_na[k],
+                             pd_ptr->ocmn_na[k], pd_ptr->ocsd_na[k]);
+
             // Compute the fractional coverage forecast value using the
             // observation level value
             find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
                           pd_ptr->lvl_na[k], lvl_blw, lvl_abv);
 
-            // TODO: MET #2924
             f_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
-                       pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
-                       pd_ptr->ocmn_na[k], pd_ptr->ocsd_na[k],
+                       pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k], &cpi,
                        InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
                        conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
                        conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
@@ -2084,10 +2088,8 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa,
                              pd_ptr->lvl_na[k], lvl_blw, lvl_abv);
 
-               // TODO: MET #2924
                ocmn_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa,
-                             pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k],
-                             pd_ptr->ocmn_na[k], pd_ptr->ocsd_na[k],
+                             pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k], &cpi,
                              InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
                              conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
                              conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
@@ -2105,9 +2107,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->vld_ta[k],
                pd_ptr->lvl_na[k], pd_ptr->elv_na[k],
                f_cov, pd_ptr->o_na[k], pd_ptr->o_qc_sa[k].c_str(),
-               pd_ptr->fcmn_na[k], pd_ptr->fcsd_na[k],
-               pd_ptr->ocmn_na[k], pd_ptr->ocsd_na[k],
-               pd_ptr->wgt_na[k]);
+               cpi, pd_ptr->wgt_na[k]);
          } // end for k
 
          mlog << Debug(2)

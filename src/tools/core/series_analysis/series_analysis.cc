@@ -794,12 +794,13 @@ void process_scores() {
                (ocmn_flag && is_bad_data(ocmn_dp(x, y))) ||
                (ocsd_flag && is_bad_data(ocsd_dp(x, y)))) continue;
 
-            pd_ptr[i].add_grid_pair(fcst_dp(x, y), obs_dp(x, y),
-                                    (fcmn_flag ? fcmn_dp(x, y) : bad_data_double),
-                                    (fcsd_flag ? fcsd_dp(x, y) : bad_data_double),
-                                    (ocmn_flag ? ocmn_dp(x, y) : bad_data_double),
-                                    (ocsd_flag ? ocsd_dp(x, y) : bad_data_double),
-                                    default_grid_weight);
+            // Store climo data
+            ClimoPntInfo cpi((fcmn_flag ? fcmn_dp(x, y) : bad_data_double),
+                             (fcsd_flag ? fcsd_dp(x, y) : bad_data_double),
+                             (ocmn_flag ? ocmn_dp(x, y) : bad_data_double),
+                             (ocsd_flag ? ocsd_dp(x, y) : bad_data_double));
+
+            pd_ptr[i].add_grid_pair(fcst_dp(x, y), obs_dp(x, y), cpi, default_grid_weight);
 
          } // end for i
 

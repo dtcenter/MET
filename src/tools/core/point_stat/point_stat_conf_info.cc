@@ -1197,11 +1197,10 @@ void PointStatVxOpt::set_perc_thresh(const PairDataPoint *pd_ptr) {
    //
    // Compute percentiles
    //
-   // TODO: MET #2924
-   fcat_ta.set_perc(&f_sort, &o_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
-   ocat_ta.set_perc(&f_sort, &o_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
-   fcnt_ta.set_perc(&f_sort, &o_sort, &ocmn_sort, &fcnt_ta, &ocnt_ta);
-   ocnt_ta.set_perc(&f_sort, &o_sort, &ocmn_sort, &fcnt_ta, &ocnt_ta);
+   fcat_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
+   ocat_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
+   fcnt_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcnt_ta, &ocnt_ta);
+   ocnt_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcnt_ta, &ocnt_ta);
 
    return;
 }

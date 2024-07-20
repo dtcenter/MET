@@ -704,7 +704,7 @@ double interp_geog_match(const DataPlane &dp, const GridTemplate &gt,
 ////////////////////////////////////////////////////////////////////////
 
 double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
-                    double t, const SingleThresh *st, ClimoPntInfo *cpi,
+                    double t, const SingleThresh *st, const ClimoPntInfo *cpi,
                     const MaskPlane *mp) {
    int count, count_thr;
 

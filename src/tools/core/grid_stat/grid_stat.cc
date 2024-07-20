@@ -1572,11 +1572,11 @@ void process_scores() {
                         conf_info.vx_opt[i].fcat_ta[k].need_perc()) {
 
                         // Compute fractional coverage
-                        // TODO: MET #2924
                         fractional_coverage(fcst_dp, fcst_dp_smooth,
                                             nbrhd->width[j], nbrhd->shape,
                                             grid.wrap_lon(),
                                             conf_info.vx_opt[i].fcat_ta[k],
+                                            &fcmn_dp, &fcsd_dp,
                                             &ocmn_dp, &ocsd_dp,
                                             nbrhd->vld_thresh);
 
@@ -1613,11 +1613,11 @@ void process_scores() {
                         conf_info.vx_opt[i].ocat_ta[k].need_perc()) {
 
                         // Compute fractional coverage
-                        // TODO: MET #2924
                         fractional_coverage(obs_dp, obs_dp_smooth,
                                             nbrhd->width[j], nbrhd->shape,
                                             grid.wrap_lon(),
                                             conf_info.vx_opt[i].ocat_ta[k],
+                                            &fcmn_dp, &fcsd_dp,
                                             &ocmn_dp, &ocsd_dp,
                                             nbrhd->vld_thresh);
 
