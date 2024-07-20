@@ -1242,13 +1242,20 @@ void process_scores() {
             ta.get_simple_nodes(simp);
 
             // Process all CDP thresholds except 0 and 100
-            // TODO: MET #2924 handle FCDP and OCDP
             for(vector<Simple_Node>::iterator it = simp.begin();
                 it != simp.end(); it++) {
-               if(it->ptype() == perc_thresh_climo_dist &&
+               if(it->ptype() == perc_thresh_fcst_climo_dist &&
                   !is_eq(it->pvalue(), 0.0) &&
                   !is_eq(it->pvalue(), 100.0)) {
-                  cs << cs_erase << "CLIMO_CDP" << nint(it->pvalue());
+                  cs << cs_erase << "FCST_CLIMO_CDP" << nint(it->pvalue());
+                  write_nc(cs, normal_cdf_inv(it->pvalue()/100.0, fcmn_dp, fcsd_dp),
+                           i, mthd, pnts,
+                           conf_info.vx_opt[i].interp_info.field);
+               }
+               else if(it->ptype() == perc_thresh_obs_climo_dist &&
+                  !is_eq(it->pvalue(), 0.0) &&
+                  !is_eq(it->pvalue(), 100.0)) {
+                  cs << cs_erase << "OBS_CLIMO_CDP" << nint(it->pvalue());
                   write_nc(cs, normal_cdf_inv(it->pvalue()/100.0, ocmn_dp, ocsd_dp),
                            i, mthd, pnts,
                            conf_info.vx_opt[i].interp_info.field);
@@ -2809,45 +2816,81 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
                    << conf_info.vx_opt[i_vx].fcst_info->units_attr() << " and "
                    << conf_info.vx_opt[i_vx].obs_info->units_attr();
       }
-      else if(field_name == "CLIMO_MEAN") {
+      else if(field_name == "FCST_CLIMO_MEAN") {
          var_name  << cs_erase << field_name << "_"
                    << obs_name << var_suffix << "_" << mask_str;
+
          // Append interpolation string for Fourier decomposition
          if(interp_str.nonempty()) {
             if(strncmp(interp_str.c_str(), "_WV", 3) == 0) var_name << interp_str;
          }
          long_att  << cs_erase
-                   << "Climatology mean for "
-                   << obs_long_name;
-         level_att = shc.get_obs_lev();
-         units_att = conf_info.vx_opt[i_vx].obs_info->units_attr();
+                   << "Forecast climatology mean for "
+                   << fcst_long_name;
+         level_att = shc.get_fcst_lev();
+         units_att = conf_info.vx_opt[i_vx].fcst_info->units_attr();
       }
-      else if(field_name == "CLIMO_STDEV") {
+      else if(field_name == "FCST_CLIMO_STDEV") {
          var_name  << cs_erase << field_name << "_"
                    << obs_name << var_suffix << "_" << mask_str;
          long_att  << cs_erase
-                   << "Climatology standard deviation for "
+                   << "Forecast climatology standard deviation for "
+                   << fcst_long_name;
+         level_att = shc.get_fcst_lev();
+         units_att = conf_info.vx_opt[i_vx].fcst_info->units_attr();
+      }
+      else if(field_name == "OBS_CLIMO_MEAN") {
+         var_name  << cs_erase << field_name << "_"
+                   << obs_name << var_suffix << "_" << mask_str;
+
+         // Append interpolation string for Fourier decomposition
+         if(interp_str.nonempty()) {
+            if(strncmp(interp_str.c_str(), "_WV", 3) == 0) var_name << interp_str;
+         }
+         long_att  << cs_erase
+                   << "Observation climatology mean for "
                    << obs_long_name;
          level_att = shc.get_obs_lev();
          units_att = conf_info.vx_opt[i_vx].obs_info->units_attr();
       }
-      else if(field_name == "CLIMO_CDF") {
+      else if(field_name == "OBS_CLIMO_STDEV") {
          var_name  << cs_erase << field_name << "_"
                    << obs_name << var_suffix << "_" << mask_str;
          long_att  << cs_erase
-                   << "Climatology cumulative distribution function for "
+                   << "Observation climatology standard deviation for "
+                   << fcst_long_name;
+         level_att = shc.get_obs_lev();
+         units_att = conf_info.vx_opt[i_vx].obs_info->units_attr();
+      }
+      else if(field_name == "OBS_CLIMO_CDF") {
+         var_name  << cs_erase << field_name << "_"
+                   << obs_name << var_suffix << "_" << mask_str;
+         long_att  << cs_erase
+                   << "Observation climatology cumulative distribution function for "
                    << obs_long_name;
          level_att = shc.get_obs_lev();
          units_att = conf_info.vx_opt[i_vx].obs_info->units_attr();
       }
-      else if(strncmp(field_name.c_str(), "CLIMO_CDP", 9) == 0) {
+      else if(strncmp(field_name.c_str(), "FCST_CLIMO_CDP", 14) == 0) {
+         var_name  << cs_erase
+                   << field_name << "_"
+                   << conf_info.vx_opt[i_vx].fcst_info->name_attr() << "_"
+                   << conf_info.vx_opt[i_vx].fcst_info->level_attr()
+                   << var_suffix << "_" << mask_str;
+         long_att  << cs_erase
+                   << "Forecast climatology distribution percentile thresholds for "
+                   << fcst_long_name;
+         level_att = shc.get_fcst_lev();
+         units_att = conf_info.vx_opt[i_vx].fcst_info->units_attr();
+      }
+      else if(strncmp(field_name.c_str(), "OBS_CLIMO_CDP", 13) == 0) {
          var_name  << cs_erase
                    << field_name << "_"
                    << conf_info.vx_opt[i_vx].obs_info->name_attr() << "_"
                    << conf_info.vx_opt[i_vx].obs_info->level_attr()
                    << var_suffix << "_" << mask_str;
          long_att  << cs_erase
-                   << "Climatology distribution percentile thresholds for "
+                   << "Observation climatology distribution percentile thresholds for "
                    << obs_long_name;
          level_att = shc.get_obs_lev();
          units_att = conf_info.vx_opt[i_vx].obs_info->units_attr();

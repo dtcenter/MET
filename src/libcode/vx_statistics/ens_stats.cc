@@ -518,7 +518,7 @@ void RPSInfo::set_prob_cat_thresh(const ThreshArray &ta) {
 ////////////////////////////////////////////////////////////////////////
 
 void RPSInfo::set_cdp_thresh(const ThreshArray &ta) {
-   fthresh = derive_cdp_thresh(ta);
+   fthresh = derive_ocdp_thresh(ta);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -581,16 +581,18 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
       // Loop over the observations
       for(j=0; j<pd.n_obs; j++) {
 
+         // Store climo point data
+         ClimoPntInfo cpi(pd.fcmn_na[j], pd.fcsd_na[j],
+                          pd.ocmn_na[j], pd.ocsd_na[j]);
+
          // Loop over ensemble members and count events
          for(k=0, n_event=0; k<n_prob; k++) {
-            // TODO: MET#2924
-            if(fthresh[i].check(pd.e_na[k][j], pd.ocmn_na[j], pd.ocsd_na[j])) n_event++;
+            if(fthresh[i].check(pd.e_na[k][j], &cpi)) n_event++;
          }
 
          // Update the forecast PCT counts
          p = (double) n_event/n_prob;
-         // TODO: MET#2924
-         if(fthresh[i].check(pd.o_na[j], pd.ocmn_na[j], pd.ocsd_na[j])) {
+         if(fthresh[i].check(pd.o_na[j], &cpi)) {
             fcst_pct.inc_event(p);
          }
          else {
@@ -600,8 +602,7 @@ void RPSInfo::set(const PairDataEnsemble &pd) {
          // Update the climatology PCT counts
          if(cmn_flag) {
             p = climo_prob[j];
-            // TODO: MET#2924
-            if(fthresh[i].check(pd.o_na[j], pd.ocmn_na[j], pd.ocsd_na[j])) {
+            if(fthresh[i].check(pd.o_na[j], &cpi)) {
                climo_pct.inc_event(p);
             }
             else {

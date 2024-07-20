@@ -65,29 +65,27 @@ extern bool is_inclusive(ThreshType);
 
 enum PercThreshType {
 
-   perc_thresh_user_specified = 0,
-   perc_thresh_sample_fcst    = 1,
-   perc_thresh_sample_obs     = 2,
-   perc_thresh_sample_climo   = 3,
-   perc_thresh_climo_dist     = 4,
-   perc_thresh_freq_bias      = 5,
+   perc_thresh_user_specified    = 0,
+   perc_thresh_sample_fcst       = 1,
+   perc_thresh_sample_obs        = 2,
+   perc_thresh_sample_fcst_climo = 3,
+   perc_thresh_sample_obs_climo  = 4,
+   perc_thresh_fcst_climo_dist   = 5,
+   perc_thresh_obs_climo_dist    = 6,
+   perc_thresh_freq_bias         = 7,
 
    no_perc_thresh_type = -1
 
 };
 
-
-static const int n_perc_thresh_type = 7;
+static const int n_perc_thresh_type = 9;
 
 
 struct PercThreshInfo {
 
    const PercThreshType type;
-
    const char * const short_name;
-
    const int short_name_length;
-
    const char * const long_name;
 
 };
@@ -95,17 +93,14 @@ struct PercThreshInfo {
 
 static const PercThreshInfo perc_thresh_info [] = {
 
-   { perc_thresh_user_specified, "USP",    3,  "USER_SPECIFIED_PERC" },
-
-   { perc_thresh_sample_fcst,    "SFP",    3,  "SAMPLE_FCST_PERC"    },
-
-   { perc_thresh_sample_obs,     "SOP",    3,  "SAMPLE_OBS_PERC"     },
-
-   { perc_thresh_sample_climo,   "SCP",    3,  "SAMPLE_CLIMO_PERC"   },
-
-   { perc_thresh_climo_dist,     "CDP",    3,  "CLIMO_DIST_PERC"     },
-
-   { perc_thresh_freq_bias,      "FBIAS",  5,  "FREQ_BIAS_PERC"      },
+   { perc_thresh_user_specified,    "USP",    3,  "USER_SPECIFIED_PERC"    },
+   { perc_thresh_sample_fcst,       "SFP",    3,  "SAMPLE_FCST_PERC"       },
+   { perc_thresh_sample_obs,        "SOP",    3,  "SAMPLE_OBS_PERC"        },
+   { perc_thresh_sample_fcst_climo, "SFCP",   3,  "SAMPLE_FCST_CLIMO_PERC" },
+   { perc_thresh_sample_obs_climo,  "SOCP",   3,  "SAMPLE_OBS_CLIMO_PERC"  },
+   { perc_thresh_fcst_climo_dist,   "FCDP",   3,  "CLIMO_FCST_DIST_PERC"   },
+   { perc_thresh_obs_climo_dist,    "OCDP",   3,  "CLIMO_OBS_DIST_PERC"    },
+   { perc_thresh_freq_bias,         "FBIAS",  5,  "FREQ_BIAS_PERC"         },
 
 };
 
@@ -118,8 +113,22 @@ static const double perc_thresh_default_tol = 0.05;
 struct PC_info {
 
    int perc_index;
-
    double value;
+
+};
+
+
+struct ClimoPntInfo {
+
+   ClimoPntInfo() { clear(); }
+   ClimoPntInfo(double a, double b, double c, double d) :
+                fcmn(a), fcsd(b), ocmn(c), ocsd(d) {}
+   void clear() { fcmn = fcsd = ocmn = ocsd = bad_data_double; }
+
+   double fcmn;
+   double fcsd;
+   double ocmn;
+   double ocsd;
 
 };
 
@@ -144,8 +153,7 @@ class ThreshNode {
       ThreshNode();
       virtual ~ThreshNode();
 
-      virtual bool check(double) const = 0;
-      virtual bool check(double, double, double) const = 0;
+      virtual bool check(double, const ClimoPntInfo *cpi = 0) const = 0;
 
       virtual ThreshNode * copy() const = 0;
 
@@ -157,14 +165,14 @@ class ThreshNode {
 
       virtual double pvalue() const = 0;
 
-      virtual double climo_prob() const = 0;
+      virtual double obs_climo_prob() const = 0;
 
       virtual bool need_perc() const = 0;
 
-      virtual void set_perc(const NumArray *, const NumArray *, const NumArray *) = 0;
-
-      virtual void set_perc(const NumArray *, const NumArray *, const NumArray *,
-                            const SingleThresh *, const SingleThresh *) = 0;
+      virtual void set_perc(const NumArray *, const NumArray *,
+                            const NumArray *, const NumArray *,
+                            const SingleThresh *fthr = 0,
+                            const SingleThresh *othr = 0) = 0;
 
       virtual void multiply_by(const double) = 0;
 
@@ -186,8 +194,7 @@ class Or_Node : public ThreshNode {
       Or_Node();
      ~Or_Node();
 
-      bool check(double) const;
-      bool check(double, double, double) const;
+      bool check(double, const ClimoPntInfo *cpi = 0) const;
 
       ThreshNode * copy() const;
 
@@ -199,14 +206,14 @@ class Or_Node : public ThreshNode {
 
       double pvalue() const;
 
-      double climo_prob() const;
+      double obs_climo_prob() const;
 
       bool need_perc() const;
 
-      void set_perc(const NumArray *, const NumArray *, const NumArray *);
-
-      void set_perc(const NumArray *, const NumArray *, const NumArray *,
-                    const SingleThresh *, const SingleThresh *);
+      void set_perc(const NumArray *, const NumArray *,
+                    const NumArray *, const NumArray *,
+                    const SingleThresh *fthr = 0,
+                    const SingleThresh *othr = 0);
 
       void multiply_by(const double);
 
@@ -237,8 +244,7 @@ class And_Node : public ThreshNode {
       And_Node();
      ~And_Node();
 
-      bool check(double) const;
-      bool check(double, double, double) const;
+      bool check(double, const ClimoPntInfo *cpi = 0) const;
 
       ThreshType type() const;
 
@@ -248,14 +254,14 @@ class And_Node : public ThreshNode {
 
       double pvalue() const;
 
-      double climo_prob() const;
+      double obs_climo_prob() const;
 
       bool need_perc() const;
 
-      void set_perc(const NumArray *, const NumArray *, const NumArray *);
-
-      void set_perc(const NumArray *, const NumArray *, const NumArray *,
-                    const SingleThresh *, const SingleThresh *);
+      void set_perc(const NumArray *, const NumArray *,
+                    const NumArray *, const NumArray *,
+                    const SingleThresh *fthr = 0,
+                    const SingleThresh *othr = 0);
 
       void multiply_by(const double);
 
@@ -288,8 +294,7 @@ class Not_Node : public ThreshNode {
       Not_Node();
      ~Not_Node();
 
-      bool check(double) const;
-      bool check(double, double, double) const;
+      bool check(double, const ClimoPntInfo *cpi = 0) const;
 
       ThreshType type() const;
 
@@ -299,14 +304,14 @@ class Not_Node : public ThreshNode {
 
       double pvalue() const;
 
-      double climo_prob() const;
+      double obs_climo_prob() const;
 
       bool need_perc() const;
 
-      void set_perc(const NumArray *, const NumArray *, const NumArray *);
-
-      void set_perc(const NumArray *, const NumArray *, const NumArray *,
-                    const SingleThresh *, const SingleThresh *);
+      void set_perc(const NumArray *, const NumArray *,
+                    const NumArray *, const NumArray *,
+                    const SingleThresh *fthr = 0,
+                    const SingleThresh *othr = 0);
 
       void multiply_by(const double);
 
@@ -354,10 +359,10 @@ class Simple_Node : public ThreshNode {
 
       void set_na();
 
-      void set_perc(const NumArray *, const NumArray *, const NumArray *);
-
-      void set_perc(const NumArray *, const NumArray *, const NumArray *,
-                    const SingleThresh *, const SingleThresh *);
+      void set_perc(const NumArray *, const NumArray *,
+                    const NumArray *, const NumArray *,
+                    const SingleThresh *fthr = 0,
+                    const SingleThresh *othr = 0);
 
          //
          //  get stuff
@@ -371,7 +376,7 @@ class Simple_Node : public ThreshNode {
 
       double pvalue() const;
 
-      double climo_prob() const;
+      double obs_climo_prob() const;
 
       bool need_perc() const;
 
@@ -383,8 +388,7 @@ class Simple_Node : public ThreshNode {
 
       ThreshNode * copy() const;
 
-      bool check(double) const;
-      bool check(double, double, double) const;
+      bool check(double, const ClimoPntInfo *cpi = 0) const;
 
       void multiply_by(const double);
 
@@ -435,9 +439,10 @@ class SingleThresh {
       void           set(const char *);
 
       bool           need_perc() const;
-      void           set_perc(const NumArray *, const NumArray *, const NumArray *);
-      void           set_perc(const NumArray *, const NumArray *, const NumArray *,
-                              const SingleThresh *, const SingleThresh *);
+      void           set_perc(const NumArray *, const NumArray *,
+                              const NumArray *, const NumArray *,
+                              const SingleThresh *fthr = 0,
+                              const SingleThresh *othr = 0);
 
       void           set_na();
 
@@ -445,7 +450,7 @@ class SingleThresh {
       double         get_value() const;
       PercThreshType get_ptype() const;
       double         get_pvalue() const;
-      double         get_climo_prob() const;
+      double         get_obs_climo_prob() const;
       void           get_simple_nodes(std::vector<Simple_Node> &) const;
 
       void           multiply_by(const double);
@@ -453,8 +458,7 @@ class SingleThresh {
       ConcatString   get_str(int precision = thresh_default_precision) const;
       ConcatString   get_abbr_str(int precision = thresh_default_precision) const;
 
-      bool           check(double) const;
-      bool           check(double, double, double) const;
+      bool           check(double, const ClimoPntInfo *cpi = 0) const;
 
 };
 
@@ -462,11 +466,11 @@ class SingleThresh {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType     SingleThresh::get_type()       const { return ( node ? node->type()       : thresh_na           ); }
-inline double         SingleThresh::get_value()      const { return ( node ? node->value()      : bad_data_double     ); }
-inline PercThreshType SingleThresh::get_ptype()      const { return ( node ? node->ptype()      : no_perc_thresh_type ); }
-inline double         SingleThresh::get_pvalue()     const { return ( node ? node->pvalue()     : bad_data_double     ); }
-inline double         SingleThresh::get_climo_prob() const { return ( node ? node->climo_prob() : bad_data_double     ); }
+inline ThreshType     SingleThresh::get_type()           const { return ( node ? node->type()           : thresh_na           ); }
+inline double         SingleThresh::get_value()          const { return ( node ? node->value()          : bad_data_double     ); }
+inline PercThreshType SingleThresh::get_ptype()          const { return ( node ? node->ptype()          : no_perc_thresh_type ); }
+inline double         SingleThresh::get_pvalue()         const { return ( node ? node->pvalue()         : bad_data_double     ); }
+inline double         SingleThresh::get_obs_climo_prob() const { return ( node ? node->obs_climo_prob() : bad_data_double     ); }
 
 ////////////////////////////////////////////////////////////////////////
 

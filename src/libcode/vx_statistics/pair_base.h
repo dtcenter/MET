@@ -170,21 +170,19 @@ class PairBase {
 
       bool add_point_obs(const char *, double, double, double, double,
                          unixtime, double, double, double, const char *,
-                         double, double, double, double, double);
+                         const ClimoPntInfo &, double);
 
       void set_point_obs(int, const char *, double, double, double, double,
                          unixtime, double, double, double,
-                         const char *, double, double, double, double, double);
+                         const char *, const ClimoPntInfo &, double);
 
-      void add_grid_obs(double, double, double,
-                        double, double, double);
+      void add_grid_obs(double, const ClimoPntInfo &, double);
       
-      void add_grid_obs(double, double, double, double,
-                        double, double, double, double);
+      void add_grid_obs(double, double, double, const ClimoPntInfo &, double);
 
-      void add_climo(double, double, double, double, double);
+      void add_climo(double, const ClimoPntInfo &);
 
-      void set_climo(int, double, double, double, double, double);
+      void set_climo(int, double, const ClimoPntInfo &);
 
       void compute_climo_cdf();
 
@@ -396,13 +394,12 @@ class VxPairBase {
       bool is_keeper_climo(const char *, int, int, int,
                            const Grid &gr, double, double,
                            double, double, double,
-                           double &, double &, double &, double &);
+                           ClimoPntInfo &);
       bool is_keeper_fcst(const char *, int, int, int,
-                          const char *,
-                          const Grid &gr, double, double, double,
+                          const char *, const Grid &gr,
                           double, double, double,
-                          double, double, double, double,
-                          double &);
+                          double, double, double,
+                          const ClimoPntInfo &, double &);
 
       // Member functions for incrementing the counts
       void inc_count(std::vector<int> &, int);
@@ -421,7 +418,7 @@ extern void find_vert_lvl(const DataPlaneArray &, const double,
 
 extern double compute_interp(const DataPlaneArray &dpa,
                              const double obs_x, const double obs_y,
-                             const double obs_v, const double cmn, const double csd,
+                             const double obs_v, const ClimoPntInfo *cpi,
                              const InterpMthd method, const int width,
                              const GridTemplateFactory::GridTemplates shape,
                              const bool wrap_lon,

@@ -1875,10 +1875,9 @@ void STATAnalysisJob::set_perc_thresh(const NumArray &f_na,
    //
    // Compute percentiles
    //
-   // TODO: MET #2924
-   out_fcst_thresh.set_perc(&f_sort, &o_sort, &ocmn_sort,
+   out_fcst_thresh.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort,
                             &out_fcst_thresh, &out_obs_thresh);
-    out_obs_thresh.set_perc(&f_sort, &o_sort, &ocmn_sort,
+    out_obs_thresh.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort,
                             &out_fcst_thresh, &out_obs_thresh);
 
    return;

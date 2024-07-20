@@ -1683,15 +1683,14 @@ void process_grid_scores(int i_vx,
             !mask_mp.s_is_on(x, y)) continue;
 
          // Get current climatology values
-         double fcmn = (fcmn_flag ? fcmn_dp(x, y) : bad_data_double);
-         double fcsd = (fcsd_flag ? fcsd_dp(x, y) : bad_data_double);
-         double ocmn = (ocmn_flag ? ocmn_dp(x, y) : bad_data_double);
-         double ocsd = (ocsd_flag ? ocsd_dp(x, y) : bad_data_double);
+         ClimoPntInfo cpi(
+            (fcmn_flag ? fcmn_dp(x, y) : bad_data_double),
+            (fcsd_flag ? fcsd_dp(x, y) : bad_data_double),
+            (ocmn_flag ? ocmn_dp(x, y) : bad_data_double),
+            (ocsd_flag ? ocsd_dp(x, y) : bad_data_double));
 
          // Add the observation point
-         pd.add_grid_obs(x, y, oraw_dp(x, y),
-                         fcmn, fcsd, ocmn, ocsd,
-                         wgt_dp(x, y));
+         pd.add_grid_obs(x, y, oraw_dp(x, y), cpi, wgt_dp(x, y));
 
          // Get the observation error entry pointer
          if(oerr_ptr) {
@@ -2309,23 +2308,22 @@ void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
          // Initialize counts
          n_vld = n_evt = 0;
 
+         // Store climo data
+         ClimoPntInfo cpi(pd_ens.fcmn_na[i_obs], pd_ens.fcsd_na[i_obs],
+                          pd_ens.ocmn_na[i_obs], pd_ens.ocsd_na[i_obs]);
+
          // Derive the ensemble probability
          for(i_ens=0; i_ens<pd_ens.n_ens; i_ens++) {
             if(!is_bad_data(pd_ens.e_na[i_ens][i_obs])) {
                n_vld++;
-               // TODO: MET #2924
-               if(vx_opt.fcat_ta[i_thr].check(pd_ens.e_na[i_ens][i_obs],
-                                              pd_ens.ocmn_na[i_obs],
-                                              pd_ens.ocsd_na[i_obs])) n_evt++;
+               if(vx_opt.fcat_ta[i_thr].check(pd_ens.e_na[i_ens][i_obs], &cpi)) n_evt++;
             }
          } // end for i_ens
 
          // Store the probability if enough valid data is present
          if(n_vld > 0 || (double) (n_vld/pd_ens.n_ens) >= conf_info.vld_data_thresh) {
             pd_pnt.add_grid_pair((double) n_evt/n_vld, pd_ens.o_na[i_obs],
-                                 pd_ens.fcmn_na[i_obs], pd_ens.fcsd_na[i_obs],
-                                 pd_ens.ocmn_na[i_obs], pd_ens.ocsd_na[i_obs],
-                                 pd_ens.wgt_na[i_obs]);
+                                 cpi, pd_ens.wgt_na[i_obs]);
          }
 
       } // end for i_obs
@@ -2377,18 +2375,19 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
    int n_vld, n_evt, n_bin;
    PCTInfo *pct_info = (PCTInfo *) nullptr;
    PairDataPoint pd_pnt, pd;
-   ThreshArray cdp_thresh;
+   ThreshArray ocdp_thresh;
 
    // Derive a PairDataPoint object from the PairDataEnsemble input
    pd_pnt.extend(pd_ens.n_obs);
 
    // Derive the climo distribution percentile thresholds
-   cdp_thresh = derive_cdp_thresh(vx_opt.cdf_info.cdf_ta);
-   n_bin      = cdp_thresh.n();
+   ocdp_thresh = derive_ocdp_thresh(vx_opt.cdf_info.cdf_ta);
+   n_bin       = ocdp_thresh.n();
 
    mlog << Debug(2)
-        << "Computing Probabilistic Statistics for " << cdp_thresh.n()
-        << " climatological distribution percentile thresholds.\n";
+        << "Computing Probabilistic Statistics for "
+        << ocdp_thresh.n() << " observation climatological "
+        << "distribution percentile thresholds.\n";
 
    // Allocate memory
    pct_info = new PCTInfo [n_bin];
@@ -2398,7 +2397,7 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
 
       // Set the header columns
       shc.set_fcst_thresh(vx_opt.fpct_ta);
-      shc.set_obs_thresh(cdp_thresh[i_bin]);
+      shc.set_obs_thresh(ocdp_thresh[i_bin]);
 
       // Re-initialize
       pd_pnt.erase();
@@ -2410,23 +2409,22 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
          // Initialize counts
          n_vld = n_evt = 0;
 
+         // Store climo data
+         ClimoPntInfo cpi(pd_ens.fcmn_na[i_obs], pd_ens.fcsd_na[i_obs],
+                          pd_ens.ocmn_na[i_obs], pd_ens.ocsd_na[i_obs]);
+
          // Derive the ensemble probability
          for(i_ens=0; i_ens<pd_ens.n_ens; i_ens++) {
             if(!is_bad_data(pd_ens.e_na[i_ens][i_obs])) {
                n_vld++;
-               // TODO: MET #2924
-               if(cdp_thresh[i_bin].check(pd_ens.e_na[i_ens][i_obs],
-                                          pd_ens.ocmn_na[i_obs],
-                                          pd_ens.ocsd_na[i_obs])) n_evt++;
+               if(ocdp_thresh[i_bin].check(pd_ens.e_na[i_ens][i_obs], &cpi)) n_evt++;
             }
          } // end for i_ens
 
          // Store the probability if enough valid data is present
          if(n_vld > 0 || (double) (n_vld/pd_ens.n_ens) >= conf_info.vld_data_thresh) {
             pd_pnt.add_grid_pair((double) n_evt/n_vld, pd_ens.o_na[i_obs],
-                                 pd_ens.fcmn_na[i_obs], pd_ens.fcsd_na[i_obs],
-                                 pd_ens.ocmn_na[i_obs], pd_ens.ocsd_na[i_obs],
-                                 pd_ens.wgt_na[i_obs]);
+                                 cpi, pd_ens.wgt_na[i_obs]);
          }
 
       } // end for i_obs
@@ -2436,7 +2434,7 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
 
       // Store thresholds
       pct_info[i_bin].fthresh = vx_opt.fpct_ta;
-      pct_info[i_bin].othresh = cdp_thresh[i_bin];
+      pct_info[i_bin].othresh = ocdp_thresh[i_bin];
       pct_info[i_bin].allocate_n_alpha(vx_opt.get_n_ci_alpha());
 
       for(i=0; i<vx_opt.get_n_ci_alpha(); i++) {
@@ -2461,7 +2459,7 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
 
 void write_pct_info(const EnsembleStatVxOpt &vx_opt,
                     const PCTInfo *pct_info, int n_bin,
-                    bool cdp_thresh) {
+                    bool ocdp_thresh) {
 
    // Write output for each bin
    for(int i_bin=0; i_bin<n_bin; i_bin++) {
@@ -2519,13 +2517,13 @@ void write_pct_info(const EnsembleStatVxOpt &vx_opt,
       PCTInfo pct_mean;
 
       // For non-CDP thresholds, sum the total counts
-      compute_pct_mean(pct_info, n_bin, pct_mean, !cdp_thresh);
+      compute_pct_mean(pct_info, n_bin, pct_mean, !ocdp_thresh);
 
-      // For CDP thresholds, reset the OBS_THRESH column to ==1/n_bin
+      // For OCDP thresholds, reset the OBS_THRESH column to ==1/n_bin
       // to indicate the number of climatological bins used
-      if(cdp_thresh) {
+      if(ocdp_thresh) {
          pct_mean.othresh.set((double) 100.0/vx_opt.cdf_info.n_bin,
-                              thresh_eq, perc_thresh_climo_dist);
+                              thresh_eq, perc_thresh_obs_climo_dist);
       }
 
       // Write out PSTD

@@ -1031,10 +1031,9 @@ void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
    // Compute percentiles, passing the observation filtering
    // thresholds in for the fcst and obs slots.
    //
-   // TODO: MET #2924
-   othr_ta.set_perc(&f_sort, &o_sort, &ocmn_sort, &othr_ta, &othr_ta);
-   fcat_ta.set_perc(&f_sort, &o_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
-   ocat_ta.set_perc(&f_sort, &o_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
+   othr_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &othr_ta, &othr_ta);
+   fcat_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
+   ocat_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
 
    return;
 }

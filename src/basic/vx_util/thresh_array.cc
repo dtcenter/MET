@@ -386,34 +386,29 @@ void ThreshArray::check_bin_thresh() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ThreshArray::check_bins(double v) const {
-   return check_bins(v, bad_data_double, bad_data_double);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int ThreshArray::check_bins(double v, double mn, double sd) const {
+int ThreshArray::check_bins(double v, ClimoPntInfo *cpi) const {
    int i, bin;
 
    // Check for bad data or no thresholds
    if(is_bad_data(v) || Nelements == 0) return bad_data_int;
 
-   // For < and <=, check thresholds left to right.
-   if(t[0].get_type() == thresh_lt || t[0].get_type() == thresh_le) {
+   // For < and <=, check thresholds left to right
+   if(t[0].get_type() == thresh_lt ||
+      t[0].get_type() == thresh_le) {
 
       for(i=0, bin=-1; i<Nelements; i++) {
-         if(t[i].check(v, mn, sd)) {
+         if(t[i].check(v, cpi)) {
             bin = i;
             break;
          }
       }
       if(bin == -1) bin = Nelements;
    }
-   // For > and >=, check thresholds right to left.
+   // For > and >=, check thresholds right to left
    else {
 
       for(i=Nelements-1, bin=-1; i>=0; i--) {
-         if(t[i].check(v, mn, sd)) {
+         if(t[i].check(v, cpi)) {
             bin = i+1;
             break;
          }
@@ -421,26 +416,20 @@ int ThreshArray::check_bins(double v, double mn, double sd) const {
       if(bin == -1) bin = 0;
    }
 
-   // The bin value returned is 1-based, not 0-based.
+   // The bin value returned is 1-based, not 0-based
 
    return bin;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ThreshArray::check_dbl(double v) const {
-   return check_dbl(v, bad_data_double, bad_data_double);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool ThreshArray::check_dbl(double v, double mn, double sd) const {
+bool ThreshArray::check_dbl(double v, ClimoPntInfo *cpi) const {
    int i;
 
    //
    // Check if the value satisifes all the thresholds in the array
    //
-   for(i=0; i<Nelements; i++) if(!t[i].check(v, mn, sd)) return false;
+   for(i=0; i<Nelements; i++) if(!t[i].check(v, cpi)) return false;
 
    return true;
 }
@@ -463,12 +452,12 @@ bool ThreshArray::need_perc() {
 ////////////////////////////////////////////////////////////////////////
 
 void ThreshArray::set_perc(const NumArray *fptr, const NumArray *optr,
-                           const NumArray *cptr) {
+                           const NumArray *fcptr, const NumArray *ocptr) {
 
    if(Nelements == 0) return;
 
    for(int i=0; i<Nelements; i++) {
-      t[i].set_perc(fptr, optr, cptr);
+      t[i].set_perc(fptr, optr, fcptr, ocptr);
    }
 
    return;
@@ -477,7 +466,8 @@ void ThreshArray::set_perc(const NumArray *fptr, const NumArray *optr,
 ////////////////////////////////////////////////////////////////////////
 
 void ThreshArray::set_perc(const NumArray *fptr, const NumArray *optr,
-                           const NumArray *cptr, const ThreshArray *farr,
+                           const NumArray *fcptr, const NumArray *ocptr,
+                           const ThreshArray *farr,
                            const ThreshArray *oarr) {
 
    if(Nelements == 0) return;
@@ -496,8 +486,9 @@ void ThreshArray::set_perc(const NumArray *fptr, const NumArray *optr,
    }
 
    for(int i=0; i<Nelements; i++) {
-      t[i].set_perc(fptr, optr, cptr,
-                    &(farr->thresh()[i]), &(oarr->thresh()[i]));
+      t[i].set_perc(fptr, optr, fcptr, ocptr,
+                    &(farr->thresh()[i]),
+                    &(oarr->thresh()[i]));
    }
 
    return;
@@ -755,11 +746,13 @@ ThreshArray process_perc_thresh_bins(const ThreshArray &ta_in) {
    for(i=0; i<ta_in.n(); i++) {
 
       // Pass through non-equality thresholds thresholds to the output
-      if(ta_in[i].get_type()   != thresh_eq                || 
-         (ta_in[i].get_ptype() != perc_thresh_sample_fcst  &&
-          ta_in[i].get_ptype() != perc_thresh_sample_obs   &&
-          ta_in[i].get_ptype() != perc_thresh_sample_climo &&
-          ta_in[i].get_ptype() != perc_thresh_climo_dist)) {
+      if(ta_in[i].get_type()   != thresh_eq                     ||
+         (ta_in[i].get_ptype() != perc_thresh_sample_fcst       &&
+          ta_in[i].get_ptype() != perc_thresh_sample_obs        &&
+          ta_in[i].get_ptype() != perc_thresh_sample_fcst_climo &&
+          ta_in[i].get_ptype() != perc_thresh_sample_obs_climo  &&
+          ta_in[i].get_ptype() != perc_thresh_fcst_climo_dist   &&
+          ta_in[i].get_ptype() != perc_thresh_obs_climo_dist)) {
          ta_out.add(ta_in[i]);
       }
       // Expand single threshold to bins which span 0 to 100.
@@ -810,11 +803,11 @@ ThreshArray process_rps_cdp_thresh(const ThreshArray &ta) {
    SingleThresh st;
    ThreshArray ta_out;
 
-   // Check for evenly-spaced CDP thresholds
+   // Check for evenly-spaced OCDP thresholds
    for(int i=0; i<ta.n(); i++) {
 
-      // Check for the CDP threshold type
-      if(ta[i].get_ptype() != perc_thresh_climo_dist) {
+      // Check for the OCDP threshold type
+      if(ta[i].get_ptype() != perc_thresh_obs_climo_dist) {
          status = false;
          break;
       }
@@ -832,7 +825,7 @@ ThreshArray process_rps_cdp_thresh(const ThreshArray &ta) {
    }
 
    if(status) {
-      st.set(step, thresh_eq, perc_thresh_climo_dist);
+      st.set(step, thresh_eq, perc_thresh_obs_climo_dist);
       ta_out.add(st);
    }
    else {
@@ -844,7 +837,7 @@ ThreshArray process_rps_cdp_thresh(const ThreshArray &ta) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ThreshArray derive_cdp_thresh(const ThreshArray &ta) {
+ThreshArray derive_ocdp_thresh(const ThreshArray &ta) {
    SingleThresh st;
    ThreshArray ta_out;
 
@@ -854,8 +847,9 @@ ThreshArray derive_cdp_thresh(const ThreshArray &ta) {
       if(is_eq(ta[i].get_value(), 0.0) ||
          is_eq(ta[i].get_value(), 1.0)) continue;
 
-      // Add CDP thresholds
-      st.set(ta[i].get_value()*100.0, ta[i].get_type(), perc_thresh_climo_dist);
+      // Add OCDP thresholds
+      st.set(ta[i].get_value()*100.0, ta[i].get_type(),
+             perc_thresh_obs_climo_dist);
 
       ta_out.add(st);
    }

@@ -372,15 +372,14 @@ int PairBase::has_obs_rec(const char *sid, double lat, double lon,
 ////////////////////////////////////////////////////////////////////////
 
 void PairBase::add_climo(double obs,
-                         double fcmn, double fcsd,
-                         double ocmn, double ocsd) {
+                         const ClimoPntInfo &cpi) {
 
    // Compute and store the climatology information
-   fcmn_na.add(fcmn);
-   fcsd_na.add(fcsd);
-   ocmn_na.add(ocmn);
-   ocsd_na.add(ocsd);
-   ocdf_na.add(normal_cdf(obs, ocmn, ocsd));
+   fcmn_na.add(cpi.fcmn);
+   fcsd_na.add(cpi.fcsd);
+   ocmn_na.add(cpi.ocmn);
+   ocsd_na.add(cpi.ocsd);
+   ocdf_na.add(normal_cdf(obs, cpi.ocmn, cpi.ocsd));
 
    return;
 }
@@ -388,15 +387,14 @@ void PairBase::add_climo(double obs,
 ////////////////////////////////////////////////////////////////////////
 
 void PairBase::set_climo(int i_obs, double obs,
-                         double fcmn, double fcsd,
-                         double ocmn, double ocsd) {
+                         const ClimoPntInfo &cpi) {
 
    // Compute and store the climatology information
-   fcmn_na.set(i_obs, fcmn);
-   fcsd_na.set(i_obs, fcsd);
-   ocmn_na.set(i_obs, ocmn);
-   ocsd_na.set(i_obs, ocsd);
-   ocdf_na.set(i_obs, normal_cdf(obs, ocmn, ocsd));
+   fcmn_na.set(i_obs, cpi.fcmn);
+   fcsd_na.set(i_obs, cpi.fcsd);
+   ocmn_na.set(i_obs, cpi.ocmn);
+   ocsd_na.set(i_obs, cpi.ocsd);
+   ocdf_na.set(i_obs, normal_cdf(obs, cpi.ocmn, cpi.ocsd));
 
    return;
 }
@@ -433,9 +431,7 @@ bool PairBase::add_point_obs(const char *sid,
                              double lat, double lon, double x, double y,
                              unixtime ut, double lvl, double elv,
                              double o, const char *qc,
-                             double fcmn, double fcsd,
-                             double ocmn, double ocsd,
-                             double wgt) {
+                             const ClimoPntInfo &cpi, double wgt) {
 
    //
    // Set or check the IsPointVx flag
@@ -489,10 +485,10 @@ bool PairBase::add_point_obs(const char *sid,
       val.ut  = fcst_ut;
       val.lvl = lvl;
       val.elv = elv;
-      val.fcmn = fcmn;
-      val.fcsd = fcsd;
-      val.ocmn = ocmn;
-      val.ocsd = ocsd;
+      val.fcmn = cpi.fcmn;
+      val.fcsd = cpi.fcsd;
+      val.ocmn = cpi.ocmn;
+      val.ocsd = cpi.ocsd;
 
       val.obs.push_back(ob_val);
       map_key.add(obs_key.c_str());
@@ -512,7 +508,7 @@ bool PairBase::add_point_obs(const char *sid,
       elv_na.add(elv);
       o_na.add(o);
       o_qc_sa.add(qc);
-      add_climo(o, fcmn, fcsd, ocmn, ocsd);
+      add_climo(o, cpi);
 
       // Increment the number of pairs
       n_obs += 1;
@@ -528,8 +524,7 @@ void PairBase::set_point_obs(int i_obs, const char *sid,
                              double lat, double lon, double x, double y,
                              unixtime ut, double lvl, double elv,
                              double o, const char *qc,
-                             double fcmn, double fcsd,
-                             double ocmn, double ocsd,
+                             const ClimoPntInfo &cpi,
                              double wgt) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
@@ -550,7 +545,7 @@ void PairBase::set_point_obs(int i_obs, const char *sid,
    elv_na.set(i_obs, elv);
    o_na.set(i_obs, o);
    o_qc_sa.set(i_obs, qc);
-   set_climo(i_obs, o, fcmn, fcsd, ocmn, ocsd);
+   set_climo(i_obs, o, cpi);
 
    return;
 }
@@ -767,7 +762,8 @@ void PairBase::calc_obs_summary(){
       elv_na.add    (svt.elv);
       o_na.add      (ob.val);
       o_qc_sa.add   (ob.qc.c_str());
-      add_climo(ob.val, svt.fcmn, svt.fcsd, svt.ocmn, svt.ocsd);
+      ClimoPntInfo cpi(svt.fcmn, svt.fcsd, svt.ocmn, svt.ocsd);
+      add_climo(ob.val, cpi);
 
       // Increment the number of pairs
       n_obs += 1;
@@ -780,8 +776,7 @@ void PairBase::calc_obs_summary(){
 ////////////////////////////////////////////////////////////////////////
 
 void PairBase::add_grid_obs(double o,
-                            double fcmn, double fcsd,
-                            double ocmn, double ocsd,
+                            const ClimoPntInfo &cpi,
                             double wgt) {
 
    //
@@ -798,7 +793,7 @@ void PairBase::add_grid_obs(double o,
 
    o_na.add(o);
    wgt_na.add(wgt);
-   add_climo(o, fcmn, fcsd, ocmn, ocsd);
+   add_climo(o, cpi);
 
    // Increment the number of observations
    n_obs += 1;
@@ -809,11 +804,10 @@ void PairBase::add_grid_obs(double o,
 ////////////////////////////////////////////////////////////////////////
 
 void PairBase::add_grid_obs(double x, double y, double o,
-                            double fcmn, double fcsd,
-                            double ocmn, double ocsd,
+                            const ClimoPntInfo &cpi,
                             double wgt) {
 
-   add_grid_obs(o, fcmn, fcsd, ocmn, ocsd, wgt);
+   add_grid_obs(o, cpi, wgt);
 
    x_na.add(x);
    y_na.add(y);
@@ -1933,7 +1927,7 @@ bool VxPairBase::is_keeper_climo(
         int i_msg_typ, int i_mask, int i_interp,
         const Grid &gr, double obs_x, double obs_y,
         double obs_v, double obs_lvl, double obs_hgt,
-        double &fcmn_v, double &fcsd_v, double &ocmn_v, double &ocsd_v) {
+        ClimoPntInfo &cpi) {
    bool keep = true;
 
    int n = three_to_one(i_msg_typ, i_mask, i_interp);
@@ -1948,24 +1942,22 @@ bool VxPairBase::is_keeper_climo(
    int lvl_blw, lvl_abv;
 
    // Initialize
-   fcmn_v = ocmn_v = bad_data_double;
-   fcsd_v = ocsd_v = bad_data_double;
+   cpi.clear();
 
    // Forecast climatology mean
    if(keep && fcmn_dpa.n_planes() > 0) {
 
       find_vert_lvl(fcmn_dpa, to_lvl, lvl_blw, lvl_abv);
 
-      fcmn_v = compute_interp(fcmn_dpa, obs_x, obs_y, obs_v,
-                  bad_data_double, bad_data_double,
-                  pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                  pb_ptr[n]->interp_shape, gr.wrap_lon(),
-                  interp_thresh, spfh_flag,
-                  fcst_info->level().type(),
-                  to_lvl, lvl_blw, lvl_abv);
+      cpi.fcmn = compute_interp(fcmn_dpa, obs_x, obs_y, obs_v, nullptr,
+                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
+                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    interp_thresh, spfh_flag,
+                    fcst_info->level().type(),
+                    to_lvl, lvl_blw, lvl_abv);
 
       // Check for bad data
-      if(is_bad_data(fcmn_v)) {
+      if(is_bad_data(cpi.fcmn)) {
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
@@ -1985,16 +1977,15 @@ bool VxPairBase::is_keeper_climo(
 
       find_vert_lvl(ocmn_dpa, to_lvl, lvl_blw, lvl_abv);
 
-      ocmn_v = compute_interp(ocmn_dpa, obs_x, obs_y, obs_v,
-                  bad_data_double, bad_data_double,
-                  pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                  pb_ptr[n]->interp_shape, gr.wrap_lon(),
-                  interp_thresh, spfh_flag,
-                  fcst_info->level().type(),
-                  to_lvl, lvl_blw, lvl_abv);
+      cpi.ocmn = compute_interp(ocmn_dpa, obs_x, obs_y, obs_v, nullptr,
+                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
+                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    interp_thresh, spfh_flag,
+                    fcst_info->level().type(),
+                    to_lvl, lvl_blw, lvl_abv);
 
       // Check for bad data
-      if(is_bad_data(ocmn_v)) {
+      if(is_bad_data(cpi.ocmn)) {
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
@@ -2027,16 +2018,15 @@ bool VxPairBase::is_keeper_climo(
 
       find_vert_lvl(fcsd_dpa, to_lvl, lvl_blw, lvl_abv);
 
-      fcsd_v = compute_interp(fcsd_dpa, obs_x, obs_y, obs_v,
-                  bad_data_double, bad_data_double,
-                  pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                  pb_ptr[n]->interp_shape, gr.wrap_lon(),
-                  interp_thresh, spfh_flag,
-                  fcst_info->level().type(),
-                  to_lvl, lvl_blw, lvl_abv);
+      cpi.fcsd = compute_interp(fcsd_dpa, obs_x, obs_y, obs_v, nullptr,
+                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
+                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    interp_thresh, spfh_flag,
+                    fcst_info->level().type(),
+                    to_lvl, lvl_blw, lvl_abv);
 
       // Check for bad data
-      if(is_bad_data(fcsd_v)) {
+      if(is_bad_data(cpi.fcsd)) {
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
@@ -2056,16 +2046,15 @@ bool VxPairBase::is_keeper_climo(
 
       find_vert_lvl(ocsd_dpa, to_lvl, lvl_blw, lvl_abv);
 
-      ocsd_v = compute_interp(ocsd_dpa, obs_x, obs_y, obs_v,
-                  bad_data_double, bad_data_double,
-                  pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                  pb_ptr[n]->interp_shape, gr.wrap_lon(),
-                  interp_thresh, spfh_flag,
-                  fcst_info->level().type(),
-                  to_lvl, lvl_blw, lvl_abv);
+      cpi.ocsd = compute_interp(ocsd_dpa, obs_x, obs_y, obs_v, nullptr,
+                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
+                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    interp_thresh, spfh_flag,
+                    fcst_info->level().type(),
+                    to_lvl, lvl_blw, lvl_abv);
 
       // Check for bad data
-      if(is_bad_data(ocsd_v)) {
+      if(is_bad_data(cpi.ocsd)) {
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
@@ -2088,11 +2077,10 @@ bool VxPairBase::is_keeper_climo(
 bool VxPairBase::is_keeper_fcst(
         const char *pnt_obs_str,
         int i_msg_typ, int i_mask, int i_interp,
-        const char *hdr_typ_str,
-        const Grid &gr, double obs_x, double obs_y, double hdr_elv,
+        const char *hdr_typ_str, const Grid &gr,
+        double obs_x, double obs_y, double hdr_elv,
         double obs_v, double obs_lvl, double obs_hgt,
-        double fcmn_v, double fcsd_v, double ocmn_v, double ocsd_v,
-        double &fcst_v) {
+        const ClimoPntInfo &cpi, double &fcst_v) {
    bool keep = true;
 
    int n = three_to_one(i_msg_typ, i_mask, i_interp);
@@ -2132,9 +2120,7 @@ bool VxPairBase::is_keeper_fcst(
 
       find_vert_lvl(fcst_dpa, to_lvl, lvl_blw, lvl_abv);
 
-// TODO: update compute-interp to use both climos
-      fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v,
-                  fcmn_v, fcsd_v,
+      fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v, &cpi,
                   pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
                   pb_ptr[n]->interp_shape, gr.wrap_lon(),
                   interp_thresh, spfh_flag,
@@ -2260,11 +2246,9 @@ void find_vert_lvl(const DataPlaneArray &dpa, const double obs_lvl,
 
 ////////////////////////////////////////////////////////////////////////
 
-// TODO: MET #2924
-
 double compute_interp(const DataPlaneArray &dpa,
                       const double obs_x, const double obs_y,
-                      const double obs_v, const double cmn, const double csd,
+                      const double obs_v, const ClimoPntInfo *cpi,
                       const InterpMthd method, const int width,
                       const GridTemplateFactory::GridTemplates shape,
                       const bool wrap_lon,
@@ -2277,7 +2261,7 @@ double compute_interp(const DataPlaneArray &dpa,
    // Check for no data
    if(dpa.n_planes() == 0) return bad_data_double;
 
-   v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v, cmn, csd,
+   v_blw = compute_horz_interp(dpa[i_blw], obs_x, obs_y, obs_v, cpi,
                                method, width, shape, wrap_lon,
                                thresh, cat_thresh);
 
@@ -2285,7 +2269,7 @@ double compute_interp(const DataPlaneArray &dpa,
       v = v_blw;
    }
    else {
-      v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v, cmn, csd,
+      v_abv = compute_horz_interp(dpa[i_abv], obs_x, obs_y, obs_v, cpi,
                                   method, width, shape, wrap_lon,
                                   thresh, cat_thresh);
 
@@ -2469,7 +2453,7 @@ NumArray derive_climo_prob(const ClimoCDFInfo *cdf_info_ptr,
    n_sd = sd_na.n_valid();
 
    // Check for constant climo probability
-   if(!is_bad_data(prob = othresh.get_climo_prob())) {
+   if(!is_bad_data(prob = othresh.get_obs_climo_prob())) {
 
       mlog << Debug(4)
            << "For threshold " << othresh.get_str()

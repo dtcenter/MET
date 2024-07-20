@@ -84,7 +84,7 @@ extern double   interp_gaussian  (const DataPlane &, const DataPlane &, double o
 extern double   interp_geog_match(const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double obs_v, const MaskPlane *mp = 0);
 
 extern double   interp_nbrhd   (const DataPlane &, const GridTemplate &gt, int x, int y, double t, const SingleThresh *,
-                                double cmn, double csd, const MaskPlane *mp = 0);
+                                const ClimoPntInfo *, const MaskPlane *mp = 0);
 extern double   interp_bilin   (const DataPlane &, bool wrap_lon, double obs_x, double obs_y, const MaskPlane *mp = 0);
 extern double   interp_xy      (const DataPlane &, bool wrap_lon, int x, int y, const MaskPlane *mp = 0);
 
@@ -119,7 +119,7 @@ extern double compute_horz_interp(const DataPlane &dp,
 
 extern double compute_horz_interp(const DataPlane &dp,
                                   double obs_x, double obs_y,
-                                  double obs_v, double cmn, double csd,
+                                  double obs_v, const ClimoPntInfo *,
                                   const InterpMthd mthd, const int width,
                                   const GridTemplateFactory::GridTemplates shape,
                                   bool wrap_lon, double interp_thresh,

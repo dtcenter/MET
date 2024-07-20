@@ -704,7 +704,7 @@ double interp_geog_match(const DataPlane &dp, const GridTemplate &gt,
 ////////////////////////////////////////////////////////////////////////
 
 double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
-                    double t, const SingleThresh *st, double cmn, double csd,
+                    double t, const SingleThresh *st, ClimoPntInfo *cpi,
                     const MaskPlane *mp) {
    int count, count_thr;
 
@@ -723,7 +723,7 @@ double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
       if(is_bad_data(data)) continue;
 
       count++;
-      if(st->check(data, cmn, csd)) count_thr++;
+      if(st->check(data, cpi)) count_thr++;
    }
 
    // Check whether enough valid grid points were found
@@ -1099,8 +1099,8 @@ double compute_horz_interp(const DataPlane &dp,
                            const GridTemplateFactory::GridTemplates shape,
                            bool wrap_lon, double interp_thresh,
                            const SingleThresh *cat_thresh) {
-   return compute_horz_interp(dp, obs_x, obs_y, obs_v, bad_data_double,
-             bad_data_double, mthd, width, shape, wrap_lon,
+   return compute_horz_interp(dp, obs_x, obs_y, obs_v, nullptr,
+             mthd, width, shape, wrap_lon,
              interp_thresh, cat_thresh);
 }
 
@@ -1108,7 +1108,7 @@ double compute_horz_interp(const DataPlane &dp,
 
 double compute_horz_interp(const DataPlane &dp,
                            double obs_x, double obs_y,
-                           double obs_v, double cmn, double csd,
+                           double obs_v, const ClimoPntInfo *cpi,
                            const InterpMthd mthd, const int width,
                            const GridTemplateFactory::GridTemplates shape,
                            bool wrap_lon, double interp_thresh,
@@ -1157,7 +1157,7 @@ double compute_horz_interp(const DataPlane &dp,
 
       case InterpMthd::Nbrhd:       // Neighborhood fractional coverage
          v = interp_nbrhd(dp, *gt, x, y,
-                          interp_thresh, cat_thresh, cmn, csd);
+                          interp_thresh, cat_thresh, cpi);
          break;
 
       case InterpMthd::Bilin:       // Bilinear interpolation

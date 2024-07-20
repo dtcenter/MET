@@ -58,19 +58,17 @@ class PairDataPoint : public PairBase {
 
       bool add_point_pair(const char *, double, double, double, double,
                           unixtime, double, double, double, double,
-                          const char *, double, double, double,
-                          double, double);
+                          const char *, const ClimoPntInfo &, double);
       void load_seeps_climo(const ConcatString &seeps_climo_name);
       void set_seeps_thresh(const SingleThresh &p1_thresh);
       void set_seeps_score(SeepsScore *, int index=-1);
 
       void set_point_pair(int, const char *, double, double, double, double,
                           unixtime, double, double, double, double,
-                          const char *, double, double, double, double,
+                          const char *, const ClimoPntInfo &,
                           double, SeepsScore *);
 
-      bool add_grid_pair(double, double, double, double,
-                         double, double, double);
+      bool add_grid_pair(double, double, const ClimoPntInfo &, double);
 
       bool add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
                          const NumArray &fcmn_in, const NumArray &fcsd_in,
@@ -134,15 +132,15 @@ class VxPairDataPoint : public VxPairBase {
 //
 ////////////////////////////////////////////////////////////////////////
 
-extern bool check_fo_thresh(double, double, double, double,
+extern bool check_fo_thresh(double, double, const ClimoPntInfo &,
                         const SingleThresh &, const SingleThresh &,
                         const SetLogic);
 
-extern bool check_mpr_thresh(double, double, double, double,
+extern bool check_mpr_thresh(double, double, const ClimoPntInfo &,
                         const StringArray &, const ThreshArray &,
                         ConcatString * = 0);
 
-extern double get_mpr_column_value(double, double, double, double,
+extern double get_mpr_column_value(double, double, const ClimoPntInfo &,
                         const char *);
 
 extern void apply_mpr_thresh_mask(DataPlane &, DataPlane &,

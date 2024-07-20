@@ -888,7 +888,9 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
    // Loop over the pairs
    for(i=0; i<n_obs; i++) {
 
-      // TODO: MET#2924
+      // Store climo data
+      ClimoPntInfo cpi(fcmn_na[i], fcsd_na[i], ocmn_na[i], ocsd_na[i]);
+
       // Check for bad data and apply observation threshold
       if(is_bad_data(o_na[i])                   ||
          skip_ba[i]                             ||
@@ -897,7 +899,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
          (ocmn_flag && is_bad_data(ocmn_na[i])) ||
          (ocsd_flag && is_bad_data(ocsd_na[i])) ||
          (wgt_flag && is_bad_data(wgt_na[i]))   ||
-         !ot.check(o_na[i], ocmn_na[i], ocsd_na[i])) continue;
+         !ot.check(o_na[i], &cpi)) continue;
 
       // Add data for the current observation but only include data
       // required for ensemble output line types.
@@ -1312,11 +1314,10 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
          for(int i_interp=0; i_interp<n_interp; i_interp++) {
 
             // Check climatology values
-            double fcmn_v, ocmn_v;
-            double fcsd_v, ocsd_v;
+            ClimoPntInfo cpi;
             if(!is_keeper_climo(pnt_obs_str.c_str(), i_msg_typ, i_mask, i_interp,
                                 gr, obs_x, obs_y, obs_v, obs_lvl, obs_hgt,
-                                fcmn_v, fcsd_v, ocmn_v, ocsd_v)) return;
+                                cpi)) return;
 
             // Compute weight for current point
             double wgt_v = (wgt_dp == (DataPlane *) 0 ?
@@ -1325,11 +1326,10 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
 
             // Add the observation value
             // Weight is from the nearest grid point
-            // TODO: Pass fcst climo to add_point_pair
             int n = three_to_one(i_msg_typ, i_mask, i_interp);
             if(!pd[n].add_point_obs(hdr_sid_str, hdr_lat, hdr_lon,
                   obs_x, obs_y, hdr_ut, obs_lvl, obs_hgt,
-                  obs_v, obs_qty, fcmn_v, fcsd_v, ocmn_v, ocsd_v, wgt_v)) {
+                  obs_v, obs_qty, cpi, wgt_v)) {
 
                if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                   mlog << Debug(REJECT_DEBUG_LEVEL)
@@ -1422,10 +1422,11 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
          }
          // Otherwise, get a single interpolated ensemble value
          else {
-            // TODO: MET #2924
+            ClimoPntInfo cpi(it->fcmn_na[i_obs], it->fcsd_na[i_obs],
+                             it->ocmn_na[i_obs], it->ocsd_na[i_obs]);
+
             fcst_na.add(compute_interp(fcst_dpa,
-               it->x_na[i_obs], it->y_na[i_obs], it->o_na[i_obs],
-               it->ocmn_na[i_obs], it->ocsd_na[i_obs],
+               it->x_na[i_obs], it->y_na[i_obs], it->o_na[i_obs], &cpi,
                it->interp_mthd, it->interp_wdth, it->interp_shape,
                gr.wrap_lon(), interp_thresh, spfh_flag,
                fcst_info->level().type(),

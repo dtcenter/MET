@@ -327,19 +327,12 @@ void CTSInfo::allocate_n_alpha(int i) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void CTSInfo::add(double f, double o) {
-   add(f, o, bad_data_double, bad_data_double);
-   return;
-}
+void CTSInfo::add(double f, double o, ClimoPntInfo *cpi) {
 
-////////////////////////////////////////////////////////////////////////
-
-void CTSInfo::add(double f, double o, double cmn, double csd) {
-
-   if     ( fthresh.check(f, cmn, csd) &&  othresh.check(o, cmn, csd)) cts.inc_fy_oy();
-   else if( fthresh.check(f, cmn, csd) && !othresh.check(o, cmn, csd)) cts.inc_fy_on();
-   else if(!fthresh.check(f, cmn, csd) &&  othresh.check(o, cmn, csd)) cts.inc_fn_oy();
-   else if(!fthresh.check(f, cmn, csd) && !othresh.check(o, cmn, csd)) cts.inc_fn_on();
+   if     ( fthresh.check(f, cpi) &&  othresh.check(o, cpi)) cts.inc_fy_oy();
+   else if( fthresh.check(f, cpi) && !othresh.check(o, cpi)) cts.inc_fy_on();
+   else if(!fthresh.check(f, cpi) &&  othresh.check(o, cpi)) cts.inc_fn_oy();
+   else if(!fthresh.check(f, cpi) && !othresh.check(o, cpi)) cts.inc_fn_on();
 
    return;
 }
@@ -613,19 +606,12 @@ void MCTSInfo::set_othresh(const ThreshArray &ta) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void MCTSInfo::add(double f, double o) {
-   add(f, o, bad_data_double, bad_data_double);
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void MCTSInfo::add(double f, double o, double cmn, double csd) {
+void MCTSInfo::add(double f, double o, ClimoPntInfo *cpi) {
    int r, c;
 
    // Find the row and column for the forecast and observation values.
-   r = fthresh.check_bins(f, cmn, csd);
-   c = othresh.check_bins(o, cmn, csd);
+   r = fthresh.check_bins(f, cpi);
+   c = othresh.check_bins(o, cpi);
 
    // Increment the corresponding contingency table entry.
    cts.inc_entry(r, c);

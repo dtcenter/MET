@@ -589,8 +589,9 @@ void compute_ctsinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       // Add this pair to the contingency table
       //
-      // TODO: MET#2924
-      cts_info.add(pd.f_na[j], pd.o_na[j], pd.ocmn_na[j], pd.ocsd_na[j]);
+      ClimoPntInfo cpi(pd.fcmn_na[j], pd.fcsd_na[j],
+                       pd.ocmn_na[j], pd.ocsd_na[j]);
+      cts_info.add(pd.f_na[j], pd.o_na[j], &cpi);
 
    } // end for i
 
@@ -687,8 +688,9 @@ void compute_mctsinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       // Add this pair to the contingency table
       //
-      // TODO: MET#2924
-      mcts_info.add(pd.f_na[j], pd.o_na[j], pd.ocmn_na[j], pd.ocsd_na[j]);
+      ClimoPntInfo cpi(pd.fcmn_na[j], pd.fcsd_na[j],
+                       pd.ocmn_na[j], pd.ocsd_na[j]);
+      mcts_info.add(pd.f_na[j], pd.o_na[j], &cpi);
 
    } // end for i
 
@@ -802,10 +804,15 @@ void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
    for(i=0; i<n_pair; i++) {
 
       //
+      // Store climatology point data
+      //
+      ClimoPntInfo cpi(pd.fcmn_na[i], pd.fcsd_na[i],
+                       pd.ocmn_na[i], pd.ocsd_na[i]);
+
+      //
       // Check the observation thresholds and increment accordingly
       //
-      // TODO: MET#2924
-      if(pct_info.othresh.check(pd.o_na[i], pd.ocmn_na[i], pd.ocsd_na[i])) {
+      if(pct_info.othresh.check(pd.o_na[i], &cpi)) {
          pct_info.pct.inc_event(pd.f_na[i]);
          if(cmn_flag) pct_info.climo_pct.inc_event(climo_prob[i]);
       }
