@@ -1081,7 +1081,8 @@ void apply_data_mask(DataPlane &dp) {
       for(int i=0; i<nxy; i++) {
          if(!is_bad_data(dp.data()[i])) d.add(dp.data()[i]);
       }
-      thresh.set_perc(&d, &d, &d);
+      d.sort_array();
+      thresh.set_perc(&d, &d, &d, &d);
    }
 
    // For each grid point, apply the data threshold
