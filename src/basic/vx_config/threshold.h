@@ -96,10 +96,12 @@ static const PercThreshInfo perc_thresh_info [] = {
    { perc_thresh_user_specified,    "USP",    3,  "USER_SPECIFIED_PERC"    },
    { perc_thresh_sample_fcst,       "SFP",    3,  "SAMPLE_FCST_PERC"       },
    { perc_thresh_sample_obs,        "SOP",    3,  "SAMPLE_OBS_PERC"        },
-   { perc_thresh_sample_fcst_climo, "SFCP",   3,  "SAMPLE_FCST_CLIMO_PERC" },
-   { perc_thresh_sample_obs_climo,  "SOCP",   3,  "SAMPLE_OBS_CLIMO_PERC"  },
-   { perc_thresh_fcst_climo_dist,   "FCDP",   3,  "CLIMO_FCST_DIST_PERC"   },
-   { perc_thresh_obs_climo_dist,    "OCDP",   3,  "CLIMO_OBS_DIST_PERC"    },
+   { perc_thresh_sample_fcst_climo, "SFCP",   4,  "SAMPLE_FCST_CLIMO_PERC" },
+   { perc_thresh_sample_obs_climo,  "SOCP",   4,  "SAMPLE_OBS_CLIMO_PERC"  },
+   { perc_thresh_sample_obs_climo,  "SCP",    3,  "SAMPLE_OBS_CLIMO_PERC"  },
+   { perc_thresh_fcst_climo_dist,   "FCDP",   4,  "CLIMO_FCST_DIST_PERC"   },
+   { perc_thresh_obs_climo_dist,    "OCDP",   4,  "CLIMO_OBS_DIST_PERC"    },
+   { perc_thresh_obs_climo_dist,    "CDP",    3,  "CLIMO_OBS_DIST_PERC"    },
    { perc_thresh_freq_bias,         "FBIAS",  5,  "FREQ_BIAS_PERC"         },
 
 };
@@ -123,6 +125,7 @@ struct ClimoPntInfo {
    ClimoPntInfo() { clear(); }
    ClimoPntInfo(double a, double b, double c, double d) :
                 fcmn(a), fcsd(b), ocmn(c), ocsd(d) {}
+   void set(double a, double b, double c, double d) { fcmn = a; fcsd = b; ocmn = c; ocsd = d; }
    void clear() { fcmn = fcsd = ocmn = ocsd = bad_data_double; }
 
    double fcmn;

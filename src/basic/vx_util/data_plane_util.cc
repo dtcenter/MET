@@ -220,7 +220,6 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
    double v;
    double bad = bad_data_double;
    bool use_climo = false;
-   ClimoPntInfo *cpi_ptr = nullptr;
 
    // Check that width is set to 1 or greater
    if(width < 1) {
@@ -273,10 +272,10 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
       }
    }
 
-#pragma omp parallel default(none)                       \
-   shared(mlog, dp, frac_dp, shape, width, wrap_lon, t)  \
-   shared(use_climo, fcmn, fcsd, ocmn, ocsd, vld_t, bad) \
-   private(x, y, n_vld, n_thr, gp, v, cpi_ptr)
+#pragma omp parallel default(none)                      \
+   shared(mlog, dp, frac_dp, shape, width, wrap_lon, t) \
+   shared(use_climo, fcmn, fcsd, ocmn, ocsd, vld_t, bad)\
+   private(x, y, n_vld, n_thr, gp, v)
    {
 
      // Build the grid template
@@ -301,18 +300,6 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
      for(x=0; x<dp.nx(); x++) {
         for(y=0; y<dp.ny(); y++) {
 
-           // Prepare climo data
-           if(use_climo) {
-              ClimoPntInfo cpi(fcmn->get(gp->x, gp->y),
-                               fcsd->get(gp->x, gp->y),
-                               ocmn->get(gp->x, gp->y),
-                               ocsd->get(gp->x, gp->y));
-              cpi_ptr = &cpi;
-           }
-           else {
-              cpi_ptr = nullptr;
-           }
-
            // For a new column, reset the grid template and counts.
            if(y == 0) {
 
@@ -325,7 +312,14 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                   gp  = gt->getNextInGrid()) {
                  if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                  n_vld++;
-                 if(t.check(v, cpi_ptr)) n_thr++;
+                 ClimoPntInfo cpi;
+                 if(use_climo) {
+                    cpi.set(fcmn->get(gp->x, gp->y),
+                            fcsd->get(gp->x, gp->y),
+                            ocmn->get(gp->x, gp->y),
+                            ocsd->get(gp->x, gp->y));
+                 }
+                 if(t.check(v, &cpi)) n_thr++;
               }
            }
            // Subtract off the bottom edge, shift up, and add the top.
@@ -337,7 +331,14 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                   gp  = gt->getNextInBotEdge()) {
                  if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                  n_vld--;
-                 if(t.check(v, cpi_ptr)) n_thr--;
+                 ClimoPntInfo cpi;
+                 if(use_climo) {
+                    cpi.set(fcmn->get(gp->x, gp->y),
+                            fcsd->get(gp->x, gp->y),
+                            ocmn->get(gp->x, gp->y),
+                            ocsd->get(gp->x, gp->y));
+                 }
+                 if(t.check(v, &cpi)) n_thr--;
               }
 
               // Increment Y
@@ -349,7 +350,14 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                   gp  = gt->getNextInTopEdge()) {
                  if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                  n_vld++;
-                 if(t.check(v, cpi_ptr)) n_thr++;
+                 ClimoPntInfo cpi;
+                 if(use_climo) {
+                    cpi.set(fcmn->get(gp->x, gp->y),
+                            fcsd->get(gp->x, gp->y),
+                            ocmn->get(gp->x, gp->y),
+                            ocsd->get(gp->x, gp->y));
+                 }
+                 if(t.check(v, &cpi)) n_thr++;
               }
            }
 
