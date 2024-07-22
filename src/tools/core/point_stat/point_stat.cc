@@ -1901,7 +1901,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
              is_bad_data(pd_ptr->ocmn_na[j]))) continue;
 
          // Store climo data
-	 ClimoPntInfo cpi(pd_ptr->fcmn_na[j], pd_ptr->fcsd_na[j],
+         ClimoPntInfo cpi(pd_ptr->fcmn_na[j], pd_ptr->fcsd_na[j],
                           pd_ptr->ocmn_na[j], pd_ptr->ocsd_na[j]);
 
          // Store the observation value

@@ -1770,7 +1770,7 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Append the unit vectors with no climatological values
          //
-	 ClimoPntInfo cpi;
+         ClimoPntInfo cpi;
          m[key].pd_u.add_grid_pair(uf, uo, cpi, default_grid_weight);
          m[key].pd_v.add_grid_pair(vf, vo, cpi, default_grid_weight);
 

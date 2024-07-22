@@ -24,7 +24,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -50,7 +49,6 @@
 
 using namespace std;
 using namespace netCDF;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -431,9 +429,9 @@ void setup_histograms(void) {
       bin_max.clear();
       bin_mid.clear();
       for(int k=0; k<n_bins; k++) {
-	      bin_min.push_back(min + delta * k);
-	      bin_max.push_back(min + delta * (k + 1));
-	      bin_mid.push_back(min + delta * (k + 0.5));
+         bin_min.push_back(min + delta * k);
+         bin_max.push_back(min + delta * (k + 1));
+         bin_mid.push_back(min + delta * (k + 0.5));
       }
 
       bin_mins[i_var_str] = bin_min;
@@ -443,17 +441,17 @@ void setup_histograms(void) {
 
       // Initialize histograms
       mlog << Debug(2)
-	      << "Initializing " << data_info->magic_str_attr()
-	      << " histogram with " << n_bins << " bins from "
-	      << min << " to " << max << ".\n";
-      
+           << "Initializing " << data_info->magic_str_attr()
+           << " histogram with " << n_bins << " bins from "
+           << min << " to " << max << ".\n";
+
       histograms[i_var_str] = vector<long long>();
       init_pdf(n_bins, histograms[i_var_str]);
 
       // Keep track of unique output variable names
       if(nc_var_sa.has( data_info->magic_str_attr() )) unique_variable_names = false;
       nc_var_sa.add(data_info->magic_str_attr());
-      
+
    } // for i_var
 }
 
@@ -462,7 +460,7 @@ void setup_histograms(void) {
 void setup_joint_histograms(void) {
    ConcatString i_var_str, j_var_str, ij_var_str;
 
-	for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
       i_var_str << cs_erase << "VAR" << i_var+1;
 
@@ -472,7 +470,7 @@ void setup_joint_histograms(void) {
       for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
 
          j_var_str << cs_erase << "VAR" << j_var+1;
-   
+
          VarInfo *joint_info = conf_info.data_info[j_var];
          int n_joint_bins = joint_info->n_bins();
 
@@ -487,7 +485,7 @@ void setup_joint_histograms(void) {
          init_joint_pdf(n_bins, n_joint_bins,
                         joint_histograms[ij_var_str]);
       } // end  for j_var
-	} // end for i_var
+   } // end for i_var
 }
 
 ////////////////////////////////////////////////////////////////////////

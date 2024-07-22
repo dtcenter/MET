@@ -2680,7 +2680,7 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
 
    // Add the variable attributes
    add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.ens_info->get_var_info(),
-		     &nc_var, false, dp,
+                     &nc_var, false, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data
@@ -2743,7 +2743,7 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
 
    // Add the variable attributes
    add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.ens_info->get_var_info(),
-		     &nc_var, true, dp,
+                     &nc_var, true, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data

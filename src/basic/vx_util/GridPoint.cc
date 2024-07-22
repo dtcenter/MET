@@ -1,4 +1,4 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+/// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
@@ -64,7 +64,6 @@ GridPoint::~GridPoint(void)
 
 void GridPoint::rotate(const double angle)
 {
-	//const double M_PI = 3.14159265358979323846;
   double angle_rad = angle * M_PI / 180.0;
   double cosa = cos(angle_rad);
   double sina = sin(angle_rad);

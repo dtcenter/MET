@@ -190,7 +190,7 @@ void Polyline::extend_points(int n) {
 
       if(!u || !v) {
          mlog << Error << "\nPolyline::extend_points(int) -> "
-	      << "memory allocation error 1" << "\n\n";
+              << "memory allocation error 1" << "\n\n";
 
          exit(1);
       }
@@ -303,7 +303,7 @@ double Polyline::angle() const {
 
    if(n_points < 3) {
       mlog << Error << "\nPolyline::angle() -> "
-	   << "not enough points!\n\n";
+           << "not enough points!\n\n";
 
       exit(1);
    }

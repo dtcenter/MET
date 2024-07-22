@@ -1385,9 +1385,9 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
    if(logic != SetLogic::None) {
       mlog << Debug(3)
            << "Mask " << setlogic_to_string(logic)
-	   << (logic == SetLogic::Intersection ? ":\t" : ":\t\t")
+           << (logic == SetLogic::Intersection ? ":\t" : ":\t\t")
            << n_in << " of " << grid.nx() * grid.ny()
-	   << " points inside\n";
+           << " points inside\n";
    }
 
    return dp;
