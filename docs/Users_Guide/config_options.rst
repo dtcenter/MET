@@ -99,7 +99,8 @@ The configuration file language supports the following data types:
 
     * "SOCP" for a percentile of the sample observation climatology values.
       e.g. ">SOCP90" means greater than the 90-th observation climatology
-      percentile.
+      percentile. For backward compatibility, the "SCP" threshold type
+      is processed the same as "SOCP".
       
     * "USP" for a user-specified percentile threshold.
       e.g. "<USP90(2.5)" means less than the 90-th percentile values which
@@ -128,6 +129,8 @@ The configuration file language supports the following data types:
       The "OCDP" threshold logic matches the "FCDP" logic described above.
       However these thresholds are defined using the observation climatological
       mean and standard deviation rather than the forecast climatological data.
+      For backward compatibility, the "CDP" threshold type is processed the
+      same as "OCDP". 
 
   * When percentile thresholds of type SFP, SOP, SFCP, SOCP, FCDP, or OCDP are
     requested for continuous filtering thresholds (cnt_thresh), wind speed
@@ -152,9 +155,9 @@ The configuration file language supports the following data types:
 
   * Prior to MET version 12.0.0, forecast climatological inputs were not
     supported. The observation climatological inputs were used to process
-    threshold types named SCP and CDP. For backward compatibility, any
-    instances of SCP and CDP threshold types will automatically be replaced
-    with SOCP and OCDP threshold types, respectively.
+    threshold types named "SCP" and "CDP". For backward compatibility, the 
+    "SCP" threshold type is processed the same as "SOCP", and the "CDP"
+    threshold type is processed the same as "OCDP".
      
   * When parsing FCST_THRESH and OBS_THRESH columns, the Stat-Analysis tool
     ignores the actual percentile values listed in parentheses.
@@ -3772,7 +3775,7 @@ obs_prepbufr_map
 Default mapping for PREPBUFR. Replace input BUFR variable names with GRIB
 abbreviations in the output. This default map is appended to obs_bufr_map.
 This should not typically be overridden. This default mapping provides
-backward-compatibility for earlier versions of MET which wrote GRIB
+backward compatibility for earlier versions of MET which wrote GRIB
 abbreviations to the output.
 
 .. code-block:: none
