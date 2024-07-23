@@ -47,7 +47,7 @@ class PairDataPoint : public PairBase {
       // Forecast values
       NumArray f_na; // Forecast [n_obs]
       std::vector<SeepsScore *> seeps_mpr;
-      SeepsAggScore seeps;
+      SeepsAggScore seeps_agg;
 
       //////////////////////////////////////////////////////////////////
 

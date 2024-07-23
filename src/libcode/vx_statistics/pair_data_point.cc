@@ -69,8 +69,6 @@ PairDataPoint & PairDataPoint::operator=(const PairDataPoint &pd) {
 
 void PairDataPoint::init_from_scratch() {
 
-   seeps_mpr.clear();
-   seeps.clear();
    seeps_climo = nullptr;
 
    clear();
@@ -86,10 +84,13 @@ void PairDataPoint::clear() {
 
    f_na.clear();
    for (int idx=0; idx<seeps_mpr.size(); idx++) {
-      if (seeps_mpr[idx]) delete seeps_mpr[idx];
+      if (seeps_mpr[idx]) {
+         delete seeps_mpr[idx];
+         seeps_mpr[idx] = nullptr;
+      }
    }
    seeps_mpr.clear();
-   seeps.clear();
+   seeps_agg.clear();
 
    return;
 }
@@ -102,8 +103,10 @@ void PairDataPoint::erase() {
 
    f_na.erase();
    for (int idx=0; idx<seeps_mpr.size(); idx++) {
-      if (seeps_mpr[idx]) delete seeps_mpr[idx];
-      seeps_mpr[idx] = nullptr;
+      if (seeps_mpr[idx]) {
+         delete seeps_mpr[idx];
+         seeps_mpr[idx] = nullptr;
+      }
    }
 
    return;
@@ -116,7 +119,9 @@ void PairDataPoint::extend(int n) {
    PairBase::extend(n);
 
    f_na.extend(n);
-   for (int idx=seeps_mpr.size(); idx<n; idx++) seeps_mpr.push_back(nullptr);
+   for (int idx=seeps_mpr.size(); idx<n; idx++) {
+      seeps_mpr.push_back(nullptr);
+   }
 
    return;
 }
@@ -178,10 +183,10 @@ bool PairDataPoint::add_point_pair(const char *sid, double lat, double lon,
                                    const ClimoPntInfo &cpi, double wgt) {
 
    if(!add_point_obs(sid, lat, lon, x, y, ut, lvl, elv, o, qc,
-          cpi, wgt)) return false;
+                     cpi, wgt)) return false;
 
    f_na.add(f);
-   seeps_mpr.push_back((SeepsScore *)nullptr);
+   seeps_mpr.push_back(nullptr);
 
    return true;
 }
@@ -550,7 +555,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    }
 
    bool has_seeps = false;
-   SeepsScore *seeps = 0;
+   SeepsScore *seeps = nullptr;
 
    // When verifying a vertical level forecast against a surface message
    // type, set the observation level value to bad data so that it's not
@@ -638,12 +643,14 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             }
 
             // Compute seeps
-            seeps = 0;
             if (precip_flag && precip_interval == 24*60*60) {  // 24 hour precip only
                seeps = pd[n].compute_seeps(hdr_sid_str, fcst_v, obs_v, hdr_ut);
             }
+            else {
+               seeps = nullptr;
+            }
             pd[n].set_seeps_score(seeps);
-            if (seeps) delete seeps;
+            if (seeps) { delete seeps; seeps = nullptr; }
 
             if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                mlog << Debug(REJECT_DEBUG_LEVEL)
