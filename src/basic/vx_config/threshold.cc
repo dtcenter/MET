@@ -52,6 +52,33 @@ return ( t == thresh_le || t == thresh_ge || t == thresh_eq );
 ////////////////////////////////////////////////////////////////////////
 
 
+bool is_climo_dist_type(PercThreshType t)
+
+{
+
+return ( t == perc_thresh_climo_dist      ||
+         t == perc_thresh_fcst_climo_dist ||
+         t == perc_thresh_obs_climo_dist );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_obs_climo_dist_type(PercThreshType t)
+
+{
+
+return ( t == perc_thresh_climo_dist      ||
+         t == perc_thresh_obs_climo_dist );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
    //
    //  Code for class ThreshNode
    //
@@ -718,8 +745,7 @@ double tval;
    //  check climo distribution percentile thresholds
    //
 
-if ( Ptype == perc_thresh_fcst_climo_dist ||
-     Ptype == perc_thresh_obs_climo_dist ) {
+if ( is_climo_dist_type(Ptype) ) {
 
    //
    //  check the pointer
@@ -1147,7 +1173,7 @@ double Simple_Node::obs_climo_prob() const
    
 double prob = bad_data_double;
 
-if ( Ptype == perc_thresh_obs_climo_dist )  {
+if ( is_obs_climo_dist_type(Ptype) ) {
 
    // Observation climo probability varies based on the threshold type
    switch ( op )  {

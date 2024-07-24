@@ -82,6 +82,8 @@ enum PercThreshType {
 
 static const int n_perc_thresh_type = 9;
 
+extern bool is_climo_dist_type(PercThreshType);
+extern bool is_obs_climo_dist_type(PercThreshType);
 
 struct PercThreshInfo {
 
@@ -92,6 +94,9 @@ struct PercThreshInfo {
 
 };
 
+   //
+   // One entry for each PercThreshType enumerated value, in order
+   //
 
 static const PercThreshInfo perc_thresh_info [] = {
 

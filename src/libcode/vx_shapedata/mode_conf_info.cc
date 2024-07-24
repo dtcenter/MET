@@ -1802,11 +1802,10 @@ PercThreshType ModeConfInfo::perctype(const Mode_Field_Info &f)  const
            << "for multivariate mode\n\n";
       exit ( 1 );
    }
-   if (pm == perc_thresh_fcst_climo_dist || pm == perc_thresh_obs_climo_dist ||
-       pc == perc_thresh_fcst_climo_dist || pc == perc_thresh_obs_climo_dist) {
+   if (is_climo_dist_type(pm) || is_climo_dist_type(pc)) {
       mlog << Error << "\nModeConfInfo::perctype()\n"
-              << "  Thresholding with 'FCDP' or 'OCDP' in an input not implemented "
-              << "for multivariate mode\n\n";
+              << "  Thresholding with 'CDP', 'FCDP', or 'OCDP' in an "
+              << "input not implemented for multivariate mode\n\n";
       exit ( 1 );
    }
    if (pm == perc_thresh_freq_bias ||

@@ -1252,9 +1252,9 @@ void process_scores() {
                            i, mthd, pnts,
                            conf_info.vx_opt[i].interp_info.field);
                }
-               else if(it->ptype() == perc_thresh_obs_climo_dist &&
-                  !is_eq(it->pvalue(), 0.0) &&
-                  !is_eq(it->pvalue(), 100.0)) {
+               else if(is_obs_climo_dist_type(it->ptype()) &&
+                       !is_eq(it->pvalue(), 0.0) &&
+                       !is_eq(it->pvalue(), 100.0)) {
                   cs << cs_erase << "OBS_CLIMO_CDP" << nint(it->pvalue());
                   write_nc(cs, normal_cdf_inv(it->pvalue()/100.0, ocmn_dp, ocsd_dp),
                            i, mthd, pnts,
@@ -1264,9 +1264,9 @@ void process_scores() {
          }
 
          // Write out the fields of requested SEEPS
-         if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType::None
-               && conf_info.vx_opt[i].fcst_info->is_precipitation()
-               && conf_info.vx_opt[i].obs_info->is_precipitation()) {
+         if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType::None &&
+            conf_info.vx_opt[i].fcst_info->is_precipitation() &&
+            conf_info.vx_opt[i].obs_info->is_precipitation()) {
             SeepsAggScore seeps_agg;
             int month, day, year, hour, minute, second;
 

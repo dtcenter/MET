@@ -1044,9 +1044,9 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
             write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
                                 "Forecast climatology distribution percentile");
          }
-         else if(it->ptype() == perc_thresh_obs_climo_dist &&
-            !is_eq(it->pvalue(), 0.0) &&
-            !is_eq(it->pvalue(), 100.0)) {
+         else if(is_obs_climo_dist_type(it->ptype()) &&
+                 !is_eq(it->pvalue(), 0.0) &&
+                 !is_eq(it->pvalue(), 100.0)) {
             snprintf(type_str, sizeof(type_str), "CLIMO_OCDP%i",
                      nint(it->pvalue()));
             cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
