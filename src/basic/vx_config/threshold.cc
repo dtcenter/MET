@@ -731,6 +731,8 @@ if ( Ptype == perc_thresh_fcst_climo_dist ||
            << "climatological distribution percentile threshold type requested "
            << "with no ClimoPntInfo provided!\n\n";
 
+      exit ( 1 );
+
    }
 
    double cmn = (Ptype == perc_thresh_fcst_climo_dist ? cpi->fcmn : cpi->ocmn);
