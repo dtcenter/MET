@@ -68,11 +68,13 @@ enum PercThreshType {
    perc_thresh_user_specified    = 0,
    perc_thresh_sample_fcst       = 1,
    perc_thresh_sample_obs        = 2,
-   perc_thresh_sample_fcst_climo = 3,
-   perc_thresh_sample_obs_climo  = 4,
-   perc_thresh_fcst_climo_dist   = 5,
-   perc_thresh_obs_climo_dist    = 6,
-   perc_thresh_freq_bias         = 7,
+   perc_thresh_sample_climo      = 3, // Same as perc_thresh_sample_obs_climo
+   perc_thresh_sample_fcst_climo = 4,
+   perc_thresh_sample_obs_climo  = 5,
+   perc_thresh_climo_dist        = 6, // Same as perc_thresh_obs_climo_dist
+   perc_thresh_fcst_climo_dist   = 7,
+   perc_thresh_obs_climo_dist    = 8,
+   perc_thresh_freq_bias         = 9,
 
    no_perc_thresh_type = -1
 
@@ -96,12 +98,12 @@ static const PercThreshInfo perc_thresh_info [] = {
    { perc_thresh_user_specified,    "USP",    3,  "USER_SPECIFIED_PERC"    },
    { perc_thresh_sample_fcst,       "SFP",    3,  "SAMPLE_FCST_PERC"       },
    { perc_thresh_sample_obs,        "SOP",    3,  "SAMPLE_OBS_PERC"        },
+   { perc_thresh_sample_climo,      "SCP",    3,  "SAMPLE_OBS_CLIMO_PERC"  },
    { perc_thresh_sample_fcst_climo, "SFCP",   4,  "SAMPLE_FCST_CLIMO_PERC" },
    { perc_thresh_sample_obs_climo,  "SOCP",   4,  "SAMPLE_OBS_CLIMO_PERC"  },
-   { perc_thresh_sample_obs_climo,  "SCP",    3,  "SAMPLE_OBS_CLIMO_PERC"  },
+   { perc_thresh_climo_dist,        "CDP",    3,  "CLIMO_OBS_DIST_PERC"    },
    { perc_thresh_fcst_climo_dist,   "FCDP",   4,  "CLIMO_FCST_DIST_PERC"   },
    { perc_thresh_obs_climo_dist,    "OCDP",   4,  "CLIMO_OBS_DIST_PERC"    },
-   { perc_thresh_obs_climo_dist,    "CDP",    3,  "CLIMO_OBS_DIST_PERC"    },
    { perc_thresh_freq_bias,         "FBIAS",  5,  "FREQ_BIAS_PERC"         },
 
 };
