@@ -1226,9 +1226,9 @@ void process_scores() {
          }
 
          // Write out the fields of requested climo distribution percentile threshold values
-         if(conf_info.vx_opt[i].nc_info.do_climo_cdp     &&
-            (!fcmn_dp.is_empty() && !fcsd_dp.is_empty()) ||
-            (!ocmn_dp.is_empty() && !ocsd_dp.is_empty())) {
+         if(conf_info.vx_opt[i].nc_info.do_climo_cdp      &&
+            ((!fcmn_dp.is_empty() && !fcsd_dp.is_empty()) ||
+             (!ocmn_dp.is_empty() && !ocsd_dp.is_empty()))) {
 
             // Construct one list of all thresholds
             ThreshArray ta;
