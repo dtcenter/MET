@@ -117,13 +117,13 @@ void MetNcCFDataFile::close() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcCFDataFile::open(const char * _filename, ConcatString attr_grid) {
+bool MetNcCFDataFile::open(const char * _filename) {
 
    close();
 
    _file = new NcCfFile;
 
-   if(!_file->open(_filename, attr_grid)) {
+   if(!_file->open(_filename)) {
       mlog << Error << "\nMetNcCFDataFile::open(const char *) -> "
            << "unable to open NetCDF file \"" << _filename << "\"\n\n";
       close();

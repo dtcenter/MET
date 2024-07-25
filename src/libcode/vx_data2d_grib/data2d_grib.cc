@@ -137,7 +137,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MetGrib1DataFile::open(const char * _filename, ConcatString grid_str)
+bool MetGrib1DataFile::open(const char * _filename)
 
 {
 

@@ -74,7 +74,7 @@ class MetGrib1DataFile : public Met2dDataFile {
          //  do stuff
          //
 
-      bool open(const char * filename, ConcatString grid_str="");
+      bool open(const char * filename);
 
       void close();
 

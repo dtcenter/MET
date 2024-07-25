@@ -82,7 +82,7 @@ void MetNcMetDataFile::close() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcMetDataFile::open(const char * _filename, ConcatString grid_str) {
+bool MetNcMetDataFile::open(const char * _filename) {
 
    close();
 

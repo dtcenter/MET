@@ -145,7 +145,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool MetPythonDataFile::open(const char * cur_command, ConcatString grid_str)
+bool MetPythonDataFile::open(const char * cur_command)
 
 {
 

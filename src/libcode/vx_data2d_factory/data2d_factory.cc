@@ -159,7 +159,7 @@ MetPythonDataFile * p = nullptr;
 
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename, ConcatString attr_grid) {
+Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename) {
    GrdFileType type;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
@@ -179,7 +179,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
    if(mtddf &&
       type != FileType_Python_Numpy &&
       type != FileType_Python_Xarray) {
-      if(!(mtddf->open(filename, attr_grid))) {
+      if(!(mtddf->open(filename))) {
          mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
               << "error opening file \"" << filename << "\"\n\n";
          exit(1);
@@ -191,7 +191,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
 
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename, GrdFileType type, ConcatString attr_grid)
+Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename, GrdFileType type)
 
 {
 
@@ -223,7 +223,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
       if(mtddf &&
          type != FileType_Python_Numpy &&
          type != FileType_Python_Xarray) {
-         if(!(mtddf->open(filename, attr_grid))) {
+         if(!(mtddf->open(filename))) {
             mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
                  << "error opening file \"" << filename << "\"\n\n";
             exit(1);
@@ -235,7 +235,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
    // Otherwise determine the type from the file name
    //
    else {
-      mtddf = new_met_2d_data_file(filename, attr_grid);
+      mtddf = new_met_2d_data_file(filename);
    }
 
    return mtddf;
