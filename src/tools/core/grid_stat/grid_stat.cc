@@ -2858,7 +2858,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
 
          // Append interpolation string for Fourier decomposition
          if(interp_str.nonempty()) {
-            if(strncmp(interp_str.c_str(), "_WV", 3) == 0) var_name << interp_str;
+            if(interp_str.startswith("_WV")) var_name << interp_str;
          }
          long_att  << cs_erase
                    << "Forecast climatology mean for "
@@ -2882,7 +2882,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
 
          // Append interpolation string for Fourier decomposition
          if(interp_str.nonempty()) {
-            if(strncmp(interp_str.c_str(), "_WV", 3) == 0) var_name << interp_str;
+            if(interp_str.startswith("_WV")) var_name << interp_str;
          }
          long_att  << cs_erase
                    << "Observation climatology mean for "
@@ -2908,7 +2908,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          level_att = shc.get_obs_lev();
          units_att = conf_info.vx_opt[i_vx].obs_info->units_attr();
       }
-      else if(strncmp(field_name.c_str(), "FCST_CLIMO_CDP", 14) == 0) {
+      else if(field_name.startswith("FCST_CLIMO_CDP")) {
          var_name  << cs_erase
                    << field_name << "_"
                    << conf_info.vx_opt[i_vx].fcst_info->name_attr() << "_"
@@ -2920,7 +2920,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          level_att = shc.get_fcst_lev();
          units_att = conf_info.vx_opt[i_vx].fcst_info->units_attr();
       }
-      else if(strncmp(field_name.c_str(), "OBS_CLIMO_CDP", 13) == 0) {
+      else if(field_name.startswith("OBS_CLIMO_CDP")) {
          var_name  << cs_erase
                    << field_name << "_"
                    << conf_info.vx_opt[i_vx].obs_info->name_attr() << "_"
@@ -2939,7 +2939,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
 
          // Append interpolation string for Fourier decomposition
          if(interp_str.nonempty()) {
-            if(strncmp(interp_str.c_str(), "_WV", 3) == 0) var_name << interp_str;
+            if(interp_str.startswith("_WV")) var_name << interp_str;
          }
          long_att  << cs_erase
                    << "Climatology mean for "
@@ -2965,7 +2965,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          level_att = shc.get_obs_lev();
          units_att = conf_info.vx_opt[i_vx].obs_info->units_attr();
       }
-      else if(strncmp(field_name.c_str(), "CLIMO_CDP", 13) == 0) {
+      else if(field_name.startswith("CLIMO_CDP")) {
          var_name  << cs_erase
                    << field_name << "_"
                    << conf_info.vx_opt[i_vx].obs_info->name_attr() << "_"
@@ -3032,7 +3032,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          level_att = shc.get_obs_lev();
          units_att = conf_info.vx_opt[i_vx].obs_info->units_attr();
       }
-      else if(strncmp(field_name.c_str(), "SEEPS_MPR", 9) == 0) {
+      else if(field_name.startswith("SEEPS_MPR")) {
          ConcatString seeps_desc;
          var_name  << cs_erase << field_name << "_"
                    << obs_name << var_suffix << "_" << mask_str;
@@ -3040,11 +3040,11 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
             field_type == FieldType::Both) {
             var_name << interp_str;
          }
-         if(strncmp(field_name.c_str(), "SEEPS_MPR_SCORE", 15) == 0)
+         if(field_name.startswith("SEEPS_MPR_SCORE"))
             seeps_desc = "score";
-         else if(strncmp(field_name.c_str(), "SEEPS_MPR_FCAT", 14) == 0)
+         else if(field_name.startswith("SEEPS_MPR_FCAT"))
             seeps_desc = "forecast category";
-         else if(strncmp(field_name.c_str(), "SEEPS_MPR_OCAT", 14) == 0)
+         else if(field_name.startswith("SEEPS_MPR_OCAT"))
             seeps_desc = "observation category";
          long_att << cs_erase
                   << "SEEPS MPR " << seeps_desc << " for "
