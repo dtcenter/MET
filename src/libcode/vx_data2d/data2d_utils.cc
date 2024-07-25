@@ -24,6 +24,54 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+bool build_grid_by_grid_string(const char *grid_str, Grid &grid,
+                               const char *caller_name, bool do_warning) {
+   bool status = false;
+
+   if (nullptr != grid_str && m_strlen(grid_str) > 0) {
+      // Parse as a white-space separated string
+
+      StringArray sa;
+      sa.parse_wsss(grid_str);
+
+      // Search for a named grid
+      if (sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid)) {
+         status = true;
+         mlog << Debug(3) << "Use the grid named \"" << grid_str << "\".\n";
+      }
+      // Parse grid definition
+      else if (sa.n() > 1 && parse_grid_def(sa, grid)) {
+         status = true;
+         mlog << Debug(3) << "Use the grid defined by string \""
+              << grid_str << "\".\n";
+      }
+      else if (do_warning) {
+         mlog << Warning << "\nbuild_grid_by_grid_string() by " << caller_name
+              << " unsupported " << conf_key_set_attr_grid
+              << " definition string (" << grid_str
+              << ")!\n\n";
+      }
+   }
+
+   return status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool build_grid_by_grid_string(ConcatString &grid_str, Grid &grid,
+                               const char *caller_name, bool do_warning) {
+   bool status = false;
+
+   if(grid_str.nonempty()) {
+      status = build_grid_by_grid_string(grid_str.c_str(), grid,
+                                           caller_name, do_warning);
+   }
+
+   return status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
                  DataPlane &wdir2d) {
    int x, y;
