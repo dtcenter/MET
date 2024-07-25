@@ -488,8 +488,10 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    at.set_entry(r, c+17+n_ens, (string)orank_columns[18]);
    at.set_entry(r, c+18+n_ens, (string)orank_columns[19]);
    at.set_entry(r, c+19+n_ens, (string)orank_columns[20]);
+   /* MET #2924 Uncomment this section
    at.set_entry(r, c+20+n_ens, (string)orank_columns[21]);
    at.set_entry(r, c+21+n_ens, (string)orank_columns[22]);
+   */
 
    return;
 }
