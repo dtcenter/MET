@@ -112,6 +112,8 @@ class NcCfFile {
 
       bool getData(const char *, const LongArray &, DataPlane &, NcVarInfo *&) const;
 
+      bool check_or_update_grid(Grid &);
+
       Grid build_grid_from_lat_lon_vars(netCDF::NcVar *lat_var, netCDF::NcVar *lon_var,
                                         const long lat_counts, const long lon_counts);
       NcVarInfo* find_var_name(const char * var_name) const;
@@ -122,6 +124,7 @@ class NcCfFile {
       static const double DELTA_TOLERANCE;
 
       netCDF::NcFile * _ncFile;      //  allocated
+      bool grid_ready;
 
          //
          //  dimensions
