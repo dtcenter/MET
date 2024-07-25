@@ -137,7 +137,7 @@ class Met2dDataFile : public Met2dData {
          //  do stuff
          //
 
-      virtual bool open(const char * filename) = 0;
+      virtual bool open(const char * filename, ConcatString grid_str="") = 0;
 
       virtual void close() = 0;
 
