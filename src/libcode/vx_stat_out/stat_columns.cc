@@ -4124,11 +4124,13 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
    at.set_entry(r, c+12, // Observation Climatological CDF Value
       pd_ptr->ocdf_na[i]);
 
+/* MET #2924 Uncomment this section
    at.set_entry(r, c+13, // Forecast Climatological Mean Value
       pd_ptr->fcmn_na[i]);
 
    at.set_entry(r, c+14, // Forecast Climatological Standard Deviation Value
       pd_ptr->fcsd_na[i]);
+*/
 
    return;
 }
@@ -4585,6 +4587,7 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    at.set_entry(r, c+19+pd_ptr->n_ens,
       pd_ptr->ocsd_na[i]);
 
+/* MET #2924 Uncomment this section
    // Forecast climatology mean values
    at.set_entry(r, c+20+pd_ptr->n_ens,
       pd_ptr->fcmn_na[i]);
@@ -4592,6 +4595,7 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    // Forecast climatology standard deviation values
    at.set_entry(r, c+21+pd_ptr->n_ens,
       pd_ptr->fcsd_na[i]);
+*/
 
    return;
 }
