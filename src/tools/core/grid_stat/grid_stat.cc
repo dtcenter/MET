@@ -788,21 +788,19 @@ void process_scores() {
       }
 
       // Read forecast climatology data
-      // TODO: MET #2924 parse fcst/obs climo info
       fcmn_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                   conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
                    i, fcst_dp.valid(), grid);
       fcsd_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                   conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
                    i, fcst_dp.valid(), grid);
 
       // Read observation climatology data
-      // TODO: MET #2924 parse fcst/obs climo info
       ocmn_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                   conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
                    i, fcst_dp.valid(), grid);
       ocsd_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                   conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
                    i, fcst_dp.valid(), grid);
 
       mlog << Debug(3)
@@ -1068,22 +1066,20 @@ void process_scores() {
                if(!read_data_plane(conf_info.vx_opt[ui].obs_info,
                                    ou_dp, obs_mtddf, obs_file)) continue;
 
-               // TODO: MET #2924
-
                // Read the forecast climatology data for UGRD
                fcmnu_dp = read_climo_data_plane(
-                             conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                             conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
                              ui, fcst_dp.valid(), grid);
                fcsdu_dp = read_climo_data_plane(
-                             conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                             conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
                              ui, fcst_dp.valid(), grid);
 
                // Read the observation climatology data for UGRD
                ocmnu_dp = read_climo_data_plane(
-                             conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                             conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
                              ui, fcst_dp.valid(), grid);
                ocsdu_dp = read_climo_data_plane(
-                             conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                             conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
                              ui, fcst_dp.valid(), grid);
 
                // If requested in the config file, smooth the forecast
@@ -1924,12 +1920,11 @@ void process_scores() {
                                    ou_dp, obs_mtddf, obs_file)) continue;
 
                // Read climatology data for UGRD
-               // TODO: MET #2924
                fcmnu_dp = read_climo_data_plane(
-                             conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                             conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
                              ui, fcst_dp.valid(), grid);
                ocmnu_dp = read_climo_data_plane(
-                             conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                             conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
                              ui, fcst_dp.valid(), grid);
 
                // Apply Fourier decomposition to the U-wind fields

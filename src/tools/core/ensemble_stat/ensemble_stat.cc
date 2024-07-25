@@ -781,22 +781,20 @@ void process_point_vx() {
       conf_info.vx_opt[i].vx_pd.set_beg_ut(beg_ut);
       conf_info.vx_opt[i].vx_pd.set_end_ut(end_ut);
 
-      // TODO: MET #2924
-
       // Read forecast climatology data
       fcmn_dpa = read_climo_data_plane_array(
-                    conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                    conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
                     i, ens_valid_ut, grid);
       fcsd_dpa = read_climo_data_plane_array(
-                   conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                   conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
                    i, ens_valid_ut, grid);
 
       // Read observation climatology data
       ocmn_dpa = read_climo_data_plane_array(
-                    conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                    conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
                     i, ens_valid_ut, grid);
       ocsd_dpa = read_climo_data_plane_array(
-                   conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                   conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
                    i, ens_valid_ut, grid);
 
       mlog << Debug(3)
@@ -1423,22 +1421,20 @@ void process_grid_vx() {
          emn_dp /= (double) n;
       }
 
-      // TODO: MET #2924
-
       // Read forecast climatology data
       fcmn_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                   conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
                    i, ens_valid_ut, grid);
       fcsd_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                   conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
                    i, ens_valid_ut, grid);
 
       // Read observation climatology data
       ocmn_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                   conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
                    i, ens_valid_ut, grid);
       ocsd_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                   conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
                    i, ens_valid_ut, grid);
 
       mlog << Debug(3)

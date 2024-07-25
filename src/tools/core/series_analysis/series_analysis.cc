@@ -738,18 +738,17 @@ void process_scores() {
          }
 
          // Read climatology data for the current series entry
-         // TODO: MET #2924
          fcmn_dp = read_climo_data_plane(
-                      conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                      conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
                       i_fcst, fcst_dp.valid(), grid);
          fcsd_dp = read_climo_data_plane(
-                      conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                      conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
                       i_fcst, fcst_dp.valid(), grid);
          ocmn_dp = read_climo_data_plane(
-                      conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
+                      conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
                       i_fcst, fcst_dp.valid(), grid);
          ocsd_dp = read_climo_data_plane(
-                      conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
+                      conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
                       i_fcst, fcst_dp.valid(), grid);
 
          bool fcmn_flag = (fcmn_dp.nx() == fcst_dp.nx() &&
