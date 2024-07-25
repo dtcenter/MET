@@ -1252,7 +1252,7 @@ void process_scores() {
                            i, mthd, pnts,
                            conf_info.vx_opt[i].interp_info.field);
                }
-               else if(is_obs_climo_dist_type(it->ptype()) &&
+               else if(it->ptype() == perc_thresh_obs_climo_dist &&
                        !is_eq(it->pvalue(), 0.0) &&
                        !is_eq(it->pvalue(), 100.0)) {
                   cs << cs_erase << "OBS_CLIMO_CDP" << nint(it->pvalue());

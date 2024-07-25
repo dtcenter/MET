@@ -749,10 +749,8 @@ ThreshArray process_perc_thresh_bins(const ThreshArray &ta_in) {
       if(ta_in[i].get_type()   != thresh_eq                     ||
          (ta_in[i].get_ptype() != perc_thresh_sample_fcst       &&
           ta_in[i].get_ptype() != perc_thresh_sample_obs        &&
-          ta_in[i].get_ptype() != perc_thresh_sample_climo      &&
           ta_in[i].get_ptype() != perc_thresh_sample_fcst_climo &&
           ta_in[i].get_ptype() != perc_thresh_sample_obs_climo  &&
-          ta_in[i].get_ptype() != perc_thresh_climo_dist        &&
           ta_in[i].get_ptype() != perc_thresh_fcst_climo_dist   &&
           ta_in[i].get_ptype() != perc_thresh_obs_climo_dist)) {
          ta_out.add(ta_in[i]);
@@ -762,7 +760,7 @@ ThreshArray process_perc_thresh_bins(const ThreshArray &ta_in) {
 
          // Store the threshold value
          int pvalue = nint(ta_in[i].get_pvalue());
-         const char *ptype_str = perc_thresh_info[ta_in[i].get_ptype()].short_name;
+         string ptype_str = perc_thresh_info_map.at(ta_in[i].get_ptype()).short_name;
 
          // Threshold value must be between 0 and 100
          if(pvalue <= 0 || pvalue >=100) {
@@ -809,7 +807,7 @@ ThreshArray process_rps_cdp_thresh(const ThreshArray &ta) {
    for(int i=0; i<ta.n(); i++) {
 
       // Check for the OCDP threshold type
-      if(!is_obs_climo_dist_type(ta[i].get_ptype())) {
+      if(ta[i].get_ptype() != perc_thresh_obs_climo_dist) {
          status = false;
          break;
       }

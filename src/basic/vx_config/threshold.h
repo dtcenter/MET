@@ -13,6 +13,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <map>
 #include <vector>
 
 #include "concat_string.h"
@@ -21,7 +22,6 @@
 #include "num_array.h"
 
 ////////////////////////////////////////////////////////////////////////
-
 
    //
    // Enumeration of thresholding operations
@@ -39,7 +39,6 @@ enum ThreshType {
    thresh_complex = -2,
 
    no_thresh_type = -1
-
 };
 
 static const int n_thresh_type = 7;
@@ -55,80 +54,54 @@ static const char thresh_default_sep[]     = ",";
 
 extern bool is_inclusive(ThreshType);
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
    //
    // Enumeration of percentile threshold types
    //
 
 enum PercThreshType {
-
    perc_thresh_user_specified    = 0,
    perc_thresh_sample_fcst       = 1,
    perc_thresh_sample_obs        = 2,
-   perc_thresh_sample_climo      = 3, // Same as perc_thresh_sample_obs_climo
-   perc_thresh_sample_fcst_climo = 4,
-   perc_thresh_sample_obs_climo  = 5,
-   perc_thresh_climo_dist        = 6, // Same as perc_thresh_obs_climo_dist
-   perc_thresh_fcst_climo_dist   = 7,
-   perc_thresh_obs_climo_dist    = 8,
-   perc_thresh_freq_bias         = 9,
+   perc_thresh_sample_fcst_climo = 3,
+   perc_thresh_sample_obs_climo  = 4,
+   perc_thresh_fcst_climo_dist   = 5,
+   perc_thresh_obs_climo_dist    = 6,
+   perc_thresh_freq_bias         = 7,
 
    no_perc_thresh_type = -1
-
 };
-
-static const int n_perc_thresh_type = 9;
 
 extern bool is_climo_dist_type(PercThreshType);
-extern bool is_obs_climo_dist_type(PercThreshType);
 
 struct PercThreshInfo {
-
-   const PercThreshType type;
-   const char * const short_name;
-   const int short_name_length;
-   const char * const long_name;
-
+   const std::string short_name;
+   const std::string long_name;
 };
 
-   //
-   // One entry for each PercThreshType enumerated value, in order
-   //
-
-static const PercThreshInfo perc_thresh_info [] = {
-
-   { perc_thresh_user_specified,    "USP",    3,  "USER_SPECIFIED_PERC"    },
-   { perc_thresh_sample_fcst,       "SFP",    3,  "SAMPLE_FCST_PERC"       },
-   { perc_thresh_sample_obs,        "SOP",    3,  "SAMPLE_OBS_PERC"        },
-   { perc_thresh_sample_climo,      "SCP",    3,  "SAMPLE_OBS_CLIMO_PERC"  },
-   { perc_thresh_sample_fcst_climo, "SFCP",   4,  "SAMPLE_FCST_CLIMO_PERC" },
-   { perc_thresh_sample_obs_climo,  "SOCP",   4,  "SAMPLE_OBS_CLIMO_PERC"  },
-   { perc_thresh_climo_dist,        "CDP",    3,  "CLIMO_OBS_DIST_PERC"    },
-   { perc_thresh_fcst_climo_dist,   "FCDP",   4,  "CLIMO_FCST_DIST_PERC"   },
-   { perc_thresh_obs_climo_dist,    "OCDP",   4,  "CLIMO_OBS_DIST_PERC"    },
-   { perc_thresh_freq_bias,         "FBIAS",  5,  "FREQ_BIAS_PERC"         },
-
+static const std::map<PercThreshType,PercThreshInfo> perc_thresh_info_map = {
+   { perc_thresh_user_specified,    { "USP",   "USER_SPECIFIED_PERC"    } },
+   { perc_thresh_sample_fcst,       { "SFP",   "SAMPLE_FCST_PERC"       } },
+   { perc_thresh_sample_obs,        { "SOP",   "SAMPLE_OBS_PERC"        } },
+   { perc_thresh_sample_fcst_climo, { "SFCP",  "SAMPLE_FCST_CLIMO_PERC" } },
+   { perc_thresh_sample_obs_climo,  { "SOCP",  "SAMPLE_OBS_CLIMO_PERC"  } },
+   { perc_thresh_fcst_climo_dist,   { "FCDP",  "CLIMO_FCST_DIST_PERC"   } },
+   { perc_thresh_obs_climo_dist,    { "OCDP",  "CLIMO_OBS_DIST_PERC"    } },
+   { perc_thresh_freq_bias,         { "FBIAS", "FREQ_BIAS_PERC"         } },
 };
-
-static const int n_perc_thresh_infos = sizeof(perc_thresh_info)/sizeof(*perc_thresh_info);
 
 static const int    perc_thresh_default_precision = 0;
 static const double perc_thresh_default_tol = 0.05;
 
-
 struct PC_info {
-
-   int perc_index;
+   PercThreshType ptype;
    double value;
-
 };
 
+extern bool parse_perc_thresh(const char *str, PC_info *info = nullptr);
 
 struct ClimoPntInfo {
-
    ClimoPntInfo() { clear(); }
    ClimoPntInfo(double a, double b, double c, double d) :
                 fcmn(a), fcsd(b), ocmn(c), ocsd(d) {}
@@ -139,16 +112,12 @@ struct ClimoPntInfo {
    double fcsd;
    double ocmn;
    double ocsd;
-
 };
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
 class SingleThresh;
 class Simple_Node;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -444,7 +413,7 @@ class SingleThresh {
       void           clear();
 
       void           set(double  t, ThreshType);
-      void           set(double pt, ThreshType, int perc_index, double t = bad_data_double);
+      void           set(double pt, ThreshType, PercThreshType, double t = bad_data_double);
       void           set(const ThreshNode *);
       void           set(const char *);
 

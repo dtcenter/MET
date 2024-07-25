@@ -36,6 +36,12 @@ extern ThreshNode * result;
 
 extern bool test_mode;
 
+extern const std::string scp_perc_thresh_type_str("SCP");
+
+extern const std::string cdp_perc_thresh_type_str("CDP");
+
+static bool print_climo_perc_thresh_log_message = true; 
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -56,8 +62,7 @@ bool is_climo_dist_type(PercThreshType t)
 
 {
 
-return ( t == perc_thresh_climo_dist      ||
-         t == perc_thresh_fcst_climo_dist ||
+return ( t == perc_thresh_fcst_climo_dist ||
          t == perc_thresh_obs_climo_dist );
 
 }
@@ -66,12 +71,69 @@ return ( t == perc_thresh_climo_dist      ||
 ////////////////////////////////////////////////////////////////////////
 
 
-bool is_obs_climo_dist_type(PercThreshType t)
+bool parse_perc_thresh(const char *str, PC_info *info)
 
 {
 
-return ( t == perc_thresh_climo_dist      ||
-         t == perc_thresh_obs_climo_dist );
+bool match = false;
+
+for (auto const &x : perc_thresh_info_map) {
+
+   if ( x.second.short_name.compare(0, x.second.short_name.size(), str) &&
+        is_number(str + x.second.short_name.size()) ) {
+
+      if ( info ) {
+
+         info->ptype = x.first;
+
+         info->value = atof(str + x.second.short_name.size());
+
+      }
+
+      match = true;
+
+      break;
+
+   }
+
+}
+
+   //
+   // MET #2924: For backward compatibility support SCP and CDP
+   //            threshold types
+   //    
+
+if ( !match ) {
+
+   if ( scp_perc_thresh_type_str.compare(0, 3, str) ||
+        cdp_perc_thresh_type_str.compare(0, 3, str) ) {
+
+      if ( print_climo_perc_thresh_log_message ) {
+
+         mlog << Debug(2) << "Please replace the deprecated \"SCP\" and \"CDP\" "
+              << "threshold types with \"SOCP\" and \"OCDP\", respectively ("
+              << str << ").\n";
+
+         print_climo_perc_thresh_log_message = false;
+
+      }
+
+      ConcatString cs;
+
+      if ( scp_perc_thresh_type_str.compare(0, 3, str) ) {
+         cs << perc_thresh_info_map.at(perc_thresh_sample_obs_climo).short_name;
+      }
+      else {
+         cs << perc_thresh_info_map.at(perc_thresh_obs_climo_dist).short_name;
+      }
+      cs << str + 3;
+
+      return parse_perc_thresh(cs.c_str(), info);
+
+   } 
+}
+
+return match;
 
 }
 
@@ -911,7 +973,7 @@ else if ( Ptype == perc_thresh_freq_bias )  {
 
       mlog << Error << "\nSimple_Node::set_perc() -> "
            << "not enough information provided to define the "
-           << perc_thresh_info[Ptype].long_name
+           << perc_thresh_info_map.at(Ptype).long_name
            << " threshold \"" << s << "\".\n\n";
 
       exit ( 1 );
@@ -964,7 +1026,7 @@ else if ( Ptype == perc_thresh_freq_bias )  {
 
       mlog << Error << "\nSimple_Node::set_perc() -> "
            << "unsupported options for computing the "
-           << perc_thresh_info[Ptype].long_name
+           << perc_thresh_info_map.at(Ptype).long_name
            << " threshold \"" << s << "\".\n\n";
 
       exit ( 1 );
@@ -979,7 +1041,7 @@ else if ( Ptype == perc_thresh_freq_bias )  {
 
       mlog << Error << "\nSimple_Node::set_perc() -> "
            << "unable to compute the percentile for the "
-           << perc_thresh_info[Ptype].long_name
+           << perc_thresh_info_map.at(Ptype).long_name
            << " threshold \"" << s << "\".\n\n";
 
       exit ( 1 );
@@ -1002,7 +1064,7 @@ else  {
 if ( !ptr )  {
 
    mlog << Error << "\nSimple_Node::set_perc() -> "
-        << perc_thresh_info[Ptype].long_name
+        << perc_thresh_info_map.at(Ptype).long_name
         << " threshold \"" << s
         << "\" requested but no data provided.\n\n";
 
@@ -1037,7 +1099,7 @@ else {
 if ( data.n() == 0 )  {
 
    mlog << Error << "\nSimple_Node::set_perc() -> "
-        << "can't compute " << perc_thresh_info[Ptype].long_name
+        << "can't compute " << perc_thresh_info_map.at(Ptype).long_name
         << " threshold \"" << s
         << "\" because no valid data was provided.\n\n";
 
@@ -1173,7 +1235,7 @@ double Simple_Node::obs_climo_prob() const
    
 double prob = bad_data_double;
 
-if ( is_obs_climo_dist_type(Ptype) ) {
+if ( Ptype == perc_thresh_obs_climo_dist ) {
 
    // Observation climo probability varies based on the threshold type
    switch ( op )  {
@@ -1448,17 +1510,16 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void SingleThresh::set(double pt, ThreshType ind, int perc_index, double t)
+void SingleThresh::set(double pt, ThreshType ind, PercThreshType ptype, double t)
 
 {
 
 clear();
 
-if ( (perc_index < 0) || (perc_index >= n_perc_thresh_infos) )  {
+if ( ptype == no_perc_thresh_type )  {
 
-   mlog << Error
-        << "\nSingleThresh::set(double pt, ThreshType ind, int perc_index, double t) -> "
-        << "bad perc_index ... " << perc_index << "\n\n";
+   mlog << Error << "\nSingleThresh::set(double, ThreshType, PercThreshType, double) -> "
+        << "bad percentile threshold type\n\n";
 
    exit ( 1 );
 
@@ -1467,12 +1528,12 @@ if ( (perc_index < 0) || (perc_index >= n_perc_thresh_infos) )  {
 Simple_Node * a = new Simple_Node;
 
 ConcatString cs;
-cs << perc_thresh_info[perc_index].short_name << pt;
+cs << perc_thresh_info_map.at(ptype).short_name << pt;
 if( !is_bad_data(t) ) cs << "(" << t << ")";
 
 a->T      = t;
 a->op     = ind;
-a->Ptype  = perc_thresh_info[perc_index].type;
+a->Ptype  = ptype;
 a->PT     = pt;
 a->s      << thresh_type_str[ind] << cs;
 a->abbr_s << thresh_abbr_str[ind] << cs;
