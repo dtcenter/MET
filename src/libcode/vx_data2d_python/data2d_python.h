@@ -79,7 +79,7 @@ class MetPythonDataFile : public Met2dDataFile {
          //  do stuff
          //
 
-      bool open(const char * cur_command);
+      bool open(const char * cur_command, ConcatString grid_str="");
 
       void close();
 

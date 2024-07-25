@@ -47,7 +47,7 @@ class NcCfFile {
       NcCfFile();
      ~NcCfFile();
 
-      bool open(const char * filename);
+      bool open(const char * filename, ConcatString attr_grid="");
 
       void close();
 
@@ -117,11 +117,14 @@ class NcCfFile {
       NcVarInfo* find_var_name(const char * var_name) const;
       NcVarInfo* find_var_by_dim_name(const char *dim_name) const;
 
+      //void set_attr_grid(ConcatString grid_str);
+
    private:
 
       static const double DELTA_TOLERANCE;
 
       netCDF::NcFile * _ncFile;      //  allocated
+      ConcatString _grid_str;
 
          //
          //  dimensions
@@ -193,6 +196,12 @@ class NcCfFile {
                                             const long lat_counts, const long lon_counts,
                                             bool &swap_to_north);
 };
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+//inline void NcCfFile::set_attr_grid(ConcatString grid_str) { attr_grid = grid_str; };
 
 
 ////////////////////////////////////////////////////////////////////////

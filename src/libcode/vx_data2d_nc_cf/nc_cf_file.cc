@@ -26,6 +26,7 @@
 #include "vx_cal.h"
 #include "vx_log.h"
 
+#include "data2d_utils.h"
 #include "nc_cf_file.h"
 
 using namespace std;
@@ -169,7 +170,7 @@ void NcCfFile::close()
 ////////////////////////////////////////////////////////////////////////
 
 
-bool NcCfFile::open(const char * filepath)
+bool NcCfFile::open(const char * filepath, ConcatString grid_str)
 {
   unixtime ut;
   int sec_per_unit;
@@ -188,6 +189,8 @@ bool NcCfFile::open(const char * filepath)
 
   // FIXME: Commented out with NetCDF4 enabling
   // NcError err(NcError::silent_nonfatal);
+
+  _grid_str = grid_str;
 
   // Open the file
   _ncFile = open_ncfile(filepath);
@@ -438,7 +441,12 @@ bool NcCfFile::open(const char * filepath)
   StringArray dimNames;
   string var_x_dim_name, var_y_dim_name;
   if (IS_VALID_NC_P(_xDim)) var_x_dim_name = GET_NC_NAME_P(_xDim);
+cout << "  DEBUG HS var_x_dim_name = " << var_x_dim_name << "\n";
+cout << "  DEBUG HS IS_VALID_NC_P(_yDim) = " << IS_VALID_NC_P(_yDim) << "\n";
+  if (IS_VALID_NC_P(_yDim)) cout << "  DEBUG HS _yDim->getName() = " << _yDim->getName() << "\n";
+  if (IS_VALID_NC_P(_yDim)) cout << "  DEBUG HS GET_NC_NAME_P(_yDim) = " << GET_NC_NAME_P(_yDim) << "\n";
   if (IS_VALID_NC_P(_yDim)) var_y_dim_name = GET_NC_NAME_P(_yDim);
+cout << "  DEBUG HS var_y_dim_name = " << var_y_dim_name << "\n";
   for (int j=0; j<Nvars; ++j) {
 
     int dim_count = Var[j].Ndims;
@@ -1359,6 +1367,7 @@ void NcCfFile::read_netcdf_grid()
   NcVar *data_var = nullptr;
   NcVar *tmp_data_var = nullptr;
   IntArray var_index_list;
+  const char *method_name = "NcCfFile::read_netcdf_grid() -> ";
 
   for (int i = 0; i < Nvars; ++i)
   {
@@ -1458,11 +1467,17 @@ void NcCfFile::read_netcdf_grid()
     status = true;
   }
 
+  if (_grid_str.nonempty()) {
+    status = build_grid_by_grid_string(_grid_str, grid, method_name);
+    mlog << Debug(3) << method_name
+          << "Override the grid by set_attr_grid=\"" << _grid_str << "\"\n";
+  }
+
   if (!status ||
       !((_xDim && _yDim) ||
         (x_dim_var_name.nonempty() && y_dim_var_name.nonempty())))
   {
-     mlog << Error << "\nNcCfFile::read_netcdf_grid() -> "
+     mlog << Error << "\n" << method_name
           << "Couldn't figure out projection from information in netCDF file.\n\n";
      exit(1);
   }
@@ -3406,7 +3421,7 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
              << i-1 << "]=" << lat_values[i-1] << " lat["
              << i << "]=" << lat_values[i] << "  "
              << fabs(curr_delta - dlat) << " > " << degree_tolerance << "\n";
-        mlog << Error << "\n" << method_name << " -> "
+        mlog << Warning << "\n" << method_name << " -> "
              << "MET can only process Latitude/Longitude files where the latitudes are evenly spaced (dlat="
              << dlat <<", delta[" << i << "]=" << curr_delta << ")\n\n";
         sanity_check_failed = true;
@@ -3426,7 +3441,7 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
              << i-1 << "]=" << lon_values[i-1] << " lon["
              << i << "]=" << lon_values[i] << "  "
              << fabs(curr_delta - dlon) << " > " << degree_tolerance << "\n";
-        mlog << Error << "\n" << method_name << " -> "
+        mlog << Warning << "\n" << method_name << " -> "
              << "MET can only process Latitude/Longitude files where the longitudes are evenly spaced (dlon="
              << dlon <<", delta[" << i << "]=" << curr_delta << ")\n\n";
         sanity_check_failed = true;
@@ -3434,7 +3449,7 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
       }
     }
 
-    if (sanity_check_failed) {
+    if (sanity_check_failed && _grid_str.empty()) {
       mlog << Error << "\n" << method_name << " -> "
            << "Please check the input data is the lat/lon projection\n\n";
       exit(1);

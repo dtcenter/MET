@@ -75,7 +75,7 @@ class MetNcWrfDataFile : public Met2dDataFile {
          //  do stuff
          //
 
-      bool open  (const char * filename);
+      bool open  (const char * filename, ConcatString grid_str="");
 
       void close ();
 

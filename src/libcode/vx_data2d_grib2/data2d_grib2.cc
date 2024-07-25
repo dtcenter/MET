@@ -99,7 +99,7 @@ void MetGrib2DataFile::close() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetGrib2DataFile::open(const char * _filename) {
+bool MetGrib2DataFile::open(const char * _filename, ConcatString grid_str) {
    Filename = _filename;
    if( nullptr == (FileGrib2 = met_fopen(Filename.c_str(), "r")) ){
       mlog << Error << "\nMetGrib2DataFile::open() -> "

@@ -102,7 +102,7 @@ void MetUGridDataFile::close() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetUGridDataFile::open(const char * _filename) {
+bool MetUGridDataFile::open(const char * _filename, ConcatString grid_str) {
 
    close();
 

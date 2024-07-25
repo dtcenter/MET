@@ -83,7 +83,7 @@ void MetNcWrfDataFile::close() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool MetNcWrfDataFile::open(const char * _filename) {
+bool MetNcWrfDataFile::open(const char * _filename, ConcatString grid_str) {
 
    close();
 

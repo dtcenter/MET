@@ -22,8 +22,8 @@ class Met2dDataFileFactory
 {
    public:
       static Met2dDataFile *new_met_2d_data_file(GrdFileType type);
-      static Met2dDataFile *new_met_2d_data_file(const char *filename);
-      static Met2dDataFile *new_met_2d_data_file(const char *filename, GrdFileType type);
+      static Met2dDataFile *new_met_2d_data_file(const char *filename, ConcatString attr_grid="");
+      static Met2dDataFile *new_met_2d_data_file(const char *filename, GrdFileType type, ConcatString attr_grid="");
 };
 
 ///////////////////////////////////////////////////////////////////////////////
