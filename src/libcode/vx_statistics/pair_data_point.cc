@@ -944,7 +944,7 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
    }
 
    int i;
-   double fcst_wind, obs_wind, fcmn_wind, ocmn_wind, fcsd_wind, ocsd_wind, wgt;
+   double fcst_wind, obs_wind, wgt;
 
    // Initialize and allocate memory for output pairs
    out_pd_u.erase();
@@ -988,12 +988,12 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
                        bad_data_double);
 
       // Check for bad data
-      if(is_bad_data(fcst_wind)                ||
-         is_bad_data(obs_wind)                 ||
-         (fcmn_flag && is_bad_data(fcmn_wind)) ||
-         (fcsd_flag && is_bad_data(fcsd_wind)) ||
-         (ocmn_flag && is_bad_data(ocmn_wind)) ||
-         (ocsd_flag && is_bad_data(ocsd_wind)) ||
+      if(is_bad_data(fcst_wind)                    ||
+         is_bad_data(obs_wind)                     ||
+         (fcmn_flag && is_bad_data(wind_cpi.fcmn)) ||
+         (fcsd_flag && is_bad_data(wind_cpi.fcsd)) ||
+         (ocmn_flag && is_bad_data(wind_cpi.ocmn)) ||
+         (ocsd_flag && is_bad_data(wind_cpi.ocsd)) ||
          (wgt_flag && is_bad_data(wgt))) continue;
 
       // Check wind speed thresholds

@@ -291,9 +291,9 @@ void ThreshArray::parse_thresh_str(const char *thresh_str) {
 ////////////////////////////////////////////////////////////////////////
 
 int ThreshArray::has(const SingleThresh &st) const {
-   int index, status;
+   int index;
 
-   status = has(st, index);
+   int status = has(st, index);
 
    return status;
 }
@@ -301,13 +301,12 @@ int ThreshArray::has(const SingleThresh &st) const {
 ////////////////////////////////////////////////////////////////////////
 
 int ThreshArray::has(const SingleThresh &st, int & index) const {
-   int j;
 
    index = -1;
 
    if(Nelements == 0) return 0;
 
-   for(j=0; j<Nelements; j++) {
+   for(int j=0; j<Nelements; j++) {
 
       if(t[j] == st) { index = j; return 1; }
    }
@@ -322,13 +321,12 @@ int ThreshArray::has(const SingleThresh &st, int & index) const {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString ThreshArray::get_str(const char *sep, int precision) const {
-   int i;
    ConcatString cur_str;
    ConcatString tmp_str;
 
    if(Nelements == 0) tmp_str = na_str;
 
-   for(i=0; i<Nelements; i++) {
+   for(int i=0; i<Nelements; i++) {
       cur_str = t[i].get_str(precision);
 
       if(i==0) tmp_str << cur_str;
@@ -341,13 +339,12 @@ ConcatString ThreshArray::get_str(const char *sep, int precision) const {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString ThreshArray::get_abbr_str(const char *sep, int precision) const {
-   int i;
    ConcatString cur_str;
    ConcatString tmp_str;
 
    if(Nelements == 0) tmp_str = na_str;
 
-   for(i=0; i<Nelements; i++) {
+   for(int i=0; i<Nelements; i++) {
       cur_str = t[i].get_abbr_str(precision);
 
       if(i==0) tmp_str << cur_str;
@@ -360,13 +357,12 @@ ConcatString ThreshArray::get_abbr_str(const char *sep, int precision) const {
 ////////////////////////////////////////////////////////////////////////
 
 void ThreshArray::check_bin_thresh() const {
-   int i;
 
    //
    // Check that the threshold values are monotonically increasing
    // and the threshold types are inequalities that remain the same
    //
-   for(i=0; i<Nelements-1; i++) {
+   for(int i=0; i<Nelements-1; i++) {
 
       if(t[i].get_value() >  t[i+1].get_value() ||
          t[i].get_type()  != t[i+1].get_type()  ||
@@ -386,7 +382,7 @@ void ThreshArray::check_bin_thresh() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int ThreshArray::check_bins(double v, ClimoPntInfo *cpi) const {
+int ThreshArray::check_bins(double v, const ClimoPntInfo *cpi) const {
    int i, bin;
 
    // Check for bad data or no thresholds
@@ -423,13 +419,12 @@ int ThreshArray::check_bins(double v, ClimoPntInfo *cpi) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool ThreshArray::check_dbl(double v, ClimoPntInfo *cpi) const {
-   int i;
+bool ThreshArray::check_dbl(double v, const ClimoPntInfo *cpi) const {
 
    //
    // Check if the value satisifes all the thresholds in the array
    //
-   for(i=0; i<Nelements; i++) if(!t[i].check(v, cpi)) return false;
+   for(int i=0; i<Nelements; i++) if(!t[i].check(v, cpi)) return false;
 
    return true;
 }

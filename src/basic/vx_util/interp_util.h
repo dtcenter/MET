@@ -64,10 +64,10 @@ extern NumArray interp_points  (const DataPlane &dp, const GridTemplate &gt, dou
 
 // GridTemplate version takes center x/y
 extern NumArray interp_points  (const DataPlane &dp, const GridTemplate &gt, int x, int y);
-extern double   interp_min     (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t, const MaskPlane *mp = 0);
-extern double   interp_max     (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t, const MaskPlane *mp = 0);
-extern double   interp_median  (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t, const MaskPlane *mp = 0);
-extern double   interp_uw_mean (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t, const MaskPlane *mp = 0);
+extern double   interp_min     (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t, const MaskPlane *mp = nullptr);
+extern double   interp_max     (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t, const MaskPlane *mp = nullptr);
+extern double   interp_median  (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t, const MaskPlane *mp = nullptr);
+extern double   interp_uw_mean (const DataPlane &dp, const GridTemplate &gt, int x, int y, double t, const MaskPlane *mp = nullptr);
 
 // Non-GridTemplate version takes lower-left corner x/y
 extern double   interp_min_ll     (const DataPlane &dp, int x_ll, int y_ll, int w, double t);
@@ -76,19 +76,19 @@ extern double   interp_median_ll  (const DataPlane &dp, int x_ll, int y_ll, int 
 extern double   interp_uw_mean_ll (const DataPlane &dp, int x_ll, int y_ll, int w, double t);
 
 // GridTemplate version takes center x/y
-extern double   interp_dw_mean   (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, int i_pow, double t, const MaskPlane *mp = 0);
-extern double   interp_ls_fit    (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double t, const MaskPlane *mp = 0);
+extern double   interp_dw_mean   (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, int i_pow, double t, const MaskPlane *mp = nullptr);
+extern double   interp_ls_fit    (const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double t, const MaskPlane *mp = nullptr);
 extern void     interp_gaussian_dp(DataPlane &, const GaussianInfo &, double t);
 extern double   interp_gaussian  (const DataPlane &, const DataPlane &, double obs_x, double obs_y, int max_r, double t);
 
-extern double   interp_geog_match(const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double obs_v, const MaskPlane *mp = 0);
+extern double   interp_geog_match(const DataPlane &, const GridTemplate &gt, double obs_x, double obs_y, double obs_v, const MaskPlane *mp = nullptr);
 
 extern double   interp_nbrhd   (const DataPlane &, const GridTemplate &gt, int x, int y, double t, const SingleThresh *,
-                                const ClimoPntInfo *, const MaskPlane *mp = 0);
-extern double   interp_bilin   (const DataPlane &, bool wrap_lon, double obs_x, double obs_y, const MaskPlane *mp = 0);
-extern double   interp_xy      (const DataPlane &, bool wrap_lon, int x, int y, const MaskPlane *mp = 0);
+                                const ClimoPntInfo *, const MaskPlane *mp = nullptr);
+extern double   interp_bilin   (const DataPlane &, bool wrap_lon, double obs_x, double obs_y, const MaskPlane *mp = nullptr);
+extern double   interp_xy      (const DataPlane &, bool wrap_lon, int x, int y, const MaskPlane *mp = nullptr);
 
-extern double   interp_best    (const DataPlane &dp, const GridTemplate &gt, int x, int y, double obs_v, double t, const MaskPlane *mp = 0);
+extern double   interp_best    (const DataPlane &dp, const GridTemplate &gt, int x, int y, double obs_v, double t, const MaskPlane *mp = nullptr);
 
 extern void     get_xy_ll      (double x, double y, int w, int h, int &x_ll, int &y_ll);
 
@@ -115,7 +115,7 @@ extern double compute_horz_interp(const DataPlane &dp,
                                   const InterpMthd mthd, const int width,
                                   const GridTemplateFactory::GridTemplates shape,
                                   bool wrap_lon, double interp_thresh,
-                                  const SingleThresh *cat_thresh = 0);
+                                  const SingleThresh *cat_thresh = nullptr);
 
 extern double compute_horz_interp(const DataPlane &dp,
                                   double obs_x, double obs_y,
@@ -123,7 +123,7 @@ extern double compute_horz_interp(const DataPlane &dp,
                                   const InterpMthd mthd, const int width,
                                   const GridTemplateFactory::GridTemplates shape,
                                   bool wrap_lon, double interp_thresh,
-                                  const SingleThresh *cat_thresh = 0);
+                                  const SingleThresh *cat_thresh = nullptr);
 
 extern double compute_vert_pinterp(double, double, double, double, double);
 extern double compute_vert_zinterp(double, double, double, double, double);

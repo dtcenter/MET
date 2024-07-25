@@ -229,10 +229,10 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
    }
 
    // Check climatology data, if needed
-   if(fcmn && fcsd && ocmn && ocsd) {
-      if(!fcmn->is_empty() && !fcsd->is_empty() &&
-         !ocmn->is_empty() && !ocsd->is_empty()) use_climo = true;
-   }
+   if(fcmn && !fcmn->is_empty() &&
+      fcsd && !fcsd->is_empty() &&
+      ocmn && !ocmn->is_empty() &&
+      ocsd && !ocsd->is_empty()) use_climo = true;
 
    // Check climatology dimensions
    if(use_climo) {

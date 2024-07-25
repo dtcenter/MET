@@ -85,8 +85,8 @@ class ThreshArray {
 
       void check_bin_thresh() const;
 
-      int  check_bins(double, ClimoPntInfo *cpi = 0) const;
-      bool check_dbl (double, ClimoPntInfo *cpi = 0) const;
+      int  check_bins(double, const ClimoPntInfo *cpi = nullptr) const;
+      bool check_dbl (double, const ClimoPntInfo *cpi = nullptr) const;
 
       bool equal_bin_width(double &) const;
 };

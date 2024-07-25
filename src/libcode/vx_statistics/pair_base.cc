@@ -1161,8 +1161,7 @@ void VxPairBase::set_fcst_ut(const unixtime ut) {
    fcst_ut = ut;
 
    // Set for all PairBase instances, used for duplicate logic
-   for(vector<PairBase *>::iterator it = pb_ptr.begin();
-       it != pb_ptr.end(); it++) (*it)->set_fcst_ut(ut);
+   for(auto &x : pb_ptr) x->set_fcst_ut(ut);
 
    return;
 }
@@ -1384,8 +1383,7 @@ void VxPairBase::set_mpr_thresh(const StringArray &sa, const ThreshArray &ta) {
 
 void VxPairBase::set_climo_cdf_info_ptr(const ClimoCDFInfo *info) {
 
-   for(vector<PairBase *>::iterator it = pb_ptr.begin();
-       it != pb_ptr.end(); it++) (*it)->set_climo_cdf_info_ptr(info);
+   for(auto &x : pb_ptr) x->set_climo_cdf_info_ptr(info);
 
    return;
 }
@@ -1429,17 +1427,15 @@ void VxPairBase::set_sfc_info(const SurfaceInfo &si) {
 ////////////////////////////////////////////////////////////////////////
 
 int VxPairBase::get_n_pair() const {
-   int n = 0;
 
    if(n_vx == 0) {
       mlog << Warning << "\nVxPairBase::get_n_pair() -> "
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(vector<PairBase *>::const_iterator it = pb_ptr.begin();
-       it != pb_ptr.end(); it++) {
-      n += (*it)->n_obs;
-   }
+   int n = 0;
+
+   for(auto &x : pb_ptr) n += x->n_obs;
 
    return n;
 }
@@ -1453,10 +1449,7 @@ void VxPairBase::set_duplicate_flag(DuplicateType duplicate_flag) {
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(vector<PairBase *>::iterator it = pb_ptr.begin();
-       it != pb_ptr.end(); it++) {
-      (*it)->set_check_unique(duplicate_flag == DuplicateType::Unique);
-   }
+   for(auto &x : pb_ptr) x->set_check_unique(duplicate_flag == DuplicateType::Unique);
 
    return;
 }
@@ -1470,10 +1463,7 @@ void VxPairBase::set_obs_summary(ObsSummary s) {
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(vector<PairBase *>::iterator it = pb_ptr.begin();
-       it != pb_ptr.end(); it++) {
-      (*it)->set_obs_summary(s);
-   }
+   for(auto &x : pb_ptr) x->set_obs_summary(s);
 
    return;
 }
@@ -1487,10 +1477,7 @@ void VxPairBase::set_obs_perc_value(int percentile) {
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(vector<PairBase *>::iterator it = pb_ptr.begin();
-       it != pb_ptr.end(); it++) {
-      (*it)->set_obs_perc_value(percentile);
-   }
+   for(auto &x : pb_ptr) x->set_obs_perc_value(percentile);
 
    return;
 }
@@ -1504,10 +1491,7 @@ void VxPairBase::print_obs_summary() {
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(vector<PairBase *>::iterator it = pb_ptr.begin();
-       it != pb_ptr.end(); it++) {
-      (*it)->print_obs_summary();
-   }
+   for(auto &x : pb_ptr) x->print_obs_summary();
 
    return;
 }
@@ -1521,10 +1505,7 @@ void VxPairBase::calc_obs_summary() {
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(vector<PairBase *>::iterator it = pb_ptr.begin();
-       it != pb_ptr.end(); it++) {
-      (*it)->calc_obs_summary();
-   }
+   for(auto &x : pb_ptr) x->calc_obs_summary();
 
    return;
 }
@@ -1563,7 +1544,7 @@ bool VxPairBase::is_keeper_var(
    VarInfoGrib *obs_info_grib = (VarInfoGrib *) obs_info;
 
    // Check for matching variable name or GRIB code
-   if((var_name != 0) && (strlen(var_name) > 0)) {
+   if((var_name != 0) && (m_strlen(var_name) > 0)) {
 
       if(var_name != obs_info->name()) {
 
@@ -2191,11 +2172,11 @@ void find_vert_lvl(const DataPlaneArray &dpa, const double obs_lvl,
    int i;
    double dist, dist_blw, dist_abv;
 
+   // Initialize
+   i_blw = i_abv = bad_data_int;
+
    // Check for no data
-   if(dpa.n_planes() == 0) {
-      i_blw = i_abv = bad_data_int;
-      return;
-   }
+   if(dpa.n_planes() == 0) return;
 
    // Find the closest levels above and below the observation
    dist_blw = dist_abv = 1.0e30;

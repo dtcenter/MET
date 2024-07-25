@@ -77,24 +77,20 @@ bool parse_perc_thresh(const char *str, PC_info *info)
 
 bool match = false;
 
-if ( perc_thresh_info_map.size() == 0 ) return false;
+if ( perc_thresh_info_map.empty() ) return false;
 
 ConcatString search_cs(str);
 
-map<PercThreshType,PercThreshInfo>::const_iterator it;
+for (auto const& x : perc_thresh_info_map) {
 
-for (it  = perc_thresh_info_map.begin();
-     it != perc_thresh_info_map.end();
-     it++) {
-
-   if ( search_cs.startswith(it->second.short_name.c_str()) &&
-        is_number(str + it->second.short_name.size()) ) {
+   if ( search_cs.startswith(x.second.short_name.c_str()) &&
+        is_number(str + x.second.short_name.size()) ) {
 
       if ( info ) {
 
-         info->ptype = it->first;
+         info->ptype = x.first;
 
-         info->value = atof(str + it->second.short_name.size());
+         info->value = atof(str + x.second.short_name.size());
 
       }
 
@@ -111,35 +107,33 @@ for (it  = perc_thresh_info_map.begin();
    //            threshold types
    //    
 
-if ( !match ) {
+if ( !match &&
+    (search_cs.startswith(scp_perc_thresh_type_str.c_str()) ||
+     search_cs.startswith(cdp_perc_thresh_type_str.c_str())) ) {
 
-   if ( search_cs.startswith(scp_perc_thresh_type_str.c_str()) ||
-        search_cs.startswith(cdp_perc_thresh_type_str.c_str()) ) {
+   if ( print_climo_perc_thresh_log_message ) {
 
-      if ( print_climo_perc_thresh_log_message ) {
+      mlog << Debug(2) << R"(Please replace the deprecated "SCP" and "CDP" )" 
+           << R"(threshold types with "SOCP" and "OCDP", respectively, in the ")"
+           << str << R"(" threshold string.\n)";
 
-         mlog << Debug(2) << "Please replace the deprecated \"SCP\" and \"CDP\" "
-              << "threshold types with \"SOCP\" and \"OCDP\", respectively, in the \""
-              << str << "\" threshold string.\n";
+      print_climo_perc_thresh_log_message = false;
 
-         print_climo_perc_thresh_log_message = false;
+   }
 
-      }
+   ConcatString cs;
 
-      ConcatString cs;
+   if ( search_cs.startswith(scp_perc_thresh_type_str.c_str()) ) {
+      cs << perc_thresh_info_map.at(perc_thresh_sample_obs_climo).short_name;
+      cs << str + scp_perc_thresh_type_str.size();
+   }
+   else {
+      cs << perc_thresh_info_map.at(perc_thresh_obs_climo_dist).short_name;
+      cs << str + cdp_perc_thresh_type_str.size();
+   }
 
-      if ( search_cs.startswith(scp_perc_thresh_type_str.c_str()) ) {
-         cs << perc_thresh_info_map.at(perc_thresh_sample_obs_climo).short_name;
-	 cs << str + scp_perc_thresh_type_str.size();
-      }
-      else {
-         cs << perc_thresh_info_map.at(perc_thresh_obs_climo_dist).short_name;
-	 cs << str + cdp_perc_thresh_type_str.size();
-      }
+   return parse_perc_thresh(cs.c_str(), info);
 
-      return parse_perc_thresh(cs.c_str(), info);
-
-   } 
 }
 
 return match;

@@ -1866,7 +1866,7 @@ void STATAnalysisJob::set_perc_thresh(const NumArray &f_na,
    NumArray f_sort = f_na;
    NumArray o_sort = o_na;
    NumArray fcmn_sort = fcmn_na;
-   NumArray ocmn_sort = fcmn_na;
+   NumArray ocmn_sort = ocmn_na;
    f_sort.sort_array();
    o_sort.sort_array();
    fcmn_sort.sort_array();
