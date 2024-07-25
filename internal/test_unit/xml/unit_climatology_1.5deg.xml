@@ -94,7 +94,7 @@
       -job filter -line_type MPR -column_thresh CLIMO_CDF 'lt0.1||gt0.9' \
       -dump_row &OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_FILTER_CDF_dump.stat
     </param>
-    <! MET #2924 End replace -->    
+    <!-- MET #2924 End replace -->    
     <output>
       <stat>&OUTPUT_DIR;/climatology_1.5deg/stat_analysis_WMO_1.5DEG_FILTER_CDF_dump.stat</stat>
     </output>
