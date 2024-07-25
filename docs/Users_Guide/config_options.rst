@@ -153,15 +153,21 @@ The configuration file language supports the following data types:
     of forecast values is 3.5, then the requested threshold "<=SFP90" is
     written to the output as "<=SFP90(3.5)".
 
-  * Prior to MET version 12.0.0, forecast climatological inputs were not
-    supported. The observation climatological inputs were used to process
-    threshold types named "SCP" and "CDP". For backward compatibility, the 
-    "SCP" threshold type is processed the same as "SOCP", and the "CDP"
-    threshold type is processed the same as "OCDP".
-     
   * When parsing FCST_THRESH and OBS_THRESH columns, the Stat-Analysis tool
     ignores the actual percentile values listed in parentheses.
-     
+
+.. note::
+
+    Prior to MET version 12.0.0, forecast climatological inputs were not
+    supported. The observation climatological inputs were used to process
+    threshold types named "SCP" and "CDP".
+
+    For backward compatibility, the "SCP" threshold type is processed the same
+    as "SOCP" and "CDP" the same as "OCDP".
+
+    Users are encouraged to replace the deprecated "SCP" and "CDP" threshold
+    types with the updated "SOCP" and "OCDP" types, respectively.
+ 
 * Piecewise-Linear Function (currently used only by MODE):
   
   * A list of (x, y) points enclosed in parenthesis ().
