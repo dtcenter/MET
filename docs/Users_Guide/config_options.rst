@@ -790,7 +790,18 @@ using the following entries:
     * NEAREST     for the nearest grid point (width = 1)
       
     * BUDGET      for the mass-conserving budget interpolation
-      
+
+      * The budget interpolation method is often used for precipitation
+        in order to roughly conserve global averages. However it is
+        computationally intensive and relatively slow. To compute the
+        interpolated value for each point of the target grid, a higher
+        resolution 5x5 mesh with 0.2 grid box spacing is centered on
+        the point and bilinear interpolation is performed for each
+        of those 25 lat/lon locations. The budget interpolation value
+        is computed as the average of those 25 bilinear interpolation
+        values, assuming enough valid data is present to meet the
+        "vld_thresh" threshold.
+
     * FORCE       to compare gridded data directly with no interpolation
       as long as the grid x and y dimensions match.
       
