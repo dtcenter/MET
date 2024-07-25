@@ -79,13 +79,15 @@ bool match = false;
 
 if ( perc_thresh_info_map.size() == 0 ) return false;
 
+ConcatString search_cs(str);
+
 map<PercThreshType,PercThreshInfo>::const_iterator it;
 
 for (it  = perc_thresh_info_map.begin();
      it != perc_thresh_info_map.end();
      it++) {
 
-   if ( it->second.short_name.compare(0, it->second.short_name.size(), str) == 0 &&
+   if ( search_cs.startswith(it->second.short_name.c_str()) &&
         is_number(str + it->second.short_name.size()) ) {
 
       if ( info ) {
@@ -111,14 +113,14 @@ for (it  = perc_thresh_info_map.begin();
 
 if ( !match ) {
 
-   if ( scp_perc_thresh_type_str.compare(0, 3, str) == 0 ||
-        cdp_perc_thresh_type_str.compare(0, 3, str) == 0 ) {
+   if ( search_cs.startswith(scp_perc_thresh_type_str.c_str()) ||
+        search_cs.startswith(cdp_perc_thresh_type_str.c_str()) ) {
 
       if ( print_climo_perc_thresh_log_message ) {
 
          mlog << Debug(2) << "Please replace the deprecated \"SCP\" and \"CDP\" "
-              << "threshold types with \"SOCP\" and \"OCDP\", respectively ("
-              << str << ").\n";
+              << "threshold types with \"SOCP\" and \"OCDP\", respectively, in the \""
+              << str << "\" threshold string.\n";
 
          print_climo_perc_thresh_log_message = false;
 
@@ -126,13 +128,14 @@ if ( !match ) {
 
       ConcatString cs;
 
-      if ( scp_perc_thresh_type_str.compare(0, 3, str) ) {
+      if ( search_cs.startswith(scp_perc_thresh_type_str.c_str()) ) {
          cs << perc_thresh_info_map.at(perc_thresh_sample_obs_climo).short_name;
+	 cs << str + scp_perc_thresh_type_str.size();
       }
       else {
          cs << perc_thresh_info_map.at(perc_thresh_obs_climo_dist).short_name;
+	 cs << str + cdp_perc_thresh_type_str.size();
       }
-      cs << str + 3;
 
       return parse_perc_thresh(cs.c_str(), info);
 
