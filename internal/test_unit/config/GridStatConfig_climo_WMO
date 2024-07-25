@@ -64,25 +64,25 @@ fcst = {
       { name = "UGRD"; level = [ "P500" ]; },
       { name = "VGRD"; level = [ "P500" ]; },
       { name = "WIND"; level = [ "P500" ]; },
-      { name = "TMP";  level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
-      { name = "UGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
-      { name = "VGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
-      { name = "WIND"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; }
+      { name = "TMP";  level = [ "P850" ]; cat_thresh = [ >OCDP90 ]; },
+      { name = "UGRD"; level = [ "P850" ]; cat_thresh = [ >OCDP90 ]; },
+      { name = "VGRD"; level = [ "P850" ]; cat_thresh = [ >OCDP90 ]; },
+      { name = "WIND"; level = [ "P850" ]; cat_thresh = [ >OCDP90 ]; }
    ];
 }
 obs = {
 
-   cnt_thresh = [ NA, <CDP50, >=CDP50, ==CDP25 ];
+   cnt_thresh = [ NA, <OCDP50, >=OCDP50, ==OCDP25 ];
 
    field = [
       { name = "TMP";  level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
       { name = "UGRD"; level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
       { name = "VGRD"; level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
       { name = "WIND"; level = [ "P500" ]; cnt_thresh = [ NA ]; wind_thresh = [ NA ]; },
-      { name = "TMP";  level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
-      { name = "UGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
-      { name = "VGRD"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; },
-      { name = "WIND"; level = [ "P850" ]; cat_thresh = [ >CDP90 ]; }
+      { name = "TMP";  level = [ "P850" ]; cat_thresh = [ >OCDP90 ]; },
+      { name = "UGRD"; level = [ "P850" ]; cat_thresh = [ >OCDP90 ]; },
+      { name = "VGRD"; level = [ "P850" ]; cat_thresh = [ >OCDP90 ]; },
+      { name = "WIND"; level = [ "P850" ]; cat_thresh = [ >OCDP90 ]; }
    ];
 }
 
