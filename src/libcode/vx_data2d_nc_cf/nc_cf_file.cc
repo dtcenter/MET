@@ -136,6 +136,8 @@ void NcCfFile::close()
     _dims = (NcDim **)nullptr;
   }
 
+  grid_ready = false;
+
   _numDims = 0;
 
   _dimNames.clear();
@@ -863,6 +865,28 @@ int NcCfFile::lead_time() const
 ////////////////////////////////////////////////////////////////////////
 
 
+bool NcCfFile::check_or_update_grid(Grid &attr_grid)
+{
+  static const string method_name = "NcCfFile::check_or_update_grid(Grid &) -> ";
+  if (attr_grid.is_set())
+  {
+    grid = attr_grid;
+    grid_ready = true;
+    mlog << Debug(3) << method_name << "Override grid from set_attr_grid\n";
+  }
+
+  if (!grid_ready)
+  {
+    mlog << Error << "\n" << method_name << "Grid is not ready\n\n";
+    exit(1);
+  }
+  return grid_ready;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 double NcCfFile::getData(NcVar * var, const LongArray & a) const
 {
   clock_t start_clock = clock();
@@ -1462,9 +1486,9 @@ void NcCfFile::read_netcdf_grid()
       !((_xDim && _yDim) ||
         (x_dim_var_name.nonempty() && y_dim_var_name.nonempty())))
   {
-     mlog << Error << "\nNcCfFile::read_netcdf_grid() -> "
+     mlog << Warning << "\nNcCfFile::read_netcdf_grid() -> "
           << "Couldn't figure out projection from information in netCDF file.\n\n";
-     exit(1);
+     return;
   }
 
   return;
@@ -1506,9 +1530,9 @@ void NcCfFile::get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att)
   bool status = get_att_value_chars(grid_mapping_att, mapping_name);
   if (!status)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Cannot extract grid mapping name from netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
   NcVar *grid_mapping_var = nullptr;
@@ -1522,12 +1546,12 @@ void NcCfFile::get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att)
     }
   } /* endfor - i */
 
-  if ((grid_mapping_var == 0) || (IS_INVALID_NC_P(grid_mapping_var)))
+  if ((nullptr == grid_mapping_var) || (IS_INVALID_NC_P(grid_mapping_var)))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Cannot extract grid mapping variable (" << mapping_name
          << ") from netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
   // Get the name of the grid mapping
@@ -1536,9 +1560,10 @@ void NcCfFile::get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att)
 
   if (IS_INVALID_NC_P(grid_mapping_name_att))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Cannot get coordinate system name from netCDF file.\n\n";
-    exit(1);
+    if (grid_mapping_name_att) delete grid_mapping_name_att;
+    return;
   }
 
   //string grid_mapping_name = grid_mapping_name_att->getValues(att->as_string(0);
@@ -1606,10 +1631,10 @@ void NcCfFile::get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att)
   }
   else
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Unknown grid mapping name (" << grid_mapping_name
          << ") found in netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
 }
@@ -1673,9 +1698,9 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
                 x_coord_units_name == "meters") x_coord_to_m_cf = 1.0;
       else if (x_coord_units_name == "km") x_coord_to_m_cf = 1000.0;
       else {
-        mlog << Error << "\n" << method_name << " -> "
+        mlog << Warning << "\n" << method_name << " -> "
              << "The X coordinates must be in meters or kilometers for MET.\n\n";
-        exit(1);
+        return;
       }
     }
   }
@@ -1698,9 +1723,9 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
                 y_coord_units_name == "meters" ) y_coord_to_m_cf = 1.0;
       else if (y_coord_units_name == "km") y_coord_to_m_cf = 1000.0;
       else {
-        mlog << Error << "\n" << method_name << " -> "
-             << "The X coordinates must be in meters or kilometers for MET.\n\n";
-        exit(1);
+        mlog << Warning << "\n" << method_name << " -> "
+             << "The Y coordinates must be in meters or kilometers for MET.\n\n";
+        return;
       }
     }
   }
@@ -1737,11 +1762,11 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
     double curr_delta = fabs(x_values[i] - x_values[i-1]);
     if (fabs(curr_delta - dx_m_a) > DELTA_TOLERANCE)
     {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name << " -> "
            << "MET can only process Lambert Azimuthal Equal Area files "
            << "where the delta along the x-axis is constant ("
            << curr_delta << " != " << dx_m_a << ")\n\n";
-      exit(1);
+      return;
     }
   }
 
@@ -1750,11 +1775,11 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
     double curr_delta = fabs(y_values[i] - y_values[i-1]);
     if (fabs(curr_delta - dy_m_a) > DELTA_TOLERANCE)
     {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name << " -> "
            << "MET can only process Lambert Azimuthal Equal Area files "
            << "where the delta along the y-axis is constant ("
            << curr_delta << " != " << dy_m_a << ")\n\n";
-      exit(1);
+      return;
     }
   }
 
@@ -1806,11 +1831,11 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
 
   if(!is_bad_data(false_easting) && !is_eq(false_easting, 0.0))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "MET cannot process Lambert Azimuthal Equal Area files "
          << "with non-zero false_easting (" << false_easting
          << ").\n\n";
-    exit(1);
+    return;
   }
 
   // false_northing
@@ -1820,11 +1845,11 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
 
   if(!is_bad_data(false_northing) && !is_eq(false_northing, 0.0))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "MET cannot process Lambert Azimuthal Equal Area files "
          << "with non-zero false_northing (" << false_northing
          << ").\n\n";
-    exit(1);
+    return;
   }
 
   // Calculate the pin indices.  The pin will be located at the grid's reference
@@ -1845,6 +1870,8 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
   grid.set(data);
   if (dy_m < 0) grid.set_swap_to_north(true);
 
+  grid_ready = true;
+
 }
 
 
@@ -1863,10 +1890,10 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
     grid_mapping_var, (string)"standard_parallel");
   if (IS_INVALID_NC_P(std_parallel_att))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Cannot get standard_parallel attribute from "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
-    exit(1);
+    return;
   }
 
   // longitude_of_central_meridian
@@ -1875,10 +1902,10 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
     grid_mapping_var, (string)"longitude_of_central_meridian");
   if (IS_INVALID_NC_P(central_lon_att))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Cannot get longitude_of_central_meridian attribute from "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
-    exit(1);
+    return;
   }
 
   // latitude_of_projection_origin
@@ -1887,10 +1914,10 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
     grid_mapping_var, (string)"latitude_of_projection_origin");
   if (IS_INVALID_NC_P(proj_origin_lat_att))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Cannot get latitude_of_projection_origin attribute from "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
-    exit(1);
+    return;
   }
 
   // Look for the x/y dimensions and x/y coordinate variables
@@ -1899,9 +1926,9 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   if (get_data_size(_xCoordVar) != (int) GET_NC_SIZE_P(_xDim) ||
       get_data_size(_yCoordVar) != (int) GET_NC_SIZE_P(_yDim))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
   // Make sure that the coordinate variables are given in meters.  If we get
@@ -1925,9 +1952,9 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
                 x_coord_units_name == "meters") x_coord_to_m_cf = 1.0;
       else if (x_coord_units_name == "km") x_coord_to_m_cf = 1000.0;
       else {
-        mlog << Error << "\n" << method_name << " -> "
+        mlog << Warning << "\n" << method_name << " -> "
              << "The X coordinates must be in meters or kilometers for MET.\n\n";
-        exit(1);
+        return;
       }
     }
   }
@@ -1949,9 +1976,9 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
                 y_coord_units_name == "meters" ) y_coord_to_m_cf = 1.0;
       else if (y_coord_units_name == "km") y_coord_to_m_cf = 1000.0;
       else {
-        mlog << Error << "\n" << method_name << " -> "
-             << "The X coordinates must be in meters or kilometers for MET.\n\n";
-        exit(1);
+        mlog << Warning << "\n" << method_name << " -> "
+             << "The Y coordinates must be in meters or kilometers for MET.\n\n";
+        return;
       }
     }
   }
@@ -1983,9 +2010,9 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
 
   if (fabs(dx_m_a - dy_m_a) > DELTA_TOLERANCE)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "MET can only process Lambert Conformal files where the x-axis and y-axis deltas are the same\n\n";
-    exit(1);
+    return;
   }
 
   // As a sanity check, make sure that the deltas are constant through the
@@ -1996,9 +2023,9 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
     double curr_delta = fabs(x_values[i] - x_values[i-1]);
     if (fabs(curr_delta - dx_m_a) > DELTA_TOLERANCE)
     {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name << " -> "
            << "MET can only process Lambert Conformal files where the delta along the x-axis is constant\n\n";
-      exit(1);
+      return;
     }
   }
 
@@ -2007,9 +2034,9 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
     double curr_delta = fabs(y_values[i] - y_values[i-1]);
     if (fabs(curr_delta - dy_m_a) > DELTA_TOLERANCE)
     {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name << " -> "
            << "MET can only process Lambert Conformal files where the delta along the y-axis is constant\n\n";
-      exit(1);
+      return;
     }
   }
 
@@ -2051,6 +2078,7 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
 
   grid.set(data);
   if (dy_m < 0) grid.set_swap_to_north(true);
+  grid_ready = true;
 
   if(std_parallel_att) delete std_parallel_att;
   if(central_lon_att) delete central_lon_att;
@@ -2144,32 +2172,32 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
 
   if (_xDim == nullptr)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Didn't find X dimension (degrees_east) in netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
   if (_yDim == nullptr)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Didn't find Y dimension (degrees_north) in netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
   if (_xCoordVar == nullptr)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Didn't find X coord variable (" << GET_NC_NAME_P(_xDim)
          << ") in netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
   if (_yCoordVar == nullptr)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Didn't find Y coord variable (" << GET_NC_NAME_P(_yDim)
          << ") in netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
   long lon_counts = _xDim->getSize();
@@ -2177,9 +2205,9 @@ void NcCfFile::get_grid_mapping_latitude_longitude(const NcVar *grid_mapping_var
   if (get_data_size(_xCoordVar) != lon_counts ||
       get_data_size(_yCoordVar) != lat_counts)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
   get_grid_from_lat_lon_vars(_yCoordVar, _xCoordVar, lat_counts, lon_counts);
@@ -2277,17 +2305,17 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
          << "This is an ellipsoidal earth.\n\n";
   }
   else if(!has_scale_factor && !has_standard_parallel) {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "The attribute \"scale_factor_at_projection_origin\" and \"standard_parallel\" of the "
          << GET_NC_NAME_P(grid_mapping_var) << " variable do not exist.\n\n";
-    exit(1);
+    return;
   }
   else if(has_scale_factor && !is_eq(proj_origin_scale_factor, 1.0)) {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "Unexpected attribute value of " << proj_origin_scale_factor
          << " for the scale_factor_at_projection_origin attribute of the "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
-    exit(1);
+    return;
   }
 
   // Look for the x/y dimensions and x/y coordinate variables
@@ -2296,9 +2324,9 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   if (get_data_size(_xCoordVar) != (int) GET_NC_SIZE_P(_xDim) ||
       get_data_size(_yCoordVar) != (int) GET_NC_SIZE_P(_yDim))
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
   // Make sure that the coordinate variables are given in meters.  If we get
@@ -2322,10 +2350,10 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
                 x_coord_units_name == "meters") x_coord_to_m_cf = 1.0;
       else if ( x_coord_units_name == "km") x_coord_to_m_cf = 1000.0;
       else {
-        mlog << Error << "\n" << method_name
+        mlog << Warning << "\n" << method_name
              << "The X coordinates (" << x_coord_units_name
              << ") must be in meters or kilometers for MET.\n\n";
-        exit(1);
+        return;
       }
     }
   }
@@ -2347,9 +2375,9 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
                 y_coord_units_name == "meters" ) y_coord_to_m_cf = 1.0;
       else if ( y_coord_units_name == "km") y_coord_to_m_cf = 1000.0;
       else {
-        mlog << Error << "\n" << method_name
-             << "The X coordinates must be in meters or kilometers for MET.\n\n";
-        exit(1);
+        mlog << Warning << "\n" << method_name
+             << "The Y coordinates must be in meters or kilometers for MET.\n\n";
+        return;
       }
     }
   }
@@ -2381,9 +2409,9 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
 
   if (fabs(dx_m_a - dy_m_a) > DELTA_TOLERANCE)
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "MET can only process Polar Stereographic files where the x-axis and y-axis deltas are the same.\n\n";
-    exit(1);
+    return;
   }
 
   if (is_eq(semi_major_axis, bad_data_double))
@@ -2470,6 +2498,7 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   data.dump();
 
   grid.set(data);
+  grid_ready = true;
 
   //Note: do not set grid.set_swap_to_north()
 
@@ -2611,10 +2640,10 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
     grid_mapping_var, (string)"grid_north_pole_latitude");
   if (IS_INVALID_NC_P(grid_np_lat_att))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Cannot get grid_north_pole_latitude attribute from "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
-    exit(1);
+    return;
   }
 
   // grid_north_pole_longitude
@@ -2623,10 +2652,10 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
     grid_mapping_var, (string)"grid_north_pole_longitude");
   if (IS_INVALID_NC_P(grid_np_lon_att))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Cannot get grid_north_pole_longitude attribute from "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
-    exit(1);
+    return;
   }
 
   // Look for the grid_latitude and grid_longitude dimensions
@@ -2703,32 +2732,32 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
 
   if (_xDim == nullptr)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Didn't find X dimension (degrees_east) in netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
   if (_yDim == nullptr)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Didn't find Y dimension (degrees_north) in netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
   if (_xCoordVar == nullptr)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Didn't find X coord variable (" << GET_NC_NAME_P(_xDim)
          << ") in netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
   if (_yCoordVar == nullptr)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Didn't find Y coord variable (" << GET_NC_NAME_P(_yDim)
          << ") in netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
   long lon_counts = _xDim->getSize();
@@ -2736,9 +2765,9 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
   if (get_data_size(_xCoordVar) != lon_counts ||
       get_data_size(_yCoordVar) != lat_counts)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
-    exit(1);
+    return;
   }
 
   // Store spacing in LatLon data structure
@@ -2832,10 +2861,10 @@ void NcCfFile::get_grid_mapping_geostationary(
     grid_mapping_var, (string)"perspective_point_height");
   if (IS_INVALID_NC_P(perspective_point_height_att))
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "-> Cannot get perspective_point_height attribute from "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
-    exit(1);
+    return;
   }
 
   // semi_major_axis
@@ -2843,10 +2872,10 @@ void NcCfFile::get_grid_mapping_geostationary(
     grid_mapping_var, (string)"semi_major_axis");
   if (IS_INVALID_NC_P(semi_major_axis_att))
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "-> Cannot get semi_major_axis attribute from "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
-    exit(1);
+    return;
   }
 
   // semi_minor_axis
@@ -2854,10 +2883,10 @@ void NcCfFile::get_grid_mapping_geostationary(
     grid_mapping_var, (string)"semi_minor_axis");
   if (IS_INVALID_NC_P(semi_minor_axis_att))
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "-> Cannot get semi_minor_axis attribute from "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
-    exit(1);
+    return;
   }
 
   // inverse_flattening
@@ -2865,10 +2894,10 @@ void NcCfFile::get_grid_mapping_geostationary(
     grid_mapping_var, (string)"inverse_flattening");
   if (IS_INVALID_NC_P(inverse_flattening_att))
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "-> Cannot get inverse_flattening attribute from "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
-    exit(1);
+    return;
   }
 
   // latitude_of_projection_origin
@@ -2876,10 +2905,10 @@ void NcCfFile::get_grid_mapping_geostationary(
     grid_mapping_var, (string)"latitude_of_projection_origin");
   if (IS_INVALID_NC_P(proj_origin_lat_att))
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "-> Cannot get latitude_of_projection_origin attribute from "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
-    exit(1);
+    return;
   }
 
   // longitude_of_projection_origin
@@ -2887,10 +2916,10 @@ void NcCfFile::get_grid_mapping_geostationary(
     grid_mapping_var, (string)"longitude_of_projection_origin");
   if (IS_INVALID_NC_P(proj_origin_lon_att))
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "-> Cannot get longitude_of_projection_origin attribute from "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
-    exit(1);
+    return;
   }
 
   // sweep_angle_axis
@@ -2898,10 +2927,10 @@ void NcCfFile::get_grid_mapping_geostationary(
     grid_mapping_var, (string)"sweep_angle_axis");
   if (IS_INVALID_NC_P(sweep_angle_axis_att))
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "-> Cannot get sweep_angle_axis attribute from "
          << GET_NC_NAME_P(grid_mapping_var) << " variable.\n\n";
-    exit(1);
+    return;
   }
 
   // Look for the x/y dimensions and x/y coordinate variables
@@ -2910,21 +2939,21 @@ void NcCfFile::get_grid_mapping_geostationary(
   bool do_exit = false;
   if (_xDim == nullptr)
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "-> Didn't find X dimension (projection_x_coordinate) in netCDF file.\n\n";
     do_exit = true;
   }
 
   if (_yDim == nullptr)
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "-> Didn't find Y dimension (projection_y_coordinate) in netCDF file.\n\n";
     do_exit = true;
   }
 
   if (_xCoordVar == nullptr)
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "-> Didn't find X coord variable (" << GET_NC_NAME_P(_xDim)
          << ") in netCDF file.\n\n";
     do_exit = true;
@@ -2932,7 +2961,7 @@ void NcCfFile::get_grid_mapping_geostationary(
 
   if (_yCoordVar == nullptr)
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "-> Didn't find Y coord variable (" << GET_NC_NAME_P(_yDim)
          << ") in netCDF file.\n\n";
     do_exit = true;
@@ -2941,12 +2970,12 @@ void NcCfFile::get_grid_mapping_geostationary(
   if (get_data_size(_xCoordVar) != (int) GET_NC_SIZE_P(_xDim) ||
       get_data_size(_yCoordVar) != (int) GET_NC_SIZE_P(_yDim))
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "-> Coordinate variables don't match dimension sizes in netCDF file.\n\n";
     do_exit = true;
   }
 
-  if (do_exit) exit(1);
+  if (do_exit) return;
 
   // Figure out the dx/dy  and x/y pin values from the dimension variables
 
@@ -2954,7 +2983,6 @@ void NcCfFile::get_grid_mapping_geostationary(
   double x_values[x_counts];
 
   get_nc_data(_xCoordVar, x_values);
-
 
   long y_counts = GET_NC_SIZE_P(_yDim);
   double y_values[y_counts];
@@ -3034,6 +3062,7 @@ void NcCfFile::get_grid_mapping_geostationary(
   // Note: Computing lat/lon was deferred because it took 1 minutes
 
   grid.set(data);
+  grid_ready = true;
 
   if (perspective_point_height_att) delete perspective_point_height_att;
   if (semi_major_axis_att)          delete semi_major_axis_att;
@@ -3112,19 +3141,19 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     }
 
     if (_xCoordVar == nullptr) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name << " -> "
            << "Didn't find X coord variable (" << x_dim_var_name
            << ") in netCDF file.\n\n";
       if (coordinates_att) delete coordinates_att;
-      return true;
+      return false;
     }
 
     if (_yCoordVar == nullptr) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name << " -> "
            << "Didn't find Y coord variable (" << y_dim_var_name
            << ") in netCDF file.\n\n";
       if (coordinates_att) delete coordinates_att;
-      return true;
+      return false;
     }
 
     StringArray dimNames;
@@ -3153,10 +3182,10 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
     if ((x_size != lon_counts && x_size != latlon_counts) ||
         (y_size != lat_counts && x_size != latlon_counts))
     {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name << " -> "
            << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
       if (coordinates_att) delete coordinates_att;
-      exit(1);
+      return false;
     }
 
     if (coordinates_att) {
@@ -3280,18 +3309,18 @@ bool NcCfFile::get_grid_from_dimensions()
 
   if (_xCoordVar == nullptr)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Didn't find X coord variable (" << GET_NC_NAME_P(_xDim)
          << ") in netCDF file.\n\n";
-    exit(1);
+    return false;
   }
 
   if (_yCoordVar == nullptr)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Didn't find Y coord variable (" << GET_NC_NAME_P(_yDim)
          << ") in netCDF file.\n\n";
-    exit(1);
+    return false;
   }
 
   long lat_counts = GET_NC_SIZE_P(_yDim);
@@ -3331,15 +3360,21 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
 
   // Figure out the dlat/dlon values from the dimension variables
 
+  LatLonData data;
+  data.name = latlon_proj_type;
+  data.Nlat = lat_counts;
+  data.Nlon = lon_counts;
+
   long x_size = get_data_size(lon_var);
   long y_size = get_data_size(lat_var);
   long latlon_counts = lon_counts*lat_counts;
   bool two_dim_coord = (x_size == latlon_counts) && (y_size == latlon_counts );
+
   if( !two_dim_coord && (x_size != lon_counts || y_size != lat_counts))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "Coordinate variables don't match dimension sizes in netCDF file.\n\n";
-    exit(1);
+    return data;
   }
 
   double lat_values[lat_counts];
@@ -3365,6 +3400,8 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
     get_nc_data(lat_var,lat_values);
     get_nc_data(lon_var,lon_values);
   }
+  data.lat_ll = lat_values[0];
+  data.lon_ll = rescale_lon(-lon_values[0]);
 
   // Calculate dlat and dlon assuming they are constant.
 
@@ -3375,6 +3412,9 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
        << " dlat=" << dlat << " lon[0]=" << lon_values[0]
        << " lon[" << (lon_counts-1) << "]=" << lon_values[lon_counts-1]
        << " dlon=" << dlon << "\n";
+
+  data.delta_lat = dlat;
+  data.delta_lon = dlon;
 
   ConcatString point_nccf;
   bool skip_sanity_check = get_att_value_string(_ncFile, nc_att_met_point_nccf, point_nccf);
@@ -3406,7 +3446,7 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
              << i-1 << "]=" << lat_values[i-1] << " lat["
              << i << "]=" << lat_values[i] << "  "
              << fabs(curr_delta - dlat) << " > " << degree_tolerance << "\n";
-        mlog << Error << "\n" << method_name << " -> "
+        mlog << Warning << "\n" << method_name << " -> "
              << "MET can only process Latitude/Longitude files where the latitudes are evenly spaced (dlat="
              << dlat <<", delta[" << i << "]=" << curr_delta << ")\n\n";
         sanity_check_failed = true;
@@ -3426,7 +3466,7 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
              << i-1 << "]=" << lon_values[i-1] << " lon["
              << i << "]=" << lon_values[i] << "  "
              << fabs(curr_delta - dlon) << " > " << degree_tolerance << "\n";
-        mlog << Error << "\n" << method_name << " -> "
+        mlog << Warning << "\n" << method_name << " -> "
              << "MET can only process Latitude/Longitude files where the longitudes are evenly spaced (dlon="
              << dlon <<", delta[" << i << "]=" << curr_delta << ")\n\n";
         sanity_check_failed = true;
@@ -3435,9 +3475,9 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
     }
 
     if (sanity_check_failed) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name << " -> "
            << "Please check the input data is the lat/lon projection\n\n";
-      exit(1);
+      return data;
     }
   }
 
@@ -3450,16 +3490,6 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
   // guaranteed anywhere that I see.  But if this is not the case, then we
   // will probably also need to reorder the data itself.
 
-  LatLonData data;
-
-  data.name = latlon_proj_type;
-  data.lat_ll = lat_values[0];
-  data.lon_ll = rescale_lon(-lon_values[0]);
-  data.delta_lat = dlat;
-  data.delta_lon = dlon;
-  data.Nlat = lat_counts;
-  data.Nlon = lon_counts;
-
   if (dlat < 0) {
     swap_to_north = true;
     data.delta_lat = -dlat;
@@ -3468,6 +3498,7 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
   else {
     swap_to_north = false;
   }
+  grid_ready = true;
 
   return data;
 
