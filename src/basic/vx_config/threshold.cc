@@ -77,16 +77,22 @@ bool parse_perc_thresh(const char *str, PC_info *info)
 
 bool match = false;
 
-for (auto const &x : perc_thresh_info_map) {
+if ( perc_thresh_info_map.size() == 0 ) return false;
 
-   if ( x.second.short_name.compare(0, x.second.short_name.size(), str) &&
-        is_number(str + x.second.short_name.size()) ) {
+map<PercThreshType,PercThreshInfo>::const_iterator it;
+
+for (it  = perc_thresh_info_map.begin();
+     it != perc_thresh_info_map.end();
+     it++) {
+
+   if ( it->second.short_name.compare(0, it->second.short_name.size(), str) == 0 &&
+        is_number(str + it->second.short_name.size()) ) {
 
       if ( info ) {
 
-         info->ptype = x.first;
+         info->ptype = it->first;
 
-         info->value = atof(str + x.second.short_name.size());
+         info->value = atof(str + it->second.short_name.size());
 
       }
 
@@ -105,8 +111,8 @@ for (auto const &x : perc_thresh_info_map) {
 
 if ( !match ) {
 
-   if ( scp_perc_thresh_type_str.compare(0, 3, str) ||
-        cdp_perc_thresh_type_str.compare(0, 3, str) ) {
+   if ( scp_perc_thresh_type_str.compare(0, 3, str) == 0 ||
+        cdp_perc_thresh_type_str.compare(0, 3, str) == 0 ) {
 
       if ( print_climo_perc_thresh_log_message ) {
 
