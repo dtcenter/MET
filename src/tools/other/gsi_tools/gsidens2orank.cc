@@ -641,10 +641,8 @@ void write_orank_row_conv(AsciiTable &at, int row, int i_obs) {
    at.set_entry(row, col++, bad_data_double);          // SPREAD_OERR
    at.set_entry(row, col++, bad_data_double);          // SPREAD_PLUS_OERR
    at.set_entry(row, col++, bad_data_double);          // OBS_CLIMO_STDEV
-   /* MET #2924 Uncomment this section
    at.set_entry(row, col++, bad_data_double);          // FCST_CLIMO_MEAN
    at.set_entry(row, col++, bad_data_double);          // FCST_CLIMO_STDEV
-   */
 
    // Write extra columns
    at.set_entry(row, col++, d->n_use);                 // N_USE
@@ -711,10 +709,8 @@ void write_orank_row_rad(AsciiTable &at, int row, int i_obs) {
    at.set_entry(row, col++, bad_data_double);          // SPREAD_OERR
    at.set_entry(row, col++, bad_data_double);          // SPREAD_PLUS_OERR
    at.set_entry(row, col++, bad_data_double);          // OBS_CLIMO_STDEV
-   /* MET #2924 Uncomment this section
    at.set_entry(row, col++, bad_data_double);          // FCST_CLIMO_MEAN
    at.set_entry(row, col++, bad_data_double);          // FCST_CLIMO_STDEV
-   */
 
    // Write extra columns
    at.set_entry(row, col++, d->n_use);                 // N_USE
