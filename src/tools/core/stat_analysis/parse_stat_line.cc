@@ -333,7 +333,7 @@ void parse_mpr_line(STATLine &l, MPRData &m_data) {
       m_data.obs_climo_mean   = atof(l.get_item("CLIMO"));
       m_data.obs_climo_stdev  = bad_data_double;
       m_data.obs_climo_cdf    = bad_data_double;
-      m_data.fcst_climo_mean  = bad_data_double;
+      m_data.fcst_climo_mean  = atof(l.get_item("CLIMO"));
       m_data.fcst_climo_stdev = bad_data_double;
    }
    // In met-12.0.0 and later:
@@ -344,8 +344,8 @@ void parse_mpr_line(STATLine &l, MPRData &m_data) {
       m_data.obs_climo_mean   = atof(l.get_item("CLIMO_MEAN"));
       m_data.obs_climo_stdev  = atof(l.get_item("CLIMO_STDEV"));
       m_data.obs_climo_cdf    = atof(l.get_item("CLIMO_CDF"));
-      m_data.fcst_climo_mean  = bad_data_double;
-      m_data.fcst_climo_stdev = bad_data_double;
+      m_data.fcst_climo_mean  = atof(l.get_item("CLIMO_MEAN"));
+      m_data.fcst_climo_stdev = atof(l.get_item("CLIMO_STDEV"));
    }
    else {
       m_data.obs_climo_mean   = atof(l.get_item("OBS_CLIMO_MEAN"));
