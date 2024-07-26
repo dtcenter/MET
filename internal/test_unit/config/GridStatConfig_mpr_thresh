@@ -95,7 +95,7 @@ fcst = {
       { 
         mpr_column          = [ "ABS(OBS-CLIMO_MEAN)" ];
         mpr_thresh          = [ <=5                   ];
-        desc                = "ABS_CLIMO_MEAN_DIFF";
+        desc                = "ABS_OBS_CLIMO_MEAN_DIFF";
         nc_pairs_var_suffix = desc;
       },
       { 
