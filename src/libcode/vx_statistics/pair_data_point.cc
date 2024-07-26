@@ -237,7 +237,7 @@ void PairDataPoint::set_point_pair(int i_obs, const char *sid,
                                    double lvl, double elv,
                                    double f, double o, const char *qc,
                                    const ClimoPntInfo &cpi,
-                                   double wgt, SeepsScore *seeps) {
+                                   double wgt, const SeepsScore *seeps) {
 
    if(i_obs < 0 || i_obs >= n_obs) {
       mlog << Error << "\nPairDataPoint::set_point_pair() -> "
@@ -619,7 +619,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             }
 
             // Compute weight for current point
-            double wgt_v = (wgt_dp == (DataPlane *) 0 ?
+            double wgt_v = (wgt_dp == nullptr ?
                             default_grid_weight :
                             wgt_dp->get(x, y));
 
@@ -680,10 +680,7 @@ void VxPairDataPoint::load_seeps_climo(const ConcatString &seeps_climo_name) {
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(vector<PairDataPoint>::iterator it = pd.begin();
-       it != pd.end(); it++) {
-      it->load_seeps_climo(seeps_climo_name);
-   }
+   for(auto &x : pd) x.load_seeps_climo(seeps_climo_name);
 
    return;
 }
@@ -697,10 +694,7 @@ void VxPairDataPoint::set_seeps_thresh(const SingleThresh &p1_thresh) {
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(vector<PairDataPoint>::iterator it = pd.begin();
-       it != pd.end(); it++) {
-      it->set_seeps_thresh(p1_thresh);
-   }
+   for(auto &x : pd) x.set_seeps_thresh(p1_thresh);
 
    return;
 }
@@ -763,10 +757,9 @@ bool check_mpr_thresh(double f, double o, const ClimoPntInfo &cpi,
    StringArray sa;
    ConcatString cs;
    double v, v_cur;
-   int i, j;
 
    // Loop over all the column filter names
-   for(i=0; i<col_sa.n(); i++) {
+   for(int i=0; i<col_sa.n(); i++) {
 
       // Check for absolute value
       if(strncasecmp(col_sa[i].c_str(), "ABS", 3) == 0) {
@@ -789,7 +782,7 @@ bool check_mpr_thresh(double f, double o, const ClimoPntInfo &cpi,
       if(sa.n() > 1) {
 
          // Loop through the columns
-         for(j=1; j<sa.n(); j++) {
+         for(int j=1; j<sa.n(); j++) {
 
             // Get the current column value
             v_cur = get_mpr_column_value(f, o, cpi, sa[j].c_str());

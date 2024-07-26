@@ -66,7 +66,7 @@ class PairDataPoint : public PairBase {
       void set_point_pair(int, const char *, double, double, double, double,
                           unixtime, double, double, double, double,
                           const char *, const ClimoPntInfo &,
-                          double, SeepsScore *);
+                          double, const SeepsScore *);
 
       bool add_grid_pair(double, double, const ClimoPntInfo &, double);
 

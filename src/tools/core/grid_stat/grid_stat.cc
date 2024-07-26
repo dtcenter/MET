@@ -1354,11 +1354,11 @@ void process_scores() {
                   // Apply the current mask to the current fields
                   get_mask_points(conf_info.vx_opt[i], mask_mp,
                                   &fgx_dp, &ogx_dp,
-                                  0, 0, 0, 0,
+                                  nullptr, nullptr, nullptr, nullptr,
                                   &wgt_dp, pd_gx);
                   get_mask_points(conf_info.vx_opt[i], mask_mp,
                                   &fgy_dp, &ogy_dp,
-                                  0, 0, 0, 0,
+                                  nullptr, nullptr, nullptr, nullptr,
                                   &wgt_dp, pd_gy);
 
                   // Set the mask name
@@ -1446,8 +1446,8 @@ void process_scores() {
                      // Apply the current mask
                      get_mask_points(conf_info.vx_opt[i], mask_mp,
                                      &fcst_dp_mm, &obs_dp_mm,
-                                     &fcmn_dp, 0, &ocmn_dp, 0,
-                                     0, pd);
+                                     &fcmn_dp, nullptr, &ocmn_dp, nullptr,
+                                     nullptr, pd);
 
                      // Process percentile thresholds
                      conf_info.vx_opt[i].set_perc_thresh(pd);
@@ -1502,12 +1502,12 @@ void process_scores() {
                   // thresholded fields
                   get_mask_points(conf_info.vx_opt[i], mask_mp,
                                   &fcst_dp_dmap, &obs_dp_dmap,
-                                  0, 0, 0, 0,
-                                  0, pd);
+                                  nullptr, nullptr, nullptr, nullptr,
+                                  nullptr, pd);
                   get_mask_points(conf_info.vx_opt[i], mask_mp,
                                   &fcst_dp_thresh, &obs_dp_thresh,
-                                  0, 0, 0, 0,
-                                  0, pd_thr);
+                                  nullptr, nullptr, nullptr, nullptr,
+                                  nullptr, pd_thr);
 
                   dmap_info.set_options(
                         conf_info.vx_opt[i].baddeley_p,
@@ -1583,9 +1583,9 @@ void process_scores() {
                      // Apply the current mask
                      get_mask_points(conf_info.vx_opt[i], mask_mp,
                                      &fcst_dp, &obs_dp,
-                                     &fcmn_dp, 0,
-                                     &ocmn_dp, 0,
-                                     0, pd);
+                                     &fcmn_dp, nullptr,
+                                     &ocmn_dp, nullptr,
+                                     nullptr, pd);
 
                      // Process percentile thresholds
                      conf_info.vx_opt[i].set_perc_thresh(pd);
@@ -1691,12 +1691,12 @@ void process_scores() {
                   // and thresholded fields
                   get_mask_points(conf_info.vx_opt[i], mask_mp,
                                   &fcst_dp_smooth, &obs_dp_smooth,
-                                  0, 0, 0, 0,
+                                  nullptr, nullptr, nullptr, nullptr,
                                   &wgt_dp, pd);
                   get_mask_points(conf_info.vx_opt[i], mask_mp,
                                   &fcst_dp_thresh, &obs_dp_thresh,
-                                  0, 0, 0, 0,
-                                  0, pd_thr);
+                                  nullptr, nullptr, nullptr, nullptr,
+                                  nullptr, pd_thr);
 
                   // Store climatology values as bad data
                   pd.fcmn_na.add_const(bad_data_double, pd.f_na.n());
@@ -2008,8 +2008,8 @@ void process_scores() {
                // Apply the current mask to the U-wind fields
                get_mask_points(conf_info.vx_opt[i], mask_mp,
                                &fu_dp_smooth, &ou_dp_smooth,
-                               &fcmnu_dp_smooth, 0,
-                               &ocmnu_dp_smooth, 0,
+                               &fcmnu_dp_smooth, nullptr,
+                               &ocmnu_dp_smooth, nullptr,
                                &wgt_dp, pd_u);
 
                // Compute VL1L2

@@ -204,7 +204,7 @@ class VxPairDataEnsemble : public VxPairBase {
 
       void clear();
 
-      void set_ens_info(EnsVarInfo *);
+      void set_ens_info(const EnsVarInfo *);
       void set_size(int, int, int);
 
       // Call set_ens_size before add_ens

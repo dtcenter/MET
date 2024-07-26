@@ -186,9 +186,9 @@ class PairBase {
 
       void compute_climo_cdf();
 
-      double process_obs(const VarInfo *, double);
+      double process_obs(const VarInfo *, double) const;
 
-      void print_obs_summary();
+      void print_obs_summary() const;
 
       void calc_obs_summary();
 
@@ -316,13 +316,13 @@ class VxPairBase {
 
       void clear();
 
-      int three_to_one(int, int, int);
+      int three_to_one(int, int, int) const;
 
-      void set_fcst_info(VarInfo *);
-      void set_obs_info(VarInfo *);
+      void set_fcst_info(const VarInfo *);
+      void set_obs_info(const VarInfo *);
 
-      void set_fcst_climo_info(VarInfo *);
-      void set_obs_climo_info(VarInfo *);
+      void set_fcst_climo_info(const VarInfo *);
+      void set_obs_climo_info(const VarInfo *);
 
       void set_desc(const char *);
 
@@ -373,7 +373,7 @@ class VxPairBase {
       void set_obs_summary(ObsSummary obs_summary);
       void set_obs_perc_value(int percentile);
 
-      void print_obs_summary();
+      void print_obs_summary() const;
       void calc_obs_summary();
 
       bool is_keeper_sid(const char *, const char *);
@@ -450,9 +450,9 @@ extern double derive_prob(const NumArray &, const SingleThresh &);
 
 // Write the point observation in the MET point format for logging
 extern ConcatString point_obs_to_string(
-                       float *hdr_arr, const char *hdr_typ_str,
+                       const float *hdr_arr, const char *hdr_typ_str,
                        const char *hdr_sid_str, unixtime hdr_ut,
-                       const char *obs_qty, float *obs_arr,
+                       const char *obs_qty, const float *obs_arr,
                        const char *var_name);
 
 ////////////////////////////////////////////////////////////////////////

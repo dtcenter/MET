@@ -786,10 +786,7 @@ void PairDataEnsemble::compute_ssvar() {
 
    // Sort the bins
    set<string,ssvar_bin_comp> sorted_bins;
-   for( ssvar_bin_map::iterator map_it = bins.begin();
-        map_it != bins.end(); map_it++ ){
-      sorted_bins.insert( (*map_it).first );
-   }
+   for(auto &x : bins) sorted_bins.insert(x.first);
 
    // Report the number of bins built
    int n_bin = sorted_bins.size();
@@ -1052,7 +1049,7 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::set_ens_info(EnsVarInfo *info) {
+void VxPairDataEnsemble::set_ens_info(const EnsVarInfo *info) {
    VarInfoFactory f;
 
    // Deallocate, if necessary
@@ -1091,8 +1088,7 @@ void VxPairDataEnsemble::set_ens_size(int n) {
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(vector<PairDataEnsemble>::iterator it = pd.begin();
-       it != pd.end(); it++) {
+   for(auto it = pd.begin(); it != pd.end(); it++) {
 
       // Handle HiRA neighborhoods
       if(it->interp_mthd == InterpMthd::HiRA) {
@@ -1119,10 +1115,7 @@ void VxPairDataEnsemble::set_ssvar_bin_size(double ssvar_bin_size) {
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(vector<PairDataEnsemble>::iterator it = pd.begin();
-       it != pd.end(); it++) {
-      it->ssvar_bin_size = ssvar_bin_size;
-   }
+   for(auto &x : pd) x.ssvar_bin_size = ssvar_bin_size;
 
    return;
 }
@@ -1136,10 +1129,7 @@ void VxPairDataEnsemble::set_phist_bin_size(double phist_bin_size) {
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(vector<PairDataEnsemble>::iterator it = pd.begin();
-       it != pd.end(); it++) {
-      it->phist_bin_size = phist_bin_size;
-   }
+   for(auto &x : pd) x.phist_bin_size = phist_bin_size;
 
    return;
 }
@@ -1154,10 +1144,7 @@ void VxPairDataEnsemble::set_ctrl_index(int index) {
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(vector<PairDataEnsemble>::iterator it = pd.begin();
-       it != pd.end(); it++) {
-      it->ctrl_index = index;
-   }
+   for(auto &x : pd) x.ctrl_index = index;
 
    return;
 }
@@ -1171,10 +1158,7 @@ void VxPairDataEnsemble::set_skip_const(bool tf) {
            << "set_size() has not been called yet!\n\n";
    }
 
-   for(vector<PairDataEnsemble>::iterator it = pd.begin();
-       it != pd.end(); it++) {
-      it->skip_const = tf;
-   }
+   for(auto &x : pd) x.skip_const = tf;
 
    return;
 }
@@ -1320,7 +1304,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
                                 cpi)) continue;
 
             // Compute weight for current point
-            double wgt_v = (wgt_dp == (DataPlane *) 0 ?
+            double wgt_v = (wgt_dp == nullptr ?
                             default_grid_weight :
                             wgt_dp->get(x, y));
 
@@ -1362,8 +1346,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                     obs_info->is_specific_humidity();
 
    // Loop through all the PairDataEnsemble objects and interpolate
-   for(vector<PairDataEnsemble>::iterator it = pd.begin();
-       it != pd.end(); it++) {
+   for(auto it = pd.begin(); it != pd.end(); it++) {
 
       // Only apply HiRA to single levels
       if(it->interp_mthd == InterpMthd::HiRA &&

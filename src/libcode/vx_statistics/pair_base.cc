@@ -659,7 +659,7 @@ ob_val_t PairBase::compute_percentile(string obs_key, int perc) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::print_obs_summary(){
+void PairBase::print_obs_summary() const {
 
    if(!IsPointVx) return;
 
@@ -670,7 +670,7 @@ void PairBase::print_obs_summary(){
    //  iterate over ordered list map keys in the station id map
    for(int i=0; i<map_key.n(); i++) {
 
-      station_values_t svt = map_val[map_key[i]];
+      station_values_t svt = map_val.at(map_key[i]);
 
       mlog << Debug(4)
            << "Computed " << obssummary_to_string(obs_summary, obs_perc_value)
@@ -817,7 +817,7 @@ void PairBase::add_grid_obs(double x, double y, double o,
 
 ////////////////////////////////////////////////////////////////////////
 
-double PairBase::process_obs(const VarInfo *vinfo, double v) {
+double PairBase::process_obs(const VarInfo *vinfo, double v) const {
 
    if(!vinfo) return v;
 
@@ -1038,7 +1038,7 @@ void VxPairBase::copy_var_info(const VarInfo *info, VarInfo *&copy) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int VxPairBase::three_to_one(int i_msg_typ, int i_mask, int i_interp) {
+int VxPairBase::three_to_one(int i_msg_typ, int i_mask, int i_interp) const {
 
    int n = (i_interp * n_mask + i_mask)*n_msg_typ + i_msg_typ;
 
@@ -1057,7 +1057,7 @@ int VxPairBase::three_to_one(int i_msg_typ, int i_mask, int i_interp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::set_fcst_info(VarInfo *info) {
+void VxPairBase::set_fcst_info(const VarInfo *info) {
 
    copy_var_info(info, fcst_info);
 
@@ -1066,7 +1066,7 @@ void VxPairBase::set_fcst_info(VarInfo *info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::set_obs_info(VarInfo *info) {
+void VxPairBase::set_obs_info(const VarInfo *info) {
 
    copy_var_info(info, obs_info);
 
@@ -1075,7 +1075,7 @@ void VxPairBase::set_obs_info(VarInfo *info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::set_fcst_climo_info(VarInfo *info) {
+void VxPairBase::set_fcst_climo_info(const VarInfo *info) {
 
    copy_var_info(info, fclm_info);
 
@@ -1084,7 +1084,7 @@ void VxPairBase::set_fcst_climo_info(VarInfo *info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::set_obs_climo_info(VarInfo *info) {
+void VxPairBase::set_obs_climo_info(const VarInfo *info) {
 
    copy_var_info(info, oclm_info);
 
@@ -1249,7 +1249,6 @@ void VxPairBase::set_size(int types, int masks, int interps) {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairBase::set_msg_typ(int i_msg_typ, const char *name) {
-   int i, j;
 
    for(int i_mask=0; i_mask<n_mask; i_mask++) {
       for(int i_interp=0; i_interp<n_interp; i_interp++) {
@@ -1484,7 +1483,7 @@ void VxPairBase::set_obs_perc_value(int percentile) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::print_obs_summary() {
+void VxPairBase::print_obs_summary() const {
 
    if(n_vx == 0) {
       mlog << Warning << "\nVxPairBase::print_obs_summary() -> "
@@ -1541,10 +1540,10 @@ bool VxPairBase::is_keeper_var(
         const char *pnt_obs_str, const char *var_name, int grib_code) {
    bool keep = true;
 
-   VarInfoGrib *obs_info_grib = (VarInfoGrib *) obs_info;
+   const auto obs_info_grib = (VarInfoGrib *) obs_info;
 
    // Check for matching variable name or GRIB code
-   if((var_name != 0) && (m_strlen(var_name) > 0)) {
+   if((var_name != nullptr) && (m_strlen(var_name) > 0)) {
 
       if(var_name != obs_info->name()) {
 
@@ -1849,53 +1848,50 @@ bool VxPairBase::is_keeper_mask(
    int n = three_to_one(i_msg_typ, i_mask, 0);
 
    // Check for the obs falling within the masking region
-   if(pb_ptr[n]->mask_area_ptr != (MaskPlane *) 0) {
-      if(!pb_ptr[n]->mask_area_ptr->s_is_on(x, y)) {
+   if( pb_ptr[n]->mask_area_ptr != nullptr &&
+      !pb_ptr[n]->mask_area_ptr->s_is_on(x, y)) {
 
-         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-            mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << fcst_info->magic_str() << " versus "
-                 << obs_info->magic_str() << ", skipping observation "
-                 << "based on spatial masking region:\n"
-                 << pnt_obs_str << "\n";
-            }
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
+              << "based on spatial masking region:\n"
+              << pnt_obs_str << "\n";
+         }
 
-         inc_count(rej_mask, i_msg_typ, i_mask);
-         keep = false;
-      }
+      inc_count(rej_mask, i_msg_typ, i_mask);
+      keep = false;
    }
    // Otherwise, check for the masking SID list
-   else if(pb_ptr[n]->mask_sid_ptr != (StringArray *) 0) {
-      if(!pb_ptr[n]->mask_sid_ptr->has(hdr_sid_str)) {
+   else if( pb_ptr[n]->mask_sid_ptr != nullptr &&
+           !pb_ptr[n]->mask_sid_ptr->has(hdr_sid_str)) {
 
-         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-            mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << fcst_info->magic_str() << " versus "
-                 << obs_info->magic_str() << ", skipping observation "
-                 << "based on masking station id list:\n"
-                 << pnt_obs_str << "\n";
-         }
-
-         inc_count(rej_mask, i_msg_typ, i_mask);
-         keep = false;
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
+              << "based on masking station id list:\n"
+              << pnt_obs_str << "\n";
       }
+
+      inc_count(rej_mask, i_msg_typ, i_mask);
+      keep = false;
    }
    // Otherwise, check observation lat/lon thresholds
-   else if(pb_ptr[n]->mask_llpnt_ptr != (MaskLatLon *) 0) {
-      if(!pb_ptr[n]->mask_llpnt_ptr->lat_thresh.check(hdr_lat) ||
-         !pb_ptr[n]->mask_llpnt_ptr->lon_thresh.check(hdr_lon)) {
+   else if(  pb_ptr[n]->mask_llpnt_ptr != nullptr &&
+           (!pb_ptr[n]->mask_llpnt_ptr->lat_thresh.check(hdr_lat) ||
+            !pb_ptr[n]->mask_llpnt_ptr->lon_thresh.check(hdr_lon))) {
 
-         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-            mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << fcst_info->magic_str() << " versus "
-                 << obs_info->magic_str() << ", skipping observation "
-                 << "based on latitude/longitude thesholds:\n"
-                 << pnt_obs_str << "\n";
-         }
-
-         inc_count(rej_mask, i_msg_typ, i_mask);
-         keep = false;
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
+              << "based on latitude/longitude thesholds:\n"
+              << pnt_obs_str << "\n";
       }
+
+      inc_count(rej_mask, i_msg_typ, i_mask);
+      keep = false;
    }
 
    return keep;
@@ -2434,7 +2430,8 @@ NumArray derive_climo_prob(const ClimoCDFInfo *cdf_info_ptr,
    n_sd = sd_na.n_valid();
 
    // Check for constant climo probability
-   if(!is_bad_data(prob = othresh.get_obs_climo_prob())) {
+   prob = othresh.get_obs_climo_prob();
+   if(!is_bad_data(prob)) {
 
       mlog << Debug(4)
            << "For threshold " << othresh.get_str()
@@ -2563,14 +2560,14 @@ double derive_prob(const NumArray &na, const SingleThresh &st) {
 ////////////////////////////////////////////////////////////////////////
 
 // Write the point observation in the MET point format for logging
-ConcatString point_obs_to_string(float *hdr_arr, const char *hdr_typ_str,
+ConcatString point_obs_to_string(const float *hdr_arr, const char *hdr_typ_str,
                                  const char *hdr_sid_str, unixtime hdr_ut,
-                                 const char *obs_qty, float *obs_arr,
+                                 const char *obs_qty, const float *obs_arr,
                                  const char *var_name) {
    ConcatString obs_cs, name;
 
-   if((var_name != 0) && (0 < m_strlen(var_name))) name << var_name;
-   else                                            name << nint(obs_arr[1]);
+   if((var_name != nullptr) && (0 < m_strlen(var_name))) name << var_name;
+   else                                                  name << nint(obs_arr[1]);
 
    //
    // Write the 11-column MET point format:

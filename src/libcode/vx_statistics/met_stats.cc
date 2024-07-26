@@ -327,7 +327,7 @@ void CTSInfo::allocate_n_alpha(int i) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void CTSInfo::add(double f, double o, ClimoPntInfo *cpi) {
+void CTSInfo::add(double f, double o, const ClimoPntInfo *cpi) {
 
    if     ( fthresh.check(f, cpi) &&  othresh.check(o, cpi)) cts.inc_fy_oy();
    else if( fthresh.check(f, cpi) && !othresh.check(o, cpi)) cts.inc_fy_on();
@@ -606,7 +606,7 @@ void MCTSInfo::set_othresh(const ThreshArray &ta) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void MCTSInfo::add(double f, double o, ClimoPntInfo *cpi) {
+void MCTSInfo::add(double f, double o, const ClimoPntInfo *cpi) {
    int r, c;
 
    // Find the row and column for the forecast and observation values.
