@@ -589,7 +589,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             if(!is_keeper_climo(pnt_obs_str.c_str(),
                                 i_msg_typ, i_mask, i_interp,
                                 gr, obs_x, obs_y, obs_v, obs_lvl, obs_hgt,
-                                cpi)) return;
+                                cpi)) continue;
 
             // Check forecast values
             double fcst_v;
@@ -598,7 +598,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                                hdr_typ_str, gr,
                                obs_x, obs_y, hdr_elv,
                                obs_v, obs_lvl, obs_hgt,
-                               cpi, fcst_v)) return;
+                               cpi, fcst_v)) continue;
 
             // Check matched pair filtering options
             ConcatString reason_cs;

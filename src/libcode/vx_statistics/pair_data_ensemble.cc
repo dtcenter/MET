@@ -1317,7 +1317,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
             ClimoPntInfo cpi;
             if(!is_keeper_climo(pnt_obs_str.c_str(), i_msg_typ, i_mask, i_interp,
                                 gr, obs_x, obs_y, obs_v, obs_lvl, obs_hgt,
-                                cpi)) return;
+                                cpi)) continue;
 
             // Compute weight for current point
             double wgt_v = (wgt_dp == (DataPlane *) 0 ?
