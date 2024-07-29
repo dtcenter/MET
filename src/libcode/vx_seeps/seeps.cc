@@ -109,9 +109,13 @@ double weighted_average(double v1, double w1, double v2, double w2) {
 
 void SeepsAggScore::clear() {
 
+   // Syntax used to define SEEPS obs/fcast categories (s_* or c_*)
+   // o{d|l|h} : obs   in {dry(0)|light(1)|heavy(2)} category
+   // f{d|l|h} : fcsts in {dry(0)|light(1)|heavy(2)} category
+
    n_obs = 0;
-   c12 = c13 = c21 = c23 = c31 = c32 = 0;
-   s12 = s13 = s21 = s23 = s31 = s32 = 0.;
+   c_odfl = c_odfh = c_olfd = c_olfh = c_ohfd = c_ohfl = 0;
+   s_odfl = s_odfh = s_olfd = s_olfh = s_ohfd = s_ohfl = 0.;
    pv1 = pv2 = pv3 = 0.;
    pf1 = pf2 = pf3 = 0.;
    mean_fcst = mean_obs = bad_data_double;
@@ -134,21 +138,22 @@ SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
    n_obs += c.n_obs;
 
    // Increment counts
-   c12 += c.c12;
-   c13 += c.c13;
-   c21 += c.c21;
-   c23 += c.c23;
-   c31 += c.c31;
-   c32 += c.c32;
-
+   c_odfl += c.c_odfl;
+   c_odfh += c.c_odfh;
+   c_olfd += c.c_olfd;
+   c_olfh += c.c_olfh;
+   c_ohfd += c.c_ohfd;
+   c_ohfl += c.c_ohfl;
+   
    // Compute weighted averages
-   s12 = weighted_average(s12, w1, c.s12, w2);
-   s13 = weighted_average(s13, w1, c.s13, w2);
-   s21 = weighted_average(s21, w1, c.s21, w2);
-   s23 = weighted_average(s23, w1, c.s23, w2);
-   s31 = weighted_average(s31, w1, c.s31, w2);
-   s32 = weighted_average(s32, w1, c.s32, w2);
-
+   s_odfl = weighted_average(s_odfl, w1, c.s_odfl, w2);
+   s_odfh = weighted_average(s_odfh, w1, c.s_odfh, w2);
+   s_olfd = weighted_average(s_olfd, w1, c.s_olfd, w2);
+   s_olfh = weighted_average(s_olfh, w1, c.s_olfh, w2);
+   s_ohfd = weighted_average(s_ohfd, w1, c.s_ohfd, w2);
+   s_ohfl = weighted_average(s_ohfl, w1, c.s_ohfl, w2);
+   mlog << Debug(9) << "SEEPS 155: " << s_odfl << " " << s_odfh << "\n"; 
+   
    pv1 = weighted_average(pv1, w1, c.pv1, w2);
    pv2 = weighted_average(pv2, w1, c.pv2, w2);
    pv3 = weighted_average(pv3, w1, c.pv3, w2);
@@ -344,8 +349,12 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
             record->p2 = climo_record->p2[month-1];
             record->t1 = climo_record->t1[month-1];
             record->t2 = climo_record->t2[month-1];
+            mlog << Debug(9) << "SEEPS.cc 352 record info: sid, lat, lon, month, p1, p2, t1, t2 => "
+              << record->sid << " " << record->lat << " " << record->lon << " " << record->month
+              << " " << record->p1 << " " << record->p2 << " " << record->t1 << " " << record->t2 <<"\n";
             for (int idx=0; idx<SEEPS_MATRIX_SIZE; idx++) {
-               record->scores[idx] = climo_record->scores[month-1][idx];
+                record->scores[idx] = climo_record->scores[month-1][idx];
+                mlog << Debug(7) << "SEEPS.cc 356 record info (SEEPS matrix): score => " << record->scores[idx] <<"\n";
             }
          }
          else if (!is_eq(p1, bad_data_double)) {
@@ -363,13 +372,13 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
            << "or disable output for SEEPS and SEEPS_MPR.\n\n";
       exit(1);
    }
-
+   mlog << Debug(9) << "seeps.cc 349: " << filtered_count << "\n"; 
    return record;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-double SeepsClimo::get_score(int sid, double p_fcst, double p_obs,
+double SeepsClimo::get_seeps_category(int sid, double p_fcst, double p_obs,
                              int month, int hour) {
    double score = bad_data_double;
    SeepsRecord *record = get_record(sid, month, hour);
@@ -380,6 +389,7 @@ double SeepsClimo::get_score(int sid, double p_fcst, double p_obs,
       int jc = (p_fcst>record->t1)+(p_fcst>record->t2);
 
       score = record->scores[(jc*3)+ic];
+      mlog << Debug(9) << "seeps.cc 392 " << ic << " " << jc << " " << score << "\n";    
       delete record;
    }
 
@@ -399,11 +409,13 @@ SeepsScore *SeepsClimo::get_seeps_score(int sid, double p_fcst, double p_obs,
       score->p2 = record->p2;
       score->t1 = record->t1;
       score->t2 = record->t2;
-
+      mlog << Debug(9) << "seeps.cc 412: p1, p2, t1, t2 " << score->p1 << " " << score->p2 << " " << score->t1 << " " << score->t2 << " " << "\n"; 
+      
       score->obs_cat = (p_obs>record->t1)+(p_obs>record->t2);
       score->fcst_cat = (p_fcst>record->t1)+(p_fcst>record->t2);
       score->s_idx = (score->fcst_cat*3)+score->obs_cat;
       score->score = record->scores[score->s_idx];
+      mlog << Debug(9) << "seeps.cc 418: obs_cat, fc_cat, s_idx, score " << score->obs_cat << " " << score->fcst_cat << " " << score->s_idx << " " << score->score << " " << "\n"; 
       delete record;
    }
 
@@ -471,7 +483,7 @@ void SeepsClimo::print_record(SeepsRecord *record, bool with_header) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void SeepsClimo::read_seeps_scores(ConcatString filename) {
+void SeepsClimo::read_seeps_climo(ConcatString filename) {
    clock_t clock_time = clock();
    const char *method_name = "SeepsClimo::read_records() -> ";
 
