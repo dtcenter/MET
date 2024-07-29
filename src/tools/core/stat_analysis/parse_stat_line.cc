@@ -573,12 +573,12 @@ void parse_seeps_line(STATLine &l, SeepsAggScore &agg_score) {
 
    agg_score.n_obs = atoi(l.get_item("TOTAL"));
 
-   agg_score.s12 = atoi(l.get_item("S12"));
-   agg_score.s13 = atoi(l.get_item("S13"));
-   agg_score.s21 = atof(l.get_item("S21"));
-   agg_score.s23 = atof(l.get_item("S23"));
-   agg_score.s31 = atof(l.get_item("S31"));
-   agg_score.s32 = atof(l.get_item("S32"));
+   agg_score.s_odfl = atoi(l.get_item("S_ODFL"));
+   agg_score.s_odfh = atoi(l.get_item("S_ODFH"));
+   agg_score.s_olfd = atof(l.get_item("S_OLFD"));
+   agg_score.s_olfh = atof(l.get_item("S_OLFH"));
+   agg_score.s_ohfd = atof(l.get_item("S_OHFD"));
+   agg_score.s_ohfl = atof(l.get_item("S_OHFL"));
 
    agg_score.pf1 = atof(l.get_item("PF1"));
    agg_score.pf2 = atof(l.get_item("PF2"));

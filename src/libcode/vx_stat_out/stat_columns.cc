@@ -4141,12 +4141,12 @@ void write_seeps_cols(const SeepsAggScore *seeps,
 
    at.set_entry(r, c+0, seeps->n_obs);  // Total Number of Pairs
 
-   at.set_entry(r, c+1, seeps->s12);    // s12
-   at.set_entry(r, c+2, seeps->s13);    // s13
-   at.set_entry(r, c+3, seeps->s21);    // s21
-   at.set_entry(r, c+4, seeps->s23);    // s23
-   at.set_entry(r, c+5, seeps->s31);    // s31
-   at.set_entry(r, c+6, seeps->s32);    // s32
+   at.set_entry(r, c+1, seeps->s_odfl); // s_odfl
+   at.set_entry(r, c+2, seeps->s_odfh); // s_odfh
+   at.set_entry(r, c+3, seeps->s_olfd); // s_olfd
+   at.set_entry(r, c+4, seeps->s_olfh); // s_olfh
+   at.set_entry(r, c+5, seeps->s_ohfd); // s_ohfd
+   at.set_entry(r, c+6, seeps->s_ohfl); // s_ohfl
 
    at.set_entry(r, c+7, seeps->pf1);    // pf1
    at.set_entry(r, c+8, seeps->pf2);    // pf2

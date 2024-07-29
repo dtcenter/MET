@@ -296,20 +296,20 @@ bool PairDataPoint::add_grid_pair(const NumArray &f_in,   const NumArray &o_in,
 static int seeps_record_count = 0;
 static int seeps_debug_level = 9;
 
-SeepsScore *PairDataPoint::compute_seeps(const char *sid, double f,
-                                         double o, unixtime ut) {
-   SeepsScore *seeps = 0;
+double PairDataPoint::compute_seeps(const char *sid, double f,
+                                    double o, unixtime ut) {
+   double seeps = bad_data_double;
    int month, day, year, hour, minute, second;
 
    int sid_no = atoi(sid);
    if (sid_no && nullptr != seeps_climo) {
       unix_to_mdyhms(ut, month, day, year, hour, minute, second);
-      seeps = seeps_climo->get_seeps_score(sid_no, f, o, month, hour);
-      if (mlog.verbosity_level() >= seeps_debug_level
-          && seeps && !is_eq(seeps->score, bad_data_double)
-          && !is_eq(seeps->score, 0) && seeps_record_count < 10) {
+      seeps = seeps_climo->get_seeps_category(sid_no, f, o, month, hour);
+      if (mlog.verbosity_level() >= seeps_debug_level &&
+          !is_bad_data(seeps) && !is_eq(seeps, 0) &&
+          seeps_record_count < 10) {
          mlog << Debug(seeps_debug_level)
-              << "PairDataPoint::compute_seeps() score = " << seeps->score << "\n";
+              << "PairDataPoint::compute_seeps() score = " << seeps << "\n";
          seeps_record_count++;
       }
    }

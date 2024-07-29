@@ -372,14 +372,17 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
            << "or disable output for SEEPS and SEEPS_MPR.\n\n";
       exit(1);
    }
-   mlog << Debug(9) << "seeps.cc 349: " << filtered_count << "\n"; 
+   mlog << Debug(9) << "get_record() -> sid = " << sid
+        << ", month = " << month << ", hour = " << hour
+        << ", filtered_count = " << get_filtered_count() << "\n";
+
    return record;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double SeepsClimo::get_seeps_category(int sid, double p_fcst, double p_obs,
-                             int month, int hour) {
+                                      int month, int hour) {
    double score = bad_data_double;
    SeepsRecord *record = get_record(sid, month, hour);
 
@@ -680,7 +683,7 @@ SeepsClimoGrid::SeepsClimoGrid(int month, int hour, ConcatString seeps_climo_nam
 
    clear();
    p1_buf = p2_buf = t1_buf = t2_buf = nullptr;
-   s12_buf = s13_buf = s21_buf = s23_buf = s31_buf = s32_buf = nullptr;
+   s_odfl_buf = s_odfh_buf = s_olfd_buf = s_olfh_buf = s_ohfd_buf = s_ohfl_buf = nullptr;
 
    ConcatString seeps_name = get_climo_filename();
    if (file_exists(seeps_name.c_str())) read_seeps_climo_grid(seeps_name);
@@ -701,12 +704,12 @@ void SeepsClimoGrid::clear() {
    if (nullptr != p2_buf) { delete [] p2_buf; p2_buf = nullptr; }
    if (nullptr != t1_buf) { delete [] t1_buf; t1_buf = nullptr; }
    if (nullptr != t2_buf) { delete [] t2_buf; t2_buf = nullptr; }
-   if (nullptr != s12_buf) { delete [] s12_buf; s12_buf = nullptr; }
-   if (nullptr != s13_buf) { delete [] s13_buf; s13_buf = nullptr; }
-   if (nullptr != s21_buf) { delete [] s21_buf; s21_buf = nullptr; }
-   if (nullptr != s23_buf) { delete [] s23_buf; s23_buf = nullptr; }
-   if (nullptr != s31_buf) { delete [] s31_buf; s31_buf = nullptr; }
-   if (nullptr != s32_buf) { delete [] s32_buf; s32_buf = nullptr; }
+   if (nullptr != s_odfl_buf) { delete [] s_odfl_buf; s_odfl_buf = nullptr; }
+   if (nullptr != s_odfh_buf) { delete [] s_odfh_buf; s_odfh_buf = nullptr; }
+   if (nullptr != s_olfd_buf) { delete [] s_olfd_buf; s_olfd_buf = nullptr; }
+   if (nullptr != s_olfh_buf) { delete [] s_olfh_buf; s_olfh_buf = nullptr; }
+   if (nullptr != s_ohfd_buf) { delete [] s_ohfd_buf; s_ohfd_buf = nullptr; }
+   if (nullptr != s_ohfl_buf) { delete [] s_ohfl_buf; s_ohfl_buf = nullptr; }
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -749,34 +752,31 @@ SeepsScore *SeepsClimoGrid::get_record(int ix, int iy,
 double SeepsClimoGrid::get_seeps_score(int offset, int obs_cat, int fcst_cat) {
    double score = bad_data_double;
 
-   if (offset >= (nx * ny)) {
-      mlog << Error << "\nSeepsClimoGrid::get_seeps_score() --> offset (" << offset
-           << " is too big (" << (nx*ny) << ")\n";
+   if (offset < 0 || offset >= (nx * ny)) {
+      mlog << Error << "\nSeepsClimoGrid::get_seeps_score() -> "
+           << "offset (" << offset << ") is too big ("
+           << (nx*ny) << ")\n";
       return score;
    }
 
    // Place climate score depending on obs and forecast categories
    if (obs_cat == 0) {
-      if (fcst_cat == 1) score = s_odfl_buf[gridpos];
-      else if (fcst_cat == 2) score = s_odfh_buf[gridpos];
+      if (fcst_cat == 1) score = s_odfl_buf[offset];
+      else if (fcst_cat == 2) score = s_odfh_buf[offset];
       else score = 0.;
    }
    else if (obs_cat == 1) {
-      if (fcst_cat == 0) score = s_olfd_buf[gridpos];
-      else if (fcst_cat == 2) score = s_olfh_buf[gridpos];
+      if (fcst_cat == 0) score = s_olfd_buf[offset];
+      else if (fcst_cat == 2) score = s_olfh_buf[offset];
       else score = 0.;
    }
    else {
-      if (fcst_cat == 0) score = s_ohfd_buf[gridpos];
-      else if (fcst_cat == 1) score = s_ohfl_buf[gridpos];
+      if (fcst_cat == 0) score = s_ohfd_buf[offset];
+      else if (fcst_cat == 1) score = s_ohfl_buf[offset];
       else score = 0.;
    }
-   mlog << Debug(9) << "In get_seeps_score 755: " << obs_cat << " " << fcst_cat << " " << score << "\n";
-
-   if (gridpos == 302806) {
-     mlog << "get_seeps_score line 794 " << s_odfl_buf[gridpos] << " " << s_odfh_buf[gridpos] << " " << s_olfd_buf[gridpos] << " " << s_olfh_buf[gridpos] << " " << s_ohfd_buf[gridpos] << " " << s_ohfl_buf[gridpos] << "\n";
-   }
-     
+   mlog << Debug(9) << "In get_seeps_score() -> obs_cat = " << obs_cat
+        << ", fcst_cat = " << fcst_cat << ", score = " << score << "\n";
 
    return score;
 }
@@ -804,7 +804,7 @@ void SeepsClimoGrid::read_seeps_climo_grid(ConcatString filename) {
       if (standalone_debug_seeps) cout << "dimensions lon = " << nx << " lat = " << ny
                                        << " month=" << month << "\n";;
 
-      // Variables in climo file named as s12, s13 etc. These then stored
+      // Variables in climo file named as s_odfl, s_odfh etc. These then stored
       // into new convention s_odfl, s_odfh etc.
 
       p1_buf     = new double[nx*ny];
@@ -838,7 +838,8 @@ void SeepsClimoGrid::read_seeps_climo_grid(ConcatString filename) {
       dims.add(ny);
       dims.add(nx);
 
-      mlog << "read_seeps_climo_grid line 904 " << &var_odfl_00 << "\n";
+      mlog << Debug(9) << "read_seeps_climo_grid() -> var_odfl_00 = "
+           << &var_odfl_00 << "\n";
 
       if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_buf, dims, curs)) {
          mlog << Error << "\n" << method_name
@@ -893,9 +894,9 @@ void SeepsClimoGrid::read_seeps_climo_grid(ConcatString filename) {
       nc_file->close();
 
       for(int i = 0; i < ny+3; i++) {
-        mlog << "read_seeps_climo_grid line 958 " << s_odfl_buf[i] << "\n";
+        mlog << Debug(9) << "read_seeps_climo_grid() -> s_odfl_buf["
+             << i << "] = " << s_odfl_buf[i] << "\n";
       }
-      mlog << "read_seeps_climo_grid line 961 " << s_odfl_buf[302806] << " " << s_odfh_buf[302806] << " " << s_olfd_buf[302806] << " " << s_olfh_buf[302806] << " " << s_ohfd_buf[302806] << " " << s_ohfl_buf[302806] << "\n";
 
       float duration = (float)(clock() - clock_time)/CLOCKS_PER_SEC;
       mlog << Debug(6) << method_name << "took " << duration << " seconds\n";
@@ -924,36 +925,24 @@ void SeepsClimoGrid::print_all() {
       cout << method_name << " p2_buf[" << offset << "] = " <<  p2_buf[offset]  << "\n";
       cout << method_name << " t1_buf[" << offset << "] = " <<  t1_buf[offset]  << "\n";
       cout << method_name << " t2_buf[" << offset << "] = " <<  t2_buf[offset]  << "\n";
-      cout << method_name << "s_odfl_buf[" << gridpos << "] = " << s_odfl_buf[gridpos]  << "\n";
-      cout << method_name << "s_odfh_buf[" << gridpos << "] = " << s_odfh_buf[gridpos]  << "\n";
-      cout << method_name << "s_olfd_buf[" << gridpos << "] = " << s_olfd_buf[gridpos]  << "\n";
-      cout << method_name << "s_olfh_buf[" << gridpos << "] = " << s_olfh_buf[gridpos]  << "\n";
-      cout << method_name << "s_ohfd_buf[" << gridpos << "] = " << s_ohfd_buf[gridpos]  << "\n";
-      cout << method_name << "s_ohfl_buf[" << gridpos << "] = " << s_ohfl_buf[gridpos]  << "\n";
-
-      offset = 302806;
-      cout << method_name << " p1_buf[" << offset << "] = " <<  p1_buf[offset]  << "\n";
-      cout << method_name << " p2_buf[" << offset << "] = " <<  p2_buf[offset]  << "\n";
-      cout << method_name << " t1_buf[" << offset << "] = " <<  t1_buf[offset]  << "\n";
-      cout << method_name << " t2_buf[" << offset << "] = " <<  t2_buf[offset]  << "\n";
-      cout << method_name << "s_odfl_buf[" << gridpos << "] = " << s_odfl_buf[gridpos]  << "\n";
-      cout << method_name << "s_odfh_buf[" << gridpos << "] = " << s_odfh_buf[gridpos]  << "\n";
-      cout << method_name << "s_olfd_buf[" << gridpos << "] = " << s_olfd_buf[gridpos]  << "\n";
-      cout << method_name << "s_olfh_buf[" << gridpos << "] = " << s_olfh_buf[gridpos]  << "\n";
-      cout << method_name << "s_ohfd_buf[" << gridpos << "] = " << s_ohfd_buf[gridpos]  << "\n";
-      cout << method_name << "s_ohfl_buf[" << gridpos << "] = " << s_ohfl_buf[gridpos]  << "\n";
+      cout << method_name << "s_odfl_buf[" << offset << "] = " << s_odfl_buf[offset]  << "\n";
+      cout << method_name << "s_odfh_buf[" << offset << "] = " << s_odfh_buf[offset]  << "\n";
+      cout << method_name << "s_olfd_buf[" << offset << "] = " << s_olfd_buf[offset]  << "\n";
+      cout << method_name << "s_olfh_buf[" << offset << "] = " << s_olfh_buf[offset]  << "\n";
+      cout << method_name << "s_ohfd_buf[" << offset << "] = " << s_ohfd_buf[offset]  << "\n";
+      cout << method_name << "s_ohfl_buf[" << offset << "] = " << s_ohfl_buf[offset]  << "\n";
       
       offset = (nx*ny) - 1;
       cout << method_name << " p1_buf[" << offset << "] = " <<  p1_buf[offset]  << "\n";
       cout << method_name << " p2_buf[" << offset << "] = " <<  p2_buf[offset]  << "\n";
       cout << method_name << " t1_buf[" << offset << "] = " <<  t1_buf[offset]  << "\n";
       cout << method_name << " t2_buf[" << offset << "] = " <<  t2_buf[offset]  << "\n";
-      cout << method_name << "s_odfl_buf[" << gridpos << "] = " << s_odfl_buf[gridpos]  << "\n";
-      cout << method_name << "s_odfh_buf[" << gridpos << "] = " << s_odfh_buf[gridpos]  << "\n";
-      cout << method_name << "s_olfd_buf[" << gridpos << "] = " << s_olfd_buf[gridpos]  << "\n";
-      cout << method_name << "s_olfh_buf[" << gridpos << "] = " << s_olfh_buf[gridpos]  << "\n";
-      cout << method_name << "s_ohfd_buf[" << gridpos << "] = " << s_ohfd_buf[gridpos]  << "\n";
-      cout << method_name << "s_ohfl_buf[" << gridpos << "] = " << s_ohfl_buf[gridpos]  << "\n";
+      cout << method_name << "s_odfl_buf[" << offset << "] = " << s_odfl_buf[offset]  << "\n";
+      cout << method_name << "s_odfh_buf[" << offset << "] = " << s_odfh_buf[offset]  << "\n";
+      cout << method_name << "s_olfd_buf[" << offset << "] = " << s_olfd_buf[offset]  << "\n";
+      cout << method_name << "s_olfh_buf[" << offset << "] = " << s_olfh_buf[offset]  << "\n";
+      cout << method_name << "s_ohfd_buf[" << offset << "] = " << s_ohfd_buf[offset]  << "\n";
+      cout << method_name << "s_ohfl_buf[" << offset << "] = " << s_ohfl_buf[offset]  << "\n";
      
    }
 }

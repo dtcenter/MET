@@ -39,18 +39,18 @@ constexpr char var_name_t1_12[]     = "t1_12";
 constexpr char var_name_t2_12[]     = "t2_12";
 constexpr char var_name_matrix_00[] = "matrix_00";
 constexpr char var_name_matrix_12[] = "matrix_12";
-constexpr char *var_name_odfl_00    = "odfl_00";
-constexpr char *var_name_odfh_00    = "odfh_00";
-constexpr char *var_name_olfd_00    = "olfd_00";
-constexpr char *var_name_olfh_00    = "olfh_00";
-constexpr char *var_name_ohfd_00    = "ohfd_00";
-constexpr char *var_name_ohfl_00    = "ohfl_00";
-constexpr char *var_name_odfl_12    = "odfl_12";
-constexpr char *var_name_odfh_12    = "odfh_12";
-constexpr char *var_name_olfd_12    = "olfd_12";
-constexpr char *var_name_olfh_12    = "olfh_12";
-constexpr char *var_name_ohfd_12    = "ohfd_12";
-constexpr char *var_name_ohfl_12    = "ohfl_12";
+constexpr char var_name_odfl_00[]   = "odfl_00";
+constexpr char var_name_odfh_00[]   = "odfh_00";
+constexpr char var_name_olfd_00[]   = "olfd_00";
+constexpr char var_name_olfh_00[]   = "olfh_00";
+constexpr char var_name_ohfd_00[]   = "ohfd_00";
+constexpr char var_name_ohfl_00[]   = "ohfl_00";
+constexpr char var_name_odfl_12[]   = "odfl_12";
+constexpr char var_name_odfh_12[]   = "odfh_12";
+constexpr char var_name_olfd_12[]   = "olfd_12";
+constexpr char var_name_olfh_12[]   = "olfh_12";
+constexpr char var_name_ohfd_12[]   = "ohfd_12";
+constexpr char var_name_ohfl_12[]   = "ohfl_12";
 constexpr char def_seeps_point_filename[] =
    "MET_BASE/climo/seeps/PPT24_seepsweights.nc";
 constexpr char def_seeps_grid_filename[] =
@@ -80,7 +80,6 @@ struct SeepsAggScore {  // For SEEPS
    void clear();
    SeepsAggScore & operator+=(const SeepsAggScore &);
 
-   int   n_obs;
    int    n_obs;
    int    c_odfl;
    int    c_odfh;
@@ -196,8 +195,10 @@ class SeepsClimo : public SeepsClimoBase {
      ~SeepsClimo();
 
       SeepsRecord *get_record(int sid, int month, int hour);
-      double get_score(int sid, double p_fcst, double p_obs, int month, int hour);
-      SeepsScore *get_seeps_score(int sid, double p_fcst, double p_obs, int month, int hour);
+      double get_score(int sid, double p_fcst, double p_obs,
+                       int month, int hour);
+      double get_seeps_category(int sid, double p_fcst, double p_obs,
+                                int month, int hour);
       void print_all();
       void print_record(SeepsRecord *record, bool with_header=false);
 
@@ -242,8 +243,7 @@ class SeepsClimoGrid : public SeepsClimoBase {
      ~SeepsClimoGrid();
 
       SeepsScore *get_record(int ix, int iy, double p_fcst, double p_obs);
-      double get_score(int offset, int obs_cat, int fcst_cat);
-      double get_score(int ix, int iy, double p_fcst, double p_obs);
+      double get_seeps_score(int offset, int obs_cat, int fcst_cat);
       void print_all();
 
       //
