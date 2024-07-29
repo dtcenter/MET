@@ -156,7 +156,7 @@ class SeepsClimoBase {
       virtual void clear();
       virtual ConcatString get_env_climo_name() { return "not defined"; };
       virtual char *get_def_climo_name() { return nullptr; };
-      virtual void read_seeps_scores(ConcatString filename) {};
+      virtual void read_seeps_climo_grid(ConcatString filename) {};
       void set_seeps_ready(bool _seeps_ready) { seeps_ready = _seeps_ready; };
 
    public:
@@ -188,7 +188,7 @@ class SeepsClimo : public SeepsClimoBase {
       void clear() override;
       ConcatString get_env_climo_name() override { return MET_ENV_SEEPS_POINT_CLIMO_NAME; };
       char *get_def_climo_name() override { return (char *)def_seeps_point_filename; };
-      void read_seeps_scores(ConcatString filename) override;
+      void read_seeps_climo_grid(ConcatString filename) override;
 
    public:
 
@@ -234,7 +234,7 @@ class SeepsClimoGrid : public SeepsClimoBase {
       void clear() override;
       ConcatString get_env_climo_name() override { return MET_ENV_SEEPS_GRID_CLIMO_NAME; };
       char *get_def_climo_name() override { return (char *)def_seeps_grid_filename; };
-      void read_seeps_scores(ConcatString filename) override;
+      void read_seeps_climo_grid(ConcatString filename) override;
 
    public:
 
