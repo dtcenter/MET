@@ -49,6 +49,9 @@ extern void write_phist_header_row (int, int, AsciiTable &, int, int);
 extern void write_orank_header_row (int, int, AsciiTable &, int, int);
 extern void write_relp_header_row  (int, int, AsciiTable &, int, int);
 
+extern StringArray get_mctc_columns (int);
+extern StringArray get_pct_columns  (int);
+
 extern void write_fho_row   (StatHdrColumns &, const CTSInfo &, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_ctc_row   (StatHdrColumns &, const CTSInfo &, STATOutputType,

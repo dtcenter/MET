@@ -60,6 +60,8 @@ static const char * program_name = "series_analysis";
 static const char * default_config_filename =
    "MET_BASE/config/SeriesAnalysisConfig_default";
 
+static const char * all_columns = "ALL";
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Variables for Command Line Arguments
@@ -68,10 +70,11 @@ static const char * default_config_filename =
 
 // Input files
 static StringArray fcst_files, found_fcst_files;
-static StringArray obs_files,  found_obs_files;
-static GrdFileType ftype  = FileType_None;
-static GrdFileType otype  = FileType_None;
-static bool        paired = false;
+static StringArray obs_files, found_obs_files;
+static GrdFileType ftype = FileType_None;
+static GrdFileType otype = FileType_None;
+static ConcatString input_file;
+static bool paired = false;
 static int compress_level = -1;
 
 // Output file

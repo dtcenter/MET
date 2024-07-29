@@ -35,6 +35,7 @@
 //   014    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   015    10/03/22  Presotpnik     MET #2227 Remove namespace netCDF from header files
 //   016    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings
+//   017    07/26/24  Halley Gotway  MET #1371 Aggregate statistics through time
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -103,6 +104,11 @@ static void store_stat_pstd (int, const ConcatString &, const PCTInfo &);
 static void store_stat_pjc  (int, const ConcatString &, const PCTInfo &);
 static void store_stat_prc  (int, const ConcatString &, const PCTInfo &);
 
+static void store_stat_all_ctc  (int, const CTSInfo &);
+static void store_stat_all_mctc (int, const MCTSInfo &);
+static void store_stat_all_sl1l2(int, const SL1L2Info &);
+static void store_stat_all_pct  (int, const PCTInfo &);
+
 static void setup_nc_file(const VarInfo *, const VarInfo *);
 static void add_nc_var(const ConcatString &, const ConcatString &,
                        const ConcatString &, const ConcatString &,
@@ -118,6 +124,7 @@ static void usage();
 static void set_fcst_files(const StringArray &);
 static void set_obs_files(const StringArray &);
 static void set_both_files(const StringArray &);
+static void set_input(const StringArray &);
 static void set_paired(const StringArray &);
 static void set_out_file(const StringArray &);
 static void set_config_file(const StringArray &);
@@ -167,6 +174,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_fcst_files,  "-fcst",  -1);
    cline.add(set_obs_files,   "-obs",   -1);
    cline.add(set_both_files,  "-both",  -1);
+   cline.add(set_input,       "-input",  1);
    cline.add(set_paired,      "-paired", 0);
    cline.add(set_config_file, "-config", 1);
    cline.add(set_out_file,    "-out",    1);
@@ -1230,6 +1238,9 @@ void store_stat_ctc(int n, const ConcatString &col,
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
 
+   // Handle ALL columns
+   if(c == all_columns) return store_stat_all_ctc(n, cts_info);
+
    // Get the column value
         if(c == "TOTAL")    { v = cts_info.cts.n();        }
    else if(c == "FY_OY")    { v = cts_info.cts.fy_oy();    }
@@ -1446,6 +1457,9 @@ void store_stat_mctc(int n, const ConcatString &col,
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
    ConcatString d = c;
+
+   // Handle ALL columns
+   if(c == all_columns) return store_stat_all_mctc(n, mcts_info);
 
    // Get the column value
         if(c == "TOTAL")    { v = (double) mcts_info.cts.total();    }
@@ -1748,6 +1762,9 @@ void store_stat_sl1l2(int n, const ConcatString &col,
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
 
+   // Handle ALL columns
+   if(c == all_columns) return store_stat_all_sl1l2(n, s_info);
+
    // Get the column value
         if(c == "TOTAL")  { v = (double) s_info.scount; }
    else if(c == "FBAR")   { v = s_info.fbar;            }
@@ -1810,6 +1827,9 @@ void store_stat_pct(int n, const ConcatString &col,
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
    ConcatString d = c;
+
+   // Handle ALL columns
+   if(c == all_columns) return store_stat_all_pct(n, pct_info);
 
    // Get index value for variable column numbers
    if(check_reg_exp("_[0-9]", c.c_str())) {
@@ -2081,6 +2101,40 @@ void store_stat_prc(int n, const ConcatString &col,
 
 ////////////////////////////////////////////////////////////////////////
 
+void store_stat_all_ctc(int n, const CTSInfo &cts_info) {
+   for(int i=0; i<n_ctc_columns; i++) {
+      store_stat_ctc(n, ctc_columns[i], cts_info);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void store_stat_all_mctc(int n, const MCTSInfo &mcts_info) {
+   StringArray mctc_cols(get_mctc_columns(mcts_info.cts.nrows()));
+   for(int i=0; i<mctc_cols.n(); i++) {
+      store_stat_mctc(n, mctc_cols[i], mcts_info);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void store_stat_all_sl1l2(int n, const SL1L2Info &s_info) {
+   for(int i=0; i<n_sl1l2_columns; i++) {
+      store_stat_sl1l2(n, sl1l2_columns[i], s_info);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void store_stat_all_pct(int n, const PCTInfo &pct_info) {
+   StringArray pct_cols(get_pct_columns(pct_info.pct.nrows() + 1));
+   for(int i=0; i<pct_cols.n(); i++) {
+      store_stat_pct(n, pct_cols[i], pct_info);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
 
    // Create a new NetCDF file and open it
@@ -2265,6 +2319,7 @@ void usage() {
         << "\t-fcst  file_1 ... file_n | fcst_file_list\n"
         << "\t-obs   file_1 ... file_n | obs_file_list\n"
         << "\t[-both file_1 ... file_n | both_file_list]\n"
+        << "\t[-input input_file]\n"
         << "\t[-paired]\n"
         << "\t-out file\n"
         << "\t-config file\n"
@@ -2286,6 +2341,10 @@ void usage() {
 
         << "\t\t\"-both\" sets the \"-fcst\" and \"-obs\" options to "
         << "the same set of files (optional).\n"
+
+        << "\t\t\"-input input_file\" specifies a series_analysis output "
+        << "file with partial sums and/or contingency table counts to be "
+        << "updated prior to deriving statistics (optional).\n"
 
         << "\t\t\"-paired\" to indicate that the input -fcst and -obs "
         << "file lists are already paired (optional).\n"
@@ -2325,6 +2384,12 @@ void set_obs_files(const StringArray & a) {
 void set_both_files(const StringArray & a) {
    set_fcst_files(a);
    set_obs_files(a);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_input(const StringArray & a) {
+   input_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
