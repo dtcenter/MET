@@ -39,19 +39,18 @@ constexpr char var_name_t1_12[]     = "t1_12";
 constexpr char var_name_t2_12[]     = "t2_12";
 constexpr char var_name_matrix_00[] = "matrix_00";
 constexpr char var_name_matrix_12[] = "matrix_12";
-constexpr char var_name_s12_00[]    = "s12_00";
-constexpr char var_name_s13_00[]    = "s13_00";
-constexpr char var_name_s21_00[]    = "s21_00";
-constexpr char var_name_s23_00[]    = "s23_00";
-constexpr char var_name_s31_00[]    = "s31_00";
-constexpr char var_name_s32_00[]    = "s32_00";
-constexpr char var_name_s12_12[]    = "s12_12";
-constexpr char var_name_s13_12[]    = "s13_12";
-constexpr char var_name_s21_12[]    = "s21_12";
-constexpr char var_name_s23_12[]    = "s23_12";
-constexpr char var_name_s31_12[]    = "s31_12";
-constexpr char var_name_s32_12[]    = "s32_12";
-
+constexpr char *var_name_odfl_00    = "odfl_00";
+constexpr char *var_name_odfh_00    = "odfh_00";
+constexpr char *var_name_olfd_00    = "olfd_00";
+constexpr char *var_name_olfh_00    = "olfh_00";
+constexpr char *var_name_ohfd_00    = "ohfd_00";
+constexpr char *var_name_ohfl_00    = "ohfl_00";
+constexpr char *var_name_odfl_12    = "odfl_12";
+constexpr char *var_name_odfh_12    = "odfh_12";
+constexpr char *var_name_olfd_12    = "olfd_12";
+constexpr char *var_name_olfh_12    = "olfh_12";
+constexpr char *var_name_ohfd_12    = "ohfd_12";
+constexpr char *var_name_ohfl_12    = "ohfl_12";
 constexpr char def_seeps_point_filename[] =
    "MET_BASE/climo/seeps/PPT24_seepsweights.nc";
 constexpr char def_seeps_grid_filename[] =
@@ -65,8 +64,8 @@ const double density_radius_rad = density_radius * rad_per_deg;
 ////////////////////////////////////////////////////////////////////////
 
 struct SeepsScore { // For SEEPS_MPR
-   int   obs_cat;   // i = obs category 0,1,2
-   int   fcst_cat;  // j = model category 0,1,2
+   int   obs_cat;   // i = obs category 0,1,2 (dry, light, heavy)
+   int   fcst_cat;  // j = model category 0,1,2 (dry, light, heavy)
    int   s_idx;     // index for 3 by 3 matrix as 1 dimensional (fcst_cat*3)+obs_cat
    double p1;
    double p2;
@@ -82,18 +81,19 @@ struct SeepsAggScore {  // For SEEPS
    SeepsAggScore & operator+=(const SeepsAggScore &);
 
    int   n_obs;
-   int   c12;
-   int   c13;
-   int   c21;
-   int   c23;
-   int   c31;
-   int   c32;
-   double s12;
-   double s13;
-   double s21;
-   double s23;
-   double s31;
-   double s32;
+   int    n_obs;
+   int    c_odfl;
+   int    c_odfh;
+   int    c_olfd;
+   int    c_olfh;
+   int    c_ohfd;
+   int    c_ohfl;
+   double s_odfl;
+   double s_odfh;
+   double s_olfd;
+   double s_olfh;
+   double s_ohfd;
+   double s_ohfl;
    double pv1;   // marginal probabilities of the observed values
    double pv2;
    double pv3;
@@ -223,12 +223,12 @@ class SeepsClimoGrid : public SeepsClimoBase {
       double *p2_buf;
       double *t1_buf;
       double *t2_buf;
-      double *s12_buf;
-      double *s13_buf;
-      double *s21_buf;
-      double *s23_buf;
-      double *s31_buf;
-      double *s32_buf;
+      double *s_odfl_buf;
+      double *s_odfh_buf;
+      double *s_olfd_buf;
+      double *s_olfh_buf;
+      double *s_ohfd_buf;
+      double *s_ohfl_buf;     
 
    protected:
       void clear() override;
