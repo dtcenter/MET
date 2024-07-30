@@ -41,12 +41,12 @@ CircularTemplate::CircularTemplate(const int width, bool wrap_lon) :
 
    _wrapLon = wrap_lon;
 
-	// width of 2 is not supported
-	if (width == 2) {
+   // width of 2 is not supported
+   if (width == 2) {
       mlog << Error << "\nCircularTemplate::CircularTemplate() -> "
            << "unsupported width of " << width << " for circles.\n\n";
-		exit(1);
-	}
+      exit(1);
+   }
 
    bool evenWidth = ((width % 2) == 0);
 
@@ -59,9 +59,9 @@ CircularTemplate::CircularTemplate(const int width, bool wrap_lon) :
    // offset is within the circle.
 
    double radius = (width-1)/2.0;
-	
+
    // Create the offsets list.
-	
+
    // Need to increase the area we look at if the width is even, because
    // some valid offset points will actually be farther from the reference point
    // than the radius, because the reference point is offset from the true
@@ -71,31 +71,31 @@ CircularTemplate::CircularTemplate(const int width, bool wrap_lon) :
    if(evenWidth) maxOffset++;
   
    int minOffset = static_cast<int>(floor(-1 * radius));
-	  
+
    for(int y = minOffset; y <= maxOffset; y++) {
       for(int x = minOffset; x <= maxOffset; x++) {
          double double_x = (double)x;
          double double_y = (double)y;
 
-	      if(evenWidth) {
+         if(evenWidth) {
             // if width is even, the reference point is actually shifted 1/2 a grid spacing down and to the left,
             // from the true center of the circle.
-		      //
-		      // so when we calculate distance, we need to subtract .5 so that the distance reflects the distance from the center
-		      // of the circle, instead of the distance from the reference.
-		      //
-		      // for example - a circle with width == 4.  The reference point is the lower left corner of the center square.
-		      // the point directly below that is at (0,-1), but it's actually (-.5, -1.5) from the center of the circle.
-		      //
-		      // another example - same circle.  The point directly to the right of the reference point is (1,0), but it's
-		      // actually (.5,-.5) from the center.
-		   
+            //
+            // so when we calculate distance, we need to subtract .5 so that the distance reflects the distance from the center
+            // of the circle, instead of the distance from the reference.
+            //
+            // for example - a circle with width == 4.  The reference point is the lower left corner of the center square.
+            // the point directly below that is at (0,-1), but it's actually (-.5, -1.5) from the center of the circle.
+            //
+            // another example - same circle.  The point directly to the right of the reference point is (1,0), but it's
+            // actually (.5,-.5) from the center.
+
             double_x -= 0.5;
             double_y -= 0.5;
          }
          double distance= sqrt((double_x * double_x) + (double_y * double_y));
 
-	      if(distance <= radius) _addOffset(x, y);
+         if(distance <= radius) _addOffset(x, y);
 
       } // end for x
    } // end for y

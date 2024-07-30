@@ -32,10 +32,11 @@
 //   011    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
 //   012    01/20/22  Halley Gotway  MET #2003 Add PSTD BRIERCL output.
 //   013    05/25/22  Halley Gotway  MET #2147 Add CTS HSS_EC output.
-//   014    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
-//   015    10/03/22  Presotpnik     MET #2227 Remove namespace netCDF from header files
-//   016    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings
-//   017    07/26/24  Halley Gotway  MET #1371 Aggregate statistics through time
+//   014    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main.
+//   015    10/03/22  Presotpnik     MET #2227 Remove namespace netCDF from header files.
+//   016    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings.
+//   017    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
+//   018    07/26/24  Halley Gotway  MET #1371 Aggregate previous output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -695,8 +696,8 @@ void process_scores() {
    const char *method_name = "process_scores() ";
 
    // Climatology mean and standard deviation
-   DataPlane cmn_dp, csd_dp;
-   bool cmn_flag, csd_flag;
+   DataPlane fcmn_dp, fcsd_dp;
+   DataPlane ocmn_dp, ocsd_dp;
 
    // Number of points skipped due to valid data threshold
    int n_skip_zero = 0;
@@ -745,21 +746,34 @@ void process_scores() {
          }
 
          // Read climatology data for the current series entry
-         cmn_dp = read_climo_data_plane(
-                  conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
-                  i_fcst, fcst_dp.valid(), grid);
-         csd_dp = read_climo_data_plane(
-                  conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
-                  i_fcst, fcst_dp.valid(), grid);
+         fcmn_dp = read_climo_data_plane(
+                      conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
+                      i_fcst, fcst_dp.valid(), grid);
+         fcsd_dp = read_climo_data_plane(
+                      conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
+                      i_fcst, fcst_dp.valid(), grid);
+         ocmn_dp = read_climo_data_plane(
+                      conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
+                      i_fcst, fcst_dp.valid(), grid);
+         ocsd_dp = read_climo_data_plane(
+                      conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
+                      i_fcst, fcst_dp.valid(), grid);
 
-         cmn_flag = (cmn_dp.nx() == fcst_dp.nx() && cmn_dp.ny() == fcst_dp.ny());
-         csd_flag = (csd_dp.nx() == fcst_dp.nx() && csd_dp.ny() == fcst_dp.ny());
+         bool fcmn_flag = (fcmn_dp.nx() == fcst_dp.nx() &&
+                           fcmn_dp.ny() == fcst_dp.ny());
+         bool fcsd_flag = (fcsd_dp.nx() == fcst_dp.nx() &&
+                           fcsd_dp.ny() == fcst_dp.ny());
+         bool ocmn_flag = (ocmn_dp.nx() == fcst_dp.nx() &&
+                           ocmn_dp.ny() == fcst_dp.ny());
+         bool ocsd_flag = (ocsd_dp.nx() == fcst_dp.nx() &&
+                           ocsd_dp.ny() == fcst_dp.ny());
 
          mlog << Debug(3)
-           << "Found " << (cmn_flag ? 1 : 0)
-           << " climatology mean and " << (csd_flag ? 1 : 0)
-           << " climatology standard deviation field(s) for forecast "
-           << fcst_info->magic_str() << ".\n";
+              << "For " << fcst_info->magic_str() << ", found "
+              << (fcmn_flag ? 0 : 1) << " forecast climatology mean and "
+              << (fcsd_flag ? 0 : 1) << " standard deviation field(s), and "
+              << (ocmn_flag ? 0 : 1) << " observation climatology mean and "
+              << (ocsd_flag ? 0 : 1) << " standard deviation field(s).\n";
 
          // Setup the output NetCDF file on the first pass
          if(nc_out == (NcFile *) 0) setup_nc_file(fcst_info, obs_info);
@@ -779,16 +793,21 @@ void process_scores() {
             DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
 
             // Skip points outside the mask and bad data
-            if(!conf_info.mask_area(x, y)              ||
-               is_bad_data(fcst_dp(x, y))              ||
-               is_bad_data(obs_dp(x,y))                ||
-               (cmn_flag && is_bad_data(cmn_dp(x, y))) ||
-               (csd_flag && is_bad_data(csd_dp(x, y)))) continue;
+            if(!conf_info.mask_area(x, y)                ||
+               is_bad_data(fcst_dp(x, y))                ||
+               is_bad_data(obs_dp(x,y))                  ||
+               (fcmn_flag && is_bad_data(fcmn_dp(x, y))) ||
+               (fcsd_flag && is_bad_data(fcsd_dp(x, y))) ||
+               (ocmn_flag && is_bad_data(ocmn_dp(x, y))) ||
+               (ocsd_flag && is_bad_data(ocsd_dp(x, y)))) continue;
 
-            pd_ptr[i].add_grid_pair(fcst_dp(x, y), obs_dp(x, y),
-                         (cmn_flag ? cmn_dp(x, y) : bad_data_double),
-                         (csd_flag ? csd_dp(x, y) : bad_data_double),
-                         default_grid_weight);
+            // Store climo data
+            ClimoPntInfo cpi((fcmn_flag ? fcmn_dp(x, y) : bad_data_double),
+                             (fcsd_flag ? fcsd_dp(x, y) : bad_data_double),
+                             (ocmn_flag ? ocmn_dp(x, y) : bad_data_double),
+                             (ocsd_flag ? ocsd_dp(x, y) : bad_data_double));
+
+            pd_ptr[i].add_grid_pair(fcst_dp(x, y), obs_dp(x, y), cpi, default_grid_weight);
 
          } // end for i
 
@@ -873,8 +892,10 @@ void process_scores() {
       for(i=0; i<conf_info.block_size; i++) {
          pd_ptr[i].f_na.erase();
          pd_ptr[i].o_na.erase();
-         pd_ptr[i].cmn_na.erase();
-         pd_ptr[i].csd_na.erase();
+         pd_ptr[i].fcmn_na.erase();
+         pd_ptr[i].fcsd_na.erase();
+         pd_ptr[i].ocmn_na.erase();
+         pd_ptr[i].ocsd_na.erase();
       }
 
    } // end for i_read

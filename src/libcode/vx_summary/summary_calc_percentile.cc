@@ -40,15 +40,15 @@ SummaryCalcPercentile::SummaryCalcPercentile(const string &type_string) :
       !isdigit(type_string[2]))
   {
     mlog << Error << "\nSummaryCalcPercentile::SummaryCalcPercentile() -> "
-	 << "invalid percentile type \"" << type_string
-	 << "\" specified in configuration file.\n\n";
+         << "invalid percentile type \"" << type_string
+         << "\" specified in configuration file.\n\n";
     exit(1);
   }
-  
+
   // Pull the desired percentile from the string
 
   _percentile = atof(type_string.substr(1,2).c_str()) / 100.0;
-  
+
   // Construct the type string
 
   ConcatString type_buffer;

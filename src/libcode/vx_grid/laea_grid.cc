@@ -455,7 +455,7 @@ v = new double [n];
 if ( !u || !v )  {
 
    mlog << Error << "\nLaeaGrid::xy_closedpolyline_area() -> "
-	<< "memory allocation error\n\n";
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 

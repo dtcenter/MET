@@ -3227,7 +3227,8 @@ void write_job_aggr_mpr(STATAnalysisJob &job, STATLineType lt,
       //
       // Process percentile thresholds
       //
-      job.set_perc_thresh(it->second.pd.f_na, it->second.pd.o_na, it->second.pd.cmn_na);
+      job.set_perc_thresh(it->second.pd.f_na, it->second.pd.o_na,
+                          it->second.pd.fcmn_na, it->second.pd.ocmn_na);
 
       //
       // Prepare the output STAT header columns

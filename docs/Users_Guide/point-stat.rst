@@ -1499,14 +1499,20 @@ The first set of header columns are common to all of the output files generated 
     - OBS_QC
     - Quality control flag for observation
   * - 35
-    - CLIMO_MEAN
-    - Climatological mean value
+    - OBS_CLIMO_MEAN
+    - Observation climatological mean value (named CLIMO_MEAN prior to met-12.0.0)
   * - 36
-    - CLIMO_STDEV
-    - Climatological standard deviation value
+    - OBS_CLIMO_STDEV
+    - Observation climatological standard deviation value (named CLIMO_STDEV prior to met-12.0.0)
   * - 37
-    - CLIMO_CDF
-    - Climatological cumulative distribution function value
+    - OBS_CLIMO_CDF
+    - Observation climatological cumulative distribution function value (named CLIMO_CDF prior to met-12.0.0)
+  * - 38
+    - FCST_CLIMO_MEAN
+    - Forecast climatological mean value
+  * - 39
+    - FCST_CLIMO_STDEV
+    - Forecast climatological standard deviation value
 
 .. _table_PS_format_info_SEEPS_MPR:
 

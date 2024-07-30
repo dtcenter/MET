@@ -1081,7 +1081,8 @@ void apply_data_mask(DataPlane &dp) {
       for(int i=0; i<nxy; i++) {
          if(!is_bad_data(dp.data()[i])) d.add(dp.data()[i]);
       }
-      thresh.set_perc(&d, &d, &d);
+      d.sort_array();
+      thresh.set_perc(&d, &d, &d, &d);
    }
 
    // For each grid point, apply the data threshold
@@ -1384,9 +1385,9 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
    if(logic != SetLogic::None) {
       mlog << Debug(3)
            << "Mask " << setlogic_to_string(logic)
-	   << (logic == SetLogic::Intersection ? ":\t" : ":\t\t")
+           << (logic == SetLogic::Intersection ? ":\t" : ":\t\t")
            << n_in << " of " << grid.nx() * grid.ny()
-	   << " points inside\n";
+           << " points inside\n";
    }
 
    return dp;

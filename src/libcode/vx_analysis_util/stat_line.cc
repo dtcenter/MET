@@ -14,6 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <limits.h>
+#include <map>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -32,6 +33,32 @@
 #include "vx_log.h"
 
 using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   // MET #2924 Rename climatology column names
+   //
+
+static const map<string,string> mpr_rename_map = {
+   { "CLIMO_MEAN",  "OBS_CLIMO_MEAN"  },
+   { "CLIMO_STDEV", "OBS_CLIMO_STDEV" },
+   { "CLIMO_CDF",   "OBS_CLIMO_CDF"   }
+};
+
+static const map<string,string> orank_rename_map = {
+   { "CLIMO_MEAN",  "OBS_CLIMO_MEAN"  },
+   { "CLIMO_STDEV", "OBS_CLIMO_STDEV" }
+};
+
+static const map< STATLineType, map<string,string> > stat_lty_rename_map = {
+   { STATLineType::mpr,   mpr_rename_map   },
+   { STATLineType::orank, orank_rename_map }
+};   
+
+static StringArray print_stat_rename_message;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -442,6 +469,29 @@ offset = HdrLine->col_offset(col_str, dim);
 
 if ( is_bad_data(offset) ) {
    if ( !get_file()->header().has(col_str, offset) ) offset = bad_data_int;
+}
+
+   //
+   // If not found, check renamed columns for backward compatibility
+   //
+
+if ( is_bad_data(offset) ) {
+
+   string s(col_str);
+
+   if ( stat_lty_rename_map.count(Type) &&
+        stat_lty_rename_map.at(Type).count(s) ) {
+      if ( !print_stat_rename_message.has(s) ) {
+         mlog << Debug(2) << "The \"" << s << "\" column in the "
+              << statlinetype_to_string(Type)
+              << " line type has been renamed as \"" 
+              << (stat_lty_rename_map.at(Type)).at(s)
+              << "\". Please switch to using MET"
+              << met_version << " column names.\n";
+         print_stat_rename_message.add(s);
+      } 
+      return ( get_item((stat_lty_rename_map.at(Type)).at(s).c_str()) );
+   }
 }
 
    //

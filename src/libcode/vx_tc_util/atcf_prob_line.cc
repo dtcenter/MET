@@ -148,7 +148,7 @@ int ATCFProbLine::read_line(LineDataFile * ldf) {
          status = 0;
          continue;
       }
-	}
+   }
 
    return 1;
 }

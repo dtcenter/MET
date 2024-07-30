@@ -30,7 +30,9 @@ The Gen-Ens-Prod tool writes the gridded relative frequencies, NEP, and NMEP fie
 Climatology Data
 ----------------
 
-The ensemble relative frequencies derived by Gen-Ens-Prod are computed by applying threshold(s) to the input ensemble member data. Those thresholds can be simple and remain constant over the entire domain (e.g. >0) or can be defined relative to the climatological distribution at each grid point (e.g. >CDP90, for exceeding the 90-th percentile of climatology). When using climatological distribution percentile (CDP) thresholds, the climatological mean and standard deviation must be provided in the configuration file.
+The ensemble relative frequencies derived by Gen-Ens-Prod are computed by applying threshold(s) to the input ensemble member data. Those thresholds can be simple and remain constant over the entire domain (e.g. >0) or can be defined relative to the climatological distribution at each grid point (e.g. >OCDP90, for exceeding the 90-th percentile of the observation climatology data provided).
+
+To use climatological distribution percentile thresholds, users must specify the climatological mean ("climo_mean") and standard deviation ("climo_stdev") entries in the configuration file. With forecast climatology inputs, use forecast climatology distribution percentile thresholds (e.g. >FCDP90). With observation climatology inputs, use observation climatological distribution percentile thresholds instead (e.g. >OCDP90). However, Gen-Ens-Prod cannot actually determine the input climatology data source and both "FCDP" and "OCDP" threshold types will work.
 
 Practical Information
 =====================
@@ -295,7 +297,7 @@ The **ensemble_flag** specifies which derived ensemble fields should be calculat
 
 13. Climatology mean (**climo_mean**) and standard deviation (**climo_stdev**) data regridded to the model domain
 
-14. Climatological Distribution Percentile field for each CDP threshold specified
+14. Climatological Distribution Percentile field for each FCDP or OCDP threshold specified
 
 gen_ens_prod Output
 -------------------
