@@ -103,6 +103,9 @@ struct NcVarData {
 // Mapping of NetCDF variable name to computed statistic
 std::map<ConcatString, NcVarData> stat_data;
 
+// Mapping of aggregate NetCDF variable name to DataPlane
+std::map<ConcatString, DataPlane> aggr_data;
+
 ////////////////////////////////////////////////////////////////////////
 //
 // Miscellaneous Variables
@@ -111,7 +114,6 @@ std::map<ConcatString, NcVarData> stat_data;
 
 // Grid variables
 static Grid grid;
-static int nxy = 0;
 static int n_reads = 1; // Initialize to at least one pass
 
 // Data file factory and input files

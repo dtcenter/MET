@@ -187,11 +187,11 @@ void process_command_line(int argc, char **argv) {
    // Check for error. There should be zero arguments left.
    if(cline.n() != 0) usage();
 
-   // Warn about log output
+   // Recommend logging verbosity level of 3 or less
    if(mlog.verbosity_level() >= 3) {
-      mlog << Warning << "\nRunning Series-Analysis at verbosity >= 3 "
+      mlog << Debug(3) << "Running Series-Analysis at verbosity >= 3 "
            << "produces excessive log output and can slow the runtime "
-           << "considerably.\n\n";
+           << "considerably.\n";
    }
 
    // Check that the required arguments have been set.
@@ -217,6 +217,12 @@ void process_command_line(int argc, char **argv) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the output NetCDF file must be set using the "
            << "\"-out\" option.\n\n";
+      usage();
+   }
+   if(aggr_file == out_file) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "the \"-out\" and \"-aggregate\" options cannot be "
+           << "set to the same file (\"" << aggr_file << "\")!\n\n";
       usage();
    }
 
@@ -355,16 +361,17 @@ void process_grid(const Grid &fcst_grid, const Grid &obs_grid) {
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.fcst_info[0]->regrid(),
                         &fcst_grid, &obs_grid);
-   nxy  = grid.nx() * grid.ny();
 
    // Process masking regions
    conf_info.process_masks(grid);
 
    // Set the block size, if needed
-   if(is_bad_data(conf_info.block_size)) conf_info.block_size = nxy;
+   if(is_bad_data(conf_info.block_size)) {
+      conf_info.block_size = grid.nxy();
+   }
 
    // Compute the number of reads required
-   n_reads = nint(ceil((double) nxy / conf_info.block_size));
+   n_reads = nint(ceil((double) grid.nxy() / conf_info.block_size));
 
    mlog << Debug(2)
         << "Computing statistics using a block size of "
@@ -506,7 +513,7 @@ void get_series_data(int i_series,
    }
 
    // Setup the verification grid
-   if(nxy == 0) process_grid(fcst_grid, obs_grid);
+   if(!grid.is_set()) process_grid(fcst_grid, obs_grid);
 
    // Regrid the forecast, if necessary
    if(!(fcst_grid == grid)) {
@@ -627,7 +634,7 @@ void get_series_entry(int i_series, VarInfo *info,
    }
 
    // If not already done, read the data
-   if(dp.nx() == 0 && dp.ny() == 0) {
+   if(dp.is_empty()) {
       found = read_single_entry(info, found_files[i_series], type,
                                 dp, cur_grid);
    }
@@ -688,7 +695,8 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
-   int i, x, y, i_read, i_series, i_point, i_fcst;
+   int i, x, y;
+   int i_point = 0;
    VarInfo *fcst_info = (VarInfo *) nullptr;
    VarInfo *obs_info  = (VarInfo *) nullptr;
    PairDataPoint *pd_ptr = (PairDataPoint *) nullptr;
@@ -704,14 +712,13 @@ void process_scores() {
    int n_skip_pos  = 0;
 
    // Loop over the data reads
-   for(i_read=0; i_read<n_reads; i_read++) {
-      i_point = 0;
+   for(int i_read=0; i_read<n_reads; i_read++) {
 
       // Loop over the series variable
-      for(i_series=0; i_series<n_series; i_series++) {
+      for(int i_series=0; i_series<n_series; i_series++) {
 
          // Get the index for the forecast and climo VarInfo objects
-         i_fcst = (conf_info.get_n_fcst() > 1 ? i_series : 0);
+         int i_fcst = (conf_info.get_n_fcst() > 1 ? i_series : 0);
 
          // Store the current VarInfo objects
          fcst_info = conf_info.fcst_info[i_fcst];
@@ -742,7 +749,7 @@ void process_scores() {
             mlog << Debug(2)
                  << "Processing data pass number " << i_read + 1 << " of "
                  << n_reads << " for grid points " << i_point + 1 << " to "
-                 << min(i_point + conf_info.block_size, nxy) << ".\n";
+                 << min(i_point + conf_info.block_size, grid.nxy()) << ".\n";
          }
 
          // Read climatology data for the current series entry
@@ -759,14 +766,10 @@ void process_scores() {
                       conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
                       i_fcst, fcst_dp.valid(), grid);
 
-         bool fcmn_flag = (fcmn_dp.nx() == fcst_dp.nx() &&
-                           fcmn_dp.ny() == fcst_dp.ny());
-         bool fcsd_flag = (fcsd_dp.nx() == fcst_dp.nx() &&
-                           fcsd_dp.ny() == fcst_dp.ny());
-         bool ocmn_flag = (ocmn_dp.nx() == fcst_dp.nx() &&
-                           ocmn_dp.ny() == fcst_dp.ny());
-         bool ocsd_flag = (ocsd_dp.nx() == fcst_dp.nx() &&
-                           ocsd_dp.ny() == fcst_dp.ny());
+         bool fcmn_flag = !fcmn_dp.is_empty();
+         bool fcsd_flag = !fcsd_dp.is_empty();
+         bool ocmn_flag = !ocmn_dp.is_empty();
+         bool ocsd_flag = !ocsd_dp.is_empty();
 
          mlog << Debug(3)
               << "For " << fcst_info->magic_str() << ", found "
@@ -787,7 +790,7 @@ void process_scores() {
          set_range(obs_dp.lead(),   obs_lead_beg,   obs_lead_end);
 
          // Store matched pairs for each grid point
-         for(i=0; i<conf_info.block_size && (i_point+i)<nxy; i++) {
+         for(i=0; i<conf_info.block_size && (i_point+i)<grid.nxy(); i++) {
 
             // Convert n to x, y
             DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
@@ -810,17 +813,17 @@ void process_scores() {
             pd_ptr[i].add_grid_pair(fcst_dp(x, y), obs_dp(x, y), cpi, default_grid_weight);
 
          } // end for i
-
       } // end for i_series
 
-      if(0 == pd_ptr) {
+      if(pd_ptr == nullptr) {
          mlog << Debug(3) << method_name
-              << "PairDataPoint is not set. Skip computing statistics for each grid point in the block.\n";
+              << "Skipped computing statistics for each grid point "
+              << "in the block since PairDataPoint is not set.\n";
          continue;
       }
 
       // Compute statistics for each grid point in the block
-      for(i=0; i<conf_info.block_size && (i_point+i)<nxy; i++) {
+      for(i=0; i<conf_info.block_size && (i_point+i)<grid.nxy(); i++) {
 
          // Determine x,y location
          DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
@@ -920,11 +923,11 @@ void process_scores() {
    // Print summary counts
    mlog << Debug(2)
         << "Finished processing statistics for "
-        << nxy - n_skip_zero - n_skip_pos << " of " << nxy
-        << " grid points.\n"
-        << "Skipped " << n_skip_zero << " of " << nxy
+        << grid.nxy() - n_skip_zero - n_skip_pos << " of "
+        << grid.nxy() << " grid points.\n"
+        << "Skipped " << n_skip_zero << " of " << grid.nxy()
         << " points with no valid data.\n"
-        << "Skipped " << n_skip_pos << " of " << nxy
+        << "Skipped " << n_skip_pos << " of " << grid.nxy()
         << " points that did not meet the valid data threshold.\n";
 
    // Print config file suggestions about missing data
