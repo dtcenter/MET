@@ -1797,7 +1797,7 @@ void process_scores() {
          ocmn_dp_smooth  = ocmn_dp;
 
          // Reset forecast climo spread since it does not apply to Fourier decomposition
-         if(!fcst_dp.is_empty()) fcsd_dp.set_constant(bad_data_double);
+         if(!fcsd_dp.is_empty()) fcsd_dp.set_constant(bad_data_double);
 
          // Reset observation climo spread since it does not apply to Fourier decomposition
          if(!ocsd_dp.is_empty()) ocsd_dp.set_constant(bad_data_double);
