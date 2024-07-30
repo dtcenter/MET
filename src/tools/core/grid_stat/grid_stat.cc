@@ -684,13 +684,13 @@ void process_scores() {
    PairDataPoint pd_thr;
 
    // Allocate memory in one big chunk based on grid size
-   pd.extend(grid.nx()*grid.ny());
+   pd.extend(grid.nxy());
 
    if(conf_info.output_flag[i_nbrctc] != STATOutputType::None ||
       conf_info.output_flag[i_nbrcts] != STATOutputType::None ||
       conf_info.output_flag[i_nbrcnt] != STATOutputType::None ||
       conf_info.output_flag[i_dmap]   != STATOutputType::None) {
-      pd_thr.extend(grid.nx()*grid.ny());
+      pd_thr.extend(grid.nxy());
    }
 
    // Objects to handle vector winds
@@ -805,10 +805,10 @@ void process_scores() {
 
       mlog << Debug(3)
            << "For " << conf_info.vx_opt[i].fcst_info->magic_str() << ", found "
-           << (fcmn_dp.nx() == 0 ? 0 : 1) << " forecast climatology mean and "
-           << (fcsd_dp.nx() == 0 ? 0 : 1) << " standard deviation field(s), and "
-           << (ocmn_dp.nx() == 0 ? 0 : 1) << " observation climatology mean and "
-           << (ocsd_dp.nx() == 0 ? 0 : 1) << " standard deviation field(s).\n";
+           << (fcmn_dp.is_empty() == 0 ? 0 : 1) << " forecast climatology mean and "
+           << (fcsd_dp.is_empty() == 0 ? 0 : 1) << " standard deviation field(s), and "
+           << (ocmn_dp.is_empty() == 0 ? 0 : 1) << " observation climatology mean and "
+           << (ocsd_dp.is_empty() == 0 ? 0 : 1) << " standard deviation field(s).\n";
 
       // Apply MPR threshold filters
       if(conf_info.vx_opt[i].mpr_sa.n() > 0) {
@@ -893,25 +893,13 @@ void process_scores() {
             // Store the current mask
             mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[k]];
 
-            // Turn off the mask for missing data values
+            // Turn off the mask for any grid points containing bad data
             mask_bad_data(mask_mp, fcst_dp_smooth);
             mask_bad_data(mask_mp, obs_dp_smooth);
-            if(fcmn_dp.nx() == fcst_dp_smooth.nx() &&
-               fcmn_dp.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_mp, fcmn_dp);
-            }
-            if(fcsd_dp.nx() == fcst_dp_smooth.nx() &&
-               fcsd_dp.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_mp, fcsd_dp);
-            }
-            if(ocmn_dp.nx() == fcst_dp_smooth.nx() &&
-               ocmn_dp.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_mp, ocmn_dp);
-            }
-            if(ocsd_dp.nx() == fcst_dp_smooth.nx() &&
-               ocsd_dp.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_mp, ocsd_dp);
-            }
+            if(!fcmn_dp.is_empty()) mask_bad_data(mask_mp, fcmn_dp);
+            if(!fcsd_dp.is_empty()) mask_bad_data(mask_mp, fcsd_dp);
+            if(!ocmn_dp.is_empty()) mask_bad_data(mask_mp, ocmn_dp);
+            if(!ocsd_dp.is_empty()) mask_bad_data(mask_mp, ocsd_dp);
 
             // Apply the current mask to the current fields
             get_mask_points(conf_info.vx_opt[i], mask_mp,
@@ -1292,8 +1280,8 @@ void process_scores() {
             // Allocate memory in one big chunk based on grid size
             DataPlane fgx_dp, fgy_dp, ogx_dp, ogy_dp;
             PairDataPoint pd_gx, pd_gy;
-            pd_gx.extend(grid.nx()*grid.ny());
-            pd_gy.extend(grid.nx()*grid.ny());
+            pd_gx.extend(grid.nxy());
+            pd_gy.extend(grid.nxy());
 
             // Loop over gradient Dx/Dy
             for(k=0; k<conf_info.vx_opt[i].get_n_grad(); k++) {
@@ -1313,7 +1301,7 @@ void process_scores() {
                   // Store the current mask
                   mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[m]];
 
-                  // Turn off the mask for missing data values
+                  // Turn off the mask for any grid points containing bad data
                   mask_bad_data(mask_mp, fgx_dp);
                   mask_bad_data(mask_mp, fgy_dp);
                   mask_bad_data(mask_mp, ogx_dp);
@@ -1381,7 +1369,7 @@ void process_scores() {
 
             // Allocate memory in one big chunk based on grid size
             DataPlane fcst_dp_dmap, obs_dp_dmap;
-            pd.extend(grid.nx()*grid.ny());
+            pd.extend(grid.nxy());
 
             // Mask out missing data between the fields for a fair comparison
             DataPlane fcst_dp_mm = fcst_dp;
@@ -1641,7 +1629,7 @@ void process_scores() {
                      }
                   }
 
-                  // Turn off the mask for bad forecast or observation values
+                  // Turn off the mask for any grid points containing bad data
                   mask_bad_data(mask_mp, fcst_dp_smooth);
                   mask_bad_data(mask_mp, obs_dp_smooth);
 
@@ -1777,15 +1765,10 @@ void process_scores() {
          ocmn_dp_smooth  = ocmn_dp;
 
          // Reset forecast climo spread since it does not apply to Fourier decomposition
-         if(fcsd_dp.nx() == fcst_dp_smooth.nx() &&
-            fcsd_dp.ny() == fcst_dp_smooth.ny()) {
-            fcsd_dp.set_constant(bad_data_double);
-         }
+         if(!fcst_dp.is_empty()) fcsd_dp.set_constant(bad_data_double);
+
          // Reset observation climo spread since it does not apply to Fourier decomposition
-         if(ocsd_dp.nx() == fcst_dp_smooth.nx() &&
-            ocsd_dp.ny() == fcst_dp_smooth.ny()) {
-            ocsd_dp.set_constant(bad_data_double);
-         }
+         if(!ocsd_dp.is_empty()) ocsd_dp.set_constant(bad_data_double);
 
          if(!fcst_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
                                       conf_info.vx_opt[i].wave_1d_end[j]) ||
@@ -1800,31 +1783,27 @@ void process_scores() {
          }
 
          // Decompose the forecast climatology, if provided
-         if(fcmn_dp_smooth.nx() == fcst_dp_smooth.nx() &&
-            fcmn_dp_smooth.ny() == fcst_dp_smooth.ny()) {
-            if(!fcmn_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
-                                         conf_info.vx_opt[i].wave_1d_end[j])) {
-               mlog << Debug(2)
-                    << "Skipping Fourier decomposition for waves "
-                    << conf_info.vx_opt[i].wave_1d_beg[j] << " to "
-                    << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
-                    << "of bad forecast climatology data values.\n";
-               continue;
-            }
+         if(!fcmn_dp_smooth.is_empty() &&
+            !fcmn_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
+                                      conf_info.vx_opt[i].wave_1d_end[j])) {
+            mlog << Debug(2)
+                 << "Skipping Fourier decomposition for waves "
+                 << conf_info.vx_opt[i].wave_1d_beg[j] << " to "
+                 << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
+                 << "of bad forecast climatology data values.\n";
+            continue;
          }
 
          // Decompose the observation climatology, if provided
-         if(ocmn_dp_smooth.nx() == fcst_dp_smooth.nx() &&
-            ocmn_dp_smooth.ny() == fcst_dp_smooth.ny()) {
-            if(!ocmn_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
-                                         conf_info.vx_opt[i].wave_1d_end[j])) {
-               mlog << Debug(2)
-                    << "Skipping Fourier decomposition for waves "
-                    << conf_info.vx_opt[i].wave_1d_beg[j] << " to "
-                    << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
-                    << "of bad observation climatology data values.\n";
-               continue;
-            }
+         if(!ocmn_dp_smooth.is_empty() &&
+            !ocmn_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
+                                      conf_info.vx_opt[i].wave_1d_end[j])) {
+            mlog << Debug(2)
+                 << "Skipping Fourier decomposition for waves "
+                 << conf_info.vx_opt[i].wave_1d_beg[j] << " to "
+                 << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
+                 << "of bad observation climatology data values.\n";
+            continue;
          }
 
          // Build string for INTERP_MTHD column
@@ -1843,25 +1822,13 @@ void process_scores() {
             // Store the current mask
             mask_mp = conf_info.mask_map[conf_info.vx_opt[i].mask_name[k]];
 
-            // Turn off the mask for missing data values
+            // Turn off the mask for any grid points containing bad data
             mask_bad_data(mask_mp, fcst_dp_smooth);
             mask_bad_data(mask_mp, obs_dp_smooth);
-            if(fcmn_dp_smooth.nx() == fcst_dp_smooth.nx() &&
-               fcmn_dp_smooth.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_mp, fcmn_dp_smooth);
-            }
-            if(fcsd_dp.nx() == fcst_dp_smooth.nx() &&
-               fcsd_dp.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_mp, fcsd_dp);
-            }
-            if(ocmn_dp_smooth.nx() == fcst_dp_smooth.nx() &&
-               ocmn_dp_smooth.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_mp, ocmn_dp_smooth);
-            }
-            if(ocsd_dp.nx() == fcst_dp_smooth.nx() &&
-               ocsd_dp.ny() == fcst_dp_smooth.ny()) {
-               mask_bad_data(mask_mp, ocsd_dp);
-            }
+            if(!fcmn_dp_smooth.is_empty()) mask_bad_data(mask_mp, fcmn_dp_smooth);
+            if(!fcsd_dp.is_empty())        mask_bad_data(mask_mp, fcsd_dp);
+            if(!ocmn_dp_smooth.is_empty()) mask_bad_data(mask_mp, ocmn_dp_smooth);
+            if(!ocsd_dp.is_empty())        mask_bad_data(mask_mp, ocsd_dp);
 
             // Apply the current mask to the current fields
             get_mask_points(conf_info.vx_opt[i], mask_mp,
@@ -1946,31 +1913,27 @@ void process_scores() {
                }
 
                // Decompose the U-wind forecast climatology field, if provided
-               if(fcmnu_dp_smooth.nx() == fu_dp_smooth.nx() &&
-                  fcmnu_dp_smooth.ny() == fu_dp_smooth.ny()) {
-                  if(!fcmnu_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
-                                               conf_info.vx_opt[i].wave_1d_end[j])) {
-                     mlog << Debug(2)
-                          << "Skipping Fourier decomposition for waves "
-                          << conf_info.vx_opt[i].wave_1d_beg[j] << " to "
-                          << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
-                          << "of bad forecast climatology data values in U-wind.\n";
-                     continue;
-                  }
+               if(!fcmnu_dp_smooth.is_empty() &&
+                  !fcmnu_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
+                                             conf_info.vx_opt[i].wave_1d_end[j])) {
+                  mlog << Debug(2)
+                       << "Skipping Fourier decomposition for waves "
+                       << conf_info.vx_opt[i].wave_1d_beg[j] << " to "
+                       << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
+                       << "of bad forecast climatology data values in U-wind.\n";
+                  continue;
                }
 
                // Decompose the U-wind observation climatology field, if provided
-               if(ocmnu_dp_smooth.nx() == fu_dp_smooth.nx() &&
-                  ocmnu_dp_smooth.ny() == fu_dp_smooth.ny()) {
-                  if(!ocmnu_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
-                                               conf_info.vx_opt[i].wave_1d_end[j])) {
-                     mlog << Debug(2)
-                          << "Skipping Fourier decomposition for waves "
-                          << conf_info.vx_opt[i].wave_1d_beg[j] << " to "
-                          << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
-                          << "of bad observation climatology data values in U-wind.\n";
-                     continue;
-                  }
+               if(!ocmnu_dp_smooth.is_empty() &&
+                  !ocmnu_dp_smooth.fitwav_1d(conf_info.vx_opt[i].wave_1d_beg[j],
+                                             conf_info.vx_opt[i].wave_1d_end[j])) {
+                  mlog << Debug(2)
+                       << "Skipping Fourier decomposition for waves "
+                       << conf_info.vx_opt[i].wave_1d_beg[j] << " to "
+                       << conf_info.vx_opt[i].wave_1d_end[j] << " due to the presence "
+                       << "of bad observation climatology data values in U-wind.\n";
+                  continue;
                }
 
                // Apply the current mask to the U-wind fields
@@ -2762,7 +2725,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
 
    // Allocate memory
    float *data = (float *) nullptr;
-   data = new float [grid.nx()*grid.ny()];
+   data = new float [grid.nxy()];
 
    // Set the NetCDF compression level
    int deflate_level = compress_level;
@@ -3099,8 +3062,8 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    if(!fcst_flag && !obs_flag) return;
 
    // Allocate memory for the forecast and observation fields
-   fcst_data = new float [grid.nx()*grid.ny()];
-   obs_data  = new float [grid.nx()*grid.ny()];
+   fcst_data = new float [grid.nxy()];
+   obs_data  = new float [grid.nxy()];
 
    // Add the forecast variable
    if(fcst_flag) {
