@@ -124,7 +124,7 @@ static void usage();
 static void set_fcst_files(const StringArray &);
 static void set_obs_files(const StringArray &);
 static void set_both_files(const StringArray &);
-static void set_input(const StringArray &);
+static void set_aggregate(const StringArray &);
 static void set_paired(const StringArray &);
 static void set_out_file(const StringArray &);
 static void set_config_file(const StringArray &);
@@ -171,14 +171,14 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_fcst_files,  "-fcst",  -1);
-   cline.add(set_obs_files,   "-obs",   -1);
-   cline.add(set_both_files,  "-both",  -1);
-   cline.add(set_input,       "-input",  1);
-   cline.add(set_paired,      "-paired", 0);
-   cline.add(set_config_file, "-config", 1);
-   cline.add(set_out_file,    "-out",    1);
-   cline.add(set_compress,    "-compress", 1);
+   cline.add(set_fcst_files,  "-fcst",      -1);
+   cline.add(set_obs_files,   "-obs",       -1);
+   cline.add(set_both_files,  "-both",      -1);
+   cline.add(set_aggregate,   "-aggregate",  1);
+   cline.add(set_paired,      "-paired",     0);
+   cline.add(set_config_file, "-config",     1);
+   cline.add(set_out_file,    "-out",        1);
+   cline.add(set_compress,    "-compress",   1);
 
    // Parse the command line
    cline.parse();
@@ -825,6 +825,11 @@ void process_scores() {
                  << "] Processing point (" << x << ", " << y << ") with "
                  << pd_ptr[i].n_obs << " matched pairs.\n";
          }
+
+         // TODO: MET #1371 figure out where to read data from the aggr_file
+         //       file to initialize data structures. Maybe store DataPlanes
+         //       in a <string,DataPlane> map so that we only need to load the
+         //       gridded data once and then can read it many times?
 
          // Compute contingency table counts and statistics
          if(!conf_info.fcst_info[0]->is_prob() &&
@@ -2319,7 +2324,7 @@ void usage() {
         << "\t-fcst  file_1 ... file_n | fcst_file_list\n"
         << "\t-obs   file_1 ... file_n | obs_file_list\n"
         << "\t[-both file_1 ... file_n | both_file_list]\n"
-        << "\t[-input input_file]\n"
+        << "\t[-aggregate file]\n"
         << "\t[-paired]\n"
         << "\t-out file\n"
         << "\t-config file\n"
@@ -2342,7 +2347,7 @@ void usage() {
         << "\t\t\"-both\" sets the \"-fcst\" and \"-obs\" options to "
         << "the same set of files (optional).\n"
 
-        << "\t\t\"-input input_file\" specifies a series_analysis output "
+        << "\t\t\"-aggregate file\" specifies a series_analysis output "
         << "file with partial sums and/or contingency table counts to be "
         << "updated prior to deriving statistics (optional).\n"
 
@@ -2388,8 +2393,8 @@ void set_both_files(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_input(const StringArray & a) {
-   input_file = a[0];
+void set_aggregate(const StringArray & a) {
+   aggr_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
