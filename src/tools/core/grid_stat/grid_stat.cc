@@ -805,10 +805,10 @@ void process_scores() {
 
       mlog << Debug(3)
            << "For " << conf_info.vx_opt[i].fcst_info->magic_str() << ", found "
-           << (fcmn_dp.is_empty() == 0 ? 0 : 1) << " forecast climatology mean and "
-           << (fcsd_dp.is_empty() == 0 ? 0 : 1) << " standard deviation field(s), and "
-           << (ocmn_dp.is_empty() == 0 ? 0 : 1) << " observation climatology mean and "
-           << (ocsd_dp.is_empty() == 0 ? 0 : 1) << " standard deviation field(s).\n";
+           << (fcmn_dp.is_empty() ? 0 : 1) << " forecast climatology mean and "
+           << (fcsd_dp.is_empty() ? 0 : 1) << " standard deviation field(s), and "
+           << (ocmn_dp.is_empty() ? 0 : 1) << " observation climatology mean and "
+           << (ocsd_dp.is_empty() ? 0 : 1) << " standard deviation field(s).\n";
 
       // Apply MPR threshold filters
       if(conf_info.vx_opt[i].mpr_sa.n() > 0) {
