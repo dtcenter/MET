@@ -150,11 +150,10 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
                      bool precip_flag, bool rank_flag, bool normal_ci_flag,
                      CNTInfo &cnt_info) {
    int i, j, n;
-   double f, o, c, wgt, wgt_sum;
+   double f, o, fc, oc, wgt, wgt_sum;
    double f_bar, o_bar, ff_bar, oo_bar, fo_bar;
    double fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar;
    double err, err_bar, abs_err_bar, err_sq_bar, den;
-   bool cmn_flag;
 
    //
    // Allocate memory to store the differences
@@ -176,7 +175,8 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    //
    // Flag to process climo
    //
-   cmn_flag = set_climo_flag(pd.f_na, pd.cmn_na);
+   bool cmn_flag = set_climo_flag(pd.f_na, pd.fcmn_na) &&
+                   set_climo_flag(pd.f_na, pd.ocmn_na);
 
    //
    // Get the sum of the weights
@@ -199,7 +199,8 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
 
       f   = pd.f_na[j];
       o   = pd.o_na[j];
-      c   = (cmn_flag ? pd.cmn_na[j] : bad_data_double);
+      fc  = (cmn_flag ? pd.fcmn_na[j] : bad_data_double);
+      oc  = (cmn_flag ? pd.ocmn_na[j] : bad_data_double);
       wgt = pd.wgt_na[i]/wgt_sum;
 
       //
@@ -207,7 +208,8 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       if(is_bad_data(f) ||
          is_bad_data(o) ||
-         (cmn_flag && is_bad_data(c))) continue;
+         (cmn_flag && is_bad_data(fc)) ||
+         (cmn_flag && is_bad_data(oc))) continue;
 
       //
       // Compute the error
@@ -226,11 +228,11 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       n++;
 
       if(cmn_flag) {
-         fa_bar  += wgt*(f-c);
-         oa_bar  += wgt*(o-c);
-         foa_bar += wgt*(f-c)*(o-c);
-         ffa_bar += wgt*(f-c)*(f-c);
-         ooa_bar += wgt*(o-c)*(o-c);
+         fa_bar  += wgt*(f-fc);
+         oa_bar  += wgt*(o-oc);
+         foa_bar += wgt*(f-fc)*(o-oc);
+         ffa_bar += wgt*(f-fc)*(f-fc);
+         ooa_bar += wgt*(o-oc)*(o-oc);
       }
    } // end for i
 
@@ -587,7 +589,9 @@ void compute_ctsinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       // Add this pair to the contingency table
       //
-      cts_info.add(pd.f_na[j], pd.o_na[j], pd.cmn_na[j], pd.csd_na[j]);
+      ClimoPntInfo cpi(pd.fcmn_na[j], pd.fcsd_na[j],
+                       pd.ocmn_na[j], pd.ocsd_na[j]);
+      cts_info.add(pd.f_na[j], pd.o_na[j], &cpi);
 
    } // end for i
 
@@ -684,7 +688,9 @@ void compute_mctsinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       // Add this pair to the contingency table
       //
-      mcts_info.add(pd.f_na[j], pd.o_na[j], pd.cmn_na[j], pd.csd_na[j]);
+      ClimoPntInfo cpi(pd.fcmn_na[j], pd.fcsd_na[j],
+                       pd.ocmn_na[j], pd.ocsd_na[j]);
+      mcts_info.add(pd.f_na[j], pd.o_na[j], &cpi);
 
    } // end for i
 
@@ -761,14 +767,14 @@ void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
    n_pair = pd.f_na.n();
 
    // Flag to process climo
-   cmn_flag = (set_climo_flag(pd.f_na, pd.cmn_na) ||
-               (cprob_in && cprob_in->n() > 0));
+   cmn_flag = (set_climo_flag(pd.f_na, pd.ocmn_na) ||
+              (cprob_in && cprob_in->n() > 0));
 
    // Use input climatological probabilities or derive them
    if(cmn_flag) {
       if(cprob_in) climo_prob = *cprob_in;
       else         climo_prob = derive_climo_prob(pd.cdf_info_ptr,
-                                                  pd.cmn_na, pd.csd_na,
+                                                  pd.ocmn_na, pd.ocsd_na,
                                                   pct_info.othresh);
    }
 
@@ -798,9 +804,15 @@ void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
    for(i=0; i<n_pair; i++) {
 
       //
+      // Store climatology point data
+      //
+      ClimoPntInfo cpi(pd.fcmn_na[i], pd.fcsd_na[i],
+                       pd.ocmn_na[i], pd.ocsd_na[i]);
+
+      //
       // Check the observation thresholds and increment accordingly
       //
-      if(pct_info.othresh.check(pd.o_na[i], pd.cmn_na[i], pd.csd_na[i])) {
+      if(pct_info.othresh.check(pd.o_na[i], &cpi)) {
          pct_info.pct.inc_event(pd.f_na[i]);
          if(cmn_flag) pct_info.climo_pct.inc_event(climo_prob[i]);
       }
@@ -1401,7 +1413,7 @@ void compute_ecnt_mean(const ECNTInfo *ecnt_info, int n,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
+void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg) {
    static const char *method_name = "compute_seeps_agg() -> ";
 
    //
@@ -1414,7 +1426,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
       throw(1);
    }
 
-   SeepsScore *seeps_mpr;
+   SeepsScore *seeps_mpr = nullptr;
    int count, count_diagonal;
    int c12, c13, c21, c23, c31, c32;
    double score_sum, obs_sum, fcst_sum;
@@ -1453,15 +1465,15 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
       double pvf[SEEPS_MATRIX_SIZE];
       double weighted_score, weight_sum, weight[count];
 
-      seeps->n_obs = count;
-      seeps->mean_fcst = fcst_sum / count;
-      seeps->mean_obs = obs_sum / count;
-      seeps->score = score_sum / count;
+      seeps_agg->n_obs = count;
+      seeps_agg->mean_fcst = fcst_sum / count;
+      seeps_agg->mean_obs = obs_sum / count;
+      seeps_agg->score = score_sum / count;
 
       weighted_score = 0.;
       for (int i=0; i<SEEPS_MATRIX_SIZE; i++) pvf[i] = 0.;
 
-      compute_seeps_density_vector(pd, seeps, density_vector);
+      compute_seeps_density_vector(pd, seeps_agg, density_vector);
       int density_cnt = density_vector.size();
       if(density_cnt > count) density_cnt = count;
 
@@ -1502,35 +1514,35 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
       seeps_mprs.clear();
 
       // The weight for s12 to s32 should come from climo file, but not available yet
-      seeps->pv1 = pvf[0] + pvf[3] + pvf[6];    // sum by column for obs
-      seeps->pv2 = pvf[1] + pvf[4] + pvf[7];    // sum by column for obs
-      seeps->pv3 = pvf[2] + pvf[5] + pvf[8];    // sum by column for obs
-      seeps->pf1 = pvf[0] + pvf[1] + pvf[2];    // sum by row for forecast
-      seeps->pf2 = pvf[3] + pvf[4] + pvf[5];    // sum by row for forecast
-      seeps->pf3 = pvf[6] + pvf[7] + pvf[8];    // sum by row for forecast
-      seeps->s12 = c12 * seeps->pf1 * seeps->pv2;
-      seeps->s13 = c13 * seeps->pf1 * seeps->pv3;
-      seeps->s21 = c21 * seeps->pf2 * seeps->pv1;
-      seeps->s23 = c23 * seeps->pf2 * seeps->pv3;
-      seeps->s31 = c31 * seeps->pf3 * seeps->pv1;
-      seeps->s32 = c32 * seeps->pf3 * seeps->pv2;
-      seeps->weighted_score = weighted_score;
+      seeps_agg->pv1 = pvf[0] + pvf[3] + pvf[6];    // sum by column for obs
+      seeps_agg->pv2 = pvf[1] + pvf[4] + pvf[7];    // sum by column for obs
+      seeps_agg->pv3 = pvf[2] + pvf[5] + pvf[8];    // sum by column for obs
+      seeps_agg->pf1 = pvf[0] + pvf[1] + pvf[2];    // sum by row for forecast
+      seeps_agg->pf2 = pvf[3] + pvf[4] + pvf[5];    // sum by row for forecast
+      seeps_agg->pf3 = pvf[6] + pvf[7] + pvf[8];    // sum by row for forecast
+      seeps_agg->s12 = c12 * seeps_agg->pf1 * seeps_agg->pv2;
+      seeps_agg->s13 = c13 * seeps_agg->pf1 * seeps_agg->pv3;
+      seeps_agg->s21 = c21 * seeps_agg->pf2 * seeps_agg->pv1;
+      seeps_agg->s23 = c23 * seeps_agg->pf2 * seeps_agg->pv3;
+      seeps_agg->s31 = c31 * seeps_agg->pf3 * seeps_agg->pv1;
+      seeps_agg->s32 = c32 * seeps_agg->pf3 * seeps_agg->pv2;
+      seeps_agg->weighted_score = weighted_score;
 
       mlog << Debug(7) << method_name
-           << "SEEPS score=" << seeps->score << " weighted_score=" << weighted_score
-           << " pv1=" << seeps->pv1 << " pv2=" << seeps->pv2 << " pv3=" << seeps->pv3
-           << " pf1=" << seeps->pf1 << " pf2=" << seeps->pf2 << " pf3=" << seeps->pf3 << "\n";
+           << "SEEPS score=" << seeps_agg->score << " weighted_score=" << weighted_score
+           << " pv1=" << seeps_agg->pv1 << " pv2=" << seeps_agg->pv2 << " pv3=" << seeps_agg->pv3
+           << " pf1=" << seeps_agg->pf1 << " pf2=" << seeps_agg->pf2 << " pf3=" << seeps_agg->pf3 << "\n";
    }
    else {
       mlog << Debug(5) << method_name
            << "no SEEPS_MPR available\n";
    }
-   seeps->c12 = c12;
-   seeps->c13 = c13;
-   seeps->c21 = c21;
-   seeps->c23 = c23;
-   seeps->c31 = c31;
-   seeps->c32 = c32;
+   seeps_agg->c12 = c12;
+   seeps_agg->c13 = c13;
+   seeps_agg->c21 = c21;
+   seeps_agg->c23 = c23;
+   seeps_agg->c31 = c31;
+   seeps_agg->c32 = c32;
 
    if (count != (c12+c13+c21+c23+c31+c32+count_diagonal)){
       mlog << Debug(6) << method_name
@@ -1546,7 +1558,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps) {
 
 void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &obs_dp,
                                    DataPlane &seeps_dp, DataPlane &seeps_dp_fcat,
-                                   DataPlane &seeps_dp_ocat,SeepsAggScore *seeps,
+                                   DataPlane &seeps_dp_ocat, SeepsAggScore *seeps_agg,
                                    int month, int hour, const SingleThresh &seeps_p1_thresh,
                                    const ConcatString &seeps_climo_name) {
    int fcst_cat, obs_cat;
@@ -1559,7 +1571,6 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
    int c12, c13, c21, c23, c31, c32;
    double obs_sum, fcst_sum;
    double seeps_score, seeps_score_sum, seeps_score_partial_sum;
-   SeepsScore *seeps_mpr;
    static const char *method_name = "compute_aggregated_seeps_grid() -> ";
 
    seeps_dp.set_size(nx, ny);
@@ -1568,8 +1579,7 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
    obs_sum = fcst_sum = seeps_score_sum = 0.;
    seeps_count = count_diagonal = nan_count = bad_count = 0;
    c12 = c13 = c21 = c23 = c31 = c32 = 0;
-
-   seeps->clear();
+   seeps_agg->clear();
    SeepsClimoGrid *seeps_climo = get_seeps_climo_grid(month, seeps_climo_name);
    seeps_climo->set_p1_thresh(seeps_p1_thresh);
    for (int i=0; i<SEEPS_MATRIX_SIZE; i++) {
@@ -1584,7 +1594,7 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
          fcst_cat = obs_cat = bad_data_int;
          seeps_score = bad_data_double;
          if (!is_eq(fcst_value, -9999.0) && !is_eq(obs_value, -9999.0)) {
-            seeps_mpr = seeps_climo->get_record(ix, iy, fcst_value, obs_value);
+            SeepsScore *seeps_mpr = seeps_climo->get_record(ix, iy, fcst_value, obs_value);
             if (seeps_mpr != nullptr) {
                fcst_cat = seeps_mpr->fcst_cat;
                obs_cat = seeps_mpr->obs_cat;
@@ -1621,7 +1631,7 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
                   pvf_cnt[seeps_mpr->s_idx] += 1;
                }
 
-               delete seeps_mpr;
+               if(seeps_mpr) { delete seeps_mpr; seeps_mpr = nullptr; }
             }
          }
          seeps_dp.set(seeps_score, ix, iy);
@@ -1632,41 +1642,41 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
    }
    int cell_count = dp_size - nan_count - bad_count;
    if (cell_count > 0) {
-      seeps->weighted_score = seeps_score_sum/cell_count;
+      seeps_agg->weighted_score = seeps_score_sum/cell_count;
       for (int i=0; i<SEEPS_MATRIX_SIZE; i++) {
          pvf[i] = ((double)pvf_cnt[i]) / cell_count;
       }
    }
 
-   seeps->n_obs = seeps_count;
-   seeps->c12 = c12;
-   seeps->c13 = c13;
-   seeps->c21 = c21;
-   seeps->c23 = c23;
-   seeps->c31 = c31;
-   seeps->c32 = c32;
+   seeps_agg->n_obs = seeps_count;
+   seeps_agg->c12 = c12;
+   seeps_agg->c13 = c13;
+   seeps_agg->c21 = c21;
+   seeps_agg->c23 = c23;
+   seeps_agg->c31 = c31;
+   seeps_agg->c32 = c32;
    if (seeps_count > 0) {
-      seeps->mean_fcst = fcst_sum / seeps_count;
-      seeps->mean_obs = obs_sum / seeps_count;
+      seeps_agg->mean_fcst = fcst_sum / seeps_count;
+      seeps_agg->mean_obs = obs_sum / seeps_count;
 
-      seeps->pv1 = pvf[0] + pvf[3] + pvf[6];    // sum by column for obs
-      seeps->pv2 = pvf[1] + pvf[4] + pvf[7];    // sum by column for obs
-      seeps->pv3 = pvf[2] + pvf[5] + pvf[8];    // sum by column for obs
-      seeps->pf1 = pvf[0] + pvf[1] + pvf[2];    // sum by row for forecast
-      seeps->pf2 = pvf[3] + pvf[4] + pvf[5];    // sum by row for forecast
-      seeps->pf3 = pvf[6] + pvf[7] + pvf[8];    // sum by row for forecast
-      seeps->s12 = c12 * seeps->pf1 * seeps->pv2;
-      seeps->s13 = c13 * seeps->pf1 * seeps->pv3;
-      seeps->s21 = c21 * seeps->pf2 * seeps->pv1;
-      seeps->s23 = c23 * seeps->pf2 * seeps->pv3;
-      seeps->s31 = c31 * seeps->pf3 * seeps->pv1;
-      seeps->s32 = c32 * seeps->pf3 * seeps->pv2;
-      seeps->score = seeps_score_sum / seeps_count;
+      seeps_agg->pv1 = pvf[0] + pvf[3] + pvf[6];    // sum by column for obs
+      seeps_agg->pv2 = pvf[1] + pvf[4] + pvf[7];    // sum by column for obs
+      seeps_agg->pv3 = pvf[2] + pvf[5] + pvf[8];    // sum by column for obs
+      seeps_agg->pf1 = pvf[0] + pvf[1] + pvf[2];    // sum by row for forecast
+      seeps_agg->pf2 = pvf[3] + pvf[4] + pvf[5];    // sum by row for forecast
+      seeps_agg->pf3 = pvf[6] + pvf[7] + pvf[8];    // sum by row for forecast
+      seeps_agg->s12 = c12 * seeps_agg->pf1 * seeps_agg->pv2;
+      seeps_agg->s13 = c13 * seeps_agg->pf1 * seeps_agg->pv3;
+      seeps_agg->s21 = c21 * seeps_agg->pf2 * seeps_agg->pv1;
+      seeps_agg->s23 = c23 * seeps_agg->pf2 * seeps_agg->pv3;
+      seeps_agg->s31 = c31 * seeps_agg->pf3 * seeps_agg->pv1;
+      seeps_agg->s32 = c32 * seeps_agg->pf3 * seeps_agg->pv2;
+      seeps_agg->score = seeps_score_sum / seeps_count;
    }
    mlog << Debug(6) << method_name
-        << "SEEPS score=" << seeps->score << " weighted_score=" << seeps->weighted_score
-        << " pv1=" << seeps->pv1 << " pv2=" << seeps->pv2 << " pv3=" << seeps->pv3
-        << " pf1=" << seeps->pf1 << " pf2=" << seeps->pf2 << " pf3=" << seeps->pf3 << "\n";
+        << "SEEPS score=" << seeps_agg->score << " weighted_score=" << seeps_agg->weighted_score
+        << " pv1=" << seeps_agg->pv1 << " pv2=" << seeps_agg->pv2 << " pv3=" << seeps_agg->pv3
+        << " pf1=" << seeps_agg->pf1 << " pf2=" << seeps_agg->pf2 << " pf3=" << seeps_agg->pf3 << "\n";
    if(mlog.verbosity_level() >= detailed_debug_level) {
       char buffer[100];
       ConcatString log_message;

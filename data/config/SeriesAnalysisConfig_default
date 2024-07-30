@@ -61,7 +61,8 @@ obs = fcst;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology data
+// Climatology mean data
+// May be set separately in the "fcst" and "obs" dictionaries
 //
 climo_mean = {
 
@@ -80,11 +81,19 @@ climo_mean = {
    hour_interval      = 6;
 }
 
+//
+// Climatology standard deviation data
+// May be set separately in the "fcst" and "obs" dictionaries
+//
 climo_stdev = climo_mean;
 climo_stdev = {
    file_name = [];
 }
 
+//
+// Climatology distribution settings
+// May be set separately in each "obs.field" entry
+//
 climo_cdf = {
    cdf_bins    = 1;
    center_bins = FALSE;

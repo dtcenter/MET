@@ -646,7 +646,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    clear();
 
    // Allocate new EnsVarInfo object for fcst
-   vx_pd.fcst_info = new EnsVarInfo();
+   vx_pd.ens_info = new EnsVarInfo();
 
    // Loop over ensemble member IDs to substitute
    for(i=0; i<ens_member_ids.n(); i++) {
@@ -663,7 +663,10 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       input_info.var_info = next_var;
       input_info.file_index = 0;
       input_info.file_list = ens_files;
-      vx_pd.fcst_info->add_input(input_info);
+      vx_pd.ens_info->add_input(input_info);
+
+      // Set the fcst_info, if needed
+      if(!vx_pd.fcst_info) vx_pd.set_fcst_info(next_var); 
 
       // Add InputInfo to fcst info list for each ensemble file provided
       // set var_info to nullptr to note first VarInfo should be used
@@ -672,7 +675,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
          input_info.var_info = nullptr;
          input_info.file_index = j;
          input_info.file_list = ens_files;
-         vx_pd.fcst_info->add_input(input_info);
+         vx_pd.ens_info->add_input(input_info);
       } // end for j
    } // end for i
 
@@ -691,11 +694,11 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       input_info.var_info = next_var;
       input_info.file_index = ens_files->n() - 1;
       input_info.file_list = ens_files;
-      vx_pd.fcst_info->add_input(input_info);
+      vx_pd.ens_info->add_input(input_info);
    }
 
    // Allocate new VarInfo object for obs
-   vx_pd.obs_info  = info_factory.new_var_info(otype);
+   vx_pd.obs_info = info_factory.new_var_info(otype);
 
    // Set the VarInfo objects
    vx_pd.obs_info->set_dict(odict);
@@ -704,14 +707,14 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << "Parsed forecast field:\n";
-      vx_pd.fcst_info->get_var_info()->dump(cout);
+      vx_pd.ens_info->get_var_info()->dump(cout);
       mlog << Debug(5)
            << "Parsed observation field:\n";
       vx_pd.obs_info->dump(cout);
    }
 
    // No support for wind direction
-   if(vx_pd.fcst_info->get_var_info()->is_wind_direction() ||
+   if(vx_pd.ens_info->get_var_info()->is_wind_direction() ||
       vx_pd.obs_info->is_wind_direction()) {
       mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
            << "wind direction may not be verified using grid_stat.\n\n";
@@ -783,7 +786,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    ocat_ta = odict.lookup_thresh_array(conf_key_prob_cat_thresh);
 
    // The number of thresholds must match for non-probability forecasts
-   if(!vx_pd.fcst_info->get_var_info()->is_prob() &&
+   if(!vx_pd.ens_info->get_var_info()->is_prob() &&
       fcat_ta.n() != ocat_ta.n()) {
       mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
            << "The number of forecast (" << write_css(fcat_ta)
@@ -936,7 +939,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
    }
 
    // Define the dimensions
-   vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
+   vx_pd.set_size(n_msg_typ, n_mask, n_interp);
 
    // Store the climo CDF info
    vx_pd.set_climo_cdf_info_ptr(&cdf_info);
@@ -1014,21 +1017,23 @@ void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
    //
    // Sort the input arrays
    //
-   NumArray fsort;
-   for(int i=0; i<pd_ptr->n_ens; i++) fsort.add(pd_ptr->e_na[i]);
-   NumArray osort = pd_ptr->o_na;
-   NumArray csort = pd_ptr->cmn_na;
-   fsort.sort_array();
-   osort.sort_array();
-   csort.sort_array();
+   NumArray f_sort;
+   for(int i=0; i<pd_ptr->n_ens; i++) f_sort.add(pd_ptr->e_na[i]);
+   NumArray o_sort    = pd_ptr->o_na;
+   NumArray fcmn_sort = pd_ptr->fcmn_na;
+   NumArray ocmn_sort = pd_ptr->ocmn_na;
+   f_sort.sort_array();
+   o_sort.sort_array();
+   fcmn_sort.sort_array();
+   ocmn_sort.sort_array();
 
    //
    // Compute percentiles, passing the observation filtering
    // thresholds in for the fcst and obs slots.
    //
-   othr_ta.set_perc(&fsort, &osort, &csort, &othr_ta, &othr_ta);
-   fcat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
-   ocat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
+   othr_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &othr_ta, &othr_ta);
+   fcat_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
+   ocat_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
 
    return;
 }

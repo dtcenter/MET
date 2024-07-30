@@ -449,8 +449,8 @@ void WaveletStatConfInfo::set_perc_thresh(const DataPlane &f_dp,
    //
    // Compute percentiles
    //
-   fcat_ta->set_perc(&fsort, &osort, (NumArray *) 0, fcat_ta, ocat_ta);
-   ocat_ta->set_perc(&fsort, &osort, (NumArray *) 0, fcat_ta, ocat_ta);
+   fcat_ta->set_perc(&fsort, &osort, nullptr, nullptr, fcat_ta, ocat_ta);
+   ocat_ta->set_perc(&fsort, &osort, nullptr, nullptr, fcat_ta, ocat_ta);
 
    return;
 }

@@ -713,6 +713,9 @@ void track_counts(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, bool is_
       cmn = (cmn_dp.is_empty() ? bad_data_double : cmn_dp.data()[i]);
       csd = (csd_dp.is_empty() ? bad_data_double : csd_dp.data()[i]);
 
+      // MET #2924 Use the same data for the forecast and observation climatologies
+      ClimoPntInfo cpi(cmn, csd, cmn, csd);
+
       // Skip bad data values
       if(is_bad_data(ens)) continue;
 
@@ -738,7 +741,7 @@ void track_counts(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, bool is_
 
          // Event frequency
          for(j=0; j<n_thr; j++) {
-            if(thr_buf[j].check(ens, cmn, csd)) thresh_cnt_na[j].inc(i, 1);
+            if(thr_buf[j].check(ens, &cpi)) thresh_cnt_na[j].inc(i, 1);
          }
       } // end else
    } // end for i
@@ -757,7 +760,7 @@ void track_counts(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, bool is_
             fractional_coverage(ens_dp, frac_dp,
                conf_info.nbrhd_prob.width[j],
                conf_info.nbrhd_prob.shape, grid.wrap_lon(),
-               thr_buf[i], &cmn_dp, &csd_dp,
+               thr_buf[i], &cmn_dp, &csd_dp, &cmn_dp, &csd_dp,
                conf_info.nbrhd_prob.vld_thresh);
 
             // Increment counts
@@ -1032,15 +1035,23 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
       // Process all CDP thresholds except 0 and 100
       for(vector<Simple_Node>::iterator it = simp.begin();
           it != simp.end(); it++) {
-         if(it->ptype() == perc_thresh_climo_dist &&
+         if(it->ptype() == perc_thresh_fcst_climo_dist &&
             !is_eq(it->pvalue(), 0.0) &&
             !is_eq(it->pvalue(), 100.0)) {
-            snprintf(type_str, sizeof(type_str), "CLIMO_CDP%i",
+            snprintf(type_str, sizeof(type_str), "CLIMO_FCDP%i",
                      nint(it->pvalue()));
             cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
-            write_ens_data_plane(ens_info, cdp_dp, ens_dp,
-                                type_str,
-                                "Climatology distribution percentile");
+            write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
+                                "Forecast climatology distribution percentile");
+         }
+         else if(it->ptype() == perc_thresh_obs_climo_dist &&
+                 !is_eq(it->pvalue(), 0.0) &&
+                 !is_eq(it->pvalue(), 100.0)) {
+            snprintf(type_str, sizeof(type_str), "CLIMO_OCDP%i",
+                     nint(it->pvalue()));
+            cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
+            write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
+                                "Observation climatology distribution percentile");
          }
       } // end for it
    }

@@ -1,4 +1,4 @@
-// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+/// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2024
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
@@ -33,7 +33,7 @@ void oom() {
 void oom_grib2() {
 
    mlog << Error << "\nOut of memory reading GRIB2 data!  Exiting!\n"
-	<< "Check that MET and the GRIB2C library were compiled "
+        << "Check that MET and the GRIB2C library were compiled "
         << "consistently, either with or without the -D__64BIT__ "
         << "flag.\n\n";
    exit(1);

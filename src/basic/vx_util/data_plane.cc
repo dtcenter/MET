@@ -518,7 +518,7 @@ void DataPlane::censor(const ThreshArray &censor_thresh,
       for(i=0; i<Nxy; i++) {
          if(!is_bad_data(Data[i])) d.add(Data[i]);
       }
-      ta.set_perc(&d, &d, &d);
+      ta.set_perc(&d, &d, &d, &d);
    }
 
    mlog << Debug(3)

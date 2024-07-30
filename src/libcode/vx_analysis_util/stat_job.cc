@@ -1854,7 +1854,8 @@ void STATAnalysisJob::set_boot_seed(const char *c) {
 
 void STATAnalysisJob::set_perc_thresh(const NumArray &f_na,
                                       const NumArray &o_na,
-                                      const NumArray &cmn_na) {
+                                      const NumArray &fcmn_na,
+                                      const NumArray &ocmn_na) {
 
    if(!out_fcst_thresh.need_perc() &&
       !out_obs_thresh.need_perc()) return;
@@ -1862,19 +1863,21 @@ void STATAnalysisJob::set_perc_thresh(const NumArray &f_na,
    //
    // Sort the input arrays
    //
-   NumArray fsort = f_na;
-   NumArray osort = o_na;
-   NumArray csort = cmn_na;
-   fsort.sort_array();
-   osort.sort_array();
-   csort.sort_array();
+   NumArray f_sort = f_na;
+   NumArray o_sort = o_na;
+   NumArray fcmn_sort = fcmn_na;
+   NumArray ocmn_sort = ocmn_na;
+   f_sort.sort_array();
+   o_sort.sort_array();
+   fcmn_sort.sort_array();
+   ocmn_sort.sort_array();
 
    //
    // Compute percentiles
    //
-   out_fcst_thresh.set_perc(&fsort, &osort, &csort,
+   out_fcst_thresh.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort,
                             &out_fcst_thresh, &out_obs_thresh);
-    out_obs_thresh.set_perc(&fsort, &osort, &csort,
+    out_obs_thresh.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort,
                             &out_fcst_thresh, &out_obs_thresh);
 
    return;

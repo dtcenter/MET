@@ -230,6 +230,8 @@ class SeepsClimoGrid : public SeepsClimoBase {
       double *s31_buf;
       double *s32_buf;
 
+      void init_from_scratch();
+
    protected:
       void clear() override;
       ConcatString get_env_climo_name() override { return MET_ENV_SEEPS_GRID_CLIMO_NAME; };
