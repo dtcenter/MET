@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+  <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
+]>
+
+<!-- Requires: None -->
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="climatology_GRID_STAT_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>  <value>FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG</value></pair>
+      <pair><name>FCST_CLIMO_DIR</name> <value>&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg</value></pair>
+      <pair><name>OBS_CLIMO_DIR</name>  <value>&DATA_DIR_CLIMO;/ERA_DAILY_1.5deg</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2 \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_climo_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG \
+      -outdir &OUTPUT_DIR;/climatology_mixed -v 2
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/climatology_mixed/grid_stat_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG_240000L_20120410_000000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/climatology_mixed/grid_stat_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG_240000L_20120410_000000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+</met_test>
