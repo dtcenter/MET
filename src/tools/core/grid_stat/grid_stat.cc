@@ -1207,7 +1207,47 @@ void process_scores() {
             write_nc((string)"OBS_CLIMO_CDF", normal_cdf(obs_dp, ocmn_dp, ocsd_dp),
                      i, mthd, pnts,
                      conf_info.vx_opt[i].interp_info.field);
+=======
+>>>>>>> origin/develop
          }
+         if(conf_info.vx_opt[i].nc_info.do_climo &&
+            !ocmn_dp.is_empty()) {
+            write_nc((string)"OBS_CLIMO_MEAN", ocmn_dp,
+                     i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+         }
+         if(conf_info.vx_opt[i].nc_info.do_climo &&
+            !ocsd_dp.is_empty()) {
+            write_nc((string)"OBS_CLIMO_STDEV", ocsd_dp,
+                     i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+         }
+         if(conf_info.vx_opt[i].nc_info.do_climo &&
+            !ocmn_dp.is_empty() && !ocsd_dp.is_empty()) {
+            write_nc((string)"OBS_CLIMO_CDF", normal_cdf(obs_dp, ocmn_dp, ocsd_dp),
+                     i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+         }
+         */
+         if(conf_info.vx_opt[i].nc_info.do_climo &&
+            !ocmn_dp.is_empty()) {
+            write_nc((string)"CLIMO_MEAN", ocmn_dp,
+                     i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+         }
+         if(conf_info.vx_opt[i].nc_info.do_climo &&
+            !ocsd_dp.is_empty()) {
+            write_nc((string)"CLIMO_STDEV", fcsd_dp,
+                     i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+         }
+         if(conf_info.vx_opt[i].nc_info.do_climo &&
+            !ocmn_dp.is_empty() && !ocsd_dp.is_empty()) {
+            write_nc((string)"CLIMO_CDF", normal_cdf(obs_dp, ocmn_dp, ocsd_dp),
+                     i, mthd, pnts,
+                     conf_info.vx_opt[i].interp_info.field);
+         }
+         // MET #2924 End replace
 
          // Write out the fields of requested climo distribution percentile threshold values
          if(conf_info.vx_opt[i].nc_info.do_climo_cdp      &&
@@ -1244,6 +1284,24 @@ void process_scores() {
                            i, mthd, pnts,
                            conf_info.vx_opt[i].interp_info.field);
                }
+               else if(it->ptype() == perc_thresh_obs_climo_dist &&
+                       !is_eq(it->pvalue(), 0.0) &&
+                       !is_eq(it->pvalue(), 100.0)) {
+                  cs << cs_erase << "OBS_CLIMO_CDP" << nint(it->pvalue());
+                  write_nc(cs, normal_cdf_inv(it->pvalue()/100.0, ocmn_dp, ocsd_dp),
+                           i, mthd, pnts,
+                           conf_info.vx_opt[i].interp_info.field);
+               }
+               */
+               if(it->ptype() == perc_thresh_obs_climo_dist &&
+                       !is_eq(it->pvalue(), 0.0) &&
+                       !is_eq(it->pvalue(), 100.0)) {
+                  cs << cs_erase << "CLIMO_CDP" << nint(it->pvalue());
+                  write_nc(cs, normal_cdf_inv(it->pvalue()/100.0, ocmn_dp, ocsd_dp),
+                           i, mthd, pnts,
+                           conf_info.vx_opt[i].interp_info.field);
+               }
+               // MET #2924 End replace
             } // end for it
          }
 
@@ -1765,7 +1823,7 @@ void process_scores() {
          ocmn_dp_smooth  = ocmn_dp;
 
          // Reset forecast climo spread since it does not apply to Fourier decomposition
-         if(!fcst_dp.is_empty()) fcsd_dp.set_constant(bad_data_double);
+         if(!fcsd_dp.is_empty()) fcsd_dp.set_constant(bad_data_double);
 
          // Reset observation climo spread since it does not apply to Fourier decomposition
          if(!ocsd_dp.is_empty()) ocsd_dp.set_constant(bad_data_double);
@@ -2017,6 +2075,19 @@ void process_scores() {
                         i, shc.get_interp_mthd(),
                         bad_data_int,  FieldType::Both);
             }
+            if(conf_info.vx_opt[i].nc_info.do_climo &&
+               !ocmn_dp_smooth.is_empty()) {
+               write_nc((string)"OBS_CLIMO_MEAN", ocmn_dp_smooth,
+                        i, shc.get_interp_mthd(),
+                        bad_data_int,  FieldType::Both);
+            }
+            if(conf_info.vx_opt[i].nc_info.do_climo &&
+               !ocmn_dp_smooth.is_empty()) {
+               write_nc((string)"CLIMO_MEAN", ocmn_dp_smooth,
+                        i, shc.get_interp_mthd(),
+                        bad_data_int,  FieldType::Both);
+            }
+            // MET #2924 End replace
          } // end if
 
       } // end for j
