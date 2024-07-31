@@ -213,8 +213,8 @@ Node *Node::get_child(int n) const {
    if( n >= (children_count = n_children()) ) {
 
       mlog << Error << "\nNode::get_child(int) -> "
-	   << "attempting to access child number " << n << " when only " 
-	   << children_count << " exist\n\n";
+           << "attempting to access child number " << n << " when only "
+           << children_count << " exist\n\n";
 
       exit(1);
    }
@@ -295,7 +295,7 @@ double Node::angle() const {
    if(p.n_points < 3 && n_children() == 0) {
 
       mlog << Error << "\nNode::angle() -> "
-	   << "not enough points!\n\n";
+           << "not enough points!\n\n";
 
       exit(1);
    }

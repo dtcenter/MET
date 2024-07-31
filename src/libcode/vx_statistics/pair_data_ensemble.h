@@ -164,12 +164,11 @@ class PairDataEnsemble : public PairBase {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Class to store a variety of PairDataEnsemble objects for each
-// verification task
+// Class to store PairDataEnsemble objects for ensemble verification
 //
 ////////////////////////////////////////////////////////////////////////
 
-class VxPairDataEnsemble {
+class VxPairDataEnsemble : public VxPairBase {
 
    private:
 
@@ -189,42 +188,8 @@ class VxPairDataEnsemble {
       //
       //////////////////////////////////////////////////////////////////
 
-      EnsVarInfo *fcst_info;     // Forecast field, allocated by EnsVarInfo
-      VarInfo *climo_info;       // Climatology field, allocated by VarInfoFactory
-      VarInfo *obs_info;         // Observation field, allocated by VarInfoFactory
+      EnsVarInfo *ens_info;         // Ensemble data, allocated by EnsVarInfo
 
-      ConcatString desc;         // User description from config file
-
-      double interp_thresh;      // Threshold between 0 and 1 used when
-                                 // interpolating the forecasts to the
-                                 // observation location.
-
-      StringArray  msg_typ_sfc;  // List of surface message types
-
-      //////////////////////////////////////////////////////////////////
-      //
-      // Forecast and climotology fields falling between the requested
-      // levels.  Store the fields in a data plane array.
-      //
-      //////////////////////////////////////////////////////////////////
-
-      DataPlaneArray fcst_dpa;     // Forecast data plane array
-      DataPlaneArray climo_mn_dpa; // Climatology mean data plane array
-      DataPlaneArray climo_sd_dpa; // Climatology standard deviation data plane array
-
-      //////////////////////////////////////////////////////////////////
-
-      unixtime fcst_ut;          // Ensemble valid time
-      unixtime beg_ut;           // Beginning of valid time window
-      unixtime end_ut;           // End of valid time window
-
-      //////////////////////////////////////////////////////////////////
-
-      StringArray sid_inc_filt;  // Station ID inclusion list
-      StringArray sid_exc_filt;  // Station ID exclusion list
-      StringArray obs_qty_inc_filt;  // Observation quality include markers
-      StringArray obs_qty_exc_filt;  // Observation quality exclude markers
-      
       //////////////////////////////////////////////////////////////////
 
       ObsErrorInfo *obs_error_info; // Pointer for observation error
@@ -232,87 +197,28 @@ class VxPairDataEnsemble {
 
       //////////////////////////////////////////////////////////////////
 
-      int      n_msg_typ;        // Number of verifying message types
-
-      int      n_mask;           // Total number of masking regions
-                                 // of masking DataPlane fields or SIDs
-
-      int      n_interp;         // Number of interpolation techniques
-
-      //////////////////////////////////////////////////////////////////
-
-      PairDataEnsemble ***pd;    // 3-Dim Array of PairDataEnsemble objects
-                                 // as [n_msg_typ][n_mask][n_interp]
+      // 3-Dim vector of PairDataEnsemble objects [n_msg_typ][n_mask][n_interp]
+      std::vector<PairDataEnsemble> pd;
 
       //////////////////////////////////////////////////////////////////
 
       void clear();
 
-      void set_fcst_info(EnsVarInfo *);
-      void set_climo_info(VarInfo *);
-      void set_obs_info(VarInfo *);
-
-      void set_desc(const char *);
-
-      void set_interp_thresh(double);
-      void set_msg_typ_sfc(const StringArray &);
-
-      void set_fcst_dpa(const DataPlaneArray &);
-      void set_climo_mn_dpa(const DataPlaneArray &);
-      void set_climo_sd_dpa(const DataPlaneArray &);
-
-      void set_fcst_ut(const unixtime);
-      void set_beg_ut(const unixtime);
-      void set_end_ut(const unixtime);
-
-      void set_sid_inc_filt(const StringArray);
-      void set_sid_exc_filt(const StringArray);
-      void set_obs_qty_inc_filt(const StringArray);
-      void set_obs_qty_exc_filt(const StringArray);
-      
-      // Call set_pd_size before set_msg_typ, set_mask_area, and set_interp
-      void set_pd_size(int, int, int);
-
-      void set_msg_typ(int, const char *);
-      void set_msg_typ_vals(int, const StringArray &);
-      void set_mask_area(int, const char *, MaskPlane *);
-      void set_mask_sid(int, const char *, StringArray *);
-      void set_mask_llpnt(int, const char *, MaskLatLon *);
-
-      void set_interp(int i_interp, const char *interp_mthd_str, int width,
-                      GridTemplateFactory::GridTemplates shape);
-      void set_interp(int i_interp, InterpMthd mthd, int width,
-                      GridTemplateFactory::GridTemplates shape);
+      void set_ens_info(const EnsVarInfo *);
+      void set_size(int, int, int);
 
       // Call set_ens_size before add_ens
       void set_ens_size(int n);
 
-      void set_climo_cdf_info_ptr(const ClimoCDFInfo *);
-
       void set_ssvar_bin_size(double);
       void set_phist_bin_size(double);
+      void set_ctrl_index(int);
+      void set_skip_const(bool);
 
       void add_point_obs(float *, int *, const char *, const char *,
                          unixtime, const char *, float *, Grid &,
                          const char * = 0, const DataPlane * = 0);
-
       void add_ens(int, bool mn, Grid &);
-
-      int  get_n_pair() const;
-
-      void set_duplicate_flag(DuplicateType duplicate_flag);
-
-      void set_obs_summary(ObsSummary obs_summary);
-
-      void set_obs_perc_value(int percentile);
-
-      void print_obs_summary();
-
-      void calc_obs_summary();
-
-      void set_ctrl_index(int);
-
-      void set_skip_const(bool);
 };
 
 ////////////////////////////////////////////////////////////////////////

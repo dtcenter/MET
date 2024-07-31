@@ -42,9 +42,9 @@
 //   019    02/21/24  Halley Gotway   MET #2583 Add observation error
 //                                      ECNT statistics.
 //   020    06/14/24  Halley Gotway   MET #2911 Call apply_set_hdr_opts().
+//   021    07/05/24  Halley Gotway   MET #2924 Support forecast climatology.
 //
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <cstdio>
 #include <iostream>
@@ -1770,10 +1770,9 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Append the unit vectors with no climatological values
          //
-         m[key].pd_u.add_grid_pair(uf, uo, bad_data_double,
-                        bad_data_double, default_grid_weight);
-         m[key].pd_v.add_grid_pair(vf, vo, bad_data_double,
-                        bad_data_double, default_grid_weight);
+         ClimoPntInfo cpi;
+         m[key].pd_u.add_grid_pair(uf, uo, cpi, default_grid_weight);
+         m[key].pd_v.add_grid_pair(vf, vo, cpi, default_grid_weight);
 
          //
          // Keep track of the unique header column entries
@@ -1797,9 +1796,11 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
    VL1L2Info v_info;
    MPRData cur;
    ConcatString hdr, key;
-   double uf, uo, ucmn, ucsd;
-   double vf, vo, vcmn, vcsd;
-   double fcst_wind, obs_wind, cmn_wind, csd_wind;
+   double uf, uo, ufcmn, ufcsd, uocmn, uocsd;
+   double vf, vo, vfcmn, vfcsd, vocmn, vocsd;
+   double fcst_wind, obs_wind;
+   double fcmn_wind, fcsd_wind;
+   double ocmn_wind, ocsd_wind;
    bool is_ugrd;
    int i;
    map<ConcatString, AggrWindInfo>::iterator it;
@@ -1819,14 +1820,18 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
 
          parse_mpr_line(line, cur);
          is_ugrd = (cur.fcst_var == ugrd_abbr_str);
-         uf      = (is_ugrd ? cur.fcst        : bad_data_double);
-         uo      = (is_ugrd ? cur.obs         : bad_data_double);
-         ucmn    = (is_ugrd ? cur.climo_mean  : bad_data_double);
-         ucsd    = (is_ugrd ? cur.climo_stdev : bad_data_double);
-         vf      = (is_ugrd ? bad_data_double : cur.fcst);
-         vo      = (is_ugrd ? bad_data_double : cur.obs);
-         vcmn    = (is_ugrd ? bad_data_double : cur.climo_mean);
-         vcsd    = (is_ugrd ? bad_data_double : cur.climo_stdev);
+         uf      = (is_ugrd ? cur.fcst             : bad_data_double);
+         uo      = (is_ugrd ? cur.obs              : bad_data_double);
+         ufcmn   = (is_ugrd ? cur.fcst_climo_mean  : bad_data_double);
+         ufcsd   = (is_ugrd ? cur.fcst_climo_stdev : bad_data_double);
+         uocmn   = (is_ugrd ? cur.obs_climo_mean   : bad_data_double);
+         uocsd   = (is_ugrd ? cur.obs_climo_stdev  : bad_data_double);
+         vf      = (is_ugrd ? bad_data_double      : cur.fcst);
+         vo      = (is_ugrd ? bad_data_double      : cur.obs);
+         vfcmn   = (is_ugrd ? bad_data_double      : cur.fcst_climo_mean);
+         vfcsd   = (is_ugrd ? bad_data_double      : cur.fcst_climo_stdev);
+         vocmn   = (is_ugrd ? bad_data_double      : cur.obs_climo_mean);
+         vocsd   = (is_ugrd ? bad_data_double      : cur.obs_climo_stdev);
 
          //
          // Build header string for matching UGRD and VGRD lines
@@ -1880,10 +1885,10 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
             // Initialize values
             //
             aggr.hdr_sa.add(hdr);
-            aggr.pd_u.add_grid_pair(uf, uo, ucmn, ucsd,
-                         default_grid_weight);
-            aggr.pd_v.add_grid_pair(vf, vo, vcmn, vcsd,
-                         default_grid_weight);
+            ClimoPntInfo u_cpi(ufcmn, ufcsd, uocmn, uocsd);
+            ClimoPntInfo v_cpi(vfcmn, vfcsd, vocmn, vocsd);
+            aggr.pd_u.add_grid_pair(uf, uo, u_cpi, default_grid_weight);
+            aggr.pd_v.add_grid_pair(vf, vo, v_cpi, default_grid_weight);
 
             //
             // Add the new map entry
@@ -1927,24 +1932,28 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
                //
                // Update the existing values
                //
-               if(!is_bad_data(uf))   m[key].pd_u.f_na.set(i, uf);
-               if(!is_bad_data(uo))   m[key].pd_u.o_na.set(i, uo);
-               if(!is_bad_data(ucmn)) m[key].pd_u.cmn_na.set(i, ucmn);
-               if(!is_bad_data(ucsd)) m[key].pd_u.csd_na.set(i, ucsd);
-               if(!is_bad_data(vf))   m[key].pd_v.f_na.set(i, vf);
-               if(!is_bad_data(vo))   m[key].pd_v.o_na.set(i, vo);
-               if(!is_bad_data(vcmn)) m[key].pd_v.cmn_na.set(i, vcmn);
-               if(!is_bad_data(vcsd)) m[key].pd_v.csd_na.set(i, vcsd);
+               if(!is_bad_data(uf))    m[key].pd_u.f_na.set(i, uf);
+               if(!is_bad_data(uo))    m[key].pd_u.o_na.set(i, uo);
+               if(!is_bad_data(ufcmn)) m[key].pd_u.fcmn_na.set(i, ufcmn);
+               if(!is_bad_data(ufcsd)) m[key].pd_u.fcsd_na.set(i, ufcsd);
+               if(!is_bad_data(uocmn)) m[key].pd_u.ocmn_na.set(i, uocmn);
+               if(!is_bad_data(uocsd)) m[key].pd_u.ocsd_na.set(i, uocsd);
+               if(!is_bad_data(vf))    m[key].pd_v.f_na.set(i, vf);
+               if(!is_bad_data(vo))    m[key].pd_v.o_na.set(i, vo);
+               if(!is_bad_data(vfcmn)) m[key].pd_v.fcmn_na.set(i, vfcmn);
+               if(!is_bad_data(vfcsd)) m[key].pd_v.fcsd_na.set(i, vfcsd);
+               if(!is_bad_data(vocmn)) m[key].pd_v.ocmn_na.set(i, vocmn);
+               if(!is_bad_data(vocsd)) m[key].pd_v.ocsd_na.set(i, vocsd);
             }
             //
             // Add data for a new header entry
             //
             else {
                m[key].hdr_sa.add(hdr);
-               m[key].pd_u.add_grid_pair(uf, uo, ucmn, ucsd,
-                              default_grid_weight);
-               m[key].pd_v.add_grid_pair(vf, vo, vcmn, vcsd,
-                              default_grid_weight);
+               ClimoPntInfo u_cpi(ufcmn, ufcsd, uocmn, uocsd);
+               ClimoPntInfo v_cpi(vfcmn, vfcsd, vocmn, vocsd);
+               m[key].pd_u.add_grid_pair(uf, uo, u_cpi, default_grid_weight);
+               m[key].pd_v.add_grid_pair(vf, vo, v_cpi, default_grid_weight);
             }
          }
 
@@ -2011,18 +2020,25 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
             job.out_obs_wind_thresh.get_type()  != thresh_na) {
 
             // Compute wind speeds
-            fcst_wind = convert_u_v_to_wind(it->second.pd_u.f_na[i],
-                                            it->second.pd_v.f_na[i]);
-             obs_wind = convert_u_v_to_wind(it->second.pd_u.o_na[i],
-                                            it->second.pd_v.o_na[i]);
-             cmn_wind = convert_u_v_to_wind(it->second.pd_u.cmn_na[i],
-                                            it->second.pd_v.cmn_na[i]);
-             csd_wind = convert_u_v_to_wind(it->second.pd_u.csd_na[i],
-                                            it->second.pd_v.csd_na[i]);
+            fcst_wind  = convert_u_v_to_wind(it->second.pd_u.f_na[i],
+                                             it->second.pd_v.f_na[i]);
+             obs_wind  = convert_u_v_to_wind(it->second.pd_u.o_na[i],
+                                             it->second.pd_v.o_na[i]);
+             fcmn_wind = convert_u_v_to_wind(it->second.pd_u.fcmn_na[i],
+                                             it->second.pd_v.fcmn_na[i]);
+             fcsd_wind = convert_u_v_to_wind(it->second.pd_u.fcsd_na[i],
+                                             it->second.pd_v.fcsd_na[i]);
+             ocmn_wind = convert_u_v_to_wind(it->second.pd_u.ocmn_na[i],
+                                             it->second.pd_v.ocmn_na[i]);
+             ocsd_wind = convert_u_v_to_wind(it->second.pd_u.ocsd_na[i],
+                                             it->second.pd_v.ocsd_na[i]);
+
+            // Store climo data
+            ClimoPntInfo cpi(fcmn_wind, fcsd_wind, ocmn_wind, ocsd_wind);
 
             // No climo mean and standard deviation in the input VL1L2 lines,
             // so just fill with bad data.
-            if(!check_fo_thresh(fcst_wind, obs_wind, cmn_wind, csd_wind,
+            if(!check_fo_thresh(fcst_wind, obs_wind, cpi,
                                 job.out_fcst_wind_thresh, job.out_obs_wind_thresh,
                                 job.out_wind_logic)) {
                mlog << Debug(4) << "aggr_mpr_wind_lines() -> "
@@ -2076,15 +2092,14 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Convert to and append unit vectors
          //
+         ClimoPntInfo cpi;
          aggr.hdr_sa.add(it->second.hdr_sa[i]);
          convert_u_v_to_unit(it->second.pd_u.f_na[i],
                              it->second.pd_v.f_na[i], uf, vf);
          convert_u_v_to_unit(it->second.pd_u.o_na[i],
                              it->second.pd_v.o_na[i], uo, vo);
-         aggr.pd_u.add_grid_pair(uf, uo, bad_data_double,
-                                 bad_data_double, default_grid_weight);
-         aggr.pd_v.add_grid_pair(vf, vo, bad_data_double,
-                                 bad_data_double, default_grid_weight);
+         aggr.pd_u.add_grid_pair(uf, uo, cpi, default_grid_weight);
+         aggr.pd_v.add_grid_pair(vf, vo, cpi, default_grid_weight);
       }
 
       //
@@ -2151,17 +2166,21 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
 
             aggr.pd.f_na.clear();
             aggr.pd.o_na.clear();
-            aggr.pd.cmn_na.clear();
-            aggr.pd.csd_na.clear();
-            aggr.pd.cdf_na.clear();
+            aggr.pd.fcmn_na.clear();
+            aggr.pd.fcsd_na.clear();
+            aggr.pd.ocmn_na.clear();
+            aggr.pd.ocsd_na.clear();
+            aggr.pd.ocdf_na.clear();
             aggr.pd.wgt_na.clear();
 
             aggr.pd.n_obs = 1;
             aggr.pd.f_na.add(cur.fcst);
             aggr.pd.o_na.add(cur.obs);
-            aggr.pd.cmn_na.add(cur.climo_mean);
-            aggr.pd.csd_na.add(cur.climo_stdev);
-            aggr.pd.cdf_na.add(cur.climo_cdf);
+            aggr.pd.fcmn_na.add(cur.fcst_climo_mean);
+            aggr.pd.fcsd_na.add(cur.fcst_climo_stdev);
+            aggr.pd.ocmn_na.add(cur.obs_climo_mean);
+            aggr.pd.ocsd_na.add(cur.obs_climo_stdev);
+            aggr.pd.ocdf_na.add(cur.obs_climo_cdf);
             aggr.pd.wgt_na.add(default_grid_weight);
 
             aggr.fcst_var = cur.fcst_var;
@@ -2188,9 +2207,11 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             m[key].pd.n_obs++;
             m[key].pd.f_na.add(cur.fcst);
             m[key].pd.o_na.add(cur.obs);
-            m[key].pd.cmn_na.add(cur.climo_mean);
-            m[key].pd.csd_na.add(cur.climo_stdev);
-            m[key].pd.cdf_na.add(cur.climo_cdf);
+            m[key].pd.fcmn_na.add(cur.fcst_climo_mean);
+            m[key].pd.fcsd_na.add(cur.fcst_climo_stdev);
+            m[key].pd.ocmn_na.add(cur.obs_climo_mean);
+            m[key].pd.ocsd_na.add(cur.obs_climo_stdev);
+            m[key].pd.ocdf_na.add(cur.obs_climo_cdf);
             m[key].pd.wgt_na.add(default_grid_weight);
 
             //
@@ -3086,8 +3107,9 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          // ensemble spread, ensemble member values, and
          // valid ensemble count
          //
-         m[key].ens_pd.add_grid_obs(cur.obs, cur.climo_mean,
-                                    cur.climo_stdev, default_grid_weight);
+         ClimoPntInfo cpi(cur.fcst_climo_mean, cur.fcst_climo_stdev,
+                          cur.obs_climo_mean, cur.obs_climo_stdev);
+         m[key].ens_pd.add_grid_obs(cur.obs, cpi, default_grid_weight);
          m[key].ens_pd.skip_ba.add(false);
          m[key].ens_pd.n_pair++;
          m[key].ens_pd.r_na.add(cur.rank);
@@ -3112,7 +3134,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
 
          // Derive ensemble from climo mean and standard deviation
          derive_climo_vals(&m[key].cdf_info,
-                           cur.climo_mean, cur.climo_stdev, climo_vals);
+                           cur.obs_climo_mean, cur.obs_climo_stdev, climo_vals);
 
          // Store empirical CRPS stats and CRPS-Fair
          double crps_emp = compute_crps_emp(cur.obs, cur.ens_na);
@@ -3123,7 +3145,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
 
          // Store Gaussian CRPS stats
          m[key].ens_pd.crps_gaus_na.add(compute_crps_gaus(cur.obs, cur.ens_mean, cur.spread));
-         m[key].ens_pd.crpscl_gaus_na.add(compute_crps_gaus(cur.obs, cur.climo_mean, cur.climo_stdev));
+         m[key].ens_pd.crpscl_gaus_na.add(compute_crps_gaus(cur.obs, cur.obs_climo_mean, cur.obs_climo_stdev));
          m[key].ens_pd.ign_na.add(compute_ens_ign(cur.obs, cur.ens_mean, cur.spread));
          m[key].ens_pd.pit_na.add(compute_ens_pit(cur.obs, cur.ens_mean, cur.spread));
 
@@ -3783,8 +3805,9 @@ void mpr_to_ctc(STATAnalysisJob &job, const AggrMPRInfo &info,
    // Populate the contingency table
    //
    for(i=0; i<info.pd.n_obs; i++) {
-      cts_info.add(info.pd.f_na[i], info.pd.o_na[i],
-                   info.pd.cmn_na[i], info.pd.csd_na[i]);
+      ClimoPntInfo cpi(info.pd.fcmn_na[i], info.pd.fcsd_na[i],
+                       info.pd.ocmn_na[i], info.pd.ocsd_na[i]);
+      cts_info.add(info.pd.f_na[i], info.pd.o_na[i], &cpi);
    }
 
    return;
@@ -3978,7 +4001,7 @@ void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
                  int i_thresh, SL1L2Info &s_info) {
    int i;
    int scount, sacount;
-   double f, o, c;
+   double f, o, fc, oc;
    double f_sum,  o_sum,  ff_sum,  oo_sum,  fo_sum;
    double fa_sum, oa_sum, ffa_sum, ooa_sum, foa_sum;
    double abs_err_sum;
@@ -4024,9 +4047,10 @@ void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
       //
       // Update the counts for this matched pair
       //
-      f = pd_thr.f_na[i];
-      o = pd_thr.o_na[i];
-      c = pd_thr.cmn_na[i];
+      f  = pd_thr.f_na[i];
+      o  = pd_thr.o_na[i];
+      fc = pd_thr.fcmn_na[i];
+      oc = pd_thr.ocmn_na[i];
 
       f_sum       += f;
       o_sum       += o;
@@ -4034,18 +4058,18 @@ void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
       oo_sum      += o*o;
       fo_sum      += f*o;
       abs_err_sum += fabs(f-o);
-      scount   += 1;
+      scount      += 1;
 
       //
-      // Check c for valid data
+      // Check for valid climo data
       //
-      if(!is_bad_data(c)) {
-
-         fa_sum    += f-c;
-         oa_sum    += o-c;
-         ffa_sum   += (f-c)*(f-c);
-         ooa_sum   += (o-c)*(o-c);
-         foa_sum   += (f-c)*(o-c);
+      if(!is_bad_data(fc) &&
+         !is_bad_data(oc)) {
+         fa_sum    += f-fc;
+         oa_sum    += o-oc;
+         ffa_sum   += (f-fc)*(f-fc);
+         ooa_sum   += (o-oc)*(o-oc);
+         foa_sum   += (f-oc)*(o-oc);
          sacount   += 1;
       }
    } // end for

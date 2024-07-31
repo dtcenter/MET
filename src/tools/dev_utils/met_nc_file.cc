@@ -127,7 +127,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
       IS_INVALID_NC(obsArrVar))
   {
     mlog << Error << "\nmain() -> "
-	 << "trouble reading netCDF file " << _filePath << "\n\n";
+         << "trouble reading netCDF file " << _filePath << "\n\n";
     return false;
   }
 

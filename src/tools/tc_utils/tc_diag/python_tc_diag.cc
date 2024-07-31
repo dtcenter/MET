@@ -306,7 +306,7 @@ bool parse_python_diag_data(PyObject *module_obj,
 
    // Get the diag_data item
    PyObject *data_obj = PyDict_GetItem(module_dict_obj,
-		           PyUnicode_FromString(diag_data_dict_name));
+                           PyUnicode_FromString(diag_data_dict_name));
 
    if(!data_obj || !PyDict_Check(data_obj)) {
       mlog << Warning << "\n" << method_name
@@ -384,7 +384,7 @@ bool parse_python_string_value_map(PyObject *dict,
    long pos;
 
    PyObject *data_obj = PyDict_GetItem(dict,
-		           PyUnicode_FromString(name));
+                           PyUnicode_FromString(name));
 
    if(!data_obj || !PyDict_Check(data_obj)) {
       mlog << Warning << "\n" << method_name

@@ -53,15 +53,15 @@ static const int lr_grib_codes[] = {
    1, 7, 11, 17, 32, 31, 33, 34, 52, bad_data_int
 };
 static const string lr_grib_names[] = {
-   "PRES",      // 001	PRES	Pressure	Pa
-   "HGT",       // 007	HGT	Geopotential height	gpm
-   "TMP",       // 011	TMP	Temperature	K
-   "DPT",       // 017	DPT	Dewpoint temperature	K
-   "WIND",      // 032	WIND	Wind speed	m s-1
-   "WDIR",      // 031	WDIR	Wind direction	deg
-   "UGRD",      // 033	U GRD	u-component of wind	m s-1
-   "VGRD",      // 034	V GRD	v-component of wind	m s-1
-   "RH",        // 052	R H	Relative humidity	% 
+   "PRES",      // 001 PRES Pressure (Pa)
+   "HGT",       // 007 HGT  Geopotential height (gpm)
+   "TMP",       // 011 TMP  Temperature (K)
+   "DPT",       // 017 DPT  Dewpoint temperature (K)
+   "WIND",      // 032 WIND Wind speed (m s-1)
+   "WDIR",      // 031 WDIR Wind direction (deg)
+   "UGRD",      // 033 UGRD u-component of wind (m s-1)
+   "VGRD",      // 034 VGRD v-component of wind (m s-1)
+   "RH",        // 052 RH   Relative humidity (%)
    "UNKNOWN"    // bad_data_int
 };
 
@@ -237,7 +237,7 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
                               na_string : (string)data_line[19]);
       obs_qty.ws_strip();
 
-      // 002	PRMSL	Pressure reduced to MSL	Pa
+      // 002 PRMSL Pressure reduced to MSL (Pa)
       _addObservations(Observation(hdr_typ.text(),
                                    hdr_sid.text(),
                                    hdr_vld,

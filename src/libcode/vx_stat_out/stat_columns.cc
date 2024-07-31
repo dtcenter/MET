@@ -488,6 +488,10 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    at.set_entry(r, c+17+n_ens, (string)orank_columns[18]);
    at.set_entry(r, c+18+n_ens, (string)orank_columns[19]);
    at.set_entry(r, c+19+n_ens, (string)orank_columns[20]);
+   /* MET #2924 Uncomment this section
+   at.set_entry(r, c+20+n_ens, (string)orank_columns[21]);
+   at.set_entry(r, c+21+n_ens, (string)orank_columns[22]);
+   */
 
    return;
 }
@@ -4076,11 +4080,12 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
    //
    // Matched Pairs (MPR)
    // Dump out the MPR line:
-   //    TOTAL,       INDEX,       OBS_SID,
-   //    OBS_LAT,     OBS_LON,     OBS_LVL,
-   //    OBS_ELV,     FCST,        OBS,
-   //    OBS_QC,      CLIMO_MEAN,  CLIMO_STDEV,
-   //    CLIMO_CDF
+   //    TOTAL,           INDEX,            OBS_SID,
+   //    OBS_LAT,         OBS_LON,          OBS_LVL,
+   //    OBS_ELV,         FCST,             OBS,
+   //    OBS_QC,
+   //    OBS_CLIMO_MEAN,  OBS_CLIMO_STDEV,  OBS_CLIMO_CDF,
+   //    FCST_CLIMO_MEAN, FCST_CLIMO_STDEV
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       pd_ptr->n_obs);
@@ -4112,14 +4117,22 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
    at.set_entry(r, c+9,  // Observation Quality Control
       (string)pd_ptr->o_qc_sa[i]);
 
-   at.set_entry(r, c+10, // Climatological Mean Value
-      pd_ptr->cmn_na[i]);
+   at.set_entry(r, c+10, // Observation Climatological Mean Value
+      pd_ptr->ocmn_na[i]);
 
-   at.set_entry(r, c+11, // Climatological Standard Deviation Value
-      pd_ptr->csd_na[i]);
+   at.set_entry(r, c+11, // Observation Climatological Standard Deviation Value
+      pd_ptr->ocsd_na[i]);
 
-   at.set_entry(r, c+12, // Climatological CDF Value
-      pd_ptr->cdf_na[i]);
+   at.set_entry(r, c+12, // Observation Climatological CDF Value
+      pd_ptr->ocdf_na[i]);
+
+/* MET #2924 Uncomment this section
+   at.set_entry(r, c+13, // Forecast Climatological Mean Value
+      pd_ptr->fcmn_na[i]);
+
+   at.set_entry(r, c+14, // Forecast Climatological Standard Deviation Value
+      pd_ptr->fcsd_na[i]);
+*/
 
    return;
 }
@@ -4493,9 +4506,10 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    //    OBS_ELV,          OBS,           PIT,
    //    RANK,             N_ENS_VLD,     N_ENS,
    //    [ENS_] (for each ensemble member)
-   //    OBS_QC,           ENS_MEAN,      CLIMO_MEAN,
-   //    SPREAD,           ENS_MEAN_OERR, SPREAD_OERR,
-   //    SPREAD_PLUS_OERR, CLIMO_STDEV
+   //    OBS_QC,           ENS_MEAN,        OBS_CLIMO_MEAN,
+   //    SPREAD,           ENS_MEAN_OERR,   SPREAD_OERR,
+   //    SPREAD_PLUS_OERR, OBS_CLIMO_STDEV, FCST_CLIMO_MEAN,
+   //    FCST_CLIMO_STDEV
    //
    at.set_entry(r, c+0,  // Total Number of Pairs
       pd_ptr->n_obs);    // Use n_obs instead of n_pair to include missing data
@@ -4551,9 +4565,9 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    at.set_entry(r, c+13+pd_ptr->n_ens,
       pd_ptr->mn_na[i]);
 
-   // Climatology mean values
+   // Observation climatology mean values
    at.set_entry(r, c+14+pd_ptr->n_ens,
-      pd_ptr->cmn_na[i]);
+      pd_ptr->ocmn_na[i]);
 
    // Unperturbed ensemble spread values
    at.set_entry(r, c+15+pd_ptr->n_ens,
@@ -4571,9 +4585,19 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    at.set_entry(r, c+18+pd_ptr->n_ens,
       square_root(pd_ptr->var_plus_oerr_na[i]));
 
-   // Climatology standard deviation values
+   // Observation climatology standard deviation values
    at.set_entry(r, c+19+pd_ptr->n_ens,
-      pd_ptr->csd_na[i]);
+      pd_ptr->ocsd_na[i]);
+
+/* MET #2924 Uncomment this section
+   // Forecast climatology mean values
+   at.set_entry(r, c+20+pd_ptr->n_ens,
+      pd_ptr->fcmn_na[i]);
+
+   // Forecast climatology standard deviation values
+   at.set_entry(r, c+21+pd_ptr->n_ens,
+      pd_ptr->fcsd_na[i]);
+*/
 
    return;
 }

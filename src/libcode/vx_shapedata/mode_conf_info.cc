@@ -1192,19 +1192,23 @@ void ModeConfInfo::set_perc_thresh(const DataPlane &f_dp,
    //
    // Compute percentiles
    //
-    Fcst->conv_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+    Fcst->conv_thresh_array.set_perc(&fsort, &osort,
+                                     nullptr, nullptr,
                                      &(Fcst->conv_thresh_array),
                                       &(Obs->conv_thresh_array));
 
-     Obs->conv_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+     Obs->conv_thresh_array.set_perc(&fsort, &osort,
+                                     nullptr, nullptr,
                                      &(Fcst->conv_thresh_array),
                                       &(Obs->conv_thresh_array));
 
-   Fcst->merge_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+   Fcst->merge_thresh_array.set_perc(&fsort, &osort,
+                                     nullptr, nullptr,
                                      &(Fcst->merge_thresh_array),
                                       &(Obs->merge_thresh_array));
 
-    Obs->merge_thresh_array.set_perc(&fsort, &osort, (NumArray *) 0,
+    Obs->merge_thresh_array.set_perc(&fsort, &osort,
+                                     nullptr, nullptr,
                                      &(Fcst->merge_thresh_array),
                                       &(Obs->merge_thresh_array));
 
@@ -1253,10 +1257,12 @@ void ModeConfInfo::set_perc_thresh(const DataPlane &dp)
    //
    // Compute percentiles by hacking in the same input as if its two
    //
-   F->conv_thresh_array.set_perc(&sort, &sort, (NumArray *) 0,
+   F->conv_thresh_array.set_perc(&sort, &sort,
+                                 nullptr, nullptr,
                                  &(F->conv_thresh_array),
                                  &(F->conv_thresh_array));
-   F->merge_thresh_array.set_perc(&sort, &sort, (NumArray *) 0,
+   F->merge_thresh_array.set_perc(&sort, &sort,
+                                  nullptr, nullptr,
                                   &(F->merge_thresh_array),
                                   &(F->merge_thresh_array));
    return;
@@ -1789,14 +1795,17 @@ PercThreshType ModeConfInfo::perctype(const Mode_Field_Info &f)  const
    if  (f.conv_thresh_array.n() > 0) {
       pc = f.conv_thresh_array[0].get_ptype();
    }
-   if (pm == perc_thresh_sample_climo || pc == perc_thresh_sample_climo) {
+   if (pm == perc_thresh_sample_fcst_climo || pm == perc_thresh_sample_obs_climo ||
+       pc == perc_thresh_sample_fcst_climo || pc == perc_thresh_sample_obs_climo) {
       mlog << Error << "\nModeConfInfo::perctype()\n"
-           << "  Thresholding with 'SCP' in an input not implemented for multivariate mode\n\n";
+           << "  Thresholding with 'SFCP' or 'SOCP' in an input not implemented "
+           << "for multivariate mode\n\n";
       exit ( 1 );
    }
-   if (pm == perc_thresh_climo_dist || pc == perc_thresh_climo_dist) {
+   if (is_climo_dist_type(pm) || is_climo_dist_type(pc)) {
       mlog << Error << "\nModeConfInfo::perctype()\n"
-              << "  Thresholding with 'CDP' in an input not implemented for multivariate mode\n\n";
+              << "  Thresholding with 'CDP', 'FCDP', or 'OCDP' in an "
+              << "input not implemented for multivariate mode\n\n";
       exit ( 1 );
    }
    if (pm == perc_thresh_freq_bias ||

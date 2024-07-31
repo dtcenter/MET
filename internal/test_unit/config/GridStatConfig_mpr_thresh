@@ -79,6 +79,19 @@ fcst = {
         desc                = "ABS_OBS_FCST_DIFF";
         nc_pairs_var_suffix = desc;
       },
+// MET #2924 Replace this section
+//      { 
+//        mpr_column          = [ "ABS(OBS-OBS_CLIMO_MEAN)" ];
+//        mpr_thresh          = [ <=5                   ];
+//        desc                = "ABS_OBS_CLIMO_MEAN_DIFF";
+//        nc_pairs_var_suffix = desc;
+//      },
+//      { 
+//        mpr_column          = [ "OBS_CLIMO_CDF" ];
+//        mpr_thresh          = [ >=0.25&&<=0.75 ];
+//        desc                = "OBS_CLIMO_CDF_IQR";
+//        nc_pairs_var_suffix = desc;
+//      }
       { 
         mpr_column          = [ "ABS(OBS-CLIMO_MEAN)" ];
         mpr_thresh          = [ <=5                   ];
@@ -91,6 +104,7 @@ fcst = {
         desc                = "CLIMO_CDF_IQR";
         nc_pairs_var_suffix = desc;
       }
+// MET #2924 End replace
    ];
 }
 obs = fcst;

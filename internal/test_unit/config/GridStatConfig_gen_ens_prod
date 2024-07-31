@@ -66,9 +66,9 @@ fcst = {
    prob       = TRUE;
 
    field = [
-      { name = "UGRD_Z10_ENS_FREQ_ltCDP25";                   },
-      { name = "UGRD_Z10_ENS_NEP_ltCDP25_NBRHD25";            },
-      { name = "UGRD_Z10_ENS_NMEP_ltCDP25_NBRHD25_GAUSSIAN1"; }
+      { name = "UGRD_Z10_ENS_FREQ_ltOCDP25";                   },
+      { name = "UGRD_Z10_ENS_NEP_ltOCDP25_NBRHD25";            },
+      { name = "UGRD_Z10_ENS_NMEP_ltOCDP25_NBRHD25_GAUSSIAN1"; }
    ];
 
 }
@@ -76,7 +76,7 @@ obs = {
 
    name       = "UGRD";
    level      = "Z10";
-   cat_thresh = <CDP25;
+   cat_thresh = <OCDP25;
 
    field = [
       { desc = "FREQ"; },
