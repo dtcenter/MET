@@ -40,7 +40,8 @@ static DataPlane climo_hms_interp(
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane read_climo_data_plane(Dictionary *dict, int i_vx,
-                                unixtime vld_ut, const Grid &vx_grid) {
+                                unixtime vld_ut, const Grid &vx_grid,
+                                const char *desc) {
    DataPlane dp;
    DataPlaneArray dpa;
 
@@ -48,13 +49,13 @@ DataPlane read_climo_data_plane(Dictionary *dict, int i_vx,
    if(!dict) return dp;
 
    // Read array of climatology fields
-   dpa = read_climo_data_plane_array(dict, i_vx, vld_ut, vx_grid);
+   dpa = read_climo_data_plane_array(dict, i_vx, vld_ut, vx_grid, desc);
 
    // Check for multiple matches
    if(dpa.n_planes() > 1) {
       mlog << Warning << "\nread_climo_data_plane() -> "
-           << "Found " << dpa.n_planes() << " matching climatology "
-           << "fields.  Using the first match found.\n\n";
+           << "Found " << dpa.n_planes() << " matching " << desc
+           << " fields. Using the first match found.\n\n";
    }
 
    // Store the first match found
@@ -67,7 +68,8 @@ DataPlane read_climo_data_plane(Dictionary *dict, int i_vx,
 
 DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
                                            unixtime vld_ut,
-                                           const Grid &vx_grid) {
+                                           const Grid &vx_grid,
+                                           const char *desc) {
    DataPlaneArray dpa;
    StringArray climo_files;
    RegridInfo regrid_info;
@@ -138,7 +140,8 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
    dpa = climo_time_interp(dpa, day_ts, vld_ut, time_interp);
 
    mlog << Debug(3)
-        << "Found " << dpa.n_planes() << " climatology fields.\n";
+        << "Found " << dpa.n_planes() << " " << desc
+       	<< " fields.\n";
 
    return dpa;
 }

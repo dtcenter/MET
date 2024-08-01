@@ -196,8 +196,8 @@ static void clean_up();
 static void usage();
 static void set_outdir(const StringArray &);
 static void set_compress(const StringArray &);
-static bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
-                            const ConcatString &filename);
+static bool read_data_plane(VarInfo *info, DataPlane &dp, Met2dDataFile *mtddf,
+                            const ConcatString &filename, const char *desc);
 #ifdef WITH_UGRID
 static void set_ugrid_config(const StringArray &);
 #endif
@@ -725,7 +725,8 @@ void process_scores() {
 
       // Read the gridded data from the input forecast file
       if(!read_data_plane(conf_info.vx_opt[i].fcst_info,
-                          fcst_dp, fcst_mtddf, fcst_file)) continue;
+                          fcst_dp, fcst_mtddf, fcst_file,
+                          "forecast")) continue;
 
       mlog << Debug(3)
            << "Reading forecast data for "
@@ -740,7 +741,8 @@ void process_scores() {
 
       // Read the gridded data from the input observation file
       if(!read_data_plane(conf_info.vx_opt[i].obs_info,
-                          obs_dp, obs_mtddf, obs_file)) continue;
+                          obs_dp, obs_mtddf, obs_file,
+                          "observation")) continue;
 
       mlog << Debug(3)
            << "Reading observation data for "
@@ -790,18 +792,22 @@ void process_scores() {
       // Read forecast climatology data
       fcmn_dp = read_climo_data_plane(
                    conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
-                   i, fcst_dp.valid(), grid);
+                   i, fcst_dp.valid(), grid,
+                   "forecast climatology mean");
       fcsd_dp = read_climo_data_plane(
                    conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
-                   i, fcst_dp.valid(), grid);
+                   i, fcst_dp.valid(), grid,
+                   "forecast climatology standard deviation");
 
       // Read observation climatology data
       ocmn_dp = read_climo_data_plane(
                    conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
-                   i, fcst_dp.valid(), grid);
+                   i, fcst_dp.valid(), grid,
+                   "observation climatology mean");
       ocsd_dp = read_climo_data_plane(
                    conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
-                   i, fcst_dp.valid(), grid);
+                   i, fcst_dp.valid(), grid,
+                   "observation climatology standard deviation");
 
       mlog << Debug(3)
            << "For " << conf_info.vx_opt[i].fcst_info->magic_str() << ", found "
@@ -1048,27 +1054,33 @@ void process_scores() {
 
                // Read forecast data for UGRD
                if(!read_data_plane(conf_info.vx_opt[ui].fcst_info,
-                                   fu_dp, fcst_mtddf, fcst_file)) continue;
+                                   fu_dp, fcst_mtddf, fcst_file,
+                                   "U-wind forecast")) continue;
 
                // Read observation data for UGRD
                if(!read_data_plane(conf_info.vx_opt[ui].obs_info,
-                                   ou_dp, obs_mtddf, obs_file)) continue;
+                                   ou_dp, obs_mtddf, obs_file,
+                                   "U-wind observation")) continue;
 
                // Read the forecast climatology data for UGRD
                fcmnu_dp = read_climo_data_plane(
                              conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
-                             ui, fcst_dp.valid(), grid);
+                             ui, fcst_dp.valid(), grid,
+                             "forecast U-wind climatology mean");
                fcsdu_dp = read_climo_data_plane(
                              conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
-                             ui, fcst_dp.valid(), grid);
+                             ui, fcst_dp.valid(), grid,
+                             "forecast U-wind climatology standard deviation");
 
                // Read the observation climatology data for UGRD
                ocmnu_dp = read_climo_data_plane(
                              conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
-                             ui, fcst_dp.valid(), grid);
+                             ui, fcst_dp.valid(), grid,
+                             "observation U-wind climatology mean");
                ocsdu_dp = read_climo_data_plane(
                              conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
-                             ui, fcst_dp.valid(), grid);
+                             ui, fcst_dp.valid(), grid,
+                             "observation U-wind climatology standard deviation");
 
                // If requested in the config file, smooth the forecast
                // and climatology U-wind fields
@@ -1880,19 +1892,23 @@ void process_scores() {
 
                // Read forecast data for UGRD
                if(!read_data_plane(conf_info.vx_opt[ui].fcst_info,
-                                   fu_dp, fcst_mtddf, fcst_file)) continue;
+                                   fu_dp, fcst_mtddf, fcst_file,
+                                   "U-wind forecast")) continue;
 
                // Read observation data for UGRD
                if(!read_data_plane(conf_info.vx_opt[ui].obs_info,
-                                   ou_dp, obs_mtddf, obs_file)) continue;
+                                   ou_dp, obs_mtddf, obs_file,
+                                   "U-wind observation")) continue;
 
                // Read climatology data for UGRD
                fcmnu_dp = read_climo_data_plane(
                              conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
-                             ui, fcst_dp.valid(), grid);
+                             ui, fcst_dp.valid(), grid,
+                             "forecast U-wind climatology mean");
                ocmnu_dp = read_climo_data_plane(
                              conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
-                             ui, fcst_dp.valid(), grid);
+                             ui, fcst_dp.valid(), grid,
+                             "observation U-wind climatology mean");
 
                // Apply Fourier decomposition to the U-wind fields
                fu_dp_smooth    = fu_dp;
@@ -3306,15 +3322,15 @@ void set_compress(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
-                     const ConcatString &filename) {
+bool read_data_plane(VarInfo *info, DataPlane &dp, Met2dDataFile *mtddf,
+                     const ConcatString &filename, const char *desc) {
 
    bool status = mtddf->data_plane(*info, dp);
 
    if(!status) {
       mlog << Warning << "\nread_data_plane() -> "
            << info->magic_str()
-           << " not found in file: " << filename
+           << " not found in " << desc << " file: " << filename
            << "\n\n";
       return false;
    }
@@ -3322,7 +3338,7 @@ bool read_data_plane(VarInfo* info, DataPlane& dp, Met2dDataFile* mtddf,
    // Regrid, if necessary
    if(!(mtddf->grid() == grid)) {
       mlog << Debug(1)
-           << "Regridding field "
+           << "Regridding " << desc << " field "
            << info->magic_str()
            << " to the verification grid.\n";
       dp = met_regrid(dp, mtddf->grid(), grid, info->regrid());
