@@ -1,0 +1,1130 @@
+DEBUG 1: Default Config File: /Volumes/d1/projects/MET/MET_development/MET-feature_2924_fcst_climo/internal/test_unit/../../share/met/config/GridStatConfig_default
+DEBUG 1: User Config File: /Volumes/d1/projects/MET/MET_development/MET-feature_2924_fcst_climo/internal/test_unit/config/GridStatConfig_climo_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG
+DEBUG 4: Met2dDataFileFactory::new_met_2d_data_file() -> created new Met2dDataFile object of type "FileType_Gb2".
+DEBUG 4: Switching the GRIB2 radius of the earth value of 6371.23 km to 6371.2 km for internal consistency.
+DEBUG 4: 
+DEBUG 4: Latitude/Longitude Grid Data:
+DEBUG 4:      lat_ll: -90
+DEBUG 4:      lon_ll: -0
+DEBUG 4:   delta_lat: 0.5
+DEBUG 4:   delta_lon: 0.5
+DEBUG 4:        Nlat: 361
+DEBUG 4:        Nlon: 720
+DEBUG 4: 
+DEBUG 4: MetGrib2DataFile::read_grib2_record_list() - processed 308 records from GRIB2 file: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2
+DEBUG 4: Met2dDataFileFactory::new_met_2d_data_file() -> created new Met2dDataFile object of type "FileType_Gb2".
+DEBUG 4: Switching the GRIB2 radius of the earth value of 6371.23 km to 6371.2 km for internal consistency.
+DEBUG 4: 
+DEBUG 4: Latitude/Longitude Grid Data:
+DEBUG 4:      lat_ll: -90
+DEBUG 4:      lon_ll: -0
+DEBUG 4:   delta_lat: 0.5
+DEBUG 4:   delta_lon: 0.5
+DEBUG 4:        Nlat: 361
+DEBUG 4:        Nlon: 720
+DEBUG 4: 
+DEBUG 4: MetGrib2DataFile::read_grib2_record_list() - processed 265 records from GRIB2 file: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 3: 
+DEBUG 3: Multiple GRIB2 table entries match lookup criteria (parm_name = TMP):
+DEBUG 3:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 0, index_c = 0
+DEBUG 3:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 7, grib2_ltab = 1, index_b = 0, index_c = 0
+DEBUG 3: Using the first match found:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 0, index_c = 0
+DEBUG 3: 
+DEBUG 3: 
+DEBUG 3: Multiple GRIB2 table entries match lookup criteria (parm_name = TMP):
+DEBUG 3:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 0, index_c = 0
+DEBUG 3:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 7, grib2_ltab = 1, index_b = 0, index_c = 0
+DEBUG 3: Using the first match found:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 0, index_c = 0
+DEBUG 3: 
+DEBUG 5: Parsed forecast field:
+DEBUG 5: Parsed observation field:
+DEBUG 5: Parsed thresholds:
+DEBUG 5: Matched pair filter columns:     (nul)
+DEBUG 5: Matched pair filter thresholds:  NA
+DEBUG 5: Forecast categorical thresholds: NA
+DEBUG 5: Observed categorical thresholds: NA
+DEBUG 5: Forecast continuous thresholds:  NA
+DEBUG 5: Observed continuous thresholds:  NA
+DEBUG 5: Continuous threshold logic:      UNION
+DEBUG 5: Forecast wind speed thresholds:  NA
+DEBUG 5: Observed wind speed thresholds:  NA
+DEBUG 5: Wind speed threshold logic:      UNION
+DEBUG 4: ClimoCDFInfo::set_cdf_ta() -> For "cdf_bins" (3) and "center_bins" (true), defined climatology CDF thresholds: >=0.00000,>=0.25000,>=0.75000,>=1.00000
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 5: Parsed forecast field:
+DEBUG 5: Parsed observation field:
+DEBUG 5: Parsed thresholds:
+DEBUG 5: Matched pair filter columns:     (nul)
+DEBUG 5: Matched pair filter thresholds:  NA
+DEBUG 5: Forecast categorical thresholds: NA
+DEBUG 5: Observed categorical thresholds: NA
+DEBUG 5: Forecast continuous thresholds:  NA
+DEBUG 5: Observed continuous thresholds:  NA
+DEBUG 5: Continuous threshold logic:      UNION
+DEBUG 5: Forecast wind speed thresholds:  NA
+DEBUG 5: Observed wind speed thresholds:  NA
+DEBUG 5: Wind speed threshold logic:      UNION
+DEBUG 4: ClimoCDFInfo::set_cdf_ta() -> For "cdf_bins" (3) and "center_bins" (true), defined climatology CDF thresholds: >=0.00000,>=0.25000,>=0.75000,>=1.00000
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 5: Parsed forecast field:
+DEBUG 5: Parsed observation field:
+DEBUG 5: Parsed thresholds:
+DEBUG 5: Matched pair filter columns:     (nul)
+DEBUG 5: Matched pair filter thresholds:  NA
+DEBUG 5: Forecast categorical thresholds: NA
+DEBUG 5: Observed categorical thresholds: NA
+DEBUG 5: Forecast continuous thresholds:  NA
+DEBUG 5: Observed continuous thresholds:  NA
+DEBUG 5: Continuous threshold logic:      UNION
+DEBUG 5: Forecast wind speed thresholds:  NA
+DEBUG 5: Observed wind speed thresholds:  NA
+DEBUG 5: Wind speed threshold logic:      UNION
+DEBUG 4: ClimoCDFInfo::set_cdf_ta() -> For "cdf_bins" (3) and "center_bins" (true), defined climatology CDF thresholds: >=0.00000,>=0.25000,>=0.75000,>=1.00000
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 3: 
+DEBUG 3: Multiple GRIB2 table entries match lookup criteria (parm_name = WIND):
+DEBUG 3:   parm_name: WIND, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 2, index_c = 1
+DEBUG 3:   parm_name: WIND, index_a = 0, grib2_mtab = 14, grib2_cntr = 57, grib2_ltab = 0, index_b = 2, index_c = 1
+DEBUG 3:   parm_name: WIND, index_a = 0, grib2_mtab = 1, grib2_cntr = 7, grib2_ltab = 1, index_b = 2, index_c = 1
+DEBUG 3: Using the first match found:   parm_name: WIND, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 2, index_c = 1
+DEBUG 3: 
+DEBUG 3: 
+DEBUG 3: Multiple GRIB2 table entries match lookup criteria (parm_name = WIND):
+DEBUG 3:   parm_name: WIND, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 2, index_c = 1
+DEBUG 3:   parm_name: WIND, index_a = 0, grib2_mtab = 14, grib2_cntr = 57, grib2_ltab = 0, index_b = 2, index_c = 1
+DEBUG 3:   parm_name: WIND, index_a = 0, grib2_mtab = 1, grib2_cntr = 7, grib2_ltab = 1, index_b = 2, index_c = 1
+DEBUG 3: Using the first match found:   parm_name: WIND, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 2, index_c = 1
+DEBUG 3: 
+DEBUG 5: Parsed forecast field:
+DEBUG 5: Parsed observation field:
+DEBUG 5: Parsed thresholds:
+DEBUG 5: Matched pair filter columns:     (nul)
+DEBUG 5: Matched pair filter thresholds:  NA
+DEBUG 5: Forecast categorical thresholds: NA
+DEBUG 5: Observed categorical thresholds: NA
+DEBUG 5: Forecast continuous thresholds:  NA
+DEBUG 5: Observed continuous thresholds:  NA
+DEBUG 5: Continuous threshold logic:      UNION
+DEBUG 5: Forecast wind speed thresholds:  NA
+DEBUG 5: Observed wind speed thresholds:  NA
+DEBUG 5: Wind speed threshold logic:      UNION
+DEBUG 4: ClimoCDFInfo::set_cdf_ta() -> For "cdf_bins" (3) and "center_bins" (true), defined climatology CDF thresholds: >=0.00000,>=0.25000,>=0.75000,>=1.00000
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 3: 
+DEBUG 3: Multiple GRIB2 table entries match lookup criteria (parm_name = TMP):
+DEBUG 3:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 0, index_c = 0
+DEBUG 3:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 7, grib2_ltab = 1, index_b = 0, index_c = 0
+DEBUG 3: Using the first match found:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 0, index_c = 0
+DEBUG 3: 
+DEBUG 3: 
+DEBUG 3: Multiple GRIB2 table entries match lookup criteria (parm_name = TMP):
+DEBUG 3:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 0, index_c = 0
+DEBUG 3:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 7, grib2_ltab = 1, index_b = 0, index_c = 0
+DEBUG 3: Using the first match found:   parm_name: TMP, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 0, index_c = 0
+DEBUG 3: 
+DEBUG 5: Parsed forecast field:
+DEBUG 5: Parsed observation field:
+DEBUG 5: Parsed thresholds:
+DEBUG 5: Matched pair filter columns:     (nul)
+DEBUG 5: Matched pair filter thresholds:  NA
+DEBUG 5: Forecast categorical thresholds: >FCDP75,>OCDP75
+DEBUG 5: Observed categorical thresholds: >FCDP75,>OCDP75
+DEBUG 5: Forecast continuous thresholds:  NA
+DEBUG 5: Observed continuous thresholds:  NA
+DEBUG 5: Continuous threshold logic:      UNION
+DEBUG 5: Forecast wind speed thresholds:  NA
+DEBUG 5: Observed wind speed thresholds:  NA
+DEBUG 5: Wind speed threshold logic:      UNION
+DEBUG 4: ClimoCDFInfo::set_cdf_ta() -> For "cdf_bins" (3) and "center_bins" (true), defined climatology CDF thresholds: >=0.00000,>=0.25000,>=0.75000,>=1.00000
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 5: Parsed forecast field:
+DEBUG 5: Parsed observation field:
+DEBUG 5: Parsed thresholds:
+DEBUG 5: Matched pair filter columns:     (nul)
+DEBUG 5: Matched pair filter thresholds:  NA
+DEBUG 5: Forecast categorical thresholds: >FCDP75,>OCDP75
+DEBUG 5: Observed categorical thresholds: >FCDP75,>OCDP75
+DEBUG 5: Forecast continuous thresholds:  NA
+DEBUG 5: Observed continuous thresholds:  NA
+DEBUG 5: Continuous threshold logic:      UNION
+DEBUG 5: Forecast wind speed thresholds:  NA
+DEBUG 5: Observed wind speed thresholds:  NA
+DEBUG 5: Wind speed threshold logic:      UNION
+DEBUG 4: ClimoCDFInfo::set_cdf_ta() -> For "cdf_bins" (3) and "center_bins" (true), defined climatology CDF thresholds: >=0.00000,>=0.25000,>=0.75000,>=1.00000
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 5: Parsed forecast field:
+DEBUG 5: Parsed observation field:
+DEBUG 5: Parsed thresholds:
+DEBUG 5: Matched pair filter columns:     (nul)
+DEBUG 5: Matched pair filter thresholds:  NA
+DEBUG 5: Forecast categorical thresholds: >FCDP75,>OCDP75
+DEBUG 5: Observed categorical thresholds: >FCDP75,>OCDP75
+DEBUG 5: Forecast continuous thresholds:  NA
+DEBUG 5: Observed continuous thresholds:  NA
+DEBUG 5: Continuous threshold logic:      UNION
+DEBUG 5: Forecast wind speed thresholds:  NA
+DEBUG 5: Observed wind speed thresholds:  NA
+DEBUG 5: Wind speed threshold logic:      UNION
+DEBUG 4: ClimoCDFInfo::set_cdf_ta() -> For "cdf_bins" (3) and "center_bins" (true), defined climatology CDF thresholds: >=0.00000,>=0.25000,>=0.75000,>=1.00000
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 4: VarInfoFactory::new_var_info() -> created new VarInfo object of type "FileType_Gb2".
+DEBUG 3: 
+DEBUG 3: Multiple GRIB2 table entries match lookup criteria (parm_name = WIND):
+DEBUG 3:   parm_name: WIND, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 2, index_c = 1
+DEBUG 3:   parm_name: WIND, index_a = 0, grib2_mtab = 14, grib2_cntr = 57, grib2_ltab = 0, index_b = 2, index_c = 1
+DEBUG 3:   parm_name: WIND, index_a = 0, grib2_mtab = 1, grib2_cntr = 7, grib2_ltab = 1, index_b = 2, index_c = 1
+DEBUG 3: Using the first match found:   parm_name: WIND, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 2, index_c = 1
+DEBUG 3: 
+DEBUG 3: 
+DEBUG 3: Multiple GRIB2 table entries match lookup criteria (parm_name = WIND):
+DEBUG 3:   parm_name: WIND, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 2, index_c = 1
+DEBUG 3:   parm_name: WIND, index_a = 0, grib2_mtab = 14, grib2_cntr = 57, grib2_ltab = 0, index_b = 2, index_c = 1
+DEBUG 3:   parm_name: WIND, index_a = 0, grib2_mtab = 1, grib2_cntr = 7, grib2_ltab = 1, index_b = 2, index_c = 1
+DEBUG 3: Using the first match found:   parm_name: WIND, index_a = 0, grib2_mtab = 1, grib2_cntr = 0, grib2_ltab = 0, index_b = 2, index_c = 1
+DEBUG 3: 
+DEBUG 5: Parsed forecast field:
+DEBUG 5: Parsed observation field:
+DEBUG 5: Parsed thresholds:
+DEBUG 5: Matched pair filter columns:     (nul)
+DEBUG 5: Matched pair filter thresholds:  NA
+DEBUG 5: Forecast categorical thresholds: >FCDP75,>OCDP75
+DEBUG 5: Observed categorical thresholds: >FCDP75,>OCDP75
+DEBUG 5: Forecast continuous thresholds:  NA
+DEBUG 5: Observed continuous thresholds:  NA
+DEBUG 5: Continuous threshold logic:      UNION
+DEBUG 5: Forecast wind speed thresholds:  NA
+DEBUG 5: Observed wind speed thresholds:  NA
+DEBUG 5: Wind speed threshold logic:      UNION
+DEBUG 4: ClimoCDFInfo::set_cdf_ta() -> For "cdf_bins" (3) and "center_bins" (true), defined climatology CDF thresholds: >=0.00000,>=0.25000,>=0.75000,>=1.00000
+DEBUG 3: U-wind field array entry 2 matches V-wind field array entry 3.
+DEBUG 3: V-wind field array entry 3 matches U-wind field array entry 2.
+DEBUG 3: U-wind field array entry 6 matches V-wind field array entry 7.
+DEBUG 3: V-wind field array entry 7 matches U-wind field array entry 6.
+DEBUG 2: Using named grid as the verification grid. Name=/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/climatology_data/ERA_DAILY_1.5deg/mslp_mean.grib
+DEBUG 3: Use the grid defined by file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/climatology_data/ERA_DAILY_1.5deg/mslp_mean.grib".
+DEBUG 4: Met2dDataFileFactory::new_met_2d_data_file() -> created new Met2dDataFile object of type "FileType_Gb1".
+DEBUG 4: 
+DEBUG 4: Latitude/Longitude Grid Data:
+DEBUG 4:      lat_ll: -90
+DEBUG 4:      lon_ll: -0
+DEBUG 4:   delta_lat: 1.5
+DEBUG 4:   delta_lon: 1.5
+DEBUG 4:        Nlat: 121
+DEBUG 4:        Nlon: 240
+DEBUG 4: 
+DEBUG 3: Grid Definition: Projection: Lat/Lon Nx: 240 Ny: 121 lat_ll: -90.000 lon_ll: -0.000 delta_lat: 1.500 delta_lon: 1.500 wrapLon: true
+DEBUG 1: Forecast File: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2
+DEBUG 1: Observation File: /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'TMP/P500' in GRIB2 record 88 field 1 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: 226
+DEBUG 4:       plane max: 226
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 240000
+DEBUG 4:       init time: 20120409_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: 226
+DEBUG 4:    plane max: 226
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 240000
+DEBUG 4:    init time: 20120409_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field TMP/P500 to the verification grid.
+DEBUG 3: Reading forecast data for TMP/P500.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'TMP/P500' in GRIB2 record 88 field 1 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: 224.6
+DEBUG 4:       plane max: 224.6
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 000000
+DEBUG 4:       init time: 20120410_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: 224.6
+DEBUG 4:    plane max: 224.6
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 000000
+DEBUG 4:    init time: 20120410_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field TMP/P500 to the verification grid.
+DEBUG 3: Reading observation data for TMP/P500.
+DEBUG 3: For TMP/P500, found 0 forecast climatology mean and 0 standard deviation field(s), and 0 observation climatology mean and 0 standard deviation field(s).
+DEBUG 2: Processing masking regions.
+DEBUG 3: Processing grid mask: FULL
+DEBUG 4: parse_grid_mask() -> parsing grid mask "FULL"
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 2: Processing TMP/P500 versus TMP/P500, for smoothing method NEAREST(1), over region FULL, using 29040 matched pairs.
+DEBUG 2: Computing Scalar Partial Sums and Continuous Statistics.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'UGRD/P500' in GRIB2 record 91 field 1 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -34.18
+DEBUG 4:       plane max: -34.18
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 240000
+DEBUG 4:       init time: 20120409_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -34.18
+DEBUG 4:    plane max: -34.18
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 240000
+DEBUG 4:    init time: 20120409_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field UGRD/P500 to the verification grid.
+DEBUG 3: Reading forecast data for UGRD/P500.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'UGRD/P500' in GRIB2 record 91 field 1 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -31.27
+DEBUG 4:       plane max: -31.27
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 000000
+DEBUG 4:       init time: 20120410_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -31.27
+DEBUG 4:    plane max: -31.27
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 000000
+DEBUG 4:    init time: 20120410_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field UGRD/P500 to the verification grid.
+DEBUG 3: Reading observation data for UGRD/P500.
+DEBUG 3: For UGRD/P500, found 0 forecast climatology mean and 0 standard deviation field(s), and 0 observation climatology mean and 0 standard deviation field(s).
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 2: Processing UGRD/P500 versus UGRD/P500, for smoothing method NEAREST(1), over region FULL, using 29040 matched pairs.
+DEBUG 2: Computing Scalar Partial Sums and Continuous Statistics.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'VGRD/P500' in GRIB2 record 91 field 2 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -52.99
+DEBUG 4:       plane max: -52.99
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 240000
+DEBUG 4:       init time: 20120409_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -52.99
+DEBUG 4:    plane max: -52.99
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 240000
+DEBUG 4:    init time: 20120409_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field VGRD/P500 to the verification grid.
+DEBUG 3: Reading forecast data for VGRD/P500.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'VGRD/P500' in GRIB2 record 91 field 2 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -55.96
+DEBUG 4:       plane max: -55.96
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 000000
+DEBUG 4:       init time: 20120410_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -55.96
+DEBUG 4:    plane max: -55.96
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 000000
+DEBUG 4:    init time: 20120410_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field VGRD/P500 to the verification grid.
+DEBUG 3: Reading observation data for VGRD/P500.
+DEBUG 3: For VGRD/P500, found 0 forecast climatology mean and 0 standard deviation field(s), and 0 observation climatology mean and 0 standard deviation field(s).
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 2: Processing VGRD/P500 versus VGRD/P500, for smoothing method NEAREST(1), over region FULL, using 29040 matched pairs.
+DEBUG 2: Computing Scalar Partial Sums and Continuous Statistics.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'UGRD/P500' in GRIB2 record 91 field 1 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -34.18
+DEBUG 4:       plane max: -34.18
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 240000
+DEBUG 4:       init time: 20120409_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -34.18
+DEBUG 4:    plane max: -34.18
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 240000
+DEBUG 4:    init time: 20120409_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field UGRD/P500 to the verification grid.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'UGRD/P500' in GRIB2 record 91 field 1 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -31.27
+DEBUG 4:       plane max: -31.27
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 000000
+DEBUG 4:       init time: 20120410_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -31.27
+DEBUG 4:    plane max: -31.27
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 000000
+DEBUG 4:    init time: 20120410_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field UGRD/P500 to the verification grid.
+DEBUG 2: Computing Vector Partial Sums and Continuous Vector Statistics.
+DEBUG 3: MetGrib2DataFile::data_plane_array() -> Found exact match for "WIND/P500" in GRIB2 record 91 field 1 of GRIB2 file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2"
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -34.18
+DEBUG 4:       plane max: -34.18
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 240000
+DEBUG 4:       init time: 20120409_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -34.18
+DEBUG 4:    plane max: -34.18
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 240000
+DEBUG 4:    init time: 20120409_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 3: MetGrib2DataFile::data_plane_array() -> Found exact match for "WIND/P500" in GRIB2 record 91 field 2 of GRIB2 file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2"
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -52.99
+DEBUG 4:       plane max: -52.99
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 240000
+DEBUG 4:       init time: 20120409_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -52.99
+DEBUG 4:    plane max: -52.99
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 240000
+DEBUG 4:    init time: 20120409_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 3: Deriving wind speed from U and V wind components.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found derived match for 'WIND/P500' in GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2'
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: 63.0572
+DEBUG 4:    plane max: 63.0572
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 240000
+DEBUG 4:    init time: 20120409_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field WIND/P500 to the verification grid.
+DEBUG 3: Reading forecast data for WIND/P500.
+DEBUG 3: MetGrib2DataFile::data_plane_array() -> Found exact match for "WIND/P500" in GRIB2 record 91 field 1 of GRIB2 file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2"
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -31.27
+DEBUG 4:       plane max: -31.27
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 000000
+DEBUG 4:       init time: 20120410_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -31.27
+DEBUG 4:    plane max: -31.27
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 000000
+DEBUG 4:    init time: 20120410_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 3: MetGrib2DataFile::data_plane_array() -> Found exact match for "WIND/P500" in GRIB2 record 91 field 2 of GRIB2 file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2"
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -55.96
+DEBUG 4:       plane max: -55.96
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 000000
+DEBUG 4:       init time: 20120410_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -55.96
+DEBUG 4:    plane max: -55.96
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 000000
+DEBUG 4:    init time: 20120410_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 3: Deriving wind speed from U and V wind components.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found derived match for 'WIND/P500' in GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2'
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: 64.1041
+DEBUG 4:    plane max: 64.1041
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 000000
+DEBUG 4:    init time: 20120410_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field WIND/P500 to the verification grid.
+DEBUG 3: Reading observation data for WIND/P500.
+DEBUG 3: For WIND/P500, found 0 forecast climatology mean and 0 standard deviation field(s), and 0 observation climatology mean and 0 standard deviation field(s).
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 2: Processing WIND/P500 versus WIND/P500, for smoothing method NEAREST(1), over region FULL, using 29040 matched pairs.
+DEBUG 2: Computing Scalar Partial Sums and Continuous Statistics.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'TMP/P850' in GRIB2 record 137 field 1 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: 227.7
+DEBUG 4:       plane max: 227.7
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 240000
+DEBUG 4:       init time: 20120409_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: 227.7
+DEBUG 4:    plane max: 227.7
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 240000
+DEBUG 4:    init time: 20120409_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field TMP/P850 to the verification grid.
+DEBUG 3: Reading forecast data for TMP/P850.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'TMP/P850' in GRIB2 record 137 field 1 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: 228.2
+DEBUG 4:       plane max: 228.2
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 000000
+DEBUG 4:       init time: 20120410_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: 228.2
+DEBUG 4:    plane max: 228.2
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 000000
+DEBUG 4:    init time: 20120410_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field TMP/P850 to the verification grid.
+DEBUG 3: Reading observation data for TMP/P850.
+DEBUG 3: For TMP/P850, found 0 forecast climatology mean and 0 standard deviation field(s), and 0 observation climatology mean and 0 standard deviation field(s).
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 2: Processing TMP/P850 versus TMP/P850, for smoothing method NEAREST(1), over region FULL, using 29040 matched pairs.
+DEBUG 2: Computing Scalar Partial Sums and Continuous Statistics.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'UGRD/P850' in GRIB2 record 140 field 1 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -28.23
+DEBUG 4:       plane max: -28.23
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 240000
+DEBUG 4:       init time: 20120409_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -28.23
+DEBUG 4:    plane max: -28.23
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 240000
+DEBUG 4:    init time: 20120409_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field UGRD/P850 to the verification grid.
+DEBUG 3: Reading forecast data for UGRD/P850.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'UGRD/P850' in GRIB2 record 140 field 1 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -28.5
+DEBUG 4:       plane max: -28.5
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 000000
+DEBUG 4:       init time: 20120410_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -28.5
+DEBUG 4:    plane max: -28.5
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 000000
+DEBUG 4:    init time: 20120410_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field UGRD/P850 to the verification grid.
+DEBUG 3: Reading observation data for UGRD/P850.
+DEBUG 3: For UGRD/P850, found 0 forecast climatology mean and 0 standard deviation field(s), and 0 observation climatology mean and 0 standard deviation field(s).
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 2: Processing UGRD/P850 versus UGRD/P850, for smoothing method NEAREST(1), over region FULL, using 29040 matched pairs.
+DEBUG 2: Computing Scalar Partial Sums and Continuous Statistics.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'VGRD/P850' in GRIB2 record 140 field 2 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -36.92
+DEBUG 4:       plane max: -36.92
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 240000
+DEBUG 4:       init time: 20120409_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -36.92
+DEBUG 4:    plane max: -36.92
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 240000
+DEBUG 4:    init time: 20120409_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field VGRD/P850 to the verification grid.
+DEBUG 3: Reading forecast data for VGRD/P850.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'VGRD/P850' in GRIB2 record 140 field 2 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -39.94
+DEBUG 4:       plane max: -39.94
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 000000
+DEBUG 4:       init time: 20120410_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -39.94
+DEBUG 4:    plane max: -39.94
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 000000
+DEBUG 4:    init time: 20120410_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field VGRD/P850 to the verification grid.
+DEBUG 3: Reading observation data for VGRD/P850.
+DEBUG 3: For VGRD/P850, found 0 forecast climatology mean and 0 standard deviation field(s), and 0 observation climatology mean and 0 standard deviation field(s).
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 2: Processing VGRD/P850 versus VGRD/P850, for smoothing method NEAREST(1), over region FULL, using 29040 matched pairs.
+DEBUG 2: Computing Scalar Partial Sums and Continuous Statistics.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'UGRD/P850' in GRIB2 record 140 field 1 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -28.23
+DEBUG 4:       plane max: -28.23
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 240000
+DEBUG 4:       init time: 20120409_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -28.23
+DEBUG 4:    plane max: -28.23
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 240000
+DEBUG 4:    init time: 20120409_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field UGRD/P850 to the verification grid.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found exact match for 'UGRD/P850' in GRIB2 record 140 field 1 of GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2'
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -28.5
+DEBUG 4:       plane max: -28.5
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 000000
+DEBUG 4:       init time: 20120410_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -28.5
+DEBUG 4:    plane max: -28.5
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 000000
+DEBUG 4:    init time: 20120410_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field UGRD/P850 to the verification grid.
+DEBUG 2: Computing Vector Partial Sums and Continuous Vector Statistics.
+DEBUG 3: MetGrib2DataFile::data_plane_array() -> Found exact match for "WIND/P850" in GRIB2 record 140 field 1 of GRIB2 file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2"
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -28.23
+DEBUG 4:       plane max: -28.23
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 240000
+DEBUG 4:       init time: 20120409_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -28.23
+DEBUG 4:    plane max: -28.23
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 240000
+DEBUG 4:    init time: 20120409_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 3: MetGrib2DataFile::data_plane_array() -> Found exact match for "WIND/P850" in GRIB2 record 140 field 2 of GRIB2 file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2"
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -36.92
+DEBUG 4:       plane max: -36.92
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 240000
+DEBUG 4:       init time: 20120409_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -36.92
+DEBUG 4:    plane max: -36.92
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 240000
+DEBUG 4:    init time: 20120409_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 3: Deriving wind speed from U and V wind components.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found derived match for 'WIND/P850' in GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2'
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: 46.476
+DEBUG 4:    plane max: 46.476
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 240000
+DEBUG 4:    init time: 20120409_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field WIND/P850 to the verification grid.
+DEBUG 3: Reading forecast data for WIND/P850.
+DEBUG 3: MetGrib2DataFile::data_plane_array() -> Found exact match for "WIND/P850" in GRIB2 record 140 field 1 of GRIB2 file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2"
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -28.5
+DEBUG 4:       plane max: -28.5
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 000000
+DEBUG 4:       init time: 20120410_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -28.5
+DEBUG 4:    plane max: -28.5
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 000000
+DEBUG 4:    init time: 20120410_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 3: MetGrib2DataFile::data_plane_array() -> Found exact match for "WIND/P850" in GRIB2 record 140 field 2 of GRIB2 file "/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2"
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:       plane min: -39.94
+DEBUG 4:       plane max: -39.94
+DEBUG 4:       scan mode: 0
+DEBUG 4:      valid time: 20120410_000000
+DEBUG 4:       lead time: 000000
+DEBUG 4:       init time: 20120410_000000
+DEBUG 4:     bitmap flag: 255
+DEBUG 4: 
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: -39.94
+DEBUG 4:    plane max: -39.94
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 000000
+DEBUG 4:    init time: 20120410_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 3: Deriving wind speed from U and V wind components.
+DEBUG 3: MetGrib2DataFile::data_plane() -> Found derived match for 'WIND/P850' in GRIB2 file '/Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2'
+DEBUG 4: 
+DEBUG 4: Grid information:
+DEBUG 4:    Projection: Lat/Lon
+DEBUG 4:    Nx: 720
+DEBUG 4:    Ny: 361
+DEBUG 4:    lat_ll: -90.000
+DEBUG 4:    lon_ll: -0.000
+DEBUG 4:    delta_lat: 0.500
+DEBUG 4:    delta_lon: 0.500
+DEBUG 4:    wrapLon: true
+DEBUG 4: 
+DEBUG 4: Data plane information:
+DEBUG 4:    plane min: 49.0658
+DEBUG 4:    plane max: 49.0658
+DEBUG 4:    valid time: 20120410_000000
+DEBUG 4:    lead time: 000000
+DEBUG 4:    init time: 20120410_000000
+DEBUG 4:    accum time: 000000
+DEBUG 4: 
+DEBUG 1: Regridding field WIND/P850 to the verification grid.
+DEBUG 3: Reading observation data for WIND/P850.
+DEBUG 3: For WIND/P850, found 0 forecast climatology mean and 0 standard deviation field(s), and 0 observation climatology mean and 0 standard deviation field(s).
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 2: Processing WIND/P850 versus WIND/P850, for smoothing method NEAREST(1), over region FULL, using 29040 matched pairs.
+DEBUG 2: Computing Scalar Partial Sums and Continuous Statistics.
+DEBUG 2: 
+DEBUG 2: --------------------------------------------------------------------------------
+DEBUG 2: 
+DEBUG 1: Output file: /Volumes/d1/projects/MET/MET_unit_test/MET_test_output/climatology_mixed/grid_stat_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG_240000L_20120410_000000V.stat
+DEBUG 1: Output file: /Volumes/d1/projects/MET/MET_unit_test/MET_test_output/climatology_mixed/grid_stat_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG_240000L_20120410_000000V_cnt.txt
+DEBUG 1: Output file: /Volumes/d1/projects/MET/MET_unit_test/MET_test_output/climatology_mixed/grid_stat_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG_240000L_20120410_000000V_sl1l2.txt
+DEBUG 1: Output file: /Volumes/d1/projects/MET/MET_unit_test/MET_test_output/climatology_mixed/grid_stat_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG_240000L_20120410_000000V_sal1l2.txt
+DEBUG 1: Output file: /Volumes/d1/projects/MET/MET_unit_test/MET_test_output/climatology_mixed/grid_stat_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG_240000L_20120410_000000V_vl1l2.txt
+DEBUG 1: Output file: /Volumes/d1/projects/MET/MET_unit_test/MET_test_output/climatology_mixed/grid_stat_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG_240000L_20120410_000000V_val1l2.txt
+DEBUG 1: Output file: /Volumes/d1/projects/MET/MET_unit_test/MET_test_output/climatology_mixed/grid_stat_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG_240000L_20120410_000000V_vcnt.txt
+DEBUG 1: Output file: /Volumes/d1/projects/MET/MET_unit_test/MET_test_output/climatology_mixed/grid_stat_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG_240000L_20120410_000000V_pairs.nc
+DEBUG 1: Finish grid_stat by johnhg(6088) at 2024-07-31 19:59:25Z

@@ -1,0 +1,13 @@
+export FCST_CLIMO_DIR=${MET_TEST_INPUT}/climatology_data/NCEP_NCAR_40YR_1.0deg
+export OBS_CLIMO_DIR=${MET_TEST_INPUT}/climatology_data/ERA_DAILY_1.5deg
+export OUTPUT_PREFIX=FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG
+/Volumes/d1/projects/MET/MET_development/MET-feature_2924_fcst_climo/internal/test_unit/../../share/met/../../bin/grid_stat \
+      /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfs/gfs_2012040900_F024.grib2 \
+      /Volumes/d1/projects/MET/MET_unit_test/MET_test_input/model_data/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2 \
+      /Volumes/d1/projects/MET/MET_development/MET-feature_2924_fcst_climo/internal/test_unit/config/GridStatConfig_climo_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG \
+      -outdir /Volumes/d1/projects/MET/MET_unit_test/MET_test_output/climatology_mixed -v 2
+unset FCST_CLIMO_DIR
+unset OBS_CLIMO_DIR
+unset OUTPUT_PREFIX
+
+
