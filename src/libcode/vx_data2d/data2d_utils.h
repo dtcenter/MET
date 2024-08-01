@@ -24,7 +24,7 @@ extern bool build_grid_by_grid_string(const char *attr_grid, Grid &grid,
                                       const char *caller_name=nullptr,
                                       bool do_warning=true);
 
-extern bool build_grid_by_grid_string(ConcatString &attr_grid, Grid &grid,
+extern bool build_grid_by_grid_string(const ConcatString &attr_grid, Grid &grid,
                                       const char *caller_name=nullptr,
                                       bool do_warning=true);
 

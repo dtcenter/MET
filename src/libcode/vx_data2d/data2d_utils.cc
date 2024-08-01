@@ -58,7 +58,7 @@ bool build_grid_by_grid_string(const char *grid_str, Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool build_grid_by_grid_string(ConcatString &grid_str, Grid &grid,
+bool build_grid_by_grid_string(const ConcatString &grid_str, Grid &grid,
                                const char *caller_name, bool do_warning) {
    bool status = false;
 
