@@ -747,7 +747,7 @@ void process_scores() {
                       i_fcst, fcst_dp.valid(), grid,
                       "forecast climatology standard deviation");
 
-	 // Read observation climatology data
+         // Read observation climatology data
          ocmn_dp = read_climo_data_plane(
                       conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
                       i_fcst, fcst_dp.valid(), grid,

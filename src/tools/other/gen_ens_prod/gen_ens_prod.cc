@@ -479,7 +479,7 @@ void get_climo_mean_stdev(GenEnsProdVarInfo *ens_info, int i_var,
    csd_dp = read_climo_data_plane(
                conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
                i_var, ens_valid_ut, grid,
-	       "climatology standard deviation");
+               "climatology standard deviation");
 
    // Unset the MET_ENS_MEMBER_ID environment variable
    if(set_ens_mem_id) {
