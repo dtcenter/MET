@@ -18,22 +18,22 @@
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
 
-  <test name="climatology_GRID_STAT_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG">
+  <test name="climatology_GRID_STAT_FCST_NCEP_1.0DEG_OBS_WMO_1.5DEG">
     <exec>&MET_BIN;/grid_stat</exec>
     <env>
-      <pair><name>OUTPUT_PREFIX</name>  <value>FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>FCST_NCEP_1.0DEG_OBS_WMO_1.5DEG</value></pair>
       <pair><name>FCST_CLIMO_DIR</name> <value>&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg</value></pair>
       <pair><name>OBS_CLIMO_DIR</name>  <value>&DATA_DIR_CLIMO;/ERA_DAILY_1.5deg</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2 \
       &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2 \
-      &CONFIG_DIR;/GridStatConfig_climo_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG \
+      &CONFIG_DIR;/GridStatConfig_climo_FCST_NCEP_1.0DEG_OBS_WMO_1.5DEG \
       -outdir &OUTPUT_DIR;/climatology_mixed -v 2
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/climatology_mixed/grid_stat_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG_240000L_20120410_000000V.stat</stat>
-      <grid_nc>&OUTPUT_DIR;/climatology_mixed/grid_stat_FCST_NCAR_1.0DEG_OBS_WMO_1.5DEG_240000L_20120410_000000V_pairs.nc</grid_nc>
+      <stat>&OUTPUT_DIR;/climatology_mixed/grid_stat_FCST_NCEP_1.0DEG_OBS_WMO_1.5DEG_240000L_20120410_000000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/climatology_mixed/grid_stat_FCST_NCEP_1.0DEG_OBS_WMO_1.5DEG_240000L_20120410_000000V_pairs.nc</grid_nc>
     </output>
   </test>
 </met_test>
