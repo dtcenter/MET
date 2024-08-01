@@ -17,7 +17,6 @@
 //   000    12/10/12  Halley Gotway   New
 //   001    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files
 //
-//
 ////////////////////////////////////////////////////////////////////////
 
 #ifndef  __SERIES_ANALYSIS_H__
