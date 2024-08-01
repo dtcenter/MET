@@ -29,7 +29,7 @@ using namespace std;
 static void read_climo_file(
           const char *, GrdFileType, Dictionary *, unixtime,
           int, int, const Grid &, const RegridInfo &,
-          DataPlaneArray &dpa);
+          DataPlaneArray &dpa, const char *);
 
 static DataPlaneArray climo_time_interp(
           const DataPlaneArray &, int, unixtime, InterpMthd);
@@ -102,7 +102,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
    // Range check day_interval
    if(!is_bad_data(day_interval) && day_interval < 1) {
       mlog << Error << "\nread_climo_data_plane_array() -> "
-           << "The \"" << conf_key_day_interval << "\" entry ("
+           << "The " << conf_key_day_interval << " entry ("
            << day_interval << ") can be set to " << na_str
            << " or a value of at least 1.\n\n";
       exit(1);
@@ -115,7 +115,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
    if(!is_bad_data(hour_interval) &&
       (hour_interval <= 0 || hour_interval > 24)) {
       mlog << Error << "\nread_climo_data_plane_array() -> "
-           << "The \"" << conf_key_hour_interval << "\" entry ("
+           << "The " << conf_key_hour_interval << " entry ("
            << hour_interval << ") can be set to " << na_str
            << " or a value between 0 and 24.\n\n";
       exit(1);
@@ -133,7 +133,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
    // Search the files for the requested records
    for(i=0; i<climo_files.n(); i++) {
       read_climo_file(climo_files[i].c_str(), ctype, &i_dict, vld_ut,
-                      day_ts, hour_ts, vx_grid, regrid_info, dpa);
+                      day_ts, hour_ts, vx_grid, regrid_info, dpa, desc);
    }
    
    // Time interpolation for climo fields
@@ -152,7 +152,7 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
                      Dictionary *dict, unixtime vld_ut,
                      int day_ts, int hour_ts, const Grid &vx_grid,
                      const RegridInfo &regrid_info,
-                     DataPlaneArray &dpa) {
+                     DataPlaneArray &dpa, const char *desc) {
 
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
@@ -170,8 +170,8 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
    // Allocate memory for data file
    if(!(mtddf = mtddf_factory.new_met_2d_data_file(climo_file, ctype))) {
       mlog << Warning << "\nread_climo_file() -> "
-           << "Trouble reading climatology file \""
-           << climo_file << "\"\n\n";
+           << "Trouble reading climatology file "
+           << climo_file << "\n\n";
       return;
    }
 
@@ -194,21 +194,21 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
 
       // Check the day time step
       if(!is_bad_data(day_ts) && abs(day_diff_sec) >= day_ts) {
-         mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
-              << "\" climatology field with " << day_diff_sec / sec_per_day
+         mlog << Debug(3) << "Skipping " << clm_ut_cs << " " << info->magic_str()
+              << " climatology field with " << day_diff_sec / sec_per_day
               << " day offset (" << conf_key_day_interval << " = "
-              << day_ts / sec_per_day << ") from file \""
-              << climo_file << "\".\n";
+              << day_ts / sec_per_day << ") from file "
+              << climo_file << ".\n";
          continue;
       }
 
       // Check the hour time step
       if(!is_bad_data(hour_ts) && abs(hms_diff_sec) >= hour_ts) {
-         mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
-              << "\" climatology field with " << (double) hms_diff_sec / sec_per_hour
+         mlog << Debug(3) << "Skipping " << clm_ut_cs << " " << info->magic_str()
+              << " climatology field with " << (double) hms_diff_sec / sec_per_hour
               << " hour offset (" << conf_key_hour_interval << " = "
-              << hour_ts / sec_per_hour << ") from file \""
-              << climo_file << "\".\n";
+              << hour_ts / sec_per_hour << ") from file "
+              << climo_file << ".\n";
          continue;
       }
 
@@ -216,17 +216,17 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
       unixtime clm_vld_ut = vld_ut + day_diff_sec + hms_diff_sec;
 
       // Print log message for matching record
-      mlog << Debug(3) << "Storing " << clm_ut_cs << " \"" << info->magic_str()
-           << "\" climatology field with " << day_diff_sec / sec_per_day
+      mlog << Debug(3) << "Storing " << clm_ut_cs << " " << info->magic_str()
+           << " climatology field with " << day_diff_sec / sec_per_day
            << " day, " << (double) hms_diff_sec / sec_per_hour << " hour offset as time "
-           << unix_to_yyyymmdd_hhmmss(clm_vld_ut) << " from file \""
-           << climo_file << "\".\n";
+           << unix_to_yyyymmdd_hhmmss(clm_vld_ut) << " from file "
+           << climo_file << ".\n";
 
       // Regrid, if needed
       if(!(mtddf->grid() == vx_grid)) {
-         mlog << Debug(2) << "Regridding " << clm_ut_cs << " \""
-              << info->magic_str()
-              << "\" climatology field to the verification grid.\n";
+         mlog << Debug(2) << "Regridding " << clm_ut_cs << " "
+              << desc << " field " << info->magic_str()
+              << " to the verification grid.\n";
          dp = met_regrid(clm_dpa[i], mtddf->grid(), vx_grid,
                          regrid_info);
       }
@@ -346,8 +346,8 @@ DataPlaneArray climo_time_interp(const DataPlaneArray &dpa, int day_ts,
          // This should only occur when day_interval > 1.
          if(day_ts <= 3600*24) {
             mlog << Error << "\nclimo_time_interp() -> "
-                 << "Expecting 1 or 2 climatology fields when \""
-                 << conf_key_day_interval << "\" <= 1 but found "
+                 << "Expecting 1 or 2 climatology fields when "
+                 << conf_key_day_interval << " <= 1 but found "
                  << it->second.n() << "\n\n";
             exit(1);
          }
