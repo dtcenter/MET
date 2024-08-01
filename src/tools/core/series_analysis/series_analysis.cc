@@ -56,7 +56,6 @@
 #include "main.h"
 #include "series_analysis.h"
 
-#include "vx_data2d_nc_met.h"
 #include "vx_statistics.h"
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
@@ -696,6 +695,9 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
    return found;
 }
 
+// TODO MET #1371 figure out how valid data thresholds should be handled
+//                when reading -aggr data
+
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane get_aggr_data(const ConcatString &var_name) {
@@ -703,8 +705,11 @@ DataPlane get_aggr_data(const ConcatString &var_name) {
    bool found = false;
 
    // Open the aggregate file, if needed
-   if(!aggr_mtddf) {
-      aggr_mtddf = mtddf_factory.new_met_2d_data_file(aggr_file.c_str(), FileType_NcMet);
+   if(!aggr_nc.MetNc) {
+
+      mlog << Debug(2) << "Reading aggregate data file: " << aggr_file << "\n";
+
+      aggr_nc.open(aggr_file.c_str());
 
       // Update timing info
       /* TODO MET #1371
@@ -722,20 +727,20 @@ DataPlane get_aggr_data(const ConcatString &var_name) {
    aggr_info.set_magic(var_name, "(*,*)");
 
    // Attempt to read the gridded data from the current file
-   if(!aggr_mtddf->data_plane(aggr_info, aggr_dp)) {
+   if(!aggr_nc.data_plane(aggr_info, aggr_dp)) {
       mlog << Error << "\nget_aggr_data() -> "
-           << "Required variable " << var_name << " not found in aggregate file "
-           << aggr_file << "\n\n";
+           << "Required variable \"" << aggr_info.magic_str() << "\""
+           << " not found in aggregate file!\n\n";
       exit(1);
    }
 
    // Check that the grid has not changed
-   if(aggr_mtddf->grid().nx() != grid.nx() ||
-      aggr_mtddf->grid().ny() != grid.ny()) {
+   if(aggr_nc.grid().nx() != grid.nx() ||
+      aggr_nc.grid().ny() != grid.ny()) {
       mlog << Error << "\nget_aggr_data() -> "
            << "the input grid dimensions (" << grid.nx() << ", " << grid.ny()
-           << ") and aggregate grid dimensions (" << aggr_mtddf->grid().nx()
-           << ", " << aggr_mtddf->grid().ny() << ") do not match!\n\n";
+           << ") and aggregate grid dimensions (" << aggr_nc.grid().nx()
+           << ", " << aggr_nc.grid().ny() << ") do not match!\n\n";
       exit(1);
    }
 
@@ -1028,7 +1033,6 @@ void do_cts(int n, const PairDataPoint *pd_ptr) {
          read_aggr_ctc(n, cts_info[i], aggr_ctc);
 
          // Aggregate past CTC counts with new ones
-         // TODO MET #1371: rename CTS to CTC?
          cts_info[i].cts += aggr_ctc;
 
          // Compute statistics and confidence intervals
@@ -1226,7 +1230,7 @@ void read_aggr_ctc(int n, const CTSInfo &cts_info,
                    TTContingencyTable &ctc) {
 
    // Initialize
-   ctc.clear();
+   ctc.zero_out();
 
    // Loop over the CTC column names
    for(int i=0; i<n_ctc_columns; i++) {
@@ -2447,7 +2451,6 @@ void clean_up() {
    // Deallocate memory for data files
    if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = nullptr; }
    if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = nullptr; }
-   if(aggr_mtddf) { delete aggr_mtddf; aggr_mtddf = nullptr; }
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);

@@ -42,6 +42,7 @@
 #include "series_analysis_conf_info.h"
 
 #include "vx_data2d_factory.h"
+#include "vx_data2d_nc_met.h"
 #include "vx_grid.h"
 #include "vx_util.h"
 #include "vx_stat_out.h"
@@ -119,7 +120,7 @@ static int n_reads = 1; // Initialize to at least one pass
 static Met2dDataFileFactory mtddf_factory;
 static Met2dDataFile *fcst_mtddf = nullptr;
 static Met2dDataFile *obs_mtddf  = nullptr;
-static Met2dDataFile *aggr_mtddf = nullptr;
+static MetNcMetDataFile aggr_nc;
 
 // Pointer to the random number generator to be used
 static gsl_rng *rng_ptr = (gsl_rng *) nullptr;
