@@ -56,18 +56,18 @@ class NcCfFile {
 
       int getNx() const
       {
-        if (_xDim == 0)
+        if (_xDim == nullptr)
           return 0;
 
-        return GET_NC_SIZE_P(_xDim);
+        return (int)GET_NC_SIZE_P(_xDim);
       }
 
       int getNy() const
       {
-        if (_yDim == 0)
+        if (_yDim == nullptr)
           return 0;
 
-        return GET_NC_SIZE_P(_yDim);
+        return (int)GET_NC_SIZE_P(_yDim);
       }
 
       NcVarInfo *get_time_var_info() const { return _time_var_info; }
@@ -112,7 +112,7 @@ class NcCfFile {
 
       bool getData(const char *, const LongArray &, DataPlane &, NcVarInfo *&) const;
 
-      bool check_or_update_grid(Grid &);
+      bool check_or_update_grid(const Grid &);
 
       Grid build_grid_from_lat_lon_vars(netCDF::NcVar *lat_var, netCDF::NcVar *lon_var,
                                         const long lat_counts, const long lon_counts);

@@ -57,8 +57,6 @@ static ConcatString y_dim_var_name;
 static double get_nc_var_att_double(const NcVar *nc_var, const char *att_name,
                                     bool is_required=true);
 
-#define USE_BUFFER  1
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -215,8 +213,8 @@ bool NcCfFile::open(const char * filepath)
   // Pull out the variables
 
   int max_dim_count = 0;
-  NcVar *z_var = (NcVar *)nullptr;
-  NcVar *valid_time_var = (NcVar *)nullptr;
+  auto z_var = (NcVar *)nullptr;
+  auto valid_time_var = (NcVar *)nullptr;
   ConcatString att_value;
 
   StringArray varNames;
@@ -313,7 +311,7 @@ bool NcCfFile::open(const char * filepath)
     // Parse the units for the time variable.
     ut = sec_per_unit = 0;
     if (get_var_units(valid_time_var, units)) {
-      if (units.length() == 0) {
+      if (units.empty()) {
          mlog << Warning << "\n" << method_name
               << "the \"time\" variable must contain a \"units\" attribute. "
               << "Using valid time of 0\n\n";
@@ -326,7 +324,7 @@ bool NcCfFile::open(const char * filepath)
     }
 
     NcVar bounds_time_var;
-    NcVar *nc_time_var = (NcVar *)nullptr;
+    auto nc_time_var = (NcVar *)nullptr;
     bool use_bounds_var = false;
     ConcatString bounds_var_name;
     nc_time_var = valid_time_var;
@@ -343,10 +341,10 @@ bool NcCfFile::open(const char * filepath)
     if (bounds_att) delete bounds_att;
 
     // Determine the number of times present.
-    int n_times = (int) get_data_size(valid_time_var);
+    int n_times = get_data_size(valid_time_var);
     int tim_buf_size = n_times;
     if (use_bounds_var) tim_buf_size *= 2;
-    double *time_values = new double[tim_buf_size];
+    auto time_values = new double[tim_buf_size];
 
     if( get_nc_data(nc_time_var, time_values) ) {
       bool no_leap_year = get_att_no_leap_year(valid_time_var);
@@ -405,7 +403,7 @@ bool NcCfFile::open(const char * filepath)
 
     // Parse the units for the time variable.
     if (get_var_units(&init_time_var, units)) {
-      if (units.length() == 0) {
+      if (units.empty()) {
          mlog << Warning << "\n" << method_name
               << "the \"forecast_reference_time\" variable must contain a \"units\" attribute.\n\n";
          ut = sec_per_unit = 0;
@@ -420,8 +418,8 @@ bool NcCfFile::open(const char * filepath)
       ut = sec_per_unit = 0;
     }
 
-    double time_value = get_nc_time(&init_time_var,(int)0);
-    InitTime = (unixtime)ut + sec_per_unit * time_value;
+    double time_value = get_nc_time(&init_time_var,0);
+    InitTime = (unixtime)(ut + sec_per_unit * time_value);
   }
 
   // Pull out the grid.  This must be done after pulling out the dimension
@@ -438,7 +436,8 @@ bool NcCfFile::open(const char * filepath)
   StringArray z_dims;
   StringArray t_dims;
   StringArray dimNames;
-  string var_x_dim_name, var_y_dim_name;
+  string var_x_dim_name;
+  string var_y_dim_name;
   if (IS_VALID_NC_P(_xDim)) var_x_dim_name = GET_NC_NAME_P(_xDim);
   if (IS_VALID_NC_P(_yDim)) var_y_dim_name = GET_NC_NAME_P(_yDim);
   for (int j=0; j<Nvars; ++j) {
@@ -503,8 +502,8 @@ bool NcCfFile::open(const char * filepath)
   // Pull out the vertical levels
   if (IS_VALID_NC_P(z_var)) {
 
-    int z_count = (int) get_data_size(z_var);
-    double *z_values = new double[z_count];
+    int z_count = get_data_size(z_var);
+    auto z_values = new double[z_count];
 
     if( get_nc_data(z_var, z_values) ) {
       for(int i=0; i<z_count; i++) {
@@ -865,7 +864,7 @@ int NcCfFile::lead_time() const
 ////////////////////////////////////////////////////////////////////////
 
 
-bool NcCfFile::check_or_update_grid(Grid &attr_grid)
+bool NcCfFile::check_or_update_grid(const Grid &attr_grid)
 {
   static const string method_name = "NcCfFile::check_or_update_grid(Grid &) -> ";
   if (attr_grid.is_set())
@@ -1502,7 +1501,7 @@ void NcCfFile::read_netcdf_grid()
 Grid NcCfFile::build_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
                                             const long lat_counts, const long lon_counts) {
   Grid grid_ll;
-  bool swap_to_north;
+  bool swap_to_north = false;
   LatLonData data = get_data_from_lat_lon_vars(lat_var, lon_var,
                                                lat_counts, lon_counts,
                                                swap_to_north);
@@ -3005,7 +3004,7 @@ void NcCfFile::get_grid_mapping_geostationary(
   NcVar *var_y_bound = (NcVar *)nullptr;
   for (int j=0; j<Nvars; ++j)  {
     if ( Var[j].name == "x_image_bounds" ) var_x_bound = Var[j].var;
-    if ( Var[j].name == "y_image_bounds" ) var_y_bound = Var[j].var;
+    else if ( Var[j].name == "y_image_bounds" ) var_y_bound = Var[j].var;
   }
 
 
@@ -3032,8 +3031,8 @@ void NcCfFile::get_grid_mapping_geostationary(
   if (bound_count > 0) {
     data.x_image_bounds = new double[bound_count];
     data.y_image_bounds = new double[bound_count];
-    if (0 != var_x_bound) get_nc_data(var_x_bound, data.x_image_bounds);
-    if (0 != var_y_bound) get_nc_data(var_y_bound, data.y_image_bounds);
+    if (nullptr != var_x_bound) get_nc_data(var_x_bound, data.x_image_bounds);
+    if (nullptr != var_y_bound) get_nc_data(var_y_bound, data.y_image_bounds);
   }
 
   double flatten = 1.0/data.inverse_flattening;
@@ -3362,8 +3361,8 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
 
   LatLonData data;
   data.name = latlon_proj_type;
-  data.Nlat = lat_counts;
-  data.Nlon = lon_counts;
+  data.Nlat = (int)lat_counts;
+  data.Nlon = (int)lon_counts;
 
   long x_size = get_data_size(lon_var);
   long y_size = get_data_size(lat_var);
