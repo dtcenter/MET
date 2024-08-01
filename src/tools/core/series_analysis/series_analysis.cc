@@ -2478,6 +2478,9 @@ void clean_up() {
       nc_out = (NcFile *) nullptr;
    }
 
+   // Close the aggregate NetCDF file
+   if(aggr_nc.MetNc) aggr_nc.close();
+
    // Deallocate memory for data files
    if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = nullptr; }
    if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = nullptr; }
