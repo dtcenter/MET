@@ -117,8 +117,9 @@ static int n_reads = 1; // Initialize to at least one pass
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) nullptr;
-static Met2dDataFile *obs_mtddf  = (Met2dDataFile *) nullptr;
+static Met2dDataFile *fcst_mtddf = nullptr;
+static Met2dDataFile *obs_mtddf  = nullptr;
+static Met2dDataFile *aggr_mtddf = nullptr;
 
 // Pointer to the random number generator to be used
 static gsl_rng *rng_ptr = (gsl_rng *) nullptr;

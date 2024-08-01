@@ -40,7 +40,6 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -57,6 +56,7 @@
 #include "main.h"
 #include "series_analysis.h"
 
+#include "vx_data2d_nc_met.h"
 #include "vx_statistics.h"
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
@@ -65,7 +65,6 @@
 
 using namespace std;
 using namespace netCDF;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -84,6 +83,7 @@ static void get_series_entry(int, VarInfo *, const StringArray &,
                              DataPlane &, Grid &);
 static bool read_single_entry(VarInfo *, const ConcatString &,
                               const GrdFileType, DataPlane &, Grid &);
+static DataPlane get_aggr_data(const ConcatString &);
 
 static void process_scores();
 
@@ -92,6 +92,8 @@ static void do_mcts  (int, const PairDataPoint *);
 static void do_cnt   (int, const PairDataPoint *);
 static void do_sl1l2 (int, const PairDataPoint *);
 static void do_pct   (int, const PairDataPoint *);
+
+static void read_aggr_ctc   (int, const CTSInfo &, TTContingencyTable &ctc);
 
 static void store_stat_fho  (int, const ConcatString &, const CTSInfo &);
 static void store_stat_ctc  (int, const ConcatString &, const CTSInfo &);
@@ -110,6 +112,8 @@ static void store_stat_all_mctc (int, const MCTSInfo &);
 static void store_stat_all_sl1l2(int, const SL1L2Info &);
 static void store_stat_all_pct  (int, const PCTInfo &);
 
+static ConcatString build_nc_var_name_ctc(const ConcatString &, const CTSInfo &);
+
 static void setup_nc_file(const VarInfo *, const VarInfo *);
 static void add_nc_var(const ConcatString &, const ConcatString &,
                        const ConcatString &, const ConcatString &,
@@ -125,7 +129,7 @@ static void usage();
 static void set_fcst_files(const StringArray &);
 static void set_obs_files(const StringArray &);
 static void set_both_files(const StringArray &);
-static void set_aggregate(const StringArray &);
+static void set_aggr(const StringArray &);
 static void set_paired(const StringArray &);
 static void set_out_file(const StringArray &);
 static void set_config_file(const StringArray &);
@@ -172,14 +176,14 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_fcst_files,  "-fcst",      -1);
-   cline.add(set_obs_files,   "-obs",       -1);
-   cline.add(set_both_files,  "-both",      -1);
-   cline.add(set_aggregate,   "-aggregate",  1);
-   cline.add(set_paired,      "-paired",     0);
-   cline.add(set_config_file, "-config",     1);
-   cline.add(set_out_file,    "-out",        1);
-   cline.add(set_compress,    "-compress",   1);
+   cline.add(set_fcst_files,  "-fcst",    -1);
+   cline.add(set_obs_files,   "-obs",     -1);
+   cline.add(set_both_files,  "-both",    -1);
+   cline.add(set_aggr,        "-aggr",     1);
+   cline.add(set_paired,      "-paired",   0);
+   cline.add(set_config_file, "-config",   1);
+   cline.add(set_out_file,    "-out",      1);
+   cline.add(set_compress,    "-compress", 1);
 
    // Parse the command line
    cline.parse();
@@ -221,7 +225,7 @@ void process_command_line(int argc, char **argv) {
    }
    if(aggr_file == out_file) {
       mlog << Error << "\nprocess_command_line() -> "
-           << "the \"-out\" and \"-aggregate\" options cannot be "
+           << "the \"-out\" and \"-aggr\" options cannot be "
            << "set to the same file (\"" << aggr_file << "\")!\n\n";
       usage();
    }
@@ -694,6 +698,52 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
 
 ////////////////////////////////////////////////////////////////////////
 
+DataPlane get_aggr_data(const ConcatString &var_name) {
+   DataPlane aggr_dp;
+   bool found = false;
+
+   // Open the aggregate file, if needed
+   if(!aggr_mtddf) {
+      aggr_mtddf = mtddf_factory.new_met_2d_data_file(aggr_file.c_str(), FileType_NcMet);
+
+      // Update timing info
+      /* TODO MET #1371
+      set_range(fcst_dp.init(),  fcst_init_beg,  fcst_init_end);
+      set_range(fcst_dp.valid(), fcst_valid_beg, fcst_valid_end);
+      set_range(fcst_dp.lead(),  fcst_lead_beg,  fcst_lead_end);
+      set_range(obs_dp.init(),   obs_init_beg,   obs_init_end);
+      set_range(obs_dp.valid(),  obs_valid_beg,  obs_valid_end);
+      set_range(obs_dp.lead(),   obs_lead_beg,   obs_lead_end);
+      */
+   }
+
+   // Setup the data request
+   VarInfoNcMet aggr_info;
+   aggr_info.set_magic(var_name, "(*,*)");
+
+   // Attempt to read the gridded data from the current file
+   if(!aggr_mtddf->data_plane(aggr_info, aggr_dp)) {
+      mlog << Error << "\nget_aggr_data() -> "
+           << "Required variable " << var_name << " not found in aggregate file "
+           << aggr_file << "\n\n";
+      exit(1);
+   }
+
+   // Check that the grid has not changed
+   if(aggr_mtddf->grid().nx() != grid.nx() ||
+      aggr_mtddf->grid().ny() != grid.ny()) {
+      mlog << Error << "\nget_aggr_data() -> "
+           << "the input grid dimensions (" << grid.nx() << ", " << grid.ny()
+           << ") and aggregate grid dimensions (" << aggr_mtddf->grid().nx()
+           << ", " << aggr_mtddf->grid().ny() << ") do not match!\n\n";
+      exit(1);
+   }
+
+   return aggr_dp;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void process_scores() {
    int i, x, y;
    int i_point = 0;
@@ -848,11 +898,6 @@ void process_scores() {
                  << pd_ptr[i].n_obs << " matched pairs.\n";
          }
 
-         // TODO: MET #1371 figure out where to read data from the aggr_file
-         //       file to initialize data structures. Maybe store DataPlanes
-         //       in a <string,DataPlane> map so that we only need to load the
-         //       gridded data once and then can read it many times?
-
          // Compute contingency table counts and statistics
          if(!conf_info.fcst_info[0]->is_prob() &&
             (conf_info.output_stats[STATLineType::fho].n() +
@@ -946,7 +991,6 @@ void process_scores() {
 ////////////////////////////////////////////////////////////////////////
 
 void do_cts(int n, const PairDataPoint *pd_ptr) {
-   int i, j;
 
    mlog << Debug(4) << "Computing Categorical Statistics.\n";
 
@@ -955,20 +999,47 @@ void do_cts(int n, const PairDataPoint *pd_ptr) {
    CTSInfo *cts_info = new CTSInfo [n_cts];
 
    // Setup CTSInfo objects
-   for(i=0; i<n_cts; i++) {
+   for(int i=0; i<n_cts; i++) {
       cts_info[i].cts.set_ec_value(conf_info.hss_ec_value);
       cts_info[i].fthresh = conf_info.fcat_ta[i];
       cts_info[i].othresh = conf_info.ocat_ta[i];
-
       cts_info[i].allocate_n_alpha(conf_info.ci_alpha.n());
-      for(j=0; j<conf_info.ci_alpha.n(); j++) {
+
+      for(int j=0; j<conf_info.ci_alpha.n(); j++) {
          cts_info[i].alpha[j] = conf_info.ci_alpha[j];
       }
    }
 
+   // Aggregate past CTC counts
+   if(aggr_file.nonempty()) {
+
+      // Index NumArray to use all points
+      NumArray i_na;
+      i_na.add_seq(0, pd_ptr->n_obs-1);
+
+      // Loop over the thresholds
+      for(int i=0; i<n_cts; i++) {
+
+         // Compute the current CTSInfo
+         compute_ctsinfo(*pd_ptr, i_na, false, false, cts_info[i]);
+
+         // Read the CTC data to be aggregated
+         TTContingencyTable aggr_ctc;
+         read_aggr_ctc(n, cts_info[i], aggr_ctc);
+
+         // Aggregate past CTC counts with new ones
+         // TODO MET #1371: rename CTS to CTC?
+         cts_info[i].cts += aggr_ctc;
+
+         // Compute statistics and confidence intervals
+         cts_info[i].compute_stats();
+         cts_info[i].compute_ci();
+
+      } // end for i
+   }
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
-   if(conf_info.boot_interval == BootIntervalType::BCA) {
+   else if(conf_info.boot_interval == BootIntervalType::BCA) {
       compute_cts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.n_boot_rep,
          cts_info, n_cts, true,
@@ -982,22 +1053,22 @@ void do_cts(int n, const PairDataPoint *pd_ptr) {
    }
 
    // Loop over the categorical thresholds
-   for(i=0; i<n_cts; i++) {
+   for(int i=0; i<n_cts; i++) {
 
       // Add statistic value for each possible FHO column
-      for(j=0; j<conf_info.output_stats[STATLineType::fho].n(); j++) {
+      for(int j=0; j<conf_info.output_stats[STATLineType::fho].n(); j++) {
          store_stat_fho(n, conf_info.output_stats[STATLineType::fho][j],
                         cts_info[i]);
       }
 
       // Add statistic value for each possible CTC column
-      for(j=0; j<conf_info.output_stats[STATLineType::ctc].n(); j++) {
+      for(int j=0; j<conf_info.output_stats[STATLineType::ctc].n(); j++) {
          store_stat_ctc(n, conf_info.output_stats[STATLineType::ctc][j],
                         cts_info[i]);
       }
 
       // Add statistic value for each possible CTS column
-      for(j=0; j<conf_info.output_stats[STATLineType::cts].n(); j++) {
+      for(int j=0; j<conf_info.output_stats[STATLineType::cts].n(); j++) {
          store_stat_cts(n, conf_info.output_stats[STATLineType::cts][j],
                         cts_info[i]);
       }
@@ -1151,6 +1222,41 @@ void do_sl1l2(int n, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void read_aggr_ctc(int n, const CTSInfo &cts_info,
+                   TTContingencyTable &ctc) {
+
+   // Initialize
+   ctc.clear();
+
+   // Loop over the CTC column names
+   for(int i=0; i<n_ctc_columns; i++) {
+
+      // Set the column name to all upper case
+      ConcatString c = to_upper(ctc_columns[i]);
+
+      ConcatString var_name(build_nc_var_name_ctc(c, cts_info));
+
+      // Read aggregate data, if needed
+      if(aggr_data.count(var_name) == 0) {
+         aggr_data[var_name] = get_aggr_data(var_name);
+      }
+
+      // Determine x,y location
+      double v = aggr_data[var_name].buf()[n];
+
+      // Populate the CTC table
+           if(c == "FY_OY")    { ctc.set_fy_oy(nint(v)); }
+      else if(c == "FY_ON")    { ctc.set_fy_on(nint(v)); }
+      else if(c == "FN_OY")    { ctc.set_fn_oy(nint(v)); }
+      else if(c == "FN_ON")    { ctc.set_fn_on(nint(v)); }
+      else if(c == "EC_VALUE") { ctc.set_ec_value(v);    }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void do_pct(int n, const PairDataPoint *pd_ptr) {
    int i, j;
 
@@ -1261,8 +1367,7 @@ void store_stat_fho(int n, const ConcatString &col,
 
 void store_stat_ctc(int n, const ConcatString &col,
                     const CTSInfo &cts_info) {
-   int v;
-   ConcatString lty_stat, var_name;
+   double v;
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
@@ -1285,22 +1390,14 @@ void store_stat_ctc(int n, const ConcatString &col,
    }
 
    // Construct the NetCDF variable name
-   var_name << cs_erase << "series_ctc_" << c;
-
-   // Append threshold information
-   if(cts_info.fthresh == cts_info.othresh) {
-      var_name << "_" << cts_info.fthresh.get_abbr_str();
-   }
-   else {
-      var_name << "_fcst" << cts_info.fthresh.get_abbr_str()
-               << "_obs" << cts_info.othresh.get_abbr_str();
-   }
+   ConcatString var_name(build_nc_var_name_ctc(c, cts_info));
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
       // Build key
-      lty_stat << "CTC_" << c;
+      ConcatString lty_stat("CTC_");
+      lty_stat << c;
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
@@ -1310,7 +1407,7 @@ void store_stat_ctc(int n, const ConcatString &col,
    }
 
    // Store the statistic value
-   put_nc_val(n, var_name, (float) v);
+   put_nc_val(n, var_name, v);
 
    return;
 }
@@ -2164,6 +2261,26 @@ void store_stat_all_pct(int n, const PCTInfo &pct_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
+ConcatString build_nc_var_name_ctc(const ConcatString &col, const CTSInfo &cts_info) {
+   ConcatString var_name;
+
+   // Append the column name
+   var_name << "series_ctc_" << col;
+
+   // Append threshold information
+   if(cts_info.fthresh == cts_info.othresh) {
+      var_name << "_" << cts_info.fthresh.get_abbr_str();
+   }
+   else {
+      var_name << "_fcst" << cts_info.fthresh.get_abbr_str()
+               << "_obs" << cts_info.othresh.get_abbr_str();
+   }
+
+   return var_name;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
 
    // Create a new NetCDF file and open it
@@ -2328,8 +2445,9 @@ void clean_up() {
    }
 
    // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = (Met2dDataFile *) nullptr; }
-   if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = (Met2dDataFile *) nullptr; }
+   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = nullptr; }
+   if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = nullptr; }
+   if(aggr_mtddf) { delete aggr_mtddf; aggr_mtddf = nullptr; }
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);
@@ -2348,7 +2466,7 @@ void usage() {
         << "\t-fcst  file_1 ... file_n | fcst_file_list\n"
         << "\t-obs   file_1 ... file_n | obs_file_list\n"
         << "\t[-both file_1 ... file_n | both_file_list]\n"
-        << "\t[-aggregate file]\n"
+        << "\t[-aggr file]\n"
         << "\t[-paired]\n"
         << "\t-out file\n"
         << "\t-config file\n"
@@ -2371,7 +2489,7 @@ void usage() {
         << "\t\t\"-both\" sets the \"-fcst\" and \"-obs\" options to "
         << "the same set of files (optional).\n"
 
-        << "\t\t\"-aggregate file\" specifies a series_analysis output "
+        << "\t\t\"-aggr file\" specifies a series_analysis output "
         << "file with partial sums and/or contingency table counts to be "
         << "updated prior to deriving statistics (optional).\n"
 
@@ -2417,7 +2535,7 @@ void set_both_files(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_aggregate(const StringArray & a) {
+void set_aggr(const StringArray & a) {
    aggr_file = a[0];
 }
 
