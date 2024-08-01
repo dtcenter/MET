@@ -711,15 +711,45 @@ DataPlane get_aggr_data(const ConcatString &var_name) {
 
       aggr_nc.open(aggr_file.c_str());
 
-      // Update timing info
-      /* TODO MET #1371
-      set_range(fcst_dp.init(),  fcst_init_beg,  fcst_init_end);
-      set_range(fcst_dp.valid(), fcst_valid_beg, fcst_valid_end);
-      set_range(fcst_dp.lead(),  fcst_lead_beg,  fcst_lead_end);
-      set_range(obs_dp.init(),   obs_init_beg,   obs_init_end);
-      set_range(obs_dp.valid(),  obs_valid_beg,  obs_valid_end);
-      set_range(obs_dp.lead(),   obs_lead_beg,   obs_lead_end);
-      */
+      // Update timing info based on aggregate file global attributes
+      ConcatString cs;
+
+      if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_init_beg", cs)) {
+         set_range(timestring_to_unix(cs.c_str()), fcst_init_beg, fcst_init_end);
+      }
+      if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_init_end", cs)) {
+         set_range(timestring_to_unix(cs.c_str()), fcst_init_beg, fcst_init_end);
+      }
+      if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_valid_beg", cs)) {
+         set_range(timestring_to_unix(cs.c_str()), fcst_valid_beg, fcst_valid_end);
+      }
+      if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_valid_end", cs)) {
+         set_range(timestring_to_unix(cs.c_str()), fcst_valid_beg, fcst_valid_end);
+      }
+      if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_lead_beg", cs)) {
+         set_range(timestring_to_sec(cs.c_str()), fcst_lead_beg, fcst_lead_end);
+      }
+      if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_lead_end", cs)) {
+         set_range(timestring_to_sec(cs.c_str()), fcst_lead_beg, fcst_lead_end);
+      }
+      if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_init_beg", cs)) {
+         set_range(timestring_to_unix(cs.c_str()), obs_init_beg, obs_init_end);
+      }
+      if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_init_end", cs)) {
+         set_range(timestring_to_unix(cs.c_str()), obs_init_beg, obs_init_end);
+      }
+      if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_valid_beg", cs)) {
+         set_range(timestring_to_unix(cs.c_str()), obs_valid_beg, obs_valid_end);
+      }
+      if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_valid_end", cs)) {
+         set_range(timestring_to_unix(cs.c_str()), obs_valid_beg, obs_valid_end);
+      }
+      if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_lead_beg", cs)) {
+         set_range(timestring_to_sec(cs.c_str()), obs_lead_beg, obs_lead_end);
+      }
+      if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_lead_end", cs)) {
+         set_range(timestring_to_sec(cs.c_str()), obs_lead_beg, obs_lead_end);
+      }
    }
 
    // Setup the data request
