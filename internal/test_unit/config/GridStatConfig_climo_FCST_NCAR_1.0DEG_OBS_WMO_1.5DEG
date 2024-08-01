@@ -63,11 +63,9 @@ field_list = [
    { name = "TMP";  level = [ "P500" ]; },
    { name = "UGRD"; level = [ "P500" ]; },
    { name = "VGRD"; level = [ "P500" ]; },
-   { name = "WIND"; level = [ "P500" ]; },
    { name = "TMP";  level = [ "P850" ]; cat_thresh = [ >FCDP75, >OCDP75 ]; },
    { name = "UGRD"; level = [ "P850" ]; cat_thresh = [ >FCDP75, >OCDP75 ]; },
-   { name = "VGRD"; level = [ "P850" ]; cat_thresh = [ >FCDP75, >OCDP75 ]; },
-   { name = "WIND"; level = [ "P850" ]; cat_thresh = [ >FCDP75, >OCDP75 ]; }
+   { name = "VGRD"; level = [ "P850" ]; cat_thresh = [ >FCDP75, >OCDP75 ]; }
 ];
 
 fcst = {
@@ -75,15 +73,13 @@ fcst = {
    field = field_list;
 
    climo_mean = {
-      file_name = [ "${FCST_CLIMO_DIR}/cmean_1d.19590409",
-                    "${FCST_CLIMO_DIR}/cmean_1d.19590410",
-                    "${FCST_CLIMO_DIR}/cmean_1d.19590411" ];
+      field = field_list;
+      file_name = [ "${FCST_CLIMO_DIR}/cmean_1d.19590410" ];
    };
 
    climo_stdev = {
-      file_name = [ "${FCST_CLIMO_DIR}/cstdv_1d.19590409",
-                    "${FCST_CLIMO_DIR}/cstdv_1d.19590410",
-                    "${FCST_CLIMO_DIR}/cstdv_1d.19590411" ];
+      field = field_list;
+      file_name = [ "${FCST_CLIMO_DIR}/cstdv_1d.19590410" ];
    };
 
    time_interp_method = DW_MEAN;
@@ -96,21 +92,20 @@ obs = {
    field = field_list;
 
    climo_mean = {
+      field = field_list;
       file_name = [ "${OBS_CLIMO_DIR}/t500hPa_mean.grib",
                     "${OBS_CLIMO_DIR}/t850hPa_mean.grib",
                     "${OBS_CLIMO_DIR}/u500hPa_mean.grib",
                     "${OBS_CLIMO_DIR}/u850hPa_mean.grib",
                     "${OBS_CLIMO_DIR}/v500hPa_mean.grib",
-                    "${OBS_CLIMO_DIR}/v850hPa_mean.grib",
-                    "${OBS_CLIMO_DIR}/ws500hPa_mean.grib",
-                    "${OBS_CLIMO_DIR}/ws850hPa_mean.grib" ];
+                    "${OBS_CLIMO_DIR}/v850hPa_mean.grib" ];
    };
 
    climo_stdev = {
+      field = field_list;
       file_name = [ "${OBS_CLIMO_DIR}/t850hPa_stdev.grib",
                     "${OBS_CLIMO_DIR}/u850hPa_stdev.grib",
-                    "${OBS_CLIMO_DIR}/v850hPa_stdev.grib",
-                    "${OBS_CLIMO_DIR}/ws850hPa_stdev.grib" ];
+                    "${OBS_CLIMO_DIR}/v850hPa_stdev.grib" ];
    };
 
    time_interp_method = DW_MEAN;
@@ -124,7 +119,7 @@ obs = {
 // May be set separately in each "obs.field" entry
 //
 climo_cdf = {
-   cdf_bins    = 3;
+   cdf_bins    = 1;
    center_bins = TRUE;
    write_bins  = FALSE;
    direct_prob = FALSE;
