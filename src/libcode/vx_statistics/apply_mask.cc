@@ -215,7 +215,7 @@ void parse_grid_mask(const ConcatString &mask_grid_str, Grid &grid) {
    // Check for empty input string
    if(mask_grid_str.empty()) return;
 
-   if (!build_grid_by_grid_string((ConcatString &)mask_grid_str, grid, "parse_grid_mask", false)) {
+   if (!build_grid_by_grid_string(mask_grid_str, grid, "parse_grid_mask", false)) {
       // Extract the grid from a gridded data file
       mlog << Debug(3)
            << "Use the grid defined by file \""
