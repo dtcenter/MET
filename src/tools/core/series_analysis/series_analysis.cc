@@ -92,7 +92,11 @@ static void do_cnt   (int, const PairDataPoint *);
 static void do_sl1l2 (int, const PairDataPoint *);
 static void do_pct   (int, const PairDataPoint *);
 
-static void read_aggr_ctc   (int, const CTSInfo &, TTContingencyTable &ctc);
+// TODO: MET #1371 need logic to aggregate SL1L2, SAL1L2, and CNT (?)
+
+static void read_aggr_ctc   (int, const CTSInfo &,  TTContingencyTable &);
+static void read_aggr_mctc  (int, const MCTSInfo &, ContingencyTable &);
+static void read_aggr_pct   (int, const PCTInfo &,  Nx2ContingencyTable &);
 
 static void store_stat_fho  (int, const ConcatString &, const CTSInfo &);
 static void store_stat_ctc  (int, const ConcatString &, const CTSInfo &);
@@ -531,7 +535,7 @@ void get_series_data(int i_series,
          exit(1);
       }
 
-      mlog << Debug(1)
+      mlog << Debug(3)
            << "Regridding field " << fcst_info->magic_str()
            << " to the verification grid.\n";
       fcst_dp = met_regrid(fcst_dp, fcst_grid, grid,
@@ -551,7 +555,7 @@ void get_series_data(int i_series,
          exit(1);
       }
 
-      mlog << Debug(1)
+      mlog << Debug(3)
            << "Regridding field " << obs_info->magic_str()
            << " to the verification grid.\n";
       obs_dp = met_regrid(obs_dp, obs_grid, grid,
@@ -707,7 +711,8 @@ DataPlane get_aggr_data(const ConcatString &var_name) {
    // Open the aggregate file, if needed
    if(!aggr_nc.MetNc) {
 
-      mlog << Debug(2) << "Reading aggregate data file: " << aggr_file << "\n";
+      mlog << Debug(1)
+           << "Reading aggregate data file: " << aggr_file << "\n";
 
       aggr_nc.open(aggr_file.c_str());
 
@@ -1045,7 +1050,7 @@ void do_cts(int n, const PairDataPoint *pd_ptr) {
       }
    }
 
-   // Aggregate past CTC counts
+   // Aggregate new point data with input CTC counts
    if(aggr_file.nonempty()) {
 
       // Index NumArray to use all points
@@ -1135,9 +1140,31 @@ void do_mcts(int n, const PairDataPoint *pd_ptr) {
       mcts_info.alpha[i] = conf_info.ci_alpha[i];
    }
 
+   // Aggregate new point data with input MCTC counts
+   if(aggr_file.nonempty()) {
+
+      // Index NumArray to use all points
+      NumArray i_na;
+      i_na.add_seq(0, pd_ptr->n_obs-1);
+
+      // Compute the current MCTSInfo
+      compute_mctsinfo(*pd_ptr, i_na, false, false, mcts_info);
+
+      // Read the MCTC data to be aggregated
+      ContingencyTable aggr_ctc;
+      read_aggr_mctc(n, mcts_info, aggr_ctc);
+
+      // Aggregate past MCTC counts with new ones
+      mcts_info.cts += aggr_ctc;
+
+      // Compute statistics and confidence intervals
+      mcts_info.compute_stats();
+      mcts_info.compute_ci();
+
+   }
    // Compute the counts, stats, normal confidence intervals, and
    // bootstrap confidence intervals
-   if(conf_info.boot_interval == BootIntervalType::BCA) {
+   else if(conf_info.boot_interval == BootIntervalType::BCA) {
       compute_mcts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.n_boot_rep,
          mcts_info, true,
@@ -1257,17 +1284,15 @@ void do_sl1l2(int n, const PairDataPoint *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 void read_aggr_ctc(int n, const CTSInfo &cts_info,
-                   TTContingencyTable &ctc) {
+                   TTContingencyTable &aggr_ctc) {
 
    // Initialize
-   ctc.zero_out();
+   aggr_ctc.zero_out();
 
    // Loop over the CTC column names
    for(int i=0; i<n_ctc_columns; i++) {
 
-      // Set the column name to all upper case
-      ConcatString c = to_upper(ctc_columns[i]);
-
+      ConcatString c(to_upper(ctc_columns[i]));
       ConcatString var_name(build_nc_var_name_ctc(c, cts_info));
 
       // Read aggregate data, if needed
@@ -1275,16 +1300,126 @@ void read_aggr_ctc(int n, const CTSInfo &cts_info,
          aggr_data[var_name] = get_aggr_data(var_name);
       }
 
-      // Determine x,y location
+      // Get the n-th value
       double v = aggr_data[var_name].buf()[n];
 
       // Populate the CTC table
-           if(c == "FY_OY")    { ctc.set_fy_oy(nint(v)); }
-      else if(c == "FY_ON")    { ctc.set_fy_on(nint(v)); }
-      else if(c == "FN_OY")    { ctc.set_fn_oy(nint(v)); }
-      else if(c == "FN_ON")    { ctc.set_fn_on(nint(v)); }
-      else if(c == "EC_VALUE") { ctc.set_ec_value(v);    }
+           if(c == "FY_OY")    { aggr_ctc.set_fy_oy(nint(v)); }
+      else if(c == "FY_ON")    { aggr_ctc.set_fy_on(nint(v)); }
+      else if(c == "FN_OY")    { aggr_ctc.set_fn_oy(nint(v)); }
+      else if(c == "FN_ON")    { aggr_ctc.set_fn_on(nint(v)); }
+      else if(c == "EC_VALUE") { aggr_ctc.set_ec_value(v);    }
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
+                    ContingencyTable &aggr_ctc) {
+
+   // Initialize
+   aggr_ctc = mcts_info.cts;
+   aggr_ctc.zero_out();
+
+   // Get MCTC column names
+   StringArray mctc_cols(get_mctc_columns(aggr_ctc.nrows()));
+
+   // Loop over the MCTC column names
+   for(int i=0; i<mctc_cols.n(); i++) {
+
+      ConcatString c(to_upper(mctc_cols[i]));
+      ConcatString var_name("series_mctc_");
+      var_name << c;
+
+      // Read aggregate data, if needed
+      if(aggr_data.count(var_name) == 0) {
+         aggr_data[var_name] = get_aggr_data(var_name);
+      }
+
+      // Get the n-th value
+      double v = aggr_data[var_name].buf()[n];
+
+      // Check the number of categories
+      if(c == "N_CAT" && !is_bad_data(v) &&
+         aggr_ctc.nrows() != nint(v)) {
+         mlog << Error << "\nread_aggr_mctc() -> "
+              << "the number of MCTC categories do not match ("
+              << nint(v) << " != " << aggr_ctc.nrows() << ")!\n\n";
+         exit(1);
+      }
+      // Check the expected correct
+      else if(c == "EC_VALUE" && !is_bad_data(v) &&
+              !is_eq(v, aggr_ctc.ec_value(), loose_tol)) {
+         mlog << Error << "\nread_aggr_mctc() -> "
+              << "the MCTC expected correct values do not match ("
+              << v << " != " << aggr_ctc.ec_value() << ")!\n\n";
+         exit(1);
+      }
+      // Populate the MCTC table
+      else if(check_reg_exp("F[0-9]*_O[0-9]*", c.c_str())) {
+         StringArray sa(c.split("_"));
+         int i_row = atoi(sa[0].c_str()+1) - 1;
+         int i_col = atoi(sa[1].c_str()+1) - 1;
+         aggr_ctc.set_entry(i_row, i_col, nint(v));
+      }
+   } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void read_aggr_pct(int n, const PCTInfo &pct_info,
+                   Nx2ContingencyTable &aggr_pct) {
+
+   // Initialize
+   aggr_pct = pct_info.pct;
+   aggr_pct.zero_out();
+
+   // Get PCT column names
+   StringArray pct_cols(get_pct_columns(aggr_pct.nrows()));
+
+   // Loop over the PCT colum names
+   for(int i=0; i<pct_cols.n(); i++) {
+
+      ConcatString c(to_upper(pct_cols[i]));
+      ConcatString var_name("series_pct_");
+      var_name << c << "_obs" << pct_info.othresh.get_abbr_str();
+
+      // Read aggregate data, if needed
+      if(aggr_data.count(var_name) == 0) {
+         aggr_data[var_name] = get_aggr_data(var_name);
+      }
+
+      // Get the n-th value
+      double v = aggr_data[var_name].buf()[n];
+
+      // Check the number of thresholds
+      if(c == "N_THRESH" && !is_bad_data(v) &&
+         aggr_pct.nrows() != nint(v)+1) {
+         mlog << Error << "\nread_aggr_pct() -> "
+              << "the number of PCT categories do not match ("
+              << nint(v)+1 << " != " << aggr_pct.nrows() << ")!\n\n";
+         exit(1);
+      }
+      // Set the event counts
+      else if(check_reg_exp("OY_[0-9]", c.c_str())) {
+
+         // Parse the index value from the column name
+         int i_row = atoi(strrchr(c.c_str(), '_') + 1) - 1;
+         aggr_pct.set_event(i_row, nint(v));
+      }
+      // Set the non-event counts
+      else if(check_reg_exp("ON_[0-9]", c.c_str())) {
+
+         // Parse the index value from the column name
+         int i_row = atoi(strrchr(c.c_str(), '_') + 1) - 1;
+         aggr_pct.set_nonevent(i_row, nint(v));
+      }
+
+   } // end for i
 
    return;
 }
@@ -1313,8 +1448,28 @@ void do_pct(int n, const PairDataPoint *pd_ptr) {
       // Set the current observation threshold
       pct_info.othresh = conf_info.ocat_ta[i];
 
+      // Aggregate new point data with input PCT counts
+      if(aggr_file.nonempty()) {
+
+         // Compute the probabilistic counts
+         compute_pctinfo(*pd_ptr, false, pct_info);
+
+         // Read the PCT data to be aggregated
+         Nx2ContingencyTable aggr_pct;
+         read_aggr_pct(n, pct_info, aggr_pct);
+
+         // Aggregate past PCT counts with new ones
+         pct_info.pct += aggr_pct;
+
+         // Compute statistics and confidence intervals
+         pct_info.compute_stats();
+         pct_info.compute_ci();
+
+      }
       // Compute the probabilistic counts and statistics
-      compute_pctinfo(*pd_ptr, true, pct_info);
+      else {
+         compute_pctinfo(*pd_ptr, true, pct_info);
+      }
 
       // Add statistic value for each possible PCT column
       for(j=0; j<conf_info.output_stats[STATLineType::pct].n(); j++) {
