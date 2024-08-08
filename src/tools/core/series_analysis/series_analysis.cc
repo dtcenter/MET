@@ -1825,7 +1825,6 @@ void store_stat_sl1l2(int n, const ConcatString &col,
 void store_stat_sal1l2(int n, const ConcatString &col,
                        const SL1L2Info &s_info) {
    double v;
-   ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
@@ -1846,7 +1845,8 @@ void store_stat_sal1l2(int n, const ConcatString &col,
    }
 
    // Construct the NetCDF variable name
-   var_name << cs_erase << "series_sal1l2_" << c;
+   ConcatString var_name("series_sal1l2_");
+   var_name << c;
 
    // Append threshold information, if supplied
    if(s_info.fthresh.get_type() != thresh_na ||
@@ -1860,7 +1860,8 @@ void store_stat_sal1l2(int n, const ConcatString &col,
    if(stat_data.count(var_name) == 0) {
 
       // Build key
-      lty_stat << "SAL1L2_" << c;
+      ConcatString lty_stat("SAL1L2_");
+      lty_stat << c;
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
