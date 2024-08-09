@@ -239,6 +239,12 @@ class SL1L2Info {
 
       void zero_out();
       void clear();
+
+      void set_sl1l2_stat (const std::string &, double);
+      void set_sal1l2_stat(const std::string &, double);
+
+      double get_sl1l2_stat (const std::string &) const;
+      double get_sal1l2_stat(const std::string &) const;
 };
 
 ////////////////////////////////////////////////////////////////////////

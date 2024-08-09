@@ -86,20 +86,25 @@ static DataPlane get_aggr_data(const ConcatString &);
 
 static void process_scores();
 
-static void do_cts   (int, const PairDataPoint *);
-static void do_mcts  (int, const PairDataPoint *);
-static void do_cnt   (int, const PairDataPoint *);
-static void do_sl1l2 (int, const PairDataPoint *);
-static void do_pct   (int, const PairDataPoint *);
+static void do_categorical   (int, const PairDataPoint *);
+static void do_multicategory (int, const PairDataPoint *);
+static void do_continuous    (int, const PairDataPoint *);
+static void do_partialsums   (int, const PairDataPoint *);
+static void do_probabilistic (int, const PairDataPoint *);
 
-// TODO: MET #1371 need logic to aggregate SL1L2, SAL1L2, and CNT (?)
-//       Add a PCT aggregation logic test
+// TODO: MET #1371
+// - Add a PCT aggregation logic test
+// - Switch to set_stat() and get_stat() functions
+// - Can briercl be aggregated as a weighted average and used for bss?
+// - How should valid data thresholds be applied when reading -aggr data?
+// - Currently no way to aggregate anom_corr since CNTInfo::set(sl1l2)
+//   doesn't support it.
 
 static void read_aggr_ctc    (int, const CTSInfo &,   TTContingencyTable &);
 static void read_aggr_mctc   (int, const MCTSInfo &,  ContingencyTable &);
+static void read_aggr_sl1l2  (int, const SL1L2Info &, SL1L2Info &);
+static void read_aggr_sal1l2 (int, const SL1L2Info &, SL1L2Info &);
 static void read_aggr_pct    (int, const PCTInfo &,   Nx2ContingencyTable &);
-static void read_aggr_sl1l2  (int, const SL1L2Info &, SL1L2Info &); // JHG
-static void read_aggr_sal1l2 (int, const SL1L2Info &, SL1L2Info &); // JHG
 
 static void store_stat_fho   (int, const ConcatString &, const CTSInfo &);
 static void store_stat_ctc   (int, const ConcatString &, const CTSInfo &);
@@ -121,6 +126,9 @@ static void store_stat_all_sal1l2(int, const SL1L2Info &);
 static void store_stat_all_pct   (int, const PCTInfo &);
 
 static ConcatString build_nc_var_name_ctc(const ConcatString &, const CTSInfo &);
+static ConcatString build_nc_var_name_sl1l2(const ConcatString &, const SL1L2Info &);
+static ConcatString build_nc_var_name_sal1l2(const ConcatString &, const SL1L2Info &);
+static ConcatString build_nc_var_name_cnt(const ConcatString &, const CNTInfo &);
 
 static void setup_nc_file(const VarInfo *, const VarInfo *);
 static void add_nc_var(const ConcatString &, const ConcatString &,
@@ -704,9 +712,6 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
    return found;
 }
 
-// TODO MET #1371 figure out how valid data thresholds should be handled
-//                when reading -aggr data
-
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane get_aggr_data(const ConcatString &var_name) {
@@ -794,7 +799,6 @@ void process_scores() {
    int i_point = 0;
    VarInfo *fcst_info = (VarInfo *) nullptr;
    VarInfo *obs_info  = (VarInfo *) nullptr;
-   PairDataPoint *pd_ptr = (PairDataPoint *) nullptr;
    DataPlane fcst_dp, obs_dp;
    const char *method_name = "process_scores() ";
 
@@ -806,8 +810,19 @@ void process_scores() {
    int n_skip_zero = 0;
    int n_skip_pos  = 0;
 
+   // Create a vector of PairDataPoint objects
+   vector<PairDataPoint> pd_block;
+   pd_block.resize(conf_info.block_size);
+   for(auto &x : pd_block) x.extend(n_series);
+
    // Loop over the data reads
    for(int i_read=0; i_read<n_reads; i_read++) {
+
+      // Re-initialize the PairDataPoint objects
+      for(auto &x : pd_block) {
+         x.erase();
+         x.set_climo_cdf_info_ptr(&conf_info.cdf_info);
+      }
 
       // Loop over the series variable
       for(int i_series=0; i_series<n_series; i_series++) {
@@ -824,19 +839,8 @@ void process_scores() {
          // Retrieve the data planes for the current series entry
          get_series_data(i_series, fcst_info, obs_info, fcst_dp, obs_dp);
 
-         // Allocate PairDataPoint objects, if needed
-         if(!pd_ptr) {
-            pd_ptr = new PairDataPoint [conf_info.block_size];
-            for(i=0; i<conf_info.block_size; i++) pd_ptr[i].extend(n_series);
-         }
-
-         // Re-initialize the PairDataPoint objects, if needed
+         // Define starting point for this data pass
          if(i_series == 0) {
-
-            for(i=0; i<conf_info.block_size; i++) {
-               pd_ptr[i].erase();
-               pd_ptr[i].set_climo_cdf_info_ptr(&conf_info.cdf_info);
-            }
 
             // Starting grid point
             i_point = i_read*conf_info.block_size;
@@ -905,17 +909,11 @@ void process_scores() {
                              (ocmn_flag ? ocmn_dp(x, y) : bad_data_double),
                              (ocsd_flag ? ocsd_dp(x, y) : bad_data_double));
 
-            pd_ptr[i].add_grid_pair(fcst_dp(x, y), obs_dp(x, y), cpi, default_grid_weight);
+            pd_block[i].add_grid_pair(fcst_dp(x, y), obs_dp(x, y),
+                                      cpi, default_grid_weight);
 
          } // end for i
       } // end for i_series
-
-      if(pd_ptr == nullptr) {
-         mlog << Debug(3) << method_name
-              << "Skipped computing statistics for each grid point "
-              << "in the block since PairDataPoint is not set.\n";
-         continue;
-      }
 
       // Compute statistics for each grid point in the block
       for(i=0; i<conf_info.block_size && (i_point+i)<grid.nxy(); i++) {
@@ -924,15 +922,15 @@ void process_scores() {
          DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
 
          // Check for the required number of matched pairs
-         if(pd_ptr[i].f_na.n()/(double) n_series < conf_info.vld_data_thresh) {
+         if(pd_block[i].f_na.n()/(double) n_series < conf_info.vld_data_thresh) {
             mlog << Debug(4)
                  << "[" << i+1 << " of " << conf_info.block_size
                  << "] Skipping point (" << x << ", " << y << ") with "
-                 << pd_ptr[i].f_na.n() << " matched pairs.\n";
+                 << pd_block[i].f_na.n() << " matched pairs.\n";
 
             // Keep track of the number of points skipped
-            if(pd_ptr[i].f_na.n() == 0) n_skip_zero++;
-            else                        n_skip_pos++;
+            if(pd_block[i].f_na.n() == 0) n_skip_zero++;
+            else                          n_skip_pos++;
 
             continue;
          }
@@ -940,7 +938,7 @@ void process_scores() {
             mlog << Debug(4)
                  << "[" << i+1 << " of " << conf_info.block_size
                  << "] Processing point (" << x << ", " << y << ") with "
-                 << pd_ptr[i].n_obs << " matched pairs.\n";
+                 << pd_block[i].n_obs << " matched pairs.\n";
          }
 
          // Compute contingency table counts and statistics
@@ -948,27 +946,27 @@ void process_scores() {
             (conf_info.output_stats[STATLineType::fho].n() +
              conf_info.output_stats[STATLineType::ctc].n() +
              conf_info.output_stats[STATLineType::cts].n()) > 0) {
-            do_cts(i_point+i, &pd_ptr[i]);
+            do_categorical(i_point+i, &pd_block[i]);
          }
 
          // Compute multi-category contingency table counts and statistics
          if(!conf_info.fcst_info[0]->is_prob() &&
             (conf_info.output_stats[STATLineType::mctc].n() +
              conf_info.output_stats[STATLineType::mcts].n()) > 0) {
-            do_mcts(i_point+i, &pd_ptr[i]);
+            do_multicategory(i_point+i, &pd_block[i]);
          }
 
          // Compute continuous statistics
          if(!conf_info.fcst_info[0]->is_prob() &&
             conf_info.output_stats[STATLineType::cnt].n() > 0) {
-            do_cnt(i_point+i, &pd_ptr[i]); // JHG work on me
+            do_continuous(i_point+i, &pd_block[i]);
          }
 
          // Compute partial sums
          if(!conf_info.fcst_info[0]->is_prob() &&
             (conf_info.output_stats[STATLineType::sl1l2].n() +
              conf_info.output_stats[STATLineType::sal1l2].n()) > 0) {
-            do_sl1l2(i_point+i, &pd_ptr[i]);
+            do_partialsums(i_point+i, &pd_block[i]);
          }
 
          // Compute probabilistics counts and statistics
@@ -977,19 +975,9 @@ void process_scores() {
              conf_info.output_stats[STATLineType::pstd].n() +
              conf_info.output_stats[STATLineType::pjc].n() +
              conf_info.output_stats[STATLineType::prc].n()) > 0) {
-            do_pct(i_point+i, &pd_ptr[i]);
+            do_probabilistic(i_point+i, &pd_block[i]);
          }
       } // end for i
-
-      // Erase the data
-      for(i=0; i<conf_info.block_size; i++) {
-         pd_ptr[i].f_na.erase();
-         pd_ptr[i].o_na.erase();
-         pd_ptr[i].fcmn_na.erase();
-         pd_ptr[i].fcsd_na.erase();
-         pd_ptr[i].ocmn_na.erase();
-         pd_ptr[i].ocsd_na.erase();
-      }
 
    } // end for i_read
 
@@ -1006,9 +994,6 @@ void process_scores() {
    add_att(nc_out, "obs_valid_end",  (string)unix_to_yyyymmdd_hhmmss(obs_valid_end));
    add_att(nc_out, "obs_lead_beg",   (string)sec_to_hhmmss(obs_lead_beg));
    add_att(nc_out, "obs_lead_end",   (string)sec_to_hhmmss(obs_lead_end));
-
-   // Clean up
-   if(pd_ptr) { delete [] pd_ptr; pd_ptr = (PairDataPoint *) nullptr; }
 
    // Print summary counts
    mlog << Debug(2)
@@ -1035,7 +1020,7 @@ void process_scores() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cts(int n, const PairDataPoint *pd_ptr) {
+void do_categorical(int n, const PairDataPoint *pd_ptr) {
 
    mlog << Debug(4) << "Computing Categorical Statistics.\n";
 
@@ -1055,7 +1040,7 @@ void do_cts(int n, const PairDataPoint *pd_ptr) {
       }
    }
 
-   // Aggregate new point data with input CTC counts
+   // Aggregate input pair data with existing CTC counts
    if(aggr_file.nonempty()) {
 
       // Index NumArray to use all points
@@ -1072,7 +1057,7 @@ void do_cts(int n, const PairDataPoint *pd_ptr) {
          TTContingencyTable aggr_ctc;
          read_aggr_ctc(n, cts_info[i], aggr_ctc);
 
-         // Aggregate past CTC counts with new ones
+         // Aggregate CTC counts
          cts_info[i].cts += aggr_ctc;
 
          // Compute statistics and confidence intervals
@@ -1126,8 +1111,7 @@ void do_cts(int n, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_mcts(int n, const PairDataPoint *pd_ptr) {
-   int i;
+void do_multicategory(int n, const PairDataPoint *pd_ptr) {
 
    mlog << Debug(4) << "Computing Multi-Category Statistics.\n";
 
@@ -1141,11 +1125,11 @@ void do_mcts(int n, const PairDataPoint *pd_ptr) {
    mcts_info.set_othresh(conf_info.ocat_ta);
 
    mcts_info.allocate_n_alpha(conf_info.ci_alpha.n());
-   for(i=0; i<conf_info.ci_alpha.n(); i++) {
+   for(int i=0; i<conf_info.ci_alpha.n(); i++) {
       mcts_info.alpha[i] = conf_info.ci_alpha[i];
    }
 
-   // Aggregate new point data with input MCTC counts
+   // Aggregate input pair data with existing MCTC counts
    if(aggr_file.nonempty()) {
 
       // Index NumArray to use all points
@@ -1159,7 +1143,7 @@ void do_mcts(int n, const PairDataPoint *pd_ptr) {
       ContingencyTable aggr_ctc;
       read_aggr_mctc(n, mcts_info, aggr_ctc);
 
-      // Aggregate past MCTC counts with new ones
+      // Aggregate MCTC counts
       mcts_info.cts += aggr_ctc;
 
       // Compute statistics and confidence intervals
@@ -1183,13 +1167,13 @@ void do_mcts(int n, const PairDataPoint *pd_ptr) {
    }
 
    // Add statistic value for each possible MCTC column
-   for(i=0; i<conf_info.output_stats[STATLineType::mctc].n(); i++) {
+   for(int i=0; i<conf_info.output_stats[STATLineType::mctc].n(); i++) {
       store_stat_mctc(n, conf_info.output_stats[STATLineType::mctc][i],
                       mcts_info);
    }
 
    // Add statistic value for each possible MCTS column
-   for(i=0; i<conf_info.output_stats[STATLineType::mcts].n(); i++) {
+   for(int i=0; i<conf_info.output_stats[STATLineType::mcts].n(); i++) {
       store_stat_mcts(n, conf_info.output_stats[STATLineType::mcts][i],
                       mcts_info);
    }
@@ -1199,7 +1183,7 @@ void do_mcts(int n, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cnt(int n, const PairDataPoint *pd_ptr) {
+void do_continuous(int n, const PairDataPoint *pd_ptr) {
    int i, j;
    CNTInfo cnt_info;
    PairDataPoint pd;
@@ -1223,29 +1207,51 @@ void do_cnt(int n, const PairDataPoint *pd_ptr) {
          cnt_info.alpha[j] = conf_info.ci_alpha[j];
       }
 
-      // Apply continuous filtering thresholds to subset pairs
-      pd = pd_ptr->subset_pairs_cnt_thresh(cnt_info.fthresh, cnt_info.othresh,
-                                           cnt_info.logic);
+      // Aggregate input pair data with existing partial sums
+      if(aggr_file.nonempty()) {
 
-      // Check for no matched pairs to process
-      if(pd.n_obs == 0) continue;
+         // Compute partial sums from the pair data
+         SL1L2Info s_info;
+         s_info.fthresh = cnt_info.fthresh;
+         s_info.othresh = cnt_info.othresh;
+         s_info.logic   = cnt_info.logic;
+         s_info.set(*pd_ptr);
 
-      // Compute the stats, normal confidence intervals, and
-      // bootstrap confidence intervals
-      int precip_flag = (conf_info.fcst_info[0]->is_precipitation() &&
-                         conf_info.obs_info[0]->is_precipitation());
+         // Aggregate partial sums
+         SL1L2Info aggr_psum;
+         read_aggr_sl1l2(n, s_info, aggr_psum);
+         s_info += aggr_psum;
 
-      if(conf_info.boot_interval == BootIntervalType::BCA) {
-         compute_cnt_stats_ci_bca(rng_ptr, pd,
-            precip_flag, conf_info.rank_corr_flag,
-            conf_info.n_boot_rep,
-            cnt_info, conf_info.tmp_dir.c_str());
+         // Compute continuous statistics from partial sums
+         compute_cntinfo(s_info, false, cnt_info);
       }
+      // Compute continuous statistics from the pair data
       else {
-         compute_cnt_stats_ci_perc(rng_ptr, pd,
-            precip_flag, conf_info.rank_corr_flag,
-            conf_info.n_boot_rep, conf_info.boot_rep_prop,
-            cnt_info, conf_info.tmp_dir.c_str());
+
+         // Apply continuous filtering thresholds to subset pairs
+         pd = pd_ptr->subset_pairs_cnt_thresh(cnt_info.fthresh, cnt_info.othresh,
+                                              cnt_info.logic);
+
+         // Check for no matched pairs to process
+         if(pd.n_obs == 0) continue;
+
+         // Compute the stats, normal confidence intervals, and
+         // bootstrap confidence intervals
+         int precip_flag = (conf_info.fcst_info[0]->is_precipitation() &&
+                            conf_info.obs_info[0]->is_precipitation());
+
+         if(conf_info.boot_interval == BootIntervalType::BCA) {
+            compute_cnt_stats_ci_bca(rng_ptr, pd,
+               precip_flag, conf_info.rank_corr_flag,
+               conf_info.n_boot_rep,
+               cnt_info, conf_info.tmp_dir.c_str());
+         }
+         else {
+            compute_cnt_stats_ci_perc(rng_ptr, pd,
+               precip_flag, conf_info.rank_corr_flag,
+               conf_info.n_boot_rep, conf_info.boot_rep_prop,
+               cnt_info, conf_info.tmp_dir.c_str());
+         }
       }
 
       // Add statistic value for each possible CNT column
@@ -1260,16 +1266,15 @@ void do_cnt(int n, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_sl1l2(int n, const PairDataPoint *pd_ptr) {
-   int i, j;
-   SL1L2Info s_info;
+void do_partialsums(int n, const PairDataPoint *pd_ptr) {
 
    mlog << Debug(4) << "Computing Scalar Partial Sums.\n";
 
-   // Loop over the continuous thresholds and compute scalar partial sums
-   for(i=0; i<conf_info.fcnt_ta.n(); i++) {
+   // Process each filtering threshold
+   for(int i=0; i<conf_info.fcnt_ta.n(); i++) {
 
       // Store thresholds
+      SL1L2Info s_info;
       s_info.fthresh = conf_info.fcnt_ta[i];
       s_info.othresh = conf_info.ocnt_ta[i];
       s_info.logic   = conf_info.cnt_logic;
@@ -1277,16 +1282,36 @@ void do_sl1l2(int n, const PairDataPoint *pd_ptr) {
       // Compute partial sums
       s_info.set(*pd_ptr);
 
+      // Aggregate input pair data with existing partial sums
+      if(aggr_file.nonempty()) {
+
+         // Read the partial sum data to be aggregated
+         SL1L2Info aggr_psum;
+
+         // Aggregate SL1L2 partial sums
+         if(conf_info.output_stats[STATLineType::sl1l2].n() > 0) {
+            read_aggr_sl1l2(n, s_info, aggr_psum);
+            s_info += aggr_psum;
+         }
+
+         // Aggregate SAL1L2 partial sums
+         if(conf_info.output_stats[STATLineType::sal1l2].n() > 0) {
+            read_aggr_sal1l2(n, s_info, aggr_psum);
+            s_info += aggr_psum;
+         }
+      }
+
       // Add statistic value for each possible SL1L2 column
-      for(j=0; j<conf_info.output_stats[STATLineType::sl1l2].n(); j++) {
+      for(int j=0; j<conf_info.output_stats[STATLineType::sl1l2].n(); j++) {
          store_stat_sl1l2(n, conf_info.output_stats[STATLineType::sl1l2][j], s_info);
       }
 
       // Add statistic value for each possible SAL1L2 column
-      for(j=0; j<conf_info.output_stats[STATLineType::sal1l2].n(); j++) {
+      for(int j=0; j<conf_info.output_stats[STATLineType::sal1l2].n(); j++) {
          store_stat_sal1l2(n, conf_info.output_stats[STATLineType::sal1l2][j], s_info);
       }
-   }
+
+   } // end for i
 
    return;
 }
@@ -1319,6 +1344,60 @@ void read_aggr_ctc(int n, const CTSInfo &cts_info,
       else if(c == "FN_OY")    { aggr_ctc.set_fn_oy(nint(v)); }
       else if(c == "FN_ON")    { aggr_ctc.set_fn_on(nint(v)); }
       else if(c == "EC_VALUE") { aggr_ctc.set_ec_value(v);    }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void read_aggr_sl1l2(int n, const SL1L2Info &s_info,
+                     SL1L2Info &aggr_psum) {
+
+   // Initialize
+   aggr_psum.zero_out();
+
+   // Loop over the SL1L2 column names
+   for(int i=0; i<n_sl1l2_columns; i++) {
+
+      ConcatString c(to_upper(sl1l2_columns[i]));
+      ConcatString var_name(build_nc_var_name_sl1l2(c, s_info));
+
+      // Read aggregate data, if needed
+      if(aggr_data.count(var_name) == 0) {
+         aggr_data[var_name] = get_aggr_data(var_name);
+      }
+
+      // Populate the partial sums
+      aggr_psum.set_sl1l2_stat(sl1l2_columns[i],
+                               aggr_data[var_name].buf()[n]);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void read_aggr_sal1l2(int n, const SL1L2Info &s_info,
+                      SL1L2Info &aggr_psum) {
+
+   // Initialize
+   aggr_psum.zero_out();
+
+   // Loop over the SAL1L2 column names
+   for(int i=0; i<n_sal1l2_columns; i++) {
+
+      ConcatString c(to_upper(sal1l2_columns[i]));
+      ConcatString var_name(build_nc_var_name_sal1l2(c, s_info));
+
+      // Read aggregate data, if needed
+      if(aggr_data.count(var_name) == 0) {
+         aggr_data[var_name] = get_aggr_data(var_name);
+      }
+
+      // Populate the partial sums
+      aggr_psum.set_sal1l2_stat(sal1l2_columns[i],
+                                aggr_data[var_name].buf()[n]);
    }
 
    return;
@@ -1435,7 +1514,7 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_pct(int n, const PairDataPoint *pd_ptr) {
+void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
    int i, j;
 
    mlog << Debug(4) << "Computing Probabilistic Statistics.\n";
@@ -1457,7 +1536,7 @@ void do_pct(int n, const PairDataPoint *pd_ptr) {
       // Set the current observation threshold
       pct_info.othresh = conf_info.ocat_ta[i];
 
-      // Aggregate new point data with input PCT counts
+      // Aggregate input pair data with existing PCT counts
       if(aggr_file.nonempty()) {
 
          // Compute the probabilistic counts
@@ -1467,15 +1546,11 @@ void do_pct(int n, const PairDataPoint *pd_ptr) {
          Nx2ContingencyTable aggr_pct;
          read_aggr_pct(n, pct_info, aggr_pct);
 
-         // Aggregate past PCT counts with new ones
+         // Aggregate PCT counts
          pct_info.pct += aggr_pct;
 
          // Zero out the climatology PCT table which cannot be aggregated
          pct_info.climo_pct.zero_out();
-
-         // TODO: MET #1371 can the climo brier score (briercl)
-         //       be aggregated as a weighted average? If so,
-         //       add logic to handle that.
 
          // Compute statistics and confidence intervals
          pct_info.compute_stats();
@@ -2049,15 +2124,7 @@ void store_stat_cnt(int n, const ConcatString &col,
       }
 
       // Construct the NetCDF variable name
-      var_name << cs_erase << "series_cnt_" << c;
-
-      // Append threshold information, if supplied
-      if(cnt_info.fthresh.get_type() != thresh_na ||
-         cnt_info.othresh.get_type() != thresh_na) {
-         var_name << "_fcst" << cnt_info.fthresh.get_abbr_str()
-                  << "_" << setlogic_to_abbr(conf_info.cnt_logic)
-                  << "_obs" << cnt_info.othresh.get_abbr_str();
-      }
+      ConcatString var_name(build_nc_var_name_cnt(c, cnt_info));
 
       // Append confidence interval alpha value
       if(n_ci > 1) var_name << "_a"  << cnt_info.alpha[i];
@@ -2088,7 +2155,6 @@ void store_stat_cnt(int n, const ConcatString &col,
 void store_stat_sl1l2(int n, const ConcatString &col,
                       const SL1L2Info &s_info) {
    double v;
-   ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
@@ -2112,21 +2178,14 @@ void store_stat_sl1l2(int n, const ConcatString &col,
    }
 
    // Construct the NetCDF variable name
-   var_name << cs_erase << "series_sl1l2_" << c;
-
-   // Append threshold information, if supplied
-   if(s_info.fthresh.get_type() != thresh_na ||
-      s_info.othresh.get_type() != thresh_na) {
-      var_name << "_fcst" << s_info.fthresh.get_abbr_str()
-               << "_" << setlogic_to_abbr(conf_info.cnt_logic)
-               << "_obs" << s_info.othresh.get_abbr_str();
-   }
+   ConcatString var_name(build_nc_var_name_sl1l2(c, s_info));
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
       // Build key
-      lty_stat << "SL1L2_" << c;
+      ConcatString lty_stat("SL1L2_");
+      lty_stat << c;
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
@@ -2169,16 +2228,7 @@ void store_stat_sal1l2(int n, const ConcatString &col,
    }
 
    // Construct the NetCDF variable name
-   ConcatString var_name("series_sal1l2_");
-   var_name << c;
-
-   // Append threshold information, if supplied
-   if(s_info.fthresh.get_type() != thresh_na ||
-      s_info.othresh.get_type() != thresh_na) {
-      var_name << "_fcst" << s_info.fthresh.get_abbr_str()
-               << "_" << setlogic_to_abbr(conf_info.cnt_logic)
-               << "_obs" << s_info.othresh.get_abbr_str();
-   }
+   ConcatString var_name(build_nc_var_name_sal1l2(c, s_info));
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
@@ -2527,11 +2577,12 @@ void store_stat_all_pct(int n, const PCTInfo &pct_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString build_nc_var_name_ctc(const ConcatString &col, const CTSInfo &cts_info) {
-   ConcatString var_name;
+ConcatString build_nc_var_name_ctc(const ConcatString &col,
+                                   const CTSInfo &cts_info) {
 
    // Append the column name
-   var_name << "series_ctc_" << col;
+   ConcatString var_name("series_ctc_");
+   var_name << col;
 
    // Append threshold information
    if(cts_info.fthresh == cts_info.othresh) {
@@ -2540,6 +2591,66 @@ ConcatString build_nc_var_name_ctc(const ConcatString &col, const CTSInfo &cts_i
    else {
       var_name << "_fcst" << cts_info.fthresh.get_abbr_str()
                << "_obs" << cts_info.othresh.get_abbr_str();
+   }
+
+   return var_name;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString build_nc_var_name_sl1l2(const ConcatString &col,
+                                     const SL1L2Info &s_info) {
+
+   // Append the column name
+   ConcatString var_name("series_sl1l2_");
+   var_name << col;
+
+   // Append threshold information, if supplied
+   if(s_info.fthresh.get_type() != thresh_na ||
+      s_info.othresh.get_type() != thresh_na) {
+      var_name << "_fcst" << s_info.fthresh.get_abbr_str()
+               << "_" << setlogic_to_abbr(s_info.logic)
+               << "_obs" << s_info.othresh.get_abbr_str();
+   }
+
+   return var_name;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString build_nc_var_name_sal1l2(const ConcatString &col,
+                                      const SL1L2Info &s_info) {
+
+   // Append the column name
+   ConcatString var_name("series_sal1l2_");
+   var_name << col;
+
+   // Append threshold information, if supplied
+   if(s_info.fthresh.get_type() != thresh_na ||
+      s_info.othresh.get_type() != thresh_na) {
+      var_name << "_fcst" << s_info.fthresh.get_abbr_str()
+               << "_" << setlogic_to_abbr(s_info.logic)
+               << "_obs" << s_info.othresh.get_abbr_str();
+   }
+
+   return var_name;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString build_nc_var_name_cnt(const ConcatString &col,
+                                   const CNTInfo &cnt_info) {
+
+   // Append the column name
+   ConcatString var_name("series_cnt_");
+   var_name << col;
+
+   // Append threshold information, if supplied
+   if(cnt_info.fthresh.get_type() != thresh_na ||
+      cnt_info.othresh.get_type() != thresh_na) {
+      var_name << "_fcst" << cnt_info.fthresh.get_abbr_str()
+               << "_" << setlogic_to_abbr(cnt_info.logic)
+               << "_obs" << cnt_info.othresh.get_abbr_str();
    }
 
    return var_name;

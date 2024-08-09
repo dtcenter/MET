@@ -1306,6 +1306,68 @@ void SL1L2Info::set(const PairDataPoint &pd_all) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void SL1L2Info::set_sl1l2_stat(const string &stat_name, double v) {
+
+        if(stat_name == "TOTAL") scount = nint(v);
+   else if(stat_name == "FBAR" ) fbar   = v;
+   else if(stat_name == "OBAR" ) obar   = v;
+   else if(stat_name == "FOBAR") fobar  = v;
+   else if(stat_name == "FFBAR") ffbar  = v;
+   else if(stat_name == "OOBAR") oobar  = v;
+   else if(stat_name == "MAE"  ) smae   = v;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void SL1L2Info::set_sal1l2_stat(const string &stat_name, double v) {
+
+        if(stat_name == "TOTAL" ) sacount = nint(v);
+   else if(stat_name == "FABAR" ) fabar   = v;
+   else if(stat_name == "OABAR" ) oabar   = v;
+   else if(stat_name == "FOABAR") foabar  = v;
+   else if(stat_name == "FFABAR") ffabar  = v;
+   else if(stat_name == "OOABAR") ooabar  = v;
+   else if(stat_name == "MAE"   ) samae   = v;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double SL1L2Info::get_sl1l2_stat(const string &stat_name) const {
+   double v = bad_data_double;
+
+        if(stat_name == "TOTAL") v = (double) scount;
+   else if(stat_name == "FBAR" ) v = fbar;
+   else if(stat_name == "OBAR" ) v = obar;
+   else if(stat_name == "FOBAR") v = fobar;
+   else if(stat_name == "FFBAR") v = ffbar;
+   else if(stat_name == "OOBAR") v = oobar;
+   else if(stat_name == "MAE"  ) v = smae;
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double SL1L2Info::get_sal1l2_stat(const string &stat_name) const {
+   double v = bad_data_double;
+
+        if(stat_name == "TOTAL" ) v = (double) sacount;
+   else if(stat_name == "FABAR" ) v = fabar;
+   else if(stat_name == "OABAR" ) v = oabar;
+   else if(stat_name == "FOABAR") v = foabar;
+   else if(stat_name == "FFABAR") v = ffabar;
+   else if(stat_name == "OOABAR") v = ooabar;
+   else if(stat_name == "MAE"   ) v = samae;
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class VL1L2Info
 //
