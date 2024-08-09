@@ -1428,7 +1428,6 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
          int i_row = atoi(strrchr(c.c_str(), '_') + 1) - 1;
          aggr_pct.set_nonevent(i_row, nint(v));
       }
-
    } // end for i
 
    return;
