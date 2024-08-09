@@ -1204,7 +1204,7 @@ The first set of header columns are common to all of the output files generated 
     - Mean(o²)
   * - 31
     - MAE
-    - Mean Absolute Error
+    - Mean(\|f-o\|)
 
 .. _table_PS_format_info_SAL1L2:
 
@@ -1223,25 +1223,25 @@ The first set of header columns are common to all of the output files generated 
     - Scalar Anomaly L1L2 line type
   * - 25
     - TOTAL
-    - Total number of matched triplets of forecast (f), observation (o), and climatological value (c)
+    - Total number of matched pairs of forecast (f), observation (o), forecast climatology (cf), and observation climatology (co)
   * - 26
     - FABAR
-    - Mean(f-c)
+    - Mean(f-cf)
   * - 27
     - OABAR
-    - Mean(o-c)
+    - Mean(o-co)
   * - 28
     - FOABAR
-    - Mean((f-c)*(o-c))
+    - Mean((f-cf)*(o-co))
   * - 29
     - FFABAR
-    - Mean((f-c)²)
+    - Mean((f-cf)²)
   * - 30
     - OOABAR
-    - Mean((o-c)²)
+    - Mean((o-co)²)
   * - 31
     - MAE
-    - Mean Absolute Error
+    - Mean(\|(f-cf)-(o-co)\|)
 
 .. _table_PS_format_info_VL1L2:
 
@@ -1318,28 +1318,28 @@ The first set of header columns are common to all of the output files generated 
     - Vector Anomaly L1L2 line type
   * - 25
     - TOTAL
-    - Total number of matched triplets of forecast winds (uf, vf), observation winds (uo, vo), and climatological winds (uc, vc)
+    - Total number of matched pairs of forecast winds (uf, vf), observation winds (uo, vo), forecast climatology winds (ucf, vcf), and observation climatology winds (uco, vco)
   * - 26
     - UFABAR
-    - Mean(uf-uc)
+    - Mean(uf-ucf)
   * - 27
     - VFABAR
-    - Mean(vf-vc)
+    - Mean(vf-vcf)
   * - 28
     - UOABAR
-    - Mean(uo-uc)
+    - Mean(uo-uco)
   * - 29
     - VOABAR
-    - Mean(vo-vc)
+    - Mean(vo-vco)
   * - 30
     - UVFOABAR
-    - Mean((uf-uc)*(uo-uc)+(vf-vc)*(vo-vc))
+    - Mean((uf-ucf)*(uo-uco)+(vf-vcf)*(vo-vco))
   * - 31
     - UVFFABAR
-    - Mean((uf-uc)²+(vf-vc)²)
+    - Mean((uf-ucf)²+(vf-vcf)²)
   * - 32
     - UVOOABAR
-    - Mean((uo-uc)²+(vo-vc)²)
+    - Mean((uo-uco)²+(vo-vco)²)
   * - 33
     - FA_SPEED_BAR
     - Mean forecast wind speed anomaly
@@ -1348,7 +1348,7 @@ The first set of header columns are common to all of the output files generated 
     - Mean observed wind speed anomaly
   * - 35
     - TOTAL_DIR 
-    - Total number of matched triplets for which the forecast, observation, and climatological wind directions are well-defined (i.e. non-zero vectors)
+    - Total number of matched pairs for which the forecast, observation, forecast climatology, and observation climatology wind directions are well-defined (i.e. non-zero vectors)
   * - 36
     - DIRA_ME
     - Mean wind direction anomaly difference, from -180 to 180 degrees

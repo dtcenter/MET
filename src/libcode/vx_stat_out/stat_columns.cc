@@ -2949,7 +2949,7 @@ void write_sl1l2_cols(const SL1L2Info &sl1l2_info,
       sl1l2_info.oobar);
 
    at.set_entry(r, c+6,  // MAE
-      sl1l2_info.mae);
+      sl1l2_info.smae);
 
    return;
 }
@@ -2985,7 +2985,7 @@ void write_sal1l2_cols(const SL1L2Info &sl1l2_info,
       sl1l2_info.ooabar);
 
    at.set_entry(r, c+6,  // MAE
-      sl1l2_info.mae);
+      sl1l2_info.samae);
 
    return;
 }
