@@ -200,7 +200,7 @@ void parse_sl1l2_line(STATLine &l, SL1L2Info &s_info) {
    s_info.fobar  = atof(l.get_item("FOBAR"));
    s_info.ffbar  = atof(l.get_item("FFBAR"));
    s_info.oobar  = atof(l.get_item("OOBAR"));
-   s_info.mae    = atof(l.get_item("MAE"));
+   s_info.smae   = atof(l.get_item("MAE"));
 
    return;
 }
@@ -217,7 +217,7 @@ void parse_sal1l2_line(STATLine &l, SL1L2Info &s_info) {
    s_info.foabar  = atof(l.get_item("FOABAR"));
    s_info.ffabar  = atof(l.get_item("FFABAR"));
    s_info.ooabar  = atof(l.get_item("OOABAR"));
-   s_info.mae     = atof(l.get_item("MAE"));
+   s_info.samae   = atof(l.get_item("MAE"));
 
    return;
 }

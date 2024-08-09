@@ -3999,12 +3999,6 @@ void mpr_to_cnt(STATAnalysisJob &job, const AggrMPRInfo &info,
 
 void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
                  int i_thresh, SL1L2Info &s_info) {
-   int i;
-   int scount, sacount;
-   double f, o, fc, oc;
-   double f_sum,  o_sum,  ff_sum,  oo_sum,  fo_sum;
-   double fa_sum, oa_sum, ffa_sum, ooa_sum, foa_sum;
-   double abs_err_sum;
    PairDataPoint pd_thr;
 
    //
@@ -4034,31 +4028,41 @@ void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    // Initialize counts
    //
-   scount = sacount = 0;
-   f_sum  = o_sum  =  ff_sum  = oo_sum  = fo_sum  = 0.0;
-   fa_sum = oa_sum =  ffa_sum = ooa_sum = foa_sum = 0.0;
-   abs_err_sum = 0.0;
+   int scount       = 0;
+   int sacount      = 0;
+   double f_sum     = 0.0;
+   double o_sum     = 0.0;
+   double ff_sum    = 0.0;
+   double oo_sum    = 0.0;
+   double fo_sum    = 0.0;
+   double smae_sum  = 0.0;
+   double fa_sum    = 0.0;
+   double oa_sum    = 0.0;
+   double ffa_sum   = 0.0;
+   double ooa_sum   = 0.0;
+   double foa_sum   = 0.0;
+   double samae_sum = 0.0;
 
    //
    // Update the partial sums
    //
-   for(i=0; i<pd_thr.n_obs; i++) {
+   for(int i=0; i<pd_thr.n_obs; i++) {
 
       //
       // Update the counts for this matched pair
       //
-      f  = pd_thr.f_na[i];
-      o  = pd_thr.o_na[i];
-      fc = pd_thr.fcmn_na[i];
-      oc = pd_thr.ocmn_na[i];
+      double f  = pd_thr.f_na[i];
+      double o  = pd_thr.o_na[i];
+      double fc = pd_thr.fcmn_na[i];
+      double oc = pd_thr.ocmn_na[i];
 
-      f_sum       += f;
-      o_sum       += o;
-      ff_sum      += f*f;
-      oo_sum      += o*o;
-      fo_sum      += f*o;
-      abs_err_sum += fabs(f-o);
-      scount      += 1;
+      f_sum    += f;
+      o_sum    += o;
+      ff_sum   += f*f;
+      oo_sum   += o*o;
+      fo_sum   += f*o;
+      smae_sum += fabs(f-o);
+      scount   += 1;
 
       //
       // Check for valid climo data
@@ -4070,6 +4074,7 @@ void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
          ffa_sum   += (f-fc)*(f-fc);
          ooa_sum   += (o-oc)*(o-oc);
          foa_sum   += (f-oc)*(o-oc);
+         samae_sum += fabs((f-fc)-(o-oc));
          sacount   += 1;
       }
    } // end for
@@ -4081,16 +4086,17 @@ void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
       s_info.fobar  = fo_sum/scount;
       s_info.ffbar  = ff_sum/scount;
       s_info.oobar  = oo_sum/scount;
-      s_info.mae    = abs_err_sum/scount;
+      s_info.smae   = smae_sum/scount;
    }
 
    if(sacount != 0) {
-      s_info.sacount  = sacount;
-      s_info.fabar    = fa_sum/sacount;
-      s_info.oabar    = oa_sum/sacount;
-      s_info.foabar   = foa_sum/sacount;
-      s_info.ffabar   = ffa_sum/sacount;
-      s_info.ooabar   = ooa_sum/sacount;
+      s_info.sacount = sacount;
+      s_info.fabar   = fa_sum/sacount;
+      s_info.oabar   = oa_sum/sacount;
+      s_info.foabar  = foa_sum/sacount;
+      s_info.ffabar  = ffa_sum/sacount;
+      s_info.ooabar  = ooa_sum/sacount;
+      s_info.samae   = samae_sum/scount;
    }
 
    return;

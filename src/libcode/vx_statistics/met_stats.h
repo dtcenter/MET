@@ -224,16 +224,15 @@ class SL1L2Info {
       double fbar, obar;
       double fobar;
       double ffbar, oobar;
+      double smae;
       int    scount;
 
       // SAL1L2 Quantities
       double fabar, oabar;
       double foabar;
       double ffabar, ooabar;
+      double samae;
       int    sacount;
-
-      // Mean absolute error
-      double mae;
 
       // Compute sums
       void set(const PairDataPoint &);

@@ -92,17 +92,18 @@ static void do_cnt   (int, const PairDataPoint *);
 static void do_sl1l2 (int, const PairDataPoint *);
 static void do_pct   (int, const PairDataPoint *);
 
-static void store_stat_fho  (int, const ConcatString &, const CTSInfo &);
-static void store_stat_ctc  (int, const ConcatString &, const CTSInfo &);
-static void store_stat_cts  (int, const ConcatString &, const CTSInfo &);
-static void store_stat_mctc (int, const ConcatString &, const MCTSInfo &);
-static void store_stat_mcts (int, const ConcatString &, const MCTSInfo &);
-static void store_stat_cnt  (int, const ConcatString &, const CNTInfo &);
-static void store_stat_sl1l2(int, const ConcatString &, const SL1L2Info &);
-static void store_stat_pct  (int, const ConcatString &, const PCTInfo &);
-static void store_stat_pstd (int, const ConcatString &, const PCTInfo &);
-static void store_stat_pjc  (int, const ConcatString &, const PCTInfo &);
-static void store_stat_prc  (int, const ConcatString &, const PCTInfo &);
+static void store_stat_fho   (int, const ConcatString &, const CTSInfo &);
+static void store_stat_ctc   (int, const ConcatString &, const CTSInfo &);
+static void store_stat_cts   (int, const ConcatString &, const CTSInfo &);
+static void store_stat_mctc  (int, const ConcatString &, const MCTSInfo &);
+static void store_stat_mcts  (int, const ConcatString &, const MCTSInfo &);
+static void store_stat_cnt   (int, const ConcatString &, const CNTInfo &);
+static void store_stat_sl1l2 (int, const ConcatString &, const SL1L2Info &);
+static void store_stat_sal1l2(int, const ConcatString &, const SL1L2Info &);
+static void store_stat_pct   (int, const ConcatString &, const PCTInfo &);
+static void store_stat_pstd  (int, const ConcatString &, const PCTInfo &);
+static void store_stat_pjc   (int, const ConcatString &, const PCTInfo &);
+static void store_stat_prc   (int, const ConcatString &, const PCTInfo &);
 
 static void setup_nc_file(const VarInfo *, const VarInfo *);
 static void add_nc_var(const ConcatString &, const ConcatString &,
@@ -866,8 +867,8 @@ void process_scores() {
 
          // Compute partial sums
          if(!conf_info.fcst_info[0]->is_prob() &&
-            (conf_info.output_stats[STATLineType::sl1l2].n()  > 0 ||
-             conf_info.output_stats[STATLineType::sal1l2].n() > 0)) {
+            (conf_info.output_stats[STATLineType::sl1l2].n() +
+             conf_info.output_stats[STATLineType::sal1l2].n()) > 0) {
             do_sl1l2(i_point+i, &pd_ptr[i]);
          }
 
@@ -1133,6 +1134,11 @@ void do_sl1l2(int n, const PairDataPoint *pd_ptr) {
       // Add statistic value for each possible SL1L2 column
       for(j=0; j<conf_info.output_stats[STATLineType::sl1l2].n(); j++) {
          store_stat_sl1l2(n, conf_info.output_stats[STATLineType::sl1l2][j], s_info);
+      }
+
+      // Add statistic value for each possible SAL1L2 column
+      for(j=0; j<conf_info.output_stats[STATLineType::sal1l2].n(); j++) {
+         store_stat_sal1l2(n, conf_info.output_stats[STATLineType::sal1l2][j], s_info);
       }
    } // end for i
 
@@ -1776,19 +1782,13 @@ void store_stat_sl1l2(int n, const ConcatString &col,
    ConcatString c = to_upper(col);
 
    // Get the column value
-        if(c == "TOTAL")  { v = (double) s_info.scount; }
-   else if(c == "FBAR")   { v = s_info.fbar;            }
-   else if(c == "OBAR")   { v = s_info.obar;            }
-   else if(c == "FOBAR")  { v = s_info.fobar;           }
-   else if(c == "FFBAR")  { v = s_info.ffbar;           }
-   else if(c == "OOBAR")  { v = s_info.oobar;           }
-   else if(c == "MAE")    { v = s_info.mae;             }
-   else if(c == "FABAR")  { v = s_info.fabar;           }
-   else if(c == "OABAR")  { v = s_info.oabar;           }
-   else if(c == "FOABAR") { v = s_info.foabar;          }
-   else if(c == "FFABAR") { v = s_info.ffabar;          }
-   else if(c == "OOABAR") { v = s_info.ooabar;          }
-   else if(c == "MAE")    { v = s_info.mae;             }
+        if(c == "TOTAL") { v = (double) s_info.scount; }
+   else if(c == "FBAR")  { v = s_info.fbar;            }
+   else if(c == "OBAR")  { v = s_info.obar;            }
+   else if(c == "FOBAR") { v = s_info.fobar;           }
+   else if(c == "FFBAR") { v = s_info.ffbar;           }
+   else if(c == "OOBAR") { v = s_info.oobar;           }
+   else if(c == "MAE")   { v = s_info.smae;            }
    else {
      mlog << Error << "\nstore_stat_sl1l2() -> "
           << "unsupported column name requested \"" << c
@@ -1812,6 +1812,62 @@ void store_stat_sl1l2(int n, const ConcatString &col,
 
       // Build key
       lty_stat << "SL1L2_" << c;
+
+      // Add new map entry
+      add_nc_var(var_name, c, stat_long_name[lty_stat],
+                 s_info.fthresh.get_str(),
+                 s_info.othresh.get_str(),
+                 bad_data_double);
+   }
+
+   // Store the statistic value
+   put_nc_val(n, var_name, (float) v);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void store_stat_sal1l2(int n, const ConcatString &col,
+                       const SL1L2Info &s_info) {
+   double v;
+
+   // Set the column name to all upper case
+   ConcatString c = to_upper(col);
+
+   // Get the column value
+        if(c == "TOTAL")  { v = (double) s_info.sacount; }
+   else if(c == "FABAR")  { v = s_info.fabar;            }
+   else if(c == "OABAR")  { v = s_info.oabar;            }
+   else if(c == "FOABAR") { v = s_info.foabar;           }
+   else if(c == "FFABAR") { v = s_info.ffabar;           }
+   else if(c == "OOABAR") { v = s_info.ooabar;           }
+   else if(c == "MAE")    { v = s_info.samae;            }
+   else {
+     mlog << Error << "\nstore_stat_sal1l2() -> "
+          << "unsupported column name requested \"" << c
+          << "\"\n\n";
+     exit(1);
+   }
+
+   // Construct the NetCDF variable name
+   ConcatString var_name("series_sal1l2_");
+   var_name << c;
+
+   // Append threshold information, if supplied
+   if(s_info.fthresh.get_type() != thresh_na ||
+      s_info.othresh.get_type() != thresh_na) {
+      var_name << "_fcst" << s_info.fthresh.get_abbr_str()
+               << "_" << setlogic_to_abbr(conf_info.cnt_logic)
+               << "_obs" << s_info.othresh.get_abbr_str();
+   }
+
+   // Add map for this variable name
+   if(stat_data.count(var_name) == 0) {
+
+      // Build key
+      ConcatString lty_stat("SAL1L2_");
+      lty_stat << c;
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],

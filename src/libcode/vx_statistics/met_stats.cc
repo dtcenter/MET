@@ -1124,11 +1124,11 @@ SL1L2Info & SL1L2Info::operator+=(const SL1L2Info &c) {
       s_info.ffbar = (ffbar*scount + c.ffbar*c.scount)/s_info.scount;
       s_info.oobar = (oobar*scount + c.oobar*c.scount)/s_info.scount;
 
-      if(is_bad_data(mae) || is_bad_data(c.mae)) {
-         s_info.mae = bad_data_double;
+      if(is_bad_data(smae) || is_bad_data(c.smae)) {
+         s_info.smae = bad_data_double;
       }
       else {
-         s_info.mae = (mae*scount + c.mae*c.scount)/s_info.scount;
+         s_info.smae = (smae*scount + c.smae*c.scount)/s_info.scount;
       }
    }
 
@@ -1141,11 +1141,11 @@ SL1L2Info & SL1L2Info::operator+=(const SL1L2Info &c) {
       s_info.ffabar = (ffabar*sacount + c.ffabar*c.sacount)/s_info.sacount;
       s_info.ooabar = (ooabar*sacount + c.ooabar*c.sacount)/s_info.sacount;
 
-      if(is_bad_data(mae) || is_bad_data(c.mae)) {
-         s_info.mae = bad_data_double;
+      if(is_bad_data(samae) || is_bad_data(c.samae)) {
+         s_info.samae = bad_data_double;
       }
       else {
-         s_info.mae = (mae*sacount + c.mae*c.sacount)/s_info.sacount;
+         s_info.samae = (samae*sacount + c.samae*c.sacount)/s_info.sacount;
       }
    }
 
@@ -1170,14 +1170,14 @@ void SL1L2Info::zero_out() {
    // SL1L2 Quantities
    fbar    = obar   = 0.0;
    fobar   = ffbar  = oobar  = 0.0;
+   smae    = 0.0;
    scount  = 0;
 
    // SAL1L2 Quantities
    fabar   = oabar  = 0.0;
    foabar  = ffabar = ooabar = 0.0;
+   samae   = 0.0;
    sacount = 0;
-
-   mae     = 0.0;
 
    return;
 }
@@ -1211,6 +1211,7 @@ void SL1L2Info::assign(const SL1L2Info &c) {
    fobar   = c.fobar;
    ffbar   = c.ffbar;
    oobar   = c.oobar;
+   smae    = c.smae;
    scount  = c.scount;
 
    // SAL1L2 Quantities
@@ -1219,9 +1220,8 @@ void SL1L2Info::assign(const SL1L2Info &c) {
    foabar  = c.foabar;
    ffabar  = c.ffabar;
    ooabar  = c.ooabar;
+   samae   = c.samae;
    sacount = c.sacount;
-
-   mae     = c.mae;
 
    return;
 }
@@ -1272,7 +1272,7 @@ void SL1L2Info::set(const PairDataPoint &pd_all) {
       fobar += wgt*f*o;
       ffbar += wgt*f*f;
       oobar += wgt*o*o;
-      mae   += wgt*fabs(f-o);
+      smae  += wgt*fabs(f-o);
       scount++;
 
       // SAL1L2 sums
@@ -1282,6 +1282,7 @@ void SL1L2Info::set(const PairDataPoint &pd_all) {
          foabar += wgt*(f-fc)*(o-oc);
          ffabar += wgt*(f-fc)*(f-fc);
          ooabar += wgt*(o-oc)*(o-oc);
+         samae  += wgt*fabs((f-fc)-(o-oc));
          sacount++;
       }
    }
