@@ -731,19 +731,19 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
             //
             if((line.type() == STATLineType::fho ||
                 line.type() == STATLineType::ctc) && lty == STATLineType::cts) {
-               v = cts_info.get_stat(req_col[i].c_str());
+               v = cts_info.get_stat_cts(req_col[i].c_str());
                w = cts_info.cts.n();
             }
             else if(line.type() == STATLineType::sl1l2 && lty == STATLineType::cnt) {
-               v = cnt_info.get_stat(req_col[i].c_str());
+               v = cnt_info.get_stat_cnt(req_col[i].c_str());
                w = cnt_info.n;
             }
             else if(line.type() == STATLineType::sal1l2 && lty == STATLineType::cnt) {
-               v = cnt_info.get_stat(req_col[i].c_str());
+               v = cnt_info.get_stat_cnt(req_col[i].c_str());
                w = cnt_info.n;
             }
             else if(line.type() == STATLineType::vl1l2 && lty == STATLineType::vcnt) {
-               v = vl1l2_info.get_stat(req_col[i].c_str());
+               v = vl1l2_info.get_stat_vcnt(req_col[i].c_str());
                w = (is_vector_dir_stat(line.type(), req_col[i].c_str()) ?
                     vl1l2_info.dcount :
                     vl1l2_info.vcount);

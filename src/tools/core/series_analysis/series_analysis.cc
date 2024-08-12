@@ -94,7 +94,6 @@ static void do_probabilistic (int, const PairDataPoint *);
 
 // TODO: MET #1371
 // - Add a PCT aggregation logic test
-// - Switch to set_stat() and get_stat() functions
 // - Can briercl be aggregated as a weighted average and used for bss?
 // - How should valid data thresholds be applied when reading -aggr data?
 // - Currently no way to aggregate anom_corr since CNTInfo::set(sl1l2)
@@ -125,10 +124,21 @@ static void store_stat_all_sl1l2 (int, const SL1L2Info &);
 static void store_stat_all_sal1l2(int, const SL1L2Info &);
 static void store_stat_all_pct   (int, const PCTInfo &);
 
-static ConcatString build_nc_var_name_ctc(const ConcatString &, const CTSInfo &);
-static ConcatString build_nc_var_name_sl1l2(const ConcatString &, const SL1L2Info &);
-static ConcatString build_nc_var_name_sal1l2(const ConcatString &, const SL1L2Info &);
-static ConcatString build_nc_var_name_cnt(const ConcatString &, const CNTInfo &);
+static ConcatString build_nc_var_name_categorical(
+                       STATLineType, const ConcatString &,
+                       const CTSInfo &, double);
+static ConcatString build_nc_var_name_multicategory(
+                       STATLineType, const ConcatString &,
+                       double);
+static ConcatString build_nc_var_name_partialsums(
+                       STATLineType, const ConcatString &,
+                       const SL1L2Info &);
+static ConcatString build_nc_var_name_continuous(
+                       STATLineType, const ConcatString &,
+                       const CNTInfo &, double);
+static ConcatString build_nc_var_name_probabilistic(
+                       STATLineType, const ConcatString &,
+                       const PCTInfo &, double);
 
 static void setup_nc_file(const VarInfo *, const VarInfo *);
 static void add_nc_var(const ConcatString &, const ConcatString &,
@@ -1328,7 +1338,9 @@ void read_aggr_ctc(int n, const CTSInfo &cts_info,
    for(int i=0; i<n_ctc_columns; i++) {
 
       ConcatString c(to_upper(ctc_columns[i]));
-      ConcatString var_name(build_nc_var_name_ctc(c, cts_info));
+      ConcatString var_name(build_nc_var_name_categorical(
+                               STATLineType::ctc, c,
+                               cts_info, bad_data_double));
 
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
@@ -1361,7 +1373,9 @@ void read_aggr_sl1l2(int n, const SL1L2Info &s_info,
    for(int i=0; i<n_sl1l2_columns; i++) {
 
       ConcatString c(to_upper(sl1l2_columns[i]));
-      ConcatString var_name(build_nc_var_name_sl1l2(c, s_info));
+      ConcatString var_name(build_nc_var_name_partialsums(
+                               STATLineType::sl1l2, c,
+                               s_info));
 
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
@@ -1369,7 +1383,7 @@ void read_aggr_sl1l2(int n, const SL1L2Info &s_info,
       }
 
       // Populate the partial sums
-      aggr_psum.set_sl1l2_stat(sl1l2_columns[i],
+      aggr_psum.set_stat_sl1l2(sl1l2_columns[i],
                                aggr_data[var_name].buf()[n]);
    }
 
@@ -1388,7 +1402,9 @@ void read_aggr_sal1l2(int n, const SL1L2Info &s_info,
    for(int i=0; i<n_sal1l2_columns; i++) {
 
       ConcatString c(to_upper(sal1l2_columns[i]));
-      ConcatString var_name(build_nc_var_name_sal1l2(c, s_info));
+      ConcatString var_name(build_nc_var_name_partialsums(
+                               STATLineType::sal1l2, c,
+                               s_info));
 
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
@@ -1396,7 +1412,7 @@ void read_aggr_sal1l2(int n, const SL1L2Info &s_info,
       }
 
       // Populate the partial sums
-      aggr_psum.set_sal1l2_stat(sal1l2_columns[i],
+      aggr_psum.set_stat_sal1l2(sal1l2_columns[i],
                                 aggr_data[var_name].buf()[n]);
    }
 
@@ -1594,41 +1610,21 @@ void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
 
 void store_stat_fho(int n, const ConcatString &col,
                     const CTSInfo &cts_info) {
-   double v;
-   ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
 
-   // Get the column value
-        if(c == "TOTAL")  { v = (double) cts_info.cts.n(); }
-   else if(c == "F_RATE") { v = cts_info.cts.f_rate();     }
-   else if(c == "H_RATE") { v = cts_info.cts.h_rate();     }
-   else if(c == "O_RATE") { v = cts_info.cts.o_rate();     }
-   else {
-     mlog << Error << "\nstore_stat_fho() -> "
-          << "unsupported column name requested \"" << c
-          << "\"\n\n";
-     exit(1);
-   }
-
    // Construct the NetCDF variable name
-   var_name << cs_erase << "series_fho_" << c;
-
-   // Append threshold information
-   if(cts_info.fthresh == cts_info.othresh) {
-      var_name << "_" << cts_info.fthresh.get_abbr_str();
-   }
-   else {
-      var_name << "_fcst" << cts_info.fthresh.get_abbr_str()
-               << "_obs" << cts_info.othresh.get_abbr_str();
-   }
+   ConcatString var_name(build_nc_var_name_categorical(
+                            STATLineType::fho, c,
+                            cts_info, bad_data_double));
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
       // Build key
-      lty_stat << "FHO_" << c;
+      ConcatString lty_stat("FHO_");
+      lty_stat << c;
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
@@ -1638,7 +1634,8 @@ void store_stat_fho(int n, const ConcatString &col,
    }
 
    // Store the statistic value
-   put_nc_val(n, var_name, (float) v);
+   put_nc_val(n, var_name,
+              (float) cts_info.get_stat_fho(c));
 
    return;
 }
@@ -1647,7 +1644,6 @@ void store_stat_fho(int n, const ConcatString &col,
 
 void store_stat_ctc(int n, const ConcatString &col,
                     const CTSInfo &cts_info) {
-   double v;
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
@@ -1655,22 +1651,10 @@ void store_stat_ctc(int n, const ConcatString &col,
    // Handle ALL columns
    if(c == all_columns) return store_stat_all_ctc(n, cts_info);
 
-   // Get the column value
-        if(c == "TOTAL")    { v = cts_info.cts.n();        }
-   else if(c == "FY_OY")    { v = cts_info.cts.fy_oy();    }
-   else if(c == "FY_ON")    { v = cts_info.cts.fy_on();    }
-   else if(c == "FN_OY")    { v = cts_info.cts.fn_oy();    }
-   else if(c == "FN_ON")    { v = cts_info.cts.fn_on();    }
-   else if(c == "EC_VALUE") { v = cts_info.cts.ec_value(); }
-   else {
-     mlog << Error << "\nstore_stat_ctc() -> "
-          << "unsupported column name requested \"" << c
-          << "\"\n\n";
-     exit(1);
-   }
-
    // Construct the NetCDF variable name
-   ConcatString var_name(build_nc_var_name_ctc(c, cts_info));
+   ConcatString var_name(build_nc_var_name_categorical(
+                            STATLineType::ctc, c,
+                            cts_info, bad_data_double));
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
@@ -1687,7 +1671,8 @@ void store_stat_ctc(int n, const ConcatString &col,
    }
 
    // Store the statistic value
-   put_nc_val(n, var_name, v);
+   put_nc_val(n, var_name,
+              (float) cts_info.get_stat_ctc(c));
 
    return;
 }
@@ -1696,157 +1681,44 @@ void store_stat_ctc(int n, const ConcatString &col,
 
 void store_stat_cts(int n, const ConcatString &col,
                     const CTSInfo &cts_info) {
-   int i;
-   double v;
-   ConcatString lty_stat, var_name;
-   int n_ci = 1;
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
 
    // Check for columns with normal or bootstrap confidence limits
-   if(strstr(c.c_str(), "_NC") || strstr(c.c_str(), "_BC")) n_ci = cts_info.n_alpha;
+   int n_alpha = 1;
+   if(is_ci_stat_name(c)) n_alpha = cts_info.n_alpha;
 
-   // Loop over the alpha values, if necessary
-   for(i=0; i<n_ci; i++) {
+   // Loop over the alpha values
+   for(int i_alpha=0; i_alpha<n_alpha; i_alpha++) {
 
-      // Get the column value
-           if(c == "TOTAL")      { v = (double) cts_info.cts.n(); }
-      else if(c == "BASER")      { v = cts_info.baser.v;          }
-      else if(c == "BASER_NCL")  { v = cts_info.baser.v_ncl[i];   }
-      else if(c == "BASER_NCU")  { v = cts_info.baser.v_ncu[i];   }
-      else if(c == "BASER_BCL")  { v = cts_info.baser.v_bcl[i];   }
-      else if(c == "BASER_BCU")  { v = cts_info.baser.v_bcu[i];   }
-      else if(c == "FMEAN")      { v = cts_info.fmean.v;          }
-      else if(c == "FMEAN_NCL")  { v = cts_info.fmean.v_ncl[i];   }
-      else if(c == "FMEAN_NCU")  { v = cts_info.fmean.v_ncu[i];   }
-      else if(c == "FMEAN_BCL")  { v = cts_info.fmean.v_bcl[i];   }
-      else if(c == "FMEAN_BCU")  { v = cts_info.fmean.v_bcu[i];   }
-      else if(c == "ACC")        { v = cts_info.acc.v;            }
-      else if(c == "ACC_NCL")    { v = cts_info.acc.v_ncl[i];     }
-      else if(c == "ACC_NCU")    { v = cts_info.acc.v_ncu[i];     }
-      else if(c == "ACC_BCL")    { v = cts_info.acc.v_bcl[i];     }
-      else if(c == "ACC_BCU")    { v = cts_info.acc.v_bcu[i];     }
-      else if(c == "FBIAS")      { v = cts_info.fbias.v;          }
-      else if(c == "FBIAS_BCL")  { v = cts_info.fbias.v_bcl[i];   }
-      else if(c == "FBIAS_BCU")  { v = cts_info.fbias.v_bcu[i];   }
-      else if(c == "PODY")       { v = cts_info.pody.v;           }
-      else if(c == "PODY_NCL")   { v = cts_info.pody.v_ncl[i];    }
-      else if(c == "PODY_NCU")   { v = cts_info.pody.v_ncu[i];    }
-      else if(c == "PODY_BCL")   { v = cts_info.pody.v_bcl[i];    }
-      else if(c == "PODY_BCU")   { v = cts_info.pody.v_bcu[i];    }
-      else if(c == "PODN")       { v = cts_info.podn.v;           }
-      else if(c == "PODN_NCL")   { v = cts_info.podn.v_ncl[i];    }
-      else if(c == "PODN_NCU")   { v = cts_info.podn.v_ncu[i];    }
-      else if(c == "PODN_BCL")   { v = cts_info.podn.v_bcl[i];    }
-      else if(c == "PODN_BCU")   { v = cts_info.podn.v_bcu[i];    }
-      else if(c == "POFD")       { v = cts_info.pofd.v;           }
-      else if(c == "POFD_NCL")   { v = cts_info.pofd.v_ncl[i];    }
-      else if(c == "POFD_NCU")   { v = cts_info.pofd.v_ncu[i];    }
-      else if(c == "POFD_BCL")   { v = cts_info.pofd.v_bcl[i];    }
-      else if(c == "POFD_BCU")   { v = cts_info.pofd.v_bcu[i];    }
-      else if(c == "FAR")        { v = cts_info.far.v;            }
-      else if(c == "FAR_NCL")    { v = cts_info.far.v_ncl[i];     }
-      else if(c == "FAR_NCU")    { v = cts_info.far.v_ncu[i];     }
-      else if(c == "FAR_BCL")    { v = cts_info.far.v_bcl[i];     }
-      else if(c == "FAR_BCU")    { v = cts_info.far.v_bcu[i];     }
-      else if(c == "CSI")        { v = cts_info.csi.v;            }
-      else if(c == "CSI_NCL")    { v = cts_info.csi.v_ncl[i];     }
-      else if(c == "CSI_NCU")    { v = cts_info.csi.v_ncu[i];     }
-      else if(c == "CSI_BCL")    { v = cts_info.csi.v_bcl[i];     }
-      else if(c == "CSI_BCU")    { v = cts_info.csi.v_bcu[i];     }
-      else if(c == "GSS")        { v = cts_info.gss.v;            }
-      else if(c == "GSS_BCL")    { v = cts_info.gss.v_bcl[i];     }
-      else if(c == "GSS_BCU")    { v = cts_info.gss.v_bcu[i];     }
-      else if(c == "HK")         { v = cts_info.hk.v;             }
-      else if(c == "HK_NCL")     { v = cts_info.hk.v_ncl[i];      }
-      else if(c == "HK_NCU")     { v = cts_info.hk.v_ncu[i];      }
-      else if(c == "HK_BCL")     { v = cts_info.hk.v_bcl[i];      }
-      else if(c == "HK_BCU")     { v = cts_info.hk.v_bcu[i];      }
-      else if(c == "HSS")        { v = cts_info.hss.v;            }
-      else if(c == "HSS_BCL")    { v = cts_info.hss.v_bcl[i];     }
-      else if(c == "HSS_BCU")    { v = cts_info.hss.v_bcu[i];     }
-      else if(c == "ODDS")       { v = cts_info.odds.v;           }
-      else if(c == "ODDS_NCL")   { v = cts_info.odds.v_ncl[i];    }
-      else if(c == "ODDS_NCU")   { v = cts_info.odds.v_ncu[i];    }
-      else if(c == "ODDS_BCL")   { v = cts_info.odds.v_bcl[i];    }
-      else if(c == "ODDS_BCU")   { v = cts_info.odds.v_bcu[i];    }
-      else if(c == "LODDS")      { v = cts_info.lodds.v;          }
-      else if(c == "LODDS_NCL")  { v = cts_info.lodds.v_ncl[i];   }
-      else if(c == "LODDS_NCU")  { v = cts_info.lodds.v_ncu[i];   }
-      else if(c == "LODDS_BCL")  { v = cts_info.lodds.v_bcl[i];   }
-      else if(c == "LODDS_BCU")  { v = cts_info.lodds.v_bcu[i];   }
-      else if(c == "ORSS")       { v = cts_info.orss.v;           }
-      else if(c == "ORSS_NCL")   { v = cts_info.orss.v_ncl[i];    }
-      else if(c == "ORSS_NCU")   { v = cts_info.orss.v_ncu[i];    }
-      else if(c == "ORSS_BCL")   { v = cts_info.orss.v_bcl[i];    }
-      else if(c == "ORSS_BCU")   { v = cts_info.orss.v_bcu[i];    }
-      else if(c == "EDS")        { v = cts_info.eds.v;            }
-      else if(c == "EDS_NCL")    { v = cts_info.eds.v_ncl[i];     }
-      else if(c == "EDS_NCU")    { v = cts_info.eds.v_ncu[i];     }
-      else if(c == "EDS_BCL")    { v = cts_info.eds.v_bcl[i];     }
-      else if(c == "EDS_BCU")    { v = cts_info.eds.v_bcu[i];     }
-      else if(c == "SEDS")       { v = cts_info.seds.v;           }
-      else if(c == "SEDS_NCL")   { v = cts_info.seds.v_ncl[i];    }
-      else if(c == "SEDS_NCU")   { v = cts_info.seds.v_ncu[i];    }
-      else if(c == "SEDS_BCL")   { v = cts_info.seds.v_bcl[i];    }
-      else if(c == "SEDS_BCU")   { v = cts_info.seds.v_bcu[i];    }
-      else if(c == "EDI")        { v = cts_info.edi.v;            }
-      else if(c == "EDI_NCL")    { v = cts_info.edi.v_ncl[i];     }
-      else if(c == "EDI_NCU")    { v = cts_info.edi.v_ncu[i];     }
-      else if(c == "EDI_BCL")    { v = cts_info.edi.v_bcl[i];     }
-      else if(c == "EDI_BCU")    { v = cts_info.edi.v_bcu[i];     }
-      else if(c == "SEDI")       { v = cts_info.sedi.v;           }
-      else if(c == "SEDI_NCL")   { v = cts_info.sedi.v_ncl[i];    }
-      else if(c == "SEDI_NCU")   { v = cts_info.sedi.v_ncu[i];    }
-      else if(c == "SEDI_BCL")   { v = cts_info.sedi.v_bcl[i];    }
-      else if(c == "SEDI_BCU")   { v = cts_info.sedi.v_bcu[i];    }
-      else if(c == "BAGSS")      { v = cts_info.bagss.v;          }
-      else if(c == "BAGSS_BCL")  { v = cts_info.bagss.v_bcl[i];   }
-      else if(c == "BAGSS_BCU")  { v = cts_info.bagss.v_bcu[i];   }
-      else if(c == "HSS_EC")     { v = cts_info.hss_ec.v;         }
-      else if(c == "HSS_EC_BCL") { v = cts_info.hss_ec.v_bcl[i];  }
-      else if(c == "HSS_EC_BCU") { v = cts_info.hss_ec.v_bcu[i];  }
-      else if(c == "EC_VALUE")   { v = cts_info.cts.ec_value();   }
-      else {
-        mlog << Error << "\nstore_stat_cts() -> "
-             << "unsupported column name requested \"" << c
-             << "\"\n\n";
-        exit(1);
-      }
+      // Store alpha value
+      double alpha = (n_alpha > 1 ? cts_info.alpha[i_alpha] : bad_data_double);
 
       // Construct the NetCDF variable name
-      var_name << cs_erase << "series_cts_" << c;
-
-      // Append threshold information
-      if(cts_info.fthresh == cts_info.othresh) {
-         var_name << "_" << cts_info.fthresh.get_abbr_str();
-      }
-      else {
-         var_name << "_fcst" << cts_info.fthresh.get_abbr_str()
-                  << "_obs" << cts_info.othresh.get_abbr_str();
-      }
-
-      // Append confidence interval alpha value
-      if(n_ci > 1) var_name << "_a"  << cts_info.alpha[i];
+      ConcatString var_name(build_nc_var_name_categorical(
+                               STATLineType::cts, c,
+                               cts_info, alpha));
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
 
          // Build key
-         lty_stat << "CTS_" << c;
+         ConcatString lty_stat("CTS_");
+         lty_stat << c;
 
          // Add new map entry
          add_nc_var(var_name, c, stat_long_name[lty_stat],
                     cts_info.fthresh.get_str(),
                     cts_info.othresh.get_str(),
-                    (n_ci > 1 ? cts_info.alpha[i] : bad_data_double));
+                    alpha);
       }
 
       // Store the statistic value
-      put_nc_val(n, var_name, (float) v);
+      put_nc_val(n, var_name,
+                 (float) cts_info.get_stat_cts(c, i_alpha));
 
-   } // end for i
+   } // end for i_alpha
 
    return;
 }
@@ -1855,58 +1727,28 @@ void store_stat_cts(int n, const ConcatString &col,
 
 void store_stat_mctc(int n, const ConcatString &col,
                      const MCTSInfo &mcts_info) {
-   int i, j;
-   double v;
-   ConcatString lty_stat, var_name;
-   StringArray sa;
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
-   ConcatString d = c;
 
    // Handle ALL columns
    if(c == all_columns) return store_stat_all_mctc(n, mcts_info);
 
-   // Get the column value
-        if(c == "TOTAL")    { v = (double) mcts_info.cts.total();    }
-   else if(c == "N_CAT")    { v = (double) mcts_info.cts.nrows();    }
-   else if(c == "EC_VALUE") { v =          mcts_info.cts.ec_value(); }
-   else if(check_reg_exp("F[0-9]*_O[0-9]*", c.c_str())) {
-
-      d = "FI_OJ";
-
-      // Parse column name to retrieve index values
-      sa = c.split("_");
-      i  = atoi(sa[0].c_str()+1) - 1;
-      j  = atoi(sa[1].c_str()+1) - 1;
-
-      // Range check
-      if(i < 0 || i >= mcts_info.cts.nrows() ||
-         j < 0 || j >= mcts_info.cts.ncols()) {
-         mlog << Error << "\nstore_stat_mctc() -> "
-              << "range check error for column name requested \"" << c
-              << "\"\n\n";
-         exit(1);
-      }
-
-      // Retrieve the value
-      v = (double) mcts_info.cts.entry(i, j);
-   }
-   else {
-     mlog << Error << "\nstore_stat_mctc() -> "
-          << "unsupported column name requested \"" << c
-          << "\"\n\n";
-     exit(1);
-   }
-
    // Construct the NetCDF variable name
-   var_name << cs_erase << "series_mctc_" << c;
+   ConcatString var_name(build_nc_var_name_multicategory(
+                            STATLineType::mctc, c,
+                            bad_data_double));
+
+   // Store the data value
+   ConcatString col_name;
+   float v = (float) mcts_info.get_stat_mctc(c, col_name);
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
       // Build key
-      lty_stat << "MCTC_" << d;
+      ConcatString lty_stat("MCTC_");
+      lty_stat << col_name;
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
@@ -1916,7 +1758,7 @@ void store_stat_mctc(int n, const ConcatString &col,
    }
 
    // Store the statistic value
-   put_nc_val(n, var_name, (float) v);
+   put_nc_val(n, var_name, v);
 
    return;
 }
@@ -1925,71 +1767,44 @@ void store_stat_mctc(int n, const ConcatString &col,
 
 void store_stat_mcts(int n, const ConcatString &col,
                      const MCTSInfo &mcts_info) {
-   int i;
-   double v;
-   ConcatString lty_stat, var_name;
-   int n_ci = 1;
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
 
    // Check for columns with normal or bootstrap confidence limits
-   if(strstr(c.c_str(), "_NC") || strstr(c.c_str(), "_BC")) n_ci = mcts_info.n_alpha;
+   int n_alpha = 1;
+   if(is_ci_stat_name(c)) n_alpha = mcts_info.n_alpha;
 
-   // Loop over the alpha values, if necessary
-   for(i=0; i<n_ci; i++) {
+   // Loop over the alpha values
+   for(int i_alpha=0; i_alpha<n_alpha; i_alpha++) {
 
-      // Get the column value
-           if(c == "TOTAL")      { v = (double) mcts_info.cts.total(); }
-      else if(c == "N_CAT")      { v = (double) mcts_info.cts.nrows(); }
-      else if(c == "ACC")        { v = mcts_info.acc.v;                }
-      else if(c == "ACC_NCL")    { v = mcts_info.acc.v_ncl[i];         }
-      else if(c == "ACC_NCU")    { v = mcts_info.acc.v_ncu[i];         }
-      else if(c == "ACC_BCL")    { v = mcts_info.acc.v_bcl[i];         }
-      else if(c == "ACC_BCU")    { v = mcts_info.acc.v_bcu[i];         }
-      else if(c == "HK")         { v = mcts_info.hk.v;                 }
-      else if(c == "HK_BCL")     { v = mcts_info.hk.v_bcl[i];          }
-      else if(c == "HK_BCU")     { v = mcts_info.hk.v_bcu[i];          }
-      else if(c == "HSS")        { v = mcts_info.hss.v;                }
-      else if(c == "HSS_BCL")    { v = mcts_info.hss.v_bcl[i];         }
-      else if(c == "HSS_BCU")    { v = mcts_info.hss.v_bcu[i];         }
-      else if(c == "GER")        { v = mcts_info.ger.v;                }
-      else if(c == "GER_BCL")    { v = mcts_info.ger.v_bcl[i];         }
-      else if(c == "GER_BCU")    { v = mcts_info.ger.v_bcu[i];         }
-      else if(c == "HSS_EC")     { v = mcts_info.hss_ec.v;             }
-      else if(c == "HSS_EC_BCL") { v = mcts_info.hss_ec.v_bcl[i];      }
-      else if(c == "HSS_EC_BCU") { v = mcts_info.hss_ec.v_bcu[i];      }
-      else if(c == "EC_VALUE")   { v = mcts_info.cts.ec_value();       }
-      else {
-        mlog << Error << "\nstore_stat_mcts() -> "
-             << "unsupported column name requested \"" << c
-             << "\"\n\n";
-        exit(1);
-      }
+      // Store alpha value
+      double alpha = (n_alpha > 1 ? mcts_info.alpha[i_alpha] : bad_data_double);
 
       // Construct the NetCDF variable name
-      var_name << cs_erase << "series_mcts_" << c;
-
-      // Append confidence interval alpha value
-      if(n_ci > 1) var_name << "_a"  << mcts_info.alpha[i];
+      ConcatString var_name(build_nc_var_name_multicategory(
+                               STATLineType::mcts, c,
+                               alpha));
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
 
          // Build key
-         lty_stat << "MCTS_" << c;
+         ConcatString lty_stat("MCTS_");
+         lty_stat << c;
 
          // Add new map entry
          add_nc_var(var_name, c, stat_long_name[lty_stat],
                     mcts_info.fthresh.get_str(","),
                     mcts_info.othresh.get_str(","),
-                    (n_ci > 1 ? mcts_info.alpha[i] : bad_data_double));
+                    alpha);
       }
 
       // Store the statistic value
-      put_nc_val(n, var_name, (float) v);
+      put_nc_val(n, var_name,
+                 (float) mcts_info.get_stat_mcts(c, i_alpha));
 
-   } // end for i
+   } // end for i_alpha
 
    return;
 }
@@ -1998,154 +1813,44 @@ void store_stat_mcts(int n, const ConcatString &col,
 
 void store_stat_cnt(int n, const ConcatString &col,
                     const CNTInfo &cnt_info) {
-   int i;
-   double v;
-   ConcatString lty_stat, var_name;
-   int n_ci = 1;
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
 
    // Check for columns with normal or bootstrap confidence limits
-   if(strstr(c.c_str(), "_NC") || strstr(c.c_str(), "_BC")) n_ci = cnt_info.n_alpha;
+   int n_alpha = 1;
+   if(is_ci_stat_name(c)) n_alpha = cnt_info.n_alpha;
 
-   // Loop over the alpha values, if necessary
-   for(i=0; i<n_ci; i++) {
+   // Loop over the alpha values
+   for(int i_alpha=0; i_alpha<n_alpha; i_alpha++) {
 
-      // Get the column value
-           if(c == "TOTAL")                { v = (double) cnt_info.n;                }
-      else if(c == "FBAR")                 { v = cnt_info.fbar.v;                    }
-      else if(c == "FBAR_NCL")             { v = cnt_info.fbar.v_ncl[i];             }
-      else if(c == "FBAR_NCU")             { v = cnt_info.fbar.v_ncu[i];             }
-      else if(c == "FBAR_BCL")             { v = cnt_info.fbar.v_bcl[i];             }
-      else if(c == "FBAR_BCU")             { v = cnt_info.fbar.v_bcu[i];             }
-      else if(c == "FSTDEV")               { v = cnt_info.fstdev.v;                  }
-      else if(c == "FSTDEV_NCL")           { v = cnt_info.fstdev.v_ncl[i];           }
-      else if(c == "FSTDEV_NCU")           { v = cnt_info.fstdev.v_ncu[i];           }
-      else if(c == "FSTDEV_BCL")           { v = cnt_info.fstdev.v_bcl[i];           }
-      else if(c == "FSTDEV_BCU")           { v = cnt_info.fstdev.v_bcu[i];           }
-      else if(c == "OBAR")                 { v = cnt_info.obar.v;                    }
-      else if(c == "OBAR_NCL")             { v = cnt_info.obar.v_ncl[i];             }
-      else if(c == "OBAR_NCU")             { v = cnt_info.obar.v_ncu[i];             }
-      else if(c == "OBAR_BCL")             { v = cnt_info.obar.v_bcl[i];             }
-      else if(c == "OBAR_BCU")             { v = cnt_info.obar.v_bcu[i];             }
-      else if(c == "OSTDEV")               { v = cnt_info.ostdev.v;                  }
-      else if(c == "OSTDEV_NCL")           { v = cnt_info.ostdev.v_ncl[i];           }
-      else if(c == "OSTDEV_NCU")           { v = cnt_info.ostdev.v_ncu[i];           }
-      else if(c == "OSTDEV_BCL")           { v = cnt_info.ostdev.v_bcl[i];           }
-      else if(c == "OSTDEV_BCU")           { v = cnt_info.ostdev.v_bcu[i];           }
-      else if(c == "PR_CORR")              { v = cnt_info.pr_corr.v;                 }
-      else if(c == "PR_CORR_NCL")          { v = cnt_info.pr_corr.v_ncl[i];          }
-      else if(c == "PR_CORR_NCU")          { v = cnt_info.pr_corr.v_ncu[i];          }
-      else if(c == "PR_CORR_BCL")          { v = cnt_info.pr_corr.v_bcl[i];          }
-      else if(c == "PR_CORR_BCU")          { v = cnt_info.pr_corr.v_bcu[i];          }
-      else if(c == "SP_CORR")              { v = cnt_info.sp_corr.v;                 }
-      else if(c == "KT_CORR")              { v = cnt_info.kt_corr.v;                 }
-      else if(c == "RANKS")                { v = cnt_info.n_ranks;                   }
-      else if(c == "FRANK_TIES")           { v = cnt_info.frank_ties;                }
-      else if(c == "ORANK_TIES")           { v = cnt_info.orank_ties;                }
-      else if(c == "ME")                   { v = cnt_info.me.v;                      }
-      else if(c == "ME_NCL")               { v = cnt_info.me.v_ncl[i];               }
-      else if(c == "ME_NCU")               { v = cnt_info.me.v_ncu[i];               }
-      else if(c == "ME_BCL")               { v = cnt_info.me.v_bcl[i];               }
-      else if(c == "ME_BCU")               { v = cnt_info.me.v_bcu[i];               }
-      else if(c == "ESTDEV")               { v = cnt_info.estdev.v;                  }
-      else if(c == "ESTDEV_NCL")           { v = cnt_info.estdev.v_ncl[i];           }
-      else if(c == "ESTDEV_NCU")           { v = cnt_info.estdev.v_ncu[i];           }
-      else if(c == "ESTDEV_BCL")           { v = cnt_info.estdev.v_bcl[i];           }
-      else if(c == "ESTDEV_BCU")           { v = cnt_info.estdev.v_bcu[i];           }
-      else if(c == "MBIAS")                { v = cnt_info.mbias.v;                   }
-      else if(c == "MBIAS_BCL")            { v = cnt_info.mbias.v_bcl[i];            }
-      else if(c == "MBIAS_BCU")            { v = cnt_info.mbias.v_bcu[i];            }
-      else if(c == "MAE")                  { v = cnt_info.mae.v;                     }
-      else if(c == "MAE_BCL")              { v = cnt_info.mae.v_bcl[i];              }
-      else if(c == "MAE_BCU")              { v = cnt_info.mae.v_bcu[i];              }
-      else if(c == "MSE")                  { v = cnt_info.mse.v;                     }
-      else if(c == "MSE_BCL")              { v = cnt_info.mse.v_bcl[i];              }
-      else if(c == "MSE_BCU")              { v = cnt_info.mse.v_bcu[i];              }
-      else if(c == "BCMSE")                { v = cnt_info.bcmse.v;                   }
-      else if(c == "BCMSE_BCL")            { v = cnt_info.bcmse.v_bcl[i];            }
-      else if(c == "BCMSE_BCU")            { v = cnt_info.bcmse.v_bcu[i];            }
-      else if(c == "RMSE")                 { v = cnt_info.rmse.v;                    }
-      else if(c == "RMSE_BCL")             { v = cnt_info.rmse.v_bcl[i];             }
-      else if(c == "RMSE_BCU")             { v = cnt_info.rmse.v_bcu[i];             }
-      else if(c == "SI")                   { v = cnt_info.si.v;                      }
-      else if(c == "SI_BCL")               { v = cnt_info.si.v_bcl[i];               }
-      else if(c == "SI_BCU")               { v = cnt_info.si.v_bcu[i];               }
-      else if(c == "E10")                  { v = cnt_info.e10.v;                     }
-      else if(c == "E10_BCL")              { v = cnt_info.e10.v_bcl[i];              }
-      else if(c == "E10_BCU")              { v = cnt_info.e10.v_bcu[i];              }
-      else if(c == "E25")                  { v = cnt_info.e25.v;                     }
-      else if(c == "E25_BCL")              { v = cnt_info.e25.v_bcl[i];              }
-      else if(c == "E25_BCU")              { v = cnt_info.e25.v_bcu[i];              }
-      else if(c == "E50")                  { v = cnt_info.e50.v;                     }
-      else if(c == "E50_BCL")              { v = cnt_info.e50.v_bcl[i];              }
-      else if(c == "E50_BCU")              { v = cnt_info.e50.v_bcu[i];              }
-      else if(c == "E75")                  { v = cnt_info.e75.v;                     }
-      else if(c == "E75_BCL")              { v = cnt_info.e75.v_bcl[i];              }
-      else if(c == "E75_BCU")              { v = cnt_info.e75.v_bcu[i];              }
-      else if(c == "E90")                  { v = cnt_info.e90.v;                     }
-      else if(c == "E90_BCL")              { v = cnt_info.e90.v_bcl[i];              }
-      else if(c == "E90_BCU")              { v = cnt_info.e90.v_bcu[i];              }
-      else if(c == "EIQR")                 { v = cnt_info.eiqr.v;                    }
-      else if(c == "EIQR_BCL")             { v = cnt_info.eiqr.v_bcl[i];             }
-      else if(c == "EIQR_BCU")             { v = cnt_info.eiqr.v_bcu[i];             }
-      else if(c == "MAD")                  { v = cnt_info.mad.v;                     }
-      else if(c == "MAD_BCL")              { v = cnt_info.mad.v_bcl[i];              }
-      else if(c == "MAD_BCU")              { v = cnt_info.mad.v_bcu[i];              }
-      else if(c == "ANOM_CORR")            { v = cnt_info.anom_corr.v;               }
-      else if(c == "ANOM_CORR_NCL")        { v = cnt_info.anom_corr.v_ncl[i];        }
-      else if(c == "ANOM_CORR_NCU")        { v = cnt_info.anom_corr.v_ncu[i];        }
-      else if(c == "ANOM_CORR_BCL")        { v = cnt_info.anom_corr.v_bcl[i];        }
-      else if(c == "ANOM_CORR_BCU")        { v = cnt_info.anom_corr.v_bcu[i];        }
-      else if(c == "ME2")                  { v = cnt_info.me2.v;                     }
-      else if(c == "ME2_BCL")              { v = cnt_info.me2.v_bcl[i];              }
-      else if(c == "ME2_BCU")              { v = cnt_info.me2.v_bcu[i];              }
-      else if(c == "MSESS")                { v = cnt_info.msess.v;                   }
-      else if(c == "MSESS_BCL")            { v = cnt_info.msess.v_bcl[i];            }
-      else if(c == "MSESS_BCU")            { v = cnt_info.msess.v_bcu[i];            }
-      else if(c == "RMSFA")                { v = cnt_info.rmsfa.v;                   }
-      else if(c == "RMSFA_BCL")            { v = cnt_info.rmsfa.v_bcl[i];            }
-      else if(c == "RMSFA_BCU")            { v = cnt_info.rmsfa.v_bcu[i];            }
-      else if(c == "RMSOA")                { v = cnt_info.rmsoa.v;                   }
-      else if(c == "RMSOA_BCL")            { v = cnt_info.rmsoa.v_bcl[i];            }
-      else if(c == "RMSOA_BCU")            { v = cnt_info.rmsoa.v_bcu[i];            }
-      else if(c == "ANOM_CORR_UNCNTR")     { v = cnt_info.anom_corr_uncntr.v;        }
-      else if(c == "ANOM_CORR_UNCNTR_BCL") { v = cnt_info.anom_corr_uncntr.v_bcl[i]; }
-      else if(c == "ANOM_CORR_UNCNTR_BCU") { v = cnt_info.anom_corr_uncntr.v_bcu[i]; }
-      else if(c == "SI")                   { v = cnt_info.si.v;                      }
-      else if(c == "SI_BCL")               { v = cnt_info.si.v_bcl[i];               }
-      else if(c == "SI_BCU")               { v = cnt_info.si.v_bcu[i];               }
-      else {
-        mlog << Error << "\nstore_stat_cnt() -> "
-             << "unsupported column name requested \"" << c
-             << "\"\n\n";
-        exit(1);
-      }
+      // Store alpha value
+      double alpha = (n_alpha > 1 ? cnt_info.alpha[i_alpha] : bad_data_double);
 
       // Construct the NetCDF variable name
-      ConcatString var_name(build_nc_var_name_cnt(c, cnt_info));
-
-      // Append confidence interval alpha value
-      if(n_ci > 1) var_name << "_a"  << cnt_info.alpha[i];
+      ConcatString var_name(build_nc_var_name_continuous(
+                               STATLineType::cnt, c,
+                               cnt_info, alpha));
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
 
          // Build key
-         lty_stat << "CNT_" << c;
+         ConcatString lty_stat("CNT_");
+         lty_stat << c;
 
          // Add new map entry
          add_nc_var(var_name, c, stat_long_name[lty_stat],
                     cnt_info.fthresh.get_str(),
                     cnt_info.othresh.get_str(),
-                    (n_ci > 1 ? cnt_info.alpha[i] : bad_data_double));
+                    alpha);
       }
 
       // Store the statistic value
-      put_nc_val(n, var_name, (float) v);
+      put_nc_val(n, var_name,
+                 (float) cnt_info.get_stat_cnt(c, i_alpha));
 
-   } // end for i
+   } // end for i_alpha
 
    return;
 }
@@ -2154,7 +1859,6 @@ void store_stat_cnt(int n, const ConcatString &col,
 
 void store_stat_sl1l2(int n, const ConcatString &col,
                       const SL1L2Info &s_info) {
-   double v;
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
@@ -2162,23 +1866,10 @@ void store_stat_sl1l2(int n, const ConcatString &col,
    // Handle ALL columns
    if(c == all_columns) return store_stat_all_sl1l2(n, s_info);
 
-   // Get the column value
-        if(c == "TOTAL") { v = (double) s_info.scount; }
-   else if(c == "FBAR")  { v = s_info.fbar;            }
-   else if(c == "OBAR")  { v = s_info.obar;            }
-   else if(c == "FOBAR") { v = s_info.fobar;           }
-   else if(c == "FFBAR") { v = s_info.ffbar;           }
-   else if(c == "OOBAR") { v = s_info.oobar;           }
-   else if(c == "MAE")   { v = s_info.smae;            }
-   else {
-     mlog << Error << "\nstore_stat_sl1l2() -> "
-          << "unsupported column name requested \"" << c
-          << "\"\n\n";
-     exit(1);
-   }
-
    // Construct the NetCDF variable name
-   ConcatString var_name(build_nc_var_name_sl1l2(c, s_info));
+   ConcatString var_name(build_nc_var_name_partialsums(
+                            STATLineType::sl1l2, c,
+                            s_info));
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
@@ -2195,7 +1886,8 @@ void store_stat_sl1l2(int n, const ConcatString &col,
    }
 
    // Store the statistic value
-   put_nc_val(n, var_name, (float) v);
+   put_nc_val(n, var_name,
+              (float) s_info.get_stat_sl1l2(c));
 
    return;
 }
@@ -2212,23 +1904,9 @@ void store_stat_sal1l2(int n, const ConcatString &col,
    // Handle ALL columns
    if(c == all_columns) return store_stat_all_sal1l2(n, s_info);
 
-   // Get the column value
-        if(c == "TOTAL")  { v = (double) s_info.sacount; }
-   else if(c == "FABAR")  { v = s_info.fabar;            }
-   else if(c == "OABAR")  { v = s_info.oabar;            }
-   else if(c == "FOABAR") { v = s_info.foabar;           }
-   else if(c == "FFABAR") { v = s_info.ffabar;           }
-   else if(c == "OOABAR") { v = s_info.ooabar;           }
-   else if(c == "MAE")    { v = s_info.samae;            }
-   else {
-     mlog << Error << "\nstore_stat_sal1l2() -> "
-          << "unsupported column name requested \"" << c
-          << "\"\n\n";
-     exit(1);
-   }
-
-   // Construct the NetCDF variable name
-   ConcatString var_name(build_nc_var_name_sal1l2(c, s_info));
+   ConcatString var_name(build_nc_var_name_partialsums(
+                            STATLineType::sal1l2, c,
+                            s_info));
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
@@ -2245,7 +1923,8 @@ void store_stat_sal1l2(int n, const ConcatString &col,
    }
 
    // Store the statistic value
-   put_nc_val(n, var_name, (float) v);
+   put_nc_val(n, var_name,
+              (float) s_info.get_stat_sal1l2(c.c_str()));
 
    return;
 }
@@ -2254,56 +1933,28 @@ void store_stat_sal1l2(int n, const ConcatString &col,
 
 void store_stat_pct(int n, const ConcatString &col,
                     const PCTInfo &pct_info) {
-   int i = 0;
-   double v;
-   ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
-   ConcatString d = c;
 
    // Handle ALL columns
    if(c == all_columns) return store_stat_all_pct(n, pct_info);
 
-   // Get index value for variable column numbers
-   if(check_reg_exp("_[0-9]", c.c_str())) {
-
-      // Parse the index value from the column name
-      i = atoi(strrchr(c.c_str(), '_') + 1) - 1;
-
-      // Range check
-      if(i < 0 || i >= pct_info.pct.nrows()) {
-         mlog << Error << "\nstore_stat_pct() -> "
-              << "range check error for column name requested \"" << c
-              << "\"\n\n";
-         exit(1);
-      }
-   }  // end if
-
-   // Get the column value
-        if(c == "TOTAL")                             { v = (double) pct_info.pct.n();                      }
-   else if(c == "N_THRESH")                          { v = (double) pct_info.pct.nrows() + 1;              }
-   else if(check_reg_exp("THRESH_[0-9]", c.c_str())) { v = pct_info.pct.threshold(i);                      }
-   else if(check_reg_exp("OY_[0-9]", c.c_str()))     { v = (double) pct_info.pct.event_count_by_row(i);
-                                                       d = "OY_I";                                         }
-   else if(check_reg_exp("ON_[0-9]", c.c_str()))     { v = (double) pct_info.pct.nonevent_count_by_row(i);
-                                                       d = "ON_I";                                         }
-   else {
-     mlog << Error << "\nstore_stat_pct() -> "
-          << "unsupported column name requested \"" << c
-          << "\"\n\n";
-     exit(1);
-   }
-
    // Construct the NetCDF variable name
-   var_name << cs_erase << "series_pct_" << c
-            << "_obs" << pct_info.othresh.get_abbr_str();
+   ConcatString var_name(build_nc_var_name_probabilistic(
+                            STATLineType::pct, c,
+                            pct_info, bad_data_double));
+
+   // Store the data value
+   ConcatString col_name;
+   float v = (float) pct_info.get_stat_pct(c, col_name);
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
       // Build key
-      lty_stat << "PCT_" << d;
+      ConcatString lty_stat("PCT_");
+      lty_stat << col_name;
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
@@ -2313,7 +1964,7 @@ void store_stat_pct(int n, const ConcatString &col,
    }
 
    // Store the statistic value
-   put_nc_val(n, var_name, (float) v);
+   put_nc_val(n, var_name, v);
 
    return;
 }
@@ -2322,68 +1973,47 @@ void store_stat_pct(int n, const ConcatString &col,
 
 void store_stat_pstd(int n, const ConcatString &col,
                      const PCTInfo &pct_info) {
-   int i;
-   double v;
-   ConcatString lty_stat, var_name;
-   int n_ci = 1;
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
 
    // Check for columns with normal or bootstrap confidence limits
-   if(strstr(c.c_str(), "_NC") || strstr(c.c_str(), "_BC")) n_ci = pct_info.n_alpha;
+   int n_alpha = 1;
+   if(is_ci_stat_name(c)) n_alpha = pct_info.n_alpha;
 
-   // Loop over the alpha values, if necessary
-   for(i=0; i<n_ci; i++) {
+   // Loop over the alpha values
+   for(int i_alpha=0; i_alpha<n_alpha; i_alpha++) {
 
-      // Get the column value
-           if(c == "TOTAL")       { v = (double) pct_info.pct.n();         }
-      else if(c == "N_THRESH")    { v = (double) pct_info.pct.nrows() + 1; }
-      else if(c == "BASER")       { v = pct_info.baser.v;                  }
-      else if(c == "BASER_NCL")   { v = pct_info.baser.v_ncl[i];           }
-      else if(c == "BASER_NCU")   { v = pct_info.baser.v_ncu[i];           }
-      else if(c == "RELIABILITY") { v = pct_info.pct.reliability();        }
-      else if(c == "RESOLUTION")  { v = pct_info.pct.resolution();         }
-      else if(c == "UNCERTAINTY") { v = pct_info.pct.uncertainty();        }
-      else if(c == "ROC_AUC")     { v = pct_info.pct.roc_auc();            }
-      else if(c == "BRIER")       { v = pct_info.brier.v;                  }
-      else if(c == "BRIER_NCL")   { v = pct_info.brier.v_ncl[i];           }
-      else if(c == "BRIER_NCU")   { v = pct_info.brier.v_ncu[i];           }
-      else if(c == "BRIERCL")     { v = pct_info.briercl.v;                }
-      else if(c == "BRIERCL_NCL") { v = pct_info.briercl.v_ncl[i];         }
-      else if(c == "BRIERCL_NCU") { v = pct_info.briercl.v_ncu[i];         }
-      else if(c == "BSS")         { v = pct_info.bss;                      }
-      else if(c == "BSS_SMPL")    { v = pct_info.bss_smpl;                 }
-      else {
-        mlog << Error << "\nstore_stat_pstd() -> "
-             << "unsupported column name requested \"" << c
-             << "\"\n\n";
-        exit(1);
-      }
+      // Store alpha value
+      double alpha = (n_alpha > 1 ? pct_info.alpha[i_alpha] : bad_data_double);
 
       // Construct the NetCDF variable name
-      var_name << cs_erase << "series_pstd_" << c;
+      ConcatString var_name(build_nc_var_name_probabilistic(
+                               STATLineType::pstd, c,
+                               pct_info, alpha));
 
-      // Append confidence interval alpha value
-      if(n_ci > 1) var_name << "_a"  << pct_info.alpha[i];
+      // Store the data value
+      ConcatString col_name;
+      float v = (float) pct_info.get_stat_pstd(c, col_name);
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
 
          // Build key
-         lty_stat << "PSTD_" << c;
+         ConcatString lty_stat("PSTD_");
+         lty_stat << col_name;
 
          // Add new map entry
          add_nc_var(var_name, c, stat_long_name[lty_stat],
                     pct_info.fthresh.get_str(","),
                     pct_info.othresh.get_str(),
-                    (n_ci > 1 ? pct_info.alpha[i] : bad_data_double));
+                    alpha);
       }
 
       // Store the statistic value
-      put_nc_val(n, var_name, (float) v);
+      put_nc_val(n, var_name, v);
 
-   } // end for i
+   } // end for i_alpha
 
    return;
 }
@@ -2392,66 +2022,25 @@ void store_stat_pstd(int n, const ConcatString &col,
 
 void store_stat_pjc(int n, const ConcatString &col,
                     const PCTInfo &pct_info) {
-   int i = 0;
-   int tot;
-   double v;
-   ConcatString lty_stat, var_name;
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
-   ConcatString d = c;
-
-   // Get index value for variable column numbers
-   if(check_reg_exp("_[0-9]", c.c_str())) {
-
-      // Parse the index value from the column name
-      i = atoi(strrchr(c.c_str(), '_') + 1) - 1;
-
-      // Range check
-      if(i < 0 || i >= pct_info.pct.nrows()) {
-         mlog << Error << "\nstore_stat_pjc() -> "
-              << "range check error for column name requested \"" << c
-              << "\"\n\n";
-         exit(1);
-      }
-   }  // end if
-
-   // Store the total count
-   tot = pct_info.pct.n();
-
-   // Get the column value
-        if(c == "TOTAL")                                  { v = (double) tot;                                       }
-   else if(c == "N_THRESH")                               { v = (double) pct_info.pct.nrows() + 1;                  }
-   else if(check_reg_exp("THRESH_[0-9]", c.c_str()))      { v = pct_info.pct.threshold(i);
-                                                            d = "THRESH_I";                                         }
-   else if(check_reg_exp("OY_TP_[0-9]", c.c_str()))       { v = pct_info.pct.event_count_by_row(i)/(double) tot;
-                                                            d = "OY_TP_I";                                          }
-   else if(check_reg_exp("ON_TP_[0-9]", c.c_str()))       { v = pct_info.pct.nonevent_count_by_row(i)/(double) tot;
-                                                            d = "ON_TP_I";                                          }
-   else if(check_reg_exp("CALIBRATION_[0-9]", c.c_str())) { v = pct_info.pct.row_calibration(i);
-                                                            d = "CALIBRATION_I";                                    }
-   else if(check_reg_exp("REFINEMENT_[0-9]", c.c_str()))  { v = pct_info.pct.row_refinement(i);
-                                                            d = "REFINEMENT_I";                                     }
-   else if(check_reg_exp("LIKELIHOOD_[0-9]", c.c_str()))  { v = pct_info.pct.row_event_likelihood(i);
-                                                            d = "LIKELIHOOD_I";                                     }
-   else if(check_reg_exp("BASER_[0-9]", c.c_str()))       { v = pct_info.pct.row_obar(i);
-                                                            d = "BASER_I";                                          }
-   else {
-     mlog << Error << "\nstore_stat_pjc() -> "
-          << "unsupported column name requested \"" << c
-          << "\"\n\n";
-     exit(1);
-   }
 
    // Construct the NetCDF variable name
-   var_name << cs_erase << "series_pjc_" << c
-            << "_obs" << pct_info.othresh.get_abbr_str();
+   ConcatString var_name(build_nc_var_name_probabilistic(
+                            STATLineType::pjc, c,
+                            pct_info, bad_data_double));
+
+   // Store the data value
+   ConcatString col_name;
+   float v = (float) pct_info.get_stat_pct(c, col_name);
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
       // Build key
-      lty_stat << "PJC_" << d;
+      ConcatString lty_stat("PJC_");
+      lty_stat << col_name;
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
@@ -2461,7 +2050,7 @@ void store_stat_pjc(int n, const ConcatString &col,
    }
 
    // Store the statistic value
-   put_nc_val(n, var_name, (float) v);
+   put_nc_val(n, var_name, v);
 
    return;
 }
@@ -2470,55 +2059,25 @@ void store_stat_pjc(int n, const ConcatString &col,
 
 void store_stat_prc(int n, const ConcatString &col,
                     const PCTInfo &pct_info) {
-   int i = 0;
-   double v;
-   ConcatString lty_stat, var_name;
-   TTContingencyTable ct;
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
-   ConcatString d = c;
 
-   // Get index value for variable column numbers
-   if(check_reg_exp("_[0-9]", c.c_str())) {
+   // Construct the NetCDF variable name
+   ConcatString var_name(build_nc_var_name_probabilistic(
+                            STATLineType::prc, c,
+                            pct_info, bad_data_double));
 
-      // Parse the index value from the column name
-      i = atoi(strrchr(c.c_str(), '_') + 1) - 1;
-
-      // Range check
-      if(i < 0 || i >= pct_info.pct.nrows()) {
-         mlog << Error << "\nstore_stat_prc() -> "
-              << "range check error for column name requested \"" << c
-              << "\"\n\n";
-         exit(1);
-      }
-
-      // Get the 2x2 contingency table for this row
-      ct = pct_info.pct.ctc_by_row(i);
-
-   }  // end if
-
-   // Get the column value
-        if(c == "TOTAL")                             { v = (double) pct_info.pct.n();         }
-   else if(c == "N_THRESH")                          { v = (double) pct_info.pct.nrows() + 1; }
-   else if(check_reg_exp("THRESH_[0-9]", c.c_str())) { v = pct_info.pct.threshold(i);
-                                                       d = "THRESH_I";                        }
-   else if(check_reg_exp("PODY_[0-9]", c.c_str()))   { v = ct.pod_yes();
-                                                       d = "PODY_I";                          }
-   else if(check_reg_exp("POFD_[0-9]", c.c_str()))   { v = ct.pofd();
-                                                       d = "POFD_I";                          }
-   else {
-     mlog << Error << "\nstore_stat_prc() -> "
-          << "unsupported column name requested \"" << c
-          << "\"\n\n";
-     exit(1);
-   }
+   // Store the data value
+   ConcatString col_name;
+   float v = (float) pct_info.get_stat_pct(c, col_name);
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
       // Build key
-      lty_stat << "PRC_" << d;
+      ConcatString lty_stat("PRC_");
+      lty_stat << col_name;
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
@@ -2528,7 +2087,7 @@ void store_stat_prc(int n, const ConcatString &col,
    }
 
    // Store the statistic value
-   put_nc_val(n, var_name, (float) v);
+   put_nc_val(n, var_name, v);
 
    return;
 }
@@ -2577,12 +2136,13 @@ void store_stat_all_pct(int n, const PCTInfo &pct_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString build_nc_var_name_ctc(const ConcatString &col,
-                                   const CTSInfo &cts_info) {
+ConcatString build_nc_var_name_categorical(
+                STATLineType lt, const ConcatString &col,
+                const CTSInfo &cts_info, double alpha) {
 
    // Append the column name
-   ConcatString var_name("series_ctc_");
-   var_name << col;
+   ConcatString var_name("series_");
+   var_name << to_lower(statlinetype_to_string(lt)) << "_" << col;
 
    // Append threshold information
    if(cts_info.fthresh == cts_info.othresh) {
@@ -2593,17 +2153,37 @@ ConcatString build_nc_var_name_ctc(const ConcatString &col,
                << "_obs" << cts_info.othresh.get_abbr_str();
    }
 
+   // Append confidence interval alpha value
+   if(!is_bad_data(alpha)) var_name << "_a"  << alpha;
+
    return var_name;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString build_nc_var_name_sl1l2(const ConcatString &col,
-                                     const SL1L2Info &s_info) {
+ConcatString build_nc_var_name_multicategory(
+                STATLineType lt, const ConcatString &col,
+                double alpha) {
 
    // Append the column name
-   ConcatString var_name("series_sl1l2_");
-   var_name << col;
+   ConcatString var_name("series_");
+   var_name << to_lower(statlinetype_to_string(lt)) << "_" << col;
+
+   // Append confidence interval alpha value
+   if(!is_bad_data(alpha)) var_name << "_a"  << alpha;
+
+   return var_name;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString build_nc_var_name_partialsums(
+                STATLineType lt, const ConcatString &col,
+                const SL1L2Info &s_info) {
+
+   // Append the column name
+   ConcatString var_name("series_");
+   var_name << to_lower(statlinetype_to_string(lt)) << "_"  << col;
 
    // Append threshold information, if supplied
    if(s_info.fthresh.get_type() != thresh_na ||
@@ -2618,32 +2198,13 @@ ConcatString build_nc_var_name_sl1l2(const ConcatString &col,
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString build_nc_var_name_sal1l2(const ConcatString &col,
-                                      const SL1L2Info &s_info) {
+ConcatString build_nc_var_name_continuous(
+                STATLineType lt, const ConcatString &col,
+                const CNTInfo &cnt_info, double alpha) {
 
    // Append the column name
-   ConcatString var_name("series_sal1l2_");
-   var_name << col;
-
-   // Append threshold information, if supplied
-   if(s_info.fthresh.get_type() != thresh_na ||
-      s_info.othresh.get_type() != thresh_na) {
-      var_name << "_fcst" << s_info.fthresh.get_abbr_str()
-               << "_" << setlogic_to_abbr(s_info.logic)
-               << "_obs" << s_info.othresh.get_abbr_str();
-   }
-
-   return var_name;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ConcatString build_nc_var_name_cnt(const ConcatString &col,
-                                   const CNTInfo &cnt_info) {
-
-   // Append the column name
-   ConcatString var_name("series_cnt_");
-   var_name << col;
+   ConcatString var_name("series_");
+   var_name << to_lower(statlinetype_to_string(lt)) << "_" << col;
 
    // Append threshold information, if supplied
    if(cnt_info.fthresh.get_type() != thresh_na ||
@@ -2652,6 +2213,28 @@ ConcatString build_nc_var_name_cnt(const ConcatString &col,
                << "_" << setlogic_to_abbr(cnt_info.logic)
                << "_obs" << cnt_info.othresh.get_abbr_str();
    }
+
+   // Append confidence interval alpha value
+   if(!is_bad_data(alpha)) var_name << "_a"  << alpha;
+
+   return var_name;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString build_nc_var_name_probabilistic(
+                STATLineType lt, const ConcatString &col,
+                const PCTInfo &pct_info, double alpha) {
+
+   // Append the column name
+   ConcatString var_name("series_");
+   var_name << to_lower(statlinetype_to_string(lt)) << "_" << col;
+
+   // Append the observation threshold
+   var_name << "_obs" << pct_info.othresh.get_abbr_str();
+
+   // Append confidence interval alpha value
+   if(!is_bad_data(alpha)) var_name << "_a"  << alpha;
 
    return var_name;
 }
