@@ -124,7 +124,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
         if cmd_only:
             if 'env' in test.keys():
                 for key, val in sorted(test['env'].items()):
-                    print(f"export {key}={val}")
+                    print(f"export '{key}={val}'")
             print(f"{cmd}")
             if 'env' in test.keys():
                 for key, val in sorted(test['env'].items()):
