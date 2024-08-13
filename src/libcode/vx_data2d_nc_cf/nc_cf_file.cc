@@ -135,6 +135,7 @@ void NcCfFile::close()
   }
 
   grid_ready = false;
+  has_attr_grid = false;
 
   _numDims = 0;
 
@@ -864,11 +865,11 @@ int NcCfFile::lead_time() const
 ////////////////////////////////////////////////////////////////////////
 
 
-bool NcCfFile::check_or_update_grid(const Grid &attr_grid)
+bool NcCfFile::update_grid(const Grid &attr_grid)
 {
-  static const string method_name = "NcCfFile::check_or_update_grid(Grid &) -> ";
-  if (attr_grid.is_set())
-  {
+  static const string method_name = "NcCfFile::update_grid(Grid &) -> ";
+  has_attr_grid = attr_grid.is_set();
+  if (has_attr_grid) {
     grid = attr_grid;
     grid_ready = true;
     mlog << Debug(3) << method_name << "Override grid from set_attr_grid\n";
@@ -989,7 +990,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   //  find varinfo's
 
   bool found = false;
-  NcVarInfo *var = (NcVarInfo *)nullptr;
+  auto var = (NcVarInfo *)nullptr;
 
   for (int j = 0; j < Nvars; ++j)
   {
@@ -1014,13 +1015,19 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   for (int j = 0; j < a.n_elements(); ++j)
   {
-    if (a[j] == vx_data2d_star)
+    if (a[j] != vx_data2d_star) continue;
+
+    ++count;
+    if ( var == nullptr || ((j != var->x_slot) && (j != var->y_slot)) )
     {
-      ++count;
-      if ( var == nullptr || ((j != var->x_slot) && (j != var->y_slot)) )
-      {
+      if (has_attr_grid) {
+        mlog << Debug(3) << "\n" << method_name
+             << "star found in unknown slot (" << j << ") for " << GET_NC_NAME_P(v) << "\n\n";
+      }
+      else {
         mlog << Error << "\n" << method_name
              << "star found in bad slot (" << j << ") for " << GET_NC_NAME_P(v) << "\n\n";
+
         exit(1);
       }
     }
@@ -1034,13 +1041,22 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   }
 
   //  check slots - additional logic to satisfy Fortify Null Dereference
- int x_slot_tmp = 0;
- int y_slot_tmp = 0;
+  int x_slot_tmp = 0;
+  int y_slot_tmp = 0;
   if (var == nullptr || var->x_slot < 0 || var->y_slot < 0)
   {
-    mlog << Error << "\n" << method_name
-         << "bad x|y|z slot\n\n";
-    exit(1);
+    if (has_attr_grid) {
+      mlog << Warning << "\n" << method_name
+           << "bad x|y|z slot (" << var->x_slot << "|" << var->y_slot
+           << "|" << var->z_slot << "|" << var->t_slot <<")\n\n";
+      x_slot_tmp = dim_count - 1;
+      y_slot_tmp = dim_count - 2;
+    }
+    else {
+      mlog << Error << "\n" << method_name
+           << "bad x|y|z slot\n\n";
+      exit(1);
+    }
   }
   else {
     x_slot_tmp = var->x_slot;
@@ -3355,7 +3371,7 @@ void NcCfFile::get_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
 LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
                                                 const long lat_counts, const long lon_counts,
                                                 bool &swap_to_north) {
-  static const string method_name = "get_data_from_lat_lon_vars()";
+  static const string method_name = "NcCfFile::get_data_from_lat_lon_vars()";
 
   // Figure out the dlat/dlon values from the dimension variables
 

@@ -165,7 +165,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       = "MetNcCFDataFile::data_plane(VarInfo &, DataPlane &) -> ";
 
   Grid grid_attr = vinfo.grid_attr();
-  _file->check_or_update_grid(grid_attr);
+  _file->update_grid(grid_attr);
 
   // Initialize the data plane
 
@@ -343,7 +343,7 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
          = "MetNcCFDataFile::data_plane_array(VarInfo &, DataPlaneArray &) -> ";
 
    Grid grid_attr = vinfo.grid_attr();
-   _file->check_or_update_grid(grid_attr);
+   _file->update_grid(grid_attr);
 
    // Initialize
    plane_array.clear();
