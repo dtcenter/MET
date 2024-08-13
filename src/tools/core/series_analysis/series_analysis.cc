@@ -561,8 +561,8 @@ void get_series_data(int i_series,
          exit(1);
       }
 
-      mlog << Debug(3)
-           << "Regridding field " << fcst_info->magic_str()
+      mlog << Debug(2)
+           << "Regridding forecast " << fcst_info->magic_str()
            << " to the verification grid.\n";
       fcst_dp = met_regrid(fcst_dp, fcst_grid, grid,
                            fcst_info->regrid());
@@ -581,8 +581,8 @@ void get_series_data(int i_series,
          exit(1);
       }
 
-      mlog << Debug(3)
-           << "Regridding field " << obs_info->magic_str()
+      mlog << Debug(2)
+           << "Regridding observation " << obs_info->magic_str()
            << " to the verification grid.\n";
       obs_dp = met_regrid(obs_dp, obs_grid, grid,
                           obs_info->regrid());
@@ -813,6 +813,7 @@ void process_scores() {
    VarInfo *fcst_info = (VarInfo *) nullptr;
    VarInfo *obs_info  = (VarInfo *) nullptr;
    DataPlane fcst_dp, obs_dp;
+   vector<PairDataPoint> pd_block;
    const char *method_name = "process_scores() ";
 
    // Climatology mean and standard deviation
@@ -823,19 +824,8 @@ void process_scores() {
    int n_skip_zero = 0;
    int n_skip_pos  = 0;
 
-   // Create a vector of PairDataPoint objects
-   vector<PairDataPoint> pd_block;
-   pd_block.resize(conf_info.block_size);
-   for(auto &x : pd_block) x.extend(n_series);
-
    // Loop over the data reads
    for(int i_read=0; i_read<n_reads; i_read++) {
-
-      // Re-initialize the PairDataPoint objects
-      for(auto &x : pd_block) {
-         x.erase();
-         x.set_climo_cdf_info_ptr(&conf_info.cdf_info);
-      }
 
       // Loop over the series variable
       for(int i_series=0; i_series<n_series; i_series++) {
@@ -852,8 +842,21 @@ void process_scores() {
          // Retrieve the data planes for the current series entry
          get_series_data(i_series, fcst_info, obs_info, fcst_dp, obs_dp);
 
-         // Define starting point for this data pass
+         // Initialize PairDataPoint vector, if needed
+         // block_size is defined in get_series_data()
+         if(pd_block.size() == 0) {
+            pd_block.resize(conf_info.block_size);
+            for(auto &x : pd_block) x.extend(n_series);
+         }
+
+         // Beginning of each data pass
          if(i_series == 0) {
+
+            // Re-initialize the PairDataPoint objects
+            for(auto &x : pd_block) {
+               x.erase();
+               x.set_climo_cdf_info_ptr(&conf_info.cdf_info);
+            }
 
             // Starting grid point
             i_point = i_read*conf_info.block_size;

@@ -221,9 +221,9 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
 
       // Regrid, if needed
       if(!(mtddf->grid() == vx_grid)) {
-         mlog << Debug(2) << "Regridding " << clm_ut_cs << " \""
+         mlog << Debug(2) << "Regridding climatology " << clm_ut_cs << " \""
               << info->magic_str()
-              << "\" climatology field to the verification grid.\n";
+              << "\" to the verification grid.\n";
          dp = met_regrid(clm_dpa[i], mtddf->grid(), vx_grid,
                          regrid_info);
       }
