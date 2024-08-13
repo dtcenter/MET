@@ -97,6 +97,9 @@ class CTSInfo {
       void compute_stats();
       void compute_ci();
 
+      void set_stat_ctc(const std::string &, double);
+
+      double get_stat(STATLineType, const std::string &, int i_alpha=0) const;
       double get_stat_fho(const std::string &) const;
       double get_stat_ctc(const std::string &) const;
       double get_stat_cts(const std::string &, int i_alpha=0) const;
@@ -139,6 +142,7 @@ class MCTSInfo {
       void compute_stats();
       void compute_ci();
 
+      double get_stat(STATLineType, const std::string &, ConcatString &, int i_alpha=0) const;
       double get_stat_mctc(const std::string &, ConcatString &) const;
       double get_stat_mcts(const std::string &, int i_alpha=0) const;
 };
@@ -197,7 +201,7 @@ class CNTInfo {
       void allocate_n_alpha(int);
       void compute_ci();
 
-      double get_stat_cnt(const std::string &, int i_alpha=0) const;
+      double get_stat(const std::string &, int i_alpha=0) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -248,6 +252,7 @@ class SL1L2Info {
       void set_stat_sl1l2(const std::string &, double);
       void set_stat_sal1l2(const std::string &, double);
 
+      double get_stat(STATLineType, const std::string &) const;
       double get_stat_sl1l2(const std::string &) const;
       double get_stat_sal1l2(const std::string &) const;
 };
@@ -572,6 +577,7 @@ class PCTInfo {
       void compute_stats();
       void compute_ci();
 
+      double get_stat(STATLineType, const std::string &, ConcatString &, int i_alpha=0) const;
       double get_stat_pct(const std::string &, ConcatString &) const;
       double get_stat_pjc(const std::string &, ConcatString &) const;
       double get_stat_prc(const std::string &, ConcatString &) const;

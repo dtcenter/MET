@@ -425,6 +425,38 @@ void CTSInfo::compute_ci() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void CTSInfo::set_stat_ctc(const string &stat_name, double v) {
+
+        if(stat_name == "FY_OY")    cts.set_fy_oy(nint(v));
+   else if(stat_name == "FY_ON")    cts.set_fy_on(nint(v));
+   else if(stat_name == "FN_OY")    cts.set_fn_oy(nint(v));
+   else if(stat_name == "FN_ON")    cts.set_fn_on(nint(v));
+   else if(stat_name == "EC_VALUE") cts.set_ec_value(v);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double CTSInfo::get_stat(STATLineType lt, const string &stat_name, int i_alpha) const {
+   double v = bad_data_double;
+
+   // Get statistic by line type
+        if(lt == STATLineType::fho) v = get_stat_fho(stat_name);
+   else if(lt == STATLineType::ctc) v = get_stat_ctc(stat_name);
+   else if(lt == STATLineType::cts) v = get_stat_cts(stat_name, i_alpha);
+   else {
+      mlog << Error << "\nCTSInfo::get_stat() -> "
+           << "unexpected line type \"" << statlinetype_to_string(lt)
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 double CTSInfo::get_stat_fho(const string &stat_name) const {
    double v = bad_data_double;
 
@@ -786,6 +818,30 @@ void MCTSInfo::compute_ci() {
    } // end for i
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double MCTSInfo::get_stat(STATLineType lt,
+                          const string &stat_name,
+                          ConcatString &col_name,
+                          int i_alpha) const {
+   double v = bad_data_double;
+
+   // Initialize
+   col_name = stat_name;
+
+   // Get statistic by line type
+        if(lt == STATLineType::mctc) v = get_stat_mctc(stat_name, col_name);
+   else if(lt == STATLineType::mcts) v = get_stat_mcts(stat_name, i_alpha);
+   else {
+      mlog << Error << "\nMCTSInfo::get_stat() -> "
+           << "unexpected line type \"" << statlinetype_to_string(lt)
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1250,12 +1306,12 @@ void CNTInfo::compute_ci() {
 
 ////////////////////////////////////////////////////////////////////////
 
-double CNTInfo::get_stat_cnt(const string &stat_name, int i_alpha) const {
+double CNTInfo::get_stat(const string &stat_name, int i_alpha) const {
    double v = bad_data_double;
 
    // Range check alpha index
    if(i_alpha >= n_alpha && is_ci_stat_name(stat_name)) {
-      mlog << Error << "\nCNTInfo::get_stat_cnt() -> "
+      mlog << Error << "\nCNTInfo::get_stat() -> "
            << "alpha index out of range (" << i_alpha << " >= "
            << n_alpha << ")!\n\n";
       exit(1);
@@ -1366,7 +1422,7 @@ double CNTInfo::get_stat_cnt(const string &stat_name, int i_alpha) const {
    else if(stat_name == "SI_BCL"              ) v = si.v_bcl[i_alpha];
    else if(stat_name == "SI_BCU"              ) v = si.v_bcu[i_alpha];
    else {
-      mlog << Error << "\nCNTInfo::get_stat_cnt() -> "
+      mlog << Error << "\nCNTInfo::get_stat() -> "
            << "unknown continuous statistic name \"" << stat_name
            << "\"!\n\n";
       exit(1);
@@ -1651,6 +1707,24 @@ void SL1L2Info::set_stat_sal1l2(const string &stat_name, double v) {
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double SL1L2Info::get_stat(STATLineType lt, const string &stat_name) const {
+   double v = bad_data_double;
+
+   // Get statistic by line type
+        if(lt == STATLineType::sl1l2)  v = get_stat_sl1l2(stat_name);
+   else if(lt == STATLineType::sal1l2) v = get_stat_sal1l2(stat_name);
+   else {
+      mlog << Error << "\nSL1L2Info::get_stat() -> "
+           << "unexpected line type \"" << statlinetype_to_string(lt)
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3205,6 +3279,29 @@ void PCTInfo::compute_ci() {
    } // end for i
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double PCTInfo::get_stat(STATLineType lt,
+                          const string &stat_name,
+                          ConcatString &col_name,
+                          int i_alpha) const {
+   double v = bad_data_double;
+
+   // Get statistic by line type
+        if(lt == STATLineType::pct)  v = get_stat_pct(stat_name, col_name);
+   else if(lt == STATLineType::pjc)  v = get_stat_pjc(stat_name, col_name);
+   else if(lt == STATLineType::prc)  v = get_stat_prc(stat_name, col_name);
+   else if(lt == STATLineType::pstd) v = get_stat_pstd(stat_name, col_name, i_alpha);
+   else {
+      mlog << Error << "\nPCTInfo::get_stat() -> "
+           << "unexpected line type \"" << statlinetype_to_string(lt)
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////

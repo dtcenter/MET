@@ -99,24 +99,27 @@ static void do_probabilistic (int, const PairDataPoint *);
 // - Currently no way to aggregate anom_corr since CNTInfo::set(sl1l2)
 //   doesn't support it.
 
-static void read_aggr_ctc    (int, const CTSInfo &,   TTContingencyTable &);
-static void read_aggr_mctc   (int, const MCTSInfo &,  ContingencyTable &);
+static void read_aggr_ctc    (int, const CTSInfo &,   CTSInfo &);
+static void read_aggr_mctc   (int, const MCTSInfo &,  MCTSInfo &);
 static void read_aggr_sl1l2  (int, const SL1L2Info &, SL1L2Info &);
 static void read_aggr_sal1l2 (int, const SL1L2Info &, SL1L2Info &);
-static void read_aggr_pct    (int, const PCTInfo &,   Nx2ContingencyTable &);
+static void read_aggr_pct    (int, const PCTInfo &,   PCTInfo &);
 
-static void store_stat_fho   (int, const ConcatString &, const CTSInfo &);
-static void store_stat_ctc   (int, const ConcatString &, const CTSInfo &);
-static void store_stat_cts   (int, const ConcatString &, const CTSInfo &);
-static void store_stat_mctc  (int, const ConcatString &, const MCTSInfo &);
-static void store_stat_mcts  (int, const ConcatString &, const MCTSInfo &);
-static void store_stat_cnt   (int, const ConcatString &, const CNTInfo &);
-static void store_stat_sl1l2 (int, const ConcatString &, const SL1L2Info &);
-static void store_stat_sal1l2(int, const ConcatString &, const SL1L2Info &);
-static void store_stat_pct   (int, const ConcatString &, const PCTInfo &);
-static void store_stat_pstd  (int, const ConcatString &, const PCTInfo &);
-static void store_stat_pjc   (int, const ConcatString &, const PCTInfo &);
-static void store_stat_prc   (int, const ConcatString &, const PCTInfo &);
+static void store_stat_categorical(int,
+               STATLineType, const ConcatString &,
+               const CTSInfo &);
+static void store_stat_multicategory(int,
+               STATLineType, const ConcatString &,
+               const MCTSInfo &);
+static void store_stat_partialsums(int,
+               STATLineType, const ConcatString &,
+               const SL1L2Info &);
+static void store_stat_continuous(int,
+               STATLineType, const ConcatString &,
+               const CNTInfo &);
+static void store_stat_probabilistic(int,
+               STATLineType, const ConcatString &,
+               const PCTInfo &);
 
 static void store_stat_all_ctc   (int, const CTSInfo &);
 static void store_stat_all_mctc  (int, const MCTSInfo &);
@@ -1064,11 +1067,11 @@ void do_categorical(int n, const PairDataPoint *pd_ptr) {
          compute_ctsinfo(*pd_ptr, i_na, false, false, cts_info[i]);
 
          // Read the CTC data to be aggregated
-         TTContingencyTable aggr_ctc;
-         read_aggr_ctc(n, cts_info[i], aggr_ctc);
+         CTSInfo aggr_cts;
+         read_aggr_ctc(n, cts_info[i], aggr_cts);
 
          // Aggregate CTC counts
-         cts_info[i].cts += aggr_ctc;
+         cts_info[i].cts += aggr_cts.cts;
 
          // Compute statistics and confidence intervals
          cts_info[i].compute_stats();
@@ -1096,20 +1099,23 @@ void do_categorical(int n, const PairDataPoint *pd_ptr) {
 
       // Add statistic value for each possible FHO column
       for(int j=0; j<conf_info.output_stats[STATLineType::fho].n(); j++) {
-         store_stat_fho(n, conf_info.output_stats[STATLineType::fho][j],
-                        cts_info[i]);
+         store_stat_categorical(n, STATLineType::fho,
+            conf_info.output_stats[STATLineType::fho][j],
+            cts_info[i]);
       }
 
       // Add statistic value for each possible CTC column
       for(int j=0; j<conf_info.output_stats[STATLineType::ctc].n(); j++) {
-         store_stat_ctc(n, conf_info.output_stats[STATLineType::ctc][j],
-                        cts_info[i]);
+         store_stat_categorical(n, STATLineType::ctc,
+            conf_info.output_stats[STATLineType::ctc][j],
+            cts_info[i]);
       }
 
       // Add statistic value for each possible CTS column
       for(int j=0; j<conf_info.output_stats[STATLineType::cts].n(); j++) {
-         store_stat_cts(n, conf_info.output_stats[STATLineType::cts][j],
-                        cts_info[i]);
+         store_stat_categorical(n, STATLineType::cts,
+            conf_info.output_stats[STATLineType::cts][j],
+            cts_info[i]);
       }
    } // end for i
 
@@ -1150,11 +1156,11 @@ void do_multicategory(int n, const PairDataPoint *pd_ptr) {
       compute_mctsinfo(*pd_ptr, i_na, false, false, mcts_info);
 
       // Read the MCTC data to be aggregated
-      ContingencyTable aggr_ctc;
-      read_aggr_mctc(n, mcts_info, aggr_ctc);
+      MCTSInfo aggr_mcts;
+      read_aggr_mctc(n, mcts_info, aggr_mcts);
 
       // Aggregate MCTC counts
-      mcts_info.cts += aggr_ctc;
+      mcts_info.cts += aggr_mcts.cts;
 
       // Compute statistics and confidence intervals
       mcts_info.compute_stats();
@@ -1178,14 +1184,16 @@ void do_multicategory(int n, const PairDataPoint *pd_ptr) {
 
    // Add statistic value for each possible MCTC column
    for(int i=0; i<conf_info.output_stats[STATLineType::mctc].n(); i++) {
-      store_stat_mctc(n, conf_info.output_stats[STATLineType::mctc][i],
-                      mcts_info);
+      store_stat_multicategory(n, STATLineType::mctc,
+         conf_info.output_stats[STATLineType::mctc][i],
+         mcts_info);
    }
 
    // Add statistic value for each possible MCTS column
    for(int i=0; i<conf_info.output_stats[STATLineType::mcts].n(); i++) {
-      store_stat_mcts(n, conf_info.output_stats[STATLineType::mcts][i],
-                      mcts_info);
+      store_stat_multicategory(n, STATLineType::mcts,
+         conf_info.output_stats[STATLineType::mcts][i],
+         mcts_info);
    }
 
    return;
@@ -1266,8 +1274,9 @@ void do_continuous(int n, const PairDataPoint *pd_ptr) {
 
       // Add statistic value for each possible CNT column
       for(j=0; j<conf_info.output_stats[STATLineType::cnt].n(); j++) {
-         store_stat_cnt(n, conf_info.output_stats[STATLineType::cnt][j],
-                        cnt_info);
+         store_stat_continuous(n, STATLineType::cnt,
+            conf_info.output_stats[STATLineType::cnt][j],
+            cnt_info);
       }
    } // end for i
 
@@ -1313,12 +1322,16 @@ void do_partialsums(int n, const PairDataPoint *pd_ptr) {
 
       // Add statistic value for each possible SL1L2 column
       for(int j=0; j<conf_info.output_stats[STATLineType::sl1l2].n(); j++) {
-         store_stat_sl1l2(n, conf_info.output_stats[STATLineType::sl1l2][j], s_info);
+         store_stat_partialsums(n, STATLineType::sl1l2,
+            conf_info.output_stats[STATLineType::sl1l2][j],
+            s_info);
       }
 
       // Add statistic value for each possible SAL1L2 column
       for(int j=0; j<conf_info.output_stats[STATLineType::sal1l2].n(); j++) {
-         store_stat_sal1l2(n, conf_info.output_stats[STATLineType::sal1l2][j], s_info);
+         store_stat_partialsums(n, STATLineType::sal1l2,
+            conf_info.output_stats[STATLineType::sal1l2][j],
+            s_info);
       }
 
    } // end for i
@@ -1329,10 +1342,10 @@ void do_partialsums(int n, const PairDataPoint *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 void read_aggr_ctc(int n, const CTSInfo &cts_info,
-                   TTContingencyTable &aggr_ctc) {
+                   CTSInfo &aggr_cts) {
 
    // Initialize
-   aggr_ctc.zero_out();
+   aggr_cts.cts.zero_out();
 
    // Loop over the CTC column names
    for(int i=0; i<n_ctc_columns; i++) {
@@ -1351,11 +1364,8 @@ void read_aggr_ctc(int n, const CTSInfo &cts_info,
       double v = aggr_data[var_name].buf()[n];
 
       // Populate the CTC table
-           if(c == "FY_OY")    { aggr_ctc.set_fy_oy(nint(v)); }
-      else if(c == "FY_ON")    { aggr_ctc.set_fy_on(nint(v)); }
-      else if(c == "FN_OY")    { aggr_ctc.set_fn_oy(nint(v)); }
-      else if(c == "FN_ON")    { aggr_ctc.set_fn_on(nint(v)); }
-      else if(c == "EC_VALUE") { aggr_ctc.set_ec_value(v);    }
+      aggr_cts.set_stat_ctc(ctc_columns[i],
+                            aggr_data[var_name].buf()[n]);
    }
 
    return;
@@ -1422,21 +1432,22 @@ void read_aggr_sal1l2(int n, const SL1L2Info &s_info,
 ////////////////////////////////////////////////////////////////////////
 
 void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
-                    ContingencyTable &aggr_ctc) {
+                    MCTSInfo &aggr_mcts) {
 
    // Initialize
-   aggr_ctc = mcts_info.cts;
-   aggr_ctc.zero_out();
+   aggr_mcts.cts = mcts_info.cts;
+   aggr_mcts.cts.zero_out();
 
    // Get MCTC column names
-   StringArray mctc_cols(get_mctc_columns(aggr_ctc.nrows()));
+   StringArray mctc_cols(get_mctc_columns(aggr_mcts.cts.nrows()));
 
    // Loop over the MCTC column names
    for(int i=0; i<mctc_cols.n(); i++) {
 
+      // Construct the NetCDF variable name
       ConcatString c(to_upper(mctc_cols[i]));
-      ConcatString var_name("series_mctc_");
-      var_name << c;
+      ConcatString var_name(build_nc_var_name_multicategory(STATLineType::mctc,
+                               c, bad_data_double));
 
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
@@ -1448,18 +1459,18 @@ void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
 
       // Check the number of categories
       if(c == "N_CAT" && !is_bad_data(v) &&
-         aggr_ctc.nrows() != nint(v)) {
+         aggr_mcts.cts.nrows() != nint(v)) {
          mlog << Error << "\nread_aggr_mctc() -> "
               << "the number of MCTC categories do not match ("
-              << nint(v) << " != " << aggr_ctc.nrows() << ")!\n\n";
+              << nint(v) << " != " << aggr_mcts.cts.nrows() << ")!\n\n";
          exit(1);
       }
       // Check the expected correct
       else if(c == "EC_VALUE" && !is_bad_data(v) &&
-              !is_eq(v, aggr_ctc.ec_value(), loose_tol)) {
+              !is_eq(v, aggr_mcts.cts.ec_value(), loose_tol)) {
          mlog << Error << "\nread_aggr_mctc() -> "
               << "the MCTC expected correct values do not match ("
-              << v << " != " << aggr_ctc.ec_value() << ")!\n\n";
+              << v << " != " << aggr_mcts.cts.ec_value() << ")!\n\n";
          exit(1);
       }
       // Populate the MCTC table
@@ -1467,7 +1478,7 @@ void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
          StringArray sa(c.split("_"));
          int i_row = atoi(sa[0].c_str()+1) - 1;
          int i_col = atoi(sa[1].c_str()+1) - 1;
-         aggr_ctc.set_entry(i_row, i_col, nint(v));
+         aggr_mcts.cts.set_entry(i_row, i_col, nint(v));
       }
    } // end for i
 
@@ -1477,21 +1488,23 @@ void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
 ////////////////////////////////////////////////////////////////////////
 
 void read_aggr_pct(int n, const PCTInfo &pct_info,
-                   Nx2ContingencyTable &aggr_pct) {
+                   PCTInfo &aggr_pct) {
 
    // Initialize
-   aggr_pct = pct_info.pct;
-   aggr_pct.zero_out();
+   aggr_pct.pct = pct_info.pct;
+   aggr_pct.pct.zero_out();
 
    // Get PCT column names
-   StringArray pct_cols(get_pct_columns(aggr_pct.nrows()));
+   StringArray pct_cols(get_pct_columns(aggr_pct.pct.nrows()));
 
    // Loop over the PCT colum names
    for(int i=0; i<pct_cols.n(); i++) {
 
+      // Construct the NetCDF variable name
       ConcatString c(to_upper(pct_cols[i]));
-      ConcatString var_name("series_pct_");
-      var_name << c << "_obs" << pct_info.othresh.get_abbr_str();
+      ConcatString var_name(build_nc_var_name_probabilistic(
+                               STATLineType::pct, c,
+                               pct_info, bad_data_double));
 
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
@@ -1503,10 +1516,10 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
 
       // Check the number of thresholds
       if(c == "N_THRESH" && !is_bad_data(v) &&
-         aggr_pct.nrows() != nint(v)+1) {
+         aggr_pct.pct.nrows() != nint(v)+1) {
          mlog << Error << "\nread_aggr_pct() -> "
               << "the number of PCT categories do not match ("
-              << nint(v)+1 << " != " << aggr_pct.nrows() << ")!\n\n";
+              << nint(v)+1 << " != " << aggr_pct.pct.nrows() << ")!\n\n";
          exit(1);
       }
       // Set the event counts
@@ -1514,14 +1527,14 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
 
          // Parse the index value from the column name
          int i_row = atoi(strrchr(c.c_str(), '_') + 1) - 1;
-         aggr_pct.set_event(i_row, nint(v));
+         aggr_pct.pct.set_event(i_row, nint(v));
       }
       // Set the non-event counts
       else if(check_reg_exp("ON_[0-9]", c.c_str())) {
 
          // Parse the index value from the column name
          int i_row = atoi(strrchr(c.c_str(), '_') + 1) - 1;
-         aggr_pct.set_nonevent(i_row, nint(v));
+         aggr_pct.pct.set_nonevent(i_row, nint(v));
       }
    } // end for i
 
@@ -1559,11 +1572,11 @@ void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
          compute_pctinfo(*pd_ptr, false, pct_info);
 
          // Read the PCT data to be aggregated
-         Nx2ContingencyTable aggr_pct;
+         PCTInfo aggr_pct;
          read_aggr_pct(n, pct_info, aggr_pct);
 
          // Aggregate PCT counts
-         pct_info.pct += aggr_pct;
+         pct_info.pct += aggr_pct.pct;
 
          // Zero out the climatology PCT table which cannot be aggregated
          pct_info.climo_pct.zero_out();
@@ -1580,26 +1593,30 @@ void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
 
       // Add statistic value for each possible PCT column
       for(j=0; j<conf_info.output_stats[STATLineType::pct].n(); j++) {
-         store_stat_pct(n, conf_info.output_stats[STATLineType::pct][j],
-                        pct_info);
+         store_stat_probabilistic(n, STATLineType::pct,
+            conf_info.output_stats[STATLineType::pct][j],
+            pct_info);
       }
 
       // Add statistic value for each possible PSTD column
       for(j=0; j<conf_info.output_stats[STATLineType::pstd].n(); j++) {
-         store_stat_pstd(n, conf_info.output_stats[STATLineType::pstd][j],
-                         pct_info);
+         store_stat_probabilistic(n, STATLineType::pstd,
+            conf_info.output_stats[STATLineType::pstd][j],
+            pct_info);
       }
 
       // Add statistic value for each possible PJC column
       for(j=0; j<conf_info.output_stats[STATLineType::pjc].n(); j++) {
-         store_stat_pjc(n, conf_info.output_stats[STATLineType::pjc][j],
-                        pct_info);
+         store_stat_probabilistic(n, STATLineType::prc,
+            conf_info.output_stats[STATLineType::pjc][j],
+            pct_info);
       }
 
       // Add statistic value for each possible PRC column
       for(j=0; j<conf_info.output_stats[STATLineType::prc].n(); j++) {
-         store_stat_prc(n, conf_info.output_stats[STATLineType::prc][j],
-                        pct_info);
+         store_stat_probabilistic(n, STATLineType::prc,
+            conf_info.output_stats[STATLineType::prc][j],
+            pct_info);
       }
    } // end for i
 
@@ -1608,86 +1625,23 @@ void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_fho(int n, const ConcatString &col,
-                    const CTSInfo &cts_info) {
+void store_stat_categorical(int n, STATLineType lt,
+        const ConcatString &col,
+        const CTSInfo &cts_info) {
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
 
-   // Construct the NetCDF variable name
-   ConcatString var_name(build_nc_var_name_categorical(
-                            STATLineType::fho, c,
-                            cts_info, bad_data_double));
-
-   // Add map for this variable name
-   if(stat_data.count(var_name) == 0) {
-
-      // Build key
-      ConcatString lty_stat("FHO_");
-      lty_stat << c;
-
-      // Add new map entry
-      add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 cts_info.fthresh.get_str(),
-                 cts_info.othresh.get_str(),
-                 bad_data_double);
+   // Handle ALL CTC columns
+   if(lt == STATLineType::ctc && c == all_columns) {
+      return store_stat_all_ctc(n, cts_info);
    }
-
-   // Store the statistic value
-   put_nc_val(n, var_name,
-              (float) cts_info.get_stat_fho(c));
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void store_stat_ctc(int n, const ConcatString &col,
-                    const CTSInfo &cts_info) {
-
-   // Set the column name to all upper case
-   ConcatString c = to_upper(col);
-
-   // Handle ALL columns
-   if(c == all_columns) return store_stat_all_ctc(n, cts_info);
-
-   // Construct the NetCDF variable name
-   ConcatString var_name(build_nc_var_name_categorical(
-                            STATLineType::ctc, c,
-                            cts_info, bad_data_double));
-
-   // Add map for this variable name
-   if(stat_data.count(var_name) == 0) {
-
-      // Build key
-      ConcatString lty_stat("CTC_");
-      lty_stat << c;
-
-      // Add new map entry
-      add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 cts_info.fthresh.get_str(),
-                 cts_info.othresh.get_str(),
-                 bad_data_double);
-   }
-
-   // Store the statistic value
-   put_nc_val(n, var_name,
-              (float) cts_info.get_stat_ctc(c));
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void store_stat_cts(int n, const ConcatString &col,
-                    const CTSInfo &cts_info) {
-
-   // Set the column name to all upper case
-   ConcatString c = to_upper(col);
 
    // Check for columns with normal or bootstrap confidence limits
    int n_alpha = 1;
-   if(is_ci_stat_name(c)) n_alpha = cts_info.n_alpha;
+   if(lt == STATLineType::cts && is_ci_stat_name(c)) {
+      n_alpha = cts_info.n_alpha;
+   }
 
    // Loop over the alpha values
    for(int i_alpha=0; i_alpha<n_alpha; i_alpha++) {
@@ -1697,15 +1651,14 @@ void store_stat_cts(int n, const ConcatString &col,
 
       // Construct the NetCDF variable name
       ConcatString var_name(build_nc_var_name_categorical(
-                               STATLineType::cts, c,
-                               cts_info, alpha));
+                               lt, c, cts_info, alpha));
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
 
          // Build key
-         ConcatString lty_stat("CTS_");
-         lty_stat << c;
+         ConcatString lty_stat(statlinetype_to_string(lt));
+         lty_stat << "_" << c;
 
          // Add new map entry
          add_nc_var(var_name, c, stat_long_name[lty_stat],
@@ -1716,7 +1669,7 @@ void store_stat_cts(int n, const ConcatString &col,
 
       // Store the statistic value
       put_nc_val(n, var_name,
-                 (float) cts_info.get_stat_cts(c, i_alpha));
+                 (float) cts_info.get_stat(lt, c, i_alpha));
 
    } // end for i_alpha
 
@@ -1725,55 +1678,23 @@ void store_stat_cts(int n, const ConcatString &col,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_mctc(int n, const ConcatString &col,
-                     const MCTSInfo &mcts_info) {
+void store_stat_multicategory(int n, STATLineType lt,
+        const ConcatString &col,
+        const MCTSInfo &mcts_info) {
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
 
-   // Handle ALL columns
-   if(c == all_columns) return store_stat_all_mctc(n, mcts_info);
-
-   // Construct the NetCDF variable name
-   ConcatString var_name(build_nc_var_name_multicategory(
-                            STATLineType::mctc, c,
-                            bad_data_double));
-
-   // Store the data value
-   ConcatString col_name;
-   float v = (float) mcts_info.get_stat_mctc(c, col_name);
-
-   // Add map for this variable name
-   if(stat_data.count(var_name) == 0) {
-
-      // Build key
-      ConcatString lty_stat("MCTC_");
-      lty_stat << col_name;
-
-      // Add new map entry
-      add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 mcts_info.fthresh.get_str(","),
-                 mcts_info.othresh.get_str(","),
-                 bad_data_double);
+   // Handle ALL MCTC columns
+   if(lt == STATLineType::mctc && c == all_columns) {
+      return store_stat_all_mctc(n, mcts_info);
    }
-
-   // Store the statistic value
-   put_nc_val(n, var_name, v);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void store_stat_mcts(int n, const ConcatString &col,
-                     const MCTSInfo &mcts_info) {
-
-   // Set the column name to all upper case
-   ConcatString c = to_upper(col);
 
    // Check for columns with normal or bootstrap confidence limits
    int n_alpha = 1;
-   if(is_ci_stat_name(c)) n_alpha = mcts_info.n_alpha;
+   if(lt == STATLineType::mcts && is_ci_stat_name(c)) {
+      n_alpha = mcts_info.n_alpha;
+   }
 
    // Loop over the alpha values
    for(int i_alpha=0; i_alpha<n_alpha; i_alpha++) {
@@ -1783,15 +1704,18 @@ void store_stat_mcts(int n, const ConcatString &col,
 
       // Construct the NetCDF variable name
       ConcatString var_name(build_nc_var_name_multicategory(
-                               STATLineType::mcts, c,
-                               alpha));
+                               lt, c, alpha));
+
+      // Store the data value
+      ConcatString col_name;
+      float v = (float) mcts_info.get_stat(lt, c, col_name, i_alpha);
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
 
          // Build key
-         ConcatString lty_stat("MCTS_");
-         lty_stat << c;
+         ConcatString lty_stat;
+         lty_stat << statlinetype_to_string(lt) << "_" << col_name;
 
          // Add new map entry
          add_nc_var(var_name, c, stat_long_name[lty_stat],
@@ -1801,8 +1725,7 @@ void store_stat_mcts(int n, const ConcatString &col,
       }
 
       // Store the statistic value
-      put_nc_val(n, var_name,
-                 (float) mcts_info.get_stat_mcts(c, i_alpha));
+      put_nc_val(n, var_name, v);
 
    } // end for i_alpha
 
@@ -1811,8 +1734,9 @@ void store_stat_mcts(int n, const ConcatString &col,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_cnt(int n, const ConcatString &col,
-                    const CNTInfo &cnt_info) {
+void store_stat_continuous(int n, STATLineType lt,
+        const ConcatString &col,
+        const CNTInfo &cnt_info) {
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
@@ -1829,15 +1753,14 @@ void store_stat_cnt(int n, const ConcatString &col,
 
       // Construct the NetCDF variable name
       ConcatString var_name(build_nc_var_name_continuous(
-                               STATLineType::cnt, c,
-                               cnt_info, alpha));
+                               lt, c, cnt_info, alpha));
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
 
          // Build key
-         ConcatString lty_stat("CNT_");
-         lty_stat << c;
+         ConcatString lty_stat(statlinetype_to_string(lt));
+         lty_stat << "_" << c;
 
          // Add new map entry
          add_nc_var(var_name, c, stat_long_name[lty_stat],
@@ -1848,7 +1771,7 @@ void store_stat_cnt(int n, const ConcatString &col,
 
       // Store the statistic value
       put_nc_val(n, var_name,
-                 (float) cnt_info.get_stat_cnt(c, i_alpha));
+                 (float) cnt_info.get_stat(c, i_alpha));
 
    } // end for i_alpha
 
@@ -1857,26 +1780,29 @@ void store_stat_cnt(int n, const ConcatString &col,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_sl1l2(int n, const ConcatString &col,
-                      const SL1L2Info &s_info) {
+void store_stat_partialsums(int n, STATLineType lt,
+        const ConcatString &col,
+        const SL1L2Info &s_info) {
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
 
    // Handle ALL columns
-   if(c == all_columns) return store_stat_all_sl1l2(n, s_info);
+   if(c == all_columns) {
+           if(lt == STATLineType::sl1l2)  return store_stat_all_sl1l2(n, s_info);
+      else if(lt == STATLineType::sal1l2) return store_stat_all_sal1l2(n, s_info);
+   }
 
    // Construct the NetCDF variable name
    ConcatString var_name(build_nc_var_name_partialsums(
-                            STATLineType::sl1l2, c,
-                            s_info));
+                            lt, c, s_info));
 
    // Add map for this variable name
    if(stat_data.count(var_name) == 0) {
 
       // Build key
-      ConcatString lty_stat("SL1L2_");
-      lty_stat << c;
+      ConcatString lty_stat(statlinetype_to_string(lt));
+      lty_stat << "_" << c;
 
       // Add new map entry
       add_nc_var(var_name, c, stat_long_name[lty_stat],
@@ -1887,95 +1813,24 @@ void store_stat_sl1l2(int n, const ConcatString &col,
 
    // Store the statistic value
    put_nc_val(n, var_name,
-              (float) s_info.get_stat_sl1l2(c));
+              (float) s_info.get_stat(lt, c));
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_sal1l2(int n, const ConcatString &col,
-                       const SL1L2Info &s_info) {
-   double v;
+void store_stat_probabilistic(int n, STATLineType lt,
+        const ConcatString &col,
+        const PCTInfo &pct_info) {
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
 
-   // Handle ALL columns
-   if(c == all_columns) return store_stat_all_sal1l2(n, s_info);
-
-   ConcatString var_name(build_nc_var_name_partialsums(
-                            STATLineType::sal1l2, c,
-                            s_info));
-
-   // Add map for this variable name
-   if(stat_data.count(var_name) == 0) {
-
-      // Build key
-      ConcatString lty_stat("SAL1L2_");
-      lty_stat << c;
-
-      // Add new map entry
-      add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 s_info.fthresh.get_str(),
-                 s_info.othresh.get_str(),
-                 bad_data_double);
+   // Handle ALL PCT columns
+   if(lt == STATLineType::pct && c == all_columns) {
+      return store_stat_all_pct(n, pct_info);
    }
-
-   // Store the statistic value
-   put_nc_val(n, var_name,
-              (float) s_info.get_stat_sal1l2(c.c_str()));
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void store_stat_pct(int n, const ConcatString &col,
-                    const PCTInfo &pct_info) {
-
-   // Set the column name to all upper case
-   ConcatString c = to_upper(col);
-
-   // Handle ALL columns
-   if(c == all_columns) return store_stat_all_pct(n, pct_info);
-
-   // Construct the NetCDF variable name
-   ConcatString var_name(build_nc_var_name_probabilistic(
-                            STATLineType::pct, c,
-                            pct_info, bad_data_double));
-
-   // Store the data value
-   ConcatString col_name;
-   float v = (float) pct_info.get_stat_pct(c, col_name);
-
-   // Add map for this variable name
-   if(stat_data.count(var_name) == 0) {
-
-      // Build key
-      ConcatString lty_stat("PCT_");
-      lty_stat << col_name;
-
-      // Add new map entry
-      add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 pct_info.fthresh.get_str(","),
-                 pct_info.othresh.get_str(),
-                 bad_data_double);
-   }
-
-   // Store the statistic value
-   put_nc_val(n, var_name, v);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void store_stat_pstd(int n, const ConcatString &col,
-                     const PCTInfo &pct_info) {
-
-   // Set the column name to all upper case
-   ConcatString c = to_upper(col);
 
    // Check for columns with normal or bootstrap confidence limits
    int n_alpha = 1;
@@ -1989,19 +1844,18 @@ void store_stat_pstd(int n, const ConcatString &col,
 
       // Construct the NetCDF variable name
       ConcatString var_name(build_nc_var_name_probabilistic(
-                               STATLineType::pstd, c,
-                               pct_info, alpha));
+                               lt, c, pct_info, alpha));
 
       // Store the data value
       ConcatString col_name;
-      float v = (float) pct_info.get_stat_pstd(c, col_name);
+      float v = (float) pct_info.get_stat(lt, c, col_name, i_alpha);
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
 
          // Build key
-         ConcatString lty_stat("PSTD_");
-         lty_stat << col_name;
+         ConcatString lty_stat(statlinetype_to_string(lt));
+         lty_stat << "_" << col_name;
 
          // Add new map entry
          add_nc_var(var_name, c, stat_long_name[lty_stat],
@@ -2020,83 +1874,9 @@ void store_stat_pstd(int n, const ConcatString &col,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_pjc(int n, const ConcatString &col,
-                    const PCTInfo &pct_info) {
-
-   // Set the column name to all upper case
-   ConcatString c = to_upper(col);
-
-   // Construct the NetCDF variable name
-   ConcatString var_name(build_nc_var_name_probabilistic(
-                            STATLineType::pjc, c,
-                            pct_info, bad_data_double));
-
-   // Store the data value
-   ConcatString col_name;
-   float v = (float) pct_info.get_stat_pct(c, col_name);
-
-   // Add map for this variable name
-   if(stat_data.count(var_name) == 0) {
-
-      // Build key
-      ConcatString lty_stat("PJC_");
-      lty_stat << col_name;
-
-      // Add new map entry
-      add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 pct_info.fthresh.get_str(","),
-                 pct_info.othresh.get_str(),
-                 bad_data_double);
-   }
-
-   // Store the statistic value
-   put_nc_val(n, var_name, v);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void store_stat_prc(int n, const ConcatString &col,
-                    const PCTInfo &pct_info) {
-
-   // Set the column name to all upper case
-   ConcatString c = to_upper(col);
-
-   // Construct the NetCDF variable name
-   ConcatString var_name(build_nc_var_name_probabilistic(
-                            STATLineType::prc, c,
-                            pct_info, bad_data_double));
-
-   // Store the data value
-   ConcatString col_name;
-   float v = (float) pct_info.get_stat_pct(c, col_name);
-
-   // Add map for this variable name
-   if(stat_data.count(var_name) == 0) {
-
-      // Build key
-      ConcatString lty_stat("PRC_");
-      lty_stat << col_name;
-
-      // Add new map entry
-      add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 pct_info.fthresh.get_str(","),
-                 pct_info.othresh.get_str(),
-                 bad_data_double);
-   }
-
-   // Store the statistic value
-   put_nc_val(n, var_name, v);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void store_stat_all_ctc(int n, const CTSInfo &cts_info) {
    for(int i=0; i<n_ctc_columns; i++) {
-      store_stat_ctc(n, ctc_columns[i], cts_info);
+      store_stat_categorical(n, STATLineType::ctc, ctc_columns[i], cts_info);
    }
 }
 
@@ -2105,7 +1885,7 @@ void store_stat_all_ctc(int n, const CTSInfo &cts_info) {
 void store_stat_all_mctc(int n, const MCTSInfo &mcts_info) {
    StringArray mctc_cols(get_mctc_columns(mcts_info.cts.nrows()));
    for(int i=0; i<mctc_cols.n(); i++) {
-      store_stat_mctc(n, mctc_cols[i], mcts_info);
+      store_stat_multicategory(n, STATLineType::mctc, mctc_cols[i], mcts_info);
    }
 }
 
@@ -2113,7 +1893,7 @@ void store_stat_all_mctc(int n, const MCTSInfo &mcts_info) {
 
 void store_stat_all_sl1l2(int n, const SL1L2Info &s_info) {
    for(int i=0; i<n_sl1l2_columns; i++) {
-      store_stat_sl1l2(n, sl1l2_columns[i], s_info);
+      store_stat_partialsums(n, STATLineType::sl1l2, sl1l2_columns[i], s_info);
    }
 }
 
@@ -2121,7 +1901,7 @@ void store_stat_all_sl1l2(int n, const SL1L2Info &s_info) {
 
 void store_stat_all_sal1l2(int n, const SL1L2Info &s_info) {
    for(int i=0; i<n_sal1l2_columns; i++) {
-      store_stat_sal1l2(n, sal1l2_columns[i], s_info);
+      store_stat_partialsums(n, STATLineType::sal1l2, sal1l2_columns[i], s_info);
    }
 }
 
@@ -2130,7 +1910,7 @@ void store_stat_all_sal1l2(int n, const SL1L2Info &s_info) {
 void store_stat_all_pct(int n, const PCTInfo &pct_info) {
    StringArray pct_cols(get_pct_columns(pct_info.pct.nrows() + 1));
    for(int i=0; i<pct_cols.n(); i++) {
-      store_stat_pct(n, pct_cols[i], pct_info);
+      store_stat_probabilistic(n, STATLineType::pct, pct_cols[i], pct_info);
    }
 }
 

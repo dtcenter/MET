@@ -735,11 +735,11 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
                w = cts_info.cts.n();
             }
             else if(line.type() == STATLineType::sl1l2 && lty == STATLineType::cnt) {
-               v = cnt_info.get_stat_cnt(req_col[i].c_str());
+               v = cnt_info.get_stat(req_col[i].c_str());
                w = cnt_info.n;
             }
             else if(line.type() == STATLineType::sal1l2 && lty == STATLineType::cnt) {
-               v = cnt_info.get_stat_cnt(req_col[i].c_str());
+               v = cnt_info.get_stat(req_col[i].c_str());
                w = cnt_info.n;
             }
             else if(line.type() == STATLineType::vl1l2 && lty == STATLineType::vcnt) {
