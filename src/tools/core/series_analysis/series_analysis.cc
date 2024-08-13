@@ -92,13 +92,6 @@ static void do_continuous    (int, const PairDataPoint *);
 static void do_partialsums   (int, const PairDataPoint *);
 static void do_probabilistic (int, const PairDataPoint *);
 
-// TODO: MET #1371
-// - Add a PCT aggregation logic test
-// - Can briercl be aggregated as a weighted average and used for bss?
-// - How should valid data thresholds be applied when reading -aggr data?
-// - Currently no way to aggregate anom_corr since CNTInfo::set(sl1l2)
-//   doesn't support it.
-
 static void read_aggr_ctc    (int, const CTSInfo &,   CTSInfo &);
 static void read_aggr_mctc   (int, const MCTSInfo &,  MCTSInfo &);
 static void read_aggr_sl1l2  (int, const SL1L2Info &, SL1L2Info &);
@@ -1503,7 +1496,7 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
    aggr_pct.pct.zero_out();
 
    // Get PCT column names
-   StringArray pct_cols(get_pct_columns(aggr_pct.pct.nrows()));
+   StringArray pct_cols(get_pct_columns(aggr_pct.pct.nrows()+1));
 
    // Loop over the PCT colum names
    for(int i=0; i<pct_cols.n(); i++) {
@@ -1524,10 +1517,11 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
 
       // Check the number of thresholds
       if(c == "N_THRESH" && !is_bad_data(v) &&
-         aggr_pct.pct.nrows() != nint(v)+1) {
+         (aggr_pct.pct.nrows()+1) != nint(v)) {
          mlog << Error << "\nread_aggr_pct() -> "
-              << "the number of PCT categories do not match ("
-              << nint(v)+1 << " != " << aggr_pct.pct.nrows() << ")!\n\n";
+              << "the number of PCT thresholds do not match ("
+              << nint(v) << " != " << aggr_pct.pct.nrows()+1
+              << ")!\n\n";
          exit(1);
       }
       // Set the event counts

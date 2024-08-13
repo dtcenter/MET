@@ -3318,8 +3318,8 @@ double PCTInfo::get_stat_pct(const string &stat_name,
       // Parse the index value from the column name
       i = atoi(strrchr(stat_name.c_str(), '_') + 1) - 1;
 
-      // Range check
-      if(i < 0 || i >= pct.nrows()) {
+      // Range check (allow THRESH_N for N == nrows)
+      if(i < 0 || i > pct.nrows()) {
          mlog << Error << "\nPCTInfo::get_stat_pct() -> "
               << "range check error for column name requested \"" << stat_name
               << "\"\n\n";
