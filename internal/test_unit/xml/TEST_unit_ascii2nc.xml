@@ -1,0 +1,293 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+]>
+
+<!-- Requires: None -->
+
+<!-- Dependent: At least one unit test depends on the output of each of these tests. -->
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+<!--  <test name="ascii2nc_TRMM_3hr">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/trmm/TRMM_3B42.007.accumulated_precipitation.10:30Z09Apr2012.G3.output.mtxt \
+      &OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/trmm_2012040912_3hr.nc</point_nc>
+    </output>
+  </test> -->
+
+  <test name="ascii2nc_GAGE_24hr_pass_no_retval">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/gauge/2012041012.precip24_qty.ascii \
+      &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_GAGE_24hr_fail_no_retval">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/gauge/2012041012.badfile.ascii \
+      &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc</point_nc>
+    </output>
+  </test>  
+
+  <test name="ascii2nc_GAGE_24hr_pass_retval0">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <retval>0</retval>
+    <param> \
+      &DATA_DIR_OBS;/gauge/2012041012.precip24_qty.ascii \
+      &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc</point_nc>
+    </output>
+  </test>  
+
+  <test name="ascii2nc_GAGE_24hr_fail_retval0">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <retval>0</retval>
+    <param> \
+      &DATA_DIR_OBS;/gauge/2012041012.badfile.ascii \
+      &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc</point_nc>
+    </output>
+  </test>  
+
+  <test name="ascii2nc_GAGE_24hr_fail_retval1">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <retval>1</retval>
+    <param> \
+      &DATA_DIR_OBS;/gauge/2012041012.precip24_qty.ascii \
+      &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc</point_nc>
+    </output>
+  </test>    
+
+  <test name="ascii2nc_GAGE_24hr_pass_retval1">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <retval>1</retval>
+    <param> \
+      &DATA_DIR_OBS;/gauge/2012041012.badfile.ascii \
+      &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
+      -v 1
+    </param>
+    <output>
+    <!--  <point_nc>&OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc</point_nc> -->
+    </output>
+  </test>        
+
+<!--  <test name="ascii2nc_duplicates">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/ascii/dup_test_qty.txt \
+      &OUTPUT_DIR;/ascii2nc/dup_test.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/dup_test.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_SURFRAD1">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/surfrad/tbl12001.dat \
+      &DATA_DIR_OBS;/surfrad/tbl12002.dat \
+      &DATA_DIR_OBS;/surfrad/tbl12003.dat \
+      &OUTPUT_DIR;/ascii2nc/surfrad.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/surfrad.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_insitu_turb">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.13.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.14.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.15.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.16.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.17.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.18.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.19.ascii \
+      &DATA_DIR_OBS;/insitu_ascii/20130827/edr_hourly.20130827.20.ascii \
+      &OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/edr_hourly.20130827.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_by_var_name_PB">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/ascii/gdas1.20120409.t12z.prepbufr.name.txt \
+      &OUTPUT_DIR;/ascii2nc/gdas1.20120409.t12z.prepbufr.ascii_name.nc \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/gdas1.20120409.t12z.prepbufr.ascii_name.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_rain_01H_sum">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_020000.txt \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_021500.txt \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_023000.txt \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_024500.txt \
+      &DATA_DIR_OBS;/ascii/aws/aws_20220609_030000.txt \
+      &OUTPUT_DIR;/ascii2nc/aws_2022060903_rain_01H_sum.nc \
+      -config &CONFIG_DIR;/Ascii2NcConfig_rain_01H_sum
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/aws_2022060903_rain_01H_sum.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_airnow_daily_v2">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/airnow/daily_data_v2.dat \
+      &OUTPUT_DIR;/ascii2nc/airnow/daily_data_v2_20220312.nc
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/airnow/daily_data_v2_20220312.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_airnow_hourly_aqobs">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/airnow/HourlyAQObs_2022031200.dat \
+      &OUTPUT_DIR;/ascii2nc/airnow/HourlyAQObs_20220312.nc
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/airnow/HourlyAQObs_20220312.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_airnow_hourly">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+      &DATA_DIR_OBS;/airnow/HourlyData_2022031200.dat \
+      &OUTPUT_DIR;/ascii2nc/airnow/HourlyData_20220312.nc
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/airnow/HourlyData_20220312.nc</point_nc>
+    </output>
+  </test>
+  
+  <test name="ascii2nc_ndbc">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+    -format ndbc_standard  \
+    &DATA_DIR_OBS;/ndbc/13001.txt  \
+    &DATA_DIR_OBS;/ndbc/13002.txt \
+    &DATA_DIR_OBS;/ndbc/13008.txt \
+    &DATA_DIR_OBS;/ndbc/13009.txt \
+    &DATA_DIR_OBS;/ndbc/14040.txt \
+    &DATA_DIR_OBS;/ndbc/14043.txt \
+    &DATA_DIR_OBS;/ndbc/15001.txt \
+    &DATA_DIR_OBS;/ndbc/15002.txt \
+    &DATA_DIR_OBS;/ndbc/15006.txt \
+    &DATA_DIR_OBS;/ndbc/28401.txt \
+    &DATA_DIR_OBS;/ndbc/31001.txt \
+    &DATA_DIR_OBS;/ndbc/31003.txt \
+    &DATA_DIR_OBS;/ndbc/31004.txt \
+    &DATA_DIR_OBS;/ndbc/31005.txt \
+    &DATA_DIR_OBS;/ndbc/31006.txt \
+    &DATA_DIR_OBS;/ndbc/31007.txt \
+    &DATA_DIR_OBS;/ndbc/32ST0.txt\
+    &DATA_DIR_OBS;/ndbc/51000.txt \
+    &DATA_DIR_OBS;/ndbc/51001.txt \
+    &DATA_DIR_OBS;/ndbc/51002.txt \
+    &DATA_DIR_OBS;/ndbc/51003.txt \
+    &DATA_DIR_OBS;/ndbc/51004.txt \
+    &DATA_DIR_OBS;/ndbc/51101.txt \
+    &DATA_DIR_OBS;/ndbc/51201.txt \
+    &DATA_DIR_OBS;/ndbc/51202.txt \
+    &DATA_DIR_OBS;/ndbc/51205.txt \
+    &DATA_DIR_OBS;/ndbc/51206.txt \
+    &DATA_DIR_OBS;/ndbc/51207.txt \
+    &DATA_DIR_OBS;/ndbc/51208.txt \
+    &DATA_DIR_OBS;/ndbc/51209.txt \
+    &DATA_DIR_OBS;/ndbc/51211.txt \
+    &DATA_DIR_OBS;/ndbc/51212.txt \
+    &DATA_DIR_OBS;/ndbc/51213.txt \
+    &DATA_DIR_OBS;/ndbc/51WH0.txt \
+    &DATA_DIR_OBS;/ndbc/52200.txt \
+    &DATA_DIR_OBS;/ndbc/52202.txt\
+    &DATA_DIR_OBS;/ndbc/52211.txt \
+    &DATA_DIR_OBS;/ndbc/52212.txt \
+    &OUTPUT_DIR;/ascii2nc/ndbc.nc
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/ndbc.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_ismn_SNOTEL">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+    -format ismn  \
+    &DATA_DIR_OBS;/ismn/SNOTEL/*/*.stm \
+    &OUTPUT_DIR;/ascii2nc/ismn_SNOTEL_20220924_20220927.nc
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/ismn_SNOTEL_20220924_20220927.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_iabp">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+    -format iabp  \
+    -valid_beg 20140101 -valid_end 20140201 \
+    &DATA_DIR_OBS;/iabp/090629.dat \
+    &DATA_DIR_OBS;/iabp/109320.dat  \
+    &DATA_DIR_OBS;/iabp/109499.dat \
+    &OUTPUT_DIR;/ascii2nc/iabp_20140101_20140201.nc
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/iabp_20140101_20140201.nc</point_nc>
+    </output>
+  </test> -->
+
+</met_test>

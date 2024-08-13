@@ -143,7 +143,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
             logger.debug(f"Return code: {cmd_return.returncode}")
 
         #   # check the return status and output files
-            ret_ok = not cmd_return.returncode
+            ret_ok = (cmd_return.returncode == test['retval'])
             if ret_ok:
                 out_ok = True
 
@@ -279,9 +279,16 @@ def build_tests(test_root):
             logger.error("ERROR: name attribute not found for test")
             raise
 
+        test['retval'] = 0
         for el in test_el:
             if (el.tag=='exec' or el.tag=='param'):
                 test[el.tag] = repl_env(el.text)
+            elif el.tag=='retval':
+                try:
+                    test['retval'] = int(el.text)
+                except ValueError:
+                    logger.error("ERROR: retval must be an integer value")
+                    raise
             elif el.tag=='output':
                 test['out_pnc'] = []
                 test['out_gnc'] = []
