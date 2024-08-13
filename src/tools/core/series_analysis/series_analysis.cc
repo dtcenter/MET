@@ -842,7 +842,7 @@ void process_scores() {
 
          // Initialize PairDataPoint vector, if needed
          // block_size is defined in get_series_data()
-         if(pd_block.size() == 0) {
+         if(pd_block.empty()) {
             pd_block.resize(conf_info.block_size);
             for(auto &pd : pd_block) pd.extend(n_series);
          }
@@ -1347,10 +1347,10 @@ void read_aggr_ctc(int n, const CTSInfo &cts_info,
    // Initialize
    aggr_cts.cts.zero_out();
 
-   // Loop over the CTC column names
-   for(int i=0; i<n_ctc_columns; i++) {
+   // Loop over the CTC columns
+   for(auto &col : ctc_columns) {
 
-      ConcatString c(to_upper(ctc_columns[i]));
+      ConcatString c(to_upper(col));
       ConcatString var_name(build_nc_var_name_categorical(
                                STATLineType::ctc, c,
                                cts_info, bad_data_double));
@@ -1361,8 +1361,7 @@ void read_aggr_ctc(int n, const CTSInfo &cts_info,
       }
 
       // Populate the CTC table
-      aggr_cts.set_stat_ctc(ctc_columns[i],
-                            aggr_data[var_name].buf()[n]);
+      aggr_cts.set_stat_ctc(col, aggr_data[var_name].buf()[n]);
    }
 
    return;
@@ -1376,10 +1375,10 @@ void read_aggr_sl1l2(int n, const SL1L2Info &s_info,
    // Initialize
    aggr_psum.zero_out();
 
-   // Loop over the SL1L2 column names
-   for(int i=0; i<n_sl1l2_columns; i++) {
+   // Loop over the SL1L2 columns
+   for(auto &col : sl1l2_columns) {
 
-      ConcatString c(to_upper(sl1l2_columns[i]));
+      ConcatString c(to_upper(col));
       ConcatString var_name(build_nc_var_name_partialsums(
                                STATLineType::sl1l2, c,
                                s_info));
@@ -1390,8 +1389,7 @@ void read_aggr_sl1l2(int n, const SL1L2Info &s_info,
       }
 
       // Populate the partial sums
-      aggr_psum.set_stat_sl1l2(sl1l2_columns[i],
-                               aggr_data[var_name].buf()[n]);
+      aggr_psum.set_stat_sl1l2(col, aggr_data[var_name].buf()[n]);
    }
 
    return;
@@ -1405,10 +1403,10 @@ void read_aggr_sal1l2(int n, const SL1L2Info &s_info,
    // Initialize
    aggr_psum.zero_out();
 
-   // Loop over the SAL1L2 column names
-   for(int i=0; i<n_sal1l2_columns; i++) {
+   // Loop over the SAL1L2 columns
+   for(auto &col : sal1l2_columns) {
 
-      ConcatString c(to_upper(sal1l2_columns[i]));
+      ConcatString c(to_upper(col));
       ConcatString var_name(build_nc_var_name_partialsums(
                                STATLineType::sal1l2, c,
                                s_info));
@@ -1419,8 +1417,7 @@ void read_aggr_sal1l2(int n, const SL1L2Info &s_info,
       }
 
       // Populate the partial sums
-      aggr_psum.set_stat_sal1l2(sal1l2_columns[i],
-                                aggr_data[var_name].buf()[n]);
+      aggr_psum.set_stat_sal1l2(col, aggr_data[var_name].buf()[n]);
    }
 
    return;
@@ -1438,12 +1435,13 @@ void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
    // Get MCTC column names
    StringArray mctc_cols(get_mctc_columns(aggr_mcts.cts.nrows()));
 
-   // Loop over the MCTC column names
+   // Loop over the MCTC columns
    for(int i=0; i<mctc_cols.n(); i++) {
 
       // Construct the NetCDF variable name
       ConcatString c(to_upper(mctc_cols[i]));
-      ConcatString var_name(build_nc_var_name_multicategory(STATLineType::mctc,
+      ConcatString var_name(build_nc_var_name_multicategory(
+                               STATLineType::mctc,
                                c, bad_data_double));
 
       // Read aggregate data, if needed
@@ -1477,7 +1475,7 @@ void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
          int i_col = atoi(sa[1].c_str()+1) - 1;
          aggr_mcts.cts.set_entry(i_row, i_col, nint(v));
       }
-   } // end for i
+   }
 
    return;
 }
@@ -1494,7 +1492,7 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
    // Get PCT column names
    StringArray pct_cols(get_pct_columns(aggr_pct.pct.nrows()+1));
 
-   // Loop over the PCT colum names
+   // Loop over the PCT columns
    for(int i=0; i<pct_cols.n(); i++) {
 
       // Construct the NetCDF variable name
@@ -1534,7 +1532,7 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
          int i_row = atoi(strrchr(c.c_str(), '_') + 1) - 1;
          aggr_pct.pct.set_nonevent(i_row, nint(v));
       }
-   } // end for i
+   }
 
    return;
 }
@@ -1705,7 +1703,7 @@ void store_stat_multicategory(int n, STATLineType lt,
 
       // Store the data value
       ConcatString col_name;
-      float v = (float) mcts_info.get_stat(lt, c, col_name, i_alpha);
+      auto v = (float) mcts_info.get_stat(lt, c, col_name, i_alpha);
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
@@ -1845,7 +1843,7 @@ void store_stat_probabilistic(int n, STATLineType lt,
 
       // Store the data value
       ConcatString col_name;
-      float v = (float) pct_info.get_stat(lt, c, col_name, i_alpha);
+      auto v = (float) pct_info.get_stat(lt, c, col_name, i_alpha);
 
       // Add map for this variable name
       if(stat_data.count(var_name) == 0) {
@@ -1872,8 +1870,8 @@ void store_stat_probabilistic(int n, STATLineType lt,
 ////////////////////////////////////////////////////////////////////////
 
 void store_stat_all_ctc(int n, const CTSInfo &cts_info) {
-   for(int i=0; i<n_ctc_columns; i++) {
-      store_stat_categorical(n, STATLineType::ctc, ctc_columns[i], cts_info);
+   for(auto &col : ctc_columns) {
+      store_stat_categorical(n, STATLineType::ctc, col, cts_info);
    }
 }
 
@@ -1889,16 +1887,16 @@ void store_stat_all_mctc(int n, const MCTSInfo &mcts_info) {
 ////////////////////////////////////////////////////////////////////////
 
 void store_stat_all_sl1l2(int n, const SL1L2Info &s_info) {
-   for(int i=0; i<n_sl1l2_columns; i++) {
-      store_stat_partialsums(n, STATLineType::sl1l2, sl1l2_columns[i], s_info);
+   for(auto &col : sl1l2_columns) {
+      store_stat_partialsums(n, STATLineType::sl1l2, col, s_info);
    }
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void store_stat_all_sal1l2(int n, const SL1L2Info &s_info) {
-   for(int i=0; i<n_sal1l2_columns; i++) {
-      store_stat_partialsums(n, STATLineType::sal1l2, sal1l2_columns[i], s_info);
+   for(auto &col : sal1l2_columns) {
+      store_stat_partialsums(n, STATLineType::sal1l2, col, s_info);
    }
 }
 
