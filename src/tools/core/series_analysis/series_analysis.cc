@@ -1615,7 +1615,7 @@ void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
 
       // Add statistic value for each possible PJC column
       for(j=0; j<conf_info.output_stats[STATLineType::pjc].n(); j++) {
-         store_stat_probabilistic(n, STATLineType::prc,
+         store_stat_probabilistic(n, STATLineType::pjc,
             conf_info.output_stats[STATLineType::pjc][j],
             pct_info);
       }
