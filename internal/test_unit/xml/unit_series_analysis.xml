@@ -93,7 +93,7 @@
       -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/series_analysis/series_analysis_AGGREGATE_APCP_06_2012040900_to_2012041100.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/series_analysis/series_analysis_AGGREGATE_APCP_06_2012040900_to_2012041012.nc</grid_nc>
     </output>
   </test>
 
