@@ -737,7 +737,12 @@ DataPlane get_aggr_data(const ConcatString &var_name) {
       mlog << Debug(1)
            << "Reading aggregate data file: " << aggr_file << "\n";
 
-      aggr_nc.open(aggr_file.c_str());
+      if(!aggr_nc.open(aggr_file.c_str())) {
+         mlog << Error << "\nget_aggr_data() -> "
+              << "unable to open the aggregate NetCDF file \""
+              << aggr_file << "\"\n\n";
+         exit(1);
+      }
 
       // Update timing info based on aggregate file global attributes
       ConcatString cs;
