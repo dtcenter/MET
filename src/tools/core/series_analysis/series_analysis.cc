@@ -618,7 +618,6 @@ void get_series_entry(int i_series, VarInfo *info,
                       const GrdFileType type,
                       StringArray &found_files, DataPlane &dp,
                       Grid &cur_grid) {
-   int i, j;
    bool found = false;
 
    // Initialize
@@ -628,10 +627,10 @@ void get_series_entry(int i_series, VarInfo *info,
    if(found_files[i_series].length() == 0) {
 
       // Loop through the file list
-      for(i=0; i<search_files.n(); i++) {
+      for(int i=0; i<search_files.n(); i++) {
 
          // Start the search with the value of i_series
-         j = (i_series + i) % search_files.n();
+         int j = (i_series + i) % search_files.n();
 
          mlog << Debug(3)
               << "Searching file " << search_files[j] << "\n";
@@ -652,7 +651,7 @@ void get_series_entry(int i_series, VarInfo *info,
          mlog << Error << "\nget_series_entry() -> "
               << "Could not find data for " << info->magic_str()
               << " in file list:\n";
-         for(i=0; i<search_files.n(); i++)
+         for(int i=0; i<search_files.n(); i++)
             mlog << Error << "   " << search_files[i] << "\n";
          mlog << Error << "\n";
          exit(1);
@@ -722,7 +721,6 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
 
 DataPlane get_aggr_data(const ConcatString &var_name) {
    DataPlane aggr_dp;
-   bool found = false;
 
    // Open the aggregate file, if needed
    if(!aggr_nc.MetNc) {
@@ -806,11 +804,13 @@ DataPlane get_aggr_data(const ConcatString &var_name) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
-   int i, x, y;
+   int x;
+   int y;
    int i_point = 0;
    VarInfo *fcst_info = (VarInfo *) nullptr;
    VarInfo *obs_info  = (VarInfo *) nullptr;
-   DataPlane fcst_dp, obs_dp;
+   DataPlane fcst_dp;
+   DataPlane obs_dp;
    vector<PairDataPoint> pd_block;
    const char *method_name = "process_scores() ";
 
@@ -844,16 +844,16 @@ void process_scores() {
          // block_size is defined in get_series_data()
          if(pd_block.size() == 0) {
             pd_block.resize(conf_info.block_size);
-            for(auto &x : pd_block) x.extend(n_series);
+            for(auto &pd : pd_block) pd.extend(n_series);
          }
 
          // Beginning of each data pass
          if(i_series == 0) {
 
             // Re-initialize the PairDataPoint objects
-            for(auto &x : pd_block) {
-               x.erase();
-               x.set_climo_cdf_info_ptr(&conf_info.cdf_info);
+            for(auto &pd : pd_block) {
+               pd.erase();
+               pd.set_climo_cdf_info_ptr(&conf_info.cdf_info);
             }
 
             // Starting grid point
@@ -903,7 +903,7 @@ void process_scores() {
          set_range(obs_dp.lead(),   obs_lead_beg,   obs_lead_end);
 
          // Store matched pairs for each grid point
-         for(i=0; i<conf_info.block_size && (i_point+i)<grid.nxy(); i++) {
+         for(int i=0; i<conf_info.block_size && (i_point+i)<grid.nxy(); i++) {
 
             // Convert n to x, y
             DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
@@ -930,7 +930,7 @@ void process_scores() {
       } // end for i_series
 
       // Compute statistics for each grid point in the block
-      for(i=0; i<conf_info.block_size && (i_point+i)<grid.nxy(); i++) {
+      for(int i=0; i<conf_info.block_size && (i_point+i)<grid.nxy(); i++) {
 
          // Determine x,y location
          DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
@@ -1203,14 +1203,13 @@ void do_multicategory(int n, const PairDataPoint *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 void do_continuous(int n, const PairDataPoint *pd_ptr) {
-   int i, j;
    CNTInfo cnt_info;
    PairDataPoint pd;
 
    mlog << Debug(4) << "Computing Continuous Statistics.\n";
 
    // Process each filtering threshold
-   for(i=0; i<conf_info.fcnt_ta.n(); i++) {
+   for(int i=0; i<conf_info.fcnt_ta.n(); i++) {
 
       // Initialize
       cnt_info.clear();
@@ -1222,7 +1221,7 @@ void do_continuous(int n, const PairDataPoint *pd_ptr) {
 
       // Setup the CNTInfo alpha values
       cnt_info.allocate_n_alpha(conf_info.ci_alpha.n());
-      for(j=0; j<conf_info.ci_alpha.n(); j++) {
+      for(int j=0; j<conf_info.ci_alpha.n(); j++) {
          cnt_info.alpha[j] = conf_info.ci_alpha[j];
       }
 
@@ -1274,7 +1273,7 @@ void do_continuous(int n, const PairDataPoint *pd_ptr) {
       }
 
       // Add statistic value for each possible CNT column
-      for(j=0; j<conf_info.output_stats[STATLineType::cnt].n(); j++) {
+      for(int j=0; j<conf_info.output_stats[STATLineType::cnt].n(); j++) {
          store_stat_continuous(n, STATLineType::cnt,
             conf_info.output_stats[STATLineType::cnt][j],
             cnt_info);
@@ -1360,9 +1359,6 @@ void read_aggr_ctc(int n, const CTSInfo &cts_info,
       if(aggr_data.count(var_name) == 0) {
          aggr_data[var_name] = get_aggr_data(var_name);
       }
-
-      // Get the n-th value
-      double v = aggr_data[var_name].buf()[n];
 
       // Populate the CTC table
       aggr_cts.set_stat_ctc(ctc_columns[i],
@@ -1546,7 +1542,6 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
 ////////////////////////////////////////////////////////////////////////
 
 void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
-   int i, j;
 
    mlog << Debug(4) << "Computing Probabilistic Statistics.\n";
 
@@ -1557,12 +1552,12 @@ void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
    pct_info.fthresh = conf_info.fcat_ta;
    pct_info.allocate_n_alpha(conf_info.ci_alpha.n());
 
-   for(i=0; i<conf_info.ci_alpha.n(); i++) {
+   for(int i=0; i<conf_info.ci_alpha.n(); i++) {
       pct_info.alpha[i] = conf_info.ci_alpha[i];
    }
 
    // Compute PCTInfo for each observation threshold
-   for(i=0; i<conf_info.ocat_ta.n(); i++) {
+   for(int i=0; i<conf_info.ocat_ta.n(); i++) {
 
       // Set the current observation threshold
       pct_info.othresh = conf_info.ocat_ta[i];
@@ -1594,28 +1589,28 @@ void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
       }
 
       // Add statistic value for each possible PCT column
-      for(j=0; j<conf_info.output_stats[STATLineType::pct].n(); j++) {
+      for(int j=0; j<conf_info.output_stats[STATLineType::pct].n(); j++) {
          store_stat_probabilistic(n, STATLineType::pct,
             conf_info.output_stats[STATLineType::pct][j],
             pct_info);
       }
 
       // Add statistic value for each possible PSTD column
-      for(j=0; j<conf_info.output_stats[STATLineType::pstd].n(); j++) {
+      for(int j=0; j<conf_info.output_stats[STATLineType::pstd].n(); j++) {
          store_stat_probabilistic(n, STATLineType::pstd,
             conf_info.output_stats[STATLineType::pstd][j],
             pct_info);
       }
 
       // Add statistic value for each possible PJC column
-      for(j=0; j<conf_info.output_stats[STATLineType::pjc].n(); j++) {
+      for(int j=0; j<conf_info.output_stats[STATLineType::pjc].n(); j++) {
          store_stat_probabilistic(n, STATLineType::pjc,
             conf_info.output_stats[STATLineType::pjc][j],
             pct_info);
       }
 
       // Add statistic value for each possible PRC column
-      for(j=0; j<conf_info.output_stats[STATLineType::prc].n(); j++) {
+      for(int j=0; j<conf_info.output_stats[STATLineType::prc].n(); j++) {
          store_stat_probabilistic(n, STATLineType::prc,
             conf_info.output_stats[STATLineType::prc][j],
             pct_info);
