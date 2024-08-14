@@ -79,57 +79,57 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char
   NcDim  lat_dim  ;
   NcDim  lon_dim  ;
   NcVar  f_var    ;
-  
-  
+
+
   // Create a new NetCDF file and open it
   f_out = open_ncfile(out_filename, true);
-  
+
   if(IS_INVALID_NC_P(f_out)) 
   {
     mlog << Error << "\nwrite_netcdf() -> "
-	 << "trouble opening output file " << out_filename
-	 << "\n\n";
+         << "trouble opening output file " << out_filename
+         << "\n\n";
     delete f_out;  f_out = (NcFile *) nullptr;
     
     exit(1);
   }
-  
+
   // Add global attributes
   const char * program_name = "data_plane_to_netcdf";
   write_netcdf_global(f_out, out_filename, program_name);
-  
+
   // Add the projection information
   write_netcdf_proj(f_out, grid, lat_dim, lon_dim);
 
   // Add the lat/lon variables
   write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
-  
+
   int deflate_level = get_compress();
   //if (deflate_level < 0) deflate_level = 0;
-  
+
   // Define variable
   f_var = add_var(f_out, (string)var_info.name(), ncFloat, lat_dim, lon_dim, deflate_level);
-  
+
   // Add variable attributes
   add_att(&f_var, "name", (string)var_info.name());
   add_att(&f_var, "units", (string)var_info.units());
   add_att(&f_var, "long_name", (string)var_info.long_name());
   add_att(&f_var, "_FillValue", bad_data_float);
-  
+
   // Write out the times
   write_netcdf_var_times(&f_var, plane);
-  
+
   // Write the data
   if (!put_nc_data_with_dims(&f_var, plane.data(), plane.ny(), plane.nx())) 
   {
     mlog << Error << "\nwrite_netcdf() -> "
-	 << "error with f_var->put()\n\n";
+         << "error with f_var->put()\n\n";
     exit(1);
   }
-  
+
   // Close and clean up
   delete f_out;
   f_out = (NcFile *) nullptr;
-  
+
   return;
 }

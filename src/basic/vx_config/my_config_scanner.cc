@@ -514,7 +514,7 @@ int do_id()
 
 {
 
-int j, k;
+int j;
 const char *method_name = "do_id() -> ";
 
 Column += m_strlen(configtext);
@@ -618,15 +618,7 @@ for (j=0; j<n_fort_thresh_strings; ++j)  {
    //  simple percentile threshold?  (example: "SOP50")
    //
 
-for (j=0; j<n_perc_thresh_infos; ++j)  {
-
-   k = perc_thresh_info[j].short_name_length;
-
-   if (    (strncmp(configtext, perc_thresh_info[j].short_name, k) == 0)
-        && (is_number(configtext + k, max_id_length - k))  )
-           { return do_simple_perc_thresh(); }
-
-}
+if ( parse_perc_thresh(configtext) )  return do_simple_perc_thresh();
 
     ///////////////////////////////////////////////////////////////////////
 
@@ -1417,22 +1409,11 @@ bool is_simple_perc_thresh()
 
 {
 
-int j, k;
-
    //
    //  simple percentile threshold?  (example: "SOP50.0")
    //
 
-for (j=0; j<n_perc_thresh_infos; ++j)  {
-
-   k = perc_thresh_info[j].short_name_length;
-
-   if (    (strncmp(configtext, perc_thresh_info[j].short_name, k) == 0)
-        && (is_number(configtext + k, max_id_length - k))  )
-           { return do_simple_perc_thresh(); }
-
-}
-
+if ( parse_perc_thresh(configtext) )  return do_simple_perc_thresh();
 
 return false;
 
@@ -1446,27 +1427,7 @@ int do_simple_perc_thresh()
 
 {
 
-int j, k;
-int index = -1;
-double value = bad_data_double;
-
-for (j=0; j<n_perc_thresh_infos; ++j)  {
-
-   k = perc_thresh_info[j].short_name_length;
-
-   if ( strncmp(configtext, perc_thresh_info[j].short_name, k) == 0 )  {
-
-      index = j;
-
-      value = atof(configtext + k);
-
-      break;
-
-   }
-
-}
-
-if ( index < 0 )   {
+if ( !parse_perc_thresh(configtext, &configlval.pc_info) ) {
 
    mlog << Error << "\ndo_simple_perc_thresh() -> "
         << "unable to parse string \"" << configtext << "\"\n\n";
@@ -1474,10 +1435,6 @@ if ( index < 0 )   {
    exit ( 1 );
 
 }
-
-configlval.pc_info.perc_index = index;
-configlval.pc_info.value      = value;
-
 
 return SIMPLE_PERC_THRESH;
 

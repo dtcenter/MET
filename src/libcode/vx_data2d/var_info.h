@@ -278,7 +278,7 @@ class EnsVarInfo {
 
    private:
       std::vector<InputInfo> inputs; // Vector of InputInfo
-      VarInfo * ctrl_info;      // Field info for control member
+      VarInfo * ctrl_info;           // Field info for control member
 
    public:
       EnsVarInfo();

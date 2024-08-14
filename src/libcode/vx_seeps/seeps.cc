@@ -64,34 +64,23 @@ void release_seeps_climo() {
 ////////////////////////////////////////////////////////////////////////
 
 SeepsClimoGrid *get_seeps_climo_grid(int month, ConcatString seeps_grid_climo_name, int hour) {
-   bool not_found = true;
-   SeepsClimoGrid *seeps_climo_grid = nullptr;
-   for (map<int,SeepsClimoGrid *>::iterator it=seeps_climo_grid_map_00.begin();
-        it!=seeps_climo_grid_map_00.end(); ++it) {
-      if (it->first == month) {
-         not_found = false;
-         seeps_climo_grid = (SeepsClimoGrid *)it->second;
-         break;
-      }
+
+   if (seeps_climo_grid_map_00.count(month) == 0) {
+      seeps_climo_grid_map_00[month] = nullptr;
+      seeps_climo_grid_map_00[month] = new SeepsClimoGrid(month, hour, seeps_grid_climo_name);
    }
 
-   if (not_found) {
-      seeps_climo_grid = new SeepsClimoGrid(month, hour, seeps_grid_climo_name);
-      seeps_climo_grid_map_00[month] = seeps_climo_grid;
-   }
-   return seeps_climo_grid;
+   return seeps_climo_grid_map_00[month];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void release_seeps_climo_grid(int month, int hour) {
-   for (map<int,SeepsClimoGrid *>::iterator it=seeps_climo_grid_map_00.begin();
-        it!=seeps_climo_grid_map_00.end(); ++it) {
-      if (it->first == month) {
-         delete it->second;
-         seeps_climo_grid_map_00.erase(it);
-         break;
-      }
+
+   if (seeps_climo_grid_map_00.count(month) > 0) {
+      delete seeps_climo_grid_map_00[month];
+      seeps_climo_grid_map_00[month] = nullptr;
+      seeps_climo_grid_map_00.erase(month);
    }
 }
 
@@ -103,9 +92,7 @@ double weighted_average(double v1, double w1, double v2, double w2) {
           v1 * w1 + v2 * w2);
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void SeepsAggScore::clear() {
 
@@ -170,7 +157,6 @@ SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
 
    return *this;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -672,27 +658,30 @@ void SeepsClimo::read_seeps_climo(ConcatString filename) {
 
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////
-
 
 SeepsClimoGrid::SeepsClimoGrid(int month, int hour, ConcatString seeps_climo_name)
    : month{month}, hour{hour}, SeepsClimoBase{seeps_climo_name}
 {
-
    clear();
    p1_buf = p2_buf = t1_buf = t2_buf = nullptr;
    s_odfl_buf = s_odfh_buf = s_olfd_buf = s_olfh_buf = s_ohfd_buf = s_ohfl_buf = nullptr;
 
    ConcatString seeps_name = get_climo_filename();
    if (file_exists(seeps_name.c_str())) read_seeps_climo_grid(seeps_name);
-
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 SeepsClimoGrid::~SeepsClimoGrid() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void SeepsClimoGrid::init_from_scratch() {
+   p1_buf = p2_buf = t1_buf = t2_buf = nullptr;
+   s12_buf = s13_buf = s21_buf = s23_buf = s31_buf = s32_buf = nullptr;
    clear();
 }
 

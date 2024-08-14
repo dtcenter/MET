@@ -145,6 +145,7 @@ class STATAnalysisJob {
 
       void set_perc_thresh(const NumArray &,
                            const NumArray &,
+                           const NumArray &,
                            const NumArray &);
 
       void open_dump_row_file ();

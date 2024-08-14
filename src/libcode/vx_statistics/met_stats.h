@@ -93,8 +93,7 @@ class CTSInfo {
 
       void clear();
       void allocate_n_alpha(int);
-      void add(double, double);
-      void add(double, double, double, double);
+      void add(double, double, const ClimoPntInfo * = nullptr);
       void compute_stats();
       void compute_ci();
 
@@ -134,8 +133,7 @@ class MCTSInfo {
       void allocate_n_alpha(int);
       void set_fthresh(const ThreshArray &);
       void set_othresh(const ThreshArray &);
-      void add(double, double);
-      void add(double, double, double, double);
+      void add(double, double, const ClimoPntInfo *cpi = nullptr);
       void compute_stats();
       void compute_ci();
 };
@@ -226,16 +224,15 @@ class SL1L2Info {
       double fbar, obar;
       double fobar;
       double ffbar, oobar;
+      double smae;
       int    scount;
 
       // SAL1L2 Quantities
       double fabar, oabar;
       double foabar;
       double ffabar, ooabar;
+      double samae;
       int    sacount;
-
-      // Mean absolute error
-      double mae;
 
       // Compute sums
       void set(const PairDataPoint &);

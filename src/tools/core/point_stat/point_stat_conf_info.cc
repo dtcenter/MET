@@ -841,8 +841,8 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    clear();
 
    // Allocate new VarInfo objects
-   vx_pd.fcst_info = info_factory.new_var_info(ftype);
-   vx_pd.obs_info  = new VarInfoGrib;
+   vx_pd.set_fcst_info(info_factory.new_var_info(ftype));
+   vx_pd.set_obs_info(new VarInfoGrib);
 
    // Set the VarInfo objects
    vx_pd.fcst_info->set_dict(fdict);
@@ -1077,7 +1077,7 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    }
 
    // Define the dimensions
-   vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
+   vx_pd.set_size(n_msg_typ, n_mask, n_interp);
 
    // Store the MPR filter threshold
    vx_pd.set_mpr_thresh(mpr_sa, mpr_ta);
@@ -1185,20 +1185,22 @@ void PointStatVxOpt::set_perc_thresh(const PairDataPoint *pd_ptr) {
    //
    // Sort the input arrays
    //
-   NumArray fsort = pd_ptr->f_na;
-   NumArray osort = pd_ptr->o_na;
-   NumArray csort = pd_ptr->cmn_na;
-   fsort.sort_array();
-   osort.sort_array();
-   csort.sort_array();
+   NumArray f_sort    = pd_ptr->f_na;
+   NumArray o_sort    = pd_ptr->o_na;
+   NumArray fcmn_sort = pd_ptr->fcmn_na;
+   NumArray ocmn_sort = pd_ptr->ocmn_na;
+   f_sort.sort_array();
+   o_sort.sort_array();
+   fcmn_sort.sort_array();
+   ocmn_sort.sort_array();
 
    //
    // Compute percentiles
    //
-   fcat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
-   ocat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
-   fcnt_ta.set_perc(&fsort, &osort, &csort, &fcnt_ta, &ocnt_ta);
-   ocnt_ta.set_perc(&fsort, &osort, &csort, &fcnt_ta, &ocnt_ta);
+   fcat_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
+   ocat_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
+   fcnt_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcnt_ta, &ocnt_ta);
+   ocnt_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcnt_ta, &ocnt_ta);
 
    return;
 }

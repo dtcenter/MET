@@ -327,19 +327,12 @@ void CTSInfo::allocate_n_alpha(int i) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void CTSInfo::add(double f, double o) {
-   add(f, o, bad_data_double, bad_data_double);
-   return;
-}
+void CTSInfo::add(double f, double o, const ClimoPntInfo *cpi) {
 
-////////////////////////////////////////////////////////////////////////
-
-void CTSInfo::add(double f, double o, double cmn, double csd) {
-
-   if     ( fthresh.check(f, cmn, csd) &&  othresh.check(o, cmn, csd)) cts.inc_fy_oy();
-   else if( fthresh.check(f, cmn, csd) && !othresh.check(o, cmn, csd)) cts.inc_fy_on();
-   else if(!fthresh.check(f, cmn, csd) &&  othresh.check(o, cmn, csd)) cts.inc_fn_oy();
-   else if(!fthresh.check(f, cmn, csd) && !othresh.check(o, cmn, csd)) cts.inc_fn_on();
+   if     ( fthresh.check(f, cpi) &&  othresh.check(o, cpi)) cts.inc_fy_oy();
+   else if( fthresh.check(f, cpi) && !othresh.check(o, cpi)) cts.inc_fy_on();
+   else if(!fthresh.check(f, cpi) &&  othresh.check(o, cpi)) cts.inc_fn_oy();
+   else if(!fthresh.check(f, cpi) && !othresh.check(o, cpi)) cts.inc_fn_on();
 
    return;
 }
@@ -613,19 +606,12 @@ void MCTSInfo::set_othresh(const ThreshArray &ta) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void MCTSInfo::add(double f, double o) {
-   add(f, o, bad_data_double, bad_data_double);
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void MCTSInfo::add(double f, double o, double cmn, double csd) {
+void MCTSInfo::add(double f, double o, const ClimoPntInfo *cpi) {
    int r, c;
 
    // Find the row and column for the forecast and observation values.
-   r = fthresh.check_bins(f, cmn, csd);
-   c = othresh.check_bins(o, cmn, csd);
+   r = fthresh.check_bins(f, cpi);
+   c = othresh.check_bins(o, cpi);
 
    // Increment the corresponding contingency table entry.
    cts.inc_entry(r, c);
@@ -1138,11 +1124,11 @@ SL1L2Info & SL1L2Info::operator+=(const SL1L2Info &c) {
       s_info.ffbar = (ffbar*scount + c.ffbar*c.scount)/s_info.scount;
       s_info.oobar = (oobar*scount + c.oobar*c.scount)/s_info.scount;
 
-      if(is_bad_data(mae) || is_bad_data(c.mae)) {
-         s_info.mae = bad_data_double;
+      if(is_bad_data(smae) || is_bad_data(c.smae)) {
+         s_info.smae = bad_data_double;
       }
       else {
-         s_info.mae = (mae*scount + c.mae*c.scount)/s_info.scount;
+         s_info.smae = (smae*scount + c.smae*c.scount)/s_info.scount;
       }
    }
 
@@ -1155,11 +1141,11 @@ SL1L2Info & SL1L2Info::operator+=(const SL1L2Info &c) {
       s_info.ffabar = (ffabar*sacount + c.ffabar*c.sacount)/s_info.sacount;
       s_info.ooabar = (ooabar*sacount + c.ooabar*c.sacount)/s_info.sacount;
 
-      if(is_bad_data(mae) || is_bad_data(c.mae)) {
-         s_info.mae = bad_data_double;
+      if(is_bad_data(samae) || is_bad_data(c.samae)) {
+         s_info.samae = bad_data_double;
       }
       else {
-         s_info.mae = (mae*sacount + c.mae*c.sacount)/s_info.sacount;
+         s_info.samae = (samae*sacount + c.samae*c.sacount)/s_info.sacount;
       }
    }
 
@@ -1184,14 +1170,14 @@ void SL1L2Info::zero_out() {
    // SL1L2 Quantities
    fbar    = obar   = 0.0;
    fobar   = ffbar  = oobar  = 0.0;
+   smae    = 0.0;
    scount  = 0;
 
    // SAL1L2 Quantities
    fabar   = oabar  = 0.0;
    foabar  = ffabar = ooabar = 0.0;
+   samae   = 0.0;
    sacount = 0;
-
-   mae     = 0.0;
 
    return;
 }
@@ -1225,6 +1211,7 @@ void SL1L2Info::assign(const SL1L2Info &c) {
    fobar   = c.fobar;
    ffbar   = c.ffbar;
    oobar   = c.oobar;
+   smae    = c.smae;
    scount  = c.scount;
 
    // SAL1L2 Quantities
@@ -1233,9 +1220,8 @@ void SL1L2Info::assign(const SL1L2Info &c) {
    foabar  = c.foabar;
    ffabar  = c.ffabar;
    ooabar  = c.ooabar;
+   samae   = c.samae;
    sacount = c.sacount;
-
-   mae     = c.mae;
 
    return;
 }
@@ -1244,7 +1230,7 @@ void SL1L2Info::assign(const SL1L2Info &c) {
 
 void SL1L2Info::set(const PairDataPoint &pd_all) {
    int i;
-   double f, o, c, wgt, wgt_sum;
+   double f, o, fc, oc, wgt, wgt_sum;
    PairDataPoint pd;
 
    // Check for mismatch
@@ -1273,7 +1259,8 @@ void SL1L2Info::set(const PairDataPoint &pd_all) {
 
       f   = pd.f_na[i];
       o   = pd.o_na[i];
-      c   = pd.cmn_na[i];
+      fc  = pd.fcmn_na[i];
+      oc  = pd.ocmn_na[i];
       wgt = pd.wgt_na[i]/wgt_sum;
 
       // Skip bad data values in the forecast or observation fields
@@ -1285,16 +1272,17 @@ void SL1L2Info::set(const PairDataPoint &pd_all) {
       fobar += wgt*f*o;
       ffbar += wgt*f*f;
       oobar += wgt*o*o;
-      mae   += wgt*fabs(f-o);
+      smae  += wgt*fabs(f-o);
       scount++;
 
       // SAL1L2 sums
-      if(!is_bad_data(c)) {
-         fabar  += wgt*(f-c);
-         oabar  += wgt*(o-c);
-         foabar += wgt*(f-c)*(o-c);
-         ffabar += wgt*(f-c)*(f-c);
-         ooabar += wgt*(o-c)*(o-c);
+      if(!is_bad_data(fc) && !is_bad_data(oc)) {
+         fabar  += wgt*(f-fc);
+         oabar  += wgt*(o-oc);
+         foabar += wgt*(f-fc)*(o-oc);
+         ffabar += wgt*(f-fc)*(f-fc);
+         ooabar += wgt*(o-oc)*(o-oc);
+         samae  += wgt*fabs((f-fc)-(o-oc));
          sacount++;
       }
    }
@@ -1605,7 +1593,7 @@ void VL1L2Info::assign(const VL1L2Info &c) {
 void VL1L2Info::set(const PairDataPoint &pd_u_all,
                     const PairDataPoint &pd_v_all) {
    int i;
-   double uf, vf, uo, vo, uc, vc, wgt, wgt_sum;
+   double uf, vf, uo, vo, ufc, vfc, uoc, voc, wgt, wgt_sum;
    double u_diff, v_diff;
    double d_diff, dir_wgt_sum, dira_wgt_sum;
    PairDataPoint pd_u, pd_v;
@@ -1641,12 +1629,14 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
    for(i=0; i<pd_u.f_na.n(); i++) {
 
       // Retrieve the U,V values
-      uf = pd_u.f_na[i];
-      vf = pd_v.f_na[i];
-      uo = pd_u.o_na[i];
-      vo = pd_v.o_na[i];
-      uc = pd_u.cmn_na[i];
-      vc = pd_v.cmn_na[i];
+      uf  = pd_u.f_na[i];
+      vf  = pd_v.f_na[i];
+      uo  = pd_u.o_na[i];
+      vo  = pd_v.o_na[i];
+      ufc = pd_u.fcmn_na[i];
+      vfc = pd_v.fcmn_na[i];
+      uoc = pd_u.ocmn_na[i];
+      voc = pd_v.ocmn_na[i];
 
       u_diff = uf - uo;
       v_diff = vf - vo;
@@ -1681,23 +1671,24 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
       }
 
       // VAL1L2 sums
-      if(!is_bad_data(uc) && !is_bad_data(vc)) {
+      if(!is_bad_data(ufc) && !is_bad_data(vfc) &&
+         !is_bad_data(uoc) && !is_bad_data(voc)) {
          vacount      += 1;
 
-         ufa_bar      += wgt*(uf-uc);
-         vfa_bar      += wgt*(vf-vc);
-         uoa_bar      += wgt*(uo-uc);
-         voa_bar      += wgt*(vo-vc);
+         ufa_bar      += wgt*(uf-ufc);
+         vfa_bar      += wgt*(vf-vfc);
+         uoa_bar      += wgt*(uo-uoc);
+         voa_bar      += wgt*(vo-voc);
 
-         uvfoa_bar    += wgt*((uf-uc)*(uo-uc) + (vf-vc)*(vo-vc));
-         uvffa_bar    += wgt*((uf-uc)*(uf-uc) + (vf-vc)*(vf-vc));
-         uvooa_bar    += wgt*((uo-uc)*(uo-uc) + (vo-vc)*(vo-vc));
+         uvfoa_bar    += wgt*((uf-ufc)*(uo-uoc) + (vf-vfc)*(vo-voc));
+         uvffa_bar    += wgt*((uf-ufc)*(uf-ufc) + (vf-vfc)*(vf-vfc));
+         uvooa_bar    += wgt*((uo-uoc)*(uo-uoc) + (vo-voc)*(vo-voc));
 
-         fa_speed_bar += wgt*sqrt((uf-uc)*(uf-uc) + (vf-vc)*(vf-vc));
-         oa_speed_bar += wgt*sqrt((uo-uc)*(uo-uc) + (vo-vc)*(vo-vc));
+         fa_speed_bar += wgt*sqrt((uf-ufc)*(uf-ufc) + (vf-vfc)*(vf-vfc));
+         oa_speed_bar += wgt*sqrt((uo-uoc)*(uo-uoc) + (vo-voc)*(vo-voc));
 
          // Compute anomalous direction difference
-         d_diff = angle_difference(uf-uc, vf-vc, uo-uc, vo-vc);
+         d_diff = angle_difference(uf-ufc, vf-vfc, uo-uoc, vo-voc);
 
          // Ignore undefined anomalous direction differences
          if(!is_bad_data(d_diff)) {

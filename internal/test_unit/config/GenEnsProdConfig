@@ -60,17 +60,17 @@ ens = {
       {
          name       = "UGRD";
          level      = [ "Z10" ];
-         cat_thresh = [ <CDP25 ];
+         cat_thresh = [ <OCDP25 ];
       },
       {
          name       = "VGRD";
          level      = [ "Z10" ];
-         cat_thresh = [ >CDP75 ];
+         cat_thresh = [ >OCDP75 ];
       },
       {
          name       = "WIND";
          level      = [ "Z10" ];
-         cat_thresh = [ >=CDP25&&<=CDP75 ];
+         cat_thresh = [ >=OCDP25&&<=OCDP75 ];
       }
    ];
 }

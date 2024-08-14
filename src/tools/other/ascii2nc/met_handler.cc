@@ -101,13 +101,13 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
 
     // Check for the first line of the file or the header changing
 
-    if (data_line.line_number() == 1            ||
-	hdr_typ           != data_line[0]        ||
-	hdr_sid           != data_line[1]        ||
-	hdr_vld_str       != data_line[2]        ||
-	!is_eq(hdr_lat, parse_num(data_line[3])) ||
-	!is_eq(hdr_lon, parse_num(data_line[4])) ||
-	!is_eq(hdr_elv, parse_num(data_line[5])))
+    if (data_line.line_number() == 1             ||
+        hdr_typ           != data_line[0]        ||
+        hdr_sid           != data_line[1]        ||
+        hdr_vld_str       != data_line[2]        ||
+        !is_eq(hdr_lat, parse_num(data_line[3])) ||
+        !is_eq(hdr_lon, parse_num(data_line[4])) ||
+        !is_eq(hdr_elv, parse_num(data_line[5])))
     {
       // Store the column format
 
@@ -115,9 +115,9 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
       if (data_line.line_number() == 1 &&
           _nFileColumns == n_met_col)
       {
-	    mlog << Warning << "\nFound deprecated 10 column input file format, "
-	         << "consider adding quality flag values to file: "
-	         << ascii_file.filename() << "\n\n";
+         mlog << Warning << "\nFound deprecated 10 column input file format, "
+              << "consider adding quality flag values to file: "
+              << ascii_file.filename() << "\n\n";
       }
 
       // Store the header info
@@ -135,8 +135,10 @@ bool MetHandler::_readObservations(LineDataFile &ascii_file)
 
     // Pressure level (hPa) or precip accumulation interval (sec)
 
-    double obs_prs = ((is_precip_grib_name(data_line[6]) || is_precip_grib_code(atoi(data_line[6]))) ?
-		      timestring_to_sec(data_line[7]) : parse_num(data_line[7]));
+    double obs_prs = ((is_precip_grib_name(data_line[6]) ||
+                       is_precip_grib_code(atoi(data_line[6]))) ?
+                      timestring_to_sec(data_line[7]) :
+                      parse_num(data_line[7]));
 
     // Observation height (meters above sea level)
 
