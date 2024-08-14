@@ -78,7 +78,7 @@ class PairDataPoint : public PairBase {
       PairDataPoint subset_pairs_cnt_thresh(const SingleThresh &ft,
                                             const SingleThresh &ot,
                                             const SetLogic type) const;
-      double compute_seeps(const char *, double, double, unixtime);
+      SeepsScore *compute_seeps(const char *, double, double, unixtime);
 
 };
 

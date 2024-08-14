@@ -1479,9 +1479,9 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
 
       mlog << Debug(9) << method_name
            << "mean_fcst, mean_obs, mean_seeps => "
-           << seeps->mean_fcst << " "
-           << seeps->mean_obs << " "
-           << seeps->score << "\n";
+           << seeps_agg->mean_fcst << " "
+           << seeps_agg->mean_obs << " "
+           << seeps_agg->score << "\n";
 
       weighted_score = 0.;
       for (int i=0; i<SEEPS_MATRIX_SIZE; i++) pvf[i] = 0.;
@@ -1539,8 +1539,8 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
       density_vector.clear();
 
       seeps_mprs.clear();
-      seeps->mean_obs = weight_obs_sum;
-      seeps->mean_fcst = weight_fcst_sum;
+      seeps_agg->mean_obs = weight_obs_sum;
+      seeps_agg->mean_fcst = weight_fcst_sum;
 
       // The weight for odfl to ohfl come from climo file
       seeps_agg->pv1 = pvf[0] + pvf[3] + pvf[6];    // sum by column for obs

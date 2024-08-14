@@ -195,18 +195,17 @@ class SeepsClimo : public SeepsClimoBase {
      ~SeepsClimo();
 
       SeepsRecord *get_record(int sid, int month, int hour);
-      double get_score(int sid, double p_fcst, double p_obs,
-                       int month, int hour);
       double get_seeps_category(int sid, double p_fcst, double p_obs,
                                 int month, int hour);
+      SeepsScore *get_seeps_score(int sid, double p_fcst, double p_obs,
+                                  int month, int hour);
+
       void print_all();
       void print_record(SeepsRecord *record, bool with_header=false);
 
       //
       //
       //
-
-      SeepsRecord get_seeps_record(int sid) const;
 
 };
 
@@ -229,7 +228,7 @@ class SeepsClimoGrid : public SeepsClimoBase {
       double *s_olfd_buf;
       double *s_olfh_buf;
       double *s_ohfd_buf;
-      double *s_ohfl_buf;     
+      double *s_ohfl_buf;
 
       void init_from_scratch();
 
