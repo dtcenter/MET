@@ -61,6 +61,9 @@ static const char * default_config_filename =
    "MET_BASE/config/SeriesAnalysisConfig_default";
 
 static const char * all_columns = "ALL";
+static const char * n_series_var_name = "n_series";
+
+static const char * total_name = "TOTAL";
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -91,7 +94,7 @@ static SeriesAnalysisConfInfo conf_info;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static netCDF::NcFile *nc_out  = (netCDF::NcFile *) nullptr;
+static netCDF::NcFile *nc_out = nullptr;
 static netCDF::NcDim  lat_dim;
 static netCDF::NcDim  lon_dim ;
 
@@ -123,7 +126,7 @@ static Met2dDataFile *obs_mtddf  = nullptr;
 static MetNcMetDataFile aggr_nc;
 
 // Pointer to the random number generator to be used
-static gsl_rng *rng_ptr = (gsl_rng *) nullptr;
+static gsl_rng *rng_ptr = nullptr;
 
 // Enumeration of ways that a series can be defined
 enum class SeriesType {
@@ -136,7 +139,8 @@ enum class SeriesType {
 static SeriesType series_type = SeriesType::None;
 
 // Series length
-static int n_series = 0;
+static int n_series_pair = 0; // Input pair data series
+static int n_series_aggr = 0; // Input aggr series
 
 // Range of timing values encountered in the data
 static unixtime fcst_init_beg  = (unixtime) 0;

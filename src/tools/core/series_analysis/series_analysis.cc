@@ -82,7 +82,9 @@ static void get_series_entry(int, VarInfo *, const StringArray &,
                              DataPlane &, Grid &);
 static bool read_single_entry(VarInfo *, const ConcatString &,
                               const GrdFileType, DataPlane &, Grid &);
-static DataPlane get_aggr_data(const ConcatString &);
+
+static void open_aggr_file();
+static DataPlane read_aggr_data_plane(const ConcatString &);
 
 static void process_scores();
 
@@ -92,6 +94,7 @@ static void do_continuous    (int, const PairDataPoint *);
 static void do_partialsums   (int, const PairDataPoint *);
 static void do_probabilistic (int, const PairDataPoint *);
 
+static int  read_aggr_total  (int);
 static void read_aggr_ctc    (int, const CTSInfo &,   CTSInfo &);
 static void read_aggr_mctc   (int, const MCTSInfo &,  MCTSInfo &);
 static void read_aggr_sl1l2  (int, const SL1L2Info &, SL1L2Info &);
@@ -305,35 +308,35 @@ void process_command_line(int argc, char **argv) {
    // - Observation file list
    if(conf_info.get_n_fcst() > 1) {
       series_type = SeriesType::Fcst_Conf;
-      n_series = conf_info.get_n_fcst();
+      n_series_pair = conf_info.get_n_fcst();
       mlog << Debug(1)
            << "Series defined by the \"fcst.field\" configuration entry "
-           << "of length " << n_series << ".\n";
+           << "of length " << n_series_pair << ".\n";
    }
    else if(conf_info.get_n_obs() > 1) {
       series_type = SeriesType::Obs_Conf;
-      n_series = conf_info.get_n_obs();
+      n_series_pair = conf_info.get_n_obs();
       mlog << Debug(1)
            << "Series defined by the \"obs.field\" configuration entry "
-           << "of length " << n_series << ".\n";
+           << "of length " << n_series_pair << ".\n";
    }
    else if(fcst_files.n() > 1) {
       series_type = SeriesType::Fcst_Files;
-      n_series = fcst_files.n();
+      n_series_pair = fcst_files.n();
       mlog << Debug(1)
            << "Series defined by the forecast file list of length "
-           << n_series << ".\n";
+           << n_series_pair << ".\n";
    }
    else if(obs_files.n() > 1) {
       series_type = SeriesType::Obs_Files;
-      n_series = obs_files.n();
+      n_series_pair = obs_files.n();
       mlog << Debug(1)
            << "Series defined by the observation file list of length "
-           << n_series << ".\n";
+           << n_series_pair << ".\n";
    }
    else {
       series_type = SeriesType::Fcst_Conf;
-      n_series = 1;
+      n_series_pair = 1;
       mlog << Debug(1)
            << "The \"fcst.field\" and \"obs.field\" configuration entries "
            << "and the \"-fcst\" and \"-obs\" command line options "
@@ -354,24 +357,24 @@ void process_command_line(int argc, char **argv) {
       }
 
       // The number of files must match the series length.
-      if(fcst_files.n() != n_series) {
+      if(fcst_files.n() != n_series_pair) {
          mlog << Error << "\nprocess_command_line() -> "
               << "when using the \"-paired\" command line option, the "
               << "the file list length (" << fcst_files.n()
-              << ") and series length (" << n_series
+              << ") and series length (" << n_series_pair
               << ") must match.\n\n";
          usage();
       }
 
       // Set the series file names to the input file lists
-      for(i=0; i<n_series; i++) {
+      for(i=0; i<n_series_pair; i++) {
          found_fcst_files.add(fcst_files[i]);
          found_obs_files.add(obs_files[i]);
       }
    }
    // If not paired, initialize the series file names.
    else {
-      for(i=0; i<n_series; i++) {
+      for(i=0; i<n_series_pair; i++) {
          found_fcst_files.add("");
          found_obs_files.add("");
       }
@@ -461,7 +464,7 @@ void get_series_data(int i_series,
 
    mlog << Debug(2)
         << "Processing series entry " << i_series + 1 << " of "
-        << n_series << ": " << fcst_info->magic_str()
+        << n_series_pair << ": " << fcst_info->magic_str()
         << " versus " << obs_info->magic_str() << "\n";
 
    // Switch on the series type
@@ -719,62 +722,68 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlane get_aggr_data(const ConcatString &var_name) {
-   DataPlane aggr_dp;
+void open_aggr_file() {
 
-   // Open the aggregate file, if needed
-   if(!aggr_nc.MetNc) {
+   mlog << Debug(1)
+        << "Reading aggregate data file: " << aggr_file << "\n";
 
-      mlog << Debug(1)
-           << "Reading aggregate data file: " << aggr_file << "\n";
-
-      if(!aggr_nc.open(aggr_file.c_str())) {
-         mlog << Error << "\nget_aggr_data() -> "
-              << "unable to open the aggregate NetCDF file \""
-              << aggr_file << "\"\n\n";
-         exit(1);
-      }
-
-      // Update timing info based on aggregate file global attributes
-      ConcatString cs;
-
-      if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_init_beg", cs)) {
-         set_range(timestring_to_unix(cs.c_str()), fcst_init_beg, fcst_init_end);
-      }
-      if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_init_end", cs)) {
-         set_range(timestring_to_unix(cs.c_str()), fcst_init_beg, fcst_init_end);
-      }
-      if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_valid_beg", cs)) {
-         set_range(timestring_to_unix(cs.c_str()), fcst_valid_beg, fcst_valid_end);
-      }
-      if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_valid_end", cs)) {
-         set_range(timestring_to_unix(cs.c_str()), fcst_valid_beg, fcst_valid_end);
-      }
-      if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_lead_beg", cs)) {
-         set_range(timestring_to_sec(cs.c_str()), fcst_lead_beg, fcst_lead_end);
-      }
-      if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_lead_end", cs)) {
-         set_range(timestring_to_sec(cs.c_str()), fcst_lead_beg, fcst_lead_end);
-      }
-      if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_init_beg", cs)) {
-         set_range(timestring_to_unix(cs.c_str()), obs_init_beg, obs_init_end);
-      }
-      if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_init_end", cs)) {
-         set_range(timestring_to_unix(cs.c_str()), obs_init_beg, obs_init_end);
-      }
-      if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_valid_beg", cs)) {
-         set_range(timestring_to_unix(cs.c_str()), obs_valid_beg, obs_valid_end);
-      }
-      if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_valid_end", cs)) {
-         set_range(timestring_to_unix(cs.c_str()), obs_valid_beg, obs_valid_end);
-      }
-      if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_lead_beg", cs)) {
-         set_range(timestring_to_sec(cs.c_str()), obs_lead_beg, obs_lead_end);
-      }
-      if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_lead_end", cs)) {
-         set_range(timestring_to_sec(cs.c_str()), obs_lead_beg, obs_lead_end);
-      }
+   if(!aggr_nc.open(aggr_file.c_str())) {
+      mlog << Error << "\nopen_aggr_file() -> "
+           << "unable to open the aggregate NetCDF file \""
+           << aggr_file << "\"\n\n";
+      exit(1);
    }
+
+   // Update timing info based on aggregate file global attributes
+   ConcatString cs;
+
+   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_init_beg", cs)) {
+      set_range(timestring_to_unix(cs.c_str()), fcst_init_beg, fcst_init_end);
+   }
+   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_init_end", cs)) {
+      set_range(timestring_to_unix(cs.c_str()), fcst_init_beg, fcst_init_end);
+   }
+   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_valid_beg", cs)) {
+      set_range(timestring_to_unix(cs.c_str()), fcst_valid_beg, fcst_valid_end);
+   }
+   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_valid_end", cs)) {
+      set_range(timestring_to_unix(cs.c_str()), fcst_valid_beg, fcst_valid_end);
+   }
+   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_lead_beg", cs)) {
+      set_range(timestring_to_sec(cs.c_str()), fcst_lead_beg, fcst_lead_end);
+   }
+   if(get_att_value_string(aggr_nc.MetNc->Nc, "fcst_lead_end", cs)) {
+      set_range(timestring_to_sec(cs.c_str()), fcst_lead_beg, fcst_lead_end);
+   }
+   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_init_beg", cs)) {
+      set_range(timestring_to_unix(cs.c_str()), obs_init_beg, obs_init_end);
+   }
+   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_init_end", cs)) {
+      set_range(timestring_to_unix(cs.c_str()), obs_init_beg, obs_init_end);
+   }
+   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_valid_beg", cs)) {
+      set_range(timestring_to_unix(cs.c_str()), obs_valid_beg, obs_valid_end);
+   }
+   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_valid_end", cs)) {
+      set_range(timestring_to_unix(cs.c_str()), obs_valid_beg, obs_valid_end);
+   }
+   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_lead_beg", cs)) {
+      set_range(timestring_to_sec(cs.c_str()), obs_lead_beg, obs_lead_end);
+   }
+   if(get_att_value_string(aggr_nc.MetNc->Nc, "obs_lead_end", cs)) {
+      set_range(timestring_to_sec(cs.c_str()), obs_lead_beg, obs_lead_end);
+   }
+
+   // Store the aggregate series length
+   n_series_aggr = get_int_var(aggr_nc.MetNc->Nc, n_series_var_name, 0);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DataPlane read_aggr_data_plane(const ConcatString &var_name) {
+   DataPlane aggr_dp;
 
    // Setup the data request
    VarInfoNcMet aggr_info;
@@ -782,16 +791,16 @@ DataPlane get_aggr_data(const ConcatString &var_name) {
 
    // Attempt to read the gridded data from the current file
    if(!aggr_nc.data_plane(aggr_info, aggr_dp)) {
-      mlog << Error << "\nget_aggr_data() -> "
+      mlog << Error << "\nread_aggr_data_plane() -> "
            << "Required variable \"" << aggr_info.magic_str() << "\""
-           << " not found in aggregate file!\n\n";
+           << " not found in the aggregate file!\n\n";
       exit(1);
    }
 
    // Check that the grid has not changed
    if(aggr_nc.grid().nx() != grid.nx() ||
       aggr_nc.grid().ny() != grid.ny()) {
-      mlog << Error << "\nget_aggr_data() -> "
+      mlog << Error << "\nread_aggr_data_plane() -> "
            << "the input grid dimensions (" << grid.nx() << ", " << grid.ny()
            << ") and aggregate grid dimensions (" << aggr_nc.grid().nx()
            << ", " << aggr_nc.grid().ny() << ") do not match!\n\n";
@@ -818,15 +827,18 @@ void process_scores() {
    DataPlane fcmn_dp, fcsd_dp;
    DataPlane ocmn_dp, ocsd_dp;
 
+   // Open the aggregate file, if needed
+   if(aggr_file.nonempty()) open_aggr_file();
+
    // Number of points skipped due to valid data threshold
-   int n_skip_zero = 0;
-   int n_skip_pos  = 0;
+   int n_skip_zero_vld = 0;
+   int n_skip_some_vld = 0;
 
    // Loop over the data reads
    for(int i_read=0; i_read<n_reads; i_read++) {
 
       // Loop over the series variable
-      for(int i_series=0; i_series<n_series; i_series++) {
+      for(int i_series=0; i_series<n_series_pair; i_series++) {
 
          // Get the index for the forecast and climo VarInfo objects
          int i_fcst = (conf_info.get_n_fcst() > 1 ? i_series : 0);
@@ -844,7 +856,7 @@ void process_scores() {
          // block_size is defined in get_series_data()
          if(pd_block.empty()) {
             pd_block.resize(conf_info.block_size);
-            for(auto &pd : pd_block) pd.extend(n_series);
+            for(auto &pd : pd_block) pd.extend(n_series_pair);
          }
 
          // Beginning of each data pass
@@ -892,7 +904,7 @@ void process_scores() {
               << (ocsd_flag ? 0 : 1) << " standard deviation field(s).\n";
 
          // Setup the output NetCDF file on the first pass
-         if(nc_out == (NcFile *) 0) setup_nc_file(fcst_info, obs_info);
+         if(!nc_out) setup_nc_file(fcst_info, obs_info);
 
          // Update timing info
          set_range(fcst_dp.init(),  fcst_init_beg,  fcst_init_end);
@@ -935,16 +947,21 @@ void process_scores() {
          // Determine x,y location
          DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
 
+         // Compute the total number of valid points and series length
+         int n_valid  = pd_block[i].f_na.n() +
+                        (aggr_file.empty() ? 0 : read_aggr_total(i_point+1));
+         int n_series = n_series_pair + n_series_aggr;
+
          // Check for the required number of matched pairs
-         if(pd_block[i].f_na.n()/(double) n_series < conf_info.vld_data_thresh) {
+         if(n_valid / (double) n_series < conf_info.vld_data_thresh) {
             mlog << Debug(4)
                  << "[" << i+1 << " of " << conf_info.block_size
                  << "] Skipping point (" << x << ", " << y << ") with "
-                 << pd_block[i].f_na.n() << " matched pairs.\n";
+                 << n_valid << " of " << n_series << " valid matched pairs.\n";
 
             // Keep track of the number of points skipped
-            if(pd_block[i].f_na.n() == 0) n_skip_zero++;
-            else                          n_skip_pos++;
+            if(n_valid == 0) n_skip_zero_vld++;
+            else             n_skip_some_vld++;
 
             continue;
          }
@@ -952,7 +969,7 @@ void process_scores() {
             mlog << Debug(4)
                  << "[" << i+1 << " of " << conf_info.block_size
                  << "] Processing point (" << x << ", " << y << ") with "
-                 << pd_block[i].n_obs << " matched pairs.\n";
+                 << n_valid << " of " << n_series << " valid matched pairs.\n";
          }
 
          // Compute contingency table counts and statistics
@@ -1012,15 +1029,15 @@ void process_scores() {
    // Print summary counts
    mlog << Debug(2)
         << "Finished processing statistics for "
-        << grid.nxy() - n_skip_zero - n_skip_pos << " of "
+        << grid.nxy() - n_skip_zero_vld - n_skip_some_vld << " of "
         << grid.nxy() << " grid points.\n"
-        << "Skipped " << n_skip_zero << " of " << grid.nxy()
+        << "Skipped " << n_skip_zero_vld << " of " << grid.nxy()
         << " points with no valid data.\n"
-        << "Skipped " << n_skip_pos << " of " << grid.nxy()
+        << "Skipped " << n_skip_some_vld << " of " << grid.nxy()
         << " points that did not meet the valid data threshold.\n";
 
    // Print config file suggestions about missing data
-   if(n_skip_pos > 0 && conf_info.vld_data_thresh == 1.0) {
+   if(n_skip_some_vld > 0 && conf_info.vld_data_thresh == 1.0) {
       mlog << Debug(2)
            << "Some points skipped due to missing data:\n"
            << "Consider decreasing \"vld_thresh\" in the config file "
@@ -1341,6 +1358,38 @@ void do_partialsums(int n, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
+int read_aggr_total(int n) {
+
+   // Read TOTAL data, if needed
+   if(aggr_data.count(total_name) == 0) {
+
+      // Retrive all the aggregate file variable names
+      StringArray aggr_var_names;
+      get_var_names(aggr_nc.MetNc->Nc, &aggr_var_names);
+
+      // Search for one containing TOTAL
+      for(int i=0; i<aggr_var_names.n(); i++) {
+         if(aggr_var_names[i].find(total_name) != string::npos) {
+            aggr_data[total_name] = read_aggr_data_plane(aggr_var_names[i]);
+            break;
+         }
+      }
+
+      // Check for a match
+      if(aggr_data.count(total_name) == 0) {
+         mlog << Error << "\nread_aggr_total() -> "
+              << "No variable containing \"" << total_name << "\""
+              << " not found in the aggregate file!\n\n";
+         exit(1);
+      }
+   }
+
+   // Return the TOTAL count for the current point
+   return nint(aggr_data[total_name].buf()[n]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void read_aggr_ctc(int n, const CTSInfo &cts_info,
                    CTSInfo &aggr_cts) {
 
@@ -1357,7 +1406,7 @@ void read_aggr_ctc(int n, const CTSInfo &cts_info,
 
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
-         aggr_data[var_name] = get_aggr_data(var_name);
+         aggr_data[var_name] = read_aggr_data_plane(var_name);
       }
 
       // Populate the CTC table
@@ -1385,7 +1434,7 @@ void read_aggr_sl1l2(int n, const SL1L2Info &s_info,
 
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
-         aggr_data[var_name] = get_aggr_data(var_name);
+         aggr_data[var_name] = read_aggr_data_plane(var_name);
       }
 
       // Populate the partial sums
@@ -1413,7 +1462,7 @@ void read_aggr_sal1l2(int n, const SL1L2Info &s_info,
 
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
-         aggr_data[var_name] = get_aggr_data(var_name);
+         aggr_data[var_name] = read_aggr_data_plane(var_name);
       }
 
       // Populate the partial sums
@@ -1446,7 +1495,7 @@ void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
 
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
-         aggr_data[var_name] = get_aggr_data(var_name);
+         aggr_data[var_name] = read_aggr_data_plane(var_name);
       }
 
       // Get the n-th value
@@ -1503,7 +1552,7 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
 
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
-         aggr_data[var_name] = get_aggr_data(var_name);
+         aggr_data[var_name] = read_aggr_data_plane(var_name);
       }
 
       // Get the n-th value
@@ -2052,9 +2101,10 @@ void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
    if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
    // Add the series length variable
-   NcVar var = add_var(nc_out, "n_series", ncInt, deflate_level);
+   NcVar var = add_var(nc_out, n_series_var_name, ncInt, deflate_level);
    add_att(&var, "long_name", "length of series");
 
+   int n_series = n_series_pair + n_series_aggr;
    if(!put_nc_data(&var, &n_series)) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "error writing the series length variable.\n\n";
