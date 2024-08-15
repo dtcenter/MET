@@ -54,7 +54,7 @@ constexpr char var_name_ohfl_12[]   = "ohfl_12";
 constexpr char def_seeps_point_filename[] =
    "MET_BASE/climo/seeps/PPT24_seepsweights.nc";
 constexpr char def_seeps_grid_filename[] =
-   "MET_BASE/climo/seeps/PPT24_seepsweights_grid.nc";
+   "MET_BASE/climo/seeps/PPT24_seepsweights_grid_v12.0.nc";
 
 //density_radius = 0.75 degrees (83km; this is described as “the smallest possible
 // value that ensures approximately equal representation of all subregions of Europe”.)
