@@ -1790,7 +1790,7 @@ in the following ways:
 
     .. code-block:: none
 
-       mask = { poly = [ "share/met/poly/CONUS.poly"; ]; }
+       mask = { poly = [ "share/met/poly/CONUS.poly" ]; }
 
   * Option 2 - Gen-Vx-Mask output:
 
@@ -1799,7 +1799,7 @@ in the following ways:
 
     .. code-block:: none
 
-       mask = { poly = [ "/path/to/gen_vx_mask_output.nc"; ]; }
+       mask = { poly = [ "/path/to/gen_vx_mask_output.nc" ]; }
 
   * Option 3 - Any gridded data file:
 
