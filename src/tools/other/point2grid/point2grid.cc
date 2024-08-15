@@ -383,7 +383,7 @@ void process_data_file() {
    if (compress_level < 0) compress_level = config.nc_compression();
 
    // Get the gridded file type from config string, if present
-   ftype = parse_conf_file_type(&config);
+   ftype = parse_conf_file_type(&conf_info.conf);
 
    // Open the input file
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
@@ -391,7 +391,7 @@ void process_data_file() {
    bool use_python = false;
    int obs_type;
    Met2dDataFileFactory m_factory;
-   Met2dDataFile *fr_mtddf = (Met2dDataFile *) 0;
+   Met2dDataFile *fr_mtddf = (Met2dDataFile *) nullptr;
 #ifdef WITH_PYTHON
    string python_command = InputFilename;
    bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
@@ -417,6 +417,7 @@ void process_data_file() {
       obs_type = get_obs_type(nc_in);
       goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
 
+      if (obs_type == TYPE_UNKNOWN && ftype == FileType_NcCF) obs_type = TYPE_NCCF;
       if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
 
       // Read the input data file
@@ -1961,7 +1962,7 @@ static bool get_grid_mapping(Grid to_grid, IntArray *cellMapping,
 static void get_grid_mapping_latlon(
       DataPlane from_dp, DataPlane to_dp, Grid to_grid,
       IntArray *cellMapping, float *latitudes, float *longitudes,
-      int from_lat_count, int from_lon_count, bool *skip_times, bool to_north) {
+      int from_lat_count, int from_lon_count, bool *skip_times, bool to_north, bool is_2d) {
    double x, y;
    double to_ll_lat, to_ll_lon;
    float lat, lon;
@@ -1985,11 +1986,16 @@ static void get_grid_mapping_latlon(
    //Count the number of cells to be mapped to TO_GRID
    //Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
    for (int yIdx=0; yIdx<from_lat_count; yIdx++) {
+      int lat_offset = yIdx;
       for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
+         int lon_offset = xIdx;
          int coord_offset = from_dp.two_to_one(xIdx, yIdx, to_north);
-         if( skip_times != 0 && skip_times[coord_offset] ) continue;
-         lat = latitudes[coord_offset];
-         lon = longitudes[coord_offset];
+         if (is_2d) {
+            lon_offset = lat_offset = coord_offset;
+            if( skip_times != 0 && skip_times[coord_offset] ) continue;
+         }
+         lat = latitudes[lat_offset];
+         lon = longitudes[lon_offset];
          if( lat < MISSING_LATLON || lon < MISSING_LATLON ) continue;
          to_grid.latlon_to_xy(lat, -1.0*lon, x, y);
          idx_x = nint(x);
@@ -2093,15 +2099,17 @@ static bool get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    }
    else if (data_size > 0) {
       int last_idx = data_size - 1;
-      float *latitudes  = new float[data_size];
-      float *longitudes = new float[data_size];
+      int lat_count = get_data_size(&var_lat);
+      int lon_count = get_data_size(&var_lon);
+      auto latitudes  = new float[lat_count];
+      auto longitudes = new float[lon_count];
       status = get_nc_data(&var_lat, latitudes);
       if( status ) status = get_nc_data(&var_lon, longitudes);
       if( status ) {
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping,
                                  latitudes, longitudes, from_lat_count,
                                  from_lon_count, skip_times,
-                                 !fr_grid.get_swap_to_north());
+                                 !fr_grid.get_swap_to_north(), (lon_count==data_size));
 
          if (is_eq(latitudes[0], latitudes[last_idx]) ||
              is_eq(longitudes[0], longitudes[last_idx])) {
@@ -2220,10 +2228,12 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
    to_dp.set_size(to_lon_count, to_lat_count);
 
    if (data_size > 0) {
-      float  *latitudes  = (float *)nullptr;
-      float  *longitudes = (float *)nullptr;
-      float  *latitudes_buf  = (float *)nullptr;
-      float  *longitudes_buf = (float *)nullptr;
+      int lat_count = data_size;
+      int lon_count = data_size;
+      auto latitudes  = (float *)nullptr;
+      auto longitudes = (float *)nullptr;
+      auto latitudes_buf  = (float *)nullptr;
+      auto longitudes_buf = (float *)nullptr;
       int buff_size = data_size*sizeof(float);
       GoesImagerData grid_data;
       grid_data.reset();
@@ -2241,6 +2251,8 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
             NcVar var_lat = get_nc_var(coord_nc_in, var_name_lat);
             NcVar var_lon = get_nc_var(coord_nc_in, var_name_lon);
             if (IS_VALID_NC(var_lat) && IS_VALID_NC(var_lon)) {
+               lat_count = get_data_size(&var_lat);
+               lon_count = get_data_size(&var_lon);
                get_nc_data(&var_lat, latitudes);
                get_nc_data(&var_lon, longitudes);
             }
@@ -2297,23 +2309,21 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
             }
          }
       }
-      else {
-         if (fr_grid.info().gi) {
-            grid_data.copy(fr_grid.info().gi);
-            grid_data.compute_lat_lon();
-            latitudes = grid_data.lat_values;
-            longitudes = grid_data.lon_values;
-            if (!file_exists(geostationary_file.c_str())) {
-               save_geostationary_data(geostationary_file,
-                     latitudes, longitudes, grid_data);
-            }
+      else if (fr_grid.info().gi) {
+         grid_data.copy(fr_grid.info().gi);
+         grid_data.compute_lat_lon();
+         latitudes = grid_data.lat_values;
+         longitudes = grid_data.lon_values;
+         if (!file_exists(geostationary_file.c_str())) {
+            save_geostationary_data(geostationary_file,
+                  latitudes, longitudes, grid_data);
          }
       }
-      if (0 == latitudes) {
+      if (nullptr == latitudes) {
          mlog << Error << "\n" << method_name
               << "Fail to get latitudes!\n\n";
       }
-      else if (0 == longitudes) {
+      else if (nullptr == longitudes) {
          mlog << Error << "\n" << method_name
               << "Fail to get longitudes!\n\n";
       }
@@ -2321,7 +2331,7 @@ void get_grid_mapping(Grid fr_grid, Grid to_grid, IntArray *cellMapping,
          check_lat_lon(data_size, latitudes, longitudes);
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping, latitudes,
                                  longitudes, from_lat_count, from_lon_count, 0,
-                                 !fr_grid.get_swap_to_north());
+                                 !fr_grid.get_swap_to_north(), (lon_count==data_size));
       }
 
       if (latitudes_buf)  delete [] latitudes_buf;
