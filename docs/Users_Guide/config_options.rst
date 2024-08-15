@@ -1729,7 +1729,7 @@ Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
 .. _config_options-mask:
 
 mask
----
+----
 
 The "mask" entry is a dictionary that specifies the verification masking
 regions to be used when computing statistics. Each mask defines a
@@ -1749,11 +1749,18 @@ in the following ways:
 
 * The "poly" entry contains a comma-separated list of files that define
   verification masking regions. These masking regions may be specified in
-  two ways: in an ASCII file containing lat/lon points defining the mask polygon,
-  or using a gridded data file such as the NetCDF output of the Gen-Vx-Mask tool.
-  Some details for each of these options are described below:
+  three ways:
 
-  * If providing an ASCII file containing the lat/lon points defining the mask
+    1. An ASCII polyline file containing lat/lon points defining the mask polygon.
+    2. The NetCDF output of the Gen-Vx-Mask tool.
+    3. Any gridded data file followed by a configuration string describing the
+       data to be read and an optional threshold to be applied to that data.
+
+  These three options are described below:
+
+  * Option 1 - ASCII polyline file:
+
+    If providing an ASCII file containing the lat/lon points defining the mask
     polygon, the file must contain a name for the region followed by the latitude
     (degrees north) and longitude (degrees east) for each vertex of the polygon.
     The values are separated by whitespace (e.g. spaces or newlines), and the
@@ -1781,17 +1788,38 @@ in the following ways:
     observation point falls within the polygon defined is done in x/y
     grid space.
 
-  * The NetCDF output of the gen_vx_mask tool. Please see :numref:`masking`
+    .. code-block:: none
+
+       mask = { poly = [ "share/met/poly/CONUS.poly" ]; }
+
+  * Option 2 - Gen-Vx-Mask output:
+
+    The NetCDF output of the gen_vx_mask tool. Please see :numref:`masking`
     for more details.
 
-  * Any gridded data file that MET can read may be used to define a
+    .. code-block:: none
+
+       mask = { poly = [ "/path/to/gen_vx_mask_output.nc" ]; }
+
+  * Option 3 - Any gridded data file:
+
+    Any gridded data file that MET can read may be used to define a
     verification masking region. Users must specify a description of the
     field to be used from the input file and, optionally, may specify a
     threshold to be applied to that field. Once this threshold is
     applied, any grid point where the resulting field is 0, the mask is
     turned off. Any grid point where it is non-zero, the mask is turned
     on.
-    For example, "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
+
+    .. code-block:: none
+
+       mask = { poly = [ "/path/to/sample.grib {name = \"TMP\"; level = \"Z2\";} >273" ]; }
+
+  .. note::
+
+    The syntax for the Option 3 is complicated since it includes quotes
+    embedded within another quoted string. Any such embedded quotes must
+    be escaped using a preceeding backslash character.
 
 * The "sid" entry is an array of strings which define groups of
   observation station ID's over which to compute statistics. Each entry
