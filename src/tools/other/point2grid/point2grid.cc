@@ -424,6 +424,7 @@ static void process_data_file() {
       // Get the obs type before opening NetCDF
       obs_type = get_obs_type(nc_in);
       goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
+      if (obs_type == TYPE_UNKNOWN && ftype == FileType_NcCF) obs_type = TYPE_NCCF;
       if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
 
       // Read the input data file
