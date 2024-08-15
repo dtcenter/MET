@@ -95,19 +95,25 @@ static SeriesAnalysisConfInfo conf_info;
 
 // Output NetCDF file
 static netCDF::NcFile *nc_out = nullptr;
-static netCDF::NcDim  lat_dim;
-static netCDF::NcDim  lon_dim ;
+static netCDF::NcDim   lat_dim;
+static netCDF::NcDim   lon_dim ;
 
-// Structure to store computed statistics and corresponding metadata
+// Structure to store computed statistics
 struct NcVarData {
-   netCDF::NcVar * var; // Pointer to NetCDF variable
+   DataPlane dp;
+   std::string name;
+   std::string long_name;
+   std::string fcst_thresh;
+   std::string obs_thresh;
+   double alpha;
 };
 
 // Mapping of NetCDF variable name to computed statistic
-std::map<ConcatString, NcVarData> stat_data;
+std::map<std::string, NcVarData> stat_data;
+std::vector<std::string> stat_data_keys;
 
 // Mapping of aggregate NetCDF variable name to DataPlane
-std::map<ConcatString, DataPlane> aggr_data;
+std::map<std::string, DataPlane> aggr_data;
 
 ////////////////////////////////////////////////////////////////////////
 //

@@ -140,10 +140,10 @@ static ConcatString build_nc_var_name_probabilistic(
                        const PCTInfo &, double);
 
 static void setup_nc_file(const VarInfo *, const VarInfo *);
-static void add_nc_var(const ConcatString &, const ConcatString &,
-                       const ConcatString &, const ConcatString &,
-                       const ConcatString &, double);
-static void put_nc_val(int, const ConcatString &, float);
+static void add_stat_data(const ConcatString &, const ConcatString &,
+                          const ConcatString &, const ConcatString &,
+                          const ConcatString &, double);
+static void write_stat_data();
 
 static void set_range(const unixtime &, unixtime &, unixtime &);
 static void set_range(const int &, int &, int &);
@@ -607,7 +607,8 @@ void get_series_data(int i_series,
               << cs << "\n\n";
       }
       else {
-         mlog << Debug(3) << cs << "\n";
+         mlog << Debug(3)
+              << cs << "\n";
       }
    }
 
@@ -1012,6 +1013,9 @@ void process_scores() {
 
    } // end for i_read
 
+   // Write the computed statistics
+   write_stat_data();
+
    // Add time range information to the global NetCDF attributes
    add_att(nc_out, "fcst_init_beg",  (string)unix_to_yyyymmdd_hhmmss(fcst_init_beg));
    add_att(nc_out, "fcst_init_end",  (string)unix_to_yyyymmdd_hhmmss(fcst_init_end));
@@ -1053,7 +1057,8 @@ void process_scores() {
 
 void do_categorical(int n, const PairDataPoint *pd_ptr) {
 
-   mlog << Debug(4) << "Computing Categorical Statistics.\n";
+   mlog << Debug(4)
+        << "Computing Categorical Statistics.\n";
 
    // Allocate objects to store categorical statistics
    int n_cts = conf_info.fcat_ta.n();
@@ -1147,7 +1152,8 @@ void do_categorical(int n, const PairDataPoint *pd_ptr) {
 
 void do_multicategory(int n, const PairDataPoint *pd_ptr) {
 
-   mlog << Debug(4) << "Computing Multi-Category Statistics.\n";
+   mlog << Debug(4)
+        << "Computing Multi-Category Statistics.\n";
 
    // Object to store multi-category statistics
    MCTSInfo mcts_info;
@@ -1223,7 +1229,8 @@ void do_continuous(int n, const PairDataPoint *pd_ptr) {
    CNTInfo cnt_info;
    PairDataPoint pd;
 
-   mlog << Debug(4) << "Computing Continuous Statistics.\n";
+   mlog << Debug(4)
+        << "Computing Continuous Statistics.\n";
 
    // Process each filtering threshold
    for(int i=0; i<conf_info.fcnt_ta.n(); i++) {
@@ -1304,7 +1311,8 @@ void do_continuous(int n, const PairDataPoint *pd_ptr) {
 
 void do_partialsums(int n, const PairDataPoint *pd_ptr) {
 
-   mlog << Debug(4) << "Computing Scalar Partial Sums.\n";
+   mlog << Debug(4)
+        << "Computing Scalar Partial Sums.\n";
 
    // Process each filtering threshold
    for(int i=0; i<conf_info.fcnt_ta.n(); i++) {
@@ -1590,7 +1598,8 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
 
 void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
 
-   mlog << Debug(4) << "Computing Probabilistic Statistics.\n";
+   mlog << Debug(4)
+        << "Computing Probabilistic Statistics.\n";
 
    // Object to store probabilistic statistics
    PCTInfo pct_info;
@@ -1705,15 +1714,14 @@ void store_stat_categorical(int n, STATLineType lt,
          lty_stat << "_" << c;
 
          // Add new map entry
-         add_nc_var(var_name, c, stat_long_name[lty_stat],
-                    cts_info.fthresh.get_str(),
-                    cts_info.othresh.get_str(),
-                    alpha);
+         add_stat_data(var_name, c, stat_long_name[lty_stat],
+                       cts_info.fthresh.get_str(),
+                       cts_info.othresh.get_str(),
+                       alpha);
       }
 
       // Store the statistic value
-      put_nc_val(n, var_name,
-                 (float) cts_info.get_stat(lt, c, i_alpha));
+      stat_data[var_name].dp.buf()[n] = cts_info.get_stat(lt, c, i_alpha);
 
    } // end for i_alpha
 
@@ -1762,14 +1770,14 @@ void store_stat_multicategory(int n, STATLineType lt,
          lty_stat << statlinetype_to_string(lt) << "_" << col_name;
 
          // Add new map entry
-         add_nc_var(var_name, c, stat_long_name[lty_stat],
-                    mcts_info.fthresh.get_str(","),
-                    mcts_info.othresh.get_str(","),
-                    alpha);
+         add_stat_data(var_name, c, stat_long_name[lty_stat],
+                       mcts_info.fthresh.get_str(","),
+                       mcts_info.othresh.get_str(","),
+                       alpha);
       }
 
       // Store the statistic value
-      put_nc_val(n, var_name, v);
+      stat_data[var_name].dp.buf()[n] = v;
 
    } // end for i_alpha
 
@@ -1807,15 +1815,14 @@ void store_stat_continuous(int n, STATLineType lt,
          lty_stat << "_" << c;
 
          // Add new map entry
-         add_nc_var(var_name, c, stat_long_name[lty_stat],
-                    cnt_info.fthresh.get_str(),
-                    cnt_info.othresh.get_str(),
-                    alpha);
+         add_stat_data(var_name, c, stat_long_name[lty_stat],
+                       cnt_info.fthresh.get_str(),
+                       cnt_info.othresh.get_str(),
+                       alpha);
       }
 
       // Store the statistic value
-      put_nc_val(n, var_name,
-                 (float) cnt_info.get_stat(c, i_alpha));
+      stat_data[var_name].dp.buf()[n] = cnt_info.get_stat(c, i_alpha);
 
    } // end for i_alpha
 
@@ -1849,15 +1856,14 @@ void store_stat_partialsums(int n, STATLineType lt,
       lty_stat << "_" << c;
 
       // Add new map entry
-      add_nc_var(var_name, c, stat_long_name[lty_stat],
-                 s_info.fthresh.get_str(),
-                 s_info.othresh.get_str(),
-                 bad_data_double);
+      add_stat_data(var_name, c, stat_long_name[lty_stat],
+                    s_info.fthresh.get_str(),
+                    s_info.othresh.get_str(),
+                    bad_data_double);
    }
 
    // Store the statistic value
-   put_nc_val(n, var_name,
-              (float) s_info.get_stat(lt, c));
+   stat_data[var_name].dp.buf()[n] = s_info.get_stat(lt, c);
 
    return;
 }
@@ -1902,14 +1908,14 @@ void store_stat_probabilistic(int n, STATLineType lt,
          lty_stat << "_" << col_name;
 
          // Add new map entry
-         add_nc_var(var_name, c, stat_long_name[lty_stat],
-                    pct_info.fthresh.get_str(","),
-                    pct_info.othresh.get_str(),
-                    alpha);
+         add_stat_data(var_name, c, stat_long_name[lty_stat],
+                       pct_info.fthresh.get_str(","),
+                       pct_info.othresh.get_str(),
+                       alpha);
       }
 
       // Store the statistic value
-      put_nc_val(n, var_name, v);
+      stat_data[var_name].dp.buf()[n] = v;
 
    } // end for i_alpha
 
@@ -2119,68 +2125,76 @@ void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_nc_var(const ConcatString &var_name,
-                const ConcatString &name,
-                const ConcatString &long_name,
-                const ConcatString &fcst_thresh,
-                const ConcatString &obs_thresh,
-                double alpha) {
-   NcVarData d;
+void add_stat_data(const ConcatString &var_name,
+                   const ConcatString &name,
+                   const ConcatString &long_name,
+                   const ConcatString &fcst_thresh,
+                   const ConcatString &obs_thresh,
+                   double alpha) {
 
-   int deflate_level = compress_level;
-   if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
+   NcVarData data;
+   data.dp.set_size(grid.nx(), grid.ny());
+   data.name        = name;
+   data.long_name   = long_name;
+   data.fcst_thresh = fcst_thresh;
+   data.obs_thresh  = obs_thresh;
+   data.alpha       = alpha;
 
-   // Add a new variable to the NetCDF file
-   NcVar var = add_var(nc_out, (string)var_name, ncFloat, lat_dim, lon_dim, deflate_level);
-   d.var = new NcVar(var);
-
-   // Add variable attributes
-   add_att(d.var, "_FillValue", bad_data_float);
-   if(name.length() > 0)        add_att(d.var, "name", (string)name);
-   if(long_name.length() > 0)   add_att(d.var, "long_name", (string)long_name);
-   if(fcst_thresh.length() > 0) add_att(d.var, "fcst_thresh", (string)fcst_thresh);
-   if(obs_thresh.length() > 0)  add_att(d.var, "obs_thresh", (string)obs_thresh);
-   if(!is_bad_data(alpha))      add_att(d.var, "alpha", alpha);
-
-   // Store the new NcVarData object in the map
-   stat_data[var_name] = d;
+   // Store the new NcVarData object
+   stat_data[var_name] = data;
+   stat_data_keys.push_back(var_name);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void put_nc_val(int n, const ConcatString &var_name, float v) {
-   int x, y;
+void write_stat_data() {
 
-   // Determine x,y location
-   DefaultTO.one_to_two(grid.nx(), grid.ny(), n, x, y);
+   mlog << Debug(2)
+        << "Writing " << stat_data_keys.size()
+        << " output variables.\n";
 
-   // Check for key in the map
-   if(stat_data.count(var_name) == 0) {
-      mlog << Error << "\nput_nc_val() -> "
-           << "variable name \"" << var_name
-           << "\" does not exist in the map.\n\n";
-      exit(1);
+   int deflate_level = compress_level;
+   if(deflate_level < 0) deflate_level = conf_info.get_compression_level();
+
+   // Allocate memory to store data values for each grid point
+   float *data = new float [grid.nx()*grid.ny()];
+
+   // Write output for each stat_data map entry
+   for(auto &key : stat_data_keys) {
+
+      NcVarData *ptr = &stat_data[key];
+
+      // Add a new variable to the NetCDF file
+      NcVar nc_var = add_var(nc_out, key, ncFloat, lat_dim, lon_dim, deflate_level);
+
+      // Add variable attributes
+      add_att(&nc_var, "_FillValue", bad_data_float);
+      add_att(&nc_var, "name", ptr->name);
+      add_att(&nc_var, "long_name", ptr->long_name);
+      if(ptr->fcst_thresh.length() > 0) add_att(&nc_var, "fcst_thresh", ptr->fcst_thresh);
+      if(ptr->obs_thresh.length() > 0) add_att(&nc_var, "obs_thresh", ptr->obs_thresh);
+      if(!is_bad_data(ptr->alpha)) add_att(&nc_var, "alpha", ptr->alpha);
+
+      // Store the data
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
+            int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+            data[n] = (float) ptr->dp(x, y);
+         } // end for y
+      } // end for x
+
+      // Write out the data
+      if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
+         mlog << Error << "\nwrite_stat_data() -> "
+              << "error writing \"" << key << "\" data to the output file.\n\n";
+         exit(1);
+      }
    }
 
-   // Get the NetCDF variable to be written
-   NcVar *var = stat_data[var_name].var;
-
-   long offsets[2];
-   long lengths[2];
-   offsets[0] = y;
-   offsets[1] = x;
-   lengths[0] = 1;
-   lengths[1] = 1;
-
-   // Store the current value
-   if(!put_nc_data(var, &v, lengths, offsets)) {
-      mlog << Error << "\nput_nc_val() -> "
-           << "error writing to variable " << var_name
-           << " for point (" << x << ", " << y << ").\n\n";
-      exit(1);
-   }
+   // Clean up
+   if(data) { delete [] data;  data = (float *) nullptr; }
 
    return;
 }
@@ -2213,17 +2227,12 @@ void set_range(const int &t, int &beg, int &end) {
 
 void clean_up() {
 
-   // Deallocate NetCDF variable for each map entry
-   map<ConcatString, NcVarData>::const_iterator it;
-   for(it=stat_data.begin(); it!=stat_data.end(); it++) {
-      if(it->second.var) { delete it->second.var; }
-   }
-
    // Close the output NetCDF file
    if(nc_out) {
 
       // List the NetCDF file after it is finished
-      mlog << Debug(1) << "Output file: " << out_file << "\n";
+      mlog << Debug(1)
+           << "Output file: " << out_file << "\n";
 
       delete nc_out;
       nc_out = (NcFile *) nullptr;
