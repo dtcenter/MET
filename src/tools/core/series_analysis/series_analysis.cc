@@ -792,6 +792,10 @@ DataPlane read_aggr_data_plane(const ConcatString &var_name,
    VarInfoNcMet aggr_info;
    aggr_info.set_magic(var_name, "(*,*)");
 
+   mlog << Debug(2)
+        << "Reading aggregation \""
+        << aggr_info.magic_str() << "\" field.\n";
+
    // Attempt to read the gridded data from the current file
    if(!aggr_nc.data_plane(aggr_info, aggr_dp)) {
       mlog << Error << "\nread_aggr_data_plane() -> "
