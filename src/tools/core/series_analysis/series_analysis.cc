@@ -84,7 +84,8 @@ static bool read_single_entry(VarInfo *, const ConcatString &,
                               const GrdFileType, DataPlane &, Grid &);
 
 static void open_aggr_file();
-static DataPlane read_aggr_data_plane(const ConcatString &);
+static DataPlane read_aggr_data_plane(const ConcatString &,
+                                      const STATLineType aggr_lt=STATLineType::none);
 
 static void process_scores();
 
@@ -783,7 +784,8 @@ void open_aggr_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlane read_aggr_data_plane(const ConcatString &var_name) {
+DataPlane read_aggr_data_plane(const ConcatString &var_name,
+                               STATLineType aggr_lt) {
    DataPlane aggr_dp;
 
    // Setup the data request
@@ -795,6 +797,13 @@ DataPlane read_aggr_data_plane(const ConcatString &var_name) {
       mlog << Error << "\nread_aggr_data_plane() -> "
            << "Required variable \"" << aggr_info.magic_str() << "\""
            << " not found in the aggregate file!\n\n";
+      if(aggr_lt != STATLineType::none) {
+         mlog << Error
+              << "Recommend recreating \"" << aggr_file
+              << "\" to request that \"" << all_columns << "\" "
+              << statlinetype_to_string(aggr_lt)
+              << " columns be written.\n\n";
+      }
       exit(1);
    }
 
@@ -1414,67 +1423,13 @@ void read_aggr_ctc(int n, const CTSInfo &cts_info,
 
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
-         aggr_data[var_name] = read_aggr_data_plane(var_name);
+         aggr_data[var_name] = read_aggr_data_plane(
+                                  var_name,
+                                  STATLineType::ctc);
       }
 
       // Populate the CTC table
       aggr_cts.set_stat_ctc(col, aggr_data[var_name].buf()[n]);
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void read_aggr_sl1l2(int n, const SL1L2Info &s_info,
-                     SL1L2Info &aggr_psum) {
-
-   // Initialize
-   aggr_psum.zero_out();
-
-   // Loop over the SL1L2 columns
-   for(auto &col : sl1l2_columns) {
-
-      ConcatString c(to_upper(col));
-      ConcatString var_name(build_nc_var_name_partialsums(
-                               STATLineType::sl1l2, c,
-                               s_info));
-
-      // Read aggregate data, if needed
-      if(aggr_data.count(var_name) == 0) {
-         aggr_data[var_name] = read_aggr_data_plane(var_name);
-      }
-
-      // Populate the partial sums
-      aggr_psum.set_stat_sl1l2(col, aggr_data[var_name].buf()[n]);
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void read_aggr_sal1l2(int n, const SL1L2Info &s_info,
-                      SL1L2Info &aggr_psum) {
-
-   // Initialize
-   aggr_psum.zero_out();
-
-   // Loop over the SAL1L2 columns
-   for(auto &col : sal1l2_columns) {
-
-      ConcatString c(to_upper(col));
-      ConcatString var_name(build_nc_var_name_partialsums(
-                               STATLineType::sal1l2, c,
-                               s_info));
-
-      // Read aggregate data, if needed
-      if(aggr_data.count(var_name) == 0) {
-         aggr_data[var_name] = read_aggr_data_plane(var_name);
-      }
-
-      // Populate the partial sums
-      aggr_psum.set_stat_sal1l2(col, aggr_data[var_name].buf()[n]);
    }
 
    return;
@@ -1503,7 +1458,9 @@ void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
 
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
-         aggr_data[var_name] = read_aggr_data_plane(var_name);
+         aggr_data[var_name] = read_aggr_data_plane(
+                                  var_name,
+                                  STATLineType::mctc);
       }
 
       // Get the n-th value
@@ -1539,6 +1496,66 @@ void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
 
 ////////////////////////////////////////////////////////////////////////
 
+void read_aggr_sl1l2(int n, const SL1L2Info &s_info,
+                     SL1L2Info &aggr_psum) {
+
+   // Initialize
+   aggr_psum.zero_out();
+
+   // Loop over the SL1L2 columns
+   for(auto &col : sl1l2_columns) {
+
+      ConcatString c(to_upper(col));
+      ConcatString var_name(build_nc_var_name_partialsums(
+                               STATLineType::sl1l2, c,
+                               s_info));
+
+      // Read aggregate data, if needed
+      if(aggr_data.count(var_name) == 0) {
+         aggr_data[var_name] = read_aggr_data_plane(
+                                  var_name,
+                                  STATLineType::sl1l2);
+      }
+
+      // Populate the partial sums
+      aggr_psum.set_stat_sl1l2(col, aggr_data[var_name].buf()[n]);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void read_aggr_sal1l2(int n, const SL1L2Info &s_info,
+                      SL1L2Info &aggr_psum) {
+
+   // Initialize
+   aggr_psum.zero_out();
+
+   // Loop over the SAL1L2 columns
+   for(auto &col : sal1l2_columns) {
+
+      ConcatString c(to_upper(col));
+      ConcatString var_name(build_nc_var_name_partialsums(
+                               STATLineType::sal1l2, c,
+                               s_info));
+
+      // Read aggregate data, if needed
+      if(aggr_data.count(var_name) == 0) {
+         aggr_data[var_name] = read_aggr_data_plane(
+                                  var_name,
+                                  STATLineType::sal1l2);
+      }
+
+      // Populate the partial sums
+      aggr_psum.set_stat_sal1l2(col, aggr_data[var_name].buf()[n]);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void read_aggr_pct(int n, const PCTInfo &pct_info,
                    PCTInfo &aggr_pct) {
 
@@ -1560,7 +1577,9 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
 
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
-         aggr_data[var_name] = read_aggr_data_plane(var_name);
+         aggr_data[var_name] = read_aggr_data_plane(
+                                  var_name,
+                                  STATLineType::pct);
       }
 
       // Get the n-th value
