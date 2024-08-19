@@ -2156,7 +2156,7 @@ void add_stat_data(const ConcatString &var_name,
                    double alpha) {
 
    NcVarData data;
-   data.dp.set_size(grid.nx(), grid.ny());
+   data.dp.set_size(grid.nx(), grid.ny(), bad_data_double);
    data.name        = name;
    data.long_name   = long_name;
    data.fcst_thresh = fcst_thresh;
