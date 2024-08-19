@@ -1475,7 +1475,8 @@ SL1L2Info & SL1L2Info::operator=(const SL1L2Info &c) {
 ////////////////////////////////////////////////////////////////////////
 
 SL1L2Info & SL1L2Info::operator+=(const SL1L2Info &c) {
-   SL1L2Info s_info;
+   SL1L2Info s_info = *this;
+   s_info.zero_out();
 
    s_info.scount  = scount + c.scount;
 
@@ -1810,11 +1811,8 @@ VL1L2Info & VL1L2Info::operator=(const VL1L2Info &c) {
 ////////////////////////////////////////////////////////////////////////
 
 VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
-   VL1L2Info v_info;
-
-   // Store alpha values
-   v_info.allocate_n_alpha(n_alpha);
-   for(int i=0; i<n_alpha; i++) v_info.alpha[i] = alpha[i];
+   VL1L2Info v_info = *this;
+   v_info.zero_out();
 
    v_info.vcount = vcount + c.vcount;
    v_info.dcount = dcount + c.dcount;
@@ -2653,7 +2651,8 @@ NBRCNTInfo & NBRCNTInfo::operator=(const NBRCNTInfo &c) {
 ////////////////////////////////////////////////////////////////////////
 
 NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
-   NBRCNTInfo n_info;
+   NBRCNTInfo n_info = *this;
+   n_info.sl1l2_info.zero_out();
    double den;
 
    n_info.sl1l2_info.scount = sl1l2_info.scount + c.sl1l2_info.scount;
