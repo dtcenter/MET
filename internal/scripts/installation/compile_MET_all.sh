@@ -640,7 +640,7 @@ if  [ $COMPILE_ECKIT -eq 1 ]; then
 
   # Need to obtain ecbuild before installing eckit
 
-  vrs="3.5.0"
+  vrs="3.7.0"
     
   echo  
   echo "Compiling ECBUILD at `date`"
@@ -653,7 +653,7 @@ if  [ $COMPILE_ECKIT -eq 1 ]; then
   run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} > $(pwd)/ecbuild.cmake.log 2>&1"
   run_cmd "make ${MAKE_ARGS} install > $(pwd)/ecbuild.make_install.log 2>&1"
   
-  vrs="1.20.2"
+  vrs="1.24.4"
 
   echo
   echo "Compiling ECKIT at `date`"
@@ -671,7 +671,7 @@ fi
 # Compile ATLAS
 if [ $COMPILE_ATLAS -eq 1 ]; then
 
-  vrs="0.30.0"
+  vrs="0.35.0"
 
   echo
   echo "Compiling ATLAS at `date`"
