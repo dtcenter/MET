@@ -4636,7 +4636,7 @@ void write_ssvar_cols(const PairDataEnsemble *pd_ptr, int i,
    //
    cnt_info.allocate_n_alpha(1);
    cnt_info.alpha[0] = alpha;
-   compute_cntinfo(pd_ptr->ssvar_bins[i].sl1l2_info, 0, cnt_info);
+   compute_cntinfo(pd_ptr->ssvar_bins[i].sl1l2_info, cnt_info);
 
    //
    // Ensemble spread/skill variance bins

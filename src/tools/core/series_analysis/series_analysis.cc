@@ -1272,13 +1272,19 @@ void do_continuous(int n, const PairDataPoint *pd_ptr) {
          s_info.logic   = cnt_info.logic;
          s_info.set(*pd_ptr);
 
-         // Aggregate partial sums
+         // Aggregate scalar partial sums
          SL1L2Info aggr_psum;
          read_aggr_sl1l2(n, s_info, aggr_psum);
          s_info += aggr_psum;
 
+         // Aggregate scalar anomaly partial sums
+         if(conf_info.output_stats[STATLineType::cnt].has("ANOM_CORR")) {
+            read_aggr_sal1l2(n, s_info, aggr_psum);
+            s_info += aggr_psum;
+         }
+
          // Compute continuous statistics from partial sums
-         compute_cntinfo(s_info, false, cnt_info);
+         compute_cntinfo(s_info, cnt_info);
       }
       // Compute continuous statistics from the pair data
       else {

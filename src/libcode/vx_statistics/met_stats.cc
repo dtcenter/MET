@@ -985,6 +985,44 @@ void CNTInfo::init_from_scratch() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void CNTInfo::zero_out() {
+
+   fbar.set_bad_data();
+   fstdev.set_bad_data();
+   obar.set_bad_data();
+   ostdev.set_bad_data();
+   pr_corr.set_bad_data();
+   sp_corr.set_bad_data();
+   kt_corr.set_bad_data();
+   anom_corr.set_bad_data();
+   rmsfa.set_bad_data();
+   rmsoa.set_bad_data();
+   anom_corr_uncntr.set_bad_data();
+   me.set_bad_data();
+   me2.set_bad_data();
+   estdev.set_bad_data();
+   mbias.set_bad_data();
+   mae.set_bad_data();
+   mse.set_bad_data();
+   msess.set_bad_data();
+   bcmse.set_bad_data();
+   rmse.set_bad_data();
+   si.set_bad_data();
+   e10.set_bad_data();
+   e25.set_bad_data();
+   e50.set_bad_data();
+   e75.set_bad_data();
+   e90.set_bad_data();
+   eiqr.set_bad_data();
+   mad.set_bad_data();
+
+   n_ranks = frank_ties = orank_ties = 0;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void CNTInfo::clear() {
 
    n = 0;

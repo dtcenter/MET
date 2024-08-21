@@ -706,7 +706,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
          else if(do_cnt && (line.type() == STATLineType::sl1l2 ||
                             line.type() == STATLineType::sal1l2)) {
             parse_sl1l2_line(line, sl1l2_info);
-            compute_cntinfo(sl1l2_info, 0, cnt_info);
+            compute_cntinfo(sl1l2_info, cnt_info);
          }
 
          //
@@ -1519,7 +1519,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
             //
             // Compute the stats for the current time
             //
-            compute_cntinfo(cur_sl1l2, 0, cur_cnt);
+            compute_cntinfo(cur_sl1l2, cur_cnt);
 
             //
             // Append the stats

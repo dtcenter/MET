@@ -197,7 +197,9 @@ class CNTInfo {
       
       int n_ranks, frank_ties, orank_ties;
 
+      void zero_out();
       void clear();
+
       void allocate_n_alpha(int);
       void compute_ci();
 
@@ -370,9 +372,9 @@ class VL1L2Info {
 
       // Compute sums
       void set(const PairDataPoint &, const PairDataPoint &);
-   
-      void clear();
+
       void zero_out();
+      void clear();
 
       void allocate_n_alpha(int);
       void compute_stats();
@@ -520,8 +522,9 @@ class ISCInfo {
       double  baser;
       double  fbias;
 
-      void clear();
       void zero_out();
+      void clear();
+
       void allocate_n_scale(int);
       void compute_isc();
       void compute_isc(int);
