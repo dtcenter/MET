@@ -913,7 +913,7 @@ The contents of the columns in this ASCII file are summarized in :numref:`MODE_o
   * - 50
     - AREA_RATIO
     - The forecast object area divided by the observation object area (unitless) :raw-html:`<br />`
-      **NOTE:** Prior to met-10.0.0, defined as the lesser of the two object areas divided by the greater of the two
+      **NOTE:** Prior to MET version 10.0.0, the AREA_RATIO was defined as the lesser of the two object areas divided by the greater of the two.
   * - 51
     - INTERSECTION :raw-html:`<br />` \_AREA
     - Intersection area of two objects (in grid squares)

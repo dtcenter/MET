@@ -158,15 +158,15 @@ The configuration file language supports the following data types:
 
 .. note::
 
-    Prior to MET version 12.0.0, forecast climatological inputs were not
-    supported. The observation climatological inputs were used to process
-    threshold types named "SCP" and "CDP".
+  Prior to MET version 12.0.0, forecast climatological inputs were not
+  supported. The observation climatological inputs were used to process
+  threshold types named "SCP" and "CDP".
 
-    For backward compatibility, the "SCP" threshold type is processed the same
-    as "SOCP" and "CDP" the same as "OCDP".
+  For backward compatibility, the "SCP" threshold type is processed the same
+  as "SOCP" and "CDP" the same as "OCDP".
 
-    Users are encouraged to replace the deprecated "SCP" and "CDP" threshold
-    types with the updated "SOCP" and "OCDP" types, respectively.
+  Users are encouraged to replace the deprecated "SCP" and "CDP" threshold
+  types with the updated "SOCP" and "OCDP" types, respectively.
  
 * Piecewise-Linear Function (currently used only by MODE):
   
@@ -324,8 +324,10 @@ To run this utility:
     -e EXISTING_FILE, --existing=EXISTING_FILE
                           Save the text into the named file (optional, default: ../../../data/table_files/ndbc_stations.xml)
 
-NOTE: The downloaded files are written to a subdirectory ndbc_temp_data which
-can be deleted once the final output file is created.
+.. note::
+
+  The downloaded files are written to a subdirectory ndbc_temp_data which
+  can be deleted once the final output file is created.
 
 MET_BASE
 --------
@@ -1508,8 +1510,11 @@ the climatology file names and fields to be used.
   with 6 and 12 being common choices. Use "NA" if the timing of the
   climatology data should not be checked.
 
-* The "day_interval" and "hour_interval" entries replace the deprecated
-  entries "match_month", "match_day", and "time_step".
+.. note::
+
+  As of MET version 11.0.0, the "day_interval" and "hour_interval" entries
+  replace the "match_month", "match_day", and "time_step" entries, which are
+  now deprecated.
 
 .. code-block:: none
 
@@ -1561,6 +1566,27 @@ over the "climo_mean" setting and then updating the "file_name" entry.
   climo_stdev = climo_mean;
   climo_stdev = {
      file_name = [ "/path/to/climatological/standard/deviation/files" ];
+  }
+
+Prior to MET version 12.0.0, forecast climatological inputs were not supported.
+If the "climo_mean" and "climo_stdev" dictionaries are defined at the top-level
+configuration file context, the same data is used for both the forecast and
+observation climatologies. To specify separate forecast and observation
+climatologies, define "climo_mean" and "climo_stdev" inside the "fcst" and "obs"
+dictionaries, as shown below.
+
+.. code-block:: none
+
+  fcst = {
+    field = [ ... ];
+    climo_mean = { ... };
+    climo_stdev = { ... };
+  }
+
+  obs = {
+    field = [ ... ];
+    climo_mean = { ... };
+    climo_stdev = { ... };
   }
 
 climo_cdf
@@ -2297,8 +2323,10 @@ For example:
 | nc_pairs_var_suffix = "FREEZING"; (for the freezing level height)
 |
 
-NOTE: This option was previously named "nc_pairs_var_str", which is
-now deprecated.
+.. note::
+
+  Prior to MET version 9.0.0, this option was named "nc_pairs_var_str",'
+  which is now deprecated.
 
 .. code-block:: none
 

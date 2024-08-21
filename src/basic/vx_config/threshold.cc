@@ -103,9 +103,8 @@ for (auto const& x : perc_thresh_info_map) {
 }
 
    //
-   // MET #2924: For backward compatibility support SCP and CDP
-   //            threshold types
-   //    
+   // MET #2924 Backward compatible support for SCP and CDP types
+   //
 
 if ( !match &&
     (search_cs.startswith(scp_perc_thresh_type_str.c_str()) ||

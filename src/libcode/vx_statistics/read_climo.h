@@ -19,10 +19,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 extern DataPlane read_climo_data_plane(Dictionary *, int,
-                                       unixtime, const Grid &);
+                                       unixtime, const Grid &,
+                                       const char *);
 
 extern DataPlaneArray read_climo_data_plane_array(Dictionary *, int,
-                                                  unixtime, const Grid &);
+                                                  unixtime, const Grid &,
+                                                  const char *);
 
 ////////////////////////////////////////////////////////////////////////
 

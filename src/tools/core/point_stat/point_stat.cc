@@ -668,18 +668,22 @@ void process_fcst_climo_files() {
       // Read forecast climatology data
       fcmn_dpa = read_climo_data_plane_array(
                     conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
-                    i, fcst_dpa[0].valid(), grid);
+                    i, fcst_dpa[0].valid(), grid,
+                    "forecast climatology mean");
       fcsd_dpa = read_climo_data_plane_array(
                     conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
-                    i, fcst_dpa[0].valid(), grid);
+                    i, fcst_dpa[0].valid(), grid,
+                    "forecast climatology standard deviation");
 
       // Read observation climatology data
       ocmn_dpa = read_climo_data_plane_array(
                     conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
-                    i, fcst_dpa[0].valid(), grid);
+                    i, fcst_dpa[0].valid(), grid,
+                    "observation climatology mean");
       ocsd_dpa = read_climo_data_plane_array(
                     conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
-                    i, fcst_dpa[0].valid(), grid);
+                    i, fcst_dpa[0].valid(), grid,
+                    "observation climatology standard deviation");
 
       // Store data for the current verification task
       conf_info.vx_opt[i].vx_pd.set_fcst_dpa(fcst_dpa);
