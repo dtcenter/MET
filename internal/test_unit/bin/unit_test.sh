@@ -86,6 +86,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_climatology_1.0deg.xml \
           unit_climatology_1.5deg.xml \
           unit_climatology_2.5deg.xml \
+          unit_climatology_mixed.xml \
           unit_grib_tables.xml \
           unit_grid_weight.xml \
           unit_netcdf.xml \
