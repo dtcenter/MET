@@ -820,7 +820,6 @@ double get_mpr_column_value(double f, double o, const ClimoPntInfo &cpi,
                             const char *s) {
    double v;
 
-/* #MET #2924 Replace this section
         if(strcasecmp(s, "FCST")             == 0) v = f;
    else if(strcasecmp(s, "OBS")              == 0) v = o;
    else if(strcasecmp(s, "FCST_CLIMO_MEAN")  == 0) v = cpi.fcmn;
@@ -831,16 +830,6 @@ double get_mpr_column_value(double f, double o, const ClimoPntInfo &cpi,
       v = (is_bad_data(cpi.ocmn) || is_bad_data(cpi.ocsd) ?
            bad_data_double : normal_cdf(o, cpi.ocmn, cpi.ocsd));
    }
-*/
-        if(strcasecmp(s, "FCST")         == 0) v = f;
-   else if(strcasecmp(s, "OBS")          == 0) v = o;
-   else if(strcasecmp(s, "CLIMO_MEAN")   == 0) v = cpi.ocmn;
-   else if(strcasecmp(s, "CLIMO_STDEV")  == 0) v = cpi.ocsd;
-   else if(strcasecmp(s, "CLIMO_CDF")    == 0) {
-      v = (is_bad_data(cpi.ocmn) || is_bad_data(cpi.ocsd) ?
-           bad_data_double : normal_cdf(o, cpi.ocmn, cpi.ocsd));
-   }
-// MET #2924 End replace
    else {
       mlog << Error << "\nget_mpr_column_value() -> "
            << "unsupported matched pair column name requested in \""

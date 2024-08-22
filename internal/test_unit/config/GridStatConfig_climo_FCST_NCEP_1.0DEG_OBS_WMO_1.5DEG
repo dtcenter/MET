@@ -28,10 +28,11 @@ obtype = "GFSANL";
 // Verification grid
 //
 regrid = {
-   to_grid    = NONE;
-   method     = NEAREST;
-   width      = 1;
+   to_grid    = "${OBS_CLIMO_DIR}/mslp_mean.grib";
+   method     = BILIN;
+   width      = 2;
    vld_thresh = 0.5;
+   shape      = SQUARE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -57,77 +58,70 @@ rank_corr_flag      = FALSE;
 //
 // Forecast and observation fields to be verified
 //
+
+field_list = [
+   { name = "TMP";  level = [ "P500" ]; },
+   { name = "UGRD"; level = [ "P500" ]; },
+   { name = "VGRD"; level = [ "P500" ]; },
+   { name = "TMP";  level = [ "P850" ]; cat_thresh = [ >FCDP75, >OCDP75 ]; },
+   { name = "UGRD"; level = [ "P850" ]; cat_thresh = [ >FCDP75, >OCDP75 ]; },
+   { name = "VGRD"; level = [ "P850" ]; cat_thresh = [ >FCDP75, >OCDP75 ]; }
+];
+
 fcst = {
 
-   name  = "TMP";
-   level = "Z2";
+   field = field_list;
 
-   field = [
-      {
-        desc                = "NO_MPR_THRESH";
-        nc_pairs_var_suffix = desc;
-      },
-      {
-        mpr_column          = [ "OBS-FCST" ];
-        mpr_thresh          = [ >=-5&&<=5  ];
-        desc                = "OBS_FCST_DIFF";
-        nc_pairs_var_suffix = desc;
-      },
-      {
-        mpr_column          = [ "ABS(OBS-FCST)" ];
-        mpr_thresh          = [ <=5             ];
-        desc                = "ABS_OBS_FCST_DIFF";
-        nc_pairs_var_suffix = desc;
-      },
-      { 
-        mpr_column          = [ "ABS(OBS-OBS_CLIMO_MEAN)" ];
-        mpr_thresh          = [ <=5                   ];
-        desc                = "ABS_OBS_CLIMO_MEAN_DIFF";
-        nc_pairs_var_suffix = desc;
-      },
-      { 
-        mpr_column          = [ "OBS_CLIMO_CDF" ];
-        mpr_thresh          = [ >=0.25&&<=0.75 ];
-        desc                = "OBS_CLIMO_CDF_IQR";
-        nc_pairs_var_suffix = desc;
-      }
-   ];
-}
-obs = fcst;
+   climo_mean = {
+      field = field_list;
+      file_name = [ "${FCST_CLIMO_DIR}/cmean_1d.19590410" ];
+   };
 
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Climatology mean data
-//
-climo_mean = fcst;
-climo_mean = {
-
-   file_name = [ ${CLIMO_MEAN_FILE_LIST} ];
-
-   regrid = {
-      method     = BILIN;
-      width      = 2;
-      vld_thresh = 0.5;
-   }
+   climo_stdev = {
+      field = field_list;
+      file_name = [ "${FCST_CLIMO_DIR}/cstdv_1d.19590410" ];
+   };
 
    time_interp_method = DW_MEAN;
-   day_interval       = ${DAY_INTERVAL};
-   hour_interval      = ${HOUR_INTERVAL};
+   day_interval       = 1;
+   hour_interval      = 6;
 }
 
-climo_stdev = climo_mean;
-climo_stdev = {
-   file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
+obs = {
+
+   field = field_list;
+
+   climo_mean = {
+      field = field_list;
+      file_name = [ "${OBS_CLIMO_DIR}/t500hPa_mean.grib",
+                    "${OBS_CLIMO_DIR}/t850hPa_mean.grib",
+                    "${OBS_CLIMO_DIR}/u500hPa_mean.grib",
+                    "${OBS_CLIMO_DIR}/u850hPa_mean.grib",
+                    "${OBS_CLIMO_DIR}/v500hPa_mean.grib",
+                    "${OBS_CLIMO_DIR}/v850hPa_mean.grib" ];
+   };
+
+   climo_stdev = {
+      field = field_list;
+      file_name = [ "${OBS_CLIMO_DIR}/t850hPa_stdev.grib",
+                    "${OBS_CLIMO_DIR}/u850hPa_stdev.grib",
+                    "${OBS_CLIMO_DIR}/v850hPa_stdev.grib" ];
+   };
+
+   time_interp_method = DW_MEAN;
+   day_interval       = 1;
+   hour_interval      = 12;
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 //
 // May be set separately in each "obs.field" entry
 //
 climo_cdf = {
    cdf_bins    = 1;
-   center_bins = FALSE;
-   write_bins  = TRUE;
+   center_bins = TRUE;
+   write_bins  = FALSE;
    direct_prob = FALSE;
 }
 
@@ -203,8 +197,8 @@ fourier = {
 // May be set separately in each "obs.field" entry
 //
 gradient = {
-   dx = [ 1 ];
-   dy = [ 1 ];
+   dx = [];
+   dy = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -232,12 +226,12 @@ output_flag = {
    cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = NONE;
+   cnt    = STAT;
    sl1l2  = STAT;
-   sal1l2 = NONE;
-   vl1l2  = NONE;
-   val1l2 = NONE;
-   vcnt   = NONE;
+   sal1l2 = STAT;
+   vl1l2  = STAT;
+   val1l2 = STAT;
+   vcnt   = STAT;
    pct    = NONE;
    pstd   = NONE;
    pjc    = NONE;
@@ -255,12 +249,12 @@ output_flag = {
 // NetCDF matched pairs output file
 //
 nc_pairs_flag = {
-   latlon       = FALSE;
-   raw          = FALSE;
+   latlon       = TRUE;
+   raw          = TRUE;
    diff         = TRUE;
-   climo        = FALSE;
-   climo_cdp    = FALSE;
-   weight       = FALSE;
+   climo        = TRUE;
+   climo_cdp    = TRUE;
+   weight       = TRUE;
    nbrhd        = FALSE;
    fourier      = FALSE;
    gradient     = FALSE;

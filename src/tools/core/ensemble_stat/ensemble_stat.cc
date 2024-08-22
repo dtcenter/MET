@@ -784,18 +784,22 @@ void process_point_vx() {
       // Read forecast climatology data
       fcmn_dpa = read_climo_data_plane_array(
                     conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
-                    i, ens_valid_ut, grid);
+                    i, ens_valid_ut, grid,
+                    "forecast climatology mean");
       fcsd_dpa = read_climo_data_plane_array(
-                   conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
-                   i, ens_valid_ut, grid);
+                    conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
+                    i, ens_valid_ut, grid,
+                    "forecast climatology standard deviation");
 
       // Read observation climatology data
       ocmn_dpa = read_climo_data_plane_array(
                     conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
-                    i, ens_valid_ut, grid);
+                    i, ens_valid_ut, grid,
+                    "observation climatology mean");
       ocsd_dpa = read_climo_data_plane_array(
-                   conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
-                   i, ens_valid_ut, grid);
+                    conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
+                    i, ens_valid_ut, grid,
+                    "observation climatology standard deviation");
 
       mlog << Debug(3)
            << "For " << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str() << ", found "
@@ -1424,18 +1428,22 @@ void process_grid_vx() {
       // Read forecast climatology data
       fcmn_dp = read_climo_data_plane(
                    conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
-                   i, ens_valid_ut, grid);
+                   i, ens_valid_ut, grid,
+                   "forecast climatology mean");
       fcsd_dp = read_climo_data_plane(
                    conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
-                   i, ens_valid_ut, grid);
+                   i, ens_valid_ut, grid,
+                   "forecast climatology standard deviation");
 
       // Read observation climatology data
       ocmn_dp = read_climo_data_plane(
                    conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
-                   i, ens_valid_ut, grid);
+                   i, ens_valid_ut, grid,
+                   "observation climatology mean");
       ocsd_dp = read_climo_data_plane(
                    conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
-                   i, ens_valid_ut, grid);
+                   i, ens_valid_ut, grid,
+                   "observation climatology standard deviation");
 
       mlog << Debug(3)
            << "For " << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str() << ", found "

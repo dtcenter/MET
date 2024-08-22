@@ -158,15 +158,15 @@ The configuration file language supports the following data types:
 
 .. note::
 
-    Prior to MET version 12.0.0, forecast climatological inputs were not
-    supported. The observation climatological inputs were used to process
-    threshold types named "SCP" and "CDP".
+  Prior to MET version 12.0.0, forecast climatological inputs were not
+  supported. The observation climatological inputs were used to process
+  threshold types named "SCP" and "CDP".
 
-    For backward compatibility, the "SCP" threshold type is processed the same
-    as "SOCP" and "CDP" the same as "OCDP".
+  For backward compatibility, the "SCP" threshold type is processed the same
+  as "SOCP" and "CDP" the same as "OCDP".
 
-    Users are encouraged to replace the deprecated "SCP" and "CDP" threshold
-    types with the updated "SOCP" and "OCDP" types, respectively.
+  Users are encouraged to replace the deprecated "SCP" and "CDP" threshold
+  types with the updated "SOCP" and "OCDP" types, respectively.
  
 * Piecewise-Linear Function (currently used only by MODE):
   
@@ -324,8 +324,10 @@ To run this utility:
     -e EXISTING_FILE, --existing=EXISTING_FILE
                           Save the text into the named file (optional, default: ../../../data/table_files/ndbc_stations.xml)
 
-NOTE: The downloaded files are written to a subdirectory ndbc_temp_data which
-can be deleted once the final output file is created.
+.. note::
+
+  The downloaded files are written to a subdirectory ndbc_temp_data which
+  can be deleted once the final output file is created.
 
 MET_BASE
 --------
@@ -1508,8 +1510,11 @@ the climatology file names and fields to be used.
   with 6 and 12 being common choices. Use "NA" if the timing of the
   climatology data should not be checked.
 
-* The "day_interval" and "hour_interval" entries replace the deprecated
-  entries "match_month", "match_day", and "time_step".
+.. note::
+
+  As of MET version 11.0.0, the "day_interval" and "hour_interval" entries
+  replace the "match_month", "match_day", and "time_step" entries, which are
+  now deprecated.
 
 .. code-block:: none
 
@@ -1561,6 +1566,27 @@ over the "climo_mean" setting and then updating the "file_name" entry.
   climo_stdev = climo_mean;
   climo_stdev = {
      file_name = [ "/path/to/climatological/standard/deviation/files" ];
+  }
+
+Prior to MET version 12.0.0, forecast climatological inputs were not supported.
+If the "climo_mean" and "climo_stdev" dictionaries are defined at the top-level
+configuration file context, the same data is used for both the forecast and
+observation climatologies. To specify separate forecast and observation
+climatologies, define "climo_mean" and "climo_stdev" inside the "fcst" and "obs"
+dictionaries, as shown below.
+
+.. code-block:: none
+
+  fcst = {
+    field = [ ... ];
+    climo_mean = { ... };
+    climo_stdev = { ... };
+  }
+
+  obs = {
+    field = [ ... ];
+    climo_mean = { ... };
+    climo_stdev = { ... };
   }
 
 climo_cdf
@@ -1729,7 +1755,7 @@ Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
 .. _config_options-mask:
 
 mask
----
+----
 
 The "mask" entry is a dictionary that specifies the verification masking
 regions to be used when computing statistics. Each mask defines a
@@ -1749,11 +1775,18 @@ in the following ways:
 
 * The "poly" entry contains a comma-separated list of files that define
   verification masking regions. These masking regions may be specified in
-  two ways: in an ASCII file containing lat/lon points defining the mask polygon,
-  or using a gridded data file such as the NetCDF output of the Gen-Vx-Mask tool.
-  Some details for each of these options are described below:
+  three ways:
 
-  * If providing an ASCII file containing the lat/lon points defining the mask
+    1. An ASCII polyline file containing lat/lon points defining the mask polygon.
+    2. The NetCDF output of the Gen-Vx-Mask tool.
+    3. Any gridded data file followed by a configuration string describing the
+       data to be read and an optional threshold to be applied to that data.
+
+  These three options are described below:
+
+  * Option 1 - ASCII polyline file:
+
+    If providing an ASCII file containing the lat/lon points defining the mask
     polygon, the file must contain a name for the region followed by the latitude
     (degrees north) and longitude (degrees east) for each vertex of the polygon.
     The values are separated by whitespace (e.g. spaces or newlines), and the
@@ -1781,17 +1814,38 @@ in the following ways:
     observation point falls within the polygon defined is done in x/y
     grid space.
 
-  * The NetCDF output of the gen_vx_mask tool. Please see :numref:`masking`
+    .. code-block:: none
+
+       mask = { poly = [ "share/met/poly/CONUS.poly" ]; }
+
+  * Option 2 - Gen-Vx-Mask output:
+
+    The NetCDF output of the gen_vx_mask tool. Please see :numref:`masking`
     for more details.
 
-  * Any gridded data file that MET can read may be used to define a
+    .. code-block:: none
+
+       mask = { poly = [ "/path/to/gen_vx_mask_output.nc" ]; }
+
+  * Option 3 - Any gridded data file:
+
+    Any gridded data file that MET can read may be used to define a
     verification masking region. Users must specify a description of the
     field to be used from the input file and, optionally, may specify a
     threshold to be applied to that field. Once this threshold is
     applied, any grid point where the resulting field is 0, the mask is
     turned off. Any grid point where it is non-zero, the mask is turned
     on.
-    For example, "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
+
+    .. code-block:: none
+
+       mask = { poly = [ "/path/to/sample.grib {name = \"TMP\"; level = \"Z2\";} >273" ]; }
+
+  .. note::
+
+    The syntax for the Option 3 is complicated since it includes quotes
+    embedded within another quoted string. Any such embedded quotes must
+    be escaped using a preceeding backslash character.
 
 * The "sid" entry is an array of strings which define groups of
   observation station ID's over which to compute statistics. Each entry
@@ -2269,8 +2323,10 @@ For example:
 | nc_pairs_var_suffix = "FREEZING"; (for the freezing level height)
 |
 
-NOTE: This option was previously named "nc_pairs_var_str", which is
-now deprecated.
+.. note::
+
+  Prior to MET version 9.0.0, this option was named "nc_pairs_var_str",'
+  which is now deprecated.
 
 .. code-block:: none
 
