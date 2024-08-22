@@ -30,7 +30,7 @@ if (test -z "$MET_CXX_STANDARD"); then
   AC_MSG_NOTICE([c++17 will be used as the C++ standard])
 elif (test -n "$MET_CXX_STANDARD"); then
   MET_CXX_STANDARD=${MET_CXX_STANDARD}
-  AC_MSG_NOTICE([MET_CXX_STANDARD will be set)
+  AC_MSG_NOTICE([MET_CXX_STANDARD will be set])
 fi
 
 #
