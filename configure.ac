@@ -21,7 +21,7 @@ LDFLAGS="${LDFLAGS} ${OPENMP_CFLAGS}"
 
 # Configure the variable. The help text will appear if the user uses "configure --help".
 
-AC_ARG_VAR([MET_CXX_STANDARD], [Enable support for the specified version of the C++ standard. Default value is 17. Other values may be 11 or 14.])
+AC_ARG_VAR([MET_CXX_STANDARD], [Specify the version of the supported C++ standard. Values may be 11, 14, or 17. Default value is 17.])
 
 # Set a default value
 
