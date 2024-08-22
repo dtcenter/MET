@@ -25,8 +25,12 @@ AC_ARG_VAR([MET_CXX_STANDARD], [Specify the version of the supported C++ standar
 
 # Set a default value
 
-if (test -n "$MET_CXX_STANDARD"); then
+if (test -z "$MET_CXX_STANDARD"); then
   MET_CXX_STANDARD=17
+  AC_MSG_NOTICE([c++17 will be used as the C++ standard])
+elif (test -n "$MET_CXX_STANDARD"); then
+  MET_CXX_STANDARD=${MET_CXX_STANDARD}
+  AC_MSG_NOTICE([MET_CXX_STANDARD will be set)
 fi
 
 #
