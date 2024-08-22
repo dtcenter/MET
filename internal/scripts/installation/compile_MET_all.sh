@@ -874,9 +874,11 @@ if [ -z ${MET_PROJ} ]; then
   export MET_PROJ=${LIB_DIR}
 fi
 
-export MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE:=${MET_PYTHON}/bin/python3}
-export MET_PYTHON_LD
-export MET_PYTHON_CC
+if [[ ! -z ${MET_PYTHON_CC} || ! -z ${MET_PYTHON_LD} ]]; then
+  export MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE:=${MET_PYTHON}/bin/python3}
+  export MET_PYTHON_LD
+  export MET_PYTHON_CC
+fi
 
 # add flags to user-defined LDFLAGS for MacOS
 if [[ $machine != "Mac" ]]; then
