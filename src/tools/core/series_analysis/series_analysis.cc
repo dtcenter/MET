@@ -918,10 +918,10 @@ void process_scores() {
 
          mlog << Debug(3)
               << "For " << fcst_info->magic_str() << ", found "
-              << (fcmn_flag ? 0 : 1) << " forecast climatology mean and "
-              << (fcsd_flag ? 0 : 1) << " standard deviation field(s), and "
-              << (ocmn_flag ? 0 : 1) << " observation climatology mean and "
-              << (ocsd_flag ? 0 : 1) << " standard deviation field(s).\n";
+              << (fcmn_flag ? 1 : 0) << " forecast climatology mean and "
+              << (fcsd_flag ? 1 : 0) << " standard deviation field(s), and "
+              << (ocmn_flag ? 1 : 0) << " observation climatology mean and "
+              << (ocsd_flag ? 1 : 0) << " standard deviation field(s).\n";
 
          // Setup the output NetCDF file on the first pass
          if(!nc_out) setup_nc_file(fcst_info, obs_info);
