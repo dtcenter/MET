@@ -733,7 +733,7 @@ void compute_i_mctsinfo(const PairDataPoint &pd, int skip,
 }
 
 ////////////////////////////////////////////////////////////////////////
-
+// JHG maybe cprob_in should be removed?
 void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
                      PCTInfo &pct_info, const NumArray *cprob_in) {
    int i, n_thresh, n_pair;
@@ -757,10 +757,23 @@ void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
 
    // Use input climatological probabilities or derive them
    if(cmn_flag) {
-      if(cprob_in) climo_prob = *cprob_in;
-      else         climo_prob = derive_climo_prob(pd.cdf_info_ptr,
-                                                  pd.ocmn_na, pd.ocsd_na,
-                                                  pct_info.othresh);
+
+      // Use climatological probabilities direclty, if supplied
+      if(cprob_in) {
+         climo_prob = *cprob_in;
+      }
+      // Use observation climatology data, if available
+      else if(pd.ocmn_na.n() > 0) {
+         climo_prob = derive_climo_prob(pd.cdf_info_ptr,
+                                        pd.ocmn_na, pd.ocsd_na,
+                                        pct_info.othresh);
+      }
+      // Otherwise, try using forecast climatology data
+      else {
+         climo_prob = derive_climo_prob(pd.cdf_info_ptr,
+                                        pd.fcmn_na, pd.fcsd_na,
+                                        pct_info.othresh);
+      }
    }
 
    //
