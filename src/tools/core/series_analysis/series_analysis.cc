@@ -2052,6 +2052,8 @@ void store_stat_all_sal1l2(int n, const SL1L2Info &s_info) {
 void store_stat_all_pct(int n, const PCTInfo &pct_info) {
    StringArray pct_cols(get_pct_columns(pct_info.pct.nrows() + 1));
    for(int i=0; i<pct_cols.n(); i++) {
+      // Skip unused "THRESH_" columns
+      if(pct_cols[i].find("THRESH_") != string::npos) continue;
       store_stat_probabilistic(n, STATLineType::pct, pct_cols[i], pct_info);
    }
 }
