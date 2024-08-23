@@ -5332,8 +5332,14 @@ LDFLAGS="${LDFLAGS} ${OPENMP_CFLAGS}"
 
 # Set a default value
 
-if (test -n "$MET_CXX_STANDARD"); then
+if (test -z "$MET_CXX_STANDARD"); then
   MET_CXX_STANDARD=17
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: c++17 will be used as the C++ standard" >&5
+printf "%s\n" "$as_me: c++17 will be used as the C++ standard" >&6;}
+elif (test -n "$MET_CXX_STANDARD"); then
+  MET_CXX_STANDARD=${MET_CXX_STANDARD}
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: MET_CXX_STANDARD will be set" >&5
+printf "%s\n" "$as_me: MET_CXX_STANDARD will be set" >&6;}
 fi
 
 #
@@ -7007,7 +7013,7 @@ fi
 CPPFLAGS=$CPPFLAGS' -DMET_BASE="\"$(pkgdatadir)\""'
 
 # Add -std=c++11 to CXXFLAGS
-CXXFLAGS=$CXXFLAGS' -std=c++$MET_CXX_STANDARD'
+CXXFLAGS=$CXXFLAGS' -std=c++'$MET_CXX_STANDARD
 
 # Define other variables for the makefiles
 
