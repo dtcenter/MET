@@ -733,7 +733,7 @@ void compute_i_mctsinfo(const PairDataPoint &pd, int skip,
 }
 
 ////////////////////////////////////////////////////////////////////////
-// JHG maybe cprob_in should be removed?
+
 void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
                      PCTInfo &pct_info, const NumArray *cprob_in) {
    int i, n_thresh, n_pair;
