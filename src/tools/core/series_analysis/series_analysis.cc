@@ -85,7 +85,7 @@ static bool read_single_entry(VarInfo *, const ConcatString &,
 
 static void open_aggr_file();
 static DataPlane read_aggr_data_plane(const ConcatString &,
-                                      const STATLineType aggr_lt=STATLineType::none);
+                                      const char *suggestion=nullptr);
 
 static void process_scores();
 
@@ -94,6 +94,7 @@ static void do_multicategory (int, const PairDataPoint *);
 static void do_continuous    (int, const PairDataPoint *);
 static void do_partialsums   (int, const PairDataPoint *);
 static void do_probabilistic (int, const PairDataPoint *);
+static void do_climo_brier   (int, double, int, PCTInfo &);
 
 static int  read_aggr_total  (int);
 static void read_aggr_ctc    (int, const CTSInfo &,   CTSInfo &);
@@ -788,7 +789,7 @@ void open_aggr_file() {
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane read_aggr_data_plane(const ConcatString &var_name,
-                               STATLineType aggr_lt) {
+                               const char *suggestion) {
    DataPlane aggr_dp;
 
    // Setup the data request
@@ -804,12 +805,11 @@ DataPlane read_aggr_data_plane(const ConcatString &var_name,
       mlog << Error << "\nread_aggr_data_plane() -> "
            << "Required variable \"" << aggr_info.magic_str() << "\""
            << " not found in the aggregate file!\n\n";
-      if(aggr_lt != STATLineType::none) {
+      if(suggestion) {
          mlog << Error
               << "Recommend recreating \"" << aggr_file
-              << "\" to request that \"" << all_columns << "\" "
-              << statlinetype_to_string(aggr_lt)
-              << " columns be written.\n\n";
+              << "\" to request that " << suggestion
+              << " column(s) be written.\n\n";
       }
       exit(1);
    }
@@ -1448,8 +1448,7 @@ void read_aggr_ctc(int n, const CTSInfo &cts_info,
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
          aggr_data[var_name] = read_aggr_data_plane(
-                                  var_name,
-                                  STATLineType::ctc);
+                                  var_name, "ALL CTC");
       }
 
       // Populate the CTC table
@@ -1483,8 +1482,7 @@ void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
          aggr_data[var_name] = read_aggr_data_plane(
-                                  var_name,
-                                  STATLineType::mctc);
+                                  var_name, "ALL MCTC");
       }
 
       // Get the n-th value
@@ -1537,8 +1535,7 @@ void read_aggr_sl1l2(int n, const SL1L2Info &s_info,
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
          aggr_data[var_name] = read_aggr_data_plane(
-                                  var_name,
-                                  STATLineType::sl1l2);
+                                  var_name, "ALL SL1L2");
       }
 
       // Populate the partial sums
@@ -1567,8 +1564,7 @@ void read_aggr_sal1l2(int n, const SL1L2Info &s_info,
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
          aggr_data[var_name] = read_aggr_data_plane(
-                                  var_name,
-                                  STATLineType::sal1l2);
+                                  var_name, "ALL SAL1L2");
       }
 
       // Populate the partial sums
@@ -1602,8 +1598,7 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
          aggr_data[var_name] = read_aggr_data_plane(
-                                  var_name,
-                                  STATLineType::pct);
+                                  var_name, "ALL PCT");
       }
 
       // Get the n-th value
@@ -1674,13 +1669,21 @@ void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
          // Aggregate PCT counts
          pct_info.pct += aggr_pct.pct;
 
-         // Zero out the climatology PCT table which cannot be aggregated
+         // The climatology PCT table cannot be aggregated since the counts
+         // are not written to the output. Store the pair climo brier score
+         // before zeroing the PCT table.
+         double briercl_pair = pct_info.climo_pct.brier_score();
          pct_info.climo_pct.zero_out();
 
          // Compute statistics and confidence intervals
          pct_info.compute_stats();
          pct_info.compute_ci();
 
+         // Custom logic for the climatology Brier Score
+         if(conf_info.output_stats[STATLineType::pstd].has("BRIERCL") ||
+            conf_info.output_stats[STATLineType::pstd].has("BSS")) {
+            do_climo_brier(n, briercl_pair, n_series_pair, pct_info);
+         }
       }
       // Compute the probabilistic counts and statistics
       else {
@@ -1715,6 +1718,50 @@ void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
             pct_info);
       }
    } // end for i
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void do_climo_brier(int n, double briercl_pair,
+                    int total_pair, PCTInfo &pct_info) {
+
+   // Aggregate the climatology brier score as a weighted
+   // average and recompute the brier skill score
+
+   if(is_bad_data(briercl_pair) || total_pair == 0) return;
+
+   // Construct the NetCDF variable name
+   ConcatString var_name(build_nc_var_name_probabilistic(
+                            STATLineType::pstd, "BRIERCL",
+                            pct_info, bad_data_double));
+
+   // Read aggregate data, if needed
+   if(aggr_data.count(var_name) == 0) {
+      aggr_data[var_name] = read_aggr_data_plane(
+                               var_name, "the BRIERCL PSTD");
+   }
+
+   // Get the n-th BRIERCL value
+   double briercl_aggr = aggr_data[var_name].buf()[n];
+   int total_aggr = read_aggr_total(n);
+
+   // Aggregate BRIERCL as a weighted average
+   if(!is_bad_data(briercl_pair) &&
+      !is_bad_data(briercl_aggr) &&
+      (total_pair + total_aggr) > 0) {
+
+      pct_info.briercl.v = (total_pair * briercl_pair +
+                            total_aggr * briercl_aggr) /
+                           (total_pair + total_aggr);
+
+      // Compute the brier skill score
+      if(!is_bad_data(pct_info.brier.v) &&
+         !is_bad_data(pct_info.briercl.v)) {
+         pct_info.bss = 1.0 - (pct_info.brier.v / pct_info.briercl.v);
+      }
+   }
 
    return;
 }
