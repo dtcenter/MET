@@ -229,31 +229,32 @@ void process_command_line(int argc, char **argv) {
    if(fcst_files.n() == 0) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the forecast file list must be set using the "
-           << "\"-fcst\" or \"-both\" option.\n\n";
+           << R"("-fcst" or "-both" option.\n\n)";
       usage();
    }
    if(obs_files.n() == 0) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the observation file list must be set using the "
-           << "\"-obs\" or \"-both\" option.\n\n";
+           << R"("-obs" or "-both" option.\n\n)";
       usage();
    }
    if(config_file.length() == 0) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the configuration file must be set using the "
-           << "\"-config\" option.\n\n";
+           << R"("-config" option.\n\n)";
       usage();
    }
    if(out_file.length() == 0) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the output NetCDF file must be set using the "
-           << "\"-out\" option.\n\n";
+           << R"("-out" option.\n\n)";
       usage();
    }
    if(aggr_file == out_file) {
       mlog << Error << "\nprocess_command_line() -> "
-           << "the \"-out\" and \"-aggr\" options cannot be "
-           << "set to the same file (\"" << aggr_file << "\")!\n\n";
+           << R"(the "-out" and "-aggr" options cannot be )"
+           << R"(set to the same file (")" << aggr_file
+           << R"(")!\n\n)";
       usage();
    }
 
@@ -293,9 +294,9 @@ void process_command_line(int argc, char **argv) {
 
    // List the lengths of the series options
    mlog << Debug(1)
-        << "Length of configuration \"fcst.field\" = "
+        << R"(Length of configuration "fcst.field" = )"
         << conf_info.get_n_fcst() << "\n"
-        << "Length of configuration \"obs.field\"  = "
+        << R"(Length of configuration "obs.field"  = )"
         << conf_info.get_n_obs() << "\n"
         << "Length of forecast file list         = "
         << fcst_files.n() << "\n"
@@ -312,14 +313,14 @@ void process_command_line(int argc, char **argv) {
       series_type = SeriesType::Fcst_Conf;
       n_series_pair = conf_info.get_n_fcst();
       mlog << Debug(1)
-           << "Series defined by the \"fcst.field\" configuration entry "
+           << R"(Series defined by the "fcst.field" configuration entry )"
            << "of length " << n_series_pair << ".\n";
    }
    else if(conf_info.get_n_obs() > 1) {
       series_type = SeriesType::Obs_Conf;
       n_series_pair = conf_info.get_n_obs();
       mlog << Debug(1)
-           << "Series defined by the \"obs.field\" configuration entry "
+           << R"(Series defined by the "obs.field" configuration entry )"
            << "of length " << n_series_pair << ".\n";
    }
    else if(fcst_files.n() > 1) {
@@ -340,8 +341,8 @@ void process_command_line(int argc, char **argv) {
       series_type = SeriesType::Fcst_Conf;
       n_series_pair = 1;
       mlog << Debug(1)
-           << "The \"fcst.field\" and \"obs.field\" configuration entries "
-           << "and the \"-fcst\" and \"-obs\" command line options "
+           << R"(The "fcst.field" and "obs.field" configuration entries )"
+           << R"(and the "-fcst" and "-obs" command line options )"
            << "all have length one.\n";
    }
 
@@ -351,7 +352,7 @@ void process_command_line(int argc, char **argv) {
       // The number of forecast and observation files must match.
       if(fcst_files.n() != obs_files.n()) {
          mlog << Error << "\nprocess_command_line() -> "
-              << "when using the \"-paired\" command line option, the "
+              << R"(when using the "-paired" command line option, the )"
               << "number of forecast (" << fcst_files.n()
               << ") and observation (" << obs_files.n()
               << ") files must match.\n\n";
@@ -361,7 +362,7 @@ void process_command_line(int argc, char **argv) {
       // The number of files must match the series length.
       if(fcst_files.n() != n_series_pair) {
          mlog << Error << "\nprocess_command_line() -> "
-              << "when using the \"-paired\" command line option, the "
+              << R"(when using the "-paired" command line option, the )"
               << "the file list length (" << fcst_files.n()
               << ") and series length (" << n_series_pair
               << ") must match.\n\n";
@@ -416,7 +417,7 @@ void process_grid(const Grid &fcst_grid, const Grid &obs_grid) {
            << "\nA block size of " << conf_info.block_size << " for a "
            << grid.nx() << " x " << grid.ny() << " grid requires "
            << n_reads << " passes through the data which will be slow.\n"
-           << "Consider increasing \"block_size\" in the configuration "
+           << R"(Consider increasing "block_size" in the configuration )"
            << "file based on available memory.\n\n";
    }
 
@@ -443,8 +444,8 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
 
    // Read first valid file
    if(!(mtddf = mtddf_factory.new_met_2d_data_file(file_list[i].c_str(), type))) {
-      mlog << Error << "\nTrouble reading data file \""
-           << file_list[i] << "\"\n\n";
+      mlog << Error << "\nTrouble reading data file: "
+           << file_list[i] << "\n\n";
       exit(1);
    }
 
@@ -555,7 +556,7 @@ void get_series_data(int i_series,
               << "disabled:\n" << fcst_grid.serialize()
               << " !=\n" << grid.serialize()
               << "\nSpecify regridding logic in the config file "
-              << "\"regrid\" section.\n\n";
+              << R"("regrid" section.\n\n)";
          exit(1);
       }
 
@@ -575,7 +576,7 @@ void get_series_data(int i_series,
               << "disabled:\n" << obs_grid.serialize()
               << " !=\n" << grid.serialize()
               << "\nSpecify regridding logic in the config file "
-              << "\"regrid\" section.\n\n";
+              << R"("regrid" section.\n\n)";
          exit(1);
       }
 
@@ -732,8 +733,8 @@ void open_aggr_file() {
 
    if(!aggr_nc.open(aggr_file.c_str())) {
       mlog << Error << "\nopen_aggr_file() -> "
-           << "unable to open the aggregate NetCDF file \""
-           << aggr_file << "\"\n\n";
+           << "unable to open the aggregate NetCDF file: "
+           << aggr_file << "\n\n";
       exit(1);
    }
 
@@ -797,18 +798,19 @@ DataPlane read_aggr_data_plane(const ConcatString &var_name,
    aggr_info.set_magic(var_name, "(*,*)");
 
    mlog << Debug(2)
-        << "Reading aggregation \""
-        << aggr_info.magic_str() << "\" field.\n";
+        << R"(Reading aggregation ")"
+        << aggr_info.magic_str()
+        << R"(" field.\n)";
 
    // Attempt to read the gridded data from the current file
    if(!aggr_nc.data_plane(aggr_info, aggr_dp)) {
       mlog << Error << "\nread_aggr_data_plane() -> "
-           << "Required variable \"" << aggr_info.magic_str() << "\""
-           << " not found in the aggregate file!\n\n";
+           << R"(Required variable ")" << aggr_info.magic_str()
+           << R"(" not found in the aggregate file!\n\n)";
       if(suggestion) {
          mlog << Error
-              << "Recommend recreating \"" << aggr_file
-              << "\" to request that " << suggestion
+              << R"(Recommend recreating ")" << aggr_file
+              << R"(" to request that )" << suggestion
               << " column(s) be written.\n\n";
       }
       exit(1);
@@ -1067,9 +1069,9 @@ void process_scores() {
    if(n_skip_some_vld > 0 && conf_info.vld_data_thresh == 1.0) {
       mlog << Debug(2)
            << "Some points skipped due to missing data:\n"
-           << "Consider decreasing \"vld_thresh\" in the config file "
+           << R"(Consider decreasing "vld_thresh" in the config file )"
            << "to include more points.\n"
-           << "Consider requesting \"TOTAL\" from \"output_stats\" "
+           << R"(Consider requesting "TOTAL" from "output_stats" )"
            << "in the config file to see the valid data counts.\n";
    }
 
@@ -1415,8 +1417,8 @@ int read_aggr_total(int n) {
       // Check for a match
       if(aggr_data.count(total_name) == 0) {
          mlog << Error << "\nread_aggr_total() -> "
-              << "No variable containing \"" << total_name << "\""
-              << " found in the aggregate file!\n\n";
+              << R"(No variable containing ")" << total_name
+              << R"(" "found in the aggregate file!\n\n)";
          exit(1);
       }
    }
@@ -2278,7 +2280,8 @@ void write_stat_data() {
       // Write out the data
       if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
          mlog << Error << "\nwrite_stat_data() -> "
-              << "error writing \"" << key << "\" data to the output file.\n\n";
+              << R"(error writing ")" << key
+              << R"(" data to the output file.\n\n)";
          exit(1);
       }
    }
@@ -2360,41 +2363,41 @@ void usage() {
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"-fcst file_1 ... file_n\" are the gridded "
+        << R"(\twhere\t"-fcst file_1 ... file_n" are the gridded )"
         << "forecast files to be used (required).\n"
 
-        << "\t\t\"-fcst fcst_file_list\" is an ASCII file containing "
+        << R"(\t\t"-fcst fcst_file_list" is an ASCII file containing )"
         << "a list of gridded forecast files to be used (required).\n"
 
-        << "\t\t\"-obs  file_1 ... file_n\" are the gridded "
+        << R"(\t\t"-obs  file_1 ... file_n" are the gridded )"
         << "observation files to be used (required).\n"
 
-        << "\t\t\"-obs  obs_file_list\" is an ASCII file containing "
+        << R"(\t\t"-obs  obs_file_list" is an ASCII file containing )"
         << "a list of gridded observation files to be used (required).\n"
 
-        << "\t\t\"-both\" sets the \"-fcst\" and \"-obs\" options to "
+        << R"(\t\t"-both" sets the "-fcst" and "-obs" options to )"
         << "the same set of files (optional).\n"
 
-        << "\t\t\"-aggr file\" specifies a series_analysis output "
+        << R"(\t\t"-aggr file" specifies a series_analysis output )"
         << "file with partial sums and/or contingency table counts to be "
         << "updated prior to deriving statistics (optional).\n"
 
-        << "\t\t\"-paired\" to indicate that the input -fcst and -obs "
+        << R"(\t\t"-paired" to indicate that the input -fcst and -obs )"
         << "file lists are already paired (optional).\n"
 
-        << "\t\t\"-out file\" is the NetCDF output file containing "
+        << R"(\t\t"-out file" is the NetCDF output file containing )"
         << "computed statistics (required).\n"
 
-        << "\t\t\"-config file\" is a SeriesAnalysisConfig file "
+        << R"(\t\t"-config file" is a SeriesAnalysisConfig file )"
         << "containing the desired configuration settings (required).\n"
 
-        << "\t\t\"-log file\" outputs log messages to the specified "
+        << R"(\t\t"-log file" outputs log messages to the specified )"
         << "file (optional).\n"
 
-        << "\t\t\"-v level\" overrides the default level of logging ("
+        << R"(\t\t"-v level" overrides the default level of logging ()"
         << mlog.verbosity_level() << ") (optional).\n"
 
-        << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
+        << R"(\t\t"-compress level" overrides the compression level of NetCDF variable ()"
         << conf_info.get_compression_level() << ") (optional).\n\n" << flush;
 
    exit(1);
@@ -2464,8 +2467,8 @@ void parse_long_names() {
    f_in.open(file_name.c_str());
    if(!f_in) {
       mlog << Error << "\nparse_long_names() -> "
-           << "can't open the ASCII file \"" << file_name
-           << "\" for reading\n\n";
+           << R"(can't open the ASCII file ") << file_name
+           << R"(" for reading\n\n)";
       exit(1);
    }
 
