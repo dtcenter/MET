@@ -779,6 +779,9 @@ void open_aggr_file() {
    // Store the aggregate series length
    n_series_aggr = get_int_var(aggr_nc.MetNc->Nc, n_series_var_name, 0);
 
+   mlog << Debug(3)
+        << "Aggregation series has length " << n_series_aggr << ".\n";
+
    return;
 }
 
@@ -969,7 +972,7 @@ void process_scores() {
 
          // Compute the total number of valid points and series length
          int n_valid  = pd_block[i].f_na.n() +
-                        (aggr_file.empty() ? 0 : read_aggr_total(i_point+1));
+                        (aggr_file.empty() ? 0 : read_aggr_total(i_point+i));
          int n_series = n_series_pair + n_series_aggr;
 
          // Check for the required number of matched pairs
@@ -1028,6 +1031,7 @@ void process_scores() {
              conf_info.output_stats[STATLineType::prc].n()) > 0) {
             do_probabilistic(i_point+i, &pd_block[i]);
          }
+
       } // end for i
 
    } // end for i_read
@@ -1412,13 +1416,17 @@ int read_aggr_total(int n) {
       if(aggr_data.count(total_name) == 0) {
          mlog << Error << "\nread_aggr_total() -> "
               << "No variable containing \"" << total_name << "\""
-              << " not found in the aggregate file!\n\n";
+              << " found in the aggregate file!\n\n";
          exit(1);
       }
    }
 
+   // Replace bad data with a total count of 0
+   int total = nint(aggr_data[total_name].buf()[n]);
+   if(is_bad_data(total)) total = 0;
+
    // Return the TOTAL count for the current point
-   return nint(aggr_data[total_name].buf()[n]);
+   return total;
 }
 
 ////////////////////////////////////////////////////////////////////////
