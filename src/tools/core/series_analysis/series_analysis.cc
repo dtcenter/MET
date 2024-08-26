@@ -1450,7 +1450,7 @@ void read_aggr_ctc(int n, const CTSInfo &cts_info,
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
          aggr_data[var_name] = read_aggr_data_plane(
-                                  var_name, "ALL CTC");
+                                  var_name, R"("ALL" CTC)");
       }
 
       // Populate the CTC table
@@ -1484,7 +1484,7 @@ void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
          aggr_data[var_name] = read_aggr_data_plane(
-                                  var_name, "ALL MCTC");
+                                  var_name, R"("ALL" MCTC)");
       }
 
       // Get the n-th value
@@ -1537,7 +1537,7 @@ void read_aggr_sl1l2(int n, const SL1L2Info &s_info,
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
          aggr_data[var_name] = read_aggr_data_plane(
-                                  var_name, "ALL SL1L2");
+                                  var_name, R"("ALL" SL1L2)");
       }
 
       // Populate the partial sums
@@ -1566,7 +1566,7 @@ void read_aggr_sal1l2(int n, const SL1L2Info &s_info,
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
          aggr_data[var_name] = read_aggr_data_plane(
-                                  var_name, "ALL SAL1L2");
+                                  var_name, R"("ALL" SAL1L2)");
       }
 
       // Populate the partial sums
@@ -1600,7 +1600,7 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
       // Read aggregate data, if needed
       if(aggr_data.count(var_name) == 0) {
          aggr_data[var_name] = read_aggr_data_plane(
-                                  var_name, "ALL PCT");
+                                  var_name, R"("ALL" PCT)");
       }
 
       // Get the n-th value
@@ -1742,7 +1742,7 @@ void do_climo_brier(int n, double briercl_pair,
    // Read aggregate data, if needed
    if(aggr_data.count(var_name) == 0) {
       aggr_data[var_name] = read_aggr_data_plane(
-                               var_name, "the BRIERCL PSTD");
+                               var_name, R"(the "BRIERCL" PSTD)");
    }
 
    // Get the n-th BRIERCL value
