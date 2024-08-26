@@ -1591,6 +1591,9 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
    // Loop over the PCT columns
    for(int i=0; i<pct_cols.n(); i++) {
 
+      // Skip unused "THRESH_" columns
+      if(pct_cols[i].find("THRESH_") != string::npos) continue;
+
       // Construct the NetCDF variable name
       ConcatString c(to_upper(pct_cols[i]));
       ConcatString var_name(build_nc_var_name_probabilistic(
