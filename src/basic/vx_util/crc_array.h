@@ -108,6 +108,7 @@ class CRC_Array {
 
       void add(const T &);
       void add(const CRC_Array <T> &);
+      void add_uniq(const T &, bool forward=true);
       void add_css_sec(const char *);
 
       void set(const T & val);
@@ -500,6 +501,22 @@ for (j=0; j<(a.Nelements); ++j)  {
 
 }
 
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
+void CRC_Array<T>::add_uniq(const T & k, bool forward)
+
+{
+
+if ( !has(k, forward) )  add(k);
 
 return;
 
