@@ -229,32 +229,32 @@ void process_command_line(int argc, char **argv) {
    if(fcst_files.n() == 0) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the forecast file list must be set using the "
-           << R"("-fcst" or "-both" option.\n\n)";
+           << R"("-fcst" or "-both" option.)" << "\n\n";
       usage();
    }
    if(obs_files.n() == 0) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the observation file list must be set using the "
-           << R"("-obs" or "-both" option.\n\n)";
+           << R"("-obs" or "-both" option.)" << "\n\n";
       usage();
    }
    if(config_file.length() == 0) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the configuration file must be set using the "
-           << R"("-config" option.\n\n)";
+           << R"("-config" option.)" << "\n\n";
       usage();
    }
    if(out_file.length() == 0) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the output NetCDF file must be set using the "
-           << R"("-out" option.\n\n)";
+           << R"("-out" option.)" << "\n\n";
       usage();
    }
    if(aggr_file == out_file) {
       mlog << Error << "\nprocess_command_line() -> "
            << R"(the "-out" and "-aggr" options cannot be )"
            << R"(set to the same file (")" << aggr_file
-           << R"(")!\n\n)";
+           << R"(")!)" << "\n\n";
       usage();
    }
 
@@ -556,7 +556,7 @@ void get_series_data(int i_series,
               << "disabled:\n" << fcst_grid.serialize()
               << " !=\n" << grid.serialize()
               << "\nSpecify regridding logic in the config file "
-              << R"("regrid" section.\n\n)";
+              << R"("regrid" section.)" << "\n\n";
          exit(1);
       }
 
@@ -576,7 +576,7 @@ void get_series_data(int i_series,
               << "disabled:\n" << obs_grid.serialize()
               << " !=\n" << grid.serialize()
               << "\nSpecify regridding logic in the config file "
-              << R"("regrid" section.\n\n)";
+              << R"("regrid" section.)" << "\n\n";
          exit(1);
       }
 
@@ -800,13 +800,13 @@ DataPlane read_aggr_data_plane(const ConcatString &var_name,
    mlog << Debug(2)
         << R"(Reading aggregation ")"
         << aggr_info.magic_str()
-        << R"(" field.\n)";
+        << R"(" field.)" << "\n";
 
    // Attempt to read the gridded data from the current file
    if(!aggr_nc.data_plane(aggr_info, aggr_dp)) {
       mlog << Error << "\nread_aggr_data_plane() -> "
            << R"(Required variable ")" << aggr_info.magic_str()
-           << R"(" not found in the aggregate file!\n\n)";
+           << R"(" not found in the aggregate file!)" << "\n\n";
       if(suggestion) {
          mlog << Error
               << R"(Recommend recreating ")" << aggr_file
@@ -1418,7 +1418,7 @@ int read_aggr_total(int n) {
       if(aggr_data.count(total_name) == 0) {
          mlog << Error << "\nread_aggr_total() -> "
               << R"(No variable containing ")" << total_name
-              << R"(" "found in the aggregate file!\n\n)";
+              << R"(" "found in the aggregate file!)" << "\n\n";
          exit(1);
       }
    }
@@ -2283,7 +2283,7 @@ void write_stat_data() {
       if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
          mlog << Error << "\nwrite_stat_data() -> "
               << R"(error writing ")" << key
-              << R"(" data to the output file.\n\n)";
+              << R"(" data to the output file.)" << "\n\n";
          exit(1);
       }
    }
@@ -2365,41 +2365,53 @@ void usage() {
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
 
-        << R"(\twhere\t"-fcst file_1 ... file_n" are the gridded )"
+        << "\twhere\t"
+        << R"("-fcst file_1 ... file_n" are the gridded )"
         << "forecast files to be used (required).\n"
 
-        << R"(\t\t"-fcst fcst_file_list" is an ASCII file containing )"
+        << "\t\t"
+        << R"("-fcst fcst_file_list" is an ASCII file containing )"
         << "a list of gridded forecast files to be used (required).\n"
 
-        << R"(\t\t"-obs  file_1 ... file_n" are the gridded )"
+        << "\t\t"
+        << R"("-obs  file_1 ... file_n" are the gridded )"
         << "observation files to be used (required).\n"
 
-        << R"(\t\t"-obs  obs_file_list" is an ASCII file containing )"
+        << "\t\t"
+        << R"("-obs  obs_file_list" is an ASCII file containing )"
         << "a list of gridded observation files to be used (required).\n"
 
-        << R"(\t\t"-both" sets the "-fcst" and "-obs" options to )"
+        << "\t\t"
+        << R"("-both" sets the "-fcst" and "-obs" options to )"
         << "the same set of files (optional).\n"
 
-        << R"(\t\t"-aggr file" specifies a series_analysis output )"
+        << "\t\t"
+        << R"("-aggr file" specifies a series_analysis output )"
         << "file with partial sums and/or contingency table counts to be "
         << "updated prior to deriving statistics (optional).\n"
 
-        << R"(\t\t"-paired" to indicate that the input -fcst and -obs )"
+        << "\t\t"
+        << R"("-paired" to indicate that the input -fcst and -obs )"
         << "file lists are already paired (optional).\n"
 
-        << R"(\t\t"-out file" is the NetCDF output file containing )"
+        << "\t\t"
+        << R"("-out file" is the NetCDF output file containing )"
         << "computed statistics (required).\n"
 
-        << R"(\t\t"-config file" is a SeriesAnalysisConfig file )"
+        << "\t\t"
+        << R"("-config file" is a SeriesAnalysisConfig file )"
         << "containing the desired configuration settings (required).\n"
 
-        << R"(\t\t"-log file" outputs log messages to the specified )"
+        << "\t\t"
+        << R"("-log file" outputs log messages to the specified )"
         << "file (optional).\n"
 
-        << R"(\t\t"-v level" overrides the default level of logging ()"
+        << "\t\t"
+        << R"("-v level" overrides the default level of logging ()"
         << mlog.verbosity_level() << ") (optional).\n"
 
-        << R"(\t\t"-compress level" overrides the compression level of NetCDF variable ()"
+        << "\t\t"
+        << R"("-compress level" overrides the compression level of NetCDF variable ()"
         << conf_info.get_compression_level() << ") (optional).\n\n" << flush;
 
    exit(1);
@@ -2470,7 +2482,7 @@ void parse_long_names() {
    if(!f_in) {
       mlog << Error << "\nparse_long_names() -> "
            << R"(can't open the ASCII file ") << file_name
-           << R"(" for reading\n\n)";
+           << R"(" for reading!)" << "\n\n";
       exit(1);
    }
 
