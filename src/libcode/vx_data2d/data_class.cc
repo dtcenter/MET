@@ -257,13 +257,21 @@ mlog << Debug(3) << "Resetting grid definition from \""
      // Make sure the grid dimensions do not change
      //
 
-  if ( raw_nx() != grid.nx() || raw_ny() != grid.ny() )  {
+  if ( raw_nx() <= 0 && raw_ny() <= 0 )  {
+
+     mlog << Warning << "\nMet2dDataFile::set_grid() -> "
+          << "When resetting the grid definition to \""
+          << grid.serialize() << "\", the grid dimensions "
+          << "are changed (" << grid.nx() << ", " << grid.ny()
+          << ") != (" << raw_nx() << ", " << raw_ny() << ").\n\n";
+  }
+  else if ( raw_nx() != grid.nx() || raw_ny() != grid.ny() )  {
 
      mlog << Error << "\nMet2dDataFile::set_grid() -> "
           << "When resetting the grid definition to \""
           << grid.serialize() << "\", the grid dimensions "
-          << "cannot change (" << grid.nx() << ", " << grid.ny()
-          << ") != (" << raw_nx() << ", " << raw_ny() << ").\n\n";
+          << "cannot change to (" << grid.nx() << ", " << grid.ny()
+          << ") from (" << raw_nx() << ", " << raw_ny() << ").\n\n";
 
      exit ( 1 );
 
