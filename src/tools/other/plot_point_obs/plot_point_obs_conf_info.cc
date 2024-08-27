@@ -444,22 +444,9 @@ void PlotPointObsConfInfo::process_config(
 
    // Parse plot_grid_string, if set
    if(m_strlen(plot_grid_string) > 0) {
-
-      // Parse as a white-space separated string
-      sa.parse_wsss(plot_grid_string);
-
-      // Search for a named grid
-      if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid)) {
-         mlog << Debug(3) << "Use the grid named \""
-              << plot_grid_string << "\".\n";
-      }
-      // Parse grid definition
-      else if(sa.n() > 1 && parse_grid_def(sa, grid)) {
-         mlog << Debug(3) << "Use the grid defined by string \""
-              << plot_grid_string << "\".\n";
-      }
-      // Extract the grid from a gridded data file
-      else {
+      if (!build_grid_by_grid_string(plot_grid_string, grid,
+                                     "PlotPointObsConfInfo::process_config -> ", false)) {
+         // Extract the grid from a gridded data file
          mlog << Debug(3) << "Use the grid defined by file \""
               << plot_grid_string << "\".\n";
 
