@@ -1095,6 +1095,19 @@ Only 4 interpolation methods are applied to the field variables; MIN/MAX/MEDIAN/
     
 For the GOES-16 and GOES-17 data, the computing lat/long is time consuming. The computed coordinate (lat/long) is saved to a temporary NetCDF file, as described in :numref:`Contributor's Guide Section %s <tmp_files_point2grid>`. The computing lat/long step can be skipped if the coordinate file is given through the environment variable MET_GEOSTATIONARY_DATA. The grid mapping to the target grid is saved to MET_TMP_DIR to save the execution time. Once this file is created, the MET_GEOSTATIONARY_DATA is ignored. The grid mapping file should be deleted manually in order to apply a new MET_GEOSTATIONARY_DATA environment variable or to re-generate the grid mapping file. An example of call point2grid to process GOES-16 AOD data is shown below:
 
+
+The grid name or the grid definition can be given at -field option when the grid information is missing at the input NetCDF of the latitude_longitude projection. The lattitude and longitude variable names should be defined at the user defined configuration. The grid information from set_attr_grid is ignored.
+
+.. code-block:: none
+		
+		point2grid \
+		iceh.2018-01-03.c00.tlat_tlon.nc \
+		G231 \
+		point2grid_cice_to_G231.nc \
+		-config Point2GridConfig_tlat_tlon \
+		-field 'name="hi_d"; level="(0,*,*)"; set_attr_grid="latlon 1440 1080 -79.80672 60.28144 0.04 0.04";' \
+		-v 1
+
 .. code-block:: none
 		
 		point2grid \
