@@ -237,22 +237,30 @@ void apply_scale_factor_(T *data, const int cell_count,
    const char *method_name = "apply_scale_factor(T) ";
 
    if (cell_count > 0) {
-      int idx;
+      T min_value;
+      T max_value;
+      T raw_min_val;
+      T raw_max_val;
+      int idx = 0;
       int positive_cnt = 0;
       int unpacked_count = 0;
-      T min_value, max_value;
-      T raw_min_val, raw_max_val;
 
-      idx = 0;
       if (has_fill_value) {
+         // Set met_fill_value (-8=9999) for FIllValues (missing values)
          for (; idx<cell_count; idx++) {
             if (!is_eq(nc_fill_value, data[idx])) break;
             data[idx] = met_fill_value;
          }
       }
 
-      raw_min_val = raw_max_val = data[idx];
-      min_value = max_value = (data[idx] * scale_factor) + add_offset;
+      if (idx < cell_count) {
+         raw_min_val = raw_max_val = data[idx];
+         min_value = max_value = (data[idx] * scale_factor) + add_offset;
+      }
+      else {
+         raw_min_val = raw_max_val = data[0];
+         min_value = max_value = (data[idx] * scale_factor) + add_offset;
+      }
       for (; idx<cell_count; idx++) {
          if (has_fill_value && is_eq(nc_fill_value, data[idx]))
             data[idx] = met_fill_value;
@@ -268,7 +276,7 @@ void apply_scale_factor_(T *data, const int cell_count,
       }
       //cout << typeid(nc_fill_value).name();
       mlog << Debug(debug_level) << method_name << var_name
-           << "(" << typeid(data[0]).name() << "): unpacked data: count="
+           << "(data_type=" << typeid(data[0]).name() << "): unpacked data: count="
            << unpacked_count << " out of " << cell_count
            << ", scale_factor=" << scale_factor<< " add_offset=" << add_offset
            << ". FillValue(" << data_type << ")=" << nc_fill_value << "\n";
@@ -276,6 +284,58 @@ void apply_scale_factor_(T *data, const int cell_count,
            << " data range [" << min_value << " - " << max_value
            << "] raw data: [" << raw_min_val << " - " << raw_max_val
            << "] Positive count: " << positive_cnt << "\n";
+   }
+   mlog << Debug(debug_level) << method_name << " took "
+        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+template <typename T>
+void update_missing_values(T *data, const int cell_count,
+                           const T nc_fill_value, const T met_fill_value,
+                           const char *data_type, const char *var_name) {
+   int missing_count = 0;
+   const int debug_level = 7;
+   clock_t start_clock = clock();
+   const char *method_name = "update_missing_values(T) ";
+
+   if (cell_count > 0) {
+      T max_value;
+      T min_value;
+      int idx = 0;
+      int positive_cnt = 0;
+
+      // Set met_fill_value (-8=9999) for FIllValues (missing values)
+      for (; idx<cell_count; idx++) {
+         if (!is_eq(nc_fill_value, data[idx])) break;
+         data[idx] = met_fill_value;
+      }
+
+      if (idx < cell_count) min_value = max_value = data[idx];
+      else min_value = max_value = met_fill_value;
+
+      for (; idx<cell_count; idx++) {
+         if (is_eq(nc_fill_value, data[idx])) {
+            data[idx] = met_fill_value;
+            missing_count++;
+         }
+         else {
+            if (min_value > data[idx]) min_value = data[idx];
+            if (max_value < data[idx]) max_value = data[idx];
+         }
+      }
+      //cout << typeid(nc_fill_value).name();
+      mlog << Debug(debug_level) << method_name << var_name
+           << "(data_type=" << typeid(data[0]).name() << "): FillValue(" << data_type << ")=" << nc_fill_value << "\n";
+      mlog << Debug(debug_level) << method_name
+           << " data range [" << min_value << " - " << max_value
+           << "] Positive count: " << positive_cnt << "\n";
+      if (0 < missing_count) {
+         mlog << Debug(3) << method_name << var_name
+              << "(data_type=" << typeid(data[0]).name() << "): found " << missing_count << " FillValues out of " << cell_count << "\n";
+      }
    }
    mlog << Debug(debug_level) << method_name << " took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
@@ -311,17 +371,22 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, const T met_missing) {
    bool return_status = get_nc_data_t(var, data);
 
    if (return_status) {
+      T nc_missing;
+      const int cell_count = get_data_size(var);
+      bool has_missing_attr = get_var_fill_value(var, nc_missing);
+      if (!has_missing_attr) nc_missing = met_missing;
+
       //scale_factor and add_offset
       if (has_add_offset_attr(var) || has_scale_factor_attr(var)) {
-         T nc_missing;
-         const int cell_count = get_data_size(var);
          double add_offset = get_var_add_offset(var);
          double scale_factor = get_var_scale_factor(var);
-         bool has_missing_attr = get_var_fill_value(var, nc_missing);
-         if (!has_missing_attr) nc_missing = met_missing;
          apply_scale_factor_(data, cell_count, add_offset, scale_factor,
                              nc_missing, met_missing, has_missing_attr,
                              "<T>", GET_NC_NAME_P(var).c_str());
+      }
+      else if (has_missing_attr) {
+          update_missing_values(data, cell_count, nc_missing, met_missing,
+                                "<T>", GET_NC_NAME_P(var).c_str());
       }
    }
    return return_status;
@@ -330,7 +395,7 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, const T met_missing) {
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const LongArray &dims, const LongArray &curs) {
+bool get_nc_data_(netCDF::NcVar *var, T *data, T met_missing, const LongArray &dims, const LongArray &curs) {
    bool return_status = false;
    const char *method_name = "get_nc_data_(T, *dims, *curs) ";
 
@@ -371,7 +436,7 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const LongArray &dims
       }
 
       for (int idx1=0; idx1<data_size; idx1++) {
-         data[idx1] = bad_data;
+         data[idx1] = met_missing;
       }
 
       //
@@ -381,16 +446,22 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const LongArray &dims
       var->getVar(start, count, data);
       return_status = true;
 
+      T nc_missing;
+      bool has_missing_attr = get_var_fill_value(var, nc_missing);
+      if (!has_missing_attr) nc_missing = met_missing;
+
       //scale_factor and add_offset
       if (has_add_offset_attr(var) || has_scale_factor_attr(var)) {
          T nc_missing;
          double add_offset = get_var_add_offset(var);
          double scale_factor = get_var_scale_factor(var);
-         bool has_missing_attr = get_var_fill_value(var, nc_missing);
-         if (!has_missing_attr) nc_missing = bad_data;
          apply_scale_factor_(data, data_size, add_offset, scale_factor,
-                             nc_missing, bad_data, has_missing_attr,
+                             nc_missing, met_missing, has_missing_attr,
                              "<T>", GET_NC_NAME_P(var).c_str());
+      }
+      else if (has_missing_attr) {
+          update_missing_values(data, data_size, nc_missing, met_missing,
+                                "<T>", GET_NC_NAME_P(var).c_str());
       }
    }
    return return_status;
@@ -437,16 +508,21 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, T met_missing, const long dim, co
       var->getVar(start, count, data);
       return_status = true;
 
+      T nc_missing;
+      bool has_missing_attr = get_var_fill_value(var, nc_missing);
+      if (!has_missing_attr) nc_missing = met_missing;
+
       //scale_factor and add_offset
       if (has_add_offset_attr(var) || has_scale_factor_attr(var)) {
-         T nc_missing;
          double add_offset = get_var_add_offset(var);
          double scale_factor = get_var_scale_factor(var);
-         bool has_missing_attr = get_var_fill_value(var, nc_missing);
-         if (!has_missing_attr) nc_missing = met_missing;
          apply_scale_factor_(data, dim, add_offset, scale_factor,
                              nc_missing, met_missing, has_missing_attr,
                              "<T>", GET_NC_NAME_P(var).c_str());
+      }
+      else if (has_missing_attr) {
+          update_missing_values(data, dim, nc_missing, met_missing,
+                                "<T>", GET_NC_NAME_P(var).c_str());
       }
    }
    return return_status;
@@ -456,7 +532,7 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, T met_missing, const long dim, co
 // read a single data
 
 template <typename T>
-bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const LongArray &curs) {
+bool get_nc_data_(netCDF::NcVar *var, T *data, T met_missing, const LongArray &curs) {
    bool return_status = false;
    //const char *method_name = "get_nc_data_(*curs) ";
 
@@ -470,7 +546,7 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, T bad_data, const LongArray &curs
       }
 
       // Retrieve the NetCDF value from the NetCDF variable.
-      return_status = get_nc_data_(var, data, bad_data, dims, curs);
+      return_status = get_nc_data_(var, data, met_missing, dims, curs);
    }
    return return_status;
 }
