@@ -50,7 +50,7 @@ jobs:
           - jobid:  'job1'
             config: ''
           - jobid:  'job2'
-            config: '--enable-all'
+            config: '--enable-all'  
           - jobid:  'job3'
             config: '--enable-grib2'
           - jobid:  'job4'
@@ -63,6 +63,8 @@ jobs:
             config: '--enable-mode_graphics'
           - jobid:  'job8'
             config: '--enable-modis'
+          - jobid:  'job9'
+            config: '--enable-all MET_CXX_STANDARD=11'  
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
