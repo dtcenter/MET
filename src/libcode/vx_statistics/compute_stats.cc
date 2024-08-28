@@ -27,7 +27,6 @@ using namespace std;
 
 const int detailed_debug_level = 5;
 
-
 ////////////////////////////////////////////////////////////////////////
 
 void compute_cntinfo(const SL1L2Info &s, bool aflag, CNTInfo &cnt_info) {

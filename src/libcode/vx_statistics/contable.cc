@@ -6,10 +6,7 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
-
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <iostream>
 #include <unistd.h>
@@ -26,1725 +23,654 @@
 
 using namespace std;
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 static int table_rc_to_n(int r_table, int c_table, int w, int h);
 
+////////////////////////////////////////////////////////////////////////
+//
+// Code for class ContingencyTable
+//
+////////////////////////////////////////////////////////////////////////
+
+ContingencyTable::ContingencyTable() {
+   init_from_scratch();
+}
 
 ////////////////////////////////////////////////////////////////////////
 
-
-   //
-   //  Code for class ContingencyTable
-   //
-
+ContingencyTable::~ContingencyTable() {
+   clear();
+}
 
 ////////////////////////////////////////////////////////////////////////
 
-
-ContingencyTable::ContingencyTable()
-{
-    
-init_from_scratch();
-
+ContingencyTable::ContingencyTable(const ContingencyTable & t) {
+   init_from_scratch();
+   assign(t);
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-ContingencyTable::~ContingencyTable()
-
-{
-
-clear();
-
+ContingencyTable & ContingencyTable::operator=(const ContingencyTable & t) {
+   if(this == &t) return *this;
+   assign(t);
+   return *this;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
+ContingencyTable & ContingencyTable::operator+=(const ContingencyTable & t) {
 
-ContingencyTable::ContingencyTable(const ContingencyTable & t)
-{
+   // Check consistent dimensions
+   if(Nrows != t.Nrows || Ncols != t.Ncols) {
+      mlog << Error << "\nContingencyTable::operator+=() -> "
+           << "table dimensions do not match: (" << Nrows << ", " << Ncols
+           << ") != (" << t.Nrows << ", " << t.Ncols << ")\n\n";
+      exit(1);
+   }
 
-init_from_scratch();
+   // Check consistent expected correct
+   if(!is_eq(ECvalue, t.ECvalue)) {
+      mlog << Error << "\nContingencyTable::operator+=() -> "
+           << "the expected correct values do not match: "
+           << ECvalue << " != " << t.ECvalue << "\n\n";
+      exit(1);
+   }
 
-assign(t);
+   // Increment table entries
+   for(int i=0; i<E.size(); ++i) E[i] += t.E[i];
 
+   return *this;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-ContingencyTable & ContingencyTable::operator=(const ContingencyTable & t)
-
-{
-
-if ( this == &t )  return *this;
-
-assign(t);
-
-return *this;
-
+void ContingencyTable::init_from_scratch() {
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
+void ContingencyTable::clear() {
 
-ContingencyTable & ContingencyTable::operator+=(const ContingencyTable & t)
-
-{
-
-if ( Nrows != t.Nrows || Ncols != t.Ncols )  {
-
-   mlog << Error << "\nContingencyTable::operator+=() -> "
-        << "table dimensions do not match: (" << Nrows << ", " << Ncols
-        << ") != (" << t.Nrows << ", " << t.Ncols << ")\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( !is_eq(ECvalue, t.ECvalue) )  {
-
-   mlog << Error << "\nContingencyTable::operator+=() -> "
-        << "the expected correct values do not match: "
-        << ECvalue << " != " << t.ECvalue << "\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( E )  {
-   for ( int i=0; i<E->size(); ++i )  (*E)[i] += (*t.E)[i];
-}
-
-return *this;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ContingencyTable::init_from_scratch()
-{
-    E = new vector<int>();
-    Name.clear();
+    E.clear();
     Nrows = Ncols = 0;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ContingencyTable::clear()
-{
-    if (E) delete E;
-    E = new vector<int>();
-
     ECvalue = bad_data_double;
     Name.clear();
-    Nrows = Ncols = 0;
-    
+
     return;
-    
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ContingencyTable::assign(const ContingencyTable & t)
-{
-    
-    clear();
- 
-    if(t.E->size() == 0)  return;
- 
-    ContingencyTable::set_size(t.Nrows, t.Ncols);
-    
-    if (E) delete E;
-    E = new vector<int>(*(t.E));
-    ECvalue = t.ECvalue;
-    Name = t.Name;
-    
-    //
-    //  done
-    //
-    
-    return;
-    
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ContingencyTable::zero_out()
-{
-    
-    int n = Nrows*Ncols;
-    
-    if ( n == 0 )  return;
-    
-    E->assign(n, 0);
-    
-    return;
-    
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+void ContingencyTable::assign(const ContingencyTable & t) {
 
-void ContingencyTable::dump(ostream & out, int depth) const
+   clear();
 
-{
+   E = t.E;
+   Nrows = t.Nrows;
+   Ncols = t.Ncols;
+   ECvalue = t.ECvalue;
+   Name = t.Name;
 
-int r, c;
-Indent prefix(depth);
-ConcatString junk;
-
-out << prefix << "Name    = ";
-
-if ( Name.length() > 0 )  out << '\"' << Name << "\"\n";
-else                      out << "(nul)\n";
-
-out << prefix << "Nrows   = " << Nrows << "\n";
-out << prefix << "Ncols   = " << Ncols << "\n";
-out << prefix << "ECvalue = " << ECvalue << "\n";
-out << prefix << "\n";
-
-if ( E->empty() )  { out.flush();  return; }
-
-for (r=0; r<Nrows; ++r)  {
-
-   junk.format("Sum for row %2d is %12d", r, row_total(r));
-
-   out << prefix << junk << "\n";
-
-   if ( ((r%5) == 4) && (r != (Nrows - 1)) )  out.put('\n');
-
+   return;
 }
 
-out << prefix << "\n";
+////////////////////////////////////////////////////////////////////////
 
-for (c=0; c<Ncols; ++c)  {
+void ContingencyTable::zero_out() {
 
-   junk.format("Sum for col %2d is %12d", c, col_total(c));
+   fill(E.begin(), E.end(), 0.0);
 
-   out << prefix << junk << "\n";
-
-   if ( ((c%5) == 4) && (c != (Ncols - 1)) )  out.put('\n');
-
+   return;
 }
 
-out << prefix << "\n";
+////////////////////////////////////////////////////////////////////////
 
-out << prefix << "Table Total = " << total() << "\n";
+void ContingencyTable::dump(ostream & out, int depth) const {
+   Indent prefix(depth);
+   ConcatString msg;
 
-out << prefix << "\n";
+   out << prefix << "Name    = ";
 
-   //////////////
+   if(Name.nonempty()) out << R"(")" << Name << R"(")" << "\n";
+   else                out << "(nul)\n";
 
-int n, m, k;
-int w, h;
-int r_table, c_table;
-const int hpad = 2;
-const int vpad = 1;
-const char v_sep      = '|';
-const char h_sep      = '-';
-const char corner_sep = '+';
+   out << prefix << "Nrows   = " << Nrows << "\n";
+   out << prefix << "Ncols   = " << Ncols << "\n";
+   out << prefix << "ECvalue = " << ECvalue << "\n";
+   out << prefix << "\n";
 
-std::vector<int> col_width(Ncols);
+   if(!E.empty()) {
 
-for (c=0; c<Ncols; ++c)  {
-
-   comma_string(c, junk);
-
-   col_width[c] = junk.length();
-
-   junk.format("%d", (int) col_total(c));
-
-   k = junk.length();
-
-   if ( k > col_width[c] )  col_width[c] = k;
-
-   for (r=0; r<Nrows; ++r)  {
-
-      n = rc_to_n(r, c);
-
-      comma_string((*E)[n], junk);
-
-      k = junk.length();
-
-      if ( k > col_width[c] )  col_width[c] = k;
-
-   }
-
-}
-
-w = 2*hpad*Ncols + Ncols + 1;
-
-for (c=0; c<Ncols; ++c)  w += col_width[c];
-
-h = (2*vpad + 2)*Nrows + 1;
-
-std::vector<char> table(w*h, ' ');
-
-   //
-   //  top, bottom
-   //
-
-for (c_table=0; c_table<w; ++c_table)  {
-
-   n = table_rc_to_n(0, c_table, w, h);
-
-
-   table[n] = '=';
-
-   n = table_rc_to_n(h - 1, c_table, w, h);
-
-
-   table[n] = '=';
-
-}
-
-   //
-   //  left, right
-   //
-
-for (r_table=1; r_table<(h - 1); ++r_table)  {
-
-   n = table_rc_to_n(r_table, 0, w, h);
-
-   table[n] = v_sep;
-
-   n = table_rc_to_n(r_table, w - 1, w, h);
-
-   table[n] = v_sep;
-
-}
-
-   //
-   //  col separators
-   //
-
-for (c=1; c<Ncols; ++c)  {
-
-   c_table = 0;
-
-   for (k=0; k<c; ++k)  c_table += 2*hpad + col_width[k] + 1;
-
-   if (c_table < w) {
-
-      for (r_table=1; r_table<(h - 1); ++r_table)  {
-
-         n = table_rc_to_n(r_table, c_table, w, h);
-
-         table[n] = v_sep;
-
+      for(int r=0; r<Nrows; ++r) {
+         msg.format("Sum for row %2d is %f", r, row_total(r));
+         out << prefix << msg << "\n";
+         if((r%5) == 4 && r != (Nrows - 1)) out.put('\n');
       }
 
-   }
-   else {
-      mlog << Warning << "\nContingencyTable::dump() -> "
-           << "c_table (" << c_table << ") is greater then w (" << w << ")\n\n";
-   }
+      out << prefix << "\n";
 
-}
-
-   //
-   //  row separators
-   //
-
-for (r=1; r<Nrows; ++r)  {
-
-   r_table = (2*vpad + 2)*r;
-
-   for (c_table=1; c_table<(w - 1); ++c_table)  {
-
-      n = table_rc_to_n(r_table, c_table, w, h);
-
-      if ( table[n] == v_sep )  table[n] = corner_sep;
-      else                      table[n] = h_sep;
-
-   }
-
-}
-
-   //
-   //  entries
-   //
-
-for (r=0; r<Nrows; ++r)  {
-
-   r_table = 2 + 4*r;
-
-   for (c=0; c<Ncols; ++c)  {
-
-      c_table = 0;
-
-      for (k=0; k<=c; ++k)  c_table += 2*hpad + col_width[k] + 1;
-
-      n = rc_to_n(r, c);
-
-      junk << cs_erase << (*E)[n];
-
-      k = junk.length();
-
-      c_table -= k + hpad;
-
-      c_table -= (col_width[c] - k)/2;   //  center justified
-
-      for (m=0; m<k; ++m)  {
-
-         n = table_rc_to_n(r_table, c_table + m, w, h);
-
-         table[n] = junk[m];
-
+      for(int c=0; c<Ncols; ++c) {
+         msg.format("Sum for col %2d is %f", c, col_total(c));
+         out << prefix << msg << "\n";
+         if((c%5) == 4 && c != (Ncols - 1)) out.put('\n');
       }
 
-   }   //  for c
+      out << prefix << "\n";
 
-}   //  for r
+      out << prefix << "Table Total = " << total() << "\n";
 
-   //
-   //  write table
-   //
-
-for (r_table=0; r_table<h; ++r_table)  {
-
-   out << prefix;
-
-   for (c_table=0; c_table<w; ++c_table)  {
-
-      n = table_rc_to_n(r_table, c_table, w, h);
-
-      out.put(table[n]);
-
+      out << prefix << "\n";
    }
 
-   out << "\n";
+   out.flush();
 
+   return;
 }
-
-   //
-   //  done
-   //
-
-out.flush();
-
-return;
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
+void ContingencyTable::set_size(int N) {
 
-void ContingencyTable::set_size(int N)
+   ContingencyTable::set_size(N, N);
 
-{
-
-ContingencyTable::set_size(N, N);
-
-return;
-
+   return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void ContingencyTable::set_size(int NR, int NC)
-
-{
-
-clear();
-
-if ( (NR < 2) || (NC < 2) )  {
-
-   mlog << Error << "\nContingencyTable::set_size() -> "
-        << "# rows (" << NR << ") and # cols (" << NC
-        << ") must be at least 2!\n\n";
-
-   exit ( 1 );
-
-}
-
-int n;
-
-n = NR*NC;
-
-E->resize(n, 0);
-
-Nrows = NR;
-Ncols = NC;
-
-   //
-   //  if square, set default expected correct value
-   //
-
-if ( Nrows == Ncols )  {
-
-   ECvalue = 1.0 / Nrows;
-
-}
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ContingencyTable::set_ec_value(double v)
-
-{
-
-   //
-   //  do not override the default value with bad data
-   //
-
-if ( !is_bad_data(v) )  ECvalue = v;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ContingencyTable::set_name(const char * text)
-
-{
-
-Name = text;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int ContingencyTable::rc_to_n(int r, int c) const
-
-{
-
-if ( (r < 0) || (r >= Nrows) || (c < 0) || (c >= Ncols) )  {
-
-   mlog << Error << "\nContingencyTable::rc_to_n() -> "
-        << "range check error!\n\n";
-
-   exit ( 1 );
-
-}
-
-int n;
-
-
-n = r*Ncols + c;
-
-
-
-return n;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ContingencyTable::set_entry(int row, int col, int value)
-
-{
-
-int n;
-
-n = rc_to_n(row, col);
-
-(*E)[n] = value;
-
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void ContingencyTable::inc_entry(int row, int col)
-
-{
-
-int n;
-
-n = rc_to_n(row, col);
-
-++((*E)[n]);
-
-
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int ContingencyTable::total() const
-
-{
-
-const int n = Nrows*Ncols;
-
-if ( n == 0 )  return 0;
-
-int j, sum;
-
-sum = 0;
-
-for (j=0; j<n; ++j)  sum += (*E)[j];
-
-
-
-return sum;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int ContingencyTable::row_total(int row) const
-
-{
-
-if ( (row < 0) || (row >= Nrows) )  {
-
-   mlog << Error << "\nContingencyTable::row_total() -> "
-        << "range check error!\n\n";
-
-   exit ( 1 );
-
-}
-
-int n, col, sum;
-
-
-sum = 0;
-
-for (col=0; col<Ncols; ++col)  {
-
-   n = rc_to_n(row, col);
-
-   sum += (*E)[n];
-
-}
-
-
-
-
-return sum;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int ContingencyTable::col_total(int col) const
-
-{
-
-if ( (col < 0) || (col >= Ncols) )  {
-
-   mlog << Error << "\nContingencyTable::col_total() -> "
-        << "range check error!\n\n";
-
-   exit ( 1 );
-
-}
-
-int n, row, sum;
-
-
-sum = 0;
-
-for (row=0; row<Nrows; ++row)  {
-
-   n = rc_to_n(row, col);
-
-   sum += (*E)[n];
-
-}
-
-
-
-
-return sum;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int ContingencyTable::entry(int row, int col) const
-
-{
-
-int n;
-
-n = rc_to_n(row, col);
-
-
-return (*E)[n];
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int ContingencyTable::largest_entry() const
-
-{
-
-int n = Nrows*Ncols;
-
-if ( n == 0 )  return 0;
-
-int j, a;
-
-a = (*E)[0];
-
-for (j=1; j<n; ++j)  {
-
-   if ( (*E)[n] > a )  a = (*E)[n];
-
-}
-
-
-return a;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int ContingencyTable::smallest_entry() const
-
-{
-
-int n = Nrows*Ncols;
-
-if ( n == 0 )  return 0;
-
-int j, a;
-
-a = (*E)[0];
-
-for (j=1; j<n; ++j)  {
-
-   if ( (*E)[n] < a )  a = (*E)[n];
-
-}
-
-
-return a;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  see figure 7.2, page 243 in wilks
-   //
-
-
-TTContingencyTable ContingencyTable::condition_on(int k) const
-
-{
-
-if ( Nrows != Ncols )  {
-
-   mlog << Error << "\nContingencyTable::condition_on() -> "
-        << "table not square!\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( (k < 0) || (k >= Nrows) )  {
-
-   mlog << Error << "\nContingencyTable::condition_on() -> "
-        << "range check error\n\n";
-
-   exit ( 1 );
-
-}
-
-int r, c;
-int n, sum;
-TTContingencyTable t;
-
-   //
-   //
-   //
-
-t.set_entry(0, 0, entry(k, k));
-
-   //
-   //
-   //
-
-sum = 0;
-
-for (c=0; c<Ncols; ++c)  {
-
-   if ( c == k )  continue;
-
-   n = rc_to_n(k, c);
-
-   sum += (*E)[n];
-
-}
-
-t.set_entry(0, 1, sum);
-
-   //
-   //
-   //
-
-sum = 0;
-
-for (r=0; r<Nrows; ++r)  {
-
-   if ( r == k )  continue;
-
-   n = rc_to_n(r, k);
-
-   sum += (*E)[n];
-
-}
-
-t.set_entry(1, 0, sum);
-
-   //
-   //
-   //
-
-sum = 0;
-
-for (r=0; r<Nrows; ++r)  {
-
-   if ( r == k )  continue;
-
-   for (c=0; c<Ncols; ++c)  {
-
-      if ( c == k )  continue;
-
-      n = rc_to_n(r, c);
-
-      sum += (*E)[n];
-
+void ContingencyTable::set_size(int NR, int NC) {
+
+   clear();
+
+   if(NR < 2 || NC < 2) {
+      mlog << Error << "\nContingencyTable::set_size() -> "
+           << "# rows (" << NR << ") and # cols (" << NC
+           << ") must be at least 2!\n\n";
+      exit(1);
    }
 
+   Nrows = NR;
+   Ncols = NC;
+
+   E.resize(NR*NC, 0.0);
+
+   // Set default expected correct value for square tables
+   if(Nrows == Ncols) ECvalue = 1.0 / Nrows;
+
+   return;
 }
 
-t.set_entry(1, 1, sum);
+////////////////////////////////////////////////////////////////////////
 
+void ContingencyTable::set_ec_value(double v) {
 
-   //
-   //  done
-   //
+   // Do not override the default value with bad data
+   if(!is_bad_data(v)) ECvalue = v;
 
-return t;
-
+   return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void ContingencyTable::set_name(const char * text) {
+
+   Name = text;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int ContingencyTable::rc_to_n(int r, int c) const {
+
+   if(r < 0 || r >= Nrows || c < 0 || c >= Ncols) {
+      mlog << Error << "\nContingencyTable::rc_to_n() -> "
+           << "range check error requesting (" << r << ", "
+           << c << ") from table with dimension (" << Nrows
+           << ", " << Ncols << ")!\n\n";
+      exit(1);
+   }
+
+   return r*Ncols + c;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ContingencyTable::set_entry(int row, int col, double value) {
+
+   E[(rc_to_n(row, col))] = value;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ContingencyTable::inc_entry(int row, int col, double weight) {
+
+   E[(rc_to_n(row, col))] += weight;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double ContingencyTable::total() const {
+   double sum = 0.0;
+
+   for(auto &x : E) sum += x;
+
+   return sum;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double ContingencyTable::row_total(int row) const {
+   double sum = 0.0;
+
+   for(int col=0; col<Ncols; ++col) {
+      sum += E[(rc_to_n(row, col))];
+   }
+
+   return sum;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double ContingencyTable::col_total(int col) const {
+   double sum = 0.0;
+
+   for(int row=0; row<Nrows; ++row) {
+      sum += E[(rc_to_n(row, col))];
+   }
+
+   return sum;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double ContingencyTable::entry(int row, int col) const {
+   return E[(rc_to_n(row, col))];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double ContingencyTable::max() const {
+   double max;
+
+   if(E.empty()) max = 0.0;
+   else          max = *max_element(E.begin(), E.end());
+
+   return max;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double ContingencyTable::min() const {
+   double min;
+
+   if(E.empty()) min = 0.0;
+   else          min = *min_element(E.begin(), E.end());
+
+   return min;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Code for class TTContingencyTable
+//
+////////////////////////////////////////////////////////////////////////
+
+TTContingencyTable::TTContingencyTable() {
+   ContingencyTable::set_size(2, 2);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TTContingencyTable::~TTContingencyTable() {
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TTContingencyTable::TTContingencyTable(const TTContingencyTable & t) {
+   assign(t);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TTContingencyTable & TTContingencyTable::operator=(const TTContingencyTable & t) {
+
+   if(this == &t) return *this;
+
+   assign(t);
+
+   return *this;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TTContingencyTable::set_fn_on(double k) {
+
+   set_entry(FN_row, ON_col, k);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TTContingencyTable::set_fy_on(double k) {
+
+   set_entry(FY_row, ON_col, k);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TTContingencyTable::set_fn_oy(double k) {
+
+   set_entry(FN_row, OY_col, k);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TTContingencyTable::set_fy_oy(double k) {
+
+   set_entry(FY_row, OY_col, k);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TTContingencyTable::inc_fn_on(double weight) {
+
+   inc_entry(FN_row, ON_col, weight);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TTContingencyTable::inc_fy_on(double weight) {
+
+   inc_entry(FY_row, ON_col, weight);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TTContingencyTable::inc_fn_oy(double weight) {
+
+   inc_entry(FN_row, OY_col, weight);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void TTContingencyTable::inc_fy_oy(double weight) {
+
+   inc_entry(FY_row, OY_col, weight);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fy_oy() const {
+   return entry(FY_row, OY_col);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fy_on() const {
+   return entry(FY_row, ON_col);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fn_oy() const {
+   return entry(FN_row, OY_col);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fn_on() const {
+   return entry(FN_row, ON_col);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fy() const {
+   return row_total(FY_row);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fn() const {
+   return row_total(FN_row);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::oy() const {
+   return col_total(OY_col);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::on() const {
+   return col_total(ON_col);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::n() const {
+   return total();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::f_rate() const {
+   return compute_proportion(fy(), n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::h_rate() const {
+   return compute_proportion(fy_oy(), n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::o_rate() const {
+   return compute_proportion(oy(), n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fy_oy_tp() const {
+   return compute_proportion(fy_oy(), n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fy_on_tp() const {
+   return compute_proportion(fy_on(), n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fn_oy_tp() const {
+   return compute_proportion(fn_oy(), n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fn_on_tp() const {
+   return compute_proportion(fn_on(), n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fy_tp() const {
+   return compute_proportion(fy(), n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fn_tp() const {
+   return compute_proportion(fn(), n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::oy_tp() const {
+   return compute_proportion(oy(), n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::on_tp() const {
+   return compute_proportion(on(), n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fy_oy_fp() const {
+   return compute_proportion(fy_oy(), fy());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fy_on_fp() const {
+   return compute_proportion(fy_on(), fy());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double TTContingencyTable::fn_oy_fp() const {
+   return compute_proportion(fn_oy(), fn());
+}
 
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  Code for class TTContingencyTable
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-TTContingencyTable::TTContingencyTable()
-
-{
-
-ContingencyTable::set_size(2, 2);
-
+double TTContingencyTable::fn_on_fp() const {
+   return compute_proportion(fn_on(), fn());
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-TTContingencyTable::~TTContingencyTable()
-
-{
-
-
+double TTContingencyTable::fy_oy_op() const {
+   return compute_proportion(fy_oy(), oy());
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-TTContingencyTable::TTContingencyTable(const TTContingencyTable & t)
-
-{
-
-assign(t);
-
+double TTContingencyTable::fy_on_op() const {
+   return compute_proportion(fy_on(), on());
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
-
-TTContingencyTable & TTContingencyTable::operator=(const TTContingencyTable & t)
-
-{
-
-if ( this == &t )  return *this;
-
-assign(t);
-
-return *this;
-
+double TTContingencyTable::fn_oy_op() const {
+   return compute_proportion(fn_oy(), oy());
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-void TTContingencyTable::set_fn_on(int k)
-
-{
-
-set_entry(FN_row, ON_col, k);
-
-return;
-
+double TTContingencyTable::fn_on_op() const {
+   return compute_proportion(fn_on(), on());
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-void TTContingencyTable::set_fy_on(int k)
-
-{
-
-set_entry(FY_row, ON_col, k);
-
-return;
-
+void TTContingencyTable::set_size(int N) {
+   mlog << Error << "\nTTContingencyTable::set_size(int) -> "
+        << "2 x 2 tables cannot be resized!\n\n";
+   exit(1);
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-void TTContingencyTable::set_fn_oy(int k)
-
-{
-
-set_entry(FN_row, OY_col, k);
-
-return;
-
+void TTContingencyTable::set_size(int NR, int NC) {
+   mlog << Error << "\nTTContingencyTable::set_size(int, int) -> "
+        << "2 x 2 tables cannot be resized!\n\n";
+   exit(1);
 }
 
-
+////////////////////////////////////////////////////////////////////////
+//
+// Code for misc functions
+//
 ////////////////////////////////////////////////////////////////////////
 
+//
+// Reference table 7.1a, page 242 in wilks
+//
 
-void TTContingencyTable::set_fy_oy(int k)
+TTContingencyTable finley() {
+   TTContingencyTable t;
 
-{
+   t.set_fy_oy(28);
+   t.set_fn_oy(23);
+   t.set_fy_on(72);
+   t.set_fn_on(2680);
 
-set_entry(FY_row, OY_col, k);
+   t.set_name("Finley Tornado Forecasts (1884)");
 
-return;
-
+   return t;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
+//
+// Reference table 7.1b, page 242 in wilks
+//
 
-void TTContingencyTable::inc_fn_on()
+TTContingencyTable finley_always_no() {
+   TTContingencyTable t;
 
-{
+   t.set_fy_oy(0);
+   t.set_fn_oy(51);
+   t.set_fy_on(0);
+   t.set_fn_on(2752);
 
-inc_entry(FN_row, ON_col);
+   t.set_name("Finley Tornado Forecasts (Always No) (1884)");
 
-return;
-
+   return t;
 }
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void TTContingencyTable::inc_fy_on()
-
-{
-
-inc_entry(FY_row, ON_col);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void TTContingencyTable::inc_fn_oy()
-
-{
-
-inc_entry(FN_row, OY_col);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void TTContingencyTable::inc_fy_oy()
-
-{
-
-inc_entry(FY_row, OY_col);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int TTContingencyTable::fy_oy() const
-
-{
-
-int k;
-
-k = entry(FY_row, OY_col);
-
-return k;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int TTContingencyTable::fy_on() const
-
-{
-
-int k;
-
-k = entry(FY_row, ON_col);
-
-return k;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int TTContingencyTable::fn_oy() const
-
-{
-
-int k;
-
-k = entry(FN_row, OY_col);
-
-return k;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int TTContingencyTable::fn_on() const
-
-{
-
-int k;
-
-k = entry(FN_row, ON_col);
-
-return k;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int TTContingencyTable::fy() const
-
-{
-
-int k;
-
-k = row_total(FY_row);
-
-return k;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int TTContingencyTable::fn() const
-
-{
-
-int k;
-
-k = row_total(FN_row);
-
-return k;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int TTContingencyTable::oy() const
-
-{
-
-int k;
-
-k = col_total(OY_col);
-
-return k;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int TTContingencyTable::on() const
-
-{
-
-int k;
-
-k = col_total(ON_col);
-
-return k;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-int TTContingencyTable::n() const
-
-{
-
-int k;
-
-k = total();
-
-return k;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::f_rate() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fy();
-D = n();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::h_rate() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fy_oy();
-D = n();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::o_rate() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = oy();
-D = n();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::fy_oy_tp() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fy_oy();
-D = n();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::fy_on_tp() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fy_on();
-D = n();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::fn_oy_tp() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fn_oy();
-D = n();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::fn_on_tp() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fn_on();
-D = n();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::fy_tp() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fy();
-D = n();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::fn_tp() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fn();
-D = n();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::oy_tp() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = oy();
-D = n();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::on_tp() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = on();
-D = n();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::fy_oy_fp() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fy_oy();
-D = fy();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::fy_on_fp() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fy_on();
-D = fy();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::fn_oy_fp() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fn_oy();
-D = fn();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::fn_on_fp() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fn_on();
-D = fn();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::fy_oy_op() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fy_oy();
-D = oy();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::fy_on_op() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fy_on();
-D = on();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::fn_oy_op() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fn_oy();
-D = oy();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double TTContingencyTable::fn_on_op() const
-
-{
-
-int N, D;
-double num, denom;
-
-N = fn_on();
-D = on();
-
-if ( D == 0 )  return bad_data_double;
-
-num   = (double) N;
-denom = (double) D;
-
-return num/denom;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void TTContingencyTable::set_size(int N)
-
-{
-
-mlog << Error << "\nTTContingencyTable::set_size(int) -> "
-     << "2 x 2 tables cannot be resized!\n\n";
-
-exit ( 1 );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void TTContingencyTable::set_size(int NR, int NC)
-
-{
-
-mlog << Error << "\nTTContingencyTable::set_size(int, int) -> "
-     << "2 x 2 tables cannot be resized!\n\n";
-
-exit ( 1 );
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for misc functions
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
-   //
-   //  see table 7.1a, page 242 in wilks
-   //
-
-TTContingencyTable finley()
-
-{
-
-TTContingencyTable t;
-
-
-t.set_fy_oy(28);
-t.set_fn_oy(23);
-
-t.set_fy_on(72);
-t.set_fn_on(2680);
-
-
-t.set_name("Finley Tornado Forecasts (1884)");
-
-
-return t;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-   //
-   //  see table 7.1b, page 242 in wilks
-   //
-
-TTContingencyTable finley_always_no()
-
-{
-
-TTContingencyTable t;
-
-
-t.set_fy_oy(0);
-t.set_fn_oy(51);
-
-t.set_fy_on(0);
-t.set_fn_on(2752);
-
-
-t.set_name("Finley Tornado Forecasts (Always No) (1884)");
-
-
-return t;
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 // r_table < h
 // c_table < w
 
-int table_rc_to_n(int r_table, int c_table, int w, int h)
-
-{
-
-int n;
-
-n = r_table*w + c_table;
-
-return n;
-
+int table_rc_to_n(int r_table, int c_table, int w, int h) {
+   return r_table*w + c_table;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+double compute_proportion(double num, double den) {
+   double prop;
+
+   // Check for bad data and divide by zero
+   if(is_bad_data(num)   ||
+      is_bad_data(den) ||
+      is_eq(den, 0.0)) {
+      prop = bad_data_double;
+   }
+   else {
+      prop = num/den;
+   }
+
+   return prop;
+}
 
 ////////////////////////////////////////////////////////////////////////
