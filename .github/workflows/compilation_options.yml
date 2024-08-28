@@ -50,7 +50,7 @@ jobs:
           - jobid:  'job1'
             config: ''
           - jobid:  'job2'
-            config: '--enable-all'  
+            config: '--enable-all'
           - jobid:  'job3'
             config: '--enable-grib2'
           - jobid:  'job4'
