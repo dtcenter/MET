@@ -420,7 +420,7 @@ bool NcCfFile::open(const char * filepath)
     }
 
     double time_value = get_nc_time(&init_time_var,0);
-    InitTime = (unixtime)(ut + sec_per_unit * time_value);
+    InitTime = ut + (unixtime)(sec_per_unit * time_value);
   }
 
   // Pull out the grid.  This must be done after pulling out the dimension
@@ -946,7 +946,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   //  done
 
   mlog << Debug(6) << method_name << "took "
-       << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+       << get_exe_duration(start_clock) << " seconds\n";
 
   return d;
 }
@@ -1155,7 +1155,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   //  done
   mlog << Debug(6) << method_name << "took "
-       << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+       << get_exe_duration(start_clock) << " seconds\n";
 
   return true;
 }
