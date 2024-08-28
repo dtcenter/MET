@@ -83,7 +83,7 @@ void Nx2ContingencyTable::assign(const Nx2ContingencyTable & t) {
    clear();
 
    ContingencyTable::assign(t);
-   set_thresholds(t.Thresholds);
+   Thresholds = t.Thresholds;
 
    return;
 }

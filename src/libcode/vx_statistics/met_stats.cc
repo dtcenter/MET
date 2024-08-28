@@ -2598,8 +2598,8 @@ void PCTInfo::clear() {
    n_alpha = 0;
    if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
 
-   pct.zero_out();
-   climo_pct.zero_out();
+   pct.clear();
+   climo_pct.clear();
    fthresh.clear();
    othresh.clear();
 
