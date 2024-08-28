@@ -364,7 +364,7 @@
       &OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3.ps \
       'name="precipitation"; level="(*,*)";' \
       -color_table &MET_BASE;/colortables/trmm_daily_precip.ctable \
-      -v 7
+      -v 1
     </param>
     <output>
       <ps>&OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3.ps</ps>
