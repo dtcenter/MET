@@ -236,55 +236,50 @@ void apply_scale_factor_(T *data, const int cell_count,
    clock_t start_clock = clock();
    const char *method_name = "apply_scale_factor(T) ";
 
-   if (cell_count > 0) {
-      T min_value;
-      T max_value;
-      T raw_min_val;
-      T raw_max_val;
-      int idx = 0;
-      int positive_cnt = 0;
-      int unpacked_count = 0;
+   if (cell_count <= 0) return;
 
-      if (has_fill_value) {
-         // Set met_fill_value (-8=9999) for FIllValues (missing values)
-         for (; idx<cell_count; idx++) {
-            if (!is_eq(nc_fill_value, data[idx])) break;
-            data[idx] = met_fill_value;
-         }
-      }
+   T min_value;
+   T max_value;
+   T raw_min_val;
+   T raw_max_val;
+   int idx = 0;
+   int positive_cnt = 0;
+   int unpacked_count = 0;
 
-      if (idx < cell_count) {
-         raw_min_val = raw_max_val = data[idx];
-         min_value = max_value = (data[idx] * scale_factor) + add_offset;
-      }
-      else {
-         raw_min_val = raw_max_val = data[0];
-         min_value = max_value = (data[idx] * scale_factor) + add_offset;
-      }
+   if (has_fill_value) {
+      // Set met_fill_value (-9999) for FillValues (missing values)
       for (; idx<cell_count; idx++) {
-         if (has_fill_value && is_eq(nc_fill_value, data[idx]))
-            data[idx] = met_fill_value;
-         else {
-            if (raw_min_val > data[idx]) raw_min_val = data[idx];
-            if (raw_max_val < data[idx]) raw_max_val = data[idx];
-            data[idx] = (data[idx] * scale_factor) + add_offset;
-            if (data[idx] > 0) positive_cnt++;
-            if (min_value > data[idx]) min_value = data[idx];
-            if (max_value < data[idx]) max_value = data[idx];
-            unpacked_count++;
-         }
+         if (!is_eq(nc_fill_value, data[idx])) break;
+         data[idx] = met_fill_value;
       }
-      //cout << typeid(nc_fill_value).name();
-      mlog << Debug(debug_level) << method_name << var_name
-           << "(data_type=" << typeid(data[0]).name() << "): unpacked data: count="
-           << unpacked_count << " out of " << cell_count
-           << ", scale_factor=" << scale_factor<< " add_offset=" << add_offset
-           << ". FillValue(" << data_type << ")=" << nc_fill_value << "\n";
-      mlog << Debug(debug_level) << method_name
-           << " data range [" << min_value << " - " << max_value
-           << "] raw data: [" << raw_min_val << " - " << raw_max_val
-           << "] Positive count: " << positive_cnt << "\n";
    }
+
+   int tmp_idx = (idx < cell_count) ? idx : 0;
+   raw_min_val = raw_max_val = data[tmp_idx];
+   min_value = max_value = (T)(((double)data[tmp_idx] * scale_factor) + add_offset);
+   for (; idx<cell_count; idx++) {
+      if (has_fill_value && is_eq(nc_fill_value, data[idx]))
+         data[idx] = met_fill_value;
+      else {
+         if (raw_min_val > data[idx]) raw_min_val = data[idx];
+         if (raw_max_val < data[idx]) raw_max_val = data[idx];
+         data[idx] = (data[idx] * scale_factor) + add_offset;
+         if (data[idx] > 0) positive_cnt++;
+         if (min_value > data[idx]) min_value = data[idx];
+         if (max_value < data[idx]) max_value = data[idx];
+         unpacked_count++;
+      }
+   }
+   mlog << Debug(debug_level) << method_name << var_name
+        << "(data_type=" << typeid(data[0]).name() << "): unpacked data: count="
+        << unpacked_count << " out of " << cell_count
+        << ", scale_factor=" << scale_factor<< " add_offset=" << add_offset
+        << ". FillValue(" << data_type << ")=" << nc_fill_value << "\n";
+   mlog << Debug(debug_level) << method_name
+        << " data range [" << min_value << " - " << max_value
+        << "] raw data: [" << raw_min_val << " - " << raw_max_val
+        << "] Positive count: " << positive_cnt << "\n";
+
    mlog << Debug(debug_level) << method_name << " took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
    return;
@@ -293,7 +288,7 @@ void apply_scale_factor_(T *data, const int cell_count,
 ////////////////////////////////////////////////////////////////////////
 
 template <typename T>
-void update_missing_values(T *data, const int cell_count,
+void update_missing_values(T *data, const long cell_count,
                            const T nc_fill_value, const T met_fill_value,
                            const char *data_type, const char *var_name) {
    int missing_count = 0;
@@ -301,41 +296,40 @@ void update_missing_values(T *data, const int cell_count,
    clock_t start_clock = clock();
    const char *method_name = "update_missing_values(T) ";
 
-   if (cell_count > 0) {
-      T max_value;
-      T min_value;
-      int idx = 0;
-      int positive_cnt = 0;
+   if (cell_count <= 0) return;
 
-      // Set met_fill_value (-8=9999) for FIllValues (missing values)
-      for (; idx<cell_count; idx++) {
-         if (!is_eq(nc_fill_value, data[idx])) break;
+   T max_value;
+   T min_value;
+   long idx = 0;
+   int positive_cnt = 0;
+
+   // Set met_fill_value (-9999) for FillValues (missing values)
+   for (; idx<cell_count; idx++) {
+      if (!is_eq(nc_fill_value, data[idx])) break;
+      data[idx] = met_fill_value;
+   }
+
+   if (idx < cell_count) min_value = max_value = data[idx];
+   else min_value = max_value = met_fill_value;
+
+   for (; idx<cell_count; idx++) {
+      if (is_eq(nc_fill_value, data[idx])) {
          data[idx] = met_fill_value;
+         missing_count++;
       }
-
-      if (idx < cell_count) min_value = max_value = data[idx];
-      else min_value = max_value = met_fill_value;
-
-      for (; idx<cell_count; idx++) {
-         if (is_eq(nc_fill_value, data[idx])) {
-            data[idx] = met_fill_value;
-            missing_count++;
-         }
-         else {
-            if (min_value > data[idx]) min_value = data[idx];
-            if (max_value < data[idx]) max_value = data[idx];
-         }
+      else {
+         if (min_value > data[idx]) min_value = data[idx];
+         if (max_value < data[idx]) max_value = data[idx];
       }
-      //cout << typeid(nc_fill_value).name();
-      mlog << Debug(debug_level) << method_name << var_name
-           << "(data_type=" << typeid(data[0]).name() << "): FillValue(" << data_type << ")=" << nc_fill_value << "\n";
-      mlog << Debug(debug_level) << method_name
-           << " data range [" << min_value << " - " << max_value
-           << "] Positive count: " << positive_cnt << "\n";
-      if (0 < missing_count) {
-         mlog << Debug(3) << method_name << var_name
-              << "(data_type=" << typeid(data[0]).name() << "): found " << missing_count << " FillValues out of " << cell_count << "\n";
-      }
+   }
+   mlog << Debug(debug_level) << method_name << var_name
+        << "(data_type=" << typeid(data[0]).name() << "): FillValue(" << data_type << ")=" << nc_fill_value << "\n";
+   mlog << Debug(debug_level) << method_name
+        << " data range [" << min_value << " - " << max_value
+        << "] Positive count: " << positive_cnt << "\n";
+   if (0 < missing_count) {
+      mlog << Debug(3) << method_name << var_name
+           << "(data_type=" << typeid(data[0]).name() << "): found " << missing_count << " FillValues out of " << cell_count << "\n";
    }
    mlog << Debug(debug_level) << method_name << " took "
         << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
