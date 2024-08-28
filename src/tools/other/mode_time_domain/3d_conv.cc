@@ -154,8 +154,6 @@ struct DataHandle {
 
    {
 
-      int j;
-
       _out.put('\n');
 
       _out << "   DataHandle:\n";
@@ -168,13 +166,13 @@ struct DataHandle {
 
       _out << "   plane_loaded = [";
 
-      for (j=0; j<time_radius; ++j)  _out << ' ' << bool_to_string(plane_loaded[j]);
+      for (int j=0; j<time_radius; ++j)  _out << ' ' << bool_to_string(plane_loaded[j]);
 
       _out << " ]\n";
 
       _out << "   plane_time = [";
 
-      for (j=0; j<time_radius; ++j)  {
+      for (int j=0; j<time_radius; ++j)  {
 
          _out << ' ';
 
@@ -227,7 +225,7 @@ double value;
 MtdFloatFile out;
 double min_conv_value;
 double max_conv_value;
-double * conv_data = (double *) nullptr;
+auto conv_data = (double *) nullptr;
 DataHandle handle;
 
 const int time_radius = time_end - time_beg + 1;
@@ -278,7 +276,7 @@ if ( !conv_data )  {
 min_conv_value =  1.0e100;
 max_conv_value = -1.0e100;
 
-unixtime time_start = time(0);
+unixtime time_start = time(nullptr);
 
 // cout << "\n\n  n = " << mtd_three_to_one(Nx, Ny, Nt, 88, 397, 0) << "\n\n";
 
@@ -356,13 +354,12 @@ for (int t=0; t<Nt; ++t)  {
 
 }   //  for t
 
-unixtime time_stop = time(0);
-
 
 mlog << Debug(5) << "Conv data range is " << min_conv_value << " to " << max_conv_value << "\n\n";
 
 
 if ( verbose )  {
+   unixtime time_stop = time(nullptr);
 
    mlog << Debug(5) << "\n  Conv time       = " << (time_stop - time_start) << " seconds\n";
 
