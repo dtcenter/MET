@@ -364,7 +364,7 @@
       &OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3.ps \
       'name="precipitation"; level="(*,*)";' \
       -color_table &MET_BASE;/colortables/trmm_daily_precip.ctable \
-      -v 1
+      -v 7
     </param>
     <output>
       <ps>&OUTPUT_DIR;/plot_data_plane/3B42_daily.2013.11.30.7.G3.ps</ps>
@@ -677,6 +677,20 @@
     </param>
     <output>
       <ps>&OUTPUT_DIR;/plot_data_plane/wrf_bottom_top_stag.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_set_attr_grid">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/MITLL.ProxyEchoTopsCalibratedMosaic.20200831_235328_v_20200831_235328.nc \
+      &OUTPUT_DIR;/plot_data_plane/EchoTops_set_attr_grid.ps \
+      'name="ProxyEchoTopsCalibratedMosaic"; level="(0,*,*)"; set_attr_grid="latlon 8008 4004 -90 -180 0.04 0.04";' \
+      -title "Global Synthetic Weather Radar EchoTops" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/EchoTops_set_attr_grid.ps</ps>
     </output>
   </test>
 
