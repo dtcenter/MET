@@ -452,7 +452,6 @@ bool get_nc_data_(netCDF::NcVar *var, T *data, T met_missing, const LongArray &d
 
       //scale_factor and add_offset
       if (has_add_offset_attr(var) || has_scale_factor_attr(var)) {
-         T nc_missing;
          double add_offset = get_var_add_offset(var);
          double scale_factor = get_var_scale_factor(var);
          apply_scale_factor_(data, data_size, add_offset, scale_factor,
