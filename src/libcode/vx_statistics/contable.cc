@@ -317,6 +317,22 @@ double ContingencyTable::min() const {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool ContingencyTable::is_integer() const {
+   bool status = true;
+
+   // Check that each entry contains an integer
+   for(auto &x : E) {
+      if(!is_eq(trunc(x), x)) {
+         status = false;
+         break;
+      }
+   }
+
+   return status;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class TTContingencyTable
 //

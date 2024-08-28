@@ -20,7 +20,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-class TTContingencyTable;   //  forward reference
+// Forward reference
+class TTContingencyTable;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -92,6 +93,8 @@ class ContingencyTable {
 
       double max() const;
       double min() const;
+
+      bool is_integer() const;
 
       // Statistics
       virtual double gaccuracy () const;
