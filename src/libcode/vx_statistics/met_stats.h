@@ -97,7 +97,12 @@ class CTSInfo {
       void compute_stats();
       void compute_ci();
 
-      double get_stat(const char *);
+      void set_stat_ctc(const std::string &, double);
+
+      double get_stat(STATLineType, const std::string &, int i_alpha=0) const;
+      double get_stat_fho(const std::string &) const;
+      double get_stat_ctc(const std::string &) const;
+      double get_stat_cts(const std::string &, int i_alpha=0) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -136,6 +141,10 @@ class MCTSInfo {
       void add(double, double, const ClimoPntInfo *cpi = nullptr);
       void compute_stats();
       void compute_ci();
+
+      double get_stat(STATLineType, const std::string &, ConcatString &, int i_alpha=0) const;
+      double get_stat_mctc(const std::string &, ConcatString &) const;
+      double get_stat_mcts(const std::string &, int i_alpha=0) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -188,11 +197,13 @@ class CNTInfo {
       
       int n_ranks, frank_ties, orank_ties;
 
+      void zero_out();
       void clear();
+
       void allocate_n_alpha(int);
       void compute_ci();
 
-      double get_stat(const char *);
+      double get_stat(const std::string &, int i_alpha=0) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -239,6 +250,13 @@ class SL1L2Info {
 
       void zero_out();
       void clear();
+
+      void set_stat_sl1l2(const std::string &, double);
+      void set_stat_sal1l2(const std::string &, double);
+
+      double get_stat(STATLineType, const std::string &) const;
+      double get_stat_sl1l2(const std::string &) const;
+      double get_stat_sal1l2(const std::string &) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -354,15 +372,17 @@ class VL1L2Info {
 
       // Compute sums
       void set(const PairDataPoint &, const PairDataPoint &);
-   
-      void clear();
+
       void zero_out();
+      void clear();
 
       void allocate_n_alpha(int);
       void compute_stats();
       void compute_ci();
 
-      double get_stat(const char *);
+      double get_stat_vl1l2(const std::string &) const;
+      double get_stat_val1l2(const std::string &) const;
+      double get_stat_vcnt(const std::string &) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -502,8 +522,9 @@ class ISCInfo {
       double  baser;
       double  fbias;
 
-      void clear();
       void zero_out();
+      void clear();
+
       void allocate_n_scale(int);
       void compute_isc();
       void compute_isc(int);
@@ -558,6 +579,12 @@ class PCTInfo {
       void set_fthresh(const ThreshArray &);
       void compute_stats();
       void compute_ci();
+
+      double get_stat(STATLineType, const std::string &, ConcatString &, int i_alpha=0) const;
+      double get_stat_pct(const std::string &, ConcatString &) const;
+      double get_stat_pjc(const std::string &, ConcatString &) const;
+      double get_stat_prc(const std::string &, ConcatString &) const;
+      double get_stat_pstd(const std::string &, ConcatString &, int i_alpha=0) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -736,6 +763,8 @@ extern double compute_afss(double, double);
 extern double compute_ufss(double);
 
 extern int    compute_rank(const DataPlane &, DataPlane &, double *, int &);
+
+extern bool   is_ci_stat_name(const std::string &);
 
 ////////////////////////////////////////////////////////////////////////
 
