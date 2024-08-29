@@ -85,15 +85,17 @@
     <param> \
       -fcst   &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F030.grib \
               &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F036.grib \
+              &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F042.grib \
       -obs    &DATA_DIR_OBS;/stage4_hmt/stage4_2012041006_06h.grib \
               &DATA_DIR_OBS;/stage4_hmt/stage4_2012041012_06h.grib \
+              &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib \
       -aggr   &OUTPUT_DIR;/series_analysis/series_analysis_CMD_LINE_APCP_06_2012040900_to_2012041000.nc \
-      -out    &OUTPUT_DIR;/series_analysis/series_analysis_AGGR_CMD_LINE_APCP_06_2012040900_to_2012041012.nc \
+      -out    &OUTPUT_DIR;/series_analysis/series_analysis_AGGR_CMD_LINE_APCP_06_2012040900_to_2012041018.nc \
       -config &CONFIG_DIR;/SeriesAnalysisConfig \
       -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/series_analysis/series_analysis_AGGR_CMD_LINE_APCP_06_2012040900_to_2012041012.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/series_analysis/series_analysis_AGGR_CMD_LINE_APCP_06_2012040900_to_2012041018.nc</grid_nc>
     </output>
   </test>
 
