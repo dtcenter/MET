@@ -64,7 +64,9 @@ jobs:
           - jobid:  'job8'
             config: '--enable-modis'
           - jobid:  'job9'
-            config: '--enable-all MET_CXX_STANDARD=11'  
+            config: '--enable-all MET_CXX_STANDARD=11'
+          - jobid:  'job10'
+            config: '--enable-all MET_CXX_STANDARD=14'
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
