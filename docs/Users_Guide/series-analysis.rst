@@ -61,7 +61,7 @@ Optional Arguments for series_analysis
 
 6. The -aggr option specifies the path to an existing Series-Analysis output file. When computing statistics for the input forecast and observation data, Series-Analysis aggregates the partial sums (SL1L2, SAL1L2 line types) and contingency table counts (CTC, MCTC, and PCT line types) with data provided in the aggregate file. This option enables Series-Analysis to run iteratively and update existing partial sums, counts, and statistics with new data.
 
-.. note:: When the -aggr option is used, only statistics that are derivable from partial sums and contingency table counts can be requested.
+.. note:: When the -aggr option is used, only statistics that are derivable from partial sums and contingency table counts can be requested. Runtimes are generally much slower when aggregating data since it requires many additional NetCDF variables containing the scalar partial sums and contingency table counts to be read and written.
 
 7. The -paired option indicates that the -fcst and -obs file lists are already paired, meaning there is a one-to-one correspondence between the files in those lists. This option affects how missing data is handled. When -paired is not used, missing or incomplete files result in a runtime error with no output file being created. When -paired is used, missing or incomplete files result in a warning with output being created using the available data.
 
