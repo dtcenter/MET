@@ -706,7 +706,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
          else if(do_cnt && (line.type() == STATLineType::sl1l2 ||
                             line.type() == STATLineType::sal1l2)) {
             parse_sl1l2_line(line, sl1l2_info);
-            compute_cntinfo(sl1l2_info, 0, cnt_info);
+            compute_cntinfo(sl1l2_info, cnt_info);
          }
 
          //
@@ -731,7 +731,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
             //
             if((line.type() == STATLineType::fho ||
                 line.type() == STATLineType::ctc) && lty == STATLineType::cts) {
-               v = cts_info.get_stat(req_col[i].c_str());
+               v = cts_info.get_stat_cts(req_col[i].c_str());
                w = cts_info.cts.n();
             }
             else if(line.type() == STATLineType::sl1l2 && lty == STATLineType::cnt) {
@@ -743,7 +743,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
                w = cnt_info.n;
             }
             else if(line.type() == STATLineType::vl1l2 && lty == STATLineType::vcnt) {
-               v = vl1l2_info.get_stat(req_col[i].c_str());
+               v = vl1l2_info.get_stat_vcnt(req_col[i].c_str());
                w = (is_vector_dir_stat(line.type(), req_col[i].c_str()) ?
                     vl1l2_info.dcount :
                     vl1l2_info.vcount);
@@ -1519,7 +1519,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
             //
             // Compute the stats for the current time
             //
-            compute_cntinfo(cur_sl1l2, 0, cur_cnt);
+            compute_cntinfo(cur_sl1l2, cur_cnt);
 
             //
             // Append the stats
