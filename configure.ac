@@ -16,6 +16,24 @@ CPPFLAGS="${CPPFLAGS} ${OPENMP_CFLAGS}"
 LDFLAGS="${LDFLAGS} ${OPENMP_CFLAGS}"
 
 #
+# Look for a specified C++ Standard
+#
+
+# Configure the variable. The help text will appear if the user uses "configure --help".
+
+AC_ARG_VAR([MET_CXX_STANDARD], [Specify the version of the supported C++ standard. Values may be 11, 14, or 17. Default value is 17.])
+
+# Set a default value
+
+if (test -z "$MET_CXX_STANDARD"); then
+  MET_CXX_STANDARD=17
+  AC_MSG_NOTICE([c++17 will be used as the C++ standard])
+elif (test -n "$MET_CXX_STANDARD"); then
+  MET_CXX_STANDARD=${MET_CXX_STANDARD}
+  AC_MSG_NOTICE([MET_CXX_STANDARD will be set])
+fi
+
+#
 # Look for the Proj library.
 #
 
@@ -1160,7 +1178,7 @@ AM_CONDITIONAL([ENABLE_DEVELOPMENT], [test -n "$MET_DEVELOPMENT"])
 CPPFLAGS=$CPPFLAGS' -DMET_BASE="\"$(pkgdatadir)\""'
 
 # Add -std=c++11 to CXXFLAGS                                                                                                                                                 
-CXXFLAGS=$CXXFLAGS' -std=c++11'
+CXXFLAGS=$CXXFLAGS' -std=c++'$MET_CXX_STANDARD
 
 # Define other variables for the makefiles
 
