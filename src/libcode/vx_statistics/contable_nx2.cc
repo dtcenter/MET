@@ -574,9 +574,9 @@ double Nx2ContingencyTable::roc_auc() const {
    TTContingencyTable ct;
    double x_prev = 1.0;
    double y_prev = 1.0;
-   double area = 0.0;
+   double area = bad_data_double;
 
-   for(int j=0, area=bad_data_double; j<Nrows; ++j) {
+   for(int j=0; j<Nrows; ++j) {
 
       // 2x2 Contingency Table for this row
       ct = ctc_by_row(j);
@@ -586,6 +586,9 @@ double Nx2ContingencyTable::roc_auc() const {
       double y = ct.pod_yes();
 
       if(is_bad_data(x) || is_bad_data(y)) continue;
+
+      // Initialize area to 0 for the first valid point
+      if(is_bad_data(area)) area = 0.0;
 
       // Compute area under the curve using the trapezoid rule
       area += (x_prev - x)*(y_prev + y)*0.5;
