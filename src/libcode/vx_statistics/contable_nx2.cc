@@ -543,10 +543,10 @@ TTContingencyTable Nx2ContingencyTable::ctc_by_row(int row) const {
       exit(1);
    }
 
-   double sy;
-   double sn;
+   double sy = 0.0;
+   double sn = 0.0;
 
-   for(int j=(row + 1), sy=sn=0.0; j<Nrows; ++j) {
+   for(int j=row+1; j<Nrows; ++j) {
       sy +=    event_count_by_row(j);
       sn += nonevent_count_by_row(j);
    }
@@ -554,7 +554,10 @@ TTContingencyTable Nx2ContingencyTable::ctc_by_row(int row) const {
    tt.set_fy_oy(sy);
    tt.set_fy_on(sn);
 
-   for(int j=0, sy=sn=0.0; j<=row; ++j) {
+   sy = 0.0;
+   sn = 0.0;
+
+   for(int j=0; j<=row; ++j) {
       sy +=    event_count_by_row(j);
       sn += nonevent_count_by_row(j);
    }

@@ -3470,7 +3470,7 @@ double PCTInfo::get_stat_pjc(const string &stat_name,
 
 double PCTInfo::get_stat_prc(const string &stat_name,
                              ConcatString &col_name) const {
-   int i = 0;
+   int i = bad_data_int;
    double v = bad_data_double;
    col_name = stat_name;
    TTContingencyTable ct;
