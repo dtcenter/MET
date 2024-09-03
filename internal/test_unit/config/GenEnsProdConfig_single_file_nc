@@ -13,7 +13,6 @@ model = "CFSv2";
 
 //
 // Output description to be written
-// May be set separately in each "obs.field" entry
 //
 desc = "NA";
 
