@@ -165,6 +165,10 @@ class Nx2ContingencyTable : public ContingencyTable {
       double    event_count_by_row(int row) const;
       double nonevent_count_by_row(int row) const;
 
+      // Set counts
+      void set_event(int row, double);
+      void set_nonevent(int row, double);
+
       double n() const;
 
       // Column totals
@@ -198,11 +202,11 @@ class Nx2ContingencyTable : public ContingencyTable {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline double Nx2ContingencyTable::event_col_total    () const { return col_total(nx2_event_column); }
-inline double Nx2ContingencyTable::nonevent_col_total () const { return col_total(nx2_nonevent_column); }
-
 inline double Nx2ContingencyTable::event_count_by_row    (int row) const { return entry(row, nx2_event_column); }
 inline double Nx2ContingencyTable::nonevent_count_by_row (int row) const { return entry(row, nx2_nonevent_column); }
+
+inline double Nx2ContingencyTable::event_col_total    () const { return col_total(nx2_event_column); }
+inline double Nx2ContingencyTable::nonevent_col_total () const { return col_total(nx2_nonevent_column); }
 
 ////////////////////////////////////////////////////////////////////////
 //

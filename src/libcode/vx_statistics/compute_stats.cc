@@ -29,109 +29,95 @@ const int detailed_debug_level = 5;
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_cntinfo(const SL1L2Info &s, bool aflag, CNTInfo &cnt_info) {
-   double fbar, obar, ffbar, fobar, oobar, den;
-   int n;
+void compute_cntinfo(const SL1L2Info &s, CNTInfo &cnt_info) {
 
-   // Set the quantities that can't be derived from SL1L2Info to bad data
-   cnt_info.sp_corr.set_bad_data();
-   cnt_info.kt_corr.set_bad_data();
-   cnt_info.e10.set_bad_data();
-   cnt_info.e25.set_bad_data();
-   cnt_info.e50.set_bad_data();
-   cnt_info.e75.set_bad_data();
-   cnt_info.e90.set_bad_data();
-   cnt_info.eiqr.set_bad_data();
-   cnt_info.mad.set_bad_data();
-   cnt_info.n_ranks    = 0;
-   cnt_info.frank_ties = 0;
-   cnt_info.orank_ties = 0;
+   // Initialize statistics
+   cnt_info.zero_out();
 
-   // Get partial sums
-   n     = (aflag ? s.sacount : s.scount);
-   fbar  = (aflag ? s.fabar   : s.fbar);
-   obar  = (aflag ? s.oabar   : s.obar);
-   fobar = (aflag ? s.foabar  : s.fobar);
-   ffbar = (aflag ? s.ffabar  : s.ffbar);
-   oobar = (aflag ? s.ooabar  : s.oobar);
+   // Check for consistent counts
+   if(s.scount > 0 && s.sacount > 0 &&
+      s.scount != s.sacount) {
+      mlog << Error << "\ncompute_cntinfo() -> "
+           << "the scalar partial sum and scalar anomaly partial sum "
+           << "counts are both non-zero but do not match ("
+           << s.scount << " != " << s.sacount << ").\n\n";
+      exit(1);
+   }
 
    // Number of matched pairs
+   int n = max(s.scount, s.sacount);
    cnt_info.n = n;
 
-   // Forecast mean and standard deviation
-   cnt_info.fbar.v   = fbar;
-   cnt_info.fstdev.v = compute_stdev(fbar*n, ffbar*n, n);
+   // Process scalar partial sum statistics
+   if(s.scount > 0) {
 
-   // Observation mean and standard deviation
-   cnt_info.obar.v   = obar;
-   cnt_info.ostdev.v = compute_stdev(obar*n, oobar*n, n);
+      // Forecast mean and standard deviation
+      cnt_info.fbar.v   = s.fbar;
+      cnt_info.fstdev.v = compute_stdev(s.fbar*n, s.ffbar*n, n);
 
-   // Multiplicative bias
-   cnt_info.mbias.v = (is_eq(obar, 0.0) ? bad_data_double : fbar/obar);
+      // Observation mean and standard deviation
+      cnt_info.obar.v   = s.obar;
+      cnt_info.ostdev.v = compute_stdev(s.obar*n, s.oobar*n, n);
 
-   // Correlation coefficient
+      // Multiplicative bias
+      cnt_info.mbias.v = (is_eq(s.obar, 0.0) ? bad_data_double : s.fbar/s.obar);
 
-   // Handle SAL1L2 data
-   if(aflag) {
-      cnt_info.pr_corr.v          = bad_data_double;
-      cnt_info.anom_corr.v        = compute_corr( fbar*n,  obar*n,
-                                                 ffbar*n, oobar*n,
-                                                 fobar*n, n);
-      cnt_info.rmsfa.v            = sqrt(ffbar);
-      cnt_info.rmsoa.v            = sqrt(oobar);
-      cnt_info.anom_corr_uncntr.v = compute_anom_corr_uncntr(ffbar, oobar,
-                                                             fobar);
+      // Correlation coefficient
+      cnt_info.pr_corr.v = compute_corr( s.fbar*n,  s.obar*n,
+                                        s.ffbar*n, s.oobar*n,
+                                        s.fobar*n, n);
+
+      // Compute mean error
+      cnt_info.me.v = s.fbar - s.obar;
+
+      // Compute mean error squared
+      cnt_info.me2.v = cnt_info.me.v * cnt_info.me.v;
+
+      // Compute mean absolute error
+      cnt_info.mae.v = s.smae;
+
+      // Compute mean squared error
+      cnt_info.mse.v = s.ffbar + s.oobar - 2.0*s.fobar;
+
+      // Compute mean squared error skill score
+      double den = cnt_info.ostdev.v * cnt_info.ostdev.v;
+      if(!is_eq(den, 0.0)) {
+         cnt_info.msess.v = 1.0 - cnt_info.mse.v / den;
+      }
+      else {
+         cnt_info.msess.v = bad_data_double;
+      }
+
+      // Compute standard deviation of the mean error
+      cnt_info.estdev.v = compute_stdev(cnt_info.me.v*n,
+                                        cnt_info.mse.v*n, n);
+
+      // Compute bias corrected mean squared error (decomposition of MSE)
+      cnt_info.bcmse.v = cnt_info.mse.v - (s.fbar - s.obar)*(s.fbar - s.obar);
+
+      // Compute root mean squared error
+      cnt_info.rmse.v = sqrt(cnt_info.mse.v);
+
+      // Compute Scatter Index (SI)
+      if(!is_eq(cnt_info.obar.v, 0.0)) {
+         cnt_info.si.v = cnt_info.rmse.v / cnt_info.obar.v;
+      }
+      else {
+         cnt_info.si.v = bad_data_double;
+      }
    }
-   // Handle SL1L2 data
-   else {
-      cnt_info.pr_corr.v          = compute_corr( fbar*n,  obar*n,
-                                                 ffbar*n, oobar*n,
-                                                 fobar*n, n);
-      cnt_info.anom_corr.v        = bad_data_double;
-      cnt_info.rmsfa.v            = bad_data_double;
-      cnt_info.rmsoa.v            = bad_data_double;
-      cnt_info.anom_corr_uncntr.v = bad_data_double;
+
+   // Process scalar anomaly partial sum statistics
+   if(s.sacount > 0) {
+      cnt_info.anom_corr.v        = compute_corr( s.fabar*n,  s.oabar*n,
+                                                 s.ffabar*n, s.ooabar*n,
+                                                 s.foabar*n, n);
+      cnt_info.rmsfa.v            = sqrt(s.ffabar);
+      cnt_info.rmsoa.v            = sqrt(s.ooabar);
+      cnt_info.anom_corr_uncntr.v = compute_anom_corr_uncntr(s.ffabar, s.ooabar,
+                                                             s.foabar);
    }
 
-   // Compute mean error
-   cnt_info.me.v = fbar - obar;
-
-   // Compute mean error squared
-   cnt_info.me2.v = cnt_info.me.v * cnt_info.me.v;
-
-   // Compute mean absolute error
-   cnt_info.mae.v = s.smae;
-
-   // Compute mean squared error
-   cnt_info.mse.v = ffbar + oobar - 2.0*fobar;
-
-   // Compute mean squared error skill score
-   den = cnt_info.ostdev.v * cnt_info.ostdev.v;
-   if(!is_eq(den, 0.0)) {
-      cnt_info.msess.v = 1.0 - cnt_info.mse.v / den;
-   }
-   else {
-      cnt_info.msess.v = bad_data_double;
-   }
-
-   // Compute standard deviation of the mean error
-   cnt_info.estdev.v = compute_stdev(cnt_info.me.v*n,
-                                     cnt_info.mse.v*n, n);
-
-   // Compute bias corrected mean squared error (decomposition of MSE)
-   cnt_info.bcmse.v = cnt_info.mse.v - (fbar - obar)*(fbar - obar);
-
-   // Compute root mean squared error
-   cnt_info.rmse.v = sqrt(cnt_info.mse.v);
-
-   // Compute Scatter Index (SI)
-   if(!is_eq(cnt_info.obar.v, 0.0)) {
-      cnt_info.si.v = cnt_info.rmse.v / cnt_info.obar.v;
-   }
-   else {
-      cnt_info.si.v = bad_data_double;
-   }
-   
    // Compute normal confidence intervals
    cnt_info.compute_ci();
 
@@ -771,10 +757,23 @@ void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
 
    // Use input climatological probabilities or derive them
    if(cmn_flag) {
-      if(cprob_in) climo_prob = *cprob_in;
-      else         climo_prob = derive_climo_prob(pd.cdf_info_ptr,
-                                                  pd.ocmn_na, pd.ocsd_na,
-                                                  pct_info.othresh);
+
+      // Use climatological probabilities direclty, if supplied
+      if(cprob_in) {
+         climo_prob = *cprob_in;
+      }
+      // Use observation climatology data, if available
+      else if(pd.ocmn_na.n() > 0) {
+         climo_prob = derive_climo_prob(pd.cdf_info_ptr,
+                                        pd.ocmn_na, pd.ocsd_na,
+                                        pct_info.othresh);
+      }
+      // Otherwise, try using forecast climatology data
+      else {
+         climo_prob = derive_climo_prob(pd.cdf_info_ptr,
+                                        pd.fcmn_na, pd.fcsd_na,
+                                        pct_info.othresh);
+      }
    }
 
    //

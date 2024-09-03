@@ -161,7 +161,7 @@ void Nx2ContingencyTable::set_thresholds(const vector<double> &Values) {
 
 double Nx2ContingencyTable::threshold(int k) const {
 
-   // there are Nrows + 1 thresholds
+   // There are Nrows + 1 thresholds
    if(k < 0 || k > Thresholds.size()) {
       mlog << Error << "\nNx2ContingencyTable::threshold(int) const -> "
            << "range check error!\n\n";
@@ -233,32 +233,32 @@ double Nx2ContingencyTable::nonevent_count_by_thresh(double t) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-double Nx2ContingencyTable::row_obar(int row) const {
-   return compute_proportion(event_count_by_row(row), row_total(row));
-}
-
-////////////////////////////////////////////////////////////////////////
-
-double Nx2ContingencyTable::obar() const {
-   return compute_proportion(event_col_total(), n());
-}
-
-////////////////////////////////////////////////////////////////////////
-
-double Nx2ContingencyTable::row_proby(int row) const {
+void Nx2ContingencyTable::set_event(int row, double value) {
 
    if(row < 0 || row >= Nrows) {
-      mlog << Error << "\nNx2ContingencyTable::row_proby(int) const -> "
-           << "range check error\n\n";
+      mlog << Error << "\nNx2ContingencyTable::set_event(int, double) -> "
+           << "bad row index ... " << row << "\n\n";
       exit(1);
    }
 
-   double v;
+   set_entry(row, nx2_event_column, value);
 
-   if(use_center) v = 0.5*(Thresholds[row] + Thresholds[row + 1]);
-   else           v = Thresholds[row];
+   return;
+}
 
-   return v;
+////////////////////////////////////////////////////////////////////////
+
+void Nx2ContingencyTable::set_nonevent(int row, double value) {
+
+   if(row < 0 || row >= Nrows) {
+      mlog << Error << "\nNx2ContingencyTable::set_nonevent(int, double) -> "
+           << "bad row index ... " << row << "\n\n";
+      exit(1);
+   }
+
+   set_entry(row, nx2_nonevent_column, value);
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -276,6 +276,88 @@ double Nx2ContingencyTable::baser_ci(double alpha,
    compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
 
    return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double Nx2ContingencyTable::brier_score() const {
+
+   if(E.empty()) return bad_data_double;
+
+   double sum = 0.0;
+   double count;
+   double yi;
+   double t;
+
+   // Terms for event
+   for(int j=0; j<Nrows; ++j) {
+      count = event_count_by_row(j);
+      yi = row_proby(j);
+      t = yi - 1.0;
+      sum += count*t*t;
+   }
+
+   // Terms for nonevent
+   for(int j=0; j<Nrows; ++j) {
+      count = nonevent_count_by_row(j);
+      yi = row_proby(j);
+      t = yi;
+      sum += count*t*t;
+   }
+
+   return compute_proportion(sum, n());
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Compute a confidence interval for the Brier Score.
+// Reference:
+// Bradley, A.A, S.S. Schwartz, and T. Hashino, 2008:
+// Sampling Uncertainty and Confidence Intervals for the Brier Score
+// and Brier Skill Score.  Weather and Forecasting, 23, 992-1006.
+//
+////////////////////////////////////////////////////////////////////////
+
+double Nx2ContingencyTable::brier_ci_halfwidth(double alpha) const {
+   double bs = brier_score();
+   const double N = n();
+   const double Ninv = 1.0/N;
+
+   // N must be > 1 so that degf > 0 in the call to gsl_cdf_tdist_Pinv()
+   if(is_bad_data(bs) || N <= 1.0)  return bad_data_double;
+
+   double degf = N - 1.0;
+   double t = gsl_cdf_tdist_Pinv(1.0 - 0.5*alpha, degf);
+   double ob = obar();
+
+   double af1 = 0.0;
+   double sf2 = 0.0;
+   double sf3 = 0.0;
+   double af4 = 0.0;
+
+   for(int j=0; j<Nrows; ++j) {
+
+      double ee = Ninv*(   event_count_by_row(j));
+      double ne = Ninv*(nonevent_count_by_row(j));
+      double term = ee + ne;
+
+      term *= term; //  squared
+      term *= term; //  fourth power
+      af4 += term;
+      term = ee*ee;
+      af1 += ee;
+      sf2 += term;
+      sf3 += term*ee;
+   }
+
+   af4 *= Ninv;
+   af1 *= Ninv;
+
+   double term = 1.0 - 4.0*sf3 + 6.0*sf2 + 4.0*af1;
+   double var = (af4 + ob*term - bs*bs)*Ninv;
+   double halfwidth = t*sqrt(var);
+
+   return halfwidth;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -363,32 +445,32 @@ double Nx2ContingencyTable::bss_smpl() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-double Nx2ContingencyTable::brier_score() const {
+double Nx2ContingencyTable::row_obar(int row) const {
+   return compute_proportion(event_count_by_row(row), row_total(row));
+}
 
-   if(E.empty()) return bad_data_double;
+////////////////////////////////////////////////////////////////////////
 
-   double sum = 0.0;
-   double count;
-   double yi;
-   double t;
+double Nx2ContingencyTable::obar() const {
+   return compute_proportion(event_col_total(), n());
+}
 
-   // Terms for event
-   for(int j=0; j<Nrows; ++j) {
-      count = event_count_by_row(j);
-      yi = row_proby(j);
-      t = yi - 1.0;
-      sum += count*t*t;
+////////////////////////////////////////////////////////////////////////
+
+double Nx2ContingencyTable::row_proby(int row) const {
+
+   if(row < 0 || row >= Nrows) {
+      mlog << Error << "\nNx2ContingencyTable::row_proby(int) const -> "
+           << "range check error\n\n";
+      exit(1);
    }
 
-   // Terms for nonevent
-   for(int j=0; j<Nrows; ++j) {
-      count = nonevent_count_by_row(j);
-      yi = row_proby(j);
-      t = yi;
-      sum += count*t*t;
-   }
+   double v;
 
-   return compute_proportion(sum, n());
+   if(use_center) v = 0.5*(Thresholds[row] + Thresholds[row + 1]);
+   else           v = Thresholds[row];
+
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -511,58 +593,6 @@ double Nx2ContingencyTable::roc_auc() const {
    }
 
    return area;
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// Compute a confidence interval for the Brier Score.
-// Reference:
-// Bradley, A.A, S.S. Schwartz, and T. Hashino, 2008:
-// Sampling Uncertainty and Confidence Intervals for the Brier Score
-// and Brier Skill Score.  Weather and Forecasting, 23, 992-1006.
-//
-////////////////////////////////////////////////////////////////////////
-
-double Nx2ContingencyTable::brier_ci_halfwidth(double alpha) const {
-   double bs = brier_score();
-   const double N = n();
-   const double Ninv = 1.0/N;
-
-   // N must be > 1 so that degf > 0 in the call to gsl_cdf_tdist_Pinv()
-   if(is_bad_data(bs) || N <= 1.0)  return bad_data_double;
-
-   double degf = N - 1.0;
-   double t = gsl_cdf_tdist_Pinv(1.0 - 0.5*alpha, degf);
-   double ob = obar();
-
-   double af1 = 0.0;
-   double sf2 = 0.0;
-   double sf3 = 0.0;
-   double af4 = 0.0;
-
-   for(int j=0; j<Nrows; ++j) {
-
-      double ee = Ninv*(   event_count_by_row(j));
-      double ne = Ninv*(nonevent_count_by_row(j));
-      double term = ee + ne;
-
-      term *= term; //  squared
-      term *= term; //  fourth power
-      af4 += term;
-      term = ee*ee;
-      af1 += ee;
-      sf2 += term;
-      sf3 += term*ee;
-   }
-
-   af4 *= Ninv;
-   af1 *= Ninv;
-
-   double term = 1.0 - 4.0*sf3 + 6.0*sf2 + 4.0*af1;
-   double var = (af4 + ob*term - bs*bs)*Ninv;
-   double halfwidth = t*sqrt(var);
-
-   return halfwidth;
 }
 
 ////////////////////////////////////////////////////////////////////////
