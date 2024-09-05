@@ -29,12 +29,12 @@
       <pair><name>OBS_FIELD</name>       <value>{ name = "APCP"; level = [ "A06" ]; }</value></pair>
       <pair><name>MASK_POLY</name>       <value></value></pair>
       <pair><name>FHO_STATS</name>       <value>"F_RATE", "O_RATE"</value></pair>
-      <pair><name>CTC_STATS</name>       <value>"FY_OY", "FN_ON"</value></pair>
+      <pair><name>CTC_STATS</name>       <value>"ALL"</value></pair>
       <pair><name>CTS_STATS</name>       <value>"CSI", "GSS"</value></pair>
-      <pair><name>MCTC_STATS</name>      <value>"F1_O1", "F2_O2", "F3_O3"</value></pair>
+      <pair><name>MCTC_STATS</name>      <value>"ALL"</value></pair>
       <pair><name>MCTS_STATS</name>      <value>"ACC", "ACC_NCL", "ACC_NCU"</value></pair>
       <pair><name>CNT_STATS</name>       <value>"TOTAL", "ME", "ME_NCL", "ME_NCU"</value></pair>
-      <pair><name>SL1L2_STATS</name>     <value>"FBAR", "OBAR"</value></pair>
+      <pair><name>SL1L2_STATS</name>     <value>"ALL"</value></pair>
       <pair><name>SAL1L2_STATS</name>    <value></value></pair>
       <pair><name>PCT_STATS</name>       <value></value></pair>
       <pair><name>PSTD_STATS</name>      <value></value></pair>
@@ -46,22 +46,56 @@
               &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F012.grib \
               &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F018.grib \
               &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F024.grib \
-              &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F030.grib \
-              &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F036.grib \
-              &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F042.grib \
       -obs    &DATA_DIR_OBS;/stage4_hmt/stage4_2012040906_06h.grib \
               &DATA_DIR_OBS;/stage4_hmt/stage4_2012040912_06h.grib \
               &DATA_DIR_OBS;/stage4_hmt/stage4_2012040918_06h.grib \
               &DATA_DIR_OBS;/stage4_hmt/stage4_2012041000_06h.grib \
-              &DATA_DIR_OBS;/stage4_hmt/stage4_2012041006_06h.grib \
-              &DATA_DIR_OBS;/stage4_hmt/stage4_2012041012_06h.grib \
-              &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib \
-      -out    &OUTPUT_DIR;/series_analysis/series_analysis_CMD_LINE_APCP_06_2012040900_to_2012041100.nc \
+      -out    &OUTPUT_DIR;/series_analysis/series_analysis_CMD_LINE_APCP_06_2012040900_to_2012041000.nc \
       -config &CONFIG_DIR;/SeriesAnalysisConfig \
       -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/series_analysis/series_analysis_CMD_LINE_APCP_06_2012040900_to_2012041100.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/series_analysis/series_analysis_CMD_LINE_APCP_06_2012040900_to_2012041000.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="series_analysis_AGGR_CMD_LINE">
+    <exec>&MET_BIN;/series_analysis</exec>
+    <env>
+      <pair><name>MODEL</name>           <value>GFS</value></pair>
+      <pair><name>OBTYPE</name>          <value>STAGE4</value></pair>
+      <pair><name>FCST_CAT_THRESH</name> <value>>0.0, >5.0</value></pair>
+      <pair><name>FCST_FIELD</name>      <value>{ name = "APCP"; level = [ "A06" ]; }</value></pair>
+      <pair><name>OBS_CAT_THRESH</name>  <value>>0.0, >5.0</value></pair>
+      <pair><name>OBS_FIELD</name>       <value>{ name = "APCP"; level = [ "A06" ]; }</value></pair>
+      <pair><name>MASK_POLY</name>       <value></value></pair>
+      <pair><name>FHO_STATS</name>       <value>"F_RATE", "O_RATE"</value></pair>
+      <pair><name>CTC_STATS</name>       <value>"ALL"</value></pair>
+      <pair><name>CTS_STATS</name>       <value>"CSI", "GSS"</value></pair>
+      <pair><name>MCTC_STATS</name>      <value>"ALL"</value></pair>
+      <pair><name>MCTS_STATS</name>      <value>"ACC", "ACC_NCL", "ACC_NCU"</value></pair>
+      <pair><name>CNT_STATS</name>       <value>"TOTAL", "ME", "ME_NCL", "ME_NCU"</value></pair>
+      <pair><name>SL1L2_STATS</name>     <value>"ALL"</value></pair>
+      <pair><name>SAL1L2_STATS</name>    <value></value></pair>
+      <pair><name>PCT_STATS</name>       <value></value></pair>
+      <pair><name>PSTD_STATS</name>      <value></value></pair>
+      <pair><name>PJC_STATS</name>       <value></value></pair>
+      <pair><name>PRC_STATS</name>       <value></value></pair>
+    </env>
+    <param> \
+      -fcst   &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F030.grib \
+              &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F036.grib \
+              &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F042.grib \
+      -obs    &DATA_DIR_OBS;/stage4_hmt/stage4_2012041006_06h.grib \
+              &DATA_DIR_OBS;/stage4_hmt/stage4_2012041012_06h.grib \
+              &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib \
+      -aggr   &OUTPUT_DIR;/series_analysis/series_analysis_CMD_LINE_APCP_06_2012040900_to_2012041000.nc \
+      -out    &OUTPUT_DIR;/series_analysis/series_analysis_AGGR_CMD_LINE_APCP_06_2012040900_to_2012041018.nc \
+      -config &CONFIG_DIR;/SeriesAnalysisConfig \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/series_analysis/series_analysis_AGGR_CMD_LINE_APCP_06_2012040900_to_2012041018.nc</grid_nc>
     </output>
   </test>
 
@@ -69,18 +103,12 @@
     <exec>echo "&DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F009.grib \
                 &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F015.grib \
                 &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F021.grib \
-                &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F027.grib \
-                &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F033.grib \
-                &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F039.grib \
-                &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F045.grib" \
+                &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F027.grib" \
                 > &OUTPUT_DIR;/series_analysis/input_fcst_file_list; \
           echo "&DATA_DIR_OBS;/stage4_hmt/stage4_2012040906_06h.grib \
                 &DATA_DIR_OBS;/stage4_hmt/stage4_2012040912_06h.grib \
                 &DATA_DIR_OBS;/stage4_hmt/stage4_2012040918_06h.grib \
-                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041000_06h.grib \
-                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041006_06h.grib \
-                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041012_06h.grib \
-                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib" \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041000_06h.grib" \
                 > &OUTPUT_DIR;/series_analysis/input_obs_file_list; \
           &MET_BIN;/series_analysis</exec>
     <env>
@@ -99,7 +127,7 @@
       <pair><name>CNT_STATS</name>       <value></value></pair>
       <pair><name>SL1L2_STATS</name>     <value></value></pair>
       <pair><name>SAL1L2_STATS</name>    <value></value></pair>
-      <pair><name>PCT_STATS</name>       <value>"OY_1", "ON_1"</value></pair>
+      <pair><name>PCT_STATS</name>       <value>"ALL"</value></pair>
       <pair><name>PSTD_STATS</name>      <value>"TOTAL", "ROC_AUC", "BRIER", "BRIER_NCL", "BRIER_NCU"</value></pair>
       <pair><name>PJC_STATS</name>       <value>"CALIBRATION_1", "REFINEMENT_1"</value></pair>
       <pair><name>PRC_STATS</name>       <value>"PODY_1", "POFD_1"</value></pair>
@@ -107,12 +135,56 @@
     <param> \
       -fcst   &OUTPUT_DIR;/series_analysis/input_fcst_file_list \
       -obs    &OUTPUT_DIR;/series_analysis/input_obs_file_list \
-      -out    &OUTPUT_DIR;/series_analysis/series_analysis_FILE_LIST_PROB_APCP_06_2012040900_to_2012041100.nc \
+      -out    &OUTPUT_DIR;/series_analysis/series_analysis_FILE_LIST_PROB_APCP_06_2012040900_to_2012041000.nc \
       -config &CONFIG_DIR;/SeriesAnalysisConfig \
       -v 1
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/series_analysis/series_analysis_FILE_LIST_PROB_APCP_06_2012040900_to_2012041100.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/series_analysis/series_analysis_FILE_LIST_PROB_APCP_06_2012040900_to_2012041000.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="series_analysis_AGGR_FILE_LIST">
+    <exec>echo "&DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F033.grib \
+                &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F039.grib \
+                &DATA_DIR_MODEL;/grib1/sref/sref_2012040821_F045.grib" \
+                > &OUTPUT_DIR;/series_analysis/aggregate_fcst_file_list; \
+          echo "&DATA_DIR_OBS;/stage4_hmt/stage4_2012041006_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041012_06h.grib \
+                &DATA_DIR_OBS;/stage4_hmt/stage4_2012041018_06h.grib" \
+                > &OUTPUT_DIR;/series_analysis/aggregate_obs_file_list; \
+          &MET_BIN;/series_analysis</exec>
+    <env>
+      <pair><name>MODEL</name>           <value>SREF</value></pair>
+      <pair><name>OBTYPE</name>          <value>STAGE4</value></pair>
+      <pair><name>FCST_CAT_THRESH</name> <value>>=0.00, >=0.25, >=0.50, >=0.75, >=1.00</value></pair>
+      <pair><name>FCST_FIELD</name>      <value>{ name  = "PROB"; level = "A06"; prob  = { name = "APCP"; thresh_lo = 0.25; }; }</value></pair>
+      <pair><name>OBS_CAT_THRESH</name>  <value>>0.25</value></pair>
+      <pair><name>OBS_FIELD</name>       <value>{ name = "APCP"; level = "A06"; }</value></pair>
+      <pair><name>MASK_POLY</name>       <value></value></pair>
+      <pair><name>FHO_STATS</name>       <value></value></pair>
+      <pair><name>CTC_STATS</name>       <value></value></pair>
+      <pair><name>CTS_STATS</name>       <value></value></pair>
+      <pair><name>MCTC_STATS</name>      <value></value></pair>
+      <pair><name>MCTS_STATS</name>      <value></value></pair>
+      <pair><name>CNT_STATS</name>       <value></value></pair>
+      <pair><name>SL1L2_STATS</name>     <value></value></pair>
+      <pair><name>SAL1L2_STATS</name>    <value></value></pair>
+      <pair><name>PCT_STATS</name>       <value>"ALL"</value></pair>
+      <pair><name>PSTD_STATS</name>      <value>"TOTAL", "ROC_AUC", "BRIER", "BRIER_NCL", "BRIER_NCU"</value></pair>
+      <pair><name>PJC_STATS</name>       <value>"CALIBRATION_1", "REFINEMENT_1"</value></pair>
+      <pair><name>PRC_STATS</name>       <value>"PODY_1", "POFD_1"</value></pair>
+    </env>
+    <param> \
+      -fcst   &OUTPUT_DIR;/series_analysis/aggregate_fcst_file_list \
+      -obs    &OUTPUT_DIR;/series_analysis/aggregate_obs_file_list \
+      -aggr   &OUTPUT_DIR;/series_analysis/series_analysis_FILE_LIST_PROB_APCP_06_2012040900_to_2012041000.nc \
+      -out    &OUTPUT_DIR;/series_analysis/series_analysis_AGGR_FILE_LIST_PROB_APCP_06_2012040900_to_2012041018.nc \
+      -config &CONFIG_DIR;/SeriesAnalysisConfig \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/series_analysis/series_analysis_AGGR_FILE_LIST_PROB_APCP_06_2012040900_to_2012041018.nc</grid_nc>
     </output>
   </test>
 

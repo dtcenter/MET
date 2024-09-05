@@ -194,6 +194,13 @@ class Nx2ContingencyTable : public ContingencyTable {
       double threshold(int index) const;   //  0 <= index <= Nrows
 
          //
+         //  set counts
+         //
+
+      void set_event(int row, int count);
+      void set_nonevent(int row, int count);
+
+         //
          //  increment counts
          //
 

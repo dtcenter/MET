@@ -48,7 +48,7 @@ inline int is_bad_data(float a) {
 }
 
 inline int is_bad_data(char a) {
-   return(a == bad_data_char);
+   return (a == bad_data_char);
 }
 
 inline int is_eq(double a, double b, double tol) {
@@ -60,6 +60,30 @@ inline int is_eq(double a, double b) {
    return is_eq(a, b, default_tol);
 }
 
+inline int is_eq(double a, int b) {
+   return is_eq(a, (double)b);
+}
+
+inline int is_eq(int a, double b) {
+   return is_eq((double)a, b);
+}
+
+inline int is_eq(double a, unixtime b) {
+   return is_eq(a, (double)b);
+}
+
+inline int is_eq(unixtime a, double b) {
+   return is_eq((double)a, b);
+}
+
+inline int is_eq(float a, float b) {
+   return is_eq((double)a, (double)b);
+}
+
+template <typename T>
+inline int is_eq(T a, T b) {
+   return (a == b);
+}
 
 ////////////////////////////////////////////////////////////////////////
 
