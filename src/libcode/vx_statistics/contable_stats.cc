@@ -309,8 +309,8 @@ double TTContingencyTable::bagss() const {
       ha = (double) oy() - (fy_on() / lf) * lw;
    }
 
-   num = ha - (oy() * oy() / n());
-   den = 2.0*oy() - ha - (oy() * oy() / n());
+   num = ha - ((double) oy() * oy() / n());
+   den = 2.0*oy() - ha - ((double) oy() * oy() / n());
 
    if(is_eq(den, 0.0)) v = bad_data_double;
    else                v = num/den;
@@ -698,7 +698,7 @@ double TTContingencyTable::sedi_ci(double alpha,
                                    double &cl, double &cu) const {
    double v, h, f, b, se, mf, mh;
 
-   v = edi();
+   v = sedi();
    f = (double) fy_on() / (fy_on() + fn_on());
    h = pod_yes();
    b = baser();

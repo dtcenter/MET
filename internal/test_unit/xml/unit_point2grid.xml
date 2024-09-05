@@ -356,4 +356,23 @@
     </output>
   </test>
 
+  <test name="point2grid_cice_set_attr_grid">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/cice/iceh.2018-01-03.c00.tlat_tlon.nc \
+      G231 \
+      &OUTPUT_DIR;/point2grid/point2grid_cice_to_G231.nc \
+      -config &CONFIG_DIR;/Point2GridConfig_tlat_tlon \
+      -field 'name="hi_d"; level="(0,*,*)"; set_attr_grid="latlon 180 360 -80 -180 1 1";' \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_cice_to_G231.nc</grid_nc>
+    </output>
+  </test>
+
+
 </met_test>

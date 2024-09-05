@@ -797,6 +797,7 @@ MET_ATLAS
 MET_PROJLIB
 MET_PROJINC
 MET_PROJ
+MET_CXX_STANDARD
 OPENMP_CFLAGS
 am__fastdepCC_FALSE
 am__fastdepCC_TRUE
@@ -933,6 +934,7 @@ CFLAGS
 LDFLAGS
 LIBS
 CPPFLAGS
+MET_CXX_STANDARD
 MET_PROJ
 MET_PROJINC
 MET_PROJLIB
@@ -1667,6 +1669,9 @@ Some influential environment variables:
   LIBS        libraries to pass to the linker, e.g. -l<library>
   CPPFLAGS    (Objective) C/C++ preprocessor flags, e.g. -I<include dir> if
               you have headers in a nonstandard directory <include dir>
+  MET_CXX_STANDARD
+              Specify the version of the supported C++ standard. Values may be
+              11, 14, or 17. Default value is 17.
   MET_PROJ    Where proj lib and include subdirectories are located. If they
               are installed in /usr/local, you don't have to specify them.
   MET_PROJINC Where proj include files are located. Use if the libraries and
@@ -5318,6 +5323,26 @@ CPPFLAGS="${CPPFLAGS} ${OPENMP_CFLAGS}"
 LDFLAGS="${LDFLAGS} ${OPENMP_CFLAGS}"
 
 #
+# Look for a specified C++ Standard
+#
+
+# Configure the variable. The help text will appear if the user uses "configure --help".
+
+
+
+# Set a default value
+
+if (test -z "$MET_CXX_STANDARD"); then
+  MET_CXX_STANDARD=17
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: c++17 will be used as the C++ standard" >&5
+printf "%s\n" "$as_me: c++17 will be used as the C++ standard" >&6;}
+elif (test -n "$MET_CXX_STANDARD"); then
+  MET_CXX_STANDARD=${MET_CXX_STANDARD}
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: MET_CXX_STANDARD will be set" >&5
+printf "%s\n" "$as_me: MET_CXX_STANDARD will be set" >&6;}
+fi
+
+#
 # Look for the Proj library.
 #
 
@@ -6988,7 +7013,7 @@ fi
 CPPFLAGS=$CPPFLAGS' -DMET_BASE="\"$(pkgdatadir)\""'
 
 # Add -std=c++11 to CXXFLAGS
-CXXFLAGS=$CXXFLAGS' -std=c++11'
+CXXFLAGS=$CXXFLAGS' -std=c++'$MET_CXX_STANDARD
 
 # Define other variables for the makefiles
 
