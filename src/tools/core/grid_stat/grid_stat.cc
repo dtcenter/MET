@@ -791,21 +791,25 @@ void process_scores() {
 
       // Read forecast climatology data
       fcmn_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
+                   conf_info.conf.lookup_dictionary(conf_key_fcst),
+                   conf_key_climo_mean,
                    i, fcst_dp.valid(), grid,
                    "forecast climatology mean");
       fcsd_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
+                   conf_info.conf.lookup_dictionary(conf_key_fcst),
+                   conf_key_climo_stdev,
                    i, fcst_dp.valid(), grid,
                    "forecast climatology standard deviation");
 
       // Read observation climatology data
       ocmn_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
+                   conf_info.conf.lookup_dictionary(conf_key_obs),
+                   conf_key_climo_mean,
                    i, fcst_dp.valid(), grid,
                    "observation climatology mean");
       ocsd_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
+                   conf_info.conf.lookup_dictionary(conf_key_obs),
+                   conf_key_climo_stdev,
                    i, fcst_dp.valid(), grid,
                    "observation climatology standard deviation");
 
@@ -1064,21 +1068,25 @@ void process_scores() {
 
                // Read the forecast climatology data for UGRD
                fcmnu_dp = read_climo_data_plane(
-                             conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
+                             conf_info.conf.lookup_dictionary(conf_key_fcst),
+                             conf_key_climo_mean,
                              ui, fcst_dp.valid(), grid,
                              "forecast U-wind climatology mean");
                fcsdu_dp = read_climo_data_plane(
-                             conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
+                             conf_info.conf.lookup_dictionary(conf_key_fcst),
+                             conf_key_climo_stdev,
                              ui, fcst_dp.valid(), grid,
                              "forecast U-wind climatology standard deviation");
 
                // Read the observation climatology data for UGRD
                ocmnu_dp = read_climo_data_plane(
-                             conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
+                             conf_info.conf.lookup_dictionary(conf_key_obs),
+                             conf_key_climo_mean,
                              ui, fcst_dp.valid(), grid,
                              "observation U-wind climatology mean");
                ocsdu_dp = read_climo_data_plane(
-                             conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
+                             conf_info.conf.lookup_dictionary(conf_key_obs),
+                             conf_key_climo_stdev,
                              ui, fcst_dp.valid(), grid,
                              "observation U-wind climatology standard deviation");
 
@@ -1902,11 +1910,13 @@ void process_scores() {
 
                // Read climatology data for UGRD
                fcmnu_dp = read_climo_data_plane(
-                             conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
+                             conf_info.conf.lookup_dictionary(conf_key_fcst),
+                             conf_key_climo_mean,
                              ui, fcst_dp.valid(), grid,
                              "forecast U-wind climatology mean");
                ocmnu_dp = read_climo_data_plane(
-                             conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
+                             conf_info.conf.lookup_dictionary(conf_key_fcst),
+                             conf_key_climo_mean,
                              ui, fcst_dp.valid(), grid,
                              "observation U-wind climatology mean");
 
