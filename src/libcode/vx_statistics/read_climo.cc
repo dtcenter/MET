@@ -106,18 +106,25 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
    // Get the i-th array entry
    Dictionary i_dict = parse_conf_i_vx_dict(field_dict, i_vx);
 
-   // Parse the "regrid" dictionary
-   RegridInfo regrid_info;
+   // Find the correct "regrid" config file context
+   Dictionary *regrid_parent_dict = nullptr;
    cs << cs_erase << climo_name << "." << conf_key_regrid;
 
+   // First choice e.g. "config.fcst.climo_mean.regrid"
    if(dict->lookup(cs.c_str(), false)) {
-      Dictionary *climo_dict = dict->lookup_dictionary(climo_name);
-      regrid_info = parse_conf_regrid(climo_dict);
+      regrid_parent_dict = dict->lookup_dictionary(climo_name);
    }
-   else {
-      Dictionary *climo_dict = dict->parent()->lookup_dictionary(climo_name);
-      regrid_info = parse_conf_regrid(climo_dict);
+   // Second choice e.g. "config.fcst.regrid" 
+   else if(dict->lookup(conf_key_regrid)) {
+      regrid_parent_dict = dict;
    }
+   // Third choice e.g. default "config.climo_mean.regrid"
+   else if(dict->parent()->lookup(cs.c_str(), false)) {
+      regrid_parent_dict = dict->parent()->lookup_dictionary(climo_name);
+   }
+
+   // Parse the "regrid" dictionary
+   RegridInfo regrid_info = parse_conf_regrid(regrid_parent_dict);
 
    // Parse the "time_interp_method"
    cs << cs_erase << climo_name << "." << conf_key_time_interp_method;

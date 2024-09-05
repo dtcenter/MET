@@ -82,6 +82,13 @@ fcst = {
       file_name = [ "${FCST_CLIMO_DIR}/cstdv_1d.19590410" ];
    };
 
+   regrid = {
+      method     = BILIN;
+      width      = 2;
+      vld_thresh = 0.5;
+      shape      = SQUARE;
+   }
+
    time_interp_method = DW_MEAN;
    day_interval       = 1;
    hour_interval      = 6;
@@ -107,6 +114,13 @@ obs = {
                     "${OBS_CLIMO_DIR}/u850hPa_stdev.grib",
                     "${OBS_CLIMO_DIR}/v850hPa_stdev.grib" ];
    };
+
+   regrid = {
+      method     = BILIN;
+      width      = 2;
+      vld_thresh = 0.5;
+      shape      = SQUARE;
+   }
 
    time_interp_method = DW_MEAN;
    day_interval       = 1;
