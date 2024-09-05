@@ -122,6 +122,11 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
    else if(dict->parent()->lookup(cs.c_str(), false)) {
       regrid_parent_dict = dict->parent()->lookup_dictionary(climo_name);
    }
+   else {
+      mlog << Error << "\n" << method_name
+           << "Trouble parsing configuration entry: " << cs << "\n";
+      exit(1);
+   }
 
    // Parse the "regrid" dictionary
    RegridInfo regrid_info = parse_conf_regrid(regrid_parent_dict);
