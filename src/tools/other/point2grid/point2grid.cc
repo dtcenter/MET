@@ -963,7 +963,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
             var_index_array.add(idx);
             var_count++;
-            if (is_eq(obs_data->obs_vals[idx], 0.)) obs_count_zero_from++;
+            if (is_eq(obs_data->obs_vals[idx], (float)0.)) obs_count_zero_from++;
             else obs_count_non_zero_from++;
          }
       }
