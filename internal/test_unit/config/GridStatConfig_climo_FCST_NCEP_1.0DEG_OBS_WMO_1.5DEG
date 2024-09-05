@@ -75,23 +75,24 @@ fcst = {
    climo_mean = {
       field = field_list;
       file_name = [ "${FCST_CLIMO_DIR}/cmean_1d.19590410" ];
+
+      regrid = {
+         method     = BILIN;
+         width      = 2;
+         vld_thresh = 0.5;
+         shape      = SQUARE;
+      }
+
+      time_interp_method = DW_MEAN;
+      day_interval       = 1;
+      hour_interval      = 6;
    };
 
+   climo_stdev = climo_mean;
    climo_stdev = {
-      field = field_list;
       file_name = [ "${FCST_CLIMO_DIR}/cstdv_1d.19590410" ];
    };
 
-   regrid = {
-      method     = BILIN;
-      width      = 2;
-      vld_thresh = 0.5;
-      shape      = SQUARE;
-   }
-
-   time_interp_method = DW_MEAN;
-   day_interval       = 1;
-   hour_interval      = 6;
 }
 
 obs = {
@@ -106,25 +107,24 @@ obs = {
                     "${OBS_CLIMO_DIR}/u850hPa_mean.grib",
                     "${OBS_CLIMO_DIR}/v500hPa_mean.grib",
                     "${OBS_CLIMO_DIR}/v850hPa_mean.grib" ];
+      regrid = {
+         method     = BILIN;
+         width      = 2;
+         vld_thresh = 0.5;
+         shape      = SQUARE;
+      }
+
+      time_interp_method = DW_MEAN;
+      day_interval       = 1;
+      hour_interval      = 12;
    };
 
+   climo_stdev = climo_mean;
    climo_stdev = {
-      field = field_list;
       file_name = [ "${OBS_CLIMO_DIR}/t850hPa_stdev.grib",
                     "${OBS_CLIMO_DIR}/u850hPa_stdev.grib",
                     "${OBS_CLIMO_DIR}/v850hPa_stdev.grib" ];
    };
-
-   regrid = {
-      method     = BILIN;
-      width      = 2;
-      vld_thresh = 0.5;
-      shape      = SQUARE;
-   }
-
-   time_interp_method = DW_MEAN;
-   day_interval       = 1;
-   hour_interval      = 12;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
