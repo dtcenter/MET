@@ -284,26 +284,6 @@
     </output>
   </test>
 
-<!--
-  <test name="point2grid_tripolar_gfs_ocean">
-    <exec>&MET_BIN;/point2grid</exec>
-    <env>
-      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
-    </env>
-    <param> \
-      &DATA_DIR_OBS;/point_obs/gfs.ocean.t00z.6hr_avg.f006_SST.nc \
-      "latlon 360 180 -90 -180 1.0 1.0" \
-      &OUTPUT_DIR;/point2grid/point2grid_gfs_ocean_SST.nc \
-      -field 'name="SST"; level="(0,*,*)";' \
-      -config &CONFIG_DIR;/Point2GridConfig_SST \
-      -v 1
-    </param>
-    <output>
-      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_gfs_ocean_SST.nc</grid_nc>
-    </output>
-  </test>
--->
-
   <test name="point2grid_tripolar_rtofs">
     <exec>&MET_BIN;/point2grid</exec>
     <env>
@@ -318,6 +298,24 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_rtofs_ice_coverage.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="point2grid_gfs_1D_lat_lon">
+    <exec>&MET_BIN;/point2grid</exec>
+    <env>
+      <pair><name>MET_TMP_DIR</name>  <value>&OUTPUT_DIR;/point2grid</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/point_obs/gfs.ocean.t00z.6hr_avg.f006_SST.nc \
+      G231 \
+      &OUTPUT_DIR;/point2grid/point2grid_gfs.ocean.SST.nc \
+      -config &CONFIG_DIR;/Point2GridConfig_SST \
+      -field 'name="SST";  level="(0,*,*)";' \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/point2grid_gfs.ocean.SST.nc</grid_nc>
     </output>
   </test>
 
