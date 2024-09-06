@@ -2358,7 +2358,7 @@ Three grid weighting options are currently supported:
 * "COS_LAT" to define the weight as the cosine of the grid point latitude.
   This an approximation for grid box area used by NCEP and WMO.
   
-* "AREA" to define the weight as the true area of the grid box (km^2).
+* AREA to define the weight as the true area of the grid box (km^2).
 
 The weights are ultimately computed as the weight at each grid point divided
 by the sum of the weights for the current masking region.
@@ -3347,7 +3347,7 @@ The object definition settings for MODE are contained within the "fcst" and
 
   The "filter_attr_name" entry is an array of strings specifying the MODE
   output header column names for the object attributes of interest, such
-  as "AREA", "LENGTH", "WIDTH", and "INTENSITY_50". In addition,
+  as AREA, LENGTH, WIDTH, and INTENSITY_50. In addition,
   "ASPECT_RATIO" specifies the aspect ratio (width/length),
   "INTENSITY_101" specifies the  mean intensity value, and "INTENSITY_102"
   specifies the sum of the intensity values.
@@ -4439,7 +4439,7 @@ grid_decomp_flag
 The "grid_decomp_flag" entry specifies how the grid should be decomposed in
 Wavelet-Stat into dyadic (2^n x 2^n) tiles:
 
-* "AUTO" to tile the input data using tiles of dimension n by n where n
+* AUTO to tile the input data using tiles of dimension n by n where n
   is the largest integer power of 2 less than the smallest dimension of
   the input data. Center as many tiles as possible with no overlap.
 * "TILE" to use the tile definition specified below.
