@@ -247,7 +247,7 @@ Environment Variable Descriptions
     containing the bin, include, lib, and share directories for Python.
 
     **MET_PYTHON_CC** - Format is -I followed by the directory containing
-    the Python include files (ex. -I/usr/local/python3/include/python3.10).
+    the Python include files (e.g. -I/usr/local/python3/include/python3.10).
     This information may be obtained by 
     running :code:`python3-config --cflags`;
     however, this command can, on certain systems, 
@@ -257,7 +257,7 @@ Environment Variable Descriptions
     the Python library 
     files then a space, then -l followed by the necessary Python
     libraries to link to 
-    (ex. -L/usr/local/python3/lib/\\ -lpython3.10\\
+    (e.g. -L/usr/local/python3/lib/\\ -lpython3.10\\
     -lpthread\\ -ldl\\ -lutil\\ -lm). 
     The backslashes are necessary in the example shown because of
     the spaces, which will be 
@@ -285,7 +285,11 @@ Environment Variable Descriptions
     without a specified value of cores to use.  The automated MET
     testing scripts in the 
     Docker environment have been successful with a value of
-    5 (ex. export MAKE_ARGS=”-j 5”).
+    5 (e.g. export MAKE_ARGS=”-j 5”).
+
+    **export MET_CXX_STANDARD** - Specify the version of the supported
+    C++ standard. Values may be 11, 14, or 17. The default value is 17.
+    (e.g. export MET_CXX_STANDARD=11).
 
 
 External Library Handling in compile_MET_all.sh

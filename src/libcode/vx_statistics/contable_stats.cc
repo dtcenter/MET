@@ -259,8 +259,7 @@ double TTContingencyTable::bagss() const {
       double num = ha - (oy() * oy() / n());
       double den = 2.0*oy() - ha - (oy() * oy() / n());
 
-      if(is_eq(den, 0.0)) v = bad_data_double;
-      else                v = num / den;
+      v = compute_proportion(num, den);
    }
 
    return v;
@@ -630,8 +629,7 @@ double TTContingencyTable::sedi() const {
       double num = (log(f) - log(h) - log(1 - f) + log(1 - h));
       double den = (log(f) + log(h) + log(1 - f) + log(1 - h));
 
-      if(is_eq(den, 0.0)) v = bad_data_double;
-      else                v = num / den;
+      v = compute_proportion(num, den);
    }
 
    return v;

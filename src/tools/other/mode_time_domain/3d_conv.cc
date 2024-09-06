@@ -154,8 +154,6 @@ struct DataHandle {
 
    {
 
-      int j;
-
       _out.put('\n');
 
       _out << "   DataHandle:\n";
@@ -168,13 +166,13 @@ struct DataHandle {
 
       _out << "   plane_loaded = [";
 
-      for (j=0; j<time_radius; ++j)  _out << ' ' << bool_to_string(plane_loaded[j]);
+      for (int j=0; j<time_radius; ++j)  _out << ' ' << bool_to_string(plane_loaded[j]);
 
       _out << " ]\n";
 
       _out << "   plane_time = [";
 
-      for (j=0; j<time_radius; ++j)  {
+      for (int j=0; j<time_radius; ++j)  {
 
          _out << ' ';
 
@@ -221,15 +219,14 @@ MtdFloatFile MtdFloatFile::convolve(const int spatial_R, const int time_beg, con
 
 {
 
-int j, k, n;
-int x, y, t;
+int n;
 int n_good;
 double value;
 MtdFloatFile out;
-double min_conv_value, max_conv_value;
-double * conv_data = (double *) nullptr;
+double min_conv_value;
+double max_conv_value;
+auto conv_data = (double *) nullptr;
 DataHandle handle;
-unixtime time_start, time_stop;
 
 const int time_radius = time_end - time_beg + 1;
 
@@ -262,7 +259,7 @@ ok_sum_plane_buf = new bool   [Nxy];
 handle.set_size(Nx, Ny, time_radius);
 
 conv_data = new double [Nxyz];
-for (k=0; k<Nxyz; k++) conv_data[k] = bad_data_double;
+for (int k=0; k<Nxyz; k++) conv_data[k] = bad_data_double;
 
 if ( !conv_data )  {
 
@@ -279,11 +276,11 @@ if ( !conv_data )  {
 min_conv_value =  1.0e100;
 max_conv_value = -1.0e100;
 
-time_start = time(0);
+unixtime time_start = time(nullptr);
 
 // cout << "\n\n  n = " << mtd_three_to_one(Nx, Ny, Nt, 88, 397, 0) << "\n\n";
 
-for (t=0; t<Nt; ++t)  {
+for (int t=0; t<Nt; ++t)  {
 
    n = mtd_three_to_one(Nx, Ny, Nt, 0, 0, t);
 
@@ -293,7 +290,7 @@ for (t=0; t<Nt; ++t)  {
 
    // handle.dump(cout);
 
-   for (k=0; k<time_radius; ++k)  {
+   for (int k=0; k<time_radius; ++k)  {
 
       ss[k] = handle.sum_plane[k];
 
@@ -305,17 +302,15 @@ for (t=0; t<Nt; ++t)  {
       //   the order of loops is important here
       //
 
-   for (j=0; j<Nxy; ++j)  {
+   for (int j=0; j<Nxy; ++j)  {
 
       // if ( (t == 0) && (j == 243846) )  {
-      //
       //    cerr << "ok\n";
-      //
       // }
 
       bool has_good_data = false;
 
-      for (k=0; k<time_radius; ++k)  {
+      for (int k=0; k<time_radius; ++k)  {
 
          if ( handle.plane_loaded[k] && *(ok[k]) ) {
             has_good_data = true;
@@ -331,7 +326,7 @@ for (t=0; t<Nt; ++t)  {
 
          n_good = 0;
 
-         for (k=0; k<time_radius; ++k)  {
+         for (int k=0; k<time_radius; ++k)  {
             if ( handle.plane_loaded[k] && *(ok[k]) )  { value += (*ss[k]);  ++n_good; }
          }
 
@@ -346,9 +341,9 @@ for (t=0; t<Nt; ++t)  {
 
       }
 
-      *p++ = value;
+      if ((n + j) < Nxyz) *p++ = value;
 
-      for (k=0; k<time_radius; ++k)  {
+      for (int k=0; k<time_radius; ++k)  {
 
          ++(ss[k]);
          ++(ok[k]);
@@ -359,13 +354,12 @@ for (t=0; t<Nt; ++t)  {
 
 }   //  for t
 
-time_stop = time(0);
-
 
 mlog << Debug(5) << "Conv data range is " << min_conv_value << " to " << max_conv_value << "\n\n";
 
 
 if ( verbose )  {
+   unixtime time_stop = time(nullptr);
 
    mlog << Debug(5) << "\n  Conv time       = " << (time_stop - time_start) << " seconds\n";
 
@@ -392,7 +386,7 @@ out.set_spatial_radius(spatial_R);
 
 out.set_time_window(time_beg, time_end);
 
-for (j=0; j<Nt; ++j)  {
+for (int j=0; j<Nt; ++j)  {
 
    out.set_lead_time(j, lead_time(j));
 
@@ -404,13 +398,13 @@ for (j=0; j<Nt; ++j)  {
    //
 
 
-for (x=0; x<Nx; ++x)  {
+for (int x=0; x<Nx; ++x)  {
 
    // if ( verbose && ((x%100) == 0) )  mlog << Debug(5) << "Pass 2: x = " << x << " of " << Nx << "\n";
 
-   for (y=0; y<Ny; ++y)  {
+   for (int y=0; y<Ny; ++y)  {
 
-      for (t=0; t<Nt; ++t)  {
+      for (int t=0; t<Nt; ++t)  {
 
          n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
 

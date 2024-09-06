@@ -26,6 +26,7 @@
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_log.h"
+#include "data2d_utils.h"
 
 using namespace std;
 
@@ -541,25 +542,7 @@ void VarInfo::set_dict(Dictionary &dict) {
 
    // Parse set_attr grid
    s = parse_set_attr_string(dict, conf_key_set_attr_grid);
-   if(s.nonempty()) {
-
-      // Parse as a white-space separated string
-      StringArray sa;
-      sa.parse_wsss(s);
-
-      // Search for a named grid
-      if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), SetAttrGrid)) {
-      }
-      // Parse grid definition
-      else if(sa.n() > 1 && parse_grid_def(sa, SetAttrGrid)) {
-      }
-      else {
-         mlog << Warning << "\nVarInfo::set_dict() -> "
-              << "unsupported " << conf_key_set_attr_grid
-              << " definition string (" << s
-              << ")!\n\n";
-      }
-   }
+   build_grid_by_grid_string(s, SetAttrGrid, "VarInfo::set_dict(Dictionary &dict) ->");
 
    // Parse set_attr times
    s = parse_set_attr_string(dict, conf_key_set_attr_init);
