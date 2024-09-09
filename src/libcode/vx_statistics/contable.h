@@ -146,8 +146,8 @@ class Nx2ContingencyTable : public ContingencyTable {
 
       void clear();
 
-      void set_size(int NR);
-      void set_size(int NR, int NC); // NC must be 2
+      void set_size(int NR) override;
+      void set_size(int NR, int NC) override; // NC must be 2
 
       void set_thresholds(const std::vector<double> &);
 
@@ -223,8 +223,8 @@ class TTContingencyTable : public ContingencyTable {
       TTContingencyTable(const TTContingencyTable &);
       TTContingencyTable & operator=(const TTContingencyTable &);
 
-      void set_size(int);
-      void set_size(int NR, int NC);
+      void set_size(int) override;
+      void set_size(int NR, int NC) override;
 
       // Set table entries
       void set_fn_on(double);

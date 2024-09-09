@@ -272,10 +272,10 @@ double TTContingencyTable::bagss() const {
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::hk() const {
-   double a = (long long) fy_oy();
-   double b = (long long) fy_on();
-   double c = (long long) fn_oy();
-   double d = (long long) fn_on();
+   double a = fy_oy();
+   double b = fy_on();
+   double c = fn_oy();
+   double d = fn_on();
 
    double num = (a*d - b*c);
    double den = (a + c)*(b + d);
@@ -759,8 +759,6 @@ double ContingencyTable::gheidke() const {
 
    sum = 0.0;
    for(int j=0; j<Nrows; ++j) {
-      double k = row_total(j);
-      double m = col_total(j);
       sum += (row_total(j)/DN)*(col_total(j)/DN);
    }
 
