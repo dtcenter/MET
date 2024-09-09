@@ -384,7 +384,7 @@ At runtime, the MET tools read default GRIB tables from the installed
 *share/met/table_files* directory, and their file formats are described below:
 
 GRIB1 table files begin with "grib1" prefix and end with a ".txt" suffix.
-The first line of the file must contain "GRIB1".
+The first line of the file must contain GRIB1.
 The following lines consist of 4 integers followed by 3 strings:
 
 | Column 1: GRIB code (e.g. 11 for temperature)
@@ -404,7 +404,7 @@ References:
 | 
 
 GRIB2 table files begin with "grib2" prefix and end with a ".txt" suffix.
-The first line of the file must contain "GRIB2".
+The first line of the file must contain GRIB2.
 The following lines consist of 8 integers followed by 3 strings.
 
 | Column 1:  Section 0 Discipline
@@ -824,7 +824,7 @@ using the following entries:
   - width = 4;    To regrid using a 4x4 box or circle with diameter 4.
 
 * The "shape" entry defines the shape of the neighborhood.
-  Valid values are "SQUARE" or "CIRCLE"
+  Valid values are SQUARE or CIRCLE
 
 * The "gaussian_dx" entry specifies a delta distance for Gaussian
   smoothing. The default is 81.271. Ignored if not Gaussian method.
@@ -1037,9 +1037,9 @@ to be verified. This dictionary may include the following entries:
     thresholds to specify which matched pairs should be included in the
     statistics. These options apply to the Point-Stat and Grid-Stat tools.
     They are parsed seperately for each "obs.field" array entry.
-    The "mpr_column" strings specify MPR column names ("FCST", "OBS",
-    "CLIMO_MEAN", "CLIMO_STDEV", or "CLIMO_CDF"), differences of columns
-    ("FCST-OBS"), or the absolute value of those differences ("ABS(FCST-OBS)").
+    The "mpr_column" strings specify MPR column names (FCST, OBS,
+    CLIMO_MEAN, CLIMO_STDEV, or CLIMO_CDF), differences of columns
+    (FCST-OBS), or the absolute value of those differences (ABS(FCST-OBS)).
     The number of "mpr_thresh" thresholds must match the number of "mpr_column"
     entries, and the n-th threshold is applied to the n-th column. Any matched
     pairs which do not meet any of the specified thresholds are excluded from
@@ -1058,12 +1058,12 @@ to be verified. This dictionary may include the following entries:
   * The "cnt_thresh" entry is an array of thresholds for filtering
     data prior to computing continuous statistics and partial sums.
 
-  * The "cnt_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
+  * The cnt_logic entry may be set to UNION, INTERSECTION, or SYMDIFF
     and controls the logic for how the forecast and observed cnt_thresh
     settings are combined when filtering matched pairs of forecast and
     observed values.
 
-* The "file_type" entry specifies the input gridded data file type rather
+* The file_type entry specifies the input gridded data file type rather
   than letting the code determine it. MET determines the file type by
   checking for known suffixes and examining the file contents. Use this
   option to override the code's choice. The valid file_type values are
@@ -1093,17 +1093,17 @@ to be verified. This dictionary may include the following entries:
                                   an xarray object.
     }
 
-* The "wind_thresh" entry is an array of thresholds used to filter wind
+* The wind_thresh entry is an array of thresholds used to filter wind
   speed values when computing VL1L2 vector partial sums. Only those U/V
   pairs that meet this wind speed criteria will be included in the sums.
   Setting this threshold to NA will result in all U/V pairs being used.
 
-* The "wind_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
+* The wind_logic entry may be set to UNION, INTERSECTION, or SYMDIFF
   and controls the logic for how the forecast and observed wind_thresh
   settings are combined when filtering matched pairs of forecast and
   observed wind speeds.
 
-* The "eclv_points" entry specifies the economic cost/loss ratio points
+* The eclv_points entry specifies the economic cost/loss ratio points
   to be evaluated. For each cost/loss ratio specified, the relative value
   will be computed and written to the ECLV output line. This entry may
   either be specified as an array of numbers between 0 and 1 or as a single
@@ -1112,26 +1112,26 @@ to be verified. This dictionary may include the following entries:
   eclv_points defines the spacing. Cost/loss values are omitted for
   ratios of 0.0 and 1.0 since they are undefined.
 
-* The "init_time" entry specifies the initialization time in
+* The init_time entry specifies the initialization time in
   YYYYMMDD[_HH[MMSS]]
   format. This entry can be included in the "fcst" entry as shown below or
   included in the "field" entry if the user would like to use different
   initialization times for different fields.
 
-* The "valid_time" entry specifies the valid time in YYYYMMDD[_HH[MMSS]]
+* The valid_time entry specifies the valid time in YYYYMMDD[_HH[MMSS]]
   format. This entry can be included in the "fcst" entry as shown below or
   included in the "field" entry if the user would like to use different
   valid times for different fields.
 
-* The "lead_time" entry specifies the lead time in HH[MMSS]
+* The lead_time entry specifies the lead time in HH[MMSS]
   format. This entry can be included in the "fcst" entry as shown below or
   included in the "field" entry if the user would like to use different
   lead times for different fields.
 
-It is only necessary to use the "init_time", "valid_time", and/or "lead_time"
+It is only necessary to use the init_time, valid_time, and/or lead_time
 settings when verifying a file containing data for multiple output times.
 For example, to verify a GRIB file containing data for many lead times, you
-could use "lead_time" to specify the record to be verified.
+could use lead_time to specify the record to be verified.
 
 File-format specific settings for the "field" entry:
 
@@ -1170,64 +1170,64 @@ File-format specific settings for the "field" entry:
       extended PDS for ensembles. Set to "hi_res_ctl", "low_res_ctl",
       "+n", or "-n", for the n-th ensemble member.
        
-    * The "GRIB1_ptv" entry is an integer specifying the GRIB1 parameter
+    * The GRIB1_ptv entry is an integer specifying the GRIB1 parameter
       table version number.
        
-    * The "GRIB1_code" entry is an integer specifying the GRIB1 code (wgrib
+    * The GRIB1_code entry is an integer specifying the GRIB1 code (wgrib
       kpds5 value).
        
-    * The "GRIB1_center" is an integer specifying the originating center.
+    * The GRIB1_center is an integer specifying the originating center.
        
-    * The "GRIB1_subcenter" is an integer specifying the originating
+    * The GRIB1_subcenter is an integer specifying the originating
       subcenter.
        
-    * The "GRIB1_tri" is an integer specifying the time range indicator.
+    * The GRIB1_tri is an integer specifying the time range indicator.
        
-    * The "GRIB2_mtab" is an integer specifying the master table number.
+    * The GRIB2_mtab is an integer specifying the master table number.
        
-    * The "GRIB2_ltab" is an integer specifying the local table number.
+    * The GRIB2_ltab is an integer specifying the local table number.
        
-    * The "GRIB2_disc" is an integer specifying the GRIB2 discipline code.
+    * The GRIB2_disc is an integer specifying the GRIB2 discipline code.
        
-    * The "GRIB2_parm_cat" is an integer specifying the parameter category
+    * The GRIB2_parm_cat is an integer specifying the parameter category
       code.
        
-    * The "GRIB2_parm" is an integer specifying the parameter code.
+    * The GRIB2_parm is an integer specifying the parameter code.
        
-    * The "GRIB2_pdt" is an integer specifying the product definition
+    * The GRIB2_pdt is an integer specifying the product definition
       template (Table 4.0).
        
-    * The "GRIB2_process" is an integer specifying the generating process
+    * The GRIB2_process is an integer specifying the generating process
       (Table 4.3).
        
-    * The "GRIB2_cntr" is an integer specifying the originating center.
+    * The GRIB2_cntr is an integer specifying the originating center.
        
-    * The "GRIB2_ens_type" is an integer specifying the ensemble type
+    * The GRIB2_ens_type is an integer specifying the ensemble type
       (Table 4.6).
        
-    * The "GRIB2_der_type" is an integer specifying the derived product
+    * The GRIB2_der_type is an integer specifying the derived product
       type (Table 4.7).
        
-    * The "GRIB2_stat_type" is an integer specifying the statistical
+    * The GRIB2_stat_type is an integer specifying the statistical
       processing type (Table 4.10).
 
-    * The "GRIB2_perc_val" is an integer specifying the requested percentile
+    * The GRIB2_perc_val is an integer specifying the requested percentile
       value (0 to 100) to be used. This applies only to GRIB2 product
       definition templates 4.6 and 4.10.
 
-    * The "GRIB2_aerosol_type" is an integer specifying the aerosol type
-      (Table 4.233). This applies only to GRIB2 product defintion templates
+    * The GRIB2_aerosol_type is an integer specifying the aerosol type
+      (Table 4.233). This applies only to GRIB2 product definition templates
       4.46 and 4.48.
 
-    * The "GRIB2_aerosol_interval_type" is an integer specifying the aerosol
-      size interval (Table 4.91). This applies only to GRIB2 product defintion
+    * The GRIB2_aerosol_interval_type is an integer specifying the aerosol
+      size interval (Table 4.91). This applies only to GRIB2 product definition
       templates 4.46 and 4.48.
 
-    * The "GRIB2_aerosol_size_lower" and "GRIB2_aerosol_size_upper" are doubles
+    * The GRIB2_aerosol_size_lower and "GRIB2_aerosol_size_upper" are doubles
       specifying the endpoints of the aerosol size interval. These applies only
       to GRIB2 product defintion templates 4.46 and 4.48.
 
-    * The "GRIB2_ipdtmpl_index" and "GRIB2_ipdtmpl_val" entries are arrays
+    * The GRIB2_ipdtmpl_index and GRIB2_ipdtmpl_val entries are arrays
       of integers which specify the product description template values to
       be used. The indices are 0-based. For example, use the following to
       request a GRIB2 record whose 9-th and 27-th product description
@@ -1724,11 +1724,11 @@ in the Wavelet-Stat and MODE tools:
 
  * "NONE" to perform no masking of missing data
    
- * "FCST" to mask the forecast field with missing observation data
+ * FCST to mask the forecast field with missing observation data
    
  * "OBS" to mask the observation field with missing forecast data
    
- * "BOTH" to mask both fields with missing data from the other
+ * BOTH to mask both fields with missing data from the other
 
 .. code-block:: none
 
@@ -1930,7 +1930,7 @@ should be used for computing bootstrap confidence intervals:
 
 * The "interval" entry specifies the confidence interval method:
   
-  * "BCA" for the BCa (bias-corrected percentile) interval method is
+  * BCA for the BCa (bias-corrected percentile) interval method is
     highly accurate but computationally intensive.
     
   * "PCTILE" uses the percentile method which is somewhat less accurate
@@ -1995,11 +1995,11 @@ This dictionary may include the following entries:
   should be applied. This does not apply when doing point verification
   with the Point-Stat or Ensemble-Stat tools:
   
-  * "FCST" to interpolate/smooth the forecast field.
+  * FCST to interpolate/smooth the forecast field.
     
   * "OBS" to interpolate/smooth the observation field.
     
-  * "BOTH" to interpolate/smooth both the forecast and the observation.
+  * BOTH to interpolate/smooth both the forecast and the observation.
 
 * The "vld_thresh" entry specifies a number between 0 and 1. When
   performing interpolation over some neighborhood of points the ratio of
@@ -2186,7 +2186,7 @@ This dictionary may include the following entries:
   output line and used for computing probabilistic statistics.
 
 * The "shape" entry defines the shape of the neighborhood.
-  Valid values are "SQUARE" or "CIRCLE"
+  Valid values are SQUARE or CIRCLE
 
 * The "prob_cat_thresh" entry defines the thresholds which define ensemble
   probabilities from which to compute the ranked probability score output.
@@ -2216,7 +2216,7 @@ output line type from the MET tools. Each line type may be set to one of:
   
 * "STAT" to write the verification output only to the ".stat" output file
   
-* "BOTH" to write to the ".stat" output file as well the optional
+* BOTH to write to the ".stat" output file as well the optional
   "_type.txt" file, a more readable ASCII file sorted by line type.
 
 .. code-block:: none
@@ -2355,7 +2355,7 @@ Three grid weighting options are currently supported:
 
 * "NONE" to disable grid weighting using a constant weight (default).
   
-* "COS_LAT" to define the weight as the cosine of the grid point latitude.
+* COS_LAT to define the weight as the cosine of the grid point latitude.
   This an approximation for grid box area used by NCEP and WMO.
   
 * AREA to define the weight as the true area of the grid box (km^2).
@@ -2438,7 +2438,7 @@ currently supported:
   
 * "UW_MEAN" compute an unweighted mean of the observations
   
-* "DW_MEAN" compute a weighted mean of the observations based
+* DW_MEAN compute a weighted mean of the observations based
   on the time of the observation
   
 * "MEDIAN" use the median observation
@@ -3376,9 +3376,9 @@ The object definition settings for MODE are contained within the "fcst" and
    * "THRESH" for the double-threshold merging method. Merge objects
      that would be part of the same object at the lower threshold.
      
-   * "ENGINE" for the fuzzy logic approach comparing the field to itself
+   * ENGINE for the fuzzy logic approach comparing the field to itself
      
-   * "BOTH" for both the double-threshold and engine merging methods
+   * BOTH for both the double-threshold and engine merging methods
 
 .. code-block:: none
 
@@ -3419,11 +3419,11 @@ The "match_flag" entry specifies the matching method to be applied:
 
 * "NONE" for no matching between forecast and observation objects
   
-* "MERGE_BOTH" for matching allowing additional merging in both fields.
+* MERGE_BOTH for matching allowing additional merging in both fields.
   If two objects in one field match the same object in the other field,
   those two objects are merged.
   
-* "MERGE_FCST" for matching allowing only additional forecast merging
+* MERGE_FCST for matching allowing only additional forecast merging
   
 * "NO_MERGE" for matching with no additional merging in either field
 
@@ -3885,7 +3885,7 @@ See `Code table for observation quality markers <http://www.emc.ncep.noaa.gov/mm
 event_stack_flag
 ^^^^^^^^^^^^^^^^
 
-The "event_stack_flag" entry is set to "TOP" or "BOTTOM" to
+The "event_stack_flag" entry is set to TOP or BOTTOM to
 specify whether observations should be drawn from the top of the event
 stack (most quality controlled) or the bottom of the event stack (most raw).
 
@@ -4487,20 +4487,20 @@ wavelet decomposition should be performed:
 
 * Valid combinations of the two are listed below:
     
-  * "HAAR" for Haar wavelet (member = 2)
+  * HAAR for Haar wavelet (member = 2)
       
-  * "HAAR_CNTR" for Centered-Haar wavelet (member = 2)
+  * HAAR_CNTR for Centered-Haar wavelet (member = 2)
 
-  * "DAUB" for Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16,
+  * DAUB for Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16,
     18, 20)
 	
-  * "DAUB_CNTR" for Centered-Daubechies wavelet (member = 4, 6, 8, 10,
+  * DAUB_CNTR for Centered-Daubechies wavelet (member = 4, 6, 8, 10,
     12, 14, 16, 18, 20)
 	 
-  * "BSPLINE" for Bspline wavelet (member = 103, 105, 202, 204, 206,
+  * BSPLINE for Bspline wavelet (member = 103, 105, 202, 204, 206,
     208, 301, 303, 305, 307, 309)
 
-  * "BSPLINE_CNTR" for Centered-Bspline wavelet (member = 103, 105, 202,
+  * BSPLINE_CNTR for Centered-Bspline wavelet (member = 103, 105, 202,
     204, 206, 208, 301, 303, 305, 307, 309)
 
 .. code-block:: none
