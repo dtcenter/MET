@@ -44,6 +44,18 @@
     </output>
   </test>
 
+    <test name="ascii2nc_GAGE_24hr_badfile">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <retval>1</retval>
+    <param> \
+      &DATA_DIR_OBS;/gauge/2012041012.badfile.ascii \
+      &OUTPUT_DIR;/ascii2nc/gauge_2012041012_24hr.nc \
+      -v 1
+    </param>
+    <output>
+    </output>
+  </test>  
+
   <test name="ascii2nc_duplicates">
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
