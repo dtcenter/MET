@@ -235,12 +235,12 @@ Specify whether special processing should be performed for interpolated model
 names ending in 'I' (e.g. AHWI).  Search for corresponding tracks whose model
 name ends in '2' (e.g. AHW2) and apply the following logic:
 
-* "NONE" to do nothing.
+* NONE to do nothing.
 
-* "FILL" to create a copy of '2' track and rename it as 'I' only when the
+* FILL to create a copy of '2' track and rename it as 'I' only when the
   'I' track does not already exist.
      
-* "REPLACE" to create a copy of the '2' track and rename it as 'I' in all
+* REPLACE to create a copy of the '2' track and rename it as 'I' in all
   cases, replacing any 'I' tracks that may already exist.
 
 .. code-block:: none
