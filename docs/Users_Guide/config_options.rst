@@ -744,7 +744,7 @@ The "regrid" entry is a dictionary containing information about how to handle
 input gridded data files. The "regrid" entry specifies regridding logic
 using the following entries:
 
-* The to_grid entry may be set to NONE, FCST, OBS, a named grid, the path
+* The "to_grid" entry may be set to NONE, FCST, OBS, a named grid, the path
   to a gridded data file defining the grid, or an explicit grid specification
   string.
   
@@ -1037,7 +1037,7 @@ to be verified. This dictionary may include the following entries:
     thresholds to specify which matched pairs should be included in the
     statistics. These options apply to the Point-Stat and Grid-Stat tools.
     They are parsed seperately for each "obs.field" array entry.
-    The mpr_column strings specify MPR column names (FCST, OBS,
+    The "mpr_column" strings specify MPR column names (FCST, OBS,
     CLIMO_MEAN, CLIMO_STDEV, or CLIMO_CDF), differences of columns
     (FCST-OBS), or the absolute value of those differences (ABS(FCST-OBS)).
     The number of "mpr_thresh" thresholds must match the number of "mpr_column"
@@ -1058,12 +1058,12 @@ to be verified. This dictionary may include the following entries:
   * The "cnt_thresh" entry is an array of thresholds for filtering
     data prior to computing continuous statistics and partial sums.
 
-  * The cnt_logic entry may be set to UNION, INTERSECTION, or SYMDIFF
+  * The "cnt_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
     and controls the logic for how the forecast and observed cnt_thresh
     settings are combined when filtering matched pairs of forecast and
     observed values.
 
-* The file_type entry specifies the input gridded data file type rather
+* The "file_type" entry specifies the input gridded data file type rather
   than letting the code determine it. MET determines the file type by
   checking for known suffixes and examining the file contents. Use this
   option to override the code's choice. The valid file_type values are
@@ -1093,17 +1093,17 @@ to be verified. This dictionary may include the following entries:
                                   an xarray object.
     }
 
-* The wind_thresh entry is an array of thresholds used to filter wind
+* The "wind_thresh" entry is an array of thresholds used to filter wind
   speed values when computing VL1L2 vector partial sums. Only those U/V
   pairs that meet this wind speed criteria will be included in the sums.
   Setting this threshold to NA will result in all U/V pairs being used.
 
-* The wind_logic entry may be set to UNION, INTERSECTION, or SYMDIFF
+* The "wind_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
   and controls the logic for how the forecast and observed wind_thresh
   settings are combined when filtering matched pairs of forecast and
   observed wind speeds.
 
-* The eclv_points entry specifies the economic cost/loss ratio points
+* The "eclv_points" entry specifies the economic cost/loss ratio points
   to be evaluated. For each cost/loss ratio specified, the relative value
   will be computed and written to the ECLV output line. This entry may
   either be specified as an array of numbers between 0 and 1 or as a single
@@ -1112,26 +1112,26 @@ to be verified. This dictionary may include the following entries:
   eclv_points defines the spacing. Cost/loss values are omitted for
   ratios of 0.0 and 1.0 since they are undefined.
 
-* The init_time entry specifies the initialization time in
+* The "init_time" entry specifies the initialization time in
   YYYYMMDD[_HH[MMSS]]
   format. This entry can be included in the "fcst" entry as shown below or
   included in the "field" entry if the user would like to use different
   initialization times for different fields.
 
-* The valid_time entry specifies the valid time in YYYYMMDD[_HH[MMSS]]
+* The "valid_time" entry specifies the valid time in YYYYMMDD[_HH[MMSS]]
   format. This entry can be included in the "fcst" entry as shown below or
   included in the "field" entry if the user would like to use different
   valid times for different fields.
 
-* The lead_time entry specifies the lead time in HH[MMSS]
+* The "lead_time" entry specifies the lead time in HH[MMSS]
   format. This entry can be included in the "fcst" entry as shown below or
   included in the "field" entry if the user would like to use different
   lead times for different fields.
 
-It is only necessary to use the init_time, valid_time, and/or lead_time
+It is only necessary to use the "init_time", "valid_time", and/or "lead_time"
 settings when verifying a file containing data for multiple output times.
 For example, to verify a GRIB file containing data for many lead times, you
-could use lead_time to specify the record to be verified.
+could use "lead_time" to specify the record to be verified.
 
 File-format specific settings for the "field" entry:
 
