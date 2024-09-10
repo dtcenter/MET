@@ -423,8 +423,8 @@ double TTContingencyTable::lodds_ci(double alpha,
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::orss() const {
-   return compute_proportion(fy_oy() * fn_on() - fy_on() * fn_oy(),
-                             fy_oy() * fn_on() + fy_on() * fn_oy());
+   double r = odds();
+   return compute_proportion(r - 1, r + 1);
 }
 
 ////////////////////////////////////////////////////////////////////////
