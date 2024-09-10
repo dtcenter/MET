@@ -171,9 +171,8 @@ void compute_wilson_ci(double p, int n_int, double alpha, double vif,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_woolf_ci(double odds, double alpha,
-                      int fy_oy, int fy_on, int fn_oy, int fn_on,
+                      double fy_oy, double fy_on, double fn_oy, double fn_on,
                       double &odds_cl, double &odds_cu) {
-   double cv_normal_l, cv_normal_u, a, b;
 
    if(is_bad_data(odds) ||
       fy_oy == 0 || fy_on == 0 || fn_oy == 0 || fn_on == 0) {
@@ -185,14 +184,14 @@ void compute_woolf_ci(double odds, double alpha,
    // Compute the upper and lower critical values from the
    // normal distribution.
    //
-   cv_normal_l = normal_cdf_inv(alpha/2.0, 0.0, 1.0);
-   cv_normal_u = normal_cdf_inv(1.0 - (alpha/2.0), 0.0, 1.0);
+   double cv_normal_l = normal_cdf_inv(alpha/2.0, 0.0, 1.0);
+   double cv_normal_u = normal_cdf_inv(1.0 - (alpha/2.0), 0.0, 1.0);
 
    //
    // Compute the upper and lower bounds of the confidence interval
    //
-   a = exp(cv_normal_l*sqrt(1.0/fy_oy + 1.0/fy_on + 1.0/fn_oy + 1.0/fn_on));
-   b = exp(cv_normal_u*sqrt(1.0/fy_oy + 1.0/fy_on + 1.0/fn_oy + 1.0/fn_on));
+   double a = exp(cv_normal_l*sqrt(1.0/fy_oy + 1.0/fy_on + 1.0/fn_oy + 1.0/fn_on));
+   double b = exp(cv_normal_u*sqrt(1.0/fy_oy + 1.0/fy_on + 1.0/fn_oy + 1.0/fn_on));
 
    odds_cl = odds * a;
    odds_cu = odds * b;
@@ -210,19 +209,16 @@ void compute_woolf_ci(double odds, double alpha,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_hk_ci(double hk, double alpha, double vif,
-                   int fy_oy, int fy_on, int fn_oy, int fn_on,
+                   double fy_oy, double fy_on, double fn_oy, double fn_on,
                    double &hk_cl, double &hk_cu) {
-   double cv_normal, stdev;
-   double h, h_var, f_var;
-   int h_n, f_n;
 
    //
    // Get the counts
    //
-   h_n = fy_oy + fn_oy;
-   f_n = fn_on + fy_on;
+   double h_n = fy_oy + fn_oy;
+   double f_n = fn_on + fy_on;
 
-   if(is_bad_data(hk) || h_n == 0 || f_n == 0) {
+   if(is_bad_data(hk) || is_eq(h_n, 0.0) || is_eq(f_n, 0.0)) {
       hk_cl = hk_cu = bad_data_double;
       return;
    }
@@ -231,26 +227,26 @@ void compute_hk_ci(double hk, double alpha, double vif,
    // Compute the critical value for the normal distribution based
    // on the sample size
    //
-   cv_normal = normal_cdf_inv(alpha/2.0, 0.0, 1.0);
+   double cv_normal = normal_cdf_inv(alpha/2.0, 0.0, 1.0);
 
    //
    // Compute the hit rate and false alarm rate
    //
-   h = (double) fy_oy/h_n;
+   double h = fy_oy/h_n;
 
    //
    // Compute a variance for H and F
    //
-   h_var = sqrt(h*(1.0-h)/h_n + cv_normal*cv_normal/(4.0*h_n*h_n))
-         / (1.0 + cv_normal*cv_normal/h_n);
+   double h_var = sqrt(h*(1.0-h)/h_n + cv_normal*cv_normal/(4.0*h_n*h_n))
+                  / (1.0 + cv_normal*cv_normal/h_n);
 
-   f_var = sqrt(h*(1.0-h)/f_n + cv_normal*cv_normal/(4.0*f_n*f_n))
-         / (1.0 + cv_normal*cv_normal/f_n);
+   double f_var = sqrt(h*(1.0-h)/f_n + cv_normal*cv_normal/(4.0*f_n*f_n))
+                  / (1.0 + cv_normal*cv_normal/f_n);
 
    //
    // Compute the standard deviation for HK
    //
-   stdev = sqrt(vif*(h_var*h_var + f_var*f_var));
+   double stdev = sqrt(vif*(h_var*h_var + f_var*f_var));
 
    //
    // Compute the upper and lower bounds of the confidence interval
