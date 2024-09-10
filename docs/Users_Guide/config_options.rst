@@ -2214,7 +2214,7 @@ output line type from the MET tools. Each line type may be set to one of:
 
 * NONE to skip the corresponding verification method
   
-* "STAT" to write the verification output only to the ".stat" output file
+* STAT to write the verification output only to the ".stat" output file
   
 * BOTH to write to the ".stat" output file as well the optional
   "_type.txt" file, a more readable ASCII file sorted by line type.
@@ -2405,7 +2405,7 @@ observations in Point-Stat and Ensemble-Stat:
 
 * NONE to use all point observations (legacy behavior)
   
-* "UNIQUE" only use a single observation if two or more observations
+* UNIQUE only use a single observation if two or more observations
   match. Matching observations are determined if they contain identical
   latitude, longitude, level, elevation, and time information.
   They may contain different observation values or station IDs
@@ -2436,7 +2436,7 @@ currently supported:
   
 * MAX use only the observation that has the highest value
   
-* "UW_MEAN" compute an unweighted mean of the observations
+* UW_MEAN compute an unweighted mean of the observations
   
 * DW_MEAN compute a weighted mean of the observations based
   on the time of the observation
@@ -3373,7 +3373,7 @@ The object definition settings for MODE are contained within the "fcst" and
   
    * NONE for no merging
      
-   * "THRESH" for the double-threshold merging method. Merge objects
+   * THRESH for the double-threshold merging method. Merge objects
      that would be part of the same object at the lower threshold.
      
    * ENGINE for the fuzzy logic approach comparing the field to itself
@@ -4442,7 +4442,7 @@ Wavelet-Stat into dyadic (2^n x 2^n) tiles:
 * AUTO to tile the input data using tiles of dimension n by n where n
   is the largest integer power of 2 less than the smallest dimension of
   the input data. Center as many tiles as possible with no overlap.
-* "TILE" to use the tile definition specified below.
+* TILE to use the tile definition specified below.
 * PAD to pad the input data out to the nearest integer power of 2.
 
 .. code-block:: none
@@ -4453,7 +4453,7 @@ tile
 ^^^^
 
 The "tile" entry is a dictionary that specifies how tiles should be defined
-in Wavelet-Stat when the "grid_decomp_flag" is set to "TILE":
+in Wavelet-Stat when the "grid_decomp_flag" is set to TILE:
 
 * The "width" entry specifies the dimension for all tiles and must be
   an integer power of 2.
