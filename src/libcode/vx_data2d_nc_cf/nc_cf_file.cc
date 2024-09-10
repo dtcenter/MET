@@ -1079,6 +1079,18 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   const int nx = grid.nx();
   const int ny = grid.ny();
 
+  size_t data_size = 1;
+  for (int k=0; k<dim_count; k++) {
+    if (a[k] == vx_data2d_star) data_size *= v->getDim(k).getSize();
+  }
+  if (data_size == 1) data_size = v->getDim(x_slot).getSize() * v->getDim(y_slot).getSize();
+  if (!is_eq(data_size, (size_t)nx*ny)) {
+    mlog << Error << "\n" << method_name
+         << "Allocated DataPlane from Grid (" << nx*ny << ") does not match with the variable size ("
+         << data_size << "). Please check set_attr_grid settings (nx and ny) if applied.\n\n";
+    exit(1);
+  }
+
   plane.clear();
   plane.set_size(nx, ny);
 

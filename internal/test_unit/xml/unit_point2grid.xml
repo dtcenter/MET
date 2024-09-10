@@ -364,7 +364,7 @@
       G231 \
       &OUTPUT_DIR;/point2grid/point2grid_cice_to_G231.nc \
       -config &CONFIG_DIR;/Point2GridConfig_tlat_tlon \
-      -field 'name="hi_d"; level="(0,*,*)"; set_attr_grid="latlon 180 360 -80 -180 1 1";' \
+      -field 'name="hi_d"; level="(0,*,*)"; set_attr_grid="latlon 1440 1080 -80 -180 0.1 0.1";' \
       -v 1
     </param>
     <output>
