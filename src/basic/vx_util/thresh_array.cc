@@ -618,7 +618,8 @@ ThreshArray define_prob_bins(double beg, double end, double inc, int prec) {
    }
 
    // Add final 1.0 threshold, if needed
-   if(!is_eq(ta[(ta.n() - 1)].get_value(), 1.0)) {
+   v = ta[(ta.n() - 1)].get_value();
+   if(v < 1.0 && !is_eq(v, 1.0)) {
       cs << cs_erase << ">=1.0";
       ta.add(cs.c_str());
    }
