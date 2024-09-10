@@ -366,7 +366,7 @@ and applied to the ensemble member values. See the obs_error description below
 for details on the supported error distributions. The last two columns, MIN and
 MAX, define the bounds for the valid range of the bias-corrected observation
 values and randomly perturbed ensemble member values. Values less than MIN are
-reset to the mimimum value and values greater than MAX are reset to the maximum
+reset to the minimum value and values greater than MAX are reset to the maximum
 value. A value of NA indicates that the variable is unbounded.
 
 MET_GRIB_TABLES
@@ -744,7 +744,7 @@ The "regrid" entry is a dictionary containing information about how to handle
 input gridded data files. The "regrid" entry specifies regridding logic
 using the following entries:
 
-* The "to_grid" entry may be set to NONE, FCST, OBS, a named grid, the path
+* The to_grid entry may be set to NONE, FCST, OBS, a named grid, the path
   to a gridded data file defining the grid, or an explicit grid specification
   string.
   
@@ -1037,7 +1037,7 @@ to be verified. This dictionary may include the following entries:
     thresholds to specify which matched pairs should be included in the
     statistics. These options apply to the Point-Stat and Grid-Stat tools.
     They are parsed seperately for each "obs.field" array entry.
-    The "mpr_column" strings specify MPR column names (FCST, OBS,
+    The mpr_column strings specify MPR column names (FCST, OBS,
     CLIMO_MEAN, CLIMO_STDEV, or CLIMO_CDF), differences of columns
     (FCST-OBS), or the absolute value of those differences (ABS(FCST-OBS)).
     The number of "mpr_thresh" thresholds must match the number of "mpr_column"
@@ -1722,11 +1722,11 @@ mask_missing_flag
 The "mask_missing_flag" entry specifies how missing data should be handled
 in the Wavelet-Stat and MODE tools:
 
- * "NONE" to perform no masking of missing data
+ * NONE to perform no masking of missing data
    
  * FCST to mask the forecast field with missing observation data
    
- * "OBS" to mask the observation field with missing forecast data
+ * OBS to mask the observation field with missing forecast data
    
  * BOTH to mask both fields with missing data from the other
 
@@ -1933,7 +1933,7 @@ should be used for computing bootstrap confidence intervals:
   * BCA for the BCa (bias-corrected percentile) interval method is
     highly accurate but computationally intensive.
     
-  * "PCTILE" uses the percentile method which is somewhat less accurate
+  * PCTILE uses the percentile method which is somewhat less accurate
     but more efficient.
 
 * The "rep_prop" entry specifies a proportion between 0 and 1 to define
@@ -1997,7 +1997,7 @@ This dictionary may include the following entries:
   
   * FCST to interpolate/smooth the forecast field.
     
-  * "OBS" to interpolate/smooth the observation field.
+  * OBS to interpolate/smooth the observation field.
     
   * BOTH to interpolate/smooth both the forecast and the observation.
 
@@ -2212,7 +2212,7 @@ The "output_flag" entry is a dictionary that specifies what verification
 methods should be applied to the input data. Options exist for each
 output line type from the MET tools. Each line type may be set to one of:
 
-* "NONE" to skip the corresponding verification method
+* NONE to skip the corresponding verification method
   
 * "STAT" to write the verification output only to the ".stat" output file
   
@@ -2353,7 +2353,7 @@ Lat/Lon grids. It is only applied for grid-to-grid verification in Grid-Stat
 and Ensemble-Stat and is not applied for grid-to-point verification.
 Three grid weighting options are currently supported:
 
-* "NONE" to disable grid weighting using a constant weight (default).
+* NONE to disable grid weighting using a constant weight (default).
   
 * COS_LAT to define the weight as the cosine of the grid point latitude.
   This an approximation for grid box area used by NCEP and WMO.
@@ -2403,7 +2403,7 @@ duplicate_flag
 The "duplicate_flag" entry specifies how to handle duplicate point
 observations in Point-Stat and Ensemble-Stat:
 
-* "NONE" to use all point observations (legacy behavior)
+* NONE to use all point observations (legacy behavior)
   
 * "UNIQUE" only use a single observation if two or more observations
   match. Matching observations are determined if they contain identical
@@ -2427,23 +2427,23 @@ observations that appear at a single location (lat,lon,level,elev)
 in Point-Stat and Ensemble-Stat. Eight techniques are
 currently supported:
 
-* "NONE" to use all point observations (legacy behavior)
+* NONE to use all point observations (legacy behavior)
   
-* "NEAREST" use only the observation that has the valid
+* NEAREST use only the observation that has the valid
   time closest to the forecast valid time
   
-* "MIN" use only the observation that has the lowest value
+* MIN use only the observation that has the lowest value
   
-* "MAX" use only the observation that has the highest value
+* MAX use only the observation that has the highest value
   
 * "UW_MEAN" compute an unweighted mean of the observations
   
 * DW_MEAN compute a weighted mean of the observations based
   on the time of the observation
   
-* "MEDIAN" use the median observation
+* MEDIAN use the median observation
   
-* "PERC" use the Nth percentile observation where N = obs_perc_value
+* PERC use the Nth percentile observation where N = obs_perc_value
 
 The reporting mechanism for this feature can be activated by specifying
 a verbosity level of three or higher. The report will show information
@@ -3371,7 +3371,7 @@ The object definition settings for MODE are contained within the "fcst" and
 
 * The "merge_flag" entry specifies the merging methods to be applied:
   
-   * "NONE" for no merging
+   * NONE for no merging
      
    * "THRESH" for the double-threshold merging method. Merge objects
      that would be part of the same object at the lower threshold.
@@ -3417,7 +3417,7 @@ match_flag
 
 The "match_flag" entry specifies the matching method to be applied:
 
-* "NONE" for no matching between forecast and observation objects
+* NONE for no matching between forecast and observation objects
   
 * MERGE_BOTH for matching allowing additional merging in both fields.
   If two objects in one field match the same object in the other field,
@@ -3425,7 +3425,7 @@ The "match_flag" entry specifies the matching method to be applied:
   
 * MERGE_FCST for matching allowing only additional forecast merging
   
-* "NO_MERGE" for matching with no additional merging in either field
+* NO_MERGE for matching with no additional merging in either field
 
 .. code-block:: none
 
@@ -4443,7 +4443,7 @@ Wavelet-Stat into dyadic (2^n x 2^n) tiles:
   is the largest integer power of 2 less than the smallest dimension of
   the input data. Center as many tiles as possible with no overlap.
 * "TILE" to use the tile definition specified below.
-* "PAD" to pad the input data out to the nearest integer power of 2.
+* PAD to pad the input data out to the nearest integer power of 2.
 
 .. code-block:: none
 
