@@ -36,7 +36,7 @@ basin
 Specify a comma-separated list of basins to be used. Expected format is
 a 2-letter basin identifier. An empty list indicates that all should be used.
 
-|  Valid basins: WP, IO, SH, CP, EP, AL, SL
+|  Valid basins: "WP", "IO", "SH", "CP", "EP", "AL", "SL"
 |
 
 For example:
