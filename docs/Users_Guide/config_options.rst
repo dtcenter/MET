@@ -87,26 +87,26 @@ The configuration file language supports the following data types:
 	
   * The following percentile threshold types are supported:
     
-    * "SFP" for a percentile of the sample forecast values.
+    * SFP for a percentile of the sample forecast values.
       e.g. ">SFP33.3" means greater than the 33.3-rd forecast percentile.
       
-    * "SOP" for a percentile of the sample observation values.
+    * SOP for a percentile of the sample observation values.
       e.g. ">SOP75" means greater than the 75-th observation percentile.
       
-    * "SFCP" for a percentile of the sample forecast climatology values.
+    * SFCP for a percentile of the sample forecast climatology values.
       e.g. ">SFCP90" means greater than the 90-th forecast climatology
       percentile.
 
-    * "SOCP" for a percentile of the sample observation climatology values.
+    * SOCP for a percentile of the sample observation climatology values.
       e.g. ">SOCP90" means greater than the 90-th observation climatology
       percentile. For backward compatibility, the "SCP" threshold type
       is processed the same as "SOCP".
       
-    * "USP" for a user-specified percentile threshold.
+    * USP for a user-specified percentile threshold.
       e.g. "<USP90(2.5)" means less than the 90-th percentile values which
       the user has already determined to be 2.5 outside of MET.
       
-    * "==FBIAS" for a user-specified frequency bias value.
+    * ==FBIAS for a user-specified frequency bias value.
       e.g. "==FBIAS1" to automatically de-bias the data, "==FBIAS0.9" to
       select a low-bias threshold, or "==FBIAS1.1" to select a high-bias
       threshold. This option must be used in conjunction with a simple
@@ -115,7 +115,7 @@ The configuration file language supports the following data types:
       the observations and then chooses a forecast threshold which results in
       a frequency bias of 1. The frequency bias can be any float value > 0.0.
       
-    * "FCDP" for forecast climatological distribution percentile thresholds.
+    * FCDP for forecast climatological distribution percentile thresholds.
       These thresholds require that the forecast climatological mean and
       standard deviation be defined using the "climo_mean" and "climo_stdev"
       config file options, respectively. The categorical (cat_thresh),
@@ -125,7 +125,7 @@ The configuration file language supports the following data types:
       e.g. ">FCDP50" means greater than the 50-th percentile of the
       climatological distribution for each point.
 
-    * "OCDP" for observation climatological distribution percentile thresholds.
+    * OCDP for observation climatological distribution percentile thresholds.
       The "OCDP" threshold logic matches the "FCDP" logic described above.
       However these thresholds are defined using the observation climatological
       mean and standard deviation rather than the forecast climatological data.
@@ -138,7 +138,7 @@ The configuration file language supports the following data types:
     in ensemble_stat), the following special logic is applied. Percentile
     thresholds of type equality are automatically converted to percentile
     bins which span the values from 0 to 100.
-    For example, "==OCDP25" is automatically expanded to 4 percentile bins:
+    For example, ==OCDP25 is automatically expanded to 4 percentile bins:
     >=OCDP0&&<OCDP25,>=OCDP25&&<OCDP50,>=OCDP50&&<OCDP75,>=OCDP75&&<=OCDP100
      
   * When sample percentile thresholds of type SFP, SOP, SFCP, SOCP, or FBIAS
@@ -160,13 +160,13 @@ The configuration file language supports the following data types:
 
   Prior to MET version 12.0.0, forecast climatological inputs were not
   supported. The observation climatological inputs were used to process
-  threshold types named "SCP" and "CDP".
+  threshold types named SCP and CDP.
 
-  For backward compatibility, the "SCP" threshold type is processed the same
-  as "SOCP" and "CDP" the same as "OCDP".
+  For backward compatibility, the SCP threshold type is processed the same
+  as SOCP and CDP the same as OCDP.
 
-  Users are encouraged to replace the deprecated "SCP" and "CDP" threshold
-  types with the updated "SOCP" and "OCDP" types, respectively.
+  Users are encouraged to replace the deprecated SCP and CDP threshold
+  types with the updated SOCP and OCDP types, respectively.
  
 * Piecewise-Linear Function (currently used only by MODE):
   
@@ -351,14 +351,14 @@ values and/or define observation bias corrections.
 When processing point and gridded observations, Ensemble-Stat searches the table
 to find the entry defining the observation error information. The table
 consists of 15 columns and includes a header row defining each column. The
-special string "ALL" is interpreted as a wildcard in these files. The first 6
+special string ALL is interpreted as a wildcard in these files. The first 6
 columns (OBS_VAR, MESSAGE_TYPE, PB_REPORT_TYPE, IN_REPORT_TYPE, INSTRUMENT_TYPE,
 and STATION_ID) may be set to a comma-separated list of strings to be matched.
 In addition, the strings in the OBS_VAR column are interpreted as regular
 expressions when searching for a match. For example, setting the OBS_VAR column
 to 'APCP_[0-9]+' would match observations for both APCP_03 and APCP_24. The
-HGT_RANGE, VAL_RANGE, and PRS_RANGE columns should either be set to "ALL" or
-"BEG,END" where BEG and END specify the range of values to be used. The
+HGT_RANGE, VAL_RANGE, and PRS_RANGE columns should either be set to ALL or
+BEG,END where BEG and END specify the range of values to be used. The
 INST_BIAS_SCALE and INST_BIAS_OFFSET columns define instrument bias adjustments
 which are applied to the observation values. The DIST_TYPE and DIST_PARM
 columns define the distribution from which random perturbations should be drawn
@@ -3347,7 +3347,7 @@ The object definition settings for MODE are contained within the "fcst" and
 
   The "filter_attr_name" entry is an array of strings specifying the MODE
   output header column names for the object attributes of interest, such
-  as AREA, LENGTH, WIDTH, and INTENSITY_50. In addition,
+  as "AREA", "LENGTH", "WIDTH", and "INTENSITY_50". In addition,
   "ASPECT_RATIO" specifies the aspect ratio (width/length),
   "INTENSITY_101" specifies the  mean intensity value, and "INTENSITY_102"
   specifies the sum of the intensity values.
@@ -3665,9 +3665,9 @@ In the PB2NC tool, the "message_type" entry is an array of message types
 to be retained. An empty list indicates that all should be retained.
 
 | List of valid message types:
-| ADPUPA AIRCAR AIRCFT ADPSFC ERS1DA GOESND GPSIPW
-| MSONET PROFLR QKSWND RASSDA SATEMP SATWND SFCBOG
-| SFCSHP SPSSMI SYNDAT VADWND
+| “ADPUPA”, “AIRCAR”, “AIRCFT”, “ADPSFC”, “ERS1DA”, “GOESND”, “GPSIPW”, 
+| “MSONET”, “PROFLR”, “QKSWND”, “RASSDA”, “SATEMP”, 
+| “SATWND”, “SFCBOG”, “SFCSHP”, “SPSSMI”, “SYNDAT”, “VADWND”
 
 For example:
 
