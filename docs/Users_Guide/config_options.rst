@@ -3204,7 +3204,7 @@ Floating-point max/min options: Setting limits on various floating-point
 attributes. One may specify these as integers (i.e., without a decimal
 point), if desired. The following pairs of options indicate minimum and
 maximum values for each MODE attribute that can be described as a floating-
-point number. Please refer to "The MODE Tool" section on attributes in the
+point number. Please refer to :ref:`mode-attributes` in the
 MET User's Guide for a description of these attributes.
 
 .. code-block:: none
