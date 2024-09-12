@@ -31,18 +31,34 @@ static const char conf_key_old_prepbufr_map[] = "obs_prefbufr_map";    // for ba
 ////////////////////////////////////////////////////////////////////////
 
 extern ConcatString    parse_conf_version(Dictionary *dict);
-extern ConcatString    parse_conf_string(Dictionary *dict, const char *, bool check_empty = true);
+extern ConcatString    parse_conf_string(
+                          Dictionary *dict,
+                          const char *,
+                          bool check_empty=true);
 extern GrdFileType     parse_conf_file_type(Dictionary *dict);
 extern std::map<STATLineType,STATOutputType>
-                       parse_conf_output_flag(Dictionary *dict, const STATLineType *, int);
+                       parse_conf_output_flag(
+                          Dictionary *dict,
+                          const STATLineType *, int);
 extern std::map<STATLineType,StringArray>
                        parse_conf_output_stats(Dictionary *dict);
 extern int             parse_conf_n_vx(Dictionary *dict);
-extern Dictionary      parse_conf_i_vx_dict(Dictionary *dict, int index);
-extern StringArray     parse_conf_tc_model(Dictionary *dict, bool error_out = default_dictionary_error_out);
-extern StringArray     parse_conf_message_type(Dictionary *dict, bool error_out = default_dictionary_error_out);
-extern StringArray     parse_conf_sid_list(Dictionary *dict, const char *);
-extern void            parse_sid_mask(const ConcatString &, StringArray &, ConcatString &);
+extern Dictionary      parse_conf_i_vx_dict(
+                          Dictionary *dict,
+                          int index);
+extern StringArray     parse_conf_tc_model(
+                          Dictionary *dict,
+                          bool error_out=default_dictionary_error_out);
+extern StringArray     parse_conf_message_type(
+                          Dictionary *dict,
+                          bool error_out=default_dictionary_error_out);
+extern StringArray     parse_conf_sid_list(
+                          Dictionary *dict,
+                          const char *);
+extern void            parse_sid_mask(
+                          const ConcatString &,
+                          StringArray &,
+                          ConcatString &);
 extern std::vector<MaskLatLon>
                        parse_conf_llpnt_mask(Dictionary *dict);
 extern StringArray     parse_conf_obs_qty_inc(Dictionary *dict);
@@ -51,27 +67,40 @@ extern NumArray        parse_conf_ci_alpha(Dictionary *dict);
 extern NumArray        parse_conf_eclv_points(Dictionary *dict);
 extern ClimoCDFInfo    parse_conf_climo_cdf(Dictionary *dict);
 extern TimeSummaryInfo parse_conf_time_summary(Dictionary *dict);
-extern std::map<ConcatString,ConcatString> parse_conf_key_value_map(
-                          Dictionary *dict, const char *conf_key_map_name, const char *caller=nullptr);
+extern std::map<ConcatString,ConcatString>
+                       parse_conf_key_value_map(
+                          Dictionary *dict,
+                          const char *conf_key_map_name,
+                          const char *caller=nullptr);
 extern void            parse_add_conf_key_value_map(
-                          Dictionary *dict, const char *conf_key_map_name, std::map<ConcatString,ConcatString> *m);
+                          Dictionary *dict,
+                          const char *conf_key_map_name,
+                          std::map<ConcatString,ConcatString> *m);
 extern void            parse_add_conf_key_values_map(
-                          Dictionary *dict, const char *conf_key_map_name,
-                          std::map<ConcatString,StringArray> *m, const char *caller=nullptr);
+                          Dictionary *dict,
+                          const char *conf_key_map_name,
+                          std::map<ConcatString,StringArray> *m,
+                          const char *caller=nullptr);
 extern std::map<ConcatString,ConcatString>
                        parse_conf_message_type_map(Dictionary *dict);
 extern std::map<ConcatString,StringArray>
                        parse_conf_message_type_group_map(Dictionary *dict);
-extern std::map<ConcatString,StringArray> parse_conf_metadata_map(Dictionary *dict);
+extern std::map<ConcatString,StringArray>
+                       parse_conf_metadata_map(Dictionary *dict);
 extern std::map<ConcatString,ConcatString>
                        parse_conf_obs_name_map(Dictionary *dict);
 extern std::map<ConcatString,StringArray>
                        parse_conf_obs_to_qc_map(Dictionary *dict);
 extern std::map<ConcatString,UserFunc_1Arg>
                        parse_conf_key_convert_map(
-                          Dictionary *dict, const char *conf_key_map_name, const char *caller=nullptr);
+                          Dictionary *dict,
+                          const char *conf_key_map_name,
+                          const char *caller=nullptr);
 extern BootInfo        parse_conf_boot(Dictionary *dict);
-extern RegridInfo      parse_conf_regrid(Dictionary *dict, bool error_out = default_dictionary_error_out);
+extern RegridInfo      parse_conf_regrid(
+                          Dictionary *dict,
+                          Dictionary *default_dict=nullptr,
+                          bool error_out=default_dictionary_error_out);
 extern InterpInfo      parse_conf_interp(Dictionary *dict, const char *);
 extern NbrhdInfo       parse_conf_nbrhd(Dictionary *dict, const char *);
 extern HiRAInfo        parse_conf_hira(Dictionary *dict);
@@ -92,7 +121,9 @@ extern ConcatString    parse_conf_ugrid_coordinates_file(Dictionary *dict);
 extern ConcatString    parse_conf_ugrid_dataset(Dictionary *dict);
 extern ConcatString    parse_conf_ugrid_map_config(Dictionary *dict);
 extern double          parse_conf_ugrid_max_distance_km(Dictionary *dict);
-extern void            parse_add_conf_ugrid_metadata_map(Dictionary *dict, std::map<ConcatString,StringArray> *m);
+extern void            parse_add_conf_ugrid_metadata_map(
+                          Dictionary *dict,
+                          std::map<ConcatString,StringArray> *m);
 
 extern void         check_mask_names(const StringArray &);
 

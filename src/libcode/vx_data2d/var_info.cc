@@ -528,7 +528,7 @@ void VarInfo::set_dict(Dictionary &dict) {
    if(dict.last_lookup_status()) set_range(na);
 
    // Parse regrid, if present
-   Regrid = parse_conf_regrid(&dict, false);
+   Regrid = parse_conf_regrid(&dict, nullptr, false);
 
    // Parse set_attr strings
    SetAttrName =

@@ -106,23 +106,12 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
    // Get the i-th array entry
    Dictionary i_dict = parse_conf_i_vx_dict(field_dict, i_vx);
 
-   // Find the "climo_name.regrid" setting
-   Dictionary *climo_dict = nullptr;
-   cs << cs_erase << climo_name << "." << conf_key_regrid;
-
-   // Try the current climo_name.regrid setting
-   // e.g. "config.fcst.climo_mean.regrid"
-   if(dict->lookup(cs.c_str(), false)) {
-      climo_dict = dict->lookup_dictionary(climo_name);
-   }
-   // Try the default climo_name.regrid setting
-   // e.g. "config.climo_mean.regrid"
-   else {
-      climo_dict = dict->parent()->lookup_dictionary(climo_name);
-   }
-
-   // Parse the "regrid" dictionary
-   RegridInfo regrid_info = parse_conf_regrid(climo_dict);
+   // Parse the "regrid" dictionary from the current location
+   // (e.g. "config.fcst.climo_mean.regrid") or default
+   // location (e.g. "config.climo_mean.regrid")
+   RegridInfo regrid_info = parse_conf_regrid(
+                               dict->lookup_dictionary(climo_name, false, false, false),
+                               dict->parent()->lookup_dictionary(climo_name, false, false, false));
 
    // Parse the "time_interp_method"
    cs << cs_erase << climo_name << "." << conf_key_time_interp_method;
