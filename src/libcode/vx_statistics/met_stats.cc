@@ -3160,8 +3160,8 @@ void PCTInfo::clear() {
    n_alpha = 0;
    if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
 
-   pct.zero_out();
-   climo_pct.zero_out();
+   pct.clear();
+   climo_pct.clear();
    fthresh.clear();
    othresh.clear();
 
@@ -3470,7 +3470,7 @@ double PCTInfo::get_stat_pjc(const string &stat_name,
 
 double PCTInfo::get_stat_prc(const string &stat_name,
                              ConcatString &col_name) const {
-   int i = 0;
+   int i = bad_data_int;
    double v = bad_data_double;
    col_name = stat_name;
    TTContingencyTable ct;
