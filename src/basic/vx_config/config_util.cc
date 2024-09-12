@@ -1367,8 +1367,10 @@ RegridInfo parse_conf_regrid(Dictionary *dict, Dictionary *default_dict, bool er
    }
 
    // Conf: to_grid (optional) as an integer or string
-   const DictionaryEntry * entry = regrid_dict->lookup(conf_key_to_grid, false);
-   if(!entry) entry = regrid_default->lookup(conf_key_to_grid, false);
+   const DictionaryEntry * entry = nullptr;
+
+   if(regrid_dict)              entry = regrid_dict->lookup(conf_key_to_grid, false);
+   if(!entry && regrid_default) entry = regrid_default->lookup(conf_key_to_grid, false);
 
    // to_grid found
    if(entry) {
