@@ -146,13 +146,13 @@ class DataLine {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline  int           DataLine::n_items      () const { return ( N_items ); }
+inline  int           DataLine::n_items      () const { return N_items; }
 
-inline  int           DataLine::line_number  () const { return ( LineNumber ); }
+inline  int           DataLine::line_number  () const { return LineNumber; }
 
-inline  const char *  DataLine::get_line     () const { return ( Line.c_str() ); }
+inline  const char *  DataLine::get_line     () const { return Line.c_str(); }
 
-inline  const char *  DataLine::get_delimiter() const { return ( Delimiter.c_str() ); }
+inline  const char *  DataLine::get_delimiter() const { return Delimiter.c_str(); }
 
 inline  void          DataLine::set_is_header(bool __tf__) { IsHeader = __tf__;  return; }
 
@@ -213,13 +213,13 @@ class LineDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline const char * LineDataFile::filename() const { return ( Filename.c_str() ); }
+inline const char * LineDataFile::filename() const { return Filename.c_str(); }
 
-inline const char * LineDataFile::short_filename() const { return ( ShortFilename.c_str() ); }
+inline const char * LineDataFile::short_filename() const { return ShortFilename.c_str(); }
 
-inline int LineDataFile::last_line_number() const { return ( Last_Line_Number ); }
+inline int LineDataFile::last_line_number() const { return Last_Line_Number; }
 
-inline const StringArray & LineDataFile::header() const { return ( Header ); }
+inline const StringArray & LineDataFile::header() const { return Header; }
 
 
 ////////////////////////////////////////////////////////////////////////

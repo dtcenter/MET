@@ -100,16 +100,16 @@ class Histogram {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int Histogram::nbins  () const { return ( Nbins  ); }
+inline int Histogram::nbins  () const { return Nbins ; }
 
-inline double Histogram::bottom () const { return ( Bottom ); }
-inline double Histogram::delta  () const { return ( Delta  ); }
+inline double Histogram::bottom () const { return Bottom; }
+inline double Histogram::delta  () const { return Delta ; }
 
-inline double Histogram::min_data_value  () const { return ( MinValue ); }
-inline double Histogram::max_data_value  () const { return ( MaxValue ); }
+inline double Histogram::min_data_value  () const { return MinValue; }
+inline double Histogram::max_data_value  () const { return MaxValue; }
 
-inline int Histogram::too_big_count    () const { return ( TooBigCount ); }
-inline int Histogram::too_small_count  () const { return ( TooSmallCount ); }
+inline int Histogram::too_big_count    () const { return TooBigCount; }
+inline int Histogram::too_small_count  () const { return TooSmallCount; }
 
 
 ////////////////////////////////////////////////////////////////////////

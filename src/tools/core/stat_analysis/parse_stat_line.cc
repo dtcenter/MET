@@ -152,14 +152,13 @@ void parse_nbrctc_ctable(STATLine &l, TTContingencyTable &ct) {
 void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
    int i, n, oy, on;
    char col_str[max_str_len];
-   double *thresh = (double *) nullptr;
 
    // N_THRESH
    n = atoi(l.get_item("N_THRESH"));
    pct.set_size(n-1);
 
-   // Allocate space for list of thresholds
-   thresh = new double [n];
+   // Store a vector of threshold values
+   vector<double> thresh(n);
 
    for(i=0; i<n-1; i++) {
 
@@ -183,8 +182,6 @@ void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
    thresh[n-1] = atof(l.get_item(col_str));
    pct.set_thresholds(thresh);
 
-   if ( thresh )  { delete [] thresh; thresh = (double *) nullptr; }
-
    return;
 }
 
@@ -200,7 +197,7 @@ void parse_sl1l2_line(STATLine &l, SL1L2Info &s_info) {
    s_info.fobar  = atof(l.get_item("FOBAR"));
    s_info.ffbar  = atof(l.get_item("FFBAR"));
    s_info.oobar  = atof(l.get_item("OOBAR"));
-   s_info.mae    = atof(l.get_item("MAE"));
+   s_info.smae   = atof(l.get_item("MAE"));
 
    return;
 }
@@ -217,7 +214,7 @@ void parse_sal1l2_line(STATLine &l, SL1L2Info &s_info) {
    s_info.foabar  = atof(l.get_item("FOABAR"));
    s_info.ffabar  = atof(l.get_item("FFABAR"));
    s_info.ooabar  = atof(l.get_item("OOABAR"));
-   s_info.mae     = atof(l.get_item("MAE"));
+   s_info.samae   = atof(l.get_item("MAE"));
 
    return;
 }
@@ -327,16 +324,32 @@ void parse_mpr_line(STATLine &l, MPRData &m_data) {
    m_data.fcst     = atof(l.get_item("FCST"));
    m_data.obs      = atof(l.get_item("OBS"));
 
-   // In met-6.1 and later, CLIMO column was replaced by CLIMO_MEAN
+   // In met-6.1 and later:
+   // - CLIMO was replaced by CLIMO_MEAN
    if(l.has("CLIMO")) {
-      m_data.climo_mean  = atof(l.get_item("CLIMO"));
-      m_data.climo_stdev = bad_data_double;
-      m_data.climo_cdf   = bad_data_double;
+      m_data.obs_climo_mean   = atof(l.get_item("CLIMO"));
+      m_data.obs_climo_stdev  = bad_data_double;
+      m_data.obs_climo_cdf    = bad_data_double;
+      m_data.fcst_climo_mean  = atof(l.get_item("CLIMO"));
+      m_data.fcst_climo_stdev = bad_data_double;
+   }
+   // In met-12.0.0 and later:
+   // - CLIMO_MEAN was replaced by OBS_CLIMO_MEAN
+   // - CLIMO_STDEV was replaced by OBS_CLIMO_STDEV
+   // - CLIMO_CDF was replaced by OBS_CLIMO_CDF
+   else if(l.has("CLIMO_MEAN")) {
+      m_data.obs_climo_mean   = atof(l.get_item("CLIMO_MEAN"));
+      m_data.obs_climo_stdev  = atof(l.get_item("CLIMO_STDEV"));
+      m_data.obs_climo_cdf    = atof(l.get_item("CLIMO_CDF"));
+      m_data.fcst_climo_mean  = atof(l.get_item("CLIMO_MEAN"));
+      m_data.fcst_climo_stdev = atof(l.get_item("CLIMO_STDEV"));
    }
    else {
-      m_data.climo_mean  = atof(l.get_item("CLIMO_MEAN"));
-      m_data.climo_stdev = atof(l.get_item("CLIMO_STDEV"));
-      m_data.climo_cdf   = atof(l.get_item("CLIMO_CDF"));
+      m_data.obs_climo_mean   = atof(l.get_item("OBS_CLIMO_MEAN"));
+      m_data.obs_climo_stdev  = atof(l.get_item("OBS_CLIMO_STDEV"));
+      m_data.obs_climo_cdf    = atof(l.get_item("OBS_CLIMO_CDF"));
+      m_data.fcst_climo_mean  = atof(l.get_item("FCST_CLIMO_MEAN"));
+      m_data.fcst_climo_stdev = atof(l.get_item("FCST_CLIMO_STDEV"));
    }
 
    m_data.obs_qc   = l.get_item("OBS_QC", false);
@@ -530,14 +543,28 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
    o_data.spread_oerr      = atof(l.get_item("SPREAD_OERR"));
    o_data.spread_plus_oerr = atof(l.get_item("SPREAD_PLUS_OERR"));
 
-   // In met-10.0.0 and later, CLIMO column was replaced by CLIMO_MEAN
+   // In met-10.0.0 and later:
+   // - CLIMO was replaced by CLIMO_MEAN
    if(l.has("CLIMO")) {
-      o_data.climo_mean  = atof(l.get_item("CLIMO"));
-      o_data.climo_stdev = bad_data_double;
+      o_data.obs_climo_mean   = atof(l.get_item("CLIMO"));
+      o_data.obs_climo_stdev  = bad_data_double;
+      o_data.fcst_climo_mean  = bad_data_double;
+      o_data.fcst_climo_stdev = bad_data_double;
+   }
+   // In met-12.0.0 and later:
+   // - CLIMO_MEAN was replaced by OBS_CLIMO_MEAN
+   // - CLIMO_STDEV was replaced by OBS_CLIMO_STDEV
+   else if(l.has("CLIMO_MEAN")) {
+      o_data.obs_climo_mean   = atof(l.get_item("CLIMO_MEAN"));
+      o_data.obs_climo_stdev  = atof(l.get_item("CLIMO_STDEV"));
+      o_data.fcst_climo_mean  = bad_data_double;
+      o_data.fcst_climo_stdev = bad_data_double;
    }
    else {
-      o_data.climo_mean  = atof(l.get_item("CLIMO_MEAN"));
-      o_data.climo_stdev = atof(l.get_item("CLIMO_STDEV"));
+      o_data.obs_climo_mean   = atof(l.get_item("OBS_CLIMO_MEAN"));
+      o_data.obs_climo_stdev  = atof(l.get_item("OBS_CLIMO_STDEV"));
+      o_data.fcst_climo_mean  = atof(l.get_item("FCST_CLIMO_MEAN"));
+      o_data.fcst_climo_stdev = atof(l.get_item("FCST_CLIMO_STDEV"));
    }
 
    return;

@@ -1262,7 +1262,7 @@ rho = image_aspect/view_aspect;
 
 mag = min(rho, 1.0);
 
-mag *= (view_width)/(image_width);
+mag *= view_width/image_width;
 
 return mag;
 

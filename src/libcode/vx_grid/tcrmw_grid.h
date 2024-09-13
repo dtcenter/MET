@@ -101,17 +101,17 @@ class TcrmwGrid : public RotatedLatLonGrid {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int TcrmwGrid::range_n  () const { return ( Range_n ); }
-inline int TcrmwGrid::azimuth_n () const { return ( Azimuth_n ); }
+inline int TcrmwGrid::range_n  () const { return Range_n; }
+inline int TcrmwGrid::azimuth_n () const { return Azimuth_n; }
 
-inline double TcrmwGrid::range_max_km () const { return ( Range_max_km ); }
+inline double TcrmwGrid::range_max_km () const { return Range_max_km; }
 
-inline double TcrmwGrid::range_delta_km () const { return ( Range_max_km/(Range_n - 1) ); }
+inline double TcrmwGrid::range_delta_km () const { return Range_max_km/(Range_n - 1); }
 
-inline double TcrmwGrid::azimuth_delta_deg () const { return ( 360.0/Azimuth_n ); }
+inline double TcrmwGrid::azimuth_delta_deg () const { return 360.0/Azimuth_n; }
 
-inline double TcrmwGrid::lat_center_deg () const { return ( Lat_Center_Deg ); }
-inline double TcrmwGrid::lon_center_deg () const { return ( Lon_Center_Deg ); }
+inline double TcrmwGrid::lat_center_deg () const { return Lat_Center_Deg; }
+inline double TcrmwGrid::lon_center_deg () const { return Lon_Center_Deg; }
 
 
 ////////////////////////////////////////////////////////////////////////

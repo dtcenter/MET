@@ -35,13 +35,8 @@ using namespace netCDF;
 
 bool standalone_debug_seeps = false;
 
-static SeepsClimo *seeps_climo = 0;
+static SeepsClimo *seeps_climo = nullptr;
 static std::map<int,SeepsClimoGrid *> seeps_climo_grid_map_00;
-
-static const char *def_seeps_filename =
-   "MET_BASE/climo/seeps/PPT24_seepsweights.nc";
-static const char *def_seeps_grid_filename =
-   "MET_BASE/climo/seeps/PPT24_seepsweights_grid.nc";
 
 static const char *var_name_sid       = "sid";
 static const char *var_name_lat       = "lat";
@@ -55,48 +50,37 @@ double weighted_average(double, double, double, double);
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsClimo *get_seeps_climo() {
-   if (! seeps_climo) seeps_climo = new SeepsClimo();
+SeepsClimo *get_seeps_climo(ConcatString seeps_point_climo_name) {
+   if (! seeps_climo) seeps_climo = new SeepsClimo(seeps_point_climo_name);
    return seeps_climo;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void release_seeps_climo() {
-   if (seeps_climo) { delete seeps_climo; seeps_climo = 0; }
+   if (seeps_climo) { delete seeps_climo; seeps_climo = nullptr; }
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsClimoGrid *get_seeps_climo_grid(int month, int hour) {
-   bool not_found = true;
-   SeepsClimoGrid *seeps_climo_grid = nullptr;
-   for (map<int,SeepsClimoGrid *>::iterator it=seeps_climo_grid_map_00.begin();
-        it!=seeps_climo_grid_map_00.end(); ++it) {
-      if (it->first == month) {
-         not_found = false;
-         seeps_climo_grid = (SeepsClimoGrid *)it->second;
-         break;
-      }
+SeepsClimoGrid *get_seeps_climo_grid(int month, ConcatString seeps_grid_climo_name, int hour) {
+
+   if (seeps_climo_grid_map_00.count(month) == 0) {
+      seeps_climo_grid_map_00[month] = nullptr;
+      seeps_climo_grid_map_00[month] = new SeepsClimoGrid(month, hour, seeps_grid_climo_name);
    }
 
-   if (not_found) {
-      seeps_climo_grid = new SeepsClimoGrid(month, hour);
-      seeps_climo_grid_map_00[month] = seeps_climo_grid;
-   }
-   return seeps_climo_grid;
+   return seeps_climo_grid_map_00[month];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void release_seeps_climo_grid(int month, int hour) {
-   for (map<int,SeepsClimoGrid *>::iterator it=seeps_climo_grid_map_00.begin();
-        it!=seeps_climo_grid_map_00.end(); ++it) {
-      if (it->first == month) {
-         delete it->second;
-         seeps_climo_grid_map_00.erase(it);
-         break;
-      }
+
+   if (seeps_climo_grid_map_00.count(month) > 0) {
+      delete seeps_climo_grid_map_00[month];
+      seeps_climo_grid_map_00[month] = nullptr;
+      seeps_climo_grid_map_00.erase(month);
    }
 }
 
@@ -108,9 +92,7 @@ double weighted_average(double v1, double w1, double v2, double w2) {
           v1 * w1 + v2 * w2);
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void SeepsAggScore::clear() {
 
@@ -171,12 +153,13 @@ SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
    return *this;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
+SeepsClimoBase::SeepsClimoBase(ConcatString seeps_climo_name) : climo_file_name{seeps_climo_name} {
 
-SeepsClimoBase::SeepsClimoBase() {
    clear();
+   seeps_ready = false;
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -188,9 +171,52 @@ SeepsClimoBase::~SeepsClimoBase() {
 ////////////////////////////////////////////////////////////////////////
 
 void SeepsClimoBase::clear() {
-   seeps_ready = false;
    filtered_count = 0;
    seeps_p1_thresh.clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString SeepsClimoBase::get_climo_filename() {
+   ConcatString log_seeps_filename;
+   ConcatString seeps_filename;
+   const char *method_name = "SeepsClimoBase::get_climo_filename() -> ";
+
+   // Use the environment variable, if set.
+   ConcatString env_climo_name = get_env_climo_name();
+   bool use_env = get_env(env_climo_name.c_str(), seeps_filename);
+   if(!use_env) {
+      seeps_filename = climo_file_name.nonempty() ? climo_file_name : get_def_climo_name();
+   }
+   seeps_filename = replace_path(seeps_filename);
+
+   seeps_ready = file_exists(seeps_filename.c_str());
+   if (seeps_ready) {
+      mlog << Debug(7) << method_name << "SEEPS climo name=\""
+           << seeps_filename.c_str() << "\"\n";
+   }
+   else {
+      ConcatString message = "";
+      ConcatString message2 = "";
+      if (use_env) {
+         message.add("from the environment variable ");
+         message.add(env_climo_name);
+         message2.add("Correct the environment variable");
+      }
+      else {
+         message.add(climo_file_name.nonempty()
+                     ? "from the configuration" : "from the default");
+         message2.add("Correct the configuration");
+      }
+      mlog << Warning << "\n" << method_name
+           << "The SEEPS climo name \"" << seeps_filename.c_str()
+           << "\" " << message << " does not exist!\n"
+           << message2 << " to set its location "
+           << "or disable output for SEEPS and SEEPS_MPR.\n\n";
+      exit(1);
+   }
+
+   return seeps_filename;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -203,19 +229,12 @@ void SeepsClimoBase::set_p1_thresh(const SingleThresh &p1_thresh) {
 ////////////////////////////////////////////////////////////////////////
 
 
-SeepsClimo::SeepsClimo() {
+SeepsClimo::SeepsClimo(ConcatString seeps_climo_name) : SeepsClimoBase{seeps_climo_name} {
 
-   ConcatString seeps_name = get_seeps_climo_filename();
-   seeps_ready = file_exists(seeps_name.c_str());
-   if (seeps_ready) read_seeps_scores(seeps_name);
-   else {
-      mlog << Error << "\nSeepsClimo::SeepsClimo() -> "
-           << "The SEEPS point climo data \"" << seeps_name << "\" is missing!\n"
-           << "Set the " << MET_ENV_SEEPS_POINT_CLIMO_NAME
-           << " environment variable to define its location "
-           << "or disable output for SEEPS and SEEPS_MPR.\n\n";
-      exit(1);
-   }
+   clear();
+   ConcatString seeps_name = get_climo_filename();
+   if (file_exists(seeps_name.c_str())) read_seeps_scores(seeps_name);
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -287,7 +306,7 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
    SeepsRecord *record = nullptr;
    const char *method_name = "SeepsClimo::get_record() -> ";
 
-   if (seeps_ready) {
+   if (is_seeps_ready()) {
       SeepsClimoRecord *climo_record = nullptr;
       map<int,SeepsClimoRecord *>::iterator it;
       if (hour < 6 || hour >= 18) {
@@ -300,7 +319,7 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
       }
       if (nullptr != climo_record) {
          double p1 = climo_record->p1[month-1];
-         if (seeps_p1_thresh.check(p1)) {
+         if (check_seeps_p1_thresh(p1)) {
             record = new SeepsRecord;
             record->sid = climo_record->sid;
             record->lat = climo_record->lat;
@@ -316,7 +335,7 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
             }
          }
          else if (!is_eq(p1, bad_data_double)) {
-            filtered_count++;
+            increase_filtered_count();
             mlog << Debug(7) << method_name << " filtered by threshold p1="
                  << climo_record->p1[month-1] <<"\n";
          }
@@ -332,35 +351,6 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
    }
 
    return record;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ConcatString SeepsClimo::get_seeps_climo_filename() {
-   ConcatString seeps_filename;
-   const char *method_name = "SeepsClimo::get_seeps_climo_filename() -> ";
-
-   // Use the environment variable, if set.
-   bool use_env = get_env(MET_ENV_SEEPS_POINT_CLIMO_NAME, seeps_filename);
-   if(use_env) seeps_filename = replace_path(seeps_filename);
-   else seeps_filename = replace_path(def_seeps_filename);
-
-   if (seeps_ready = file_exists(seeps_filename.c_str())) {
-      mlog << Debug(7) << method_name << "SEEPS point climo name=\""
-           << seeps_filename.c_str() << "\"\n";
-   }
-   else {
-      ConcatString message = "";
-      if (use_env) {
-         message.add("from the env. name ");
-         message.add(MET_ENV_SEEPS_POINT_CLIMO_NAME);
-      }
-      mlog << Warning << "\n" << method_name
-           << "The SEEPS point climo name \"" << seeps_filename.c_str()
-           << "\"" << message << " does not exist!\n\n";
-   }
-
-   return seeps_filename;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -483,6 +473,8 @@ void SeepsClimo::read_seeps_scores(ConcatString filename) {
       double matrix_00_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
       double matrix_12_buf[SEEPS_MONTH*SEEPS_MATRIX_SIZE];
       NcFile *nc_file = open_ncfile(filename.c_str());
+
+      clear();
 
       // dimensions: month = 12 ; nstn = 5293 ; nmatrix = 9 ;
       get_dim(nc_file, dim_name_nstn, nstn, true);
@@ -642,7 +634,7 @@ void SeepsClimo::read_seeps_scores(ConcatString filename) {
    }
    catch(int i_err) {
 
-      seeps_ready = false;
+      set_seeps_ready(false);
       mlog << Error << "\n" << method_name
            << "encountered an error on reading " << filename << ". ecception_code="  << i_err << "\n\n";
 
@@ -651,34 +643,27 @@ void SeepsClimo::read_seeps_scores(ConcatString filename) {
 
 }
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
-
-SeepsClimoGrid::SeepsClimoGrid(int month, int hour) : month{month}, hour{hour}
+SeepsClimoGrid::SeepsClimoGrid(int month, int hour, ConcatString seeps_climo_name)
+   : month{month}, hour{hour}, SeepsClimoBase{seeps_climo_name}
 {
-
-   p1_buf = p2_buf = t1_buf = t2_buf = nullptr;
-   s12_buf = s13_buf = s21_buf = s23_buf = s31_buf = s32_buf = nullptr;
-
-   ConcatString seeps_name = get_seeps_climo_filename();
-   seeps_ready = file_exists(seeps_name.c_str());
-   if (seeps_ready) read_seeps_scores(seeps_name);
-   else {
-      mlog << Error << "\nSeepsClimoGrid::SeepsClimoGrid -> "
-           << "The SEEPS grid climo data \"" << seeps_name << "\" is missing!\n"
-           << "Set the " << MET_ENV_SEEPS_GRID_CLIMO_NAME
-           << " environment variable to define its location "
-           << "or disable output for SEEPS.\n\n";
-      exit(1);
-   }
-
+   init_from_scratch();
+   ConcatString seeps_name = get_climo_filename();
+   if (file_exists(seeps_name.c_str())) read_seeps_scores(seeps_name);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 SeepsClimoGrid::~SeepsClimoGrid() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void SeepsClimoGrid::init_from_scratch() {
+   p1_buf = p2_buf = t1_buf = t2_buf = nullptr;
+   s12_buf = s13_buf = s21_buf = s23_buf = s31_buf = s32_buf = nullptr;
    clear();
 }
 
@@ -708,7 +693,7 @@ SeepsScore *SeepsClimoGrid::get_record(int ix, int iy,
       int offset = iy * nx + ix;
       double p1 = p1_buf[offset];
 
-      if (seeps_p1_thresh.check(p1)) {
+      if (check_seeps_p1_thresh(p1)) {
          // Determine location in contingency table
          int ic = (p_obs>t1_buf[offset])+(p_obs>t2_buf[offset]);
          int jc = (p_fcst>t1_buf[offset])+(p_fcst>t2_buf[offset]);
@@ -725,7 +710,7 @@ SeepsScore *SeepsClimoGrid::get_record(int ix, int iy,
          seeps_record->score = score;
       }
       else if (~is_eq(p1, bad_data_double)) {
-         filtered_count++;
+         increase_filtered_count();
          mlog << Debug(7) << method_name << " filtered by threshold p1=" << p1_buf[offset] <<"\n";
       }
    }
@@ -777,37 +762,6 @@ double SeepsClimoGrid::get_score(int ix, int iy, double p_fcst, double p_obs) {
    }
 
    return score;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-ConcatString SeepsClimoGrid::get_seeps_climo_filename() {
-   ConcatString seeps_filename;
-   const char *method_name = "SeepsClimoGrid::get_seeps_climo_filename() -> ";
-
-   // Use the environment variable, if set.
-   bool use_env = get_env(MET_ENV_SEEPS_GRID_CLIMO_NAME, seeps_filename);
-   if(use_env) {
-      seeps_filename = replace_path(seeps_filename);
-   }
-   else seeps_filename = replace_path(def_seeps_grid_filename);
-
-   if (seeps_ready = file_exists(seeps_filename.c_str())) {
-      mlog << Debug(7) << method_name << "SEEPS grid climo name=\""
-           << seeps_filename.c_str() << "\"\n";
-   }
-   else {
-      ConcatString message = "";
-      if (use_env) {
-         message.add("from the env. name ");
-         message.add(MET_ENV_SEEPS_GRID_CLIMO_NAME);
-      }
-      mlog << Warning << "\n" << method_name
-           << "The SEEPS grid climo name \"" << seeps_filename.c_str()
-           << "\"" << message << " does not exist!\n\n";
-   }
-
-   return seeps_filename;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -922,7 +876,7 @@ void SeepsClimoGrid::read_seeps_scores(ConcatString filename) {
    }
    catch(...) {
 
-      seeps_ready = false;
+      set_seeps_ready(false);
       mlog << Error << "\n" << method_name
            << "encountered an error on reading " << filename << ".\n\n";
 

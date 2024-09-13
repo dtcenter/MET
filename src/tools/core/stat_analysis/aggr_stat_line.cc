@@ -42,9 +42,9 @@
 //   019    02/21/24  Halley Gotway   MET #2583 Add observation error
 //                                      ECNT statistics.
 //   020    06/14/24  Halley Gotway   MET #2911 Call apply_set_hdr_opts().
+//   021    07/05/24  Halley Gotway   MET #2924 Support forecast climatology.
 //
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <cstdio>
 #include <iostream>
@@ -630,7 +630,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
               << "trouble parsing \"-column " << job.column[i]
               << "\" option.  Either use \"-line_type\" exactly once "
               << "or use format \"-column LINE_TYPE:COLUMN\".\n\n";
-         throw(1);
+         throw 1;
       }
    }
 
@@ -706,7 +706,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
          else if(do_cnt && (line.type() == STATLineType::sl1l2 ||
                             line.type() == STATLineType::sal1l2)) {
             parse_sl1l2_line(line, sl1l2_info);
-            compute_cntinfo(sl1l2_info, 0, cnt_info);
+            compute_cntinfo(sl1l2_info, cnt_info);
          }
 
          //
@@ -731,7 +731,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
             //
             if((line.type() == STATLineType::fho ||
                 line.type() == STATLineType::ctc) && lty == STATLineType::cts) {
-               v = cts_info.get_stat(req_col[i].c_str());
+               v = cts_info.get_stat_cts(req_col[i].c_str());
                w = cts_info.cts.n();
             }
             else if(line.type() == STATLineType::sl1l2 && lty == STATLineType::cnt) {
@@ -743,7 +743,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
                w = cnt_info.n;
             }
             else if(line.type() == STATLineType::vl1l2 && lty == STATLineType::vcnt) {
-               v = vl1l2_info.get_stat(req_col[i].c_str());
+               v = vl1l2_info.get_stat_vcnt(req_col[i].c_str());
                w = (is_vector_dir_stat(line.type(), req_col[i].c_str()) ?
                     vl1l2_info.dcount :
                     vl1l2_info.vcount);
@@ -854,7 +854,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
                     << "line type value of " << statlinetype_to_string(line.type())
                     << " not currently supported for the aggregation job.\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
-               throw(1);
+               throw 1;
          } // end switch
 
          //
@@ -976,7 +976,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_ctc_lines() -> "
                  << "should be no ties in the valid time array.\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -1045,7 +1045,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter multi-category contingency table count "
                  << "(MCTC) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -1087,7 +1087,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
                     << "lines.  Try setting \"-column_eq N_CAT n\", "
                     << m[key].mcts_info.cts.nrows() << " != "
                     << cur.cts.nrows() << "\n\n";
-               throw(1);
+               throw 1;
             }
 
             //
@@ -1172,7 +1172,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_mctc_lines() -> "
                  << "should be no ties in the valid time array.\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -1225,7 +1225,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter probability contingency table (PCT) "
                  << "line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -1266,7 +1266,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
                     << "thresholds must remain the same for all lines, "
                     << m[key].pct_info.pct.nrows() << " != "
                     << cur.pct.nrows() << "\n\n";
-               throw(1);
+               throw 1;
             }
 
             //
@@ -1283,7 +1283,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
                        << "values must remain the same for all lines, "
                        << m[key].pct_info.pct.threshold(i) << " != "
                        << cur.pct.threshold(i) << "\n\n";
-                  throw(1);
+                  throw 1;
                }
 
                oy = m[key].pct_info.pct.event_count_by_row(i);
@@ -1367,7 +1367,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_pct_lines() -> "
                  << "should be no ties in the valid time array.\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -1461,7 +1461,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
                mlog << Error << "\naggr_psum_lines() -> "
                     << "should only encounter partial sum line types.\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
-               throw(1);
+               throw 1;
          } // end switch
 
          //
@@ -1519,7 +1519,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
             //
             // Compute the stats for the current time
             //
-            compute_cntinfo(cur_sl1l2, 0, cur_cnt);
+            compute_cntinfo(cur_sl1l2, cur_cnt);
 
             //
             // Append the stats
@@ -1568,7 +1568,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_psum_lines() -> "
                  << "should be no ties in the valid time array.\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -1619,7 +1619,7 @@ void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &job,
             mlog << Error << "\naggr_grad_lines() -> "
                  << "should only encounter gradient (GRAD) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -1659,7 +1659,7 @@ void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &job,
                     << " != " << cur.dx << " and " << cur.dy
                     << ").  Try setting \"-column_eq DX n -column_eq DY n\""
                     << " or \"-by DX,DY\".\n\n";
-               throw(1);
+               throw 1;
             }
 
             //
@@ -1739,7 +1739,7 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
                mlog << Error << "\naggr_wind_lines() -> "
                     << "should only encounter vector partial sum line types.\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
-               throw(1);
+               throw 1;
          } // end switch
 
          //
@@ -1770,10 +1770,9 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Append the unit vectors with no climatological values
          //
-         m[key].pd_u.add_grid_pair(uf, uo, bad_data_double,
-                        bad_data_double, default_grid_weight);
-         m[key].pd_v.add_grid_pair(vf, vo, bad_data_double,
-                        bad_data_double, default_grid_weight);
+         ClimoPntInfo cpi;
+         m[key].pd_u.add_grid_pair(uf, uo, cpi, default_grid_weight);
+         m[key].pd_v.add_grid_pair(vf, vo, cpi, default_grid_weight);
 
          //
          // Keep track of the unique header column entries
@@ -1797,9 +1796,11 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
    VL1L2Info v_info;
    MPRData cur;
    ConcatString hdr, key;
-   double uf, uo, ucmn, ucsd;
-   double vf, vo, vcmn, vcsd;
-   double fcst_wind, obs_wind, cmn_wind, csd_wind;
+   double uf, uo, ufcmn, ufcsd, uocmn, uocsd;
+   double vf, vo, vfcmn, vfcsd, vocmn, vocsd;
+   double fcst_wind, obs_wind;
+   double fcmn_wind, fcsd_wind;
+   double ocmn_wind, ocsd_wind;
    bool is_ugrd;
    int i;
    map<ConcatString, AggrWindInfo>::iterator it;
@@ -1819,14 +1820,18 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
 
          parse_mpr_line(line, cur);
          is_ugrd = (cur.fcst_var == ugrd_abbr_str);
-         uf      = (is_ugrd ? cur.fcst        : bad_data_double);
-         uo      = (is_ugrd ? cur.obs         : bad_data_double);
-         ucmn    = (is_ugrd ? cur.climo_mean  : bad_data_double);
-         ucsd    = (is_ugrd ? cur.climo_stdev : bad_data_double);
-         vf      = (is_ugrd ? bad_data_double : cur.fcst);
-         vo      = (is_ugrd ? bad_data_double : cur.obs);
-         vcmn    = (is_ugrd ? bad_data_double : cur.climo_mean);
-         vcsd    = (is_ugrd ? bad_data_double : cur.climo_stdev);
+         uf      = (is_ugrd ? cur.fcst             : bad_data_double);
+         uo      = (is_ugrd ? cur.obs              : bad_data_double);
+         ufcmn   = (is_ugrd ? cur.fcst_climo_mean  : bad_data_double);
+         ufcsd   = (is_ugrd ? cur.fcst_climo_stdev : bad_data_double);
+         uocmn   = (is_ugrd ? cur.obs_climo_mean   : bad_data_double);
+         uocsd   = (is_ugrd ? cur.obs_climo_stdev  : bad_data_double);
+         vf      = (is_ugrd ? bad_data_double      : cur.fcst);
+         vo      = (is_ugrd ? bad_data_double      : cur.obs);
+         vfcmn   = (is_ugrd ? bad_data_double      : cur.fcst_climo_mean);
+         vfcsd   = (is_ugrd ? bad_data_double      : cur.fcst_climo_stdev);
+         vocmn   = (is_ugrd ? bad_data_double      : cur.obs_climo_mean);
+         vocsd   = (is_ugrd ? bad_data_double      : cur.obs_climo_stdev);
 
          //
          // Build header string for matching UGRD and VGRD lines
@@ -1880,10 +1885,10 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
             // Initialize values
             //
             aggr.hdr_sa.add(hdr);
-            aggr.pd_u.add_grid_pair(uf, uo, ucmn, ucsd,
-                         default_grid_weight);
-            aggr.pd_v.add_grid_pair(vf, vo, vcmn, vcsd,
-                         default_grid_weight);
+            ClimoPntInfo u_cpi(ufcmn, ufcsd, uocmn, uocsd);
+            ClimoPntInfo v_cpi(vfcmn, vfcsd, vocmn, vocsd);
+            aggr.pd_u.add_grid_pair(uf, uo, u_cpi, default_grid_weight);
+            aggr.pd_v.add_grid_pair(vf, vo, v_cpi, default_grid_weight);
 
             //
             // Add the new map entry
@@ -1927,24 +1932,28 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
                //
                // Update the existing values
                //
-               if(!is_bad_data(uf))   m[key].pd_u.f_na.set(i, uf);
-               if(!is_bad_data(uo))   m[key].pd_u.o_na.set(i, uo);
-               if(!is_bad_data(ucmn)) m[key].pd_u.cmn_na.set(i, ucmn);
-               if(!is_bad_data(ucsd)) m[key].pd_u.csd_na.set(i, ucsd);
-               if(!is_bad_data(vf))   m[key].pd_v.f_na.set(i, vf);
-               if(!is_bad_data(vo))   m[key].pd_v.o_na.set(i, vo);
-               if(!is_bad_data(vcmn)) m[key].pd_v.cmn_na.set(i, vcmn);
-               if(!is_bad_data(vcsd)) m[key].pd_v.csd_na.set(i, vcsd);
+               if(!is_bad_data(uf))    m[key].pd_u.f_na.set(i, uf);
+               if(!is_bad_data(uo))    m[key].pd_u.o_na.set(i, uo);
+               if(!is_bad_data(ufcmn)) m[key].pd_u.fcmn_na.set(i, ufcmn);
+               if(!is_bad_data(ufcsd)) m[key].pd_u.fcsd_na.set(i, ufcsd);
+               if(!is_bad_data(uocmn)) m[key].pd_u.ocmn_na.set(i, uocmn);
+               if(!is_bad_data(uocsd)) m[key].pd_u.ocsd_na.set(i, uocsd);
+               if(!is_bad_data(vf))    m[key].pd_v.f_na.set(i, vf);
+               if(!is_bad_data(vo))    m[key].pd_v.o_na.set(i, vo);
+               if(!is_bad_data(vfcmn)) m[key].pd_v.fcmn_na.set(i, vfcmn);
+               if(!is_bad_data(vfcsd)) m[key].pd_v.fcsd_na.set(i, vfcsd);
+               if(!is_bad_data(vocmn)) m[key].pd_v.ocmn_na.set(i, vocmn);
+               if(!is_bad_data(vocsd)) m[key].pd_v.ocsd_na.set(i, vocsd);
             }
             //
             // Add data for a new header entry
             //
             else {
                m[key].hdr_sa.add(hdr);
-               m[key].pd_u.add_grid_pair(uf, uo, ucmn, ucsd,
-                              default_grid_weight);
-               m[key].pd_v.add_grid_pair(vf, vo, vcmn, vcsd,
-                              default_grid_weight);
+               ClimoPntInfo u_cpi(ufcmn, ufcsd, uocmn, uocsd);
+               ClimoPntInfo v_cpi(vfcmn, vfcsd, vocmn, vocsd);
+               m[key].pd_u.add_grid_pair(uf, uo, u_cpi, default_grid_weight);
+               m[key].pd_v.add_grid_pair(vf, vo, v_cpi, default_grid_weight);
             }
          }
 
@@ -2011,18 +2020,25 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
             job.out_obs_wind_thresh.get_type()  != thresh_na) {
 
             // Compute wind speeds
-            fcst_wind = convert_u_v_to_wind(it->second.pd_u.f_na[i],
-                                            it->second.pd_v.f_na[i]);
-             obs_wind = convert_u_v_to_wind(it->second.pd_u.o_na[i],
-                                            it->second.pd_v.o_na[i]);
-             cmn_wind = convert_u_v_to_wind(it->second.pd_u.cmn_na[i],
-                                            it->second.pd_v.cmn_na[i]);
-             csd_wind = convert_u_v_to_wind(it->second.pd_u.csd_na[i],
-                                            it->second.pd_v.csd_na[i]);
+            fcst_wind  = convert_u_v_to_wind(it->second.pd_u.f_na[i],
+                                             it->second.pd_v.f_na[i]);
+             obs_wind  = convert_u_v_to_wind(it->second.pd_u.o_na[i],
+                                             it->second.pd_v.o_na[i]);
+             fcmn_wind = convert_u_v_to_wind(it->second.pd_u.fcmn_na[i],
+                                             it->second.pd_v.fcmn_na[i]);
+             fcsd_wind = convert_u_v_to_wind(it->second.pd_u.fcsd_na[i],
+                                             it->second.pd_v.fcsd_na[i]);
+             ocmn_wind = convert_u_v_to_wind(it->second.pd_u.ocmn_na[i],
+                                             it->second.pd_v.ocmn_na[i]);
+             ocsd_wind = convert_u_v_to_wind(it->second.pd_u.ocsd_na[i],
+                                             it->second.pd_v.ocsd_na[i]);
+
+            // Store climo data
+            ClimoPntInfo cpi(fcmn_wind, fcsd_wind, ocmn_wind, ocsd_wind);
 
             // No climo mean and standard deviation in the input VL1L2 lines,
             // so just fill with bad data.
-            if(!check_fo_thresh(fcst_wind, obs_wind, cmn_wind, csd_wind,
+            if(!check_fo_thresh(fcst_wind, obs_wind, cpi,
                                 job.out_fcst_wind_thresh, job.out_obs_wind_thresh,
                                 job.out_wind_logic)) {
                mlog << Debug(4) << "aggr_mpr_wind_lines() -> "
@@ -2076,15 +2092,14 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Convert to and append unit vectors
          //
+         ClimoPntInfo cpi;
          aggr.hdr_sa.add(it->second.hdr_sa[i]);
          convert_u_v_to_unit(it->second.pd_u.f_na[i],
                              it->second.pd_v.f_na[i], uf, vf);
          convert_u_v_to_unit(it->second.pd_u.o_na[i],
                              it->second.pd_v.o_na[i], uo, vo);
-         aggr.pd_u.add_grid_pair(uf, uo, bad_data_double,
-                                 bad_data_double, default_grid_weight);
-         aggr.pd_v.add_grid_pair(vf, vo, bad_data_double,
-                                 bad_data_double, default_grid_weight);
+         aggr.pd_u.add_grid_pair(uf, uo, cpi, default_grid_weight);
+         aggr.pd_v.add_grid_pair(vf, vo, cpi, default_grid_weight);
       }
 
       //
@@ -2126,7 +2141,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             mlog << Error << "\naggr_mpr_lines() -> "
                  << "should only encounter matched pair (MPR) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2151,17 +2166,21 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
 
             aggr.pd.f_na.clear();
             aggr.pd.o_na.clear();
-            aggr.pd.cmn_na.clear();
-            aggr.pd.csd_na.clear();
-            aggr.pd.cdf_na.clear();
+            aggr.pd.fcmn_na.clear();
+            aggr.pd.fcsd_na.clear();
+            aggr.pd.ocmn_na.clear();
+            aggr.pd.ocsd_na.clear();
+            aggr.pd.ocdf_na.clear();
             aggr.pd.wgt_na.clear();
 
             aggr.pd.n_obs = 1;
             aggr.pd.f_na.add(cur.fcst);
             aggr.pd.o_na.add(cur.obs);
-            aggr.pd.cmn_na.add(cur.climo_mean);
-            aggr.pd.csd_na.add(cur.climo_stdev);
-            aggr.pd.cdf_na.add(cur.climo_cdf);
+            aggr.pd.fcmn_na.add(cur.fcst_climo_mean);
+            aggr.pd.fcsd_na.add(cur.fcst_climo_stdev);
+            aggr.pd.ocmn_na.add(cur.obs_climo_mean);
+            aggr.pd.ocsd_na.add(cur.obs_climo_stdev);
+            aggr.pd.ocdf_na.add(cur.obs_climo_cdf);
             aggr.pd.wgt_na.add(default_grid_weight);
 
             aggr.fcst_var = cur.fcst_var;
@@ -2188,9 +2207,11 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             m[key].pd.n_obs++;
             m[key].pd.f_na.add(cur.fcst);
             m[key].pd.o_na.add(cur.obs);
-            m[key].pd.cmn_na.add(cur.climo_mean);
-            m[key].pd.csd_na.add(cur.climo_stdev);
-            m[key].pd.cdf_na.add(cur.climo_cdf);
+            m[key].pd.fcmn_na.add(cur.fcst_climo_mean);
+            m[key].pd.fcsd_na.add(cur.fcst_climo_stdev);
+            m[key].pd.ocmn_na.add(cur.obs_climo_mean);
+            m[key].pd.ocsd_na.add(cur.obs_climo_stdev);
+            m[key].pd.ocdf_na.add(cur.obs_climo_cdf);
             m[key].pd.wgt_na.add(default_grid_weight);
 
             //
@@ -2203,7 +2224,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
                     << "remain constant.  Try setting \"-fcst_var\" and/or "
                     << "\"-obs_var\".\n"
                     << "ERROR occurred on STAT line:\n" << line << "\n\n";
-               throw(1);
+               throw 1;
             }
          }
 
@@ -2250,7 +2271,7 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
                  << "should only encounter intensity-scale "
                  << "(ISC) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2325,7 +2346,7 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
                  << "filter out only those lines you'd like "
                  << "to aggregate.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2508,7 +2529,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter ensemble continuous statistics "
                  << "(ECNT) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2569,14 +2590,14 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          m[key].me_na.add(cur.me);
          m[key].mae_na.add(cur.mae);
-         m[key].mse_na.add((is_bad_data(cur.rmse) ?
-                            bad_data_double :
-                            cur.rmse * cur.rmse));
+         m[key].mse_na.add(is_bad_data(cur.rmse) ?
+                           bad_data_double :
+                           cur.rmse * cur.rmse);
          m[key].me_oerr_na.add(cur.me_oerr);
          m[key].mae_oerr_na.add(cur.mae_oerr);
-         m[key].mse_oerr_na.add((is_bad_data(cur.rmse_oerr) ?
-                                 bad_data_double :
-                                 cur.rmse_oerr * cur.rmse_oerr));
+         m[key].mse_oerr_na.add(is_bad_data(cur.rmse_oerr) ?
+                                bad_data_double :
+                                cur.rmse_oerr * cur.rmse_oerr);
 
          //
          // Keep track of the unique header column entries
@@ -2659,7 +2680,7 @@ void aggr_rps_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter ranked probability score "
                  << "(RPS) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2699,7 +2720,7 @@ void aggr_rps_lines(LineDataFile &f, STATAnalysisJob &job,
                     << "the \"N_PROB\" column must remain constant ("
                     << m[key].rps_info.n_prob << " != " << cur.n_prob
                     << ").  Try setting \"-column_eq N_PROB n\".\n\n";
-               throw(1);
+               throw 1;
             }
 
             //
@@ -2751,7 +2772,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter ranked histogram "
                  << "(RHIST) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2784,7 +2805,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "the \"N_RANK\" column must remain constant ("
                  << m[key].ens_pd.rhist_na.n() << " != " << cur.n_rank
                  << ").  Try setting \"-column_eq N_RANK n\".\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2841,7 +2862,7 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter probability integral "
                  << "transform histogram (PHIST) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2879,7 +2900,7 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &job,
                     << "the \"BIN_SIZE\" column must remain constant ("
                     << m[key].ens_pd.phist_bin_size << " != " << cur.bin_size
                     << ").  Try setting \"-column_eq BIN_SIZE n\".\n\n";
-               throw(1);
+               throw 1;
             }
 
             //
@@ -2932,7 +2953,7 @@ void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter relative position (RELP) "
                  << "line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -2969,7 +2990,7 @@ void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &job,
                     << "the \"N_ENS\" column must remain constant ("
                     << m[key].ens_pd.relp_na.n() << " != " << cur.n_ens
                     << ").  Try setting \"-column_eq N_ENS n\".\n\n";
-               throw(1);
+               throw 1;
             }
 
             //
@@ -3024,7 +3045,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter observation rank "
                  << "(ORANK) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3078,7 +3099,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
             mlog << Error << "\naggr_orank_lines() -> "
                  << "the \"N_ENS\" column must remain constant. "
                  << "Try setting \"-column_eq N_ENS n\".\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3086,8 +3107,9 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          // ensemble spread, ensemble member values, and
          // valid ensemble count
          //
-         m[key].ens_pd.add_grid_obs(cur.obs, cur.climo_mean,
-                                    cur.climo_stdev, default_grid_weight);
+         ClimoPntInfo cpi(cur.fcst_climo_mean, cur.fcst_climo_stdev,
+                          cur.obs_climo_mean, cur.obs_climo_stdev);
+         m[key].ens_pd.add_grid_obs(cur.obs, cpi, default_grid_weight);
          m[key].ens_pd.skip_ba.add(false);
          m[key].ens_pd.n_pair++;
          m[key].ens_pd.r_na.add(cur.rank);
@@ -3112,7 +3134,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
 
          // Derive ensemble from climo mean and standard deviation
          derive_climo_vals(&m[key].cdf_info,
-                           cur.climo_mean, cur.climo_stdev, climo_vals);
+                           cur.obs_climo_mean, cur.obs_climo_stdev, climo_vals);
 
          // Store empirical CRPS stats and CRPS-Fair
          double crps_emp = compute_crps_emp(cur.obs, cur.ens_na);
@@ -3123,7 +3145,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
 
          // Store Gaussian CRPS stats
          m[key].ens_pd.crps_gaus_na.add(compute_crps_gaus(cur.obs, cur.ens_mean, cur.spread));
-         m[key].ens_pd.crpscl_gaus_na.add(compute_crps_gaus(cur.obs, cur.climo_mean, cur.climo_stdev));
+         m[key].ens_pd.crpscl_gaus_na.add(compute_crps_gaus(cur.obs, cur.obs_climo_mean, cur.obs_climo_stdev));
          m[key].ens_pd.ign_na.add(compute_ens_ign(cur.obs, cur.ens_mean, cur.spread));
          m[key].ens_pd.pit_na.add(compute_ens_pit(cur.obs, cur.ens_mean, cur.spread));
 
@@ -3213,7 +3235,7 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "should only encounter spread-skill variance "
                  << "(SSVAR) line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3229,7 +3251,7 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "remain constant.  Try setting \"-fcst_var\" and/or "
                  << "\"-obs_var\".\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3317,7 +3339,7 @@ void aggr_seeps_lines(LineDataFile &f, STATAnalysisJob &job,
             mlog << Error << "\naggr_seeps_lines() -> "
                  << "should only encounter SEEPS line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3333,7 +3355,7 @@ void aggr_seeps_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "remain constant.  Try setting \"-fcst_var\" and/or "
                  << "\"-obs_var\".\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3401,7 +3423,7 @@ void aggr_seeps_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             mlog << Error << "\naggr_seeps_mpr_lines() -> "
                  << "should only encounter SEEPS_MPR line types.\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3417,7 +3439,7 @@ void aggr_seeps_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "remain constant.  Try setting \"-fcst_var\" and/or "
                  << "\"-obs_var\".\n"
                  << "ERROR occurred on STAT line:\n" << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3520,7 +3542,7 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &job,
                  << "remain constant for case \"" << key
                  << "\".  Try setting \"-fcst_var\" and/or \"-obs_var\".\n"
                  << line << "\n\n";
-            throw(1);
+            throw 1;
          }
 
          //
@@ -3598,7 +3620,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
            << "this job may only be called when the \"-model\" option "
            << "has been used exactly twice to specify the forecast "
            << "model followed by the reference model.\n\n";
-      throw(1);
+      throw 1;
    }
    else {
       cur.job_info.fcst_model = job.model[0];
@@ -3628,7 +3650,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
            << "you must define the skill score index to be computed "
            << "using the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
            << "\"-line_type\", \"-column\", and \"-weight\" options.\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -3644,7 +3666,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
            << n_term << ") or have length 1!\n"
            << "Check the \"-fcst_var\", \"-fcst_lev\", \"-fcst_lead\", "
            << "\"-line_type\", \"-column\", and \"-weight\" options.\n\n";
-      throw(1);
+      throw 1;
    }
 
    //
@@ -3677,7 +3699,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
                  << "a skill score index can only be computed using "
                  << "statistics derived from SL1L2 or CTC line types."
                  << "\n\n";
-            throw(1);
+            throw 1;
          }
       }
 
@@ -3783,8 +3805,9 @@ void mpr_to_ctc(STATAnalysisJob &job, const AggrMPRInfo &info,
    // Populate the contingency table
    //
    for(i=0; i<info.pd.n_obs; i++) {
-      cts_info.add(info.pd.f_na[i], info.pd.o_na[i],
-                   info.pd.cmn_na[i], info.pd.csd_na[i]);
+      ClimoPntInfo cpi(info.pd.fcmn_na[i], info.pd.fcsd_na[i],
+                       info.pd.ocmn_na[i], info.pd.ocsd_na[i]);
+      cts_info.add(info.pd.f_na[i], info.pd.o_na[i], &cpi);
    }
 
    return;
@@ -3976,12 +3999,6 @@ void mpr_to_cnt(STATAnalysisJob &job, const AggrMPRInfo &info,
 
 void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
                  int i_thresh, SL1L2Info &s_info) {
-   int i;
-   int scount, sacount;
-   double f, o, c;
-   double f_sum,  o_sum,  ff_sum,  oo_sum,  fo_sum;
-   double fa_sum, oa_sum, ffa_sum, ooa_sum, foa_sum;
-   double abs_err_sum;
    PairDataPoint pd_thr;
 
    //
@@ -4011,41 +4028,53 @@ void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    // Initialize counts
    //
-   scount = sacount = 0;
-   f_sum  = o_sum  =  ff_sum  = oo_sum  = fo_sum  = 0.0;
-   fa_sum = oa_sum =  ffa_sum = ooa_sum = foa_sum = 0.0;
-   abs_err_sum = 0.0;
+   int scount       = 0;
+   int sacount      = 0;
+   double f_sum     = 0.0;
+   double o_sum     = 0.0;
+   double ff_sum    = 0.0;
+   double oo_sum    = 0.0;
+   double fo_sum    = 0.0;
+   double smae_sum  = 0.0;
+   double fa_sum    = 0.0;
+   double oa_sum    = 0.0;
+   double ffa_sum   = 0.0;
+   double ooa_sum   = 0.0;
+   double foa_sum   = 0.0;
+   double samae_sum = 0.0;
 
    //
    // Update the partial sums
    //
-   for(i=0; i<pd_thr.n_obs; i++) {
+   for(int i=0; i<pd_thr.n_obs; i++) {
 
       //
       // Update the counts for this matched pair
       //
-      f = pd_thr.f_na[i];
-      o = pd_thr.o_na[i];
-      c = pd_thr.cmn_na[i];
+      double f  = pd_thr.f_na[i];
+      double o  = pd_thr.o_na[i];
+      double fc = pd_thr.fcmn_na[i];
+      double oc = pd_thr.ocmn_na[i];
 
-      f_sum       += f;
-      o_sum       += o;
-      ff_sum      += f*f;
-      oo_sum      += o*o;
-      fo_sum      += f*o;
-      abs_err_sum += fabs(f-o);
+      f_sum    += f;
+      o_sum    += o;
+      ff_sum   += f*f;
+      oo_sum   += o*o;
+      fo_sum   += f*o;
+      smae_sum += fabs(f-o);
       scount   += 1;
 
       //
-      // Check c for valid data
+      // Check for valid climo data
       //
-      if(!is_bad_data(c)) {
-
-         fa_sum    += f-c;
-         oa_sum    += o-c;
-         ffa_sum   += (f-c)*(f-c);
-         ooa_sum   += (o-c)*(o-c);
-         foa_sum   += (f-c)*(o-c);
+      if(!is_bad_data(fc) &&
+         !is_bad_data(oc)) {
+         fa_sum    += f-fc;
+         oa_sum    += o-oc;
+         ffa_sum   += (f-fc)*(f-fc);
+         ooa_sum   += (o-oc)*(o-oc);
+         foa_sum   += (f-oc)*(o-oc);
+         samae_sum += fabs((f-fc)-(o-oc));
          sacount   += 1;
       }
    } // end for
@@ -4057,16 +4086,17 @@ void mpr_to_psum(STATAnalysisJob &job, const AggrMPRInfo &info,
       s_info.fobar  = fo_sum/scount;
       s_info.ffbar  = ff_sum/scount;
       s_info.oobar  = oo_sum/scount;
-      s_info.mae    = abs_err_sum/scount;
+      s_info.smae   = smae_sum/scount;
    }
 
    if(sacount != 0) {
-      s_info.sacount  = sacount;
-      s_info.fabar    = fa_sum/sacount;
-      s_info.oabar    = oa_sum/sacount;
-      s_info.foabar   = foa_sum/sacount;
-      s_info.ffabar   = ffa_sum/sacount;
-      s_info.ooabar   = ooa_sum/sacount;
+      s_info.sacount = sacount;
+      s_info.fabar   = fa_sum/sacount;
+      s_info.oabar   = oa_sum/sacount;
+      s_info.foabar  = foa_sum/sacount;
+      s_info.ffabar  = ffa_sum/sacount;
+      s_info.ooabar  = ooa_sum/sacount;
+      s_info.samae   = samae_sum/scount;
    }
 
    return;

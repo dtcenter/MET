@@ -60,8 +60,8 @@ The configuration file language supports the following data types:
 * Percentile Thresholds:
 
   * A threshold type (<, <=, ==, !=, >=, or >), followed by a percentile
-    type description (SFP, SOP, SCP, USP, CDP, or FBIAS), followed by a
-    numeric value, typically between 0 and 100.
+    type description (SFP, SOP, SFCP, SOCP, USP, FCDP, OCDP, or FBIAS),
+    followed by a numeric value, typically between 0 and 100.
 
   * Note that the two letter threshold type abbreviations (lt, le, eq, ne,
     ge, gt) are not supported for percentile thresholds.
@@ -93,8 +93,14 @@ The configuration file language supports the following data types:
     * "SOP" for a percentile of the sample observation values.
       e.g. ">SOP75" means greater than the 75-th observation percentile.
       
-    * "SCP" for a percentile of the sample climatology values.
-      e.g. ">SCP90" means greater than the 90-th climatology percentile.
+    * "SFCP" for a percentile of the sample forecast climatology values.
+      e.g. ">SFCP90" means greater than the 90-th forecast climatology
+      percentile.
+
+    * "SOCP" for a percentile of the sample observation climatology values.
+      e.g. ">SOCP90" means greater than the 90-th observation climatology
+      percentile. For backward compatibility, the "SCP" threshold type
+      is processed the same as "SOCP".
       
     * "USP" for a user-specified percentile threshold.
       e.g. "<USP90(2.5)" means less than the 90-th percentile values which
@@ -109,40 +115,59 @@ The configuration file language supports the following data types:
       the observations and then chooses a forecast threshold which results in
       a frequency bias of 1. The frequency bias can be any float value > 0.0.
       
-    * "CDP" for climatological distribution percentile thresholds.
-      These thresholds require that the climatological mean and standard
-      deviation be defined using the climo_mean and climo_stdev config file
-      options, respectively. The categorical (cat_thresh), conditional
-      (cnt_thresh), or wind speed (wind_thresh) thresholds are defined
-      relative to the climatological distribution at each point. Therefore,
-      the actual numeric threshold applied can change for each point.
-      e.g. ">CDP50" means greater than the 50-th percentile of the
+    * "FCDP" for forecast climatological distribution percentile thresholds.
+      These thresholds require that the forecast climatological mean and
+      standard deviation be defined using the "climo_mean" and "climo_stdev"
+      config file options, respectively. The categorical (cat_thresh),
+      conditional (cnt_thresh), or wind speed (wind_thresh) thresholds can
+      be defined relative to the climatological distribution at each point.
+      Therefore, the actual numeric threshold applied can change for each point.
+      e.g. ">FCDP50" means greater than the 50-th percentile of the
       climatological distribution for each point.
-      
-  * When percentile thresholds of type SFP, SOP, SCP, or CDP are requested
-    for continuous filtering thresholds (cnt_thresh), wind speed thresholds
-    (wind_thresh), or observation filtering thresholds (obs_thresh in
-    ensemble_stat), the following special logic is applied. Percentile
+
+    * "OCDP" for observation climatological distribution percentile thresholds.
+      The "OCDP" threshold logic matches the "FCDP" logic described above.
+      However these thresholds are defined using the observation climatological
+      mean and standard deviation rather than the forecast climatological data.
+      For backward compatibility, the "CDP" threshold type is processed the
+      same as "OCDP". 
+
+  * When percentile thresholds of type SFP, SOP, SFCP, SOCP, FCDP, or OCDP are
+    requested for continuous filtering thresholds (cnt_thresh), wind speed
+    thresholds (wind_thresh), or observation filtering thresholds (obs_thresh
+    in ensemble_stat), the following special logic is applied. Percentile
     thresholds of type equality are automatically converted to percentile
     bins which span the values from 0 to 100.
-    For example, "==CDP25" is automatically expanded to 4 percentile bins:
-    >=CDP0&&<CDP25,>=CDP25&&<CDP50,>=CDP50&&<CDP75,>=CDP75&&<=CDP100
+    For example, "==OCDP25" is automatically expanded to 4 percentile bins:
+    >=OCDP0&&<OCDP25,>=OCDP25&&<OCDP50,>=OCDP50&&<OCDP75,>=OCDP75&&<=OCDP100
      
-  * When sample percentile thresholds of type SFP, SOP, SCP, or FBIAS are
-    requested, MET recomputes the actual percentile that the threshold
+  * When sample percentile thresholds of type SFP, SOP, SFCP, SOCP, or FBIAS
+    are requested, MET recomputes the actual percentile that the threshold
     represents. If the requested percentile and actual percentile differ by
     more than 5%, a warning message is printed. This may occur when the
     sample size is small or the data values are not truly continuous.
      
-  * When percentile thresholds of type SFP, SOP, SCP, or USP are used, the
-    actual threshold value is appended to the FCST_THRESH and OBS_THRESH
+  * When percentile thresholds of type SFP, SOP, SFCP, SOCP, or USP are used,
+    the actual threshold value is appended to the FCST_THRESH and OBS_THRESH
     output columns. For example, if the 90-th percentile of the current set
     of forecast values is 3.5, then the requested threshold "<=SFP90" is
     written to the output as "<=SFP90(3.5)".
-     
+
   * When parsing FCST_THRESH and OBS_THRESH columns, the Stat-Analysis tool
     ignores the actual percentile values listed in parentheses.
-     
+
+.. note::
+
+  Prior to MET version 12.0.0, forecast climatological inputs were not
+  supported. The observation climatological inputs were used to process
+  threshold types named "SCP" and "CDP".
+
+  For backward compatibility, the "SCP" threshold type is processed the same
+  as "SOCP" and "CDP" the same as "OCDP".
+
+  Users are encouraged to replace the deprecated "SCP" and "CDP" threshold
+  types with the updated "SOCP" and "OCDP" types, respectively.
+ 
 * Piecewise-Linear Function (currently used only by MODE):
   
   * A list of (x, y) points enclosed in parenthesis ().
@@ -299,8 +324,10 @@ To run this utility:
     -e EXISTING_FILE, --existing=EXISTING_FILE
                           Save the text into the named file (optional, default: ../../../data/table_files/ndbc_stations.xml)
 
-NOTE: The downloaded files are written to a subdirectory ndbc_temp_data which
-can be deleted once the final output file is created.
+.. note::
+
+  The downloaded files are written to a subdirectory ndbc_temp_data which
+  can be deleted once the final output file is created.
 
 MET_BASE
 --------
@@ -765,7 +792,18 @@ using the following entries:
     * NEAREST     for the nearest grid point (width = 1)
       
     * BUDGET      for the mass-conserving budget interpolation
-      
+
+      * The budget interpolation method is often used for precipitation
+        in order to roughly conserve global averages. However it is
+        computationally intensive and relatively slow. To compute the
+        interpolated value for each point of the target grid, a higher
+        resolution 5x5 mesh with 0.2 grid box spacing is centered on
+        the point and bilinear interpolation is performed for each
+        of those 25 lat/lon locations. The budget interpolation value
+        is computed as the average of those 25 bilinear interpolation
+        values, assuming enough valid data is present to meet the
+        "vld_thresh" threshold.
+
     * FORCE       to compare gridded data directly with no interpolation
       as long as the grid x and y dimensions match.
       
@@ -1437,8 +1475,11 @@ climo_mean
 ----------
       
 The "climo_mean" dictionary specifies climatology mean data to be read by the
-Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis tools. It consists
-of several entires defining the climatology file names and fields to be used.
+Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis tools. It can be
+set inside the "fcst" and "obs" dictionaries to specify separate forecast and
+observation climatology data or once at the top-level configuration file
+context to use the same data for both. It consists of several entries defining
+the climatology file names and fields to be used.
 
 * The "file_names" entry specifies one or more file names containing
   the gridded climatology data to be used.
@@ -1469,8 +1510,11 @@ of several entires defining the climatology file names and fields to be used.
   with 6 and 12 being common choices. Use "NA" if the timing of the
   climatology data should not be checked.
 
-* The "day_interval" and "hour_interval" entries replace the deprecated
-  entries "match_month", "match_day", and "time_step".
+.. note::
+
+  As of MET version 11.0.0, the "day_interval" and "hour_interval" entries
+  replace the "match_month", "match_day", and "time_step" entries, which are
+  now deprecated.
 
 .. code-block:: none
 
@@ -1495,19 +1539,22 @@ climo_stdev
       
 The "climo_stdev" dictionary specifies climatology standard deviation data to
 be read by the Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis
-tools. The "climo_mean" and "climo_stdev" data define the climatological
-distribution for each grid point, assuming normality. These climatological
-distributions are used in two ways:
+tools. It can be set inside the "fcst" and "obs" dictionaries to specify
+separate forecast and observation climatology data or once at the top-level
+configuration file context to use the same data for both. The "climo_mean" and
+"climo_stdev" data define the climatological distribution for each grid point,
+assuming normality. These climatological distributions are used in two ways:
 
 (1)
-    To define climatological distribution percentile (CDP) thresholds which
-    can be used as categorical (cat_thresh), continuous (cnt_thresh), or wind
-    speed (wind_thresh) thresholds.
+    To define climatological distribution percentiles thresholds (FCDP and
+    OCDP) which can be used as categorical (cat_thresh), continuous (cnt_thresh),
+    or wind speed (wind_thresh) thresholds.
 
 (2)
     To subset matched pairs into climatological bins based on where the
-    observation value falls within the climatological distribution. See the
-    "climo_cdf" dictionary.
+    observation value falls within the observation climatological distribution.
+    See the "climo_cdf" dictionary. Note that only the observation climatology
+    data is used for this purpose, not the forecast climatology data.
 
 This dictionary is identical to the "climo_mean" dictionary described above
 but points to files containing climatological standard deviation values
@@ -1521,14 +1568,36 @@ over the "climo_mean" setting and then updating the "file_name" entry.
      file_name = [ "/path/to/climatological/standard/deviation/files" ];
   }
 
+Prior to MET version 12.0.0, forecast climatological inputs were not supported.
+If the "climo_mean" and "climo_stdev" dictionaries are defined at the top-level
+configuration file context, the same data is used for both the forecast and
+observation climatologies. To specify separate forecast and observation
+climatologies, define "climo_mean" and "climo_stdev" inside the "fcst" and "obs"
+dictionaries, as shown below.
+
+.. code-block:: none
+
+  fcst = {
+    field = [ ... ];
+    climo_mean = { ... };
+    climo_stdev = { ... };
+  }
+
+  obs = {
+    field = [ ... ];
+    climo_mean = { ... };
+    climo_stdev = { ... };
+  }
+
 climo_cdf
 ---------
       
-The "climo_cdf" dictionary specifies how the the climatological mean
-("climo_mean") and standard deviation ("climo_stdev") data are used to
+The "climo_cdf" dictionary specifies how the the observation climatological
+mean ("climo_mean") and standard deviation ("climo_stdev") data are used to
 evaluate model performance relative to where the observation value falls
-within the climatological distribution. This dictionary consists of the
-following entries:
+within the observation climatological distribution. It can be set inside the
+"obs" dictionary or at the top-level configuration file context. This
+dictionary consists of the following entries:
 
 (1)
     The "cdf_bins" entry defines the climatological bins either as an integer
@@ -1542,11 +1611,11 @@ following entries:
 
 (4) The "direct_prob" entry may be set to TRUE or FALSE.
 
-MET uses the climatological mean and standard deviation to construct a normal
-PDF at each observation location. The total area under the PDF is 1, and the
-climatological CDF value is computed as the area of the PDF to the left of
-the observation value. Since the CDF is a value between 0 and 1, the CDF
-bins must span that same range.
+MET uses the observation climatological mean and standard deviation to
+construct a normal PDF at each observation location. The total area under the
+PDF is 1, and the climatological CDF value is computed as the area of the PDF
+to the left of the observation value. Since the CDF is a value between 0 and 1,
+the CDF bins must span that same range.
 
 When "cdf_bins" is set to an array of floats, they explicitly define the
 climatological bins. The array must begin with 0.0 and end with 1.0.
@@ -1590,20 +1659,21 @@ all pairs into a single climatological bin.
 
 climate_data
 ------------
-      
-When specifying climatology data for probability forecasts, either supply a
-probabilistic "climo_mean" field or non-probabilistic "climo_mean" and
-"climo_stdev" fields from which a normal approximation of the climatological
-probabilities should be derived.
 
-When "climo_mean" is set to a probability field with a range of [0, 1] and
-"climo_stdev" is unset, the MET tools use the "climo_mean" probability values
-directly to compute Brier Skill Score (BSS).
+When specifying observation climatology data to evaluate probability
+forecasts, either supply a probabilistic observation "climo_mean" field or
+non-probabilistic "climo_mean" and "climo_stdev" fields from which a normal
+approximation of the observation climatological probabilities should be
+derived.
 
-When "climo_mean" and "climo_stdev" are both set to non-probability fields,
-the MET tools use the mean, standard deviation, and observation event
-threshold to derive a normal approximation of the climatological
-probabilities.
+When the observation "climo_mean" is set to a probability field with a range
+of [0, 1] and "climo_stdev" is unset, the MET tools use the "climo_mean"
+probability values directly to compute Brier Skill Score (BSS).
+
+When the observation "climo_mean" and "climo_stdev" are both set to
+non-probability fields, the MET tools use the mean, standard deviation, and
+observation event threshold to derive a normal approximation of the
+observation climatological probabilities.
 
 The "direct_prob" option controls the derivation logic. When "direct_prob" is
 true, the climatological probability is computed directly from the
@@ -1625,6 +1695,26 @@ The default setting is >=0.1&&<=0.85.
 .. code-block:: none
 
   seeps_p1_thresh = >=0.1&&<=0.85;
+
+seeps_grid_climo_name
+---------------------
+
+The "seeps_grid_climo_name" option sets the location and the filename of the SEEPS climo file for the gridded data.
+The default setting is the empty string. It should be configured by the user. It can be overridden by the environment variable, MET_SEEPS_GRID_CLIMO_NAME.
+
+.. code-block:: none
+
+  seeps_grid_climo_name = "";
+
+seeps_point_climo_name
+----------------------
+
+The "seeps_point_climo_name" option controls the location and the filename of the SEEPS climo file for the point data.
+The default setting is the empty string which does not override the default location and name. It can be overridden by the environment variable, MET_SEEPS_POINT_CLIMO_NAME.
+
+.. code-block:: none
+
+  seeps_point_climo_name = "";
 
 mask_missing_flag
 -----------------
@@ -1665,8 +1755,8 @@ Point-Stat and Ensemble-Stat, the reference time is the forecast valid time.
 .. _config_options-mask:
 
 mask
----
-     
+----
+
 The "mask" entry is a dictionary that specifies the verification masking
 regions to be used when computing statistics. Each mask defines a
 geographic extent, and any matched pairs falling inside that area will be
@@ -1685,11 +1775,18 @@ in the following ways:
 
 * The "poly" entry contains a comma-separated list of files that define
   verification masking regions. These masking regions may be specified in
-  two ways: in an ASCII file containing lat/lon points defining the mask polygon,
-  or using a gridded data file such as the NetCDF output of the Gen-Vx-Mask tool.
-  Some details for each of these options are described below:
+  three ways:
 
-  * If providing an ASCII file containing the lat/lon points defining the mask
+    1. An ASCII polyline file containing lat/lon points defining the mask polygon.
+    2. The NetCDF output of the Gen-Vx-Mask tool.
+    3. Any gridded data file followed by a configuration string describing the
+       data to be read and an optional threshold to be applied to that data.
+
+  These three options are described below:
+
+  * Option 1 - ASCII polyline file:
+
+    If providing an ASCII file containing the lat/lon points defining the mask
     polygon, the file must contain a name for the region followed by the latitude
     (degrees north) and longitude (degrees east) for each vertex of the polygon.
     The values are separated by whitespace (e.g. spaces or newlines), and the
@@ -1717,17 +1814,38 @@ in the following ways:
     observation point falls within the polygon defined is done in x/y
     grid space.
 
-  * The NetCDF output of the gen_vx_mask tool. Please see :numref:`masking`
+    .. code-block:: none
+
+       mask = { poly = [ "share/met/poly/CONUS.poly" ]; }
+
+  * Option 2 - Gen-Vx-Mask output:
+
+    The NetCDF output of the gen_vx_mask tool. Please see :numref:`masking`
     for more details.
 
-  * Any gridded data file that MET can read may be used to define a
+    .. code-block:: none
+
+       mask = { poly = [ "/path/to/gen_vx_mask_output.nc" ]; }
+
+  * Option 3 - Any gridded data file:
+
+    Any gridded data file that MET can read may be used to define a
     verification masking region. Users must specify a description of the
     field to be used from the input file and, optionally, may specify a
     threshold to be applied to that field. Once this threshold is
     applied, any grid point where the resulting field is 0, the mask is
     turned off. Any grid point where it is non-zero, the mask is turned
     on.
-    For example, "sample.grib {name = \"TMP\"; level = \"Z2\";} >273"
+
+    .. code-block:: none
+
+       mask = { poly = [ "/path/to/sample.grib {name = \"TMP\"; level = \"Z2\";} >273" ]; }
+
+  .. note::
+
+    The syntax for the Option 3 is complicated since it includes quotes
+    embedded within another quoted string. Any such embedded quotes must
+    be escaped using a preceeding backslash character.
 
 * The "sid" entry is an array of strings which define groups of
   observation station ID's over which to compute statistics. Each entry
@@ -2205,8 +2323,10 @@ For example:
 | nc_pairs_var_suffix = "FREEZING"; (for the freezing level height)
 |
 
-NOTE: This option was previously named "nc_pairs_var_str", which is
-now deprecated.
+.. note::
+
+  Prior to MET version 9.0.0, this option was named "nc_pairs_var_str",'
+  which is now deprecated.
 
 .. code-block:: none
 
@@ -3728,7 +3848,7 @@ obs_prepbufr_map
 Default mapping for PREPBUFR. Replace input BUFR variable names with GRIB
 abbreviations in the output. This default map is appended to obs_bufr_map.
 This should not typically be overridden. This default mapping provides
-backward-compatibility for earlier versions of MET which wrote GRIB
+backward compatibility for earlier versions of MET which wrote GRIB
 abbreviations to the output.
 
 .. code-block:: none

@@ -145,6 +145,7 @@ class STATAnalysisJob {
 
       void set_perc_thresh(const NumArray &,
                            const NumArray &,
+                           const NumArray &,
                            const NumArray &);
 
       void open_dump_row_file ();
@@ -364,7 +365,7 @@ class STATAnalysisJob {
 inline void STATAnalysisJob::set_job_type  (const STATJobType t) { job_type = t; return; }
 
 inline void STATAnalysisJob::set_precision (int p)  { precision = p; return; }
-inline int  STATAnalysisJob::get_precision () const { return(precision);     }
+inline int  STATAnalysisJob::get_precision () const { return precision;      }
 
 ////////////////////////////////////////////////////////////////////////
 

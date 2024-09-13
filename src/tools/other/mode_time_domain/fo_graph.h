@@ -107,10 +107,10 @@ class FO_Graph {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int FO_Graph::n_fcst () const { return ( N_fcst ); }
-inline int FO_Graph::n_obs  () const { return ( N_obs  ); }
+inline int FO_Graph::n_fcst () const { return N_fcst; }
+inline int FO_Graph::n_obs  () const { return N_obs ; }
 
-inline int FO_Graph::n_nodes () const { return ( N_nodes ); }
+inline int FO_Graph::n_nodes () const { return N_nodes; }
 
 inline int FO_Graph::n_total () const { return ( N_fcst + N_obs  ); }
 

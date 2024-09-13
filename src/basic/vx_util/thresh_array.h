@@ -68,8 +68,10 @@ class ThreshArray {
       int has(const SingleThresh &, int & index) const;
 
       bool need_perc();
-      void set_perc(const NumArray *, const NumArray *, const NumArray *);
-      void set_perc(const NumArray *, const NumArray *, const NumArray *,
+      void set_perc(const NumArray *, const NumArray *,
+                    const NumArray *, const NumArray *);
+      void set_perc(const NumArray *, const NumArray *,
+                    const NumArray *, const NumArray *,
                     const ThreshArray *, const ThreshArray *);
 
       void multiply_by(const double);
@@ -82,21 +84,19 @@ class ThreshArray {
                                 int precision = thresh_default_precision) const;
 
       void check_bin_thresh() const;
-      int check_bins(double) const;
-      int check_bins(double, double, double) const;
 
-      bool check_dbl(double) const;
-      bool check_dbl(double, double, double) const;
+      int  check_bins(double, const ClimoPntInfo *cpi = nullptr) const;
+      bool check_dbl (double, const ClimoPntInfo *cpi = nullptr) const;
 
       bool equal_bin_width(double &) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int                  ThreshArray::n_elements() const { return ( Nelements ); }
-inline int                  ThreshArray::n()          const { return ( Nelements ); }
-inline const SingleThresh * ThreshArray::thresh()     const { return ( t );         }
-inline       SingleThresh * ThreshArray::buf()        const { return ( t );         }
+inline int                  ThreshArray::n_elements() const { return Nelements; }
+inline int                  ThreshArray::n()          const { return Nelements; }
+inline const SingleThresh * ThreshArray::thresh()     const { return t;         }
+inline       SingleThresh * ThreshArray::buf()        const { return t;         }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -106,7 +106,7 @@ extern ThreshArray  define_prob_bins         (double, double, double, int);
 extern bool         check_prob_thresh        (const ThreshArray &, bool error_out = true);
 extern ThreshArray  process_perc_thresh_bins (const ThreshArray &);
 extern ThreshArray  process_rps_cdp_thresh   (const ThreshArray &);
-extern ThreshArray  derive_cdp_thresh        (const ThreshArray &);
+extern ThreshArray  derive_ocdp_thresh       (const ThreshArray &);
 extern ConcatString write_css                (const ThreshArray &);
 
 ////////////////////////////////////////////////////////////////////////

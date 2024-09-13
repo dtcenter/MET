@@ -144,9 +144,9 @@ class LaeaGrid : public GridRep {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline bool   LaeaGrid::is_north () const { return ( true );  }
-inline bool   LaeaGrid::is_south () const { return ( false ); }
-inline double LaeaGrid::scale_km()  const { return ( -1.0 );  }
+inline bool   LaeaGrid::is_north () const { return true;  }
+inline bool   LaeaGrid::is_south () const { return false; }
+inline double LaeaGrid::scale_km()  const { return -1.0;  }
 
 inline void   LaeaGrid::set_so2(double) { return; }
 

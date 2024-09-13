@@ -129,17 +129,17 @@ class Box {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double Box::left () const { return ( Left ); }
-inline double Box::right() const { return ( Right ); }
+inline double Box::left () const { return Left; }
+inline double Box::right() const { return Right; }
 
-inline double Box::bottom () const { return ( Bottom ); }
-inline double Box::top    () const { return ( Top ); }
+inline double Box::bottom () const { return Bottom; }
+inline double Box::top    () const { return Top; }
 
-inline double Box::x_ll () const { return ( Left ); }
-inline double Box::y_ll () const { return ( Bottom ); }
+inline double Box::x_ll () const { return Left; }
+inline double Box::y_ll () const { return Bottom; }
 
-inline double Box::x_ur () const { return ( Right ); }
-inline double Box::y_ur () const { return ( Top ); }
+inline double Box::x_ur () const { return Right; }
+inline double Box::y_ur () const { return Top; }
 
 inline double Box::width () const { return ( Right - Left ); }
 inline double Box::height () const { return ( Top - Bottom ); }
@@ -287,15 +287,15 @@ class Affine : public GeneralAffine {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double Affine::m11() const { return ( M11 ); }
-inline double Affine::m12() const { return ( M12 ); }
-inline double Affine::m21() const { return ( M21 ); }
-inline double Affine::m22() const { return ( M22 ); }
+inline double Affine::m11() const { return M11; }
+inline double Affine::m12() const { return M12; }
+inline double Affine::m21() const { return M21; }
+inline double Affine::m22() const { return M22; }
 
-inline double Affine::tx () const { return ( TX ); }
-inline double Affine::ty () const { return ( TY ); }
+inline double Affine::tx () const { return TX; }
+inline double Affine::ty () const { return TY; }
 
-inline double Affine::det() const { return ( Det ); }
+inline double Affine::det() const { return Det; }
 
 inline void Affine::calc_det() { Det = M11*M22 - M21*M12;  return; }
 
@@ -428,21 +428,21 @@ class ConformalAffine : public GeneralAffine {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double ConformalAffine::angle() const { return ( Angle ); }
+inline double ConformalAffine::angle() const { return Angle; }
 
-inline double ConformalAffine::scale() const { return ( Scale ); }
+inline double ConformalAffine::scale() const { return Scale; }
 
-inline bool   ConformalAffine::is_conformal() const { return ( true ); }
+inline bool   ConformalAffine::is_conformal() const { return true; }
 
 
-inline double ConformalAffine::m11() const { return (  Scale*CosAngle ); }
-inline double ConformalAffine::m12() const { return (  Scale*SinAngle ); }
+inline double ConformalAffine::m11() const { return  Scale*CosAngle; }
+inline double ConformalAffine::m12() const { return  Scale*SinAngle; }
 
-inline double ConformalAffine::m21() const { return ( -Scale*SinAngle ); }
-inline double ConformalAffine::m22() const { return (  Scale*CosAngle ); }
+inline double ConformalAffine::m21() const { return -Scale*SinAngle; }
+inline double ConformalAffine::m22() const { return  Scale*CosAngle; }
 
-inline double ConformalAffine::tx () const { return ( TX ); }
-inline double ConformalAffine::ty () const { return ( TY ); }
+inline double ConformalAffine::tx () const { return TX; }
+inline double ConformalAffine::ty () const { return TY; }
 
 
 inline double ConformalAffine::det() const { return ( Scale*Scale ); }

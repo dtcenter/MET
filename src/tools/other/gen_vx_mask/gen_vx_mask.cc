@@ -177,24 +177,8 @@ void process_command_line(int argc, char **argv) {
 
 void process_input_grid(DataPlane &dp) {
 
-   // Parse the input grid as a white-space separated string
-   StringArray sa;
-   sa.parse_wsss(input_gridname);
-
-   // Search for a named grid
-   if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid)) {
-      mlog << Debug(3)
-           << "Use input grid named \"" << input_gridname << "\".\n";
-   }
-   // Parse grid definition
-   else if(sa.n() > 1 && parse_grid_def(sa, grid)) {
-      mlog << Debug(3)
-           << "Use input grid defined by string \"" << input_gridname
-           << "\".\n";
-   }
-   // Extract the grid from a gridded data file
-   else {
-
+   if (!build_grid_by_grid_string(input_gridname, grid, "process_input_grid", false)) {
+      // Extract the grid from a gridded data file
       mlog << Debug(3)
            << "Use input grid defined by file \"" << input_gridname
            << "\".\n";
@@ -284,22 +268,7 @@ void process_mask_file(DataPlane &dp) {
       // For the grid mask type, support named grids and grid
       // specification strings
       if(mask_type == MaskType::Grid) {
-
-         // Parse the mask file as a white-space separated string
-         StringArray sa;
-         sa.parse_wsss(mask_filename);
-
-         // Search for a named grid
-         if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid_mask)) {
-            mlog << Debug(3)
-                 << "Use mask grid named \"" << mask_filename << "\".\n";
-         }
-         // Parse grid definition
-         else if(sa.n() > 1 && parse_grid_def(sa, grid_mask)) {
-            mlog << Debug(3)
-                 << "Use mask grid defined by string \"" << mask_filename
-                 << "\".\n";
-         }
+         build_grid_by_grid_string(mask_filename, grid_mask, "process_mask_file", false);
       }
 
       // Parse as a gridded data file if not already set
@@ -1081,7 +1050,8 @@ void apply_data_mask(DataPlane &dp) {
       for(int i=0; i<nxy; i++) {
          if(!is_bad_data(dp.data()[i])) d.add(dp.data()[i]);
       }
-      thresh.set_perc(&d, &d, &d);
+      d.sort_array();
+      thresh.set_perc(&d, &d, &d, &d);
    }
 
    // For each grid point, apply the data threshold
@@ -1384,9 +1354,9 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
    if(logic != SetLogic::None) {
       mlog << Debug(3)
            << "Mask " << setlogic_to_string(logic)
-	   << (logic == SetLogic::Intersection ? ":\t" : ":\t\t")
+           << (logic == SetLogic::Intersection ? ":\t" : ":\t\t")
            << n_in << " of " << grid.nx() * grid.ny()
-	   << " points inside\n";
+           << " points inside\n";
    }
 
    return dp;

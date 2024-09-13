@@ -74,7 +74,7 @@ class TokenStack {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int TokenStack::depth() const { return ( Nelements ); }
+inline int TokenStack::depth() const { return Nelements; }
 
 inline bool TokenStack::empty() const { return ( Nelements == 0 ); }
 

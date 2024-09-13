@@ -196,7 +196,7 @@ void process_binary() {
 
       // Loop over climo bins, skipping the first and last points
       for(j=0; j<(n_bin-1); j++) {
-         int byte_offset = (j+1)*((n_read_bin - 1)/(n_bin))*4;
+         int byte_offset = (j+1)*((n_read_bin - 1)/n_bin)*4;
          unsigned char * b = buf + byte_offset;
          my_memcpy(&v, b, 4);
          shuffle_4(&v);

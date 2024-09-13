@@ -75,8 +75,8 @@ class GsiRecord {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline bool GsiRecord::shuffle        () const { return ( Shuffle ); }
-inline int  GsiRecord::rec_pad_length () const { return ( RecPadLength ); }
+inline bool GsiRecord::shuffle        () const { return Shuffle; }
+inline int  GsiRecord::rec_pad_length () const { return RecPadLength; }
 
 
 ////////////////////////////////////////////////////////////////////////

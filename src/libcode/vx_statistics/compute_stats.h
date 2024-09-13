@@ -24,8 +24,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-extern void   compute_cntinfo(const SL1L2Info &, bool, CNTInfo &);
-
+extern void   compute_cntinfo(const SL1L2Info &, CNTInfo &);
 extern void   compute_cntinfo(const PairDataPoint &, const NumArray &,
                               bool, bool, bool, CNTInfo &);
 extern void   compute_i_cntinfo(const PairDataPoint &, int,
@@ -64,7 +63,8 @@ extern void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *see
 extern void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &obs_dp,
                                           DataPlane &seeps_dp, DataPlane &seeps_dp_fcat,
                                           DataPlane &seeps_dp_ocat,SeepsAggScore *seeps,
-                                          int month, int hour, const SingleThresh &seeps_p1_thresh);
+                                          int month, int hour, const SingleThresh &seeps_p1_thresh,
+                                          const ConcatString &seeps_climo_name);
 extern void compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps,
                                          std::vector<double> &density_vector);
 

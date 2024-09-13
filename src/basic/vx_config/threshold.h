@@ -13,6 +13,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <map>
 #include <vector>
 
 #include "concat_string.h"
@@ -21,7 +22,6 @@
 #include "num_array.h"
 
 ////////////////////////////////////////////////////////////////////////
-
 
    //
    // Enumeration of thresholding operations
@@ -39,7 +39,6 @@ enum ThreshType {
    thresh_complex = -2,
 
    no_thresh_type = -1
-
 };
 
 static const int n_thresh_type = 7;
@@ -55,81 +54,70 @@ static const char thresh_default_sep[]     = ",";
 
 extern bool is_inclusive(ThreshType);
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
    //
    // Enumeration of percentile threshold types
    //
 
 enum PercThreshType {
-
-   perc_thresh_user_specified = 0,
-   perc_thresh_sample_fcst    = 1,
-   perc_thresh_sample_obs     = 2,
-   perc_thresh_sample_climo   = 3,
-   perc_thresh_climo_dist     = 4,
-   perc_thresh_freq_bias      = 5,
+   perc_thresh_user_specified    = 0,
+   perc_thresh_sample_fcst       = 1,
+   perc_thresh_sample_obs        = 2,
+   perc_thresh_sample_fcst_climo = 3,
+   perc_thresh_sample_obs_climo  = 4,
+   perc_thresh_fcst_climo_dist   = 5,
+   perc_thresh_obs_climo_dist    = 6,
+   perc_thresh_freq_bias         = 7,
 
    no_perc_thresh_type = -1
-
 };
 
-
-static const int n_perc_thresh_type = 7;
-
+extern bool is_climo_dist_type(PercThreshType);
 
 struct PercThreshInfo {
-
-   const PercThreshType type;
-
-   const char * const short_name;
-
-   const int short_name_length;
-
-   const char * const long_name;
-
+   const std::string short_name;
+   const std::string long_name;
 };
 
-
-static const PercThreshInfo perc_thresh_info [] = {
-
-   { perc_thresh_user_specified, "USP",    3,  "USER_SPECIFIED_PERC" },
-
-   { perc_thresh_sample_fcst,    "SFP",    3,  "SAMPLE_FCST_PERC"    },
-
-   { perc_thresh_sample_obs,     "SOP",    3,  "SAMPLE_OBS_PERC"     },
-
-   { perc_thresh_sample_climo,   "SCP",    3,  "SAMPLE_CLIMO_PERC"   },
-
-   { perc_thresh_climo_dist,     "CDP",    3,  "CLIMO_DIST_PERC"     },
-
-   { perc_thresh_freq_bias,      "FBIAS",  5,  "FREQ_BIAS_PERC"      },
-
+static const std::map<PercThreshType,PercThreshInfo> perc_thresh_info_map = {
+   { perc_thresh_user_specified,    { "USP",   "USER_SPECIFIED_PERC"    } },
+   { perc_thresh_sample_fcst,       { "SFP",   "SAMPLE_FCST_PERC"       } },
+   { perc_thresh_sample_obs,        { "SOP",   "SAMPLE_OBS_PERC"        } },
+   { perc_thresh_sample_fcst_climo, { "SFCP",  "SAMPLE_FCST_CLIMO_PERC" } },
+   { perc_thresh_sample_obs_climo,  { "SOCP",  "SAMPLE_OBS_CLIMO_PERC"  } },
+   { perc_thresh_fcst_climo_dist,   { "FCDP",  "CLIMO_FCST_DIST_PERC"   } },
+   { perc_thresh_obs_climo_dist,    { "OCDP",  "CLIMO_OBS_DIST_PERC"    } },
+   { perc_thresh_freq_bias,         { "FBIAS", "FREQ_BIAS_PERC"         } },
 };
-
-static const int n_perc_thresh_infos = sizeof(perc_thresh_info)/sizeof(*perc_thresh_info);
 
 static const int    perc_thresh_default_precision = 0;
 static const double perc_thresh_default_tol = 0.05;
 
-
 struct PC_info {
-
-   int perc_index;
-
+   PercThreshType ptype;
    double value;
-
 };
 
+extern bool parse_perc_thresh(const char *str, PC_info *info = nullptr);
+
+struct ClimoPntInfo {
+   ClimoPntInfo() { clear(); }
+   ClimoPntInfo(double a, double b, double c, double d) :
+                fcmn(a), fcsd(b), ocmn(c), ocsd(d) {}
+   void set(double a, double b, double c, double d) { fcmn = a; fcsd = b; ocmn = c; ocsd = d; }
+   void clear() { fcmn = fcsd = ocmn = ocsd = bad_data_double; }
+
+   double fcmn;
+   double fcsd;
+   double ocmn;
+   double ocsd;
+};
 
 ////////////////////////////////////////////////////////////////////////
 
-
 class SingleThresh;
 class Simple_Node;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -144,8 +132,7 @@ class ThreshNode {
       ThreshNode();
       virtual ~ThreshNode();
 
-      virtual bool check(double) const = 0;
-      virtual bool check(double, double, double) const = 0;
+      virtual bool check(double, const ClimoPntInfo *cpi = nullptr) const = 0;
 
       virtual ThreshNode * copy() const = 0;
 
@@ -157,14 +144,14 @@ class ThreshNode {
 
       virtual double pvalue() const = 0;
 
-      virtual double climo_prob() const = 0;
+      virtual double obs_climo_prob() const = 0;
 
       virtual bool need_perc() const = 0;
 
-      virtual void set_perc(const NumArray *, const NumArray *, const NumArray *) = 0;
-
-      virtual void set_perc(const NumArray *, const NumArray *, const NumArray *,
-                            const SingleThresh *, const SingleThresh *) = 0;
+      virtual void set_perc(const NumArray *, const NumArray *,
+                            const NumArray *, const NumArray *,
+                            const SingleThresh *fthr = nullptr,
+                            const SingleThresh *othr = nullptr) = 0;
 
       virtual void multiply_by(const double) = 0;
 
@@ -186,31 +173,30 @@ class Or_Node : public ThreshNode {
       Or_Node();
      ~Or_Node();
 
-      bool check(double) const;
-      bool check(double, double, double) const;
+      bool check(double, const ClimoPntInfo *cpi = nullptr) const override;
 
-      ThreshNode * copy() const;
+      ThreshNode * copy() const override;
 
-      ThreshType type() const;
+      ThreshType type() const override;
 
-      double value() const;
+      double value() const override;
 
-      PercThreshType ptype() const;
+      PercThreshType ptype() const override;
 
-      double pvalue() const;
+      double pvalue() const override;
 
-      double climo_prob() const;
+      double obs_climo_prob() const override;
 
-      bool need_perc() const;
+      bool need_perc() const override;
 
-      void set_perc(const NumArray *, const NumArray *, const NumArray *);
+      void set_perc(const NumArray *, const NumArray *,
+                    const NumArray *, const NumArray *,
+                    const SingleThresh *fthr = nullptr,
+                    const SingleThresh *othr = nullptr) override;
 
-      void set_perc(const NumArray *, const NumArray *, const NumArray *,
-                    const SingleThresh *, const SingleThresh *);
+      void multiply_by(const double) override;
 
-      void multiply_by(const double);
-
-      void get_simple_nodes(std::vector<Simple_Node> &) const;
+      void get_simple_nodes(std::vector<Simple_Node> &) const override;
 
       ThreshNode * left_child;
       ThreshNode * right_child;
@@ -221,10 +207,10 @@ class Or_Node : public ThreshNode {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType     Or_Node::type()   const { return ( thresh_complex      ); }
-inline double         Or_Node::value()  const { return ( bad_data_double     ); }
-inline PercThreshType Or_Node::ptype()  const { return ( no_perc_thresh_type ); }
-inline double         Or_Node::pvalue() const { return ( bad_data_double     ); }
+inline ThreshType     Or_Node::type()   const { return thresh_complex      ; }
+inline double         Or_Node::value()  const { return bad_data_double     ; }
+inline PercThreshType Or_Node::ptype()  const { return no_perc_thresh_type ; }
+inline double         Or_Node::pvalue() const { return bad_data_double     ; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -237,31 +223,30 @@ class And_Node : public ThreshNode {
       And_Node();
      ~And_Node();
 
-      bool check(double) const;
-      bool check(double, double, double) const;
+      bool check(double, const ClimoPntInfo *cpi = nullptr) const override;
 
-      ThreshType type() const;
+      ThreshType type() const override;
 
-      double value() const;
+      double value() const override;
 
-      PercThreshType ptype() const;
+      PercThreshType ptype() const override;
 
-      double pvalue() const;
+      double pvalue() const override;
 
-      double climo_prob() const;
+      double obs_climo_prob() const override;
 
-      bool need_perc() const;
+      bool need_perc() const override;
 
-      void set_perc(const NumArray *, const NumArray *, const NumArray *);
+      void set_perc(const NumArray *, const NumArray *,
+                    const NumArray *, const NumArray *,
+                    const SingleThresh *fthr = nullptr,
+                    const SingleThresh *othr = nullptr) override;
 
-      void set_perc(const NumArray *, const NumArray *, const NumArray *,
-                    const SingleThresh *, const SingleThresh *);
+      void multiply_by(const double) override;
 
-      void multiply_by(const double);
+      void get_simple_nodes(std::vector<Simple_Node> &) const override;
 
-      void get_simple_nodes(std::vector<Simple_Node> &) const;
-
-      ThreshNode * copy() const;
+      ThreshNode * copy() const override;
 
       ThreshNode * left_child;
       ThreshNode * right_child;
@@ -272,10 +257,10 @@ class And_Node : public ThreshNode {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType     And_Node::type()   const { return ( thresh_complex      ); }
-inline double         And_Node::value()  const { return ( bad_data_double     ); }
-inline PercThreshType And_Node::ptype()  const { return ( no_perc_thresh_type ); }
-inline double         And_Node::pvalue() const { return ( bad_data_double     ); }
+inline ThreshType     And_Node::type()   const { return thresh_complex      ; }
+inline double         And_Node::value()  const { return bad_data_double     ; }
+inline PercThreshType And_Node::ptype()  const { return no_perc_thresh_type ; }
+inline double         And_Node::pvalue() const { return bad_data_double     ; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -288,31 +273,30 @@ class Not_Node : public ThreshNode {
       Not_Node();
      ~Not_Node();
 
-      bool check(double) const;
-      bool check(double, double, double) const;
+      bool check(double, const ClimoPntInfo *cpi = nullptr) const override;
 
-      ThreshType type() const;
+      ThreshType type() const override;
 
-      double value() const;
+      double value() const override;
 
-      PercThreshType ptype() const;
+      PercThreshType ptype() const override;
 
-      double pvalue() const;
+      double pvalue() const override;
 
-      double climo_prob() const;
+      double obs_climo_prob() const override;
 
-      bool need_perc() const;
+      bool need_perc() const override;
 
-      void set_perc(const NumArray *, const NumArray *, const NumArray *);
+      void set_perc(const NumArray *, const NumArray *,
+                    const NumArray *, const NumArray *,
+                    const SingleThresh *fthr = nullptr,
+                    const SingleThresh *othr = nullptr) override;
 
-      void set_perc(const NumArray *, const NumArray *, const NumArray *,
-                    const SingleThresh *, const SingleThresh *);
+      void multiply_by(const double) override;
 
-      void multiply_by(const double);
+      void get_simple_nodes(std::vector<Simple_Node> &) const override;
 
-      void get_simple_nodes(std::vector<Simple_Node> &) const;
-
-      ThreshNode * copy() const;
+      ThreshNode * copy() const override;
 
       ThreshNode * child;
 
@@ -322,10 +306,10 @@ class Not_Node : public ThreshNode {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType     Not_Node::type()   const { return ( thresh_complex      ); }
-inline double         Not_Node::value()  const { return ( bad_data_double     ); }
-inline PercThreshType Not_Node::ptype()  const { return ( no_perc_thresh_type ); }
-inline double         Not_Node::pvalue() const { return ( bad_data_double     ); }
+inline ThreshType     Not_Node::type()   const { return thresh_complex      ; }
+inline double         Not_Node::value()  const { return bad_data_double     ; }
+inline PercThreshType Not_Node::ptype()  const { return no_perc_thresh_type ; }
+inline double         Not_Node::pvalue() const { return bad_data_double     ; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -354,39 +338,38 @@ class Simple_Node : public ThreshNode {
 
       void set_na();
 
-      void set_perc(const NumArray *, const NumArray *, const NumArray *);
-
-      void set_perc(const NumArray *, const NumArray *, const NumArray *,
-                    const SingleThresh *, const SingleThresh *);
+      void set_perc(const NumArray *, const NumArray *,
+                    const NumArray *, const NumArray *,
+                    const SingleThresh *fthr = nullptr,
+                    const SingleThresh *othr = nullptr) override;
 
          //
          //  get stuff
          //
 
-      ThreshType type() const;
+      ThreshType type() const override;
 
-      double value() const;
+      double value() const override;
 
-      PercThreshType ptype() const;
+      PercThreshType ptype() const override;
 
-      double pvalue() const;
+      double pvalue() const override;
 
-      double climo_prob() const;
+      double obs_climo_prob() const override;
 
-      bool need_perc() const;
+      bool need_perc() const override;
 
-      void get_simple_nodes(std::vector<Simple_Node> &) const;
+      void get_simple_nodes(std::vector<Simple_Node> &) const override;
 
          //
          //  do stuff
          //
 
-      ThreshNode * copy() const;
+      ThreshNode * copy() const override;
 
-      bool check(double) const;
-      bool check(double, double, double) const;
+      bool check(double, const ClimoPntInfo *cpi = nullptr) const override;
 
-      void multiply_by(const double);
+      void multiply_by(const double) override;
 
 };
 
@@ -394,10 +377,10 @@ class Simple_Node : public ThreshNode {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType     Simple_Node::type()   const { return ( op    ); }
-inline double         Simple_Node::value()  const { return ( T     ); }
-inline PercThreshType Simple_Node::ptype()  const { return ( Ptype ); }
-inline double         Simple_Node::pvalue() const { return ( PT    ); }
+inline ThreshType     Simple_Node::type()   const { return op    ; }
+inline double         Simple_Node::value()  const { return T     ; }
+inline PercThreshType Simple_Node::ptype()  const { return Ptype ; }
+inline double         Simple_Node::pvalue() const { return PT    ; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -430,14 +413,15 @@ class SingleThresh {
       void           clear();
 
       void           set(double  t, ThreshType);
-      void           set(double pt, ThreshType, int perc_index, double t = bad_data_double);
+      void           set(double pt, ThreshType, PercThreshType, double t = bad_data_double);
       void           set(const ThreshNode *);
       void           set(const char *);
 
       bool           need_perc() const;
-      void           set_perc(const NumArray *, const NumArray *, const NumArray *);
-      void           set_perc(const NumArray *, const NumArray *, const NumArray *,
-                              const SingleThresh *, const SingleThresh *);
+      void           set_perc(const NumArray *, const NumArray *,
+                              const NumArray *, const NumArray *,
+                              const SingleThresh *fthr = nullptr,
+                              const SingleThresh *othr = nullptr);
 
       void           set_na();
 
@@ -445,7 +429,7 @@ class SingleThresh {
       double         get_value() const;
       PercThreshType get_ptype() const;
       double         get_pvalue() const;
-      double         get_climo_prob() const;
+      double         get_obs_climo_prob() const;
       void           get_simple_nodes(std::vector<Simple_Node> &) const;
 
       void           multiply_by(const double);
@@ -453,8 +437,7 @@ class SingleThresh {
       ConcatString   get_str(int precision = thresh_default_precision) const;
       ConcatString   get_abbr_str(int precision = thresh_default_precision) const;
 
-      bool           check(double) const;
-      bool           check(double, double, double) const;
+      bool           check(double, const ClimoPntInfo *cpi = nullptr) const; 
 
 };
 
@@ -462,11 +445,11 @@ class SingleThresh {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ThreshType     SingleThresh::get_type()       const { return ( node ? node->type()       : thresh_na           ); }
-inline double         SingleThresh::get_value()      const { return ( node ? node->value()      : bad_data_double     ); }
-inline PercThreshType SingleThresh::get_ptype()      const { return ( node ? node->ptype()      : no_perc_thresh_type ); }
-inline double         SingleThresh::get_pvalue()     const { return ( node ? node->pvalue()     : bad_data_double     ); }
-inline double         SingleThresh::get_climo_prob() const { return ( node ? node->climo_prob() : bad_data_double     ); }
+inline ThreshType     SingleThresh::get_type()           const { return ( node ? node->type()           : thresh_na           ); }
+inline double         SingleThresh::get_value()          const { return ( node ? node->value()          : bad_data_double     ); }
+inline PercThreshType SingleThresh::get_ptype()          const { return ( node ? node->ptype()          : no_perc_thresh_type ); }
+inline double         SingleThresh::get_pvalue()         const { return ( node ? node->pvalue()         : bad_data_double     ); }
+inline double         SingleThresh::get_obs_climo_prob() const { return ( node ? node->obs_climo_prob() : bad_data_double     ); }
 
 ////////////////////////////////////////////////////////////////////////
 

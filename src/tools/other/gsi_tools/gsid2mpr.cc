@@ -16,11 +16,11 @@
 //   ----   ----      ----            -----------
 //   000    06/09/15  Bullock         New
 //   001    01/26/16  Halley Gotway   Add -no_check_dup option.
-//   002    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
-//   003    10/03/22  Prestopnik      MET #2227 Remove using namespace std from header files
+//   002    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main.
+//   003    10/03/22  Prestopnik      MET #2227 Remove using namespace std from header files.
+//   004    07/17/24  Halley Gotway   MET #2924 Support forecast climatology.
 //
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <fstream>
 #include <unistd.h>
@@ -389,9 +389,11 @@ void write_mpr_row_conv(AsciiTable &at, int row, const ConvData &d) {
    at.set_entry(row, col++, d.guess);     // FCST
    at.set_entry(row, col++, d.obs);       // OBS
    at.set_entry(row, col++, d.obs_qc[0]); // OBS_QC
-   at.set_entry(row, col++, na_str);      // CLIMO_MEAN
-   at.set_entry(row, col++, na_str);      // CLIMO_STDEV
-   at.set_entry(row, col++, na_str);      // CLIMO_CDF
+   at.set_entry(row, col++, na_str);      // OBS_CLIMO_MEAN
+   at.set_entry(row, col++, na_str);      // OBS_CLIMO_STDEV
+   at.set_entry(row, col++, na_str);      // OBS_CLIMO_CDF
+   at.set_entry(row, col++, na_str);      // FCST_CLIMO_MEAN
+   at.set_entry(row, col++, na_str);      // FCST_CLIMO_STDEV
 
    // Write extra columns
    at.set_entry(row, col++, d.prs);       // OBS_PRS
@@ -443,9 +445,11 @@ void write_mpr_row_rad(AsciiTable &at, int row, const RadData & d) {
    at.set_entry(row, col++, d.guess);       // FCST
    at.set_entry(row, col++, d.obs);         // OBS
    at.set_entry(row, col++, d.obs_qc[0]);   // OBS_QC
-   at.set_entry(row, col++, na_str);        // CLIMO_MEAN
-   at.set_entry(row, col++, na_str);        // CLIMO_STDEV
-   at.set_entry(row, col++, na_str);        // CLIMO_CDF
+   at.set_entry(row, col++, na_str);        // OBS_CLIMO_MEAN
+   at.set_entry(row, col++, na_str);        // OBS_CLIMO_STDEV
+   at.set_entry(row, col++, na_str);        // OBS_CLIMO_CDF
+   at.set_entry(row, col++, na_str);        // FCST_CLIMO_MEAN
+   at.set_entry(row, col++, na_str);        // FCST_CLIMO_STDEV
 
    // Write extra columns
    at.set_entry(row, col++, d.use);         // CHAN_USE

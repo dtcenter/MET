@@ -85,7 +85,7 @@ class MetNcMetDataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline GrdFileType MetNcMetDataFile::file_type () const { return ( FileType_NcMet ); }
+inline GrdFileType MetNcMetDataFile::file_type () const { return FileType_NcMet; }
 
 
 ////////////////////////////////////////////////////////////////////////

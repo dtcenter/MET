@@ -198,11 +198,12 @@ static const char * const eclv_columns [] = {
 };
 
 static const char * const mpr_columns [] = {
-   "TOTAL",       "INDEX",       "OBS_SID",
-   "OBS_LAT",     "OBS_LON",     "OBS_LVL",
-   "OBS_ELV",     "FCST",        "OBS",
-   "OBS_QC",      "CLIMO_MEAN",  "CLIMO_STDEV",
-   "CLIMO_CDF"
+   "TOTAL",           "INDEX",            "OBS_SID",
+   "OBS_LAT",         "OBS_LON",          "OBS_LVL",
+   "OBS_ELV",         "FCST",             "OBS",
+   "OBS_QC",
+   "OBS_CLIMO_MEAN",  "OBS_CLIMO_STDEV",  "OBS_CLIMO_CDF",
+   "FCST_CLIMO_MEAN", "FCST_CLIMO_STDEV"
 };
 
 static const char * const nbrctc_columns [] = {
@@ -296,13 +297,14 @@ static const char * const phist_columns [] = {
 };
 
 static const char * const orank_columns [] = {
-   "TOTAL",       "INDEX",            "OBS_SID",
-   "OBS_LAT",     "OBS_LON",          "OBS_LVL",
-   "OBS_ELV",     "OBS",              "PIT",
-   "RANK",        "N_ENS_VLD",        "N_ENS",
-   "ENS_",        "OBS_QC",           "ENS_MEAN",
-   "CLIMO_MEAN",  "SPREAD",           "ENS_MEAN_OERR",
-   "SPREAD_OERR", "SPREAD_PLUS_OERR", "CLIMO_STDEV"
+   "TOTAL",           "INDEX",            "OBS_SID",
+   "OBS_LAT",         "OBS_LON",          "OBS_LVL",
+   "OBS_ELV",         "OBS",              "PIT",
+   "RANK",            "N_ENS_VLD",        "N_ENS",
+   "ENS_",            "OBS_QC",           "ENS_MEAN",
+   "OBS_CLIMO_MEAN",  "SPREAD",           "ENS_MEAN_OERR",
+   "SPREAD_OERR",     "SPREAD_PLUS_OERR", "OBS_CLIMO_STDEV",
+   "FCST_CLIMO_MEAN", "FCST_CLIMO_STDEV"
 };
 
 static const char * const ssvar_columns [] = {
@@ -456,7 +458,7 @@ inline int get_n_eclv_columns  (int n) { return(4  + 2*n);                  } //
 inline int get_n_rhist_columns (int n) { return(2  + n);                    } // n = N_RANK
 inline int get_n_phist_columns (int n) { return(3  + n);                    } // n = N_BINS
 inline int get_n_relp_columns  (int n) { return(2  + n);                    } // n = N_ENS
-inline int get_n_orank_columns (int n) { return(20 + n);                    } // n = N_ENS
+inline int get_n_orank_columns (int n) { return(22 + n);                    } // n = N_ENS
 
 ////////////////////////////////////////////////////////////////////////
 

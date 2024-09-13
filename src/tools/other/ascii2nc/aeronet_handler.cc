@@ -794,7 +794,7 @@ string AeronetHandler::make_var_name_from_header(string hdr_field) {
     else if ((int) string::npos != hdr_field.find(WAVELENGTHS_PW_NAME)) {
       var_name = WAVELENGTHS_PW_NAME;
     }
-    else if ((hdr_field == OPTICAL_AIR_MASS_NAME)) {
+    else if (hdr_field == OPTICAL_AIR_MASS_NAME) {
       var_name = hdr_field;
     }
     else {

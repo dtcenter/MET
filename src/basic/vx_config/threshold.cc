@@ -36,6 +36,12 @@ extern ThreshNode * result;
 
 extern bool test_mode;
 
+extern const std::string scp_perc_thresh_type_str("SCP");
+
+extern const std::string cdp_perc_thresh_type_str("CDP");
+
+static bool print_climo_perc_thresh_log_message = true; 
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -45,6 +51,91 @@ bool is_inclusive(ThreshType t)
 {
 
 return ( t == thresh_le || t == thresh_ge || t == thresh_eq );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_climo_dist_type(PercThreshType t)
+
+{
+
+return ( t == perc_thresh_fcst_climo_dist ||
+         t == perc_thresh_obs_climo_dist );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool parse_perc_thresh(const char *str, PC_info *info)
+
+{
+
+bool match = false;
+
+if ( perc_thresh_info_map.empty() ) return false;
+
+ConcatString search_cs(str);
+
+for (auto const& x : perc_thresh_info_map) {
+
+   if ( search_cs.startswith(x.second.short_name.c_str()) &&
+        is_number(str + x.second.short_name.size()) ) {
+
+      if ( info ) {
+
+         info->ptype = x.first;
+
+         info->value = atof(str + x.second.short_name.size());
+
+      }
+
+      match = true;
+
+      break;
+
+   }
+
+}
+
+   //
+   // MET #2924 Backward compatible support for SCP and CDP types
+   //
+
+if ( !match &&
+    (search_cs.startswith(scp_perc_thresh_type_str.c_str()) ||
+     search_cs.startswith(cdp_perc_thresh_type_str.c_str())) ) {
+
+   if ( print_climo_perc_thresh_log_message ) {
+
+      mlog << Debug(2) << R"(Please replace the deprecated "SCP" and "CDP" )" 
+           << R"(threshold types with "SOCP" and "OCDP", respectively, in the ")"
+           << str << R"(" threshold string.\n)";
+
+      print_climo_perc_thresh_log_message = false;
+
+   }
+
+   ConcatString cs;
+
+   if ( search_cs.startswith(scp_perc_thresh_type_str.c_str()) ) {
+      cs << perc_thresh_info_map.at(perc_thresh_sample_obs_climo).short_name;
+      cs << str + scp_perc_thresh_type_str.size();
+   }
+   else {
+      cs << perc_thresh_info_map.at(perc_thresh_obs_climo_dist).short_name;
+      cs << str + cdp_perc_thresh_type_str.size();
+   }
+
+   return parse_perc_thresh(cs.c_str(), info);
+
+}
+
+return match;
 
 }
 
@@ -119,27 +210,15 @@ if ( right_child )  { delete right_child;  right_child = nullptr; }
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Or_Node::check(double x) const
+bool Or_Node::check(double x, const ClimoPntInfo *cpi) const
 
 {
 
-return check(x, bad_data_double, bad_data_double);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool Or_Node::check(double x, double cmn, double csd) const
-
-{
-
-const bool tf_left = left_child->check(x, cmn, csd);
+const bool tf_left = left_child->check(x, cpi);
 
 if ( tf_left )  return true;
 
-const bool tf_right = right_child->check(x, cmn, csd);
+const bool tf_right = right_child->check(x, cpi);
 
 return tf_right;
 
@@ -168,13 +247,13 @@ return n;
 ////////////////////////////////////////////////////////////////////////
 
 
-double Or_Node::climo_prob() const
+double Or_Node::obs_climo_prob() const
 
 {
 
 if ( !left_child || !right_child )  {
 
-   mlog << Error << "\nOr_Node::climo_prob() -> "
+   mlog << Error << "\nOr_Node::obs_climo_prob() -> "
         << "node not populated!\n\n";
 
    exit ( 1 );
@@ -182,8 +261,8 @@ if ( !left_child || !right_child )  {
 }
 
 double prob       = bad_data_double;
-double prob_left  = left_child->climo_prob();
-double prob_right = right_child->climo_prob();
+double prob_left  = left_child->obs_climo_prob();
+double prob_right = right_child->obs_climo_prob();
 
 if ( !is_bad_data(prob_left) && !is_bad_data(prob_right) )  {
 
@@ -220,21 +299,8 @@ return ( left_child->need_perc() || right_child->need_perc() );
 ////////////////////////////////////////////////////////////////////////
 
 
-void Or_Node::set_perc(const NumArray *fptr, const NumArray *optr, const NumArray *cptr)
-
-{
-
-set_perc(fptr, optr, cptr, 0, 0);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void Or_Node::set_perc(const NumArray *fptr, const NumArray *optr, const NumArray *cptr,
+void Or_Node::set_perc(const NumArray *fptr, const NumArray *optr,
+                       const NumArray *fcptr, const NumArray *ocptr,
                        const SingleThresh *fthr, const SingleThresh *othr)
 
 {
@@ -248,8 +314,8 @@ if ( !left_child || !right_child )  {
 
 }
 
- left_child->set_perc(fptr, optr, cptr, fthr, othr);
-right_child->set_perc(fptr, optr, cptr, fthr, othr);
+ left_child->set_perc(fptr, optr, fcptr, ocptr, fthr, othr);
+right_child->set_perc(fptr, optr, fcptr, ocptr, fthr, othr);
 
 return;
 
@@ -340,27 +406,15 @@ if ( right_child )  { delete right_child;  right_child = nullptr; }
 ////////////////////////////////////////////////////////////////////////
 
 
-bool And_Node::check(double x) const
+bool And_Node::check(double x, const ClimoPntInfo *cpi) const
 
 {
 
-return check(x, bad_data_double, bad_data_double);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool And_Node::check(double x, double cmn, double csd) const
-
-{
-
-const bool tf_left = left_child->check(x, cmn, csd);
+const bool tf_left = left_child->check(x, cpi);
 
 if ( ! tf_left )  return false;
 
-const bool tf_right = right_child->check(x, cmn, csd);
+const bool tf_right = right_child->check(x, cpi);
 
 return ( tf_left && tf_right );
 
@@ -389,13 +443,13 @@ return n;
 ////////////////////////////////////////////////////////////////////////
 
 
-double And_Node::climo_prob() const
+double And_Node::obs_climo_prob() const
 
 {
 
 if ( !left_child || !right_child )  {
 
-   mlog << Error << "\nAnd_Node::climo_prob() -> "
+   mlog << Error << "\nAnd_Node::obs_climo_prob() -> "
         << "node not populated!\n\n";
 
    exit ( 1 );
@@ -403,8 +457,8 @@ if ( !left_child || !right_child )  {
 }
 
 double prob       = bad_data_double;
-double prob_left  = left_child->climo_prob();
-double prob_right = right_child->climo_prob();
+double prob_left  = left_child->obs_climo_prob();
+double prob_right = right_child->obs_climo_prob();
 
    //
    // For opposing inequalities, compute the difference in percentiles
@@ -459,21 +513,8 @@ return ( left_child->need_perc() || right_child->need_perc() );
 ////////////////////////////////////////////////////////////////////////
 
 
-void And_Node::set_perc(const NumArray *fptr, const NumArray *optr, const NumArray *cptr)
-
-{
-
-set_perc(fptr, optr, cptr, 0, 0);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void And_Node::set_perc(const NumArray *fptr, const NumArray *optr, const NumArray *cptr,
+void And_Node::set_perc(const NumArray *fptr, const NumArray *optr,
+                        const NumArray *fcptr, const NumArray *ocptr,
                         const SingleThresh *fthr, const SingleThresh *othr)
 
 {
@@ -487,8 +528,8 @@ if ( !left_child || !right_child )  {
 
 }
 
- left_child->set_perc(fptr, optr, cptr, fthr, othr);
-right_child->set_perc(fptr, optr, cptr, fthr, othr);
+ left_child->set_perc(fptr, optr, fcptr, ocptr, fthr, othr);
+right_child->set_perc(fptr, optr, fcptr, ocptr, fthr, othr);
 
 return;
 
@@ -578,23 +619,11 @@ if ( child )  { delete child;  child = nullptr; }
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Not_Node::check(double x) const
+bool Not_Node::check(double x, const ClimoPntInfo *cpi) const
 
 {
 
-return check(x, bad_data_double, bad_data_double);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool Not_Node::check(double x, double cmn, double csd) const
-
-{
-
-const bool tf = child->check(x, cmn, csd);
+const bool tf = child->check(x, cpi);
 
 return !tf;
 
@@ -622,12 +651,12 @@ return n;
 ////////////////////////////////////////////////////////////////////////
 
 
-double Not_Node::climo_prob() const
+double Not_Node::obs_climo_prob() const
 
 {
 
 double prob       = bad_data_double;
-double prob_child = child->climo_prob();
+double prob_child = child->obs_climo_prob();
 
 if ( !is_bad_data(prob_child) )  prob = 1.0 - prob_child;
 
@@ -660,22 +689,10 @@ return child->need_perc();
 ////////////////////////////////////////////////////////////////////////
 
 
-void Not_Node::set_perc(const NumArray *fptr, const NumArray *optr, const NumArray *cptr)
-
-{
-
-set_perc(fptr, optr, cptr, 0, 0);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void Not_Node::set_perc(const NumArray *fptr, const NumArray *optr, const NumArray *cptr,
+void Not_Node::set_perc(const NumArray *fptr, const NumArray *optr,
+                        const NumArray *fcptr, const NumArray *ocptr,
                         const SingleThresh *fthr, const SingleThresh *othr)
+
 
 {
 
@@ -688,7 +705,7 @@ if ( !child )  {
 
 }
 
-child->set_perc(fptr, optr, cptr, fthr, othr);
+child->set_perc(fptr, optr, fcptr, ocptr, fthr, othr);
 
 return;
 
@@ -780,19 +797,7 @@ Simple_Node::~Simple_Node()
 ////////////////////////////////////////////////////////////////////////
 
 
-bool Simple_Node::check(double x) const
-
-{
-
-return check(x, bad_data_double, bad_data_double);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool Simple_Node::check(double x, double cmn, double csd) const
+bool Simple_Node::check(double x, const ClimoPntInfo *cpi) const
 
 {
 
@@ -804,11 +809,32 @@ double tval;
    //  check climo distribution percentile thresholds
    //
 
-if ( Ptype == perc_thresh_climo_dist ) {
+if ( is_climo_dist_type(Ptype) ) {
+
+   //
+   //  check the pointer
+   //
+
+   if(!cpi) {
+
+      mlog << Error << "\nSimple_Node::check(double, const ClimoPntInfo *) const -> "
+           << "climatological distribution percentile threshold type requested "
+           << "with no ClimoPntInfo provided!\n\n";
+
+      exit ( 1 );
+
+   }
+
+   double cmn = (Ptype == perc_thresh_fcst_climo_dist ? cpi->fcmn : cpi->ocmn);
+   double csd = (Ptype == perc_thresh_fcst_climo_dist ? cpi->fcsd : cpi->ocsd);
+
+   //
+   //  check the climo data
+   //
 
    if(is_bad_data(cmn) || is_bad_data(csd)) {
 
-      mlog << Error << "\nSimple_Node::check(double, double, double) const -> "
+      mlog << Error << "\nSimple_Node::check(double, const ClimoPntInfo *) const -> "
            << "climatological distribution percentile threshold \"" << s
            << "\" requested with invalid mean (" << cmn
            << ") or standard deviation (" << csd << ").\n\n";
@@ -832,7 +858,7 @@ else {
 
 if ( Ptype != no_perc_thresh_type && is_bad_data(tval) ) {
 
-   mlog << Error << "\nSimple_Node::check(double, double, double) const -> "
+   mlog << Error << "\nSimple_Node::check(double, const ClimoPntInfo *) const -> "
         << "percentile threshold \"" << s
         << "\" used before it was set.\n\n";
 
@@ -856,7 +882,7 @@ switch ( op )  {
    case thresh_ne:   tf = !eq;  break;
 
    default:
-      mlog << Error << "\nSimple_Node::check(double, double, double) const -> "
+      mlog << Error << "\nSimple_Node::check(double, const ClimoPntInfo *) const -> "
            << "bad op ... " << op << "\n\n";
       exit ( 1 );
 
@@ -914,24 +940,12 @@ return;
 
 }
 
-////////////////////////////////////////////////////////////////////////
-
-
-void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr, const NumArray *cptr)
-
-{
-
-set_perc(fptr, optr, cptr, 0, 0);
-
-return;
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
 
-void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr, const NumArray *cptr,
+void Simple_Node::set_perc(const NumArray *fptr, const NumArray *optr,
+                           const NumArray *fcptr, const NumArray *ocptr,
                            const SingleThresh *fthr, const SingleThresh *othr)
 
 {
@@ -946,9 +960,10 @@ bool fbias_fcst = false;
    //  handle sample percentile types
    //
 
-     if ( Ptype == perc_thresh_sample_fcst  )  ptr = fptr;
-else if ( Ptype == perc_thresh_sample_obs   )  ptr = optr;
-else if ( Ptype == perc_thresh_sample_climo )  ptr = cptr;
+     if ( Ptype == perc_thresh_sample_fcst       )  ptr = fptr;
+else if ( Ptype == perc_thresh_sample_obs        )  ptr = optr;
+else if ( Ptype == perc_thresh_sample_fcst_climo )  ptr = fcptr;
+else if ( Ptype == perc_thresh_sample_obs_climo  )  ptr = ocptr;
 
    //
    //  handle bias-correction type
@@ -960,7 +975,7 @@ else if ( Ptype == perc_thresh_freq_bias )  {
 
       mlog << Error << "\nSimple_Node::set_perc() -> "
            << "not enough information provided to define the "
-           << perc_thresh_info[Ptype].long_name
+           << perc_thresh_info_map.at(Ptype).long_name
            << " threshold \"" << s << "\".\n\n";
 
       exit ( 1 );
@@ -1013,7 +1028,7 @@ else if ( Ptype == perc_thresh_freq_bias )  {
 
       mlog << Error << "\nSimple_Node::set_perc() -> "
            << "unsupported options for computing the "
-           << perc_thresh_info[Ptype].long_name
+           << perc_thresh_info_map.at(Ptype).long_name
            << " threshold \"" << s << "\".\n\n";
 
       exit ( 1 );
@@ -1028,7 +1043,7 @@ else if ( Ptype == perc_thresh_freq_bias )  {
 
       mlog << Error << "\nSimple_Node::set_perc() -> "
            << "unable to compute the percentile for the "
-           << perc_thresh_info[Ptype].long_name
+           << perc_thresh_info_map.at(Ptype).long_name
            << " threshold \"" << s << "\".\n\n";
 
       exit ( 1 );
@@ -1051,7 +1066,7 @@ else  {
 if ( !ptr )  {
 
    mlog << Error << "\nSimple_Node::set_perc() -> "
-        << perc_thresh_info[Ptype].long_name
+        << perc_thresh_info_map.at(Ptype).long_name
         << " threshold \"" << s
         << "\" requested but no data provided.\n\n";
 
@@ -1086,7 +1101,7 @@ else {
 if ( data.n() == 0 )  {
 
    mlog << Error << "\nSimple_Node::set_perc() -> "
-        << "can't compute " << perc_thresh_info[Ptype].long_name
+        << "can't compute " << perc_thresh_info_map.at(Ptype).long_name
         << " threshold \"" << s
         << "\" because no valid data was provided.\n\n";
 
@@ -1216,15 +1231,15 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double Simple_Node::climo_prob() const
+double Simple_Node::obs_climo_prob() const
 
 {
    
 double prob = bad_data_double;
 
-if ( Ptype == perc_thresh_climo_dist )  {
+if ( Ptype == perc_thresh_obs_climo_dist ) {
 
-   // Climo probability varies based on the threshold type
+   // Observation climo probability varies based on the threshold type
    switch ( op )  {
 
       case thresh_lt:
@@ -1251,9 +1266,9 @@ if ( Ptype == perc_thresh_climo_dist )  {
 
       default:
 
-         mlog << Error << "\nSimple_Node::climo_prob() -> "
-              << "cannot convert climatological distribution percentile "
-              << "threshold to a probability!\n\n";
+         mlog << Error << "\nSimple_Node::obs_climo_prob() -> "
+              << "cannot convert observation climatological distribution "
+              << "percentile threshold to a probability!\n\n";
 
          exit ( 1 );
 
@@ -1272,9 +1287,10 @@ bool Simple_Node::need_perc() const
 
 {
 
-return ( Ptype == perc_thresh_sample_fcst  ||
-         Ptype == perc_thresh_sample_obs   ||
-         Ptype == perc_thresh_sample_climo ||
+return ( Ptype == perc_thresh_sample_fcst       ||
+         Ptype == perc_thresh_sample_obs        ||
+         Ptype == perc_thresh_sample_fcst_climo ||
+         Ptype == perc_thresh_sample_obs_climo  ||
          Ptype == perc_thresh_freq_bias );
 
 }
@@ -1496,17 +1512,16 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void SingleThresh::set(double pt, ThreshType ind, int perc_index, double t)
+void SingleThresh::set(double pt, ThreshType ind, PercThreshType ptype, double t)
 
 {
 
 clear();
 
-if ( (perc_index < 0) || (perc_index >= n_perc_thresh_infos) )  {
+if ( ptype == no_perc_thresh_type )  {
 
-   mlog << Error
-        << "\nSingleThresh::set(double pt, ThreshType ind, int perc_index, double t) -> "
-        << "bad perc_index ... " << perc_index << "\n\n";
+   mlog << Error << "\nSingleThresh::set(double, ThreshType, PercThreshType, double) -> "
+        << "bad percentile threshold type\n\n";
 
    exit ( 1 );
 
@@ -1515,12 +1530,12 @@ if ( (perc_index < 0) || (perc_index >= n_perc_thresh_infos) )  {
 Simple_Node * a = new Simple_Node;
 
 ConcatString cs;
-cs << perc_thresh_info[perc_index].short_name << pt;
+cs << perc_thresh_info_map.at(ptype).short_name << pt;
 if( !is_bad_data(t) ) cs << "(" << t << ")";
 
 a->T      = t;
 a->op     = ind;
-a->Ptype  = perc_thresh_info[perc_index].type;
+a->Ptype  = ptype;
 a->PT     = pt;
 a->s      << thresh_type_str[ind] << cs;
 a->abbr_s << thresh_abbr_str[ind] << cs;
@@ -1656,27 +1671,15 @@ return false;
 ////////////////////////////////////////////////////////////////////////
 
 
-void SingleThresh::set_perc(const NumArray *fptr, const NumArray *optr, const NumArray *cptr)
-
-{
-
-set_perc(fptr, optr, cptr, 0, 0);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void SingleThresh::set_perc(const NumArray *fptr, const NumArray *optr, const NumArray *cptr,
+void SingleThresh::set_perc(const NumArray *fptr, const NumArray *optr,
+                            const NumArray *fcptr, const NumArray *ocptr,
                             const SingleThresh *fthr, const SingleThresh *othr)
+
 {
 
 if ( node )  {
 
-   node->set_perc(fptr, optr, cptr, fthr, othr);
+   node->set_perc(fptr, optr, fcptr, ocptr, fthr, othr);
 
 }
 
@@ -1796,23 +1799,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool SingleThresh::check(double x) const
+bool SingleThresh::check(double x, const ClimoPntInfo *cpi) const
 
 {
 
-return check(x, bad_data_double, bad_data_double);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-bool SingleThresh::check(double x, double cmn, double csd) const
-
-{
-
-return ( node ? node->check(x, cmn, csd) : true  );
+return ( node ? node->check(x, cpi) : true );
 
 
 }

@@ -612,6 +612,8 @@ static const char conf_key_mask_sid[]          = "mask.sid";
 static const char conf_key_mask_llpnt[]        = "mask.llpnt";
 static const char conf_key_lat_thresh[]        = "lat_thresh";
 static const char conf_key_lon_thresh[]        = "lon_thresh";
+static const char conf_key_lat_vname[]         = "lat_vname";
+static const char conf_key_lon_vname[]         = "lon_vname";
 static const char conf_key_ci_alpha[]          = "ci_alpha";
 static const char conf_key_time_summary[]      = "time_summary";
 static const char conf_key_flag[]              = "flag";
@@ -690,7 +692,9 @@ static const char conf_key_obs_to_qc_map[]     = "obs_to_qc_map";
 static const char conf_key_missing_thresh[]    = "missing_thresh";
 static const char conf_key_control_id[]        = "control_id";
 static const char conf_key_ens_member_ids[]    = "ens_member_ids";
-static const char conf_key_seeps_p1_thresh[]   = "seeps_p1_thresh";
+static const char conf_key_seeps_grid_climo_name[]  = "seeps_grid_climo_name";
+static const char conf_key_seeps_point_climo_name[] = "seeps_point_climo_name";
+static const char conf_key_seeps_p1_thresh[]        = "seeps_p1_thresh";
 static const char conf_key_ugrid_coordinates_file[] = "ugrid_coordinates_file";
 static const char conf_key_ugrid_dataset[]          = "ugrid_dataset";
 static const char conf_key_ugrid_map_config[]       = "ugrid_map_config";
@@ -719,10 +723,18 @@ static const char conf_key_is_wind_direction[]    = "is_wind_direction";
 static const char conf_key_is_prob[]              = "is_prob";
 
 //
-// Climatology parameter key names
+// Climatology data parameter key names
 //
-static const char conf_key_climo_mean_field[]   = "climo_mean.field";
-static const char conf_key_climo_stdev_field[]  = "climo_stdev.field";
+static const char conf_key_climo_mean_field[]       = "climo_mean.field";
+static const char conf_key_fcst_climo_mean_field[]  = "fcst.climo_mean.field";
+static const char conf_key_obs_climo_mean_field[]   = "obs.climo_mean.field";
+static const char conf_key_climo_stdev_field[]      = "climo_stdev.field";
+static const char conf_key_fcst_climo_stdev_field[] = "fcst.climo_stdev.field";
+static const char conf_key_obs_climo_stdev_field[]  = "obs.climo_stdev.field";
+
+//
+// Climatology distribution parameter key names
+//
 static const char conf_key_climo_cdf[]          = "climo_cdf";
 static const char conf_key_cdf_bins[]           = "cdf_bins";
 static const char conf_key_center_bins[]        = "center_bins";

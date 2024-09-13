@@ -439,7 +439,7 @@ lon_rad = -u;
 
 lon_deg = lon_rad*deg_per_rad;
 
-return ( lon_deg );
+return lon_deg;
 
 }
 
@@ -455,7 +455,7 @@ double lat;
 
 lat = 2.0*atand(exp(v)) - 90.0;
 
-return ( lat );
+return lat;
 
 }
 

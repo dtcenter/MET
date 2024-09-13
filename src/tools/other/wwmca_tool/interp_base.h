@@ -119,9 +119,9 @@ class Interpolator {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int Interpolator::width() const { return ( Width ); }
+inline int Interpolator::width() const { return Width; }
 
-inline int Interpolator::wm1o2() const { return ( Wm1o2 ); }
+inline int Interpolator::wm1o2() const { return Wm1o2; }
 
 
 ////////////////////////////////////////////////////////////////////////

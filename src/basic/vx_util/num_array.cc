@@ -1127,7 +1127,7 @@ double NumArray::mean_sqrt() const
    // for simple mean, call weighted mean with constant weight
    wgt.add_const(1.0, n_elements());
    
-   return(wmean_sqrt(wgt));
+   return wmean_sqrt(wgt);
 
 }
 
@@ -1144,7 +1144,7 @@ double NumArray::mean_fisher() const
    // for simple mean, call weighted mean with constant weight
    wgt.add_const(1.0, n_elements());
    
-   return(wmean_fisher(wgt));
+   return wmean_fisher(wgt);
 
 }
 
@@ -1177,7 +1177,7 @@ double NumArray::wmean(const NumArray &wgt) const
    if(count == 0) wmn = bad_data_double;
    else           wmn = s/w;
 
-   return(wmn);
+   return wmn;
 
 }
 
@@ -1267,7 +1267,7 @@ double NumArray::variance(int skip_index) const
       var = bad_data_double;
    }
 
-   return(var);
+   return var;
 
 }
 
@@ -1335,7 +1335,7 @@ double NumArray::wmean_abs_diff() const
    else 
       wmad = wgt * mad;
    
-   return(wmad);
+   return wmad;
 
 }
 

@@ -95,7 +95,7 @@ nmep_smooth = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology data
+// Climatology mean data
 //
 climo_mean = {
 
@@ -114,6 +114,9 @@ climo_mean = {
    hour_interval      = 6;
 }
 
+//
+// Climatology standard deviation data
+//
 climo_stdev = climo_mean;
 climo_stdev = {
    file_name = [];

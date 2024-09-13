@@ -75,6 +75,7 @@
 //   042    04/29/24  Halley Gotway  MET #2870 Ignore MISSING keyword.
 //   043    04/29/24  Halley Gotway  MET #2795 Move level mismatch warning.
 //   044    06/17/24  Halley Gotway  MET #2856 Reinitialize climo_cdf pointer
+//   045    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -128,6 +129,7 @@ static void process_point_scores  ();
 static void process_grid_vx       ();
 static void process_grid_scores   (int,
                const DataPlane *, const DataPlane *,
+               const DataPlane &, const DataPlane &,
                const DataPlane &, const DataPlane &,
                const DataPlane &, const DataPlane &,
                const DataPlane &, const MaskPlane &,
@@ -486,7 +488,7 @@ void process_grid(const Grid &fcst_grid) {
 
    // Parse regridding logic
    RegridInfo ri;
-   ri = conf_info.vx_opt[0].vx_pd.fcst_info->get_var_info()->regrid();
+   ri = conf_info.vx_opt[0].vx_pd.ens_info->get_var_info()->regrid();
 
    // Read gridded observation data, if necessary
    if(ri.field == FieldType::Obs) {
@@ -552,15 +554,15 @@ void process_n_vld() {
    // Loop through the verification fields to be processed
    for(i_var=0; i_var<conf_info.get_n_vx(); i_var++) {
 
-      n_ens_inputs = conf_info.vx_opt[i_var].vx_pd.fcst_info->inputs_n();
+      n_ens_inputs = conf_info.vx_opt[i_var].vx_pd.ens_info->inputs_n();
 
       // Loop through the forecast inputs
       for(i_ens=n_vld=0; i_ens<n_ens_inputs; i_ens++) {
 
          // Get forecast file and VarInfo to process
-         fcst_file = conf_info.vx_opt[i_var].vx_pd.fcst_info->get_file(i_ens);
-         var_info = conf_info.vx_opt[i_var].vx_pd.fcst_info->get_var_info(i_ens);
-         j = conf_info.vx_opt[i_var].vx_pd.fcst_info->get_file_index(i_ens);
+         fcst_file = conf_info.vx_opt[i_var].vx_pd.ens_info->get_file(i_ens);
+         var_info  = conf_info.vx_opt[i_var].vx_pd.ens_info->get_var_info(i_ens);
+         j         = conf_info.vx_opt[i_var].vx_pd.ens_info->get_file_index(i_ens);
 
          // Check for valid file
          if(!ens_file_vld[j]) continue;
@@ -592,7 +594,7 @@ void process_n_vld() {
               << n_vld << " of " << n_ens_inputs
               << " (" << (double) n_vld/n_ens_inputs << ")"
               << " forecast fields found for \""
-              << conf_info.vx_opt[i_var].vx_pd.fcst_info->get_var_info()->magic_str()
+              << conf_info.vx_opt[i_var].vx_pd.fcst_info->magic_str()
               << "\" does not meet the threshold specified by \""
               << conf_key_fcst_ens_thresh << "\" (" << conf_info.vld_ens_thresh
               << ") in the configuration file.\n\n";
@@ -755,7 +757,8 @@ void process_point_vx() {
    int i, j, i_file, n_miss;
    unixtime beg_ut, end_ut;
    DataPlaneArray fcst_dpa, emn_dpa;
-   DataPlaneArray cmn_dpa, csd_dpa;
+   DataPlaneArray fcmn_dpa, fcsd_dpa;
+   DataPlaneArray ocmn_dpa, ocsd_dpa;
 
    // Loop through each of the fields to be verified
    for(i=0; i<conf_info.get_n_vx(); i++) {
@@ -778,23 +781,38 @@ void process_point_vx() {
       conf_info.vx_opt[i].vx_pd.set_beg_ut(beg_ut);
       conf_info.vx_opt[i].vx_pd.set_end_ut(end_ut);
 
-      // Read climatology data
-      cmn_dpa = read_climo_data_plane_array(
-                   conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
-                   i, ens_valid_ut, grid);
-      csd_dpa = read_climo_data_plane_array(
-                   conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
-                   i, ens_valid_ut, grid);
+      // Read forecast climatology data
+      fcmn_dpa = read_climo_data_plane_array(
+                    conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
+                    i, ens_valid_ut, grid,
+                    "forecast climatology mean");
+      fcsd_dpa = read_climo_data_plane_array(
+                    conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
+                    i, ens_valid_ut, grid,
+                    "forecast climatology standard deviation");
+
+      // Read observation climatology data
+      ocmn_dpa = read_climo_data_plane_array(
+                    conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
+                    i, ens_valid_ut, grid,
+                    "observation climatology mean");
+      ocsd_dpa = read_climo_data_plane_array(
+                    conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
+                    i, ens_valid_ut, grid,
+                    "observation climatology standard deviation");
 
       mlog << Debug(3)
-           << "Found " << cmn_dpa.n_planes()
-           << " climatology mean field(s) and " << csd_dpa.n_planes()
-           << " climatology standard deviation field(s) for forecast "
-           << conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->magic_str() << ".\n";
+           << "For " << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str() << ", found "
+           << fcmn_dpa.n_planes() << " forecast climatology mean and "
+           << fcsd_dpa.n_planes() << " standard deviation level(s), and "
+           << ocmn_dpa.n_planes() << " observation climatology mean and "
+           << ocsd_dpa.n_planes() << " standard deviation level(s).\n";
 
       // Store climatology information
-      conf_info.vx_opt[i].vx_pd.set_climo_mn_dpa(cmn_dpa);
-      conf_info.vx_opt[i].vx_pd.set_climo_sd_dpa(csd_dpa);
+      conf_info.vx_opt[i].vx_pd.set_fcst_climo_mn_dpa(fcmn_dpa);
+      conf_info.vx_opt[i].vx_pd.set_fcst_climo_sd_dpa(fcsd_dpa);
+      conf_info.vx_opt[i].vx_pd.set_obs_climo_mn_dpa(ocmn_dpa);
+      conf_info.vx_opt[i].vx_pd.set_obs_climo_sd_dpa(ocsd_dpa);
    }
 
    // Process each point observation NetCDF file
@@ -809,17 +827,18 @@ void process_point_vx() {
    // Loop through each of the fields to be verified
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
-      VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info();
-      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
+      EnsVarInfo *ens_info  = conf_info.vx_opt[i].vx_pd.ens_info;
+      VarInfo    *fcst_info = ens_info->get_var_info();
+      VarInfo    *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
       bool print_level_mismatch_warning = true;
 
       // Initialize
       emn_dpa.clear();
 
       // Loop through the ensemble inputs
-      for(j=0, n_miss=0; j<conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n(); j++) {
+      for(j=0, n_miss=0; j<ens_info->inputs_n(); j++) {
 
-         i_file = conf_info.vx_opt[i].vx_pd.fcst_info->get_file_index(j);
+         i_file = ens_info->get_file_index(j);
 
          // If the current forecast file is valid, process it
          if(!ens_file_vld[i_file]) {
@@ -886,7 +905,7 @@ void process_point_vx() {
 
          mlog << Debug(2) << "Computing the ensemble mean from the members.\n";
 
-         int n = conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n() - n_miss;
+         int n = ens_info->inputs_n() - n_miss;
 
          if(n <= 0) {
             mlog << Error << "\nprocess_point_vx() -> "
@@ -986,11 +1005,11 @@ void process_point_obs(int i_nc) {
    int hdr_count = met_point_obs->get_hdr_cnt();
    int obs_count = met_point_obs->get_obs_cnt();
 
-   mlog << Debug(2) << "Searching " << (obs_count)
-        << " observations from " << (hdr_count)
+   mlog << Debug(2) << "Searching " << obs_count
+        << " observations from " << hdr_count
         << " header messages.\n";
 
-   const int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : (obs_count));
+   const int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : obs_count);
 
    int   obs_qty_idx_block[buf_size];
    float obs_arr_block[buf_size][OBS_ARRAY_LEN];
@@ -1099,13 +1118,13 @@ bool process_point_ens(int i_vx, int i_ens, DataPlaneArray &fcst_dpa) {
    fcst_dpa.clear();
 
    // Get file based on current vx and ensemble index
-   ConcatString ens_file = conf_info.vx_opt[i_vx].vx_pd.fcst_info->get_file(i_ens);
+   ConcatString ens_file = conf_info.vx_opt[i_vx].vx_pd.ens_info->get_file(i_ens);
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n"
         << "Processing ensemble member file: " << ens_file
         << (i_ens == ctrl_file_index ? " (control)\n" : "\n");
 
-   VarInfo *info = conf_info.vx_opt[i_vx].vx_pd.fcst_info->get_var_info(i_ens);
+   VarInfo *info = conf_info.vx_opt[i_vx].vx_pd.ens_info->get_var_info(i_ens);
 
    // Read the gridded data from the input forecast file
    bool status = get_data_plane_array(ens_file.c_str(), info->file_type(), info,
@@ -1143,28 +1162,31 @@ void process_point_scores() {
    // requested, and write the output.
    for(i=0; i<conf_info.get_n_vx(); i++) {
 
+      VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.ens_info->get_var_info();
+      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
+
       // Set the description
       shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
 
       // Store the forecast variable name
-      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->name_attr());
+      shc.set_fcst_var(fcst_info->name_attr());
 
       // Store the forecast variable units
-      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->units_attr());
+      shc.set_fcst_units(fcst_info->units_attr());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->level_attr().c_str());
+      shc.set_fcst_lev(fcst_info->level_attr().c_str());
 
       // Store the observation variable name
-      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name_attr());
+      shc.set_obs_var(obs_info->name_attr());
 
       // Store the observation variable units
-      cs = conf_info.vx_opt[i].vx_pd.obs_info->units_attr();
+      cs = obs_info->units_attr();
       if(cs.empty()) cs = na_string;
       shc.set_obs_units(cs);
 
       // Set the observation level name
-      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_attr().c_str());
+      shc.set_obs_lev(obs_info->level_attr().c_str());
 
       // Set the observation lead time
       shc.set_obs_lead_sec(0);
@@ -1195,13 +1217,13 @@ void process_point_scores() {
                   shc.set_interp_wdth(conf_info.vx_opt[i].interp_info.width[l]);
                }
 
-               pd_ptr = &conf_info.vx_opt[i].vx_pd.pd[j][k][l];
+               int n = conf_info.vx_opt[i].vx_pd.three_to_one(j, k, l);
+
+               pd_ptr = &conf_info.vx_opt[i].vx_pd.pd[n];
 
                mlog << Debug(2)
                     << "Processing point verification "
-                    << conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->magic_str()
-                    << " versus "
-                    << conf_info.vx_opt[i].vx_pd.obs_info->magic_str()
+                    << fcst_info->magic_str() << " versus " << obs_info->magic_str()
                     << ", for observation type " << pd_ptr->msg_typ
                     << ", over region " << pd_ptr->mask_name
                     << ", for interpolation method "
@@ -1238,7 +1260,7 @@ void process_grid_vx() {
    DataPlane *fcst_dp = (DataPlane *) nullptr;
    DataPlane *fraw_dp = (DataPlane *) nullptr;
    DataPlane  obs_dp, oraw_dp;
-   DataPlane emn_dp, cmn_dp, csd_dp;
+   DataPlane emn_dp, fcmn_dp, fcsd_dp, ocmn_dp, ocsd_dp;
    PairDataEnsemble pd_all, pd;
    ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) nullptr;
    VarInfo * var_info;
@@ -1251,12 +1273,15 @@ void process_grid_vx() {
    shc.set_obtype(conf_info.obtype.c_str());
 
    // Allocate space to store the forecast fields
-   int num_dp = conf_info.vx_opt[0].vx_pd.fcst_info->inputs_n();
+   int num_dp = conf_info.vx_opt[0].vx_pd.ens_info->inputs_n();
    fcst_dp = new DataPlane [num_dp];
    fraw_dp = new DataPlane [num_dp];
 
    // Loop through each of the fields to be verified
    for(i=0; i<conf_info.get_n_vx(); i++) {
+
+      VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.ens_info->get_var_info();
+      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
 
       // Initialize
       emn_dp.clear();
@@ -1272,13 +1297,13 @@ void process_grid_vx() {
       shc.set_desc(conf_info.vx_opt[i].vx_pd.desc.c_str());
 
       // Set the forecast variable name
-      shc.set_fcst_var(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->name_attr());
+      shc.set_fcst_var(fcst_info->name_attr());
 
       // Store the forecast variable units
-      shc.set_fcst_units(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->units_attr());
+      shc.set_fcst_units(fcst_info->units_attr());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->level_attr().c_str());
+      shc.set_fcst_lev(fcst_info->level_attr().c_str());
 
       // Set the ObsErrorEntry pointer
       if(conf_info.vx_opt[i].obs_error.flag) {
@@ -1295,12 +1320,12 @@ void process_grid_vx() {
 
             // Check for table entries for this variable and message type
             if(!obs_error_table.has(
-                  conf_info.vx_opt[i].vx_pd.obs_info->name().c_str(),
+                  obs_info->name().c_str(),
                   conf_info.obtype.c_str())) {
                mlog << Warning << "\nprocess_grid_vx() -> "
                     << "Disabling observation error logic since the "
                     << "obs error table contains no entry for OBS_VAR("
-                    << conf_info.vx_opt[i].vx_pd.obs_info->name()
+                    << obs_info->name()
                     << ") and MESSAGE_TYPE(" << conf_info.obtype
                     << ").\nSpecify a custom obs error table using the "
                     << "MET_OBS_ERROR_TABLE environment variable.\n\n";
@@ -1310,7 +1335,7 @@ void process_grid_vx() {
 
                // Do a lookup for this variable and message type
                oerr_ptr = obs_error_table.lookup(
-                  conf_info.vx_opt[i].vx_pd.obs_info->name().c_str(),
+                  obs_info->name().c_str(),
                   conf_info.obtype.c_str());
 
                // If match was found and includes a value range setting,
@@ -1333,14 +1358,14 @@ void process_grid_vx() {
       }
 
       // Loop through each of the input ensemble files/variables
-      for(j=0, n_miss=0; j < conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n(); j++) {
+      for(j=0, n_miss=0; j < conf_info.vx_opt[i].vx_pd.ens_info->inputs_n(); j++) {
 
          // Initialize
          fcst_dp[j].clear();
 
-         i_file = conf_info.vx_opt[i].vx_pd.fcst_info->get_file_index(j);
-         var_info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info(j);
-         fcst_file = conf_info.vx_opt[i].vx_pd.fcst_info->get_file(j);
+         i_file    = conf_info.vx_opt[i].vx_pd.ens_info->get_file_index(j);
+         var_info  = conf_info.vx_opt[i].vx_pd.ens_info->get_var_info(j);
+         fcst_file = conf_info.vx_opt[i].vx_pd.ens_info->get_file(j);
 
          // If the current ensemble file is valid, read the field
          if(ens_file_vld[i_file]) {
@@ -1369,7 +1394,7 @@ void process_grid_vx() {
          mlog << Debug(2) << "Processing ensemble mean file: "
               << ens_mean_file << "\n";
 
-         VarInfo *info = conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info();
+         VarInfo *info = conf_info.vx_opt[i].vx_pd.ens_info->get_var_info();
 
          // Read the gridded data from the mean file
          found = get_data_plane(ens_mean_file.c_str(), FileType_None,
@@ -1388,7 +1413,7 @@ void process_grid_vx() {
 
          mlog << Debug(2) << "Computing the ensemble mean from the members.\n";
 
-         int n = conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n() - n_miss;
+         int n = conf_info.vx_opt[i].vx_pd.ens_info->inputs_n() - n_miss;
 
          if(n <= 0) {
             mlog << Error << "\nprocess_grid_vx() -> "
@@ -1400,19 +1425,33 @@ void process_grid_vx() {
          emn_dp /= (double) n;
       }
 
-      // Read climatology data
-      cmn_dp = read_climo_data_plane(
-                  conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
-                  i, ens_valid_ut, grid);
-      csd_dp = read_climo_data_plane(
-                  conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
-                  i, ens_valid_ut, grid);
+      // Read forecast climatology data
+      fcmn_dp = read_climo_data_plane(
+                   conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
+                   i, ens_valid_ut, grid,
+                   "forecast climatology mean");
+      fcsd_dp = read_climo_data_plane(
+                   conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
+                   i, ens_valid_ut, grid,
+                   "forecast climatology standard deviation");
+
+      // Read observation climatology data
+      ocmn_dp = read_climo_data_plane(
+                   conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
+                   i, ens_valid_ut, grid,
+                   "observation climatology mean");
+      ocsd_dp = read_climo_data_plane(
+                   conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
+                   i, ens_valid_ut, grid,
+                   "observation climatology standard deviation");
 
       mlog << Debug(3)
-           << "Found " << (cmn_dp.nx() == 0 ? 0 : 1)
-           << " climatology mean field(s) and " << (csd_dp.nx() == 0 ? 0 : 1)
-           << " climatology standard deviation field(s) for forecast "
-           << conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->magic_str() << ".\n";
+           << "For " << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str() << ", found "
+           << (fcmn_dp.nx() == 0 ? 0 : 1) << " forecast climatology mean and "
+           << (fcsd_dp.nx() == 0 ? 0 : 1) << " standard deviation field(s), and "
+           << (ocmn_dp.nx() == 0 ? 0 : 1) << " observation climatology mean and "
+           << (ocsd_dp.nx() == 0 ? 0 : 1) << " standard deviation field(s).\n";
+
 
       // If requested in the config file, create a NetCDF file to store
       // the verification matched pairs
@@ -1447,13 +1486,13 @@ void process_grid_vx() {
       }
 
       // Set the observation variable name
-      shc.set_obs_var(conf_info.vx_opt[i].vx_pd.obs_info->name_attr());
+      shc.set_obs_var(obs_info->name_attr());
 
       // Store the observation variable units
-      shc.set_obs_units(conf_info.vx_opt[i].vx_pd.obs_info->units_attr());
+      shc.set_obs_units(obs_info->units_attr());
 
       // Set the observation level name
-      shc.set_obs_lev(conf_info.vx_opt[i].vx_pd.obs_info->level_attr().c_str());
+      shc.set_obs_lev(obs_info->level_attr().c_str());
 
       // Set the observation lead time
       shc.set_obs_lead_sec(obs_dp.lead());
@@ -1513,12 +1552,12 @@ void process_grid_vx() {
                  << "gridded observation data.\n";
             obs_dp = add_obs_error_bc(conf_info.rng_ptr,
                         FieldType::Obs, oerr_ptr, oraw_dp, oraw_dp,
-                        conf_info.vx_opt[i].vx_pd.obs_info->name().c_str(),
+                        obs_info->name().c_str(),
                         conf_info.obtype.c_str());
          }
 
          // Loop through the ensemble members
-         for(k=0; k < conf_info.vx_opt[i].vx_pd.fcst_info->inputs_n(); k++) {
+         for(k=0; k < conf_info.vx_opt[i].vx_pd.ens_info->inputs_n(); k++) {
 
             // Smooth the forecast field, if requested
             if(field == FieldType::Fcst || field == FieldType::Both) {
@@ -1538,7 +1577,7 @@ void process_grid_vx() {
                     << "ensemble member " << k+1 << ".\n";
                fcst_dp[k] = add_obs_error_inc(conf_info.rng_ptr,
                                FieldType::Fcst, oerr_ptr, fraw_dp[k], oraw_dp,
-                               conf_info.vx_opt[i].vx_pd.obs_info->name().c_str(),
+                               obs_info->name().c_str(),
                                conf_info.obtype.c_str());
             }
          } // end for k
@@ -1556,22 +1595,22 @@ void process_grid_vx() {
             pd_all.clear();
             pd_all.set_ens_size(n_vx_vld[i]);
             pd_all.set_climo_cdf_info_ptr(&conf_info.vx_opt[i].cdf_info);
-            pd_all.ctrl_index = conf_info.vx_opt[i].vx_pd.pd[0][0][0].ctrl_index;
-            pd_all.skip_const = conf_info.vx_opt[i].vx_pd.pd[0][0][0].skip_const;
+            pd_all.ctrl_index = conf_info.vx_opt[i].vx_pd.pd[0].ctrl_index;
+            pd_all.skip_const = conf_info.vx_opt[i].vx_pd.pd[0].skip_const;
 
             // Apply the current mask to the fields and compute the pairs
             process_grid_scores(i,
                                 fcst_dp, fraw_dp,
                                 obs_dp, oraw_dp,
-                                emn_dp, cmn_dp, csd_dp,
+                                emn_dp,
+                                fcmn_dp, fcsd_dp,
+                                ocmn_dp, ocsd_dp,
                                 mask_mp, oerr_ptr,
                                 pd_all);
 
             mlog << Debug(2)
                  << "Processing gridded verification "
-                 << conf_info.vx_opt[i].vx_pd.fcst_info->get_var_info()->magic_str()
-                 << " versus "
-                 << conf_info.vx_opt[i].vx_pd.obs_info->magic_str()
+                 << fcst_info->magic_str() << " versus " << obs_info->magic_str()
                  << ", for observation type " << shc.get_obtype()
                  << ", over region " << shc.get_mask()
                  << ", for interpolation method "
@@ -1615,23 +1654,28 @@ void process_grid_vx() {
 void process_grid_scores(int i_vx,
         const DataPlane *fcst_dp, const DataPlane *fraw_dp,
         const DataPlane &obs_dp,  const DataPlane &oraw_dp,
-        const DataPlane &emn_dp,  const DataPlane &cmn_dp,
-        const DataPlane &csd_dp,  const MaskPlane &mask_mp,
+        const DataPlane &emn_dp,
+        const DataPlane &fcmn_dp, const DataPlane &fcsd_dp,
+        const DataPlane &ocmn_dp, const DataPlane &ocsd_dp,
+        const MaskPlane &mask_mp,
         ObsErrorEntry *oerr_ptr,  PairDataEnsemble &pd) {
    int i, j, x, y, n_miss;
-   double cmn, csd;
    ObsErrorEntry *e = (ObsErrorEntry *) nullptr;
 
    // Allocate memory in one big chunk based on grid size
    pd.extend(nxy);
 
    // Climatology flags
-   bool emn_flag = (emn_dp.nx() == obs_dp.nx() &&
-                    emn_dp.ny() == obs_dp.ny());
-   bool cmn_flag = (cmn_dp.nx() == obs_dp.nx() &&
-                    cmn_dp.ny() == obs_dp.ny());
-   bool csd_flag = (csd_dp.nx() == obs_dp.nx() &&
-                    csd_dp.ny() == obs_dp.ny());
+   bool emn_flag  = (emn_dp.nx()  == obs_dp.nx() &&
+                     emn_dp.ny()  == obs_dp.ny());
+   bool fcmn_flag = (fcmn_dp.nx() == obs_dp.nx() &&
+                     fcmn_dp.ny() == obs_dp.ny());
+   bool fcsd_flag = (fcsd_dp.nx() == obs_dp.nx() &&
+                     fcsd_dp.ny() == obs_dp.ny());
+   bool ocmn_flag = (ocmn_dp.nx() == obs_dp.nx() &&
+                     ocmn_dp.ny() == obs_dp.ny());
+   bool ocsd_flag = (ocsd_dp.nx() == obs_dp.nx() &&
+                     ocsd_dp.ny() == obs_dp.ny());
 
    // Loop through the observation field
    for(x=0; x<obs_dp.nx(); x++) {
@@ -1643,11 +1687,14 @@ void process_grid_scores(int i_vx,
             !mask_mp.s_is_on(x, y)) continue;
 
          // Get current climatology values
-         cmn = (cmn_flag ? cmn_dp(x, y) : bad_data_double);
-         csd = (csd_flag ? csd_dp(x, y) : bad_data_double);
+         ClimoPntInfo cpi(
+            (fcmn_flag ? fcmn_dp(x, y) : bad_data_double),
+            (fcsd_flag ? fcsd_dp(x, y) : bad_data_double),
+            (ocmn_flag ? ocmn_dp(x, y) : bad_data_double),
+            (ocsd_flag ? ocsd_dp(x, y) : bad_data_double));
 
          // Add the observation point
-         pd.add_grid_obs(x, y, oraw_dp(x, y), cmn, csd, wgt_dp(x, y));
+         pd.add_grid_obs(x, y, oraw_dp(x, y), cpi, wgt_dp(x, y));
 
          // Get the observation error entry pointer
          if(oerr_ptr) {
@@ -1666,7 +1713,7 @@ void process_grid_scores(int i_vx,
          pd.add_obs_error_entry(e);
 
          // Add the ensemble mean value for this point
-         pd.mn_na.add((emn_flag ? emn_dp(x, y) : bad_data_double));
+         pd.mn_na.add(emn_flag ? emn_dp(x, y) : bad_data_double);
 
       } // end for y
    } // end for x
@@ -1678,7 +1725,7 @@ void process_grid_scores(int i_vx,
       y = nint(pd.y_na[i]);
 
       // Loop through each of the ensemble members
-      for(j=0,n_miss=0; j < conf_info.vx_opt[i_vx].vx_pd.fcst_info->inputs_n(); j++) {
+      for(j=0,n_miss=0; j < conf_info.vx_opt[i_vx].vx_pd.ens_info->inputs_n(); j++) {
 
          // Skip missing data
          if(fcst_dp[j].nx() == 0 || fcst_dp[j].ny() == 0) {
@@ -1742,17 +1789,17 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
    rps_info.othresh = othresh;
    rps_info.set_prob_cat_thresh(vx_opt.fcat_ta);
 
-   // If prob_cat_thresh is empty and climo data is available,
-   // use climo_cdf thresholds instead
+   // If prob_cat_thresh is empty and observation climo
+   // data is available, use climo_cdf thresholds instead
    if(rps_info.fthresh.n()      == 0 &&
-      pd_ptr->cmn_na.n_valid()   > 0 &&
-      pd_ptr->csd_na.n_valid()   > 0 &&
+      pd_ptr->ocmn_na.n_valid()  > 0 &&
+      pd_ptr->ocsd_na.n_valid()  > 0 &&
       vx_opt.cdf_info.cdf_ta.n() > 0) {
       rps_info.set_cdp_thresh(vx_opt.cdf_info.cdf_ta);
    }
 
    // Compute ensemble RPS statistics from pre-computed binned probabilities
-   if(vx_opt.vx_pd.fcst_info->get_var_info()->is_prob()) {
+   if(vx_opt.vx_pd.ens_info->get_var_info()->is_prob()) {
       rps_info.set_climo_bin_prob(*pd_ptr, vx_opt.ocat_ta);
    }
    // Compute ensemble RPS statistics from ensemble member values
@@ -1833,7 +1880,7 @@ void setup_txt_files() {
 
    // Compute the number of PHIST bins
    for(i=n_phist_bin=0; i<conf_info.get_n_vx(); i++) {
-      n = ceil(1.0 / conf_info.vx_opt[i].vx_pd.pd[0][0][0].phist_bin_size);
+      n = ceil(1.0 / conf_info.vx_opt[i].vx_pd.pd[0].phist_bin_size);
       n_phist_bin = (n > n_phist_bin ? n : n_phist_bin);
    }
 
@@ -1901,39 +1948,39 @@ void setup_txt_files() {
          // Get the maximum number of columns for this line type
          switch(i) {
 
-            case(i_rhist):
+            case i_rhist:
                max_col = get_n_rhist_columns(max_n_ens+1) + n_header_columns + 1;
                break;
 
-            case(i_phist):
+            case i_phist:
                max_col = get_n_phist_columns(n_phist_bin) + n_header_columns + 1;
                break;
 
-            case(i_relp):
+            case i_relp:
                max_col = get_n_relp_columns(max_n_ens) + n_header_columns + 1;
                break;
 
-            case(i_orank):
+            case i_orank:
                max_col = get_n_orank_columns(max_n_ens) + n_header_columns + 1;
                break;
 
-            case(i_pct):
+            case i_pct:
                max_col = get_n_pct_columns(n_prob) + n_header_columns + 1;
                break;
 
-            case(i_pstd):
+            case i_pstd:
                max_col = get_n_pstd_columns(n_prob) + n_header_columns + 1;
                break;
 
-            case(i_pjc):
+            case i_pjc:
                max_col = get_n_pjc_columns(n_prob) + n_header_columns + 1;
                break;
 
-            case(i_prc):
+            case i_prc:
                max_col = get_n_prc_columns(n_prob) + n_header_columns + 1;
                break;
 
-            case(i_eclv):
+            case i_eclv:
                max_col = get_n_eclv_columns(n_eclv) + n_header_columns + 1;
                break;
 
@@ -1949,39 +1996,39 @@ void setup_txt_files() {
          // Write the text header row
          switch(i) {
 
-            case(i_rhist):
+            case i_rhist:
                write_rhist_header_row(1, max_n_ens+1, txt_at[i], 0, 0);
                break;
 
-            case(i_phist):
+            case i_phist:
                write_phist_header_row(1, n_phist_bin, txt_at[i], 0, 0);
                break;
 
-            case(i_relp):
+            case i_relp:
                write_relp_header_row(1, max_n_ens, txt_at[i], 0, 0);
                break;
 
-            case(i_orank):
+            case i_orank:
                write_orank_header_row(1, max_n_ens, txt_at[i], 0, 0);
                break;
 
-            case(i_pct):
+            case i_pct:
                write_pct_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_pstd):
+            case i_pstd:
                write_pstd_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_pjc):
+            case i_pjc:
                write_pjc_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_prc):
+            case i_prc:
                write_prc_header_row(1, n_prob, txt_at[i], 0, 0);
                break;
 
-            case(i_eclv):
+            case i_eclv:
                write_eclv_header_row(1, n_eclv, txt_at[i], 0, 0);
                break;
 
@@ -2059,7 +2106,7 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
    PairDataEnsemble pd;
 
    // Check for probabilistic input
-   bool is_prob = vx_opt.vx_pd.fcst_info->get_var_info()->is_prob();
+   bool is_prob = vx_opt.vx_pd.ens_info->get_var_info()->is_prob();
 
    // Process each observation filtering threshold
    for(i=0; i<vx_opt.othr_ta.n(); i++) {
@@ -2105,7 +2152,7 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       if(!is_prob &&
          vx_opt.output_flag[i_phist] != STATOutputType::None) {
 
-         pd.phist_bin_size = vx_opt.vx_pd.pd[0][0][0].phist_bin_size;
+         pd.phist_bin_size = vx_opt.vx_pd.pd[0].phist_bin_size;
          pd.compute_phist();
 
          if(pd.phist_na.sum() > 0) {
@@ -2134,7 +2181,7 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       if(!is_prob &&
          vx_opt.output_flag[i_ssvar] != STATOutputType::None) {
 
-         pd.ssvar_bin_size = vx_opt.vx_pd.pd[0][0][0].ssvar_bin_size;
+         pd.ssvar_bin_size = vx_opt.vx_pd.pd[0].ssvar_bin_size;
          pd.compute_ssvar();
 
          // Make sure there are bins to process
@@ -2196,17 +2243,15 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
 void do_pct(const EnsembleStatVxOpt &vx_opt,
             const PairDataEnsemble &pd_ens) {
 
-   // Flag to indicate the presence of valid climo data
-   bool have_climo = (pd_ens.cmn_na.n_valid() > 0 &&
-                      pd_ens.csd_na.n_valid() > 0);
-
    // If forecast probability thresholds were specified, use them.
    if(vx_opt.fcat_ta.n() > 0) {
       do_pct_cat_thresh(vx_opt, pd_ens);
    }
    // Otherwise, if climo data is available and bins were requested,
    // use climo_cdf thresholds instead.
-   else if(have_climo && vx_opt.cdf_info.cdf_ta.n() > 0) {
+   else if(pd_ens.ocmn_na.n_valid()   > 0 &&
+           pd_ens.ocsd_na.n_valid()   > 0 &&
+           vx_opt.cdf_info.cdf_ta.n() > 0) {
       do_pct_cdp_thresh(vx_opt, pd_ens);
    }
 
@@ -2232,7 +2277,8 @@ void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
    pd_pnt.extend(pd_ens.n_obs);
 
    // Determine the number of climo CDF bins
-   n_bin = (pd_ens.cmn_na.n_valid() > 0 && pd_ens.csd_na.n_valid() > 0 ?
+   n_bin = (pd_ens.ocmn_na.n_valid() > 0 &&
+            pd_ens.ocsd_na.n_valid() > 0 ?
             vx_opt.get_n_cdf_bin() : 1);
 
    if(n_bin > 1) {
@@ -2266,21 +2312,22 @@ void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
          // Initialize counts
          n_vld = n_evt = 0;
 
+         // Store climo data
+         ClimoPntInfo cpi(pd_ens.fcmn_na[i_obs], pd_ens.fcsd_na[i_obs],
+                          pd_ens.ocmn_na[i_obs], pd_ens.ocsd_na[i_obs]);
+
          // Derive the ensemble probability
          for(i_ens=0; i_ens<pd_ens.n_ens; i_ens++) {
             if(!is_bad_data(pd_ens.e_na[i_ens][i_obs])) {
                n_vld++;
-               if(vx_opt.fcat_ta[i_thr].check(pd_ens.e_na[i_ens][i_obs],
-                                              pd_ens.cmn_na[i_obs],
-                                              pd_ens.csd_na[i_obs])) n_evt++;
+               if(vx_opt.fcat_ta[i_thr].check(pd_ens.e_na[i_ens][i_obs], &cpi)) n_evt++;
             }
          } // end for i_ens
 
          // Store the probability if enough valid data is present
          if(n_vld > 0 || (double) (n_vld/pd_ens.n_ens) >= conf_info.vld_data_thresh) {
             pd_pnt.add_grid_pair((double) n_evt/n_vld, pd_ens.o_na[i_obs],
-                                 pd_ens.cmn_na[i_obs], pd_ens.csd_na[i_obs],
-                                 pd_ens.wgt_na[i_obs]);
+                                 cpi, pd_ens.wgt_na[i_obs]);
          }
 
       } // end for i_obs
@@ -2332,18 +2379,19 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
    int n_vld, n_evt, n_bin;
    PCTInfo *pct_info = (PCTInfo *) nullptr;
    PairDataPoint pd_pnt, pd;
-   ThreshArray cdp_thresh;
+   ThreshArray ocdp_thresh;
 
    // Derive a PairDataPoint object from the PairDataEnsemble input
    pd_pnt.extend(pd_ens.n_obs);
 
    // Derive the climo distribution percentile thresholds
-   cdp_thresh = derive_cdp_thresh(vx_opt.cdf_info.cdf_ta);
-   n_bin      = cdp_thresh.n();
+   ocdp_thresh = derive_ocdp_thresh(vx_opt.cdf_info.cdf_ta);
+   n_bin       = ocdp_thresh.n();
 
    mlog << Debug(2)
-        << "Computing Probabilistic Statistics for " << cdp_thresh.n()
-        << " climatological distribution percentile thresholds.\n";
+        << "Computing Probabilistic Statistics for "
+        << ocdp_thresh.n() << " observation climatological "
+        << "distribution percentile thresholds.\n";
 
    // Allocate memory
    pct_info = new PCTInfo [n_bin];
@@ -2353,7 +2401,7 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
 
       // Set the header columns
       shc.set_fcst_thresh(vx_opt.fpct_ta);
-      shc.set_obs_thresh(cdp_thresh[i_bin]);
+      shc.set_obs_thresh(ocdp_thresh[i_bin]);
 
       // Re-initialize
       pd_pnt.erase();
@@ -2365,21 +2413,22 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
          // Initialize counts
          n_vld = n_evt = 0;
 
+         // Store climo data
+         ClimoPntInfo cpi(pd_ens.fcmn_na[i_obs], pd_ens.fcsd_na[i_obs],
+                          pd_ens.ocmn_na[i_obs], pd_ens.ocsd_na[i_obs]);
+
          // Derive the ensemble probability
          for(i_ens=0; i_ens<pd_ens.n_ens; i_ens++) {
             if(!is_bad_data(pd_ens.e_na[i_ens][i_obs])) {
                n_vld++;
-               if(cdp_thresh[i_bin].check(pd_ens.e_na[i_ens][i_obs],
-                                          pd_ens.cmn_na[i_obs],
-                                          pd_ens.csd_na[i_obs])) n_evt++;
+               if(ocdp_thresh[i_bin].check(pd_ens.e_na[i_ens][i_obs], &cpi)) n_evt++;
             }
          } // end for i_ens
 
          // Store the probability if enough valid data is present
          if(n_vld > 0 || (double) (n_vld/pd_ens.n_ens) >= conf_info.vld_data_thresh) {
             pd_pnt.add_grid_pair((double) n_evt/n_vld, pd_ens.o_na[i_obs],
-                                 pd_ens.cmn_na[i_obs], pd_ens.csd_na[i_obs],
-                                 pd_ens.wgt_na[i_obs]);
+                                 cpi, pd_ens.wgt_na[i_obs]);
          }
 
       } // end for i_obs
@@ -2389,7 +2438,7 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
 
       // Store thresholds
       pct_info[i_bin].fthresh = vx_opt.fpct_ta;
-      pct_info[i_bin].othresh = cdp_thresh[i_bin];
+      pct_info[i_bin].othresh = ocdp_thresh[i_bin];
       pct_info[i_bin].allocate_n_alpha(vx_opt.get_n_ci_alpha());
 
       for(i=0; i<vx_opt.get_n_ci_alpha(); i++) {
@@ -2414,7 +2463,7 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
 
 void write_pct_info(const EnsembleStatVxOpt &vx_opt,
                     const PCTInfo *pct_info, int n_bin,
-                    bool cdp_thresh) {
+                    bool ocdp_thresh) {
 
    // Write output for each bin
    for(int i_bin=0; i_bin<n_bin; i_bin++) {
@@ -2472,13 +2521,13 @@ void write_pct_info(const EnsembleStatVxOpt &vx_opt,
       PCTInfo pct_mean;
 
       // For non-CDP thresholds, sum the total counts
-      compute_pct_mean(pct_info, n_bin, pct_mean, !cdp_thresh);
+      compute_pct_mean(pct_info, n_bin, pct_mean, !ocdp_thresh);
 
-      // For CDP thresholds, reset the OBS_THRESH column to ==1/n_bin
+      // For OCDP thresholds, reset the OBS_THRESH column to ==1/n_bin
       // to indicate the number of climatological bins used
-      if(cdp_thresh) {
+      if(ocdp_thresh) {
          pct_mean.othresh.set((double) 100.0/vx_opt.cdf_info.n_bin,
-                              thresh_eq, perc_thresh_climo_dist);
+                              thresh_eq, perc_thresh_obs_climo_dist);
       }
 
       // Write out PSTD
@@ -2634,7 +2683,8 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
    nc_var = add_var(nc_out, (string)var_name, ncFloat, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.fcst_info->get_var_info(), &nc_var, false, dp,
+   add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.ens_info->get_var_info(),
+                     &nc_var, false, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data
@@ -2696,7 +2746,8 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
    nc_var = add_var(nc_out, (string)var_name, ncInt, lat_dim, lon_dim);
 
    // Add the variable attributes
-   add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.fcst_info->get_var_info(), &nc_var, true, dp,
+   add_var_att_local(conf_info.vx_opt[i_vx].vx_pd.ens_info->get_var_info(),
+                     &nc_var, true, dp,
                      name_str.c_str(), long_name_str);
 
    // Write the data

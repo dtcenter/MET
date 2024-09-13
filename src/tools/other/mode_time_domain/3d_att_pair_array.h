@@ -99,8 +99,8 @@ class PairAtt3DArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int PairAtt3DArray::n_elements() const { return ( Nelements ); }
-inline int PairAtt3DArray::n         () const { return ( Nelements ); }
+inline int PairAtt3DArray::n_elements() const { return  Nelements; }
+inline int PairAtt3DArray::n         () const { return  Nelements; }
 
 
 ////////////////////////////////////////////////////////////////////////

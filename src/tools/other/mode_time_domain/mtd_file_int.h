@@ -164,25 +164,25 @@ class MtdIntFile : public MtdFileBase {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int MtdIntFile::radius() const { return ( Radius ); }
+inline int MtdIntFile::radius() const { return Radius; }
 
-inline int MtdIntFile::time_beg() const { return ( TimeBeg ); }
-inline int MtdIntFile::time_end() const { return ( TimeEnd ); }
+inline int MtdIntFile::time_beg() const { return TimeBeg; }
+inline int MtdIntFile::time_end() const { return TimeEnd; }
 
-inline double MtdIntFile::threshold() const { return ( Threshold ); }
+inline double MtdIntFile::threshold() const { return Threshold; }
 
-inline int MtdIntFile::data_min() const { return ( DataMin ); }
-inline int MtdIntFile::data_max() const { return ( DataMax ); }
+inline int MtdIntFile::data_min() const { return DataMin; }
+inline int MtdIntFile::data_max() const { return DataMax; }
 
-inline int MtdIntFile::n_objects() const { return ( Nobjects ); }
+inline int MtdIntFile::n_objects() const { return Nobjects; }
 
-inline const int * MtdIntFile::data() const { return ( Data ); }
+inline const int * MtdIntFile::data() const { return Data; }
 
 inline int MtdIntFile::operator()(int _x, int _y, int _t) const
 
 {
 
-return ( Data[mtd_three_to_one(Nx, Ny, Nt, _x, _y, _t)] );
+return Data[mtd_three_to_one(Nx, Ny, Nt, _x, _y, _t)];
 
 }
 

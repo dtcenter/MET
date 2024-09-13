@@ -63,9 +63,9 @@ class ClistEntry {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline Dcolor ClistEntry::dc() const { return ( D ); }
+inline Dcolor ClistEntry::dc() const { return D; }
 
-inline const char * ClistEntry::name() const { return ( Name.c_str() ); }
+inline const char * ClistEntry::name() const { return Name.c_str(); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -118,7 +118,7 @@ class ColorList {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int ColorList::n_elements() const { return ( Nelements ); }
+inline int ColorList::n_elements() const { return Nelements; }
 
 
 ////////////////////////////////////////////////////////////////////////

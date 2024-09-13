@@ -154,9 +154,9 @@ class DictionaryEntry {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline ConfigObjectType DictionaryEntry::type() const { return ( Type ); }
+inline ConfigObjectType DictionaryEntry::type() const { return Type; }
 
-inline ConcatString DictionaryEntry::name() const { return ( Name ); }
+inline ConcatString DictionaryEntry::name() const { return Name; }
 
 inline bool DictionaryEntry::is_number() const { return ( (Type == IntegerType) || (Type == FloatType) ); }
 
@@ -164,11 +164,11 @@ inline bool DictionaryEntry::is_dictionary() const { return ( Type == Dictionary
 
 inline bool DictionaryEntry::is_array() const { return ( Type == ArrayType ); }
 
-inline int DictionaryEntry::n_args() const { return ( Nargs ); }
+inline int DictionaryEntry::n_args() const { return Nargs; }
 
-inline const IcodeVector * DictionaryEntry::icv() const { return ( v ); }
+inline const IcodeVector * DictionaryEntry::icv() const { return v; }
 
-inline Dictionary * DictionaryEntry::dict() const { return ( Dict ); }
+inline Dictionary * DictionaryEntry::dict() const { return Dict; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -344,15 +344,15 @@ class Dictionary {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int Dictionary::n_entries() const { return ( Nentries ); }
+inline int Dictionary::n_entries() const { return Nentries; }
 
-inline const Dictionary * Dictionary::parent() const { return ( Parent ); }
+inline const Dictionary * Dictionary::parent() const { return Parent; }
 
 inline void Dictionary::set_is_array(bool __tf) { IsArray = __tf;  return; }
 
-inline bool Dictionary::is_array() const { return ( IsArray ); }
+inline bool Dictionary::is_array() const { return IsArray; }
 
-inline bool Dictionary::last_lookup_status() const { return ( LastLookupStatus ); }
+inline bool Dictionary::last_lookup_status() const { return LastLookupStatus; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -434,7 +434,7 @@ class DictionaryStack {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int DictionaryStack::n_elements () const { return ( Nelements ); }
+inline int DictionaryStack::n_elements () const { return Nelements; }
 
 
 ////////////////////////////////////////////////////////////////////////

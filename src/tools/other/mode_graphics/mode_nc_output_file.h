@@ -161,23 +161,23 @@ class ModeNcOutputFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int ModeNcOutputFile::nx() const { return ( Nx ); }
-inline int ModeNcOutputFile::ny() const { return ( Ny ); }
+inline int ModeNcOutputFile::nx() const { return Nx; }
+inline int ModeNcOutputFile::ny() const { return Ny; }
 
-inline const Grid & ModeNcOutputFile::grid() const { return ( *_Grid ); }
+inline const Grid & ModeNcOutputFile::grid() const { return *_Grid; }
 
-inline ConcatString ModeNcOutputFile::filename() const { return ( Filename ); }
+inline ConcatString ModeNcOutputFile::filename() const { return Filename; }
 
-inline unixtime ModeNcOutputFile::valid_time() const { return ( ValidTime ); }
-inline unixtime ModeNcOutputFile::init_time () const { return (  InitTime ); }
+inline unixtime ModeNcOutputFile::valid_time() const { return ValidTime; }
+inline unixtime ModeNcOutputFile::init_time () const { return  InitTime; }
 
-inline int ModeNcOutputFile::accum_time () const { return ( AccumTime ); }
+inline int ModeNcOutputFile::accum_time () const { return AccumTime; }
 
-// inline int ModeNcOutputFile::n_fcst_objs () const { return ( NFcstObjs ); }
-// inline int ModeNcOutputFile::n_obs_objs  () const { return ( NObsObjs ); }
+// inline int ModeNcOutputFile::n_fcst_objs () const { return NFcstObjs; }
+// inline int ModeNcOutputFile::n_obs_objs  () const { return NObsObjs ; }
 // 
-// inline int ModeNcOutputFile::n_fcst_clus () const { return ( NFcstClus ); }
-// inline int ModeNcOutputFile::n_obs_clus  () const { return ( NObsClus ); }
+// inline int ModeNcOutputFile::n_fcst_clus () const { return NFcstClus; }
+// inline int ModeNcOutputFile::n_obs_clus  () const { return NObsClus ; }
 
 
 ////////////////////////////////////////////////////////////////////////

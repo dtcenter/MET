@@ -6,10 +6,7 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
-
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <iostream>
 #include <unistd.h>
@@ -26,877 +23,289 @@
 
 using namespace std;
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 static const int use_center = 1;
 
+////////////////////////////////////////////////////////////////////////
+//
+// Code for class Nx2ContingencyTable
+//
+////////////////////////////////////////////////////////////////////////
+
+Nx2ContingencyTable::Nx2ContingencyTable() {
+   init_from_scratch();
+}
 
 ////////////////////////////////////////////////////////////////////////
 
-
-   //
-   //  Code for class Nx2ContingencyTable
-   //
-
+Nx2ContingencyTable::~Nx2ContingencyTable() {
+   clear();
+}
 
 ////////////////////////////////////////////////////////////////////////
 
-
-Nx2ContingencyTable::Nx2ContingencyTable()
-
-{
-
-init_from_scratch();
-
+Nx2ContingencyTable::Nx2ContingencyTable(const Nx2ContingencyTable & t) {
+   init_from_scratch();
+   assign(t);
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-Nx2ContingencyTable::~Nx2ContingencyTable()
-
-{
-
-clear();
-
+void Nx2ContingencyTable::init_from_scratch() {
+   ContingencyTable::init_from_scratch();
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
+void Nx2ContingencyTable::clear() {
 
-Nx2ContingencyTable::Nx2ContingencyTable(const Nx2ContingencyTable & t)
+   ContingencyTable::clear();
+   Thresholds.clear();
 
-{
-
-init_from_scratch();
-
-assign(t);
-
+   return;
 }
-
-
 
 ////////////////////////////////////////////////////////////////////////
 
+Nx2ContingencyTable & Nx2ContingencyTable::operator=(const Nx2ContingencyTable &t) {
 
-void Nx2ContingencyTable::init_from_scratch()
+   if(this == &t) return *this;
+   assign(t);
 
-{
-
-ContingencyTable::init_from_scratch();
-
-Thresholds = (double *) nullptr;
-
-clear();
-
-return;
-
+   return *this;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
+void Nx2ContingencyTable::assign(const Nx2ContingencyTable & t) {
 
-void Nx2ContingencyTable::clear()
+   clear();
 
-{
+   ContingencyTable::assign(t);
+   Thresholds = t.Thresholds;
 
-ContingencyTable::clear();
-
-if ( Thresholds )  { delete [] Thresholds;  Thresholds = (double *) nullptr; }
-
-return;
-
+   return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-Nx2ContingencyTable & Nx2ContingencyTable::operator=(const Nx2ContingencyTable & t)
-
-{
-
-if ( this == &t )  return *this;
-
-assign(t);
-
-return *this;
-
+double Nx2ContingencyTable::n() const {
+   return total();
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void Nx2ContingencyTable::assign(const Nx2ContingencyTable & t)
-
-{
-
-clear();
-
-ContingencyTable::assign(t);
-
-if(t.Thresholds) set_thresholds(t.Thresholds);
-
-return;
-
+void Nx2ContingencyTable::set_size(int N) {
+   ContingencyTable::set_size(N, 2);
+   return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
+void Nx2ContingencyTable::set_size(int NR, int NC) {
 
-int Nx2ContingencyTable::n() const
+   if(NC != 2) {
+      mlog << Error << "\nNx2ContingencyTable::set_size(int, int) -> "
+           << "must have 2 columns, not " << NC << "!\n\n";
+      exit(1);
+   }
 
-{
+   set_size(NR);
 
-int k;
-
-k = total();
-
-return k;
-
+   return;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
+int Nx2ContingencyTable::value_to_row(double t) const {
 
-void Nx2ContingencyTable::set_size(int N)
+   if(Thresholds.empty()) {
+      mlog << Error << "\nNx2ContingencyTable::value_to_row(double) const -> "
+           << "thresholds array not set!\n\n";
+      exit(1);
+   }
 
-{
+   //  Thresholds array is of size Nrows + 1, so
+   //  the last element has index Nrows, not Nrows - 1
+   if(t < Thresholds[0]     && !is_eq(t, Thresholds[0]))      return -1;
+   if(t > Thresholds[Nrows] && !is_eq(t, Thresholds[Nrows]) ) return -1;
 
-ContingencyTable::set_size(N, 2);
+   for(int j=0; j<Nrows; ++j) {
+      if ((t > Thresholds[j]     ||  is_eq(t, Thresholds[j])    ) &&
+          (t < Thresholds[j + 1] && !is_eq(t, Thresholds[j + 1]))) return j;
+   }
 
-return;
+   if(is_eq(t, Thresholds[Nrows])) return (Nrows - 1);
 
+   return -1;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
+void Nx2ContingencyTable::set_thresholds(const vector<double> &Values) {
 
-void Nx2ContingencyTable::set_size(int NR, int NC)
+   if(Values.size() != Nrows + 1) {
+      mlog << Error << "\nNx2ContingencyTable::set_thresholds(const double *) -> "
+           << "expected " << Nrows + 1 << " thresholds but only received "
+           << Values.size() << "!\n\n";
+      exit(1);
+   }
 
-{
+   Thresholds = Values;
 
-if ( NC != 2 )  {
-
-   mlog << Error << "\nNx2ContingencyTable::set_size(int, int) -> must have 2 columns!\n\n";
-
-   exit ( 1 );
-
+   return;
 }
-
-set_size(NR);
-
-return;
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
+double Nx2ContingencyTable::threshold(int k) const {
 
-int Nx2ContingencyTable::value_to_row(double t) const
+   // There are Nrows + 1 thresholds
+   if(k < 0 || k > Thresholds.size()) {
+      mlog << Error << "\nNx2ContingencyTable::threshold(int) const -> "
+           << "range check error!\n\n";
+      exit(1);
+   }
 
-{
-
-if ( !Thresholds )  {
-
-   mlog << Error << "\nNx2ContingencyTable::value_to_row(double) const -> thresholds array not set!\n\n";
-
-   exit ( 1 );
-
+   return Thresholds[k];
 }
-
-if ( t < Thresholds[0]     && !is_eq(t, Thresholds[0]) )      return -1;
-
-if ( t > Thresholds[Nrows] && !is_eq(t, Thresholds[Nrows]) )  return -1;
-                                               //  Thresholds array is of size Nrows + 1, so
-                                               //  the last element has index Nrows, not Nrows - 1
-
-int j;
-
-for (j=0; j<Nrows; ++j)  {
-
-   if ( ( t > Thresholds[j    ] ||  is_eq(t, Thresholds[j    ]) ) &&
-        ( t < Thresholds[j + 1] && !is_eq(t, Thresholds[j + 1]) ) )  return j;
-
-}
-
-if ( is_eq(t, Thresholds[Nrows]) ) return ( Nrows - 1 );
-
-return -1;
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
+void Nx2ContingencyTable::inc_event(double t, double weight) {
+   int r = value_to_row(t);
 
-void Nx2ContingencyTable::set_thresholds(const double * Values)
+   if(r < 0) {
+      mlog << Error << "\nNx2ContingencyTable::inc_event(double) -> "
+           << "bad value ... " << t << "\n\n";
+      exit(1);
+   }
 
-{
+   inc_entry(r, nx2_event_column, weight);
 
-if ( E->empty() )  {
-
-   mlog << Error << "\nNx2ContingencyTable::set_thresholds(const double *) -> table empty!\n\n";
-
-   exit ( 1 );
-
+   return;
 }
-
-if ( Thresholds )  { delete [] Thresholds;  Thresholds = (double *) nullptr; }
-
-Thresholds = new double [Nrows + 1];
-
-memcpy(Thresholds, Values, (Nrows + 1)*sizeof(double));
-
-return;
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
+void Nx2ContingencyTable::inc_nonevent(double t, double weight) {
+   int r = value_to_row(t);
 
-double Nx2ContingencyTable::threshold(int k) const
+   if(r < 0) {
+      mlog << Error << "\nNx2ContingencyTable::inc_nonevent(double) -> "
+           << "bad value ... " << t << "\n\n";
+      exit(1);
+   }
 
-{
+   inc_entry(r, nx2_nonevent_column, weight);
 
-if ( !Thresholds )  {
-
-   mlog << Error << "\nNx2ContingencyTable::threshold(int) const -> no thresholds set!\n\n";
-
-   exit ( 1 );
-
+   return;
 }
-
-if ( (k < 0) || (k > Nrows) )  {   //  there are Nrows + 1 thresholds
-
-   mlog << Error << "\nNx2ContingencyTable::threshold(int) const -> range check error\n\n";
-
-   exit ( 1 );
-
-}
-
-return Thresholds[k];
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
+double Nx2ContingencyTable::event_count_by_thresh(double t) const {
+   int r = value_to_row(t);
 
-void Nx2ContingencyTable::inc_event(double t)
+   if(r < 0) {
+      mlog << Error << "\nNx2ContingencyTable::event_count_by_thresh(double) -> "
+           << "bad value ... " << t << "\n\n";
+      exit(1);
+   }
 
-{
-
-int r;
-
-r = value_to_row(t);
-
-if ( r < 0 )  {
-
-   mlog << Error << "\nNx2ContingencyTable::inc_event(double) -> bad value ... " << t << "\n\n";
-
-   exit ( 1 );
-
+   return entry(r, nx2_event_column);
 }
-
-inc_entry(r, nx2_event_column);
-
-return;
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
+double Nx2ContingencyTable::nonevent_count_by_thresh(double t) const {
+   int r = value_to_row(t);
 
-void Nx2ContingencyTable::inc_nonevent(double t)
+   if(r < 0) {
+      mlog << Error << "\nNx2ContingencyTable::nonevent_count_by_thresh(double) -> "
+           << "bad value ... " << t << "\n\n";
+      exit(1);
+   }
 
-{
-
-int r;
-
-r = value_to_row(t);
-
-if ( r < 0 )  {
-
-   mlog << Error << "\nNx2ContingencyTable::inc_nonevent(double) -> bad value ... " << t << "\n\n";
-
-   exit ( 1 );
-
+   return entry(r, nx2_nonevent_column);
 }
-
-inc_entry(r, nx2_nonevent_column);
-
-return;
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
+void Nx2ContingencyTable::set_event(int row, double value) {
 
-int Nx2ContingencyTable::event_count_by_thresh(double t) const
+   if(row < 0 || row >= Nrows) {
+      mlog << Error << "\nNx2ContingencyTable::set_event(int, double) -> "
+           << "bad row index ... " << row << "\n\n";
+      exit(1);
+   }
 
-{
+   set_entry(row, nx2_event_column, value);
 
-int r;
-
-r = value_to_row(t);
-
-if ( r < 0 )  {
-
-   mlog << Error << "\nNx2ContingencyTable::event_count_by_thresh(double) -> bad value ... " << t << "\n\n";
-
-   exit ( 1 );
-
+   return;
 }
-
-int k;
-
-k = entry(r, nx2_event_column);
-
-return k;
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
+void Nx2ContingencyTable::set_nonevent(int row, double value) {
 
-int Nx2ContingencyTable::nonevent_count_by_thresh(double t) const
+   if(row < 0 || row >= Nrows) {
+      mlog << Error << "\nNx2ContingencyTable::set_nonevent(int, double) -> "
+           << "bad row index ... " << row << "\n\n";
+      exit(1);
+   }
 
-{
+   set_entry(row, nx2_nonevent_column, value);
 
-int r;
-
-r = value_to_row(t);
-
-if ( r < 0 )  {
-
-   mlog << Error << "\nNx2ContingencyTable::nonevent_count_by_thresh(double) -> bad value ... " << t << "\n\n";
-
-   exit ( 1 );
-
+   return;
 }
-
-int k;
-
-k = entry(r, nx2_nonevent_column);
-
-return k;
-
-}
-
 
 ////////////////////////////////////////////////////////////////////////
-
-
-double Nx2ContingencyTable::row_obar(int row) const
-
-{
-
-const int obs_count = event_count_by_row(row);
-const int Ni = row_total(row);
-double x;
-
-if(Ni == 0) x = bad_data_double;
-else        x = ((double) obs_count)/((double) Ni);
-
-return x;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double Nx2ContingencyTable::obar() const
-
-{
-
-const int obs_count = event_col_total();
-const int N = n();
-double x;
-
-if (N == 0) x = bad_data_double;
-else        x = ((double) obs_count)/((double) N);
-
-return x;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double Nx2ContingencyTable::row_proby(int row) const
-
-{
-
-if ( (row < 0) || (row >= Nrows) )  {
-
-   mlog << Error << "\nNx2ContingencyTable::row_proby(int) const -> range check error\n\n";
-
-   exit ( 1 );
-
-}
-
-double x;
-
-if ( use_center ) x = 0.5*(Thresholds[row] + Thresholds[row + 1]);
-else              x = Thresholds[row];
-
-return x;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
 
 double Nx2ContingencyTable::baser() const {
-
-   double v;
-
-   if( n() == 0 ) v = bad_data_double;
-   else           v = (double) event_col_total()/n();
- 
-   return ( v );
+   return compute_proportion(event_col_total(), n());
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 double Nx2ContingencyTable::baser_ci(double alpha,
                                      double &cl, double &cu) const {
-   double v;
-
-   v = baser();
+   double v = baser();
 
    compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
 
    return v;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-   //
-   //  Reference: Equation 7.40, page 286 in Wilks, 2nd Ed.
-   //
-
-double Nx2ContingencyTable::reliability() const
-
-{
-
-int row;
-double sum;
-const int N = n();
-int Ni;
-double yi, obari, t;
-
-
-sum = 0.0;
-
-for (row=0; row<Nrows; ++row)  {
-
-   Ni = row_total(row);
-
-   yi = row_proby(row);
-
-   obari = row_obar(row);
-
-   // When obari is not defined, don't include it in the sum
-   if(is_bad_data(obari)) continue;
-
-   t = yi - obari;
-
-   sum += Ni*t*t;
-
-}
-
-if (N == 0) sum  = bad_data_double;
-else        sum /= N;
-
-return sum;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double Nx2ContingencyTable::resolution() const
-
-{
-
-int row, Ni;
-const int N = n();
-double sum, Obar, obari, t;
-
-
-Obar = obar();
-
-sum = 0.0;
-
-for (row=0; row<Nrows; ++row)  {
-
-   Ni = row_total(row);
-
-   obari = row_obar(row);
-
-   // When obari is not defined, don't include it in the sum
-   if(is_bad_data(obari)) continue;
-
-   t = obari - Obar;
-
-   sum += Ni*t*t;
-
-}
-
-if (N == 0) sum  = bad_data_double;
-else        sum /= N;
-
-return sum;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double Nx2ContingencyTable::uncertainty() const
-
-{
-
-double a, b;
-
-a = obar();
-
-if (is_bad_data(a)) b = bad_data_double;
-else                b = a*(1.0 - a);
-
-return b;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Reference: Equation 8.43, page 340 in Wilks, 3rd Ed.
-   //
-
-double Nx2ContingencyTable::bss_smpl() const
-
-{
-
-double res, rel, unc, bss;
-
-res = resolution();
-rel = reliability();
-unc = uncertainty();
-
-if (is_bad_data(res) || is_bad_data(rel) ||
-    is_bad_data(unc) || is_eq(unc, 0.0))  {
-   bss = bad_data_double;
-}
-else {
-   bss = ( res - rel ) / unc;
-}
-
-return bss;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double Nx2ContingencyTable::brier_score() const
-
-{
-
-const int N = n();
-
-if ( N == 0 )  return bad_data_double;
-
-int j, count;
-double t, yi, sum;
-
-sum = 0.0;
-
-   //
-   //  terms for event
-   //
-
-for (j=0; j<Nrows; ++j)  {
-
-   count = event_count_by_row(j);
-
-   yi = row_proby(j);
-
-   t = yi - 1.0;
-
-   sum += count*t*t;
-
-}   //  for j
-
-   //
-   //  terms for nonevent
-   //
-
-for (j=0; j<Nrows; ++j)  {
-
-   count = nonevent_count_by_row(j);
-
-   yi = row_proby(j);
-
-   t = yi;
-
-   sum += count*t*t;
-
-}   //  for j
-
-   //
-   //  that's all the terms
-   //
-
-if (N == 0) sum  = bad_data_double;
-else        sum /= N;
-
-return sum;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double Nx2ContingencyTable::row_calibration(int row) const
-
-{
-
-if ( (row < 0) || (row >= Nrows) )  {
-
-   mlog << Error << "\nNx2ContingencyTable::row_calibration(int) const -> range check error\n\n";
-
-   exit ( 1 );
-
-}
-
-double num, denom;
-double x;
-
-num   = (double) event_count_by_row(row);
-
-denom = num + nonevent_count_by_row(row);
-
-if(is_eq(denom, 0.0)) x = bad_data_double;
-else                  x = num/denom;
-
-return x;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double Nx2ContingencyTable::row_refinement(int row) const
-
-{
-
-if ( (row < 0) || (row >= Nrows) )  {
-
-   mlog << Error << "\nNx2ContingencyTable::row_refinement(int) const -> range check error\n\n";
-
-   exit ( 1 );
-
-}
-
-int py_o1, py_o2;
-const int N = n();
-double x;
-
-py_o1 =    event_count_by_row(row);
-py_o2 = nonevent_count_by_row(row);
-
-x = (double) (py_o1 + py_o2);
-
-if (N == 0) x  = bad_data_double;
-else        x /= N;
-
-return x;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double Nx2ContingencyTable::row_event_likelihood(int row) const
-
-{
-
-if ( (row < 0) || (row >= Nrows) )  {
-
-   mlog << Error << "\nNx2ContingencyTable::row_event_likelihood(int) const -> range check error\n\n";
-
-   exit ( 1 );
-
-}
-
-double x, num, denom;
-
-denom = (double) event_col_total();
-
-num   = (double) event_count_by_row(row);
-
-if(is_eq(denom, 0.0)) x = bad_data_double;
-else                  x = num/denom;
-
-return x;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double Nx2ContingencyTable::row_nonevent_likelihood(int row) const
-
-{
-
-if ( (row < 0) || (row >= Nrows) )  {
-
-   mlog << Error << "\nNx2ContingencyTable::row_nonevent_likelihood(int) const -> range check error\n\n";
-
-   exit ( 1 );
-
-}
-
-double x, num, denom;
-
-denom = (double) nonevent_col_total();
-
-num   = (double) nonevent_count_by_row(row);
-
-if(is_eq(denom, 0.0)) x = bad_data_double;
-else                  x = num/denom;
-
-return x;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-TTContingencyTable Nx2ContingencyTable::ctc_by_row(int row) const
-
-{
-
-TTContingencyTable tt;
-
-if ( (row < 0) || (row >= Nrows) )  {
-
-   mlog << Error << "\nNx2ContingencyTable::ctc_by_row(int) const -> range check error\n\n";
-
-   exit ( 1 );
-
-}
-
-int j;
-int sy, sn;
-
-   ///////////////////
-
-sy = sn = 0;
-
-for (j=(row + 1); j<Nrows; ++j)  {
-
-   sy +=    event_count_by_row(j);
-   sn += nonevent_count_by_row(j);
-
-}
-
-tt.set_fy_oy(sy);
-tt.set_fy_on(sn);
-
-   ///////////////////
-
-sy = sn = 0;
-
-for (j=0; j<=row; ++j)  {
-
-   sy +=    event_count_by_row(j);
-   sn += nonevent_count_by_row(j);
-
-}
-
-tt.set_fn_oy(sy);
-tt.set_fn_on(sn);
-
-   ///////////////////
-
-return tt;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-double Nx2ContingencyTable::roc_auc() const
-
-{
-
-int j;
-TTContingencyTable ct;
-double area, x_prev, y_prev, x, y;
-
-x_prev = y_prev = 1.0;
-
-for(j=0, area=bad_data_double; j<Nrows; ++j)  {
-
-   // 2x2 Contingency Table for this row
-   ct = ctc_by_row(j);
-
-   // Retrieve the ROC point for this row
-   x = ct.pofd();
-   y = ct.pod_yes();
-
-   if(is_bad_data(x) || is_bad_data(y)) continue;
-
-   // Initialize area to 0 for the first valid point
-   if(is_bad_data(area)) area = 0.0;
-
-   // Compute area under the curve using the trapezoid rule
-   area += (x_prev - x)*(y_prev + y)*0.5;
-
-   // Save current ROC point as the previous point
-   x_prev = x;
-   y_prev = y;
-
-}
-
-return area;
-
+double Nx2ContingencyTable::brier_score() const {
+
+   if(E.empty()) return bad_data_double;
+
+   double sum = 0.0;
+   double count;
+   double yi;
+   double t;
+
+   // Terms for event
+   for(int j=0; j<Nrows; ++j) {
+      count = event_count_by_row(j);
+      yi = row_proby(j);
+      t = yi - 1.0;
+      sum += count*t*t;
+   }
+
+   // Terms for nonevent
+   for(int j=0; j<Nrows; ++j) {
+      count = nonevent_count_by_row(j);
+      yi = row_proby(j);
+      t = yi;
+      sum += count*t*t;
+   }
+
+   return compute_proportion(sum, n());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -909,69 +318,287 @@ return area;
 //
 ////////////////////////////////////////////////////////////////////////
 
+double Nx2ContingencyTable::brier_ci_halfwidth(double alpha) const {
+   double bs = brier_score();
+   const double N = n();
+   const double Ninv = 1.0/N;
 
-double Nx2ContingencyTable::brier_ci_halfwidth(double alpha) const
+   // N must be > 1 so that degf > 0 in the call to gsl_cdf_tdist_Pinv()
+   if(is_bad_data(bs) || N <= 1.0)  return bad_data_double;
 
-{
+   double degf = N - 1.0;
+   double t = gsl_cdf_tdist_Pinv(1.0 - 0.5*alpha, degf);
+   double ob = obar();
 
-int j;
-double ee, ne;
-double ob, degf, bs, t;
-double term, var;
-double af4, sf3, sf2, af1;
-double halfwidth;
-const double N = (double) n();
-const double Ninv = 1.0/N;
+   double af1 = 0.0;
+   double sf2 = 0.0;
+   double sf3 = 0.0;
+   double af4 = 0.0;
 
-// N must be > 1 so that degf > 0 in the call to gsl_cdf_tdist_Pinv()
+   for(int j=0; j<Nrows; ++j) {
 
-if(is_bad_data(bs = brier_score()) || N <= 1)  return bad_data_double;
+      double ee = Ninv*(   event_count_by_row(j));
+      double ne = Ninv*(nonevent_count_by_row(j));
+      double term = ee + ne;
 
-degf = N - 1.0;
+      term *= term; //  squared
+      term *= term; //  fourth power
+      af4 += term;
+      term = ee*ee;
+      af1 += ee;
+      sf2 += term;
+      sf3 += term*ee;
+   }
 
-t = gsl_cdf_tdist_Pinv(1.0 - 0.5*alpha, degf);
+   af4 *= Ninv;
+   af1 *= Ninv;
 
-ob = obar();
+   double term = 1.0 - 4.0*sf3 + 6.0*sf2 + 4.0*af1;
+   double var = (af4 + ob*term - bs*bs)*Ninv;
+   double halfwidth = t*sqrt(var);
 
-af1 = sf2 = sf3 = af4 = 0.0;
-
-for (j=0; j<Nrows; ++j)  {
-
-   ee = Ninv*(   event_count_by_row(j));
-   ne = Ninv*(nonevent_count_by_row(j));
-
-   term = ee + ne;
-   // term = row_proby(j);
-
-   term *= term;   //  squared
-   term *= term;   //  fourth power
-
-   af4 += term;
-
-   term = ee*ee;
-
-   af1 += ee;
-
-   sf2 += term;
-
-   sf3 += term*ee;
-
-}   //  for j
-
-af4 *= Ninv;
-af1 *= Ninv;
-
-term = 1.0 - 4.0*sf3 + 6.0*sf2 + 4.0*af1;
-
-var = ( af4 + ob*term - bs*bs )*Ninv;
-
-halfwidth = t*sqrt(var);
-
-return halfwidth;
-
+   return halfwidth;
 }
 
+////////////////////////////////////////////////////////////////////////
+//
+// Reference: Equation 7.40, page 286 in Wilks, 2nd Ed.
+//
+////////////////////////////////////////////////////////////////////////
+
+double Nx2ContingencyTable::reliability() const {
+   double sum = 0.0;
+   for(int row=0; row<Nrows; ++row) {
+
+      double Ni    = row_total(row);
+      double yi    = row_proby(row);
+      double obari = row_obar(row);
+
+      // When obari is not defined, do not include in the sum
+      if(is_bad_data(obari)) continue;
+
+      double t = yi - obari;
+
+      sum += Ni*t*t;
+   }
+
+   return compute_proportion(sum, n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double Nx2ContingencyTable::resolution() const {
+   double Obar = obar();
+   double sum = 0.0;
+
+   for(int row=0; row<Nrows; ++row) {
+
+      double Ni = row_total(row);
+      double obari = row_obar(row);
+
+      // When obari is not defined, do not include it in the sum
+      if(is_bad_data(obari)) continue;
+
+      double t = obari - Obar;
+
+      sum += Ni*t*t;
+   }
+
+   return compute_proportion(sum, n());
+}
 
 ////////////////////////////////////////////////////////////////////////
 
 
+double Nx2ContingencyTable::uncertainty() const {
+   double a = obar();
+   double v;
+
+   if(is_bad_data(a)) v = bad_data_double;
+   else               v = a*(1.0 - a);
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Reference: Equation 8.43, page 340 in Wilks, 3rd Ed.
+//
+////////////////////////////////////////////////////////////////////////
+
+double Nx2ContingencyTable::bss_smpl() const {
+   double res = resolution();
+   double rel = reliability();
+   double unc = uncertainty();
+   double bss;
+
+   if(is_bad_data(res) || is_bad_data(rel) ||
+      is_bad_data(unc) || is_eq(unc, 0.0)) {
+      bss = bad_data_double;
+   }
+   else {
+      bss = (res - rel)/unc;
+   }
+
+   return bss;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double Nx2ContingencyTable::row_obar(int row) const {
+   return compute_proportion(event_count_by_row(row), row_total(row));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double Nx2ContingencyTable::obar() const {
+   return compute_proportion(event_col_total(), n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double Nx2ContingencyTable::row_proby(int row) const {
+
+   if(row < 0 || row >= Nrows) {
+      mlog << Error << "\nNx2ContingencyTable::row_proby(int) const -> "
+           << "range check error\n\n";
+      exit(1);
+   }
+
+   double v;
+
+   if(use_center) v = 0.5*(Thresholds[row] + Thresholds[row + 1]);
+   else           v = Thresholds[row];
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double Nx2ContingencyTable::row_calibration(int row) const {
+
+   if(row < 0 || row >= Nrows) {
+      mlog << Error << "\nNx2ContingencyTable::row_calibration(int) const -> "
+           << "range check error\n\n";
+      exit(1);
+   }
+
+   double num = event_count_by_row(row);
+   double den = num + nonevent_count_by_row(row);
+
+   return compute_proportion(num, den);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double Nx2ContingencyTable::row_refinement(int row) const {
+
+   if(row < 0 || row >= Nrows) {
+      mlog << Error << "\nNx2ContingencyTable::row_refinement(int) const -> "
+           << "range check error\n\n";
+      exit(1);
+   }
+
+   return compute_proportion(   event_count_by_row(row) +
+                             nonevent_count_by_row(row), n());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double Nx2ContingencyTable::row_event_likelihood(int row) const {
+
+   if(row < 0 || row >= Nrows) {
+      mlog << Error << "\nNx2ContingencyTable::row_event_likelihood(int) const -> "
+           << "range check error\n\n";
+      exit(1);
+   }
+
+   return compute_proportion(event_count_by_row(row),
+                             event_col_total());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+
+double Nx2ContingencyTable::row_nonevent_likelihood(int row) const {
+
+   if(row < 0 || row >= Nrows) {
+      mlog << Error << "\nNx2ContingencyTable::row_nonevent_likelihood(int) const -> "
+           << "range check error\n\n";
+      exit(1);
+   }
+
+   return compute_proportion(nonevent_count_by_row(row),
+                             nonevent_col_total());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+TTContingencyTable Nx2ContingencyTable::ctc_by_row(int row) const {
+   TTContingencyTable tt;
+
+   if(row < 0 || row >= Nrows) {
+      mlog << Error << "\nNx2ContingencyTable::ctc_by_row(int) const -> "
+           << "range check error\n\n";
+      exit(1);
+   }
+
+   double sy = 0.0;
+   double sn = 0.0;
+
+   for(int j=row+1; j<Nrows; ++j) {
+      sy +=    event_count_by_row(j);
+      sn += nonevent_count_by_row(j);
+   }
+
+   tt.set_fy_oy(sy);
+   tt.set_fy_on(sn);
+
+   sy = 0.0;
+   sn = 0.0;
+
+   for(int j=0; j<=row; ++j) {
+      sy +=    event_count_by_row(j);
+      sn += nonevent_count_by_row(j);
+   }
+
+   tt.set_fn_oy(sy);
+   tt.set_fn_on(sn);
+
+   return tt;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double Nx2ContingencyTable::roc_auc() const {
+   TTContingencyTable ct;
+   double x_prev = 1.0;
+   double y_prev = 1.0;
+   double area = bad_data_double;
+
+   for(int j=0; j<Nrows; ++j) {
+
+      // 2x2 Contingency Table for this row
+      ct = ctc_by_row(j);
+
+      // Retrieve the ROC point for this row
+      double x = ct.pofd();
+      double y = ct.pod_yes();
+
+      if(is_bad_data(x) || is_bad_data(y)) continue;
+
+      // Initialize area to 0 for the first valid point
+      if(is_bad_data(area)) area = 0.0;
+
+      // Compute area under the curve using the trapezoid rule
+      area += (x_prev - x)*(y_prev + y)*0.5;
+
+      // Save current ROC point as the previous point
+      x_prev = x;
+      y_prev = y;
+   }
+
+   return area;
+}
+
+////////////////////////////////////////////////////////////////////////

@@ -65,11 +65,11 @@ class CRC_Array {
 
       CRC_Array & operator=(const CRC_Array <T> & _a)  {
 
-         if ( this == &_a )  return ( * this );
+         if ( this == &_a )  return *this;
 
          assign(_a);
 
-         return ( * this );
+         return *this;
 
       }
 
@@ -94,8 +94,8 @@ class CRC_Array {
          //  get stuff
          //
 
-      int n_elements() const { return ( Nelements ); }
-      int n         () const { return ( Nelements ); }
+      int n_elements() const { return Nelements; }
+      int n         () const { return Nelements; }
 
       T operator[] (int) const;
 
@@ -108,6 +108,7 @@ class CRC_Array {
 
       void add(const T &);
       void add(const CRC_Array <T> &);
+      void add_uniq(const T &, bool forward=true);
       void add_css_sec(const char *);
 
       void set(const T & val);
@@ -145,7 +146,7 @@ clear();
 
 for(int j=0; j<a.n_elements(); ++j) add(nint(a[j]));
 
-return ( * this );
+return *this;
 
 }
 
@@ -159,13 +160,13 @@ bool CRC_Array<T>::operator==(const CRC_Array<T> & a) const
 
 {
 
-if ( Nelements != a.Nelements )  return ( false );
+if ( Nelements != a.Nelements )  return false;
 
 for(int j=0; j<Nelements; ++j)  {
-   if(e[j] != a.e[j])  return ( false );
+   if(e[j] != a.e[j])  return false;
 }
 
-return ( true );
+return true;
 
 }
 
@@ -391,7 +392,7 @@ if ( (i < 0) || (i >= Nelements) )  {
 
 }
 
-return ( e[i] );
+return e[i];
 
 }
 
@@ -424,7 +425,7 @@ else {
    }
 }
 
-return ( found );
+return found;
 
 }
 
@@ -454,7 +455,7 @@ else {
    }
 }
 
-return ( found );
+return found;
 
 }
 
@@ -500,6 +501,22 @@ for (j=0; j<(a.Nelements); ++j)  {
 
 }
 
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+template <typename T>
+
+void CRC_Array<T>::add_uniq(const T & k, bool forward)
+
+{
+
+if ( !has(k, forward) )  add(k);
 
 return;
 
@@ -577,7 +594,7 @@ for(j=0, count=0; j<Nelements; j++) {
 
 if ( count == 0 )  s = bad_data_double;
 
-return ( s );
+return s;
 
 }
 
@@ -591,7 +608,7 @@ T CRC_Array<T>::min() const
 
 {
 
-if ( Nelements == 0 )  return ( bad_data_int );
+if ( Nelements == 0 )  return bad_data_int;
 
 int j;
 
@@ -605,7 +622,7 @@ for(j=0; j<Nelements; j++) {
 
 }
 
-return ( min_v );
+return min_v;
 
 }
 
@@ -619,7 +636,7 @@ T CRC_Array<T>::max() const
 
 {
 
-if(Nelements == 0) return(bad_data_int);
+if(Nelements == 0) return bad_data_int;
 
 int j;
 
@@ -633,7 +650,7 @@ for(j=0; j<Nelements; j++) {
 
 }
 
-return ( max_v );
+return max_v;
 
 }
 

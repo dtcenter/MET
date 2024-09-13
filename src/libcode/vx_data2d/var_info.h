@@ -98,7 +98,7 @@ class VarInfo
 
       void clear();
       void clone_base() const;
-     
+
       virtual void dump(std::ostream &) const;
 
          //
@@ -212,48 +212,48 @@ class VarInfo
 
 inline void VarInfo::add_grib_code(Dictionary &d)   { return;                   }
 
-inline ConcatString VarInfo::magic_str()      const { return(MagicStr);         }
-inline ConcatString VarInfo::req_name()       const { return(ReqName);          }
-inline ConcatString VarInfo::name()           const { return(Name);             }
-inline ConcatString VarInfo::units()          const { return(Units);            }
-inline LevelInfo    VarInfo::level()          const { return(Level);            }
-inline ConcatString VarInfo::req_level_name() const { return(Level.req_name()); }
-inline ConcatString VarInfo::level_name()     const { return(Level.name());     }
-inline ConcatString VarInfo::long_name()      const { return(LongName);         }
-inline ConcatString VarInfo::ens()            const { return(Ensemble);         }
+inline ConcatString VarInfo::magic_str()      const { return MagicStr;         }
+inline ConcatString VarInfo::req_name()       const { return ReqName;          }
+inline ConcatString VarInfo::name()           const { return Name;             }
+inline ConcatString VarInfo::units()          const { return Units;            }
+inline LevelInfo    VarInfo::level()          const { return Level;            }
+inline ConcatString VarInfo::req_level_name() const { return Level.req_name(); }
+inline ConcatString VarInfo::level_name()     const { return Level.name();     }
+inline ConcatString VarInfo::long_name()      const { return LongName;         }
+inline ConcatString VarInfo::ens()            const { return Ensemble;         }
 
-inline bool         VarInfo::p_flag()         const { return(PFlag);            }
-inline ConcatString VarInfo::p_name()         const { return(PName);            }
-inline ConcatString VarInfo::p_units()        const { return(PUnits);           }
-inline SingleThresh VarInfo::p_thresh_lo()    const { return(PThreshLo);        }
-inline SingleThresh VarInfo::p_thresh_hi()    const { return(PThreshHi);        }
-inline bool         VarInfo::p_as_scalar()    const { return(PAsScalar);        }
+inline bool         VarInfo::p_flag()         const { return PFlag;            }
+inline ConcatString VarInfo::p_name()         const { return PName;            }
+inline ConcatString VarInfo::p_units()        const { return PUnits;           }
+inline SingleThresh VarInfo::p_thresh_lo()    const { return PThreshLo;        }
+inline SingleThresh VarInfo::p_thresh_hi()    const { return PThreshHi;        }
+inline bool         VarInfo::p_as_scalar()    const { return PAsScalar;        }
 
-inline int          VarInfo::uv_index()       const { return(UVIndex);          }
+inline int          VarInfo::uv_index()       const { return UVIndex;          }
 
-inline unixtime     VarInfo::init()           const { return(Init);             }
-inline unixtime     VarInfo::valid()          const { return(Valid);            }
-inline int          VarInfo::lead()           const { return(Lead);             }
+inline unixtime     VarInfo::init()           const { return Init;             }
+inline unixtime     VarInfo::valid()          const { return Valid;            }
+inline int          VarInfo::lead()           const { return Lead;             }
 
-inline ThreshArray  VarInfo::censor_thresh()  const { return(CensorThresh);     }
-inline NumArray     VarInfo::censor_val()     const { return(CensorVal);        }
+inline ThreshArray  VarInfo::censor_thresh()  const { return CensorThresh;     }
+inline NumArray     VarInfo::censor_val()     const { return CensorVal;        }
 
-inline int          VarInfo::n_bins()         const { return(nBins);            }
-inline NumArray     VarInfo::range()          const { return(Range);            }
+inline int          VarInfo::n_bins()         const { return nBins;            }
+inline NumArray     VarInfo::range()          const { return Range;            }
 
-inline RegridInfo   VarInfo::regrid()         const { return(Regrid);           }
+inline RegridInfo   VarInfo::regrid()         const { return Regrid;           }
 
 inline ConcatString VarInfo::name_attr()      const { return(SetAttrName.empty()     ? name()       : SetAttrName);     }
 inline ConcatString VarInfo::units_attr()     const { return(SetAttrUnits.empty()    ? units()      : SetAttrUnits);    }
 inline ConcatString VarInfo::level_attr()     const { return(SetAttrLevel.empty()    ? level_name() : SetAttrLevel);    }
 inline ConcatString VarInfo::long_name_attr() const { return(SetAttrLongName.empty() ? long_name()  : SetAttrLongName); }
 
-inline Grid         VarInfo::grid_attr()      const { return(SetAttrGrid);     }
+inline Grid         VarInfo::grid_attr()      const { return SetAttrGrid;     }
 
-inline unixtime     VarInfo::init_attr()      const { return(SetAttrInit);     }
-inline unixtime     VarInfo::valid_attr()     const { return(SetAttrValid);    }
-inline int          VarInfo::lead_attr()      const { return(SetAttrLead);     }
-inline int          VarInfo::accum_attr()     const { return(SetAttrAccum);    }
+inline unixtime     VarInfo::init_attr()      const { return SetAttrInit;     }
+inline unixtime     VarInfo::valid_attr()     const { return SetAttrValid;    }
+inline int          VarInfo::lead_attr()      const { return SetAttrLead;     }
+inline int          VarInfo::accum_attr()     const { return SetAttrAccum;    }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -278,7 +278,7 @@ class EnsVarInfo {
 
    private:
       std::vector<InputInfo> inputs; // Vector of InputInfo
-      VarInfo * ctrl_info;      // Field info for control member
+      VarInfo * ctrl_info;           // Field info for control member
 
    public:
       EnsVarInfo();
@@ -294,7 +294,7 @@ class EnsVarInfo {
       void set_ctrl(VarInfo *);
       VarInfo * get_ctrl(int);
 
-      // Get VarInfo from first InputInfo if requested VarInfo is nullptr 
+      // Get VarInfo from first InputInfo if requested VarInfo is nullptr
       VarInfo * get_var_info(int index=0);
       ConcatString get_file(int index=0);
       int get_file_index(int index=0);

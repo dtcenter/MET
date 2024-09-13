@@ -17,44 +17,49 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#define SEEPS_MONTH         12
-#define SEEPS_MATRIX_SIZE   9
+constexpr int SEEPS_MONTH       = 12;
+constexpr int SEEPS_MATRIX_SIZE = 9;
 
-#define SAMPLE_STATION_ID   11035
+constexpr int SAMPLE_STATION_ID = 11035;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char *MET_ENV_SEEPS_POINT_CLIMO_NAME = "MET_SEEPS_POINT_CLIMO_NAME";
-static const char *MET_ENV_SEEPS_GRID_CLIMO_NAME  = "MET_SEEPS_GRID_CLIMO_NAME";
+constexpr char MET_ENV_SEEPS_POINT_CLIMO_NAME[] = "MET_SEEPS_POINT_CLIMO_NAME";
+constexpr char MET_ENV_SEEPS_GRID_CLIMO_NAME[]  = "MET_SEEPS_GRID_CLIMO_NAME";
 
-static const char *dim_name_nstn      = "nstn";
+constexpr char dim_name_nstn[]      = "nstn";
 
-static const char *var_name_p1_00     = "p1_00";
-static const char *var_name_p2_00     = "p2_00";
-static const char *var_name_t1_00     = "t1_00";
-static const char *var_name_t2_00     = "t2_00";
-static const char *var_name_p1_12     = "p1_12";
-static const char *var_name_p2_12     = "p2_12";
-static const char *var_name_t1_12     = "t1_12";
-static const char *var_name_t2_12     = "t2_12";
-static const char *var_name_matrix_00 = "matrix_00";
-static const char *var_name_matrix_12 = "matrix_12";
-static const char *var_name_s12_00    = "s12_00";
-static const char *var_name_s13_00    = "s13_00";
-static const char *var_name_s21_00    = "s21_00";
-static const char *var_name_s23_00    = "s23_00";
-static const char *var_name_s31_00    = "s31_00";
-static const char *var_name_s32_00    = "s32_00";
-static const char *var_name_s12_12    = "s12_12";
-static const char *var_name_s13_12    = "s13_12";
-static const char *var_name_s21_12    = "s21_12";
-static const char *var_name_s23_12    = "s23_12";
-static const char *var_name_s31_12    = "s31_12";
-static const char *var_name_s32_12    = "s32_12";
+constexpr char var_name_p1_00[]     = "p1_00";
+constexpr char var_name_p2_00[]     = "p2_00";
+constexpr char var_name_t1_00[]     = "t1_00";
+constexpr char var_name_t2_00[]     = "t2_00";
+constexpr char var_name_p1_12[]     = "p1_12";
+constexpr char var_name_p2_12[]     = "p2_12";
+constexpr char var_name_t1_12[]     = "t1_12";
+constexpr char var_name_t2_12[]     = "t2_12";
+constexpr char var_name_matrix_00[] = "matrix_00";
+constexpr char var_name_matrix_12[] = "matrix_12";
+constexpr char var_name_s12_00[]    = "s12_00";
+constexpr char var_name_s13_00[]    = "s13_00";
+constexpr char var_name_s21_00[]    = "s21_00";
+constexpr char var_name_s23_00[]    = "s23_00";
+constexpr char var_name_s31_00[]    = "s31_00";
+constexpr char var_name_s32_00[]    = "s32_00";
+constexpr char var_name_s12_12[]    = "s12_12";
+constexpr char var_name_s13_12[]    = "s13_12";
+constexpr char var_name_s21_12[]    = "s21_12";
+constexpr char var_name_s23_12[]    = "s23_12";
+constexpr char var_name_s31_12[]    = "s31_12";
+constexpr char var_name_s32_12[]    = "s32_12";
+
+constexpr char def_seeps_point_filename[] =
+   "MET_BASE/climo/seeps/PPT24_seepsweights.nc";
+constexpr char def_seeps_grid_filename[] =
+   "MET_BASE/climo/seeps/PPT24_seepsweights_grid.nc";
 
 //density_radius = 0.75 degrees (83km; this is described as “the smallest possible
 // value that ensures approximately equal representation of all subregions of Europe”.)
-static double density_radius = 0.75;
+constexpr double density_radius = 0.75;
 const double density_radius_rad = density_radius * rad_per_deg;
 
 ////////////////////////////////////////////////////////////////////////
@@ -135,21 +140,31 @@ struct SeepsClimoRecord {
 
 class SeepsClimoBase {
 
-   protected:
-
+   private:
       bool seeps_ready;
       int filtered_count;
-      SingleThresh seeps_p1_thresh;      // Range of SEEPS p1 (probability of being dry)std::map<int,SeepsClimoRecord *> seeps_score_00_map;
+      SingleThresh seeps_p1_thresh;      // Range of SEEPS p1 (probability of being dry)
+      ConcatString climo_file_name;
+
+   protected:
+
+      bool is_seeps_ready() { return seeps_ready; };
+      void increase_filtered_count() { filtered_count++; };
+      bool check_seeps_p1_thresh(double p1) { return seeps_p1_thresh.check(p1); };
+      ConcatString get_climo_filename();
 
       virtual void clear();
+      virtual ConcatString get_env_climo_name() { return "not defined"; };
+      virtual char *get_def_climo_name() { return nullptr; };
+      virtual void read_seeps_scores(ConcatString filename) {};
+      void set_seeps_ready(bool _seeps_ready) { seeps_ready = _seeps_ready; };
 
    public:
 
-      SeepsClimoBase();
-     ~SeepsClimoBase();
-
+      SeepsClimoBase(ConcatString seeps_climo_name);
+      virtual ~SeepsClimoBase();
       void set_p1_thresh(const SingleThresh &p1_thresh);
-      int get_filtered_count();
+      int get_filtered_count() const;
 
 };
 
@@ -169,15 +184,17 @@ class SeepsClimo : public SeepsClimoBase {
       void print_record(SeepsClimoRecord *record, bool with_header=false);
       void read_records(ConcatString filename);
 
-      ConcatString get_seeps_climo_filename();
-      void read_seeps_scores(ConcatString filename);
+   protected:
+      void clear() override;
+      ConcatString get_env_climo_name() override { return MET_ENV_SEEPS_POINT_CLIMO_NAME; };
+      char *get_def_climo_name() override { return (char *)def_seeps_point_filename; };
+      void read_seeps_scores(ConcatString filename) override;
 
    public:
 
-      SeepsClimo();
+      SeepsClimo(ConcatString seeps_climo_name);
      ~SeepsClimo();
 
-      void clear();
       SeepsRecord *get_record(int sid, int month, int hour);
       double get_score(int sid, double p_fcst, double p_obs, int month, int hour);
       SeepsScore *get_seeps_score(int sid, double p_fcst, double p_obs, int month, int hour);
@@ -199,7 +216,7 @@ class SeepsClimoGrid : public SeepsClimoBase {
    private:
 
       int   month;
-      int   hour;
+      int   hour; // not implemented
       int   nx;
       int   ny;
       double *p1_buf;
@@ -213,15 +230,19 @@ class SeepsClimoGrid : public SeepsClimoBase {
       double *s31_buf;
       double *s32_buf;
 
-      ConcatString get_seeps_climo_filename();
-      void read_seeps_scores(ConcatString filename);
+      void init_from_scratch();
+
+   protected:
+      void clear() override;
+      ConcatString get_env_climo_name() override { return MET_ENV_SEEPS_GRID_CLIMO_NAME; };
+      char *get_def_climo_name() override { return (char *)def_seeps_grid_filename; };
+      void read_seeps_scores(ConcatString filename) override;
 
    public:
 
-      SeepsClimoGrid(int month, int hour);
+      SeepsClimoGrid(int month, int hour, ConcatString seeps_climo_name);
      ~SeepsClimoGrid();
 
-      void clear();
       SeepsScore *get_record(int ix, int iy, double p_fcst, double p_obs);
       double get_score(int offset, int obs_cat, int fcst_cat);
       double get_score(int ix, int iy, double p_fcst, double p_obs);
@@ -236,12 +257,12 @@ class SeepsClimoGrid : public SeepsClimoBase {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int SeepsClimoBase::get_filtered_count() { return filtered_count; }
+inline int SeepsClimoBase::get_filtered_count() const { return filtered_count; }
 
 ////////////////////////////////////////////////////////////////////////
 
-extern SeepsClimo *get_seeps_climo();
-extern SeepsClimoGrid *get_seeps_climo_grid(int month, int hour=0);
+extern SeepsClimo *get_seeps_climo(ConcatString seeps_point_climo_name);
+extern SeepsClimoGrid *get_seeps_climo_grid(int month, ConcatString seeps_grid_climo_name, int hour=0);
 
 extern void release_seeps_climo();
 extern void release_seeps_climo_grid();

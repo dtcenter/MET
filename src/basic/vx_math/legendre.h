@@ -90,15 +90,15 @@ class Legendre {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double Legendre::value() const { return ( P[MaxDegree] ); }
+inline double Legendre::value() const { return P[MaxDegree]; }
 
-inline double Legendre::last_x() const { return ( X ); }
+inline double Legendre::last_x() const { return X; }
 
-inline double Legendre::value(int __n__) const { return ( P[__n__] ); }
+inline double Legendre::value(int __n__) const { return P[__n__]; }
 
-inline double Legendre::der_value() const { return ( PP[MaxDegree] ); }
+inline double Legendre::der_value() const { return PP[MaxDegree]; }
 
-inline double Legendre::der_value(int __n__) const { return ( PP[__n__] ); }
+inline double Legendre::der_value(int __n__) const { return PP[__n__]; }
 
 
 ////////////////////////////////////////////////////////////////////////

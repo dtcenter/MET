@@ -37,7 +37,7 @@ regrid = {
 
 censor_thresh = []; 
 censor_val    = [];
-cat_thresh    = [ >CDP25, >CDP50, >CDP75 ];
+cat_thresh    = [ >OCDP25, >OCDP50, >OCDP75 ];
 cnt_thresh    = [ NA ];
 cnt_logic     = UNION;
 
@@ -50,7 +50,7 @@ fcst = {
    ];
 }
 obs = {
-   cnt_thresh = [ NA, >CDP25&&<CDP75 ];
+   cnt_thresh = [ NA, >OCDP25&&<OCDP75 ];
    field = [ 
       { name = "TMP"; level = "P850"; }
    ];
@@ -132,13 +132,13 @@ vld_thresh = 0.5;
 //
 output_stats = {
    fho    = [ "TOTAL", "F_RATE", "H_RATE", "O_RATE" ];
-   ctc    = [ ];
+   ctc    = [ "ALL" ];
    cts    = [ ];
    mctc   = [ ];
-   mcts   = [ "ACC" ];
-   cnt    = [ "TOTAL", "RMSE", "ANOM_CORR" ];
-   sl1l2  = [ ];
-   sal1l2 = [ ];
+   mcts   = [ ];
+   cnt    = [ "TOTAL", "RMSE", "ANOM_CORR", "RMSFA", "RMSOA" ];
+   sl1l2  = [ "ALL" ];
+   sal1l2 = [ "ALL" ];
    pct    = [ ];
    pstd   = [ ];
    pjc    = [ ];

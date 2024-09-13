@@ -669,7 +669,8 @@ void read_pds(const GribRecord &r, int &bms_flag,
 
    //
    // Set the valid and accumulation times based on the
-   // contents of the time range indicator
+   // contents of the time range indicator in GRIB1 Table 5:
+   //   https://www.nco.ncep.noaa.gov/pmb/docs/on388/table5.html
    //
    switch((int) pds->tri) {
 
@@ -724,6 +725,11 @@ void read_pds(const GribRecord &r, int &bms_flag,
           valid_ut = init_ut;
           accum = 0;
           break;
+
+      case 123: // Average of N uninitialized analyses, starting at the reference time, at intervals of P2.
+         valid_ut = init_ut;
+         accum = 0;
+         break;
 
       case 136: // Climatological Standard Deviation
           valid_ut = init_ut;
