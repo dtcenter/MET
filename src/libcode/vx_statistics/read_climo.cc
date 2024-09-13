@@ -110,8 +110,8 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
    // (e.g. "config.fcst.climo_mean.regrid") or default
    // location (e.g. "config.climo_mean.regrid")
    RegridInfo regrid_info = parse_conf_regrid(
-                               dict->lookup_dictionary(climo_name, false, false, false),
-                               dict->parent()->lookup_dictionary(climo_name, false, false, false));
+                               dict->lookup_dictionary(climo_name, false),
+                               dict->parent()->lookup_dictionary(climo_name, false));
 
    // Parse the "time_interp_method"
    cs << cs_erase << climo_name << "." << conf_key_time_interp_method;
