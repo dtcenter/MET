@@ -482,11 +482,11 @@ double TTContingencyTable::lodds_ci(double alpha,
 double TTContingencyTable::orss() const {
    double v, num, den;
 
-   num = fy_oy() * fn_on() - fy_on() * fn_oy();
-   den = fy_oy() * fn_on() + fy_on() * fn_oy();
+   num = (double) fy_oy() * fn_on() - (double) fy_on() * fn_oy();
+   den = (double) fy_oy() * fn_on() + (double) fy_on() * fn_oy();
 
-   if(den == 0) v = bad_data_double;
-   else         v = (double) num / den;
+   if(is_eq(den, 0.0)) v = bad_data_double;
+   else                v = num / den;
 
    return(v);
 }
