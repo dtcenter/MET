@@ -177,7 +177,7 @@ can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ i
 `scripts/installation/config <https://github.com/dtcenter/MET/tree/main_v12.0/internal/scripts/installation/config>`_
 directory.
 
-.. note:
+.. note::
 
    Starting with MET-12.0.0, the C++17 standard is the default standard for
    MET, due to the C++17 standard being a requirement for the dependent
