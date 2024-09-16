@@ -177,18 +177,15 @@ can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ i
 `scripts/installation/config <https://github.com/dtcenter/MET/tree/main_v12.0/internal/scripts/installation/config>`_
 directory.
 
-.. note::
-
-   Starting with MET-12.0.0, the C++17 standard is the default standard for
-   MET, due to the C++17 standard being a requirement for the dependent
-   library, ATLAS, in versions 0.33.0 and greater. The ATLAS library is
-   conditionally required, if support for unstructured grids is desired.
-
-   At this time, users with systems that do not yet support the C++17
-   standard, can still compile MET with an older C++ standard, using an
-   older version of ATLAS, by adding the MET_CXX_STANDARD variable to
-   the environment configuration file as described in the **OPTIONAL**
-   section below.
+.. note:: Starting with MET-12.0.0, the C++17 standard is the default standard for
+          MET, due to the C++17 standard being a requirement for the dependent
+	  library, ATLAS, in versions 0.33.0 and greater. The ATLAS library is
+	  conditionally required, if support for unstructured grids is desired.
+	  At this time, users with systems that do not yet support the C++17
+	  standard, can still compile MET with an older C++ standard, using an
+	  older version of ATLAS, by adding the MET_CXX_STANDARD variable to
+	  the environment configuration file as described in the **OPTIONAL**
+	  section below.
    
 
 Environment Variable Descriptions
