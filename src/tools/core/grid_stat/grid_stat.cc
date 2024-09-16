@@ -3350,7 +3350,8 @@ bool read_data_plane(VarInfo *info, DataPlane &dp, Met2dDataFile *mtddf,
       mlog << Debug(1)
            << "Regridding " << desc << " field "
            << info->magic_str()
-           << " to the verification grid.\n";
+           << " to the verification grid using "
+           << info->regrid().get_str() << ".\n";
       dp = met_regrid(dp, mtddf->grid(), grid, info->regrid());
    }
 

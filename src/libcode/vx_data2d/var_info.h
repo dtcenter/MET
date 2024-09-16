@@ -57,7 +57,8 @@ class VarInfo
       int           nBins;     // Number of pdf bins
       NumArray      Range;     // Range of pdf bins
 
-      RegridInfo    Regrid;    // Regridding logic
+      RegridInfo    DefaultRegrid; // Default regridding logic
+      RegridInfo    Regrid;        // Regridding logic
 
       // Options to override metadata
       ConcatString  SetAttrName;
@@ -189,6 +190,7 @@ class VarInfo
       void set_n_bins(const int &);
       void set_range(const NumArray &);
 
+      void set_default_regrid(const RegridInfo &);
       void set_regrid(const RegridInfo &);
 
       void set_level_info_grib(Dictionary & dict);

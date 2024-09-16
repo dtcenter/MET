@@ -649,7 +649,8 @@ void process_fcst_climo_files() {
          mlog << Debug(1)
               << "Regridding " << fcst_dpa.n_planes()
               << " forecast field(s) for " << fcst_info->magic_str()
-              << " to the verification grid.\n";
+              << " to the verification grid using "
+              << fcst_info->regrid().get_str() << ".\n";
 
          // Loop through the forecast fields
          for(j=0; j<fcst_dpa.n_planes(); j++) {

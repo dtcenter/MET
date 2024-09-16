@@ -99,7 +99,7 @@ extern std::map<ConcatString,UserFunc_1Arg>
 extern BootInfo        parse_conf_boot(Dictionary *dict);
 extern RegridInfo      parse_conf_regrid(
                           Dictionary *dict,
-                          Dictionary *default_dict=nullptr,
+                          RegridInfo *default_info=nullptr,
                           bool error_out=default_dictionary_error_out);
 extern InterpInfo      parse_conf_interp(Dictionary *dict, const char *);
 extern NbrhdInfo       parse_conf_nbrhd(Dictionary *dict, const char *);

@@ -297,7 +297,7 @@ struct InterpInfo {
    void        clear();
    void        validate(); // Ensure that width and method are accordant
    bool        operator==(const InterpInfo &) const;
-   InterpInfo &operator=(const InterpInfo &a) noexcept; // SoanrQube findings
+   InterpInfo &operator=(const InterpInfo &a) noexcept; // SonarQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -329,6 +329,7 @@ struct RegridInfo {
    void validate();        // ensure that width and method are accordant
    void validate_point();  // ensure that width and method are accordant
    RegridInfo &operator=(const RegridInfo &a) noexcept; // SoanrQube findings
+   ConcatString get_str() const;
 };
 
 ////////////////////////////////////////////////////////////////////////

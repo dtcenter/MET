@@ -2286,9 +2286,8 @@ void TmpFileInfo::write_nc_data(const VarInfo *vi, const DataPlane &dp_in,
    RegridInfo ri = vi->regrid();
 
    mlog << Debug(4) << "Regridding \"" << vi->magic_str()
-        << "\" to the \"" << domain << "\" domain using the "
-        << interpmthd_to_string(ri.method) << "(" << ri.width
-        << ") interpolation method.\n";
+        << "\" to the \"" << domain << "\" domain using "
+        << ri.get_str() << ".\n";
 
    // Do the cylindrical coordinate transformation
    if(dp_in.nxy() > 0) {

@@ -116,6 +116,7 @@ void VarInfo::assign(const VarInfo &v) {
    nBins = v.nBins;
    Range = v.Range;
 
+   DefaultRegrid = v.DefaultRegrid;
    Regrid = v.Regrid;
 
    SetAttrName = v.SetAttrName;
@@ -176,6 +177,7 @@ void VarInfo::clear() {
    nBins = 0;
    Range.clear();
 
+   DefaultRegrid.clear();
    Regrid.clear();
 
    SetAttrName.clear();
@@ -215,26 +217,29 @@ void VarInfo::dump(ostream &out) const {
 
    // Dump out the contents
    out << "VarInfo::dump():\n"
-       << "  MagicStr     = " << MagicStr.contents() << "\n"
-       << "  ReqName      = " << ReqName.contents() << "\n"
-       << "  Name         = " << Name.contents() << "\n"
-       << "  LongName     = " << LongName.contents() << "\n"
-       << "  Units        = " << Units.contents() << "\n"
-       << "  PFlag        = " << PFlag << "\n"
-       << "  PName        = " << PName.contents() << "\n"
-       << "  PUnits       = " << PUnits.contents() << "\n"
-       << "  PAsScalar    = " << PAsScalar << "\n"
-       << "  UVIndex      = " << UVIndex << "\n"
-       << "  Init         = " << init_str << " (" << Init << ")\n"
-       << "  Valid        = " << valid_str << " (" << Valid << ")\n"
-       << "  Ensemble     = " << Ensemble.contents() << "\n"
-       << "  Lead         = " << lead_str << " (" << Lead << ")\n"
-       << "  ConvertFx    = " << (ConvertFx.is_set() ? "IsSet" : "(nul)") << "\n"
-       << "  CensorThresh = " << CensorThresh.get_str() << "\n"
-       << "  CensorVal    = " << CensorVal.serialize() << "\n"
-       << "  nBins        = " << nBins << "\n"
-       << "  Range        = " << Range.serialize() << "\n"
-       << "  Regrid       = " << interpmthd_to_string(Regrid.method) << "\n";
+       << "  MagicStr      = " << MagicStr.contents() << "\n"
+       << "  ReqName       = " << ReqName.contents() << "\n"
+       << "  Name          = " << Name.contents() << "\n"
+       << "  LongName      = " << LongName.contents() << "\n"
+       << "  Units         = " << Units.contents() << "\n"
+       << "  PFlag         = " << PFlag << "\n"
+       << "  PName         = " << PName.contents() << "\n"
+       << "  PUnits        = " << PUnits.contents() << "\n"
+       << "  PAsScalar     = " << PAsScalar << "\n"
+       << "  UVIndex       = " << UVIndex << "\n"
+       << "  Init          = " << init_str << " (" << Init << ")\n"
+       << "  Valid         = " << valid_str << " (" << Valid << ")\n"
+       << "  Ensemble      = " << Ensemble.contents() << "\n"
+       << "  Lead          = " << lead_str << " (" << Lead << ")\n"
+       << "  ConvertFx     = " << (ConvertFx.is_set() ? "IsSet" : "(nul)") << "\n"
+       << "  CensorThresh  = " << CensorThresh.get_str() << "\n"
+       << "  CensorVal     = " << CensorVal.serialize() << "\n"
+       << "  nBins         = " << nBins << "\n"
+       << "  Range         = " << Range.serialize() << "\n"
+       << "  DefaultRegrid = " << interpmthd_to_string(DefaultRegrid.method)
+                               << "(" << DefaultRegrid.width << ")\n"
+       << "  Regrid        = " << interpmthd_to_string(Regrid.method)
+                               << "(" << Regrid.width << ")\n";
 
    Level.dump(out);
 
@@ -425,6 +430,13 @@ void VarInfo::set_range(const NumArray &a) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfo::set_default_regrid(const RegridInfo &ri) {
+   DefaultRegrid = ri;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_regrid(const RegridInfo &ri) {
    Regrid = ri;
    return;
@@ -528,7 +540,7 @@ void VarInfo::set_dict(Dictionary &dict) {
    if(dict.last_lookup_status()) set_range(na);
 
    // Parse regrid, if present
-   Regrid = parse_conf_regrid(&dict, nullptr, false);
+   Regrid = parse_conf_regrid(&dict, &DefaultRegrid, false);
 
    // Parse set_attr strings
    SetAttrName =

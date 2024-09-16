@@ -562,7 +562,8 @@ void get_series_data(int i_series,
 
       mlog << Debug(2)
            << "Regridding forecast " << fcst_info->magic_str()
-           << " to the verification grid.\n";
+           << " to the verification grid using "
+           << fcst_info->regrid().get_str() << ".\n";
       fcst_dp = met_regrid(fcst_dp, fcst_grid, grid,
                            fcst_info->regrid());
    }
@@ -582,7 +583,8 @@ void get_series_data(int i_series,
 
       mlog << Debug(2)
            << "Regridding observation " << obs_info->magic_str()
-           << " to the verification grid.\n";
+           << " to the verification grid using "
+           << obs_info->regrid().get_str() << ".\n";
       obs_dp = met_regrid(obs_dp, obs_grid, grid,
                           obs_info->regrid());
    }

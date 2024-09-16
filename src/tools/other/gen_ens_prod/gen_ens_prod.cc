@@ -649,7 +649,8 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
       if(!(mtddf->grid() == grid)) {
          mlog << Debug(1)
               << "Regridding field \"" << info->magic_str()
-              << "\" to the verification grid.\n";
+              << "\" to the verification grid using "
+              << info->regrid().get_str() << ".\n";
          dp = met_regrid(dp, mtddf->grid(), grid, info->regrid());
       }
 

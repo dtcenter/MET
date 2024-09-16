@@ -633,7 +633,8 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
       if(do_regrid && !(mtddf->grid() == grid)) {
          mlog << Debug(1)
               << "Regridding field \"" << info->magic_str()
-              << "\" to the verification grid.\n";
+              << "\" to the verification grid using "
+              << info->regrid().get_str() << ".\n";
          dp = met_regrid(dp, mtddf->grid(), grid, info->regrid());
       }
 
@@ -691,7 +692,8 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
          mlog << Debug(1)
               << "Regridding " << dpa.n_planes()
               << " field(s) \"" << info->magic_str()
-              << "\" to the verification grid.\n";
+              << "\" to the verification grid using "
+              << info->regrid().get_str() << ".\n";
 
          // Loop through the forecast fields
          for(i=0; i<dpa.n_planes(); i++) {

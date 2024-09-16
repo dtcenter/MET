@@ -266,6 +266,13 @@ RegridInfo &RegridInfo::operator=(const RegridInfo &a) noexcept {
    return *this;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString RegridInfo::get_str() const {
+   ConcatString cs(interpmthd_to_string(method));
+   cs << "(" << width << ")";
+   return cs;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1332,12 +1339,9 @@ BootInfo parse_conf_boot(Dictionary *dict) {
    return info;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-RegridInfo parse_conf_regrid(Dictionary *dict, Dictionary *default_dict, bool error_out) {
-   Dictionary *regrid_dict = nullptr;
-   Dictionary *regrid_default = nullptr;
+RegridInfo parse_conf_regrid(Dictionary *dict, RegridInfo *default_info, bool error_out) {
    RegridInfo info;
 
    if(!dict) {
@@ -1347,15 +1351,10 @@ RegridInfo parse_conf_regrid(Dictionary *dict, Dictionary *default_dict, bool er
    }
 
    // Conf: regrid
-   regrid_dict = dict->lookup_dictionary(conf_key_regrid, false);
-
-   // Dictionary with default settings
-   if(default_dict) {
-      regrid_default = default_dict->lookup_dictionary(conf_key_regrid, false);
-   }
+   Dictionary *regrid_dict = dict->lookup_dictionary(conf_key_regrid, false);
 
    // Check that the regrid dictionary is present
-   if(!regrid_dict && !regrid_default) {
+   if(!regrid_dict && !default_info) {
       if(error_out) {
          mlog << Error << "\nparse_conf_regrid() -> "
               << "can't find the \"regrid\" dictionary!\n\n";
@@ -1369,8 +1368,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict, Dictionary *default_dict, bool er
    // Conf: to_grid (optional) as an integer or string
    const DictionaryEntry * entry = nullptr;
 
-   if(regrid_dict)              entry = regrid_dict->lookup(conf_key_to_grid, false);
-   if(!entry && regrid_default) entry = regrid_default->lookup(conf_key_to_grid, false);
+   if(regrid_dict) entry = regrid_dict->lookup(conf_key_to_grid, false);
 
    // to_grid found
    if(entry) {
@@ -1395,6 +1393,11 @@ RegridInfo parse_conf_regrid(Dictionary *dict, Dictionary *default_dict, bool er
          exit(1);
       }
    }
+   // Use default RegridInfo
+   else if(default_info){
+      info.name   = default_info->name;
+      info.enable = default_info->enable;
+   }
    // to_grid not found
    else {
       info.name   = "";
@@ -1406,77 +1409,82 @@ RegridInfo parse_conf_regrid(Dictionary *dict, Dictionary *default_dict, bool er
    if(regrid_dict && regrid_dict->lookup(conf_key_vld_thresh, false)) {
       v_dbl = regrid_dict->lookup_double(conf_key_vld_thresh);
    }
-   else if(regrid_default && regrid_default->lookup(conf_key_vld_thresh, false)) {
-      v_dbl = regrid_default->lookup_double(conf_key_vld_thresh);
+   // Use default RegridInfo
+   else if(default_info) {
+      v_dbl = default_info->vld_thresh;
    }
    info.vld_thresh = (is_bad_data(v_dbl) ? default_vld_thresh : v_dbl);
 
    // Conf: method (required)
-   int v_int = bad_data_int;
    if(regrid_dict && regrid_dict->lookup(conf_key_method, false)) {
-      v_int = regrid_dict->lookup_int(conf_key_method);
+      info.method = int_to_interpmthd(regrid_dict->lookup_int(conf_key_method));
    }
-   else if(regrid_default && regrid_default->lookup(conf_key_method, false)) {
-      v_int = regrid_default->lookup_int(conf_key_method);
+   // Use default RegridInfo
+   else if(default_info) {
+      info.method = default_info->method;
    }
-   info.method = int_to_interpmthd(v_int);
 
    // Conf: width (required)
-   v_int = bad_data_int;
    if(regrid_dict && regrid_dict->lookup(conf_key_width, false)) {
-      v_int = regrid_dict->lookup_int(conf_key_width);
+      info.width = regrid_dict->lookup_int(conf_key_width);
    }
-   else if(regrid_default && regrid_default->lookup(conf_key_width, false)) {
-      v_int = regrid_default->lookup_int(conf_key_width);
+   // Use default RegridInfo
+   else if(default_info) {
+      info.width = default_info->width;
    }
-   info.width = v_int;
 
    // Conf: shape (optional)
-   v_int = bad_data_int;
    if(regrid_dict && regrid_dict->lookup(conf_key_shape, false)) {
-      v_int = regrid_dict->lookup_int(conf_key_shape);
+      info.shape = int_to_gridtemplate(regrid_dict->lookup_int(conf_key_shape));
    }
-   else if(regrid_default && regrid_default->lookup(conf_key_shape, false)) {
-      v_int = regrid_default->lookup_int(conf_key_shape);
+   // Use default RegridInfo
+   else if(default_info) {
+      info.shape = default_info->shape;
    }
-   // Default is square
-   info.shape = (is_bad_data(v_int) ?
-                 GridTemplateFactory::GridTemplates::Square :
-                 int_to_gridtemplate(v_int));
+   // Use global default
+   else {
+      info.shape = GridTemplateFactory::GridTemplates::Square;
+   }
 
    // Conf: gaussian_dx (optional)
-   v_dbl = bad_data_double;
    if(regrid_dict && regrid_dict->lookup(conf_key_gaussian_dx, false)) {
-      v_dbl = regrid_dict->lookup_double(conf_key_gaussian_dx);
+      info.gaussian.dx = regrid_dict->lookup_double(conf_key_gaussian_dx);
    }
-   else if(regrid_default && regrid_default->lookup(conf_key_gaussian_dx, false)) {
-      v_dbl = regrid_default->lookup_double(conf_key_gaussian_dx);
+   // Use default RegridInfo
+   else if(default_info) {
+      info.gaussian.dx = default_info->gaussian.dx;
    }
-   info.gaussian.dx = (is_bad_data(v_dbl) ? default_gaussian_dx : v_dbl);
+   // Use global default
+   else {
+      info.gaussian.dx = default_gaussian_dx;
+   }
 
    // Conf: gaussian_radius (optional)
-   v_dbl = bad_data_double;
    if(regrid_dict && regrid_dict->lookup(conf_key_gaussian_radius, false)) {
-      v_dbl = regrid_dict->lookup_double(conf_key_gaussian_radius);
+      info.gaussian.radius = regrid_dict->lookup_double(conf_key_gaussian_radius);
    }
-   else if(regrid_default && regrid_default->lookup(conf_key_gaussian_radius, false)) {
-      v_dbl = regrid_default->lookup_double(conf_key_gaussian_radius);
+   // Use default RegridInfo
+   else if(default_info) {
+      info.gaussian.radius = default_info->gaussian.radius;
    }
-   info.gaussian.radius = (is_bad_data(v_dbl) ?
-                           default_gaussian_radius :
-                           v_dbl);
+   // Use global default
+   else {
+      info.gaussian.radius = default_gaussian_radius;
+   }
 
    // Conf: gaussian_trunc_factor (optional)
    v_dbl = bad_data_double;
    if(regrid_dict && regrid_dict->lookup(conf_key_trunc_factor, false)) {
       v_dbl = regrid_dict->lookup_double(conf_key_trunc_factor);
    }
-   else if(regrid_default && regrid_default->lookup(conf_key_trunc_factor, false)) {
-      v_dbl = regrid_default->lookup_double(conf_key_trunc_factor);
+   // Use default RegridInfo
+   else if(default_info) {
+      info.gaussian.trunc_factor = default_info->gaussian.trunc_factor;
    }
-   info.gaussian.trunc_factor = (is_bad_data(v_dbl) ?
-                                 default_trunc_factor :
-                                 v_dbl);
+   // Use global default
+   else {
+      info.gaussian.trunc_factor = default_trunc_factor;
+   }
 
    if(info.method == InterpMthd::Gaussian ||
       info.method == InterpMthd::MaxGauss) {
@@ -1491,24 +1499,27 @@ RegridInfo parse_conf_regrid(Dictionary *dict, Dictionary *default_dict, bool er
    if(regrid_dict && regrid_dict->lookup(conf_key_convert, false)) {
       info.convert_fx.set(regrid_dict->lookup(conf_key_convert));
    }
-   else if(regrid_default && regrid_default->lookup(conf_key_convert, false)) {
-      info.convert_fx.set(regrid_default->lookup(conf_key_convert));
+   // Use default RegridInfo
+   else if(default_info) {
+      info.convert_fx = default_info->convert_fx;
    }
 
    // Conf: censor_thresh (optional)
    if(regrid_dict && regrid_dict->lookup(conf_key_censor_thresh, false)) {
       info.censor_thresh = regrid_dict->lookup_thresh_array(conf_key_censor_thresh);
    }
-   else if(regrid_default && regrid_default->lookup(conf_key_censor_thresh, false)) {
-      info.censor_thresh = regrid_default->lookup_thresh_array(conf_key_censor_thresh);
+   // Use default RegridInfo
+   else if(default_info) {
+      info.censor_thresh = default_info->censor_thresh;
    }
 
    // Conf: censor_val (optional)
    if(regrid_dict && regrid_dict->lookup(conf_key_censor_val, false)) {
       info.censor_val = regrid_dict->lookup_num_array(conf_key_censor_val);
    }
-   else if(regrid_default && regrid_default->lookup(conf_key_censor_val, false)) {
-      info.censor_val = regrid_default->lookup_num_array(conf_key_censor_val);
+   // Use default RegridInfo
+   else if(default_info) {
+      info.censor_val = default_info->censor_val;
    }
 
    // Validate the settings

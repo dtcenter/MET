@@ -106,12 +106,11 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
    // Get the i-th array entry
    Dictionary i_dict = parse_conf_i_vx_dict(field_dict, i_vx);
 
-   // Parse the "regrid" dictionary from the current location
-   // (e.g. "config.fcst.climo_mean.regrid") or default
-   // location (e.g. "config.climo_mean.regrid")
-   RegridInfo regrid_info = parse_conf_regrid(
-                               dict->lookup_dictionary(climo_name, false),
-                               dict->parent()->lookup_dictionary(climo_name, false));
+   // Parse the "regrid" dictionary from the top-level
+   // config file context (e.g. "config.climo_mean.regrid")
+   // to serve as the default.
+   RegridInfo regrid_default = parse_conf_regrid(
+                                  dict->parent()->lookup_dictionary(climo_name, false));
 
    // Parse the "time_interp_method"
    cs << cs_erase << climo_name << "." << conf_key_time_interp_method;
@@ -152,8 +151,8 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
            << " data using climo_name = " << climo_name
            << ", i_vx = " << i_vx
            << ", valid time = " << unix_to_yyyymmdd_hhmmss(vld_ut)
-           << ", regrid_info = " << interpmthd_to_string(regrid_info.method)
-           << "(" << regrid_info.width << ")"
+           << ", regrid_default = " << interpmthd_to_string(regrid_default.method)
+           << "(" << regrid_default.width << ")"
            << ", time_interp = " << interpmthd_to_string(time_interp)
            << ", day_interval = " << day_interval
            << ", hour_interval = " << hour_interval
@@ -172,7 +171,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
    // Search the files for the requested records
    for(int i=0; i<climo_files.n(); i++) {
       read_climo_file(climo_files[i].c_str(), ctype, &i_dict, vld_ut,
-                      day_ts, hour_ts, vx_grid, regrid_info, dpa, desc);
+                      day_ts, hour_ts, vx_grid, regrid_default, dpa, desc);
    }
 
    // Time interpolation for climo fields
@@ -190,7 +189,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
 void read_climo_file(const char *climo_file, GrdFileType ctype,
                      Dictionary *dict, unixtime vld_ut,
                      int day_ts, int hour_ts, const Grid &vx_grid,
-                     const RegridInfo &regrid_info,
+                     const RegridInfo &regrid_default,
                      DataPlaneArray &dpa, const char *desc) {
 
    Met2dDataFileFactory mtddf_factory;
@@ -216,6 +215,7 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
 
    // Parse the variable name and level
    info = info_factory.new_var_info(mtddf->file_type());
+   info->set_default_regrid(regrid_default);
    info->set_dict(*dict);
 
    // Read data planes
@@ -265,9 +265,10 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
       if(!(mtddf->grid() == vx_grid)) {
          mlog << Debug(2) << "Regridding " << clm_ut_cs << " "
               << desc << " field " << info->magic_str()
-              << " to the verification grid.\n";
+              << " to the verification grid using "
+              << info->regrid().get_str() << ".\n";
          dp = met_regrid(clm_dpa[i], mtddf->grid(), vx_grid,
-                         regrid_info);
+                         info->regrid());
       }
       else {
          dp = clm_dpa[i];
