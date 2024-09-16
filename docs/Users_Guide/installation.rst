@@ -315,7 +315,7 @@ Environment Variable Descriptions
 External Library Handling in compile_MET_all.sh
 -----------------------------------------------
 
-.. dropdown:: IF THE USER WANTS TO HAVE THE COMPILATION SCRIPT INSTALL THE LIBRARY DEPENDENCIES
+.. dropdown:: IF THE USER WANTS TO HAVE THE COMPILATION SCRIPT COMPILE THE LIBRARY DEPENDENCIES
 
     The **compile_MET_all.sh** script will compile and install MET and its
     :ref:`required_external_libraries_to_build_MET`, if needed. 
