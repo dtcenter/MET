@@ -216,7 +216,7 @@ Environment Variable Descriptions
     subdirectory will
     be installed and is often set equivalent to **TEST_BASE** (e.g. ${TEST_BASE}).
 
-    **MET_TARBALL** – Format is *v12.0.0tar.gz*. This is the name of the downloaded MET tarball.
+    **MET_TARBALL** – Format is *v12.0.0.tar.gz*. This is the name of the downloaded MET tarball.
 
     **USE_MODULES** – Format is *TRUE* or *FALSE*. Set to FALSE if using a machine that does not use 
     modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on 
