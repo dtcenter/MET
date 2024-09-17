@@ -110,9 +110,9 @@ format from GitHub, which the script will then install.
 To begin, create and change to a directory where the latest version of MET will be
 installed. Assuming that the following guidance uses “/d1” as the parent directory, 
 a suggested format is a path to a “met” directory, followed by the version number 
-subdirectory (e.g. */d1/met/12.0.0*). 
+subdirectory (e.g. */d1/met/|version|.0*). 
 Next, download the
-`compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/main_v12.0/internal/scripts/installation/compile_MET_all.sh>`_
+`compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/main_v|version|/internal/scripts/installation/compile_MET_all.sh>`_
 script and 
 `tar_files.tgz <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz>`_ 
 file and place both of these files in the
@@ -122,7 +122,7 @@ the terminal while in the directory MET will be installed in:
 
 .. code-block:: ini
 
-  wget https://raw.githubusercontent.com/dtcenter/MET/main_v12.0/internal/scripts/installation/compile_MET_all.sh
+  wget https://raw.githubusercontent.com/dtcenter/MET/main_v|version|/internal/scripts/installation/compile_MET_all.sh
   wget https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz
 
 The tar files will need to be extracted in the MET installation directory:
@@ -144,7 +144,7 @@ Now change directories to the one that was created from expanding the tar files:
   cd tar_files
 
 The next step will be to identify and download the latest MET release as a
-tar file (e.g. **v12.0.0.tar.gz**) and place it in
+tar file (e.g. **v|version|.0.tar.gz**) and place it in
 the *tar_files* directory. The file is available from the
 MET line under the “RECOMMENDED - COMPONENTS” section on the
 `METplus website <https://dtcenter.org/community-code/metplus/download>`_ or
@@ -152,7 +152,7 @@ by using a wget command while in the *tar_files* directory:
 
 .. code-block:: ini
 
-  wget https://github.com/dtcenter/MET/archive/refs/tags/v12.0.0.tar.gz
+  wget https://github.com/dtcenter/MET/archive/refs/tags/v|version|.0.tar.gz
 
 .. _Install_Required-libraries-and:
 
@@ -174,10 +174,10 @@ environment variables is in an environment configuration file
 configuration file to start with (**install_met_env.generic_gnu**),
 as well as the environment configuration files used on HPCs at NCAR and NOAA,
 can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ in the 
-`scripts/installation/config <https://github.com/dtcenter/MET/tree/main_v12.0/internal/scripts/installation/config>`_
+`scripts/installation/config <https://github.com/dtcenter/MET/tree/main_v|version|/internal/scripts/installation/config>`_
 directory.
 
-.. note:: Starting with MET-12.0.0, C++17 is the default C++ standard for MET due to the requirements of its dependent libraries. However, MET itself only makes use of C++11 features.
+.. note:: Starting with MET-|version|.0, C++17 is the default C++ standard for MET due to the requirements of its dependent libraries. However, MET itself only makes use of C++11 features.
 
     The ATLAS library (conditionally required for MET, if support for
     unstructured grids is desired)
@@ -195,7 +195,7 @@ Environment Variable Descriptions
 
 .. dropdown:: REQUIRED
 
-    **TEST_BASE** – Format is */d1/met/12.0.0*. This is the MET
+    **TEST_BASE** – Format is */d1/met/|version|.0*. This is the MET
     installation directory that was created 
     the beginning of, :numref:`compile_script_install` and contains the
     **compile_MET_all.sh** script, **tar_files.tgz**, 
@@ -210,11 +210,11 @@ Environment Variable Descriptions
     provided for the PGI family of compilers through “pgi”. However, this compiler 
     option is no longer actively tested. 
 
-    **MET_SUBDIR** – Format is */d1/met/12.0.0*. This is the location where the top-level MET 
+    **MET_SUBDIR** – Format is */d1/met/|version|.0*. This is the location where the top-level MET 
     subdirectory will
     be installed and is often set equivalent to **TEST_BASE** (e.g. ${TEST_BASE}).
 
-    **MET_TARBALL** – Format is *v12.0.0.tar.gz*. This is the name of the downloaded MET tarball.
+    **MET_TARBALL** – Format is *v|version|.0.tar.gz*. This is the name of the downloaded MET tarball.
 
     **USE_MODULES** – Format is *TRUE* or *FALSE*. Set to FALSE if using a machine that does not use 
     modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on 
@@ -418,10 +418,10 @@ this step on the machine ‘hera’.
 
 .. code-block:: ini
 
-  /contrib/met/12.0.0$ ls
+  /contrib/met/|version|.0$ ls
   compile_MET_all.sh  install_met_env.hera  tar_files
   
-  /contrib/met/12.0.0$ ls tar_files
+  /contrib/met/|version|.0$ ls tar_files
   HDF-EOS2.16v1.00.tar.Z         eckit-1.24.4.tar.gz            netcdf-4.7.4.tar.gz
   HDF4.2r3.tar.gz                freetype-2.11.0.tar.gz         netcdf-cxx4-4.3.1.tar.gz
   atlas-0.30.0.tar.gz            g2clib-1.6.4.tar.gz            pixman-0.40.0.tar.gz
@@ -442,14 +442,14 @@ The screenshot below shows the contents of the installation directory after inst
 
 .. code-block:: ini
 
-  /contrib/met/12.0.0$ ls
-  MET-12.0.0  bin  compile_MET_all.sh  external_libs  install_met_env.hera  share  tar_files
+  /contrib/met/|version|.0$ ls
+  MET-|version|.0  bin  compile_MET_all.sh  external_libs  install_met_env.hera  share  tar_files
 
 To confirm that MET was installed successfully, run the following command from the installation directory to check for errors in the test file:
 
 .. code-block:: ini
 
-  grep -i error MET-12.0.0/met.make_test.log
+  grep -i error MET-|version|.0/met.make_test.log
 
 If no errors are returned, the installation was successful.
 Due to the highly variable nature of hardware systems, users may encounter issues during 
@@ -507,7 +507,7 @@ MET version number, for example:
 
 .. code-block:: ini
 
-  docker pull dtcenter/met:12.0.0
+  docker pull dtcenter/met:|version|.0
 
 Omitting the
 version number will result in an error due to Docker’s behavior
@@ -533,7 +533,7 @@ the same way the latest image of MET was pulled:
 
 .. code-block:: ini
 
-  docker run -it --rm dtcenter/met:12.0.0 /bin/bash 
+  docker run -it --rm dtcenter/met:|version|.0 /bin/bash 
 
 If the  usage MET via Docker images was successful, it is highly
 recommended to move on 
@@ -582,7 +582,7 @@ to make the container:
 
 .. code-block:: ini
 
-  singularity build met-12.0.0.sif docker://dtcenter/met:12.0.0
+  singularity build met-|version|.0.sif docker://dtcenter/met:|version|.0
 
 Running the MET Container
 -------------------------
@@ -593,7 +593,7 @@ MET command line usage:
 
 .. code-block:: ini
 
-  singularity exec met-12.0.0.sif plot_data_plane /home/data/fcst_006.grb2 image_output.ps ‘name=”TMP”; level=”Z0”;’
+  singularity exec met-|version|.0.sif plot_data_plane /home/data/fcst_006.grb2 image_output.ps ‘name=”TMP”; level=”Z0”;’
 
 Stopping the Apptainer Instance
 -------------------------------
@@ -604,7 +604,7 @@ be used otherwise the instance will continue to run in the background:
 
 .. code-block:: ini
 
-  singularity instance stop /path/to/container/met-12.0.0.sif met-12.0.0  
+  singularity instance stop /path/to/container/met-|version|.0.sif met-|version|.0  
 
 Now that MET is successfully installed, it is highly recommended to
 next install the METplus wrappers to take full advantage of
