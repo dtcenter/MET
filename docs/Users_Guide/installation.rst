@@ -177,7 +177,7 @@ can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ i
 `scripts/installation/config <https://github.com/dtcenter/MET/tree/main_v12.0/internal/scripts/installation/config>`_
 directory.
 
-.. note:: Starting with MET-12.0.0, the C++17 standard is the default C++ standard for MET.
+.. note:: Starting with MET-12.0.0, C++17 is the default C++ standard for MET due to the requirements of its dependent libraries. However, MET itself only makes use of C++11 features.
 
     The ATLAS library (conditionally required for MET, if support for
     unstructured grids is desired)
