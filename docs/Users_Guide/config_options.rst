@@ -87,26 +87,26 @@ The configuration file language supports the following data types:
 	
   * The following percentile threshold types are supported:
     
-    * "SFP" for a percentile of the sample forecast values.
+    * SFP for a percentile of the sample forecast values.
       e.g. ">SFP33.3" means greater than the 33.3-rd forecast percentile.
       
-    * "SOP" for a percentile of the sample observation values.
+    * SOP for a percentile of the sample observation values.
       e.g. ">SOP75" means greater than the 75-th observation percentile.
       
-    * "SFCP" for a percentile of the sample forecast climatology values.
+    * SFCP for a percentile of the sample forecast climatology values.
       e.g. ">SFCP90" means greater than the 90-th forecast climatology
       percentile.
 
-    * "SOCP" for a percentile of the sample observation climatology values.
+    * SOCP for a percentile of the sample observation climatology values.
       e.g. ">SOCP90" means greater than the 90-th observation climatology
       percentile. For backward compatibility, the "SCP" threshold type
       is processed the same as "SOCP".
       
-    * "USP" for a user-specified percentile threshold.
+    * USP for a user-specified percentile threshold.
       e.g. "<USP90(2.5)" means less than the 90-th percentile values which
       the user has already determined to be 2.5 outside of MET.
       
-    * "==FBIAS" for a user-specified frequency bias value.
+    * ==FBIAS for a user-specified frequency bias value.
       e.g. "==FBIAS1" to automatically de-bias the data, "==FBIAS0.9" to
       select a low-bias threshold, or "==FBIAS1.1" to select a high-bias
       threshold. This option must be used in conjunction with a simple
@@ -115,7 +115,7 @@ The configuration file language supports the following data types:
       the observations and then chooses a forecast threshold which results in
       a frequency bias of 1. The frequency bias can be any float value > 0.0.
       
-    * "FCDP" for forecast climatological distribution percentile thresholds.
+    * FCDP for forecast climatological distribution percentile thresholds.
       These thresholds require that the forecast climatological mean and
       standard deviation be defined using the "climo_mean" and "climo_stdev"
       config file options, respectively. The categorical (cat_thresh),
@@ -125,7 +125,7 @@ The configuration file language supports the following data types:
       e.g. ">FCDP50" means greater than the 50-th percentile of the
       climatological distribution for each point.
 
-    * "OCDP" for observation climatological distribution percentile thresholds.
+    * OCDP for observation climatological distribution percentile thresholds.
       The "OCDP" threshold logic matches the "FCDP" logic described above.
       However these thresholds are defined using the observation climatological
       mean and standard deviation rather than the forecast climatological data.
@@ -138,7 +138,7 @@ The configuration file language supports the following data types:
     in ensemble_stat), the following special logic is applied. Percentile
     thresholds of type equality are automatically converted to percentile
     bins which span the values from 0 to 100.
-    For example, "==OCDP25" is automatically expanded to 4 percentile bins:
+    For example, ==OCDP25 is automatically expanded to 4 percentile bins:
     >=OCDP0&&<OCDP25,>=OCDP25&&<OCDP50,>=OCDP50&&<OCDP75,>=OCDP75&&<=OCDP100
      
   * When sample percentile thresholds of type SFP, SOP, SFCP, SOCP, or FBIAS
@@ -160,13 +160,13 @@ The configuration file language supports the following data types:
 
   Prior to MET version 12.0.0, forecast climatological inputs were not
   supported. The observation climatological inputs were used to process
-  threshold types named "SCP" and "CDP".
+  threshold types named SCP and CDP.
 
-  For backward compatibility, the "SCP" threshold type is processed the same
-  as "SOCP" and "CDP" the same as "OCDP".
+  For backward compatibility, the SCP threshold type is processed the same
+  as SOCP and CDP the same as OCDP.
 
-  Users are encouraged to replace the deprecated "SCP" and "CDP" threshold
-  types with the updated "SOCP" and "OCDP" types, respectively.
+  Users are encouraged to replace the deprecated SCP and CDP threshold
+  types with the updated SOCP and OCDP types, respectively.
  
 * Piecewise-Linear Function (currently used only by MODE):
   
@@ -351,14 +351,14 @@ values and/or define observation bias corrections.
 When processing point and gridded observations, Ensemble-Stat searches the table
 to find the entry defining the observation error information. The table
 consists of 15 columns and includes a header row defining each column. The
-special string "ALL" is interpreted as a wildcard in these files. The first 6
+special string ALL is interpreted as a wildcard in these files. The first 6
 columns (OBS_VAR, MESSAGE_TYPE, PB_REPORT_TYPE, IN_REPORT_TYPE, INSTRUMENT_TYPE,
 and STATION_ID) may be set to a comma-separated list of strings to be matched.
 In addition, the strings in the OBS_VAR column are interpreted as regular
 expressions when searching for a match. For example, setting the OBS_VAR column
 to 'APCP_[0-9]+' would match observations for both APCP_03 and APCP_24. The
-HGT_RANGE, VAL_RANGE, and PRS_RANGE columns should either be set to "ALL" or
-"BEG,END" where BEG and END specify the range of values to be used. The
+HGT_RANGE, VAL_RANGE, and PRS_RANGE columns should either be set to ALL or
+BEG,END where BEG and END specify the range of values to be used. The
 INST_BIAS_SCALE and INST_BIAS_OFFSET columns define instrument bias adjustments
 which are applied to the observation values. The DIST_TYPE and DIST_PARM
 columns define the distribution from which random perturbations should be drawn
@@ -366,7 +366,7 @@ and applied to the ensemble member values. See the obs_error description below
 for details on the supported error distributions. The last two columns, MIN and
 MAX, define the bounds for the valid range of the bias-corrected observation
 values and randomly perturbed ensemble member values. Values less than MIN are
-reset to the mimimum value and values greater than MAX are reset to the maximum
+reset to the minimum value and values greater than MAX are reset to the maximum
 value. A value of NA indicates that the variable is unbounded.
 
 MET_GRIB_TABLES
@@ -384,7 +384,7 @@ At runtime, the MET tools read default GRIB tables from the installed
 *share/met/table_files* directory, and their file formats are described below:
 
 GRIB1 table files begin with "grib1" prefix and end with a ".txt" suffix.
-The first line of the file must contain "GRIB1".
+The first line of the file must contain GRIB1.
 The following lines consist of 4 integers followed by 3 strings:
 
 | Column 1: GRIB code (e.g. 11 for temperature)
@@ -404,7 +404,7 @@ References:
 | 
 
 GRIB2 table files begin with "grib2" prefix and end with a ".txt" suffix.
-The first line of the file must contain "GRIB2".
+The first line of the file must contain GRIB2.
 The following lines consist of 8 integers followed by 3 strings.
 
 | Column 1:  Section 0 Discipline
@@ -824,7 +824,7 @@ using the following entries:
   - width = 4;    To regrid using a 4x4 box or circle with diameter 4.
 
 * The "shape" entry defines the shape of the neighborhood.
-  Valid values are "SQUARE" or "CIRCLE"
+  Valid values are SQUARE or CIRCLE
 
 * The "gaussian_dx" entry specifies a delta distance for Gaussian
   smoothing. The default is 81.271. Ignored if not Gaussian method.
@@ -1037,9 +1037,9 @@ to be verified. This dictionary may include the following entries:
     thresholds to specify which matched pairs should be included in the
     statistics. These options apply to the Point-Stat and Grid-Stat tools.
     They are parsed seperately for each "obs.field" array entry.
-    The "mpr_column" strings specify MPR column names ("FCST", "OBS",
-    "CLIMO_MEAN", "CLIMO_STDEV", or "CLIMO_CDF"), differences of columns
-    ("FCST-OBS"), or the absolute value of those differences ("ABS(FCST-OBS)").
+    The "mpr_column" strings specify MPR column names (FCST, OBS,
+    CLIMO_MEAN, CLIMO_STDEV, or CLIMO_CDF), differences of columns
+    (FCST-OBS), or the absolute value of those differences (ABS(FCST-OBS)).
     The number of "mpr_thresh" thresholds must match the number of "mpr_column"
     entries, and the n-th threshold is applied to the n-th column. Any matched
     pairs which do not meet any of the specified thresholds are excluded from
@@ -1170,64 +1170,64 @@ File-format specific settings for the "field" entry:
       extended PDS for ensembles. Set to "hi_res_ctl", "low_res_ctl",
       "+n", or "-n", for the n-th ensemble member.
        
-    * The "GRIB1_ptv" entry is an integer specifying the GRIB1 parameter
+    * The GRIB1_ptv entry is an integer specifying the GRIB1 parameter
       table version number.
        
-    * The "GRIB1_code" entry is an integer specifying the GRIB1 code (wgrib
+    * The GRIB1_code entry is an integer specifying the GRIB1 code (wgrib
       kpds5 value).
        
-    * The "GRIB1_center" is an integer specifying the originating center.
+    * The GRIB1_center is an integer specifying the originating center.
        
-    * The "GRIB1_subcenter" is an integer specifying the originating
+    * The GRIB1_subcenter is an integer specifying the originating
       subcenter.
        
-    * The "GRIB1_tri" is an integer specifying the time range indicator.
+    * The GRIB1_tri is an integer specifying the time range indicator.
        
-    * The "GRIB2_mtab" is an integer specifying the master table number.
+    * The GRIB2_mtab is an integer specifying the master table number.
        
-    * The "GRIB2_ltab" is an integer specifying the local table number.
+    * The GRIB2_ltab is an integer specifying the local table number.
        
-    * The "GRIB2_disc" is an integer specifying the GRIB2 discipline code.
+    * The GRIB2_disc is an integer specifying the GRIB2 discipline code.
        
-    * The "GRIB2_parm_cat" is an integer specifying the parameter category
+    * The GRIB2_parm_cat is an integer specifying the parameter category
       code.
        
-    * The "GRIB2_parm" is an integer specifying the parameter code.
+    * The GRIB2_parm is an integer specifying the parameter code.
        
-    * The "GRIB2_pdt" is an integer specifying the product definition
+    * The GRIB2_pdt is an integer specifying the product definition
       template (Table 4.0).
        
-    * The "GRIB2_process" is an integer specifying the generating process
+    * The GRIB2_process is an integer specifying the generating process
       (Table 4.3).
        
-    * The "GRIB2_cntr" is an integer specifying the originating center.
+    * The GRIB2_cntr is an integer specifying the originating center.
        
-    * The "GRIB2_ens_type" is an integer specifying the ensemble type
+    * The GRIB2_ens_type is an integer specifying the ensemble type
       (Table 4.6).
        
-    * The "GRIB2_der_type" is an integer specifying the derived product
+    * The GRIB2_der_type is an integer specifying the derived product
       type (Table 4.7).
        
-    * The "GRIB2_stat_type" is an integer specifying the statistical
+    * The GRIB2_stat_type is an integer specifying the statistical
       processing type (Table 4.10).
 
-    * The "GRIB2_perc_val" is an integer specifying the requested percentile
+    * The GRIB2_perc_val is an integer specifying the requested percentile
       value (0 to 100) to be used. This applies only to GRIB2 product
       definition templates 4.6 and 4.10.
 
-    * The "GRIB2_aerosol_type" is an integer specifying the aerosol type
-      (Table 4.233). This applies only to GRIB2 product defintion templates
+    * The GRIB2_aerosol_type is an integer specifying the aerosol type
+      (Table 4.233). This applies only to GRIB2 product definition templates
       4.46 and 4.48.
 
-    * The "GRIB2_aerosol_interval_type" is an integer specifying the aerosol
-      size interval (Table 4.91). This applies only to GRIB2 product defintion
+    * The GRIB2_aerosol_interval_type is an integer specifying the aerosol
+      size interval (Table 4.91). This applies only to GRIB2 product definition
       templates 4.46 and 4.48.
 
-    * The "GRIB2_aerosol_size_lower" and "GRIB2_aerosol_size_upper" are doubles
+    * The GRIB2_aerosol_size_lower and "GRIB2_aerosol_size_upper" are doubles
       specifying the endpoints of the aerosol size interval. These applies only
       to GRIB2 product defintion templates 4.46 and 4.48.
 
-    * The "GRIB2_ipdtmpl_index" and "GRIB2_ipdtmpl_val" entries are arrays
+    * The GRIB2_ipdtmpl_index and GRIB2_ipdtmpl_val entries are arrays
       of integers which specify the product description template values to
       be used. The indices are 0-based. For example, use the following to
       request a GRIB2 record whose 9-th and 27-th product description
@@ -1722,13 +1722,13 @@ mask_missing_flag
 The "mask_missing_flag" entry specifies how missing data should be handled
 in the Wavelet-Stat and MODE tools:
 
- * "NONE" to perform no masking of missing data
+ * NONE to perform no masking of missing data
    
- * "FCST" to mask the forecast field with missing observation data
+ * FCST to mask the forecast field with missing observation data
    
- * "OBS" to mask the observation field with missing forecast data
+ * OBS to mask the observation field with missing forecast data
    
- * "BOTH" to mask both fields with missing data from the other
+ * BOTH to mask both fields with missing data from the other
 
 .. code-block:: none
 
@@ -1930,10 +1930,10 @@ should be used for computing bootstrap confidence intervals:
 
 * The "interval" entry specifies the confidence interval method:
   
-  * "BCA" for the BCa (bias-corrected percentile) interval method is
+  * BCA for the BCa (bias-corrected percentile) interval method is
     highly accurate but computationally intensive.
     
-  * "PCTILE" uses the percentile method which is somewhat less accurate
+  * PCTILE uses the percentile method which is somewhat less accurate
     but more efficient.
 
 * The "rep_prop" entry specifies a proportion between 0 and 1 to define
@@ -1995,11 +1995,11 @@ This dictionary may include the following entries:
   should be applied. This does not apply when doing point verification
   with the Point-Stat or Ensemble-Stat tools:
   
-  * "FCST" to interpolate/smooth the forecast field.
+  * FCST to interpolate/smooth the forecast field.
     
-  * "OBS" to interpolate/smooth the observation field.
+  * OBS to interpolate/smooth the observation field.
     
-  * "BOTH" to interpolate/smooth both the forecast and the observation.
+  * BOTH to interpolate/smooth both the forecast and the observation.
 
 * The "vld_thresh" entry specifies a number between 0 and 1. When
   performing interpolation over some neighborhood of points the ratio of
@@ -2186,7 +2186,7 @@ This dictionary may include the following entries:
   output line and used for computing probabilistic statistics.
 
 * The "shape" entry defines the shape of the neighborhood.
-  Valid values are "SQUARE" or "CIRCLE"
+  Valid values are SQUARE or CIRCLE
 
 * The "prob_cat_thresh" entry defines the thresholds which define ensemble
   probabilities from which to compute the ranked probability score output.
@@ -2212,11 +2212,11 @@ The "output_flag" entry is a dictionary that specifies what verification
 methods should be applied to the input data. Options exist for each
 output line type from the MET tools. Each line type may be set to one of:
 
-* "NONE" to skip the corresponding verification method
+* NONE to skip the corresponding verification method
   
-* "STAT" to write the verification output only to the ".stat" output file
+* STAT to write the verification output only to the ".stat" output file
   
-* "BOTH" to write to the ".stat" output file as well the optional
+* BOTH to write to the ".stat" output file as well the optional
   "_type.txt" file, a more readable ASCII file sorted by line type.
 
 .. code-block:: none
@@ -2353,12 +2353,12 @@ Lat/Lon grids. It is only applied for grid-to-grid verification in Grid-Stat
 and Ensemble-Stat and is not applied for grid-to-point verification.
 Three grid weighting options are currently supported:
 
-* "NONE" to disable grid weighting using a constant weight (default).
+* NONE to disable grid weighting using a constant weight (default).
   
-* "COS_LAT" to define the weight as the cosine of the grid point latitude.
+* COS_LAT to define the weight as the cosine of the grid point latitude.
   This an approximation for grid box area used by NCEP and WMO.
   
-* "AREA" to define the weight as the true area of the grid box (km^2).
+* AREA to define the weight as the true area of the grid box (km^2).
 
 The weights are ultimately computed as the weight at each grid point divided
 by the sum of the weights for the current masking region.
@@ -2403,9 +2403,9 @@ duplicate_flag
 The "duplicate_flag" entry specifies how to handle duplicate point
 observations in Point-Stat and Ensemble-Stat:
 
-* "NONE" to use all point observations (legacy behavior)
+* NONE to use all point observations (legacy behavior)
   
-* "UNIQUE" only use a single observation if two or more observations
+* UNIQUE only use a single observation if two or more observations
   match. Matching observations are determined if they contain identical
   latitude, longitude, level, elevation, and time information.
   They may contain different observation values or station IDs
@@ -2427,23 +2427,23 @@ observations that appear at a single location (lat,lon,level,elev)
 in Point-Stat and Ensemble-Stat. Eight techniques are
 currently supported:
 
-* "NONE" to use all point observations (legacy behavior)
+* NONE to use all point observations (legacy behavior)
   
-* "NEAREST" use only the observation that has the valid
+* NEAREST use only the observation that has the valid
   time closest to the forecast valid time
   
-* "MIN" use only the observation that has the lowest value
+* MIN use only the observation that has the lowest value
   
-* "MAX" use only the observation that has the highest value
+* MAX use only the observation that has the highest value
   
-* "UW_MEAN" compute an unweighted mean of the observations
+* UW_MEAN compute an unweighted mean of the observations
   
-* "DW_MEAN" compute a weighted mean of the observations based
+* DW_MEAN compute a weighted mean of the observations based
   on the time of the observation
   
-* "MEDIAN" use the median observation
+* MEDIAN use the median observation
   
-* "PERC" use the Nth percentile observation where N = obs_perc_value
+* PERC use the Nth percentile observation where N = obs_perc_value
 
 The reporting mechanism for this feature can be activated by specifying
 a verbosity level of three or higher. The report will show information
@@ -3204,7 +3204,7 @@ Floating-point max/min options: Setting limits on various floating-point
 attributes. One may specify these as integers (i.e., without a decimal
 point), if desired. The following pairs of options indicate minimum and
 maximum values for each MODE attribute that can be described as a floating-
-point number. Please refer to "The MODE Tool" section on attributes in the
+point number. Please refer to :ref:`mode-attributes` in the
 MET User's Guide for a description of these attributes.
 
 .. code-block:: none
@@ -3371,14 +3371,14 @@ The object definition settings for MODE are contained within the "fcst" and
 
 * The "merge_flag" entry specifies the merging methods to be applied:
   
-   * "NONE" for no merging
+   * NONE for no merging
      
-   * "THRESH" for the double-threshold merging method. Merge objects
+   * THRESH for the double-threshold merging method. Merge objects
      that would be part of the same object at the lower threshold.
      
-   * "ENGINE" for the fuzzy logic approach comparing the field to itself
+   * ENGINE for the fuzzy logic approach comparing the field to itself
      
-   * "BOTH" for both the double-threshold and engine merging methods
+   * BOTH for both the double-threshold and engine merging methods
 
 .. code-block:: none
 
@@ -3417,15 +3417,15 @@ match_flag
 
 The "match_flag" entry specifies the matching method to be applied:
 
-* "NONE" for no matching between forecast and observation objects
+* NONE for no matching between forecast and observation objects
   
-* "MERGE_BOTH" for matching allowing additional merging in both fields.
+* MERGE_BOTH for matching allowing additional merging in both fields.
   If two objects in one field match the same object in the other field,
   those two objects are merged.
   
-* "MERGE_FCST" for matching allowing only additional forecast merging
+* MERGE_FCST for matching allowing only additional forecast merging
   
-* "NO_MERGE" for matching with no additional merging in either field
+* NO_MERGE for matching with no additional merging in either field
 
 .. code-block:: none
 
@@ -3665,9 +3665,9 @@ In the PB2NC tool, the "message_type" entry is an array of message types
 to be retained. An empty list indicates that all should be retained.
 
 | List of valid message types:
-| ADPUPA AIRCAR AIRCFT ADPSFC ERS1DA GOESND GPSIPW
-| MSONET PROFLR QKSWND RASSDA SATEMP SATWND SFCBOG
-| SFCSHP SPSSMI SYNDAT VADWND
+| “ADPUPA”, “AIRCAR”, “AIRCFT”, “ADPSFC”, “ERS1DA”, “GOESND”, “GPSIPW”, 
+| “MSONET”, “PROFLR”, “QKSWND”, “RASSDA”, “SATEMP”, 
+| “SATWND”, “SFCBOG”, “SFCSHP”, “SPSSMI”, “SYNDAT”, “VADWND”
 
 For example:
 
@@ -3885,7 +3885,7 @@ See `Code table for observation quality markers <http://www.emc.ncep.noaa.gov/mm
 event_stack_flag
 ^^^^^^^^^^^^^^^^
 
-The "event_stack_flag" entry is set to "TOP" or "BOTTOM" to
+The "event_stack_flag" entry is set to TOP or BOTTOM to
 specify whether observations should be drawn from the top of the event
 stack (most quality controlled) or the bottom of the event stack (most raw).
 
@@ -4439,11 +4439,11 @@ grid_decomp_flag
 The "grid_decomp_flag" entry specifies how the grid should be decomposed in
 Wavelet-Stat into dyadic (2^n x 2^n) tiles:
 
-* "AUTO" to tile the input data using tiles of dimension n by n where n
+* AUTO to tile the input data using tiles of dimension n by n where n
   is the largest integer power of 2 less than the smallest dimension of
   the input data. Center as many tiles as possible with no overlap.
-* "TILE" to use the tile definition specified below.
-* "PAD" to pad the input data out to the nearest integer power of 2.
+* TILE to use the tile definition specified below.
+* PAD to pad the input data out to the nearest integer power of 2.
 
 .. code-block:: none
 
@@ -4453,7 +4453,7 @@ tile
 ^^^^
 
 The "tile" entry is a dictionary that specifies how tiles should be defined
-in Wavelet-Stat when the "grid_decomp_flag" is set to "TILE":
+in Wavelet-Stat when the "grid_decomp_flag" is set to TILE:
 
 * The "width" entry specifies the dimension for all tiles and must be
   an integer power of 2.
@@ -4487,20 +4487,20 @@ wavelet decomposition should be performed:
 
 * Valid combinations of the two are listed below:
     
-  * "HAAR" for Haar wavelet (member = 2)
+  * HAAR for Haar wavelet (member = 2)
       
-  * "HAAR_CNTR" for Centered-Haar wavelet (member = 2)
+  * HAAR_CNTR for Centered-Haar wavelet (member = 2)
 
-  * "DAUB" for Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16,
+  * DAUB for Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16,
     18, 20)
 	
-  * "DAUB_CNTR" for Centered-Daubechies wavelet (member = 4, 6, 8, 10,
+  * DAUB_CNTR for Centered-Daubechies wavelet (member = 4, 6, 8, 10,
     12, 14, 16, 18, 20)
 	 
-  * "BSPLINE" for Bspline wavelet (member = 103, 105, 202, 204, 206,
+  * BSPLINE for Bspline wavelet (member = 103, 105, 202, 204, 206,
     208, 301, 303, 305, 307, 309)
 
-  * "BSPLINE_CNTR" for Centered-Bspline wavelet (member = 103, 105, 202,
+  * BSPLINE_CNTR for Centered-Bspline wavelet (member = 103, 105, 202,
     204, 206, 208, 301, 303, 305, 307, 309)
 
 .. code-block:: none
