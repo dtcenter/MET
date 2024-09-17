@@ -151,8 +151,6 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
            << " data using climo_name = " << climo_name
            << ", i_vx = " << i_vx
            << ", valid time = " << unix_to_yyyymmdd_hhmmss(vld_ut)
-           << ", regrid_default = " << interpmthd_to_string(regrid_default.method)
-           << "(" << regrid_default.width << ")"
            << ", time_interp = " << interpmthd_to_string(time_interp)
            << ", day_interval = " << day_interval
            << ", hour_interval = " << hour_interval

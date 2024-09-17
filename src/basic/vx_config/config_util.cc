@@ -1398,22 +1398,24 @@ RegridInfo parse_conf_regrid(Dictionary *dict, RegridInfo *default_info, bool er
       info.name   = default_info->name;
       info.enable = default_info->enable;
    }
-   // to_grid not found
+   // Use global default
    else {
       info.name   = "";
       info.enable = true;
    }
 
    // Conf: vld_thresh (required)
-   double v_dbl = bad_data_double;
    if(regrid_dict && regrid_dict->lookup(conf_key_vld_thresh, false)) {
-      v_dbl = regrid_dict->lookup_double(conf_key_vld_thresh);
+      info.vld_thresh = regrid_dict->lookup_double(conf_key_vld_thresh);
    }
    // Use default RegridInfo
    else if(default_info) {
-      v_dbl = default_info->vld_thresh;
+      info.vld_thresh = default_info->vld_thresh;
    }
-   info.vld_thresh = (is_bad_data(v_dbl) ? default_vld_thresh : v_dbl);
+   // Use global default
+   else {
+      info.vld_thresh = default_vld_thresh;
+   }
 
    // Conf: method (required)
    if(regrid_dict && regrid_dict->lookup(conf_key_method, false)) {
@@ -1473,9 +1475,8 @@ RegridInfo parse_conf_regrid(Dictionary *dict, RegridInfo *default_info, bool er
    }
 
    // Conf: gaussian_trunc_factor (optional)
-   v_dbl = bad_data_double;
    if(regrid_dict && regrid_dict->lookup(conf_key_trunc_factor, false)) {
-      v_dbl = regrid_dict->lookup_double(conf_key_trunc_factor);
+      info.gaussian.trunc_factor = regrid_dict->lookup_double(conf_key_trunc_factor);
    }
    // Use default RegridInfo
    else if(default_info) {
@@ -1486,6 +1487,7 @@ RegridInfo parse_conf_regrid(Dictionary *dict, RegridInfo *default_info, bool er
       info.gaussian.trunc_factor = default_trunc_factor;
    }
 
+   // Compute Guassian parameters
    if(info.method == InterpMthd::Gaussian ||
       info.method == InterpMthd::MaxGauss) {
       info.gaussian.compute();
