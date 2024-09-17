@@ -177,20 +177,18 @@ can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ i
 `scripts/installation/config <https://github.com/dtcenter/MET/tree/main_v12.0/internal/scripts/installation/config>`_
 directory.
 
-.. note:: Starting with MET-12.0.0, the C++17 standard is the default C++
-	  standard for MET.
+.. note:: Starting with MET-12.0.0, the C++17 standard is the default C++ standard for MET.
 
-	  The ATLAS library (conditionally required for MET, if support for
-	  unstructured grids is desired)
-	  `versions 0.33.0 <https://github.com/ecmwf/atlas/releases/tag/0.33.0>`_
-	  and later requires compiler support for the C++17 standard.
+    The ATLAS library (conditionally required for MET, if support for
+    unstructured grids is desired)
+    `versions 0.33.0 <https://github.com/ecmwf/atlas/releases/tag/0.33.0>`_
+    and later requires compiler support for the C++17 standard.
 
-	  At this time, users with systems that do not yet support the C++17
-	  standard, can still compile MET with an older C++ standard, using an
-	  older version of ATLAS, by adding the MET_CXX_STANDARD variable to
-	  the environment configuration file as described in the **OPTIONAL**
-	  section below.
-   
+    At this time, users with systems that do not yet support the C++17
+    standard, can still compile MET with an older C++ standard, using an
+    older version of ATLAS, by adding the MET_CXX_STANDARD variable to
+    the environment configuration file as described in the **OPTIONAL**
+    section below.
 
 Environment Variable Descriptions
 ---------------------------------
@@ -258,7 +256,6 @@ Environment Variable Descriptions
     classic Intel compiler are encouraged to use the install_met_env.generic_intel_classic 
     configuration file, and users with a oneAPI Intel compiler should use the 
     install_met_env.generic_intel_oneapi configuration file. 
-
 
 .. dropdown:: REQUIRED, IF COMPILING PYTHON EMBEDDING
 
@@ -451,9 +448,9 @@ The screenshot below shows the contents of the installation directory after inst
 To confirm that MET was installed successfully, run the following command from the installation directory to check for errors in the test file:
 
 .. code-block:: ini
-		
+
   grep -i error MET-12.0.0/met.make_test.log
-  
+
 If no errors are returned, the installation was successful.
 Due to the highly variable nature of hardware systems, users may encounter issues during 
 the installation process that result in MET not being installed. If this occurs please 
@@ -500,7 +497,6 @@ version. If a different version is required, select the correct
 version from the dropdown option. Follow Docker’s instructions
 for a successful installation.
 
-
 Loading the Latest Docker Image of MET
 --------------------------------------
 
@@ -517,7 +513,6 @@ Omitting the
 version number will result in an error due to Docker’s behavior
 of attempting to retrieve an image with the “latest” tag, which
 MET no longer uses. 
-
 
 Running the Docker version of MET
 ---------------------------------
@@ -539,7 +534,7 @@ the same way the latest image of MET was pulled:
 .. code-block:: ini
 
   docker run -it --rm dtcenter/met:12.0.0 /bin/bash 
-  
+
 If the  usage MET via Docker images was successful, it is highly
 recommended to move on 
 to using the METplus wrappers of the tools, which have their own
@@ -589,7 +584,6 @@ to make the container:
 
   singularity build met-12.0.0.sif docker://dtcenter/met:12.0.0
 
-
 Running the MET Container
 -------------------------
 
@@ -610,7 +604,7 @@ be used otherwise the instance will continue to run in the background:
 
 .. code-block:: ini
 
-    singularity instance stop /path/to/container/met-12.0.0.sif met-12.0.0  
+  singularity instance stop /path/to/container/met-12.0.0.sif met-12.0.0  
 
 Now that MET is successfully installed, it is highly recommended to
 next install the METplus wrappers to take full advantage of
@@ -620,5 +614,3 @@ Users can also proceed to the
 and run through the examples that only utilize the MET processes
 (METplus wrapper applications and commands will not work unless
 METplus wrappers are also installed).
-
-
