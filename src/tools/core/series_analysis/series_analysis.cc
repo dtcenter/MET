@@ -562,7 +562,8 @@ void get_series_data(int i_series,
 
       mlog << Debug(2)
            << "Regridding forecast " << fcst_info->magic_str()
-           << " to the verification grid.\n";
+           << " to the verification grid using "
+           << fcst_info->regrid().get_str() << ".\n";
       fcst_dp = met_regrid(fcst_dp, fcst_grid, grid,
                            fcst_info->regrid());
    }
@@ -582,7 +583,8 @@ void get_series_data(int i_series,
 
       mlog << Debug(2)
            << "Regridding observation " << obs_info->magic_str()
-           << " to the verification grid.\n";
+           << " to the verification grid using "
+           << obs_info->regrid().get_str() << ".\n";
       obs_dp = met_regrid(obs_dp, obs_grid, grid,
                           obs_info->regrid());
    }
@@ -898,21 +900,25 @@ void process_scores() {
 
          // Read forecast climatology data
          fcmn_dp = read_climo_data_plane(
-                      conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
+                      conf_info.conf.lookup_dictionary(conf_key_fcst),
+                      conf_key_climo_mean,
                       i_fcst, fcst_dp.valid(), grid,
                       "forecast climatology mean");
          fcsd_dp = read_climo_data_plane(
-                      conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
+                      conf_info.conf.lookup_dictionary(conf_key_fcst),
+                      conf_key_climo_stdev,
                       i_fcst, fcst_dp.valid(), grid,
                       "forecast climatology standard deviation");
 
          // Read observation climatology data
          ocmn_dp = read_climo_data_plane(
-                      conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
+                      conf_info.conf.lookup_dictionary(conf_key_obs),
+                      conf_key_climo_mean,
                       i_fcst, fcst_dp.valid(), grid,
                       "observation climatology mean");
          ocsd_dp = read_climo_data_plane(
-                      conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
+                      conf_info.conf.lookup_dictionary(conf_key_obs),
+                      conf_key_climo_stdev,
                       i_fcst, fcst_dp.valid(), grid,
                       "observation climatology standard deviation");
 

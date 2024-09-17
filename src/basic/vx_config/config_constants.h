@@ -297,7 +297,7 @@ struct InterpInfo {
    void        clear();
    void        validate(); // Ensure that width and method are accordant
    bool        operator==(const InterpInfo &) const;
-   InterpInfo &operator=(const InterpInfo &a) noexcept; // SoanrQube findings
+   InterpInfo &operator=(const InterpInfo &a) noexcept; // SonarQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -329,6 +329,7 @@ struct RegridInfo {
    void validate();        // ensure that width and method are accordant
    void validate_point();  // ensure that width and method are accordant
    RegridInfo &operator=(const RegridInfo &a) noexcept; // SoanrQube findings
+   ConcatString get_str() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -725,12 +726,10 @@ static const char conf_key_is_prob[]              = "is_prob";
 //
 // Climatology data parameter key names
 //
-static const char conf_key_climo_mean_field[]       = "climo_mean.field";
-static const char conf_key_fcst_climo_mean_field[]  = "fcst.climo_mean.field";
-static const char conf_key_obs_climo_mean_field[]   = "obs.climo_mean.field";
-static const char conf_key_climo_stdev_field[]      = "climo_stdev.field";
-static const char conf_key_fcst_climo_stdev_field[] = "fcst.climo_stdev.field";
-static const char conf_key_obs_climo_stdev_field[]  = "obs.climo_stdev.field";
+static const char conf_key_climo_mean[]        = "climo_mean";
+static const char conf_key_climo_mean_field[]  = "climo_mean.field";
+static const char conf_key_climo_stdev[]       = "climo_stdev";
+static const char conf_key_climo_stdev_field[] = "climo_stdev.field";
 
 //
 // Climatology distribution parameter key names
