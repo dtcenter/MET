@@ -103,8 +103,14 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
    cs << cs_erase << climo_name << "." << conf_key_field;
    Dictionary *field_dict = dict->lookup_array(cs.c_str(), false);
 
-   // Get the i-th array entry
-   Dictionary i_dict = parse_conf_i_vx_dict(field_dict, i_vx);
+   // Determine which climo array entry to use 
+   int i_climo_field = bad_data_int;
+        if(field_dict->n_entries() == 0) return dpa;
+   else if(field_dict->n_entries() == 1) i_climo_field = 0;
+   else i_climo_field = i_vx; 
+
+   // Parse the climo dictionary
+   Dictionary i_dict = parse_conf_i_vx_dict(field_dict, i_climo_field);
 
    // Parse the "regrid" dictionary from the top-level
    // config file context (e.g. "config.climo_mean.regrid")
