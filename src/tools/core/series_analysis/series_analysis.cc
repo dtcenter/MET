@@ -861,11 +861,14 @@ void process_scores() {
       // Loop over the series variable
       for(int i_series=0; i_series<n_series_pair; i_series++) {
 
-         // Get the index for the forecast and climo VarInfo objects
+         // Get the index for the VarInfo objects
          int i_fcst = (conf_info.get_n_fcst() > 1 ? i_series : 0);
+         int i_obs  = (conf_info.get_n_obs()  > 1 ? i_series : 0);
 
          // Store the current VarInfo objects
-         fcst_info = conf_info.fcst_info[i_fcst];
+         fcst_info = (conf_info.get_n_fcst() > 1 ?
+                      conf_info.fcst_info[i_series] :
+                      conf_info.fcst_info[0]);
          obs_info  = (conf_info.get_n_obs() > 1 ?
                       conf_info.obs_info[i_series] :
                       conf_info.obs_info[0]);
@@ -914,12 +917,12 @@ void process_scores() {
          ocmn_dp = read_climo_data_plane(
                       conf_info.conf.lookup_dictionary(conf_key_obs),
                       conf_key_climo_mean,
-                      i_fcst, fcst_dp.valid(), grid,
+                      i_obs, fcst_dp.valid(), grid,
                       "observation climatology mean");
          ocsd_dp = read_climo_data_plane(
                       conf_info.conf.lookup_dictionary(conf_key_obs),
                       conf_key_climo_stdev,
-                      i_fcst, fcst_dp.valid(), grid,
+                      i_obs, fcst_dp.valid(), grid,
                       "observation climatology standard deviation");
 
          bool fcmn_flag = !fcmn_dp.is_empty();
