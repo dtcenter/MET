@@ -2632,7 +2632,7 @@ void check_climo_n_vx(Dictionary *dict, const int n_input) {
            << "The number of climatology mean fields in \""
            << conf_key_climo_mean_field << "\" (" << n_climo
            << ") must be 0, 1, or match the number of input fields ("
-	   << n_input << ").\n\n";
+           << n_input << ").\n\n";
       exit(1);
    }
 
