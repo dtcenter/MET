@@ -291,7 +291,8 @@ void process_series(void) {
         if(!(cur_grid == grid)) {
            mlog << Debug(2)
                 << "Regridding field " << data_info->magic_str_attr()
-                << " to the verification grid.\n";
+                << " to the verification grid using "
+                << data_info->regrid().get_str() << ".\n";
            data_dp[i_var] = met_regrid(data_dp[i_var],
                                        cur_grid, grid,
                                        data_info->regrid());

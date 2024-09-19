@@ -261,8 +261,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    n_vx   = n_fvx;
    vx_opt = new EnsembleStatVxOpt [n_vx];
 
-   // Check climatology fields
-   check_climo_n_vx(&conf, n_vx);
+   // Check for consistent number of climatology fields
+   check_climo_n_vx(fdict, n_vx);
+   check_climo_n_vx(odict, n_vx);
 
    // Parse settings for each verification task
    for(i=0,max_hira_size=0; i<n_vx; i++) {

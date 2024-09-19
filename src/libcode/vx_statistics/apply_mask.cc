@@ -633,7 +633,8 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
             regrid_info = parse_conf_regrid(dict);
             mlog << Debug(2)
                  << "Regridding geography mask data " << info->magic_str()
-                 << " to the verification grid.\n";
+                 << " to the verification grid using "
+                 << regrid_info.get_str() << ".\n";
             dp = met_regrid(dp, mtddf->grid(), vx_grid, regrid_info);
          }
       }

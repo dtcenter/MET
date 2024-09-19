@@ -211,7 +211,8 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    vx_opt = new GridStatVxOpt [n_vx];
 
    // Check for consistent number of climatology fields
-   check_climo_n_vx(&conf, n_vx);
+   check_climo_n_vx(fdict, n_vx);
+   check_climo_n_vx(odict, n_vx);
 
    // Parse settings for each verification task
    for(i=0; i<n_vx; i++) {
@@ -654,6 +655,11 @@ void GridStatVxOpt::process_config(
    // Allocate new VarInfo objects
    fcst_info = info_factory.new_var_info(ftype);
    obs_info  = info_factory.new_var_info(otype);
+
+   // Set the top-level regrid as the default 
+   RegridInfo regrid_info = parse_conf_regrid(fdict.parent());
+   fcst_info->set_default_regrid(regrid_info);
+   obs_info->set_default_regrid(regrid_info);
 
    // Set the VarInfo objects
    fcst_info->set_dict(fdict);

@@ -243,7 +243,7 @@ class Dictionary {
 
       virtual const DictionaryEntry * operator[](int) const;
 
-      virtual const Dictionary * parent() const;
+      virtual Dictionary * parent() const;
 
       virtual bool is_array() const;
 
@@ -346,7 +346,7 @@ class Dictionary {
 
 inline int Dictionary::n_entries() const { return Nentries; }
 
-inline const Dictionary * Dictionary::parent() const { return Parent; }
+inline Dictionary * Dictionary::parent() const { return Parent; }
 
 inline void Dictionary::set_is_array(bool __tf) { IsArray = __tf;  return; }
 
