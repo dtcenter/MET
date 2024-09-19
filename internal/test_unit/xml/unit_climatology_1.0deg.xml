@@ -186,6 +186,34 @@
     </output>
   </test>
 
+  <test name="climatology_SERIES_ANALYSIS_1.0DEG_CONST_CLIMO">
+    <exec>&MET_BIN;/series_analysis</exec>
+    <env>
+      <pair><name>CLIMO_MEAN_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cmean_1d.19590409"
+         </value>
+      </pair>
+      <pair><name>CLIMO_STDEV_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cstdv_1d.19590409"
+         </value>
+      </pair>
+    </env>
+    <param> \
+        -fcst &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F024.grib2 \
+              &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F036.grib2 \
+        -obs  &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_0000_000.grb2 \
+              &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120410_1200_000.grb2 \
+      -out    &OUTPUT_DIR;/climatology_1.0deg/series_analysis_GFS_CLIMO_1.0DEG_CONST_CLIMO.nc \
+      -config &CONFIG_DIR;/SeriesAnalysisConfig_const_climo \
+      -v 3
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/climatology_1.0deg/series_analysis_GFS_CLIMO_1.0DEG_CONST_CLIMO.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="climatology_SERIES_ANALYSIS_1.0DEG_AGGR">
     <exec>&MET_BIN;/series_analysis</exec>
     <env>

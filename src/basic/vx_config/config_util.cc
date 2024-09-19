@@ -2622,28 +2622,28 @@ void check_mask_names(const StringArray &sa) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void check_climo_n_vx(Dictionary *dict, const int n_vx) {
-   int n;
+void check_climo_n_vx(Dictionary *dict, const int n_input) {
+   int n_climo;
 
    // Check for a valid number of climatology mean fields
-   n = parse_conf_n_vx(dict->lookup_array(conf_key_climo_mean_field, false));
-   if(n != 0 && n != n_vx) {
+   n_climo = parse_conf_n_vx(dict->lookup_array(conf_key_climo_mean_field, false));
+   if(n_climo != 0 && n_climo != 1 && n_climo != n_input) {
       mlog << Error << "\ncheck_climo_n_vx() -> "
            << "The number of climatology mean fields in \""
-           << conf_key_climo_mean_field
-           << "\" must be zero or match the number (" << n_vx
-           << ") in \"" << conf_key_fcst_field << "\".\n\n";
+           << conf_key_climo_mean_field << "\" (" << n_climo
+           << ") must be 0, 1, or match the number of input fields ("
+           << n_input << ").\n\n";
       exit(1);
    }
 
    // Check for a valid number of climatology standard deviation fields
-   n = parse_conf_n_vx(dict->lookup_array(conf_key_climo_stdev_field, false));
-   if(n != 0 && n != n_vx) {
+   n_climo = parse_conf_n_vx(dict->lookup_array(conf_key_climo_stdev_field, false));
+   if(n_climo != 0 && n_climo != 1 && n_climo != n_input) {
       mlog << Error << "\ncheck_climo_n_vx() -> "
            << "The number of climatology standard deviation fields in \""
-           << conf_key_climo_stdev_field
-           << "\" must be zero or match the number ("
-           << n_vx << ") in \"" << conf_key_fcst_field << "\".\n\n";
+           << conf_key_climo_stdev_field << "\" (" << n_climo
+           << ") must be 0, 1, or match the number of input fields ("
+           << n_input << ").\n\n";
       exit(1);
    }
 

@@ -114,7 +114,7 @@ if ( !match &&
 
       mlog << Debug(2) << R"(Please replace the deprecated "SCP" and "CDP" )" 
            << R"(threshold types with "SOCP" and "OCDP", respectively, in the ")"
-           << str << R"(" threshold string.\n)";
+           << str << R"(" threshold string.)" << "\n";
 
       print_climo_perc_thresh_log_message = false;
 
