@@ -57,6 +57,7 @@ An example of the steps involved in resolving objects is shown in :numref:`mode-
 
    Example of an application of the MODE object identification process to a model precipitation field.
 
+.. _mode-attributes:
 
 Attributes
 ----------

@@ -486,7 +486,8 @@ void PlotPointObsConfInfo::process_config(
          // Regrid, if requested
          if(grid_data_info->regrid().enable) {
             mlog << Debug(1) << "Regridding field "
-                 << grid_data_info->magic_str() << ".\n";
+                 << grid_data_info->magic_str() << " using "
+                 << grid_data_info->regrid().get_str() << ".\n";
             Grid to_grid(parse_vx_grid(grid_data_info->regrid(),
                                        &grid, &grid));
             grid_data = met_regrid(grid_data, grid, to_grid,

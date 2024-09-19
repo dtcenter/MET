@@ -425,7 +425,7 @@ While initial versions of the ASCII2NC tool only supported a simple 11 column AS
 
 • `AirNow DailyData_v2, AirNow HourlyData, and AirNow HourlyAQObs formats <https://www.epa.gov/outdoor-air-quality-data>`_. See the :ref:`MET_AIRNOW_STATIONS` environment variable.
 
-• `National Data Buoy (NDBC) Standard Meteorlogical Data format <https://www.ndbc.noaa.gov/measdes.shtml>`_. See the :ref:`MET_NDBC_STATIONS` environment variable.
+• `National Data Buoy (NDBC) Standard Meteorological Data format <https://www.ndbc.noaa.gov/measdes.shtml>`_. See the :ref:`MET_NDBC_STATIONS` environment variable.
 
 • `International Soil Moisture Network (ISMN) Data format <https://ismn.bafg.de/en/>`_.
 

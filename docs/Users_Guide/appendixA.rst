@@ -515,7 +515,7 @@ Q. What is an example of using Grid-Stat with regridding and masking turned on?
      This tells Grid-Stat to do verification on the "observation" grid.
      Grid-Stat reads the GFS and Stage4 data and then automatically regrids
      the GFS data to the Stage4 domain using budget interpolation.
-     Use "FCST" to verify the forecast domain. And use either a named
+     Use FCST to verify the forecast domain. And use either a named
      grid or a grid specification string to regrid both the forecast and
      observation to a common grid. For example, to_grid = "G212"; will
      regrid both to NCEP Grid 212 before comparing them.
