@@ -363,7 +363,7 @@ void process_command_line(int argc, char **argv) {
       if(fcst_files.n() != n_series_pair) {
          mlog << Error << "\nprocess_command_line() -> "
               << R"(when using the "-paired" command line option, the )"
-              << "the file list length (" << fcst_files.n()
+              << "file list length (" << fcst_files.n()
               << ") and series length (" << n_series_pair
               << ") must match.\n\n";
          usage();
