@@ -2299,7 +2299,7 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
 {
   double x_coord_to_m_cf = 1.0;
   double y_coord_to_m_cf = 1.0;
-  static const string method_name = "NcCfFile::get_grid_mapping_polar_stereographic() --> ";
+  static const string method_name = "NcCfFile::get_grid_mapping_polar_stereographic() -> ";
 
   // Get projection attributes
   // proj_origin_lat: either 90.0 or -90.0, to decide the northern/southern hemisphere
