@@ -26,6 +26,7 @@
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_log.h"
+#include "data2d_utils.h"
 
 using namespace std;
 
@@ -115,6 +116,7 @@ void VarInfo::assign(const VarInfo &v) {
    nBins = v.nBins;
    Range = v.Range;
 
+   DefaultRegrid = v.DefaultRegrid;
    Regrid = v.Regrid;
 
    SetAttrName = v.SetAttrName;
@@ -175,6 +177,7 @@ void VarInfo::clear() {
    nBins = 0;
    Range.clear();
 
+   DefaultRegrid.clear();
    Regrid.clear();
 
    SetAttrName.clear();
@@ -214,26 +217,29 @@ void VarInfo::dump(ostream &out) const {
 
    // Dump out the contents
    out << "VarInfo::dump():\n"
-       << "  MagicStr     = " << MagicStr.contents() << "\n"
-       << "  ReqName      = " << ReqName.contents() << "\n"
-       << "  Name         = " << Name.contents() << "\n"
-       << "  LongName     = " << LongName.contents() << "\n"
-       << "  Units        = " << Units.contents() << "\n"
-       << "  PFlag        = " << PFlag << "\n"
-       << "  PName        = " << PName.contents() << "\n"
-       << "  PUnits       = " << PUnits.contents() << "\n"
-       << "  PAsScalar    = " << PAsScalar << "\n"
-       << "  UVIndex      = " << UVIndex << "\n"
-       << "  Init         = " << init_str << " (" << Init << ")\n"
-       << "  Valid        = " << valid_str << " (" << Valid << ")\n"
-       << "  Ensemble     = " << Ensemble.contents() << "\n"
-       << "  Lead         = " << lead_str << " (" << Lead << ")\n"
-       << "  ConvertFx    = " << (ConvertFx.is_set() ? "IsSet" : "(nul)") << "\n"
-       << "  CensorThresh = " << CensorThresh.get_str() << "\n"
-       << "  CensorVal    = " << CensorVal.serialize() << "\n"
-       << "  nBins        = " << nBins << "\n"
-       << "  Range        = " << Range.serialize() << "\n"
-       << "  Regrid       = " << interpmthd_to_string(Regrid.method) << "\n";
+       << "  MagicStr      = " << MagicStr.contents() << "\n"
+       << "  ReqName       = " << ReqName.contents() << "\n"
+       << "  Name          = " << Name.contents() << "\n"
+       << "  LongName      = " << LongName.contents() << "\n"
+       << "  Units         = " << Units.contents() << "\n"
+       << "  PFlag         = " << PFlag << "\n"
+       << "  PName         = " << PName.contents() << "\n"
+       << "  PUnits        = " << PUnits.contents() << "\n"
+       << "  PAsScalar     = " << PAsScalar << "\n"
+       << "  UVIndex       = " << UVIndex << "\n"
+       << "  Init          = " << init_str << " (" << Init << ")\n"
+       << "  Valid         = " << valid_str << " (" << Valid << ")\n"
+       << "  Ensemble      = " << Ensemble.contents() << "\n"
+       << "  Lead          = " << lead_str << " (" << Lead << ")\n"
+       << "  ConvertFx     = " << (ConvertFx.is_set() ? "IsSet" : "(nul)") << "\n"
+       << "  CensorThresh  = " << CensorThresh.get_str() << "\n"
+       << "  CensorVal     = " << CensorVal.serialize() << "\n"
+       << "  nBins         = " << nBins << "\n"
+       << "  Range         = " << Range.serialize() << "\n"
+       << "  DefaultRegrid = " << interpmthd_to_string(DefaultRegrid.method)
+                               << "(" << DefaultRegrid.width << ")\n"
+       << "  Regrid        = " << interpmthd_to_string(Regrid.method)
+                               << "(" << Regrid.width << ")\n";
 
    Level.dump(out);
 
@@ -424,6 +430,13 @@ void VarInfo::set_range(const NumArray &a) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfo::set_default_regrid(const RegridInfo &ri) {
+   DefaultRegrid = ri;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void VarInfo::set_regrid(const RegridInfo &ri) {
    Regrid = ri;
    return;
@@ -527,7 +540,7 @@ void VarInfo::set_dict(Dictionary &dict) {
    if(dict.last_lookup_status()) set_range(na);
 
    // Parse regrid, if present
-   Regrid = parse_conf_regrid(&dict, false);
+   Regrid = parse_conf_regrid(&dict, &DefaultRegrid, false);
 
    // Parse set_attr strings
    SetAttrName =
@@ -541,25 +554,7 @@ void VarInfo::set_dict(Dictionary &dict) {
 
    // Parse set_attr grid
    s = parse_set_attr_string(dict, conf_key_set_attr_grid);
-   if(s.nonempty()) {
-
-      // Parse as a white-space separated string
-      StringArray sa;
-      sa.parse_wsss(s);
-
-      // Search for a named grid
-      if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), SetAttrGrid)) {
-      }
-      // Parse grid definition
-      else if(sa.n() > 1 && parse_grid_def(sa, SetAttrGrid)) {
-      }
-      else {
-         mlog << Warning << "\nVarInfo::set_dict() -> "
-              << "unsupported " << conf_key_set_attr_grid
-              << " definition string (" << s
-              << ")!\n\n";
-      }
-   }
+   build_grid_by_grid_string(s, SetAttrGrid, "VarInfo::set_dict(Dictionary &dict) ->");
 
    // Parse set_attr times
    s = parse_set_attr_string(dict, conf_key_set_attr_init);

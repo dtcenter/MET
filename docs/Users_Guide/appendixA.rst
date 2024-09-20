@@ -515,7 +515,7 @@ Q. What is an example of using Grid-Stat with regridding and masking turned on?
      This tells Grid-Stat to do verification on the "observation" grid.
      Grid-Stat reads the GFS and Stage4 data and then automatically regrids
      the GFS data to the Stage4 domain using budget interpolation.
-     Use "FCST" to verify the forecast domain. And use either a named
+     Use FCST to verify the forecast domain. And use either a named
      grid or a grid specification string to regrid both the forecast and
      observation to a common grid. For example, to_grid = "G212"; will
      regrid both to NCEP Grid 212 before comparing them.
@@ -1801,8 +1801,11 @@ Q. What are MET's conventions for latitude, longitude, azimuth and bearing angle
    
   .. dropdown:: Answer
 		
-     MET considers north latitude and east longitude positive. Latitudes
-     have range from :math:`-90^\circ` to :math:`+90^\circ`. Longitudes have
+     MET considers north latitude and east longitude positive. However,
+     internally MET considers east longitude negative so users may encounter
+     DEBUG statements with longitude of a different sign than they provided
+     (e.g. for observation locations or grid metadata). Latitudes have
+     range from :math:`-90^\circ` to :math:`+90^\circ`. Longitudes have
      range from :math:`-180^\circ` to :math:`+180^\circ`. Plane angles such
      as azimuths and bearing (example: horizontal wind direction) have
      range :math:`0^\circ` to :math:`360^\circ` and are measured clockwise

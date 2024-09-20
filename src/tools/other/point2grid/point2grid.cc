@@ -30,7 +30,7 @@
 #include <cstdlib>
 #include <dirent.h>
 
-#include<netcdf>
+#include <netcdf>
 
 #include "main.h"
 #include "vx_log.h"
@@ -389,7 +389,7 @@ static void process_data_file() {
    config.read_string(FieldSA[0].c_str());
 
    // Note: The command line argument MUST processed before this
-   if (compress_level < 0) compress_level = config.nc_compression();
+   if (compress_level < 0) compress_level = conf_info.conf.nc_compression();
 
    // Get the gridded file type from config string, if present
    ftype = parse_conf_file_type(&conf_info.conf);
@@ -424,6 +424,7 @@ static void process_data_file() {
       // Get the obs type before opening NetCDF
       obs_type = get_obs_type(nc_in);
       goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
+      if (obs_type == TYPE_UNKNOWN && ftype == FileType_NcCF) obs_type = TYPE_NCCF;
       if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
 
       // Read the input data file
@@ -594,14 +595,33 @@ bool get_nc_data_string_array(NcFile *nc, const char *var_name,
 
 static int get_obs_type(NcFile *nc) {
    int obs_type = TYPE_UNKNOWN;
+   MetConfig config;
    ConcatString att_val_scene_id;
    ConcatString att_val_project;
    ConcatString input_type;
    static const char *method_name = "get_obs_type() -> ";
 
-   bool has_project = get_global_att(nc, (string)"project", att_val_project);
-   bool has_scene_id = get_global_att(nc, (string)"scene_id", att_val_scene_id);
-   if( has_scene_id && has_project && att_val_project == "GOES" ) {
+   bool has_attr_grid = false;
+   auto vinfo = VarInfoFactory::new_var_info(FileType_NcCF);
+   for(int i=0; i<FieldSA.n(); i++) {
+      vinfo->clear();
+      // Populate the VarInfo object using the config string
+      config.read_string(FieldSA[i].c_str());
+      vinfo->set_dict(config);
+      if (vinfo->grid_attr().is_set()) {
+         has_attr_grid = true;
+         break;
+      }
+   }
+   if (vinfo) { delete vinfo; vinfo = (VarInfo *) nullptr; }
+
+   if (has_attr_grid) {
+      obs_type = TYPE_NCCF;
+      input_type = "OBS_NCCF";
+   }
+   else if (get_global_att(nc, (string)"scene_id", att_val_scene_id)
+            && get_global_att(nc, (string)"project", att_val_project)
+            && att_val_project == "GOES" ) {
       obs_type = TYPE_GOES;
       input_type = "GOES";
       if (!adp_filename.empty()) {
@@ -693,12 +713,15 @@ std::set<GOES_QC> prepare_qoes_qc_array() {
 
 void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarInfo *vinfo,
                             const Grid &to_grid) {
-   int idx, hdr_idx;
+   int hdr_idx;
    int var_idx_or_gc;
    ConcatString vname;
-   DataPlane fr_dp, to_dp;
-   DataPlane cnt_dp, mask_dp;
-   DataPlane prob_dp, prob_mask_dp;
+   DataPlane fr_dp;
+   DataPlane to_dp;
+   DataPlane cnt_dp;
+   DataPlane mask_dp;
+   DataPlane prob_dp;
+   DataPlane prob_mask_dp;
 
    bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
 
@@ -807,7 +830,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
             }
             else {
                bool not_found_grib_code = true;
-               for (idx=0; idx<nobs; idx++) {
+               for (int idx=0; idx<nobs; idx++) {
                   if (var_idx_or_gc == obs_data->obs_ids[idx]) {
                      not_found_grib_code = false;
                      break;
@@ -824,7 +847,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       if (exit_by_field_name_error) {
          ConcatString log_msg;
          if (use_var_id) {
-            for (idx=0; idx<var_names.n(); idx++) {
+            for (int idx=0; idx<var_names.n(); idx++) {
                if (0 < idx) log_msg << ", ";
                log_msg << var_names[idx];
             }
@@ -832,7 +855,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          else {
             log_msg << "GRIB codes: ";
             IntArray grib_codes;
-            for (idx=0; idx<nobs; idx++) {
+            for (int idx=0; idx<nobs; idx++) {
                if (!grib_codes.has(obs_data->obs_ids[idx])) {
                   grib_codes.add(obs_data->obs_ids[idx]);
                   if (0 < idx) log_msg << ", ";
@@ -855,7 +878,9 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
       // Check the time range. Apply the time window
       bool valid_time_from_config = true;
-      unixtime valid_beg_ut, valid_end_ut, obs_time;
+      unixtime valid_beg_ut;
+      unixtime valid_end_ut;
+      unixtime obs_time;
 
       valid_time_array.clear();
       valid_time = vinfo->valid();
@@ -865,7 +890,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          valid_beg_ut = valid_end_ut = valid_time;
          if (!is_bad_data(conf_info.beg_ds)) valid_beg_ut += conf_info.beg_ds;
          if (!is_bad_data(conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
-         for(idx=0; idx<hdr_valid_times.n(); idx++) {
+         for(int idx=0; idx<hdr_valid_times.n(); idx++) {
             obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
             if (valid_beg_ut <= obs_time && obs_time <= valid_end_ut) {
                valid_time_array.add(idx);
@@ -879,7 +904,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          valid_time_from_config = false;
          // Set the latest available valid time
          valid_time = 0;
-         for(idx=0; idx<hdr_valid_times.n(); idx++) {
+         for(int idx=0; idx<hdr_valid_times.n(); idx++) {
             obs_time = timestring_to_unix(hdr_valid_times[idx].c_str());
             if (obs_time > valid_time) valid_time = obs_time;
          }
@@ -915,7 +940,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       int filtered_by_time = 0;
       int filtered_by_msg_type = 0;
       int filtered_by_qc = 0;
-      for (idx=0; idx < nobs; idx++) {
+      for (int idx=0; idx < nobs; idx++) {
          if (var_idx_or_gc == obs_data->obs_ids[idx]) {
             var_count2++;
             hdr_idx = obs_data->obs_hids[idx];
@@ -938,7 +963,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
             var_index_array.add(idx);
             var_count++;
-            if (is_eq(obs_data->obs_vals[idx], 0.)) obs_count_zero_from++;
+            if (is_eq(obs_data->obs_vals[idx], (float)0.)) obs_count_zero_from++;
             else obs_count_non_zero_from++;
          }
       }
@@ -1104,7 +1129,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       log_msg << ", by msg_type: " << filtered_by_msg_type;
       if (0 < filtered_by_msg_type) {
          log_msg << " [";
-         for(idx=0; idx<conf_info.message_type.n(); idx++) {
+         for(int idx=0; idx<conf_info.message_type.n(); idx++) {
             if (idx > 0) log_msg << ",";
             log_msg << conf_info.message_type[idx];
          }
@@ -1113,7 +1138,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       log_msg << ", by QC: " << filtered_by_qc;
       if (0 < filtered_by_qc) {
          log_msg << " [";
-         for(idx=0; idx<qc_flags.n(); idx++) {
+         for(int idx=0; idx<qc_flags.n(); idx++) {
             if (idx > 0) log_msg << ",";
             log_msg << qc_flags[idx];
          }
@@ -1179,7 +1204,7 @@ static void process_point_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    nc_point_obs.close();
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
-        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+        << get_exe_duration(start_clock) << " seconds\n";
 
 }
 
@@ -1216,7 +1241,7 @@ static void process_point_python(const string python_command, MetConfig &config,
    met_point_file.close();
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
-        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+        << get_exe_duration(start_clock) << " seconds\n";
 
    return;
 }
@@ -1234,10 +1259,10 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    bool *skip_times = nullptr;
    double *valid_times = nullptr;
    int filtered_by_time = 0;
+   int time_from_size = 1;
    clock_t start_clock =  clock();
    bool opt_all_attrs = false;
    Grid fr_grid = fr_mtddf->grid();
-   int from_size = fr_grid.nx() * fr_grid.ny();
    static const char *method_name = "process_point_nccf_file() -> ";
 
    NcVar var_lat;
@@ -1247,10 +1272,10 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    ConcatString lon_vname = conf_info.get_var_name(conf_key_lon_vname);
 
    if (lat_vname != conf_key_lat_vname && lon_vname != conf_key_lon_vname) {
-      if (lat_vname != conf_key_lat_vname && has_var(nc_in, lat_vname.c_str())) {
+      if (has_var(nc_in, lat_vname.c_str())) {
          var_lat = get_nc_var(nc_in, lat_vname.c_str());
       }
-      if (lon_vname != conf_key_lon_vname && has_var(nc_in, lon_vname.c_str())) {
+      if (has_var(nc_in, lon_vname.c_str())) {
          var_lon = get_nc_var(nc_in, lon_vname.c_str());
       }
       if (IS_INVALID_NC(var_lat)) {
@@ -1270,7 +1295,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    // Find lat/lon variables from the coordinates attribue
    if (0 < FieldSA.n() && !user_defined_latlon) {
       ConcatString coordinates_value;
-      VarInfoNcCF var_info = VarInfoNcCF(*(VarInfoNcCF *)vinfo);
+      auto var_info = VarInfoNcCF(*(VarInfoNcCF *)vinfo);
       // Initialize
       var_info.clear();
       // Populate the VarInfo object using the config string
@@ -1322,8 +1347,9 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    if( IS_VALID_NC(time_var) ) {
       if( 1 < get_dim_count(&time_var) ) {
          double max_time = bad_data_double;
-         skip_times = new bool[from_size];
-         valid_times = new double[from_size];
+         time_from_size = get_data_size(&time_var);
+         skip_times = new bool[time_from_size];
+         valid_times = new double[time_from_size];
          if (get_nc_data(&time_var, valid_times)) {
             int sec_per_unit = 0;
             bool no_leap_year = false;
@@ -1334,7 +1360,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
                if (!is_bad_data(conf_info.end_ds)) valid_end_ut += conf_info.end_ds;
                ref_ut = get_reference_unixtime(&time_var, sec_per_unit, no_leap_year);
             }
-            for (int i=0; i<from_size; i++) {
+            for (int i=0; i<time_from_size; i++) {
                if( conf_info.valid_time > 0 ) {
                   tmp_time = add_to_unixtime(ref_ut, sec_per_unit,
                                              valid_times[i], no_leap_year);
@@ -1405,7 +1431,10 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
 
       // List range of data values
       if(mlog.verbosity_level() >= 2) {
-         double fr_dmin, fr_dmax, to_dmin, to_dmax;
+         double fr_dmin;
+         double fr_dmax;
+         double to_dmin;
+         double to_dmax;
          fr_dp.data_range(fr_dmin, fr_dmax);
          to_dp.data_range(to_dmin, to_dmax);
          mlog << Debug(2) << "Range of data (" << FieldSA[i] << ")\n"
@@ -1428,7 +1457,8 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
 
       bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
       if (has_prob_thresh || do_gaussian_filter) {
-         DataPlane prob_dp, prob_mask_dp;
+         DataPlane prob_dp;
+         DataPlane prob_mask_dp;
          ConcatString vname_prob = vname;
          vname_prob << "_prob_" << prob_cat_thresh.get_abbr_str();
          int nx = to_dp.nx();
@@ -1477,12 +1507,12 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    cellMapping = (IntArray *) nullptr;
    if( 0 < filtered_by_time ) {
       mlog << Debug(2) << method_name << "Filtered by time: " << filtered_by_time
-           << " out of " << from_size
+           << " out of " << time_from_size
            << " [" << unix_to_yyyymmdd_hhmmss(valid_beg_ut) << " to "
            << unix_to_yyyymmdd_hhmmss(valid_end_ut) << "]\n";
    }
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
-        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+        << get_exe_duration(start_clock) << " seconds\n";
 
    return;
 }
@@ -1506,9 +1536,6 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       exit(1);
    }
 
-   int from_lat_cnt = fr_grid.ny();
-   int from_lon_cnt = fr_grid.nx();
-   int from_data_size = from_lat_cnt * from_lon_cnt;
    if(!fr_mtddf->data_plane(*vinfo, fr_dp)) {
       mlog << Error << "\n" << method_name
            << "Trouble reading data \""
@@ -1516,106 +1543,112 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
            << InputFilename << "\"\n\n";
       exit(1);
    }
-   else {
-      bool is_to_north = !fr_grid.get_swap_to_north();
-      auto from_data = new float[from_data_size];
-      for (int xIdx=0; xIdx<from_lon_cnt; xIdx++) {
-         for (int yIdx=0; yIdx<from_lat_cnt; yIdx++) {
-            int offset = fr_dp.two_to_one(xIdx,yIdx,is_to_north);
-            from_data[offset] = fr_dp.get(xIdx,yIdx);
-         }
+
+   int from_lat_count = fr_grid.ny();
+   int from_lon_count = fr_grid.nx();
+   if (0 == from_lat_count) from_lat_count = fr_dp.ny();
+   if (0 == from_lon_count) from_lon_count = fr_dp.nx();
+
+   int from_data_size = from_lat_count * from_lon_count;
+   bool is_to_north = !fr_grid.get_swap_to_north();
+   auto from_data = new float[from_data_size];
+   for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
+      for (int yIdx=0; yIdx<from_lat_count; yIdx++) {
+         int offset = fr_dp.two_to_one(xIdx,yIdx,is_to_north);
+         from_data[offset] = fr_dp.get(xIdx,yIdx);
       }
-      mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
-           << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds for read variable\n";
-
-      int from_index;
-      int no_map_cnt = 0;
-      int missing_cnt = 0;
-      int non_missing_cnt = 0;
-      double data_value;
-      IntArray cellArray;
-      NumArray dataArray;
-      double from_min_value =  10e10;
-      double from_max_value = -10e10;
-      int to_lat_cnt = to_grid.ny();
-      int to_lon_cnt = to_grid.nx();
-
-      missing_cnt = non_missing_cnt = 0;
-      to_dp.set_constant(bad_data_double);
-
-      for (int xIdx=0; xIdx<to_lon_cnt; xIdx++) {
-         for (int yIdx=0; yIdx<to_lat_cnt; yIdx++) {
-            int offset = to_dp.two_to_one(xIdx,yIdx);
-            cellArray = cellMapping[offset];
-            if (0 < cellArray.n()) {
-               dataArray.clear();
-               dataArray.extend(cellArray.n());
-               for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
-                  from_index = cellArray[dIdx];
-                  data_value = from_data[from_index];
-                  if (is_bad_data(data_value)) {
-                     missing_cnt++;
-                     continue;
-                  }
-
-                  dataArray.add(data_value);
-                  non_missing_cnt++;
-                  if(mlog.verbosity_level() >= 4) {
-                     if (from_min_value > data_value) from_min_value = data_value;
-                     if (from_max_value < data_value) from_max_value = data_value;
-                  }
-               }
-
-               if (0 < dataArray.n()) {
-                  double to_value;
-                  int data_cnt = dataArray.n();
-                  if (1 == data_cnt) to_value = dataArray[0];
-                  else if (RGInfo.method == InterpMthd::Min) to_value = dataArray.min();
-                  else if (RGInfo.method == InterpMthd::Max) to_value = dataArray.max();
-                  else if (RGInfo.method == InterpMthd::Median) {
-                     dataArray.sort_array();
-                     to_value = dataArray[data_cnt/2];
-                     if (0 == data_cnt % 2)
-                        to_value = (to_value + dataArray[(data_cnt/2)+1])/2;
-                  }
-                  else to_value = dataArray.sum() / data_cnt;    // UW_Mean
-
-                  to_dp.set(to_value, xIdx, yIdx);
-                  to_cell_cnt++;
-                  if(mlog.verbosity_level() >= 9) {
-                     double to_lat, to_lon;
-                     to_grid.xy_to_latlon(xIdx,yIdx, to_lat, to_lon);
-                     to_lon *= -1;
-                     if (1 == data_cnt)
-                        mlog << Debug(9) << method_name
-                             << "value: " << to_value << " to (" << to_lon << ", " << to_lat
-                             << ") from offset " << from_index << ".\n";
-                     else
-                        mlog << Debug(9) << method_name
-                             <<   "value: " << to_value
-                             << ", max: " << dataArray.max()
-                             << ", min: " << dataArray.min()
-                             << ", mean: " << dataArray.sum()/data_cnt
-                             << " from " << data_cnt << " (out of " << cellArray.n()
-                             << ") data values to (" << to_lon << ", " << to_lat << ").\n";
-                  }
-               }
-            }
-            else {
-               no_map_cnt++;
-            }
-         }
-      }
-
-      delete [] from_data;
-
-      mlog << Debug(4) << method_name << "[Count] data cells: " << to_cell_cnt
-           << ", missing: " << missing_cnt << ", non_missing: " << non_missing_cnt
-           << ", non mapped cells: " << no_map_cnt
-           << " out of " << (to_lat_cnt*to_lon_cnt)
-           << "\n\tRange:  data: [" << from_min_value << " - " << from_max_value
-           << "]\n";
    }
+   mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
+        << get_exe_duration(start_clock) << " seconds for read variable\n";
+
+   int from_index;
+   int no_map_cnt = 0;
+   int missing_cnt = 0;
+   int non_missing_cnt = 0;
+   double data_value;
+   IntArray cellArray;
+   NumArray dataArray;
+   double from_min_value =  10e10;
+   double from_max_value = -10e10;
+   int to_lat_cnt = to_grid.ny();
+   int to_lon_cnt = to_grid.nx();
+
+   missing_cnt = non_missing_cnt = 0;
+   to_dp.set_constant(bad_data_double);
+
+   for (int xIdx=0; xIdx<to_lon_cnt; xIdx++) {
+      for (int yIdx=0; yIdx<to_lat_cnt; yIdx++) {
+         int offset = to_dp.two_to_one(xIdx,yIdx);
+         cellArray = cellMapping[offset];
+         if (0 < cellArray.n()) {
+            dataArray.clear();
+            dataArray.extend(cellArray.n());
+            for (int dIdx=0; dIdx<cellArray.n(); dIdx++) {
+               from_index = cellArray[dIdx];
+               data_value = from_data[from_index];
+               if (is_bad_data(data_value)) {
+                  missing_cnt++;
+                  continue;
+               }
+
+               dataArray.add(data_value);
+               non_missing_cnt++;
+               if(mlog.verbosity_level() >= 4) {
+                  if (from_min_value > data_value) from_min_value = data_value;
+                  if (from_max_value < data_value) from_max_value = data_value;
+               }
+            }
+
+            if (0 < dataArray.n()) {
+               double to_value;
+               int data_cnt = dataArray.n();
+               if (1 == data_cnt) to_value = dataArray[0];
+               else if (RGInfo.method == InterpMthd::Min) to_value = dataArray.min();
+               else if (RGInfo.method == InterpMthd::Max) to_value = dataArray.max();
+               else if (RGInfo.method == InterpMthd::Median) {
+                  dataArray.sort_array();
+                  to_value = dataArray[data_cnt/2];
+                  if (0 == data_cnt % 2)
+                     to_value = (to_value + dataArray[(data_cnt/2)+1])/2;
+               }
+               else to_value = dataArray.sum() / data_cnt;    // UW_Mean
+
+               to_dp.set(to_value, xIdx, yIdx);
+               to_cell_cnt++;
+               if(mlog.verbosity_level() >= 9) {
+                  double to_lat;
+                  double to_lon;
+                  to_grid.xy_to_latlon(xIdx,yIdx, to_lat, to_lon);
+                  to_lon *= -1;
+                  if (1 == data_cnt)
+                     mlog << Debug(9) << method_name
+                          << "value: " << to_value << " to (" << to_lon << ", " << to_lat
+                          << ") from offset " << from_index << ".\n";
+                  else
+                     mlog << Debug(9) << method_name
+                          <<   "value: " << to_value
+                          << ", max: " << dataArray.max()
+                          << ", min: " << dataArray.min()
+                          << ", mean: " << dataArray.sum()/data_cnt
+                          << " from " << data_cnt << " (out of " << cellArray.n()
+                          << ") data values to (" << to_lon << ", " << to_lat << ").\n";
+               }
+            }
+         }
+         else {
+            no_map_cnt++;
+         }
+      }
+   }
+
+   delete [] from_data;
+
+   mlog << Debug(4) << method_name << "[Count] data cells: " << to_cell_cnt
+        << ", missing: " << missing_cnt << ", non_missing: " << non_missing_cnt
+        << ", non mapped cells: " << no_map_cnt
+        << " out of " << (to_lat_cnt*to_lon_cnt)
+        << "\n\tRange:  data: [" << from_min_value << " - " << from_max_value
+        << "]\n";
 
    if (to_cell_cnt == 0) {
       mlog << Warning << "\n" << method_name
@@ -1623,7 +1656,7 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    }
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
-        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+        << get_exe_duration(start_clock) << " seconds\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1818,7 +1851,10 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
       // List range of data values
       if(mlog.verbosity_level() >= 2) {
-         double fr_dmin, fr_dmax, to_dmin, to_dmax;
+         double fr_dmin;
+         double fr_dmax;
+         double to_dmin;
+         double to_dmax;
          fr_dp.data_range(fr_dmin, fr_dmax);
          to_dp.data_range(to_dmin, to_dmax);
          mlog << Debug(2) << "Range of data (" << FieldSA[i] << ")\n"
@@ -1848,7 +1884,8 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
       bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
       if (has_prob_thresh || do_gaussian_filter) {
-         DataPlane prob_dp, prob_mask_dp;
+         DataPlane prob_dp;
+         DataPlane prob_mask_dp;
          ConcatString vname_prob = vname;
          vname_prob << "_prob_" << prob_cat_thresh.get_abbr_str();
          int nx = to_dp.nx();
@@ -1901,7 +1938,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    clear_cell_mapping(cellMapping);
    delete [] cellMapping;   cellMapping = (IntArray *) nullptr;
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
-        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+        << get_exe_duration(start_clock) << " seconds\n";
 
    return;
 }
@@ -2018,7 +2055,8 @@ static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
       return status;
    }
 
-   double x, y;
+   double x;
+   double y;
    DataPlane to_dp;
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
@@ -2050,7 +2088,7 @@ static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
            << ((obs_count > 0) ? 1.0*count_in_grid/obs_count*100 : 0) << "%)\n";
    }
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
-        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+        << get_exe_duration(start_clock) << " seconds\n";
    return status;
 }
 
@@ -2060,16 +2098,18 @@ static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
 static void get_grid_mapping_latlon(
       DataPlane from_dp, DataPlane to_dp, Grid to_grid,
       IntArray *cellMapping, float *latitudes, float *longitudes,
-      int from_lat_count, int from_lon_count, bool *skip_times, bool to_north) {
-   double x, y;
-   double to_ll_lat, to_ll_lon;
+      int from_lat_count, int from_lon_count, bool *skip_times, bool to_north, bool is_2d) {
+   double x;
+   double y;
+   double to_ll_lat;
+   double to_ll_lon;
    int count_in_grid = 0;
    clock_t start_clock =  clock();
    int to_lat_count = to_grid.ny();
    int to_lon_count = to_grid.nx();
    int to_size  = to_lat_count * to_lon_count;
    int data_size  = from_lat_count * from_lon_count;
-   static const char *method_name = "get_grid_mapping(lats, lons) -> ";
+   static const char *method_name = "get_grid_mapping_latlon(lats, lons) -> ";
 
    auto to_cell_counts = new int[to_size];
    auto mapping_indices = new int[data_size];
@@ -2082,13 +2122,18 @@ static void get_grid_mapping_latlon(
    //Count the number of cells to be mapped to TO_GRID
    //Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
    for (int yIdx=0; yIdx<from_lat_count; yIdx++) {
+      int lat_offset = yIdx;
       for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
+         int lon_offset = xIdx;
          int coord_offset = from_dp.two_to_one(xIdx, yIdx, to_north);
-         if( skip_times != nullptr && skip_times[coord_offset] ) continue;
-         float lat = latitudes[coord_offset];
-         float lon = longitudes[coord_offset];
+         if (is_2d) {
+            lon_offset = lat_offset = coord_offset;
+            if( skip_times != 0 && skip_times[coord_offset] ) continue;
+         }
+         float lat = latitudes[lat_offset];
+         float lon = longitudes[lon_offset];
          if( lat < MISSING_LATLON || lon < MISSING_LATLON ) continue;
-         to_grid.latlon_to_xy(lat, -1.0*lon, x, y);
+         to_grid.latlon_to_xy(lat, -1.0*rescale_lon(lon), x, y);
          int idx_x = nint(x);
          int idx_y = nint(y);
          if (0 <= idx_x && idx_x < to_lon_count && 0 <= idx_y && idx_y < to_lat_count) {
@@ -2097,16 +2142,17 @@ static void get_grid_mapping_latlon(
             to_cell_counts[to_offset] += 1;
             count_in_grid++;
             if(mlog.verbosity_level() >= 15) {
-               double to_lat, to_lon;
+               double to_lat;
+               double to_lon;
                to_grid.xy_to_latlon(idx_x, idx_y, to_lat, to_lon);
-               mlog << Debug(15) << method_name << " [" << xIdx << "," << yIdx << "] to " << coord_offset
-                    << " (" << lon << ", " << lat << ") to (" << (to_lon*-1) << ", " << to_lat << ")\n";
+               mlog << Debug(15) << method_name << " index: [" << xIdx << "," << yIdx << "] to " << coord_offset
+                    << " (" << lon << ", " << lat << ") to (" << rescale_lon(-1*to_lon) << ", " << to_lat << ")\n";
             }
          }
       }
    }
    mlog << Debug(LEVEL_FOR_PERFORMANCE+2) << method_name << "took "
-        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds for mapping cells\n";
+        << get_exe_duration(start_clock) << " seconds for mapping cells\n";
 
    // Count the mapping cells for each to_cell and prepare IntArray
    int max_count = 0;
@@ -2129,7 +2175,7 @@ static void get_grid_mapping_latlon(
       }
    }
    mlog << Debug(LEVEL_FOR_PERFORMANCE+1) << method_name << "took "
-        << (clock()-tmp_clock)/double(CLOCKS_PER_SEC)
+        << get_exe_duration(tmp_clock)
         << " seconds for extending IntArray (max_cells=" << max_count << ")\n";
 
    // Build cell mapping
@@ -2150,7 +2196,7 @@ static void get_grid_mapping_latlon(
    mlog << Debug(3) << method_name << "within grid: " << count_in_grid
         << " out of " << data_size << " (" << 1.0*count_in_grid/data_size*100 << "%)\n";
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
-        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+        << get_exe_duration(start_clock) << " seconds\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2158,7 +2204,8 @@ static void get_grid_mapping_latlon(
 static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping,
                              NcVar var_lat, NcVar var_lon, bool *skip_times) {
    bool status = false;
-   DataPlane from_dp, to_dp;
+   DataPlane from_dp;
+   DataPlane to_dp;
    ConcatString cur_coord_name;
    clock_t start_clock =  clock();
    static const char *method_name = "get_grid_mapping(var_lat, var_lon) -> ";
@@ -2167,7 +2214,14 @@ static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
    int to_lon_count = to_grid.nx();
    int from_lat_count = fr_grid.ny();
    int from_lon_count = fr_grid.nx();
-
+   if (0 == from_lat_count) {
+      int dim_offset = get_dim_count(&var_lat) - 1;
+      if (dim_offset < 0) dim_offset = 0;
+      from_lat_count = get_dim_size(&var_lat, dim_offset);
+      dim_offset = get_dim_count(&var_lon) - 2;
+      if (dim_offset < 0) dim_offset = 0;
+      from_lon_count = get_dim_size(&var_lon, dim_offset);
+   }
    // Override the from nx & ny from NetCDF if exists
    int data_size  = from_lat_count * from_lon_count;
    mlog << Debug(4) << method_name << "data_size (ny*nx): " << data_size
@@ -2190,15 +2244,17 @@ static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
    }
    else if (data_size > 0) {
       int last_idx = data_size - 1;
-      auto latitudes  = new float[data_size];
-      auto longitudes = new float[data_size];
+      int lat_count = get_data_size(&var_lat);
+      int lon_count = get_data_size(&var_lon);
+      auto latitudes  = new float[lat_count];
+      auto longitudes = new float[lon_count];
       status = get_nc_data(&var_lat, latitudes);
       if( status ) status = get_nc_data(&var_lon, longitudes);
       if( status ) {
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping,
                                  latitudes, longitudes, from_lat_count,
                                  from_lon_count, skip_times,
-                                 !fr_grid.get_swap_to_north());
+                                 !fr_grid.get_swap_to_north(), (lon_count==data_size));
 
          if (is_eq(latitudes[0], latitudes[last_idx]) ||
              is_eq(longitudes[0], longitudes[last_idx])) {
@@ -2212,7 +2268,7 @@ static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
       if( longitudes ) delete [] longitudes;
    }   //  if data_size > 0
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
-        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+        << get_exe_duration(start_clock) << " seconds\n";
    return status;
 }
 
@@ -2272,7 +2328,8 @@ static ConcatString get_goes_grid_input(MetConfig config, const Grid fr_grid) {
 static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping,
                              const ConcatString &geostationary_file) {
    static const char *method_name = "get_grid_mapping() -> ";
-   DataPlane from_dp, to_dp;
+   DataPlane from_dp;
+   DataPlane to_dp;
    ConcatString cur_coord_name;
 
    clock_t start_clock =  clock();
@@ -2317,6 +2374,8 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
    to_dp.set_size(to_lon_count, to_lat_count);
 
    if (data_size > 0) {
+      int lat_count = data_size;
+      int lon_count = data_size;
       auto latitudes  = (float *)nullptr;
       auto longitudes = (float *)nullptr;
       auto latitudes_buf  = (float *)nullptr;
@@ -2338,6 +2397,8 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
             NcVar var_lat = get_nc_var(coord_nc_in, var_name_lat);
             NcVar var_lon = get_nc_var(coord_nc_in, var_name_lon);
             if (IS_VALID_NC(var_lat) && IS_VALID_NC(var_lon)) {
+               lat_count = get_data_size(&var_lat);
+               lon_count = get_data_size(&var_lon);
                get_nc_data(&var_lat, latitudes);
                get_nc_data(&var_lon, longitudes);
             }
@@ -2394,16 +2455,14 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
             }
          }
       }
-      else {
-         if (fr_grid.info().gi) {
-            grid_data.copy(fr_grid.info().gi);
-            grid_data.compute_lat_lon();
-            latitudes = grid_data.lat_values;
-            longitudes = grid_data.lon_values;
-            if (!file_exists(geostationary_file.c_str())) {
-               save_geostationary_data(geostationary_file,
-                     latitudes, longitudes, grid_data);
-            }
+      else if (fr_grid.info().gi) {
+         grid_data.copy(fr_grid.info().gi);
+         grid_data.compute_lat_lon();
+         latitudes = grid_data.lat_values;
+         longitudes = grid_data.lon_values;
+         if (!file_exists(geostationary_file.c_str())) {
+            save_geostationary_data(geostationary_file,
+                  latitudes, longitudes, grid_data);
          }
       }
       if (nullptr == latitudes) {
@@ -2418,7 +2477,7 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
          check_lat_lon(data_size, latitudes, longitudes);
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping, latitudes,
                                  longitudes, from_lat_count, from_lon_count, nullptr,
-                                 !fr_grid.get_swap_to_north());
+                                 !fr_grid.get_swap_to_north(), (lon_count==data_size));
       }
 
       if (latitudes_buf)  delete [] latitudes_buf;
@@ -2431,7 +2490,7 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
    if(coord_nc_in) delete coord_nc_in;
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
-        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+        << get_exe_duration(start_clock) << " seconds\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2831,7 +2890,7 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
    }
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
-        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+        << get_exe_duration(start_clock) << " seconds\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2900,7 +2959,7 @@ static void save_geostationary_data(const ConcatString geostationary_file,
    delete nc_file;  nc_file = nullptr;
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
-        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
+        << get_exe_duration(start_clock) << " seconds\n";
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -292,7 +292,8 @@ void ModeExecutive::setup_traditional_fcst_obs_data()
    if ( !(fcst_mtddf->grid() == grid) )  {
       mlog << Debug(1)
            << "Regridding forecast " << engine.conf_info.Fcst->var_info->magic_str()
-           << " to the verification grid.\n";
+           << " to the verification grid using "
+           << engine.conf_info.Fcst->var_info->regrid().get_str() << ".\n";
       Fcst_sd.data = met_regrid(Fcst_sd.data, fcst_mtddf->grid(), grid,
                                 engine.conf_info.Fcst->var_info->regrid());
    }
@@ -302,7 +303,8 @@ void ModeExecutive::setup_traditional_fcst_obs_data()
    if ( !(obs_mtddf->grid() == grid) )  {
       mlog << Debug(1)
            << "Regridding observation " << engine.conf_info.Obs->var_info->magic_str()
-           << " to the verification grid.\n";
+           << " to the verification grid using "
+           << engine.conf_info.Obs->var_info->regrid().get_str() << ".\n";
       Obs_sd.data = met_regrid(Obs_sd.data, obs_mtddf->grid(), grid,
                                engine.conf_info.Obs->var_info->regrid());
    }
@@ -454,7 +456,8 @@ void ModeExecutive::setup_multivar_fcst_data(const Grid &verification_grid,
    if ( !(input._grid == grid) ) {
       mlog << Debug(1)
            << "Regridding forecast " << engine.conf_info.Fcst->var_info->magic_str()
-           << " to the verification grid.\n";
+           << " to the verification grid using "
+           << engine.conf_info.Fcst->var_info->regrid().get_str() << ".\n";
       Fcst_sd.data = met_regrid(Fcst_sd.data, input._grid, grid, 
                                 engine.conf_info.Fcst->var_info->regrid());
    }
@@ -520,7 +523,8 @@ void ModeExecutive::setup_multivar_obs_data(const Grid &verification_grid,
    if ( !(input._grid == grid) )  {
       mlog << Debug(1)
            << "Regridding observation " << engine.conf_info.Obs->var_info->magic_str()
-           << " to the verification grid.\n";
+           << " to the verification grid using "
+           << engine.conf_info.Obs->var_info->regrid().get_str() << ".\n";
       Obs_sd.data = met_regrid(Obs_sd.data, input._grid, grid,
                                engine.conf_info.Obs->var_info->regrid());
    }

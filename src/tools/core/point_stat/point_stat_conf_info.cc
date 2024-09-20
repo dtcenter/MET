@@ -197,7 +197,8 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    vx_opt = new PointStatVxOpt [n_vx];
 
    // Check for consistent number of climatology fields
-   check_climo_n_vx(&conf, n_vx);
+   check_climo_n_vx(fdict, n_vx);
+   check_climo_n_vx(odict, n_vx);
 
    // Conf: threshold for SEEPS p1
    seeps_p1_thresh = conf.lookup_thresh(conf_key_seeps_p1_thresh);

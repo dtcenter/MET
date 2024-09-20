@@ -122,32 +122,18 @@ void write_header_row(const char * const * cols, int n_cols, int hdr_flag,
 
 void write_mctc_header_row(int hdr_flag, int n_cat, AsciiTable &at,
                            int r, int c) {
-   int i, j, col;
-   ConcatString cs;
 
    // Write the header column names if requested
    if(hdr_flag) {
-      for(i=0; i<n_header_columns; i++)
+      for(int i=0; i<n_header_columns; i++)
          at.set_entry(r, i+c, (string)hdr_columns[i]);
 
       c += n_header_columns;
    }
 
    // Write the columns names specific to the MCTC line type
-   at.set_entry(r, c+0, (string)mctc_columns[0]);
-   at.set_entry(r, c+1, (string)mctc_columns[1]);
-
-   // Write Fi_Oj for each cell of the NxN table
-   for(i=0, col=c+2; i<n_cat; i++) {
-      for(j=0; j<n_cat; j++) {
-         cs.format("F%i_O%i", i+1, j+1);
-         at.set_entry(r, col, cs); // Fi_Oj
-         col++;
-      }
-   }
-
-   at.set_entry(r, col, (string)mctc_columns[3]);
-   col++;
+   StringArray sa(get_mctc_columns(n_cat));
+   for(int i=0; i<sa.n(); i++) at.set_entry(r, c+i, sa[i]);
 
    return;
 }
@@ -156,42 +142,18 @@ void write_mctc_header_row(int hdr_flag, int n_cat, AsciiTable &at,
 
 void write_pct_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
                           int r, int c) {
-   int i, col;
-   ConcatString tmp_str;
 
    // Write the header column names if requested
    if(hdr_flag) {
-      for(i=0; i<n_header_columns; i++)
+      for(int i=0; i<n_header_columns; i++)
          at.set_entry(r, i+c, (string)hdr_columns[i]);
 
       c += n_header_columns;
    }
 
    // Write the columns names specific to the PCT line type
-   at.set_entry(r, c+0, (string)pct_columns[0]);
-   at.set_entry(r, c+1, (string)pct_columns[1]);
-
-   // Write THRESH_i, OY_i, ON_i for each row of the Nx2 table
-   for(i=0, col=c+2; i<n_thresh-1; i++) {
-
-      tmp_str.format("%s%i", pct_columns[2], i+1);
-      at.set_entry(r, col, tmp_str); // Threshold
-      col++;
-
-      tmp_str.format("%s%i", pct_columns[3], i+1);
-      at.set_entry(r, col, tmp_str); // Event Count (OY)
-      col++;
-
-      tmp_str.format("%s%i", pct_columns[4], i+1);
-      at.set_entry(r, col, tmp_str); // Non-Event Count (ON)
-      col++;
-   }
-
-   // Write out the last threshold
-   if(n_thresh >= 1) {
-      tmp_str.format("%s%i", pct_columns[2], n_thresh);
-      at.set_entry(r, col, tmp_str);    // Threshold
-   }
+   StringArray sa(get_pct_columns(n_thresh));
+   for(int i=0; i<sa.n(); i++) at.set_entry(r, c+i, sa[i]);
 
    return;
 }
@@ -488,10 +450,8 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    at.set_entry(r, c+17+n_ens, (string)orank_columns[18]);
    at.set_entry(r, c+18+n_ens, (string)orank_columns[19]);
    at.set_entry(r, c+19+n_ens, (string)orank_columns[20]);
-   /* MET #2924 Uncomment this section
    at.set_entry(r, c+20+n_ens, (string)orank_columns[21]);
    at.set_entry(r, c+21+n_ens, (string)orank_columns[22]);
-   */
 
    return;
 }
@@ -524,6 +484,66 @@ void write_relp_header_row(int hdr_flag, int n_ens, AsciiTable &at,
 
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+StringArray get_mctc_columns(int n_cat) {
+   StringArray sa;
+
+   // Add leading fixed columns
+   sa.add(mctc_columns[0]);
+   sa.add(mctc_columns[1]);
+
+   // Write Fi_Oj for each cell of the NxN table
+   for(int i=0; i<n_cat; i++) {
+      for(int j=0; j<n_cat; j++) {
+         ConcatString cs;
+         cs.format("F%i_O%i", i+1, j+1);
+         sa.add(cs);
+      }
+   }
+
+   // Add trailing fixed column
+   sa.add(mctc_columns[3]);
+
+   return sa;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+StringArray get_pct_columns(int n_thresh) {
+   StringArray sa;
+   ConcatString cs;
+
+   // Add leading fixed columns
+   sa.add(pct_columns[0]);
+   sa.add(pct_columns[1]);
+
+   // Write THRESH_i, OY_i, ON_i for each row of the Nx2 table
+   for(int i=0; i<n_thresh-1; i++) {
+
+      // Threshold (THRESH_i)
+      cs.format("%s%i", pct_columns[2], i+1);
+      sa.add(cs);
+
+      // Event Count (OY_i)
+      cs.format("%s%i", pct_columns[3], i+1);
+      sa.add(cs);
+
+      // Non-Event Count (ON_i)
+      cs.format("%s%i", pct_columns[4], i+1);
+      sa.add(cs);
+   }
+
+   // Write out the last threshold
+   if(n_thresh >= 1) {
+      cs.format("%s%i", pct_columns[2], n_thresh);
+      sa.add(cs);
+   }
+
+   return sa;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -4126,13 +4146,11 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
    at.set_entry(r, c+12, // Observation Climatological CDF Value
       pd_ptr->ocdf_na[i]);
 
-/* MET #2924 Uncomment this section
    at.set_entry(r, c+13, // Forecast Climatological Mean Value
       pd_ptr->fcmn_na[i]);
 
    at.set_entry(r, c+14, // Forecast Climatological Standard Deviation Value
       pd_ptr->fcsd_na[i]);
-*/
 
    return;
 }
@@ -4589,7 +4607,6 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    at.set_entry(r, c+19+pd_ptr->n_ens,
       pd_ptr->ocsd_na[i]);
 
-/* MET #2924 Uncomment this section
    // Forecast climatology mean values
    at.set_entry(r, c+20+pd_ptr->n_ens,
       pd_ptr->fcmn_na[i]);
@@ -4597,7 +4614,6 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    // Forecast climatology standard deviation values
    at.set_entry(r, c+21+pd_ptr->n_ens,
       pd_ptr->fcsd_na[i]);
-*/
 
    return;
 }
@@ -4614,7 +4630,7 @@ void write_ssvar_cols(const PairDataEnsemble *pd_ptr, int i,
    //
    cnt_info.allocate_n_alpha(1);
    cnt_info.alpha[0] = alpha;
-   compute_cntinfo(pd_ptr->ssvar_bins[i].sl1l2_info, 0, cnt_info);
+   compute_cntinfo(pd_ptr->ssvar_bins[i].sl1l2_info, cnt_info);
 
    //
    // Ensemble spread/skill variance bins

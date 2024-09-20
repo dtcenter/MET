@@ -649,7 +649,8 @@ void process_fcst_climo_files() {
          mlog << Debug(1)
               << "Regridding " << fcst_dpa.n_planes()
               << " forecast field(s) for " << fcst_info->magic_str()
-              << " to the verification grid.\n";
+              << " to the verification grid using "
+              << fcst_info->regrid().get_str() << ".\n";
 
          // Loop through the forecast fields
          for(j=0; j<fcst_dpa.n_planes(); j++) {
@@ -667,19 +668,27 @@ void process_fcst_climo_files() {
 
       // Read forecast climatology data
       fcmn_dpa = read_climo_data_plane_array(
-                    conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
-                    i, fcst_dpa[0].valid(), grid);
+                    conf_info.conf.lookup_dictionary(conf_key_fcst),
+                    conf_key_climo_mean,
+                    i, fcst_dpa[0].valid(), grid,
+                    "forecast climatology mean");
       fcsd_dpa = read_climo_data_plane_array(
-                    conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
-                    i, fcst_dpa[0].valid(), grid);
+                    conf_info.conf.lookup_dictionary(conf_key_fcst),
+                    conf_key_climo_stdev,
+                    i, fcst_dpa[0].valid(), grid,
+                    "forecast climatology standard deviation");
 
       // Read observation climatology data
       ocmn_dpa = read_climo_data_plane_array(
-                    conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
-                    i, fcst_dpa[0].valid(), grid);
+                    conf_info.conf.lookup_dictionary(conf_key_obs),
+                    conf_key_climo_mean,
+                    i, fcst_dpa[0].valid(), grid,
+                    "observation climatology mean");
       ocsd_dpa = read_climo_data_plane_array(
-                    conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
-                    i, fcst_dpa[0].valid(), grid);
+                    conf_info.conf.lookup_dictionary(conf_key_obs),
+                    conf_key_climo_stdev,
+                    i, fcst_dpa[0].valid(), grid,
+                    "observation climatology standard deviation");
 
       // Store data for the current verification task
       conf_info.vx_opt[i].vx_pd.set_fcst_dpa(fcst_dpa);

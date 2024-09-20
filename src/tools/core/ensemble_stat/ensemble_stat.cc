@@ -633,7 +633,8 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
       if(do_regrid && !(mtddf->grid() == grid)) {
          mlog << Debug(1)
               << "Regridding field \"" << info->magic_str()
-              << "\" to the verification grid.\n";
+              << "\" to the verification grid using "
+              << info->regrid().get_str() << ".\n";
          dp = met_regrid(dp, mtddf->grid(), grid, info->regrid());
       }
 
@@ -691,7 +692,8 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
          mlog << Debug(1)
               << "Regridding " << dpa.n_planes()
               << " field(s) \"" << info->magic_str()
-              << "\" to the verification grid.\n";
+              << "\" to the verification grid using "
+              << info->regrid().get_str() << ".\n";
 
          // Loop through the forecast fields
          for(i=0; i<dpa.n_planes(); i++) {
@@ -783,19 +785,27 @@ void process_point_vx() {
 
       // Read forecast climatology data
       fcmn_dpa = read_climo_data_plane_array(
-                    conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
-                    i, ens_valid_ut, grid);
+                    conf_info.conf.lookup_dictionary(conf_key_fcst),
+                    conf_key_climo_mean,
+                    i, ens_valid_ut, grid,
+                    "forecast climatology mean");
       fcsd_dpa = read_climo_data_plane_array(
-                   conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
-                   i, ens_valid_ut, grid);
+                    conf_info.conf.lookup_dictionary(conf_key_fcst),
+                    conf_key_climo_stdev,
+                    i, ens_valid_ut, grid,
+                    "forecast climatology standard deviation");
 
       // Read observation climatology data
       ocmn_dpa = read_climo_data_plane_array(
-                    conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
-                    i, ens_valid_ut, grid);
+                    conf_info.conf.lookup_dictionary(conf_key_obs),
+                    conf_key_climo_mean,
+                    i, ens_valid_ut, grid,
+                    "observation climatology mean");
       ocsd_dpa = read_climo_data_plane_array(
-                   conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
-                   i, ens_valid_ut, grid);
+                    conf_info.conf.lookup_dictionary(conf_key_obs),
+                    conf_key_climo_stdev,
+                    i, ens_valid_ut, grid,
+                    "observation climatology standard deviation");
 
       mlog << Debug(3)
            << "For " << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str() << ", found "
@@ -1423,19 +1433,27 @@ void process_grid_vx() {
 
       // Read forecast climatology data
       fcmn_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_fcst_climo_mean_field, false),
-                   i, ens_valid_ut, grid);
+                   conf_info.conf.lookup_dictionary(conf_key_fcst),
+                   conf_key_climo_mean,
+                   i, ens_valid_ut, grid,
+                   "forecast climatology mean");
       fcsd_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_fcst_climo_stdev_field, false),
-                   i, ens_valid_ut, grid);
+                   conf_info.conf.lookup_dictionary(conf_key_fcst),
+                   conf_key_climo_stdev,
+                   i, ens_valid_ut, grid,
+                   "forecast climatology standard deviation");
 
       // Read observation climatology data
       ocmn_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_obs_climo_mean_field, false),
-                   i, ens_valid_ut, grid);
+                   conf_info.conf.lookup_dictionary(conf_key_obs),
+                   conf_key_climo_mean,
+                   i, ens_valid_ut, grid,
+                   "observation climatology mean");
       ocsd_dp = read_climo_data_plane(
-                   conf_info.conf.lookup_array(conf_key_obs_climo_stdev_field, false),
-                   i, ens_valid_ut, grid);
+                   conf_info.conf.lookup_dictionary(conf_key_obs),
+                   conf_key_climo_stdev,
+                   i, ens_valid_ut, grid,
+                   "observation climatology standard deviation");
 
       mlog << Debug(3)
            << "For " << conf_info.vx_opt[i].vx_pd.fcst_info->magic_str() << ", found "

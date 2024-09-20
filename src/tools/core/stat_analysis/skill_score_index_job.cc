@@ -245,17 +245,17 @@ SSIDXData SSIndexJobInfo::compute_ss_index() {
 
       // Continuous stats
       if(job_lt[i] == STATLineType::sl1l2) {
-         compute_cntinfo(fcst_sl1l2[i], 0, fcst_cnt);
+         compute_cntinfo(fcst_sl1l2[i], fcst_cnt);
          fcst_stat = fcst_cnt.get_stat(fcst_job[i].column[0].c_str());
-         compute_cntinfo(ref_sl1l2[i], 0, ref_cnt);
+         compute_cntinfo(ref_sl1l2[i], ref_cnt);
          ref_stat = ref_cnt.get_stat(fcst_job[i].column[0].c_str());
       }
       // Categorical stats
       else if(job_lt[i] == STATLineType::ctc) {
          fcst_cts[i].compute_stats();
-         fcst_stat = fcst_cts[i].get_stat(fcst_job[i].column[0].c_str());
+         fcst_stat = fcst_cts[i].get_stat_cts(fcst_job[i].column[0].c_str());
          ref_cts[i].compute_stats();
-         ref_stat = ref_cts[i].get_stat(fcst_job[i].column[0].c_str());
+         ref_stat = ref_cts[i].get_stat_cts(fcst_job[i].column[0].c_str());
       }
       else {
          mlog << Error << "\nSSIndexJobInfo::compute_ss_index() -> "

@@ -29,7 +29,7 @@ using namespace std;
 static void read_climo_file(
           const char *, GrdFileType, Dictionary *, unixtime,
           int, int, const Grid &, const RegridInfo &,
-          DataPlaneArray &dpa);
+          DataPlaneArray &dpa, const char *);
 
 static DataPlaneArray climo_time_interp(
           const DataPlaneArray &, int, unixtime, InterpMthd);
@@ -39,8 +39,12 @@ static DataPlane climo_hms_interp(
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlane read_climo_data_plane(Dictionary *dict, int i_vx,
-                                unixtime vld_ut, const Grid &vx_grid) {
+DataPlane read_climo_data_plane(Dictionary *dict,
+                                const char *entry_name,
+                                int i_vx,
+                                unixtime vld_ut,
+                                const Grid &vx_grid,
+                                const char *desc) {
    DataPlane dp;
    DataPlaneArray dpa;
 
@@ -48,13 +52,14 @@ DataPlane read_climo_data_plane(Dictionary *dict, int i_vx,
    if(!dict) return dp;
 
    // Read array of climatology fields
-   dpa = read_climo_data_plane_array(dict, i_vx, vld_ut, vx_grid);
+   dpa = read_climo_data_plane_array(dict, entry_name, i_vx,
+                                     vld_ut, vx_grid, desc);
 
    // Check for multiple matches
    if(dpa.n_planes() > 1) {
       mlog << Warning << "\nread_climo_data_plane() -> "
-           << "Found " << dpa.n_planes() << " matching climatology "
-           << "fields.  Using the first match found.\n\n";
+           << "Found " << dpa.n_planes() << " matching " << desc
+           << " fields. Using the first match found.\n\n";
    }
 
    // Store the first match found
@@ -65,80 +70,120 @@ DataPlane read_climo_data_plane(Dictionary *dict, int i_vx,
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
+DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
+                                           const char *climo_name,
+                                           int i_vx,
                                            unixtime vld_ut,
-                                           const Grid &vx_grid) {
+                                           const Grid &vx_grid,
+                                           const char *desc) {
+
+   const char *method_name = "read_climo_data_plane_array() -> ";
+
+   //
+   // Parse each of the climatology configuration entries separately
+   // using the "climo_name.entry_name" scope notation. Use the value
+   // from the specified dictionary (e.g. "fcst.climo_mean") if found,
+   // or use the value from the parent dictionary (e.g. top-level config
+   // "climo_mean") if not found.
+   //
    DataPlaneArray dpa;
-   StringArray climo_files;
-   RegridInfo regrid_info;
-   InterpMthd time_interp;
-   GrdFileType ctype;
-   double day_interval, hour_interval;
-   int i, day_ts, hour_ts;
+   ConcatString cs;
 
    // Check for null
    if(!dict) return dpa;
 
-   // Get the i-th array entry
-   Dictionary i_dict = parse_conf_i_vx_dict(dict, i_vx);
+   // Parse the "file_name" array entry
+   cs << cs_erase << climo_name << "." << conf_key_file_name;
+   StringArray climo_files(dict->lookup_string_array(cs.c_str()));
 
-   // Climatology mean and standard deviation files
-   climo_files = i_dict.lookup_string_array(conf_key_file_name, false);
-
-   // Check for at least one file
+   // Check for at least one input file
    if(climo_files.n() == 0) return dpa;
 
-   // Regrid info
-   regrid_info = parse_conf_regrid(&i_dict);
+   // Parse the "field" array entry
+   cs << cs_erase << climo_name << "." << conf_key_field;
+   Dictionary *field_dict = dict->lookup_array(cs.c_str(), false);
 
-   // Time interpolation
-   time_interp = int_to_interpmthd(i_dict.lookup_int(conf_key_time_interp_method));
+   // Determine which climo array entry to use 
+   int i_climo_field = bad_data_int;
+        if(field_dict->n_entries() == 0) return dpa;
+   else if(field_dict->n_entries() == 1) i_climo_field = 0;
+   else i_climo_field = i_vx; 
 
-   // Day interval
-   day_interval = i_dict.lookup_double(conf_key_day_interval);
+   // Parse the climo dictionary
+   Dictionary i_dict = parse_conf_i_vx_dict(field_dict, i_climo_field);
 
-   // Range check day_interval
+   // Parse the "regrid" dictionary from the top-level
+   // config file context (e.g. "config.climo_mean.regrid")
+   // to serve as the default.
+   RegridInfo regrid_default = parse_conf_regrid(
+                                  dict->parent()->lookup_dictionary(climo_name, false));
+
+   // Parse the "time_interp_method"
+   cs << cs_erase << climo_name << "." << conf_key_time_interp_method;
+   InterpMthd time_interp = int_to_interpmthd(dict->lookup_int(cs.c_str()));
+
+   // Parse the "day_interval" value
+   cs << cs_erase << climo_name << "." << conf_key_day_interval;
+   double day_interval = dict->lookup_double(cs.c_str());
+
+   // Range check day_interval value
    if(!is_bad_data(day_interval) && day_interval < 1) {
-      mlog << Error << "\nread_climo_data_plane_array() -> "
-           << "The \"" << conf_key_day_interval << "\" entry ("
+      mlog << Error << "\n" << method_name
+           << "The " << conf_key_day_interval << " entry ("
            << day_interval << ") can be set to " << na_str
            << " or a value of at least 1.\n\n";
       exit(1);
    }
 
-   // Hour interval
-   hour_interval = i_dict.lookup_double(conf_key_hour_interval);
+   // Parse the "hour_interval" value
+   cs << cs_erase << climo_name << "." << conf_key_hour_interval;
+   double hour_interval = dict->lookup_double(cs.c_str());
 
    // Range check hour_interval
    if(!is_bad_data(hour_interval) &&
       (hour_interval <= 0 || hour_interval > 24)) {
-      mlog << Error << "\nread_climo_data_plane_array() -> "
-           << "The \"" << conf_key_hour_interval << "\" entry ("
+      mlog << Error << "\n" << method_name
+           << "The " << conf_key_hour_interval << " entry ("
            << hour_interval << ") can be set to " << na_str
            << " or a value between 0 and 24.\n\n";
       exit(1);
    }
 
-   // Check if file_type was specified
-   ctype = parse_conf_file_type(&i_dict);
+   // Log search criteria
+   if(mlog.verbosity_level() >= 5) {
+      mlog << Debug(5)
+           << "Searching " << climo_files.n()
+           << " file(s) for " << desc
+           << " data using climo_name = " << climo_name
+           << ", i_vx = " << i_vx
+           << ", valid time = " << unix_to_yyyymmdd_hhmmss(vld_ut)
+           << ", time_interp = " << interpmthd_to_string(time_interp)
+           << ", day_interval = " << day_interval
+           << ", hour_interval = " << hour_interval
+           << "\n";
+   }
 
    // Store the time steps in seconds
-   day_ts  = (is_bad_data(day_interval) ? bad_data_int :
-              nint(day_interval * 24.0 * sec_per_hour));
-   hour_ts = (is_bad_data(hour_interval) ? bad_data_int :
-              nint(hour_interval * sec_per_hour));
-   
+   int day_ts  = (is_bad_data(day_interval) ? bad_data_int :
+                  nint(day_interval * 24.0 * sec_per_hour));
+   int hour_ts = (is_bad_data(hour_interval) ? bad_data_int :
+                  nint(hour_interval * sec_per_hour));
+
+   // Check if file_type was specified
+   GrdFileType ctype = parse_conf_file_type(&i_dict);
+
    // Search the files for the requested records
-   for(i=0; i<climo_files.n(); i++) {
+   for(int i=0; i<climo_files.n(); i++) {
       read_climo_file(climo_files[i].c_str(), ctype, &i_dict, vld_ut,
-                      day_ts, hour_ts, vx_grid, regrid_info, dpa);
+                      day_ts, hour_ts, vx_grid, regrid_default, dpa, desc);
    }
-   
+
    // Time interpolation for climo fields
    dpa = climo_time_interp(dpa, day_ts, vld_ut, time_interp);
 
    mlog << Debug(3)
-        << "Found " << dpa.n_planes() << " climatology fields.\n";
+        << "Found " << dpa.n_planes() << " " << desc
+        << " fields.\n";
 
    return dpa;
 }
@@ -148,8 +193,8 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict, int i_vx,
 void read_climo_file(const char *climo_file, GrdFileType ctype,
                      Dictionary *dict, unixtime vld_ut,
                      int day_ts, int hour_ts, const Grid &vx_grid,
-                     const RegridInfo &regrid_info,
-                     DataPlaneArray &dpa) {
+                     const RegridInfo &regrid_default,
+                     DataPlaneArray &dpa, const char *desc) {
 
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
@@ -167,13 +212,14 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
    // Allocate memory for data file
    if(!(mtddf = mtddf_factory.new_met_2d_data_file(climo_file, ctype))) {
       mlog << Warning << "\nread_climo_file() -> "
-           << "Trouble reading climatology file \""
-           << climo_file << "\"\n\n";
+           << "Trouble reading climatology file "
+           << climo_file << "\n\n";
       return;
    }
 
    // Parse the variable name and level
    info = info_factory.new_var_info(mtddf->file_type());
+   info->set_default_regrid(regrid_default);
    info->set_dict(*dict);
 
    // Read data planes
@@ -191,21 +237,21 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
 
       // Check the day time step
       if(!is_bad_data(day_ts) && abs(day_diff_sec) >= day_ts) {
-         mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
-              << "\" climatology field with " << day_diff_sec / sec_per_day
+         mlog << Debug(3) << "Skipping " << clm_ut_cs << " " << info->magic_str()
+              << " climatology field with " << day_diff_sec / sec_per_day
               << " day offset (" << conf_key_day_interval << " = "
-              << day_ts / sec_per_day << ") from file \""
-              << climo_file << "\".\n";
+              << day_ts / sec_per_day << ") from file "
+              << climo_file << ".\n";
          continue;
       }
 
       // Check the hour time step
       if(!is_bad_data(hour_ts) && abs(hms_diff_sec) >= hour_ts) {
-         mlog << Debug(3) << "Skipping " << clm_ut_cs << " \"" << info->magic_str()
-              << "\" climatology field with " << (double) hms_diff_sec / sec_per_hour
+         mlog << Debug(3) << "Skipping " << clm_ut_cs << " " << info->magic_str()
+              << " climatology field with " << (double) hms_diff_sec / sec_per_hour
               << " hour offset (" << conf_key_hour_interval << " = "
-              << hour_ts / sec_per_hour << ") from file \""
-              << climo_file << "\".\n";
+              << hour_ts / sec_per_hour << ") from file "
+              << climo_file << ".\n";
          continue;
       }
 
@@ -213,19 +259,20 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
       unixtime clm_vld_ut = vld_ut + day_diff_sec + hms_diff_sec;
 
       // Print log message for matching record
-      mlog << Debug(3) << "Storing " << clm_ut_cs << " \"" << info->magic_str()
-           << "\" climatology field with " << day_diff_sec / sec_per_day
+      mlog << Debug(3) << "Storing " << clm_ut_cs << " " << info->magic_str()
+           << " climatology field with " << day_diff_sec / sec_per_day
            << " day, " << (double) hms_diff_sec / sec_per_hour << " hour offset as time "
-           << unix_to_yyyymmdd_hhmmss(clm_vld_ut) << " from file \""
-           << climo_file << "\".\n";
+           << unix_to_yyyymmdd_hhmmss(clm_vld_ut) << " from file "
+           << climo_file << ".\n";
 
       // Regrid, if needed
       if(!(mtddf->grid() == vx_grid)) {
-         mlog << Debug(2) << "Regridding " << clm_ut_cs << " \""
-              << info->magic_str()
-              << "\" climatology field to the verification grid.\n";
+         mlog << Debug(2) << "Regridding " << clm_ut_cs << " "
+              << desc << " field " << info->magic_str()
+              << " to the verification grid using "
+              << info->regrid().get_str() << ".\n";
          dp = met_regrid(clm_dpa[i], mtddf->grid(), vx_grid,
-                         regrid_info);
+                         info->regrid());
       }
       else {
          dp = clm_dpa[i];
@@ -343,8 +390,8 @@ DataPlaneArray climo_time_interp(const DataPlaneArray &dpa, int day_ts,
          // This should only occur when day_interval > 1.
          if(day_ts <= 3600*24) {
             mlog << Error << "\nclimo_time_interp() -> "
-                 << "Expecting 1 or 2 climatology fields when \""
-                 << conf_key_day_interval << "\" <= 1 but found "
+                 << "Expecting 1 or 2 climatology fields when "
+                 << conf_key_day_interval << " <= 1 but found "
                  << it->second.n() << "\n\n";
             exit(1);
          }

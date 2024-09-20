@@ -61,7 +61,7 @@ jobs:
         run: .github/jobs/build_sonarqube_image.sh
         env:
           MET_BASE_REPO: met-base
-          MET_BASE_TAG: v3.2
+          MET_BASE_TAG: v3.3
           SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
           WD_REFERENCE_BRANCH: ${{ github.event.inputs.reference_branch }}
           SONAR_SCANNER_VERSION: 5.0.1.3006

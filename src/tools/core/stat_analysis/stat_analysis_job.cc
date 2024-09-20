@@ -1876,10 +1876,7 @@ void write_job_aggr_psum(STATAnalysisJob &job, STATLineType lt,
          //
          // Compute CNTInfo statistics from the aggregated partial sums
          //
-         if(it->second.sl1l2_info.scount > 0)
-            compute_cntinfo(it->second.sl1l2_info, 0, it->second.cnt_info);
-         else
-            compute_cntinfo(it->second.sl1l2_info, 1, it->second.cnt_info);
+         compute_cntinfo(it->second.sl1l2_info, it->second.cnt_info);
 
          if(job.stat_out) {
             write_cnt_cols(it->second.cnt_info, 0, job.stat_at,
@@ -2610,7 +2607,7 @@ void write_job_aggr_ssvar(STATAnalysisJob &job, STATLineType lt,
          //
          // Compute CNTInfo statistics from the aggregated partial sums
          //
-         compute_cntinfo(bin_it->second.sl1l2_info, 0, cnt_info);
+         compute_cntinfo(bin_it->second.sl1l2_info, cnt_info);
 
          //
          // Write the output STAT line

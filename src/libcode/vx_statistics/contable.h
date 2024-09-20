@@ -6,37 +6,28 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
-
 ////////////////////////////////////////////////////////////////////////
-
 
 #ifndef  __CONTINGENCY_TABLE_H__
 #define  __CONTINGENCY_TABLE_H__
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <iostream>
 
 #include "vx_util.h"
 #include "vx_math.h"
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-class TTContingencyTable;   //  forward reference
-
+// Forward reference
+class TTContingencyTable;
 
 ////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  general contingency table
-   //
-
+//
+// General contingency table
+//
+////////////////////////////////////////////////////////////////////////
 
 class ContingencyTable {
 
@@ -48,7 +39,8 @@ class ContingencyTable {
 
       int rc_to_n(int r, int c) const;
 
-      std::vector<int> *E;   //  this is really a two-dimensional array
+      // This is really a two-dimensional array (Nrows, Ncols)
+      std::vector<double> E;
 
       int Nrows;
       int Ncols;
@@ -71,73 +63,49 @@ class ContingencyTable {
 
       virtual void dump(std::ostream & out, int depth = 0) const;
 
-         //
-         //  condition on an event
-         //
-
-      TTContingencyTable condition_on(int) const;
-
-         //
-         //  set attributes
-         //
-
+      // Set attributes
       virtual void set_size(int);
       virtual void set_size(int NR, int NC);
 
       void set_ec_value(double);
       void set_name(const char *);
 
-         //
-         //  get attributes
-         //
-
+      // Get attributes
       int nrows() const;
       int ncols() const;
 
       double ec_value() const;
       ConcatString name() const;
 
-         //
-         //  set counts
-         //
+      // Set table entries
+      void set_entry(int row, int col, double value);
 
-      void set_entry(int row, int col, int value);
+      // Increment table entries
+      void inc_entry(int row, int col, double weight=1.0);
 
-         //
-         //  increment counts
-         //
+      // Get values
+      double total() const;
 
-      void inc_entry(int row, int col);
+      double row_total(int row) const;
+      double col_total(int col) const;
 
-         //
-         //  get counts
-         //
+      double entry(int row, int col) const;
 
-      int total() const;
+      double max() const;
+      double min() const;
 
-      int row_total(int row) const;
-      int col_total(int col) const;
+      bool is_integer() const;
 
-      int entry(int row, int col) const;
-
-      int  largest_entry() const;
-      int smallest_entry() const;
-
-         //
-         //  statistics
-         //
-
+      // Statistics
       virtual double gaccuracy () const;
       virtual double gheidke   () const;
       virtual double gheidke_ec(double) const;
       virtual double gkuiper   () const;
       virtual double gerrity   () const;
-
 };
 
 
 ////////////////////////////////////////////////////////////////////////
-
 
 inline int ContingencyTable::nrows() const { return Nrows; }
 inline int ContingencyTable::ncols() const { return Ncols; }
@@ -145,27 +113,23 @@ inline int ContingencyTable::ncols() const { return Ncols; }
 inline double       ContingencyTable::ec_value() const { return ECvalue; }
 inline ConcatString ContingencyTable::name()     const { return Name;    }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 static const int nx2_event_column     = 0;
 static const int nx2_nonevent_column  = 1;
 
-
 ////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  N x 2 contingency table
-   //
-
+//
+// N x 2 contingency table
+//
+////////////////////////////////////////////////////////////////////////
 
 class Nx2ContingencyTable : public ContingencyTable {
 
    private:
 
-      double * Thresholds;   //  N + 1 count, increasing
+      // N + 1 count, parametrically increasing or decreasing
+      std::vector<double> Thresholds;
 
       int value_to_row(double) const;
 
@@ -182,47 +146,36 @@ class Nx2ContingencyTable : public ContingencyTable {
 
       void clear();
 
-      void set_size(int NR);
-      void set_size(int NR, int NC);   //  NC had better be 2
+      void set_size(int NR) override;
+      void set_size(int NR, int NC) override; // NC must be 2
 
-      void set_thresholds(const double *);
+      void set_thresholds(const std::vector<double> &);
 
-         //
-         //  get thresholds
-         //
+      // Get thresholds
+      double threshold(int index) const; // 0 <= index <= Nrows
 
-      double threshold(int index) const;   //  0 <= index <= Nrows
+      // Increment table entries
+      void inc_event    (double value, double weight=1.0);
+      void inc_nonevent (double value, double weight=1.0);
 
-         //
-         //  increment counts
-         //
+      // Get table entries
+      double    event_count_by_thresh(double) const;
+      double nonevent_count_by_thresh(double) const;
 
-      void inc_event    (double);
-      void inc_nonevent (double);
+      double    event_count_by_row(int row) const;
+      double nonevent_count_by_row(int row) const;
 
-         //
-         //  get counts
-         //
+      // Set counts
+      void set_event(int row, double);
+      void set_nonevent(int row, double);
 
-      int    event_count_by_thresh(double) const;
-      int nonevent_count_by_thresh(double) const;
+      double n() const;
 
-      int    event_count_by_row(int row) const;
-      int nonevent_count_by_row(int row) const;
+      // Column totals
+      double    event_col_total() const;
+      double nonevent_col_total() const;
 
-      int n() const;
-
-         //
-         //  column totals
-         //
-
-      int    event_col_total() const;
-      int nonevent_col_total() const;
-
-         //
-         //  statistics
-         //
-
+      // Statistics
       double baser        () const;
       double baser_ci     (double alpha, double &cl, double &cu) const;
       double brier_score  () const;
@@ -245,27 +198,21 @@ class Nx2ContingencyTable : public ContingencyTable {
 
       TTContingencyTable ctc_by_row  (int row) const;
       double             roc_auc() const;
-
 };
 
-
 ////////////////////////////////////////////////////////////////////////
 
+inline double Nx2ContingencyTable::event_count_by_row    (int row) const { return entry(row, nx2_event_column); }
+inline double Nx2ContingencyTable::nonevent_count_by_row (int row) const { return entry(row, nx2_nonevent_column); }
 
-inline int Nx2ContingencyTable::event_col_total    () const { return col_total(nx2_event_column); }
-inline int Nx2ContingencyTable::nonevent_col_total () const { return col_total(nx2_nonevent_column); }
-
-inline int Nx2ContingencyTable::event_count_by_row    (int row) const { return entry(row, nx2_event_column); }
-inline int Nx2ContingencyTable::nonevent_count_by_row (int row) const { return entry(row, nx2_nonevent_column); }
-
+inline double Nx2ContingencyTable::event_col_total    () const { return col_total(nx2_event_column); }
+inline double Nx2ContingencyTable::nonevent_col_total () const { return col_total(nx2_nonevent_column); }
 
 ////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  2 x 2 contingency table
-   //
-
+//
+// 2 x 2 contingency table
+//
+////////////////////////////////////////////////////////////////////////
 
 class TTContingencyTable : public ContingencyTable {
 
@@ -276,63 +223,47 @@ class TTContingencyTable : public ContingencyTable {
       TTContingencyTable(const TTContingencyTable &);
       TTContingencyTable & operator=(const TTContingencyTable &);
 
-      void set_size(int);
-      void set_size(int NR, int NC);
+      void set_size(int) override;
+      void set_size(int NR, int NC) override;
 
-         //
-         //  set counts
-         //
+      // Set table entries
+      void set_fn_on(double);
+      void set_fy_on(double);
 
-      void set_fn_on(int);
-      void set_fy_on(int);
+      void set_fn_oy(double);
+      void set_fy_oy(double);
 
-      void set_fn_oy(int);
-      void set_fy_oy(int);
+      // Increment table entries
+      void inc_fn_on(double weight=1.0);
+      void inc_fy_on(double weight=1.0);
 
-         //
-         //  increment counts
-         //
+      void inc_fn_oy(double weight=1.0);
+      void inc_fy_oy(double weight=1.0);
 
-      void inc_fn_on();
-      void inc_fy_on();
+      //  Get table entries
+      double fn_on() const;
+      double fy_on() const;
 
-      void inc_fn_oy();
-      void inc_fy_oy();
+      double fn_oy() const;
+      double fy_oy() const;
 
-         //
-         //  get counts
-         //
+      double on() const;
+      double oy() const;
 
-      int fn_on() const;
-      int fy_on() const;
+      double fn() const;
+      double fy() const;
 
-      int fn_oy() const;
-      int fy_oy() const;
+      double n() const;
 
-      int on() const;
-      int oy() const;
+      //  FHO rates where:
+      //     f_rate = FY/N
+      //     h_rate = fy_oy/N
+      //     o_rate = OY/N
+      double f_rate() const;
+      double h_rate() const;
+      double o_rate() const;
 
-      int fn() const;
-      int fy() const;
-
-      int n() const;
-
-         //
-         //  FHO rates where:
-         //  f_rate = FY/N
-         //  h_rate = fy_oy/N
-         //  o_rate = OY/N
-         //
-
-      double f_rate    () const;
-      double h_rate    () const;
-      double o_rate    () const;
-
-         //
-         //  Raw counts as proportions of the
-         //  total count.
-         //
-
+      // Proportions of the total
       double fy_oy_tp  () const;
       double fy_on_tp  () const;
       double fn_oy_tp  () const;
@@ -344,31 +275,19 @@ class TTContingencyTable : public ContingencyTable {
       double oy_tp     () const;
       double on_tp     () const;
 
-         //
-         //  Raw counts as proportions of the
-         //  total forecast yes count.
-         //
-
+      // Proportions of forecast
       double fy_oy_fp () const;
       double fy_on_fp () const;
       double fn_oy_fp () const;
       double fn_on_fp () const;
 
-         //
-         //  Raw counts as proportions of the
-         //  total observation yes count.
-         //
-
+      // Proportions of observation
       double fy_oy_op () const;
       double fy_on_op () const;
       double fn_oy_op () const;
       double fn_on_op () const;
 
-         //
-         //  Contingency Table Statistics with confidence intervals
-         //  when applicable.
-         //
-
+      // Contingency Table Statistics and confidence intervals
       double baser      () const;
       double baser_ci   (double alpha, double &cl, double &cu) const;
       double fmean      () const;
@@ -409,26 +328,19 @@ class TTContingencyTable : public ContingencyTable {
       double cost_loss  (double) const;
 };
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 extern TTContingencyTable finley();
 
 extern TTContingencyTable finley_always_no();
 
-
 ////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  this is the layout on page 239 of
-   //
-   //   "Statistical Methods in the Atmospheric Sciences" (1st ed)
-   //
-   //     by Daniel S. Wilks
-   //
-
+//
+//  Reference page 239 of
+//     "Statistical Methods in the Atmospheric Sciences" (1st ed)
+//     by Daniel S. Wilks
+//
+////////////////////////////////////////////////////////////////////////
 
 static const int OY_col = 0;
 static const int ON_col = 1;
@@ -436,19 +348,15 @@ static const int ON_col = 1;
 static const int FY_row = 0;
 static const int FN_row = 1;
 
-
 ////////////////////////////////////////////////////////////////////////
 
+extern void calc_gerrity_scoring_matrix(int N, const std::vector<double> &p,
+                                                     std::vector<double> &s);
 
-extern void calc_gerrity_scoring_matrix(int N, const double * p, double * s);
-
+extern double compute_proportion(double, double);
 
 ////////////////////////////////////////////////////////////////////////
-
 
 #endif   //  __CONTINGENCY_TABLE_H__
 
-
 ////////////////////////////////////////////////////////////////////////
-
-

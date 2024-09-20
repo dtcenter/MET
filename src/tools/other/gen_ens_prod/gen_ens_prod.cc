@@ -468,16 +468,20 @@ void get_climo_mean_stdev(GenEnsProdVarInfo *ens_info, int i_var,
         << ens_info->get_var_info(i_ens)->magic_str() << "\".\n";
 
    cmn_dp = read_climo_data_plane(
-               conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
-               i_var, ens_valid_ut, grid);
+               conf_info.conf.lookup_dictionary(conf_key_ens),
+               conf_key_climo_mean,
+               i_var, ens_valid_ut, grid,
+               "ensemble climatology mean");
 
    mlog << Debug(4)
         << "Reading climatology standard deviation data for ensemble field \""
         << ens_info->get_var_info(i_ens)->magic_str() << "\".\n";
 
    csd_dp = read_climo_data_plane(
-               conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
-               i_var, ens_valid_ut, grid);
+               conf_info.conf.lookup_dictionary(conf_key_ens),
+               conf_key_climo_stdev,
+               i_var, ens_valid_ut, grid,
+               "ensemble climatology standard deviation");
 
    // Unset the MET_ENS_MEMBER_ID environment variable
    if(set_ens_mem_id) {
@@ -645,7 +649,8 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
       if(!(mtddf->grid() == grid)) {
          mlog << Debug(1)
               << "Regridding field \"" << info->magic_str()
-              << "\" to the verification grid.\n";
+              << "\" to the verification grid using "
+              << info->regrid().get_str() << ".\n";
          dp = met_regrid(dp, mtddf->grid(), grid, info->regrid());
       }
 

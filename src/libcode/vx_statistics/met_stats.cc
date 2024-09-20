@@ -425,41 +425,208 @@ void CTSInfo::compute_ci() {
 
 ////////////////////////////////////////////////////////////////////////
 
-double CTSInfo::get_stat(const char *stat_name) {
+void CTSInfo::set_stat_ctc(const string &stat_name, double v) {
+
+        if(stat_name == "FY_OY")    cts.set_fy_oy(nint(v));
+   else if(stat_name == "FY_ON")    cts.set_fy_on(nint(v));
+   else if(stat_name == "FN_OY")    cts.set_fn_oy(nint(v));
+   else if(stat_name == "FN_ON")    cts.set_fn_on(nint(v));
+   else if(stat_name == "EC_VALUE") cts.set_ec_value(v);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double CTSInfo::get_stat(STATLineType lt, const string &stat_name, int i_alpha) const {
+   double v = bad_data_double;
+
+   // Get statistic by line type
+        if(lt == STATLineType::fho) v = get_stat_fho(stat_name);
+   else if(lt == STATLineType::ctc) v = get_stat_ctc(stat_name);
+   else if(lt == STATLineType::cts) v = get_stat_cts(stat_name, i_alpha);
+   else {
+      mlog << Error << "\nCTSInfo::get_stat() -> "
+           << "unexpected line type \"" << statlinetype_to_string(lt)
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double CTSInfo::get_stat_fho(const string &stat_name) const {
    double v = bad_data_double;
 
    // Find the statistic by name
-        if(strcmp(stat_name, "TOTAL" ) == 0) v = cts.n();
-   else if(strcmp(stat_name, "BASER" ) == 0) v = cts.baser();
-   else if(strcmp(stat_name, "FMEAN" ) == 0) v = cts.fmean();
-   else if(strcmp(stat_name, "ACC"   ) == 0) v = cts.accuracy();
-   else if(strcmp(stat_name, "FBIAS" ) == 0) v = cts.fbias();
-   else if(strcmp(stat_name, "PODY"  ) == 0) v = cts.pod_yes();
-   else if(strcmp(stat_name, "PODN"  ) == 0) v = cts.pod_no();
-   else if(strcmp(stat_name, "POFD"  ) == 0) v = cts.pofd();
-   else if(strcmp(stat_name, "FAR"   ) == 0) v = cts.far();
-   else if(strcmp(stat_name, "CSI"   ) == 0) v = cts.csi();
-   else if(strcmp(stat_name, "GSS"   ) == 0) v = cts.gss();
-   else if(strcmp(stat_name, "HK"    ) == 0) v = cts.hk();
-   else if(strcmp(stat_name, "HSS"   ) == 0) v = cts.hss();
-   else if(strcmp(stat_name, "HSS_EC") == 0) v = cts.gheidke_ec(cts.ec_value());
-   else if(strcmp(stat_name, "ODDS"  ) == 0) v = cts.odds();
-   else if(strcmp(stat_name, "LODDS" ) == 0) v = cts.lodds();
-   else if(strcmp(stat_name, "ORSS"  ) == 0) v = cts.orss();
-   else if(strcmp(stat_name, "EDS"   ) == 0) v = cts.eds();
-   else if(strcmp(stat_name, "SEDS"  ) == 0) v = cts.seds();
-   else if(strcmp(stat_name, "EDI"   ) == 0) v = cts.edi();
-   else if(strcmp(stat_name, "SEDI"  ) == 0) v = cts.sedi();
-   else if(strcmp(stat_name, "BAGSS" ) == 0) v = cts.bagss();
+        if(stat_name == "TOTAL" ) v = cts.n();
+   else if(stat_name == "F_RATE") v = cts.f_rate();
+   else if(stat_name == "H_RATE") v = cts.h_rate();
+   else if(stat_name == "O_RATE") v = cts.o_rate();
    else {
-      mlog << Error << "\nCTSInfo::get_stat() -> "
+      mlog << Error << "\nCTSInfo::get_stat_fho() -> "
+           << "unknown categorical statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   // Return bad data for 0 pairs
+   if(cts.n() == 0 && stat_name != "TOTAL") {
+      v = bad_data_double;
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double CTSInfo::get_stat_ctc(const string &stat_name) const {
+   double v = bad_data_double;
+
+   // Find the statistic by name
+        if(stat_name == "TOTAL"   ) v = cts.n();
+   else if(stat_name == "FY_OY"   ) v = cts.fy_oy();
+   else if(stat_name == "FY_ON"   ) v = cts.fy_on();
+   else if(stat_name == "FN_OY"   ) v = cts.fn_oy();
+   else if(stat_name == "FN_ON"   ) v = cts.fn_on();
+   else if(stat_name == "EC_VALUE") v = cts.ec_value();
+   else {
+      mlog << Error << "\nCTSInfo::get_stat_ctc() -> "
+           << "unknown categorical statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   // Return bad data for 0 pairs
+   if(cts.n() == 0 && stat_name != "TOTAL") {
+      v = bad_data_double;
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double CTSInfo::get_stat_cts(const string &stat_name, int i_alpha) const {
+   double v = bad_data_double;
+
+   // Range check alpha index
+   if(i_alpha >= n_alpha && is_ci_stat_name(stat_name)) {
+      mlog << Error << "\nCTSInfo::get_stat_cts() -> "
+           << "alpha index out of range (" << i_alpha << " >= "
+           << n_alpha << ")!\n\n";
+      exit(1);
+   }
+
+   // Find the statistic by name
+        if(stat_name == "TOTAL"     ) v = (double) cts.n();
+   else if(stat_name == "BASER"     ) v = baser.v;
+   else if(stat_name == "BASER_NCL" ) v = baser.v_ncl[i_alpha];
+   else if(stat_name == "BASER_NCU" ) v = baser.v_ncu[i_alpha];
+   else if(stat_name == "BASER_BCL" ) v = baser.v_bcl[i_alpha];
+   else if(stat_name == "BASER_BCU" ) v = baser.v_bcu[i_alpha];
+   else if(stat_name == "FMEAN"     ) v = fmean.v;
+   else if(stat_name == "FMEAN_NCL" ) v = fmean.v_ncl[i_alpha];
+   else if(stat_name == "FMEAN_NCU" ) v = fmean.v_ncu[i_alpha];
+   else if(stat_name == "FMEAN_BCL" ) v = fmean.v_bcl[i_alpha];
+   else if(stat_name == "FMEAN_BCU" ) v = fmean.v_bcu[i_alpha];
+   else if(stat_name == "ACC"       ) v = acc.v;
+   else if(stat_name == "ACC_NCL"   ) v = acc.v_ncl[i_alpha];
+   else if(stat_name == "ACC_NCU"   ) v = acc.v_ncu[i_alpha];
+   else if(stat_name == "ACC_BCL"   ) v = acc.v_bcl[i_alpha];
+   else if(stat_name == "ACC_BCU"   ) v = acc.v_bcu[i_alpha];
+   else if(stat_name == "FBIAS"     ) v = fbias.v;
+   else if(stat_name == "FBIAS_BCL" ) v = fbias.v_bcl[i_alpha];
+   else if(stat_name == "FBIAS_BCU" ) v = fbias.v_bcu[i_alpha];
+   else if(stat_name == "PODY"      ) v = pody.v;
+   else if(stat_name == "PODY_NCL"  ) v = pody.v_ncl[i_alpha];
+   else if(stat_name == "PODY_NCU"  ) v = pody.v_ncu[i_alpha];
+   else if(stat_name == "PODY_BCL"  ) v = pody.v_bcl[i_alpha];
+   else if(stat_name == "PODY_BCU"  ) v = pody.v_bcu[i_alpha];
+   else if(stat_name == "PODN"      ) v = podn.v;
+   else if(stat_name == "PODN_NCL"  ) v = podn.v_ncl[i_alpha];
+   else if(stat_name == "PODN_NCU"  ) v = podn.v_ncu[i_alpha];
+   else if(stat_name == "PODN_BCL"  ) v = podn.v_bcl[i_alpha];
+   else if(stat_name == "PODN_BCU"  ) v = podn.v_bcu[i_alpha];
+   else if(stat_name == "POFD"      ) v = pofd.v;
+   else if(stat_name == "POFD_NCL"  ) v = pofd.v_ncl[i_alpha];
+   else if(stat_name == "POFD_NCU"  ) v = pofd.v_ncu[i_alpha];
+   else if(stat_name == "POFD_BCL"  ) v = pofd.v_bcl[i_alpha];
+   else if(stat_name == "POFD_BCU"  ) v = pofd.v_bcu[i_alpha];
+   else if(stat_name == "FAR"       ) v = far.v;
+   else if(stat_name == "FAR_NCL"   ) v = far.v_ncl[i_alpha];
+   else if(stat_name == "FAR_NCU"   ) v = far.v_ncu[i_alpha];
+   else if(stat_name == "FAR_BCL"   ) v = far.v_bcl[i_alpha];
+   else if(stat_name == "FAR_BCU"   ) v = far.v_bcu[i_alpha];
+   else if(stat_name == "CSI"       ) v = csi.v;
+   else if(stat_name == "CSI_NCL"   ) v = csi.v_ncl[i_alpha];
+   else if(stat_name == "CSI_NCU"   ) v = csi.v_ncu[i_alpha];
+   else if(stat_name == "CSI_BCL"   ) v = csi.v_bcl[i_alpha];
+   else if(stat_name == "CSI_BCU"   ) v = csi.v_bcu[i_alpha];
+   else if(stat_name == "GSS"       ) v = gss.v;
+   else if(stat_name == "GSS_BCL"   ) v = gss.v_bcl[i_alpha];
+   else if(stat_name == "GSS_BCU"   ) v = gss.v_bcu[i_alpha];
+   else if(stat_name == "HK"        ) v = hk.v;
+   else if(stat_name == "HK_NCL"    ) v = hk.v_ncl[i_alpha];
+   else if(stat_name == "HK_NCU"    ) v = hk.v_ncu[i_alpha];
+   else if(stat_name == "HK_BCL"    ) v = hk.v_bcl[i_alpha];
+   else if(stat_name == "HK_BCU"    ) v = hk.v_bcu[i_alpha];
+   else if(stat_name == "HSS"       ) v = hss.v;
+   else if(stat_name == "HSS_BCL"   ) v = hss.v_bcl[i_alpha];
+   else if(stat_name == "HSS_BCU"   ) v = hss.v_bcu[i_alpha];
+   else if(stat_name == "ODDS"      ) v = odds.v;
+   else if(stat_name == "ODDS_NCL"  ) v = odds.v_ncl[i_alpha];
+   else if(stat_name == "ODDS_NCU"  ) v = odds.v_ncu[i_alpha];
+   else if(stat_name == "ODDS_BCL"  ) v = odds.v_bcl[i_alpha];
+   else if(stat_name == "ODDS_BCU"  ) v = odds.v_bcu[i_alpha];
+   else if(stat_name == "LODDS"     ) v = lodds.v;
+   else if(stat_name == "LODDS_NCL" ) v = lodds.v_ncl[i_alpha];
+   else if(stat_name == "LODDS_NCU" ) v = lodds.v_ncu[i_alpha];
+   else if(stat_name == "LODDS_BCL" ) v = lodds.v_bcl[i_alpha];
+   else if(stat_name == "LODDS_BCU" ) v = lodds.v_bcu[i_alpha];
+   else if(stat_name == "ORSS"      ) v = orss.v;
+   else if(stat_name == "ORSS_NCL"  ) v = orss.v_ncl[i_alpha];
+   else if(stat_name == "ORSS_NCU"  ) v = orss.v_ncu[i_alpha];
+   else if(stat_name == "ORSS_BCL"  ) v = orss.v_bcl[i_alpha];
+   else if(stat_name == "ORSS_BCU"  ) v = orss.v_bcu[i_alpha];
+   else if(stat_name == "EDS"       ) v = eds.v;
+   else if(stat_name == "EDS_NCL"   ) v = eds.v_ncl[i_alpha];
+   else if(stat_name == "EDS_NCU"   ) v = eds.v_ncu[i_alpha];
+   else if(stat_name == "EDS_BCL"   ) v = eds.v_bcl[i_alpha];
+   else if(stat_name == "EDS_BCU"   ) v = eds.v_bcu[i_alpha];
+   else if(stat_name == "SEDS"      ) v = seds.v;
+   else if(stat_name == "SEDS_NCL"  ) v = seds.v_ncl[i_alpha];
+   else if(stat_name == "SEDS_NCU"  ) v = seds.v_ncu[i_alpha];
+   else if(stat_name == "SEDS_BCL"  ) v = seds.v_bcl[i_alpha];
+   else if(stat_name == "SEDS_BCU"  ) v = seds.v_bcu[i_alpha];
+   else if(stat_name == "EDI"       ) v = edi.v;
+   else if(stat_name == "EDI_NCL"   ) v = edi.v_ncl[i_alpha];
+   else if(stat_name == "EDI_NCU"   ) v = edi.v_ncu[i_alpha];
+   else if(stat_name == "EDI_BCL"   ) v = edi.v_bcl[i_alpha];
+   else if(stat_name == "EDI_BCU"   ) v = edi.v_bcu[i_alpha];
+   else if(stat_name == "SEDI"      ) v = sedi.v;
+   else if(stat_name == "SEDI_NCL"  ) v = sedi.v_ncl[i_alpha];
+   else if(stat_name == "SEDI_NCU"  ) v = sedi.v_ncu[i_alpha];
+   else if(stat_name == "SEDI_BCL"  ) v = sedi.v_bcl[i_alpha];
+   else if(stat_name == "SEDI_BCU"  ) v = sedi.v_bcu[i_alpha];
+   else if(stat_name == "BAGSS"     ) v = bagss.v;
+   else if(stat_name == "BAGSS_BCL" ) v = bagss.v_bcl[i_alpha];
+   else if(stat_name == "BAGSS_BCU" ) v = bagss.v_bcu[i_alpha];
+   else if(stat_name == "HSS_EC"    ) v = hss_ec.v;
+   else if(stat_name == "HSS_EC_BCL") v = hss_ec.v_bcl[i_alpha];
+   else if(stat_name == "HSS_EC_BCU") v = hss_ec.v_bcu[i_alpha];
+   else if(stat_name == "EC_VALUE"  ) v = cts.ec_value();
+   else {
+      mlog << Error << "\nCTSInfo::get_stat_cts() -> "
            << "unknown categorical statistic name \"" << stat_name
            << "\"!\n\n";
       exit(1);
    }
  
    // Return bad data for 0 pairs 
-   if(cts.n() == 0 && strcmp(stat_name, "TOTAL") != 0) {
+   if(cts.n() == 0 && stat_name != "TOTAL") {
       v = bad_data_double;
    }
 
@@ -654,6 +821,122 @@ void MCTSInfo::compute_ci() {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+double MCTSInfo::get_stat(STATLineType lt,
+                          const string &stat_name,
+                          ConcatString &col_name,
+                          int i_alpha) const {
+   double v = bad_data_double;
+
+   // Initialize
+   col_name = stat_name;
+
+   // Get statistic by line type
+        if(lt == STATLineType::mctc) v = get_stat_mctc(stat_name, col_name);
+   else if(lt == STATLineType::mcts) v = get_stat_mcts(stat_name, i_alpha);
+   else {
+      mlog << Error << "\nMCTSInfo::get_stat() -> "
+           << "unexpected line type \"" << statlinetype_to_string(lt)
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double MCTSInfo::get_stat_mctc(const string &stat_name,
+                               ConcatString &col_name) const {
+   double v = bad_data_double;
+   col_name = stat_name;
+
+   // Find the statistic by name
+        if(stat_name == "TOTAL"   ) v = (double) cts.total();
+   else if(stat_name == "N_CAT"   ) v = (double) cts.nrows();
+   else if(stat_name == "EC_VALUE") v = cts.ec_value();
+   else if(check_reg_exp("F[0-9]*_O[0-9]*", stat_name.c_str())) {
+
+      col_name = "FI_OJ";
+
+      // Parse column name to retrieve index values
+      ConcatString cs(stat_name);
+      StringArray sa = cs.split("_");
+      int i = atoi(sa[0].c_str()+1) - 1;
+      int j = atoi(sa[1].c_str()+1) - 1;
+
+      // Range check
+      if(i < 0 || i >= cts.nrows() ||
+         j < 0 || j >= cts.ncols()) {
+         mlog << Error << "\nget_stat_mctc() -> "
+              << "range check error for column name requested \"" << stat_name
+              << "\"\n\n";
+         exit(1);
+      }
+
+      // Retrieve the value
+      v = (double) cts.entry(i, j);
+   }
+   else {
+      mlog << Error << "\nMCTSInfo::get_stat_mctc() -> "
+           << "unknown multi-category statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double MCTSInfo::get_stat_mcts(const string &stat_name, int i_alpha) const {
+   double v = bad_data_double;
+
+   // Range check alpha index
+   if(i_alpha >= n_alpha && is_ci_stat_name(stat_name)) {
+      mlog << Error << "\nMCTSInfo::get_stat_mcts() -> "
+           << "alpha index out of range (" << i_alpha << " >= "
+           << n_alpha << ")!\n\n";
+      exit(1);
+   }
+
+   // Find the statistic by name
+        if(stat_name == "TOTAL"     ) v = (double) cts.total();
+   else if(stat_name == "N_CAT"     ) v = (double) cts.nrows();
+   else if(stat_name == "ACC"       ) v = acc.v;
+   else if(stat_name == "ACC_NCL"   ) v = acc.v_ncl[i_alpha];
+   else if(stat_name == "ACC_NCU"   ) v = acc.v_ncu[i_alpha];
+   else if(stat_name == "ACC_BCL"   ) v = acc.v_bcl[i_alpha];
+   else if(stat_name == "ACC_BCU"   ) v = acc.v_bcu[i_alpha];
+   else if(stat_name == "HK"        ) v = hk.v;
+   else if(stat_name == "HK_BCL"    ) v = hk.v_bcl[i_alpha];
+   else if(stat_name == "HK_BCU"    ) v = hk.v_bcu[i_alpha];
+   else if(stat_name == "HSS"       ) v = hss.v;
+   else if(stat_name == "HSS_BCL"   ) v = hss.v_bcl[i_alpha];
+   else if(stat_name == "HSS_BCU"   ) v = hss.v_bcu[i_alpha];
+   else if(stat_name == "GER"       ) v = ger.v;
+   else if(stat_name == "GER_BCL"   ) v = ger.v_bcl[i_alpha];
+   else if(stat_name == "GER_BCU"   ) v = ger.v_bcu[i_alpha];
+   else if(stat_name == "HSS_EC"    ) v = hss_ec.v;
+   else if(stat_name == "HSS_EC_BCL") v = hss_ec.v_bcl[i_alpha];
+   else if(stat_name == "HSS_EC_BCU") v = hss_ec.v_bcu[i_alpha];
+   else if(stat_name == "EC_VALUE"  ) v = cts.ec_value();
+   else {
+      mlog << Error << "\nMCTSInfo::get_stat_mcts() -> "
+           << "unknown multi-category statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   // Return bad data for 0 pairs
+   if(cts.total() == 0 && stat_name != "TOTAL") {
+      v = bad_data_double;
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class CNTInfo
 //
@@ -696,6 +979,44 @@ void CNTInfo::init_from_scratch() {
    alpha = (double *) nullptr;
 
    clear();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void CNTInfo::zero_out() {
+
+   fbar.set_bad_data();
+   fstdev.set_bad_data();
+   obar.set_bad_data();
+   ostdev.set_bad_data();
+   pr_corr.set_bad_data();
+   sp_corr.set_bad_data();
+   kt_corr.set_bad_data();
+   anom_corr.set_bad_data();
+   rmsfa.set_bad_data();
+   rmsoa.set_bad_data();
+   anom_corr_uncntr.set_bad_data();
+   me.set_bad_data();
+   me2.set_bad_data();
+   estdev.set_bad_data();
+   mbias.set_bad_data();
+   mae.set_bad_data();
+   mse.set_bad_data();
+   msess.set_bad_data();
+   bcmse.set_bad_data();
+   rmse.set_bad_data();
+   si.set_bad_data();
+   e10.set_bad_data();
+   e25.set_bad_data();
+   e50.set_bad_data();
+   e75.set_bad_data();
+   e90.set_bad_data();
+   eiqr.set_bad_data();
+   mad.set_bad_data();
+
+   n_ranks = frank_ties = orank_ties = 0;
 
    return;
 }
@@ -1023,42 +1344,121 @@ void CNTInfo::compute_ci() {
 
 ////////////////////////////////////////////////////////////////////////
 
-double CNTInfo::get_stat(const char *stat_name) {
+double CNTInfo::get_stat(const string &stat_name, int i_alpha) const {
    double v = bad_data_double;
 
+   // Range check alpha index
+   if(i_alpha >= n_alpha && is_ci_stat_name(stat_name)) {
+      mlog << Error << "\nCNTInfo::get_stat() -> "
+           << "alpha index out of range (" << i_alpha << " >= "
+           << n_alpha << ")!\n\n";
+      exit(1);
+   }
+
    // Find the statistic by name
-        if(strcmp(stat_name, "TOTAL"           ) == 0) v = n;
-   else if(strcmp(stat_name, "FBAR"            ) == 0) v = fbar.v;
-   else if(strcmp(stat_name, "FSTDEV"          ) == 0) v = fstdev.v;
-   else if(strcmp(stat_name, "OBAR"            ) == 0) v = obar.v;
-   else if(strcmp(stat_name, "OSTDEV"          ) == 0) v = ostdev.v;
-   else if(strcmp(stat_name, "PR_CORR"         ) == 0) v = pr_corr.v;
-   else if(strcmp(stat_name, "SP_CORR"         ) == 0) v = sp_corr.v;
-   else if(strcmp(stat_name, "KT_CORR"         ) == 0) v = kt_corr.v;
-   else if(strcmp(stat_name, "RANKS"           ) == 0) v = n_ranks;
-   else if(strcmp(stat_name, "FRANK_TIES"      ) == 0) v = frank_ties;
-   else if(strcmp(stat_name, "ORANK_TIES"      ) == 0) v = orank_ties;
-   else if(strcmp(stat_name, "ME"              ) == 0) v = me.v;
-   else if(strcmp(stat_name, "ESTDEV"          ) == 0) v = estdev.v;
-   else if(strcmp(stat_name, "MBIAS"           ) == 0) v = mbias.v;
-   else if(strcmp(stat_name, "MAE"             ) == 0) v = mae.v;
-   else if(strcmp(stat_name, "MSE"             ) == 0) v = mse.v;
-   else if(strcmp(stat_name, "BCMSE"           ) == 0) v = bcmse.v;
-   else if(strcmp(stat_name, "RMSE"            ) == 0) v = rmse.v;
-   else if(strcmp(stat_name, "SI"              ) == 0) v = si.v;
-   else if(strcmp(stat_name, "E10"             ) == 0) v = e10.v;
-   else if(strcmp(stat_name, "E25"             ) == 0) v = e25.v;
-   else if(strcmp(stat_name, "E50"             ) == 0) v = e50.v;
-   else if(strcmp(stat_name, "E75"             ) == 0) v = e75.v;
-   else if(strcmp(stat_name, "E90"             ) == 0) v = e90.v;
-   else if(strcmp(stat_name, "EIQR"            ) == 0) v = eiqr.v;
-   else if(strcmp(stat_name, "MAD  "           ) == 0) v = mad.v;
-   else if(strcmp(stat_name, "ANOM_CORR"       ) == 0) v = anom_corr.v;
-   else if(strcmp(stat_name, "ME2"             ) == 0) v = me2.v;
-   else if(strcmp(stat_name, "MSESS"           ) == 0) v = msess.v;
-   else if(strcmp(stat_name, "RMSFA"           ) == 0) v = rmsfa.v;
-   else if(strcmp(stat_name, "RMSOA"           ) == 0) v = rmsoa.v;
-   else if(strcmp(stat_name, "ANOM_CORR_UNCNTR") == 0) v = anom_corr_uncntr.v;
+        if(stat_name == "TOTAL"               ) v = (double) n;
+   else if(stat_name == "FBAR"                ) v = fbar.v;
+   else if(stat_name == "FBAR_NCL"            ) v = fbar.v_ncl[i_alpha];
+   else if(stat_name == "FBAR_NCU"            ) v = fbar.v_ncu[i_alpha];
+   else if(stat_name == "FBAR_BCL"            ) v = fbar.v_bcl[i_alpha];
+   else if(stat_name == "FBAR_BCU"            ) v = fbar.v_bcu[i_alpha];
+   else if(stat_name == "FSTDEV"              ) v = fstdev.v;
+   else if(stat_name == "FSTDEV_NCL"          ) v = fstdev.v_ncl[i_alpha];
+   else if(stat_name == "FSTDEV_NCU"          ) v = fstdev.v_ncu[i_alpha];
+   else if(stat_name == "FSTDEV_BCL"          ) v = fstdev.v_bcl[i_alpha];
+   else if(stat_name == "FSTDEV_BCU"          ) v = fstdev.v_bcu[i_alpha];
+   else if(stat_name == "OBAR"                ) v = obar.v;
+   else if(stat_name == "OBAR_NCL"            ) v = obar.v_ncl[i_alpha];
+   else if(stat_name == "OBAR_NCU"            ) v = obar.v_ncu[i_alpha];
+   else if(stat_name == "OBAR_BCL"            ) v = obar.v_bcl[i_alpha];
+   else if(stat_name == "OBAR_BCU"            ) v = obar.v_bcu[i_alpha];
+   else if(stat_name == "OSTDEV"              ) v = ostdev.v;
+   else if(stat_name == "OSTDEV_NCL"          ) v = ostdev.v_ncl[i_alpha];
+   else if(stat_name == "OSTDEV_NCU"          ) v = ostdev.v_ncu[i_alpha];
+   else if(stat_name == "OSTDEV_BCL"          ) v = ostdev.v_bcl[i_alpha];
+   else if(stat_name == "OSTDEV_BCU"          ) v = ostdev.v_bcu[i_alpha];
+   else if(stat_name == "PR_CORR"             ) v = pr_corr.v;
+   else if(stat_name == "PR_CORR_NCL"         ) v = pr_corr.v_ncl[i_alpha];
+   else if(stat_name == "PR_CORR_NCU"         ) v = pr_corr.v_ncu[i_alpha];
+   else if(stat_name == "PR_CORR_BCL"         ) v = pr_corr.v_bcl[i_alpha];
+   else if(stat_name == "PR_CORR_BCU"         ) v = pr_corr.v_bcu[i_alpha];
+   else if(stat_name == "SP_CORR"             ) v = sp_corr.v;
+   else if(stat_name == "KT_CORR"             ) v = kt_corr.v;
+   else if(stat_name == "RANKS"               ) v = n_ranks;
+   else if(stat_name == "FRANK_TIES"          ) v = frank_ties;
+   else if(stat_name == "ORANK_TIES"          ) v = orank_ties;
+   else if(stat_name == "ME"                  ) v = me.v;
+   else if(stat_name == "ME_NCL"              ) v = me.v_ncl[i_alpha];
+   else if(stat_name == "ME_NCU"              ) v = me.v_ncu[i_alpha];
+   else if(stat_name == "ME_BCL"              ) v = me.v_bcl[i_alpha];
+   else if(stat_name == "ME_BCU"              ) v = me.v_bcu[i_alpha];
+   else if(stat_name == "ESTDEV"              ) v = estdev.v;
+   else if(stat_name == "ESTDEV_NCL"          ) v = estdev.v_ncl[i_alpha];
+   else if(stat_name == "ESTDEV_NCU"          ) v = estdev.v_ncu[i_alpha];
+   else if(stat_name == "ESTDEV_BCL"          ) v = estdev.v_bcl[i_alpha];
+   else if(stat_name == "ESTDEV_BCU"          ) v = estdev.v_bcu[i_alpha];
+   else if(stat_name == "MBIAS"               ) v = mbias.v;
+   else if(stat_name == "MBIAS_BCL"           ) v = mbias.v_bcl[i_alpha];
+   else if(stat_name == "MBIAS_BCU"           ) v = mbias.v_bcu[i_alpha];
+   else if(stat_name == "MAE"                 ) v = mae.v;
+   else if(stat_name == "MAE_BCL"             ) v = mae.v_bcl[i_alpha];
+   else if(stat_name == "MAE_BCU"             ) v = mae.v_bcu[i_alpha];
+   else if(stat_name == "MSE"                 ) v = mse.v;
+   else if(stat_name == "MSE_BCL"             ) v = mse.v_bcl[i_alpha];
+   else if(stat_name == "MSE_BCU"             ) v = mse.v_bcu[i_alpha];
+   else if(stat_name == "BCMSE"               ) v = bcmse.v;
+   else if(stat_name == "BCMSE_BCL"           ) v = bcmse.v_bcl[i_alpha];
+   else if(stat_name == "BCMSE_BCU"           ) v = bcmse.v_bcu[i_alpha];
+   else if(stat_name == "RMSE"                ) v = rmse.v;
+   else if(stat_name == "RMSE_BCL"            ) v = rmse.v_bcl[i_alpha];
+   else if(stat_name == "RMSE_BCU"            ) v = rmse.v_bcu[i_alpha];
+   else if(stat_name == "SI"                  ) v = si.v;
+   else if(stat_name == "SI_BCL"              ) v = si.v_bcl[i_alpha];
+   else if(stat_name == "SI_BCU"              ) v = si.v_bcu[i_alpha];
+   else if(stat_name == "E10"                 ) v = e10.v;
+   else if(stat_name == "E10_BCL"             ) v = e10.v_bcl[i_alpha];
+   else if(stat_name == "E10_BCU"             ) v = e10.v_bcu[i_alpha];
+   else if(stat_name == "E25"                 ) v = e25.v;
+   else if(stat_name == "E25_BCL"             ) v = e25.v_bcl[i_alpha];
+   else if(stat_name == "E25_BCU"             ) v = e25.v_bcu[i_alpha];
+   else if(stat_name == "E50"                 ) v = e50.v;
+   else if(stat_name == "E50_BCL"             ) v = e50.v_bcl[i_alpha];
+   else if(stat_name == "E50_BCU"             ) v = e50.v_bcu[i_alpha];
+   else if(stat_name == "E75"                 ) v = e75.v;
+   else if(stat_name == "E75_BCL"             ) v = e75.v_bcl[i_alpha];
+   else if(stat_name == "E75_BCU"             ) v = e75.v_bcu[i_alpha];
+   else if(stat_name == "E90"                 ) v = e90.v;
+   else if(stat_name == "E90_BCL"             ) v = e90.v_bcl[i_alpha];
+   else if(stat_name == "E90_BCU"             ) v = e90.v_bcu[i_alpha];
+   else if(stat_name == "EIQR"                ) v = eiqr.v;
+   else if(stat_name == "EIQR_BCL"            ) v = eiqr.v_bcl[i_alpha];
+   else if(stat_name == "EIQR_BCU"            ) v = eiqr.v_bcu[i_alpha];
+   else if(stat_name == "MAD"                 ) v = mad.v;
+   else if(stat_name == "MAD_BCL"             ) v = mad.v_bcl[i_alpha];
+   else if(stat_name == "MAD_BCU"             ) v = mad.v_bcu[i_alpha];
+   else if(stat_name == "ANOM_CORR"           ) v = anom_corr.v;
+   else if(stat_name == "ANOM_CORR_NCL"       ) v = anom_corr.v_ncl[i_alpha];
+   else if(stat_name == "ANOM_CORR_NCU"       ) v = anom_corr.v_ncu[i_alpha];
+   else if(stat_name == "ANOM_CORR_BCL"       ) v = anom_corr.v_bcl[i_alpha];
+   else if(stat_name == "ANOM_CORR_BCU"       ) v = anom_corr.v_bcu[i_alpha];
+   else if(stat_name == "ME2"                 ) v = me2.v;
+   else if(stat_name == "ME2_BCL"             ) v = me2.v_bcl[i_alpha];
+   else if(stat_name == "ME2_BCU"             ) v = me2.v_bcu[i_alpha];
+   else if(stat_name == "MSESS"               ) v = msess.v;
+   else if(stat_name == "MSESS_BCL"           ) v = msess.v_bcl[i_alpha];
+   else if(stat_name == "MSESS_BCU"           ) v = msess.v_bcu[i_alpha];
+   else if(stat_name == "RMSFA"               ) v = rmsfa.v;
+   else if(stat_name == "RMSFA_BCL"           ) v = rmsfa.v_bcl[i_alpha];
+   else if(stat_name == "RMSFA_BCU"           ) v = rmsfa.v_bcu[i_alpha];
+   else if(stat_name == "RMSOA"               ) v = rmsoa.v;
+   else if(stat_name == "RMSOA_BCL"           ) v = rmsoa.v_bcl[i_alpha];
+   else if(stat_name == "RMSOA_BCU"           ) v = rmsoa.v_bcu[i_alpha];
+   else if(stat_name == "ANOM_CORR_UNCNTR"    ) v = anom_corr_uncntr.v;
+   else if(stat_name == "ANOM_CORR_UNCNTR_BCL") v = anom_corr_uncntr.v_bcl[i_alpha];
+   else if(stat_name == "ANOM_CORR_UNCNTR_BCU") v = anom_corr_uncntr.v_bcu[i_alpha];
+   else if(stat_name == "SI"                  ) v = si.v;
+   else if(stat_name == "SI_BCL"              ) v = si.v_bcl[i_alpha];
+   else if(stat_name == "SI_BCU"              ) v = si.v_bcu[i_alpha];
    else {
       mlog << Error << "\nCNTInfo::get_stat() -> "
            << "unknown continuous statistic name \"" << stat_name
@@ -1067,7 +1467,7 @@ double CNTInfo::get_stat(const char *stat_name) {
    }
 
    // Return bad data for 0 pairs 
-   if(n == 0 && strcmp(stat_name, "TOTAL") != 0) {
+   if(n == 0 && stat_name != "TOTAL") {
       v = bad_data_double;
    }
 
@@ -1113,7 +1513,8 @@ SL1L2Info & SL1L2Info::operator=(const SL1L2Info &c) {
 ////////////////////////////////////////////////////////////////////////
 
 SL1L2Info & SL1L2Info::operator+=(const SL1L2Info &c) {
-   SL1L2Info s_info;
+   SL1L2Info s_info = *this;
+   s_info.zero_out();
 
    s_info.scount  = scount + c.scount;
 
@@ -1306,6 +1707,110 @@ void SL1L2Info::set(const PairDataPoint &pd_all) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+void SL1L2Info::set_stat_sl1l2(const string &stat_name, double v) {
+
+        if(stat_name == "TOTAL") scount = nint(v);
+   else if(stat_name == "FBAR" ) fbar   = v;
+   else if(stat_name == "OBAR" ) obar   = v;
+   else if(stat_name == "FOBAR") fobar  = v;
+   else if(stat_name == "FFBAR") ffbar  = v;
+   else if(stat_name == "OOBAR") oobar  = v;
+   else if(stat_name == "MAE"  ) smae   = v;
+   else {
+      mlog << Error << "\nSL1L2Info::set_stat_sl1l2() -> "
+           << "unknown scalar partial sum statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void SL1L2Info::set_stat_sal1l2(const string &stat_name, double v) {
+
+        if(stat_name == "TOTAL" ) sacount = nint(v);
+   else if(stat_name == "FABAR" ) fabar   = v;
+   else if(stat_name == "OABAR" ) oabar   = v;
+   else if(stat_name == "FOABAR") foabar  = v;
+   else if(stat_name == "FFABAR") ffabar  = v;
+   else if(stat_name == "OOABAR") ooabar  = v;
+   else if(stat_name == "MAE"   ) samae   = v;
+   else {
+      mlog << Error << "\nSL1L2Info::set_stat_sal1l2() -> "
+           << "unknown scalar anomaly partial sum statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double SL1L2Info::get_stat(STATLineType lt, const string &stat_name) const {
+   double v = bad_data_double;
+
+   // Get statistic by line type
+        if(lt == STATLineType::sl1l2)  v = get_stat_sl1l2(stat_name);
+   else if(lt == STATLineType::sal1l2) v = get_stat_sal1l2(stat_name);
+   else {
+      mlog << Error << "\nSL1L2Info::get_stat() -> "
+           << "unexpected line type \"" << statlinetype_to_string(lt)
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double SL1L2Info::get_stat_sl1l2(const string &stat_name) const {
+   double v = bad_data_double;
+
+        if(stat_name == "TOTAL") v = (double) scount;
+   else if(stat_name == "FBAR" ) v = fbar;
+   else if(stat_name == "OBAR" ) v = obar;
+   else if(stat_name == "FOBAR") v = fobar;
+   else if(stat_name == "FFBAR") v = ffbar;
+   else if(stat_name == "OOBAR") v = oobar;
+   else if(stat_name == "MAE"  ) v = smae;
+   else {
+      mlog << Error << "\nSL1L2Info::get_stat_sl1l2() -> "
+           << "unknown scalar partial sum statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double SL1L2Info::get_stat_sal1l2(const string &stat_name) const {
+   double v = bad_data_double;
+
+        if(stat_name == "TOTAL" ) v = (double) sacount;
+   else if(stat_name == "FABAR" ) v = fabar;
+   else if(stat_name == "OABAR" ) v = oabar;
+   else if(stat_name == "FOABAR") v = foabar;
+   else if(stat_name == "FFABAR") v = ffabar;
+   else if(stat_name == "OOABAR") v = ooabar;
+   else if(stat_name == "MAE"   ) v = samae;
+   else {
+      mlog << Error << "\nSL1L2Info::get_stat_sal1l2() -> "
+           << "unknown scalar anomaly partial sum statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class VL1L2Info
 //
@@ -1344,11 +1849,8 @@ VL1L2Info & VL1L2Info::operator=(const VL1L2Info &c) {
 ////////////////////////////////////////////////////////////////////////
 
 VL1L2Info & VL1L2Info::operator+=(const VL1L2Info &c) {
-   VL1L2Info v_info;
-
-   // Store alpha values
-   v_info.allocate_n_alpha(n_alpha);
-   for(int i=0; i<n_alpha; i++) v_info.alpha[i] = alpha[i];
+   VL1L2Info v_info = *this;
+   v_info.zero_out();
 
    v_info.vcount = vcount + c.vcount;
    v_info.dcount = dcount + c.dcount;
@@ -1966,40 +2468,99 @@ void VL1L2Info::compute_ci() {
    return;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+double VL1L2Info::get_stat_vl1l2(const string &stat_name) const {
+   double v = bad_data_double;
+
+   // Find the statistic by name
+        if(stat_name == "TOTAL"      ) v = vcount;
+   else if(stat_name == "UFBAR"      ) v = uf_bar;
+   else if(stat_name == "VFBAR"      ) v = vf_bar;
+   else if(stat_name == "UOBAR"      ) v = uo_bar;
+   else if(stat_name == "VOBAR"      ) v = vo_bar;
+   else if(stat_name == "UVFOBAR"    ) v = uvfo_bar;
+   else if(stat_name == "UVFFBAR"    ) v = uvff_bar;
+   else if(stat_name == "UVOOBAR"    ) v = uvoo_bar;
+   else if(stat_name == "F_SPEED_BAR") v = f_speed_bar;
+   else if(stat_name == "O_SPEED_BAR") v = o_speed_bar;
+   else if(stat_name == "TOTAL_DIR"  ) v = dcount;
+   else if(stat_name == "DIR_ME"     ) v = dir_bar;
+   else if(stat_name == "DIR_MAE"    ) v = absdir_bar;
+   else if(stat_name == "DIR_MSE"    ) v = dir2_bar;
+   else {
+      mlog << Error << "\nVL1L2Info::get_stat_vl1l2() -> "
+           << "unknown vector partial sums statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return v;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
-double VL1L2Info::get_stat(const char *stat_name) {
+double VL1L2Info::get_stat_val1l2(const string &stat_name) const {
    double v = bad_data_double;
 
-        if(strcmp(stat_name, "TOTAL"           ) == 0) v = vcount;
-   else if(strcmp(stat_name, "FBAR"            ) == 0) v = FBAR.v;
-   else if(strcmp(stat_name, "OBAR"            ) == 0) v = OBAR.v;
-   else if(strcmp(stat_name, "FS_RMS"          ) == 0) v = FS_RMS.v;
-   else if(strcmp(stat_name, "OS_RMS"          ) == 0) v = OS_RMS.v;
-   else if(strcmp(stat_name, "MSVE"            ) == 0) v = MSVE.v;
-   else if(strcmp(stat_name, "RMSVE"           ) == 0) v = RMSVE.v;
-   else if(strcmp(stat_name, "FSTDEV"          ) == 0) v = FSTDEV.v;
-   else if(strcmp(stat_name, "OSTDEV"          ) == 0) v = OSTDEV.v;
-   else if(strcmp(stat_name, "FDIR"            ) == 0) v = FDIR.v;
-   else if(strcmp(stat_name, "ODIR"            ) == 0) v = ODIR.v;
-   else if(strcmp(stat_name, "FBAR_SPEED"      ) == 0) v = FBAR_SPEED.v;
-   else if(strcmp(stat_name, "OBAR_SPEED"      ) == 0) v = OBAR_SPEED.v;
-   else if(strcmp(stat_name, "VDIFF_SPEED"     ) == 0) v = VDIFF_SPEED.v;
-   else if(strcmp(stat_name, "VDIFF_DIR"       ) == 0) v = VDIFF_DIR.v;
-   else if(strcmp(stat_name, "SPEED_ERR"       ) == 0) v = SPEED_ERR.v;
-   else if(strcmp(stat_name, "SPEED_ABSERR"    ) == 0) v = SPEED_ABSERR.v;
-   else if(strcmp(stat_name, "DIR_ERR"         ) == 0) v = DIR_ERR.v;
-   else if(strcmp(stat_name, "DIR_ABSERR"      ) == 0) v = DIR_ABSERR.v;
-   else if(strcmp(stat_name, "ANOM_CORR"       ) == 0) v = ANOM_CORR.v;
-   else if(strcmp(stat_name, "ANOM_CORR_UNCNTR") == 0) v = ANOM_CORR_UNCNTR.v;
-   else if(strcmp(stat_name, "DIR_ME"          ) == 0) v = DIR_ME.v;
-   else if(strcmp(stat_name, "DIR_MAE"         ) == 0) v = DIR_MAE.v;
-   else if(strcmp(stat_name, "DIR_MSE"         ) == 0) v = DIR_MSE.v;
-   else if(strcmp(stat_name, "DIR_RMSE"        ) == 0) v = DIR_RMSE.v;
+   // Find the statistic by name
+        if(stat_name == "TOTAL"       ) v = vacount;
+   else if(stat_name == "UFABAR"      ) v = ufa_bar;
+   else if(stat_name == "VFABAR"      ) v = vfa_bar;
+   else if(stat_name == "UOABAR"      ) v = uoa_bar;
+   else if(stat_name == "VOABAR"      ) v = voa_bar;
+   else if(stat_name == "UVFOABAR"    ) v = uvfoa_bar;
+   else if(stat_name == "UVFFABAR"    ) v = uvffa_bar;
+   else if(stat_name == "UVOOABAR"    ) v = uvooa_bar;
+   else if(stat_name == "FA_SPEED_BAR") v = fa_speed_bar;
+   else if(stat_name == "OA_SPEED_BAR") v = oa_speed_bar;
+   else if(stat_name == "TOTAL_DIR"   ) v = dacount;
+   else if(stat_name == "DIRA_ME"     ) v = dira_bar;
+   else if(stat_name == "DIRA_MAE"    ) v = absdira_bar;
+   else if(stat_name == "DIRA_MSE"    ) v = dira2_bar;
    else {
       mlog << Error << "\nVL1L2Info::get_stat() -> "
-           << "unknown continuous statistic name \"" << stat_name
+           << "unknown vector anomaly partial sums statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double VL1L2Info::get_stat_vcnt(const string &stat_name) const {
+   double v = bad_data_double;
+
+        if(stat_name == "TOTAL"           ) v = vcount;
+   else if(stat_name == "FBAR"            ) v = FBAR.v;
+   else if(stat_name == "OBAR"            ) v = OBAR.v;
+   else if(stat_name == "FS_RMS"          ) v = FS_RMS.v;
+   else if(stat_name == "OS_RMS"          ) v = OS_RMS.v;
+   else if(stat_name == "MSVE"            ) v = MSVE.v;
+   else if(stat_name == "RMSVE"           ) v = RMSVE.v;
+   else if(stat_name == "FSTDEV"          ) v = FSTDEV.v;
+   else if(stat_name == "OSTDEV"          ) v = OSTDEV.v;
+   else if(stat_name == "FDIR"            ) v = FDIR.v;
+   else if(stat_name == "ODIR"            ) v = ODIR.v;
+   else if(stat_name == "FBAR_SPEED"      ) v = FBAR_SPEED.v;
+   else if(stat_name == "OBAR_SPEED"      ) v = OBAR_SPEED.v;
+   else if(stat_name == "VDIFF_SPEED"     ) v = VDIFF_SPEED.v;
+   else if(stat_name == "VDIFF_DIR"       ) v = VDIFF_DIR.v;
+   else if(stat_name == "SPEED_ERR"       ) v = SPEED_ERR.v;
+   else if(stat_name == "SPEED_ABSERR"    ) v = SPEED_ABSERR.v;
+   else if(stat_name == "DIR_ERR"         ) v = DIR_ERR.v;
+   else if(stat_name == "DIR_ABSERR"      ) v = DIR_ABSERR.v;
+   else if(stat_name == "ANOM_CORR"       ) v = ANOM_CORR.v;
+   else if(stat_name == "ANOM_CORR_UNCNTR") v = ANOM_CORR_UNCNTR.v;
+   else if(stat_name == "DIR_ME"          ) v = DIR_ME.v;
+   else if(stat_name == "DIR_MAE"         ) v = DIR_MAE.v;
+   else if(stat_name == "DIR_MSE"         ) v = DIR_MSE.v;
+   else if(stat_name == "DIR_RMSE"        ) v = DIR_RMSE.v;
+   else {
+      mlog << Error << "\nVL1L2Info::get_stat_vcnt() -> "
+           << "unknown vector continuous statistic name \"" << stat_name
            << "\"!\n\n";
       exit(1);
    }
@@ -2128,7 +2689,8 @@ NBRCNTInfo & NBRCNTInfo::operator=(const NBRCNTInfo &c) {
 ////////////////////////////////////////////////////////////////////////
 
 NBRCNTInfo & NBRCNTInfo::operator+=(const NBRCNTInfo &c) {
-   NBRCNTInfo n_info;
+   NBRCNTInfo n_info = *this;
+   n_info.sl1l2_info.zero_out();
    double den;
 
    n_info.sl1l2_info.scount = sl1l2_info.scount + c.sl1l2_info.scount;
@@ -2598,8 +3160,8 @@ void PCTInfo::clear() {
    n_alpha = 0;
    if(alpha) { delete [] alpha; alpha = (double *) nullptr; }
 
-   pct.zero_out();
-   climo_pct.zero_out();
+   pct.clear();
+   climo_pct.clear();
    fthresh.clear();
    othresh.clear();
 
@@ -2754,6 +3316,285 @@ void PCTInfo::compute_ci() {
    } // end for i
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double PCTInfo::get_stat(STATLineType lt,
+                          const string &stat_name,
+                          ConcatString &col_name,
+                          int i_alpha) const {
+   double v = bad_data_double;
+
+   // Get statistic by line type
+        if(lt == STATLineType::pct)  v = get_stat_pct(stat_name, col_name);
+   else if(lt == STATLineType::pjc)  v = get_stat_pjc(stat_name, col_name);
+   else if(lt == STATLineType::prc)  v = get_stat_prc(stat_name, col_name);
+   else if(lt == STATLineType::pstd) v = get_stat_pstd(stat_name, col_name, i_alpha);
+   else {
+      mlog << Error << "\nPCTInfo::get_stat() -> "
+           << "unexpected line type \"" << statlinetype_to_string(lt)
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double PCTInfo::get_stat_pct(const string &stat_name,
+                             ConcatString &col_name) const {
+   int i = 0;
+   double v = bad_data_double;
+   col_name = stat_name;
+
+   // Get index value for variable column numbers
+   if(check_reg_exp("_[0-9]", stat_name.c_str())) {
+
+      // Parse the index value from the column name
+      i = atoi(strrchr(stat_name.c_str(), '_') + 1) - 1;
+
+      // Range check (allow THRESH_N for N == nrows)
+      if(i < 0 || i > pct.nrows()) {
+         mlog << Error << "\nPCTInfo::get_stat_pct() -> "
+              << "range check error for column name requested \"" << stat_name
+              << "\"\n\n";
+         exit(1);
+      }
+   } // end if
+
+   // Find the statistic by name
+   if(stat_name == "TOTAL") {
+      v = (double) pct.n();
+   }
+   else if(stat_name == "N_THRESH") {
+      v = (double) pct.nrows() + 1;
+   }
+   else if(check_reg_exp("THRESH_[0-9]", stat_name.c_str())) {
+      v = pct.threshold(i);
+      col_name = "THRESH_I";
+   }
+   else if(check_reg_exp("OY_[0-9]", stat_name.c_str())){
+      v = (double) pct.event_count_by_row(i);
+      col_name = "OY_I";
+   }
+   else if(check_reg_exp("ON_[0-9]", stat_name.c_str())) {
+      v = (double) pct.nonevent_count_by_row(i);
+      col_name = "ON_I";
+   }
+   else {
+      mlog << Error << "\nPCTInfo::get_stat_pct() -> "
+           << "unsupported column name requested \"" << stat_name
+           << "\"\n\n";
+      exit(1);
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double PCTInfo::get_stat_pjc(const string &stat_name,
+                             ConcatString &col_name) const {
+   int i = 0;
+   double v = bad_data_double;
+   col_name = stat_name;
+
+   // Get index value for variable column numbers
+   if(check_reg_exp("_[0-9]", stat_name.c_str())) {
+
+      // Parse the index value from the column name
+      i = atoi(strrchr(stat_name.c_str(), '_') + 1) - 1;
+
+      // Range check
+      if(i < 0 || i >= pct.nrows()) {
+         mlog << Error << "\nPCTInfo::get_stat_pjc() -> "
+              << "range check error for column name requested \"" << stat_name
+              << "\"\n\n";
+         exit(1);
+      }
+   } // end if
+
+   // Find the statistic by name
+   if(stat_name == "TOTAL") {
+      v = (double) pct.n();
+   }
+   else if(stat_name == "N_THRESH") {
+      v = (double) pct.nrows() + 1;
+   }
+   else if(check_reg_exp("THRESH_[0-9]", stat_name.c_str())) {
+      v = pct.threshold(i);
+      col_name = "THRESH_I";
+   }
+   else if(check_reg_exp("OY_TP_[0-9]", stat_name.c_str())) {
+      v = pct.event_count_by_row(i)/(double) pct.n();
+      col_name = "OY_TP_I";
+   }
+   else if(check_reg_exp("ON_TP_[0-9]", stat_name.c_str())) {
+      v = pct.nonevent_count_by_row(i)/(double) pct.n();
+      col_name = "ON_TP_I";
+   }
+   else if(check_reg_exp("CALIBRATION_[0-9]", stat_name.c_str())) {
+      v = pct.row_calibration(i);
+      col_name = "CALIBRATION_I";
+   }
+   else if(check_reg_exp("REFINEMENT_[0-9]", stat_name.c_str())) {
+      v = pct.row_refinement(i);
+      col_name = "REFINEMENT_I";
+   }
+   else if(check_reg_exp("LIKELIHOOD_[0-9]", stat_name.c_str())) {
+      v = pct.row_event_likelihood(i);
+      col_name = "LIKELIHOOD_I";
+   }
+   else if(check_reg_exp("BASER_[0-9]", stat_name.c_str())) {
+      v = pct.row_obar(i);
+      col_name = "BASER_I";
+   }
+   else {
+     mlog << Error << "\nPCTInfo::get_stat_pjc() -> "
+          << "unsupported column name requested \"" << stat_name
+          << "\"\n\n";
+     exit(1);
+   }
+
+   // Return bad data for 0 pairs
+   if(pct.n() == 0 && stat_name != "TOTAL") {
+      v = bad_data_double;
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double PCTInfo::get_stat_prc(const string &stat_name,
+                             ConcatString &col_name) const {
+   int i = bad_data_int;
+   double v = bad_data_double;
+   col_name = stat_name;
+   TTContingencyTable ct;
+
+   // Get index value for variable column numbers
+   if(check_reg_exp("_[0-9]", stat_name.c_str())) {
+
+      // Parse the index value from the column name
+      i = atoi(strrchr(stat_name.c_str(), '_') + 1) - 1;
+
+      // Range check
+      if(i < 0 || i >= pct.nrows()) {
+         mlog << Error << "\nPCTInfo::get_stat_prc() -> "
+              << "range check error for column name requested \"" << stat_name
+              << "\"\n\n";
+         exit(1);
+      }
+
+      // Get the 2x2 contingency table for this row
+      ct = pct.ctc_by_row(i);
+
+   } // end if
+
+   // Find the statistic by name
+   if(stat_name == "TOTAL") {
+      v = (double) pct.n();
+   }
+   else if(stat_name == "N_THRESH") {
+      v = (double) pct.nrows() + 1;
+   }
+   else if(check_reg_exp("THRESH_[0-9]", stat_name.c_str())) {
+      v = pct.threshold(i);
+      col_name = "THRESH_I";
+   }
+   else if(check_reg_exp("PODY_[0-9]", stat_name.c_str())) {
+      v = ct.pod_yes();
+      col_name = "PODY_I";
+   }
+   else if(check_reg_exp("POFD_[0-9]", stat_name.c_str())) {
+      v = ct.pofd();
+      col_name = "POFD_I";
+   }
+   else {
+     mlog << Error << "\nPCTInfo::get_stat_prc() -> "
+          << "unsupported column name requested \"" << stat_name
+          << "\"\n\n";
+     exit(1);
+   }
+
+   // Return bad data for 0 pairs
+   if(pct.n() == 0 && stat_name != "TOTAL") {
+      v = bad_data_double;
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double PCTInfo::get_stat_pstd(const string &stat_name,
+                              ConcatString &col_name,
+                              int i_alpha) const {
+   int i = 0;
+   double v = bad_data_double;
+   col_name = stat_name;
+
+   // Range check alpha index
+   if(i_alpha >= n_alpha && is_ci_stat_name(stat_name)) {
+      mlog << Error << "\nPCTInfo::get_stat_pstd() -> "
+           << "alpha index out of range (" << i_alpha << " >= "
+           << n_alpha << ")!\n\n";
+      exit(1);
+   }
+
+   // Get index value for variable column numbers
+   if(check_reg_exp("_[0-9]", stat_name.c_str())) {
+
+      // Parse the index value from the column name
+      i = atoi(strrchr(stat_name.c_str(), '_') + 1) - 1;
+
+      // Range check
+      if(i < 0 || i >= pct.nrows()) {
+         mlog << Error << "\nPCTInfo::get_stat_pstd() -> "
+              << "range check error for column name requested \"" << stat_name
+              << "\"\n\n";
+         exit(1);
+      }
+   } // end if
+
+   // Find the statistic by name
+        if(stat_name == "TOTAL"      ) v = (double) pct.n();
+   else if(stat_name == "N_THRESH"   ) v = (double) pct.nrows() + 1;
+   else if(stat_name == "BASER"      ) v = baser.v;
+   else if(stat_name == "BASER_NCL"  ) v = baser.v_ncl[i_alpha];
+   else if(stat_name == "BASER_NCU"  ) v = baser.v_ncu[i_alpha];
+   else if(stat_name == "RELIABILITY") v = pct.reliability();
+   else if(stat_name == "RESOLUTION" ) v = pct.resolution();
+   else if(stat_name == "UNCERTAINTY") v = pct.uncertainty();
+   else if(stat_name == "ROC_AUC"    ) v = pct.roc_auc();
+   else if(stat_name == "BRIER"      ) v = brier.v;
+   else if(stat_name == "BRIER_NCL"  ) v = brier.v_ncl[i_alpha];
+   else if(stat_name == "BRIER_NCU"  ) v = brier.v_ncu[i_alpha];
+   else if(stat_name == "BRIERCL"    ) v = briercl.v;
+   else if(stat_name == "BRIERCL_NCL") v = briercl.v_ncl[i_alpha];
+   else if(stat_name == "BRIERCL_NCU") v = briercl.v_ncu[i_alpha];
+   else if(stat_name == "BSS"        ) v = bss;
+   else if(stat_name == "BSS_SMPL"   ) v = bss_smpl;
+   else if(check_reg_exp("THRESH_[0-9]", stat_name.c_str())) {
+      v = pct.threshold(i);
+      col_name = "THRESH_I";
+   }
+   else {
+      mlog << Error << "\nPCTInfo::get_stat_pstd() -> "
+           << "unsupported column name requested \"" << stat_name
+           << "\"\n\n";
+      exit(1);
+   }
+
+   // Return bad data for 0 pairs
+   if(pct.n() == 0 && stat_name != "TOTAL") {
+      v = bad_data_double;
+   }
+
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3624,6 +4465,13 @@ int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int
    if(data_loc)  { delete [] data_loc;  data_loc = (int *) nullptr; }
 
    return n;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_ci_stat_name(const string &stat_name) {
+   return (stat_name.find("_NC") != string::npos ||
+           stat_name.find("_BC") != string::npos);
 }
 
 ////////////////////////////////////////////////////////////////////////

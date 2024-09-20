@@ -24,8 +24,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-extern void   compute_cntinfo(const SL1L2Info &, bool, CNTInfo &);
-
+extern void   compute_cntinfo(const SL1L2Info &, CNTInfo &);
 extern void   compute_cntinfo(const PairDataPoint &, const NumArray &,
                               bool, bool, bool, CNTInfo &);
 extern void   compute_i_cntinfo(const PairDataPoint &, int,
