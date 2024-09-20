@@ -1467,7 +1467,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
       double score_sum_wgt, weight_sum, weight[count];
 
       mlog << Debug(9) << method_name
-           << "Categories c_odfl, c_odfh, c_olfd, c_ohfd, c_ohfl => "
+           << "Categories c_odfl, c_odfh, c_olfd, c_olfh, c_ohfd, c_ohfl => "
            << c_odfl << " " << c_odfh << " " << c_olfd << " "
            << c_olfh << " " << c_ohfd << " " << c_ohfl << "\n";
 
@@ -1552,9 +1552,9 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
       seeps_agg->s_olfh = (is_eq(svf[7], 0.0) ? 0.0 : svf[7]);
       seeps_agg->s_ohfd = (is_eq(svf[2], 0.0) ? 0.0 : svf[2]);
       seeps_agg->s_ohfl = (is_eq(svf[5], 0.0) ? 0.0 : svf[5]);
-      seeps_agg->mean_fcst = fcst_sum_wgt;
-      seeps_agg->mean_obs  = obs_sum_wgt;
-      seeps_agg->score_wgt = score_sum_wgt;
+      seeps_agg->mean_fcst_wgt = fcst_sum_wgt;
+      seeps_agg->mean_obs_wgt  = obs_sum_wgt;
+      seeps_agg->score_wgt     = score_sum_wgt;
 
       mlog << Debug(7) << method_name
            << "SEEPS score=" << seeps_agg->score << " score_wgt=" << seeps_agg->score_wgt
@@ -1813,7 +1813,7 @@ void compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps,
            << seeps_idx << " " << seeps_mpr << "\n";
 
       if (!seeps_mpr || is_eq(seeps_mpr->score, bad_data_double)) continue;
-      mlog << Debug(2) << method_name
+      mlog << Debug(4) << method_name
            << "lat, long => " << pd->lat_na[i] << " "
            << fmod((pd->lon_na[i] + 360.), 360.) << "\n";
 
@@ -1894,13 +1894,13 @@ void compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps,
               density2 = 0.;
             }
             //double dens = exp(-(pow(2,2)));
-            mlog << Debug(2) << method_name
+            mlog << Debug(4) << method_name
                  << "final density, density2 => "
                  << density << " " << density2 << "\n";
          } else {
             density = 1.;
          }
-         mlog << Debug(2) << method_name
+         mlog << Debug(4) << method_name
               << "For Info - Feeding density2 (not density) back as vector "
               << "as density all zeros in final output" << "\n";
          density_vector[j] += density2;
