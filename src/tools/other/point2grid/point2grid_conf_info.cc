@@ -110,10 +110,10 @@ void PointToGridConfInfo::process_config() {
    var_name_map = parse_conf_key_value_map(&conf, conf_key_var_name_map);
 
    // Conf: obs_quality_inc
-   obs_quality_inc = parse_conf_obs_qty_inc(&conf);
+   obs_qty_inc = parse_conf_obs_qty_inc(&conf);
 
    // Conf: obs_quality_exc
-   obs_quality_exc = parse_conf_obs_qty_exc(&conf);
+   obs_qty_exc = parse_conf_obs_qty_exc(&conf);
 
    return;
 }

@@ -954,8 +954,17 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
                continue;
             }
 
-            // Filter by QC flag
+            // Filter by QC flag (-qc command line option)
             if (has_qc_flags && !qc_idx_array.has(obs_data->obs_qids[idx])) {
+               filtered_by_qc++;
+               continue;
+            }
+
+            // Filter by QC inclusion/exclusion lists (obs_quality_inc/exc config option)
+            if ((conf_info.obs_qty_inc.n() > 0 &&
+                !conf_info.obs_qty_inc.has(obs_data->get_obs_qty(idx))) ||
+                (conf_info.obs_qty_exc.n() > 0 &&
+                 conf_info.obs_qty_exc.has(obs_data->get_obs_qty(idx)))) {
                filtered_by_qc++;
                continue;
             }

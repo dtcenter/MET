@@ -249,7 +249,7 @@ void MetPointObsData::assign(MetPointObsData &o) {
       }
    }
    var_names = o.var_names;
-   qty_names = o.var_names;
+   qty_names = o.qty_names;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -334,6 +334,12 @@ bool MetPointObsData::fill_obs_buf(int buf_size, int offset,
 float MetPointObsData::get_obs_val(int index) {
    float obs_val = (is_obs_array ? obs_arr[index*obs_cnt+4] : obs_vals[index]);
    return obs_val;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+string MetPointObsData::get_obs_qty(int index) {
+   return qty_names[(obs_qids[index])];
 }
 
 ///////////////////////////////////////////////////////////////////////////////

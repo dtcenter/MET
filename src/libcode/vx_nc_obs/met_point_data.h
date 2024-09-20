@@ -79,6 +79,7 @@ struct MetPointObsData {
    void clear_strings();
    bool fill_obs_buf(int buf_size, int offset, float *obs_arr, int *qty_idx_arr);
    float get_obs_val(int index);
+   std::string get_obs_qty(int index);
 };
 
 
