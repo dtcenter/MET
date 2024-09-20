@@ -1589,22 +1589,22 @@ The first set of header columns are common to all of the output files generated 
     - TOTAL
     - Total number of SEEPS matched pairs
   * - 26
-    - S12
+    - ODFL
     - Counts multiplied by the weights for FCST_CAT 1 and OBS_CAT 2
   * - 27
-    - S13
+    - ODFH
     - Counts multiplied by the weights for FCST_CAT 1 and OBS_CAT 3
   * - 28
-    - S21
+    - OLFD
     - Counts multiplied by the weights for FCST_CAT 2 and OBS_CAT 1
   * - 29
-    - S23
+    - OLFH
     - Counts multiplied by the weights for FCST_CAT 2 and OBS_CAT 3
   * - 30
-    - S31
+    - OHFD
     - Counts multiplied by the weights for FCST_CAT 3 and OBS_CAT 1
   * - 31
-    - S32
+    - OHFL
     - Counts multiplied by the weights for FCST_CAT 3 and OBS_CAT 2
   * - 32
     - PF1

@@ -912,32 +912,32 @@ void SeepsClimoGrid::read_seeps_climo_grid(ConcatString filename) {
       }
       if (IS_INVALID_NC(var_odfl_00) || !get_nc_data(&var_odfl_00, s_odfl_buf, dims, curs)) {
          mlog << Error << "\n" << method_name
-              << "Did not get odfl_00 (s12)\n\n";
+              << "Did not get odfl_00\n\n";
          exit(1);
       }
       if (IS_INVALID_NC(var_odfh_00) || !get_nc_data(&var_odfh_00, s_odfh_buf, dims, curs)) {
          mlog << Error << "\n" << method_name
-              << "Did not get odfh_00 (s13)\n\n";
+              << "Did not get odfh_00\n\n";
          exit(1);
       }
       if (IS_INVALID_NC(var_olfd_00) || !get_nc_data(&var_olfd_00, s_olfd_buf, dims, curs)) {
          mlog << Error << "\n" << method_name
-              << "Did not get olfd_00 (s21)\n\n";
+              << "Did not get olfd_00\n\n";
          exit(1);
       }
       if (IS_INVALID_NC(var_olfh_00) || !get_nc_data(&var_olfh_00, s_olfh_buf, dims, curs)) {
          mlog << Error << "\n" << method_name
-              << "Did not get olfh_00 (s23)\n\n";
+              << "Did not get olfh_00\n\n";
          exit(1);
       }
       if (IS_INVALID_NC(var_ohfd_00) || !get_nc_data(&var_ohfd_00, s_ohfd_buf, dims, curs)) {
          mlog << Error << "\n" << method_name
-              << "Did not get ohfd_00 (s31)\n\n";
+              << "Did not get ohfd_00\n\n";
          exit(1);
       }
       if (IS_INVALID_NC(var_ohfl_00) || !get_nc_data(&var_ohfl_00, s_ohfl_buf, dims, curs)) {
          mlog << Error << "\n" << method_name
-              << "Did not get ohfl_00 (s32)\n\n";
+              << "Did not get ohfl_00\n\n";
          exit(1);
       }
       nc_file->close();
