@@ -1549,10 +1549,10 @@ The first set of header columns are common to all of the output files generated 
     - Quality control flag for observation
   * - 31
     - FCST_CAT
-    - Forecast category to 3 by 3 matrix
+    - Forecast category (dry, light, or heavy)
   * - 32
     - OBS_CAT
-    - Observationtegory to 3 by 3 matrix
+    - Observation category (dry, light, or heavy)
   * - 33
     - P1
     - Climo-derived probability value for this station (dry)
@@ -1561,10 +1561,10 @@ The first set of header columns are common to all of the output files generated 
     - Climo-derived probability value for this station (dry + light)
   * - 35
     - T1
-    - Threshold 1 for p1
+    - Threshold 1 for P1 (dry)
   * - 36
     - T2
-    - Threshold 2 for p2
+    - Threshold 2 for P2 (dry + light)
   * - 37
     - SEEPS
     - SEEPS (Stable Equitable Error in Probability Space) score
@@ -1590,40 +1590,40 @@ The first set of header columns are common to all of the output files generated 
     - Total number of SEEPS matched pairs
   * - 26
     - ODFL
-    - Counts multiplied by the weights for FCST_CAT 1 and OBS_CAT 2
+    - Counts multiplied by the weights for the observation dry, forecast light category
   * - 27
     - ODFH
-    - Counts multiplied by the weights for FCST_CAT 1 and OBS_CAT 3
+    - Counts multiplied by the weights for the observation dry, forecast heavy category
   * - 28
     - OLFD
-    - Counts multiplied by the weights for FCST_CAT 2 and OBS_CAT 1
+    - Counts multiplied by the weights for the observation light, forecast dry category
   * - 29
     - OLFH
-    - Counts multiplied by the weights for FCST_CAT 2 and OBS_CAT 3
+    - Counts multiplied by the weights for the observation light, forecast heavy category
   * - 30
     - OHFD
-    - Counts multiplied by the weights for FCST_CAT 3 and OBS_CAT 1
+    - Counts multiplied by the weights for the observation heavy, forecast dry category
   * - 31
     - OHFL
-    - Counts multiplied by the weights for FCST_CAT 3 and OBS_CAT 2
+    - Counts multiplied by the weights for the observation heavy, forecast light category
   * - 32
     - PF1
-    - marginal probabilities of the forecast values (FCST_CAT 1)
+    - Marginal probabilities of the forecast dry (FCST_CAT 0)
   * - 33
     - PF2
-    - marginal probabilities of the forecast values (FCST_CAT 2)
+    - Marginal probabilities of the forecast light (FCST_CAT 1)
   * - 34
     - PF3
-    - marginal probabilities of the forecast values (FCST_CAT 3)
+    - Marginal probabilities of the forecast heavy (FCST_CAT 2)
   * - 35
     - PV1
-    - marginal probabilities of the observed values (OBS_CAT 1)
+    - Marginal probabilities of the observed dry (OBS_CAT 0)
   * - 36
     - PV2
-    - marginal probabilities of the observed values (OBS_CAT 2)
+    - Marginal probabilities of the observed light (OBS_CAT 1)
   * - 37
     - PV3
-    - marginal probabilities of the observed values (OBS_CAT 3)
+    - Marginal probabilities of the observed heavy (OBS_CAT 2)
   * - 38
     - SEEPS
     - Averaged SEEPS (Stable Equitable Error in Probability Space) score
