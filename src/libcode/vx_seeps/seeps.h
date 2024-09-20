@@ -100,9 +100,11 @@ struct SeepsAggScore {  // For SEEPS
    double pf2;
    double pf3;
    double mean_fcst;
+   double mean_fcst_wgt;
    double mean_obs;
+   double mean_obs_wgt;
    double score;
-   double weighted_score;
+   double score_wgt;
 };
 
 ////////////////////////////////////////////////////////////////////////

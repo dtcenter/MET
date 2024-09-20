@@ -615,11 +615,12 @@ void parse_seeps_line(STATLine &l, SeepsAggScore &agg_score) {
    agg_score.pv2 = atof(l.get_item("PV2"));
    agg_score.pv3 = atof(l.get_item("PV3"));
 
-   agg_score.mean_fcst = atof(l.get_item("MEAN_FCST"));
-   agg_score.mean_obs  = atof(l.get_item("MEAN_OBS"));
-
-   agg_score.score          = atof(l.get_item("SEEPS"));
-   agg_score.weighted_score = agg_score.score;
+   agg_score.mean_fcst     = atof(l.get_item("MEAN_FCST"));
+   agg_score.mean_fcst_wgt = agg_score.mean_fcst;
+   agg_score.mean_obs      = atof(l.get_item("MEAN_OBS"));
+   agg_score.mean_obs_wgt  = agg_score.mean_fcst;
+   agg_score.score         = atof(l.get_item("SEEPS"));
+   agg_score.score_wgt     = agg_score.score;
 
    return;
 }
