@@ -1632,7 +1632,7 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
          mlog << Debug(9) << method_name
               << "obs_value, fcst_value: "
               << obs_value << " " << fcst_value << "\n";
-         if (!is_eq(fcst_value, -9999.0) && !is_eq(obs_value, -9999.0)) {
+         if (!is_bad_data(fcst_value) && !is_bad_data(obs_value)) {
             SeepsScore *seeps_mpr = seeps_climo->get_record(ix, iy, fcst_value, obs_value);
             if (seeps_mpr != nullptr) {
                fcst_cat = seeps_mpr->fcst_cat;
