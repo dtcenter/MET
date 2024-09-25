@@ -22,6 +22,7 @@
 //   004    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   005    08-01-22  Albo           MET #1971 Differing time steps
 //   006    10-03-22  Prestopnik     MET #2227 Remove using namespace std from header files
+//   007    09-25-24  Halley Gotway  MET #2979 Fix for all supported projections
 //
 ////////////////////////////////////////////////////////////////////////
 
