@@ -68,11 +68,9 @@ const bool have_pairs =    (fcst_obj.n_objects() != 0)
                         && ( obs_obj.n_objects() != 0);
 
    //
-   //  dimensions
+   //  add time dimension
    //
 
-nx_dim = add_dim(&out,  nx_dim_name, fcst_raw.nx());
-ny_dim = add_dim(&out,  ny_dim_name, fcst_raw.ny());
 nt_dim = add_dim(&out,  nt_dim_name, fcst_raw.nt());
 
    //
@@ -150,11 +148,9 @@ if ( IS_INVALID_NC(out) )  {
 }
 
    //
-   //  dimensions
+   //  add time dimension
    //
 
-nx_dim = add_dim(&out,  nx_dim_name, raw.nx());
-ny_dim = add_dim(&out,  ny_dim_name, raw.ny());
 nt_dim = add_dim(&out,  nt_dim_name, raw.nt());
 
    //
