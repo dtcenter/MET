@@ -125,7 +125,6 @@ test_velocity_DEPENDENCIES = ${top_builddir}/src/tools/other/mode_time_domain/mt
 	${top_builddir}/src/tools/other/mode_time_domain/mtd-mtd_partition.o \
 	${top_builddir}/src/tools/other/mode_time_domain/mtd-mtd_read_data.o \
 	${top_builddir}/src/tools/other/mode_time_domain/mtd-mtd_txt_output.o \
-	${top_builddir}/src/tools/other/mode_time_domain/mtd-nc_grid.o \
 	${top_builddir}/src/tools/other/mode_time_domain/mtd-nc_utils_local.o \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
@@ -378,7 +377,6 @@ test_velocity_LDADD = \
 	${top_builddir}/src/tools/other/mode_time_domain/mtd-mtd_partition.o \
 	${top_builddir}/src/tools/other/mode_time_domain/mtd-mtd_read_data.o \
 	${top_builddir}/src/tools/other/mode_time_domain/mtd-mtd_txt_output.o \
-	${top_builddir}/src/tools/other/mode_time_domain/mtd-nc_grid.o \
 	${top_builddir}/src/tools/other/mode_time_domain/mtd-nc_utils_local.o \
 	-lvx_pxm \
 	-lvx_plot_util \
