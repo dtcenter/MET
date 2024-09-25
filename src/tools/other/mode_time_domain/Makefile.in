@@ -102,13 +102,13 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_mtd_OBJECTS = mtd-mtd.$(OBJEXT) mtd-mtdfiletype_to_string.$(OBJEXT) \
-	mtd-nc_utils_local.$(OBJEXT) mtd-nc_grid.$(OBJEXT) \
-	mtd-3d_moments.$(OBJEXT) mtd-2d_moments.$(OBJEXT) \
-	mtd-fo_node.$(OBJEXT) mtd-fo_node_array.$(OBJEXT) \
-	mtd-fo_graph.$(OBJEXT) mtd-mtd_config_info.$(OBJEXT) \
-	mtd-mtd_file_base.$(OBJEXT) mtd-mtd_file_float.$(OBJEXT) \
-	mtd-mtd_file_int.$(OBJEXT) mtd-mtd_read_data.$(OBJEXT) \
-	mtd-3d_att.$(OBJEXT) mtd-3d_att_single_array.$(OBJEXT) \
+	mtd-nc_utils_local.$(OBJEXT) mtd-3d_moments.$(OBJEXT) \
+	mtd-2d_moments.$(OBJEXT) mtd-fo_node.$(OBJEXT) \
+	mtd-fo_node_array.$(OBJEXT) mtd-fo_graph.$(OBJEXT) \
+	mtd-mtd_config_info.$(OBJEXT) mtd-mtd_file_base.$(OBJEXT) \
+	mtd-mtd_file_float.$(OBJEXT) mtd-mtd_file_int.$(OBJEXT) \
+	mtd-mtd_read_data.$(OBJEXT) mtd-3d_att.$(OBJEXT) \
+	mtd-3d_att_single_array.$(OBJEXT) \
 	mtd-3d_att_pair_array.$(OBJEXT) mtd-2d_att.$(OBJEXT) \
 	mtd-2d_att_array.$(OBJEXT) mtd-3d_conv.$(OBJEXT) \
 	mtd-mtd_txt_output.$(OBJEXT) mtd-mtd_nc_output.$(OBJEXT) \
@@ -153,7 +153,7 @@ am__depfiles_remade = ./$(DEPDIR)/mtd-2d_att.Po \
 	./$(DEPDIR)/mtd-mtd_read_data.Po \
 	./$(DEPDIR)/mtd-mtd_txt_output.Po \
 	./$(DEPDIR)/mtd-mtdfiletype_to_string.Po \
-	./$(DEPDIR)/mtd-nc_grid.Po ./$(DEPDIR)/mtd-nc_utils_local.Po
+	./$(DEPDIR)/mtd-nc_utils_local.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -373,7 +373,6 @@ MAINTAINERCLEANFILES = Makefile.in
 mtd_SOURCES = mtd.cc \
 	mtdfiletype_to_string.cc mtdfiletype_to_string.h \
 	nc_utils_local.cc nc_utils_local.h \
-	nc_grid.cc nc_grid.h \
 	3d_moments.cc 3d_moments.h \
 	2d_moments.cc 2d_moments.h \
 	fo_node.cc fo_node.h \
@@ -544,7 +543,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mtd-mtd_read_data.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mtd-mtd_txt_output.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mtd-mtdfiletype_to_string.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mtd-nc_grid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mtd-nc_utils_local.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
@@ -608,20 +606,6 @@ mtd-nc_utils_local.obj: nc_utils_local.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='nc_utils_local.cc' object='mtd-nc_utils_local.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mtd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mtd-nc_utils_local.obj `if test -f 'nc_utils_local.cc'; then $(CYGPATH_W) 'nc_utils_local.cc'; else $(CYGPATH_W) '$(srcdir)/nc_utils_local.cc'; fi`
-
-mtd-nc_grid.o: nc_grid.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mtd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mtd-nc_grid.o -MD -MP -MF $(DEPDIR)/mtd-nc_grid.Tpo -c -o mtd-nc_grid.o `test -f 'nc_grid.cc' || echo '$(srcdir)/'`nc_grid.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mtd-nc_grid.Tpo $(DEPDIR)/mtd-nc_grid.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='nc_grid.cc' object='mtd-nc_grid.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mtd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mtd-nc_grid.o `test -f 'nc_grid.cc' || echo '$(srcdir)/'`nc_grid.cc
-
-mtd-nc_grid.obj: nc_grid.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mtd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mtd-nc_grid.obj -MD -MP -MF $(DEPDIR)/mtd-nc_grid.Tpo -c -o mtd-nc_grid.obj `if test -f 'nc_grid.cc'; then $(CYGPATH_W) 'nc_grid.cc'; else $(CYGPATH_W) '$(srcdir)/nc_grid.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mtd-nc_grid.Tpo $(DEPDIR)/mtd-nc_grid.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='nc_grid.cc' object='mtd-nc_grid.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mtd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mtd-nc_grid.obj `if test -f 'nc_grid.cc'; then $(CYGPATH_W) 'nc_grid.cc'; else $(CYGPATH_W) '$(srcdir)/nc_grid.cc'; fi`
 
 mtd-3d_moments.o: 3d_moments.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mtd_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mtd-3d_moments.o -MD -MP -MF $(DEPDIR)/mtd-3d_moments.Tpo -c -o mtd-3d_moments.o `test -f '3d_moments.cc' || echo '$(srcdir)/'`3d_moments.cc
@@ -1067,7 +1051,6 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/mtd-mtd_read_data.Po
 	-rm -f ./$(DEPDIR)/mtd-mtd_txt_output.Po
 	-rm -f ./$(DEPDIR)/mtd-mtdfiletype_to_string.Po
-	-rm -f ./$(DEPDIR)/mtd-nc_grid.Po
 	-rm -f ./$(DEPDIR)/mtd-nc_utils_local.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -1137,7 +1120,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/mtd-mtd_read_data.Po
 	-rm -f ./$(DEPDIR)/mtd-mtd_txt_output.Po
 	-rm -f ./$(DEPDIR)/mtd-mtdfiletype_to_string.Po
-	-rm -f ./$(DEPDIR)/mtd-nc_grid.Po
 	-rm -f ./$(DEPDIR)/mtd-nc_utils_local.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
