@@ -481,18 +481,16 @@ void MtdFileBase::write(NcFile & f) const
 char junk[256];
 ConcatString s;
 
-   //  Nx, Ny, Nt
+   //  Add the time dimension
 
-add_dim(&f, nx_dim_name, Nx);
-add_dim(&f, ny_dim_name, Ny);
 add_dim(&f, nt_dim_name, Nt);
 
    //  Grid
 
-NcDim lat_dim = get_nc_dim(&f, ny_dim_name);
-NcDim lon_dim = get_nc_dim(&f, nx_dim_name);
+NcDim ny_dim;
+NcDim nx_dim;
 
-write_netcdf_proj(&f, *G, lat_dim, lon_dim);
+write_netcdf_proj(&f, *G, ny_dim, nx_dim);
 
    //  timestamp info
 
