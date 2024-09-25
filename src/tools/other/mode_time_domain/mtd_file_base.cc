@@ -26,9 +26,10 @@ using namespace netCDF;
 #include "mtd_file.h"
 #include "mtd_partition.h"
 #include "mtd_nc_defs.h"
-#include "nc_grid.h"
 #include "nc_utils_local.h"
 #include "mtdfiletype_to_string.h"
+#include "get_met_grid.h"
+#include "write_netcdf.h"
 
 #include "vx_math.h"
 
@@ -433,7 +434,7 @@ Nt  = GET_NC_SIZE(dim);
 
 G = new Grid;
 
-read_nc_grid(f, *G);
+read_netcdf_grid(&f, *G);
 
    //  timestamp info
 
@@ -488,7 +489,10 @@ add_dim(&f, nt_dim_name, Nt);
 
    //  Grid
 
-write_nc_grid(f, *G);
+NcDim lat_dim = get_nc_dim(&f, ny_dim_name);
+NcDim lon_dim = get_nc_dim(&f, nx_dim_name);
+
+write_netcdf_proj(&f, *G, lat_dim, lon_dim);
 
    //  timestamp info
 
