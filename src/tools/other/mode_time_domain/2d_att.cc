@@ -7,7 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -399,15 +398,7 @@ a.ObjectNumber = obj_number;
 
 moments = mask_2d.calc_2d_moments();
 
-if ( moments.N == 0 )  {
-
-   // mlog << Error << "\n\n  calc_2d_single_atts() -> empty object!\n\n";
-
-   // exit ( 1 );
-
-   return a;
-
-}
+if ( moments.N == 0 )  return a;
 
 a.Xbar = (moments.Sx)/(moments.N);
 a.Ybar = (moments.Sy)/(moments.N);
@@ -430,7 +421,8 @@ values = new float [a.Area];
 
 if ( !values )  {
 
-   mlog << Error << "\n\n  calc_2d_single_atts() -> memory allocation error\n\n";
+   mlog << Error << "\ncalc_2d_single_atts() -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -624,8 +616,5 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
 
 

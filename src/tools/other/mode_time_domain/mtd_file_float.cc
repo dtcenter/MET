@@ -168,7 +168,6 @@ if ( f.Data )  {
 }
 
 
-
    //
    //  done
    //
@@ -255,7 +254,8 @@ void MtdFloatFile::set_spatial_radius(int spatial_r)
 
 if ( spatial_r < 0 )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::set_spatial_radius(int) -> bad value ... " << spatial_r << "\n\n";
+   mlog << Error << "\nMtdFloatFile::set_spatial_radius(int) -> "
+        << "bad value ... " << spatial_r << "\n\n";
 
    exit ( 1 );
 
@@ -277,7 +277,8 @@ void MtdFloatFile::set_time_window(int beg, int end)
 
 if ( end < beg )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::set_time_window(int) -> bad values ... " << beg << " and " << end << "\n\n";
+   mlog << Error << "\nMtdFloatFile::set_time_window(int) -> "
+        << "bad values ... " << beg << " and " << end << "\n\n";
 
    exit ( 1 );
 
@@ -317,7 +318,8 @@ void MtdFloatFile::put(const DataPlane & plane, const int t)
 
 if ( (plane.nx() != Nx) || (plane.ny() != Ny) )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::put(const DataPlane &, const int) -> plane wrong size!\n\n";
+   mlog << Error << "\nMtdFloatFile::put(const DataPlane &, const int) -> "
+        << "plane wrong size!\n\n";
 
    exit ( 1 );
 
@@ -325,7 +327,8 @@ if ( (plane.nx() != Nx) || (plane.ny() != Ny) )  {
 
 if ( (t < 0) || (t >= Nt) )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::put(const DataPlane &, const int) -> bad time\n\n";
+   mlog << Error << "\nMtdFloatFile::put(const DataPlane &, const int) -> "
+        << "bad time\n\n";
 
    exit ( 1 );
 
@@ -358,8 +361,6 @@ for (x=0; x<Nx; ++x)  {
    }
 
 }
-
-// mlog << Debug(5) << "   Bad data count is " << count << "\n";
 
    //
    //  done
@@ -469,7 +470,8 @@ void MtdFloatFile::threshold(double T, MtdIntFile & out) const
 
 if ( !Data )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::threshold(double, MtdIntFile &) const -> no data!\n\n";
+   mlog << Error << "\nMtdFloatFile::threshold(double, MtdIntFile &) const -> "
+        << "no data!\n\n";
 
    exit ( 1 );
 
@@ -542,7 +544,8 @@ void MtdFloatFile::threshold(const SingleThresh & t, MtdIntFile & out) const
 
 if ( !Data )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::threshold(double, MtdIntFile &) const -> no data!\n\n";
+   mlog << Error << "\nMtdFloatFile::threshold(double, MtdIntFile &) const -> "
+        << "no data!\n\n";
 
    exit ( 1 );
 
@@ -592,7 +595,6 @@ out.set_threshold(-9999.0);
 out.set_filetype(mtd_file_mask);
 
 
-
    //
    //  done
    //
@@ -629,9 +631,7 @@ void MtdFloatFile::read(NcFile & f)
 
 {
 
-//NcVar * var = 0;
 NcVar var;
-
 
 
    //
@@ -663,7 +663,8 @@ lengths.add(Nx);
 
 if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::read(const char *) -> trouble getting data\n\n";
+   mlog << Error << "\nMtdFloatFile::read(const char *) -> "
+        << "trouble getting data\n\n";
 
    exit ( 1 );
 
@@ -685,13 +686,9 @@ void MtdFloatFile::write(NcFile & f) const
 
 {
 
-//NcDim * nx_dim   = 0;
-//NcDim * ny_dim   = 0;
-//NcDim * nt_dim   = 0;
 NcDim nx_dim;
 NcDim ny_dim;
 NcDim nt_dim;
-//NcVar * data_var = 0;
 NcVar data_var ;
 const char format [] = "%.3f";
 char junk[256];
@@ -741,24 +738,6 @@ add_var(&f, data_field_name, ncFloat, nt_dim, ny_dim, nx_dim);
 
 data_var = get_nc_var(&f, data_field_name);
 
-//if ( !(data_var->set_cur(0, 0, 0)) )  {
-//
-//   mlog << Error << "\n\n  MtdFloatFile::write() -> trouble setting corner on data field\n\n";
-//
-//   exit ( 1 );
-//
-//}
-//
-//// const time_t t_start = time(0);   //  for timing the data write operation
-//
-//if ( !(data_var->put(Data, Nt, Ny, Nx)) )  {
-//
-//   mlog << Error << "\n\n  MtdFloatFile::write() -> trouble with put in data field\n\n";
-//
-//   exit ( 1 );
-//
-//}
-
 LongArray offsets;  // {0,0,0};
 LongArray lengths;  // {Nt, Ny, Nx};
 
@@ -769,18 +748,14 @@ lengths.add(Nt);
 lengths.add(Ny);
 lengths.add(Nx);
 
-//if ( ! get_nc_data(&data_var, Data, (long *){Nt, Ny, Nx}, (long *){0,0,0}) )  {
 if ( ! get_nc_data(&data_var, Data, lengths, offsets) )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::read(const char *) -> trouble getting data\n\n";
+   mlog << Error << "\nMtdFloatFile::read(const char *) -> "
+        << "trouble getting data\n\n";
 
    exit ( 1 );
 
 }
-
-// const time_t t_stop = time(0);   //  for timing the data write operation
-
-// mlog << Debug(5) << "\n\n  MtdFloatFile::write(): Time to write data = " << (t_stop - t_start) << " seconds\n\n" << flush;
 
    //
    //  done
@@ -802,11 +777,10 @@ NcFile f(_filename, NcFile::replace);
 
 if ( IS_INVALID_NC(f) )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::write(const char *) -> unable to open netcdf output file \"" << _filename << "\"\n\n";
+   mlog << Error << "\nMtdFloatFile::write(const char *) -> "
+        << "unable to open netcdf output file: " << _filename << "\n\n";
 
-   // exit ( 1 );
-
-   return;
+   exit ( 1 );
 
 }
 
@@ -830,7 +804,8 @@ MtdFloatFile MtdFloatFile::const_t_slice(int t) const
 
 if ( (t < 0) || (t >= Nt) )  {
 
-   mlog << Error << "\n\n  MtdFloatFile MtdFloatFile::const_t_slice(int) const -> range check error\n\n";
+   mlog << Error << "\nMtdFloatFile MtdFloatFile::const_t_slice(int) const -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -898,7 +873,8 @@ void MtdFloatFile::get_data_plane(const int t, DataPlane & out)
 
 if ( (t < 0) || (t >= Nt) )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::get_data_plane() -> range check error on t\n\n";
+   mlog << Error << "\nMtdFloatFile::get_data_plane() -> "
+        << "range check error on t\n\n";
 
    exit ( 1 );
 
@@ -933,9 +909,6 @@ for (x=0; x<Nx; ++x)  {
 }   //  for x
 
 
-
-
-
    //
    //  done
    //
@@ -952,9 +925,11 @@ void MtdFloatFile::put_data_plane(const int t, const DataPlane & d)
 
 {
 const char *method_name = "MtdFloatFile::put_data_plane() -> ";
+
 if ( (t < 0) || (t >= Nt) )  {
 
-   mlog << Error << "\n\n  " << method_name << "range check error on t\n\n";
+   mlog << Error << "\n" << method_name
+        << "range check error on t\n\n";
 
    exit ( 1 );
 
@@ -962,7 +937,8 @@ if ( (t < 0) || (t >= Nt) )  {
 
 if ( (d.nx() != Nx) || (d.ny() != Ny) )  {
 
-   mlog << Error << "\n\n  " << method_name << "data plane is wrong size!\n\n";
+   mlog << Error << "\n" << method_name
+        << "data plane is wrong size!\n\n";
 
    exit ( 1 );
 
@@ -979,8 +955,9 @@ for (x=0; x<Nx; ++x)  {
 
       n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
       if (n < 0 || n >=data_cnt) {
-         mlog << Debug(4) << method_name << "offset " << n
-              << " is out of range (" << " from " << x << ", " << y <<", " << t <<")\n";
+         mlog << Debug(4) << method_name
+              << "offset " << n << " is out of range (from "
+              << x << ", " << y <<", " << t <<")\n";
          continue;
       }
 
@@ -1060,9 +1037,5 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
 
 

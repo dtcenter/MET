@@ -191,51 +191,6 @@ conf.read(default_file_name);
 
 if ( user_file_name )  conf.read(user_file_name);
 
-   //  check the fuzzy-engine weights
-   //     calculation of total interest assumes these tests
-
-   //
-   //  Update: these tests are not really needed since the InterestCalculator
-   //          class checks this
-   //
-
-/*
-bool all_zero = true;
-
-if ( is_eq(space_centroid_dist_wt, 0.0) )  space_centroid_dist_wt = 0.0;
-else                                       all_zero = false;
-
-if ( is_eq(time_centroid_delta_wt, 0.0) )  time_centroid_delta_wt = 0.0;
-else                                       all_zero = false;
-
-if ( is_eq(speed_delta_wt, 0.0) )          speed_delta_wt = 0.0;
-else                                       all_zero = false;
-
-if ( is_eq(direction_diff_wt, 0.0) )       direction_diff_wt = 0.0;
-else                                       all_zero = false;
-
-if ( is_eq(volume_ratio_wt, 0.0) )         volume_ratio_wt = 0.0;
-else                                       all_zero = false;
-
-if ( is_eq(axis_angle_diff_wt, 0.0) )      axis_angle_diff_wt = 0.0;
-else                                       all_zero = false;
-
-if ( is_eq(start_time_delta_wt, 0.0) )     start_time_delta_wt = 0.0;
-else                                       all_zero = false;
-
-if ( is_eq(end_time_delta_wt, 0.0) )       end_time_delta_wt = 0.0;
-else                                       all_zero = false;
-
-
-if ( all_zero )  {
-
-   mlog << Error << "\n\n  MtdConfigInfo::read_config() -> all the fuzzy engine weights are zero!\n\n";
-
-   exit ( 1 );
-
-}
-*/
-
    //
    //  done
    //
@@ -258,10 +213,6 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
    PlotInfo plot_info;
    bool status = false;
    double sum;
-
-      // Dump the contents of the config file
-
-   // if(mlog.verbosity_level() >= 5) conf.dump(cout);
 
       // Initialize
 
@@ -297,19 +248,6 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
    fcst_info->set_dict(*(fcst_dict->lookup_dictionary(conf_key_field)));
    obs_info->set_dict(*(obs_dict->lookup_dictionary(conf_key_field)));
-
-      // Dump the contents of the VarInfo objects
-//
-//       if(mlog.verbosity_level() >= 5) {
-//       mlog << Debug(5)
-//            << "Parsed forecast field:\n";
-//       fcst_info->dump(cout);
-//       mlog << Debug(5)
-//            << "Parsed observation field:\n";
-//       obs_info->dump(cout);
-//    }
-//
-
 
       // No support for wind direction
 
@@ -349,68 +287,6 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
    fcst_conv_thresh = fcst_dict->lookup_thresh(conf_key_conv_thresh);
    obs_conv_thresh  = obs_dict->lookup_thresh(conf_key_conv_thresh);
-
-      // Conf: fcst.vld_thresh and obs.vld_thresh
-
-   // fcst_vld_thresh = fcst_dict->lookup_double(conf_key_vld_thresh);
-   // obs_vld_thresh  = obs_dict->lookup_double(conf_key_vld_thresh);
-
-      // Conf: fcst.merge_thresh and obs.merge_thresh
-
-   // fcst_merge_thresh = fcst_dict->lookup_thresh(conf_key_merge_thresh);
-   // obs_merge_thresh  = obs_dict->lookup_thresh(conf_key_merge_thresh);
-
-      // Conf: fcst.merge_flag and obs.merge_flag
-
-   // fcst_merge_flag = int_to_mergetype(fcst_dict->lookup_int(conf_key_merge_flag));
-   // obs_merge_flag  = int_to_mergetype(obs_dict->lookup_int(conf_key_merge_flag));
-
-      // Conf: mask_missing_flag
-
-   // mask_missing_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_missing_flag));
-
-      // Conf: match_flag
-
-   // match_flag = int_to_matchtype(conf.lookup_int(conf_key_match_flag));
-
-      // Check that match_flag is set between 0 and 3
-/*
-   if(match_flag == MatchType::None &&
-      (fcst_merge_flag != MergeType::None || obs_merge_flag  != MergeType::None) ) {
-      mlog << Warning << "\nMtdConfigInfo::process_config() -> "
-           << "When matching is disabled (match_flag = "
-           << matchtype_to_string(match_flag)
-           << ") but merging is requested (fcst_merge_flag = "
-           << mergetype_to_string(fcst_merge_flag)
-           << ", obs_merge_flag = "
-           << mergetype_to_string(obs_merge_flag)
-           << ") any merging information will be discarded.\n\n";
-   }
-*/
-      // Conf: max_centroid_dist
-
-   // max_centroid_dist = conf.lookup_double(conf_key_max_centroid_dist);
-
-      // Check that max_centroid_dist is > 0
-/*
-   if(max_centroid_dist <= 0) {
-      mlog << Warning << "\nMtdConfigInfo::process_config() -> "
-           << "max_centroid_dist (" << max_centroid_dist
-           << ") should be set > 0\n\n";
-   }
-
-*/
-      // Conf: mask.grid
-
-/*
-   mask_grid_name = conf.lookup_string(conf_key_mask_grid);
-   mask_grid_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_grid_flag));
-
-      // Conf: mask.poly
-
-   mask_poly_name = conf.lookup_string(conf_key_mask_poly);
-   mask_poly_flag = int_to_fieldtype(conf.lookup_int(conf_key_mask_poly_flag));
-*/
 
       // Conf: weight
 
@@ -494,20 +370,6 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
       exit(1);
    }
 
-      // Conf: print_interest_thresh
-
-   // print_interest_thresh = conf.lookup_double(conf_key_print_interest_thresh);
-
-      // Check that print_interest_thresh is between 0 and 1.
-/*
-   if(print_interest_thresh < 0 || print_interest_thresh > 1) {
-      mlog << Error << "\nMtdConfigInfo::process_config() -> "
-           << "print_interest_thresh (" << print_interest_thresh
-           << ") must be set between 0 and 1.\n\n";
-      exit(1);
-   }
-*/
-
       // Conf: nc_pairs_flag
 
    parse_nc_info();
@@ -515,10 +377,6 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
       //  ascii attribute output flags
 
    parse_txt_info();
-
-      // Conf: ct_stats_flag
-
-   // ct_stats_flag = conf.lookup_bool(conf_key_ct_stats_flag);
 
       // Conf: output_prefix
 
@@ -564,8 +422,8 @@ e = conf.lookup(conf_key_nc_output);
 
 if ( !e )  {
 
-   mlog << Error
-        << "\n\n  MtdConfigInfo::parse_nc_info() -> lookup failed for key \""
+   mlog << Error << "\nMtdConfigInfo::parse_nc_info() -> "
+        << "lookup failed for key \""
         << conf_key_nc_output << "\"\n\n";
 
    exit ( 1 );
@@ -590,11 +448,9 @@ if ( type == BooleanType )  {
 
 if ( type != DictionaryType )  {
 
-   mlog << Error
-        << "\n\n  MtdConfigInfo::parse_nc_info() -> bad type ("
-        << configobjecttype_to_string(type)
-        << ") for key \""
-        << conf_key_nc_pairs_flag << "\"\n\n";
+   mlog << Error << "\nMtdConfigInfo::parse_nc_info() -> "
+        << "bad type (" << configobjecttype_to_string(type)
+        << ") for key \"" << conf_key_nc_pairs_flag << "\"\n\n";
 
    exit ( 1 );
 
@@ -608,10 +464,8 @@ Dictionary * d = e->dict_value();
 
 nc_info.do_latlon     = d->lookup_bool(conf_key_latlon_flag);
 nc_info.do_raw        = d->lookup_bool(conf_key_raw_flag);
-// nc_info.do_object_raw = d->lookup_bool(conf_key_object_raw_flag);
 nc_info.do_object_id  = d->lookup_bool(conf_key_object_id_flag);
 nc_info.do_cluster_id = d->lookup_bool(conf_key_cluster_id_flag);
-// nc_info.do_polylines  = d->lookup_bool(conf_key_do_polylines_flag);
 
    //
    //  done
@@ -638,9 +492,8 @@ e = conf.lookup(key);
 
 if ( !e )  {
 
-   mlog << Error
-        << "\n\n  MtdConfigInfo::parse_txt_info() -> lookup failed for key \""
-        << key << "\"\n\n";
+   mlog << Error << "\nMtdConfigInfo::parse_txt_info() -> "
+        << "lookup failed for key \"" << key << "\"\n\n";
 
    exit ( 1 );
 
@@ -654,11 +507,9 @@ const ConfigObjectType type = e->type();
 
 if ( type != DictionaryType )  {
 
-   mlog << Error
-        << "\n\n  MtdConfigInfo::parse_txt_info() -> bad type ("
-        << configobjecttype_to_string(type)
-        << ") for key \""
-        << key << "\"\n\n";
+   mlog << Error << "\nMtdConfigInfo::parse_txt_info() -> "
+        << "bad type (" << configobjecttype_to_string(type)
+        << ") for key \"" << key << "\"\n\n";
 
    exit ( 1 );
 
@@ -851,7 +702,6 @@ bool MtdNcOutInfo::all_false() const
 
 {
 
-// bool status = do_latlon || do_raw || do_object_raw || do_object_id || do_cluster_id || do_polylines;
    bool status = do_latlon || do_raw ||                  do_object_id || do_cluster_id;
 
 return !status;
@@ -868,10 +718,8 @@ void MtdNcOutInfo::set_all_false()
 
 do_latlon     = false;
 do_raw        = false;
-// do_object_raw = false;
 do_object_id  = false;
 do_cluster_id = false;
-// do_polylines  = false;
 
 return;
 
@@ -887,10 +735,8 @@ void MtdNcOutInfo::set_all_true()
 
 do_latlon     = true;
 do_raw        = true;
-// do_object_raw = true;
 do_object_id  = true;
 do_cluster_id = true;
-// do_polylines  = true;
 
 return;
 

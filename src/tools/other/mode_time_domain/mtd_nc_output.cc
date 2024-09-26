@@ -57,8 +57,9 @@ NcFile out(output_filename, NcFile::replace);
 
 if ( IS_INVALID_NC(out) )  {
 
-   mlog << Error << "\n\n  do_mtd_nc_output() -> trouble opening output file \""
-        << output_filename << "\"\n\n";
+   mlog << Error << "\ndo_mtd_nc_output() -> "
+        << "trouble opening output file: "
+        << output_filename << "\n\n";
 
    exit ( 1 );
 
@@ -140,8 +141,9 @@ NcFile out(output_filename, NcFile::replace);
 
 if ( IS_INVALID_NC(out) )  {
 
-   mlog << Error << "\n\n  do_mtd_nc_output[single]() -> trouble opening output file \""
-        << output_filename << "\"\n\n";
+   mlog << Error << "\ndo_mtd_nc_output[single]() -> "
+        << "trouble opening output file: "
+        << output_filename << "\n\n";
 
    exit ( 1 );
 
@@ -215,7 +217,6 @@ add_att(&lon_var, "long_name", "Longitude");
 
 float * lat_data = new float [nx*ny];
 float * lon_data = new float [nx*ny];
-
 
 Lat = lat_data;
 Lon = lon_data;
@@ -314,7 +315,6 @@ add_att(&var, "_FillValue", bad_data_int);
 long offsets[3] = {0,0,0};
 long lengths[3] = {nt,ny, nx};
 put_nc_data(&var, id.data(), lengths, offsets);
-
 
    //
    //  done
