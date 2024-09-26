@@ -19,7 +19,6 @@
 
 
 #include "mtd_nc_defs.h"
-#include "nc_utils_local.h"
 
 #include "mtd_file_float.h"
 #include "mtd_file_int.h"

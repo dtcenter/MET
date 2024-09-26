@@ -24,9 +24,9 @@
 #include "mtd_file.h"
 #include "mtd_partition.h"
 #include "mtd_nc_defs.h"
-#include "nc_utils_local.h"
 
 #include "vx_math.h"
+#include "vx_nc_util.h"
 
 using namespace std;
 using namespace netCDF;
@@ -642,32 +642,14 @@ MtdFileBase::read(f);
 
    //  DataMin, DataMax
 
-DataMin = string_att_as_double (f, min_value_att_name);
-DataMax = string_att_as_double (f, max_value_att_name);
+DataMin = get_att_value_double(&f, min_value_att_name);
+DataMax = get_att_value_double(&f, max_value_att_name);
 
    //  Data
 
 set_size(Nx, Ny, Nt);
 
 var = get_nc_var(&f, data_field_name);
-
-//if ( !(var->set_cur(0, 0, 0)) )  {
-//
-//   mlog << Error << "\n\n  MtdFloatFile::read() -> trouble setting corner\n\n";
-//
-//   exit ( 1 );
-//
-//}
-//
-//// const time_t t_start = time(0);   //  for timing the data read operation
-//
-//if ( ! (var->get(Data, Nt, Ny, Nx)) )  {
-//
-//   mlog << Error << "\n\n  MtdFloatFile::read(const char *) -> trouble getting data\n\n";
-//
-//   exit ( 1 );
-//
-//}
 
 LongArray offsets;  // {0,0,0};
 LongArray lengths;  // {Nt, Ny, Nx};
@@ -679,7 +661,6 @@ lengths.add(Nt);
 lengths.add(Ny);
 lengths.add(Nx);
 
-//if ( ! get_nc_data(&var, Data, (long *){Nt, Ny, Nx}, (long *){0,0,0}) )  {
 if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
 
    mlog << Error << "\n\n  MtdFloatFile::read(const char *) -> trouble getting data\n\n";
@@ -687,10 +668,6 @@ if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
    exit ( 1 );
 
 }
-
-// const time_t t_stop = time(0);   //  for timing the data read operation
-
-// mlog << Debug(5) << "\n\n  MtdFloatFile::read(): Time to read data = " << (t_stop - t_start) << " seconds\n\n" << flush;
 
    //
    //  done

@@ -19,7 +19,7 @@
 
 #include "mtd_nc_output.h"
 
-#include "write_netcdf.h"
+#include "vx_nc_util.h"
 
 using namespace std;
 using namespace netCDF;
@@ -264,7 +264,7 @@ const int ny = raw.ny();
 const int nt = raw.nt();
 ConcatString s;
 
-const char * const name = ( is_fcst ? fcst_raw_name : obs_raw_name );
+const string name = ( is_fcst ? fcst_raw_name : obs_raw_name );
 
 NcVar var = add_var(&out, name, ncFloat, nt_dim, ny_dim, nx_dim);
 
@@ -300,7 +300,7 @@ const int ny = id.ny();
 const int nt = id.nt();
 ConcatString s;
 
-const char * const name = ( is_fcst ? fcst_obj_id_name : obs_obj_id_name );
+const string name = ( is_fcst ? fcst_obj_id_name : obs_obj_id_name );
 
 NcVar var = add_var(&out, name, ncInt, nt_dim, ny_dim, nx_dim);
 
@@ -346,7 +346,7 @@ const int n3 = nx*ny*nt;
 
 out_data = new int [n3];
 
-const char * const name = ( is_fcst ? fcst_clus_id_name : obs_clus_id_name );
+const string name = ( is_fcst ? fcst_clus_id_name : obs_clus_id_name );
 
 NcVar var = add_var(&out, name, ncInt, nt_dim, ny_dim, nx_dim);
 

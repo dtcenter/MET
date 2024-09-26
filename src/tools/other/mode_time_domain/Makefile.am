@@ -12,7 +12,6 @@ include ${top_srcdir}/Make-include
 bin_PROGRAMS    = mtd
 mtd_SOURCES = mtd.cc \
 	mtdfiletype_to_string.cc mtdfiletype_to_string.h \
-	nc_utils_local.cc nc_utils_local.h \
 	3d_moments.cc 3d_moments.h \
 	2d_moments.cc 2d_moments.h \
 	fo_node.cc fo_node.h \

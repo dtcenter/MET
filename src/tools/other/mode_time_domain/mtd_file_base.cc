@@ -23,12 +23,11 @@
 #include "mtd_file.h"
 #include "mtd_partition.h"
 #include "mtd_nc_defs.h"
-#include "nc_utils_local.h"
 #include "mtdfiletype_to_string.h"
 #include "get_met_grid.h"
-#include "write_netcdf.h"
 
 #include "vx_math.h"
+#include "vx_nc_util.h"
 
 using namespace std;
 using namespace netCDF;
@@ -414,7 +413,6 @@ void MtdFileBase::read(NcFile & f)
 
 {
 
-//NcDim * dim = 0;
 NcDim dim;
 
    //  Nx, Ny, Nt
@@ -428,8 +426,6 @@ Ny  = GET_NC_SIZE(dim);
 dim = get_nc_dim(&f, nt_dim_name);
 Nt  = GET_NC_SIZE(dim);
 
-//dim = 0;
-
    //  Grid
 
 G = new Grid;
@@ -438,17 +434,19 @@ read_netcdf_grid(&f, *G);
 
    //  timestamp info
 
-StartValidTime = parse_start_time(string_att(f, start_time_att_name));
+ConcatString s;
 
-DeltaT    = string_att_as_int (f, delta_t_att_name);
+get_att_value_string(&f, start_time_att_name, s);
+
+StartValidTime = timestring_to_unix(s.text());
+
+DeltaT = get_att_value_int(&f, delta_t_att_name);
 
    //  FileType
 
-// ConcatString s = (string)string_att(f, filetype_att_name);
-ConcatString s;
 bool status = false;
 
-s.add(string_att(f, filetype_att_name));
+get_att_value_string(&f, filetype_att_name, s);
 
 status = string_to_mtdfiletype(s.text(), FileType);
 
@@ -460,7 +458,6 @@ if ( ! status )  {
    exit ( 1 );
 
 }
-
 
    //
    //  done
@@ -494,7 +491,7 @@ write_netcdf_proj(&f, *G, ny_dim, nx_dim);
 
    //  timestamp info
 
-s = start_time_string(StartValidTime);
+s = unix_to_yyyymmdd_hhmmss(StartValidTime);
 
 add_att(&f, start_time_att_name, s.text());
 

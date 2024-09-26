@@ -24,9 +24,9 @@
 #include "mtd_file.h"
 #include "mtd_partition.h"
 #include "mtd_nc_defs.h"
-#include "nc_utils_local.h"
 
 #include "vx_math.h"
+#include "vx_nc_util.h"
 
 using namespace std;
 using namespace netCDF;
@@ -421,10 +421,7 @@ void MtdIntFile::read(NcFile & f)
 
 {
 
-//NcVar * var = 0;
 NcVar var ;
-
-
 
    //
    //  read the base class stuff
@@ -434,32 +431,14 @@ MtdFileBase::read(f);
 
    //  DataMin, DataMax
 
-DataMin = string_att_as_double (f, min_value_att_name);
-DataMax = string_att_as_double (f, max_value_att_name);
+DataMin = get_att_value_double(&f, min_value_att_name);
+DataMax = get_att_value_double(&f, max_value_att_name);
 
    //  Data
 
 set_size(Nx, Ny, Nt);
 
 var = get_nc_var(&f, data_field_name);
-
-//if ( !(var->set_cur(0, 0, 0)) )  {
-//
-//   mlog << Error << "\n  MtdIntFile::read() -> trouble setting corner\n\n";
-//
-//   exit ( 1 );
-//
-//}
-//
-//// const time_t t_start = time(0);   //  for timing the data read operation
-//
-//if ( ! (var->get(Data, Nt, Ny, Nx)) )  {
-//
-//   mlog << Error << "\n  MtdIntFile::read(const char *) -> trouble getting data\n\n";
-//
-//   exit ( 1 );
-//
-//}
 
 LongArray offsets;  // {0,0,0};
 LongArray lengths;  // {Nt, Ny, Nx};
@@ -471,7 +450,6 @@ lengths.add(Nt);
 lengths.add(Ny);
 lengths.add(Nx);
 
-//if ( ! get_nc_data(&var, Data, (long *){Nt, Ny, Nx}, (long *){0,0,0}) )  {
 if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
 
    mlog << Error << "\n  MtdIntFile::read(const char *) -> trouble getting data\n\n";
@@ -479,10 +457,6 @@ if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
    exit ( 1 );
 
 }
-
-// const time_t t_stop = time(0);   //  for timing the data read operation
-
-// mlog << Debug(5) << "\n  MtdIntFile::read(): Time to read data = " << (t_stop - t_start) << " seconds\n\n" << flush;
 
    //
    //  done
@@ -500,22 +474,15 @@ void MtdIntFile::write(NcFile & f) const
 
 {
 
-//NcDim * nx_dim   = 0;
-//NcDim * ny_dim   = 0;
-//NcDim * nt_dim   = 0;
-//NcDim * n_obj_dim   = 0;
-NcDim nx_dim   ;
-NcDim ny_dim   ;
-NcDim nt_dim   ;
+NcDim nx_dim;
+NcDim ny_dim;
+NcDim nt_dim;
 NcDim n_obj_dim;
-//NcVar * data_var = 0;
-//NcVar * volumes_var = 0;
-NcVar  data_var    ;
-NcVar  volumes_var ;
+NcVar data_var;
+NcVar volumes_var; 
 const char format [] = "%d";
 char junk[256];
 const bool is_split = (ObjVolume != 0);
-
 
    //
    //  write stuff from parent class
@@ -571,8 +538,6 @@ add_att(&f, threshold_att_name, Threshold);
 
 data_var = add_var(&f, data_field_name, ncInt, nt_dim, ny_dim, nx_dim);
 
-//data_var = get_nc_var(&f, data_field_name);
-
 LongArray offsets;  // {0,0,0};
 LongArray lengths;  // {Nt, Ny, Nx};
 
@@ -591,24 +556,6 @@ if ( ! put_nc_data(&data_var, Data, lengths, offsets) )  {
 
 }
 
-//if ( !(data_var->set_cur(0, 0, 0)) )  {
-//
-//   mlog << Error << "\n  MtdIntFile::write() -> trouble setting corner on data field\n\n";
-//
-//   exit ( 1 );
-//
-//}
-//
-//// const time_t t_start = time(0);   //  for timing the data write operation
-//
-//if ( !(data_var->put(Data, Nt, Ny, Nx)) )  {
-//
-//   mlog << Error << "\n  MtdIntFile::write() -> trouble writing data field\n\n";
-//
-//   exit ( 1 );
-//
-//}
-
    //
    //  volumes, if needed
    //
@@ -616,8 +563,6 @@ if ( ! put_nc_data(&data_var, Data, lengths, offsets) )  {
 if ( is_split )  {
 
    volumes_var = add_var(&f, volumes_name, ncInt, n_obj_dim);
-
-   //volumes_var = get_nc_var(&f, volumes_name);
 
    if ( !(put_nc_data(&volumes_var, ObjVolume, Nobjects, 0)) )  {
 
@@ -628,10 +573,6 @@ if ( is_split )  {
    }
 
 }   //  if is_split
-
-// const time_t t_stop = time(0);   //  for timing the data write operation
-
-// mlog << Debug(5) << "\n  MtdIntFile::write(): Time to write data = " << (t_stop - t_start) << " seconds\n\n" << flush;
 
    //
    //  done
