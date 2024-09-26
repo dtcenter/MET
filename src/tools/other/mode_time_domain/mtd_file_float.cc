@@ -642,8 +642,8 @@ MtdFileBase::read(f);
 
    //  DataMin, DataMax
 
-DataMin = get_att_value_double(&f, min_value_att_name);
-DataMax = get_att_value_double(&f, max_value_att_name);
+DataMin = (float) get_att_value_double(&f, min_value_att_name);
+DataMax = (float) get_att_value_double(&f, max_value_att_name);
 
    //  Data
 

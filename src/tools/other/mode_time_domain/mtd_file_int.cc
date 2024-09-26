@@ -425,8 +425,8 @@ MtdFileBase::read(f);
 
    //  DataMin, DataMax
 
-DataMin = get_att_value_double(&f, min_value_att_name);
-DataMax = get_att_value_double(&f, max_value_att_name);
+DataMin = get_att_value_int(&f, min_value_att_name);
+DataMax = get_att_value_int(&f, max_value_att_name);
 
    //  Data
 
