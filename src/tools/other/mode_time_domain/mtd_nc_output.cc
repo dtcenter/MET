@@ -68,11 +68,9 @@ const bool have_pairs =    (fcst_obj.n_objects() != 0)
                         && ( obs_obj.n_objects() != 0);
 
    //
-   //  dimensions
+   //  add time dimension
    //
 
-nx_dim = add_dim(&out,  nx_dim_name, fcst_raw.nx());
-ny_dim = add_dim(&out,  ny_dim_name, fcst_raw.ny());
 nt_dim = add_dim(&out,  nt_dim_name, fcst_raw.nt());
 
    //
@@ -82,7 +80,7 @@ nt_dim = add_dim(&out,  nt_dim_name, fcst_raw.nt());
 write_netcdf_global(&out, output_filename, "MTD",
                     config.model.c_str(), config.obtype.c_str(), config.desc.c_str());
 
-write_nc_grid(out, fcst_raw.grid());
+write_netcdf_proj(&out, fcst_raw.grid(), ny_dim, nx_dim);
 
    //
    //  variables
@@ -150,11 +148,9 @@ if ( IS_INVALID_NC(out) )  {
 }
 
    //
-   //  dimensions
+   //  add time dimension
    //
 
-nx_dim = add_dim(&out,  nx_dim_name, raw.nx());
-ny_dim = add_dim(&out,  ny_dim_name, raw.ny());
 nt_dim = add_dim(&out,  nt_dim_name, raw.nt());
 
    //
@@ -164,7 +160,7 @@ nt_dim = add_dim(&out,  nt_dim_name, raw.nt());
 write_netcdf_global(&out, output_filename, "MTD",
                     config.model.c_str(), config.obtype.c_str(), config.desc.c_str());
 
-write_nc_grid(out, raw.grid());
+write_netcdf_proj(&out, raw.grid(), ny_dim, nx_dim);
 
    //
    //  variables
