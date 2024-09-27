@@ -7,20 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Warning:  This file is machine generated
-   //
-   //            Do not edit by hand
-   //
-   //
-   //  Created by arraygen on September 17, 2015   10:11 am   MDT
-   //
-
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -127,12 +113,9 @@ void SingleAtt2DArray::clear()
 if ( e )  { delete [] e;  e = (SingleAtt2D *) nullptr; }
 
 
-
 Nelements = 0;
 
 Nalloc = 0;
-
-// AllocInc = 50;   //  don't reset AllocInc
 
 
 return;
@@ -174,7 +157,8 @@ SingleAtt2D * u = new SingleAtt2D [N];
 
 if ( !u )  {
 
-   mlog << Error << "SingleAtt2DArray::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nSingleAtt2DArray::extend(int) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -238,7 +222,8 @@ void SingleAtt2DArray::set_alloc_inc(int N)
 
 if ( N < 0 )  {
 
-   mlog << Error << "SingleAtt2DArray::set_alloc_int(int) -> bad value ... " << N << "\n\n";
+   mlog << Error << "\nSingleAtt2DArray::set_alloc_int(int) -> "
+        << "bad value ... " << N << "\n\n";
 
    exit ( 1 );
 
@@ -299,7 +284,8 @@ SingleAtt2D & SingleAtt2DArray::operator[](int N) const
 
 if ( (N < 0) || (N >= Nelements) )  {
 
-   mlog << Error << "\n\n  SingleAtt2DArray::operator[](int) -> range check error ... " << N << "\n\n";
+   mlog << Error << "\nSingleAtt2DArray::operator[](int) -> "
+        << "range check error ... " << N << "\n\n";
 
    exit ( 1 );
 }
@@ -344,8 +330,8 @@ unixtime SingleAtt2DArray::valid_time(int index) const
 
 if ( (index < 0) || (index >= Nelements) )  {
 
-   mlog << Error
-        << "SingleAtt2DArray::valid_time(int) const -> range check error\n\n";
+   mlog << Error << "\nSingleAtt2DArray::valid_time(int) const -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -365,8 +351,8 @@ int SingleAtt2DArray::lead_time(int index) const
 
 if ( (index < 0) || (index >= Nelements) )  {
 
-   mlog << Error
-        << "SingleAtt2DArray::lead_time(int) const -> range check error\n\n";
+   mlog << Error << "\nSingleAtt2DArray::lead_time(int) const -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -386,8 +372,8 @@ int SingleAtt2DArray::time_index(int index) const
 
 if ( (index < 0) || (index >= Nelements) )  {
 
-   mlog << Error
-        << "SingleAtt2DArray::time_index(int) const -> range check error\n\n";
+   mlog << Error << "\nSingleAtt2DArray::time_index(int) const -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -399,7 +385,5 @@ return e[index].time_index();
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
 
 

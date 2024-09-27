@@ -7,7 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -23,11 +22,11 @@
 #include "mtd_file.h"
 #include "mtd_partition.h"
 #include "mtd_nc_defs.h"
-#include "nc_grid.h"
-#include "nc_utils_local.h"
 #include "mtdfiletype_to_string.h"
+#include "get_met_grid.h"
 
 #include "vx_math.h"
+#include "vx_nc_util.h"
 
 using namespace std;
 using namespace netCDF;
@@ -179,8 +178,6 @@ if ( G )  {
 
    G->dump(out, depth + 1);
 
-   // out << prefix << (G->xml_serialize()) << '\n';
-
 } else {
 
    out << prefix << "Grid              = 0\n";
@@ -238,7 +235,8 @@ Grid MtdFileBase::grid() const
 
 if ( !G )  {
 
-   mlog << Error << "\n\n  MtdFileBase::grid() const -> no grid!\n\n";
+   mlog << Error << "\nMtdFileBase::grid() const -> "
+        << "no grid!\n\n";
 
    exit ( 1 );
 
@@ -271,7 +269,8 @@ void MtdFileBase::latlon_to_xy(double lat, double lon, double & x, double & y) c
 
 if ( !G )  {
 
-   mlog << Error << "\n\n  MtdFileBase::latlon_to_xy() -> no grid!\n\n";
+   mlog << Error << "\nMtdFileBase::latlon_to_xy() -> "
+        << "no grid!\n\n";
 
    exit ( 1 );
 
@@ -333,7 +332,8 @@ void MtdFileBase::xy_to_latlon(double x, double y, double & lat, double & lon) c
 
 if ( !G )  {
 
-   mlog << Error << "\n\n  MtdFileBase::xy_to_latlon() -> no grid!\n\n";
+   mlog << Error << "\nMtdFileBase::xy_to_latlon() -> "
+        << "no grid!\n\n";
 
    exit ( 1 );
 
@@ -355,7 +355,8 @@ unixtime MtdFileBase::valid_time(int t) const
 
 if ( (t < 0) || ( t >= Nt) )  {
 
-   mlog << Error << "\n\n  MtdFileBase::valid_time(int t) -> range check error\n\n";
+   mlog << Error << "\nMtdFileBase::valid_time(int t) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -375,7 +376,8 @@ unixtime MtdFileBase::actual_valid_time(int t) const
 
 if ( (t < 0) || ( t >= (int)ActualValidTimes.size()) )  {
 
-   mlog << Error << "\n\n  MtdFileBase::valid_time(int t) -> range check error\n\n";
+   mlog << Error << "\nMtdFileBase::valid_time(int t) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -395,7 +397,8 @@ int MtdFileBase::lead_time(int index) const
 
 if ( (index < 0) || ( index >= Nt) )  {
 
-   mlog << Error << "\n\n  MtdFileBase::lead_time(int t) -> range check error\n\n";
+   mlog << Error << "\nMtdFileBase::lead_time(int t) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -413,7 +416,6 @@ void MtdFileBase::read(NcFile & f)
 
 {
 
-//NcDim * dim = 0;
 NcDim dim;
 
    //  Nx, Ny, Nt
@@ -427,39 +429,39 @@ Ny  = GET_NC_SIZE(dim);
 dim = get_nc_dim(&f, nt_dim_name);
 Nt  = GET_NC_SIZE(dim);
 
-//dim = 0;
-
    //  Grid
 
 G = new Grid;
 
-read_nc_grid(f, *G);
+read_netcdf_grid(&f, *G);
 
    //  timestamp info
 
-StartValidTime = parse_start_time(string_att(f, start_time_att_name));
+ConcatString s;
 
-DeltaT    = string_att_as_int (f, delta_t_att_name);
+get_att_value_string(&f, start_time_att_name, s);
+
+StartValidTime = timestring_to_unix(s.text());
+
+DeltaT = get_att_value_int(&f, delta_t_att_name);
 
    //  FileType
 
-// ConcatString s = (string)string_att(f, filetype_att_name);
-ConcatString s;
 bool status = false;
 
-s.add(string_att(f, filetype_att_name));
+get_att_value_string(&f, filetype_att_name, s);
 
 status = string_to_mtdfiletype(s.text(), FileType);
 
 if ( ! status )  {
 
-   mlog << Error << "\n\n  MtdFileBase::read(NcFile &) -> unable to parse filetype string \""
+   mlog << Error << "\nMtdFileBase::read(NcFile &) -> "
+        << "unable to parse filetype string \""
         << s << "\"\n\n";
 
    exit ( 1 );
 
 }
-
 
    //
    //  done
@@ -480,19 +482,20 @@ void MtdFileBase::write(NcFile & f) const
 char junk[256];
 ConcatString s;
 
-   //  Nx, Ny, Nt
+   //  Add the time dimension
 
-add_dim(&f, nx_dim_name, Nx);
-add_dim(&f, ny_dim_name, Ny);
 add_dim(&f, nt_dim_name, Nt);
 
    //  Grid
 
-write_nc_grid(f, *G);
+NcDim ny_dim;
+NcDim nx_dim;
+
+write_netcdf_proj(&f, *G, ny_dim, nx_dim);
 
    //  timestamp info
 
-s = start_time_string(StartValidTime);
+s = unix_to_yyyymmdd_hhmmss(StartValidTime);
 
 add_att(&f, start_time_att_name, s.text());
 
@@ -506,7 +509,6 @@ add_att(&f, delta_t_att_name, junk);
 s = mtdfiletype_to_string(FileType);
 
 add_att(&f, filetype_att_name, s.text());
-
 
 
    //
@@ -527,8 +529,8 @@ void MtdFileBase::set_lead_time(int index, int value)
 
 if ( (index < 0) || (index >= Nt) )  {
 
-   mlog << Error
-        << "MtdFileBase::set_lead_time(int index, int value) -> range check error on index ... "
+   mlog << Error << "MtdFileBase::set_lead_time(int index, int value) -> "
+        << "range check error on index ... "
         << index << "\n\n";
 
    exit ( 1 );
@@ -551,9 +553,5 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
 
 
