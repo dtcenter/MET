@@ -7,7 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -201,28 +200,6 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-bool EquivalenceClass::has(int k) const
-
-{
-
-int j;
-int * e = E;
-
-for (j=0; j<Nelements; ++j, ++e)  {
-
-   if ( *e == k )  return true;
-
-}
-
-
-return false;
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 void EquivalenceClass::add_no_repeat(int k)
 
@@ -254,7 +231,8 @@ int EquivalenceClass::element(int k) const
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   mlog << Error << "\n\n  EquivalenceClass::element(int) const -> range check error\n\n";
+   mlog << Error << "\nEquivalenceClass::element(int) const -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -531,28 +509,6 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-bool Mtd_Partition::has(int k) const
-
-{
-
-int j;
-EquivalenceClass ** c = C;
-
-for (j=0; j<Nelements; ++j, ++c)  {
-
-   if ( (*c)->has(k) )  return true;
-
-}
-
-
-return false;
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 bool Mtd_Partition::has(int index, int k) const
 
@@ -560,7 +516,8 @@ bool Mtd_Partition::has(int index, int k) const
 
 if ( (index < 0) || (index >= Nelements) )  {
 
-   mlog << Error << "\n\n  Mtd_Partition::has(int index, int k) const -> range check error on index\n\n";
+   mlog << Error << "\nMtd_Partition::has(int index, int k) const -> "
+        << "range check error on index\n\n";
 
    exit ( 1 );
 
@@ -602,7 +559,8 @@ void Mtd_Partition::merge_classes(int nclass_1, int nclass_2)
 
 if ( (nclass_1 < 0) || (nclass_1 >= Nelements) || (nclass_2 < 0) || (nclass_2 >= Nelements) )  {
 
-   mlog << Error << "\n\n  Mtd_Partition::merge_classes() -> range check error\n\n";
+   mlog << Error << "\nMtd_Partition::merge_classes() -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -662,7 +620,8 @@ nclass_2 = which_class(value_2);
 
 if ( (nclass_1 < 0) || (nclass_2 < 0) )  {
 
-   mlog << Error << "\n\n  Mtd_Partition::merge_values() -> bad values ... "
+   mlog << Error << "\nMtd_Partition::merge_values() -> "
+        << "bad values ... "
         << "(value_1, value_2) = " << value_1 << ", " << value_2 << " ... "
         << "(nclass_1, nclass_2) = " << nclass_1 << ", " << nclass_2
         << "\n\n";
@@ -711,7 +670,8 @@ const EquivalenceClass * Mtd_Partition::operator()(int k) const
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   mlog << Error << "\n\n  Mtd_Partition::operator()(int) const -> range check error\n\n";
+   mlog << Error << "\nMtd_Partition::operator()(int) const -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -778,8 +738,6 @@ for (j=0; j<Nelements; ++j)  {
 }   //  for j
 
 
-
-
 return out;
 
 }
@@ -819,7 +777,5 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
 
 

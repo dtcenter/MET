@@ -57,7 +57,6 @@ class Mtd_2D_Moments {
 
       int area() const;
 
-
          //
          //  do stuff
          //
@@ -66,10 +65,7 @@ class Mtd_2D_Moments {
 
       void centralize();
 
-
       double calc_2D_axis_plane_angle() const;
-
-
 
 };
 
