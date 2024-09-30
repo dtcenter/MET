@@ -80,6 +80,14 @@ inline int is_eq(float a, float b) {
    return is_eq((double)a, (double)b);
 }
 
+inline int is_eq(double a, float b) {
+   return is_eq(a, (double)b);
+}
+
+inline int is_eq(float a, double b) {
+   return is_eq((double)a, b);
+}
+
 template <typename T>
 inline int is_eq(T a, T b) {
    return (a == b);

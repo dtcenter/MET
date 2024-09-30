@@ -234,7 +234,7 @@ def unit(test_xml, file_log=None, cmd_only=False, noexit=False, memchk=False, ca
 
             #   # on failure, print the problematic test and exit, if requested
             if not (ret_ok and out_ok):
-                logger.info("\n".join(set_envs) + cmd + cmd_outs + "\n".join(unset_envs) + "\n")
+                logger.info("\n".join(set_envs) + "\n" + cmd + "\n" + cmd_outs + "\n".join(unset_envs) + "\n")
                 if not noexit:
                     sys.exit(1)
 
