@@ -46,6 +46,23 @@
     </output>
   </test>
 
+  <test name="point2grid_pb2nc_WINDS">
+    <exec>&MET_BIN;/point2grid</exec>
+    <param> \
+      &OUTPUT_DIR;/pb2nc/ndas.20120409.t12z.prepbufr.tm00.nc \
+      G212 \
+      &OUTPUT_DIR;/point2grid/pb2nc_WINDS.nc \
+      -field 'name="UGRD"; level="*";' \
+      -field 'name="VGRD"; level="*";' \
+      -name UWIND,VWIND \
+    -config &CONFIG_DIR;/Point2GridConfig_WINDS \
+      -v 3 
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/point2grid/pb2nc_WINDS.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="point2grid_pb2nc_TMP">
     <exec>&MET_BIN;/point2grid</exec>
     <param> \
