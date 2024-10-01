@@ -1136,21 +1136,25 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       }
       log_msg << ", by msg_type: " << filtered_by_msg_type;
       if (0 < filtered_by_msg_type) {
-         log_msg << " [";
-         for(int idx=0; idx<conf_info.message_type.n(); idx++) {
-            if (idx > 0) log_msg << ",";
-            log_msg << conf_info.message_type[idx];
-         }
-         log_msg << "]";
+         log_msg << " [" << write_css(conf_info.message_type) << "]";
       }
       log_msg << ", by QC: " << filtered_by_qc;
       if (0 < filtered_by_qc) {
-         log_msg << " [";
-         for(int idx=0; idx<qc_flags.n(); idx++) {
-            if (idx > 0) log_msg << ",";
-            log_msg << qc_flags[idx];
+         if (0 < qc_flags.n()) {
+            log_msg << " [-qc "
+                    << write_css(qc_flags)
+                    << "]";
          }
-         log_msg << "]";
+         if (0 < conf_info.obs_qty_inc.n()) {
+            log_msg << " [obs_quality_inc = "
+                    << write_css(conf_info.obs_qty_inc)
+                    << "]";
+         }
+         if (0 < conf_info.obs_qty_exc.n()) {
+            log_msg << " [obs_quality_exc = "
+                    << write_css(conf_info.obs_qty_exc)
+                    << "]";
+         }
       }
       log_msg << ", out of " << var_count2;
       int filtered_count = filtered_by_msg_type + filtered_by_qc + (int)requested_valid_time;
