@@ -332,14 +332,14 @@ bool MetPointObsData::fill_obs_buf(int buf_size, int offset,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-float MetPointObsData::get_obs_val(int index) {
+float MetPointObsData::get_obs_val(int index) const {
    float obs_val = (is_obs_array ? obs_arr[index*obs_cnt+4] : obs_vals[index]);
    return obs_val;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-string MetPointObsData::get_obs_qty(int index) {
+string MetPointObsData::get_obs_qty(int index) const {
    const char *method_name = "MetPointObsData::get_obs_qty() -> ";
 
    if(index < 0 || index >= obs_cnt) {
