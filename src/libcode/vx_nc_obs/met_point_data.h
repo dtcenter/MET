@@ -18,6 +18,7 @@
 
 
 #include <ostream>
+#include <vector>
 
 #include "nc_utils.h"
 
@@ -61,13 +62,13 @@ struct MetPointObsData {
    int obs_cnt;
    bool is_obs_array;
    
-   int *obs_ids;       // grib_code or var_id
-   int *obs_hids;
-   int *obs_qids;
-   float *obs_lvls;
-   float *obs_hgts;
-   float *obs_vals;
-   float *obs_arr;       // nobs * 5
+   std::vector<int> obs_ids;       // grib_code or var_id
+   std::vector<int> obs_hids;
+   std::vector<int> obs_qids;
+   std::vector<float> obs_lvls;
+   std::vector<float> obs_hgts;
+   std::vector<float> obs_vals;
+   std::vector<float> obs_arr;       // nobs * 5
    StringArray var_names;
    StringArray qty_names;
    

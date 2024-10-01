@@ -170,7 +170,6 @@ static void set_gaussian_dx(const StringArray &);
 static void set_gaussian_radius(const StringArray &);
 
 static unixtime compute_unixtime(NcVar *time_var, unixtime var_value);
-void clear_cell_mapping(IntArray *cell_mapping);
 static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping,
                              NcVar var_lat, NcVar var_lon, bool *skip_times);
 static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
@@ -742,8 +741,8 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
    bool empty_input = (nhdr == 0 && nobs == 0);
    bool use_var_id = met_point_obs->is_using_var_id();
 
-   auto hdr_lats = new float[nhdr];
-   auto hdr_lons = new float[nhdr];
+   vector<float> hdr_lats(nhdr, bad_data_float);
+   vector<float> hdr_lons(nhdr, bad_data_float);
    IntArray var_index_array;
    IntArray valid_time_array;
    StringArray qc_tables = met_point_obs->get_qty_data();
@@ -751,8 +750,8 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
    StringArray hdr_valid_times = header_data->vld_array;
    hdr_valid_times.sort();
 
-   met_point_obs->get_lats(hdr_lats);
-   met_point_obs->get_lons(hdr_lons);
+   met_point_obs->get_lats(hdr_lats.data());
+   met_point_obs->get_lons(hdr_lons.data());
 
    // Check the message types
    prepare_message_types(header_data->typ_array);
@@ -783,7 +782,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
    int obs_count_zero_from = 0;
    int obs_count_non_zero_to = 0;
    int obs_count_non_zero_from = 0;
-   auto cellMapping = (IntArray *) nullptr;
+   vector<IntArray> cellMapping;
    for(int i=0; i<FieldSA.n(); i++) {
 
       var_idx_or_gc = -1;
@@ -976,14 +975,11 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          }
       }
 
-      if (cellMapping) {
-         clear_cell_mapping(cellMapping);
-         delete [] cellMapping;
-         cellMapping = (IntArray *) nullptr;
-      }
-      cellMapping = new IntArray[nx * ny];
-      if( get_grid_mapping(to_grid, cellMapping, var_index_array,
-                           obs_data->obs_hids, hdr_lats, hdr_lons) ) {
+      cellMapping.clear();
+      cellMapping.resize(nx * ny);
+      if( get_grid_mapping(to_grid, cellMapping.data(), var_index_array,
+                           obs_data->obs_hids.data(),
+                           hdr_lats.data(), hdr_lons.data()) ) {
          int from_index;
          IntArray cellArray;
          NumArray dataArray;
@@ -1179,14 +1175,6 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       }
    } // end for i
 
-   if (cellMapping) {
-      clear_cell_mapping(cellMapping);
-      delete [] cellMapping;   cellMapping = (IntArray *) nullptr;
-   }
-
-   delete [] hdr_lats;
-   delete [] hdr_lons;
-
    return;
 }
 
@@ -1362,9 +1350,9 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       if( 1 < get_dim_count(&time_var) ) {
          double max_time = bad_data_double;
          time_from_size = get_data_size(&time_var);
-         skip_times = new bool[time_from_size];
-         valid_times = new double[time_from_size];
-         if (get_nc_data(&time_var, valid_times)) {
+         vector<bool> skip_times(time_from_size, false);
+         vector<double> valid_times(time_from_size, bad_data_double);
+         if (get_nc_data(&time_var, valid_times.data())) {
             int sec_per_unit = 0;
             bool no_leap_year = false;
             auto ref_ut = (unixtime) 0;
@@ -1390,11 +1378,9 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       else valid_time = find_valid_time(time_var);
    }
    to_dp.set_size(to_grid.nx(), to_grid.ny());
-   IntArray *var_cell_mapping = nullptr;
-   auto cellMapping = new IntArray[to_grid.nx() * to_grid.ny()];
-   get_grid_mapping(fr_grid, to_grid, cellMapping, var_lat, var_lon, skip_times);
-   if( skip_times ) delete [] skip_times;
-   if( valid_times ) delete [] valid_times;
+   vector<IntArray> var_cell_mapping;
+   vector<IntArray> cellMapping(to_grid.nx() * to_grid.ny());
+   get_grid_mapping(fr_grid, to_grid, cellMapping.data(), var_lat, var_lon, skip_times);
 
    // Loop through the requested fields
    for(int i=0; i<FieldSA.n(); i++) {
@@ -1429,8 +1415,8 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
                      else if (is_nc_unit_longitude(units.c_str())) v_lon = nc_var;
                   }
                }
-               var_cell_mapping = new IntArray[to_grid.nx() * to_grid.ny()];
-               get_grid_mapping(fr_grid, to_grid, var_cell_mapping, v_lat, v_lon, skip_times);
+               var_cell_mapping.resize(to_grid.nx() * to_grid.ny());
+               get_grid_mapping(fr_grid, to_grid, var_cell_mapping.data(), v_lat, v_lon, skip_times);
                mlog << Debug(4) << method_name << "Override cell mapping from "
                     << GET_NC_NAME(v_lat) << " and " << GET_NC_NAME(v_lon) << "\n";
             }
@@ -1441,7 +1427,9 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       to_dp.set_init(valid_time);
       to_dp.set_valid(valid_time);
       regrid_nc_variable(nc_in, fr_mtddf, vinfo, fr_dp, to_dp, to_grid,
-                         (nullptr != var_cell_mapping ? var_cell_mapping: cellMapping));
+                         (var_cell_mapping.size() > 0 ?
+                          var_cell_mapping.data() :
+                          cellMapping.data()));
 
       // List range of data values
       if(mlog.verbosity_level() >= 2) {
@@ -1508,17 +1496,8 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
          }
       }
 
-      if (nullptr != var_cell_mapping) {
-         clear_cell_mapping(var_cell_mapping);
-         delete [] var_cell_mapping;
-         var_cell_mapping = nullptr;
-      }
-
    } // end for i
 
-   clear_cell_mapping(cellMapping);
-   delete [] cellMapping;
-   cellMapping = (IntArray *) nullptr;
    if( 0 < filtered_by_time ) {
       mlog << Debug(3) << method_name << "Filtered by time: " << filtered_by_time
            << " out of " << time_from_size
@@ -1565,7 +1544,7 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
 
    int from_data_size = from_lat_count * from_lon_count;
    bool is_to_north = !fr_grid.get_swap_to_north();
-   auto from_data = new float[from_data_size];
+   vector<float> from_data(from_data_size, bad_data_float);
    for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
       for (int yIdx=0; yIdx<from_lat_count; yIdx++) {
          int offset = fr_dp.two_to_one(xIdx,yIdx,is_to_north);
@@ -1655,8 +1634,6 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
       }
    }
 
-   delete [] from_data;
-
    mlog << Debug(4) << method_name << "[Count] data cells: " << to_cell_cnt
         << ", missing: " << missing_cnt << ", non_missing: " << non_missing_cnt
         << ", non mapped cells: " << no_map_cnt
@@ -1707,7 +1684,7 @@ static void open_nc(const Grid &grid, ConcatString run_cs) {
 void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
 
    // Allocate memory to store data values for each grid point
-   auto data = new float [grid.nx()*grid.ny()];
+   vector<float> data(grid.nx()*grid.ny(), bad_data_float);
 
    // Store the data
    int grid_nx = grid.nx();
@@ -1720,14 +1697,11 @@ void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
    } // end for x
 
    // Write out the data
-   if(!put_nc_data_with_dims(data_var, &data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(data_var, &data.data()[0], grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_nc_data() -> "
            << "error writing data to the output file.\n\n";
       exit(1);
    }
-
-   // Clean up
-   if(data) { delete [] data;  data = (float *) nullptr; }
 
    return;
 }
@@ -1737,7 +1711,7 @@ void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
 void write_nc_data_int(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
 
    // Allocate memory to store data values for each grid point
-   auto data = new int [grid.nx()*grid.ny()];
+   vector<int> data(grid.nx()*grid.ny(), bad_data_int);
 
    // Store the data
    int grid_nx = grid.nx();
@@ -1750,14 +1724,11 @@ void write_nc_data_int(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
    } // end for x
 
    // Write out the data
-   if(!put_nc_data_with_dims(data_var, &data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(data_var, &data.data()[0], grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_nc_data_int() -> "
            << "error writing data to the output file.\n\n";
       exit(1);
    }
-
-   // Clean up
-   if(data) { delete [] data;  data = (int *) nullptr; }
 
    return;
 }
@@ -1806,11 +1777,10 @@ static void write_nc_int(const DataPlane &dp, const Grid &grid,
    return;
 }
 
-//
 ////////////////////////////////////////////////////////////////////////
+//
 // GOES related modules
 //
-
 ////////////////////////////////////////////////////////////////////////
 
 static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
@@ -1844,8 +1814,8 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    NcVar time_var = get_nc_var_time(nc_in);
    unixtime valid_time = find_valid_time(time_var);
    to_dp.set_size(to_grid.nx(), to_grid.ny());
-   auto cellMapping = new IntArray[to_grid.nx() * to_grid.ny()];
-   get_grid_mapping(fr_grid, to_grid, cellMapping, geostationary_file);
+   vector<IntArray> cellMapping(to_grid.nx() * to_grid.ny());
+   get_grid_mapping(fr_grid, to_grid, cellMapping.data(), geostationary_file);
 
    // Loop through the requested fields
    for(int i=0; i<FieldSA.n(); i++) {
@@ -1861,7 +1831,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       to_dp.set_init(valid_time);
       to_dp.set_valid(valid_time);
       regrid_goes_variable(nc_in, vinfo, fr_dp, to_dp,
-                           fr_grid, to_grid, cellMapping, nc_adp);
+                           fr_grid, to_grid, cellMapping.data(), nc_adp);
 
       // List range of data values
       if(mlog.verbosity_level() >= 2) {
@@ -1949,8 +1919,6 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
    }
 
    delete nc_adp; nc_adp = nullptr;
-   clear_cell_mapping(cellMapping);
-   delete [] cellMapping;   cellMapping = (IntArray *) nullptr;
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << get_exe_duration(start_clock) << " seconds\n";
 
@@ -2012,15 +1980,6 @@ GOES_QC compute_adp_qc_flag(int adp_qc, int shift_bits) {
    else adp_qc_flag = GOES_QC::NA;
 
    return adp_qc_flag;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-void clear_cell_mapping(IntArray *cell_mapping) {
-   if (nullptr != cell_mapping) {
-      for (int idx=0; idx<cell_mapping->n(); idx++) cell_mapping[idx].clear();
-   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2125,10 +2084,8 @@ static void get_grid_mapping_latlon(
    int data_size  = from_lat_count * from_lon_count;
    static const char *method_name = "get_grid_mapping_latlon(lats, lons) -> ";
 
-   auto to_cell_counts = new int[to_size];
-   auto mapping_indices = new int[data_size];
-   for (int xIdx=0; xIdx<to_size; xIdx++) to_cell_counts[xIdx] = 0;
-   for (int xIdx=0; xIdx<data_size; xIdx++) mapping_indices[xIdx] = bad_data_int;
+   vector<int> to_cell_counts(to_size, 0);
+   vector<int> mapping_indices(data_size, bad_data_int);
 
    to_grid.xy_to_latlon(0, 0, to_ll_lat, to_ll_lon);
    mlog << Debug(5) << method_name << " to_grid ll corner: (" << to_ll_lon << ", " << to_ll_lat << ")\n";
@@ -2204,8 +2161,6 @@ static void get_grid_mapping_latlon(
       }
       else cellMapping[to_offset].add(xIdx);
    }
-   delete [] to_cell_counts;
-   delete [] mapping_indices;
 
    mlog << Debug(3) << method_name << "within grid: " << count_in_grid
         << " out of " << data_size << " (" << 1.0*count_in_grid/data_size*100 << "%)\n";
@@ -2260,14 +2215,14 @@ static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
       int last_idx = data_size - 1;
       int lat_count = get_data_size(&var_lat);
       int lon_count = get_data_size(&var_lon);
-      auto latitudes  = new float[lat_count];
-      auto longitudes = new float[lon_count];
-      status = get_nc_data(&var_lat, latitudes);
-      if( status ) status = get_nc_data(&var_lon, longitudes);
+      vector<float> latitudes(lat_count, bad_data_float);
+      vector<float> longitudes(lon_count, bad_data_float);
+      status = get_nc_data(&var_lat, latitudes.data());
+      if( status ) status = get_nc_data(&var_lon, longitudes.data());
       if( status ) {
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping,
-                                 latitudes, longitudes, from_lat_count,
-                                 from_lon_count, skip_times,
+                                 latitudes.data(), longitudes.data(),
+                                 from_lat_count, from_lon_count, skip_times,
                                  !fr_grid.get_swap_to_north(), (lon_count==data_size));
 
          if (is_eq(latitudes[0], latitudes[last_idx]) ||
@@ -2278,8 +2233,6 @@ static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
                  << longitudes[last_idx] << "\n\n";
          }
       }
-      if( latitudes )  delete [] latitudes;
-      if( longitudes ) delete [] longitudes;
    }   //  if data_size > 0
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
         << get_exe_duration(start_clock) << " seconds\n";
@@ -2390,22 +2343,14 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
    if (data_size > 0) {
       int lat_count = data_size;
       int lon_count = data_size;
-      auto latitudes  = (float *)nullptr;
-      auto longitudes = (float *)nullptr;
-      auto latitudes_buf  = (float *)nullptr;
-      auto longitudes_buf = (float *)nullptr;
-      int buff_size = data_size*sizeof(float);
+      float *latitudes = nullptr;
+      float *longitudes = nullptr;
+      vector<float> latitudes_buf(data_size, bad_data_float);
+      vector<float> longitudes_buf(data_size, bad_data_float);
       GoesImagerData grid_data;
       grid_data.reset();
 
       if (has_coord_input) {
-         latitudes_buf  = new float[data_size];
-         longitudes_buf = new float[data_size];
-
-         latitudes = latitudes_buf;
-         longitudes = longitudes_buf;
-         memset(latitudes,  0, buff_size);
-         memset(longitudes, 0, buff_size);
 
          if (IS_VALID_NC_P(coord_nc_in)) {
             NcVar var_lat = get_nc_var(coord_nc_in, var_name_lat);
@@ -2413,12 +2358,16 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
             if (IS_VALID_NC(var_lat) && IS_VALID_NC(var_lon)) {
                lat_count = get_data_size(&var_lat);
                lon_count = get_data_size(&var_lon);
+               latitudes = latitudes_buf.data();
+               longitudes = longitudes_buf.data();
                get_nc_data(&var_lat, latitudes);
                get_nc_data(&var_lon, longitudes);
             }
          }
          else {
             FILE *pFile = met_fopen ( cur_coord_name.c_str(), "rb" );
+            latitudes = latitudes_buf.data();
+            longitudes = longitudes_buf.data();
             (void) fread (latitudes,sizeof(latitudes[0]),data_size,pFile);
             (void) fread (longitudes,sizeof(longitudes[0]),data_size,pFile);
             fclose (pFile);
@@ -2479,23 +2428,21 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
                   latitudes, longitudes, grid_data);
          }
       }
-      if (nullptr == latitudes) {
+      if (latitudes == nullptr) {
          mlog << Error << "\n" << method_name
               << "Fail to get latitudes!\n\n";
       }
-      else if (nullptr == longitudes) {
+      else if (longitudes == nullptr) {
          mlog << Error << "\n" << method_name
               << "Fail to get longitudes!\n\n";
       }
       else {
          check_lat_lon(data_size, latitudes, longitudes);
-         get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping, latitudes,
-                                 longitudes, from_lat_count, from_lon_count, nullptr,
+         get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping,
+                                 latitudes, longitudes,
+                                 from_lat_count, from_lon_count, nullptr,
                                  !fr_grid.get_swap_to_north(), (lon_count==data_size));
       }
-
-      if (latitudes_buf)  delete [] latitudes_buf;
-      if (longitudes_buf) delete [] longitudes_buf;
 
       grid_data.release();
 
@@ -2628,14 +2575,11 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
    ConcatString goes_var_sub_name;
    ConcatString qc_var_name;
    uchar qc_value;
-   auto qc_data = new uchar[from_data_size];
-   auto adp_data = new uchar[from_data_size];
-   auto from_data = new float[from_data_size];
-   auto adp_qc_data = new unsigned short[from_data_size];
+   vector<uchar> qc_data(from_data_size, -99);
+   vector<uchar> adp_data(from_data_size, 1);
+   vector<float> from_data(from_data_size, bad_data_float);
+   vector<unsigned short> adp_qc_data(from_data_size, 255);
    static const char *method_name = "regrid_goes_variable() -> ";
-
-   // -99 is arbitrary number as invalid QC value
-   memset(qc_data, -99, from_data_size*sizeof(uchar));
 
    adp_qc_high = 3;     /* 3 as baseline algorithm, 0 for enterprise algorithm */
    adp_qc_medium = 1;   /* 1 as baseline algorithm, 1 for enterprise algorithm */
@@ -2651,8 +2595,6 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
    auto actual_var_len = actual_var_name.length();
    bool is_adp_variable = (0 != actual_var_name.compare(vinfo->name().c_str()));
 
-   memset(adp_data, 1, from_data_size*sizeof(uchar));   // Default: 1 = data present
-   memset(adp_qc_data, 255, from_data_size*sizeof(unsigned short));
    if (is_adp_variable && IS_VALID_NC_P(nc_adp)) {
       is_dust_only  = (0 == vinfo->name().comparecase((actual_var_len + 1),
             vname_dust.length(), vname_dust.c_str()));
@@ -2663,13 +2605,13 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
       else if (is_smoke_only)   var_adp = get_goes_nc_var(nc_adp, vname_smoke);
 
       if (IS_VALID_NC(var_adp)) {
-         get_nc_data(&var_adp, adp_data, true);
+         get_nc_data(&var_adp, adp_data.data(), true);
 
          //ADP Smoke:ancillary_variables: ubyte DQF(y, x)
          if (get_att_value_string(&var_adp, (string)"ancillary_variables", qc_var_name)) {
             var_adp_qc = get_nc_var(nc_adp, qc_var_name.c_str());
             if (IS_VALID_NC(var_adp_qc)) {
-               get_nc_data(&var_adp_qc, adp_qc_data);
+               get_nc_data(&var_adp_qc, adp_qc_data.data());
                set_adp_gc_values(var_adp_qc);
                has_adp_qc_var = true;
                mlog << Debug(5) << method_name << "found QC var: " << qc_var_name
@@ -2691,7 +2633,7 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
    if (get_att_value_string(&var_data, (string)"ancillary_variables", qc_var_name)) {
       var_qc = get_nc_var(nc_in, qc_var_name.c_str());
       if (IS_VALID_NC(var_qc)) {
-         get_nc_data(&var_qc, qc_data);
+         get_nc_data(&var_qc, qc_data.data());
          has_qc_var = true;
          mlog << Debug(3) << method_name << "found QC var: " << qc_var_name << ".\n";
       }
@@ -2702,7 +2644,7 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
       }
    }
 
-   get_nc_data(&var_data, from_data);
+   get_nc_data(&var_data, from_data.data());
 
    fr_dp.set_size(from_lon_count, from_lat_count);
    for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
@@ -2863,11 +2805,6 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
          }
       }
    }
-
-   delete [] qc_data;
-   delete [] adp_data;
-   delete [] from_data;
-   delete [] adp_qc_data;
 
    int cnt_adjused_low = cnt_adp_qc_low + cnt_adp_qc_high_to_low + cnt_adp_qc_medium_to_low;
    int cnt_adjused_high = cnt_adp_qc_high - cnt_adp_qc_high_to_medium - cnt_adp_qc_high_to_low;

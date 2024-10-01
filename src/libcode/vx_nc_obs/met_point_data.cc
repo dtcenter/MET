@@ -59,7 +59,6 @@ void MetPointData::init_from_scratch() {
    use_arr_vars = false;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 void MetPointData::clear() {
@@ -127,7 +126,6 @@ bool MetPointData::get_lons(float *hdr_lons) {
    return true;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 bool MetPointData::is_same_obs_values(const float obs_arr1[OBS_ARRAY_LEN],
@@ -150,17 +148,10 @@ void MetPointData::set_obs_cnt(int obs_cnt) {
    obs_data->obs_cnt = obs_cnt;
 }
 
-
-
-
 ////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for class MetPointDataPython
-   //
-
-
+//
+//  Code for class MetPointDataPython
+//
 ////////////////////////////////////////////////////////////////////////
 
 MetPointDataPython::MetPointDataPython() {
@@ -178,13 +169,11 @@ MetPointDataPython::MetPointDataPython(MetPointDataPython &d) {
    header_data.assign(*d.get_header_data());
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 MetPointDataPython::~MetPointDataPython() {
    clear();
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -193,61 +182,45 @@ void MetPointDataPython::allocate(int obs_cnt) {
    obs_data->allocate();
 }
 
-////////////////////////////////////////////////////////////////////////
-
-
-
 ///////////////////////////////////////////////////////////////////////////////
-// struct MetPointObsData
+//
+// Code for struct MetPointObsData
+//
+///////////////////////////////////////////////////////////////////////////////
 
-MetPointObsData::MetPointObsData():
-   obs_cnt(0),
-   obs_ids((int *)0),
-   obs_hids((int *)0),
-   obs_qids((int *)0),
-   obs_lvls((float *)0),
-   obs_hgts((float *)0),
-   obs_vals((float *)0),
-   obs_arr((float *)0),
-   is_obs_array(false)
-{
+MetPointObsData::MetPointObsData() {
+   clear();
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void MetPointObsData::allocate() {
-   if (is_obs_array) obs_arr = new float[obs_cnt*OBS_ARRAY_LEN];  // nobs * 5
+   if (is_obs_array) {
+      obs_arr.resize(obs_cnt*OBS_ARRAY_LEN, bad_data_float);  // nobs * 5
+   }
    else {
-      obs_ids = new int[obs_cnt];      // grib_code or var_id
-      obs_hids = new int[obs_cnt];
-      obs_qids = new int[obs_cnt];
-      obs_lvls = new float[obs_cnt];
-      obs_hgts = new float[obs_cnt];
-      obs_vals = new float[obs_cnt];
+      obs_ids.resize(obs_cnt, bad_data_int);      // grib_code or var_id
+      obs_hids.resize(obs_cnt, bad_data_int);
+      obs_qids.resize(obs_cnt, bad_data_int);
+      obs_lvls.resize(obs_cnt, bad_data_float);
+      obs_hgts.resize(obs_cnt, bad_data_float);
+      obs_vals.resize(obs_cnt, bad_data_float);
    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void MetPointObsData::assign(MetPointObsData &o) {
+   clear();
    obs_cnt = o.obs_cnt;
    is_obs_array = o.is_obs_array;
-
-   clear();
-   allocate();
-   if (is_obs_array)
-      for (int idx=0; idx<obs_cnt*OBS_ARRAY_LEN; idx++) obs_arr[idx] = o.obs_arr[idx];
-   else {
-      for (int idx=0; idx<obs_cnt; idx++) {
-         obs_ids[idx] = o.obs_ids[idx];
-         obs_hids[idx] = o.obs_hids[idx];
-         obs_qids[idx] = o.obs_qids[idx];
-         obs_lvls[idx] = o.obs_lvls[idx];
-         obs_hgts[idx] = o.obs_hgts[idx];
-         obs_vals[idx] = o.obs_vals[idx];
-      }
-   }
+   obs_arr = o.obs_arr;
+   obs_ids = o.obs_ids;
+   obs_hids = o.obs_hids;
+   obs_qids = o.obs_qids;
+   obs_lvls = o.obs_lvls;
+   obs_hgts = o.obs_hgts;
+   obs_vals = o.obs_vals;
    var_names = o.var_names;
    qty_names = o.qty_names;
 }
@@ -257,7 +230,6 @@ void MetPointObsData::assign(MetPointObsData &o) {
 void MetPointObsData::clear() {
    obs_cnt = 0;
    is_obs_array = false;
-
    clear_numbers();
    clear_strings();
 }
@@ -265,34 +237,13 @@ void MetPointObsData::clear() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void MetPointObsData::clear_numbers() {
-   if (0 != obs_ids) {
-      delete [] obs_ids;
-      obs_ids = (int *) nullptr;
-   }
-   if (0 != obs_hids) {
-      delete [] obs_hids;
-      obs_hids = (int *) nullptr;
-   }
-   if (0 != obs_qids) {
-      delete [] obs_qids;
-      obs_qids = (int *) nullptr;
-   }
-   if (0 != obs_lvls) {
-      delete [] obs_lvls;
-      obs_lvls = (float *) nullptr;
-   }
-   if (0 != obs_hgts) {
-      delete [] obs_hgts;
-      obs_hgts = (float *) nullptr;
-   }
-   if (0 != obs_vals) {
-      delete [] obs_vals;
-      obs_vals = (float *) nullptr;
-   }
-   if (0 != obs_arr) {
-      delete [] obs_arr;
-      obs_arr = (float *) nullptr;
-   }
+   obs_arr.clear();
+   obs_ids.clear();
+   obs_hids.clear();
+   obs_qids.clear();
+   obs_lvls.clear();
+   obs_hgts.clear();
+   obs_vals.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
