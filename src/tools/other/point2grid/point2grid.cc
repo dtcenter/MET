@@ -1130,7 +1130,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
            << ", obs_count_non_zero_to: " << obs_count_non_zero_to << "\n";
 
       ConcatString log_msg;
-      int filtered_count = filtered_by_msg_type + filtered_by_qc + (int)requested_valid_time;
+      int filtered_count = filtered_by_msg_type + filtered_by_qc + filtered_by_time;
       log_msg << "Filtered " << filtered_count << " of " << var_count2
               << " observations by time: " << filtered_by_time;
       if (0 < requested_valid_time) {
@@ -1140,7 +1140,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
       if (0 < filtered_by_msg_type) {
          log_msg << " [" << write_css(conf_info.message_type) << "]";
       }
-      log_msg << ", by QC: " << filtered_by_qc;
+      log_msg << ", and by QC: " << filtered_by_qc;
       if (0 < filtered_by_qc) {
          if (0 < qc_flags.n()) {
             log_msg << " [-qc "
@@ -1168,14 +1168,14 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          else {
             mlog << Warning << "\n" << method_name
                  << "No valid data after filtering.\n\t"
-                 << log_msg << ".\n\n";
+                 << log_msg << "\n\n";
          }
       }
       else {
          mlog << Debug(3) << "Using " << var_count << " "
               << vinfo->name() << " observations to populate " << to_count
               << " of " << to_grid.nxy() << " grid points.\n";
-         if (0 < filtered_count ) mlog << Debug(3) << log_msg << "\n";
+         if (0 < filtered_count ) mlog << log_msg << "\n";
       }
    } // end for i
 
