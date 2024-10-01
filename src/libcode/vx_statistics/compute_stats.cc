@@ -1629,10 +1629,12 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
          float obs_value = obs_dp.get(ix, iy);
          fcst_cat = obs_cat = bad_data_int;
          seeps_score = bad_data_double;
-         mlog << Debug(9) << method_name
+
+	 mlog << Debug(9) << method_name
               << "obs_value, fcst_value: "
               << obs_value << " " << fcst_value << "\n";
-         if (!is_bad_data(fcst_value) && !is_bad_data(obs_value)) {
+
+	 if (!is_bad_data(fcst_value) && !is_bad_data(obs_value)) {
             SeepsScore *seeps_mpr = seeps_climo->get_record(ix, iy, fcst_value, obs_value);
             if (seeps_mpr != nullptr) {
                fcst_cat = seeps_mpr->fcst_cat;

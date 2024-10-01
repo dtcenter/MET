@@ -92,7 +92,6 @@ class PairAtt3DArray {
 
       void patch_cluster_numbers(const MM_Engine &);
 
-
 };
 
 

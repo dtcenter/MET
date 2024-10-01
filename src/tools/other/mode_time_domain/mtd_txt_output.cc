@@ -7,7 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -56,13 +55,13 @@ ofstream out;
 AsciiTable table;
 const int Nobj = fcst_att.n() + obs_att.n();
 
-
 out.open(output_filename);
 
 if ( ! out )  {
 
-   mlog << Error << "\n\n  do_3d_single_txt_output() -> unable to open output filename \""
-        << output_filename << "\'\n\n";
+   mlog << Error << "\ndo_3d_single_txt_output() -> "
+        << "unable to open output filename: "
+        << output_filename << "\n\n";
 
    exit ( 1 );
 
@@ -172,13 +171,13 @@ ofstream out;
 AsciiTable table;
 const int Nobj = att.n();
 
-
 out.open(output_filename);
 
 if ( ! out )  {
 
-   mlog << Error << "\n\n  do_3d_single_txt_output[single]() -> unable to open output filename \""
-        << output_filename << "\'\n\n";
+   mlog << Error << "\ndo_3d_single_txt_output[single]() -> "
+        << "unable to open output filename: "
+        << output_filename << "\n\n";
 
    exit ( 1 );
 
@@ -322,8 +321,9 @@ out.open(output_filename);
 
 if ( ! out )  {
 
-   mlog << Error << "\n\n  do_3d_pair_txt_output() -> unable to open output filename \""
-        << output_filename << "\'\n\n";
+   mlog << Error << "\ndo_3d_pair_txt_output() -> "
+        << "unable to open output filename: "
+        << output_filename << "\n\n";
 
    exit ( 1 );
 
@@ -415,13 +415,13 @@ ofstream out;
 AsciiTable table;
 const int n_total = fcst_simple_att.n() + obs_simple_att.n() + fcst_cluster_att.n() + obs_cluster_att.n();
 
-
 out.open(output_filename);
 
 if ( ! out )  {
 
-   mlog << Error << "\n\n  do_2d_txt_output() -> unable to open output filename \""
-        << output_filename << "\'\n\n";
+   mlog << Error << "\ndo_2d_txt_output() -> "
+        << "unable to open output filename: "
+        << output_filename << "\n\n";
 
    exit ( 1 );
 
@@ -613,13 +613,13 @@ ofstream out;
 AsciiTable table;
 const int n_total = att.n();
 
-
 out.open(output_filename);
 
 if ( ! out )  {
 
-   mlog << Error << "\n\n  do_2d_txt_output[single]() -> unable to open output filename \""
-        << output_filename << "\'\n\n";
+   mlog << Error << "\ndo_2d_txt_output[single]() -> "
+        << "unable to open output filename: "
+        << output_filename << "\n\n";
 
    exit ( 1 );
 

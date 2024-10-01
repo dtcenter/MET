@@ -19,7 +19,7 @@
 
 #include "mtd_nc_output.h"
 
-#include "write_netcdf.h"
+#include "vx_nc_util.h"
 
 using namespace std;
 using namespace netCDF;
@@ -57,8 +57,9 @@ NcFile out(output_filename, NcFile::replace);
 
 if ( IS_INVALID_NC(out) )  {
 
-   mlog << Error << "\n\n  do_mtd_nc_output() -> trouble opening output file \""
-        << output_filename << "\"\n\n";
+   mlog << Error << "\ndo_mtd_nc_output() -> "
+        << "trouble opening output file: "
+        << output_filename << "\n\n";
 
    exit ( 1 );
 
@@ -68,11 +69,9 @@ const bool have_pairs =    (fcst_obj.n_objects() != 0)
                         && ( obs_obj.n_objects() != 0);
 
    //
-   //  dimensions
+   //  add time dimension
    //
 
-nx_dim = add_dim(&out,  nx_dim_name, fcst_raw.nx());
-ny_dim = add_dim(&out,  ny_dim_name, fcst_raw.ny());
 nt_dim = add_dim(&out,  nt_dim_name, fcst_raw.nt());
 
    //
@@ -82,7 +81,7 @@ nt_dim = add_dim(&out,  nt_dim_name, fcst_raw.nt());
 write_netcdf_global(&out, output_filename, "MTD",
                     config.model.c_str(), config.obtype.c_str(), config.desc.c_str());
 
-write_nc_grid(out, fcst_raw.grid());
+write_netcdf_proj(&out, fcst_raw.grid(), ny_dim, nx_dim);
 
    //
    //  variables
@@ -142,19 +141,18 @@ NcFile out(output_filename, NcFile::replace);
 
 if ( IS_INVALID_NC(out) )  {
 
-   mlog << Error << "\n\n  do_mtd_nc_output[single]() -> trouble opening output file \""
-        << output_filename << "\"\n\n";
+   mlog << Error << "\ndo_mtd_nc_output[single]() -> "
+        << "trouble opening output file: "
+        << output_filename << "\n\n";
 
    exit ( 1 );
 
 }
 
    //
-   //  dimensions
+   //  add time dimension
    //
 
-nx_dim = add_dim(&out,  nx_dim_name, raw.nx());
-ny_dim = add_dim(&out,  ny_dim_name, raw.ny());
 nt_dim = add_dim(&out,  nt_dim_name, raw.nt());
 
    //
@@ -164,7 +162,7 @@ nt_dim = add_dim(&out,  nt_dim_name, raw.nt());
 write_netcdf_global(&out, output_filename, "MTD",
                     config.model.c_str(), config.obtype.c_str(), config.desc.c_str());
 
-write_nc_grid(out, raw.grid());
+write_netcdf_proj(&out, raw.grid(), ny_dim, nx_dim);
 
    //
    //  variables
@@ -220,7 +218,6 @@ add_att(&lon_var, "long_name", "Longitude");
 float * lat_data = new float [nx*ny];
 float * lon_data = new float [nx*ny];
 
-
 Lat = lat_data;
 Lon = lon_data;
 
@@ -268,7 +265,7 @@ const int ny = raw.ny();
 const int nt = raw.nt();
 ConcatString s;
 
-const char * const name = ( is_fcst ? fcst_raw_name : obs_raw_name );
+const string name = ( is_fcst ? fcst_raw_name : obs_raw_name );
 
 NcVar var = add_var(&out, name, ncFloat, nt_dim, ny_dim, nx_dim);
 
@@ -304,7 +301,7 @@ const int ny = id.ny();
 const int nt = id.nt();
 ConcatString s;
 
-const char * const name = ( is_fcst ? fcst_obj_id_name : obs_obj_id_name );
+const string name = ( is_fcst ? fcst_obj_id_name : obs_obj_id_name );
 
 NcVar var = add_var(&out, name, ncInt, nt_dim, ny_dim, nx_dim);
 
@@ -318,7 +315,6 @@ add_att(&var, "_FillValue", bad_data_int);
 long offsets[3] = {0,0,0};
 long lengths[3] = {nt,ny, nx};
 put_nc_data(&var, id.data(), lengths, offsets);
-
 
    //
    //  done
@@ -350,7 +346,7 @@ const int n3 = nx*ny*nt;
 
 out_data = new int [n3];
 
-const char * const name = ( is_fcst ? fcst_clus_id_name : obs_clus_id_name );
+const string name = ( is_fcst ? fcst_clus_id_name : obs_clus_id_name );
 
 NcVar var = add_var(&out, name, ncInt, nt_dim, ny_dim, nx_dim);
 
