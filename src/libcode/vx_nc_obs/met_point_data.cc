@@ -310,7 +310,8 @@ bool MetPointObsData::fill_obs_buf(int buf_size, int offset,
    const char *method_name = "fill_obs_data() -> ";
 
    if (obs_cnt < (buf_size + offset)) {
-      mlog << Error << "\n" << method_name << "obs data is not ready\n\n";
+      mlog << Error << "\n" << method_name
+           << "obs data is not ready\n\n";
    }
    else {
       float *tmp_obs_arr = obs_arr_buf;
@@ -339,6 +340,22 @@ float MetPointObsData::get_obs_val(int index) {
 ///////////////////////////////////////////////////////////////////////////////
 
 string MetPointObsData::get_obs_qty(int index) {
+   const char *method_name = "MetPointObsData::get_obs_qty() -> ";
+
+   if(index < 0 || index >= obs_cnt) {
+      mlog << Error << "\n" << method_name
+           << "index value (" << index << ") out of range for "
+           << obs_cnt << " observations.\n\n";
+      exit(1);
+   }
+   if(obs_qids[index] < 0 || obs_qids[index] >= qty_names.n()) {
+      mlog << Error << "\n" << method_name
+           << "observation quality index (" << obs_qids[index]
+           << ") out of range for " << qty_names.n()
+           << " quality strings.\n\n";
+      exit(1);
+   }
+
    return qty_names[(obs_qids[index])];
 }
 

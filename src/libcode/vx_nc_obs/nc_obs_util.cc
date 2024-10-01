@@ -157,7 +157,17 @@ bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
          }
       }
       else succeed = false;
-
+      if (IS_INVALID_NC(obs_vars.obs_qty_var)) {
+         succeed = false;
+         missing_vars.add(nc_var_obs_qty);
+      }
+      else {
+         obs_qids = new int[obs_cnt];
+         if (!get_nc_data(&obs_vars.obs_qty_var, obs_qids)) {
+            succeed = false;
+            failed_vars.add(nc_var_obs_qty);
+         }
+      }
    }
 
    for (int idx=0; idx<missing_vars.n(); idx++) {
