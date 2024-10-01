@@ -1130,11 +1130,13 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
            << ", obs_count_non_zero_to: " << obs_count_non_zero_to << "\n";
 
       ConcatString log_msg;
-      log_msg << "Filtered by time: " << filtered_by_time;
+      int filtered_count = filtered_by_msg_type + filtered_by_qc + (int)requested_valid_time;
+      log_msg << "Filtered " << filtered_count << " of " << var_count2
+              << " observations by time: " << filtered_by_time;
       if (0 < requested_valid_time) {
          log_msg << " [" << unix_to_yyyymmdd_hhmmss(requested_valid_time) << "]";
       }
-      log_msg << ", by msg_type: " << filtered_by_msg_type;
+      log_msg << ", by message type: " << filtered_by_msg_type;
       if (0 < filtered_by_msg_type) {
          log_msg << " [" << write_css(conf_info.message_type) << "]";
       }
@@ -1156,8 +1158,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
                     << "]";
          }
       }
-      log_msg << ", out of " << var_count2;
-      int filtered_count = filtered_by_msg_type + filtered_by_qc + (int)requested_valid_time;
+      log_msg << ".";
       if (0 == var_count) {
          if (0 == filtered_count) {
             mlog << Warning << "\n" << method_name
@@ -1171,9 +1172,10 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          }
       }
       else {
-         mlog << Debug(2) << method_name << "var_count=" << var_count
-              << ", grid: " << to_count << " out of " << (nx * ny) << "  "
-              << (0 < filtered_count ? log_msg.c_str() : " ") << "\n";
+         mlog << Debug(3) << "Using " << var_count << " "
+              << vinfo->name() << " observations to populate " << to_count
+              << " of " << to_grid.nxy() << " grid points.\n";
+         if (0 < filtered_count ) mlog << Debug(3) << log_msg << "\n";
       }
    } // end for i
 
@@ -1518,7 +1520,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    delete [] cellMapping;
    cellMapping = (IntArray *) nullptr;
    if( 0 < filtered_by_time ) {
-      mlog << Debug(2) << method_name << "Filtered by time: " << filtered_by_time
+      mlog << Debug(3) << method_name << "Filtered by time: " << filtered_by_time
            << " out of " << time_from_size
            << " [" << unix_to_yyyymmdd_hhmmss(valid_beg_ut) << " to "
            << unix_to_yyyymmdd_hhmmss(valid_end_ut) << "]\n";
