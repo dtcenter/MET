@@ -171,7 +171,7 @@ static void set_gaussian_radius(const StringArray &);
 
 static unixtime compute_unixtime(NcVar *time_var, unixtime var_value);
 static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping,
-                             NcVar var_lat, NcVar var_lon, bool *skip_times);
+                             NcVar var_lat, NcVar var_lon, vector<bool> skip_times);
 static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
                              const IntArray obs_index_array, const int *obs_hids,
                              const float *hdr_lats, const float *hdr_lons);
@@ -1258,7 +1258,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
    unixtime valid_beg_ut, valid_end_ut;
-   vector<int> skip_times;
+   vector<bool> skip_times;
    int filtered_by_time = 0;
    int time_from_size = 1;
    clock_t start_clock =  clock();
@@ -1365,10 +1365,10 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
                if( conf_info.valid_time > 0 ) {
                   tmp_time = add_to_unixtime(ref_ut, sec_per_unit,
                                              valid_times[i], no_leap_year);
-                  skip_times[i] = (valid_beg_ut > tmp_time || tmp_time > valid_end_ut ? 1 : 0);
+                  skip_times[i] = (valid_beg_ut > tmp_time || tmp_time > valid_end_ut);
                   if( skip_times[i] ) filtered_by_time++;
                }
-               else skip_times[i] = 0;
+               else skip_times[i] = false;
                if (max_time < valid_times[i]) max_time = valid_times[i];
             }
             valid_time = compute_unixtime(&time_var, max_time);
@@ -1379,7 +1379,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    to_dp.set_size(to_grid.nx(), to_grid.ny());
    vector<IntArray> var_cell_mapping;
    vector<IntArray> cellMapping(to_grid.nx() * to_grid.ny());
-   get_grid_mapping(fr_grid, to_grid, cellMapping.data(), var_lat, var_lon, (bool *) skip_times.data());
+   get_grid_mapping(fr_grid, to_grid, cellMapping.data(), var_lat, var_lon, skip_times);
 
    // Loop through the requested fields
    for(int i=0; i<FieldSA.n(); i++) {
@@ -1415,7 +1415,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
                   }
                }
                var_cell_mapping.resize(to_grid.nx() * to_grid.ny());
-               get_grid_mapping(fr_grid, to_grid, var_cell_mapping.data(), v_lat, v_lon, (bool *) skip_times.data());
+               get_grid_mapping(fr_grid, to_grid, var_cell_mapping.data(), v_lat, v_lon, skip_times);
                mlog << Debug(4) << method_name << "Override cell mapping from "
                     << GET_NC_NAME(v_lat) << " and " << GET_NC_NAME(v_lon) << "\n";
             }
@@ -2070,7 +2070,7 @@ static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
 static void get_grid_mapping_latlon(
       DataPlane from_dp, DataPlane to_dp, Grid to_grid,
       IntArray *cellMapping, float *latitudes, float *longitudes,
-      int from_lat_count, int from_lon_count, bool *skip_times, bool to_north, bool is_2d) {
+      int from_lat_count, int from_lon_count, vector<bool> skip_times, bool to_north, bool is_2d) {
    double x;
    double y;
    double to_ll_lat;
@@ -2098,7 +2098,7 @@ static void get_grid_mapping_latlon(
          int coord_offset = from_dp.two_to_one(xIdx, yIdx, to_north);
          if (is_2d) {
             lon_offset = lat_offset = coord_offset;
-            if( skip_times != 0 && skip_times[coord_offset] ) continue;
+            if( skip_times.size() > 0 && skip_times[coord_offset] ) continue;
          }
          float lat = latitudes[lat_offset];
          float lon = longitudes[lon_offset];
@@ -2170,7 +2170,7 @@ static void get_grid_mapping_latlon(
 ////////////////////////////////////////////////////////////////////////
 
 static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray *cellMapping,
-                             NcVar var_lat, NcVar var_lon, bool *skip_times) {
+                             NcVar var_lat, NcVar var_lon, vector<bool> skip_times) {
    bool status = false;
    DataPlane from_dp;
    DataPlane to_dp;
@@ -2437,9 +2437,10 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
       }
       else {
          check_lat_lon(data_size, latitudes, longitudes);
+         vector<bool> skip_times;
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping,
                                  latitudes, longitudes,
-                                 from_lat_count, from_lon_count, nullptr,
+                                 from_lat_count, from_lon_count, skip_times,
                                  !fr_grid.get_swap_to_north(), (lon_count==data_size));
       }
 
