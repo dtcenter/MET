@@ -1258,8 +1258,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    DataPlane fr_dp, to_dp;
    DataPlane cnt_dp, mask_dp;
    unixtime valid_beg_ut, valid_end_ut;
-   bool *skip_times = nullptr;
-   double *valid_times = nullptr;
+   vector<int> skip_times;
    int filtered_by_time = 0;
    int time_from_size = 1;
    clock_t start_clock =  clock();
@@ -1350,7 +1349,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       if( 1 < get_dim_count(&time_var) ) {
          double max_time = bad_data_double;
          time_from_size = get_data_size(&time_var);
-         vector<bool> skip_times(time_from_size, false);
+         skip_times.resize(time_from_size, false);
          vector<double> valid_times(time_from_size, bad_data_double);
          if (get_nc_data(&time_var, valid_times.data())) {
             int sec_per_unit = 0;
@@ -1366,10 +1365,10 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
                if( conf_info.valid_time > 0 ) {
                   tmp_time = add_to_unixtime(ref_ut, sec_per_unit,
                                              valid_times[i], no_leap_year);
-                  skip_times[i] = (valid_beg_ut > tmp_time || tmp_time > valid_end_ut);
-                  if( skip_times[i]) filtered_by_time++;
+                  skip_times[i] = (valid_beg_ut > tmp_time || tmp_time > valid_end_ut ? 1 : 0);
+                  if( skip_times[i] ) filtered_by_time++;
                }
-               else skip_times[i] = false;
+               else skip_times[i] = 0;
                if (max_time < valid_times[i]) max_time = valid_times[i];
             }
             valid_time = compute_unixtime(&time_var, max_time);
@@ -1380,7 +1379,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    to_dp.set_size(to_grid.nx(), to_grid.ny());
    vector<IntArray> var_cell_mapping;
    vector<IntArray> cellMapping(to_grid.nx() * to_grid.ny());
-   get_grid_mapping(fr_grid, to_grid, cellMapping.data(), var_lat, var_lon, skip_times);
+   get_grid_mapping(fr_grid, to_grid, cellMapping.data(), var_lat, var_lon, (bool *) skip_times.data());
 
    // Loop through the requested fields
    for(int i=0; i<FieldSA.n(); i++) {
@@ -1416,7 +1415,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
                   }
                }
                var_cell_mapping.resize(to_grid.nx() * to_grid.ny());
-               get_grid_mapping(fr_grid, to_grid, var_cell_mapping.data(), v_lat, v_lon, skip_times);
+               get_grid_mapping(fr_grid, to_grid, var_cell_mapping.data(), v_lat, v_lon, (bool *) skip_times.data());
                mlog << Debug(4) << method_name << "Override cell mapping from "
                     << GET_NC_NAME(v_lat) << " and " << GET_NC_NAME(v_lon) << "\n";
             }
