@@ -217,7 +217,7 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
 static void save_geostationary_data(const ConcatString geostationary_file,
             const float *latitudes, const float *longitudes,
             const GoesImagerData &grid_data);
-static void set_qc_flags(const StringArray &);
+static void set_goes_qc_flags(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -272,7 +272,9 @@ static void process_command_line(int argc, char **argv) {
    cline.add(set_vld_thresh,      "-vld_thresh",      1);
    cline.add(set_name,            "-name",            1);
    cline.add(set_compress,        "-compress",        1);
-   cline.add(set_qc_flags,        "-qc",              1);
+   cline.add(set_goes_qc_flags,   "-goes_qc",         1);
+   // Also support old -qc option
+   cline.add(set_goes_qc_flags,   "-qc",              1);
    cline.add(set_adp,             "-adp",             1);
    cline.add(set_config,          "-config",          1);
    cline.add(set_prob_cat_thresh, "-prob_cat_thresh", 1);
@@ -2970,7 +2972,8 @@ __attribute__((noreturn)) static void usage() {
         << "\toutput_filename\n"
         << "\t-field string\n"
         << "\t[-config file]\n"
-        << "\t[-qc flags]\n"
+        << "\t[-goes_qc flags]\n"
+        << "\t[-adp adp_filename]\n"
         << "\t[-method type]\n"
         << "\t[-gaussian_dx n]\n"
         << "\t[-gaussian_radius n]\n"
@@ -2997,21 +3000,26 @@ __attribute__((noreturn)) static void usage() {
         << "\t\t\"-config file\" uses the specified configuration file "
         << "to generate gridded data (optional).\n"
 
-        << "\t\t\"-qc flags\" specifies a comma-separated list of QC flags, for example \"0,1\" (optional).\n"
-        << "\t\t\tOnly applied if grid_mapping is set to \"goes_imager_projection\" and the QC variable exists.\n"
+        << "\t\t\"-goes_qc flags\" specifies a comma-separated list of QC flags, "
+	<< "for example \"0,1\" (optional).\n"
+        << "\t\t\tOnly used if grid_mapping is set to \"goes_imager_projection\" "
+        << "and the QC variable exists.\n"
 
-        << "\t\t\"-adp adp_file_name\" specifies a ADP data input for AOD dataset (ignored if the input is not AOD from GOES16/17).\n"
+        << "\t\t\"-adp adp_filename\" specifies an ADP input file for the AOD dataset.\n"
+        << "\t\t\tOnly used if the input is AOD from GOES16/17.\n"
 
-        << "\t\t\"-method type\" overrides the default regridding "
-        << "method (default: " << interpmthd_to_string(RGInfo.method)
-        << ", optional) to -field variable. Additional gaussian smoothing only to the probabililty variable"
-        << " with additional \"-method GAUSSIAN\" or \"-method MAXGAUSS\".\n"
+        << "\t\t\"-method type\" specifies the regridding method (default: "
+        << interpmthd_to_string(RGInfo.method) << ", optional).\n"
+        << "\t\t\tAdditional Gaussian smoothing only to the probability variable "
+        << "with additional \"-method GAUSSIAN\" or \"-method MAXGAUSS\".\n"
 
-        << "\t\t\"-gaussian_dx n\" specifies a delta distance for Gaussian smoothing."
-        << " The default is " << RGInfo.gaussian.dx << ". Ignored if not Gaussian method (optional).\n"
+        << "\t\t\"-gaussian_dx n\" specifies the delta distance for Gaussian smoothing (default: "
+        << RGInfo.gaussian.dx << ", optional).\n"
+        << "\t\t\tOnly used for the Gaussian method.\n"
 
-        << "\t\t\"-gaussian_radius n\" specifies the radius of influence for Gaussian smoothing."
-        << " The default is " << RGInfo.gaussian.radius << "). Ignored if not Gaussian method (optional).\n"
+        << "\t\t\"-gaussian_radius n\" specifies the radius of influence for Gaussian smoothing (default: "
+        << RGInfo.gaussian.radius << ", optional).\n"
+        << "\t\t\tOnly used for the Gaussian method (optional).\n"
 
         << "\t\t\"-prob_cat_thresh string\" sets the threshold to compute the probability of occurrence (optional).\n"
 
@@ -3118,7 +3126,7 @@ static void set_compress(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void set_qc_flags(const StringArray & a) {
+static void set_goes_qc_flags(const StringArray & a) {
    int qc_flag;
    StringArray sa;
 

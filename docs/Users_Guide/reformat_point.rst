@@ -965,8 +965,8 @@ The usage statement for the Point2Grid tool is shown below:
          output_filename
          -field string
          [-config file]
-         [-qc flags]
-         [-adp adp_file_name]
+         [-goes_qc flags]
+         [-adp adp_filename]
          [-method type]
          [-gaussian_dx n]
          [-gaussian_radius n]
@@ -995,15 +995,15 @@ Optional Arguments for point2grid
 
 5. The **-config** file option is the configuration file to be used.
 
-6. The **-qc** flags option specifies a comma-separated list of quality control (QC) flags, for example "0,1". This should only be applied if grid_mapping is set to "goes_imager_projection" and the QC variable exists.
+6. The **-goes_qc** flags option specifies a comma-separated list of quality control (QC) flags, for example "0,1". Only used if grid_mapping is set to "goes_imager_projection" and the QC variable exists. Note that the older **-qc** option name is also supported.
 
-7. The **-adp adp_file_name** option provides an additional Aerosol Detection Product (ADP) information on aerosols, dust, and smoke. This option is ignored if the requested variable is not AOD ("AOD_Dust" or "AOD_Smoke") from GOES16/17. The gridded data is filtered by the presence of dust/smoke. If -qc options are given, it's applied to QC of dust/smoke, too (First filtering with AOD QC values and the second filtering with dust/smoke QC values).
+7. The **-adp adp_filename** option provides an additional Aerosol Detection Product (ADP) information on aerosols, dust, and smoke. This option is ignored if the requested variable is not AOD ("AOD_Dust" or "AOD_Smoke") from GOES16/17. The gridded data is filtered by the presence of dust/smoke. If -goes_qc options are given, it's applied to QC of dust/smoke, too (First filtering with AOD QC values and the second filtering with dust/smoke QC values).
 
 8. The **-method type** option specifies the regridding method. The default method is UW_MEAN.
 
-9. The **-gaussian_dx n** option defines the distance interval for Gaussian smoothing. The default is 81.271 km. Ignored if the method is not GAUSSIAN or MAXGAUSS.
+9. The **-gaussian_dx n** option specifies the distance interval for Gaussian smoothing. The default is 81.271 km. Only used if the method is GAUSSIAN or MAXGAUSS.
 
-10. The **-gaussian_radius** n option defines the radius of influence for Gaussian interpolation. The default is 120. Ignored if the method is not GAUSSIAN or MAXGAUSS.
+10. The **-gaussian_radius** n option specifies the radius of influence for Gaussian interpolation. The default is 120. Only used if the method is GAUSSIAN or MAXGAUSS.
 
 11. The **-prob_cat_thresh string** option sets the threshold to compute the probability of occurrence. The default is set to disabled. This option is relevant when calculating practically perfect forecasts.
 
@@ -1041,11 +1041,11 @@ The grid name or the grid definition can be given with the -field option when th
       G212 \
       regrid_data_plane_GOES-16_AOD_TO_G212.nc \
       -field 'name="AOD"; level="(*,*)";' \
-      -qc 0,1,2
+      -goes_qc 0,1,2
       -method MAX -v 1
 
 
-When processing GOES-16 data, the **-qc** option may also be used to specify the acceptable quality control flag values. The example above regrids the GOES-16 AOD values to NCEP Grid number 212 (which QC flags are high, medium, and low), writing to the output the maximum AOD value falling inside each grid box.
+When processing GOES-16 data, the **-goes_qc** option may also be used to specify the acceptable quality control flag values. The example above regrids the GOES-16 AOD values to NCEP Grid number 212 (which QC flags are high, medium, and low), writing to the output the maximum AOD value falling inside each grid box.
 
 Listed below is an example of processing the same set of observations but using Python embedding instead:
 
