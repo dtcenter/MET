@@ -1388,6 +1388,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
 
       // Initialize
       vinfo->clear();
+      var_cell_mapping.clear();
 
       // Populate the VarInfo object using the config string
       config.read_string(FieldSA[i].c_str());
