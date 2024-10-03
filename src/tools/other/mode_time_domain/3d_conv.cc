@@ -244,12 +244,6 @@ file_id = 1;   //  This is declared static in the netCDF library header file ncG
 
 spatial_conv_radius = spatial_R;
 
-
-// mlog << Error << "\n\n"
-//      << "    MtdFloatFile::convolve(const int) const -> still doesn't allow for bad data!\n\n"
-//      << "\n\n";
-
-
 const int Nxy = Nx*Ny;
 const int Nxyz = Nx*Ny*Nt;
 
@@ -263,7 +257,8 @@ for (int k=0; k<Nxyz; k++) conv_data[k] = bad_data_double;
 
 if ( !conv_data )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::convolve(const int, const int, const int) const: process() -> memory allocation error\n\n";
+   mlog << Error << "\nMtdFloatFile::convolve(const int, const int, const int) const: process() -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -278,8 +273,6 @@ max_conv_value = -1.0e100;
 
 unixtime time_start = time(nullptr);
 
-// cout << "\n\n  n = " << mtd_three_to_one(Nx, Ny, Nt, 88, 397, 0) << "\n\n";
-
 for (int t=0; t<Nt; ++t)  {
 
    n = mtd_three_to_one(Nx, Ny, Nt, 0, 0, t);
@@ -287,8 +280,6 @@ for (int t=0; t<Nt; ++t)  {
    p = conv_data + n;
 
    load_handle(handle, *this, t, time_beg, time_end);
-
-   // handle.dump(cout);
 
    for (int k=0; k<time_radius; ++k)  {
 
@@ -303,10 +294,6 @@ for (int t=0; t<Nt; ++t)  {
       //
 
    for (int j=0; j<Nxy; ++j)  {
-
-      // if ( (t == 0) && (j == 243846) )  {
-      //    cerr << "ok\n";
-      // }
 
       bool has_good_data = false;
 
@@ -400,15 +387,12 @@ for (int j=0; j<Nt; ++j)  {
 
 for (int x=0; x<Nx; ++x)  {
 
-   // if ( verbose && ((x%100) == 0) )  mlog << Debug(5) << "Pass 2: x = " << x << " of " << Nx << "\n";
-
    for (int y=0; y<Ny; ++y)  {
 
       for (int t=0; t<Nt; ++t)  {
 
          n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
 
-         // value = calc_conv_value(in, x, y, t);
          value = conv_data[n];
 
          out.put((float) value, x, y, t);
@@ -443,7 +427,8 @@ void DataHandle::set_size(int _nx, int _ny, int _time_radius)
 
 if ( (_nx <= 0) || (_ny <= 0) )  {
 
-   mlog << Error << "\n\n  DataHandle::set_size() -> bad size\n\n";
+   mlog << Error << "\nDataHandle::set_size() -> "
+        << "bad size\n\n";
 
    exit ( 1 );
 
@@ -532,9 +517,6 @@ bool status = false;
 const int nx = mtd.nx();
 const int ny = mtd.ny();
 
-
-// mlog << Debug(5) << "In get_data_plane\n";
-
 for (y=0; y<ny; ++y)  {
 
    for (x=0; x<nx; ++x)  {
@@ -543,7 +525,7 @@ for (y=0; y<ny; ++y)  {
 
       status = is_bad_data(value);
 
-      if (offset < (nx * ny)) { // kludge for SonarQube findings
+      if (offset < (nx * ny)) {
          *(d+offset) = (float) value;
 
          *(ok+offset) = ! status;
@@ -607,13 +589,6 @@ const double * data_back_p    = nullptr;
 const double * data_in_p      = nullptr;
       double * data_out_p     = nullptr;
       double * data_put_p     = nullptr;
-
-
-// mlog << Debug(5) << "in calc_sum_plane\n";
-
-// snprintf(junk, sizeof(junk), "raw_%02d", t_count);
-
-// data_pgm(data_plane, nx, ny, junk);
 
    //
    //  zero out the sum plane buffer
@@ -701,9 +676,6 @@ for (y=0; y<ny; ++y)  {
    }   //  for x
 
 }   //  for y
-
-// memcpy(   sum_plane,    sum_plane_buf, nxy*sizeof(double));
-// memcpy(ok_sum_plane, ok_sum_plane_buf, nxy*sizeof(bool));
 
 if ( do_ppms )  {
 
@@ -985,11 +957,10 @@ for (x=0; x<nx; ++x)  {
 
 }
 
-// mlog << Debug(5) << "writing image file \"" << filename << "\"\n";
-
 if ( ! image.write(filename) )  {
 
-   mlog << Error << "\n\n  unable to write image file \"" << filename << "\"\n\n";
+   mlog << Error << "\ndata_handle_ppm() -> "
+        << "unable to write image file: " << filename << "\n\n";
 
    exit ( 1 );
 
@@ -1038,11 +1009,10 @@ for (int x=0; x<nx; ++x)  {
 
 }
 
-// mlog << Debug(5) << "writing image file \"" << filename << "\"\n";
-
 if ( ! image.write(filename) )  {
 
-   mlog << Error << "\n\n  unable to write image file \"" << filename << "\"\n\n";
+   mlog << Error << "\nok_handle_ppm() -> "
+        << "unable to write image file: " << filename << "\n\n";
 
    exit ( 1 );
 
@@ -1054,9 +1024,5 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
 
 

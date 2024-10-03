@@ -300,7 +300,8 @@ void process_scores() {
       if(!(fcst_mtddf->grid() == grid)) {
          mlog << Debug(1)
               << "Regridding forecast " << conf_info.fcst_info[i]->magic_str()
-              << " to the verification grid.\n";
+              << " to the verification grid using "
+              << conf_info.fcst_info[i]->regrid().get_str() << ".\n";
          fcst_dp = met_regrid(fcst_dp, fcst_mtddf->grid(), grid,
                               conf_info.fcst_info[i]->regrid());
       }
@@ -326,7 +327,8 @@ void process_scores() {
       if(!(obs_mtddf->grid() == grid)) {
          mlog << Debug(1)
               << "Regridding observation " << conf_info.obs_info[i]->magic_str()
-              << " to the verification grid.\n";
+              << " to the verification grid using "
+              << conf_info.obs_info[i]->regrid().get_str() << ".\n";
          obs_dp = met_regrid(obs_dp, obs_mtddf->grid(), grid,
                              conf_info.obs_info[i]->regrid());
       }

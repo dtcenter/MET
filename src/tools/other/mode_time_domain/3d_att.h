@@ -308,9 +308,6 @@ class PairAtt3D {
 
       void dump(std::ostream &, int depth = 0) const;
 
-      // SingleAtt3D Fcst;
-      // SingleAtt3D Obs;
-
          //
          //  set stuff
          //
@@ -395,7 +392,6 @@ inline int PairAtt3D::fcst_cluster_number() const { return FcstClusterNumber; }
 inline int  PairAtt3D::obs_cluster_number() const { return ObsClusterNumber; }
 
 inline int PairAtt3D::intersection_vol () const { return IntersectionVol; }
-// inline int PairAtt3D::union_vol        () const { return UnionVol; }
 
 inline double PairAtt3D::time_centroid_delta () const { return TimeCentroidDelta; }
 inline double PairAtt3D::space_centroid_dist () const { return SpaceCentroidDist; }
@@ -429,8 +425,6 @@ extern PairAtt3D   calc_3d_pair_atts(const Object      & _fcst_obj,
                                      const Object      & _obs_obj, 
                                      const SingleAtt3D & _fa, 
                                      const SingleAtt3D & _oa);
-
-// extern double calc_total_interest(const PairAtt3D &, const MtdConfigInfo &);
 
 
 ////////////////////////////////////////////////////////////////////////

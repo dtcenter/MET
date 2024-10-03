@@ -24,12 +24,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-// typedef int GraphNodeType;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 class FO_Graph {
 
    private:
@@ -99,7 +93,6 @@ class FO_Graph {
 
       void dump_as_table(std::ostream &) const;
       void dump_as_table(const int) const;   //  dumps to mlog with the given verbosity level
-
 
 };
 

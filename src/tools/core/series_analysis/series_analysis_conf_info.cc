@@ -212,8 +212,9 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
       exit(1);
    }
 
-   // Check climatology fields
-   check_climo_n_vx(&conf, n_fcst);
+   // Check for consistent number of climatology fields
+   check_climo_n_vx(fdict, n_fcst);
+   check_climo_n_vx(odict, n_obs);
 
    // Allocate space based on the number of verification tasks
    fcst_info = new VarInfo * [n_fcst];

@@ -84,7 +84,6 @@ class InterestCalculator {
 
       double operator()(const PairAtt3D &);
 
-
 };
 
 

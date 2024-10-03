@@ -36,7 +36,7 @@ basin
 Specify a comma-separated list of basins to be used. Expected format is
 a 2-letter basin identifier. An empty list indicates that all should be used.
 
-|  Valid basins: WP, IO, SH, CP, EP, AL, SL
+|  Valid basins: "WP", "IO", "SH", "CP", "EP", "AL", "SL"
 |
 
 For example:
@@ -235,12 +235,12 @@ Specify whether special processing should be performed for interpolated model
 names ending in 'I' (e.g. AHWI).  Search for corresponding tracks whose model
 name ends in '2' (e.g. AHW2) and apply the following logic:
 
-* "NONE" to do nothing.
+* NONE to do nothing.
 
-* "FILL" to create a copy of '2' track and rename it as 'I' only when the
+* FILL to create a copy of '2' track and rename it as 'I' only when the
   'I' track does not already exist.
      
-* "REPLACE" to create a copy of the '2' track and rename it as 'I' in all
+* REPLACE to create a copy of the '2' track and rename it as 'I' in all
   cases, replacing any 'I' tracks that may already exist.
 
 .. code-block:: none
@@ -394,16 +394,16 @@ replaced with "val". This map can be used to modify basin names to make them
 consistent across the ATCF input files.
 
 Many global modeling centers use ATCF basin identifiers based on region
-(e.g., 'SP' for South Pacific Ocean, etc.), however the best track data
+(e.g., "SP" for South Pacific Ocean, etc.), however the best track data
 provided by the Joint Typhoon Warning Center (JTWC) use just one basin
-identifier 'SH' for all of the Southern Hemisphere basins. Additionally,
+identifier "SH" for all of the Southern Hemisphere basins. Additionally,
 some modeling centers may report basin identifiers separately for the Bay
-of Bengal (BB) and Arabian Sea (AB) whereas JTWC uses 'IO'.
+of Bengal (BB) and Arabian Sea (AB) whereas JTWC uses "IO".
 
 The basin mapping allows MET to map the basin identifiers to the expected
 values without having to modify your data. For example, the first entry
-in the list below indicates that any data entries for 'SI' will be matched
-as if they were 'SH'. In this manner, all verification results for the
+in the list below indicates that any data entries for "SI" will be matched
+as if they were "SH". In this manner, all verification results for the
 Southern Hemisphere basins will be reported together as one basin.
 
 An empty list indicates that no basin mapping should be used. Use this if
@@ -854,11 +854,11 @@ Where "job_name" is set to one of the following:
   specified using the "-line_type" and "-column" arguments.
   For TCStat, the "-column" argument may be set to:
 
-  * "TRACK" for track, along-track, and cross-track errors.
-  * "WIND" for all wind radius errors.
-  * "TI" for track and maximum wind intensity errors.
-  * "AC" for along-track and cross-track errors.
-  * "XY" for x-track and y-track errors.
+  * TRACK for track, along-track, and cross-track errors.
+  * WIND for all wind radius errors.
+  * TI for track and maximum wind intensity errors.
+  * AC for along-track and cross-track errors.
+  * XY for x-track and y-track errors.
   * "col" for a specific column name.
   * "col1-col2" for a difference of two columns.
   * "ABS(col or col1-col2)" for the absolute value.
