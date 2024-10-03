@@ -60,19 +60,19 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
 
       // Verify on the forecast grid
       if(info.field == FieldType::Fcst) {
-         mlog << Debug(2) << "Using the forecast grid as the verification grid\n";
+         mlog << Debug(2) << "Using the forecast grid as the verification grid.\n";
          vx_grid = *fgrid;
       }
       // Verify on the observation grid
       else if(info.field == FieldType::Obs) {
-         mlog << Debug(2) << "Using the observation grid as the verification grid\n";
+         mlog << Debug(2) << "Using the observation grid as the verification grid.\n";
          vx_grid = *ogrid;
       }
       // Parse a named grid, grid specification string,
       // or gridded data file
       else {
-         mlog << Debug(2) << "Using named grid as the verification grid. "
-              << "Name=" << info.name << "\n";
+         mlog << Debug(2) << "Using named grid (" << info.name
+              << ") as the verification grid.\n";
          parse_grid_mask(info.name, vx_grid);
       }
    }

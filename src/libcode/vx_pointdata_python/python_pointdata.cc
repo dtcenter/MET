@@ -253,12 +253,12 @@ MetPointHeader *header_data = met_pd_out.get_header_data();
 
    check_header_data(header_data, method_name);
 
-   set_array_from_python(python_met_point_data, numpy_array_obs_qty, obs_data->obs_qids);
-   set_array_from_python(python_met_point_data, numpy_array_obs_hid, obs_data->obs_hids);
-   set_array_from_python(python_met_point_data, numpy_array_obs_vid, obs_data->obs_ids);
-   set_array_from_python(python_met_point_data, numpy_array_obs_lvl, obs_data->obs_lvls);
-   set_array_from_python(python_met_point_data, numpy_array_obs_hgt, obs_data->obs_hgts);
-   set_array_from_python(python_met_point_data, numpy_array_obs_val, obs_data->obs_vals);
+   set_array_from_python(python_met_point_data, numpy_array_obs_qty, obs_data->obs_qids.data());
+   set_array_from_python(python_met_point_data, numpy_array_obs_hid, obs_data->obs_hids.data());
+   set_array_from_python(python_met_point_data, numpy_array_obs_vid, obs_data->obs_ids.data());
+   set_array_from_python(python_met_point_data, numpy_array_obs_lvl, obs_data->obs_lvls.data());
+   set_array_from_python(python_met_point_data, numpy_array_obs_hgt, obs_data->obs_hgts.data());
+   set_array_from_python(python_met_point_data, numpy_array_obs_val, obs_data->obs_vals.data());
 
    set_str_array_from_python(python_met_point_data, numpy_array_obs_qty_table, &obs_data->qty_names);
    set_str_array_from_python(python_met_point_data, numpy_array_obs_var_table, &obs_data->var_names);

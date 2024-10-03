@@ -8,12 +8,10 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
 #include "point2grid_conf_info.h"
 #include "vx_log.h"
 
 using namespace std;
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -49,7 +47,8 @@ void PointToGridConfInfo::clear() {
    // Initialize values
    message_type.clear();
    beg_ds = end_ds = bad_data_int;
-   quality_mark_thresh = bad_data_int;
+   obs_qty_inc.clear();
+   obs_qty_exc.clear();
    version.clear();
    valid_time = 0;
    def_var_name_map.clear();
@@ -110,16 +109,11 @@ void PointToGridConfInfo::process_config() {
    // Conf: var_name_map
    var_name_map = parse_conf_key_value_map(&conf, conf_key_var_name_map);
 
-   // Conf: quality_mark_thresh
-   quality_mark_thresh = conf.lookup_int(conf_key_quality_mark_thresh);
+   // Conf: obs_quality_inc
+   obs_qty_inc = parse_conf_obs_qty_inc(&conf);
 
-   // Check the value
-   if(quality_mark_thresh < 0 || quality_mark_thresh > 15) {
-      mlog << Warning << "\nPointToGridConfInfo::process_config() -> "
-           << "the \"" << conf_key_quality_mark_thresh
-           << "\" entry (" << quality_mark_thresh
-           << ") should be set between 0 and 15.\n\n";
-   }
+   // Conf: obs_quality_exc
+   obs_qty_exc = parse_conf_obs_qty_exc(&conf);
 
    return;
 }
