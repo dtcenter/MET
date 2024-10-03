@@ -3807,7 +3807,7 @@ void mpr_to_ctc(STATAnalysisJob &job, const AggrMPRInfo &info,
    for(i=0; i<info.pd.n_obs; i++) {
       ClimoPntInfo cpi(info.pd.fcmn_na[i], info.pd.fcsd_na[i],
                        info.pd.ocmn_na[i], info.pd.ocsd_na[i]);
-      cts_info.add(info.pd.f_na[i], info.pd.o_na[i], &cpi);
+      cts_info.add(info.pd.f_na[i], info.pd.o_na[i], 1.0, &cpi);
    }
 
    return;
@@ -3879,7 +3879,11 @@ void mpr_to_mctc(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    // Update the contingency table counts
    //
-   for(i=0; i<n; i++) mcts_info.add(info.pd.f_na[i], info.pd.o_na[i]);
+   for(i=0; i<n; i++) {
+      ClimoPntInfo cpi(info.pd.fcmn_na[i], info.pd.fcsd_na[i],
+                       info.pd.ocmn_na[i], info.pd.ocsd_na[i]);
+      mcts_info.add(info.pd.f_na[i], info.pd.o_na[i], 1.0, &cpi);
+   }
 
    return;
 }

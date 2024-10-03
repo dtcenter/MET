@@ -113,6 +113,7 @@
 //   055    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files.
 //   056    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings.
 //   057    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
+//   058    10/03/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2481,7 +2482,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
 
          // Compute the probabilistic counts and statistics
-         compute_pctinfo(pd, ( STATOutputType::None!=vx_opt.output_flag[i_pstd]), pct_info[j]);
+         compute_pctinfo(pd, (STATOutputType::None!=vx_opt.output_flag[i_pstd]), pct_info[j]);
 
          // Check for no matched pairs to process
          if(pd.n_obs == 0) continue;

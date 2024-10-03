@@ -576,7 +576,7 @@ void compute_ctsinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       ClimoPntInfo cpi(pd.fcmn_na[j], pd.fcsd_na[j],
                        pd.ocmn_na[j], pd.ocsd_na[j]);
-      cts_info.add(pd.f_na[j], pd.o_na[j], &cpi);
+      cts_info.add(pd.f_na[j], pd.o_na[j], pd.wgt_na[j], &cpi);
 
    } // end for i
 
@@ -675,7 +675,7 @@ void compute_mctsinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       ClimoPntInfo cpi(pd.fcmn_na[j], pd.fcsd_na[j],
                        pd.ocmn_na[j], pd.ocsd_na[j]);
-      mcts_info.add(pd.f_na[j], pd.o_na[j], &cpi);
+      mcts_info.add(pd.f_na[j], pd.o_na[j], pd.wgt_na[j], &cpi);
 
    } // end for i
 
@@ -811,12 +811,12 @@ void compute_pctinfo(const PairDataPoint &pd, bool pstd_flag,
       // Check the observation thresholds and increment accordingly
       //
       if(pct_info.othresh.check(pd.o_na[i], &cpi)) {
-         pct_info.pct.inc_event(pd.f_na[i]);
-         if(cmn_flag) pct_info.climo_pct.inc_event(climo_prob[i]);
+         pct_info.pct.inc_event(pd.f_na[i], pd.wgt_na[i]);
+         if(cmn_flag) pct_info.climo_pct.inc_event(climo_prob[i], pd.wgt_na[i]);
       }
       else {
-         pct_info.pct.inc_nonevent(pd.f_na[i]);
-         if(cmn_flag) pct_info.climo_pct.inc_nonevent(climo_prob[i]);
+         pct_info.pct.inc_nonevent(pd.f_na[i], pd.wgt_na[i]);
+         if(cmn_flag) pct_info.climo_pct.inc_nonevent(climo_prob[i], pd.wgt_na[i]);
       }
    } // end for i
 
