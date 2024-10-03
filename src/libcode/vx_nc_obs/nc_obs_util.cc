@@ -87,12 +87,15 @@ bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
    clear_numbers();
    obs_cnt = obs_vars.obs_cnt;
 
+   if (!IS_INVALID_NC(obs_vars.obs_arr_var)) is_obs_array = true;
+
+   // Resize arrays for input data
+   allocate();
+
    StringArray missing_vars;
    StringArray failed_vars;
-   if (!IS_INVALID_NC(obs_vars.obs_arr_var)) {
-      is_obs_array = true;
-      obs_arr = new float[obs_cnt*OBS_ARRAY_LEN];
-      if (!get_nc_data(&obs_vars.obs_arr_var, obs_arr)) {
+   if(is_obs_array) {
+      if (!get_nc_data(&obs_vars.obs_arr_var, obs_arr.data())) {
          succeed = false;
          failed_vars.add(nc_var_obs_arr);
       }
@@ -103,8 +106,7 @@ bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
          missing_vars.add(nc_var_obs_hid);
       }
       else {
-         obs_hids = new int[obs_cnt];
-         if (!get_nc_data(&obs_vars.obs_hid_var, obs_hids)) {
+         if (!get_nc_data(&obs_vars.obs_hid_var, obs_hids.data())) {
             succeed = false;
             failed_vars.add(nc_var_obs_hid);
          }
@@ -114,8 +116,7 @@ bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
          missing_vars.add(nc_var_obs_lvl);
       }
       else {
-         obs_lvls = new float[obs_cnt];
-         if (!get_nc_data(&obs_vars.obs_lvl_var, obs_lvls)) {
+         if (!get_nc_data(&obs_vars.obs_lvl_var, obs_lvls.data())) { 
             succeed = false;
             failed_vars.add(nc_var_obs_lvl);
          }
@@ -125,8 +126,7 @@ bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
          missing_vars.add(nc_var_obs_hgt);
       }
       else {
-         obs_hgts = new float[obs_cnt];
-         if (!get_nc_data(&obs_vars.obs_hgt_var, obs_hgts)) {
+         if (!get_nc_data(&obs_vars.obs_hgt_var, obs_hgts.data())) {
             succeed = false;
             failed_vars.add(nc_var_obs_hgt);
          }
@@ -136,28 +136,34 @@ bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
          missing_vars.add(nc_var_obs_val);
       }
       else {
-         obs_vals = new float[obs_cnt];
-         if (!get_nc_data(&obs_vars.obs_val_var, obs_vals)) {
+         if (!get_nc_data(&obs_vars.obs_val_var, obs_vals.data())) {
             succeed = false;
             failed_vars.add(nc_var_obs_val);
          }
       }
       if (IS_VALID_NC(obs_vars.obs_gc_var)) {
-         obs_ids = new int[obs_cnt];
-         if (!get_nc_data(&obs_vars.obs_gc_var, obs_ids)) {
+         if (!get_nc_data(&obs_vars.obs_gc_var, obs_ids.data())) {
             succeed = false;
             failed_vars.add(nc_var_obs_gc);
          }
       }
       else if (IS_VALID_NC(obs_vars.obs_vid_var)) {
-         obs_ids = new int[obs_cnt];
-         if (!get_nc_data(&obs_vars.obs_vid_var, obs_ids)) {
+         if (!get_nc_data(&obs_vars.obs_vid_var, obs_ids.data())) {
             succeed = false;
             failed_vars.add(nc_var_obs_vid);
          }
       }
       else succeed = false;
-
+      if (IS_INVALID_NC(obs_vars.obs_qty_var)) {
+         succeed = false;
+         missing_vars.add(nc_var_obs_qty);
+      }
+      else {
+         if (!get_nc_data(&obs_vars.obs_qty_var, obs_qids.data())) {
+            succeed = false;
+            failed_vars.add(nc_var_obs_qty);
+         }
+      }
    }
 
    for (int idx=0; idx<missing_vars.n(); idx++) {

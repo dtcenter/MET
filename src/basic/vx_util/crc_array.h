@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "num_array.h"
-#include "int_array.h"
 #include "is_bad_data.h"
 #include "nint.h"
 #include "vx_cal.h"
