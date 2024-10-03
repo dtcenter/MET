@@ -19,6 +19,7 @@
 
 #include "num_array.h"
 
+#include "int_array.h"
 #include "is_bad_data.h"
 #include "ptile.h"
 #include "nint.h"
@@ -1382,3 +1383,22 @@ ConcatString write_css_hhmmss(const NumArray &na)
 
 
 ////////////////////////////////////////////////////////////////////////
+
+
+ConcatString write_css(const IntArray &ia)
+
+{
+
+   ConcatString css;
+
+   for ( int i=0; i<ia.n(); ++i ) {
+      css << (i == 0 ? "" : ",") << ia[i];
+   }
+
+   return css;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
