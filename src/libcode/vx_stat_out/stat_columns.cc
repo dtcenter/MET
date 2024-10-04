@@ -2088,7 +2088,7 @@ void write_fho_cols(const CTSInfo &cts_info,
    //    O_RATE
    //
    at.set_entry(r, c+0,  // Total Count
-      cts_info.cts.n());
+      cts_info.cts.n_pairs());
 
    at.set_entry(r, c+1,  // Forecast Rate = FY/N
       cts_info.cts.f_rate());
@@ -2114,7 +2114,7 @@ void write_ctc_cols(const CTSInfo &cts_info,
    //    FN_OY,       FN_ON,       EC_VALUE
    //
    at.set_entry(r, c+0,  // Total Count
-      cts_info.cts.n());
+      cts_info.cts.n_pairs());
 
    at.set_entry(r, c+1,  // FY_OY
       cts_info.cts.fy_oy());
@@ -2167,7 +2167,7 @@ void write_cts_cols(const CTSInfo &cts_info, int i,
    //    EC_VALUE
    //
    at.set_entry(r, c+0,  // Total count
-      cts_info.cts.n());
+      cts_info.cts.n_pairs());
 
    at.set_entry(r, c+1,  // Base Rate (oy_tp)
       cts_info.baser.v);
@@ -2812,8 +2812,8 @@ void write_mctc_cols(const MCTSInfo &mcts_info,
    // Dump out the MCTC line:
    //    TOTAL,       N_CAT,     Fi_Oj,     EC_VALUE
    //
-   at.set_entry(r, c+0,  // Total Count
-      mcts_info.cts.total());
+   at.set_entry(r, c+0,  // Total number of pairs
+      mcts_info.cts.n_pairs());
 
    at.set_entry(r, c+1,  // Number of categories 
       mcts_info.cts.nrows());
@@ -2853,8 +2853,8 @@ void write_mcts_cols(const MCTSInfo &mcts_info, int i,
    //    HSS_EC,      HSS_EC_BCL,  HSS_EC_BCU,
    //    EC_VALUE
    //
-   at.set_entry(r, c+0,  // Total count
-      mcts_info.cts.total());
+   at.set_entry(r, c+0,  // Total number of pairs
+      mcts_info.cts.n_pairs());
 
    at.set_entry(r, c+1,  // Number of categories
       mcts_info.cts.nrows());
@@ -3268,7 +3268,7 @@ void write_pct_cols(const PCTInfo &pct_info,
    //    THRESH                         (last threshold)
    //
    at.set_entry(r, c+0,    // Total Count
-      pct_info.pct.n());
+      pct_info.pct.n_pairs());
 
    at.set_entry(r, c+1,    // N_THRESH
       pct_info.pct.nrows() + 1);
@@ -3283,11 +3283,11 @@ void write_pct_cols(const PCTInfo &pct_info,
       col++;
 
       at.set_entry(r, col, // Event Count (OY)
-         pct_info.pct.event_count_by_row(i));
+         pct_info.pct.event_total_by_row(i));
       col++;
 
       at.set_entry(r, col, // Non-Event Count (ON)
-         pct_info.pct.nonevent_count_by_row(i));
+         pct_info.pct.nonevent_total_by_row(i));
       col++;
    }
 
@@ -3384,7 +3384,7 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
 
 void write_pjc_cols(const PCTInfo &pct_info,
                     AsciiTable &at, int r, int c) {
-   int i, col, n;
+   int i, col;
 
    //
    // Nx2 Contingency Table Joint/Continuous Probability
@@ -3396,7 +3396,7 @@ void write_pjc_cols(const PCTInfo &pct_info,
    //    THRESH                          (last threshold)
    //
    at.set_entry(r, c+0,    // Total Count
-      pct_info.pct.n());
+      pct_info.pct.n_pairs());
 
    at.set_entry(r, c+1,    // N_THRESH
       pct_info.pct.nrows() + 1);
@@ -3404,7 +3404,7 @@ void write_pjc_cols(const PCTInfo &pct_info,
    //
    // Write THRESH, OY, ON for each row of the Nx2 table
    //
-   n = pct_info.pct.n();
+   double total = pct_info.pct.total();
    for(i=0, col=c+2; i<pct_info.pct.nrows(); i++) {
 
       at.set_entry(r, col, // THRESH
@@ -3412,13 +3412,13 @@ void write_pjc_cols(const PCTInfo &pct_info,
       col++;
 
       at.set_entry(r, col, // OY_TP
-         (n == 0 ? bad_data_double :
-          pct_info.pct.event_count_by_row(i)/(double) n));
+         (is_eq(total, 0.0) ? bad_data_double :
+          pct_info.pct.event_total_by_row(i)/total));
       col++;
 
       at.set_entry(r, col, // ON_TP
-         (n == 0 ? bad_data_double :
-          pct_info.pct.nonevent_count_by_row(i)/(double) n));
+         (is_eq(total, 0.0) ? bad_data_double :
+          pct_info.pct.nonevent_total_by_row(i)/total));
       col++;
 
       at.set_entry(r, col, // CALIBRATION
@@ -3462,7 +3462,7 @@ void write_prc_cols(const PCTInfo &pct_info,
    //    THRESH                           (last threshold)
    //
    at.set_entry(r, c+0,    // Total Count
-      pct_info.pct.n());
+      pct_info.pct.n_pairs());
 
    at.set_entry(r, c+1,    // N_THRESH
       pct_info.pct.nrows() + 1);
@@ -3513,7 +3513,7 @@ void write_eclv_cols(const TTContingencyTable &ct,
    //    N_PNT,   [CL_],   [VALUE_] (for each point)
    //
    at.set_entry(r, c+0,  // Total Number of pairs
-      ct.n());
+      ct.n_pairs());
 
    at.set_entry(r, c+1,  // Base Rate
       ct.baser());
@@ -3553,7 +3553,7 @@ void write_nbrctc_cols(const NBRCTSInfo &nbrcts_info,
    //    FN_OY,       FN_ON
    //
    at.set_entry(r, c+0,  // Total Count
-      nbrcts_info.cts_info.cts.n());
+      nbrcts_info.cts_info.cts.n_pairs());
 
    at.set_entry(r, c+1,  // FY_OY
       nbrcts_info.cts_info.cts.fy_oy());
@@ -3601,7 +3601,7 @@ void write_nbrcts_cols(const NBRCTSInfo &nbrcts_info, int i,
    //    BAGSS,       BAGSS_BCL,   BAGSS_BCU
    //
    at.set_entry(r, c+0,  // Total count
-      nbrcts_info.cts_info.cts.n());
+      nbrcts_info.cts_info.cts.n_pairs());
 
    at.set_entry(r, c+1,  // Base Rate (oy_tp)
       nbrcts_info.cts_info.baser.v);

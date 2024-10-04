@@ -74,6 +74,9 @@ ContingencyTable & ContingencyTable::operator+=(const ContingencyTable & t) {
       exit(1);
    }
 
+   // Increment the number of pairs
+   Npairs += t.Npairs;
+
    // Increment table entries
    for(int i=0; i<E.size(); ++i) E[i] += t.E[i];
 
@@ -92,6 +95,7 @@ void ContingencyTable::clear() {
 
     E.clear();
     Nrows = Ncols = 0;
+    Npairs = 0;
     ECvalue = bad_data_double;
     Name.clear();
 
@@ -107,6 +111,7 @@ void ContingencyTable::assign(const ContingencyTable & t) {
    E = t.E;
    Nrows = t.Nrows;
    Ncols = t.Ncols;
+   Npairs = t.Npairs;
    ECvalue = t.ECvalue;
    Name = t.Name;
 
@@ -135,6 +140,7 @@ void ContingencyTable::dump(ostream & out, int depth) const {
 
    out << prefix << "Nrows   = " << Nrows << "\n";
    out << prefix << "Ncols   = " << Ncols << "\n";
+   out << prefix << "Npairs  = " << Npairs << "\n";
    out << prefix << "ECvalue = " << ECvalue << "\n";
    out << prefix << "\n";
 
@@ -201,6 +207,15 @@ void ContingencyTable::set_size(int NR, int NC) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void ContingencyTable::set_n_pairs(int n) {
+
+   Npairs = n;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void ContingencyTable::set_ec_value(double v) {
 
    // Do not override the default value with bad data
@@ -239,6 +254,8 @@ void ContingencyTable::set_entry(int row, int col, double value) {
 
    E[(rc_to_n(row, col))] = value;
 
+   // Number of pairs defined by set_n_pairs(int)
+
    return;
 }
 
@@ -247,6 +264,9 @@ void ContingencyTable::set_entry(int row, int col, double value) {
 void ContingencyTable::inc_entry(int row, int col, double weight) {
 
    E[(rc_to_n(row, col))] += weight;
+
+   // Increment pair counter
+   Npairs++;
 
    return;
 }
@@ -483,74 +503,68 @@ double TTContingencyTable::on() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-double TTContingencyTable::n() const {
-   return total();
-}
-
-////////////////////////////////////////////////////////////////////////
-
 double TTContingencyTable::f_rate() const {
-   return compute_proportion(fy(), n());
+   return compute_proportion(fy(), total());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::h_rate() const {
-   return compute_proportion(fy_oy(), n());
+   return compute_proportion(fy_oy(), total());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::o_rate() const {
-   return compute_proportion(oy(), n());
+   return compute_proportion(oy(), total());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::fy_oy_tp() const {
-   return compute_proportion(fy_oy(), n());
+   return compute_proportion(fy_oy(), total());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::fy_on_tp() const {
-   return compute_proportion(fy_on(), n());
+   return compute_proportion(fy_on(), total());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::fn_oy_tp() const {
-   return compute_proportion(fn_oy(), n());
+   return compute_proportion(fn_oy(), total());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::fn_on_tp() const {
-   return compute_proportion(fn_on(), n());
+   return compute_proportion(fn_on(), total());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::fy_tp() const {
-   return compute_proportion(fy(), n());
+   return compute_proportion(fy(), total());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::fn_tp() const {
-   return compute_proportion(fn(), n());
+   return compute_proportion(fn(), total());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::oy_tp() const {
-   return compute_proportion(oy(), n());
+   return compute_proportion(oy(), total());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::on_tp() const {
-   return compute_proportion(on(), n());
+   return compute_proportion(on(), total());
 }
 
 ////////////////////////////////////////////////////////////////////////

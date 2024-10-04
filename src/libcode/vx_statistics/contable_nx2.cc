@@ -90,12 +90,6 @@ void Nx2ContingencyTable::assign(const Nx2ContingencyTable & t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-double Nx2ContingencyTable::n() const {
-   return total();
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void Nx2ContingencyTable::set_size(int N) {
    ContingencyTable::set_size(N, 2);
    return;
@@ -205,11 +199,11 @@ void Nx2ContingencyTable::inc_nonevent(double t, double weight) {
 
 ////////////////////////////////////////////////////////////////////////
 
-double Nx2ContingencyTable::event_count_by_thresh(double t) const {
+double Nx2ContingencyTable::event_total_by_thresh(double t) const {
    int r = value_to_row(t);
 
    if(r < 0) {
-      mlog << Error << "\nNx2ContingencyTable::event_count_by_thresh(double) -> "
+      mlog << Error << "\nNx2ContingencyTable::event_total_by_thresh(double) -> "
            << "bad value ... " << t << "\n\n";
       exit(1);
    }
@@ -219,11 +213,11 @@ double Nx2ContingencyTable::event_count_by_thresh(double t) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-double Nx2ContingencyTable::nonevent_count_by_thresh(double t) const {
+double Nx2ContingencyTable::nonevent_total_by_thresh(double t) const {
    int r = value_to_row(t);
 
    if(r < 0) {
-      mlog << Error << "\nNx2ContingencyTable::nonevent_count_by_thresh(double) -> "
+      mlog << Error << "\nNx2ContingencyTable::nonevent_total_by_thresh(double) -> "
            << "bad value ... " << t << "\n\n";
       exit(1);
    }
@@ -241,6 +235,8 @@ void Nx2ContingencyTable::set_event(int row, double value) {
       exit(1);
    }
 
+   // Number of pairs defined by set_n_pairs(int)
+
    set_entry(row, nx2_event_column, value);
 
    return;
@@ -256,6 +252,8 @@ void Nx2ContingencyTable::set_nonevent(int row, double value) {
       exit(1);
    }
 
+   // Number of pairs defined by set_n_pairs(int)
+
    set_entry(row, nx2_nonevent_column, value);
 
    return;
@@ -264,7 +262,7 @@ void Nx2ContingencyTable::set_nonevent(int row, double value) {
 ////////////////////////////////////////////////////////////////////////
 
 double Nx2ContingencyTable::baser() const {
-   return compute_proportion(event_col_total(), n());
+   return compute_proportion(event_col_total(), total());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -273,7 +271,7 @@ double Nx2ContingencyTable::baser_ci(double alpha,
                                      double &cl, double &cu) const {
    double v = baser();
 
-   compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, total(), alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -285,27 +283,27 @@ double Nx2ContingencyTable::brier_score() const {
    if(E.empty()) return bad_data_double;
 
    double sum = 0.0;
-   double count;
+   double row_total;
    double yi;
    double t;
 
    // Terms for event
    for(int j=0; j<Nrows; ++j) {
-      count = event_count_by_row(j);
+      row_total = event_total_by_row(j);
       yi = row_proby(j);
       t = yi - 1.0;
-      sum += count*t*t;
+      sum += row_total*t*t;
    }
 
    // Terms for nonevent
    for(int j=0; j<Nrows; ++j) {
-      count = nonevent_count_by_row(j);
+      row_total = nonevent_total_by_row(j);
       yi = row_proby(j);
       t = yi;
-      sum += count*t*t;
+      sum += row_total*t*t;
    }
 
-   return compute_proportion(sum, n());
+   return compute_proportion(sum, total());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -320,7 +318,7 @@ double Nx2ContingencyTable::brier_score() const {
 
 double Nx2ContingencyTable::brier_ci_halfwidth(double alpha) const {
    double bs = brier_score();
-   const double N = n();
+   const double N = total();
    const double Ninv = 1.0/N;
 
    // N must be > 1 so that degf > 0 in the call to gsl_cdf_tdist_Pinv()
@@ -337,8 +335,8 @@ double Nx2ContingencyTable::brier_ci_halfwidth(double alpha) const {
 
    for(int j=0; j<Nrows; ++j) {
 
-      double ee = Ninv*(   event_count_by_row(j));
-      double ne = Ninv*(nonevent_count_by_row(j));
+      double ee = Ninv*(   event_total_by_row(j));
+      double ne = Ninv*(nonevent_total_by_row(j));
       double term = ee + ne;
 
       term *= term; //  squared
@@ -382,7 +380,7 @@ double Nx2ContingencyTable::reliability() const {
       sum += Ni*t*t;
    }
 
-   return compute_proportion(sum, n());
+   return compute_proportion(sum, total());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -404,7 +402,7 @@ double Nx2ContingencyTable::resolution() const {
       sum += Ni*t*t;
    }
 
-   return compute_proportion(sum, n());
+   return compute_proportion(sum, total());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -446,13 +444,13 @@ double Nx2ContingencyTable::bss_smpl() const {
 ////////////////////////////////////////////////////////////////////////
 
 double Nx2ContingencyTable::row_obar(int row) const {
-   return compute_proportion(event_count_by_row(row), row_total(row));
+   return compute_proportion(event_total_by_row(row), row_total(row));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double Nx2ContingencyTable::obar() const {
-   return compute_proportion(event_col_total(), n());
+   return compute_proportion(event_col_total(), total());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -483,8 +481,8 @@ double Nx2ContingencyTable::row_calibration(int row) const {
       exit(1);
    }
 
-   double num = event_count_by_row(row);
-   double den = num + nonevent_count_by_row(row);
+   double num = event_total_by_row(row);
+   double den = num + nonevent_total_by_row(row);
 
    return compute_proportion(num, den);
 }
@@ -499,8 +497,8 @@ double Nx2ContingencyTable::row_refinement(int row) const {
       exit(1);
    }
 
-   return compute_proportion(   event_count_by_row(row) +
-                             nonevent_count_by_row(row), n());
+   return compute_proportion(   event_total_by_row(row) +
+                             nonevent_total_by_row(row), total());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -513,7 +511,7 @@ double Nx2ContingencyTable::row_event_likelihood(int row) const {
       exit(1);
    }
 
-   return compute_proportion(event_count_by_row(row),
+   return compute_proportion(event_total_by_row(row),
                              event_col_total());
 }
 
@@ -528,7 +526,7 @@ double Nx2ContingencyTable::row_nonevent_likelihood(int row) const {
       exit(1);
    }
 
-   return compute_proportion(nonevent_count_by_row(row),
+   return compute_proportion(nonevent_total_by_row(row),
                              nonevent_col_total());
 }
 
@@ -547,8 +545,8 @@ TTContingencyTable Nx2ContingencyTable::ctc_by_row(int row) const {
    double sn = 0.0;
 
    for(int j=row+1; j<Nrows; ++j) {
-      sy +=    event_count_by_row(j);
-      sn += nonevent_count_by_row(j);
+      sy +=    event_total_by_row(j);
+      sn += nonevent_total_by_row(j);
    }
 
    tt.set_fy_oy(sy);
@@ -558,12 +556,14 @@ TTContingencyTable Nx2ContingencyTable::ctc_by_row(int row) const {
    sn = 0.0;
 
    for(int j=0; j<=row; ++j) {
-      sy +=    event_count_by_row(j);
-      sn += nonevent_count_by_row(j);
+      sy +=    event_total_by_row(j);
+      sn += nonevent_total_by_row(j);
    }
 
    tt.set_fn_oy(sy);
    tt.set_fn_on(sn);
+
+   // Note that the number of pairs (Npairs) are not defined
 
    return tt;
 }

@@ -732,7 +732,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
             if((line.type() == STATLineType::fho ||
                 line.type() == STATLineType::ctc) && lty == STATLineType::cts) {
                v = cts_info.get_stat_cts(req_col[i].c_str());
-               w = cts_info.cts.n();
+               w = cts_info.cts.n_pairs();
             }
             else if(line.type() == STATLineType::sl1l2 && lty == STATLineType::cnt) {
                v = cnt_info.get_stat(req_col[i].c_str());
@@ -888,14 +888,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
          // Increment counts in the existing map entry
          //
          else {
-            m[key].cts_info.cts.set_fy_oy(m[key].cts_info.cts.fy_oy() +
-                                          cur.cts.fy_oy());
-            m[key].cts_info.cts.set_fy_on(m[key].cts_info.cts.fy_on() +
-                                          cur.cts.fy_on());
-            m[key].cts_info.cts.set_fn_oy(m[key].cts_info.cts.fn_oy() +
-                                          cur.cts.fn_oy());
-            m[key].cts_info.cts.set_fn_on(m[key].cts_info.cts.fn_on() +
-                                          cur.cts.fn_on());
+            m[key].cts_info.cts += cur.cts;
          }
 
          //
@@ -1201,7 +1194,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
    PCTInfo cur;
    ConcatString key;
    unixtime ut;
-   int i, n, oy, on, n_ties;
+   int i, n, n_ties;
    map<ConcatString, AggrPCTInfo>::iterator it;
 
    //
@@ -1256,45 +1249,8 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
          // Increment counts in the existing map entry
          //
          else {
-
-            //
-            // The size of the contingency table must remain the same
-            //
-            if(m[key].pct_info.pct.nrows() != cur.pct.nrows()) {
-               mlog << Error << "\naggr_pct_lines() -> "
-                    << "when aggregating PCT lines the number of "
-                    << "thresholds must remain the same for all lines, "
-                    << m[key].pct_info.pct.nrows() << " != "
-                    << cur.pct.nrows() << "\n\n";
-               throw 1;
-            }
-
-            //
-            // Increment the counts
-            //
-            for(i=0; i<m[key].pct_info.pct.nrows(); i++) {
-
-               //
-               // The threshold values must remain the same
-               //
-               if(!is_eq(m[key].pct_info.pct.threshold(i), cur.pct.threshold(i))) {
-                  mlog << Error << "\naggr_pct_lines() -> "
-                       << "when aggregating PCT lines the threshold "
-                       << "values must remain the same for all lines, "
-                       << m[key].pct_info.pct.threshold(i) << " != "
-                       << cur.pct.threshold(i) << "\n\n";
-                  throw 1;
-               }
-
-               oy = m[key].pct_info.pct.event_count_by_row(i);
-               on = m[key].pct_info.pct.nonevent_count_by_row(i);
-
-               m[key].pct_info.pct.set_entry(i, nx2_event_column,
-                                             oy + cur.pct.event_count_by_row(i));
-               m[key].pct_info.pct.set_entry(i, nx2_nonevent_column,
-                                             on + cur.pct.nonevent_count_by_row(i));
-            } // end for i
-         } // end else
+            m[key].pct_info.pct += cur.pct;
+         }
 
          //
          // Keep track of scores for each time step for VIF

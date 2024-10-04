@@ -45,6 +45,7 @@ class ContingencyTable {
       int Nrows;
       int Ncols;
 
+      int Npairs;
       double ECvalue;
 
       ConcatString Name;
@@ -67,6 +68,7 @@ class ContingencyTable {
       virtual void set_size(int);
       virtual void set_size(int NR, int NC);
 
+      void set_n_pairs(int);
       void set_ec_value(double);
       void set_name(const char *);
 
@@ -74,6 +76,7 @@ class ContingencyTable {
       int nrows() const;
       int ncols() const;
 
+      int n_pairs() const;
       double ec_value() const;
       ConcatString name() const;
 
@@ -110,6 +113,7 @@ class ContingencyTable {
 inline int ContingencyTable::nrows() const { return Nrows; }
 inline int ContingencyTable::ncols() const { return Ncols; }
 
+inline int          ContingencyTable::n_pairs()  const { return Npairs;  }
 inline double       ContingencyTable::ec_value() const { return ECvalue; }
 inline ConcatString ContingencyTable::name()     const { return Name;    }
 
@@ -159,17 +163,15 @@ class Nx2ContingencyTable : public ContingencyTable {
       void inc_nonevent (double value, double weight=1.0);
 
       // Get table entries
-      double    event_count_by_thresh(double) const;
-      double nonevent_count_by_thresh(double) const;
+      double    event_total_by_thresh(double) const;
+      double nonevent_total_by_thresh(double) const;
 
-      double    event_count_by_row(int row) const;
-      double nonevent_count_by_row(int row) const;
+      double    event_total_by_row(int row) const;
+      double nonevent_total_by_row(int row) const;
 
       // Set counts
       void set_event(int row, double);
       void set_nonevent(int row, double);
-
-      double n() const;
 
       // Column totals
       double    event_col_total() const;
@@ -202,8 +204,8 @@ class Nx2ContingencyTable : public ContingencyTable {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline double Nx2ContingencyTable::event_count_by_row    (int row) const { return entry(row, nx2_event_column); }
-inline double Nx2ContingencyTable::nonevent_count_by_row (int row) const { return entry(row, nx2_nonevent_column); }
+inline double Nx2ContingencyTable::event_total_by_row    (int row) const { return entry(row, nx2_event_column); }
+inline double Nx2ContingencyTable::nonevent_total_by_row (int row) const { return entry(row, nx2_nonevent_column); }
 
 inline double Nx2ContingencyTable::event_col_total    () const { return col_total(nx2_event_column); }
 inline double Nx2ContingencyTable::nonevent_col_total () const { return col_total(nx2_nonevent_column); }
@@ -252,8 +254,6 @@ class TTContingencyTable : public ContingencyTable {
 
       double fn() const;
       double fy() const;
-
-      double n() const;
 
       //  FHO rates where:
       //     f_rate = FY/N

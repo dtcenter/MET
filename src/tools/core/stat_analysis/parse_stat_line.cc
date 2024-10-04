@@ -55,17 +55,19 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 void parse_fho_ctable(STATLine &l, TTContingencyTable &ct) {
-   int n, fy, fy_oy, oy;
-   double f_rate, h_rate, o_rate;
 
-   n      = atoi(l.get_item("TOTAL"));
-   f_rate = atof(l.get_item("F_RATE"));
-   h_rate = atof(l.get_item("H_RATE"));
-   o_rate = atof(l.get_item("O_RATE"));
+   int    n_pairs = atoi(l.get_item("TOTAL"));
+   double f_rate  = atof(l.get_item("F_RATE"));
+   double h_rate  = atof(l.get_item("H_RATE"));
+   double o_rate  = atof(l.get_item("O_RATE"));
 
-   fy    = nint(n * f_rate);
-   fy_oy = nint(n * h_rate);
-   oy    = nint(n * o_rate);
+   // MET #2887: JHG multiple by the sum of the weights here instead?
+   double fy    = n_pairs * f_rate;
+   double fy_oy = n_pairs * h_rate;
+   double oy    = n_pairs * o_rate;
+
+   // Npairs
+   ct.set_n_pairs(n_pairs);
 
    // FY_OY
    ct.set_fy_oy(fy_oy);
@@ -77,7 +79,7 @@ void parse_fho_ctable(STATLine &l, TTContingencyTable &ct) {
    ct.set_fn_oy(oy - fy_oy);
 
    // FN_ON
-   ct.set_fn_on(n - fy - oy + fy_oy);
+   ct.set_fn_on(n_pairs - fy - oy + fy_oy);
 
    return;
 }
@@ -86,17 +88,20 @@ void parse_fho_ctable(STATLine &l, TTContingencyTable &ct) {
 
 void parse_ctc_ctable(STATLine &l, TTContingencyTable &ct) {
 
+   // Npairs 
+   ct.set_n_pairs(atoi(l.get_item("TOTAL")));
+
    // FY_OY
-   ct.set_fy_oy(atoi(l.get_item("FY_OY")));
+   ct.set_fy_oy(atof(l.get_item("FY_OY")));
 
    // FY_ON
-   ct.set_fy_on(atoi(l.get_item("FY_ON")));
+   ct.set_fy_on(atof(l.get_item("FY_ON")));
 
    // FN_OY
-   ct.set_fn_oy(atoi(l.get_item("FN_OY")));
+   ct.set_fn_oy(atof(l.get_item("FN_OY")));
 
    // FN_ON
-   ct.set_fn_on(atoi(l.get_item("FN_ON")));
+   ct.set_fn_on(atof(l.get_item("FN_ON")));
 
    // EC_VALUE
    ct.set_ec_value(atof(l.get_item("EC_VALUE")));
@@ -118,7 +123,7 @@ void parse_mctc_ctable(STATLine &l, ContingencyTable &ct) {
    for(i=0; i<n_cat; i++) {
       for(j=0; j<n_cat; j++) {
          snprintf(col_str, sizeof(col_str), "F%i_O%i", i+1, j+1);
-         ct.set_entry(i, j, atoi(l.get_item(col_str)));
+         ct.set_entry(i, j, atof(l.get_item(col_str)));
       }
    }
 
@@ -132,17 +137,20 @@ void parse_mctc_ctable(STATLine &l, ContingencyTable &ct) {
 
 void parse_nbrctc_ctable(STATLine &l, TTContingencyTable &ct) {
 
+   // Npairs
+   ct.set_n_pairs(atoi(l.get_item("TOTAL")));
+
    // FY_OY
-   ct.set_fy_oy(atoi(l.get_item("FY_OY")));
+   ct.set_fy_oy(atof(l.get_item("FY_OY")));
 
    // FY_ON
-   ct.set_fy_on(atoi(l.get_item("FY_ON")));
+   ct.set_fy_on(atof(l.get_item("FY_ON")));
 
    // FN_OY
-   ct.set_fn_oy(atoi(l.get_item("FN_OY")));
+   ct.set_fn_oy(atof(l.get_item("FN_OY")));
 
    // FN_ON
-   ct.set_fn_on(atoi(l.get_item("FN_ON")));
+   ct.set_fn_on(atof(l.get_item("FN_ON")));
 
    return;
 }
@@ -168,12 +176,12 @@ void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
 
       // OY_i
       snprintf(col_str, sizeof(col_str), "OY_%i", i+1);
-      oy = atoi(l.get_item(col_str));
+      oy = atof(l.get_item(col_str));
       pct.set_entry(i, nx2_event_column, oy);
 
       // ON_i
       snprintf(col_str, sizeof(col_str), "ON_%i", i+1);
-      on = atoi(l.get_item(col_str));
+      on = atof(l.get_item(col_str));
       pct.set_entry(i, nx2_nonevent_column, on);
    }
 
@@ -600,8 +608,8 @@ void parse_seeps_line(STATLine &l, SeepsAggScore &agg_score) {
 
    agg_score.n_obs = atoi(l.get_item("TOTAL"));
 
-   agg_score.s12 = atoi(l.get_item("S12"));
-   agg_score.s13 = atoi(l.get_item("S13"));
+   agg_score.s12 = atof(l.get_item("S12"));
+   agg_score.s13 = atof(l.get_item("S13"));
    agg_score.s21 = atof(l.get_item("S21"));
    agg_score.s23 = atof(l.get_item("S23"));
    agg_score.s31 = atof(l.get_item("S31"));
