@@ -560,7 +560,7 @@ used.
 
 .. code-block:: none
 		
-  mesage_type_group_map = [
+  message_type_group_map = [
      { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
      { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
      { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
