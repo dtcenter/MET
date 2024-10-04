@@ -424,7 +424,10 @@ double TTContingencyTable::lodds_ci(double alpha,
 
 double TTContingencyTable::orss() const {
    double r = odds();
-   return compute_proportion(r - 1, r + 1);
+   double v = (is_bad_data(r) || is_eq(r + 1, 0.0) ?
+               bad_data_double : 
+               (r - 1)/(r + 1));
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -855,7 +858,7 @@ double ContingencyTable::gkuiper() const {
 
    double den = 1.0 - sum;
 
-   return(compute_proportion(num, den));
+   return compute_proportion(num, den);
 }
 
 ////////////////////////////////////////////////////////////////////////
