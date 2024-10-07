@@ -115,12 +115,12 @@ void parse_mctc_ctable(STATLine &l, ContingencyTable &ct) {
    int n_cat, i, j;
    char col_str[max_str_len];
 
-   // Npairs 
-   ct.set_n_pairs(atoi(l.get_item("TOTAL")));
-
    // N_CAT
    n_cat = atoi(l.get_item("N_CAT"));
    ct.set_size(n_cat);
+
+   // Npairs 
+   ct.set_n_pairs(atoi(l.get_item("TOTAL")));
 
    // Fi_Oj
    for(i=0; i<n_cat; i++) {
@@ -164,12 +164,12 @@ void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
    int i, n, oy, on;
    char col_str[max_str_len];
 
-   // Npairs 
-   pct.set_n_pairs(atoi(l.get_item("TOTAL")));
-
    // N_THRESH
    n = atoi(l.get_item("N_THRESH"));
    pct.set_size(n-1);
+
+   // Npairs 
+   pct.set_n_pairs(atoi(l.get_item("TOTAL")));
 
    // Store a vector of threshold values
    vector<double> thresh(n);
