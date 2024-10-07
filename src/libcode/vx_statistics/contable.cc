@@ -123,6 +123,7 @@ void ContingencyTable::assign(const ContingencyTable & t) {
 void ContingencyTable::zero_out() {
 
    fill(E.begin(), E.end(), 0.0);
+   Npairs = 0;
 
    return;
 }
