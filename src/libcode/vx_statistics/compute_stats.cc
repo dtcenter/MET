@@ -1461,10 +1461,6 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
       seeps_mprs.push_back(seeps_mpr);
    }
    if (count > 0) {
-      vector<double> density_vector;
-      double pvf[SEEPS_MATRIX_SIZE];
-      double svf[SEEPS_MATRIX_SIZE];
-      double score_sum_wgt, weight_sum, weight[count];
 
       mlog << Debug(9) << method_name
            << "Categories c_odfl, c_odfh, c_olfd, c_olfh, c_ohfd, c_ohfl => "
@@ -1483,19 +1479,21 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
            << seeps_agg->mean_obs << " "
            << seeps_agg->score << "\n";
 
-      score_sum_wgt = 0.;
-      for (int i=0; i<SEEPS_MATRIX_SIZE; i++) pvf[i] = 0.;
+      double score_sum_wgt = 0.0;
+      vector<double> pvf(SEEPS_MATRIX_SIZE, 0.0);
+      vector<double> svf(SEEPS_MATRIX_SIZE, 0.0);
 
+      vector<double> density_vector;
       compute_seeps_density_vector(pd, seeps_agg, density_vector);
       int density_cnt = density_vector.size();
       if(density_cnt > count) density_cnt = count;
 
       //IDL: w = 1/d
-      weight_sum = 0.;
-      for (int i=0; i<count; i++) weight[i] = 0;
+      double weight_sum = 0.0;
+      vector<double> weight(count, 0.0);
       for (int i=0; i<density_cnt; i++) {
-         if (!is_eq(density_vector[i], 0)) {
-            weight[i] = 1 / density_vector[i];
+         if (!is_eq(density_vector[i], 0.0)) {
+            weight[i] = 1.0 / density_vector[i];
             weight_sum += weight[i];
             mlog << Debug(9) << method_name
                  << "i, dens_vec(i), weight(i), weight_sum => "
@@ -1503,7 +1501,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
                  << weight[i] << " " << weight_sum << "\n";
          }
       }
-      if (!is_eq(weight_sum, 0)) {
+      if (!is_eq(weight_sum, 0.0)) {
          //IDL: w = w/sum(w)
          for (int i=0; i<count; i++) weight[i] /= weight_sum;
 
