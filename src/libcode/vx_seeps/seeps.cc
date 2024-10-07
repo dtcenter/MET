@@ -533,20 +533,20 @@ void SeepsClimo::read_seeps_climo_grid(ConcatString filename) {
               << "dimensions nstn = " << nstn << "\n";
       }
 
-      int    *sid_array = new int[nstn];
-      double *lat_array = new double[nstn];
-      double *lon_array = new double[nstn];
-      double *elv_array = new double[nstn];
-      double *p1_00_array = new double[nstn*SEEPS_MONTH];
-      double *p2_00_array = new double[nstn*SEEPS_MONTH];
-      double *t1_00_array = new double[nstn*SEEPS_MONTH];
-      double *t2_00_array = new double[nstn*SEEPS_MONTH];
-      double *p1_12_array = new double[nstn*SEEPS_MONTH];
-      double *p2_12_array = new double[nstn*SEEPS_MONTH];
-      double *t1_12_array = new double[nstn*SEEPS_MONTH];
-      double *t2_12_array = new double[nstn*SEEPS_MONTH];
-      double *matrix_00_array = new double[nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE];
-      double *matrix_12_array = new double[nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE];
+      vector<int>    sid_array(nstn);
+      vector<double> lat_array(nstn);
+      vector<double> lon_array(nstn);
+      vector<double> elv_array(nstn);
+      vector<double> p1_00_array(nstn*SEEPS_MONTH);
+      vector<double> p2_00_array(nstn*SEEPS_MONTH);
+      vector<double> t1_00_array(nstn*SEEPS_MONTH);
+      vector<double> t2_00_array(nstn*SEEPS_MONTH);
+      vector<double> p1_12_array(nstn*SEEPS_MONTH);
+      vector<double> p2_12_array(nstn*SEEPS_MONTH);
+      vector<double> t1_12_array(nstn*SEEPS_MONTH);
+      vector<double> t2_12_array(nstn*SEEPS_MONTH);
+      vector<double> matrix_00_array(nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE);
+      vector<double> matrix_12_array(nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE);
 
       NcVar var_sid       = get_nc_var(nc_file, var_name_sid);
       NcVar var_lat       = get_nc_var(nc_file, var_name_lat);
@@ -563,72 +563,72 @@ void SeepsClimo::read_seeps_climo_grid(ConcatString filename) {
       NcVar var_matrix_00 = get_nc_var(nc_file, var_name_matrix_00);
       NcVar var_matrix_12 = get_nc_var(nc_file, var_name_matrix_12);
 
-      if (IS_INVALID_NC(var_sid) || !get_nc_data(&var_sid, sid_array)) {
+      if (IS_INVALID_NC(var_sid) || !get_nc_data(&var_sid, sid_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get sid\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_lat) || !get_nc_data(&var_lat, lat_array)) {
+      if (IS_INVALID_NC(var_lat) || !get_nc_data(&var_lat, lat_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get lat\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_lon) || !get_nc_data(&var_lon, lon_array)) {
+      if (IS_INVALID_NC(var_lon) || !get_nc_data(&var_lon, lon_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get lon\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_elv) || !get_nc_data(&var_elv, elv_array)) {
+      if (IS_INVALID_NC(var_elv) || !get_nc_data(&var_elv, elv_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get elv\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_00_array)) {
+      if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_00_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get p1_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_p2_00) || !get_nc_data(&var_p2_00, p2_00_array)) {
+      if (IS_INVALID_NC(var_p2_00) || !get_nc_data(&var_p2_00, p2_00_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get p2_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_t1_00) || !get_nc_data(&var_t1_00, t1_00_array)) {
+      if (IS_INVALID_NC(var_t1_00) || !get_nc_data(&var_t1_00, t1_00_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get t1_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_t2_00) || !get_nc_data(&var_t2_00, t2_00_array)) {
+      if (IS_INVALID_NC(var_t2_00) || !get_nc_data(&var_t2_00, t2_00_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get t2_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_p1_12) || !get_nc_data(&var_p1_12, p1_12_array)) {
+      if (IS_INVALID_NC(var_p1_12) || !get_nc_data(&var_p1_12, p1_12_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get p1_12\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_p2_12) || !get_nc_data(&var_p2_12, p2_12_array)) {
+      if (IS_INVALID_NC(var_p2_12) || !get_nc_data(&var_p2_12, p2_12_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get p2_12\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_t1_12) || !get_nc_data(&var_t1_12, t1_12_array)) {
+      if (IS_INVALID_NC(var_t1_12) || !get_nc_data(&var_t1_12, t1_12_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get t1_12\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_t2_12) || !get_nc_data(&var_t2_12, t2_12_array)) {
+      if (IS_INVALID_NC(var_t2_12) || !get_nc_data(&var_t2_12, t2_12_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get t2_12\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_matrix_00) || !get_nc_data(&var_matrix_00, matrix_00_array)) {
+      if (IS_INVALID_NC(var_matrix_00) || !get_nc_data(&var_matrix_00, matrix_00_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get matrix_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_matrix_12) || !get_nc_data(&var_matrix_12, matrix_12_array)) {
+      if (IS_INVALID_NC(var_matrix_12) || !get_nc_data(&var_matrix_12, matrix_12_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get matrix_12\n\n";
          exit(1);
@@ -663,21 +663,6 @@ void SeepsClimo::read_seeps_climo_grid(ConcatString filename) {
          seeps_score_12_map[sid] = rec_12;
       }
 
-      if (sid_array) delete [] sid_array;
-      if (lat_array) delete [] lat_array;
-      if (lon_array) delete [] lon_array;
-      if (elv_array) delete [] elv_array;
-      if (p1_00_array) delete [] p1_00_array;
-      if (p2_00_array) delete [] p2_00_array;
-      if (t1_00_array) delete [] t1_00_array;
-      if (t2_00_array) delete [] t2_00_array;
-      if (p1_12_array) delete [] p1_12_array;
-      if (p2_12_array) delete [] p2_12_array;
-      if (t1_12_array) delete [] t1_12_array;
-      if (t2_12_array) delete [] t2_12_array;
-      if (matrix_00_array) delete [] matrix_00_array;
-      if (matrix_12_array) delete [] matrix_12_array;
-
       nc_file->close();
 
       float duration = (float)(clock() - clock_time)/CLOCKS_PER_SEC;
@@ -705,8 +690,6 @@ SeepsClimoGrid::SeepsClimoGrid(int month, int hour, ConcatString seeps_climo_nam
    : month{month}, hour{hour}, SeepsClimoBase{seeps_climo_name}
 {
    clear();
-   p1_buf = p2_buf = t1_buf = t2_buf = nullptr;
-   s_odfl_buf = s_odfh_buf = s_olfd_buf = s_olfh_buf = s_ohfd_buf = s_ohfl_buf = nullptr;
 
    ConcatString seeps_name = get_climo_filename();
    if (file_exists(seeps_name.c_str())) read_seeps_climo_grid(seeps_name);
@@ -721,19 +704,6 @@ SeepsClimoGrid::~SeepsClimoGrid() {
 ////////////////////////////////////////////////////////////////////////
 
 void SeepsClimoGrid::init_from_scratch() {
-
-   // Initialize pointers
-   p1_buf = nullptr;
-   p2_buf = nullptr;
-   t1_buf = nullptr;
-   t2_buf = nullptr;
-   s_odfl_buf = nullptr;
-   s_odfh_buf = nullptr;
-   s_olfd_buf = nullptr;
-   s_olfh_buf = nullptr;
-   s_ohfd_buf = nullptr;
-   s_ohfl_buf = nullptr;
-
    clear();
 }
 
@@ -743,16 +713,16 @@ void SeepsClimoGrid::clear() {
 
    SeepsClimoBase::clear();
 
-   if (nullptr != p1_buf) { delete [] p1_buf; p1_buf = nullptr; }
-   if (nullptr != p2_buf) { delete [] p2_buf; p2_buf = nullptr; }
-   if (nullptr != t1_buf) { delete [] t1_buf; t1_buf = nullptr; }
-   if (nullptr != t2_buf) { delete [] t2_buf; t2_buf = nullptr; }
-   if (nullptr != s_odfl_buf) { delete [] s_odfl_buf; s_odfl_buf = nullptr; }
-   if (nullptr != s_odfh_buf) { delete [] s_odfh_buf; s_odfh_buf = nullptr; }
-   if (nullptr != s_olfd_buf) { delete [] s_olfd_buf; s_olfd_buf = nullptr; }
-   if (nullptr != s_olfh_buf) { delete [] s_olfh_buf; s_olfh_buf = nullptr; }
-   if (nullptr != s_ohfd_buf) { delete [] s_ohfd_buf; s_ohfd_buf = nullptr; }
-   if (nullptr != s_ohfl_buf) { delete [] s_ohfl_buf; s_ohfl_buf = nullptr; }
+   p1_buf.clear();
+   p2_buf.clear();
+   t1_buf.clear();
+   t2_buf.clear();
+   s_odfl_buf.clear();
+   s_odfh_buf.clear();
+   s_olfd_buf.clear();
+   s_olfh_buf.clear();
+   s_ohfd_buf.clear();
+   s_ohfl_buf.clear();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -860,16 +830,16 @@ void SeepsClimoGrid::read_seeps_climo_grid(ConcatString filename) {
       // Variables in climo file named as s_odfl, s_odfh etc. These then stored
       // into new convention s_odfl, s_odfh etc.
 
-      p1_buf     = new double[nx*ny];
-      p2_buf     = new double[nx*ny];
-      t1_buf     = new double[nx*ny];
-      t2_buf     = new double[nx*ny];
-      s_odfl_buf = new double[nx*ny];
-      s_odfh_buf = new double[nx*ny];
-      s_olfd_buf = new double[nx*ny];
-      s_olfh_buf = new double[nx*ny];
-      s_ohfd_buf = new double[nx*ny];
-      s_ohfl_buf = new double[nx*ny];
+      p1_buf.resize(nx*ny);
+      p2_buf.resize(nx*ny);
+      t1_buf.resize(nx*ny);
+      t2_buf.resize(nx*ny);
+      s_odfl_buf.resize(nx*ny);
+      s_odfh_buf.resize(nx*ny);
+      s_olfd_buf.resize(nx*ny);
+      s_olfh_buf.resize(nx*ny);
+      s_ohfd_buf.resize(nx*ny);
+      s_ohfl_buf.resize(nx*ny);
 
       LongArray curs;   // = { month-1, 0, 0 };
       LongArray dims;   // = { 1, ny, nx };
@@ -894,52 +864,52 @@ void SeepsClimoGrid::read_seeps_climo_grid(ConcatString filename) {
       mlog << Debug(9) << method_name
            << "var_odfl_00 = " << &var_odfl_00 << "\n";
 
-      if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
               << "Did not get p1_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_p2_00) || !get_nc_data(&var_p2_00, p2_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_p2_00) || !get_nc_data(&var_p2_00, p2_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
               << "Did not get p2_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_t1_00) || !get_nc_data(&var_t1_00, t1_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_t1_00) || !get_nc_data(&var_t1_00, t1_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
               << "Did not get t1_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_t2_00) || !get_nc_data(&var_t2_00, t2_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_t2_00) || !get_nc_data(&var_t2_00, t2_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
               << "Did not get t2_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_odfl_00) || !get_nc_data(&var_odfl_00, s_odfl_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_odfl_00) || !get_nc_data(&var_odfl_00, s_odfl_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
               << "Did not get odfl_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_odfh_00) || !get_nc_data(&var_odfh_00, s_odfh_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_odfh_00) || !get_nc_data(&var_odfh_00, s_odfh_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
               << "Did not get odfh_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_olfd_00) || !get_nc_data(&var_olfd_00, s_olfd_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_olfd_00) || !get_nc_data(&var_olfd_00, s_olfd_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
               << "Did not get olfd_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_olfh_00) || !get_nc_data(&var_olfh_00, s_olfh_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_olfh_00) || !get_nc_data(&var_olfh_00, s_olfh_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
               << "Did not get olfh_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_ohfd_00) || !get_nc_data(&var_ohfd_00, s_ohfd_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_ohfd_00) || !get_nc_data(&var_ohfd_00, s_ohfd_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
               << "Did not get ohfd_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_ohfl_00) || !get_nc_data(&var_ohfl_00, s_ohfl_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_ohfl_00) || !get_nc_data(&var_ohfl_00, s_ohfl_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
               << "Did not get ohfl_00\n\n";
          exit(1);
