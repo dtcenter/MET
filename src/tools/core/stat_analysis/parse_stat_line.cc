@@ -115,6 +115,9 @@ void parse_mctc_ctable(STATLine &l, ContingencyTable &ct) {
    int n_cat, i, j;
    char col_str[max_str_len];
 
+   // Npairs 
+   ct.set_n_pairs(atoi(l.get_item("TOTAL")));
+
    // N_CAT
    n_cat = atoi(l.get_item("N_CAT"));
    ct.set_size(n_cat);
@@ -160,6 +163,9 @@ void parse_nbrctc_ctable(STATLine &l, TTContingencyTable &ct) {
 void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
    int i, n, oy, on;
    char col_str[max_str_len];
+
+   // Npairs 
+   pct.set_n_pairs(atoi(l.get_item("TOTAL")));
 
    // N_THRESH
    n = atoi(l.get_item("N_THRESH"));
