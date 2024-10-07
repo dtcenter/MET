@@ -428,10 +428,10 @@ void CTSInfo::compute_ci() {
 void CTSInfo::set_stat_ctc(const string &stat_name, double v) {
 
         if(stat_name == "TOTAL")    cts.set_n_pairs(nint(v));
-   else if(stat_name == "FY_OY")    cts.set_fy_oy(nint(v));
-   else if(stat_name == "FY_ON")    cts.set_fy_on(nint(v));
-   else if(stat_name == "FN_OY")    cts.set_fn_oy(nint(v));
-   else if(stat_name == "FN_ON")    cts.set_fn_on(nint(v));
+   else if(stat_name == "FY_OY")    cts.set_fy_oy(v);
+   else if(stat_name == "FY_ON")    cts.set_fy_on(v);
+   else if(stat_name == "FN_OY")    cts.set_fn_oy(v);
+   else if(stat_name == "FN_ON")    cts.set_fn_on(v);
    else if(stat_name == "EC_VALUE") cts.set_ec_value(v);
 
    return;

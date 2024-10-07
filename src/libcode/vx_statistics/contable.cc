@@ -646,6 +646,7 @@ void TTContingencyTable::set_size(int NR, int NC) {
 TTContingencyTable finley() {
    TTContingencyTable t;
 
+   t.set_n_pairs(2803);
    t.set_fy_oy(28);
    t.set_fn_oy(23);
    t.set_fy_on(72);
@@ -665,6 +666,7 @@ TTContingencyTable finley() {
 TTContingencyTable finley_always_no() {
    TTContingencyTable t;
 
+   t.set_n_pairs(2803);
    t.set_fy_oy(0);
    t.set_fn_oy(51);
    t.set_fy_on(0);

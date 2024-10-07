@@ -541,6 +541,9 @@ TTContingencyTable Nx2ContingencyTable::ctc_by_row(int row) const {
       exit(1);
    }
 
+   // Store the number of pairs
+   tt.set_n_pairs(Npairs);
+
    double sy = 0.0;
    double sn = 0.0;
 
