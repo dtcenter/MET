@@ -234,6 +234,7 @@ extern bool get_nc_data(netCDF::NcVar *, std::vector<char>   &data, const LongAr
 extern bool get_nc_data(netCDF::NcVar *, std::vector<short>  &data, const LongArray &curs);
 extern bool get_nc_data(netCDF::NcVar *, std::vector<float>  &data, const LongArray &curs);
 extern bool get_nc_data(netCDF::NcVar *, std::vector<double> &data, const LongArray &curs);
+extern bool get_nc_data_ptr(netCDF::NcVar *, double          *data, const LongArray &curs);
 
 extern bool get_nc_data(netCDF::NcVar *, std::vector<int>    &data, const long dim, const long cur=0);
 extern bool get_nc_data(netCDF::NcVar *, std::vector<char>   &data, const long dim, const long cur=0);
@@ -270,6 +271,7 @@ extern bool put_nc_data_ptr(netCDF::NcVar *, const double data, const long offse
 extern bool put_nc_data(netCDF::NcVar *, const std::vector<int>   &data, const long length, const long offset);
 extern bool put_nc_data(netCDF::NcVar *, const std::vector<char>  &data, const long length, const long offset);
 extern bool put_nc_data(netCDF::NcVar *, const std::vector<float> &data, const long length, const long offset);
+extern bool put_nc_data_ptr(netCDF::NcVar *, const int            *data, const long length, const long offset);
 
 extern bool put_nc_data_ptr(netCDF::NcVar *, const int            *data, const long *lengths, const long *offsets);
 extern bool put_nc_data_ptr(netCDF::NcVar *, const char           *data, const long *lengths, const long *offsets);
