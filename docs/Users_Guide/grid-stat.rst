@@ -239,31 +239,32 @@ __________________________
 
 .. code-block:: none
 
-  model          = "FCST";
-  desc           = "NA";
-  obtype         = "ANALYS"; 
-  fcst           = { ... }
-  obs            = { ... }
-  regrid         = { ... }
-  climo_mean     = { ... }
-  climo_stdev    = { ... }
-  climo_cdf      = { ... }
-  mask           = { grid = [ "FULL" ]; poly = []; }
-  ci_alpha       = [ 0.05 ];
-  boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
-                     rng = "mt19937"; seed = ""; }
-  interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
-                     type = [ { method = NEAREST; width = 1; } ]; }
-  censor_thresh  = [];
-  censor_val     = [];
-  mpr_column     = [];
-  mpr_thresh     = [];
-  eclv_points    = 0.05;
-  hss_ec_value   = NA;
-  rank_corr_flag = TRUE;
-  tmp_dir        = "/tmp";
-  output_prefix  = "";
-  version        = "VN.N";
+  model            = "FCST";
+  desc             = "NA";
+  obtype           = "ANALYS"; 
+  fcst             = { ... }
+  obs              = { ... }
+  regrid           = { ... }
+  climo_mean       = { ... }
+  climo_stdev      = { ... }
+  climo_cdf        = { ... }
+  mask             = { grid = [ "FULL" ]; poly = []; }
+  ci_alpha         = [ 0.05 ];
+  boot             = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
+                       rng = "mt19937"; seed = ""; }
+  interp           = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
+                       type = [ { method = NEAREST; width = 1; } ]; }
+  censor_thresh    = [];
+  censor_val       = [];
+  mpr_column       = [];
+  mpr_thresh       = [];
+  eclv_points      = 0.05;
+  hss_ec_value     = NA;
+  rank_corr_flag   = TRUE;
+  grid_weight_flag = NONE;
+  tmp_dir          = "/tmp";
+  output_prefix    = "";
+  version          = "VN.N";
 
 The configuration options listed above are common to multiple MET tools and are described in :numref:`config_options`.
 
