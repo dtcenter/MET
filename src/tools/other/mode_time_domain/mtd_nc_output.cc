@@ -204,8 +204,6 @@ void do_latlon(NcFile & out, const Grid & grid)
 
 int x, y;
 double lat, lon;
-float * Lat = 0;
-float * Lon = 0;
 const int nx = grid.nx();
 const int ny = grid.ny();
 
@@ -215,12 +213,10 @@ NcVar lon_var = add_var(&out, lon_name, ncFloat, ny_dim, nx_dim);
 add_att(&lat_var, "long_name", "Latitude");
 add_att(&lon_var, "long_name", "Longitude");
 
-float * lat_data = new float [nx*ny];
-float * lon_data = new float [nx*ny];
+vector<float> lat_data(nx*ny);
+vector<float> lon_data(nx*ny);
 
-Lat = lat_data;
-Lon = lon_data;
-
+int idx = 0;
 for (y=0; y<ny; ++y)  {
 
    for (x=0; x<nx; ++x)  {
@@ -229,8 +225,9 @@ for (y=0; y<ny; ++y)  {
 
       lon = -lon;
 
-      *Lat++ = (float) lat;
-      *Lon++ = (float) lon;
+      lat_data[idx] = (float) lat;
+      lon_data[idx] = (float) lon;
+      idx++;
 
    }
 
@@ -244,9 +241,6 @@ put_nc_data(&lon_var, lon_data, lengths, offsets);
    //
    //  done
    //
-
-if ( lat_data )  { delete [] lat_data;  lat_data = 0; }
-if ( lon_data )  { delete [] lon_data;  lon_data = 0; }
 
 return;
 
@@ -278,7 +272,7 @@ add_att(&var, "_FillValue", bad_data_float);
 
 long offsets[3] = {0,0,0};
 long lengths[3] = {nt,ny, nx};
-put_nc_data(&var, raw.data(), lengths, offsets);
+put_nc_data_ptr(&var, raw.data(), lengths, offsets);
 
    //
    //  done
@@ -314,7 +308,7 @@ add_att(&var, "_FillValue", bad_data_int);
 
 long offsets[3] = {0,0,0};
 long lengths[3] = {nt,ny, nx};
-put_nc_data(&var, id.data(), lengths, offsets);
+put_nc_data_ptr(&var, id.data(), lengths, offsets);
 
    //
    //  done
@@ -337,14 +331,12 @@ const int nx = id.nx();
 const int ny = id.ny();
 const int nt = id.nt();
 const int * ip = id.data();
-int * out_data = 0;
-int * op = 0;
-int * remap = 0;
+vector<int> remap;
 ConcatString s;
 
 const int n3 = nx*ny*nt;
 
-out_data = new int [n3];
+vector<int> out_data(n3);
 
 const string name = ( is_fcst ? fcst_clus_id_name : obs_clus_id_name );
 
@@ -363,7 +355,7 @@ add_att(&var, "_FillValue", bad_data_int);
 
 const int n_objects = ( is_fcst ? (e.n_fcst_simples()) : (e.n_obs_simples()) );
 
-remap = new int [n_objects + 1];
+remap.resize(n_objects + 1);
 
 remap[0] = 0;
 
@@ -378,11 +370,9 @@ for (j=1; j<=n_objects; ++j)  {
 
 }
 
-op = out_data;
-
 for (j=0; j<n3; ++j)  {
 
-   *op++ = remap[*ip++];
+   out_data[j] = remap[*ip++];
 
 }
 
@@ -393,10 +383,6 @@ put_nc_data(&var, out_data, lengths, offsets);
    //
    //  done
    //
-
-if ( remap )  { delete [] remap;  remap = 0; }
-
-if ( out_data )  { delete [] out_data;  out_data = 0; }
 
 return;
 

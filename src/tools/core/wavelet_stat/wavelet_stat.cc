@@ -700,7 +700,7 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
       y = nint(conf_info.tile_yll[i]);
 
       // Write the x_ll value
-      if(!put_nc_data(&x_ll_var, &x, 1, i)) {
+      if(!put_nc_data_ptr(&x_ll_var, &x, 1, i)) {
 
          mlog << Error << "\nsetup_nc_file() -> "
               << "error with the x_ll_var->put"
@@ -709,7 +709,7 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
       }
 
       // Write the y_ll value
-      if(!put_nc_data(&y_ll_var, &y, 1, i)) {
+      if(!put_nc_data_ptr(&y_ll_var, &y, 1, i)) {
 
          mlog << Error << "\nsetup_nc_file() -> "
               << "error with the y_ll_var->put"
@@ -1407,9 +1407,9 @@ void compute_energy(const double *arr, int n, double &en) {
 void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, const double *odata, int n,
                   int i_vx, int i_tile) {
    int i, d;
-   float *fcst_data = (float *) nullptr;
-   float *obs_data  = (float *) nullptr;
-   float *diff_data = (float *) nullptr;
+   vector<float> fcst_data;
+   vector<float> obs_data ;
+   vector<float> diff_data;
    ConcatString fcst_var_name;
    ConcatString obs_var_name;
    ConcatString diff_var_name;
@@ -1530,28 +1530,30 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
 
    // Allocate memory for the forecast, observation, and difference
    // fields
-   if ( nc_info.do_raw )  {
-      fcst_data = new float [n];
-      obs_data  = new float [n];
+   if ( nc_info.do_raw ) {
+      fcst_data.resize(n, bad_data_float);
+      obs_data.resize(n, bad_data_float);
    }
-   if ( nc_info.do_diff )  diff_data = new float [n];
+   if ( nc_info.do_diff ) diff_data.resize(n, bad_data_float);
 
    // Store the forecast, observation, and difference fields
+   bool empty_fdata = (fdata == nullptr);
+   bool empty_odata = (odata == nullptr);
    for(i=0; i<n; i++) {
 
-      if ( nc_info.do_raw && fcst_data != nullptr && obs_data != nullptr)  {
+      if ( nc_info.do_raw && !fcst_data.empty() && !obs_data.empty())  {
 
          // Set the forecast data
-         if(fdata == nullptr || is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
-         else                      fcst_data[i] = (float) fdata[i];
+         if(empty_fdata || is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
+         else                                     fcst_data[i] = (float) fdata[i];
 
          // Set the observation data
-         if(odata == nullptr || is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
-         else                      obs_data[i]  = (float) odata[i];
+         if(empty_odata || is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
+         else                                     obs_data[i]  = (float) odata[i];
 
       }
 
-      if ( nc_info.do_diff && fdata != nullptr && odata != nullptr && diff_data != nullptr)  {
+      if ( nc_info.do_diff && !empty_fdata && !empty_odata && !diff_data.empty())  {
          // Set the difference data
          if(is_bad_data(fdata[i]) ||
             is_bad_data(odata[i]))
@@ -1579,7 +1581,7 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
 
    if ( nc_info.do_raw )  {
       // Write out the forecast field
-      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths, offsets)) {
+      if(!put_nc_data(&fcst_var, fcst_data, lengths, offsets)) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the fcst_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1587,7 +1589,7 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       }
 
       // Write out the observation field
-      if(!put_nc_data(&obs_var, &obs_data[0], lengths, offsets)) {
+      if(!put_nc_data(&obs_var, obs_data, lengths, offsets)) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the obs_var->put for field "
               << shc.get_obs_var() << "\n\n";
@@ -1599,7 +1601,7 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    if ( nc_info.do_diff )  {
 
       // Write out the difference field
-      if(!put_nc_data(&diff_var, &diff_data[0], lengths, offsets)) {
+      if(!put_nc_data(&diff_var, diff_data, lengths, offsets)) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the diff_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1607,11 +1609,6 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       }
 
    }
-
-   // Deallocate and clean up
-   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) nullptr; }
-   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) nullptr; }
-   if(diff_data) { delete [] diff_data; diff_data = (float *) nullptr; }
 
    return;
 
@@ -1623,9 +1620,9 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
                   int i_vx, int i_tile, int i_scale,
                   SingleThresh &fcst_st, SingleThresh &obs_st) {
    int i, d;
-   float *fcst_data = (float *) nullptr;
-   float *obs_data  = (float *) nullptr;
-   float *diff_data = (float *) nullptr;
+   vector<float> fcst_data;
+   vector<float> obs_data ;
+   vector<float> diff_data;
    ConcatString fcst_var_name, obs_var_name, diff_var_name;
    ConcatString fcst_thresh_str, obs_thresh_str;
    ConcatString val;
@@ -1777,27 +1774,27 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    // fields
 
    if ( nc_info.do_raw )  {
-      fcst_data = new float [n];
-      obs_data  = new float [n];
+      fcst_data.resize(n, bad_data_float);
+      obs_data.resize(n, bad_data_float);
    }
-   if ( nc_info.do_diff )  diff_data = new float [n];
+   if ( nc_info.do_diff ) diff_data.resize(n, bad_data_float);
 
    // Store the forecast, observation, and difference fields
    for(i=0; i<n; i++) {
 
-      if ( nc_info.do_raw && fcst_data != nullptr && obs_data != nullptr)  {
+      if ( nc_info.do_raw && !fcst_data.empty() && !obs_data.empty())  {
 
          // Set the forecast data
          if(fdata == nullptr || is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
-         else                      fcst_data[i] = (float) fdata[i];
+         else                                          fcst_data[i] = (float) fdata[i];
 
          // Set the observation data
          if(odata == nullptr || is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
-         else                      obs_data[i]  = (float) odata[i];
+         else                                          obs_data[i]  = (float) odata[i];
 
       }
 
-      if ( nc_info.do_diff && fdata != nullptr && odata != nullptr && diff_data != nullptr)  {
+      if ( nc_info.do_diff && fdata != nullptr && odata != nullptr && !diff_data.empty())  {
 
          // Set the difference data
          if(is_bad_data(fdata[i]) ||
@@ -1828,7 +1825,7 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    if ( nc_info.do_raw )  {
 
       // Write out the forecast field
-      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths, offsets)) {
+      if(!put_nc_data(&fcst_var, fcst_data, lengths, offsets)) {
          mlog << Error << "\nwrite_nc_wav() -> "
               << "error with the fcst_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1836,7 +1833,7 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       }
 
       // Write out the observation field
-      if(!put_nc_data(&obs_var, &obs_data[0], lengths, offsets)) {
+      if(!put_nc_data(&obs_var, obs_data, lengths, offsets)) {
          mlog << Error << "\nwrite_nc_wav() -> "
               << "error with the obs_var->put for field "
               << shc.get_obs_var() << "\n\n";
@@ -1849,7 +1846,7 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
 
 
       // Write out the difference field
-      if(!put_nc_data(&diff_var, &diff_data[0], lengths, offsets)) {
+      if(!put_nc_data(&diff_var, diff_data, lengths, offsets)) {
          mlog << Error << "\nwrite_nc()_wav -> "
               << "error with the diff_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1857,11 +1854,6 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       }
 
    }
-
-   // Deallocate and clean up
-   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) nullptr; }
-   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) nullptr; }
-   if(diff_data) { delete [] diff_data; diff_data = (float *) nullptr; }
 
    return;
 }
