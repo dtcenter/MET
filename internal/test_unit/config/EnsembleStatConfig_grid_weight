@@ -139,6 +139,11 @@ climo_mean = {
    hour_interval      = 6;
 }
 
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [ "${CLIMO_STDEV_FILE}" ];
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //

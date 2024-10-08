@@ -78,9 +78,10 @@
   <test name="grid_weight_ENSEMBLE_STAT_NONE">
     <exec>&MET_BIN;/ensemble_stat</exec>
     <env>
-      <pair><name>OUTPUT_PREFIX</name>   <value>NO_WEIGHT</value></pair>
-      <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790410</value></pair>
-      <pair><name>GRID_WEIGHT</name>     <value>NONE</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>    <value>NO_WEIGHT</value></pair>
+      <pair><name>CLIMO_MEAN_FILE</name>  <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790410</value></pair>
+      <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790410</value></pair>
+      <pair><name>GRID_WEIGHT</name>      <value>NONE</value></pair>
     </env>
     <param> \
       6 \
@@ -105,6 +106,7 @@
     <env>
       <pair><name>OUTPUT_PREFIX</name>   <value>COS_LAT_WEIGHT</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790410</value></pair>
+      <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790410</value></pair>
       <pair><name>GRID_WEIGHT</name>     <value>COS_LAT</value></pair>
     </env>
     <param> \
@@ -130,6 +132,7 @@
     <env>
       <pair><name>OUTPUT_PREFIX</name>   <value>AREA_WEIGHT</value></pair>
       <pair><name>CLIMO_MEAN_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cmean_1d.19790410</value></pair>
+      <pair><name>CLIMO_STDEV_FILE</name> <value>&DATA_DIR_CLIMO;/NCEP_1.0deg/cstdv_1d.19790410</value></pair>
       <pair><name>GRID_WEIGHT</name>     <value>AREA</value></pair>
     </env>
     <param> \
