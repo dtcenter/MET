@@ -2250,7 +2250,8 @@ static unixtime find_valid_time(NcVar time_var) {
    static const char *method_name = "find_valid_time() -> ";
 
    if( IS_VALID_NC(time_var) || get_dim_count(&time_var) < 2) {
-      int time_count = get_dim_size(&time_var, 0);
+      // Handle the variable without dimension
+      int time_count = (0 == get_dim_count(&time_var)) ? 1 : get_dim_size(&time_var, 0);
 
       vector<double> time_values(time_count+1);
       if (get_nc_data(&time_var, time_values)) {

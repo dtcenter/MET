@@ -1374,8 +1374,8 @@ bool get_nc_data_ptr(NcVar *var, float *data) {
       // Note: missing data was checked here
       //
       int type_id = GET_NC_TYPE_ID_P(var);
-      int cell_count = get_data_size(var);
-      if (cell_count== 0) cell_count = 1;   // in case of a variable without dimension, for example, "float t ;"
+      // Handle the variable without dimension, for example, "float t ;"
+      int cell_count = (0 == get_dim_count(var)) ? 1 : get_data_size(var);
 
       return_status = true;
       if (NcType::nc_FLOAT == type_id) {
@@ -1570,8 +1570,8 @@ bool get_nc_data_ptr(NcVar *var, double *data) {
       //
       int unpacked_count = 0;
       int type_id = GET_NC_TYPE_ID_P(var);
-      int tmp_count = get_data_size(var);
-      const int cell_count = (tmp_count==0) ? 1 : tmp_count;    // in case of a variable without dimension, for example, "double t ;"
+      // Handle the variable without dimension, for example, "double t ;"
+      const int cell_count = (0 == get_dim_count(var)) ? 1 : get_data_size(var);
 
       return_status = true;
       if (NcType::nc_DOUBLE == type_id) {
