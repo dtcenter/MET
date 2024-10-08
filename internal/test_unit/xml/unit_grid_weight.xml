@@ -32,7 +32,7 @@
       -outdir &OUTPUT_DIR;/grid_weight -v 1
     </param>
     <output>
-       <stat>&OUTPUT_DIR;/grid_weight/grid_stat_NO_WEIGHT_240000L_20120410_000000V.stat</stat>
+      <stat>&OUTPUT_DIR;/grid_weight/grid_stat_NO_WEIGHT_240000L_20120410_000000V.stat</stat>
       <grid_nc>&OUTPUT_DIR;/grid_weight/grid_stat_NO_WEIGHT_240000L_20120410_000000V_pairs.nc</grid_nc>
     </output>
   </test>
@@ -51,7 +51,7 @@
       -outdir &OUTPUT_DIR;/grid_weight -v 1
     </param>
     <output>
-       <stat>&OUTPUT_DIR;/grid_weight/grid_stat_COS_LAT_WEIGHT_240000L_20120410_000000V.stat</stat>
+      <stat>&OUTPUT_DIR;/grid_weight/grid_stat_COS_LAT_WEIGHT_240000L_20120410_000000V.stat</stat>
       <grid_nc>&OUTPUT_DIR;/grid_weight/grid_stat_COS_LAT_WEIGHT_240000L_20120410_000000V_pairs.nc</grid_nc>
     </output>
   </test>
@@ -70,7 +70,7 @@
       -outdir &OUTPUT_DIR;/grid_weight -v 1
     </param>
     <output>
-       <stat>&OUTPUT_DIR;/grid_weight/grid_stat_AREA_WEIGHT_240000L_20120410_000000V.stat</stat>
+      <stat>&OUTPUT_DIR;/grid_weight/grid_stat_AREA_WEIGHT_240000L_20120410_000000V.stat</stat>
       <grid_nc>&OUTPUT_DIR;/grid_weight/grid_stat_AREA_WEIGHT_240000L_20120410_000000V_pairs.nc</grid_nc>
     </output>
   </test>

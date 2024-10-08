@@ -62,7 +62,7 @@ prob_pct_thresh = [ ==0.25 ];
 nc_var_str  = "";
 eclv_points = 0.05;
 
-tmp_field = [ { name = "TMP"; level = [ "Z2" ]; } ];
+tmp_field = [ { name = "TMP"; level = [ "Z2" ]; prob_cat_thresh = [ <=273, >273 ]; } ];
 
 //
 // Forecast and observation fields to be verified
@@ -200,11 +200,11 @@ output_flag = {
    orank = NONE;
    ssvar = STAT;
    relp  = STAT;
-   pct   = NONE;
-   pstd  = NONE;
-   pjc   = NONE;
-   prc   = NONE;
-   eclv  = NONE;
+   pct   = STAT;
+   pstd  = STAT;
+   pjc   = STAT;
+   prc   = STAT;
+   eclv  = STAT;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
