@@ -345,7 +345,7 @@ bool NcCfFile::open(const char * filepath)
     int n_times = get_data_size(valid_time_var);
     int tim_buf_size = n_times;
     if (use_bounds_var) tim_buf_size *= 2;
-    auto time_values = new double[tim_buf_size];
+    vector<double> time_values(tim_buf_size);
 
     if( get_nc_data(nc_time_var, time_values) ) {
       bool no_leap_year = get_att_no_leap_year(valid_time_var);
@@ -381,7 +381,6 @@ bool NcCfFile::open(const char * filepath)
       }
     }
     else ValidTime.add(0);  //Initialize
-    delete [] time_values;
   }
 
   NcVar init_time_var = get_var(_ncFile, "forecast_reference_time");
@@ -504,14 +503,13 @@ bool NcCfFile::open(const char * filepath)
   if (IS_VALID_NC_P(z_var)) {
 
     int z_count = get_data_size(z_var);
-    auto z_values = new double[z_count];
+    vector<double> z_values(z_count);
 
     if( get_nc_data(z_var, z_values) ) {
       for(int i=0; i<z_count; i++) {
         vlevels.add(z_values[i]);
       }
     }
-    delete [] z_values;
   }
 
   //  done
@@ -934,7 +932,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   //double missing_value = get_var_missing_value(var);
   get_var_fill_value(var, fill_value);
 
-  status = get_nc_data(var, &d, a);
+  status = get_nc_data_ptr(var, &d, a);
 
   if (!status)
   {
@@ -1102,7 +1100,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   //  get the data
   const int plane_size = nx * ny;
-  double *d = new double[plane_size];
+  vector<double> d(plane_size);
 
   size_t dim_size;
   LongArray offsets;
@@ -1162,8 +1160,6 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
       } /*  for y */
     }   /*  for x */
   }
-
-  delete [] d;
 
   //  done
   mlog << Debug(6) << method_name << "took "
@@ -1760,12 +1756,12 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
   // Figure out the dx/dy  and x/y pin values from the dimension variables
 
   long x_counts = GET_NC_SIZE_P(_xDim);
-  double x_values[x_counts];
+  vector<double> x_values(x_counts, bad_data_double);
 
   get_nc_data(_xCoordVar, x_values);
 
   long y_counts = GET_NC_SIZE_P(_yDim);
-  double y_values[y_counts];
+  vector<double> y_values(y_counts, bad_data_double);
 
   get_nc_data(_yCoordVar, y_values);
 
@@ -2013,13 +2009,11 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   // Figure out the dx/dy  and x/y pin values from the dimension variables
 
   long x_counts = GET_NC_SIZE_P(_xDim);
-  double x_values[x_counts];
-
+  vector<double> x_values(x_counts, bad_data_double);
   get_nc_data(_xCoordVar, x_values);
 
   long y_counts = GET_NC_SIZE_P(_yDim);
-  double y_values[y_counts];
-
+  vector<double> y_values(y_counts, bad_data_double);
   get_nc_data(_yCoordVar, y_values);
 
   // Unit conversion
@@ -2412,13 +2406,11 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   // Figure out the dx/dy  and x/y pin values from the dimension variables
 
   long x_counts = GET_NC_SIZE_P(_xDim);
-  double x_values[x_counts];
-
+  vector<double> x_values(x_counts, bad_data_double);
   get_nc_data(_xCoordVar, x_values);
 
   long y_counts = GET_NC_SIZE_P(_yDim);
-  double y_values[y_counts];
-
+  vector<double> y_values(y_counts, bad_data_double);
   get_nc_data(_yCoordVar, y_values);
 
   // Unit conversion
@@ -3007,12 +2999,12 @@ void NcCfFile::get_grid_mapping_geostationary(
   // Figure out the dx/dy  and x/y pin values from the dimension variables
 
   long x_counts = GET_NC_SIZE_P(_xDim);
-  double x_values[x_counts];
+  vector<double> x_values(x_counts);
 
   get_nc_data(_xCoordVar, x_values);
 
   long y_counts = GET_NC_SIZE_P(_yDim);
-  double y_values[y_counts];
+  vector<double> y_values(y_counts);
 
   get_nc_data(_yCoordVar, y_values);
 
@@ -3057,8 +3049,8 @@ void NcCfFile::get_grid_mapping_geostationary(
   data.dx_rad = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
   data.dy_rad = (y_values[y_counts-1] - y_values[0]) / (y_counts - 1);
   if (bound_count > 0) {
-    data.x_image_bounds = new double[bound_count];
-    data.y_image_bounds = new double[bound_count];
+    data.x_image_bounds.resize(bound_count, bad_data_double);
+    data.y_image_bounds.resize(bound_count, bad_data_double);
     if (nullptr != var_x_bound) get_nc_data(var_x_bound, data.x_image_bounds);
     if (nullptr != var_y_bound) get_nc_data(var_y_bound, data.y_image_bounds);
   }
@@ -3069,19 +3061,13 @@ void NcCfFile::get_grid_mapping_geostationary(
   data.inv_radius_ratio2 = 1.0/data.radius_ratio2;
   data.H = data.perspective_point_height + data.semi_major_axis;
 
-  data.x_values = new double[x_counts];
-  data.y_values = new double[y_counts];
-
-  memcpy(data.x_values, x_values, sizeof(data.x_values[0])*x_counts);
-  memcpy(data.y_values, y_values, sizeof(data.y_values[0])*y_counts);
+  data.x_values = x_values;
+  data.y_values = y_values;
 
   // Get scene_id: "Full Disk", "CONUS", or "Mesoscale"
   ConcatString scene_id;
   if (get_global_att(_ncFile, (string)"scene_id", scene_id)) {
-    char* scene_id_str = new char[scene_id.length()+1];
-    m_strncpy(scene_id_str, scene_id.text(), scene_id.length(), method_name.c_str());
-    scene_id_str[scene_id.length()] = 0;
-    data.scene_id = scene_id_str;
+    data.scene_id = scene_id;
   }
 
   data.dump();
@@ -3404,8 +3390,8 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
     return data;
   }
 
-  double lat_values[lat_counts];
-  double lon_values[lon_counts];
+  vector<double> lat_values(lat_counts, bad_data_double);
+  vector<double> lon_values(lon_counts, bad_data_double);
   bool lat_first = false;
   if (two_dim_coord) {
     lat_first = (lat_counts == get_dim_size(lat_var, 0));

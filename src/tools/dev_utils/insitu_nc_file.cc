@@ -101,15 +101,6 @@ void InsituNcFile::close()
 
   // Reclaim the space used for the variables
 
-  delete [] _aircraftId;
-  delete [] _timeObs;
-  delete [] _latitude;
-  delete [] _longitude;
-  delete [] _altitude;
-  delete [] _QCconfidence;
-  delete [] _medEDR;
-  delete [] _maxEDR;
-  
   return;
 }
 
@@ -189,7 +180,7 @@ bool InsituNcFile::open(const char * filename)
   
   char *aircraft_id= new char[_numRecords * aircraft_id_len];
   
-  if (!get_nc_data(&aircraft_id_var, aircraft_id))
+  if (!get_nc_data_ptr(&aircraft_id_var, aircraft_id))
   {
     mlog << Error << "\n" << method_name << " -> "
          << "error retrieving aircraftId values from file\n";
@@ -215,7 +206,7 @@ bool InsituNcFile::open(const char * filename)
     return false;
   }
   
-  _timeObs = new time_t[_numRecords];
+  _timeObs.resize(_numRecords);
   
   //if (!get_nc_data(time_obs_var, _timeObs, _numRecords))
   if (!get_nc_data(&time_obs_var, _timeObs))
@@ -237,7 +228,7 @@ bool InsituNcFile::open(const char * filename)
     return false;
   }
   
-  _latitude = new double[_numRecords];
+  _latitude.resize(_numRecords);
   
   if (!get_nc_data(&latitude_var, _latitude, _numRecords))
   {
@@ -258,7 +249,7 @@ bool InsituNcFile::open(const char * filename)
     return false;
   }
   
-  _longitude = new double[_numRecords];
+  _longitude.resize(_numRecords);
   
   if (!get_nc_data(&longitude_var, _longitude, _numRecords))
   {
@@ -279,7 +270,7 @@ bool InsituNcFile::open(const char * filename)
     return false;
   }
   
-  _altitude = new double[_numRecords];
+  _altitude.resize(_numRecords);
   
   if (!get_nc_data(&altitude_var, _altitude, _numRecords))
   {
@@ -300,7 +291,7 @@ bool InsituNcFile::open(const char * filename)
     return false;
   }
   
-  _QCconfidence = new double[_numRecords];
+  _QCconfidence.resize(_numRecords);
   
   if (!get_nc_data(&qc_confidence_var, _QCconfidence, _numRecords))
   {
@@ -321,7 +312,7 @@ bool InsituNcFile::open(const char * filename)
     return false;
   }
   
-  _medEDR = new double[_numRecords];
+  _medEDR.resize(_numRecords);
   
   if (!get_nc_data(&med_edr_var, _medEDR, _numRecords))
   {
@@ -342,7 +333,7 @@ bool InsituNcFile::open(const char * filename)
     return false;
   }
   
-  _maxEDR = new double[_numRecords];
+  _maxEDR.resize(_numRecords);
   
   if (!get_nc_data(&max_edr_var, _maxEDR, _numRecords))
   {

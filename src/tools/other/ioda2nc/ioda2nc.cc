@@ -170,12 +170,12 @@ static bool check_core_data(const bool, const bool,
                             StringArray &, StringArray &, e_ioda_format);
 static bool check_missing_thresh(float value);
 static ConcatString find_meta_name(string meta_key, StringArray available_names);
-static bool get_meta_data_float(NcFile *, StringArray &, const char *, float *,
+static bool get_meta_data_float(NcFile *, StringArray &, const char *, vector<float> &,
                                 const int);
 static bool get_meta_data_strings(NcVar &, char *);
 static bool get_meta_data_strings(NcVar &, char **);
 static bool get_obs_data_float(NcFile *, const ConcatString, NcVar *,
-                               float *, int *, const int, const e_ioda_format);
+                               vector<float> &, vector<int> &, const int, const e_ioda_format);
 static bool has_postfix(const std::string &, std::string const &);
 static bool is_in_metadata_map(string metadata_key, StringArray &available_list);
 
@@ -572,12 +572,12 @@ void process_ioda_file(int i_pb) {
                ? (npbmsg * nmsg_percent / 100) : nmsg;
    }
 
-   float *hdr_lat_arr = new float[nlocs];
-   float *hdr_lon_arr = new float[nlocs];
-   float *hdr_elv_arr = new float[nlocs];
-   float *obs_pres_arr = new float[nlocs];
-   float *obs_hght_arr = new float[nlocs];
-   float *hdr_time_arr = new float[nlocs];
+   vector<float> hdr_lat_arr (nlocs);
+   vector<float> hdr_lon_arr (nlocs);
+   vector<float> hdr_elv_arr (nlocs);
+   vector<float> obs_pres_arr(nlocs);
+   vector<float> obs_hght_arr(nlocs);
+   vector<float> hdr_time_arr(nlocs);
    char *hdr_vld_block = new char[nlocs*ndatetime];
    char *hdr_msg_types = nullptr;
    char *hdr_station_ids = nullptr;
@@ -601,7 +601,7 @@ void process_ioda_file(int i_pb) {
       if (NC_STRING == GET_NC_TYPE_ID(msg_type_var)) {
          hdr_msg_types2 = (char**) calloc(nlocs, sizeof(char*));
          for (int i=0; i<nlocs; i++ ) hdr_msg_types2[i] = (char*)calloc(nstring, sizeof(char));
-         get_nc_data(&msg_type_var, hdr_msg_types2);
+         get_nc_data_ptr(&msg_type_var, hdr_msg_types2);
       }
       else {
          hdr_msg_types = new char[nlocs*nstring];
@@ -618,7 +618,7 @@ void process_ioda_file(int i_pb) {
       if (NC_STRING == GET_NC_TYPE_ID(sid_var)) {
          hdr_station_ids2 = (char**) calloc(nlocs, sizeof(char*));
          for (int i=0; i<nlocs; i++ ) hdr_station_ids2[i] = (char*)calloc(nstring, sizeof(char));
-         get_nc_data(&sid_var, hdr_station_ids2);
+         get_nc_data_ptr(&sid_var, hdr_station_ids2);
       }
       else {
          hdr_station_ids = new char[nlocs*nstring];
@@ -643,8 +643,8 @@ void process_ioda_file(int i_pb) {
 
    status = is_time_offset ? get_nc_data(&in_hdr_vld_var, hdr_time_arr)
                            : is_time_string
-                             ? get_nc_data(&in_hdr_vld_var, hdr_vld_block2)
-                             : get_nc_data(&in_hdr_vld_var, hdr_vld_block);
+                             ? get_nc_data_ptr(&in_hdr_vld_var, hdr_vld_block2)
+                             : get_nc_data_ptr(&in_hdr_vld_var, hdr_vld_block);
    if(!status) {
       mlog << Error << "\n" << method_name
            << "trouble getting datetime\n\n";
@@ -658,9 +658,9 @@ void process_ioda_file(int i_pb) {
    NcVar obs_var, qc_var;
    ConcatString unit_attr;
    ConcatString desc_attr;
+   vector<int> qc_data(nlocs);
+   vector<float> obs_data(nlocs);
    for(idx=0; idx<raw_var_names.n(); idx++ ) {
-      int *qc_data = new int[nlocs];
-      float *obs_data = new float[nlocs];
 
       for (int idx2=0; idx2<nlocs; idx2++) {
          qc_data[idx2] = bad_data_int;
@@ -670,8 +670,8 @@ void process_ioda_file(int i_pb) {
            << "processing \"" << raw_var_names[idx] << "\" variable!\n";
       obs_var = get_var(f_in, raw_var_names[idx].c_str(), obs_group_name);
       if (IS_INVALID_NC(obs_var)) obs_var = get_var(f_in, raw_var_names[idx].c_str(), derived_obs_group_name);
-      v_qc_data.push_back(qc_data);
-      v_obs_data.push_back(obs_data);
+      v_qc_data.push_back(qc_data.data());
+      v_obs_data.push_back(obs_data.data());
       unit_attr.clear();
       desc_attr.clear();
       if(IS_VALID_NC(obs_var)) {
@@ -1014,13 +1014,7 @@ void process_ioda_file(int i_pb) {
       }
    }
    
-   delete [] hdr_lat_arr;
-   delete [] hdr_lon_arr;
-   delete [] hdr_elv_arr;
-   delete [] hdr_time_arr;
    delete [] hdr_vld_block;
-   delete [] obs_pres_arr;
-   delete [] obs_hght_arr;
 
    if (hdr_msg_types) delete [] hdr_msg_types;
    if (hdr_station_ids) delete [] hdr_station_ids;
@@ -1037,8 +1031,8 @@ void process_ioda_file(int i_pb) {
       delete [] hdr_vld_block2;
    }
 
-   for(idx=0; idx<v_obs_data.size(); idx++ ) delete [] v_obs_data[idx];
-   for(idx=0; idx<v_qc_data.size(); idx++ ) delete [] v_qc_data[idx];
+   //for(idx=0; idx<v_obs_data.size(); idx++ ) delete [] v_obs_data[idx];
+   //for(idx=0; idx<v_qc_data.size(); idx++ ) delete [] v_qc_data[idx];
    v_obs_data.clear();
    v_qc_data.clear();
 
@@ -1279,7 +1273,7 @@ ConcatString find_meta_name(string meta_key, StringArray available_names) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_meta_data_float(NcFile *f_in, StringArray &metadata_vars,
-                         const char *metadata_key, float *metadata_buf,
+                         const char *metadata_key, vector<float> &metadata_buf,
                          const int nlocs) {
    bool status = false;
    static const char *method_name = "get_meta_data_float() -> ";
@@ -1314,7 +1308,7 @@ bool get_meta_data_strings(NcVar &var, char *metadata_buf) {
    static const char *method_name = "get_meta_data_strings() -> ";
 
    if(IS_VALID_NC(var)) {
-      status = get_nc_data(&var, metadata_buf);
+      status = get_nc_data_ptr(&var, metadata_buf);
       if(!status) {
          mlog << Error << "\n" << method_name << " -> "
               << "trouble getting " << GET_NC_NAME(var) << "\n\n";
@@ -1327,7 +1321,7 @@ bool get_meta_data_strings(NcVar &var, char *metadata_buf) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_obs_data_float(NcFile *f_in, const ConcatString var_name,
-                        NcVar *obs_var, float *obs_buf, int *qc_buf,
+                        NcVar *obs_var, vector<float> &obs_buf, vector<int> &qc_buf,
                         const int nlocs, const e_ioda_format ioda_format) {
    bool status = false;
    static const char *method_name = "get_obs_data_float() -> ";

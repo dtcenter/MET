@@ -350,7 +350,7 @@ bool UGridFile::open_metadata(const char * filepath)
     int n_times = IS_VALID_NC_P(_tDim) ? get_dim_size(_tDim)
                                        : (int) get_data_size(valid_time_var);
     int tim_buf_size = n_times;
-    double *time_values = new double[tim_buf_size];
+    vector<double> time_values(tim_buf_size, bad_data_double);
     if(2 == time_dim_count) {
       for(int i=0; i<n_times; i++) {
         time_values[i] = get_nc_time(valid_time_var, i);
@@ -396,7 +396,6 @@ bool UGridFile::open_metadata(const char * filepath)
       }
     }
     else ValidTime.add(0);  //Initialize
-    delete [] time_values;
   }
 
   // Pull out the grid.  This must be done after pulling out the dimension
@@ -440,14 +439,13 @@ bool UGridFile::open_metadata(const char * filepath)
   if (IS_VALID_NC_P(z_var)) {
 
     int z_count = (int) get_data_size(z_var);
-    double *z_values = new double[z_count];
+    vector<double> z_values(z_count, bad_data_double);
 
     if( get_nc_data(z_var, z_values) ) {
       for(int i=0; i<z_count; i++) {
         vlevels.add(z_values[i]);
       }
     }
-    delete [] z_values;
   }
 
   //  done
@@ -622,8 +620,7 @@ double UGridFile::getData(NcVar * var, const LongArray & a) const
   double fill_value;
   get_var_fill_value(var, fill_value);
 
-  //status = get_nc_data(var, &d, a);
-  status = get_nc_data(var, a);
+  status = get_nc_data_ptr(var, &d, a);
 
   if (!status)
   {
@@ -637,7 +634,7 @@ double UGridFile::getData(NcVar * var, const LongArray & a) const
   mlog << Debug(6) << method_name << "took "
        << (clock()-start_clock)/double(CLOCKS_PER_SEC) << " seconds\n";
 
-  return d;
+  return (fill_value == d ? bad_data_double : d);
 }
 
 
@@ -699,7 +696,7 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   //  get the data
   const int plane_size = nx * ny;
-  double *d = new double[plane_size];
+  vector<double> d(plane_size, bad_data_double);
 
   int length;
   size_t dim_size;
@@ -743,8 +740,6 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     plane.set(value, x, 0);
 
   }   //  for x
-
-  if (nullptr != d) delete [] d;
 
   //  done
   ConcatString log_message;
@@ -906,8 +901,8 @@ void UGridFile::read_netcdf_grid()
   ConcatString units_value;
   const char *method_name = "UGridFile::read_netcdf_grid() -> ";
 
-  double *_lat = new double[face_count];
-  double *_lon = new double[face_count];
+  vector<double> _lat(face_count, bad_data_double);
+  vector<double> _lon(face_count, bad_data_double);
   
   if (IS_INVALID_NC_P(_latVar)) {
     mlog << Error << "\n" << method_name << "latitude variable is missing\n\n";
@@ -943,16 +938,13 @@ void UGridFile::read_netcdf_grid()
   // Convert longitude from degrees east to west
   for (int idx=0; idx<face_count; idx++) _lon[idx] = -1.0*rescale_deg(_lon[idx], -180, 180);
 
-  grid_data.set_points(face_count, _lon, _lat);
+  grid_data.set_points(face_count, _lon.data(), _lat.data());
   grid_data.max_distance_km = max_distance_km;
 
   grid.set(grid_data);
 
   // Pull the grid projection from the variable information.  First, look for
   // a grid_mapping attribute.
-
-  if (_lat) delete [] _lat;
-  if (_lon) delete [] _lon;
 
 }
 

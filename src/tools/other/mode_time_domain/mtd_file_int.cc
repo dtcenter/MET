@@ -113,7 +113,7 @@ void MtdIntFile::int_init_from_scratch()
 
 Data = 0;
 
-ObjVolume = 0;
+ObjVolume.clear();
 
 clear();
 
@@ -133,7 +133,7 @@ MtdFileBase::clear();
 
 if ( Data )  { delete [] Data;  Data = 0; }
 
-if ( ObjVolume )  { delete [] ObjVolume;  ObjVolume = 0; }
+ObjVolume.clear();
 
 DataMin = DataMax = 0;
 
@@ -197,11 +197,11 @@ if ( f.Data )  {
 
 n = Nobjects;
 
-if ( f.ObjVolume )  {
+if ( !f.ObjVolume.empty() )  {
 
-   ObjVolume = new int [n];
+   ObjVolume.resize(n);
 
-   memcpy(ObjVolume, f.ObjVolume, n*sizeof(int));
+   ObjVolume = f.ObjVolume;
 
 }
 
@@ -444,7 +444,7 @@ lengths.add(Nt);
 lengths.add(Ny);
 lengths.add(Nx);
 
-if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
+if ( ! get_nc_data_ptr(&var, Data, lengths, offsets) )  {
 
    mlog << Error << "\nMtdIntFile::read(const char *) -> "
         << "trouble getting data\n\n";
@@ -477,7 +477,7 @@ NcVar data_var;
 NcVar volumes_var; 
 const char format [] = "%d";
 char junk[256];
-const bool is_split = (ObjVolume != 0);
+const bool is_split = !ObjVolume.empty();
 
    //
    //  write stuff from parent class
@@ -543,7 +543,7 @@ lengths.add(Nt);
 lengths.add(Ny);
 lengths.add(Nx);
 
-if ( ! put_nc_data(&data_var, Data, lengths, offsets) )  {
+if ( ! put_nc_data_ptr(&data_var, Data, lengths, offsets) )  {
 
    mlog << Error << "\nMtdIntFile::write(const char *) -> "
         << "trouble getting data\n\n";
@@ -1152,7 +1152,7 @@ void MtdIntFile::split()
 {
 
 int j, k;
-int * d = 0;
+int * d = nullptr;
 MtdIntFile old;
 
 old = ::split(*this, Nobjects);
@@ -1167,9 +1167,7 @@ const int Nxyt = Nx*Ny*Nt;
 
 if ( Nobjects == 0 )  return;
 
-old.ObjVolume = new int [Nobjects];
-
-for (j=0; j<Nobjects; ++j)  old.ObjVolume[j] = 0;
+old.ObjVolume.resize(Nobjects, 0);
 
 d = old.Data;
 if (d) {
@@ -1203,7 +1201,7 @@ int MtdIntFile::volume(int k) const
 
 {
 
-if ( !ObjVolume )  {
+if ( ObjVolume.empty() )  {
 
    mlog << Error << "\nMtdIntFile::volume(int) -> "
         << "field not split!\n\n";
@@ -1234,7 +1232,7 @@ int MtdIntFile::total_volume() const
 
 {
 
-if ( !ObjVolume )  {
+if ( ObjVolume.empty() )  {
 
    mlog << Error << "\nMtdIntFile::total_volume() -> "
         << "field not split!\n\n";
@@ -1300,7 +1298,7 @@ if ( n_new == Nobjects )  return;
 int j, k;
 const int n3 = Nx*Ny*Nt;
 int * old_to_new = (int *) nullptr;
-int * new_volumes = (int *) nullptr;
+vector<int> new_volumes;
 int * d = Data;
 
 if ( n_new > 0 )  {
@@ -1309,7 +1307,7 @@ if ( n_new > 0 )  {
 
    for (j=0; j<Nobjects; ++j)  old_to_new[j] = -1;
 
-   new_volumes = new int [n_new];
+   new_volumes.resize(n_new);
 
    for (j=0; j<n_new; ++j)  {
 
@@ -1355,13 +1353,12 @@ Nobjects = n_new;
 
 DataMax  = Nobjects;
 
+ObjVolume.clear();
 if ( n_new > 0 )  {
-
-   delete [] ObjVolume;  ObjVolume = (int *) nullptr;
 
    ObjVolume = new_volumes;
 
-} else ObjVolume = 0;
+}
 
 
    //
@@ -1535,11 +1532,9 @@ void MtdIntFile::set_volumes(int n, const int * V)
 
 {
 
-if ( ObjVolume )  { delete [] ObjVolume;  ObjVolume = (int *) nullptr; }
-
 int j;
 
-ObjVolume = new int [n];
+ObjVolume.resize(n);
 
 for (j=0; j<n; ++j)  ObjVolume[j] = V[j];
 
