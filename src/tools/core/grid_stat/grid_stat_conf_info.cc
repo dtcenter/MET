@@ -228,6 +228,19 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    // Summarize output flags across all verification tasks
    process_flags();
 
+   // FHO output is not compatible with grid weights
+   if(output_flag[i_fho] != STATOutputType::None &&
+      grid_weight_flag   != GridWeightType::None) {
+
+      mlog << Warning << "\nGridStatConfInfo::process_config() -> "
+           << "Disabling FHO output that is not compatible with grid weighting. "
+           << "Set \"grid_weight_flag = NONE\" to write FHO output.\n\n";
+
+      // Disable FHO output
+      for(i=0; i<n_vx; i++) vx_opt[i].output_flag[i_fho] = STATOutputType::None;
+      output_flag[i_fho] = STATOutputType::None; 
+   }
+
    // If VL1L2, VAL1L2, or VCNT is requested, set the uv_index
    if(output_flag[i_vl1l2]  != STATOutputType::None ||
       output_flag[i_val1l2] != STATOutputType::None ||
