@@ -215,7 +215,7 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
             DataPlane &fr_dp, DataPlane &to_dp,
             Grid fr_grid, Grid to_grid, IntArray *cellMapping, NcFile *nc_adp);
 static void save_geostationary_data(const ConcatString geostationary_file,
-            const float *latitudes, const float *longitudes,
+            const vector<float> &latitudes, const vector<float> &longitudes,
             const GoesImagerData &grid_data);
 static void set_goes_qc_flags(const StringArray &);
 
@@ -515,6 +515,7 @@ static void process_data_file() {
 ////////////////////////////////////////////////////////////////////////
 // returns true if no error
 
+/*
 bool get_nc_data_int_array(NcFile *nc, char *var_name, int *data_array, bool stop=true) {
    bool status = false;
    NcVar nc_var = get_nc_var(nc, var_name, stop);
@@ -590,6 +591,7 @@ bool get_nc_data_string_array(NcFile *nc, const char *var_name,
    }
    return status;
 }
+*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1353,7 +1355,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
          time_from_size = get_data_size(&time_var);
          skip_times.resize(time_from_size, false);
          vector<double> valid_times(time_from_size, bad_data_double);
-         if (get_nc_data(&time_var, valid_times.data())) {
+         if (get_nc_data(&time_var, valid_times)) {
             int sec_per_unit = 0;
             bool no_leap_year = false;
             auto ref_ut = (unixtime) 0;
@@ -1699,7 +1701,7 @@ void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
    } // end for x
 
    // Write out the data
-   if(!put_nc_data_with_dims(data_var, &data.data()[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(data_var, data, grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_nc_data() -> "
            << "error writing data to the output file.\n\n";
       exit(1);
@@ -1726,7 +1728,7 @@ void write_nc_data_int(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
    } // end for x
 
    // Write out the data
-   if(!put_nc_data_with_dims(data_var, &data.data()[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(data_var, data, grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_nc_data_int() -> "
            << "error writing data to the output file.\n\n";
       exit(1);
@@ -2072,7 +2074,7 @@ static bool get_grid_mapping(const Grid &to_grid, IntArray *cellMapping,
 
 static void get_grid_mapping_latlon(
       DataPlane from_dp, DataPlane to_dp, Grid to_grid,
-      IntArray *cellMapping, float *latitudes, float *longitudes,
+      IntArray *cellMapping, vector<float> &latitudes, vector<float> &longitudes,
       int from_lat_count, int from_lon_count, vector<bool> skip_times, bool to_north, bool is_2d) {
    double x;
    double y;
@@ -2219,11 +2221,11 @@ static bool get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
       int lon_count = get_data_size(&var_lon);
       vector<float> latitudes(lat_count, bad_data_float);
       vector<float> longitudes(lon_count, bad_data_float);
-      status = get_nc_data(&var_lat, latitudes.data());
-      if( status ) status = get_nc_data(&var_lon, longitudes.data());
+      status = get_nc_data(&var_lat, latitudes);
+      if( status ) status = get_nc_data(&var_lon, longitudes);
       if( status ) {
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping,
-                                 latitudes.data(), longitudes.data(),
+                                 latitudes, longitudes,
                                  from_lat_count, from_lon_count, skip_times,
                                  !fr_grid.get_swap_to_north(), (lon_count==data_size));
 
@@ -2250,7 +2252,7 @@ static unixtime find_valid_time(NcVar time_var) {
    if( IS_VALID_NC(time_var) || get_dim_count(&time_var) < 2) {
       int time_count = get_dim_size(&time_var, 0);
 
-      double time_values [time_count + 1];
+      vector<double> time_values(time_count+1);
       if (get_nc_data(&time_var, time_values)) {
          valid_time = compute_unixtime(&time_var, time_values[0]);
       }
@@ -2362,14 +2364,14 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
                lon_count = get_data_size(&var_lon);
                latitudes = latitudes_buf.data();
                longitudes = longitudes_buf.data();
-               get_nc_data(&var_lat, latitudes);
-               get_nc_data(&var_lon, longitudes);
+               get_nc_data(&var_lat, latitudes_buf);
+               get_nc_data(&var_lon, longitudes_buf);
             }
          }
          else {
             FILE *pFile = met_fopen ( cur_coord_name.c_str(), "rb" );
-            latitudes = latitudes_buf.data();
-            longitudes = longitudes_buf.data();
+            float *latitudes = latitudes_buf.data();
+            float *longitudes = longitudes_buf.data();
             (void) fread (latitudes,sizeof(latitudes[0]),data_size,pFile);
             (void) fread (longitudes,sizeof(longitudes[0]),data_size,pFile);
             fclose (pFile);
@@ -2384,8 +2386,8 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
                int lat_mis_matching_count = 0;
                int lon_matching_count = 0;
                int lon_mis_matching_count = 0;
-               const float *tmp_lats = grid_data.lat_values;
-               const float *tmp_lons = grid_data.lon_values;
+               const float *tmp_lats = grid_data.lat_values.data();
+               const float *tmp_lons = grid_data.lon_values.data();
 
                for (int idx=0; idx<data_size; idx++) {
                    if ((latitudes[idx] > MISSING_LATLON) && (tmp_lats[idx] > MISSING_LATLON)) {
@@ -2423,11 +2425,9 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
       else if (fr_grid.info().gi) {
          grid_data.copy(fr_grid.info().gi);
          grid_data.compute_lat_lon();
-         latitudes = grid_data.lat_values;
-         longitudes = grid_data.lon_values;
          if (!file_exists(geostationary_file.c_str())) {
             save_geostationary_data(geostationary_file,
-                  latitudes, longitudes, grid_data);
+                  grid_data.lat_values, grid_data.lon_values, grid_data);
          }
       }
       if (latitudes == nullptr) {
@@ -2442,7 +2442,7 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
          check_lat_lon(data_size, latitudes, longitudes);
          vector<bool> skip_times;
          get_grid_mapping_latlon(from_dp, to_dp, to_grid, cellMapping,
-                                 latitudes, longitudes,
+                                 latitudes_buf, longitudes_buf,
                                  from_lat_count, from_lon_count, skip_times,
                                  !fr_grid.get_swap_to_north(), (lon_count==data_size));
       }
@@ -2608,13 +2608,13 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
       else if (is_smoke_only)   var_adp = get_goes_nc_var(nc_adp, vname_smoke);
 
       if (IS_VALID_NC(var_adp)) {
-         get_nc_data(&var_adp, adp_data.data(), true);
+         get_nc_data(&var_adp, adp_data, true);
 
          //ADP Smoke:ancillary_variables: ubyte DQF(y, x)
          if (get_att_value_string(&var_adp, (string)"ancillary_variables", qc_var_name)) {
             var_adp_qc = get_nc_var(nc_adp, qc_var_name.c_str());
             if (IS_VALID_NC(var_adp_qc)) {
-               get_nc_data(&var_adp_qc, adp_qc_data.data());
+               get_nc_data(&var_adp_qc, adp_qc_data);
                set_adp_gc_values(var_adp_qc);
                has_adp_qc_var = true;
                mlog << Debug(5) << method_name << "found QC var: " << qc_var_name
@@ -2636,7 +2636,7 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
    if (get_att_value_string(&var_data, (string)"ancillary_variables", qc_var_name)) {
       var_qc = get_nc_var(nc_in, qc_var_name.c_str());
       if (IS_VALID_NC(var_qc)) {
-         get_nc_data(&var_qc, qc_data.data());
+         get_nc_data(&var_qc, qc_data);
          has_qc_var = true;
          mlog << Debug(3) << method_name << "found QC var: " << qc_var_name << ".\n";
       }
@@ -2647,7 +2647,7 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
       }
    }
 
-   get_nc_data(&var_data, from_data.data());
+   get_nc_data(&var_data, from_data);
 
    fr_dp.set_size(from_lon_count, from_lat_count);
    for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
@@ -2850,7 +2850,7 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
 ////////////////////////////////////////////////////////////////////////
 
 static void save_geostationary_data(const ConcatString geostationary_file,
-      const float *latitudes, const float *longitudes,
+      const vector<float> &latitudes, const vector<float> &longitudes,
       const GoesImagerData &grid_data) {
    bool has_error = false;
    int deflate_level = 0;

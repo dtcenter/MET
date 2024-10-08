@@ -156,9 +156,9 @@ static void do_pct_cdp_thresh(const EnsembleStatVxOpt &, const PairDataEnsemble 
 static void write_pct_info(const EnsembleStatVxOpt &, const PCTInfo *, int, bool);
 
 static void write_orank_nc(PairDataEnsemble &, DataPlane &, int, int, int);
-static void write_orank_var_float(int, int, int, float *, DataPlane &,
+static void write_orank_var_float(int, int, int, vector<float> &, DataPlane &,
                                   const char *, const char *);
-static void write_orank_var_int(int, int, int, int *, DataPlane &,
+static void write_orank_var_int(int, int, int, vector<int> &, DataPlane &,
                                 const char *, const char *);
 
 static void add_var_att_local(VarInfo *, NcVar *, bool is_int,
@@ -2559,27 +2559,11 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
    int i, n;
 
    // Arrays for storing observation rank data
-   float *obs_v    = (float *) nullptr;
-   int   *obs_rank = (int *)   nullptr;
-   float *obs_pit  = (float *) nullptr;
-   int   *ens_vld  = (int *)   nullptr;
-   float *ens_mean = (float *) nullptr;
-
-   // Allocate memory for storing ensemble data
-   obs_v    = new float [nxy];
-   obs_rank = new int   [nxy];
-   obs_pit  = new float [nxy];
-   ens_vld  = new int   [nxy];
-   ens_mean = new float [nxy];
-
-   // Initialize
-   for(i=0; i<nxy; i++) {
-      obs_v[i]    = bad_data_float;
-      obs_rank[i] = bad_data_int;
-      obs_pit[i]  = bad_data_float;
-      ens_vld[i]  = bad_data_int;
-      ens_mean[i] = bad_data_float;
-   }
+   vector<float> obs_v    (nxy, bad_data_float);
+   vector<int  > obs_rank (nxy, bad_data_int);
+   vector<float> obs_pit  (nxy, bad_data_float);
+   vector<int  > ens_vld  (nxy, bad_data_int);
+   vector<float> ens_mean (nxy, bad_data_float);
 
    // Loop over all the pairs
    for(i=0; i<pd.n_obs; i++) {
@@ -2631,20 +2615,13 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
                           "Ensemble Valid Data Count");
    }
 
-   // Deallocate and clean up
-   if(obs_v)    { delete [] obs_v;    obs_v    = (float *) nullptr; }
-   if(obs_rank) { delete [] obs_rank; obs_rank = (int   *) nullptr; }
-   if(obs_pit)  { delete [] obs_pit;  obs_pit  = (float *) nullptr; }
-   if(ens_vld)  { delete [] ens_vld;  ens_vld  = (int   *) nullptr; }
-   if(ens_mean) { delete [] ens_mean; ens_mean = (float *) nullptr; }
-
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void write_orank_var_float(int i_vx, int i_interp, int i_mask,
-                           float *data, DataPlane &dp,
+                           vector<float> &data, DataPlane &dp,
                            const char *type_str,
                            const char *long_name_str) {
    NcVar nc_var;
@@ -2698,7 +2675,7 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
                      name_str.c_str(), long_name_str);
 
    // Write the data
-   if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&nc_var, data, grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_orank_var_float() -> "
            << "error in nc_var->put for the " << var_name
            << " field.\n\n";
@@ -2711,7 +2688,7 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
 ////////////////////////////////////////////////////////////////////////
 
 void write_orank_var_int(int i_vx, int i_interp, int i_mask,
-                         int *data, DataPlane &dp,
+                         vector<int> &data, DataPlane &dp,
                          const char *type_str,
                          const char *long_name_str) {
    NcVar nc_var;
@@ -2761,7 +2738,7 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
                      name_str.c_str(), long_name_str);
 
    // Write the data
-   if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&nc_var, data, grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_orank_var_int() -> "
            << "error in nc_var->put for the " << var_name
            << " field.\n\n";

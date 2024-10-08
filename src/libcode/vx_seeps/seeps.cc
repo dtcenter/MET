@@ -481,20 +481,20 @@ void SeepsClimo::read_seeps_scores(ConcatString filename) {
       mlog << Debug(6) << method_name << "dimensions nstn = " << nstn << "\n";
       if (standalone_debug_seeps) cout << "dimensions nstn = " << nstn << "\n";
 
-      int    *sid_array = new int[nstn];
-      double *lat_array = new double[nstn];
-      double *lon_array = new double[nstn];
-      double *elv_array = new double[nstn];
-      double *p1_00_array = new double[nstn*SEEPS_MONTH];
-      double *p2_00_array = new double[nstn*SEEPS_MONTH];
-      double *t1_00_array = new double[nstn*SEEPS_MONTH];
-      double *t2_00_array = new double[nstn*SEEPS_MONTH];
-      double *p1_12_array = new double[nstn*SEEPS_MONTH];
-      double *p2_12_array = new double[nstn*SEEPS_MONTH];
-      double *t1_12_array = new double[nstn*SEEPS_MONTH];
-      double *t2_12_array = new double[nstn*SEEPS_MONTH];
-      double *matrix_00_array = new double[nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE];
-      double *matrix_12_array = new double[nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE];
+      vector<int   > sid_array(nstn);
+      vector<double> lat_array(nstn);
+      vector<double> lon_array(nstn);
+      vector<double> elv_array(nstn);
+      vector<double> p1_00_array(nstn*SEEPS_MONTH);
+      vector<double> p2_00_array(nstn*SEEPS_MONTH);
+      vector<double> t1_00_array(nstn*SEEPS_MONTH);
+      vector<double> t2_00_array(nstn*SEEPS_MONTH);
+      vector<double> p1_12_array(nstn*SEEPS_MONTH);
+      vector<double> p2_12_array(nstn*SEEPS_MONTH);
+      vector<double> t1_12_array(nstn*SEEPS_MONTH);
+      vector<double> t2_12_array(nstn*SEEPS_MONTH);
+      vector<double> matrix_00_array(nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE);
+      vector<double> matrix_12_array(nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE);
 
       NcVar var_sid       = get_nc_var(nc_file, var_name_sid);
       NcVar var_lat       = get_nc_var(nc_file, var_name_lat);
@@ -611,21 +611,6 @@ void SeepsClimo::read_seeps_scores(ConcatString filename) {
          seeps_score_12_map[sid] = rec_12;
       }
 
-      if (sid_array) delete [] sid_array;
-      if (lat_array) delete [] lat_array;
-      if (lon_array) delete [] lon_array;
-      if (elv_array) delete [] elv_array;
-      if (p1_00_array) delete [] p1_00_array;
-      if (p2_00_array) delete [] p2_00_array;
-      if (t1_00_array) delete [] t1_00_array;
-      if (t2_00_array) delete [] t2_00_array;
-      if (p1_12_array) delete [] p1_12_array;
-      if (p2_12_array) delete [] p2_12_array;
-      if (t1_12_array) delete [] t1_12_array;
-      if (t2_12_array) delete [] t2_12_array;
-      if (matrix_00_array) delete [] matrix_00_array;
-      if (matrix_12_array) delete [] matrix_12_array;
-
       nc_file->close();
 
       float duration = (float)(clock() - clock_time)/CLOCKS_PER_SEC;
@@ -662,8 +647,6 @@ SeepsClimoGrid::~SeepsClimoGrid() {
 ////////////////////////////////////////////////////////////////////////
 
 void SeepsClimoGrid::init_from_scratch() {
-   p1_buf = p2_buf = t1_buf = t2_buf = nullptr;
-   s12_buf = s13_buf = s21_buf = s23_buf = s31_buf = s32_buf = nullptr;
    clear();
 }
 
@@ -671,16 +654,16 @@ void SeepsClimoGrid::init_from_scratch() {
 
 void SeepsClimoGrid::clear() {
    SeepsClimoBase::clear();
-   if (nullptr != p1_buf) { delete [] p1_buf; p1_buf = nullptr; }
-   if (nullptr != p2_buf) { delete [] p2_buf; p2_buf = nullptr; }
-   if (nullptr != t1_buf) { delete [] t1_buf; t1_buf = nullptr; }
-   if (nullptr != t2_buf) { delete [] t2_buf; t2_buf = nullptr; }
-   if (nullptr != s12_buf) { delete [] s12_buf; s12_buf = nullptr; }
-   if (nullptr != s13_buf) { delete [] s13_buf; s13_buf = nullptr; }
-   if (nullptr != s21_buf) { delete [] s21_buf; s21_buf = nullptr; }
-   if (nullptr != s23_buf) { delete [] s23_buf; s23_buf = nullptr; }
-   if (nullptr != s31_buf) { delete [] s31_buf; s31_buf = nullptr; }
-   if (nullptr != s32_buf) { delete [] s32_buf; s32_buf = nullptr; }
+   p1_buf.clear();
+   p2_buf.clear();
+   t1_buf.clear();
+   t2_buf.clear();
+   s12_buf.clear();
+   s13_buf.clear();
+   s21_buf.clear();
+   s23_buf.clear();
+   s31_buf.clear();
+   s32_buf.clear();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -787,16 +770,16 @@ void SeepsClimoGrid::read_seeps_scores(ConcatString filename) {
       if (standalone_debug_seeps) cout << "dimensions lon = " << nx << " lat = " << ny
                                        << " month=" << month << "\n";;
 
-      p1_buf = new double[nx*ny];
-      p2_buf = new double[nx*ny];
-      t1_buf = new double[nx*ny];
-      t2_buf = new double[nx*ny];
-      s12_buf = new double[nx*ny];
-      s13_buf = new double[nx*ny];
-      s21_buf = new double[nx*ny];
-      s23_buf = new double[nx*ny];
-      s31_buf = new double[nx*ny];
-      s32_buf = new double[nx*ny];
+      p1_buf.resize(nx*ny, bad_data_double);
+      p2_buf.resize(nx*ny, bad_data_double);
+      t1_buf.resize(nx*ny, bad_data_double);
+      t2_buf.resize(nx*ny, bad_data_double);
+      s12_buf.resize(nx*ny, bad_data_double);
+      s13_buf.resize(nx*ny, bad_data_double);
+      s21_buf.resize(nx*ny, bad_data_double);
+      s23_buf.resize(nx*ny, bad_data_double);
+      s31_buf.resize(nx*ny, bad_data_double);
+      s32_buf.resize(nx*ny, bad_data_double);
 
       LongArray curs;   // = { month-1, 0, 0 };
       LongArray dims;   // = { 1, ny, nx };

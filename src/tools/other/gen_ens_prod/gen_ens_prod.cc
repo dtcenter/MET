@@ -71,9 +71,9 @@ static void track_counts(GenEnsProdVarInfo *, const DataPlane &, bool,
 static void setup_nc_file();
 static void write_ens_nc(GenEnsProdVarInfo *, int, const DataPlane &,
                          const DataPlane &, const DataPlane &);
-static void write_ens_var_float(GenEnsProdVarInfo *, float *, const DataPlane &,
+static void write_ens_var_float(GenEnsProdVarInfo *, vector<float> &, const DataPlane &,
                                 const char *, const char *);
-static void write_ens_var_int(GenEnsProdVarInfo *, int *, const DataPlane &,
+static void write_ens_var_int(GenEnsProdVarInfo *, vector<int> &, const DataPlane &,
                               const char *, const char *);
 static void write_ens_data_plane(GenEnsProdVarInfo *, const DataPlane &, const DataPlane &,
                                  const char *, const char *);
@@ -821,14 +821,14 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
    DataPlane prob_dp, nbrhd_dp;
 
    // Allocate memory for storing ensemble data
-   float *ens_mean  = new float [nxy];
-   float *ens_stdev = new float [nxy];
-   float *ens_minus = new float [nxy];
-   float *ens_plus  = new float [nxy];
-   float *ens_min   = new float [nxy];
-   float *ens_max   = new float [nxy];
-   float *ens_range = new float [nxy];
-   int   *ens_vld   = new int   [nxy];
+   vector<float> ens_mean (nxy, bad_data_float);
+   vector<float> ens_stdev(nxy, bad_data_float);
+   vector<float> ens_minus(nxy, bad_data_float);
+   vector<float> ens_plus (nxy, bad_data_float);
+   vector<float> ens_min  (nxy, bad_data_float);
+   vector<float> ens_max  (nxy, bad_data_float);
+   vector<float> ens_range(nxy, bad_data_float);
+   vector<int  > ens_vld  (nxy, bad_data_int  );
 
    // Store the threshold for the ratio of valid data points
    t = conf_info.vld_data_thresh;
@@ -1061,22 +1061,12 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
       } // end for it
    }
 
-   // Deallocate and clean up
-   if(ens_mean)  { delete [] ens_mean;  ens_mean  = (float *) nullptr; }
-   if(ens_stdev) { delete [] ens_stdev; ens_stdev = (float *) nullptr; }
-   if(ens_minus) { delete [] ens_minus; ens_minus = (float *) nullptr; }
-   if(ens_plus)  { delete [] ens_plus;  ens_plus  = (float *) nullptr; }
-   if(ens_min)   { delete [] ens_min;   ens_min   = (float *) nullptr; }
-   if(ens_max)   { delete [] ens_max;   ens_max   = (float *) nullptr; }
-   if(ens_range) { delete [] ens_range; ens_range = (float *) nullptr; }
-   if(ens_vld)   { delete [] ens_vld;   ens_vld   = (int   *) nullptr; }
-
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_float(GenEnsProdVarInfo *ens_info, float *ens_data, const DataPlane &dp,
+void write_ens_var_float(GenEnsProdVarInfo *ens_info, vector<float> &ens_data, const DataPlane &dp,
                          const char *type_str,
                          const char *long_name_str) {
    NcVar ens_var;
@@ -1120,7 +1110,7 @@ void write_ens_var_float(GenEnsProdVarInfo *ens_info, float *ens_data, const Dat
                      name_str.c_str(), long_name_str);
 
    // Write the data
-   if(!put_nc_data_with_dims(&ens_var, &ens_data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&ens_var, ens_data, grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_ens_var_float() -> "
            << "error in ens_var->put for the " << ens_var_name
            << " field.\n\n";
@@ -1132,7 +1122,7 @@ void write_ens_var_float(GenEnsProdVarInfo *ens_info, float *ens_data, const Dat
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_int(GenEnsProdVarInfo *ens_info, int *ens_data, const DataPlane &dp,
+void write_ens_var_int(GenEnsProdVarInfo *ens_info, vector<int> &ens_data, const DataPlane &dp,
                        const char *type_str,
                        const char *long_name_str) {
    NcVar ens_var;
@@ -1167,7 +1157,7 @@ void write_ens_var_int(GenEnsProdVarInfo *ens_info, int *ens_data, const DataPla
                      name_str.c_str(), long_name_str);
 
    // Write the data
-   if(!put_nc_data_with_dims(&ens_var, &ens_data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&ens_var, ens_data, grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_ens_var_int() -> "
            << "error in ens_var->put for the " << ens_var_name
            << " field.\n\n";
@@ -1183,16 +1173,13 @@ void write_ens_data_plane(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, 
                           const char *type_str, const char *long_name_str) {
 
    // Allocate memory for this data
-   float *ens_data = new float [nxy];
+   vector<float> ens_data(nxy);
 
    // Store the data in an array of floats
    for(int i=0; i<nxy; i++) ens_data[i] = ens_dp.data()[i];
 
    // Write the output
    write_ens_var_float(ens_info, ens_data, dp, type_str, long_name_str);
-
-   // Cleanup
-   if(ens_data) { delete [] ens_data; ens_data = (float *) nullptr; }
 
    return;
 }

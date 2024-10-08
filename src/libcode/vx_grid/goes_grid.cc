@@ -114,13 +114,13 @@ void GoesImagerGrid::latlon_to_xy(double lat, double lon, double & x_idx, double
   float cos_clat = cos(c_lat);
 
   float rc = Data.semi_minor_axis/sqrt(1.0 - pow(Data.ecc*cos_clat, 2.0));
-      
+
   float del_lon_angle = (lon - Data.lon_of_projection_origin)*deg_per_rad;
 
   float sx = Data.H - (rc*cos_clat*cos(del_lon_angle));
   float sy = -rc*cos_clat*sin(del_lon_angle);
   float sz = rc*sin(c_lat);
-      
+
   // check that point is on disk of the earth
   if((Data.H*(Data.H - sx)) < (sy*sy + Data.radius_ratio2*sz*sz)) {
     x_idx = -1;
@@ -132,7 +132,7 @@ void GoesImagerGrid::latlon_to_xy(double lat, double lon, double & x_idx, double
   float xx = asin(-sy/rl);
   float yy = atan(sz/sx);
 
-  
+
   x_idx = round((xx - Data.x_image_bounds[0])/Data.dx_rad);
   y_idx = round((Data.y_image_bounds[0] - yy)/Data.dy_rad);
 
@@ -369,7 +369,7 @@ void convert_angles_to_geodetic(
    double a, b, disdance_sat_to_p, h_minus_sx;
    double sx, sy, sz;
    static const string method_name = "goes_grid convert_angles_to_geodetic()";
-   
+
    a = sin_x*sin_x + cos_x*cos_x*(cos_y*cos_y + axis_ratio*sin_y*sin_y);
    b = -2 * data_H * cos_x * cos_y;
    disdance_sat_to_p = (-b - sqrt(b*b - 4*a*param_c)) / (2 * a);
@@ -403,7 +403,7 @@ void GoesImagerData::compute_lat_lon()
    double axis_ratio = semi_major_axis_sqr / (semi_minor_axis*semi_minor_axis);
    double param_c = H * H - semi_major_axis_sqr;
    static const string method_name = "GoesImagerData::compute_lat_lon() ";
-   
+
    lat_min = 90.0;
    lat_max = -90.0;
    lon_min = 360.0;
@@ -411,10 +411,10 @@ void GoesImagerData::compute_lat_lon()
    idx_lat_min = idx_lat_max = idx_lon_min = idx_lon_max = 0;
    buf_len = nx * ny;
 
-   if ((0 != x_values) && (0 != y_values)) {
-      lat_values = new float[buf_len];
-      lon_values = new float[buf_len];
-      
+   if (!x_values.empty() && !y_values.empty()) {
+      lat_values.resize(buf_len, bad_data_float);
+      lon_values.resize(buf_len, bad_data_float);
+
       // Order matters, checked with binary coordinate file
       for (int yIdx=0; yIdx<ny; yIdx++) {
          y_rad = y_values[yIdx];
@@ -445,7 +445,7 @@ void GoesImagerData::compute_lat_lon()
                }
                lat_values[index] = lat;
                lon_values[index] = lon;
-               
+
                mlog << Debug(10) << method_name << "index=" << index
                     << "  lat: " << lat << "  lon: " << lon
                     << "  lat_rad: " << lat_rad << "  lon_rad: " << lon_rad << "\n";
@@ -481,52 +481,43 @@ void GoesImagerData::copy(const GoesImagerData *from)
    inverse_flattening = from->inverse_flattening;
    lat_of_projection_origin = from->lat_of_projection_origin;
    lon_of_projection_origin = from->lon_of_projection_origin;
-   
-   int var_x_size = sizeof(from->x_image_bounds[0]);
-   int var_y_size = sizeof(from->y_image_bounds[0]);
-   int var_x_bound = sizeof(from->x_image_bounds) / var_x_size;
-   int var_y_bound = sizeof(from->y_image_bounds) / var_y_size;
-   mlog << Debug(5) << "GoesImager copy(): bound count: x=" 
-        << var_x_bound << ", y=" << var_y_bound
-        << " data size (bytes): x=" << var_x_size << ", y=" << var_y_size << "\n";
-   if (0 != var_x_bound) {
-      x_image_bounds = new double[var_x_bound];
-      memcpy(x_image_bounds, from->x_image_bounds,
-            var_x_bound * var_x_size);
-   }
-   if (0 != var_y_bound) {
-      y_image_bounds = new double[var_y_bound];
-      memcpy(y_image_bounds, from->y_image_bounds,
-            var_y_bound * var_y_size);
-   }
-   
-   if (0 != from->lat_values) {
-      if (lat_values) delete[] lat_values;
-      lat_values = new float[nx*ny];
-      memcpy(lat_values, from->lat_values, nx*ny*sizeof(lat_values[0]));
-   }
-   //else lat_values = 0;
-   
-   if (0 != from->lon_values) {
-      if (lon_values) delete[] lon_values;
-      lon_values = new float[nx*ny];
-      memcpy(lon_values, from->lon_values, nx*ny*sizeof(lon_values[0]));
-   }
-   //else lon_values = 0;
 
-   if (0 != from->x_values) {
-      if (x_values) delete[] x_values;
-      x_values = new double[nx];
-      memcpy(x_values, from->x_values, nx*sizeof(x_values[0]));
+   int var_x_bound = from->x_image_bounds.size();
+   int var_y_bound = from->y_image_bounds.size();
+   mlog << Debug(5) << "GoesImager copy(): bound count: x="
+        << var_x_bound << ", y=" << var_y_bound << "\n";
+   if (!from->x_image_bounds.empty()) {
+      x_image_bounds.resize(var_x_bound, bad_data_double);
+      x_image_bounds = from->x_image_bounds;
    }
-   //else x_values = 0;
-   
-   if (0 != from->y_values) {
-      if (y_values) delete[] y_values;
-      y_values = new double[ny];
-      memcpy(y_values, from->y_values, ny*sizeof(y_values[0]));
+   if (!from->y_image_bounds.empty()) {
+      y_image_bounds.resize(var_y_bound, bad_data_double);
+      y_image_bounds = from->y_image_bounds;
    }
-   //else from->y_values = 0;
+
+   if (!from->lat_values.empty()) {
+      lat_values.resize(nx*ny, bad_data_float);
+      lat_values = from->lat_values;
+   }
+   else lat_values.clear();
+
+   if (!from->lon_values.empty()) {
+      lon_values.resize(nx*ny, bad_data_float);
+      lon_values = from->lon_values;
+   }
+   else lon_values.clear();
+
+   if (!from->x_values.empty()) {
+      x_values.resize(nx, bad_data_double);
+      x_values = from->x_values;
+   }
+   else x_values.clear();
+
+   if (!from->y_values.empty()) {
+      y_values.resize(ny, bad_data_double);
+      y_values = from->y_values;
+   }
+   else y_values.clear();
 
 }
 
@@ -562,25 +553,19 @@ mlog << Debug(4)
 ////////////////////////////////////////////////////////////////////////
 
 void GoesImagerData::reset() {
-   lat_values = 0;
-   lon_values = 0;
-   x_values = 0; //radian
-   y_values = 0; //radian
-   x_image_bounds = 0;
-   y_image_bounds = 0;
-   scene_id = 0;
+   lat_values.clear();
+   lon_values.clear();
+   x_values.clear(); //radian
+   y_values.clear(); //radian
+   x_image_bounds.clear();
+   y_image_bounds.clear();
+   scene_id.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void GoesImagerData::release() {
-   if (lat_values) { delete[] lat_values; lat_values=0; }
-   if (lon_values) { delete[] lon_values; lon_values=0; }
-   if (x_values) { delete[] x_values; x_values=0; }
-   if (y_values) { delete[] y_values; y_values=0; }
-   if (x_image_bounds) { delete[] x_image_bounds; x_image_bounds=0; }
-   if (y_image_bounds) { delete[] y_image_bounds; y_image_bounds=0; }
-   if (scene_id) { delete[] scene_id; scene_id=0; }
+   reset();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -608,12 +593,12 @@ void GoesImagerData::test() {
    lon = lon_of_projection_origin - (lon_rad * deg_per_rad);
 
    mlog << Debug(5) << method_name
-        << " TEST lat: " << lat << ",  lon: " << lon 
+        << " TEST lat: " << lat << ",  lon: " << lon
         << "\n\twhich is " << lat_rad << " and " << lon_rad
         << " (rad) from " << x_rad << " and " << y_rad << " (rad)."
         << "\n\tshould be " << target_lat << " (" << (lat - target_lat)
         << ") and " << target_lon << " (" << (lon - target_lon) << ")\n";
-   
+
    if (! is_eq(lat, target_lat, loose_tol)) {
      mlog << Error << method_name << " computed latitude does not match: " << lat
           << " should be " << target_lat << " diff: " << (lat - target_lat) <<  "\n";

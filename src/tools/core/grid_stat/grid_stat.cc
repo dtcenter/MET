@@ -2750,8 +2750,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    n_masks    = (apply_mask ? conf_info.vx_opt[i_vx].get_n_mask() : 1);
 
    // Allocate memory
-   float *data = (float *) nullptr;
-   data = new float [grid.nxy()];
+   vector<float> data(grid.nxy());
 
    // Set the NetCDF compression level
    int deflate_level = compress_level;
@@ -3008,7 +3007,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       } // end for x
 
       // Write out the data
-      if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
+      if(!put_nc_data_with_dims(&nc_var, data, grid.ny(), grid.nx())) {
          mlog << Error << "\nwrite_nc() -> "
               << "error writing NetCDF variable name " << var_name
               << "\n\n";
@@ -3016,9 +3015,6 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       }
 
    } // end for i
-
-   // Deallocate and clean up
-   if(data) { delete [] data; data = (float *) nullptr; }
 
    return;
 }
@@ -3053,9 +3049,6 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    // Store the apply_mask option
    apply_mask = conf_info.vx_opt[i_vx].nc_info.do_apply_mask;
 
-   float *fcst_data = (float *) nullptr;
-   float *obs_data  = (float *) nullptr;
-
    NcVar fcst_var;
    NcVar obs_var;
 
@@ -3088,8 +3081,8 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    if(!fcst_flag && !obs_flag) return;
 
    // Allocate memory for the forecast and observation fields
-   fcst_data = new float [grid.nxy()];
-   obs_data  = new float [grid.nxy()];
+   vector<float> fcst_data(grid.nxy());
+   vector<float> obs_data (grid.nxy());
 
    // Add the forecast variable
    if(fcst_flag) {
@@ -3168,7 +3161,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
    // Write out the forecast field
    if(fcst_flag) {
-      if(!put_nc_data_with_dims(&fcst_var, &fcst_data[0], grid.ny(), grid.nx())) {
+      if(!put_nc_data_with_dims(&fcst_var, fcst_data, grid.ny(), grid.nx())) {
          mlog << Error << "\nwrite_nbrhd_nc() -> "
               << "error with the fcst_var->put for forecast variable "
               << fcst_var_name << "\n\n";
@@ -3178,17 +3171,13 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
    // Write out the observation field
    if(obs_flag) {
-      if(!put_nc_data_with_dims(&obs_var, &obs_data[0], grid.ny(), grid.nx())) {
+      if(!put_nc_data_with_dims(&obs_var, obs_data, grid.ny(), grid.nx())) {
          mlog << Error << "\nwrite_nbrhd_nc() -> "
               << "error with the obs_var->put for observation variable "
               << obs_var_name << "\n\n";
          exit(1);
       }
    }
-
-   // Deallocate and clean up
-   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) nullptr; }
-   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) nullptr; }
 
    return;
 }
