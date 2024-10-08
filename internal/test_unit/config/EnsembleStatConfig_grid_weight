@@ -15,7 +15,7 @@ model = "FCST";
 // Output description to be written
 // May be set separately in each "obs.field" entry
 //
-desc = "NA";
+desc = "${DESC}";
 
 //
 // Output observation type to be written
