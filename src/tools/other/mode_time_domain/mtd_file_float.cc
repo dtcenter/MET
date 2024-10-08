@@ -661,7 +661,7 @@ lengths.add(Nt);
 lengths.add(Ny);
 lengths.add(Nx);
 
-if ( ! get_nc_data(&var, Data, lengths, offsets) )  {
+if ( ! get_nc_data_ptr(&var, Data, lengths, offsets) )  {
 
    mlog << Error << "\nMtdFloatFile::read(const char *) -> "
         << "trouble getting data\n\n";
@@ -748,7 +748,7 @@ lengths.add(Nt);
 lengths.add(Ny);
 lengths.add(Nx);
 
-if ( ! get_nc_data(&data_var, Data, lengths, offsets) )  {
+if ( ! get_nc_data_ptr(&data_var, Data, lengths, offsets) )  {
 
    mlog << Error << "\nMtdFloatFile::read(const char *) -> "
         << "trouble getting data\n\n";

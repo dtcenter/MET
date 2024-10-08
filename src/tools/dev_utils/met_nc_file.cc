@@ -193,7 +193,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
   // Get the corresponding header message type
   //
   lengths[1] = typ_len;
-  if(!get_nc_data(&hdrTypeVar, (char *)&hdr_typ_str_full[0], lengths, offsets)) {
+  if(!get_nc_data_ptr(&hdrTypeVar, (char *)&hdr_typ_str_full[0], lengths, offsets)) {
     mlog << Error << "\nmain() -> "
          << "trouble getting hdr_typ\n\n";
     exit(1);
@@ -203,7 +203,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
   // Get the corresponding header station id
   //
   lengths[1] = sid_len;
-  if(!get_nc_data(&hdrSidVar, (char *)&hdr_sid_str_full[0], lengths, offsets)) {
+  if(!get_nc_data_ptr(&hdrSidVar, (char *)&hdr_sid_str_full[0], lengths, offsets)) {
     mlog << Error << "\nmain() -> "
          << "trouble getting hdr_sid\n\n";
     exit(1);
@@ -213,7 +213,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
   // Get the corresponding header valid time
   //
   lengths[1] = vld_len;
-  if(!get_nc_data(&hdrVldVar, (char *)&hdr_vld_str_full[0], lengths, offsets)) {
+  if(!get_nc_data_ptr(&hdrVldVar, (char *)&hdr_vld_str_full[0], lengths, offsets)) {
     mlog << Error << "\nmain() -> "
          << "trouble getting hdr_vld\n\n";
     exit(1);
@@ -223,7 +223,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
   // Get the header for this observation
   //
   lengths[1] = hdr_arr_len;
-  if(!get_nc_data(&hdrArrVar, (float *)&hdr_arr_full[0], lengths, offsets)) {
+  if(!get_nc_data_ptr(&hdrArrVar, (float *)&hdr_arr_full[0], lengths, offsets)) {
     mlog << Error << "\nmain() -> "
         << "trouble getting hdr_arr\n\n";
     exit(1);
@@ -237,13 +237,13 @@ bool MetNcFile::readFile(const int desired_grib_code,
   lengths[1] = obs_arr_len;
 
   // Read the current observation message
-  if(!get_nc_data(&obsArrVar, (float *)&obs_arr_block[0], lengths, offsets)) {
+  if(!get_nc_data_ptr(&obsArrVar, (float *)&obs_arr_block[0], lengths, offsets)) {
     mlog << Error << "\nmain() -> trouble getting obs_arr\n\n";
     exit(1);
   }
 
   lengths[1] = strl_count;
-  //if(!get_nc_data(&obs_arr_var, (char *)&obs_qty_str_block[0], lengths, offsets)) {
+  //if(!get_nc_data_ptr(&obs_arr_var, (char *)&obs_qty_str_block[0], lengths, offsets)) {
   //   mlog << Error << "\nmain() -> trouble getting obs_arr\n\n";
   //   exit(1);
   //}
