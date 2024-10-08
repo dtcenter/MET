@@ -38,7 +38,7 @@ static const int  max_met_args             = 30;
 
 ////////////////////////////////////////////////////////////////////////
 
-void check_nc_data_2d(const double *from_array, const int nx, const int ny,
+void check_nc_data_2d(const vector<double> from_array, const int nx, const int ny,
                       const double missing_value) {
    int count_zero, count_missing, count_valid;
    count_zero = count_missing = count_valid = 0;
@@ -404,16 +404,13 @@ if ( dimCount >= max_met_args )  {
 
 }
 
-int i;
-short s;
-float f;
 double d = bad_data_double;
 bool status;
 double fill_value;
 double missing_value = get_var_missing_value(var);
 get_var_fill_value(var, fill_value);
 
-status = get_nc_data(var, &d, a);
+status = get_nc_data_ptr(var, &d, a);
 
 if ( !status )  {
 
@@ -587,14 +584,14 @@ plane.set_size(Nx, Ny);
    dim[x_slot] = Nx;
    dim[y_slot] = Ny;
 
-   double *data_array = new double[cell_count];
-   double *double_array = new double[cell_count];
+   std::vector<double> data_array(cell_count);
+   std::vector<double> double_array(cell_count);
 
    clock_time = clock();
 
    get_nc_data(v, double_array, dim, cur);
-   copy_nc_data_as_double(data_array, double_array, x_slot, y_slot, Nx, Ny,
-                          missing_value, fill_value);
+   copy_nc_data_as_double(data_array, double_array.data(), x_slot, y_slot,
+                          Nx, Ny, missing_value, fill_value);
 
    nc_time = clock();
    if (mlog.verbosity_level() >= 7) {
@@ -604,16 +601,13 @@ plane.set_size(Nx, Ny);
            << " seconds to read NetCDF data\n";
    }
 
-   plane.set_block(data_array, Nx, Ny);
+   plane.set_block(data_array.data(), Nx, Ny);
 
    if (mlog.verbosity_level() >= 7) {
       double duration_sec = (double)(clock() - nc_time)/CLOCKS_PER_SEC;
       mlog << Debug(7) << method_name_short << "took " << duration_sec
            << " seconds to fill data plane\n";
    }
-
-   if (data_array) delete[] data_array;
-   if (double_array) delete[] double_array;
 
    //
    //  done

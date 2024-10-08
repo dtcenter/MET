@@ -457,7 +457,7 @@ offsets.add(0);
 lengths.add(Ny);
 lengths.add(Nx);
 
-if (get_nc_data(var, (int *)&v, lengths, offsets)) {
+if (get_nc_data_ptr(var, (int *)&v, lengths, offsets)) {
    for (x=0; x<Nx; ++x)  {
    
       for (y=0; y<Ny; ++y)  {
@@ -493,7 +493,7 @@ if ( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) )  {
 
 }
 
-int i[2];
+vector<int> i(2, bad_data_int);
 int status;
 LongArray offsets;  // {y, x};   //  NOT (x, y)!
 LongArray lengths;  // {1,1};
@@ -514,7 +514,7 @@ lengths.add(1);
 //}
 //
 //status = var->get(i, 1, 1);
-status = get_nc_data(var, (int *)&i, lengths, offsets);
+status = get_nc_data(var, i, lengths, offsets);
 
 if ( !status )  {
 
@@ -546,7 +546,7 @@ if ( (x < 0) || (x >= Nx) || (y < 0) || (y >= Ny) )  {
 
 }
 
-float ff[2];
+vector<float> ff(2,bad_data_float);
 int status;
 LongArray offsets;  // {y, x};   //  NOT (x, y)!
 LongArray lengths;  // {1,1};
@@ -567,7 +567,7 @@ lengths.add(1);
 //}
 //
 //status = var->get(ff, 1, 1);
-status = get_nc_data(var, (float *)&ff, lengths, offsets);
+status = get_nc_data(var, ff, lengths, offsets);
 
 if ( !status )  {
 
