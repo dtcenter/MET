@@ -50,7 +50,7 @@ class MtdIntFile : public MtdFileBase {
 
       int * Data;   //  allocated
 
-      int * ObjVolume;    //  volume, allocated, used after splitting
+      std::vector<int> ObjVolume;    //  volume, allocated, used after splitting
 
       int Nobjects;   //  object numbers run from 1 to Nobjects inclusive
 
