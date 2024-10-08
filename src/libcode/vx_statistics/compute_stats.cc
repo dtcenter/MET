@@ -1427,13 +1427,21 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
    }
 
    SeepsScore *seeps_mpr = nullptr;
-   int count, count_diagonal;
-   int c_odfl, c_odfh, c_olfd, c_olfh, c_ohfd, c_ohfl;
-   double score_sum, obs_sum_wgt, fcst_sum_wgt, obs_sum, fcst_sum;
+   int count = 0;
+   int count_diagonal = 0;
+   int c_odfl = 0;
+   int c_odfh = 0;
+   int c_olfd = 0;
+   int c_olfh = 0;
+   int c_ohfd = 0;
+   int c_ohfl = 0;
+   double score_sum = 0.0;
+   double obs_sum_wgt = 0.0;
+   double fcst_sum_wgt = 0.0;
+   double obs_sum = 0.0;
+   double fcst_sum = 0.0;
    vector<SeepsScore *> seeps_mprs;
 
-   score_sum = obs_sum = obs_sum_wgt = fcst_sum = fcst_sum_wgt = 0.;
-   count = count_diagonal = c_odfl = c_odfh = c_olfd = c_olfh = c_ohfd = c_ohfl = 0;
    for(int i=0; i<pd->n_obs; i++) {
       if (i >= pd->seeps_mpr.size()) break;
       seeps_mpr = pd->seeps_mpr[i];
@@ -1590,25 +1598,32 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
                                    DataPlane &seeps_dp_ocat, SeepsAggScore *seeps_agg,
                                    int month, int hour, const SingleThresh &seeps_p1_thresh,
                                    const ConcatString &seeps_climo_name) {
-   int fcst_cat, obs_cat;
-   int seeps_count, count_diagonal, nan_count, bad_count;
    int nx = fcst_dp.nx();
    int ny = fcst_dp.ny();
    int dp_size = (nx * ny);
-   int pvf_cnt[SEEPS_MATRIX_SIZE];
-   double pvf[SEEPS_MATRIX_SIZE];
-   double svf[SEEPS_MATRIX_SIZE];
-   int c_odfl, c_odfh, c_olfd, c_olfh, c_ohfd, c_ohfl;
-   double obs_sum, fcst_sum;
-   double seeps_score, seeps_score_sum, seeps_score_partial_sum;
    static const char *method_name = "compute_aggregated_seeps_grid() -> ";
+
+   int fcst_cat = bad_data_int;
+   int obs_cat = bad_data_int;
+   int seeps_count = 0;
+   int count_diagonal = 0;
+   int nan_count = 0;
+   int bad_count = 0;
+   int c_odfl = 0;
+   int c_odfh = 0;
+   int c_olfd = 0;
+   int c_olfh = 0;
+   int c_ohfd = 0;
+   int c_ohfl = 0;
+   double seeps_score = 0.0;
+   double seeps_score_sum = 0.0;
+   double seeps_score_partial_sum = 0.0;
+   double obs_sum = 0.0;
+   double fcst_sum = 0.0;
 
    seeps_dp.set_size(nx, ny);
    seeps_dp_fcat.set_size(nx, ny);
    seeps_dp_ocat.set_size(nx, ny);
-   obs_sum = fcst_sum = seeps_score_sum = 0.;
-   seeps_count = count_diagonal = nan_count = bad_count = 0;
-   c_odfl = c_odfh = c_olfd = c_olfh = c_ohfd = c_ohfl = 0;
 
    seeps_agg->clear();
    mlog << Debug(9) << method_name
@@ -1616,10 +1631,11 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
 
    SeepsClimoGrid *seeps_climo = get_seeps_climo_grid(month, seeps_climo_name);
    seeps_climo->set_p1_thresh(seeps_p1_thresh);
-   for (int i=0; i<SEEPS_MATRIX_SIZE; i++) {
-      pvf[i] = 0.;
-      pvf_cnt[i] = 0;
-   }
+
+   vector<int>    pvf_cnt(SEEPS_MATRIX_SIZE, 0);
+   vector<double> pvf(SEEPS_MATRIX_SIZE, 0.0);
+   vector<double> svf(SEEPS_MATRIX_SIZE, 0.0);
+
    for (int ix=0; ix<nx; ix++) {
       seeps_score_partial_sum = 0.;
       for (int iy=0; iy<ny; iy++) {
@@ -1726,12 +1742,14 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
       seeps_agg->mean_obs  = obs_sum / seeps_count;
       seeps_agg->score     = seeps_score_sum / seeps_count;
    }
+
    mlog << Debug(6) << method_name
         << "SEEPS score=" << seeps_agg->score
         << " score_wgt=" << seeps_agg->score_wgt
         << " pv1=" << seeps_agg->pv1 << " pv2=" << seeps_agg->pv2 << " pv3=" << seeps_agg->pv3
         << " pf1=" << seeps_agg->pf1 << " pf2=" << seeps_agg->pf2 << " pf3=" << seeps_agg->pf3
         << "\n";
+
    if(mlog.verbosity_level() >= detailed_debug_level) {
       char buffer[100];
       ConcatString log_message;
@@ -1832,10 +1850,9 @@ void compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps,
    }
 
    // produces n by n matrix by multiplying transposed vector
-   int v_count;
-   double density, density2, mask1, mask2, mask3, mask4, mask5, mask6, mask7, temp;
+ 
    // Initialize
-   v_count = 0;
+   int v_count = 0;
    mlog << Debug(9) << method_name
         << "seeps_idx, seeps_cnt => "
         << seeps_idx << " " << seeps_cnt << "\n";
@@ -1856,18 +1873,18 @@ void compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps,
               << clon_m[i][j] << " " << slon_m[i][j] << "\n";
 
          //IDL: r=(clat#transpose(clat))*(slon#transpose(slon)) + (clon#transpose(clon))*(slat#transpose(slat))
-         density = clat_m[i][j] * slon_m[i][j] + clon_m[i][j] * slat_m[i][j];
-         density2 = (clat_m[i][j] * (slon_m[i][j] + clon_m[i][j])) + slat_m[i][j];
+         double density = clat_m[i][j] * slon_m[i][j] + clon_m[i][j] * slat_m[i][j];
+         double density2 = (clat_m[i][j] * (slon_m[i][j] + clon_m[i][j])) + slat_m[i][j];
          mlog << Debug(9) << method_name
               << "density, density2 => " << density << " " << density2 << "\n";
 
          //IDL: r * ((r lt 1.) and (r gt -1.)) + (r ge 1.) - (r le -1.)
-         mask1 = (density < 1.0 && density > -1.0) ? 1. : 0.;
-         mask2 = (density >= 1.0 ) ? 1. : 0.;
-         mask3 = (density <= -1.0) ? 1. : 0.;
-         mask5 = (density2 < 1.0 && density > -1.0) ? 1. : 0.;
-         mask6 = (density2 >= 1.0 ) ? 1. : 0.;
-         mask7 = (density2 <= -1.0) ? 1. : 0.;
+         double mask1 = (density < 1.0 && density > -1.0) ? 1. : 0.;
+         double mask2 = (density >= 1.0 ) ? 1. : 0.;
+         double mask3 = (density <= -1.0) ? 1. : 0.;
+         double mask5 = (density2 < 1.0 && density > -1.0) ? 1. : 0.;
+         double mask6 = (density2 >= 1.0 ) ? 1. : 0.;
+         double mask7 = (density2 <= -1.0) ? 1. : 0.;
          density = density * mask1 + mask2 - mask3;
          density2 = density2 * mask5 + mask6 - mask7;
          mlog << Debug(9) << method_name
@@ -1878,22 +1895,19 @@ void compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps,
          //IDL: if r0 gt 0.0 then r = exp(-(r/r0)^2) * (r le 4. * r0) else r = (r*0.)+1.
                   if (density_radius_rad > 0.) {
          if (density < 4.0 * density_radius_rad) {
-              //temp = density / density_radius_rad;
               mask3 = (density <= 4.0) ? 1. : 0.;
-              temp = density / density_radius_rad;
+              double temp = density / density_radius_rad;
               density = exp(-(temp * temp)) * mask3 * density_radius_rad;
             }
             else {
               density = 0.;
             }
             if (density2 < 4.0 * density_radius_rad) {
-              //temp = density / density_radius_rad;
               density2 = exp(-(pow(density2 / density_radius_rad,2)));
             }
             else {
               density2 = 0.;
             }
-            //double dens = exp(-(pow(2,2)));
             mlog << Debug(4) << method_name
                  << "final density, density2 => "
                  << density << " " << density2 << "\n";

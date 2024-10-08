@@ -50,7 +50,7 @@ double weighted_average(double, double, double, double);
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsClimo *get_seeps_climo(ConcatString seeps_point_climo_name) {
+SeepsClimo *get_seeps_climo(const ConcatString &seeps_point_climo_name) {
    if (! seeps_climo) seeps_climo = new SeepsClimo(seeps_point_climo_name);
    return seeps_climo;
 }
@@ -63,7 +63,7 @@ void release_seeps_climo() {
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsClimoGrid *get_seeps_climo_grid(int month, ConcatString seeps_grid_climo_name, int hour) {
+SeepsClimoGrid *get_seeps_climo_grid(int month, const ConcatString &seeps_grid_climo_name, int hour) {
 
    if (seeps_climo_grid_map_00.count(month) == 0) {
       seeps_climo_grid_map_00[month] = nullptr;
@@ -167,7 +167,7 @@ SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsClimoBase::SeepsClimoBase(ConcatString seeps_climo_name) : climo_file_name{seeps_climo_name} {
+SeepsClimoBase::SeepsClimoBase(const ConcatString &seeps_climo_name) : climo_file_name{seeps_climo_name} {
 
    clear();
    seeps_ready = false;
@@ -242,7 +242,7 @@ void SeepsClimoBase::set_p1_thresh(const SingleThresh &p1_thresh) {
 ////////////////////////////////////////////////////////////////////////
 
 
-SeepsClimo::SeepsClimo(ConcatString seeps_climo_name) : SeepsClimoBase{seeps_climo_name} {
+SeepsClimo::SeepsClimo(const ConcatString &seeps_climo_name) : SeepsClimoBase{seeps_climo_name} {
 
    clear();
    ConcatString seeps_name = get_climo_filename();
@@ -505,7 +505,7 @@ void SeepsClimo::print_record(SeepsRecord *record, bool with_header) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void SeepsClimo::read_seeps_climo_grid(ConcatString filename) {
+void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
    clock_t clock_time = clock();
    const char *method_name = "SeepsClimo::read_seeps_climo_grid() -> ";
 
@@ -686,7 +686,7 @@ void SeepsClimo::read_seeps_climo_grid(ConcatString filename) {
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsClimoGrid::SeepsClimoGrid(int month, int hour, ConcatString seeps_climo_name)
+SeepsClimoGrid::SeepsClimoGrid(int month, int hour, const ConcatString &seeps_climo_name)
    : month{month}, hour{hour}, SeepsClimoBase{seeps_climo_name}
 {
    clear();
@@ -802,7 +802,7 @@ double SeepsClimoGrid::get_seeps_score(int offset, int obs_cat, int fcst_cat) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void SeepsClimoGrid::read_seeps_climo_grid(ConcatString filename) {
+void SeepsClimoGrid::read_seeps_climo_grid(const ConcatString &filename) {
    clock_t clock_time = clock();
    const char *method_name = "SeepsClimoGrid::read_seeps_climo_grid() -> ";
 
