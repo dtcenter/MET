@@ -2216,8 +2216,8 @@ void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
    NcVar var = add_var(nc_out, n_series_var_name, ncInt, deflate_level);
    add_att(&var, "long_name", "length of series");
 
-   int n_series = n_series_pair + n_series_aggr;
-   if(!put_nc_data(&var, &n_series)) {
+   vector<int> n_series = { n_series_pair + n_series_aggr };
+   if(!put_nc_data(&var, n_series)) {
       mlog << Error << "\nsetup_nc_file() -> "
            << "error writing the series length variable.\n\n";
             exit(1);
@@ -2265,7 +2265,7 @@ void write_stat_data() {
    if(deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
    // Allocate memory to store data values for each grid point
-   float *data = new float [grid.nx()*grid.ny()];
+   vector<float> data(grid.nx()*grid.ny(), bad_data_float);
 
    // Write output for each stat_data map entry
    for(auto &key : stat_data_keys) {
@@ -2292,16 +2292,13 @@ void write_stat_data() {
       } // end for x
 
       // Write out the data
-      if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
+      if(!put_nc_data_with_dims(&nc_var, data, grid.ny(), grid.nx())) {
          mlog << Error << "\nwrite_stat_data() -> "
               << R"(error writing ")" << key
               << R"(" data to the output file.)" << "\n\n";
          exit(1);
       }
    }
-
-   // Clean up
-   if(data) { delete [] data;  data = (float *) nullptr; }
 
    return;
 }

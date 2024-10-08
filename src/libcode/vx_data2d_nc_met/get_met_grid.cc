@@ -699,10 +699,9 @@ void get_semilatlon_var(NcFile *ncfile, const char * var_name, NumArray &out_na)
 
    // Store the requested data in the specified NumArray object
    long count = get_data_size(&nc_var);
-   double * data_values = new double[ count ];
+   vector<double> data_values(count);
    get_nc_data(&nc_var, data_values);
    for(int i=0; i<count; i++)  out_na.add(data_values[i]);
-   if(data_values) { delete [] data_values; data_values = (double *) nullptr; }
 
    return;
 }

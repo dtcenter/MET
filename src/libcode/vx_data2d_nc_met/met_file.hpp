@@ -24,7 +24,7 @@
 
 template <typename T>
 
-void copy_nc_data_as_double(double *to_array, const T *from_array,
+void copy_nc_data_as_double(std::vector<double> &to_array, const T *from_array,
                             const int x_slot, const int y_slot,
                             const int nx, const int ny,
                             double missing_value, double fill_value) {

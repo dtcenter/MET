@@ -219,16 +219,16 @@ class SeepsClimoGrid : public SeepsClimoBase {
       int   hour; // not implemented
       int   nx;
       int   ny;
-      double *p1_buf;
-      double *p2_buf;
-      double *t1_buf;
-      double *t2_buf;
-      double *s12_buf;
-      double *s13_buf;
-      double *s21_buf;
-      double *s23_buf;
-      double *s31_buf;
-      double *s32_buf;
+      std::vector<double> p1_buf;
+      std::vector<double> p2_buf;
+      std::vector<double> t1_buf;
+      std::vector<double> t2_buf;
+      std::vector<double> s12_buf;
+      std::vector<double> s13_buf;
+      std::vector<double> s21_buf;
+      std::vector<double> s23_buf;
+      std::vector<double> s31_buf;
+      std::vector<double> s32_buf;
 
       void init_from_scratch();
 

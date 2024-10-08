@@ -1331,14 +1331,11 @@ void copy_time_vars(NcFile *to_nc, NcFile *from_nc, int i_time) {
       }
 
       // Allocate buffer
-      double *buf = new double[buf_size];
+      vector<double> buf(buf_size);
 
       // Copy the data for this time slice
       get_nc_data(&from_var, buf);
-      to_var.putVar(offsets, counts, buf);
-
-      // Cleanup
-      if(buf) { delete[] buf; buf = (double *) nullptr; }
+      to_var.putVar(offsets, counts, buf.data());
 
    } // end for i
 

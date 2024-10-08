@@ -279,12 +279,9 @@ map<string, int> get_pressure_level_indices(
 void def_tc_pressure(NcFile* nc_out,
     const NcDim& pressure_dim, set<double> pressure_levels) {
 
-    NcVar pressure_var;
-
-    double* pressure_data = new double[pressure_levels.size()];
-
     // Define variable
-    pressure_var = nc_out->addVar("pressure", ncDouble, pressure_dim);
+    NcVar pressure_var = nc_out->addVar("pressure", ncDouble, pressure_dim);
+    vector<double> pressure_data(pressure_levels.size());
 
     // Add attributes
     add_att(&pressure_var, "long_name", "pressure");
@@ -300,10 +297,9 @@ void def_tc_pressure(NcFile* nc_out,
         k--;
     }
 
-    put_nc_data(&pressure_var, &pressure_data[0]);
+    put_nc_data(&pressure_var, pressure_data);
 
     // Cleanup
-    if(pressure_data) { delete [] pressure_data; pressure_data = (double *) 0; }
 
     return;
 }
@@ -317,8 +313,8 @@ void def_tc_range_azimuth(NcFile* nc_out,
     NcVar range_var;
     NcVar azimuth_var;
 
-    double* range_data = new double[grid.range_n()];
-    double* azimuth_data = new double[grid.azimuth_n()];
+    vector<double> range_data(grid.range_n());
+    vector<double> azimuth_data(grid.azimuth_n());
 
     // Define variables
     range_var = nc_out->addVar("range", ncDouble, range_dim);
@@ -352,12 +348,10 @@ void def_tc_range_azimuth(NcFile* nc_out,
     }
 
     // Write coordinates
-    put_nc_data(&range_var, &range_data[0]);
-    put_nc_data(&azimuth_var, &azimuth_data[0]);
+    put_nc_data(&range_var, range_data);
+    put_nc_data(&azimuth_var, azimuth_data);
 
     // Cleanup
-    if(range_data)   { delete [] range_data;   range_data   = (double *) 0; }
-    if(azimuth_data) { delete [] azimuth_data; azimuth_data = (double *) 0; }
 
     return;
 }

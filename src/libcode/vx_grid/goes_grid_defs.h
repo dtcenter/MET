@@ -26,7 +26,7 @@
 struct GoesImagerData {
 
    const char *name;
-   const char *scene_id;
+   std::string scene_id;
 
    double perspective_point_height;
    double semi_major_axis;
@@ -42,10 +42,8 @@ struct GoesImagerData {
    double dx_rad;
    double dy_rad;
 
-   //std::vector< float > x_image_bounds;
-   //std::vector< float > y_image_bounds;
-   double *x_image_bounds;
-   double *y_image_bounds;
+   std::vector<double> x_image_bounds;
+   std::vector<double> y_image_bounds;
    
    double ecc;
    double radius_ratio2;
@@ -54,10 +52,10 @@ struct GoesImagerData {
    //int _xSubSatIdx;
    //int _ySubSatIdx;
    
-   float *lat_values;
-   float *lon_values;
-   double *x_values; //radian
-   double *y_values; //radian
+   std::vector<float>  lat_values;
+   std::vector<float>  lon_values;
+   std::vector<double> x_values; //radian
+   std::vector<double> y_values; //radian
    
    void dump() const;
    void compute_lat_lon();

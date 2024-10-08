@@ -63,13 +63,13 @@ class InsituNcFile {
       //
 
       std::string *_aircraftId;
-      time_t*_timeObs;
-      double *_latitude;
-      double *_longitude;
-      double *_altitude;
-      double *_QCconfidence;
-      double *_medEDR;
-      double *_maxEDR;
+      std::vector<time_t> _timeObs;
+      std::vector<double> _latitude;
+      std::vector<double> _longitude;
+      std::vector<double> _altitude;
+      std::vector<double> _QCconfidence;
+      std::vector<double> _medEDR;
+      std::vector<double> _maxEDR;
       
       //
       // Get the next record in the file

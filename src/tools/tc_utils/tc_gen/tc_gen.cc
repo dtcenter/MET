@@ -2412,10 +2412,9 @@ void write_nc(GenCTCInfo &gci) {
    unixtime valid_end = (unixtime) 0;
 
    // Allocate memory
-   float *data = (float *) nullptr;
    int nx = gci.NcOutGrid->nx();
    int ny = gci.NcOutGrid->ny();
-   data = new float [nx*ny];
+   vector<float> data(nx*ny, 0);
 
    // Loop over vector of output types
    for(i=0; i<n_ncout; i++) {
@@ -2523,9 +2522,6 @@ void write_nc(GenCTCInfo &gci) {
       add_att(&nc_var, "valid_beg", unix_to_yyyymmdd_hhmmss(valid_beg));
       add_att(&nc_var, "valid_end", unix_to_yyyymmdd_hhmmss(valid_end));
 
-      // Reset memory
-      memset(data, 0, nx*ny);
-             
       // Store the data
       for(x=0; x<nx; x++) {
          for(y=0; y<ny; y++) {
@@ -2535,16 +2531,13 @@ void write_nc(GenCTCInfo &gci) {
       } // end for x
 
       // Write out the data
-      if(!put_nc_data_with_dims(&nc_var, &data[0], ny, nx)) {
+      if(!put_nc_data_with_dims(&nc_var, data, ny, nx)) {
          mlog << Error << "\nwrite_nc() -> "
               << "error writing NetCDF variable name " << var_name
               << "\n\n";
          exit(1);
       }
    }
-
-   // Deallocate and clean up
-   if(data) { delete [] data; data = (float *) nullptr; }
 
    return;
 }
