@@ -25,6 +25,13 @@ using namespace netCDF::exceptions;
 
 ////////////////////////////////////////////////////////////////////////
 
+
+bool get_nc_data_ptr(netCDF::NcVar *, double *data, const LongArray &dims, const LongArray &curs);
+bool get_nc_data_ptr(netCDF::NcVar *, ncbyte *data, const LongArray &dims, const LongArray &curs);
+
+
+////////////////////////////////////////////////////////////////////////
+
 void patch_nc_name(string *var_name) {
    size_t offset;
 
@@ -1299,8 +1306,12 @@ float get_float_var(NcVar * var, const int index) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+// Start get_nc_data with pointer
+////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, int *data, const LongArray &curs) {
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data_ptr(NcVar *var, int *data, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, bad_data_int, curs);
 
    return return_status;
@@ -1308,7 +1319,7 @@ bool get_nc_data(NcVar *var, int *data, const LongArray &curs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, time_t *data) {
+bool get_nc_data_ptr(NcVar *var, time_t *data) {
    bool return_status = get_nc_data_(var, data, (time_t)bad_data_int);
 
    return return_status;
@@ -1316,20 +1327,20 @@ bool get_nc_data(NcVar *var, time_t *data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, int *data) {
+bool get_nc_data_ptr(NcVar *var, int *data) {
    bool return_status = get_nc_data_(var, data, bad_data_int);
    return return_status;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, int *data, const long dim, const long cur) {
+bool get_nc_data_ptr(NcVar *var, int *data, const long dim, const long cur) {
    return get_nc_data_(var, data, bad_data_int, dim, cur);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, int *data, const LongArray &dims, const LongArray &curs) {
+bool get_nc_data_ptr(NcVar *var, int *data, const LongArray &dims, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, bad_data_int, dims, curs);
 
    return return_status;
@@ -1337,7 +1348,7 @@ bool get_nc_data(NcVar *var, int *data, const LongArray &dims, const LongArray &
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, short *data, const LongArray &curs) {
+bool get_nc_data_ptr(NcVar *var, short *data, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, (short)bad_data_int, curs);
 
    return return_status;
@@ -1345,7 +1356,7 @@ bool get_nc_data(NcVar *var, short *data, const LongArray &curs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, short *data, const LongArray &dims, const LongArray &curs) {
+bool get_nc_data_ptr(NcVar *var, short *data, const LongArray &dims, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, (short)bad_data_int, dims, curs);
 
    return return_status;
@@ -1353,7 +1364,7 @@ bool get_nc_data(NcVar *var, short *data, const LongArray &dims, const LongArray
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, float *data) {
+bool get_nc_data_ptr(NcVar *var, float *data) {
    bool return_status = false;
    clock_t start_clock = clock();
    static const char *method_name = "get_nc_data(NcVar *, float *) ";
@@ -1522,7 +1533,7 @@ bool get_nc_data(NcVar *var, float *data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, float *data, const LongArray &curs) {
+bool get_nc_data_ptr(NcVar *var, float *data, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, bad_data_float, curs);
 
    return return_status;
@@ -1530,7 +1541,7 @@ bool get_nc_data(NcVar *var, float *data, const LongArray &curs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, float *data, const LongArray &dims, const LongArray &curs) {
+bool get_nc_data_ptr(NcVar *var, float *data, const LongArray &dims, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, bad_data_float, dims, curs);
 
    return return_status;
@@ -1538,7 +1549,7 @@ bool get_nc_data(NcVar *var, float *data, const LongArray &dims, const LongArray
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, float *data, const long dim, const long cur) {
+bool get_nc_data_ptr(NcVar *var, float *data, const long dim, const long cur) {
    bool return_status = get_nc_data_(var, data, bad_data_float, dim, cur);
 
    return return_status;
@@ -1546,19 +1557,19 @@ bool get_nc_data(NcVar *var, float *data, const long dim, const long cur) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcFile *nc, const char *var_name, double *data,
-                 const LongArray &dims, const LongArray &curs) {
+bool get_nc_data_ptr(NcFile *nc, const char *var_name, double *data,
+                     const LongArray &dims, const LongArray &curs) {
 
    //
    // Retrieve the input variables
    //
    NcVar var = get_var(nc, var_name);
-   return get_nc_data(&var, data, dims, curs);
+   return get_nc_data_ptr(&var, data, dims, curs);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, double *data) {
+bool get_nc_data_ptr(NcVar *var, double *data) {
    bool return_status = false;
    static const char *method_name = "get_nc_data(NcVar *, double *) ";
 
@@ -1718,14 +1729,14 @@ bool get_nc_data(NcVar *var, double *data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, double *data, const LongArray &curs) {
+bool get_nc_data_ptr(NcVar *var, double *data, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, bad_data_double, curs);
    return return_status;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, double *data, const long dim, const long cur) {
+bool get_nc_data_ptr(NcVar *var, double *data, const long dim, const long cur) {
    bool return_status = get_nc_data_(var, data, bad_data_double, dim, cur);;
 
    return return_status;
@@ -1733,8 +1744,8 @@ bool get_nc_data(NcVar *var, double *data, const long dim, const long cur) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, double *data, const LongArray &dims,
-                 const LongArray &curs) {
+bool get_nc_data_ptr(NcVar *var, double *data, const LongArray &dims,
+                     const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, bad_data_double, dims, curs);
 
    return return_status;
@@ -1742,7 +1753,7 @@ bool get_nc_data(NcVar *var, double *data, const LongArray &dims,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, char *data) {
+bool get_nc_data_ptr(NcVar *var, char *data) {
    bool return_status = get_nc_data_t(var, data);
 
    return return_status;
@@ -1750,7 +1761,7 @@ bool get_nc_data(NcVar *var, char *data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, char **data) {
+bool get_nc_data_ptr(NcVar *var, char **data) {
    bool return_status = get_nc_data_t(var, data);
 
    return return_status;
@@ -1758,7 +1769,7 @@ bool get_nc_data(NcVar *var, char **data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, uchar *data, bool allow_conversion) {
+bool get_nc_data_ptr(NcVar *var, uchar *data, bool allow_conversion) {
    bool return_status = false;
    int cell_count = get_data_size(var);
    int data_type = GET_NC_TYPE_ID_P(var);
@@ -1797,7 +1808,7 @@ bool get_nc_data(NcVar *var, uchar *data, bool allow_conversion) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, unsigned short *data) {
+bool get_nc_data_ptr(NcVar *var, unsigned short *data) {
    bool return_status = false;
    int cell_count = get_data_size(var);
    int data_type = GET_NC_TYPE_ID_P(var);
@@ -1839,19 +1850,19 @@ bool get_nc_data(NcVar *var, unsigned short *data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcFile *nc, const char *var_name, char *data,
-                 const LongArray &dims, const LongArray &curs) {
+bool get_nc_data_ptr(NcFile *nc, const char *var_name, char *data,
+                     const LongArray &dims, const LongArray &curs) {
 
    //
    // Retrieve the input variables
    //
    NcVar var = get_var(nc, var_name);
-   return get_nc_data(&var, data, dims, curs);
+   return get_nc_data_ptr(&var, data, dims, curs);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, char *data, const long dim, const long cur) {
+bool get_nc_data_ptr(NcVar *var, char *data, const long dim, const long cur) {
    bool return_status = get_nc_data_(var, data, bad_data_char, dim, cur);
 
    return return_status;
@@ -1859,7 +1870,7 @@ bool get_nc_data(NcVar *var, char *data, const long dim, const long cur) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, char *data, const LongArray &dims, const LongArray &curs) {
+bool get_nc_data_ptr(NcVar *var, char *data, const LongArray &dims, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, bad_data_char, dims, curs);
 
    return return_status;
@@ -1868,7 +1879,7 @@ bool get_nc_data(NcVar *var, char *data, const LongArray &dims, const LongArray 
 ////////////////////////////////////////////////////////////////////////
 
 /*
-bool get_nc_data(NcVar *var, ncbyte *data) {
+bool get_nc_data_ptr(NcVar *var, ncbyte *data) {
    bool return_status = get_nc_data_no_scale_T(var, data);
 
    return return_status;
@@ -1877,19 +1888,19 @@ bool get_nc_data(NcVar *var, ncbyte *data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcFile *nc, const char *var_name, ncbyte *data,
-                 const LongArray &dims, const LongArray &curs) {
+bool get_nc_data_ptr(NcFile *nc, const char *var_name, ncbyte *data,
+                     const LongArray &dims, const LongArray &curs) {
 
    //
    // Retrieve the input variables
    //
    NcVar var = get_var(nc, var_name);
-   return get_nc_data(&var, data, dims, curs);
+   return get_nc_data_ptr(&var, data, dims, curs);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, ncbyte *data, const long dim, const long cur) {
+bool get_nc_data_ptr(NcVar *var, ncbyte *data, const long dim, const long cur) {
    bool return_status = get_nc_data_(var, data, (ncbyte)bad_data_char, dim, cur);
 
    return return_status;
@@ -1897,11 +1908,204 @@ bool get_nc_data(NcVar *var, ncbyte *data, const long dim, const long cur) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, ncbyte *data, const LongArray &dims, const LongArray &curs) {
+bool get_nc_data_ptr(NcVar *var, ncbyte *data, const LongArray &dims, const LongArray &curs) {
    bool return_status = get_nc_data_(var, data, (ncbyte)bad_data_char, dims, curs);
 
    return return_status;
 }
+
+////////////////////////////////////////////////////////////////////////
+// End get_nc_data with pointer
+////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
+// Start get_nc_data with vector
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<long> &data) {
+   return get_nc_data_ptr(var, data.data());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<time_t> data) {
+   return get_nc_data_ptr(var, data.data());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<int> &data) {
+   return get_nc_data_ptr(var, data.data());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<int> &data, const LongArray &curs) {
+   return get_nc_data_ptr(var, data.data(), curs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<int> &data, const long dim, const long cur) {
+   return get_nc_data_ptr(var, data.data(), dim, cur);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<int> &data, const LongArray &dims, const LongArray &curs) {
+   return get_nc_data_ptr(var, data.data(), dims, curs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<short> &data, const LongArray &curs) {
+   return get_nc_data_ptr(var, data.data(), curs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<short> &data, const LongArray &dims, const LongArray &curs) {
+   return get_nc_data_ptr(var, data.data(), dims, curs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<float> &data) {
+   return get_nc_data_ptr(var, data.data());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<float> &data, const LongArray &curs) {
+   return get_nc_data_ptr(var, data.data(), curs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<float> &data, const LongArray &dims, const LongArray &curs) {
+   return get_nc_data_ptr(var, data.data(), dims, curs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<float> &data, const long dim, const long cur) {
+   return get_nc_data_ptr(var, data.data(), dim, cur);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcFile *nc, const char *var_name, vector<double> &data,
+                 const LongArray &dims, const LongArray &curs) {
+
+   return get_nc_data_ptr(nc, var_name, data.data(), dims, curs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<double> &data) {
+   return get_nc_data_ptr(var, data.data());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<double> &data, const LongArray &curs) {
+   return get_nc_data_ptr(var, data.data(), curs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<double> &data, const long dim, const long cur) {
+   return get_nc_data_ptr(var, data.data(), dim, cur);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<double> &data, const LongArray &dims,
+                 const LongArray &curs) {
+   return get_nc_data_ptr(var, data.data(), dims, curs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+//bool get_nc_data(NcVar *var, vector<char> &data) {
+//   return get_nc_data_ptr(var, data.data());
+//}
+
+////////////////////////////////////////////////////////////////////////
+
+//bool get_nc_data(NcVar *var, vector<string> &data) {
+//   bool return_status = get_nc_data_t(var, data);
+
+//   return return_status;
+//}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<uchar> &data, bool allow_conversion) {
+   return get_nc_data_ptr(var, data.data(), allow_conversion);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<unsigned short> &data) {
+   return get_nc_data_ptr(var, data.data());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcFile *nc, const char *var_name, vector<char> &data,
+                 const LongArray &dims, const LongArray &curs) {
+   return get_nc_data_ptr(nc, var_name, data.data(), dims, curs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<char> &data, const long dim, const long cur) {
+   return get_nc_data_ptr(var, data.data(), dim, cur);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<char> &data, const LongArray &dims, const LongArray &curs) {
+   return get_nc_data_ptr(var, data.data(), dims, curs);
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+/*
+bool get_nc_data(NcVar *var, vector<ncbyte> &data) {
+   bool return_status = get_nc_data_no_scale_T(var, data);
+
+   return return_status;
+}
+*/
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcFile *nc, const char *var_name, vector<ncbyte> &data,
+                 const LongArray &dims, const LongArray &curs) {
+   return get_nc_data_ptr(nc, var_name, data.data(), dims, curs);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<ncbyte> &data, const long dim, const long cur) {
+   return get_nc_data_ptr(var, data.data(), dim, cur);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_data(NcVar *var, vector<ncbyte> &data, const LongArray &dims, const LongArray &curs) {
+   return get_nc_data_ptr(var, data.data(), dims, curs);
+}
+
+////////////////////////////////////////////////////////////////////////
+// End get_nc_data with vector
+////////////////////////////////////////////////////////////////////////
+
 
 ////////////////////////////////////////////////////////////////////////
 // returns matching offset or bad_data_int if not found
@@ -1911,7 +2115,7 @@ int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool i
    static const char *method_name = "get_index_at_nc_data() -> ";
    if (IS_VALID_NC_P(var)) {
       int data_size = get_data_size(var);
-      double *values = new double[data_size];
+      vector<double> values(data_size);
 
       if (get_nc_data(var, values)) {
          unixtime ut;
@@ -1943,7 +2147,6 @@ int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool i
             }
          }
       }
-      if (values) delete [] values;
 
       ConcatString value_str;
       if (is_time && (value > 10000000.)) value_str << unix_to_yyyymmdd_hhmmss(value);
@@ -1995,7 +2198,7 @@ bool get_nc_data_to_array(NcVar *var, StringArray *array_buf) {
 
          result = true;
          for (int idx=0; idx<count; idx++) {
-            if(!get_nc_data(var, str_buffer, lengths, offsets)) {
+            if(!get_nc_data_ptr(var, str_buffer, lengths, offsets)) {
                result = false;
                break;
             }
@@ -2058,169 +2261,314 @@ int get_nc_string_length(NcFile *nc_file, NcVar var, const char *var_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const int data, long offset0, long offset1, long offset2) {
+////////////////////////////////////////////////////////////////////////
+// Start put_nc_data with pointer
+////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool put_nc_data_ptr(NcVar *var, const int data, long offset0, long offset1, long offset2) {
    return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const char data, long offset0, long offset1, long offset2) {
+bool put_nc_data_ptr(NcVar *var, const char data, long offset0, long offset1, long offset2) {
    return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const float data , long offset0, long offset1, long offset2) {
+bool put_nc_data_ptr(NcVar *var, const float data, long offset0, long offset1, long offset2) {
    return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const double data, long offset0, long offset1, long offset2) {
+bool put_nc_data_ptr(NcVar *var, const double data, long offset0, long offset1, long offset2) {
    return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const ncbyte data, long offset0, long offset1, long offset2) {
+bool put_nc_data_ptr(NcVar *var, const ncbyte data, long offset0, long offset1, long offset2) {
    return put_nc_data_T(var, data, offset0, offset1, offset2);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const int *data    ) {
+bool put_nc_data_ptr(NcVar *var, const int *data) {
    var->putVar(data);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const char *data   ) {
+bool put_nc_data_ptr(NcVar *var, const char *data) {
    var->putVar(data);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const float *data  ) {
+bool put_nc_data_ptr(NcVar *var, const float *data) {
    var->putVar(data);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const double *data ) {
+bool put_nc_data_ptr(NcVar *var, const double *data ) {
    var->putVar(data);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const ncbyte *data ) {
+bool put_nc_data_ptr(NcVar *var, const ncbyte *data) {
    var->putVar(data);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const int *data,    const long length, const long offset) {
+bool put_nc_data_ptr(NcVar *var, const int *data,    const long length, const long offset) {
    put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const char *data,   const long length, const long offset) {
+bool put_nc_data_ptr(NcVar *var, const char *data,   const long length, const long offset) {
    put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const float *data , const long length, const long offset) {
+bool put_nc_data_ptr(NcVar *var, const float *data, const long length, const long offset) {
    put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const double *data, const long length, const long offset) {
+bool put_nc_data_ptr(NcVar *var, const double *data, const long length, const long offset) {
    put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const ncbyte *data, const long length, const long offset) {
+bool put_nc_data_ptr(NcVar *var, const ncbyte *data, const long length, const long offset) {
    put_nc_data_T(var, data, length, offset);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const float *data , const long *lengths, const long *offsets) {
-   put_nc_data_T(var, data , lengths, offsets);
+bool put_nc_data_ptr(NcVar *var, const float *data, const long *lengths, const long *offsets) {
+   put_nc_data_T(var, data, lengths, offsets);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const char *data , const long *lengths, const long *offsets) {
-   put_nc_data_T(var, data , lengths, offsets);
+bool put_nc_data_ptr(NcVar *var, const char *data, const long *lengths, const long *offsets) {
+   put_nc_data_T(var, data, lengths, offsets);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data(NcVar *var, const int *data , const long *lengths, const long *offsets) {
-   put_nc_data_T(var, data , lengths, offsets);
+bool put_nc_data_ptr(NcVar *var, const int *data, const long *lengths, const long *offsets) {
+   put_nc_data_T(var, data, lengths, offsets);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data_with_dims(NcVar *var, const int *data,
-                           const int len0, const int len1, const int len2) {
-   return put_nc_data_with_dims(var, data, (long)len0, (long)len1, (long)len2);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool put_nc_data_with_dims(NcVar *var, const int *data,
-                           const long len0, const long len1, const long len2) {
+bool put_nc_data_with_dims_ptr(NcVar *var, const int *data,
+                               const int len0, const int len1, const int len2) {
    put_nc_data_T_with_dims(var, data, len0, len1, len2);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data_with_dims(NcVar *var, const float *data,
-                           const int len0, const int len1, const int len2) {
-   return put_nc_data_with_dims(var, data, (long)len0, (long)len1, (long)len2);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool put_nc_data_with_dims(NcVar *var, const float *data,
-                           const long len0, const long len1, const long len2) {
+bool put_nc_data_with_dims_ptr(NcVar *var, const int *data,
+                               const long len0, const long len1, const long len2) {
    put_nc_data_T_with_dims(var, data, len0, len1, len2);
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data_with_dims(NcVar *var, const double *data,
-                           const int len0, const int len1, const int len2) {
-   return put_nc_data_with_dims(var, data, (long)len0, (long)len1, (long)len2);
+bool put_nc_data_with_dims_ptr(NcVar *var, const float *data,
+                               const int len0, const int len1, const int len2) {
+   put_nc_data_T_with_dims(var, data, len0, len1, len2);
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool put_nc_data_with_dims(NcVar *var, const double *data,
-                           const long len0, const long len1, const long len2) {
+bool put_nc_data_with_dims_ptr(NcVar *var, const float *data,
+                               const long len0, const long len1, const long len2) {
    put_nc_data_T_with_dims(var, data, len0, len1, len2);
    return true;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data_with_dims_ptr(NcVar *var, const double *data,
+                               const int len0, const int len1, const int len2) {
+   put_nc_data_T_with_dims(var, data, len0, len1, len2);
+   return true;
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data_with_dims_ptr(NcVar *var, const double *data,
+                               const long len0, const long len1, const long len2) {
+   put_nc_data_T_with_dims(var, data, len0, len1, len2);
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+// End put_nc_data with pointer
+////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
+// Start put_nc_data with vector
+////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data(NcVar *var, const vector<int> &data) {
+   return put_nc_data_ptr(var, data.data());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data(NcVar *var, const vector<char> &data) {
+   return put_nc_data_ptr(var, data.data());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data(NcVar *var, const vector<float> &data) {
+   return put_nc_data_ptr(var, data.data());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data(NcVar *var, const vector<double> &data) {
+   return put_nc_data_ptr(var, data.data());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data(NcVar *var, const vector<ncbyte> &data) {
+   return put_nc_data_ptr(var, data.data());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data(NcVar *var, const vector<int> &data, const long length, const long offset) {
+   return put_nc_data_ptr(var, data.data(), length, offset) ;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data(NcVar *var, const vector<char> &data, const long length, const long offset) {
+   return put_nc_data_ptr(var, data.data(), length, offset) ;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data(NcVar *var, const vector<float> &data, const long length, const long offset) {
+   return put_nc_data_ptr(var, data.data(), length, offset) ;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data(NcVar *var, const vector<double> &data, const long length, const long offset) {
+   return put_nc_data_ptr(var, data.data(), length, offset) ;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data(NcVar *var, const vector<ncbyte> &data, const long length, const long offset) {
+   return put_nc_data_ptr(var, data.data(), length, offset) ;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data(NcVar *var, const vector<float> &data, const long *lengths, const long *offsets) {
+   return put_nc_data_ptr(var, data.data(), lengths, offsets) ;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data(NcVar *var, const vector<char> &data, const long *lengths, const long *offsets) {
+   return put_nc_data_ptr(var, data.data(), lengths, offsets) ;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data(NcVar *var, const vector<int> &data, const long *lengths, const long *offsets) {
+   return put_nc_data_ptr(var, data.data(), lengths, offsets) ;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data_with_dims(NcVar *var, const vector<int> &data,
+                           const int len0, const int len1, const int len2) {
+   return put_nc_data_with_dims_ptr(var, data.data(), len0, len1, len2);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data_with_dims(NcVar *var, const vector<int> &data,
+                           const long len0, const long len1, const long len2) {
+   return put_nc_data_with_dims_ptr(var, data.data(), len0, len1, len2);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data_with_dims(NcVar *var, const vector<float> &data,
+                           const int len0, const int len1, const int len2) {
+   return put_nc_data_with_dims_ptr(var, data.data(), len0, len1, len2);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data_with_dims(NcVar *var, const vector<float> &data,
+                           const long len0, const long len1, const long len2) {
+   return put_nc_data_with_dims_ptr(var, data.data(), len0, len1, len2);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data_with_dims(NcVar *var, const vector<double> &data,
+                           const int len0, const int len1, const int len2) {
+   return put_nc_data_with_dims_ptr(var, data.data(), len0, len1, len2);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data_with_dims(NcVar *var, const vector<double> &data,
+                           const long len0, const long len1, const long len2) {
+   return put_nc_data_with_dims_ptr(var, data.data(), len0, len1, len2);
+}
+
+////////////////////////////////////////////////////////////////////////
+// End put_nc_data with vector
+////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////
 
