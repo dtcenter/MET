@@ -675,7 +675,7 @@ void write_nc_var_int(const char *var_name, const char *long_name,
    NcVar var = add_var(nc_out, var_name, ncInt64);
    add_att(&var, "long_name", long_name);
 
-   if(!put_nc_data(&var, &n)) {
+   if(!put_nc_data_ptr(&var, &n)) {
       mlog << Error << "\nwrite_nc_int() -> "
            << "error writing the \"" << long_name << "\" variable.\n\n";
       exit(1);

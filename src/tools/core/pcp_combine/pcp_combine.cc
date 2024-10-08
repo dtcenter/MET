@@ -1512,8 +1512,8 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
    //
    // Write the data.
    //
-   if(!put_nc_data_with_dims(&nc_var, cur_dp.data(),
-                             cur_dp.ny(), cur_dp.nx())) {
+   if(!put_nc_data_with_dims_ptr(&nc_var, cur_dp.data(),
+                                 cur_dp.ny(), cur_dp.nx())) {
       mlog << Error << "\nwrite_nc_data() -> "
            << "error with nc_var->put()\n\n";
       exit(1);

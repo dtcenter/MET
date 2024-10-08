@@ -48,7 +48,7 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid,
   // Initialization
   VarInfoFactory var_fac;
   VarInfo* var = (VarInfo *) nullptr; // allocated, need to delete
-  
+
   //  create a VarInfo object
   var = var_fac.new_var_info((string)"FileType_NcMet");
   if( !var )
@@ -56,7 +56,7 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid,
     mlog << Debug(4) << "write_grid_to_netcdf() - can't switch on file type \"FileType_NcMet\" and instantiate the appropriate class\n";
     exit(1);
   }
-  
+
   // Set up a NetCDF object
   var->set_name(var_name);
   var->set_long_name(var_long_name);
@@ -72,7 +72,7 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid,
 ////////////////////////////////////////////////////////////////////////
 
 
-void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char * out_filename, const VarInfo & var_info) 
+void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char * out_filename, const VarInfo & var_info)
 {
   // Initialization
   NcFile *f_out   = (NcFile *) nullptr;
@@ -84,13 +84,13 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char
   // Create a new NetCDF file and open it
   f_out = open_ncfile(out_filename, true);
 
-  if(IS_INVALID_NC_P(f_out)) 
+  if(IS_INVALID_NC_P(f_out))
   {
     mlog << Error << "\nwrite_netcdf() -> "
          << "trouble opening output file " << out_filename
          << "\n\n";
     delete f_out;  f_out = (NcFile *) nullptr;
-    
+
     exit(1);
   }
 
@@ -120,7 +120,7 @@ void write_grid_to_netcdf(const DataPlane & plane, const Grid & grid, const char
   write_netcdf_var_times(&f_var, plane);
 
   // Write the data
-  if (!put_nc_data_with_dims(&f_var, plane.data(), plane.ny(), plane.nx())) 
+  if (!put_nc_data_with_dims_ptr(&f_var, plane.data(), plane.ny(), plane.nx()))
   {
     mlog << Error << "\nwrite_netcdf() -> "
          << "error with f_var->put()\n\n";
