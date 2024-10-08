@@ -2251,7 +2251,8 @@ static unixtime find_valid_time(NcVar time_var) {
 
    if( IS_VALID_NC(time_var) || get_dim_count(&time_var) < 2) {
       // Handle the variable without dimension
-      int time_count = (0 == get_dim_count(&time_var)) ? 1 : get_dim_size(&time_var, 0);
+      int time_count = get_dim_size(&time_var, 0);
+      if (time_count == 0) time_count = get_data_size(&time_var);
 
       vector<double> time_values(time_count+1);
       if (get_nc_data(&time_var, time_values)) {
