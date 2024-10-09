@@ -112,19 +112,18 @@ void parse_ctc_ctable(STATLine &l, TTContingencyTable &ct) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_mctc_ctable(STATLine &l, ContingencyTable &ct) {
-   int n_cat, i, j;
    char col_str[max_str_len];
 
    // N_CAT
-   n_cat = atoi(l.get_item("N_CAT"));
+   int n_cat = atoi(l.get_item("N_CAT"));
    ct.set_size(n_cat);
 
    // Npairs 
    ct.set_n_pairs(atoi(l.get_item("TOTAL")));
 
    // Fi_Oj
-   for(i=0; i<n_cat; i++) {
-      for(j=0; j<n_cat; j++) {
+   for(int i=0; i<n_cat; i++) {
+      for(int j=0; j<n_cat; j++) {
          snprintf(col_str, sizeof(col_str), "F%i_O%i", i+1, j+1);
          ct.set_entry(i, j, atof(l.get_item(col_str)));
       }
@@ -161,11 +160,10 @@ void parse_nbrctc_ctable(STATLine &l, TTContingencyTable &ct) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
-   int i, n, oy, on;
    char col_str[max_str_len];
 
    // N_THRESH
-   n = atoi(l.get_item("N_THRESH"));
+   int n = atoi(l.get_item("N_THRESH"));
    pct.set_size(n-1);
 
    // Npairs 
@@ -174,7 +172,7 @@ void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
    // Store a vector of threshold values
    vector<double> thresh(n);
 
-   for(i=0; i<n-1; i++) {
+   for(int i=0; i<n-1; i++) {
 
       // THRESH_i
       snprintf(col_str, sizeof(col_str), "THRESH_%i", i+1);
@@ -182,12 +180,12 @@ void parse_nx2_ctable(STATLine &l, Nx2ContingencyTable &pct) {
 
       // OY_i
       snprintf(col_str, sizeof(col_str), "OY_%i", i+1);
-      oy = atof(l.get_item(col_str));
+      double oy = atof(l.get_item(col_str));
       pct.set_entry(i, nx2_event_column, oy);
 
       // ON_i
       snprintf(col_str, sizeof(col_str), "ON_%i", i+1);
-      on = atof(l.get_item(col_str));
+      double on = atof(l.get_item(col_str));
       pct.set_entry(i, nx2_nonevent_column, on);
    }
 
@@ -465,7 +463,6 @@ void parse_rps_line(STATLine &l, RPSInfo &r_info) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_rhist_line(STATLine &l, RHISTData &r_data) {
-   int i;
    char col_str[max_str_len];
 
    r_data.total  = atoi(l.get_item("TOTAL"));
@@ -474,7 +471,7 @@ void parse_rhist_line(STATLine &l, RHISTData &r_data) {
    r_data.rhist_na.clear();
 
    // Parse out RANK_i
-   for(i=0; i<r_data.n_rank; i++) {
+   for(int i=0; i<r_data.n_rank; i++) {
       snprintf(col_str, sizeof(col_str), "RANK_%i", i+1);
       r_data.rhist_na.add(atoi(l.get_item(col_str)));
    }
@@ -485,7 +482,6 @@ void parse_rhist_line(STATLine &l, RHISTData &r_data) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_phist_line(STATLine &l, PHISTData &p_data) {
-   int i;
    char col_str[max_str_len];
 
    p_data.total    = atoi(l.get_item("TOTAL"));
@@ -495,7 +491,7 @@ void parse_phist_line(STATLine &l, PHISTData &p_data) {
    p_data.phist_na.clear();
 
    // Parse out BIN_i
-   for(i=0; i<p_data.n_bin; i++) {
+   for(int i=0; i<p_data.n_bin; i++) {
       snprintf(col_str, sizeof(col_str), "BIN_%i", i+1);
       p_data.phist_na.add(atoi(l.get_item(col_str)));
    }
@@ -506,7 +502,6 @@ void parse_phist_line(STATLine &l, PHISTData &p_data) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_relp_line(STATLine &l, RELPData &r_data) {
-   int i;
    char col_str[max_str_len];
 
    r_data.total    = atoi(l.get_item("TOTAL"));
@@ -515,7 +510,7 @@ void parse_relp_line(STATLine &l, RELPData &r_data) {
    r_data.relp_na.clear();
 
    // Parse out RELP_i
-   for(i=0; i<r_data.n_ens; i++) {
+   for(int i=0; i<r_data.n_ens; i++) {
       snprintf(col_str, sizeof(col_str), "RELP_%i", i+1);
       r_data.relp_na.add(atof(l.get_item(col_str)));
    }
@@ -526,7 +521,6 @@ void parse_relp_line(STATLine &l, RELPData &r_data) {
 ////////////////////////////////////////////////////////////////////////
 
 void parse_orank_line(STATLine &l, ORANKData &o_data) {
-   int i, ens1;
 
    o_data.total     = atoi(l.get_item("TOTAL"));
    o_data.index     = atoi(l.get_item("INDEX"));
@@ -545,9 +539,9 @@ void parse_orank_line(STATLine &l, ORANKData &o_data) {
 
    // Parse out ENS_i
    o_data.ens_na.erase();
-   ens1 = l.get_offset("ENS_1");
-   for(i=0; i<o_data.n_ens; i++) {
-      o_data.ens_na.add(atof(l.get_item(ens1+i)));
+   int ens_1_offset = l.get_offset("ENS_1");
+   for(int i=0; i<o_data.n_ens; i++) {
+      o_data.ens_na.add(atof(l.get_item(ens_1_offset+i)));
    }
 
    o_data.obs_qc           =      l.get_item("OBS_QC", false);

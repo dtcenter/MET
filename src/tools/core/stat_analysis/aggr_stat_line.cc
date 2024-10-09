@@ -589,12 +589,16 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
                         int &n_in, int &n_out) {
    STATLine line;
    AggrSummaryInfo aggr;
-   ConcatString key, cs;
-   StringArray sa, req_stat, req_lty, req_col;
+   ConcatString cs;
+   StringArray sa;
+   StringArray req_stat;
+   StringArray req_lty;
+   StringArray req_col;
    STATLineType lty;
    NumArray empty_na;
-   int i, n_add;
-   double v, w;
+   int n_add;
+   double v;
+   double w;
 
    //
    // Objects for derived statistics
@@ -607,7 +611,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
    //
    // Build list of requested line types and column names
    //
-   for(i=0; i<job.column.n(); i++) {
+   for(int i=0; i<job.column.n(); i++) {
 
       // Split -column entry on colon
       sa = ConcatString(job.column[i]).split(":");
@@ -672,7 +676,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -680,7 +684,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
          if(m.count(key) == 0) {
             aggr.val.clear();
             aggr.wgt.clear();
-            for(i=0; i<req_stat.n(); i++) {
+            for(int i=0; i<req_stat.n(); i++) {
                aggr.val[req_stat[i]] = empty_na;
                aggr.wgt[req_stat[i]] = empty_na;
             }
@@ -719,7 +723,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Update the map entries for each requested statistic
          //
-         for(i=0,n_add=0; i<req_col.n(); i++) {
+         for(int i=0, n_add=0; i<req_col.n(); i++) {
 
             //
             // Store the current requested line type
@@ -808,9 +812,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrCTCInfo aggr;
    CTSInfo cur;
-   ConcatString key;
    unixtime ut;
-   int n, n_ties;
    map<ConcatString, AggrCTCInfo>::iterator it;
 
    //
@@ -860,7 +862,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -964,7 +966,8 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Sort the valid times
          //
-         n = it->second.valid_ts.rank_array(n_ties);
+         int n_ties;
+	 int n = it->second.valid_ts.rank_array(n_ties);
 
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_ctc_lines() -> "
@@ -1012,9 +1015,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrMCTCInfo aggr;
    MCTSInfo cur;
-   ConcatString key;
    unixtime ut;
-   int i, k, n, n_ties;
    map<ConcatString, AggrMCTCInfo>::iterator it;
 
    //
@@ -1049,7 +1050,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -1086,8 +1087,8 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
             //
             // Increment the counts
             //
-            for(i=0; i<m[key].mcts_info.cts.nrows(); i++) {
-               for(k=0; k<m[key].mcts_info.cts.ncols(); k++) {
+            for(int i=0; i<m[key].mcts_info.cts.nrows(); i++) {
+               for(int k=0; k<m[key].mcts_info.cts.ncols(); k++) {
                   m[key].mcts_info.cts.set_entry(i, k,
                                                  m[key].mcts_info.cts.entry(i, k) +
                                                  cur.cts.entry(i, k));
@@ -1160,7 +1161,8 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Sort the valid times
          //
-         n = it->second.valid_ts.rank_array(n_ties);
+         int n_ties;
+	 int n = it->second.valid_ts.rank_array(n_ties);
 
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_mctc_lines() -> "
@@ -1192,9 +1194,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrPCTInfo aggr;
    PCTInfo cur;
-   ConcatString key;
    unixtime ut;
-   int i, n, n_ties;
    map<ConcatString, AggrPCTInfo>::iterator it;
 
    //
@@ -1229,7 +1229,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -1318,7 +1318,8 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Sort the valid times
          //
-         n = it->second.valid_ts.rank_array(n_ties);
+	 int n_ties;
+         int n = it->second.valid_ts.rank_array(n_ties);
 
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_pct_lines() -> "
@@ -1355,9 +1356,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
    VL1L2Info cur_vl1l2;
    NBRCNTInfo cur_nbrcnt;
    CNTInfo cur_cnt;
-   ConcatString key;
    unixtime ut;
-   int n, n_ties;
    map<ConcatString, AggrPSumInfo>::iterator it;
 
    //
@@ -1423,7 +1422,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -1519,7 +1518,8 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Sort the valid times
          //
-         n = it->second.valid_ts.rank_array(n_ties);
+         int n_ties;
+	 int n = it->second.valid_ts.rank_array(n_ties);
 
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_psum_lines() -> "
@@ -1555,7 +1555,6 @@ void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrGRADInfo aggr;
    GRADInfo cur;
-   ConcatString key;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -1586,7 +1585,7 @@ void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -1645,8 +1644,10 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrWindInfo aggr;
    VL1L2Info cur;
-   ConcatString key;
-   double uf, vf, uo, vo;
+   double uf;
+   double vf;
+   double uo;
+   double vo;
 
    //
    // Process the STAT lines
@@ -1701,7 +1702,7 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -1751,14 +1752,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
    AggrWindInfo aggr;
    VL1L2Info v_info;
    MPRData cur;
-   ConcatString hdr, key;
-   double uf, uo, ufcmn, ufcsd, uocmn, uocsd;
-   double vf, vo, vfcmn, vfcsd, vocmn, vocsd;
-   double fcst_wind, obs_wind;
-   double fcmn_wind, fcsd_wind;
-   double ocmn_wind, ocsd_wind;
-   bool is_ugrd;
-   int i;
+   ConcatString hdr;
    map<ConcatString, AggrWindInfo>::iterator it;
 
    //
@@ -1775,19 +1769,19 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          job.dump_stat_line(line);
 
          parse_mpr_line(line, cur);
-         is_ugrd = (cur.fcst_var == ugrd_abbr_str);
-         uf      = (is_ugrd ? cur.fcst             : bad_data_double);
-         uo      = (is_ugrd ? cur.obs              : bad_data_double);
-         ufcmn   = (is_ugrd ? cur.fcst_climo_mean  : bad_data_double);
-         ufcsd   = (is_ugrd ? cur.fcst_climo_stdev : bad_data_double);
-         uocmn   = (is_ugrd ? cur.obs_climo_mean   : bad_data_double);
-         uocsd   = (is_ugrd ? cur.obs_climo_stdev  : bad_data_double);
-         vf      = (is_ugrd ? bad_data_double      : cur.fcst);
-         vo      = (is_ugrd ? bad_data_double      : cur.obs);
-         vfcmn   = (is_ugrd ? bad_data_double      : cur.fcst_climo_mean);
-         vfcsd   = (is_ugrd ? bad_data_double      : cur.fcst_climo_stdev);
-         vocmn   = (is_ugrd ? bad_data_double      : cur.obs_climo_mean);
-         vocsd   = (is_ugrd ? bad_data_double      : cur.obs_climo_stdev);
+         bool   is_ugrd = (cur.fcst_var == ugrd_abbr_str);
+         double uf      = (is_ugrd ? cur.fcst             : bad_data_double);
+         double uo      = (is_ugrd ? cur.obs              : bad_data_double);
+         double ufcmn   = (is_ugrd ? cur.fcst_climo_mean  : bad_data_double);
+         double ufcsd   = (is_ugrd ? cur.fcst_climo_stdev : bad_data_double);
+         double uocmn   = (is_ugrd ? cur.obs_climo_mean   : bad_data_double);
+         double uocsd   = (is_ugrd ? cur.obs_climo_stdev  : bad_data_double);
+         double vf      = (is_ugrd ? bad_data_double      : cur.fcst);
+         double vo      = (is_ugrd ? bad_data_double      : cur.obs);
+         double vfcmn   = (is_ugrd ? bad_data_double      : cur.fcst_climo_mean);
+         double vfcsd   = (is_ugrd ? bad_data_double      : cur.fcst_climo_stdev);
+         double vocmn   = (is_ugrd ? bad_data_double      : cur.obs_climo_mean);
+         double vocsd   = (is_ugrd ? bad_data_double      : cur.obs_climo_stdev);
 
          //
          // Build header string for matching UGRD and VGRD lines
@@ -1816,7 +1810,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -1863,6 +1857,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
             //
             // Add data for existing header entry
             //
+            int i;
             if(m[key].hdr_sa.has(hdr, i)) {
 
                //
@@ -1945,7 +1940,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
       //
       // Loop over the pairs for the current map entry
       //
-      for(i=0; i<it->second.hdr_sa.n(); i++) {
+      for(int i=0; i<it->second.hdr_sa.n(); i++) {
 
          //
          // Check for missing UGRD data
@@ -1976,18 +1971,18 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
             job.out_obs_wind_thresh.get_type()  != thresh_na) {
 
             // Compute wind speeds
-            fcst_wind  = convert_u_v_to_wind(it->second.pd_u.f_na[i],
-                                             it->second.pd_v.f_na[i]);
-             obs_wind  = convert_u_v_to_wind(it->second.pd_u.o_na[i],
-                                             it->second.pd_v.o_na[i]);
-             fcmn_wind = convert_u_v_to_wind(it->second.pd_u.fcmn_na[i],
-                                             it->second.pd_v.fcmn_na[i]);
-             fcsd_wind = convert_u_v_to_wind(it->second.pd_u.fcsd_na[i],
-                                             it->second.pd_v.fcsd_na[i]);
-             ocmn_wind = convert_u_v_to_wind(it->second.pd_u.ocmn_na[i],
-                                             it->second.pd_v.ocmn_na[i]);
-             ocsd_wind = convert_u_v_to_wind(it->second.pd_u.ocsd_na[i],
-                                             it->second.pd_v.ocsd_na[i]);
+            double fcst_wind = convert_u_v_to_wind(it->second.pd_u.f_na[i],
+                                                   it->second.pd_v.f_na[i]);
+            double obs_wind  = convert_u_v_to_wind(it->second.pd_u.o_na[i],
+                                                   it->second.pd_v.o_na[i]);
+            double fcmn_wind = convert_u_v_to_wind(it->second.pd_u.fcmn_na[i],
+                                                   it->second.pd_v.fcmn_na[i]);
+            double fcsd_wind = convert_u_v_to_wind(it->second.pd_u.fcsd_na[i],
+                                                   it->second.pd_v.fcsd_na[i]);
+            double ocmn_wind = convert_u_v_to_wind(it->second.pd_u.ocmn_na[i],
+                                                   it->second.pd_v.ocmn_na[i]);
+            double ocsd_wind = convert_u_v_to_wind(it->second.pd_u.ocsd_na[i],
+                                                   it->second.pd_v.ocsd_na[i]);
 
             // Store climo data
             ClimoPntInfo cpi(fcmn_wind, fcsd_wind, ocmn_wind, ocsd_wind);
@@ -2050,8 +2045,12 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          ClimoPntInfo cpi;
          aggr.hdr_sa.add(it->second.hdr_sa[i]);
+         double uf;
+         double vf;
          convert_u_v_to_unit(it->second.pd_u.f_na[i],
                              it->second.pd_v.f_na[i], uf, vf);
+         double uo;
+         double vo;
          convert_u_v_to_unit(it->second.pd_u.o_na[i],
                              it->second.pd_v.o_na[i], uo, vo);
          aggr.pd_u.add_grid_pair(uf, uo, cpi, default_grid_weight);
@@ -2075,7 +2074,6 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrMPRInfo aggr;
    MPRData cur;
-   ConcatString key;
 
    //
    // Process the STAT lines
@@ -2113,7 +2111,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -2204,9 +2202,8 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
    STATLine line;
    AggrISCInfo aggr;
    ISCInfo cur;
-   ConcatString key;
-   int i, k, iscale;
-   double total, w, den, baser_fbias_sum;
+   int iscale;
+   double den;
    map<ConcatString, AggrISCInfo>::iterator it;
 
    //
@@ -2245,7 +2242,7 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -2354,20 +2351,20 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
       // Get the sum of the totals, compute the weight, and sum the
       // weighted scores
       //
-      for(i=0; i<it->second.isc_info.n_scale+2; i++) {
+      for(int i=0; i<it->second.isc_info.n_scale+2; i++) {
 
          // Total number of points for this scale
-         total = it->second.total_na[i].sum();
+         double total = it->second.total_na[i].sum();
 
          // Initialize
-         baser_fbias_sum = 0.0;
+         double baser_fbias_sum = 0.0;
 
          // Loop through all scores for this scale
-         for(k=0; k<it->second.total_na[i].n(); k++) {
+         for(int k=0; k<it->second.total_na[i].n(); k++) {
 
             // Compute the weight for each score to be aggregated
             // based on the number of points it represents
-            w = it->second.total_na[i][k]/total;
+            double w = it->second.total_na[i][k]/total;
 
             // Sum scores for the binary fields
             if(i == 0) {
@@ -2463,8 +2460,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrENSInfo aggr;
    ECNTData cur;
-   ConcatString key;
-   double crps_emp, crps_emp_fair, spread_md, crpscl_emp, crps_gaus, crpscl_gaus, v;
+   double v;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -2496,7 +2492,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -2582,12 +2578,12 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
       v                            = it->second.mse_oerr_na.wmean(it->second.ens_pd.wgt_na);
       it->second.ens_pd.rmse_oerr  = (is_bad_data(v) ? bad_data_double : sqrt(v));
 
-      crps_emp      = it->second.ens_pd.crps_emp_na.wmean(it->second.ens_pd.wgt_na);
-      crps_emp_fair = it->second.ens_pd.crps_emp_fair_na.wmean(it->second.ens_pd.wgt_na);
-      spread_md     = it->second.ens_pd.spread_md_na.wmean(it->second.ens_pd.wgt_na);
-      crpscl_emp    = it->second.ens_pd.crpscl_emp_na.wmean(it->second.ens_pd.wgt_na);
-      crps_gaus     = it->second.ens_pd.crps_gaus_na.wmean(it->second.ens_pd.wgt_na);
-      crpscl_gaus   = it->second.ens_pd.crpscl_gaus_na.wmean(it->second.ens_pd.wgt_na);
+      double crps_emp      = it->second.ens_pd.crps_emp_na.wmean(it->second.ens_pd.wgt_na);
+      double crps_emp_fair = it->second.ens_pd.crps_emp_fair_na.wmean(it->second.ens_pd.wgt_na);
+      double spread_md     = it->second.ens_pd.spread_md_na.wmean(it->second.ens_pd.wgt_na);
+      double crpscl_emp    = it->second.ens_pd.crpscl_emp_na.wmean(it->second.ens_pd.wgt_na);
+      double crps_gaus     = it->second.ens_pd.crps_gaus_na.wmean(it->second.ens_pd.wgt_na);
+      double crpscl_gaus   = it->second.ens_pd.crpscl_gaus_na.wmean(it->second.ens_pd.wgt_na);
 
       // Compute aggregated empirical CRPSS
       it->second.ens_pd.crpss_emp =
@@ -2612,7 +2608,6 @@ void aggr_rps_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrRPSInfo aggr;
    RPSInfo cur;
-   ConcatString key;
    map<ConcatString, AggrRPSInfo>::iterator it;
 
    //
@@ -2647,7 +2642,7 @@ void aggr_rps_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -2706,8 +2701,6 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrENSInfo aggr;
    RHISTData cur;
-   ConcatString key;
-   int i;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -2739,14 +2732,14 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
          //
          if(m.count(key) == 0) {
             aggr.clear();
-            for(i=0; i<cur.n_rank; i++) aggr.ens_pd.rhist_na.add(0);
+            for(int i=0; i<cur.n_rank; i++) aggr.ens_pd.rhist_na.add(0);
             m[key] = aggr;
             mlog << Debug(3) << "[Case " << m.size()
                  << "] Added new case for key \""
@@ -2772,7 +2765,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Aggregate the ranked histogram counts
          //
-         for(i=0; i<m[key].ens_pd.rhist_na.n(); i++) {
+         for(int i=0; i<m[key].ens_pd.rhist_na.n(); i++) {
             m[key].ens_pd.rhist_na.set(i, m[key].ens_pd.rhist_na[i] + cur.rhist_na[i]);
          }
 
@@ -2796,8 +2789,6 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrENSInfo aggr;
    PHISTData cur;
-   ConcatString key;
-   int i;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -2829,7 +2820,7 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -2862,7 +2853,7 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &job,
             //
             // Aggregate the probability integral transform histogram counts
             //
-            for(i=0; i<m[key].ens_pd.phist_na.n(); i++) {
+            for(int i=0; i<m[key].ens_pd.phist_na.n(); i++) {
                m[key].ens_pd.phist_na.set(i, m[key].ens_pd.phist_na[i] + cur.phist_na[i]);
             }
          } // end else
@@ -2887,8 +2878,6 @@ void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrENSInfo aggr;
    RELPData cur;
-   ConcatString key;
-   int i;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -2920,7 +2909,7 @@ void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -2952,7 +2941,7 @@ void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &job,
             //
             // Aggregate the RELP histogram counts
             //
-            for(i=0; i<m[key].ens_pd.relp_na.n(); i++) {
+            for(int i=0; i<m[key].ens_pd.relp_na.n(); i++) {
                m[key].ens_pd.relp_na.set(i, m[key].ens_pd.relp_na[i] + cur.relp_na[i]);
             }
          } // end else
@@ -2977,10 +2966,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrENSInfo aggr;
    ORANKData cur;
-   ConcatString key;
    NumArray climo_vals;
-   int i, n_valid, n_bin;
-   double esum, esumsq;
    map<ConcatString, AggrENSInfo>::iterator it;
 
    //
@@ -3012,7 +2998,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Skip missing data
@@ -3029,10 +3015,10 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.ens_pd.obs_error_flag = !is_bad_data(cur.ens_mean_oerr);
             aggr.ens_pd.set_ens_size(cur.n_ens);
             aggr.ens_pd.extend(cur.total);
-            for(i=0; i<cur.n_ens+1; i++) aggr.ens_pd.rhist_na.add(0);
+            for(int i=0; i<cur.n_ens+1; i++) aggr.ens_pd.rhist_na.add(0);
             aggr.ens_pd.phist_bin_size = job.out_bin_size;
-            n_bin = ceil(1.0/aggr.ens_pd.phist_bin_size);
-            for(i=0; i<n_bin; i++) aggr.ens_pd.phist_na.add(0);
+            int n_bin = ceil(1.0/aggr.ens_pd.phist_bin_size);
+            for(int i=0; i<n_bin; i++) aggr.ens_pd.phist_na.add(0);
             aggr.ens_pd.ssvar_bin_size = job.out_bin_size;
 
             bool center = false;
@@ -3075,8 +3061,10 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.mn_na.add(cur.ens_mean);
          m[key].ens_pd.mn_oerr_na.add(cur.ens_mean_oerr);
 
-         for(i=0, n_valid=0, esum=0.0, esumsq=0.0;
-             i<m[key].ens_pd.n_ens; i++) {
+         int n_valid = 0;
+         double esum = 0.0;
+         double esumsq = 0.0;
+         for(int i=0; i<m[key].ens_pd.n_ens; i++) {
             m[key].ens_pd.add_ens(i, cur.ens_na[i]);
             if(!is_bad_data(cur.ens_na[i])) {
                esum   += cur.ens_na[i];
@@ -3114,8 +3102,10 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          }
 
          // Store BIAS_RATIO terms
-         int n_ge_obs, n_lt_obs;
-         double me_ge_obs, me_lt_obs;
+         int n_ge_obs;
+	 int n_lt_obs;
+         double me_ge_obs;
+	 double me_lt_obs;
          compute_bias_ratio_terms(
             cur.obs, cur.ens_na,
             n_ge_obs, me_ge_obs,
@@ -3126,7 +3116,8 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          m[key].ens_pd.me_lt_obs_na.add(me_lt_obs);
 
          // Compute observation error log scores
-         double v_conv, v_corr;
+         double v_conv;
+	 double v_corr;
          compute_obs_error_log_scores(
             cur.ens_mean, cur.spread, cur.obs, oerr_var,
             v_conv, v_corr);
@@ -3136,7 +3127,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Increment the RHIST counts
          //
-         i = cur.rank - 1;
+         int i = cur.rank - 1;
          m[key].ens_pd.rhist_na.set(i, m[key].ens_pd.rhist_na[i] + 1);
 
          //
@@ -3169,8 +3160,9 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrSSVARInfo aggr;
    SSVARInfo cur;
-   ConcatString case_key, bin_key;
-   ConcatString fcst_var, obs_var;
+   ConcatString bin_key;
+   ConcatString fcst_var;
+   ConcatString obs_var;
    double bin_width = bad_data_double;
 
    //
@@ -3231,8 +3223,9 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the case map and bin map keys for the current line
          //
-         case_key = job.get_case_info(line);
-         bin_key << cs_erase << cur.var_min << ":" << cur.var_max;
+         ConcatString case_key(job.get_case_info(line));
+         ConcatString bin_key;
+         bin_key << cur.var_min << ":" << cur.var_max;
 
          //
          // Add a new case map entry, if necessary
@@ -3276,7 +3269,8 @@ void aggr_seeps_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrSEEPSInfo aggr;
    SeepsAggScore cur;
-   ConcatString key, fcst_var, obs_var;
+   ConcatString fcst_var;
+   ConcatString obs_var;
 
    //
    // Process the STAT lines
@@ -3322,7 +3316,7 @@ void aggr_seeps_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -3360,7 +3354,8 @@ void aggr_seeps_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrSEEPSMPRInfo aggr;
    SEEPSMPRData cur;
-   ConcatString key, fcst_var, obs_var;
+   ConcatString fcst_var;
+   ConcatString obs_var;
 
    //
    // Process the STAT lines
@@ -3406,7 +3401,7 @@ void aggr_seeps_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -3453,7 +3448,6 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &job,
                             int &n_in, int &n_out) {
    STATLine line;
    AggrTimeSeriesInfo cur;
-   ConcatString key;
    int lead_sec;
    unixtime init_ut, valid_ut;
 
@@ -3473,7 +3467,7 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -3558,8 +3552,6 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
                    int &n_in, int &n_out) {
    STATLine line;
    AggrSSIndexInfo cur;
-   ConcatString key;
-   int i, n_term;
 
    //
    // Store the index name and valid data threshold
@@ -3591,6 +3583,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
    //
    // Compute the number of terms as the maximum array length
    //
+   int n_term;
    n_term = max(     0, job.fcst_var.n());
    n_term = max(n_term, job.fcst_lev.n());
    n_term = max(n_term, job.fcst_lead.n());
@@ -3628,7 +3621,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
    //
    // Create a job for each term
    //
-   for(i=0; i<n_term; i++) {
+   for(int i=0; i<n_term; i++) {
 
       //
       // Create a STATAnalysisJob for each term
@@ -3709,7 +3702,7 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
          //
          // Build the map key for the current line
          //
-         key = job.get_case_info(line);
+         ConcatString key(job.get_case_info(line));
 
          //
          // Add a new map entry, if necessary
@@ -3747,7 +3740,6 @@ void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
 
 void mpr_to_ctc(STATAnalysisJob &job, const AggrMPRInfo &info,
                 int i_thresh, CTSInfo &cts_info) {
-   int i;
 
    //
    // Initialize
@@ -3760,7 +3752,7 @@ void mpr_to_ctc(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    // Populate the contingency table
    //
-   for(i=0; i<info.pd.n_obs; i++) {
+   for(int i=0; i<info.pd.n_obs; i++) {
       ClimoPntInfo cpi(info.pd.fcmn_na[i], info.pd.fcsd_na[i],
                        info.pd.ocmn_na[i], info.pd.ocsd_na[i]);
       cts_info.add(info.pd.f_na[i], info.pd.o_na[i], 1.0, &cpi);
@@ -3820,7 +3812,6 @@ void mpr_to_cts(STATAnalysisJob &job, const AggrMPRInfo &info,
 
 void mpr_to_mctc(STATAnalysisJob &job, const AggrMPRInfo &info,
                  MCTSInfo &mcts_info) {
-   int i;
    int n = info.pd.f_na.n();
 
    //
@@ -3835,7 +3826,7 @@ void mpr_to_mctc(STATAnalysisJob &job, const AggrMPRInfo &info,
    //
    // Update the contingency table counts
    //
-   for(i=0; i<n; i++) {
+   for(int i=0; i<n; i++) {
       ClimoPntInfo cpi(info.pd.fcmn_na[i], info.pd.fcsd_na[i],
                        info.pd.ocmn_na[i], info.pd.ocsd_na[i]);
       mcts_info.add(info.pd.f_na[i], info.pd.o_na[i], 1.0, &cpi);
@@ -4100,13 +4091,12 @@ void mpr_to_pct(STATAnalysisJob &job, const AggrMPRInfo &info,
 ////////////////////////////////////////////////////////////////////////
 
 double compute_vif(NumArray &na) {
-   double corr, vif;
 
    // Compute the lag1 autocorrelation
-   corr = stats_lag1_autocorrelation(na);
+   double corr = stats_lag1_autocorrelation(na);
 
    // Compute the variance inflation factor
-   vif = 1 + 2.0*fabs(corr) - 2.0*fabs(corr)/na.n();
+   double vif = 1 + 2.0*fabs(corr) - 2.0*fabs(corr)/na.n();
 
    return vif;
 }

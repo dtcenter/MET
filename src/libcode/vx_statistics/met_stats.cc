@@ -380,21 +380,21 @@ void CTSInfo::compute_ci() {
       // Compute confidence intervals for the scores based on
       // proportions
       //
-      compute_proportion_ci(baser.v, cts.total(), alpha[i], baser.vif,
+      compute_proportion_ci(baser.v, cts.n_pairs(), alpha[i], baser.vif,
                             baser.v_ncl[i], baser.v_ncu[i]);
-      compute_proportion_ci(fmean.v, cts.total(), alpha[i], fmean.vif,
+      compute_proportion_ci(fmean.v, cts.n_pairs(), alpha[i], fmean.vif,
                             fmean.v_ncl[i], fmean.v_ncu[i]);
-      compute_proportion_ci(acc.v, cts.total(), alpha[i], acc.vif,
+      compute_proportion_ci(acc.v, cts.n_pairs(), alpha[i], acc.vif,
                             acc.v_ncl[i], acc.v_ncu[i]);
-      compute_proportion_ci(pody.v, cts.total(), alpha[i], pody.vif,
+      compute_proportion_ci(pody.v, cts.n_pairs(), alpha[i], pody.vif,
                             pody.v_ncl[i], pody.v_ncu[i]);
-      compute_proportion_ci(podn.v, cts.total(), alpha[i], podn.vif,
+      compute_proportion_ci(podn.v, cts.n_pairs(), alpha[i], podn.vif,
                             podn.v_ncl[i], podn.v_ncu[i]);
-      compute_proportion_ci(pofd.v, cts.total(), alpha[i], pofd.vif,
+      compute_proportion_ci(pofd.v, cts.n_pairs(), alpha[i], pofd.vif,
                             pofd.v_ncl[i], pofd.v_ncu[i]);
-      compute_proportion_ci(far.v, cts.total(), alpha[i], far.vif,
+      compute_proportion_ci(far.v, cts.n_pairs(), alpha[i], far.vif,
                             far.v_ncl[i], far.v_ncu[i]);
-      compute_proportion_ci(csi.v, cts.total(), alpha[i], csi.vif,
+      compute_proportion_ci(csi.v, cts.n_pairs(), alpha[i], csi.vif,
                             csi.v_ncl[i], csi.v_ncu[i]);
 
       //
@@ -814,7 +814,7 @@ void MCTSInfo::compute_ci() {
       // Compute confidence intervals for the scores based on
       // proportions
       //
-      compute_proportion_ci(acc.v, cts.total(), alpha[i], acc.vif,
+      compute_proportion_ci(acc.v, cts.n_pairs(), alpha[i], acc.vif,
                             acc.v_ncl[i], acc.v_ncu[i]);
    } // end for i
 
@@ -3293,7 +3293,7 @@ void PCTInfo::compute_ci() {
    //
    for(i=0; i<n_alpha; i++) {
 
-      compute_proportion_ci(baser.v, pct.total(), alpha[i], baser.vif,
+      compute_proportion_ci(baser.v, pct.n_pairs(), alpha[i], baser.vif,
                             baser.v_ncl[i], baser.v_ncu[i]);
 
       // Compute brier CI using the VIF
@@ -3377,11 +3377,11 @@ double PCTInfo::get_stat_pct(const string &stat_name,
       col_name = "THRESH_I";
    }
    else if(check_reg_exp("OY_[0-9]", stat_name.c_str())){
-      v = (double) pct.event_total_by_row(i);
+      v = pct.event_total_by_row(i);
       col_name = "OY_I";
    }
    else if(check_reg_exp("ON_[0-9]", stat_name.c_str())) {
-      v = (double) pct.nonevent_total_by_row(i);
+      v = pct.nonevent_total_by_row(i);
       col_name = "ON_I";
    }
    else {

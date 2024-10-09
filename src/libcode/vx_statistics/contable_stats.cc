@@ -41,7 +41,7 @@ double TTContingencyTable::baser_ci(double alpha,
 
    v = baser();
 
-   compute_proportion_ci(v, total(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -60,7 +60,7 @@ double TTContingencyTable::fmean_ci(double alpha,
 
    v = fmean();
 
-   compute_proportion_ci(v, total(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -79,7 +79,7 @@ double TTContingencyTable::accuracy_ci(double alpha,
 
    v = accuracy();
 
-   compute_proportion_ci(v, total(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -112,7 +112,7 @@ double TTContingencyTable::pod_yes_ci(double alpha,
 
    v = pod_yes();
 
-   compute_proportion_ci(v, total(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -131,7 +131,7 @@ double TTContingencyTable::pod_no_ci(double alpha,
 
    v = pod_no();
 
-   compute_proportion_ci(v, total(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -157,7 +157,7 @@ double TTContingencyTable::pofd_ci(double alpha,
 
    v = pofd();
 
-   compute_proportion_ci(v, total(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -180,7 +180,7 @@ double TTContingencyTable::far_ci(double alpha,
 
    v = far();
 
-   compute_proportion_ci(v, total(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -203,7 +203,7 @@ double TTContingencyTable::csi_ci(double alpha,
 
    v = csi();
 
-   compute_proportion_ci(v, total(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }

@@ -31,7 +31,10 @@ class TTContingencyTable;
 
 class ContingencyTable {
 
-   protected:
+   friend class TTContingencyTable;
+   friend class Nx2ContingencyTable;
+
+   private:
 
       void init_from_scratch();
 
