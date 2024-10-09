@@ -142,9 +142,9 @@ void PB2NCConfInfo::read_config(const char *default_file_name,
 
 void PB2NCConfInfo::process_config() {
    int i;
-   ConcatString s, mask_name;
+   ConcatString s;
+   ConcatString mask_name;
    StringArray sa;
-   StringArray * sid_list = 0;
    Dictionary *dict = (Dictionary *) nullptr;
 
    // Dump the contents of the config file
@@ -184,10 +184,9 @@ void PB2NCConfInfo::process_config() {
 
    // Conf: station_id
    sa = conf.lookup_string_array(conf_key_station_id);
-   sid_list = new StringArray [sa.n_elements()];
-   for(i=0; i<sa.n_elements(); i++) {
-      parse_sid_mask(replace_path(sa[i]), sid_list[i], mask_name);
-      station_id.add(sid_list[i]);
+   for(i=0; i<sa.n(); i++) {
+      MaskSID ms = parse_sid_mask(replace_path(sa[i]));
+      for(auto item : ms.sid_list) station_id.add(item.first);
    }
 
    // Conf: beg_ds and end_ds
@@ -268,8 +267,6 @@ void PB2NCConfInfo::process_config() {
 
    obs_bufr_map = parse_conf_obs_bufr_map(&conf);
    message_type_map = parse_conf_message_type_map(&conf);
-
-   if ( sid_list )  { delete [] sid_list;   sid_list = (StringArray *) nullptr; }
 
    return;
 }

@@ -378,7 +378,6 @@ void EnsembleStatConfInfo::process_flags() {
 void EnsembleStatConfInfo::process_masks(const Grid &grid) {
    int i, j;
    MaskPlane mp;
-   StringArray sid;
    ConcatString name;
 
    mlog << Debug(2)
@@ -447,9 +446,9 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
             mlog << Debug(3)
                  << "Processing station ID mask: "
                  << vx_opt[i].mask_sid[j] << "\n";
-            parse_sid_mask(vx_opt[i].mask_sid[j], sid, name);
-            sid_map[vx_opt[i].mask_sid[j]] = name;
-            mask_sid_map[name] = sid;
+            MaskSID ms = parse_sid_mask(vx_opt[i].mask_sid[j]);
+            sid_map[vx_opt[i].mask_sid[j]] = ms.name;
+            mask_sid_map[ms.name] = ms;
          }
 
          // Store the name only for point verification

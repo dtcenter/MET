@@ -743,18 +743,18 @@ void set_mask_poly(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_mask_sid(const StringArray & a) {
-   ConcatString mask_name;
 
    // List the station ID mask
    mlog << Debug(1)
         << "Station ID Mask: " << a[0] << "\n";
 
-   parse_sid_mask(a[0], mask_sid, mask_name);
+   MaskSID ms = parse_sid_mask(a[0]);
+   for(auto item : ms.sid_list) mask_sid.add(item.first);
 
    // List the length of the station ID mask
    mlog << Debug(2)
-        << "Parsed Station ID Mask: " << mask_name
-        << " containing " << mask_sid.n_elements() << " points\n";
+        << "Parsed Station ID Mask: " << ms.name
+        << " containing " << mask_sid.n() << " stations\n";
 }
 
 ////////////////////////////////////////////////////////////////////////

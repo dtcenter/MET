@@ -1802,20 +1802,19 @@ void STATAnalysisJob::set_mask_sid(const char *c) {
 
    if(!c) return;
 
-   ConcatString mask_name;
-
    mask_sid_str = c;
 
    // List the station ID mask
    mlog << Debug(1)
         << "Station ID Mask: " << mask_sid_str << "\n";
 
-   parse_sid_mask(mask_sid_str, mask_sid, mask_name);
+   MaskSID ms = parse_sid_mask(mask_sid_str);
+   for(auto item : ms.sid_list) mask_sid.add(item.first);
 
    // List the length of the station ID mask
    mlog << Debug(2)
-        << "Parsed Station ID Mask: " << mask_name
-        << " containing " << mask_sid.n() << " points\n";
+        << "Parsed Station ID Mask: " << ms.name
+        << " containing " << mask_sid.n() << " stations\n";
 
    return;
 }

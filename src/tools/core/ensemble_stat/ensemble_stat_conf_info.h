@@ -226,7 +226,7 @@ class EnsembleStatConfInfo {
       std::map<ConcatString,MaskPlane>   mask_area_map;
 
       // Mapping of mask names to Station ID lists
-      std::map<ConcatString,StringArray> mask_sid_map;
+      std::map<ConcatString,MaskSID>     mask_sid_map;
 
       gsl_rng *rng_ptr;                     // GSL random number generator (allocated)
 
