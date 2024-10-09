@@ -162,7 +162,6 @@ void write_pct_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
 
 void write_pstd_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
                            int r, int c) {
-   int col;
    char tmp_str[max_str_len];
 
    // Write the header column names if requested
@@ -194,7 +193,8 @@ void write_pstd_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
    at.set_entry(r, c+16, (string)pstd_columns[16]);
 
    // Write THRESH_i for each threshold
-   for(int i=0, col=c+17; i<n_thresh; i++) {
+   int col = c+17;
+   for(int i=0; i<n_thresh; i++) {
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", pstd_columns[17], i+1);
       at.set_entry(r, col, (string)tmp_str); // Threshold
@@ -208,7 +208,6 @@ void write_pstd_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
 
 void write_pjc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
                           int r, int c) {
-   int col;
    char tmp_str[max_str_len];
 
    // Write the header column names if requested
@@ -226,7 +225,8 @@ void write_pjc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
 
    // Write THRESH_i, OY_TP_i, ON_TP_i, CALIBRATION_i, REFINEMENT_i,
    // LIKELIHOOD_i, and BASER_i for each row of the Nx2 table
-   for(int i=0, col=c+2; i<n_thresh-1; i++) {
+   int col = c+2;
+   for(int i=0; i<n_thresh-1; i++) {
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", pjc_columns[2], i+1);
       at.set_entry(r, col, (string)tmp_str); // Threshold
@@ -270,7 +270,6 @@ void write_pjc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
 
 void write_prc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
                           int r, int c) {
-   int col;
    char tmp_str[max_str_len];
 
    // Write the header column names if requested
@@ -287,6 +286,7 @@ void write_prc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
    at.set_entry(r, c+1, (string)prc_columns[1]);
 
    // Write THRESH_i, PODY_i, POFD_i for each row of the Nx2 table
+   int col = c+2;
    for(int i=0, col=c+2; i<n_thresh-1; i++) {
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", prc_columns[2], i+1);
@@ -315,7 +315,6 @@ void write_prc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
 
 void write_eclv_header_row(int hdr_flag, int n_pnt, AsciiTable &at,
                            int r, int c) {
-   int col;
    ConcatString tmp_str;
 
    // Write the header column names if requested
@@ -334,6 +333,7 @@ void write_eclv_header_row(int hdr_flag, int n_pnt, AsciiTable &at,
    at.set_entry(r, c+3, (string)eclv_columns[3]);
 
    // Write CL_i and VALUE_i for each bin
+   int col = c+4;
    for(int i=0, col=c+4; i<n_pnt; i++) {
 
       tmp_str.format("%s%i", eclv_columns[4], i+1);
@@ -352,7 +352,6 @@ void write_eclv_header_row(int hdr_flag, int n_pnt, AsciiTable &at,
 
 void write_rhist_header_row(int hdr_flag, int n_rank, AsciiTable &at,
                             int r, int c) {
-   int col;
    char tmp_str[max_str_len];
 
    // Write the header column names if requested
@@ -369,6 +368,7 @@ void write_rhist_header_row(int hdr_flag, int n_rank, AsciiTable &at,
    at.set_entry(r, c+1, (string)rhist_columns[1]);
 
    // Write RANK_i for each rank
+   int col = c+2;
    for(int i=0, col=c+2; i<n_rank; i++) {
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", rhist_columns[2], i+1);
@@ -383,7 +383,6 @@ void write_rhist_header_row(int hdr_flag, int n_rank, AsciiTable &at,
 
 void write_phist_header_row(int hdr_flag, int n_bin, AsciiTable &at,
                             int r, int c) {
-   int col;
    char tmp_str[max_str_len];
 
    // Write the header column names if requested
@@ -401,6 +400,7 @@ void write_phist_header_row(int hdr_flag, int n_bin, AsciiTable &at,
    at.set_entry(r, c+2, (string)phist_columns[2]);
 
    // Write BIN_i for each bin
+   int col = c+3;
    for(int i=0, col=c+3; i<n_bin; i++) {
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", phist_columns[3], i+1);
@@ -415,7 +415,6 @@ void write_phist_header_row(int hdr_flag, int n_bin, AsciiTable &at,
 
 void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
                             int r, int c) {
-   int col;
    char tmp_str[max_str_len];
 
    // Write the header column names if requested
@@ -442,6 +441,7 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    at.set_entry(r, c+11, (string)orank_columns[11]);
 
    // Write ENS_i for each ensemble member
+   int col = c+12;
    for(int i=0, col=c+12; i<n_ens; i++) {
 
      snprintf(tmp_str, sizeof(tmp_str), "%s%i", orank_columns[12], i+1);
@@ -467,7 +467,6 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
 
 void write_relp_header_row(int hdr_flag, int n_ens, AsciiTable &at,
                            int r, int c) {
-   int col;
    char tmp_str[max_str_len];
 
    // Write the header column names if requested
@@ -484,6 +483,7 @@ void write_relp_header_row(int hdr_flag, int n_ens, AsciiTable &at,
    at.set_entry(r, c+1, (string)relp_columns[1]);
 
    // Write RELP_i for each ensemble member
+   int col = c+2;
    for(int i=0, col=c+2; i<n_ens; i++) {
      snprintf(tmp_str, sizeof(tmp_str), "%s%i", relp_columns[2], i+1);
       at.set_entry(r, col, (string)tmp_str);
@@ -2801,7 +2801,6 @@ void write_cnt_cols(const CNTInfo &cnt_info, int i,
 
 void write_mctc_cols(const MCTSInfo &mcts_info,
                      AsciiTable &at, int r, int c) {
-   int col;
 
    //
    // Multi-Category Contingency Table Counts
@@ -2817,7 +2816,8 @@ void write_mctc_cols(const MCTSInfo &mcts_info,
    //
    // Loop through the contingency table rows and columns
    //
-   for(int i=0, col=c+2; i<mcts_info.cts.nrows(); i++) {
+   int col = c+2;
+   for(int i=0; i<mcts_info.cts.nrows(); i++) {
       for(int j=0; j<mcts_info.cts.ncols(); j++) {
 
          at.set_entry(r, col,      // Fi_Oj table counts
@@ -3254,7 +3254,6 @@ void write_vcnt_cols(const VL1L2Info &vcnt_info, int i,
 
 void write_pct_cols(const PCTInfo &pct_info,
                     AsciiTable &at, int r, int c) {
-   int col;
 
    //
    // Nx2 Contingency Table Counts for Probability Forecast
@@ -3272,7 +3271,8 @@ void write_pct_cols(const PCTInfo &pct_info,
    //
    // Write THRESH_i, OY_i, ON_i for each row of the Nx2 table
    //
-   for(int i=0, col=c+2; i<pct_info.pct.nrows(); i++) {
+   int col = c+2;
+   for(int i=0; i<pct_info.pct.nrows(); i++) {
 
       at.set_entry(r, col, // THRESH
          pct_info.pct.threshold(i));
@@ -3380,7 +3380,6 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
 
 void write_pjc_cols(const PCTInfo &pct_info,
                     AsciiTable &at, int r, int c) {
-   int col;
 
    //
    // Nx2 Contingency Table Joint/Continuous Probability
@@ -3401,7 +3400,8 @@ void write_pjc_cols(const PCTInfo &pct_info,
    // Write THRESH, OY, ON for each row of the Nx2 table
    //
    double total = pct_info.pct.total();
-   for(int i=0, col=c+2; i<pct_info.pct.nrows(); i++) {
+   int col = c+2;
+   for(int i=0; i<pct_info.pct.nrows(); i++) {
 
       at.set_entry(r, col, // THRESH
          pct_info.pct.threshold(i));
@@ -3447,7 +3447,6 @@ void write_pjc_cols(const PCTInfo &pct_info,
 
 void write_prc_cols(const PCTInfo &pct_info,
                     AsciiTable &at, int r, int c) {
-   int col;
    TTContingencyTable ct;
 
    //
@@ -3466,7 +3465,8 @@ void write_prc_cols(const PCTInfo &pct_info,
    //
    // Write THRESH, PODY, POFD for each row of the Nx2 table
    //
-   for(int i=0, col=c+2; i<pct_info.pct.nrows(); i++) {
+   int col = c+2;
+   for(int i=0; i<pct_info.pct.nrows(); i++) {
 
       //
       // Get the 2x2 contingency table for this row
@@ -4446,7 +4446,6 @@ void write_rps_cols(const RPSInfo &rps_info,
 
 void write_rhist_cols(const PairDataEnsemble *pd_ptr,
                       AsciiTable &at, int r, int c) {
-   int col;
 
    //
    // Ensemble Ranked Histogram
@@ -4463,6 +4462,7 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
    //
    // Write RANK_i count for each bin
    //
+   int col = c+2;
    for(int i=0, col=c+2; i<pd_ptr->rhist_na.n_elements(); i++) {
 
       at.set_entry(r, col, // RANK_i
@@ -4477,7 +4477,6 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
 
 void write_phist_cols(const PairDataEnsemble *pd_ptr,
                       AsciiTable &at, int r, int c) {
-   int col;
 
    //
    // Probability Integral Transform Histogram
@@ -4496,6 +4495,7 @@ void write_phist_cols(const PairDataEnsemble *pd_ptr,
    //
    // Write BIN_i count for each bin
    //
+   int col = c+3;
    for(int i=0, col=c+3; i<pd_ptr->phist_na.n_elements(); i++) {
 
       at.set_entry(r, col, // BIN_i
@@ -4510,7 +4510,6 @@ void write_phist_cols(const PairDataEnsemble *pd_ptr,
 
 void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
                       AsciiTable &at, int r, int c) {
-   int col;
 
    //
    // Ensemble Observation Rank Matched Pairs
@@ -4564,7 +4563,8 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    //
    // Write ENS_j for each ensemble member
    //
-   for(int j=0, col=c+12; j<pd_ptr->n_ens; j++) {
+   int col = c+12;
+   for(int j=0; j<pd_ptr->n_ens; j++) {
 
       at.set_entry(r, col, // ENS_j
          pd_ptr->e_na[j][i]);
@@ -4758,7 +4758,6 @@ void write_ssvar_cols(const PairDataEnsemble *pd_ptr, int i,
 
 void write_relp_cols(const PairDataEnsemble *pd_ptr,
                      AsciiTable &at, int r, int c) {
-   int col;
 
    //
    // Relative Position
@@ -4774,6 +4773,7 @@ void write_relp_cols(const PairDataEnsemble *pd_ptr,
    //
    // Write RELP_i count for each bin
    //
+   int col = c+2;
    for(int i=0, col=c+2; i<pd_ptr->relp_na.n_elements(); i++) {
 
       at.set_entry(r, col, // RELP_i

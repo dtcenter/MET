@@ -596,7 +596,6 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
    StringArray req_col;
    STATLineType lty;
    NumArray empty_na;
-   int n_add;
    double v;
    double w;
 
@@ -723,7 +722,8 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Update the map entries for each requested statistic
          //
-         for(int i=0, n_add=0; i<req_col.n(); i++) {
+	 int n_add = 0;
+         for(int i=0; i<req_col.n(); i++) {
 
             //
             // Store the current requested line type
@@ -2578,12 +2578,10 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
       v                            = it->second.mse_oerr_na.wmean(it->second.ens_pd.wgt_na);
       it->second.ens_pd.rmse_oerr  = (is_bad_data(v) ? bad_data_double : sqrt(v));
 
-      double crps_emp      = it->second.ens_pd.crps_emp_na.wmean(it->second.ens_pd.wgt_na);
-      double crps_emp_fair = it->second.ens_pd.crps_emp_fair_na.wmean(it->second.ens_pd.wgt_na);
-      double spread_md     = it->second.ens_pd.spread_md_na.wmean(it->second.ens_pd.wgt_na);
-      double crpscl_emp    = it->second.ens_pd.crpscl_emp_na.wmean(it->second.ens_pd.wgt_na);
-      double crps_gaus     = it->second.ens_pd.crps_gaus_na.wmean(it->second.ens_pd.wgt_na);
-      double crpscl_gaus   = it->second.ens_pd.crpscl_gaus_na.wmean(it->second.ens_pd.wgt_na);
+      double crps_emp    = it->second.ens_pd.crps_emp_na.wmean(it->second.ens_pd.wgt_na);
+      double crpscl_emp  = it->second.ens_pd.crpscl_emp_na.wmean(it->second.ens_pd.wgt_na);
+      double crps_gaus   = it->second.ens_pd.crps_gaus_na.wmean(it->second.ens_pd.wgt_na);
+      double crpscl_gaus = it->second.ens_pd.crpscl_gaus_na.wmean(it->second.ens_pd.wgt_na);
 
       // Compute aggregated empirical CRPSS
       it->second.ens_pd.crpss_emp =
@@ -3017,7 +3015,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.ens_pd.extend(cur.total);
             for(int i=0; i<cur.n_ens+1; i++) aggr.ens_pd.rhist_na.add(0);
             aggr.ens_pd.phist_bin_size = job.out_bin_size;
-            int n_bin = ceil(1.0/aggr.ens_pd.phist_bin_size);
+            int n_bin = (int) ceil(1.0/aggr.ens_pd.phist_bin_size);
             for(int i=0; i<n_bin; i++) aggr.ens_pd.phist_na.add(0);
             aggr.ens_pd.ssvar_bin_size = job.out_bin_size;
 
@@ -3160,7 +3158,6 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &job,
    STATLine line;
    AggrSSVARInfo aggr;
    SSVARInfo cur;
-   ConcatString bin_key;
    ConcatString fcst_var;
    ConcatString obs_var;
    double bin_width = bad_data_double;
