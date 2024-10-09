@@ -287,7 +287,7 @@ void write_prc_header_row(int hdr_flag, int n_thresh, AsciiTable &at,
 
    // Write THRESH_i, PODY_i, POFD_i for each row of the Nx2 table
    int col = c+2;
-   for(int i=0, col=c+2; i<n_thresh-1; i++) {
+   for(int i=0; i<n_thresh-1; i++) {
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", prc_columns[2], i+1);
       at.set_entry(r, col, (string)tmp_str); // Threshold
@@ -334,7 +334,7 @@ void write_eclv_header_row(int hdr_flag, int n_pnt, AsciiTable &at,
 
    // Write CL_i and VALUE_i for each bin
    int col = c+4;
-   for(int i=0, col=c+4; i<n_pnt; i++) {
+   for(int i=0; i<n_pnt; i++) {
 
       tmp_str.format("%s%i", eclv_columns[4], i+1);
       at.set_entry(r, col, tmp_str);
@@ -369,7 +369,7 @@ void write_rhist_header_row(int hdr_flag, int n_rank, AsciiTable &at,
 
    // Write RANK_i for each rank
    int col = c+2;
-   for(int i=0, col=c+2; i<n_rank; i++) {
+   for(int i=0; i<n_rank; i++) {
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", rhist_columns[2], i+1);
       at.set_entry(r, col, (string)tmp_str); // Counts for each rank
@@ -401,7 +401,7 @@ void write_phist_header_row(int hdr_flag, int n_bin, AsciiTable &at,
 
    // Write BIN_i for each bin
    int col = c+3;
-   for(int i=0, col=c+3; i<n_bin; i++) {
+   for(int i=0; i<n_bin; i++) {
 
       snprintf(tmp_str, sizeof(tmp_str), "%s%i", phist_columns[3], i+1);
       at.set_entry(r, col, (string)tmp_str); // Counts for each bin
@@ -442,7 +442,7 @@ void write_orank_header_row(int hdr_flag, int n_ens, AsciiTable &at,
 
    // Write ENS_i for each ensemble member
    int col = c+12;
-   for(int i=0, col=c+12; i<n_ens; i++) {
+   for(int i=0; i<n_ens; i++) {
 
      snprintf(tmp_str, sizeof(tmp_str), "%s%i", orank_columns[12], i+1);
       at.set_entry(r, col, (string)tmp_str); // Ensemble member value
@@ -484,7 +484,7 @@ void write_relp_header_row(int hdr_flag, int n_ens, AsciiTable &at,
 
    // Write RELP_i for each ensemble member
    int col = c+2;
-   for(int i=0, col=c+2; i<n_ens; i++) {
+   for(int i=0; i<n_ens; i++) {
      snprintf(tmp_str, sizeof(tmp_str), "%s%i", relp_columns[2], i+1);
       at.set_entry(r, col, (string)tmp_str);
       col++;
@@ -3300,7 +3300,7 @@ void write_pct_cols(const PCTInfo &pct_info,
 
 void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
                      AsciiTable &at, int r, int c) {
-   int i, col;
+   int i;
 
    //
    // Nx2 Contingency Table Statistics for Probability Forecast
@@ -3366,7 +3366,8 @@ void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
    //
    // Write THRESH_i for each probability threshold
    //
-   for(int i=0, col=c+17; i<=pct_info.pct.nrows(); i++) {
+   int col = c+17;
+   for(int i=0; i<=pct_info.pct.nrows(); i++) {
 
       at.set_entry(r, col, // THRESH
          pct_info.pct.threshold(i));
@@ -3500,7 +3501,7 @@ void write_prc_cols(const PCTInfo &pct_info,
 void write_eclv_cols(const TTContingencyTable &ct,
                      const NumArray &eclv_points,
                      AsciiTable &at, int r, int c) {
-   int i, col;
+   int i;
 
    //
    // Economic Cost/Loss Value
@@ -3523,7 +3524,8 @@ void write_eclv_cols(const TTContingencyTable &ct,
    //
    // Write CL_i and VALUE_i count for each bin
    //
-   for(int i=0, col=c+4; i<eclv_points.n_elements(); i++) {
+   int col = c+4;
+   for(int i=0; i<eclv_points.n_elements(); i++) {
 
       at.set_entry(r, col, // CL_i
          eclv_points[i]);
@@ -4463,7 +4465,7 @@ void write_rhist_cols(const PairDataEnsemble *pd_ptr,
    // Write RANK_i count for each bin
    //
    int col = c+2;
-   for(int i=0, col=c+2; i<pd_ptr->rhist_na.n_elements(); i++) {
+   for(int i=0; i<pd_ptr->rhist_na.n_elements(); i++) {
 
       at.set_entry(r, col, // RANK_i
          nint(pd_ptr->rhist_na[i]));
@@ -4496,7 +4498,7 @@ void write_phist_cols(const PairDataEnsemble *pd_ptr,
    // Write BIN_i count for each bin
    //
    int col = c+3;
-   for(int i=0, col=c+3; i<pd_ptr->phist_na.n_elements(); i++) {
+   for(int i=0; i<pd_ptr->phist_na.n_elements(); i++) {
 
       at.set_entry(r, col, // BIN_i
          nint(pd_ptr->phist_na[i]));
@@ -4774,7 +4776,7 @@ void write_relp_cols(const PairDataEnsemble *pd_ptr,
    // Write RELP_i count for each bin
    //
    int col = c+2;
-   for(int i=0, col=c+2; i<pd_ptr->relp_na.n_elements(); i++) {
+   for(int i=0; i<pd_ptr->relp_na.n_elements(); i++) {
 
       at.set_entry(r, col, // RELP_i
          pd_ptr->relp_na[i]);

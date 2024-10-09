@@ -3015,7 +3015,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.ens_pd.extend(cur.total);
             for(int i=0; i<cur.n_ens+1; i++) aggr.ens_pd.rhist_na.add(0);
             aggr.ens_pd.phist_bin_size = job.out_bin_size;
-            int n_bin = (int) ceil(1.0/aggr.ens_pd.phist_bin_size);
+            auto n_bin = (int) ceil(1.0/aggr.ens_pd.phist_bin_size);
             for(int i=0; i<n_bin; i++) aggr.ens_pd.phist_na.add(0);
             aggr.ens_pd.ssvar_bin_size = job.out_bin_size;
 
