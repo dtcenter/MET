@@ -722,7 +722,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Update the map entries for each requested statistic
          //
-	 int n_add = 0;
+         int n_add = 0;
          for(int i=0; i<req_col.n(); i++) {
 
             //
@@ -967,7 +967,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
          // Sort the valid times
          //
          int n_ties;
-	 int n = it->second.valid_ts.rank_array(n_ties);
+         int n = it->second.valid_ts.rank_array(n_ties);
 
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_ctc_lines() -> "
@@ -1162,7 +1162,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
          // Sort the valid times
          //
          int n_ties;
-	 int n = it->second.valid_ts.rank_array(n_ties);
+         int n = it->second.valid_ts.rank_array(n_ties);
 
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_mctc_lines() -> "
@@ -1318,7 +1318,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Sort the valid times
          //
-	 int n_ties;
+         int n_ties;
          int n = it->second.valid_ts.rank_array(n_ties);
 
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
@@ -1519,7 +1519,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
          // Sort the valid times
          //
          int n_ties;
-	 int n = it->second.valid_ts.rank_array(n_ties);
+         int n = it->second.valid_ts.rank_array(n_ties);
 
          if(n_ties > 0 || n != it->second.valid_ts.n()) {
             mlog << Error << "\naggr_psum_lines() -> "
@@ -3101,9 +3101,9 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
 
          // Store BIAS_RATIO terms
          int n_ge_obs;
-	 int n_lt_obs;
+         int n_lt_obs;
          double me_ge_obs;
-	 double me_lt_obs;
+         double me_lt_obs;
          compute_bias_ratio_terms(
             cur.obs, cur.ens_na,
             n_ge_obs, me_ge_obs,
@@ -3115,7 +3115,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
 
          // Compute observation error log scores
          double v_conv;
-	 double v_corr;
+         double v_corr;
          compute_obs_error_log_scores(
             cur.ens_mean, cur.spread, cur.obs, oerr_var,
             v_conv, v_corr);
