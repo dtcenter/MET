@@ -614,12 +614,12 @@ void parse_seeps_line(STATLine &l, SeepsAggScore &agg_score) {
 
    agg_score.n_obs = atoi(l.get_item("TOTAL"));
 
-   agg_score.s12 = atof(l.get_item("S12"));
-   agg_score.s13 = atof(l.get_item("S13"));
-   agg_score.s21 = atof(l.get_item("S21"));
-   agg_score.s23 = atof(l.get_item("S23"));
-   agg_score.s31 = atof(l.get_item("S31"));
-   agg_score.s32 = atof(l.get_item("S32"));
+   agg_score.s_odfl = atof(l.get_item("ODFL"));
+   agg_score.s_odfh = atof(l.get_item("ODFH"));
+   agg_score.s_olfd = atof(l.get_item("OLFD"));
+   agg_score.s_olfh = atof(l.get_item("OLFH"));
+   agg_score.s_ohfd = atof(l.get_item("OHFD"));
+   agg_score.s_ohfl = atof(l.get_item("OHFL"));
 
    agg_score.pf1 = atof(l.get_item("PF1"));
    agg_score.pf2 = atof(l.get_item("PF2"));
@@ -629,11 +629,12 @@ void parse_seeps_line(STATLine &l, SeepsAggScore &agg_score) {
    agg_score.pv2 = atof(l.get_item("PV2"));
    agg_score.pv3 = atof(l.get_item("PV3"));
 
-   agg_score.mean_fcst = atof(l.get_item("MEAN_FCST"));
-   agg_score.mean_obs  = atof(l.get_item("MEAN_OBS"));
-
-   agg_score.score          = atof(l.get_item("SEEPS"));
-   agg_score.weighted_score = agg_score.score;
+   agg_score.mean_fcst     = atof(l.get_item("MEAN_FCST"));
+   agg_score.mean_fcst_wgt = agg_score.mean_fcst;
+   agg_score.mean_obs      = atof(l.get_item("MEAN_OBS"));
+   agg_score.mean_obs_wgt  = agg_score.mean_fcst;
+   agg_score.score         = atof(l.get_item("SEEPS"));
+   agg_score.score_wgt     = agg_score.score;
 
    return;
 }
