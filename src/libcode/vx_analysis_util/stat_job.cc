@@ -1994,6 +1994,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case STATLineType::prc:    c = get_n_prc_columns(n);   break;
          case STATLineType::eclv:   c = get_n_eclv_columns(n);  break;
          case STATLineType::mpr:    c = n_mpr_columns;          break;
+         case STATLineType::seeps:  c = n_seeps_columns;        break;
          case STATLineType::nbrctc: c = n_nbrctc_columns;       break;
          case STATLineType::nbrcts: c = n_nbrcts_columns;       break;
          case STATLineType::nbrcnt: c = n_nbrcnt_columns;       break;
@@ -2065,6 +2066,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case STATLineType::prc:    write_prc_header_row   (1, n,                                    stat_at, 0, 0); break;
          case STATLineType::eclv:   write_eclv_header_row  (1, n,                                    stat_at, 0, 0); break;
          case STATLineType::mpr:    write_header_row       (mpr_columns, n_mpr_columns, 1,           stat_at, 0, 0); break;
+         case STATLineType::seeps:  write_header_row       (seeps_columns, n_seeps_columns, 1,       stat_at, 0, 0); break;
          case STATLineType::nbrctc: write_header_row       (nbrctc_columns, n_nbrctc_columns, 1,     stat_at, 0, 0); break;
          case STATLineType::nbrcts: write_header_row       (nbrcts_columns, n_nbrcts_columns, 1,     stat_at, 0, 0); break;
          case STATLineType::nbrcnt: write_header_row       (nbrcnt_columns, n_nbrcnt_columns, 1,     stat_at, 0, 0); break;
