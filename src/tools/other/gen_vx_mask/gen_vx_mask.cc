@@ -1368,7 +1368,6 @@ void write_netcdf(const DataPlane &dp) {
    int n, x, y;
    ConcatString cs;
 
-   float *mask_data = (float *)  nullptr;
    NcFile *f_out    = (NcFile *) nullptr;
    NcDim lat_dim;
    NcDim lon_dim;
@@ -1433,7 +1432,7 @@ void write_netcdf(const DataPlane &dp) {
    }
 
    // Allocate memory to store the mask values for each grid point
-   mask_data = new float [grid.nx()*grid.ny()];
+   vector<float> mask_data(grid.nx()*grid.ny());
 
    // Loop through each grid point
    for(x=0; x<grid.nx(); x++) {
@@ -1443,16 +1442,11 @@ void write_netcdf(const DataPlane &dp) {
       } // end for y
    } // end for x
 
-   if(!put_nc_data_with_dims(&mask_var, &mask_data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&mask_var, mask_data.data(), grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "error with mask_var->put\n\n";
-      // Delete allocated memory
-      if(mask_data) { delete[] mask_data; mask_data = (float *) nullptr; }
       exit(1);
    }
-
-   // Delete allocated memory
-   if(mask_data) { delete[] mask_data; mask_data = (float *) nullptr; }
 
    delete f_out;
    f_out = (NcFile *) nullptr;

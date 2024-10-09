@@ -2265,7 +2265,7 @@ void write_stat_data() {
    if(deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
    // Allocate memory to store data values for each grid point
-   float *data = new float [grid.nx()*grid.ny()];
+   vector<float> data(grid.nx()*grid.ny());
 
    // Write output for each stat_data map entry
    for(auto &key : stat_data_keys) {
@@ -2292,16 +2292,13 @@ void write_stat_data() {
       } // end for x
 
       // Write out the data
-      if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
+      if(!put_nc_data_with_dims(&nc_var, data.data(), grid.ny(), grid.nx())) {
          mlog << Error << "\nwrite_stat_data() -> "
               << R"(error writing ")" << key
               << R"(" data to the output file.)" << "\n\n";
          exit(1);
       }
    }
-
-   // Clean up
-   if(data) { delete [] data;  data = (float *) nullptr; }
 
    return;
 }

@@ -953,13 +953,6 @@ int get_tile_tot_count() {
 
 void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
                         ISCInfo *&isc_info, int i_vx, int i_tile) {
-   double *f_dat = (double *) nullptr; // Raw and thresholded binary fields
-   double *o_dat = (double *) nullptr; // Raw and thresholded binary fields
-   double *f_dwt = (double *) nullptr; // Discrete wavelet transformations
-   double *o_dwt = (double *) nullptr; // Discrete wavelet transformations
-   double *f_scl = (double *) nullptr; // Binary field decomposed by scale
-   double *o_scl = (double *) nullptr; // Binary field decomposed by scale
-   double *diff = (double *) nullptr;  // Difference field
    double mse, fen, oen, mad;
    int n, ns, n_isc;
    int bnd, row, col;
@@ -999,13 +992,13 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    }
 
    // Allocate space
-   f_dat = new double [n];
-   o_dat = new double [n];
-   f_dwt = new double [n];
-   o_dwt = new double [n];
-   f_scl = new double [n];
-   o_scl = new double [n];
-   diff  = new double [n];
+   vector<double> f_dat(n); // Raw and thresholded binary fields
+   vector<double> o_dat(n); // Raw and thresholded binary fields
+   vector<double> f_dwt(n); // Discrete wavelet transformations
+   vector<double> o_dwt(n); // Discrete wavelet transformations
+   vector<double> f_scl(n); // Binary field decomposed by scale
+   vector<double> o_scl(n); // Binary field decomposed by scale
+   vector<double> diff (n); // Difference field
 
    // Initialize f_dat and o_dat
    for(i=0; i<n; i++) {
@@ -1015,7 +1008,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
    // Write out the raw fields to NetCDF
    if( conf_info.nc_info.do_raw || conf_info.nc_info.do_diff ) {
-      write_nc_raw(conf_info.nc_info, f_dat, o_dat, n, i_vx, i_tile);
+      write_nc_raw(conf_info.nc_info, f_dat.data(), o_dat.data(), n, i_vx, i_tile);
    }
 
    // Apply each threshold
@@ -1057,41 +1050,42 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
       } // end for j
 
       // Compute the contingency table for the binary fields
-      compute_cts(f_dat, o_dat, n, isc_info[i]);
+      compute_cts(f_dat.data(), o_dat.data(), n, isc_info[i]);
 
       // Compute the MSE for the binary fields
-      compute_mse(f_dat, o_dat, n, isc_info[i].mse);
+      compute_mse(f_dat.data(), o_dat.data(), n, isc_info[i].mse);
 
       // Compute the energy for the binary fields
-      compute_energy(f_dat, n, isc_info[i].fen);
-      compute_energy(o_dat, n, isc_info[i].oen);
+      compute_energy(f_dat.data(), n, isc_info[i].fen);
+      compute_energy(o_dat.data(), n, isc_info[i].oen);
 
       // Compute the ISC for the binary fields
       isc_info[i].compute_isc(-1);
 
       // Write the thresholded binary fields to NetCDF
       if(conf_info.nc_info.do_raw || conf_info.nc_info.do_diff )  {
-         write_nc_wav(conf_info.nc_info, f_dat, o_dat, n, i_vx, i_tile, -1,
+         write_nc_wav(conf_info.nc_info, f_dat.data(), o_dat.data(),
+                      n, i_vx, i_tile, -1,
                       isc_info[i].fthresh,
                       isc_info[i].othresh);
       }
 
       // Write the thresholded binary difference field to PostScript
       if(!conf_info.nc_info.all_false()) {
-         plot_ps_wvlt(diff, mad, n, i_vx, i_tile, isc_info[i], -1, ns);
+         plot_ps_wvlt(diff.data(), mad, n, i_vx, i_tile, isc_info[i], -1, ns);
       }
 
       // Initialize the discrete wavelet transforms
-      memcpy(f_dwt, f_dat, n*sizeof(double));
-      memcpy(o_dwt, o_dat, n*sizeof(double));
+      memcpy(f_dwt.data(), f_dat.data(), n*sizeof(double));
+      memcpy(o_dwt.data(), o_dat.data(), n*sizeof(double));
 
       // Perform the discrete wavelet transforms
-      wavelet2d_transform_forward(conf_info.wvlt_ptr, f_dwt,
+      wavelet2d_transform_forward(conf_info.wvlt_ptr, f_dwt.data(),
                                   conf_info.get_tile_dim(),
                                   conf_info.get_tile_dim(),
                                   conf_info.get_tile_dim(),
                                   conf_info.wvlt_work_ptr);
-      wavelet2d_transform_forward(conf_info.wvlt_ptr, o_dwt,
+      wavelet2d_transform_forward(conf_info.wvlt_ptr, o_dwt.data(),
                                   conf_info.get_tile_dim(),
                                   conf_info.get_tile_dim(),
                                   conf_info.get_tile_dim(),
@@ -1123,24 +1117,24 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
          }
 
          // Compute the inverse discrete wavelet transforms
-         wavelet2d_transform_inverse(conf_info.wvlt_ptr, f_scl,
+         wavelet2d_transform_inverse(conf_info.wvlt_ptr, f_scl.data(),
                                      conf_info.get_tile_dim(),
                                      conf_info.get_tile_dim(),
                                      conf_info.get_tile_dim(),
                                      conf_info.wvlt_work_ptr);
-         wavelet2d_transform_inverse(conf_info.wvlt_ptr, o_scl,
+         wavelet2d_transform_inverse(conf_info.wvlt_ptr, o_scl.data(),
                                      conf_info.get_tile_dim(),
                                      conf_info.get_tile_dim(),
                                      conf_info.get_tile_dim(),
                                      conf_info.wvlt_work_ptr);
 
          // Compute the MSE for the decomposed fields
-         compute_mse(f_scl, o_scl, n, mse);
+         compute_mse(f_scl.data(), o_scl.data(), n, mse);
          isc_info[i].mse_scale[j] = mse;
 
          // Compute the energy for the decomposed fields
-         compute_energy(f_scl, n, fen);
-         compute_energy(o_scl, n, oen);
+         compute_energy(f_scl.data(), n, fen);
+         compute_energy(o_scl.data(), n, oen);
 
          isc_info[i].fen_scale[j] = fen;
          isc_info[i].oen_scale[j] = oen;
@@ -1151,7 +1145,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
          // Write the decomposed fields for this scale to NetCDF
          if(!conf_info.nc_info.all_false()) {
             write_nc_wav(conf_info.nc_info,
-                         f_scl, o_scl, n, i_vx, i_tile, j,
+                         f_scl.data(), o_scl.data(), n, i_vx, i_tile, j,
                          isc_info[i].fthresh,
                          isc_info[i].othresh);
          }
@@ -1161,7 +1155,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
          // Write the decomposed difference field for this scale to PostScript
          if(conf_info.ps_plot_flag) {
-            plot_ps_wvlt(diff, mad, n, i_vx, i_tile, isc_info[i], j, ns);
+            plot_ps_wvlt(diff.data(), mad, n, i_vx, i_tile, isc_info[i], j, ns);
          }
 
       } // end for j
@@ -1205,15 +1199,6 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
       mlog << Debug(3) << msg;
 
    } // end for i
-
-   // Deallocate memory
-   if(f_dat) { delete [] f_dat; f_dat = (double *) nullptr; }
-   if(o_dat) { delete [] o_dat; o_dat = (double *) nullptr; }
-   if(f_dwt) { delete [] f_dwt; f_dwt = (double *) nullptr; }
-   if(o_dwt) { delete [] o_dwt; o_dwt = (double *) nullptr; }
-   if(f_scl) { delete [] f_scl; f_scl = (double *) nullptr; }
-   if(o_scl) { delete [] o_scl; o_scl = (double *) nullptr; }
-   if(diff)  { delete [] diff;  diff  = (double *) nullptr; }
 
    return;
 }
