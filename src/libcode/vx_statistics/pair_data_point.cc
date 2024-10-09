@@ -223,8 +223,10 @@ void PairDataPoint::set_seeps_score(SeepsScore *seeps, int index) {
             }
          }
       }
-      else mlog << Warning << "\nPairDataPoint::set_seeps_score("
-                << index << ") is out of range " << seeps_count << "\n\n";
+      else {
+         mlog << Warning << "\nPairDataPoint::set_seeps_score("
+              << index << ") is out of range " << seeps_count << "\n\n";
+      }
    }
 
 }
@@ -317,14 +319,17 @@ SeepsScore *PairDataPoint::compute_seeps(const char *sid, double f,
    int month, day, year, hour, minute, second;
 
    int sid_no = atoi(sid);
-   if (sid_no && nullptr != seeps_climo) {
+   if (sid_no && seeps_climo) {
       unix_to_mdyhms(ut, month, day, year, hour, minute, second);
       seeps = seeps_climo->get_seeps_score(sid_no, f, o, month, hour);
-      if (mlog.verbosity_level() >= seeps_debug_level
-          && seeps && !is_eq(seeps->score, bad_data_double)
-          && !is_eq(seeps->score, 0) && seeps_record_count < 10) {
+      if (mlog.verbosity_level() >= seeps_debug_level &&
+          seeps &&
+          !is_bad_data(seeps->score) &&
+          !is_eq(seeps->score, 0) &&
+          seeps_record_count < 10) {
          mlog << Debug(seeps_debug_level)
-              << "PairDataPoint::compute_seeps() score = " << seeps->score << "\n";
+              << "PairDataPoint::compute_seeps() score = "
+              << seeps->score << "\n";
          seeps_record_count++;
       }
    }

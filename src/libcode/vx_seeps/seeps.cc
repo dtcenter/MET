@@ -50,7 +50,7 @@ double weighted_average(double, double, double, double);
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsClimo *get_seeps_climo(ConcatString seeps_point_climo_name) {
+SeepsClimo *get_seeps_climo(const ConcatString &seeps_point_climo_name) {
    if (! seeps_climo) seeps_climo = new SeepsClimo(seeps_point_climo_name);
    return seeps_climo;
 }
@@ -63,7 +63,7 @@ void release_seeps_climo() {
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsClimoGrid *get_seeps_climo_grid(int month, ConcatString seeps_grid_climo_name, int hour) {
+SeepsClimoGrid *get_seeps_climo_grid(int month, const ConcatString &seeps_grid_climo_name, int hour) {
 
    if (seeps_climo_grid_map_00.count(month) == 0) {
       seeps_climo_grid_map_00[month] = nullptr;
@@ -96,19 +96,25 @@ double weighted_average(double v1, double w1, double v2, double w2) {
 
 void SeepsAggScore::clear() {
 
+   // Syntax used to define SEEPS obs/fcast categories (s_* or c_*)
+   // o{d|l|h} : obs   in {dry(0)|light(1)|heavy(2)} category
+   // f{d|l|h} : fcsts in {dry(0)|light(1)|heavy(2)} category
+
    n_obs = 0;
-   c12 = c13 = c21 = c23 = c31 = c32 = 0;
-   s12 = s13 = s21 = s23 = s31 = s32 = 0.;
-   pv1 = pv2 = pv3 = 0.;
-   pf1 = pf2 = pf3 = 0.;
-   mean_fcst = mean_obs = bad_data_double;
-   weighted_score = score = bad_data_double;
+   c_odfl = c_odfh = c_olfd = c_olfh = c_ohfd = c_ohfl = 0;
+   s_odfl = s_odfh = s_olfd = s_olfh = s_ohfd = s_ohfl = 0.0;
+   pv1 = pv2 = pv3 = 0.0;
+   pf1 = pf2 = pf3 = 0.0;
+   mean_fcst = mean_fcst_wgt = bad_data_double;
+   mean_obs  = mean_obs_wgt  = bad_data_double;
+   score     = score_wgt     = bad_data_double;
 
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
+   const char *method_name = "SeepsAggScore::operator+=() -> ";
 
    // Check for degenerate case
    if(n_obs == 0 && c.n_obs == 0) return *this;
@@ -121,20 +127,23 @@ SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
    n_obs += c.n_obs;
 
    // Increment counts
-   c12 += c.c12;
-   c13 += c.c13;
-   c21 += c.c21;
-   c23 += c.c23;
-   c31 += c.c31;
-   c32 += c.c32;
-
+   c_odfl += c.c_odfl;
+   c_odfh += c.c_odfh;
+   c_olfd += c.c_olfd;
+   c_olfh += c.c_olfh;
+   c_ohfd += c.c_ohfd;
+   c_ohfl += c.c_ohfl;
+   
    // Compute weighted averages
-   s12 = weighted_average(s12, w1, c.s12, w2);
-   s13 = weighted_average(s13, w1, c.s13, w2);
-   s21 = weighted_average(s21, w1, c.s21, w2);
-   s23 = weighted_average(s23, w1, c.s23, w2);
-   s31 = weighted_average(s31, w1, c.s31, w2);
-   s32 = weighted_average(s32, w1, c.s32, w2);
+   s_odfl = weighted_average(s_odfl, w1, c.s_odfl, w2);
+   s_odfh = weighted_average(s_odfh, w1, c.s_odfh, w2);
+   s_olfd = weighted_average(s_olfd, w1, c.s_olfd, w2);
+   s_olfh = weighted_average(s_olfh, w1, c.s_olfh, w2);
+   s_ohfd = weighted_average(s_ohfd, w1, c.s_ohfd, w2);
+   s_ohfl = weighted_average(s_ohfl, w1, c.s_ohfl, w2);
+   mlog << Debug(9) << method_name
+        << "s_odfl, o_odfh => "
+        << s_odfl << " " << s_odfh << "\n";
 
    pv1 = weighted_average(pv1, w1, c.pv1, w2);
    pv2 = weighted_average(pv2, w1, c.pv2, w2);
@@ -144,18 +153,21 @@ SeepsAggScore & SeepsAggScore::operator+=(const SeepsAggScore &c) {
    pf2 = weighted_average(pf2, w1, c.pf2, w2);
    pf3 = weighted_average(pf3, w1, c.pf3, w2);
 
-   mean_fcst = weighted_average(mean_fcst, w1, c.mean_fcst, w2);
-   mean_obs  = weighted_average(mean_obs,  w1, c.mean_obs,  w2);
+   mean_fcst     = weighted_average(mean_fcst,     w1, c.mean_fcst,     w2);
+   mean_fcst_wgt = weighted_average(mean_fcst_wgt, w1, c.mean_fcst_wgt, w2);
 
-   score          = weighted_average(score,          w1, c.score,          w2);
-   weighted_score = weighted_average(weighted_score, w1, c.weighted_score, w2);
+   mean_obs     = weighted_average(mean_obs,     w1, c.mean_obs,     w2);
+   mean_obs_wgt = weighted_average(mean_obs_wgt, w1, c.mean_obs_wgt, w2);
+
+   score     = weighted_average(score,     w1, c.score,     w2);
+   score_wgt = weighted_average(score_wgt, w1, c.score_wgt, w2);
 
    return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsClimoBase::SeepsClimoBase(ConcatString seeps_climo_name) : climo_file_name{seeps_climo_name} {
+SeepsClimoBase::SeepsClimoBase(const ConcatString &seeps_climo_name) : climo_file_name{seeps_climo_name} {
 
    clear();
    seeps_ready = false;
@@ -192,7 +204,8 @@ ConcatString SeepsClimoBase::get_climo_filename() {
 
    seeps_ready = file_exists(seeps_filename.c_str());
    if (seeps_ready) {
-      mlog << Debug(7) << method_name << "SEEPS climo name=\""
+      mlog << Debug(7) << method_name
+           << "SEEPS climo name=\""
            << seeps_filename.c_str() << "\"\n";
    }
    else {
@@ -229,11 +242,11 @@ void SeepsClimoBase::set_p1_thresh(const SingleThresh &p1_thresh) {
 ////////////////////////////////////////////////////////////////////////
 
 
-SeepsClimo::SeepsClimo(ConcatString seeps_climo_name) : SeepsClimoBase{seeps_climo_name} {
+SeepsClimo::SeepsClimo(const ConcatString &seeps_climo_name) : SeepsClimoBase{seeps_climo_name} {
 
    clear();
    ConcatString seeps_name = get_climo_filename();
-   if (file_exists(seeps_name.c_str())) read_seeps_scores(seeps_name);
+   if (file_exists(seeps_name.c_str())) read_seeps_climo_grid(seeps_name);
 
 }
 
@@ -268,13 +281,17 @@ SeepsClimoRecord *SeepsClimo::create_climo_record(
       double *p1, double *p2, double *t1, double *t2, double *scores) {
    int offset;
    SeepsClimoRecord *record = new SeepsClimoRecord();
+   const char *method_name = "SeepsClimo::create_climo_record() -> ";
    
    record->sid = sid;
    record->lat = lat;
    record->lon = lon;
    record->elv = elv;
    if (standalone_debug_seeps && SAMPLE_STATION_ID == sid) {
-      cout << "   sid=" << sid << ", lat=" << lat << ", lon=" << lon << ", elv=" << elv << "\n";
+      cout << method_name
+           << "sid=" << sid << ", lat=" << lat
+           << ", lon=" << lon << ", elv=" << elv
+           << "\n";
    }
    for (int idx=0; idx<SEEPS_MONTH; idx++) {
       record->p1[idx] = p1[idx];
@@ -283,7 +300,8 @@ SeepsClimoRecord *SeepsClimo::create_climo_record(
       record->t2[idx] = t2[idx];
 
       if (standalone_debug_seeps && SAMPLE_STATION_ID == sid) {
-         cout << str_format("\t%2d: %6.3f %6.3f  %6.3f %6.3f   ",
+         cout << method_name
+              << str_format("\t%2d: %6.3f %6.3f  %6.3f %6.3f   ",
                             (idx+1), record->p1[idx], record->p2[idx],
                             record->t1[idx], record->t2[idx]);
       }
@@ -291,7 +309,8 @@ SeepsClimoRecord *SeepsClimo::create_climo_record(
          offset = idx*SEEPS_MATRIX_SIZE + idx_m;
          record->scores[idx][idx_m] = scores[offset];
          if (standalone_debug_seeps && SAMPLE_STATION_ID == sid) {
-            cout << str_format(" %.3f", record->scores[idx][idx_m]);
+            cout << method_name
+                 << str_format(" %.3f", record->scores[idx][idx_m]);
          }
       }
       if (standalone_debug_seeps && SAMPLE_STATION_ID == sid) cout << "\n";
@@ -330,14 +349,24 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
             record->p2 = climo_record->p2[month-1];
             record->t1 = climo_record->t1[month-1];
             record->t2 = climo_record->t2[month-1];
+            mlog << Debug(9) << method_name
+               << "record info: sid, lat, lon, month, p1, p2, t1, t2 => "
+               << record->sid << " " << record->lat << " "
+               << record->lon << " " << record->month << " "
+               << record->p1 << " " << record->p2 << " "
+               << record->t1 << " " << record->t2 << "\n";
             for (int idx=0; idx<SEEPS_MATRIX_SIZE; idx++) {
-               record->scores[idx] = climo_record->scores[month-1][idx];
+                record->scores[idx] = climo_record->scores[month-1][idx];
+                mlog << Debug(7) << method_name
+                     << "record info (SEEPS matrix): score => "
+                     << record->scores[idx] << "\n";
             }
          }
          else if (!is_eq(p1, bad_data_double)) {
             increase_filtered_count();
-            mlog << Debug(7) << method_name << " filtered by threshold p1="
-                 << climo_record->p1[month-1] <<"\n";
+            mlog << Debug(7) << method_name
+                 << "filtered by threshold p1="
+                 << climo_record->p1[month-1] << "\n";
          }
       }
    }
@@ -349,16 +378,21 @@ SeepsRecord *SeepsClimo::get_record(int sid, int month, int hour) {
            << "or disable output for SEEPS and SEEPS_MPR.\n\n";
       exit(1);
    }
+   mlog << Debug(9) << method_name
+        << "sid = " << sid
+        << ", month = " << month << ", hour = " << hour
+        << ", filtered_count = " << get_filtered_count() << "\n";
 
    return record;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-double SeepsClimo::get_score(int sid, double p_fcst, double p_obs,
-                             int month, int hour) {
+double SeepsClimo::get_seeps_category(int sid, double p_fcst, double p_obs,
+                                      int month, int hour) {
    double score = bad_data_double;
    SeepsRecord *record = get_record(sid, month, hour);
+   const char *method_name = "SeepsClimo::get_seeps_category() -> ";
 
    if (nullptr != record) {
       // Determine location in contingency table
@@ -366,6 +400,10 @@ double SeepsClimo::get_score(int sid, double p_fcst, double p_obs,
       int jc = (p_fcst>record->t1)+(p_fcst>record->t2);
 
       score = record->scores[(jc*3)+ic];
+      mlog << Debug(9) << method_name
+           << "ic, jc, score => "
+           << ic << " " << jc << " "
+           << score << "\n";
       delete record;
    }
 
@@ -378,6 +416,7 @@ SeepsScore *SeepsClimo::get_seeps_score(int sid, double p_fcst, double p_obs,
                                         int month, int hour) {
    SeepsScore *score = nullptr;
    SeepsRecord *record = get_record(sid, month, hour);
+   const char *method_name = "SeepsClimo::get_seeps_score() -> ";
 
    if (nullptr != record) {
       score = new SeepsScore();
@@ -385,17 +424,26 @@ SeepsScore *SeepsClimo::get_seeps_score(int sid, double p_fcst, double p_obs,
       score->p2 = record->p2;
       score->t1 = record->t1;
       score->t2 = record->t2;
-
+      mlog << Debug(9) << method_name
+           << "p1, p2, t1, t2 => "
+           << score->p1 << " " << score->p2 << " "
+           << score->t1 << " " << score->t2
+           << "\n";
+      
       score->obs_cat = (p_obs>record->t1)+(p_obs>record->t2);
       score->fcst_cat = (p_fcst>record->t1)+(p_fcst>record->t2);
       score->s_idx = (score->fcst_cat*3)+score->obs_cat;
       score->score = record->scores[score->s_idx];
+      mlog << Debug(9) << method_name
+           << "obs_cat, fc_cat, s_idx, score => "
+           << score->obs_cat << " " << score->fcst_cat
+           << " " << score->s_idx << " " << score->score
+           << "\n";
       delete record;
    }
 
    return score;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -457,9 +505,9 @@ void SeepsClimo::print_record(SeepsRecord *record, bool with_header) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void SeepsClimo::read_seeps_scores(ConcatString filename) {
+void SeepsClimo::read_seeps_climo_grid(const ConcatString &filename) {
    clock_t clock_time = clock();
-   const char *method_name = "SeepsClimo::read_records() -> ";
+   const char *method_name = "SeepsClimo::read_seeps_climo_grid() -> ";
 
    try {
       double p1_00_buf[SEEPS_MONTH];
@@ -478,23 +526,27 @@ void SeepsClimo::read_seeps_scores(ConcatString filename) {
 
       // dimensions: month = 12 ; nstn = 5293 ; nmatrix = 9 ;
       get_dim(nc_file, dim_name_nstn, nstn, true);
-      mlog << Debug(6) << method_name << "dimensions nstn = " << nstn << "\n";
-      if (standalone_debug_seeps) cout << "dimensions nstn = " << nstn << "\n";
+      mlog << Debug(6) << method_name
+           << "dimensions nstn = " << nstn << "\n";
+      if (standalone_debug_seeps) {
+         cout << method_name
+              << "dimensions nstn = " << nstn << "\n";
+      }
 
-      int    *sid_array = new int[nstn];
-      double *lat_array = new double[nstn];
-      double *lon_array = new double[nstn];
-      double *elv_array = new double[nstn];
-      double *p1_00_array = new double[nstn*SEEPS_MONTH];
-      double *p2_00_array = new double[nstn*SEEPS_MONTH];
-      double *t1_00_array = new double[nstn*SEEPS_MONTH];
-      double *t2_00_array = new double[nstn*SEEPS_MONTH];
-      double *p1_12_array = new double[nstn*SEEPS_MONTH];
-      double *p2_12_array = new double[nstn*SEEPS_MONTH];
-      double *t1_12_array = new double[nstn*SEEPS_MONTH];
-      double *t2_12_array = new double[nstn*SEEPS_MONTH];
-      double *matrix_00_array = new double[nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE];
-      double *matrix_12_array = new double[nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE];
+      vector<int>    sid_array(nstn);
+      vector<double> lat_array(nstn);
+      vector<double> lon_array(nstn);
+      vector<double> elv_array(nstn);
+      vector<double> p1_00_array(nstn*SEEPS_MONTH);
+      vector<double> p2_00_array(nstn*SEEPS_MONTH);
+      vector<double> t1_00_array(nstn*SEEPS_MONTH);
+      vector<double> t2_00_array(nstn*SEEPS_MONTH);
+      vector<double> p1_12_array(nstn*SEEPS_MONTH);
+      vector<double> p2_12_array(nstn*SEEPS_MONTH);
+      vector<double> t1_12_array(nstn*SEEPS_MONTH);
+      vector<double> t2_12_array(nstn*SEEPS_MONTH);
+      vector<double> matrix_00_array(nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE);
+      vector<double> matrix_12_array(nstn*SEEPS_MONTH*SEEPS_MATRIX_SIZE);
 
       NcVar var_sid       = get_nc_var(nc_file, var_name_sid);
       NcVar var_lat       = get_nc_var(nc_file, var_name_lat);
@@ -511,72 +563,72 @@ void SeepsClimo::read_seeps_scores(ConcatString filename) {
       NcVar var_matrix_00 = get_nc_var(nc_file, var_name_matrix_00);
       NcVar var_matrix_12 = get_nc_var(nc_file, var_name_matrix_12);
 
-      if (IS_INVALID_NC(var_sid) || !get_nc_data(&var_sid, sid_array)) {
+      if (IS_INVALID_NC(var_sid) || !get_nc_data(&var_sid, sid_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get sid\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_lat) || !get_nc_data(&var_lat, lat_array)) {
+      if (IS_INVALID_NC(var_lat) || !get_nc_data(&var_lat, lat_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get lat\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_lon) || !get_nc_data(&var_lon, lon_array)) {
+      if (IS_INVALID_NC(var_lon) || !get_nc_data(&var_lon, lon_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get lon\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_elv) || !get_nc_data(&var_elv, elv_array)) {
+      if (IS_INVALID_NC(var_elv) || !get_nc_data(&var_elv, elv_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get elv\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_00_array)) {
+      if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_00_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get p1_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_p2_00) || !get_nc_data(&var_p2_00, p2_00_array)) {
+      if (IS_INVALID_NC(var_p2_00) || !get_nc_data(&var_p2_00, p2_00_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get p2_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_t1_00) || !get_nc_data(&var_t1_00, t1_00_array)) {
+      if (IS_INVALID_NC(var_t1_00) || !get_nc_data(&var_t1_00, t1_00_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get t1_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_t2_00) || !get_nc_data(&var_t2_00, t2_00_array)) {
+      if (IS_INVALID_NC(var_t2_00) || !get_nc_data(&var_t2_00, t2_00_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get t2_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_p1_12) || !get_nc_data(&var_p1_12, p1_12_array)) {
+      if (IS_INVALID_NC(var_p1_12) || !get_nc_data(&var_p1_12, p1_12_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get p1_12\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_p2_12) || !get_nc_data(&var_p2_12, p2_12_array)) {
+      if (IS_INVALID_NC(var_p2_12) || !get_nc_data(&var_p2_12, p2_12_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get p2_12\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_t1_12) || !get_nc_data(&var_t1_12, t1_12_array)) {
+      if (IS_INVALID_NC(var_t1_12) || !get_nc_data(&var_t1_12, t1_12_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get t1_12\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_t2_12) || !get_nc_data(&var_t2_12, t2_12_array)) {
+      if (IS_INVALID_NC(var_t2_12) || !get_nc_data(&var_t2_12, t2_12_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get t2_12\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_matrix_00) || !get_nc_data(&var_matrix_00, matrix_00_array)) {
+      if (IS_INVALID_NC(var_matrix_00) || !get_nc_data(&var_matrix_00, matrix_00_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get matrix_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_matrix_12) || !get_nc_data(&var_matrix_12, matrix_12_array)) {
+      if (IS_INVALID_NC(var_matrix_12) || !get_nc_data(&var_matrix_12, matrix_12_array.data())) {
          mlog << Error << "\n" << method_name
               << "Did not get matrix_12\n\n";
          exit(1);
@@ -611,26 +663,15 @@ void SeepsClimo::read_seeps_scores(ConcatString filename) {
          seeps_score_12_map[sid] = rec_12;
       }
 
-      if (sid_array) delete [] sid_array;
-      if (lat_array) delete [] lat_array;
-      if (lon_array) delete [] lon_array;
-      if (elv_array) delete [] elv_array;
-      if (p1_00_array) delete [] p1_00_array;
-      if (p2_00_array) delete [] p2_00_array;
-      if (t1_00_array) delete [] t1_00_array;
-      if (t2_00_array) delete [] t2_00_array;
-      if (p1_12_array) delete [] p1_12_array;
-      if (p2_12_array) delete [] p2_12_array;
-      if (t1_12_array) delete [] t1_12_array;
-      if (t2_12_array) delete [] t2_12_array;
-      if (matrix_00_array) delete [] matrix_00_array;
-      if (matrix_12_array) delete [] matrix_12_array;
-
       nc_file->close();
 
       float duration = (float)(clock() - clock_time)/CLOCKS_PER_SEC;
-      mlog << Debug(6) << method_name << "took " << duration << " seconds\n";
-      if (standalone_debug_seeps) cout << method_name << "took " << duration  << " seconds\n";
+      mlog << Debug(6) << method_name
+           << "took " << duration << " seconds\n";
+      if (standalone_debug_seeps) {
+         cout << method_name
+              << "took " << duration  << " seconds\n";
+      }
    }
    catch(int i_err) {
 
@@ -645,12 +686,13 @@ void SeepsClimo::read_seeps_scores(ConcatString filename) {
 
 ////////////////////////////////////////////////////////////////////////
 
-SeepsClimoGrid::SeepsClimoGrid(int month, int hour, ConcatString seeps_climo_name)
+SeepsClimoGrid::SeepsClimoGrid(int month, int hour, const ConcatString &seeps_climo_name)
    : month{month}, hour{hour}, SeepsClimoBase{seeps_climo_name}
 {
-   init_from_scratch();
+   clear();
+
    ConcatString seeps_name = get_climo_filename();
-   if (file_exists(seeps_name.c_str())) read_seeps_scores(seeps_name);
+   if (file_exists(seeps_name.c_str())) read_seeps_climo_grid(seeps_name);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -662,25 +704,25 @@ SeepsClimoGrid::~SeepsClimoGrid() {
 ////////////////////////////////////////////////////////////////////////
 
 void SeepsClimoGrid::init_from_scratch() {
-   p1_buf = p2_buf = t1_buf = t2_buf = nullptr;
-   s12_buf = s13_buf = s21_buf = s23_buf = s31_buf = s32_buf = nullptr;
    clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void SeepsClimoGrid::clear() {
+
    SeepsClimoBase::clear();
-   if (nullptr != p1_buf) { delete [] p1_buf; p1_buf = nullptr; }
-   if (nullptr != p2_buf) { delete [] p2_buf; p2_buf = nullptr; }
-   if (nullptr != t1_buf) { delete [] t1_buf; t1_buf = nullptr; }
-   if (nullptr != t2_buf) { delete [] t2_buf; t2_buf = nullptr; }
-   if (nullptr != s12_buf) { delete [] s12_buf; s12_buf = nullptr; }
-   if (nullptr != s13_buf) { delete [] s13_buf; s13_buf = nullptr; }
-   if (nullptr != s21_buf) { delete [] s21_buf; s21_buf = nullptr; }
-   if (nullptr != s23_buf) { delete [] s23_buf; s23_buf = nullptr; }
-   if (nullptr != s31_buf) { delete [] s31_buf; s31_buf = nullptr; }
-   if (nullptr != s32_buf) { delete [] s32_buf; s32_buf = nullptr; }
+
+   p1_buf.clear();
+   p2_buf.clear();
+   t1_buf.clear();
+   t2_buf.clear();
+   s_odfl_buf.clear();
+   s_odfh_buf.clear();
+   s_olfd_buf.clear();
+   s_olfh_buf.clear();
+   s_ohfd_buf.clear();
+   s_ohfl_buf.clear();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -689,6 +731,7 @@ SeepsScore *SeepsClimoGrid::get_record(int ix, int iy,
                                        double p_fcst, double p_obs) {
    SeepsScore *seeps_record = nullptr;
    const char *method_name = "SeepsClimoGrid::get_record() -> ";
+
    if (!is_eq(p_fcst, -9999.0) && !is_eq(p_obs, -9999.0)) {
       int offset = iy * nx + ix;
       double p1 = p1_buf[offset];
@@ -697,7 +740,7 @@ SeepsScore *SeepsClimoGrid::get_record(int ix, int iy,
          // Determine location in contingency table
          int ic = (p_obs>t1_buf[offset])+(p_obs>t2_buf[offset]);
          int jc = (p_fcst>t1_buf[offset])+(p_fcst>t2_buf[offset]);
-         double score = get_score(offset, ic, jc);
+         double score = get_seeps_score(offset, ic, jc);
 
          seeps_record = new SeepsScore();
          seeps_record->obs_cat = ic;
@@ -711,7 +754,9 @@ SeepsScore *SeepsClimoGrid::get_record(int ix, int iy,
       }
       else if (~is_eq(p1, bad_data_double)) {
          increase_filtered_count();
-         mlog << Debug(7) << method_name << " filtered by threshold p1=" << p1_buf[offset] <<"\n";
+         mlog << Debug(7) << method_name
+              << " filtered by threshold p1="
+              << p1_buf[offset] << "\n";
       }
    }
 
@@ -720,55 +765,46 @@ SeepsScore *SeepsClimoGrid::get_record(int ix, int iy,
 
 ////////////////////////////////////////////////////////////////////////
 
-double SeepsClimoGrid::get_score(int offset, int obs_cat, int fcst_cat) {
+double SeepsClimoGrid::get_seeps_score(int offset, int obs_cat, int fcst_cat) {
    double score = bad_data_double;
+   const char *method_name = "SeepsClimoGrid::get_seeps_score() -> ";
 
-   if (offset >= (nx * ny)) {
-      mlog << Error << "\nSeepsClimoGrid::get_score() --> offset (" << offset
-           << " is too big (" << (nx*ny) << ")\n";
+   if (offset < 0 || offset >= (nx * ny)) {
+      mlog << Error << method_name
+           << "offset (" << offset << ") is too big ("
+           << (nx*ny) << ")\n";
       return score;
    }
 
+   // Place climate score depending on obs and forecast categories
    if (obs_cat == 0) {
-      if (fcst_cat == 1) score = s12_buf[offset];
-      else if (fcst_cat == 2) score = s13_buf[offset];
+      if (fcst_cat == 1) score = s_odfl_buf[offset];
+      else if (fcst_cat == 2) score = s_odfh_buf[offset];
       else score = 0.;
    }
    else if (obs_cat == 1) {
-      if (fcst_cat == 0) score = s21_buf[offset];
-      else if (fcst_cat == 2) score = s23_buf[offset];
+      if (fcst_cat == 0) score = s_olfd_buf[offset];
+      else if (fcst_cat == 2) score = s_olfh_buf[offset];
       else score = 0.;
    }
    else {
-      if (fcst_cat == 0) score = s31_buf[offset];
-      else if (fcst_cat == 1) score = s32_buf[offset];
+      if (fcst_cat == 0) score = s_ohfd_buf[offset];
+      else if (fcst_cat == 1) score = s_ohfl_buf[offset];
       else score = 0.;
    }
+   mlog << Debug(9) << method_name
+        << "obs_cat = " << obs_cat
+        << ", fcst_cat = " << fcst_cat
+        << ", score = " << score << "\n";
 
    return score;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-double SeepsClimoGrid::get_score(int ix, int iy, double p_fcst, double p_obs) {
-   double score = bad_data_double;
-
-   if (!is_eq(p_fcst, -9999.0) && !is_eq(p_obs, -9999.0)) {
-      int offset = iy * nx + ix;
-      // Determine location in contingency table
-      int ic = (p_obs>t1_buf[offset])+(p_obs>t2_buf[offset]);
-      int jc = (p_fcst>t1_buf[offset])+(p_fcst>t2_buf[offset]);
-      score = get_score(offset, ic, jc);
-   }
-
-   return score;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void SeepsClimoGrid::read_seeps_scores(ConcatString filename) {
+void SeepsClimoGrid::read_seeps_climo_grid(const ConcatString &filename) {
    clock_t clock_time = clock();
-   const char *method_name = "SeepsClimoGrid::read_seeps_scores() -> ";
+   const char *method_name = "SeepsClimoGrid::read_seeps_climo_grid() -> ";
 
    try {
       NcFile *nc_file = open_ncfile(filename.c_str());
@@ -777,26 +813,33 @@ void SeepsClimoGrid::read_seeps_scores(ConcatString filename) {
       if (!has_dim(nc_file, dim_name_lat) || !has_dim(nc_file, dim_name_lon)) {
          mlog << Error << "\n" << method_name
               << "\"" << filename << "\" is not valid SEEPS climo file\n\n";
-         //exit(1);
+         exit(1);
       }
 
       get_dim(nc_file, dim_name_lat, ny, true);
       get_dim(nc_file, dim_name_lon, nx, true);
-      mlog << Debug(6) << method_name << "dimensions lon = " << nx << " lat = " << ny
+      mlog << Debug(6) << method_name
+           << "dimensions lon = " << nx << " lat = " << ny
            << " month=" << month << "\n";
-      if (standalone_debug_seeps) cout << "dimensions lon = " << nx << " lat = " << ny
-                                       << " month=" << month << "\n";;
+      if (standalone_debug_seeps) {
+         cout << method_name
+              << "dimensions lon = " << nx << " lat = " << ny
+              << " month=" << month << "\n";
+      }
 
-      p1_buf = new double[nx*ny];
-      p2_buf = new double[nx*ny];
-      t1_buf = new double[nx*ny];
-      t2_buf = new double[nx*ny];
-      s12_buf = new double[nx*ny];
-      s13_buf = new double[nx*ny];
-      s21_buf = new double[nx*ny];
-      s23_buf = new double[nx*ny];
-      s31_buf = new double[nx*ny];
-      s32_buf = new double[nx*ny];
+      // Variables in climo file named as s_odfl, s_odfh etc. These then stored
+      // into new convention s_odfl, s_odfh etc.
+
+      p1_buf.resize(nx*ny);
+      p2_buf.resize(nx*ny);
+      t1_buf.resize(nx*ny);
+      t2_buf.resize(nx*ny);
+      s_odfl_buf.resize(nx*ny);
+      s_odfh_buf.resize(nx*ny);
+      s_olfd_buf.resize(nx*ny);
+      s_olfh_buf.resize(nx*ny);
+      s_ohfd_buf.resize(nx*ny);
+      s_ohfl_buf.resize(nx*ny);
 
       LongArray curs;   // = { month-1, 0, 0 };
       LongArray dims;   // = { 1, ny, nx };
@@ -804,12 +847,12 @@ void SeepsClimoGrid::read_seeps_scores(ConcatString filename) {
       NcVar var_p2_00  = get_nc_var(nc_file, var_name_p2_00);
       NcVar var_t1_00  = get_nc_var(nc_file, var_name_t1_00);
       NcVar var_t2_00  = get_nc_var(nc_file, var_name_t2_00);
-      NcVar var_s12_00 = get_nc_var(nc_file, var_name_s12_00);
-      NcVar var_s13_00 = get_nc_var(nc_file, var_name_s13_00);
-      NcVar var_s21_00 = get_nc_var(nc_file, var_name_s21_00);
-      NcVar var_s23_00 = get_nc_var(nc_file, var_name_s23_00);
-      NcVar var_s31_00 = get_nc_var(nc_file, var_name_s31_00);
-      NcVar var_s32_00 = get_nc_var(nc_file, var_name_s32_00);
+      NcVar var_odfl_00 = get_nc_var(nc_file, var_name_odfl_00);
+      NcVar var_odfh_00 = get_nc_var(nc_file, var_name_odfh_00);
+      NcVar var_olfd_00 = get_nc_var(nc_file, var_name_olfd_00);
+      NcVar var_olfh_00 = get_nc_var(nc_file, var_name_olfh_00);
+      NcVar var_ohfd_00 = get_nc_var(nc_file, var_name_ohfd_00);
+      NcVar var_ohfl_00 = get_nc_var(nc_file, var_name_ohfl_00);
 
       curs.add(month-1);
       curs.add(0);
@@ -818,72 +861,85 @@ void SeepsClimoGrid::read_seeps_scores(ConcatString filename) {
       dims.add(ny);
       dims.add(nx);
 
-      if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_buf, dims, curs)) {
+      mlog << Debug(9) << method_name
+           << "var_odfl_00 = " << &var_odfl_00 << "\n";
+
+      if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
               << "Did not get p1_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_p2_00) || !get_nc_data(&var_p2_00, p2_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_p2_00) || !get_nc_data(&var_p2_00, p2_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
               << "Did not get p2_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_t1_00) || !get_nc_data(&var_t1_00, t1_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_t1_00) || !get_nc_data(&var_t1_00, t1_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
               << "Did not get t1_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_t2_00) || !get_nc_data(&var_t2_00, t2_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_t2_00) || !get_nc_data(&var_t2_00, t2_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
               << "Did not get t2_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_s12_00) || !get_nc_data(&var_s12_00, s12_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_odfl_00) || !get_nc_data(&var_odfl_00, s_odfl_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
-              << "Did not get s12_00\n\n";
+              << "Did not get odfl_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_s13_00) || !get_nc_data(&var_s12_00, s13_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_odfh_00) || !get_nc_data(&var_odfh_00, s_odfh_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
-              << "Did not get s13_00\n\n";
+              << "Did not get odfh_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_s21_00) || !get_nc_data(&var_s21_00, s21_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_olfd_00) || !get_nc_data(&var_olfd_00, s_olfd_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
-              << "Did not get s21_00\n\n";
+              << "Did not get olfd_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_s23_00) || !get_nc_data(&var_s23_00, s23_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_olfh_00) || !get_nc_data(&var_olfh_00, s_olfh_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
-              << "Did not get s23_00\n\n";
+              << "Did not get olfh_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_s31_00) || !get_nc_data(&var_s31_00, s31_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_ohfd_00) || !get_nc_data(&var_ohfd_00, s_ohfd_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
-              << "Did not get s31_00\n\n";
+              << "Did not get ohfd_00\n\n";
          exit(1);
       }
-      if (IS_INVALID_NC(var_s32_00) || !get_nc_data(&var_s32_00, s32_buf, dims, curs)) {
+      if (IS_INVALID_NC(var_ohfl_00) || !get_nc_data(&var_ohfl_00, s_ohfl_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name
-              << "Did not get s32_00\n\n";
+              << "Did not get ohfl_00\n\n";
          exit(1);
       }
       nc_file->close();
 
+      for(int i = 0; i < ny+3; i++) {
+        mlog << Debug(9) << method_name
+             << "s_odfl_buf[" << i << "] = " << s_odfl_buf[i] << "\n";
+      }
+
       float duration = (float)(clock() - clock_time)/CLOCKS_PER_SEC;
-      mlog << Debug(6) << method_name << "took " << duration << " seconds\n";
-      if (standalone_debug_seeps) cout << method_name << "took " << duration  << " seconds\n";
+      mlog << Debug(6) << method_name
+           << "took " << duration << " seconds\n";
+      if (standalone_debug_seeps) {
+         cout << method_name
+              << "took " << duration  << " seconds\n";
+      }
    }
    catch(...) {
 
       set_seeps_ready(false);
       mlog << Error << "\n" << method_name
            << "encountered an error on reading " << filename << ".\n\n";
-
       exit(-1);
+
    } // end catch block
 
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -896,36 +952,25 @@ void SeepsClimoGrid::print_all() {
       cout << method_name << " p2_buf[" << offset << "] = " <<  p2_buf[offset]  << "\n";
       cout << method_name << " t1_buf[" << offset << "] = " <<  t1_buf[offset]  << "\n";
       cout << method_name << " t2_buf[" << offset << "] = " <<  t2_buf[offset]  << "\n";
-      cout << method_name << "s12_buf[" << offset << "] = " << s12_buf[offset]  << "\n";
-      cout << method_name << "s13_buf[" << offset << "] = " << s13_buf[offset]  << "\n";
-      cout << method_name << "s21_buf[" << offset << "] = " << s21_buf[offset]  << "\n";
-      cout << method_name << "s23_buf[" << offset << "] = " << s23_buf[offset]  << "\n";
-      cout << method_name << "s31_buf[" << offset << "] = " << s31_buf[offset]  << "\n";
-      cout << method_name << "s32_buf[" << offset << "] = " << s32_buf[offset]  << "\n";
-
-      offset = 400;
-      cout << method_name << " p1_buf[" << offset << "] = " <<  p1_buf[offset]  << "\n";
-      cout << method_name << " p2_buf[" << offset << "] = " <<  p2_buf[offset]  << "\n";
-      cout << method_name << " t1_buf[" << offset << "] = " <<  t1_buf[offset]  << "\n";
-      cout << method_name << " t2_buf[" << offset << "] = " <<  t2_buf[offset]  << "\n";
-      cout << method_name << "s12_buf[" << offset << "] = " << s12_buf[offset]  << "\n";
-      cout << method_name << "s13_buf[" << offset << "] = " << s13_buf[offset]  << "\n";
-      cout << method_name << "s21_buf[" << offset << "] = " << s21_buf[offset]  << "\n";
-      cout << method_name << "s23_buf[" << offset << "] = " << s23_buf[offset]  << "\n";
-      cout << method_name << "s31_buf[" << offset << "] = " << s31_buf[offset]  << "\n";
-      cout << method_name << "s32_buf[" << offset << "] = " << s32_buf[offset]  << "\n";
-
+      cout << method_name << "s_odfl_buf[" << offset << "] = " << s_odfl_buf[offset]  << "\n";
+      cout << method_name << "s_odfh_buf[" << offset << "] = " << s_odfh_buf[offset]  << "\n";
+      cout << method_name << "s_olfd_buf[" << offset << "] = " << s_olfd_buf[offset]  << "\n";
+      cout << method_name << "s_olfh_buf[" << offset << "] = " << s_olfh_buf[offset]  << "\n";
+      cout << method_name << "s_ohfd_buf[" << offset << "] = " << s_ohfd_buf[offset]  << "\n";
+      cout << method_name << "s_ohfl_buf[" << offset << "] = " << s_ohfl_buf[offset]  << "\n";
+      
       offset = (nx*ny) - 1;
       cout << method_name << " p1_buf[" << offset << "] = " <<  p1_buf[offset]  << "\n";
       cout << method_name << " p2_buf[" << offset << "] = " <<  p2_buf[offset]  << "\n";
       cout << method_name << " t1_buf[" << offset << "] = " <<  t1_buf[offset]  << "\n";
       cout << method_name << " t2_buf[" << offset << "] = " <<  t2_buf[offset]  << "\n";
-      cout << method_name << "s12_buf[" << offset << "] = " << s12_buf[offset]  << "\n";
-      cout << method_name << "s13_buf[" << offset << "] = " << s13_buf[offset]  << "\n";
-      cout << method_name << "s21_buf[" << offset << "] = " << s21_buf[offset]  << "\n";
-      cout << method_name << "s23_buf[" << offset << "] = " << s23_buf[offset]  << "\n";
-      cout << method_name << "s31_buf[" << offset << "] = " << s31_buf[offset]  << "\n";
-      cout << method_name << "s32_buf[" << offset << "] = " << s32_buf[offset]  << "\n";
+      cout << method_name << "s_odfl_buf[" << offset << "] = " << s_odfl_buf[offset]  << "\n";
+      cout << method_name << "s_odfh_buf[" << offset << "] = " << s_odfh_buf[offset]  << "\n";
+      cout << method_name << "s_olfd_buf[" << offset << "] = " << s_olfd_buf[offset]  << "\n";
+      cout << method_name << "s_olfh_buf[" << offset << "] = " << s_olfh_buf[offset]  << "\n";
+      cout << method_name << "s_ohfd_buf[" << offset << "] = " << s_ohfd_buf[offset]  << "\n";
+      cout << method_name << "s_ohfl_buf[" << offset << "] = " << s_ohfl_buf[offset]  << "\n";
+     
    }
 }
 
