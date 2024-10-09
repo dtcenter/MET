@@ -2284,9 +2284,10 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
 GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
    GridWeightType t = GridWeightType::None;
    int v;
+   const char *method_name = "parse_conf_grid_weight_flag() -> ";
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_grid_weight_flag() -> "
+      mlog << Error << "\n" << method_name
            << "empty dictionary!\n\n";
       exit(1);
    }
@@ -2299,9 +2300,38 @@ GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
    else if(v == conf_const.lookup_int(conf_val_cos_lat)) t = GridWeightType::Cos_Lat;
    else if(v == conf_const.lookup_int(conf_val_area))    t = GridWeightType::Area;
    else {
-      mlog << Error << "\nparse_conf_grid_weight_flag() -> "
+      mlog << Error << "\n" << method_name
            << "Unexpected config file value of " << v << " for \""
            << conf_key_grid_weight_flag << "\".\n\n";
+      exit(1);
+   }
+
+   return t;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PointWeightType parse_conf_point_weight_flag(Dictionary *dict) {
+   PointWeightType t = PointWeightType::None;
+   int v;
+   const char *method_name = "parse_conf_point_weight_flag() -> ";
+
+   if(!dict) {
+      mlog << Error << "\n" << method_name
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Get the integer flag value for the current entry
+   v = dict->lookup_int(conf_key_point_weight_flag);
+
+   // Convert integer to enumerated GridWeightType
+        if(v == conf_const.lookup_int(conf_val_none)) t = PointWeightType::None;
+   else if(v == conf_const.lookup_int(conf_val_sid))  t = PointWeightType::SID;
+   else {
+      mlog << Error << "\n" << method_name
+           << "Unexpected config file value of " << v << " for \""
+           << conf_key_point_weight_flag << "\".\n\n";
       exit(1);
    }
 

@@ -137,6 +137,10 @@ NONE           = 1;
 COS_LAT        = 2;
 AREA           = 3;
 
+// Point weight flag settings
+NONE           = 1;
+SID            = 2;
+
 // Duplicate flag settings
 NONE           = 1;
 UNIQUE         = 2;
