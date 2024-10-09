@@ -80,6 +80,8 @@ The Stable Equitable Error in Probability Space (SEEPS) was devised for monitori
 
 The capability to calculate the SEEPS has also been added to Grid-Stat. This follows the method described in :ref:`North et al, 2022 <North-2022>`, which uses the TRMM 3B42 v7 gridded satellite product for the climatological values and interpolates the forecast and observed products onto this grid for evaluation. A 24-hour TRMM climatology (valid at 00 UTC) constructed from data over the time period 1998-2015 is supplied with the release. Expansion of the capability to other fields will occur as well vetted examples and funding allow.
 
+The gridded climatology required to compute SEEPS is not distributed as part of the code release and can be downloaded from `Zenodo <https://zenodo.org/records/13121064?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6ImM5NThkNDU4LTEzNDgtNDlmMy05ZjMwLTVkOWQ0MGZjMTFjNyIsImRhdGEiOnt9LCJyYW5kb20iOiI0NzMxYTM3YmNkMWE0MDA4ZWUyMDU4YTdkOTUyMjE4NCJ9.NJZPN0KkouUCQSmB0QjZbfJEOO6d6ZZQ_Me5VLbVaUY4aWQHSqGE4VLmUdLk-uTjN749Wdv92xLYz0aXay5cNw>`. The path to the file needs to be specified using MET_SEEPS_GRID_CLIMO_NAME.
+
 Fourier Decomposition
 ---------------------
 

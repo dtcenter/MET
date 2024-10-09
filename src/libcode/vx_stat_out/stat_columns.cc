@@ -4158,35 +4158,40 @@ void write_seeps_cols(const SeepsAggScore *seeps,
    //
    // Stable Equitable Error in Probability Space (SEEPS)
    // Dump out the SEEPS line:
-   //    TOTAL        S12,         S13,
-   //    S21,         S23,         S31,
-   //    S32,         PF1,         PF2,
-   //    PF3,         PV1,         PV2,
-   //    PV3,         MEAN_FCST,   MEAN_OBS,
-   //    SEEPS
+   //    TOTAL,
+   //    ODFL,        ODFH,        OLFD,
+   //    OLFH,        OHFD,        OHFL,
+   //    PF1,         PF2,         PF3,
+   //    PV1,         PV2,         PV3,
+   //    MEAN_FCST,   MEAN_OBS,    SEEPS
    //
 
    at.set_entry(r, c+0, seeps->n_obs);  // Total Number of Pairs
 
-   at.set_entry(r, c+1, seeps->s12);    // s12
-   at.set_entry(r, c+2, seeps->s13);    // s13
-   at.set_entry(r, c+3, seeps->s21);    // s21
-   at.set_entry(r, c+4, seeps->s23);    // s23
-   at.set_entry(r, c+5, seeps->s31);    // s31
-   at.set_entry(r, c+6, seeps->s32);    // s32
+   at.set_entry(r, c+1, seeps->s_odfl); // ODFL
+   at.set_entry(r, c+2, seeps->s_odfh); // ODFH
+   at.set_entry(r, c+3, seeps->s_olfd); // OLFD
+   at.set_entry(r, c+4, seeps->s_olfh); // OLFH
+   at.set_entry(r, c+5, seeps->s_ohfd); // OHFD
+   at.set_entry(r, c+6, seeps->s_ohfl); // OHFL
 
-   at.set_entry(r, c+7, seeps->pf1);    // pf1
-   at.set_entry(r, c+8, seeps->pf2);    // pf2
-   at.set_entry(r, c+9, seeps->pf3);    // pf3
+   at.set_entry(r, c+7, seeps->pf1);    // PF1
+   at.set_entry(r, c+8, seeps->pf2);    // PF2
+   at.set_entry(r, c+9, seeps->pf3);    // PF3
 
-   at.set_entry(r, c+10, seeps->pv1);   // pv1
-   at.set_entry(r, c+11, seeps->pv2);   // pv2
-   at.set_entry(r, c+12, seeps->pv3);   // pv3
+   at.set_entry(r, c+10, seeps->pv1);   // PV1
+   at.set_entry(r, c+11, seeps->pv2);   // PV2
+   at.set_entry(r, c+12, seeps->pv3);   // PV3
 
-   at.set_entry(r, c+13, seeps->mean_fcst); // mean_fcst
-   at.set_entry(r, c+14, seeps->mean_obs);  // mean_obs
-
-   at.set_entry(r, c+15, (use_weighted_seeps ? seeps->weighted_score : seeps->score)); // SEEPS score/weighted score
+   at.set_entry(r, c+13, (use_weighted_seeps ?
+                          seeps->mean_fcst_wgt :
+                          seeps->mean_fcst)); // MEAN_FCST
+   at.set_entry(r, c+14, (use_weighted_seeps ?
+                          seeps->mean_obs_wgt :
+                          seeps->mean_obs));  // MEAN_OBS
+   at.set_entry(r, c+15, (use_weighted_seeps ?
+                          seeps->score_wgt:
+                          seeps->score));     // SEEPS
 
    return;
 }
@@ -4215,18 +4220,18 @@ void write_seeps_mpr_cols(const PairDataPoint *pd_ptr, int i,
 
    at.set_entry(r, c+4, pd_ptr->o_na[i]);   // Observation Value
 
-   at.set_entry(r, c+5, (string)pd_ptr->o_qc_sa[i]);    // Observation Quality Control
+   at.set_entry(r, c+5, (string)pd_ptr->o_qc_sa[i]); // Observation Quality Control
 
-   at.set_entry(r, c+6, pd_ptr->seeps_mpr[i]->fcst_cat);    // model category
-   at.set_entry(r, c+7, pd_ptr->seeps_mpr[i]->obs_cat);     // observation category
+   at.set_entry(r, c+6, pd_ptr->seeps_mpr[i]->fcst_cat); // FCST_CAT
+   at.set_entry(r, c+7, pd_ptr->seeps_mpr[i]->obs_cat);  // OBS_CAT
 
-   at.set_entry(r, c+8, pd_ptr->seeps_mpr[i]->p1);  // p1
-   at.set_entry(r, c+9, pd_ptr->seeps_mpr[i]->p2);  // p2
+   at.set_entry(r, c+8, pd_ptr->seeps_mpr[i]->p1); // P1
+   at.set_entry(r, c+9, pd_ptr->seeps_mpr[i]->p2); // P2
 
-   at.set_entry(r, c+10, pd_ptr->seeps_mpr[i]->t1); // t1
-   at.set_entry(r, c+11, pd_ptr->seeps_mpr[i]->t2); // t2
+   at.set_entry(r, c+10, pd_ptr->seeps_mpr[i]->t1); // T1
+   at.set_entry(r, c+11, pd_ptr->seeps_mpr[i]->t2); // T2
 
-   at.set_entry(r, c+12, pd_ptr->seeps_mpr[i]->score);  // SEEPS score
+   at.set_entry(r, c+12, pd_ptr->seeps_mpr[i]->score); // SEEPS
 
 }
 
