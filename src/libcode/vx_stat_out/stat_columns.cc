@@ -3300,7 +3300,6 @@ void write_pct_cols(const PCTInfo &pct_info,
 
 void write_pstd_cols(const PCTInfo &pct_info, int alpha_i,
                      AsciiTable &at, int r, int c) {
-   int i;
 
    //
    // Nx2 Contingency Table Statistics for Probability Forecast
@@ -3501,7 +3500,6 @@ void write_prc_cols(const PCTInfo &pct_info,
 void write_eclv_cols(const TTContingencyTable &ct,
                      const NumArray &eclv_points,
                      AsciiTable &at, int r, int c) {
-   int i;
 
    //
    // Economic Cost/Loss Value
