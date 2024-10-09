@@ -117,9 +117,9 @@ void Legendre::init_from_scratch()
 
 {
 
-P = 0;
+P.clear();
 
-PP = 0;
+PP.clear();
 
 clear();
 
@@ -135,9 +135,9 @@ void Legendre::clear()
 
 {
 
-if ( P )  { delete [] P;  P = nullptr; }
+P.clear();
 
-if ( PP )  { delete [] PP;  PP = nullptr; }
+PP.clear();
 
 X = 0.0;
 
@@ -201,9 +201,9 @@ clear();
 
 MaxDegree = N;
 
-P     = new double [N + 1];
+P.resize(N + 1);
 
-PP = new double [N + 1];
+PP.resize(N + 1);
 
 calc(0.0);
 

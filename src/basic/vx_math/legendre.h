@@ -21,6 +21,10 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include <vector>
+
+////////////////////////////////////////////////////////////////////////
+
 
 class Legendre {
 
@@ -37,9 +41,9 @@ class Legendre {
 
       double X;   //  last x value
 
-      double * P;   //  allocated
+      std::vector<double> P;   //  allocated
 
-      double * PP;   //  allocated
+      std::vector<double> PP;   //  allocated
 
    public:
 

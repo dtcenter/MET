@@ -215,11 +215,10 @@ if ( n <= 1 )  return 0;
 int i, j, ties_current, ties_total, tie_rank_start = 0, tie_rank_end;
 double tie_rank_mean;
 RankInfo *rank_info = (RankInfo *) nullptr;
-double *ordered_array = (double *) nullptr;
+vector<double> ordered_array(n);
 double prev_v, v;
 
 rank_info = new RankInfo [n];
-ordered_array = new double [n];
 
 // Each RankInfo structure contains a index value from 0 to n-1 and a pointer
 // to the data to be ranked
@@ -296,7 +295,6 @@ if(ties_current != 0) {
 }
 
 if(rank_info)     { delete [] rank_info;     rank_info = (RankInfo *) nullptr; }
-if(ordered_array) { delete [] ordered_array; ordered_array = (double *) nullptr; }
 
 return ties_total;
 

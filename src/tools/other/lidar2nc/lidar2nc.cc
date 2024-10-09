@@ -370,7 +370,7 @@ else                                            s << " on host " << junk;
    //  allocate the buffer
    //
 
-int   * const ibuf = new int [n_data];
+vector<int> ibuf(n_data, 0);
 
 mlog << Debug(2) << "Processing Lidar points\t= " << n_data << "\n";
 
@@ -379,17 +379,17 @@ mlog << Debug(2) << "Processing Lidar points\t= " << n_data << "\n";
    //  populate the hdr_typ variable
    //
 
-memset(ibuf, 0, n_data*sizeof(int));
+//memset(ibuf, 0, n_data*sizeof(int));
 
-obs_vars->hdr_typ_var.putVar(ibuf);
+obs_vars->hdr_typ_var.putVar(ibuf.data());
 
    //
    //  populate the hdr_sid variable
    //
 
-memset(ibuf, 0, n_data*sizeof(int));
+//memset(ibuf, 0, n_data*sizeof(int));
 
-obs_vars->hdr_sid_var.putVar(ibuf);
+obs_vars->hdr_sid_var.putVar(ibuf.data());
 nc_point_obs.add_header_strings(hdr_typ_string, na_str);
 
    //
@@ -401,13 +401,9 @@ nc_point_obs.add_header_strings(hdr_typ_string, na_str);
 
 float ff[2];
 
-float *fhdr_lat_buf = new float[n_data];
-float *fhdr_lon_buf = new float[n_data];
-float *fhdr_elv_buf = new float[n_data];
-
-memset(fhdr_lat_buf, 0, n_data * sizeof(float));
-memset(fhdr_lon_buf, 0, n_data * sizeof(float));
-memset(fhdr_elv_buf, 0, n_data * sizeof(float));
+vector<float> fhdr_lat_buf(n_data, 0.0);
+vector<float> fhdr_lon_buf(n_data, 0.0);
+vector<float> fhdr_elv_buf(n_data, 0.0);
 
 for (j=0; j<n_data; ++j)  {
 
@@ -419,14 +415,10 @@ for (j=0; j<n_data; ++j)  {
 
 }   //  for j
 
-obs_vars->hdr_lat_var.putVar(fhdr_lat_buf);
-obs_vars->hdr_lon_var.putVar(fhdr_lon_buf);
-obs_vars->hdr_elv_var.putVar(fhdr_elv_buf);
+obs_vars->hdr_lat_var.putVar(fhdr_lat_buf.data());
+obs_vars->hdr_lon_var.putVar(fhdr_lon_buf.data());
+obs_vars->hdr_elv_var.putVar(fhdr_elv_buf.data());
 
-delete [] fhdr_lat_buf;
-delete [] fhdr_lon_buf;
-delete [] fhdr_elv_buf;
- 
    //
    //  populate the hdr_vld variable
    //
@@ -441,7 +433,7 @@ unixtime t;
 get_hdf_var_info(hdf_sd_id, hdf_time_name, info);
 
 
-memset(ibuf, 0, n_data*sizeof(int));
+//memset(ibuf, 0, n_data*sizeof(int));
 
 for (j=0; j<n_data; ++j)  {
    int v_idx;
@@ -465,10 +457,8 @@ for (j=0; j<n_data; ++j)  {
 }   //  for j
 
 
-obs_vars->hdr_vld_var.putVar(ibuf);
+obs_vars->hdr_vld_var.putVar(ibuf.data());
 
-delete[] ibuf;
- 
    //
    //  populate the obs_arr variable
    //
@@ -585,7 +575,7 @@ void write_nc_record(const float * f, int qc_value)
       snprintf(junk, sizeof(junk), "%d", qc_value);
       nc_point_obs.write_observation(f, junk);
    }
-   
+
    return;
 
 }

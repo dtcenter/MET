@@ -1704,15 +1704,15 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    const ConcatString fcst_thresh = engine.conf_info.Fcst->conv_thresh.get_str(5);
    const ConcatString  obs_thresh = engine.conf_info.Obs->conv_thresh.get_str(5);
 
-   float *fcst_raw_data      = (float *) nullptr;
-   float *fcst_obj_raw_data  = (float *) nullptr;
-   int   *fcst_obj_data      = (int *)   nullptr;
-   int   *fcst_clus_data     = (int *)   nullptr;
+   vector<float> fcst_raw_data    ;
+   vector<float> fcst_obj_raw_data;
+   vector<int  > fcst_obj_data    ;
+   vector<int  > fcst_clus_data   ;
 
-   float *obs_raw_data       = (float *) nullptr;
-   float *obs_obj_raw_data   = (float *) nullptr;
-   int   *obs_obj_data       = (int *)   nullptr;
-   int   *obs_clus_data      = (int *)   nullptr;
+   vector<float> obs_raw_data    ;
+   vector<float> obs_obj_raw_data;
+   vector<int  > obs_obj_data    ;
+   vector<int  > obs_clus_data   ;
 
    NcFile *f_out             = (NcFile *) nullptr;
 
@@ -1917,29 +1917,29 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
 
    if ( info.do_raw )  {
 
-      fcst_raw_data      = new float [grid.nx()*grid.ny()];
-      obs_raw_data       = new float [grid.nx()*grid.ny()];
+      fcst_raw_data.resize(grid.nx()*grid.ny());
+       obs_raw_data.resize(grid.nx()*grid.ny());
 
    }
 
    if ( info.do_object_raw )  {
 
-      fcst_obj_raw_data  = new float [grid.nx()*grid.ny()];
-      obs_obj_raw_data   = new float [grid.nx()*grid.ny()];
+      fcst_obj_raw_data.resize(grid.nx()*grid.ny());
+       obs_obj_raw_data.resize(grid.nx()*grid.ny());
 
    }
 
    if ( info.do_object_id )  {
 
-      fcst_obj_data      = new int   [grid.nx()*grid.ny()];
-      obs_obj_data       = new int   [grid.nx()*grid.ny()];
+      fcst_obj_data.resize(grid.nx()*grid.ny());
+       obs_obj_data.resize(grid.nx()*grid.ny());
 
    }
 
    if ( info.do_cluster_id )  {
 
-      fcst_clus_data     = new int   [grid.nx()*grid.ny()];
-      obs_clus_data      = new int   [grid.nx()*grid.ny()];
+      fcst_clus_data.resize(grid.nx()*grid.ny());
+       obs_clus_data.resize(grid.nx()*grid.ny());
 
    }
 
@@ -1954,7 +1954,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
          // Extra nullptr checks to satisfy Fortify
 
          if ( info.do_raw &&
-              fcst_raw_data != nullptr && obs_raw_data != nullptr &&
+              !fcst_raw_data.empty() && !obs_raw_data.empty() &&
               engine.fcst_raw != nullptr && engine.obs_raw != nullptr  )  {
 
             fcst_raw_data[n] = engine.fcst_raw->data (x, y);
@@ -1963,35 +1963,35 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
          }
 
          if(engine.fcst_split->is_nonzero(x, y) ) {
-            if ( info.do_object_raw && fcst_obj_raw_data != nullptr && engine.fcst_raw != nullptr ) {
+            if ( info.do_object_raw && !fcst_obj_raw_data.empty() && engine.fcst_raw != nullptr ) {
                fcst_obj_raw_data[n] = engine.fcst_raw->data(x, y);
             }
-            if ( info.do_object_id && fcst_obj_data != nullptr && engine.fcst_split != nullptr ) {
+            if ( info.do_object_id && !fcst_obj_data.empty() && engine.fcst_split != nullptr ) {
                fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
             }
          }
          else {
-            if ( info.do_object_raw && fcst_obj_raw_data != nullptr ) {
+            if ( info.do_object_raw && !fcst_obj_raw_data.empty() ) {
                fcst_obj_raw_data[n] = bad_data_float;
             }
-            if ( info.do_object_id && fcst_obj_data != nullptr ) {
+            if ( info.do_object_id && !fcst_obj_data.empty() ) {
                fcst_obj_data[n] = bad_data_int;
             }
          }
 
          if(engine.obs_split->is_nonzero(x, y) ) {
-            if ( info.do_object_raw && obs_obj_raw_data != nullptr ) {
+            if ( info.do_object_raw && !obs_obj_raw_data.empty() ) {
                obs_obj_raw_data[n] = engine.obs_raw->data(x, y);
             }
-            if ( info.do_object_id && obs_obj_data != nullptr ) {
+            if ( info.do_object_id && !obs_obj_data.empty() ) {
                obs_obj_data[n] = nint(engine.obs_split->data(x, y));
             }
          }
          else {
-            if ( info.do_object_raw && obs_obj_raw_data != nullptr) {
+            if ( info.do_object_raw && !obs_obj_raw_data.empty()) {
                obs_obj_raw_data[n] = bad_data_float;
             }
-            if ( info.do_object_id && obs_obj_data != nullptr ) {
+            if ( info.do_object_id && !obs_obj_data.empty() ) {
                obs_obj_data[n] = bad_data_int;
             }
          }
@@ -2000,7 +2000,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
          // Get cluster object ID's for each grid box
          //
 
-         if ( info.do_cluster_id && fcst_clus_data != nullptr && obs_clus_data != nullptr)  {
+         if ( info.do_cluster_id && !fcst_clus_data.empty() && !obs_clus_data.empty())  {
 
             // Write the index of the cluster object
             if ( engine.fcst_clus_split->data(x, y) > 0 ) {
@@ -2040,8 +2040,8 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
 
    if ( info.do_raw )  {
 
-      if( !put_nc_data_with_dims(&fcst_raw_var, &fcst_raw_data[0], grid.ny(), grid.nx()) ||
-          !put_nc_data_with_dims(&obs_raw_var, &obs_raw_data[0], grid.ny(), grid.nx()) ) {
+      if( !put_nc_data_with_dims(&fcst_raw_var, fcst_raw_data.data(), grid.ny(), grid.nx()) ||
+          !put_nc_data_with_dims(&obs_raw_var, obs_raw_data.data(), grid.ny(), grid.nx()) ) {
 
          mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
               << "error with the fcst_raw_var->put or obs_raw_var->put\n\n";
@@ -2052,8 +2052,8 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
 
    if ( info.do_object_raw )  {
 
-      if( !put_nc_data_with_dims(&fcst_obj_raw_var, &fcst_obj_raw_data[0], grid.ny(), grid.nx()) ||
-          !put_nc_data_with_dims(&obs_obj_raw_var, &obs_obj_raw_data[0], grid.ny(), grid.nx()) ) {
+      if( !put_nc_data_with_dims(&fcst_obj_raw_var, fcst_obj_raw_data.data(), grid.ny(), grid.nx()) ||
+          !put_nc_data_with_dims(&obs_obj_raw_var, obs_obj_raw_data.data(), grid.ny(), grid.nx()) ) {
 
          mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
               << "error with the fcst_obj_raw_var->put or obs_obj_raw_var->put\n\n";
@@ -2068,8 +2068,8 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
 
    if ( info.do_object_id )  {
 
-      if( !put_nc_data_with_dims(&fcst_obj_var, &fcst_obj_data[0], grid.ny(), grid.nx()) ||
-          !put_nc_data_with_dims(&obs_obj_var, &obs_obj_data[0], grid.ny(), grid.nx()) ) {
+      if( !put_nc_data_with_dims(&fcst_obj_var, fcst_obj_data.data(), grid.ny(), grid.nx()) ||
+          !put_nc_data_with_dims(&obs_obj_var, obs_obj_data.data(), grid.ny(), grid.nx()) ) {
 
          mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
               << "error with the fcst_obj_var->put or obs_obj_var->put\n\n";
@@ -2084,8 +2084,8 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
 
    if ( info.do_cluster_id )  {
 
-      if( !put_nc_data_with_dims(&fcst_clus_var, &fcst_clus_data[0], grid.ny(), grid.nx()) ||
-          !put_nc_data_with_dims(&obs_clus_var, &obs_clus_data[0], grid.ny(), grid.nx()) ) {
+      if( !put_nc_data_with_dims(&fcst_clus_var, fcst_clus_data.data(), grid.ny(), grid.nx()) ||
+          !put_nc_data_with_dims(&obs_clus_var, obs_clus_data.data(), grid.ny(), grid.nx()) ) {
 
          mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
               << "error with the fcst_clus_var->put or obs_clus_var->put\n\n";
@@ -2093,20 +2093,6 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
       }
 
    }
-
-   //
-   // Delete allocated memory
-   //
-
-   if (fcst_raw_data)      { delete [] fcst_raw_data;      fcst_raw_data     = (float *) nullptr; }
-   if (fcst_obj_raw_data)  { delete [] fcst_obj_raw_data;  fcst_obj_raw_data = (float *) nullptr; }
-   if (fcst_obj_data)      { delete [] fcst_obj_data;      fcst_obj_data     = (int *)   nullptr; }
-   if (fcst_clus_data)     { delete [] fcst_clus_data;     fcst_clus_data    = (int *)   nullptr; }
-
-   if (obs_raw_data)       { delete [] obs_raw_data;       obs_raw_data      = (float *) nullptr; }
-   if (obs_obj_raw_data)   { delete [] obs_obj_raw_data;   obs_obj_raw_data  = (float *) nullptr; }
-   if (obs_obj_data)       { delete [] obs_obj_data;       obs_obj_data      = (int *)   nullptr; }
-   if (obs_clus_data)      { delete [] obs_clus_data;      obs_clus_data     = (int *)   nullptr; }
 
    //
    // Write out the values of the vertices of the polylines.
@@ -2184,13 +2170,6 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    double lat, lon;
 
    Polyline **poly            = (Polyline **) nullptr;
-
-   int   *poly_start          = (int       *) nullptr;
-   int   *poly_npts           = (int       *) nullptr;
-   float *poly_lat            = (float     *) nullptr;
-   float *poly_lon            = (float     *) nullptr;
-   int   *poly_x              = (int       *) nullptr;
-   int   *poly_y              = (int       *) nullptr;
 
    // Dimensions and variables for each object
    NcDim  obj_dim            ;
@@ -2368,12 +2347,12 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Allocate memory for the polyline points
    //
-   poly_start = new int   [n_poly];
-   poly_npts  = new int   [n_poly];
-   poly_lat   = new float [n_pts];
-   poly_lon   = new float [n_pts];
-   poly_x     = new int   [n_pts];
-   poly_y     = new int   [n_pts];
+   vector<int  > poly_start(n_poly);
+   vector<int  > poly_npts (n_poly);
+   vector<float> poly_lat  (n_pts);
+   vector<float> poly_lon  (n_pts);
+   vector<int  > poly_x    (n_pts);
+   vector<int  > poly_y    (n_pts);
 
    //
    // Store the points for each polyline
@@ -2404,8 +2383,8 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Write the polyline information
    //
-   if( !put_nc_data_with_dims(&obj_poly_start_var, &poly_start[0], n_poly) ||
-       !put_nc_data_with_dims(&obj_poly_npts_var, &poly_npts[0], n_poly) ) {
+   if( !put_nc_data_with_dims(&obj_poly_start_var, poly_start.data(), n_poly) ||
+       !put_nc_data_with_dims(&obj_poly_npts_var, poly_npts.data(), n_poly) ) {
 
       mlog << Error << "\nModeExecutive::write_poly_netcdf() -> "
            << "error with " << start_var_name << "->put or "
@@ -2416,8 +2395,8 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Write the forecast boundary lat/lon points
    //
-   if( !put_nc_data_with_dims(&poly_lat_var, &poly_lat[0], n_pts) ||
-       !put_nc_data_with_dims(&poly_lon_var, &poly_lon[0], n_pts) ) {
+   if( !put_nc_data_with_dims(&poly_lat_var, poly_lat.data(), n_pts) ||
+       !put_nc_data_with_dims(&poly_lon_var, poly_lon.data(), n_pts) ) {
 
       mlog << Error << "\nModeExecutive::write_poly_netcdf() -> "
            << "error with " << lat_var_name << "->put or "
@@ -2428,25 +2407,14 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Write the forecast boundary (x,y) points
    //
-   if( !put_nc_data_with_dims(&poly_x_var, &poly_x[0], n_pts) ||
-       !put_nc_data_with_dims(&poly_y_var, &poly_y[0], n_pts) ) {
+   if( !put_nc_data_with_dims(&poly_x_var, poly_x.data(), n_pts) ||
+       !put_nc_data_with_dims(&poly_y_var, poly_y.data(), n_pts) ) {
 
       mlog << Error << "\nModeExecutive::write_poly_netcdf() -> "
            << "error with " << x_var_name << "->put or"
            << y_var_name << "->put\n\n";
       exit(1);
    }
-
-   //
-   // Delete allocated memory
-   //
-   if(poly)       { delete [] poly;       poly       = (Polyline **) nullptr; }
-   if(poly_start) { delete [] poly_start; poly_start = (int       *) nullptr; }
-   if(poly_npts)  { delete [] poly_npts;  poly_npts  = (int       *) nullptr; }
-   if(poly_lat)   { delete [] poly_lat;   poly_lat   = (float     *) nullptr; }
-   if(poly_lon)   { delete [] poly_lon;   poly_lon   = (float     *) nullptr; }
-   if(poly_x)     { delete [] poly_x;     poly_x     = (int       *) nullptr; }
-   if(poly_y)     { delete [] poly_y;     poly_y     = (int       *) nullptr; }
 
    return;
 }

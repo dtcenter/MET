@@ -390,7 +390,6 @@ double ShapeData::complexity() const {
 double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
                                        bool precip_flag) const {
    int n = 0;
-   double * val = (double *) nullptr;
    double v;
    double val_sum = 0.0;
    const int Nxy = data.nx()*data.ny();
@@ -401,7 +400,7 @@ double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
       exit(1);
    }
 
-   val = new double [Nxy];
+   vector<double> val(Nxy);
 
    // Compute the requested percentile of intensity
    for(int i=0; i<Nxy; i++) {
@@ -431,12 +430,9 @@ double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
    }
    // Compute a percentile of intensity
    else {
-      sort(val, n);
-      v = percentile(val, n, (double) perc/100.0);
+      sort(val.data(), n);
+      v = percentile(val.data(), n, (double) perc/100.0);
    }
-
-   // Clean up
-   if(val) { delete [] val; val = (double *) nullptr; };
 
    return v;
 }
@@ -716,7 +712,6 @@ Polyline ShapeData::convex_hull_old() const
 
    int j, k, n, y;
    int done;
-   int *Index = (int *) nullptr;
    Polyline outline;
    Polyline hull;
    double e1u, e1v, e2u, e2v;
@@ -736,14 +731,14 @@ Polyline ShapeData::convex_hull_old() const
    hull.extend_points(2*data.ny());
    outline.extend_points(2*data.ny());
 
-   Index = new int [2*data.ny()];
+   vector<int> Index(2*data.ny());
 
-   if ( !Index )  {
-
-      mlog << Error << "\nShapedata::convex_hull() -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
+   //if ( !Index )  {
+   //
+   //   mlog << Error << "\nShapedata::convex_hull() -> "
+   //        << "memory allocation error\n\n";
+   //   exit(1);
+   //}
 
    n = 0;
 
@@ -888,8 +883,6 @@ Polyline ShapeData::convex_hull_old() const
       //
       //  done
       //
-
-   delete [] Index;   Index = (int *) nullptr;
 
    return hull;
 

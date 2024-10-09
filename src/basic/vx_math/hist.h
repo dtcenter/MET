@@ -18,6 +18,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <vector>
 #include <iostream>
 
 
@@ -28,7 +29,7 @@ class Histogram {
 
    private:
 
-      int * Count;
+      std::vector<int> Count;
 
       int  Nbins;
 

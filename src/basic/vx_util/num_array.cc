@@ -123,7 +123,7 @@ void NumArray::init_from_scratch()
 {
 
    clear();
- 
+
    return;
 
 }
@@ -171,7 +171,7 @@ void NumArray::assign(const NumArray & a)
    clear();
 
    e = a.e;
-   
+
    Sorted = a.Sorted;
 
    return;
@@ -209,7 +209,7 @@ void NumArray::dump(ostream & out, int depth) const
    int j;
 
    for (j=0; j<n_elements(); ++j)  {
-      
+
       out << prefix << "Element # " << j << " = " << e[j] << "\n";
 
    }
@@ -285,7 +285,7 @@ int NumArray::has(double d, bool forward) const
          }
       }
    }
-   
+
    return found;
 
 }
@@ -352,7 +352,7 @@ void NumArray::add(const NumArray & a)
 {
 
    extend(n_elements() + a.n_elements());
-   
+
    int j;
 
    for (j=0; j<(a.n_elements()); ++j)  {
@@ -376,7 +376,7 @@ void NumArray::add_const(double v, int n)
 {
 
    extend(n_elements() + n);
-   
+
    int j;
 
    for (j=0; j<n; ++j)  {
@@ -400,7 +400,7 @@ void NumArray::add_seq(int beg, int end)
 {
 
    extend(n_elements() + (end - beg + 1));
-   
+
    int j;
 
    for (j=beg; j<=end; ++j)  {
@@ -494,7 +494,7 @@ void NumArray::set(double d)
 {
 
    erase();
-   
+
    add(d);
 
    //
@@ -582,7 +582,7 @@ void NumArray::sort_array(bool increasing)
       else              sort(e.rbegin(), e.rend());
 
    }
-   
+
    Sorted = true;
 
    return;
@@ -639,29 +639,27 @@ int NumArray::rank_array(int &ties)
 
 {
 
-   int n_vld, i;
-
-   double *data      = (double *) nullptr;
-   int    *data_loc  = (int *) nullptr;
-   double *data_rank = (double *) nullptr;
+   int i;
+   int n_vld;
+   int n = n_elements();
 
    //
    // Arrays to store the raw data values to be ranked, their locations,
    // and their computed ranks.  The ranks are stored as doubles since
    // they can be set to 0.5 in the case of ties.
    //
-   data      = new double [n_elements()];
-   data_loc  = new int    [n_elements()];
-   data_rank = new double [n_elements()];
-   
-   if ( !data || !data_loc || !data_rank )  {
+   vector<double> data      (n);
+   vector<int   > data_loc  (n);
+   vector<double> data_rank (n);
 
-      mlog << Error << "\nint NumArray::rank_array() -> "
-           << "memory allocation error\n\n";
-
-      exit ( 1 );
-
-   }
+   //if ( !data || !data_loc || !data_rank )  {
+   //
+   //   mlog << Error << "\nint NumArray::rank_array() -> "
+   //        << "memory allocation error\n\n";
+   //
+   //   exit ( 1 );
+   //
+   //}
 
    //
    // Search the data array for valid data and keep track of its location
@@ -679,19 +677,12 @@ int NumArray::rank_array(int &ties)
    // Compute the rank of the data and store the ranks in the data_rank array
    // Keep track of the number of ties in the ranks.
    //
-   ties = do_rank(data, data_rank, n_vld);
+   ties = do_rank(data.data(), data_rank.data(), n_vld);
 
    //
    // Store the data_rank values
    //
    for(i=0; i<n_vld; i++) e[data_loc[i]] = data_rank[i];
-
-   //
-   // Deallocate memory
-   //
-   if(data)      { delete [] data;      data      = (double *) nullptr; }
-   if(data_loc)  { delete [] data_loc;  data_loc  = (int *) nullptr;    }
-   if(data_rank) { delete [] data_rank; data_rank = (double *) nullptr; }
 
    Sorted = false;
 
@@ -715,7 +706,7 @@ double NumArray::percentile_array(double t)
    if ( !Sorted ) sort_array();
 
    v = percentile(e.data(), n_elements(), t);
-   
+
    return v;
 
 }
@@ -1001,7 +992,7 @@ ConcatString NumArray::serialize() const
 
    s << e[0];
    for(j=1; j<n_elements(); j++) s << " " << e[j];
-   
+
    return s;
 
 }
@@ -1054,7 +1045,7 @@ NumArray NumArray::subset(int beg, int end) const
            << "range check error\n\n";
       exit ( 1 );
    }
-   
+
    // Store subset
    for(int i=beg; i<=end; i++) subset_na.add(e[i]);
 
@@ -1081,7 +1072,7 @@ NumArray NumArray::subset(const NumArray &keep) const
            << n_elements() << " array elements)\n\n";
       exit ( 1 );
    }
-   
+
    // Store subset
    for(int i=0; i<=n_elements(); i++)  {
       if(keep[i])  subset_na.add(e[i]);
@@ -1101,7 +1092,7 @@ double NumArray::mean() const
 
    int j, count;
    double s, mn;
-   
+
    for(j=0, count=0, s=0.0; j<n_elements(); j++) {
       if(is_bad_data(e[j])) continue;
       s += e[j];
@@ -1127,7 +1118,7 @@ double NumArray::mean_sqrt() const
 
    // for simple mean, call weighted mean with constant weight
    wgt.add_const(1.0, n_elements());
-   
+
    return wmean_sqrt(wgt);
 
 }
@@ -1144,7 +1135,7 @@ double NumArray::mean_fisher() const
 
    // for simple mean, call weighted mean with constant weight
    wgt.add_const(1.0, n_elements());
-   
+
    return wmean_fisher(wgt);
 
 }
@@ -1300,19 +1291,19 @@ double NumArray::mean_abs_diff() const
    double sum, mad;
 
    int n = n_elements();
-   
+
    for(i=0, count=0, sum=0.0; i<n; i++) {
       for(j=i+1; j<n; j++) {
-      
+
          if( is_bad_data(e[i]) || is_bad_data(e[j]) ) continue;
          sum += abs(e[i]-e[j]);
          count++;
       }
    }
-   
+
    if(count == 0) mad = bad_data_double;
    else           mad = sum / count;
-   
+
    return mad;
 
 }
@@ -1326,16 +1317,16 @@ double NumArray::wmean_abs_diff() const
 {
 
    double wmad;
-   
+
    int n = n_elements();
    double wgt = 1.0/(2.0*n);
    double mad = mean_abs_diff();
-   
-   if( is_bad_data(mad) )    
+
+   if( is_bad_data(mad) )
       wmad = bad_data_double;
-   else 
+   else
       wmad = wgt * mad;
-   
+
    return wmad;
 
 }

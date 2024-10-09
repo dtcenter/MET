@@ -198,13 +198,10 @@ clear();
 
 int j, k;
 int argv_len;
-int * len = nullptr;
+vector<int> len(_argc);
 
 
 Argc = _argc;
-
-len = new int [Argc];
-
 
    //
    //  total length of the argument string ... 
@@ -284,8 +281,6 @@ for (j=0; j<Argc; ++j)  {
    //
    //  done
    //
-
-if ( len )  { delete [] len;  len = nullptr; }
 
 return;
 

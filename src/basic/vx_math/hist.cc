@@ -51,7 +51,7 @@ Histogram::~Histogram()
 
 {
 
-if ( Count )  { delete [] Count;  Count = (int *) nullptr; }
+Count.clear();
 
 }
 
@@ -93,7 +93,7 @@ void Histogram::init_from_scratch()
 
 {
 
-Count = (int *) nullptr;
+Count.clear();
 
 Nbins = 0;
 
@@ -120,9 +120,7 @@ void Histogram::clear()
 
 {
 
-int j;
-
-for (j=0; j<Nbins; ++j)  Count[j] = 0;
+//for (int j=0; j<Nbins; ++j)  Count[j] = 0;
 
 is_empty = 1;
 
@@ -142,15 +140,13 @@ void Histogram::set_nbd(int n, double b, double d)
 
 {
 
-if ( Count )  { delete [] Count;  Count = (int *) nullptr; }
-
 Nbins  = n;
 
 Bottom = b;
 Delta  = d;
 
 
-Count = new int [Nbins];
+Count.resize(Nbins, 0);
 
 clear();
 
