@@ -96,9 +96,9 @@ void Wchar_Argv::init_from_scratch()
 
 {
 
-W_Buf = 0;
+W_Buf = nullptr;
 
-W_Argv = 0;
+W_Argv = nullptr;
 
 
 return;
@@ -134,8 +134,7 @@ void Wchar_Argv::set(const StringArray & a)
 
 int j, k, N;
 int len;
-char * s = nullptr;
-char ** av = nullptr;
+
 ConcatString c;
 const char *method_name = "Wchar_Argv::set() -> ";
 
@@ -150,37 +149,31 @@ for (j=0; j<(a.n()); ++j)  {
 
 N = len + a.n();
 
-s = new char [N];
+vector<char> s(N, 0);
 
-av = new char * [a.n()];
-
-memset(s, 0, N);
+vector<char *> av((a.n());
 
 k = 0;
 
 for (j=0; j<(a.n()); ++j)  {
 
-   av[j] = s + k;
+   av[j] = s.data() + k;
 
    c = a[j].c_str();
 
    len = c.length();
 
-   m_strncpy(s + k, c.text(), len, method_name);
+   m_strncpy(s.data() + k, c.text(), len, method_name);
 
    k += (len + 1);
 
 }
 
-set(a.n(), av);
+set(a.n(), av.data());
 
    //
    //  done
    //
-
-if ( s )  { delete [] s;  s = nullptr; }
-
-if ( av )  { delete [] av;  av = nullptr; }
 
 return;
 
@@ -196,26 +189,30 @@ void Wchar_Argv::set(int _argc, char ** _argv)
 
 clear();
 
-int j, k;
-int argv_len;
-vector<int> len(_argc);
+int k;
 
 
 Argc = _argc;
+
+vector<int>len(Argc);
+
 
    //
    //  total length of the argument string ... 
    //
 
-argv_len = 0;
+int argv_len = 0;
+int argv_buf_len = sizeof(_argv)/sizeof(*_argv);
 
-for (j=0; j<_argc; ++j)  {
+for (int j=0; j<_argc; ++j)  {
 
-   len[j] = m_strlen(_argv[j]);   //  we're using the len array here because
-                                //  we don't want to call m_strlen more than 
-                                //  once on each argv value
-
-   argv_len += len[j];
+   if (j < argv_buf_len) {
+      len[j] = m_strlen(_argv[j]);   //  we're using the len array here because
+                                   //  we don't want to call m_strlen more than 
+                                   //  once on each argv value
+      
+      argv_len += len[j];
+   }
 
    ++argv_len;   //  ... including the end-of-string sentinels (ie, nul chars);
 
@@ -232,7 +229,7 @@ for (j=0; j<_argc; ++j)  {
 
 W_Buf = new wchar_t [argv_len];
 
-for (j=0; j<argv_len; ++j)  {
+for (int j=0; j<argv_len; ++j)  {
 
    W_Buf[j] = L'\0';
 
@@ -244,7 +241,7 @@ for (j=0; j<argv_len; ++j)  {
 
 k = 0;
 
-for (j=0; j<Argc; ++j)  {
+for (int j=0; j<Argc; ++j)  {
 
    if ( mbstowcs(W_Buf + k, _argv[j], len[j]) == (size_t) -1 )  {
 
@@ -270,7 +267,7 @@ W_Argv = new wchar_t * [Argc];
 
 k = 0;
 
-for (j=0; j<Argc; ++j)  {
+for (int j=0; j<Argc; ++j)  {
 
    W_Argv[j] = W_Buf + k;
 
