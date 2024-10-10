@@ -775,6 +775,16 @@ void PairBase::calc_obs_summary(){
 
 ////////////////////////////////////////////////////////////////////////
 
+void PairBase::set_point_weight(const PointWeightType wgt_flag) {
+
+   if(!IsPointVx) return;
+
+   // JHG work here
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void PairBase::add_grid_obs(double o,
                             const ClimoPntInfo &cpi,
                             double wgt) {
@@ -1507,6 +1517,20 @@ void VxPairBase::calc_obs_summary() {
    }
 
    for(auto &x : pb_ptr) x->calc_obs_summary();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairBase::set_point_weight(const PointWeightType wgt_flag) {
+
+   if(n_vx == 0) {
+      mlog << Warning << "\nVxPairBase::set_point_weight() -> "
+           << "set_size() has not been called yet!\n\n";
+   }
+
+   for(auto &x : pb_ptr) x->set_point_weight(wgt_flag);
 
    return;
 }
