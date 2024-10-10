@@ -148,8 +148,11 @@ seeps_p1_thresh = NA;
 
 duplicate_flag = NONE;
 rank_corr_flag = TRUE;
-tmp_dir        = "/tmp";
-output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V12.0.0";
+
+point_weight_flag = NONE;
+
+tmp_dir       = "/tmp";
+output_prefix = "${OUTPUT_PREFIX}";
+version       = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

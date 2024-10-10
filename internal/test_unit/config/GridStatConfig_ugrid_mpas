@@ -255,8 +255,9 @@ ugrid_coordinates_file = "${MET_TEST_INPUT}/ugrid_data/mpas/static.40962_reduced
 ////////////////////////////////////////////////////////////////////////////////
 
 grid_weight_flag = NONE;
-tmp_dir          = "/tmp";
-output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V12.0.0";
+
+tmp_dir       = "/tmp";
+output_prefix = "${OUTPUT_PREFIX}";
+version       = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////
