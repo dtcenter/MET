@@ -40,7 +40,7 @@ export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_HDFLIB}:${MET_HDF5}/lib:${MET_GSL}/l
 export LDFLAGS="${LDFLAGS} -L${JASPER}/lib"
 
 # Variables required to run MET
-export MET_TEST_INPUT=${MET_PROJ_DIR}/MET_test_data/unit_test
+export MET_TEST_INPUT=${MET_PROJ_DIR}/MET_test_data/main_v11.1/unit_test
 export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
 
 # Define Rscript to use a version with the ncdf4 package 1.17 or later 
