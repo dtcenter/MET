@@ -1,0 +1,1225 @@
+export MET_BASE=/d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/../../share/met
+export MET_BUILD_BASE=/d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/../..
+export MET_TEST_BASE=/d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit
+export MET_TEST_INPUT=/d1/projects/MET/MET_test_data/unit_test
+export MET_TEST_OUTPUT=/d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/../../test_output
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_ascii2nc.xml
+
+TEST: ascii2nc_TRMM_3hr
+	- pass - 	17.767 sec
+TEST: ascii2nc_GAGE_24hr
+	- pass - 	1.165 sec
+TEST: ascii2nc_GAGE_24hr_badfile
+	- pass - 	0.53 sec
+TEST: ascii2nc_duplicates
+	- pass - 	0.532 sec
+TEST: ascii2nc_SURFRAD1
+	- pass - 	0.975 sec
+TEST: ascii2nc_insitu_turb
+	- pass - 	3.119 sec
+TEST: ascii2nc_by_var_name_PB
+	- pass - 	146.208 sec
+TEST: ascii2nc_rain_01H_sum
+	- pass - 	0.582 sec
+TEST: ascii2nc_airnow_daily_v2
+	- pass - 	0.799 sec
+TEST: ascii2nc_airnow_hourly_aqobs
+	- pass - 	0.886 sec
+TEST: ascii2nc_airnow_hourly
+	- pass - 	3.847 sec
+TEST: ascii2nc_ndbc
+	- pass - 	8.243 sec
+TEST: ascii2nc_ismn_SNOTEL
+	- pass - 	14.834 sec
+TEST: ascii2nc_iabp
+	- pass - 	0.542 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_ascii2nc_indy.xml
+
+TEST: ascii2nc_TRMM_12hr
+	- pass - 	20.969 sec
+TEST: ascii2nc_LITTLE_R
+	- pass - 	0.605 sec
+TEST: ascii2nc_LITTLE_R_BAD_RECORD
+	- pass - 	0.551 sec
+TEST: ascii2nc_SURFRAD
+	- pass - 	0.976 sec
+TEST: ascii2nc_SURFRAD_summary1
+	- pass - 	2.007 sec
+TEST: ascii2nc_SURFRAD_summary2
+	- pass - 	1.483 sec
+TEST: ascii2nc_SURFRAD_summary3
+	- pass - 	1.224 sec
+TEST: ascii2nc_SURFRAD_summary4
+	- pass - 	1.205 sec
+TEST: ascii2nc_insitu_turb_mask_sid
+	- pass - 	1.241 sec
+TEST: ascii2nc_insitu_turb_mask_grid_data
+	- pass - 	2.994 sec
+TEST: ascii2nc_insitu_turb_mask_named_grid
+	- pass - 	2.963 sec
+TEST: ascii2nc_MASK_GRID
+	- pass - 	3.539 sec
+TEST: ascii2nc_MASK_POLY
+	- pass - 	1.298 sec
+TEST: ascii2nc_WWSIS_clear_pvwatts_one_min
+	- pass - 	18.383 sec
+TEST: ascii2nc_WWSIS_clear_pvwatts_five_min
+	- pass - 	2.641 sec
+TEST: ascii2nc_WWSIS_clear_pvwatts_ten_min
+	- pass - 	1.509 sec
+TEST: ascii2nc_WWSIS_clear_pvwatts_sixty_min
+	- pass - 	0.694 sec
+TEST: ascii2nc_WWSIS_HA_pvwatts_sixty_min
+	- pass - 	0.735 sec
+TEST: ascii2nc_WWSIS_pvwatts_one_min
+	- pass - 	18.646 sec
+TEST: ascii2nc_WWSIS_pvwatts_sixty_min
+	- pass - 	0.7 sec
+TEST: ascii2nc_by_var_name
+	- pass - 	0.534 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_madis2nc.xml
+
+TEST: madis2nc_METAR
+	- pass - 	12.385 sec
+TEST: madis2nc_METAR_time_summary
+	- pass - 	16.391 sec
+TEST: madis2nc_METAR_mask_sid
+	- pass - 	0.608 sec
+TEST: madis2nc_METAR_mask_grid
+	- pass - 	1.052 sec
+TEST: madis2nc_RAOB
+	- pass - 	3.295 sec
+TEST: madis2nc_PROFILER_MASK_POLY
+	- pass - 	0.57 sec
+TEST: madis2nc_MARITIME
+	- pass - 	0.811 sec
+TEST: madis2nc_MESONET_MASK_GRID
+	- pass - 	6.653 sec
+TEST: madis2nc_MESONET_optional_vars
+	- pass - 	4.856 sec
+TEST: madis2nc_ACARS_PROFILES
+	- pass - 	2.095 sec
+TEST: madis2nc_buf_handle
+	- pass - 	2.626 sec
+TEST: madis2nc_multiple_inputs
+	- pass - 	2.167 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_trmm2nc.xml
+
+TEST: trmm2nc_3hr
+	- pass - 	0.334 sec
+TEST: trmm2nc_12hr
+	- pass - 	0.331 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_pb2nc.xml
+
+TEST: pb2nc_GDAS_mask_grid_G212
+	- pass - 	8.247 sec
+TEST: pb2nc_NDAS_no_mask
+	- pass - 	9.265 sec
+TEST: pb2nc_NDAS_mask_poly_conus
+	- pass - 	3.676 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_pb2nc_indy.xml
+
+TEST: pb2nc_NDAS_mask_sid_list
+	- pass - 	1.602 sec
+TEST: pb2nc_NDAS_mask_sid_file
+	- pass - 	1.765 sec
+TEST: pb2nc_NDAS_mask_grid_data_cfg
+	- pass - 	4.469 sec
+TEST: pb2nc_compute_pbl_cape
+	- pass - 	13.715 sec
+TEST: pb2nc_NDAS_var_all
+	- pass - 	19.439 sec
+TEST: pb2nc_vertical_level_500
+	- pass - 	1.392 sec
+TEST: pb2nc_NDAS_summary
+	- pass - 	6.866 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_gen_vx_mask.xml
+
+TEST: gen_vx_mask_POLY_GFS_LATLON
+	- pass - 	11.973 sec
+TEST: gen_vx_mask_POLY_GFS_MERCATOR
+	- pass - 	0.607 sec
+TEST: gen_vx_mask_POLY_NAM_LAMBERT
+	- pass - 	4.092 sec
+TEST: gen_vx_mask_POLY_HMT_STEREO
+	- pass - 	1.026 sec
+TEST: gen_vx_mask_POLY_GFS_LATLON_NAK
+	- pass - 	1.476 sec
+TEST: gen_vx_mask_POLY_LATLON_RECTANGLE
+	- pass - 	0.552 sec
+TEST: gen_vx_mask_POLY_XY_RECTANGLE
+	- pass - 	0.544 sec
+TEST: gen_vx_mask_GRID_NAM_HMT_STEREO
+	- pass - 	0.732 sec
+TEST: gen_vx_mask_GRID_NAMED_GRIDS
+	- pass - 	0.618 sec
+TEST: gen_vx_mask_GRID_SPEC_STRINGS
+	- pass - 	0.598 sec
+TEST: gen_vx_mask_CIRCLE
+	- pass - 	0.685 sec
+TEST: gen_vx_mask_CIRCLE_MASK
+	- pass - 	0.642 sec
+TEST: gen_vx_mask_CIRCLE_COMPLEMENT
+	- pass - 	0.649 sec
+TEST: gen_vx_mask_TRACK
+	- pass - 	1.096 sec
+TEST: gen_vx_mask_TRACK_MASK
+	- pass - 	1.098 sec
+TEST: gen_vx_mask_DATA_APCP_24
+	- pass - 	1.067 sec
+TEST: gen_vx_mask_POLY_PASS_THRU
+	- pass - 	0.633 sec
+TEST: gen_vx_mask_POLY_INTERSECTION
+	- pass - 	0.633 sec
+TEST: gen_vx_mask_POLY_UNION
+	- pass - 	0.634 sec
+TEST: gen_vx_mask_POLY_SYMDIFF
+	- pass - 	0.627 sec
+TEST: gen_vx_mask_DATA_INPUT_FIELD
+	- pass - 	1.211 sec
+TEST: gen_vx_mask_BOX
+	- pass - 	0.536 sec
+TEST: gen_vx_mask_SOLAR_ALT
+	- pass - 	0.557 sec
+TEST: gen_vx_mask_SOLAR_AZI
+	- pass - 	0.673 sec
+TEST: gen_vx_mask_LAT
+	- pass - 	0.543 sec
+TEST: gen_vx_mask_LON
+	- pass - 	0.548 sec
+TEST: gen_vx_mask_SHAPE
+	- pass - 	0.549 sec
+TEST: gen_vx_mask_SHAPE_STR
+	- pass - 	0.695 sec
+TEST: gen_vx_mask_SHAPE_STR_MULTI
+	- pass - 	0.605 sec
+TEST: gen_vx_mask_PYTHON
+	- pass - 	1.605 sec
+TEST: gen_vx_mask_DATA_TWO_FILE_TYPES
+	- pass - 	1.22 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_gen_ens_prod.xml
+
+TEST: gen_ens_prod_NO_CTRL
+	- pass - 	9.428 sec
+TEST: gen_ens_prod_WITH_CTRL
+	- pass - 	8.858 sec
+TEST: gen_ens_prod_SINGLE_FILE_NC_NO_CTRL
+	- pass - 	1.23 sec
+TEST: gen_ens_prod_SINGLE_FILE_NC_WITH_CTRL
+	- pass - 	1.144 sec
+TEST: gen_ens_prod_SINGLE_FILE_GRIB_NO_CTRL
+	- pass - 	1.206 sec
+TEST: gen_ens_prod_SINGLE_FILE_GRIB_WITH_CTRL
+	- pass - 	1.213 sec
+TEST: gen_ens_prod_NORMALIZE
+	- pass - 	6.058 sec
+TEST: gen_ens_prod_CLIMO_ANOM_ENS_MEMBER_ID
+	- pass - 	0.88 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_pcp_combine.xml
+
+TEST: pcp_combine_sum_GRIB1
+	- pass - 	28.664 sec
+TEST: pcp_combine_sum_GRIB1_MISSING
+	- pass - 	14.362 sec
+TEST: pcp_combine_sum_GRIB1_MULTIPLE_FIELDS
+	- pass - 	42.993 sec
+TEST: pcp_combine_sum_GRIB2
+	- pass - 	1.445 sec
+TEST: pcp_combine_add_GRIB1
+	- pass - 	1.686 sec
+TEST: pcp_combine_add_GRIB2
+	- pass - 	0.601 sec
+TEST: pcp_combine_add_STAGEIV
+	- pass - 	1.207 sec
+TEST: pcp_combine_add_ACCUMS
+	- pass - 	1.414 sec
+TEST: pcp_combine_sub_GRIB1
+	- pass - 	1.089 sec
+TEST: pcp_combine_sub_GRIB1_run2
+	- pass - 	0.675 sec
+TEST: pcp_combine_sub_GRIB2
+	- pass - 	0.553 sec
+TEST: pcp_combine_sub_NC_MET_06
+	- pass - 	0.631 sec
+TEST: pcp_combine_sub_P_INTERP
+	- pass - 	0.811 sec
+TEST: pcp_combine_add_VARNAME
+	- pass - 	0.891 sec
+TEST: pcp_combine_sub_DIFFERENT_INIT
+	- pass - 	0.669 sec
+TEST: pcp_combine_sub_NEGATIVE_ACCUM
+	- pass - 	0.694 sec
+TEST: pcp_combine_sub_SUBTRACT_MULTIPLE_FIELDS
+	- pass - 	1.045 sec
+TEST: pcp_combine_derive_LIST_OF_FILES
+	- pass - 	1.104 sec
+TEST: pcp_combine_derive_MULTIPLE_FIELDS
+	- pass - 	3.137 sec
+TEST: pcp_combine_derive_VLD_THRESH
+	- pass - 	1.208 sec
+TEST: pcp_combine_derive_CUSTOM_NAMES
+	- pass - 	0.747 sec
+TEST: pcp_combine_sub_ROT_LL
+	- pass - 	1.096 sec
+TEST: pcp_combine_LAEA_GRIB2
+	- pass - 	1.428 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_wwmca_regrid.xml
+
+TEST: wwmca_regrid_G003_NO_AGE
+	- pass - 	2.472 sec
+TEST: wwmca_regrid_G003_AGE_60
+	- pass - 	1.532 sec
+TEST: wwmca_regrid_G003_AGE_120
+	- pass - 	1.531 sec
+TEST: wwmca_regrid_G003_AGE_240
+	- pass - 	1.575 sec
+TEST: wwmca_regrid_G003_WRITE_PIXEL_AGE
+	- pass - 	1.547 sec
+TEST: wwmca_regrid_GFS_LATLON
+	- pass - 	4.694 sec
+TEST: wwmca_regrid_GFS_MERCATOR
+	- pass - 	0.699 sec
+TEST: wwmca_regrid_NAM_LAMBERT
+	- pass - 	5.288 sec
+TEST: wwmca_regrid_HMT_STEREO
+	- pass - 	0.963 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_point_stat.xml
+
+TEST: point_stat_GRIB1_NAM_GDAS
+	- pass - 	49.029 sec
+TEST: point_stat_GRIB1_NAM_GDAS_WINDS
+	- pass - 	11.773 sec
+TEST: point_stat_GRIB1_NAM_GDAS_MASK_SID
+	- pass - 	43.827 sec
+TEST: point_stat_GRIB2_NAM_NDAS
+	- pass - 	36.403 sec
+TEST: point_stat_GRIB2_SREF_GDAS
+	- pass - 	28.574 sec
+TEST: point_stat_GRIB1_NAM_TRMM
+	- pass - 	15.594 sec
+TEST: point_stat_GRIB2_SREF_TRMM
+	- pass - 	15.265 sec
+TEST: point_stat_NCMET_NAM_HMTGAGE
+	- pass - 	1.756 sec
+TEST: point_stat_NCMET_NAM_NDAS_SEEPS
+	- pass - 	9.972 sec
+TEST: point_stat_NCPINT_TRMM
+	- pass - 	15.005 sec
+TEST: point_stat_NCPINT_NDAS
+	- pass - 	7.636 sec
+TEST: point_stat_GRIB2_SREF_TRMM_prob
+	- pass - 	2.426 sec
+TEST: point_stat_GTG_lc
+	- pass - 	60.144 sec
+TEST: point_stat_GTG_latlon
+	- pass - 	43.921 sec
+TEST: point_stat_SID_INC_EXC
+	- pass - 	6.573 sec
+TEST: point_stat_SID_INC_EXC_CENSOR
+	- pass - 	7.393 sec
+TEST: point_stat_GRIB1_NAM_GDAS_INTERP_OPTS
+	- pass - 	5.202 sec
+TEST: point_stat_GRIB1_NAM_GDAS_INTERP_OPTS_name
+	- pass - 	20.228 sec
+TEST: point_stat_LAND_TOPO_MASK
+	- pass - 	36.319 sec
+TEST: point_stat_MPR_THRESH
+	- pass - 	57.575 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_stat_analysis_ps.xml
+
+TEST: stat_analysis_CONFIG_POINT_STAT
+	- pass - 	44.426 sec
+TEST: stat_analysis_POINT_STAT_SUMMARY
+	- pass - 	34.47 sec
+TEST: stat_analysis_POINT_STAT_SUMMARY_UNION
+	- pass - 	19.293 sec
+TEST: stat_analysis_POINT_STAT_FILTER_OBS_SID
+	- pass - 	1.695 sec
+TEST: stat_analysis_POINT_STAT_FILTER_TIMES
+	- pass - 	8.536 sec
+TEST: stat_analysis_POINT_STAT_SEEPS
+	- pass - 	3.168 sec
+TEST: stat_analysis_RAMPS
+	- pass - 	3.089 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_duplicate_flag.xml
+
+TEST: point_stat_DUP_NONE
+	- pass - 	0.694 sec
+TEST: point_stat_DUP_UNIQUE
+	- pass - 	0.679 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_obs_summary.xml
+
+TEST: ascii2nc_obs_summary
+	- pass - 	0.571 sec
+TEST: point_stat_OS_NONE
+	- pass - 	0.684 sec
+TEST: point_stat_OS_NEAREST
+	- pass - 	0.728 sec
+TEST: point_stat_OS_MIN
+	- pass - 	0.676 sec
+TEST: point_stat_OS_MAX
+	- pass - 	0.686 sec
+TEST: point_stat_OS_UW_MEAN
+	- pass - 	0.681 sec
+TEST: point_stat_OS_DW_MEAN
+	- pass - 	0.676 sec
+TEST: point_stat_OS_MEDIAN
+	- pass - 	0.677 sec
+TEST: point_stat_OS_PERC
+	- pass - 	0.682 sec
+TEST: point_stat_OS_UNIQUE_ALL
+	- pass - 	1.406 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_grid_stat.xml
+
+TEST: grid_stat_GRIB_lvl_typ_val
+	- pass - 	102.432 sec
+TEST: grid_stat_GRIB_set_attr
+	- pass - 	26.404 sec
+TEST: grid_stat_GRIB2_NAM_RTMA
+	- pass - 	21.167 sec
+TEST: grid_stat_GRIB2_NAM_RTMA_NP2
+	- pass - 	19.316 sec
+TEST: grid_stat_GRIB1_NAM_STAGE4
+	- pass - 	35.211 sec
+TEST: grid_stat_GRIB1_NAM_STAGE4_CENSOR
+	- pass - 	3.779 sec
+TEST: grid_stat_GTG_lc
+	- pass - 	2.261 sec
+TEST: grid_stat_GTG_latlon
+	- pass - 	3.405 sec
+TEST: grid_stat_GRIB2_SREF_STAGE4_prob_as_scalar
+	- pass - 	2.357 sec
+TEST: grid_stat_APPLY_MASK_TRUE
+	- pass - 	5.515 sec
+TEST: grid_stat_APPLY_MASK_FALSE
+	- pass - 	5.392 sec
+TEST: grid_stat_GFS_FOURIER
+	- pass - 	8.642 sec
+TEST: grid_stat_MPR_THRESH
+	- pass - 	59.558 sec
+TEST: grid_stat_UK_SEEPS
+	- pass - 	4.344 sec
+TEST: grid_stat_WRF_pres
+	- pass - 	1.113 sec
+TEST: grid_stat_GEN_ENS_PROD
+	- pass - 	3.09 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_stat_analysis_gs.xml
+
+TEST: stat_analysis_CONFIG_GRID_STAT
+	- pass - 	0.878 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_wavelet_stat.xml
+
+TEST: wavelet_stat_GRIB1_NAM_STAGE4
+	- pass - 	27.062 sec
+TEST: wavelet_stat_GRIB1_NAM_STAGE4_NO_THRESH
+	- pass - 	15.383 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_stat_analysis_ws.xml
+
+TEST: stat_analysis_AGG_ISC
+	- pass - 	0.64 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_ensemble_stat.xml
+
+TEST: ensemble_stat_CMD_LINE
+	- pass - 	5.766 sec
+TEST: ensemble_stat_FILE_LIST
+	- pass - 	5.425 sec
+TEST: ensemble_stat_MASK_SID
+	- pass - 	1.392 sec
+TEST: ensemble_stat_MASK_SID_CTRL
+	- pass - 	1.345 sec
+TEST: ensemble_stat_MASK_SID_CENSOR
+	- pass - 	1.732 sec
+TEST: ensemble_stat_SKIP_CONST
+	- pass - 	5.18 sec
+TEST: ensemble_stat_OBSERR
+	- pass - 	13.099 sec
+TEST: ensemble_stat_SINGLE_FILE_NC_NO_CTRL
+	- pass - 	3.044 sec
+TEST: ensemble_stat_SINGLE_FILE_NC_WITH_CTRL
+	- pass - 	3.158 sec
+TEST: ensemble_stat_SINGLE_FILE_GRIB_NO_CTRL
+	- pass - 	2.072 sec
+TEST: ensemble_stat_SINGLE_FILE_GRIB_WITH_CTRL
+	- pass - 	2.109 sec
+TEST: ensemble_stat_RPS_CLIMO_BIN_PROB
+	- pass - 	0.581 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_stat_analysis_es.xml
+
+TEST: stat_analysis_AGG_RHIST
+	- pass - 	0.843 sec
+TEST: stat_analysis_AGG_PHIST
+	- pass - 	0.843 sec
+TEST: stat_analysis_AGG_RELP
+	- pass - 	1.007 sec
+TEST: stat_analysis_AGG_ECNT
+	- pass - 	1.031 sec
+TEST: stat_analysis_AGG_STAT_ORANK_RHIST_PHIST
+	- pass - 	5.348 sec
+TEST: stat_analysis_AGG_STAT_ORANK_RELP
+	- pass - 	4.691 sec
+TEST: stat_analysis_AGG_STAT_ORANK_SSVAR
+	- pass - 	5.3 sec
+TEST: stat_analysis_AGG_STAT_ORANK_ECNT
+	- pass - 	11.662 sec
+TEST: stat_analysis_AGG_SSVAR
+	- pass - 	1.132 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_mode.xml
+
+TEST: mode_NO_MATCH_MERGE
+	- pass - 	2.319 sec
+TEST: mode_NO_MERGE
+	- pass - 	1.94 sec
+TEST: mode_MERGE_BOTH
+	- pass - 	3.724 sec
+TEST: mode_MASK_POLY
+	- pass - 	1.96 sec
+TEST: mode_QUILT
+	- pass - 	5.595 sec
+TEST: mode_CONFIG_MERGE
+	- pass - 	3.549 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_mode_multivar.xml
+
+TEST: mode_multivar_snow
+	- pass - 	36.544 sec
+TEST: mode_multivar_snow_3_2
+	- pass - 	19.229 sec
+TEST: mode_multivar_snow_super
+	- pass - 	31.774 sec
+TEST: mode_multivar_FAKE_DATA
+	- pass - 	4.152 sec
+TEST: mode_multivar_FAKE_DATA_with_intensities
+	- pass - 	6.589 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_mode_analysis.xml
+
+TEST: mode_analysis_BYCASE_SIMPLE
+	- pass - 	0.758 sec
+TEST: mode_analysis_BYCASE_CLUSTER
+	- pass - 	0.55 sec
+TEST: mode_analysis_MET-644_LOOKIN_BY_DIR
+	- pass - 	0.593 sec
+TEST: mode_analysis_MET-644_LOOKIN_BY_FILE
+	- pass - 	0.553 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_plot_point_obs.xml
+
+TEST: plot_point_obs_G218
+	- pass - 	4.803 sec
+TEST: plot_point_obs_TMP_ADPUPA
+	- pass - 	4.345 sec
+TEST: plot_point_obs_CONFIG
+	- pass - 	4.309 sec
+TEST: plot_point_obs_CONFIG_REGRID
+	- pass - 	4.069 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_plot_data_plane.xml
+
+TEST: plot_data_plane_GRIB1
+	- pass - 	1.385 sec
+TEST: plot_data_plane_GRIB1_REC
+	- pass - 	0.934 sec
+TEST: plot_data_plane_GRIB1_CODE
+	- pass - 	0.916 sec
+TEST: plot_data_plane_GRIB1_ENS
+	- pass - 	0.825 sec
+TEST: plot_data_plane_GRIB1_ENS_HI
+	- pass - 	0.793 sec
+TEST: plot_data_plane_GRIB1_rotlatlon
+	- pass - 	0.721 sec
+TEST: plot_data_plane_GRIB2
+	- pass - 	0.858 sec
+TEST: plot_data_plane_GRIB2_ENS
+	- pass - 	0.715 sec
+TEST: plot_data_plane_GRIB2_ENS_LOW
+	- pass - 	0.725 sec
+TEST: plot_data_plane_GRIB2_PROB
+	- pass - 	0.645 sec
+TEST: plot_data_plane_NC_PINTERP
+	- pass - 	0.755 sec
+TEST: plot_data_plane_NC_MET
+	- pass - 	0.804 sec
+TEST: plot_data_plane_NCCF_lc_0
+	- pass - 	0.746 sec
+TEST: plot_data_plane_NCCF_lc_25
+	- pass - 	0.815 sec
+TEST: plot_data_plane_NCCF_lc_50
+	- pass - 	0.802 sec
+TEST: plot_data_plane_NCCF_latlon_0
+	- pass - 	1.003 sec
+TEST: plot_data_plane_NCCF_latlon_12
+	- pass - 	0.976 sec
+TEST: plot_data_plane_NCCF_latlon_25
+	- pass - 	0.976 sec
+TEST: plot_data_plane_NCCF_latlon_by_value
+	- pass - 	0.956 sec
+TEST: plot_data_plane_NCCF_north_to_south
+	- pass - 	4.35 sec
+TEST: plot_data_plane_NCCF_time
+	- pass - 	0.681 sec
+TEST: plot_data_plane_NCCF_time_int64
+	- pass - 	0.73 sec
+TEST: plot_data_plane_NCCF_rotlatlon
+	- pass - 	0.934 sec
+TEST: plot_data_plane_TRMM_3B42_3hourly_nc
+	- pass - 	1.041 sec
+TEST: plot_data_plane_TRMM_3B42_daily_nc
+	- pass - 	1.233 sec
+TEST: plot_data_plane_TRMM_3B42_daily_packed
+	- pass - 	1.209 sec
+TEST: plot_data_plane_TRMM_3B42_daily_packed_CONVERT
+	- pass - 	1.71 sec
+TEST: plot_data_plane_EaSM_CMIP5_rcp85
+	- pass - 	0.752 sec
+TEST: plot_data_plane_EaSM_CMIP5_rcp85_time_slice
+	- pass - 	0.76 sec
+TEST: plot_data_plane_EaSM_CESM
+	- pass - 	0.771 sec
+TEST: plot_data_plane_GRIB2_NBM_CWASP_L0
+	- pass - 	3.072 sec
+TEST: plot_data_plane_GRIB2_NBM_CWASP_PERC_5
+	- pass - 	3.146 sec
+TEST: plot_data_plane_GRIB2_NBM_CWASP_PROB_50
+	- pass - 	2.262 sec
+TEST: plot_data_plane_GRIB2_NBM_WETBT_MIXED_LEVELS
+	- pass - 	3.377 sec
+TEST: plot_data_plane_GRIB2_NBM_FICEAC_A48_PERC_10
+	- pass - 	2.102 sec
+TEST: plot_data_plane_LAEA_GRIB2
+	- pass - 	1.631 sec
+TEST: plot_data_plane_LAEA_NCCF
+	- pass - 	1.595 sec
+TEST: plot_data_plane_LAEA_MET_NC
+	- pass - 	1.634 sec
+TEST: plot_data_plane_NCCF_POLAR_STEREO
+	- pass - 	1.747 sec
+TEST: plot_data_plane_NCCF_POLAR_ELLIPSOIDAL
+	- pass - 	0.719 sec
+TEST: plot_data_plane_GRIB2_TABLE_4.48
+	- pass - 	1.514 sec
+TEST: plot_data_plane_WRF_west_east_stag
+	- pass - 	0.864 sec
+TEST: plot_data_plane_WRF_south_north_stag
+	- pass - 	0.863 sec
+TEST: plot_data_plane_WRF_num_press_levels_stag
+	- pass - 	0.761 sec
+TEST: plot_data_plane_WRF_num_z_levels_stag
+	- pass - 	0.741 sec
+TEST: plot_data_plane_WRF_bottom_top
+	- pass - 	0.866 sec
+TEST: plot_data_plane_WRF_bottom_top_stag
+	- pass - 	0.852 sec
+TEST: plot_data_plane_set_attr_grid
+	- pass - 	14.222 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_wwmca_plot.xml
+
+TEST: wwmca_plot_NH_SH_AGE_240
+	- pass - 	2.607 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_series_analysis.xml
+
+TEST: series_analysis_CMD_LINE
+	- pass - 	8.969 sec
+TEST: series_analysis_AGGR_CMD_LINE
+	- pass - 	10.585 sec
+TEST: series_analysis_FILE_LIST
+	- pass - 	6.317 sec
+TEST: series_analysis_AGGR_FILE_LIST
+	- pass - 	7.913 sec
+TEST: series_analysis_UPPER_AIR
+	- pass - 	3.876 sec
+TEST: series_analysis_CONDITIONAL
+	- pass - 	3.963 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_tc_dland.xml
+
+TEST: tc_dland_ONE_DEG
+	- pass - 	17.215 sec
+TEST: tc_dland_HALF_DEG
+	- pass - 	65.738 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_tc_pairs.xml
+
+TEST: tc_pairs_ALAL2010
+	- pass - 	2.412 sec
+TEST: tc_pairs_CONSENSUS
+	- pass - 	5.688 sec
+TEST: tc_pairs_INTERP12_FILL
+	- pass - 	0.923 sec
+TEST: tc_pairs_INTERP12_REPLACE
+	- pass - 	0.938 sec
+TEST: tc_pairs_PROBRIRW
+	- pass - 	2.656 sec
+TEST: tc_pairs_BASIN_MAP
+	- pass - 	2.661 sec
+TEST: tc_pairs_LEAD_REQ
+	- pass - 	1.023 sec
+TEST: tc_pairs_WRITE_VALID
+	- pass - 	0.741 sec
+TEST: tc_pairs_WRITE_VALID_PROBRIRW
+	- pass - 	2.105 sec
+TEST: tc_pairs_DIAGNOSTICS
+	- pass - 	0.932 sec
+TEST: tc_pairs_DIAGNOSTICS_CONSENSUS
+	- pass - 	5.124 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_tc_stat.xml
+
+TEST: tc_stat_ALAL2010
+	- pass - 	24.263 sec
+TEST: tc_stat_FILTER_STRINGS
+	- pass - 	2.475 sec
+TEST: tc_stat_PROBRIRW
+	- pass - 	40.831 sec
+TEST: tc_stat_LEAD_REQ
+	- pass - 	1.483 sec
+TEST: tc_stat_FALSE_ALARMS
+	- pass - 	2.438 sec
+TEST: tc_stat_DIAGNOSTICS
+	- pass - 	7.112 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_plot_tc.xml
+
+TEST: plot_tc_TCMPR
+	- pass - 	9.155 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_tc_rmw.xml
+
+TEST: tc_rmw_PRESSURE_LEV_OUT
+	- pass - 	39.751 sec
+TEST: tc_rmw_GONZALO
+	- pass - 	9.403 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_rmw_analysis.xml
+
+TEST: rmw_analysis
+	- pass - 	1.61 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_tc_diag.xml
+
+TEST: tc_diag_IAN
+	- pass - 	117.499 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_tc_gen.xml
+
+TEST: tc_gen_2016
+	- pass - 	94.491 sec
+TEST: tc_gen_prob
+	- pass - 	1.05 sec
+TEST: tc_gen_2021_shape
+	- pass - 	9.322 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_met_test_scripts.xml
+
+TEST: test_all_gen_vx_mask_1
+	- pass - 	1.263 sec
+TEST: test_all_gen_vx_mask_2
+	- pass - 	1.054 sec
+TEST: test_all_gen_ens_prod
+	- pass - 	1.72 sec
+TEST: test_all_pcp_combine_1
+	- pass - 	1.855 sec
+TEST: test_all_pcp_combine_2
+	- pass - 	3.97 sec
+TEST: test_all_pcp_combine_3
+	- pass - 	5.307 sec
+TEST: test_all_pcp_combine_4
+	- pass - 	1.066 sec
+TEST: test_all_pcp_combine_5
+	- pass - 	1.075 sec
+TEST: test_all_pcp_combine_6
+	- pass - 	1.563 sec
+TEST: test_all_mode_1
+	- pass - 	2.505 sec
+TEST: test_all_mode_2
+	- pass - 	2.463 sec
+TEST: test_all_mode_3
+	- pass - 	3.169 sec
+TEST: test_all_grid_stat_1
+	- pass - 	2.189 sec
+TEST: test_all_grid_stat_2
+	- pass - 	0.646 sec
+TEST: test_all_grid_stat_3
+	- pass - 	1.26 sec
+TEST: test_all_grid_stat_4
+	- pass - 	8.559 sec
+TEST: test_all_pb2nc
+	- pass - 	3.645 sec
+TEST: test_all_plot_point_obs
+	- pass - 	5.294 sec
+TEST: test_all_ascii2nc_1
+	- pass - 	0.599 sec
+TEST: test_all_ascii2nc_2
+	- pass - 	0.715 sec
+TEST: test_all_madis2nc
+	- pass - 	1.521 sec
+TEST: test_all_point_stat
+	- pass - 	72.135 sec
+TEST: test_all_wavelet_stat_1
+	- pass - 	4.892 sec
+TEST: test_all_wavelet_stat_2
+	- pass - 	2.751 sec
+TEST: test_all_ensemble_stat
+	- pass - 	9.129 sec
+TEST: test_all_stat_analysis
+	- pass - 	15.05 sec
+TEST: test_all_mode_analysis_1
+	- pass - 	0.713 sec
+TEST: test_all_mode_analysis_2
+	- pass - 	0.561 sec
+TEST: test_all_mode_analysis_3
+	- pass - 	0.574 sec
+TEST: test_all_plot_data_plane_1
+	- pass - 	1.109 sec
+TEST: test_all_plot_data_plane_2
+	- pass - 	0.662 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_modis.xml
+
+TEST: modis_regrid_SURFACE_TEMPERATURE
+	- pass - 	3.171 sec
+TEST: modis_regrid_CLOUD_FRACTION
+	- pass - 	2.371 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_ref_config_lead_00.xml
+
+TEST: gen_vx_mask
+	- pass - 	2.464 sec
+TEST: pb2nc_ndas_lead_00
+	- pass - 	8.045 sec
+TEST: point_stat_lead_00_upper_air_AFWAv3.4_Noahv2.7.1
+	- pass - 	48.708 sec
+TEST: point_stat_lead_00_surface_AFWAv3.4_Noahv2.7.1
+	- pass - 	24.294 sec
+TEST: point_stat_lead_00_winds_AFWAv3.4_Noahv2.7.1
+	- pass - 	56.158 sec
+TEST: point_stat_lead_00_upper_air_AFWAv3.4_Noahv3.3
+	- pass - 	48.776 sec
+TEST: point_stat_lead_00_surface_AFWAv3.4_Noahv3.3
+	- pass - 	24.526 sec
+TEST: point_stat_lead_00_winds_AFWAv3.4_Noahv3.3
+	- pass - 	56.448 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_ref_config_lead_12.xml
+
+TEST: gen_vx_mask
+	- pass - 	2.225 sec
+TEST: pb2nc_ndas_lead_12
+	- pass - 	8.146 sec
+TEST: pcp_combine_ST2ml_3hr_09_12
+	- pass - 	0.909 sec
+TEST: pcp_combine_wrf_3hr_09_12
+	- pass - 	1.143 sec
+TEST: point_stat_lead_12_upper_air_AFWAv3.4_Noahv2.7.1
+	- pass - 	48.863 sec
+TEST: point_stat_lead_12_surface_AFWAv3.4_Noahv2.7.1
+	- pass - 	25.401 sec
+TEST: point_stat_lead_12_winds_AFWAv3.4_Noahv2.7.1
+	- pass - 	55.69 sec
+TEST: point_stat_lead_12_upper_air_AFWAv3.4_Noahv3.3
+	- pass - 	48.919 sec
+TEST: point_stat_lead_12_surface_AFWAv3.4_Noahv3.3
+	- pass - 	25.006 sec
+TEST: point_stat_lead_12_winds_AFWAv3.4_Noahv3.3
+	- pass - 	55.808 sec
+TEST: grid_stat_3hr_accum_time_12
+	- pass - 	0.883 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_ref_config_lead_24.xml
+
+TEST: gen_vx_mask
+	- pass - 	2.181 sec
+TEST: pb2nc_ndas_lead_24
+	- pass - 	7.926 sec
+TEST: pcp_combine_ST2ml_3hr_21_24
+	- pass - 	0.76 sec
+TEST: pcp_combine_wrf_3hr_21_24
+	- pass - 	1.115 sec
+TEST: point_stat_lead_24_upper_air_AFWAv3.4_Noahv2.7.1
+	- pass - 	47.982 sec
+TEST: point_stat_lead_24_surface_AFWAv3.4_Noahv2.7.1
+	- pass - 	23.972 sec
+TEST: point_stat_lead_24_winds_AFWAv3.4_Noahv2.7.1
+	- pass - 	54.219 sec
+TEST: point_stat_lead_24_upper_air_AFWAv3.4_Noahv3.3
+	- pass - 	48.24 sec
+TEST: point_stat_lead_24_surface_AFWAv3.4_Noahv3.3
+	- pass - 	24.114 sec
+TEST: point_stat_lead_24_winds_AFWAv3.4_Noahv3.3
+	- pass - 	54.602 sec
+TEST: grid_stat_3hr_accum_time_24
+	- pass - 	0.892 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_ref_config_lead_36.xml
+
+TEST: gen_vx_mask
+	- pass - 	2.186 sec
+TEST: pb2nc_ndas_lead_36
+	- pass - 	8.025 sec
+TEST: pcp_combine_ST2ml_3hr_33_36
+	- pass - 	0.697 sec
+TEST: pcp_combine_ST2ml_24hr_12_36
+	- pass - 	0.596 sec
+TEST: pcp_combine_wrf_3hr_33_36
+	- pass - 	1.092 sec
+TEST: pcp_combine_wrf_24hr_12_36
+	- pass - 	1.108 sec
+TEST: point_stat_lead_36_upper_air_AFWAv3.4_Noahv2.7.1
+	- pass - 	48.391 sec
+TEST: point_stat_lead_36_surface_AFWAv3.4_Noahv2.7.1
+	- pass - 	24.7 sec
+TEST: point_stat_lead_36_winds_AFWAv3.4_Noahv2.7.1
+	- pass - 	54.79 sec
+TEST: point_stat_lead_36_upper_air_AFWAv3.4_Noahv3.3
+	- pass - 	48.341 sec
+TEST: point_stat_lead_36_surface_AFWAv3.4_Noahv3.3
+	- pass - 	24.723 sec
+TEST: point_stat_lead_36_winds_AFWAv3.4_Noahv3.3
+	- pass - 	54.725 sec
+TEST: grid_stat_3hr_accum_time_36
+	- pass - 	0.917 sec
+TEST: grid_stat_24hr_accum_time_36
+	- pass - 	0.896 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_ref_config_lead_48.xml
+
+TEST: gen_vx_mask
+	- pass - 	2.193 sec
+TEST: pb2nc_ndas_lead_48
+	- pass - 	8.014 sec
+TEST: pcp_combine_ST2ml_3hr_45_48
+	- pass - 	0.72 sec
+TEST: pcp_combine_wrf_3hr_45_48
+	- pass - 	1.101 sec
+TEST: point_stat_lead_48_upper_air_AFWAv3.4_Noahv2.7.1
+	- pass - 	48.027 sec
+TEST: point_stat_lead_48_surface_AFWAv3.4_Noahv2.7.1
+	- pass - 	24.714 sec
+TEST: point_stat_lead_48_winds_AFWAv3.4_Noahv2.7.1
+	- pass - 	54.824 sec
+TEST: point_stat_lead_48_upper_air_AFWAv3.4_Noahv3.3
+	- pass - 	48.048 sec
+TEST: point_stat_lead_48_surface_AFWAv3.4_Noahv3.3
+	- pass - 	24.41 sec
+TEST: point_stat_lead_48_winds_AFWAv3.4_Noahv3.3
+	- pass - 	55.39 sec
+TEST: grid_stat_3hr_accum_time_48
+	- pass - 	0.893 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_ref_config.xml
+
+TEST: stat_analysis_GO_Index
+	- pass - 	1.468 sec
+TEST: stat_analysis_GO_Index_out_stat
+	- pass - 	1.179 sec
+TEST: stat_analysis_SFC_SS_Index_out
+	- pass - 	0.874 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_mode_graphics.xml
+
+TEST: mode_graphics_PLOT_MULTIPLE
+	- pass - 	63.828 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_regrid.xml
+
+TEST: regrid_grid_stat_ST4_TO_HMT
+	- pass - 	1.052 sec
+TEST: regrid_grid_stat_HMT_TO_ST4
+	- pass - 	8.112 sec
+TEST: regrid_grid_stat_BOTH_TO_DTC165
+	- pass - 	1.594 sec
+TEST: regrid_grid_stat_BOTH_TO_NAM
+	- pass - 	5.106 sec
+TEST: regrid_grid_stat_BOTH_TO_HMT_D02
+	- pass - 	1.577 sec
+TEST: regrid_data_plane_GFS_TO_HMT_NEAREST
+	- pass - 	2.858 sec
+TEST: regrid_data_plane_GFS_ROTLATLON_GRID_SPEC
+	- pass - 	2.465 sec
+TEST: regrid_data_plane_GFS_TO_HMT_BILIN
+	- pass - 	2.782 sec
+TEST: regrid_data_plane_GFS_TO_HMT_BUDGET
+	- pass - 	2.539 sec
+TEST: regrid_data_plane_GFS_TO_HMT_MIN_3
+	- pass - 	3.824 sec
+TEST: regrid_data_plane_GFS_TO_HMT_MAX_3
+	- pass - 	3.887 sec
+TEST: regrid_data_plane_GFS_TO_HMT_UW_MEAN_3
+	- pass - 	3.837 sec
+TEST: regrid_data_plane_GFS_TO_HMT_UW_MEAN_9
+	- pass - 	19.083 sec
+TEST: regrid_data_plane_GFS_TO_HMT_DW_MEAN_3
+	- pass - 	3.94 sec
+TEST: regrid_data_plane_HRRR_MAXGAUSS
+	- pass - 	4.686 sec
+TEST: regrid_data_plane_GFS_TO_HMT_MEDIAN_3
+	- pass - 	3.921 sec
+TEST: regrid_data_plane_GFS_TO_HMT_LS_FIT_3
+	- pass - 	3.982 sec
+TEST: regrid_data_plane_GFS_TO_HMT_MAX_5_SQUARE
+	- pass - 	1.92 sec
+TEST: regrid_data_plane_GFS_TO_G212_CONVERT_CENSOR
+	- pass - 	0.893 sec
+TEST: regrid_data_plane_WRAP_LON
+	- pass - 	1.438 sec
+TEST: regrid_data_plane_NC_ROT_LAT_LON
+	- pass - 	2.385 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_gsi_tools.xml
+
+TEST: gsid2mpr_CONV
+	- pass - 	2.161 sec
+TEST: gsid2mpr_DUP
+	- pass - 	1.27 sec
+TEST: gsid2mpr_RAD
+	- pass - 	2.469 sec
+TEST: gsidens2orank_CONV_NO_MEAN
+	- pass - 	5.607 sec
+TEST: gsidens2orank_CONV_ENS_MEAN
+	- pass - 	4.809 sec
+TEST: gsidens2orank_RAD
+	- pass - 	4.108 sec
+TEST: gsidens2orank_RAD_CHANNEL
+	- pass - 	1.14 sec
+TEST: stat_analysis_MPR_TO_CNT
+	- pass - 	2.631 sec
+TEST: stat_analysis_ORANK_TO_RHIST
+	- pass - 	23.803 sec
+TEST: stat_analysis_ORANK_TO_SSVAR
+	- pass - 	23.779 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_aeronet.xml
+
+TEST: ascii2nc_AERONET_daily
+	- pass - 	0.814 sec
+TEST: ascii2nc_AERONET_v3_daily
+	- pass - 	0.537 sec
+TEST: ascii2nc_AERONET_v3_concat
+	- pass - 	0.574 sec
+TEST: ascii2nc_AERONET_vld_thresh
+	- pass - 	0.545 sec
+TEST: ascii2nc_AERONET_monthly
+	- pass - 	0.698 sec
+TEST: point_stat_GRIB2_f18_NGAC_AERONET_daily
+	- pass - 	0.59 sec
+TEST: point_stat_GRIB2_f18_NGAC_AERONET_monthly
+	- pass - 	0.639 sec
+TEST: point_stat_GRIB2_f21_NGAC_AERONET_daily
+	- pass - 	0.595 sec
+TEST: point_stat_GRIB2_f21_NGAC_AERONET_monthly
+	- pass - 	0.639 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_shift_data_plane.xml
+
+TEST: shift_data_plane_GRIB1
+	- pass - 	4.387 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_mtd.xml
+
+TEST: mtd_basic
+	- pass - 	45.285 sec
+TEST: mtd_conv_time
+	- pass - 	47.593 sec
+TEST: mtd_single
+	- pass - 	11.058 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_climatology_1.0deg.xml
+
+TEST: climatology_POINT_STAT_GFS_1.0DEG
+	- pass - 	128.342 sec
+TEST: climatology_POINT_STAT_GFS_1.0DEG_CLIMO_PREV_MONTH
+	- pass - 	127.347 sec
+TEST: climatology_POINT_STAT_PROB_GFS_1.0DEG
+	- pass - 	11.152 sec
+TEST: climatology_GRID_STAT_PROB_GFS_1.0DEG
+	- pass - 	8.402 sec
+TEST: climatology_STAT_ANALYSIS_1.0DEG
+	- pass - 	3.124 sec
+TEST: climatology_SERIES_ANALYSIS_1.0DEG
+	- pass - 	168.005 sec
+TEST: climatology_SERIES_ANALYSIS_1.0DEG_CONST_CLIMO
+	- pass - 	49.084 sec
+TEST: climatology_SERIES_ANALYSIS_1.0DEG_AGGR
+	- pass - 	215.56 sec
+TEST: climatology_SERIES_ANALYSIS_PROB_1.0DEG
+	- pass - 	20.95 sec
+TEST: climatology_SERIES_ANALYSIS_PROB_1.0DEG_AGGR
+	- pass - 	24.843 sec
+TEST: climatology_ENSEMBLE_STAT_1.0DEG
+	- pass - 	31.429 sec
+TEST: climatology_ENSEMBLE_STAT_1.0DEG_ONE_CDF_BIN
+	- pass - 	11.051 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_climatology_1.5deg.xml
+
+TEST: climatology_POINT_STAT_WMO_1.5DEG
+	- pass - 	245.695 sec
+TEST: climatology_STAT_ANALYSIS_WMO_1.5DEG_MPR_AGG_STAT
+	- pass - 	0.741 sec
+TEST: climatology_STAT_ANALYSIS_WMO_1.5DEG_VAL1L2_AGG_STAT
+	- pass - 	0.607 sec
+TEST: climatology_STAT_ANALYSIS_WMO_1.5DEG_FILTER
+	- pass - 	0.758 sec
+TEST: climatology_GRID_STAT_WMO_1.5DEG
+	- pass - 	253.773 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_climatology_2.5deg.xml
+
+TEST: climatology_POINT_STAT_GFS_2.5DEG
+	- pass - 	207.139 sec
+TEST: climatology_GRID_STAT_WRAP_YEAR_2.5DEG
+	- pass - 	126.605 sec
+TEST: climatology_GRID_STAT_SINGLE_MONTH_2.5DEG
+	- pass - 	64.927 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_climatology_mixed.xml
+
+TEST: climatology_GRID_STAT_FCST_NCEP_1.0DEG_OBS_WMO_1.5DEG
+	- pass - 	72.612 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_grib_tables.xml
+
+TEST: GRIB1_um_dcf
+	- pass - 	2.76 sec
+TEST: GRIB2_um_raw
+	- pass - 	2.366 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_grid_weight.xml
+
+TEST: grid_weight_GRID_STAT_NONE
+	- pass - 	6.082 sec
+TEST: grid_weight_GRID_STAT_COS_LAT
+	- pass - 	6.075 sec
+TEST: grid_weight_GRID_STAT_AREA
+	- pass - 	6.081 sec
+TEST: grid_weight_ENSEMBLE_STAT_NONE
+	- pass - 	2.327 sec
+TEST: grid_weight_ENSEMBLE_STAT_COS_LAT
+	- pass - 	2.287 sec
+TEST: grid_weight_ENSEMBLE_STAT_AREA
+	- pass - 	2.291 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_netcdf.xml
+
+TEST: ascii2nc_no_compression
+	- pass - 	16.393 sec
+TEST: ascii2nc_compression2_by_config
+	- pass - 	16.728 sec
+TEST: ascii2nc_compression3_by_env
+	- pass - 	16.411 sec
+TEST: ascii2nc_compression4_by_argument
+	- pass - 	16.483 sec
+TEST: 365_days
+	- pass - 	1.913 sec
+TEST: netcdf_1byte_time
+	- pass - 	0.934 sec
+TEST: netcdf_months_units
+	- pass - 	0.653 sec
+TEST: netcdf_months_units_from_day2
+	- pass - 	0.535 sec
+TEST: netcdf_months_units_to_next_month
+	- pass - 	0.537 sec
+TEST: netcdf_years_units
+	- pass - 	0.535 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_hira.xml
+
+WARNING: unable to read test_dir from /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_hira.xml
+TEST: point_stat_NCMET_NAM_HMTGAGE_HIRA
+	- pass - 	10.392 sec
+TEST: point_stat_HIRA_EMPTY_PROB_CAT_THRESH
+	- pass - 	9.472 sec
+TEST: stat_analysis_CONFIG_HIRA
+	- pass - 	4.317 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_interp_shape.xml
+
+TEST: grid_stat_INTERP_SQUARE
+	- pass - 	6.366 sec
+TEST: grid_stat_INTERP_CIRCLE
+	- pass - 	5.351 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_lidar2nc.xml
+
+TEST: lidar2nc_CALIPSO
+	- pass - 	1.126 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_ioda2nc.xml
+
+TEST: ioda2nc_mask_sid_list
+	- pass - 	1.612 sec
+TEST: ioda2nc_var_all
+	- pass - 	0.549 sec
+TEST: ioda2nc_summary
+	- pass - 	0.566 sec
+TEST: ioda2nc_same_input
+	- pass - 	0.565 sec
+TEST: ioda2nc_int_datetime
+	- pass - 	0.575 sec
+TEST: ioda2nc_v2_string_sid
+	- pass - 	0.576 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_airnow.xml
+
+TEST: pb2nc_AIRNOW
+	- pass - 	16.993 sec
+TEST: point_stat_GRIB2_AIRNOW
+	- pass - 	2.994 sec
+
+CALLING: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py  /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/xml/unit_python.xml
+
+TEST: python_numpy_grid_name
+	- pass - 	1.728 sec
+TEST: python_numpy_grid_string
+	- pass - 	1.147 sec
+TEST: python_numpy_grid_data_file
+	- pass - 	1.163 sec
+TEST: python_numpy_plot_data_plane
+	- pass - 	1.221 sec
+TEST: python_xarray_plot_data_plane
+	- pass - 	1.193 sec
+TEST: python_numpy_plot_data_plane_missing
+	- FAIL - 	0.533 sec
+export MET_PYTHON_EXE=${MET_TEST_MET_PYTHON_EXE}
+/d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/../../share/met/../../bin/plot_data_plane \
+      PYTHON_NUMPY \
+      /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/../../test_output/python/letter_numpy_0_to_missing.ps \
+      'name = "/d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/../../share/met/python/examples/read_ascii_numpy.py /d1/projects/MET/MET_test_data/unit_test/python/letter.txt LETTER 0.0";' \
+      -plot_range 0.0 255.0 \
+      -title "Python enabled numpy plot_data_plane" \
+      -v 1
+DEBUG 1: Start plot_data_plane by johnhg(6088) at 2024-10-07 17:45:28Z  cmd: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/../../share/met/../../bin/plot_data_plane PYTHON_NUMPY /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/../../test_output/python/letter_numpy_0_to_missing.ps name = "/d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/../../share/met/python/examples/read_ascii_numpy.py /d1/projects/MET/MET_test_data/unit_test/python/letter.txt LETTER 0.0"; -plot_range 0.0 255.0 -title Python enabled numpy plot_data_plane -v 1 
+DEBUG 1: Opening data file: PYTHON_NUMPY
+sh: 1: /usr/local/python3/bin/python3: not found
+ERROR  : 
+ERROR  : tmp_nc_dataplane() -> command "${MET_TEST_MET_PYTHON_EXE} /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/../../share/met/python/pyembed/write_tmp_dataplane.py /tmp/tmp_met_data_386958_0 /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/../../share/met/python/examples/read_ascii_numpy /d1/projects/MET/MET_test_data/unit_test/python/letter.txt LETTER 0.0" failed ... status = 32512
+ERROR  : 
+unset MET_PYTHON_EXE
+
+
+ERROR: /d1/personal/johnhg/MET/MET_development/MET-feature_2887_categorical_weights/internal/test_unit/python/unit.py unit_python.xml failed.
+
+*** UNIT TESTS FAILED ***
+
