@@ -1727,8 +1727,8 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          // Append the unit vectors with no climatological values
          //
          ClimoPntInfo cpi;
-         m[key].pd_u.add_grid_pair(uf, uo, cpi, default_grid_weight);
-         m[key].pd_v.add_grid_pair(vf, vo, cpi, default_grid_weight);
+         m[key].pd_u.add_grid_pair(uf, uo, cpi, default_weight);
+         m[key].pd_v.add_grid_pair(vf, vo, cpi, default_weight);
 
          //
          // Keep track of the unique header column entries
@@ -1843,8 +1843,8 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.hdr_sa.add(hdr);
             ClimoPntInfo u_cpi(ufcmn, ufcsd, uocmn, uocsd);
             ClimoPntInfo v_cpi(vfcmn, vfcsd, vocmn, vocsd);
-            aggr.pd_u.add_grid_pair(uf, uo, u_cpi, default_grid_weight);
-            aggr.pd_v.add_grid_pair(vf, vo, v_cpi, default_grid_weight);
+            aggr.pd_u.add_grid_pair(uf, uo, u_cpi, default_weight);
+            aggr.pd_v.add_grid_pair(vf, vo, v_cpi, default_weight);
 
             //
             // Add the new map entry
@@ -1908,8 +1908,8 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
                m[key].hdr_sa.add(hdr);
                ClimoPntInfo u_cpi(ufcmn, ufcsd, uocmn, uocsd);
                ClimoPntInfo v_cpi(vfcmn, vfcsd, vocmn, vocsd);
-               m[key].pd_u.add_grid_pair(uf, uo, u_cpi, default_grid_weight);
-               m[key].pd_v.add_grid_pair(vf, vo, v_cpi, default_grid_weight);
+               m[key].pd_u.add_grid_pair(uf, uo, u_cpi, default_weight);
+               m[key].pd_v.add_grid_pair(vf, vo, v_cpi, default_weight);
             }
          }
 
@@ -2054,8 +2054,8 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
                              it->second.pd_v.f_na[i], uf, vf);
          convert_u_v_to_unit(it->second.pd_u.o_na[i],
                              it->second.pd_v.o_na[i], uo, vo);
-         aggr.pd_u.add_grid_pair(uf, uo, cpi, default_grid_weight);
-         aggr.pd_v.add_grid_pair(vf, vo, cpi, default_grid_weight);
+         aggr.pd_u.add_grid_pair(uf, uo, cpi, default_weight);
+         aggr.pd_v.add_grid_pair(vf, vo, cpi, default_weight);
       }
 
       //
@@ -2137,7 +2137,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             aggr.pd.ocmn_na.add(cur.obs_climo_mean);
             aggr.pd.ocsd_na.add(cur.obs_climo_stdev);
             aggr.pd.ocdf_na.add(cur.obs_climo_cdf);
-            aggr.pd.wgt_na.add(default_grid_weight);
+            aggr.pd.wgt_na.add(default_weight);
 
             aggr.fcst_var = cur.fcst_var;
             aggr.obs_var = cur.obs_var;
@@ -2168,7 +2168,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             m[key].pd.ocmn_na.add(cur.obs_climo_mean);
             m[key].pd.ocsd_na.add(cur.obs_climo_stdev);
             m[key].pd.ocdf_na.add(cur.obs_climo_cdf);
-            m[key].pd.wgt_na.add(default_grid_weight);
+            m[key].pd.wgt_na.add(default_weight);
 
             //
             // Only aggregate consistent variable names
@@ -3065,7 +3065,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          ClimoPntInfo cpi(cur.fcst_climo_mean, cur.fcst_climo_stdev,
                           cur.obs_climo_mean, cur.obs_climo_stdev);
-         m[key].ens_pd.add_grid_obs(cur.obs, cpi, default_grid_weight);
+         m[key].ens_pd.add_grid_obs(cur.obs, cpi, default_weight);
          m[key].ens_pd.skip_ba.add(false);
          m[key].ens_pd.n_pair++;
          m[key].ens_pd.r_na.add(cur.rank);

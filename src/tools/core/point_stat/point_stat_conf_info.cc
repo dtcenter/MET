@@ -71,6 +71,7 @@ void PointStatConfInfo::clear() {
    msg_typ_group_map.clear();
    mask_area_map.clear();
    mask_sid_map.clear();
+   point_weight_flag = PointWeightType::None;
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
@@ -150,6 +151,9 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
    // Conf: model
    model = parse_conf_string(&conf, conf_key_model);
+
+   // Conf: point_weight_flag
+   point_weight_flag = parse_conf_point_weight_flag(&conf);
 
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);

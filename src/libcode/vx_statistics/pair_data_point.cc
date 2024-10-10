@@ -503,8 +503,7 @@ void VxPairDataPoint::set_size(int types, int masks, int interps) {
 void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                                     const char *hdr_sid_str, unixtime hdr_ut,
                                     const char *obs_qty, float *obs_arr,
-                                    Grid &gr, const char *var_name,
-                                    const DataPlane *wgt_dp) {
+                                    Grid &gr, const char *var_name) {
 
    // Increment the number of tries count
    n_try++;
@@ -553,11 +552,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                       obs_info->is_specific_humidity();
    bool precip_flag = fcst_info->is_precipitation() &&
                       obs_info->is_precipitation();
-   int precip_interval = bad_data_int;
-   if(precip_flag) {
-      if(wgt_dp) precip_interval = wgt_dp->accum();
-      else precip_interval = fcst_dpa[0].accum();
-   }
+   int precip_interval = fcst_dpa[0].accum();
 
    bool has_seeps = false;
    SeepsScore *seeps = nullptr;
@@ -623,17 +618,12 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                continue;
             }
 
-            // Compute weight for current point
-            double wgt_v = (wgt_dp == nullptr ?
-                            default_grid_weight :
-                            wgt_dp->get(x, y));
-
             // Add the forecast, climatological, and observation data
             // Weight is from the nearest grid point
             int n = three_to_one(i_msg_typ, i_mask, i_interp);
             if(!pd[n].add_point_pair(hdr_sid_str,
                          hdr_lat, hdr_lon, obs_x, obs_y, hdr_ut, obs_lvl,
-                         obs_hgt, fcst_v, obs_v, obs_qty, cpi, wgt_v)) {
+                         obs_hgt, fcst_v, obs_v, obs_qty, cpi, default_weight)) {
 
                if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                   mlog << Debug(REJECT_DEBUG_LEVEL)
@@ -954,7 +944,7 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
    // Loop over the pairs
    for(i=0; i<pd_u.n_obs; i++) {
       
-      wgt = (wgt_flag ? pd_u.wgt_na[i] : default_grid_weight);
+      wgt = (wgt_flag ? pd_u.wgt_na[i] : default_weight);
 
       // Compute wind speeds
       fcst_wind = convert_u_v_to_wind(pd_u.f_na[i], pd_v.f_na[i]);

@@ -970,7 +970,7 @@ void process_scores() {
                              (ocsd_flag ? ocsd_dp(x, y) : bad_data_double));
 
             pd_block[i].add_grid_pair(fcst_dp(x, y), obs_dp(x, y),
-                                      cpi, default_grid_weight);
+                                      cpi, default_weight);
 
          } // end for i
       } // end for i_series

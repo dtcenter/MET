@@ -102,7 +102,7 @@ static const int tmp_buf_size = 512;
 static const double grib_earth_radius_km = 6371.20;
 static const int default_nc_compression = 0;
 static const int default_precision = 5;
-static const double default_grid_weight = 1.0;
+static const double default_weight = 1.0;
 static const char default_tmp_dir[] = "/tmp";
 
 ////////////////////////////////////////////////////////////////////////

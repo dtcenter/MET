@@ -173,12 +173,14 @@ class PairBase {
                          const ClimoPntInfo &, double);
 
       void set_point_obs(int, const char *, double, double, double, double,
-                         unixtime, double, double, double,
-                         const char *, const ClimoPntInfo &, double);
+                         unixtime, double, double, double, const char *,
+                         const ClimoPntInfo &, double);
 
-      void add_grid_obs(double, const ClimoPntInfo &, double);
+      void add_grid_obs(double,
+                        const ClimoPntInfo &, double);
       
-      void add_grid_obs(double, double, double, const ClimoPntInfo &, double);
+      void add_grid_obs(double, double, double,
+                        const ClimoPntInfo &, double);
 
       void add_climo(double, const ClimoPntInfo &);
 

@@ -74,7 +74,7 @@ void EnsembleStatConfInfo::clear() {
    mask_area_map.clear();
    mask_sid_map.clear();
    grid_weight_flag = GridWeightType::None;
-   tmp_dir.clear();
+   point_weight_flag = PointWeightType::None;
    output_prefix.clear();
    version.clear();
 
@@ -157,6 +157,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Conf: grid_weight_flag
    grid_weight_flag = parse_conf_grid_weight_flag(&conf);
+
+   // Conf: point_weight_flag
+   point_weight_flag = parse_conf_point_weight_flag(&conf);
 
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);

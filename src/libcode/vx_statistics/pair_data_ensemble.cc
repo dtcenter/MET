@@ -1170,8 +1170,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
                                        const char *hdr_sid_str,
                                        unixtime hdr_ut,
                                        const char *obs_qty, float *obs_arr,
-                                       Grid &gr, const char *var_name,
-                                       const DataPlane *wgt_dp) {
+                                       Grid &gr, const char *var_name) {
 
    // Check the observation VarInfo file type
    if(obs_info->file_type() != FileType_Gb1) {
@@ -1303,17 +1302,12 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
                                 gr, obs_x, obs_y, obs_v, obs_lvl, obs_hgt,
                                 cpi)) continue;
 
-            // Compute weight for current point
-            double wgt_v = (wgt_dp == nullptr ?
-                            default_grid_weight :
-                            wgt_dp->get(x, y));
-
             // Add the observation value
             // Weight is from the nearest grid point
             int n = three_to_one(i_msg_typ, i_mask, i_interp);
             if(!pd[n].add_point_obs(hdr_sid_str, hdr_lat, hdr_lon,
                   obs_x, obs_y, hdr_ut, obs_lvl, obs_hgt,
-                  obs_v, obs_qty, cpi, wgt_v)) {
+                  obs_v, obs_qty, cpi, default_weight)) {
 
                if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                   mlog << Debug(REJECT_DEBUG_LEVEL)
