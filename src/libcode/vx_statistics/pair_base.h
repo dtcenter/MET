@@ -195,7 +195,6 @@ class PairBase {
       void calc_obs_summary();
 
       void set_point_weight(const PointWeightType);
-
 };
 
 ////////////////////////////////////////////////////////////////////////

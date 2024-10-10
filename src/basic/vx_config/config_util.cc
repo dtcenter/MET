@@ -671,12 +671,21 @@ void MaskSID::add_css(const string &text) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool MaskSID::has(const string &s) {
+bool MaskSID::has(const string &s) const {
+   pair<string,double> *item_ptr = nullptr;
+ 
+   return has(s, item_ptr);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool MaskSID::has(const string &s, pair<string,double> *item_ptr) const {
    bool match = false;
 
    for(auto item : sid_list) {
       if(s == item.first) {
          match = true;
+         item_ptr = &item;
          break;
       }
    }

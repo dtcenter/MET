@@ -432,7 +432,7 @@ struct MaskSID {
    ConcatString name;
 
    // Vector of SID name and corresponding weights
-   std::vector<std::pair<std::string, double>> sid_list;
+   std::vector<std::pair<std::string,double>> sid_list;
 
    void      clear();
    bool      operator==(const MaskSID &) const;
@@ -443,7 +443,9 @@ struct MaskSID {
    // Formatted as: station_name(numeric_weight)
    void add(const std::string &);
    void add_css(const std::string &);
-   bool has(const std::string &);
+   bool has(const std::string &) const ;
+   bool has(const std::string &,
+            std::pair<std::string,double> *item_ptr) const;
    void sort();
 };
 

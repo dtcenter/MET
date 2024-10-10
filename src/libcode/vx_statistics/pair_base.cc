@@ -777,9 +777,29 @@ void PairBase::calc_obs_summary(){
 
 void PairBase::set_point_weight(const PointWeightType wgt_flag) {
 
-   if(!IsPointVx) return;
+   const char *method_name = "PairBase::set_point_weight() -> ";
 
-   // JHG work here
+   if(!IsPointVx || wgt_flag == PointWeightType::None) return;
+
+   // Apply the SID point weight type
+   if(wgt_flag == PointWeightType::SID &&
+      mask_sid_ptr != nullptr) {
+
+      // Loop through the point observations
+      for(int i_obs=0; i_obs<n_obs; i_obs++) {
+
+         pair<string,double> *item_ptr = nullptr;
+         if(mask_sid_ptr->has(sid_sa[i_obs], item_ptr)) {
+            wgt_na.set(i_obs, item_ptr->second);
+         }
+         else {
+            mlog << Warning << "\n" << method_name
+                 << "no match found for station id: "
+                 << sid_sa[i_obs] << "\n\n";
+         }
+      }
+   }
+
    return;
 }
 
