@@ -652,14 +652,14 @@ int NumArray::rank_array(int &ties)
    vector<int   > data_loc  (n);
    vector<double> data_rank (n);
 
-   //if ( !data || !data_loc || !data_rank )  {
-   //
-   //   mlog << Error << "\nint NumArray::rank_array() -> "
-   //        << "memory allocation error\n\n";
-   //
-   //   exit ( 1 );
-   //
-   //}
+   if ( data.size() < n || data_loc.size() < n || data_rank.size() < n)  {
+   
+      mlog << Error << "\nint NumArray::rank_array() -> "
+           << "memory allocation error\n\n";
+   
+      exit ( 1 );
+   
+   }
 
    //
    // Search the data array for valid data and keep track of its location
