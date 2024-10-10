@@ -181,7 +181,7 @@ class dataplane(met_base):
       if hasattr(met_data, 'shape'):
           nx, ny = met_data.shape
       else:
-         met_base.quit(f"{method_name} The met_data does not have shape member")
+         met_base.quit(f"{method_name} The met_data does not have the shape property")
          sys.exit(1)
 
       met_fill_value = met_base.MET_FILL_VALUE
