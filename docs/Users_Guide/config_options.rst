@@ -2347,9 +2347,9 @@ grid_weight_flag
 ----------------
 
 The "grid_weight_flag" specifies how grid weighting should be applied
-during the computation of contingency tables (CTC, MCTC, PCT, NBRCTC),
-partial sums (SL1L2, SAL1L2, VL1L2, VAL1L2), and statistics (CNT, CTS,
-MCTS, PSTD, PRC, PJC, ECLV, NBRCNT, and NBRCTS).
+during the computation of contingency tables (CTC, MCTC, PCT, and
+NBRCTC), partial sums (SL1L2, SAL1L2, VL1L2, and VAL1L2), and statistics
+(CNT, CTS, MCTS, PSTD, PRC, PJC, ECLV, NBRCNT, and NBRCTS).
 It is meant to account for grid box area distortion and is often applied
 to global Lat/Lon grids. It is only applied for grid-to-grid verification
 in Grid-Stat and Ensemble-Stat and is not applied for grid-to-point
@@ -2370,23 +2370,22 @@ the NetCDF output from Grid-Stat and Ensemble-Stat.
 
 When computing partial sums and continuous statistics, the weights are
 first normalized by dividing by the sum of the weights for the current
-masking region.
-
-When computing contingency tables and deriving statistics, each cell
-contains the sum of the weights of the matching grid points rather than
-the integer count of those grid points. Statistics are derived using these
-sums of weights rather than the raw counts.
+masking region. When computing contingency tables and deriving statistics,
+each contingency table cell contains the sum of the weights of the matching
+grid points rather than the integer count of those grid points. Statistics
+are derived using these sums of weights rather than the raw counts.
 
 When no grid weighting is requested (**NONE**), contingency tables are
-populated using a default constant weightand the corresponding cells are
-written to the output as integer counts.
+populated using a default constant weight of 1.0 and the corresponding cells
+are written to the output as integer counts for consistency with earlier
+versions of MET.
 
 .. note::
 
   The FHO line type is not compatible with grid weighting. If requested
-  with grid weighting, Grid-Stat prints a warning message and automatically
-  disables the FHO line type. Users are advised to request the CTC line type
-  instead.
+  with grid weighting enabled, Grid-Stat prints a warning message and
+  automatically disables the FHO line type. Users are advised to request the
+  CTC line type instead.
 
 .. code-block:: none
 
