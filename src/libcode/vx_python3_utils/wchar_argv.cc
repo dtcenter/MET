@@ -13,11 +13,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <cmath>
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <cmath>
 
 #include "wchar_argv.h"
 #include "concat_string.h"
@@ -132,23 +132,21 @@ void Wchar_Argv::set(const StringArray & a)
 
 {
 
-int j, k, N;
-int len;
 char * s = nullptr;
 char ** av = nullptr;
 ConcatString c;
 const char *method_name = "Wchar_Argv::set() -> ";
 
 
-len = 0;
+int len = 0;
 
-for (j=0; j<(a.n()); ++j)  {
+for (int j=0; j<(a.n()); ++j)  {
 
    len += a.length(j);
 
 }
 
-N = len + a.n();
+int N = len + a.n();
 
 s = new char [N];
 
@@ -156,9 +154,9 @@ av = new char * [a.n()];
 
 memset(s, 0, N);
 
-k = 0;
+int k = 0;
 
-for (j=0; j<(a.n()); ++j)  {
+for (int j=0; j<(a.n()); ++j)  {
 
    av[j] = s + k;
 
@@ -196,8 +194,6 @@ void Wchar_Argv::set(int _argc, char ** _argv)
 
 clear();
 
-int j, k;
-int argv_len;
 int * len = nullptr;
 
 
@@ -210,9 +206,9 @@ len = new int [Argc];
    //  total length of the argument string ... 
    //
 
-argv_len = 0;
+int argv_len = 0;
 
-for (j=0; j<_argc; ++j)  {
+for (int j=0; j<_argc; ++j)  {
 
    len[j] = m_strlen(_argv[j]);   //  we're using the len array here because
                                 //  we don't want to call m_strlen more than 
@@ -235,7 +231,7 @@ for (j=0; j<_argc; ++j)  {
 
 W_Buf = new wchar_t [argv_len];
 
-for (j=0; j<argv_len; ++j)  {
+for (int j=0; j<argv_len; ++j)  {
 
    W_Buf[j] = L'\0';
 
@@ -245,9 +241,9 @@ for (j=0; j<argv_len; ++j)  {
    //  translate the individual argv values into wchar strings
    //
 
-k = 0;
+int k = 0;
 
-for (j=0; j<Argc; ++j)  {
+for (int j=0; j<Argc; ++j)  {
 
    if ( mbstowcs(W_Buf + k, _argv[j], len[j]) == (size_t) -1 )  {
 
@@ -273,7 +269,7 @@ W_Argv = new wchar_t * [Argc];
 
 k = 0;
 
-for (j=0; j<Argc; ++j)  {
+for (int j=0; j<Argc; ++j)  {
 
    W_Argv[j] = W_Buf + k;
 
