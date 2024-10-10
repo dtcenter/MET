@@ -84,7 +84,7 @@ class ContingencyTable {
       void set_entry(int row, int col, double value);
 
       // Increment table entries
-      void inc_entry(int row, int col, double weight=1.0);
+      void inc_entry(int row, int col, double weight=default_weight);
 
       // Get values
       double total() const;
@@ -159,8 +159,8 @@ class Nx2ContingencyTable : public ContingencyTable {
       double threshold(int index) const; // 0 <= index <= Nrows
 
       // Increment table entries
-      void inc_event    (double value, double weight=1.0);
-      void inc_nonevent (double value, double weight=1.0);
+      void inc_event    (double value, double weight=default_weight);
+      void inc_nonevent (double value, double weight=default_weight);
 
       // Get table entries
       double    event_total_by_thresh(double) const;
@@ -236,11 +236,11 @@ class TTContingencyTable : public ContingencyTable {
       void set_fy_oy(double);
 
       // Increment table entries
-      void inc_fn_on(double weight=1.0);
-      void inc_fy_on(double weight=1.0);
+      void inc_fn_on(double weight=default_weight);
+      void inc_fy_on(double weight=default_weight);
 
-      void inc_fn_oy(double weight=1.0);
-      void inc_fy_oy(double weight=1.0);
+      void inc_fn_oy(double weight=default_weight);
+      void inc_fy_oy(double weight=default_weight);
 
       //  Get table entries
       double fn_on() const;
