@@ -733,12 +733,12 @@ Polyline ShapeData::convex_hull_old() const
 
    vector<int> Index(2*data.ny());
 
-   //if ( !Index )  {
-   //
-   //   mlog << Error << "\nShapedata::convex_hull() -> "
-   //        << "memory allocation error\n\n";
-   //   exit(1);
-   //}
+   if ( Index.size() < 2*data.ny() )  {
+
+      mlog << Error << "\nShapedata::convex_hull() -> "
+           << "memory allocation error\n\n";
+      exit(1);
+   }
 
    n = 0;
 
@@ -1891,7 +1891,7 @@ void ShapeData::threshold(SingleThresh t) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ShapeData::set_to_1_or_0() 
+void ShapeData::set_to_1_or_0()
 {
    int j;
    double v;
