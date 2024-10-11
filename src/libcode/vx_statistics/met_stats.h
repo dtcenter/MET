@@ -93,7 +93,8 @@ class CTSInfo {
 
       void clear();
       void allocate_n_alpha(int);
-      void add(double, double, const ClimoPntInfo * = nullptr);
+      void add(double f, double o, double wgt,
+               const ClimoPntInfo *cpi = nullptr);
       void compute_stats();
       void compute_ci();
 
@@ -138,7 +139,8 @@ class MCTSInfo {
       void allocate_n_alpha(int);
       void set_fthresh(const ThreshArray &);
       void set_othresh(const ThreshArray &);
-      void add(double, double, const ClimoPntInfo *cpi = nullptr);
+      void add(double f, double o, double wgt,
+               const ClimoPntInfo *cpi = nullptr);
       void compute_stats();
       void compute_ci();
 

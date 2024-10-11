@@ -2528,7 +2528,7 @@ void ModeExecutive::write_ct_stats()
       cts_at.set_entry(i+1, c++, cts[i].name());
 
       // Total
-      cts_at.set_entry(i+1, c++, cts[i].n());
+      cts_at.set_entry(i+1, c++, cts[i].n_pairs());
 
       // FY_OY
       cts_at.set_entry(i+1, c++, cts[i].fy_oy());

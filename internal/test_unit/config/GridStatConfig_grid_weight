@@ -15,7 +15,7 @@ model = "GFS";
 // Output description to be written
 // May be set separately in each "obs.field" entry
 //
-desc = "NA";
+desc = "${DESC}";
 
 //
 // Output observation type to be written
@@ -54,7 +54,7 @@ nc_pairs_var_suffix = "";
 hss_ec_value        = NA;
 rank_corr_flag      = FALSE;
 
-tmp_field = [ { name = "TMP"; level = [ "P500" ]; } ];
+tmp_field = [ { name = "TMP"; level = [ "P500" ]; cat_thresh = [ >245, >255 ]; } ];
 
 //
 // Forecast and observation fields to be verified
@@ -179,11 +179,11 @@ distance_map = {
 // Statistical output types
 //
 output_flag = {
-   fho    = NONE;
-   ctc    = NONE;
-   cts    = NONE;
-   mctc   = NONE;
-   mcts   = NONE;
+   fho    = NONE; 
+   ctc    = STAT;
+   cts    = STAT;
+   mctc   = STAT;
+   mcts   = STAT;
    cnt    = STAT;
    sl1l2  = STAT;
    sal1l2 = STAT;
