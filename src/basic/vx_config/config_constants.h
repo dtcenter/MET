@@ -445,7 +445,7 @@ struct MaskSID {
    void add_css(const std::string &);
    bool has(const std::string &) const ;
    bool has(const std::string &,
-            std::pair<std::string,double> *item_ptr) const;
+            std::pair<std::string,double> *&item_ptr) const;
    void sort();
 };
 

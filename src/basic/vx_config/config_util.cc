@@ -640,18 +640,14 @@ int MaskSID::n() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void MaskSID::add(const string &text) {
-   size_t pos = 0;
-   ConcatString sid;
+   ConcatString sid(text);
    double wgt = 1.0;
 
-   // Parse station id and optional weight 
-   if((pos = text.find("(")) != string::npos) {
-      sid = text.substr(0, pos);
-      wgt = stod(text.substr(pos));
-   }
-   // No weight specified 
-   else {
-      sid = text;
+   // Check for optional weight
+   StringArray sa(sid.split("("));
+   if(sa.n() > 0) {
+      sid = sa[0];
+      wgt = stod(sa[1]);
    }
 
    // Store the pair
@@ -679,7 +675,7 @@ bool MaskSID::has(const string &s) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool MaskSID::has(const string &s, pair<string,double> *item_ptr) const {
+bool MaskSID::has(const string &s, pair<string,double> *&item_ptr) const {
    bool match = false;
 
    for(auto item : sid_list) {

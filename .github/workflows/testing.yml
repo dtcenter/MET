@@ -176,7 +176,7 @@ jobs:
           - jobid: 'job1'
             tests: 'ascii2nc_indy pb2nc_indy tc_dland tc_pairs tc_stat plot_tc tc_rmw rmw_analysis tc_diag tc_gen'
           - jobid: 'job2'
-            tests: 'met_test_scripts mode_multivar mode_graphics mtd regrid airnow gsi_tools netcdf modis series_analysis wwmca_regrid gen_vx_mask grid_weight interp_shape grid_diag grib_tables lidar2nc shift_data_plane trmm2nc aeronet wwmca_plot ioda2nc gaussian'
+            tests: 'met_test_scripts mode_multivar mode_graphics mtd regrid airnow gsi_tools netcdf modis series_analysis wwmca_regrid gen_vx_mask interp_shape grid_diag grib_tables lidar2nc shift_data_plane trmm2nc aeronet wwmca_plot ioda2nc gaussian'
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
@@ -310,6 +310,8 @@ jobs:
             tests: 'ensemble_stat stat_analysis_es'
           - jobid: 'job5'
             tests: 'ugrid'
+          - jobid: 'job6'
+            tests: 'grid_weight point_weight'
       fail-fast: false
     steps:
       - uses: actions/checkout@v4

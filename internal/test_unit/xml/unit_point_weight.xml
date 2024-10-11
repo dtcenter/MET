@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+  <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
+]>
+
+<!-- Requires: unit_pb2nc.xml -->
+
+<met_test>
+
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="point_weight_POINT_STAT_NONE">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>NO_WEIGHT</value></pair>
+      <pair><name>DESC</name>            <value>NO_WEIGHT</value></pair>
+      <pair><name>POINT_WEIGHT</name>    <value>NONE</value></pair>
+      <pair><name>CONFIG_DIR</name>      <value>&CONFIG_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F015.grib2 \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_point_weight \
+      -outdir &OUTPUT_DIR;/point_weight -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_weight/point_stat_NO_WEIGHT_150000L_20120409_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="point_weight_POINT_STAT_SID">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>SID_WEIGHT</value></pair>
+      <pair><name>DESC</name>            <value>SID_WEIGHT</value></pair>
+      <pair><name>POINT_WEIGHT</name>    <value>SID</value></pair>
+      <pair><name>CONFIG_DIR</name>      <value>&CONFIG_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/sref_mn/sref_mean_2012040821_F015.grib2 \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_point_weight \
+      -outdir &OUTPUT_DIR;/point_weight -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_weight/point_stat_SID_WEIGHT_150000L_20120409_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="point_weight_POINT_STAT_PROB_NONE">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>PROB_NO_WEIGHT</value></pair>
+      <pair><name>DESC</name>            <value>NO_WEIGHT</value></pair>
+      <pair><name>POINT_WEIGHT</name>    <value>NONE</value></pair>
+      <pair><name>CONFIG_DIR</name>      <value>&CONFIG_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F015.grib2 \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_prob_point_weight \
+      -outdir &OUTPUT_DIR;/point_weight -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_weight/point_stat_PROB_NO_WEIGHT_150000L_20120409_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="point_weight_POINT_STAT_PROB_SID">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>PROB_SID_WEIGHT</value></pair>
+      <pair><name>DESC</name>            <value>SID_WEIGHT</value></pair>
+      <pair><name>POINT_WEIGHT</name>    <value>SID</value></pair>
+      <pair><name>CONFIG_DIR</name>      <value>&CONFIG_DIR;</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/sref_pr/sref_prob_2012040821_F015.grib2 \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_prob_point_weight \
+      -outdir &OUTPUT_DIR;/point_weight -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_weight/point_stat_PROB_SID_WEIGHT_150000L_20120409_120000V.stat</stat>
+    </output>
+  </test>
+
+</met_test>
+
