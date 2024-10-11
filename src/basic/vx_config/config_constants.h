@@ -431,6 +431,9 @@ struct MaskSID {
    // Mask name
    ConcatString name;
 
+   // Boolean for non-default weights 
+   bool has_weights;
+
    // Vector of SID name and corresponding weights
    std::vector<std::pair<std::string,double>> sid_list;
 

@@ -605,6 +605,7 @@ StringArray parse_conf_message_type(Dictionary *dict, bool error_out) {
 
 void MaskSID::clear() {
    name.clear();
+   has_weights = false;
    sid_list.clear();
 }
 
@@ -626,6 +627,7 @@ bool MaskSID::operator==(const MaskSID &v) const {
 MaskSID &MaskSID::operator=(const MaskSID &a) noexcept {
    if(this != &a) {
       name = a.name;
+      has_weights = a.has_weights;
       sid_list = a.sid_list;
    }
    return *this;
@@ -641,17 +643,18 @@ int MaskSID::n() const {
 
 void MaskSID::add(const string &text) {
    ConcatString sid(text);
-   double wgt = 1.0;
+   double weight = 1.0;
 
    // Check for optional weight
    StringArray sa(sid.split("("));
    if(sa.n() > 1) {
       sid = sa[0];
-      wgt = stod(sa[1]);
+      weight = stod(sa[1]);
+      has_weights = true;
    }
 
-   // Store the pair
-   sid_list.push_back(pair<string,double>(sid,wgt));
+   // Store the station ID, weight pair
+   sid_list.push_back(pair<string,double>(sid,weight));
 
    return;
 }
