@@ -151,7 +151,7 @@ N = len + a.n();
 
 vector<char> s(N, 0);
 
-vector<char *> av((a.n());
+vector<char *> av(a.n());
 
 k = 0;
 
