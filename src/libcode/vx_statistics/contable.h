@@ -31,24 +31,25 @@ class TTContingencyTable;
 
 class ContingencyTable {
 
-   protected:
+   friend class TTContingencyTable;
+   friend class Nx2ContingencyTable;
 
-      void init_from_scratch();
+   void init_from_scratch();
 
-      void assign(const ContingencyTable &);
+   void assign(const ContingencyTable &);
 
-      int rc_to_n(int r, int c) const;
+   int rc_to_n(int r, int c) const;
 
-      // This is really a two-dimensional array (Nrows, Ncols)
-      std::vector<double> E;
+   // This is really a two-dimensional array (Nrows, Ncols)
+   std::vector<double> E;
 
-      int Nrows;
-      int Ncols;
+   int Nrows;
+   int Ncols;
 
-      int Npairs;
-      double ECvalue;
+   int Npairs;
+   double ECvalue;
 
-      ConcatString Name;
+   ConcatString Name;
 
    public:
 
