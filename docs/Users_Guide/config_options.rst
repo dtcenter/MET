@@ -1847,15 +1847,18 @@ in the following ways:
     embedded within another quoted string. Any such embedded quotes must
     be escaped using a preceeding backslash character.
 
-* The "sid" entry is an array of strings which define groups of
-  observation station ID's over which to compute statistics. Each entry
-  in the array is either a filename of a comma-separated list.
+* The "sid" entry is an array of strings which define groups of observation station
+  ID's over which to compute statistics. Each station ID string can be followed by an
+  optional numeric weight enclosed in parenethesis and used by the "point_weight_flag"
+  configuration option. Each entry in the "sid" "array is either a filename or a
+  comma-separated list.
 
-  * For a filename, the strings are whitespace-separated. The first
-    string is the mask "name" and the remaining strings are the station
+  * For an ASCII filename, the strings contained within it are whitespace-separated.
+    The first string is the mask "name" and the remaining strings are the station
     ID's to be used.
   * For a comma-separated list, optionally use a colon to specify a name.
-    For "MY_LIST:SID1,SID2", name = MY_LIST and values = SID1 and SID2.
+    For "MY_LIST:SID1(WGT1),SID2(WGT2)", name = MY_LIST which consists of
+    two station ID's (SID1 and SID2) and optional numeric weights (WGT1 and WGT2).
   * For a comma-separated list of length one with no name specified, the
     mask "name" and value are both set to the single station ID string.
     For "SID1", name = SID1 and value = SID1.
@@ -1865,6 +1868,7 @@ in the following ways:
     For "SID1,SID2", name = MASK_SID and values = SID1 and SID2.
   * The "name" of the station ID mask is written to the VX_MASK column
     of the MET output files.
+
 * The "llpnt" entry is either a single dictionary or an array of
   dictionaries. Each dictionary contains three entries, the "name" for
   the masking region, "lat_thresh", and "lon_thresh". The latitude and
@@ -2390,6 +2394,27 @@ versions of MET.
 .. code-block:: none
 
   grid_weight_flag = NONE;
+
+point_weight_flag
+-----------------
+
+The "point_weight_flag" is similar to the "grid_weight_flag", described above,
+but applies to grid-to-point verification in Point-Stat and Ensemble-Stat.
+It is not applied for grid-to-grid verification. It can only be defined once
+at the highest level of config file context and applies to all verification
+tasks for that run.
+
+While only one point weighting option is currently supported, additional
+methods are planned for future versions:
+
+* NONE to disable point weighting using a constant weight of 1.0 (default).
+
+* SID to use the weights defined by the station ID masking configuration option,
+  "mask.sid".
+
+.. code-block:: none
+
+  point_weight_flag = NONE;
 
 hss_ec_value
 ------------

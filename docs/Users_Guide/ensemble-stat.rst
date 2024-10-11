@@ -182,6 +182,7 @@ ____________________
   obs_perc_value   = 50;
   message_type_group_map = [...];
   grid_weight_flag = NONE;
+  point_weight_flag = NONE;
   output_prefix    = "";
   version          = "VN.N";
 
