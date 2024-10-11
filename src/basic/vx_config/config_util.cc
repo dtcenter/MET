@@ -645,7 +645,7 @@ void MaskSID::add(const string &text) {
 
    // Check for optional weight
    StringArray sa(sid.split("("));
-   if(sa.n() > 0) {
+   if(sa.n() > 1) {
       sid = sa[0];
       wgt = stod(sa[1]);
    }
