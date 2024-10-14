@@ -189,7 +189,18 @@ ____________________
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
-Note that the **HIRA** interpolation method is only supported in Ensemble-Stat.
+.. note::
+
+  The **HIRA** interpolation method is only supported in Ensemble-Stat.
+
+.. note::
+
+  The "grid_weight_flag" and "point_weight_flag" options described in
+  :numref:`config_options` define how matched pairs are weighted for
+  grid-to-grid and grid-to-point verification in Ensemble-Stat. These
+  weights currently only apply to the computation of probabilistic
+  outputs (PCT, PSTD, PJC, and PRC) but no other Ensemble-Stat output
+  line types.
 
 _____________________
 

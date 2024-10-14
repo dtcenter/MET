@@ -2357,8 +2357,9 @@ NBRCTC), partial sums (SL1L2, SAL1L2, VL1L2, and VAL1L2), and statistics
 It is meant to account for grid box area distortion and is often applied
 to global Lat/Lon grids. It is only applied for grid-to-grid verification
 in Grid-Stat and Ensemble-Stat and is not applied for grid-to-point
-verification. It can only be defined once at the highest level of config
-file context and applies to all verification tasks for that run.
+verification, which is controlled by the "point_weight_flag" option.
+It can only be defined once at the highest level of config file context
+and applies to all verification tasks for that run.
 
 Three grid weighting options are currently supported:
 
@@ -2400,9 +2401,9 @@ point_weight_flag
 
 The "point_weight_flag" is similar to the "grid_weight_flag", described above,
 but applies to grid-to-point verification in Point-Stat and Ensemble-Stat.
-It is not applied for grid-to-grid verification. It can only be defined once
-at the highest level of config file context and applies to all verification
-tasks for that run.
+It is not applied for grid-to-grid verification which is controlled by the
+"grid_weight_flag" option. It can only be defined once at the highest level
+of config file context and applies to all verification tasks for that run.
 
 While only one point weighting option is currently supported, additional
 methods are planned for future versions:
