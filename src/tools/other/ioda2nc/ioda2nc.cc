@@ -572,12 +572,12 @@ void process_ioda_file(int i_pb) {
                ? (npbmsg * nmsg_percent / 100) : nmsg;
    }
 
-   float *hdr_lat_arr = new float[nlocs];
-   float *hdr_lon_arr = new float[nlocs];
-   float *hdr_elv_arr = new float[nlocs];
-   float *obs_pres_arr = new float[nlocs];
-   float *obs_hght_arr = new float[nlocs];
-   float *hdr_time_arr = new float[nlocs];
+   vector<float> hdr_lat_arr  (nlocs);
+   vector<float> hdr_lon_arr  (nlocs);
+   vector<float> hdr_elv_arr  (nlocs);
+   vector<float> obs_pres_arr (nlocs);
+   vector<float> obs_hght_arr (nlocs);
+   vector<float> hdr_time_arr (nlocs);
    char *hdr_vld_block = new char[nlocs*ndatetime];
    char *hdr_msg_types = nullptr;
    char *hdr_station_ids = nullptr;
@@ -592,9 +592,9 @@ void process_ioda_file(int i_pb) {
       for (int i=0; i<nlocs; i++ ) hdr_vld_block2[i] = (char*)calloc(nstring, sizeof(char));
    }
    
-   get_meta_data_float(f_in, metadata_vars, "pressure", obs_pres_arr, nlocs);
-   get_meta_data_float(f_in, metadata_vars, "height", obs_hght_arr, nlocs);
-   get_meta_data_float(f_in, metadata_vars, "elevation", hdr_elv_arr, nlocs);
+   get_meta_data_float(f_in, metadata_vars, "pressure", obs_pres_arr.data(), nlocs);
+   get_meta_data_float(f_in, metadata_vars, "height",   obs_hght_arr.data(), nlocs);
+   get_meta_data_float(f_in, metadata_vars, "elevation", hdr_elv_arr.data(), nlocs);
 
    if(has_msg_type) {
       NcVar msg_type_var = get_var(f_in, msg_type_name.c_str(), metadata_group_name);
@@ -630,18 +630,18 @@ void process_ioda_file(int i_pb) {
            << "The metadata variable for station ID does not exist!\n";
    }
 
-   if(!get_nc_data(&in_hdr_lat_var, hdr_lat_arr, nlocs)) {
+   if(!get_nc_data(&in_hdr_lat_var, hdr_lat_arr.data(), nlocs)) {
       mlog << Error << "\n" << method_name
            << "trouble getting latitude\n\n";
       exit(1);
    }
-   if(!get_nc_data(&in_hdr_lon_var, hdr_lon_arr, nlocs)) {
+   if(!get_nc_data(&in_hdr_lon_var, hdr_lon_arr.data(), nlocs)) {
       mlog << Error << "\n" << method_name
            << "trouble getting longitude\n\n";
       exit(1);
    }
 
-   status = is_time_offset ? get_nc_data(&in_hdr_vld_var, hdr_time_arr)
+   status = is_time_offset ? get_nc_data(&in_hdr_vld_var, hdr_time_arr.data())
                            : is_time_string
                              ? get_nc_data(&in_hdr_vld_var, hdr_vld_block2)
                              : get_nc_data(&in_hdr_vld_var, hdr_vld_block);
@@ -1014,13 +1014,7 @@ void process_ioda_file(int i_pb) {
       }
    }
    
-   delete [] hdr_lat_arr;
-   delete [] hdr_lon_arr;
-   delete [] hdr_elv_arr;
-   delete [] hdr_time_arr;
    delete [] hdr_vld_block;
-   delete [] obs_pres_arr;
-   delete [] obs_hght_arr;
 
    if (hdr_msg_types) delete [] hdr_msg_types;
    if (hdr_station_ids) delete [] hdr_station_ids;

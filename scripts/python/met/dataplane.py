@@ -177,8 +177,12 @@ class dataplane(met_base):
       if met_data is None:
          met_base.quit(f"{method_name} The met_data is None")
          sys.exit(1)
+
+      if hasattr(met_data, 'shape'):
+          nx, ny = met_data.shape
       else:
-         nx, ny = met_data.shape
+         met_base.quit(f"{method_name} The met_data does not have the shape property")
+         sys.exit(1)
 
       met_fill_value = met_base.MET_FILL_VALUE
       if dataplane.is_xarray_dataarray(met_data):
