@@ -3742,7 +3742,7 @@ void set_mask_sid(const StringArray & a) {
    mlog << Debug(1)
         << "Station ID Mask: " << a[0] << "\n";
 
-   MaskSID ms;
+   MaskSID ms = parse_sid_mask(a[0]);
    for(const auto &pair : ms.sid_map) mask_sid.add(pair.first);
 
    // List the length of the station ID mask

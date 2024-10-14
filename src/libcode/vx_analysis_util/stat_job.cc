@@ -1808,8 +1808,7 @@ void STATAnalysisJob::set_mask_sid(const char *c) {
    mlog << Debug(1)
         << "Station ID Mask: " << mask_sid_str << "\n";
 
-   MaskSID ms;
-   ms = parse_sid_mask(mask_sid_str);
+   MaskSID ms = parse_sid_mask(mask_sid_str);
    for(const auto &pair : ms.sid_map) mask_sid.add(pair.first);
 
    // List the length of the station ID mask
