@@ -1499,8 +1499,12 @@ void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
       // Get the n-th value
       double v = aggr_data[var_name].buf()[n];
 
+      // Store the number of pairs
+      if(c == "TOTAL" && !is_bad_data(v)) {
+         aggr_mcts.cts.set_n_pairs(nint(v));
+      }
       // Check the number of categories
-      if(c == "N_CAT" && !is_bad_data(v) &&
+      else if(c == "N_CAT" && !is_bad_data(v) &&
          aggr_mcts.cts.nrows() != nint(v)) {
          mlog << Error << "\nread_aggr_mctc() -> "
               << "the number of MCTC categories do not match ("
@@ -1618,8 +1622,12 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
       // Get the n-th value
       double v = aggr_data[var_name].buf()[n];
 
+      // Store the number of pairs
+      if(c == "TOTAL" && !is_bad_data(v)) {
+         aggr_pct.pct.set_n_pairs(nint(v));
+      }
       // Check the number of thresholds
-      if(c == "N_THRESH" && !is_bad_data(v) &&
+      else if(c == "N_THRESH" && !is_bad_data(v) &&
          (aggr_pct.pct.nrows()+1) != nint(v)) {
          mlog << Error << "\nread_aggr_pct() -> "
               << "the number of PCT thresholds do not match ("
@@ -2265,7 +2273,7 @@ void write_stat_data() {
    if(deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
    // Allocate memory to store data values for each grid point
-   float *data = new float [grid.nx()*grid.ny()];
+   vector<float> data(grid.nx()*grid.ny());
 
    // Write output for each stat_data map entry
    for(auto &key : stat_data_keys) {
@@ -2292,16 +2300,13 @@ void write_stat_data() {
       } // end for x
 
       // Write out the data
-      if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
+      if(!put_nc_data_with_dims(&nc_var, data.data(), grid.ny(), grid.nx())) {
          mlog << Error << "\nwrite_stat_data() -> "
               << R"(error writing ")" << key
               << R"(" data to the output file.)" << "\n\n";
          exit(1);
       }
    }
-
-   // Clean up
-   if(data) { delete [] data;  data = (float *) nullptr; }
 
    return;
 }

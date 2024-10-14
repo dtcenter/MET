@@ -327,12 +327,12 @@ void CTSInfo::allocate_n_alpha(int i) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void CTSInfo::add(double f, double o, const ClimoPntInfo *cpi) {
+void CTSInfo::add(double f, double o, double wgt, const ClimoPntInfo *cpi) {
 
-   if     ( fthresh.check(f, cpi) &&  othresh.check(o, cpi)) cts.inc_fy_oy();
-   else if( fthresh.check(f, cpi) && !othresh.check(o, cpi)) cts.inc_fy_on();
-   else if(!fthresh.check(f, cpi) &&  othresh.check(o, cpi)) cts.inc_fn_oy();
-   else if(!fthresh.check(f, cpi) && !othresh.check(o, cpi)) cts.inc_fn_on();
+   if     ( fthresh.check(f, cpi) &&  othresh.check(o, cpi)) cts.inc_fy_oy(wgt);
+   else if( fthresh.check(f, cpi) && !othresh.check(o, cpi)) cts.inc_fy_on(wgt);
+   else if(!fthresh.check(f, cpi) &&  othresh.check(o, cpi)) cts.inc_fn_oy(wgt);
+   else if(!fthresh.check(f, cpi) && !othresh.check(o, cpi)) cts.inc_fn_on(wgt);
 
    return;
 }
@@ -380,21 +380,21 @@ void CTSInfo::compute_ci() {
       // Compute confidence intervals for the scores based on
       // proportions
       //
-      compute_proportion_ci(baser.v, cts.n(), alpha[i], baser.vif,
+      compute_proportion_ci(baser.v, cts.n_pairs(), alpha[i], baser.vif,
                             baser.v_ncl[i], baser.v_ncu[i]);
-      compute_proportion_ci(fmean.v, cts.n(), alpha[i], fmean.vif,
+      compute_proportion_ci(fmean.v, cts.n_pairs(), alpha[i], fmean.vif,
                             fmean.v_ncl[i], fmean.v_ncu[i]);
-      compute_proportion_ci(acc.v, cts.n(), alpha[i], acc.vif,
+      compute_proportion_ci(acc.v, cts.n_pairs(), alpha[i], acc.vif,
                             acc.v_ncl[i], acc.v_ncu[i]);
-      compute_proportion_ci(pody.v, cts.n(), alpha[i], pody.vif,
+      compute_proportion_ci(pody.v, cts.n_pairs(), alpha[i], pody.vif,
                             pody.v_ncl[i], pody.v_ncu[i]);
-      compute_proportion_ci(podn.v, cts.n(), alpha[i], podn.vif,
+      compute_proportion_ci(podn.v, cts.n_pairs(), alpha[i], podn.vif,
                             podn.v_ncl[i], podn.v_ncu[i]);
-      compute_proportion_ci(pofd.v, cts.n(), alpha[i], pofd.vif,
+      compute_proportion_ci(pofd.v, cts.n_pairs(), alpha[i], pofd.vif,
                             pofd.v_ncl[i], pofd.v_ncu[i]);
-      compute_proportion_ci(far.v, cts.n(), alpha[i], far.vif,
+      compute_proportion_ci(far.v, cts.n_pairs(), alpha[i], far.vif,
                             far.v_ncl[i], far.v_ncu[i]);
-      compute_proportion_ci(csi.v, cts.n(), alpha[i], csi.vif,
+      compute_proportion_ci(csi.v, cts.n_pairs(), alpha[i], csi.vif,
                             csi.v_ncl[i], csi.v_ncu[i]);
 
       //
@@ -427,10 +427,11 @@ void CTSInfo::compute_ci() {
 
 void CTSInfo::set_stat_ctc(const string &stat_name, double v) {
 
-        if(stat_name == "FY_OY")    cts.set_fy_oy(nint(v));
-   else if(stat_name == "FY_ON")    cts.set_fy_on(nint(v));
-   else if(stat_name == "FN_OY")    cts.set_fn_oy(nint(v));
-   else if(stat_name == "FN_ON")    cts.set_fn_on(nint(v));
+        if(stat_name == "TOTAL")    cts.set_n_pairs(nint(v));
+   else if(stat_name == "FY_OY")    cts.set_fy_oy(v);
+   else if(stat_name == "FY_ON")    cts.set_fy_on(v);
+   else if(stat_name == "FN_OY")    cts.set_fn_oy(v);
+   else if(stat_name == "FN_ON")    cts.set_fn_on(v);
    else if(stat_name == "EC_VALUE") cts.set_ec_value(v);
 
    return;
@@ -461,7 +462,7 @@ double CTSInfo::get_stat_fho(const string &stat_name) const {
    double v = bad_data_double;
 
    // Find the statistic by name
-        if(stat_name == "TOTAL" ) v = cts.n();
+        if(stat_name == "TOTAL" ) v = (double) cts.n_pairs();
    else if(stat_name == "F_RATE") v = cts.f_rate();
    else if(stat_name == "H_RATE") v = cts.h_rate();
    else if(stat_name == "O_RATE") v = cts.o_rate();
@@ -473,7 +474,7 @@ double CTSInfo::get_stat_fho(const string &stat_name) const {
    }
 
    // Return bad data for 0 pairs
-   if(cts.n() == 0 && stat_name != "TOTAL") {
+   if(cts.n_pairs() == 0 && stat_name != "TOTAL") {
       v = bad_data_double;
    }
 
@@ -486,7 +487,7 @@ double CTSInfo::get_stat_ctc(const string &stat_name) const {
    double v = bad_data_double;
 
    // Find the statistic by name
-        if(stat_name == "TOTAL"   ) v = cts.n();
+        if(stat_name == "TOTAL"   ) v = (double) cts.n_pairs();
    else if(stat_name == "FY_OY"   ) v = cts.fy_oy();
    else if(stat_name == "FY_ON"   ) v = cts.fy_on();
    else if(stat_name == "FN_OY"   ) v = cts.fn_oy();
@@ -500,7 +501,7 @@ double CTSInfo::get_stat_ctc(const string &stat_name) const {
    }
 
    // Return bad data for 0 pairs
-   if(cts.n() == 0 && stat_name != "TOTAL") {
+   if(cts.n_pairs() == 0 && stat_name != "TOTAL") {
       v = bad_data_double;
    }
 
@@ -521,7 +522,7 @@ double CTSInfo::get_stat_cts(const string &stat_name, int i_alpha) const {
    }
 
    // Find the statistic by name
-        if(stat_name == "TOTAL"     ) v = (double) cts.n();
+        if(stat_name == "TOTAL"     ) v = (double) cts.n_pairs();
    else if(stat_name == "BASER"     ) v = baser.v;
    else if(stat_name == "BASER_NCL" ) v = baser.v_ncl[i_alpha];
    else if(stat_name == "BASER_NCU" ) v = baser.v_ncu[i_alpha];
@@ -626,7 +627,7 @@ double CTSInfo::get_stat_cts(const string &stat_name, int i_alpha) const {
    }
  
    // Return bad data for 0 pairs 
-   if(cts.n() == 0 && stat_name != "TOTAL") {
+   if(cts.n_pairs() == 0 && stat_name != "TOTAL") {
       v = bad_data_double;
    }
 
@@ -773,7 +774,7 @@ void MCTSInfo::set_othresh(const ThreshArray &ta) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void MCTSInfo::add(double f, double o, const ClimoPntInfo *cpi) {
+void MCTSInfo::add(double f, double o, double wgt, const ClimoPntInfo *cpi) {
    int r, c;
 
    // Find the row and column for the forecast and observation values.
@@ -781,7 +782,7 @@ void MCTSInfo::add(double f, double o, const ClimoPntInfo *cpi) {
    c = othresh.check_bins(o, cpi);
 
    // Increment the corresponding contingency table entry.
-   cts.inc_entry(r, c);
+   cts.inc_entry(r, c, wgt);
 
    return;
 }
@@ -813,7 +814,7 @@ void MCTSInfo::compute_ci() {
       // Compute confidence intervals for the scores based on
       // proportions
       //
-      compute_proportion_ci(acc.v, cts.total(), alpha[i], acc.vif,
+      compute_proportion_ci(acc.v, cts.n_pairs(), alpha[i], acc.vif,
                             acc.v_ncl[i], acc.v_ncu[i]);
    } // end for i
 
@@ -852,7 +853,7 @@ double MCTSInfo::get_stat_mctc(const string &stat_name,
    col_name = stat_name;
 
    // Find the statistic by name
-        if(stat_name == "TOTAL"   ) v = (double) cts.total();
+        if(stat_name == "TOTAL"   ) v = (double) cts.n_pairs();
    else if(stat_name == "N_CAT"   ) v = (double) cts.nrows();
    else if(stat_name == "EC_VALUE") v = cts.ec_value();
    else if(check_reg_exp("F[0-9]*_O[0-9]*", stat_name.c_str())) {
@@ -901,7 +902,7 @@ double MCTSInfo::get_stat_mcts(const string &stat_name, int i_alpha) const {
    }
 
    // Find the statistic by name
-        if(stat_name == "TOTAL"     ) v = (double) cts.total();
+        if(stat_name == "TOTAL"     ) v = (double) cts.n_pairs();
    else if(stat_name == "N_CAT"     ) v = (double) cts.nrows();
    else if(stat_name == "ACC"       ) v = acc.v;
    else if(stat_name == "ACC_NCL"   ) v = acc.v_ncl[i_alpha];
@@ -929,7 +930,7 @@ double MCTSInfo::get_stat_mcts(const string &stat_name, int i_alpha) const {
    }
 
    // Return bad data for 0 pairs
-   if(cts.total() == 0 && stat_name != "TOTAL") {
+   if(cts.n_pairs() == 0 && stat_name != "TOTAL") {
       v = bad_data_double;
    }
 
@@ -3042,7 +3043,7 @@ void ISCInfo::compute_isc() {
    int i;
 
    // Get the Total, Base Rate, and Frequency Bias
-   total = cts.n();
+   total = cts.n_pairs();
    fbias = cts.fbias();
    baser = cts.baser();
 
@@ -3076,7 +3077,7 @@ void ISCInfo::compute_isc(int i) {
    double den;
 
    // Get the Total, Base Rate, and Frequency Bias
-   total = cts.n();
+   total = cts.n_pairs();
    fbias = cts.fbias();
    baser = cts.baser();
 
@@ -3257,7 +3258,7 @@ void PCTInfo::set_fthresh(const ThreshArray &ta) {
 
 void PCTInfo::compute_stats() {
 
-   total       = pct.n();
+   total       = pct.n_pairs();
    baser.v     = pct.baser();
    reliability = pct.reliability();
    resolution  = pct.resolution();
@@ -3292,7 +3293,7 @@ void PCTInfo::compute_ci() {
    //
    for(i=0; i<n_alpha; i++) {
 
-      compute_proportion_ci(baser.v, pct.n(), alpha[i], baser.vif,
+      compute_proportion_ci(baser.v, pct.n_pairs(), alpha[i], baser.vif,
                             baser.v_ncl[i], baser.v_ncu[i]);
 
       // Compute brier CI using the VIF
@@ -3366,7 +3367,7 @@ double PCTInfo::get_stat_pct(const string &stat_name,
 
    // Find the statistic by name
    if(stat_name == "TOTAL") {
-      v = (double) pct.n();
+      v = (double) pct.n_pairs();
    }
    else if(stat_name == "N_THRESH") {
       v = (double) pct.nrows() + 1;
@@ -3376,11 +3377,11 @@ double PCTInfo::get_stat_pct(const string &stat_name,
       col_name = "THRESH_I";
    }
    else if(check_reg_exp("OY_[0-9]", stat_name.c_str())){
-      v = (double) pct.event_count_by_row(i);
+      v = pct.event_total_by_row(i);
       col_name = "OY_I";
    }
    else if(check_reg_exp("ON_[0-9]", stat_name.c_str())) {
-      v = (double) pct.nonevent_count_by_row(i);
+      v = pct.nonevent_total_by_row(i);
       col_name = "ON_I";
    }
    else {
@@ -3418,7 +3419,7 @@ double PCTInfo::get_stat_pjc(const string &stat_name,
 
    // Find the statistic by name
    if(stat_name == "TOTAL") {
-      v = (double) pct.n();
+      v = (double) pct.n_pairs();
    }
    else if(stat_name == "N_THRESH") {
       v = (double) pct.nrows() + 1;
@@ -3428,11 +3429,11 @@ double PCTInfo::get_stat_pjc(const string &stat_name,
       col_name = "THRESH_I";
    }
    else if(check_reg_exp("OY_TP_[0-9]", stat_name.c_str())) {
-      v = pct.event_count_by_row(i)/(double) pct.n();
+      v = pct.event_total_by_row(i)/pct.total();
       col_name = "OY_TP_I";
    }
    else if(check_reg_exp("ON_TP_[0-9]", stat_name.c_str())) {
-      v = pct.nonevent_count_by_row(i)/(double) pct.n();
+      v = pct.nonevent_total_by_row(i)/pct.total();
       col_name = "ON_TP_I";
    }
    else if(check_reg_exp("CALIBRATION_[0-9]", stat_name.c_str())) {
@@ -3459,7 +3460,7 @@ double PCTInfo::get_stat_pjc(const string &stat_name,
    }
 
    // Return bad data for 0 pairs
-   if(pct.n() == 0 && stat_name != "TOTAL") {
+   if(pct.n_pairs() == 0 && stat_name != "TOTAL") {
       v = bad_data_double;
    }
 
@@ -3496,7 +3497,7 @@ double PCTInfo::get_stat_prc(const string &stat_name,
 
    // Find the statistic by name
    if(stat_name == "TOTAL") {
-      v = (double) pct.n();
+      v = (double) pct.n_pairs();
    }
    else if(stat_name == "N_THRESH") {
       v = (double) pct.nrows() + 1;
@@ -3521,7 +3522,7 @@ double PCTInfo::get_stat_prc(const string &stat_name,
    }
 
    // Return bad data for 0 pairs
-   if(pct.n() == 0 && stat_name != "TOTAL") {
+   if(pct.n_pairs() == 0 && stat_name != "TOTAL") {
       v = bad_data_double;
    }
 
@@ -3561,7 +3562,7 @@ double PCTInfo::get_stat_pstd(const string &stat_name,
    } // end if
 
    // Find the statistic by name
-        if(stat_name == "TOTAL"      ) v = (double) pct.n();
+        if(stat_name == "TOTAL"      ) v = (double) pct.n_pairs();
    else if(stat_name == "N_THRESH"   ) v = (double) pct.nrows() + 1;
    else if(stat_name == "BASER"      ) v = baser.v;
    else if(stat_name == "BASER_NCL"  ) v = baser.v_ncl[i_alpha];
@@ -3590,7 +3591,7 @@ double PCTInfo::get_stat_pstd(const string &stat_name,
    }
 
    // Return bad data for 0 pairs
-   if(pct.n() == 0 && stat_name != "TOTAL") {
+   if(pct.n_pairs() == 0 && stat_name != "TOTAL") {
       v = bad_data_double;
    }
 
@@ -3766,7 +3767,7 @@ void GRADInfo::set(int grad_dx, int grad_dy,
            << "count mismatch ("
            << fgx_na.n() << ", " << fgy_na.n() << ", "
            << ogx_na.n() << ", " << ogy_na.n() << ", "
-           <<   wgt_na.n() << ")\n\n";
+           << wgt_na.n() << ")\n\n";
       exit(1);
    }
 

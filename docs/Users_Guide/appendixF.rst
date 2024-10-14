@@ -355,7 +355,7 @@ The first argument for the Plot-Data-Plane tool is the gridded data file to be r
                 'level': 'Surface', 'units': 'None',
                 'init': '20050807_000000', 'valid': '20050807_120000',
                 'lead': '120000',  'accum': '120000'
-                'grid': {...} } 
+                'grid': { ... } } 
    DEBUG 1: Creating postscript file: fcst.ps
 
 Special Case for Ensemble-Stat, Series-Analysis, and MTD

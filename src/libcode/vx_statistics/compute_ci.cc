@@ -61,14 +61,14 @@ void compute_normal_ci(double v, double alpha, double se,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_proportion_ci(double p, int n, double alpha, double vif,
+void compute_proportion_ci(double p, int n_pairs, double alpha, double vif,
                            double &p_cl, double &p_cu) {
 
    //
    // Compute the confidence interval using the Wilson method for all
    // sizes of n, since it provides a better approximation
    //
-   compute_wilson_ci(p, n, alpha, vif, p_cl, p_cu);
+   compute_wilson_ci(p, n_pairs, alpha, vif, p_cl, p_cu);
 
    return;
 }
@@ -81,7 +81,7 @@ void compute_proportion_ci(double p, int n, double alpha, double vif,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_wald_ci(double p, int n, double alpha, double vif,
+void compute_wald_ci(double p, int n_pairs, double alpha, double vif,
                      double &p_cl, double &p_cu) {
    double v, cv_normal_l, cv_normal_u;
 
@@ -100,7 +100,7 @@ void compute_wald_ci(double p, int n, double alpha, double vif,
    //
    // Compute the upper and lower bounds of the confidence interval
    //
-   v = vif*p*(1.0-p)/n;
+   v = vif*p*(1.0-p)/n_pairs;
 
    if(v < 0.0) {
       p_cl = bad_data_double;
@@ -122,10 +122,10 @@ void compute_wald_ci(double p, int n, double alpha, double vif,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_wilson_ci(double p, int n_int, double alpha, double vif,
+void compute_wilson_ci(double p, int n_pairs, double alpha, double vif,
                        double &p_cl, double &p_cu) {
    double v, cv_normal_l, cv_normal_u;
-   long long n = n_int;
+   long long n = n_pairs;
 
    if(is_bad_data(p)) {
       p_cl = p_cu = bad_data_double;

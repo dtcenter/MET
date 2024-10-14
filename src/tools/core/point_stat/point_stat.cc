@@ -1153,7 +1153,7 @@ void process_scores() {
                   // Loop through the categorical thresholds
                   for(int i_cat=0; i_cat<conf_info.vx_opt[i_vx].fcat_ta.n(); i_cat++) {
 
-                     if(cts_info[i_cat].cts.n() == 0) continue;
+                     if(cts_info[i_cat].cts.n_pairs() == 0) continue;
 
                      // Write out FHO
                      if(conf_info.vx_opt[i_vx].output_flag[i_fho] != STATOutputType::None) {
@@ -1201,10 +1201,10 @@ void process_scores() {
                   // Compute MCTS Info
                   do_mcts(mcts_info, i_vx, pd_ptr);
 
-                  // Write out MCTC
-                  if(conf_info.vx_opt[i_vx].output_flag[i_mctc] != STATOutputType::None &&
-                     mcts_info.cts.total() > 0) {
+                  if(mcts_info.cts.n_pairs() == 0) continue;
 
+                  // Write out MCTC
+                  if(conf_info.vx_opt[i_vx].output_flag[i_mctc] != STATOutputType::None) {
                      write_mctc_row(shc, mcts_info,
                         conf_info.vx_opt[i_vx].output_flag[i_mctc],
                         stat_at, i_stat_row,
@@ -1212,9 +1212,7 @@ void process_scores() {
                   }
 
                   // Write out MCTS
-                  if(conf_info.vx_opt[i_vx].output_flag[i_mcts] != STATOutputType::None &&
-                     mcts_info.cts.total() > 0) {
-
+                  if(conf_info.vx_opt[i_vx].output_flag[i_mcts] != STATOutputType::None) {
                      write_mcts_row(shc, mcts_info,
                         conf_info.vx_opt[i_vx].output_flag[i_mcts],
                         stat_at, i_stat_row,

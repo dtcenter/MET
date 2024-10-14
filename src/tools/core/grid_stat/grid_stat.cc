@@ -113,6 +113,7 @@
 //   055    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files.
 //   056    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings.
 //   057    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
+//   058    10/03/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -953,10 +954,10 @@ void process_scores() {
                // Loop through all of the thresholds
                for(m=0; m<conf_info.vx_opt[i].fcat_ta.n(); m++) {
 
-                  // Write out FHO
-                  if(conf_info.vx_opt[i].output_flag[i_fho] != STATOutputType::None &&
-                     cts_info[m].cts.n() > 0) {
+                  if(cts_info[m].cts.n_pairs() == 0) continue;
 
+                  // Write out FHO
+                  if(conf_info.vx_opt[i].output_flag[i_fho] != STATOutputType::None) {
                      write_fho_row(shc, cts_info[m],
                         conf_info.vx_opt[i].output_flag[i_fho],
                         stat_at, i_stat_row,
@@ -964,9 +965,7 @@ void process_scores() {
                   }
 
                   // Write out CTC
-                  if(conf_info.vx_opt[i].output_flag[i_ctc] != STATOutputType::None &&
-                     cts_info[m].cts.n() > 0) {
-
+                  if(conf_info.vx_opt[i].output_flag[i_ctc] != STATOutputType::None) {
                      write_ctc_row(shc, cts_info[m],
                         conf_info.vx_opt[i].output_flag[i_ctc],
                         stat_at, i_stat_row,
@@ -974,9 +973,7 @@ void process_scores() {
                   }
 
                   // Write out CTS
-                  if(conf_info.vx_opt[i].output_flag[i_cts] != STATOutputType::None &&
-                     cts_info[m].cts.n() > 0) {
-
+                  if(conf_info.vx_opt[i].output_flag[i_cts] != STATOutputType::None) {
                      write_cts_row(shc, cts_info[m],
                         conf_info.vx_opt[i].output_flag[i_cts],
                         stat_at, i_stat_row,
@@ -984,9 +981,7 @@ void process_scores() {
                   }
 
                   // Write out ECLV
-                  if(conf_info.vx_opt[i].output_flag[i_eclv] != STATOutputType::None &&
-                     cts_info[m].cts.n() > 0) {
-
+                  if(conf_info.vx_opt[i].output_flag[i_eclv] != STATOutputType::None) {
                      write_eclv_row(shc, cts_info[m], conf_info.vx_opt[i].eclv_points,
                         conf_info.vx_opt[i].output_flag[i_eclv],
                         stat_at, i_stat_row,
@@ -1007,10 +1002,10 @@ void process_scores() {
                // Compute MCTS
                do_mcts(mcts_info, i, &pd);
 
-               // Write out MCTC
-               if(conf_info.vx_opt[i].output_flag[i_mctc] != STATOutputType::None &&
-                  mcts_info.cts.total() > 0) {
+               if(mcts_info.cts.n_pairs() == 0) continue;
 
+               // Write out MCTC
+               if(conf_info.vx_opt[i].output_flag[i_mctc] != STATOutputType::None) {
                   write_mctc_row(shc, mcts_info,
                      conf_info.vx_opt[i].output_flag[i_mctc],
                      stat_at, i_stat_row,
@@ -1018,9 +1013,7 @@ void process_scores() {
                }
 
                // Write out MCTS
-               if(conf_info.vx_opt[i].output_flag[i_mcts] != STATOutputType::None &&
-                  mcts_info.cts.total() > 0) {
-
+               if(conf_info.vx_opt[i].output_flag[i_mcts] != STATOutputType::None) {
                   write_mcts_row(shc, mcts_info,
                      conf_info.vx_opt[i].output_flag[i_mcts],
                      stat_at, i_stat_row,
@@ -1713,7 +1706,7 @@ void process_scores() {
                      for(n=0; n<conf_info.vx_opt[i].get_n_cov_thresh(); n++) {
 
                         // Only write out if n > 0
-                        if(nbrcts_info[n].cts_info.cts.n() > 0) {
+                        if(nbrcts_info[n].cts_info.cts.n_pairs() > 0) {
 
                            // Write out NBRCTC
                            if(conf_info.vx_opt[i].output_flag[i_nbrctc] != STATOutputType::None) {
@@ -2481,7 +2474,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
 
          // Compute the probabilistic counts and statistics
-         compute_pctinfo(pd, ( STATOutputType::None!=vx_opt.output_flag[i_pstd]), pct_info[j]);
+         compute_pctinfo(pd, (STATOutputType::None!=vx_opt.output_flag[i_pstd]), pct_info[j]);
 
          // Check for no matched pairs to process
          if(pd.n_obs == 0) continue;
@@ -2750,8 +2743,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    n_masks    = (apply_mask ? conf_info.vx_opt[i_vx].get_n_mask() : 1);
 
    // Allocate memory
-   float *data = (float *) nullptr;
-   data = new float [grid.nxy()];
+   vector<float> data(grid.nxy());
 
    // Set the NetCDF compression level
    int deflate_level = compress_level;
@@ -3008,7 +3000,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       } // end for x
 
       // Write out the data
-      if(!put_nc_data_with_dims(&nc_var, &data[0], grid.ny(), grid.nx())) {
+      if(!put_nc_data_with_dims(&nc_var, data.data(), grid.ny(), grid.nx())) {
          mlog << Error << "\nwrite_nc() -> "
               << "error writing NetCDF variable name " << var_name
               << "\n\n";
@@ -3016,9 +3008,6 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       }
 
    } // end for i
-
-   // Deallocate and clean up
-   if(data) { delete [] data; data = (float *) nullptr; }
 
    return;
 }
@@ -3053,9 +3042,6 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    // Store the apply_mask option
    apply_mask = conf_info.vx_opt[i_vx].nc_info.do_apply_mask;
 
-   float *fcst_data = (float *) nullptr;
-   float *obs_data  = (float *) nullptr;
-
    NcVar fcst_var;
    NcVar obs_var;
 
@@ -3088,8 +3074,8 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    if(!fcst_flag && !obs_flag) return;
 
    // Allocate memory for the forecast and observation fields
-   fcst_data = new float [grid.nxy()];
-   obs_data  = new float [grid.nxy()];
+   vector<float> fcst_data(grid.nxy());
+   vector<float> obs_data (grid.nxy());
 
    // Add the forecast variable
    if(fcst_flag) {
@@ -3168,7 +3154,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
    // Write out the forecast field
    if(fcst_flag) {
-      if(!put_nc_data_with_dims(&fcst_var, &fcst_data[0], grid.ny(), grid.nx())) {
+      if(!put_nc_data_with_dims(&fcst_var, fcst_data.data(), grid.ny(), grid.nx())) {
          mlog << Error << "\nwrite_nbrhd_nc() -> "
               << "error with the fcst_var->put for forecast variable "
               << fcst_var_name << "\n\n";
@@ -3178,17 +3164,13 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
    // Write out the observation field
    if(obs_flag) {
-      if(!put_nc_data_with_dims(&obs_var, &obs_data[0], grid.ny(), grid.nx())) {
+      if(!put_nc_data_with_dims(&obs_var, obs_data.data(), grid.ny(), grid.nx())) {
          mlog << Error << "\nwrite_nbrhd_nc() -> "
               << "error with the obs_var->put for observation variable "
               << obs_var_name << "\n\n";
          exit(1);
       }
    }
-
-   // Deallocate and clean up
-   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) nullptr; }
-   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) nullptr; }
 
    return;
 }
