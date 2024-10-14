@@ -2347,17 +2347,18 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Allocate memory for the polyline points
    //
-   vector<int  > poly_start(n_poly);
-   vector<int  > poly_npts (n_poly);
-   vector<float> poly_lat  (n_pts);
-   vector<float> poly_lon  (n_pts);
-   vector<int  > poly_x    (n_pts);
-   vector<int  > poly_y    (n_pts);
+   vector<int  > poly_start(n_poly, 0);
+   vector<int  > poly_npts (n_poly, 0);
+   vector<float> poly_lat  (n_pts,  bad_data_float);
+   vector<float> poly_lon  (n_pts,  bad_data_float);
+   vector<int  > poly_x    (n_pts,  0);
+   vector<int  > poly_y    (n_pts,  0);
 
    //
    // Store the points for each polyline
    //
-   for(i=0, n_pts=0; i<n_poly; i++) {
+   n_pts = 0;
+   for(i=0; i<n_poly; i++) {
 
       // Store the starting point for this object.
       poly_start[i] = n_pts;
