@@ -240,10 +240,9 @@ double get_att_value_double(const NcAtt *att) {
 
 void get_att_value_doubles(const NcAtt *att, NumArray &value) {
    value.erase();
-   double *values = new double[att->getAttLength()];
-   att->getValues(values);
+   vector<double> values(att->getAttLength());
+   att->getValues(values.data());
    for(unsigned int i=0; i<=att->getAttLength(); i++) value.add(values[i]);
-   if(values) { delete [] values; values = 0; }
    return;
 }
 
@@ -1397,8 +1396,8 @@ bool get_nc_data(NcVar *var, float *data) {
          switch ( type_id )  {
             case NcType::nc_DOUBLE:
                {
-                  double *packed_data = new double[cell_count];
-                  if (get_nc_data_t(var, packed_data)) {
+                  vector<double> packed_data(cell_count);
+                  if (get_nc_data_t(var, packed_data.data())) {
                      double fill_value;
                      bool has_fill_value = get_var_fill_value(var, fill_value);
                      for (int idx=0; idx<cell_count; idx++) {
@@ -1411,98 +1410,88 @@ bool get_nc_data(NcVar *var, float *data) {
                   else {
                      for (int idx=0; idx<cell_count; idx++) data[idx] = bad_data_double;
                   }
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_INT64:
                {
-                  long long *packed_data = new long long[cell_count];
-                  for (int idx=0; idx<cell_count; idx++) packed_data[idx] = (long long)bad_data_int;
+                  vector<long long> packed_data(cell_count, (long long)bad_data_int);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "int64", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_INT:
                {
-                  int *packed_data = new int[cell_count];
+                  vector<int> packed_data(cell_count);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "int", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_SHORT:
                {
                   short missing_value;
                   bool has_missing = get_var_fill_value(var, missing_value);
-                  short *packed_data = new short[cell_count];
+                  vector<short> packed_data(cell_count);
 
-                  var->getVar(packed_data);
+                  var->getVar(packed_data.data());
                   if (unsigned_value) {
-                     unsigned short *ushort_data = new unsigned short[cell_count];
+                     vector<unsigned short> ushort_data(cell_count);
                      for (int idx=0; idx<cell_count; idx++) {
                         ushort_data[idx] =(unsigned short)packed_data[idx];
                      }
-                     copy_nc_data_t(var, data, ushort_data, cell_count,
+                     copy_nc_data_t(var, data, ushort_data.data(), cell_count,
                                     "ushort", add_offset, scale_factor,
                                     has_missing, (unsigned short)missing_value);
-                     delete [] ushort_data;
                   }
                   else {
-                     copy_nc_data_t(var, data, packed_data, cell_count,
+                     copy_nc_data_t(var, data, packed_data.data(), cell_count,
                                     "short", add_offset, scale_factor,
                                     has_missing, missing_value);
                   }
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_USHORT:
                {
-                  unsigned short *packed_data = new unsigned short[cell_count];
+                  vector<unsigned short> packed_data(cell_count);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "unsigned short", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_BYTE:
                {
                   ncbyte missing_value;
                   bool has_missing = get_var_fill_value(var, missing_value);
-                  ncbyte *packed_data = new ncbyte[cell_count];
+                  vector<ncbyte> packed_data(cell_count);
 
-                  var->getVar(packed_data);
+                  var->getVar(packed_data.data());
                   if (unsigned_value) {
-                     unsigned char *ubyte_data = new unsigned char[cell_count];
+                     vector<unsigned char> ubyte_data(cell_count);
                      for (int idx=0; idx<cell_count; idx++) {
                         ubyte_data[idx] =(unsigned char)packed_data[idx];
                      }
-                     copy_nc_data_t(var, data, ubyte_data, cell_count,
+                     copy_nc_data_t(var, data, ubyte_data.data(), cell_count,
                                     "ncubyte", add_offset, scale_factor,
                                     has_missing, (unsigned char)missing_value);
-                     delete [] ubyte_data;
                   }
                   else {
-                     copy_nc_data_t(var, data, packed_data, cell_count,
+                     copy_nc_data_t(var, data, packed_data.data(), cell_count,
                                     "ncbyte", add_offset, scale_factor,
                                     has_missing, missing_value);
                   }
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_UBYTE:
                {
-                  unsigned char *packed_data = new unsigned char[cell_count];
+                  vector<unsigned char> packed_data(cell_count);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "unsigned char", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             default:
@@ -1601,9 +1590,9 @@ bool get_nc_data(NcVar *var, double *data) {
          switch ( type_id )  {
             case NcType::nc_FLOAT:
                {
-                  float *packed_data = new float[cell_count];
+                  vector<float> packed_data(cell_count);
 
-                  var->getVar(packed_data);
+                  var->getVar(packed_data.data());
 
                   float fill_value;
                   bool has_fill_value = get_var_fill_value(var, fill_value);
@@ -1612,96 +1601,87 @@ bool get_nc_data(NcVar *var, double *data) {
                         data[idx] = bad_data_double;
                      else data[idx] = (double)packed_data[idx];
                   }
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_INT64:
                {
-                  long long *packed_data = new long long[cell_count];
+                  vector<long long> packed_data(cell_count);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "int64", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_INT:
                {
-                  int *packed_data = new int[cell_count];
+                  vector<int> packed_data(cell_count);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "int", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_SHORT:
                {
                   short missing_value;
                   bool has_missing = get_var_fill_value(var, missing_value);
-                  short *packed_data = new short[cell_count];
-                  var->getVar(packed_data);
+                  vector<short> packed_data(cell_count);
+                  var->getVar(packed_data.data());
                   if (unsigned_value) {
-                     unsigned short *ushort_data = new unsigned short[cell_count];
+                     vector<unsigned short> ushort_data(cell_count);
                      for (int idx=0; idx<cell_count; idx++) {
                         ushort_data[idx] =(unsigned short)packed_data[idx];
                      }
-                     copy_nc_data_t(var, data, ushort_data, cell_count,
+                     copy_nc_data_t(var, data, ushort_data.data(), cell_count,
                                     "ushort", add_offset, scale_factor,
                                     has_missing, (unsigned short)missing_value);
-                     delete [] ushort_data;
                   }
                   else {
-                     copy_nc_data_t(var, data, packed_data, cell_count,
+                     copy_nc_data_t(var, data, packed_data.data(), cell_count,
                                     "short", add_offset, scale_factor,
                                     has_missing, missing_value);
                   }
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_USHORT:
                {
-                  unsigned short *packed_data = new unsigned short[cell_count];
+                  vector<unsigned short> packed_data(cell_count);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "ushort", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_BYTE:
                {
                   ncbyte missing_value;
                   bool has_missing = get_var_fill_value(var, missing_value);
-                  ncbyte *packed_data = new ncbyte[cell_count];
+                  vector<ncbyte> packed_data(cell_count);
 
-                  var->getVar(packed_data);
+                  var->getVar(packed_data.data());
                   if (unsigned_value) {
-                     unsigned char *ubyte_data = new unsigned char[cell_count];
+                     vector<unsigned char> ubyte_data(cell_count);
                      for (int idx=0; idx<cell_count; idx++) {
                         ubyte_data[idx] =(unsigned char)packed_data[idx];
                      }
-                     copy_nc_data_t(var, data, ubyte_data, cell_count,
+                     copy_nc_data_t(var, data, ubyte_data.data(), cell_count,
                                     "ncubyte", add_offset, scale_factor,
                                     has_missing, (unsigned char)missing_value);
-                     delete [] ubyte_data;
                   }
                   else {
-                     copy_nc_data_t(var, data, packed_data, cell_count,
+                     copy_nc_data_t(var, data, packed_data.data(), cell_count,
                                     "ncbyte", add_offset, scale_factor,
                                     has_missing, missing_value);
                   }
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_UBYTE:
                {
-                  unsigned char *packed_data = new unsigned char[cell_count];
+                  vector<unsigned char> packed_data(cell_count);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "ncubyte", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             default:
@@ -1770,14 +1750,13 @@ bool get_nc_data(NcVar *var, uchar *data, bool allow_conversion) {
               << "INFO: Unexpected conversion from 'ncbyte' for variable \""
               << GET_NC_NAME_P(var) << "\".\n\n";
       }
-      ncbyte *signed_data = new ncbyte[cell_count];
-      return_status = get_nc_data_t(var, signed_data);
+      vector<ncbyte> signed_data(cell_count);
+      return_status = get_nc_data_t(var, signed_data.data());
       if (return_status) {
          for (int idx=0; idx<cell_count; idx++) {
             data[idx] = (uchar)signed_data[idx];
          }
       }
-      delete [] signed_data;
    }
    else {
       mlog << Error << "\n" << method_name
@@ -1809,8 +1788,8 @@ bool get_nc_data(NcVar *var, unsigned short *data) {
       bool has_fill_value = IS_VALID_NC_P(att_fill_value);
       if (has_fill_value) fill_value = get_att_value_int(att_fill_value);
 
-      short *short_data = new short[cell_count];
-      if (return_status = get_nc_data_t(var, short_data)) {
+      vector<short> short_data(cell_count);
+      if (return_status = get_nc_data_t(var, short_data.data())) {
          for (int idx=0; idx<cell_count; idx++) {
             if (has_fill_value && fill_value == short_data[idx])
                data[idx] = (unsigned short)bad_data_int;
@@ -1818,7 +1797,6 @@ bool get_nc_data(NcVar *var, unsigned short *data) {
                data[idx] = (unsigned short)short_data[idx];
          }
       }
-      delete [] short_data;
       if (att_fill_value) delete att_fill_value;
    }
    else {
@@ -1911,9 +1889,9 @@ int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool i
    static const char *method_name = "get_index_at_nc_data() -> ";
    if (IS_VALID_NC_P(var)) {
       int data_size = get_data_size(var);
-      double *values = new double[data_size];
+      vector<double> values(data_size);
 
-      if (get_nc_data(var, values)) {
+      if (get_nc_data(var, values.data())) {
          unixtime ut;
          int sec_per_unit;
          bool no_leap_year = get_att_no_leap_year(var);
@@ -1943,7 +1921,6 @@ int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool i
             }
          }
       }
-      if (values) delete [] values;
 
       ConcatString value_str;
       if (is_time && (value > 10000000.)) value_str << unix_to_yyyymmdd_hhmmss(value);
@@ -2818,65 +2795,45 @@ void copy_nc_atts(NcVar *var_from, NcVar *var_to, const bool all_attrs) {
 
 void copy_nc_data_char(NcVar *var_from, NcVar *var_to, int data_size) {
    //const string method_name = "copy_nc_data_char";
-   char *data = new char[data_size];
-   var_from->getVar(data);
-   var_to->putVar(data);
-   //   mlog << Error << "\n" << method_name << " -> error writing the variable "
-   //        << GET_NC_NAME_P(var_to) << " to the netCDF file\n\n";
-   //   exit(1);
-   delete[] data;
+   vector<char> data(data_size);
+   var_from->getVar(data.data());
+   var_to->putVar(data.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_double(NcVar *var_from, NcVar *var_to, int data_size) {
    //const string method_name = "copy_nc_data_double";
-   double *data = new double[data_size];
-   var_from->getVar(data);
-   var_to->putVar(data);
-   //   mlog << Error << "\n" << method_name << " -> error writing the variable "
-   //        << GET_NC_NAME_P(var_to) << " to the netCDF file\n\n";
-   //   exit(1);
-   delete[] data;
+   vector<double> data(data_size);
+   var_from->getVar(data.data());
+   var_to->putVar(data.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_float(NcVar *var_from, NcVar *var_to, int data_size) {
    //const string method_name = "copy_nc_data_float";
-   float *data = new float[data_size];
-   var_from->getVar(data);
-   var_to->putVar(data);
-   //   mlog << Error << "\n" << method_name << " -> error writing the variable "
-   //        << GET_NC_NAME_P(var_to) << " to the netCDF file\n\n";
-   //   exit(1);
-   delete[] data;
+   vector<float> data(data_size);
+   var_from->getVar(data.data());
+   var_to->putVar(data.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_int(NcVar *var_from, NcVar *var_to, int data_size) {
    //const string method_name = "copy_nc_data_int";
-   int *data = new int[data_size];
-   var_from->getVar(data);
-   var_to->putVar(data);
-   //   mlog << Error << "\n" << method_name << " -> error writing the variable "
-   //        << GET_NC_NAME_P(var_to) << " to the netCDF file\n\n";
-   //   exit(1);
-   delete[] data;
+   vector<int> data(data_size);
+   var_from->getVar(data.data());
+   var_to->putVar(data.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_short(NcVar *var_from, NcVar *var_to, int data_size) {
    //const string method_name = "copy_nc_data_double";
-   short *data = new short[data_size];
-   var_from->getVar(data);
-   var_to->putVar(data);
-   //   mlog << Error << "\n" << method_name << " -> error writing the variable "
-   //        << GET_NC_NAME_P(var_to) << " to the netCDF file\n\n";
-   //   exit(1);
-   delete[] data;
+   vector<short> data(data_size);
+   var_from->getVar(data.data());
+   var_to->putVar(data.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2886,9 +2843,6 @@ void copy_nc_data_string(NcVar *var_from, NcVar *var_to, int data_size) {
    string *data = new string[data_size];
    var_from->getVar(data);
    var_to->putVar(data);
-   //   mlog << Error << "\n" << method_name << " -> error writing the variable "
-   //        << GET_NC_NAME_P(var_to) << " to the netCDF file\n\n";
-   //   exit(1);
    delete[] data;
 }
 

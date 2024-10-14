@@ -2560,27 +2560,11 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
    int i, n;
 
    // Arrays for storing observation rank data
-   float *obs_v    = (float *) nullptr;
-   int   *obs_rank = (int *)   nullptr;
-   float *obs_pit  = (float *) nullptr;
-   int   *ens_vld  = (int *)   nullptr;
-   float *ens_mean = (float *) nullptr;
-
-   // Allocate memory for storing ensemble data
-   obs_v    = new float [nxy];
-   obs_rank = new int   [nxy];
-   obs_pit  = new float [nxy];
-   ens_vld  = new int   [nxy];
-   ens_mean = new float [nxy];
-
-   // Initialize
-   for(i=0; i<nxy; i++) {
-      obs_v[i]    = bad_data_float;
-      obs_rank[i] = bad_data_int;
-      obs_pit[i]  = bad_data_float;
-      ens_vld[i]  = bad_data_int;
-      ens_mean[i] = bad_data_float;
-   }
+   vector<float> obs_v    (nxy, bad_data_float);
+   vector<int  > obs_rank (nxy, bad_data_int  );
+   vector<float> obs_pit  (nxy, bad_data_float);
+   vector<int  > ens_vld  (nxy, bad_data_int  );
+   vector<float> ens_mean (nxy, bad_data_float);
 
    // Loop over all the pairs
    for(i=0; i<pd.n_obs; i++) {
@@ -2599,45 +2583,38 @@ void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
 
    // Add the ensemble mean values
    if(conf_info.nc_info.do_mean) {
-      write_orank_var_float(i_vx, i_interp, i_mask, ens_mean, dp,
+      write_orank_var_float(i_vx, i_interp, i_mask, ens_mean.data(), dp,
                             "ENS_MEAN",
                             "Ensemble Mean");
    }
 
    // Add the observation values
    if(conf_info.nc_info.do_raw) {
-      write_orank_var_float(i_vx, i_interp, i_mask, obs_v, dp,
+      write_orank_var_float(i_vx, i_interp, i_mask, obs_v.data(), dp,
                             "OBS",
                             "Observation Value");
    }
 
    // Add the observation ranks
    if(conf_info.nc_info.do_rank) {
-      write_orank_var_int(i_vx, i_interp, i_mask, obs_rank, dp,
+      write_orank_var_int(i_vx, i_interp, i_mask, obs_rank.data(), dp,
                           "OBS_RANK",
                           "Observation Rank");
    }
 
    // Add the probability integral transforms
    if(conf_info.nc_info.do_pit) {
-      write_orank_var_float(i_vx, i_interp, i_mask, obs_pit, dp,
+      write_orank_var_float(i_vx, i_interp, i_mask, obs_pit.data(), dp,
                             "OBS_PIT",
                             "Probability Integral Transform");
    }
 
    // Add the number of valid ensemble members
    if(conf_info.nc_info.do_vld) {
-      write_orank_var_int(i_vx, i_interp, i_mask, ens_vld, dp,
+      write_orank_var_int(i_vx, i_interp, i_mask, ens_vld.data(), dp,
                           "ENS_VLD",
                           "Ensemble Valid Data Count");
    }
-
-   // Deallocate and clean up
-   if(obs_v)    { delete [] obs_v;    obs_v    = (float *) nullptr; }
-   if(obs_rank) { delete [] obs_rank; obs_rank = (int   *) nullptr; }
-   if(obs_pit)  { delete [] obs_pit;  obs_pit  = (float *) nullptr; }
-   if(ens_vld)  { delete [] ens_vld;  ens_vld  = (int   *) nullptr; }
-   if(ens_mean) { delete [] ens_mean; ens_mean = (float *) nullptr; }
 
    return;
 }

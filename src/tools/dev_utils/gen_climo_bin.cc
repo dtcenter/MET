@@ -282,7 +282,7 @@ void write_nc_bin(const DataPlane &dp, int i_cdf, double cdf_y) {
 
    // Allocate memory
    n = grid.nx() * grid.ny();
-   float * data = new float [n];
+   vector<float> data(n);
 
    dp.data_range(dmin, dmax);
    mlog << Debug(2)
@@ -319,16 +319,13 @@ void write_nc_bin(const DataPlane &dp, int i_cdf, double cdf_y) {
    }
 
    // Write out the gridded field of CDF X-values
-   if(!put_nc_data(&cdf_x_var, &data[0], lengths, offsets)) {
+   if(!put_nc_data(&cdf_x_var, data.data(), lengths, offsets)) {
       mlog << Error << "\nwrite_nc_bin() -> "
            << "error writing NetCDF variable name \""
            << var_name << "\" for the " << i_cdf
            << "-th CDF Y-value ( " << cdf_y << ").\n\n";
       exit(1);
    }
-
-   // Deallocate and clean up
-   if(data) { delete [] data; data = (float *) nullptr; }
 
    return;
 }

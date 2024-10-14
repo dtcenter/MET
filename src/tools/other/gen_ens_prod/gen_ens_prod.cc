@@ -821,14 +821,14 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
    DataPlane prob_dp, nbrhd_dp;
 
    // Allocate memory for storing ensemble data
-   float *ens_mean  = new float [nxy];
-   float *ens_stdev = new float [nxy];
-   float *ens_minus = new float [nxy];
-   float *ens_plus  = new float [nxy];
-   float *ens_min   = new float [nxy];
-   float *ens_max   = new float [nxy];
-   float *ens_range = new float [nxy];
-   int   *ens_vld   = new int   [nxy];
+   vector<float> ens_mean  (nxy);
+   vector<float> ens_stdev (nxy);
+   vector<float> ens_minus (nxy);
+   vector<float> ens_plus  (nxy);
+   vector<float> ens_min   (nxy);
+   vector<float> ens_max   (nxy);
+   vector<float> ens_range (nxy);
+   vector<int  > ens_vld   (nxy);
 
    // Store the threshold for the ratio of valid data points
    t = conf_info.vld_data_thresh;
@@ -865,56 +865,56 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
 
    // Add the ensemble mean, if requested
    if(ens_info->nc_info.do_mean) {
-      write_ens_var_float(ens_info, ens_mean, ens_dp,
+      write_ens_var_float(ens_info, ens_mean.data(), ens_dp,
                           "ENS_MEAN",
                           "Ensemble Mean");
    }
 
    // Add the ensemble standard deviation, if requested
    if(ens_info->nc_info.do_stdev) {
-      write_ens_var_float(ens_info, ens_stdev, ens_dp,
+      write_ens_var_float(ens_info, ens_stdev.data(), ens_dp,
                           "ENS_STDEV",
                           "Ensemble Standard Deviation");
    }
 
    // Add the ensemble mean minus one standard deviation, if requested
    if(ens_info->nc_info.do_minus) {
-      write_ens_var_float(ens_info, ens_minus, ens_dp,
+      write_ens_var_float(ens_info, ens_minus.data(), ens_dp,
                           "ENS_MINUS",
                           "Ensemble Mean Minus 1 Standard Deviation");
    }
 
    // Add the ensemble mean plus one standard deviation, if requested
    if(ens_info->nc_info.do_plus) {
-      write_ens_var_float(ens_info, ens_plus, ens_dp,
+      write_ens_var_float(ens_info, ens_plus.data(), ens_dp,
                           "ENS_PLUS",
                           "Ensemble Mean Plus 1 Standard Deviation");
    }
 
    // Add the ensemble minimum value, if requested
    if(ens_info->nc_info.do_min) {
-      write_ens_var_float(ens_info, ens_min, ens_dp,
+      write_ens_var_float(ens_info, ens_min.data(), ens_dp,
                           "ENS_MIN",
                           "Ensemble Minimum");
    }
 
    // Add the ensemble maximum value, if requested
    if(ens_info->nc_info.do_max) {
-      write_ens_var_float(ens_info, ens_max, ens_dp,
+      write_ens_var_float(ens_info, ens_max.data(), ens_dp,
                           "ENS_MAX",
                           "Ensemble Maximum");
    }
 
    // Add the ensemble range, if requested
    if(ens_info->nc_info.do_range) {
-      write_ens_var_float(ens_info, ens_range, ens_dp,
+      write_ens_var_float(ens_info, ens_range.data(), ens_dp,
                           "ENS_RANGE",
                           "Ensemble Range");
    }
 
    // Add the ensemble valid data count, if requested
    if(ens_info->nc_info.do_vld) {
-      write_ens_var_int(ens_info, ens_vld, ens_dp,
+      write_ens_var_int(ens_info, ens_vld.data(), ens_dp,
                         "ENS_VLD",
                         "Ensemble Valid Data Count");
    }
@@ -1060,16 +1060,6 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
          }
       } // end for it
    }
-
-   // Deallocate and clean up
-   if(ens_mean)  { delete [] ens_mean;  ens_mean  = (float *) nullptr; }
-   if(ens_stdev) { delete [] ens_stdev; ens_stdev = (float *) nullptr; }
-   if(ens_minus) { delete [] ens_minus; ens_minus = (float *) nullptr; }
-   if(ens_plus)  { delete [] ens_plus;  ens_plus  = (float *) nullptr; }
-   if(ens_min)   { delete [] ens_min;   ens_min   = (float *) nullptr; }
-   if(ens_max)   { delete [] ens_max;   ens_max   = (float *) nullptr; }
-   if(ens_range) { delete [] ens_range; ens_range = (float *) nullptr; }
-   if(ens_vld)   { delete [] ens_vld;   ens_vld   = (int   *) nullptr; }
 
    return;
 }

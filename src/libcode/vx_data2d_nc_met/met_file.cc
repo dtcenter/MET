@@ -587,33 +587,30 @@ plane.set_size(Nx, Ny);
    dim[x_slot] = Nx;
    dim[y_slot] = Ny;
 
-   double *data_array = new double[cell_count];
-   double *double_array = new double[cell_count];
+   vector<double> data_array(cell_count);
+   vector<double> double_array(cell_count);
 
    clock_time = clock();
 
-   get_nc_data(v, double_array, dim, cur);
-   copy_nc_data_as_double(data_array, double_array, x_slot, y_slot, Nx, Ny,
+   get_nc_data(v, double_array.data(), dim, cur);
+   copy_nc_data_as_double(data_array.data(), double_array.data(), x_slot, y_slot, Nx, Ny,
                           missing_value, fill_value);
 
    nc_time = clock();
    if (mlog.verbosity_level() >= 7) {
       double duration_sec = (double)(nc_time - clock_time)/CLOCKS_PER_SEC;
-      check_nc_data_2d(data_array, Nx, Ny, missing_value);
+      check_nc_data_2d(data_array.data(), Nx, Ny, missing_value);
       mlog << Debug(7) << method_name_short << "took " << duration_sec
            << " seconds to read NetCDF data\n";
    }
 
-   plane.set_block(data_array, Nx, Ny);
+   plane.set_block(data_array.data(), Nx, Ny);
 
    if (mlog.verbosity_level() >= 7) {
       double duration_sec = (double)(clock() - nc_time)/CLOCKS_PER_SEC;
       mlog << Debug(7) << method_name_short << "took " << duration_sec
            << " seconds to fill data plane\n";
    }
-
-   if (data_array) delete[] data_array;
-   if (double_array) delete[] double_array;
 
    //
    //  done
