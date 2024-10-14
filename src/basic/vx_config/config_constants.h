@@ -434,8 +434,8 @@ struct MaskSID {
    // Boolean for non-default weights 
    bool has_weights;
 
-   // Vector of SID name and corresponding weights
-   std::vector<std::pair<std::string,double>> sid_list;
+   // Mapping of SID name to weight value
+   std::map<std::string,double> sid_map;
 
    void      clear();
    bool      operator==(const MaskSID &) const;
@@ -447,9 +447,7 @@ struct MaskSID {
    void add(const std::string &);
    void add_css(const std::string &);
    bool has(const std::string &) const ;
-   bool has(const std::string &,
-            std::pair<std::string,double> *&item_ptr) const;
-   void sort();
+   bool has(const std::string &, double &) const;
 };
 
 ////////////////////////////////////////////////////////////////////////

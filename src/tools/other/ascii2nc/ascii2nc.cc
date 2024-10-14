@@ -749,12 +749,12 @@ void set_mask_sid(const StringArray & a) {
         << "Station ID Mask: " << a[0] << "\n";
 
    MaskSID ms = parse_sid_mask(a[0]);
-   for(auto item : ms.sid_list) mask_sid.add(item.first);
+   for(const auto &pair : ms.sid_map) mask_sid.add(pair.first);
 
    // List the length of the station ID mask
    mlog << Debug(2)
-        << "Parsed Station ID Mask: " << ms.name
-        << " containing " << mask_sid.n() << " stations\n";
+        << "Parsed Station ID Mask (" << ms.name
+        << ") containing " << mask_sid.n() << " stations\n";
 }
 
 ////////////////////////////////////////////////////////////////////////

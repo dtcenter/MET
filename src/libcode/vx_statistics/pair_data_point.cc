@@ -503,7 +503,7 @@ void VxPairDataPoint::set_size(int types, int masks, int interps) {
 void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                                     const char *hdr_sid_str, unixtime hdr_ut,
                                     const char *obs_qty, float *obs_arr,
-                                    Grid &gr, const char *var_name) {
+                                    const Grid &gr, const char *var_name) {
 
    // Increment the number of tries count
    n_try++;

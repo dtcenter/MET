@@ -56,6 +56,7 @@ extern StringArray     parse_conf_sid_list(
                           Dictionary *dict,
                           const char *);
 extern MaskSID         parse_sid_mask(const ConcatString &);
+extern StringArray     parse_sid_mask_as_list(const ConcatString &);
 extern std::vector<MaskLatLon>
                        parse_conf_llpnt_mask(Dictionary *dict);
 extern StringArray     parse_conf_obs_qty_inc(Dictionary *dict);

@@ -606,7 +606,7 @@ StringArray parse_conf_message_type(Dictionary *dict, bool error_out) {
 void MaskSID::clear() {
    name.clear();
    has_weights = false;
-   sid_list.clear();
+   sid_map.clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -614,8 +614,8 @@ void MaskSID::clear() {
 bool MaskSID::operator==(const MaskSID &v) const {
    bool match = true;
 
-   if(!(name     == v.name    ) ||
-      !(sid_list == v.sid_list)) {
+   if(!(name    == v.name   ) ||
+      !(sid_map == v.sid_map)) {
       match = false;
    }
 
@@ -628,7 +628,7 @@ MaskSID &MaskSID::operator=(const MaskSID &a) noexcept {
    if(this != &a) {
       name = a.name;
       has_weights = a.has_weights;
-      sid_list = a.sid_list;
+      sid_map = a.sid_map;
    }
    return *this;
 }
@@ -636,7 +636,7 @@ MaskSID &MaskSID::operator=(const MaskSID &a) noexcept {
 ///////////////////////////////////////////////////////////////////////////////
 
 int MaskSID::n() const {
-   return sid_list.size();
+   return (int) sid_map.size();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -653,8 +653,8 @@ void MaskSID::add(const string &text) {
       has_weights = true;
    }
 
-   // Store the station ID, weight pair
-   sid_list.push_back(pair<string,double>(sid,weight));
+   // Add station ID map entry
+   if(sid_map.count(sid) == 0) sid_map[sid] = weight;
 
    return;
 }
@@ -671,40 +671,28 @@ void MaskSID::add_css(const string &text) {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool MaskSID::has(const string &s) const {
-   pair<string,double> *item_ptr = nullptr;
- 
-   return has(s, item_ptr);
+   return sid_map.count(s) > 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool MaskSID::has(const string &s, pair<string,double> *&item_ptr) const {
-   bool match = false;
+bool MaskSID::has(const string &s, double &weight) const {
+   bool found = false;
 
-   for(auto item : sid_list) {
-      if(s == item.first) {
-         match = true;
-         item_ptr = &item;
-         break;
-      }
+   if(sid_map.count(s) == 0) {
+      weight = bad_data_double;
+   }
+   else {
+      found = true;
+      weight = sid_map.at(s);
    }
 
-   return match;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void MaskSID::sort() {
-
-   std::sort(sid_list.begin(), sid_list.end());
-
-   return;
+   return found;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 StringArray parse_conf_sid_list(Dictionary *dict, const char *conf_key) {
-   MaskSID cur;
    StringArray sid_sa;
    const char *method_name = "parse_conf_sid_list() -> ";
 
@@ -712,8 +700,7 @@ StringArray parse_conf_sid_list(Dictionary *dict, const char *conf_key) {
 
    // Append to the list of station ID's
    for(int i=0; i<sa.n(); i++) {
-      cur = parse_sid_mask(string(sa[i]));
-      for(auto item : cur.sid_list) sid_sa.add(item.first);
+      sid_sa.add(parse_sid_mask_as_list(string(sa[i])));
    }
 
    mlog << Debug(4) << method_name
@@ -808,8 +795,8 @@ MaskSID parse_sid_mask(const ConcatString &mask_sid_str) {
       // One elements means no colon was specified
       if(sa.n() == 1) {
          mask_sid.add_css(sa[0]);
-         mask_sid.name = (mask_sid.sid_list.size() == 1 ?
-                          mask_sid.sid_list[0].first : "MASK_SID");
+         mask_sid.name = (mask_sid.sid_map.size() == 1 ?
+                          mask_sid.sid_map.begin()->first : "MASK_SID");
       }
       // Two elements means one colon was specified
       else if(sa.n() == 2) {
@@ -825,10 +812,19 @@ MaskSID parse_sid_mask(const ConcatString &mask_sid_str) {
 
    }
 
-   // Sort the mask_sid's
-   mask_sid.sort();
-   
    return mask_sid;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+StringArray parse_sid_mask_as_list(const ConcatString &mask_sid_str) {
+
+   MaskSID ms = parse_sid_mask(mask_sid_str);
+
+   StringArray sa;
+   for(const auto &pair : ms.sid_map) sa.add(pair.first);
+
+   return sa;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

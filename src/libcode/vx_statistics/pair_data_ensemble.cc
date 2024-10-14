@@ -1170,7 +1170,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
                                        const char *hdr_sid_str,
                                        unixtime hdr_ut,
                                        const char *obs_qty, float *obs_arr,
-                                       Grid &gr, const char *var_name) {
+                                       const Grid &gr, const char *var_name) {
 
    // Check the observation VarInfo file type
    if(obs_info->file_type() != FileType_Gb1) {

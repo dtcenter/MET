@@ -216,7 +216,7 @@ class VxPairDataEnsemble : public VxPairBase {
       void set_skip_const(bool);
 
       void add_point_obs(float *, int *, const char *, const char *,
-                         unixtime, const char *, float *, Grid &,
+                         unixtime, const char *, float *, const Grid &,
                          const char *);
       void add_ens(int, bool mn, Grid &);
 };

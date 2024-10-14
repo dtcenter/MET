@@ -801,9 +801,9 @@ void PairBase::set_point_weight(const PointWeightType wgt_flag) {
       // Loop through the point observations
       for(int i_obs=0; i_obs<n_obs; i_obs++) {
 
-         pair<string,double> *item_ptr = nullptr;
-         if(mask_sid_ptr->has(sid_sa[i_obs], item_ptr)) {
-            wgt_na.set(i_obs, item_ptr->second);
+         double wgt; 
+         if(mask_sid_ptr->has(sid_sa[i_obs], wgt)) {
+            wgt_na.set(i_obs, wgt);
          }
          else {
             mlog << Warning << "\n" << method_name

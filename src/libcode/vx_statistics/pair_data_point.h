@@ -122,7 +122,8 @@ class VxPairDataPoint : public VxPairBase {
       void set_seeps_thresh(const SingleThresh &p1_thresh);
 
       void add_point_obs(float *, const char *, const char *, unixtime,
-                         const char *, float *, Grid &, const char *);
+                         const char *, float *, const Grid &,
+                         const char *);
 };
 
 

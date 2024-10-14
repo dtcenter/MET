@@ -125,8 +125,7 @@ void IODA2NCConfInfo::process_config() {
    // Conf: station_id
    sa = conf.lookup_string_array(conf_key_station_id);
    for(i=0; i<sa.n(); i++) {
-      MaskSID ms = parse_sid_mask(replace_path(sa[i]));
-      for(auto item : ms.sid_list) station_id.add(item.first);
+      station_id.add(parse_sid_mask_as_list(replace_path(sa[i])));
    }
 
    // Conf: beg_ds and end_ds
