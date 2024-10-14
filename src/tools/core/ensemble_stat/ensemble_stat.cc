@@ -76,6 +76,7 @@
 //   043    04/29/24  Halley Gotway  MET #2795 Move level mismatch warning.
 //   044    06/17/24  Halley Gotway  MET #2856 Reinitialize climo_cdf pointer
 //   045    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
+//   046    10/08/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
 //
 ////////////////////////////////////////////////////////////////////////
 

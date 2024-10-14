@@ -1250,6 +1250,7 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
    } // end for i
 
    // Store the aggregated contingency table counts
+   isc_aggr.cts.set_n_pairs(fy_oy + fy_on + fn_oy + fn_on);
    isc_aggr.cts.set_fy_oy(fy_oy);
    isc_aggr.cts.set_fy_on(fy_on);
    isc_aggr.cts.set_fn_oy(fn_oy);

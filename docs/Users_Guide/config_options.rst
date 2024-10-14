@@ -21,42 +21,42 @@ which are dictionaries themselves.
 The configuration file language supports the following data types:
 
 * Dictionary:
-  
+
   * Grouping of one or more entries enclosed by curly braces {}.
 
 * Array:
-  
+
   * List of one or more entries enclosed by square braces [].
-    
+
   * Array elements are separated by commas.
 
 * String:
-  
+
   * A character string enclosed by double quotation marks "".
-    
+
 * Integer:
-  
+
   * A numeric integer value.
-    
+
 * Float:
-  
+
   * A numeric float value.
-    
+
 * Boolean:
-  
+
   * A boolean value (TRUE or FALSE).
-    
+
 * Threshold:
-  
+
   * A threshold type (<, <=, ==, !-, >=, or >) followed by a numeric value.
-    
+
   * The threshold type may also be specified using two letter abbreviations
     (lt, le, eq, ne, ge, gt).
-      
+
   * Multiple thresholds may be combined by specifying the logic type of AND
     (&&) or OR (||). For example, ">=5&&<=10" defines the numbers between 5
     and 10 and "==1||==2" defines numbers exactly equal to 1 or 2.
-     
+
 * Percentile Thresholds:
 
   * A threshold type (<, <=, ==, !=, >=, or >), followed by a percentile
@@ -65,34 +65,34 @@ The configuration file language supports the following data types:
 
   * Note that the two letter threshold type abbreviations (lt, le, eq, ne,
     ge, gt) are not supported for percentile thresholds.
-  
+
   * Thresholds may be defined as percentiles of the data being processed in
     several places:
-    
+
     * In Point-Stat and Grid-Stat when setting "cat_thresh", "wind_thresh"
       and "cnt_thresh".
-      
+
     * In Wavelet-Stat when setting "cat_thresh".
-      
+
     * In MODE when setting "conv_thresh" and "merge_thresh".
-      
+
     * In Ensemble-Stat when setting "obs_thresh".
-	
+
     * When using the "censor_thresh" config option.
-	
+
     * In the Stat-Analysis "-out_fcst_thresh" and "-out_obs_thresh" job
       command options.
-	
+
     * In the Gen-Vx-Mask "-thresh" command line option.
-	
+
   * The following percentile threshold types are supported:
-    
+
     * SFP for a percentile of the sample forecast values.
       e.g. ">SFP33.3" means greater than the 33.3-rd forecast percentile.
-      
+
     * SOP for a percentile of the sample observation values.
       e.g. ">SOP75" means greater than the 75-th observation percentile.
-      
+
     * SFCP for a percentile of the sample forecast climatology values.
       e.g. ">SFCP90" means greater than the 90-th forecast climatology
       percentile.
@@ -101,11 +101,11 @@ The configuration file language supports the following data types:
       e.g. ">SOCP90" means greater than the 90-th observation climatology
       percentile. For backward compatibility, the "SCP" threshold type
       is processed the same as "SOCP".
-      
+
     * USP for a user-specified percentile threshold.
       e.g. "<USP90(2.5)" means less than the 90-th percentile values which
       the user has already determined to be 2.5 outside of MET.
-      
+
     * ==FBIAS for a user-specified frequency bias value.
       e.g. "==FBIAS1" to automatically de-bias the data, "==FBIAS0.9" to
       select a low-bias threshold, or "==FBIAS1.1" to select a high-bias
@@ -114,7 +114,7 @@ The configuration file language supports the following data types:
       and "fcst.cat_thresh = ==FBIAS1;", MET applies the >5.0 threshold to
       the observations and then chooses a forecast threshold which results in
       a frequency bias of 1. The frequency bias can be any float value > 0.0.
-      
+
     * FCDP for forecast climatological distribution percentile thresholds.
       These thresholds require that the forecast climatological mean and
       standard deviation be defined using the "climo_mean" and "climo_stdev"
@@ -130,7 +130,7 @@ The configuration file language supports the following data types:
       However these thresholds are defined using the observation climatological
       mean and standard deviation rather than the forecast climatological data.
       For backward compatibility, the "CDP" threshold type is processed the
-      same as "OCDP". 
+      same as "OCDP".
 
   * When percentile thresholds of type SFP, SOP, SFCP, SOCP, FCDP, or OCDP are
     requested for continuous filtering thresholds (cnt_thresh), wind speed
@@ -140,13 +140,13 @@ The configuration file language supports the following data types:
     bins which span the values from 0 to 100.
     For example, ==OCDP25 is automatically expanded to 4 percentile bins:
     >=OCDP0&&<OCDP25,>=OCDP25&&<OCDP50,>=OCDP50&&<OCDP75,>=OCDP75&&<=OCDP100
-     
+
   * When sample percentile thresholds of type SFP, SOP, SFCP, SOCP, or FBIAS
     are requested, MET recomputes the actual percentile that the threshold
     represents. If the requested percentile and actual percentile differ by
     more than 5%, a warning message is printed. This may occur when the
     sample size is small or the data values are not truly continuous.
-     
+
   * When percentile thresholds of type SFP, SOP, SFCP, SOCP, or USP are used,
     the actual threshold value is appended to the FCST_THRESH and OBS_THRESH
     output columns. For example, if the 90-th percentile of the current set
@@ -167,20 +167,20 @@ The configuration file language supports the following data types:
 
   Users are encouraged to replace the deprecated SCP and CDP threshold
   types with the updated SOCP and OCDP types, respectively.
- 
+
 * Piecewise-Linear Function (currently used only by MODE):
-  
+
   * A list of (x, y) points enclosed in parenthesis ().
-    
+
   * The (x, y) points are *NOT* separated by commas.
-    
+
 * User-defined function of a single variable:
-  
+
   * Left side is a function name followed by variable name in parenthesis.
-    
+
   * Right side is an equation which includes basic math functions (+,-,*,/),
     built-in functions (listed below), or other user-defined functions.
-    
+
   * Built-in functions include:
     sin, cos, tan, sind, cosd, tand, asin, acos, atan, asind, acosd, atand,
     atan2, atan2d, arg, argd, log, exp, log10, exp10, sqrt, abs, min, max,
@@ -401,7 +401,7 @@ References:
 
 | `Office Note 388 GRIB1 <http://www.nco.ncep.noaa.gov/pmb/docs/on388>`_
 | `A Guide to the Code Form FM 92-IX Ext. GRIB Edition 1 <http://www.wmo.int/pages/prog/www/WMOCodes/Guides/GRIB/GRIB1-Contents.html>`_
-| 
+|
 
 GRIB2 table files begin with "grib2" prefix and end with a ".txt" suffix.
 The first line of the file must contain GRIB2.
@@ -418,7 +418,7 @@ The following lines consist of 8 integers followed by 3 strings.
 | Column 9:  variable name
 | Column 10: variable description
 | Column 11: units
-| 
+|
 
 References:
 
@@ -502,7 +502,7 @@ parallelization:
   * :code:`grid_ens_prod`
   * :code:`mode`
 
-**Thread Binding**    
+**Thread Binding**
 
 It is normally beneficial to bind threads to particular cores, sometimes called
 *affinitization*. There are a few reasons for this, but at the very least it
@@ -618,7 +618,7 @@ writing of NetCDF files within MET significantly.
 
 output_precision
 ----------------
-  
+
 The "output_precision" entry in ConfigConstants defines the precision
 (number of significant decimal places) to be written to the ASCII output
 files. Setting this option in the config file of one of the tools will
@@ -632,7 +632,7 @@ override the default value set in ConfigConstants.
 
 tmp_dir
 -------
-      
+
 The "tmp_dir" entry in ConfigConstants defines the directory for the
 temporary files. The directory must exist and be writable. The environment
 variable MET_TMP_DIR overrides the default value at the configuration file.
@@ -669,7 +669,7 @@ used.
 
 message_type_map
 ----------------
-  
+
 The "message_type_map" entry is an array of dictionaries, each containing
 a "key" string and "val" string. This defines a mapping of input strings
 to output message types. This mapping is applied in ASCII2NC when
@@ -693,7 +693,7 @@ types.
 
 model
 -----
-      
+
 The "model" entry specifies a name for the model being verified. This name
 is written to the MODEL column of the ASCII output generated. If you're
 verifying multiple models, you should choose descriptive model names (no
@@ -706,7 +706,7 @@ e.g. model = "GFS";
 
 desc
 ----
-      
+
 The "desc" entry specifies a user-specified description for each verification
 task. This string is written to the DESC column of the ASCII output
 generated. It may be set separately in each "obs.field" verification task
@@ -736,10 +736,10 @@ the configuration file obtype value is written.
   obtype = "ANALYS";
 
 .. _regrid:
-  
+
 regrid
 ------
-      
+
 The "regrid" entry is a dictionary containing information about how to handle
 input gridded data files. The "regrid" entry specifies regridding logic
 using the following entries:
@@ -747,17 +747,17 @@ using the following entries:
 * The "to_grid" entry may be set to NONE, FCST, OBS, a named grid, the path
   to a gridded data file defining the grid, or an explicit grid specification
   string.
-  
+
   * to_grid = NONE;   To disable regridding.
-    
+
   * to_grid = FCST;   To regrid observations to the forecast grid.
-    
+
   * to_grid = OBS;    To regrid forecasts to the observation grid.
-    
+
   * to_grid = "G218"; To regrid both to a named grid.
-    
+
   * to_grid = "path"; To regrid both to a grid defined by a file.
-    
+
   * to_grid = "spec"; To define a grid specification string, as
     described in :ref:`appendixB`.
 
@@ -768,29 +768,29 @@ using the following entries:
   write bad data for the current point.
 
 * The "method" entry defines the regridding method to be used.
-  
+
   * Valid regridding methods:
-    
+
     * MIN         for the minimum value
-      
+
     * MAX         for the maximum value
-      
+
     * MEDIAN      for the median value
-      
+
     * UW_MEAN     for the unweighted average value
-      
+
     * DW_MEAN     for the distance-weighted average value (weight =
       distance^-2)
-      
+
     * AW_MEAN     for an area-weighted mean when regridding from
       high to low resolution grids (width = 1)
-      
+
     * LS_FIT      for a least-squares fit
-      
+
     * BILIN       for bilinear interpolation (width = 2)
-      
+
     * NEAREST     for the nearest grid point (width = 1)
-      
+
     * BUDGET      for the mass-conserving budget interpolation
 
       * The budget interpolation method is often used for precipitation
@@ -806,15 +806,15 @@ using the following entries:
 
     * FORCE       to compare gridded data directly with no interpolation
       as long as the grid x and y dimensions match.
-      
+
     * UPPER_LEFT  for the upper left grid point (width = 1)
-      
+
     * UPPER_RIGHT for the upper right grid point (width = 1)
-      
+
     * LOWER_RIGHT for the lower right grid point (width = 1)
-      
+
     * LOWER_LEFT  for the lower left grid point (width = 1)
-      
+
     * MAXGAUSS    to compute the maximum value in the neighborhood
       and apply a Gaussian smoother to the result
 
@@ -842,7 +842,7 @@ using the following entries:
   regridding step. The conversion operation is applied first, followed by
   the censoring operation. Note that these operations are limited in scope.
   They are only applied if defined within the regrid dictionary itself.
-  Settings defined at higher levels of config file context are not applied. 
+  Settings defined at higher levels of config file context are not applied.
 
 .. code-block:: none
 
@@ -861,7 +861,7 @@ using the following entries:
 
 fcst
 ----
-  
+
 The "fcst" entry is a dictionary containing information about the field(s)
 to be verified. This dictionary may include the following entries:
 
@@ -1046,7 +1046,7 @@ to be verified. This dictionary may include the following entries:
     the analysis. For example, the following settings exclude matched pairs
     where the observation value differs from the forecast or climatological
     mean values by more than 10:
-    
+
     .. code-block:: none
 
       mpr_column = [ "ABS(OBS-FCST)", "ABS(OBS-CLIMO_MEAN)" ];
@@ -1144,70 +1144,70 @@ File-format specific settings for the "field" entry:
       * `GRIB1 Product Definition Section <http://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html>`_
 
       * `GRIB2 Product Definition Section <http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc>`_
-	 
+
     * The "level" entry specifies a level type and value:
-       
+
       * ANNN for accumulation interval NNN
-	 
+
       * ZNNN for vertical level NNN
-	 
+
       * ZNNN-NNN for a range of vertical levels
-	 
+
       * PNNN for pressure level NNN in hPa
-	 
+
       * PNNN-NNN for a range of pressure levels in hPa
-	 
+
       * LNNN for a generic level type
-	 
+
       * RNNN for a specific GRIB record number
-	 
+
     * The "GRIB_lvl_typ" entry is an integer specifying the level type.
-       
+
     * The "GRIB_lvl_val1" and "GRIB_lvl_val2" entries are floats specifying
       the first and second level values.
-       
+
     * The "GRIB_ens" entry is a string specifying NCEP's usage of the
       extended PDS for ensembles. Set to "hi_res_ctl", "low_res_ctl",
       "+n", or "-n", for the n-th ensemble member.
-       
+
     * The GRIB1_ptv entry is an integer specifying the GRIB1 parameter
       table version number.
-       
+
     * The GRIB1_code entry is an integer specifying the GRIB1 code (wgrib
       kpds5 value).
-       
+
     * The GRIB1_center is an integer specifying the originating center.
-       
+
     * The GRIB1_subcenter is an integer specifying the originating
       subcenter.
-       
+
     * The GRIB1_tri is an integer specifying the time range indicator.
-       
+
     * The GRIB2_mtab is an integer specifying the master table number.
-       
+
     * The GRIB2_ltab is an integer specifying the local table number.
-       
+
     * The GRIB2_disc is an integer specifying the GRIB2 discipline code.
-       
+
     * The GRIB2_parm_cat is an integer specifying the parameter category
       code.
-       
+
     * The GRIB2_parm is an integer specifying the parameter code.
-       
+
     * The GRIB2_pdt is an integer specifying the product definition
       template (Table 4.0).
-       
+
     * The GRIB2_process is an integer specifying the generating process
       (Table 4.3).
-       
+
     * The GRIB2_cntr is an integer specifying the originating center.
-       
+
     * The GRIB2_ens_type is an integer specifying the ensemble type
       (Table 4.6).
-       
+
     * The GRIB2_der_type is an integer specifying the derived product
       type (Table 4.7).
-       
+
     * The GRIB2_stat_type is an integer specifying the statistical
       processing type (Table 4.10).
 
@@ -1234,13 +1234,13 @@ File-format specific settings for the "field" entry:
       template values are 1 and 2, respectively:
 
       GRIB2_ipdtmpl_index=[8, 26]; GRIB2_ipdtmpl_val=[1, 2];
-	  
+
   * NetCDF (from MET tools, CF-compliant, p_interp, and wrf_interp):
-     
+
     * The "name" entry specifies the NetCDF variable name.
-       
+
     * The "level" entry specifies the dimensions to be used:
-       
+
       * (i,...,j,*,*) for a single field, where i,...,j specifies fixed
         dimension values and *,* specifies the two dimensions for the
         gridded field. @ specifies the vertical level value or time value
@@ -1271,10 +1271,10 @@ File-format specific settings for the "field" entry:
            ];
 
   * Python (using PYTHON_NUMPY or PYTHON_XARRAY):
-     
+
     * The Python interface for MET is described in Appendix F of the MET
       User's Guide.
-       
+
     * Two methods for specifying the Python command and input file name
       are supported. For tools which read a single gridded forecast and/or
       observation file, both options work. However, only the second option
@@ -1282,13 +1282,13 @@ File-format specific settings for the "field" entry:
       as Ensemble-Stat, Series-Analysis, and MTD.
 
     Option 1:
-     
+
       * On the command line, replace the path to the input gridded data
         file with the constant string PYTHON_NUMPY or PYTHON_XARRAY.
-	 
+
       * Specify the configuration "name" entry as the Python command to be
         executed to read the data.
-	 
+
       * The "level" entry is not required for Python.
 
         For example:
@@ -1303,14 +1303,14 @@ File-format specific settings for the "field" entry:
 
       * On the command line, leave the path to the input gridded data
         as is.
-	 
+
       * Set the configuration "file_type" entry to the constant
         PYTHON_NUMPY or PYTHON_XARRAY.
-	 
+
       * Specify the configuration "name" entry as the Python command to be
         executed to read the data, but replace the input gridded data file
         with the constant MET_PYTHON_INPUT_ARG.
-	 
+
       * The "level" entry is not required for Python.
 
         For example:
@@ -1337,7 +1337,7 @@ File-format specific settings for the "field" entry:
      init_time     = "20120619_12";
      valid_time    = "20120620_00";
      lead_time     = "12";
-  
+
      field = [
         {
           name       = "APCP";
@@ -1453,16 +1453,16 @@ or
    that filtering by station ID may also be accomplished using the "mask.sid"
    option. However, when using the "sid_inc" option, statistics are reported
    separately for each masking region.
-   
+
  * The "sid_exc" entry is an array of station ID groups indicating which
    station ID's should be excluded from the verification task.
-   
+
  * Each element in the "sid_inc" and "sid_exc" arrays is either the name of
    a single station ID or the full path to a station ID group file name.
    A station ID group file consists of a name for the group followed by a
    list of station ID's. All of the station ID's indicated will be concatenated
    into one long list of station ID's to be included or excluded.
-   
+
  * As with "message_type" above, the "sid_inc" and "sid_exc" settings can be
    placed in the in the "field" array element to control which station ID's
    are included or excluded for each verification task.
@@ -1473,7 +1473,7 @@ or
 
 climo_mean
 ----------
-      
+
 The "climo_mean" dictionary specifies climatology mean data to be read by the
 Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis tools. It can be
 set inside the "fcst" and "obs" dictionaries to specify separate forecast and
@@ -1496,7 +1496,7 @@ the climatology file names and fields to be used.
 
 * The "time_interp_method" entry specifies how the climatology data should
   be interpolated in time to the forecast valid time:
-  
+
  * NEAREST for data closest in time
  * UW_MEAN for average of data before and after
  * DW_MEAN for linear interpolation in time of data before and after
@@ -1519,16 +1519,16 @@ the climatology file names and fields to be used.
 .. code-block:: none
 
   climo_mean = {
-  
+
      file_name = [ "/path/to/climatological/mean/files" ];
      field     = [];
-  
+
      regrid = {
         method     = NEAREST;
         width      = 1;
         vld_thresh = 0.5;
      }
-  
+
      time_interp_method = DW_MEAN;
      day_interval       = 31;
      hour_interval      = 6;
@@ -1536,7 +1536,7 @@ the climatology file names and fields to be used.
 
 climo_stdev
 -----------
-      
+
 The "climo_stdev" dictionary specifies climatology standard deviation data to
 be read by the Grid-Stat, Point-Stat, Ensemble-Stat, and Series-Analysis
 tools. It can be set inside the "fcst" and "obs" dictionaries to specify
@@ -1591,7 +1591,7 @@ dictionaries, as shown below.
 
 climo_cdf
 ---------
-      
+
 The "climo_cdf" dictionary specifies how the the observation climatological
 mean ("climo_mean") and standard deviation ("climo_stdev") data are used to
 evaluate model performance relative to where the observation value falls
@@ -1723,11 +1723,11 @@ The "mask_missing_flag" entry specifies how missing data should be handled
 in the Wavelet-Stat and MODE tools:
 
  * NONE to perform no masking of missing data
-   
+
  * FCST to mask the forecast field with missing observation data
-   
+
  * OBS to mask the observation field with missing forecast data
-   
+
  * BOTH to mask both fields with missing data from the other
 
 .. code-block:: none
@@ -1770,7 +1770,7 @@ in the following ways:
   three digit grid number. Supplying a value of "FULL" indicates that the
   verification should be performed over the entire grid on which the data
   resides.
-  See: `ON388 - TABLE B, GRID IDENTIFICATION (PDS Octet 7), MASTER LIST OF NCEP STORAGE GRIDS, GRIB Edition 1 (FM92) <http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_.  
+  See: `ON388 - TABLE B, GRID IDENTIFICATION (PDS Octet 7), MASTER LIST OF NCEP STORAGE GRIDS, GRIB Edition 1 (FM92) <http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_.
   The "grid" entry can be the gridded data file defining grid.
 
 * The "poly" entry contains a comma-separated list of files that define
@@ -1850,7 +1850,7 @@ in the following ways:
 * The "sid" entry is an array of strings which define groups of
   observation station ID's over which to compute statistics. Each entry
   in the array is either a filename of a comma-separated list.
-  
+
   * For a filename, the strings are whitespace-separated. The first
     string is the mask "name" and the remaining strings are the station
     ID's to be used.
@@ -1929,10 +1929,10 @@ bootstrap confidence intervals. The interval variable indicates what method
 should be used for computing bootstrap confidence intervals:
 
 * The "interval" entry specifies the confidence interval method:
-  
+
   * BCA for the BCa (bias-corrected percentile) interval method is
     highly accurate but computationally intensive.
-    
+
   * PCTILE uses the percentile method which is somewhat less accurate
     but more efficient.
 
@@ -1965,7 +1965,7 @@ should be used for computing bootstrap confidence intervals:
   documentation of the
   `GNU Scientific Library <https://www.gnu.org/software/gsl/doc/html/rng.html>`_
   for a listing of the random number generators available for use.
-  
+
 * The "seed" entry may be set to a specific value to make the computation
   of bootstrap confidence intervals fully repeatable. When left empty
   the random number generator seed is chosen automatically which will lead
@@ -1994,11 +1994,11 @@ This dictionary may include the following entries:
 * The "field" entry specifies to which field(s) the interpolation method
   should be applied. This does not apply when doing point verification
   with the Point-Stat or Ensemble-Stat tools:
-  
+
   * FCST to interpolate/smooth the forecast field.
-    
+
   * OBS to interpolate/smooth the observation field.
-    
+
   * BOTH to interpolate/smooth both the forecast and the observation.
 
 * The "vld_thresh" entry specifies a number between 0 and 1. When
@@ -2033,38 +2033,38 @@ This dictionary may include the following entries:
 
   * The "method" entry is an array of interpolation procedures to be
     applied to the points in the box:
-    
+
     * MIN         for the minimum value
-    
+
     * MAX         for the maximum value
-    
+
     * MEDIAN      for the median value
-    
+
     * UW_MEAN     for the unweighted average value
-    
+
     * DW_MEAN     for the distance-weighted average value
       where weight = distance^-2
 
     * LS_FIT      for a least-squares fit
-    
+
     * BILIN       for bilinear interpolation (width = 2)
-    
+
     * NEAREST     for the nearest grid point (width = 1)
-    
+
     * BEST        for the value closest to the observation
-    
+
     * UPPER_LEFT  for the upper left grid point (width = 1)
 
     * UPPER_RIGHT for the upper right grid point (width = 1)
-    
+
     * LOWER_RIGHT for the lower right grid point (width = 1)
-    
+
     * LOWER_LEFT  for the lower left grid point (width = 1)
 
     * GAUSSIAN    for the Gaussian kernel
 
     * MAXGAUSS    for the maximum value followed by a Gaussian smoother
-    
+
     * GEOG_MATCH  for the nearest grid point where the land/sea mask
       and geography criteria are satisfied
 
@@ -2096,7 +2096,7 @@ This dictionary may include the following entries:
 
 land_mask
 ---------
-     
+
 The "land_mask" dictionary defines the land/sea mask field used when
 verifying at the surface. The "flag" entry enables/disables this logic.
 When enabled, the "message_type_group_map" dictionary must contain entries
@@ -2124,7 +2124,7 @@ The "land_mask.flag" entry may be set separately in each "obs.field" entry.
 
 topo_mask
 ---------
-     
+
 The "topo_mask" dictionary defines the model topography field used when
 verifying at the surface. The flag entry enables/disables this logic.
 When enabled, the "message_type_group_map" dictionary must contain an entry
@@ -2154,7 +2154,7 @@ The "topo_mask.flag" entry may be set separately in each "obs.field" entry.
 
 hira
 ----
-     
+
 The "hira" entry is a dictionary that is very similar to the "interp" and
 "nbrhd" entries. It specifies information for applying the High Resolution
 Assessment (HiRA) verification logic in Point-Stat. HiRA is analogous to
@@ -2207,15 +2207,15 @@ This dictionary may include the following entries:
 
 output_flag
 -----------
-     
+
 The "output_flag" entry is a dictionary that specifies what verification
 methods should be applied to the input data. Options exist for each
 output line type from the MET tools. Each line type may be set to one of:
 
 * NONE to skip the corresponding verification method
-  
+
 * STAT to write the verification output only to the ".stat" output file
-  
+
 * BOTH to write to the ".stat" output file as well the optional
   "_type.txt" file, a more readable ASCII file sorted by line type.
 
@@ -2289,7 +2289,7 @@ netcdf output will be generated.
 
 nc_pairs_var_name
 -----------------
-  
+
 The "nc_pairs_var_name" entry specifies a string for each verification task
 in Grid-Stat. This string is parsed from each "obs.field" dictionary entry
 and is used to construct variable names for the NetCDF matched pairs output
@@ -2302,14 +2302,14 @@ For example:
 
 | nc_pairs_var_name = "TMP";
 |
- 
+
 .. code-block:: none
 
   nc_pairs_var_name = "";
 
 nc_pairs_var_suffix
 -------------------
-     
+
 The "nc_pairs_var_suffix" entry is similar to the "nc_pairs_var_name" entry
 described above.  It is also parsed from each "obs.field" dictionary entry.
 However, it defines a suffix to be appended to the output variable name.
@@ -2334,7 +2334,7 @@ For example:
 
 ps_plot_flag
 ------------
-     
+
 The "ps_plot_flag" entry is a boolean value for Wavelet-Stat and MODE
 indicating whether a PostScript plot should be generated summarizing
 the verification.
@@ -2345,23 +2345,47 @@ the verification.
 
 grid_weight_flag
 ----------------
-     
+
 The "grid_weight_flag" specifies how grid weighting should be applied
-during the computation of continuous statistics and partial sums. It is
-meant to account for grid box area distortion and is often applied to global
-Lat/Lon grids. It is only applied for grid-to-grid verification in Grid-Stat
-and Ensemble-Stat and is not applied for grid-to-point verification.
+during the computation of contingency tables (CTC, MCTC, PCT, and
+NBRCTC), partial sums (SL1L2, SAL1L2, VL1L2, and VAL1L2), and statistics
+(CNT, CTS, MCTS, PSTD, PRC, PJC, ECLV, NBRCNT, and NBRCTS).
+It is meant to account for grid box area distortion and is often applied
+to global Lat/Lon grids. It is only applied for grid-to-grid verification
+in Grid-Stat and Ensemble-Stat and is not applied for grid-to-point
+verification. It can only be defined once at the highest level of config
+file context and applies to all verification tasks for that run.
+
 Three grid weighting options are currently supported:
 
-* NONE to disable grid weighting using a constant weight (default).
-  
+* NONE to disable grid weighting using a constant weight of 1.0 (default).
+
 * COS_LAT to define the weight as the cosine of the grid point latitude.
   This an approximation for grid box area used by NCEP and WMO.
-  
+
 * AREA to define the weight as the true area of the grid box (km^2).
 
-The weights are ultimately computed as the weight at each grid point divided
-by the sum of the weights for the current masking region.
+If requested in the config file, the raw grid weights can be written to
+the NetCDF output from Grid-Stat and Ensemble-Stat.
+
+When computing partial sums and continuous statistics, the weights are
+first normalized by dividing by the sum of the weights for the current
+masking region. When computing contingency tables and deriving statistics,
+each contingency table cell contains the sum of the weights of the matching
+grid points rather than the integer count of those grid points. Statistics
+are derived using these sums of weights rather than the raw counts.
+
+When no grid weighting is requested (**NONE**), contingency tables are
+populated using a default constant weight of 1.0 and the corresponding cells
+are written to the output as integer counts for consistency with earlier
+versions of MET.
+
+.. note::
+
+  The FHO line type is not compatible with grid weighting. If requested
+  with grid weighting enabled, Grid-Stat prints a warning message and
+  automatically disables the FHO line type. Users are advised to request the
+  CTC line type instead.
 
 .. code-block:: none
 
@@ -2404,7 +2428,7 @@ The "duplicate_flag" entry specifies how to handle duplicate point
 observations in Point-Stat and Ensemble-Stat:
 
 * NONE to use all point observations (legacy behavior)
-  
+
 * UNIQUE only use a single observation if two or more observations
   match. Matching observations are determined if they contain identical
   latitude, longitude, level, elevation, and time information.
@@ -2428,21 +2452,21 @@ in Point-Stat and Ensemble-Stat. Eight techniques are
 currently supported:
 
 * NONE to use all point observations (legacy behavior)
-  
+
 * NEAREST use only the observation that has the valid
   time closest to the forecast valid time
-  
+
 * MIN use only the observation that has the lowest value
-  
+
 * MAX use only the observation that has the highest value
-  
+
 * UW_MEAN compute an unweighted mean of the observations
-  
+
 * DW_MEAN compute a weighted mean of the observations based
   on the time of the observation
-  
+
 * MEDIAN use the median observation
-  
+
 * PERC use the Nth percentile observation where N = obs_perc_value
 
 The reporting mechanism for this feature can be activated by specifying
@@ -2457,14 +2481,14 @@ in those cases.
 
 obs_perc_value
 --------------
-     
+
 Percentile value to use when obs_summary = PERC
 
 .. code-block:: none
 
   obs_perc_value = 50;
 
-  
+
 obs_quality_inc
 ---------------
 
@@ -2480,7 +2504,7 @@ Note "obs_quality_inc" replaces the older option "obs_quality".
 
   obs_quality_inc = [ "1", "2", "3", "9" ];
 
-  
+
 obs_quality_exc
 ---------------
 
@@ -2495,7 +2519,7 @@ an array of strings, even if the values themselves are numeric.
 
   obs_quality_exc = [ "1", "2", "3", "9" ];
 
-  
+
 met_data_dir
 ------------
 
@@ -2685,7 +2709,7 @@ entries. This dictionary may include the following entries:
      censor_val    = [];
      ens_thresh    = 1.0;
      vld_thresh    = 1.0;
-  
+
      field = [
         {
            name       = "APCP";
@@ -2746,37 +2770,37 @@ combination of the categorical threshold (cat_thresh), neighborhood width
 
 ensemble_flag
 ^^^^^^^^^^^^^
-  
+
 The "ensemble_flag" entry is a dictionary of boolean value indicating
 which ensemble products should be generated:
 
 * "latlon" for a grid of the Latitude and Longitude fields
 
 * "mean" for the simple ensemble mean
-  
+
 * "stdev" for the ensemble standard deviation
-  
+
 * "minus" for the mean minus one standard deviation
-  
+
 * "plus" for the mean plus one standard deviation
-  
+
 * "min" for the ensemble minimum
-  
+
 * "max" for the ensemble maximum
-  
+
 * "range" for the range of ensemble values
-  
+
 * "vld_count" for the number of valid ensemble members
-  
+
 * "frequency" for the ensemble relative frequency meeting a threshold
-  
+
 * "nep" for the neighborhood ensemble probability
-  
+
 * "nmep" for the neighborhood maximum ensemble probability
-  
+
 * "rank" to write the rank for the gridded observation field to separate
   NetCDF output file.
-  
+
 * "weight" to write the grid weights specified in grid_weight_flag to the
   rank NetCDF output file.
 
@@ -2798,7 +2822,7 @@ which ensemble products should be generated:
      rank      = TRUE;
      weight    = FALSE;
   }
-  
+
 EnsembleStatConfig_default
 --------------------------
 
@@ -2831,7 +2855,7 @@ data is provided, the climo_cdf thresholds will be used instead.
      ens_ssvar_bin_size = 1;
      ens_phist_bin_size = 0.05;
      prob_cat_thresh    = [];
-  
+
      field = [
         {
            name  = "APCP";
@@ -2916,7 +2940,7 @@ CHISQUARED distributions are defined by a single parameter. The GAMMA,
 UNIFORM, and BETA distributions are defined by two parameters. See the
 `GNU Scientific Library Reference Manual <https://www.gnu.org/software/gsl/manual>`_
 for more information on these distributions.
-   
+
 
 The inst_bias_scale and inst_bias_offset entries specify bias scale and
 offset values that should be applied to observation values prior to
@@ -3211,85 +3235,85 @@ MET User's Guide for a description of these attributes.
 
   // centroid_x_min                 = 0.0;
   // centroid_x_max                 = 0.0;
- 
+
   // centroid_y_min                 = 0.0;
   // centroid_y_max                 = 0.0;
- 
+
   // centroid_lat_min               = 0.0;
   // centroid_lat_max               = 0.0;
- 
+
   // centroid_lon_min               = 0.0;
   // centroid_lon_max               = 0.0;
- 
+
   // axis_ang_min                   = 0.0;
   // axis_ang_max                   = 0.0;
- 
+
   // length_min                     = 0.0;
   // length_max                     = 0.0;
- 
+
   // width_min                      = 0.0;
   // width_max                      = 0.0;
- 
+
   // aspect_ratio_min               = 0.0;
   // aspect_ratio_max               = 0.0;
- 
+
   // curvature_min                  = 0.0;
   // curvature_max                  = 0.0;
- 
+
   // curvature_x_min                = 0.0;
   // curvature_x_max                = 0.0;
- 
+
   // curvature_y_min                = 0.0;
   // curvature_y_max                = 0.0;
- 
+
   // complexity_min                 = 0.0;
   // complexity_max                 = 0.0;
- 
+
   // intensity_10_min               = 0.0;
   // intensity_10_max               = 0.0;
- 
+
   // intensity_25_min               = 0.0;
   // intensity_25_max               = 0.0;
 
   // intensity_50_min               = 0.0;
   // intensity_50_max               = 0.0;
- 
+
   // intensity_75_min               = 0.0;
   // intensity_75_max               = 0.0;
- 
+
   // intensity_90_min               = 0.0;
   // intensity_90_max               = 0.0;
- 
+
   // intensity_user_min             = 0.0;
   // intensity_user_max             = 0.0;
- 
+
   // intensity_sum_min              = 0.0;
   // intensity_sum_max              = 0.0;
- 
+
   // centroid_dist_min              = 0.0;
   // centroid_dist_max              = 0.0;
- 
+
   // boundary_dist_min              = 0.0;
   // boundary_dist_max              = 0.0;
- 
+
   // convex_hull_dist_min           = 0.0;
   // convex_hull_dist_max           = 0.0;
- 
+
   // angle_diff_min                 = 0.0;
   // angle_diff_max                 = 0.0;
- 
+
   // area_ratio_min                 = 0.0;
   // area_ratio_max                 = 0.0;
- 
+
   // intersection_over_area_min     = 0.0;
   // intersection_over_area_max     = 0.0;
- 
+
   // complexity_ratio_min           = 0.0;
   // complexity_ratio_max           = 0.0;
- 
+
   // percentile_intensity_ratio_min = 0.0;
   // percentile_intensity_ratio_max = 0.0;
- 
+
   // interest_min                   = 0.0;
   // interest_max                   = 0.0;
 
@@ -3370,14 +3394,14 @@ The object definition settings for MODE are contained within the "fcst" and
     merge_thresh = [ >=1.0, >=2.0, >=3.0 ];
 
 * The "merge_flag" entry specifies the merging methods to be applied:
-  
+
    * NONE for no merging
-     
+
    * THRESH for the double-threshold merging method. Merge objects
      that would be part of the same object at the lower threshold.
-     
+
    * ENGINE for the fuzzy logic approach comparing the field to itself
-     
+
    * BOTH for both the double-threshold and engine merging methods
 
 .. code-block:: none
@@ -3387,7 +3411,7 @@ The object definition settings for MODE are contained within the "fcst" and
         name  = "APCP";
         level = "A03";
      }
-  
+
      censor_thresh      = [];
      censor_val         = [];
      conv_radius        = 60.0/grid_res; in grid squares
@@ -3418,13 +3442,13 @@ match_flag
 The "match_flag" entry specifies the matching method to be applied:
 
 * NONE for no matching between forecast and observation objects
-  
+
 * MERGE_BOTH for matching allowing additional merging in both fields.
   If two objects in one field match the same object in the other field,
   those two objects are merged.
-  
+
 * MERGE_FCST for matching allowing only additional forecast merging
-  
+
 * NO_MERGE for matching with no additional merging in either field
 
 .. code-block:: none
@@ -3445,7 +3469,7 @@ skip unreasonable object comparisons.
 
 weight
 ^^^^^^
-     
+
 The weight variables control how much weight is assigned to each pairwise
 attribute when computing a total interest value for object pairs. The weights
 need not sum to any particular value but must be non-negative. When the
@@ -3479,23 +3503,23 @@ mathematical functions.
 .. code-block:: none
 
   interest_function = {
-  
+
      centroid_dist = (
         (            0.0, 1.0 )
         (  60.0/grid_res, 1.0 )
         ( 600.0/grid_res, 0.0 )
      );
-  
+
      boundary_dist = (
         (            0.0, 1.0 )
         ( 400.0/grid_res, 0.0 )
      );
-  
+
      convex_hull_dist = (
         (            0.0, 1.0 )
         ( 400.0/grid_res, 0.0 )
      );
-  
+
      angle_diff = (
         (  0.0, 1.0 )
         ( 30.0, 1.0 )
@@ -3508,24 +3532,24 @@ mathematical functions.
         ( corner, 1.0 )
         (    1.0, 1.0 )
      );
-  
+
      area_ratio = ratio_if;
-  
+
      int_area_ratio = (
         ( 0.00, 0.00 )
         ( 0.10, 0.50 )
         ( 0.25, 1.00 )
         ( 1.00, 1.00 )
      );
-  
+
      complexity_ratio = ratio_if;
-  
+
      inten_perc_ratio = ratio_if;
   }
 
 total_interest_thresh
 ^^^^^^^^^^^^^^^^^^^^^
-  
+
 The total_interest_thresh variable should be set between 0 and 1. This
 threshold is applied to the total interest values computed for each pair of
 objects and is used in determining matches.
@@ -3574,7 +3598,7 @@ lines in the grid.
 
 ct_stats_flag
 ^^^^^^^^^^^^^
-  
+
 The ct_stats_flag can be set to TRUE or FALSE to produce additional output,
 in the form of contingency table counts and statistics.
 
@@ -3604,16 +3628,16 @@ The PB2NC tool filters out observations from PREPBUFR or BUFR files using the
 following criteria:
 
 (1) by message type: supply a list of PREPBUFR message types to retain
- 
+
 (2) by station id: supply a list of observation stations to retain
- 
+
 (3) by valid time: supply the beginning and ending time offset values
     in the obs_window entry described above.
 
 (4) by location: use the "mask" entry described below to supply either
     an NCEP masking grid, a masking lat/lon polygon or a file to a
     mask lat/lon polygon
- 
+
 (5) by elevation: supply min/max elevation values
 
 (6) by report type: supply a list of report types to retain using
@@ -3621,15 +3645,15 @@ following criteria:
 
 (7) by instrument type: supply a list of instrument type to
     retain
- 
+
 (8) by vertical level: supply beg/end vertical levels using the
     level_range entry described below
- 
+
 (9) by variable type: supply a list of observation variable types to
     retain using the obs_bufr_var entry described below
- 
+
 (10) by quality mark: supply a quality mark threshold
- 
+
 (11) Flag to retain values for all quality marks, or just the first
      quality mark (highest): use the event_stack_flag described below
 
@@ -3637,24 +3661,24 @@ following criteria:
      retain.
 
      0 - Surface level (mass reports only)
-     
+
      1 - Mandatory level (upper-air profile reports)
-     
+
      2 - Significant temperature level (upper-air profile reports)
-     
+
      2 - Significant temperature and winds-by-pressure level
      (future combined mass and wind upper-air reports)
-	 
+
      3 - Winds-by-pressure level (upper-air profile reports)
-     
+
      4 - Winds-by-height level (upper-air profile reports)
-     
+
      5 - Tropopause level (upper-air profile reports)
-     
+
      6 - Reports on a single level
      (e.g., aircraft, satellite-wind, surface wind,
      precipitable water retrievals, etc.)
-	  
+
      7 - Auxiliary levels generated via interpolation from spanning levels
      (upper-air profile reports)
 
@@ -3665,14 +3689,14 @@ In the PB2NC tool, the "message_type" entry is an array of message types
 to be retained. An empty list indicates that all should be retained.
 
 | List of valid message types:
-| “ADPUPA”, “AIRCAR”, “AIRCFT”, “ADPSFC”, “ERS1DA”, “GOESND”, “GPSIPW”, 
-| “MSONET”, “PROFLR”, “QKSWND”, “RASSDA”, “SATEMP”, 
+| “ADPUPA”, “AIRCAR”, “AIRCFT”, “ADPSFC”, “ERS1DA”, “GOESND”, “GPSIPW”,
+| “MSONET”, “PROFLR”, “QKSWND”, “RASSDA”, “SATEMP”,
 | “SATWND”, “SFCBOG”, “SFCSHP”, “SPSSMI”, “SYNDAT”, “VADWND”
 
 For example:
 
 | message_type[] = [ "ADPUPA", "AIRCAR" ];
-| 
+|
 
 `Current Table A Entries in PREPBUFR mnemonic table <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_
 
@@ -3782,12 +3806,12 @@ categories should be retained:
 
 | 1 = Mandatory level (upper-air profile reports)
 
-| 2 = Significant temperature level (upper-air profile reports) 
+| 2 = Significant temperature level (upper-air profile reports)
 
 | 2 = Significant temperature and winds-by-pressure level (future combined mass
-|     and wind upper-air reports) 
+|     and wind upper-air reports)
 
-| 3 = Winds-by-pressure level (upper-air profile reports) 
+| 3 = Winds-by-pressure level (upper-air profile reports)
 
 | 4 = Winds-by-height level (upper-air profile reports)
 
@@ -3799,7 +3823,7 @@ categories should be retained:
 | 7 = Auxiliary levels generated via interpolation from spanning levels
 |     (upper-air profile reports)
 
-|    
+|
 
 An empty list indicates that all should be retained.
 
@@ -3870,7 +3894,7 @@ abbreviations to the output.
 
 quality_mark_thresh
 ^^^^^^^^^^^^^^^^^^^
-     
+
 The "quality_mark_thresh" entry specifies the maximum quality mark value
 to be retained. Observations with a quality mark LESS THAN OR EQUAL TO
 this threshold will be retained, while observations with a quality mark
@@ -3959,12 +3983,12 @@ job to be performed. The format for an analysis job is as follows:
 
 | -job job_name
 | OPTIONAL ARGS
-| 
+|
 
 Where "job_name" is set to one of the following:
 
 * "filter"
-  
+
   To filter out the STAT lines matching the job filtering criteria
   specified below and using the optional arguments below.
   The output STAT lines are written to the file specified using the
@@ -3983,7 +4007,7 @@ Where "job_name" is set to one of the following:
 |
 
 * "summary"
-  
+
   To compute summary information for a set of statistics.
   The summary output includes the mean, standard deviation,
   percentiles (0th, 10th, 25th, 50th, 75th, 90th, and 100th), range,
@@ -3993,10 +4017,10 @@ Where "job_name" is set to one of the following:
   logic:
 
   * simple arithmetic mean (default)
-	   
+
   * square root of the mean of the statistic squared
     (applied to columns listed in "wmo_sqrt_stats")
-	   
+
   *  apply fisher transform
      (applied to columns listed in "wmo_fisher_stats")
 
@@ -4004,9 +4028,9 @@ Where "job_name" is set to one of the following:
 
   The columns of data to be summarized are specified in one of two
   ways:
-	 
+
   * Specify the -line_type option once and specify one or more column names.
-	   
+
   * Format the -column option as LINE_TYPE:COLUMN.
 
 |
@@ -4020,7 +4044,7 @@ Where "job_name" is set to one of the following:
   processing them separately.
 
   For TCStat, the "-column" argument may be set to:
-  
+
     * "TRACK" for track, along-track, and cross-track errors.
     * "WIND" for all wind radius errors.
     * "TI" for track and maximum wind intensity errors.
@@ -4046,7 +4070,7 @@ Where "job_name" is set to one of the following:
        To summarize multiple columns.
 
 * "aggregate"
-  
+
   To aggregate the STAT data for the STAT line type specified using
   the "-line_type" argument. The output of the job will be in the
   same format as the input line type specified. The following line
@@ -4058,13 +4082,13 @@ Where "job_name" is set to one of the following:
                SL1L2, SAL1L2, VL1L2, VAL1L2,
                PCT, NBRCNT, NBRCTC, GRAD,
                ISC, ECNT, RPS, RHIST, PHIST, RELP, SSVAR
-	       
+
   Required Args: -line_type
 
 |
 
 * "aggregate_stat"
-  
+
   To aggregate the STAT data for the STAT line type specified using
   the "-line_type" argument. The output of the job will be the line
   type specified using the "-out_line_type" argument. The valid
@@ -4156,11 +4180,11 @@ Where "job_name" is set to one of the following:
     Optionally, specify other filters for each term, -fcst_thresh.
 
 * "go_index"
-  
+
   The GO Index is a special case of the skill score index consisting
   of a predefined set of variables, levels, lead times, statistics,
   and weights.
-  
+
   For lead times of 12, 24, 36, and 48 hours, it contains RMSE for:
 
   .. code-block:: none
@@ -4178,7 +4202,7 @@ Where "job_name" is set to one of the following:
 |
 
 * "ramp"
-  
+
   The ramp job operates on a time-series of forecast and observed
   values and is analogous to the RIRW (Rapid Intensification and
   Weakening) job supported by the tc_stat tool. The amount of change
@@ -4486,17 +4510,17 @@ wavelet decomposition should be performed:
   See: `Discrete Wavelet Transforms (DWT) initialization <https://www.gnu.org/software/gsl/doc/html/dwt.html#initialization>`_
 
 * Valid combinations of the two are listed below:
-    
+
   * HAAR for Haar wavelet (member = 2)
-      
+
   * HAAR_CNTR for Centered-Haar wavelet (member = 2)
 
   * DAUB for Daubechies wavelet (member = 4, 6, 8, 10, 12, 14, 16,
     18, 20)
-	
+
   * DAUB_CNTR for Centered-Daubechies wavelet (member = 4, 6, 8, 10,
     12, 14, 16, 18, 20)
-	 
+
   * BSPLINE for Bspline wavelet (member = 103, 105, 202, 204, 206,
     208, 301, 303, 305, 307, 309)
 

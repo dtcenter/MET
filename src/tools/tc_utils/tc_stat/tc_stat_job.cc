@@ -3395,18 +3395,7 @@ void TCStatJobRIRW::add_map(map<ConcatString,RIRWMapData,cs_cmp>&m) {
               << it->second.Info.cts.fn_on() << " correct negatives.\n";
 
          // Increment the counts for the existing key
-         RIRWMap[it->first].Info.cts.set_fy_oy(
-            RIRWMap[it->first].Info.cts.fy_oy() +
-            it->second.Info.cts.fy_oy());
-         RIRWMap[it->first].Info.cts.set_fy_on(
-            RIRWMap[it->first].Info.cts.fy_on() +
-            it->second.Info.cts.fy_on());
-         RIRWMap[it->first].Info.cts.set_fn_oy(
-            RIRWMap[it->first].Info.cts.fn_oy() +
-            it->second.Info.cts.fn_oy());
-         RIRWMap[it->first].Info.cts.set_fn_on(
-            RIRWMap[it->first].Info.cts.fn_on() +
-            it->second.Info.cts.fn_on());
+         RIRWMap[it->first].Info.cts += it->second.Info.cts;
 
          RIRWMap[it->first].Hdr.add_uniq(it->second.Hdr);
          RIRWMap[it->first].AModel.add_uniq(it->second.AModel);

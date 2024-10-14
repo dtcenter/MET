@@ -113,6 +113,7 @@
 //   055    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files.
 //   056    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings.
 //   057    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
+//   058    10/03/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -953,10 +954,10 @@ void process_scores() {
                // Loop through all of the thresholds
                for(m=0; m<conf_info.vx_opt[i].fcat_ta.n(); m++) {
 
-                  // Write out FHO
-                  if(conf_info.vx_opt[i].output_flag[i_fho] != STATOutputType::None &&
-                     cts_info[m].cts.n() > 0) {
+                  if(cts_info[m].cts.n_pairs() == 0) continue;
 
+                  // Write out FHO
+                  if(conf_info.vx_opt[i].output_flag[i_fho] != STATOutputType::None) {
                      write_fho_row(shc, cts_info[m],
                         conf_info.vx_opt[i].output_flag[i_fho],
                         stat_at, i_stat_row,
@@ -964,9 +965,7 @@ void process_scores() {
                   }
 
                   // Write out CTC
-                  if(conf_info.vx_opt[i].output_flag[i_ctc] != STATOutputType::None &&
-                     cts_info[m].cts.n() > 0) {
-
+                  if(conf_info.vx_opt[i].output_flag[i_ctc] != STATOutputType::None) {
                      write_ctc_row(shc, cts_info[m],
                         conf_info.vx_opt[i].output_flag[i_ctc],
                         stat_at, i_stat_row,
@@ -974,9 +973,7 @@ void process_scores() {
                   }
 
                   // Write out CTS
-                  if(conf_info.vx_opt[i].output_flag[i_cts] != STATOutputType::None &&
-                     cts_info[m].cts.n() > 0) {
-
+                  if(conf_info.vx_opt[i].output_flag[i_cts] != STATOutputType::None) {
                      write_cts_row(shc, cts_info[m],
                         conf_info.vx_opt[i].output_flag[i_cts],
                         stat_at, i_stat_row,
@@ -984,9 +981,7 @@ void process_scores() {
                   }
 
                   // Write out ECLV
-                  if(conf_info.vx_opt[i].output_flag[i_eclv] != STATOutputType::None &&
-                     cts_info[m].cts.n() > 0) {
-
+                  if(conf_info.vx_opt[i].output_flag[i_eclv] != STATOutputType::None) {
                      write_eclv_row(shc, cts_info[m], conf_info.vx_opt[i].eclv_points,
                         conf_info.vx_opt[i].output_flag[i_eclv],
                         stat_at, i_stat_row,
@@ -1007,10 +1002,10 @@ void process_scores() {
                // Compute MCTS
                do_mcts(mcts_info, i, &pd);
 
-               // Write out MCTC
-               if(conf_info.vx_opt[i].output_flag[i_mctc] != STATOutputType::None &&
-                  mcts_info.cts.total() > 0) {
+               if(mcts_info.cts.n_pairs() == 0) continue;
 
+               // Write out MCTC
+               if(conf_info.vx_opt[i].output_flag[i_mctc] != STATOutputType::None) {
                   write_mctc_row(shc, mcts_info,
                      conf_info.vx_opt[i].output_flag[i_mctc],
                      stat_at, i_stat_row,
@@ -1018,9 +1013,7 @@ void process_scores() {
                }
 
                // Write out MCTS
-               if(conf_info.vx_opt[i].output_flag[i_mcts] != STATOutputType::None &&
-                  mcts_info.cts.total() > 0) {
-
+               if(conf_info.vx_opt[i].output_flag[i_mcts] != STATOutputType::None) {
                   write_mcts_row(shc, mcts_info,
                      conf_info.vx_opt[i].output_flag[i_mcts],
                      stat_at, i_stat_row,
@@ -1713,7 +1706,7 @@ void process_scores() {
                      for(n=0; n<conf_info.vx_opt[i].get_n_cov_thresh(); n++) {
 
                         // Only write out if n > 0
-                        if(nbrcts_info[n].cts_info.cts.n() > 0) {
+                        if(nbrcts_info[n].cts_info.cts.n_pairs() > 0) {
 
                            // Write out NBRCTC
                            if(conf_info.vx_opt[i].output_flag[i_nbrctc] != STATOutputType::None) {
@@ -2481,7 +2474,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          }
 
          // Compute the probabilistic counts and statistics
-         compute_pctinfo(pd, ( STATOutputType::None!=vx_opt.output_flag[i_pstd]), pct_info[j]);
+         compute_pctinfo(pd, (STATOutputType::None!=vx_opt.output_flag[i_pstd]), pct_info[j]);
 
          // Check for no matched pairs to process
          if(pd.n_obs == 0) continue;

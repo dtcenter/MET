@@ -41,7 +41,7 @@ double TTContingencyTable::baser_ci(double alpha,
 
    v = baser();
 
-   compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -60,7 +60,7 @@ double TTContingencyTable::fmean_ci(double alpha,
 
    v = fmean();
 
-   compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -68,7 +68,7 @@ double TTContingencyTable::fmean_ci(double alpha,
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::accuracy() const {
-   return compute_proportion(fy_oy() + fn_on(), n());
+   return compute_proportion(fy_oy() + fn_on(), total());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ double TTContingencyTable::accuracy_ci(double alpha,
 
    v = accuracy();
 
-   compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -112,7 +112,7 @@ double TTContingencyTable::pod_yes_ci(double alpha,
 
    v = pod_yes();
 
-   compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -131,7 +131,7 @@ double TTContingencyTable::pod_no_ci(double alpha,
 
    v = pod_no();
 
-   compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -157,7 +157,7 @@ double TTContingencyTable::pofd_ci(double alpha,
 
    v = pofd();
 
-   compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -180,7 +180,7 @@ double TTContingencyTable::far_ci(double alpha,
 
    v = far();
 
-   compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -192,7 +192,7 @@ double TTContingencyTable::far_ci(double alpha,
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::csi() const {
-   return compute_proportion(fy_oy(), n() - fn_on());
+   return compute_proportion(fy_oy(), total() - fn_on());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -203,7 +203,7 @@ double TTContingencyTable::csi_ci(double alpha,
 
    v = csi();
 
-   compute_proportion_ci(v, n(), alpha, 1.0, cl, cu);
+   compute_proportion_ci(v, Npairs, alpha, 1.0, cl, cu);
 
    return v;
 }
@@ -219,9 +219,9 @@ double TTContingencyTable::gss() const {
    double b = fy_on();
    double c = fn_oy();
 
-   if(is_eq(n(), 0.0)) return bad_data_double;
+   if(is_eq(total(), 0.0)) return bad_data_double;
 
-   double q   = (a + b)*(a + c)/n();
+   double q   = (a + b)*(a + c)/total();
    double num = (a - q);
    double den = (a + b + c - q);
 
@@ -238,7 +238,7 @@ double TTContingencyTable::gss() const {
 
 double TTContingencyTable::bagss() const {
 
-   if(is_eq(n(),     0.0) ||
+   if(is_eq(total(), 0.0) ||
       is_eq(oy(),    0.0) ||
       is_eq(fn_oy(), 0.0) ||
       is_eq(fy_on(), 0.0)) {
@@ -256,8 +256,8 @@ double TTContingencyTable::bagss() const {
    }
    else {
       double ha  = oy() - (fy_on() / lf) * lw;
-      double num = ha - (oy() * oy() / n());
-      double den = 2.0*oy() - ha - (oy() * oy() / n());
+      double num = ha - (oy() * oy() / total());
+      double den = 2.0*oy() - ha - (oy() * oy() / total());
 
       v = compute_proportion(num, den);
    }
@@ -423,8 +423,11 @@ double TTContingencyTable::lodds_ci(double alpha,
 ////////////////////////////////////////////////////////////////////////
 
 double TTContingencyTable::orss() const {
-   return compute_proportion(fy_oy() * fn_on() - fy_on() * fn_oy(),
-                             fy_oy() * fn_on() + fy_on() * fn_oy());
+   double r = odds();
+   double v = (is_bad_data(r) || is_eq(r + 1, 0.0) ?
+               bad_data_double : 
+               (r - 1)/(r + 1));
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -463,12 +466,12 @@ double TTContingencyTable::eds() const {
 
    if(is_eq(fy_oy(),           0.0) ||
       is_eq(fy_oy() + fn_oy(), 0.0) ||
-      is_eq(n(),               0.0)) {
+      is_eq(total(),           0.0)) {
       v = bad_data_double;
    }
    else {
-      double num = log((fy_oy() + fn_oy()) / n());
-      double den = log( fy_oy() / n());
+      double num = log((fy_oy() + fn_oy()) / total());
+      double den = log( fy_oy() / total());
 
       if(is_eq(den, 0.0)) v = bad_data_double;
       else                v = 2.0 * num / den - 1.0;
@@ -497,7 +500,7 @@ double TTContingencyTable::eds_ci(double alpha,
       // Compute the standard error
       double se = 2.0 *
                   fabs(log(b)) / (h * pow(log(b) + log(h), 2.0)) *
-                  sqrt(h * (1 - h) / (b * n()));
+                  sqrt(h * (1 - h) / (b * total()));
 
       compute_normal_ci(v, alpha, se, cl, cu);
    }
@@ -511,15 +514,15 @@ double TTContingencyTable::seds() const {
    double v;
 
    if(is_eq(fy_oy(),           0.0) ||
-      is_eq(n(),               0.0) ||
+      is_eq(total(),           0.0) ||
       is_eq(fy_oy() + fn_oy(), 0.0) ||
       is_eq(fy_oy() + fy_on(), 0.0)) {
       v = bad_data_double;
    }
    else {
-      double num = log((fy_oy() + fy_on()) / n()) +
-                   log((fy_oy() + fn_oy()) / n());
-      double den = log( fy_oy() / n());
+      double num = log((fy_oy() + fy_on()) / total()) +
+                   log((fy_oy() + fn_oy()) / total());
+      double den = log( fy_oy() / total());
 
       if(is_eq(den, 0.0)) v = bad_data_double;
       else                v = num / den - 1.0;
@@ -546,7 +549,7 @@ double TTContingencyTable::seds_ci(double alpha,
    else {
 
       // Compute the standard error
-      double se = sqrt(h * (1.0 - h) / (n() * b)) *
+      double se = sqrt(h * (1.0 - h) / (total() * b)) *
                   (-1.0 * log(fbias() * pow(b, 2.0)) /
                   (h * pow(log(h * b), 2.0)));
 
@@ -601,7 +604,7 @@ double TTContingencyTable::edi_ci(double alpha,
       // Compute the standard error
       double se = 2.0 * fabs(log(f) + h / (1.0 - h) * log(h)) /
                   (h * pow(log(f) + log(h), 2.0)) *
-                  sqrt(h * (1.0 - h) / (b * n()));
+                  sqrt(h * (1.0 - h) / (b * total()));
 
       compute_normal_ci(v, alpha, se, cl, cu);
    }
@@ -663,7 +666,7 @@ double TTContingencyTable::sedi_ci(double alpha,
                   fabs((mh * mf + h * f) / (mh * mf) *
                         log(f * mh) + 2.0 * h / mh * log(h * mf)) /
                   (h * pow(log(f * mh) + log(h * mf), 2.0)) *
-                  sqrt(h * mh / (b * n()));
+                  sqrt(h * mh / (b * total()));
 
       compute_normal_ci(v, alpha, se, cl, cu);
    }
@@ -682,13 +685,13 @@ double TTContingencyTable::cost_loss(double r) const {
    double num;
    double den;
 
-   if(is_eq(n(), 0.0)) return bad_data_double;
+   if(is_eq(total(), 0.0)) return bad_data_double;
 
    // Total proportion of hits, misses, false alarms, and observations 
-   double h = fy_oy() / n();
-   double m = fn_oy() / n();
-   double f = fy_on() / n();
-   double b =    oy() / n();
+   double h = fy_oy() / total();
+   double m = fn_oy() / total();
+   double f = fy_on() / total();
+   double b =    oy() / total();
 
    if(r < b) {
       num = (r * (h + f - 1)) + m;
@@ -855,7 +858,7 @@ double ContingencyTable::gkuiper() const {
 
    double den = 1.0 - sum;
 
-   return(compute_proportion(num, den));
+   return compute_proportion(num, den);
 }
 
 ////////////////////////////////////////////////////////////////////////
