@@ -214,9 +214,11 @@ argv_len = 0;
 
 for (j=0; j<_argc; ++j)  {
 
-   len[j] = m_strlen(_argv[j]);   //  we're using the len array here because
-                                //  we don't want to call m_strlen more than 
-                                //  once on each argv value
+   if (_argv != nullptr) {
+      len[j] = m_strlen(_argv[j]);  //  we're using the len array here because
+                                    //  we don't want to call m_strlen more than
+                                    //  once on each argv value
+   }
 
    argv_len += len[j];
 
@@ -249,7 +251,7 @@ k = 0;
 
 for (j=0; j<Argc; ++j)  {
 
-   if ( mbstowcs(W_Buf + k, _argv[j], len[j]) == (size_t) -1 )  {
+   if ( _argv != nullptr && mbstowcs(W_Buf + k, _argv[j], len[j]) == (size_t) -1 )  {
 
       mlog << Error << "\nWchar_Argv::set() -> "
            << "mbstowcs failed for string \"" << _argv[j] << "\"\n\n";
