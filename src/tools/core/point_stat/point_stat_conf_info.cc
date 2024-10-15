@@ -448,8 +448,8 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
                  << "Processing station ID mask: "
                  << vx_opt[i].mask_sid[j] << "\n";
             MaskSID ms = parse_sid_mask(vx_opt[i].mask_sid[j]);
-            sid_map[vx_opt[i].mask_sid[j]] = ms.name;
-            mask_sid_map[ms.name] = ms;
+            sid_map[vx_opt[i].mask_sid[j]] = ms.name();
+            mask_sid_map[ms.name()] = ms;
          }
 
          // Store the name for the current station ID mask

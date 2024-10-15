@@ -137,13 +137,13 @@ void MaskSID::add_css(const string &text) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool MaskSID::has(const string &s) const {
+bool MaskSID::has_sid(const string &s) const {
    return SIDMap.count(s) > 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool MaskSID::has(const string &s, double &weight) const {
+bool MaskSID::has_sid(const string &s, double &weight) const {
    bool found = false;
 
    if(SIDMap.count(s) == 0) {

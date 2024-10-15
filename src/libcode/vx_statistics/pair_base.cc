@@ -790,7 +790,7 @@ void PairBase::set_point_weight(const PointWeightType wgt_flag) {
            << mask_sid_ptr->name() << "\" station ID masking region.\n";
 
       // Print warning if no weights are provided
-      if(!mask_sid_ptr->has_weights) {
+      if(!mask_sid_ptr->has_weights()) {
          mlog << Warning << "\n" << method_name
               << "station ID point weighting requested but no weights "
               << "were defined in the \"" << mask_sid_ptr->name()
@@ -802,7 +802,7 @@ void PairBase::set_point_weight(const PointWeightType wgt_flag) {
       for(int i_obs=0; i_obs<n_obs; i_obs++) {
 
          double wgt; 
-         if(mask_sid_ptr->has(sid_sa[i_obs], wgt)) {
+         if(mask_sid_ptr->has_sid(sid_sa[i_obs], wgt)) {
             wgt_na.set(i_obs, wgt);
          }
          else {
@@ -1923,7 +1923,7 @@ bool VxPairBase::is_keeper_mask(
    }
    // Otherwise, check for the masking SID list
    else if( pb_ptr[n]->mask_sid_ptr != nullptr &&
-           !pb_ptr[n]->mask_sid_ptr->has(hdr_sid_str)) {
+           !pb_ptr[n]->mask_sid_ptr->has_sid(hdr_sid_str)) {
 
       if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
          mlog << Debug(REJECT_DEBUG_LEVEL)

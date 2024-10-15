@@ -45,6 +45,7 @@ class MaskSID {
 
       int n() const;
       std::string name() const;
+      bool has_weights() const;
       const std::map<std::string,double> & sid_map() const;
 
       void set_name(const std::string &);
@@ -52,14 +53,15 @@ class MaskSID {
       // Formatted as: station_name(numeric_weight)
       void add(const std::string &);
       void add_css(const std::string &);
-      bool has(const std::string &) const ;
-      bool has(const std::string &, double &) const;
+      bool has_sid(const std::string &) const ;
+      bool has_sid(const std::string &, double &) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int         MaskSID::n()    const { return (int) SIDMap.size(); }
-inline std::string MaskSID::name() const { return Name;                }
+inline int         MaskSID::n()           const { return (int) SIDMap.size(); }
+inline std::string MaskSID::name()        const { return Name;                }
+inline bool        MaskSID::has_weights() const { return HasWeights;          }
 
 ////////////////////////////////////////////////////////////////////////
 
