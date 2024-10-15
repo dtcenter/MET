@@ -56,14 +56,16 @@ class PairDataPoint : public PairBase {
 
       void extend(int);
 
-      bool add_point_pair(const char *, double, double, double, double,
+      bool add_point_pair(const char *, const char *,
+                          double, double, double, double,
                           unixtime, double, double, double, double,
                           const char *, const ClimoPntInfo &, double);
       void load_seeps_climo(const ConcatString &seeps_climo_name);
       void set_seeps_thresh(const SingleThresh &p1_thresh);
       void set_seeps_score(SeepsScore *, int index=-1);
 
-      void set_point_pair(int, const char *, double, double, double, double,
+      void set_point_pair(int, const char *, const char *,
+                          double, double, double, double,
                           unixtime, double, double, double, double,
                           const char *, const ClimoPntInfo &,
                           double, const SeepsScore *);

@@ -104,6 +104,7 @@ void PairBase::clear() {
    ocsd_na.clear();
    ocdf_na.clear();
 
+   typ_sa.clear();
    sid_sa.clear();
    lat_na.clear();
    lon_na.clear();
@@ -155,6 +156,7 @@ void PairBase::erase() {
    ocsd_na.erase();
    ocdf_na.erase();
 
+   typ_sa.clear();  // no erase option
    sid_sa.clear();  // no erase option
    lat_na.erase();
    lon_na.erase();
@@ -427,7 +429,7 @@ void PairBase::compute_climo_cdf() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairBase::add_point_obs(const char *sid,
+bool PairBase::add_point_obs(const char *typ, const char *sid,
                              double lat, double lon, double x, double y,
                              unixtime ut, double lvl, double elv,
                              double o, const char *qc,
@@ -476,6 +478,7 @@ bool PairBase::add_point_obs(const char *sid,
    }
    else {
       station_values_t val;
+      val.typ = string(typ);
       val.sid = string(sid);
       val.lat = lat;
       val.lon = lon;
@@ -497,6 +500,7 @@ bool PairBase::add_point_obs(const char *sid,
    }
 
    if(obs_summary == ObsSummary::None) {
+      typ_sa.add(typ);
       sid_sa.add(sid);
       lat_na.add(lat);
       lon_na.add(lon);
@@ -520,7 +524,7 @@ bool PairBase::add_point_obs(const char *sid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_point_obs(int i_obs, const char *sid,
+void PairBase::set_point_obs(int i_obs, const char *typ, const char *sid,
                              double lat, double lon, double x, double y,
                              unixtime ut, double lvl, double elv,
                              double o, const char *qc,
@@ -534,6 +538,7 @@ void PairBase::set_point_obs(int i_obs, const char *sid,
       exit(1);
    }
 
+   typ_sa.set(i_obs, typ);
    sid_sa.set(i_obs, sid);
    lat_na.set(i_obs, lat);
    lon_na.set(i_obs, lon);
@@ -751,6 +756,7 @@ void PairBase::calc_obs_summary(){
       // Store summarized value in the map
       svt.summary_val = ob.val;
 
+      typ_sa.add    (svt.typ.c_str());
       sid_sa.add    (svt.sid.c_str());
       lat_na.add    (svt.lat);
       lon_na.add    (svt.lon);

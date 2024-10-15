@@ -36,6 +36,7 @@ struct station_values_t {
 
    void clear();
 
+   std::string typ;
    std::string sid;
    double lat;
    double lon;
@@ -110,6 +111,7 @@ class PairBase {
       NumArray    ocdf_na; // Observation climatology cumulative distribution function [n_obs]
 
       // Point Observation Information
+      StringArray typ_sa;  // Message type [n_obs]
       StringArray sid_sa;  // Station ID [n_obs]
       NumArray    lat_na;  // Latitude [n_obs]
       NumArray    lon_na;  // Longitude [n_obs]
@@ -168,11 +170,13 @@ class PairBase {
       ob_val_t compute_median(std::string sng_key);
       ob_val_t compute_percentile(std::string sng_key, int perc);
 
-      bool add_point_obs(const char *, double, double, double, double,
+      bool add_point_obs(const char *, const char *,
+                         double, double, double, double,
                          unixtime, double, double, double, const char *,
                          const ClimoPntInfo &, double);
 
-      void set_point_obs(int, const char *, double, double, double, double,
+      void set_point_obs(int, const char *, const char *,
+                         double, double, double, double,
                          unixtime, double, double, double,
                          const char *, const ClimoPntInfo &, double);
 

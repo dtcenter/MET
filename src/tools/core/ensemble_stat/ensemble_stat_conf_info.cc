@@ -70,6 +70,7 @@ void EnsembleStatConfInfo::clear() {
    vld_ens_thresh = bad_data_double;
    vld_data_thresh = bad_data_double;
    msg_typ_group_map.clear();
+   obtype_as_obs_message_type = false;
    msg_typ_sfc.clear();
    mask_area_map.clear();
    mask_sid_map.clear();
@@ -172,6 +173,10 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    else {
       msg_typ_sfc.parse_css(default_msg_typ_group_surface);
    }
+
+   // Conf: obtype_as_obs_message_type_flag
+   obtype_as_obs_message_type_flag =
+   conf.lookup_bool(conf_key_obtype_as_obs_message_type_flag);
 
    // Conf: ens_member_ids
    ens_member_ids = parse_conf_ens_member_ids(&conf);
