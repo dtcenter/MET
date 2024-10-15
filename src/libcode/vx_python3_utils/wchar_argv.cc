@@ -132,48 +132,50 @@ void Wchar_Argv::set(const StringArray & a)
 
 {
 
-int j, k, N;
-int len;
-
+int k = 0;
+int len = 0;
 ConcatString c;
 const char *method_name = "Wchar_Argv::set() -> ";
 
 
-len = 0;
-
-for (j=0; j<(a.n()); ++j)  {
+for (int j=0; j<(a.n()); ++j)  {
 
    len += a.length(j);
 
 }
 
-N = len + a.n();
+int N = len + a.n();
 
-vector<char> s(N, 0);
+char * s = new char [N];
 
-vector<char *> av(a.n());
+char ** av = new char * [a.n()];
 
-k = 0;
+memset(s, 0, N);
 
-for (j=0; j<(a.n()); ++j)  {
 
-   av[j] = s.data() + k;
+for (int j=0; j<(a.n()); ++j)  {
+
+   av[j] = s + k;
 
    c = a[j].c_str();
 
    len = c.length();
 
-   m_strncpy(s.data() + k, c.text(), len, method_name);
+   m_strncpy(s + k, c.text(), len, method_name);
 
    k += (len + 1);
 
 }
 
-set(a.n(), av.data());
+set(a.n(), av);
 
    //
    //  done
    //
+
+if ( s )  { delete [] s;  s = nullptr; }
+
+if ( av )  { delete [] av;  av = nullptr; }
 
 return;
 
@@ -187,32 +189,26 @@ void Wchar_Argv::set(int _argc, char ** _argv)
 
 {
 
+int k;
+int argv_len = 0;
+vector<int> len(_argc, 0);
+
 clear();
 
-int k;
-
-
 Argc = _argc;
-
-vector<int>len(Argc);
 
 
    //
    //  total length of the argument string ... 
    //
 
-int argv_len = 0;
-int argv_buf_len = sizeof(_argv)/sizeof(*_argv);
-
 for (int j=0; j<_argc; ++j)  {
 
-   if (j < argv_buf_len) {
-      len[j] = m_strlen(_argv[j]);   //  we're using the len array here because
-                                   //  we don't want to call m_strlen more than 
-                                   //  once on each argv value
-      
-      argv_len += len[j];
-   }
+   len[j] = m_strlen(_argv[j]); //  we're using the len array here because
+                                //  we don't want to call m_strlen more than
+                                //  once on each argv value
+
+   argv_len += len[j];
 
    ++argv_len;   //  ... including the end-of-string sentinels (ie, nul chars);
 
