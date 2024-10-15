@@ -196,29 +196,24 @@ void Wchar_Argv::set(int _argc, char ** _argv)
 
 clear();
 
-int j, k;
-int argv_len;
-int * len = nullptr;
+int k;
+int *len = new int [_argc];
 
 
 Argc = _argc;
-
-len = new int [Argc];
-
 
    //
    //  total length of the argument string ... 
    //
 
-argv_len = 0;
+int argv_len = 0;
 
-for (j=0; j<_argc; ++j)  {
+for (int j=0; j<_argc; ++j)  {
 
-   if (_argv != nullptr) {
-      len[j] = m_strlen(_argv[j]);  //  we're using the len array here because
-                                    //  we don't want to call m_strlen more than
-                                    //  once on each argv value
-   }
+   // we're using the len array here because
+   // we don't want to call m_strlen more than
+   // once on each argv value
+   len[j] = (_argv == nullptr) ? 0 : len[j] = m_strlen(_argv[j]);
 
    argv_len += len[j];
 
@@ -237,7 +232,7 @@ for (j=0; j<_argc; ++j)  {
 
 W_Buf = new wchar_t [argv_len];
 
-for (j=0; j<argv_len; ++j)  {
+for (int j=0; j<argv_len; ++j)  {
 
    W_Buf[j] = L'\0';
 
@@ -249,7 +244,7 @@ for (j=0; j<argv_len; ++j)  {
 
 k = 0;
 
-for (j=0; j<Argc; ++j)  {
+for (int j=0; j<Argc; ++j)  {
 
    if ( _argv != nullptr && mbstowcs(W_Buf + k, _argv[j], len[j]) == (size_t) -1 )  {
 
@@ -275,7 +270,7 @@ W_Argv = new wchar_t * [Argc];
 
 k = 0;
 
-for (j=0; j<Argc; ++j)  {
+for (int j=0; j<Argc; ++j)  {
 
    W_Argv[j] = W_Buf + k;
 
