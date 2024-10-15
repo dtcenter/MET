@@ -423,36 +423,6 @@ struct MaskLatLon {
 ////////////////////////////////////////////////////////////////////////
 
 //
-// Struct to store masking station id information
-//
-
-struct MaskSID {
-
-   // Mask name
-   ConcatString name;
-
-   // Boolean for non-default weights 
-   bool has_weights;
-
-   // Mapping of SID name to weight value
-   std::map<std::string,double> sid_map;
-
-   void      clear();
-   bool      operator==(const MaskSID &) const;
-   MaskSID  &operator=(const MaskSID &a) noexcept;
-
-   int n() const;
-
-   // Formatted as: station_name(numeric_weight)
-   void add(const std::string &);
-   void add_css(const std::string &);
-   bool has(const std::string &) const ;
-   bool has(const std::string &, double &) const;
-};
-
-////////////////////////////////////////////////////////////////////////
-
-//
 // Enumeration for duplicate_flag configuration parameter
 //
 
