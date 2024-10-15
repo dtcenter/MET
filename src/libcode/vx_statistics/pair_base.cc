@@ -787,13 +787,13 @@ void PairBase::set_point_weight(const PointWeightType wgt_flag) {
 
       mlog << Debug(4)
            << "Applying point weights for the \""
-           << mask_sid_ptr->name << "\" station ID masking region.\n";
+           << mask_sid_ptr->name() << "\" station ID masking region.\n";
 
       // Print warning if no weights are provided
       if(!mask_sid_ptr->has_weights) {
          mlog << Warning << "\n" << method_name
               << "station ID point weighting requested but no weights "
-              << "were defined in the \"" << mask_sid_ptr->name
+              << "were defined in the \"" << mask_sid_ptr->name()
               << "\" station ID mask. Using default weights of "
               << default_weight << ".\n\n";
       }
