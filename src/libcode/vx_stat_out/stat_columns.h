@@ -109,7 +109,7 @@ extern void write_mpr_row   (StatHdrColumns &, const PairDataPoint *, STATOutput
                              bool update_obtype, bool update_thresh = true);
 extern void write_seeps_row (StatHdrColumns &, const SeepsAggScore *, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &,
-                             bool update_obtype, bool update_thresh = true);
+                             bool update_thresh = true);
 extern void write_seeps_mpr_row (StatHdrColumns &, const PairDataPoint *, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &,
                              bool update_obtype, bool update_thresh = true);

@@ -120,6 +120,8 @@ message_type_group_map = [
    { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
 ];
 
+obtype_as_obs_message_type_flag = FALSE;
+
 //
 // Ensemble bin sizes
 // May be set separately in each "obs.field" entry
