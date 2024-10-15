@@ -2243,7 +2243,7 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
          vx_opt.output_flag[i_orank],
          stat_at, i_stat_row,
          txt_at[i_orank], i_txt_row[i_orank],
-         conf_info.obtype_as_obs_message_type_flag);
+         conf_info.obtype_as_group_val_flag);
 
       // Reset the obtype column
       shc.set_obtype(cur_obtype.c_str());

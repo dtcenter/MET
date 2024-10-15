@@ -115,7 +115,7 @@ message_type_group_map = [
    { key = "WATERSF"; val = "SFCSHP";                             }
 ];
 
-obtype_as_obs_message_type_flag = FALSE;
+obtype_as_group_val_flag = FALSE;
 
 ////////////////////////////////////////////////////////////////////////////////
 
