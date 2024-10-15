@@ -379,15 +379,11 @@ mlog << Debug(2) << "Processing Lidar points\t= " << n_data << "\n";
    //  populate the hdr_typ variable
    //
 
-//memset(ibuf, 0, n_data*sizeof(int));
-
 obs_vars->hdr_typ_var.putVar(ibuf.data());
 
    //
    //  populate the hdr_sid variable
    //
-
-//memset(ibuf, 0, n_data*sizeof(int));
 
 obs_vars->hdr_sid_var.putVar(ibuf.data());
 nc_point_obs.add_header_strings(hdr_typ_string, na_str);
@@ -432,8 +428,6 @@ unixtime t;
 
 get_hdf_var_info(hdf_sd_id, hdf_time_name, info);
 
-
-//memset(ibuf, 0, n_data*sizeof(int));
 
 for (j=0; j<n_data; ++j)  {
    int v_idx;
