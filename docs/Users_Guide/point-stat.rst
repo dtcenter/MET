@@ -362,6 +362,8 @@ ________________________
   obs_summary    = NONE;
   obs_perc_value = 50;
   message_type_group_map = [...];
+  obtype_as_group_val_flag = FALSE;
+  point_weight_flag = NONE;
   tmp_dir        = "/tmp";
   output_prefix  = "";
   version        = "VN.N";

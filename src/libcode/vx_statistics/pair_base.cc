@@ -81,9 +81,9 @@ void PairBase::clear() {
    IsPointVx = false;
 
    mask_name.clear();
-   mask_area_ptr  = (MaskPlane *)    nullptr;  // Not allocated
-   mask_sid_ptr   = (StringArray *)  nullptr;  // Not allocated
-   mask_llpnt_ptr = (MaskLatLon *)   nullptr;  // Not allocated
+   mask_area_ptr  = (MaskPlane *)  nullptr;  // Not allocated
+   mask_sid_ptr   = (MaskSID *)    nullptr;  // Not allocated
+   mask_llpnt_ptr = (MaskLatLon *) nullptr;  // Not allocated
 
    cdf_info_ptr = (const ClimoCDFInfo *) nullptr;  // Not allocated
 
@@ -104,6 +104,7 @@ void PairBase::clear() {
    ocsd_na.clear();
    ocdf_na.clear();
 
+   typ_sa.clear();
    sid_sa.clear();
    lat_na.clear();
    lon_na.clear();
@@ -133,9 +134,9 @@ void PairBase::erase() {
    IsPointVx = false;
 
    mask_name.erase();
-   mask_area_ptr  = (MaskPlane *)    nullptr;  // Not allocated
-   mask_sid_ptr   = (StringArray *)  nullptr;  // Not allocated
-   mask_llpnt_ptr = (MaskLatLon *)   nullptr;  // Not allocated
+   mask_area_ptr  = (MaskPlane *)  nullptr;  // Not allocated
+   mask_sid_ptr   = (MaskSID *)    nullptr;  // Not allocated
+   mask_llpnt_ptr = (MaskLatLon *) nullptr;  // Not allocated
 
    cdf_info_ptr = (const ClimoCDFInfo *) nullptr;  // Not allocated
 
@@ -155,6 +156,7 @@ void PairBase::erase() {
    ocsd_na.erase();
    ocdf_na.erase();
 
+   typ_sa.clear();  // no erase option
    sid_sa.clear();  // no erase option
    lat_na.erase();
    lon_na.erase();
@@ -205,9 +207,9 @@ void PairBase::extend(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_mask_name(const char *c) {
+void PairBase::set_mask_name(const string &s) {
 
-   mask_name = c;
+   mask_name = s;
 
   return;
 }
@@ -223,9 +225,9 @@ void PairBase::set_mask_area_ptr(MaskPlane *mp_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_mask_sid_ptr(StringArray *sid_ptr) {
+void PairBase::set_mask_sid_ptr(MaskSID *ms_ptr) {
 
-   mask_sid_ptr = sid_ptr;
+   mask_sid_ptr = ms_ptr;
 
    return;
 }
@@ -427,7 +429,7 @@ void PairBase::compute_climo_cdf() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairBase::add_point_obs(const char *sid,
+bool PairBase::add_point_obs(const char *typ, const char *sid,
                              double lat, double lon, double x, double y,
                              unixtime ut, double lvl, double elv,
                              double o, const char *qc,
@@ -476,6 +478,7 @@ bool PairBase::add_point_obs(const char *sid,
    }
    else {
       station_values_t val;
+      val.typ = string(typ);
       val.sid = string(sid);
       val.lat = lat;
       val.lon = lon;
@@ -497,6 +500,7 @@ bool PairBase::add_point_obs(const char *sid,
    }
 
    if(obs_summary == ObsSummary::None) {
+      typ_sa.add(typ);
       sid_sa.add(sid);
       lat_na.add(lat);
       lon_na.add(lon);
@@ -520,7 +524,7 @@ bool PairBase::add_point_obs(const char *sid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairBase::set_point_obs(int i_obs, const char *sid,
+void PairBase::set_point_obs(int i_obs, const char *typ, const char *sid,
                              double lat, double lon, double x, double y,
                              unixtime ut, double lvl, double elv,
                              double o, const char *qc,
@@ -534,6 +538,7 @@ void PairBase::set_point_obs(int i_obs, const char *sid,
       exit(1);
    }
 
+   typ_sa.set(i_obs, typ);
    sid_sa.set(i_obs, sid);
    lat_na.set(i_obs, lat);
    lon_na.set(i_obs, lon);
@@ -751,6 +756,7 @@ void PairBase::calc_obs_summary(){
       // Store summarized value in the map
       svt.summary_val = ob.val;
 
+      typ_sa.add    (svt.typ.c_str());
       sid_sa.add    (svt.sid.c_str());
       lat_na.add    (svt.lat);
       lon_na.add    (svt.lon);
@@ -769,6 +775,49 @@ void PairBase::calc_obs_summary(){
       n_obs += 1;
 
    } // end for map
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairBase::set_point_weight(const PointWeightType wgt_flag) {
+
+   const char *method_name = "PairBase::set_point_weight() -> ";
+
+   if(!IsPointVx || wgt_flag == PointWeightType::None) return;
+
+   // Apply the SID point weight type
+   if(wgt_flag == PointWeightType::SID &&
+      mask_sid_ptr != nullptr) {
+
+      mlog << Debug(4)
+           << "Applying point weights for the \""
+           << mask_sid_ptr->name() << "\" station ID masking region.\n";
+
+      // Print warning if no weights are provided
+      if(!mask_sid_ptr->has_weights()) {
+         mlog << Warning << "\n" << method_name
+              << "station ID point weighting requested but no weights "
+              << "were defined in the \"" << mask_sid_ptr->name()
+              << "\" station ID mask. Using default weights of "
+              << default_weight << ".\n\n";
+      }
+
+      // Loop through the point observations
+      for(int i_obs=0; i_obs<n_obs; i_obs++) {
+
+         double wgt; 
+         if(mask_sid_ptr->has_sid(sid_sa[i_obs], wgt)) {
+            wgt_na.set(i_obs, wgt);
+         }
+         else {
+            mlog << Warning << "\n" << method_name
+                 << "no match found for station id: "
+                 << sid_sa[i_obs] << "\n\n";
+         }
+      }
+   }
 
    return;
 }
@@ -1293,13 +1342,15 @@ void VxPairBase::set_mask_area(int i_mask, const char *name,
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairBase::set_mask_sid(int i_mask, const char *name,
-                              StringArray *sid_ptr) {
+                              MaskSID *ms_ptr) {
+
+   if(!ms_ptr) return;
 
    for(int i_msg_typ=0; i_msg_typ<n_msg_typ; i_msg_typ++) {
       for(int i_interp=0; i_interp<n_interp; i_interp++) {
          int n = three_to_one(i_msg_typ, i_mask, i_interp);
          pb_ptr[n]->set_mask_name(name);
-         pb_ptr[n]->set_mask_sid_ptr(sid_ptr);
+         pb_ptr[n]->set_mask_sid_ptr(ms_ptr);
       }
    }
 
@@ -1505,6 +1556,20 @@ void VxPairBase::calc_obs_summary() {
    }
 
    for(auto &x : pb_ptr) x->calc_obs_summary();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairBase::set_point_weight(const PointWeightType wgt_flag) {
+
+   if(n_vx == 0) {
+      mlog << Warning << "\nVxPairBase::set_point_weight() -> "
+           << "set_size() has not been called yet!\n\n";
+   }
+
+   for(auto &x : pb_ptr) x->set_point_weight(wgt_flag);
 
    return;
 }
@@ -1864,7 +1929,7 @@ bool VxPairBase::is_keeper_mask(
    }
    // Otherwise, check for the masking SID list
    else if( pb_ptr[n]->mask_sid_ptr != nullptr &&
-           !pb_ptr[n]->mask_sid_ptr->has(hdr_sid_str)) {
+           !pb_ptr[n]->mask_sid_ptr->has_sid(hdr_sid_str)) {
 
       if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
          mlog << Debug(REJECT_DEBUG_LEVEL)

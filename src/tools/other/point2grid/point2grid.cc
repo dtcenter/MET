@@ -1699,7 +1699,7 @@ void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
    } // end for x
 
    // Write out the data
-   if(!put_nc_data_with_dims(data_var, &data.data()[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(data_var, data.data(), grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_nc_data() -> "
            << "error writing data to the output file.\n\n";
       exit(1);
@@ -1726,7 +1726,7 @@ void write_nc_data_int(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
    } // end for x
 
    // Write out the data
-   if(!put_nc_data_with_dims(data_var, &data.data()[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(data_var, data.data(), grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_nc_data_int() -> "
            << "error writing data to the output file.\n\n";
       exit(1);

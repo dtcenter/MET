@@ -336,7 +336,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    add_att(&data_var, "smoothing_shape", gtf.enum2String(Shape));
 
    // Allocate memory to store data values for each grid point
-   float *data = new float [grid.nx()*grid.ny()];
+   vector<float> data(grid.nx()*grid.ny());
 
    // Store the data
    for(int x=0; x<grid.nx(); x++) {
@@ -347,14 +347,13 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    } // end for x
 
    // Write out the data
-   if(!put_nc_data_with_dims(&data_var, &data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&data_var, data.data(), grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_nc() -> "
            << "error writing data to the output file.\n\n";
       exit(1);
    }
 
    // Clean up
-   if(data)  {                 delete [] data; data  = (float *) nullptr; }
    if(f_out) {
       delete f_out;   f_out = (NcFile *) nullptr;
    }

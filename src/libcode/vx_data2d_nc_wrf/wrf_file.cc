@@ -849,7 +849,7 @@ plane.set_size(Nx, Ny);
    //
    //  get the data
    //
-double d[Ny];
+vector<double> d(Ny);
 
 LongArray offsets;
 LongArray lengths;
@@ -863,7 +863,7 @@ lengths[y_slot] = Ny;
 int type_id = GET_NC_TYPE_ID_P(v);
 for (x=0; x<Nx; ++x)  {
    offsets[x_slot] = x;
-   get_nc_data(v, (double *)&d, lengths, offsets);
+   get_nc_data(v, d.data(), lengths, offsets);
 
    b[x_slot] = x;
 

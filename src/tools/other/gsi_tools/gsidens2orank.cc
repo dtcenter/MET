@@ -269,9 +269,9 @@ void process_conv_data(ConvData &d, int i_mem) {
       // Store the current observation info
       ClimoPntInfo cpi(bad_data_double, bad_data_double,
                        bad_data_double, bad_data_double);
-      ens_pd.add_point_obs(d.sid.c_str(), d.lat, d.lon,
+      ens_pd.add_point_obs(d.obtype.c_str(), d.sid.c_str(), d.lat, d.lon,
                 bad_data_double, bad_data_double, d.obs_ut, d.prs,
-                d.elv, d.obs, na_str, cpi, default_grid_weight);
+                d.elv, d.obs, na_str, cpi, default_weight);
 
       // Initialize ensemble members and mean to bad data
       for(i=0; i<n_ens; i++) ens_pd.add_ens(i, bad_data_double);
@@ -429,10 +429,10 @@ void process_rad_data(RadData &d, int i_mem) {
       // Store the current observation info
       ClimoPntInfo cpi(bad_data_double, bad_data_double,
                        bad_data_double, bad_data_double);
-      ens_pd.add_point_obs(na_str, d.lat, d.lon,
+      ens_pd.add_point_obs(na_str, na_str, d.lat, d.lon,
                 bad_data_double, bad_data_double, d.obs_ut,
                 bad_data_double, d.elv, d.obs, na_str,
-                cpi, default_grid_weight);
+                cpi, default_weight);
 
       // Initialize ensemble members and mean to bad data
       for(i=0; i<n_ens; i++) ens_pd.add_ens(i, bad_data_double);

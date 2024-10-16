@@ -345,9 +345,9 @@ bool NcCfFile::open(const char * filepath)
     int n_times = get_data_size(valid_time_var);
     int tim_buf_size = n_times;
     if (use_bounds_var) tim_buf_size *= 2;
-    auto time_values = new double[tim_buf_size];
+    vector<double> time_values(tim_buf_size);
 
-    if( get_nc_data(nc_time_var, time_values) ) {
+    if( get_nc_data(nc_time_var, time_values.data()) ) {
       bool no_leap_year = get_att_no_leap_year(valid_time_var);
       if( time_dim_count > 1 ) {
         double latest_time = bad_data_double;
@@ -381,7 +381,6 @@ bool NcCfFile::open(const char * filepath)
       }
     }
     else ValidTime.add(0);  //Initialize
-    delete [] time_values;
   }
 
   NcVar init_time_var = get_var(_ncFile, "forecast_reference_time");
@@ -504,14 +503,13 @@ bool NcCfFile::open(const char * filepath)
   if (IS_VALID_NC_P(z_var)) {
 
     int z_count = get_data_size(z_var);
-    auto z_values = new double[z_count];
+    vector<double> z_values(z_count);
 
-    if( get_nc_data(z_var, z_values) ) {
+    if( get_nc_data(z_var, z_values.data()) ) {
       for(int i=0; i<z_count; i++) {
         vlevels.add(z_values[i]);
       }
     }
-    delete [] z_values;
   }
 
   //  done
@@ -1102,7 +1100,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
   //  get the data
   const int plane_size = nx * ny;
-  double *d = new double[plane_size];
+  vector<double> d(plane_size);
 
   size_t dim_size;
   LongArray offsets;
@@ -1125,7 +1123,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   offsets[y_slot] = 0;
   lengths[y_slot] = ny;
 
-  get_nc_data(v, d, lengths, offsets);
+  get_nc_data(v, d.data(), lengths, offsets);
 
   int offset = 0;
   if( x_slot > y_slot ) {
@@ -1162,8 +1160,6 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
       } /*  for y */
     }   /*  for x */
   }
-
-  delete [] d;
 
   //  done
   mlog << Debug(6) << method_name << "took "

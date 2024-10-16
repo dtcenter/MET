@@ -235,12 +235,15 @@ class PointStatConfInfo {
 
       // Message type groups that should be processed together
       std::map<ConcatString,StringArray> msg_typ_group_map;
+      bool                               obtype_as_group_val_flag;
 
       // Mapping of mask names to DataPlanes
       std::map<ConcatString,MaskPlane>   mask_area_map;
 
       // Mapping of mask names to Station ID lists
-      std::map<ConcatString,StringArray> mask_sid_map;
+      std::map<ConcatString,MaskSID>     mask_sid_map;
+
+      PointWeightType point_weight_flag;    // Point weighting flag
 
       ConcatString tmp_dir;                 // Directory for temporary files
       ConcatString output_prefix;           // String to customize output file name

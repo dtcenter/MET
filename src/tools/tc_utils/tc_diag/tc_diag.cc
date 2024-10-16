@@ -1331,14 +1331,11 @@ void copy_time_vars(NcFile *to_nc, NcFile *from_nc, int i_time) {
       }
 
       // Allocate buffer
-      double *buf = new double[buf_size];
+      vector<double> buf(buf_size);
 
       // Copy the data for this time slice
-      get_nc_data(&from_var, buf);
-      to_var.putVar(offsets, counts, buf);
-
-      // Cleanup
-      if(buf) { delete[] buf; buf = (double *) nullptr; }
+      get_nc_data(&from_var, buf.data());
+      to_var.putVar(offsets, counts, buf.data());
 
    } // end for i
 
@@ -1665,7 +1662,7 @@ void OutFileInfo::write_nc_diag() {
 
    // Allocate space
    int n_prs_data = vld_dim.getSize() * prs_dim.getSize();
-   float *prs_data = new float [n_prs_data];
+   vector<float> prs_data(n_prs_data);
    ConcatString diag_name;
 
    // Loop over the pressure diagnostic names
@@ -1698,7 +1695,7 @@ void OutFileInfo::write_nc_diag() {
       } // end for j
 
       // Write the data
-      write_nc_diag_prs_vals(prs_diag[i], prs_data);
+      write_nc_diag_prs_vals(prs_diag[i], prs_data.data());
 
    } // end for i
 
@@ -1707,9 +1704,6 @@ void OutFileInfo::write_nc_diag() {
        it != diag_custom_keys.end(); it++) {
       write_nc_diag_vals(*it, diag_custom_map.at(*it));
    }
-
-   // Clean up
-   if(prs_data) { delete [] prs_data; prs_data = (float *) nullptr; }
 
    return;
 }
@@ -2198,8 +2192,8 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    // Define latitude and longitude arrays
    TcrmwData d = di.data;
    int nra = d.range_n * d.azimuth_n;
-   double *lat_arr = new double[nra];
-   double *lon_arr = new double[nra];
+   vector<double> lat_arr(nra);
+   vector<double> lon_arr(nra);
 
    // Set grid center
    d.lat_center   =      pnt_ptr->lat();
@@ -2262,18 +2256,14 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
                   lat_var, lon_var);
 
    // Compute lat and lon coordinate arrays
-   compute_lat_lon(ra_grid, lat_arr, lon_arr);
+   compute_lat_lon(ra_grid, lat_arr.data(), lon_arr.data());
 
    // Write coordinate arrays
-   write_tc_data(tmp_out, ra_grid, 0, lat_var, lat_arr);
-   write_tc_data(tmp_out, ra_grid, 0, lon_var, lon_arr);
+   write_tc_data(tmp_out, ra_grid, 0, lat_var, lat_arr.data());
+   write_tc_data(tmp_out, ra_grid, 0, lon_var, lon_arr.data());
 
    // Write track point values
    write_tc_track_point(tmp_out, vld_dim, *pnt_ptr);
-
-   // Clean up
-   if(lat_arr) { delete[] lat_arr; lat_arr = (double *) nullptr; }
-   if(lon_arr) { delete[] lon_arr; lon_arr = (double *) nullptr; }
 
    return;
 }

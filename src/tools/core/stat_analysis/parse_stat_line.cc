@@ -61,7 +61,6 @@ void parse_fho_ctable(STATLine &l, TTContingencyTable &ct) {
    double h_rate  = atof(l.get_item("H_RATE"));
    double o_rate  = atof(l.get_item("O_RATE"));
 
-   // MET #2887: JHG multiple by the sum of the weights here instead?
    double fy    = n_pairs * f_rate;
    double fy_oy = n_pairs * h_rate;
    double oy    = n_pairs * o_rate;

@@ -105,6 +105,9 @@
 //   053    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files.
 //   054    04/29/24  Halley Gotway  MET #2795 Move level mismatch warning.
 //   055    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
+//   056    10/08/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
+//   057    10/14/24  Halley Gotway  MET #2279 Add point_weight_flag option.
+//   058    10/15/24  Halley Gotway  MET #2893 Write individual pair OBTYPE.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -202,10 +205,11 @@ int met_main(int argc, char *argv[]) {
       process_obs_file(i);
    }
 
-   // Calculate and print observation summaries
+   // Process observation summaries and point weights
    for(i=0; i<conf_info.get_n_vx(); i++) {
       conf_info.vx_opt[i].vx_pd.calc_obs_summary();
       conf_info.vx_opt[i].vx_pd.print_obs_summary();
+      conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_flag);
    }
 
    // Compute the scores and write them out
@@ -1108,7 +1112,11 @@ void process_scores() {
                   write_mpr_row(shc, pd_ptr,
                      conf_info.vx_opt[i_vx].output_flag[i_mpr],
                      stat_at, i_stat_row,
-                     txt_at[i_mpr], i_txt_row[i_mpr]);
+                     txt_at[i_mpr], i_txt_row[i_mpr],
+                     conf_info.obtype_as_group_val_flag);
+
+                  // Reset the obtype column
+                  shc.set_obtype(conf_info.vx_opt[i_vx].msg_typ[i_msg_typ].c_str());
 
                   // Reset the observation valid time
                   shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
@@ -1120,7 +1128,11 @@ void process_scores() {
                   write_seeps_mpr_row(shc, pd_ptr,
                      conf_info.vx_opt[i_vx].output_flag[i_seeps_mpr],
                      stat_at, i_stat_row,
-                     txt_at[i_seeps_mpr], i_txt_row[i_seeps_mpr]);
+                     txt_at[i_seeps_mpr], i_txt_row[i_seeps_mpr],
+                     conf_info.obtype_as_group_val_flag);
+
+                  // Reset the obtype column
+                  shc.set_obtype(conf_info.vx_opt[i_vx].msg_typ[i_msg_typ].c_str());
 
                   // Reset the observation valid time
                   shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
@@ -1910,7 +1922,8 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
                           pd_ptr->ocmn_na[j], pd_ptr->ocsd_na[j]);
 
          // Store the observation value
-         hira_pd.add_point_obs(pd_ptr->sid_sa[j].c_str(),
+         hira_pd.add_point_obs(
+            pd_ptr->typ_sa[j].c_str(), pd_ptr->sid_sa[j].c_str(),
             pd_ptr->lat_na[j], pd_ptr->lon_na[j],
             pd_ptr->x_na[j], pd_ptr->y_na[j], pd_ptr->vld_ta[j],
             pd_ptr->lvl_na[j], pd_ptr->elv_na[j],
@@ -1965,7 +1978,11 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          write_orank_row(shc, &hira_pd,
             conf_info.vx_opt[i_vx].output_flag[i_orank],
             stat_at, i_stat_row,
-            txt_at[i_orank], i_txt_row[i_orank]);
+            txt_at[i_orank], i_txt_row[i_orank],
+            conf_info.obtype_as_group_val_flag);
+  
+         // Reset the obtype column
+         shc.set_obtype(pd_ptr->msg_typ.c_str());
 
          // Reset the observation valid time
          shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
@@ -2107,7 +2124,9 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
             }
 
             // Store the fractional coverage pair
-            hira_pd.add_point_pair(pd_ptr->sid_sa[k].c_str(),
+            hira_pd.add_point_pair(
+               pd_ptr->typ_sa[k].c_str(),
+               pd_ptr->sid_sa[k].c_str(),
                pd_ptr->lat_na[k], pd_ptr->lon_na[k],
                pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->vld_ta[k],
                pd_ptr->lvl_na[k], pd_ptr->elv_na[k],
@@ -2155,7 +2174,12 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
             write_mpr_row(shc, &hira_pd,
                conf_info.vx_opt[i_vx].output_flag[i_mpr],
                stat_at, i_stat_row,
-               txt_at[i_mpr], i_txt_row[i_mpr], false);
+               txt_at[i_mpr], i_txt_row[i_mpr],
+               conf_info.obtype_as_group_val_flag,
+               false);
+
+            // Reset the obtype column
+            shc.set_obtype(pd_ptr->msg_typ.c_str());
 
             // Reset the observation valid time
             shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);

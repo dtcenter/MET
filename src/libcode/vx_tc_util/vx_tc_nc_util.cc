@@ -56,8 +56,8 @@ void write_tc_track_lat_lon(NcFile* nc_out,
     add_att(&track_lon_var, "units", "degrees_east");
     add_att(&track_lon_var, "standard_name", "longitude_track");
 
-    double* track_lat_data = new double[track.n_points()];
-    double* track_lon_data = new double[track.n_points()];
+    vector<double> track_lat_data(track.n_points());
+    vector<double> track_lon_data(track.n_points());
 
     for(int i = 0; i < track.n_points(); i++) {
         mlog << Debug(5) << track[i].serialize() << "\n";
@@ -71,11 +71,9 @@ void write_tc_track_lat_lon(NcFile* nc_out,
     vector<size_t> counts;
     counts.push_back(track.n_points());
 
-    track_lat_var.putVar(offsets, counts, track_lat_data);
-    track_lon_var.putVar(offsets, counts, track_lon_data);
+    track_lat_var.putVar(offsets, counts, track_lat_data.data());
+    track_lon_var.putVar(offsets, counts, track_lon_data.data());
 
-    delete[] track_lat_data;
-    delete[] track_lon_data;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -139,7 +137,7 @@ void write_tc_rmw(NcFile* nc_out,
     add_att(&track_mrd_var, "units", "nautical_miles");
     add_att(&track_mrd_var, "standard_name", "radius_max_wind");
 
-    double* track_mrd_data = new double[track.n_points()];
+    vector<double> track_mrd_data(track.n_points());
 
     for(int i = 0; i < track.n_points(); i++) {
         track_mrd_data[i] = track[i].mrd();
@@ -151,9 +149,8 @@ void write_tc_rmw(NcFile* nc_out,
     vector<size_t> counts;
     counts.push_back(track.n_points());
 
-    track_mrd_var.putVar(offsets, counts, track_mrd_data);
+    track_mrd_var.putVar(offsets, counts, track_mrd_data.data());
 
-    delete[] track_mrd_data;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -281,7 +278,7 @@ void def_tc_pressure(NcFile* nc_out,
 
     NcVar pressure_var;
 
-    double* pressure_data = new double[pressure_levels.size()];
+    vector<double> pressure_data(pressure_levels.size());
 
     // Define variable
     pressure_var = nc_out->addVar("pressure", ncDouble, pressure_dim);
@@ -300,10 +297,7 @@ void def_tc_pressure(NcFile* nc_out,
         k--;
     }
 
-    put_nc_data(&pressure_var, &pressure_data[0]);
-
-    // Cleanup
-    if(pressure_data) { delete [] pressure_data; pressure_data = (double *) 0; }
+    put_nc_data(&pressure_var, pressure_data.data());
 
     return;
 }
@@ -317,8 +311,8 @@ void def_tc_range_azimuth(NcFile* nc_out,
     NcVar range_var;
     NcVar azimuth_var;
 
-    double* range_data = new double[grid.range_n()];
-    double* azimuth_data = new double[grid.azimuth_n()];
+    vector<double> range_data(grid.range_n());
+    vector<double> azimuth_data(grid.azimuth_n());
 
     // Define variables
     range_var = nc_out->addVar("range", ncDouble, range_dim);
@@ -352,12 +346,8 @@ void def_tc_range_azimuth(NcFile* nc_out,
     }
 
     // Write coordinates
-    put_nc_data(&range_var, &range_data[0]);
-    put_nc_data(&azimuth_var, &azimuth_data[0]);
-
-    // Cleanup
-    if(range_data)   { delete [] range_data;   range_data   = (double *) 0; }
-    if(azimuth_data) { delete [] azimuth_data; azimuth_data = (double *) 0; }
+    put_nc_data(&range_var, range_data.data());
+    put_nc_data(&azimuth_var, azimuth_data.data());
 
     return;
 }
@@ -669,8 +659,7 @@ void write_tc_data_rev(NcFile* nc_out, const TcrmwGrid& grid,
 
     vector<size_t> offsets;
     vector<size_t> counts;
-
-    double* data_rev;
+    vector<double> data_rev(grid.range_n() * grid.azimuth_n());
 
     offsets.clear();
     offsets.push_back(i_point);
@@ -682,9 +671,6 @@ void write_tc_data_rev(NcFile* nc_out, const TcrmwGrid& grid,
     counts.push_back(grid.range_n());
     counts.push_back(grid.azimuth_n());
 
-    data_rev = new double[
-        grid.range_n() * grid.azimuth_n()];
-
     for(int ir = 0; ir < grid.range_n(); ir++) {
         for(int ia = 0; ia < grid.azimuth_n(); ia++) {
             int i = ir * grid.azimuth_n() + ia;
@@ -693,9 +679,8 @@ void write_tc_data_rev(NcFile* nc_out, const TcrmwGrid& grid,
         }
     }
 
-    var.putVar(offsets, counts, data_rev);
+    var.putVar(offsets, counts, data_rev.data());
 
-    delete[] data_rev;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -706,8 +691,8 @@ void write_tc_azi_mean_data(NcFile* nc_out, const TcrmwGrid& grid,
     vector<size_t> offsets;
     vector<size_t> counts;
 
-    double* data_rev;
-    double* data_azi_mean;
+    vector<double> data_rev(grid.range_n() * grid.azimuth_n());
+    vector<double> data_azi_mean(grid.range_n(), 0.0);
 
     offsets.clear();
     offsets.push_back(i_point);
@@ -716,10 +701,6 @@ void write_tc_azi_mean_data(NcFile* nc_out, const TcrmwGrid& grid,
     counts.clear();
     counts.push_back(1);
     counts.push_back(grid.range_n());
-
-    data_rev = new double[
-        grid.range_n() * grid.azimuth_n()];
-    data_azi_mean = new double[grid.range_n()];
 
     for(int ir = 0; ir < grid.range_n(); ir++) {
         data_azi_mean[ir] = 0.;
@@ -735,10 +716,8 @@ void write_tc_azi_mean_data(NcFile* nc_out, const TcrmwGrid& grid,
         data_azi_mean[ir] /= grid.azimuth_n();
     }
 
-    var.putVar(offsets, counts, data_azi_mean);
+    var.putVar(offsets, counts, data_azi_mean.data());
 
-    delete[] data_rev;
-    delete[] data_azi_mean;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -761,8 +740,7 @@ extern void write_tc_pressure_level_data(
 
     vector<size_t> offsets_3d;
     vector<size_t> counts_3d;
-
-    double* data_rev;
+    vector<double> data_rev(grid.range_n() * grid.azimuth_n());
 
     offsets_3d.clear();
     offsets_3d.push_back(i_point);
@@ -776,9 +754,6 @@ extern void write_tc_pressure_level_data(
     counts_3d.push_back(grid.range_n());
     counts_3d.push_back(grid.azimuth_n());
 
-    data_rev = new double[
-        grid.range_n() * grid.azimuth_n()];
-
     for(int ir = 0; ir < grid.range_n(); ir++) {
         for(int ia = 0; ia < grid.azimuth_n(); ia++) {
             int i = ir * grid.azimuth_n() + ia;
@@ -787,9 +762,8 @@ extern void write_tc_pressure_level_data(
         }
     }
 
-    var.putVar(offsets_3d, counts_3d, data_rev);
+    var.putVar(offsets_3d, counts_3d, data_rev.data());
 
-    delete[] data_rev;
 }
 
 ////////////////////////////////////////////////////////////////////////
