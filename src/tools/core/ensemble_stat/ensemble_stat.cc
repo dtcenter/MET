@@ -77,6 +77,8 @@
 //   044    06/17/24  Halley Gotway  MET #2856 Reinitialize climo_cdf pointer
 //   045    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
 //   046    10/08/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
+//   047    10/14/24  Halley Gotway  MET #2279 Add point_weight_flag option.
+//   048    10/15/24  Halley Gotway  MET #2893 Write individual pair OBTYPE.
 //
 ////////////////////////////////////////////////////////////////////////
 

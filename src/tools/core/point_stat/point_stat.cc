@@ -105,6 +105,9 @@
 //   053    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files.
 //   054    04/29/24  Halley Gotway  MET #2795 Move level mismatch warning.
 //   055    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
+//   056    10/08/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
+//   057    10/14/24  Halley Gotway  MET #2279 Add point_weight_flag option.
+//   058    10/15/24  Halley Gotway  MET #2893 Write individual pair OBTYPE.
 //
 ////////////////////////////////////////////////////////////////////////
 
