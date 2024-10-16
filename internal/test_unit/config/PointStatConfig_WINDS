@@ -52,7 +52,7 @@ message_type_group_map = [
    { key = "USERSF";  val = "ADPSFC,SFCSHP";                      }
 ];
 
-obtype_as_group_val_flag = TRUE;
+obtype_as_group_val_flag = FALSE;
 
 fcst = {
    sid_inc = [];
@@ -60,7 +60,7 @@ fcst = {
    obs_quality_inc  = [];
    obs_quality_exc  = [];
 
-   message_type = [ "USERSF" ];
+   message_type = [ "ADPSFC", "SFCSHP", "USERSF" ];
    wind_thresh  = [ NA, >=3, >=5 ];
 
    field = [
@@ -151,7 +151,7 @@ output_flag = {
    rps    = NONE;
    orank  = NONE;
    eclv   = NONE;
-   mpr    = STAT;
+   mpr    = NONE;
    seeps  = NONE;
    seeps_mpr = NONE;
 }
