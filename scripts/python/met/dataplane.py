@@ -25,6 +25,9 @@ class dataplane(met_base):
           sys.exit(1)
 
        met_base.log_message(f"User python command:\t{repr(' '.join(argv[1:]))}")
+       if not argv[1] or not argv[1].strip():
+          met_base.quit_msg(f"User python command is empty")
+          sys.exit(1)
 
        # argv[1] contains the user defined python script
        pyembed_module_name = argv[1]
