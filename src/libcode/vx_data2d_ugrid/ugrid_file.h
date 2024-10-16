@@ -58,13 +58,14 @@ class UGridFile {
 
 
       int getNx() const {
-        return (_faceDim == nullptr) ? 0 : GET_NC_SIZE_P(_faceDim);
+        return ((_faceDim == nullptr) ? 0 : GET_NC_SIZE_P(_faceDim))
+             * ((_faceDimY == nullptr) ? 1 : GET_NC_SIZE_P(_faceDimY));
       }
       
       int getNy() const {
         return 1;
       }
-      
+
       NcVarInfo *get_time_var_info() const { return _time_var_info; }
       
          //
@@ -140,6 +141,7 @@ class UGridFile {
       // arrays so should not be deleted.
 
       netCDF::NcDim *_faceDim;
+      netCDF::NcDim *_faceDimY;
       netCDF::NcDim *_edgeDim;
       netCDF::NcDim *_nodeDim;
       netCDF::NcDim *_virtDim;

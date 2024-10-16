@@ -92,6 +92,7 @@ void UGridFile::init_from_scratch()
   _time_var_info = (NcVarInfo *)nullptr;
 
   _faceDim = (NcDim *)nullptr;
+  _faceDimY = (NcDim *)nullptr;
   _edgeDim = (NcDim *)nullptr;
   _nodeDim = (NcDim *)nullptr;
   _virtDim = (NcDim *)nullptr;
@@ -135,7 +136,22 @@ void UGridFile::close()
   metadata_map.clear();
   metadata_names.clear();
 
-  _faceDim = _edgeDim = _tDim = (NcDim *)nullptr;
+  if (_faceDim) {
+    delete _faceDim;
+    _faceDim = (NcDim *)nullptr;
+  }
+  if (_faceDimY) {
+    delete _faceDimY;
+    _faceDimY = (NcDim *)nullptr;
+  }
+  if (_edgeDim) {
+    delete _edgeDim;
+    _edgeDim = (NcDim *)nullptr;
+  }
+  if (_tDim) {
+    delete _tDim;
+    _tDim = (NcDim *)nullptr;
+  }
 
   // Reclaim the variable pointers
 
@@ -215,13 +231,20 @@ bool UGridFile::open_metadata(const char * filepath)
   get_dim_names(_ncMetaFile, &dim_names);
 
   // Face (cell) dimension
+  face_count = 1;
   meta_name = find_metadata_name(DIM_KEYS[0], dim_names);
   if (0 < meta_name.length()) {
-    dim = get_nc_dim(_ncMetaFile, meta_name.c_str());
-    face_count = get_dim_size(&dim);
-    _faceDim = new NcDim(dim);
-    NcDim face_dim = get_nc_dim(_ncFile, meta_name.c_str());
-    int data_face_count = get_dim_size(&face_dim);
+    int data_face_count = 1;
+    StringArray sa;
+    sa.parse_css(meta_name);
+    for (int i=0; i<sa.n(); i++) {
+      dim = get_nc_dim(_ncMetaFile, sa[i].c_str());
+      face_count *= get_dim_size(&dim);
+      if (i == 0) _faceDim = new NcDim(dim);
+      else _faceDimY = new NcDim(dim);
+      NcDim face_dim = get_nc_dim(_ncFile, sa[i].c_str());
+      data_face_count *= get_dim_size(&face_dim);
+    }
     if (face_count != data_face_count) {
       mlog << Error << "\n" << method_name
            << meta_name << " dimension is different: data file = "
@@ -473,6 +496,7 @@ void UGridFile::dump(ostream & out, int depth) const
   out << prefix << "\n";
 
   out << prefix << "face_dim = " << (_faceDim ? GET_NC_NAME_P(_faceDim) : "(nul)") << "\n";
+  out << prefix << "face_dimY = " << (_faceDimY ? GET_NC_NAME_P(_faceDimY) : "(nul)") << "\n";
   out << prefix << "edge_dim = " << (_edgeDim ? GET_NC_NAME_P(_edgeDim) : "(nul)") << "\n";
   out << prefix << "Tdim = " << (_tDim ? GET_NC_NAME_P(_tDim) : "(nul)") << "\n";
 
@@ -512,7 +536,7 @@ void UGridFile::dump(ostream & out, int depth) const
     {
       if (Var[j].Dims[k] == _faceDim)
         out << 'X';
-      else if (Var[j].Dims[k] == _edgeDim)
+      else if (Var[j].Dims[k] == _faceDimY)
         out << 'Y';
       else if (Var[j].Dims[k] == _tDim)
         out << 'T';
