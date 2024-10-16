@@ -463,6 +463,17 @@ enum class GridWeightType {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Enumeration for point_weight_flag configuration parameter
+//
+
+enum class PointWeightType {
+   None, // Apply no point weighting
+   SID   // Apply station ID weighting
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Enumeration for grid_decomp_flag configuration parameter
 //
 
@@ -753,6 +764,7 @@ static const char conf_key_topo_mask[]          = "topo_mask";
 static const char conf_key_topo_mask_flag[]     = "topo_mask.flag";
 static const char conf_key_use_obs_thresh[]     = "use_obs_thresh";
 static const char conf_key_interp_fcst_thresh[] = "interp_fcst_thresh";
+static const char conf_key_point_weight_flag[]  = "point_weight_flag";
 
 //
 // Grid-Stat specific parameter key names
@@ -1299,6 +1311,9 @@ static const char conf_val_bca[]    = "BCA";
 // Grid weight flag values
 static const char conf_val_cos_lat[] = "COS_LAT";
 static const char conf_val_area[]    = "AREA";
+
+// Point weight flag values
+static const char conf_val_sid[]     = "SID";
 
 // Duplicate flag values
 static const char conf_val_unique[] = "UNIQUE";

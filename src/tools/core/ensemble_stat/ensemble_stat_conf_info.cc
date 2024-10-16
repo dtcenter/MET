@@ -74,7 +74,7 @@ void EnsembleStatConfInfo::clear() {
    mask_area_map.clear();
    mask_sid_map.clear();
    grid_weight_flag = GridWeightType::None;
-   tmp_dir.clear();
+   point_weight_flag = PointWeightType::None;
    output_prefix.clear();
    version.clear();
 
@@ -157,6 +157,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Conf: grid_weight_flag
    grid_weight_flag = parse_conf_grid_weight_flag(&conf);
+
+   // Conf: point_weight_flag
+   point_weight_flag = parse_conf_point_weight_flag(&conf);
 
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
@@ -378,7 +381,6 @@ void EnsembleStatConfInfo::process_flags() {
 void EnsembleStatConfInfo::process_masks(const Grid &grid) {
    int i, j;
    MaskPlane mp;
-   StringArray sid;
    ConcatString name;
 
    mlog << Debug(2)
@@ -447,9 +449,9 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
             mlog << Debug(3)
                  << "Processing station ID mask: "
                  << vx_opt[i].mask_sid[j] << "\n";
-            parse_sid_mask(vx_opt[i].mask_sid[j], sid, name);
-            sid_map[vx_opt[i].mask_sid[j]] = name;
-            mask_sid_map[name] = sid;
+            MaskSID ms = parse_sid_mask(vx_opt[i].mask_sid[j]);
+            sid_map[vx_opt[i].mask_sid[j]] = ms.name();
+            mask_sid_map[ms.name()] = ms;
          }
 
          // Store the name only for point verification

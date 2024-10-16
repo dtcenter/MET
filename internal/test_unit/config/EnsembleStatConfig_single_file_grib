@@ -271,8 +271,10 @@ rng = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-grid_weight_flag = NONE;
-output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V12.0.0";
+grid_weight_flag  = NONE;
+point_weight_flag = NONE;
+
+output_prefix = "${OUTPUT_PREFIX}";
+version       = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

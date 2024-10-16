@@ -55,10 +55,8 @@ extern StringArray     parse_conf_message_type(
 extern StringArray     parse_conf_sid_list(
                           Dictionary *dict,
                           const char *);
-extern void            parse_sid_mask(
-                          const ConcatString &,
-                          StringArray &,
-                          ConcatString &);
+extern MaskSID         parse_sid_mask(const ConcatString &);
+extern StringArray     parse_sid_mask_as_list(const ConcatString &);
 extern std::vector<MaskLatLon>
                        parse_conf_llpnt_mask(Dictionary *dict);
 extern StringArray     parse_conf_obs_qty_inc(Dictionary *dict);
@@ -105,6 +103,7 @@ extern InterpInfo      parse_conf_interp(Dictionary *dict, const char *);
 extern NbrhdInfo       parse_conf_nbrhd(Dictionary *dict, const char *);
 extern HiRAInfo        parse_conf_hira(Dictionary *dict);
 extern GridWeightType  parse_conf_grid_weight_flag(Dictionary *dict);
+extern PointWeightType parse_conf_point_weight_flag(Dictionary *dict);
 extern DuplicateType   parse_conf_duplicate_flag(Dictionary *dict);
 extern ObsSummary      parse_conf_obs_summary(Dictionary *dict);
 extern ConcatString    parse_conf_tmp_dir(Dictionary *dict);

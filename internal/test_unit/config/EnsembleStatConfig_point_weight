@@ -15,7 +15,7 @@ model = "FCST";
 // Output description to be written
 // May be set separately in each "obs.field" entry
 //
-desc = "NA";
+desc = "${DESC}";
 
 //
 // Output observation type to be written
@@ -66,36 +66,14 @@ eclv_points = 0.05;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   ens_thresh   = 1.0;
-   vld_thresh   = 1.0;
-   message_type = [ "ADPSFC" ];
-   sid_inc      = [];
-   sid_exc      = [];
+   ens_thresh      = 0.75;
+   vld_thresh      = 1.0;
+   message_type    = [ "ADPSFC" ];
+   obs_quality_inc = [];
+   obs_quality_exc = [];
 
    field = [
-      {
-         name            = "TMP";
-         level           = [ "Z2" ];
-         obs_quality_inc = [];
-         obs_quality_exc = [];
-         desc            = "ALL_QTY";
-      },
-
-      {
-         name            = "TMP";
-         level           = [ "Z2" ];
-         obs_quality_inc = [ ${OBS_QUALITY_INC} ];
-         obs_quality_exc = [];
-         desc            = "QTY_INC";
-      },
-      
-      {
-         name            = "TMP";
-         level           = [ "Z2" ];
-         obs_quality_inc = [];
-         obs_quality_exc = [ ${OBS_QUALITY_EXC} ];
-         desc            = "QTY_EXC";
-      }
+      { name = "APCP"; level = "A24"; prob_cat_thresh = [ >=2.54 ]; }
    ];
 }
 obs = fcst;
@@ -155,9 +133,9 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid  = [ "FULL" ];
+   grid  = [];
    poly  = [];
-   sid   = [];
+   sid   = [ "${CONFIG_DIR}/SID_CONUS_ADPSFC_ELEV.txt" ];
    llpnt = [];
 }
 
@@ -193,18 +171,18 @@ interp = {
 // May be set separately in each "obs.field" entry
 //
 output_flag = {
-   ecnt  = BOTH;
+   ecnt  = NONE;
    rps   = NONE;
-   rhist = BOTH;
+   rhist = NONE;
    phist = NONE;
-   orank = BOTH;
+   orank = NONE;
    ssvar = NONE;
    relp  = NONE;
-   pct   = NONE;
-   pstd  = NONE;
-   pjc   = NONE;
-   prc   = NONE;
-   eclv  = NONE;
+   pct   = STAT;
+   pstd  = STAT;
+   pjc   = STAT;
+   prc   = STAT;
+   eclv  = STAT;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -213,15 +191,7 @@ output_flag = {
 // Gridded verification output types
 // May be set separately in each "obs.field" entry
 //
-nc_orank_flag = {
-   latlon    = TRUE;
-   mean      = TRUE;
-   raw       = TRUE;
-   rank      = TRUE;
-   pit       = TRUE;
-   vld_count = TRUE;
-   weight    = FALSE;
-}
+nc_orank_flag = FALSE;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -236,7 +206,7 @@ rng = {
 ////////////////////////////////////////////////////////////////////////////////
 
 grid_weight_flag  = NONE;
-point_weight_flag = NONE;
+point_weight_flag = ${POINT_WEIGHT};
 
 output_prefix = "${OUTPUT_PREFIX}";
 version       = "V12.0.0";

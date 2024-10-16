@@ -138,7 +138,7 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
             w = grid.calc_area(x, y);
          }
          else {
-            w = default_grid_weight;
+            w = default_weight;
          }
 
          // Store the current weight

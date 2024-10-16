@@ -240,7 +240,9 @@ class PointStatConfInfo {
       std::map<ConcatString,MaskPlane>   mask_area_map;
 
       // Mapping of mask names to Station ID lists
-      std::map<ConcatString,StringArray> mask_sid_map;
+      std::map<ConcatString,MaskSID>     mask_sid_map;
+
+      PointWeightType point_weight_flag;    // Point weighting flag
 
       ConcatString tmp_dir;                 // Directory for temporary files
       ConcatString output_prefix;           // String to customize output file name
