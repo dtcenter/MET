@@ -75,8 +75,8 @@
   <test name="point_stat_GRIB1_NAM_GDAS_MPR_OBTYPE">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
-      <pair><name>BEG_DS</name>         <value>-1800</value></pair>
-      <pair><name>END_DS</name>         <value>1800</value></pair>
+      <pair><name>BEG_DS</name>         <value>-300</value></pair>
+      <pair><name>END_DS</name>         <value>300</value></pair>
       <pair><name>OUTPUT_PREFIX</name>  <value>GRIB1_NAM_GDAS_MPR_OBTYPE</value></pair>
       <pair><name>CONFIG_DIR</name>     <value>&CONFIG_DIR;</value></pair>
       <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>

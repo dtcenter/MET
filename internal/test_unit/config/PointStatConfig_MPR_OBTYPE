@@ -112,12 +112,12 @@ interp = {
 ////////////////////////////////////////////////////////////////////////////////
 
 hira = {
-   flag            = FALSE;
-   width           = [ 2, 3, 4, 5 ];
+   flag            = TRUE;
+   width           = [ 3 ];
    vld_thresh      = 1.0;
    cov_thresh      = [ ==0.25 ];
    shape           = SQUARE;
-   prob_cat_thresh = [];
+   prob_cat_thresh = [ >273 ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -134,13 +134,13 @@ output_flag = {
    vl1l2  = NONE;
    val1l2 = NONE;
    vcnt   = NONE;
-   pct    = NONE;
+   pct    = STAT;
    pstd   = NONE;
    pjc    = NONE;
    prc    = NONE;
-   ecnt   = NONE;
+   ecnt   = STAT;
    rps    = NONE;
-   orank  = NONE;
+   orank  = STAT;
    eclv   = NONE;
    mpr    = STAT;
    seeps  = NONE;

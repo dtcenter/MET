@@ -1982,7 +1982,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
             conf_info.obtype_as_group_val_flag);
   
          // Reset the obtype column
-         shc.set_obtype(conf_info.vx_opt[i_vx].msg_typ[i_msg_typ].c_str());
+         shc.set_obtype(pd_ptr->msg_typ.c_str());
 
          // Reset the observation valid time
          shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
@@ -2179,7 +2179,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                false);
 
             // Reset the obtype column
-            shc.set_obtype(conf_info.vx_opt[i_vx].msg_typ[i_msg_typ].c_str());
+            shc.set_obtype(pd_ptr->msg_typ.c_str());
 
             // Reset the observation valid time
             shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
