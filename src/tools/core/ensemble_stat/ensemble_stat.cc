@@ -77,6 +77,8 @@
 //   044    06/17/24  Halley Gotway  MET #2856 Reinitialize climo_cdf pointer
 //   045    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
 //   046    10/08/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
+//   047    10/14/24  Halley Gotway  MET #2279 Add point_weight_flag option.
+//   048    10/15/24  Halley Gotway  MET #2893 Write individual pair OBTYPE.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2237,10 +2239,17 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
       // Set the header column
       shc.set_obs_thresh(na_str);
 
+      // Store current obtype value
+      string cur_obtype = shc.get_obtype();
+
       write_orank_row(shc, &pd_all,
          vx_opt.output_flag[i_orank],
          stat_at, i_stat_row,
-         txt_at[i_orank], i_txt_row[i_orank]);
+         txt_at[i_orank], i_txt_row[i_orank],
+         conf_info.obtype_as_group_val_flag);
+
+      // Reset the obtype column
+      shc.set_obtype(cur_obtype.c_str());
 
       // Reset the observation valid time
       shc.set_obs_valid_beg(vx_opt.vx_pd.beg_ut);

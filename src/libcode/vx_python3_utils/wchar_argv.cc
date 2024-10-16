@@ -96,9 +96,9 @@ void Wchar_Argv::init_from_scratch()
 
 {
 
-W_Buf = 0;
+W_Buf = nullptr;
 
-W_Argv = 0;
+W_Argv = nullptr;
 
 
 return;
@@ -132,13 +132,11 @@ void Wchar_Argv::set(const StringArray & a)
 
 {
 
-char * s = nullptr;
-char ** av = nullptr;
+int k = 0;
+int len = 0;
 ConcatString c;
 const char *method_name = "Wchar_Argv::set() -> ";
 
-
-int len = 0;
 
 for (int j=0; j<(a.n()); ++j)  {
 
@@ -148,13 +146,11 @@ for (int j=0; j<(a.n()); ++j)  {
 
 int N = len + a.n();
 
-s = new char [N];
+char * s = new char [N];
 
-av = new char * [a.n()];
+char ** av = new char * [a.n()];
 
 memset(s, 0, N);
-
-int k = 0;
 
 for (int j=0; j<(a.n()); ++j)  {
 
@@ -194,13 +190,11 @@ void Wchar_Argv::set(int _argc, char ** _argv)
 
 clear();
 
-int * len = nullptr;
+int k;
+int *len = new int [_argc];
 
 
 Argc = _argc;
-
-len = new int [Argc];
-
 
    //
    //  total length of the argument string ... 
@@ -210,9 +204,10 @@ int argv_len = 0;
 
 for (int j=0; j<_argc; ++j)  {
 
-   len[j] = m_strlen(_argv[j]);   //  we're using the len array here because
-                                //  we don't want to call m_strlen more than 
-                                //  once on each argv value
+   // we're using the len array here because
+   // we don't want to call m_strlen more than
+   // once on each argv value
+   len[j] = (_argv == nullptr) ? 0 : len[j] = m_strlen(_argv[j]);
 
    argv_len += len[j];
 
@@ -241,11 +236,11 @@ for (int j=0; j<argv_len; ++j)  {
    //  translate the individual argv values into wchar strings
    //
 
-int k = 0;
+k = 0;
 
 for (int j=0; j<Argc; ++j)  {
 
-   if ( mbstowcs(W_Buf + k, _argv[j], len[j]) == (size_t) -1 )  {
+   if ( _argv != nullptr && mbstowcs(W_Buf + k, _argv[j], len[j]) == (size_t) -1 )  {
 
       mlog << Error << "\nWchar_Argv::set() -> "
            << "mbstowcs failed for string \"" << _argv[j] << "\"\n\n";

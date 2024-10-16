@@ -181,9 +181,6 @@ class met_base_point(met_base):
          if self.use_var_id:
             self.check_data_member_string(self.obs_var_table,'obs_var_table')
 
-   #def convert_to_numpy(self, value_list):
-   #   return met_point_tools.convert_to_ndarray(value_list)
-
    def dump(self):
       met_point_tools.print_point_data(self.get_point_data())
 
@@ -346,7 +343,7 @@ class met_base_point(met_base):
 
          nc_point_obs.write_nc_file(tmp_filename, self)
          if met_base_tools.is_debug_enabled("point"):
-            met_base.log_message(f"Save to a temporary NetCDF file (point)")
+            met_base.log_message("Save to a temporary NetCDF file (point)")
       else:
          self.write_point_data_json_numpy(tmp_filename)
 
@@ -417,8 +414,8 @@ class csv_point_obs(met_base_point):
    def check_csv_record(self, csv_point_data, index):
       method_name = f"{self.__class__.__name__}.check_csv_record()"
       error_msgs = []
-      # names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs']
-      # dtype={'typ':'str', 'sid':'str', 'vld':'str', 'var':'str', 'qc':'str'}
+      # names: ['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs']
+      # dtype: {'typ':'str', 'sid':'str', 'vld':'str', 'var':'str', 'qc':'str'}
       if 11 > len(csv_point_data):
          error_msgs.append(f"{method_name} {index}-th data: missing columns. should be 11 columns, not {len(csv_point_data)} columns")
       elif 11 < len(csv_point_data):
@@ -488,7 +485,7 @@ class csv_point_obs(met_base_point):
       self.use_var_id = not self.is_grib_code()
 
       index = 0
-      #names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs']
+      #name: ['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs']
       for csv_point_record in self.point_data:
          # Build header map.
          hdr_typ_str = csv_point_record[0]
@@ -539,7 +536,7 @@ class csv_point_obs(met_base_point):
             obs_qty_map[qc_str] = qc_id
             qc_cnt += 1
 
-         # names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs']
+         # names: ['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs']
          self.obs_vid[index] = var_id
          self.obs_hid[index] = hdr_idx
          self.obs_lvl[index] = self.get_num_value(csv_point_record[7])
@@ -627,21 +624,21 @@ class met_point_obs(ABC, met_base_point):
       # - set self.input_name
       #
       # Here is a template
-      '''
-      if isinstance(args, dict):
-         in_filename = args.get('in_name',None)
-      elif isinstance(args, list):
-         in_filename = args[0]
-      else:
-         in_filename = args
-      self.input_name = in_filename
-      '''
+      #
+      #   if isinstance(args, dict):
+      #      in_filename = args.get('in_name',None)
+      #   elif isinstance(args, list):
+      #      in_filename = args[0]
+      #   else:
+      #      in_filename = args
+      #   self.input_name = in_filename
       pass
 
 
 class dummy_point_obs(met_point_obs):
 
    def read_data(self, args):
+      # Do nothing to return an empty point_obs
       pass
 
 
@@ -689,7 +686,7 @@ class met_point_tools(met_base_tools):
 
    @staticmethod
    def print_point_data(met_point_data, print_subset=True):
-      method_name = f"met_point_tools.print_point_data()"
+      method_name = "met_point_tools.print_point_data()"
       print(' === MET point data by python embedding ===')
       if print_subset:
           met_point_tools.print_data('nhdr',met_point_data['nhdr'])
@@ -714,26 +711,26 @@ class met_point_tools(met_base_tools):
           met_point_tools.print_data('obs_val',met_point_data['obs_val'])
       else:
           print(f'{method_name} All',met_point_data)
-          print(f"         nhdr: met_point_data['nhdr']")
-          print(f"         nobs: met_point_data['nobs']")
-          print(f"   use_var_id: met_point_data['use_var_id']")
-          print(f"      hdr_typ: met_point_data['hdr_typ']")
-          print(f"hdr_typ_table: met_point_data['hdr_typ_table']")
-          print(f"      hdr_sid: met_point_data['hdr_sid']")
-          print(f"hdr_sid_table: met_point_data['hdr_sid_table']")
-          print(f"      hdr_vld: met_point_data['hdr_vld']")
-          print(f"hdr_vld_table: met_point_data['hdr_vld_table']")
-          print(f"      hdr_lat: met_point_data['hdr_lat']")
-          print(f"      hdr_lon: met_point_data['hdr_lon']")
-          print(f"      hdr_elv: met_point_data['hdr_elv']")
-          print(f"      obs_hid: met_point_data['obs_hid']")
-          print(f"      obs_vid: met_point_data['obs_vid']")
-          print(f"obs_var_table: met_point_data['obs_var_table']")
-          print(f"      obs_qty: met_point_data['obs_qty']")
-          print(f"obs_qty_table: met_point_data['obs_qty_table']")
-          print(f"      obs_lvl: met_point_data['obs_lvl']")
-          print(f"      obs_hgt: met_point_data['obs_hgt']")
-          print(f"      obs_val: met_point_data['obs_val']")
+          print("         nhdr: met_point_data['nhdr']")
+          print("         nobs: met_point_data['nobs']")
+          print("   use_var_id: met_point_data['use_var_id']")
+          print("      hdr_typ: met_point_data['hdr_typ']")
+          print("hdr_typ_table: met_point_data['hdr_typ_table']")
+          print("      hdr_sid: met_point_data['hdr_sid']")
+          print("hdr_sid_table: met_point_data['hdr_sid_table']")
+          print("      hdr_vld: met_point_data['hdr_vld']")
+          print("hdr_vld_table: met_point_data['hdr_vld_table']")
+          print("      hdr_lat: met_point_data['hdr_lat']")
+          print("      hdr_lon: met_point_data['hdr_lon']")
+          print("      hdr_elv: met_point_data['hdr_elv']")
+          print("      obs_hid: met_point_data['obs_hid']")
+          print("      obs_vid: met_point_data['obs_vid']")
+          print("obs_var_table: met_point_data['obs_var_table']")
+          print("      obs_qty: met_point_data['obs_qty']")
+          print("obs_qty_table: met_point_data['obs_qty_table']")
+          print("      obs_lvl: met_point_data['obs_lvl']")
+          print("      obs_hgt: met_point_data['obs_hgt']")
+          print("      obs_val: met_point_data['obs_val']")
 
       print(' === MET point data by python embedding ===')
 

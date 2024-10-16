@@ -181,6 +181,7 @@ ____________________
   obs_summary      = NONE;
   obs_perc_value   = 50;
   message_type_group_map = [...];
+  obtype_as_group_val_flag = FALSE;
   grid_weight_flag = NONE;
   point_weight_flag = NONE;
   output_prefix    = "";

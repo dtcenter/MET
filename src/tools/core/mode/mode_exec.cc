@@ -2378,7 +2378,8 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    //
    // Store the points for each polyline
    //
-   for(i=0, n_pts=0; i<n_poly; i++) {
+   n_pts = 0;
+   for(i=0; i<n_poly; i++) {
 
       // Store the starting point for this object.
       poly_start[i] = n_pts;

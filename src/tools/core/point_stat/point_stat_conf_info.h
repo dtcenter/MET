@@ -235,6 +235,7 @@ class PointStatConfInfo {
 
       // Message type groups that should be processed together
       std::map<ConcatString,StringArray> msg_typ_group_map;
+      bool                               obtype_as_group_val_flag;
 
       // Mapping of mask names to DataPlanes
       std::map<ConcatString,MaskPlane>   mask_area_map;

@@ -114,11 +114,11 @@ bool straight_python_dataplane(const char * user_script_name,
 
 {
 
-PyObject * module_obj      = 0;
-PyObject * module_dict_obj = 0;
-PyObject * key_obj         = 0;
-PyObject * numpy_array_obj = 0;
-PyObject * attrs_dict_obj  = 0;
+PyObject * module_obj      = nullptr;
+PyObject * module_dict_obj = nullptr;
+PyObject * key_obj         = nullptr;
+PyObject * numpy_array_obj = nullptr;
+PyObject * attrs_dict_obj  = nullptr;
 ConcatString cs, user_dir, user_base;
 const char *method_name = "straight_python_dataplane() -> ";
 
