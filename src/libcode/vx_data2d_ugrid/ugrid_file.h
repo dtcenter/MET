@@ -61,7 +61,7 @@ class UGridFile {
         return ((_faceDim == nullptr) ? 0 : GET_NC_SIZE_P(_faceDim))
              * ((_faceDimY == nullptr) ? 1 : GET_NC_SIZE_P(_faceDimY));
       }
-      
+
       int getNy() const {
         return 1;
       }
@@ -166,6 +166,7 @@ class UGridFile {
       // grid member with that information.
 
       std::string find_metadata_name(std::string &key, StringArray &available_names);
+      bool find_metadata_names(std::string &key, StringArray &meta_names, StringArray &available_names);
       StringArray get_metadata_names(std::string &key);
       void read_config(ConcatString config_filename);
       void read_netcdf_grid();

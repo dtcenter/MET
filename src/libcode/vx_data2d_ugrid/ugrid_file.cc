@@ -232,11 +232,10 @@ bool UGridFile::open_metadata(const char * filepath)
 
   // Face (cell) dimension
   face_count = 1;
-  meta_name = find_metadata_name(DIM_KEYS[0], dim_names);
-  if (0 < meta_name.length()) {
+  StringArray sa;
+  bool status = find_metadata_names(DIM_KEYS[0], sa, dim_names);
+  if (status && 0 < sa.n()) {
     int data_face_count = 1;
-    StringArray sa;
-    sa.parse_css(meta_name);
     for (int i=0; i<sa.n(); i++) {
       dim = get_nc_dim(_ncMetaFile, sa[i].c_str());
       face_count *= get_dim_size(&dim);
@@ -244,6 +243,7 @@ bool UGridFile::open_metadata(const char * filepath)
       else _faceDimY = new NcDim(dim);
       NcDim face_dim = get_nc_dim(_ncFile, sa[i].c_str());
       data_face_count *= get_dim_size(&face_dim);
+cout << " DEBUG HS  sa[" <<i<<"] = " << sa[i] << "   face_count=" << face_count << ", data_face_count=" << data_face_count<< "\n";
     }
     if (face_count != data_face_count) {
       mlog << Error << "\n" << method_name
@@ -578,6 +578,22 @@ std::string UGridFile::find_metadata_name(std::string &key, StringArray &availab
 
 ////////////////////////////////////////////////////////////////////////
 
+bool UGridFile::find_metadata_names(std::string &key, StringArray &meta_names, StringArray &available_names) {
+  meta_names.clear();
+  meta_names = get_metadata_names(key);
+
+  bool found = true;
+  for (int idx=0; idx<meta_names.n(); idx++) {
+    if (!available_names.has(meta_names[idx])) {
+      found = false;
+      break;
+    }
+  }
+  return found;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 
 NcVarInfo* UGridFile::find_by_name(const char * var_name) const
 {
@@ -724,19 +740,22 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
   vector<double> d(plane_size);
 
   int length;
+  int data_size = 1;
   size_t dim_size;
   LongArray offsets;
   LongArray lengths;
   for (int k=0; k<dim_count; k++) {
     length = 1;
+    dim_size = v->getDim(k).getSize();
     if (a[k] == vx_data2d_star) {
       offsets.add(0);
-      length = plane_size;
+      length = dim_size;
     }
     else {
       offsets.add(a[k]);
       if (k != var->t_slot && k != var->z_slot) length = plane_size - a[k];
     }
+    data_size *= length;
     lengths.add(length);
     dim_size = v->getDim(k).getSize();
     if (dim_size < offsets[k]) {
@@ -748,11 +767,23 @@ bool UGridFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
     }
   }
 
+  if(data_size < plane_size) {
+    mlog << Error << "\n" << method_name
+         << "allocate memory (" << plane_size << ") is smaller than the data size ("
+         << data_size << ") for " << GET_NC_NAME_P(v) << "\"\n\n";
+    exit ( 1 );
+  }
+  else if(data_size > plane_size) {
+    mlog << Warning << "\n" << method_name
+         << "allocate memory (" << plane_size << ") is bigger than the data size ("
+         << data_size << ") for " << GET_NC_NAME_P(v) << "\"\n\n";
+  }
+
   get_nc_data(v, d.data(), lengths, offsets);
 
   double min_value = 10e10;
   double max_value = -min_value;
-  for (int x = 0; x< nx; ++x) {
+  for (int x = 0; x<nx; ++x) {
     double value = d[x];
     if( is_eq(value, missing_value) || is_eq(value, fill_value) ) {
       value = bad_data_double;
@@ -925,6 +956,11 @@ void UGridFile::read_netcdf_grid()
 
   ConcatString units_value;
   const char *method_name = "UGridFile::read_netcdf_grid() -> ";
+
+  if (0 == face_count) {
+    mlog << Error << "\n" << method_name << "The size of the data buffer can not be 0\n\n";
+    exit(1);
+  }
 
   vector<double> _lat(face_count);
   vector<double> _lon(face_count);
