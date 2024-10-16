@@ -34,8 +34,8 @@ MET Version 12.0.0-beta6 Release Notes (20241017)
      * **Add support for new point_weight_flag to the Point-Stat and Ensemble-Stat tools** (`#2279 <https://github.com/dtcenter/MET/issues/2279>`_).
      * Allow observation anomaly replacement in Anomaly Correlation Coefficient (ACC) calculation (`#2308 <https://github.com/dtcenter/MET/issues/2308>`_).
      * Enhance Point2Grid to filter quality control strings with config file options (`#2880 <https://github.com/dtcenter/MET/issues/2880>`_).
-     * **Enhance MET to calculate weighted contingency table counts and statistics** (`#2887 <https://github.com/dtcenter/MET/issues/2887>`_).
      * Refine SEEPS processing logic and output naming conventions (`#2882 <https://github.com/dtcenter/MET/issues/2882>`_).
+     * **Enhance MET to calculate weighted contingency table counts and statistics** (`#2887 <https://github.com/dtcenter/MET/issues/2887>`_).
      * Enhance the OBTYPE header column for MPR and ORANK line types (`#2893 <https://github.com/dtcenter/MET/issues/2893>`_).
      * **Enhance MET to support separate climatology datasets for both the forecast and observation inputs** (`#2924 <https://github.com/dtcenter/MET/issues/2924>`_).
      * Refine PB2NC warning messages about changing Bufr center times (`#2938 <https://github.com/dtcenter/MET/issues/2938>`_).
