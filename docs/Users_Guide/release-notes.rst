@@ -9,6 +9,42 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.0.0-beta6 Release Notes (20241017)
+-------------------------------------------------
+
+  .. dropdown:: Repository, build, and test
+
+     * Update METbaseimage to use newer versions of Atlas and ecKit (`METbaseimage#27 <https://github.com/dtcenter/METbaseimage/issues/27>`_).
+     * MET: Enhance the MET testing framework to provide a mechanism for expected failure (`METplus-Internal#23 <https://github.com/dtcenter/METplus-Internal/issues/23>`_).
+     * Fix the SonarQube findings for MET version 12.0.0 (`#2673 <https://github.com/dtcenter/MET/issues/2673>`_).
+     * Enhance the `unit.py` MET testing script to allow for expected failures (`#2937 <https://github.com/dtcenter/MET/issues/2937>`_).
+     * Modify configure.ac to define C++17 as the default compilation standard (`#2948 <https://github.com/dtcenter/MET/issues/2948>`_).
+
+  .. dropdown:: Bugfixes
+
+     * Bugfix: Fix Point2Grid processing of GFS Ocean data input (`#2936 <https://github.com/dtcenter/MET/issues/2936>`_).
+     * **Bugfix: Fix contingency table statistic bugs in the CTS and NBRCTS line types for BAGSS, SEDI CI's, ORSS, and ORSS CI's** (`#2958 <https://github.com/dtcenter/MET/issues/2958>`_).
+     * Bugfix: Fix the grid dimensions used for `point2grid_cice_set_attr_grid` unit test (`#2968 <https://github.com/dtcenter/MET/issues/2968>`_).
+     * Bugfix: Fix MTD to run on any MET-supported grid projection (`#2979 <https://github.com/dtcenter/MET/issues/2979>`_).
+
+  .. dropdown:: Enhancements
+
+     * **Enhance Series-Analysis to read its own output and incrementally update output statistics over time** (`#1371 <https://github.com/dtcenter/MET/issues/1371>`_).
+     * Enhance the `set_attr_grid` processing logic to support input files lacking a grid definition (`#1729 <https://github.com/dtcenter/MET/issues/1729>`_).
+     * **Add support for new point_weight_flag to the Point-Stat and Ensemble-Stat tools** (`#2279 <https://github.com/dtcenter/MET/issues/2279>`_).
+     * Allow observation anomaly replacement in Anomaly Correlation Coefficient (ACC) calculation (`#2308 <https://github.com/dtcenter/MET/issues/2308>`_).
+     * Enhance Point2Grid to filter quality control strings with config file options (`#2880 <https://github.com/dtcenter/MET/issues/2880>`_).
+     * Refine SEEPS processing logic and output naming conventions (`#2882 <https://github.com/dtcenter/MET/issues/2882>`_).
+     * **Enhance MET to calculate weighted contingency table counts and statistics** (`#2887 <https://github.com/dtcenter/MET/issues/2887>`_).
+     * Enhance the OBTYPE header column for MPR and ORANK line types (`#2893 <https://github.com/dtcenter/MET/issues/2893>`_).
+     * **Enhance MET to support separate climatology datasets for both the forecast and observation inputs** (`#2924 <https://github.com/dtcenter/MET/issues/2924>`_).
+     * Refine PB2NC warning messages about changing Bufr center times (`#2938 <https://github.com/dtcenter/MET/issues/2938>`_).
+
+  .. dropdown:: Documentation
+
+     * Remove the double-quotes around keywords (`#2023 <https://github.com/dtcenter/MET/issues/2023>`_).
+     * Documentation: Provide instructions for compiling MET with the C++11 standard (`#2949 <https://github.com/dtcenter/MET/issues/2949>`_).
+
 MET Version 12.0.0-beta5 Release Notes (20240710)
 -------------------------------------------------
 
@@ -17,7 +53,7 @@ MET Version 12.0.0-beta5 Release Notes (20240710)
      * Reimplement and enhance the Perl-based (unit.pl) unit test control script in Python (`#2717 <https://github.com/dtcenter/MET/issues/2717>`_).
      * Update compilation script and configuration files as needed for supported platforms (`#2753 <https://github.com/dtcenter/MET/issues/2753>`_).
      * Update tag used for the release checksum action (`#2929 <https://github.com/dtcenter/MET/issues/2929>`_).
-  				
+
   .. dropdown:: Bugfixes
 
      * Bugfix (METbaseimage): Fix the environment to correct the ncdump runtime linker error (`METbaseimage#24 <https://github.com/dtcenter/METbaseimage/issues/24>`_).
