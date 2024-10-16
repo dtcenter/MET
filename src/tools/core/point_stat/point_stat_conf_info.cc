@@ -71,6 +71,7 @@ void PointStatConfInfo::clear() {
    msg_typ_group_map.clear();
    mask_area_map.clear();
    mask_sid_map.clear();
+   point_weight_flag = PointWeightType::None;
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
@@ -150,6 +151,9 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
    // Conf: model
    model = parse_conf_string(&conf, conf_key_model);
+
+   // Conf: point_weight_flag
+   point_weight_flag = parse_conf_point_weight_flag(&conf);
 
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
@@ -378,7 +382,6 @@ void PointStatConfInfo::process_flags() {
 void PointStatConfInfo::process_masks(const Grid &grid) {
    int i, j;
    MaskPlane mp;
-   StringArray sid;
    ConcatString name;
 
    mlog << Debug(2)
@@ -444,9 +447,9 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
             mlog << Debug(3)
                  << "Processing station ID mask: "
                  << vx_opt[i].mask_sid[j] << "\n";
-            parse_sid_mask(vx_opt[i].mask_sid[j], sid, name);
-            sid_map[vx_opt[i].mask_sid[j]] = name;
-            mask_sid_map[name] = sid;
+            MaskSID ms = parse_sid_mask(vx_opt[i].mask_sid[j]);
+            sid_map[vx_opt[i].mask_sid[j]] = ms.name();
+            mask_sid_map[ms.name()] = ms;
          }
 
          // Store the name for the current station ID mask

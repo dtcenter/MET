@@ -2088,7 +2088,7 @@ void get_mask_points(const GridStatVxOpt &vx_opt,
    if(ocsd_ptr) apply_mask(*ocsd_ptr, mask_mp, pd.ocsd_na);
    else         pd.ocsd_na.add_const(bad_data_double, pd.n_obs);
    if(wgt_ptr) apply_mask(*wgt_ptr, mask_mp, pd.wgt_na);
-   else        pd.wgt_na.add_const(default_grid_weight, pd.n_obs);
+   else        pd.wgt_na.add_const(default_weight, pd.n_obs);
 
    if(ocmn_ptr && ocsd_ptr) pd.compute_climo_cdf();
 

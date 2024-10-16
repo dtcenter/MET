@@ -13,11 +13,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <cmath>
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <cmath>
 
 #include "wchar_argv.h"
 #include "concat_string.h"
@@ -152,7 +152,6 @@ char ** av = new char * [a.n()];
 
 memset(s, 0, N);
 
-
 for (int j=0; j<(a.n()); ++j)  {
 
    av[j] = s + k;
@@ -189,24 +188,26 @@ void Wchar_Argv::set(int _argc, char ** _argv)
 
 {
 
-int k;
-int argv_len = 0;
-vector<int> len(_argc, 0);
-
 clear();
 
-Argc = _argc;
+int k;
+int *len = new int [_argc];
 
+
+Argc = _argc;
 
    //
    //  total length of the argument string ... 
    //
 
+int argv_len = 0;
+
 for (int j=0; j<_argc; ++j)  {
 
-   len[j] = m_strlen(_argv[j]); //  we're using the len array here because
-                                //  we don't want to call m_strlen more than
-                                //  once on each argv value
+   // we're using the len array here because
+   // we don't want to call m_strlen more than
+   // once on each argv value
+   len[j] = (_argv == nullptr) ? 0 : len[j] = m_strlen(_argv[j]);
 
    argv_len += len[j];
 
@@ -239,7 +240,7 @@ k = 0;
 
 for (int j=0; j<Argc; ++j)  {
 
-   if ( mbstowcs(W_Buf + k, _argv[j], len[j]) == (size_t) -1 )  {
+   if ( _argv != nullptr && mbstowcs(W_Buf + k, _argv[j], len[j]) == (size_t) -1 )  {
 
       mlog << Error << "\nWchar_Argv::set() -> "
            << "mbstowcs failed for string \"" << _argv[j] << "\"\n\n";
@@ -274,6 +275,8 @@ for (int j=0; j<Argc; ++j)  {
    //
    //  done
    //
+
+if ( len )  { delete [] len;  len = nullptr; }
 
 return;
 

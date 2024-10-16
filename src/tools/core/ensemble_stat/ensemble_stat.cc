@@ -825,10 +825,11 @@ void process_point_vx() {
    // Process each point observation NetCDF file
    for(i=0; i<point_obs_file_list.n(); i++) process_point_obs(i);
 
-   // Calculate and print observation summaries
+   // Process observation summaries and point weights
    for(i=0; i<conf_info.get_n_vx(); i++) {
       conf_info.vx_opt[i].vx_pd.calc_obs_summary();
       conf_info.vx_opt[i].vx_pd.print_obs_summary();
+      conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_flag);
    }
 
    // Loop through each of the fields to be verified

@@ -600,16 +600,14 @@ StringArray parse_conf_message_type(Dictionary *dict, bool error_out) {
 ///////////////////////////////////////////////////////////////////////////////
 
 StringArray parse_conf_sid_list(Dictionary *dict, const char *conf_key) {
-   StringArray sa, cur, sid_sa;
-   ConcatString mask_name;
+   StringArray sid_sa;
    const char *method_name = "parse_conf_sid_list() -> ";
 
-   sa = parse_conf_string_array(dict, conf_key, method_name);
+   StringArray sa(parse_conf_string_array(dict, conf_key, method_name));
 
-   // Parse station ID's to exclude from each entry
+   // Append to the list of station ID's
    for(int i=0; i<sa.n(); i++) {
-     parse_sid_mask(string(sa[i]), cur, mask_name);
-      sid_sa.add(cur);
+      sid_sa.add(parse_sid_mask_as_list(string(sa[i])));
    }
 
    mlog << Debug(4) << method_name
@@ -631,33 +629,29 @@ StringArray parse_conf_sid_list(Dictionary *dict, const char *conf_key) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-void parse_sid_mask(const ConcatString &mask_sid_str,
-                    StringArray &mask_sid, ConcatString &mask_name) {
-   ifstream in;
-   ConcatString tmp_file;
+MaskSID parse_sid_mask(const ConcatString &mask_sid_str) {
+   MaskSID mask_sid;
    std::string sid_str;
-
-   // Initialize
-   mask_sid.clear();
-   mask_name = na_str;
+   const char *method_name = "parse_sid_mask() -> ";
 
    // Check for an empty length string
-   if(mask_sid_str.empty()) return;
+   if(mask_sid_str.empty()) return mask_sid;
 
    // Replace any instances of MET_BASE with it's expanded value
-   tmp_file = replace_path(mask_sid_str.c_str());
+   ConcatString tmp_file(replace_path(mask_sid_str.c_str()));
 
    // Process file name
    if(file_exists(tmp_file.c_str())) {
 
-      mlog << Debug(4) << "parse_sid_mask() -> "
+      mlog << Debug(4) << method_name
            << "parsing station ID masking file \"" << tmp_file << "\"\n";
 
       // Open the mask station id file specified
+      ifstream in;
       in.open(tmp_file.c_str());
 
       if(!in) {
-         mlog << Error << "\nparse_sid_mask() -> "
+         mlog << Error << "\n" << method_name
               << "Can't open the station ID masking file \""
               << tmp_file << "\".\n\n";
          exit(1);
@@ -665,7 +659,7 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
 
       // Store the first entry as the name of the mask
       in >> sid_str;
-      mask_name = sid_str;
+      mask_sid.set_name(sid_str);
 
       // Store the rest of the entries as masking station ID's
       while(in >> sid_str) mask_sid.add(sid_str.c_str());
@@ -673,9 +667,9 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
       // Close the input file
       in.close();
 
-      mlog << Debug(4) << "parse_sid_mask() -> "
+      mlog << Debug(4) << method_name
            << "parsed " << mask_sid.n() << " station ID's for the \""
-           << mask_name << "\" mask from file \"" << tmp_file << "\"\n";
+           << mask_sid.name() << "\" mask from file \"" << tmp_file << "\"\n";
    }
    // Process list of strings
    else {
@@ -683,19 +677,19 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
       // Print a warning if the string contains a dot which suggests
       // the user was trying to specify a file name.
       if(check_reg_exp("[.]", mask_sid_str.c_str())) {
-         mlog << Warning << "\nparse_sid_mask() -> "
+         mlog << Warning << "\n" << method_name
               << "unable to process \"" << mask_sid_str
               << "\" as a file name and processing it as a single "
               << "station ID mask instead.\n\n";
       }
 
-      mlog << Debug(4) << "parse_sid_mask() -> "
+      mlog << Debug(4) << method_name
            << "storing single station ID mask \"" << mask_sid_str << "\"\n";
 
       // Check for embedded whitespace or slashes
       if(check_reg_exp(ws_reg_exp, mask_sid_str.c_str()) ||
          check_reg_exp("[/]", mask_sid_str.c_str())) {
-         mlog << Error << "\nparse_sid_mask() -> "
+         mlog << Error << "\n" << method_name
               << "masking station ID string can't contain whitespace or "
               << "slashes \"" << mask_sid_str << "\".\n\n";
          exit(1);
@@ -708,15 +702,16 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
       // One elements means no colon was specified
       if(sa.n() == 1) {
          mask_sid.add_css(sa[0]);
-         mask_name = ( mask_sid.n() == 1 ? mask_sid[0] : "MASK_SID" );
+         mask_sid.set_name((mask_sid.n() == 1 ?
+                            mask_sid.sid_map().begin()->first : "MASK_SID"));
       }
       // Two elements means one colon was specified
       else if(sa.n() == 2) {
-         mask_name = sa[0];
          mask_sid.add_css(sa[1]);
+         mask_sid.set_name(sa[0]);
       }
       else {
-         mlog << Error << "\nparse_sid_mask() -> "
+         mlog << Error << "\n" << method_name
               << "masking station ID string may contain at most one colon to "
               << "specify the mask name \"" << mask_sid_str << "\".\n\n";
          exit(1);
@@ -724,14 +719,26 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
 
    }
 
-   // Sort the mask_sid's
-   mask_sid.sort();
-   
-   return;
+   return mask_sid;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+StringArray parse_sid_mask_as_list(const ConcatString &mask_sid_str) {
+
+   MaskSID ms = parse_sid_mask(mask_sid_str);
+
+   StringArray sa;
+   for(const auto &pair : ms.sid_map()) sa.add(pair.first);
+
+   return sa;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Code for MaskLatLon struct
+//
+///////////////////////////////////////////////////////////////////////////////
 
 void MaskLatLon::clear() {
    name.clear();
@@ -763,7 +770,6 @@ MaskLatLon &MaskLatLon::operator=(const MaskLatLon &a) noexcept {
    }
    return *this;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -2189,9 +2195,10 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
 GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
    GridWeightType t = GridWeightType::None;
    int v;
+   const char *method_name = "parse_conf_grid_weight_flag() -> ";
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_grid_weight_flag() -> "
+      mlog << Error << "\n" << method_name
            << "empty dictionary!\n\n";
       exit(1);
    }
@@ -2204,9 +2211,38 @@ GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
    else if(v == conf_const.lookup_int(conf_val_cos_lat)) t = GridWeightType::Cos_Lat;
    else if(v == conf_const.lookup_int(conf_val_area))    t = GridWeightType::Area;
    else {
-      mlog << Error << "\nparse_conf_grid_weight_flag() -> "
+      mlog << Error << "\n" << method_name
            << "Unexpected config file value of " << v << " for \""
            << conf_key_grid_weight_flag << "\".\n\n";
+      exit(1);
+   }
+
+   return t;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PointWeightType parse_conf_point_weight_flag(Dictionary *dict) {
+   PointWeightType t = PointWeightType::None;
+   int v;
+   const char *method_name = "parse_conf_point_weight_flag() -> ";
+
+   if(!dict) {
+      mlog << Error << "\n" << method_name
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Get the integer flag value for the current entry
+   v = dict->lookup_int(conf_key_point_weight_flag);
+
+   // Convert integer to enumerated GridWeightType
+        if(v == conf_const.lookup_int(conf_val_none)) t = PointWeightType::None;
+   else if(v == conf_const.lookup_int(conf_val_sid))  t = PointWeightType::SID;
+   else {
+      mlog << Error << "\n" << method_name
+           << "Unexpected config file value of " << v << " for \""
+           << conf_key_point_weight_flag << "\".\n\n";
       exit(1);
    }
 
