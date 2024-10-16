@@ -221,6 +221,7 @@ class EnsembleStatConfInfo {
       // Message type groups that should be processed together
       std::map<ConcatString,StringArray> msg_typ_group_map;
       StringArray                        msg_typ_sfc;
+      bool                               obtype_as_group_val_flag;
 
       // Mapping of mask names to MaskPlanes
       std::map<ConcatString,MaskPlane>   mask_area_map;

@@ -667,6 +667,25 @@ used.
      { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
   ];
 
+obtype_as_group_val_flag
+------------------------
+
+The "obtype_as_group_val_flag" entry is a boolean that controls how the
+OBTYPE header column is populated for message type groups defined in
+"message_type_group_map". If set to TRUE and when writing matched pair
+line types (MPR, SEEPS_MPR, and ORANK), write OBTYPE as the group map
+*value*, i.e. the input message type for each individual observation.
+If set to FALSE (default) and for all other line types, write OBTYPE
+as the group map key, i.e. the name of the message type group.
+
+For example, if FALSE, write the OBTYPE column in the MPR line type
+as the "ANYAIR" message type group name. If TRUE, write OBTYPE as "AIRCAR"
+or "AIRCFT", based on the input message type of each point observation.
+
+.. code-block:: none
+
+  obtyp_as_group_val_flag = FALSE;
+
 message_type_map
 ----------------
 

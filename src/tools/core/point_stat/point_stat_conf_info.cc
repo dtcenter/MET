@@ -69,6 +69,7 @@ void PointStatConfInfo::clear() {
    topo_use_obs_thresh.clear();
    topo_interp_fcst_thresh.clear();
    msg_typ_group_map.clear();
+   obtype_as_group_val_flag = false;
    mask_area_map.clear();
    mask_sid_map.clear();
    point_weight_flag = PointWeightType::None;
@@ -177,6 +178,10 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 
    // Conf: message_type_group_map
    msg_typ_group_map = parse_conf_message_type_group_map(&conf);
+
+   // Conf: obtype_as_group_val_flag
+   obtype_as_group_val_flag =
+      conf.lookup_bool(conf_key_obtype_as_group_val_flag);
 
    // Conf: fcst.field and obs.field
    fdict = conf.lookup_array(conf_key_fcst_field);

@@ -25,8 +25,8 @@ regrid = {
 ////////////////////////////////////////////////////////////////////////////////
 
 obs_window = {
-   beg = -1800;
-   end =  1800;
+   beg = ${BEG_DS};
+   end = ${END_DS};
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,36 +38,6 @@ cnt_logic   = UNION;
 wind_thresh = [ NA ];
 wind_logic  = UNION;
 eclv_points = 0.05;
-
-fcst = {
-   sid_inc = [];
-   sid_exc = [];
-   obs_quality_inc  = [];
-   obs_quality_exc  = [];
-
-   name         = "TMP";
-   level        = "Z2";
-   message_type = [ "ADPSFC", "SFCSHP" ];
-
-   field = [
-      {      desc = "TOPO_FALSE_LAND_FALSE";
-        topo_mask = { flag = FALSE; };
-        land_mask = { flag = FALSE; }; },
-      {      desc = "TOPO_TRUE_LAND_FALSE";
-        topo_mask = { flag = TRUE;  };
-        land_mask = { flag = FALSE; }; },
-      {      desc = "TOPO_FALSE_LAND_TRUE";
-        topo_mask = { flag = FALSE;  };
-        land_mask = { flag = TRUE; }; },
-      {      desc = "TOPO_TRUE_LAND_TRUE";
-        topo_mask = { flag = TRUE;  };
-        land_mask = { flag = TRUE; }; }
-   ];
-
-}
-obs = fcst;
-
-////////////////////////////////////////////////////////////////////////////////
 
 //
 // Mapping of message type group name to comma-separated list of values.
@@ -81,38 +51,28 @@ message_type_group_map = [
    { key = "WATERSF"; val = "SFCSHP";                             }
 ];
 
-obtype_as_group_val_flag = FALSE;
+obtype_as_group_val_flag = TRUE;
+
+fcst = {
+   sid_inc = [];
+   sid_exc = [];
+   obs_quality_inc = [];
+   obs_quality_exc = [];
+
+   message_type = [ "SURFACE" ];
+
+   field = [
+      { name = "TMP"; level = "Z2"; }
+   ];
+
+}
+obs = fcst;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 climo_mean = fcst;
 climo_mean = {
    file_name = [ ${CLIMO_FILE} ];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Land/Sea mask
-//
-land_mask = {
-   flag      = FALSE;
-   file_name = [ ${GEOG_FILE} ];
-   field     = { name = "LAND"; level = "L0"; }
-   regrid    = { method = NEAREST; width = 1; }
-   thresh    = eq1;
-}
-
-//
-// Topography
-//
-topo_mask = {
-   flag               = FALSE;
-   file_name          = [ ${GEOG_FILE} ];
-   field              = { name = "HGT"; level = "Z0"; }
-   regrid             = { method = BILIN; width = 2; }
-   use_obs_thresh     = ge-100&&le100;
-   interp_fcst_thresh = ge-50&&le50;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -142,20 +102,22 @@ interp = {
    vld_thresh = 1.0;
 
    type = [
-      { method = NEAREST;    width = 1; },
-      { method = GEOG_MATCH; width = 3; }
+      {
+         method = NEAREST;
+         width  = 1;
+      }
    ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 hira = {
-   flag            = FALSE;
-   width           = [ 2, 3, 4, 5 ];
+   flag            = TRUE;
+   width           = [ 3 ];
    vld_thresh      = 1.0;
    cov_thresh      = [ ==0.25 ];
    shape           = SQUARE;
-   prob_cat_thresh = [];
+   prob_cat_thresh = [ >273 ];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -166,21 +128,21 @@ output_flag = {
    cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = NONE;
-   sl1l2  = BOTH;
-   sal1l2 = NONE;
+   cnt    = STAT;
+   sl1l2  = STAT;
+   sal1l2 = STAT;
    vl1l2  = NONE;
    val1l2 = NONE;
    vcnt   = NONE;
-   pct    = NONE;
+   pct    = STAT;
    pstd   = NONE;
    pjc    = NONE;
    prc    = NONE;
-   ecnt   = NONE;
-   orank  = NONE;
+   ecnt   = STAT;
    rps    = NONE;
+   orank  = STAT;
    eclv   = NONE;
-   mpr    = BOTH;
+   mpr    = STAT;
    seeps  = NONE;
    seeps_mpr = NONE;
 }

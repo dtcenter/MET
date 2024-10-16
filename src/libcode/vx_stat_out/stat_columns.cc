@@ -1548,6 +1548,7 @@ void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
                    STATOutputType out_type,
                    AsciiTable &stat_at, int &stat_row,
                    AsciiTable &txt_at, int &txt_row,
+                   bool update_obtype,
                    bool update_thresh) {
 
    // MPR line type
@@ -1566,6 +1567,9 @@ void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
 
    // Write a line for each matched pair
    for(int i=0; i<pd_ptr->n_obs; i++) {
+
+      // MET #2893 write individual obs message type
+      if(update_obtype) shc.set_obtype(pd_ptr->typ_sa[i].c_str());
 
       // Set the observation valid time
       shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
@@ -1645,6 +1649,7 @@ void write_seeps_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
                          STATOutputType out_type,
                          AsciiTable &stat_at, int &stat_row,
                          AsciiTable &txt_at, int &txt_row,
+                         bool update_obtype,
                          bool update_thresh) {
 
    // SEEPS line type
@@ -1667,6 +1672,9 @@ void write_seeps_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
       if(i >= pd_ptr->seeps_mpr.size()) break;
       if(!pd_ptr->seeps_mpr[i] ||
          is_bad_data(pd_ptr->seeps_mpr[i]->score)) continue;
+
+      // MET #2893 write individual obs message type
+      if(update_obtype) shc.set_obtype(pd_ptr->typ_sa[i].c_str());
 
       // Set the observation valid time
       shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
@@ -1899,7 +1907,8 @@ void write_phist_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
                      STATOutputType out_type,
                      AsciiTable &stat_at, int &stat_row,
-                     AsciiTable &txt_at, int &txt_row) {
+                     AsciiTable &txt_at, int &txt_row,
+                     bool update_obtype) {
 
    // Observation Rank line type
    shc.set_line_type(stat_orank_str);
@@ -1912,6 +1921,9 @@ void write_orank_row(StatHdrColumns &shc, const PairDataEnsemble *pd_ptr,
 
    // Write a line for each ensemble pair
    for(int i=0; i<pd_ptr->n_obs; i++) {
+
+      // MET #2893 write individual obs message type
+      if(update_obtype) shc.set_obtype(pd_ptr->typ_sa[i].c_str());
 
       // Set the observation valid time
       shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
