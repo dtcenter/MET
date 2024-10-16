@@ -243,7 +243,6 @@ bool UGridFile::open_metadata(const char * filepath)
       else _faceDimY = new NcDim(dim);
       NcDim face_dim = get_nc_dim(_ncFile, sa[i].c_str());
       data_face_count *= get_dim_size(&face_dim);
-cout << " DEBUG HS  sa[" <<i<<"] = " << sa[i] << "   face_count=" << face_count << ", data_face_count=" << data_face_count<< "\n";
     }
     if (face_count != data_face_count) {
       mlog << Error << "\n" << method_name
