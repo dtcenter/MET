@@ -24,7 +24,7 @@ MET Version 12.0.0-beta6 Release Notes (20241017)
 
      * Bugfix: Fix Point2Grid processing of GFS Ocean data input (`#2936 <https://github.com/dtcenter/MET/issues/2936>`_).
      * **Bugfix: Fix contingency table statistic bugs in the CTS and NBRCTS line types for BAGSS, SEDI CI's, ORSS, and ORSS CI's** (`#2958 <https://github.com/dtcenter/MET/issues/2958>`_).
-     * Bugfix: Bugfix: Fix the grid dimensions used for `point2grid_cice_set_attr_grid` unit test (`#2968 <https://github.com/dtcenter/MET/issues/2968>`_).
+     * Bugfix: Fix the grid dimensions used for `point2grid_cice_set_attr_grid` unit test (`#2968 <https://github.com/dtcenter/MET/issues/2968>`_).
      * Bugfix: Fix MTD to run on any MET-supported grid projection (`#2979 <https://github.com/dtcenter/MET/issues/2979>`_).
 
   .. dropdown:: Enhancements
