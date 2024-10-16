@@ -129,13 +129,14 @@ am__libvx_util_a_SOURCES_DIST = ascii_table.cc ascii_table.h \
 	interp_util.h two_to_one.cc two_to_one.h get_filenames.cc \
 	get_filenames.h util_constants.h bool_to_string.h \
 	empty_string.h polyline.h polyline.cc mask_poly.h mask_poly.cc \
-	read_fortran_binary.h read_fortran_binary.cc met_buffer.h \
-	met_buffer.cc smart_buffer.h smart_buffer.cc vx_util.h \
-	CircularTemplate.h CircularTemplate.cc GridTemplate.h \
-	GridTemplate.cc GridPoint.h GridPoint.cc GridOffset.h \
-	GridOffset.cc observation.h observation.cc stat_column_defs.h \
-	handle_openmp.h handle_openmp.cc RectangularTemplate.h \
-	RectangularTemplate.cc python_line.h python_line.cc
+	mask_sid.h mask_sid.cc read_fortran_binary.h \
+	read_fortran_binary.cc met_buffer.h met_buffer.cc \
+	smart_buffer.h smart_buffer.cc vx_util.h CircularTemplate.h \
+	CircularTemplate.cc GridTemplate.h GridTemplate.cc GridPoint.h \
+	GridPoint.cc GridOffset.h GridOffset.cc observation.h \
+	observation.cc stat_column_defs.h handle_openmp.h \
+	handle_openmp.cc RectangularTemplate.h RectangularTemplate.cc \
+	python_line.h python_line.cc
 @ENABLE_PYTHON_TRUE@am__objects_1 =  \
 @ENABLE_PYTHON_TRUE@	libvx_util_a-python_line.$(OBJEXT)
 am__objects_2 = $(am__objects_1)
@@ -172,6 +173,7 @@ am_libvx_util_a_OBJECTS = libvx_util_a-ascii_table.$(OBJEXT) \
 	libvx_util_a-get_filenames.$(OBJEXT) \
 	libvx_util_a-polyline.$(OBJEXT) \
 	libvx_util_a-mask_poly.$(OBJEXT) \
+	libvx_util_a-mask_sid.$(OBJEXT) \
 	libvx_util_a-read_fortran_binary.$(OBJEXT) \
 	libvx_util_a-met_buffer.$(OBJEXT) \
 	libvx_util_a-smart_buffer.$(OBJEXT) \
@@ -230,6 +232,7 @@ am__depfiles_remade = ./$(DEPDIR)/libvx_util_a-CircularTemplate.Po \
 	./$(DEPDIR)/libvx_util_a-main.Po \
 	./$(DEPDIR)/libvx_util_a-make_path.Po \
 	./$(DEPDIR)/libvx_util_a-mask_poly.Po \
+	./$(DEPDIR)/libvx_util_a-mask_sid.Po \
 	./$(DEPDIR)/libvx_util_a-memory.Po \
 	./$(DEPDIR)/libvx_util_a-met_buffer.Po \
 	./$(DEPDIR)/libvx_util_a-normalize.Po \
@@ -508,6 +511,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                empty_string.h \
                polyline.h polyline.cc \
                mask_poly.h mask_poly.cc \
+               mask_sid.h mask_sid.cc \
                read_fortran_binary.h read_fortran_binary.cc \
                met_buffer.h met_buffer.cc \
                smart_buffer.h smart_buffer.cc  \
@@ -602,6 +606,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-main.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-make_path.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-mask_poly.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-mask_sid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-memory.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-met_buffer.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_util_a-normalize.Po@am__quote@ # am--include-marker
@@ -1128,6 +1133,20 @@ libvx_util_a-mask_poly.obj: mask_poly.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_util_a-mask_poly.obj `if test -f 'mask_poly.cc'; then $(CYGPATH_W) 'mask_poly.cc'; else $(CYGPATH_W) '$(srcdir)/mask_poly.cc'; fi`
 
+libvx_util_a-mask_sid.o: mask_sid.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_util_a-mask_sid.o -MD -MP -MF $(DEPDIR)/libvx_util_a-mask_sid.Tpo -c -o libvx_util_a-mask_sid.o `test -f 'mask_sid.cc' || echo '$(srcdir)/'`mask_sid.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_util_a-mask_sid.Tpo $(DEPDIR)/libvx_util_a-mask_sid.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mask_sid.cc' object='libvx_util_a-mask_sid.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_util_a-mask_sid.o `test -f 'mask_sid.cc' || echo '$(srcdir)/'`mask_sid.cc
+
+libvx_util_a-mask_sid.obj: mask_sid.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_util_a-mask_sid.obj -MD -MP -MF $(DEPDIR)/libvx_util_a-mask_sid.Tpo -c -o libvx_util_a-mask_sid.obj `if test -f 'mask_sid.cc'; then $(CYGPATH_W) 'mask_sid.cc'; else $(CYGPATH_W) '$(srcdir)/mask_sid.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_util_a-mask_sid.Tpo $(DEPDIR)/libvx_util_a-mask_sid.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='mask_sid.cc' object='libvx_util_a-mask_sid.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_util_a-mask_sid.obj `if test -f 'mask_sid.cc'; then $(CYGPATH_W) 'mask_sid.cc'; else $(CYGPATH_W) '$(srcdir)/mask_sid.cc'; fi`
+
 libvx_util_a-read_fortran_binary.o: read_fortran_binary.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_util_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_util_a-read_fortran_binary.o -MD -MP -MF $(DEPDIR)/libvx_util_a-read_fortran_binary.Tpo -c -o libvx_util_a-read_fortran_binary.o `test -f 'read_fortran_binary.cc' || echo '$(srcdir)/'`read_fortran_binary.cc
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_util_a-read_fortran_binary.Tpo $(DEPDIR)/libvx_util_a-read_fortran_binary.Po
@@ -1440,6 +1459,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_util_a-main.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-make_path.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-mask_poly.Po
+	-rm -f ./$(DEPDIR)/libvx_util_a-mask_sid.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-memory.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-met_buffer.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-normalize.Po
@@ -1531,6 +1551,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_util_a-main.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-make_path.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-mask_poly.Po
+	-rm -f ./$(DEPDIR)/libvx_util_a-mask_sid.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-memory.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-met_buffer.Po
 	-rm -f ./$(DEPDIR)/libvx_util_a-normalize.Po

@@ -59,6 +59,7 @@
 #include "empty_string.h"
 #include "polyline.h"
 #include "mask_poly.h"
+#include "mask_sid.h"
 #include "read_fortran_binary.h"
 #include "stat_column_defs.h"
 

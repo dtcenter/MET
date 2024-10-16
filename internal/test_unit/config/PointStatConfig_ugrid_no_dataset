@@ -160,8 +160,11 @@ ugrid_coordinates_file = "${MET_TEST_INPUT}/ugrid_data/mpas/static.40962_reduced
 
 duplicate_flag = NONE;
 rank_corr_flag = TRUE;
-tmp_dir        = "/tmp";
-output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V12.0.0";
+
+point_weight_flag = NONE;
+
+tmp_dir       = "/tmp";
+output_prefix = "${OUTPUT_PREFIX}";
+version       = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

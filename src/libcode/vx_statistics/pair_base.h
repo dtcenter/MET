@@ -76,10 +76,10 @@ class PairBase {
       //////////////////////////////////////////////////////////////////
 
       // Masking area applied to the forecast and climo fields
-      ConcatString  mask_name;
+      ConcatString   mask_name;
       MaskPlane     *mask_area_ptr;  // Pointer to the masking MaskPlane
                                      // which is not allocated
-      StringArray   *mask_sid_ptr;   // Pointer to masking station ID list
+      MaskSID       *mask_sid_ptr;   // Pointer to masking station ID list
                                      // which is not allocated
       MaskLatLon    *mask_llpnt_ptr; // Pointer to Lat/Lon thresholds
                                      // which is not allocated
@@ -139,9 +139,9 @@ class PairBase {
 
       bool is_point_vx() const;
 
-      void set_mask_name(const char *);
+      void set_mask_name(const std::string &);
       void set_mask_area_ptr(MaskPlane *);
-      void set_mask_sid_ptr(StringArray *);
+      void set_mask_sid_ptr(MaskSID *);
       void set_mask_llpnt_ptr(MaskLatLon *);
 
       void set_climo_cdf_info_ptr(const ClimoCDFInfo *);
@@ -180,9 +180,11 @@ class PairBase {
                          unixtime, double, double, double,
                          const char *, const ClimoPntInfo &, double);
 
-      void add_grid_obs(double, const ClimoPntInfo &, double);
+      void add_grid_obs(double,
+                        const ClimoPntInfo &, double);
       
-      void add_grid_obs(double, double, double, const ClimoPntInfo &, double);
+      void add_grid_obs(double, double, double,
+                        const ClimoPntInfo &, double);
 
       void add_climo(double, const ClimoPntInfo &);
 
@@ -196,6 +198,7 @@ class PairBase {
 
       void calc_obs_summary();
 
+      void set_point_weight(const PointWeightType);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -353,7 +356,7 @@ class VxPairBase {
       void set_msg_typ(int, const char *);
       void set_msg_typ_vals(int, const StringArray &);
       void set_mask_area(int, const char *, MaskPlane *);
-      void set_mask_sid(int, const char *, StringArray *);
+      void set_mask_sid(int, const char *, MaskSID *);
       void set_mask_llpnt(int, const char *, MaskLatLon *);
 
       void set_interp(int i_interp, const char *interp_mthd_str, int width,
@@ -379,6 +382,7 @@ class VxPairBase {
 
       void print_obs_summary() const;
       void calc_obs_summary();
+      void set_point_weight(const PointWeightType);
 
       bool is_keeper_sid(const char *, const char *);
       bool is_keeper_var(const char *, const char *, int);
