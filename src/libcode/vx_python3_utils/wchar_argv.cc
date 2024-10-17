@@ -206,10 +206,7 @@ for (int j=0; j<_argc; ++j)  {
    // we're using the len array here because
    // we don't want to call m_strlen more than
    // once on each argv value
-   if (_argv) {
-      string arg_str = _argv[j];
-      len[j] = arg_str.length();
-   }
+   if (_argv && _argv[j]) len[j] = m_strlen(_argv[j]);
 
    argv_len += len[j];
 
