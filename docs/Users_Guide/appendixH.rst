@@ -29,7 +29,7 @@ To correctly parse the UGRID topology, MET needs the following information that 
     - Description
     - Required
   * - dim_face
-    - Dimension name for UGRID cells
+    - Dimension name for UGRID cells or "<lon_dim_name>,<lat_dim_name>" for non UGRID data like tripolar data
     - Required
   * - lat_face
     - Coordinate variable name for the latitude of each UGRID cell
