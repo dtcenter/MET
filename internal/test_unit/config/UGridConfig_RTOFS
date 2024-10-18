@@ -1,0 +1,27 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Unstructured grid configuration file.
+//
+// UGridConfig_mpas at the current working directory replaces the settings here.
+// For additional or updated information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Dimensions and variables mapping for RTOFS dataset
+//
+ugrid_metadata_map = [
+   { key = "dim_face";  val = "X,Y"; },
+   { key = "dim_time";  val = "MT"; },
+   { key = "dim_vert";  val = ""; }, // optional
+   { key = "lat_face";  val = "Latitude"; },
+   { key = "lon_face";  val = "Longitude"; },
+   { key = "vert_face"; val = ""; },       // optional
+   { key = "time";      val = "MT"; }
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
+version = "V12.0.0";
+
+////////////////////////////////////////////////////////////////////////////////

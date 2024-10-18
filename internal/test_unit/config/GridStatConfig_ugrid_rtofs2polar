@@ -1,0 +1,191 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Grid-Stat configuration file.
+//
+// For additional information, see the MET_BASE/config/README file.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+// model =
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+// desc =
+
+//
+// Output observation type to be written
+//
+// obtype =
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+//
+regrid = {
+  to_grid = "${MET_TEST_INPUT}/model_data/tripolar/seaice_conc_daily_nh_1978_v04r00.nc";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//censor_thresh =
+//censor_val =
+//cat_thresh =
+cnt_thresh   = [ NA ];
+cnt_logic    = UNION;
+wind_thresh  = [ NA ];
+wind_logic   = UNION;
+eclv_points  = 0.05;
+//nc_pairs_var_name =
+nc_pairs_var_suffix = "";
+//hss_ec_value =
+
+rank_corr_flag   = FALSE;
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+  file_type = NETCDF_UGRID;
+  field = [
+    { 
+      name  = "ice_temperature";
+      level = "(0,*,*)";
+    }
+  ];
+}
+
+obs = {
+  file_type = NETCDF_NCCF;
+  field = [
+    { 
+      name  = "cdr_seaice_conc";
+      level = "(0,*,*)";
+    }
+  ];
+}
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Climatology mean data
+//
+//climo_mean = {
+
+
+//climo_stdev = {
+
+//
+// May be set separately in each "obs.field" entry
+//
+//climo_cdf = {
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+// mask = {
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 0;
+   rng      = "mt19937";
+   seed     = "";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Data smoothing methods
+//
+//interp = {
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Neighborhood methods
+//
+nbrhd = {
+   field      = BOTH;
+   vld_thresh = 1.0;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Fourier decomposition
+// May be set separately in each "obs.field" entry
+//
+//fourier = {
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Gradient statistics
+// May be set separately in each "obs.field" entry
+//
+gradient = {
+   dx = [ 1 ];
+   dy = [ 1 ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Distance Map statistics
+// May be set separately in each "obs.field" entry
+//
+//distance_map = {
+
+
+////////////////////////////////////////////////////////////////////////////////
+// Threshold for SEEPS p1 (Probability of being dry)
+
+//seeps_p1_thresh =
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+//
+output_flag = {
+  mpr = STAT;
+}
+
+//
+// NetCDF matched pairs output file
+// May be set separately in each "obs.field" entry
+//
+// nc_pairs_flag = {
+
+////////////////////////////////////////////////////////////////////////////////
+
+//ugrid_dataset =
+
+//ugrid_max_distance_km =
+
+//ugrid_coordinates_file =
+
+////////////////////////////////////////////////////////////////////////////////
+
+//grid_weight_flag =
+
+tmp_dir = "/tmp";
+
+output_prefix = "${OUTPUT_PREFIX}";
+
+////////////////////////////////////////////////////////////////////////////////
+

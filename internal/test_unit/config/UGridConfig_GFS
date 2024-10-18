@@ -1,0 +1,27 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Unstructured grid configuration file.
+//
+// UGridConfig_mpas at the current working directory replaces the settings here.
+// For additional or updated information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Dimensions and variables mapping for GFS dataset
+//
+ugrid_metadata_map = [
+   { key = "dim_face";  val = "xh,yh"; },
+   { key = "dim_time";  val = "time"; },
+   { key = "dim_vert";  val = ""; }, // optional
+   { key = "lat_face";  val = "geolat"; },
+   { key = "lon_face";  val = "geolon"; },
+   { key = "vert_face"; val = ""; },       // optional
+   { key = "time";      val = "time"; }
+];
+
+////////////////////////////////////////////////////////////////////////////////
+
+version = "V12.0.0";
+
+////////////////////////////////////////////////////////////////////////////////
