@@ -24,7 +24,7 @@ version = '12.0.0-beta6'
 verinfo = version
 release = f'{version}'
 release_year = '2024'
-release_date = f'{release_year}-10-17'
+release_date = f'{release_year}-10-18'
 copyright = f'{release_year}, {author}'
 
 # -- General configuration ---------------------------------------------------
