@@ -58,6 +58,79 @@
     </output>
   </test>
 
+  <test name="grid_stat_ugrid_gfs_to_polar">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_GFS_POLAR</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/tripolar/gfs.ocean.t00z.6hr_avg.f006.SST.nc \
+      &DATA_DIR_MODEL;/tripolar/seaice_conc_daily_nh_1978_v04r00.nc \
+      &CONFIG_DIR;/GridStatConfig_ugrid_gfs2polar \
+      -ugrid_config &CONFIG_DIR;/UGridConfig_GFS \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_GFS_POLAR_000000L_20200102_030000V_pairs.nc</exist>
+    </output>
+  </test>
+
+  <test name="grid_stat_ugrid_gfs">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_GFS</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/tripolar/gfs.ocean.t00z.6hr_avg.f006.SST.nc \
+      &DATA_DIR_MODEL;/tripolar/gfs.ocean.t00z.6hr_avg.f012.SST.nc \
+      &CONFIG_DIR;/GridStatConfig_ugrid_gfs \
+      -ugrid_config &CONFIG_DIR;/UGridConfig_GFS \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_GFS_000000L_20200102_030000V_pairs.nc</exist>
+    </output>
+  </test>
+
+  <test name="grid_stat_ugrid_rtofs_to_polar">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_RTOFS_TO_POLAR</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/tripolar/rtofs_glo_2ds_f006_ice.nc \
+      &DATA_DIR_MODEL;/tripolar/seaice_conc_daily_nh_1978_v04r00.nc \
+      &CONFIG_DIR;/GridStatConfig_ugrid_rtofs2polar \
+      -ugrid_config &CONFIG_DIR;/UGridConfig_RTOFS \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_RTOFS_TO_POLAR_000000L_19001231_000000V_pairs.nc</exist>
+    </output>
+  </test>
+
+  <!-- commented out because of execition time (more than 15 minutes at seneca)
+  <test name="grid_stat_ugrid_rtofs">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name>   <value>UGRID_RTOFS</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/tripolar/rtofs_glo_2ds_f006_ice.nc \
+      &DATA_DIR_MODEL;/tripolar/rtofs_glo_2ds_f006_ice_coverage.nc \
+      &CONFIG_DIR;/GridStatConfig_ugrid_rtofs \
+      -ugrid_config &CONFIG_DIR;/UGridConfig_RTOFS \
+      -outdir &OUTPUT_DIR;/grid_stat_ugrid -v 1
+    </param>
+    <output>
+      <exist>&OUTPUT_DIR;/grid_stat_ugrid/grid_stat_UGRID_RTOFS_000000L_19001231_000000V_pairs.nc</exist>
+    </output>
+  </test>
+  -->
+
+
+
+
 
   <!--                                    -->
   <!--                                    -->
