@@ -1061,7 +1061,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
 
                      if (1 < data_count) {
                         mlog << Debug(9) << method_name
-                             << " to_value:" << to_value
+                             << " to_value: " << to_value
                              << " at " << x_idx << "," << y_idx
                              << ", max: " << dataArray.max()
                              << ", min: " << dataArray.min()
@@ -1646,7 +1646,7 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
 
    if (to_cell_cnt == 0) {
       mlog << Debug(2) << method_name
-           << " There are no matching cells between input and the target grid.\n";
+           << "There are no matching cells between input and the target grid.\n";
    }
 
    mlog << Debug(LEVEL_FOR_PERFORMANCE) << method_name << "took "
@@ -2091,7 +2091,7 @@ static void get_grid_mapping_latlon(
    vector<int> mapping_indices(data_size, bad_data_int);
 
    to_grid.xy_to_latlon(0, 0, to_ll_lat, to_ll_lon);
-   mlog << Debug(5) << method_name << " to_grid ll corner: (" << to_ll_lon << ", " << to_ll_lat << ")\n";
+   mlog << Debug(5) << method_name << "to_grid ll corner: (" << to_ll_lon << ", " << to_ll_lat << ")\n";
 
    //Count the number of cells to be mapped to TO_GRID
    //Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
@@ -2119,7 +2119,7 @@ static void get_grid_mapping_latlon(
                double to_lat;
                double to_lon;
                to_grid.xy_to_latlon(idx_x, idx_y, to_lat, to_lon);
-               mlog << Debug(15) << method_name << " index: [" << xIdx << "," << yIdx << "] to " << coord_offset
+               mlog << Debug(15) << method_name << "index: [" << xIdx << "," << yIdx << "] to " << coord_offset
                     << " (" << lon << ", " << lat << ") to (" << rescale_lon(-1*to_lon) << ", " << to_lat << ")\n";
             }
          }
@@ -2393,7 +2393,7 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
                       if (!is_eq(latitudes[idx], tmp_lats[idx], loose_tol)) {
                          lat_mis_matching_count++;
                          mlog << Warning << "\n" << method_name
-                              << "diff lat at " << idx << "  binary-computing: "
+                              << "diff lat at " << idx << " binary-computing: "
                               << latitudes[idx] << " - " << tmp_lats[idx] << " = "
                               << (latitudes[idx]-tmp_lats[idx]) << "\n\n";
                       }
@@ -2404,7 +2404,7 @@ static void get_grid_mapping(const Grid &fr_grid, const Grid &to_grid, IntArray 
                       if (!is_eq(longitudes[idx], tmp_lons[idx], loose_tol)) {
                          lon_mis_matching_count++;
                          mlog << Warning << "\n" << method_name
-                              << "diff lon at " << idx << "  binary-computing: "
+                              << "diff lon at " << idx << " binary-computing: "
                               << longitudes[idx] << " - " << tmp_lons[idx] << " = "
                               << (longitudes[idx]-tmp_lons[idx]) << "\n\n";
                       }
