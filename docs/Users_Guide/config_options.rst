@@ -329,6 +329,8 @@ To run this utility:
   The downloaded files are written to a subdirectory ndbc_temp_data which
   can be deleted once the final output file is created.
 
+.. _met_base_env_var:
+
 MET_BASE
 --------
 
