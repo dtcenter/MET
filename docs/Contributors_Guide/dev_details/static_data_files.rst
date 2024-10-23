@@ -29,7 +29,7 @@ recommended update frequency and method.
     To be used in real time, this file should be regenerated daily and the
     :code:`MET_NDBC_STATION` environment variable should define its
     current location. Since this static file is included with the code,
-    its contents should be updated **for each major release** using the
+    its contents should be updated **for each major X.Y release** using the
     :code:`scripts/python/utility/build_ndbc_stations_from_web.py` utility.
 
   - :code:`table_files/airnow_monitoring_site_locations_v2.txt`,
@@ -38,7 +38,7 @@ recommended update frequency and method.
     locations that can change over time. The :code:`MET_AIRNOW_STATIONS`
     environment variable can be set to override its default location.
     Since this static file is included with the code, its contents should
-    be updated **for each major release**.
+    be updated **for each major X.Y release**.
 
   - :code:`table_files/obs_error_table.txt`, described in
     :numref:`User's Guide Section %s <met_obs_error_table>`, is read by
@@ -53,15 +53,15 @@ recommended update frequency and method.
     GRIB2 table information. They are read by the MET libraries which
     read GRIB1 and GRIB2 input data. Additions are made to these tables
     over time and their contents should be reviewed and updated **for each
-    major X.Y** release. The GRIB2 tables should be kept current with each
-    release of the **wgrib2** software, available at
+    major X.Y** release. The GRIB2 tables should be kept current with those
+    provided with the **wgrib2** software, available at
     https://github.com/NOAA-EMC/wgrib2.  
 
   - :code:`table_files/met_header_columns_VX.Y.txt` files define
     line types and column names for each **X.Y** released version of MET.
     Stat-Analysis reads these files when processing the STAT output from
-    other MET tools. A new header file must be added **for each major X.Y**
-    release.
+    other MET tools. A new header file must be added **for each major X.Y
+    release**.
 
   - :code:`table_files/stat_column_descriptions*.txt` is read by
     Series-Analysis and contains descriptions of each statistic that are
@@ -72,7 +72,7 @@ recommended update frequency and method.
   - :code:`tc_data/wwpts_us.txt` is read by TC-Pairs, contains hurricane
     watch/warning information, and is referenced in the TC-Pairs
     configuration file. Since hurricane watches and warnings change over
-    time, its contents should be updated **for each major X.Y** release.
+    time, its contents should be updated **for each major X.Y release**.
 
   - :code:`tc_data/*land*` files are read be TC-DLand and/or TC-Pairs to
     define storms distance to land. These definitions seldom change over
