@@ -280,10 +280,10 @@ AirNow stations based on stationId and/or AqSid.
 Additional information and updated site locations can be found at the
 `EPA AirNow website <https://www.airnow.gov>`_. While some monitoring stations are
 permanent, others are temporary, and theirs locations can change. When running the
-ascii2nc tool with the `-format airnowhourly` option, users should
-`download <https://test.airnowtech.org/>`_ the `Monitoring_Site_Locations_V2.dat` data file
-data file corresponding to the date being processed and set the MET_AIRNOW_STATIONS
-envrionment variable to define its location.
+ASCII2NC tool with the :code:`-format airnowhourly` option, users should
+`download <https://files.airnowtech.org>`_ the **Monitoring_Site_Locations_V2.dat**
+data file for the date being processed and set the MET_AIRNOW_STATIONS environment
+variable to define its location.
 
 .. _met_ndbc_stations:
 

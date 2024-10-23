@@ -28,10 +28,10 @@ recommended update frequency and method.
     files used by the MET tools. These are updated routinely when adding new
     features and enhancements to the tools.
 
-  - The :code:`python` and :code:`wrappers` directorie contains Python
+  - The :code:`python` and :code:`wrappers` directories contain Python
     scripts to support the Python-embedding logic used throughout MET.
     These are updated routinely when adding new Python-embedding features
-    or enhancements.
+    and enhancements.
 
   - :code:`table_files/met_header_columns_VX.Y.txt` files define
     line types and column names for each major **X.Y** released version
@@ -48,7 +48,7 @@ recommended update frequency and method.
     regenerated daily and the :code:`MET_NDBC_STATION` environment variable
     should define its location. Use the
     :code:`scripts/python/utility/build_ndbc_stations_from_web.py`
-    utility to update the contents.
+    utility to update its contents.
 
   - :code:`table_files/airnow_monitoring_site_locations_v2.txt`,
     described in :numref:`User's Guide Section %s <met_airnow_stations>`,
@@ -61,8 +61,8 @@ recommended update frequency and method.
     information. They are read by the MET libraries which read GRIB1 and
     GRIB2 input data. Additions are made to these tables over time and
     they should be routinely updated. The GRIB2 tables should be kept
-    current with those included in the **wgrib2** software, available at
-    https://github.com/NOAA-EMC/wgrib2.
+    current with those included in the **wgrib2** software found in the
+    `wgrib2 code repository <https://github.com/NOAA-EMC/wgrib2>`_.
 
   - :code:`tc_data/wwpts_us.txt` is read by TC-Pairs, contains hurricane
     watch/warning information, and is referenced in the TC-Pairs
