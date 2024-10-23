@@ -341,6 +341,8 @@ files when specifying paths and the appropriate path will be substituted in.
 If MET_BASE is defined as an environment variable, its value will be used
 instead of the one defined at compilation time.
 
+.. _met_obs_error_table:
+
 MET_OBS_ERROR_TABLE
 -------------------
 
