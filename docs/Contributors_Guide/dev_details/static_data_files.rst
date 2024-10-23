@@ -26,20 +26,20 @@ recommended update frequency and method.
 
   - The :code:`config` directory contains all of the default configuration
     files used by the MET tools. These are updated routinely when adding new
-    features and enhancements.
+    features and enhancements to the tools.
 
-  - The :code:`python` and :code:`wrappers` directories contains Python
+  - The :code:`python` and :code:`wrappers` directorie contains Python
     scripts to support the Python-embedding logic used throughout MET.
-    These are updated routinely when adding new features or enhancements
-    for Python-embedding.
+    These are updated routinely when adding new Python-embedding features
+    or enhancements.
 
   - :code:`table_files/met_header_columns_VX.Y.txt` files define
-    line types and column names for each **X.Y** released version of MET.
-    Stat-Analysis reads these files when processing the STAT output from
-    other MET tools. A new header file is added during development when
-    the software version number is increased.
+    line types and column names for each major **X.Y** released version
+    of MET. Stat-Analysis reads these files when processing the STAT output
+    from other MET tools. A new header file is added during development
+    whenever the **X.Y** software version number is increased.
 
-- Updated *by developers* prior to **each major X.Y release*:
+- Updated *by developers* prior to **each major X.Y release**:
 
   - :code:`table_files/ndbc_stations.xml`, described in
     :numref:`User's Guide Section %s <met_ndbc_stations>`, is read by
@@ -69,21 +69,21 @@ recommended update frequency and method.
     configuration file. Since hurricane watches and warnings change over
     time, this file should be routinely updated.
 
-  - :code:`data/map` is read by the MET tools which create PostScript
-    output plots. This data is derived from GIS shapefiles and defines
-    the background map data for plots. Since map data can change over
-    time, these files should be periodically updated using the
-    :code:`make_mapfiles` development utility.
+  - The :code:`map` directory contains map data read by the MET tools
+    which create PostScript output plots. This data is derived from GIS
+    shapefiles and defines the background map data for those plots.
+    Since map data can change over time, these files should be periodically
+    updated using the :code:`make_mapfiles` development utility.
 
 - Updated *by developers* only as needed:
 
-  - :code:`table_files/stat_column_descriptions*.txt` is read by
-    Series-Analysis and contains descriptions of each statistic that are
-    written to the **long_name** attribute of the output variables.
-    This only needs to be updated when Series-Analysis is enhanced to
-    write new output statistic types.
+  - :code:`table_files/stat_column_description.txt` is read by
+    Series-Analysis and contains a description for each statistic
+    computed by the tool. These descriptions are written to the **long_name**
+    attribute of the output variables. This only needs to be updated when
+    Series-Analysis is enhanced to process new output statistics.
 
-  - :code:`tc_data/*land*` files are read be TC-DLand and/or TC-Pairs to
+  - :code:`tc_data/*land*` files are read by TC-DLand and TC-Pairs to
     define the distance of storms to land. These definitions seldom change
     over time and should only be modified when the TC-DLand tool is modified
     to process the updated inputs.
@@ -107,17 +107,18 @@ recommended update frequency and method.
 
 - No updates typically required:
 
-  - :code:`colortables` is read by MET tools which write PostScript
-    output plots. While users are encouraged to copy and modify these
-    colortable files for their specific needs, these default colortables
-    do not change over time and typically require no updates.
-
-  - :code:`poly` is read by the MET tools when applying polyline masking
-    regions. The default polyline regions included were originally
-    defined at NOAA/EMC, do not change over time, and typically require
-    no updates.
-
-  - :code:`ps` is read by the MET tools which write PostScript output
-    plots. It contains the definintion of fonts that do not change over
+  - The :code:`colortables` directory contains color table definitions
+    that are read by MET tools which create PostScript output plots.
+    While users are encouraged to copy and modify these color table files
+    for their specific needs, these default colortables do not change over
     time and typically require no updates.
+
+  - The :code:`poly` directory contains polyline files read by the MET
+    tools when applying polyline masking regions. The default polyline
+    regions included were originally defined by NOAA/EMC, do not change
+    over time, and typically require no updates.
+
+  - The :code:`ps` directory contains font definition files that are read
+    by the MET tools which create PostScript output plots. These font
+    definitions do not change over time and typically require no updates.
 
