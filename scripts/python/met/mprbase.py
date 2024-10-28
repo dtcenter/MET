@@ -6,6 +6,7 @@ class mpr_data():
 
    # Read a text file with N columns and returns the list of N column data
    # Skip first "col_start" columns if col_start is not 0.
+   @staticmethod
    def read_mpr(input_file, col_last, col_start = 0, header=None,
                 delim_whitespace=True, keep_default_na=False,
                 skiprows=1, dtype='string'):

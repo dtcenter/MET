@@ -127,21 +127,19 @@ output_flag = {
    rps    = NONE;
    eclv   = BOTH;
    mpr    = NONE;
-   seeps  = ${SEEPS_FLAG};
-   seeps_mpr = ${SEEPS_FLAG};
+   seeps  = NONE;
+   seeps_mpr = NONE;
 }
-
-////////////////////////////////////////////////////////////////////////////////
-// Threshold for SEEPS p1 (Probability of being dry)
-
-seeps_p1_thresh = ${SEEPS_P1_THRESH};
 
 ////////////////////////////////////////////////////////////////////////////////
 
 duplicate_flag = NONE;
 rank_corr_flag = FALSE;
-tmp_dir        = "/tmp";
-output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V12.0.0";
+
+point_weight_flag = NONE;
+
+tmp_dir       = "/tmp";
+output_prefix = "${OUTPUT_PREFIX}";
+version       = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

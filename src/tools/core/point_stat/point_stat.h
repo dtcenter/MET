@@ -15,11 +15,8 @@
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
 //   000    11/11/08  Halley Gotway   New
-//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files
+//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files.
 //
-//
-////////////////////////////////////////////////////////////////////////
-
 ////////////////////////////////////////////////////////////////////////
 
 #ifndef  __POINT_STAT_H__
@@ -61,7 +58,7 @@ static const char * default_config_filename =
    "MET_BASE/config/PointStatConfig_default";
 
 // Header columns
-static const char **txt_columns[n_txt] = {
+static const char * const * txt_columns[n_txt] = {
    fho_columns,    ctc_columns,    cts_columns,
    mctc_columns,   mcts_columns,   cnt_columns,
    sl1l2_columns,  sal1l2_columns, vl1l2_columns,
@@ -85,7 +82,7 @@ static const int n_txt_columns[n_txt] = {
 };
 
 // Text file abbreviations
-static const char *txt_file_abbr[n_txt] = {
+static const char * const txt_file_abbr[n_txt] = {
    "fho",    "ctc",    "cts",
    "mctc",   "mcts",   "cnt",
    "sl1l2",  "sal1l2", "vl1l2",

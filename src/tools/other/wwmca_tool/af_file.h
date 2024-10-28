@@ -93,12 +93,12 @@ class AFDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int AFDataFile::nx() const { return ( af_nx ); }
-inline int AFDataFile::ny() const { return ( af_ny ); }
+inline int AFDataFile::nx() const { return af_nx; }
+inline int AFDataFile::ny() const { return af_ny; }
 
-inline unixtime AFDataFile::init       () const { return ( Init ); }
-inline unixtime AFDataFile::valid      () const { return ( Valid ); }
-inline char     AFDataFile::hemisphere () const { return ( Hemisphere ); }
+inline unixtime AFDataFile::init       () const { return Init; }
+inline unixtime AFDataFile::valid      () const { return Valid; }
+inline char     AFDataFile::hemisphere () const { return Hemisphere; }
 
 
 ////////////////////////////////////////////////////////////////////////

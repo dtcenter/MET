@@ -239,7 +239,7 @@ void VarInfoNcWrf::set_magic(const ConcatString &nstr, const ConcatString &lstr)
                   level_value = unix_time;
                   as_offset = false;
                }
-	       else if (is_number(ptr2)) {
+               else if (is_number(ptr2)) {
                   if (as_offset) level = atoi(ptr2);
                   else {
                      level = vx_data2d_dim_by_value;

@@ -80,14 +80,10 @@ struct StatHdrInfo {
                             const StringArray  &hdr_cols,
                             const StringArray  &hdr_vals,
                             const STATLineType lt);
-   ConcatString get_shc_str(const ConcatString &cur_case,
-                            const StringArray  &case_cols,
-                            const StringArray  &case_vals,
-                            const StringArray  &hdr_cols,
-                            const StringArray  &hdr_vals,
+   ConcatString get_col_css(const ConcatString &cur_case,
                             const char         *col_name,
                             const StringArray  &col_vals,
-                            bool               warning);
+                            bool               warning) const;
 };
 
 struct AggrSummaryInfo {
@@ -173,7 +169,7 @@ struct ssvar_bin_cmp {
   bool operator()(const ConcatString & cs1, const ConcatString & cs2) const {
 
     // Check for string equality
-    if( cs1 == cs2) return(0);
+    if( cs1 == cs2) return 0;
 
     // Otherwise, parse list of numbers and compare each element
     StringArray sa1 = cs1.split(":");
@@ -183,7 +179,7 @@ struct ssvar_bin_cmp {
           return(atof(sa1[i].c_str()) < atof(sa2[i].c_str()));
        }
     }
-    return(-1);
+    return -1;
   }
 };
 

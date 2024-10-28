@@ -49,14 +49,14 @@ static const char * default_config_filename =
    "MET_BASE/config/EnsembleStatConfig_default";
 
 // Text file abbreviations
-static const char *txt_file_abbr[n_txt] = {
+static const char * const txt_file_abbr[n_txt] = {
    "ecnt",  "rps",   "rhist", "phist",
    "orank", "ssvar", "relp",  "pct",
    "pstd",  "pjc",   "prc",   "eclv"
 };
 
 // Header columns
-static const char **txt_columns[n_txt] = {
+static const char * const * txt_columns[n_txt] = {
    ecnt_columns,  rps_columns,   rhist_columns,
    phist_columns, orank_columns, ssvar_columns,
    relp_columns,  pct_columns,   pstd_columns,

@@ -247,14 +247,14 @@ class VarInfoNcWrf : public VarInfo
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline GrdFileType       VarInfoNcWrf::file_type()      const { return(FileType_NcWrf);         }
-inline const LongArray & VarInfoNcWrf::dimension()      const { return(Dimension);              }
-inline int               VarInfoNcWrf::dimension(int i) const { return(Dimension[i]);           }
-inline int               VarInfoNcWrf::n_dimension()    const { return(Dimension.n_elements()); }
-inline const NumArray  & VarInfoNcWrf::dim_value()      const { return(Dim_value);             }
-inline double            VarInfoNcWrf::dim_value(int i) const { return(Dim_value[i]);          }
-inline const BoolArray & VarInfoNcWrf::is_offset()      const { return(Is_offset);             }
-inline bool              VarInfoNcWrf::is_offset(int i) const { return(Is_offset[i]);          }
+inline GrdFileType       VarInfoNcWrf::file_type()      const { return FileType_NcWrf;         }
+inline const LongArray & VarInfoNcWrf::dimension()      const { return Dimension;              }
+inline int               VarInfoNcWrf::dimension(int i) const { return Dimension[i];           }
+inline int               VarInfoNcWrf::n_dimension()    const { return Dimension.n_elements(); }
+inline const NumArray  & VarInfoNcWrf::dim_value()      const { return Dim_value;              }
+inline double            VarInfoNcWrf::dim_value(int i) const { return Dim_value[i];           }
+inline const BoolArray & VarInfoNcWrf::is_offset()      const { return Is_offset;              }
+inline bool              VarInfoNcWrf::is_offset(int i) const { return Is_offset[i];           }
 
 ///////////////////////////////////////////////////////////////////////////////
 

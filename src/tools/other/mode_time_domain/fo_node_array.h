@@ -74,8 +74,8 @@ class FO_Node_Array {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int FO_Node_Array::n_elements() const { return ( Nelements ); }
-inline int FO_Node_Array::n         () const { return ( Nelements ); }
+inline int FO_Node_Array::n_elements() const { return Nelements; }
+inline int FO_Node_Array::n         () const { return Nelements; }
 
 
 ////////////////////////////////////////////////////////////////////////

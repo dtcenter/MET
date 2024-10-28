@@ -214,10 +214,17 @@ GrdFileType ftype = FileType_None;
 for ( int i=0; i<file_list.n(); i++ )  {
 
    //
+   //  check for python inputs
+   //
+
+   bool is_python = (file_list[i].find(conf_val_python_xarray) == 0) ||
+                    (file_list[i].find(conf_val_python_numpy)  == 0);
+
+   //
    //  skip missing files
    //
 
-   if( !file_exists(file_list[i].c_str()) ) continue;
+   if( !file_exists(file_list[i].c_str()) && !is_python ) continue;
 
    //
    //  get the current file type

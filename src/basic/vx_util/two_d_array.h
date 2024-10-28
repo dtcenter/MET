@@ -54,11 +54,11 @@ class TwoD_Array {
 
       TwoD_Array <T> & operator=(const TwoD_Array <T> & _t)  {
 
-         if ( this == &_t )  return ( * this );
+         if ( this == &_t )  return *this;
 
          assign(_t);
 
-         return ( * this );
+         return *this;
 
       }
 
@@ -78,14 +78,14 @@ class TwoD_Array {
          //  get stuff
          //
 
-      int  nx()       const { return ( Nx ); }
-      int  ny()       const { return ( Ny ); }
+      int  nx()       const { return Nx; }
+      int  ny()       const { return Ny; }
       bool is_empty() const { return ( Nx*Ny == 0 ); }
       int  count()    const;
 
-      const T * data() const { return ( E ); }
+      const T * data() const { return E; }
 
-      T * buf() { return ( E ); }   //  careful with this
+      T * buf() { return E; }   //  careful with this
 
       T operator()(int, int) const;
 
@@ -244,7 +244,7 @@ for (j=0,n=0; j<nxy; ++j)  {
 }
 
 
-return(n);
+return n;
 
 }
 
@@ -274,7 +274,7 @@ T TwoD_Array<T>::operator()(int _x, int _y) const
 
 {
 
-return ( get(_x, _y) );
+return get(_x, _y);
 
 }
 
@@ -292,7 +292,7 @@ if (E == nullptr) {
    exit ( 1 );
 }
 
-return ( E[two_to_one(_x, _y)] );
+return E[two_to_one(_x, _y)];
 
 }
 
@@ -320,15 +320,15 @@ bool TwoD_Array<T>::f_is_on(int _x, int _y) const
 
 {
 
-if ( s_is_on(_x, _y) )                                 return ( true );
+if ( s_is_on(_x, _y) )                                 return true;
 
-if( (_x > 0) && s_is_on(_x - 1, _y) )                  return ( true );
+if( (_x > 0) && s_is_on(_x - 1, _y) )                  return true;
 
-if( (_x > 0) && (_y > 0) && s_is_on(_x - 1, _y - 1))   return ( true );
+if( (_x > 0) && (_y > 0) && s_is_on(_x - 1, _y - 1))   return true;
 
-if( (_y > 0 ) && s_is_on(_x, _y - 1) )                 return ( true );
+if( (_y > 0 ) && s_is_on(_x, _y - 1) )                 return true;
 
-return ( false );
+return false;
 
 }
 
@@ -355,12 +355,12 @@ int j;
 
 for (j=0; j<Nx; ++j)  {
 
-   if ( f_is_on(j, _y)  )  return ( j );
+   if ( f_is_on(j, _y)  )  return j;
 
 }
 
 
-return ( -1 );
+return -1;
 
 }
 
@@ -387,12 +387,12 @@ int j;
 
 for (j=(Nx - 1); j>=0; --j)  {
 
-   if ( f_is_on(j, _y)  )  return ( j );
+   if ( f_is_on(j, _y)  )  return j;
 
 }
 
 
-return ( -1 );
+return -1;
 
 }
 

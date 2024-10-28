@@ -92,15 +92,15 @@ class Python3_Script {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline PyObject * Python3_Script::get_module() { return ( Module ); }
+inline PyObject * Python3_Script::get_module() { return Module; }
 
-inline PyObject * Python3_Script::dict() { return ( Dict ); }
+inline PyObject * Python3_Script::dict() { return Dict; }
 
-inline PyObject * Python3_Script::module_ascii() { return ( ModuleAscii ); }
+inline PyObject * Python3_Script::module_ascii() { return ModuleAscii; }
 
-inline PyObject * Python3_Script::dict_ascii() { return ( DictAscii ); }
+inline PyObject * Python3_Script::dict_ascii() { return DictAscii; }
 
-inline ConcatString Python3_Script::filename() const { return ( Script_Filename ); }
+inline ConcatString Python3_Script::filename() const { return Script_Filename; }
 
 
 ////////////////////////////////////////////////////////////////////////

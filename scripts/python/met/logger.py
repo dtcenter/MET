@@ -25,10 +25,6 @@ class logger():
       for a_msg in msgs:
          logger.log_message(logger.append_error_prompt(a_msg))
 
-   #@staticmethod
-   #def get_met_fill_value():
-   #   return logger.MET_FILL_VALUE
-
    @staticmethod
    def info_message(msg):
       print(f'{logger.PROMPT} {logger.INFO_P} {msg}')
@@ -78,8 +74,8 @@ class met_base(logger):
 
    @staticmethod
    def get_numpy_filename(tmp_filename):
-      return logger.replace_extension(tmp_filename, "json", "npy") if tmp_filename.endswith(".json") else \
-             logger.replace_extension(tmp_filename, "nc", "npy") if tmp_filename.endswith(".nc") else f'{tmp_filename}.npy'
+      file_ext = os.path.splitext(tmp_filename)[1]
+      return logger.replace_extension(tmp_filename, file_ext, ".npy") if file_ext else f'{tmp_filename}.npy'
 
    def is_debug_enabled(self, component_name=""):
       return met_base_tools.is_debug_enabled(component_name)
@@ -100,21 +96,26 @@ class met_base_tools(object):
    ENV_MET_PYTHON_TMP_FORMAT = "MET_PYTHON_TMP_FORMAT"
 
    @staticmethod
+   def convert_byte_type_to_array(ndarray_data):
+      array_data = []
+      if isinstance(ndarray_data[0], (np.ma.MaskedArray, np.ma.core.MaskedArray)):
+         for byte_data in ndarray_data:
+            array_data.append(byte_data.tobytes(fill_value=' ').decode('utf-8').rstrip())
+      else:
+         for byte_data in ndarray_data:
+            array_data.append(byte_data.decode("utf-8").rstrip())
+      return array_data
+
+   @staticmethod
    def convert_to_array(ndarray_data):
       is_byte_type = False
       if 0 < len(ndarray_data):
          is_byte_type = isinstance(ndarray_data[0], (bytes, np.bytes_))
-         if isinstance(ndarray_data[0], np.ndarray):
-            if 0 < len(ndarray_data[0]):
-               is_byte_type = isinstance(ndarray_data[0][0], (bytes, np.bytes_))
+         if not is_byte_type and isinstance(ndarray_data[0], np.ndarray) \
+               and 0 < len(ndarray_data[0]):
+            is_byte_type = isinstance(ndarray_data[0][0], (bytes, np.bytes_))
       if is_byte_type:
-         array_data = []
-         if isinstance(ndarray_data[0], (np.ma.MaskedArray, np.ma.core.MaskedArray)):
-            for byte_data in ndarray_data:
-               array_data.append(byte_data.tobytes(fill_value=' ').decode('utf-8').rstrip())
-         else:
-            for byte_data in ndarray_data:
-               array_data.append(byte_data.decode("utf-8").rstrip())
+         array_data = met_base_tools.convert_byte_type_to_array(ndarray_data)
       elif isinstance(ndarray_data, (np.ma.MaskedArray, np.ma.core.MaskedArray)):
          array_data = ndarray_data.filled(fill_value=-9999).tolist()
       elif isinstance(ndarray_data, np.ndarray):

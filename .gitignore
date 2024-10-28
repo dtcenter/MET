@@ -19,3 +19,5 @@ make.log
 make_install.log
 .idea
 cmake-build-debug
+
+__pycache__

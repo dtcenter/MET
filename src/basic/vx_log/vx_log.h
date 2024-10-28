@@ -26,6 +26,15 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+inline double get_exe_duration(clock_t start_clock, clock_t end_clock) {
+   return ((double)(end_clock - start_clock)) / CLOCKS_PER_SEC;
+}
+
+inline double get_exe_duration(clock_t start_clock) {
+   return get_exe_duration(start_clock, clock());
+}
+
+////////////////////////////////////////////////////////////////////////
 
 #endif   //  __VX_LOG_H__
 

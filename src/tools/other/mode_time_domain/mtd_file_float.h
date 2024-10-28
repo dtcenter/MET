@@ -137,21 +137,21 @@ class MtdFloatFile : public MtdFileBase {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int MtdFloatFile::spatial_radius() const { return ( Spatial_Radius ); }
+inline int MtdFloatFile::spatial_radius() const { return Spatial_Radius; }
 
-inline int MtdFloatFile::time_beg() const { return ( TimeBeg ); }
-inline int MtdFloatFile::time_end() const { return ( TimeEnd ); }
+inline int MtdFloatFile::time_beg() const { return TimeBeg; }
+inline int MtdFloatFile::time_end() const { return TimeEnd; }
 
-inline float MtdFloatFile::data_min() const { return ( DataMin ); }
-inline float MtdFloatFile::data_max() const { return ( DataMax ); }
+inline float MtdFloatFile::data_min() const { return DataMin; }
+inline float MtdFloatFile::data_max() const { return DataMax; }
 
-inline const float * MtdFloatFile::data() const { return ( Data ); }
+inline const float * MtdFloatFile::data() const { return Data; }
 
 inline float MtdFloatFile::operator()(int _x, int _y, int _t) const
 
 {
 
-return ( Data[mtd_three_to_one(Nx, Ny, Nt, _x, _y, _t)] );
+return Data[mtd_three_to_one(Nx, Ny, Nt, _x, _y, _t)];
 
 }
 

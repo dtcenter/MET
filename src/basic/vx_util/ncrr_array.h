@@ -67,11 +67,11 @@ class NCRR_Array {
 
       NCRR_Array & operator=(const NCRR_Array & _a)  {
 
-         if ( this == _a )  return ( * this );
+         if ( this == _a )  return *this;
 
          assign(_a);
 
-         return ( * this );
+         return *this;
 
       }
 
@@ -89,9 +89,9 @@ class NCRR_Array {
          //  get stuff
          //
 
-      int n_elements() const  { return ( Nelements );}
+      int n_elements() const  { return Nelements;}
 
-      int n         () const  { return ( Nelements );}
+      int n         () const  { return Nelements;}
 
       T & operator[](int) const;
 

@@ -244,7 +244,7 @@ bool ProbInfoArray::add(const ATCFProbLine &l, double dland, bool check_dup) {
    // Store based on the input line type
    switch(l.type()) {
 
-      case(ATCFLineType::ProbRI):
+      case ATCFLineType::ProbRI:
 
          // Add line to an existing entry
          if(ProbRIRW.size()  > 0 &&
@@ -260,7 +260,7 @@ bool ProbInfoArray::add(const ATCFProbLine &l, double dland, bool check_dup) {
          }
          break;
 
-      case(ATCFLineType::ProbGN):
+      case ATCFLineType::ProbGN:
 
          // Add line to an existing entry
          if(ProbGen.size()  > 0 &&

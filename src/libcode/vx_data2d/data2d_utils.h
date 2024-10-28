@@ -20,6 +20,14 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+extern bool build_grid_by_grid_string(const char *attr_grid, Grid &grid,
+                                      const char *caller_name=nullptr,
+                                      bool do_warning=true);
+
+extern bool build_grid_by_grid_string(const ConcatString &attr_grid, Grid &grid,
+                                      const char *caller_name=nullptr,
+                                      bool do_warning=true);
+
 extern bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
                         DataPlane &wdir);
 

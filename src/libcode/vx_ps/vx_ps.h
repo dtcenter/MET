@@ -293,12 +293,12 @@ class PSfile {
 //////////////////////////////////////////////////////////////
 
 
-inline PSFilter & PSfile::file() const { return ( *Head ); }
+inline PSFilter & PSfile::file() const { return *Head; }
 
-inline DocumentOrientation PSfile::orientation () const { return ( Orientation ); }
-inline DocumentMedia       PSfile::media       () const { return ( Media ); }
+inline DocumentOrientation PSfile::orientation () const { return Orientation; }
+inline DocumentMedia       PSfile::media       () const { return Media; }
 
-inline ConcatString PSfile::output_filename () const { return ( OutputFilename ); }
+inline ConcatString PSfile::output_filename () const { return OutputFilename; }
 
 inline double PSfile::page_width  () const { return ( (Orientation == OrientationPortrait) ? MediaWidth  : MediaHeight); }
 inline double PSfile::page_height () const { return ( (Orientation == OrientationPortrait) ? MediaHeight : MediaWidth ); }
@@ -318,7 +318,7 @@ inline void PSfile::setlinejoin_miter() { setlinejoin(0);  return; };
 inline void PSfile::setlinejoin_round() { setlinejoin(1);  return; };
 inline void PSfile::setlinejoin_bevel() { setlinejoin(2);  return; };
 
-inline FontFamily PSfile::family () const { return ( Family ); }
+inline FontFamily PSfile::family () const { return Family; }
 
 
 //////////////////////////////////////////////////////////////

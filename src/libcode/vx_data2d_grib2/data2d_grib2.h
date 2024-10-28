@@ -164,7 +164,7 @@ class MetGrib2DataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline GrdFileType MetGrib2DataFile::file_type () const { return ( FileType_Gb2 ); }
+inline GrdFileType MetGrib2DataFile::file_type () const { return FileType_Gb2; }
 
 
 ////////////////////////////////////////////////////////////////////////

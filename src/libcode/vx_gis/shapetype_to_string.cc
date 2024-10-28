@@ -28,7 +28,6 @@
 
 #include "shapetype_to_string.h"
 
-
 using namespace std;
 
 

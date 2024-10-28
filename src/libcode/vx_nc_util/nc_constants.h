@@ -29,10 +29,10 @@
 
 
 // NetCDF keywords
-static const char * const CONFIG_NetCDF_Dimension = "NetCDF_Dimension";
+constexpr char CONFIG_NetCDF_Dimension[] = "NetCDF_Dimension";
 
 // Flag value used to indicate a range of values within a dimension
-static const int range_flag = bad_data_int;
+constexpr int range_flag = bad_data_int;
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -166,8 +166,8 @@ class TableHelper {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int TableHelper::nrows() const { return ( Nrows ); }
-inline int TableHelper::ncols() const { return ( Ncols ); }
+inline int TableHelper::nrows() const { return Nrows; }
+inline int TableHelper::ncols() const { return Ncols; }
 
 
 ////////////////////////////////////////////////////////////////////////

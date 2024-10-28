@@ -468,16 +468,20 @@ void get_climo_mean_stdev(GenEnsProdVarInfo *ens_info, int i_var,
         << ens_info->get_var_info(i_ens)->magic_str() << "\".\n";
 
    cmn_dp = read_climo_data_plane(
-               conf_info.conf.lookup_array(conf_key_climo_mean_field, false),
-               i_var, ens_valid_ut, grid);
+               conf_info.conf.lookup_dictionary(conf_key_ens),
+               conf_key_climo_mean,
+               i_var, ens_valid_ut, grid,
+               "ensemble climatology mean");
 
    mlog << Debug(4)
         << "Reading climatology standard deviation data for ensemble field \""
         << ens_info->get_var_info(i_ens)->magic_str() << "\".\n";
 
    csd_dp = read_climo_data_plane(
-               conf_info.conf.lookup_array(conf_key_climo_stdev_field, false),
-               i_var, ens_valid_ut, grid);
+               conf_info.conf.lookup_dictionary(conf_key_ens),
+               conf_key_climo_stdev,
+               i_var, ens_valid_ut, grid,
+               "ensemble climatology standard deviation");
 
    // Unset the MET_ENS_MEMBER_ID environment variable
    if(set_ens_mem_id) {
@@ -645,7 +649,8 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
       if(!(mtddf->grid() == grid)) {
          mlog << Debug(1)
               << "Regridding field \"" << info->magic_str()
-              << "\" to the verification grid.\n";
+              << "\" to the verification grid using "
+              << info->regrid().get_str() << ".\n";
          dp = met_regrid(dp, mtddf->grid(), grid, info->regrid());
       }
 
@@ -713,6 +718,9 @@ void track_counts(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, bool is_
       cmn = (cmn_dp.is_empty() ? bad_data_double : cmn_dp.data()[i]);
       csd = (csd_dp.is_empty() ? bad_data_double : csd_dp.data()[i]);
 
+      // MET #2924 Use the same data for the forecast and observation climatologies
+      ClimoPntInfo cpi(cmn, csd, cmn, csd);
+
       // Skip bad data values
       if(is_bad_data(ens)) continue;
 
@@ -738,7 +746,7 @@ void track_counts(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, bool is_
 
          // Event frequency
          for(j=0; j<n_thr; j++) {
-            if(thr_buf[j].check(ens, cmn, csd)) thresh_cnt_na[j].inc(i, 1);
+            if(thr_buf[j].check(ens, &cpi)) thresh_cnt_na[j].inc(i, 1);
          }
       } // end else
    } // end for i
@@ -757,7 +765,7 @@ void track_counts(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, bool is_
             fractional_coverage(ens_dp, frac_dp,
                conf_info.nbrhd_prob.width[j],
                conf_info.nbrhd_prob.shape, grid.wrap_lon(),
-               thr_buf[i], &cmn_dp, &csd_dp,
+               thr_buf[i], &cmn_dp, &csd_dp, &cmn_dp, &csd_dp,
                conf_info.nbrhd_prob.vld_thresh);
 
             // Increment counts
@@ -813,14 +821,14 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
    DataPlane prob_dp, nbrhd_dp;
 
    // Allocate memory for storing ensemble data
-   float *ens_mean  = new float [nxy];
-   float *ens_stdev = new float [nxy];
-   float *ens_minus = new float [nxy];
-   float *ens_plus  = new float [nxy];
-   float *ens_min   = new float [nxy];
-   float *ens_max   = new float [nxy];
-   float *ens_range = new float [nxy];
-   int   *ens_vld   = new int   [nxy];
+   vector<float> ens_mean  (nxy);
+   vector<float> ens_stdev (nxy);
+   vector<float> ens_minus (nxy);
+   vector<float> ens_plus  (nxy);
+   vector<float> ens_min   (nxy);
+   vector<float> ens_max   (nxy);
+   vector<float> ens_range (nxy);
+   vector<int  > ens_vld   (nxy);
 
    // Store the threshold for the ratio of valid data points
    t = conf_info.vld_data_thresh;
@@ -857,56 +865,56 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
 
    // Add the ensemble mean, if requested
    if(ens_info->nc_info.do_mean) {
-      write_ens_var_float(ens_info, ens_mean, ens_dp,
+      write_ens_var_float(ens_info, ens_mean.data(), ens_dp,
                           "ENS_MEAN",
                           "Ensemble Mean");
    }
 
    // Add the ensemble standard deviation, if requested
    if(ens_info->nc_info.do_stdev) {
-      write_ens_var_float(ens_info, ens_stdev, ens_dp,
+      write_ens_var_float(ens_info, ens_stdev.data(), ens_dp,
                           "ENS_STDEV",
                           "Ensemble Standard Deviation");
    }
 
    // Add the ensemble mean minus one standard deviation, if requested
    if(ens_info->nc_info.do_minus) {
-      write_ens_var_float(ens_info, ens_minus, ens_dp,
+      write_ens_var_float(ens_info, ens_minus.data(), ens_dp,
                           "ENS_MINUS",
                           "Ensemble Mean Minus 1 Standard Deviation");
    }
 
    // Add the ensemble mean plus one standard deviation, if requested
    if(ens_info->nc_info.do_plus) {
-      write_ens_var_float(ens_info, ens_plus, ens_dp,
+      write_ens_var_float(ens_info, ens_plus.data(), ens_dp,
                           "ENS_PLUS",
                           "Ensemble Mean Plus 1 Standard Deviation");
    }
 
    // Add the ensemble minimum value, if requested
    if(ens_info->nc_info.do_min) {
-      write_ens_var_float(ens_info, ens_min, ens_dp,
+      write_ens_var_float(ens_info, ens_min.data(), ens_dp,
                           "ENS_MIN",
                           "Ensemble Minimum");
    }
 
    // Add the ensemble maximum value, if requested
    if(ens_info->nc_info.do_max) {
-      write_ens_var_float(ens_info, ens_max, ens_dp,
+      write_ens_var_float(ens_info, ens_max.data(), ens_dp,
                           "ENS_MAX",
                           "Ensemble Maximum");
    }
 
    // Add the ensemble range, if requested
    if(ens_info->nc_info.do_range) {
-      write_ens_var_float(ens_info, ens_range, ens_dp,
+      write_ens_var_float(ens_info, ens_range.data(), ens_dp,
                           "ENS_RANGE",
                           "Ensemble Range");
    }
 
    // Add the ensemble valid data count, if requested
    if(ens_info->nc_info.do_vld) {
-      write_ens_var_int(ens_info, ens_vld, ens_dp,
+      write_ens_var_int(ens_info, ens_vld.data(), ens_dp,
                         "ENS_VLD",
                         "Ensemble Valid Data Count");
    }
@@ -1032,28 +1040,26 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
       // Process all CDP thresholds except 0 and 100
       for(vector<Simple_Node>::iterator it = simp.begin();
           it != simp.end(); it++) {
-         if(it->ptype() == perc_thresh_climo_dist &&
+         if(it->ptype() == perc_thresh_fcst_climo_dist &&
             !is_eq(it->pvalue(), 0.0) &&
             !is_eq(it->pvalue(), 100.0)) {
-            snprintf(type_str, sizeof(type_str), "CLIMO_CDP%i",
+            snprintf(type_str, sizeof(type_str), "CLIMO_FCDP%i",
                      nint(it->pvalue()));
             cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
-            write_ens_data_plane(ens_info, cdp_dp, ens_dp,
-                                type_str,
-                                "Climatology distribution percentile");
+            write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
+                                "Forecast climatology distribution percentile");
+         }
+         else if(it->ptype() == perc_thresh_obs_climo_dist &&
+                 !is_eq(it->pvalue(), 0.0) &&
+                 !is_eq(it->pvalue(), 100.0)) {
+            snprintf(type_str, sizeof(type_str), "CLIMO_OCDP%i",
+                     nint(it->pvalue()));
+            cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
+            write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
+                                "Observation climatology distribution percentile");
          }
       } // end for it
    }
-
-   // Deallocate and clean up
-   if(ens_mean)  { delete [] ens_mean;  ens_mean  = (float *) nullptr; }
-   if(ens_stdev) { delete [] ens_stdev; ens_stdev = (float *) nullptr; }
-   if(ens_minus) { delete [] ens_minus; ens_minus = (float *) nullptr; }
-   if(ens_plus)  { delete [] ens_plus;  ens_plus  = (float *) nullptr; }
-   if(ens_min)   { delete [] ens_min;   ens_min   = (float *) nullptr; }
-   if(ens_max)   { delete [] ens_max;   ens_max   = (float *) nullptr; }
-   if(ens_range) { delete [] ens_range; ens_range = (float *) nullptr; }
-   if(ens_vld)   { delete [] ens_vld;   ens_vld   = (int   *) nullptr; }
 
    return;
 }

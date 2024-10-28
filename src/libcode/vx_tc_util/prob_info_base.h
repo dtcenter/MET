@@ -114,21 +114,21 @@ class ProbInfoBase {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline       ATCFLineType   ProbInfoBase::type()           const { return(Type);                          }
-inline const ConcatString & ProbInfoBase::storm_id()       const { return(StormId);                       }
-inline const ConcatString & ProbInfoBase::basin()          const { return(Basin);                         }
-inline const ConcatString & ProbInfoBase::cyclone()        const { return(Cyclone);                       }
-inline const ConcatString & ProbInfoBase::technique()      const { return(Technique);                     }
-inline unixtime             ProbInfoBase::init()           const { return(InitTime);                      }
-inline int                  ProbInfoBase::init_hour()      const { return(unix_to_sec_of_day(InitTime));  }
-inline unixtime             ProbInfoBase::valid()          const { return(ValidTime);                     }
-inline int                  ProbInfoBase::valid_hour()     const { return(unix_to_sec_of_day(ValidTime)); }
-inline double               ProbInfoBase::lat()            const { return(Lat);                           }
-inline double               ProbInfoBase::lon()            const { return(Lon);                           }
-inline double               ProbInfoBase::dland()          const { return(DLand);                         }
-inline int                  ProbInfoBase::n_prob()         const { return(NProb);                         }
-inline double               ProbInfoBase::prob(int i)      const { return(Prob[i]);                       }
-inline double               ProbInfoBase::prob_item(int i) const { return(ProbItem[i]);                   }
+inline       ATCFLineType   ProbInfoBase::type()           const { return Type;                          }
+inline const ConcatString & ProbInfoBase::storm_id()       const { return StormId;                       }
+inline const ConcatString & ProbInfoBase::basin()          const { return Basin;                         }
+inline const ConcatString & ProbInfoBase::cyclone()        const { return Cyclone;                       }
+inline const ConcatString & ProbInfoBase::technique()      const { return Technique;                     }
+inline unixtime             ProbInfoBase::init()           const { return InitTime;                      }
+inline int                  ProbInfoBase::init_hour()      const { return unix_to_sec_of_day(InitTime);  }
+inline unixtime             ProbInfoBase::valid()          const { return ValidTime;                     }
+inline int                  ProbInfoBase::valid_hour()     const { return unix_to_sec_of_day(ValidTime); }
+inline double               ProbInfoBase::lat()            const { return Lat;                           }
+inline double               ProbInfoBase::lon()            const { return Lon;                           }
+inline double               ProbInfoBase::dland()          const { return DLand;                         }
+inline int                  ProbInfoBase::n_prob()         const { return NProb;                         }
+inline double               ProbInfoBase::prob(int i)      const { return Prob[i];                       }
+inline double               ProbInfoBase::prob_item(int i) const { return ProbItem[i];                   }
 
 ////////////////////////////////////////////////////////////////////////
 

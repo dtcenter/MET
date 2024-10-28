@@ -68,8 +68,8 @@ bool NdbcLocations::initialize(const string &fName)
   LineDataFile locFile;
   if (!locFile.open(fileName.c_str())) {
     mlog << Error << method_name << "->"
-	 << "can't open input ASCII file \"" << fileName 
-	 << "\" for reading\n\n";
+         << "can't open input ASCII file \"" << fileName
+         << "\" for reading\n\n";
     return false;
   }
   DataLine data_line;
@@ -77,7 +77,7 @@ bool NdbcLocations::initialize(const string &fName)
   string latKey = "lat=";
   string lonKey = "lon=";
   string elevKey = "elev=";
-  
+
   while (locFile >> data_line) {
     string sline = data_line.get_line();
     string stationId;
@@ -88,14 +88,14 @@ bool NdbcLocations::initialize(const string &fName)
     }
     if (!_parseLineForDouble(sline, latKey, lat)) {
       mlog << Warning << method_name << "-> "
-	   << "parsing out lat from line '" << sline << "'\n"
-	   << "in file \"" << fileName << "\n\n";
+           << "parsing out lat from line '" << sline << "'\n"
+           << "in file \"" << fileName << "\n\n";
       continue;
     }
     if (!_parseLineForDouble(sline, lonKey, lon)) {
       mlog << Warning << method_name << "-> "
-	   << "parsing out lon from line '" << sline << "'\n"
-	   << "in file \"" << fileName << "\n\n";
+           << "parsing out lon from line '" << sline << "'\n"
+           << "in file \"" << fileName << "\n\n";
       continue;
     }      
     if (!_parseLineForDouble(sline, elevKey, elev)) {

@@ -109,8 +109,9 @@ run_command "git checkout ${1}"
 # Otherwise, the SonarQube logic does not work.
 export MET_DEVELOPMENT=true
 
-# Run the configure script
-run_command "./configure --prefix=`pwd` --enable-all"
+# Run the configure script.
+# Specify the C++ standard to limit the scope of the findings.
+run_command "./configure --prefix=`pwd` --enable-all MET_CXX_STANDARD=11"
 
 # Define the version string
 SONAR_PROJECT_VERSION=$(grep "^version" docs/conf.py | cut -d'=' -f2 | tr -d "\'\" ")

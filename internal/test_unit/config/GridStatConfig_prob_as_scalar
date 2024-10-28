@@ -238,8 +238,9 @@ seeps_p1_thresh = NA;
 ////////////////////////////////////////////////////////////////////////////////
 
 grid_weight_flag = NONE;
-tmp_dir          = "/tmp";
-output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V12.0.0";
+
+tmp_dir       = "/tmp";
+output_prefix = "${OUTPUT_PREFIX}";
+version       = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

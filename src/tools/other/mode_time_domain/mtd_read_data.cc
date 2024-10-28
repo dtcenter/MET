@@ -33,9 +33,12 @@ vector<unixtime> mtd_read_data(MtdConfigInfo & config, VarInfo & varinfo,
 
 {
 
+static const char *method_name = "mtd_read_data() -> ";
+
 if ( filenames.n() < 2 )  {
 
-   mlog << Error << "\n\n  mtd_read_data() -> need at least 2 data files!\n\n";
+   mlog << Error << "\n" << method_name
+        << "need at least 2 data files!\n\n";
 
    exit ( 1 );
 
@@ -52,14 +55,15 @@ vector<unixtime> valid_times;
 
 for (j=0; j<(filenames.n()); ++j)  {
 
-   mlog << Debug(2)
-        << "mtd_read_data() -> processing file \"" << filenames[j] << "\"\n";
+   mlog << Debug(2) << method_name
+        << "processing file: " << filenames[j] << "\n";
 
    data_2d_file = factory.new_met_2d_data_file(filenames[j].c_str(), varinfo.file_type());
 
    if ( ! data_2d_file->data_plane(varinfo, plane) )  {
 
-      mlog << Error << "\n\n  mtd_read_data() -> unable to get data plane at time " << j << "\n\n";
+      mlog << Error << "\n" << method_name
+           << "unable to get data plane at time " << j << "\n\n";
 
       exit ( 1 );
 
@@ -67,7 +71,8 @@ for (j=0; j<(filenames.n()); ++j)  {
 
    if ( ! data_2d_file->data_plane(varinfo, plane) )  {
 
-      mlog << Error << "\n\n  mtd_read_data() -> unable to get data plane at time " << j << "\n\n";
+      mlog << Error << "\n" << method_name
+           << "unable to get data plane at time " << j << "\n\n";
 
       exit ( 1 );
 
@@ -157,9 +162,13 @@ if (variableTimeIncs) {
       unixtime umean = (unixtime)mean;
       unixtime uvar = (unixtime)var;
       unixtime suvar = (unixtime)svar;
-      mlog << Warning << "\n\n mtd_read_data() -> File time increments are not constant, could be problematic\n";
-      mlog << Warning << " mtd_read_data() -> Using MODE of the increments, mode=" << dt_start << "\n";
-      mlog << Warning << " mtd_read_data() -> Time increment properties: mean=" << umean << " variance=" << uvar << " sqrt(var)=" << suvar << "\n\n";
+      mlog << Warning << "\n" << method_name
+           << "file time increments are not constant, could be problematic\n\n";
+      mlog << Warning << "\n" << method_name
+           << "using MODE of the increments, mode=" << dt_start << "\n\n";
+      mlog << Warning << "\n" << method_name
+           << "Time increment properties: mean=" << umean << " variance=" << uvar
+           << " sqrt(var)=" << suvar << "\n\n";
    }
 }
  

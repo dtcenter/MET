@@ -297,7 +297,7 @@ struct InterpInfo {
    void        clear();
    void        validate(); // Ensure that width and method are accordant
    bool        operator==(const InterpInfo &) const;
-   InterpInfo &operator=(const InterpInfo &a) noexcept; // SoanrQube findings
+   InterpInfo &operator=(const InterpInfo &a) noexcept; // SonarQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -329,6 +329,7 @@ struct RegridInfo {
    void validate();        // ensure that width and method are accordant
    void validate_point();  // ensure that width and method are accordant
    RegridInfo &operator=(const RegridInfo &a) noexcept; // SoanrQube findings
+   ConcatString get_str() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -462,6 +463,17 @@ enum class GridWeightType {
 ////////////////////////////////////////////////////////////////////////
 
 //
+// Enumeration for point_weight_flag configuration parameter
+//
+
+enum class PointWeightType {
+   None, // Apply no point weighting
+   SID   // Apply station ID weighting
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
 // Enumeration for grid_decomp_flag configuration parameter
 //
 
@@ -537,6 +549,7 @@ static const char conf_key_model[]             = "model";
 static const char conf_key_desc[]              = "desc";
 static const char conf_key_obtype[]            = "obtype";
 static const char conf_key_output_flag[]       = "output_flag";
+static const char conf_key_obtype_as_group_val_flag[] = "obtype_as_group_val_flag";
 static const char conf_key_obs_window[]        = "obs_window";
 static const char conf_key_beg[]               = "beg";
 static const char conf_key_end[]               = "end";
@@ -612,6 +625,8 @@ static const char conf_key_mask_sid[]          = "mask.sid";
 static const char conf_key_mask_llpnt[]        = "mask.llpnt";
 static const char conf_key_lat_thresh[]        = "lat_thresh";
 static const char conf_key_lon_thresh[]        = "lon_thresh";
+static const char conf_key_lat_vname[]         = "lat_vname";
+static const char conf_key_lon_vname[]         = "lon_vname";
 static const char conf_key_ci_alpha[]          = "ci_alpha";
 static const char conf_key_time_summary[]      = "time_summary";
 static const char conf_key_flag[]              = "flag";
@@ -690,7 +705,9 @@ static const char conf_key_obs_to_qc_map[]     = "obs_to_qc_map";
 static const char conf_key_missing_thresh[]    = "missing_thresh";
 static const char conf_key_control_id[]        = "control_id";
 static const char conf_key_ens_member_ids[]    = "ens_member_ids";
-static const char conf_key_seeps_p1_thresh[]   = "seeps_p1_thresh";
+static const char conf_key_seeps_grid_climo_name[]  = "seeps_grid_climo_name";
+static const char conf_key_seeps_point_climo_name[] = "seeps_point_climo_name";
+static const char conf_key_seeps_p1_thresh[]        = "seeps_p1_thresh";
 static const char conf_key_ugrid_coordinates_file[] = "ugrid_coordinates_file";
 static const char conf_key_ugrid_dataset[]          = "ugrid_dataset";
 static const char conf_key_ugrid_map_config[]       = "ugrid_map_config";
@@ -719,10 +736,16 @@ static const char conf_key_is_wind_direction[]    = "is_wind_direction";
 static const char conf_key_is_prob[]              = "is_prob";
 
 //
-// Climatology parameter key names
+// Climatology data parameter key names
 //
-static const char conf_key_climo_mean_field[]   = "climo_mean.field";
-static const char conf_key_climo_stdev_field[]  = "climo_stdev.field";
+static const char conf_key_climo_mean[]        = "climo_mean";
+static const char conf_key_climo_mean_field[]  = "climo_mean.field";
+static const char conf_key_climo_stdev[]       = "climo_stdev";
+static const char conf_key_climo_stdev_field[] = "climo_stdev.field";
+
+//
+// Climatology distribution parameter key names
+//
 static const char conf_key_climo_cdf[]          = "climo_cdf";
 static const char conf_key_cdf_bins[]           = "cdf_bins";
 static const char conf_key_center_bins[]        = "center_bins";
@@ -742,6 +765,7 @@ static const char conf_key_topo_mask[]          = "topo_mask";
 static const char conf_key_topo_mask_flag[]     = "topo_mask.flag";
 static const char conf_key_use_obs_thresh[]     = "use_obs_thresh";
 static const char conf_key_interp_fcst_thresh[] = "interp_fcst_thresh";
+static const char conf_key_point_weight_flag[]  = "point_weight_flag";
 
 //
 // Grid-Stat specific parameter key names
@@ -1288,6 +1312,9 @@ static const char conf_val_bca[]    = "BCA";
 // Grid weight flag values
 static const char conf_val_cos_lat[] = "COS_LAT";
 static const char conf_val_area[]    = "AREA";
+
+// Point weight flag values
+static const char conf_val_sid[]     = "SID";
 
 // Duplicate flag values
 static const char conf_val_unique[] = "UNIQUE";

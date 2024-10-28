@@ -253,12 +253,12 @@ MetPointHeader *header_data = met_pd_out.get_header_data();
 
    check_header_data(header_data, method_name);
 
-   set_array_from_python(python_met_point_data, numpy_array_obs_qty, obs_data->obs_qids);
-   set_array_from_python(python_met_point_data, numpy_array_obs_hid, obs_data->obs_hids);
-   set_array_from_python(python_met_point_data, numpy_array_obs_vid, obs_data->obs_ids);
-   set_array_from_python(python_met_point_data, numpy_array_obs_lvl, obs_data->obs_lvls);
-   set_array_from_python(python_met_point_data, numpy_array_obs_hgt, obs_data->obs_hgts);
-   set_array_from_python(python_met_point_data, numpy_array_obs_val, obs_data->obs_vals);
+   set_array_from_python(python_met_point_data, numpy_array_obs_qty, obs_data->obs_qids.data());
+   set_array_from_python(python_met_point_data, numpy_array_obs_hid, obs_data->obs_hids.data());
+   set_array_from_python(python_met_point_data, numpy_array_obs_vid, obs_data->obs_ids.data());
+   set_array_from_python(python_met_point_data, numpy_array_obs_lvl, obs_data->obs_lvls.data());
+   set_array_from_python(python_met_point_data, numpy_array_obs_hgt, obs_data->obs_hgts.data());
+   set_array_from_python(python_met_point_data, numpy_array_obs_val, obs_data->obs_vals.data());
 
    set_str_array_from_python(python_met_point_data, numpy_array_obs_qty_table, &obs_data->qty_names);
    set_str_array_from_python(python_met_point_data, numpy_array_obs_var_table, &obs_data->var_names);
@@ -350,8 +350,10 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
       // get valid time index
       vld_time = obs.getValidTime();
       if ( !header_data->vld_num_array.has(vld_time, vld_idx) )  {
+         // MET #2897 keep vld_array and vld_num_array in sync
+         header_data->vld_array.add(obs.getValidTimeString());
          header_data->vld_num_array.add(vld_time);
-         header_data->vld_num_array.has(vld_time, vld_idx);
+         vld_idx = header_data->vld_num_array.n() - 1;
       }
 
       if (!is_eq(prev_lat, lat) || !is_eq(prev_lon, lon) || !is_eq(prev_elv, elv)
@@ -363,7 +365,6 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
          header_data->sid_idx_array.add(sid);
          header_data->typ_idx_array.add(typ_idx);
          header_data->vld_idx_array.add(vld_idx);
-         header_data->vld_array.add(obs.getValidTimeString());
 
          prev_lat = lat;
          prev_lon = lon;
@@ -763,7 +764,7 @@ void print_met_data(MetPointObsData *obs_data, MetPointHeader *header_data,
         << header_data->vld_idx_array.n()  << ", lat="
         << header_data->lat_array.n()      << ", lon="
         << header_data->lon_array.n()      << ", elv="
-        << header_data->elv_array.n()      << ",  message_type="
+        << header_data->elv_array.n()      << ", message_type="
         << header_data->typ_array.n()      << ", station_id="
         << header_data->sid_array.n()      << ", valid_time="
         << header_data->vld_array.n()      << ", prpt="
@@ -774,7 +775,7 @@ void print_met_data(MetPointObsData *obs_data, MetPointHeader *header_data,
 
    log_count = (header_data->hdr_count > min_count) ? min_count : header_data->hdr_count;
    mlog << Debug(debug_level) << method_name
-        << "header_data: message_type,station_id,time_time,lat,lon.elv\n";
+        << "header_data: message_type,station_id,time_time,lat,lon,elv\n";
    for (int idx=0; idx<log_count; idx++) {
       mlog << Debug(debug_level)
            << "  header_data[" << idx << "] = "
@@ -869,7 +870,7 @@ void print_met_data(MetPointObsData *obs_data, MetPointHeader *header_data,
 
    log_count = (obs_data->obs_cnt > min_count) ? min_count : obs_data->obs_cnt;
    mlog << Debug(debug_level) << "\n" << method_name
-        << "obs_data: hid,vid.level,height,value,qty\n";
+        << "obs_data: hid,vid,level,height,value,qty\n";
    for (int idx=0; idx<log_count; idx++) {
       mlog << Debug(debug_level)
            << "     obs_data[" << idx << "] = "

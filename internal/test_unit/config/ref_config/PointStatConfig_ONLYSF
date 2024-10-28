@@ -192,8 +192,11 @@ output_flag = {
 
 duplicate_flag = NONE;
 rank_corr_flag = FALSE;
-tmp_dir        = "/tmp";
-output_prefix  = "${MODEL}_F${FCST_TIME}_ONLYSF";
-version        = "V12.0.0";
+
+point_weight_flag = NONE;
+
+tmp_dir       = "/tmp";
+output_prefix = "${MODEL}_F${FCST_TIME}_ONLYSF";
+version       = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

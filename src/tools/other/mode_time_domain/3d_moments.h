@@ -70,12 +70,9 @@ class Mtd_3D_Moments {
 
       void centralize();
 
-
       void calc_3d_velocity(double & vx, double & vy) const;
 
       double calc_3d_axis_plane_angle() const;
-
-
 
 };
 
@@ -83,7 +80,7 @@ class Mtd_3D_Moments {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int Mtd_3D_Moments::volume() const { return ( N ); }
+inline int Mtd_3D_Moments::volume() const { return N; }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -60,19 +60,19 @@ Grid parse_vx_grid(const RegridInfo info, const Grid *fgrid, const Grid *ogrid) 
 
       // Verify on the forecast grid
       if(info.field == FieldType::Fcst) {
-         mlog << Debug(2) << "Using the forecast grid as the verification grid\n";
+         mlog << Debug(2) << "Using the forecast grid as the verification grid.\n";
          vx_grid = *fgrid;
       }
       // Verify on the observation grid
       else if(info.field == FieldType::Obs) {
-         mlog << Debug(2) << "Using the observation grid as the verification grid\n";
+         mlog << Debug(2) << "Using the observation grid as the verification grid.\n";
          vx_grid = *ogrid;
       }
       // Parse a named grid, grid specification string,
       // or gridded data file
       else {
-         mlog << Debug(2) << "Using named grid as the verification grid. "
-              << "Name=" << info.name << "\n";
+         mlog << Debug(2) << "Using named grid (" << info.name
+              << ") as the verification grid.\n";
          parse_grid_mask(info.name, vx_grid);
       }
    }
@@ -89,21 +89,8 @@ Grid parse_grid_string(const char *grid_str) {
    Grid grid;
    StringArray sa;
 
-   // Parse as a white-space separated string
-   sa.parse_wsss(grid_str);
-
-   // Search for a named grid
-   if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid)) {
-      mlog << Debug(3) << "Use the grid named \""
-           << grid_str << "\".\n";
-   }
-   // Parse grid definition
-   else if(sa.n() > 1 && parse_grid_def(sa, grid)) {
-      mlog << Debug(3) << "Use the grid defined by string \""
-           << grid_str << "\".\n";
-   }
-   // Extract the grid from a gridded data file
-   else {
+   if (!build_grid_by_grid_string(grid_str, grid, "parse_grid_strin", false)) {
+      // Extract the grid from a gridded data file
       mlog << Debug(3) << "Use the grid defined by file \""
            << grid_str << "\".\n";
 
@@ -151,7 +138,7 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
             w = grid.calc_area(x, y);
          }
          else {
-            w = default_grid_weight;
+            w = default_weight;
          }
 
          // Store the current weight
@@ -228,24 +215,8 @@ void parse_grid_mask(const ConcatString &mask_grid_str, Grid &grid) {
    // Check for empty input string
    if(mask_grid_str.empty()) return;
 
-   // Parse mask_grid_str as a white-space separated string
-   StringArray sa;
-   sa.parse_wsss(mask_grid_str);
-      
-   // Named grid
-   if(sa.n() == 1 && find_grid_by_name(mask_grid_str.c_str(), grid)) {
-      mlog << Debug(3)
-           << "Use the grid named \"" << mask_grid_str << "\".\n";
-   }
-   // Grid specification string
-   else if(sa.n() > 1 && parse_grid_def(sa, grid)) {
-      mlog << Debug(3)
-           << "Use the grid defined by string \"" << mask_grid_str
-           << "\".\n";
-   }
-   // Extract the grid from a gridded data file
-   else {
-   
+   if (!build_grid_by_grid_string(mask_grid_str, grid, "parse_grid_mask", false)) {
+      // Extract the grid from a gridded data file
       mlog << Debug(3)
            << "Use the grid defined by file \""
            << mask_grid_str << "\".\n";
@@ -662,7 +633,8 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
             regrid_info = parse_conf_regrid(dict);
             mlog << Debug(2)
                  << "Regridding geography mask data " << info->magic_str()
-                 << " to the verification grid.\n";
+                 << " to the verification grid using "
+                 << regrid_info.get_str() << ".\n";
             dp = met_regrid(dp, mtddf->grid(), vx_grid, regrid_info);
          }
       }

@@ -100,8 +100,8 @@ class MetPythonDataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double      MetPythonDataFile::operator  () (int x, int y) const { return ( get(x, y)    ); }
-inline GrdFileType MetPythonDataFile::file_type ()                const { return ( Type ); }
+inline double      MetPythonDataFile::operator  () (int x, int y) const { return get(x, y); }
+inline GrdFileType MetPythonDataFile::file_type ()                const { return Type; }
 
 
 ////////////////////////////////////////////////////////////////////////

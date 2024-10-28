@@ -20,8 +20,6 @@
 
 #include <iostream>
 
-#include "num_array.h"
-
 #include "crc_array.h"
 
 
@@ -29,6 +27,12 @@
 
 
 typedef CRC_Array<int> IntArray;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+extern ConcatString write_css(const IntArray &);
 
 
 ////////////////////////////////////////////////////////////////////////

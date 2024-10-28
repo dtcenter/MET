@@ -527,7 +527,7 @@ else  {
    if ( ! pointdata_from_np_array(np, &vals) )  {
 
       mlog << Error << "\nlookup_python_num_array() -> "
-	   << "can't parse values for \"" << key << "\" from python \""
+           << "can't parse values for \"" << key << "\" from python \""
            << Py_TYPE(obj)->tp_name << "\" object.\n";
    }
 

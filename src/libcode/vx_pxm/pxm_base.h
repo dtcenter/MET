@@ -137,15 +137,15 @@ class PxmBase {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline const char * PxmBase::name() const { return ( Name ); }
+inline const char * PxmBase::name() const { return Name; }
 
-inline int PxmBase::nrows() const { return ( Nrows ); }
-inline int PxmBase::ncols() const { return ( Ncols ); }
+inline int PxmBase::nrows() const { return Nrows; }
+inline int PxmBase::ncols() const { return Ncols; }
 
-inline int PxmBase::ny() const { return ( Nrows ); }
-inline int PxmBase::nx() const { return ( Ncols ); }
+inline int PxmBase::ny() const { return Nrows; }
+inline int PxmBase::nx() const { return Ncols; }
 
-inline int PxmBase::n_comments() const { return ( Ncomments ); }
+inline int PxmBase::n_comments() const { return Ncomments; }
 
 inline int PxmBase::ok() const { return ( data ? 1 : 0 ); }
 

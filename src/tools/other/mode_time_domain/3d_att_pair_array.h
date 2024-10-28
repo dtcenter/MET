@@ -92,15 +92,14 @@ class PairAtt3DArray {
 
       void patch_cluster_numbers(const MM_Engine &);
 
-
 };
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int PairAtt3DArray::n_elements() const { return ( Nelements ); }
-inline int PairAtt3DArray::n         () const { return ( Nelements ); }
+inline int PairAtt3DArray::n_elements() const { return  Nelements; }
+inline int PairAtt3DArray::n         () const { return  Nelements; }
 
 
 ////////////////////////////////////////////////////////////////////////

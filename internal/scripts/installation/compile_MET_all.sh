@@ -640,7 +640,11 @@ if  [ $COMPILE_ECKIT -eq 1 ]; then
 
   # Need to obtain ecbuild before installing eckit
 
-  vrs="3.5.0"
+  if [[ ! -z ${MET_CXX_STANDARD} && ${MET_CXX_STANDARD} -le 14 ]]; then
+      vrs="3.5.0"
+  elif [[ -z ${MET_CXX_STANDARD} ]]; then
+      vrs="3.7.0"
+  fi
     
   echo  
   echo "Compiling ECBUILD at `date`"
@@ -652,9 +656,13 @@ if  [ $COMPILE_ECKIT -eq 1 ]; then
   run_cmd "mkdir build; cd build"
   run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} > $(pwd)/ecbuild.cmake.log 2>&1"
   run_cmd "make ${MAKE_ARGS} install > $(pwd)/ecbuild.make_install.log 2>&1"
-  
-  vrs="1.20.2"
 
+  if [[ ! -z ${MET_CXX_STANDARD} && ${MET_CXX_STANDARD} -le 14 ]]; then
+      vrs="1.20.2"
+  elif [[ -z ${MET_CXX_STANDARD} ]]; then
+      vrs="1.24.4"
+  fi
+      
   echo
   echo "Compiling ECKIT at `date`"
   mkdir -p ${LIB_DIR}/eckit
@@ -671,7 +679,11 @@ fi
 # Compile ATLAS
 if [ $COMPILE_ATLAS -eq 1 ]; then
 
-  vrs="0.30.0"
+  if [[ ! -z ${MET_CXX_STANDARD} && ${MET_CXX_STANDARD} -le 14 ]]; then  
+      vrs="0.30.0"
+  elif [[ -z ${MET_CXX_STANDARD} ]]; then
+      vrs="0.35.0"
+  fi
 
   echo
   echo "Compiling ATLAS at `date`"
@@ -862,9 +874,11 @@ if [ -z ${MET_PROJ} ]; then
   export MET_PROJ=${LIB_DIR}
 fi
 
-export MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE:=${MET_PYTHON}/bin/python3}
-export MET_PYTHON_LD
-export MET_PYTHON_CC
+if [[ ! -z ${MET_PYTHON_CC} || ! -z ${MET_PYTHON_LD} ]]; then
+  export MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE:=${MET_PYTHON}/bin/python3}
+  export MET_PYTHON_LD
+  export MET_PYTHON_CC
+fi
 
 # add flags to user-defined LDFLAGS for MacOS
 if [[ $machine != "Mac" ]]; then

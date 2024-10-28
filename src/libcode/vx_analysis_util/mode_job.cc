@@ -138,7 +138,7 @@ if ( accums )  { delete [] accums;  accums = (NumArray *) nullptr; }
 n_lines_read = n_lines_kept = 0;
 
 // Write any remaning lines to the dump file
-if ( dumpfile )  *(dumpfile) << dump_at;
+if ( dumpfile )  *dumpfile << dump_at;
 
 dumpfile = (ostream *) nullptr;   //  don't delete
 
@@ -346,7 +346,7 @@ n_dump++;
 
 // Write the buffer, if full
 if ( n_dump%dump_at.nrows() == 0 ) {
-   *(dumpfile) << dump_at;
+   *dumpfile << dump_at;
    dump_at.erase();
 }
 

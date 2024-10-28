@@ -40,9 +40,9 @@ const char * timeseriestype_to_string(const TimeSeriesType t) {
    const char *s = (const char *) nullptr;
 
    switch(t) {
-      case(TimeSeriesType::DyDt):  s = timeseriestype_dydt_str;  break;
-      case(TimeSeriesType::Swing): s = timeseriestype_swing_str; break;
-      default:                     s = na_str;                   break;
+      case TimeSeriesType::DyDt:  s = timeseriestype_dydt_str;  break;
+      case TimeSeriesType::Swing: s = timeseriestype_swing_str; break;
+      default:                    s = na_str;                   break;
    }
 
    return s;

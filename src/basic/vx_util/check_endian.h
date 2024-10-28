@@ -85,8 +85,8 @@ extern void shuffle_8(void *);
    inline void handle_big_4    (void *)    { return; }
    inline void handle_big_8    (void *)    { return; }
 
-   inline bool is_little_endian () { return ( false ); }
-   inline bool is_big_endian    () { return ( true  ); }
+   inline bool is_little_endian () { return false; }
+   inline bool is_big_endian    () { return true ; }
 
 #else
 
@@ -98,8 +98,8 @@ extern void shuffle_8(void *);
    inline void handle_big_4    (void * p)  { shuffle_4(p);  return; }
    inline void handle_big_8    (void * p)  { shuffle_8(p);  return; }
 
-   inline bool is_little_endian () { return ( true  ); }
-   inline bool is_big_endian    () { return ( false ); }
+   inline bool is_little_endian () { return true ; }
+   inline bool is_big_endian    () { return false; }
 
 #endif
 

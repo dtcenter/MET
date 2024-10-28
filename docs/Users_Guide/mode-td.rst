@@ -217,7 +217,9 @@ Required Arguments for mtd
 Optional Arguments for mtd
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. **-single file\_list** may be used instead of **-fcst** and **-obs** to define objects in a single field.
+4. **-single file\_list** command line option may be used instead of the **-fcst** and **-obs** command line options to define objects in a single field.
+
+.. note:: When the **-single** command line option is used, data specified in the **fcst** configuration file entry is read from those input files.
 
 5. **-log file** gives the name of a file where a log of this MTD run will be written. All output that appears on the screen during a MTD run will be duplicated in the log file. 
 

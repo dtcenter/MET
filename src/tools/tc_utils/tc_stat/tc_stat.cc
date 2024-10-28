@@ -22,6 +22,7 @@
 //   004    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   005    09/28/22  Prestopnik      MET #2227 Remove namespace std from header files
 //   006    10/06/22  Halley Gotway   MET #392 Incorporate diagnostics
+//   007    06/14/24  Halley Gotway   MET #2911 Support -set_hdr job command option
 //
 ////////////////////////////////////////////////////////////////////////
 

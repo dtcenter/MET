@@ -77,9 +77,9 @@ class Color {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline unsigned char Color::red   () const { return ( R ); }
-inline unsigned char Color::green () const { return ( G ); }
-inline unsigned char Color::blue  () const { return ( B ); }
+inline unsigned char Color::red   () const { return R; }
+inline unsigned char Color::green () const { return G; }
+inline unsigned char Color::blue  () const { return B; }
 
 inline bool Color::is_gray() const { return ( (R == G) && (G == B) ); }
 
@@ -182,10 +182,10 @@ class CtableEntry {
 
 inline void CtableEntry::set_color(const Color & c) { C = c;  return; }
 
-inline const Color & CtableEntry::color() const { return ( C ); }
+inline const Color & CtableEntry::color() const { return C; }
 
-inline double CtableEntry::value_low()  const { return ( ValueLo ); }
-inline double CtableEntry::value_high() const { return ( ValueHi ); }
+inline double CtableEntry::value_low()  const { return ValueLo; }
+inline double CtableEntry::value_high() const { return ValueHi; }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -282,9 +282,9 @@ class ColorTable {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int     ColorTable::n_entries()   const { return ( Nentries ); }
+inline int     ColorTable::n_entries()   const { return Nentries; }
 
-inline double  ColorTable::gamma()       const { return ( Gamma ); }
+inline double  ColorTable::gamma()       const { return Gamma; }
 
 
 ////////////////////////////////////////////////////////////////////////

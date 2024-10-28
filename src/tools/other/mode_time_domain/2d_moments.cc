@@ -7,7 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -25,11 +24,9 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-
    //
    //  Code for class Mtd_2D_Moments
    //
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -177,7 +174,8 @@ void Mtd_2D_Moments::centralize()
 
 if ( N == 0 )  {
 
-   mlog << Error << "\n\n  Mtd_2D_Moments::centralize() -> no data!\n\n";
+   mlog << Error << "\nMtd_2D_Moments::centralize() -> "
+        << "no data!\n\n";
 
    exit ( 1 );
 
@@ -220,7 +218,8 @@ double Mtd_2D_Moments::calc_2D_axis_plane_angle() const
 
 if ( ! IsCentralized )  {
 
-   mlog << Error << "\n\n  Mtd_2D_Moments::calc_2D_axis_plane_angle() const -> moments must be centralized first!\n\n";
+   mlog << Error << "\nMtd_2D_Moments::calc_2D_axis_plane_angle() const -> "
+        << "moments must be centralized first!\n\n";
 
    exit ( 1 );
 
@@ -240,8 +239,5 @@ return angle;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
 
 

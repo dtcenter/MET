@@ -112,11 +112,11 @@ class GenesisInfo : public TrackInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline double   GenesisInfo::lat()          const { return(Lat);         }
-inline double   GenesisInfo::lon()          const { return(Lon);         }
-inline double   GenesisInfo::dland()        const { return(DLand);       }
-inline unixtime GenesisInfo::genesis_time() const { return(GenesisTime); }
-inline int      GenesisInfo::genesis_lead() const { return(GenesisLead); }
+inline double   GenesisInfo::lat()          const { return Lat;         }
+inline double   GenesisInfo::lon()          const { return Lon;         }
+inline double   GenesisInfo::dland()        const { return DLand;       }
+inline unixtime GenesisInfo::genesis_time() const { return GenesisTime; }
+inline int      GenesisInfo::genesis_lead() const { return GenesisLead; }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -167,7 +167,7 @@ class GenesisInfoArray {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int GenesisInfoArray::n() const { return(Genesis.size()); }
+inline int GenesisInfoArray::n() const { return Genesis.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 

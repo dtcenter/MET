@@ -216,8 +216,11 @@ seeps_p1_thresh = NA;
 ////////////////////////////////////////////////////////////////////////////////
 
 rank_corr_flag = TRUE;
-tmp_dir        = "/tmp";
-output_prefix  = "";
-version        = "V12.0.0";
+
+point_weight_flag = NONE;
+
+tmp_dir       = "/tmp";
+output_prefix = "";
+version       = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

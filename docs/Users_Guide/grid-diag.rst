@@ -27,7 +27,9 @@ The following sections describe the usage statement, required arguments, and opt
          [-v level]
          [-compress level]
 
-    NOTE: The "-data" option can be used once to read all fields from each input file or once for each field to be processed.
+.. note::
+
+  The "-data" option can be used once to read all fields from each input file or once for each field to be processed.
 
 grid_diag has required arguments and can accept several optional arguments.
 

@@ -616,23 +616,23 @@ Anomaly Correlation Coefficient
 
 Called "ANOM_CORR" and "ANOM_CORR_UNCNTR" for centered and uncentered versions in CNT output :numref:`table_PS_format_info_CNT`
 
-The anomaly correlation coefficient is equivalent to the Pearson correlation coefficient, except that both the forecasts and observations are first adjusted according to a climatology value. The anomaly is the difference between the individual forecast or observation and the typical situation, as measured by a climatology (**c**) of some variety. It measures the strength of linear association between the forecast anomalies and observed anomalies. The anomaly correlation coefficient is defined as: 
+The anomaly correlation coefficient is equivalent to the Pearson correlation coefficient, except that both the forecasts and observations are first adjusted by subtracting their corresponding climatology value. The anomaly is the difference between the individual forecast or observation and the typical situation, as measured by a forecast climatology (:math:`c_f`) and observation climatology (:math:`c_o`). It measures the strength of linear association between the forecast anomalies and observed anomalies. The anomaly correlation coefficient is defined as:
 
-.. math:: \text{Anomaly Correlation} = \frac{\sum(f_i - c)(o_i - c)}{\sqrt{\sum(f_i - c)^2} \sqrt{\sum(o_i -c)^2}} .
+.. math:: \text{Anomaly Correlation} = \frac{\sum(f_i - {c_f}_i)(o_i - {c_o}_i)}{\sqrt{\sum(f_i - {c_f}_i)^2} \sqrt{\sum(o_i - {c_o}_i)^2}} .
 
 The centered anomaly correlation coefficient (ANOM_CORR) which includes the mean error is defined as: 
 
 .. only:: latex
 
-  .. math:: \text{ANOM\_CORR } = \frac{ \overline{[(f - c) - \overline{(f - c)}][(a - c) - \overline{(a - c)}]}}{ \sqrt{ \overline{( (f - c) - \overline{(f - c)})^2} \overline{( (a - c) - \overline{(a - c)})^2}}}
+  .. math:: \text{ANOM\_CORR } = \frac{ \overline{[(f - c_f) - \overline{(f - c_f)}][(o - c_o) - \overline{(o - c_o)}]}}{ \sqrt{ \overline{( (f - c_f) - \overline{(f - c_f)})^2} \overline{( (o - c_o) - \overline{(o - c_o)})^2}}}
 
 .. only:: html
 
-  .. math:: \text{ANOM_CORR } = \frac{ \overline{[(f - c) - \overline{(f - c)}][(a - c) - \overline{(a - c)}]}}{ \sqrt{ \overline{( (f - c) - \overline{(f - c)})^2} \overline{( (a - c) - \overline{(a - c)})^2}}}
+  .. math:: \text{ANOM_CORR } = \frac{ \overline{[(f - c_f) - \overline{(f - c_f)}][(o - c_o) - \overline{(o - c_o)}]}}{ \sqrt{ \overline{( (f - c_f) - \overline{(f - c_f)})^2} \overline{( (o - c_o) - \overline{(o - c_o)})^2}}}
 
 The uncentered anomaly correlation coefficient (ANOM_CORR_UNCNTR) which does not include the mean errors is defined as: 
 
-.. math:: \text{Anomaly Correlation Raw } = \frac{ \overline{(f - c)(a - c)}}{ \sqrt{\overline{(f - c)^2} \overline{(a - c)^2}}}
+.. math:: \text{Anomaly Correlation Raw } = \frac{ \overline{(f - c_f)(o - c_o)}}{ \sqrt{\overline{(f - c_f)^2} \overline{(o - c_o)^2}}}
 
 Anomaly correlation can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecast and observed anomalies are not correlated.
 
@@ -650,56 +650,60 @@ The partial sums can be accumulated over individual cases to produce statistics 
 Scalar L1 and L2 Values
 -----------------------
 
-Called "FBAR", "OBAR", "FOBAR", "FFBAR", and "OOBAR" in SL1L2 output :numref:`table_PS_format_info_SL1L2`
+Called "FBAR", "OBAR", "FOBAR", "FFBAR", "OOBAR", and "MAE" in SL1L2 output :numref:`table_PS_format_info_SL1L2`
 
 These statistics are simply the 1st and 2nd moments of the forecasts, observations and errors:
 
 .. math:: 
-  \text{FBAR} = \text{Mean}(f) = \bar{f} = \frac{1}{n} \sum_{i=1}^n f_i
+  \text{FBAR} = \text{Mean}(f) = \frac{1}{n} \sum_{i=1}^n f_i
 
-  \text{OBAR} = \text{Mean}(o) = \bar{o} = \frac{1}{n} \sum_{i=1}^n o_i
+  \text{OBAR} = \text{Mean}(o) = \frac{1}{n} \sum_{i=1}^n o_i
 
-  \text{FOBAR} = \text{Mean}(fo) = \bar{fo} = \frac{1}{n} \sum_{i=1}^n f_i o_i
+  \text{FOBAR} = \text{Mean}(fo) = \frac{1}{n} \sum_{i=1}^n f_i o_i
 
-  \text{FFBAR} = \text{Mean}(f^2) = \bar{f}^2 = \frac{1}{n} \sum_{i=1}^n f_i^2
+  \text{FFBAR} = \text{Mean}(f^2) = \frac{1}{n} \sum_{i=1}^n f_i^2
 
-  \text{OOBAR} = \text{Mean}(o^2) = \bar{o}^2 = \frac{1}{n} \sum_{i=1}^n o_i^2
+  \text{OOBAR} = \text{Mean}(o^2) = \frac{1}{n} \sum_{i=1}^n o_i^2
+
+  \text{MAE} = \text{Mean}(|f - o|) = \frac{1}{n} \sum_{i=1}^n |f_i - o_i|
 
 Some of the other statistics for continuous forecasts (e.g., RMSE) can be derived from these moments.
 
 Scalar Anomaly L1 and L2 Values
 -------------------------------
 
-Called "FABAR", "OABAR", "FOABAR", "FFABAR", "OOABAR" in SAL1L2 output :numref:`table_PS_format_info_SAL1L2`
+Called "FABAR", "OABAR", "FOABAR", "FFABAR", "OOABAR", and "MAE" in SAL1L2 output :numref:`table_PS_format_info_SAL1L2`
 
-Computation of these statistics requires a climatological value, c. These statistics are the 1st and 2nd moments of the scalar anomalies. The moments are defined as:
+Computation of these statistics requires climatological values, where :math:`c_f` is the forecast climatology value and :math:`c_o` is the observation climatology value. These statistics are the 1st and 2nd moments of the scalar anomalies. The moments are defined as:
 
 .. math:: 
-  \text{FABAR} = \text{Mean}(f - c) = \bar{f - c} = \frac{1}{n} \sum_{i=1}^n (f_i - c)
+  \text{FABAR} = \text{Mean}(f - c_f) = \frac{1}{n} \sum_{i=1}^n (f_i - {c_f}_i)
 
-  \text{OABAR} = \text{Mean}(o - c) = \bar{o - c} = \frac{1}{n} \sum_{i=1}^n (o_i - c)
+  \text{OABAR} = \text{Mean}(o - c_o) = \frac{1}{n} \sum_{i=1}^n (o_i - {c_o}_i)
 
-  \text{FOABAR} = \text{Mean}[(f - c)(o - c)] = \bar{(f - c)(o - c)} = \frac{1}{n} \sum_{i=1}^n (f_i - c)(o_i - c)
+  \text{FOABAR} = \text{Mean}[(f - c_f)(o - c_o)] = \frac{1}{n} \sum_{i=1}^n (f_i - {c_f}_i)(o_i - {c_o}_i)
 
-  \text{FFABAR} = \text{Mean}[(f - c)^2] = \bar{(f - c)}^2 = \frac{1}{n} \sum_{i=1}^n (f_i - c)^2
+  \text{FFABAR} = \text{Mean}[(f - c_f)^2] = \frac{1}{n} \sum_{i=1}^n (f_i - {c_f}_i)^2
 
-  \text{OOABAR} = \text{Mean}[(o - c)^2] = \bar{(o - c)}^2 = \frac{1}{n} \sum_{i=1}^n (o_i - c)^2
+  \text{OOABAR} = \text{Mean}[(o - c_o)^2] = \frac{1}{n} \sum_{i=1}^n (o_i - {c_o}_i)^2
+
+  \text{MAE} = \text{Mean}(|(f - c_f) - (o - c_o)|) = \frac{1}{n} \sum_{i=1}^n |(f_i - {c_f}_i) - (o_i - {c_o}_i)|
 
 Vector L1 and L2 Values
 -----------------------
 
-Called "UFBAR", "VFBAR", "UOBAR", "VOBAR", "UVFOBAR", "UVFFBAR", "UVOOBAR" in VL1L2 output :numref:`table_PS_format_info_VL1L2`
+Called "UFBAR", "VFBAR", "UOBAR", "VOBAR", "UVFOBAR", "UVFFBAR", and "UVOOBAR" in VL1L2 output :numref:`table_PS_format_info_VL1L2`
 
-These statistics are the moments for wind vector values, where **u** is the E-W wind component and **v** is the N-S wind component ( :math:`u_f` is the forecast E-W wind component; :math:`u_o` is the observed E-W wind component; :math:`v_f` is the forecast N-S wind component; and :math:`v_o` is the observed N-S wind component). The following measures are computed:
+These statistics are the moments for wind vector values, where :math:`u` is the E-W wind component and :math:`v` is the N-S wind component ( :math:`u_f` is the forecast E-W wind component; :math:`u_o` is the observed E-W wind component; :math:`v_f` is the forecast N-S wind component; and :math:`v_o` is the observed N-S wind component). The following measures are computed:
 
 .. math:: 
-  \text{UFBAR} = \text{Mean}(u_f) = \bar{u}_f = \frac{1}{n} \sum_{i=1}^n u_{fi}
+  \text{UFBAR} = \text{Mean}(u_f) = \frac{1}{n} \sum_{i=1}^n u_{fi}
 
-  \text{VFBAR} = \text{Mean}(v_f) = \bar{v}_f = \frac{1}{n} \sum_{i=1}^n v_{fi}
+  \text{VFBAR} = \text{Mean}(v_f) = \frac{1}{n} \sum_{i=1}^n v_{fi}
 
-  \text{UOBAR} = \text{Mean}(u_o) = \bar{u}_o = \frac{1}{n} \sum_{i=1}^n u_{oi}
+  \text{UOBAR} = \text{Mean}(u_o) = \frac{1}{n} \sum_{i=1}^n u_{oi}
 
-  \text{VOBAR} = \text{Mean}(v_o) = \bar{v}_o = \frac{1}{n} \sum_{i=1}^n v_{oi}
+  \text{VOBAR} = \text{Mean}(v_o) = \frac{1}{n} \sum_{i=1}^n v_{oi}
 
   \text{UVFOBAR} = \text{Mean}(u_f u_o + v_f v_o) = \frac{1}{n} \sum_{i=1}^n (u_{fi} u_{oi} + v_{fi} v_{oi})
 
@@ -710,25 +714,27 @@ These statistics are the moments for wind vector values, where **u** is the E-W 
 Vector Anomaly L1 and L2 Values
 -------------------------------
 
-Called "UFABAR", "VFABAR", "UOABAR", "VOABAR", "UVFOABAR", "UVFFABAR", "UVOOABAR" in VAL1L2 output :numref:`table_PS_format_info_VAL1L2`
+Called "UFABAR", "VFABAR", "UOABAR", "VOABAR", "UVFOABAR", "UVFFABAR", and "UVOOABAR" in VAL1L2 output :numref:`table_PS_format_info_VAL1L2`
 
-These statistics require climatological values for the wind vector components, :math:`u_c \text{ and } v_c`. The measures are defined below:
+These statistics require climatological values for the wind vector components, where :math:`{u_c}_f` and :math:`{v_c}_f` are the forecast climatology vectors and :math:`{u_c}_o` and :math:`{v_c}_o` are the observation climatology vectors. The measures are defined below:
 
 .. math:: 
-  \text{UFABAR} = \text{Mean}(u_f - u_c) = \frac{1}{n} \sum_{i=1}^n (u_{fi} - u_c)
+  \text{UFABAR} = \text{Mean}(u_f - {u_c}_f) = \frac{1}{n} \sum_{i=1}^n ({u_f}_i - {{u_c}_f}_i)
 
-  \text{VFBAR} = \text{Mean}(v_f - v_c) = \frac{1}{n} \sum_{i=1}^n (v_{fi} - v_c)
+  \text{VFBAR} = \text{Mean}(v_f - {v_c}_f) = \frac{1}{n} \sum_{i=1}^n ({v_f}_i - {{v_c}_f}_i)
 
-  \text{UOABAR} = \text{Mean}(u_o - u_c) = \frac{1}{n} \sum_{i=1}^n (u_{oi} - u_c)
+  \text{UOABAR} = \text{Mean}(u_o - {u_c}_o) = \frac{1}{n} \sum_{i=1}^n ({u_o}_i - {{u_c}_o}_i)
 
-  \text{VOABAR} = \text{Mean}(v_o - v_c) = \frac{1}{n} \sum_{i=1}^n (v_{oi} - v_c)
+  \text{VOABAR} = \text{Mean}(v_o - {v_c}_o) = \frac{1}{n} \sum_{i=1}^n ({v_o}_i - {{v_c}_o}_i)
 
-  \text{UVFOABAR} &= \text{Mean}[(u_f - u_c)(u_o - u_c) + (v_f - v_c)(v_o - v_c)] \\
-                  &= \frac{1}{n} \sum_{i=1}^n (u_{fi} - u_c) + (u_{oi} - u_c) + (v_{fi} - v_c)(v_{oi} - v_c)
+  \text{UVFOABAR} &= \text{Mean}[(u_f - {u_c}_f)(u_o - {u_c}_o) + (v_f - {v_c}_f)(v_o - {v_c}_o)] \\
+                  &= \frac{1}{n} \sum_{i=1}^n ({u_f}_i - {{u_c}_f}_i) + ({u_o}_i - {{u_c}_o}_i) + ({v_f}_i - {{v_c}_f}_i)({v_o}_i - {{v_c}_o}_i)
 
-  \text{UVFFABAR} = \text{Mean}[(u_f - u_c)^2 + (v_f - v_c)^2] = \frac{1}{n} \sum_{i=1}^n ((u_{fi} - u_c)^2 + (v_{fi} - v_c)^2)
+  \text{UVFFABAR} &= \text{Mean}[(u_f - {u_c}_f)^2 + (v_f - {v_c}_f)^2] \\
+                  &= \frac{1}{n} \sum_{i=1}^n (({u_f}_i - {{u_c}_f}_i)^2 + ({v_f}_i - {{v_c}_f}_i)^2)
 
-  \text{UVOOABAR} = \text{Mean}[(u_o - u_c)^2 + (v_o - v_c)^2] = \frac{1}{n} \sum_{i=1}^n ((u_{oi} - u_c)^2 + (v_{oi} - v_c)^2)
+  \text{UVOOABAR} &= \text{Mean}[(u_o - {u_c}_o)^2 + (v_o - {v_c}_o)^2] \\
+                  &= \frac{1}{n} \sum_{i=1}^n (({u_o}_i - {{u_c}_o}_i)^2 + ({v_o}_i - {{v_c}_o}_i)^2)
 
 Gradient Values
 ---------------

@@ -7,7 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -779,8 +778,6 @@ IntersectionVol = 0;
 
 IsSimple = true;
 
-// UnionVol = 0;
-
 TimeCentroidDelta = 0.0;
 
 SpaceCentroidDist = 0.0;
@@ -829,9 +826,6 @@ FcstClusterNumber = a.FcstClusterNumber;
 ObsClusterNumber  = a.ObsClusterNumber;
 
 IntersectionVol = a.IntersectionVol;
-
-// UnionVol = a.UnionVol;
-
 
 TimeCentroidDelta = a.TimeCentroidDelta;
 
@@ -953,20 +947,6 @@ return;
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-/*
-void PairAtt3D::set_union_volume(int k)
-
-{
-
-UnionVol = k;
-
-return;
-
-}
-*/
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1261,7 +1241,7 @@ moments = mask.calc_3d_moments();
 
 if ( moments.N == 0 )  {
 
-   mlog << Error << "\n\ncalc_3d_single_atts() -> "
+   mlog << Error << "\ncalc_3d_single_atts() -> "
         << "empty object!\n\n";
 
    exit ( 1 );
@@ -1354,7 +1334,7 @@ values = new float [Vol];
 
 if ( !values )  {
 
-   mlog << Error << "\n\ncalc_3d_single_atts() -> "
+   mlog << Error << "\ncalc_3d_single_atts() -> "
         << "memory allocation error\n\n";
 
    exit ( 1 );
@@ -1453,7 +1433,6 @@ for (x=0; x<(fcst_obj.nx()); ++x)  {
 }
 
 p.set_intersection_volume (IV);
-// p.set_union_volume        (UV);
 
    //
    //  centroid distances
@@ -1548,188 +1527,6 @@ return p;
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-double calc_total_interest(const PairAtt3D & p, const MtdConfigInfo & conf)
-
-{
-
-double t = 0.0;
-double num, den;   //  numerator and denominator in the expression for total interest
-double I, w;
-PiecewiseLinear * f = 0;
-
-num = 0.0;
-den = 0.0;
-
-   //
-   //  We don't need to use "is_eq" to check whether each weight is
-   //     nonzero, because the MtdConfigInfo::read_config() function has
-   //     already done that.  That same function has already tested that
-   //     the weights are not all zero.
-   //
-
-   //
-   //  space centroid dist
-   //
-
-w = conf.space_centroid_dist_wt;
-
-if ( w != 0.0 )  {
-
-   f = conf.space_centroid_dist_if;
-
-   I = (*f)(p.space_centroid_dist());
-
-   num += w*I;
-
-   den += w;
-
-}
-
-   //
-   //  time centroid delta
-   //
-
-w = conf.time_centroid_delta_wt;
-
-if ( w != 0.0 )  {
-
-   f = conf.time_centroid_delta_if;
-
-   I = (*f)(p.time_centroid_delta());
-
-   num += w*I;
-
-   den += w;
-
-}
-
-   //
-   //  speed delta
-   //
-
-w = conf.speed_delta_wt;
-
-if ( w != 0.0 )  {
-
-   f = conf.speed_delta_if;
-
-   I = (*f)(p.speed_delta());
-
-   num += w*I;
-
-   den += w;
-
-}
-
-   //
-   //  direction difference
-   //
-
-w = conf.direction_diff_wt;
-
-if ( w != 0.0 )  {
-
-   f = conf.direction_diff_if;
-
-   I = (*f)(p.direction_difference());
-
-   num += w*I;
-
-   den += w;
-
-}
-
-   //
-   //  volume ratio
-   //
-
-w = conf.volume_ratio_wt;
-
-if ( w != 0.0 )  {
-
-   f = conf.volume_ratio_if;
-
-   I = (*f)(p.volume_ratio());
-
-   num += w*I;
-
-   den += w;
-
-}
-
-   //
-   //  axis angle difference
-   //
-
-w = conf.axis_angle_diff_wt;
-
-if ( w != 0.0 )  {
-
-   f = conf.axis_angle_diff_if;
-
-   I = (*f)(p.axis_angle_diff());
-
-   num += w*I;
-
-   den += w;
-
-}
-
-   //
-   //  start time delta
-   //
-
-w = conf.start_time_delta_wt;
-
-if ( w != 0.0 )  {
-
-   f = conf.start_time_delta_if;
-
-   I = (*f)(p.start_time_delta());
-
-   num += w*I;
-
-   den += w;
-
-}
-
-   //
-   //  end time delta
-   //
-
-w = conf.end_time_delta_wt;
-
-if ( w != 0.0 )  {
-
-   f = conf.end_time_delta_if;
-
-   I = (*f)(p.end_time_delta());
-
-   num += w*I;
-
-   den += w;
-
-}
-
-   //
-   //  The denominator is just the sum of the weights,
-   //    which, as stated above, we already know is nonzero.
-   //
-
-t = num/den;
-
-   //
-   //  done
-   //
-
-return t;
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 double calc_2d_dist(const double x1_grid, const double y1_grid, 
                     const double x2_grid, const double y2_grid, const Grid & grid)
@@ -1737,15 +1534,6 @@ double calc_2d_dist(const double x1_grid, const double y1_grid,
 {
 
 double dist;
-
-   //
-   //  distance in grid units
-   //
-
-// const double dx = x1_grid - x2_grid;
-// const double dy = y1_grid - y2_grid;
-// 
-// dist = sqrt ( dx*dx + dy*dy );
 
    //
    //  great circle distance
@@ -1769,10 +1557,5 @@ return dist;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
-
 
 

@@ -154,8 +154,6 @@ struct DataHandle {
 
    {
 
-      int j;
-
       _out.put('\n');
 
       _out << "   DataHandle:\n";
@@ -168,13 +166,13 @@ struct DataHandle {
 
       _out << "   plane_loaded = [";
 
-      for (j=0; j<time_radius; ++j)  _out << ' ' << bool_to_string(plane_loaded[j]);
+      for (int j=0; j<time_radius; ++j)  _out << ' ' << bool_to_string(plane_loaded[j]);
 
       _out << " ]\n";
 
       _out << "   plane_time = [";
 
-      for (j=0; j<time_radius; ++j)  {
+      for (int j=0; j<time_radius; ++j)  {
 
          _out << ' ';
 
@@ -221,15 +219,14 @@ MtdFloatFile MtdFloatFile::convolve(const int spatial_R, const int time_beg, con
 
 {
 
-int j, k, n;
-int x, y, t;
+int n;
 int n_good;
 double value;
 MtdFloatFile out;
-double min_conv_value, max_conv_value;
-double * conv_data = (double *) nullptr;
+double min_conv_value;
+double max_conv_value;
+auto conv_data = (double *) nullptr;
 DataHandle handle;
-unixtime time_start, time_stop;
 
 const int time_radius = time_end - time_beg + 1;
 
@@ -247,12 +244,6 @@ file_id = 1;   //  This is declared static in the netCDF library header file ncG
 
 spatial_conv_radius = spatial_R;
 
-
-// mlog << Error << "\n\n"
-//      << "    MtdFloatFile::convolve(const int) const -> still doesn't allow for bad data!\n\n"
-//      << "\n\n";
-
-
 const int Nxy = Nx*Ny;
 const int Nxyz = Nx*Ny*Nt;
 
@@ -262,11 +253,12 @@ ok_sum_plane_buf = new bool   [Nxy];
 handle.set_size(Nx, Ny, time_radius);
 
 conv_data = new double [Nxyz];
-for (k=0; k<Nxyz; k++) conv_data[k] = bad_data_double;
+for (int k=0; k<Nxyz; k++) conv_data[k] = bad_data_double;
 
 if ( !conv_data )  {
 
-   mlog << Error << "\n\n  MtdFloatFile::convolve(const int, const int, const int) const: process() -> memory allocation error\n\n";
+   mlog << Error << "\nMtdFloatFile::convolve(const int, const int, const int) const: process() -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -279,11 +271,9 @@ if ( !conv_data )  {
 min_conv_value =  1.0e100;
 max_conv_value = -1.0e100;
 
-time_start = time(0);
+unixtime time_start = time(nullptr);
 
-// cout << "\n\n  n = " << mtd_three_to_one(Nx, Ny, Nt, 88, 397, 0) << "\n\n";
-
-for (t=0; t<Nt; ++t)  {
+for (int t=0; t<Nt; ++t)  {
 
    n = mtd_three_to_one(Nx, Ny, Nt, 0, 0, t);
 
@@ -291,9 +281,7 @@ for (t=0; t<Nt; ++t)  {
 
    load_handle(handle, *this, t, time_beg, time_end);
 
-   // handle.dump(cout);
-
-   for (k=0; k<time_radius; ++k)  {
+   for (int k=0; k<time_radius; ++k)  {
 
       ss[k] = handle.sum_plane[k];
 
@@ -305,17 +293,11 @@ for (t=0; t<Nt; ++t)  {
       //   the order of loops is important here
       //
 
-   for (j=0; j<Nxy; ++j)  {
-
-      // if ( (t == 0) && (j == 243846) )  {
-      //
-      //    cerr << "ok\n";
-      //
-      // }
+   for (int j=0; j<Nxy; ++j)  {
 
       bool has_good_data = false;
 
-      for (k=0; k<time_radius; ++k)  {
+      for (int k=0; k<time_radius; ++k)  {
 
          if ( handle.plane_loaded[k] && *(ok[k]) ) {
             has_good_data = true;
@@ -331,7 +313,7 @@ for (t=0; t<Nt; ++t)  {
 
          n_good = 0;
 
-         for (k=0; k<time_radius; ++k)  {
+         for (int k=0; k<time_radius; ++k)  {
             if ( handle.plane_loaded[k] && *(ok[k]) )  { value += (*ss[k]);  ++n_good; }
          }
 
@@ -346,9 +328,9 @@ for (t=0; t<Nt; ++t)  {
 
       }
 
-      *p++ = value;
+      if ((n + j) < Nxyz) *p++ = value;
 
-      for (k=0; k<time_radius; ++k)  {
+      for (int k=0; k<time_radius; ++k)  {
 
          ++(ss[k]);
          ++(ok[k]);
@@ -359,13 +341,12 @@ for (t=0; t<Nt; ++t)  {
 
 }   //  for t
 
-time_stop = time(0);
-
 
 mlog << Debug(5) << "Conv data range is " << min_conv_value << " to " << max_conv_value << "\n\n";
 
 
 if ( verbose )  {
+   unixtime time_stop = time(nullptr);
 
    mlog << Debug(5) << "\n  Conv time       = " << (time_stop - time_start) << " seconds\n";
 
@@ -392,7 +373,7 @@ out.set_spatial_radius(spatial_R);
 
 out.set_time_window(time_beg, time_end);
 
-for (j=0; j<Nt; ++j)  {
+for (int j=0; j<Nt; ++j)  {
 
    out.set_lead_time(j, lead_time(j));
 
@@ -404,17 +385,14 @@ for (j=0; j<Nt; ++j)  {
    //
 
 
-for (x=0; x<Nx; ++x)  {
+for (int x=0; x<Nx; ++x)  {
 
-   // if ( verbose && ((x%100) == 0) )  mlog << Debug(5) << "Pass 2: x = " << x << " of " << Nx << "\n";
+   for (int y=0; y<Ny; ++y)  {
 
-   for (y=0; y<Ny; ++y)  {
-
-      for (t=0; t<Nt; ++t)  {
+      for (int t=0; t<Nt; ++t)  {
 
          n = mtd_three_to_one(Nx, Ny, Nt, x, y, t);
 
-         // value = calc_conv_value(in, x, y, t);
          value = conv_data[n];
 
          out.put((float) value, x, y, t);
@@ -449,7 +427,8 @@ void DataHandle::set_size(int _nx, int _ny, int _time_radius)
 
 if ( (_nx <= 0) || (_ny <= 0) )  {
 
-   mlog << Error << "\n\n  DataHandle::set_size() -> bad size\n\n";
+   mlog << Error << "\nDataHandle::set_size() -> "
+        << "bad size\n\n";
 
    exit ( 1 );
 
@@ -538,9 +517,6 @@ bool status = false;
 const int nx = mtd.nx();
 const int ny = mtd.ny();
 
-
-// mlog << Debug(5) << "In get_data_plane\n";
-
 for (y=0; y<ny; ++y)  {
 
    for (x=0; x<nx; ++x)  {
@@ -549,7 +525,7 @@ for (y=0; y<ny; ++y)  {
 
       status = is_bad_data(value);
 
-      if (offset < (nx * ny)) { // kludge for SonarQube findings
+      if (offset < (nx * ny)) {
          *(d+offset) = (float) value;
 
          *(ok+offset) = ! status;
@@ -613,13 +589,6 @@ const double * data_back_p    = nullptr;
 const double * data_in_p      = nullptr;
       double * data_out_p     = nullptr;
       double * data_put_p     = nullptr;
-
-
-// mlog << Debug(5) << "in calc_sum_plane\n";
-
-// snprintf(junk, sizeof(junk), "raw_%02d", t_count);
-
-// data_pgm(data_plane, nx, ny, junk);
 
    //
    //  zero out the sum plane buffer
@@ -707,9 +676,6 @@ for (y=0; y<ny; ++y)  {
    }   //  for x
 
 }   //  for y
-
-// memcpy(   sum_plane,    sum_plane_buf, nxy*sizeof(double));
-// memcpy(ok_sum_plane, ok_sum_plane_buf, nxy*sizeof(bool));
 
 if ( do_ppms )  {
 
@@ -991,11 +957,10 @@ for (x=0; x<nx; ++x)  {
 
 }
 
-// mlog << Debug(5) << "writing image file \"" << filename << "\"\n";
-
 if ( ! image.write(filename) )  {
 
-   mlog << Error << "\n\n  unable to write image file \"" << filename << "\"\n\n";
+   mlog << Error << "\ndata_handle_ppm() -> "
+        << "unable to write image file: " << filename << "\n\n";
 
    exit ( 1 );
 
@@ -1044,11 +1009,10 @@ for (int x=0; x<nx; ++x)  {
 
 }
 
-// mlog << Debug(5) << "writing image file \"" << filename << "\"\n";
-
 if ( ! image.write(filename) )  {
 
-   mlog << Error << "\n\n  unable to write image file \"" << filename << "\"\n\n";
+   mlog << Error << "\nok_handle_ppm() -> "
+        << "unable to write image file: " << filename << "\n\n";
 
    exit ( 1 );
 
@@ -1060,9 +1024,5 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
 
 

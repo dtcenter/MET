@@ -79,7 +79,7 @@
     <param> \
       -subtract \
       &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_012.tm00 12 \
-      &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_009.tm00 9 \      
+      &DATA_DIR_MODEL;/grib1/ref_config/2011090200/AFWAv3.4_Noahv3.3/postprd/wrfprs_009.tm00 9 \
       &OUTPUT_DIR;/ref_config_lead_12/pcp_combine/wrf/wrfpcp03_012.nc
     </param>
     <output>

@@ -50,7 +50,7 @@ The relative position (RELP) is a count of the number of times each ensemble mem
 
 The ranked probability score (RPS) is included in the Ranked Probability Score (RPS) line type. It is the mean of the Brier scores computed from ensemble probabilities derived for each probability category threshold (prob_cat_thresh) specified in the configuration file. The continuous ranked probability score (CRPS) is the average the distance between the forecast (ensemble) cumulative distribution function and the observation cumulative distribution function. It is an analog of the Brier score, but for continuous forecast and observation fields. The CRPS statistic is computed using two methods: assuming a normal distribution defined by the ensemble mean and spread (:ref:`Gneiting et al., 2004 <Gneiting-2004>`) and using the empirical ensemble distribution (:ref:`Hersbach, 2000 <Hersbach-2000>`). The CRPS statistic using the empirical ensemble distribution can be adjusted (bias corrected) by subtracting 1/(2*m) times the mean absolute difference of the ensemble members, where m is the ensemble size. This is reported as a separate statistic called CRPS_EMP_FAIR. The empirical CRPS and its fair version are included in the Ensemble Continuous Statistics (ECNT) line type, along with other statistics quantifying the ensemble spread and ensemble mean skill.
 
-The Ensemble-Stat tool can derive ensemble relative frequencies and verify them as probability forecasts all in the same run. Note however that these simple ensemble relative frequencies are not actually calibrated probability forecasts. If probabilistic line types are requested (output_flag), this logic is applied to each pair of fields listed in the forecast (fcst) and observation (obs) dictionaries of the configuration file. Each probability category threshold (prob_cat_thresh) listed for the forecast field is applied to the input ensemble members to derive a relative frequency forecast. The probability category threshold (prob_cat_thresh) parsed from the corresponding observation entry is applied to the (gridded or point) observations to determine whether or not the event actually occurred. The paired ensemble relative freqencies and observation events are used to populate an Nx2 probabilistic contingency table. The dimension of that table is determined by the probability PCT threshold (prob_pct_thresh) configuration file option parsed from the forecast dictionary. All probabilistic output types requested are derived from the this Nx2 table and written to the ascii output files. Note that the FCST_VAR name header column is automatically reset as "PROB({FCST_VAR}{THRESH})" where {FCST_VAR} is the current field being evaluated and {THRESH} is the threshold that was applied.
+The Ensemble-Stat tool can derive ensemble relative frequencies and verify them as probability forecasts all in the same run. Note however that these simple ensemble relative frequencies are not actually calibrated probability forecasts. If probabilistic line types are requested (output_flag), this logic is applied to each pair of fields listed in the forecast (fcst) and observation (obs) dictionaries of the configuration file. Each probability category threshold (prob_cat_thresh) listed for the forecast field is applied to the input ensemble members to derive a relative frequency forecast. The probability category threshold (prob_cat_thresh) parsed from the corresponding observation entry is applied to the (gridded or point) observations to determine whether or not the event actually occurred. The paired ensemble relative frequencies and observation events are used to populate an Nx2 probabilistic contingency table. The dimension of that table is determined by the probability PCT threshold (prob_pct_thresh) configuration file option parsed from the forecast dictionary. All probabilistic output types requested are derived from this Nx2 table and written to the ascii output files. Note that the FCST_VAR name header column is automatically reset as "PROB({FCST_VAR}{THRESH})" where {FCST_VAR} is the current field being evaluated and {THRESH} is the threshold that was applied.
 
 Note that if no probability category thresholds (prob_cat_thresh) are defined, but climatological mean and standard deviation data is provided along with climatological bins, climatological distribution percentile thresholds are automatically derived and used to compute probabilistic outputs. 
 
@@ -160,34 +160,48 @@ ____________________
 
 .. code-block:: none
 
-  model          = "FCST";
-  desc           = "NA";
-  obtype         = "ANALYS";
-  regrid         = { ... }
-  climo_mean     = { ... }
-  climo_stdev    = { ... }
-  climo_cdf      = { ... }
-  obs_window     = { beg = -5400; end =  5400; }
-  mask           = { grid = [ "FULL" ]; poly = []; sid = []; }
-  ci_alpha       = [ 0.05 ];
-  interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
-                     type = [ { method = NEAREST; width = 1; } ]; }
-  eclv_points    = [];
-  sid_inc        = [];
-  sid_exc        = [];
-  duplicate_flag = NONE;
+  model            = "FCST";
+  desc             = "NA";
+  obtype           = "ANALYS";
+  regrid           = { ... }
+  climo_mean       = { ... }
+  climo_stdev      = { ... }
+  climo_cdf        = { ... }
+  obs_window       = { beg = -5400; end =  5400; }
+  mask             = { grid = [ "FULL" ]; poly = []; sid = []; }
+  ci_alpha         = [ 0.05 ];
+  interp           = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
+                       type = [ { method = NEAREST; width = 1; } ]; }
+  eclv_points      = [];
+  sid_inc          = [];
+  sid_exc          = [];
+  duplicate_flag   = NONE;
   obs_quality_inc  = [];
   obs_quality_exc  = [];
-  obs_summary    = NONE;
-  obs_perc_value = 50;
+  obs_summary      = NONE;
+  obs_perc_value   = 50;
   message_type_group_map = [...];
-  output_prefix  = "";
-  version        = "VN.N";
+  obtype_as_group_val_flag = FALSE;
+  grid_weight_flag = NONE;
+  point_weight_flag = NONE;
+  output_prefix    = "";
+  version          = "VN.N";
 
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
-Note that the **HIRA** interpolation method is only supported in Ensemble-Stat.
+.. note::
+
+  The **HIRA** interpolation method is only supported in Ensemble-Stat.
+
+.. note::
+
+  The "grid_weight_flag" and "point_weight_flag" options described in
+  :numref:`config_options` define how matched pairs are weighted for
+  grid-to-grid and grid-to-point verification in Ensemble-Stat. These
+  weights currently only apply to the computation of probabilistic
+  outputs (PCT, PSTD, PJC, and PRC) but no other Ensemble-Stat output
+  line types.
 
 _____________________
 
@@ -856,30 +870,36 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
   * - 37
     - ENS_i
     - Value of the ith ensemble member (repeated)
-  * - Last-7
+  * - Last-9
     - OBS_QC
     - Quality control string for the observation
-  * - Last-6
+  * - Last-8
     - ENS_MEAN
     - The unperturbed ensemble mean value
-  * - Last-5
-    - CLIMO_MEAN
-    - Climatological mean value (named CLIMO prior to met-10.0.0)
-  * - Last-4
+  * - Last-7
+    - OBS_CLIMO_MEAN
+    - Observation climatological mean value (named CLIMO_MEAN prior to met-12.0.0)
+  * - Last-6
     - SPREAD
     - The spread (standard deviation) of the unperturbed ensemble member values
-  * - Last-3
+  * - Last-5
     - ENS_MEAN _OERR
     - The PERTURBED ensemble mean (e.g. with Observation Error).
-  * - Last-2
+  * - Last-4
     - SPREAD_OERR
     - The spread (standard deviation) of the PERTURBED ensemble member values (e.g. with Observation Error).
-  * - Last-1
+  * - Last-3
     - SPREAD_PLUS_OERR
     - The square root of the sum of the unperturbed ensemble variance and the observation error variance.
+  * - Last-2
+    - OBS_CLIMO_STDEV
+    - Observation climatological standard deviation value (named CLIMO_STDEV prior to met-12.0.0)
+  * - Last-1
+    - FCST_CLIMO_MEAN
+    - Forecast climatological mean value
   * - Last
-    - CLIMO_STDEV
-    - Climatological standard deviation value
+    - FCST_CLIMO_STDEV
+    - Forecast climatological standard deviation value
       
 .. role:: raw-html(raw)
     :format: html

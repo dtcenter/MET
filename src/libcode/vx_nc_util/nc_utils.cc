@@ -240,10 +240,9 @@ double get_att_value_double(const NcAtt *att) {
 
 void get_att_value_doubles(const NcAtt *att, NumArray &value) {
    value.erase();
-   double *values = new double[att->getAttLength()];
-   att->getValues(values);
+   vector<double> values(att->getAttLength());
+   att->getValues(values.data());
    for(unsigned int i=0; i<=att->getAttLength(); i++) value.add(values[i]);
-   if(values) { delete [] values; values = 0; }
    return;
 }
 
@@ -532,6 +531,16 @@ bool get_nc_att_value(const NcVar *var, const ConcatString &att_name,
    static const char *method_name = "get_nc_att_value(NcVar,float) -> ";
    bool status = get_nc_att_value_(var, att_name, att_val, exit_on_error,
                                    bad_data_float, method_name);
+   return status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool get_nc_att_values(const NcVar *var, const ConcatString &att_name,
+                       unsigned short *att_val, bool exit_on_error) {
+   static const char *method_name = "get_nc_att_value(NcVar,float) -> ";
+   bool status = get_nc_att_values_(var, att_name, att_val, exit_on_error,
+                                    method_name);
    return status;
 }
 
@@ -877,14 +886,12 @@ void add_att(NcVar *var, const string &att_name, const double att_val) {
 
 int get_var_names(NcFile *nc, StringArray *var_names) {
 
-   NcVar var;
    int i = 0;
    int var_count = nc->getVarCount();
 
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
-   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
-        it_var != mapVar.end(); ++it_var) {
-      var = (*it_var).second;
+   for (auto &kv : mapVar) {
+      NcVar var = kv.second;
       var_names->add(var.getName());
       i++;
    }
@@ -1389,8 +1396,8 @@ bool get_nc_data(NcVar *var, float *data) {
          switch ( type_id )  {
             case NcType::nc_DOUBLE:
                {
-                  double *packed_data = new double[cell_count];
-                  if (get_nc_data_t(var, packed_data)) {
+                  vector<double> packed_data(cell_count);
+                  if (get_nc_data_t(var, packed_data.data())) {
                      double fill_value;
                      bool has_fill_value = get_var_fill_value(var, fill_value);
                      for (int idx=0; idx<cell_count; idx++) {
@@ -1403,98 +1410,88 @@ bool get_nc_data(NcVar *var, float *data) {
                   else {
                      for (int idx=0; idx<cell_count; idx++) data[idx] = bad_data_double;
                   }
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_INT64:
                {
-                  long long *packed_data = new long long[cell_count];
-                  for (int idx=0; idx<cell_count; idx++) packed_data[idx] = (long long)bad_data_int;
+                  vector<long long> packed_data(cell_count, (long long)bad_data_int);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "int64", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_INT:
                {
-                  int *packed_data = new int[cell_count];
+                  vector<int> packed_data(cell_count);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "int", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_SHORT:
                {
                   short missing_value;
                   bool has_missing = get_var_fill_value(var, missing_value);
-                  short *packed_data = new short[cell_count];
+                  vector<short> packed_data(cell_count);
 
-                  var->getVar(packed_data);
+                  var->getVar(packed_data.data());
                   if (unsigned_value) {
-                     unsigned short *ushort_data = new unsigned short[cell_count];
+                     vector<unsigned short> ushort_data(cell_count);
                      for (int idx=0; idx<cell_count; idx++) {
                         ushort_data[idx] =(unsigned short)packed_data[idx];
                      }
-                     copy_nc_data_t(var, data, ushort_data, cell_count,
+                     copy_nc_data_t(var, data, ushort_data.data(), cell_count,
                                     "ushort", add_offset, scale_factor,
                                     has_missing, (unsigned short)missing_value);
-                     delete [] ushort_data;
                   }
                   else {
-                     copy_nc_data_t(var, data, packed_data, cell_count,
+                     copy_nc_data_t(var, data, packed_data.data(), cell_count,
                                     "short", add_offset, scale_factor,
                                     has_missing, missing_value);
                   }
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_USHORT:
                {
-                  unsigned short *packed_data = new unsigned short[cell_count];
+                  vector<unsigned short> packed_data(cell_count);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "unsigned short", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_BYTE:
                {
                   ncbyte missing_value;
                   bool has_missing = get_var_fill_value(var, missing_value);
-                  ncbyte *packed_data = new ncbyte[cell_count];
+                  vector<ncbyte> packed_data(cell_count);
 
-                  var->getVar(packed_data);
+                  var->getVar(packed_data.data());
                   if (unsigned_value) {
-                     unsigned char *ubyte_data = new unsigned char[cell_count];
+                     vector<unsigned char> ubyte_data(cell_count);
                      for (int idx=0; idx<cell_count; idx++) {
                         ubyte_data[idx] =(unsigned char)packed_data[idx];
                      }
-                     copy_nc_data_t(var, data, ubyte_data, cell_count,
+                     copy_nc_data_t(var, data, ubyte_data.data(), cell_count,
                                     "ncubyte", add_offset, scale_factor,
                                     has_missing, (unsigned char)missing_value);
-                     delete [] ubyte_data;
                   }
                   else {
-                     copy_nc_data_t(var, data, packed_data, cell_count,
+                     copy_nc_data_t(var, data, packed_data.data(), cell_count,
                                     "ncbyte", add_offset, scale_factor,
                                     has_missing, missing_value);
                   }
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_UBYTE:
                {
-                  unsigned char *packed_data = new unsigned char[cell_count];
+                  vector<unsigned char> packed_data(cell_count);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "unsigned char", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             default:
@@ -1593,9 +1590,9 @@ bool get_nc_data(NcVar *var, double *data) {
          switch ( type_id )  {
             case NcType::nc_FLOAT:
                {
-                  float *packed_data = new float[cell_count];
+                  vector<float> packed_data(cell_count);
 
-                  var->getVar(packed_data);
+                  var->getVar(packed_data.data());
 
                   float fill_value;
                   bool has_fill_value = get_var_fill_value(var, fill_value);
@@ -1604,96 +1601,87 @@ bool get_nc_data(NcVar *var, double *data) {
                         data[idx] = bad_data_double;
                      else data[idx] = (double)packed_data[idx];
                   }
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_INT64:
                {
-                  long long *packed_data = new long long[cell_count];
+                  vector<long long> packed_data(cell_count);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "int64", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_INT:
                {
-                  int *packed_data = new int[cell_count];
+                  vector<int> packed_data(cell_count);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "int", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_SHORT:
                {
                   short missing_value;
                   bool has_missing = get_var_fill_value(var, missing_value);
-                  short *packed_data = new short[cell_count];
-                  var->getVar(packed_data);
+                  vector<short> packed_data(cell_count);
+                  var->getVar(packed_data.data());
                   if (unsigned_value) {
-                     unsigned short *ushort_data = new unsigned short[cell_count];
+                     vector<unsigned short> ushort_data(cell_count);
                      for (int idx=0; idx<cell_count; idx++) {
                         ushort_data[idx] =(unsigned short)packed_data[idx];
                      }
-                     copy_nc_data_t(var, data, ushort_data, cell_count,
+                     copy_nc_data_t(var, data, ushort_data.data(), cell_count,
                                     "ushort", add_offset, scale_factor,
                                     has_missing, (unsigned short)missing_value);
-                     delete [] ushort_data;
                   }
                   else {
-                     copy_nc_data_t(var, data, packed_data, cell_count,
+                     copy_nc_data_t(var, data, packed_data.data(), cell_count,
                                     "short", add_offset, scale_factor,
                                     has_missing, missing_value);
                   }
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_USHORT:
                {
-                  unsigned short *packed_data = new unsigned short[cell_count];
+                  vector<unsigned short> packed_data(cell_count);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "ushort", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_BYTE:
                {
                   ncbyte missing_value;
                   bool has_missing = get_var_fill_value(var, missing_value);
-                  ncbyte *packed_data = new ncbyte[cell_count];
+                  vector<ncbyte> packed_data(cell_count);
 
-                  var->getVar(packed_data);
+                  var->getVar(packed_data.data());
                   if (unsigned_value) {
-                     unsigned char *ubyte_data = new unsigned char[cell_count];
+                     vector<unsigned char> ubyte_data(cell_count);
                      for (int idx=0; idx<cell_count; idx++) {
                         ubyte_data[idx] =(unsigned char)packed_data[idx];
                      }
-                     copy_nc_data_t(var, data, ubyte_data, cell_count,
+                     copy_nc_data_t(var, data, ubyte_data.data(), cell_count,
                                     "ncubyte", add_offset, scale_factor,
                                     has_missing, (unsigned char)missing_value);
-                     delete [] ubyte_data;
                   }
                   else {
-                     copy_nc_data_t(var, data, packed_data, cell_count,
+                     copy_nc_data_t(var, data, packed_data.data(), cell_count,
                                     "ncbyte", add_offset, scale_factor,
                                     has_missing, missing_value);
                   }
-                  delete [] packed_data;
                }
                break;
             case NcType::nc_UBYTE:
                {
-                  unsigned char *packed_data = new unsigned char[cell_count];
+                  vector<unsigned char> packed_data(cell_count);
 
-                  var->getVar(packed_data);
-                  copy_nc_data_(var, data, packed_data, cell_count,
+                  var->getVar(packed_data.data());
+                  copy_nc_data_(var, data, packed_data.data(), cell_count,
                                 "ncubyte", add_offset, scale_factor);
-                  delete [] packed_data;
                }
                break;
             default:
@@ -1750,20 +1738,25 @@ bool get_nc_data(NcVar *var, char **data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_nc_data(NcVar *var, uchar *data) {
+bool get_nc_data(NcVar *var, uchar *data, bool allow_conversion) {
    bool return_status = false;
    int cell_count = get_data_size(var);
    int data_type = GET_NC_TYPE_ID_P(var);
    static const char *method_name = "get_nc_data(NcVar *, uchar *) -> ";
    if (NC_UBYTE == data_type) return_status = get_nc_data_t(var, data);
-   else if (NC_BYTE == data_type && has_unsigned_attribute(var)) {
-      ncbyte *signed_data = new ncbyte[cell_count];
-      if (return_status = get_nc_data_t(var, signed_data)) {
+   else if (NC_BYTE == data_type) {
+      if (!has_unsigned_attribute(var) && !allow_conversion) {
+         mlog << Debug(1) << "\n" << method_name
+              << "INFO: Unexpected conversion from 'ncbyte' for variable \""
+              << GET_NC_NAME_P(var) << "\".\n\n";
+      }
+      vector<ncbyte> signed_data(cell_count);
+      return_status = get_nc_data_t(var, signed_data.data());
+      if (return_status) {
          for (int idx=0; idx<cell_count; idx++) {
             data[idx] = (uchar)signed_data[idx];
          }
       }
-      delete [] signed_data;
    }
    else {
       mlog << Error << "\n" << method_name
@@ -1795,8 +1788,8 @@ bool get_nc_data(NcVar *var, unsigned short *data) {
       bool has_fill_value = IS_VALID_NC_P(att_fill_value);
       if (has_fill_value) fill_value = get_att_value_int(att_fill_value);
 
-      short *short_data = new short[cell_count];
-      if (return_status = get_nc_data_t(var, short_data)) {
+      vector<short> short_data(cell_count);
+      if (return_status = get_nc_data_t(var, short_data.data())) {
          for (int idx=0; idx<cell_count; idx++) {
             if (has_fill_value && fill_value == short_data[idx])
                data[idx] = (unsigned short)bad_data_int;
@@ -1804,7 +1797,6 @@ bool get_nc_data(NcVar *var, unsigned short *data) {
                data[idx] = (unsigned short)short_data[idx];
          }
       }
-      delete [] short_data;
       if (att_fill_value) delete att_fill_value;
    }
    else {
@@ -1897,9 +1889,9 @@ int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool i
    static const char *method_name = "get_index_at_nc_data() -> ";
    if (IS_VALID_NC_P(var)) {
       int data_size = get_data_size(var);
-      double *values = new double[data_size];
+      vector<double> values(data_size);
 
-      if (get_nc_data(var, values)) {
+      if (get_nc_data(var, values.data())) {
          unixtime ut;
          int sec_per_unit;
          bool no_leap_year = get_att_no_leap_year(var);
@@ -1929,7 +1921,6 @@ int get_index_at_nc_data(NcVar *var, double value, const string dim_name, bool i
             }
          }
       }
-      if (values) delete [] values;
 
       ConcatString value_str;
       if (is_time && (value > 10000000.)) value_str << unix_to_yyyymmdd_hhmmss(value);
@@ -2804,65 +2795,45 @@ void copy_nc_atts(NcVar *var_from, NcVar *var_to, const bool all_attrs) {
 
 void copy_nc_data_char(NcVar *var_from, NcVar *var_to, int data_size) {
    //const string method_name = "copy_nc_data_char";
-   char *data = new char[data_size];
-   var_from->getVar(data);
-   var_to->putVar(data);
-   //   mlog << Error << "\n" << method_name << " -> error writing the variable "
-   //        << GET_NC_NAME_P(var_to) << " to the netCDF file\n\n";
-   //   exit(1);
-   delete[] data;
+   vector<char> data(data_size);
+   var_from->getVar(data.data());
+   var_to->putVar(data.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_double(NcVar *var_from, NcVar *var_to, int data_size) {
    //const string method_name = "copy_nc_data_double";
-   double *data = new double[data_size];
-   var_from->getVar(data);
-   var_to->putVar(data);
-   //   mlog << Error << "\n" << method_name << " -> error writing the variable "
-   //        << GET_NC_NAME_P(var_to) << " to the netCDF file\n\n";
-   //   exit(1);
-   delete[] data;
+   vector<double> data(data_size);
+   var_from->getVar(data.data());
+   var_to->putVar(data.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_float(NcVar *var_from, NcVar *var_to, int data_size) {
    //const string method_name = "copy_nc_data_float";
-   float *data = new float[data_size];
-   var_from->getVar(data);
-   var_to->putVar(data);
-   //   mlog << Error << "\n" << method_name << " -> error writing the variable "
-   //        << GET_NC_NAME_P(var_to) << " to the netCDF file\n\n";
-   //   exit(1);
-   delete[] data;
+   vector<float> data(data_size);
+   var_from->getVar(data.data());
+   var_to->putVar(data.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_int(NcVar *var_from, NcVar *var_to, int data_size) {
    //const string method_name = "copy_nc_data_int";
-   int *data = new int[data_size];
-   var_from->getVar(data);
-   var_to->putVar(data);
-   //   mlog << Error << "\n" << method_name << " -> error writing the variable "
-   //        << GET_NC_NAME_P(var_to) << " to the netCDF file\n\n";
-   //   exit(1);
-   delete[] data;
+   vector<int> data(data_size);
+   var_from->getVar(data.data());
+   var_to->putVar(data.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_short(NcVar *var_from, NcVar *var_to, int data_size) {
    //const string method_name = "copy_nc_data_double";
-   short *data = new short[data_size];
-   var_from->getVar(data);
-   var_to->putVar(data);
-   //   mlog << Error << "\n" << method_name << " -> error writing the variable "
-   //        << GET_NC_NAME_P(var_to) << " to the netCDF file\n\n";
-   //   exit(1);
-   delete[] data;
+   vector<short> data(data_size);
+   var_from->getVar(data.data());
+   var_to->putVar(data.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2872,9 +2843,6 @@ void copy_nc_data_string(NcVar *var_from, NcVar *var_to, int data_size) {
    string *data = new string[data_size];
    var_from->getVar(data);
    var_to->putVar(data);
-   //   mlog << Error << "\n" << method_name << " -> error writing the variable "
-   //        << GET_NC_NAME_P(var_to) << " to the netCDF file\n\n";
-   //   exit(1);
    delete[] data;
 }
 
@@ -3307,22 +3275,21 @@ bool is_nc_name_time(const ConcatString name) {
 ////////////////////////////////////////////////////////////////////////
 
 bool is_nc_attr_lat(const ConcatString name) {
-   bool is_latitude = (is_nc_name_lat(name) || name == "x" || name == "X");
+   bool is_latitude = (is_nc_name_lat(name) || name == "y" || name == "Y");
    return is_latitude;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool is_nc_attr_lon(const ConcatString name) {
-   bool is_longitude = (is_nc_name_lon(name) || name == "y" || name == "Y");
+   bool is_longitude = (is_nc_name_lon(name) || name == "x" || name == "X");
    return is_longitude;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool is_nc_attr_time(const ConcatString name) {
-   bool is_time = (is_nc_name_time(name) || name == "T");
-   return is_time;
+   return is_nc_name_time(name);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3330,30 +3297,48 @@ bool is_nc_attr_time(const ConcatString name) {
 NcVar get_nc_var_lat(const NcFile *nc) {
    NcVar var;
    bool found = false;
+   int max_dim_cnt = 0;
+   ConcatString att_val;
+   ConcatString coordinates_att;
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
    static const char *method_name = "get_nc_var_lat() ";
 
-   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
-        it_var != mapVar.end(); ++it_var) {
-      ConcatString name = (*it_var).first;
-      //if (is_nc_name_lat(name)) found = true;
-      if (get_var_standard_name(&(*it_var).second, name)) {
-         if (is_nc_name_lat(name)) found = true;
+   for (const auto &kv : mapVar) {
+      ConcatString name = kv.first;
+      if (is_nc_name_lat(name)) found = true;
+      if (!found && get_var_standard_name(&kv.second, att_val)) {
+         if (is_nc_name_lat(att_val)) found = true;
       }
-      if (!found && get_var_units(&(*it_var).second, name)) {
-         if (is_nc_unit_latitude(name.c_str())) {
-            if (get_nc_att_value(&(*it_var).second, axis_att_name, name)) {
-               if (is_nc_attr_lat(name)) found = true;
-            }
-            else if (get_nc_att_value(&(*it_var).second,
-                                      coordinate_axis_type_att_name, name)) {
-               if (is_nc_attr_lat(name)) found = true;
-            }
+      if (!found && get_var_units(&kv.second, att_val)
+          && is_nc_unit_latitude(att_val.c_str())) {
+         if (get_nc_att_value(&kv.second, axis_att_name, att_val)) {
+            if (is_nc_attr_lat(att_val)) found = true;
+         }
+         else if (get_nc_att_value(&kv.second,
+                                   coordinate_axis_type_att_name, att_val)) {
+            if (is_nc_attr_lat(att_val)) found = true;
          }
       }
       if (found) {
-         var = (*it_var).second;
+         var = kv.second;
          break;
+      }
+      int dim_count = GET_NC_DIM_COUNT(kv.second);
+      if (dim_count > max_dim_cnt) {
+         max_dim_cnt = dim_count;
+         if (get_nc_att_value(&kv.second, coordinates_att_name, att_val)) coordinates_att = att_val;
+      }
+   }
+
+   if (!found && !coordinates_att.empty()) {
+      StringArray coord_names = coordinates_att.split(" ");
+      for (int i=0; i< coord_names.n(); i++) {
+         NcVar var_lat = get_nc_var((NcFile *)nc, coord_names[i].c_str());
+         if (get_var_units(&var_lat, att_val) && is_nc_unit_latitude(att_val.c_str())) {
+            found = true;
+            var = var_lat;
+            break;
+         }
       }
    }
 
@@ -3372,30 +3357,49 @@ NcVar get_nc_var_lat(const NcFile *nc) {
 NcVar get_nc_var_lon(const NcFile *nc) {
    NcVar var;
    bool found = false;
+   int max_dim_cnt = 0;
+   ConcatString att_val;
+   ConcatString coordinates_att;
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
    static const char *method_name = "get_nc_var_lon() ";
 
-   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
-        it_var != mapVar.end(); ++it_var) {
-      ConcatString name = (*it_var).first;
-      //if (is_nc_name_lon(name)) found = true;
-      if (get_var_standard_name(&(*it_var).second, name)) {
-         if (is_nc_name_lon(name)) found = true;
+   for (const auto &kv : mapVar) {
+      ConcatString name = kv.first;
+      if (is_nc_name_lon(name)) found = true;
+      if (!found && get_var_standard_name(&kv.second, att_val)) {
+         if (is_nc_name_lon(att_val)) found = true;
       }
-      if (!found && get_var_units(&(*it_var).second, name)) {
-         if (is_nc_unit_longitude(name.c_str())) {
-            if (get_nc_att_value(&(*it_var).second, axis_att_name, name)) {
-               if (is_nc_attr_lon(name)) found = true;
-            }
-            else if (get_nc_att_value(&(*it_var).second,
-                                      coordinate_axis_type_att_name, name)) {
-               if (is_nc_attr_lon(name)) found = true;
-            }
+      if (!found && get_var_units(&kv.second, att_val)
+          && is_nc_unit_longitude(att_val.c_str())) {
+         if (get_nc_att_value(&kv.second, axis_att_name, att_val)) {
+            if (is_nc_attr_lon(att_val)) found = true;
+         }
+         else if (get_nc_att_value(&kv.second,
+                                   coordinate_axis_type_att_name, att_val)) {
+            if (is_nc_attr_lon(att_val)) found = true;
          }
       }
       if (found) {
-         var = (*it_var).second;
+         var = kv.second;
          break;
+      }
+
+      int dim_count = GET_NC_DIM_COUNT(kv.second);
+      if (dim_count > max_dim_cnt) {
+         max_dim_cnt = dim_count;
+         if (get_nc_att_value(&kv.second, coordinates_att_name, att_val)) coordinates_att = att_val;
+      }
+   }
+
+   if (!found && !coordinates_att.empty()) {
+      StringArray coord_names = coordinates_att.split(" ");
+      for (int i=0; i< coord_names.n(); i++) {
+         NcVar var_lon = get_nc_var((NcFile *)nc, coord_names[i].c_str());
+         if (get_var_units(&var_lon, att_val) && is_nc_unit_longitude(att_val.c_str())) {
+            found = true;
+            var = var_lon;
+            break;
+         }
       }
    }
 
@@ -3414,32 +3418,50 @@ NcVar get_nc_var_lon(const NcFile *nc) {
 NcVar get_nc_var_time(const NcFile *nc) {
    NcVar var;
    bool found = false;
+   int max_dim_cnt = 0;
+   ConcatString att_val;
+   ConcatString coordinates_att;
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
    static const char *method_name = "get_nc_var_time() ";
 
-   for (multimap<string,NcVar>::iterator it_var = mapVar.begin();
-        it_var != mapVar.end(); ++it_var) {
-      ConcatString name = (*it_var).first;
-      //if (is_nc_name_time(name)) found = true;
-      if (get_var_standard_name(&(*it_var).second, name)) {
-         if (is_nc_name_time(name)) found = true;
+   for (auto &kv : mapVar) {
+      ConcatString name = kv.first;
+      if (!found && is_nc_name_time(name)) found = true;
+      if (get_var_standard_name(&kv.second, att_val)) {
+         if (is_nc_name_time(att_val)) found = true;
          mlog << Debug(7) << method_name << "checked variable \""
            << name << "\"  is_time: " << found << "\n";
       }
-      if (!found && get_var_units(&(*it_var).second, name)) {
-         if (is_nc_unit_time(name.c_str())) {
-            if (get_nc_att_value(&(*it_var).second, axis_att_name, name)) {
-               if (is_nc_attr_time(name)) found = true;
-            }
-            else if (get_nc_att_value(&(*it_var).second,
-                                      coordinate_axis_type_att_name, name)) {
-               if (is_nc_attr_time(name)) found = true;
-            }
+      if (!found && get_var_units(&kv.second, att_val)
+          && is_nc_unit_time(att_val.c_str())) {
+         if (get_nc_att_value(&kv.second, axis_att_name, att_val)) {
+            if (is_nc_attr_time(att_val)) found = true;
+         }
+         else if (get_nc_att_value(&kv.second,
+                                   coordinate_axis_type_att_name, att_val)) {
+            if (is_nc_attr_time(att_val)) found = true;
          }
       }
       if (found) {
-         var = (*it_var).second;
+         var = kv.second;
          break;
+      }
+      int dim_count = GET_NC_DIM_COUNT(kv.second);
+      if (dim_count > max_dim_cnt) {
+         max_dim_cnt = dim_count;
+         if (get_nc_att_value(&kv.second, coordinates_att_name, att_val)) coordinates_att = att_val;
+      }
+   }
+
+   if (!found && !coordinates_att.empty()) {
+      StringArray coord_names = coordinates_att.split(" ");
+      for (int i=0; i< coord_names.n(); i++) {
+         NcVar var_time = get_nc_var((NcFile *)nc, coord_names[i].c_str());
+         if (get_var_units(&var_time, att_val) && is_nc_unit_time(att_val.c_str())) {
+            found = true;
+            var = var_time;
+            break;
+         }
       }
    }
 
@@ -3478,10 +3500,8 @@ NcFile *open_ncfile(const char * nc_name, bool write) {
 // Implement the old API var->num_vals()
 
 int get_data_size(NcVar *var) {
-   int dimCount = 0;
    int data_size = 1;
-
-   dimCount = var->getDimCount();
+   int dimCount = var->getDimCount();
    for (int i=0; i<dimCount; i++) {
       data_size *= var->getDim(i).getSize();
    }

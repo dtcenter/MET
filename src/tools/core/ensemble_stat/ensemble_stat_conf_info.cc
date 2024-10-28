@@ -70,11 +70,12 @@ void EnsembleStatConfInfo::clear() {
    vld_ens_thresh = bad_data_double;
    vld_data_thresh = bad_data_double;
    msg_typ_group_map.clear();
+   obtype_as_group_val_flag = false;
    msg_typ_sfc.clear();
    mask_area_map.clear();
    mask_sid_map.clear();
    grid_weight_flag = GridWeightType::None;
-   tmp_dir.clear();
+   point_weight_flag = PointWeightType::None;
    output_prefix.clear();
    version.clear();
 
@@ -158,6 +159,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Conf: grid_weight_flag
    grid_weight_flag = parse_conf_grid_weight_flag(&conf);
 
+   // Conf: point_weight_flag
+   point_weight_flag = parse_conf_point_weight_flag(&conf);
+
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
 
@@ -172,6 +176,10 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    else {
       msg_typ_sfc.parse_css(default_msg_typ_group_surface);
    }
+
+   // Conf: obtype_as_group_val_flag
+   obtype_as_group_val_flag =
+      conf.lookup_bool(conf_key_obtype_as_group_val_flag);
 
    // Conf: ens_member_ids
    ens_member_ids = parse_conf_ens_member_ids(&conf);
@@ -261,8 +269,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    n_vx   = n_fvx;
    vx_opt = new EnsembleStatVxOpt [n_vx];
 
-   // Check climatology fields
-   check_climo_n_vx(&conf, n_vx);
+   // Check for consistent number of climatology fields
+   check_climo_n_vx(fdict, n_vx);
+   check_climo_n_vx(odict, n_vx);
 
    // Parse settings for each verification task
    for(i=0,max_hira_size=0; i<n_vx; i++) {
@@ -377,7 +386,6 @@ void EnsembleStatConfInfo::process_flags() {
 void EnsembleStatConfInfo::process_masks(const Grid &grid) {
    int i, j;
    MaskPlane mp;
-   StringArray sid;
    ConcatString name;
 
    mlog << Debug(2)
@@ -446,9 +454,9 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
             mlog << Debug(3)
                  << "Processing station ID mask: "
                  << vx_opt[i].mask_sid[j] << "\n";
-            parse_sid_mask(vx_opt[i].mask_sid[j], sid, name);
-            sid_map[vx_opt[i].mask_sid[j]] = name;
-            mask_sid_map[name] = sid;
+            MaskSID ms = parse_sid_mask(vx_opt[i].mask_sid[j]);
+            sid_map[vx_opt[i].mask_sid[j]] = ms.name();
+            mask_sid_map[ms.name()] = ms;
          }
 
          // Store the name only for point verification
@@ -646,7 +654,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    clear();
 
    // Allocate new EnsVarInfo object for fcst
-   vx_pd.fcst_info = new EnsVarInfo();
+   vx_pd.ens_info = new EnsVarInfo();
 
    // Loop over ensemble member IDs to substitute
    for(i=0; i<ens_member_ids.n(); i++) {
@@ -663,7 +671,10 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       input_info.var_info = next_var;
       input_info.file_index = 0;
       input_info.file_list = ens_files;
-      vx_pd.fcst_info->add_input(input_info);
+      vx_pd.ens_info->add_input(input_info);
+
+      // Set the fcst_info, if needed
+      if(!vx_pd.fcst_info) vx_pd.set_fcst_info(next_var); 
 
       // Add InputInfo to fcst info list for each ensemble file provided
       // set var_info to nullptr to note first VarInfo should be used
@@ -672,7 +683,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
          input_info.var_info = nullptr;
          input_info.file_index = j;
          input_info.file_list = ens_files;
-         vx_pd.fcst_info->add_input(input_info);
+         vx_pd.ens_info->add_input(input_info);
       } // end for j
    } // end for i
 
@@ -691,11 +702,11 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       input_info.var_info = next_var;
       input_info.file_index = ens_files->n() - 1;
       input_info.file_list = ens_files;
-      vx_pd.fcst_info->add_input(input_info);
+      vx_pd.ens_info->add_input(input_info);
    }
 
    // Allocate new VarInfo object for obs
-   vx_pd.obs_info  = info_factory.new_var_info(otype);
+   vx_pd.obs_info = info_factory.new_var_info(otype);
 
    // Set the VarInfo objects
    vx_pd.obs_info->set_dict(odict);
@@ -704,14 +715,14 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << "Parsed forecast field:\n";
-      vx_pd.fcst_info->get_var_info()->dump(cout);
+      vx_pd.ens_info->get_var_info()->dump(cout);
       mlog << Debug(5)
            << "Parsed observation field:\n";
       vx_pd.obs_info->dump(cout);
    }
 
    // No support for wind direction
-   if(vx_pd.fcst_info->get_var_info()->is_wind_direction() ||
+   if(vx_pd.ens_info->get_var_info()->is_wind_direction() ||
       vx_pd.obs_info->is_wind_direction()) {
       mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
            << "wind direction may not be verified using grid_stat.\n\n";
@@ -783,7 +794,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    ocat_ta = odict.lookup_thresh_array(conf_key_prob_cat_thresh);
 
    // The number of thresholds must match for non-probability forecasts
-   if(!vx_pd.fcst_info->get_var_info()->is_prob() &&
+   if(!vx_pd.ens_info->get_var_info()->is_prob() &&
       fcat_ta.n() != ocat_ta.n()) {
       mlog << Error << "\nEnsembleStatVxOpt::process_config() -> "
            << "The number of forecast (" << write_css(fcat_ta)
@@ -936,7 +947,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
    }
 
    // Define the dimensions
-   vx_pd.set_pd_size(n_msg_typ, n_mask, n_interp);
+   vx_pd.set_size(n_msg_typ, n_mask, n_interp);
 
    // Store the climo CDF info
    vx_pd.set_climo_cdf_info_ptr(&cdf_info);
@@ -1014,21 +1025,23 @@ void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
    //
    // Sort the input arrays
    //
-   NumArray fsort;
-   for(int i=0; i<pd_ptr->n_ens; i++) fsort.add(pd_ptr->e_na[i]);
-   NumArray osort = pd_ptr->o_na;
-   NumArray csort = pd_ptr->cmn_na;
-   fsort.sort_array();
-   osort.sort_array();
-   csort.sort_array();
+   NumArray f_sort;
+   for(int i=0; i<pd_ptr->n_ens; i++) f_sort.add(pd_ptr->e_na[i]);
+   NumArray o_sort    = pd_ptr->o_na;
+   NumArray fcmn_sort = pd_ptr->fcmn_na;
+   NumArray ocmn_sort = pd_ptr->ocmn_na;
+   f_sort.sort_array();
+   o_sort.sort_array();
+   fcmn_sort.sort_array();
+   ocmn_sort.sort_array();
 
    //
    // Compute percentiles, passing the observation filtering
    // thresholds in for the fcst and obs slots.
    //
-   othr_ta.set_perc(&fsort, &osort, &csort, &othr_ta, &othr_ta);
-   fcat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
-   ocat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
+   othr_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &othr_ta, &othr_ta);
+   fcat_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
+   ocat_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
 
    return;
 }
@@ -1051,8 +1064,8 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
    // Switch on the index of the line type
    switch(i_txt_row) {
 
-      case(i_ecnt):
-      case(i_rps):
+      case i_ecnt:
+      case i_rps:
 
          // Maximum number of ECNT and RPS lines possible =
          //    Point Vx: Message Types * Masks * Interpolations * Obs Thresholds * Alphas
@@ -1061,9 +1074,9 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_obs_thresh() * get_n_ci_alpha();
          break;
 
-      case(i_rhist):
-      case(i_phist):
-      case(i_relp):
+      case i_rhist:
+      case i_phist:
+      case i_relp:
 
          // Maximum number of RHIST, PHIST, and RELP lines possible =
          //    Point Vx: Message Types * Masks * Interpolations * Obs Thresholds
@@ -1072,7 +1085,7 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_obs_thresh();
          break;
 
-      case(i_orank):
+      case i_orank:
 
          // Compute the maximum number of matched pairs to be written
          // out by summing the number for each VxPairDataEnsemble object
@@ -1082,40 +1095,40 @@ int EnsembleStatVxOpt::n_txt_row(int i_txt_row) const {
          n = vx_pd.get_n_pair() * get_n_obs_thresh();
          break;
 
-      case(i_ssvar):
+      case i_ssvar:
 
          // Just return zero since we'll resize the output AsciiTables
          // to accomodate the SSVAR output
          n = 0;
          break;
 
-      case(i_pct):
-      case(i_pjc):
-      case(i_prc):
+      case i_pct:
+      case i_pjc:
+      case i_prc:
 
          // Maximum number of PCT, PJC, and PRC lines possible =
-         //    Point Vx: Message Types * Masks * Interpolations * Categorical Thresholds
-         //     Grid Vx:                 Masks * Interpolations * Categorical Thresholds
+         //    Point Vx: Message Types * Masks * Interpolations * Categorical Thresholds * Climo CDF Bins
+         //     Grid Vx:                 Masks * Interpolations * Categorical Thresholds * Climo CDF Bins
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
-              get_n_prob_cat_thresh();
+              max(fcat_ta.n(), 1) * cdf_info.cdf_ta.n();
          break;
 
-      case(i_pstd):
+      case i_pstd:
 
          // Maximum number of PSTD lines possible =
-         //    Point Vx: Message Types * Masks * Interpolations * Categorical Thresholds * Alphas
-         //     Grid Vx:                 Masks * Interpolations * Categorical Thresholds * Alphas
+         //    Point Vx: Message Types * Masks * Interpolations * Categorical Thresholds * Climo CDF Bins * Alphas
+         //     Grid Vx:                 Masks * Interpolations * Categorical Thresholds * Climo CDF Bins * Alphas
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
-              get_n_prob_cat_thresh() * get_n_ci_alpha();
+              max(fcat_ta.n(), 1) * cdf_info.cdf_ta.n() * get_n_ci_alpha();
          break;
 
-      case(i_eclv):
+      case i_eclv:
 
          // Maximum number of ECLV lines possible =
-         //    Point Vx: Message Types * Masks * Interpolations * Probability Thresholds
-         //     Grid Vx:                 Masks * Interpolations * Probability Thresholds
+         //    Point Vx: Message Types * Masks * Interpolations * Probability Thresholds * Climo CDF Bins
+         //     Grid Vx:                 Masks * Interpolations * Probability Thresholds * Climo CDF Bins
          n = (get_n_msg_typ() + 1) * get_n_mask() * get_n_interp() *
-              get_n_prob_cat_thresh() * get_n_prob_cat_thresh();
+              get_n_prob_cat_thresh() * get_n_prob_cat_thresh() * cdf_info.cdf_ta.n();
          break;
 
       default:

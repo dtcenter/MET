@@ -94,16 +94,16 @@ class RenderInfo {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double RenderInfo::x_ll () const { return ( X_ll ); }
-inline double RenderInfo::y_ll () const { return ( Y_ll ); }
+inline double RenderInfo::x_ll () const { return X_ll; }
+inline double RenderInfo::y_ll () const { return Y_ll; }
 
-inline double RenderInfo::x_mag() const { return ( X_mag ); }
-inline double RenderInfo::y_mag() const { return ( Y_mag ); }
+inline double RenderInfo::x_mag() const { return X_mag; }
+inline double RenderInfo::y_mag() const { return Y_mag; }
 
-inline int RenderInfo::n_filters() const { return ( Nfilters ); }
+inline int RenderInfo::n_filters() const { return Nfilters; }
 
-inline bool RenderInfo::is_bw    () const { return (   BW ); }
-inline bool RenderInfo::is_color () const { return ( ! BW ); }
+inline bool RenderInfo::is_bw    () const { return  BW; }
+inline bool RenderInfo::is_color () const { return !BW; }
 
 
 ////////////////////////////////////////////////////////////////////////

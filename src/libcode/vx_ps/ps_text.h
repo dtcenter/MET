@@ -121,21 +121,21 @@ class VxpsTextNode {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int    VxpsTextNode::font_number() const { return ( FontNumber ); }
-inline double VxpsTextNode::font_size()   const { return ( FontSize   ); }
+inline int    VxpsTextNode::font_number() const { return FontNumber; }
+inline double VxpsTextNode::font_size()   const { return FontSize  ; }
 
-inline const char * VxpsTextNode::text() const { return ( Text ); }
+inline const char * VxpsTextNode::text() const { return Text; }
 
-inline double VxpsTextNode::width () const { return ( Width  ); }
+inline double VxpsTextNode::width () const { return Width ; }
 
-inline double VxpsTextNode::right  () const { return ( Right  ); }
-inline double VxpsTextNode::left   () const { return ( Left   ); }
-inline double VxpsTextNode::bottom () const { return ( Bottom ); }
-inline double VxpsTextNode::top    () const { return ( Top    ); }
+inline double VxpsTextNode::right  () const { return Right ; }
+inline double VxpsTextNode::left   () const { return Left  ; }
+inline double VxpsTextNode::bottom () const { return Bottom; }
+inline double VxpsTextNode::top    () const { return Top   ; }
 
-inline int VxpsTextNode::nchars() const { return ( Nchars ); }
+inline int VxpsTextNode::nchars() const { return Nchars; }
 
-inline double VxpsTextNode::dx () const { return ( Dx ); }
+inline double VxpsTextNode::dx () const { return Dx; }
 
 inline int VxpsTextNode::is_empty() const { return ( Text ? 0 : 1 ); }
 

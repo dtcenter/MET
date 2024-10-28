@@ -84,6 +84,9 @@ void GridStatConfInfo::clear() {
    output_ascii_flag = false;
    output_nc_flag = false;
 
+   seeps_climo_name.clear();
+   seeps_p1_thresh.clear();
+
    // Deallocate memory
    if(vx_opt) { delete [] vx_opt; vx_opt = (GridStatVxOpt *) nullptr; }
 
@@ -162,6 +165,12 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
 
+   // Conf: threshold for SEEPS p1
+   seeps_p1_thresh = conf.lookup_thresh(conf_key_seeps_p1_thresh);
+
+   // Conf: SEEPS climo filename
+   seeps_climo_name = conf.lookup_string(conf_key_seeps_grid_climo_name, false);
+
 #ifdef WITH_UGRID
    // Conf: ugrid_dataset
    if (!ignore_ugrid_dataset) ugrid_dataset = parse_conf_ugrid_dataset(&conf);
@@ -202,7 +211,8 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
    vx_opt = new GridStatVxOpt [n_vx];
 
    // Check for consistent number of climatology fields
-   check_climo_n_vx(&conf, n_vx);
+   check_climo_n_vx(fdict, n_vx);
+   check_climo_n_vx(odict, n_vx);
 
    // Parse settings for each verification task
    for(i=0; i<n_vx; i++) {
@@ -217,6 +227,19 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 
    // Summarize output flags across all verification tasks
    process_flags();
+
+   // FHO output is not compatible with grid weights
+   if(output_flag[i_fho] != STATOutputType::None &&
+      grid_weight_flag   != GridWeightType::None) {
+
+      mlog << Warning << "\nGridStatConfInfo::process_config() -> "
+           << "Disabling FHO output that is not compatible with grid weighting. "
+           << "Set \"grid_weight_flag = NONE\" to write FHO output.\n\n";
+
+      // Disable FHO output
+      for(i=0; i<n_vx; i++) vx_opt[i].output_flag[i_fho] = STATOutputType::None;
+      output_flag[i_fho] = STATOutputType::None; 
+   }
 
    // If VL1L2, VAL1L2, or VCNT is requested, set the uv_index
    if(output_flag[i_vl1l2]  != STATOutputType::None ||
@@ -618,8 +641,6 @@ void GridStatVxOpt::clear() {
    hss_ec_value = bad_data_double;
    rank_corr_flag = false;
 
-   seeps_p1_thresh.clear();
-
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    nc_info.clear();
@@ -647,6 +668,11 @@ void GridStatVxOpt::process_config(
    // Allocate new VarInfo objects
    fcst_info = info_factory.new_var_info(ftype);
    obs_info  = info_factory.new_var_info(otype);
+
+   // Set the top-level regrid as the default 
+   RegridInfo regrid_info = parse_conf_regrid(fdict.parent());
+   fcst_info->set_default_regrid(regrid_info);
+   obs_info->set_default_regrid(regrid_info);
 
    // Set the VarInfo objects
    fcst_info->set_dict(fdict);
@@ -913,9 +939,6 @@ void GridStatVxOpt::process_config(
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
 
-   // Conf: threshold for SEEPS p1
-   seeps_p1_thresh = odict.lookup_thresh(conf_key_seeps_p1_thresh);
-
    // Conf: nc_pairs_flag
    parse_nc_info(odict);
 
@@ -1027,20 +1050,22 @@ void GridStatVxOpt::set_perc_thresh(const PairDataPoint &pd) {
    //
    // Sort the input arrays
    //
-   NumArray fsort = pd.f_na;
-   NumArray osort = pd.o_na;
-   NumArray csort = pd.cmn_na;
-   fsort.sort_array();
-   osort.sort_array();
-   csort.sort_array();
+   NumArray f_sort    = pd.f_na;
+   NumArray o_sort    = pd.o_na;
+   NumArray fcmn_sort = pd.fcmn_na;
+   NumArray ocmn_sort = pd.ocmn_na;
+   f_sort.sort_array();
+   o_sort.sort_array();
+   fcmn_sort.sort_array();
+   ocmn_sort.sort_array();
 
    //
    // Compute percentiles
    //
-   fcat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
-   ocat_ta.set_perc(&fsort, &osort, &csort, &fcat_ta, &ocat_ta);
-   fcnt_ta.set_perc(&fsort, &osort, &csort, &fcnt_ta, &ocnt_ta);
-   ocnt_ta.set_perc(&fsort, &osort, &csort, &fcnt_ta, &ocnt_ta);
+   fcat_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
+   ocat_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcat_ta, &ocat_ta);
+   fcnt_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcnt_ta, &ocnt_ta);
+   ocnt_ta.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort, &fcnt_ta, &ocnt_ta);
 
    return;
 }
@@ -1076,15 +1101,15 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
    // Switch on the index of the line type
    switch(i_txt_row) {
 
-      case(i_fho):
-      case(i_ctc):
+      case i_fho:
+      case i_ctc:
          // Number of FHO or CTC lines =
          //    Masks * Smoothing Methods * Thresholds
          n = (prob_flag ? 0 :
               get_n_mask() * get_n_interp() * get_n_cat_thresh());
          break;
 
-      case(i_cts):
+      case i_cts:
          // Number of CTS lines =
          //    Masks * Smoothing Methods * Thresholds * Alphas
          n = (prob_flag ? 0:
@@ -1092,21 +1117,21 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_ci_alpha());
          break;
 
-      case(i_mctc):
+      case i_mctc:
          // Number of MCTC lines =
          //    Masks * Smoothing Methods
          n = (prob_flag ? 0 :
               get_n_mask() * get_n_interp());
          break;
 
-      case(i_mcts):
+      case i_mcts:
          // Number of MCTS lines =
          //    Masks * Smoothing Methods * Alphas
          n = (prob_flag ? 0:
               get_n_mask() * get_n_interp() * get_n_ci_alpha());
          break;
 
-      case(i_cnt):
+      case i_cnt:
          // Number of CNT lines =
          //    Masks * (Smoothing Methods + Fourier Waves) *
          //    Thresholds * Climo Bins * Alphas
@@ -1115,8 +1140,8 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_cnt_thresh() * n_bin * get_n_ci_alpha());
          break;
 
-      case(i_sl1l2):
-      case(i_sal1l2):
+      case i_sl1l2:
+      case i_sal1l2:
          // Number of SL1L2 or SAL1L2 lines =
          //    Masks * (Smoothing Methods + Fourier Waves) *
          //    Thresholds * Climo Bins
@@ -1125,8 +1150,8 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_cnt_thresh() * n_bin);
          break;
 
-      case(i_vl1l2):
-      case(i_val1l2):
+      case i_vl1l2:
+      case i_val1l2:
          // Number of VL1L2 or VAL1L2 lines =
          //    Masks * (Smoothing Methods + Fourier Waves) * Thresholds
          n = (!vect_flag ? 0 :
@@ -1134,7 +1159,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_wind_thresh());
          break;
 
-      case(i_vcnt):
+      case i_vcnt:
          // Number of VCNT lines =
          //    Masks * (Smoothing Methods + Fourier Waves) * Thresholds *
          //    Alphas
@@ -1143,7 +1168,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_wind_thresh() * get_n_ci_alpha());
          break;
 
-      case(i_nbrctc):
+      case i_nbrctc:
          // Number of NBRCTC lines =
          //    Masks * Thresholds * Neighborhoods * Frac Thresholds
          n = (prob_flag ? 0 :
@@ -1151,7 +1176,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_cov_thresh());
          break;
 
-      case(i_nbrcts):
+      case i_nbrcts:
          // Number of NBRCTS lines =
          //    Masks * Thresholds * Neighborhoods * Frac Thresholds *
          //    Alphas
@@ -1160,7 +1185,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_cov_thresh() * get_n_ci_alpha());
          break;
 
-      case(i_nbrcnt):
+      case i_nbrcnt:
          // Number of NBRCNT lines =
          //    Masks * Thresholds * Neighborhoods * Alphas
          n = (prob_flag ? 0 :
@@ -1168,9 +1193,9 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_ci_alpha());
          break;
 
-      case(i_pct):
-      case(i_pjc):
-      case(i_prc):
+      case i_pct:
+      case i_pjc:
+      case i_prc:
          // Number of PCT, PJC, or PRC lines =
          //    Masks * Smoothing Methods * Thresholds * Climo Bins
          n = (!prob_flag ? 0 :
@@ -1178,7 +1203,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
               n_bin);
          break;
 
-      case(i_pstd):
+      case i_pstd:
          // Number of PSTD lines =
          //    Masks * Smoothing Methods * Thresholds * Alphas *
          //    Climo Bins
@@ -1187,7 +1212,7 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
               get_n_ci_alpha() * n_bin);
          break;
 
-      case(i_eclv):
+      case i_eclv:
          // Number of CTC -> ECLV lines =
          //    Masks * Smoothing Methods * Thresholds
          n = (prob_flag ? 0 :
@@ -1202,21 +1227,21 @@ int GridStatVxOpt::n_txt_row(int i_txt_row) const {
                get_n_fprob_thresh() * n_bin);
          break;
 
-      case(i_grad):
+      case i_grad:
          // Number of GRAD lines =
          //    Masks * Smoothing Methods * Gradient Sizes
          n = (prob_flag ? 0 :
               get_n_mask() * get_n_interp() * get_n_grad());
          break;
 
-      case(i_dmap):
+      case i_dmap:
          // Number of DMAP lines =
          //    Masks * Smoothing Methods * Thresholds
          n = (prob_flag ? 0 :
               get_n_mask() * get_n_interp() * get_n_cat_thresh());
          break;
 
-      case(i_seeps):
+      case i_seeps:
          n = (prob_flag ? 0 : get_n_mask() * get_n_interp());
          break;
 

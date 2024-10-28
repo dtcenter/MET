@@ -59,7 +59,7 @@ void Madis2NcConfInfo::clear()
 ////////////////////////////////////////////////////////////////////////
 
 void Madis2NcConfInfo::read_config(const string &default_filename,
-				   const string &user_filename)
+                                   const string &user_filename)
 {
   // Read the config file constants
 

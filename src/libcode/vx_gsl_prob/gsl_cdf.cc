@@ -259,7 +259,7 @@ bot = gsl_ran_fdist_pdf(x, deg_freedom_1, deg_freedom_2);
 x_new = x - (top/bot);
 
 
-return ( x_new );
+return x_new;
 
 }
 

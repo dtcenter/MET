@@ -102,7 +102,7 @@ void adjuste_day_for_month_year_units(int &day, int &month, int &year, double mo
   // Compute remaining days from the month fraction
   bool day_adjusted = false;
   const int day_offset = (int)(month_fraction * DAYS_PER_MONTH + 0.5);
-  const char *method_name = "adjuste_day() --> ";
+  const char *method_name = "adjuste_day_for_month_year_units() -> ";
 
   day += day_offset;
   if (day == 1 && abs(month_fraction-0.5) < DAY_EPSILON) {
@@ -162,7 +162,7 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
   unixtime ut;
   auto time_value_ut = (unixtime)time_value;
   double time_fraction = time_value - (double)time_value_ut;
-  const char *method_name = "add_to_unixtime() -->";
+  const char *method_name = "add_to_unixtime() -> ";
 
   if (sec_per_unit == SEC_MONTH || sec_per_unit == SEC_YEAR) {
     if (time_value < 0) {

@@ -61,7 +61,7 @@ class CircularTemplate : public GridTemplate {
   
       // Return the class name for error messages.
       static const char* _className(void) {
-         return("CircleTemplate");
+         return "CircleTemplate";
       }
 };
 

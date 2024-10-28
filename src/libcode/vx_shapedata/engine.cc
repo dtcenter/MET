@@ -1752,20 +1752,20 @@ void ModeFuzzyEngine::do_fcst_merge_engine(const char *default_config,
    // this will capture any previous merging performed
    // in the current forecast field.
    //
-   *(fcst_engine->fcst_raw)    = *(fcst_raw);
-   *(fcst_engine->obs_raw)     = *(fcst_raw);
+   *(fcst_engine->fcst_raw)    = *fcst_raw;
+   *(fcst_engine->obs_raw)     = *fcst_raw;
 
-   *(fcst_engine->fcst_conv)   = *(fcst_conv);
-   *(fcst_engine->obs_conv)    = *(fcst_conv);
+   *(fcst_engine->fcst_conv)   = *fcst_conv;
+   *(fcst_engine->obs_conv)    = *fcst_conv;
 
-   *(fcst_engine->fcst_thresh) = *(fcst_thresh);
-   *(fcst_engine->obs_thresh)  = *(fcst_thresh);
+   *(fcst_engine->fcst_thresh) = *fcst_thresh;
+   *(fcst_engine->obs_thresh)  = *fcst_thresh;
 
-   *(fcst_engine->fcst_mask)   = *(fcst_mask);
-   *(fcst_engine->obs_mask)    = *(fcst_mask);
+   *(fcst_engine->fcst_mask)   = *fcst_mask;
+   *(fcst_engine->obs_mask)    = *fcst_mask;
 
-   *(fcst_engine->fcst_split)  = *(fcst_split);
-   *(fcst_engine->obs_split)   = *(fcst_split);
+   *(fcst_engine->fcst_split)  = *fcst_split;
+   *(fcst_engine->obs_split)   = *fcst_split;
 
    fcst_engine->n_fcst = n_fcst;
    fcst_engine->n_obs  = n_fcst;
@@ -1919,20 +1919,20 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
    // this will capture any previous merging performed
    // in the current observation field.
    //
-   *(obs_engine->fcst_raw)    = *(obs_raw);
-   *(obs_engine->obs_raw)     = *(obs_raw);
+   *(obs_engine->fcst_raw)    = *obs_raw;
+   *(obs_engine->obs_raw)     = *obs_raw;
 
-   *(obs_engine->fcst_conv)   = *(obs_conv);
-   *(obs_engine->obs_conv)    = *(obs_conv);
+   *(obs_engine->fcst_conv)   = *obs_conv;
+   *(obs_engine->obs_conv)    = *obs_conv;
 
-   *(obs_engine->fcst_thresh) = *(obs_thresh);
-   *(obs_engine->obs_thresh)  = *(obs_thresh);
+   *(obs_engine->fcst_thresh) = *obs_thresh;
+   *(obs_engine->obs_thresh)  = *obs_thresh;
 
-   *(obs_engine->fcst_mask)   = *(obs_mask);
-   *(obs_engine->obs_mask)    = *(obs_mask);
+   *(obs_engine->fcst_mask)   = *obs_mask;
+   *(obs_engine->obs_mask)    = *obs_mask;
 
-   *(obs_engine->fcst_split)  = *(obs_split);
-   *(obs_engine->obs_split)   = *(obs_split);
+   *(obs_engine->fcst_split)  = *obs_split;
+   *(obs_engine->obs_split)   = *obs_split;
 
    obs_engine->n_fcst = n_obs;
    obs_engine->n_obs  = n_obs;

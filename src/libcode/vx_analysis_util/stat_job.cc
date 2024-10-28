@@ -1174,12 +1174,12 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
       else if(jc_array[i] == "-column_str_exc" ) {
          column_str_exc_map.clear();
       }
+      else if(jc_array[i] == "-by"             ) {
+         by_column.clear();
+      }
       else if(jc_array[i] == "-set_hdr"        ) {
          hdr_name.clear();
          hdr_value.clear();
-      }
-      else if(jc_array[i] == "-by"             ) {
-         by_column.clear();
       }
       else if(jc_array[i] == "-out_line_type"  ) {
          out_line_type.clear();
@@ -1216,7 +1216,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
                  << "unrecognized job type specified \"" << jc_array[i]
                  << "\" in job command line: " << jobstring << "\n\n";
             if(line) { delete [] line; line = (char *) nullptr; }
-            throw(1);
+            throw 1;
          }
          i++;
       }
@@ -1450,14 +1450,14 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
          }
          i+=2;
       }
+      else if(jc_array[i] == "-by") {
+         by_column.add_css(to_upper(jc_array[i+1]));
+         i+=1;
+      }
       else if(jc_array[i] == "-set_hdr") {
          hdr_name.add_css(to_upper(jc_array[i+1]));
          hdr_value.add_css(jc_array[i+2]);
          i+=2;
-      }
-      else if(jc_array[i] == "-by") {
-         by_column.add_css(to_upper(jc_array[i+1]));
-         i+=1;
       }
       else if(jc_array[i] == "-dump_row") {
          set_dump_row(jc_array[i+1].c_str());
@@ -1638,7 +1638,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
               << "\" in job command line: "
               << jobstring << "\n\n";
          if(line) { delete [] line; line = (char *) nullptr; }
-         throw(1);
+         throw 1;
       } // end if
 
    } // end for
@@ -1660,7 +1660,7 @@ void STATAnalysisJob::parse_job_command(const char *jobstring) {
                  << (line_type.n() == 1 ? line_type[0] : "header")
                  << " column named \"" << hdr_name[i] << "\"\n\n";
             if(line) { delete [] line; line = (char *) nullptr; }
-            throw(1);
+            throw 1;
          }
       } // end for
    }
@@ -1802,20 +1802,19 @@ void STATAnalysisJob::set_mask_sid(const char *c) {
 
    if(!c) return;
 
-   ConcatString mask_name;
-
    mask_sid_str = c;
 
    // List the station ID mask
    mlog << Debug(1)
         << "Station ID Mask: " << mask_sid_str << "\n";
 
-   parse_sid_mask(mask_sid_str, mask_sid, mask_name);
+   MaskSID ms = parse_sid_mask(mask_sid_str);
+   for(const auto &pair : ms.sid_map()) mask_sid.add(pair.first);
 
    // List the length of the station ID mask
    mlog << Debug(2)
-        << "Parsed Station ID Mask: " << mask_name
-        << " containing " << mask_sid.n() << " points\n";
+        << "Parsed Station ID Mask (" << ms.name()
+        << ") containing " << mask_sid.n() << " stations\n";
 
    return;
 }
@@ -1854,7 +1853,8 @@ void STATAnalysisJob::set_boot_seed(const char *c) {
 
 void STATAnalysisJob::set_perc_thresh(const NumArray &f_na,
                                       const NumArray &o_na,
-                                      const NumArray &cmn_na) {
+                                      const NumArray &fcmn_na,
+                                      const NumArray &ocmn_na) {
 
    if(!out_fcst_thresh.need_perc() &&
       !out_obs_thresh.need_perc()) return;
@@ -1862,19 +1862,21 @@ void STATAnalysisJob::set_perc_thresh(const NumArray &f_na,
    //
    // Sort the input arrays
    //
-   NumArray fsort = f_na;
-   NumArray osort = o_na;
-   NumArray csort = cmn_na;
-   fsort.sort_array();
-   osort.sort_array();
-   csort.sort_array();
+   NumArray f_sort = f_na;
+   NumArray o_sort = o_na;
+   NumArray fcmn_sort = fcmn_na;
+   NumArray ocmn_sort = ocmn_na;
+   f_sort.sort_array();
+   o_sort.sort_array();
+   fcmn_sort.sort_array();
+   ocmn_sort.sort_array();
 
    //
    // Compute percentiles
    //
-   out_fcst_thresh.set_perc(&fsort, &osort, &csort,
+   out_fcst_thresh.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort,
                             &out_fcst_thresh, &out_obs_thresh);
-    out_obs_thresh.set_perc(&fsort, &osort, &csort,
+    out_obs_thresh.set_perc(&f_sort, &o_sort, &fcmn_sort, &ocmn_sort,
                             &out_fcst_thresh, &out_obs_thresh);
 
    return;
@@ -1897,7 +1899,7 @@ void STATAnalysisJob::open_dump_row_file() {
            << "can't open the output file \"" << dump_row
            << "\" for writing!\n\n";
 
-      throw(1);
+      throw 1;
    }
 
    return;
@@ -1912,7 +1914,7 @@ void STATAnalysisJob::close_dump_row_file() {
       //
       // Write any remaining lines
       //
-      *(dr_out) << dump_at;
+      *dr_out << dump_at;
 
       dr_out->close();
       delete dr_out;
@@ -1941,7 +1943,7 @@ void STATAnalysisJob::open_stat_file() {
            << "can't open the output STAT file \"" << stat_file
            << "\" for writing!\n\n";
 
-      throw(1);
+      throw 1;
    }
 
    return;
@@ -1991,6 +1993,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case STATLineType::prc:    c = get_n_prc_columns(n);   break;
          case STATLineType::eclv:   c = get_n_eclv_columns(n);  break;
          case STATLineType::mpr:    c = n_mpr_columns;          break;
+         case STATLineType::seeps:  c = n_seeps_columns;        break;
          case STATLineType::nbrctc: c = n_nbrctc_columns;       break;
          case STATLineType::nbrcts: c = n_nbrcts_columns;       break;
          case STATLineType::nbrcnt: c = n_nbrcnt_columns;       break;
@@ -2062,6 +2065,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          case STATLineType::prc:    write_prc_header_row   (1, n,                                    stat_at, 0, 0); break;
          case STATLineType::eclv:   write_eclv_header_row  (1, n,                                    stat_at, 0, 0); break;
          case STATLineType::mpr:    write_header_row       (mpr_columns, n_mpr_columns, 1,           stat_at, 0, 0); break;
+         case STATLineType::seeps:  write_header_row       (seeps_columns, n_seeps_columns, 1,       stat_at, 0, 0); break;
          case STATLineType::nbrctc: write_header_row       (nbrctc_columns, n_nbrctc_columns, 1,     stat_at, 0, 0); break;
          case STATLineType::nbrcts: write_header_row       (nbrcts_columns, n_nbrcts_columns, 1,     stat_at, 0, 0); break;
          case STATLineType::nbrcnt: write_header_row       (nbrcnt_columns, n_nbrcnt_columns, 1,     stat_at, 0, 0); break;
@@ -2133,7 +2137,7 @@ void STATAnalysisJob::close_stat_file() {
       //
       // Write any remaining lines
       //
-      *(stat_out) << stat_at;
+      *stat_out << stat_at;
 
       stat_out->close();
       delete stat_out;
@@ -2176,6 +2180,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
       if(line_type.n() == 1) {
 
          switch(string_to_statlinetype(line_type[0].c_str())) {
+
             case STATLineType::fho:
                write_header_row(fho_columns, n_fho_columns, 1, dump_at, 0, 0);
                break;
@@ -2198,6 +2203,10 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
 
             case STATLineType::sal1l2:
                write_header_row(sal1l2_columns, n_sal1l2_columns, 1, dump_at, 0, 0);
+               break;
+
+            case STATLineType::vcnt:
+               write_header_row(vcnt_columns, n_vcnt_columns, 1, dump_at, 0, 0);
                break;
 
             case STATLineType::vl1l2:
@@ -2232,6 +2241,10 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
                write_header_row(ecnt_columns, n_ecnt_columns, 1, dump_at, 0, 0);
                break;
 
+            case STATLineType::rps:
+               write_header_row(rps_columns, n_rps_columns, 1, dump_at, 0, 0);
+               break;
+
             case STATLineType::isc:
                write_header_row(isc_columns, n_isc_columns, 1, dump_at, 0, 0);
                break;
@@ -2246,6 +2259,14 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
 
             case STATLineType::seeps_mpr:
                write_header_row(seeps_mpr_columns, n_seeps_mpr_columns, 1, dump_at, 0, 0);
+               break;
+
+            case STATLineType::dmap:
+               write_header_row(dmap_columns, n_dmap_columns, 1, dump_at, 0, 0);
+               break;
+
+            case STATLineType::ssidx:
+               write_header_row(ssidx_columns, n_ssidx_columns, 1, dump_at, 0, 0);
                break;
 
             // Just write a STAT header line for indeterminant line types
@@ -2267,7 +2288,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
             default:
                mlog << Error << "\ndump_stat_line() -> "
                     << "unexpected line type value " << line_type[0] << "\n\n";
-               throw(1);
+               throw 1;
          } // end switch
       }
       //
@@ -2308,7 +2329,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
    // Write the buffer, if full
    //
    if(n_dump%dump_at.nrows() == 0) {
-      *(dr_out) << dump_at;
+      *dr_out << dump_at;
       dump_at.erase();
    }
 

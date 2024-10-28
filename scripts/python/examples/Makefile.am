@@ -32,7 +32,8 @@ pythonexamples_DATA = \
 	read_ascii_numpy.py \
 	read_ascii_point.py \
 	read_ascii_xarray.py \
-	read_met_point_obs.py
+	read_met_point_obs.py \
+	read_met_point_obs_pandas.py
 
 EXTRA_DIST = ${pythonexamples_DATA}
 

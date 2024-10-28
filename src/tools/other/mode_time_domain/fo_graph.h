@@ -24,12 +24,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-// typedef int GraphNodeType;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 class FO_Graph {
 
    private:
@@ -100,17 +94,16 @@ class FO_Graph {
       void dump_as_table(std::ostream &) const;
       void dump_as_table(const int) const;   //  dumps to mlog with the given verbosity level
 
-
 };
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int FO_Graph::n_fcst () const { return ( N_fcst ); }
-inline int FO_Graph::n_obs  () const { return ( N_obs  ); }
+inline int FO_Graph::n_fcst () const { return N_fcst; }
+inline int FO_Graph::n_obs  () const { return N_obs ; }
 
-inline int FO_Graph::n_nodes () const { return ( N_nodes ); }
+inline int FO_Graph::n_nodes () const { return N_nodes; }
 
 inline int FO_Graph::n_total () const { return ( N_fcst + N_obs  ); }
 

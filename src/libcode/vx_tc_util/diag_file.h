@@ -135,17 +135,17 @@ class DiagFile : public LineDataFile {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline const ConcatString & DiagFile::storm_id()     const { return(StormId);      }
-inline const ConcatString & DiagFile::basin()        const { return(Basin);        }
-inline const ConcatString & DiagFile::cyclone()      const { return(Cyclone);      }
-inline const StringArray  & DiagFile::technique()    const { return(Technique);    }
-inline unixtime             DiagFile::init()         const { return(InitTime);     }
-inline int                  DiagFile::n_time()       const { return(NTime);        }
-inline DiagType             DiagFile::diag_source()  const { return(DiagSource);   }
-inline const ConcatString & DiagFile::track_source() const { return(TrackSource);  }
-inline const ConcatString & DiagFile::field_source() const { return(FieldSource);  }
-inline int                  DiagFile::n_diag()       const { return(DiagName.n()); }
-inline const StringArray &  DiagFile::diag_name()    const { return(DiagName);     }
+inline const ConcatString & DiagFile::storm_id()     const { return StormId;      }
+inline const ConcatString & DiagFile::basin()        const { return Basin;        }
+inline const ConcatString & DiagFile::cyclone()      const { return Cyclone;      }
+inline const StringArray  & DiagFile::technique()    const { return Technique;    }
+inline unixtime             DiagFile::init()         const { return InitTime;     }
+inline int                  DiagFile::n_time()       const { return NTime;        }
+inline DiagType             DiagFile::diag_source()  const { return DiagSource;   }
+inline const ConcatString & DiagFile::track_source() const { return TrackSource;  }
+inline const ConcatString & DiagFile::field_source() const { return FieldSource;  }
+inline int                  DiagFile::n_diag()       const { return DiagName.n(); }
+inline const StringArray &  DiagFile::diag_name()    const { return DiagName;     }
 
 ////////////////////////////////////////////////////////////////////////
 

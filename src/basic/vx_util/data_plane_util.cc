@@ -210,7 +210,9 @@ DataPlane smooth_field(const DataPlane &dp,
 void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
         int width, GridTemplateFactory::GridTemplates shape,
         bool wrap_lon, SingleThresh t,
-        const DataPlane *cmn, const DataPlane *csd, double vld_t) {
+        const DataPlane *fcmn, const DataPlane *fcsd,
+        const DataPlane *ocmn, const DataPlane *ocsd,
+        double vld_t) {
    GridPoint *gp = nullptr;
    int x, y;
    int n_vld = 0;
@@ -227,26 +229,43 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
    }
 
    // Check climatology data, if needed
-   if(cmn && csd) {
-      if(!cmn->is_empty() && !csd->is_empty()) use_climo = true;
-   }
+   if(fcmn && !fcmn->is_empty() &&
+      fcsd && !fcsd->is_empty() &&
+      ocmn && !ocmn->is_empty() &&
+      ocsd && !ocsd->is_empty()) use_climo = true;
 
    // Check climatology dimensions
    if(use_climo) {
 
       // Check dimensions
-      if(cmn->nx() != dp.nx() || cmn->ny() != dp.ny()) {
+      if(fcmn->nx() != dp.nx() || fcmn->ny() != dp.ny()) {
          mlog << Error << "\nfractional_coverage() -> "
-           << "climatology mean dimension ("
-           << cmn->nx() << ", " << cmn->ny()
+           << "forecast climatology mean dimension ("
+           << fcmn->nx() << ", " << fcmn->ny()
            << ") does not match the data dimenion ("
            << dp.nx() << ", " << dp.ny() << ")!\n\n";
          exit(1);
       }
-      if(csd->nx() != dp.nx() || csd->ny() != dp.ny()) {
+      if(fcsd->nx() != dp.nx() || fcsd->ny() != dp.ny()) {
          mlog << Error << "\nfractional_coverage() -> "
-           << "climatology standard deviation dimension ("
-           << csd->nx() << ", " << csd->ny()
+           << "forecast climatology standard deviation dimension ("
+           << fcsd->nx() << ", " << fcsd->ny()
+           << ") does not match the data dimenion ("
+           << dp.nx() << ", " << dp.ny() << ")!\n\n";
+         exit(1);
+      }
+      if(ocmn->nx() != dp.nx() || ocmn->ny() != dp.ny()) {
+         mlog << Error << "\nfractional_coverage() -> "
+           << "observation climatology mean dimension ("
+           << ocmn->nx() << ", " << ocmn->ny()
+           << ") does not match the data dimenion ("
+           << dp.nx() << ", " << dp.ny() << ")!\n\n";
+         exit(1);
+      }
+      if(ocsd->nx() != dp.nx() || ocsd->ny() != dp.ny()) {
+         mlog << Error << "\nfractional_coverage() -> "
+           << "observation climatology standard deviation dimension ("
+           << ocsd->nx() << ", " << ocsd->ny()
            << ") does not match the data dimenion ("
            << dp.nx() << ", " << dp.ny() << ")!\n\n";
          exit(1);
@@ -255,7 +274,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 
 #pragma omp parallel default(none)                      \
    shared(mlog, dp, frac_dp, shape, width, wrap_lon, t) \
-   shared(use_climo, cmn, csd, vld_t, bad)              \
+   shared(use_climo, fcmn, fcsd, ocmn, ocsd, vld_t, bad)\
    private(x, y, n_vld, n_thr, gp, v)
    {
 
@@ -293,9 +312,14 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                   gp  = gt->getNextInGrid()) {
                  if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                  n_vld++;
-                 if(t.check(v,
-                    (use_climo ? cmn->get(gp->x, gp->y) : bad),
-                    (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr++;
+                 ClimoPntInfo cpi;
+                 if(use_climo) {
+                    cpi.set(fcmn->get(gp->x, gp->y),
+                            fcsd->get(gp->x, gp->y),
+                            ocmn->get(gp->x, gp->y),
+                            ocsd->get(gp->x, gp->y));
+                 }
+                 if(t.check(v, &cpi)) n_thr++;
               }
            }
            // Subtract off the bottom edge, shift up, and add the top.
@@ -307,9 +331,14 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                   gp  = gt->getNextInBotEdge()) {
                  if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                  n_vld--;
-                 if(t.check(v,
-                    (use_climo ? cmn->get(gp->x, gp->y) : bad),
-                    (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr--;
+                 ClimoPntInfo cpi;
+                 if(use_climo) {
+                    cpi.set(fcmn->get(gp->x, gp->y),
+                            fcsd->get(gp->x, gp->y),
+                            ocmn->get(gp->x, gp->y),
+                            ocsd->get(gp->x, gp->y));
+                 }
+                 if(t.check(v, &cpi)) n_thr--;
               }
 
               // Increment Y
@@ -321,9 +350,14 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                   gp  = gt->getNextInTopEdge()) {
                  if(is_bad_data(v = dp.get(gp->x, gp->y))) continue;
                  n_vld++;
-                 if(t.check(v,
-                    (use_climo ? cmn->get(gp->x, gp->y) : bad),
-                    (use_climo ? csd->get(gp->x, gp->y) : bad))) n_thr++;
+                 ClimoPntInfo cpi;
+                 if(use_climo) {
+                    cpi.set(fcmn->get(gp->x, gp->y),
+                            fcsd->get(gp->x, gp->y),
+                            ocmn->get(gp->x, gp->y),
+                            ocsd->get(gp->x, gp->y));
+                 }
+                 if(t.check(v, &cpi)) n_thr++;
               }
            }
 

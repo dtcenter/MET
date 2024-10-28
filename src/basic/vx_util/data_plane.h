@@ -145,21 +145,21 @@ class DataPlane {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int DataPlane::nx()  const { return (Nx);  }
-inline int DataPlane::ny()  const { return (Ny);  }
-inline int DataPlane::nxy() const { return (Nxy); }
+inline int DataPlane::nx()  const { return Nx;  }
+inline int DataPlane::ny()  const { return Ny;  }
+inline int DataPlane::nxy() const { return Nxy; }
 
 inline bool DataPlane::is_empty() const { return (Nxy == 0); }
 
-inline unixtime DataPlane::init()  const { return (InitTime);  }
-inline unixtime DataPlane::valid() const { return (ValidTime); }
-inline int      DataPlane::lead()  const { return (LeadTime);  }
-inline int      DataPlane::accum() const { return (AccumTime); }
+inline unixtime DataPlane::init()  const { return InitTime;  }
+inline unixtime DataPlane::valid() const { return ValidTime; }
+inline int      DataPlane::lead()  const { return LeadTime;  }
+inline int      DataPlane::accum() const { return AccumTime; }
 
-inline double DataPlane::operator()(int x, int y) const { return(get(x, y)); }
+inline double DataPlane::operator()(int x, int y) const { return get(x, y); }
 
-inline const double * DataPlane::data() const { return ( Data.data() ); }
-inline std::vector<double> & DataPlane::buf() { return ( Data ); }
+inline const double * DataPlane::data() const { return Data.data(); }
+inline std::vector<double> & DataPlane::buf() { return Data; }
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -244,7 +244,7 @@ class DataPlaneArray {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int DataPlaneArray::n_planes () const { return ( Nplanes ); }
+inline int DataPlaneArray::n_planes () const { return Nplanes; }
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -111,24 +111,24 @@ class ProbRIRWPairInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline const ProbRIRWInfo & ProbRIRWPairInfo::prob_rirw()  const { return(ProbRIRW);  }
-inline const TrackInfo *    ProbRIRWPairInfo::bdeck()      const { return(BDeck);     }
-inline const ConcatString & ProbRIRWPairInfo::storm_name() const { return(StormName); }
-inline const ConcatString & ProbRIRWPairInfo::bmodel()     const { return(BModel);    }
-inline       double         ProbRIRWPairInfo::blat()       const { return(BLat);      }
-inline       double         ProbRIRWPairInfo::blon()       const { return(BLon);      }
-inline       double         ProbRIRWPairInfo::adland()     const { return(ADLand);    }
-inline       double         ProbRIRWPairInfo::bdland()     const { return(BDLand);    }
-inline       double         ProbRIRWPairInfo::track_err()  const { return(TrackErr);  }
-inline       double         ProbRIRWPairInfo::x_err()      const { return(XErr);      }
-inline       double         ProbRIRWPairInfo::y_err()      const { return(YErr);      }
-inline       double         ProbRIRWPairInfo::bbegv()      const { return(BBegV);     }
-inline       double         ProbRIRWPairInfo::bendv()      const { return(BEndV);     }
-inline       double         ProbRIRWPairInfo::bminv()      const { return(BMinV);     }
-inline       double         ProbRIRWPairInfo::bmaxv()      const { return(BMaxV);     }
-inline       CycloneLevel   ProbRIRWPairInfo::bbeglev()    const { return(BBegLev);   }
-inline       CycloneLevel   ProbRIRWPairInfo::bendlev()    const { return(BEndLev);   }
-inline const TCStatLine &   ProbRIRWPairInfo::line()       const { return(Line);      }
+inline const ProbRIRWInfo & ProbRIRWPairInfo::prob_rirw()  const { return ProbRIRW;  }
+inline const TrackInfo *    ProbRIRWPairInfo::bdeck()      const { return BDeck;     }
+inline const ConcatString & ProbRIRWPairInfo::storm_name() const { return StormName; }
+inline const ConcatString & ProbRIRWPairInfo::bmodel()     const { return BModel;    }
+inline       double         ProbRIRWPairInfo::blat()       const { return BLat;      }
+inline       double         ProbRIRWPairInfo::blon()       const { return BLon;      }
+inline       double         ProbRIRWPairInfo::adland()     const { return ADLand;    }
+inline       double         ProbRIRWPairInfo::bdland()     const { return BDLand;    }
+inline       double         ProbRIRWPairInfo::track_err()  const { return TrackErr;  }
+inline       double         ProbRIRWPairInfo::x_err()      const { return XErr;      }
+inline       double         ProbRIRWPairInfo::y_err()      const { return YErr;      }
+inline       double         ProbRIRWPairInfo::bbegv()      const { return BBegV;     }
+inline       double         ProbRIRWPairInfo::bendv()      const { return BEndV;     }
+inline       double         ProbRIRWPairInfo::bminv()      const { return BMinV;     }
+inline       double         ProbRIRWPairInfo::bmaxv()      const { return BMaxV;     }
+inline       CycloneLevel   ProbRIRWPairInfo::bbeglev()    const { return BBegLev;   }
+inline       CycloneLevel   ProbRIRWPairInfo::bendlev()    const { return BEndLev;   }
+inline const TCStatLine &   ProbRIRWPairInfo::line()       const { return Line;      }
 
 inline void ProbRIRWPairInfo::set_adland(double d) { ADLand = d; return; }
 inline void ProbRIRWPairInfo::set_bdland(double d) { BDLand = d; return; }
@@ -183,7 +183,7 @@ class ProbRIRWPairInfoArray {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int ProbRIRWPairInfoArray::n_pairs() const { return(Pairs.size()); }
+inline int ProbRIRWPairInfoArray::n_pairs() const { return Pairs.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 

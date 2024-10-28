@@ -209,8 +209,8 @@ class TableFlatFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int TableFlatFile::n_grib1_elements() const { return ( N_grib1_elements ); }
-inline int TableFlatFile::n_grib2_elements() const { return ( N_grib2_elements ); }
+inline int TableFlatFile::n_grib1_elements() const { return N_grib1_elements; }
+inline int TableFlatFile::n_grib2_elements() const { return N_grib2_elements; }
 
 
 ////////////////////////////////////////////////////////////////////////

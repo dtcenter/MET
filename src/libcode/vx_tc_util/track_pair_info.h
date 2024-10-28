@@ -151,24 +151,24 @@ class TrackPairInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int                TrackPairInfo::n_points()             const { return(NPoints);              }
-inline const TrackInfo &  TrackPairInfo::adeck()                const { return(ADeck);                }
-inline const TrackInfo &  TrackPairInfo::bdeck()                const { return(BDeck);                }
-inline double             TrackPairInfo::adeck_dland(int i)     const { return(ADeckDLand[i]);        }
-inline double             TrackPairInfo::bdeck_dland(int i)     const { return(BDeckDLand[i]);        }
-inline double             TrackPairInfo::track_err(int i)       const { return(TrackErr[i]);          }
-inline double             TrackPairInfo::x_err(int i)           const { return(XErr[i]);              }
-inline double             TrackPairInfo::y_err(int i)           const { return(YErr[i]);              }
-inline double             TrackPairInfo::along_track_err(int i) const { return(AlongTrackErr[i]);     }
-inline double             TrackPairInfo::cross_track_err(int i) const { return(CrossTrackErr[i]);     }
-inline int                TrackPairInfo::adeck_rirw(int i)      const { return(nint(ADeckRIRW[i]));   }
-inline int                TrackPairInfo::bdeck_rirw(int i)      const { return(nint(BDeckRIRW[i]));   }
-inline int                TrackPairInfo::adeck_prv_int(int i)   const { return(nint(ADeckPrvInt[i])); }
-inline int                TrackPairInfo::bdeck_prv_int(int i)   const { return(nint(BDeckPrvInt[i])); }
-inline int                TrackPairInfo::n_lines()              const { return(NLines);               }
-inline const TCStatLine * TrackPairInfo::tcmpr_line(int i)      const { return(&TCMPRLine[i]);        }
-inline const TCStatLine * TrackPairInfo::tcdiag_line(int i)     const { return(&TCDIAGLine[i]);       }
-inline bool               TrackPairInfo::keep(int i)            const { return(Keep[i] != 0);         }
+inline int                TrackPairInfo::n_points()             const { return NPoints;              }
+inline const TrackInfo &  TrackPairInfo::adeck()                const { return ADeck;                }
+inline const TrackInfo &  TrackPairInfo::bdeck()                const { return BDeck;                }
+inline double             TrackPairInfo::adeck_dland(int i)     const { return ADeckDLand[i];        }
+inline double             TrackPairInfo::bdeck_dland(int i)     const { return BDeckDLand[i];        }
+inline double             TrackPairInfo::track_err(int i)       const { return TrackErr[i];          }
+inline double             TrackPairInfo::x_err(int i)           const { return XErr[i];              }
+inline double             TrackPairInfo::y_err(int i)           const { return YErr[i];              }
+inline double             TrackPairInfo::along_track_err(int i) const { return AlongTrackErr[i];     }
+inline double             TrackPairInfo::cross_track_err(int i) const { return CrossTrackErr[i];     }
+inline int                TrackPairInfo::adeck_rirw(int i)      const { return nint(ADeckRIRW[i]);   }
+inline int                TrackPairInfo::bdeck_rirw(int i)      const { return nint(BDeckRIRW[i]);   }
+inline int                TrackPairInfo::adeck_prv_int(int i)   const { return nint(ADeckPrvInt[i]); }
+inline int                TrackPairInfo::bdeck_prv_int(int i)   const { return nint(BDeckPrvInt[i]); }
+inline int                TrackPairInfo::n_lines()              const { return NLines;              }
+inline const TCStatLine * TrackPairInfo::tcmpr_line(int i)      const { return &TCMPRLine[i];       }
+inline const TCStatLine * TrackPairInfo::tcdiag_line(int i)     const { return &TCDIAGLine[i];      }
+inline bool               TrackPairInfo::keep(int i)            const { return (Keep[i] != 0);       }
 
 ////////////////////////////////////////////////////////////////////////
 //

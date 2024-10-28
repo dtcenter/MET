@@ -204,6 +204,7 @@ MET_BUFRLIB = @MET_BUFRLIB@
 MET_CAIRO = @MET_CAIRO@
 MET_CAIROINC = @MET_CAIROINC@
 MET_CAIROLIB = @MET_CAIROLIB@
+MET_CXX_STANDARD = @MET_CXX_STANDARD@
 MET_ECKIT = @MET_ECKIT@
 MET_ECKITINC = @MET_ECKITINC@
 MET_ECKITLIB = @MET_ECKITLIB@
@@ -317,7 +318,8 @@ pythonexamples_DATA = \
 	read_ascii_numpy.py \
 	read_ascii_point.py \
 	read_ascii_xarray.py \
-	read_met_point_obs.py
+	read_met_point_obs.py \
+	read_met_point_obs_pandas.py
 
 EXTRA_DIST = ${pythonexamples_DATA}
 MAINTAINERCLEANFILES = Makefile.in

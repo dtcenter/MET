@@ -514,7 +514,7 @@ else {
 
 }
 
-lon += twopi*floor( 0.5 - ((lon)/twopi) );
+lon += twopi*floor( 0.5 - (lon/twopi) );
 
 lon = lon * deg_per_rad;
 //lon *= cf;

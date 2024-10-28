@@ -791,7 +791,7 @@ double stereographic_alpha(double scale_lat, double r_km, double d_km)
 
 double alpha;
 
-alpha = (1.0 + sind(fabs(scale_lat)))*((r_km)/(d_km));
+alpha = (1.0 + sind(fabs(scale_lat)))*(r_km/d_km);
 
 
 return alpha;

@@ -221,17 +221,19 @@ class EnsembleStatConfInfo {
       // Message type groups that should be processed together
       std::map<ConcatString,StringArray> msg_typ_group_map;
       StringArray                        msg_typ_sfc;
+      bool                               obtype_as_group_val_flag;
 
       // Mapping of mask names to MaskPlanes
       std::map<ConcatString,MaskPlane>   mask_area_map;
 
       // Mapping of mask names to Station ID lists
-      std::map<ConcatString,StringArray> mask_sid_map;
+      std::map<ConcatString,MaskSID>     mask_sid_map;
 
       gsl_rng *rng_ptr;                     // GSL random number generator (allocated)
 
-      GridWeightType grid_weight_flag;      // Grid weighting flag
-      ConcatString   tmp_dir;               // Directory for temporary files
+      GridWeightType  grid_weight_flag;     // Grid weighting flag
+      PointWeightType point_weight_flag;    // Point weighting flag
+
       ConcatString   output_prefix;         // String to customize output file name
       ConcatString   version;               // Config file version
 

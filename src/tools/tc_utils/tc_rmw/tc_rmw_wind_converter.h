@@ -15,7 +15,7 @@
 //
 //   Mod#  Date      Name      Description
 //   ----  ----      ----      -----------
-//   000   05/11/22  DaveAlbo  New
+//   000   05/11/22  Albo      New
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -31,7 +31,6 @@
 
 using std::map;
 using std::string;
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -98,8 +97,8 @@ class TCRMW_WindConverter {
   // if configured to compute winds, but didn't find U or V, turn off
   // the wind computations and report an error
   void append_nc_output_vars(std::map<std::string, std::vector<std::string> > &variable_levels,
-			     std::map<std::string, std::string> &variable_long_names,
-			     std::map<std::string, std::string> &variable_units);
+                             std::map<std::string, std::string> &variable_long_names,
+                             std::map<std::string, std::string> &variable_units);
 
   // Check input varName against U, and if it's a match, lookup V using the
   // map members, and then compute tangential and radial winds if it is so
@@ -109,17 +108,15 @@ class TCRMW_WindConverter {
   // If true if returned, the winds can be accessed by calls to
   // get_wind_t_arr() and get_wind_r_arr()
   bool compute_winds_if_input_is_u(int i_point,
-				   const string &varName,
-				   const string &varLevel,
-				   unixtime valid_time,
-				   const StringArray &data_files,
-				   const GrdFileType &ftype,
-				   const Grid &latlon_arr,
-				   const double *lat_arr,
-				   const double *lon_arr,
-				   const Grid &grid,
-				   const DataPlane &data_dp,
-				   const TcrmwGrid &tcrmw_grid);
+                                   const string &varName,
+                                   const string &varLevel,
+                                   unixtime valid_time,
+                                   const StringArray &data_files,
+                                   const GrdFileType &ftype,
+                                   const Grid &grid_in,
+                                   const Grid &grid_out,
+                                   const DataPlane &u_wind_dp,
+                                   const TcrmwGrid &tcrmw_grid);
 };
 
 

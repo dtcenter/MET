@@ -159,10 +159,13 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
 {
   // Not sure why we do this
 
-  NcVarInfo *data_var = (NcVarInfo *)nullptr;
-  VarInfoNcCF *vinfo_nc = (VarInfoNcCF *)&vinfo;
+  auto data_var = (NcVarInfo *)nullptr;
+  auto vinfo_nc = (VarInfoNcCF *)&vinfo;
   static const string method_name
       = "MetNcCFDataFile::data_plane(VarInfo &, DataPlane &) -> ";
+
+  Grid grid_attr = vinfo.grid_attr();
+  _file->update_grid(grid_attr);
 
   // Initialize the data plane
 
@@ -338,6 +341,9 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    bool status = false;
    static const string method_name
          = "MetNcCFDataFile::data_plane_array(VarInfo &, DataPlaneArray &) -> ";
+
+   Grid grid_attr = vinfo.grid_attr();
+   _file->update_grid(grid_attr);
 
    // Initialize
    plane_array.clear();
@@ -672,5 +678,13 @@ long MetNcCFDataFile::convert_value_to_offset(double z_value, string z_dim_name)
 
    return z_offset;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+Grid MetNcCFDataFile::build_grid_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
+                                            const long lat_counts, const long lon_counts) {
+   return (nullptr != _file) ? _file->build_grid_from_lat_lon_vars(lat_var, lon_var, lat_counts, lon_counts) : grid();
+}
+
 
 ////////////////////////////////////////////////////////////////////////

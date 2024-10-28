@@ -7,7 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -113,13 +112,9 @@ void SingleAtt3DArray::clear()
 
 if ( e )  { delete [] e;  e = (SingleAtt3D *) nullptr; }
 
-
-
 Nelements = 0;
 
 Nalloc = 0;
-
-// AllocInc = 100;   //  don't reset AllocInc
 
 
 return;
@@ -161,7 +156,8 @@ SingleAtt3D * u = new SingleAtt3D [N];
 
 if ( !u )  {
 
-   mlog << Error << "SingleAtt3DArray::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nSingleAtt3DArray::extend(int) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -225,7 +221,8 @@ void SingleAtt3DArray::set_alloc_inc(int N)
 
 if ( N < 0 )  {
 
-   mlog << Error << "SingleAtt3DArray::set_alloc_int(int) -> bad value ... " << N << "\n\n";
+   mlog << Error << "\nSingleAtt3DArray::set_alloc_int(int) -> "
+        << "bad value ... " << N << "\n\n";
 
    exit ( 1 );
 
@@ -286,7 +283,8 @@ SingleAtt3D & SingleAtt3DArray::operator[](int N) const
 
 if ( (N < 0) || (N >= Nelements) )  {
 
-   mlog << Error << "\n\n  SingleAtt3DArray::operator[](int) -> range check error ... " << N << "\n\n";
+   mlog << Error << "\nSingleAtt3DArray::operator[](int) -> "
+        << "range check error ... " << N << "\n\n";
 
    exit ( 1 );
 }

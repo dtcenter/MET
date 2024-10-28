@@ -400,6 +400,8 @@ The output generated from the TC-Stat tool contains statistics produced by the a
 
 This job command finds and filters TCST lines down to those meeting the criteria selected by the filter's options. The filtered TCST lines are written to a file specified by the **-dump_row** option. The TCST output from this job follows the TCST output description in :numref:`tc-dland` and :numref:`tc-pairs`.
 
+ The "-set_hdr" job command option can be used to override any of the output header strings (e.g. "-set_hdr DESC EVENT_EQUAL" sets the output DESC column to "EVENT_EQUAL").
+
 **Job: Summary**
 
 This job produces summary statistics for the column name specified by the **-column** option. The output of the summary job consists of three rows:
@@ -474,6 +476,18 @@ The RIRW job produces contingency table counts and statistics defined by identif
 Users may also specify the **-out_alpha** option to define the alpha value for the confidence intervals in the CTS output line type. In addition, the **-by column_name** option is a convenient way of running the same job across multiple stratifications of data. For example, **-by AMODEL** runs the same job for each unique AMODEL name in the data.
 
 Users may also specify the **-out_stat** option to write the contingency table counts and statistics (for the CTC and CTS output line types) to an output STAT file. Information about the RIRW timing information and filtering criteria are written to the STAT header columns while the contingency table counts and/or statistics are written to the CTC and/or CTS output columns.
+
+When using the "-out_stat" option to create a .stat output file and stratifying results using one or more "-by" job command options, those columns may be referenced in the "-set_hdr" option.
+
+.. code-block:: none
+
+  -job rirw -line_type TCMPR -by CYCLONE -out_stat ctc.stat -set_hdr DESC CYCLONE
+
+When using multiple "-by" options, use "CASE" to reference the full case information string.
+
+.. code-block:: none
+
+  -job rirw -line_type TCMPR -by CYCLONE,LEAD -out_stat ctc.stat -set_hdr DESC CASE
 
 **Job: PROBRIRW**
 

@@ -444,22 +444,9 @@ void PlotPointObsConfInfo::process_config(
 
    // Parse plot_grid_string, if set
    if(m_strlen(plot_grid_string) > 0) {
-
-      // Parse as a white-space separated string
-      sa.parse_wsss(plot_grid_string);
-
-      // Search for a named grid
-      if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid)) {
-         mlog << Debug(3) << "Use the grid named \""
-              << plot_grid_string << "\".\n";
-      }
-      // Parse grid definition
-      else if(sa.n() > 1 && parse_grid_def(sa, grid)) {
-         mlog << Debug(3) << "Use the grid defined by string \""
-              << plot_grid_string << "\".\n";
-      }
-      // Extract the grid from a gridded data file
-      else {
+      if (!build_grid_by_grid_string(plot_grid_string, grid,
+                                     "PlotPointObsConfInfo::process_config -> ", false)) {
+         // Extract the grid from a gridded data file
          mlog << Debug(3) << "Use the grid defined by file \""
               << plot_grid_string << "\".\n";
 
@@ -499,7 +486,8 @@ void PlotPointObsConfInfo::process_config(
          // Regrid, if requested
          if(grid_data_info->regrid().enable) {
             mlog << Debug(1) << "Regridding field "
-                 << grid_data_info->magic_str() << ".\n";
+                 << grid_data_info->magic_str() << " using "
+                 << grid_data_info->regrid().get_str() << ".\n";
             Grid to_grid(parse_vx_grid(grid_data_info->regrid(),
                                        &grid, &grid));
             grid_data = met_regrid(grid_data, grid, to_grid,

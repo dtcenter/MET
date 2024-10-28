@@ -177,24 +177,8 @@ void process_command_line(int argc, char **argv) {
 
 void process_input_grid(DataPlane &dp) {
 
-   // Parse the input grid as a white-space separated string
-   StringArray sa;
-   sa.parse_wsss(input_gridname);
-
-   // Search for a named grid
-   if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid)) {
-      mlog << Debug(3)
-           << "Use input grid named \"" << input_gridname << "\".\n";
-   }
-   // Parse grid definition
-   else if(sa.n() > 1 && parse_grid_def(sa, grid)) {
-      mlog << Debug(3)
-           << "Use input grid defined by string \"" << input_gridname
-           << "\".\n";
-   }
-   // Extract the grid from a gridded data file
-   else {
-
+   if (!build_grid_by_grid_string(input_gridname, grid, "process_input_grid", false)) {
+      // Extract the grid from a gridded data file
       mlog << Debug(3)
            << "Use input grid defined by file \"" << input_gridname
            << "\".\n";
@@ -284,22 +268,7 @@ void process_mask_file(DataPlane &dp) {
       // For the grid mask type, support named grids and grid
       // specification strings
       if(mask_type == MaskType::Grid) {
-
-         // Parse the mask file as a white-space separated string
-         StringArray sa;
-         sa.parse_wsss(mask_filename);
-
-         // Search for a named grid
-         if(sa.n() == 1 && find_grid_by_name(sa[0].c_str(), grid_mask)) {
-            mlog << Debug(3)
-                 << "Use mask grid named \"" << mask_filename << "\".\n";
-         }
-         // Parse grid definition
-         else if(sa.n() > 1 && parse_grid_def(sa, grid_mask)) {
-            mlog << Debug(3)
-                 << "Use mask grid defined by string \"" << mask_filename
-                 << "\".\n";
-         }
+         build_grid_by_grid_string(mask_filename, grid_mask, "process_mask_file", false);
       }
 
       // Parse as a gridded data file if not already set
@@ -432,9 +401,8 @@ void get_data_plane(const ConcatString &file_name,
    }
 
    // Attempt to open the data file
-   Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf_ptr = (Met2dDataFile *) nullptr;
-   mtddf_ptr = mtddf_factory.new_met_2d_data_file(file_name.c_str(), ftype);
+   Met2dDataFile *mtddf_ptr = Met2dDataFileFactory::new_met_2d_data_file(
+                                file_name.c_str(), ftype);
    if(!mtddf_ptr) {
       mlog << Error << "\nget_data_plane() -> "
            << "can't open input file \"" << file_name << "\"\n\n";
@@ -454,9 +422,7 @@ void get_data_plane(const ConcatString &file_name,
    if(local_cs.length() > 0) {
 
       // Allocate new VarInfo object
-      VarInfoFactory vi_factory;
-      VarInfo *vi_ptr = (VarInfo *) nullptr;
-      vi_ptr = vi_factory.new_var_info(mtddf_ptr->file_type());
+      VarInfo *vi_ptr = VarInfoFactory::new_var_info(mtddf_ptr->file_type());
       if(!vi_ptr) {
          mlog << Error << "\nget_data_plane() -> "
               << "can't allocate new VarInfo pointer.\n\n";
@@ -475,7 +441,8 @@ void get_data_plane(const ConcatString &file_name,
       }
 
       // Dump the range of data values read
-      double dmin, dmax;
+      double dmin;
+      double dmax;
       dp.data_range(dmin, dmax);
       mlog << Debug(3)
            << "Read field \"" << vi_ptr->magic_str() << "\" from \""
@@ -502,7 +469,6 @@ bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
                                 ConcatString &config_str) {
    bool status = false;
    ConcatString tool;
-   int i;
 
    // Check for null pointer
    if(!mnmdf_ptr) return status;
@@ -514,7 +480,7 @@ bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
    if(tool != program_name) return status;
 
    // Loop through the NetCDF variables
-   for(i=0; i<mnmdf_ptr->MetNc->Nvars; i++) {
+   for(int i=0; i<mnmdf_ptr->MetNc->Nvars; i++) {
 
       // Skip the lat/lon variables
       if(mnmdf_ptr->MetNc->Var[i].name == "lat" ||
@@ -546,7 +512,7 @@ void get_shapefile_strings() {
         << dbf_filename << "\n";
 
    // Open the database file
-   if(!(f.open(dbf_filename.c_str()))) {
+   if(!f.open(dbf_filename.c_str())) {
       mlog << Error << "\nget_shapefile_strings() -> "
            << "unable to open database file \"" << dbf_filename
            << "\"\n\n";
@@ -613,7 +579,7 @@ void get_shapefile_records() {
    }
 
    // Open shapefile
-   if(!(f.open(shape_filename))) {
+   if(!f.open(shape_filename)) {
       mlog << Error << "\nget_shapefile_records() -> "
            << "unable to open shape file \"" << shape_filename
            << "\"\n\n";
@@ -698,13 +664,14 @@ bool is_shape_str_match(const int i_shape, const StringArray &names, const Strin
 ////////////////////////////////////////////////////////////////////////
 
 void apply_poly_mask(DataPlane & dp) {
-   int x, y, n_in;
+   int n_in = 0;
    bool inside;
-   double lat, lon;
+   double lat;
+   double lon;
 
    // Check the Lat/Lon of each grid point being inside the polyline
-   for(x=0,n_in=0; x<grid.nx(); x++) {
-      for(y=0; y<grid.ny(); y++) {
+   for(int x=0; x<grid.nx(); x++) {
+      for(int y=0; y<grid.ny(); y++) {
 
          // Lat/Lon value for the current grid point
          grid.xy_to_latlon(x, y, lat, lon);
@@ -740,20 +707,20 @@ void apply_poly_mask(DataPlane & dp) {
 ////////////////////////////////////////////////////////////////////////
 
 void apply_poly_xy_mask(DataPlane & dp) {
-   int i, x, y, n_in;
+   int n_in = 0;
    bool inside;
    double x_dbl, y_dbl;
    GridClosedPoly poly_xy;
 
    // Convert MaskPoly Lat/Lon coordinates to Grid X/Y
-   for(i=0; i<poly_mask.n_points(); i++) {
+   for(int i=0; i<poly_mask.n_points(); i++) {
       grid.latlon_to_xy(poly_mask.lat(i), poly_mask.lon(i), x_dbl, y_dbl);
       poly_xy.add_point(x_dbl, y_dbl);
    }
 
    // Check the X/Y of each grid point being inside the polyline
-   for(x=0,n_in=0; x<grid.nx(); x++) {
-      for(y=0; y<grid.ny(); y++) {
+   for(int x=0; x<grid.nx(); x++) {
+      for(int y=0; y<grid.ny(); y++) {
 
          // Check current grid point inside polyline
          inside = (poly_xy.is_inside((double) x, (double) y) != 0);
@@ -861,8 +828,11 @@ void apply_box_mask(DataPlane &dp) {
 ////////////////////////////////////////////////////////////////////////
 
 void apply_circle_mask(DataPlane &dp) {
-   int x, y, i, n_in;
-   double lat, lon, dist, v;
+   int n_in = 0;
+   double lat;
+   double lon;
+   double dist;
+   double v;
    bool check;
 
    // Check for no threshold
@@ -874,15 +844,16 @@ void apply_circle_mask(DataPlane &dp) {
    }
 
    // For each grid point, compute mimumum distance to polyline points
-   for(x=0,n_in=0; x<grid.nx(); x++) {
-      for(y=0; y<grid.ny(); y++) {
+   for(int x=0; x<grid.nx(); x++) {
+      for(int y=0; y<grid.ny(); y++) {
 
          // Lat/Lon value for the current grid point
          grid.xy_to_latlon(x, y, lat, lon);
          lon -= 360.0*floor((lon + 180.0)/360.0);
 
          // Find the minimum distance to a polyline point
-         for(i=0, dist=1.0E10; i<poly_mask.n_points(); i++) {
+         dist = 1.0E10;
+         for(int i=0; i<poly_mask.n_points(); i++) {
             dist = min(dist, gc_dist(lat, lon, poly_mask.lat(i), poly_mask.lon(i)));
          }
 
@@ -921,7 +892,8 @@ void apply_circle_mask(DataPlane &dp) {
    }
    // Otherwise, list the min/max distances computed
    else {
-      double dmin, dmax;
+      double dmin;
+      double dmax;
       dp.data_range(dmin, dmax);
       mlog << Debug(3)
            << "Circle Masking:\tDistances ranging from "
@@ -934,8 +906,11 @@ void apply_circle_mask(DataPlane &dp) {
 ////////////////////////////////////////////////////////////////////////
 
 void apply_track_mask(DataPlane &dp) {
-   int x, y, i, n_in;
-   double lat, lon, dist, v;
+   int n_in = 0;
+   double lat;
+   double lon;
+   double dist;
+   double v;
    bool check;
 
    // Check for no threshold
@@ -947,15 +922,16 @@ void apply_track_mask(DataPlane &dp) {
    }
 
    // For each grid point, compute mimumum distance to track
-   for(x=0,n_in=0; x<grid.nx(); x++) {
-      for(y=0; y<grid.ny(); y++) {
+   for(int x=0; x<grid.nx(); x++) {
+      for(int y=0; y<grid.ny(); y++) {
 
          // Lat/Lon value for the current grid point
          grid.xy_to_latlon(x, y, lat, lon);
          lon -= 360.0*floor((lon + 180.0)/360.0);
 
          // Find the minimum distance to the track
-         for(i=1, dist=1.0E10; i<poly_mask.n_points(); i++) {
+         dist = 1.0E10;
+         for(int i=1; i<poly_mask.n_points(); i++) {
             dist = min(dist,
                        gc_dist_to_line(poly_mask.lat(i-1), poly_mask.lon(i-1),
                                        poly_mask.lat(i),   poly_mask.lon(i),
@@ -1010,13 +986,16 @@ void apply_track_mask(DataPlane &dp) {
 ////////////////////////////////////////////////////////////////////////
 
 void apply_grid_mask(DataPlane &dp) {
-   int x, y, n_in;
+   int n_in = 0;
    bool inside;
-   double lat, lon, mask_x, mask_y;
+   double lat;
+   double lon;
+   double mask_x;
+   double mask_y;
 
    // Check each grid point being inside the masking grid
-   for(x=0,n_in=0; x<grid.nx(); x++) {
-      for(y=0; y<grid.ny(); y++) {
+   for(int x=0; x<grid.nx(); x++) {
+      for(int y=0; y<grid.ny(); y++) {
 
          // Lat/Lon value for the current grid point
          grid.xy_to_latlon(x, y, lat, lon);
@@ -1056,7 +1035,7 @@ void apply_grid_mask(DataPlane &dp) {
 ////////////////////////////////////////////////////////////////////////
 
 void apply_data_mask(DataPlane &dp) {
-   int x, y, n_in;
+   int n_in = 0;
    bool check;
 
    // Nothing to do without a threshold
@@ -1081,12 +1060,13 @@ void apply_data_mask(DataPlane &dp) {
       for(int i=0; i<nxy; i++) {
          if(!is_bad_data(dp.data()[i])) d.add(dp.data()[i]);
       }
-      thresh.set_perc(&d, &d, &d);
+      d.sort_array();
+      thresh.set_perc(&d, &d, &d, &d);
    }
 
    // For each grid point, apply the data threshold
-   for(x=0,n_in=0; x<grid.nx(); x++) {
-      for(y=0; y<grid.ny(); y++) {
+   for(int x=0; x<grid.nx(); x++) {
+      for(int y=0; y<grid.ny(); y++) {
 
          // Apply the threshold
          check = thresh.check(dp(x,y));
@@ -1114,7 +1094,7 @@ void apply_data_mask(DataPlane &dp) {
 ////////////////////////////////////////////////////////////////////////
 
 void apply_solar_mask(DataPlane &dp) {
-   int x, y, n_in;
+   int n_in = 0;
    double lat, lon, alt, azi, v;
    bool check;
 
@@ -1127,8 +1107,8 @@ void apply_solar_mask(DataPlane &dp) {
    }
 
    // Compute solar value for each grid point Lat/Lon
-   for(x=0,n_in=0; x<grid.nx(); x++) {
-      for(y=0; y<grid.ny(); y++) {
+   for(int x=0; x<grid.nx(); x++) {
+      for(int y=0; y<grid.ny(); y++) {
 
          // Lat/Lon value for the current grid point
          grid.xy_to_latlon(x, y, lat, lon);
@@ -1188,7 +1168,7 @@ void apply_solar_mask(DataPlane &dp) {
 ////////////////////////////////////////////////////////////////////////
 
 void apply_lat_lon_mask(DataPlane &dp) {
-   int x, y, n_in;
+   int n_in = 0;
    double lat, lon, v;
    bool check;
 
@@ -1201,8 +1181,8 @@ void apply_lat_lon_mask(DataPlane &dp) {
    }
 
    // Compute Lat/Lon value for each grid point
-   for(x=0,n_in=0; x<grid.nx(); x++) {
-      for(y=0; y<grid.ny(); y++) {
+   for(int x=0; x<grid.nx(); x++) {
+      for(int y=0; y<grid.ny(); y++) {
 
          // Lat/Lon value for the current grid point
          grid.xy_to_latlon(x, y, lat, lon);
@@ -1258,7 +1238,7 @@ void apply_lat_lon_mask(DataPlane &dp) {
 ////////////////////////////////////////////////////////////////////////
 
 void apply_shape_mask(DataPlane & dp) {
-   int x, y, n_in;
+   int n_in = 0;
    bool status = false;
 
    // Load the shapes
@@ -1272,8 +1252,8 @@ void apply_shape_mask(DataPlane & dp) {
    }
 
    // Check grid points
-   for(x=0,n_in=0; x<(grid.nx()); x++) {
-      for(y=0; y<(grid.ny()); y++) {
+   for(int x=0; x<(grid.nx()); x++) {
+      for(int y=0; y<(grid.ny()); y++) {
 
          vector<GridClosedPolyArray>::const_iterator poly_it;
          for(poly_it  = poly_list.begin();
@@ -1315,7 +1295,7 @@ void apply_shape_mask(DataPlane & dp) {
 
 DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
                   SetLogic logic) {
-   int x, y, n_in;
+   int n_in = 0;
    bool v_data, v_mask;
    double v;
    DataPlane dp;
@@ -1339,8 +1319,8 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
    dp.set_size(grid.nx(), grid.ny());
 
    // Process each point
-   for(x=0,n_in=0; x<grid.nx(); x++) {
-      for(y=0; y<grid.ny(); y++) {
+   for(int x=0; x<grid.nx(); x++) {
+      for(int y=0; y<grid.ny(); y++) {
 
          // Get the two input data values
          v_data = !is_eq(dp_data(x, y), 0.0);
@@ -1384,9 +1364,9 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
    if(logic != SetLogic::None) {
       mlog << Debug(3)
            << "Mask " << setlogic_to_string(logic)
-	   << (logic == SetLogic::Intersection ? ":\t" : ":\t\t")
+           << (logic == SetLogic::Intersection ? ":\t" : ":\t\t")
            << n_in << " of " << grid.nx() * grid.ny()
-	   << " points inside\n";
+           << " points inside\n";
    }
 
    return dp;
@@ -1395,10 +1375,9 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
 ////////////////////////////////////////////////////////////////////////
 
 void write_netcdf(const DataPlane &dp) {
-   int n, x, y;
+   int n;
    ConcatString cs;
 
-   float *mask_data = (float *)  nullptr;
    NcFile *f_out    = (NcFile *) nullptr;
    NcDim lat_dim;
    NcDim lon_dim;
@@ -1463,26 +1442,21 @@ void write_netcdf(const DataPlane &dp) {
    }
 
    // Allocate memory to store the mask values for each grid point
-   mask_data = new float [grid.nx()*grid.ny()];
+   vector<float> mask_data(grid.nx()*grid.ny());
 
    // Loop through each grid point
-   for(x=0; x<grid.nx(); x++) {
-      for(y=0; y<grid.ny(); y++) {
+   for(int x=0; x<grid.nx(); x++) {
+      for(int y=0; y<grid.ny(); y++) {
          n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
          mask_data[n] = dp(x, y);
       } // end for y
    } // end for x
 
-   if(!put_nc_data_with_dims(&mask_var, &mask_data[0], grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(&mask_var, mask_data.data(), grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "error with mask_var->put\n\n";
-      // Delete allocated memory
-      if(mask_data) { delete[] mask_data; mask_data = (float *) nullptr; }
       exit(1);
    }
-
-   // Delete allocated memory
-   if(mask_data) { delete[] mask_data; mask_data = (float *) nullptr; }
 
    delete f_out;
    f_out = (NcFile *) nullptr;

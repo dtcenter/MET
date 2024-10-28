@@ -84,8 +84,8 @@ class SingleAtt2DArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int SingleAtt2DArray::n_elements() const { return ( Nelements ); }
-inline int SingleAtt2DArray::n         () const { return ( Nelements ); }
+inline int SingleAtt2DArray::n_elements() const { return Nelements; }
+inline int SingleAtt2DArray::n         () const { return Nelements; }
 
 
 ////////////////////////////////////////////////////////////////////////

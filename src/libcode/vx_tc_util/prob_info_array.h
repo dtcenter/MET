@@ -79,8 +79,8 @@ class ProbInfoArray {
 ////////////////////////////////////////////////////////////////////////
 
 inline int ProbInfoArray::n_probs()     const { return(ProbRIRW.size() + ProbGen.size()); }
-inline int ProbInfoArray::n_prob_rirw() const { return(ProbRIRW.size());                  }
-inline int ProbInfoArray::n_prob_gen()  const { return(ProbGen.size());                   }
+inline int ProbInfoArray::n_prob_rirw() const { return ProbRIRW.size();                   }
+inline int ProbInfoArray::n_prob_gen()  const { return ProbGen.size();                    }
 
 ////////////////////////////////////////////////////////////////////////
 

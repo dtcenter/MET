@@ -920,16 +920,16 @@ void draw_map(Cgraph & plot, const Box & map_box, const Grid & grid)
 {
 
 int j;
-Dictionary & s = *(sources);
-const DictionaryEntry * e = 0;
-Dictionary * dict = 0;
+Dictionary & s = *sources;
+const DictionaryEntry * e = nullptr;
+Dictionary * dict = nullptr;
 
 
 for (j=0; j<n_sources; ++j)  {
 
    e = s[j];
 
-   if ( ! (e->is_dictionary()) )  {
+   if ( ! e->is_dictionary() )  {
 
       mlog << Error
            << "\n\n  " << program_name << ": draw_map() -> non-dictionary found "

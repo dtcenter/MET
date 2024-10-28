@@ -18,51 +18,19 @@
 
 #include <netcdf>
 
-#ifndef ncbyte
-typedef signed char ncbyte; // from ncvalues.h
-#endif   /*  ncbyte  */
-#ifndef uchar
-typedef unsigned char uchar;
-#endif   /*  uchar  */
-
 #include "concat_string.h"
 #include "int_array.h"
 #include "long_array.h"
 #include "num_array.h"
 #include "nc_var_info.h"
 
+#include "nc_utils.hpp"
+
 ////////////////////////////////////////////////////////////////////////
 
-static const std::string C_unknown_str = std::string("unknown");
-
-#define IS_VALID_NC(ncObj)          (!ncObj.isNull())
-#define IS_VALID_NC_P(ncObjPtr)     ((ncObjPtr != nullptr && !ncObjPtr->isNull()))
-
-#define IS_INVALID_NC(ncObj)        ncObj.isNull()
-#define IS_INVALID_NC_P(ncObjPtr)   (ncObjPtr == nullptr || ncObjPtr->isNull())
-
-#define GET_NC_NAME(ncObj)          ncObj.getName()
-#define GET_NC_NAME_P(ncObjPtr)     ncObjPtr->getName()
-
-#define GET_NC_SIZE(ncObj)          ncObj.getSize()
-#define GET_NC_SIZE_P(ncObjPtr)     ncObjPtr->getSize()
-
-#define GET_SAFE_NC_NAME(ncObj)         (ncObj.isNull() ? C_unknown_str : ncObj.getName())
-#define GET_SAFE_NC_NAME_P(ncObjPtr)    (IS_INVALID_NC_P(ncObjPtr) ? C_unknown_str : ncObjPtr->getName())
-
-#define GET_NC_TYPE_ID(ncObj)           ncObj.getType().getId()
-#define GET_NC_TYPE_ID_P(ncObjPtr)      ncObjPtr->getType().getId()
-#define GET_NC_TYPE_NAME(ncObj)         ncObj.getType().getName()
-#define GET_NC_TYPE_NAME_P(ncObjPtr)    ncObjPtr->getType().getName()
-
-#define GET_NC_DIM_COUNT(ncObj)         ncObj.getDimCount()
-#define GET_NC_DIM_COUNT_P(ncObjPtr)    ncObjPtr->getDimCount()
-
-#define GET_NC_VAR_COUNT(ncObj)         ncObj.getVarCount()
-#define GET_NC_VAR_COUNT_P(ncObjPtr)    ncObjPtr->getVarCount()
-
-#define GET_NC_VARS(ncObj)              ncObj.getVars()
-#define GET_NC_VARS_P(ncObjPtr)         ncObjPtr->getVars()
+#ifndef uchar
+typedef unsigned char uchar;
+#endif   /*  uchar  */
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -84,49 +52,49 @@ static const std::string C_unknown_str = std::string("unknown");
 
 #define OBS_BUFFER_SIZE  (128 * 1024)
 
-static const char nc_dim_nhdr[]              = "nhdr";
-static const char nc_dim_nhdr_typ[]          = "nhdr_typ";
-static const char nc_dim_nhdr_sid[]          = "nhdr_sid";
-static const char nc_dim_nhdr_vld[]          = "nhdr_vld";
-static const char nc_dim_npbhdr[]            = "npbhdr";
-static const char nc_dim_nobs[]              = "nobs";
-static const char nc_dim_nqty[]              = "nobs_qty";
-static const char nc_dim_hdr_arr[]           = "hdr_arr_len";
-static const char nc_dim_obs_arr[]           = "obs_arr_len";
-static const char nc_dim_mxstr[]             = "mxstr";
-static const char nc_dim_mxstr2[]            = "mxstr2";
-static const char nc_dim_mxstr3[]            = "mxstr3";
-static const char nc_dim_nvar[]              = "obs_var_num";
-static const char nc_dim_unit[]              = "unit_len";
-static const char nc_dim_desc[]              = "desc_len";
-static const char nc_var_desc[]              = "obs_desc";
-static const char nc_var_hdr_arr[]           = "hdr_arr";
-static const char nc_var_hdr_lat[]           = "hdr_lat";
-static const char nc_var_hdr_lon[]           = "hdr_lon";
-static const char nc_var_hdr_elv[]           = "hdr_elv";
-static const char nc_var_hdr_typ[]           = "hdr_typ";
-static const char nc_var_hdr_sid[]           = "hdr_sid";
-static const char nc_var_hdr_vld[]           = "hdr_vld";
-static const char nc_var_hdr_prpt_typ[]      = "hdr_prpt_typ";
-static const char nc_var_hdr_irpt_typ[]      = "hdr_irpt_typ";
-static const char nc_var_hdr_inst_typ[]      = "hdr_inst_typ";
-static const char nc_var_hdr_typ_tbl[]       = "hdr_typ_table";
-static const char nc_var_hdr_sid_tbl[]       = "hdr_sid_table";
-static const char nc_var_hdr_vld_tbl[]       = "hdr_vld_table";
-static const char nc_var_obs_arr[]           = "obs_arr";
-static const char nc_var_obs_hid[]           = "obs_hid";
-static const char nc_var_obs_gc[]            = "obs_gc";
-static const char nc_var_obs_vid[]           = "obs_vid";
-static const char nc_var_obs_lvl[]           = "obs_lvl";
-static const char nc_var_obs_hgt[]           = "obs_hgt";
-static const char nc_var_obs_val[]           = "obs_val";
-static const char nc_var_obs_qty[]           = "obs_qty";
-static const char nc_var_obs_qty_tbl[]       = "obs_qty_table";
-static const char nc_var_obs_var[]           = "obs_var";
-static const char nc_var_unit[]              = "obs_unit";
-static const std::string nc_att_use_var_id   = "use_var_id";
-static const char nc_att_obs_version[]       = "MET_Obs_version";
-static const char nc_att_met_point_nccf[]    = "MET_point_NCCF";
+constexpr char nc_dim_nhdr[]              = "nhdr";
+constexpr char nc_dim_nhdr_typ[]          = "nhdr_typ";
+constexpr char nc_dim_nhdr_sid[]          = "nhdr_sid";
+constexpr char nc_dim_nhdr_vld[]          = "nhdr_vld";
+constexpr char nc_dim_npbhdr[]            = "npbhdr";
+constexpr char nc_dim_nobs[]              = "nobs";
+constexpr char nc_dim_nqty[]              = "nobs_qty";
+constexpr char nc_dim_hdr_arr[]           = "hdr_arr_len";
+constexpr char nc_dim_obs_arr[]           = "obs_arr_len";
+constexpr char nc_dim_mxstr[]             = "mxstr";
+constexpr char nc_dim_mxstr2[]            = "mxstr2";
+constexpr char nc_dim_mxstr3[]            = "mxstr3";
+constexpr char nc_dim_nvar[]              = "obs_var_num";
+constexpr char nc_dim_unit[]              = "unit_len";
+constexpr char nc_dim_desc[]              = "desc_len";
+constexpr char nc_var_desc[]              = "obs_desc";
+constexpr char nc_var_hdr_arr[]           = "hdr_arr";
+constexpr char nc_var_hdr_lat[]           = "hdr_lat";
+constexpr char nc_var_hdr_lon[]           = "hdr_lon";
+constexpr char nc_var_hdr_elv[]           = "hdr_elv";
+constexpr char nc_var_hdr_typ[]           = "hdr_typ";
+constexpr char nc_var_hdr_sid[]           = "hdr_sid";
+constexpr char nc_var_hdr_vld[]           = "hdr_vld";
+constexpr char nc_var_hdr_prpt_typ[]      = "hdr_prpt_typ";
+constexpr char nc_var_hdr_irpt_typ[]      = "hdr_irpt_typ";
+constexpr char nc_var_hdr_inst_typ[]      = "hdr_inst_typ";
+constexpr char nc_var_hdr_typ_tbl[]       = "hdr_typ_table";
+constexpr char nc_var_hdr_sid_tbl[]       = "hdr_sid_table";
+constexpr char nc_var_hdr_vld_tbl[]       = "hdr_vld_table";
+constexpr char nc_var_obs_arr[]           = "obs_arr";
+constexpr char nc_var_obs_hid[]           = "obs_hid";
+constexpr char nc_var_obs_gc[]            = "obs_gc";
+constexpr char nc_var_obs_vid[]           = "obs_vid";
+constexpr char nc_var_obs_lvl[]           = "obs_lvl";
+constexpr char nc_var_obs_hgt[]           = "obs_hgt";
+constexpr char nc_var_obs_val[]           = "obs_val";
+constexpr char nc_var_obs_qty[]           = "obs_qty";
+constexpr char nc_var_obs_qty_tbl[]       = "obs_qty_table";
+constexpr char nc_var_obs_var[]           = "obs_var";
+constexpr char nc_var_unit[]              = "obs_unit";
+constexpr char nc_att_use_var_id[]        = "use_var_id";
+constexpr char nc_att_obs_version[]       = "MET_Obs_version";
+constexpr char nc_att_met_point_nccf[]    = "MET_point_NCCF";
 
 static const std::string add_offset_att_name           = "add_offset";
 static const std::string axis_att_name                 = "axis";
@@ -135,27 +103,25 @@ static const std::string coordinates_att_name          = "coordinates";
 static const std::string coordinate_axis_type_att_name = "_CoordinateAxisType";
 static const std::string cf_att_name                   = "Conventions";
 static const std::string description_att_name          = "description";
-static const std::string fill_value_att_name           = "_FillValue";
 static const std::string grid_mapping_att_name         = "grid_mapping";
 static const std::string grid_mapping_name_att_name    = "grid_mapping_name";
 static const std::string long_name_att_name            = "long_name";
-static const std::string missing_value_att_name        = "missing_value";
 static const std::string projection_att_name           = "Projection";
 static const std::string scale_factor_att_name         = "scale_factor";
 static const std::string standard_name_att_name        = "standard_name";
 static const std::string units_att_name                = "units";
 
-static const char nc_time_unit_exp[]    = "^[a-z|A-Z]* *since *[0-9]\\{1,4\\}-[0-9]\\{1,2\\}-[0-9]\\{1,2\\}";
-static const char nc_time_unit_ymd_exp[] = "[0-9]\\{1,4\\}-[0-9]\\{1,2\\}-[0-9]\\{1,2\\}";
+constexpr char nc_time_unit_exp[]    = "^[a-z|A-Z]* *since *[0-9]\\{1,4\\}-[0-9]\\{1,2\\}-[0-9]\\{1,2\\}";
+constexpr char nc_time_unit_ymd_exp[] = "[0-9]\\{1,4\\}-[0-9]\\{1,2\\}-[0-9]\\{1,2\\}";
 
-static const char MET_NC_Obs_ver_1_2[]  = "1.02";
-static const char MET_NC_Obs_version[]  = "1.02";
+constexpr char MET_NC_Obs_ver_1_2[]  = "1.02";
+constexpr char MET_NC_Obs_version[]  = "1.02";
 
-static const int exit_code_no_error    = 0;
-static const int exit_code_no_dim      = 1;
-static const int exit_code_no_hdr_vars = 2;
-static const int exit_code_no_loc_vars = 3;
-static const int exit_code_no_obs_vars = 4;
+constexpr int exit_code_no_error    = 0;
+constexpr int exit_code_no_dim      = 1;
+constexpr int exit_code_no_hdr_vars = 2;
+constexpr int exit_code_no_loc_vars = 3;
+constexpr int exit_code_no_obs_vars = 4;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -183,9 +149,6 @@ extern bool      get_att_no_leap_year(const netCDF::NcVar *);
 
 extern bool      get_cf_conventions(const netCDF::NcFile *, ConcatString&);
 
-extern netCDF::NcVarAtt   *get_nc_att(const netCDF::NcVar  *, const ConcatString &, bool exit_on_error = false);
-extern netCDF::NcGroupAtt *get_nc_att(const netCDF::NcFile *, const ConcatString &, bool exit_on_error = false);
-
 extern bool get_nc_att_value(const netCDF::NcVarAtt *, std::string &);
 extern bool get_nc_att_value(const netCDF::NcVarAtt *, int          &, bool exit_on_error = true);
 extern bool get_nc_att_value(const netCDF::NcVarAtt *, float        &, bool exit_on_error = true);
@@ -195,6 +158,7 @@ extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, Concat
 extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, int          &, bool exit_on_error = false);
 extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, float        &, bool exit_on_error = false);
 extern bool get_nc_att_value(const netCDF::NcVar *, const ConcatString &, double       &, bool exit_on_error = false);
+extern bool get_nc_att_values(const netCDF::NcVar *, const ConcatString &, unsigned short *, bool exit_on_error = false);
 
 extern bool has_att(netCDF::NcFile *, const ConcatString name, bool exit_on_error=false);
 extern bool has_att(netCDF::NcVar *, const ConcatString name, bool do_log=false);
@@ -257,11 +221,10 @@ extern ConcatString* get_string_val(netCDF::NcVar *var, const int index, const i
 extern bool get_nc_data(netCDF::NcVar *, int    *data);
 extern bool get_nc_data(netCDF::NcVar *, char   *data);
 extern bool get_nc_data(netCDF::NcVar *, char  **data);
-extern bool get_nc_data(netCDF::NcVar *, uchar  *data);
+extern bool get_nc_data(netCDF::NcVar *, uchar  *data, bool allow_conversion=false);
 extern bool get_nc_data(netCDF::NcVar *, float  *data);
 extern bool get_nc_data(netCDF::NcVar *, double *data);
 extern bool get_nc_data(netCDF::NcVar *, time_t *data);
-extern bool get_nc_data(netCDF::NcVar *, ncbyte *data);
 extern bool get_nc_data(netCDF::NcVar *, unsigned short *data);
 
 extern bool get_nc_data(netCDF::NcVar *, int    *data, const LongArray &curs);
@@ -359,14 +322,8 @@ extern netCDF::NcDim  add_dim(netCDF::NcFile *, const std::string &);
 extern netCDF::NcDim  add_dim(netCDF::NcFile *, const std::string &, const size_t);
 extern bool   has_dim(netCDF::NcFile *, const char *dim_name);
 extern bool   get_dim(const netCDF::NcFile *, const ConcatString &, int &, bool error_out = false);
-extern int    get_dim_count(const netCDF::NcVar *);
 extern int    get_dim_count(const netCDF::NcFile *);
-extern int    get_dim_size(const netCDF::NcDim *);
-extern int    get_dim_size(const netCDF::NcVar *, const int dim_offset);
 extern int    get_dim_value(const netCDF::NcFile *, const std::string &, const bool error_out = false);
-extern netCDF::NcDim  get_nc_dim(const netCDF::NcFile *, const std::string &dim_name);
-extern netCDF::NcDim  get_nc_dim(const netCDF::NcVar *, const std::string &dim_name);
-extern netCDF::NcDim  get_nc_dim(const netCDF::NcVar *, const int dim_offset);
 extern bool   get_dim_names(const netCDF::NcVar *var, StringArray *dimNames);
 extern bool   get_dim_names(const netCDF::NcFile *nc, StringArray *dimNames);
 
@@ -376,7 +333,6 @@ extern netCDF::NcVar  get_nc_var_time(const netCDF::NcFile *nc);
 extern int    get_index_at_nc_data(netCDF::NcVar *var, double value, const std::string dim_name, bool is_time=false);
 extern netCDF::NcFile* open_ncfile(const char * nc_name, bool write = false);
 
-extern int get_data_size(netCDF::NcVar *);
 extern unixtime get_reference_unixtime(netCDF::NcVar *time_var, int &sec_per_unit,
                                        bool &no_leap_year);
 
@@ -387,10 +343,6 @@ extern bool is_nc_unit_latitude(const char *units);
 extern void parse_cf_time_string(const char *str, unixtime &ref_ut,
                                  int &sec_per_unit);
 extern void parse_time_string(const char *str, unixtime &ut);
-
-////////////////////////////////////////////////////////////////////////
-
-#include "nc_utils.hpp"
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -89,15 +89,15 @@ class ConvFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline bool ConvFile::get_swap_endian() const { return ( SwapEndian ); }
+inline bool ConvFile::get_swap_endian() const { return SwapEndian; }
 
-inline int ConvFile::get_rec_pad_size() const { return ( RecPadSize ); }
+inline int ConvFile::get_rec_pad_size() const { return RecPadSize; }
 
-inline unixtime ConvFile::date() const { return ( Date ); }
+inline unixtime ConvFile::date() const { return Date; }
 
-inline int ConvFile::n_rec() const { return ( Nrec ); }
+inline int ConvFile::n_rec() const { return Nrec; }
 
-inline int ConvFile::n_pair() const { return ( Npair ); }
+inline int ConvFile::n_pair() const { return Npair; }
 
 
 ////////////////////////////////////////////////////////////////////////

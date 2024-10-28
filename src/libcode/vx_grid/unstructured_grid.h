@@ -85,8 +85,8 @@ class UnstructuredGrid : public GridRep {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double UnstructuredGrid::scale_km() const { return ( -1.0 );    }
-inline bool   UnstructuredGrid::wrap_lon() const { return ( wrapLon ); }
+inline double UnstructuredGrid::scale_km() const { return -1.0;    }
+inline bool   UnstructuredGrid::wrap_lon() const { return wrapLon; }
 
 
 ////////////////////////////////////////////////////////////////////////

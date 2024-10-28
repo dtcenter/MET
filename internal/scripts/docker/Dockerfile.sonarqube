@@ -1,5 +1,5 @@
 ARG MET_BASE_REPO=met-base
-ARG MET_BASE_TAG=v3.2
+ARG MET_BASE_TAG=v3.3
 
 FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_TAG}
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
@@ -9,7 +9,7 @@ MAINTAINER John Halley Gotway <johnhg@ucar.edu>
 # SonarQube static code analysis on the specified branch or tag.
 # https://docs.sonarqube.org/latest/analysis/scan/sonarscanner/
 #
-ARG SONAR_SCANNER_VERSION=5.0.1.3006
+ARG SONAR_SCANNER_VERSION=6.1.0.4477
 ARG SONAR_HOST_URL
 ARG SONAR_TOKEN
 ARG SOURCE_BRANCH

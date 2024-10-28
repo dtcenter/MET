@@ -151,7 +151,6 @@ default_config_filename = replace_path(default_config_path);
 config.read_config(default_config_filename.c_str(), local_config_filename.c_str());
 
 
-
    //
    //  determine the input file types
    //    - check the config file for the file_type
@@ -263,8 +262,6 @@ fcst_raw.regrid(to_grid, config.fcst_info->regrid());
    //
 
 ConcatString prefix;
-// int year, month, day, hour, minute, second;
-// char junk[256];
 
 prefix = make_output_prefix(config, obs_raw.start_valid_time());
 
@@ -394,10 +391,6 @@ MtdIntFile fo, oo;
 
 if ( have_pairs )  {
 
-   // mlog << Debug(5) << "\n  Calculating pair attributes ... (Nf = "
-   //      << (fcst_obj.n_objects()) << ", No = "
-   //      << (obs_obj.n_objects())  << ")\n\n";
-
    for (j=0; j<(fcst_obj.n_objects()); ++j)  {
 
       fo = fcst_obj.select(j + 1);
@@ -412,9 +405,6 @@ if ( have_pairs )  {
 
          p.set_simple();
 
-         // mlog << Debug(5) << "   (F_" << j << ", O_" << k << ")   "
-         //      << p.total_interest() << '\n';
-
          pa_simple.add(p);
 
       }
@@ -422,7 +412,6 @@ if ( have_pairs )  {
    }
 
 }   //  if have_pairs
-
 
 
    //
@@ -520,9 +509,6 @@ for (j=0; j<(obs_obj.n_objects()); ++j)  {
 }   //  for j
 
 
-
-
-
    //
    //  create graph
    //
@@ -554,25 +540,13 @@ if ( have_pairs )  {
 
       for (j=0; j<n_clusters; ++j)  {
 
-         // mlog << Debug(5) << "Fcst objects in composite " << j << ":  ";
-
          a = engine.fcst_composite(j);
 
-         // a.dump_one_line(cout);
-
-         // mlog << Debug(5) << "Obs  objects in composite " << j << ":  ";
-
          a = engine.obs_composite(j);
-
-         // a.dump_one_line(cout);
-
-         // mlog << Debug(5) << '\n';
 
       }
 
    }   //  if
-
-   // mlog << Debug(2) << "N composites = " << e.n_composites() << "\n";
 
 }   //  if have_pairs
 
@@ -607,8 +581,6 @@ if ( have_pairs )  {
 
    }
 
-   // if ( mlog.verbosity_level() > 5 )  fcst_cluster_att.dump(cout);
-
    mlog << Debug(2)
         << "Calculating 3D obs cluster attributes\n";
 
@@ -622,8 +594,6 @@ if ( have_pairs )  {
 
       att_3 = calc_3d_single_atts(mask, obs_raw, config.model.c_str(), config.inten_perc_value);
 
-      // if ( att.Xvelocity > 20.0 )  mask.write("w.nc");
-
       att_3.set_object_number(j + 1);   //  1-based
 
       att_3.set_obs();
@@ -633,8 +603,6 @@ if ( have_pairs )  {
       obs_cluster_att.add(att_3);
 
    }
-
-   // obs_cluster_att.dump(cout);
 
 }   //  if have_pairs
 
@@ -670,11 +638,7 @@ if ( have_pairs )  {
 
          p.set_cluster();
 
-         // p.set_total_interest(e.calc(p));
          p.set_total_interest(-1.0);
-
-         // mlog << Debug(5) << "   (F_" << j << ", O_" << k << ")   "
-         //      << p.total_interest() << '\n';
 
          pa_cluster.add(p);
 
@@ -786,9 +750,6 @@ if ( have_pairs )  {
       }   //  for t
 
    }   //  for j
-
-
-
 
 }   //  if have pairs
 

@@ -232,6 +232,33 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void DataLine::set_item(int k, const ConcatString &item_cs)
+
+{
+
+if ( (k < 0) || (k >= N_items) )  {
+
+   ConcatString cs = (File ? File->filename() : "");
+
+   mlog << Error << "\nDataLine::set_item(int) -> "
+        << "range check error setting line number " << LineNumber
+        << ", item number " << k+1 << " of " << N_items
+        << " from file \"" << cs << "\"\n\n";
+
+   exit ( 1 );
+
+}
+
+Items[k] = item_cs;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 const char * DataLine::get_item(int k) const
 
 {

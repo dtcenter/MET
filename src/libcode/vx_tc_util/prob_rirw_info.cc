@@ -143,8 +143,8 @@ void ProbRIRWInfo::assign(const ProbRIRWInfo &p) {
 ////////////////////////////////////////////////////////////////////////
 
 int ProbRIRWInfo::rirw_window() const {
-   return((is_bad_data(rirw_beg()) || is_bad_data(rirw_end()) ?
-           bad_data_int : rirw_end() - rirw_beg()));
+   return (is_bad_data(rirw_beg()) || is_bad_data(rirw_end()) ?
+           bad_data_int : rirw_end() - rirw_beg());
 }
 
 ////////////////////////////////////////////////////////////////////////

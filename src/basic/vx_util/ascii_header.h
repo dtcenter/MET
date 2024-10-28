@@ -86,12 +86,12 @@ inline void AsciiHeaderLine::set_version  (const char *s) { Version  = s;  Versi
 inline void AsciiHeaderLine::set_data_type(const char *s) { DataType = s; DataType.ws_strip(); }
 inline void AsciiHeaderLine::set_line_type(const char *s) { LineType = s; LineType.ws_strip(); }
 
-inline const char * AsciiHeaderLine::version()          const { return(Version.c_str());        }
-inline const char * AsciiHeaderLine::data_type()        const { return(DataType.c_str());       }
-inline const char * AsciiHeaderLine::line_type()        const { return(LineType.c_str());       }
-inline const char * AsciiHeaderLine::var_index_name()   const { return(VarIndexName.c_str());   }
-inline int          AsciiHeaderLine::var_index_offset() const { return(VarIndexOffset); }
-inline int          AsciiHeaderLine::var_beg_offset()   const { return(VarBegOffset);   }
+inline const char * AsciiHeaderLine::version()          const { return Version.c_str();        }
+inline const char * AsciiHeaderLine::data_type()        const { return DataType.c_str();       }
+inline const char * AsciiHeaderLine::line_type()        const { return LineType.c_str();       }
+inline const char * AsciiHeaderLine::var_index_name()   const { return VarIndexName.c_str();   }
+inline int          AsciiHeaderLine::var_index_offset() const { return VarIndexOffset; }
+inline int          AsciiHeaderLine::var_beg_offset()   const { return VarBegOffset;   }
 
 ////////////////////////////////////////////////////////////////////////
 

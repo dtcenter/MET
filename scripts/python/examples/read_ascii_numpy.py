@@ -85,7 +85,6 @@ try:
          user_fill_value = float(sys.argv[3])
    except:
       log(f"{SCRIPT_NAME} Ignored argument {sys.argv[3]}")
-      pass
 
    log(f"{SCRIPT_NAME} Input File:\t{repr(input_file)}")
    log(f"{SCRIPT_NAME} Data Name:\t{repr(data_name)}")

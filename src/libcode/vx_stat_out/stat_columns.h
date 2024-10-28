@@ -35,7 +35,7 @@ extern void close_txt_file(std::ofstream *&,  const char *);
 extern ConcatString append_climo_bin(const ConcatString &, int, int);
 
 // Write out the header row for fixed length line types
-extern void write_header_row(const char **, int, int, AsciiTable &, int, int);
+extern void write_header_row(const char * const *, int, int, AsciiTable &, int, int);
 
 // Write out the header row for variable length line types
 extern void write_mctc_header_row  (int, int, AsciiTable &, int, int);
@@ -48,6 +48,9 @@ extern void write_rhist_header_row (int, int, AsciiTable &, int, int);
 extern void write_phist_header_row (int, int, AsciiTable &, int, int);
 extern void write_orank_header_row (int, int, AsciiTable &, int, int);
 extern void write_relp_header_row  (int, int, AsciiTable &, int, int);
+
+extern StringArray get_mctc_columns (int);
+extern StringArray get_pct_columns  (int);
 
 extern void write_fho_row   (StatHdrColumns &, const CTSInfo &, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
@@ -103,13 +106,13 @@ extern void write_dmap_row  (StatHdrColumns &, const DMAPInfo &, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_mpr_row   (StatHdrColumns &, const PairDataPoint *, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &,
-                             bool update_thresh = true);
+                             bool update_obtype, bool update_thresh = true);
 extern void write_seeps_row (StatHdrColumns &, const SeepsAggScore *, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &,
                              bool update_thresh = true);
 extern void write_seeps_mpr_row (StatHdrColumns &, const PairDataPoint *, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &,
-                             bool update_thresh = true);
+                             bool update_obtype, bool update_thresh = true);
 extern void write_isc_row   (StatHdrColumns &, const ISCInfo &, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_ecnt_row  (StatHdrColumns &, const ECNTInfo &, STATOutputType,
@@ -121,7 +124,8 @@ extern void write_rhist_row (StatHdrColumns &, const PairDataEnsemble *, STATOut
 extern void write_phist_row (StatHdrColumns &, const PairDataEnsemble *, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_orank_row (StatHdrColumns &, const PairDataEnsemble *, STATOutputType,
-                             AsciiTable &, int &, AsciiTable &, int &);
+                             AsciiTable &, int &, AsciiTable &, int &,
+                             bool update_obtype = false);
 extern void write_ssvar_row (StatHdrColumns &, const PairDataEnsemble *, double, STATOutputType,
                              AsciiTable &, int &, AsciiTable &, int &);
 extern void write_relp_row  (StatHdrColumns &, const PairDataEnsemble *, STATOutputType,

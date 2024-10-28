@@ -86,10 +86,10 @@ class ProbGenInfo : public ProbInfoBase {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline const ConcatString & ProbGenInfo::initials()     const { return(Initials);    }
-inline const ConcatString & ProbGenInfo::gen_or_dis()   const { return(GenOrDis);    }
-inline unixtime             ProbGenInfo::genesis_time() const { return(GenesisTime); }
-inline int                  ProbGenInfo::genesis_lead() const { return(GenesisLead); }
+inline const ConcatString & ProbGenInfo::initials()     const { return Initials;    }
+inline const ConcatString & ProbGenInfo::gen_or_dis()   const { return GenOrDis;    }
+inline unixtime             ProbGenInfo::genesis_time() const { return GenesisTime; }
+inline int                  ProbGenInfo::genesis_lead() const { return GenesisLead; }
 
 ////////////////////////////////////////////////////////////////////////
 

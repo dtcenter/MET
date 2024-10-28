@@ -8,12 +8,10 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
 #include "point2grid_conf_info.h"
 #include "vx_log.h"
 
 using namespace std;
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -49,7 +47,8 @@ void PointToGridConfInfo::clear() {
    // Initialize values
    message_type.clear();
    beg_ds = end_ds = bad_data_int;
-   quality_mark_thresh = bad_data_int;
+   obs_qty_inc.clear();
+   obs_qty_exc.clear();
    version.clear();
    valid_time = 0;
    def_var_name_map.clear();
@@ -85,7 +84,7 @@ void PointToGridConfInfo::read_config(const char *default_file_name,
 void PointToGridConfInfo::process_config() {
    ConcatString s;
    StringArray sa;
-   Dictionary *dict = (Dictionary *) nullptr;
+   auto dict = (Dictionary *) nullptr;
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
@@ -110,23 +109,18 @@ void PointToGridConfInfo::process_config() {
    // Conf: var_name_map
    var_name_map = parse_conf_key_value_map(&conf, conf_key_var_name_map);
 
-   // Conf: quality_mark_thresh
-   quality_mark_thresh = conf.lookup_int(conf_key_quality_mark_thresh);
+   // Conf: obs_quality_inc
+   obs_qty_inc = parse_conf_obs_qty_inc(&conf);
 
-   // Check the value
-   if(quality_mark_thresh < 0 || quality_mark_thresh > 15) {
-      mlog << Warning << "\nPointToGridConfInfo::process_config() -> "
-           << "the \"" << conf_key_quality_mark_thresh
-           << "\" entry (" << quality_mark_thresh
-           << ") should be set between 0 and 15.\n\n";
-   }
+   // Conf: obs_quality_exc
+   obs_qty_exc = parse_conf_obs_qty_exc(&conf);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString PointToGridConfInfo::get_var_id(const ConcatString var_name) {
+ConcatString PointToGridConfInfo::get_var_id(const ConcatString &var_name) {
    ConcatString var_id;
 
    map<ConcatString,ConcatString>::iterator ptr;
@@ -136,7 +130,7 @@ ConcatString PointToGridConfInfo::get_var_id(const ConcatString var_name) {
          break;
       }
    }
-   
+
    if( var_id.empty() ) {
       for (ptr=def_var_name_map.begin(); ptr != def_var_name_map.end(); ptr++) {
          if( ptr->second == var_name ) {
@@ -151,17 +145,14 @@ ConcatString PointToGridConfInfo::get_var_id(const ConcatString var_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString PointToGridConfInfo::get_var_name(const ConcatString var_name) {
+ConcatString PointToGridConfInfo::get_var_name(const ConcatString &var_name) {
    ConcatString out_var;
-   ConcatString t_name;
-   
-   t_name = var_name_map[var_name];
+   ConcatString t_name = var_name_map[var_name];
    if (t_name.empty()) t_name = def_var_name_map[var_name];
    if (t_name.empty()) {
-      ConcatString tmp_key, tmp_value;
-      tmp_key = "grib_code_";
+      ConcatString tmp_key = "grib_code_";
       tmp_key << atoi(var_name.c_str());
-      tmp_value = var_name_map[tmp_key];
+      ConcatString tmp_value = var_name_map[tmp_key];
       if (tmp_value.empty()) tmp_value = def_var_name_map[tmp_key];
       if (!tmp_value.empty()) t_name = tmp_value;
    }

@@ -421,7 +421,7 @@ void UnstructuredData::set_points(int count, const std::vector<PointLonLat> &ptL
    n_face = count;
    point_lonlat.reserve(count);
    for (int i=0; i<count; i++) {
-      point_lonlat[i] = {(ptLonLat)[i].x(), (ptLonLat)[i].y()};
+      point_lonlat[i] = {ptLonLat[i].x(), ptLonLat[i].y()};
    }
    if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
         << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredData::set_points(int, std::vector<PointLonLat> &) first: ("

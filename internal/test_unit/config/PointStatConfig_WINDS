@@ -52,6 +52,8 @@ message_type_group_map = [
    { key = "USERSF";  val = "ADPSFC,SFCSHP";                      }
 ];
 
+obtype_as_group_val_flag = FALSE;
+
 fcst = {
    sid_inc = [];
    sid_exc = [];
@@ -163,8 +165,11 @@ seeps_p1_thresh = NA;
 
 duplicate_flag = NONE;
 rank_corr_flag = TRUE;
-tmp_dir        = "/tmp";
-output_prefix  = "${OUTPUT_PREFIX}";
-version        = "V12.0.0";
+
+point_weight_flag = NONE;
+
+tmp_dir       = "/tmp";
+output_prefix = "${OUTPUT_PREFIX}";
+version       = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

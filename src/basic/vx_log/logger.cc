@@ -627,7 +627,6 @@ Logger & Logger::operator<<(const string s)
             //
             // put the next character into the ConcatString msg
             //
-	//         tmp[0] = s[i];
          msg.add(s[i]);
 
          if (s[i] == '\n')
@@ -636,7 +635,7 @@ Logger & Logger::operator<<(const string s)
                // this was a newline, so
                // put msg into the StringArray messages
                //
-	   messages.add((string)msg);
+            messages.add((string)msg);
 
                //
                // clear msg, and continue checking s
@@ -655,7 +654,7 @@ Logger & Logger::operator<<(const string s)
       {
          if (s[s.length() - 1] != '\n')
          {
-	   messages.add((string)msg);
+            messages.add((string)msg);
             msg.clear();
 
          }

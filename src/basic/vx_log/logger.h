@@ -177,9 +177,9 @@ class LoggerDebug {
 //////////////////////////////////////////////////////////////////
 
 
-inline int LoggerDebug::value() const { return (Value); }
+inline int LoggerDebug::value() const { return Value; }
 
-inline LoggerDebug::operator int () const { return (Value); }
+inline LoggerDebug::operator int () const { return Value; }
 
 
 //////////////////////////////////////////////////////////////////
@@ -292,9 +292,9 @@ class Logger
 //////////////////////////////////////////////////////////////////
 
 
-inline ConcatString Logger::log_filename() const { return (LogFilename); }
+inline ConcatString Logger::log_filename() const { return LogFilename; }
 
-inline int Logger::verbosity_level() const { return (VerbosityLevel); }
+inline int Logger::verbosity_level() const { return VerbosityLevel; }
 
 inline bool Logger::is_open() const { return (out != nullptr); }
 

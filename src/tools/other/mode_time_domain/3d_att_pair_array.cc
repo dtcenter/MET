@@ -7,7 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -113,14 +112,9 @@ void PairAtt3DArray::clear()
 
 if ( e )  { delete [] e;  e = (PairAtt3D *) nullptr; }
 
-
-
 Nelements = 0;
 
 Nalloc = 0;
-
-// AllocInc = 100;   //  don't reset AllocInc
-
 
 return;
 
@@ -161,7 +155,8 @@ PairAtt3D * u = new PairAtt3D [N];
 
 if ( !u )  {
 
-   mlog << Error << "PairAtt3DArray::extend(int) -> memory allocation error\n\n";
+   mlog << Error << "\nPairAtt3DArray::extend(int) -> "
+        << "memory allocation error\n\n";
 
    exit ( 1 );
 
@@ -225,7 +220,8 @@ void PairAtt3DArray::set_alloc_inc(int N)
 
 if ( N < 0 )  {
 
-   mlog << Error << "PairAtt3DArray::set_alloc_int(int) -> bad value ... " << N << "\n\n";
+   mlog << Error << "\nPairAtt3DArray::set_alloc_int(int) -> "
+        << "bad value ... " << N << "\n\n";
 
    exit ( 1 );
 
@@ -286,7 +282,8 @@ PairAtt3D & PairAtt3DArray::operator[](int N) const
 
 if ( (N < 0) || (N >= Nelements) )  {
 
-   mlog << Error << "\n\n  PairAtt3DArray::operator[](int) -> range check error ... " << N << "\n\n";
+   mlog << Error << "\nPairAtt3DArray::operator[](int) -> "
+        << "range check error ... " << N << "\n\n";
 
    exit ( 1 );
 }
@@ -305,7 +302,8 @@ int PairAtt3DArray::fcst_obj_number(int k) const
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   mlog << Error << "\n\n  PairAtt3DArray::fcst_obj_number(int) -> range check error\n\n";
+   mlog << Error << "\nPairAtt3DArray::fcst_obj_number(int) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -325,7 +323,8 @@ int PairAtt3DArray::obs_obj_number(int k) const
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   mlog << Error << "\n\n  PairAtt3DArray::obs_obj_number(int) -> range check error\n\n";
+   mlog << Error << "\nPairAtt3DArray::obs_obj_number(int) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -345,7 +344,8 @@ int PairAtt3DArray::fcst_cluster_number(int k) const
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   mlog << Error << "\n\n  PairAtt3DArray::fcst_cluster_number(int) -> range check error\n\n";
+   mlog << Error << "\nPairAtt3DArray::fcst_cluster_number(int) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -365,7 +365,8 @@ int PairAtt3DArray::obs_cluster_number(int k) const
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   mlog << Error << "\n\n  PairAtt3DArray::obs_cluster_number(int) -> range check error\n\n";
+   mlog << Error << "\nPairAtt3DArray::obs_cluster_number(int) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -385,7 +386,8 @@ double PairAtt3DArray::total_interest(int k) const
 
 if ( (k < 0) || (k >= Nelements) )  {
 
-   mlog << Error << "\n\n  PairAtt3DArray::total_interest(int) -> range check error\n\n";
+   mlog << Error << "\nPairAtt3DArray::total_interest(int) -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 

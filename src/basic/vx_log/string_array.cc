@@ -363,7 +363,7 @@ void StringArray::add_css(const std::string text)
   }
 
   Sorted = false;
-  
+
   return;
 
 }
@@ -450,7 +450,7 @@ void StringArray::insert(int i, const char * text)
   s.insert(s.begin()+i, text);
 
   Sorted = false;
-  
+
   return;
 
 }
@@ -464,7 +464,7 @@ bool StringArray::has(const std::string text) const
 {
    bool found = false;
    bool forward = true;
-   
+
    if (Sorted && !IgnoreCase) {
       found = binary_search(s.begin(), s.end(), text);
 }
@@ -496,13 +496,13 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
    //
    bool found = false;
    index = -1;
-   
+
    if (!s.empty()) {
       int count;
       std::string lower_text = text;
       std::vector<std::string>::const_iterator it;
       if ( IgnoreCase ) transform(lower_text.begin(), lower_text.end(), lower_text.begin(), ::tolower);
-      
+
       if (forward) {
          count = 0;
          for(it = s.begin(); it != s.end(); it++, count++) {
@@ -552,7 +552,7 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
       }
       if (found) index = count;
    }
-   
+
    return found;
 }
 
@@ -595,7 +595,7 @@ void StringArray::parse_delim(const std::string text, const char *delim)
   clear();
 
   std::string str = text;
-    
+
   size_t start = 0;
   size_t end = str.find_first_of(delim);
   while (end != string::npos) {
@@ -608,7 +608,7 @@ void StringArray::parse_delim(const std::string text, const char *delim)
       s.push_back(str.substr(start).c_str());
 
   Sorted = false;
-  
+
   return;
 
 }
@@ -729,15 +729,15 @@ void StringArray::sort()
       Sorted = true;
       return;
    }
-   
+
    if ( !Sorted ) {
       std::sort(s.begin(), s.end());
    }
-   
+
    Sorted = true;
-   
+
    return;
-   
+
 }
 
 
@@ -751,7 +751,7 @@ StringArray StringArray::uniq() const
   StringArray sa;
 
   sa.s = s;
-  
+
   std::vector<std::string>::iterator it;
 
   it = std::unique(sa.s.begin(), sa.s.end());
@@ -783,7 +783,7 @@ regex_t buffer;
 regex_t *preg = &buffer;
 
 // Check for null pointers
-if( !reg_exp_str || !test_str ) return( false ); 
+if( !reg_exp_str || !test_str ) return false;
 
 if( regcomp(preg, reg_exp_str, REG_EXTENDED*REG_NOSUB) != 0 ) {
    mlog << Error << "\ncheck_reg_exp(char *, char *) -> "
@@ -798,7 +798,7 @@ if( regexec(preg, test_str, 0, 0, 0) == 0 ) { valid = true; }
 // Free allocated memory.
 regfree( preg );
 
-return( valid );
+return valid;
 
 }
 

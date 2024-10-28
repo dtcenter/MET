@@ -328,34 +328,34 @@ class AsciiTable {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int  AsciiTable::nrows() const { return ( Nrows ); }
+inline int  AsciiTable::nrows() const { return Nrows; }
 
-inline int  AsciiTable::ncols() const { return ( Ncols ); }
+inline int  AsciiTable::ncols() const { return Ncols; }
 
-inline char AsciiTable::col_sep_char() const { return ( ColSepChar ); }
+inline char AsciiTable::col_sep_char() const { return ColSepChar; }
 
-inline char AsciiTable::pad_char() const { return ( PadChar ); }
+inline char AsciiTable::pad_char() const { return PadChar; }
 
-inline bool AsciiTable::fill_blank () const { return ( FillBlank ); }
+inline bool AsciiTable::fill_blank () const { return FillBlank; }
 
 inline void AsciiTable::set_fill_blank (bool tf) { FillBlank = tf;  return; }
 
-inline int  AsciiTable::table_indent () const { return ( TableIndent ); }
+inline int  AsciiTable::table_indent () const { return TableIndent; }
 
-inline int  AsciiTable::precision() const { return ( Precision ); }
+inline int  AsciiTable::precision() const { return Precision; }
 
-inline const char * AsciiTable::f_float_format() const { return ( f_FloatFormat ); }
-inline const char * AsciiTable::g_float_format() const { return ( g_FloatFormat ); }
+inline const char * AsciiTable::f_float_format() const { return f_FloatFormat; }
+inline const char * AsciiTable::g_float_format() const { return g_FloatFormat; }
 
-inline bool AsciiTable::comma_string() const { return ( DoCommaString ); }
+inline bool AsciiTable::comma_string() const { return DoCommaString; }
 
-inline bool AsciiTable::delete_trailing_blank_rows() const { return ( DeleteTrailingBlankRows ); }
+inline bool AsciiTable::delete_trailing_blank_rows() const { return DeleteTrailingBlankRows; }
 
-inline bool AsciiTable::elim_trailing_whitespace() const { return ( ElimTrailingWhitespace ); }
+inline bool AsciiTable::elim_trailing_whitespace() const { return ElimTrailingWhitespace; }
 
-inline bool AsciiTable::align_decimal_points() const { return ( AlignDecimalPoints ); }
+inline bool AsciiTable::align_decimal_points() const { return AlignDecimalPoints; }
 
-inline bool AsciiTable::decimal_points_aligned() const { return ( DecimalPointsAligned ); }
+inline bool AsciiTable::decimal_points_aligned() const { return DecimalPointsAligned; }
 
 
 ////////////////////////////////////////////////////////////////////////

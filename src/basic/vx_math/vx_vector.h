@@ -111,9 +111,9 @@ class Vector {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double Vector::x() const { return ( X ); }
-inline double Vector::y() const { return ( Y ); }
-inline double Vector::z() const { return ( Z ); }
+inline double Vector::x() const { return X; }
+inline double Vector::y() const { return Y; }
+inline double Vector::z() const { return Z; }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -1068,7 +1068,7 @@ if(is_eq(old_v_lo, bad_data_value)) {
    new_v_lo = bad_data_value;
 }
 else {
-   v_lo = (old_v_lo - old_b)/(old_m);
+   v_lo = (old_v_lo - old_b)/old_m;
    new_v_lo = v_lo*new_m + new_b;
 }
 
@@ -1080,7 +1080,7 @@ if(is_eq(old_v_hi, bad_data_value)) {
    new_v_hi = bad_data_value;
 }
 else {
-   v_hi = (old_v_hi - old_b)/(old_m);
+   v_hi = (old_v_hi - old_b)/old_m;
    new_v_hi = v_hi*new_m + new_b;
 }
 

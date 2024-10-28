@@ -192,7 +192,7 @@ void strip_char(char *str, const char c)
    ptr = str + m_strlen(str) - 1;
 
    if(*ptr == c) {
-      *(ptr) = 0;
+      *ptr = 0;
    }
 
    return;

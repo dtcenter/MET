@@ -137,6 +137,8 @@ message_type_group_map = [
    { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
 ];
 
+obtype_as_group_val_flag = FALSE;
+
 //
 // Ensemble bin sizes
 // May be set separately in each "obs.field" entry
@@ -277,8 +279,10 @@ rng = {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-grid_weight_flag = NONE;
-output_prefix    = "${OUTPUT_PREFIX}";
-version          = "V12.0.0";
+grid_weight_flag  = NONE;
+point_weight_flag = NONE;
+
+output_prefix = "${OUTPUT_PREFIX}";
+version       = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

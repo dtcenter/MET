@@ -80,6 +80,8 @@ The Stable Equitable Error in Probability Space (SEEPS) was devised for monitori
 
 The capability to calculate the SEEPS has also been added to Grid-Stat. This follows the method described in :ref:`North et al, 2022 <North-2022>`, which uses the TRMM 3B42 v7 gridded satellite product for the climatological values and interpolates the forecast and observed products onto this grid for evaluation. A 24-hour TRMM climatology (valid at 00 UTC) constructed from data over the time period 1998-2015 is supplied with the release. Expansion of the capability to other fields will occur as well vetted examples and funding allow.
 
+The gridded climatology required to compute SEEPS is not distributed as part of the code release and can be downloaded from `Zenodo <https://zenodo.org/records/13121064?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6ImM5NThkNDU4LTEzNDgtNDlmMy05ZjMwLTVkOWQ0MGZjMTFjNyIsImRhdGEiOnt9LCJyYW5kb20iOiI0NzMxYTM3YmNkMWE0MDA4ZWUyMDU4YTdkOTUyMjE4NCJ9.NJZPN0KkouUCQSmB0QjZbfJEOO6d6ZZQ_Me5VLbVaUY4aWQHSqGE4VLmUdLk-uTjN749Wdv92xLYz0aXay5cNw>`. The path to the file needs to be specified using MET_SEEPS_GRID_CLIMO_NAME.
+
 Fourier Decomposition
 ---------------------
 
@@ -239,31 +241,32 @@ __________________________
 
 .. code-block:: none
 
-  model          = "FCST";
-  desc           = "NA";
-  obtype         = "ANALYS"; 
-  fcst           = { ... }
-  obs            = { ... }
-  regrid         = { ... }
-  climo_mean     = { ... }
-  climo_stdev    = { ... }
-  climo_cdf      = { ... }
-  mask           = { grid = [ "FULL" ]; poly = []; }
-  ci_alpha       = [ 0.05 ];
-  boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
-                     rng = "mt19937"; seed = ""; }
-  interp         = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
-                     type = [ { method = NEAREST; width = 1; } ]; }
-  censor_thresh  = [];
-  censor_val     = [];
-  mpr_column     = [];
-  mpr_thresh     = [];
-  eclv_points    = 0.05;
-  hss_ec_value   = NA;
-  rank_corr_flag = TRUE;
-  tmp_dir        = "/tmp";
-  output_prefix  = "";
-  version        = "VN.N";
+  model            = "FCST";
+  desc             = "NA";
+  obtype           = "ANALYS"; 
+  fcst             = { ... }
+  obs              = { ... }
+  regrid           = { ... }
+  climo_mean       = { ... }
+  climo_stdev      = { ... }
+  climo_cdf        = { ... }
+  mask             = { grid = [ "FULL" ]; poly = []; }
+  ci_alpha         = [ 0.05 ];
+  boot             = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
+                       rng = "mt19937"; seed = ""; }
+  interp           = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
+                       type = [ { method = NEAREST; width = 1; } ]; }
+  censor_thresh    = [];
+  censor_val       = [];
+  mpr_column       = [];
+  mpr_thresh       = [];
+  eclv_points      = 0.05;
+  hss_ec_value     = NA;
+  rank_corr_flag   = TRUE;
+  grid_weight_flag = NONE;
+  tmp_dir          = "/tmp";
+  output_prefix    = "";
+  version          = "VN.N";
 
 The configuration options listed above are common to multiple MET tools and are described in :numref:`config_options`.
 
@@ -428,7 +431,7 @@ The **output_flag** array controls the type of output that the Grid-Stat tool ge
 
 Note that the first two line types are easily derived from one another. The user is free to choose which measure is most desired. The output line types are described in more detail in :numref:`grid_stat-output`.
 
-The SEEPS climo file is not distributed with MET tools because of the file size. It should be configured by using the environment variable, MET_SEEPS_GRID_CLIMO_NAME.
+The SEEPS climo file is not distributed with MET tools because of the file size. It should be configured by using the configuration file (seeps_grid_climo_name). It can be overridden by the environment variable, MET_SEEPS_GRID_CLIMO_NAME.
 
 
 _____________________
@@ -451,7 +454,7 @@ _____________________
 
 The **nc_pairs_flag** entry may either be set to a boolean value or a dictionary specifying which fields should be written. Setting it to TRUE indicates the output NetCDF matched pairs file should be created with all available output fields, while setting all to FALSE disables its creation. This is done regardless of if **output_flag** dictionary indicates any statistics should be computed. The **latlon, raw**, and **diff** entries control the creation of output variables for the latitude and longitude, the forecast and observed fields after they have been modified by any user-defined regridding, censoring, and conversion, and the forecast minus observation difference fields, respectively. The **climo, weight**, and **nbrhd** entries control the creation of output variables for the climatological mean and standard deviation fields, the grid area weights applied, and the fractional coverage fields computed for neighborhood verification methods. Setting these entries to TRUE indicates that they should be written, while setting them to FALSE disables their creation.
 
-Setting the **climo_cdp** entry to TRUE enables the creation of an output variable for each climatological distribution percentile (CDP) threshold requested in the configuration file. Note that enabling **nbrhd** output may lead to very large output files. The **gradient** entry controls the creation of output variables for the FCST and OBS gradients in the grid-x and grid-y directions. The **distance_map** entry controls the creation of output variables for the FCST and OBS distance maps for each categorical threshold. The **apply_mask** entry controls whether to create the FCST, OBS, and DIFF output variables for all defined masking regions. Setting this to TRUE will create the FCST, OBS, and DIFF output variables for all defined masking regions. Setting this to FALSE will create the FCST, OBS, and DIFF output variables for only the FULL verification domain.
+Setting the **climo_cdp** entry to TRUE enables the creation of an output variable for each climatological distribution percentile (FCDP or OCDP) threshold requested in the configuration file. Note that enabling **nbrhd** output may lead to very large output files. The **gradient** entry controls the creation of output variables for the FCST and OBS gradients in the grid-x and grid-y directions. The **distance_map** entry controls the creation of output variables for the FCST and OBS distance maps for each categorical threshold. The **apply_mask** entry controls whether to create the FCST, OBS, and DIFF output variables for all defined masking regions. Setting this to TRUE will create the FCST, OBS, and DIFF output variables for all defined masking regions. Setting this to FALSE will create the FCST, OBS, and DIFF output variables for only the FULL verification domain.
 
 ______________________
 

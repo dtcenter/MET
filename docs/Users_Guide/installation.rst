@@ -162,17 +162,33 @@ Environment Variables to Run Script
 Before running the compilation script, there are five environment variables
 that are required: 
 **TEST_BASE**, **COMPILER**, **MET_SUBDIR**, **MET_TARBALL**, and **USE_MODULES**.  
+
 If compiling support for Python embedding, the script will need the following
 additional environment variables: **MET_PYTHON**, **MET_PYTHON_CC**, and
-**MET_PYTHON_LD**. All of these environment variables are discussed
-in further detail in the Environment Variable Descriptions section below.
-An easy way to set these environment variables is in an environment
-configuration file  (for example, **install_met_env.<machine_name>**). An
-example environment configuration file to start from (**install_met_env.generic_gnu**),
-as well as environment configuration files used on HPCs at NCAR and NOAA,
+**MET_PYTHON_LD**.
+
+All of these environment variables are discussed in further detail in the
+Environment Variable Descriptions section below. An easy way to set these
+environment variables is in an environment configuration file
+(for example, **install_met_env.<machine_name>**). An example environment
+configuration file to start with (**install_met_env.generic_gnu**),
+as well as the environment configuration files used on HPCs at NCAR and NOAA,
 can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ in the 
 `scripts/installation/config <https://github.com/dtcenter/MET/tree/main_v12.0/internal/scripts/installation/config>`_
 directory.
+
+.. note:: Starting with MET-12.0.0, C++17 is the default C++ standard for MET due to the requirements of its dependent libraries. However, MET itself only makes use of C++11 features.
+
+    The ATLAS library (conditionally required for MET, if support for
+    unstructured grids is desired)
+    `versions 0.33.0 <https://github.com/ecmwf/atlas/releases/tag/0.33.0>`_
+    and later requires compiler support for the C++17 standard.
+
+    At this time, users with systems that do not yet support the C++17
+    standard, can still compile MET with an older C++ standard, using an
+    older version of ATLAS, by adding the MET_CXX_STANDARD variable to
+    the environment configuration file as described in the **OPTIONAL**
+    section below.
 
 Environment Variable Descriptions
 ---------------------------------
@@ -198,7 +214,7 @@ Environment Variable Descriptions
     subdirectory will
     be installed and is often set equivalent to **TEST_BASE** (e.g. ${TEST_BASE}).
 
-    **MET_TARBALL** – Format is *v12.0.0tar.gz*. This is the name of the downloaded MET tarball.
+    **MET_TARBALL** – Format is *v12.0.0.tar.gz*. This is the name of the downloaded MET tarball.
 
     **USE_MODULES** – Format is *TRUE* or *FALSE*. Set to FALSE if using a machine that does not use 
     modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on 
@@ -218,6 +234,7 @@ Environment Variable Descriptions
     following environment variables if using the Intel compilers: 
 
     | For non-oneAPI Intel compilers:
+    |
     | export FC=ifort
     | export F77=ifort
     | export F90=ifort
@@ -226,6 +243,7 @@ Environment Variable Descriptions
 
 
     | For oneAPI Intel compilers:
+    | 
     | export FC=ifx
     | export F77=ifx
     | export F90=ifx
@@ -239,7 +257,6 @@ Environment Variable Descriptions
     configuration file, and users with a oneAPI Intel compiler should use the 
     install_met_env.generic_intel_oneapi configuration file. 
 
-
 .. dropdown:: REQUIRED, IF COMPILING PYTHON EMBEDDING
 
     **MET_PYTHON** – Format is */usr/local/python3*.
@@ -247,7 +264,7 @@ Environment Variable Descriptions
     containing the bin, include, lib, and share directories for Python.
 
     **MET_PYTHON_CC** - Format is -I followed by the directory containing
-    the Python include files (ex. -I/usr/local/python3/include/python3.10).
+    the Python include files (e.g. -I/usr/local/python3/include/python3.10).
     This information may be obtained by 
     running :code:`python3-config --cflags`;
     however, this command can, on certain systems, 
@@ -257,7 +274,7 @@ Environment Variable Descriptions
     the Python library 
     files then a space, then -l followed by the necessary Python
     libraries to link to 
-    (ex. -L/usr/local/python3/lib/\\ -lpython3.10\\
+    (e.g. -L/usr/local/python3/lib/\\ -lpython3.10\\
     -lpthread\\ -ldl\\ -lutil\\ -lm). 
     The backslashes are necessary in the example shown because of
     the spaces, which will be 
@@ -285,13 +302,17 @@ Environment Variable Descriptions
     without a specified value of cores to use.  The automated MET
     testing scripts in the 
     Docker environment have been successful with a value of
-    5 (ex. export MAKE_ARGS=”-j 5”).
+    5 (e.g. export MAKE_ARGS=”-j 5”).
+
+    **export MET_CXX_STANDARD** - Specify the version of the supported
+    C++ standard. Values may be 11, 14, or 17. The default value is 17.
+    (e.g. export MET_CXX_STANDARD=11)
 
 
 External Library Handling in compile_MET_all.sh
 -----------------------------------------------
 
-.. dropdown:: IF THE USER WANTS TO HAVE THE COMPILATION SCRIPT DOWNLOAD THE LIBRARY DEPENDENCIES
+.. dropdown:: IF THE USER WANTS TO HAVE THE COMPILATION SCRIPT COMPILE THE LIBRARY DEPENDENCIES
 
     The **compile_MET_all.sh** script will compile and install MET and its
     :ref:`required_external_libraries_to_build_MET`, if needed. 
@@ -395,7 +416,21 @@ particular system’s needs, MET is ready for installation. The screenshot below
 contents of the installation directory followed by the tar_files subdirectory at 
 this step on the machine ‘hera’.
 
-.. image:: figure/installation_dir.png
+.. code-block:: ini
+
+  /contrib/met/12.0.0$ ls
+  compile_MET_all.sh  install_met_env.hera  tar_files
+  
+  /contrib/met/12.0.0$ ls tar_files
+  HDF-EOS2.16v1.00.tar.Z         eckit-1.24.4.tar.gz            netcdf-4.7.4.tar.gz
+  HDF4.2r3.tar.gz                freetype-2.11.0.tar.gz         netcdf-cxx4-4.3.1.tar.gz
+  atlas-0.30.0.tar.gz            g2clib-1.6.4.tar.gz            pixman-0.40.0.tar.gz
+  atlas-0.35.0.tar.gz            gsl-1.11.tar.gz                proj-7.1.0.tar.gz
+  bufr_v11.6.0.tar.gz            gsl-2.7.1.tar.gz               sqlite-autoconf-3430100.tar.gz
+  cairo-1.16.0.tar.xz            hdf5-1.12.2.tar.gz             tiff-4.6.0.tar.gz
+  ecbuild-3.5.0.tar.gz           jasper-2.0.25.tar.gz           zlib-1.2.11.tar.gz
+  ecbuild-3.7.0.tar.gz           jpegsrc.v9e.tar.gz
+  eckit-1.20.2.tar.gz            libpng-1.6.37.tar.gz
 
 Simply enter the following into the terminal to execute the script:
 
@@ -405,14 +440,17 @@ Simply enter the following into the terminal to execute the script:
 
 The screenshot below shows the contents of the installation directory after installation:
 
-.. image:: figure/installation_dir_after.png
+.. code-block:: ini
+
+  /contrib/met/12.0.0$ ls
+  MET-12.0.0  bin  compile_MET_all.sh  external_libs  install_met_env.hera  share  tar_files
 
 To confirm that MET was installed successfully, run the following command from the installation directory to check for errors in the test file:
 
 .. code-block:: ini
-		
-  grep -i error MET12.0.0/met.make_test.log
-  
+
+  grep -i error MET-12.0.0/met.make_test.log
+
 If no errors are returned, the installation was successful.
 Due to the highly variable nature of hardware systems, users may encounter issues during 
 the installation process that result in MET not being installed. If this occurs please 
@@ -459,7 +497,6 @@ version. If a different version is required, select the correct
 version from the dropdown option. Follow Docker’s instructions
 for a successful installation.
 
-
 Loading the Latest Docker Image of MET
 --------------------------------------
 
@@ -476,7 +513,6 @@ Omitting the
 version number will result in an error due to Docker’s behavior
 of attempting to retrieve an image with the “latest” tag, which
 MET no longer uses. 
-
 
 Running the Docker version of MET
 ---------------------------------
@@ -498,7 +534,7 @@ the same way the latest image of MET was pulled:
 .. code-block:: ini
 
   docker run -it --rm dtcenter/met:12.0.0 /bin/bash 
-  
+
 If the  usage MET via Docker images was successful, it is highly
 recommended to move on 
 to using the METplus wrappers of the tools, which have their own
@@ -548,7 +584,6 @@ to make the container:
 
   singularity build met-12.0.0.sif docker://dtcenter/met:12.0.0
 
-
 Running the MET Container
 -------------------------
 
@@ -569,7 +604,7 @@ be used otherwise the instance will continue to run in the background:
 
 .. code-block:: ini
 
-    singularity instance stop /path/to/container/met-12.0.0.sif met-12.0.0  
+  singularity instance stop /path/to/container/met-12.0.0.sif met-12.0.0  
 
 Now that MET is successfully installed, it is highly recommended to
 next install the METplus wrappers to take full advantage of
@@ -579,5 +614,3 @@ Users can also proceed to the
 and run through the examples that only utilize the MET processes
 (METplus wrapper applications and commands will not work unless
 METplus wrappers are also installed).
-
-

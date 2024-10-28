@@ -164,6 +164,36 @@ bool TCStatLine::is_header() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool TCStatLine::has(const char *col_str) const {
+   return !is_bad_data(get_offset(col_str));
+}
+
+////////////////////////////////////////////////////////////////////////
+
+int TCStatLine::get_offset(const char *col_str) const {
+   int offset = bad_data_int;
+
+   //
+   // Search for matching header column
+   //
+   offset = HdrLine->col_offset(col_str);
+
+   //
+   // If not found, check extra header columns
+   //
+   if(is_bad_data(offset)) {
+      if(!get_file()->header().has(col_str, offset)) offset = bad_data_int;
+   }
+
+   //
+   // Return the offset value
+   //
+
+   return offset;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 ConcatString TCStatLine::get(const char *col_str, bool check_na) const {
 
   ConcatString cs = (string)get_item(col_str, check_na);

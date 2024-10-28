@@ -162,48 +162,48 @@ class SingleAtt2D {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int SingleAtt2D::object_number() const { return ( ObjectNumber ); }
+inline int SingleAtt2D::object_number() const { return ObjectNumber; }
 
-inline int SingleAtt2D::cluster_number() const { return ( ClusterNumber ); }
+inline int SingleAtt2D::cluster_number() const { return ClusterNumber; }
 
-inline int SingleAtt2D::time_index() const { return ( TimeIndex ); }
+inline int SingleAtt2D::time_index() const { return TimeIndex; }
 
 inline void SingleAtt2D::set_object_number  (int _n) { ObjectNumber  = _n;  return; }
 inline void SingleAtt2D::set_cluster_number (int _n) { ClusterNumber = _n;  return; }
 
-inline int SingleAtt2D::area() const { return ( Area ); }
+inline int SingleAtt2D::area() const { return Area; }
 
 inline void SingleAtt2D::set_area(int _A) { Area = _A;  return; }
 
 inline void SingleAtt2D::set_time_index(int _t) { TimeIndex = _t;  return; }
 
 
-inline double SingleAtt2D::xbar() const { return ( Xbar ); }
-inline double SingleAtt2D::ybar() const { return ( Ybar ); }
+inline double SingleAtt2D::xbar() const { return Xbar; }
+inline double SingleAtt2D::ybar() const { return Ybar; }
 
-inline double SingleAtt2D::centroid_lat() const { return ( CentroidLat ); }
-inline double SingleAtt2D::centroid_lon() const { return ( CentroidLon ); }
+inline double SingleAtt2D::centroid_lat() const { return CentroidLat; }
+inline double SingleAtt2D::centroid_lon() const { return CentroidLon; }
 
-inline double SingleAtt2D::axis() const { return ( AxisAngle ); }
+inline double SingleAtt2D::axis() const { return AxisAngle; }
 
-inline double SingleAtt2D::ptile_10() const { return ( Ptile_10 ); }
-inline double SingleAtt2D::ptile_25() const { return ( Ptile_25 ); }
-inline double SingleAtt2D::ptile_50() const { return ( Ptile_50 ); }
-inline double SingleAtt2D::ptile_75() const { return ( Ptile_75 ); }
-inline double SingleAtt2D::ptile_90() const { return ( Ptile_90 ); }
+inline double SingleAtt2D::ptile_10() const { return Ptile_10; }
+inline double SingleAtt2D::ptile_25() const { return Ptile_25; }
+inline double SingleAtt2D::ptile_50() const { return Ptile_50; }
+inline double SingleAtt2D::ptile_75() const { return Ptile_75; }
+inline double SingleAtt2D::ptile_90() const { return Ptile_90; }
 
-inline int    SingleAtt2D::ptile_value() const { return ( Ptile_Value ); }
-inline double SingleAtt2D::ptile_user()  const { return ( Ptile_User  ); }
+inline int    SingleAtt2D::ptile_value() const { return Ptile_Value; }
+inline double SingleAtt2D::ptile_user()  const { return Ptile_User ; }
 
-inline bool   SingleAtt2D::is_fcst() const { return (   IsFcst ); }
-inline bool   SingleAtt2D::is_obs () const { return ( ! IsFcst ); }
+inline bool   SingleAtt2D::is_fcst() const { return  IsFcst; }
+inline bool   SingleAtt2D::is_obs () const { return !IsFcst; }
 
-inline bool   SingleAtt2D::is_cluster () const { return (   Is_Cluster ); }
-inline bool   SingleAtt2D::is_simple  () const { return ( ! Is_Cluster ); }
+inline bool   SingleAtt2D::is_cluster () const { return  Is_Cluster; }
+inline bool   SingleAtt2D::is_simple  () const { return !Is_Cluster; }
 
-inline unixtime SingleAtt2D::valid_time () const { return ( ValidTime ); }
+inline unixtime SingleAtt2D::valid_time () const { return ValidTime; }
 
-inline int      SingleAtt2D::lead_time  () const { return ( Lead_Time ); }
+inline int      SingleAtt2D::lead_time  () const { return Lead_Time; }
 
 
 ////////////////////////////////////////////////////////////////////////

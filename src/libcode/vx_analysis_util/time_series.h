@@ -72,10 +72,10 @@ class TimeSeries {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline unixtime TimeSeries::time_start() const { return ( TimeStart ); }
-inline int      TimeSeries::time_delta() const { return ( TimeDelta ); }
+inline unixtime TimeSeries::time_start() const { return TimeStart; }
+inline int      TimeSeries::time_delta() const { return TimeDelta; }
 
-inline int      TimeSeries::n_elements() const { return ( Nelements ); }
+inline int      TimeSeries::n_elements() const { return Nelements; }
 
 
 ////////////////////////////////////////////////////////////////////////

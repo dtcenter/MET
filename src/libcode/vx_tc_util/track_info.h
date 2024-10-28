@@ -182,9 +182,9 @@ class TrackInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline bool TrackInfo::is_best_track() const               { return(IsBestTrack); }
-inline bool TrackInfo::is_oper_track() const               { return(IsOperTrack); }
-inline bool TrackInfo::is_anly_track() const               { return(IsAnlyTrack); }
+inline bool TrackInfo::is_best_track() const               { return IsBestTrack;  }
+inline bool TrackInfo::is_oper_track() const               { return IsOperTrack;  }
+inline bool TrackInfo::is_anly_track() const               { return IsAnlyTrack;  }
 inline void TrackInfo::set_storm_id(const char *s)         { StormId = s;         }
 inline void TrackInfo::set_basin(const char *s)            { Basin = s;           }
 inline void TrackInfo::set_cyclone(const char *s)          { Cyclone = s;         }
@@ -200,28 +200,28 @@ inline void TrackInfo::set_track_source(const char *s)     { TrackSource = s;   
 inline void TrackInfo::set_field_source(const char *s)     { FieldSource = s;     }
 inline void TrackInfo::set_diag_name(const StringArray &s) { DiagName = s;        }
 
-inline const ConcatString & TrackInfo::storm_id()         const { return(StormId);                      }
-inline const ConcatString & TrackInfo::basin()            const { return(Basin);                        }
-inline const ConcatString & TrackInfo::cyclone()          const { return(Cyclone);                      }
-inline const ConcatString & TrackInfo::storm_name()       const { return(StormName);                    }
-inline int                  TrackInfo::technique_number() const { return(TechniqueNumber);              }
-inline const ConcatString & TrackInfo::technique()        const { return(Technique);                    }
-inline const ConcatString & TrackInfo::initials()         const { return(Initials);                     }
-inline unixtime             TrackInfo::init()             const { return(InitTime);                     }
-inline int                  TrackInfo::init_hour()        const { return(unix_to_sec_of_day(InitTime)); }
-inline unixtime             TrackInfo::valid_min()        const { return(MinValidTime);                 }
-inline unixtime             TrackInfo::valid_max()        const { return(MaxValidTime);                 }
-inline unixtime             TrackInfo::warm_core_min()    const { return(MinWarmCore);                  }
-inline unixtime             TrackInfo::warm_core_max()    const { return(MaxWarmCore);                  }
-inline int                  TrackInfo::n_points()         const { return(NPoints);                      }
+inline const ConcatString & TrackInfo::storm_id()         const { return StormId;                      }
+inline const ConcatString & TrackInfo::basin()            const { return Basin;                        }
+inline const ConcatString & TrackInfo::cyclone()          const { return Cyclone;                      }
+inline const ConcatString & TrackInfo::storm_name()       const { return StormName;                    }
+inline int                  TrackInfo::technique_number() const { return TechniqueNumber;              }
+inline const ConcatString & TrackInfo::technique()        const { return Technique;                    }
+inline const ConcatString & TrackInfo::initials()         const { return Initials;                     }
+inline unixtime             TrackInfo::init()             const { return InitTime;                     }
+inline int                  TrackInfo::init_hour()        const { return unix_to_sec_of_day(InitTime); }
+inline unixtime             TrackInfo::valid_min()        const { return MinValidTime;                 }
+inline unixtime             TrackInfo::valid_max()        const { return MaxValidTime;                 }
+inline unixtime             TrackInfo::warm_core_min()    const { return MinWarmCore;                  }
+inline unixtime             TrackInfo::warm_core_max()    const { return MaxWarmCore;                  }
+inline int                  TrackInfo::n_points()         const { return NPoints;                      }
 
-inline DiagType             TrackInfo::diag_source()      const { return(DiagSource);   }
-inline const ConcatString & TrackInfo::track_source()     const { return(TrackSource);  }
-inline const ConcatString & TrackInfo::field_source()     const { return(FieldSource);  }
-inline int                  TrackInfo::n_diag()           const { return(DiagName.n()); }
-inline const StringArray &  TrackInfo::diag_name()        const { return(DiagName);     }
+inline DiagType             TrackInfo::diag_source()      const { return DiagSource;   }
+inline const ConcatString & TrackInfo::track_source()     const { return TrackSource;  }
+inline const ConcatString & TrackInfo::field_source()     const { return FieldSource;  }
+inline int                  TrackInfo::n_diag()           const { return DiagName.n(); }
+inline const StringArray &  TrackInfo::diag_name()        const { return DiagName;     }
 
-inline StringArray          TrackInfo::track_lines()      const { return(TrackLines); }
+inline StringArray          TrackInfo::track_lines()      const { return TrackLines;   }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -279,7 +279,7 @@ class TrackInfoArray {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TrackInfoArray::n() const { return(Track.size()); }
+inline int TrackInfoArray::n() const { return Track.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -7,7 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -208,11 +207,7 @@ for (j=0; j<(graph.n_fcst()); ++j)  {
 
       if ( ! graph.has_fo_edge(j, k) )  continue;
 
-      // mlog << Debug(5) << "\n  Merging fcst " << j << ", obs " << k << '\n' << flush;
-
       part.merge_values(f_i, o_i);
-
-      // specialzed_dump(graph.n_fcst(), graph.n_obs(), p);
 
    }   //  for k
 

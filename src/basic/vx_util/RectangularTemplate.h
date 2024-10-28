@@ -66,7 +66,7 @@ class RectangularTemplate : public GridTemplate {
 
       // Return the class name for error messages.
       static const char* _className(void) {
-         return("RectangularTemplate");
+         return "RectangularTemplate";
       }
 };
 

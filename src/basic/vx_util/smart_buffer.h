@@ -90,13 +90,13 @@ class SmartBuffer {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int  SmartBuffer::size()  const { return ( Size ); }
+inline int  SmartBuffer::size()  const { return Size; }
 
-inline bool SmartBuffer::is_empty() const { return ( Buf == 0 ); }
+inline bool SmartBuffer::is_empty() const { return ( Buf == nullptr ); }
 
-inline      SmartBuffer::operator unsigned char * () const { return ( Buf ); }
+inline      SmartBuffer::operator unsigned char * () const { return Buf; }
 
-inline      SmartBuffer::operator void * () const { return ( Buf ); }
+inline      SmartBuffer::operator void * () const { return Buf; }
 
 
 ////////////////////////////////////////////////////////////////////////

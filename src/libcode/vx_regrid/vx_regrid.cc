@@ -40,6 +40,10 @@ switch ( info.method )  {
    case InterpMthd::LS_Fit:
    case InterpMthd::Bilin:
    case InterpMthd::Nearest:
+   case InterpMthd::Upper_Left:
+   case InterpMthd::Upper_Right:
+   case InterpMthd::Lower_Right:
+   case InterpMthd::Lower_Left:
       out = met_regrid_generic (in, from_grid, to_grid, info);
       break;
 

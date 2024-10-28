@@ -7,7 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -187,7 +186,8 @@ void Mtd_3D_Moments::centralize()
 
 if ( N == 0 )  {
 
-   mlog << Error << "\n\n  Mtd_3D_Moments::centralize() -> no data!\n\n";
+   mlog << Error << "\nMtd_3D_Moments::centralize() -> "
+        << "no data!\n\n";
 
    exit ( 1 );
 
@@ -242,7 +242,8 @@ void Mtd_3D_Moments::calc_3d_velocity(double & vx, double & vy) const
 
 if ( ! IsCentralized )  {
 
-   mlog << Error << "\n\n  Mtd_3D_Moments::calc_3d_velocity(double &, double &) const -> moments must be centralized first!\n\n";
+   mlog << Error << "\nMtd_3D_Moments::calc_3d_velocity(double &, double &) const -> "
+        << "moments must be centralized first!\n\n";
 
    exit ( 1 );
 
@@ -266,7 +267,8 @@ double Mtd_3D_Moments::calc_3d_axis_plane_angle() const
 
 if ( ! IsCentralized )  {
 
-   mlog << Error << "\n\n  Mtd_3D_Moments::calc_3d_axis_plane_angle() const -> moments must be centralized first!\n\n";
+   mlog << Error << "\nMtd_3D_Moments::calc_3d_axis_plane_angle() const -> "
+        << "moments must be centralized first!\n\n";
 
    exit ( 1 );
 
@@ -286,8 +288,5 @@ return angle;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
 
 

@@ -435,7 +435,7 @@ bool DataPlane::is_all_bad_data() const {
       }
    }
 
-   return(status);
+   return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -461,7 +461,7 @@ double DataPlane::get(int x, int y) const {
 
    n = two_to_one(x, y);
 
-   return(Data[n]);
+   return Data[n];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -518,7 +518,7 @@ void DataPlane::censor(const ThreshArray &censor_thresh,
       for(i=0; i<Nxy; i++) {
          if(!is_bad_data(Data[i])) d.add(Data[i]);
       }
-      ta.set_perc(&d, &d, &d);
+      ta.set_perc(&d, &d, &d, &d);
    }
 
    mlog << Debug(3)

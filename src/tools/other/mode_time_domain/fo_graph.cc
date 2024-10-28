@@ -7,7 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
-
 ////////////////////////////////////////////////////////////////////////
 
 
@@ -168,7 +167,8 @@ int FO_Graph::f_index(int f_num) const
 
 if ( (f_num < 0) || (f_num >= N_fcst) )  {
 
-   mlog << Error << "\n\n  FO_Graph::f_index(int f_num) const -> range check error!\n\n";
+   mlog << Error << "\nFO_Graph::f_index(int f_num) const -> "
+        << "range check error!\n\n";
 
    exit ( 1 );
 
@@ -188,7 +188,8 @@ int FO_Graph::o_index(int o_num) const
 
 if ( (o_num < 0) || (o_num >= N_obs) )  {
 
-   mlog << Error << "\n\n  FO_Graph::o_index(int o_num) const -> range check error!\n\n";
+   mlog << Error << "\nFO_Graph::o_index(int o_num) const -> "
+        << "range check error!\n\n";
 
    exit ( 1 );
 
@@ -214,7 +215,8 @@ if ( (n_f == 0) && (n_o == 0) )  trouble = true;
 
 if ( trouble )  {
 
-   mlog << Error << "\n\n  FO_Graph::set_size(int n_f, int n_o) -> bad n_f or n_o value(s)\n\n";
+   mlog << Error << "\nFO_Graph::set_size(int n_f, int n_o) -> "
+        << "bad n_f or n_o value(s)\n\n";
 
    exit ( 1 );
 
@@ -228,9 +230,6 @@ N_obs  = n_o;
 N_total  = N_fcst + N_obs;
 
 TheGraph = new FO_Node [N_total*N_total];
-
-
-
 
    //
    //  done
@@ -365,7 +364,8 @@ void FO_Graph::erase_edges()
 
 if ( ! TheGraph )  {
 
-   mlog << Error << "\n\n  FO_Graph::erase_edges() -> empty graph!\n\n";
+   mlog << Error << "\nFO_Graph::erase_edges() -> "
+        << "empty graph!\n\n";
 
    exit ( 1 );
 
@@ -394,7 +394,8 @@ void FO_Graph::do_dump_table(AsciiTable & table) const
 
 if ( ! TheGraph )  {
 
-   mlog << Error << "\n\n  FO_Graph::dump_as_table() -> empty graph!\n\n";
+   mlog << Error << "\nO_Graph::dump_as_table() -> "
+        << "empty graph!\n\n";
 
    exit ( 1 );
 
@@ -409,16 +410,6 @@ const int  obs_stop  = obs_start + N_obs - 1;
 
 
 table.set_size(N_total + 2, N_total + 2);
-
-// for (r=0; r<(table.nrows()); ++r)  {
-// 
-//    for (c=0; c<(table.ncols()); ++c)  {
-// 
-//       table.set_entry(r, c, '.');
-// 
-//    }
-// 
-// }
 
 c = fcst_stop + 1;
 
@@ -499,7 +490,6 @@ for (j=0; j<N_obs; ++j)  {
 
 }
 
-
    //
    //  fcst-obs edges
    //
@@ -570,7 +560,6 @@ for (j=0; j<(table.nrows()); ++j)  {
 
 }
 
-
    //
    //  done
    //
@@ -581,7 +570,5 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
 
 

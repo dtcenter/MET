@@ -100,7 +100,7 @@ class BasicModeAnalysisJob {
 
 inline void BasicModeAnalysisJob::set_precision (int p)  { precision = p; return; }
 
-inline int  BasicModeAnalysisJob::get_precision () const { return(precision);     }
+inline int  BasicModeAnalysisJob::get_precision () const { return precision;      }
 
 
 ////////////////////////////////////////////////////////////////////////

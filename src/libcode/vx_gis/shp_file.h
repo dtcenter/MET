@@ -159,11 +159,11 @@ class ShpFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline const ShpFileHeader * ShpFile::header() const { return ( &Header ); }
+inline const ShpFileHeader * ShpFile::header() const { return &Header; }
 
-inline int   ShpFile::shape_type() const { return ( Header.shape_type ); }
+inline int   ShpFile::shape_type() const { return Header.shape_type; }
 
-inline bool  ShpFile::at_eof() const { return ( At_Eof ); }
+inline bool  ShpFile::at_eof() const { return At_Eof; }
 
 inline bool  ShpFile::is_open() const { return ( fd >= 0 ); }
 

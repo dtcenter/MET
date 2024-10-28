@@ -676,7 +676,7 @@ c[0] &= 127;
 else if ( n == 3 )  answer = (double) 0.001*parity*char3_to_int(c);
 else                answer = (double) bad_data_float;
 
-return ( answer );
+return answer;
 
 }
 

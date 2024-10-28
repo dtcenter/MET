@@ -1805,7 +1805,7 @@ else if ((h.type == 3) || (h.type == 13))
    file << "   lat_sp:     " << char3_to_int(h.grid_type.lambert_conf.lat_sp) << "\n";
    file << "   lon_sp:     " << char3_to_int(h.grid_type.lambert_conf.lon_sp) << "\n\n";
 }
-else if ((h.type == 5))
+else if (h.type == 5)
 {
 
    file << "   lat1:       " << char3_to_int(h.grid_type.stereographic.lat1)   << "\n";
@@ -1822,7 +1822,7 @@ else if ((h.type == 5))
 
    file << "   scan_flag:  " << (int) h.grid_type.stereographic.scan_flag      << "\n\n";
 }
-else if ((h.type == 10))
+else if (h.type == 10)
 {
 
    file << "   lat1:      " << char3_to_int(h.grid_type.rot_latlon_grid.lat1)     << "\n";

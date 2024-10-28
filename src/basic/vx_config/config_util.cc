@@ -14,6 +14,7 @@
 
 #include "config_util.h"
 #include "enum_as_int.hpp"
+#include "configobjecttype_to_string.h"
 
 #include "vx_math.h"
 #include "vx_util.h"
@@ -265,6 +266,13 @@ RegridInfo &RegridInfo::operator=(const RegridInfo &a) noexcept {
    return *this;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+ConcatString RegridInfo::get_str() const {
+   ConcatString cs(interpmthd_to_string(method));
+   cs << "(" << width << ")";
+   return cs;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -592,16 +600,14 @@ StringArray parse_conf_message_type(Dictionary *dict, bool error_out) {
 ///////////////////////////////////////////////////////////////////////////////
 
 StringArray parse_conf_sid_list(Dictionary *dict, const char *conf_key) {
-   StringArray sa, cur, sid_sa;
-   ConcatString mask_name;
+   StringArray sid_sa;
    const char *method_name = "parse_conf_sid_list() -> ";
 
-   sa = parse_conf_string_array(dict, conf_key, method_name);
+   StringArray sa(parse_conf_string_array(dict, conf_key, method_name));
 
-   // Parse station ID's to exclude from each entry
+   // Append to the list of station ID's
    for(int i=0; i<sa.n(); i++) {
-     parse_sid_mask(string(sa[i]), cur, mask_name);
-      sid_sa.add(cur);
+      sid_sa.add(parse_sid_mask_as_list(string(sa[i])));
    }
 
    mlog << Debug(4) << method_name
@@ -623,33 +629,29 @@ StringArray parse_conf_sid_list(Dictionary *dict, const char *conf_key) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-void parse_sid_mask(const ConcatString &mask_sid_str,
-                    StringArray &mask_sid, ConcatString &mask_name) {
-   ifstream in;
-   ConcatString tmp_file;
+MaskSID parse_sid_mask(const ConcatString &mask_sid_str) {
+   MaskSID mask_sid;
    std::string sid_str;
-
-   // Initialize
-   mask_sid.clear();
-   mask_name = na_str;
+   const char *method_name = "parse_sid_mask() -> ";
 
    // Check for an empty length string
-   if(mask_sid_str.empty()) return;
+   if(mask_sid_str.empty()) return mask_sid;
 
    // Replace any instances of MET_BASE with it's expanded value
-   tmp_file = replace_path(mask_sid_str.c_str());
+   ConcatString tmp_file(replace_path(mask_sid_str.c_str()));
 
    // Process file name
    if(file_exists(tmp_file.c_str())) {
 
-      mlog << Debug(4) << "parse_sid_mask() -> "
+      mlog << Debug(4) << method_name
            << "parsing station ID masking file \"" << tmp_file << "\"\n";
 
       // Open the mask station id file specified
+      ifstream in;
       in.open(tmp_file.c_str());
 
       if(!in) {
-         mlog << Error << "\nparse_sid_mask() -> "
+         mlog << Error << "\n" << method_name
               << "Can't open the station ID masking file \""
               << tmp_file << "\".\n\n";
          exit(1);
@@ -657,7 +659,7 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
 
       // Store the first entry as the name of the mask
       in >> sid_str;
-      mask_name = sid_str;
+      mask_sid.set_name(sid_str);
 
       // Store the rest of the entries as masking station ID's
       while(in >> sid_str) mask_sid.add(sid_str.c_str());
@@ -665,9 +667,9 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
       // Close the input file
       in.close();
 
-      mlog << Debug(4) << "parse_sid_mask() -> "
+      mlog << Debug(4) << method_name
            << "parsed " << mask_sid.n() << " station ID's for the \""
-           << mask_name << "\" mask from file \"" << tmp_file << "\"\n";
+           << mask_sid.name() << "\" mask from file \"" << tmp_file << "\"\n";
    }
    // Process list of strings
    else {
@@ -675,19 +677,19 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
       // Print a warning if the string contains a dot which suggests
       // the user was trying to specify a file name.
       if(check_reg_exp("[.]", mask_sid_str.c_str())) {
-         mlog << Warning << "\nparse_sid_mask() -> "
+         mlog << Warning << "\n" << method_name
               << "unable to process \"" << mask_sid_str
               << "\" as a file name and processing it as a single "
               << "station ID mask instead.\n\n";
       }
 
-      mlog << Debug(4) << "parse_sid_mask() -> "
+      mlog << Debug(4) << method_name
            << "storing single station ID mask \"" << mask_sid_str << "\"\n";
 
       // Check for embedded whitespace or slashes
       if(check_reg_exp(ws_reg_exp, mask_sid_str.c_str()) ||
          check_reg_exp("[/]", mask_sid_str.c_str())) {
-         mlog << Error << "\nparse_sid_mask() -> "
+         mlog << Error << "\n" << method_name
               << "masking station ID string can't contain whitespace or "
               << "slashes \"" << mask_sid_str << "\".\n\n";
          exit(1);
@@ -700,15 +702,16 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
       // One elements means no colon was specified
       if(sa.n() == 1) {
          mask_sid.add_css(sa[0]);
-         mask_name = ( mask_sid.n() == 1 ? mask_sid[0] : "MASK_SID" );
+         mask_sid.set_name((mask_sid.n() == 1 ?
+                            mask_sid.sid_map().begin()->first : "MASK_SID"));
       }
       // Two elements means one colon was specified
       else if(sa.n() == 2) {
-         mask_name = sa[0];
          mask_sid.add_css(sa[1]);
+         mask_sid.set_name(sa[0]);
       }
       else {
-         mlog << Error << "\nparse_sid_mask() -> "
+         mlog << Error << "\n" << method_name
               << "masking station ID string may contain at most one colon to "
               << "specify the mask name \"" << mask_sid_str << "\".\n\n";
          exit(1);
@@ -716,14 +719,26 @@ void parse_sid_mask(const ConcatString &mask_sid_str,
 
    }
 
-   // Sort the mask_sid's
-   mask_sid.sort();
-   
-   return;
+   return mask_sid;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+StringArray parse_sid_mask_as_list(const ConcatString &mask_sid_str) {
+
+   MaskSID ms = parse_sid_mask(mask_sid_str);
+
+   StringArray sa;
+   for(const auto &pair : ms.sid_map()) sa.add(pair.first);
+
+   return sa;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Code for MaskLatLon struct
+//
+///////////////////////////////////////////////////////////////////////////////
 
 void MaskLatLon::clear() {
    name.clear();
@@ -755,7 +770,6 @@ MaskLatLon &MaskLatLon::operator=(const MaskLatLon &a) noexcept {
    }
    return *this;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1331,13 +1345,10 @@ BootInfo parse_conf_boot(Dictionary *dict) {
    return info;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
-   Dictionary *regrid_dict = (Dictionary *) nullptr;
+RegridInfo parse_conf_regrid(Dictionary *dict, RegridInfo *default_info, bool error_out) {
    RegridInfo info;
-   int v;
 
    if(!dict) {
       mlog << Error << "\nparse_conf_regrid() -> "
@@ -1346,10 +1357,10 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
    }
 
    // Conf: regrid
-   regrid_dict = dict->lookup_dictionary(conf_key_regrid, false);
+   Dictionary *regrid_dict = dict->lookup_dictionary(conf_key_regrid, false);
 
    // Check that the regrid dictionary is present
-   if(!regrid_dict) {
+   if(!regrid_dict && !default_info) {
       if(error_out) {
          mlog << Error << "\nparse_conf_regrid() -> "
               << "can't find the \"regrid\" dictionary!\n\n";
@@ -1360,61 +1371,164 @@ RegridInfo parse_conf_regrid(Dictionary *dict, bool error_out) {
       }
    }
 
-   // Parse to_grid as an integer
-   v = regrid_dict->lookup_int(conf_key_to_grid, false, false);
+   // Conf: to_grid (optional) as an integer or string
+   const DictionaryEntry * entry = nullptr;
 
-   // If integer lookup successful, convert to FieldType.
-   if(regrid_dict->last_lookup_status()) {
-      info.field  = int_to_fieldtype(v);
-      info.enable = (info.field == FieldType::Fcst ||
-                     info.field == FieldType::Obs);
+   if(regrid_dict) entry = regrid_dict->lookup(conf_key_to_grid, false);
+
+   // to_grid found
+   if(entry) {
+
+      // Convert integer to FieldType
+      if(entry->type() == IntegerType) {
+         info.field  = int_to_fieldtype(entry->i_value());
+         info.enable = (info.field == FieldType::Fcst ||
+                        info.field == FieldType::Obs);
+      }
+      // Store grid name string
+      else if(entry->type() == StringType) {
+         info.name   = entry->string_value();
+         info.enable = true;
+      }
+      else {
+         mlog << Error << "\nparse_conf_regrid() -> "
+              << "Unexpected type ("
+              << configobjecttype_to_string(entry->type())
+              << ") for \"" << conf_key_to_grid
+              << "\" configuration entry.\n\n";
+         exit(1);
+      }
    }
-   // If integer lookup unsuccessful, parse vx_grid as a string.
-   // Do not error out since to_grid isn't specified for climo.regrid.
+   // Use default RegridInfo
+   else if(default_info){
+      info.name   = default_info->name;
+      info.enable = default_info->enable;
+   }
+   // Use global default
    else {
-      info.name   = regrid_dict->lookup_string(conf_key_to_grid, false);
+      info.name   = "";
       info.enable = true;
    }
 
-   // Conf: vld_thresh
-   double thr      = regrid_dict->lookup_double(conf_key_vld_thresh, false);
-   info.vld_thresh = (is_bad_data(thr) ? default_vld_thresh : thr);
-
-   // Parse the method and width
-   info.method = int_to_interpmthd(regrid_dict->lookup_int(conf_key_method));
-   info.width  = regrid_dict->lookup_int(conf_key_width);
-
-   // Conf: shape
-   v = regrid_dict->lookup_int(conf_key_shape, false);
-   if (regrid_dict->last_lookup_status()) {
-      info.shape = int_to_gridtemplate(v);
+   // Conf: vld_thresh (required)
+   if(regrid_dict && regrid_dict->lookup(conf_key_vld_thresh, false)) {
+      info.vld_thresh = regrid_dict->lookup_double(conf_key_vld_thresh);
    }
+   // Use default RegridInfo
+   else if(default_info) {
+      info.vld_thresh = default_info->vld_thresh;
+   }
+   // Use global default
    else {
-      // If not specified, use the default square shape
+      info.vld_thresh = default_vld_thresh;
+   }
+
+   // Conf: method (required)
+   if(regrid_dict && regrid_dict->lookup(conf_key_method, false)) {
+      info.method = int_to_interpmthd(regrid_dict->lookup_int(conf_key_method));
+   }
+   // Use default RegridInfo
+   else if(default_info) {
+      info.method = default_info->method;
+   }
+
+   // Conf: width (required)
+   if(regrid_dict && regrid_dict->lookup(conf_key_width, false)) {
+      info.width = regrid_dict->lookup_int(conf_key_width);
+   }
+   // Use default RegridInfo
+   else if(default_info) {
+      info.width = default_info->width;
+   }
+
+   // Conf: shape (optional)
+   if(regrid_dict && regrid_dict->lookup(conf_key_shape, false)) {
+      info.shape = int_to_gridtemplate(regrid_dict->lookup_int(conf_key_shape));
+   }
+   // Use default RegridInfo
+   else if(default_info) {
+      info.shape = default_info->shape;
+   }
+   // Use global default
+   else {
       info.shape = GridTemplateFactory::GridTemplates::Square;
    }
 
-   // Conf: gaussian dx and radius
-   double conf_value = regrid_dict->lookup_double(conf_key_gaussian_dx, false);
-   info.gaussian.dx = (is_bad_data(conf_value) ? default_gaussian_dx : conf_value);
-   conf_value = regrid_dict->lookup_double(conf_key_gaussian_radius, false);
-   info.gaussian.radius = (is_bad_data(conf_value) ? default_gaussian_radius : conf_value);
-   conf_value = regrid_dict->lookup_double(conf_key_trunc_factor, false);
-   info.gaussian.trunc_factor = (is_bad_data(conf_value) ? default_trunc_factor : conf_value);
-   if (info.method == InterpMthd::Gaussian || info.method == InterpMthd::MaxGauss) info.gaussian.compute();
+   // Conf: gaussian_dx (optional)
+   if(regrid_dict && regrid_dict->lookup(conf_key_gaussian_dx, false)) {
+      info.gaussian.dx = regrid_dict->lookup_double(conf_key_gaussian_dx);
+   }
+   // Use default RegridInfo
+   else if(default_info) {
+      info.gaussian.dx = default_info->gaussian.dx;
+   }
+   // Use global default
+   else {
+      info.gaussian.dx = default_gaussian_dx;
+   }
+
+   // Conf: gaussian_radius (optional)
+   if(regrid_dict && regrid_dict->lookup(conf_key_gaussian_radius, false)) {
+      info.gaussian.radius = regrid_dict->lookup_double(conf_key_gaussian_radius);
+   }
+   // Use default RegridInfo
+   else if(default_info) {
+      info.gaussian.radius = default_info->gaussian.radius;
+   }
+   // Use global default
+   else {
+      info.gaussian.radius = default_gaussian_radius;
+   }
+
+   // Conf: gaussian_trunc_factor (optional)
+   if(regrid_dict && regrid_dict->lookup(conf_key_trunc_factor, false)) {
+      info.gaussian.trunc_factor = regrid_dict->lookup_double(conf_key_trunc_factor);
+   }
+   // Use default RegridInfo
+   else if(default_info) {
+      info.gaussian.trunc_factor = default_info->gaussian.trunc_factor;
+   }
+   // Use global default
+   else {
+      info.gaussian.trunc_factor = default_trunc_factor;
+   }
+
+   // Compute Guassian parameters
+   if(info.method == InterpMthd::Gaussian ||
+      info.method == InterpMthd::MaxGauss) {
+      info.gaussian.compute();
+   }
 
    // MET#2437 Do not search the higher levels of config file context for convert,
    //          censor_thresh, and censor_val. They must be specified within the
    //          regrid dictionary itself.
 
-   // Conf: convert
-   info.convert_fx.set(regrid_dict->lookup(conf_key_convert, false));
+   // Conf: convert (optional)
+   if(regrid_dict && regrid_dict->lookup(conf_key_convert, false)) {
+      info.convert_fx.set(regrid_dict->lookup(conf_key_convert));
+   }
+   // Use default RegridInfo
+   else if(default_info) {
+      info.convert_fx = default_info->convert_fx;
+   }
 
-   // Conf: censor_thresh
-   info.censor_thresh = regrid_dict->lookup_thresh_array(conf_key_censor_thresh, false, true, false);
+   // Conf: censor_thresh (optional)
+   if(regrid_dict && regrid_dict->lookup(conf_key_censor_thresh, false)) {
+      info.censor_thresh = regrid_dict->lookup_thresh_array(conf_key_censor_thresh);
+   }
+   // Use default RegridInfo
+   else if(default_info) {
+      info.censor_thresh = default_info->censor_thresh;
+   }
 
-   // Conf: censor_val
-   info.censor_val = regrid_dict->lookup_num_array(conf_key_censor_val, false, true, false);
+   // Conf: censor_val (optional)
+   if(regrid_dict && regrid_dict->lookup(conf_key_censor_val, false)) {
+      info.censor_val = regrid_dict->lookup_num_array(conf_key_censor_val);
+   }
+   // Use default RegridInfo
+   else if(default_info) {
+      info.censor_val = default_info->censor_val;
+   }
 
    // Validate the settings
    info.validate();
@@ -2081,9 +2195,10 @@ HiRAInfo parse_conf_hira(Dictionary *dict) {
 GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
    GridWeightType t = GridWeightType::None;
    int v;
+   const char *method_name = "parse_conf_grid_weight_flag() -> ";
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_grid_weight_flag() -> "
+      mlog << Error << "\n" << method_name
            << "empty dictionary!\n\n";
       exit(1);
    }
@@ -2096,9 +2211,38 @@ GridWeightType parse_conf_grid_weight_flag(Dictionary *dict) {
    else if(v == conf_const.lookup_int(conf_val_cos_lat)) t = GridWeightType::Cos_Lat;
    else if(v == conf_const.lookup_int(conf_val_area))    t = GridWeightType::Area;
    else {
-      mlog << Error << "\nparse_conf_grid_weight_flag() -> "
+      mlog << Error << "\n" << method_name
            << "Unexpected config file value of " << v << " for \""
            << conf_key_grid_weight_flag << "\".\n\n";
+      exit(1);
+   }
+
+   return t;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+PointWeightType parse_conf_point_weight_flag(Dictionary *dict) {
+   PointWeightType t = PointWeightType::None;
+   int v;
+   const char *method_name = "parse_conf_point_weight_flag() -> ";
+
+   if(!dict) {
+      mlog << Error << "\n" << method_name
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Get the integer flag value for the current entry
+   v = dict->lookup_int(conf_key_point_weight_flag);
+
+   // Convert integer to enumerated GridWeightType
+        if(v == conf_const.lookup_int(conf_val_none)) t = PointWeightType::None;
+   else if(v == conf_const.lookup_int(conf_val_sid))  t = PointWeightType::SID;
+   else {
+      mlog << Error << "\n" << method_name
+           << "Unexpected config file value of " << v << " for \""
+           << conf_key_point_weight_flag << "\".\n\n";
       exit(1);
    }
 
@@ -2514,28 +2658,28 @@ void check_mask_names(const StringArray &sa) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void check_climo_n_vx(Dictionary *dict, const int n_vx) {
-   int n;
+void check_climo_n_vx(Dictionary *dict, const int n_input) {
+   int n_climo;
 
    // Check for a valid number of climatology mean fields
-   n = parse_conf_n_vx(dict->lookup_array(conf_key_climo_mean_field, false));
-   if(n != 0 && n != n_vx) {
+   n_climo = parse_conf_n_vx(dict->lookup_array(conf_key_climo_mean_field, false));
+   if(n_climo != 0 && n_climo != 1 && n_climo != n_input) {
       mlog << Error << "\ncheck_climo_n_vx() -> "
            << "The number of climatology mean fields in \""
-           << conf_key_climo_mean_field
-           << "\" must be zero or match the number (" << n_vx
-           << ") in \"" << conf_key_fcst_field << "\".\n\n";
+           << conf_key_climo_mean_field << "\" (" << n_climo
+           << ") must be 0, 1, or match the number of input fields ("
+           << n_input << ").\n\n";
       exit(1);
    }
 
    // Check for a valid number of climatology standard deviation fields
-   n = parse_conf_n_vx(dict->lookup_array(conf_key_climo_stdev_field, false));
-   if(n != 0 && n != n_vx) {
+   n_climo = parse_conf_n_vx(dict->lookup_array(conf_key_climo_stdev_field, false));
+   if(n_climo != 0 && n_climo != 1 && n_climo != n_input) {
       mlog << Error << "\ncheck_climo_n_vx() -> "
            << "The number of climatology standard deviation fields in \""
-           << conf_key_climo_stdev_field
-           << "\" must be zero or match the number ("
-           << n_vx << ") in \"" << conf_key_fcst_field << "\".\n\n";
+           << conf_key_climo_stdev_field << "\" (" << n_climo
+           << ") must be 0, 1, or match the number of input fields ("
+           << n_input << ").\n\n";
       exit(1);
    }
 

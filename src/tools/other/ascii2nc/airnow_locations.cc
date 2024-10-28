@@ -55,8 +55,8 @@ bool AirnowLocations::initialize(const string &fileName)
   LineDataFile locFile;
   if (!locFile.open(monitoringSiteFileName.c_str())) {
     mlog << Warning << "\n" << method_name << " -> "
-	      << "can't open input ASCII file \"" << monitoringSiteFileName
-	      << "\" for reading\n\n";
+         << "can't open input ASCII file \"" << monitoringSiteFileName
+         << "\" for reading\n\n";
     return false;
   }
   DataLine data_line;
@@ -82,7 +82,7 @@ bool AirnowLocations::initialize(const string &fileName)
   if (!status) {
     return false;
   }
-  
+
   // this is inefficient, but will work
   int bad_line_count = 0;
   while (locFile >> data_line) {
@@ -126,12 +126,12 @@ bool AirnowLocations::initialize(const string &fileName)
 #ifdef DEBUGGING
   for (size_t i=0; i<monitoringSiteAqsid.size(); ++i) {
     printf("%s %s %s %lf %lf %lf\n",
-	   monitoringSiteStationId[i].c_str(),
-	   monitoringSiteAqsid[i].c_str(),
-	   monitoringSiteFullAqsid[i].c_str(),
-	   monitoringSiteLat[i],
-	   monitoringSiteLon[i],
-	   monitoringSiteElev[i]);
+           monitoringSiteStationId[i].c_str(),
+           monitoringSiteAqsid[i].c_str(),
+           monitoringSiteFullAqsid[i].c_str(),
+           monitoringSiteLat[i],
+           monitoringSiteLon[i],
+           monitoringSiteElev[i]);
   }
 #endif
   return true;

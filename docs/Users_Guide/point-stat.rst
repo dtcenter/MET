@@ -23,7 +23,7 @@ Interpolation/Matching Methods
 
 This section provides information about the various methods available in MET to match gridded model output to point observations. Matching in the vertical and horizontal are completed separately using different methods.
 
-In the vertical, if forecasts and observations are at the same vertical level, then they are paired as-is. If any discrepancy exists between the vertical levels, then the forecasts are interpolated to the level of the observation. The vertical interpolation is done in the natural log of pressure coordinates, except for specific humidity, which is interpolated using the natural log of specific humidity in the natural log of pressure coordinates. Vertical interpolation for heights above ground are done linear in height coordinates. When forecasts are for the surface, no interpolation is done. They are matched to observations with message types that are mapped to **SURFACE** in the **message_type_group_map** configuration option. By default, the surface message types include ADPSFC, SFCSHP, and MSONET. The regular expression is applied to the message type list at the message_type_group_map. The derived message types from the time summary ("ADPSFC_MIN_hhmmss" and "ADPSFC_MAX_hhmmss") are accepted as "ADPSFC".
+In the vertical, if forecasts and observations are at the same vertical level, then they are paired as-is. If any discrepancy exists between the vertical levels, then the forecasts are interpolated to the level of the observation. The vertical interpolation is done in the natural log of pressure coordinates, except for specific humidity, which is interpolated using the natural log of specific humidity in the natural log of pressure coordinates. Vertical interpolation for heights above ground are done linear in height coordinates. When forecasts are for the surface, no interpolation is done. They are matched to observations with message types that are mapped to "SURFACE" in the **message_type_group_map** configuration option. By default, the surface message types include ADPSFC, SFCSHP, and MSONET. The regular expression is applied to the message type list at the message_type_group_map. The derived message types from the time summary ("ADPSFC_MIN_hhmmss" and "ADPSFC_MAX_hhmmss") are accepted as "ADPSFC".
 
 To match forecasts and observations in the horizontal plane, the user can select from a number of methods described below. Many of these methods require the user to define the width of the forecast grid W, around each observation point P, that should be considered. In addition, the user can select the interpolation shape, either a SQUARE or a CIRCLE. For example, a square of width 2 defines the 2 x 2 set of grid points enclosing P, or simply the 4 grid points closest to P. A square of width of 3 defines a 3 x 3 square consisting of 9 grid points centered on the grid point closest to P. :numref:`point_stat_fig1`  provides illustration. The point P denotes the observation location where the interpolated value is calculated. The interpolation width W, shown is five. 
 
@@ -264,7 +264,7 @@ Practical Information
 
 The Point-Stat tool is used to perform verification of a gridded model field using point observations. The gridded model field to be verified must be in one of the supported file formats. The point observations must be formatted as the NetCDF output of the point reformatting tools described in :numref:`reformat_point`. The Point-Stat tool provides the capability of interpolating the gridded forecast data to the observation points using a variety of methods as described in :numref:`matching-methods`. The Point-Stat tool computes a number of continuous statistics on the matched pair data as well as discrete statistics once the matched pair data have been thresholded.
 
-If no matched pairs are found for a particular verification task, a report listing counts for reasons why the observations were not used is written to the log output at the default verbosity level of 2. If matched pairs are found, this report is written at verbosity level 3. Inspecting these rejection reason counts is the first step in determining why Point-Stat found no matched pairs. The order of the log messages matches the order in which the processing logic is applied. Start from the last log message and work your way up, considering each of the non-zero rejection reason counts.
+If no matched pairs are found for a particular verification task, a report listing counts for reasons why the observations were not used is written to the log output at the default verbosity level of 2. If matched pairs are found, this report is written at verbosity level 3. Inspecting these rejection reason counts is the first step in determining why Point-Stat found no matched pairs. The order of the log messages matches the order in which the processing logic is applied. Start from the last log message and work your way up, considering each of the non-zero rejection reason counts. Verbosity level 9 prints a very detailed explanation about why each observation is used or skipped for each verification task.
 
 point_stat Usage
 ----------------
@@ -362,6 +362,8 @@ ________________________
   obs_summary    = NONE;
   obs_perc_value = 50;
   message_type_group_map = [...];
+  obtype_as_group_val_flag = FALSE;
+  point_weight_flag = NONE;
   tmp_dir        = "/tmp";
   output_prefix  = "";
   version        = "VN.N";
@@ -501,7 +503,7 @@ Note that writing out matched pair data (MPR lines) for a large number of cases 
 
 If all line types corresponding to a particular verification method are set to NONE, the computation of those statistics will be skipped in the code and thus make the Point-Stat tool run more efficiently. For example, if FHO, CTC, and CTS are all set to NONE, the Point-Stat tool will skip the categorical verification step.
 
-The default SEEPS climo file exists at MET_BASE/climo/seeps/PPT24_seepsweights.nc. It can be overridden by using the environment variable, MET_SEEPS_POINT_CLIMO_NAME.
+The default SEEPS climo file exists at MET_BASE/climo/seeps/PPT24_seepsweights.nc. It is configurable by using the configuration file (seeps_point_climo_name). It can be overridden by the environment variable, MET_SEEPS_POINT_CLIMO_NAME.
 
 .. _point_stat-output:
 
@@ -1204,7 +1206,7 @@ The first set of header columns are common to all of the output files generated 
     - Mean(o²)
   * - 31
     - MAE
-    - Mean Absolute Error
+    - Mean(\|f-o\|)
 
 .. _table_PS_format_info_SAL1L2:
 
@@ -1223,25 +1225,25 @@ The first set of header columns are common to all of the output files generated 
     - Scalar Anomaly L1L2 line type
   * - 25
     - TOTAL
-    - Total number of matched triplets of forecast (f), observation (o), and climatological value (c)
+    - Total number of matched pairs of forecast (f), observation (o), forecast climatology (cf), and observation climatology (co)
   * - 26
     - FABAR
-    - Mean(f-c)
+    - Mean(f-cf)
   * - 27
     - OABAR
-    - Mean(o-c)
+    - Mean(o-co)
   * - 28
     - FOABAR
-    - Mean((f-c)*(o-c))
+    - Mean((f-cf)*(o-co))
   * - 29
     - FFABAR
-    - Mean((f-c)²)
+    - Mean((f-cf)²)
   * - 30
     - OOABAR
-    - Mean((o-c)²)
+    - Mean((o-co)²)
   * - 31
     - MAE
-    - Mean Absolute Error
+    - Mean(\|(f-cf)-(o-co)\|)
 
 .. _table_PS_format_info_VL1L2:
 
@@ -1289,12 +1291,15 @@ The first set of header columns are common to all of the output files generated 
     - O_SPEED_BAR
     - Mean observed wind speed
   * - 35
+    - TOTAL_DIR 
+    - Total number of matched pairs for which both the forecast and observation wind directions are well-defined (i.e. non-zero vectors)
+  * - 36
     - DIR_ME
     - Mean wind direction difference, from -180 to 180 degrees
-  * - 36
+  * - 37
     - DIR_MAE
     - Mean absolute wind direction difference
-  * - 37
+  * - 38
     - DIR_MSE
     - Mean squared wind direction difference
 
@@ -1315,28 +1320,28 @@ The first set of header columns are common to all of the output files generated 
     - Vector Anomaly L1L2 line type
   * - 25
     - TOTAL
-    - Total number of matched triplets of forecast winds (uf, vf), observation winds (uo, vo), and climatological winds (uc, vc)
+    - Total number of matched pairs of forecast winds (uf, vf), observation winds (uo, vo), forecast climatology winds (ucf, vcf), and observation climatology winds (uco, vco)
   * - 26
     - UFABAR
-    - Mean(uf-uc)
+    - Mean(uf-ucf)
   * - 27
     - VFABAR
-    - Mean(vf-vc)
+    - Mean(vf-vcf)
   * - 28
     - UOABAR
-    - Mean(uo-uc)
+    - Mean(uo-uco)
   * - 29
     - VOABAR
-    - Mean(vo-vc)
+    - Mean(vo-vco)
   * - 30
     - UVFOABAR
-    - Mean((uf-uc)*(uo-uc)+(vf-vc)*(vo-vc))
+    - Mean((uf-ucf)*(uo-uco)+(vf-vcf)*(vo-vco))
   * - 31
     - UVFFABAR
-    - Mean((uf-uc)²+(vf-vc)²)
+    - Mean((uf-ucf)²+(vf-vcf)²)
   * - 32
     - UVOOABAR
-    - Mean((uo-uc)²+(vo-vc)²)
+    - Mean((uo-uco)²+(vo-vco)²)
   * - 33
     - FA_SPEED_BAR
     - Mean forecast wind speed anomaly
@@ -1344,12 +1349,15 @@ The first set of header columns are common to all of the output files generated 
     - OA_SPEED_BAR
     - Mean observed wind speed anomaly
   * - 35
+    - TOTAL_DIR 
+    - Total number of matched pairs for which the forecast, observation, forecast climatology, and observation climatology wind directions are well-defined (i.e. non-zero vectors)
+  * - 36
     - DIRA_ME
     - Mean wind direction anomaly difference, from -180 to 180 degrees
-  * - 36
+  * - 37
     - DIRA_MAE
     - Mean absolute wind direction anomaly difference
-  * - 37
+  * - 38
     - DIRA_MSE
     - Mean squared wind direction anomaly difference
 
@@ -1431,16 +1439,19 @@ The first set of header columns are common to all of the output files generated 
   * - 85-87
     - ANOM_CORR_UNCNTR, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCL, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCU
     - Uncentered vector Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
-  * - 88-90
+  * - 88
+    - TOTAL_DIR 
+    - Total number of matched pairs for which both the forecast and observation wind directions are well-defined (i.e. non-zero vectors)
+  * - 89-91
     - DIR_ME, :raw-html:`<br />` DIR_ME_BCL, :raw-html:`<br />` DIR_ME_BCU
     - Mean direction difference, from -180 to 180 degrees, including bootstrap upper and lower confidence limits
-  * - 91-93
+  * - 92-94
     - DIR_MAE, :raw-html:`<br />` DIR_MAE_BCL, :raw-html:`<br />` DIR_MAE_BCU
     - Mean absolute direction difference including bootstrap upper and lower confidence limits
-  * - 94-96
+  * - 95-97
     - DIR_MSE, :raw-html:`<br />` DIR_MSE_BCL, :raw-html:`<br />` DIR_MSE_BCU
     - Mean squared direction difference including bootstrap upper and lower confidence limits
-  * - 97-99
+  * - 98-100
     - DIR_RMSE, :raw-html:`<br />` DIR_RMSE_BCL, :raw-html:`<br />` DIR_RMSE_BCU
     - Root mean squared direction difference including bootstrap upper and lower confidence limits
 
@@ -1490,14 +1501,20 @@ The first set of header columns are common to all of the output files generated 
     - OBS_QC
     - Quality control flag for observation
   * - 35
-    - CLIMO_MEAN
-    - Climatological mean value
+    - OBS_CLIMO_MEAN
+    - Observation climatological mean value (named CLIMO_MEAN prior to met-12.0.0)
   * - 36
-    - CLIMO_STDEV
-    - Climatological standard deviation value
+    - OBS_CLIMO_STDEV
+    - Observation climatological standard deviation value (named CLIMO_STDEV prior to met-12.0.0)
   * - 37
-    - CLIMO_CDF
-    - Climatological cumulative distribution function value
+    - OBS_CLIMO_CDF
+    - Observation climatological cumulative distribution function value (named CLIMO_CDF prior to met-12.0.0)
+  * - 38
+    - FCST_CLIMO_MEAN
+    - Forecast climatological mean value
+  * - 39
+    - FCST_CLIMO_STDEV
+    - Forecast climatological standard deviation value
 
 .. _table_PS_format_info_SEEPS_MPR:
 
@@ -1534,10 +1551,10 @@ The first set of header columns are common to all of the output files generated 
     - Quality control flag for observation
   * - 31
     - FCST_CAT
-    - Forecast category to 3 by 3 matrix
+    - Forecast category (dry, light, or heavy)
   * - 32
     - OBS_CAT
-    - Observationtegory to 3 by 3 matrix
+    - Observation category (dry, light, or heavy)
   * - 33
     - P1
     - Climo-derived probability value for this station (dry)
@@ -1546,10 +1563,10 @@ The first set of header columns are common to all of the output files generated 
     - Climo-derived probability value for this station (dry + light)
   * - 35
     - T1
-    - Threshold 1 for p1
+    - Threshold 1 for P1 (dry)
   * - 36
     - T2
-    - Threshold 2 for p2
+    - Threshold 2 for P2 (dry + light)
   * - 37
     - SEEPS
     - SEEPS (Stable Equitable Error in Probability Space) score
@@ -1574,41 +1591,41 @@ The first set of header columns are common to all of the output files generated 
     - TOTAL
     - Total number of SEEPS matched pairs
   * - 26
-    - S12
-    - Counts multiplied by the weights for FCST_CAT 1 and OBS_CAT 2
+    - ODFL
+    - Counts multiplied by the weights for the observation dry, forecast light category
   * - 27
-    - S13
-    - Counts multiplied by the weights for FCST_CAT 1 and OBS_CAT 3
+    - ODFH
+    - Counts multiplied by the weights for the observation dry, forecast heavy category
   * - 28
-    - S21
-    - Counts multiplied by the weights for FCST_CAT 2 and OBS_CAT 1
+    - OLFD
+    - Counts multiplied by the weights for the observation light, forecast dry category
   * - 29
-    - S23
-    - Counts multiplied by the weights for FCST_CAT 2 and OBS_CAT 3
+    - OLFH
+    - Counts multiplied by the weights for the observation light, forecast heavy category
   * - 30
-    - S31
-    - Counts multiplied by the weights for FCST_CAT 3 and OBS_CAT 1
+    - OHFD
+    - Counts multiplied by the weights for the observation heavy, forecast dry category
   * - 31
-    - S32
-    - Counts multiplied by the weights for FCST_CAT 3 and OBS_CAT 2
+    - OHFL
+    - Counts multiplied by the weights for the observation heavy, forecast light category
   * - 32
     - PF1
-    - marginal probabilities of the forecast values (FCST_CAT 1)
+    - Marginal probabilities of the forecast dry (FCST_CAT 0)
   * - 33
     - PF2
-    - marginal probabilities of the forecast values (FCST_CAT 2)
+    - Marginal probabilities of the forecast light (FCST_CAT 1)
   * - 34
     - PF3
-    - marginal probabilities of the forecast values (FCST_CAT 3)
+    - Marginal probabilities of the forecast heavy (FCST_CAT 2)
   * - 35
     - PV1
-    - marginal probabilities of the observed values (OBS_CAT 1)
+    - Marginal probabilities of the observed dry (OBS_CAT 0)
   * - 36
     - PV2
-    - marginal probabilities of the observed values (OBS_CAT 2)
+    - Marginal probabilities of the observed light (OBS_CAT 1)
   * - 37
     - PV3
-    - marginal probabilities of the observed values (OBS_CAT 3)
+    - Marginal probabilities of the observed heavy (OBS_CAT 2)
   * - 38
     - SEEPS
     - Averaged SEEPS (Stable Equitable Error in Probability Space) score

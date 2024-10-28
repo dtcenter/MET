@@ -102,6 +102,9 @@ class MetNcCFDataFile : public Met2dDataFile {
 
       void dump(std::ostream &, int = 0) const;
 
+      Grid build_grid_from_lat_lon_vars(netCDF::NcVar *lat_var, netCDF::NcVar *lon_var,
+                                        const long lat_counts, const long lon_counts);
+
 };
 
 

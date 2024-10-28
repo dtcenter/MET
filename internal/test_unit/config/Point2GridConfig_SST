@@ -1,0 +1,7 @@
+file_type      = NETCDF_NCCF;
+
+var_name_map = [
+  { key = "lat_vname";     val = "yh"; },
+  { key = "lon_vname";     val = "xh"; }
+];
+

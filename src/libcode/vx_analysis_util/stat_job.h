@@ -145,6 +145,7 @@ class STATAnalysisJob {
 
       void set_perc_thresh(const NumArray &,
                            const NumArray &,
+                           const NumArray &,
                            const NumArray &);
 
       void open_dump_row_file ();
@@ -234,13 +235,16 @@ class STATAnalysisJob {
       std::map<ConcatString,StringArray> column_str_inc_map;
       std::map<ConcatString,StringArray> column_str_exc_map;
 
-      StringArray hdr_name;
-      StringArray hdr_value;
-
       //
       // Store the case information for the -by option
       //
       StringArray by_column;
+
+      //
+      // Options for -set_hdr output
+      //
+      StringArray hdr_name;
+      StringArray hdr_value;
 
       //
       // Variables used to the store the analysis job specification
@@ -361,7 +365,7 @@ class STATAnalysisJob {
 inline void STATAnalysisJob::set_job_type  (const STATJobType t) { job_type = t; return; }
 
 inline void STATAnalysisJob::set_precision (int p)  { precision = p; return; }
-inline int  STATAnalysisJob::get_precision () const { return(precision);     }
+inline int  STATAnalysisJob::get_precision () const { return precision;      }
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -87,12 +87,15 @@ bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
    clear_numbers();
    obs_cnt = obs_vars.obs_cnt;
 
+   if (!IS_INVALID_NC(obs_vars.obs_arr_var)) is_obs_array = true;
+
+   // Resize arrays for input data
+   allocate();
+
    StringArray missing_vars;
    StringArray failed_vars;
-   if (!IS_INVALID_NC(obs_vars.obs_arr_var)) {
-      is_obs_array = true;
-      obs_arr = new float[obs_cnt*OBS_ARRAY_LEN];
-      if (!get_nc_data(&obs_vars.obs_arr_var, obs_arr)) {
+   if(is_obs_array) {
+      if (!get_nc_data(&obs_vars.obs_arr_var, obs_arr.data())) {
          succeed = false;
          failed_vars.add(nc_var_obs_arr);
       }
@@ -103,8 +106,7 @@ bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
          missing_vars.add(nc_var_obs_hid);
       }
       else {
-         obs_hids = new int[obs_cnt];
-         if (!get_nc_data(&obs_vars.obs_hid_var, obs_hids)) {
+         if (!get_nc_data(&obs_vars.obs_hid_var, obs_hids.data())) {
             succeed = false;
             failed_vars.add(nc_var_obs_hid);
          }
@@ -114,8 +116,7 @@ bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
          missing_vars.add(nc_var_obs_lvl);
       }
       else {
-         obs_lvls = new float[obs_cnt];
-         if (!get_nc_data(&obs_vars.obs_lvl_var, obs_lvls)) {
+         if (!get_nc_data(&obs_vars.obs_lvl_var, obs_lvls.data())) { 
             succeed = false;
             failed_vars.add(nc_var_obs_lvl);
          }
@@ -125,8 +126,7 @@ bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
          missing_vars.add(nc_var_obs_hgt);
       }
       else {
-         obs_hgts = new float[obs_cnt];
-         if (!get_nc_data(&obs_vars.obs_hgt_var, obs_hgts)) {
+         if (!get_nc_data(&obs_vars.obs_hgt_var, obs_hgts.data())) {
             succeed = false;
             failed_vars.add(nc_var_obs_hgt);
          }
@@ -136,28 +136,34 @@ bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
          missing_vars.add(nc_var_obs_val);
       }
       else {
-         obs_vals = new float[obs_cnt];
-         if (!get_nc_data(&obs_vars.obs_val_var, obs_vals)) {
+         if (!get_nc_data(&obs_vars.obs_val_var, obs_vals.data())) {
             succeed = false;
             failed_vars.add(nc_var_obs_val);
          }
       }
       if (IS_VALID_NC(obs_vars.obs_gc_var)) {
-         obs_ids = new int[obs_cnt];
-         if (!get_nc_data(&obs_vars.obs_gc_var, obs_ids)) {
+         if (!get_nc_data(&obs_vars.obs_gc_var, obs_ids.data())) {
             succeed = false;
             failed_vars.add(nc_var_obs_gc);
          }
       }
       else if (IS_VALID_NC(obs_vars.obs_vid_var)) {
-         obs_ids = new int[obs_cnt];
-         if (!get_nc_data(&obs_vars.obs_vid_var, obs_ids)) {
+         if (!get_nc_data(&obs_vars.obs_vid_var, obs_ids.data())) {
             succeed = false;
             failed_vars.add(nc_var_obs_vid);
          }
       }
       else succeed = false;
-
+      if (IS_INVALID_NC(obs_vars.obs_qty_var)) {
+         succeed = false;
+         missing_vars.add(nc_var_obs_qty);
+      }
+      else {
+         if (!get_nc_data(&obs_vars.obs_qty_var, obs_qids.data())) {
+            succeed = false;
+            failed_vars.add(nc_var_obs_qty);
+         }
+      }
    }
 
    for (int idx=0; idx<missing_vars.n(); idx++) {
@@ -327,7 +333,7 @@ void NetcdfObsVars::create_obs_vars (NcFile *f_out) {
 
    add_att(&obs_lvl_var,  "long_name", "pressure level (hPa) or accumulation interval (sec)");
    add_att(&obs_lvl_var, "_FillValue", FILL_VALUE);
-   long_name_str = (attr_agl)
+   long_name_str = attr_agl
          ? "height in meters above sea level or ground level (msl or agl)"
          : "height in meters above sea level (msl)";
    add_att(&obs_hgt_var,  "long_name", long_name_str);
@@ -589,7 +595,7 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
    hdr_data.vld_idx_array.extend(nhdr_count);
 
    int buf_size = ((nhdr_count > NC_BUFFER_SIZE_32K)
-                   ? NC_BUFFER_SIZE_32K : (nhdr_count));
+                   ? NC_BUFFER_SIZE_32K : nhdr_count);
 
    //
    // Allocate space to store the data
@@ -597,12 +603,12 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
    char hdr_typ_block[buf_size][typ_len];
    char hdr_sid_block[buf_size][sid_len];
    char hdr_vld_block[buf_size][vld_len];
-   int  *hdr_typ_idx_block = new int[buf_size];
-   int  *hdr_sid_idx_block = new int[buf_size];
-   int  *hdr_vld_idx_block = new int[buf_size];
-   float *hdr_lat_block    = new float[buf_size];
-   float *hdr_lon_block    = new float[buf_size];
-   float *hdr_elv_block    = new float[buf_size];
+   vector<int> hdr_typ_idx_block(buf_size);
+   vector<int> hdr_sid_idx_block(buf_size);
+   vector<int> hdr_vld_idx_block(buf_size);
+   vector<float> hdr_lat_block(buf_size);
+   vector<float> hdr_lon_block(buf_size);
+   vector<float> hdr_elv_block(buf_size);
 
    LongArray offsets;       // = { 0, 0 };
    LongArray lengths;       // = { 1, 1 };
@@ -679,7 +685,7 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
       else {
          // Get the corresponding header message type (index, not string)
          if(!get_nc_data(&hdr_typ_var,
-               hdr_typ_idx_block, lengths_1D, offsets_1D)) {
+               hdr_typ_idx_block.data(), lengths_1D, offsets_1D)) {
             mlog << Error << "\n" << method_name
                  << "trouble getting hdr_typ\n\n";
             exit(1);
@@ -687,7 +693,7 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
 
          // Get the corresponding header station id (index, not string)
          if(!get_nc_data(&hdr_sid_var,
-               hdr_sid_idx_block, lengths_1D, offsets_1D)) {
+               hdr_sid_idx_block.data(), lengths_1D, offsets_1D)) {
             mlog << Error << "\n" << method_name
                  << "trouble getting hdr_sid\n\n";
             exit(1);
@@ -695,7 +701,7 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
 
          // Get the corresponding header valid time (index, not string)
          if(!get_nc_data(&hdr_vld_var,
-               hdr_vld_idx_block, lengths_1D, offsets_1D)) {
+               hdr_vld_idx_block.data(), lengths_1D, offsets_1D)) {
             mlog << Error << "\n" << method_name
                  << "trouble getting hdr_vld\n\n";
             exit(1);
@@ -705,19 +711,19 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
          // Get the header for this observation
          //
          if(!get_nc_data(&hdr_lat_var,
-               hdr_lat_block, lengths_1D, offsets_1D)) {
+               hdr_lat_block.data(), lengths_1D, offsets_1D)) {
             mlog << Error << "\n" << method_name
                  << "trouble getting hdr_lat\n\n";
             exit(1);
          }
          if(!get_nc_data(&hdr_lon_var,
-               hdr_lon_block, lengths_1D, offsets_1D)) {
+               hdr_lon_block.data(), lengths_1D, offsets_1D)) {
             mlog << Error << "\n" << method_name
                  << "trouble getting hdr_lon\n\n";
             exit(1);
          }
          if(!get_nc_data(&hdr_elv_var,
-               hdr_elv_block, lengths_1D, offsets_1D)) {
+               hdr_elv_block.data(), lengths_1D, offsets_1D)) {
             mlog << Error << "\n" << method_name
                  << "trouble getting hdr_elv\n\n";
             exit(1);
@@ -732,13 +738,6 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
          }
       }
    }
-
-   delete[] hdr_typ_idx_block;
-   delete[] hdr_sid_idx_block;
-   delete[] hdr_vld_idx_block;
-   delete[] hdr_lat_block;
-   delete[] hdr_lon_block;
-   delete[] hdr_elv_block;
 
    if (!has_array_vars) {
       int tmp_dim_size;
@@ -854,40 +853,40 @@ bool NetcdfObsVars::read_obs_data(int buf_size, int offset,
       }
    }
    else {
-      int   *obs_hid_buf = new   int[buf_size];
-      int   *obs_vid_buf = new   int[buf_size];
-      float *obs_lvl_buf = new float[buf_size];
-      float *obs_hgt_buf = new float[buf_size];
-      float *obs_val_buf = new float[buf_size];
+      vector<int  > obs_hid_buf(buf_size);
+      vector<int  > obs_vid_buf(buf_size);
+      vector<float> obs_lvl_buf(buf_size);
+      vector<float> obs_hgt_buf(buf_size);
+      vector<float> obs_val_buf(buf_size);
 
       lengths[1] = 1;
 
-      if(!get_nc_data(&obs_hid_var, obs_hid_buf, lengths, offsets)) {
+      if(!get_nc_data(&obs_hid_var, obs_hid_buf.data(), lengths, offsets)) {
          mlog << Error << "\n" << method_name
               << "can't read the record for observation "
               << "index " << offset << "\n\n";
          result = false;
       }
       if(!get_nc_data((IS_INVALID_NC(obs_gc_var) ? &obs_vid_var : &obs_gc_var),
-            obs_vid_buf, lengths, offsets)) {
+            obs_vid_buf.data(), lengths, offsets)) {
          mlog << Error << "\n" << method_name
               << "can't read the record (vid or gc) for observation "
               << "index " << offset << "\n\n";
          result = false;
       }
-      if(!get_nc_data(&obs_lvl_var, obs_lvl_buf, lengths, offsets)) {
+      if(!get_nc_data(&obs_lvl_var, obs_lvl_buf.data(), lengths, offsets)) {
          mlog << Error << "\n" << method_name
               << "can't read the record (lvl) for observation "
               << "index " << offset << "\n\n";
          result = false;
       }
-      if(!get_nc_data(&obs_hgt_var, obs_hgt_buf, lengths, offsets)) {
+      if(!get_nc_data(&obs_hgt_var, obs_hgt_buf.data(), lengths, offsets)) {
          mlog << Error << "\n" << method_name
               << "can't read the record (hgt) for observation "
               << "index " << offset << "\n\n";
          result = false;
       }
-      if(!get_nc_data(&obs_val_var, obs_val_buf, lengths, offsets)) {
+      if(!get_nc_data(&obs_val_var, obs_val_buf.data(), lengths, offsets)) {
          mlog << Error << "\n" << method_name
               << "can't read the record (val) for observation "
               << "index " << offset << "\n\n";
@@ -912,11 +911,6 @@ bool NetcdfObsVars::read_obs_data(int buf_size, int offset,
          }
       }
 
-      delete[] obs_hid_buf;
-      delete[] obs_vid_buf;
-      delete[] obs_lvl_buf;
-      delete[] obs_hgt_buf;
-      delete[] obs_val_buf;
    }
    return result;
 }
@@ -948,10 +942,10 @@ void NetcdfObsVars::read_pb_hdr_data(MetPointHeader &hdr_data) {
 
    // Read PB report type
    int buf_size = ((pb_hdr_count > NC_BUFFER_SIZE_32K)
-         ? NC_BUFFER_SIZE_32K : (pb_hdr_count));
-   int *hdr_prpt_typ_block = new int[buf_size];
-   int *hdr_irpt_typ_block = new int[buf_size];
-   int *hdr_inst_typ_block = new int[buf_size];
+         ? NC_BUFFER_SIZE_32K : pb_hdr_count);
+   vector<int> hdr_prpt_typ_block(buf_size);
+   vector<int> hdr_irpt_typ_block(buf_size);
+   vector<int> hdr_inst_typ_block(buf_size);
    for(int i_start=0; i_start<pb_hdr_count; i_start+=buf_size) {
       int buf_size2 = pb_hdr_count - i_start;
       if (buf_size2 > NC_BUFFER_SIZE_32K) buf_size2 = NC_BUFFER_SIZE_32K;
@@ -961,7 +955,7 @@ void NetcdfObsVars::read_pb_hdr_data(MetPointHeader &hdr_data) {
       if (has_hdr_prpt_typ_var) {
          // Get the corresponding header PB message type (string)
          if(!get_nc_data(&hdr_prpt_typ_var,
-               hdr_prpt_typ_block, lengths, offsets)) {
+               hdr_prpt_typ_block.data(), lengths, offsets)) {
             mlog << Error << "\n" << method_name
                  << "trouble getting hdr_prpt_typ\n\n";
             exit(1);
@@ -971,7 +965,7 @@ void NetcdfObsVars::read_pb_hdr_data(MetPointHeader &hdr_data) {
       if (has_hdr_irpt_typ_var) {
          // Get the corresponding header In message type (string)
          if(!get_nc_data(&hdr_irpt_typ_var,
-               hdr_irpt_typ_block, lengths, offsets)) {
+               hdr_irpt_typ_block.data(), lengths, offsets)) {
             mlog << Error << "\n" << method_name
                  << "trouble getting hdr_irpt_typ\n\n";
             exit(1);
@@ -981,7 +975,7 @@ void NetcdfObsVars::read_pb_hdr_data(MetPointHeader &hdr_data) {
       if (has_hdr_inst_typ_var) {
          // Get the corresponding header instrument type (string)
          if(!get_nc_data(&hdr_inst_typ_var,
-               hdr_inst_typ_block, lengths, offsets)) {
+               hdr_inst_typ_block.data(), lengths, offsets)) {
             mlog << Error << "\n" << method_name
                  << "trouble getting hdr_inst_typ\n\n";
             exit(1);
@@ -994,10 +988,6 @@ void NetcdfObsVars::read_pb_hdr_data(MetPointHeader &hdr_data) {
          hdr_data.inst_typ_array.add(hdr_inst_typ_block[hIndex]);
       }
    }
-
-   delete[] hdr_prpt_typ_block;
-   delete[] hdr_irpt_typ_block;
-   delete[] hdr_inst_typ_block;
 
 }
 

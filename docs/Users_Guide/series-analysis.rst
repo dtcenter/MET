@@ -33,6 +33,7 @@ The usage statement for the Series-Analysis tool is shown below:
          -fcst  file_1 ... file_n | fcst_file_list
          -obs   file_1 ... file_n | obs_file_list
          [-both file_1 ... file_n | both_file_list]
+         [-aggr file]
          [-paired]
          -out file
          -config file
@@ -58,13 +59,17 @@ Optional Arguments for series_analysis
 
 5. To set both the forecast and observations to the same set of files, use the optional -both file_1 ... file_n | both_file_list option to the same set of files. This is useful when reading the NetCDF matched pair output of the Grid-Stat tool which contains both forecast and observation data.
 
-6. The -paired option indicates that the -fcst and -obs file lists are already paired, meaning there is a one-to-one correspondence between the files in those lists. This option affects how missing data is handled. When -paired is not used, missing or incomplete files result in a runtime error with no output file being created. When -paired is used, missing or incomplete files result in a warning with output being created using the available data.
+6. The -aggr option specifies the path to an existing Series-Analysis output file. When computing statistics for the input forecast and observation data, Series-Analysis aggregates the partial sums (SL1L2, SAL1L2 line types) and contingency table counts (CTC, MCTC, and PCT line types) with data provided in the aggregate file. This option enables Series-Analysis to run iteratively and update existing partial sums, counts, and statistics with new data.
 
-7. The -log file outputs log messages to the specified file.
+.. note:: When the -aggr option is used, only statistics that are derivable from partial sums and contingency table counts can be requested. Runtimes are generally much slower when aggregating data since it requires many additional NetCDF variables containing the scalar partial sums and contingency table counts to be read and written.
 
-8. The -v level overrides the default level of logging (2).
+7. The -paired option indicates that the -fcst and -obs file lists are already paired, meaning there is a one-to-one correspondence between the files in those lists. This option affects how missing data is handled. When -paired is not used, missing or incomplete files result in a runtime error with no output file being created. When -paired is used, missing or incomplete files result in a warning with output being created using the available data.
 
-9. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+8. The -log file outputs log messages to the specified file.
+
+9. The -v level overrides the default level of logging (2).
+
+10. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the series_analysis calling sequence is shown below:
 
@@ -179,3 +184,5 @@ The output_stats array controls the type of output that the Series-Analysis tool
 11. PJC for Joint and Conditional factorization for Probabilistic forecasts (See :numref:`table_PS_format_info_PJC`)
 
 12. PRC for Receiver Operating Characteristic for Probabilistic forecasts (See :numref:`table_PS_format_info_PRC`)
+
+.. note:: When the -input option is used, all partial sum and contingency table count columns are required to aggregate statistics across multiple runs. To facilitate this, the output_stats entries for the CTC, SL1L2, SAL1L2, and PCT line types can be set to "ALL" to indicate that all available columns for those line types should be written.

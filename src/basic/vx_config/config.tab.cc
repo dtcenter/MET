@@ -3229,11 +3229,10 @@ Simple_Node * s = new Simple_Node;
 
 s->op = op;
 
-if ( (info.perc_index < 0) || (info.perc_index >= n_perc_thresh_infos) )  {
+if ( info.ptype == no_perc_thresh_type )  {
 
-   mlog << Error
-        << "\ndo_simple_perc_thresh() -> bad perc_index ... "
-        << (info.perc_index) << "\n\n";
+   mlog << Error << "\ndo_simple_perc_thresh() -> "
+        << "bad percentile threshold type\n\n";
 
    exit ( 1 );
 
@@ -3243,7 +3242,7 @@ s->T     = bad_data_double;
 
 s->PT    = info.value;
 
-s->Ptype = perc_thresh_info[info.perc_index].type;
+s->Ptype = info.ptype;
 
    //
    //  sanity check
@@ -3274,7 +3273,7 @@ if ( s->Ptype == perc_thresh_freq_bias && s->PT <= 0 )  {
 if ( op >= 0 )  {
 
    ConcatString cs;
-   cs << perc_thresh_info[info.perc_index].short_name;
+   cs << perc_thresh_info_map.at(info.ptype).short_name;
    cs << info.value;
    fix_float(cs);
 
@@ -3303,11 +3302,10 @@ Simple_Node * s = new Simple_Node;
 
 s->op = op;
 
-if ( (info.perc_index < 0) || (info.perc_index >= n_perc_thresh_infos) )  {
+if ( info.ptype == no_perc_thresh_type )  {
 
-   mlog << Error
-        << "\ndo_compound_perc_thresh() -> bad perc_index ... "
-        << (info.perc_index) << "\n\n";
+   mlog << Error << "\ndo_compound_perc_thresh() -> "
+        << "bad percentile threshold type\n\n";
 
    exit ( 1 );
 
@@ -3318,7 +3316,7 @@ else               s->T     = num.d;
 
 s->PT    = info.value;
 
-s->Ptype = perc_thresh_info[info.perc_index].type;
+s->Ptype = info.ptype;
 
    //
    //  sanity check
@@ -3349,7 +3347,7 @@ if ( s->Ptype == perc_thresh_freq_bias && !is_eq(s->PT, 1.0) )  {
 if ( op >= 0 )  {
 
    ConcatString cs;
-   cs << perc_thresh_info[info.perc_index].short_name;
+   cs << perc_thresh_info_map.at(info.ptype).short_name;
    cs << info.value;
    fix_float(cs);
    cs << "(" << number_string << ")";

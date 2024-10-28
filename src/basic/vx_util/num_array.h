@@ -57,7 +57,7 @@ class NumArray {
 
       double operator[](int) const;
 
-      const double * vals() const;
+      const std::vector<double> & vals() const;
       double * buf();
       
       int has(int, bool forward=true)    const;
@@ -127,12 +127,13 @@ class NumArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int            NumArray::n_elements()         const { return ( e.size() ); }
-inline int            NumArray::n         ()         const { return ( e.size() ); }
-inline const double * NumArray::vals()               const { return ( e.data() ); }
-inline       double * NumArray::buf()                      { return ( e.data() ); }
-inline void           NumArray::inc(int i, int v)          { e[i] += v; return;   }
-inline void           NumArray::inc(int i, double v)       { e[i] += v; return;   }
+inline int            NumArray::n_elements()         const { return e.size();   }
+inline int            NumArray::n()                  const { return e.size();   }
+inline const std::vector<double> &
+                      NumArray::vals()               const { return e;          }
+inline       double * NumArray::buf()                      { return e.data();   }
+inline void           NumArray::inc(int i, int v)          { e[i] += v; return; }
+inline void           NumArray::inc(int i, double v)       { e[i] += v; return; }
 
 
 ////////////////////////////////////////////////////////////////////////

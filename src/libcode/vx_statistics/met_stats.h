@@ -93,12 +93,17 @@ class CTSInfo {
 
       void clear();
       void allocate_n_alpha(int);
-      void add(double, double);
-      void add(double, double, double, double);
+      void add(double f, double o, double wgt,
+               const ClimoPntInfo *cpi = nullptr);
       void compute_stats();
       void compute_ci();
 
-      double get_stat(const char *);
+      void set_stat_ctc(const std::string &, double);
+
+      double get_stat(STATLineType, const std::string &, int i_alpha=0) const;
+      double get_stat_fho(const std::string &) const;
+      double get_stat_ctc(const std::string &) const;
+      double get_stat_cts(const std::string &, int i_alpha=0) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -134,10 +139,14 @@ class MCTSInfo {
       void allocate_n_alpha(int);
       void set_fthresh(const ThreshArray &);
       void set_othresh(const ThreshArray &);
-      void add(double, double);
-      void add(double, double, double, double);
+      void add(double f, double o, double wgt,
+               const ClimoPntInfo *cpi = nullptr);
       void compute_stats();
       void compute_ci();
+
+      double get_stat(STATLineType, const std::string &, ConcatString &, int i_alpha=0) const;
+      double get_stat_mctc(const std::string &, ConcatString &) const;
+      double get_stat_mcts(const std::string &, int i_alpha=0) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -190,11 +199,13 @@ class CNTInfo {
       
       int n_ranks, frank_ties, orank_ties;
 
+      void zero_out();
       void clear();
+
       void allocate_n_alpha(int);
       void compute_ci();
 
-      double get_stat(const char *);
+      double get_stat(const std::string &, int i_alpha=0) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -226,22 +237,28 @@ class SL1L2Info {
       double fbar, obar;
       double fobar;
       double ffbar, oobar;
+      double smae;
       int    scount;
 
       // SAL1L2 Quantities
       double fabar, oabar;
       double foabar;
       double ffabar, ooabar;
+      double samae;
       int    sacount;
-
-      // Mean absolute error
-      double mae;
 
       // Compute sums
       void set(const PairDataPoint &);
 
       void zero_out();
       void clear();
+
+      void set_stat_sl1l2(const std::string &, double);
+      void set_stat_sal1l2(const std::string &, double);
+
+      double get_stat(STATLineType, const std::string &) const;
+      double get_stat_sl1l2(const std::string &) const;
+      double get_stat_sal1l2(const std::string &) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -277,10 +294,6 @@ class VL1L2Info {
       // Number of points
       int n;
 
-      // Number of points for which the wind direction difference is undefined
-      int n_dir_undef; 
-      int n_dira_undef; 
-   
       // VL1L2 Quantities
 
       double uf_bar;
@@ -336,7 +349,8 @@ class VL1L2Info {
       CIInfo DIR_MSE;
       CIInfo DIR_RMSE;
 
-      int    vcount;
+      int    vcount; // Vector count
+      int    dcount; // Direction count
 
       // VAL1L2 Quantities
       double ufa_bar;
@@ -355,19 +369,22 @@ class VL1L2Info {
       double absdira_bar; // Average anomalous absolute direction difference
       double dira2_bar;   // Average anomalous squared direction difference
 
-      int    vacount;
+      int    vacount; // Vector anomaly count
+      int    dacount; // Direction anomaly count
 
       // Compute sums
       void set(const PairDataPoint &, const PairDataPoint &);
-   
-      void clear();
+
       void zero_out();
+      void clear();
 
       void allocate_n_alpha(int);
       void compute_stats();
       void compute_ci();
 
-      double get_stat(const char *);
+      double get_stat_vl1l2(const std::string &) const;
+      double get_stat_val1l2(const std::string &) const;
+      double get_stat_vcnt(const std::string &) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -507,8 +524,9 @@ class ISCInfo {
       double  baser;
       double  fbias;
 
-      void clear();
       void zero_out();
+      void clear();
+
       void allocate_n_scale(int);
       void compute_isc();
       void compute_isc(int);
@@ -563,6 +581,12 @@ class PCTInfo {
       void set_fthresh(const ThreshArray &);
       void compute_stats();
       void compute_ci();
+
+      double get_stat(STATLineType, const std::string &, ConcatString &, int i_alpha=0) const;
+      double get_stat_pct(const std::string &, ConcatString &) const;
+      double get_stat_pjc(const std::string &, ConcatString &) const;
+      double get_stat_prc(const std::string &, ConcatString &) const;
+      double get_stat_pstd(const std::string &, ConcatString &, int i_alpha=0) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -677,7 +701,7 @@ class DMAPInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline double DMAPInfo::get_beta_value() const { return(beta_value); }
+inline double DMAPInfo::get_beta_value() const { return beta_value; }
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -741,6 +765,8 @@ extern double compute_afss(double, double);
 extern double compute_ufss(double);
 
 extern int    compute_rank(const DataPlane &, DataPlane &, double *, int &);
+
+extern bool   is_ci_stat_name(const std::string &);
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -58,8 +58,9 @@
 //                                   from header files
 //   019    07/21/23  Prestopnik, J. MET #2615 Add #include <array> to compile
 //                                   successfully using gcc12
+//   020    08/26/24  Halley Gotway  MET #2938 Silence center time warnings
+//
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <cstdio>
 #include <cstdlib>
@@ -386,6 +387,7 @@ static bool   insert_pbl(float *obs_arr, const float pbl_value, const int pbl_co
 static int    interpolate_by_pressure(int length, float *pres_data, float *var_data);
 static void   interpolate_pqtzuv(float*, float*, float*);
 static bool   is_valid_pb_data(float pb_value);
+static void   check_fortran_file_id(const int unit, const char *method_name);
 static void   log_merged_tqz_uv(map<float, float*> pqtzuv_map_tq,
                                 map<float, float*> pqtzuv_map_uv,
                                 map<float, float*> &pqtzuv_map_merged,
@@ -431,10 +433,7 @@ void dump_pb_data(
       msg_typ_ret[i] = keep_message_type(vld_msg_typ_list[i]);
    }
 
-   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
-      mlog << Error << "\n" << method_name
-           << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
-   }
+   check_fortran_file_id(unit, method_name);
    dumppb_(blk_file.c_str(), &unit, dump_dir.c_str(), &len1,
            prefix.c_str(), &len2, msg_typ_ret);
 }
@@ -469,7 +468,7 @@ int met_main(int argc, char *argv[]) {
 
    if (collect_metadata) {
       // Process each PrepBufr file
-      for(int i=0; i<pbfile.n_elements(); i++) {
+      for(int i=0; i<pbfile.n(); i++) {
          process_pbfile_metadata(i);
       }
       display_bufr_variables(tableB_vars, tableB_descs,
@@ -481,7 +480,7 @@ int met_main(int argc, char *argv[]) {
       open_netcdf();
 
       // Process each PrepBufr file
-      for(int i=0; i<pbfile.n_elements(); i++) {
+      for(int i=0; i<pbfile.n(); i++) {
          process_pbfile_metadata(i);
          process_pbfile(i);
       }
@@ -530,33 +529,33 @@ void initialize() {
    tmp_hdr_array.clear();
    tmp_hdr_array.parse_wsss(prepbufr_p_event);
    prepbufr_event_members.add(tmp_hdr_array);
-   if (0 < tmp_hdr_array.n_elements()) prepbufr_vars.add(tmp_hdr_array[0]);
+   if (0 < tmp_hdr_array.n()) prepbufr_vars.add(tmp_hdr_array[0]);
 
    tmp_hdr_array.clear();
    tmp_hdr_array.parse_wsss(prepbufr_q_event);
    prepbufr_event_members.add(tmp_hdr_array);
-   if (0 < tmp_hdr_array.n_elements()) prepbufr_vars.add(tmp_hdr_array[0]);
+   if (0 < tmp_hdr_array.n()) prepbufr_vars.add(tmp_hdr_array[0]);
 
 
    tmp_hdr_array.clear();
    tmp_hdr_array.parse_wsss(prepbufr_t_event);
    prepbufr_event_members.add(tmp_hdr_array);
-   if (0 < tmp_hdr_array.n_elements()) prepbufr_vars.add(tmp_hdr_array[0]);
+   if (0 < tmp_hdr_array.n()) prepbufr_vars.add(tmp_hdr_array[0]);
 
    tmp_hdr_array.clear();
    tmp_hdr_array.parse_wsss(prepbufr_z_event);
    prepbufr_event_members.add(tmp_hdr_array);
-   if (0 < tmp_hdr_array.n_elements()) prepbufr_vars.add(tmp_hdr_array[0]);
+   if (0 < tmp_hdr_array.n()) prepbufr_vars.add(tmp_hdr_array[0]);
 
    tmp_hdr_array.clear();
    tmp_hdr_array.parse_wsss(prepbufr_u_event);
    prepbufr_event_members.add(tmp_hdr_array);
-   if (0 < tmp_hdr_array.n_elements()) prepbufr_vars.add(tmp_hdr_array[0]);
+   if (0 < tmp_hdr_array.n()) prepbufr_vars.add(tmp_hdr_array[0]);
 
    tmp_hdr_array.clear();
    tmp_hdr_array.parse_wsss(prepbufr_v_event);
    prepbufr_event_members.add(tmp_hdr_array);
-   if (0 < tmp_hdr_array.n_elements()) prepbufr_vars.add(tmp_hdr_array[0]);
+   if (0 < tmp_hdr_array.n()) prepbufr_vars.add(tmp_hdr_array[0]);
 
    prepbufr_derive_vars.add("D_DPT");
    prepbufr_derive_vars.add("D_WDIR");
@@ -645,7 +644,7 @@ void process_command_line(int argc, char **argv) {
 
    if (!override_vars) {
       bufr_target_variables = conf_info.obs_bufr_var;
-      do_all_vars = (0 == conf_info.obs_bufr_var.n_elements());
+      do_all_vars = (0 == conf_info.obs_bufr_var.n());
    }
 
    do_summary = conf_info.getSummaryInfo().flag;
@@ -661,14 +660,12 @@ ConcatString save_bufr_table_to_file(const char *blk_file, int _file_id) {
    int len;
    ConcatString tbl_filename;
    ConcatString tbl_prefix;
+   const char *method_name = "save_bufr_table_to_file() ";
 
    tbl_prefix << conf_info.tmp_dir << "/" << tmp_pb2nc_base;
    tbl_filename = make_temp_file_name(tbl_prefix.c_str(), "tbl");
    len = tbl_filename.length();
-   if (_file_id > MAX_FORTRAN_FILE_ID || _file_id < MIN_FORTRAN_FILE_ID) {
-      mlog << Error << "\nsave_bufr_table_to_file() -> "
-           << "Invalid file ID [" << _file_id << "] between 1 and 99.\n\n";
-   }
+   check_fortran_file_id(_file_id, method_name);
    openpb_(blk_file, &_file_id);
    dump_tbl_(blk_file, &_file_id, tbl_filename.c_str(), &len);
    closepb_(&_file_id);
@@ -822,6 +819,7 @@ void get_variable_info(ConcatString blk_file, int unit) {
    }
 
    remove_temp_file(tbl_filename);
+
    return;
 }
 
@@ -898,8 +896,7 @@ void process_pbfile(int i_pb) {
    clock_t start_t, end_t, method_start, method_end;
    start_t = end_t = method_start = method_end = clock();
 
-   IntArray diff_file_times;
-   int diff_file_time_count;
+   IntArray unique_msg_ut;
    StringArray variables_big_nlevels;
    static const char *method_name_s = "process_pbfile()";
    static const char *method_name = "process_pbfile() -> ";
@@ -936,7 +933,7 @@ void process_pbfile(int i_pb) {
    if(dump_flag) {
 
       // Check for multiple PrepBufr files
-      if(pbfile.n_elements() > 1) {
+      if(pbfile.n() > 1) {
          mlog << Error << "\n" << method_name
               << "the \"-dump\" and \"-pbfile\" options may not be "
               << "used together.  Only one Bufr file may be dump "
@@ -946,16 +943,12 @@ void process_pbfile(int i_pb) {
 
       unit = dump_unit+i_pb;
       prefix = get_short_name(pbfile[i_pb].c_str());
-      dump_pb_data((dump_unit+i_pb), prefix, blk_file, method_name);
+      dump_pb_data((dump_unit+i_pb), prefix, blk_file, method_name_s);
    }
-
 
    // Open the blocked temp PrepBufr file for reading
    unit = file_unit + i_pb;
-   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
-      mlog << Error << "\n" << method_name
-           << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
-   }
+   check_fortran_file_id(unit, method_name_s);
    openpb_(blk_file.c_str(), &unit);
 
    // Compute the number of PrepBufr records in the current file.
@@ -1074,15 +1067,14 @@ void process_pbfile(int i_pb) {
    cape_h = pbl_h = 0;
    cape_p = pbl_p = bad_data_float;
 
-   diff_file_time_count = 0;
    cycle_minute = missing_cycle_minute;     // initialize
 
-   // Derive quantities which can be derived from
-   // P, Q, T, Z, U, V
+   // Check the number of variables to be derived from:
+   //   P, Q, T, Z, U, V
    if (n_derive_gc > bufr_derive_cfgs.size()) {
-      mlog << Debug(3) << "\n" << method_name
-           << "Skip the derived variables because of not requested ("
-           << bufr_derive_cfgs.size() << ").\n\n";
+      mlog << Debug(3) << method_name
+           << "No observation variables requested to be derived ("
+           << bufr_derive_cfgs.size() << ").\n";
    }
 
    for (int idx=0; idx<OBS_ARRAY_LEN; idx++) obs_arr[idx] = 0;
@@ -1096,8 +1088,7 @@ void process_pbfile(int i_pb) {
             showed_progress = true;
             if(mlog.verbosity_level() >= debug_level_for_performance) {
                end_t = clock();
-               cout << (end_t-start_t)/double(CLOCKS_PER_SEC)
-                         << " seconds\n";
+               cout << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds\n";
                start_t = clock();
             }
          }
@@ -1156,10 +1147,10 @@ void process_pbfile(int i_pb) {
               << " to " << end_time_str << "\n";
 
       }
-      else if(file_ut != msg_ut) {
-         diff_file_time_count++;
-         if (!diff_file_times.has(msg_ut)) diff_file_times.add(msg_ut);
-      }
+
+      // Keep track of the unique message reference times,
+      // searching from newest to oldest
+      unique_msg_ut.add_uniq(msg_ut, false);
 
       // Add minutes by calling IUPVS01(unit, "MINU")
       if (cycle_minute != missing_cycle_minute) {
@@ -1809,7 +1800,7 @@ void process_pbfile(int i_pb) {
          int n_other_file_obs  = 0;
          int n_other_total_obs = 0;
          int n_other_hdr_obs   = 0;
-         int var_count = bufr_obs_name_arr.n_elements();
+         int var_count = bufr_obs_name_arr.n();
          for (int vIdx=0; vIdx<var_count; vIdx++) {
             int nlev2;
             ConcatString var_name;
@@ -1987,27 +1978,34 @@ void process_pbfile(int i_pb) {
       if(mlog.verbosity_level() >= debug_level_for_performance) {
          end_t = clock();
          log_message << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds";
-         //start_t = clock();
       }
       cout << log_message << "\n";
    }
 
-   if(0 < diff_file_time_count && 0 < diff_file_times.n_elements()) {
-      mlog << Warning << "\n" << method_name
-           << "The observation time should remain the same for "
-           << "all " << (is_prepbufr ? "PrepBufr" : "Bufr") << " messages\n";
-      mlog << Warning << method_name << "   "
-           << diff_file_time_count << " messages with different reference time ("
-           << unix_to_yyyymmdd_hhmmss(file_ut) << "):\n";
-      for (int idx=0; idx<diff_file_times.n_elements(); idx++) {
-         mlog << Warning << method_name << "\t- "
-              << unix_to_yyyymmdd_hhmmss(diff_file_times[idx]) << "\n";
+   // Log information about multiple message reference times
+   if(unique_msg_ut.n() > 1) {
+
+      ConcatString msg_cs;
+      msg_cs << "Found " << unique_msg_ut.n() << " unique "
+             << (is_prepbufr ? "PrepBufr" : "Bufr")
+             << " message reference time(s) from "
+             << unix_to_yyyymmdd_hhmmss(unique_msg_ut.min()) << " to "
+             << unix_to_yyyymmdd_hhmmss(unique_msg_ut.max()) << ".\n";
+
+      // Print warning if the time window was not defined on the command line
+      if(valid_beg_ut == (unixtime) 0 &&
+         valid_end_ut == (unixtime) 0) {
+         mlog << Warning << "\n" << method_name
+              << msg_cs << "\n"
+              << R"(Set the "-valid_beg" and/or "-valid_end" )"
+              << "command line options to define the retention "
+              << "time window.\n\n";
       }
-      mlog << Warning << "\n";
+      else {
+         mlog << Debug(3) << msg_cs;
+      }
    }
    nc_point_obs.write_observation();
-
-   if(mlog.verbosity_level() > 0) cout << "\n" << flush;
 
    mlog << Debug(2)
         << "Messages processed\t\t\t= " << npbmsg << "\n"
@@ -2039,7 +2037,7 @@ void process_pbfile(int i_pb) {
    if (cal_cape) {
       mlog << Debug(3) << "\nDerived CAPE = " << cape_count
            << "\tZero = " << cape_cnt_zero_values
-           << "\n\tnot derived: No cape inputs = " << (cape_cnt_no_levels)
+           << "\n\tnot derived: No cape inputs = " << cape_cnt_no_levels
            << "\tNo vertical levels = " << cape_cnt_surface_msgs
            << "\n\tfiltered: " << cape_cnt_missing_values << ", "
            << cape_cnt_too_big
@@ -2072,7 +2070,7 @@ void process_pbfile(int i_pb) {
       int debug_level = 5;
       if(mlog.verbosity_level() >= debug_level) {
          log_message = "Filtered time:";
-         for (kk=0; kk<filtered_times.n_elements();kk++) {
+         for (kk=0; kk<filtered_times.n();kk++) {
             log_message.add((0 == (kk % 3)) ? "\n\t" : "  ");
             log_message.add(unix_to_yyyymmdd_hhmmss(filtered_times[kk]));
          }
@@ -2143,18 +2141,12 @@ void process_pbfile_metadata(int i_pb) {
    pblock(file_name.c_str(), blk_file.c_str(), Action::block);
 
    unit = dump_unit + i_pb + file_unit;
-   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
-      mlog << Error << "\n" << method_name << " -> "
-           << "Invalid file ID [" << unit << "] between 1 and 99 for BUFR table.\n\n";
-   }
+   check_fortran_file_id(unit, method_name);
    get_variable_info(blk_file, unit);
 
    // The input PrepBufr file is blocked already.
    unit = dump_unit + i_pb;
-   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
-      mlog << Error << "\n" << method_name << " -> "
-           << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
-   }
+   check_fortran_file_id(unit, method_name);
 
    // Compute the number of PrepBufr records in the current file.
    numpbmsg_new_(blk_file.c_str(), &unit, &npbmsg);
@@ -2201,7 +2193,7 @@ void process_pbfile_metadata(int i_pb) {
 
    StringArray unchecked_var_list;
    if (check_all) {
-      for(i=0; i<tableB_vars.n_elements(); i++) {
+      for(i=0; i<tableB_vars.n(); i++) {
          if (!headers.has(tableB_vars[i]) && check_all) {
             unchecked_var_list.add(tableB_vars[i]);
          }
@@ -2258,7 +2250,7 @@ void process_pbfile_metadata(int i_pb) {
          if (is_prepbufr_hdr) {
             tmp_hdr_array.clear();
             tmp_hdr_array.parse_wsss(prepbufr_hdrs_str);
-            for (index=0; index<tmp_hdr_array.n_elements(); index++) {
+            for (index=0; index<tmp_hdr_array.n(); index++) {
                if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
             }
          }
@@ -2270,7 +2262,7 @@ void process_pbfile_metadata(int i_pb) {
             if (0 < nlev) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(bufr_avail_sid_names);
-               for (index=0; index<tmp_hdr_array.n_elements(); index++) {
+               for (index=0; index<tmp_hdr_array.n(); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
                      var_name = tmp_hdr_array[index];
                      if (!bufr_hdr_name_arr.has(var_name, false)) bufr_hdr_name_arr.add(var_name);
@@ -2288,7 +2280,7 @@ void process_pbfile_metadata(int i_pb) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(bufr_avail_latlon_names);
                var_name = default_lon_name;
-               for (index=0; index<(tmp_hdr_array.n_elements()/2); index++) {
+               for (index=0; index<(tmp_hdr_array.n()/2); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
                      var_name = tmp_hdr_array[index];
                      if (!bufr_hdr_name_arr.has(var_name, false)) bufr_hdr_name_arr.add(var_name);
@@ -2299,7 +2291,7 @@ void process_pbfile_metadata(int i_pb) {
                hdr_name_str.add(var_name);
 
                var_name = default_lat_name;
-               for (index=(tmp_hdr_array.n_elements()/2); index<tmp_hdr_array.n_elements(); index++) {
+               for (index=(tmp_hdr_array.n()/2); index<tmp_hdr_array.n(); index++) {
                   if (bufr_obs[0][index] < r8bfms) {
                      var_name = tmp_hdr_array[index];
                      if (!bufr_hdr_name_arr.has(var_name, false)) bufr_hdr_name_arr.add(var_name);
@@ -2324,7 +2316,7 @@ void process_pbfile_metadata(int i_pb) {
                time_hdr_names.add(event_members[index]);
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(event_members[index]);
-               for (index=0; index<tmp_hdr_array.n_elements(); index++) {
+               for (index=0; index<tmp_hdr_array.n(); index++) {
                   if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
             }
@@ -2332,7 +2324,7 @@ void process_pbfile_metadata(int i_pb) {
                time_hdr_names.add(default_ymd_name);
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(default_ymd_name);
-               for (index=0; index<tmp_hdr_array.n_elements(); index++) {
+               for (index=0; index<tmp_hdr_array.n(); index++) {
                   if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
             }
@@ -2342,7 +2334,7 @@ void process_pbfile_metadata(int i_pb) {
                time_hdr_names.add(event_members[index]);
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(event_members[index]);
-               for (index=0; index<tmp_hdr_array.n_elements(); index++) {
+               for (index=0; index<tmp_hdr_array.n(); index++) {
                   if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
             }
@@ -2351,7 +2343,7 @@ void process_pbfile_metadata(int i_pb) {
                time_hdr_names.add(" SECO");
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(event_members[index]);
-               for (index=0; index<tmp_hdr_array.n_elements(); index++) {
+               for (index=0; index<tmp_hdr_array.n(); index++) {
                   if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
                if (!bufr_hdr_name_arr.has("SECO")) bufr_hdr_name_arr.add("SECO");
@@ -2360,7 +2352,7 @@ void process_pbfile_metadata(int i_pb) {
                time_hdr_names.add(default_hms_name);
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(default_hms_name);
-               for (index=0; index<tmp_hdr_array.n_elements(); index++) {
+               for (index=0; index<tmp_hdr_array.n(); index++) {
                   if (!bufr_hdr_name_arr.has(tmp_hdr_array[index], false)) bufr_hdr_name_arr.add(tmp_hdr_array[index]);
                }
             }
@@ -2379,14 +2371,14 @@ void process_pbfile_metadata(int i_pb) {
 
          if (check_all) {
             // Remove variables for headers
-            for (index=0; index<bufr_hdr_name_arr.n_elements(); index++) {
+            for (index=0; index<bufr_hdr_name_arr.n(); index++) {
                if (unchecked_var_list.has(bufr_hdr_name_arr[index], var_index, false)) {
                   unchecked_var_list.shift_down(var_index, 1);
                }
             }
          }
          else {
-            for (index=0; index<bufr_target_variables.n_elements(); index++) {
+            for (index=0; index<bufr_target_variables.n(); index++) {
                const string bufr_var_name = bufr_target_variables[index].c_str();
                if (!tableB_vars.has(bufr_var_name) && !prepbufr_derive_vars.has(bufr_var_name)) {
                   mlog << Error << "\n" << method_name << " -> variable \""
@@ -2401,9 +2393,9 @@ void process_pbfile_metadata(int i_pb) {
          }
       } // if (0 == i_read)
 
-      if (0 == unchecked_var_list.n_elements()) break;
+      if (0 == unchecked_var_list.n()) break;
 
-      int var_count = unchecked_var_list.n_elements();
+      int var_count = unchecked_var_list.n();
       for (int vIdx=var_count-1; vIdx>=0; vIdx--) {
          int nlev2, count;
          bool has_valid_data;
@@ -2454,7 +2446,7 @@ void process_pbfile_metadata(int i_pb) {
    bool has_prepbufr_vars = false;
    const char * tmp_var_name;
    bufr_obs_name_arr.clear();
-   for (index=0; index<prepbufr_vars.n_elements(); index++) {
+   for (index=0; index<prepbufr_vars.n(); index++) {
       tmp_var_name = prepbufr_vars[index].c_str();
       if (do_all_vars || bufr_target_variables.has(tmp_var_name, false)) {
          if (tableB_vars.has(tmp_var_name)) {
@@ -2467,7 +2459,7 @@ void process_pbfile_metadata(int i_pb) {
    }
    bufr_derive_cfgs.clear();
    if (has_prepbufr_vars) {
-      for (int vIdx=0; vIdx< prepbufr_derive_vars.n_elements(); vIdx++) {
+      for (int vIdx=0; vIdx< prepbufr_derive_vars.n(); vIdx++) {
          tmp_var_name = prepbufr_derive_vars[vIdx].c_str();
          bufr_derive_cfgs.push_back(derive_var_cfg(tmp_var_name));
          if (do_all_vars || bufr_target_variables.has(tmp_var_name)) {
@@ -2478,7 +2470,7 @@ void process_pbfile_metadata(int i_pb) {
          }
       }
    }
-   for (i=0; i<tmp_bufr_obs_name_arr.n_elements(); i++) {
+   for (i=0; i<tmp_bufr_obs_name_arr.n(); i++) {
       if (!bufr_obs_name_arr.has(tmp_bufr_obs_name_arr[i], false)) {
          bufr_obs_name_arr.add(tmp_bufr_obs_name_arr[i]);
       }
@@ -2511,11 +2503,13 @@ void write_netcdf_hdr_data() {
 
    // Check for no messages retained
    if(dim_count <= 0) {
-      mlog << Error << "\n" << method_name << "-> "
-           << "No PrepBufr messages retained.  Nothing to write.\n\n";
+      mlog << Warning << "\n" << method_name << "-> "
+           << "No PrepBufr messages retained.  No output file written.\n\n";
+
       // Delete the NetCDF file
       remove_temp_file(ncfile);
-      exit(1);
+
+      return;
    }
 
    nc_point_obs.get_obs_vars()->attr_pb2nc = true;
@@ -2534,7 +2528,7 @@ void write_netcdf_hdr_data() {
    StringArray nc_var_unit_arr;
    StringArray nc_var_desc_arr;
    map<ConcatString, ConcatString> obs_var_map = conf_info.getObsVarMap();
-   for(int i=0; i<bufr_obs_name_arr.n_elements(); i++) {
+   for(int i=0; i<bufr_obs_name_arr.n(); i++) {
       int var_index;
       string var_name;
       ConcatString unit_str, desc_str;
@@ -2740,7 +2734,7 @@ void dbl2str(double *d, ConcatString & str) {
 bool keep_message_type(const char *mt_str) {
    bool keep = false;
 
-   keep = conf_info.message_type.n_elements() == 0 ||
+   keep = conf_info.message_type.n() == 0 ||
           conf_info.message_type.has(mt_str, false);
 
    return keep;
@@ -2750,7 +2744,7 @@ bool keep_message_type(const char *mt_str) {
 
 bool keep_station_id(const char *sid_str) {
 
-   return(conf_info.station_id.n_elements() == 0 ||
+   return(conf_info.station_id.n() == 0 ||
           conf_info.station_id.has(sid_str, false));
 }
 
@@ -2780,35 +2774,35 @@ bool keep_valid_time(const unixtime ut,
 
 bool keep_pb_report_type(int type) {
 
-   return(conf_info.pb_report_type.n_elements() == 0 ||
+   return(conf_info.pb_report_type.n() == 0 ||
           conf_info.pb_report_type.has(type, false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool keep_in_report_type(int type) {
-   return(conf_info.in_report_type.n_elements() == 0 ||
+   return(conf_info.in_report_type.n() == 0 ||
           conf_info.in_report_type.has(type, false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool keep_instrument_type(int type) {
-   return(conf_info.instrument_type.n_elements() == 0 ||
+   return(conf_info.instrument_type.n() == 0 ||
           conf_info.instrument_type.has(type, false));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool keep_bufr_obs_index(int code) {
-   return(code >= 0 && (do_all_vars || code < bufr_target_variables.n_elements()));
+   return(code >= 0 && (do_all_vars || code < bufr_target_variables.n()));
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 
 bool keep_level_category(int category) {
-   return(conf_info.level_category.n_elements() == 0 ||
+   return(conf_info.level_category.n() == 0 ||
           conf_info.level_category.has(category, false));
 }
 
@@ -2822,7 +2816,7 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
    switch(gc) {
 
       // Pressure Reduced to Mean Sea Level
-      case(prmsl_grib_code):
+      case prmsl_grib_code:
          p      = (double) pqtzuv[0];
          t      = (double) pqtzuv[2];
          z      = (double) pqtzuv[3];
@@ -2833,14 +2827,14 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
          break;
 
       // Humidity mixing ratio
-      case(mixr_grib_code):
+      case mixr_grib_code:
          q      = (double) pqtzuv[1];
          qty    = pqtzuv_qty[1];
          result = (float) convert_q_to_w(q);
          break;
 
       // Dewpoint temperature: derived from p and q
-      case(dpt_grib_code):
+      case dpt_grib_code:
          p      = (double) pqtzuv[0];
          q      = (double) pqtzuv[1];
          qty    = pqtzuv_qty[0];
@@ -2851,7 +2845,7 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
          break;
 
       // Relative humidity
-      case(rh_grib_code):
+      case rh_grib_code:
          p      = (double) pqtzuv[0];
          q      = (double) pqtzuv[1];
          t      = (double) pqtzuv[2];
@@ -2862,7 +2856,7 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
          break;
 
       // Wind direction (direction wind is coming from): derived from u and v
-      case(wdir_grib_code):
+      case wdir_grib_code:
          u      = (double) pqtzuv[4];
          v      = (double) pqtzuv[5];
          qty    = pqtzuv_qty[4];
@@ -2871,7 +2865,7 @@ float derive_grib_code(int gc, float *pqtzuv, float *pqtzuv_qty,
          break;
 
       // Wind speed: derived from u and v
-      case(wind_grib_code):
+      case wind_grib_code:
          u      = (double) pqtzuv[4];
          v      = (double) pqtzuv[5];
          qty    = pqtzuv_qty[4];
@@ -2895,8 +2889,8 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
    ConcatString description;
    ConcatString line_buf;
 
-   mlog << Debug(1) << "\n   Header variables (" << hdr_arr.n_elements() << ") :\n";
-   for(i=0; i<hdr_arr.n_elements(); i++) {
+   mlog << Debug(1) << "\n   Header variables (" << hdr_arr.n() << ") :\n";
+   for(i=0; i<hdr_arr.n(); i++) {
       if (all_vars.has(hdr_arr[i], index, false)) {
          description = all_descs[index];
       }
@@ -2907,10 +2901,10 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
       mlog << Debug(1) << line_buf;
    }
 
-   mlog << Debug(1) << "\n   Observation variables (" << obs_arr.n_elements()
+   mlog << Debug(1) << "\n   Observation variables (" << obs_arr.n()
         << ")  Name: Description                       Types:\n";
 
-   for(i=0; i<obs_arr.n_elements(); i++) {
+   for(i=0; i<obs_arr.n(); i++) {
       if (all_vars.has(obs_arr[i], index, false)) {
          description = all_descs[index];
       }
@@ -2921,7 +2915,7 @@ void display_bufr_variables(const StringArray &all_vars, const StringArray &all_
          ConcatString message_types;
          StringArray typeArray = variableTypeMap[obs_arr[i]];
 
-         int type_cnt = typeArray.n_elements();
+         int type_cnt = typeArray.n();
          for (int ii=0; ii<type_cnt; ii++) {
             if (message_types.nonempty()) message_types.add(" ");
             message_types.add(typeArray[ii]);
@@ -3130,8 +3124,10 @@ float compute_pbl(map<float, float*> pqtzuv_map_tq,
             selected_levels.add(nint(pqtzuv[0]));
          }
          if (start_offset > 0) {
-            // Replace the interpolated records with common records.
-            mlog << Error << "\n" << method_name  << "Excluded " << start_offset << " records\n";
+
+            // Replace the interpolated records with common records
+            mlog << Debug(5) << method_name  << "Excluded " << start_offset << " records\n";
+
             // Find vertical levels with both data
             float highest_pressure = bad_data_float;
             for (it = pqtzuv_map_tq.begin(); it!=pqtzuv_map_tq.end(); ++it) {
@@ -3318,8 +3314,8 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
    if ((nint(prev_pqtzuv[0]) == nint(cur_pqtzuv[0]))
        || (nint(next_pqtzuv[0]) == nint(cur_pqtzuv[0]))
        || (nint(prev_pqtzuv[0]) == nint(next_pqtzuv[0]))) {
-      mlog << Error << "\n" << method_name
-           << "  Can't interpolate because of same pressure levels. prev: "
+      mlog << Debug(9) << method_name
+           << "  can't interpolate because of same pressure levels. prev: "
            << prev_pqtzuv[0] << ", cur: " << cur_pqtzuv[0]
            << ", next: " <<  prev_pqtzuv[0] << "\n\n";
    }
@@ -3355,6 +3351,16 @@ void interpolate_pqtzuv(float *prev_pqtzuv, float *cur_pqtzuv, float *next_pqtzu
 
 static bool is_valid_pb_data(float pb_value) {
    return (!is_bad_data(pb_value) && pb_value < r8bfms);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void check_fortran_file_id(const int unit, const char *method_name) {
+   if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
+      mlog << Error << "\n" << method_name << " -> "
+           << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
+      exit(1);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3448,7 +3454,7 @@ void log_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       log_array.add(buf.c_str());
    }
    offset = 0;
-   for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
+   for (int idx=log_array.n()-1; idx>=0; idx--) {
       mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "TQZ record: "
            << offset++ << "\t" << log_array[idx] << "\n";
    }
@@ -3462,7 +3468,7 @@ void log_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
       log_array.add(buf.c_str());
    }
    offset = 0;
-   for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
+   for (int idx=log_array.n()-1; idx>=0; idx--) {
       mlog << Debug(PBL_DEBUG_LEVEL) << method_name << " UV record: "
            << offset++ << "\t" << log_array[idx] << "\n";
    }
@@ -3495,7 +3501,7 @@ void log_merged_tqz_uv(map<float, float*> pqtzuv_map_tq,
       log_array.add(buf.c_str());
    }
    int offset = 0;
-   for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
+   for (int idx=log_array.n()-1; idx>=0; idx--) {
       mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "    merged: "
            << offset++ << "\t" << log_array[idx] << "\n";
    }
@@ -3522,7 +3528,7 @@ void log_pbl_input(int pbl_level, const char *method_name) {
    int offset = 0;
    mlog << Debug(PBL_DEBUG_LEVEL) << method_name
         << "input to calpbl_ (buffer): index, P, Q, T, Z, U, V\n";
-   for (int idx=log_array.n_elements()-1; idx>=0; idx--) {
+   for (int idx=log_array.n()-1; idx>=0; idx--) {
       mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "  "
            << offset++ << "\t" << log_array[idx] << "\n";
    }
