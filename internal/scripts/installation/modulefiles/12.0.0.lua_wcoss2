@@ -8,7 +8,6 @@ local pkgNameVer = myModuleFullName()
 local hierA        = hierarchyA(pkgNameVer,1)
 local compNameVer  = hierA[1]
 
-
 conflict(pkgName)
 
 local opt = os.getenv("HPC_OPT") or os.getenv("OPT") or "/opt/modules"
@@ -20,8 +19,10 @@ prepend_path("PATH", pathJoin(base,"bin"))
 setenv("MET_ROOT", base)
 setenv("MET_BASE", pathJoin(base, "share", "met"))
 setenv("MET_VERSION", pkgVersion)
+setenv("MET_PYTHON_EXE","/apps/dev/ve/evs/2.0/bin/python")
 
 whatis("Name: ".. pkgName)
 whatis("Version: " .. pkgVersion)
 whatis("Category: applications")
 whatis("Description: Model Evaluation Tools (MET)")
+
