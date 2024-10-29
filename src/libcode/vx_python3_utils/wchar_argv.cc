@@ -146,35 +146,28 @@ for (int j=0; j<(a.n()); ++j)  {
 
 int N = len + a.n();
 
-char * s = new char [N];
-
-char ** av = new char * [a.n()];
-
-memset(s, 0, N);
+vector<char> s(N, 0);
+vector<char *> av(a.n(), nullptr);
 
 for (int j=0; j<(a.n()); ++j)  {
-
-   av[j] = s + k;
 
    c = a[j].c_str();
 
    len = c.length();
 
-   m_strncpy(s + k, c.text(), len, method_name);
+   m_strncpy(s.data() + k, c.text(), len, method_name);
+
+   av[j] = s.data() + k;
 
    k += (len + 1);
 
 }
 
-set(a.n(), av);
+set(a.n(), av.data());
 
    //
    //  done
    //
-
-if ( s )  { delete [] s;  s = nullptr; }
-
-if ( av )  { delete [] av;  av = nullptr; }
 
 return;
 
@@ -191,8 +184,6 @@ void Wchar_Argv::set(int _argc, char ** _argv)
 clear();
 
 int k;
-int *len = new int [_argc];
-
 
 Argc = _argc;
 
@@ -201,13 +192,14 @@ Argc = _argc;
    //
 
 int argv_len = 0;
+vector<int> len(_argc, 0);
 
 for (int j=0; j<_argc; ++j)  {
 
    // we're using the len array here because
    // we don't want to call m_strlen more than
    // once on each argv value
-   len[j] = (_argv == nullptr) ? 0 : len[j] = m_strlen(_argv[j]);
+   if (_argv) len[j] = m_strlen(_argv[j]);
 
    argv_len += len[j];
 
@@ -275,8 +267,6 @@ for (int j=0; j<Argc; ++j)  {
    //
    //  done
    //
-
-if ( len )  { delete [] len;  len = nullptr; }
 
 return;
 
