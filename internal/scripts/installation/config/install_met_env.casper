@@ -1,9 +1,14 @@
 module load ncarenv/23.10
-module load intel-classic/2023.2.1
+module load intel-oneapi/2023.2.1
 module load cmake/3.26.3
 
+export CC=`which icx`
+export CXX=`which icpx`
+export FC=`which ifx`
+export F77=`which ifx`
+export F90=`which ifx`
 export TEST_BASE=/glade/work/dtcrt/METplus/casper/components/MET/installations/12.0.0
-export COMPILER=intel-classic_2023.2.1
+export COMPILER=intel-oneapi_2023.2.1
 export MET_SUBDIR=${TEST_BASE}
 export MET_TARBALL=v12.0.0.tar.gz
 export USE_MODULES=TRUE
