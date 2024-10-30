@@ -11,7 +11,7 @@ proc ModulesHelp { } {
 # The intel compiler is required to run MET
 
 module load ncarenv/23.10
-module load intel-classic/2023.2.1
+module load intel-oneapi/2023.2.1
 
 set base /glade/work/dtcrt/METplus/casper/components/MET/installations/12.0.0
 set ver  12.0.0
