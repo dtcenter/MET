@@ -127,7 +127,7 @@ GRIB1
 125 128 7 -1 "VFLX" "Momentum flux, v component" "N/m^2"
 126 128 7 -1 "WMIXE" "Wind mixing energy" "J"
 127 128 7 -1 "IMGD" "Image data" ""
-128 7 -1 128 7 -1 "AVDEPTH" "Ocean depth - mean" "m"
+128 128 7 -1 "AVDEPTH" "Ocean depth - mean" "m"
 129 128 7 -1 "DEPTH" "Ocean depth - instantaneous" "m"
 130 128 7 -1 "ELEV" "Ocean surface elevation relative to geoid" "m"
 131 128 7 -1 "MXEL24" "Max ocean surface elevation inlast 24 hours" "m"
