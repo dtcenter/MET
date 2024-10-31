@@ -129,7 +129,7 @@ GRIB1
 127 130 7 -1 "IMGD" "Image data" ""
 128 130 7 -1 "var128" "undefined" ""
 129 130 7 -1 "var129" "undefined" ""
-130 7 -1 130 7 -1 "var130" "undefined" ""
+130 130 7 -1 "var130" "undefined" ""
 131 130 7 -1 "var131" "undefined" ""
 132 130 7 -1 "var132" "undefined" ""
 133 130 7 -1 "var133" "undefined" ""

@@ -139,7 +139,7 @@ GRIB1
 137 140 7 -1 "var137" "undefined" ""
 138 140 7 -1 "var138" "undefined" ""
 139 140 7 -1 "var139" "undefined" ""
-140 7 -1 140 7 -1 "var140" "undefined" ""
+140 140 7 -1 "var140" "undefined" ""
 141 140 7 -1 "var141" "undefined" ""
 142 140 7 -1 "var142" "undefined" ""
 143 140 7 -1 "var143" "undefined" ""
