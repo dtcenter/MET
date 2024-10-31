@@ -60,7 +60,7 @@ GRIB1
 58 128 98 -1 "PAR" "Photosynthetically active radiation at the surface" "w/m^2*s"
 59 128 98 -1 "CAPE" "Convective available potential energy" "J/kg"
 60 128 98 -1 "PV" "Potential vorticity" "K*m^2/(kg*s)"
-61 128 98 -1 "var61" "undefined" ""s
+61 128 98 -1 "var61" "undefined" ""
 62 128 98 -1 "OBCT" "Observation count" ""
 63 128 98 -1 "var63" "Start time for skin temperature difference" "s"
 64 128 98 -1 "var64" "Finish time for skin temperature difference" "s"
