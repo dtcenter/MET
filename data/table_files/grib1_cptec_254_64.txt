@@ -40,7 +40,7 @@ GRIB1
 38 254 46 -1 "sgvv" "SIGMA COORD VERT VEL" "sec/sec"
 39 254 46 -1 "omeg" "OMEGA" "Pa/s"
 40 254 46 -1 "omg2" "VERTICAL VELOCITY" "m/s"
-41 254 46 -1 "abvo" "ABSOLUTE VORTICITY       " "10^5/sec"
+41 254 46 -1 "abvo" "ABSOLUTE VORTICITY" "10^5/sec"
 42 254 46 -1 "abdv" "ABSOLUTE DIVERGENCE" "10^5/sec"
 43 254 46 -1 "vort" "VORTICITY " "1/s"
 44 254 46 -1 "divg" "DIVERGENCE" "1/s"
