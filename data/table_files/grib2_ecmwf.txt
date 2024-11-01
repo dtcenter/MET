@@ -2133,7 +2133,7 @@ GRIB2
 192 0 0 255 98 0 210 90 "ocfire" "Wildfire flux of Organic Carbon" "kg/m^2/s"
 192 0 0 255 98 0 217 63 "oclo" "Chlorine dioxide" "kg/kg"
 192 0 0 255 98 0 210 57 "ocnuc" "Mixing ration of organic carbon aerosol" "kg/kg"
-192 0 0 255 98 0 150 131 "ocpd" "Ocean potential density" "kg/m^3_-1000"
+192 0 0 255 98 0 150 131 "ocpd" "Ocean potential density" "kg/m^3-1000"
 192 0 0 255 98 0 150 129 "ocpt" "Ocean potential temperature" "deg"
 192 0 0 255 98 0 150 130 "ocs" "Ocean salinity" "psu"
 192 0 0 255 98 0 217 190 "ocs_c" "Carbonyl sulfide" "kg/kg"

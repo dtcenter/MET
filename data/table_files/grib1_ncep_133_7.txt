@@ -191,7 +191,7 @@ GRIB1
 189 133 7 -1 "var189" "undefined" ""
 190 133 7 -1 "var190" "undefined" ""
 191 133 7 -1 "SUNSD" "Sunshine Duration" "s"
-192 133 7 -1 "MOSF" "Meridional Overturning Stream Function" "106m^3s-1"
+192 133 7 -1 "MOSF" "Meridional Overturning Stream Function" "10^6m^3/s"
 193 133 7 -1 "EPSR" "Radiative emissivity" ""
 194 133 7 -1 "var194" "undefined" ""
 195 133 7 -1 "QZ0" "Specific humidity at top of viscous sublayer" "kg/kg"
