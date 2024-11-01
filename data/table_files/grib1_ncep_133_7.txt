@@ -3,7 +3,7 @@ GRIB1
 1 133 7 -1 "PRES" "Pressure" "Pa"
 2 133 7 -1 "PRMSL" "Pressure reduced to MSL" "Pa"
 3 133 7 -1 "PTEND" "Pressure tendency" "Pa/s"
-4 133 7 -1 "PVORT" "Potential vorticity" "K*m^2/(kg*s)"
+4 133 7 -1 "PVORT" "Potential vorticity" "K*m^2/kg/s"
 5 133 7 -1 "ICAHT" "ICAO Standard Atmosphere Reference Height" "m"
 6 133 7 -1 "GP" "Geopotential" "m^2/s^2"
 7 133 7 -1 "HGT" "Geopotential height" "gpm"

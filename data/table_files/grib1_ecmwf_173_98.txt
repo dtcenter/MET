@@ -211,7 +211,7 @@ GRIB1
 209 173 98 -1 "var209" "Top net thermal radiation, clear sky anomaly" "W/m^2"
 210 173 98 -1 "var210" "Surface net solar radiation, clear sky anomaly" "W/m^2"
 211 173 98 -1 "var211" "Surface net thermal radiation, clear sky anomaly" "W/m^2"
-212 173 98 -1 "var212" "Solar insolation anomaly" "W/(m^2*s)"
+212 173 98 -1 "var212" "Solar insolation anomaly" "W/m^2/s"
 213 173 98 -1 "var213" "undefined" ""
 214 173 98 -1 "var214" "undefined" ""
 215 173 98 -1 "var215" "undefined" ""

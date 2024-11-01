@@ -59,7 +59,7 @@ GRIB1
 57 200 98 -1 "UVB" "Downward UV radiation at the surface" "w/m^2*s"
 58 200 98 -1 "PAR" "Photosynthetically active radiation at the surface" "w/m^2*s"
 59 200 98 -1 "CAPE" "Convective available potential energy" "J/kg"
-60 200 98 -1 "PV" "Potential vorticity" "K*m^2/(kg*s)"
+60 200 98 -1 "PV" "Potential vorticity" "K*m^2/kg/s"
 61 200 98 -1 "TPO" "Total precipitation from observations" "Millimetres*100_+_number_of_stations"
 62 200 98 -1 "OBCT" "Observation count" ""
 63 200 98 -1 "var63" "Start time for skin temperature difference" "s"

@@ -82,7 +82,7 @@ GRIB1
 80 174 98 -1 "var80" "undefined" ""
 81 174 98 -1 "var81" "undefined" ""
 82 174 98 -1 "var82" "undefined" ""
-83 174 98 -1 "var83" "Net primary productivity" "kg*C/(m^2*s)"
+83 174 98 -1 "var83" "Net primary productivity" "kg*C/m^2/s"
 84 174 98 -1 "var84" "undefined" ""
 85 174 98 -1 "var85" "10m U wind over land" "m/s"
 86 174 98 -1 "var86" "10m V wind over land" "m/s"
