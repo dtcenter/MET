@@ -1686,9 +1686,9 @@ void usage() {
         << "\t\t   For \"data\" masking, threshold the values of "
         << "\"mask_field\".\n"
         << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, "
-        << "threshold the computed solar values.\n"
+        << "threshold the solar values in degrees.\n"
         << "\t\t   For \"solar_time\" masking, "
-        << "threshold the decimal hours of the solar day.\n"
+        << "threshold the solar time in decimal hours.\n"
         << "\t\t   For \"lat\" and \"lon\" masking, threshold the "
         << "latitude and longitude values.\n"
 

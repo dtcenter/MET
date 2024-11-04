@@ -51,7 +51,7 @@ Required Arguments for gen_vx_mask
 
 • For "grid" and "data" masking, specify a gridded data file.
 
-• For "solar_alt" and "solar_azi" masking, specify a gridded data file or a time string in YYYYMMDD[_HH[MMSS]] format.
+• For "solar_alt", "solar_azi", and "solar_time" masking, specify a gridded data file or a time string in YYYYMMDD[_HH[MMSS]] UTC format.
 
 • For "lat" and "lon" masking, no "mask_file" needed, simply repeat the path for "input_file".
 
@@ -78,7 +78,9 @@ Optional Arguments for gen_vx_mask
 
 • For "data" masking, threshold the values of "mask_field".
 
-• For "solar_alt" and "solar_azi" masking, threshold the computed solar values.
+• For "solar_alt" and "solar_azi" masking, threshold the computed solar degrees.
+
+• For "solar_time" masking, threshold the decimal solar hours of the day.
 
 • For "lat" and "lon" masking, threshold the latitude and longitude values. 
 
@@ -118,11 +120,13 @@ The Gen-Vx-Mask tool supports the following types of masking region definition s
 
 7. Data (**data**) masking reads an input gridded data file, extracts the field specified using the **-mask_field** command line option, thresholds the data using the **-thresh** command line option, and selects grid points which meet that threshold criteria. The option is useful when thresholding topography to define a mask based on elevation or when threshold land use to extract a particular category.
 
-8. Solar altitude (**solar_alt**) and solar azimuth (**solar_azi**) masking computes the solar altitude and azimuth values at each grid point for the time defined by the **mask_file** setting. **mask_file** may either be set to an explicit time string in YYYYMMDD[_HH[MMSS]] format or to a gridded data file. If set to a gridded data file, the **-mask_field** command line option specifies the field of data whose valid time should be used. If the **-thresh** command line option is not used, the raw solar altitude or azimuth value for each grid point will be written to the output. If it is used, the resulting binary mask field will be written. This option is useful when defining a day/night mask.
+8. Solar altitude (**solar_alt**) and solar azimuth (**solar_azi**) masking computes the solar altitude and azimuth values in degrees at each grid point for the time defined by the **mask_file** setting. **mask_file** may either be set to an explicit time string in YYYYMMDD[_HH[MMSS]] UTC format or to a gridded data file. If set to a gridded data file, the **-mask_field** command line option specifies the field of data whose valid time should be used. If the **-thresh** command line option is not used, the raw solar altitude or azimuth degrees for each grid point will be written to the output. If it is used, the resulting binary mask field will be written. This option is useful when defining a day/night mask.
 
-9. Latitude (**lat**) and longitude (**lon**) masking computes the latitude and longitude value at each grid point. This logic only requires the definition of the grid, specified by the **input_file**. Technically, the **mask_file** is not needed, but a value must be specified for the command line to parse correctly. Users are advised to simply repeat the **input_file** setting twice. If the **-thresh** command line option is not used, the raw latitude or longitude values for each grid point will be written to the output. This option is useful when defining latitude or longitude bands over which to compute statistics.
+9. Solar time (**solar_time**) masking computes the solar time in decimal hours at each grid point for the for the time defined by the **mask_file** setting, as described above. The solar hours of the day range from 0 to 24, with a value of 12 indicating solar noon. Note that solar time is based only on longitude. If the **-thresh** command line option is not used, the raw solar time hours will be written to the output.
 
-10. Shapefile (**shape**) masking uses closed polygons taken from an ESRI shapefile to define the masking region. Gen-Vx-Mask reads the shapefile with the ".shp" suffix and extracts the latitude and longitudes of the vertices. The shapefile must consist of closed polygons rather than polylines, points, or any of the other data types that shapefiles support. When the **-shape_str** command line option is used, Gen-Vx-Mask also reads metadata from the corresponding dBASE file with the ".dbf" suffix.
+10. Latitude (**lat**) and longitude (**lon**) masking computes the latitude and longitude value at each grid point. This logic only requires the definition of the grid, specified by the **input_file**. Technically, the **mask_file** is not needed, but a value must be specified for the command line to parse correctly. Users are advised to simply repeat the **input_file** setting twice. If the **-thresh** command line option is not used, the raw latitude or longitude values for each grid point will be written to the output. This option is useful when defining latitude or longitude bands over which to compute statistics.
+
+11. Shapefile (**shape**) masking uses closed polygons taken from an ESRI shapefile to define the masking region. Gen-Vx-Mask reads the shapefile with the ".shp" suffix and extracts the latitude and longitudes of the vertices. The shapefile must consist of closed polygons rather than polylines, points, or any of the other data types that shapefiles support. When the **-shape_str** command line option is used, Gen-Vx-Mask also reads metadata from the corresponding dBASE file with the ".dbf" suffix.
 
     Shapefiles usually contain more than one polygon, and the user must select which of these shapes should be used. The **-shapeno n** and **-shape_str name string** command line options enable the user to select one or more polygons from the shapefile. For **-shape n**, **n** is a comma-separated list of integer shape indices to be used. Note that these values are zero-based. So the first polygon in the shapefile is shape number 0, the second polygon in the shapefile is shape number 1, etc. For example, **-shapeno 0,1,2** uses the first three shapes in the shapefile. When multiple shapes are specified, the mask is defined as their union. So all grid points falling inside at least one of the specified shapes are included in the mask.
 
