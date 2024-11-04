@@ -49,31 +49,34 @@ static const char *program_name = "gen_vx_mask";
 
 enum class MaskType {
 
-   Poly,      // Polyline masking in lat/lon space
-   Poly_XY,   // Polyline masking in grid x/y space
+   Poly,       // Polyline masking in lat/lon space
+   Poly_XY,    // Polyline masking in grid x/y space
 
-   Box,       // Box masking type
-   Circle,    // Circle masking region
+   Box,        // Box masking type
+   Circle,     // Circle masking region
 
-   Track,     // Track masking region
-   Grid,      // Grid masking type
-   Data,      // Data masking type
+   Track,      // Track masking region
+   Grid,       // Grid masking type
+   Data,       // Data masking type
 
-   Solar_Alt, // Solar altitude masking type
-   Solar_Azi, // Solar azimuth masking type
+   Solar_Alt,  // Solar altitude masking type
+   Solar_Azi,  // Solar azimuth masking type
+   Solar_Time, // Solar time masking type
 
-   Lat,       // Latitude masking type
-   Lon,       // Longitude masking type
+   Lat,        // Latitude masking type
+   Lon,        // Longitude masking type
 
-   Shape,     // Shapefile
+   Shape,      // Shapefile
 
    None
 
 };
 
 extern bool is_solar_masktype(MaskType);
+extern bool is_thresh_masktype(MaskType);
 extern MaskType string_to_masktype(const char *);
 extern const char * masktype_to_string(MaskType);
+extern const char * masktype_to_description(MaskType);
 
 ////////////////////////////////////////////////////////////////////////
 //

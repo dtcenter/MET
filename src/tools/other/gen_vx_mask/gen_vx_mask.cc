@@ -31,6 +31,7 @@
 //   013    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   014    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files
 //   015    05/03/23  Halley Gotway   MET #1060 Support multiple shapes
+//   016    11/04/24  Halley Gotway   MET #2966 Add solar time option.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -160,8 +161,8 @@ void process_command_line(int argc, char **argv) {
      mlog << Error << "\n" << program_name << " -> "
           << "the -type command line requirement must be set to a specific masking type!\n"
           << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", "
-          << "\"data\", \"solar_alt\", \"solar_azi\", \"lat\", \"lon\" "
-          << "or \"shape\"" << "\n\n";
+          << "\"data\", \"solar_alt\", \"solar_azi\", \"solar_time\", "
+	  << "\"lat\", \"lon\", or \"shape\"\n\n";
      exit(1);
    }
    
@@ -325,6 +326,13 @@ void process_mask_file(DataPlane &dp) {
       exit(1);
    }
 
+   // Report the threshold 
+   if(is_thresh_masktype(mask_type)) {
+      mlog << Debug(2)
+           << masktype_to_description(mask_type)
+           << " Threshold:\t" << thresh.get_str() << "\n"; 
+   } 
+
    // Initialize the masking field, if needed
    if(dp.is_empty()) dp.set_size(grid.nx(), grid.ny());
 
@@ -361,6 +369,7 @@ void process_mask_file(DataPlane &dp) {
 
       case MaskType::Solar_Alt:
       case MaskType::Solar_Azi:
+      case MaskType::Solar_Time:
          apply_solar_mask(dp);
          break;
 
@@ -693,13 +702,15 @@ void apply_poly_mask(DataPlane & dp) {
 
    if(complement) {
       mlog << Debug(3)
-           << "Applying complement of polyline mask.\n";
+           << "Applying complement of the "
+           << masktype_to_string(mask_type) << " mask.\n";
    }
 
    // List number of points inside the mask
    mlog << Debug(3)
-        << "Polyline Masking:\t" << n_in << " of " << grid.nx() * grid.ny()
-        << " points inside\n";
+        << masktype_to_description(mask_type)
+        << " Masking:\t" << n_in << " of "
+        << grid.nxy() << " points inside\n";
 
    return;
 }
@@ -739,13 +750,15 @@ void apply_poly_xy_mask(DataPlane & dp) {
 
    if(complement) {
       mlog << Debug(3)
-           << "Applying complement of polyline XY mask.\n";
+           << "Applying complement of the "
+           << masktype_to_string(mask_type) << " mask.\n";
    }
 
    // List number of points inside the mask
    mlog << Debug(3)
-        << "Polyline XY Masking:\t" << n_in << " of " << grid.nx() * grid.ny()
-        << " points inside\n";
+        << masktype_to_description(mask_type)
+        << " Masking:\t" << n_in << " of "
+        << grid.nxy() << " points inside\n";
 
    return;
 }
@@ -814,13 +827,15 @@ void apply_box_mask(DataPlane &dp) {
 
    if(complement) {
       mlog << Debug(3)
-           << "Applying complement of box mask.\n";
+           << "Applying complement of the "
+           << masktype_to_string(mask_type) << " mask.\n";
    }
 
+   // List number of points inside the mask
    mlog << Debug(3)
-        << "Box Masking (" << height << " x " << width << "):\t"
-        << n_in << " of " << grid.nx() * grid.ny()
-        << " points inside\n";
+        << masktype_to_description(mask_type)
+        << " Masking (" << height << " x " << width << "):\t"
+       	<< n_in << " of " << grid.nxy() << " points inside\n";
 
    return;
 }
@@ -837,10 +852,10 @@ void apply_circle_mask(DataPlane &dp) {
 
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
-      mlog << Warning
-           << "\napply_circle_mask() -> since \"-thresh\" was not used "
-           << "to specify a threshold in kilometers for circle masking, "
-           << "the minimum distance to the points will be written.\n\n";
+      mlog << Debug(3)
+           << "Since \"-thresh\" was not used to specify a threshold "
+           << "in kilometers for circle masking, the minimum distance "
+           << "to the points will be written.\n";
    }
 
    // For each grid point, compute mimumum distance to polyline points
@@ -881,14 +896,16 @@ void apply_circle_mask(DataPlane &dp) {
 
    if(thresh.get_type() != thresh_na && complement) {
       mlog << Debug(3)
-           << "Applying complement of circle mask.\n";
+           << "Applying complement of the "
+           << masktype_to_string(mask_type) << " mask.\n";
    }
 
    // List the number of points inside the mask
    if(thresh.get_type() != thresh_na) {
       mlog << Debug(3)
-           << "Circle Masking:\t" << n_in << " of " << grid.nx() * grid.ny()
-           << " points inside\n";
+           << masktype_to_description(mask_type)
+           << " Masking:\t" << n_in << " of "
+           << grid.nxy() << " points inside\n";
    }
    // Otherwise, list the min/max distances computed
    else {
@@ -896,7 +913,8 @@ void apply_circle_mask(DataPlane &dp) {
       double dmax;
       dp.data_range(dmin, dmax);
       mlog << Debug(3)
-           << "Circle Masking:\tDistances ranging from "
+           << masktype_to_description(mask_type)
+           << " Masking:\tDistances ranging from "
            << dmin << " km to " << dmax << " km\n";
    }
 
@@ -915,10 +933,10 @@ void apply_track_mask(DataPlane &dp) {
 
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
-      mlog << Warning
-           << "\napply_track_mask() -> since \"-thresh\" was not used "
-           << "to specify a threshold for track masking, the minimum "
-           << "distance to the track will be written.\n\n";
+      mlog << Debug(3)
+           << "Since \"-thresh\" was not used to specify a threshold "
+           << "in kilometers for track masking, the minimum distance "
+           << "to the track will be written.\n";
    }
 
    // For each grid point, compute mimumum distance to track
@@ -962,21 +980,24 @@ void apply_track_mask(DataPlane &dp) {
 
    if(thresh.get_type() != thresh_na && complement) {
       mlog << Debug(3)
-           << "Applying complement of track mask.\n";
+           << "Applying complement of the "
+           << masktype_to_string(mask_type) << " mask.\n";
    }
 
    // List the number of points inside the mask
    if(thresh.get_type() != thresh_na) {
       mlog << Debug(3)
-           << "Track Masking:\t\t" << n_in << " of " << grid.nx() * grid.ny()
-           << " points inside\n";
+           << masktype_to_description(mask_type)
+           << " Masking:\t" << n_in << " of "
+           << grid.nxy() << " points inside\n";
    }
    // Otherwise, list the min/max distances computed
    else {
       double dmin, dmax;
       dp.data_range(dmin, dmax);
       mlog << Debug(3)
-           << "Track Masking:\t\tDistances ranging from "
+           << masktype_to_description(mask_type)
+           << " Masking:\tDistances ranging from "
            << dmin << " km to " << dmax << " km\n";
    }
 
@@ -1022,12 +1043,15 @@ void apply_grid_mask(DataPlane &dp) {
 
    if(complement) {
       mlog << Debug(3)
-           << "Applying complement of grid mask.\n";
+           << "Applying complement of the "
+           << masktype_to_string(mask_type) << " mask.\n";
    }
 
+   // List number of points inside the mask
    mlog << Debug(3)
-        << "Grid Masking:\t\t" << n_in << " of " << grid.nx() * grid.ny()
-        << " points inside\n";
+        << masktype_to_description(mask_type)
+        << " Masking:\t" << n_in << " of "
+        << grid.nxy() << " points inside\n";
 
    return;
 }
@@ -1040,15 +1064,16 @@ void apply_data_mask(DataPlane &dp) {
 
    // Nothing to do without a threshold
    if(thresh.get_type() == thresh_na) {
+      mlog << Debug(3)
+           << "Since \"-thresh\" was not used to specify a threshold "
+           << "in kilometers for data masking, the raw data values "
+           << "will be written.\n";
       double dmin, dmax;
       dp.data_range(dmin, dmax);
       mlog << Debug(3)
-           << "Data Masking:\t\tValues ranging from "
-           << dmin << " km to " << dmax << " km\n";
-      mlog << Warning
-           << "\napply_data_mask() -> since \"-thresh\" was not used "
-           << "to specify a threshold for data masking, the raw data "
-           << "values will be written.\n\n";
+           << masktype_to_description(mask_type)
+           << " Masking:\tValues ranging from "
+           << dmin << " to " << dmax << "\n";
       return;
    }
 
@@ -1083,10 +1108,11 @@ void apply_data_mask(DataPlane &dp) {
       } // end for y
    } // end for x
 
-   // List the number of points inside the mask
+   // List number of points inside the mask
    mlog << Debug(3)
-        << "Data Masking:\t\t" << n_in << " of " << grid.nx() * grid.ny()
-        << " points inside\n";
+        << masktype_to_description(mask_type)
+        << " Masking:\t" << n_in << " of "
+        << grid.nxy() << " points inside\n";
 
    return;
 }
@@ -1100,10 +1126,10 @@ void apply_solar_mask(DataPlane &dp) {
 
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
-      mlog << Warning
-           << "\napply_solar_mask() -> since \"-thresh\" was not used "
+      mlog << Debug(3)
+           << "Since \"-thresh\" was not used to specify a threshold, "
            << "the raw " << masktype_to_string(mask_type)
-           << " values will be written.\n\n";
+           << " values will be written.\n";
    }
 
    // Compute solar value for each grid point Lat/Lon
@@ -1114,9 +1140,15 @@ void apply_solar_mask(DataPlane &dp) {
          grid.xy_to_latlon(x, y, lat, lon);
          lon -= 360.0*floor((lon + 180.0)/360.0);
 
+         // Compute the solar time in hours
+         if(mask_type == MaskType::Solar_Time) {
+            v = solar_time(solar_ut, lon);
+         }
          // Compute the solar altitude and azimuth
-         solar_altaz(solar_ut, lat, lon, alt, azi);
-         v = (mask_type == MaskType::Solar_Alt ? alt : azi);
+         else {
+            solar_altaz(solar_ut, lat, lon, alt, azi);
+            v = (mask_type == MaskType::Solar_Alt ? alt : azi);
+         }
 
          // Apply threshold, if specified
          if(thresh.get_type() != thresh_na) {
@@ -1143,23 +1175,21 @@ void apply_solar_mask(DataPlane &dp) {
            << masktype_to_string(mask_type) << " mask.\n";
    }
 
-   const char *mask_str = (mask_type == MaskType::Solar_Alt ?
-                           "Altitude" : "Azimuth");
-
    // List the number of points inside the mask
    if(thresh.get_type() != thresh_na) {
       mlog << Debug(3)
-           << "Solar " << mask_str << " Masking:\t\t"
-           << n_in << " of " << grid.nx() * grid.ny()
-           << " points inside\n";
+           << masktype_to_description(mask_type)
+           << " Masking:\t" << n_in << " of "
+           << grid.nxy() << " points inside\n";
    }
    // Otherwise, list the min/max distances computed
    else {
       double dmin, dmax;
       dp.data_range(dmin, dmax);
       mlog << Debug(3)
-           << "Solar " << mask_str << " Masking:\t\t"
-           << "Values ranging from " << dmin << " to " << dmax << "\n";
+           << masktype_to_description(mask_type)
+           << " Masking:\tValues ranging from "
+           << dmin << " to " << dmax << "\n";
    }
 
    return;
@@ -1174,10 +1204,10 @@ void apply_lat_lon_mask(DataPlane &dp) {
 
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
-      mlog << Warning
-           << "\napply_lat_lon_mask() -> since \"-thresh\" was not used "
+      mlog << Debug(3)
+           << "Since \"-thresh\" was not used to specify a threshold, "
            << "the raw " << masktype_to_string(mask_type)
-           << " values will be written.\n\n";
+           << " values will be written.\n";
    }
 
    // Compute Lat/Lon value for each grid point
@@ -1214,21 +1244,20 @@ void apply_lat_lon_mask(DataPlane &dp) {
            << masktype_to_string(mask_type) << " mask.\n";
    }
 
-   const char *mask_str = (mask_type == MaskType::Lat ?
-                           "Latitude" : "Longitude");
-
    // List the number of points inside the mask
    if(thresh.get_type() != thresh_na) {
       mlog << Debug(3)
-           << mask_str << " Masking:\t\t" << n_in << " of "
-           << grid.nx() * grid.ny()<< " points inside\n";
+           << masktype_to_description(mask_type)
+	   << " Masking:\t" << n_in << " of "
+           << grid.nxy() << " points inside\n";
    }
    // Otherwise, list the min/max distances computed
    else {
       double dmin, dmax;
       dp.data_range(dmin, dmax);
       mlog << Debug(3)
-           << mask_str << " Masking:\t\tValues ranging from "
+           << masktype_to_description(mask_type)
+           << " Masking:\tValues ranging from "
            << dmin << " to " << dmax << "\n";
    }
 
@@ -1280,13 +1309,15 @@ void apply_shape_mask(DataPlane & dp) {
 
    if(complement) {
       mlog << Debug(3)
-           << "Applying complement of the shapefile mask.\n";
+           << "Applying complement of the "
+           << masktype_to_string(mask_type) << " mask.\n";
    }
 
    // List number of points inside the mask
    mlog << Debug(3)
-        << "Shape Masking:\t\t" << n_in << " of " << grid.nx() * grid.ny()
-        << " points inside\n";
+        << masktype_to_description(mask_type)
+        << " Masking:\t" << n_in << " of "
+        << grid.nxy() << " points inside\n";
 
    return;
 }
@@ -1365,7 +1396,7 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
       mlog << Debug(3)
            << "Mask " << setlogic_to_string(logic)
            << (logic == SetLogic::Intersection ? ":\t" : ":\t\t")
-           << n_in << " of " << grid.nx() * grid.ny()
+           << n_in << " of " << grid.nxy()
            << " points inside\n";
    }
 
@@ -1470,7 +1501,22 @@ void write_netcdf(const DataPlane &dp) {
 ////////////////////////////////////////////////////////////////////////
 
 bool is_solar_masktype(MaskType t) {
-   return(t == MaskType::Solar_Alt || t == MaskType::Solar_Azi);
+   return(t == MaskType::Solar_Alt ||
+          t == MaskType::Solar_Azi ||
+          t == MaskType::Solar_Time);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool is_thresh_masktype(MaskType t) { //circle,track,data,solar,lat,lon
+   return(t == MaskType::Circle     ||
+          t == MaskType::Track      ||
+          t == MaskType::Data       ||
+          t == MaskType::Solar_Alt  ||
+          t == MaskType::Solar_Azi  ||
+          t == MaskType::Solar_Time ||
+          t == MaskType::Lat        ||
+          t == MaskType::Lon);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1478,18 +1524,19 @@ bool is_solar_masktype(MaskType t) {
 MaskType string_to_masktype(const char *s) {
    MaskType t = MaskType::None;
 
-        if(strcasecmp(s, "poly")      == 0) t = MaskType::Poly;
-   else if(strcasecmp(s, "poly_xy")   == 0) t = MaskType::Poly_XY;
-   else if(strcasecmp(s, "box")       == 0) t = MaskType::Box;
-   else if(strcasecmp(s, "circle")    == 0) t = MaskType::Circle;
-   else if(strcasecmp(s, "track")     == 0) t = MaskType::Track;
-   else if(strcasecmp(s, "grid")      == 0) t = MaskType::Grid;
-   else if(strcasecmp(s, "data")      == 0) t = MaskType::Data;
-   else if(strcasecmp(s, "solar_alt") == 0) t = MaskType::Solar_Alt;
-   else if(strcasecmp(s, "solar_azi") == 0) t = MaskType::Solar_Azi;
-   else if(strcasecmp(s, "lat")       == 0) t = MaskType::Lat;
-   else if(strcasecmp(s, "lon")       == 0) t = MaskType::Lon;
-   else if(strcasecmp(s, "shape")     == 0) t = MaskType::Shape;
+        if(strcasecmp(s, "poly")       == 0) t = MaskType::Poly;
+   else if(strcasecmp(s, "poly_xy")    == 0) t = MaskType::Poly_XY;
+   else if(strcasecmp(s, "box")        == 0) t = MaskType::Box;
+   else if(strcasecmp(s, "circle")     == 0) t = MaskType::Circle;
+   else if(strcasecmp(s, "track")      == 0) t = MaskType::Track;
+   else if(strcasecmp(s, "grid")       == 0) t = MaskType::Grid;
+   else if(strcasecmp(s, "data")       == 0) t = MaskType::Data;
+   else if(strcasecmp(s, "solar_alt")  == 0) t = MaskType::Solar_Alt;
+   else if(strcasecmp(s, "solar_azi")  == 0) t = MaskType::Solar_Azi;
+   else if(strcasecmp(s, "solar_time") == 0) t = MaskType::Solar_Time;
+   else if(strcasecmp(s, "lat")        == 0) t = MaskType::Lat;
+   else if(strcasecmp(s, "lon")        == 0) t = MaskType::Lon;
+   else if(strcasecmp(s, "shape")      == 0) t = MaskType::Shape;
    else {
       mlog << Error << "\nstring_to_masktype() -> "
            << "unsupported masking type \"" << s << "\"\n\n";
@@ -1505,20 +1552,47 @@ const char * masktype_to_string(const MaskType t) {
    const char *s = (const char *) nullptr;
 
    switch(t) {
-      case MaskType::Poly:      s = "poly";           break;
-      case MaskType::Poly_XY:   s = "poly_xy";        break;
-      case MaskType::Box:       s = "box";            break;
-      case MaskType::Circle:    s = "circle";         break;
-      case MaskType::Track:     s = "track";          break;
-      case MaskType::Grid:      s = "grid";           break;
-      case MaskType::Data:      s = "data";           break;
-      case MaskType::Solar_Alt: s = "solar_alt";      break;
-      case MaskType::Solar_Azi: s = "solar_azi";      break;
-      case MaskType::Lat:       s = "lat";            break;
-      case MaskType::Lon:       s = "lon";            break;
-      case MaskType::Shape:     s = "shape";          break;
-      case MaskType::None:      s = na_str;           break;
-      default:                 s = (const char *) nullptr; break;
+      case MaskType::Poly:       s = "poly";       break;
+      case MaskType::Poly_XY:    s = "poly_xy";    break;
+      case MaskType::Box:        s = "box";        break;
+      case MaskType::Circle:     s = "circle";     break;
+      case MaskType::Track:      s = "track";      break;
+      case MaskType::Grid:       s = "grid";       break;
+      case MaskType::Data:       s = "data";       break;
+      case MaskType::Solar_Alt:  s = "solar_alt";  break;
+      case MaskType::Solar_Azi:  s = "solar_azi";  break;
+      case MaskType::Solar_Time: s = "solar_time"; break;
+      case MaskType::Lat:        s = "lat";        break;
+      case MaskType::Lon:        s = "lon";        break;
+      case MaskType::Shape:      s = "shape";      break;
+      case MaskType::None:       s = na_str;       break;
+      default:                   s = (const char *) nullptr; break;
+   }
+
+   return s;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const char * masktype_to_description(const MaskType t) {
+   const char *s = (const char *) nullptr;
+
+   switch(t) {
+      case MaskType::Poly:       s = "Polyline";       break;
+      case MaskType::Poly_XY:    s = "Polyline XY";    break;
+      case MaskType::Box:        s = "Box";            break;
+      case MaskType::Circle:     s = "Circle";         break;
+      case MaskType::Track:      s = "Track";          break;
+      case MaskType::Grid:       s = "Grrid";          break;
+      case MaskType::Data:       s = "Data";           break;
+      case MaskType::Solar_Alt:  s = "Solar Altitude"; break;
+      case MaskType::Solar_Azi:  s = "Solar Azimuth";  break;
+      case MaskType::Solar_Time: s = "Solar Time";     break;
+      case MaskType::Lat:        s = "Latitude";       break;
+      case MaskType::Lon:        s = "Longitude";      break;
+      case MaskType::Shape:      s = "Shapefile";      break;
+      case MaskType::None:       s = na_str;           break;
+      default:                   s = (const char *) nullptr; break;
    }
 
    return s;
@@ -1604,6 +1678,8 @@ void usage() {
         << "\"mask_field\".\n"
         << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, "
         << "threshold the computed solar values.\n"
+        << "\t\t   For \"solar_time\" masking, "
+        << "threshold the decimal hours of the solar day.\n"
         << "\t\t   For \"lat\" and \"lon\" masking, threshold the "
         << "latitude and longitude values.\n"
 
