@@ -1587,20 +1587,20 @@ const char * masktype_to_description(const MaskType t) {
    const char *s = (const char *) nullptr;
 
    switch(t) {
-      case MaskType::Poly:       s = "Polyline";       break;
-      case MaskType::Poly_XY:    s = "Polyline XY";    break;
-      case MaskType::Box:        s = "Box";            break;
-      case MaskType::Circle:     s = "Circle";         break;
-      case MaskType::Track:      s = "Track";          break;
-      case MaskType::Grid:       s = "Grrid";          break;
-      case MaskType::Data:       s = "Data";           break;
-      case MaskType::Solar_Alt:  s = "Solar Altitude"; break;
-      case MaskType::Solar_Azi:  s = "Solar Azimuth";  break;
-      case MaskType::Solar_Time: s = "Solar Time";     break;
-      case MaskType::Lat:        s = "Latitude";       break;
-      case MaskType::Lon:        s = "Longitude";      break;
-      case MaskType::Shape:      s = "Shapefile";      break;
-      case MaskType::None:       s = na_str;           break;
+      case MaskType::Poly:       s = "Polyline";    break;
+      case MaskType::Poly_XY:    s = "Polyline XY"; break;
+      case MaskType::Box:        s = "Box";         break;
+      case MaskType::Circle:     s = "Circle";      break;
+      case MaskType::Track:      s = "Track";       break;
+      case MaskType::Grid:       s = "Grid";        break;
+      case MaskType::Data:       s = "Data";        break;
+      case MaskType::Solar_Alt:  s = "Solar Alt";   break;
+      case MaskType::Solar_Azi:  s = "Solar Azi";   break;
+      case MaskType::Solar_Time: s = "Solar Time";  break;
+      case MaskType::Lat:        s = "Latitude";    break;
+      case MaskType::Lon:        s = "Longitude";   break;
+      case MaskType::Shape:      s = "Shapefile";   break;
+      case MaskType::None:       s = na_str;        break;
       default:                   s = (const char *) nullptr; break;
    }
 
