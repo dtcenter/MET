@@ -439,6 +439,23 @@
   </test>
 
   <!--                                                                  -->
+  <!-- SOLAR_TIME: Solar time                                           -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_SOLAR_TIME">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      'G004' \
+      '20050808_12' \
+      &OUTPUT_DIR;/gen_vx_mask/SOLAR_TIME_raw.nc \
+      -type solar_time -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/SOLAR_TIME_raw.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
   <!-- LAT: latitude band                                               -->
   <!--                                                                  -->
 
