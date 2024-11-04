@@ -108,6 +108,7 @@ static int width = bad_data_double;
 static double mask_val = default_mask_val;
 static ConcatString mask_name;
 static unixtime solar_ut = (unixtime) 0;
+static ConcatString units_cs("flag");
 
 static std::map<std::string,StringArray> shape_str_map;
 static NumArray shape_numbers;

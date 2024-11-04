@@ -458,6 +458,9 @@ void get_data_plane(const ConcatString &file_name,
            << mtddf_ptr->filename() << "\" with data ranging from "
            << dmin << " to " << dmax << ".\n";
 
+      // Store the units string if no threhsold was specified
+      if(thresh.get_type() == thresh_na) units_cs = vi_ptr->units();
+
       // Clean up
       if(vi_ptr) { delete vi_ptr; vi_ptr = (VarInfo *) nullptr; }
 
@@ -853,9 +856,10 @@ void apply_circle_mask(DataPlane &dp) {
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
       mlog << Debug(3)
-           << "Since \"-thresh\" was not used to specify a threshold "
-           << "in kilometers for circle masking, the minimum distance "
-           << "to the points will be written.\n";
+           << "Write the minimum distance in kilometers to the "
+           << "nearest point for " << masktype_to_description(mask_type)
+           << " masking since no \"-thresh\" specified.\n";
+      units_cs = "km";
    }
 
    // For each grid point, compute mimumum distance to polyline points
@@ -934,9 +938,10 @@ void apply_track_mask(DataPlane &dp) {
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
       mlog << Debug(3)
-           << "Since \"-thresh\" was not used to specify a threshold "
-           << "in kilometers for track masking, the minimum distance "
-           << "to the track will be written.\n";
+           << "Write the minimum distance in kilometers to the "
+           << "nearest point for " << masktype_to_description(mask_type)
+           << " masking since no \"-thresh\" specified.\n";
+      units_cs = "km";
    }
 
    // For each grid point, compute mimumum distance to track
@@ -1065,14 +1070,14 @@ void apply_data_mask(DataPlane &dp) {
    // Nothing to do without a threshold
    if(thresh.get_type() == thresh_na) {
       mlog << Debug(3)
-           << "Since \"-thresh\" was not used to specify a threshold "
-           << "in kilometers for data masking, the raw data values "
-           << "will be written.\n";
+           << "Write the raw inputs values for "
+           << masktype_to_description(mask_type)
+           << " masking since no \"-thresh\" specified.\n";
       double dmin, dmax;
       dp.data_range(dmin, dmax);
       mlog << Debug(3)
            << masktype_to_description(mask_type)
-           << " Masking:\tValues ranging from "
+           << " Masking:\t\tValues ranging from "
            << dmin << " to " << dmax << "\n";
       return;
    }
@@ -1127,9 +1132,11 @@ void apply_solar_mask(DataPlane &dp) {
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
       mlog << Debug(3)
-           << "Since \"-thresh\" was not used to specify a threshold, "
-           << "the raw " << masktype_to_string(mask_type)
-           << " values will be written.\n";
+           << "Write the raw "
+           << masktype_to_description(mask_type)
+           << " values since no \"-thresh\" specified.\n";
+      units_cs = (mask_type == MaskType::Solar_Time ?
+                  "hr" : "deg");
    }
 
    // Compute solar value for each grid point Lat/Lon
@@ -1205,9 +1212,10 @@ void apply_lat_lon_mask(DataPlane &dp) {
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
       mlog << Debug(3)
-           << "Since \"-thresh\" was not used to specify a threshold, "
-           << "the raw " << masktype_to_string(mask_type)
-           << " values will be written.\n";
+           << "Write the raw "
+           << masktype_to_description(mask_type)
+           << " values since no \"-thresh\" specified.\n";
+      units_cs = "deg";
    }
 
    // Compute Lat/Lon value for each grid point
@@ -1409,7 +1417,7 @@ void write_netcdf(const DataPlane &dp) {
    int n;
    ConcatString cs;
 
-   NcFile *f_out    = (NcFile *) nullptr;
+   NcFile *f_out = (NcFile *) nullptr;
    NcDim lat_dim;
    NcDim lon_dim;
    NcVar mask_var;
@@ -1455,6 +1463,7 @@ void write_netcdf(const DataPlane &dp) {
    mask_var = add_var(f_out, string(mask_name), ncFloat, lat_dim, lon_dim, deflate_level);
    cs << cs_erase << mask_name << " masking region";
    add_att(&mask_var, "long_name", string(cs));
+   add_att(&mask_var, "units", string(units_cs));
    add_att(&mask_var, "_FillValue", bad_data_float);
    cs << cs_erase << masktype_to_string(mask_type);
    if(thresh.get_type() != thresh_na) cs << thresh.get_str();
