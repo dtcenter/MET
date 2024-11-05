@@ -898,6 +898,26 @@ else
   AC_MSG_NOTICE([point_stat will not be compiled])
 fi
 
+# pair_stat
+
+AC_ARG_ENABLE(pair_stat,
+	  [AS_HELP_STRING([--disable-pair_stat], [Disable compilation of pair_stat])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_PAIR_STAT="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-pair_stat) ;;
+   esac],
+  [ENABLE_PAIR_STAT="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_PAIR_STAT], [test "x$ENABLE_PAIR_STAT" = "xyes"])
+
+if test "x$ENABLE_PAIR_STAT" = "xyes"; then
+  AC_DEFINE([ENABLE_PAIR_STAT], [], ["build pair_stat"])
+  AC_MSG_NOTICE([pair_stat will be compiled])
+else
+  AC_MSG_NOTICE([pair_stat will not be compiled])
+fi
+
 # stat_analysis
 
 AC_ARG_ENABLE(stat_analysis,
@@ -1378,6 +1398,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/core/mode_analysis/Makefile
                  src/tools/core/pcp_combine/Makefile
                  src/tools/core/point_stat/Makefile
+                 src/tools/core/pair_stat/Makefile
                  src/tools/core/series_analysis/Makefile
                  src/tools/core/stat_analysis/Makefile
                  src/tools/core/wavelet_stat/Makefile
