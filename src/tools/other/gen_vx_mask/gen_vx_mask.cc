@@ -1708,7 +1708,7 @@ __attribute__((noreturn)) static void usage() {
         << "\t\t   For \"data\" masking, specify a gridded data file.\n"
         << "\t\t   For \"solar_alt\", \"solar_azi\", and \"solar_time\" "
         << "masking, specify a gridded data file or a timestring in "
-        << "YYYYMMDD[_HH[MMSS]] format.\n"
+        << "YYYYMMDD[_HH[MMSS]] UTC format.\n"
         << "\t\t   For \"lat\" and \"lon\" masking, no \"mask_file\" is "
         << "needed, simply repeat \"input_grid\".\n"
         << "\t\t   For \"shape\" masking, specify a shapefile "
