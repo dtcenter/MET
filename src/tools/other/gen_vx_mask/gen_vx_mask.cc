@@ -501,8 +501,9 @@ static bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
 
       // Read the first non-lat/lon variable
       config_str << cs_erase
-                 << "'name=\"" << mnmdf_ptr->MetNc->Var[i].name
-                 << "\"; level=\"(*,*)\";'";
+                 << R"('name=")"
+                 << mnmdf_ptr->MetNc->Var[i].name
+                 << R"_("; level="(*,*)";')_";
       status = true;
       break;
    }
@@ -512,7 +513,7 @@ static bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_shapefile_strings() {
+static void get_shapefile_strings() {
    DbfFile f;
    StringArray rec_names;
    StringArray rec_values;
@@ -543,13 +544,10 @@ void get_shapefile_strings() {
         << ").\n";
 
    // Check that the attributes requested actually exist
-   map<string,StringArray>::const_iterator it;
-   for(it  = shape_str_map.begin();
-       it != shape_str_map.end(); it++) {
-
-      if(!rec_names.has(it->first)) {
+   for(const auto& pair: shape_str_map) {
+      if(!rec_names.has(pair.first)) {
          mlog << Warning << "\nget_shapefile_strings() -> "
-              << "the \"-shape_str\" name \"" << it->first
+              << "the \"-shape_str\" name \"" << pair.first
               << "\" is not in the list of " << rec_names.n()
               << " shapefile attributes and will be ignored:\n"
               << write_css(rec_names) << "\n\n";
@@ -676,7 +674,7 @@ bool is_shape_str_match(const int i_shape, const StringArray &names, const Strin
 
 ////////////////////////////////////////////////////////////////////////
 
-void apply_poly_mask(DataPlane & dp) {
+static void apply_poly_mask(DataPlane & dp) {
    int n_in = 0;
    bool inside;
    double lat;
@@ -721,10 +719,11 @@ void apply_poly_mask(DataPlane & dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void apply_poly_xy_mask(DataPlane & dp) {
+static void apply_poly_xy_mask(DataPlane & dp) {
    int n_in = 0;
    bool inside;
-   double x_dbl, y_dbl;
+   double x_dbl;
+   double y_dbl;
    GridClosedPoly poly_xy;
 
    // Convert MaskPoly Lat/Lon coordinates to Grid X/Y
@@ -769,15 +768,15 @@ void apply_poly_xy_mask(DataPlane & dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void apply_box_mask(DataPlane &dp) {
-   int i, x_ll, y_ll, x, y, n_in;
-   double cen_x, cen_y;
-   bool inside;
+static void apply_box_mask(DataPlane &dp) {
+   int n_in = 0;
+   double cen_x;
+   double cen_y;
 
    // Process the height and width
    if(is_bad_data(height) && is_bad_data(width)) {
       mlog << Error << "\napply_box_mask() -> "
-           << "the \"-height\" and/or \"-width\" options must be "
+           << R"(the "-height" and/or "-width" options must be )"
            << "specified in grid units for box masking.\n\n";
       exit(1);
    }
@@ -789,19 +788,21 @@ void apply_box_mask(DataPlane &dp) {
    }
 
    // Process each lat/lon point
-   for(i=0; i<poly_mask.n_points(); i++) {
+   for(int i=0; i<poly_mask.n_points(); i++) {
 
       // Convert box lat/lon to grid x/y
       grid.latlon_to_xy(poly_mask.lat(i), poly_mask.lon(i), cen_x, cen_y);
 
       // Get the lower-left x, y
+      int x_ll;
+      int y_ll;
       get_xy_ll(cen_x, cen_y, width, height, x_ll, y_ll);
 
       // Set mask value for points within the box
-      for(x=x_ll; x<x_ll+width; x++) {
+      for(int x=x_ll; x<x_ll+width; x++) {
          if(x < 0 || x >= dp.nx()) continue;
 
-         for(y=y_ll; y<y_ll+height; y++) {
+         for(int y=y_ll; y<y_ll+height; y++) {
             if(y < 0 || y >= dp.ny()) continue;
 
             // Set the mask
@@ -812,16 +813,16 @@ void apply_box_mask(DataPlane &dp) {
    } // end for i
 
    // Loop through the field, handle the complement, and count up points
-   for(x=0,n_in=0; x<dp.nx(); x++) {
-      for(y=0; y<dp.ny(); y++) {
+   for(int x=0; x<dp.nx(); x++) {
+      for(int y=0; y<dp.ny(); y++) {
 
-         inside = (dp(x, y) == 1);
+         bool inside = (dp(x, y) == 1);
 
          // Check the complement
          if(complement) inside = !inside;
 
          // Increment count
-         n_in += inside;
+         if(inside) n_in++;
 
          // Store the current mask value
          dp.set(inside, x, y);
@@ -846,20 +847,20 @@ void apply_box_mask(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void apply_circle_mask(DataPlane &dp) {
+static void apply_circle_mask(DataPlane &dp) {
    int n_in = 0;
    double lat;
    double lon;
    double dist;
    double v;
-   bool check;
 
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
       mlog << Debug(3)
            << "Write the minimum distance in kilometers to the "
            << "nearest point for " << masktype_to_description(mask_type)
-           << " masking since no \"-thresh\" specified.\n";
+           << R"( masking since no "-thresh" specified.)"
+	   << "\n";
       units_cs = "km";
    }
 
@@ -879,13 +880,14 @@ void apply_circle_mask(DataPlane &dp) {
 
          // Apply threshold, if specified
          if(thresh.get_type() != thresh_na) {
-            check = thresh.check(dist);
+
+            bool check = thresh.check(dist);
 
             // Check the complement
             if(complement) check = !check;
 
             // Increment count
-            n_in += check;
+            if(check) n_in++;
 
             v = (check ? 1.0 : 0.0);
          }
@@ -928,20 +930,20 @@ void apply_circle_mask(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void apply_track_mask(DataPlane &dp) {
+static void apply_track_mask(DataPlane &dp) {
    int n_in = 0;
    double lat;
    double lon;
    double dist;
    double v;
-   bool check;
 
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
       mlog << Debug(3)
            << "Write the minimum distance in kilometers to the "
            << "nearest point for " << masktype_to_description(mask_type)
-           << " masking since no \"-thresh\" specified.\n";
+           << R"( masking since no "-thresh" specified.)"
+	   << "\n";
       units_cs = "km";
    }
 
@@ -964,13 +966,14 @@ void apply_track_mask(DataPlane &dp) {
 
          // Apply threshold, if specified
          if(thresh.get_type() != thresh_na) {
-            check = thresh.check(dist);
+
+            bool check = thresh.check(dist);
 
             // Check the complement
             if(complement) check = !check;
 
             // Increment count
-            n_in += check;
+            if(check) n_in++;
 
             v = (check ? 1.0 : 0.0);
          }
@@ -999,7 +1002,8 @@ void apply_track_mask(DataPlane &dp) {
    }
    // Otherwise, list the min/max distances computed
    else {
-      double dmin, dmax;
+      double dmin;
+      double dmax;
       dp.data_range(dmin, dmax);
       mlog << Debug(3)
            << masktype_to_description(mask_type)
@@ -1012,34 +1016,33 @@ void apply_track_mask(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void apply_grid_mask(DataPlane &dp) {
+static void apply_grid_mask(DataPlane &dp) {
    int n_in = 0;
-   bool inside;
-   double lat;
-   double lon;
-   double mask_x;
-   double mask_y;
 
    // Check each grid point being inside the masking grid
    for(int x=0; x<grid.nx(); x++) {
       for(int y=0; y<grid.ny(); y++) {
 
          // Lat/Lon value for the current grid point
+         double lat;
+         double lon;
          grid.xy_to_latlon(x, y, lat, lon);
          lon -= 360.0*floor((lon + 180.0)/360.0);
 
          // Convert Lat/Lon to masking grid x/y
+         double mask_x;
+         double mask_y;
          grid_mask.latlon_to_xy(lat, lon, mask_x, mask_y);
 
          // Check for point falling within the masking grid
-         inside = (mask_x >= 0 && mask_x < grid_mask.nx() &&
-                   mask_y >= 0 && mask_y < grid_mask.ny());
+         bool inside = (mask_x >= 0 && mask_x < grid_mask.nx() &&
+                        mask_y >= 0 && mask_y < grid_mask.ny());
 
          // Apply the complement
          if(complement) inside = !inside;
 
          // Increment count
-         n_in += inside;
+         if(inside) n_in++;
 
          // Store the current mask value
          dp.set(inside, x, y);
@@ -1064,17 +1067,18 @@ void apply_grid_mask(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void apply_data_mask(DataPlane &dp) {
+static void apply_data_mask(DataPlane &dp) {
    int n_in = 0;
-   bool check;
 
    // Nothing to do without a threshold
    if(thresh.get_type() == thresh_na) {
       mlog << Debug(3)
            << "Write the raw inputs values for "
            << masktype_to_description(mask_type)
-           << " masking since no \"-thresh\" specified.\n";
-      double dmin, dmax;
+           << R"( masking since no "-thresh" specified.)"
+	   << "\n";
+      double dmin;
+      double dmax;
       dp.data_range(dmin, dmax);
       mlog << Debug(3)
            << masktype_to_description(mask_type)
@@ -1100,13 +1104,13 @@ void apply_data_mask(DataPlane &dp) {
       for(int y=0; y<grid.ny(); y++) {
 
          // Apply the threshold
-         check = thresh.check(dp(x,y));
+         bool check = thresh.check(dp(x,y));
 
          // Check the complement
          if(complement) check = !check;
 
          // Increment count
-         n_in += check;
+         if(check) n_in++;
 
          // Store the result
          dp.set(check ? 1.0 : 0.0, x, y);
@@ -1125,17 +1129,17 @@ void apply_data_mask(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void apply_solar_mask(DataPlane &dp) {
+static void apply_solar_mask(DataPlane &dp) {
    int n_in = 0;
-   double lat, lon, alt, azi, v;
-   bool check;
+   double v;
 
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
       mlog << Debug(3)
            << "Write the raw "
            << masktype_to_description(mask_type)
-           << " values since no \"-thresh\" specified.\n";
+           << R"( values since no "-thresh" specified.)"
+	   << "\n";
       units_cs = (mask_type == MaskType::Solar_Time ?
                   "hr" : "deg");
    }
@@ -1145,6 +1149,8 @@ void apply_solar_mask(DataPlane &dp) {
       for(int y=0; y<grid.ny(); y++) {
 
          // Lat/Lon value for the current grid point
+         double lat;
+	 double lon;
          grid.xy_to_latlon(x, y, lat, lon);
          lon -= 360.0*floor((lon + 180.0)/360.0);
 
@@ -1154,19 +1160,22 @@ void apply_solar_mask(DataPlane &dp) {
          }
          // Compute the solar altitude and azimuth
          else {
+            double alt;
+            double azi;
             solar_altaz(solar_ut, lat, lon, alt, azi);
             v = (mask_type == MaskType::Solar_Alt ? alt : azi);
          }
 
          // Apply threshold, if specified
          if(thresh.get_type() != thresh_na) {
-            check = thresh.check(v);
+
+            bool check = thresh.check(v);
 
             // Check the complement
             if(complement) check = !check;
 
             // Increment count
-            n_in += check;
+            if(check) n_in++;
 
             v = (check ? 1.0 : 0.0);
          }
@@ -1192,7 +1201,8 @@ void apply_solar_mask(DataPlane &dp) {
    }
    // Otherwise, list the min/max distances computed
    else {
-      double dmin, dmax;
+      double dmin;
+      double dmax;
       dp.data_range(dmin, dmax);
       mlog << Debug(3)
            << masktype_to_description(mask_type)
@@ -1205,17 +1215,17 @@ void apply_solar_mask(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void apply_lat_lon_mask(DataPlane &dp) {
+static void apply_lat_lon_mask(DataPlane &dp) {
    int n_in = 0;
-   double lat, lon, v;
-   bool check;
+   double v;
 
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
       mlog << Debug(3)
            << "Write the raw "
            << masktype_to_description(mask_type)
-           << " values since no \"-thresh\" specified.\n";
+           << R"( values since no "-thresh" specified.)"
+           << "\n";
       units_cs = "deg";
    }
 
@@ -1224,19 +1234,22 @@ void apply_lat_lon_mask(DataPlane &dp) {
       for(int y=0; y<grid.ny(); y++) {
 
          // Lat/Lon value for the current grid point
+         double lat;
+         double lon;
          grid.xy_to_latlon(x, y, lat, lon);
          v = (mask_type == MaskType::Lat ? lat :
               rescale_deg(-1.0*lon, -180.0, 180.0));
 
          // Apply threshold, if specified
          if(thresh.get_type() != thresh_na) {
-            check = thresh.check(v);
+
+            bool check = thresh.check(v);
 
             // Check the complement
             if(complement) check = !check;
 
             // Increment count
-            n_in += check;
+            if(check) n_in++;
 
             v = (check ? 1.0 : 0.0);
          }
@@ -1262,7 +1275,8 @@ void apply_lat_lon_mask(DataPlane &dp) {
    }
    // Otherwise, list the min/max distances computed
    else {
-      double dmin, dmax;
+      double dmin;
+      double dmax;
       dp.data_range(dmin, dmax);
       mlog << Debug(3)
            << masktype_to_description(mask_type)
@@ -1275,17 +1289,15 @@ void apply_lat_lon_mask(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void apply_shape_mask(DataPlane & dp) {
+static void apply_shape_mask(DataPlane & dp) {
    int n_in = 0;
    bool status = false;
 
    // Load the shapes
    GridClosedPolyArray poly;
    vector<GridClosedPolyArray> poly_list;
-   vector<ShpPolyRecord>::const_iterator rec_it;
-   for(rec_it  = shape_recs.begin();
-       rec_it != shape_recs.end(); ++rec_it) {
-      poly.set(*rec_it, grid);
+   for(const auto& rec: shape_recs) {
+      poly.set(rec, grid);
       poly_list.push_back(poly);
    }
 
@@ -1293,12 +1305,10 @@ void apply_shape_mask(DataPlane & dp) {
    for(int x=0; x<(grid.nx()); x++) {
       for(int y=0; y<(grid.ny()); y++) {
 
-         vector<GridClosedPolyArray>::const_iterator poly_it;
-         for(poly_it  = poly_list.begin();
-             poly_it != poly_list.end(); ++poly_it) {
+         for(const auto& poly: poly_list) {
 
             // Check if point is inside
-            status = poly_it->is_inside(x, y);
+            status = poly.is_inside(x, y);
 
             // Break after the first match
             if(status) break;
@@ -1333,10 +1343,10 @@ void apply_shape_mask(DataPlane & dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
-                  SetLogic logic) {
+static DataPlane combine(const DataPlane &dp_data,
+                         const DataPlane &dp_mask,
+                         SetLogic logic) {
    int n_in = 0;
-   bool v_data, v_mask;
    double v;
    DataPlane dp;
 
@@ -1363,8 +1373,8 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
       for(int y=0; y<grid.ny(); y++) {
 
          // Get the two input data values
-         v_data = !is_eq(dp_data(x, y), 0.0);
-         v_mask = !is_eq(dp_mask(x, y), 0.0);
+         bool v_data = !is_eq(dp_data(x, y), 0.0);
+         bool v_mask = !is_eq(dp_mask(x, y), 0.0);
 
          switch(logic) {
 
@@ -1392,7 +1402,7 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
          }
 
          // Increment count
-         n_in += !is_eq(v, 0.0);
+         if(!is_eq(v, 0.0)) n_in++;
 
          // Store the result
          dp.set(v, x, y);
@@ -1414,11 +1424,11 @@ DataPlane combine(const DataPlane &dp_data, const DataPlane &dp_mask,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_netcdf(const DataPlane &dp) {
+static void write_netcdf(const DataPlane &dp) {
    int n;
    ConcatString cs;
 
-   NcFile *f_out = (NcFile *) nullptr;
+   NcFile *f_out = nullptr;
    NcDim lat_dim;
    NcDim lon_dim;
    NcVar mask_var;
@@ -1431,7 +1441,7 @@ void write_netcdf(const DataPlane &dp) {
            << "trouble opening output file " << out_filename
            << "\n\n";
       delete f_out;
-      f_out = (NcFile *) nullptr;
+      f_out = nullptr;
       exit(1);
    }
 
@@ -1445,7 +1455,7 @@ void write_netcdf(const DataPlane &dp) {
    write_netcdf_latlon(f_out, &lat_dim, &lon_dim, grid);
 
    // Set the mask_name, if not already set
-   if(mask_name.length() == 0) {
+   if(mask_name.empty()) {
       if(mask_type == MaskType::Poly    ||
          mask_type == MaskType::Poly_XY ||
          mask_type == MaskType::Circle  ||
@@ -1489,7 +1499,7 @@ void write_netcdf(const DataPlane &dp) {
    for(int x=0; x<grid.nx(); x++) {
       for(int y=0; y<grid.ny(); y++) {
          n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-         mask_data[n] = dp(x, y);
+         mask_data[n] = (float) dp(x, y);
       } // end for y
    } // end for x
 
@@ -1500,7 +1510,7 @@ void write_netcdf(const DataPlane &dp) {
    }
 
    delete f_out;
-   f_out = (NcFile *) nullptr;
+   f_out = nullptr;
 
    mlog << Debug(1)
         << "Output File:\t\t" << out_filename << "\n";
@@ -1559,7 +1569,7 @@ MaskType string_to_masktype(const char *s) {
 ////////////////////////////////////////////////////////////////////////
 
 const char * masktype_to_string(const MaskType t) {
-   const char *s = (const char *) nullptr;
+   const char *s = nullptr;
 
    switch(t) {
       case MaskType::Poly:       s = "poly";       break;
@@ -1585,7 +1595,7 @@ const char * masktype_to_string(const MaskType t) {
 ////////////////////////////////////////////////////////////////////////
 
 const char * masktype_to_description(const MaskType t) {
-   const char *s = (const char *) nullptr;
+   const char *s = nullptr;
 
    switch(t) {
       case MaskType::Poly:       s = "Polyline";    break;
@@ -1610,7 +1620,7 @@ const char * masktype_to_description(const MaskType t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+static void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -1730,7 +1740,7 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_type(const StringArray & a) {
+static void set_type(const StringArray & a) {
    if(type_is_set) {
       mlog << Error << "\n" << program_name << " -> "
            << "the -type command line requirement can only be used once!\n"
@@ -1745,79 +1755,79 @@ void set_type(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_input_field(const StringArray & a) {
+static void set_input_field(const StringArray & a) {
    input_field_str = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_mask_field(const StringArray & a) {
+static void set_mask_field(const StringArray & a) {
    mask_field_str = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_complement(const StringArray & a) {
+static void set_complement(const StringArray &) {
    complement = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_union(const StringArray & a) {
+static void set_union(const StringArray &) {
    set_logic = SetLogic::Union;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_intersection(const StringArray & a) {
+static void set_intersection(const StringArray &) {
    set_logic = SetLogic::Intersection;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_symdiff(const StringArray & a) {
+static void set_symdiff(const StringArray &) {
    set_logic = SetLogic::SymDiff;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_thresh(const StringArray & a) {
+static void set_thresh(const StringArray & a) {
    thresh.set(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_height(const StringArray & a) {
+static void set_height(const StringArray & a) {
    height = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_width(const StringArray & a) {
+static void set_width(const StringArray & a) {
    width = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_value(const StringArray & a) {
+static void set_value(const StringArray & a) {
    mask_val = atof(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_name(const StringArray & a) {
+static void set_name(const StringArray & a) {
    mask_name = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+static void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_shapeno(const StringArray & a) {
+static void set_shapeno(const StringArray & a) {
    NumArray cur_na;
 
    cur_na.add_css(a[0].c_str());
@@ -1839,7 +1849,7 @@ void set_shapeno(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_shape_str(const StringArray & a) {
+static void set_shape_str(const StringArray & a) {
    StringArray sa;
 
    // Comma-separated list of matching strings, ignoring case
