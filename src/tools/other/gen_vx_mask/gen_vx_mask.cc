@@ -72,18 +72,20 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 int met_main(int argc, char *argv[]) {
-   static DataPlane dp_data, dp_mask, dp_out;
 
    // Process the command line arguments
    process_command_line(argc, argv);
 
    // Process the input grid
+   static DataPlane dp_data;
    process_input_grid(dp_data);
 
    // Process the mask file
+   static DataPlane dp_mask;
    process_mask_file(dp_mask);
 
    // Apply combination logic if the current mask is binary
+   static DataPlane dp_out;
    if(mask_type == MaskType::Poly    ||
       mask_type == MaskType::Poly_XY ||
       mask_type == MaskType::Shape   ||
@@ -105,13 +107,13 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return "gen_vx_mask";
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+static void process_command_line(int argc, char **argv) {
    CommandLine cline;
 
    // Check for zero arguments
@@ -160,9 +162,8 @@ void process_command_line(int argc, char **argv) {
    if(mask_type == MaskType::None) {
      mlog << Error << "\n" << program_name << " -> "
           << "the -type command line requirement must be set to a specific masking type!\n"
-          << "\t\t   \"poly\", \"box\", \"circle\", \"track\", \"grid\", "
-          << "\"data\", \"solar_alt\", \"solar_azi\", \"solar_time\", "
-	  << "\"lat\", \"lon\", or \"shape\"\n\n";
+          << "\t\t   poly, box, circle, track, grid, data, solar_alt, "
+          << "solar_azi, solar_time, lat, lon, or shape\n\n";
      exit(1);
    }
    
@@ -176,7 +177,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_input_grid(DataPlane &dp) {
+static void process_input_grid(DataPlane &dp) {
 
    if (!build_grid_by_grid_string(input_gridname, grid, "process_input_grid", false)) {
       // Extract the grid from a gridded data file
@@ -203,7 +204,7 @@ void process_input_grid(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_mask_file(DataPlane &dp) {
+static void process_mask_file(DataPlane &dp) {
 
    // Initialize
    solar_ut = (unixtime) 0;
@@ -227,7 +228,7 @@ void process_mask_file(DataPlane &dp) {
    else if(mask_type == MaskType::Shape) {
 
       // If -shape_str was specified, find the matching records
-      if(shape_str_map.size() > 0) get_shapefile_strings();
+      if(!shape_str_map.empty()) get_shapefile_strings();
 
       // Get the records specified by -shapeno and -shape_str
       get_shapefile_records();
@@ -257,9 +258,10 @@ void process_mask_file(DataPlane &dp) {
            << unix_to_yyyymmdd_hhmmss(solar_ut) << "\n";
    }
 
-   // Nothing to do for Lat/Lon masking types
+   // For Lat/Lon masking types
    else if(mask_type == MaskType::Lat ||
            mask_type == MaskType::Lon) {
+      // Nothing to do for Lat/Lon masking types
    }
 
    // Otherwise, process the mask file as a named grid, grid specification
@@ -393,10 +395,10 @@ void process_mask_file(DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_data_plane(const ConcatString &file_name,
-                    const ConcatString &config_str,
-                    bool read_gen_vx_mask_output,
-                    DataPlane &dp, Grid &dp_grid) {
+static void get_data_plane(const ConcatString &file_name,
+                           const ConcatString &config_str,
+                           bool read_gen_vx_mask_output,
+                           DataPlane &dp, Grid &dp_grid) {
    ConcatString local_cs = config_str;
    GrdFileType ftype = FileType_None;
 
@@ -404,7 +406,7 @@ void get_data_plane(const ConcatString &file_name,
    MetConfig local_config = global_config;
 
    // Parse non-empty config strings
-   if(local_cs.length() > 0) {
+   if(!local_cs.empty()) {
       local_config.read_string(local_cs.c_str());
       ftype = parse_conf_file_type(&local_config);
    }
@@ -420,15 +422,14 @@ void get_data_plane(const ConcatString &file_name,
 
    // Read gen_vx_mask output from a previous run
    if(read_gen_vx_mask_output &&
-      local_cs.length()      == 0 &&
-      mtddf_ptr->file_type() == FileType_NcMet) {
-      if(get_gen_vx_mask_config_str((MetNcMetDataFile *) mtddf_ptr, local_cs)) {
-         local_config.read_string(local_cs.c_str());
-      }
+      local_cs.empty() &&
+      mtddf_ptr->file_type() == FileType_NcMet &&
+      get_gen_vx_mask_config_str((MetNcMetDataFile *) mtddf_ptr, local_cs)) {
+      local_config.read_string(local_cs.c_str());
    }
 
    // Read data plane, if requested
-   if(local_cs.length() > 0) {
+   if(!local_cs.empty()) {
 
       // Allocate new VarInfo object
       VarInfo *vi_ptr = VarInfoFactory::new_var_info(mtddf_ptr->file_type());
@@ -477,8 +478,8 @@ void get_data_plane(const ConcatString &file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
-                                ConcatString &config_str) {
+static bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
+                                       ConcatString &config_str) {
    bool status = false;
    ConcatString tool;
 
