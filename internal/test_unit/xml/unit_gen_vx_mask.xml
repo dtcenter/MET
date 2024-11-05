@@ -447,11 +447,15 @@
     <param> \
       'G004' \
       '20050808_12' \
-      &OUTPUT_DIR;/gen_vx_mask/SOLAR_TIME_raw.nc \
-      -type solar_time -v 2
+      &OUTPUT_DIR;/gen_vx_mask/SOLAR_MIDNIGHT_NH.nc \
+      -type solar_time,solar_alt,lat \
+      -thresh 'ge21||le3,le0,ge0' \
+      -intersection \
+      -name SOLAR_MIDNIGHT_NH \
+      -v 3 
     </param>
     <output>
-      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/SOLAR_TIME_raw.nc</grid_nc>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/SOLAR_MIDNIGHT_NH.nc</grid_nc>
     </output>
   </test>
 

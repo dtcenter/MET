@@ -77,22 +77,64 @@ int met_main(int argc, char *argv[]) {
    process_command_line(argc, argv);
 
    // Process the input grid
-   static DataPlane dp_data;
-   process_input_grid(dp_data);
+   static DataPlane dp_input;
+   process_input_grid(dp_input);
 
-   // Process the mask file
    static DataPlane dp_mask;
-   process_mask_file(dp_mask);
 
-   // Apply combination logic if the current mask is binary
+   // Process each -type setting
+   for(int i=0; i<mask_type_opts.size(); i++) {
+
+      // Set the current mask type 
+      mask_type = mask_type_opts[i];
+
+      // Set the current mask field_
+      if(mask_field_opts.n() == 1) {
+         mask_field_str = mask_field_opts[0];
+      }
+      else if(mask_field_opts.n() > i) {
+         mask_field_str = mask_field_opts[i];
+      }
+      else {
+         mask_field_str.clear();
+      }
+      
+      // Set the current threshold
+      if(thresh_opts.n() == 1) {
+         thresh = thresh_opts[0];
+      }
+      else if(thresh_opts.n() > i) {
+         thresh = thresh_opts[i];
+      }
+      else {
+         thresh.clear();
+      }
+
+      // Build mask type description string 
+      if(i>0) mask_type_desc_cs << " " << setlogic_to_abbr(set_logic) << " ";
+      mask_type_desc_cs << masktype_to_string(mask_type);
+      if(thresh.get_type() != thresh_na) mask_type_desc_cs << thresh.get_str();
+
+      // Process the mask file
+      static DataPlane dp_cur;
+      process_mask_file(dp_cur);
+
+      // Combine with prior masks
+      if(dp_mask.nxy() == 0) dp_mask = dp_cur;
+      else                   dp_mask = combine(dp_mask, dp_cur, set_logic);  
+
+   } // end for i
+
+   // Combine the input data with the current binary mask
    static DataPlane dp_out;
-   if(mask_type == MaskType::Poly    ||
-      mask_type == MaskType::Poly_XY ||
-      mask_type == MaskType::Shape   ||
-      mask_type == MaskType::Box     ||
-      mask_type == MaskType::Grid    ||
-      thresh.get_type() != thresh_na) {
-      dp_out = combine(dp_data, dp_mask, set_logic);
+   if(have_input_data &&
+      (mask_type == MaskType::Poly    ||
+       mask_type == MaskType::Poly_XY ||
+       mask_type == MaskType::Shape   ||
+       mask_type == MaskType::Box     ||
+       mask_type == MaskType::Grid    ||
+       thresh.get_type() != thresh_na)) {
+      dp_out = combine(dp_input, dp_mask, set_logic);
    }
    // Otherwise, pass through the distance or raw values
    else {
@@ -158,13 +200,13 @@ static void process_command_line(int argc, char **argv) {
    mask_filename  = cline[1];
    out_filename   = cline[2];
 
-   // Check for the mask type (from -type string)
-   if(mask_type == MaskType::None) {
-     mlog << Error << "\n" << program_name << " -> "
-          << "the -type command line requirement must be set to a specific masking type!\n"
-          << "\t\t   poly, box, circle, track, grid, data, solar_alt, "
-          << "solar_azi, solar_time, lat, lon, or shape\n\n";
-     exit(1);
+   // Check for at least one mask type
+   if(mask_type_opts.empty()) {
+      mlog << Error << "\n" << program_name << " -> "
+           << "the -type command line option must be used at least once!\n"
+           << "\t\t   poly, box, circle, track, grid, data, solar_alt, "
+           << "solar_azi, solar_time, lat, lon, or shape\n\n";
+      exit(1);
    }
    
    // List the input files
@@ -179,7 +221,9 @@ static void process_command_line(int argc, char **argv) {
 
 static void process_input_grid(DataPlane &dp) {
 
-   if (!build_grid_by_grid_string(input_gridname, grid, "process_input_grid", false)) {
+   // Read grid string
+   if(!build_grid_by_grid_string(input_gridname, grid, "process_input_grid", false)) {
+
       // Extract the grid from a gridded data file
       mlog << Debug(3)
            << "Use input grid defined by file \"" << input_gridname
@@ -191,6 +235,7 @@ static void process_input_grid(DataPlane &dp) {
 
    // If not yet set, fill the input data plane with zeros
    if(dp.is_empty()) {
+      have_input_data = false;
       dp.set_size(grid.nx(), grid.ny());
       dp.set_constant(0.0);
    }
@@ -309,8 +354,8 @@ static void process_mask_file(DataPlane &dp) {
       if(mask_field_str.empty()) {
          mlog << Error << "\nprocess_mask_file() -> "
               << "use \"-mask_field\" to specify the data whose valid "
-              << "time should be used for \"solar_alt\" and "
-              << "\"solar_azi\" masking.\n\n";
+              << "time should be used for \"solar_alt\", \"solar_azi\", "
+              << "and \"solar_time\" masking.\n\n";
          exit(1);
       }
       solar_ut = dp.valid();
@@ -478,7 +523,7 @@ static void get_data_plane(const ConcatString &file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool get_gen_vx_mask_config_str(MetNcMetDataFile *mnmdf_ptr,
+static bool get_gen_vx_mask_config_str(const MetNcMetDataFile *mnmdf_ptr,
                                        ConcatString &config_str) {
    bool status = false;
    ConcatString tool;
@@ -547,7 +592,7 @@ static void get_shapefile_strings() {
    for(const auto& pair: shape_str_map) {
       if(!rec_names.has(pair.first)) {
          mlog << Warning << "\nget_shapefile_strings() -> "
-              << "the \"-shape_str\" name \"" << pair.first
+              << R"(the "-shape_str" name ")" << pair.first
               << "\" is not in the list of " << rec_names.n()
               << " shapefile attributes and will be ignored:\n"
               << write_css(rec_names) << "\n\n";
@@ -1296,8 +1341,8 @@ static void apply_shape_mask(DataPlane & dp) {
    // Load the shapes
    GridClosedPolyArray poly;
    vector<GridClosedPolyArray> poly_list;
-   for(const auto& rec: shape_recs) {
-      poly.set(rec, grid);
+   for(const auto& cur_rec: shape_recs) {
+      poly.set(cur_rec, grid);
       poly_list.push_back(poly);
    }
 
@@ -1305,10 +1350,10 @@ static void apply_shape_mask(DataPlane & dp) {
    for(int x=0; x<(grid.nx()); x++) {
       for(int y=0; y<(grid.ny()); y++) {
 
-         for(const auto& poly: poly_list) {
+         for(const auto& cur_poly: poly_list) {
 
             // Check if point is inside
-            status = poly.is_inside(x, y);
+            status = cur_poly.is_inside(x, y);
 
             // Break after the first match
             if(status) break;
@@ -1463,7 +1508,11 @@ static void write_netcdf(const DataPlane &dp) {
          mask_name = poly_mask.name();
       }
       else {
-         mask_name << masktype_to_string(mask_type) << "_mask";
+         for(int i=0; i<mask_type_opts.size(); i++) {
+            if(i>0) mask_name << "_";
+            mask_name << masktype_to_string(mask_type_opts[i]);
+         }
+         mask_name << "_mask";
       }
    }
 
@@ -1476,9 +1525,7 @@ static void write_netcdf(const DataPlane &dp) {
    add_att(&mask_var, "long_name", string(cs));
    add_att(&mask_var, "units", string(units_cs));
    add_att(&mask_var, "_FillValue", bad_data_float);
-   cs << cs_erase << masktype_to_string(mask_type);
-   if(thresh.get_type() != thresh_na) cs << thresh.get_str();
-   add_att(&mask_var, "mask_type", string(cs));
+   add_att(&mask_var, "mask_type", mask_type_desc_cs);
 
    // Write the solar time
    if(is_solar_masktype(mask_type)) {
@@ -1620,7 +1667,7 @@ const char * masktype_to_description(const MaskType t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void usage() {
+__attribute__((noreturn)) static void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -1658,11 +1705,11 @@ static void usage() {
         << "\t\t   For \"grid\" masking, specify a named grid, the "
         << "path to a gridded data file, or an explicit grid "
         << "specification.\n"
-        << "\t\t   For \"data\" masking specify a gridded data file.\n"
-        << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, "
-        << "specify a gridded data file or a timestring in "
+        << "\t\t   For \"data\" masking, specify a gridded data file.\n"
+        << "\t\t   For \"solar_alt\", \"solar_azi\", and \"solar_time\" "
+        << "masking, specify a gridded data file or a timestring in "
         << "YYYYMMDD[_HH[MMSS]] format.\n"
-        << "\t\t   For \"lat\" and \"lon\" masking, no \"mask_file\" "
+        << "\t\t   For \"lat\" and \"lon\" masking, no \"mask_file\" is "
         << "needed, simply repeat \"input_grid\".\n"
         << "\t\t   For \"shape\" masking, specify a shapefile "
         << "(suffix \".shp\").\n"
@@ -1670,51 +1717,55 @@ static void usage() {
         << "\t\t\"out_file\" is the output NetCDF mask file to be "
         << "written (required).\n"
 
-        << "\t\t\"-type string\" specify the masking type "
+        << "\t\t\"-type string\" is a comma-separated list of masking types "
         << "(required).\n"
         << "\t\t   \"poly\", \"poly_xy\", \"box\", \"circle\", \"track\", "
-        << "\"grid\", \"data\", \"solar_alt\", \"solar_azi\", \"lat\", "
-        << "\"lon\" or \"shape\"\n"
+        << "\"grid\", \"data\", \"solar_alt\", \"solar_azi\", \"solar_time\", "
+        << "\"lat\", \"lon\" or \"shape\"\n"
+        << "\t\t   Use multiple times for multiple mask types.\n"
         
-        << "\t\t\"-input_field string\" reads existing mask data from "
-        << "the \"input_grid\" gridded data file (optional).\n"
+        << "\t\t\"-input_field string\" initializes the \"input_grid\" with "
+        << "values from this field (optional).\n"
 
         << "\t\t\"-mask_field string\" (optional).\n"
         << "\t\t   For \"data\" masking, define the field from "
         << "\"mask_file\" to be used.\n"
+        << "\t\t   Use multiple times for multiple mask types.\n"
 
         << "\t\t\"-complement\" computes the complement of the current "
         << "mask (optional).\n"
 
         << "\t\t\"-union | -intersection | -symdiff\" specify how "
-        << "to combine the \"input_field\" data with the current mask "
+        << "to combine the \"input_field\" with the current mask "
         << "(optional).\n"
 
-        << "\t\t\"-thresh string\" defines the threshold to be applied "
-        << "(optional).\n"
+        << "\t\t\"-thresh string\" is a comma-separated list of thresholds "
+	<< "to be applied (optional).\n"
         << "\t\t   For \"circle\" and \"track\" masking, threshold the "
         << "distance (km).\n"
         << "\t\t   For \"data\" masking, threshold the values of "
         << "\"mask_field\".\n"
         << "\t\t   For \"solar_alt\" and \"solar_azi\" masking, "
-        << "threshold the solar values in degrees.\n"
+        << "threshold the solar values (deg).\n"
         << "\t\t   For \"solar_time\" masking, "
-        << "threshold the solar time in decimal hours.\n"
+        << "threshold the solar time (hr).\n"
         << "\t\t   For \"lat\" and \"lon\" masking, threshold the "
-        << "latitude and longitude values.\n"
+        << "latitude and longitude values (deg).\n"
+        << "\t\t   Use multiple times for multiple mask types.\n"
 
         << "\t\t\"-height n\" and \"-width n\" (optional).\n"
-        << "\t\t   For \"box\" masking, specify these dimensions in grid "
-        << "units.\n"
+        << "\t\t   For \"box\" masking, specify the dimensions (grid "
+        << "units).\n"
 
         << "\t\t\"-shapeno n\" (optional).\n"
-        << "\t\t   For \"shape\" masking, specify the integer shape "
-        << "number(s) (0-based) to be used as a comma-separated list.\n"
+        << "\t\t   For \"shape\" masking, specify a comma-separated list "
+        << "of 0-based integer shape number(s).\n"
 
         << "\t\t\"-shape_str name string\" (optional).\n"
         << "\t\t   For \"shape\" masking, specify the shape(s) to be used "
         << "as a named attribute followed by a comma-separated list of "
-        << "matching strings. If used multiple times, only shapes matching "
+        << "matching strings.\n"
+        << "\t\t   If used multiple times, only shapes matching "
         << "all named attributes will be used.\n"
 
         << "\t\t\"-value n\" overrides the default output mask data "
@@ -1723,7 +1774,7 @@ static void usage() {
         << "\t\t\"-name string\" specifies the output variable name "
         << "for the mask (optional).\n"
 
-        << "\t\t\"-log file\" outputs log messages to the specified "
+        << "\t\t\"-log file\" writes log messages to the specified "
         << "file (optional).\n"
 
         << "\t\t\"-v level\" overrides the default level of logging ("
@@ -1741,16 +1792,11 @@ static void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 static void set_type(const StringArray & a) {
-   if(type_is_set) {
-      mlog << Error << "\n" << program_name << " -> "
-           << "the -type command line requirement can only be used once!\n"
-           << "To apply multiple masks, run this tool multiple times "
-           << "using the output of one run as the input to the next."
-           << "\n\n"; 
-      exit(1);
+   StringArray sa;
+   sa.parse_css(a[0]);
+   for(int i=0; i<sa.n(); i++) {
+      mask_type_opts.push_back(string_to_masktype(sa[i].c_str()));
    }
-   mask_type = string_to_masktype(a[0].c_str());
-   type_is_set = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1762,7 +1808,7 @@ static void set_input_field(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 static void set_mask_field(const StringArray & a) {
-   mask_field_str = a[0];
+   mask_field_opts.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1792,7 +1838,13 @@ static void set_symdiff(const StringArray &) {
 ////////////////////////////////////////////////////////////////////////
 
 static void set_thresh(const StringArray & a) {
-   thresh.set(a[0].c_str());
+   StringArray sa;
+   sa.parse_css(a[0]);
+   for(int i=0; i<sa.n(); i++) {
+      SingleThresh t;
+      t.set(sa[i].c_str());
+      thresh_opts.add(t);
+   }
 }
 
 ////////////////////////////////////////////////////////////////////////

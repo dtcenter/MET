@@ -84,7 +84,6 @@ extern const char * masktype_to_description(MaskType);
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const MaskType default_mask_type = MaskType::None;
 static const double default_mask_val = 1.0;
 
 ////////////////////////////////////////////////////////////////////////
@@ -95,13 +94,18 @@ static const double default_mask_val = 1.0;
 
 // Input data file, mask file, and output NetCDF file
 static ConcatString input_gridname, mask_filename, out_filename;
-static MaskType mask_type = default_mask_type;
-static bool type_is_set = false;
+static std::vector<MaskType> mask_type_opts;
+static MaskType mask_type;
+static ConcatString mask_type_desc_cs;
 
 // Optional arguments
-static ConcatString input_field_str, mask_field_str;
+static bool have_input_data = true;
+static ConcatString input_field_str;
+static StringArray mask_field_opts;
+static ConcatString mask_field_str;
 static SetLogic set_logic = SetLogic::None;
 static bool complement = false;
+static ThreshArray thresh_opts;
 static SingleThresh thresh;
 static int height = bad_data_double;
 static int width = bad_data_double;
@@ -132,7 +136,7 @@ static void      process_mask_file(DataPlane &dp);
 static void      get_data_plane(const ConcatString &file_name,
                     const ConcatString &config_str, bool,
                     DataPlane &dp, Grid &dp_grid);
-static bool      get_gen_vx_mask_config_str(MetNcMetDataFile *,
+static bool      get_gen_vx_mask_config_str(const MetNcMetDataFile *,
                     ConcatString &);
 static void      get_shapefile_strings();
 static void      get_shapefile_records();
