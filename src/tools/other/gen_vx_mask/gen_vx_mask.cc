@@ -131,14 +131,18 @@ int met_main(int argc, char *argv[]) {
 
    // Combine the input data with the current binary mask
    static DataPlane dp_out;
-   if(have_input_data &&
-      (mask_type == MaskType::Poly    ||
-       mask_type == MaskType::Poly_XY ||
-       mask_type == MaskType::Shape   ||
-       mask_type == MaskType::Box     ||
-       mask_type == MaskType::Grid    ||
-       thresh.get_type() != thresh_na)) {
-      dp_out = combine(dp_input, dp_mask, set_logic);
+   if(mask_type == MaskType::Poly    ||
+      mask_type == MaskType::Poly_XY ||
+      mask_type == MaskType::Shape   ||
+      mask_type == MaskType::Box     ||
+      mask_type == MaskType::Grid    ||
+      thresh.get_type() != thresh_na) {
+
+      // Combination logic based on presence of input data
+      SetLogic logic = (have_input_data ?
+                        set_logic : SetLogic::None);
+
+      dp_out = combine(dp_input, dp_mask, logic);
    }
    // Otherwise, pass through the distance or raw values
    else {
