@@ -1,15 +1,15 @@
 .. _masking:
 
-*******************************************
-Regional Verification using Spatial Masking
-*******************************************
+***************
+Spatial Masking
+***************
 
-Verification over a particular region or area of interest may be performed using "masking". Defining a masking region is simply selecting the desired set of grid points to be used. The Gen-Vx-Mask tool automates this process and replaces the Gen-Poly-Mask and Gen-Circle-Mask tools from previous releases. It may be run to create a bitmap verification masking region to be used by many of the statistical tools. This tool enables the user to generate a masking region once for a domain and apply it to many cases. It has been enhanced to support additional types of masking region definition (e.g. tropical-cyclone track over water only). An iterative approach may be used to define complex areas by combining multiple masking regions together.
+Verification over a particular region or area of interest may be performed using "masking". Defining a masking region is simply selecting the desired set of grid points to be used. The Gen-Vx-Mask tool automates this process and replaces the Gen-Poly-Mask and Gen-Circle-Mask tools from previous releases. It may be run to create a bitmap verification masking region to be used by many of the statistical tools. This tool enables the user to generate a masking region once for a domain and apply it to many cases. It supports multiple methods for defining regional spatial masks, as described below. In addition, Gen-Vx-Mask can be run iteratively, passing the output from one run as input to the next, to combine multiple masking regions and define a complex area of interest.
 
 Gen-Vx-Mask Tool
 ================
 
-The Gen-Vx-Mask tool may be run to create a bitmap verification masking region to be used by the MET statistics tools. This tool enables the user to generate a masking region once for a domain and apply it to many cases. While the MET statistics tools can define some masking regions on the fly using polylines, doing so can be slow, especially for complex polylines containing hundreds of vertices. Using the Gen-Vx-Mask tool to create a bitmap masking region before running the other MET tools will make them run more efficiently.
+The Gen-Vx-Mask tool may be run to create a bitmap verification masking region to be used by the MET statistics tools. This tool enables the user to generate a masking region once for a domain and apply it to many cases. While the MET statistics tools can define some masking regions on the fly using pre-defined grids and polylines, doing so can be slow, especially for complex polylines containing hundreds of vertices. Using the Gen-Vx-Mask tool to create a bitmap masking region before running the other MET tools will make them run more efficiently.
 
 gen_vx_mask Usage
 -----------------
@@ -38,63 +38,65 @@ The usage statement for the Gen-Vx-Mask tool is shown below:
          [-v level]
          [-compress level]
 
-gen_vx_mask has four required arguments and can take optional ones. Note that **-type string** (masking type) was previously optional but is now required.
+gen_vx_mask has four required arguments and can take optional ones. Note that **-type string** (masking type) was optional in prior versions but is now required.
 
 Required Arguments for gen_vx_mask
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **input_grid** argument is a named grid, the path to a gridded data file, or an explicit grid specification string (see :numref:`App_B-grid_specification_strings`) which defines the grid for which a mask is to be defined. If set to a gen_vx_mask output file, automatically read mask data as the **input_field**.
+1. The **input_grid** is a named grid, the path to a gridded data file, or an explicit grid specification string (see :numref:`App_B-grid_specification_strings`) which defines the grid for which a mask is to be defined. If set to a gen_vx_mask output file, automatically read mask data as the **input_field**.
 
-2. The **mask_file** argument defines the masking information, see below.
+2. The **mask_file** defines the masking information, see below.
 
 • For "poly", "poly_xy", "box", "circle", and "track" masking, specify an ASCII Lat/Lon file. Refer to :ref:`Types_of_masking_gen_vx_mask` for details on how to construct the ASCII Lat/Lon file for each type of mask.
 
-• For "grid" and "data" masking, specify a gridded data file.
+• For "grid" masking, specify a named grid, the path to a gridded data file, or an explicit grid specification.
+
+• For "data" masking, specify a gridded data file.
 
 • For "solar_alt", "solar_azi", and "solar_time" masking, specify a gridded data file or a time string in YYYYMMDD[_HH[MMSS]] UTC format.
 
-• For "lat" and "lon" masking, no "mask_file" needed, simply repeat the path for "input_file".
+• For "lat" and "lon" masking, no "mask_file" is needed, simply repeat "input_grid".
 
-• For "shape" masking, specify an ESRI shapefile (.shp).
+• For "shape" masking, specify a shapefile (suffix ".shp").
 
-3. The **out_file** argument is the output NetCDF mask file to be written.
+3. The **out_file** is the output NetCDF mask file to be written.
 
-4. The **-type string** is required to set the masking type. The application will give an error message and exit if "-type string" is not specified on the command line. See the description of supported types below.
-   
+4. The **-type string** is a comma-separated list of masking types to be applied. The application will print an error message and exit if "-type string" is not specified at least once on the command line. Use multiple times for multiple mask types. See the description of supported types below.
+
 Optional Arguments for gen_vx_mask
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. The **-input_field string** option can be used to read existing mask data from "input_file".
+5. The **-input_field string** option initializes the "input_grid" with values from this field.
 
-6. The **-mask_field string** option can be used to define the field from "mask_file" to be used for "data" masking.
+6. The **-mask_field string** option defines the field from "mask_file" to be used for "data" masking. Use multiple times for multiple mask types.
 
 7. The **-complement** option can be used to compute the complement of the area defined by "mask_file".
 
-8. The **-union | -intersection | -symdiff** option can be used to specify how to combine the masks from "input_file" and "mask_file".
+8. The **-union | -intersection | -symdiff** options specify how to combine the "input_field" with the current mask.
 
-9. The **-thresh string** option can be used to define the threshold to be applied.
+9. The **-thresh string** option is a comma-separated list of thresholds to be applied. Use multiple times for multiple mask types.
 
 • For "circle" and "track" masking, threshold the distance (km).
 
 • For "data" masking, threshold the values of "mask_field".
 
-• For "solar_alt" and "solar_azi" masking, threshold the computed solar degrees.
+• For "solar_alt" and "solar_azi" masking, threshold the computed solar values (deg).
 
-• For "solar_time" masking, threshold the decimal solar hours of the day.
+• For "solar_time" masking, threshold the solar time (hr).
 
-• For "lat" and "lon" masking, threshold the latitude and longitude values. 
+• For "lat" and "lon" masking, threshold the latitude and longitude values (deg).
 
-10. The **-height n** and **-width n** options set the size in grid units for "box" masking.
+10. The **-height n** and **-width n** options specify the dimensions in grid units for "box" masking.
 
 11. The **-shapeno n** option is only used for shapefile masking. See the description of shapefile masking below.
 
 12. The **-shape_str name string** option is only used for shapefile masking. See the description of shapefile masking below.
 
-13. The **-value n** option can be used to override the default output mask data value (1).
+13. The **-value n** option overrides the default output mask data value (1).
 
-14. The **-name string** option can be used to specify the output variable name for the mask.
+14. The **-name string** option specifies the output variable name for the mask.
 
-15. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
+15. The **-log file** option writes log messages to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
 16. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
@@ -136,48 +138,71 @@ The polyline, polyline XY, box, circle, and track masking methods all read an AS
 
 The Gen-Vx-Mask tool performs three main steps, described below.
 
-1. Determine the **input_field** and grid definition.
+1. Determine the input grid definition.
 
-• Read the **input_file** to determine the grid over which the mask should be defined.
+• Read the **input_grid** to determine the grid over which the mask should be defined.
 
-• By default, initialize the **input_field** at each grid point to a value of zero.
+• By default, initialize the input field value at each grid point to zero.
 
-• If the **-input_field** option was specified, initialize the **input_field** at each grid point to the value of that field.
+• If the **-input_field** option was specified, initialize each input field value using the values from that field.
 
-• If the **input_file** is the output from a previous run of Gen-Vx-Mask, automatically initialize each grid point with the **input_field** value.
+• If the **input_grid** is the output from a previous run of Gen-Vx-Mask, automatically initialize each input field value with the previously-generated mask value.
 
-2. Determine the **mask_field**.
+2. Determine the current masking region.
 
-• Read the **mask_file**, process it based on the **-type** setting (as described above), and define the **mask_field** value for each grid point to specify whether or not it is included in the mask.
+• For each **-type** mask type option requested, process the **mask_file** setting.
+
+• Read the **mask_file**, process it based on the **-type** setting (as described above), and define the masking region value for each grid point to specify whether or not it is included in the mask.
 
 • By default, store the mask value as 1 unless the **-value** option was specified to override that default value.
 
-• If the **-complement** option was specified, the opposite of the masking area is selected.
+• If the **-complement** option was specified, select the opposite of the masking area.
 
-3. Apply logic to combine the **input_field** and **mask_field** and write the **out_file**.
+• Apply logic to combine the newly generated masking region with those defined by previous **-type** mask type options to create a **mask_field**.
 
-• By default, the output value at each grid point is set to the value of **mask_field** if included in the mask, or the value of **input_field** if not included.
+3. Apply logic to combine the input field and current masking region and write the **out_file**.
 
-• If the **-union, -intersection**, or **-symdiff** option was specified, apply that logic to the **input_field** and **mask_field** values at each grid point to determine the output value.
+• By default, the output value at each grid point is set to the value of current masking region if included in the mask, or the value of **input_field** if not included.
+
+• If the **-union, -intersection**, or **-symdiff** option was specified, apply that logic to the input field and current masking region values at each grid point to determine the output value.
 
 • Write the output value for each grid point to the **out_file**.
 
-This three step process enables the Gen-Vx-Mask tool to be run iteratively on its own output to generate complex masking areas. Additionally, the **-union, -intersection**, and **-symdiff** options control the logic for combining the input data value and current mask value at each grid point. For example, one could define a complex masking region by selecting grid points with an elevation greater than 1000 meters within a specified geographic region by doing the following:
+.. note::
 
-• Run the Gen-Vx-Mask tool to apply data masking by thresholding a field of topography greater than 1000 meters. 
+   While multiple **-type** mask types can be requested in a single run, all requested masking types must use the same **mask_file** setting.
 
-• Rerun the Gen-Vx-Mask tool passing in the output of the first call and applying polyline masking to define the geographic area of interest. 
 
-  - Use the **-intersection** option to only select grid points whose value is non-zero in both the input field and the current mask.
-
-An example of the gen_vx_mask calling sequence is shown below:
+An example of defining the northwest hemisphere of the earth, as defined by latitudes >= 0 and longitudes < 0, in a single run is shown below:
 
 .. code-block:: none
 
-  gen_vx_mask sample_fcst.grb \
-  CONUS.poly CONUS_poly.nc
+  gen_vx_mask G004 G004 northwest_hemisphere.nc \
+  -type lat,lon -thresh ge0,lt0 \
+  -intersection -name nw_hemisphere
 
-In this example, the Gen-Vx-Mask tool will read the ASCII Lat/Lon file named **CONUS.poly** and apply the default polyline masking method to the domain on which the data in the file **sample_fcst.grib** resides. It will create a NetCDF file containing a bitmap for the domain with a value of 1 for all grid points inside the CONUS polyline and a value of 0 for all grid points outside. It will write an output NetCDF file named **CONUS_poly.nc**.
+
+The Gen-Vx-Mask tool to be run iteratively on its own output using different **mask_file** settings to generate complex masking areas. The **-union, -intersection**, and **-symdiff** options control the logic for combining the input field and current mask values at each grid point. For example, one could define a complex masking region by selecting grid points with an elevation greater than 1000 meters within a Contiguous United States geographic region by doing the following:
+
+• Run Gen-Vx-Mask to apply data masking by thresholding a field of topography greater than 1000 meters.
+
+• Run Gen-Vx-Mask a second time on the output from the first call and applying polyline masking to define the geographic area of interest. Use the **-intersection** option to only select grid points whose value is non-zero in both the input field and the current mask.
+
+An example of this Gen-Vx-Mask calling sequence is shown below:
+
+.. code-block:: none
+
+  gen_vx_mask fcst.grib fcst.grib TOPO_mask.nc \
+  -type data \
+  -mask_field 'name="TOPO"; level="L0";' \
+  -thresh '>1000'
+
+  gen_vx_mask TOPO_mask.nc CONUS.poly TOPO_CONUS_mask.nc \
+  -type poly \
+  -intersection -name TOPO_CONUS_mask
+
+
+Here, Gen-Vx-Mask uses the **data** masking type to read topography data (**TOPO**) from a GRIB file and thresholds the values **>1000** to define a topography mask. The second run of Gen-Vx-Mask uses the **poly** masking type to read the ASCII Lat/Lon file named **CONUS.poly** and select all grid points within that region to define a polyline mask. When reading its own output, Gen-Vx-Mask automatically reads the topography mask as the **input_field** and applies the **intersection** logic to combine it with the polyline mask, selecting grid points where both conditions are true. The resulting complex mask is written to the output NetCDF file named **TOPO_CONUS_mask.nc**.
 
 Feature-Relative Methods
 ========================
