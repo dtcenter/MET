@@ -103,6 +103,7 @@ static bool have_input_data = true;
 static ConcatString input_field_str;
 static StringArray mask_field_opts;
 static ConcatString mask_field_str;
+static ConcatString data_desc_cs;
 static SetLogic set_logic = SetLogic::None;
 static bool complement = false;
 static ThreshArray thresh_opts;
@@ -122,7 +123,8 @@ static std::vector<ShpPolyRecord> shape_recs;
 static MaskPoly poly_mask;
 
 // Grid on which the data field resides
-static Grid grid, grid_mask;
+static Grid grid;
+static Grid grid_mask;
 
 // Configuration object for reading config strings
 static MetConfig global_config;

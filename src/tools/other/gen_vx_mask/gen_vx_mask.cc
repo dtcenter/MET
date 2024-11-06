@@ -85,10 +85,13 @@ int met_main(int argc, char *argv[]) {
    // Process each -type setting
    for(int i=0; i<mask_type_opts.size(); i++) {
 
+      // Re-initialize the mask grid for each iteration
+      grid_mask.clear();
+
       // Set the current mask type 
       mask_type = mask_type_opts[i];
 
-      // Set the current mask field_
+      // Set the current mask field
       if(mask_field_opts.n() == 1) {
          mask_field_str = mask_field_opts[0];
       }
@@ -110,14 +113,15 @@ int met_main(int argc, char *argv[]) {
          thresh.clear();
       }
 
-      // Build mask type description string 
-      if(i>0) mask_type_desc_cs << " " << setlogic_to_abbr(set_logic) << " ";
-      mask_type_desc_cs << masktype_to_string(mask_type);
-      if(thresh.get_type() != thresh_na) mask_type_desc_cs << thresh.get_str();
-
       // Process the mask file
       static DataPlane dp_cur;
       process_mask_file(dp_cur);
+
+      // Build mask type description string 
+      if(i>0) mask_type_desc_cs << " " << setlogic_to_abbr(set_logic) << " ";
+      mask_type_desc_cs << masktype_to_string(mask_type);
+      if(mask_type == MaskType::Data) mask_type_desc_cs << "(" << data_desc_cs << ")";
+      if(thresh.get_type() != thresh_na) mask_type_desc_cs << thresh.get_str();
 
       // Combine with prior masks
       if(dp_mask.nxy() == 0) dp_mask = dp_cur;
@@ -506,6 +510,9 @@ static void get_data_plane(const ConcatString &file_name,
 
       // Store the units string if no threhsold was specified
       if(thresh.get_type() == thresh_na) units_cs = vi_ptr->units();
+
+      // Store the description of the data
+      data_desc_cs = vi_ptr->magic_str();
 
       // Clean up
       if(vi_ptr) { delete vi_ptr; vi_ptr = (VarInfo *) nullptr; }
