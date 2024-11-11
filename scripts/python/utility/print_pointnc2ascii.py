@@ -158,7 +158,9 @@ class met_nc_point_obs():
     def get_precision(self, data_list):
         precision = 0
         for v in data_list:
-            if abs((v*10)-int(v*10)) < 0.000001 or abs((v*10)-int(v*10)) > 0.999998:
+            if np.ma.is_masked(v) or np.isnan(v):
+                continue 
+            elif abs((v*10)-int(v*10)) < 0.000001 or abs((v*10)-int(v*10)) > 0.999998:
                 if precision < 1:
                     precision = 1
             elif abs((v*100)-int(v*100)) < 0.000001 or abs((v*100)-int(v*100)) > 0.999998:

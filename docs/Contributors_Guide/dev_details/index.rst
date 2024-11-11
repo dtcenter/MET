@@ -9,3 +9,4 @@ MET code base. The list of topics is certainly not comprehensive.
    :titlesonly:
 
    tmp_file_use
+   static_data_files

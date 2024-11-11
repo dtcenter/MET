@@ -280,10 +280,10 @@ AirNow stations based on stationId and/or AqSid.
 Additional information and updated site locations can be found at the
 `EPA AirNow website <https://www.airnow.gov>`_. While some monitoring stations are
 permanent, others are temporary, and theirs locations can change. When running the
-ascii2nc tool with the `-format airnowhourly` option, users should
-`download <https://test.airnowtech.org/>`_ the `Monitoring_Site_Locations_V2.dat` data file
-data file corresponding to the date being processed and set the MET_AIRNOW_STATIONS
-envrionment variable to define its location.
+ASCII2NC tool with the :code:`-format airnowhourly` option, users should
+`download <https://files.airnowtech.org>`_ the **Monitoring_Site_Locations_V2.dat**
+data file for the date being processed and set the MET_AIRNOW_STATIONS environment
+variable to define its location.
 
 .. _met_ndbc_stations:
 
@@ -329,6 +329,8 @@ To run this utility:
   The downloaded files are written to a subdirectory ndbc_temp_data which
   can be deleted once the final output file is created.
 
+.. _met_base_env_var:
+
 MET_BASE
 --------
 
@@ -338,6 +340,8 @@ common polygons and color scales. MET_BASE may be used in the MET configuration
 files when specifying paths and the appropriate path will be substituted in.
 If MET_BASE is defined as an environment variable, its value will be used
 instead of the one defined at compilation time.
+
+.. _met_obs_error_table:
 
 MET_OBS_ERROR_TABLE
 -------------------
