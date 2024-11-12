@@ -209,7 +209,7 @@ Configuring Vortex Removal Option
 
 The **vortex_removal** flag entry is a boolean specifying whether or not vortex removal logic should be applied.
 
-.. note:: As of MET version 11.1.0, vortex removal logic is not yet supported.
+.. note:: As of MET version 12.0.0, vortex removal logic is not yet supported.
 
 Configuring Data Input and Output Options
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -251,11 +251,11 @@ When the **cira_diag_flag** configuration entry is set to true, an ASCII CIRA di
 
 These output files contain tabular ASCII data with the computed diagnostic values for a single track. One output file is created for each track from each model source. The output consists of the following sections:
 
-  - Two header lines list the model name, initialization time, storm basin, and storm number (of the season).
+  - Two header lines list the model name, initialization time, storm basin, and integer storm number (of the season).
 
   - The **STORM DATA** section contains single diagnostic values computed for each forecast lead time. This section begins with a line named **TIME** defining the forecast lead times in hours. The storm diagnostics computed for each line type follow. For example, **RMW** contains the radius of maximum wind value found within the range/azimuth grid.
 
-  - The **SOUNDING DATA** section contains diagnostics computed separately for each pressure level. This section begins with two lines named **NLEV** and **TIME** defining the vertical level values and forecast lead times for which diagnostics were computed, respectively. The level name is appended to the diagnostic name. For example, the **T_0850** contains the average temperature value within the range/azimuth grid at the 850 mb pressure level.
+  - The **SOUNDING DATA** section contains diagnostics computed separately for each vertical level. The vertical levels are typically the surface (e.g. **SURF**) followed by pressure levels (e.g. **0850**). This section begins with two lines named **NLEV** and **TIME** defining the number of vertical levels and their values and the forecast lead times for which diagnostics were computed, respectively. The level name is appended to each diagnostic name. For example, the **T_0850** contains the average temperature value within the range/azimuth grid at the 850 mb pressure level.
 
   - Each diagnostic output line contains:
 
