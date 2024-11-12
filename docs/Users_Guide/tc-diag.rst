@@ -249,7 +249,7 @@ The TC-Diag tool writes up to three output data types, as specified by flags in 
 
 When the **cira_diag_flag** configuration entry is set to true, an ASCII CIRA diagnostics output file is written for each model track provided. These files are named using the **output_base_format**, described above, followed by the **_diag.dat** suffix.
 
-These output files contain tabular ASCII data with diagnostic values either extracted directly from the input ATCF track file or computed from the gridded data, after converting it to a storm-centric cylindrical coordinates grid. One output file is created for each track from each model source. The output consists of the following sections:
+These output files contain tabular ASCII data with diagnostic values either extracted directly from the input ATCF track file or computed from the gridded data, after converting it to a storm-centric cylindrical grid. One output file is created for each track from each model source. The output consists of the following sections:
 
   - Two header lines list the model name, initialization time, storm basin, and integer storm number (of the season).
 
