@@ -332,7 +332,7 @@ When the **nc_diag_flag** configuration entry is set to true, a NetCDF output fi
 
 **NetCDF Range-Azimuth Output**
 
-When the **nc_rng_azi_flag** configuration entry is set to true, a NetCDF output file containing the cylindrical coordinate range-azimuth data is written for each combination of model track provided and domain specified. For example, if three model tracks are provided and data for both *parent* and *nest* domains are provided, six of these NetCDF output files will be written.
+When the **nc_rng_azi_flag** configuration entry is set to true, a NetCDF output file containing the cylindrical range-azimuth data is written for each combination of model track provided and domain specified. For example, if three model tracks are provided and data for both *parent* and *nest* domains are provided, six of these NetCDF output files will be written.
 
 The NetCDF range-azimuth output is named using the **output_base_format**, described above, followed by **_cyl_grid_{DOMAIN}.nc**, where **{DOMAIN}** is specified by the **domain** string in each **domain_info** array entry.
 
