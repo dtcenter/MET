@@ -338,7 +338,7 @@ The NetCDF range-azimuth output is named using the **output_base_format**, descr
 
 This NetCDF file contains a concatenation of the data from the temporary NetCDF files created for each track point. For each track point, TC-Diag creates a temporary NetCDF file and calls Python code to read the cylindrical grid data and compute diagnostics. By default, these temporary NetCDF files are deleted at the end of each run, but if the **nc_rng_azi_flag** is true, the data for each track point is concatenated into a single output file for each track. 
 
-.. note:: Setting the **MET_KEEP_TEMP_FILE** (:numref:`met_keep_temp_file`) environment variable retains the temporary NetCDF cylindrical coordinate files for development, testing, and debugging purposes.
+.. note:: Setting the **MET_KEEP_TEMP_FILE** (:numref:`met_keep_temp_file`) environment variable retains the temporary NetCDF cylindrical grid files for development, testing, and debugging purposes.
 
 The NetCDF range-azimuth file contains the dimensions and variables shown in :numref:`table_TC-Diag_Dimensions_NetCDF_range_azimuth` and :numref:`table_TC-Diag_Variables_NetCDF_range_azimuth`.
 
