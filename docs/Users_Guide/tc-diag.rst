@@ -249,11 +249,11 @@ The TC-Diag tool writes up to three output data types, as specified by flags in 
 
 When the **cira_diag_flag** configuration entry is set to true, an ASCII CIRA diagnostics output file is written for each model track provided. These files are named using the **output_base_format**, described above, followed by the **_diag.dat** suffix.
 
-These output files contain tabular ASCII data with the computed diagnostic values for a single track. One output file is created for each track from each model source. The output consists of the following sections:
+These output files contain tabular ASCII data with diagnostic values either extracted directly from the input ATCF track file or computed from the gridded data, after converting it to a storm-centric cylindrical coordinates grid. One output file is created for each track from each model source. The output consists of the following sections:
 
   - Two header lines list the model name, initialization time, storm basin, and integer storm number (of the season).
 
-  - The **STORM DATA** section contains single diagnostic values computed for each forecast lead time. This section begins with a line named **TIME** defining the forecast lead times in hours. The storm diagnostics computed for each line type follow. For example, **RMW** contains the radius of maximum wind value found within the range/azimuth grid.
+  - The **STORM DATA** section contains single diagnostic values either extracted from the ATCF track file or computed from the cylindrical coordinates grid for each forecast lead time. This section begins with a line named **TIME** defining the forecast lead time of each track point in hours. The following lines contain the requested storm diagnostics. For example, **MAXWIND** contains the maximum wind speed reported in the ATCF track file and **SST** contains the average sea surface temperature computed in the range/azimuth grid.
 
   - The **SOUNDING DATA** section contains diagnostics computed separately for each vertical level. The vertical levels are typically the surface (e.g. **SURF**) followed by pressure levels (e.g. **0850**). This section begins with two lines named **NLEV** and **TIME** defining the number of vertical levels and their values and the forecast lead times for which diagnostics were computed, respectively. The level name is appended to each diagnostic name. For example, the **T_0850** contains the average temperature value within the range/azimuth grid at the 850 mb pressure level.
 
