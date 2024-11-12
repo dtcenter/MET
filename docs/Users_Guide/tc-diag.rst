@@ -63,8 +63,6 @@ Optional Arguments for tc_diag
 
 6. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-.. note:: Setting the **MET_KEEP_TEMP_FILE** (:numref:`met_keep_temp_file`) environment variable retains the temporary NetCDF cylindrical coordinate files for development, testing, and debugging purposes.
-
 tc_diag Configuration File
 --------------------------
 
@@ -130,7 +128,7 @@ The **domain_info** entry is an array of dictionaries. Each dictionary consists 
 
 The **n_range** entry is an integer specifying the number of equally spaced range intervals in the range-azimuth grid to be used for this data source.
 
-The **n_azimuth** entry is an integer specifying the number of equally spaced azimuth intervals in the range-azimuth grid to be used for this data source. The azimuthal grid spacing is 360 / **n_azimuth** degrees.
+The **n_azimuth** entry is an integer specifying the number of equally spaced azimuth intervals in the range-azimuth grid to be used for this data source. The azimuthal grid spacing is 360 / **n_azimuth** degrees. Azimuths are defined by MET as *degrees clockwise* from due east. However, the TC-Diag Python code expects them as *radians counter-clockwise* from due east. The **tc_diag_driver/post_resample_driver.py** driver script performs the neccessary rotation and conversion operations. 
 
 The **delta_range_km** entry is a floating point value specifying the spacing of the range rings in kilometers.
 
@@ -249,23 +247,98 @@ The TC-Diag tool writes up to three output data types, as specified by flags in 
 
 **CIRA Diagnostics Output**
 
-When the **cira_diag_flag** configuration entry is set to true, an ASCII CIRA diagnostics output file is written for each model track provided.
+When the **cira_diag_flag** configuration entry is set to true, an ASCII CIRA diagnostics output file is written for each model track provided. These files are named using the **output_base_format**, described above, followed by the **_diag.dat** suffix.
 
-TODO: Details will be added for issue dtcenter/MET#2729.
+These output files contain tabular ASCII data with the computed diagnostic values for a single track. One output file is created for each track from each model source. The output consists of the following sections:
+
+  - Two header lines list the model name, initialization time, storm basin, and storm number (of the season).
+
+  - The **STORM DATA** section contains single diagnostic values computed for each forecast lead time. This section begins with a line named **TIME** defining the forecast lead times in hours. The storm diagnostics computed for each line type follow. For example, **RMW** contains the radius of maximum wind value found within the range/azimuth grid.
+
+  - The **SOUNDING DATA** section contains diagnostics computed separately for each pressure level. This section begins with two lines named **NLEV** and **TIME** defining the vertical level values and forecast lead times for which diagnostics were computed, respectively. The level name is appended to the diagnostic name. For example, the **T_0850** contains the average temperature value within the range/azimuth grid at the 850 mb pressure level.
+
+  - Each diagnostic output line contains:
+
+    - Diagnostic name (with or without the level) e.g. **SHR_MAG** for magnitude of wind shear
+
+    - Units string enclosed in parenthesis e.g. **(KT)** for knots
+
+    - The diagnostic values computed for each lead time e.g. **13 10 14 ...**
 
 **NetCDF Diagnostics Output**
 
-When the **nc_diag_flag** configuration entry is set to true, a NetCDF output file containing the computed diagnostics is written for each model track provided.
+When the **nc_diag_flag** configuration entry is set to true, a NetCDF output file containing the computed diagnostics is written for each model track provided. These files contain the same data provided in the CIRA Diagnostics Output but formatted in NetCDF instead of ASCII. These files are named using the **output_base_format**, described above, followed by the **_diag.nc** suffix.
 
-TODO: Details will be added for issue dtcenter/MET#2729.
+.. _table_TC-Diag_Dimensions_NetCDF_diagnostics:
+
+.. list-table:: Dimensions defined in NetCDF Diagnostics output
+  :widths: auto
+  :header-rows: 2
+
+  * - tc_diag NETCDF DIMENSIONS
+    -
+  * - NetCDF Dimension
+    - Description
+  * - time
+    - Time dimension for the number of track point valid times
+  * - pressure
+    - Vertical dimension for the number of pressure levels
+
+.. role:: raw-html(raw)
+    :format: html
+
+.. _table_TC-Diag_Variables_NetCDF_diagnostics:
+
+.. list-table:: Variables defined in NetCDF Diagnostics output
+  :widths: auto
+  :header-rows: 2
+
+  * - tc_diag NETCDF VARIABLES
+    -
+    -
+  * - NetCDF Variable
+    - Dimension
+    - Description
+  * - storm_id
+    - NA
+    - Tropical Cyclone Storm ID (BBNNYYYY) consisting of 2-letter basin name, 2-digit storm number, and 4-digit year
+  * - model
+    - NA
+    - Track ATCF ID model name
+  * - init_time
+    - NA
+    - Track initialization time string in YYYYMMDD_HHMMSS format
+  * - init_time_ut
+    - NA
+    - Track initialization time string in unixtime (seconds since January 1, 1970) format
+  * - valid_time
+    - time
+    - Track point valid time string in YYYYMMDD_HHMMSS format
+  * - valid_time_ut
+    - time
+    - Track point valid time string in unixtime (seconds since January 1, 1970) format
+  * - lead_time
+    - time
+    - Track point forecast lead time string in HHMMSS format
+  * - lead_time_sec
+    - time
+    - Track point forecast lead time integer number of seconds
+  * - {DOMAIN}_domain
+    - NA 
+    - Attributes define the range/azimuth grid for the {DOMAIN} domain: **n_range**, **n_azimuth**, **delta_range_km**
+  * - Diagnostic values
+    - time or time and pressure
+    - Computed diagnostic values for each track point and, optionally, pressure level. The **units** attribute defines the units of the diagnostic values.
 
 **NetCDF Range-Azimuth Output**
 
 When the **nc_rng_azi_flag** configuration entry is set to true, a NetCDF output file containing the cylindrical coordinate range-azimuth data is written for each combination of model track provided and domain specified. For example, if three model tracks are provided and data for both *parent* and *nest* domains are provided, six of these NetCDF output files will be written.
 
-The NetCDF range-azimuth output is named using the following naming convention:
+The NetCDF range-azimuth output is named using the **output_base_format**, described above, followed by **_cyl_grid_{DOMAIN}.nc**, where **{DOMAIN}** is specified by the **domain** string in each **domain_info** array entry.
 
-**tc_diag_STORMID_TECH_YYYYMMDDHH_cyl_grid_DOMAIN.nc** where STORMID is the 2-letter basin name, 2-digit storm number, and 4-digit year, TECH is the acronym for the objective technique, YYYYMMDDHH is the track initialization time, and DOMAIN is the domain name.
+This NetCDF file contains a concatenation of the data from the temporary NetCDF files created for each track point. For each track point, TC-Diag creates a temporary NetCDF file and calls Python code to read the cylindrical coordinates data and compute diagnostics. By default, these temporary NetCDF files are deleted at the end of each run, but if the **nc_rng_azi_flag** is true, the data for each track point is concatenated into a single output file for each track. 
+
+.. note:: Setting the **MET_KEEP_TEMP_FILE** (:numref:`met_keep_temp_file`) environment variable retains the temporary NetCDF cylindrical coordinate files for development, testing, and debugging purposes.
 
 The NetCDF range-azimuth file contains the dimensions and variables shown in :numref:`table_TC-Diag_Dimensions_NetCDF_range_azimuth` and :numref:`table_TC-Diag_Variables_NetCDF_range_azimuth`.
 
