@@ -526,9 +526,12 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
   * - 28-29
     - CENTROID_LAT,_LON
     - Location of the centroid (in lat/lon degrees)
-  * - 30-31
-    - X_,Y_DOT
-    - X and Y components of object velocity (in grid units per time step)
+  * - 30
+    - X_DOT
+    - X component of object velocity (in grid units per time step)
+  * - 31
+    - Y_DOT
+    - Y component of object velocity (in grid units per time step)
   * - 32
     - AXIS_ANG
     - Angle that the axis plane of an object makes with the grid x direction (in degrees)
