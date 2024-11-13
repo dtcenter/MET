@@ -140,7 +140,14 @@ def diag_calcs(
     land_lut = diag_vars.get_land_lut(land_lut_file)
     radii_1d = input_data[config.in_radii_name]
     _validate_radii(config.radii_to_validate, radii_1d, data_path)
-    azimuth_1d = input_data[config.in_azimuth_name]
+
+    # MET #2729: Modify the azimuth values reported by MET
+    #   - Subtract from 360 degrees to convert rotation angle
+    #     from clockwise to counter-clockwise
+    #   - Convert from degrees to radians
+    azimuth_1d_deg = (360 - input_data[config.in_azimuth_name]) % 360
+    azimuth_1d = np.deg2rad(azimuth_1d_deg)
+
     theta_2d, radii_2d = np.meshgrid(azimuth_1d, radii_1d)
     atcf_tech_id = _parse_atcf_id(input_data[config.full_track_line_name])
     track = _dataset_track_lines_to_track(

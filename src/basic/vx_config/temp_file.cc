@@ -74,7 +74,7 @@ void remove_temp_file(const ConcatString file_name) {
    if (nullptr != keep_temp
        && (0 == strcmp(keep_temp, "true") || 0 == strcmp(keep_temp, "yes"))) {
       mlog << Debug(2) << "The temporary file ("
-           << file_name << ") was not deleted. Please remove it manually\n\n";
+           << file_name << ") was not deleted. Please remove it manually.\n";
       return;
    }
 
