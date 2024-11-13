@@ -533,10 +533,10 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Version number
   * - 2
     - MODEL
-    - User provided text string designating model name
+    - User-provided text string designating model name
   * - 3
     - DESC
-    - User provided text string describing the verification task
+    - User-provided text string describing the verification task
   * - 4
     - FCST_LEAD
     - Forecast lead time in HHMMSS format
