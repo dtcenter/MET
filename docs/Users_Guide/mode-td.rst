@@ -482,40 +482,22 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
     - Time index of slice
   * - 26
     - AREA
-    - 2D cross-sectional area
-  * - 27
-    - CENTROID_X
-    - x coordinate of centroid
-  * - 28
-    - CENTROID_Y
-    - y coordinate of centroid
-  * - 29
-    - CENTROID_LAT
-    - Latitude of centroid
-  * - 30
-    - CENTROID_LON
-    - Longitude of centroid
+    - 2D cross-sectional area (in grid squares)
+  * - 27-28
+    - CENTROID_X,_Y
+    - Location of centroid (in grid units)
+  * - 29-30
+    - CENTROID_LAT,_LON
+    - Location of centroid (in lat/lon degrees)
   * - 31
     - AXIS_ANG
-    - Angle that the axis makes with the grid x direction
-  * - 32
-    - INTENSITY_10
-    - :math:`\text{10}^{th}` percentile intensity in time slice
-  * - 33
-    - INTENSITY_25
-    - :math:`\text{25}^{th}` percentile intensity in time slice
-  * - 34
-    - INTENSITY_50
-    - :math:`\text{60}^{th}` percentile intensity in time slice
-  * - 35
-    - INTENSITY_75
-    - :math:`\text{75}^{th}` percentile intensity in time slice
-  * - 36
-    - INTENSITY_90
-    - :math:`\text{90}^{th}` percentile intensity in time slice
+    - Angle that the axis makes with the grid x direction (in degrees)
+  * - 32-36
+    - INTENSITY_10,_25,_50,_75,_90
+    - 10th, 25th, 50th, 75th, and 90th percentile intensity in time slice (various units)
   * - 37
-    - INTENSITY_*
-    - User-specified percentile intensity in time slice
+    - INTENSITY_NN
+    - User-specified percentile intensity in time slice (various units)
 
 .. _table_mtd-3D-single-attributes:
 
@@ -535,60 +517,39 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
   * - 24
     - OBJECT_CAT
     - Object category
-  * - 25
-    - CENTROID_X
-    - x coordinate of centroid
-  * - 26
-    - CENTROID_Y
-    - y coordinate of centroid
+  * - 25-26
+    - CENTROID_X,_Y
+    - Location of the centroid (in grid units)
   * - 27
     - CENTROID_T
-    - t coordinate of centroid
-  * - 28
-    - CENTROID_LAT
-    - Latitude of centroid
-  * - 29
-    - CENTROID_LON
-    - Longitude of centroid
-  * - 30
-    - X_DOT
-    - x component of object velocity
-  * - 31
-    - Y_DOT
-    - y component of object velocity
+    - Time coordinate of centroid (in time steps)
+  * - 28-29
+    - CENTROID_LAT,_LON
+    - Location of the centroid (in lat/lon degrees)
+  * - 30-31
+    - X_,Y_DOT
+    - X and Y components of object velocity (in grid units per time step)
   * - 32
     - AXIS_ANG
-    - Angle that the axis plane of an object makes with the grid x direction
+    - Angle that the axis plane of an object makes with the grid x direction (in degrees)
   * - 33
     - VOLUME
-    - Integer count of the number of 3D "cells" in an object
+    - 3D object volume (integer count of 3D spacetime cells)
   * - 34
     - START_TIME
-    - Object start time
+    - Object start time (in time steps)
   * - 35
     - END_TIME
-    - Object end time
+    - Object end time (in time steps)
   * - 36
     - CDIST_TRAVELLED
-    - Total great circle distance travelled by the 2D spatial centroid over the lifetime of the 3D object
-  * - 37
-    - INTENSITY_10
-    - :math:`\text{10}^{th}` percentile intensity inside object
-  * - 38
-    - INTENSITY_25
-    - :math:`\text{25}^{th}` percentile intensity inside object
-  * - 39
-    - INTENSITY_50
-    - :math:`\text{50}^{th}` percentile intensity inside object
-  * - 40
-    - INTENSITY_75
-    - :math:`\text{75}^{th}` percentile intensity inside object
-  * - 41
-    - INTENSITY_90
-    - :math:`\text{90}^{th}` percentile intensity inside object
+    - Total great circle distance travelled by the 2D spatial centroid over the lifetime of the 3D object (in kilometers)
+  * - 37-41
+    - INTENSITY_10,_25,_50,_75,_90
+    - 10th, 25th, 50th, 75th, and 90th percentile intensity in spacetime object (various units)
   * - 42
-    - INTENSITY_*
-    - User-specified percentile intensity inside object
+    - INTENSITY_NN
+    - User-specified percentile intensity in spacetime object (various units)
 
 .. _table_mtd-3D-Pair-Attribute:
 
@@ -610,37 +571,37 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
     - Object category
   * - 25
     - SPACE_CENTROID_DIST
-    - Spatial distance between :math:`(x,y)` coordinates of object spacetime centroid
+    - Cartesian distance between :math:`(x,y)` coordinates of object spacetime centroids (in grid units)
   * - 26
     - TIME_CENTROID_DELTA
-    - Difference in *t* index of object spacetime centroid
+    - Observation minus forecast difference in *t* temporal index of object spacetime centroid (in time steps)
   * - 27
     - AXIS_DIFF
-    - Difference in spatial axis plane angles
+    - Angle between the spatial axis plane angles (in degrees, from 0 to 90)
   * - 28
     - SPEED_DELTA
-    - Difference in object speeds
+    - Forecast minus observation speed difference (in grid units per time step)
   * - 29
     - DIRECTION_DIFF
-    - Difference in object direction of movement
+    - Difference in object direction of movement (in degrees, from 0 to 180)
   * - 30
     - VOLUME_RATIO
-    - Forecast object volume divided by observation object volume
+    - Forecast 3D object volume divided by observation 3D object volume (unitless)
   * - 31
     - START_TIME_DELTA
-    - Difference in object starting time steps
+    - Forecast minus observation starting time step (in time steps)
   * - 32
     - END_TIME_DELTA
-    - Difference in object ending time steps
+    - Forecast minus observation ending time step (in time steps)
   * - 33
     - INTERSECTION_VOLUME
-    - "Volume" of object intersection
+    - 3D object intersection volume (integer count of 3D spacetime cells)
   * - 34
     - DURATION_DIFF
-    - Difference in the lifetimes of the two objects
+    - Forecast minus observation difference in object lifetimes (in time steps)
   * - 35
     - INTEREST
-    - Total interest for this object pair
+    - Total interest for this object pair (unitless)
 
 **NetCDF File**
 
