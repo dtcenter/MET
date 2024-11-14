@@ -22,7 +22,7 @@ Tropical cyclone forecasts and observations are typically provided in a specific
 Requirements for CF Compliant NetCDF
 ------------------------------------
 
-The MET tools use following attributes and variables for input "`CF Compliant NetCDF data <https://cfconventions.org/`_".
+The MET tools use following attributes and variables for input "`CF Compliant NetCDF data <https://cfconventions.org/>`_".
 
 1. The global attribute "Conventions".
 
