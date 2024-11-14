@@ -9,6 +9,32 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.0.0-rc1 Release Notes (20241114)
+-----------------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * Fix the wind-based diagnostics computations in TC-Diag
+       (`#2729 <https://github.com/dtcenter/MET/issues/2729>`_).
+
+  .. dropdown:: Enhancements
+
+     * Update ndbc_stations.xml after 7-character buoy ids are introduced in Aug/Sept 2023
+       (`#2631 <https://github.com/dtcenter/MET/issues/2631>`_).
+     * Update GRIB tables in MET based on wgrib2 versions 3.1.4 and 3.4.0
+       (`#2780 <https://github.com/dtcenter/MET/issues/2780>`_).
+     * Enhance MET to parse the `set_attr` options prior reading data from gridded data files
+       (`#2826 <https://github.com/dtcenter/MET/issues/2826>`_).
+     * Eliminate Point2Grid warning when no valid output data is found
+       (`#3000 <https://github.com/dtcenter/MET/issues/3000>`_).
+
+  .. dropdown:: Documentation
+
+     * Enhance MTD documentation so that tables 21.3 and 21.4 have units
+       (`#2750 <https://github.com/dtcenter/MET/issues/2750>`_).
+     * Update documentation about parsing grid information from CF-compliant NetCDF files
+       (`#3009 <https://github.com/dtcenter/MET/issues/3009>`_).
+
 MET Version 12.0.0-beta6 Release Notes (20241018)
 -------------------------------------------------
 
