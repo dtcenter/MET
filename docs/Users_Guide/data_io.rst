@@ -104,7 +104,7 @@ For rotated_latitude_longitude projections, MET detects the projection using the
 
 2. If a variable is found, checking to make sure the variable has a standard name attribute and that that attribute is not empty.
 
-3. Checking to see if the standard name attribute is called either grid_latitude for latitude variables or grid_longitude for the longitude variable.
+3. Checking to see if the standard name attribute is called grid_latitude for latitude variables and grid_longitude for the longitude variable.
 
 The latitude and longitude variables must be one dimensional and with their size matching the corresponding dimension for latitude_longitude and rotated_latitude_longitude grids.
 
