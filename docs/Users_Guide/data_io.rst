@@ -78,7 +78,7 @@ Here are examples for the grid mapping variable ("edr" is the data variable):
             grid_mapping:GRIB_earth_shape = "spherical" ;
             grid_mapping:GRIB_earth_shape_code = 0 ;
 
-When the grid mapping variable is not available, MET can detect either a latitude_longitude or rotated_latitude_longitude projection.  It detects the latitude_longitude projection in following order:
+When the grid mapping variable is not available, MET can detect either a latitude_longitude or rotated_latitude_longitude projection.  It detects the latitude_longitude projection in the following order:
 
 1. the lat/lon projection from the dimensions
 
@@ -105,6 +105,8 @@ For rotated_latitude_longitude projections, MET detects the projection using the
 2. If a variable is found, checking to make sure the variable has a standard name attribute and that that attribute is not empty.
 
 3. Checking to see if the standard name attribute is called either grid_latitude for latitude variables or grid_longitude for the longitude variable.
+
+The latitude and longitude variables must be one dimensional and with their size matching the corresponding dimension for latitude_longitude and rotated_latitude_longitude grids.
 
 .. list-table:: Valid strings for the "units" attribute.
   :widths: auto
