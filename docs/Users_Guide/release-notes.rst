@@ -23,7 +23,7 @@ MET Version 12.0.0-rc1 Release Notes (20241114)
        (`#2631 <https://github.com/dtcenter/MET/issues/2631>`_).
      * Update GRIB tables in MET based on wgrib2 versions 3.1.4 and 3.4.0
        (`#2780 <https://github.com/dtcenter/MET/issues/2780>`_).
-     * Enhance MET to parse the `set_attr` options prior reading data from gridded data files
+     * Enhance MET to parse the set_attr options prior reading data from gridded data files
        (`#2826 <https://github.com/dtcenter/MET/issues/2826>`_).
      * Eliminate Point2Grid warning when no valid output data is found
        (`#3000 <https://github.com/dtcenter/MET/issues/3000>`_).
@@ -231,3 +231,4 @@ MET Version 12.0.0 Upgrade Instructions
   * The optional `ecKit <https://github.com/ecmwf/eckit>`_ library dependency was added in the 12.0.0-beta2 development cycle (`#2574 <https://github.com/dtcenter/MET/issues/2574>`_).
 
 * Note that the `#2833 <https://github.com/dtcenter/MET/issues/2833>`_ bugfix affects all previously generated output from the TC-Diag and TC-RMW tools.
+* Note that the GRIB table updates in `#2780 <https://github.com/dtcenter/MET/issues/2780>`_ modified some existing units strings for consistency and clarity.
