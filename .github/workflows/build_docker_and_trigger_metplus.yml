@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - develop
+      - 'main_v[0-9]+.[0-9]+'
     paths-ignore:
       - 'docs/**'
 
@@ -47,7 +48,50 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - uses: actions/github-script@v7
+      - name: Checkout code from this repo
+        uses: actions/checkout@v4
+      - name: Get METplus repo for component version script
+        uses: actions/checkout@v4
+        with:
+          repository: 'dtcenter/METplus'
+          ref: 'develop'
+          path: 'METplus'
+      - name: Get version from ref (branch)
+      - id: get_version
+        run: |
+          version=$(cut -d "/" -f3 <<< "${GITHUB_REF}")
+          echo "version=${version}" >> $GITHUB_OUTPUT
+      - id: get_metplus_branch
+        run: |
+          repo=${{ github.repository }}
+          repo=${repo#*/}
+          version=${{ steps.get_version.outputs.version }}
+
+          if [ "${version}" == "develop" ]; then
+            metplus_branch=develop
+          else
+            cmd="$GITHUB_WORKSPACE/METplus/metplus/component_versions.py -i ${repo} -v ${version} -o METplus -f main_v{X}.{Y}"
+            echo $cmd
+            metplus_branch=$($cmd)
+          fi
+
+          # if no branch can be determined, exit and error
+          if [ -z "${metplus_branch}" ]; then
+            echo "ERROR: Could not get METplus branch"
+            exit 1
+          fi
+          branch_exists=$(git -C $GITHUB_WORKSPACE/METplus ls-remote origin ${metplus_branch})
+          if [ -z "${branch_exists}" ]; then
+            echo "METplus branch ${metplus_branch} does not exist yet"
+            metplus_branch=none
+          fi
+          echo "metplus_branch=${metplus_branch}" >> $GITHUB_OUTPUT
+      - if: ( steps.get_metplus_branch.outputs.metplus_branch  != 'none' )
+        run: |
+          metplus_branch=${{ steps.get_metplus_branch.outputs.metplus_branch }}
+          echo "Triggering workflow dispatch of ${metplus_branch}"
+      - if: ( steps.get_metplus_branch.outputs.metplus_branch  != 'none' )
+        uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.METPLUS_BOT_TOKEN }}
           script: |
@@ -55,7 +99,7 @@ jobs:
               owner: 'dtcenter',
               repo: 'METplus',
               workflow_id: 'testing.yml',
-              ref: 'develop',
+              ref: ${{ steps.get_metplus_branch.outputs.metplus_branch }},
               inputs: {
                 repository: '${{ github.repository }}',
                 ref: '${{ github.ref }}',
