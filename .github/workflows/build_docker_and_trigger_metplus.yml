@@ -57,7 +57,7 @@ jobs:
           ref: 'develop'
           path: 'METplus'
       - name: Get version from ref (branch)
-      - id: get_version
+        id: get_version
         run: |
           version=$(cut -d "/" -f3 <<< "${GITHUB_REF}")
           echo "version=${version}" >> $GITHUB_OUTPUT
