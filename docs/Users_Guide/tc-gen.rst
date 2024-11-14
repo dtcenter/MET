@@ -506,7 +506,7 @@ TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The AS
     - Current ATCF Technique name
   * - 3
     - DESC
-    - User provided text string describing the "filter" options
+    - User-provided text string describing the "filter" options
   * - 4
     - FCST_LEAD
     - Forecast lead time in HHMMSS format
