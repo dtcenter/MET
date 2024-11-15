@@ -139,8 +139,7 @@ Q. What types of NetCDF files can MET read?
 	the wrf_interp utility
 
      3. NetCDF data following the `climate-forecast (CF) convention
-	<https://cfconventions.org/Data/cf-conventions/cf-conventions-1.8/cf\
-	-conventions.html>`_
+	<https://cfconventions.org/cf-conventions/cf-conventions.html>`_
 
      Lastly, users can write python scripts to pass data that's gridded to the
      MET tools in memory. If the data doesn't fall into one of those categories,
