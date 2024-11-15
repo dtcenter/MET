@@ -114,6 +114,7 @@
 //   056    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings.
 //   057    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
 //   058    10/03/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
+//   059    11/15/24  Halley Gotway  MET #3020 SEEPS NetCDF output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1267,23 +1268,36 @@ void process_scores() {
             SeepsAggScore seeps_agg;
             int month, day, year, hour, minute, second;
 
+            // Compute SEEPS statistics
             unix_to_mdyhms(fcst_dp.valid(), month, day, year, hour, minute, second);
             compute_aggregated_seeps_grid(fcst_dp_smooth, obs_dp_smooth,
                                           seeps_dp, seeps_dp_fcat, seeps_dp_ocat,
                                           &seeps_agg, month, hour,
                                           conf_info.seeps_p1_thresh, conf_info.seeps_climo_name);
 
-            write_nc("SEEPS_MPR_SCORE", seeps_dp,
-                     i, mthd, pnts,
-                     conf_info.vx_opt[i].interp_info.field);
-            write_nc("SEEPS_MPR_FCAT", seeps_dp_fcat,
-                     i, mthd, pnts,
-                     conf_info.vx_opt[i].interp_info.field);
-            write_nc("SEEPS_MPR_OCAT", seeps_dp_ocat,
-                     i, mthd, pnts,
-                     conf_info.vx_opt[i].interp_info.field);
-            write_seeps_row(shc, &seeps_agg, conf_info.output_flag[i_seeps],
-                            stat_at, i_stat_row, txt_at[i_seeps], i_txt_row[i_seeps]);
+            // Write out SEEPS
+            if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType::None &&
+               seeps_agg.n_obs > 0) {
+
+	       write_seeps_row(shc, &seeps_agg,
+                               conf_info.output_flag[i_seeps],
+                               stat_at, i_stat_row,
+                               txt_at[i_seeps], i_txt_row[i_seeps]);
+            }
+
+            // MET #3020
+            // Write out the SEEPS data if requested in the config file
+            if(conf_info.vx_opt[i].nc_info.do_seeps) {
+               write_nc("SEEPS_MPR_SCORE", seeps_dp,
+                        i, mthd, pnts,
+                        conf_info.vx_opt[i].interp_info.field);
+               write_nc("SEEPS_MPR_FCAT", seeps_dp_fcat,
+                        i, mthd, pnts,
+                        conf_info.vx_opt[i].interp_info.field);
+               write_nc("SEEPS_MPR_OCAT", seeps_dp_ocat,
+                        i, mthd, pnts,
+                        conf_info.vx_opt[i].interp_info.field);
+            }
          }
 
          // Compute gradient statistics if requested in the config file
