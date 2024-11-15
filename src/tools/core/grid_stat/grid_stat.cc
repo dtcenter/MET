@@ -1279,7 +1279,7 @@ void process_scores() {
             if(conf_info.vx_opt[i].output_flag[i_seeps] != STATOutputType::None &&
                seeps_agg.n_obs > 0) {
 
-	       write_seeps_row(shc, &seeps_agg,
+               write_seeps_row(shc, &seeps_agg,
                                conf_info.output_flag[i_seeps],
                                stat_at, i_stat_row,
                                txt_at[i_seeps], i_txt_row[i_seeps]);
