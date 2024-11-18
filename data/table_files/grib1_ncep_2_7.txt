@@ -80,7 +80,7 @@ GRIB1
 78 2 7 0 "SNOC" "Convective snow" "kg/m^2"
 79 2 7 0 "SNOL" "Large scale snow" "kg/m^2"
 80 2 7 0 "WTMP" "Water temp." "K"
-81 2 7 0 "LAND" "Land-sea mask" "1=land; 0=sea"
+81 2 7 0 "LAND" "Land-sea mask" "1=land;0=sea"
 82 2 7 0 "DSLM" "Deviation of sea level from mean" "m"
 83 2 7 0 "SFCR" "Surface roughness" "m"
 84 2 7 0 "ALBDO" "Albedo" "%"
@@ -90,7 +90,7 @@ GRIB1
 88 2 7 0 "SALTY" "Salinity" "kg/kg"
 89 2 7 0 "DEN" "Density" "kg/m^3"
 90 2 7 0 "RUNOF" "Runoff" "kg/m^2"
-91 2 7 0 "ICEC" "Ice concentration" "ice=1;no ice=0"
+91 2 7 0 "ICEC" "Ice concentration" "ice=1;no_ice=0"
 92 2 7 0 "ICETK" "Ice thickness" "m"
 93 2 7 0 "DICED" "Direction of ice drift" "deg"
 94 2 7 0 "SICED" "Speed of ice drift" "m/s"
@@ -592,7 +592,7 @@ GRIB1
 78 2 7 2 "SNOC" "Convective snow" "kg/m^2",
 79 2 7 2 "SNOL" "Large scale snow" "kg/m^2",
 80 2 7 2 "WTMP" "Water temp." "K",
-81 2 7 2 "LAND" "Land-sea mask" "1=land; 0=sea",
+81 2 7 2 "LAND" "Land-sea mask" "1=land;0=sea",
 82 2 7 2 "DSLM" "Deviation of sea level from mean" "m",
 83 2 7 2 "SFCR" "Surface roughness" "m",
 84 2 7 2 "ALBDO" "Albedo" "%",
@@ -602,7 +602,7 @@ GRIB1
 88 2 7 2 "SALTY" "Salinity" "kg/kg",
 89 2 7 2 "DEN" "Density" "kg/m^3",
 90 2 7 2 "RUNOF" "Runoff" "kg/m^2",
-91 2 7 2 "ICEC" "Ice concentration" "ice=1;no ice=0",
+91 2 7 2 "ICEC" "Ice concentration" "ice=1;no_ice=0",
 92 2 7 2 "ICETK" "Ice thickness" "m",
 93 2 7 2 "DICED" "Direction of ice drift" "deg",
 94 2 7 2 "SICED" "Speed of ice drift" "m/s",

@@ -590,16 +590,16 @@ The MODE tool creates two ASCII output files. The first ASCII file contains cont
     - Version number
   * - 2
     - MODEL
-    - User provided text string designating model name
+    - User-provided text string giving model name
   * - 3
     - N_VALID
     - Number of valid data points
   * - 4
     - GRID_RES
-    - User provided nominal grid resolution
+    - User-provided nominal grid resolution
   * - 5
     - DESC
-    - User provided text string describing the verification task
+    - User-provided text string describing the verification task
   * - 6
     - FCST_LEAD
     - Forecast lead time in HHMMSS format
@@ -620,13 +620,13 @@ The MODE tool creates two ASCII output files. The first ASCII file contains cont
     - Observation accumulation time in HHMMSS format
   * - 12
     - FCST_RAD
-    - Forecast convolution radius in grid squares
+    - Forecast convolution radius in grid units 
   * - 13
     - FCST_THR
     - Forecast convolution threshold
   * - 14
     - OBS_RAD
-    - Observation convolution radius in grid squares
+    - Observation convolution radius in grid units 
   * - 15
     - OBS_THR
     - Observation convolution threshold
@@ -650,7 +650,7 @@ The MODE tool creates two ASCII output files. The first ASCII file contains cont
     - Observation vertical level
   * - 22
     - OBTYPE
-    - User provided observation type
+    - User-provided observation type
   * - 23
     - FIELD
     - Field type for this line:* RAW for the raw input fields * OBJECT for the resolved object fields
@@ -790,16 +790,16 @@ The contents of the columns in this ASCII file are summarized in :numref:`MODE_o
     - Version number
   * - 2
     - MODEL
-    - User provided text string designating model name
+    - User-provided text string designating model name
   * - 3
     - N_VALID
     - Number of valid data points
   * - 4
     - GRID_RES
-    - User provided nominal grid resolution
+    - User-provided nominal grid resolution
   * - 5
     - DESC
-    - User provided text string describing the verification task
+    - User-provided text string describing the verification task
   * - 6
     - FCST_LEAD
     - Forecast lead time in HHMMSS format
@@ -850,7 +850,7 @@ The contents of the columns in this ASCII file are summarized in :numref:`MODE_o
     - Observation vertical level
   * - 22
     - OBTYPE
-    - User provided observation type
+    - User-provided observation type
   * - 23
     - OBJECT_ID
     - Object numbered from 1 to the number of objects in each field

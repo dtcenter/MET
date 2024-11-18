@@ -345,10 +345,10 @@ The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to t
     - Version number
   * - 2
     - MODEL
-    - User provided text string designating model name
+    - User-provided text string designating model name
   * - 3
     - DESC
-    - User provided text string describing the verification task
+    - User-provided text string describing the verification task
   * - 4
     - FCST_LEAD
     - Forecast lead time in HHMMSS format
@@ -387,7 +387,7 @@ The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to t
     - Selected Vertical level for observations
   * - 16
     - OBTYPE
-    - User provided text string designating the observation type
+    - User-provided text string designating the observation type
   * - 17
     - VX_MASK
     - Verifying masking region indicating the masking grid or polyline region applied
