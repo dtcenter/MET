@@ -8,64 +8,51 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef  __DATA_FILE_TYPE_H__
 #define  __DATA_FILE_TYPE_H__
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
+//
+// Enumeration of supported gridded file types
+//
 
-   //
-   // Enumeration of supported gridded file types
-   //
+enum GrdFileType {
 
-enum GrdFileType
-{
+   GrdFileType_None,           // Default
 
-   FileType_None,           // Default
-
-   FileType_Gb1,            // GRIB version 1
-   FileType_Gb2,            // GRIB version 2
-   FileType_NcMet,          // NetCDF MET format
-   FileType_General_Netcdf, // NetCDF
-   FileType_NcWrf,          // NetCDF output directly from WRF-ARW
-   FileType_NcPinterp,      // NetCDF output of WRF-ARW pinterp tool
-   FileType_NcCF,           // NetCDF Climate-Forecast Convention
-   FileType_HdfEos,         // Hierarchical Data Format - Earth Observing System
-   FileType_Bufr,           // Bufr or PrepBufr format
-   FileType_Python_Numpy,   // Python script using numpy array and attributes dictionary
-   FileType_Python_Xarray,  // Python script using xarray dataplane
-   FileType_UGrid,          // Unstructured grid
+   GrdFileType_Gb1,            // GRIB version 1
+   GrdFileType_Gb2,            // GRIB version 2
+   GrdFileType_NcMet,          // NetCDF MET format
+   GrdFileType_General_Netcdf, // NetCDF
+   GrdFileType_NcWrf,          // NetCDF output directly from WRF-ARW
+   GrdFileType_NcPinterp,      // NetCDF output of WRF-ARW pinterp tool
+   GrdFileType_NcCF,           // NetCDF Climate-Forecast Convention
+   GrdFileType_HdfEos,         // Hierarchical Data Format - Earth Observing System
+   GrdFileType_Bufr,           // Bufr or PrepBufr format
+   GrdFileType_Python_Numpy,   // Python script using numpy array and attributes dictionary
+   GrdFileType_Python_Xarray,  // Python script using xarray dataplane
+   GrdFileType_UGrid,          // Unstructured grid
 
 };
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
-inline bool is_netcdf_grdfiletype(const GrdFileType _t)
-
-{
-
-return ( (_t == FileType_NcMet) || (_t == FileType_General_Netcdf) ||
-         (_t == FileType_NcWrf) || (_t == FileType_NcPinterp) ||
-         (_t == FileType_NcCF) );
-
+inline bool is_netcdf_grdfiletype(const GrdFileType _t) {
+   return(_t == GrdFileType_NcMet          ||
+          _t == GrdFileType_General_Netcdf ||
+          _t == GrdFileType_NcWrf          ||
+          _t == GrdFileType_NcPinterp      ||
+          _t == GrdFileType_NcCF);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-inline bool is_python_grdfiletype(const GrdFileType _t)
-
-{
-
-return ( (_t == FileType_Python_Xarray) || (_t == FileType_Python_Numpy) );
-
+inline bool is_python_grdfiletype(const GrdFileType _t) {
+   return(_t == GrdFileType_Python_Xarray ||
+          _t == GrdFileType_Python_Numpy);
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 

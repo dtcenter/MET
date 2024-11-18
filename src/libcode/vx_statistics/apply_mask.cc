@@ -418,7 +418,7 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    }
 
    // Parse the requested file type
-   GrdFileType type = parse_conf_file_type(&config);
+   GrdFileType type = parse_conf_grd_file_type(&config);
 
    // 2D Data file
    Met2dDataFileFactory mtddf_factory;
@@ -602,7 +602,7 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
    }
 
    // Check for specified file type
-   ftype = parse_conf_file_type(field_dict);
+   ftype = parse_conf_grd_file_type(field_dict);
 
    // Search each input file for a match
    for(i=0; !found && i<geog_files.n(); i++) {

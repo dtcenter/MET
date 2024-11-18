@@ -196,11 +196,11 @@ bool use_xarray = false;
 
 switch ( Type )  {   //  assumes Type is already set
 
-   case FileType_Python_Xarray:
+   case GrdFileType_Python_Xarray:
       use_xarray = true;
       break;
 
-   case FileType_Python_Numpy:
+   case GrdFileType_Python_Numpy:
       use_xarray = false;
       break;
 

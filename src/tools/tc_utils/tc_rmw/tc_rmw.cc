@@ -193,7 +193,7 @@ void process_command_line(int argc, char **argv) {
                           config_file.c_str());
 
     // Get data file type from config
-    ftype = parse_conf_file_type(conf_info.Conf.lookup_dictionary(
+    ftype = parse_conf_grd_file_type(conf_info.Conf.lookup_dictionary(
                                  conf_key_data));
 
     // Get data file type from input files

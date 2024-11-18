@@ -365,15 +365,15 @@ void process_command_line(int argc, char **argv) {
    conf_info.read_config(default_config_file, config_file);
 
    // Get the ensemble file type from config, if present
-   etype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
+   etype = parse_conf_grd_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
 
    // Get the ensemble file type from the files
-   if(etype == FileType_None) {
+   if(etype == GrdFileType_None) {
       etype = parse_file_list_type(ens_file_list);
    }
 
    // UGrid not supported
-   if(etype == FileType_UGrid) {
+   if(etype == GrdFileType_UGrid) {
       mlog << Error << "\n" << method_name
            << grdfiletype_to_string(etype)
            << " ensemble files are not supported\n\n";
@@ -390,23 +390,23 @@ void process_command_line(int argc, char **argv) {
 
    // Determine the input observation file type
    if(point_obs_flag) {
-      otype = FileType_Gb1;
+      otype = GrdFileType_Gb1;
    }
    else if(!grid_obs_flag) {
-      otype = FileType_None;
+      otype = GrdFileType_None;
    }
    else {
 
       // Get the observation file type from config, if present
-      otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
+      otype = parse_conf_grd_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
       // Get the observation file type from the files
-      if(otype == FileType_None) {
+      if(otype == GrdFileType_None) {
          otype = parse_file_list_type(grid_obs_file_list);
       }
 
       // UGrid not supported
-      if(otype == FileType_UGrid) {
+      if(otype == GrdFileType_UGrid) {
          mlog << Error << "\n" << method_name
               << grdfiletype_to_string(otype)
               << " gridded observation files are not supported\n\n";
@@ -1407,7 +1407,7 @@ void process_grid_vx() {
          VarInfo *info = conf_info.vx_opt[i].vx_pd.ens_info->get_var_info();
 
          // Read the gridded data from the mean file
-         found = get_data_plane(ens_mean_file.c_str(), FileType_None,
+         found = get_data_plane(ens_mean_file.c_str(), GrdFileType_None,
                                 info, emn_dp, true);
 
          if(!found) {

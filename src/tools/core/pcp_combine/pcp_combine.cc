@@ -151,7 +151,7 @@ static ConcatString pcp_reg_exp = (string)default_reg_exp;
 
 // Variables for the derive command
 static StringArray  file_list;
-static GrdFileType  file_list_type = FileType_None;
+static GrdFileType  file_list_type = GrdFileType_None;
 static StringArray  field_list;
 static StringArray  derive_list;
 
@@ -1240,12 +1240,12 @@ bool get_field(const char *filename, const char *cur_field,
    //
    // Get the gridded file type from config string, if present.
    //
-   ftype = parse_conf_file_type(&config);
+   ftype = parse_conf_grd_file_type(&config);
 
    //
    // If not set by the config string, use the file list type.
    //
-   if(ftype == FileType_None) ftype = file_list_type;
+   if(ftype == GrdFileType_None) ftype = file_list_type;
 
    //
    // Check for missing non-python input files.

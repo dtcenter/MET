@@ -153,8 +153,8 @@ void ModeExecutive::init_traditional(int n_files)
    conf_read();
 
    // Get the forecast and observation file types from config, if present
-   ftype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_fcst));
-   otype = parse_conf_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_obs));
+   ftype = parse_conf_grd_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_fcst));
+   otype = parse_conf_grd_file_type(engine.conf_info.conf.lookup_dictionary(conf_key_obs));
 
 
    // Read observation file

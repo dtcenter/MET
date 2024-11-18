@@ -47,7 +47,7 @@ class MetPythonDataFile : public Met2dDataFile {
 
       VarInfoPython VInfo;
 
-      GrdFileType Type;   // FileType_Python_Xarray or FileType_Python_Numpy
+      GrdFileType Type;   // GrdFileType_Python_Xarray or GrdFileType_Python_Numpy
 
    public:
 

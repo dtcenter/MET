@@ -170,7 +170,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
                   nint(hour_interval * sec_per_hour));
 
    // Check if file_type was specified
-   GrdFileType ctype = parse_conf_file_type(&i_dict);
+   GrdFileType ctype = parse_conf_grd_file_type(&i_dict);
 
    // Search the files for the requested records
    for(int i=0; i<climo_files.n(); i++) {

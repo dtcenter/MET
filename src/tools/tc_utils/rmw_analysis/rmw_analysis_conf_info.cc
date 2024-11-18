@@ -119,7 +119,7 @@ void RMWAnalysisConfInfo::process_config() {
     VarInfoFactory info_factory;
     Dictionary *fdict = (Dictionary *) nullptr;
     ConcatString poly_file;
-    GrdFileType ftype = FileType_NcCF;
+    GrdFileType ftype = GrdFileType_NcCF;
 
     // Conf: Version
     Version = Conf.lookup_string(conf_key_version);

@@ -69,13 +69,13 @@ int MultivarFrontEnd::run(const StringArray & Argv)
    for (int i=0; i<n_fcst_files; ++i) {
       GrdFileType ft, ot;
       ft = config.file_type_for_field(true, i);
-      ot = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_obs));
+      ot = parse_conf_grd_file_type(config.conf.lookup_dictionary(conf_key_obs));
       read_input(fcst_filenames[i], i, ModeDataType::MvMode_Fcst, ft, ot, shift);
 
    }
    for (int i=0; i<n_obs_files; ++i) {
       GrdFileType ft, ot;
-      ft = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_fcst));
+      ft = parse_conf_grd_file_type(config.conf.lookup_dictionary(conf_key_fcst));
       ot = config.file_type_for_field(false, i);
       read_input(obs_filenames[i], i, ModeDataType::MvMode_Obs, ot, ft, shift);
    }

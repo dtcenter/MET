@@ -11,103 +11,15 @@
 //   Filename:   pair_stat.cc
 //
 //   Description:
-//      Based on user-specified parameters, this tool compares a
-//      a gridded forecast field to the point observation output of
-//      the point pre-processing tools. It computes many verification
+//      Based on user-specified parameters, this tool reads already
+//      computed forecast and observation pair data, subsets them by
+//      attribute, time, and space, and computes many verification
 //      scores and statistics, including confidence intervals, to
 //      summarize the comparison.
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
-//   000    04/18/07  Halley Gotway  New
-//   001    12/20/07  Halley Gotway  Allow verification for level 0
-//                    for verifying PRMSL
-//   002    01/24/08  Halley Gotway  In compute_cnt, print a warning
-//                    message when bad data values are encountered.
-//   003    01/24/08  Halley Gotway  Add support for writing the matched
-//                    pair data to the MPR file.
-//   004    02/04/08  Halley Gotway  Modify to read new format of the
-//                    intermediate NetCDF point-observation format.
-//   005    02/11/08  Halley Gotway  Remove BIAS from the CNT line
-//                    since it's the same as the ME.
-//   006    02/12/08  Halley Gotway  Fix bug in writing COP line to
-//                    write out OY and ON rather than FY and FN.
-//   007    02/12/08  Halley Gotway  Enable Point-Stat to read the
-//                    NetCDF output of PCP-Combine.
-//   008    02/25/08  Halley Gotway  Write the output lines using the
-//                    routines in the vx_met_util library.
-//   009    07/01/08  Halley Gotway   Add the rank_corr_flag to the
-//                    config file to disable computing rank correlations.
-//   010    07/18/08  Halley Gotway   Fix bug in the write_mpr routine.
-//                    Replace i_fho with i_mpr.
-//   011    09/23/08  Halley Gotway  Change argument sequence for the
-//                    GRIB record access routines.
-//   012    11/03/08  Halley Gotway  Use the get_file_type routine to
-//                    determine the input file types.
-//   013    03/13/09  Halley Gotway  Add support for verifying
-//                    probabilistic forecasts.
-//   014    04/21/09  Halley Gotway  Fix bug for resetting obs_var.
-//   015    05/07/10  Halley Gotway  Rename process_grid() to
-//                    setup_first_pass() and modify its logic.
-//   016    05/24/10  Halley Gotway  Rename command line options:
-//                    From -ncfile to -point_obs
-//                    From -valid_beg to -obs_valid_beg
-//                    From -valid_end to -obs_valid_end
-//   017    05/27/10  Halley Gotway  Add -fcst_valid and -fcst_lead
-//                    command line options.
-//   018    06/08/10  Halley Gotway  Add support for multi-category
-//                    contingency tables.
-//   019    06/15/10  Halley Gotway  Dump reason codes for why
-//                    point observations were rejected.
-//   020    06/30/10  Halley Gotway  Enhance grid equality checks.
-//   021    10/20/11  Holmes         Added use of command line class to
-//                    parse the command line arguments.
-//   022    11/14/11  Holmes         Added code to enable reading of
-//                    multiple config files.
-//   023    02/02/12  Bullock        Set default output directory to "."
-//   024    03/05/12  Halley Gotway  Fix bug in processing command line
-//                    for setting valid end times.
-//   025    04/16/12  Halley Gotway  Switch to using vx_config library.
-//   026    04/27/12  Halley Gotway  Move -fcst_valid and -fcst_lead
-//                    command line options to config file.
-//   027    02/25/13  Halley Gotway  Add duplicates rejection counts.
-//   028    08/21/13  Halley Gotway  Fix sizing of output tables for 12
-//                    or more probabilstic thresholds.
-//   029    07/09/14  Halley Gotway  Add station id exclusion option.
-//   030    03/02/15  Halley Gotway  Add automated regridding.
-//   031    07/30/15  Halley Gotway  Add conditional continuous verification.
-//   032    09/11/15  Halley Gotway  Add climatology to config file.
-//   033    02/27/17  Halley Gotway  Add HiRA verification.
-//   034    05/15/17  Prestopnik P   Add shape for HiRA, interp and regrid.
-//   035    06/16/17  Halley Gotway  Add ECLV line type.
-//   036    11/01/17  Halley Gotway  Add binned climatologies.
-//   037    02/06/18  Halley Gotway  Restructure config logic to make
-//                    all options settable for each verification task.
-//   038    08/15/18  Halley Gotway  Add mask.llpnt type.
-//   039    08/24/18  Halley Gotway  Add ECNT output for HiRA.
-//   040    04/01/10  Fillmore       Add FCST and OBS units.
-//   041    04/08/19  Halley Gotway  Add percentile thresholds.
-//   042    10/14/19  Halley Gotway  Add support for climo distribution
-//                    percentile thresholds.
-//   043    11/15/19  Halley Gotway  Apply climatology bins to
-//                    continuous and probabilistic statistics.
-//   044    01/24/20  Halley Gotway  Add HiRA RPS output.
-//   045    03/28/21  Halley Gotway  Add mpr_column and mpr_thresh
-//                    filtering options.
-//   046    05/28/21  Halley Gotway  Add MCTS HSS_EC output.
-//   047    08/23/21  Seth Linden    Add ORANK line type for HiRA.
-//   048    09/13/21  Seth Linden    Changed obs_qty to obs_qty_inc.
-//                    Added code for obs_qty_exc.
-//   049    12/11/21  Halley Gotway  MET #1991 Fix VCNT output.
-//   050    02/11/22  Halley Gotway  MET #2045 Fix HiRA output.
-//   051    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main.
-//   052    09/29/22  Halley Gotway  MET #2286 Refine GRIB1 table lookup logic.
-//   053    10/03/22  Prestopnik     MET #2227 Remove using namespace netCDF from header files.
-//   054    04/29/24  Halley Gotway  MET #2795 Move level mismatch warning.
-//   055    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
-//   056    10/08/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
-//   057    10/14/24  Halley Gotway  MET #2279 Add point_weight_flag option.
-//   058    10/15/24  Halley Gotway  MET #2893 Write individual pair OBTYPE.
+//   000    11/07/24  Halley Gotway  MET #3006 New
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -149,13 +61,10 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-////////////////////////////////////////////////////////////////////////
-
 #define BUFFER_SIZE (DEF_NC_BUFFER_SIZE/2)
 
-static void process_command_line    (int, char **);
-static void setup_first_pass        (const DataPlane &, const Grid &);
+static void process_command_line(int, char **);
+static void setup_first_pass(const DataPlane &, const Grid &);
 
 static void setup_txt_files();
 static void setup_table    (AsciiTable &);
@@ -180,14 +89,14 @@ static void finish_txt_files();
 static void clean_up();
 
 static void usage();
-static void set_point_obs(const StringArray &);
-static void set_ncfile(const StringArray &);
-static void set_obs_valid_beg_time(const StringArray &);
-static void set_obs_valid_end_time(const StringArray &);
-static void set_outdir(const StringArray &);
+
+static void set_pairs(const StringArray &);
+static void set_format(const StringArray &);
+static void set_config(const StringArray &);
 #ifdef WITH_UGRID
 static void set_ugrid_config(const StringArray &);
 #endif
+static void set_outdir(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -248,48 +157,52 @@ void process_command_line(int argc, char **argv) {
    cline.set_usage(usage);
 
    // Add the options function calls
+   cline.add(set_pairs,        "-pairs",       -1);
+   cline.add(set_format,       "-format",       1);
+   cline.add(set_config,       "-config",       1);
 #ifdef WITH_UGRID
-   cline.add(set_ugrid_config,       "-ugrid_config",        1);
+   cline.add(set_ugrid_config, "-ugrid_config", 1);
 #endif
-   cline.add(set_point_obs,          "-point_obs",     1);
-   cline.add(set_ncfile,             "-ncfile",        1);
-   cline.add(set_obs_valid_beg_time, "-obs_valid_beg", 1);
-   cline.add(set_obs_valid_end_time, "-obs_valid_end", 1);
-   cline.add(set_outdir,             "-outdir",        1);
+   cline.add(set_outdir,       "-outdir",       1);
 
    // Parse the command line
    cline.parse();
 
-   // Check for error. There should be three arguments left:
-   // forecast, observation, and config filenames
-   if(cline.n() != 3) usage();
+   // Check for error. There should be no arguments left
+   if(cline.n() != 0) usage();
 
-   // Check that the end_ut >= beg_ut
-   if(obs_valid_beg_ut != (unixtime) 0 &&
-      obs_valid_end_ut != (unixtime) 0 &&
-      obs_valid_beg_ut > obs_valid_end_ut) {
-
+   // Check for required argruments
+   if(pairs_files.n() == 0) {
       mlog << Error << "\n" << method_name
-           << "the ending time ("
-           << unix_to_yyyymmdd_hhmmss(obs_valid_end_ut)
-           << ") must be greater than the beginning time ("
-           << unix_to_yyyymmdd_hhmmss(obs_valid_beg_ut)
-           << ").\n\n";
-      exit(1);
+           << "The \"-pairs\" command line option is required!\n\n";
+      usage();
    }
-
-   // Store the input forecast and observation file names
-   fcst_file = cline[0];
-   obs_file.insert(0, cline[1].c_str());
-   config_file = cline[2];
+   if(pairs_type == PairsFileType::None) {
+      mlog << Error << "\n" << method_name
+           << "The \"-format\" command line option is required!\n\n";
+      usage();
+   }
+   if(config_file.empty()) {
+      mlog << Error << "\n" << method_name
+           << "The \"-config\" command line option is required!\n\n";
+      usage();
+   }
 
    // Create the default config file names
    default_config_file = replace_path(default_config_filename);
 
-   // List the config files
+   // List the inputs files
    mlog << Debug(1)
         << "Default Config File: " << default_config_file << "\n"
         << "User Config File: "    << config_file << "\n";
+
+#ifdef WITH_UGRID
+   mlog << Debug(1)
+        << "UGRID Config File(s): " << write_css(ugrid_config_files) << "\n";
+#endif
+
+   mlog << Debug(1)
+        << "Pairs File(s): " << write_css(pairs_files) << "\n";
 
    // Read the config files
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
@@ -297,68 +210,17 @@ void process_command_line(int argc, char **argv) {
    conf_info.read_ugrid_configs(ugrid_config_files, config_file.c_str());
 #endif
 
-   // Get the forecast file type from config, if present
-   ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
-
-   // Read forecast file
-   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
-      mlog << Error << "\n" << method_name << "Trouble reading forecast file \""
-           << fcst_file << "\". Override the FileType with \"file_type = FileType_<type>;\"\n\n";
-      exit(1);
-   }
-
-   // Store the forecast file type
-   ftype = fcst_mtddf->file_type();
-
    // Process the configuration
-   conf_info.process_config(ftype);
+   conf_info.process_config(pairs_type);
 
    // Set the model name
    shc.set_model(conf_info.model.c_str());
-
-   if (FileType_UGrid == ftype) {
-#ifdef WITH_UGRID
-      ConcatString ugrid_dataset = conf_info.ugrid_dataset;
-      if (0 < ugrid_dataset.length()) {
-         double max_distance_km = conf_info.ugrid_max_distance_km;
-         ConcatString ugrid_nc = conf_info.ugrid_nc;
-         ConcatString ugrid_map_config_filename = conf_info.ugrid_map_config;
-         MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
-
-         ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
-                                        ugrid_map_config_filename);
-         if (0 == ugrid_nc.length() || ugrid_nc == "NA") {
-            ConcatString coordinate_file = ugrid_mtddf->coordinate_file();
-            ugrid_nc = (0 < coordinate_file.length()) ? coordinate_file : fcst_file;
-         }
-         ugrid_mtddf->open_metadata(ugrid_nc.c_str());
-         mlog << Debug(9) << method_name
-              << "ugrid_coordinate_nc: " << ugrid_nc
-              << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
-      }
-      else {
-         mlog << Error << "\n" << method_name
-              << conf_key_ugrid_dataset << " is not defined at the configuration file.\n\n";
-      }
-#else
-      ugrid_compile_error(method_name);
-#endif
-   }
 
    // Use the first verification task to set the random number generator
    // and seed value for bootstrap confidence intervals
    rng_set(rng_ptr,
            conf_info.vx_opt[0].boot_info.rng.c_str(),
            conf_info.vx_opt[0].boot_info.seed.c_str());
-
-   // List the input files
-   mlog << Debug(1)
-        << "Forecast File: " << fcst_file << "\n";
-
-   for(i=0; i<obs_file.n(); i++) {
-      mlog << Debug(1)
-           << "Observation File: " << obs_file[i] << "\n";
-   }
 
    return;
 }
@@ -2280,41 +2142,31 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\tfcst_file\n"
-        << "\tobs_file\n"
-        << "\tconfig_file\n"
+        << "\t-pairs file\n"
+        << "\t-format type\n"
+        << "\t-config config_file\n"
 #ifdef WITH_UGRID
         << "\t[-ugrid_config config_file]\n"
 #endif
-        << "\t[-point_obs file]\n"
-        << "\t[-obs_valid_beg time]\n"
-        << "\t[-obs_valid_end time]\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"fcst_file\" is a gridded forecast file containing "
-        << "the field(s) to be verified (required).\n"
+        << "\twhere\t\"-pairs file\" is one or more files containing "
+        << "forecast/observation pairs. May be used multiple times "
+        << "(required).\n"
 
-        << "\t\t\"obs_file\" is an observation file in NetCDF format "
-        << "containing the verifying point observations (required).\n"
+        << "\t\t\"-format type\" defines the input pairs file format "
+        << "and may be set to \"mpr\" or \"ioda\" (required).\n"
 
-        << "\t\t\"config_file\" is a PairStatConfig file containing "
+        << "\t\t\"-config config_file\" is a PairStatConfig file containing "
         << "the desired configuration settings (required).\n"
 
 #ifdef WITH_UGRID
-        << "\t\t\"-ugrid_config ugrid_config_file\" is a UGridConfig file containing "
-        << "the desired configuration settings for unstructured grid (required only for UGrid)\n"
+        << "\t\t\"-ugrid_config ugrid_config_file\" is a UGridConfig file "
+        << "containing the desired configuration settings for unstructured "
+        << "grid inputs (required for \"-format ioda\").\n"
 #endif
-
-        << "\t\t\"-point_obs file\" specifies additional NetCDF point "
-        << "observation files to be used (optional).\n"
-
-        << "\t\t\"-obs_valid_beg time\" in YYYYMMDD[_HH[MMSS]] sets the "
-        << "beginning of the matching time window (optional).\n"
-
-        << "\t\t\"-obs_valid_end time\" in YYYYMMDD[_HH[MMSS]] sets the "
-        << "end of the matching time window (optional).\n"
 
         << "\t\t\"-outdir path\" overrides the default output "
         << "directory (" << out_dir << ") (optional).\n"
@@ -2330,45 +2182,33 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void set_pairs(const StringArray & a) {
+   pairs_files.add(a);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_format(const StringArray & a) {
+   pairs_type = parse_conf_pairs_file_type(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_config(const StringArray & a) {
+   config_file = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
 #ifdef WITH_UGRID
-void set_ugrid_config(const StringArray & a)
-{
+void set_ugrid_config(const StringArray & a) {
    ugrid_config_files.add(a[0]);
 }
 #endif
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_point_obs(const StringArray & a)
-{
-   obs_file.add(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_ncfile(const StringArray & a)
-{
-   obs_file.add(a[0]);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_obs_valid_beg_time(const StringArray & a)
-{
-   obs_valid_beg_ut = timestring_to_unix(a[0].c_str());
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_obs_valid_end_time(const StringArray & a)
-{
-   obs_valid_end_ut = timestring_to_unix(a[0].c_str());
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void set_outdir(const StringArray & a)
-{
+void set_outdir(const StringArray & a) {
    out_dir = a[0];
 }
 

@@ -74,8 +74,8 @@ static const char * total_name = "TOTAL";
 // Input files
 static StringArray fcst_files, found_fcst_files;
 static StringArray obs_files, found_obs_files;
-static GrdFileType ftype = FileType_None;
-static GrdFileType otype = FileType_None;
+static GrdFileType ftype = GrdFileType_None;
+static GrdFileType otype = GrdFileType_None;
 static ConcatString aggr_file;
 static bool paired = false;
 static int compress_level = -1;

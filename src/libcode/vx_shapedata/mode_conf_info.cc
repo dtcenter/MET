@@ -1623,7 +1623,7 @@ GrdFileType ModeConfInfo::file_type_for_field(bool isFcst, int field_index)
       exit ( 1 );
    }
    Dictionary *dictf = e->dict_value();
-   return parse_conf_file_type(dictf);
+   return parse_conf_grd_file_type(dictf);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -115,7 +115,7 @@ void VarInfoPython::clear() {
    VarInfo::clear();
 
    // Initialize
-   Type = FileType_None;
+   Type = GrdFileType_None;
 
    return;
 }

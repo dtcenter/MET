@@ -186,15 +186,15 @@ void process_command_line(int argc, char **argv) {
    conf_info.read_config(default_config_file, config_file);
 
    // Get the ensemble file type from config, if present
-   etype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_ens));
+   etype = parse_conf_grd_file_type(conf_info.conf.lookup_dictionary(conf_key_ens));
 
    // Get the ensemble file type from the files
-   if(etype == FileType_None) {
+   if(etype == GrdFileType_None) {
       etype = parse_file_list_type(ens_files);
    }
 
    // UGrid not supported
-   if(etype == FileType_UGrid) {
+   if(etype == GrdFileType_UGrid) {
       mlog << Error << "\n" << method_name
            << grdfiletype_to_string(etype)
            << " ensemble files are not supported\n\n";

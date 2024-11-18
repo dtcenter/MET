@@ -145,7 +145,7 @@ dict = 0;   //  not allocated, so don't delete
 
 conf = 0;   //  not allocated, so don't delete
 
-gft = FileType_None;
+gft = GrdFileType_None;
 
 Multivar = false;
 
@@ -169,7 +169,7 @@ merge_thresh.clear();
 
 merge_flag = MergeType::Engine;
 
-file_type = FileType_None;
+file_type = GrdFileType_None;
  
 // raw_pi.clear();
 
@@ -338,7 +338,7 @@ if ( FO == 'F' )  raw_pi = parse_conf_plot_info(conf->lookup_dictionary(conf_key
 else              raw_pi = parse_conf_plot_info(conf->lookup_dictionary(conf_key_obs_raw_plot));
 
 
-file_type = parse_conf_file_type(dict);
+file_type = parse_conf_grd_file_type(dict);
  
    //
    //  done

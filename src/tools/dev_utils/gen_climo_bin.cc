@@ -346,7 +346,7 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
    config.read_string(config_str);
 
    // Get the gridded file type from config string, if present
-   ftype = parse_conf_file_type(&config);
+   ftype = parse_conf_grd_file_type(&config);
 
    // Instantiate Met2dDataFile object from the factory
    mlog << Debug(1)  << "Opening data file: " << file << "\n";

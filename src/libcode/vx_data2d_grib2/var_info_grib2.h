@@ -147,19 +147,19 @@ class VarInfoGrib2 : public VarInfo
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline GrdFileType VarInfoGrib2::file_type()  const { return FileType_Gb2; }
-inline int         VarInfoGrib2::record()     const { return Record;       }
-inline int         VarInfoGrib2::discipline() const { return Discipline;   }
-inline int         VarInfoGrib2::m_table()    const { return MTable;       }
-inline int         VarInfoGrib2::l_table()    const { return LTable;       }
-inline int         VarInfoGrib2::parm_cat()   const { return ParmCat;      }
-inline int         VarInfoGrib2::parm()       const { return Parm;         }
-inline int         VarInfoGrib2::pdt()        const { return PDTmpl;       }
-inline int         VarInfoGrib2::process()    const { return Process;      }
-inline int         VarInfoGrib2::ens_type()   const { return EnsType;      }
-inline int         VarInfoGrib2::der_type()   const { return DerType;      }
-inline int         VarInfoGrib2::stat_type()  const { return StatType;     }
-inline int         VarInfoGrib2::perc_val()   const { return PercVal;      }
+inline GrdFileType VarInfoGrib2::file_type()  const { return GrdFileType_Gb2; }
+inline int         VarInfoGrib2::record()     const { return Record;          }
+inline int         VarInfoGrib2::discipline() const { return Discipline;      }
+inline int         VarInfoGrib2::m_table()    const { return MTable;          }
+inline int         VarInfoGrib2::l_table()    const { return LTable;          }
+inline int         VarInfoGrib2::parm_cat()   const { return ParmCat;         }
+inline int         VarInfoGrib2::parm()       const { return Parm;            }
+inline int         VarInfoGrib2::pdt()        const { return PDTmpl;          }
+inline int         VarInfoGrib2::process()    const { return Process;         }
+inline int         VarInfoGrib2::ens_type()   const { return EnsType;         }
+inline int         VarInfoGrib2::der_type()   const { return DerType;         }
+inline int         VarInfoGrib2::stat_type()  const { return StatType;        }
+inline int         VarInfoGrib2::perc_val()   const { return PercVal;         }
 
 inline int         VarInfoGrib2::aerosol_type()          const { return AerosolType;         }
 inline int         VarInfoGrib2::aerosol_interval_type() const { return AerosolIntervalType; }

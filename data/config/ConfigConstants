@@ -59,7 +59,7 @@ MB_to_PA(p)  = HPA_to_PA(p);
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-// File types
+// Gridded data file types
 GRIB1          = 1;
 GRIB2          = 2;
 NETCDF_MET     = 3;

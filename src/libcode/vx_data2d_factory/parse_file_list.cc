@@ -108,7 +108,7 @@ if ( !is_regular_file(path) )  return a;
    //  If the input is a known gridded data file, return an empty list
    //
 
-if ( (file_type = grd_file_type(path)) != FileType_None )  {
+if ( (file_type = grd_file_type(path)) != GrdFileType_None )  {
 
    mlog << Debug(5) << "parse_ascii_file_list() -> "
         << "File \"" << path << "\" of type "
@@ -209,7 +209,7 @@ GrdFileType parse_file_list_type(const StringArray& file_list)
 
 {
 
-GrdFileType ftype = FileType_None;
+GrdFileType ftype = GrdFileType_None;
 
 for ( int i=0; i<file_list.n(); i++ )  {
 
@@ -232,7 +232,7 @@ for ( int i=0; i<file_list.n(); i++ )  {
 
    ftype = grd_file_type(file_list[i].c_str());
 
-   if ( ftype != FileType_None ) break;
+   if ( ftype != GrdFileType_None ) break;
 
 }
 

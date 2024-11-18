@@ -78,7 +78,7 @@ class VarInfoNcMet : public VarInfo
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline GrdFileType       VarInfoNcMet::file_type()      const { return FileType_NcMet;         }
+inline GrdFileType       VarInfoNcMet::file_type()      const { return GrdFileType_NcMet;      }
 inline const LongArray & VarInfoNcMet::dimension()      const { return Dimension;              }
 inline int               VarInfoNcMet::dimension(int i) const { return Dimension[i];           }
 inline int               VarInfoNcMet::n_dimension()    const { return Dimension.n_elements(); }

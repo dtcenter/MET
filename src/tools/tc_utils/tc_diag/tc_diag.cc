@@ -259,7 +259,7 @@ void get_file_type() {
 
    // Get data file type from config
    GrdFileType conf_file_type =
-      parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_data));
+      parse_conf_grd_file_type(conf_info.conf.lookup_dictionary(conf_key_data));
 
    // Find the first file that actually exists
    for(i=0; i<file_list.n(); i++) {

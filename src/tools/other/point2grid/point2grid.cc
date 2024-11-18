@@ -335,7 +335,7 @@ static void process_command_line(int argc, char **argv) {
       MetConfig config;
       ConcatString vname;
       StringArray var_names;
-      VarInfo *vinfo = VarInfoFactory::new_var_info(FileType_NcMet);
+      VarInfo *vinfo = VarInfoFactory::new_var_info(GrdFileType_NcMet);
       for(int i=0; i<FieldSA.n(); i++) {
          vinfo->clear();
          // Populate the VarInfo object using the config string
@@ -393,7 +393,7 @@ static void process_data_file() {
    if (compress_level < 0) compress_level = conf_info.conf.nc_compression();
 
    // Get the gridded file type from config string, if present
-   ftype = parse_conf_file_type(&conf_info.conf);
+   ftype = parse_conf_grd_file_type(&conf_info.conf);
 
    // Open the input file
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";
@@ -425,7 +425,7 @@ static void process_data_file() {
       // Get the obs type before opening NetCDF
       obs_type = get_obs_type(nc_in);
       goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
-      if (obs_type == TYPE_UNKNOWN && ftype == FileType_NcCF) obs_type = TYPE_NCCF;
+      if (obs_type == TYPE_UNKNOWN && ftype == GrdFileType_NcCF) obs_type = TYPE_NCCF;
       if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
 
       // Read the input data file
@@ -603,7 +603,7 @@ static int get_obs_type(NcFile *nc) {
    static const char *method_name = "get_obs_type() -> ";
 
    bool has_attr_grid = false;
-   auto vinfo = VarInfoFactory::new_var_info(FileType_NcCF);
+   auto vinfo = VarInfoFactory::new_var_info(GrdFileType_NcCF);
    for(int i=0; i<FieldSA.n(); i++) {
       vinfo->clear();
       // Populate the VarInfo object using the config string

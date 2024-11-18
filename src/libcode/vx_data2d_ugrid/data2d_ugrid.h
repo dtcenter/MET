@@ -123,7 +123,7 @@ class MetUGridDataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline GrdFileType MetUGridDataFile::file_type () const { return FileType_UGrid; }
+inline GrdFileType MetUGridDataFile::file_type () const { return GrdFileType_UGrid; }
 inline ConcatString MetUGridDataFile::coordinate_file() const { return _file->coordinate_nc(); }
 
 

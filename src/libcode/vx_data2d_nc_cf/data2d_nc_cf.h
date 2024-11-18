@@ -111,7 +111,7 @@ class MetNcCFDataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline GrdFileType MetNcCFDataFile::file_type () const { return FileType_NcCF; }
+inline GrdFileType MetNcCFDataFile::file_type () const { return GrdFileType_NcCF; }
 
 
 ////////////////////////////////////////////////////////////////////////

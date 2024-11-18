@@ -1268,7 +1268,7 @@ static const char conf_key_cira_diag_flag[]         = "cira_diag_flag";
 // Parameter value names common to multiple tools
 //
 
-// File types
+// Gridded data file types
 static const char conf_val_grib1         [] = "GRIB1";
 static const char conf_val_grib2         [] = "GRIB2";
 static const char conf_val_netcdf_met    [] = "NETCDF_MET";

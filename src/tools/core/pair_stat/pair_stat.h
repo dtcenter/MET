@@ -14,8 +14,7 @@
 //
 //   Mod#   Date      Name            Description
 //   ----   ----      ----            -----------
-//   000    11/11/08  Halley Gotway   New
-//   001    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files.
+//   000    11/07/24  Halley Gotway   MET #3006 New
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -100,17 +99,15 @@ static const char * const txt_file_abbr[n_txt] = {
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static ConcatString fcst_file;
-static StringArray  obs_file;
+static StringArray   pairs_files;
+static PairsFileType pairs_type;
 
 // Input Config file
-static ConcatString      config_file;
-static StringArray       ugrid_config_files;
+static ConcatString     config_file;
+static StringArray      ugrid_config_files;
 static PairStatConfInfo conf_info;
 
 // Optional arguments
-static unixtime     obs_valid_beg_ut = (unixtime) 0;
-static unixtime     obs_valid_end_ut = (unixtime) 0;
 static ConcatString out_dir;
 
 ////////////////////////////////////////////////////////////////////////
@@ -154,6 +151,34 @@ static gsl_rng *rng_ptr = (gsl_rng *) nullptr;
 
 // Strings to be output in the STAT and optional text files
 static StatHdrColumns shc;
+
+///////////////////////////////////////////////////////////////////////////////
+
+//
+// Enumeration of supported pairs file types
+//
+
+enum PairsFileType {
+
+   PairsFileType_None,         // Default
+
+   PairsFileType_Stat,         // MET .stat file containing matched pair data
+   PairsFileType_Python_Numpy, // Python script using numpy array and attributes dictionary
+   PairsFileType_IODA,         // IODA pairs file
+
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+// JHG, implement these functions
+extern ConcatString pairsfiletype_to_string(const PairsFileType);
+extern ConcatString string_to_pairsfiletype(const char *);
+
+///////////////////////////////////////////////////////////////////////////////
+
+inline bool is_python_pairsfiletype(const PairsFileType _t) {
+   return (_t == PairsFileType_Python_Numpy);
+}
 
 ////////////////////////////////////////////////////////////////////////
 

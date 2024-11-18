@@ -130,7 +130,7 @@ int met_main(int argc, char * argv[]) {
    //
    // get the gridded file type from config string, if present
    //
-   ftype = parse_conf_file_type(&config);
+   ftype = parse_conf_grd_file_type(&config);
 
    //
    // instantiate the Met2dDataFile object using the data_2d_factory
@@ -145,7 +145,7 @@ int met_main(int argc, char * argv[]) {
       exit(1);
    }
 
-   if (FileType_UGrid == met_ptr->file_type()) {
+   if (GrdFileType_UGrid == met_ptr->file_type()) {
       mlog << Error << "\n" << program_name << " -> filetype "
            << grdfiletype_to_string(met_ptr->file_type()) << " is not supported\n\n";
       exit(1);

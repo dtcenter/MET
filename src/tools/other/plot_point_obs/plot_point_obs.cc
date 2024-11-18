@@ -197,7 +197,7 @@ void process_point_obs(const char *point_obs_filename) {
 
       if(is_ugrid_file(point_obs_filename)) {
          mlog << Error << "\n" << program_name << " -> filetype "
-              << grdfiletype_to_string(FileType_UGrid) << " is not supported\n\n";
+              << grdfiletype_to_string(GrdFileType_UGrid) << " is not supported\n\n";
 
          exit(1);
       }

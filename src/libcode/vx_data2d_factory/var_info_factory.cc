@@ -67,11 +67,11 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
 
    switch(type) {
 
-      case FileType_Gb1:
+      case GrdFileType_Gb1:
          vi = new VarInfoGrib;
          break;
 
-      case FileType_Gb2:
+      case GrdFileType_Gb2:
 #ifdef WITH_GRIB2
          vi = new VarInfoGrib2;
          break;
@@ -82,17 +82,17 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          exit(1);
 #endif
 
-      case FileType_NcMet:
+      case GrdFileType_NcMet:
          vi = new VarInfoNcMet;
          break;
 
-      case FileType_NcWrf:
-      case FileType_NcPinterp:
+      case GrdFileType_NcWrf:
+      case GrdFileType_NcPinterp:
          vi = new VarInfoNcWrf;
          break;
 
-      case FileType_Python_Numpy:
-      case FileType_Python_Xarray:
+      case GrdFileType_Python_Numpy:
+      case GrdFileType_Python_Xarray:
 #ifdef WITH_PYTHON
          p = new VarInfoPython;
          p->set_file_type(type);
@@ -103,11 +103,11 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          python_compile_error(method_name);
 #endif
 
-      case FileType_NcCF:
+      case GrdFileType_NcCF:
          vi = new VarInfoNcCF;
          break;
 
-      case FileType_UGrid:
+      case GrdFileType_UGrid:
 #ifdef WITH_UGRID
          vi = new VarInfoUGrid;
          break;
@@ -115,7 +115,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          ugrid_compile_error(method_name);
 #endif
 
-      case FileType_HdfEos:
+      case GrdFileType_HdfEos:
          mlog << Error << "\n" << method_name
               << "Support for GrdFileType = " << grdfiletype_to_string(type)
               << " not yet implemented!\n\n";

@@ -91,7 +91,7 @@ static std::map<std::string,DataOptInfo> data_opt_map;
 static StringArray    deck_source, deck_model_suffix;
 static ConcatString   config_file;
 static TCDiagConfInfo conf_info;
-static GrdFileType    file_type = FileType_None;
+static GrdFileType    file_type = GrdFileType_None;
 
 // Optional arguments
 static ConcatString out_dir;

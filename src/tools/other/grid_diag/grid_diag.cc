@@ -762,7 +762,7 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
    i_dict = parse_conf_i_vx_dict(dict, i_field);
 
    // Look for file_type in the i-th data.field entry
-   file_type = parse_conf_file_type(&i_dict);
+   file_type = parse_conf_grd_file_type(&i_dict);
 
    // Find the first file that actually exists
    for(i=0; i<file_list.n(); i++) {
