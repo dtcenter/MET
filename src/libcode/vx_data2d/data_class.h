@@ -129,7 +129,7 @@ class Met2dDataFile : public Met2dData {
       virtual int raw_nx() const;
       virtual int raw_ny() const;
 
-      virtual GrdFileType file_type() const = 0;
+      virtual FileType file_type() const = 0;
 
       int shift_right() const;
 

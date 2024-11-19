@@ -57,7 +57,7 @@ class MetNcWrfDataFile : public Met2dDataFile {
          //  get stuff
          //
 
-      GrdFileType file_type() const;
+      FileType file_type() const;
 
          //  retrieve the first matching data plane
 
@@ -87,7 +87,7 @@ class MetNcWrfDataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline GrdFileType MetNcWrfDataFile::file_type () const { return ( GrdFileType_NcWrf ); }
+inline FileType MetNcWrfDataFile::file_type () const { return ( FileType_NcWrf ); }
 
 
 ////////////////////////////////////////////////////////////////////////

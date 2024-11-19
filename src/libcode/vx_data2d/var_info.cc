@@ -952,7 +952,7 @@ ConcatString EnsVarInfo::get_ens_member_id(int index) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ConcatString raw_magic_str(Dictionary i_edict, GrdFileType file_type) {
+ConcatString raw_magic_str(Dictionary i_edict, FileType file_type) {
    ConcatString magic_str;
 
    ConcatString name = i_edict.lookup_string("name");

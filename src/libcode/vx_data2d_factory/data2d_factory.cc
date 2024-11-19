@@ -44,7 +44,7 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type)
+Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(FileType type)
 
 {
 
@@ -62,11 +62,11 @@ MetPythonDataFile * p = nullptr;
 
    switch(type) {
 
-      case GrdFileType_Gb1:
+      case FileType_Gb1:
          mtddf = new MetGrib1DataFile;
          break;
 
-      case GrdFileType_Gb2:
+      case FileType_Gb2:
 #ifdef WITH_GRIB2
          mtddf = new MetGrib2DataFile;
 #else
@@ -77,28 +77,28 @@ MetPythonDataFile * p = nullptr;
 #endif
          break;
 
-      case GrdFileType_NcMet:
+      case FileType_NcMet:
          mtddf = new MetNcMetDataFile;
          break;
 
-      case GrdFileType_NcWrf:
-      case GrdFileType_NcPinterp:
+      case FileType_NcWrf:
+      case FileType_NcPinterp:
          mtddf = new MetNcWrfDataFile;
          break;
 
-      case GrdFileType_NcCF:
+      case FileType_NcCF:
          mtddf = new MetNcCFDataFile;
          break;
 
 #ifdef WITH_PYTHON
 
-      case GrdFileType_Python_Numpy:
+      case FileType_Python_Numpy:
          p = new MetPythonDataFile;
          p->set_type(type);
          mtddf = p;
          break;
 
-      case GrdFileType_Python_Xarray:
+      case FileType_Python_Xarray:
          p = new MetPythonDataFile;
          p->set_type(type);
          mtddf = p;
@@ -106,38 +106,38 @@ MetPythonDataFile * p = nullptr;
 
 #else
 
-      case GrdFileType_Python_Numpy:
-      case GrdFileType_Python_Xarray:
+      case FileType_Python_Numpy:
+      case FileType_Python_Xarray:
 
          python_compile_error(method_name);
 
 #endif
 
-      case GrdFileType_HdfEos:
+      case FileType_HdfEos:
 
          mlog << Error << "\n" << method_name
-              << "Support for GrdFileType = \"" << grdfiletype_to_string(type)
+              << "Support for FileType = \"" << grdfiletype_to_string(type)
               << "\" not yet implemented!\n\n";
          exit(1);
 
-      case GrdFileType_Bufr:
+      case FileType_Bufr:
 
          mlog << Error << "\n" << method_name
               << "cannot use this factory to read files of type \""
               << grdfiletype_to_string(type) << "\"\n\n";
          exit(1);
 
-      case GrdFileType_UGrid:
+      case FileType_UGrid:
 #ifdef WITH_UGRID
-         // For GrdFileType_None, silently return a nullptr pointer
+         // For FileType_None, silently return a nullptr pointer
          mtddf = new MetUGridDataFile;
 #else
          ugrid_compile_error(method_name);
 #endif
          break;
 
-      case GrdFileType_None:
-         // For GrdFileType_None, silently return a nullptr pointer
+      case FileType_None:
+         // For FileType_None, silently return a nullptr pointer
          mtddf = (Met2dDataFile *) nullptr;
          break;
 
@@ -160,7 +160,7 @@ MetPythonDataFile * p = nullptr;
 ////////////////////////////////////////////////////////////////////////
 
 Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename) {
-   GrdFileType type;
+   FileType type;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
    //
@@ -177,8 +177,8 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename)
    // Call open for non-python types
    //
    if(mtddf &&
-      type != GrdFileType_Python_Numpy &&
-      type != GrdFileType_Python_Xarray) {
+      type != FileType_Python_Numpy &&
+      type != FileType_Python_Xarray) {
       if(!(mtddf->open(filename))) {
          mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
               << "error opening file \"" << filename << "\"\n\n";
@@ -191,7 +191,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename)
 
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename, GrdFileType type)
+Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename, FileType type)
 
 {
 
@@ -200,7 +200,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
    //
    // Use the file type, if valid
    //
-   if(type != GrdFileType_None) {
+   if(type != FileType_None) {
 
       //
       // Create a new data file object
@@ -211,8 +211,8 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
       //
       // Set MET_PYTHON_INPUT_ARG environment variable for python types
       //
-      if(type == GrdFileType_Python_Numpy ||
-         type == GrdFileType_Python_Xarray) {
+      if(type == FileType_Python_Numpy ||
+         type == FileType_Python_Xarray) {
          setenv(met_python_input_arg, filename, 1);
       }
 #endif
@@ -221,8 +221,8 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename,
       // Call open for non-python types
       //
       if(mtddf &&
-         type != GrdFileType_Python_Numpy &&
-         type != GrdFileType_Python_Xarray) {
+         type != FileType_Python_Numpy &&
+         type != FileType_Python_Xarray) {
          if(!(mtddf->open(filename))) {
             mlog << Error << "\nMet2dDataFileFactory::new_met_2d_data_file() -> "
                  << "error opening file \"" << filename << "\"\n\n";
@@ -247,7 +247,7 @@ bool is_2d_data_file(const ConcatString &filename,
                      const ConcatString &config_str) {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
-   GrdFileType type = GrdFileType_None;
+   FileType type = FileType_None;
 
    // Check for a requested file type
    if(config_str.nonempty()) {

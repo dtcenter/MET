@@ -298,7 +298,7 @@ void ModeConfInfo::read_config(const char * default_file_name, const char * user
 
 ////////////////////////////////////////////////////////////////////////
 
-void ModeConfInfo::process_config_traditional(GrdFileType ftype, GrdFileType otype)
+void ModeConfInfo::process_config_traditional(FileType ftype, FileType otype)
 {
    process_config_except_fields();
    process_config_field (ftype, otype, ModeDataType::Traditional, 0);
@@ -507,7 +507,7 @@ void ModeConfInfo::process_config_except_fields()
 
 ////////////////////////////////////////////////////////////////////////
 
-void ModeConfInfo::process_config_field(GrdFileType ftype, GrdFileType otype,
+void ModeConfInfo::process_config_field(FileType ftype, FileType otype,
                                         ModeDataType dt, int field_index)
 
 {
@@ -530,7 +530,7 @@ void ModeConfInfo::process_config_field(GrdFileType ftype, GrdFileType otype,
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModeConfInfo::process_config_both(GrdFileType ftype, GrdFileType otype,
+void ModeConfInfo::process_config_both(FileType ftype, FileType otype,
                                        int field_index)
 {
    int j, k, n;
@@ -604,7 +604,7 @@ void ModeConfInfo::process_config_both(GrdFileType ftype, GrdFileType otype,
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModeConfInfo::process_config_fcst(GrdFileType ftype, int field_index)
+void ModeConfInfo::process_config_fcst(FileType ftype, int field_index)
 {
    int j, k, n;
 
@@ -641,7 +641,7 @@ void ModeConfInfo::process_config_fcst(GrdFileType ftype, int field_index)
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModeConfInfo::process_config_obs(GrdFileType otype, int field_index)
+void ModeConfInfo::process_config_obs(FileType otype, int field_index)
 {
    int j, k, n;
 
@@ -916,7 +916,7 @@ void ModeConfInfo::evaluate_obs_settings(int j)
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModeConfInfo::read_fields_0 (Mode_Field_Info * & info_array, Dictionary * dict, GrdFileType type, char _fo)
+void ModeConfInfo::read_fields_0 (Mode_Field_Info * & info_array, Dictionary * dict, FileType type, char _fo)
 
 {
 
@@ -995,7 +995,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModeConfInfo::read_fields_1 (Mode_Field_Info * & info_array, Dictionary * dict, GrdFileType type, char _fo,
+void ModeConfInfo::read_fields_1 (Mode_Field_Info * & info_array, Dictionary * dict, FileType type, char _fo,
                                   int field_index)
 
 {
@@ -1588,7 +1588,7 @@ void ModeConfInfo::set_data_type(ModeDataType type)
 
 ////////////////////////////////////////////////////////////////////////
 
-GrdFileType ModeConfInfo::file_type_for_field(bool isFcst, int field_index)
+FileType ModeConfInfo::file_type_for_field(bool isFcst, int field_index)
 {
    // look at the dictionary for the obs or forecast at index, with
    // parents

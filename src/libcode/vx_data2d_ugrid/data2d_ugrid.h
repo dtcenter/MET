@@ -83,7 +83,7 @@ class MetUGridDataFile : public Met2dDataFile {
       //  get stuff
       //
 
-      GrdFileType file_type() const;
+      FileType file_type() const;
 
       //  retrieve the first matching data plane
 
@@ -123,7 +123,7 @@ class MetUGridDataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline GrdFileType MetUGridDataFile::file_type () const { return GrdFileType_UGrid; }
+inline FileType MetUGridDataFile::file_type ()          const { return FileType_UGrid;         }
 inline ConcatString MetUGridDataFile::coordinate_file() const { return _file->coordinate_nc(); }
 
 

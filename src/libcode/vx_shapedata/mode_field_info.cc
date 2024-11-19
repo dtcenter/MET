@@ -145,7 +145,7 @@ dict = 0;   //  not allocated, so don't delete
 
 conf = 0;   //  not allocated, so don't delete
 
-gft = GrdFileType_None;
+gft = FileType_None;
 
 Multivar = false;
 
@@ -169,7 +169,7 @@ merge_thresh.clear();
 
 merge_flag = MergeType::Engine;
 
-file_type = GrdFileType_None;
+file_type = FileType_None;
  
 // raw_pi.clear();
 
@@ -193,7 +193,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Mode_Field_Info::set (const bool _multivar, int _index, Dictionary * _dict, MetConfig * _conf, GrdFileType type, char _fo, bool do_clear)
+void Mode_Field_Info::set (const bool _multivar, int _index, Dictionary * _dict, MetConfig * _conf, FileType type, char _fo, bool do_clear)
 
 {
 

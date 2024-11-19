@@ -106,7 +106,7 @@ class VarInfo
          // get stuff
          //
 
-      virtual GrdFileType  file_type() const = 0;
+      virtual FileType  file_type() const = 0;
 
       ConcatString magic_str()      const;
       ConcatString magic_time_str() const;
@@ -310,7 +310,7 @@ class EnsVarInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString raw_magic_str(Dictionary i_edict, GrdFileType file_type);
+ConcatString raw_magic_str(Dictionary i_edict, FileType file_type);
 bool is_req_level_match(const ConcatString &, const ConcatString &);
 
 ///////////////////////////////////////////////////////////////////////////////

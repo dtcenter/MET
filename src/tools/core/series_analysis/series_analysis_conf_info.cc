@@ -129,8 +129,8 @@ void SeriesAnalysisConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
-                                            GrdFileType otype) {
+void SeriesAnalysisConfInfo::process_config(FileType ftype,
+                                            FileType otype) {
    int i, n;
    ConcatString s;
    StringArray sa;

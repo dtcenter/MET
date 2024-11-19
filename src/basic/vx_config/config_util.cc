@@ -345,8 +345,8 @@ StringArray parse_conf_string_array(Dictionary *dict, const char *conf_key, cons
 
 ///////////////////////////////////////////////////////////////////////////////
 
-GrdFileType parse_conf_grd_file_type(Dictionary *dict) {
-   GrdFileType t = GrdFileType_None;
+FileType parse_conf_grd_file_type(Dictionary *dict) {
+   FileType t = FileType_None;
    int v;
 
    if(!dict) {
@@ -359,16 +359,16 @@ GrdFileType parse_conf_grd_file_type(Dictionary *dict) {
    v = dict->lookup_int(conf_key_file_type, false);
 
    if(dict->last_lookup_status()) {
-      // Convert integer to enumerated GrdFileType
-           if(v == conf_const.lookup_int(conf_val_grib1))         t = GrdFileType_Gb1;
-      else if(v == conf_const.lookup_int(conf_val_grib2))         t = GrdFileType_Gb2;
-      else if(v == conf_const.lookup_int(conf_val_netcdf_met))    t = GrdFileType_NcMet;
-      else if(v == conf_const.lookup_int(conf_val_netcdf_wrf))    t = GrdFileType_NcWrf;
-      else if(v == conf_const.lookup_int(conf_val_netcdf_pint))   t = GrdFileType_NcPinterp;
-      else if(v == conf_const.lookup_int(conf_val_netcdf_nccf))   t = GrdFileType_NcCF;
-      else if(v == conf_const.lookup_int(conf_val_netcdf_ugrid))  t = GrdFileType_UGrid;
-      else if(v == conf_const.lookup_int(conf_val_python_numpy))  t = GrdFileType_Python_Numpy;
-      else if(v == conf_const.lookup_int(conf_val_python_xarray)) t = GrdFileType_Python_Xarray;
+      // Convert integer to enumerated FileType
+           if(v == conf_const.lookup_int(conf_val_grib1))         t = FileType_Gb1;
+      else if(v == conf_const.lookup_int(conf_val_grib2))         t = FileType_Gb2;
+      else if(v == conf_const.lookup_int(conf_val_netcdf_met))    t = FileType_NcMet;
+      else if(v == conf_const.lookup_int(conf_val_netcdf_wrf))    t = FileType_NcWrf;
+      else if(v == conf_const.lookup_int(conf_val_netcdf_pint))   t = FileType_NcPinterp;
+      else if(v == conf_const.lookup_int(conf_val_netcdf_nccf))   t = FileType_NcCF;
+      else if(v == conf_const.lookup_int(conf_val_netcdf_ugrid))  t = FileType_UGrid;
+      else if(v == conf_const.lookup_int(conf_val_python_numpy))  t = FileType_Python_Numpy;
+      else if(v == conf_const.lookup_int(conf_val_python_xarray)) t = FileType_Python_Xarray;
       else {
          mlog << Error << "\nparse_conf_grd_file_type() -> "
               << "Unexpected config file value of " << v << " for \""

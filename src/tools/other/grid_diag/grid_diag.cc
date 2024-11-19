@@ -245,7 +245,7 @@ void process_series(void) {
    DataPlane data_dp[conf_info.get_n_data()];
    double min, max;
    StringArray *cur_files;
-   GrdFileType *cur_ftype;
+   FileType *cur_ftype;
    Grid cur_grid;
    ConcatString i_var_str, j_var_str, ij_var_str;
 
@@ -752,7 +752,7 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
    Dictionary *dict = (Dictionary *) nullptr;
    Dictionary i_dict;
-   GrdFileType file_type;
+   FileType file_type;
    int i;
 
    // Conf: data.field

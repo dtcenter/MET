@@ -60,7 +60,7 @@ class MetGrib1DataFile : public Met2dDataFile {
          //  get stuff
          //
 
-      GrdFileType file_type() const;
+      FileType file_type() const;
 
       double operator () (int x, int y) const;
 
@@ -102,8 +102,8 @@ class MetGrib1DataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double      MetGrib1DataFile::operator  () (int x, int y) const { return get(x, y);       }
-inline GrdFileType MetGrib1DataFile::file_type ()                const { return GrdFileType_Gb1; }
+inline double   MetGrib1DataFile::operator  () (int x, int y) const { return get(x, y);    }
+inline FileType MetGrib1DataFile::file_type ()                const { return FileType_Gb1; }
 
 
 ////////////////////////////////////////////////////////////////////////

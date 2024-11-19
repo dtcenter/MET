@@ -135,7 +135,7 @@ void PairStatConfInfo::read_ugrid_configs(StringArray ugrid_config_names, const 
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairStatConfInfo::process_config(GrdFileType ftype) {
+void PairStatConfInfo::process_config(FileType ftype) {
    int i, j, n_fvx, n_ovx;
    Dictionary *fdict = (Dictionary *) nullptr;
    Dictionary *odict = (Dictionary *) nullptr;
@@ -839,7 +839,7 @@ bool PairStatVxOpt::is_uv_match(const PairStatVxOpt &v) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairStatVxOpt::process_config(GrdFileType ftype,
+void PairStatVxOpt::process_config(FileType ftype,
         Dictionary &fdict, Dictionary &odict) {
    int n;
    VarInfoFactory info_factory;

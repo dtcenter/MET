@@ -121,13 +121,13 @@ void GridDiagConfInfo::set_n_data() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
+void GridDiagConfInfo::process_config(vector<FileType> file_types) {
    ConcatString s;
    StringArray sa;
    VarInfoFactory info_factory;
    Dictionary *dict = (Dictionary *) nullptr;
    Dictionary i_dict;
-   GrdFileType file_type;
+   FileType file_type;
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);

@@ -215,7 +215,7 @@ void process_command_line(int argc, char **argv) {
 void process_data_file() {
    DataPlane fr_dp, to_dp;
    Grid fr_grid, to_grid;
-   GrdFileType ftype;
+   FileType ftype;
    double dmin, dmax;
    ConcatString run_cs, vname;
    //Variables for GOES

@@ -137,8 +137,8 @@ void GridStatConfInfo::read_ugrid_configs(StringArray ugrid_config_names, const 
 
 ////////////////////////////////////////////////////////////////////////
 
-void GridStatConfInfo::process_config(GrdFileType ftype,
-                                      GrdFileType otype) {
+void GridStatConfInfo::process_config(FileType ftype,
+                                      FileType otype) {
    int i, j, n_fvx, n_ovx;
    Dictionary *fdict = (Dictionary *) nullptr;
    Dictionary *odict = (Dictionary *) nullptr;
@@ -655,8 +655,8 @@ void GridStatVxOpt::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatVxOpt::process_config(
-        GrdFileType ftype, Dictionary &fdict,
-        GrdFileType otype, Dictionary &odict) {
+        FileType ftype, Dictionary &fdict,
+        FileType otype, Dictionary &odict) {
    int i, n;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;

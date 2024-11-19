@@ -24,12 +24,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 bool get_series_entry(int, VarInfo*, const StringArray&,
-                      const GrdFileType, DataPlane&, Grid&,
+                      const FileType, DataPlane&, Grid&,
                       bool error_out=true,
                       bool print_warning=true);
 
 bool get_series_entries(int, std::vector<VarInfo*>&, const StringArray&,
-                        const GrdFileType, std::vector<DataPlane>&, Grid&,
+                        const FileType, std::vector<DataPlane>&, Grid&,
                         bool error_out=true,
                         bool print_warning=true);
 

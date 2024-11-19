@@ -232,7 +232,7 @@ const string get_tool_name() {
 void process_command_line(int argc, char **argv) {
    int i;
    CommandLine cline;
-   GrdFileType ftype;
+   FileType ftype;
    ConcatString default_config_file;
    const char *method_name = "process_command_line() -> ";
 
@@ -303,7 +303,7 @@ void process_command_line(int argc, char **argv) {
    // Read forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
       mlog << Error << "\n" << method_name << "Trouble reading forecast file \""
-           << fcst_file << "\". Override the FileType with \"file_type = GrdFileType_<type>;\"\n\n";
+           << fcst_file << "\". Override the FileType with \"file_type = FileType_<type>;\"\n\n";
       exit(1);
    }
 
@@ -316,7 +316,7 @@ void process_command_line(int argc, char **argv) {
    // Set the model name
    shc.set_model(conf_info.model.c_str());
 
-   if (GrdFileType_UGrid == ftype) {
+   if (FileType_UGrid == ftype) {
 #ifdef WITH_UGRID
       ConcatString ugrid_dataset = conf_info.ugrid_dataset;
       if (0 < ugrid_dataset.length()) {

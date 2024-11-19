@@ -164,13 +164,13 @@ config.read_config(default_config_filename.c_str(), local_config_filename.c_str(
 
 if ( single_filenames.n() > 0 )  {
 
-   GrdFileType stype;
+   FileType stype;
 
    stype = parse_conf_grd_file_type(config.conf.lookup_dictionary(conf_key_fcst));   //  use the "fcst" dictionary
 
    single_filenames = parse_file_list(single_filenames);
 
-   if ( stype == GrdFileType_None ) stype = grd_file_type(single_filenames[0].c_str());
+   if ( stype == FileType_None ) stype = grd_file_type(single_filenames[0].c_str());
 
    config.process_config(stype, stype);
 
@@ -187,13 +187,13 @@ if ( single_filenames.n() > 0 )  {
 fcst_filenames = parse_file_list(fcst_filenames);
 obs_filenames  = parse_file_list(obs_filenames);
 
-GrdFileType ftype, otype;
+FileType ftype, otype;
 
 ftype = parse_conf_grd_file_type(config.conf.lookup_dictionary(conf_key_fcst));
 otype = parse_conf_grd_file_type(config.conf.lookup_dictionary(conf_key_obs));
 
-if ( ftype == GrdFileType_None ) ftype = grd_file_type(fcst_filenames[0].c_str());
-if ( otype == GrdFileType_None ) otype = grd_file_type(obs_filenames[0].c_str());
+if ( ftype == FileType_None ) ftype = grd_file_type(fcst_filenames[0].c_str());
+if ( otype == FileType_None ) otype = grd_file_type(obs_filenames[0].c_str());
 
 config.process_config(ftype, otype);
 

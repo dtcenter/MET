@@ -62,7 +62,7 @@ static void process_ensemble();
 static void get_climo_mean_stdev(GenEnsProdVarInfo *, int,
                                  bool, int, DataPlane &, DataPlane &);
 static void get_ens_mean_stdev(GenEnsProdVarInfo *, DataPlane &, DataPlane &);
-static bool get_data_plane(const char *, GrdFileType, VarInfo *, DataPlane &);
+static bool get_data_plane(const char *, FileType, VarInfo *, DataPlane &);
 
 static void clear_counts();
 static void track_counts(GenEnsProdVarInfo *, const DataPlane &, bool,
@@ -189,12 +189,12 @@ void process_command_line(int argc, char **argv) {
    etype = parse_conf_grd_file_type(conf_info.conf.lookup_dictionary(conf_key_ens));
 
    // Get the ensemble file type from the files
-   if(etype == GrdFileType_None) {
+   if(etype == FileType_None) {
       etype = parse_file_list_type(ens_files);
    }
 
    // UGrid not supported
-   if(etype == GrdFileType_UGrid) {
+   if(etype == FileType_UGrid) {
       mlog << Error << "\n" << method_name
            << grdfiletype_to_string(etype)
            << " ensemble files are not supported\n\n";
@@ -624,7 +624,7 @@ void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_data_plane(const char *infile, GrdFileType ftype,
+bool get_data_plane(const char *infile, FileType ftype,
                     VarInfo *info, DataPlane &dp) {
    bool found;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;

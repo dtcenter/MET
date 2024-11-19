@@ -31,7 +31,7 @@ class VarInfoPython : public VarInfo
 
    private:
 
-      GrdFileType Type;
+      FileType Type;
 
       void init_from_scratch();
       void assign(const VarInfoPython &);
@@ -50,13 +50,13 @@ class VarInfoPython : public VarInfo
          // get stuff
          //
 
-      GrdFileType file_type() const;
+      FileType file_type() const;
 
          //
          // set stuff
          //
 
-      void set_file_type(const GrdFileType);
+      void set_file_type(const FileType);
       void set_dict(Dictionary &);
 
          //
@@ -73,7 +73,7 @@ class VarInfoPython : public VarInfo
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline GrdFileType VarInfoPython::file_type() const { return Type; }
+inline FileType VarInfoPython::file_type() const { return Type; }
 
 ///////////////////////////////////////////////////////////////////////////////
 

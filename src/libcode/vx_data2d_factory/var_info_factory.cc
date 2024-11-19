@@ -49,7 +49,7 @@ using namespace std;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
+VarInfo * VarInfoFactory::new_var_info(FileType type)
 
 {
 
@@ -67,11 +67,11 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
 
    switch(type) {
 
-      case GrdFileType_Gb1:
+      case FileType_Gb1:
          vi = new VarInfoGrib;
          break;
 
-      case GrdFileType_Gb2:
+      case FileType_Gb2:
 #ifdef WITH_GRIB2
          vi = new VarInfoGrib2;
          break;
@@ -82,17 +82,17 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          exit(1);
 #endif
 
-      case GrdFileType_NcMet:
+      case FileType_NcMet:
          vi = new VarInfoNcMet;
          break;
 
-      case GrdFileType_NcWrf:
-      case GrdFileType_NcPinterp:
+      case FileType_NcWrf:
+      case FileType_NcPinterp:
          vi = new VarInfoNcWrf;
          break;
 
-      case GrdFileType_Python_Numpy:
-      case GrdFileType_Python_Xarray:
+      case FileType_Python_Numpy:
+      case FileType_Python_Xarray:
 #ifdef WITH_PYTHON
          p = new VarInfoPython;
          p->set_file_type(type);
@@ -103,11 +103,11 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          python_compile_error(method_name);
 #endif
 
-      case GrdFileType_NcCF:
+      case FileType_NcCF:
          vi = new VarInfoNcCF;
          break;
 
-      case GrdFileType_UGrid:
+      case FileType_UGrid:
 #ifdef WITH_UGRID
          vi = new VarInfoUGrid;
          break;
@@ -115,9 +115,9 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          ugrid_compile_error(method_name);
 #endif
 
-      case GrdFileType_HdfEos:
+      case FileType_HdfEos:
          mlog << Error << "\n" << method_name
-              << "Support for GrdFileType = " << grdfiletype_to_string(type)
+              << "Support for FileType = " << grdfiletype_to_string(type)
               << " not yet implemented!\n\n";
          exit(1);
 
@@ -138,7 +138,7 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
 ///////////////////////////////////////////////////////////////////////////////
 
 VarInfo * VarInfoFactory::new_var_info(ConcatString s) {
-   GrdFileType type;
+   FileType type;
 
    // Convert the string to a gridded data file type
    string_to_grdfiletype(s.c_str(), type);

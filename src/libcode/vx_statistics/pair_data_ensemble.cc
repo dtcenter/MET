@@ -1173,7 +1173,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
                                        const Grid &gr, const char *var_name) {
 
    // Check the observation VarInfo file type
-   if(obs_info->file_type() != GrdFileType_Gb1) {
+   if(obs_info->file_type() != FileType_Gb1) {
       mlog << Error << "\nVxPairDataEnsemble::add_point_obs() -> "
            << "when processing point observations, the observation "
            << "VarInfo type must be GRIB.\n\n";

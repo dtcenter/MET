@@ -98,7 +98,7 @@ int met_main(int argc, char * argv[]) {
    VarInfoFactory v_factory;
    DataPlane data_plane;
    Grid grid;
-   GrdFileType ftype;
+   FileType ftype;
    ColorTable color_table;
    double data_min, data_max;
    bool status = false;
@@ -145,7 +145,7 @@ int met_main(int argc, char * argv[]) {
       exit(1);
    }
 
-   if (GrdFileType_UGrid == met_ptr->file_type()) {
+   if (FileType_UGrid == met_ptr->file_type()) {
       mlog << Error << "\n" << program_name << " -> filetype "
            << grdfiletype_to_string(met_ptr->file_type()) << " is not supported\n\n";
       exit(1);

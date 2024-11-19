@@ -151,7 +151,7 @@ static ConcatString pcp_reg_exp = (string)default_reg_exp;
 
 // Variables for the derive command
 static StringArray  file_list;
-static GrdFileType  file_list_type = GrdFileType_None;
+static FileType     file_list_type = FileType_None;
 static StringArray  field_list;
 static StringArray  derive_list;
 
@@ -1213,7 +1213,7 @@ bool get_field(const char *filename, const char *cur_field,
                Grid & grid, DataPlane & plane, bool error_out) {
    Met2dDataFileFactory factory;
    Met2dDataFile *mtddf = nullptr;
-   GrdFileType ftype;
+   FileType ftype;
    VarInfoFactory var_fac;
    VarInfo *cur_var = nullptr;
    const char *method_name = "get_field() -> ";
@@ -1245,7 +1245,7 @@ bool get_field(const char *filename, const char *cur_field,
    //
    // If not set by the config string, use the file list type.
    //
-   if(ftype == GrdFileType_None) ftype = file_list_type;
+   if(ftype == FileType_None) ftype = file_list_type;
 
    //
    // Check for missing non-python input files.

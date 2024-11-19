@@ -233,7 +233,7 @@ const string get_tool_name()
 
 void process_command_line(int argc, char **argv) {
    CommandLine cline;
-   GrdFileType ftype, otype;
+   FileType ftype, otype;
    ConcatString default_config_file;
    DataPlane dp;
    const char *method_name = "process_command_line() -> ";
@@ -290,14 +290,14 @@ void process_command_line(int argc, char **argv) {
    // Read forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
       mlog << Error << "\nTrouble reading forecast file \""
-           << fcst_file << "\". Override the FileType with \"file_type = GrdFileType_<type>;\"\n\n";
+           << fcst_file << "\". Override the FileType with \"file_type = FileType_<type>;\"\n\n";
       exit(1);
    }
 
    // Read observation file
    if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file.c_str(), otype))) {
       mlog << Error << "\nTrouble reading observation file \""
-           << obs_file << "\". Override the FileType with \"file_type = GrdFileType_<type>;\"\n\n";
+           << obs_file << "\". Override the FileType with \"file_type = FileType_<type>;\"\n\n";
       exit(1);
    }
 
@@ -308,14 +308,14 @@ void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(ftype, otype);
 
-   if (GrdFileType_UGrid == ftype || GrdFileType_UGrid == otype) {
+   if (FileType_UGrid == ftype || FileType_UGrid == otype) {
 #ifdef WITH_UGRID
       ConcatString ugrid_dataset = conf_info.ugrid_dataset;
       if (0 < ugrid_dataset.length()) {
          double max_distance_km = conf_info.ugrid_max_distance_km;
          ConcatString ugrid_nc = conf_info.ugrid_nc;
          ConcatString ugrid_map_config_filename = conf_info.ugrid_map_config;
-         if (GrdFileType_UGrid == ftype) {
+         if (FileType_UGrid == ftype) {
             MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
             ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
                                            ugrid_map_config_filename);
@@ -328,7 +328,7 @@ void process_command_line(int argc, char **argv) {
                  << "FCST: ugrid_coordinates_nc: " << ugrid_nc
                  << "  ugrid_max_distance_km: " << conf_info.ugrid_max_distance_km << "\n";
          }
-         if (GrdFileType_UGrid == otype) {
+         if (FileType_UGrid == otype) {
             MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)obs_mtddf;
             ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
                                            ugrid_map_config_filename);

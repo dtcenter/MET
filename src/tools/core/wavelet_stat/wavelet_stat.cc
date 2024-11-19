@@ -166,7 +166,7 @@ const string get_tool_name() {
 
 void process_command_line(int argc, char **argv) {
    CommandLine cline;
-   GrdFileType ftype, otype;
+   FileType ftype, otype;
    ConcatString default_config_file;
    DataPlane dp;
 

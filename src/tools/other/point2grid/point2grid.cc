@@ -335,7 +335,7 @@ static void process_command_line(int argc, char **argv) {
       MetConfig config;
       ConcatString vname;
       StringArray var_names;
-      VarInfo *vinfo = VarInfoFactory::new_var_info(GrdFileType_NcMet);
+      VarInfo *vinfo = VarInfoFactory::new_var_info(FileType_NcMet);
       for(int i=0; i<FieldSA.n(); i++) {
          vinfo->clear();
          // Populate the VarInfo object using the config string
@@ -379,7 +379,7 @@ static void process_command_line(int argc, char **argv) {
 
 static void process_data_file() {
    Grid fr_grid;
-   GrdFileType ftype;
+   FileType ftype;
    ConcatString run_cs;
    auto nc_in = (NcFile *) nullptr;
    static const char *method_name = "process_data_file() -> ";
@@ -425,7 +425,7 @@ static void process_data_file() {
       // Get the obs type before opening NetCDF
       obs_type = get_obs_type(nc_in);
       goes_data = (obs_type == TYPE_GOES || obs_type == TYPE_GOES_ADP);
-      if (obs_type == TYPE_UNKNOWN && ftype == GrdFileType_NcCF) obs_type = TYPE_NCCF;
+      if (obs_type == TYPE_UNKNOWN && ftype == FileType_NcCF) obs_type = TYPE_NCCF;
       if (obs_type == TYPE_NCCF) setenv(nc_att_met_point_nccf, "yes", 1);
 
       // Read the input data file
@@ -603,7 +603,7 @@ static int get_obs_type(NcFile *nc) {
    static const char *method_name = "get_obs_type() -> ";
 
    bool has_attr_grid = false;
-   auto vinfo = VarInfoFactory::new_var_info(GrdFileType_NcCF);
+   auto vinfo = VarInfoFactory::new_var_info(FileType_NcCF);
    for(int i=0; i<FieldSA.n(); i++) {
       vinfo->clear();
       // Populate the VarInfo object using the config string

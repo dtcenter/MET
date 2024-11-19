@@ -46,7 +46,7 @@ class Mode_Field_Info {
 
       MetConfig * conf;    //  not allocated, based on reading the config file
 
-      GrdFileType gft;
+      FileType gft;
 
       char FO;   //  'F' or 'O', for fcst or obs
 
@@ -62,7 +62,7 @@ class Mode_Field_Info {
 
       void clear();
 
-      void set (const bool _multivar, int _index, Dictionary *, MetConfig *, GrdFileType, char _fo, bool do_clear = false);
+      void set (const bool _multivar, int _index, Dictionary *, MetConfig *, FileType, char _fo, bool do_clear = false);
 
       int index;
 
@@ -85,7 +85,7 @@ class Mode_Field_Info {
 
       PlotInfo       raw_pi;              // Raw forecast plotting info
 
-      GrdFileType    file_type;           // each field can have a configured file type
+      FileType       file_type;           // each field can have a configured file type
    
          //
          //  member functions

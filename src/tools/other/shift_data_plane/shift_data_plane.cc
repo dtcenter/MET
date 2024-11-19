@@ -85,7 +85,7 @@ static ConcatString shift_cs;
 static void process_command_line(int, char **);
 static void process_data_file();
 static void write_netcdf(const DataPlane &dp, const Grid &grid,
-                         const VarInfo *vinfo, const GrdFileType& ftype);
+                         const VarInfo *vinfo, const FileType& ftype);
 static void usage();
 static void set_from(const StringArray &);
 static void set_to(const StringArray &);
@@ -170,7 +170,7 @@ void process_command_line(int argc, char **argv) {
 void process_data_file() {
    DataPlane dp_in, dp_shift;
    Grid grid;
-   GrdFileType ftype;
+   FileType ftype;
    double fr_x, fr_y, to_x, to_y, dx, dy, v;
    int x, y;
 
@@ -286,7 +286,7 @@ void process_data_file() {
 ////////////////////////////////////////////////////////////////////////
 
 void write_netcdf(const DataPlane &dp, const Grid &grid,
-                  const VarInfo *vinfo, const GrdFileType &ftype) {
+                  const VarInfo *vinfo, const FileType &ftype) {
    ConcatString cs;
    NcDim lat_dim, lon_dim;
 

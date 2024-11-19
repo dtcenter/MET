@@ -131,7 +131,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void MetPythonDataFile::set_type(const GrdFileType t)
+void MetPythonDataFile::set_type(const FileType t)
 
 {
 
@@ -196,11 +196,11 @@ bool use_xarray = false;
 
 switch ( Type )  {   //  assumes Type is already set
 
-   case GrdFileType_Python_Xarray:
+   case FileType_Python_Xarray:
       use_xarray = true;
       break;
 
-   case GrdFileType_Python_Numpy:
+   case FileType_Python_Numpy:
       use_xarray = false;
       break;
 

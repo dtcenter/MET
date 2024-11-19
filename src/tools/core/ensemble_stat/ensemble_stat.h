@@ -83,7 +83,7 @@ static IntArray     n_vx_vld;      // Number of members with valid data for each
 
 static StringArray  ens_file_list; // Array of ensemble input files
 static IntArray     ens_file_vld;  // Array of ensemble file valid status
-static GrdFileType  etype = GrdFileType_None;
+static FileType     etype = FileType_None;
 
 static ConcatString ens_mean_file; // User-specified ensemble mean data file
 static ConcatString ctrl_file;     // Control member file
@@ -96,7 +96,7 @@ static bool         grid_obs_flag = false;
 static StringArray  point_obs_file_list;
 static bool         point_obs_flag = false;
 
-static GrdFileType  otype = GrdFileType_None;
+static FileType     otype = FileType_None;
 
 // Input Config file
 static EnsembleStatConfInfo conf_info;

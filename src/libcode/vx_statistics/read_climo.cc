@@ -27,7 +27,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static void read_climo_file(
-          const char *, GrdFileType, Dictionary *, unixtime,
+          const char *, FileType, Dictionary *, unixtime,
           int, int, const Grid &, const RegridInfo &,
           DataPlaneArray &dpa, const char *);
 
@@ -170,7 +170,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
                   nint(hour_interval * sec_per_hour));
 
    // Check if file_type was specified
-   GrdFileType ctype = parse_conf_grd_file_type(&i_dict);
+   FileType ctype = parse_conf_grd_file_type(&i_dict);
 
    // Search the files for the requested records
    for(int i=0; i<climo_files.n(); i++) {
@@ -190,7 +190,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
 
 ////////////////////////////////////////////////////////////////////////
 
-void read_climo_file(const char *climo_file, GrdFileType ctype,
+void read_climo_file(const char *climo_file, FileType ctype,
                      Dictionary *dict, unixtime vld_ut,
                      int day_ts, int hour_ts, const Grid &vx_grid,
                      const RegridInfo &regrid_default,

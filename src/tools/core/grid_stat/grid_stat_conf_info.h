@@ -203,8 +203,8 @@ class GridStatVxOpt {
 
       void clear();
 
-      void process_config(GrdFileType, Dictionary &,
-                          GrdFileType, Dictionary &);
+      void process_config(FileType, Dictionary &,
+                          FileType, Dictionary &);
       void parse_nc_info(Dictionary &);
       bool is_uv_match(const GridStatVxOpt &) const;
 
@@ -305,7 +305,7 @@ class GridStatConfInfo {
 #ifdef WITH_UGRID
       void read_ugrid_configs(StringArray ugrid_config_names, const char * user_config);
 #endif
-      void process_config(GrdFileType, GrdFileType);
+      void process_config(FileType, FileType);
       void process_flags ();
       void process_masks (const Grid &);
 

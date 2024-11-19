@@ -112,7 +112,7 @@ class TCRMW_WindConverter {
                                    const string &varLevel,
                                    unixtime valid_time,
                                    const StringArray &data_files,
-                                   const GrdFileType &ftype,
+                                   const FileType &ftype,
                                    const Grid &grid_in,
                                    const Grid &grid_out,
                                    const DataPlane &u_wind_dp,

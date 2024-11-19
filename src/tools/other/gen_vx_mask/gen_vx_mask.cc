@@ -389,7 +389,7 @@ void get_data_plane(const ConcatString &file_name,
                     bool read_gen_vx_mask_output,
                     DataPlane &dp, Grid &dp_grid) {
    ConcatString local_cs = config_str;
-   GrdFileType ftype = GrdFileType_None;
+   FileType ftype = FileType_None;
 
    // Initialize to the global configuration
    MetConfig local_config = global_config;
@@ -412,7 +412,7 @@ void get_data_plane(const ConcatString &file_name,
    // Read gen_vx_mask output from a previous run
    if(read_gen_vx_mask_output &&
       local_cs.length()      == 0 &&
-      mtddf_ptr->file_type() == GrdFileType_NcMet) {
+      mtddf_ptr->file_type() == FileType_NcMet) {
       if(get_gen_vx_mask_config_str((MetNcMetDataFile *) mtddf_ptr, local_cs)) {
          local_config.read_string(local_cs.c_str());
       }

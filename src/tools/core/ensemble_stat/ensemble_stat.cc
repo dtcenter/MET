@@ -119,9 +119,9 @@ static void process_command_line  (int, char **);
 static void process_grid          (const Grid &);
 static void process_n_vld         ();
 static void process_vx            ();
-static bool get_data_plane        (const char *, GrdFileType, VarInfo *,
+static bool get_data_plane        (const char *, FileType, VarInfo *,
                                    DataPlane &, bool do_regrid);
-static bool get_data_plane_array  (const char *, GrdFileType, VarInfo *,
+static bool get_data_plane_array  (const char *, FileType, VarInfo *,
                                    DataPlaneArray &, bool do_regrid);
 
 static void process_point_vx      ();
@@ -368,12 +368,12 @@ void process_command_line(int argc, char **argv) {
    etype = parse_conf_grd_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
 
    // Get the ensemble file type from the files
-   if(etype == GrdFileType_None) {
+   if(etype == FileType_None) {
       etype = parse_file_list_type(ens_file_list);
    }
 
    // UGrid not supported
-   if(etype == GrdFileType_UGrid) {
+   if(etype == FileType_UGrid) {
       mlog << Error << "\n" << method_name
            << grdfiletype_to_string(etype)
            << " ensemble files are not supported\n\n";
@@ -390,10 +390,10 @@ void process_command_line(int argc, char **argv) {
 
    // Determine the input observation file type
    if(point_obs_flag) {
-      otype = GrdFileType_Gb1;
+      otype = FileType_Gb1;
    }
    else if(!grid_obs_flag) {
-      otype = GrdFileType_None;
+      otype = FileType_None;
    }
    else {
 
@@ -401,12 +401,12 @@ void process_command_line(int argc, char **argv) {
       otype = parse_conf_grd_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
       // Get the observation file type from the files
-      if(otype == GrdFileType_None) {
+      if(otype == FileType_None) {
          otype = parse_file_list_type(grid_obs_file_list);
       }
 
       // UGrid not supported
-      if(otype == GrdFileType_UGrid) {
+      if(otype == FileType_UGrid) {
          mlog << Error << "\n" << method_name
               << grdfiletype_to_string(otype)
               << " gridded observation files are not supported\n\n";
@@ -614,7 +614,7 @@ void process_n_vld() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_data_plane(const char *infile, GrdFileType ftype,
+bool get_data_plane(const char *infile, FileType ftype,
                     VarInfo *info, DataPlane &dp, bool do_regrid) {
    bool found;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
@@ -667,7 +667,7 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_data_plane_array(const char *infile, GrdFileType ftype,
+bool get_data_plane_array(const char *infile, FileType ftype,
                           VarInfo *info, DataPlaneArray &dpa,
                           bool do_regrid) {
    int n, i;
@@ -1407,7 +1407,7 @@ void process_grid_vx() {
          VarInfo *info = conf_info.vx_opt[i].vx_pd.ens_info->get_var_info();
 
          // Read the gridded data from the mean file
-         found = get_data_plane(ens_mean_file.c_str(), GrdFileType_None,
+         found = get_data_plane(ens_mean_file.c_str(), FileType_None,
                                 info, emn_dp, true);
 
          if(!found) {

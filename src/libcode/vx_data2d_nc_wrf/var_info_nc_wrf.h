@@ -213,7 +213,7 @@ class VarInfoNcWrf : public VarInfo
          // get stuff
          //
 
-      GrdFileType file_type() const;
+      FileType          file_type()      const;
       const LongArray & dimension()      const;
       int               dimension(int i) const;
       const NumArray  & dim_value()      const;
@@ -247,7 +247,7 @@ class VarInfoNcWrf : public VarInfo
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline GrdFileType       VarInfoNcWrf::file_type()      const { return GrdFileType_NcWrf;      }
+inline FileType          VarInfoNcWrf::file_type()      const { return FileType_NcWrf;         }
 inline const LongArray & VarInfoNcWrf::dimension()      const { return Dimension;              }
 inline int               VarInfoNcWrf::dimension(int i) const { return Dimension[i];           }
 inline int               VarInfoNcWrf::n_dimension()    const { return Dimension.n_elements(); }

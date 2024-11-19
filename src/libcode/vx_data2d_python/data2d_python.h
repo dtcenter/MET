@@ -47,7 +47,7 @@ class MetPythonDataFile : public Met2dDataFile {
 
       VarInfoPython VInfo;
 
-      GrdFileType Type;   // GrdFileType_Python_Xarray or GrdFileType_Python_Numpy
+      FileType Type;   // FileType_Python_Xarray or FileType_Python_Numpy
 
    public:
 
@@ -59,13 +59,13 @@ class MetPythonDataFile : public Met2dDataFile {
          //  set stuff
          //
 
-      void set_type(const GrdFileType);
+      void set_type(const FileType);
 
          //
          //  get stuff
          //
 
-      GrdFileType file_type() const;
+      FileType file_type() const;
 
       double operator () (int x, int y) const;
 
@@ -100,8 +100,8 @@ class MetPythonDataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double      MetPythonDataFile::operator  () (int x, int y) const { return get(x, y); }
-inline GrdFileType MetPythonDataFile::file_type ()                const { return Type; }
+inline double   MetPythonDataFile::operator  () (int x, int y) const { return get(x, y); }
+inline FileType MetPythonDataFile::file_type ()                const { return Type; }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -333,7 +333,7 @@ void write_nc_bin(const DataPlane &dp, int i_cdf, double cdf_y) {
 ////////////////////////////////////////////////////////////////////////
 
 void get_field(const char *file, const char *config_str, DataPlane &dp) {
-   GrdFileType ftype;
+   FileType ftype;
    Met2dDataFile * mtddf_ptr = (Met2dDataFile * ) nullptr;
    Met2dDataFileFactory m_factory;
    VarInfo * vi_ptr = (VarInfo * ) nullptr;

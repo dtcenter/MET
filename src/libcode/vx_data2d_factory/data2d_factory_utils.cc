@@ -49,28 +49,28 @@ static const int   n_bf_file_ext  = sizeof(bf_file_ext)/sizeof(*bf_file_ext);
 ////////////////////////////////////////////////////////////////////////
 
 
-static GrdFileType file_type_by_suffix(const char * filename);
+static FileType file_type_by_suffix(const char * filename);
 
 
 ////////////////////////////////////////////////////////////////////////
 
-GrdFileType grd_file_type(const char * filename)
+FileType grd_file_type(const char * filename)
 
 {
 
-GrdFileType suffix_type = GrdFileType_None;
-GrdFileType data_type   = GrdFileType_None;
+FileType suffix_type = FileType_None;
+FileType data_type   = FileType_None;
 
    //
    //  first check for python strings
    //
 
 if ( strcasecmp(filename, conf_val_python_numpy) == 0 )  {
-   return GrdFileType_Python_Numpy;
+   return FileType_Python_Numpy;
 }
 
 else if ( strcasecmp(filename, conf_val_python_xarray) == 0 )  {
-   return GrdFileType_Python_Xarray;
+   return FileType_Python_Xarray;
 }
 
    //
@@ -95,21 +95,21 @@ suffix_type = file_type_by_suffix(filename);
    //  look inside the file
    //
 
-     if ( is_grib1_file     (filename) ) data_type = GrdFileType_Gb1;
-else if ( is_grib2_file     (filename) ) data_type = GrdFileType_Gb2;
-else if ( is_ncpinterp_file (filename) ) data_type = GrdFileType_NcPinterp;
-else if ( is_ncwrf_file     (filename) ) data_type = GrdFileType_NcWrf;
-else if ( is_nccf_file      (filename) ) data_type = GrdFileType_NcCF;
-else if ( is_ncmet_file     (filename) ) data_type = GrdFileType_NcMet;
-else if ( is_bufr_file      (filename) ) data_type = GrdFileType_Bufr;
-else if ( is_ugrid_file     (filename) ) data_type = GrdFileType_UGrid;
-else                                     data_type = GrdFileType_None;
+     if ( is_grib1_file     (filename) ) data_type = FileType_Gb1;
+else if ( is_grib2_file     (filename) ) data_type = FileType_Gb2;
+else if ( is_ncpinterp_file (filename) ) data_type = FileType_NcPinterp;
+else if ( is_ncwrf_file     (filename) ) data_type = FileType_NcWrf;
+else if ( is_nccf_file      (filename) ) data_type = FileType_NcCF;
+else if ( is_ncmet_file     (filename) ) data_type = FileType_NcMet;
+else if ( is_bufr_file      (filename) ) data_type = FileType_Bufr;
+else if ( is_ugrid_file     (filename) ) data_type = FileType_UGrid;
+else                                     data_type = FileType_None;
 
    //
    //  print warning for inconsistent types
    //
 
-if ( suffix_type != GrdFileType_None && suffix_type != data_type )  {
+if ( suffix_type != FileType_None && suffix_type != data_type )  {
 
    mlog << Warning << "\ngrd_file_type() -> "
         << "the file type indicated by the suffix \""
@@ -120,7 +120,7 @@ if ( suffix_type != GrdFileType_None && suffix_type != data_type )  {
 }
 
 
-if ( suffix_type != GrdFileType_None )  return suffix_type;
+if ( suffix_type != FileType_None )  return suffix_type;
 else                                 return data_type  ;
 
 }
@@ -129,7 +129,7 @@ else                                 return data_type  ;
 ////////////////////////////////////////////////////////////////////////
 
 
-GrdFileType file_type_by_suffix(const char * filename)
+FileType file_type_by_suffix(const char * filename)
 
 {
 
@@ -137,7 +137,7 @@ int j;
 const ConcatString suffix = filename_suffix(filename);
 
 
-if ( suffix.empty() ) return GrdFileType_None;
+if ( suffix.empty() ) return FileType_None;
 
    //
    //  grib ?
@@ -145,7 +145,7 @@ if ( suffix.empty() ) return GrdFileType_None;
 
 for (j=0; j<n_gb_file_ext; ++j)  {
 
-   if ( suffix == gb_file_ext[j] )  return GrdFileType_Gb1;
+   if ( suffix == gb_file_ext[j] )  return FileType_Gb1;
 
 }
 
@@ -155,7 +155,7 @@ for (j=0; j<n_gb_file_ext; ++j)  {
 
 for (j=0; j<n_gb2_file_ext; ++j)  {
 
-   if ( suffix == gb2_file_ext[j] )  return GrdFileType_Gb2;
+   if ( suffix == gb2_file_ext[j] )  return FileType_Gb2;
 
 }
 
@@ -165,7 +165,7 @@ for (j=0; j<n_gb2_file_ext; ++j)  {
 
 for (j=0; j<n_bf_file_ext; ++j)  {
 
-   if ( suffix == bf_file_ext[j] )  return GrdFileType_Bufr;
+   if ( suffix == bf_file_ext[j] )  return FileType_Bufr;
 
 }
 
@@ -173,7 +173,7 @@ for (j=0; j<n_bf_file_ext; ++j)  {
    //  nope
    //
 
-return GrdFileType_None;
+return FileType_None;
 
 }
 
