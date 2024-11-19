@@ -54,7 +54,7 @@ class VarInfoUGrid : public VarInfo
       // get stuff
       //
 
-      FileType          file_type()      const;
+      GrdFileType       file_type()      const;
       const LongArray & dimension()      const;
       int               dimension(int i) const;
       const NumArray  & dim_value()      const;
@@ -86,7 +86,7 @@ class VarInfoUGrid : public VarInfo
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline FileType          VarInfoUGrid::file_type()      const { return FileType_UGrid;         }
+inline GrdFileType       VarInfoUGrid::file_type()      const { return FileType_UGrid;         }
 inline const LongArray & VarInfoUGrid::dimension()      const { return Dimension;              }
 inline int               VarInfoUGrid::dimension(int i) const { return Dimension[i];           }
 inline int               VarInfoUGrid::n_dimension()    const { return Dimension.n_elements(); }

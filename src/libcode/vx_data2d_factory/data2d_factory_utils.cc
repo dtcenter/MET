@@ -49,17 +49,17 @@ static const int   n_bf_file_ext  = sizeof(bf_file_ext)/sizeof(*bf_file_ext);
 ////////////////////////////////////////////////////////////////////////
 
 
-static FileType file_type_by_suffix(const char * filename);
+static GrdFileType file_type_by_suffix(const char * filename);
 
 
 ////////////////////////////////////////////////////////////////////////
 
-FileType grd_file_type(const char * filename)
+GrdFileType grd_file_type(const char * filename)
 
 {
 
-FileType suffix_type = FileType_None;
-FileType data_type   = FileType_None;
+GrdFileType suffix_type = FileType_None;
+GrdFileType data_type   = FileType_None;
 
    //
    //  first check for python strings
@@ -129,7 +129,7 @@ else                                 return data_type  ;
 ////////////////////////////////////////////////////////////////////////
 
 
-FileType file_type_by_suffix(const char * filename)
+GrdFileType file_type_by_suffix(const char * filename)
 
 {
 

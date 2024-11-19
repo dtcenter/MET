@@ -135,7 +135,7 @@ void PointStatConfInfo::read_ugrid_configs(StringArray ugrid_config_names, const
 
 ////////////////////////////////////////////////////////////////////////
 
-void PointStatConfInfo::process_config(FileType ftype) {
+void PointStatConfInfo::process_config(GrdFileType ftype) {
    int i, j, n_fvx, n_ovx;
    Dictionary *fdict = (Dictionary *) nullptr;
    Dictionary *odict = (Dictionary *) nullptr;
@@ -839,7 +839,7 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PointStatVxOpt::process_config(FileType ftype,
+void PointStatVxOpt::process_config(GrdFileType ftype,
         Dictionary &fdict, Dictionary &odict) {
    int n;
    VarInfoFactory info_factory;

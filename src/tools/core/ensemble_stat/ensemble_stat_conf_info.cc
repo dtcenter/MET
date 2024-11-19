@@ -115,8 +115,8 @@ void EnsembleStatConfInfo::read_config(const ConcatString default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatConfInfo::process_config(FileType etype,
-                                          FileType otype,
+void EnsembleStatConfInfo::process_config(GrdFileType etype,
+                                          GrdFileType otype,
                                           bool grid_vx, bool point_vx,
                                           StringArray * ens_files,
                                           bool use_ctrl) {
@@ -637,8 +637,8 @@ void EnsembleStatVxOpt::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void EnsembleStatVxOpt::process_config(FileType ftype, Dictionary &fdict,
-                                       FileType otype, Dictionary &odict,
+void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
+                                       GrdFileType otype, Dictionary &odict,
                                        gsl_rng *rng_ptr, bool grid_vx, bool point_vx,
                                        StringArray ens_member_ids,
                                        StringArray * ens_files,

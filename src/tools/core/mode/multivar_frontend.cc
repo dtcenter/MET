@@ -67,15 +67,15 @@ int MultivarFrontEnd::run(const StringArray & Argv)
    int shift = config.shift_right;
 
    for (int i=0; i<n_fcst_files; ++i) {
-      FileType ft, ot;
+      GrdFileType ft, ot;
       ft = config.file_type_for_field(true, i);
-      ot = parse_conf_grd_file_type(config.conf.lookup_dictionary(conf_key_obs));
+      ot = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_obs));
       read_input(fcst_filenames[i], i, ModeDataType::MvMode_Fcst, ft, ot, shift);
 
    }
    for (int i=0; i<n_obs_files; ++i) {
-      FileType ft, ot;
-      ft = parse_conf_grd_file_type(config.conf.lookup_dictionary(conf_key_fcst));
+      GrdFileType ft, ot;
+      ft = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_fcst));
       ot = config.file_type_for_field(false, i);
       read_input(obs_filenames[i], i, ModeDataType::MvMode_Obs, ot, ft, shift);
    }
@@ -255,7 +255,7 @@ void MultivarFrontEnd::set_compress(const StringArray & a)
 ////////////////////////////////////////////////////////////////////////
 
 void MultivarFrontEnd::read_input(const string &name, int index, ModeDataType type,
-                                  FileType f_t, FileType other_t, int shift)
+                                  GrdFileType f_t, GrdFileType other_t, int shift)
 {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *f = mtddf_factory.new_met_2d_data_file(name.c_str(), f_t);
@@ -265,7 +265,7 @@ void MultivarFrontEnd::read_input(const string &name, int index, ModeDataType ty
       exit(1);
    }
    Grid g = f->grid();
-   FileType ft = f->file_type();
+   GrdFileType ft = f->file_type();
 
    //?
    f->set_shift_right(shift);

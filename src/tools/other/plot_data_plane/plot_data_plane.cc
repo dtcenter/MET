@@ -98,7 +98,7 @@ int met_main(int argc, char * argv[]) {
    VarInfoFactory v_factory;
    DataPlane data_plane;
    Grid grid;
-   FileType ftype;
+   GrdFileType ftype;
    ColorTable color_table;
    double data_min, data_max;
    bool status = false;
@@ -130,7 +130,7 @@ int met_main(int argc, char * argv[]) {
    //
    // get the gridded file type from config string, if present
    //
-   ftype = parse_conf_grd_file_type(&config);
+   ftype = parse_conf_file_type(&config);
 
    //
    // instantiate the Met2dDataFile object using the data_2d_factory

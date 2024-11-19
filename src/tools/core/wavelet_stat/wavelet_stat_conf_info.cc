@@ -134,8 +134,8 @@ void WaveletStatConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void WaveletStatConfInfo::process_config(FileType ftype,
-                                         FileType otype) {
+void WaveletStatConfInfo::process_config(GrdFileType ftype,
+                                         GrdFileType otype) {
    int i, j, n;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;

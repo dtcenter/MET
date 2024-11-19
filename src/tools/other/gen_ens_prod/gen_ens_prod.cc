@@ -62,7 +62,7 @@ static void process_ensemble();
 static void get_climo_mean_stdev(GenEnsProdVarInfo *, int,
                                  bool, int, DataPlane &, DataPlane &);
 static void get_ens_mean_stdev(GenEnsProdVarInfo *, DataPlane &, DataPlane &);
-static bool get_data_plane(const char *, FileType, VarInfo *, DataPlane &);
+static bool get_data_plane(const char *, GrdFileType, VarInfo *, DataPlane &);
 
 static void clear_counts();
 static void track_counts(GenEnsProdVarInfo *, const DataPlane &, bool,
@@ -186,7 +186,7 @@ void process_command_line(int argc, char **argv) {
    conf_info.read_config(default_config_file, config_file);
 
    // Get the ensemble file type from config, if present
-   etype = parse_conf_grd_file_type(conf_info.conf.lookup_dictionary(conf_key_ens));
+   etype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_ens));
 
    // Get the ensemble file type from the files
    if(etype == FileType_None) {
@@ -624,7 +624,7 @@ void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_data_plane(const char *infile, FileType ftype,
+bool get_data_plane(const char *infile, GrdFileType ftype,
                     VarInfo *info, DataPlane &dp) {
    bool found;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;

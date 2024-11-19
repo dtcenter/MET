@@ -149,21 +149,21 @@ class ModeConfInfo {
 
       void read_config    (const char * default_filename, const char * user_filename);
 
-      void process_config_traditional(FileType ftype, FileType otype);
+      void process_config_traditional(GrdFileType ftype, GrdFileType otype);
 
       void process_config_except_fields();
 
-      void process_config_field (FileType ftype, FileType otype, ModeDataType dt, int field_index);
+      void process_config_field (GrdFileType ftype, GrdFileType otype, ModeDataType dt, int field_index);
 
       void config_set_all_percentile_thresholds(const std::vector<ModeInputData> &fdata,
                                                 const std::vector<ModeInputData> &odata);
       PercThreshType perctype(const Mode_Field_Info &f) const;
 
       // deal with zeroth field 
-      void read_fields_0 (Mode_Field_Info * &, Dictionary * dict, FileType, char _fo);
+      void read_fields_0 (Mode_Field_Info * &, Dictionary * dict, GrdFileType, char _fo);
 
       // deal with non-zeroth field 
-      void read_fields_1 (Mode_Field_Info * &, Dictionary * dict, FileType, char _fo, int field_index);
+      void read_fields_1 (Mode_Field_Info * &, Dictionary * dict, GrdFileType, char _fo, int field_index);
 
       PiecewiseLinear * parse_interest_function(Dictionary * dict, const char * conf_key_if);
 
@@ -295,14 +295,14 @@ class ModeConfInfo {
 
       void set_data_type(ModeDataType type);
 
-      FileType file_type_for_field(bool isFcst, int field_index);
+      GrdFileType file_type_for_field(bool isFcst, int field_index);
 
 private:
 
       // some private methods
-      void process_config_both(FileType ftype, FileType otype, int field_index=0);
-      void process_config_fcst(FileType ftype, int field_index=0);
-      void process_config_obs(FileType otype, int field_index=0);
+      void process_config_both(GrdFileType ftype, GrdFileType otype, int field_index=0);
+      void process_config_fcst(GrdFileType ftype, int field_index=0);
+      void process_config_obs(GrdFileType otype, int field_index=0);
       void evaluate_fcst_settings(int);
       void evaluate_obs_settings(int);
 

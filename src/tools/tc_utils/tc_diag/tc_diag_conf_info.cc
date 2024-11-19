@@ -224,7 +224,7 @@ void TCDiagConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCDiagConfInfo::process_config(FileType file_type,
+void TCDiagConfInfo::process_config(GrdFileType file_type,
                                     map<string,DataOptInfo> dmap) {
    int i, j;
    StringArray sa;

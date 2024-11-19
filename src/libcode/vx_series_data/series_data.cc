@@ -22,16 +22,16 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool read_single_entry(VarInfo*, const ConcatString&, const FileType,
+static bool read_single_entry(VarInfo*, const ConcatString&, const GrdFileType,
                               DataPlane&, Grid&);
 
-static bool read_all_entries(vector<VarInfo*>&, const ConcatString&, const FileType,
+static bool read_all_entries(vector<VarInfo*>&, const ConcatString&, const GrdFileType,
                              vector<DataPlane>&, Grid&);
 
 ////////////////////////////////////////////////////////////////////////
 
 bool get_series_entry(int i_series, VarInfo* data_info,
-        const StringArray& search_files, const FileType type,
+        const StringArray& search_files, const GrdFileType type,
         DataPlane& dp, Grid& grid,
         bool error_out, bool print_warning) {
    int i;
@@ -80,7 +80,7 @@ bool get_series_entry(int i_series, VarInfo* data_info,
 ////////////////////////////////////////////////////////////////////////
 
 bool read_single_entry(VarInfo* info, const ConcatString& filename,
-        const FileType type, DataPlane& dp, Grid& grid) {
+        const GrdFileType type, DataPlane& dp, Grid& grid) {
 
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile* mtddf = (Met2dDataFile*) nullptr;
@@ -110,7 +110,7 @@ bool read_single_entry(VarInfo* info, const ConcatString& filename,
 ////////////////////////////////////////////////////////////////////////
 
 bool get_series_entries(int i_series, vector<VarInfo*> &vi_list,
-        const StringArray &search_files, const FileType type,
+        const StringArray &search_files, const GrdFileType type,
         vector<DataPlane> &dp_list, Grid &grid,
         bool error_out, bool print_warning) {
    int i;
@@ -162,7 +162,7 @@ bool get_series_entries(int i_series, vector<VarInfo*> &vi_list,
 ////////////////////////////////////////////////////////////////////////
 
 bool read_all_entries(vector<VarInfo*> &vi_list, const ConcatString &filename,
-        const FileType type, vector<DataPlane> &dp_list, Grid &grid) {
+        const GrdFileType type, vector<DataPlane> &dp_list, Grid &grid) {
 
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile* mtddf = (Met2dDataFile*) nullptr;

@@ -66,7 +66,7 @@ static const char * default_config_filename =
 
 static StringArray        ens_files;
 static IntArray           ens_file_vld;
-static FileType           etype = FileType_None;
+static GrdFileType        etype = FileType_None;
 static int                n_ens_files;
 static GenEnsProdConfInfo conf_info;
 static ConcatString       config_file;

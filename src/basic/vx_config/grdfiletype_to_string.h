@@ -38,10 +38,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern ConcatString grdfiletype_to_string(const FileType);
+extern ConcatString grdfiletype_to_string(const GrdFileType);
 
 
-extern bool string_to_grdfiletype(const char *, FileType &);
+extern bool string_to_grdfiletype(const char *, GrdFileType &);
 
 
 ////////////////////////////////////////////////////////////////////////

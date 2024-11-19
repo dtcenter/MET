@@ -142,8 +142,8 @@ class EnsembleStatVxOpt {
 
       void clear();
 
-      void process_config(FileType, Dictionary &,
-                          FileType, Dictionary &,
+      void process_config(GrdFileType, Dictionary &,
+                          GrdFileType, Dictionary &,
                           gsl_rng *, bool, bool,
                           StringArray, StringArray *,
                           bool, ConcatString);
@@ -245,7 +245,7 @@ class EnsembleStatConfInfo {
       void clear();
 
       void read_config   (const ConcatString , const ConcatString);
-      void process_config(FileType, FileType, bool, bool,
+      void process_config(GrdFileType, GrdFileType, bool, bool,
                           StringArray *, bool);
       void process_grib_codes();
       void process_flags ();

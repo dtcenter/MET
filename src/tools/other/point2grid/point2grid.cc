@@ -379,7 +379,7 @@ static void process_command_line(int argc, char **argv) {
 
 static void process_data_file() {
    Grid fr_grid;
-   FileType ftype;
+   GrdFileType ftype;
    ConcatString run_cs;
    auto nc_in = (NcFile *) nullptr;
    static const char *method_name = "process_data_file() -> ";
@@ -393,7 +393,7 @@ static void process_data_file() {
    if (compress_level < 0) compress_level = conf_info.conf.nc_compression();
 
    // Get the gridded file type from config string, if present
-   ftype = parse_conf_grd_file_type(&conf_info.conf);
+   ftype = parse_conf_file_type(&conf_info.conf);
 
    // Open the input file
    mlog << Debug(1)  << "Reading data file: " << InputFilename << "\n";

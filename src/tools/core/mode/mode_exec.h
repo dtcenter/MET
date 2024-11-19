@@ -137,7 +137,7 @@ class ModeExecutive {
    ShapeData Fcst_sd, Obs_sd;
 
    // not used by multivar
-   FileType ftype, otype;
+   GrdFileType ftype, otype;
 
    // set into execs's conf varInfo object, only for multivar intensity comparisons
    // for trad it's read in from the config

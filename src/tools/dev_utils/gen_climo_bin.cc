@@ -333,7 +333,7 @@ void write_nc_bin(const DataPlane &dp, int i_cdf, double cdf_y) {
 ////////////////////////////////////////////////////////////////////////
 
 void get_field(const char *file, const char *config_str, DataPlane &dp) {
-   FileType ftype;
+   GrdFileType ftype;
    Met2dDataFile * mtddf_ptr = (Met2dDataFile * ) nullptr;
    Met2dDataFileFactory m_factory;
    VarInfo * vi_ptr = (VarInfo * ) nullptr;
@@ -346,7 +346,7 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
    config.read_string(config_str);
 
    // Get the gridded file type from config string, if present
-   ftype = parse_conf_grd_file_type(&config);
+   ftype = parse_conf_file_type(&config);
 
    // Instantiate Met2dDataFile object from the factory
    mlog << Debug(1)  << "Opening data file: " << file << "\n";

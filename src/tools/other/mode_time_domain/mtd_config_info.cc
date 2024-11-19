@@ -202,7 +202,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void MtdConfigInfo::process_config(FileType ftype, FileType otype)
+void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
 {
 

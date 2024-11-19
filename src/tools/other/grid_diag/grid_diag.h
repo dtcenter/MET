@@ -68,7 +68,7 @@ static const char * default_config_filename =
 
 // Input files
 static std::vector <StringArray> data_files;
-static std::vector <FileType> file_types;
+static std::vector <GrdFileType> file_types;
 static int compress_level = -1;
 
 // Output file

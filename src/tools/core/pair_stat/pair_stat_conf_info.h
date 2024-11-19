@@ -163,7 +163,7 @@ class PairStatVxOpt {
 
       void clear();
 
-      void process_config(FileType, Dictionary &, Dictionary &);
+      void process_config(GrdFileType, Dictionary &, Dictionary &);
       void set_vx_pd(PairStatConfInfo *);
       bool is_uv_match(const PairStatVxOpt &) const;
 
@@ -272,7 +272,7 @@ class PairStatConfInfo {
       void read_ugrid_configs(StringArray ugrid_config_names, const char * user_config);
 #endif
 
-      void process_config(FileType);
+      void process_config(GrdFileType);
       void process_grib_codes();
       void process_flags();
       void process_masks(const Grid &);

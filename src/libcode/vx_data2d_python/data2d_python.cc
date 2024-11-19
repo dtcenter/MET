@@ -131,7 +131,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void MetPythonDataFile::set_type(const FileType t)
+void MetPythonDataFile::set_type(const GrdFileType t)
 
 {
 

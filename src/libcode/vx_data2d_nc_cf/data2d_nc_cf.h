@@ -78,7 +78,7 @@ class MetNcCFDataFile : public Met2dDataFile {
       //  get stuff
       //
 
-      FileType file_type() const;
+      GrdFileType file_type() const;
 
       //  retrieve the first matching data plane
 
@@ -111,7 +111,7 @@ class MetNcCFDataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline FileType MetNcCFDataFile::file_type () const { return FileType_NcCF; }
+inline GrdFileType MetNcCFDataFile::file_type () const { return FileType_NcCF; }
 
 
 ////////////////////////////////////////////////////////////////////////

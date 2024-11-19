@@ -101,7 +101,7 @@ void GenEnsProdConfInfo::read_config(const ConcatString default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenEnsProdConfInfo::process_config(FileType etype, StringArray * ens_files, bool use_ctrl) {
+void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_files, bool use_ctrl) {
    int i, j;
    VarInfoFactory info_factory;
    Dictionary *edict = (Dictionary *) nullptr;

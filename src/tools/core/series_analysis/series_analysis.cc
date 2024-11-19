@@ -71,17 +71,17 @@ static void process_command_line(int, char **);
 static void process_grid        (const Grid &, const Grid &);
 
 static Met2dDataFile *get_mtddf(const StringArray &,
-                                const FileType);
+                                const GrdFileType);
 static bool           file_is_ok(const ConcatString &,
-                                 const FileType);
+                                 const GrdFileType);
 
 static void get_series_data(int, VarInfo *, VarInfo *,
                             DataPlane &, DataPlane &);
 static void get_series_entry(int, VarInfo *, const StringArray &,
-                             const FileType, StringArray &,
+                             const GrdFileType, StringArray &,
                              DataPlane &, Grid &);
 static bool read_single_entry(VarInfo *, const ConcatString &,
-                              const FileType, DataPlane &, Grid &);
+                              const GrdFileType, DataPlane &, Grid &);
 
 static void open_aggr_file();
 static DataPlane read_aggr_data_plane(const ConcatString &,
@@ -274,8 +274,8 @@ void process_command_line(int argc, char **argv) {
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
 
    // Get the forecast and observation file types from config, if present
-   ftype = parse_conf_grd_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
-   otype = parse_conf_grd_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
+   ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
+   otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
    // Get mtddf
    fcst_mtddf = get_mtddf(fcst_files, ftype);
@@ -427,7 +427,7 @@ void process_grid(const Grid &fcst_grid, const Grid &obs_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 Met2dDataFile *get_mtddf(const StringArray &file_list,
-                         const FileType type) {
+                         const GrdFileType type) {
    int i;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
@@ -454,7 +454,7 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool file_is_ok(const ConcatString &file_name, const FileType t) {
+bool file_is_ok(const ConcatString &file_name, const GrdFileType t) {
    return(file_exists(file_name.c_str()) || is_python_grdfiletype(t));
 }
 
@@ -624,7 +624,7 @@ void get_series_data(int i_series,
 
 void get_series_entry(int i_series, VarInfo *info,
                       const StringArray &search_files,
-                      const FileType type,
+                      const GrdFileType type,
                       StringArray &found_files, DataPlane &dp,
                       Grid &cur_grid) {
    bool found = false;
@@ -699,7 +699,7 @@ void get_series_entry(int i_series, VarInfo *info,
 ////////////////////////////////////////////////////////////////////////
 
 bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
-                       const FileType type, DataPlane &dp,
+                       const GrdFileType type, DataPlane &dp,
                        Grid &cur_grid) {
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
    bool found = false;

@@ -132,7 +132,7 @@ class MetGrib2DataFile : public Met2dDataFile {
          //  get stuff
          //
 
-      FileType file_type() const;
+      GrdFileType file_type() const;
 
          //  retrieve the first matching data plane
 
@@ -164,7 +164,7 @@ class MetGrib2DataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline FileType MetGrib2DataFile::file_type () const { return FileType_Gb2; }
+inline GrdFileType MetGrib2DataFile::file_type () const { return FileType_Gb2; }
 
 
 ////////////////////////////////////////////////////////////////////////

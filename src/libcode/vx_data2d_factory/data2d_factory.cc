@@ -44,7 +44,7 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(FileType type)
+Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(GrdFileType type)
 
 {
 
@@ -116,7 +116,7 @@ MetPythonDataFile * p = nullptr;
       case FileType_HdfEos:
 
          mlog << Error << "\n" << method_name
-              << "Support for FileType = \"" << grdfiletype_to_string(type)
+              << "Support for GrdFileType = \"" << grdfiletype_to_string(type)
               << "\" not yet implemented!\n\n";
          exit(1);
 
@@ -160,7 +160,7 @@ MetPythonDataFile * p = nullptr;
 ////////////////////////////////////////////////////////////////////////
 
 Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename) {
-   FileType type;
+   GrdFileType type;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
    //
@@ -191,7 +191,7 @@ Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename)
 
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename, FileType type)
+Met2dDataFile * Met2dDataFileFactory::new_met_2d_data_file(const char *filename, GrdFileType type)
 
 {
 
@@ -247,14 +247,14 @@ bool is_2d_data_file(const ConcatString &filename,
                      const ConcatString &config_str) {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
-   FileType type = FileType_None;
+   GrdFileType type = FileType_None;
 
    // Check for a requested file type
    if(config_str.nonempty()) {
       MetConfig config;
       config.read(replace_path(config_const_filename).c_str());
       config.read_string(config_str.c_str());
-      type = parse_conf_grd_file_type(&config);
+      type = parse_conf_file_type(&config);
    }
 
    mtddf = mtddf_factory.new_met_2d_data_file(filename.c_str(), type);

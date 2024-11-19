@@ -81,7 +81,7 @@ static StringArray   data_files;
 static StringArray   deck_source, deck_model_suffix;
 static ConcatString  config_file;
 static TCRMWConfInfo conf_info;
-static FileType      ftype;
+static GrdFileType   ftype;
 static TCRMW_WindConverter wind_converter;
 
 // Optional arguments

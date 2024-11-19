@@ -119,7 +119,7 @@ void TCRMWConfInfo::read_config(const char* default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCRMWConfInfo::process_config(FileType ftype) {
+void TCRMWConfInfo::process_config(GrdFileType ftype) {
     int i;
     StringArray sa;
     VarInfoFactory info_factory;

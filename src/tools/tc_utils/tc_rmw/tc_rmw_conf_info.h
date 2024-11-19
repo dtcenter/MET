@@ -71,7 +71,7 @@ class TCRMWConfInfo {
         void clear();
 
         void read_config(const char *, const char *);
-        void process_config(FileType);
+        void process_config(GrdFileType);
 
         int get_n_data() const;
 };

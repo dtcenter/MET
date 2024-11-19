@@ -54,7 +54,7 @@ class VarInfoNcCF : public VarInfo
       // get stuff
       //
 
-      FileType          file_type()      const;
+      GrdFileType       file_type()      const;
       const LongArray & dimension()      const;
       int               dimension(int i) const;
       const NumArray  & dim_value()      const;
@@ -86,7 +86,7 @@ class VarInfoNcCF : public VarInfo
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline FileType          VarInfoNcCF::file_type()      const { return FileType_NcCF;          }
+inline GrdFileType       VarInfoNcCF::file_type()      const { return FileType_NcCF;          }
 inline const LongArray & VarInfoNcCF::dimension()      const { return Dimension;              }
 inline int               VarInfoNcCF::dimension(int i) const { return Dimension[i];           }
 inline int               VarInfoNcCF::n_dimension()    const { return Dimension.n_elements(); }

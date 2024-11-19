@@ -49,7 +49,7 @@ using namespace std;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-VarInfo * VarInfoFactory::new_var_info(FileType type)
+VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
 
 {
 
@@ -117,7 +117,7 @@ VarInfo * VarInfoFactory::new_var_info(FileType type)
 
       case FileType_HdfEos:
          mlog << Error << "\n" << method_name
-              << "Support for FileType = " << grdfiletype_to_string(type)
+              << "Support for GrdFileType = " << grdfiletype_to_string(type)
               << " not yet implemented!\n\n";
          exit(1);
 
@@ -138,7 +138,7 @@ VarInfo * VarInfoFactory::new_var_info(FileType type)
 ///////////////////////////////////////////////////////////////////////////////
 
 VarInfo * VarInfoFactory::new_var_info(ConcatString s) {
-   FileType type;
+   GrdFileType type;
 
    // Convert the string to a gridded data file type
    string_to_grdfiletype(s.c_str(), type);

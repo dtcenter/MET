@@ -73,7 +73,7 @@ class MtdConfigInfo {
 
       void read_config    (const char * default_filename, const char * user_filename);
 
-      void process_config (FileType ftype, FileType otype);
+      void process_config (GrdFileType ftype, GrdFileType otype);
 
       void parse_nc_info  ();
       void parse_txt_info  ();

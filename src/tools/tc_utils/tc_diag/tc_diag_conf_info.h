@@ -144,7 +144,7 @@ class TCDiagConfInfo {
       void clear();
 
       void read_config(const char *, const char *);
-      void process_config(FileType,
+      void process_config(GrdFileType,
                           std::map<std::string,DataOptInfo>);
 
       void parse_domain_info(std::map<std::string,DataOptInfo>);

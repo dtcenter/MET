@@ -34,7 +34,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString grdfiletype_to_string(const FileType t)
+ConcatString grdfiletype_to_string(const GrdFileType t)
 
 {
 
@@ -73,7 +73,7 @@ return ConcatString(s);
 ////////////////////////////////////////////////////////////////////////
 
 
-bool string_to_grdfiletype(const char * text, FileType & t)
+bool string_to_grdfiletype(const char * text, GrdFileType & t)
 
 {
 

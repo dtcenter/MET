@@ -93,7 +93,7 @@ StringArray parse_ascii_file_list(const char * path)
 
 ifstream f_in;
 StringArray a;
-FileType file_type;
+GrdFileType file_type;
 std::string file_name;
 ConcatString list_str(file_list_str);
 bool check_files_exist = true;
@@ -205,11 +205,11 @@ return a;
 ////////////////////////////////////////////////////////////////////////
 
 
-FileType parse_file_list_type(const StringArray& file_list)
+GrdFileType parse_file_list_type(const StringArray& file_list)
 
 {
 
-FileType ftype = FileType_None;
+GrdFileType ftype = FileType_None;
 
 for ( int i=0; i<file_list.n(); i++ )  {
 

@@ -85,7 +85,7 @@ static ConcatString shift_cs;
 static void process_command_line(int, char **);
 static void process_data_file();
 static void write_netcdf(const DataPlane &dp, const Grid &grid,
-                         const VarInfo *vinfo, const FileType& ftype);
+                         const VarInfo *vinfo, const GrdFileType& ftype);
 static void usage();
 static void set_from(const StringArray &);
 static void set_to(const StringArray &);
@@ -170,7 +170,7 @@ void process_command_line(int argc, char **argv) {
 void process_data_file() {
    DataPlane dp_in, dp_shift;
    Grid grid;
-   FileType ftype;
+   GrdFileType ftype;
    double fr_x, fr_y, to_x, to_y, dx, dy, v;
    int x, y;
 
@@ -183,7 +183,7 @@ void process_data_file() {
    if (compress_level < 0) compress_level = config.nc_compression();
 
    // Get the gridded file type from config string, if present
-   ftype = parse_conf_grd_file_type(&config);
+   ftype = parse_conf_file_type(&config);
 
    // Read the input data file
    Met2dDataFileFactory m_factory;
@@ -286,7 +286,7 @@ void process_data_file() {
 ////////////////////////////////////////////////////////////////////////
 
 void write_netcdf(const DataPlane &dp, const Grid &grid,
-                  const VarInfo *vinfo, const FileType &ftype) {
+                  const VarInfo *vinfo, const GrdFileType &ftype) {
    ConcatString cs;
    NcDim lat_dim, lon_dim;
 

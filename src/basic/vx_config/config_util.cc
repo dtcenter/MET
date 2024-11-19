@@ -345,12 +345,12 @@ StringArray parse_conf_string_array(Dictionary *dict, const char *conf_key, cons
 
 ///////////////////////////////////////////////////////////////////////////////
 
-FileType parse_conf_grd_file_type(Dictionary *dict) {
-   FileType t = FileType_None;
+GrdFileType parse_conf_file_type(Dictionary *dict) {
+   GrdFileType t = FileType_None;
    int v;
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_grd_file_type() -> "
+      mlog << Error << "\nparse_conf_file_type() -> "
            << "empty dictionary!\n\n";
       exit(1);
    }
@@ -359,7 +359,7 @@ FileType parse_conf_grd_file_type(Dictionary *dict) {
    v = dict->lookup_int(conf_key_file_type, false);
 
    if(dict->last_lookup_status()) {
-      // Convert integer to enumerated FileType
+      // Convert integer to enumerated GrdFileType
            if(v == conf_const.lookup_int(conf_val_grib1))         t = FileType_Gb1;
       else if(v == conf_const.lookup_int(conf_val_grib2))         t = FileType_Gb2;
       else if(v == conf_const.lookup_int(conf_val_netcdf_met))    t = FileType_NcMet;
@@ -370,7 +370,7 @@ FileType parse_conf_grd_file_type(Dictionary *dict) {
       else if(v == conf_const.lookup_int(conf_val_python_numpy))  t = FileType_Python_Numpy;
       else if(v == conf_const.lookup_int(conf_val_python_xarray)) t = FileType_Python_Xarray;
       else {
-         mlog << Error << "\nparse_conf_grd_file_type() -> "
+         mlog << Error << "\nparse_conf_file_type() -> "
               << "Unexpected config file value of " << v << " for \""
               << conf_key_file_type << "\".\n\n";
          exit(1);

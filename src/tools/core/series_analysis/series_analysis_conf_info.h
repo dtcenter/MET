@@ -89,7 +89,7 @@ class SeriesAnalysisConfInfo {
       void clear();
 
       void read_config   (const char *, const char *);
-      void process_config(FileType, FileType);
+      void process_config(GrdFileType, GrdFileType);
       void process_masks (const Grid &);
       int get_compression_level();
 

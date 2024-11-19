@@ -76,7 +76,7 @@ public:
    static void set_compress  (const StringArray &);
 
    void read_input(const std::string &name, int index, ModeDataType type,
-                   FileType f_t, FileType other_t, int shift);
+                   GrdFileType f_t, GrdFileType other_t, int shift);
 
 
    void create_verif_grid(void);

@@ -429,7 +429,7 @@ void PlotPointObsConfInfo::process_config(
    dict = conf.lookup_dictionary(conf_key_grid_data);
 
    // Conf: grid_data.file_type, if present
-   FileType ftype = parse_conf_grd_file_type(dict);
+   GrdFileType ftype = parse_conf_file_type(dict);
 
    // Conf: field
    fdict = dict->lookup_array(conf_key_field);

@@ -141,7 +141,7 @@ const string get_tool_name() {
 void process_command_line(int argc, char **argv) {
    int i;
    CommandLine cline;
-   FileType ftype;
+   GrdFileType ftype;
    ConcatString default_config_file;
    const char *method_name = "process_command_line() -> ";
 

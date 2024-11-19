@@ -61,8 +61,8 @@ using namespace netCDF;
 static void usage();
 static void process_command_line(int, char**);
 
-static FileType get_file_type(const StringArray &, const FileType);
-static bool file_is_ok(const ConcatString &, const FileType);
+static GrdFileType get_file_type(const StringArray &, const GrdFileType);
+static bool file_is_ok(const ConcatString &, const GrdFileType);
 
 static void process_rmw();
 static void process_tracks(TrackInfoArray&);
@@ -193,7 +193,7 @@ void process_command_line(int argc, char **argv) {
                           config_file.c_str());
 
     // Get data file type from config
-    ftype = parse_conf_grd_file_type(conf_info.Conf.lookup_dictionary(
+    ftype = parse_conf_file_type(conf_info.Conf.lookup_dictionary(
                                  conf_key_data));
 
     // Get data file type from input files
@@ -210,12 +210,12 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-FileType get_file_type(const StringArray &file_list,
-                       const FileType in_ftype) {
+GrdFileType get_file_type(const StringArray &file_list,
+                          const GrdFileType in_ftype) {
     int i;
     Met2dDataFileFactory mtddf_factory;
     Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
-    FileType out_ftype;
+    GrdFileType out_ftype;
 
     // Find the first file that actually exists
     for(i=0; i<file_list.n(); i++) {
@@ -246,7 +246,7 @@ FileType get_file_type(const StringArray &file_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool file_is_ok(const ConcatString &file_name, const FileType t) {
+bool file_is_ok(const ConcatString &file_name, const GrdFileType t) {
     return(file_exists(file_name.c_str()) || is_python_grdfiletype(t));
 }
 

@@ -17,7 +17,7 @@
 // Enumeration of supported file types
 //
 
-enum FileType {
+enum GrdFileType {
 
    FileType_None,           // Default
 
@@ -38,7 +38,7 @@ enum FileType {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline bool is_netcdf_grdfiletype(const FileType _t) {
+inline bool is_netcdf_grdfiletype(const GrdFileType _t) {
    return(_t == FileType_NcMet          ||
           _t == FileType_General_Netcdf ||
           _t == FileType_NcWrf          ||
@@ -48,7 +48,7 @@ inline bool is_netcdf_grdfiletype(const FileType _t) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline bool is_python_grdfiletype(const FileType _t) {
+inline bool is_python_grdfiletype(const GrdFileType _t) {
    return(_t == FileType_Python_Xarray ||
           _t == FileType_Python_Numpy);
 }

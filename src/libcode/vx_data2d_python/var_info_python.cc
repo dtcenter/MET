@@ -135,7 +135,7 @@ void VarInfoPython::dump(ostream &out) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void VarInfoPython::set_file_type(const FileType t) {
+void VarInfoPython::set_file_type(const GrdFileType t) {
 
    if ( is_python_grdfiletype(t) ) {
 
@@ -146,7 +146,7 @@ void VarInfoPython::set_file_type(const FileType t) {
    }
 
    mlog << Error
-        << "VarInfoPython::set_file_type(const FileType) -> bad type ... "
+        << "VarInfoPython::set_file_type(const GrdFileType) -> bad type ... "
         << grdfiletype_to_string(t) << "\n\n";
 
    return;

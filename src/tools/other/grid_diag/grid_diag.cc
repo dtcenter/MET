@@ -245,7 +245,7 @@ void process_series(void) {
    DataPlane data_dp[conf_info.get_n_data()];
    double min, max;
    StringArray *cur_files;
-   FileType *cur_ftype;
+   GrdFileType *cur_ftype;
    Grid cur_grid;
    ConcatString i_var_str, j_var_str, ij_var_str;
 
@@ -752,7 +752,7 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
    Dictionary *dict = (Dictionary *) nullptr;
    Dictionary i_dict;
-   FileType file_type;
+   GrdFileType file_type;
    int i;
 
    // Conf: data.field
@@ -762,7 +762,7 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
    i_dict = parse_conf_i_vx_dict(dict, i_field);
 
    // Look for file_type in the i-th data.field entry
-   file_type = parse_conf_grd_file_type(&i_dict);
+   file_type = parse_conf_file_type(&i_dict);
 
    // Find the first file that actually exists
    for(i=0; i<file_list.n(); i++) {

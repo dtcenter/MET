@@ -119,9 +119,9 @@ static void process_command_line  (int, char **);
 static void process_grid          (const Grid &);
 static void process_n_vld         ();
 static void process_vx            ();
-static bool get_data_plane        (const char *, FileType, VarInfo *,
+static bool get_data_plane        (const char *, GrdFileType, VarInfo *,
                                    DataPlane &, bool do_regrid);
-static bool get_data_plane_array  (const char *, FileType, VarInfo *,
+static bool get_data_plane_array  (const char *, GrdFileType, VarInfo *,
                                    DataPlaneArray &, bool do_regrid);
 
 static void process_point_vx      ();
@@ -365,7 +365,7 @@ void process_command_line(int argc, char **argv) {
    conf_info.read_config(default_config_file, config_file);
 
    // Get the ensemble file type from config, if present
-   etype = parse_conf_grd_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
+   etype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
 
    // Get the ensemble file type from the files
    if(etype == FileType_None) {
@@ -398,7 +398,7 @@ void process_command_line(int argc, char **argv) {
    else {
 
       // Get the observation file type from config, if present
-      otype = parse_conf_grd_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
+      otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
       // Get the observation file type from the files
       if(otype == FileType_None) {
@@ -614,7 +614,7 @@ void process_n_vld() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_data_plane(const char *infile, FileType ftype,
+bool get_data_plane(const char *infile, GrdFileType ftype,
                     VarInfo *info, DataPlane &dp, bool do_regrid) {
    bool found;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
@@ -667,7 +667,7 @@ bool get_data_plane(const char *infile, FileType ftype,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_data_plane_array(const char *infile, FileType ftype,
+bool get_data_plane_array(const char *infile, GrdFileType ftype,
                           VarInfo *info, DataPlaneArray &dpa,
                           bool do_regrid) {
    int n, i;

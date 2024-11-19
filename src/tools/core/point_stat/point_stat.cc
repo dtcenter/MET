@@ -232,7 +232,7 @@ const string get_tool_name() {
 void process_command_line(int argc, char **argv) {
    int i;
    CommandLine cline;
-   FileType ftype;
+   GrdFileType ftype;
    ConcatString default_config_file;
    const char *method_name = "process_command_line() -> ";
 
@@ -298,7 +298,7 @@ void process_command_line(int argc, char **argv) {
 #endif
 
    // Get the forecast file type from config, if present
-   ftype = parse_conf_grd_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
+   ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
 
    // Read forecast file
    if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {

@@ -193,7 +193,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void Mode_Field_Info::set (const bool _multivar, int _index, Dictionary * _dict, MetConfig * _conf, FileType type, char _fo, bool do_clear)
+void Mode_Field_Info::set (const bool _multivar, int _index, Dictionary * _dict, MetConfig * _conf, GrdFileType type, char _fo, bool do_clear)
 
 {
 
@@ -338,7 +338,7 @@ if ( FO == 'F' )  raw_pi = parse_conf_plot_info(conf->lookup_dictionary(conf_key
 else              raw_pi = parse_conf_plot_info(conf->lookup_dictionary(conf_key_obs_raw_plot));
 
 
-file_type = parse_conf_grd_file_type(dict);
+file_type = parse_conf_file_type(dict);
  
    //
    //  done
