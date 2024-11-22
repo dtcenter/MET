@@ -101,7 +101,7 @@ inline double square(double v) {
 }
 
 inline double square_root(double v) {
-   return (is_bad_data(v) ? bad_data_double : sqrt(v));
+   return (is_bad_data(v) || v < 0 ? bad_data_double : sqrt(v));
 }
 
 
