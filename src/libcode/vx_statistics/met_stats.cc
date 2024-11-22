@@ -3656,6 +3656,11 @@ GRADInfo & GRADInfo::operator+=(const GRADInfo &c) {
       g_info.ogbar = (ogbar*total + c.ogbar*c.total) / g_info.total;
       g_info.mgbar = (mgbar*total + c.mgbar*c.total) / g_info.total;
       g_info.egbar = (egbar*total + c.egbar*c.total) / g_info.total;
+ 
+      g_info.fgmag   = (fgmag*total   + c.fgmag*c.total)   / g_info.total;
+      g_info.ogmag   = (ogmag*total   + c.ogmag*c.total)   / g_info.total;
+      g_info.mag_mse = (mag_mse*total + c.mag_mse*c.total) / g_info.total;
+      g_info.lap_mse = (lap_mse*total + c.lap_mse*c.total) / g_info.total;
    }
 
    assign(g_info);
@@ -3676,10 +3681,12 @@ void GRADInfo::init_from_scratch() {
 
 void GRADInfo::clear() {
 
-   dx    = dy    = 0;
-   fgbar = ogbar = 0.0;
-   mgbar = egbar = 0.0;
-   total = 0;
+   total   = 0;
+   dx      = dy      = 0;
+   fgbar   = ogbar   = 0.0;
+   mgbar   = egbar   = 0.0;
+   fgmag   = ogmag   = 0.0;
+   mag_mse = lap_mse = 0.0;
 
    return;
 }
@@ -3690,6 +3697,8 @@ void GRADInfo::assign(const GRADInfo &c) {
 
    clear();
 
+   total = c.total;
+
    // Gradient sizes
    dx = c.dx;
    dy = c.dy;
@@ -3699,7 +3708,12 @@ void GRADInfo::assign(const GRADInfo &c) {
    ogbar = c.ogbar;
    mgbar = c.mgbar;
    egbar = c.egbar;
-   total = c.total;
+
+   // Gradient vector partial sums
+   fgmag = c.fgmag;
+   ogmag = c.ogmag;
+   mag_mse = c.mag_mse;
+   lap_mse = c.lap_mse;
 
    return;
 }
@@ -3751,6 +3765,17 @@ double GRADInfo::fgog_ratio() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+double GRADInfo::magnitude_rmse() const {
+   return square_root(mag_mse);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double GRADInfo::laplace_rmse() const {
+   return square_root(lap_mse);
+}
+////////////////////////////////////////////////////////////////////////
+
 void GRADInfo::set(int grad_dx, int grad_dy,
                    const NumArray &fgx_na, const NumArray &fgy_na,
                    const NumArray &ogx_na, const NumArray &ogy_na,
@@ -3795,12 +3820,25 @@ void GRADInfo::set(int grad_dx, int grad_dy,
       wgt = wgt_na[i]/wgt_sum;
 
       // Gradient sums
+      // JHG, I suspect this implementation may be very wrong!
       fgbar += wgt * (fabs(fgx_na[i]) + fabs(fgy_na[i]));
       ogbar += wgt * (fabs(ogx_na[i]) + fabs(ogy_na[i]));
       mgbar += wgt * (max(fabs(fgx_na[i]), fabs(ogx_na[i])) +
                       max(fabs(fgy_na[i]), fabs(ogy_na[i])));
       egbar += wgt * (fabs(fgx_na[i] - ogx_na[i]) +
                       fabs(fgy_na[i] - ogy_na[i]));
+
+      // Gradient vector magnitude 
+      double fmag = square_root(fgx_na[i] * fgx_na[i] + fgy_na[i] * fgy_na[i]);
+      double omag = square_root(ogx_na[i] * ogx_na[i] + ogy_na[i] * ogy_na[i]);
+ 
+      // Gradient vector sums
+      fgmag += wgt * fmag;
+      ogmag += wgt * omag;
+      mag_mse += wgt * (fmag - omag)*(fmag - omag);
+      // TODO: confirm the algorithm for laplace_rmse
+      double diff = (fgx_na[i] + fgy_na[i]) - (ogx_na[i] - ogy_na[i]);
+      lap_mse += wgt * (diff * diff);
       total++;
    }
 

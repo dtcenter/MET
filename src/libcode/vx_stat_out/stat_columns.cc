@@ -3976,7 +3976,9 @@ void write_grad_cols(const GRADInfo &grad_info,
    //    TOTAL,
    //    FGBAR,       OGBAR,       MGBAR,
    //    EGBAR,       S1,          S1_OG,
-   //    FGOG_RATIO,  DX,          DY
+   //    FGOG_RATIO,  DX,          DY,
+   //    FGMAG,       OGMAG,       MAG_RMSE,
+   //    LAPLACE_RMSE
    //
    at.set_entry(r, c+0,  // Total Count
       grad_info.total);
@@ -4007,6 +4009,18 @@ void write_grad_cols(const GRADInfo &grad_info,
 
    at.set_entry(r, c+9,  // DY
       grad_info.dy);
+
+   at.set_entry(r, c+10,  // FGMAG
+      grad_info.fgmag);
+
+   at.set_entry(r, c+11,  // OGMAG 
+      grad_info.ogmag);
+
+   at.set_entry(r, c+12,  // MAG_RMSE
+      grad_info.magnitude_rmse());
+
+   at.set_entry(r, c+13,  // LAPLACE_RMSE 
+      grad_info.laplace_rmse());
 
    return;
 }

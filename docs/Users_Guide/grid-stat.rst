@@ -789,6 +789,18 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
   * - 34
     - DY
     - Gradient size in the Y-direction
+  * - 35
+    - FGMAG 
+    - Magnitude of the forecast gradient when the X and Y-directions are interpreted as a vector
+  * - 36
+    - OGMAG 
+    - Magnitude of the observed gradient when the X and Y-directions are intrepreted as a vector
+  * - 37
+    - MAG_RMSE 
+    - Root mean squared difference of the forecast gradient magnitude minus the observed gradient magnitude
+  * - 38
+    - LAPLACE_RMSE 
+    - Root mean squared difference of the sum of the forecast X and Y-gradients minus the sum of the observed forecast X and Y-gradients
 
 .. _table_GS_format_info_DMAP:
 

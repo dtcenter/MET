@@ -613,14 +613,23 @@ class GRADInfo {
       int dx;
       int dy;
 
-      // Gradient Partial Sums
-      int    total;
+      // Number of pairs
+      int total;
+
+      // Gradient Partial sums
       double fgbar, ogbar, mgbar, egbar;
+
+      // Gradient Vector Partial Sums 
+      double fgmag, ogmag;
+      double mag_mse, lap_mse;
 
       // Gradient Statistics
       double s1()         const; // s1         = 100 * egbar / mgbar
       double s1_og()      const; // s1_og      = 100 * egbar / ogbar
       double fgog_ratio() const; // fgog_ratio = fgbar / ogbar
+
+      double magnitude_rmse() const;
+      double laplace_rmse()   const;
 
       // Compute sums
       void set(int grad_dx, int grad_dy,
