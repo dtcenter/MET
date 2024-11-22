@@ -1746,9 +1746,10 @@ __attribute__((noreturn)) static void usage() {
         << "\t\t\"-complement\" computes the complement of the current "
         << "mask (optional).\n"
 
-        << "\t\t\"-union | -intersection | -symdiff\" specify how "
-        << "to combine the \"input_field\" with the current mask "
-        << "(optional).\n"
+        << "\t\t\"-union | -intersection | -symdiff\" specify how to combine "
+        << "multiple binary masks (optional).\n"
+        << "\t\t   Applies to masks read from the \"input_field\" and those "
+        << "generated during the current run.\n"
 
         << "\t\t\"-thresh string\" is a comma-separated list of thresholds "
 	<< "to be applied (optional).\n"

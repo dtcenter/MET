@@ -61,7 +61,11 @@ Required Arguments for gen_vx_mask
 
 3. The **out_file** is the output NetCDF mask file to be written.
 
-4. The **-type string** is a comma-separated list of masking types to be applied. The application will print an error message and exit if "-type string" is not specified at least once on the command line. Use multiple times for multiple mask types. See the description of supported types below.
+4. The **-type string** is a comma-separated list of masking types to be applied. The application will print an error message and exit if "-type string" is not specified at least once on the command line. Use multiple times for multiple mask types. See a list of supported masking types described below.
+
+.. note::
+
+   While multiple **-type** mask types can be requested in a single run, all requested masking types must use the same **mask_file** setting.
 
 Optional Arguments for gen_vx_mask
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -72,7 +76,7 @@ Optional Arguments for gen_vx_mask
 
 7. The **-complement** option can be used to compute the complement of the area defined by "mask_file".
 
-8. The **-union | -intersection | -symdiff** options specify how to combine the "input_field" with the current mask.
+8. The **-union | -intersection | -symdiff** options specify how to combine multiple binary masks. Applies to masks read from the "input_field" and those generated during the current run.
 
 9. The **-thresh string** option is a comma-separated list of thresholds to be applied. Use multiple times for multiple mask types.
 
@@ -136,6 +140,9 @@ The Gen-Vx-Mask tool supports the following types of masking region definition s
 
 The polyline, polyline XY, box, circle, and track masking methods all read an ASCII file containing Lat/Lon locations. Those files must contain a string, which defines the name of the masking region, followed by a series of whitespace-separated latitude (degrees north) and longitude (degree east) values.
 
+Logic for gen_vx_mask
+^^^^^^^^^^^^^^^^^^^^^
+
 The Gen-Vx-Mask tool performs three main steps, described below.
 
 1. Determine the input grid definition.
@@ -148,7 +155,7 @@ The Gen-Vx-Mask tool performs three main steps, described below.
 
 • If the **input_grid** is the output from a previous run of Gen-Vx-Mask, automatically initialize each input field value with the previously-generated mask value.
 
-2. Determine the current masking region.
+2. Process each of the requested masking regions.
 
 • For each **-type** mask type option requested, process the **mask_file** setting.
 
@@ -160,6 +167,8 @@ The Gen-Vx-Mask tool performs three main steps, described below.
 
 • Apply logic to combine the newly generated masking region with those defined by previous **-type** mask type options to create a **mask_field**.
 
+  • By default, compute the **-union** of multiple masks, unless **-intersection** or **-symdiff** were specified to override this default.
+
 3. Apply logic to combine the input field and current masking region and write the **out_file**.
 
 • By default, the output value at each grid point is set to the value of current masking region if included in the mask, or the value of **input_field** if not included.
@@ -168,10 +177,8 @@ The Gen-Vx-Mask tool performs three main steps, described below.
 
 • Write the output value for each grid point to the **out_file**.
 
-.. note::
-
-   While multiple **-type** mask types can be requested in a single run, all requested masking types must use the same **mask_file** setting.
-
+Examples for gen_vx_mask
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 An example of defining the northwest hemisphere of the earth, as defined by latitudes >= 0 and longitudes < 0, in a single run is shown below:
 
