@@ -46,6 +46,25 @@ extern void solar_altaz(unixtime gmt, double lat, double lon, double & alt, doub
 ////////////////////////////////////////////////////////////////////////
 
 
+extern double solar_time(unixtime gmt, double lon);
+
+   //
+   //  calculates the solar time for the given longitude.
+   //
+   //
+   //  Input:   gmt, greenwich mean time expressed as unix time
+   //
+   //           lon, longitude (degrees) of given location (+ west, - east)
+   //
+   //
+   //  Output:  decimal hours f the solar day in range [0, 24),
+   //           where 12 is solar noon
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 extern void solar_radec(unixtime gmt, double & Ra, double & Dec);
 
    //
