@@ -1368,6 +1368,45 @@ void ModeConfInfo::set_conv_radius_by_index(int k)
 
 ////////////////////////////////////////////////////////////////////////
 
+void ModeConfInfo::set_obs_conv_radius_by_index(int k)
+
+{
+   // if (data_type != ModeDataType::MvMode_Obs) {
+   //    if ( (k < 0) || (k >= Fcst->conv_radius_array.n_elements()) )  {
+   //       mlog << Error 
+   //            << "\nModeConfInfo::set_conv_radius_by_index(int) -> "
+   //            << "range check error\n\n";
+   //       exit ( 1 );
+   //    }
+   //    Fcst->conv_radius =  Fcst->conv_radius_array[k];
+   // }
+   // if (data_type != ModeDataType::MvMode_Fcst) {
+   if ( (k < 0) || (k >= Obs->conv_radius_array.n_elements()) )  {
+      mlog << Error 
+           << "\nModeConfInfo::set_conv_radius_by_index(int) -> "
+           << "range check error\n\n";
+      exit ( 1 );
+   }
+   Obs->conv_radius = Obs->conv_radius_array[k];
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_fcst_conv_radius_by_index(int k)
+
+{
+   if ( (k < 0) || (k >= Fcst->conv_radius_array.n_elements()) )  {
+      mlog << Error 
+           << "\nModeConfInfo::set_conv_radius_by_index(int) -> "
+           << "range check error\n\n";
+      exit ( 1 );
+   }
+   Fcst->conv_radius =  Fcst->conv_radius_array[k];
+}
+
+////////////////////////////////////////////////////////////////////////
+
 
 void ModeConfInfo::set_conv_thresh(SingleThresh s)
 {
@@ -1381,6 +1420,21 @@ void ModeConfInfo::set_conv_thresh(SingleThresh s)
 
 ////////////////////////////////////////////////////////////////////////
 
+
+void ModeConfInfo::set_fcst_conv_thresh(SingleThresh s)
+{
+   Fcst->conv_thresh = s;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_obs_conv_thresh(SingleThresh s)
+{
+   Obs->conv_thresh =  s;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void ModeConfInfo::set_conv_radius(int r)
 {
    if (data_type != ModeDataType::MvMode_Obs) {
@@ -1389,6 +1443,20 @@ void ModeConfInfo::set_conv_radius(int r)
    if (data_type != ModeDataType::MvMode_Fcst) {
       Obs->conv_radius = r;
    }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_fcst_conv_radius(int r)
+{
+   Fcst->conv_radius = r;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_obs_conv_radius(int r)
+{
+   Obs->conv_radius = r;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1416,6 +1484,37 @@ void ModeConfInfo::set_conv_thresh_by_index(int k)
       Fcst->conv_thresh = Fcst->conv_thresh_array[k];
    }
    return;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_obs_conv_thresh_by_index(int k)
+
+{
+   if ( (k < 0) || (k >= Obs->conv_thresh_array.n_elements()) )  {
+      mlog << Error 
+           << "\nModeConfInfo::set_conv_thresh_by_index(int) -> "
+           << "range check error\n\n";
+      exit ( 1 );
+   }
+   Obs->conv_thresh =  Obs->conv_thresh_array[k];
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+void ModeConfInfo::set_fcst_conv_thresh_by_index(int k)
+
+{
+   if ( (k < 0) || (k >= Fcst->conv_thresh_array.n_elements()) )  {
+      
+      mlog << Error 
+           << "\nModeConfInfo::set_conv_thresh_by_index(int) -> "
+           << "range check error\n\n";
+      exit ( 1 );
+   }
+   Fcst->conv_thresh = Fcst->conv_thresh_array[k];
 }
 
 
@@ -1732,15 +1831,17 @@ void ModeConfInfo::check_multivar_not_implemented()
    }
 
    bool status = false;
-   if (quilt) {
-      mlog << Error
-           << "\nModeConfInfo::check_multivar_not_implemented():\n"
-           << "  quilting not yet implemented for multivar mode\n\n";
-      status = true;
-   }
+   // if (quilt) {
+   //    mlog << Error
+   //         << "\nModeConfInfo::check_multivar_not_implemented():\n"
+   //         << "  quilting not yet implemented for multivar mode\n\n";
+   //    status = true;
+   // }
    
+   int nForFcst = 0;
+   int nForObs = 0;
    for (int i=0; i<N_fields_f; ++i) {
-      if (data_type != ModeDataType::MvMode_Obs) {
+      //if (data_type != ModeDataType::MvMode_Obs) {
          if (fcst_array[i].merge_flag == MergeType::Both || fcst_array[i].merge_flag == MergeType::Engine)
          {
             mlog << Error
@@ -1748,16 +1849,29 @@ void ModeConfInfo::check_multivar_not_implemented()
                  << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
             status = true;
          }
-         if (fcst_array[i].conv_thresh_array.n() > 1 || fcst_array[i].merge_thresh_array.n() > 1) {
+         if (i == 0) {
+            nForFcst = fcst_array[i].conv_thresh_array.n();
+         }
+         int nti = fcst_array[i].conv_thresh_array.n();
+         int nri = fcst_array[i].conv_radius_array.n_elements();
+         if (nti != nForFcst || nri != nForFcst)  {
             mlog << Error
                  << "\nModeConfInfo::check_multivar_not_implemented():\n"
-                 << "  more than one conv_thresh or merge_thresh per input is not allowed in multivariate mode\n\n";
+                 << "  Unequal array lengths for conv_thresh or conv_radii not allowed in multivariate mode\n\n";
             status = true;
          }
-      }
+         if (fcst_array[i].merge_flag != MergeType::None) {
+            int nmi = fcst_array[i].merge_thresh_array.n();
+            if (nmi != nForFcst) {
+               mlog << Error
+                    << "\nModeConfInfo::check_multivar_not_implemented():\n"
+                    << "  Unequal array lengths for merge_thresh not allowed in multivariate mode\n\n";
+               status = true;
+            }               
+         }
    }
    for (int i=0; i<N_fields_o; ++i) {
-      if (data_type != ModeDataType::MvMode_Fcst) {
+      //if (data_type != ModeDataType::MvMode_Fcst) {
          if (obs_array[i].merge_flag == MergeType::Both || obs_array[i].merge_flag == MergeType::Engine) {
             mlog << Error
                  << "\nModeConfInfo::check_multivar_not_implemented():\n"
@@ -1765,13 +1879,40 @@ void ModeConfInfo::check_multivar_not_implemented()
             status = true;
             break;
          }
-         if (obs_array[i].conv_thresh_array.n() > 1 || obs_array[i].merge_thresh_array.n() > 1) {
+         if (i == 0) {
+            nForObs = obs_array[i].conv_thresh_array.n();
+         }
+         int nti = obs_array[i].conv_thresh_array.n();
+         int nri = obs_array[i].conv_radius_array.n_elements();
+         if (nti != nForObs || nri != nForObs)  {
             mlog << Error
                  << "\nModeConfInfo::check_multivar_not_implemented():\n"
-                 << "  more than one conv_thresh or merge_thresh per input is not allowed in multivariate mode\n\n";
+                 << "  Unequal array lengths for conv_thresh or conv_radii not allowed in multivariate mode\n\n";
             status = true;
          }
-      }
+         if (obs_array[i].merge_flag != MergeType::None) {
+            int nmi = obs_array[i].merge_thresh_array.n();
+            if (nmi != nForObs) {
+               mlog << Error
+                    << "\nModeConfInfo::check_multivar_not_implemented():\n"
+                    << "  Unequal array lengths for merge_thresh not allowed in multivariate mode\n\n";
+               status = true;
+            }               
+         }
+         // if (obs_array[i].conv_thresh_array.n() > 1 || obs_array[i].merge_thresh_array.n() > 1) {
+         //    mlog << Error
+         //         << "\nModeConfInfo::check_multivar_not_implemented():\n"
+         //         << "  more than one conv_thresh or merge_thresh per input is not allowed in multivariate mode\n\n";
+         //    status = true;
+         // }
+         //}
+   }
+
+   if (!quilt && (nForObs != nForFcst)) {
+      mlog << Error
+           << "\nModeConfInfo::check_multivar_not_implemented():\n"
+           << "  Obs convolution thresh/radius arrays must have the same number of elements as Fcst thresh/radius arrays unless quilt=true\n\n";
+      status = true;
    }
 
    if (status) {

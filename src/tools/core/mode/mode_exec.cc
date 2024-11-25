@@ -202,11 +202,13 @@ void ModeExecutive::init_traditional(int n_files)
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::init_multivar_simple(int j, int n_files, ModeDataType dtype,
+void ModeExecutive::init_multivar_simple(int rIndex, int tIndex,
+                                         int j, int n_files, ModeDataType dtype,
                                          const ModeConfInfo &conf)
 
 {
-   R_index = T_index = 0;
+   R_index = rIndex;
+   T_index = tIndex;
    engine.conf_info = conf;
 
    // tell the engine which type of data it is
@@ -772,8 +774,7 @@ void ModeExecutive::do_conv_thresh_traditional(const int r_index, const int t_in
    ModeConfInfo & conf = engine.conf_info;
 
    // note that we are assuming the same r_index and t_index for both forecasts
-   // and obs, which might not be true if mvmode were to allow >1 index
-   // (currently it does not)
+   // and obs
 
    R_index = r_index;
    T_index = t_index;
@@ -814,18 +815,22 @@ void ModeExecutive::do_conv_thresh_traditional(const int r_index, const int t_in
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::do_conv_thresh_multivar_super()
+void ModeExecutive::do_conv_thresh_multivar_super(int rIndexF, int tIndexF,
+                                                  int rIndexO, int tIndexO)
 {
 
    ModeConfInfo & conf = engine.conf_info;
 
-   R_index = 0;
-   T_index = 0;
+   // R_index = convIndex;
+   // T_index = convIndex;
 
    SingleThresh s("ne-9999");
-   conf.set_conv_thresh(s);
-   conf.set_conv_radius(0.0);
-   conf.set_merge_thresh_by_index(T_index);
+   conf.set_fcst_conv_thresh(s);
+   conf.set_fcst_conv_radius(0.0);
+   conf.set_fcst_merge_thresh_by_index(tIndexF);
+   conf.set_obs_conv_thresh(s);
+   conf.set_obs_conv_radius(0.0);
+   conf.set_obs_merge_thresh_by_index(tIndexO);
 
    //
    //  Set up the engine with these raw fields
@@ -855,17 +860,21 @@ void ModeExecutive::do_conv_thresh_multivar_super()
 ///////////////////////////////////////////////////////////////////////
 
 
-void ModeExecutive::do_conv_thresh_multivar_intensity_compare()
+void ModeExecutive::do_conv_thresh_multivar_intensity_compare(int rIndexF, int tIndexF, int rIndexO, int tIndexO)
 {
 
    ModeConfInfo & conf = engine.conf_info;
 
-   R_index = 0;
-   T_index = 0;
+   R_index = rIndexF;
+   T_index = tIndexF;
 
-   conf.set_conv_radius_by_index(R_index);
-   conf.set_conv_thresh_by_index(T_index);
-   conf.set_merge_thresh_by_index(T_index);
+   conf.set_obs_conv_radius_by_index(rIndexO);
+   conf.set_obs_conv_thresh_by_index(tIndexO);
+   conf.set_obs_merge_thresh_by_index(tIndexO);
+
+   conf.set_fcst_conv_radius_by_index(rIndexF);
+   conf.set_fcst_conv_thresh_by_index(tIndexF);
+   conf.set_fcst_merge_thresh_by_index(tIndexF);
 
    //
    //  Set up the engine with these raw fields
@@ -893,39 +902,38 @@ void ModeExecutive::do_conv_thresh_multivar_intensity_compare()
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::do_conv_thresh_multivar_simple(Processing_t p)
+void ModeExecutive::do_conv_thresh_multivar_simple(Processing_t p, int rIndex, int tIndex)
 {
+   // R_index = convIndex;
+   // T_index = convIndex;
 
    ModeConfInfo & conf = engine.conf_info;
-
-   R_index = 0;
-   T_index = 0;
+   bool obs = conf.data_type == ModeDataType::MvMode_Obs;
+   string what;
+   if (obs) {
+      what = "observation field";
+   } else {
+      what = "forecast field";
+   }      
+   mlog << Debug(2) << "Identifying objects in the " << what << "...\n";
 
    if (p == MULTIVAR_SIMPLE_MERGE) {
+      conf.set_conv_radius_by_index(R_index);   // need this because exec was killed after SIMPLE
       conf.set_conv_thresh_by_merge_index(T_index);
    } else if (p == MULTIVAR_SIMPLE) {
-      conf.set_conv_radius_by_index(0);
-      conf.set_conv_thresh_by_index(0);
+      conf.set_conv_radius_by_index(R_index);
+      conf.set_conv_thresh_by_index(T_index);
    } else {
       mlog << Error << "\nModeExecutive::do_conv_thresh_multivar_simple() -> "
            << "Wrong processing type input " << stype(p) << "\"\n\n";
       exit(1);
    }         
 
-   conf.set_merge_thresh_by_index(0);
+   conf.set_merge_thresh_by_index(T_index);
 
    //
    //  Set up the engine with these raw fields
    //
-
-   string what;
-   if (conf.data_type == ModeDataType::MvMode_Obs) {
-      what = "observation field";
-   } else {
-      what = "forecast field";
-   }
-   mlog << Debug(2) << "Identifying objects in the " << what << "...\n";
-
    engine.set(Fcst_sd, Obs_sd);
 
    // (ct_stats not needed for simple or merge, only one field)
@@ -933,7 +941,7 @@ void ModeExecutive::do_conv_thresh_multivar_simple(Processing_t p)
    //  done
    //
 
-   local_r_index = 0;
+   local_r_index = rIndex;
 
    return;
 

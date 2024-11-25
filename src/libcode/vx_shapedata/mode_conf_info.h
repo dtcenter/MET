@@ -262,16 +262,29 @@ class ModeConfInfo {
 
       void parse_nc_info  ();
 
-      // might need addtional methods here for pass2 multivariate, if/when we allow more than 1 radius
       void set_conv_radius_by_index  (int);
-      // might need addtional methods here for pass2 multivariate, if/when we allow more than 1 thresh
+      void set_obs_conv_radius_by_index  (int);
+      void set_fcst_conv_radius_by_index  (int);
+
       void set_conv_thresh_by_index  (int);
+      void set_obs_conv_thresh_by_index  (int);
+      void set_fcst_conv_thresh_by_index  (int);
 
       void set_conv_thresh(SingleThresh);
+      void set_fcst_conv_thresh(SingleThresh);
+      void set_obs_conv_thresh(SingleThresh);
       void set_conv_radius(int);
+      void set_fcst_conv_radius(int);
+      void set_obs_conv_radius(int);
 
       int n_conv_threshs  () const;
       int n_conv_radii    () const;
+
+      int n_conv_threshs_fcst  () const;
+      int n_conv_radii_fcst    () const;
+
+      int n_conv_threshs_obs  () const;
+      int n_conv_radii_obs    () const;
 
       int n_runs() const;   //  # threshs times # radii
 
@@ -316,6 +329,7 @@ inline int ModeConfInfo::n_conv_radii() const
 {
    // this could break down if multivar mode relaxes
    // its limitations on number of radii (obs and fcst could be different)
+   // so far that is not the case.
    if (data_type == ModeDataType::MvMode_Obs)
    {
       return ( Obs->conv_radius_array.n_elements() );
@@ -324,16 +338,37 @@ inline int ModeConfInfo::n_conv_radii() const
    }
 }
 
+inline int ModeConfInfo::n_conv_radii_fcst() const
+{
+   return ( Fcst->conv_radius_array.n_elements() );
+}
+
+inline int ModeConfInfo::n_conv_radii_obs() const
+{
+   return ( Obs->conv_radius_array.n_elements() );
+}
+
 inline int ModeConfInfo::n_conv_threshs() const
 {
    // this could break down if multivar mode relaxes
    // its limitations on number of thresh (obs and fcst could be different)
+   // so far that is not the case.
    if (data_type == ModeDataType::MvMode_Obs)
    {
       return ( Obs->conv_thresh_array.n_elements() );
    } else {
       return ( Fcst->conv_thresh_array.n_elements() );
    }
+}
+
+inline int ModeConfInfo::n_conv_threshs_fcst() const
+{
+   return ( Fcst->conv_thresh_array.n_elements() );
+}
+
+inline int ModeConfInfo::n_conv_threshs_obs() const
+{
+   return ( Obs->conv_thresh_array.n_elements() );
 }
 
 inline int ModeConfInfo::get_compression_level() { return conf.nc_compression(); }

@@ -30,6 +30,8 @@ class ModeSuperObject {
 
  public:
 
+   ModeSuperObject();
+
    ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
                    const std::vector<MultiVarData *> &mvd,
                    BoolCalc &calc);

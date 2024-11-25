@@ -81,14 +81,13 @@ class ModeExecutive {
    void clear();
 
    void init_traditional(int n_files);
-   void init_multivar_simple(int j, int n_files, ModeDataType dtype, const ModeConfInfo &conf);
+   void init_multivar_simple(int rIndex, int tIndex, int j, int n_files, ModeDataType dtype, const ModeConfInfo &conf);
    void init_multivar_intensities(const ModeConfInfo &conf);
 
    int n_conv_radii   () const;
    int n_conv_threshs () const;
    int n_runs() const;
 
-   // these are used only for traditional mode
    int R_index;   //  indices into the convolution radius and threshold arrays
    int T_index;   //  for the current run
 
@@ -167,9 +166,10 @@ class ModeExecutive {
                                            const Grid &igrid);
 
    void do_conv_thresh_traditional(const int r_index, const int t_index);
-   void do_conv_thresh_multivar_super();
-   void do_conv_thresh_multivar_intensity_compare();
-   void do_conv_thresh_multivar_simple(Processing_t p);
+   void do_conv_thresh_multivar_super(int rIndexF, int tIndexF,
+                                      int rIndexO, int tIndexO);
+   void do_conv_thresh_multivar_intensity_compare(int rIndexF, int tIndexF, int rIndexO, int tIndexO);
+   void do_conv_thresh_multivar_simple(Processing_t p, int rIndex, int tIndex);
 
    void do_merging_traditional();
    void do_merging_multivar(const ShapeData &f_merge, const ShapeData &o_merge,

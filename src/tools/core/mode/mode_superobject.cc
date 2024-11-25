@@ -109,6 +109,10 @@ static void _debug_shape_examine(string &name, const ShapeData &sd,
    }
 }   
 
+ModeSuperObject::ModeSuperObject()
+{
+}
+
 ModeSuperObject::ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
                                  const vector<MultiVarData *> &mvd,
                                  BoolCalc &calc)

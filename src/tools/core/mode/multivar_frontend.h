@@ -20,6 +20,7 @@
 #include "two_d_array.h"
 #include "bool_calc.h"
 #include "multivar_data.h"
+#include "simple_objects.hh"
 #include "mode_superobject.h"
 #include "mode_input_data.h"
 #include "mode_exec.h"
@@ -37,21 +38,40 @@ private:
    std::string fcst_fof;
    std::string obs_fof;
 
+   void _init(const StringArray & Argv);
    void _process_command_line(const StringArray &);
    void _read_config(const std::string & filename);
    void _setup_inputs();
    void _set_output_path();
    int  _mkdir(const char *dir);
-   void _simple_objects(ModeExecutive::Processing_t p, ModeDataType dtype,
-                        int j, int n_files, const std::string &filename,
-                        const ModeInputData &input);
-   void _init_exec(ModeExecutive::Processing_t p, const std::string &ffile, const std::string &ofile);
-   void _superobject_mode_algorithm(const ModeSuperObject &fsuper, const ModeSuperObject &osuper);
-   void _intensity_compare_mode_algorithm(const MultiVarData &mvdf, const MultiVarData &mvdo,
-                                          const ModeSuperObject &fsuper, const ModeSuperObject &osuper);
-   void _simple_mode_algorithm(ModeExecutive::Processing_t p);
-   void _mode_algorithm_init() const;
+   void _read_input(const std::string &name, int index, ModeDataType type,
+                    GrdFileType f_t, GrdFileType other_t, int shift);
+   void _create_verif_grid(void);
 
+   void _create_simple_objects(ModeDataType dtype, const std::string &name,
+                               int rIndex, int tIndex, int n_files,
+                               const StringArray &filenames, const std::vector<ModeInputData> &input,
+                               BoolCalc &calc, SimpleObjects &O) const;
+   MultiVarData *_create_simple_multivar_data(ModeDataType dtype, int rIndex, int tIndex,
+                                              int j, int n_files, const std::string &filename,
+                                              const ModeInputData &input) const;
+   void _simple_objects(ModeExecutive::Processing_t p, ModeDataType dtype, int rIndex,
+                        int tIndex, int j, int n_files, const std::string &filename,
+                        const ModeInputData &input) const;
+   void _simple_mode_algorithm(ModeExecutive::Processing_t p, int rIndex, int tIndex) const;
+
+   void _create_intensity_comparisons(SimpleObjects &fcsts, int findex, SimpleObjects &obs, int oindex,
+                                      const string &fcst_filename, const string &obs_filename);
+   void _intensity_compare_mode_algorithm(int rIndexF, int tIndexF, int rIndexO, int tIndexO,
+                                          const MultiVarData &mvdf, const MultiVarData &mvdo,
+                                          const ModeSuperObject &fsuper, const ModeSuperObject &osuper);
+
+   void _process_superobjects(SimpleObjects &fcsts, SimpleObjects &obs);
+   void _superobject_mode_algorithm(int rIndexF, int tIndexF, int rIndexO, int tIndexO,
+                                    const ModeSuperObject &fsuper, const ModeSuperObject &osuper);
+
+   void _init_exec(ModeExecutive::Processing_t p, const std::string &ffile, const std::string &ofile) const;
+   
 public:
 
    bool do_clusters;
@@ -66,36 +86,12 @@ public:
 
    ~MultivarFrontEnd();
 
-
    int run(const StringArray & Argv);
-   void init(const StringArray & Argv);
 
    static void set_outdir    (const StringArray &);
    static void set_logfile   (const StringArray &);
    static void set_verbosity (const StringArray &);
    static void set_compress  (const StringArray &);
-
-   void read_input(const std::string &name, int index, ModeDataType type,
-                   GrdFileType f_t, GrdFileType other_t, int shift);
-
-
-   void create_verif_grid(void);
-
-   MultiVarData *create_simple_objects(ModeDataType dtype, int j, int n_files,
-                                       const std::string &filename,
-                                       const ModeInputData &input);
-
-   void create_intensity_comparisons(int findex, int oindex,
-                                     const ModeSuperObject &fsuper,
-                                     const ModeSuperObject &osuper,
-                                     MultiVarData &mvdf, MultiVarData &mvdo,
-                                     const std::string &fcst_filename,
-                                     const std::string &obs_filename);
-
-   void process_superobjects(ModeSuperObject &fsuper,
-                             ModeSuperObject &osuper,
-                             const MultiVarData &mvdf,
-                             const MultiVarData &mvdo);
 
 };
 
