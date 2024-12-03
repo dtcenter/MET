@@ -23,10 +23,43 @@
 
 using namespace std;
 
+////////////////////////////////////////////////////////////////////////
+//
+// Code for class PairsFormat enumeration
+//
+////////////////////////////////////////////////////////////////////////
+
+PairsFormat string_to_pairsformat(const string &s) {
+   PairsFormat t;
+   ConcatString cs(s);
+   cs.set_upper();
+
+        if(cs == "MPR")    t = PairsFormat::MPR;
+   else if(cs == "PYTHON") t = PairsFormat::Python;
+   else if(cs == "IODA")   t = PairsFormat::IODA;
+   else                    t = PairsFormat::None;
+
+   return t;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString pairsformat_to_string(const PairsFormat t) {
+   ConcatString s;
+
+   switch(t) {
+      case PairsFormat::MPR:    s = "mpr";    break;
+      case PairsFormat::Python: s = "python"; break;
+      case PairsFormat::IODA:   s = "ioda";   break;
+      default:                  s = na_str;   break;
+   }
+
+   return s;
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class PairStatConfInfo
+// Code for class PairStatConfInfo
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -49,9 +82,6 @@ void PairStatConfInfo::init_from_scratch() {
    // Initialize pointers
    vx_opt = (PairStatVxOpt *) nullptr;
 
-#ifdef WITH_UGRID
-   ignore_ugrid_dataset = false;
-#endif
    clear();
 
    return;
@@ -76,12 +106,6 @@ void PairStatConfInfo::clear() {
    tmp_dir.clear();
    output_prefix.clear();
    version.clear();
-#ifdef WITH_UGRID
-   ugrid_nc.clear();
-   if (!ignore_ugrid_dataset) ugrid_dataset.clear();
-   ugrid_map_config.clear();
-   ugrid_max_distance_km = bad_data_double;
-#endif
    seeps_climo_name.clear();
    seeps_p1_thresh.clear();
 
@@ -96,46 +120,20 @@ void PairStatConfInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairStatConfInfo::read_config(const char *default_file_name,
-                                    const char *user_file_name) {
+void PairStatConfInfo::read_config(const StringArray &sa) {
 
-   // Read the config file constants
-   conf.read(replace_path(config_const_filename).c_str());
-
-   // Read the default config file
-   conf.read(default_file_name);
-
-   // Read the user-specified config file
-   conf.read(user_file_name);
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-#ifdef WITH_UGRID
-void PairStatConfInfo::read_ugrid_configs(StringArray ugrid_config_names, const char * user_config) {
-
-   ConcatString file_name;
-   for (int i=0; i<ugrid_config_names.n_elements(); i++) {
-      file_name = replace_path(ugrid_config_names[i].c_str());
-      if (file_exists(file_name.c_str())) {
-         conf.read(file_name.c_str());
-         ugrid_dataset = file_name;
-         ignore_ugrid_dataset = true;
-      }
-      else mlog << Warning << "\nPairStatConfInfo::read_ugrid_configs(StringArray) -> "
-                << "The configuration file \"" << ugrid_config_names[i]<< "\" does not exist.\n\n";
+   // Read each specified config file in order
+   for(int i=0; i<sa.n(); i++) {
+      mlog << Debug(1) << "Reading Config: " << sa[i] << "\n";
+      conf.read(sa[i].c_str());
    }
-   if (file_exists(user_config)) conf.read(user_config);   /* to avoid overriding by ugrid_config_names */
 
    return;
 }
-#endif
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairStatConfInfo::process_config(GrdFileType ftype) {
+void PairStatConfInfo::process_config(PairsFormat ftype) {
    int i, j, n_fvx, n_ovx;
    Dictionary *fdict = (Dictionary *) nullptr;
    Dictionary *odict = (Dictionary *) nullptr;
@@ -158,20 +156,6 @@ void PairStatConfInfo::process_config(GrdFileType ftype) {
 
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
-
-#ifdef WITH_UGRID
-   // Conf: ugrid_dataset
-   if (!ignore_ugrid_dataset) ugrid_dataset = parse_conf_ugrid_dataset(&conf);
-
-   // Conf: ugrid_nc
-   ugrid_nc = parse_conf_ugrid_coordinates_file(&conf);
-
-   // Conf: ugrid_map_config
-   ugrid_map_config = parse_conf_ugrid_map_config(&conf);
-
-   // Conf: ugrid_max_distance_km
-   ugrid_max_distance_km = parse_conf_ugrid_max_distance_km(&conf);
-#endif
 
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
@@ -384,7 +368,9 @@ void PairStatConfInfo::process_flags() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairStatConfInfo::process_masks(const Grid &grid) {
+void PairStatConfInfo::process_masks() {
+
+/* JHG need to work on this since grid is no longer defined as an input
    int i, j;
    MaskPlane mp;
    ConcatString name;
@@ -482,14 +468,15 @@ void PairStatConfInfo::process_masks(const Grid &grid) {
       check_mask_names(vx_opt[i].mask_name);
 
    } // end for i
-
+*/
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairStatConfInfo::process_geog(const Grid &grid,
-                                     const char *fcst_file) {
+void PairStatConfInfo::process_geog() {
+
+/* JHG not parsing geog data right now, the grid and fcst_file were inputs that are not available in pair_stat
    int i;
    bool land, topo;
    Dictionary *dict;
@@ -564,7 +551,7 @@ void PairStatConfInfo::process_geog(const Grid &grid,
       }
       vx_opt[i].vx_pd.set_sfc_info(sfc_info);
    }
-
+*/
    return;
 }
 
@@ -708,7 +695,7 @@ bool PairStatConfInfo::get_vflag() const {
 
 ////////////////////////////////////////////////////////////////////////
 //
-//  Code for class PairStatVxOpt
+// Code for class PairStatVxOpt
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -839,7 +826,7 @@ bool PairStatVxOpt::is_uv_match(const PairStatVxOpt &v) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void PairStatVxOpt::process_config(GrdFileType ftype,
+void PairStatVxOpt::process_config(PairsFormat ftype,
         Dictionary &fdict, Dictionary &odict) {
    int n;
    VarInfoFactory info_factory;
@@ -850,8 +837,8 @@ void PairStatVxOpt::process_config(GrdFileType ftype,
    clear();
 
    // Allocate new VarInfo objects
-   vx_pd.set_fcst_info(info_factory.new_var_info(ftype));
-   vx_pd.set_obs_info(new VarInfoGrib);
+   vx_pd.set_fcst_info(info_factory.new_var_info(FileType_None));
+   vx_pd.set_obs_info(info_factory.new_var_info(FileType_None));
 
    // Set the VarInfo objects
    vx_pd.fcst_info->set_dict(fdict);

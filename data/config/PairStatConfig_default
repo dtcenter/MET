@@ -8,33 +8,20 @@
 
 //
 // Output model name to be written
+// Non-empty string overrides input data values
 //
-model = "FCST";
+model = "";
 
 //
 // Output description to be written
-// May be set separately in each "obs.field" entry
+// May be set separately in each "pairs" entry
 //
 desc = "NA";
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Verification grid
-// May be set separately in each "field" entry
-//
-regrid = {
-   to_grid    = NONE;
-   method     = NEAREST;
-   width      = 1;
-   vld_thresh = 0.5;
-   shape      = SQUARE;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// May be set separately in each "field" entry
+// May be set separately in each "pairs" entry
 //
 censor_thresh  = [];
 censor_val     = [];
@@ -50,43 +37,42 @@ hss_ec_value   = NA;
 rank_corr_flag = FALSE;
 
 //
-// Forecast and observation fields to be verified
+// Forecast and observation pairs to be verified
+// Parse "pairs" like we'd parse "field", supporting things like set_attr_name
 //
+
+pairs = [
+  { fcst_name = , obs_name = , filters },
+  { },
+
+]
+
+
 fcst = {
-   field = [
-      {
-        name       = "SPFH";
-        level      = [ "P500" ];
-        cat_thresh = [ >80.0 ];
-      },
-
-      {
-        name       = "TMP";
-        level      = [ "P500" ];
-        cat_thresh = [ >273.0 ];
-      },
-
-      {
-        name       = "HGT";
-        level      = [ "P500" ];
-        cat_thresh = [ >0.0 ];
-      },
-
-      {
-        name       = "UGRD";
-        level      = [ "P500" ];
-        cat_thresh = [ >5.0 ];
-      },
-
-      {
-        name       = "VGRD";
-        level      = [ "P500" ];
-        cat_thresh = [ >5.0 ];
-      }
-   ];
-
+  pairs = [
+    {
+      name = "TMP"; level = "P100-1000"... P100, P200, XXX P1100 // IODA forecast variable name or comma-separated list of FCST_VAR names
+      filter_str_inc = [ { name = "FCST_LEVEL"; value = "P100,P200,P300"; } ];
+      filter_str_exc = [ { name = ""; value  = ""; } ];
+      filter_thresh  = [ { name = ""; thresh = NA; } ];
+      cat_thresh = [ >273, >283 ];
+      cnt_thresh = [ NA, >273 ];
+    }
+  ];
 }
-obs = fcst;
+
+obs = {
+  pairs = [
+    {
+      name = "TMP"; // IODA observation variable name or comma-separated list of OBS_VAR names
+      filter_str_inc = [ { name = "OBS_LEVEL"; value  = "Z2"; } ];
+      filter_str_exc = [ { name = ""; value  = ""; } ];
+      filter_thresh  = [ { name = ""; thresh = NA; } ];
+      cat_thresh = [ >273, >283 ];
+      cnt_thresh = [ NA, >273 ];
+    }
+  ];
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -103,24 +89,9 @@ duplicate_flag = NONE;
 obs_summary    = NONE;
 obs_perc_value = 50;
 
-//
-// Mapping of message type group name to comma-separated list of values.
-//
-message_type_group_map = [
-   { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
-   { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
-   { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
-   { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      },
-   { key = "LANDSF";  val = "ADPSFC,MSONET";                      },
-   { key = "WATERSF"; val = "SFCSHP";                             }
-];
-
-obtype_as_group_val_flag = FALSE;
-
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology mean data
 // May be set separately in the "fcst" and "obs" dictionaries
 //
 climo_mean = {
@@ -232,39 +203,6 @@ boot = {
    n_rep    = 0;
    rng      = "mt19937";
    seed     = "";
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Interpolation methods
-// May be set separately in each "obs.field" entry
-//
-interp = {
-   vld_thresh = 1.0;
-   shape      = SQUARE;
-
-   type = [
-      {
-         method = NEAREST;
-         width  = 1;
-      }
-   ];
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// HiRA verification method
-// May be set separately in each "obs.field" entry
-//
-hira = {
-   flag            = FALSE;
-   width           = [ 2, 3, 4, 5 ];
-   vld_thresh      = 1.0;
-   cov_thresh      = [ ==0.25 ];
-   shape           = SQUARE;
-   prob_cat_thresh = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

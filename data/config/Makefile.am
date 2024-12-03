@@ -27,6 +27,7 @@ config_DATA = \
 	GridStatConfig_default \
 	GridDiagConfig_default \
 	IODA2NCConfig_default \
+	IODADataConfig_default \
 	Madis2NcConfig_default \
 	MODEAnalysisConfig_default \
 	MODEConfig_default \

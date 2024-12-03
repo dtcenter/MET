@@ -87,11 +87,29 @@ static const STATLineType txt_file_type[n_txt] = {
    STATLineType::seeps      //  21
 };
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+//
+// Supported input pairs formats 
+//
+
+enum class PairsFormat {
+   None,   // Default
+   MPR,    // ASCII files containing MET MPR lines
+   Python, // Stat MPR data via Python embedding
+   IODA,   // IODA pairs file
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+extern ConcatString pairsformat_to_string(const PairsFormat);
+extern PairsFormat  string_to_pairsformat(const std::string &);
+
+///////////////////////////////////////////////////////////////////////////////
 
 class PairStatConfInfo; // forward reference
 
-////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 class PairStatVxOpt {
 
@@ -163,7 +181,7 @@ class PairStatVxOpt {
 
       void clear();
 
-      void process_config(GrdFileType, Dictionary &, Dictionary &);
+      void process_config(PairsFormat, Dictionary &, Dictionary &);
       void set_vx_pd(PairStatConfInfo *);
       bool is_uv_match(const PairStatVxOpt &) const;
 
@@ -252,14 +270,6 @@ class PairStatConfInfo {
       ConcatString seeps_climo_name;        // SEESP climo filename
       SingleThresh seeps_p1_thresh;         // SEESP p1 threshold
 
-#ifdef WITH_UGRID
-      bool ignore_ugrid_dataset;
-      ConcatString ugrid_nc;                // NetCDF for coordinate variables of unstructured grid
-      ConcatString ugrid_dataset;           // UGRid dataset name (mpas, lfric etc)
-      ConcatString ugrid_map_config;        // User's configuration file which contains ugrid metadata mapping
-      double ugrid_max_distance_km;         // max distance to be the closest neighbor to unstructured grid
-#endif
-
       // Summary of output file options across all verification tasks
       STATOutputType output_flag[n_txt];    // Flag for each output line type
 
@@ -267,16 +277,13 @@ class PairStatConfInfo {
 
       void clear();
 
-      void read_config(const char *, const char *);
-#ifdef WITH_UGRID
-      void read_ugrid_configs(StringArray ugrid_config_names, const char * user_config);
-#endif
+      void read_config(const StringArray &);
 
-      void process_config(GrdFileType);
+      void process_config(PairsFormat);
       void process_grib_codes();
       void process_flags();
-      void process_masks(const Grid &);
-      void process_geog(const Grid &, const char *);
+      void process_masks();
+      void process_geog();
       void set_vx_pd();
 
       // Dump out the counts

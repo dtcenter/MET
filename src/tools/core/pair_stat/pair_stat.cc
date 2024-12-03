@@ -47,10 +47,6 @@
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
-#ifdef WITH_UGRID
-#include "vx_data2d_ugrid.h"
-#endif
-
 #ifdef WITH_PYTHON
 #include "data2d_nc_met.h"
 #include "pointdata_python.h"
@@ -72,8 +68,8 @@ static void setup_table    (AsciiTable &);
 static void build_outfile_name(unixtime, int, const char *,
                                ConcatString &);
 
-static void process_fcst_climo_files();
-static void process_obs_file(int);
+static void process_mpr_pairs(const ConcatString &, PairsFormat);
+static void process_ioda_pairs(const ConcatString &);
 static void process_scores();
 
 static void do_cts       (CTSInfo   *&, int, const PairDataPoint *);
@@ -93,29 +89,35 @@ static void usage();
 static void set_pairs(const StringArray &);
 static void set_format(const StringArray &);
 static void set_config(const StringArray &);
-#ifdef WITH_UGRID
-static void set_ugrid_config(const StringArray &);
-#endif
 static void set_outdir(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
 int met_main(int argc, char *argv[]) {
-   int i;
 
    // Process the command line arguments
    process_command_line(argc, argv);
 
-   // Process the forecast and climo files
-   process_fcst_climo_files();
+   // Process each pairs file
+   for(int i=0; i<pairs_files.n(); i++) {
 
-   // Process each observation netCDF file
-   for(i=0; i<obs_file.n(); i++) {
-      process_obs_file(i);
+      if(pairs_format == PairsFormat::MPR ||
+         pairs_format == PairsFormat::Python) {
+         process_mpr_pairs(pairs_files[i], pairs_format);
+      }
+      else if(pairs_format == PairsFormat::IODA) {
+         process_ioda_pairs(pairs_files[i]);
+      }
+      else {
+         mlog << Error
+              << "Unsupported PairsFormat of \""
+              << pairsformat_to_string(pairs_format) << "\"!\n\n";
+         exit(1);
+      }
    }
 
    // Process observation summaries and point weights
-   for(i=0; i<conf_info.get_n_vx(); i++) {
+   for(int i=0; i<conf_info.get_n_vx(); i++) {
       conf_info.vx_opt[i].vx_pd.calc_obs_summary();
       conf_info.vx_opt[i].vx_pd.print_obs_summary();
       conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_flag);
@@ -139,10 +141,6 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
-   int i;
-   CommandLine cline;
-   GrdFileType ftype;
-   ConcatString default_config_file;
    const char *method_name = "process_command_line() -> ";
 
    out_dir = ".";
@@ -151,19 +149,17 @@ void process_command_line(int argc, char **argv) {
    if(argc == 1) usage();
 
    // Parse the command line into tokens
+   CommandLine cline;
    cline.set(argc, argv);
 
    // Set the usage function
    cline.set_usage(usage);
 
    // Add the options function calls
-   cline.add(set_pairs,        "-pairs",       -1);
-   cline.add(set_format,       "-format",       1);
-   cline.add(set_config,       "-config",       1);
-#ifdef WITH_UGRID
-   cline.add(set_ugrid_config, "-ugrid_config", 1);
-#endif
-   cline.add(set_outdir,       "-outdir",       1);
+   cline.add(set_pairs,  "-pairs", -1);
+   cline.add(set_format, "-format", 1);
+   cline.add(set_config, "-config", 1);
+   cline.add(set_outdir, "-outdir", 1);
 
    // Parse the command line
    cline.parse();
@@ -177,7 +173,7 @@ void process_command_line(int argc, char **argv) {
            << "The \"-pairs\" command line option is required!\n\n";
       usage();
    }
-   if(pairs_type == PairsFileType::None) {
+   if(pairs_format == PairsFormat::None) {
       mlog << Error << "\n" << method_name
            << "The \"-format\" command line option is required!\n\n";
       usage();
@@ -188,30 +184,32 @@ void process_command_line(int argc, char **argv) {
       usage();
    }
 
-   // Create the default config file names
-   default_config_file = replace_path(default_config_filename);
+   // List of config files to be read
+   StringArray config_files;
 
-   // List the inputs files
-   mlog << Debug(1)
-        << "Default Config File: " << default_config_file << "\n"
-        << "User Config File: "    << config_file << "\n";
+   // Add ConfigConstants
+   config_files.add(replace_path(config_const_filename));
 
-#ifdef WITH_UGRID
-   mlog << Debug(1)
-        << "UGRID Config File(s): " << write_css(ugrid_config_files) << "\n";
-#endif
+   // Add the IODA Data config file
+   if(pairs_format == PairsFormat::IODA) {
+      config_files.add(replace_path(ioda_data_config_filename));
+   }
+  
+   // Add the default config file
+   config_files.add(replace_path(default_config_filename));
 
-   mlog << Debug(1)
-        << "Pairs File(s): " << write_css(pairs_files) << "\n";
+   // Add the user config file
+   config_files.add(config_file);
 
    // Read the config files
-   conf_info.read_config(default_config_file.c_str(), config_file.c_str());
-#ifdef WITH_UGRID
-   conf_info.read_ugrid_configs(ugrid_config_files, config_file.c_str());
-#endif
+   conf_info.read_config(config_files);
 
    // Process the configuration
-   conf_info.process_config(pairs_type);
+   conf_info.process_config(pairs_format);
+
+   // List the pairs files
+   mlog << Debug(1)
+        << "Pairs File(s): " << write_css(pairs_files) << "\n";
 
    // Set the model name
    shc.set_model(conf_info.model.c_str());
@@ -237,10 +235,10 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
                         &data_grid, &data_grid);
 
    // Process the masks
-   conf_info.process_masks(grid);
+   conf_info.process_masks();
 
    // Process the geography data
-   conf_info.process_geog(grid, fcst_file.c_str());
+   conf_info.process_geog();
 
    // Setup the VxPairDataPoint objects
    conf_info.set_vx_pd();
@@ -464,7 +462,12 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_fcst_climo_files() {
+void process_mpr_pairs(const ConcatString &file_name, PairsFormat format) {
+
+   return;
+}
+
+/* JHG
    int j;
    int n_fcst;
    DataPlaneArray fcst_dpa;
@@ -606,10 +609,15 @@ void process_fcst_climo_files() {
 
    return;
 }
-
+*/
 ////////////////////////////////////////////////////////////////////////
 
-void process_obs_file(int i_nc) {
+void process_ioda_pairs(const ConcatString &file_name) {
+
+   return;
+}
+
+/* JHG
    int j, i_obs;
    float obs_arr[OBS_ARRAY_LEN], hdr_arr[HDR_ARRAY_LEN];
    float prev_obs_arr[OBS_ARRAY_LEN];
@@ -830,7 +838,7 @@ void process_obs_file(int i_nc) {
 
    return;
 }
-
+*/
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
@@ -2145,9 +2153,6 @@ void usage() {
         << "\t-pairs file\n"
         << "\t-format type\n"
         << "\t-config config_file\n"
-#ifdef WITH_UGRID
-        << "\t[-ugrid_config config_file]\n"
-#endif
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
@@ -2161,12 +2166,6 @@ void usage() {
 
         << "\t\t\"-config config_file\" is a PairStatConfig file containing "
         << "the desired configuration settings (required).\n"
-
-#ifdef WITH_UGRID
-        << "\t\t\"-ugrid_config ugrid_config_file\" is a UGridConfig file "
-        << "containing the desired configuration settings for unstructured "
-        << "grid inputs (required for \"-format ioda\").\n"
-#endif
 
         << "\t\t\"-outdir path\" overrides the default output "
         << "directory (" << out_dir << ") (optional).\n"
@@ -2189,7 +2188,7 @@ void set_pairs(const StringArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void set_format(const StringArray & a) {
-   pairs_type = parse_conf_pairs_file_type(a[0]);
+   pairs_format = string_to_pairsformat(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2197,14 +2196,6 @@ void set_format(const StringArray & a) {
 void set_config(const StringArray & a) {
    config_file = a[0];
 }
-
-////////////////////////////////////////////////////////////////////////
-
-#ifdef WITH_UGRID
-void set_ugrid_config(const StringArray & a) {
-   ugrid_config_files.add(a[0]);
-}
-#endif
 
 ////////////////////////////////////////////////////////////////////////
 
