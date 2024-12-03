@@ -60,6 +60,49 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+double solar_time(unixtime gmt, double lon)
+
+{
+
+   //
+   //  right ascension and declination
+   //
+
+double Ra;
+double Dec;
+
+solar_radec(gmt, Ra, Dec);
+
+   //
+   //  local hour angle
+   //
+
+double lha = gmt_to_gmst(gmt) - lon - Ra;
+
+   //
+   //  rescale angle to -180 to 180
+   //
+
+lha -= 360.0*floor((lha + 180.0)/360.0);
+
+   //
+   //  rescale local hour angle to decimal hours of the solar day
+   //
+
+double solar_hr = (lha + 180.0)/360.0 * 24; 
+
+   //
+   //  done
+   //
+
+return solar_hr;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void dh_to_aa(double lat, double Dec, double lha, double & alt, double & azi)
 
 {
