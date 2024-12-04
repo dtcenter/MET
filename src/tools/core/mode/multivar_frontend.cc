@@ -66,11 +66,10 @@ int MultivarFrontEnd::run(const StringArray & Argv)
 
    mlog << Debug(2) << "\n" << sep << "\n";
 
-   // read in all the data
-
    // in the conf object, shift *can* be set independently for obs and fcst
    int shift = config.shift_right;
 
+   // read in all the data
    for (int i=0; i<n_fcst_files; ++i) {
       GrdFileType ft, ot;
       ft = config.file_type_for_field(true, i);
@@ -91,7 +90,6 @@ int MultivarFrontEnd::run(const StringArray & Argv)
    // need data to set percentile thresholds so do so now
    config.config_set_all_percentile_thresholds(fcstInput, obsInput);
 
-
    // Define the verification grid using the 0th fcst and obs inputs
    _create_verif_grid();
 
@@ -107,61 +105,53 @@ int MultivarFrontEnd::run(const StringArray & Argv)
 
       exit ( 1 );
    }
-
    if (NCRO != NCRF) {
       mlog << Error << "\nMultivarFrontEnd::run() ->"
            << "Unequal number of forecast and obs convolution radii not yet supported\n\n";
       exit ( 1 );
    }
 
-   // the single array length
+   // the single number of convolution parameter choices shared by all inputs
    int NCONV = NCRO;
    
-   // containers for information needed to do things with simple objects after creation
+   // containers for information needed to do additional things with simple objects after creation
    vector<SimpleObjects> fcstSimple, obsSimple;
 
+   // create simple objects for all convolution settings
    if (config.quilt) {
       for (int ir=0; ir<NCONV; ++ir) {
          for (int it=0; it<NCONV; ++it) {
-            SimpleObjects O;
+            SimpleObjects OF, OO;
             _create_simple_objects(ModeDataType::MvMode_Fcst, "forecast", ir, it, n_fcst_files,
-                                   fcst_filenames, fcstInput, f_calc, O);
-            fcstSimple.push_back(O);
-         }
-      }
-      for (int ir=0; ir<NCONV; ++ir) {
-         for (int it=0; it<NCONV; ++it) {
-            SimpleObjects O;
+                                   fcst_filenames, fcstInput, f_calc, OF);
+            fcstSimple.push_back(OF);
             _create_simple_objects(ModeDataType::MvMode_Obs, "obs", ir, it, n_obs_files,
-                                   obs_filenames, obsInput, o_calc, O);
-            obsSimple.push_back(O);
+                                   obs_filenames, obsInput, o_calc, OO);
+            obsSimple.push_back(OO);
          }
       }
    }
    else {
       for (int ir=0; ir<NCONV; ++ir) {
-         SimpleObjects O;
+         SimpleObjects OF, OO;
          _create_simple_objects(ModeDataType::MvMode_Fcst, "forecast", ir, ir, n_fcst_files,
-                                fcst_filenames, fcstInput, f_calc, O);
-         fcstSimple.push_back(O);
-      }
-      for (int ir=0; ir<NCONV; ++ir) {
-         SimpleObjects O;
+                                fcst_filenames, fcstInput, f_calc, OF);
+         fcstSimple.push_back(OF);
          _create_simple_objects(ModeDataType::MvMode_Obs, "obs", ir, ir, n_obs_files,
-                                obs_filenames, obsInput, o_calc, O);
-         obsSimple.push_back(O);
+                                obs_filenames, obsInput, o_calc, OO);
+         obsSimple.push_back(OO);
       }
    }
 
-   for (int fi=0; fi<NCONV; ++fi) {
+   // Note at this point we know the compare index arrays are the same length for fcst
+   // and obs
+
+   for (size_t fi=0; fi<fcstSimple.size(); ++fi) {
       int oi = fi;
-      //
+
       // Filter the data to within the superobjects only and do statistics by invoking mode
       // algorithm again on the masked data pairs
-      //
-      // Note at this point we know the compare index arrays are the same length for fcst
-      // and obs
-      //
+
       for (int k=0; k<config.fcst_multivar_compare_index.n(); ++k)
       {
          int findex = config.fcst_multivar_compare_index[k] - 1;
@@ -171,9 +161,8 @@ int MultivarFrontEnd::run(const StringArray & Argv)
                                        fcst_filenames[findex], obs_filenames[oindex]);
       }
 
-      //
       // special case of just superobject statistics, no comparisons configured
-      //
+
       if (config.fcst_multivar_compare_index.n() <= 0) {
          _process_superobjects(fcstSimple[fi], obsSimple[oi]);
       }
@@ -594,8 +583,6 @@ void MultivarFrontEnd::_simple_objects(ModeExecutive::Processing_t p,
 void MultivarFrontEnd::_simple_mode_algorithm(ModeExecutive::Processing_t p,
                                               int rIndex, int tIndex) const
 {
-   // int NCT, NCR;
-   // _mode_algorithm_init(NCT, NCR);
    mode_exec->clear_internal_r_index();
    mode_exec->do_conv_thresh_multivar_simple(p, rIndex, tIndex);
    mode_exec->clear_internal_r_index();
@@ -609,11 +596,6 @@ void MultivarFrontEnd::_simple_mode_algorithm(ModeExecutive::Processing_t p,
 void
 MultivarFrontEnd::_create_intensity_comparisons(SimpleObjects &fcsts, int findex,
                                                 SimpleObjects &obs, int oindex,
-                                                //int rIndexF, int tIndexF, int findex,
-                                                //int rIndexO, int tIndexO, int oindex,
-                                                //const ModeSuperObject &fsuper,
-                                                //const ModeSuperObject &osuper,
-                                                //MultiVarData &mvdf, MultiVarData &mvdo,
                                                const string &fcst_filename,
                                                const string &obs_filename)
 {
@@ -673,8 +655,6 @@ MultivarFrontEnd::_intensity_compare_mode_algorithm(int rIndexF, int tIndexF,
                                                     const ModeSuperObject &fsuper,
                                                     const ModeSuperObject &osuper)
 {
-   // int NCT, NCR;
-   // _mode_algorithm_init(NCT, NCR);
    mode_exec->do_conv_thresh_multivar_intensity_compare(rIndexF, tIndexF, rIndexO, tIndexO);
    mode_exec->do_match_merge_multivar(fsuper._merge_sd_split, osuper._merge_sd_split,
                                       ModeExecutive::MULTIVAR_INTENSITY);
@@ -744,8 +724,6 @@ MultivarFrontEnd::_superobject_mode_algorithm(int rIndexF, int tIndexF,
                                               const ModeSuperObject &osuper)
 
 {
-   // int NCT, NCR;
-   // _mode_algorithm_init(NCT, NCR);
    mode_exec->clear_internal_r_index();
    mode_exec->do_conv_thresh_multivar_super(rIndexF, tIndexF, rIndexO, tIndexO);
    mode_exec->do_match_merge_multivar(fsuper._merge_sd_split, osuper._merge_sd_split,

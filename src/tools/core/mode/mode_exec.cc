@@ -904,9 +904,6 @@ void ModeExecutive::do_conv_thresh_multivar_intensity_compare(int rIndexF, int t
 
 void ModeExecutive::do_conv_thresh_multivar_simple(Processing_t p, int rIndex, int tIndex)
 {
-   // R_index = convIndex;
-   // T_index = convIndex;
-
    ModeConfInfo & conf = engine.conf_info;
    bool obs = conf.data_type == ModeDataType::MvMode_Obs;
    string what;
