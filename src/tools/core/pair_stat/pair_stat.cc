@@ -57,8 +57,6 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-#define BUFFER_SIZE (DEF_NC_BUFFER_SIZE/2)
-
 static void process_command_line(int, char **);
 static void setup_first_pass(const DataPlane &, const Grid &);
 
@@ -693,7 +691,6 @@ void process_ioda_pairs(const ConcatString &file_name) {
 #endif
 
    // Perform GRIB table lookups, if needed
-   if(!use_var_id) conf_info.process_grib_codes();
    is_vgrd = is_ugrd = false;
 
    int hdr_count = met_point_obs->get_hdr_cnt();
@@ -982,8 +979,7 @@ void process_scores() {
                   write_mpr_row(shc, pd_ptr,
                      conf_info.vx_opt[i_vx].output_flag[i_mpr],
                      stat_at, i_stat_row,
-                     txt_at[i_mpr], i_txt_row[i_mpr],
-                     conf_info.obtype_as_group_val_flag);
+                     txt_at[i_mpr], i_txt_row[i_mpr], false);
 
                   // Reset the obtype column
                   shc.set_obtype(conf_info.vx_opt[i_vx].msg_typ[i_msg_typ].c_str());
@@ -998,8 +994,7 @@ void process_scores() {
                   write_seeps_mpr_row(shc, pd_ptr,
                      conf_info.vx_opt[i_vx].output_flag[i_seeps_mpr],
                      stat_at, i_stat_row,
-                     txt_at[i_seeps_mpr], i_txt_row[i_seeps_mpr],
-                     conf_info.obtype_as_group_val_flag);
+                     txt_at[i_seeps_mpr], i_txt_row[i_seeps_mpr], false);
 
                   // Reset the obtype column
                   shc.set_obtype(conf_info.vx_opt[i_vx].msg_typ[i_msg_typ].c_str());
@@ -1848,8 +1843,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          write_orank_row(shc, &hira_pd,
             conf_info.vx_opt[i_vx].output_flag[i_orank],
             stat_at, i_stat_row,
-            txt_at[i_orank], i_txt_row[i_orank],
-            conf_info.obtype_as_group_val_flag);
+            txt_at[i_orank], i_txt_row[i_orank], false);
   
          // Reset the obtype column
          shc.set_obtype(pd_ptr->msg_typ.c_str());
@@ -2044,9 +2038,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
             write_mpr_row(shc, &hira_pd,
                conf_info.vx_opt[i_vx].output_flag[i_mpr],
                stat_at, i_stat_row,
-               txt_at[i_mpr], i_txt_row[i_mpr],
-               conf_info.obtype_as_group_val_flag,
-               false);
+               txt_at[i_mpr], i_txt_row[i_mpr], false, false);
 
             // Reset the obtype column
             shc.set_obtype(pd_ptr->msg_typ.c_str());

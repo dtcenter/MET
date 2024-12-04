@@ -79,9 +79,6 @@ PairStatConfInfo::~PairStatConfInfo() {
 
 void PairStatConfInfo::init_from_scratch() {
 
-   // Initialize pointers
-   vx_opt = (PairStatVxOpt *) nullptr;
-
    clear();
 
    return;
@@ -93,13 +90,12 @@ void PairStatConfInfo::clear() {
 
    // Initialize values
    model.clear();
-   grib_codes_set = false;
+   vx_opt.clear();
    land_mask.clear();
    topo_dp.clear();
    topo_use_obs_thresh.clear();
    topo_interp_fcst_thresh.clear();
    msg_typ_group_map.clear();
-   obtype_as_group_val_flag = false;
    mask_area_map.clear();
    mask_sid_map.clear();
    point_weight_flag = PointWeightType::None;
@@ -108,9 +104,6 @@ void PairStatConfInfo::clear() {
    version.clear();
    seeps_climo_name.clear();
    seeps_p1_thresh.clear();
-
-   // Deallocate memory
-   if(vx_opt) { delete [] vx_opt; vx_opt = (PairStatVxOpt *) nullptr; }
 
    // Set count to zero
    n_vx = 0;
@@ -163,10 +156,6 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
    // Conf: message_type_group_map
    msg_typ_group_map = parse_conf_message_type_group_map(&conf);
 
-   // Conf: obtype_as_group_val_flag
-   obtype_as_group_val_flag =
-      conf.lookup_bool(conf_key_obtype_as_group_val_flag);
-
    // Conf: fcst.field and obs.field
    fdict = conf.lookup_array(conf_key_fcst_field);
    odict = conf.lookup_array(conf_key_obs_field);
@@ -187,7 +176,7 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
 
    // Allocate memory for the verification task options
    n_vx   = n_fvx;
-   vx_opt = new PairStatVxOpt [n_vx];
+   vx_opt.resize(n_vx);
 
    // Check for consistent number of climatology fields
    check_climo_n_vx(fdict, n_vx);
@@ -298,32 +287,6 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
          }
       } // end for i
    } // end if
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairStatConfInfo::process_grib_codes() {
-
-   // Only needs to be set once
-   if(grib_codes_set) return;
-
-   mlog << Debug(3) << "Processing each \"" << conf_key_obs_field
-        << "\" name as a GRIB code abbreviation since the point "
-        << "observations are specified as GRIB codes.\n";
-
-   Dictionary *odict = conf.lookup_array(conf_key_obs_field);
-   Dictionary i_odict;
-
-   // Add the GRIB code by parsing each observation dictionary
-   for(int i=0; i<n_vx; i++) {
-      i_odict = parse_conf_i_vx_dict(odict, i);
-      vx_opt[i].vx_pd.obs_info->add_grib_code(i_odict);
-   }
-
-   // Flag to prevent processing more than once
-   grib_codes_set = true;
 
    return;
 }

@@ -242,8 +242,7 @@ class PairStatConfInfo {
       // Store data parsed from the Pair-Stat configuration object
       ConcatString model;                   // Model name
 
-      PairStatVxOpt * vx_opt;              // Array of vx task options [n_vx] (allocated)
-      bool             grib_codes_set;
+      std::vector<PairStatVxOpt> vx_opt;    // Vector of vx options [n_vx]
 
       // Land/sea mask and topography info for data filtering
       MaskPlane    land_mask;
@@ -251,15 +250,14 @@ class PairStatConfInfo {
       SingleThresh topo_use_obs_thresh;
       SingleThresh topo_interp_fcst_thresh;
 
-      // Message type groups that should be processed together
+      // Message type groups
       std::map<ConcatString,StringArray> msg_typ_group_map;
-      bool                               obtype_as_group_val_flag;
 
       // Mapping of mask names to DataPlanes
-      std::map<ConcatString,MaskPlane>   mask_area_map;
+      std::map<ConcatString,MaskPlane> mask_area_map;
 
       // Mapping of mask names to Station ID lists
-      std::map<ConcatString,MaskSID>     mask_sid_map;
+      std::map<ConcatString,MaskSID> mask_sid_map;
 
       PointWeightType point_weight_flag;    // Point weighting flag
 
@@ -280,7 +278,6 @@ class PairStatConfInfo {
       void read_config(const StringArray &);
 
       void process_config(PairsFormat);
-      void process_grib_codes();
       void process_flags();
       void process_masks();
       void process_geog();

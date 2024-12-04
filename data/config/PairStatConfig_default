@@ -14,49 +14,21 @@ model = "";
 
 //
 // Output description to be written
-// May be set separately in each "pairs" entry
+// Non-empty string overrides input data values
+// May be set separately in each "obs.pairs" entry
 //
-desc = "NA";
+desc = "";
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// May be set separately in each "pairs" entry
-//
-censor_thresh  = [];
-censor_val     = [];
-mpr_column     = [];
-mpr_thresh     = [];
-cat_thresh     = [ NA ];
-cnt_thresh     = [ NA ];
-cnt_logic      = UNION;
-wind_thresh    = [ NA ];
-wind_logic     = UNION;
-eclv_points    = 0.05;
-hss_ec_value   = NA;
-rank_corr_flag = FALSE;
-
-//
 // Forecast and observation pairs to be verified
-// Parse "pairs" like we'd parse "field", supporting things like set_attr_name
 //
-
-pairs = [
-  { fcst_name = , obs_name = , filters },
-  { },
-
-]
-
-
 fcst = {
   pairs = [
     {
-      name = "TMP"; level = "P100-1000"... P100, P200, XXX P1100 // IODA forecast variable name or comma-separated list of FCST_VAR names
-      filter_str_inc = [ { name = "FCST_LEVEL"; value = "P100,P200,P300"; } ];
-      filter_str_exc = [ { name = ""; value  = ""; } ];
-      filter_thresh  = [ { name = ""; thresh = NA; } ];
-      cat_thresh = [ >273, >283 ];
-      cnt_thresh = [ NA, >273 ];
+      name  = "TMP";
+      level = [ "Z2" ];
     }
   ];
 }
@@ -64,12 +36,8 @@ fcst = {
 obs = {
   pairs = [
     {
-      name = "TMP"; // IODA observation variable name or comma-separated list of OBS_VAR names
-      filter_str_inc = [ { name = "OBS_LEVEL"; value  = "Z2"; } ];
-      filter_str_exc = [ { name = ""; value  = ""; } ];
-      filter_thresh  = [ { name = ""; thresh = NA; } ];
-      cat_thresh = [ >273, >283 ];
-      cnt_thresh = [ NA, >273 ];
+      name = "TMP";
+      level = [ "Z2" ];
     }
   ];
 }
@@ -77,34 +45,42 @@ obs = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Point observation filtering options
-// May be set separately in each "obs.field" entry
+// Forecast and observation data censoring, thresholding, and filtering options
+// May be set separately in each "fcst.pairs" or "obs.pairs" entry
 //
-message_type   = [ "ADPUPA" ];
-sid_inc        = [];
-sid_exc        = [];
-obs_quality_inc  = [];
-obs_quality_exc  = [];
-duplicate_flag = NONE;
-obs_summary    = NONE;
-obs_perc_value = 50;
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [ NA ];
+cnt_thresh    = [ NA ];
+cnt_logic     = UNION;
+wind_thresh   = [ NA ];
+wind_logic    = UNION;
 
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Matched pairs filtering and control options
+// May be set separately in each "obs.pairs" entry
+//
+mpr_column     = [];
+mpr_thresh     = [];
+mpr_str_inc    = [];   // TODO: new for string inclusion
+mpr_str_exc    = [];   // TODO: new for string exclusion
+mpr_summary    = NONE; // TODO: new for multiple pairs in the time window
+eclv_points    = 0.05;
+hss_ec_value   = NA;
+rank_corr_flag = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Climatology mean data
 // May be set separately in the "fcst" and "obs" dictionaries
 //
 climo_mean = {
 
    file_name = [];
    field     = [];
-
-   regrid = {
-      method     = NEAREST;
-      width      = 1;
-      vld_thresh = 0.5;
-      shape      = SQUARE;
-   }
 
    time_interp_method = DW_MEAN;
    day_interval       = 31;
@@ -122,7 +98,7 @@ climo_stdev = {
 
 //
 // Climatology distribution settings
-// May be set separately in each "obs.field" entry
+// May be set separately in each "obs.pairs" entry
 //
 climo_cdf = {
    cdf_bins    = 1;
@@ -137,7 +113,7 @@ climo_cdf = {
 // Land/Sea mask
 // For LANDSF message types, only use forecast grid points where land = TRUE.
 // For WATERSF message types, only use forecast grid points where land = FALSE.
-// land_mask.flag may be set separately in each "obs.field" entry.
+// land_mask.flag may be set separately in each "obs.pairs" entry.
 //
 land_mask = {
    flag      = FALSE;
@@ -154,7 +130,7 @@ land_mask = {
 // For the observations kept, when interpolating forecast data to the
 // observation location, only use forecast grid points where the topo - station
 // difference meets the interp_fcst_thresh threshold.
-// topo_mask.flag may be set separately in each "obs.field" entry.
+// topo_mask.flag may be set separately in each "obs.pairs" entry.
 //
 topo_mask = {
    flag               = FALSE;
@@ -169,7 +145,7 @@ topo_mask = {
 
 //
 // Point observation time window
-// May be set separately in each "obs.field" entry
+// May be set separately in each "obs.pairs" entry
 //
 obs_window = {
    beg = -5400;
@@ -180,7 +156,7 @@ obs_window = {
 
 //
 // Verification masking regions
-// May be set separately in each "obs.field" entry
+// May be set separately in each "obs.pairs" entry
 //
 mask = {
    grid  = [ "FULL" ];
@@ -193,7 +169,7 @@ mask = {
 
 //
 // Confidence interval settings
-// May be set separately in each "obs.field" entry
+// May be set separately in each "obs.pairs" entry
 //
 ci_alpha  = [ 0.05 ];
 
@@ -216,7 +192,7 @@ seeps_p1_thresh = >=0.1&&<=0.85;
 
 //
 // Statistical output types
-// May be set separately in each "obs.field" entry
+// May be set separately in each "obs.pairs" entry
 //
 output_flag = {
    fho    = NONE;
@@ -234,9 +210,6 @@ output_flag = {
    pstd   = NONE;
    pjc    = NONE;
    prc    = NONE;
-   ecnt   = NONE; // Only for HiRA.
-   orank  = NONE; // Only for HiRA.
-   rps    = NONE; // Only for HiRA.
    eclv   = NONE;
    mpr    = NONE;
    seeps  = NONE;
@@ -246,7 +219,7 @@ output_flag = {
 ////////////////////////////////////////////////////////////////////////////////
 
 point_weight_flag = NONE;
- 
+
 tmp_dir       = "/tmp";
 output_prefix = "";
 version       = "V12.0.0";
