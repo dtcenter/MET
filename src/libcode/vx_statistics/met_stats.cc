@@ -3820,7 +3820,6 @@ void GRADInfo::set(int grad_dx, int grad_dy,
       wgt = wgt_na[i]/wgt_sum;
 
       // Gradient sums
-      // JHG, I suspect this implementation may be very wrong!
       fgbar += wgt * (fabs(fgx_na[i]) + fabs(fgy_na[i]));
       ogbar += wgt * (fabs(ogx_na[i]) + fabs(ogy_na[i]));
       mgbar += wgt * (max(fabs(fgx_na[i]), fabs(ogx_na[i])) +
@@ -3829,6 +3828,11 @@ void GRADInfo::set(int grad_dx, int grad_dy,
                       fabs(fgy_na[i] - ogy_na[i]));
 
       // Gradient vector magnitude 
+      // Reference:
+      //   Ebert-Uphoff, I.: An Investigation of Metrics to Evaluate the Sharpness in
+      //     AI-Generated Meteorology Imagery
+      //     Draft version, Jan 26, 2024
+
       double fmag = square_root(fgx_na[i] * fgx_na[i] + fgy_na[i] * fgy_na[i]);
       double omag = square_root(ogx_na[i] * ogx_na[i] + ogy_na[i] * ogy_na[i]);
  
@@ -3836,8 +3840,7 @@ void GRADInfo::set(int grad_dx, int grad_dy,
       fgmag += wgt * fmag;
       ogmag += wgt * omag;
       mag_mse += wgt * (fmag - omag)*(fmag - omag);
-      // TODO: confirm the algorithm for laplace_rmse
-      double diff = (fgx_na[i] + fgy_na[i]) - (ogx_na[i] - ogy_na[i]);
+      double diff = (fgx_na[i] + fgy_na[i]) - (ogx_na[i] + ogy_na[i]);
       lap_mse += wgt * (diff * diff);
       total++;
    }
