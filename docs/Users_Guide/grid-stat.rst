@@ -98,6 +98,13 @@ The S1 score has been in historical use for verification of forecasts, particula
 
 Differences are computed in both of the horizontal grid directions and is not a true mathematical gradient. Because the S1 score focuses on differences only, any bias in the forecast will not be measured. Further, the score depends on the domain and spacing of the grid, so can only be compared on forecasts with identical grids.
 
+As described in :ref:`Ebert-Uphoff et al., 2024 <Ebert-Uphoff-2024>`, statistics based
+on the magnitude of the forecast and observed gradients are also provided. Similiar to
+the S1 score, the root-mean-squared error the magnitude of the gradients and their
+divergence quantify the similarity in the texture of the fields, with 0 being a perfect
+score. These gradient-based statistics assess the difference in smoothness between the
+two fields but not the accuracy of the forecast.
+
 Distance Maps
 -------------
 
