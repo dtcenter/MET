@@ -739,7 +739,7 @@ These statistics require climatological values for the wind vector components, w
 Gradient Values
 ---------------
 
-Called "TOTAL", "FGBAR", "OGBAR", "MGBAR", "EGBAR", "S1", "S1_OG", and "FGOG_RATIO" in GRAD output :numref:`table_GS_format_info_GRAD`
+Called "TOTAL", "FGBAR", "OGBAR", "MGBAR", "EGBAR", "S1", "S1_OG", "FGOG_RATIO", "FGMAG", "OGMAG", "MAG_RMSE", and "LAPLACE_RMSE" in GRAD output :numref:`table_GS_format_info_GRAD`
 
 These statistics are only computed by the Grid-Stat tool and require vectors. Here :math:`\nabla` is the gradient operator, which in this applications signifies the difference between adjacent grid points in both the grid-x and grid-y directions. TOTAL is the count of grid locations used in the calculations. The remaining measures are defined below:
 
@@ -778,6 +778,20 @@ where the weights are applied at each grid location, with values assigned accord
 
     \text{FGOG_RATIO} = \frac{\text{FGBAR}}{\text{OGBAR}}
 
+The following statistics are computed using the magnitude of the vectors formed by the forecast and observation gradients in the grid-x and grid-y directions.
+
+.. math::
+  \text{FGMAG} = \text{Mean}(|| \nabla f ||) = \frac{1}{n} \sum_{i=1}^n \sqrt{\nabla {f_x}_i^2 + \nabla {f_y}_i^2}
+
+  \text{OGMAG} = \text{Mean}(|| \nabla o ||) = \frac{1}{n} \sum_{i=1}^n \sqrt{\nabla {o_x}_i^2 + \nabla {o_y}_i^2}
+
+  \text{MAG_RMSE} = \sqrt{ \frac{1}{n} \sum_{i=1}^n {(|| \nabla f_i || - || \nabla o_i ||)}^2 }
+
+Laplace RMSE is very similar to gradient RMSE, but instead of taking the magnitude of the gradient vector at each
+point, we compute the divergence of the gradient.
+
+.. math::
+  \text{LAPLACE_RMSE} = \sqrt{ \frac{1}{n} \sum_{i=1}^n { ((\nabla {f_x}_i + \nabla {f_y}_i) - (\nabla {o_x}_i + \nabla {o_y}_i))^2 }}
 
 MET Verification Measures for Probabilistic Forecasts
 =====================================================
