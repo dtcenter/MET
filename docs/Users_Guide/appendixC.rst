@@ -785,13 +785,32 @@ The following statistics are computed using the magnitude of the vectors formed 
 
   \text{OGMAG} = \text{Mean}(|| \nabla o ||) = \frac{1}{n} \sum_{i=1}^n \sqrt{\nabla {o_x}_i^2 + \nabla {o_y}_i^2}
 
-  \text{MAG_RMSE} = \sqrt{ \frac{1}{n} \sum_{i=1}^n {(|| \nabla f_i || - || \nabla o_i ||)}^2 }
+.. only:: latex
+
+  .. math::
+
+    \text{MAG\_RMSE} = \sqrt{ \frac{1}{n} \sum_{i=1}^n {(|| \nabla f_i || - || \nabla o_i ||)}^2 }
+
+.. only:: html
+
+  .. math::
+
+    \text{MAG_RMSE} = \sqrt{ \frac{1}{n} \sum_{i=1}^n {(|| \nabla f_i || - || \nabla o_i ||)}^2 }
 
 Laplace RMSE is very similar to gradient RMSE, but instead of taking the magnitude of the gradient vector at each
 point, we compute the divergence of the gradient.
 
-.. math::
-  \text{LAPLACE_RMSE} = \sqrt{ \frac{1}{n} \sum_{i=1}^n { ((\nabla {f_x}_i + \nabla {f_y}_i) - (\nabla {o_x}_i + \nabla {o_y}_i))^2 }}
+.. only:: latex
+
+  .. math::
+
+    \text{LAPLACE\_RMSE} = \sqrt{ \frac{1}{n} \sum_{i=1}^n { ((\nabla {f_x}_i + \nabla {f_y}_i) - (\nabla {o_x}_i + \nabla {o_y}_i))^2 }}
+
+.. only:: html
+
+  .. math::
+
+    \text{LAPLACE_RMSE} = \sqrt{ \frac{1}{n} \sum_{i=1}^n { ((\nabla {f_x}_i + \nabla {f_y}_i) - (\nabla {o_x}_i + \nabla {o_y}_i))^2 }}
 
 MET Verification Measures for Probabilistic Forecasts
 =====================================================
