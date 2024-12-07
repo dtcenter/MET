@@ -93,34 +93,41 @@ int MultivarFrontEnd::run(const StringArray & Argv)
    // Define the verification grid using the 0th fcst and obs inputs
    _create_verif_grid();
 
-   // in the implementation now, all 4 of these numbers must be the same
+   // in the implementation now, all 4 of these numbers must be the same without quilting
+   // and NCTF must equal NCTO, NCRF must equal NCRO with quilting
    int NCTF = config.n_conv_threshs_fcst();
    int NCRF = config.n_conv_radii_fcst();
    int NCTO = config.n_conv_threshs_obs();
    int NCRO = config.n_conv_radii_obs();
 
-   if ( NCTF != NCRF || NCTO != NCRO)  {
+   if (NCTF != NCTO) {
       mlog << Error << "\nMultivarFrontEnd::run() ->"
-           << "all convolution radius and threshold arrays must have the same number of elements\n\n";
-
+           << "all convolution threshold arrays must have the same number of elements\n\n";
       exit ( 1 );
    }
-   if (NCRO != NCRF) {
+   if (NCRF != NCRO) {
       mlog << Error << "\nMultivarFrontEnd::run() ->"
-           << "Unequal number of forecast and obs convolution radii not yet supported\n\n";
+           << "all convolution radius arrays must have the same number of elements\n\n";
       exit ( 1 );
    }
 
-   // the single number of convolution parameter choices shared by all inputs
-   int NCONV = NCRO;
+   if ((!config.quilt) && NCTF != NCRF || NCTO != NCRO) {
+      mlog << Error << "\nMultivarFrontEnd::run() ->"
+           << "all convolution radius and threshold arrays must have the same number of elements without quilting\n\n";
+      exit ( 1 );
+   }
+
+   // the numbers to use
+   int NT = NCTF;
+   int NR = NCRF;
    
    // containers for information needed to do additional things with simple objects after creation
    vector<SimpleObjects> fcstSimple, obsSimple;
 
    // create simple objects for all convolution settings
    if (config.quilt) {
-      for (int ir=0; ir<NCONV; ++ir) {
-         for (int it=0; it<NCONV; ++it) {
+      for (int ir=0; ir<NR; ++ir) {
+         for (int it=0; it<NT; ++it) {
             SimpleObjects OF, OO;
             _create_simple_objects(ModeDataType::MvMode_Fcst, "forecast", ir, it, n_fcst_files,
                                    fcst_filenames, fcstInput, f_calc, OF);
@@ -132,7 +139,7 @@ int MultivarFrontEnd::run(const StringArray & Argv)
       }
    }
    else {
-      for (int ir=0; ir<NCONV; ++ir) {
+      for (int ir=0; ir<NR; ++ir) {
          SimpleObjects OF, OO;
          _create_simple_objects(ModeDataType::MvMode_Fcst, "forecast", ir, ir, n_fcst_files,
                                 fcst_filenames, fcstInput, f_calc, OF);
@@ -522,7 +529,8 @@ void MultivarFrontEnd::_create_simple_objects(ModeDataType dtype, const std::str
    for (int j=0; j<n_files; ++j)  {
       mlog << Debug(2) 
            << "\n" << sep << "\ncreating simple " << name << " objects from " << name << " "
-           << (j + 1) << " of " << n_files << "\n" << sep << "\n";
+           << (j + 1) << " of " << n_files << "\nconv_radius[" << rIndex+1 << "] conv_thresh["
+           << tIndex+1 << "]\n" << sep << "\n";
       MultiVarData *mvdi = _create_simple_multivar_data(dtype, rIndex, tIndex, j, n_files, 
                                                         filenames[j], input[j]);
       mvdi->print();
@@ -668,17 +676,7 @@ MultivarFrontEnd::_intensity_compare_mode_algorithm(int rIndexF, int tIndexF,
 
 ////////////////////////////////////////////////////////////////////////
 
-// void MultivarFrontEnd::_process_superobjects(int rIndexF, int tIndexF,
-//                                             int rIndexO, int tIndexO,
-//                                             ModeSuperObject &fsuper,
-//                                             ModeSuperObject &osuper,
-//                                             const MultiVarData &mvdf,
-//                                             const MultiVarData &mvdo)
 void MultivarFrontEnd::_process_superobjects(SimpleObjects &fcsts, SimpleObjects &obs)
-         // _process_superobjects(fcstSimple[fi]._rIndex, fcstSimple[fi]._tIndex,
-         //                       obsSimple[oi]._rIndex, obsSimple[oi]._tIndex,
-         //                       fcstSimple[fi]._super, obsSimple[oi]._super,
-         //                       *(fcstSimple[fi]._mvd[0]), *(fcstSimple[oi]._mvd[0]));
 {
    mlog << Debug(1) << "Running superobject mode \n\n";
 

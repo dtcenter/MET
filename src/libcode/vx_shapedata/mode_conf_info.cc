@@ -1831,84 +1831,90 @@ void ModeConfInfo::check_multivar_not_implemented()
    }
 
    bool status = false;
-   // if (quilt) {
-   //    mlog << Error
-   //         << "\nModeConfInfo::check_multivar_not_implemented():\n"
-   //         << "  quilting not yet implemented for multivar mode\n\n";
-   //    status = true;
-   // }
+
+   // All inputs must have the same number of convolution radii
+   // All inputs must have the same number of convolution thresholds
+   // Without quilting, the radii/thresh array lengths must be the same
    
-   int nForFcst = 0;
-   int nForObs = 0;
+
+   int nRForFcst = 0;
+   int nRForObs = 0;
+   int nTForFcst = 0;
+   int nTForObs = 0;
    for (int i=0; i<N_fields_f; ++i) {
-      //if (data_type != ModeDataType::MvMode_Obs) {
-         if (fcst_array[i].merge_flag == MergeType::Both || fcst_array[i].merge_flag == MergeType::Engine)
-         {
+      if (fcst_array[i].merge_flag == MergeType::Both || fcst_array[i].merge_flag == MergeType::Engine)
+      {
+         mlog << Error
+              << "\nModeConfInfo::check_multivar_not_implemented():\n"
+              << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
+         status = true;
+      }
+      if (i == 0) {
+         nTForFcst = fcst_array[i].conv_thresh_array.n();
+         nRForFcst = fcst_array[i].conv_radius_array.n_elements();
+      }
+      int nti = fcst_array[i].conv_thresh_array.n();
+      int nri = fcst_array[i].conv_radius_array.n_elements();
+      if (nti != nTForFcst || nri != nRForFcst)  {
+         mlog << Error
+              << "\nModeConfInfo::check_multivar_not_implemented():\n"
+              << "  Unequal array lengths for conv_thresh or conv_radii not allowed in multivariate mode\n\n";
+         status = true;
+      }
+      if (fcst_array[i].merge_flag != MergeType::None) {
+         int nmi = fcst_array[i].merge_thresh_array.n();
+         if (nmi != nTForFcst) {
             mlog << Error
                  << "\nModeConfInfo::check_multivar_not_implemented():\n"
-                 << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
+                 << "  Unequal array lengths for merge_thresh not allowed in multivariate mode\n\n";
             status = true;
-         }
-         if (i == 0) {
-            nForFcst = fcst_array[i].conv_thresh_array.n();
-         }
-         int nti = fcst_array[i].conv_thresh_array.n();
-         int nri = fcst_array[i].conv_radius_array.n_elements();
-         if (nti != nForFcst || nri != nForFcst)  {
-            mlog << Error
-                 << "\nModeConfInfo::check_multivar_not_implemented():\n"
-                 << "  Unequal array lengths for conv_thresh or conv_radii not allowed in multivariate mode\n\n";
-            status = true;
-         }
-         if (fcst_array[i].merge_flag != MergeType::None) {
-            int nmi = fcst_array[i].merge_thresh_array.n();
-            if (nmi != nForFcst) {
-               mlog << Error
-                    << "\nModeConfInfo::check_multivar_not_implemented():\n"
-                    << "  Unequal array lengths for merge_thresh not allowed in multivariate mode\n\n";
-               status = true;
-            }               
-         }
+         }               
+      }
    }
    for (int i=0; i<N_fields_o; ++i) {
-      //if (data_type != ModeDataType::MvMode_Fcst) {
-         if (obs_array[i].merge_flag == MergeType::Both || obs_array[i].merge_flag == MergeType::Engine) {
+      if (obs_array[i].merge_flag == MergeType::Both || obs_array[i].merge_flag == MergeType::Engine) {
+         mlog << Error
+              << "\nModeConfInfo::check_multivar_not_implemented():\n"
+              << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
+         status = true;
+         break;
+      }
+      if (i == 0) {
+         nTForObs = obs_array[i].conv_thresh_array.n();
+         nRForObs = obs_array[i].conv_radius_array.n_elements();
+      }
+      int nti = obs_array[i].conv_thresh_array.n();
+      int nri = obs_array[i].conv_radius_array.n_elements();
+      if (nti != nTForObs || nri != nRForObs)  {
+         mlog << Error
+              << "\nModeConfInfo::check_multivar_not_implemented():\n"
+              << "  Unequal array lengths for conv_thresh or conv_radii not allowed in multivariate mode\n\n";
+         status = true;
+      }
+      if (obs_array[i].merge_flag != MergeType::None) {
+         int nmi = obs_array[i].merge_thresh_array.n();
+         if (nmi != nTForObs) {
             mlog << Error
                  << "\nModeConfInfo::check_multivar_not_implemented():\n"
-                 << "  merge_flag ENGINE or BOTH not implemented for multivariate mode\n\n";
+                 << "  Unequal array lengths for merge_thresh not allowed in multivariate mode\n\n";
             status = true;
-            break;
-         }
-         if (i == 0) {
-            nForObs = obs_array[i].conv_thresh_array.n();
-         }
-         int nti = obs_array[i].conv_thresh_array.n();
-         int nri = obs_array[i].conv_radius_array.n_elements();
-         if (nti != nForObs || nri != nForObs)  {
-            mlog << Error
-                 << "\nModeConfInfo::check_multivar_not_implemented():\n"
-                 << "  Unequal array lengths for conv_thresh or conv_radii not allowed in multivariate mode\n\n";
-            status = true;
-         }
-         if (obs_array[i].merge_flag != MergeType::None) {
-            int nmi = obs_array[i].merge_thresh_array.n();
-            if (nmi != nForObs) {
-               mlog << Error
-                    << "\nModeConfInfo::check_multivar_not_implemented():\n"
-                    << "  Unequal array lengths for merge_thresh not allowed in multivariate mode\n\n";
-               status = true;
-            }               
-         }
-         // if (obs_array[i].conv_thresh_array.n() > 1 || obs_array[i].merge_thresh_array.n() > 1) {
-         //    mlog << Error
-         //         << "\nModeConfInfo::check_multivar_not_implemented():\n"
-         //         << "  more than one conv_thresh or merge_thresh per input is not allowed in multivariate mode\n\n";
-         //    status = true;
-         // }
-         //}
+         }               
+      }
    }
 
-   if (!quilt && (nForObs != nForFcst)) {
+   if (nTForObs != nTForFcst) {
+      mlog << Error
+           << "\nModeConfInfo::check_multivar_not_implemented():\n"
+           << "  Obs convolution thresh/radius arrays must have the same number of elements as Fcst thresh/radius arrays\n\n";
+      status = true;
+   }      
+   if (nRForObs != nRForFcst) {
+      mlog << Error
+           << "\nModeConfInfo::check_multivar_not_implemented():\n"
+           << "  Obs convolution thresh/radius arrays must have the same number of elements as Fcst thresh/radius arrays\n\n";
+      status = true;
+   }      
+   if (!quilt && (nTForObs != nRForObs)) {
       mlog << Error
            << "\nModeConfInfo::check_multivar_not_implemented():\n"
            << "  Obs convolution thresh/radius arrays must have the same number of elements as Fcst thresh/radius arrays unless quilt=true\n\n";
@@ -1922,7 +1928,6 @@ void ModeConfInfo::check_multivar_not_implemented()
       exit ( 1 );
    }
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 

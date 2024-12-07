@@ -821,16 +821,17 @@ void ModeExecutive::do_conv_thresh_multivar_super(int rIndexF, int tIndexF,
 
    ModeConfInfo & conf = engine.conf_info;
 
-   // R_index = convIndex;
-   // T_index = convIndex;
+   R_index = rIndexF;
+   T_index = tIndexF;
 
    SingleThresh s("ne-9999");
    conf.set_fcst_conv_thresh(s);
    conf.set_fcst_conv_radius(0.0);
-   conf.set_fcst_merge_thresh_by_index(tIndexF);
+   conf.set_fcst_merge_thresh(s);
+   //conf.set_fcst_merge_thresh_by_index(0);
    conf.set_obs_conv_thresh(s);
    conf.set_obs_conv_radius(0.0);
-   conf.set_obs_merge_thresh_by_index(tIndexO);
+   conf.set_obs_merge_thresh(s);//_by_index(0);
 
    //
    //  Set up the engine with these raw fields
