@@ -64,7 +64,7 @@ int MultivarFrontEnd::run(const StringArray & Argv)
 
    _init(Argv);
 
-   mlog << Debug(2) << "\n" << sep << "\n";
+   mlog << Debug(1) << "\n" << sep << "\n";
 
    // in the conf object, shift *can* be set independently for obs and fcst
    int shift = config.shift_right;
@@ -175,7 +175,7 @@ int MultivarFrontEnd::run(const StringArray & Argv)
       }
    }
    
-   mlog << Debug(2) << "\n finished with multivar intensity comparisons \n" << sep << "\n";
+   mlog << Debug(1) << "\n finished with multivar intensity comparisons \n" << sep << "\n";
 
    // clear out memory stored in the simple objects
    
@@ -509,7 +509,7 @@ void MultivarFrontEnd::_read_input(const string &name, int index, ModeDataType t
 
 void MultivarFrontEnd::_create_verif_grid()
 {
-   mlog << Debug(2) << "\n creating the verification grid \n" << sep << "\n";
+   mlog << Debug(1) << "\n creating the verification grid \n" << sep << "\n";
 
    _init_exec(ModeExecutive::TRADITIONAL, "None", "None");
    mode_exec->setup_verification_grid(fcstInput[0], obsInput[0], config);
@@ -527,9 +527,9 @@ void MultivarFrontEnd::_create_simple_objects(ModeDataType dtype, const std::str
 {
    O.init(dtype, rIndex, tIndex);
    for (int j=0; j<n_files; ++j)  {
-      mlog << Debug(2) 
+      mlog << Debug(1) 
            << "\n" << sep << "\ncreating simple " << name << " objects from " << name << " "
-           << (j + 1) << " of " << n_files << "\nconv_radius[" << rIndex+1 << "] conv_thresh["
+           << (j + 1) << " of " << n_files << " conv_radius[" << rIndex+1 << "] conv_thresh["
            << tIndex+1 << "]\n" << sep << "\n";
       MultiVarData *mvdi = _create_simple_multivar_data(dtype, rIndex, tIndex, j, n_files, 
                                                         filenames[j], input[j]);
@@ -614,7 +614,11 @@ MultivarFrontEnd::_create_intensity_comparisons(SimpleObjects &fcsts, int findex
    fcsts._super.mask_data_simple("Fcst", *mvdf);
    obs._super.mask_data_simple("Obs", *mvdo);
 
-   mlog << Debug(1) << "Running mvmode intensity comparisions \n\n";
+   // this debug statement assumes fcsts and obs have same conv radius and thresh indices
+   // which is currently required
+   mlog << Debug(1) << "\n" << sep
+        << "\nRunning mvmode intensity comparisions conv_radius[" << fcsts._rIndex+1
+        << "] conv_thresh[" << fcsts._tIndex+1 << "]\n" << sep << "\n";
 
    _init_exec(ModeExecutive::MULTIVAR_INTENSITY, fcst_filename, obs_filename);
    mode_exec->init_multivar_intensities(config);
@@ -678,7 +682,9 @@ MultivarFrontEnd::_intensity_compare_mode_algorithm(int rIndexF, int tIndexF,
 
 void MultivarFrontEnd::_process_superobjects(SimpleObjects &fcsts, SimpleObjects &obs)
 {
-   mlog << Debug(1) << "Running superobject mode \n\n";
+   mlog << Debug(1) << "\n" << sep
+        << "\nRunning mvmode superobject analysis conv_radius[" << fcsts._rIndex+1
+        << "] conv_thresh[" << fcsts._tIndex+1 << "]\n" << sep << "\n";
 
    MultiVarData *mvdf = fcsts._mvd[0];
    MultiVarData *mvdo = obs._mvd[0];
@@ -739,7 +745,7 @@ void MultivarFrontEnd::_init_exec(ModeExecutive::Processing_t p,
                                   const string &ffile,
                                   const string &ofile) const
 {
-   mlog << Debug(1) << "Running multivar front end for " << ModeExecutive::stype(p) << "\n";
+   mlog << Debug(4) << "Running multivar front end for " << ModeExecutive::stype(p) << "\n";
 
    if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
 

@@ -42,7 +42,8 @@ void SimpleObjects::init(ModeDataType dataType, int rIndex, int tIndex)
 void SimpleObjects::setSuper(bool isFcst, int n_fcst_files, bool do_clusters,
                              BoolCalc &f_calc)
 {
-   _super = ModeSuperObject(isFcst, n_fcst_files, do_clusters, _mvd, f_calc);
+   _super = ModeSuperObject(isFcst, n_fcst_files, do_clusters,
+                            _rIndex, _tIndex, _mvd, f_calc);
 }
 
 ////////////////////////////////////////////////////////////////////////

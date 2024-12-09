@@ -913,7 +913,7 @@ void ModeExecutive::do_conv_thresh_multivar_simple(Processing_t p, int rIndex, i
    } else {
       what = "forecast field";
    }      
-   mlog << Debug(2) << "Identifying objects in the " << what << "...\n";
+   mlog << Debug(2) << "Identifying objects in the " << what << " for " << stype(p) << "\n";
 
    if (p == MULTIVAR_SIMPLE_MERGE) {
       conf.set_conv_radius_by_index(R_index);   // need this because exec was killed after SIMPLE
@@ -1176,8 +1176,7 @@ void ModeExecutive::process_obs_masks(ShapeData & obs_sd)
    ShapeData grid_mask_sd, poly_mask_sd;
    ConcatString name;
 
-   mlog << Debug(2)
-        << "Processing masking regions.\n";
+   mlog << Debug(3) << "Processing masking regions.\n";
 
    // Parse the grid mask into a ShapeData object
    if(engine.conf_info.mask_grid_flag != FieldType::None) {

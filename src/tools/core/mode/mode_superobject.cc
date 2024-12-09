@@ -114,10 +114,13 @@ ModeSuperObject::ModeSuperObject()
 }
 
 ModeSuperObject::ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
+                                 int r_index, int t_index,
                                  const vector<MultiVarData *> &mvd,
                                  BoolCalc &calc)
 {
    _hasUnion = calc.has_union();
+   _rIndex = r_index;
+   _tIndex = t_index;
    
    //
    //  set the BoolPlane values using the mvd content
@@ -150,8 +153,10 @@ ModeSuperObject::ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
       simple_name = "Obs_Simple";
       merge_name = "Obs_Merge";
    }      
-   combine_boolplanes(simple_name, simple_plane, n_files, calc, _simple_result);
-   combine_boolplanes(merge_name,  merge_plane, n_files, calc, merge_result);
+
+   mlog << Debug(1) << "\n";
+   combine_boolplanes(simple_name, _rIndex, _tIndex, simple_plane, n_files, calc, _simple_result);
+   combine_boolplanes(merge_name,  _rIndex, _tIndex, merge_plane, n_files, calc, merge_result);
 
    // create ShapeData objects using something from mvd as a template
    // (shape data has 1's or bad)
