@@ -121,6 +121,10 @@ When regridding to the FCST or OBS field (e.g. to_grid = FCST), the first field 
 
 "file_type" can be set independently for each input in multivariate mode. If not set for an input, MET uses file names and file content to determine the type.
 
+In multivariate mode, with quilt=**FALSE**, for all inputs the number of forecast and observation convolution radii and thresholds must all match. One configuration of MODE will be run for each group of settings in those lists.
+
+In multivariate mode, with quilt=**TRUE**, for all inputs the number of forecast and observation convolution radii must match and the number of forecast and observation convolution thresholds must match. When each input has N radii and M thresholds, NxM configurations of MODE will be run.
+
 When setting a threshold to a percentile, some choices require both an observation input and a forecast input.  When this is the case, it's assumed the indices match, so for example if forecast input 1 has such a percentile setting, then observation input 1 will be used to compute the percentile.  Percentiles in which this will happen are:
 
 * SFP in an observation input.
@@ -319,7 +323,7 @@ The **conv_radius** entry defines the radius of the circular convolution applied
 
 The **conv_thresh** entry specifies the threshold values to be applied to the convolved field to define objects. By default, objects are defined using a convolution threshold of 5.0. Multiple convolution thresholds may be specified as an array (e.g. **conv_thresh = [ >=5.0, >=10.0, >=15.0 ];)**.
 
-Multiple convolution radii and thresholds and processed using the logic defined by the **quilt** entry.
+Multiple convolution radii and thresholds and processed using the logic defined by the **quilt** entry.  The logic specific to multivariate mode is described in the multivariate mode section above.
 
 The **vld_thresh** entry must be set between 0 and 1. When performing the circular convolution step if the proportion of bad data values in the convolution area is greater than or equal to this threshold, the resulting convolved value will be bad data. If the proportion is less than this threshold, the convolution will be performed on only the valid data. By default, the **vld_thresh** is set to 0.5.
 
