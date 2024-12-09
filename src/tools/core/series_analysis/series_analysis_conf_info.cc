@@ -80,6 +80,8 @@ void SeriesAnalysisConfInfo::clear() {
    mask_poly_file.clear();
    mask_poly_name.clear();
    mask_area.clear();
+   grad_dx.clear();
+   grad_dy.clear();
    block_size = bad_data_int;
    vld_data_thresh = bad_data_double;
    hss_ec_value = bad_data_double;
@@ -188,6 +190,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    bool do_cnt = (output_stats[STATLineType::sl1l2].n()  +
                   output_stats[STATLineType::sal1l2].n() +
                   output_stats[STATLineType::cnt].n()) > 0;
+   bool do_grad = output_stats[STATLineType::grad].n() > 0;
 
    // Conf: fcst.field and obs.field
    fdict = conf.lookup_array(conf_key_fcst_field);
@@ -338,6 +341,23 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
          }
       }
    } // end for i
+
+   // Parse gradients
+   if(do_grad) {
+
+      // Conf: gradient
+      grad_dx = conf.lookup_int_array(conf_key_dx);
+      grad_dy = conf.lookup_int_array(conf_key_dy);
+
+      // Check for the same length
+      if(grad_dx.n() != grad_dy.n()) {
+         mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
+              << "The gradient dx and dy arrays must have "
+              << "the same length (" << grad_dx.n() << " != "
+              << grad_dy.n() << ").\n\n";
+         exit(1);
+      }
+   }
 
    // Conf: block_size
    block_size = conf.lookup_int(conf_key_block_size);

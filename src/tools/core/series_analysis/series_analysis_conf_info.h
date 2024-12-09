@@ -72,6 +72,9 @@ class SeriesAnalysisConfInfo {
       ConcatString     mask_poly_name;     // Name of masking poly area
       MaskPlane        mask_area;
 
+      IntArray         grad_dx;            // Gradient step size in the X direction
+      IntArray         grad_dy;            // Gradient step size in the Y direction
+
       int              block_size;         // Number of grid points to read concurrently
       double           vld_data_thresh;    // Minimum valid data ratio for each point
       double           hss_ec_value;       // HSS expected correct value
