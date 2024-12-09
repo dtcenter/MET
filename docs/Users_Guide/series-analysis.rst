@@ -116,6 +116,7 @@ ____________________
   boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
                      rng = "mt19937"; seed = ""; }
   mask           = { grid = [ "FULL" ]; poly = []; }
+  gradient       = { dx = [ 1 ]; dy = [ 1 ]; }
   hss_ec_value   = NA;
   rank_corr_flag = TRUE;
   tmp_dir        = "/tmp";
@@ -139,7 +140,6 @@ ____________________
 
 Ratio of valid matched pairs for the series of values at each grid point required to compute statistics. Set to a lower proportion to allow some missing values. Setting it to 1.0 requires that every data point be valid over the series to compute statistics.
 
-
 ____________________
 
 .. code-block:: none
@@ -157,6 +157,7 @@ ____________________
      pstd   = [];
      pjc    = [];
      prc    = [];
+     grad   = [];
   }
 
 The output_stats array controls the type of output that the Series-Analysis tool generates. Each flag corresponds to an output line type in the STAT file and is used to specify the comma-separated list of statistics to be computed. Use the column names from the tables listed below to specify the statistics. The output flags correspond to the following types of output line types:
@@ -185,4 +186,6 @@ The output_stats array controls the type of output that the Series-Analysis tool
 
 12. PRC for Receiver Operating Characteristic for Probabilistic forecasts (See :numref:`table_PS_format_info_PRC`)
 
-.. note:: When the -input option is used, all partial sum and contingency table count columns are required to aggregate statistics across multiple runs. To facilitate this, the output_stats entries for the CTC, SL1L2, SAL1L2, and PCT line types can be set to "ALL" to indicate that all available columns for those line types should be written.
+13. GRAD for Gradient Statistics (See :numref:`table_GS_format_info_GRAD`)
+
+.. note:: When the -input option is used, all partial sum and contingency table count columns are required to aggregate statistics across multiple runs. To facilitate this, the output_stats entries for the CTC, SL1L2, SAL1L2, and PCT line types can be set to "ALL" to indicate that all available columns for those line types should be written.
