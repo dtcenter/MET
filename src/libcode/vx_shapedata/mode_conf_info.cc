@@ -1922,9 +1922,6 @@ void ModeConfInfo::check_multivar_not_implemented()
    }
 
    if (status) {
-      mlog << Error
-           << "\nModeConfInfo::check_multivar_not_implemented:\n"
-           << "  Some features not yet implemented in multivar mode\n\n";
       exit ( 1 );
    }
 }

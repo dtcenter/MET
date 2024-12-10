@@ -111,7 +111,7 @@ int MultivarFrontEnd::run(const StringArray & Argv)
       exit ( 1 );
    }
 
-   if ((!config.quilt) && NCTF != NCRF || NCTO != NCRO) {
+   if ((!config.quilt) && (NCTF != NCRF || NCTO != NCRO)) {
       mlog << Error << "\nMultivarFrontEnd::run() ->"
            << "all convolution radius and threshold arrays must have the same number of elements without quilting\n\n";
       exit ( 1 );
