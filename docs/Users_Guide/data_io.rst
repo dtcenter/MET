@@ -26,15 +26,15 @@ The MET tools use following attributes and variables for input "`CF Compliant Ne
 
 1. The global attribute "Conventions".
 
-2. The "`standard_name <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#standard-name>`_" and "`units <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#units>`_" attributes for coordinate variables. The "`axis <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#time-axis-ex>`_" attribute ("T" or "time") must exist as the time variable if the "standard_name" attribute does not exist.
+2. The "`standard_name <https://cfconventions.org/cf-conventions/cf-conventions.html#standard-name>`_" and "`units <https://cfconventions.org/cf-conventions/cf-conventions.html#units>`_" attributes for coordinate variables. The "`axis <https://cfconventions.org/cf-conventions/cf-conventions.html#time-axis-ex>`_" attribute ("T" or "time") must exist as the time variable if the "standard_name" attribute does not exist.
 
-3. The "`coordinates <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#coordinate-types>`_" attribute for the data variables. It contains the coordinate variable names.
+3. The "`coordinates <https://cfconventions.org/cf-conventions/cf-conventions.html#coordinate-types>`_" attribute for the data variables. It contains the coordinate variable names.
 
-4. The "`grid_mapping <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#appendix-grid-mappings>`_" attribute for the data variables for projections and the matching grid mapping variable (optional for latitude_longitude and rotated_latitude_longitude projections).
+4. The "`grid_mapping <https://cfconventions.org/cf-conventions/cf-conventions.html#appendix-grid-mappings>`_" attribute for the data variables for projections and the matching grid mapping variable (optional for latitude_longitude and rotated_latitude_longitude projections).
 
 5. The gridded data should be evenly spaced horizontally and vertically.
 
-6. (Optional) the "`forecast_reference_time <https://cfconventions.org/Data/cf-conventions/cf-conventions-1.9/cf-conventions.html#scalar-coordinate-variables>`_" variable for init_time.
+6. (Optional) the "`forecast_reference_time <https://cfconventions.org/cf-conventions/cf-conventions.html#scalar-coordinate-variables>`_" variable for init_time.
 
 MET processes the CF-Compliant gridded NetCDF files with the projection information. The CF-Compliant NetCDF is defined by the global attribute "Conventions" whose value begins with "CF-" ("CF-<Version_number>"). The global attribute "Conventions" is mandatory. MET accepts the variation of this attribute ("conventions" and "CONVENTIONS"). The value should be started with "CF-" and followed by the version number. MET accepts the attribute value that begins with "CF " ("CF" and a space instead of a hyphen) or "COARDS".
 

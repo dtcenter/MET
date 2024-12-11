@@ -206,6 +206,6 @@ grid_weight_flag = NONE;
 
 tmp_dir       = "/tmp";
 output_prefix = "${OUTPUT_PREFIX}";
-version       = "V12.0.0";
+version       = "V12.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

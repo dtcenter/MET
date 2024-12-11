@@ -359,6 +359,7 @@ void GridStatConfInfo::process_flags() {
       if(vx_opt[i].nc_info.do_diff)         nc_info.do_diff         = true;
       if(vx_opt[i].nc_info.do_climo)        nc_info.do_climo        = true;
       if(vx_opt[i].nc_info.do_climo_cdp)    nc_info.do_climo_cdp    = true;
+      if(vx_opt[i].nc_info.do_seeps)        nc_info.do_seeps        = true;
       if(vx_opt[i].nc_info.do_weight)       nc_info.do_weight       = true;
       if(vx_opt[i].nc_info.do_nbrhd)        nc_info.do_nbrhd        = true;
       if(vx_opt[i].nc_info.do_fourier)      nc_info.do_fourier      = true;
@@ -987,6 +988,7 @@ void GridStatVxOpt::parse_nc_info(Dictionary &odict) {
    nc_info.do_diff         = d->lookup_bool(conf_key_diff_flag);
    nc_info.do_climo        = d->lookup_bool(conf_key_climo_flag);
    nc_info.do_climo_cdp    = d->lookup_bool(conf_key_climo_cdp_flag);
+   nc_info.do_seeps        = d->lookup_bool(conf_key_seeps_flag);
    nc_info.do_weight       = d->lookup_bool(conf_key_weight);
    nc_info.do_nbrhd        = d->lookup_bool(conf_key_nbrhd);
    nc_info.do_fourier      = d->lookup_bool(conf_key_fourier);
@@ -1310,10 +1312,10 @@ void GridStatNcOutInfo::clear() {
 
 bool GridStatNcOutInfo::all_false() const {
 
-   bool status = do_latlon       || do_raw        || do_diff     ||
-                 do_climo        || do_climo_cdp  || do_weight   ||
-                 do_nbrhd        || do_fourier    || do_gradient ||
-                 do_distance_map || do_apply_mask;
+   bool status = do_latlon   || do_raw          || do_diff    ||
+                 do_climo    || do_climo_cdp    || do_seeps   ||
+                 do_weight   || do_nbrhd        || do_fourier ||
+                 do_gradient || do_distance_map || do_apply_mask;
 
    return !status;
 }
@@ -1327,6 +1329,7 @@ void GridStatNcOutInfo::set_all_false() {
    do_diff         = false;
    do_climo        = false;
    do_climo_cdp    = false;
+   do_seeps        = false;
    do_weight       = false;
    do_nbrhd        = false;
    do_fourier      = false;
@@ -1346,6 +1349,7 @@ void GridStatNcOutInfo::set_all_true() {
    do_diff         = true;
    do_climo        = true;
    do_climo_cdp    = true;
+   do_seeps        = true;
    do_weight       = true;
    do_nbrhd        = true;
    do_fourier      = true;
