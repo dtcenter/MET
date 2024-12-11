@@ -1711,10 +1711,15 @@ bool is_eq(const UnstructuredData * us1, const UnstructuredData * us2)
         }
         else {
           status = status
-                   && us1->points_XYZ[0] == us2->points_lonlat[0]
-                   && us1->points_XYZ[us1->n_face-1] == us2->points_XYZ[us2->n_face-1];
+                   && is_eq(us1->points_XYZ[0].x(), us2->points_XYZ[0].x())
+                   && is_eq(us1->points_XYZ[0].y(), us2->points_XYZ[0].y())
+                   && is_eq(us1->points_XYZ[0].z(), us2->points_XYZ[0].z())
+                   && is_eq(us1->points_XYZ[us1->n_face-1].x(), us2->points_XYZ[us2->n_face-1].x())
+                   && is_eq(us1->points_XYZ[us1->n_face-1].y(), us2->points_XYZ[us2->n_face-1].y())
+                   && is_eq(us1->points_XYZ[us1->n_face-1].z(), us2->points_XYZ[us2->n_face-1].z())
                    && is_eq(us1->alt_checksum, us2->alt_checksum);
         }
+      }
     }
   }
 
