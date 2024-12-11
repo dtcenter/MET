@@ -316,31 +316,32 @@ void UnstructuredData::clear() {
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 void UnstructuredData::clear_data() {
 
    n_face = n_node = n_edge = 0;
-   point_lonlat.clear();
-   lat_checksum = lon_checksum = 0.;
+   points_lonlat.clear();
+   points_XYZ.clear();
+   points_XYZ_km.clear();
+   lat_checksum = lon_checksum = alt_checksum = 0.;
 
    if (kdtree) { delete kdtree; kdtree = nullptr; }
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void UnstructuredData::dump() const {
 
    mlog << Debug(grid_debug_level)
         << "\nUnstructured Grid Data:\n"
         << "           n_face: " << n_face << "\n"
-        << "    lat_checksum: " << lat_checksum << "\n"
-        << "    lon_checksum: " << lon_checksum << "\n"
-        << " max_distance_km: " << max_distance_km << "\n"
+        << "           points: " << (0 < points_lonlat.size() ? "PointLonLat" : "PointXYZ") << "\n"
+        << "     lat_checksum: " << lat_checksum << "\n"
+        << "     lon_checksum: " << lon_checksum << "\n"
+        << "     alt_checksum: " << alt_checksum << "\n"
+        << "  max_distance_km: " << max_distance_km << "\n"
         ;
 }
 
@@ -764,7 +765,12 @@ UnstructuredData *D = new UnstructuredData;
 D->n_edge = data.n_edge;
 D->n_node = data.n_node;
 D->max_distance_km = data.max_distance_km;
-D->set_points(data.n_face, data.point_lonlat);
+if (data.has_PointLatLon()) {
+   D->set_points(data.n_face, data.points_lonlat);
+}
+else {
+   D->set_points(data.n_face, data.points_XYZ);
+}
 us = D;
 D = (UnstructuredData *)nullptr;
 
@@ -1690,13 +1696,26 @@ bool is_eq(const UnstructuredData * us1, const UnstructuredData * us2)
   bool status = false;
   if (us1 && us2) {
     if (us1 == us2) status = true;
-    else status = us1->n_face == us2->n_face
-                  && us1->n_node == us2->n_node
-                  && us1->n_edge == us2->n_edge
-                  && us1->point_lonlat[0] == us2->point_lonlat[0]
-                  && (us1->n_face > 0 && us1->point_lonlat[us1->n_face-1] == us2->point_lonlat[us2->n_face-1])
-                  && is_eq(us1->lat_checksum, us2->lat_checksum)
-                  && is_eq(us1->lon_checksum, us2->lon_checksum);
+    else {
+      status = us1->n_face == us2->n_face
+               && us1->n_node == us2->n_node
+               && us1->n_edge == us2->n_edge
+               && us1->has_PointLatLon() == us2->has_PointLatLon()
+               && is_eq(us1->lat_checksum, us2->lat_checksum)
+               && is_eq(us1->lon_checksum, us2->lon_checksum);
+      if (status && (us1->n_face > 0)) {
+        if (us1->has_PointLatLon()) {
+          status = status
+                   && us1->points_lonlat[0] == us2->points_lonlat[0]
+                   && us1->points_lonlat[us1->n_face-1] == us2->points_lonlat[us2->n_face-1];
+        }
+        else {
+          status = status
+                   && us1->points_XYZ[0] == us2->points_lonlat[0]
+                   && us1->points_XYZ[us1->n_face-1] == us2->points_XYZ[us2->n_face-1];
+                   && is_eq(us1->alt_checksum, us2->alt_checksum);
+        }
+    }
   }
 
 return status;
