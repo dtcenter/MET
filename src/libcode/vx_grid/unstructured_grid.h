@@ -56,6 +56,10 @@ class UnstructuredGrid : public GridRep {
 
       virtual void xy_to_latlon(double x, double y, double & lat, double & lon) const;
 
+      //void latlonalt_to_xy(double lat, double lon, double alt_m, double & x, double & y) const;
+
+      //void xy_to_latlonalt(double x, double y, double & lat, double & lon, double &alt) const;
+
       virtual double calc_area(int x, int y) const;
 
       virtual int nx() const;
