@@ -3639,6 +3639,10 @@ GRADInfo & GRADInfo::operator=(const GRADInfo &c) {
 GRADInfo & GRADInfo::operator+=(const GRADInfo &c) {
    GRADInfo g_info;
 
+   // Return if nothing to add
+   if(c.total == 0) return *this;
+
+   // Gradient definition must remain constant
    if(dx != c.dx || dy != c.dy) {
       mlog << Error << "\nGRADInfo::operator+=() -> "
            << "the gradient DX (" << dx << " vs " << c.dx
@@ -3774,6 +3778,7 @@ double GRADInfo::magnitude_rmse() const {
 double GRADInfo::laplace_rmse() const {
    return square_root(lap_mse);
 }
+
 ////////////////////////////////////////////////////////////////////////
 
 void GRADInfo::set(int grad_dx, int grad_dy,
@@ -3848,6 +3853,37 @@ void GRADInfo::set(int grad_dx, int grad_dy,
    if(total == 0) {
       mlog << Error << "\nGRADInfo::set() -> "
            << "count is zero!\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GRADInfo::set_stat(const string &stat_name, double v) {
+
+   // Store the statistic by name
+        if(stat_name == "TOTAL"       ) total   = nint(v);
+   else if(stat_name == "FGBAR"       ) fgbar   = v;
+   else if(stat_name == "OGBAR"       ) ogbar   = v;
+   else if(stat_name == "MGBAR"       ) mgbar   = v;
+   else if(stat_name == "EGBAR"       ) egbar   = v;
+   else if(stat_name == "DX"          ) dx      = nint(v);
+   else if(stat_name == "DY"          ) dy      = nint(v);
+   else if(stat_name == "FGMAG"       ) fgmag   = v;
+   else if(stat_name == "OGMAG"       ) ogmag   = v;
+   else if(stat_name == "MAG_RMSE"    ) mag_mse = v*v;
+   else if(stat_name == "LAPLACE_RMSE") lap_mse = v*v;
+   // Ignore derived quantities
+   else if(stat_name == "S1"    ||
+           stat_name == "S1_OG" ||
+           stat_name == "FGOG_RATIO") {
+   }
+   else {
+      mlog << Error << "\nGRADInfo::set_stat() -> "
+           << "unknown gradient statistic name \"" << stat_name
+           << "\"!\n\n";
       exit(1);
    }
 

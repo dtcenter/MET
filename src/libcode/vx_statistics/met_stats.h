@@ -633,12 +633,13 @@ class GRADInfo {
 
       void clear();
  
-      // Compute sums
+      // Compute gradient sums
       void set(int grad_dx, int grad_dy,
                const NumArray &fgx_na, const NumArray &fgy_na,
                const NumArray &ogx_na, const NumArray &ogy_na,
                const NumArray &wgt_na);
 
+      void   set_stat(const std::string &, double);
       double get_stat(const std::string &) const;
 };
 
