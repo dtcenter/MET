@@ -631,13 +631,15 @@ class GRADInfo {
       double magnitude_rmse() const;
       double laplace_rmse()   const;
 
+      void clear();
+ 
       // Compute sums
       void set(int grad_dx, int grad_dy,
                const NumArray &fgx_na, const NumArray &fgy_na,
                const NumArray &ogx_na, const NumArray &ogy_na,
                const NumArray &wgt_na);
 
-      void clear();
+      double get_stat(const std::string &) const;
 };
 
 ////////////////////////////////////////////////////////////////////////

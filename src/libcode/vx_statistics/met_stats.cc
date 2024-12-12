@@ -3855,6 +3855,41 @@ void GRADInfo::set(int grad_dx, int grad_dy,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+double GRADInfo::get_stat(const string &stat_name) const {
+   double v = bad_data_double;
+
+   // Find the statistic by name
+        if(stat_name == "TOTAL"       ) v = (double) total;
+   else if(stat_name == "FGBAR"       ) v = fgbar;
+   else if(stat_name == "OGBAR"       ) v = ogbar;
+   else if(stat_name == "MGBAR"       ) v = mgbar;
+   else if(stat_name == "EGBAR"       ) v = egbar;
+   else if(stat_name == "S1"          ) v = s1();
+   else if(stat_name == "S1_OG"       ) v = s1_og();
+   else if(stat_name == "FGOG_RATIO"  ) v = fgog_ratio();
+   else if(stat_name == "DX"          ) v = (double) dx;
+   else if(stat_name == "DY"          ) v = (double) dy;
+   else if(stat_name == "FGMAG"       ) v = fgmag;
+   else if(stat_name == "OGMAG"       ) v = ogmag;
+   else if(stat_name == "MAG_RMSE"    ) v = magnitude_rmse();
+   else if(stat_name == "LAPLACE_RMSE") v = laplace_rmse();
+   else {
+      mlog << Error << "\nGRADInfo::get_stat() -> "
+           << "unknown gradient statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   // Return bad data for 0 pairs 
+   if(total == 0 && stat_name != "TOTAL") {
+      v = bad_data_double;
+   }
+
+   return v;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class DMAPInfo
 //
