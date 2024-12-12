@@ -346,8 +346,9 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    if(do_grad) {
 
       // Conf: gradient
-      grad_dx = conf.lookup_int_array(conf_key_dx);
-      grad_dy = conf.lookup_int_array(conf_key_dy);
+      Dictionary *d = conf.lookup_dictionary(conf_key_gradient);
+      grad_dx = d->lookup_int_array(conf_key_dx);
+      grad_dy = d->lookup_int_array(conf_key_dy);
 
       // Check for the same length
       if(grad_dx.n() != grad_dy.n()) {

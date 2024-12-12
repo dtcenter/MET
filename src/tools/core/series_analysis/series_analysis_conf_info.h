@@ -99,13 +99,15 @@ class SeriesAnalysisConfInfo {
       // Dump out the counts
       int get_n_fcst() const;
       int get_n_obs()  const;
+      int get_n_grad() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int SeriesAnalysisConfInfo::get_n_fcst() const { return n_fcst; }
-inline int SeriesAnalysisConfInfo::get_n_obs()  const { return n_obs;  }
 inline int SeriesAnalysisConfInfo::get_compression_level()  { return conf.nc_compression(); }
+inline int SeriesAnalysisConfInfo::get_n_fcst() const { return n_fcst;      }
+inline int SeriesAnalysisConfInfo::get_n_obs()  const { return n_obs;       }
+inline int SeriesAnalysisConfInfo::get_n_grad() const { return grad_dx.n(); }
 
 ////////////////////////////////////////////////////////////////////////
 
