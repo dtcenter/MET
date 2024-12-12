@@ -37,6 +37,7 @@
 //   016    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings.
 //   017    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
 //   018    07/26/24  Halley Gotway  MET #1371 Aggregate previous output.
+//   019    12/09/24  Halley Gotway  MET #3030 Add GRAD output.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -95,6 +96,9 @@ static void do_continuous    (int, const PairDataPoint *);
 static void do_partialsums   (int, const PairDataPoint *);
 static void do_probabilistic (int, const PairDataPoint *);
 static void do_climo_brier   (int, double, int, PCTInfo &);
+static void do_gradient      (int, int, int,
+                              const PairDataPoint *,
+                              const PairDataPoint *);
 
 static int  read_aggr_total  (int);
 static void read_aggr_ctc    (int, const CTSInfo &,   CTSInfo &);
@@ -102,6 +106,7 @@ static void read_aggr_mctc   (int, const MCTSInfo &,  MCTSInfo &);
 static void read_aggr_sl1l2  (int, const SL1L2Info &, SL1L2Info &);
 static void read_aggr_sal1l2 (int, const SL1L2Info &, SL1L2Info &);
 static void read_aggr_pct    (int, const PCTInfo &,   PCTInfo &);
+static void read_aggr_grad   (int, const GRADInfo &,  GRADInfo &);
 
 static void store_stat_categorical(int,
                STATLineType, const ConcatString &,
@@ -118,12 +123,16 @@ static void store_stat_continuous(int,
 static void store_stat_probabilistic(int,
                STATLineType, const ConcatString &,
                const PCTInfo &);
+static void store_stat_gradient(int,
+               STATLineType, const ConcatString &,
+               const GRADInfo &);
 
 static void store_stat_all_ctc   (int, const CTSInfo &);
 static void store_stat_all_mctc  (int, const MCTSInfo &);
 static void store_stat_all_sl1l2 (int, const SL1L2Info &);
 static void store_stat_all_sal1l2(int, const SL1L2Info &);
 static void store_stat_all_pct   (int, const PCTInfo &);
+static void store_stat_all_grad  (int, const GRADInfo &);
 
 static ConcatString build_nc_var_name_categorical(
                        STATLineType, const ConcatString &,
@@ -140,6 +149,9 @@ static ConcatString build_nc_var_name_continuous(
 static ConcatString build_nc_var_name_probabilistic(
                        STATLineType, const ConcatString &,
                        const PCTInfo &, double);
+static ConcatString build_nc_var_name_gradient(
+                       STATLineType, const ConcatString &,
+                       const GRADInfo &);
 
 static void setup_nc_file(const VarInfo *, const VarInfo *);
 static void add_stat_data(const ConcatString &, const ConcatString &,
@@ -149,6 +161,7 @@ static void write_stat_data();
 
 static void set_range(const unixtime &, unixtime &, unixtime &);
 static void set_range(const int &, int &, int &);
+static void set_pair_dims(vector<PairDataPoint> &, int, int);
 
 static void clean_up();
 
@@ -834,8 +847,6 @@ DataPlane read_aggr_data_plane(const ConcatString &var_name,
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
-   int x;
-   int y;
    int i_point = 0;
    VarInfo *fcst_info = (VarInfo *) nullptr;
    VarInfo *obs_info  = (VarInfo *) nullptr;
@@ -843,6 +854,13 @@ void process_scores() {
    DataPlane obs_dp;
    vector<PairDataPoint> pd_block;
    const char *method_name = "process_scores() ";
+
+   // X and Y gradient pairs
+   bool do_grad = (!conf_info.fcst_info[0]->is_prob() &&
+                    conf_info.get_n_grad() > 0 &&
+                    conf_info.output_stats[STATLineType::grad].n() > 0);
+   vector<PairDataPoint> gx_pd_block;
+   vector<PairDataPoint> gy_pd_block;
 
    // Climatology mean and standard deviation
    DataPlane fcmn_dp, fcsd_dp;
@@ -876,20 +894,31 @@ void process_scores() {
          // Retrieve the data planes for the current series entry
          get_series_data(i_series, fcst_info, obs_info, fcst_dp, obs_dp);
 
-         // Initialize PairDataPoint vector, if needed
-         // block_size is defined in get_series_data()
+         // Set the pair dimensions
          if(pd_block.empty()) {
-            pd_block.resize(conf_info.block_size);
-            for(auto &pd : pd_block) pd.extend(n_series_pair);
+            set_pair_dims(pd_block, conf_info.block_size, n_series_pair);
          }
+
+         // Set the gradient pair dimensions
+         if(gx_pd_block.empty() || gy_pd_block.empty()) {
+            int n_grad_pd = conf_info.block_size * conf_info.get_n_grad();
+            set_pair_dims(gx_pd_block, n_grad_pd, n_series_pair);
+            set_pair_dims(gy_pd_block, n_grad_pd, n_series_pair);
+         } 
 
          // Beginning of each data pass
          if(i_series == 0) {
 
-            // Re-initialize the PairDataPoint objects
+            // Re-initialize the pairs 
             for(auto &pd : pd_block) {
                pd.erase();
                pd.set_climo_cdf_info_ptr(&conf_info.cdf_info);
+            }
+
+            // Re-initialize the gradient pairs
+            if(do_grad) {
+               for(auto &pd : gx_pd_block) pd.erase();
+               for(auto &pd : gy_pd_block) pd.erase();
             }
 
             // Starting grid point
@@ -949,10 +978,14 @@ void process_scores() {
          set_range(obs_dp.lead(),   obs_lead_beg,   obs_lead_end);
 
          // Store matched pairs for each grid point
-         for(int i=0; i<conf_info.block_size && (i_point+i)<grid.nxy(); i++) {
+         for(int i_block=0;
+             i_block<conf_info.block_size && (i_point+i_block)<grid.nxy();
+             i_block++) {
 
-            // Convert n to x, y
-            DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
+            // Convert i_point+i_block to (x, y)
+            int x;
+            int y;
+            DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i_block, x, y);
 
             // Skip points outside the mask and bad data
             if(!conf_info.mask_area(x, y)                ||
@@ -969,27 +1002,85 @@ void process_scores() {
                              (ocmn_flag ? ocmn_dp(x, y) : bad_data_double),
                              (ocsd_flag ? ocsd_dp(x, y) : bad_data_double));
 
-            pd_block[i].add_grid_pair(fcst_dp(x, y), obs_dp(x, y),
-                                      cpi, default_weight);
+            // Store pairs
+            pd_block[i_block].add_grid_pair(fcst_dp(x, y), obs_dp(x, y),
+                                            cpi, default_weight);
 
-         } // end for i
+         } // end for i_block
+
+         // Set the gradient pair dimensions
+         if(do_grad) {
+
+            // Loop over the gradient options
+            for(int i_grad=0; i_grad<conf_info.get_n_grad(); i_grad++) {
+
+               int dx = conf_info.grad_dx[i_grad];
+               int dy = conf_info.grad_dy[i_grad];
+
+               // Compute the gradients
+               DataPlane fgx_dp = gradient(fcst_dp, 0, dx);
+               DataPlane fgy_dp = gradient(fcst_dp, 1, dy);
+               DataPlane ogx_dp = gradient(obs_dp,  0, dx);
+               DataPlane ogy_dp = gradient(obs_dp,  1, dy);
+              
+               // Store the gradient matched pairs for each grid point
+               for(int i_block=0;
+                   i_block<conf_info.block_size && (i_point+i_block)<grid.nxy();
+                   i_block++) {
+
+                  // Convert (i_block, i_grad) to i_pd 
+                  int i_pd = DefaultTO.two_to_one(conf_info.block_size,
+                                                  conf_info.get_n_grad(),
+                                                  i_block, i_grad);
+
+                  // Convert i_point+i_block to (x, y)
+                  int x;
+                  int y;
+                  DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i_block, x, y);
+
+                  // Skip points outside the mask and bad data
+                  if(!conf_info.mask_area(x, y) ||
+                     is_bad_data(fgx_dp(x, y))  ||
+                     is_bad_data(fgy_dp(x, y))  ||
+                     is_bad_data(ogx_dp(x, y))  ||
+                     is_bad_data(ogy_dp(x, y))) continue;
+
+                  // Climo data does not apply to gradients
+                  ClimoPntInfo cpi(bad_data_double, bad_data_double,
+                                   bad_data_double, bad_data_double);
+
+                  // Store gradient pairs
+                  gx_pd_block[i_pd].add_grid_pair(fgx_dp(x, y), ogx_dp(x, y),
+                                                  cpi, default_weight);
+                  gy_pd_block[i_pd].add_grid_pair(fgy_dp(x, y), ogy_dp(x, y),
+                                                  cpi, default_weight);
+               } // end for i_block
+            } // end for i_grad
+         } // end if(do_grad)
       } // end for i_series
 
       // Compute statistics for each grid point in the block
-      for(int i=0; i<conf_info.block_size && (i_point+i)<grid.nxy(); i++) {
+      for(int i_block=0;
+          i_block<conf_info.block_size && (i_point+i_block)<grid.nxy();
+          i_block++) {
+
+         const PairDataPoint *pd_ptr = &pd_block[i_block];
 
          // Determine x,y location
-         DefaultTO.one_to_two(grid.nx(), grid.ny(), i_point+i, x, y);
+         int x;
+         int y;
+         int i_grid = i_point + i_block;
+         DefaultTO.one_to_two(grid.nx(), grid.ny(), i_grid, x, y);
 
          // Compute the total number of valid points and series length
-         int n_valid  = pd_block[i].f_na.n() +
-                        (aggr_file.empty() ? 0 : read_aggr_total(i_point+i));
+         int n_valid  = pd_ptr->f_na.n() +
+                        (aggr_file.empty() ? 0 : read_aggr_total(i_grid));
          int n_series = n_series_pair + n_series_aggr;
 
          // Check for the required number of matched pairs
          if(n_valid / (double) n_series < conf_info.vld_data_thresh) {
             mlog << Debug(4)
-                 << "[" << i+1 << " of " << conf_info.block_size
+                 << "[" << i_block+1 << " of " << conf_info.block_size
                  << "] Skipping point (" << x << ", " << y << ") with "
                  << n_valid << " of " << n_series << " valid matched pairs.\n";
 
@@ -1001,7 +1092,7 @@ void process_scores() {
          }
          else {
             mlog << Debug(4)
-                 << "[" << i+1 << " of " << conf_info.block_size
+                 << "[" << i_block+1 << " of " << conf_info.block_size
                  << "] Processing point (" << x << ", " << y << ") with "
                  << n_valid << " of " << n_series << " valid matched pairs.\n";
          }
@@ -1011,27 +1102,27 @@ void process_scores() {
             (conf_info.output_stats[STATLineType::fho].n() +
              conf_info.output_stats[STATLineType::ctc].n() +
              conf_info.output_stats[STATLineType::cts].n()) > 0) {
-            do_categorical(i_point+i, &pd_block[i]);
+            do_categorical(i_grid, pd_ptr);
          }
 
          // Compute multi-category contingency table counts and statistics
          if(!conf_info.fcst_info[0]->is_prob() &&
             (conf_info.output_stats[STATLineType::mctc].n() +
              conf_info.output_stats[STATLineType::mcts].n()) > 0) {
-            do_multicategory(i_point+i, &pd_block[i]);
+            do_multicategory(i_grid, pd_ptr);
          }
 
          // Compute continuous statistics
          if(!conf_info.fcst_info[0]->is_prob() &&
             conf_info.output_stats[STATLineType::cnt].n() > 0) {
-            do_continuous(i_point+i, &pd_block[i]);
+            do_continuous(i_grid, pd_ptr);
          }
 
          // Compute partial sums
          if(!conf_info.fcst_info[0]->is_prob() &&
             (conf_info.output_stats[STATLineType::sl1l2].n() +
              conf_info.output_stats[STATLineType::sal1l2].n()) > 0) {
-            do_partialsums(i_point+i, &pd_block[i]);
+            do_partialsums(i_grid, pd_ptr);
          }
 
          // Compute probabilistics counts and statistics
@@ -1040,11 +1131,27 @@ void process_scores() {
              conf_info.output_stats[STATLineType::pstd].n() +
              conf_info.output_stats[STATLineType::pjc].n() +
              conf_info.output_stats[STATLineType::prc].n()) > 0) {
-            do_probabilistic(i_point+i, &pd_block[i]);
+            do_probabilistic(i_grid, pd_ptr);
          }
 
-      } // end for i
+         // Compute gradient statistics
+         if(do_grad) {
 
+            // Loop over the gradient options
+            for(int i_grad=0; i_grad<conf_info.get_n_grad(); i_grad++) {
+
+               // Convert (i_block, i_grad) to i_pd 
+               int i_pd = DefaultTO.two_to_one(conf_info.block_size,
+                                               conf_info.get_n_grad(),
+                                               i_block, i_grad);
+               do_gradient(i_grid,
+                           conf_info.grad_dx[i_grad],
+                           conf_info.grad_dy[i_grad],
+                           &gx_pd_block[i_pd], &gy_pd_block[i_pd]);
+            } // end for i_grad
+         } // end if(do_grad)
+
+      } // end for i_block
    } // end for i_read
 
    // Write the computed statistics
@@ -1656,6 +1763,35 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
 
 ////////////////////////////////////////////////////////////////////////
 
+void read_aggr_grad(int n, const GRADInfo &grad_info,
+                    GRADInfo &aggr_grad) {
+
+   // Initialize
+   aggr_grad.clear();
+
+   // Loop over the GRAD columns
+   for(auto &col : grad_columns) {
+
+      ConcatString c(to_upper(col));
+      ConcatString var_name(build_nc_var_name_gradient(
+                               STATLineType::grad, c,
+                               grad_info));
+
+      // Read aggregate data, if needed
+      if(aggr_data.count(var_name) == 0) {
+         aggr_data[var_name] = read_aggr_data_plane(
+                                  var_name, R"("ALL" GRAD)");
+      }
+
+      // Populate the gradient values
+      aggr_grad.set_stat(col, aggr_data[var_name].buf()[n]);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
 
    mlog << Debug(4)
@@ -1783,6 +1919,42 @@ void do_climo_brier(int n, double briercl_pair,
          !is_bad_data(pct_info.briercl.v)) {
          pct_info.bss = 1.0 - (pct_info.brier.v / pct_info.briercl.v);
       }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void do_gradient(int n, int dx, int dy,
+                 const PairDataPoint *pd_gx,
+                 const PairDataPoint *pd_gy) {
+
+   mlog << Debug(4)
+        << "Computing Gradient DX(" << dx << ")/DY("
+       	<< dy << ") Statistics.\n";
+
+   // Object to store gradient statistics
+   GRADInfo grad_info;
+
+   // Compute GRADInfo
+   grad_info.set(dx, dy, pd_gx->f_na, pd_gy->f_na,
+                 pd_gx->o_na, pd_gy->o_na, pd_gx->wgt_na);
+
+   // Aggregate current gradients with previous statistics
+   if(aggr_file.nonempty()) {
+
+      // Aggregate gradients
+      GRADInfo aggr_grad;
+      read_aggr_grad(n, grad_info, aggr_grad);
+      grad_info += aggr_grad;
+   }
+
+   // Add statistic value for each possible GRAD column
+   for(int j=0; j<conf_info.output_stats[STATLineType::grad].n(); j++) {
+      store_stat_gradient(n, STATLineType::grad,
+         conf_info.output_stats[STATLineType::grad][j],
+         grad_info);
    }
 
    return;
@@ -2036,6 +2208,43 @@ void store_stat_probabilistic(int n, STATLineType lt,
 
 ////////////////////////////////////////////////////////////////////////
 
+void store_stat_gradient(int n, STATLineType lt,
+        const ConcatString &col,
+        const GRADInfo &grad_info) {
+
+   // Set the column name to all upper case
+   ConcatString c = to_upper(col);
+
+   // Handle ALL GRAD columns
+   if(lt == STATLineType::grad && c == all_columns) {
+      return store_stat_all_grad(n, grad_info);
+   }
+
+   // Construct the NetCDF variable name
+   ConcatString var_name(build_nc_var_name_gradient(
+                            lt, c, grad_info));
+
+   // Add map for this variable name
+   if(stat_data.count(var_name) == 0) {
+
+      // Build key
+      ConcatString lty_stat(statlinetype_to_string(lt));
+      lty_stat << "_" << c;
+
+      // Add new map entry
+      ConcatString empty_cs;
+      add_stat_data(var_name, c, stat_long_name[lty_stat],
+                    empty_cs, empty_cs, bad_data_double);
+   }
+
+   // Store the statistic value
+   stat_data[var_name].dp.buf()[n] = grad_info.get_stat(c);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void store_stat_all_ctc(int n, const CTSInfo &cts_info) {
    for(auto &col : ctc_columns) {
       store_stat_categorical(n, STATLineType::ctc, col, cts_info);
@@ -2075,6 +2284,14 @@ void store_stat_all_pct(int n, const PCTInfo &pct_info) {
       // Skip unused "THRESH_" columns
       if(pct_cols[i].find("THRESH_") != string::npos) continue;
       store_stat_probabilistic(n, STATLineType::pct, pct_cols[i], pct_info);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void store_stat_all_grad(int n, const GRADInfo &grad_info) {
+   for(auto &col : grad_columns) {
+      store_stat_gradient(n, STATLineType::grad, col, grad_info);
    }
 }
 
@@ -2179,6 +2396,23 @@ ConcatString build_nc_var_name_probabilistic(
 
    // Append confidence interval alpha value
    if(!is_bad_data(alpha)) var_name << "_a"  << alpha;
+
+   return var_name;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString build_nc_var_name_gradient(
+                STATLineType lt, const ConcatString &col,
+                const GRADInfo &grad_info) {
+
+   // Append the column name
+   ConcatString var_name("series_");
+   var_name << to_lower(statlinetype_to_string(lt)) << "_" << col;
+
+   // Append the gradient definition
+   var_name << "_DX" << grad_info.dx
+            << "_DY" << grad_info.dy;
 
    return var_name;
 }
@@ -2334,6 +2568,21 @@ void set_range(const int &t, int &beg, int &end) {
 
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
+
+void set_pair_dims(vector<PairDataPoint> &pd_block,
+                   int n_pd, int n_pair) {
+
+   // Resize to the number of objects
+   pd_block.resize(n_pd);
+
+   // Reserve space for the number of pairs
+   for(auto &pd : pd_block) pd.extend(n_pair);
+
+   return;
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -188,4 +188,4 @@ The output_stats array controls the type of output that the Series-Analysis tool
 
 13. GRAD for Gradient Statistics (See :numref:`table_GS_format_info_GRAD`)
 
-.. note:: When the -input option is used, all partial sum and contingency table count columns are required to aggregate statistics across multiple runs. To facilitate this, the output_stats entries for the CTC, SL1L2, SAL1L2, and PCT line types can be set to "ALL" to indicate that all available columns for those line types should be written.
+.. note:: When the -input option is used, all partial sum and contingency table count columns are required to aggregate statistics across multiple runs. To facilitate this, the output_stats entries for the CTC, SL1L2, SAL1L2, PCT, and GRAD line types can be set to "ALL" to indicate that all available columns for those line types should be written.
