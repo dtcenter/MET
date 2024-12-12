@@ -3875,10 +3875,10 @@ void GRADInfo::set_stat(const string &stat_name, double v) {
    else if(stat_name == "OGMAG"       ) ogmag   = v;
    else if(stat_name == "MAG_RMSE"    ) mag_mse = v*v;
    else if(stat_name == "LAPLACE_RMSE") lap_mse = v*v;
-   // Ignore derived quantities
    else if(stat_name == "S1"    ||
            stat_name == "S1_OG" ||
            stat_name == "FGOG_RATIO") {
+      // Ignore derived quantities
    }
    else {
       mlog << Error << "\nGRADInfo::set_stat() -> "

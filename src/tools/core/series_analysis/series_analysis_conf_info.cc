@@ -133,14 +133,16 @@ void SeriesAnalysisConfInfo::read_config(const char *default_file_name,
 
 void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
                                             GrdFileType otype) {
-   int i, n;
+   int i;
+   int n;
    ConcatString s;
    StringArray sa;
    ThreshArray cur_ta;
    VarInfoFactory info_factory;
-   Dictionary *fdict = (Dictionary *) nullptr;
-   Dictionary *odict = (Dictionary *) nullptr;
-   Dictionary i_fdict, i_odict;
+   Dictionary *fdict = nullptr;
+   Dictionary *odict = nullptr;
+   Dictionary i_fdict;
+   Dictionary i_odict;
    BootInfo boot_info;
    map<STATLineType,StringArray>::iterator it;
 
@@ -466,7 +468,8 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void SeriesAnalysisConfInfo::process_masks(const Grid &grid) {
-   MaskPlane mask_grid, mask_poly;
+   MaskPlane mask_grid;
+   MaskPlane mask_poly;
    ConcatString name;
 
    mlog << Debug(2)
@@ -482,7 +485,7 @@ void SeriesAnalysisConfInfo::process_masks(const Grid &grid) {
    mask_poly_file = conf.lookup_string(conf_key_mask_poly);
 
    // Parse out the masking grid
-   if(mask_grid_file.length() > 0) {
+   if(!mask_grid_file.empty()) {
       mlog << Debug(3)
            << "Processing grid mask: " << mask_grid_file << "\n";
       parse_grid_mask(mask_grid_file, grid, mask_grid, mask_grid_name);
@@ -490,7 +493,7 @@ void SeriesAnalysisConfInfo::process_masks(const Grid &grid) {
    }
 
    // Parse out the masking polyline
-   if(mask_poly_file.length() > 0) {
+   if(!mask_poly_file.empty()) {
       mlog << Debug(3)
            << "Processing poly mask: " << mask_poly_file << "\n";
       parse_poly_mask(mask_poly_file, grid, mask_poly, mask_poly_name);

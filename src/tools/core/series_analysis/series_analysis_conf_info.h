@@ -33,14 +33,14 @@ class SeriesAnalysisConfInfo {
 
       void init_from_scratch();
 
-      // Counts based on the contents of the config file
-      int n_fcst;                          // Number of forecast fields
-      int n_obs;                           // Number of observation fields
-
    public:
 
       // Series-Analysis configuration object
       MetConfig conf;
+
+      // Counts based on the contents of the config file
+      int n_fcst;                          // Number of forecast fields
+      int n_obs;                           // Number of observation fields
 
       // Store data parsed from the Series-Analysis configuration object
       ConcatString     model;              // Model name

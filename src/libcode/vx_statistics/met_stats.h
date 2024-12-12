@@ -617,11 +617,16 @@ class GRADInfo {
       int total;
 
       // Gradient Partial sums
-      double fgbar, ogbar, mgbar, egbar;
+      double fgbar;
+      double ogbar;
+      double mgbar;
+      double egbar;
 
       // Gradient Vector Partial Sums 
-      double fgmag, ogmag;
-      double mag_mse, lap_mse;
+      double fgmag;
+      double ogmag;
+      double mag_mse;
+      double lap_mse;
 
       // Gradient Statistics
       double s1()         const; // s1         = 100 * egbar / mgbar

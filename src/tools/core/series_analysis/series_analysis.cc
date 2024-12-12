@@ -195,13 +195,13 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return "series_analysis";
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+static void process_command_line(int argc, char **argv) {
    int i;
    CommandLine cline;
    ConcatString default_config_file;
@@ -251,13 +251,13 @@ void process_command_line(int argc, char **argv) {
            << R"("-obs" or "-both" option.)" << "\n\n";
       usage();
    }
-   if(config_file.length() == 0) {
+   if(config_file.empty()) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the configuration file must be set using the "
            << R"("-config" option.)" << "\n\n";
       usage();
    }
-   if(out_file.length() == 0) {
+   if(out_file.empty()) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the output NetCDF file must be set using the "
            << R"("-out" option.)" << "\n\n";
@@ -401,7 +401,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_grid(const Grid &fcst_grid, const Grid &obs_grid) {
+static void process_grid(const Grid &fcst_grid, const Grid &obs_grid) {
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.fcst_info[0]->regrid(),
@@ -439,10 +439,10 @@ void process_grid(const Grid &fcst_grid, const Grid &obs_grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile *get_mtddf(const StringArray &file_list,
-                         const GrdFileType type) {
+static Met2dDataFile *get_mtddf(const StringArray &file_list,
+                                const GrdFileType type) {
    int i;
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
+   Met2dDataFile *mtddf = nullptr;
 
    // Find the first file that actually exists
    for(i=0; i<file_list.n(); i++) {
@@ -467,16 +467,18 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool file_is_ok(const ConcatString &file_name, const GrdFileType t) {
+static bool file_is_ok(const ConcatString &file_name,
+                       const GrdFileType t) {
    return(file_exists(file_name.c_str()) || is_python_grdfiletype(t));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_series_data(int i_series,
-                     VarInfo *fcst_info, VarInfo *obs_info,
-                     DataPlane &fcst_dp, DataPlane &obs_dp) {
-   Grid fcst_grid, obs_grid;
+static void get_series_data(int i_series,
+                            VarInfo *fcst_info, VarInfo *obs_info,
+                            DataPlane &fcst_dp, DataPlane &obs_dp) {
+   Grid fcst_grid;
+   Grid obs_grid;
 
    mlog << Debug(2)
         << "Processing series entry " << i_series + 1 << " of "
@@ -635,18 +637,18 @@ void get_series_data(int i_series,
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_series_entry(int i_series, VarInfo *info,
-                      const StringArray &search_files,
-                      const GrdFileType type,
-                      StringArray &found_files, DataPlane &dp,
-                      Grid &cur_grid) {
+static void get_series_entry(int i_series, VarInfo *info,
+                             const StringArray &search_files,
+                             const GrdFileType type,
+                             StringArray &found_files, DataPlane &dp,
+                             Grid &cur_grid) {
    bool found = false;
 
    // Initialize
    dp.clear();
 
    // If not already found, search for a matching file
-   if(found_files[i_series].length() == 0) {
+   if(found_files[i_series].empty()) {
 
       // Loop through the file list
       for(int i=0; i<search_files.n(); i++) {
@@ -703,7 +705,7 @@ void get_series_entry(int i_series, VarInfo *info,
       dp.set_constant(bad_data_double);
       dp.set_init((unixtime) 0);
       dp.set_valid((unixtime) 0);
-      dp.set_lead(bad_data_double);
+      dp.set_lead(bad_data_int);
    }
 
    return;
@@ -711,10 +713,10 @@ void get_series_entry(int i_series, VarInfo *info,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
-                       const GrdFileType type, DataPlane &dp,
-                       Grid &cur_grid) {
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
+static bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
+                              const GrdFileType type, DataPlane &dp,
+                              Grid &cur_grid) {
+   Met2dDataFile *mtddf = nullptr;
    bool found = false;
 
    // Check that the file exists
@@ -734,14 +736,14 @@ bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
    if(found) cur_grid = mtddf->grid();
 
    // Close the data file
-   delete mtddf; mtddf = (Met2dDataFile *) nullptr;
+   delete mtddf; mtddf = nullptr;
 
    return found;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void open_aggr_file() {
+static void open_aggr_file() {
 
    mlog << Debug(1)
         << "Reading aggregate data file: " << aggr_file << "\n";
@@ -804,8 +806,8 @@ void open_aggr_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlane read_aggr_data_plane(const ConcatString &var_name,
-                               const char *suggestion) {
+static DataPlane read_aggr_data_plane(const ConcatString &var_name,
+                                      const char *suggestion) {
    DataPlane aggr_dp;
 
    // Setup the data request
@@ -846,14 +848,13 @@ DataPlane read_aggr_data_plane(const ConcatString &var_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_scores() {
+static void process_scores() {
    int i_point = 0;
-   VarInfo *fcst_info = (VarInfo *) nullptr;
-   VarInfo *obs_info  = (VarInfo *) nullptr;
+   VarInfo *fcst_info = nullptr;
+   VarInfo *obs_info  = nullptr;
    DataPlane fcst_dp;
    DataPlane obs_dp;
    vector<PairDataPoint> pd_block;
-   const char *method_name = "process_scores() ";
 
    // X and Y gradient pairs
    bool do_grad = (!conf_info.fcst_info[0]->is_prob() &&
@@ -863,8 +864,10 @@ void process_scores() {
    vector<PairDataPoint> gy_pd_block;
 
    // Climatology mean and standard deviation
-   DataPlane fcmn_dp, fcsd_dp;
-   DataPlane ocmn_dp, ocsd_dp;
+   DataPlane fcmn_dp;
+   DataPlane fcsd_dp;
+   DataPlane ocmn_dp;
+   DataPlane ocsd_dp;
 
    // Open the aggregate file, if needed
    if(aggr_file.nonempty()) open_aggr_file();
@@ -1196,7 +1199,7 @@ void process_scores() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_categorical(int n, const PairDataPoint *pd_ptr) {
+static void do_categorical(int n, const PairDataPoint *pd_ptr) {
 
    mlog << Debug(4)
         << "Computing Categorical Statistics.\n";
@@ -1284,14 +1287,14 @@ void do_categorical(int n, const PairDataPoint *pd_ptr) {
    } // end for i
 
    // Deallocate memory
-   if(cts_info) { delete [] cts_info; cts_info = (CTSInfo *) nullptr; }
+   if(cts_info) { delete [] cts_info; cts_info = nullptr; }
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_multicategory(int n, const PairDataPoint *pd_ptr) {
+static void do_multicategory(int n, const PairDataPoint *pd_ptr) {
 
    mlog << Debug(4)
         << "Computing Multi-Category Statistics.\n";
@@ -1366,7 +1369,7 @@ void do_multicategory(int n, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_continuous(int n, const PairDataPoint *pd_ptr) {
+static void do_continuous(int n, const PairDataPoint *pd_ptr) {
    CNTInfo cnt_info;
    PairDataPoint pd;
 
@@ -1456,7 +1459,7 @@ void do_continuous(int n, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_partialsums(int n, const PairDataPoint *pd_ptr) {
+static void do_partialsums(int n, const PairDataPoint *pd_ptr) {
 
    mlog << Debug(4)
         << "Computing Scalar Partial Sums.\n";
@@ -1513,7 +1516,7 @@ void do_partialsums(int n, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int read_aggr_total(int n) {
+static int read_aggr_total(int n) {
 
    // Read TOTAL data, if needed
    if(aggr_data.count(total_name) == 0) {
@@ -1549,8 +1552,8 @@ int read_aggr_total(int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void read_aggr_ctc(int n, const CTSInfo &cts_info,
-                   CTSInfo &aggr_cts) {
+static void read_aggr_ctc(int n, const CTSInfo &cts_info,
+                          CTSInfo &aggr_cts) {
 
    // Initialize
    aggr_cts.cts.zero_out();
@@ -1578,8 +1581,8 @@ void read_aggr_ctc(int n, const CTSInfo &cts_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
-                    MCTSInfo &aggr_mcts) {
+static void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
+                           MCTSInfo &aggr_mcts) {
 
    // Initialize
    aggr_mcts.cts = mcts_info.cts;
@@ -1640,8 +1643,8 @@ void read_aggr_mctc(int n, const MCTSInfo &mcts_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void read_aggr_sl1l2(int n, const SL1L2Info &s_info,
-                     SL1L2Info &aggr_psum) {
+static void read_aggr_sl1l2(int n, const SL1L2Info &s_info,
+                            SL1L2Info &aggr_psum) {
 
    // Initialize
    aggr_psum.zero_out();
@@ -1669,8 +1672,8 @@ void read_aggr_sl1l2(int n, const SL1L2Info &s_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void read_aggr_sal1l2(int n, const SL1L2Info &s_info,
-                      SL1L2Info &aggr_psum) {
+static void read_aggr_sal1l2(int n, const SL1L2Info &s_info,
+                             SL1L2Info &aggr_psum) {
 
    // Initialize
    aggr_psum.zero_out();
@@ -1698,8 +1701,8 @@ void read_aggr_sal1l2(int n, const SL1L2Info &s_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void read_aggr_pct(int n, const PCTInfo &pct_info,
-                   PCTInfo &aggr_pct) {
+static void read_aggr_pct(int n, const PCTInfo &pct_info,
+                          PCTInfo &aggr_pct) {
 
    // Initialize
    aggr_pct.pct = pct_info.pct;
@@ -1763,8 +1766,8 @@ void read_aggr_pct(int n, const PCTInfo &pct_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void read_aggr_grad(int n, const GRADInfo &grad_info,
-                    GRADInfo &aggr_grad) {
+static void read_aggr_grad(int n, const GRADInfo &grad_info,
+                           GRADInfo &aggr_grad) {
 
    // Initialize
    aggr_grad.clear();
@@ -1792,7 +1795,7 @@ void read_aggr_grad(int n, const GRADInfo &grad_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
+static void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
 
    mlog << Debug(4)
         << "Computing Probabilistic Statistics.\n";
@@ -1882,8 +1885,8 @@ void do_probabilistic(int n, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_climo_brier(int n, double briercl_pair,
-                    int total_pair, PCTInfo &pct_info) {
+static void do_climo_brier(int n, double briercl_pair,
+                           int total_pair, PCTInfo &pct_info) {
 
    // Aggregate the climatology brier score as a weighted
    // average and recompute the brier skill score
@@ -1926,9 +1929,9 @@ void do_climo_brier(int n, double briercl_pair,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_gradient(int n, int dx, int dy,
-                 const PairDataPoint *pd_gx,
-                 const PairDataPoint *pd_gy) {
+static void do_gradient(int n, int dx, int dy,
+                        const PairDataPoint *pd_gx,
+                        const PairDataPoint *pd_gy) {
 
    mlog << Debug(4)
         << "Computing Gradient DX(" << dx << ")/DY("
@@ -1962,9 +1965,9 @@ void do_gradient(int n, int dx, int dy,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_categorical(int n, STATLineType lt,
-        const ConcatString &col,
-        const CTSInfo &cts_info) {
+static void store_stat_categorical(int n, STATLineType lt,
+                                   const ConcatString &col,
+                                   const CTSInfo &cts_info) {
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
@@ -2014,9 +2017,9 @@ void store_stat_categorical(int n, STATLineType lt,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_multicategory(int n, STATLineType lt,
-        const ConcatString &col,
-        const MCTSInfo &mcts_info) {
+static void store_stat_multicategory(int n, STATLineType lt,
+                                     const ConcatString &col,
+                                     const MCTSInfo &mcts_info) {
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
@@ -2070,9 +2073,9 @@ void store_stat_multicategory(int n, STATLineType lt,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_continuous(int n, STATLineType lt,
-        const ConcatString &col,
-        const CNTInfo &cnt_info) {
+static void store_stat_continuous(int n, STATLineType lt,
+                                  const ConcatString &col,
+                                  const CNTInfo &cnt_info) {
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
@@ -2115,9 +2118,9 @@ void store_stat_continuous(int n, STATLineType lt,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_partialsums(int n, STATLineType lt,
-        const ConcatString &col,
-        const SL1L2Info &s_info) {
+static void store_stat_partialsums(int n, STATLineType lt,
+                                   const ConcatString &col,
+                                   const SL1L2Info &s_info) {
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
@@ -2154,9 +2157,9 @@ void store_stat_partialsums(int n, STATLineType lt,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_probabilistic(int n, STATLineType lt,
-        const ConcatString &col,
-        const PCTInfo &pct_info) {
+static void store_stat_probabilistic(int n, STATLineType lt,
+                                     const ConcatString &col,
+                                     const PCTInfo &pct_info) {
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
@@ -2208,9 +2211,9 @@ void store_stat_probabilistic(int n, STATLineType lt,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_gradient(int n, STATLineType lt,
-        const ConcatString &col,
-        const GRADInfo &grad_info) {
+static void store_stat_gradient(int n, STATLineType lt,
+                                const ConcatString &col,
+                                const GRADInfo &grad_info) {
 
    // Set the column name to all upper case
    ConcatString c = to_upper(col);
@@ -2245,7 +2248,7 @@ void store_stat_gradient(int n, STATLineType lt,
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_all_ctc(int n, const CTSInfo &cts_info) {
+static void store_stat_all_ctc(int n, const CTSInfo &cts_info) {
    for(auto &col : ctc_columns) {
       store_stat_categorical(n, STATLineType::ctc, col, cts_info);
    }
@@ -2253,7 +2256,7 @@ void store_stat_all_ctc(int n, const CTSInfo &cts_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_all_mctc(int n, const MCTSInfo &mcts_info) {
+static void store_stat_all_mctc(int n, const MCTSInfo &mcts_info) {
    StringArray mctc_cols(get_mctc_columns(mcts_info.cts.nrows()));
    for(int i=0; i<mctc_cols.n(); i++) {
       store_stat_multicategory(n, STATLineType::mctc, mctc_cols[i], mcts_info);
@@ -2262,7 +2265,7 @@ void store_stat_all_mctc(int n, const MCTSInfo &mcts_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_all_sl1l2(int n, const SL1L2Info &s_info) {
+static void store_stat_all_sl1l2(int n, const SL1L2Info &s_info) {
    for(auto &col : sl1l2_columns) {
       store_stat_partialsums(n, STATLineType::sl1l2, col, s_info);
    }
@@ -2270,7 +2273,7 @@ void store_stat_all_sl1l2(int n, const SL1L2Info &s_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_all_sal1l2(int n, const SL1L2Info &s_info) {
+static void store_stat_all_sal1l2(int n, const SL1L2Info &s_info) {
    for(auto &col : sal1l2_columns) {
       store_stat_partialsums(n, STATLineType::sal1l2, col, s_info);
    }
@@ -2278,7 +2281,7 @@ void store_stat_all_sal1l2(int n, const SL1L2Info &s_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_all_pct(int n, const PCTInfo &pct_info) {
+static void store_stat_all_pct(int n, const PCTInfo &pct_info) {
    StringArray pct_cols(get_pct_columns(pct_info.pct.nrows() + 1));
    for(int i=0; i<pct_cols.n(); i++) {
       // Skip unused "THRESH_" columns
@@ -2289,7 +2292,7 @@ void store_stat_all_pct(int n, const PCTInfo &pct_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void store_stat_all_grad(int n, const GRADInfo &grad_info) {
+static void store_stat_all_grad(int n, const GRADInfo &grad_info) {
    for(auto &col : grad_columns) {
       store_stat_gradient(n, STATLineType::grad, col, grad_info);
    }
@@ -2297,9 +2300,9 @@ void store_stat_all_grad(int n, const GRADInfo &grad_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString build_nc_var_name_categorical(
-                STATLineType lt, const ConcatString &col,
-                const CTSInfo &cts_info, double alpha) {
+static ConcatString build_nc_var_name_categorical(
+                       STATLineType lt, const ConcatString &col,
+                       const CTSInfo &cts_info, double alpha) {
 
    // Append the column name
    ConcatString var_name("series_");
@@ -2322,9 +2325,9 @@ ConcatString build_nc_var_name_categorical(
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString build_nc_var_name_multicategory(
-                STATLineType lt, const ConcatString &col,
-                double alpha) {
+static ConcatString build_nc_var_name_multicategory(
+                       STATLineType lt, const ConcatString &col,
+                       double alpha) {
 
    // Append the column name
    ConcatString var_name("series_");
@@ -2338,9 +2341,9 @@ ConcatString build_nc_var_name_multicategory(
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString build_nc_var_name_partialsums(
-                STATLineType lt, const ConcatString &col,
-                const SL1L2Info &s_info) {
+static ConcatString build_nc_var_name_partialsums(
+                       STATLineType lt, const ConcatString &col,
+                       const SL1L2Info &s_info) {
 
    // Append the column name
    ConcatString var_name("series_");
@@ -2359,9 +2362,9 @@ ConcatString build_nc_var_name_partialsums(
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString build_nc_var_name_continuous(
-                STATLineType lt, const ConcatString &col,
-                const CNTInfo &cnt_info, double alpha) {
+static ConcatString build_nc_var_name_continuous(
+                       STATLineType lt, const ConcatString &col,
+                       const CNTInfo &cnt_info, double alpha) {
 
    // Append the column name
    ConcatString var_name("series_");
@@ -2383,9 +2386,9 @@ ConcatString build_nc_var_name_continuous(
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString build_nc_var_name_probabilistic(
-                STATLineType lt, const ConcatString &col,
-                const PCTInfo &pct_info, double alpha) {
+static ConcatString build_nc_var_name_probabilistic(
+                       STATLineType lt, const ConcatString &col,
+                       const PCTInfo &pct_info, double alpha) {
 
    // Append the column name
    ConcatString var_name("series_");
@@ -2402,9 +2405,9 @@ ConcatString build_nc_var_name_probabilistic(
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString build_nc_var_name_gradient(
-                STATLineType lt, const ConcatString &col,
-                const GRADInfo &grad_info) {
+static ConcatString build_nc_var_name_gradient(
+                       STATLineType lt, const ConcatString &col,
+                       const GRADInfo &grad_info) {
 
    // Append the column name
    ConcatString var_name("series_");
@@ -2419,7 +2422,8 @@ ConcatString build_nc_var_name_gradient(
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
+static void setup_nc_file(const VarInfo *fcst_info,
+                          const VarInfo *obs_info) {
 
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_file.c_str(), true);
@@ -2473,12 +2477,12 @@ void setup_nc_file(const VarInfo *fcst_info, const VarInfo *obs_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_stat_data(const ConcatString &var_name,
-                   const ConcatString &name,
-                   const ConcatString &long_name,
-                   const ConcatString &fcst_thresh,
-                   const ConcatString &obs_thresh,
-                   double alpha) {
+static void add_stat_data(const ConcatString &var_name,
+                          const ConcatString &name,
+                          const ConcatString &long_name,
+                          const ConcatString &fcst_thresh,
+                          const ConcatString &obs_thresh,
+                          double alpha) {
 
    NcVarData data;
    data.dp.set_size(grid.nx(), grid.ny(), bad_data_double);
@@ -2497,7 +2501,7 @@ void add_stat_data(const ConcatString &var_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_stat_data() {
+static void write_stat_data() {
 
    mlog << Debug(2)
         << "Writing " << stat_data_keys.size()
@@ -2510,9 +2514,9 @@ void write_stat_data() {
    vector<float> data(grid.nx()*grid.ny());
 
    // Write output for each stat_data map entry
-   for(auto &key : stat_data_keys) {
+   for(const auto &key : stat_data_keys) {
 
-      NcVarData *ptr = &stat_data[key];
+      const NcVarData *ptr = &stat_data[key];
 
       // Add a new variable to the NetCDF file
       NcVar nc_var = add_var(nc_out, key, ncFloat, lat_dim, lon_dim, deflate_level);
@@ -2521,9 +2525,9 @@ void write_stat_data() {
       add_att(&nc_var, "_FillValue", bad_data_float);
       add_att(&nc_var, "name", ptr->name);
       add_att(&nc_var, "long_name", ptr->long_name);
-      if(ptr->fcst_thresh.length() > 0) add_att(&nc_var, "fcst_thresh", ptr->fcst_thresh);
-      if(ptr->obs_thresh.length() > 0) add_att(&nc_var, "obs_thresh", ptr->obs_thresh);
-      if(!is_bad_data(ptr->alpha)) add_att(&nc_var, "alpha", ptr->alpha);
+      if(!ptr->fcst_thresh.empty()) add_att(&nc_var, "fcst_thresh", ptr->fcst_thresh);
+      if(!ptr->obs_thresh.empty())  add_att(&nc_var, "obs_thresh", ptr->obs_thresh);
+      if(!is_bad_data(ptr->alpha))  add_att(&nc_var, "alpha", ptr->alpha);
 
       // Store the data
       for(int x=0; x<grid.nx(); x++) {
@@ -2547,7 +2551,7 @@ void write_stat_data() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_range(const unixtime &t, unixtime &beg, unixtime &end) {
+static void set_range(const unixtime &t, unixtime &beg, unixtime &end) {
 
    if(t == (unixtime) 0) return;
 
@@ -2559,7 +2563,7 @@ void set_range(const unixtime &t, unixtime &beg, unixtime &end) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_range(const int &t, int &beg, int &end) {
+static void set_range(const int &t, int &beg, int &end) {
 
    if(is_bad_data(t)) return;
 
@@ -2571,8 +2575,8 @@ void set_range(const int &t, int &beg, int &end) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_pair_dims(vector<PairDataPoint> &pd_block,
-                   int n_pd, int n_pair) {
+static void set_pair_dims(vector<PairDataPoint> &pd_block,
+                          int n_pd, int n_pair) {
 
    // Resize to the number of objects
    pd_block.resize(n_pd);
@@ -2586,7 +2590,7 @@ void set_pair_dims(vector<PairDataPoint> &pd_block,
 
 ////////////////////////////////////////////////////////////////////////
 
-void clean_up() {
+static void clean_up() {
 
    // Close the output NetCDF file
    if(nc_out) {
@@ -2596,7 +2600,7 @@ void clean_up() {
            << "Output file: " << out_file << "\n";
 
       delete nc_out;
-      nc_out = (NcFile *) nullptr;
+      nc_out = nullptr;
    }
 
    // Close the aggregate NetCDF file
@@ -2614,7 +2618,7 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+__attribute__((noreturn)) static void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -2685,58 +2689,59 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_fcst_files(const StringArray & a) {
+static void set_fcst_files(const StringArray & a) {
    fcst_files = a;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_obs_files(const StringArray & a) {
+static void set_obs_files(const StringArray & a) {
    obs_files = a;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_both_files(const StringArray & a) {
+static void set_both_files(const StringArray & a) {
    set_fcst_files(a);
    set_obs_files(a);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_aggr(const StringArray & a) {
+static void set_aggr(const StringArray & a) {
    aggr_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_paired(const StringArray & a) {
+static void set_paired(const StringArray &) {
    paired = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out_file(const StringArray & a) {
+static void set_out_file(const StringArray & a) {
    out_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config_file(const StringArray & a) {
+static void set_config_file(const StringArray & a) {
    config_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+static void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void parse_long_names() {
+static void parse_long_names() {
    ifstream f_in;
-   ConcatString line, key;
+   ConcatString line;
+   ConcatString key;
    StringArray sa;
    ConcatString file_name = replace_path(stat_long_name_file);
 
