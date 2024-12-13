@@ -49,7 +49,7 @@ void llh_to_ecef(double lat, double lon, double alt_m,
                  double *x_km, double *y_km, double *z_km);
 void check_llh_to_ecef(double lat, double lon, double alt_m,
                        double true_x_km, double true_y_km, double true_z_km,
-                       string location);
+                       const string &location);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -161,42 +161,10 @@ void UnstructuredGrid::latlon_to_xy(double lat, double lon, double &x, double &y
 ////////////////////////////////////////////////////////////////////////
 
 
-//void UnstructuredGrid::latlonalt_to_xy(double lat, double lon, double alt_m, double &x, double &y) const {
-//
-//   double x_km;
-//   double y_km;
-//   double z_km;
-//   llh_to_ecef(lat, lon, alt_m, &x_km, &y_km, &z_km);
-//         points_XYZ_km[i] = {x_km, y_km, z_km};
-//   PointXYZ _pointXYZ(x_km, y_km, z_km);
-//
-//   IndexKDTree::ValueList neighbor = Data.closest_points(lat, lon, 1, alt_m);
-//   size_t index(neighbor[0].payload());
-//   double distance_km(neighbor[0].distance()/1000.);
-//   bool in_distance = Data.is_in_distance(distance_km);
-//
-//   x = in_distance ? index : -1.0;
-//   y = 0;
-//
-//   if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
-//        << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredGrid::latlonalt_to_xy() "
-//        << "input(lat,lon,alt)=(" << lat << ", " << lon <<", " << alt
-//        << ") ==> km(" << x_km << ", " << y_km << ", " << z_km
-//        << ") ==> (" << x << ", " << y << ") == ("
-//        << Data.points_XYZ[index].x() << ", " << Data.points_XYZ[index].y()
-//        << ", " << Data.points_XYZ[index].z() << ") distance= " << distance_km << "km, "
-//        << _pointXYZ.distance(Data.points_XYZ[index])
-//        << " km" << (in_distance ? " " : ", rejected") << "\n";
-//}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void UnstructuredGrid::xy_to_latlon(double x, double y, double &lat, double &lon) const {
 
-   lat = Data.points_lonlat[x].y();
-   lon = Data.points_lonlat[x].x();
+   lat = (double) Data.points_lonlat[x].y();
+   lon = (double) Data.points_lonlat[x].x();
 
    if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
         << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredGrid::xy_to_latlon() "
@@ -207,6 +175,7 @@ void UnstructuredGrid::xy_to_latlon(double x, double y, double &lat, double &lon
 
 ////////////////////////////////////////////////////////////////////////
 
+
 double UnstructuredGrid::calc_area(int x, int y) const {
 
    double area = 0.;
@@ -214,6 +183,7 @@ double UnstructuredGrid::calc_area(int x, int y) const {
    return area;
 
 }
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -403,7 +373,8 @@ void UnstructuredData::build_tree() {
       for (int i=0; i<n_face; i++) {
          PointLonLat pointLL(points_lonlat[i].x(), points_lonlat[i].y());
          pointLL.normalise();
-         kdtree->insert(pointLL, n++);
+         kdtree->insert(pointLL, n);
+         n++;
          lat_checksum += (i+1) * points_lonlat[i].y();
          lon_checksum += (i+1) * points_lonlat[i].x();
       }
@@ -417,7 +388,8 @@ void UnstructuredData::build_tree() {
          llh_to_ecef(points_XYZ[i].y(), points_XYZ[i].x(),
                      points_XYZ[i].z(), &x_km, &y_km, &z_km);
          points_XYZ_km.push_back({x_km, y_km, z_km});
-         kdtree->insert(points_XYZ_km[i], n++);
+         kdtree->insert(points_XYZ_km[i], n);
+         n++;
          lat_checksum += (i+1) * y_km;
          lon_checksum += (i+1) * x_km;
          alt_checksum += (i+1) * z_km;
@@ -488,7 +460,7 @@ void UnstructuredData::copy_from(const UnstructuredData *us_data) {
 ////////////////////////////////////////////////////////////////////////
 
 bool UnstructuredData::has_PointLatLon() const {
-   return (points_lonlat.size() > 0);
+   return (!points_lonlat.empty());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -504,7 +476,7 @@ bool UnstructuredData::is_in_distance(double distance_km) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void UnstructuredData::set_points(int count, double *_lon, double *_lat) {
+void UnstructuredData::set_points(int count, const double *_lon, const double *_lat) {
 
    clear_data();
 
@@ -526,13 +498,10 @@ void UnstructuredData::set_points(int count, double *_lon, double *_lat) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void UnstructuredData::set_points(int count, double *_lon, double *_lat, double *_alt) {
+void UnstructuredData::set_points(int count, const double *_lon, const double *_lat, const double *_alt) {
 
    clear_data();
 
-   double x_km;
-   double y_km;
-   double z_km;
    n_face = count;
    points_XYZ.reserve(count);
    for (int i=0; i<count; i++) {
@@ -635,9 +604,9 @@ void UnstructuredData::test_kdtree() {
          lon = points_lonlat[idx].x();
          cout << " - search index=" << idx << " (" << lat << ", " << lon << ")\n";
          IndexKDTree::ValueList neighbor = closest_points(lon, lat, closest_n);
-         for (size_t i=0; i < neighbor.size(); i++) {
-            int index = (int)neighbor[i].payload();
-            distance_km = neighbor[i].distance() / 1000.;
+         for (auto &x : neighbor) {
+            auto index = (int) x.payload();
+            distance_km = x.distance() / 1000.;
             cout << "  + closest index=" << index << "  distance=" << distance_km << " from ("
                  << points_lonlat[index].y() << ", " << points_lonlat[index].x() << ")\n";
          }
@@ -660,9 +629,9 @@ void UnstructuredData::test_kdtree() {
          alt_m = points_XYZ[idx].z();
          cout << " - search index=" << idx << " (" << lat << ", " << lon << ", " << alt_m << ")\n";
          IndexKDTree::ValueList neighbor = closest_points(lat, lon, closest_n, alt_m);
-         for (size_t i=0; i < neighbor.size(); i++) {
-            int index = (int)neighbor[i].payload();
-            distance_km = neighbor[i].distance() / 1000.;
+         for (auto &x : neighbor) {
+            auto index = (int) x.payload();
+            distance_km = x.distance() / 1000.;
             llh_to_ecef(lat, lon, alt_m, &x_km, &y_km, &z_km);
             cout << "  + closest index=" << index << "  distance=" << distance_km << " from ("
                  << points_XYZ[index].y() << ", " << points_XYZ[index].x() << ", " << points_XYZ[index].z()
@@ -670,15 +639,6 @@ void UnstructuredData::test_kdtree() {
          }
          cout << "\n";
       }
-      //if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) {
-      //   mlog << Debug(UGRID_DEBUG_LEVEL) << method_name
-      //        << "first: (" << points_XYZ[0].x() << ", " << points_XYZ[0].y() << ", "
-      //        << points_XYZ[0].z() << ") and last (" << points_XYZ[last_i].x() << ", "
-      //        << points_XYZ[last_i].y() << ", " << points_XYZ[last_i].z() << ") from ("
-      //        << points_XYZ[0].x() << ", " << points_XYZ[0].y() << ", " << points_XYZ[0].z()
-      //        << ") and (" << points_XYZ[last_i].x() << ", " << points_XYZ[last_i].y()
-      //        << ", " << points_XYZ[last_i].z() << ")\n";
-      //}
    }
 
 }
@@ -690,7 +650,7 @@ void UnstructuredData::test_kdtree() {
 // - search index=1152 (-27.9711, 107.326, 100) ==> (-1678.837,  5381.522, -2973.724) km
 // - search index=2303 ( 75.6264, 287.326, 100) ==> (  473.024, -1516.283,  6156.59 ) km
 
-void UnstructuredData::test_llh_to_ecef() {
+void UnstructuredData::test_llh_to_ecef() const {
    check_llh_to_ecef( 34.0522, -118.40806, 0., -2516.715, -4653.003,  3551.245, "           LA");
    check_llh_to_ecef(-9.59874, 287.326, 100.,   1873.072, -6004.143, -1056.531, "  First Point");
    check_llh_to_ecef(-27.9711, 107.326, 100.,  -1678.837,  5381.522, -2973.724, " Middle Point");
@@ -715,7 +675,7 @@ void llh_to_ecef(double lat, double lon, double alt_m, double *x_km, double *y_k
 
 ////////////////////////////////////////////////////////////////////////
 
-void check_llh_to_ecef(double lat, double lon, double alt_m, double true_x_km, double true_y_km, double true_z_km, string location) {
+void check_llh_to_ecef(double lat, double lon, double alt_m, double true_x_km, double true_y_km, double true_z_km, const string &location) {
    double x_km;
    double y_km;
    double z_km;
@@ -726,3 +686,5 @@ void check_llh_to_ecef(double lat, double lon, double alt_m, double true_x_km, d
         << ") Diff: (" << (true_x_km - x_km) << ", " << (true_y_km - y_km) << ", " << (true_z_km - z_km) << ")\n";
 
 }
+
+////////////////////////////////////////////////////////////////////////

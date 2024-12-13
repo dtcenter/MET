@@ -51,9 +51,9 @@ struct UnstructuredData {
 
    void build_tree();
    bool is_in_distance(double distance_km) const;
-   void set_points(int count, double *_lon, double *_lat);
+   void set_points(int count, const double *_lon, const double *_lat);
    void set_points(int count, const std::vector<atlas::PointLonLat> &);
-   void set_points(int count, double *_lon, double *_lat, double *_alt);
+   void set_points(int count, const double *_lon, const double *_lat, const double *_alt);
    void set_points(int count, const std::vector<atlas::PointXYZ> &);
    void copy_from(const UnstructuredData *);
    void copy_from(const UnstructuredData &);
@@ -61,7 +61,7 @@ struct UnstructuredData {
    void clear_data();
    bool has_PointLatLon() const;
    void test_kdtree();
-   void test_llh_to_ecef();
+   void test_llh_to_ecef() const;
    atlas::util::IndexKDTree::ValueList closest_points(
         const double &lat, const double &lon, const size_t &k,
         const double &alt_m=bad_data_double) const;

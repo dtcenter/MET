@@ -45,7 +45,6 @@ class UnstructuredGrid : public GridRep {
       void clear();
 
       void set_from_data(const UnstructuredData &);
-      //void set_max_distance_deg(double max_distance);
       void set_max_distance_km(double max_distance);
 
          //
@@ -55,10 +54,6 @@ class UnstructuredGrid : public GridRep {
       virtual void latlon_to_xy(double lat, double lon, double & x, double & y) const;
 
       virtual void xy_to_latlon(double x, double y, double & lat, double & lon) const;
-
-      //void latlonalt_to_xy(double lat, double lon, double alt_m, double & x, double & y) const;
-
-      //void xy_to_latlonalt(double x, double y, double & lat, double & lon, double &alt) const;
 
       virtual double calc_area(int x, int y) const;
 
