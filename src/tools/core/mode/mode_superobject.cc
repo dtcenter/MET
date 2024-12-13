@@ -17,6 +17,7 @@ using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
+
 static void _mask_super(const string &name, int nx, int ny, DataPlane &data)
 {
 
@@ -28,7 +29,8 @@ static void _mask_super(const string &name, int nx, int ny, DataPlane &data)
       exit( 1 );
    }
 
-   int nmasked=0, nkeep=0;
+   int nmasked=0;
+   int nkeep=0;
    
    for (int x=0; x<nx; ++x)  {
 
@@ -67,7 +69,7 @@ static void _mask(const string &name, int nx, int ny, const BoolPlane &bp,
       for (int y=0; y<ny; ++y)  {
 
          if ( bp(x, y) == false) {
-            data.set(bad_data_float, x, y);;
+            data.set(bad_data_float, x, y);
             nmasked ++;
          } else {
             nkeep ++;
@@ -82,8 +84,8 @@ static void _mask(const string &name, int nx, int ny, const BoolPlane &bp,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void _debug_shape_examine(string &name, const ShapeData &sd,
-                                  int nx, int ny)
+static void _debug_shape_examine(const string &name, const ShapeData &sd,
+                                 int nx, int ny)
 {
    vector<double> values;
    vector<int> count;
@@ -99,7 +101,7 @@ static void _debug_shape_examine(string &name, const ShapeData &sd,
             values.push_back(v);
             count.push_back(1);
          } else {
-            int ii = vi - values.begin();
+            int ii = nint(vi - values.begin());
             count[ii] = count[ii] + 1;
          }
       }
@@ -126,8 +128,8 @@ ModeSuperObject::ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
    //  set the BoolPlane values using the mvd content
    //
 
-   BoolPlane * simple_plane = new BoolPlane [n_files];
-   BoolPlane * merge_plane = new BoolPlane [n_files];
+   auto simple_plane = new BoolPlane [n_files];
+   auto merge_plane = new BoolPlane [n_files];
 
    for (int j=0; j<n_files; ++j)  {
       mvd[j]->objects_from_arrays(do_clusters, true, simple_plane[j]);
@@ -144,7 +146,8 @@ ModeSuperObject::ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
    _simple_result.set_size(nx, ny);
    merge_result.set_size(nx, ny);
 
-   string simple_name, merge_name;
+   string simple_name;
+   string merge_name;
    
    if (isFcst) {
       simple_name = "Fcst_Simple";
@@ -172,7 +175,7 @@ ModeSuperObject::ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
       }
    }
 
-   ShapeData merge_sd = ShapeData(*(mvd[0]->_simple->_sd));
+   auto merge_sd = ShapeData(*(mvd[0]->_simple->_sd));
    for (int x=0; x<nx; ++x) {
       for (int y=0; y<ny; ++y) {
          if (merge_result.get(x, y)) {

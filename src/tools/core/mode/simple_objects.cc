@@ -50,9 +50,9 @@ void SimpleObjects::setSuper(bool isFcst, int n_fcst_files, bool do_clusters,
 
 void SimpleObjects::clear(void)
 {
-   for (size_t j=0; j<_mvd.size(); ++j) {
-      delete _mvd[j];
-      _mvd[j] = 0;
+   for (auto &x : _mvd) {
+      delete x;
+      x = nullptr;
    }
    _mvd.clear();
 }

@@ -32,9 +32,12 @@ private:
    int n_fcst_files, n_obs_files;
    StringArray fcst_filenames;
    StringArray  obs_filenames;
-   BoolCalc f_calc, o_calc ;
-   std::vector<ModeInputData> fcstInput, obsInput;
-   std::vector<MultiVarData *> mvdFcst, mvdObs;
+   BoolCalc f_calc;
+   BoolCalc o_calc;
+   std::vector<ModeInputData> fcstInput;
+   std::vector<ModeInputData>  obsInput;
+   std::vector<MultiVarData *> mvdFcst;
+   std::vector<MultiVarData *> mvdObs;
    std::string fcst_fof;
    std::string obs_fof;
 
@@ -43,7 +46,7 @@ private:
    void _read_config(const std::string & filename);
    void _setup_inputs();
    void _set_output_path();
-   int  _mkdir(const char *dir);
+   int  _mkdir(const char *dir) const;
    void _read_input(const std::string &name, int index, ModeDataType type,
                     GrdFileType f_t, GrdFileType other_t, int shift);
    void _create_verif_grid(void);

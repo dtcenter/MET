@@ -34,7 +34,7 @@ static const char mode_default_config [] = "MET_BASE/config/MODEMultivarConfig_d
 
 static const int dir_creation_mode = 0755;       
 
-static ModeExecutive *mode_exec = 0;
+static ModeExecutive *mode_exec = nullptr;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +44,7 @@ MultivarFrontEnd::MultivarFrontEnd()
    do_clusters = false;
    default_out_dir = ".";
    compress_level = -1;
-   mode_exec = 0;
+   mode_exec = nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ MultivarFrontEnd::MultivarFrontEnd()
 MultivarFrontEnd::~MultivarFrontEnd()
 {
    if ( mode_exec ) {
-      delete mode_exec;  mode_exec = 0;
+      delete mode_exec;  mode_exec = nullptr;
    }
  }
 
@@ -71,16 +71,14 @@ int MultivarFrontEnd::run(const StringArray & Argv)
 
    // read in all the data
    for (int i=0; i<n_fcst_files; ++i) {
-      GrdFileType ft, ot;
-      ft = config.file_type_for_field(true, i);
-      ot = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_obs));
+      GrdFileType ft = config.file_type_for_field(true, i);
+      GrdFileType ot = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_obs));
       _read_input(fcst_filenames[i], i, ModeDataType::MvMode_Fcst, ft, ot, shift);
 
    }
    for (int i=0; i<n_obs_files; ++i) {
-      GrdFileType ft, ot;
-      ft = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_fcst));
-      ot = config.file_type_for_field(false, i);
+      GrdFileType ft = parse_conf_file_type(config.conf.lookup_dictionary(conf_key_fcst));
+      GrdFileType ot = config.file_type_for_field(false, i);
       _read_input(obs_filenames[i], i, ModeDataType::MvMode_Obs, ot, ft, shift);
    }
    
@@ -122,13 +120,15 @@ int MultivarFrontEnd::run(const StringArray & Argv)
    int NR = NCRF;
    
    // containers for information needed to do additional things with simple objects after creation
-   vector<SimpleObjects> fcstSimple, obsSimple;
+   vector<SimpleObjects> fcstSimple;
+   vector<SimpleObjects> obsSimple;
 
    // create simple objects for all convolution settings
    if (config.quilt) {
       for (int ir=0; ir<NR; ++ir) {
          for (int it=0; it<NT; ++it) {
-            SimpleObjects OF, OO;
+            SimpleObjects OF;
+            SimpleObjects OO;
             _create_simple_objects(ModeDataType::MvMode_Fcst, "forecast", ir, it, n_fcst_files,
                                    fcst_filenames, fcstInput, f_calc, OF);
             fcstSimple.push_back(OF);
@@ -140,7 +140,8 @@ int MultivarFrontEnd::run(const StringArray & Argv)
    }
    else {
       for (int ir=0; ir<NR; ++ir) {
-         SimpleObjects OF, OO;
+         SimpleObjects OF;
+         SimpleObjects OO;
          _create_simple_objects(ModeDataType::MvMode_Fcst, "forecast", ir, ir, n_fcst_files,
                                 fcst_filenames, fcstInput, f_calc, OF);
          fcstSimple.push_back(OF);
@@ -154,7 +155,7 @@ int MultivarFrontEnd::run(const StringArray & Argv)
    // and obs
 
    for (size_t fi=0; fi<fcstSimple.size(); ++fi) {
-      int oi = fi;
+      auto oi = (int) fi;
 
       // Filter the data to within the superobjects only and do statistics by invoking mode
       // algorithm again on the masked data pairs
@@ -178,13 +179,9 @@ int MultivarFrontEnd::run(const StringArray & Argv)
    mlog << Debug(1) << "\n finished with multivar intensity comparisons \n" << sep << "\n";
 
    // clear out memory stored in the simple objects
-   
-   for (size_t i=0; i<fcstSimple.size(); ++i) {
-      fcstSimple[i].clear();
-   }   
-   for (size_t i=0; i<obsSimple.size(); ++i) {
-      obsSimple[i].clear();
-   }   
+
+   for (auto &x : fcstSimple) x.clear();
+   for (auto &x : obsSimple) x.clear();
 
    //
    //  done
@@ -315,8 +312,6 @@ void MultivarFrontEnd::_read_config(const string & filename)
    // what is this, command line overrides config?  look deeper.. remove from exec
    // except traditional mode
    if (compress_level >= 0) config.nc_info.set_compress_level(compress_level);
-   // from within mode_exec:
-   // engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
 
    return;
 }
@@ -444,26 +439,24 @@ void MultivarFrontEnd::_set_output_path()
 
 ////////////////////////////////////////////////////////////////////////
 
-int MultivarFrontEnd::_mkdir(const char *dir)
+int MultivarFrontEnd::_mkdir(const char *dir) const
 {
    char tmp[256];
-   char *p = NULL;
    size_t len;
 
    snprintf(tmp, sizeof(tmp),"%s",dir);
    len = strlen(tmp);
    if (tmp[len - 1] == '/')
       tmp[len - 1] = 0;
-   for (p = tmp + 1; *p; p++)
+   for (char *p = tmp + 1; *p; p++)
       if (*p == '/') {
          *p = 0;
          string s = tmp;
-         if (s != ".") {
-            if (mkdir(tmp, dir_creation_mode) < 0) {
-               mlog << Error << "\nMultivarFrontEnd::_mkdir() ->"
-                    << "Error making " << tmp << "\n";
-               return -1;
-            }
+         if (s != "." &&
+             mkdir(tmp, dir_creation_mode) < 0) {
+            mlog << Error << "\nMultivarFrontEnd::_mkdir() ->"
+                 << "Error making " << tmp << "\n";
+            return -1;
          }
          *p = '/';
       }
@@ -514,7 +507,7 @@ void MultivarFrontEnd::_create_verif_grid()
    _init_exec(ModeExecutive::TRADITIONAL, "None", "None");
    mode_exec->setup_verification_grid(fcstInput[0], obsInput[0], config);
    verification_grid = mode_exec->grid;
-   delete mode_exec;  mode_exec = 0;
+   delete mode_exec;  mode_exec = nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -553,7 +546,7 @@ MultiVarData *MultivarFrontEnd::_create_simple_multivar_data(ModeDataType dtype,
    _simple_objects(ModeExecutive::MULTIVAR_SIMPLE, dtype, rIndex, tIndex, j, n_files,
                    filename, input);
    MultiVarData *mvdi = mode_exec->get_multivar_data(dtype);
-   delete mode_exec; mode_exec = 0;
+   delete mode_exec; mode_exec = nullptr;
 
    //
    // create simple merged objects
@@ -561,7 +554,7 @@ MultiVarData *MultivarFrontEnd::_create_simple_multivar_data(ModeDataType dtype,
    _simple_objects(ModeExecutive::MULTIVAR_SIMPLE_MERGE, dtype, rIndex, tIndex, j, n_files,
                    filename, input);
    mode_exec->add_multivar_merge_data(mvdi, dtype);
-   delete mode_exec;  mode_exec = 0;
+   delete mode_exec;  mode_exec = nullptr;
    return mvdi;
 }
 
@@ -575,11 +568,11 @@ void MultivarFrontEnd::_simple_objects(ModeExecutive::Processing_t p,
 {
    if (dtype == ModeDataType::MvMode_Fcst) {
       _init_exec(p, filename, "None");
-      mode_exec->init_multivar_simple(rIndex, tIndex, j, n_files, dtype, config);
+      mode_exec->init_multivar_simple(rIndex, tIndex, j, dtype, config);
       mode_exec->setup_multivar_fcst_data(verification_grid, input);
    } else {
       _init_exec(p, "None", filename);
-      mode_exec->init_multivar_simple(rIndex, tIndex, j, n_files, dtype, config);
+      mode_exec->init_multivar_simple(rIndex, tIndex, j, dtype, config);
       mode_exec->setup_multivar_obs_data(verification_grid, input);
    }
    
@@ -654,7 +647,7 @@ MultivarFrontEnd::_create_intensity_comparisons(SimpleObjects &fcsts, int findex
    _intensity_compare_mode_algorithm(fcsts._rIndex, fcsts._tIndex, obs._rIndex, obs._tIndex, *mvdf, *mvdo,
                                      fcsts._super, obs._super);
 
-   delete mode_exec;  mode_exec = 0;
+   delete mode_exec;  mode_exec = nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -716,7 +709,7 @@ void MultivarFrontEnd::_process_superobjects(SimpleObjects &fcsts, SimpleObjects
    _superobject_mode_algorithm(fcsts._rIndex, fcsts._tIndex, obs._rIndex, obs._tIndex,
                                fcsts._super, obs._super);
 
-   delete mode_exec;  mode_exec = 0;
+   delete mode_exec;  mode_exec = nullptr;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -747,10 +740,9 @@ void MultivarFrontEnd::_init_exec(ModeExecutive::Processing_t p,
 {
    mlog << Debug(4) << "Running multivar front end for " << ModeExecutive::stype(p) << "\n";
 
-   if ( mode_exec )  { delete mode_exec;  mode_exec = 0; }
+   if ( mode_exec )  { delete mode_exec;  mode_exec = nullptr; }
 
    mode_exec = new ModeExecutive();
-   // compress_level = -1;
    mode_exec->fcst_file = ffile;
    mode_exec->obs_file = ofile;
 

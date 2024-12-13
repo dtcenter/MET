@@ -81,7 +81,7 @@ class ModeExecutive {
    void clear();
 
    void init_traditional(int n_files);
-   void init_multivar_simple(int rIndex, int tIndex, int j, int n_files, ModeDataType dtype, const ModeConfInfo &conf);
+   void init_multivar_simple(int rIndex, int tIndex, int j, ModeDataType dtype, const ModeConfInfo &conf);
    void init_multivar_intensities(const ModeConfInfo &conf);
 
    int n_conv_radii   () const;
@@ -130,21 +130,26 @@ class ModeExecutive {
    ConcatString out_dir;
 
    // set for both trad and multivar mode, used for plotting limits
-   double data_min, data_max;
+   double data_min;
+   double data_max;
 
    // set for trad and multivar, used in the engine mode algorithm
-   ShapeData Fcst_sd, Obs_sd;
+   ShapeData Fcst_sd;
+   ShapeData Obs_sd;
 
    // not used by multivar
-   GrdFileType ftype, otype;
+   GrdFileType ftype;
+   GrdFileType otype;
 
    // set into execs's conf varInfo object, only for multivar intensity comparisons
    // for trad it's read in from the config
-   string funits, ounits;
+   string funits;
+   string ounits;
 
    // set into execs's conf varInfo object, only for multivar intensity comparisons
    // for trad it's read in from the config
-   string flevel, olevel;
+   string flevel;
+   string olevel;
 
    // used in multivar only to customize outputs correctly
    bool isMultivarOutput;

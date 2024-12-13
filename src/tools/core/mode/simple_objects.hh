@@ -24,8 +24,6 @@
 
 class SimpleObjects {
 
- private:
-
  public:
 
    SimpleObjects();

@@ -74,11 +74,11 @@ void ModeConfInfo::init_from_scratch()
    Field_Index_f = 0;
    Field_Index_o = 0;
 
-   fcst_array = 0;
-    obs_array = 0;
+   fcst_array = nullptr;
+    obs_array = nullptr;
 
-   fcst_array = 0;
-    obs_array = 0;
+   fcst_array = nullptr;
+    obs_array = nullptr;
 
    clear();
 
@@ -115,8 +115,8 @@ void ModeConfInfo::assign( const ModeConfInfo &m)
    complexity_ratio_wt = m.complexity_ratio_wt;
    inten_perc_ratio_wt = m.inten_perc_ratio_wt;
 
-   fcst_array = 0;
-   Fcst = 0;
+   fcst_array = nullptr;
+   Fcst = nullptr;
    if (N_fields_f > 0) {
       fcst_array = new Mode_Field_Info[N_fields_f];
       for (int i=0; i<N_fields_f; ++i)
@@ -125,8 +125,8 @@ void ModeConfInfo::assign( const ModeConfInfo &m)
       }
       Fcst = fcst_array + Field_Index_f;
    }
-   obs_array = 0;
-   Obs = 0;
+   obs_array = nullptr;
+   Obs = nullptr;
    if (N_fields_o > 0) {
       obs_array = new Mode_Field_Info[N_fields_o];
       for (int i=0; i<N_fields_o; ++i)
@@ -137,8 +137,7 @@ void ModeConfInfo::assign( const ModeConfInfo &m)
    }
 
    // need to be recomputed, maybe, so do so just in case
-   Dictionary * dict      = (Dictionary *) nullptr;
-   dict = conf.lookup_dictionary(conf_key_interest_function);
+   Dictionary * dict   = conf.lookup_dictionary(conf_key_interest_function);
    centroid_dist_if    = parse_interest_function(dict, conf_key_centroid_dist);
    boundary_dist_if    = parse_interest_function(dict, conf_key_boundary_dist);
    convex_hull_dist_if = parse_interest_function(dict, conf_key_convex_hull_dist);
@@ -260,11 +259,11 @@ void ModeConfInfo::clear()
    quilt = false;
 
    // Deallocate memory
-   if ( fcst_array )  { delete [] fcst_array;  fcst_array = 0; }
-   if (  obs_array )  { delete []  obs_array;   obs_array = 0; }
+   if ( fcst_array )  { delete [] fcst_array;  fcst_array = nullptr; }
+   if (  obs_array )  { delete []  obs_array;   obs_array = nullptr; }
 
-   Fcst = 0;
-    Obs = 0;
+   Fcst = nullptr;
+    Obs = nullptr;
 
    // so traditional mode will have the right value
    data_type = ModeDataType::Traditional;
@@ -308,7 +307,7 @@ void ModeConfInfo::process_config_traditional(GrdFileType ftype, GrdFileType oty
 
 void ModeConfInfo::process_config_except_fields()
 {
-   Dictionary * dict      = (Dictionary *) nullptr;
+   Dictionary * dict = nullptr;
 
       // Dump the contents of the config file
 
@@ -533,16 +532,11 @@ void ModeConfInfo::process_config_field(GrdFileType ftype, GrdFileType otype,
 void ModeConfInfo::process_config_both(GrdFileType ftype, GrdFileType otype,
                                        int field_index)
 {
-   int j, k, n;
-
-
-   Dictionary * fcst_dict = (Dictionary *) nullptr;
-   Dictionary * obs_dict  = (Dictionary *) nullptr;
 
       // Conf: fcst and obs
 
-   fcst_dict = conf.lookup_dictionary(conf_key_fcst);
-   obs_dict  = conf.lookup_dictionary(conf_key_obs);
+   Dictionary * fcst_dict = conf.lookup_dictionary(conf_key_fcst);
+   Dictionary * obs_dict  = conf.lookup_dictionary(conf_key_obs);
 
       // Conf: shift_right
 
@@ -606,11 +600,8 @@ void ModeConfInfo::process_config_both(GrdFileType ftype, GrdFileType otype,
 
 void ModeConfInfo::process_config_fcst(GrdFileType ftype, int field_index)
 {
-   int j, k, n;
 
-   Dictionary * fcst_dict = (Dictionary *) nullptr;
-
-   fcst_dict = conf.lookup_dictionary(conf_key_fcst);
+   Dictionary * fcst_dict = conf.lookup_dictionary(conf_key_fcst);
    shift_right = fcst_dict->lookup_int(conf_key_shift_right);
 
    if (field_index == 0) {
@@ -643,11 +634,8 @@ void ModeConfInfo::process_config_fcst(GrdFileType ftype, int field_index)
 
 void ModeConfInfo::process_config_obs(GrdFileType otype, int field_index)
 {
-   int j, k, n;
 
-   Dictionary * obs_dict  = (Dictionary *) nullptr;
-
-   obs_dict  = conf.lookup_dictionary(conf_key_obs);
+   Dicationary * obs_dict = conf.lookup_dictionary(conf_key_obs);
    shift_right = obs_dict->lookup_int(conf_key_shift_right);
 
    if (field_index == 0) {
@@ -688,7 +676,8 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
    // right now I simply go with frequency bias as highest priority
 
    // indices of forecast and obs inputs that have frequency bias percentile thresholding
-   vector<int> fcst_freq, obs_freq;
+   vector<int> fcst_freq;
+   vector<int> obs_freq;
 
    // indices (common to forecast and obs) that require both inputs (fcst and obs)
    // which is either frequency bias, or sample obs with a forecast input, or sample fcst
@@ -776,9 +765,8 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
    }
 
    // make sure no overlap in fcst/obs frequencies, as that's a no no
-   for (size_t i=0; i<fcst_freq.size(); ++i)
+   for (auto &findex : fcst_freq)
    {
-      int findex = fcst_freq[i];
       if (find(obs_freq.begin(), obs_freq.end(), findex) != obs_freq.end())
       {
          mlog << Error << "\nModeConfInfo::config_set_all_percentile_thresholds\n"
@@ -787,9 +775,8 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
          exit(1);
       }
    }
-   for (size_t i=0; i<obs_freq.size(); ++i)
+   for (auto &findex : obs_freq)
    {
-      int findex = obs_freq[i];
       if (find(fcst_freq.begin(), fcst_freq.end(), findex) != fcst_freq.end())
       {
          mlog << Error << "\nModeConfInfo::config_set_all_percentile_thresholds\n"
@@ -801,8 +788,7 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
 
    // now do all the indices with both, which come from FBIAS and SOP on forecasts
    // and SFP on obs  
-   for (size_t i=0; i<indices_with_both.size(); ++i) {
-      int index = indices_with_both[i];
+   for (auto &index : indices_with_both) {
       data_type = ModeDataType::MvMode_Both;
       set_field_index(index, index);
       set_perc_thresh(fdata[index]._dataPlane, odata[index]._dataPlane);
@@ -916,7 +902,7 @@ void ModeConfInfo::evaluate_obs_settings(int j)
 ////////////////////////////////////////////////////////////////////////
 
 
-void ModeConfInfo::read_fields_0 (Mode_Field_Info * & info_array, Dictionary * dict, GrdFileType type, char _fo)
+void ModeConfInfo::read_fields_0 (Mode_Field_Info * & info_array, Dictionary * dict, GrdFileType, char _fo)
 
 {
 
@@ -938,19 +924,19 @@ info_array = new Mode_Field_Info [N];
 
 if ( field->is_array() ) {
 
-   int j, k;
-   const DictionaryEntry * e = 0;
+   const DictionaryEntry * e = nullptr;
    const Dictionary & D = *field;
 
-   if (data_type == ModeDataType::Traditional) {
-      // traditional mode, extra test
-      if ( (N_fields_f > 0) && (N != N_fields_f) )  {
-         mlog << Error
-              << "\nModeConfInfo::read_fields() -> fcst and obs dictionaries have different number of entries in traditional mode"
-              << ", not allowed\n\n";
-         exit ( 1 );
+   // traditional mode, extra test
+   if ( (data_type == ModeDataType::Traditional) &&
+        (N_fields_f > 0) &&
+        (N != N_fields_f) )  {
+      mlog << Error
+           << "\nModeConfInfo::read_fields() -> fcst and obs dictionaries have different number of entries in traditional mode"
+           << ", not allowed\n\n";
+     
+      exit ( 1 );
 
-      }
    }
    
    if (_fo == 'F')  {
@@ -958,7 +944,7 @@ if ( field->is_array() ) {
    } else {
       N_fields_o = N;
    }
-   for (j=0; j<N; ++j)  {
+   for (int j=0; j<N; ++j)  {
 
       e = D[j];
 
@@ -1011,11 +997,9 @@ void ModeConfInfo::read_fields_1 (Mode_Field_Info * & info_array, Dictionary * d
 
 const Dictionary * field = ee->dict();
 
-const int N = ( (field->is_array()) ? (field->n_entries()) : 1 );
-
 if ( field->is_array() ) {
 
-   const DictionaryEntry * e = 0;
+   const DictionaryEntry * e = nullptr;
    const Dictionary & D = *field;
 
     e = D[field_index];
@@ -1175,7 +1159,8 @@ void ModeConfInfo::set_perc_thresh(const DataPlane &f_dp,
    //
    // Sort the input arrays
    //
-   NumArray fsort, osort;
+   NumArray fsort;
+   NumArray osort;
    int nxy = f_dp.nx() * f_dp.ny();
 
    fsort.extend(nxy);
@@ -1276,7 +1261,7 @@ void ModeConfInfo::parse_nc_info()
 
 {
 
-const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
+const DictionaryEntry * e = nullptr;
 
 e = conf.lookup(conf_key_nc_pairs_flag);
 
@@ -1371,16 +1356,6 @@ void ModeConfInfo::set_conv_radius_by_index(int k)
 void ModeConfInfo::set_obs_conv_radius_by_index(int k)
 
 {
-   // if (data_type != ModeDataType::MvMode_Obs) {
-   //    if ( (k < 0) || (k >= Fcst->conv_radius_array.n_elements()) )  {
-   //       mlog << Error 
-   //            << "\nModeConfInfo::set_conv_radius_by_index(int) -> "
-   //            << "range check error\n\n";
-   //       exit ( 1 );
-   //    }
-   //    Fcst->conv_radius =  Fcst->conv_radius_array[k];
-   // }
-   // if (data_type != ModeDataType::MvMode_Fcst) {
    if ( (k < 0) || (k >= Obs->conv_radius_array.n_elements()) )  {
       mlog << Error 
            << "\nModeConfInfo::set_conv_radius_by_index(int) -> "
@@ -1522,11 +1497,11 @@ void ModeConfInfo::set_fcst_conv_thresh_by_index(int k)
 
 void ModeConfInfo::set_merge_thresh_by_index(int k)
 {
-   if (data_type != ModeDataType::MvMode_Fcst) {
-      if ( Obs->need_merge_thresh  () )  set_obs_merge_thresh_by_index  (k);
+   if ( data_type != ModeDataType::MvMode_Fcst &&
+        Obs->need_merge_thresh() ) set_obs_merge_thresh_by_index  (k);
    }
-   if (data_type != ModeDataType::MvMode_Obs) {
-         if ( Fcst->need_merge_thresh () )  set_fcst_merge_thresh_by_index (k);
+   if ( data_type != ModeDataType::MvMode_Obs &&
+        Fcst->need_merge_thresh() ) set_fcst_merge_thresh_by_index (k);
    }
 }   
 
@@ -1556,11 +1531,11 @@ void ModeConfInfo::set_fcst_merge_thresh_by_index(int k)
 
 void ModeConfInfo::set_conv_thresh_by_merge_index(int k)
 {
-   if (data_type != ModeDataType::MvMode_Fcst) {
-      if (Obs->need_merge_thresh()) set_obs_conv_thresh_by_merge_index (k);
+   if ( data_type != ModeDataType::MvMode_Fcst &&
+        Obs->need_merge_thresh() ) set_obs_conv_thresh_by_merge_index (k);
    }
-   if (data_type != ModeDataType::MvMode_Obs) {
-      if (Fcst->need_merge_thresh()) set_fcst_conv_thresh_by_merge_index (k);
+   if ( data_type != ModeDataType::MvMode_Obs &&
+        Fcst->need_merge_thresh() ) set_fcst_conv_thresh_by_merge_index (k);
    }
 }
 
@@ -1692,7 +1667,7 @@ GrdFileType ModeConfInfo::file_type_for_field(bool isFcst, int field_index)
    // look at the dictionary for the obs or forecast at index, with
    // parents
    
-   Dictionary * dict = (Dictionary *) nullptr;
+   Dictionary * dict = nullptr;
    if (isFcst) {
       dict = conf.lookup_dictionary(conf_key_fcst);
    } else {
@@ -1787,7 +1762,7 @@ void ModeConfInfo::get_multivar_programs()
 
 {
 
-Dictionary * dict = (Dictionary *) nullptr;
+Dictionary * dict = nullptr;
 
 fcst_multivar_logic.clear();
 obs_multivar_logic.clear();
@@ -1930,8 +1905,8 @@ void ModeConfInfo::check_multivar_not_implemented()
 
 PercThreshType ModeConfInfo::perctype(const Mode_Field_Info &f)  const
 {
-   PercThreshType pm=no_perc_thresh_type;;
-   PercThreshType pc=no_perc_thresh_type;;
+   PercThreshType pm=no_perc_thresh_type;
+   PercThreshType pc=no_perc_thresh_type;
    if  (f.merge_thresh_array.n() > 0) {
       pm = f.merge_thresh_array[0].get_ptype();
    }

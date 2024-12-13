@@ -43,7 +43,8 @@ class ModeSuperObject {
 
    bool _isFcst;
    bool _hasUnion;
-   int _rIndex, _tIndex;
+   int _rIndex;
+   int _tIndex;
    BoolPlane _simple_result;
    ShapeData _simple_sd;
    ShapeData _merge_sd_split;

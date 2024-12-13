@@ -203,7 +203,7 @@ void ModeExecutive::init_traditional(int n_files)
 ///////////////////////////////////////////////////////////////////////
 
 void ModeExecutive::init_multivar_simple(int rIndex, int tIndex,
-                                         int j, int n_files, ModeDataType dtype,
+                                         int j, ModeDataType dtype,
                                          const ModeConfInfo &conf)
 
 {
@@ -215,8 +215,6 @@ void ModeExecutive::init_multivar_simple(int rIndex, int tIndex,
    engine.set_data_type(dtype);
 
    engine.conf_info.set_field_index(j);
-
-   // engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
 
    return;
 
@@ -238,8 +236,6 @@ void ModeExecutive::init_multivar_intensities(const ModeConfInfo &conf)
    // check one again for multivar problems
    engine.conf_info.check_multivar_not_implemented();
 
-   // engine.conf_info.nc_info.compress_level = engine.conf_info.get_compression_level();
-
    return;
 
 }
@@ -252,8 +248,10 @@ void ModeExecutive::setup_traditional_fcst_obs_data()
 
 {
 
-   // ShapeData fcst_sd, obs_sd;
-   double fmin, omin, fmax, omax;
+   double fmin;
+   double omin;
+   double fmax;
+   double omax;
 
    Fcst_sd.clear();
    Obs_sd.clear();
@@ -443,7 +441,8 @@ void ModeExecutive::setup_multivar_fcst_data(const Grid &verification_grid,
                                              const ModeInputData &input)
 {
 
-   double fmin, fmax;
+   double fmin;
+   double fmax;
 
    Fcst_sd.clear();
    Fcst_sd.data = input._dataPlane;
@@ -506,8 +505,8 @@ void ModeExecutive::setup_multivar_obs_data(const Grid &verification_grid,
                                             const ModeInputData &input)
 {
 
-   // ShapeData fcst_sd, obs_sd;
-   double omin, omax;
+   double omin;
+   double omax;
 
    Obs_sd.clear();
 
@@ -572,7 +571,10 @@ void ModeExecutive::setup_multivar_obs_data(const Grid &verification_grid,
 void ModeExecutive::setup_multivar_fcst_obs_data_intensities(const MultiVarData &mvdf,
                                                              const MultiVarData &mvdo)
 {
-   double fmin, fmax, omin, omax;
+   double fmin;
+   double fmax;
+   double omin;
+   double omax;
 
    bool simple = true;
    Fcst_sd = *(mvdf.shapedata_ptr(simple));
@@ -674,9 +676,11 @@ void ModeExecutive::setup_multivar_fcst_obs_data_super(const ShapeData &f_super,
                                                        const ShapeData &o_super,
                                                        const Grid &igrid)
 {
-   double fmin, omin, fmax, omax;
+   double fmin;
+   double omin;
+   double fmax;
+   double omax;
 
-   bool simple = true;
    Fcst_sd = f_super;
    Fcst_sd.debug_examine();
    Obs_sd = o_super;
@@ -816,7 +820,7 @@ void ModeExecutive::do_conv_thresh_traditional(const int r_index, const int t_in
 ///////////////////////////////////////////////////////////////////////
 
 void ModeExecutive::do_conv_thresh_multivar_super(int rIndexF, int tIndexF,
-                                                  int rIndexO, int tIndexO)
+                                                  int, int)
 {
 
    ModeConfInfo & conf = engine.conf_info;
@@ -828,10 +832,9 @@ void ModeExecutive::do_conv_thresh_multivar_super(int rIndexF, int tIndexF,
    conf.set_fcst_conv_thresh(s);
    conf.set_fcst_conv_radius(0.0);
    conf.set_fcst_merge_thresh(s);
-   //conf.set_fcst_merge_thresh_by_index(0);
    conf.set_obs_conv_thresh(s);
    conf.set_obs_conv_radius(0.0);
-   conf.set_obs_merge_thresh(s);//_by_index(0);
+   conf.set_obs_merge_thresh(s);
 
    //
    //  Set up the engine with these raw fields
@@ -903,7 +906,7 @@ void ModeExecutive::do_conv_thresh_multivar_intensity_compare(int rIndexF, int t
 
 ///////////////////////////////////////////////////////////////////////
 
-void ModeExecutive::do_conv_thresh_multivar_simple(Processing_t p, int rIndex, int tIndex)
+void ModeExecutive::do_conv_thresh_multivar_simple(Processing_t p, int rIndex, int)
 {
    ModeConfInfo & conf = engine.conf_info;
    bool obs = conf.data_type == ModeDataType::MvMode_Obs;
@@ -1072,7 +1075,8 @@ void ModeExecutive::process_masks(ShapeData & fcst_sd, ShapeData & obs_sd)
 
 {
 
-   ShapeData grid_mask_sd, poly_mask_sd;
+   ShapeData grid_mask_sd;
+   ShapeData poly_mask_sd;
    ConcatString name;
 
    mlog << Debug(2)
@@ -1129,7 +1133,8 @@ void ModeExecutive::process_fcst_masks(ShapeData & fcst_sd)
 
 {
 
-   ShapeData grid_mask_sd, poly_mask_sd;
+   ShapeData grid_mask_sd;
+   ShapeData poly_mask_sd;
    ConcatString name;
 
    mlog << Debug(3) << "Processing masking regions.\n";
@@ -1173,7 +1178,8 @@ void ModeExecutive::process_obs_masks(ShapeData & obs_sd)
 
 {
 
-   ShapeData grid_mask_sd, poly_mask_sd;
+   ShapeData grid_mask_sd;
+   ShapeData poly_mask_sd;
    ConcatString name;
 
    mlog << Debug(3) << "Processing masking regions.\n";
@@ -1287,21 +1293,22 @@ void ModeExecutive::process_output_multivar_intensity_compare(const MultiVarData
    double fmax = mvdf->_data_max;
    double omin = mvdo->_data_min;
    double omax = mvdo->_data_max;
-   double data_min, data_max;
-   if     (!is_bad_data(fmin) && !is_bad_data(omin)) data_min = min(fmin, omin);
-   else if(!is_bad_data(fmin) &&  is_bad_data(omin)) data_min = fmin;
-   else if( is_bad_data(fmin) && !is_bad_data(omin)) data_min = omin;
+   double dmin;
+   double dmax;
+   if     (!is_bad_data(fmin) && !is_bad_data(omin)) dmin = min(fmin, omin);
+   else if(!is_bad_data(fmin) &&  is_bad_data(omin)) dmin = fmin;
+   else if( is_bad_data(fmin) && !is_bad_data(omin)) dmin = omin;
 
-   if     (!is_bad_data(fmax) && !is_bad_data(omax)) data_max = max(fmax, omax);
-   else if(!is_bad_data(fmax) &&  is_bad_data(omax)) data_max = fmax;
-   else if( is_bad_data(fmax) && !is_bad_data(omax)) data_max = omax;
+   if     (!is_bad_data(fmax) && !is_bad_data(omax)) dmax = max(fmax, omax);
+   else if(!is_bad_data(fmax) &&  is_bad_data(omax)) dmax = fmax;
+   else if( is_bad_data(fmax) && !is_bad_data(omax)) dmax = omax;
          
    set_raw_to_full(mvdf->_simple->_raw_data,mvdo->_simple->_raw_data,
-                   mvdf->_nx, mvdf->_ny, data_min, data_max);
+                   mvdf->_nx, mvdf->_ny, dmin, dmax);
 
    write_obj_netcdf(engine.conf_info.nc_info);
 
-   if ( engine.conf_info.ps_plot_flag )   plot_engine();
+   if ( engine.conf_info.ps_plot_flag )  plot_engine();
 
    return;
 
@@ -1338,13 +1345,13 @@ void ModeExecutive::compute_ct_stats()
 
 {
 
-   int i, x, y;
-   ShapeData fcst_mask, obs_mask;
+   ShapeData fcst_mask;
+   ShapeData obs_mask;
 
    mlog << Debug(2)
         << "Computing contingency table statistics...\n";
 
-   for(i=0; i<n_cts; i++) {
+   for(int i=0; i<n_cts; i++) {
 
       cts[i].zero_out();
       cts[i].set_name(cts_str[i]);
@@ -1365,8 +1372,8 @@ void ModeExecutive::compute_ct_stats()
       }
 
       // Compute contingency table counts
-      for(x=0; x<fcst_mask.data.nx(); x++) {
-         for(y=0; y<fcst_mask.data.ny(); y++) {
+      for(int x=0; x<fcst_mask.data.nx(); x++) {
+         for(int y=0; y<fcst_mask.data.ny(); y++) {
 
             // Key off of the bad data values in the raw field
             if(engine.fcst_raw->is_bad_data(x, y) ||
@@ -1517,7 +1524,9 @@ void ModeExecutive::write_obj_stats()
 
 {
 
-   AsciiTable obj_at, fcst_merge_at, obs_merge_at;
+   AsciiTable obj_at;
+   AsciiTable fcst_merge_at;
+   AsciiTable obs_merge_at;
    ofstream out;
    ConcatString stat_file;
 
@@ -1703,45 +1712,44 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
 
    if ( info.all_false() )  return;
 
-   int n, x, y;
    ConcatString out_file;
    ConcatString s;
    const ConcatString fcst_thresh = engine.conf_info.Fcst->conv_thresh.get_str(5);
    const ConcatString  obs_thresh = engine.conf_info.Obs->conv_thresh.get_str(5);
 
-   float *fcst_raw_data      = (float *) nullptr;
-   float *fcst_obj_raw_data  = (float *) nullptr;
-   int   *fcst_obj_data      = (int *)   nullptr;
-   int   *fcst_clus_data     = (int *)   nullptr;
+   float *fcst_raw_data      = nullptr;
+   float *fcst_obj_raw_data  = nullptr;
+   int   *fcst_obj_data      = nullptr;
+   int   *fcst_clus_data     = nullptr;
 
-   float *obs_raw_data       = (float *) nullptr;
-   float *obs_obj_raw_data   = (float *) nullptr;
-   int   *obs_obj_data       = (int *)   nullptr;
-   int   *obs_clus_data      = (int *)   nullptr;
+   float *obs_raw_data       = nullptr;
+   float *obs_obj_raw_data   = nullptr;
+   int   *obs_obj_data       = nullptr;
+   int   *obs_clus_data      = nullptr;
 
-   NcFile *f_out             = (NcFile *) nullptr;
+   NcFile *f_out             = nullptr;
 
-   NcDim  lat_dim           ;
-   NcDim  lon_dim           ;
+   NcDim  lat_dim;
+   NcDim  lon_dim;
 
-   NcDim  fcst_thresh_dim   ;
-   NcDim   obs_thresh_dim   ;
+   NcDim  fcst_thresh_dim;
+   NcDim   obs_thresh_dim;
 
-   NcVar  fcst_raw_var      ;
-   NcVar  fcst_obj_raw_var  ;
-   NcVar  fcst_obj_var      ;
-   NcVar  fcst_clus_var     ;
+   NcVar  fcst_raw_var;
+   NcVar  fcst_obj_raw_var;
+   NcVar  fcst_obj_var;
+   NcVar  fcst_clus_var;
 
-   NcVar  obs_raw_var       ;
-   NcVar  obs_obj_raw_var   ;
-   NcVar  obs_obj_var       ;
-   NcVar  obs_clus_var      ;
+   NcVar  obs_raw_var;
+   NcVar  obs_obj_raw_var;
+   NcVar  obs_obj_var;
+   NcVar  obs_clus_var;
 
-   NcVar  fcst_radius_var   ;
-   NcVar   obs_radius_var   ;
+   NcVar  fcst_radius_var;
+   NcVar   obs_radius_var;
 
-   NcVar  fcst_thresh_var   ;
-   NcVar   obs_thresh_var   ;
+   NcVar  fcst_thresh_var;
+   NcVar   obs_thresh_var;
 
    //
    // Create output NetCDF file name
@@ -1948,11 +1956,11 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
 
    }
 
-   for(x=0; x<grid.nx(); x++) {
+   for(int x=0; x<grid.nx(); x++) {
 
-      for(y=0; y<grid.ny(); y++) {
+      for(int y=0; y<grid.ny(); y++) {
 
-         n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+         int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
 
          //
          // Get raw values and object ID's for each grid box
@@ -1962,14 +1970,14 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
               fcst_raw_data != nullptr && obs_raw_data != nullptr &&
               engine.fcst_raw != nullptr && engine.obs_raw != nullptr  )  {
 
-            fcst_raw_data[n] = engine.fcst_raw->data (x, y);
-            obs_raw_data[n] = engine.obs_raw->data  (x, y);
+            fcst_raw_data[n] = (float) engine.fcst_raw->data (x, y);
+            obs_raw_data[n] = (float) engine.obs_raw->data  (x, y);
 
          }
 
          if(engine.fcst_split->is_nonzero(x, y) ) {
             if ( info.do_object_raw && fcst_obj_raw_data != nullptr && engine.fcst_raw != nullptr ) {
-               fcst_obj_raw_data[n] = engine.fcst_raw->data(x, y);
+               fcst_obj_raw_data[n] = (float) engine.fcst_raw->data(x, y);
             }
             if ( info.do_object_id && fcst_obj_data != nullptr && engine.fcst_split != nullptr ) {
                fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
@@ -1986,7 +1994,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
 
          if(engine.obs_split->is_nonzero(x, y) ) {
             if ( info.do_object_raw && obs_obj_raw_data != nullptr ) {
-               obs_obj_raw_data[n] = engine.obs_raw->data(x, y);
+               obs_obj_raw_data[n] = (float) engine.obs_raw->data(x, y);
             }
             if ( info.do_object_id && obs_obj_data != nullptr ) {
                obs_obj_data[n] = nint(engine.obs_split->data(x, y));
@@ -2043,75 +2051,63 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    // Write the forecast and observation raw value variables
    //
 
-   if ( info.do_raw )  {
+   if( info.do_raw &&
+       (!put_nc_data_with_dims(&fcst_raw_var, &fcst_raw_data[0], grid.ny(), grid.nx()) ||
+        !put_nc_data_with_dims(&obs_raw_var, &obs_raw_data[0], grid.ny(), grid.nx())) ) {
 
-      if( !put_nc_data_with_dims(&fcst_raw_var, &fcst_raw_data[0], grid.ny(), grid.nx()) ||
-          !put_nc_data_with_dims(&obs_raw_var, &obs_raw_data[0], grid.ny(), grid.nx()) ) {
-
-         mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
-              << "error with the fcst_raw_var->put or obs_raw_var->put\n\n";
-         exit(1);
-      }
-
+      mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
+           << "error with the fcst_raw_var->put or obs_raw_var->put\n\n";
+      exit(1);
    }
 
-   if ( info.do_object_raw )  {
+   if ( info.do_object_raw && 
+       (!put_nc_data_with_dims(&fcst_obj_raw_var, &fcst_obj_raw_data[0], grid.ny(), grid.nx()) ||
+        !put_nc_data_with_dims(&obs_obj_raw_var, &obs_obj_raw_data[0], grid.ny(), grid.nx())) ) {
 
-      if( !put_nc_data_with_dims(&fcst_obj_raw_var, &fcst_obj_raw_data[0], grid.ny(), grid.nx()) ||
-          !put_nc_data_with_dims(&obs_obj_raw_var, &obs_obj_raw_data[0], grid.ny(), grid.nx()) ) {
-
-         mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
-              << "error with the fcst_obj_raw_var->put or obs_obj_raw_var->put\n\n";
-         exit(1);
-      }
-
+      mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
+           << "error with the fcst_obj_raw_var->put or obs_obj_raw_var->put\n\n";
+      exit(1);
    }
 
    //
    // Write the forecast and observation object ID variables
    //
 
-   if ( info.do_object_id )  {
+   if ( info.do_object_id &&
+       (!put_nc_data_with_dims(&fcst_obj_var, &fcst_obj_data[0], grid.ny(), grid.nx()) ||
+        !put_nc_data_with_dims(&obs_obj_var, &obs_obj_data[0], grid.ny(), grid.nx())) ) {
 
-      if( !put_nc_data_with_dims(&fcst_obj_var, &fcst_obj_data[0], grid.ny(), grid.nx()) ||
-          !put_nc_data_with_dims(&obs_obj_var, &obs_obj_data[0], grid.ny(), grid.nx()) ) {
-
-         mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
-              << "error with the fcst_obj_var->put or obs_obj_var->put\n\n";
-         exit(1);
-      }
-
+      mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
+           << "error with the fcst_obj_var->put or obs_obj_var->put\n\n";
+      exit(1);
    }
 
    //
    // Write the forecast and observation cluster object ID variables
    //
 
-   if ( info.do_cluster_id )  {
+   if ( info.do_cluster_id && 
+       (!put_nc_data_with_dims(&fcst_clus_var, &fcst_clus_data[0], grid.ny(), grid.nx()) ||
+        !put_nc_data_with_dims(&obs_clus_var, &obs_clus_data[0], grid.ny(), grid.nx())) ) {
 
-      if( !put_nc_data_with_dims(&fcst_clus_var, &fcst_clus_data[0], grid.ny(), grid.nx()) ||
-          !put_nc_data_with_dims(&obs_clus_var, &obs_clus_data[0], grid.ny(), grid.nx()) ) {
-
-         mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
-              << "error with the fcst_clus_var->put or obs_clus_var->put\n\n";
-         exit(1);
-      }
-
+      mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
+           << "error with the fcst_clus_var->put or obs_clus_var->put\n\n";
+      exit(1);
    }
 
    //
    // Delete allocated memory
    //
 
-   if (fcst_raw_data)      { delete [] fcst_raw_data;      fcst_raw_data     = (float *) nullptr; }
-   if (fcst_obj_raw_data)  { delete [] fcst_obj_raw_data;  fcst_obj_raw_data = (float *) nullptr; }
-   if (fcst_obj_data)      { delete [] fcst_obj_data;      fcst_obj_data     = (int *)   nullptr; }
-   if (fcst_clus_data)     { delete [] fcst_clus_data;     fcst_clus_data    = (int *)   nullptr; }
+   if (fcst_raw_data)      { delete [] fcst_raw_data;      fcst_raw_data     = nullptr; }
+   if (fcst_obj_raw_data)  { delete [] fcst_obj_raw_data;  fcst_obj_raw_data = nullptr; }
+   if (fcst_obj_data)      { delete [] fcst_obj_data;      fcst_obj_data     = nullptr; }
+   if (fcst_clus_data)     { delete [] fcst_clus_data;     fcst_clus_data    = nullptr; }
 
-   if (obs_raw_data)       { delete [] obs_raw_data;       obs_raw_data      = (float *) nullptr; }
-   if (obs_obj_raw_data)   { delete [] obs_obj_raw_data;   obs_obj_raw_data  = (float *) nullptr; }
-   if (obs_obj_data)       { delete [] obs_obj_data;       obs_obj_data      = (int *)   nullptr; }
-   if (obs_clus_data)      { delete [] obs_clus_data;      obs_clus_data     = (int *)   nullptr; }
+   if (obs_raw_data)       { delete [] obs_raw_data;       obs_raw_data      = nullptr; }
+   if (obs_obj_raw_data)   { delete [] obs_obj_raw_data;   obs_obj_raw_data  = nullptr; }
+   if (obs_obj_data)       { delete [] obs_obj_data;       obs_obj_data      = nullptr; }
+   if (obs_clus_data)      { delete [] obs_clus_data;      obs_clus_data     = nullptr; }
 
    //
    // Write out the values of the vertices of the polylines.
@@ -2185,42 +2181,53 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
 
 {
 
-   int i, j, x, y, n_pts, n_poly;
-   double lat, lon;
+   int n_pts;
+   int n_poly;
+   double lat;
+   double lon;
 
-   Polyline **poly            = (Polyline **) nullptr;
+   Polyline **poly = nullptr;
 
-   int   *poly_start          = (int       *) nullptr;
-   int   *poly_npts           = (int       *) nullptr;
-   float *poly_lat            = (float     *) nullptr;
-   float *poly_lon            = (float     *) nullptr;
-   int   *poly_x              = (int       *) nullptr;
-   int   *poly_y              = (int       *) nullptr;
+   int   *poly_start = nullptr;
+   int   *poly_npts  = nullptr;
+   float *poly_lat   = nullptr;
+   float *poly_lon   = nullptr;
+   int   *poly_x     = nullptr;
+   int   *poly_y     = nullptr;
 
    // Dimensions and variables for each object
-   NcDim  obj_dim            ;
-   NcVar  obj_poly_start_var ;
-   NcVar  obj_poly_npts_var  ;
+   NcDim obj_dim;
+   NcVar obj_poly_start_var;
+   NcVar obj_poly_npts_var;
 
    // Dimensions and variables for each boundary point
-   NcDim  poly_dim           ;
-   NcVar  poly_lat_var       ;
-   NcVar  poly_lon_var       ;
-   NcVar  poly_x_var         ;
-   NcVar  poly_y_var         ;
+   NcDim poly_dim;
+   NcVar poly_lat_var;
+   NcVar poly_lon_var;
+   NcVar poly_x_var;
+   NcVar poly_y_var;
 
    // Dimension names
-   ConcatString obj_dim_name,   poly_dim_name;
+   ConcatString obj_dim_name;
+   ConcatString poly_dim_name;
 
    // Variable names
-   ConcatString start_var_name, start_long_name;
-   ConcatString npts_var_name,  npts_long_name;
-   ConcatString lat_var_name,   lat_long_name;
-   ConcatString lon_var_name,   lon_long_name;
-   ConcatString x_var_name,     x_long_name;
-   ConcatString y_var_name,     y_long_name;
-   ConcatString field_name,     field_long;
-   ConcatString poly_name,      poly_long;
+   ConcatString start_var_name;
+   ConcatString start_long_name;
+   ConcatString npts_var_name;
+   ConcatString npts_long_name;
+   ConcatString lat_var_name;
+   ConcatString lat_long_name;
+   ConcatString lon_var_name;
+   ConcatString lon_long_name;
+   ConcatString x_var_name;
+   ConcatString x_long_name;
+   ConcatString y_var_name;
+   ConcatString y_long_name;
+   ConcatString field_name;
+   ConcatString field_long;
+   ConcatString poly_name;
+   ConcatString poly_long;
 
    // Determine the number of polylines to be written
    // and set up strings
@@ -2306,7 +2313,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    poly = new Polyline * [n_poly];
 
    // Point at the polyline to be written
-   for(i=0; i<n_poly; i++) {
+   for(int i=0; i<n_poly; i++) {
 
       switch(poly_type) {
 
@@ -2340,7 +2347,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    }
 
    // Get the number of polyline points
-   for(i=0, n_pts=0; i<n_poly; i++) n_pts += poly[i]->n_points;
+   for(int i=0, n_pts=0; i<n_poly; i++) n_pts += poly[i]->n_points;
 
    // Define dimensions
    NcDim tmp_obj_dim = get_nc_dim(f_out, (string)obj_dim_name);
@@ -2384,7 +2391,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    // Store the points for each polyline
    //
    n_pts = 0;
-   for(i=0; i<n_poly; i++) {
+   for(int i=0; i<n_poly; i++) {
 
       // Store the starting point for this object.
       poly_start[i] = n_pts;
@@ -2392,18 +2399,18 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
       // Store the number of points in this polyline.
       poly_npts[i] = poly[i]->n_points;
 
-      for(j=0; j<poly_npts[i]; j++, n_pts++) {
+      for(int j=0; j<poly_npts[i]; j++, n_pts++) {
 
          // Get the boundary point (x,y) coordinates and store them
-         x = nint(poly[i]->u[j]);
-         y = nint(poly[i]->v[j]);
+         int x = nint(poly[i]->u[j]);
+         int y = nint(poly[i]->v[j]);
          poly_x[n_pts] = x;
          poly_y[n_pts] = y;
 
          // Convert to lat/lon and store them
          grid.xy_to_latlon(x, y, lat, lon);
-         poly_lat[n_pts] = lat;
-         poly_lon[n_pts] = -1.0*lon;
+         poly_lat[n_pts] = (float) lat;
+         poly_lon[n_pts] = (float) -1.0*lon;
       }
    }
 
@@ -2465,7 +2472,7 @@ void ModeExecutive::write_ct_stats()
 
    AsciiTable cts_at;
    ofstream out;
-   int i, c;
+   int c;
    double v;
    ConcatString stat_file;
 
@@ -2496,8 +2503,8 @@ void ModeExecutive::write_ct_stats()
    // Setup the AsciiTable to be used
    //
    cts_at.clear();
-   i = n_mode_hdr_columns + n_mode_cts_columns;
-   cts_at.set_size(3, i);                        // Set table size
+   c = n_mode_hdr_columns + n_mode_cts_columns;
+   cts_at.set_size(3, c);                        // Set table size
    justify_mode_cols(cts_at);                    // Justify columns
    cts_at.set_precision(                         // Set the precision
                         engine.conf_info.conf.output_precision());
@@ -2508,14 +2515,14 @@ void ModeExecutive::write_ct_stats()
    //
    // Write out the MODE header columns
    //
-   for(i=0; i<n_mode_hdr_columns; i++) {
+   for(int i=0; i<n_mode_hdr_columns; i++) {
       cts_at.set_entry(0, i, mode_hdr_columns[i]);
    }
 
    //
    // Write out the MODE contingecy table header columns
    //
-   for(i=0; i<n_mode_cts_columns; i++) {
+   for(int i=0; i<n_mode_cts_columns; i++) {
       cts_at.set_entry(0, i + n_mode_hdr_columns, (string)mode_cts_columns[i]);
    }
 
@@ -2523,7 +2530,7 @@ void ModeExecutive::write_ct_stats()
    // Store the contingency table counts and statistics in the AsciiTable
    // object.
    //
-   for(i=0; i<n_cts; i++) {
+   for(int i=0; i<n_cts; i++) {
 
       // Write out the header columns
       write_header_columns(engine, grid, cts_at, i+1);
@@ -2648,7 +2655,7 @@ void ModeExecutive::conf_read()
    default_config_file = replace_path(default_config_filename);
 
    // If the merge config file was not set, use the match config file
-   if(merge_config_file.length() == 0)
+   if(merge_config_file.empty())
       merge_config_file = match_config_file;
 
    // List the config files
@@ -2679,7 +2686,6 @@ string ModeExecutive::stype(Processing_t t)
    case MULTIVAR_SUPER:
       s = "Multivar Superobjects";
       break;
-   case TRADITIONAL:
    default:
       s = "Traditional";
       break;
@@ -2700,14 +2706,14 @@ string ModeExecutive::stype(Processing_t t)
 ///////////////////////////////////////////////////////////////////////
 
 
-void nc_add_string(NcFile * f, const char * text, const char * var_name, const char * dim_name)
+static void nc_add_string(NcFile * f, const char * text, const char * var_name, const char * dim_name)
 
 {
 
    NcDim  dim;
    NcVar  var;
 
-   const char * t = 0;
+   const char * t = nullptr;
 
    if ( ! text )  t = "XXX";
    else           t = text;
@@ -2739,7 +2745,7 @@ void nc_add_string(NcFile * f, const char * text, const char * var_name, const c
 
 ///////////////////////////////////////////////////////////////////////
 
-void replaceAll(std::string& str, const std::string& from, const std::string& to)
+static void replaceAll(std::string& str, const std::string& from, const std::string& to)
 {
    if(from.empty())
       return;
