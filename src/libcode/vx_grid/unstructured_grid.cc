@@ -163,8 +163,8 @@ void UnstructuredGrid::latlon_to_xy(double lat, double lon, double &x, double &y
 
 void UnstructuredGrid::xy_to_latlon(double x, double y, double &lat, double &lon) const {
 
-   lat = (double) Data.points_lonlat[x].y();
-   lon = (double) Data.points_lonlat[x].x();
+   lat = Data.points_lonlat[nint(x)].y();
+   lon = Data.points_lonlat[nint(x)].x();
 
    if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
         << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredGrid::xy_to_latlon() "
@@ -604,8 +604,8 @@ void UnstructuredData::test_kdtree() {
          lon = points_lonlat[idx].x();
          cout << " - search index=" << idx << " (" << lat << ", " << lon << ")\n";
          IndexKDTree::ValueList neighbor = closest_points(lon, lat, closest_n);
-         for (auto &x : neighbor) {
-            auto index = (int) x.payload();
+         for (const auto &x : neighbor) {
+            int index = x.payload();
             distance_km = x.distance() / 1000.;
             cout << "  + closest index=" << index << "  distance=" << distance_km << " from ("
                  << points_lonlat[index].y() << ", " << points_lonlat[index].x() << ")\n";
@@ -629,8 +629,8 @@ void UnstructuredData::test_kdtree() {
          alt_m = points_XYZ[idx].z();
          cout << " - search index=" << idx << " (" << lat << ", " << lon << ", " << alt_m << ")\n";
          IndexKDTree::ValueList neighbor = closest_points(lat, lon, closest_n, alt_m);
-         for (auto &x : neighbor) {
-            auto index = (int) x.payload();
+         for (const auto &x : neighbor) {
+            int index = x.payload();
             distance_km = x.distance() / 1000.;
             llh_to_ecef(lat, lon, alt_m, &x_km, &y_km, &z_km);
             cout << "  + closest index=" << index << "  distance=" << distance_km << " from ("
