@@ -323,7 +323,7 @@ The **conv_radius** entry defines the radius of the circular convolution applied
 
 The **conv_thresh** entry specifies the threshold values to be applied to the convolved field to define objects. By default, objects are defined using a convolution threshold of 5.0. Multiple convolution thresholds may be specified as an array (e.g. **conv_thresh = [ >=5.0, >=10.0, >=15.0 ];)**.
 
-Multiple convolution radii and thresholds and processed using the logic defined by the **quilt** entry.  The logic specific to multivariate mode is described in the multivariate mode section above.
+Multiple convolution radii and thresholds are processed using the logic defined by the **quilt** entry.  The logic specific to multivariate mode is described in the multivariate mode section above.
 
 The **vld_thresh** entry must be set between 0 and 1. When performing the circular convolution step if the proportion of bad data values in the convolution area is greater than or equal to this threshold, the resulting convolved value will be bad data. If the proportion is less than this threshold, the convolution will be performed on only the valid data. By default, the **vld_thresh** is set to 0.5.
 
