@@ -635,7 +635,7 @@ void ModeConfInfo::process_config_fcst(GrdFileType ftype, int field_index)
 void ModeConfInfo::process_config_obs(GrdFileType otype, int field_index)
 {
 
-   Dicationary * obs_dict = conf.lookup_dictionary(conf_key_obs);
+   Dictionary * obs_dict = conf.lookup_dictionary(conf_key_obs);
    shift_right = obs_dict->lookup_int(conf_key_shift_right);
 
    if (field_index == 0) {
@@ -765,7 +765,7 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
    }
 
    // make sure no overlap in fcst/obs frequencies, as that's a no no
-   for (auto &findex : fcst_freq)
+   for (const auto &findex : fcst_freq)
    {
       if (find(obs_freq.begin(), obs_freq.end(), findex) != obs_freq.end())
       {
@@ -775,7 +775,7 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
          exit(1);
       }
    }
-   for (auto &findex : obs_freq)
+   for (const auto &findex : obs_freq)
    {
       if (find(fcst_freq.begin(), fcst_freq.end(), findex) != fcst_freq.end())
       {
@@ -788,7 +788,7 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
 
    // now do all the indices with both, which come from FBIAS and SOP on forecasts
    // and SFP on obs  
-   for (auto &index : indices_with_both) {
+   for (const auto &index : indices_with_both) {
       data_type = ModeDataType::MvMode_Both;
       set_field_index(index, index);
       set_perc_thresh(fdata[index]._dataPlane, odata[index]._dataPlane);
@@ -1499,10 +1499,8 @@ void ModeConfInfo::set_merge_thresh_by_index(int k)
 {
    if ( data_type != ModeDataType::MvMode_Fcst &&
         Obs->need_merge_thresh() ) set_obs_merge_thresh_by_index  (k);
-   }
    if ( data_type != ModeDataType::MvMode_Obs &&
         Fcst->need_merge_thresh() ) set_fcst_merge_thresh_by_index (k);
-   }
 }   
 
 ////////////////////////////////////////////////////////////////////////
@@ -1533,10 +1531,8 @@ void ModeConfInfo::set_conv_thresh_by_merge_index(int k)
 {
    if ( data_type != ModeDataType::MvMode_Fcst &&
         Obs->need_merge_thresh() ) set_obs_conv_thresh_by_merge_index (k);
-   }
    if ( data_type != ModeDataType::MvMode_Obs &&
         Fcst->need_merge_thresh() ) set_fcst_conv_thresh_by_merge_index (k);
-   }
 }
 
 ////////////////////////////////////////////////////////////////////////
