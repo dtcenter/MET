@@ -2181,7 +2181,6 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
 
 {
 
-   int n_pts;
    int n_poly;
    double lat;
    double lon;
@@ -2347,7 +2346,8 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
    }
 
    // Get the number of polyline points
-   for(int i=0, n_pts=0; i<n_poly; i++) n_pts += poly[i]->n_points;
+   int n_pts = 0;
+   for(int i=0; i<n_poly; i++) n_pts += poly[i]->n_points;
 
    // Define dimensions
    NcDim tmp_obj_dim = get_nc_dim(f_out, (string)obj_dim_name);
@@ -2410,7 +2410,7 @@ void ModeExecutive::write_poly_netcdf(NcFile *f_out, ObjPolyType poly_type)
          // Convert to lat/lon and store them
          grid.xy_to_latlon(x, y, lat, lon);
          poly_lat[n_pts] = (float) lat;
-         poly_lon[n_pts] = (float) -1.0*lon;
+         poly_lon[n_pts] = -1.0 * ((float) lon);
       }
    }
 

@@ -101,7 +101,7 @@ static void _debug_shape_examine(const string &name, const ShapeData &sd,
             values.push_back(v);
             count.push_back(1);
          } else {
-            int ii = nint(vi - values.begin());
+            auto ii = (int) (vi - values.begin());
             count[ii] = count[ii] + 1;
          }
       }

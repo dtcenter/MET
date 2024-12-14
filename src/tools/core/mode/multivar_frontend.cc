@@ -679,8 +679,8 @@ void MultivarFrontEnd::_process_superobjects(SimpleObjects &fcsts, SimpleObjects
         << "\nRunning mvmode superobject analysis conv_radius[" << fcsts._rIndex+1
         << "] conv_thresh[" << fcsts._tIndex+1 << "]\n" << sep << "\n";
 
-   MultiVarData *mvdf = fcsts._mvd[0];
-   MultiVarData *mvdo = obs._mvd[0];
+   const MultiVarData *mvdf = fcsts._mvd[0];
+   const MultiVarData *mvdo = obs._mvd[0];
    
    // set the data to 0 inside superobjects and missing everywhere else
 
@@ -690,7 +690,7 @@ void MultivarFrontEnd::_process_superobjects(SimpleObjects &fcsts, SimpleObjects
    _init_exec(ModeExecutive::MULTIVAR_SUPER, "None", "None");
    mode_exec->init_multivar_intensities(config);
 
-   ModeConfInfo & conf = mode_exec->engine.conf_info;
+   const ModeConfInfo & conf = mode_exec->engine.conf_info;
    if ((fcsts._super._hasUnion || obs._super._hasUnion) &&
        (conf.Fcst->merge_flag == MergeType::Thresh ||
         conf.Obs->merge_flag == MergeType::Thresh)) {
