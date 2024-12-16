@@ -35,6 +35,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 
 static bool is_grib_code_abbr_match(const ConcatString &, int);
+static void check_dim_offset(const char *);
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -223,6 +224,13 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                   // Store the dimension of the range and limits
                   *ptr3++ = 0;
                   add_dimension(range_flag, as_offset);
+
+                  // Check for integer dimension offsets
+                  if(as_offset) {
+                     check_dim_offset(ptr2);
+                     check_dim_offset(ptr3);
+                  }
+
                   Level.set_lower(as_offset ? atoi(ptr2) : atof(ptr2));
                   Level.set_upper(as_offset ? atoi(ptr3) : atof(ptr3));
 
@@ -259,6 +267,12 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                   }
                   if (datestring_start && datestring_end) as_offset = false;
 
+                  // Check for integer dimension offsets
+                  if(as_offset) {
+                     check_dim_offset(ptr2);
+                     check_dim_offset(ptr3);
+                  }
+ 
                   unixtime time_lower = datestring_start
                                         ? timestring_to_unix(ptr2)
                                         : (as_offset ? atoi(ptr2) : atof(ptr2));
@@ -297,7 +311,10 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                   as_offset = false;
                }
                else if (is_number(ptr2)) {
-                  if (as_offset) level = atoi(ptr2);
+                  if (as_offset) {
+                     check_dim_offset(ptr2);
+                     level = atoi(ptr2);
+                  }
                   else {
                      level = vx_data2d_dim_by_value;
                      level_value = atof(ptr2);
@@ -473,6 +490,21 @@ bool is_grib_code_abbr_match(const ConcatString &str, int grib_code) {
    if(strncasecmp(str.c_str(), abbr_str.c_str(), abbr_str.length()) == 0) match = true;
 
    return match;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void check_dim_offset(const char *ptr) {
+
+   if(!is_eq(atof(ptr), (double) atoi(ptr))) {
+      mlog << Warning << "\ncheck_dim_offset() -> "
+           << "Found non-integer NetCDF dimension index ("
+           << ptr << " != " << atoi(ptr) << ").\n"
+           << "Did you intend to use \"@" << ptr
+           << "\" to specify the value for that dimension instead?\n\n";
+   }
+
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
