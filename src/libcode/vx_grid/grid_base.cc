@@ -316,31 +316,32 @@ void UnstructuredData::clear() {
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 void UnstructuredData::clear_data() {
 
    n_face = n_node = n_edge = 0;
-   point_lonlat.clear();
-   lat_checksum = lon_checksum = 0.;
+   points_lonlat.clear();
+   points_XYZ.clear();
+   points_XYZ_km.clear();
+   lat_checksum = lon_checksum = alt_checksum = 0.;
 
    if (kdtree) { delete kdtree; kdtree = nullptr; }
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void UnstructuredData::dump() const {
 
    mlog << Debug(grid_debug_level)
         << "\nUnstructured Grid Data:\n"
         << "           n_face: " << n_face << "\n"
-        << "    lat_checksum: " << lat_checksum << "\n"
-        << "    lon_checksum: " << lon_checksum << "\n"
-        << " max_distance_km: " << max_distance_km << "\n"
+        << "           points: " << (points_lonlat.empty() ? "PointXYZ" : "PointLonLat") << "\n"
+        << "     lat_checksum: " << lat_checksum << "\n"
+        << "     lon_checksum: " << lon_checksum << "\n"
+        << "     alt_checksum: " << alt_checksum << "\n"
+        << "  max_distance_km: " << max_distance_km << "\n"
         ;
 }
 
@@ -442,18 +443,18 @@ void GridInfo::clear()
 
 {
 
-if ( lc  )  { delete lc;   lc  = (const LambertData *)       nullptr; };
-if ( st  )  { delete st;   st  = (const StereographicData *) nullptr; };
-if ( ll  )  { delete ll;   ll  = (const LatLonData *)        nullptr; };
-if ( rll )  { delete rll;  rll = (const RotatedLatLonData *) nullptr; };
-if ( m   )  { delete m;    m   = (const MercatorData *)      nullptr; };
-if ( g   )  { delete g;    g   = (const GaussianData *)      nullptr; };
-if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    nullptr; };
-if ( la  )  { delete la;   la  = (const LaeaData *)          nullptr; };
-if ( tc  )  { delete tc;   tc  = (const TcrmwData *)         nullptr; };
-if ( sl  )  { delete sl;   sl  = (const SemiLatLonData *)    nullptr; };
+if ( lc  )  { delete lc;   lc  = (const LambertData *)       nullptr; }
+if ( st  )  { delete st;   st  = (const StereographicData *) nullptr; }
+if ( ll  )  { delete ll;   ll  = (const LatLonData *)        nullptr; }
+if ( rll )  { delete rll;  rll = (const RotatedLatLonData *) nullptr; }
+if ( m   )  { delete m;    m   = (const MercatorData *)      nullptr; }
+if ( g   )  { delete g;    g   = (const GaussianData *)      nullptr; }
+if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    nullptr; }
+if ( la  )  { delete la;   la  = (const LaeaData *)          nullptr; }
+if ( tc  )  { delete tc;   tc  = (const TcrmwData *)         nullptr; }
+if ( sl  )  { delete sl;   sl  = (const SemiLatLonData *)    nullptr; }
 #ifdef WITH_UGRID
-if ( us  )  { delete us;   us  = (const UnstructuredData *)  nullptr; };
+if ( us  )  { delete us;   us  = (const UnstructuredData *)  nullptr; }
 #endif
 
 return;
@@ -555,13 +556,13 @@ void GridInfo::set(const LambertData & data)
 
 clear();
 
-LambertData * D = (LambertData *) nullptr;
+LambertData * D = nullptr;
 
 D = new LambertData;
 
 memcpy(D, &data, sizeof(data));
 
-lc = D;  D = (LambertData *) nullptr;
+lc = D;  D = nullptr;
 
 return;
 
@@ -577,13 +578,13 @@ void GridInfo::set(const StereographicData & data)
 
 clear();
 
-StereographicData * D = (StereographicData *) nullptr;
+StereographicData * D = nullptr;
 
 D = new StereographicData;
 
 memcpy(D, &data, sizeof(data));
 
-st = D;  D = (StereographicData *) nullptr;
+st = D;  D = nullptr;
 
 return;
 
@@ -599,13 +600,13 @@ void GridInfo::set(const LatLonData & data)
 
 clear();
 
-LatLonData * D = (LatLonData *) nullptr;
+LatLonData * D = nullptr;
 
 D = new LatLonData;
 
 memcpy(D, &data, sizeof(data));
 
-ll = D;  D = (LatLonData *) nullptr;
+ll = D;  D = nullptr;
 
 return;
 
@@ -621,13 +622,13 @@ void GridInfo::set(const RotatedLatLonData & data)
 
 clear();
 
-RotatedLatLonData * D = (RotatedLatLonData *) nullptr;
+RotatedLatLonData * D = nullptr;
 
 D = new RotatedLatLonData;
 
 memcpy(D, &data, sizeof(data));
 
-rll = D;  D = (RotatedLatLonData *) nullptr;
+rll = D;  D = nullptr;
 
 return;
 
@@ -643,13 +644,13 @@ void GridInfo::set(const MercatorData & data)
 
 clear();
 
-MercatorData * D = (MercatorData *) nullptr;
+MercatorData * D = nullptr;
 
 D = new MercatorData;
 
 memcpy(D, &data, sizeof(data));
 
-m = D;  D = (MercatorData *) nullptr;
+m = D;  D = nullptr;
 
 return;
 
@@ -665,13 +666,13 @@ void GridInfo::set(const GaussianData & data)
 
 clear();
 
-GaussianData * D = (GaussianData *) nullptr;
+GaussianData * D = nullptr;
 
 D = new GaussianData;
 
 memcpy(D, &data, sizeof(data));
 
-g = D;  D = (GaussianData *) nullptr;
+g = D;  D = nullptr;
 
 return;
 
@@ -687,13 +688,13 @@ void GridInfo::set(const GoesImagerData & data)
 
 clear();
 
-GoesImagerData * D = (GoesImagerData *) nullptr;
+GoesImagerData * D = nullptr;
 
 D = new GoesImagerData;
 
 memcpy(D, &data, sizeof(data));
 
-gi = D;  D = (GoesImagerData *) nullptr;
+gi = D;  D = nullptr;
 
 return;
 
@@ -709,13 +710,13 @@ void GridInfo::set(const LaeaData & data)
 
 clear();
 
-LaeaData * D = (LaeaData *) nullptr;
+LaeaData * D = nullptr;
 
 D = new LaeaData;
 
 memcpy(D, &data, sizeof(data));
 
-la = D;  D = (LaeaData *) nullptr;
+la = D;  D = nullptr;
 
 return;
 
@@ -731,7 +732,7 @@ void GridInfo::set(const SemiLatLonData & data)
 
 clear();
 
-SemiLatLonData * D = (SemiLatLonData *) nullptr;
+SemiLatLonData * D = nullptr;
 
 D = new SemiLatLonData;
 
@@ -742,7 +743,7 @@ D = new SemiLatLonData;
 
 *D = data;
 
-sl = D;  D = (SemiLatLonData *) nullptr;
+sl = D;  D = nullptr;
 
 return;
 
@@ -759,14 +760,21 @@ void GridInfo::set(const UnstructuredData & data)
 
 clear();
 
-UnstructuredData *D = new UnstructuredData;
+UnstructuredData * D = nullptr;
+
+D = new UnstructuredData;
 
 D->n_edge = data.n_edge;
 D->n_node = data.n_node;
 D->max_distance_km = data.max_distance_km;
-D->set_points(data.n_face, data.point_lonlat);
+if (data.has_PointLatLon()) {
+   D->set_points(data.n_face, data.points_lonlat);
+}
+else {
+   D->set_points(data.n_face, data.points_XYZ);
+}
 us = D;
-D = (UnstructuredData *)nullptr;
+D = nullptr;
 
 }
 #endif
@@ -1244,7 +1252,8 @@ if ( (nx_new < 2) || ( ny_new < 2) )  {
 }
 
 Grid g_new;
-double lat_ll, lon_ll;
+double lat_ll;
+double lon_ll;
 GridInfo info_new = info();
 
 
@@ -1296,7 +1305,8 @@ if ( info_new.lc )  {
 } else if ( info_new.m )  {
 
    MercatorData m_new = *(info_new.m);
-   double lat_ur, lon_ur;
+   double lat_ur;
+   double lon_ur;
 
    xy_to_latlon(x_ll + nx_new - 1, y_ll + ny_new - 1, lat_ur, lon_ur);
 
@@ -1340,8 +1350,10 @@ Grid Grid::subset_center(double lat_center, double lon_center, int nx_new, int n
    //  subset_ll does sanity checking on nx_new and ny_new, so we don't have to do it here
    //
 
-int ix_ll, iy_ll;
-double dx_center, dy_center;
+int ix_ll;
+int iy_ll;
+double dx_center;
+double dy_center;
 
 
    //
@@ -1690,13 +1702,31 @@ bool is_eq(const UnstructuredData * us1, const UnstructuredData * us2)
   bool status = false;
   if (us1 && us2) {
     if (us1 == us2) status = true;
-    else status = us1->n_face == us2->n_face
-                  && us1->n_node == us2->n_node
-                  && us1->n_edge == us2->n_edge
-                  && us1->point_lonlat[0] == us2->point_lonlat[0]
-                  && (us1->n_face > 0 && us1->point_lonlat[us1->n_face-1] == us2->point_lonlat[us2->n_face-1])
-                  && is_eq(us1->lat_checksum, us2->lat_checksum)
-                  && is_eq(us1->lon_checksum, us2->lon_checksum);
+    else {
+      status = us1->n_face == us2->n_face
+               && us1->n_node == us2->n_node
+               && us1->n_edge == us2->n_edge
+               && us1->has_PointLatLon() == us2->has_PointLatLon()
+               && is_eq(us1->lat_checksum, us2->lat_checksum)
+               && is_eq(us1->lon_checksum, us2->lon_checksum);
+      if (status && (us1->n_face > 0)) {
+        if (us1->has_PointLatLon()) {
+          status = status
+                   && us1->points_lonlat[0] == us2->points_lonlat[0]
+                   && us1->points_lonlat[us1->n_face-1] == us2->points_lonlat[us2->n_face-1];
+        }
+        else {
+          status = status
+                   && is_eq(us1->points_XYZ[0].x(), us2->points_XYZ[0].x())
+                   && is_eq(us1->points_XYZ[0].y(), us2->points_XYZ[0].y())
+                   && is_eq(us1->points_XYZ[0].z(), us2->points_XYZ[0].z())
+                   && is_eq(us1->points_XYZ[us1->n_face-1].x(), us2->points_XYZ[us2->n_face-1].x())
+                   && is_eq(us1->points_XYZ[us1->n_face-1].y(), us2->points_XYZ[us2->n_face-1].y())
+                   && is_eq(us1->points_XYZ[us1->n_face-1].z(), us2->points_XYZ[us2->n_face-1].z())
+                   && is_eq(us1->alt_checksum, us2->alt_checksum);
+        }
+      }
+    }
   }
 
 return status;
@@ -1708,7 +1738,7 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-int ll_func(double x_center, int N)
+static int ll_func(double x_center, int N)
 
 {
 
