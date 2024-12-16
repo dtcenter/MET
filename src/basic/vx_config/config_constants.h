@@ -717,6 +717,7 @@ static const char conf_key_ugrid_metadata_map[]     = "ugrid_metadata_map";
 //
 // Entries to override file metadata 
 //
+
 static const char conf_key_set_attr_name[]        = "set_attr_name";
 static const char conf_key_set_attr_units[]       = "set_attr_units";
 static const char conf_key_set_attr_level[]       = "set_attr_level";
@@ -738,6 +739,7 @@ static const char conf_key_is_prob[]              = "is_prob";
 //
 // Climatology data parameter key names
 //
+
 static const char conf_key_climo_mean[]        = "climo_mean";
 static const char conf_key_climo_mean_field[]  = "climo_mean.field";
 static const char conf_key_climo_stdev[]       = "climo_stdev";
@@ -746,6 +748,7 @@ static const char conf_key_climo_stdev_field[] = "climo_stdev.field";
 //
 // Climatology distribution parameter key names
 //
+
 static const char conf_key_climo_cdf[]          = "climo_cdf";
 static const char conf_key_cdf_bins[]           = "cdf_bins";
 static const char conf_key_center_bins[]        = "center_bins";
@@ -758,6 +761,7 @@ static const char conf_key_hour_interval[]      = "hour_interval";
 //
 // Point-Stat specific parameter key names
 //
+
 static const char conf_key_hira[]               = "hira";
 static const char conf_key_land_mask[]          = "land_mask";
 static const char conf_key_land_mask_flag[]     = "land_mask.flag";
@@ -768,8 +772,16 @@ static const char conf_key_interp_fcst_thresh[] = "interp_fcst_thresh";
 static const char conf_key_point_weight_flag[]  = "point_weight_flag";
 
 //
+// Pair-Stat specific parameter key names
+//
+
+static const char conf_key_fcst_pairs[] = "fcst.pairs";
+static const char conf_key_obs_pairs[]  = "obs.pairs";
+
+//
 // Grid-Stat specific parameter key names
 //
+
 static const char conf_key_nc_pairs_var_name[]   = "nc_pairs_var_name";
 static const char conf_key_nc_pairs_var_suffix[] = "nc_pairs_var_suffix";
 // nc_pairs_var_str is deprecated and replaced by nc_pairs_var_suffix
