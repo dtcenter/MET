@@ -81,7 +81,7 @@ VarInfo *VarInfoNcCF::clone() const {
 
    VarInfoNcCF *ret = new VarInfoNcCF(*this);
 
-   return (VarInfo *)ret;
+   return ret;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,14 +99,13 @@ void VarInfoNcCF::init_from_scratch() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoNcCF::assign(const VarInfoNcCF &v) {
-   int i;
 
    // First call the parent's assign
    VarInfo::assign(v);
 
    // Copy
    clear_dimension();
-   for(i=0; i<v.n_dimension(); i++) {
+   for(int i=0; i<v.n_dimension(); i++) {
       add_dimension(v.dimension(i), v.is_offset(i), v.dim_value(i));
    }
 
@@ -265,34 +264,47 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                           << MagicStr << "\".\n\n";
                      exit(1);
                   }
-                  if (datestring_start && datestring_end) as_offset = false;
 
-                  // Check for integer dimension offsets
-                  if(as_offset) {
+                  // Parse the lower and upper time limits
+                  unixtime time_lower = 0;
+                  unixtime time_upper = 0;
+
+                  if (datestring_start && datestring_end) {
+                     as_offset = false;
+                     time_lower = timestring_to_unix(ptr2);
+                     time_upper = timestring_to_unix(ptr3);
+                  }
+                  else if (as_offset) {
+
+                     // Check for integer dimension offsets
                      check_dim_offset(ptr2);
                      check_dim_offset(ptr3);
+
+                     time_lower = (unixtime) atoi(ptr2);
+                     time_upper = (unixtime) atoi(ptr3);
                   }
- 
-                  unixtime time_lower = datestring_start
-                                        ? timestring_to_unix(ptr2)
-                                        : (as_offset ? atoi(ptr2) : atof(ptr2));
-                  unixtime time_upper = datestring_end
-                                        ? timestring_to_unix(ptr3)
-                                        : (as_offset ? atoi(ptr3) : atof(ptr3));
+                  else {
+                     time_lower = (unixtime) nint(atof(ptr2));
+                     time_upper = (unixtime) nint(atof(ptr3));
+                  }
+
                   if (ptr_inc != nullptr) {
-                     if (as_offset) increment = atoi(ptr_inc);
+                     if (as_offset) {
+                        increment = atoi(ptr_inc);
+                     }
                      else {
                         increment = is_float(ptr_inc)
-                                    ? atof(ptr_inc) : timestring_to_sec(ptr_inc);
+                                    ? nint(atof(ptr_inc))
+                                    : timestring_to_sec(ptr_inc);
                         mlog << Debug(7) << method_name
-                             << " increment: \"" << ptr_inc << "\" to "
+                             << "increment: \"" << ptr_inc << "\" to "
                              << increment << " seconds.\n";
                      }
                   }
 
                   add_dimension(range_flag, as_offset);
-                  Level.set_lower(time_lower);
-                  Level.set_upper(time_upper);
+                  Level.set_lower((double) time_lower);
+                  Level.set_upper((double) time_upper);
                   Level.set_increment(increment);
 
                   // Assume time level type for a range of levels
@@ -307,7 +319,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                if (is_datestring(ptr2)) {
                   unixtime unix_time = timestring_to_unix(ptr2);
                   level = vx_data2d_dim_by_value;
-                  level_value = unix_time;
+                  level_value = (double) unix_time;
                   as_offset = false;
                }
                else if (is_number(ptr2)) {
@@ -323,7 +335,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                else if (is_datestring(ptr2)) {
                   unixtime unix_time = timestring_to_unix(ptr2);
                   level = vx_data2d_dim_by_value;
-                  level_value = unix_time;
+                  level_value = (double) unix_time;
                   as_offset = false;
                }
                else {
@@ -472,7 +484,7 @@ bool VarInfoNcCF::is_wind_direction() const {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-bool is_grib_code_abbr_match(const ConcatString &str, int grib_code) {
+static bool is_grib_code_abbr_match(const ConcatString &str, int grib_code) {
    ConcatString abbr_str;
    bool match = false;
 
@@ -494,7 +506,7 @@ bool is_grib_code_abbr_match(const ConcatString &str, int grib_code) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void check_dim_offset(const char *ptr) {
+static void check_dim_offset(const char *ptr) {
 
    if(!is_eq(atof(ptr), (double) atoi(ptr))) {
       mlog << Warning << "\ncheck_dim_offset() -> "
