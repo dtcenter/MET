@@ -54,6 +54,8 @@ void IODA2NCConfInfo::init_from_scratch() {
 
 void IODA2NCConfInfo::clear() {
 
+   IODADataConfInfo::clear();
+
    // Initialize values
    message_type.clear();
    station_id.clear();
@@ -66,7 +68,7 @@ void IODA2NCConfInfo::clear() {
    beg_level = end_level = bad_data_double;
    quality_mark_thresh = bad_data_int;
    version.clear();
-   obs_name_map.clear();
+   obs_var.clear();
    message_type_map.clear();
 
    return;
@@ -75,7 +77,7 @@ void IODA2NCConfInfo::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void IODA2NCConfInfo::read_config(const char *default_file_name,
-                                const char *user_file_name) {
+                                  const char *user_file_name) {
 
    // Read the config file constants
    conf.read(replace_path(config_const_filename).c_str());
@@ -104,6 +106,10 @@ void IODA2NCConfInfo::process_config() {
 
    // Initialize
    clear();
+   // Done by the base class
+   // Conf: missing_thresh
+   // Conf: obs_name_map, metadata_map, obs_to_qc_map
+   IODADataConfInfo::process_config();
 
    // Conf: version
    version = parse_conf_version(&conf);
@@ -112,8 +118,7 @@ void IODA2NCConfInfo::process_config() {
    message_type = conf.lookup_string_array(conf_key_message_type);
 
    // Conf: message_type_group_map
-   map<ConcatString,StringArray> group_map;
-   group_map = parse_conf_message_type_group_map(&conf);
+   map<ConcatString,StringArray> group_map = parse_conf_message_type_group_map(&conf);
 
    // Expand the values for any message type group names
    for(i=0; i<message_type.n_elements(); i++) {
@@ -154,9 +159,6 @@ void IODA2NCConfInfo::process_config() {
    // Conf: quality_mark_thresh
    quality_mark_thresh = conf.lookup_int(conf_key_quality_mark_thresh);
 
-   // Conf: missing_thresh
-   missing_thresh = conf.lookup_thresh_array(conf_key_missing_thresh, false);
-
    // Check the value
    if(quality_mark_thresh < 0 || quality_mark_thresh > 15) {
       mlog << Warning << "\nIODA2NCConfInfo::process_config() -> "
@@ -165,11 +167,8 @@ void IODA2NCConfInfo::process_config() {
            << ") should be set between 0 and 15.\n\n";
    }
 
-   // Conf: obs_name_map
-   obs_name_map = parse_conf_obs_name_map(&conf);
+   // Conf: message_type_map
    message_type_map = parse_conf_message_type_map(&conf);
-   metadata_map = parse_conf_metadata_map(&conf);
-   obs_to_qc_map = parse_conf_obs_to_qc_map(&conf);
 
    return;
 }
