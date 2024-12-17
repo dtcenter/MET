@@ -23,6 +23,7 @@ using namespace std;
 //
 
 void combine_boolplanes(const string &name,
+                        int rIndex, int tIndex,
                         const BoolPlane * bpa, const int n_planes, 
                         BoolCalc & calc, 
                         BoolPlane & bp_out)
@@ -57,7 +58,7 @@ void combine_boolplanes(const string &name,
 
    }   //  for x
 
-   mlog << Debug(1) << name << " has " << nTrue << " superobject points.\n";
+   mlog << Debug(1) << name << " has " << nTrue << " superobject points.  rIndex[" << rIndex << "] tIndex[" << tIndex << "]\n";
 
    //
    //  done
