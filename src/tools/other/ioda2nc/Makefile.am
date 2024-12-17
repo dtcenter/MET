@@ -27,6 +27,7 @@ ioda2nc_LDADD = -lvx_stat_out \
 	-lvx_data2d_nc_cf \
 	$(UGRID_MET_LIBS) \
 	$(PYTHON_MET_LIBS) \
+	-lvx_ioda \
 	-lvx_data2d \
 	-lvx_nc_obs \
 	-lvx_nc_util \
