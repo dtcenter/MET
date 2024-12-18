@@ -416,14 +416,10 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
 
 .. _TCST Header:
 
-.. list-table:: Header information for TC-Pairs TCST output.
+.. list-table:: Header information for TC-Pairs TCST output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - HEADER
-    -
-    -
-    -
   * - Column Number
     - Header Column Name
     - Description
@@ -489,14 +485,10 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
 
 .. list-table:: Format information for TCMPR (Tropical Cyclone Matched Pairs) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - TCMPR OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
-    - Header Column Name
+    - TCMPR Column Name
     - Description
     - Data Type
   * - 14
@@ -703,14 +695,10 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
 
 .. list-table:: Format information for TCDIAG (Tropical Cyclone Diagnostics) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - TCDIAG OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
-    - Header Column Name
+    - TCDIAG Column Name
     - Description
     - Data Type
   * - 14
@@ -754,14 +742,10 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
 
 .. list-table:: Format information for PROBRIRW (Probability of Rapid Intensification/Weakening) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - PROBRIRW OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
-    - Header Column Name
+    - PROBRIRW Column Name
     - Description
     - Data Type
   * - 14

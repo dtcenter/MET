@@ -384,12 +384,8 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
 
 .. list-table:: Text Header Columns
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - HEADER
-    -
-    -
-    -
   * - Column
     - Name
     - Description
@@ -485,16 +481,12 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
 
 .. _table_mtd-2D-Attributes:
 
-.. list-table:: 2D Attribute
+.. list-table:: 2D Object Attributes
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - 2D Attribute Columns
-    -
-    -
-    -
-  * - Column
-    - Name
+  * - Column Number
+    - 2D Column Name
     - Description
     - Data Type
   * - 23
@@ -536,16 +528,12 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
 
 .. _table_mtd-3D-single-attributes:
 
-.. list-table:: 3D Single Attribute
+.. list-table:: 3D Single Object Attributes
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - 3D Single Attribute Columns
-    -
-    -
-    -
-  * - Column
-    - Name
+  * - Column Number
+    - 3D Single Column Name
     - Description
     - Data Type
   * - 23
@@ -607,16 +595,12 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
 
 .. _table_mtd-3D-Pair-Attribute:
 
-.. list-table:: 3D Pair Attribute
+.. list-table:: 3D Pair Object Attributes
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - 3D Pair Attribute Columns
-    -
-    -
-    -
-  * - Column
-    - Name
+  * - Column Number
+    - 3D Pair Column Name
     - Description
     - Data Type
   * - 23

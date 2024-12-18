@@ -81,12 +81,8 @@ The GSID2MPR tool writes the same set of MPR output columns for the conventional
 
 .. list-table:: Format information for GSI Diagnostic Conventional MPR (Matched Pair) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - GSI DIAGNOSTIC CONVENTIONAL MPR OUTPUT FILE
-    -
-    -
-    -
   * - Column Number
     - Column Name
     - Description
@@ -134,12 +130,8 @@ The GSID2MPR tool writes the same set of MPR output columns for the conventional
 
 .. list-table:: Format information for GSI Diagnostic Radiance MPR (Matched Pair) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1 
 
-  * - GSI DIAGNOSTIC RADIANCE MPR OUTPUT FILE
-    -
-    -
-    -
   * - Column Number
     - Column Name
     - Description
@@ -361,12 +353,8 @@ The GSID2MPR tool writes the same set of ORANK output columns for the convention
 
 .. list-table:: Format information for GSI Diagnostic Conventional ORANK (Observation Rank) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - GSI DIAGNOSTIC CONVENTIONAL ORANK OUTPUT FILE
-    -
-    -
-    -
   * - Column Number
     - Column Name
     - Description
@@ -391,12 +379,8 @@ The GSID2MPR tool writes the same set of ORANK output columns for the convention
 
 .. list-table:: Format information for GSI Diagnostic Radiance ORANK (Observation Rank) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - GSI DIAGNOSTIC RADIANCE ORANK OUTPUT FILE
-    -
-    -
-    -
   * - Column Number
     - Column Name
     - Description

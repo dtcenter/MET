@@ -524,14 +524,10 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_header_info_point-stat_out:
 
-.. list-table:: Common STAT header columns.
+.. list-table:: Header information for Point-Stat STAT output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - HEADER
-    -
-    -
-    -
   * - Column Number
     - Header Column Name
     - Description
@@ -637,12 +633,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for FHO (Forecast, Hit rate, Observation rate) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - FHO OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - FHO Column Name
     - Description
@@ -672,12 +664,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for CTC (Contingency Table Counts) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - CTC OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - CTC Column Name
     - Description
@@ -718,12 +706,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for CTS (Contingency Table Statistics) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - CTS OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - CTS Column Name
     - Description
@@ -776,24 +760,6 @@ The first set of header columns are common to all of the output files generated 
     - GSS, :raw-html:`<br />` GSS_BCL, :raw-html:`<br />` GSS_BCU
     - Gilbert Skill Score including bootstrap upper and lower confidence limits
     - Double
-
-.. role:: raw-html(raw)
-    :format: html
-
-.. _table_PS_format_info_CTS_cont:
-
-.. list-table:: Format information for CTS (Contingency Table Statistics) output line type, continued from above
-  :widths: auto
-  :header-rows: 2
-
-  * - CTS OUTPUT FORMAT (continued)
-    -
-    -
-    -
-  * - Column Number
-    - CTS Column Name
-    - Description
-    - Data Type
   * - 72-76
     - HK, :raw-html:`<br />` HK_NCL, :raw-html:`<br />` HK_NCU, :raw-html:`<br />` HK_BCL, :raw-html:`<br />` HK_BCU
     - Hanssen-Kuipers Discriminant including normal and bootstrap upper and lower confidence limits
@@ -851,12 +817,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for CNT (Continuous Statistics) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - CNT OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - CNT Column Name
     - Description
@@ -917,25 +879,6 @@ The first set of header columns are common to all of the output files generated 
     - ESTDEV, :raw-html:`<br />` ESTDEV_NCL, :raw-html:`<br />` ESTDEV_NCU, :raw-html:`<br />` ESTDEV_BCL, :raw-html:`<br />` ESTDEV_BCU
     - Standard deviation of the error including normal and bootstrap upper and lower confidence limits
     - Double
-
-
-.. role:: raw-html(raw)
-    :format: html
-
-.. _table_PS_format_info_CNT_cont:
-
-.. list-table:: Format information for CNT (Continuous Statistics) output line type continued from above table
-  :widths: auto
-  :header-rows: 2
-
-  * - CNT OUTPUT FORMAT (continued)
-    -
-    -
-    -
-  * - Column Number
-    - CNT Column Name
-    - Description
-    - Data Type
   * - 66-68
     - MBIAS, :raw-html:`<br />` MBIAS_BCL, :raw-html:`<br />` MBIAS_BCU
     - Multiplicative bias including bootstrap upper and lower confidence limits
@@ -1002,12 +945,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for MCTC (Multi-category Contingency Table Count) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - MCTC OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - MCTC Column Name
     - Description
@@ -1039,14 +978,10 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_MCTS:
 
-.. list-table:: Format information for MCTS (Multi- category Contingency Table Statistics) output line type.
+.. list-table:: Format information for MCTS (Multi-category Contingency Table Statistics) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - MCTS OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - MCTS Column Name
     - Description
@@ -1092,12 +1027,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for PCT (Contingency Table Counts for Probabilistic forecasts) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - PCT OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - PCT Column Name
     - Description
@@ -1139,12 +1070,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for PSTD (Contingency Table Statistics for Probabilistic forecasts) output line type
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - PSTD OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - PSTD Column Name
     - Description
@@ -1206,12 +1133,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for PJC (Joint and Conditional factorization for Probabilistic forecasts) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - PJC OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - PJC Column Name
     - Description
@@ -1263,14 +1186,10 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_PRC:
 
-.. list-table:: Format information for PRC (PRC for Receiver Operating Characteristic for Probabilistic forecasts) output line type.
+.. list-table:: Format information for PRC (Receiver Operating Characteristic for Probabilistic forecasts) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - PRC OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - PRC Column Name
     - Description
@@ -1306,16 +1225,12 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_ECLV:
 
-.. list-table:: Format information for ECLV (ECLV for Economic Cost/Loss Relative Value) output line type.
+.. list-table:: Format information for ECLV (Economic Cost/Loss Relative Value) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - ECLV OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
-    - PRC Column Name
+    - ECLV Column Name
     - Description
     - Data Type
   * - 24
@@ -1351,12 +1266,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for SL1L2 (Scalar Partial Sums) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - SL1L2 OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - SL1L2 Column Name
     - Description
@@ -1398,12 +1309,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for SAL1L2 (Scalar Anomaly Partial Sums) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - SAL1L2 OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - SAL1L2 Column Name
     - Description
@@ -1445,12 +1352,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for VL1L2 (Vector Partial Sums) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - VL1L2 OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - VL1L2 Column Name
     - Description
@@ -1520,12 +1423,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - VAL1L2 OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - VAL1L2 Column Name
     - Description
@@ -1595,12 +1494,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for VCNT (Vector Continuous Statistics) output line type. Note that the bootstrap confidence intervals columns ending with BCL and BCU are not currently calculated for this release of MET, but will be in future releases.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - VCNT OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Numbers
     - VCNT Column Name
     - Description
@@ -1718,12 +1613,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for MPR (Matched Pair) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - MPR OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - MPR Column Name
     - Description
@@ -1797,12 +1688,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for SEEPS (Stable Equitable Error in Probability Space) of MPR (Matched Pair) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - SEEPS_MPR OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - SEEPS_MPR Column Name
     - Description
@@ -1869,12 +1756,8 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for SEEPS (Stable Equitable Error in Probability Space) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - SEEPS OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - SEEPS Column Name
     - Description

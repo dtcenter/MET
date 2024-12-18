@@ -273,10 +273,8 @@ When the **nc_diag_flag** configuration entry is set to true, a NetCDF output fi
 
 .. list-table:: Dimensions defined in NetCDF Diagnostics output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - tc_diag NETCDF DIMENSIONS
-    -
   * - NetCDF Dimension
     - Description
   * - time
@@ -291,12 +289,8 @@ When the **nc_diag_flag** configuration entry is set to true, a NetCDF output fi
 
 .. list-table:: Variables defined in NetCDF Diagnostics output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - tc_diag NETCDF VARIABLES
-    -
-    -
-    -
   * - NetCDF Variable
     - Dimension
     - Description
@@ -358,10 +352,8 @@ The NetCDF range-azimuth file contains the dimensions and variables shown in :nu
 
 .. list-table:: Dimensions defined in NetCDF Range-Azimuth output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - tc_diag NETCDF DIMENSIONS
-    -
   * - NetCDF Dimension
     - Description
   * - track_line
@@ -382,12 +374,8 @@ The NetCDF range-azimuth file contains the dimensions and variables shown in :nu
 
 .. list-table:: Variables defined in NetCDF Range-Azimuth output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - tc_diag NETCDF VARIABLES
-    -
-    -
-    -
   * - NetCDF Variable
     - Dimension
     - Description
