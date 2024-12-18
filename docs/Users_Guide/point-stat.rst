@@ -524,150 +524,180 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_header_info_point-stat_out:
 
-.. list-table:: Common STAT header columns.
+.. list-table:: Header information for Point-Stat STAT output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - HEADER
-    -
-    -
   * - Column Number
     - Header Column Name
     - Description
+    - Data Type
   * - 1
     - VERSION
     - Version number
+    - String
   * - 2
     - MODEL
     - User-provided text string designating model name
+    - String
   * - 3
     - DESC
     - User-provided text string describing the verification task
+    - String
   * - 4
     - FCST_LEAD
     - Forecast lead time in HHMMSS format
+    - Time String
   * - 5
     - FCST_VALID_BEG
     - Forecast valid start time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 6
     - FCST_VALID_END
     - Forecast valid end time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 7
     - OBS_LEAD
     - Observation lead time in HHMMSS format
+    - Time String
   * - 8
     - OBS_VALID_BEG
     - Observation valid start time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 9
     - OBS_VALID_END
     - Observation valid end time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 10
     - FCST_VAR
     - Model variable
+    - String
   * - 11
     - FCST_UNITS
     - Units for model variable
+    - String
   * - 12
     - FCST_LEV
-    - Selected Vertical level for forecast
+    - Selected vertical level for forecast
+    - String
   * - 13
     - OBS_VAR
     - Observation variable
+    - String
   * - 14
     - OBS_UNITS
     - Units for observation variable
+    - String
   * - 15
     - OBS_LEV
-    - Selected Vertical level for observations
+    - Selected vertical level for observations
+    - String
   * - 16
     - OBTYPE
     - Observation message type selected
+    - String
   * - 17
     - VX_MASK
     - Verifying masking region indicating the masking grid or polyline region applied
+    - String
   * - 18
     - INTERP_MTHD
     - Interpolation method applied to forecasts
+    - String
   * - 19
     - INTERP_PNTS
     - Number of points used in interpolation method
+    - Integer
   * - 20
     - FCST_THRESH
     - The threshold applied to the forecast
+    - Threshold String
   * - 21
     - OBS_THRESH
     - The threshold applied to the observations
+    - Threshold String
   * - 22
     - COV_THRESH
     - NA in Point-Stat
+    - Threshold String
   * - 23
     - ALPHA
     - Error percent value used in confidence intervals
+    - Double
   * - 24
     - LINE_TYPE
-    - Output line types are listed in tables :numref:`table_PS_format_info_FHO` through :numref:`table_PS_format_info_MPR`.
+    - Output line types are listed in tables :numref:`table_PS_format_info_FHO` through :numref:`table_PS_format_info_SEEPS`.
+    - String
 
 .. _table_PS_format_info_FHO:
 
 .. list-table:: Format information for FHO (Forecast, Hit rate, Observation rate) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - FHO OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - FHO Column Name
     - Description
+    - Data Type
   * - 24
     - FHO
     - Forecast, Hit, Observation line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26
     - F_RATE
     - Forecast rate
+    - Double
   * - 27
     - H_RATE
     - Hit rate
+    - Double
   * - 28
     - O_RATE
     - Observation rate
+    - Double
 
 .. _table_PS_format_info_CTC:
 
 .. list-table:: Format information for CTC (Contingency Table Counts) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - CTC OUTPUT FORMAT
-    -
-    - 
   * - Column Number
     - CTC Column Name
     - Description
+    - Data Type
   * - 24
     - CTC
     - Contingency Table Counts line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26
     - FY_OY
-    - Number of forecast yes and observation yes
+    - Sum of weights for hits (forecast yes and observation yes)
+    - Double
   * - 27
     - FY_ON
-    - Number of forecast yes and observation no
+    - Sum of weights for false alarms (forecast yes and observation no)
+    - Double
   * - 28
     - FN_OY
-    - Number of forecast no and observation yes
+    - Sum of weights for misses (forecast no and observation yes)
+    - Double
   * - 29
     - FN_ON
-    - Number of forecast no and observation no
+    - Sum of weights for correct negatives (forecast no and observation no)
+    - Double
   * - 30
     - EC_VALUE
     - Expected correct rate, used for CTS HSS_EC
+    - Double
 
 .. role:: raw-html(raw)
     :format: html
@@ -676,102 +706,108 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for CTS (Contingency Table Statistics) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - CTS OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - CTS Column Name
     - Description
+    - Data Type
   * - 24
     - CTS
     - Contingency Table Statistics line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26-30
     - BASER, :raw-html:`<br />` BASER_NCL, :raw-html:`<br />` BASER_NCU, :raw-html:`<br />` BASER_BCL, :raw-html:`<br />` BASER_BCU
     - Base rate including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 31-35
     - FMEAN, :raw-html:`<br />` FMEAN_NCL, :raw-html:`<br />` FMEAN_NCU, :raw-html:`<br />` FMEAN_BCL, :raw-html:`<br />` FMEAN_BCU
     - Forecast mean including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 36-40
     - ACC, :raw-html:`<br />` ACC_NCL, :raw-html:`<br />` ACC_NCU, :raw-html:`<br />` ACC_BCL, :raw-html:`<br />` ACC_BCU
     - Accuracy including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 41-43
     - FBIAS, :raw-html:`<br />` FBIAS_BCL, :raw-html:`<br />` FBIAS_BCU
     - Frequency Bias including bootstrap upper and lower confidence limits
+    - Double
   * - 44-48
     - PODY, :raw-html:`<br />` PODY_NCL, :raw-html:`<br />` PODY_NCU, :raw-html:`<br />` PODY_BCL, :raw-html:`<br />` PODY_BCU
     - Probability of detecting yes including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 49-53
     - PODN, :raw-html:`<br />` PODN_NCL, :raw-html:`<br />` PODN_NCU, :raw-html:`<br />` PODN_BCL, :raw-html:`<br />` PODN_BCU
     - Probability of detecting no including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 54-58
     - POFD, :raw-html:`<br />` POFD_NCL, :raw-html:`<br />` POFD_NCU, :raw-html:`<br />` POFD_BCL, :raw-html:`<br />` POFD_BCU
     - Probability of false detection including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 59-63
     - FAR, :raw-html:`<br />` FAR_NCL, :raw-html:`<br />` FAR_NCU, :raw-html:`<br />` FAR_BCL, :raw-html:`<br />` FAR_BCU
     - False alarm ratio including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 64-68
     - CSI, :raw-html:`<br />` CSI_NCL, :raw-html:`<br />` CSI_NCU, :raw-html:`<br />` CSI_BCL, :raw-html:`<br />` CSI_BCU
     - Critical Success Index including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 69-71
     - GSS, :raw-html:`<br />` GSS_BCL, :raw-html:`<br />` GSS_BCU
     - Gilbert Skill Score including bootstrap upper and lower confidence limits
-
-.. role:: raw-html(raw)
-    :format: html
-
-.. _table_PS_format_info_CTS_cont:
-
-.. list-table:: Format information for CTS (Contingency Table Statistics) output line type, continued from above
-  :widths: auto
-  :header-rows: 2
-
-  * - CTS OUTPUT FORMAT (continued)
-    -
-    -
-  * - Column Number
-    - CTS Column Name
-    - Description
+    - Double
   * - 72-76
     - HK, :raw-html:`<br />` HK_NCL, :raw-html:`<br />` HK_NCU, :raw-html:`<br />` HK_BCL, :raw-html:`<br />` HK_BCU
     - Hanssen-Kuipers Discriminant including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 77-79
     - HSS, :raw-html:`<br />` HSS_BCL, :raw-html:`<br />` HSS_BCU
     - Heidke Skill Score including bootstrap upper and lower confidence limits
+    - Double
   * - 80-84
     - ODDS, :raw-html:`<br />` ODDS_NCL, :raw-html:`<br />` ODDS_NCU, :raw-html:`<br />` ODDS_BCL, :raw-html:`<br />` ODDS_BCU
     - Odds Ratio including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 85-89
     - LODDS, :raw-html:`<br />` LODDS_NCL, :raw-html:`<br />` LODDS_NCU, :raw-html:`<br />` LODDS_BCL, :raw-html:`<br />` LODDS_BCU
     - Logarithm of the Odds Ratio including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 90-94
     - ORSS, :raw-html:`<br />` ORSS _NCL, :raw-html:`<br />` ORSS _NCU, :raw-html:`<br />` ORSS _BCL, :raw-html:`<br />` ORSS _BCU
     - Odds Ratio Skill Score including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 95-99
     - EDS, :raw-html:`<br />` EDS _NCL, :raw-html:`<br />` EDS _NCU, :raw-html:`<br />` EDS _BCL, :raw-html:`<br />` EDS _BCU
     - Extreme Dependency Score including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 100-104
     - SEDS, :raw-html:`<br />` SEDS _NCL, :raw-html:`<br />` SEDS _NCU, :raw-html:`<br />` SEDS _BCL, :raw-html:`<br />` SEDS _BCU
     - Symmetric Extreme Dependency Score including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 105-109
     - EDI, :raw-html:`<br />` EDI _NCL, :raw-html:`<br />` EDI _NCU, :raw-html:`<br />` EDI _BCL, :raw-html:`<br />` EDI _BCU
     - Extreme Dependency Index including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 111-113
     - SEDI, :raw-html:`<br />` SEDI _NCL, :raw-html:`<br />` SEDI _NCU, :raw-html:`<br />` SEDI _BCL, :raw-html:`<br />` SEDI _BCU
     - Symmetric Extremal Dependency Index including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 115-117
     - BAGSS, :raw-html:`<br />` BAGSS_BCL, :raw-html:`<br />` BAGSS_BCU
     - Bias-Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
+    - Double
   * - 118-120
     - HSS_EC, :raw-html:`<br />` HSS_EC_BCL, :raw-html:`<br />` HSS_EC_BCU
     - Heidke Skill Score with user-specific expected correct and bootstrap confidence limits
+    - Double
   * - 121
     - EC_VALUE
     - Expected correct rate, used for CTS HSS_EC
+    - Double
 
 
 .. role:: raw-html(raw)
@@ -781,147 +817,160 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for CNT (Continuous Statistics) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - CNT OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - CNT Column Name
     - Description
+    - Data Type
   * - 24
     - CNT
     - Continuous statistics line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26-30
     - FBAR, :raw-html:`<br />` FBAR_NCL, :raw-html:`<br />` FBAR_NCU, :raw-html:`<br />` FBAR_BCL, :raw-html:`<br />` FBAR_BCU
     - Forecast mean including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 31-35
     - FSTDEV, :raw-html:`<br />` FSTDEV_NCL, :raw-html:`<br />` FSTDEV_NCU, :raw-html:`<br />` FSTDEV_BCL, :raw-html:`<br />` FSTDEV_BCU
     - Standard deviation of the forecasts including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 36-40
     - OBAR, :raw-html:`<br />` OBAR_NCL, :raw-html:`<br />` OBAR_NCU, :raw-html:`<br />` OBAR_BCL, :raw-html:`<br />` OBAR_BCU
     - Observation mean including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 41-45
     - OSTDEV, :raw-html:`<br />` OSTDEV_NCL, :raw-html:`<br />` OSTDEV_NCU, :raw-html:`<br />` OSTDEV_BCL, :raw-html:`<br />` OSTDEV_BCU
     - Standard deviation of the observations including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 46-50
     - PR_CORR, :raw-html:`<br />` PR_CORR_NCL, :raw-html:`<br />` PR_CORR_NCU, :raw-html:`<br />` PR_CORR_BCL, :raw-html:`<br />` PR_CORR_BCU
     - Pearson correlation coefficient including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 51
     - SP_CORR
     - Spearman's rank correlation coefficient
+    - Double
   * - 52
     - KT_CORR
     - Kendall's tau statistic
+    - Double
   * - 53
     - RANKS
     - Number of ranks used in computing Kendall's tau statistic
+    - Integer
   * - 54
     - FRANK_TIES
     - Number of tied forecast ranks used in computing Kendall's tau statistic
+    - Integer
   * - 55
     - ORANK_TIES
     - Number of tied observation ranks used in computing Kendall's tau statistic
+    - Integer
   * - 56-60
     - ME, :raw-html:`<br />` ME_NCL, :raw-html:`<br />` ME_NCU, :raw-html:`<br />` ME_BCL, :raw-html:`<br />` ME_BCU
     - Mean error (F-O) including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 61-65
     - ESTDEV, :raw-html:`<br />` ESTDEV_NCL, :raw-html:`<br />` ESTDEV_NCU, :raw-html:`<br />` ESTDEV_BCL, :raw-html:`<br />` ESTDEV_BCU
     - Standard deviation of the error including normal and bootstrap upper and lower confidence limits
-
-
-.. role:: raw-html(raw)
-    :format: html
-
-.. _table_PS_format_info_CNT_cont:
-
-.. list-table:: Format information for CNT (Continuous Statistics) output line type continued from above table
-  :widths: auto
-  :header-rows: 2
-
-  * - CNT OUTPUT FORMAT (continued)
-    -
-    -
-  * - Column Number
-    - CNT Column Name
-    - Description
+    - Double
   * - 66-68
     - MBIAS, :raw-html:`<br />` MBIAS_BCL, :raw-html:`<br />` MBIAS_BCU
     - Multiplicative bias including bootstrap upper and lower confidence limits
+    - Double
   * - 69-71
     - MAE, :raw-html:`<br />` MAE_BCL, :raw-html:`<br />` MAE_BCU
     - Mean absolute error including bootstrap upper and lower confidence limits
+    - Double
   * - 72-74
     - MSE, :raw-html:`<br />` MSE_BCL, :raw-html:`<br />` MSE_BCU
     - Mean squared error including bootstrap upper and lower confidence limits
+    - Double
   * - 75-77
     - BCMSE, :raw-html:`<br />` BCMSE_BCL, :raw-html:`<br />` BCMSE_BCU
     - Bias-corrected mean squared error including bootstrap upper and lower confidence limits
+    - Double
   * - 78-80
     - RMSE, :raw-html:`<br />` RMSE_BCL, :raw-html:`<br />` RMSE_BCU
     - Root mean squared error including bootstrap upper and lower confidence limits
+    - Double
   * - 81-95
     - E10, :raw-html:`<br />` E10_BCL, :raw-html:`<br />` E10_BCU, :raw-html:`<br />` E25, :raw-html:`<br />` E25_BCL, :raw-html:`<br />` E25_BCU, :raw-html:`<br />` E50, :raw-html:`<br />` E50_BCL, :raw-html:`<br />` E50_BCU, :raw-html:`<br />` E75, :raw-html:`<br />` E75_BCL, :raw-html:`<br />` E75_BCU, :raw-html:`<br />` E90, :raw-html:`<br />` E90_BCL, :raw-html:`<br />` E90_BCU
     - 10th, 25th, 50th, 75th, and 90th percentiles of the error including bootstrap upper and lower confidence limits
+    - Double
   * - 96-98
     - EIQR, :raw-html:`<br />` IQR _BCL, :raw-html:`<br />` IQR _BCU
     - The Interquartile Range of the error including bootstrap upper and lower confidence limits
+    - Double
   * - 99-101
     - MAD, :raw-html:`<br />` MAD_BCL, :raw-html:`<br />` MAD_BCU
     - The Median Absolute Deviation including bootstrap upper and lower confidence limits
+    - Double
   * - 102-106
     - ANOM_CORR, :raw-html:`<br />` ANOM_CORR_NCL, :raw-html:`<br />` ANOM_CORR_NCU, :raw-html:`<br />` ANOM_CORR_BCL, :raw-html:`<br />` ANOM_CORR_BCU
     - The Anomaly Correlation including mean error with normal and bootstrap upper and lower confidence limits
+    - Double
   * - 107-109
     - ME2, :raw-html:`<br />` ME2_BCL, :raw-html:`<br />` ME2_BCU
     - The square of the mean error (bias) including bootstrap upper and lower confidence limits
+    - Double
   * - 110-112
     - MSESS, :raw-html:`<br />` MSESS_BCL, :raw-html:`<br />` MSESS_BCU
     - The mean squared error skill score including bootstrap upper and lower confidence limits
+    - Double
   * - 113-115
     - RMSFA, :raw-html:`<br />` RMSFA_BCL, :raw-html:`<br />` RMSFA_BCU
     - Root mean squared forecast anomaly (f-c) including bootstrap upper and lower confidence limits
+    - Double
   * - 116-118
     - RMSOA, :raw-html:`<br />` RMSOA_BCL, :raw-html:`<br />` RMSOA_BCU
     - Root mean squared observation anomaly (o-c) including bootstrap upper and lower confidence limits
+    - Double
   * - 119-121
     - ANOM_CORR_UNCNTR, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCL, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCU
     - The uncentered Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
+    - Double
   * - 122-124
     - SI, :raw-html:`<br />` SI_BCL, :raw-html:`<br />` SI_BCU
     - Scatter Index including bootstrap upper and lower confidence limits
-      
+    - Double
+
 
 .. _table_PS_format_info_MCTC:
 
 .. list-table:: Format information for MCTC (Multi-category Contingency Table Count) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - MCTC OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - MCTC Column Name
     - Description
+    - Data Type
   * - 24
     - MCTC
     - Multi-category Contingency Table Counts line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26
     - N_CAT
     - Dimension of the contingency table
+    - Integer
   * - 27
     - Fi_Oj
-    - Count of events in forecast category i and observation category j, with the observations incrementing first (repeated)
+    - Sum of weights for events in forecast category i and observation category j, with the observations incrementing first (repeated)
+    - Double
   * - \*
     - EC_VALUE
     - Expected correct rate, used for MCTS HSS_EC
+    - Double
 
 
 .. role:: raw-html(raw)
@@ -929,77 +978,89 @@ The first set of header columns are common to all of the output files generated 
 
 .. _table_PS_format_info_MCTS:
 
-.. list-table:: Format information for MCTS (Multi- category Contingency Table Statistics) output line type.
+.. list-table:: Format information for MCTS (Multi-category Contingency Table Statistics) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - MCTS OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - MCTS Column Name
     - Description
+    - Data Type
   * - 24
     - MCTS
     - Multi-category Contingency Table Statistics line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26
     - N_CAT
     - The total number of categories in each dimension of the contingency table. So the total number of cells is N_CAT*N_CAT.
+    - Integer
   * - 27-31
     - ACC, :raw-html:`<br />` ACC_NCL, :raw-html:`<br />` ACC_NCU, :raw-html:`<br />` ACC_BCL, :raw-html:`<br />` ACC_BCU
     - Accuracy, normal confidence limits and bootstrap confidence limits
+    - Double
   * - 32-34
     - HK, :raw-html:`<br />` HK_BCL, :raw-html:`<br />` HK_BCU
     - Hanssen and Kuipers Discriminant and bootstrap confidence limits
+    - Double
   * - 35-37
     - HSS, :raw-html:`<br />` HSS_BCL, :raw-html:`<br />` HSS_BCU
     - Heidke Skill Score and bootstrap confidence limits
+    - Double
   * - 38-40
     - GER, :raw-html:`<br />` GER_BCL, :raw-html:`<br />` GER_BCU
     - Gerrity Score and bootstrap confidence limits
+    - Double
   * - 41-43
     - HSS_EC, :raw-html:`<br />` HSS_EC_BCL, :raw-html:`<br />` HSS_EC_BCU
     - Heidke Skill Score with user-specific expected correct and bootstrap confidence limits
+    - Double
   * - 44
     - EC_VALUE
     - Expected correct rate, used for MCTS HSS_EC
+    - Double
 
 .. _table_PS_format_info_PCT:
 
 .. list-table:: Format information for PCT (Contingency Table Counts for Probabilistic forecasts) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - PCT OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - PCT Column Name
     - Description
+    - Data Type
   * - 24
     - PCT
     - Probability contingency table count line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26
     - N_THRESH
     - Number of probability thresholds
+    - Integer
   * - 27
     - THRESH_i
     - The ith probability threshold value (repeated)
+    - Double
   * - 28
     - OY_i
-    - Number of observation yes when forecast is between the ith and i+1th probability thresholds (repeated)
+    - Sum of weights for observation yes when forecast is between the ith and i+1th probability thresholds (repeated)
+    - Double
   * - 29
     - ON_i
-    - Number of observation no when forecast is between the ith and i+1th probability thresholds (repeated)
+    - Sum of weights for observation no when forecast is between the ith and i+1th probability thresholds (repeated)
+    - Double
   * - \*
     - THRESH_n
     - Last probability threshold value
+    - Double
 
 
 .. role:: raw-html(raw)
@@ -1009,626 +1070,758 @@ The first set of header columns are common to all of the output files generated 
 
 .. list-table:: Format information for PSTD (Contingency Table Statistics for Probabilistic forecasts) output line type
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - PSTD OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - PSTD Column Name
     - Description
+    - Data Type
   * - 24
     - PSTD
     - Probabilistic statistics for dichotomous outcome line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26
     - N_THRESH
     - Number of probability thresholds
+    - Integer
   * - 27-29
     - BASER, :raw-html:`<br />` BASER_NCL, :raw-html:`<br />` BASER_NCU
     - The Base Rate, including normal upper and lower confidence limits
+    - Double
   * - 30
     - RELIABILITY
     - Reliability
+    - Double
   * - 31
     - RESOLUTION
     - Resolution
+    - Double
   * - 32
     - UNCERTAINTY
     - Uncertainty
+    - Double
   * - 33
     - ROC_AUC
     - Area under the receiver operating characteristic curve
+    - Double
   * - 34-36
     - BRIER, :raw-html:`<br />` BRIER_NCL, :raw-html:`<br />` BRIER_NCU
     - Brier Score including normal upper and lower confidence limits
+    - Double
   * - 37-39
     - BRIERCL, :raw-html:`<br />` BRIERCL_NCL, :raw-html:`<br />` BRIERCL_NCU
     - Climatological Brier Score including upper and lower normal confidence limits
+    - Double
   * - 40
     - BSS
     - Brier Skill Score relative to external climatology
+    - Double
   * - 41
     - BSS_SMPL
     - Brier Skill Score relative to sample climatology
+    - Double
   * - 42
     - THRESH_i
     - The ith probability threshold value (repeated)
+    - Double
 
 .. _table_PS_format_info_PJC:
 
 .. list-table:: Format information for PJC (Joint and Conditional factorization for Probabilistic forecasts) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - PJC OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - PJC Column Name
     - Description
+    - Data Type
   * - 24
     - PJC
     - Probabilistic Joint/Continuous line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26
     - N_THRESH
     - Number of probability thresholds
+    - Integer
   * - 27
     - THRESH_i
     - The ith probability threshold value (repeated)
+    - Double
   * - 28
     - OY_TP_i
     - Number of observation yes when forecast is between the ith and i+1th probability thresholds as a proportion of the total OY (repeated)
+    - Double
   * - 29
     - ON_TP_i
     - Number of observation no when forecast is between the ith and i+1th probability thresholds as a proportion of the total ON (repeated)
+    - Double
   * - 30
     - CALIBRATION_i
     - Calibration when forecast is between the ith and i+1th probability thresholds (repeated)
+    - Double
   * - 31
     - REFINEMENT_i
     - Refinement when forecast is between the ith and i+1th probability thresholds (repeated)
+    - Double
   * - 32
     - LIKELIHOOD_i
-    - Likelihood when forecast is between the ith and i+1th probability thresholds (repeated
+    - Likelihood when forecast is between the ith and i+1th probability thresholds (repeated)
+    - Double
   * - 33
     - BASER_i
     - Base rate when forecast is between the ith and i+1th probability thresholds (repeated)
+    - Double
   * - \*
     - THRESH_n
     - Last probability threshold value
+    - Double
 
 .. _table_PS_format_info_PRC:
 
-.. list-table:: Format information for PRC (PRC for Receiver Operating Characteristic for Probabilistic forecasts) output line type.
+.. list-table:: Format information for PRC (Receiver Operating Characteristic for Probabilistic forecasts) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - PRC OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - PRC Column Name
     - Description
+    - Data Type
   * - 24
     - PRC
     - Probability ROC points line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26
     - N_THRESH
     - Number of probability thresholds
+    - Integer
   * - 27
     - THRESH_i
     - The ith probability threshold value (repeated)
+    - Double
   * - 28
     - PODY_i
     - Probability of detecting yes when forecast is greater than the ith probability thresholds (repeated)
+    - Double
   * - 29
     - POFD_i
     - Probability of false detection when forecast is greater than the ith probability thresholds (repeated)
+    - Double
   * - \*
     - THRESH_n
     - Last probability threshold value
+    - Double
 
 .. _table_PS_format_info_ECLV:
 
-.. list-table:: Format information for ECLV (ECLV for Economic Cost/Loss Relative Value) output line type.
+.. list-table:: Format information for ECLV (Economic Cost/Loss Relative Value) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - ECLV OUTPUT FORMAT
-    -
-    -
   * - Column Number
-    - PRC Column Name
+    - ECLV Column Name
     - Description
+    - Data Type
   * - 24
     - ECLV
     - Economic Cost/Loss Relative Value line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26
     - BASER
     - Base rate
+    - Double
   * - 27
     - VALUE_BASER
     - Economic value of the base rate
+    - Double
   * - 28
     - N_PNT
     - Number of Cost/Loss ratios
+    - Integer
   * - 29
     - CL_i
     - ith Cost/Loss ratio evaluated
+    - Double
   * - 30
     - VALUE_i
     - Relative value for the ith Cost/Loss ratio
+    - Double
 
 .. _table_PS_format_info_SL1L2:
 
 .. list-table:: Format information for SL1L2 (Scalar Partial Sums) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - SL1L2 OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - SL1L2 Column Name
     - Description
+    - Data Type
   * - 24
     - SL1L2
     - Scalar L1L2 line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs of forecast (f) and observation (o)
+    - Integer
   * - 26
     - FBAR
     - Mean(f)
+    - Double
   * - 27
     - OBAR
     - Mean(o)
+    - Double
   * - 28
     - FOBAR
     - Mean(f*o)
+    - Double
   * - 29
     - FFBAR
     - Mean(f²)
+    - Double
   * - 30
     - OOBAR
     - Mean(o²)
+    - Double
   * - 31
     - MAE
     - Mean(\|f-o\|)
+    - Double
 
 .. _table_PS_format_info_SAL1L2:
 
 .. list-table:: Format information for SAL1L2 (Scalar Anomaly Partial Sums) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - SAL1L2 OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - SAL1L2 Column Name
     - Description
+    - Data Type
   * - 24
     - SAL1L2
     - Scalar Anomaly L1L2 line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs of forecast (f), observation (o), forecast climatology (cf), and observation climatology (co)
+    - Integer
   * - 26
     - FABAR
     - Mean(f-cf)
+    - Double
   * - 27
     - OABAR
     - Mean(o-co)
+    - Double
   * - 28
     - FOABAR
     - Mean((f-cf)*(o-co))
+    - Double
   * - 29
     - FFABAR
     - Mean((f-cf)²)
+    - Double
   * - 30
     - OOABAR
     - Mean((o-co)²)
+    - Double
   * - 31
     - MAE
     - Mean(\|(f-cf)-(o-co)\|)
+    - Double
 
 .. _table_PS_format_info_VL1L2:
 
 .. list-table:: Format information for VL1L2 (Vector Partial Sums) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - VL1L2 OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - VL1L2 Column Name
     - Description
+    - Data Type
   * - 24
     - VL1L2
     - Vector L1L2 line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs of forecast winds (uf, vf) and observation winds (uo, vo)
+    - Integer
   * - 26
     - UFBAR
     - Mean(uf)
+    - Double
   * - 27
     - VFBAR
     - Mean(vf)
+    - Double
   * - 28
     - UOBAR
     - Mean(uo)
+    - Double
   * - 29
     - VOBAR
     - Mean(vo)
+    - Double
   * - 30
     - UVFOBAR
     - Mean(uf*uo+vf*vo)
+    - Double
   * - 31
     - UVFFBAR
     - Mean(uf²+vf²)
+    - Double
   * - 32
     - UVOOBAR
     - Mean(uo²+vo²)
+    - Double
   * - 33
     - F_SPEED_BAR
     - Mean forecast wind speed
+    - Double
   * - 34
     - O_SPEED_BAR
     - Mean observed wind speed
+    - Double
   * - 35
     - TOTAL_DIR 
     - Total number of matched pairs for which both the forecast and observation wind directions are well-defined (i.e. non-zero vectors)
+    - Double
   * - 36
     - DIR_ME
     - Mean wind direction difference, from -180 to 180 degrees
+    - Double
   * - 37
     - DIR_MAE
     - Mean absolute wind direction difference
+    - Double
   * - 38
     - DIR_MSE
     - Mean squared wind direction difference
+    - Double
 
 .. _table_PS_format_info_VAL1L2:
 
 .. list-table:: Format information for VAL1L2 (Vector Anomaly Partial Sums) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - VAL1L2 OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - VAL1L2 Column Name
     - Description
+    - Data Type
   * - 24
     - VAL1L2
     - Vector Anomaly L1L2 line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs of forecast winds (uf, vf), observation winds (uo, vo), forecast climatology winds (ucf, vcf), and observation climatology winds (uco, vco)
+    - Integer
   * - 26
     - UFABAR
     - Mean(uf-ucf)
+    - Double
   * - 27
     - VFABAR
     - Mean(vf-vcf)
+    - Double
   * - 28
     - UOABAR
     - Mean(uo-uco)
+    - Double
   * - 29
     - VOABAR
     - Mean(vo-vco)
+    - Double
   * - 30
     - UVFOABAR
     - Mean((uf-ucf)*(uo-uco)+(vf-vcf)*(vo-vco))
+    - Double
   * - 31
     - UVFFABAR
     - Mean((uf-ucf)²+(vf-vcf)²)
+    - Double
   * - 32
     - UVOOABAR
     - Mean((uo-uco)²+(vo-vco)²)
+    - Double
   * - 33
     - FA_SPEED_BAR
     - Mean forecast wind speed anomaly
+    - Double
   * - 34
     - OA_SPEED_BAR
     - Mean observed wind speed anomaly
+    - Double
   * - 35
     - TOTAL_DIR 
     - Total number of matched pairs for which the forecast, observation, forecast climatology, and observation climatology wind directions are well-defined (i.e. non-zero vectors)
+    - Double
   * - 36
     - DIRA_ME
     - Mean wind direction anomaly difference, from -180 to 180 degrees
+    - Double
   * - 37
     - DIRA_MAE
     - Mean absolute wind direction anomaly difference
+    - Double
   * - 38
     - DIRA_MSE
     - Mean squared wind direction anomaly difference
+    - Double
 
 .. _table_PS_format_info_VCNT:
 
 .. list-table:: Format information for VCNT (Vector Continuous Statistics) output line type. Note that the bootstrap confidence intervals columns ending with BCL and BCU are not currently calculated for this release of MET, but will be in future releases.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - VCNT OUTPUT FORMAT
-    -
-    -
   * - Column Numbers
     - VCNT Column Name
     - Description
+    - Data Type
   * - 24
     - VCNT
     - Vector Continuous Statistics line type
+    - String
   * - 25
     - TOTAL
     - Total number of data points
+    - Integer
   * - 26-28
     - FBAR, :raw-html:`<br />` FBAR_BCL, :raw-html:`<br />` FBAR_BCU
     - Mean value of forecast wind speed including bootstrap upper and lower confidence limits
+    - Double
   * - 29-31
     - OBAR, :raw-html:`<br />` OBAR_BCL, :raw-html:`<br />` OBAR_BCU
     - Mean value of observed wind speed including bootstrap upper and lower confidence limits
+    - Double
   * - 32-34
     - FS_RMS, :raw-html:`<br />` FS_RMS_BCL, :raw-html:`<br />` FS_RMS_BCU
     - Root mean square forecast wind speed including bootstrap upper and lower confidence limits
+    - Double
   * - 35-37
     - OS_RMS, :raw-html:`<br />` OS_RMS_BCL, :raw-html:`<br />` OS_RMS_BCU
     - Root mean square observed wind speed including bootstrap upper and lower confidence limits
+    - Double
   * - 38-40
     - MSVE, :raw-html:`<br />` MSVE_BCL, :raw-html:`<br />` MSVE_BCU
     - Mean squared length of the vector difference between the forecast and observed winds including bootstrap upper and lower confidence limits
+    - Double
   * - 41-43
     - RMSVE, :raw-html:`<br />` RMSVE_BCL, :raw-html:`<br />` RMSVE_BCU
     - Square root of MSVE including bootstrap upper and lower confidence limits
+    - Double
   * - 45-46
     - FSTDEV, :raw-html:`<br />` FSTDEV_BCL, :raw-html:`<br />` FSTDEV_BCU
     - Standard deviation of the forecast wind speed including bootstrap upper and lower confidence limits
+    - Double
   * - 47-49
     - OSTDEV, :raw-html:`<br />` OSTDEV_BCL, :raw-html:`<br />` OSTDEV_BCU
     - Standard deviation of the observed wind field including bootstrap upper and lower confidence limits
+    - Double
   * - 50-52
     - FDIR, :raw-html:`<br />` FDIR_BCL, :raw-html:`<br />` FDIR_BCU
     - Direction of the average forecast wind vector including bootstrap upper and lower confidence limits
+    - Double
   * - 53-55
     - ODIR, :raw-html:`<br />` ODIR_BCL, :raw-html:`<br />` ODIR_BCU
     - Direction of the average observed wind vector including bootstrap upper and lower confidence limits
+    - Double
   * - 56-58
     - FBAR_SPEED, :raw-html:`<br />` FBAR_SPEED_BCL, :raw-html:`<br />` FBAR_SPEED_BCU
     - Length (speed) of the average forecast wind vector including bootstrap upper and lower confidence limits
+    - Double
   * - 59-61
     - OBAR_SPEED, :raw-html:`<br />` OBAR_SPEED_BCL, :raw-html:`<br />` OBAR_SPEED_BCU
     - Length (speed) of the average observed wind vector including bootstrap upper and lower confidence limits
+    - Double
   * - 62-64
     - VDIFF_SPEED, :raw-html:`<br />` VDIFF_SPEED_BCL, :raw-html:`<br />` VDIFF_SPEED_BCU
     - Length (speed) of the vector difference between the average forecast and average observed wind vectors including bootstrap upper and lower confidence limits
+    - Double
   * - 65-67
     - VDIFF_DIR, :raw-html:`<br />` VDIFF_DIR_BCL, :raw-html:`<br />` VDIFF_DIR_BCU
     - Direction of the vector difference between the average forecast and average wind vectors including bootstrap upper and lower confidence limits
+    - Double
   * - 68-70
     - SPEED_ERR, :raw-html:`<br />` SPEED_ERR_BCL, :raw-html:`<br />` SPEED_ERR_BCU
     - Difference between the length of the average forecast wind vector and the average observed wind vector (in the sense F - O) including bootstrap upper and lower confidence limits
+    - Double
   * - 71-73
     - SPEED_ABSERR, :raw-html:`<br />` SPEED_ABSERR_BCL, :raw-html:`<br />` SPEED_ABSERR_BCU
     - Absolute value of SPEED_ERR including bootstrap upper and lower confidence limits
+    - Double
   * - 74-76
     - DIR_ERR, :raw-html:`<br />` DIR_ERR_BCL, :raw-html:`<br />` DIR_ERR_BCU
     - Signed angle between the directions of the average forecast and observed wing vectors. Positive if the forecast wind vector is counterclockwise from the observed wind vector including bootstrap upper and lower confidence limits
+    - Double
   * - 77-79
     - DIR_ABSERR, :raw-html:`<br />` DIR_ABSERR_BCL, :raw-html:`<br />` DIR_ABSERR_BCU
     - Absolute value of DIR_ABSERR including bootstrap upper and lower confidence limits
+    - Double
   * - 80-84
     - ANOM_CORR, :raw-html:`<br />` ANOM_CORR_NCL, :raw-html:`<br />` ANOM_CORR_NCU, :raw-html:`<br />` ANOM_CORR_BCL, :raw-html:`<br />` ANOM_CORR_BCU
     - Vector Anomaly Correlation including mean error with normal and bootstrap upper and lower confidence limits
+    - Double
   * - 85-87
     - ANOM_CORR_UNCNTR, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCL, :raw-html:`<br />` ANOM_CORR_UNCNTR_BCU
     - Uncentered vector Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
+    - Double
   * - 88
     - TOTAL_DIR 
     - Total number of matched pairs for which both the forecast and observation wind directions are well-defined (i.e. non-zero vectors)
+    - Double
   * - 89-91
     - DIR_ME, :raw-html:`<br />` DIR_ME_BCL, :raw-html:`<br />` DIR_ME_BCU
     - Mean direction difference, from -180 to 180 degrees, including bootstrap upper and lower confidence limits
+    - Double
   * - 92-94
     - DIR_MAE, :raw-html:`<br />` DIR_MAE_BCL, :raw-html:`<br />` DIR_MAE_BCU
     - Mean absolute direction difference including bootstrap upper and lower confidence limits
+    - Double
   * - 95-97
     - DIR_MSE, :raw-html:`<br />` DIR_MSE_BCL, :raw-html:`<br />` DIR_MSE_BCU
     - Mean squared direction difference including bootstrap upper and lower confidence limits
+    - Double
   * - 98-100
     - DIR_RMSE, :raw-html:`<br />` DIR_RMSE_BCL, :raw-html:`<br />` DIR_RMSE_BCU
     - Root mean squared direction difference including bootstrap upper and lower confidence limits
+    - Double
 
 .. _table_PS_format_info_MPR:
 
 .. list-table:: Format information for MPR (Matched Pair) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - MPR OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - MPR Column Name
     - Description
+    - Data Type
   * - 24
     - MPR
     - Matched Pair line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26
     - INDEX
     - Index for the current matched pair
+    - Integer
   * - 27
     - OBS_SID
     - Station Identifier of observation
+    - String
   * - 28
     - OBS_LAT
     - Latitude of the observation in degrees north
+    - Double
   * - 29
     - OBS_LON
     - Longitude of the observation in degrees east
+    - Double
   * - 30
     - OBS_LVL
     - Pressure level of the observation in hPa or accumulation interval in hours
+    - Double
   * - 31
     - OBS_ELV
     - Elevation of the observation in meters above sea level
+    - Double
   * - 32
     - FCST
     - Forecast value interpolated to the observation location
+    - Double
   * - 33
     - OBS
     - Observation value
+    - Double
   * - 34
     - OBS_QC
     - Quality control flag for observation
+    - String
   * - 35
     - OBS_CLIMO_MEAN
     - Observation climatological mean value (named CLIMO_MEAN prior to met-12.0.0)
+    - Double
   * - 36
     - OBS_CLIMO_STDEV
     - Observation climatological standard deviation value (named CLIMO_STDEV prior to met-12.0.0)
+    - Double
   * - 37
     - OBS_CLIMO_CDF
     - Observation climatological cumulative distribution function value (named CLIMO_CDF prior to met-12.0.0)
+    - Double
   * - 38
     - FCST_CLIMO_MEAN
     - Forecast climatological mean value
+    - Double
   * - 39
     - FCST_CLIMO_STDEV
     - Forecast climatological standard deviation value
+    - Double
 
 .. _table_PS_format_info_SEEPS_MPR:
 
 .. list-table:: Format information for SEEPS (Stable Equitable Error in Probability Space) of MPR (Matched Pair) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - SEEPS_MPR OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - SEEPS_MPR Column Name
     - Description
+    - Data Type
   * - 24
     - SEEPS_MPR
     - SEEPS Matched Pair line type
+    - String
   * - 25
     - OBS_SID
     - Station Identifier of observation
+    - String
   * - 26
     - OBS_LAT
     - Latitude of the observation in degrees north
+    - Double
   * - 27
     - OBS_LON
     - Longitude of the observation in degrees east
+    - Double
   * - 28
     - FCST
     - Forecast value interpolated to the observation location
+    - Double
   * - 29
     - OBS
     - Observation value
+    - Double
   * - 30
     - OBS_QC
     - Quality control flag for observation
+    - String
   * - 31
     - FCST_CAT
     - Forecast category (dry, light, or heavy)
+    - Integer
   * - 32
     - OBS_CAT
     - Observation category (dry, light, or heavy)
+    - Integer
   * - 33
     - P1
     - Climo-derived probability value for this station (dry)
+    - Double
   * - 34
     - P2
     - Climo-derived probability value for this station (dry + light)
+    - Double
   * - 35
     - T1
     - Threshold 1 for P1 (dry)
+    - Double
   * - 36
     - T2
     - Threshold 2 for P2 (dry + light)
+    - Double
   * - 37
     - SEEPS
     - SEEPS (Stable Equitable Error in Probability Space) score
+    - Double
 
 
 .. _table_PS_format_info_SEEPS:
 
 .. list-table:: Format information for SEEPS (Stable Equitable Error in Probability Space) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - SEEPS OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - SEEPS Column Name
     - Description
+    - Data Type
   * - 24
     - SEEPS
     - SEEPS line type
+    - String
   * - 25
     - TOTAL
     - Total number of SEEPS matched pairs
+    - Integer
   * - 26
     - ODFL
     - Counts multiplied by the weights for the observation dry, forecast light category
+    - Double
   * - 27
     - ODFH
     - Counts multiplied by the weights for the observation dry, forecast heavy category
+    - Double
   * - 28
     - OLFD
     - Counts multiplied by the weights for the observation light, forecast dry category
+    - Double
   * - 29
     - OLFH
     - Counts multiplied by the weights for the observation light, forecast heavy category
+    - Double
   * - 30
     - OHFD
     - Counts multiplied by the weights for the observation heavy, forecast dry category
+    - Double
   * - 31
     - OHFL
     - Counts multiplied by the weights for the observation heavy, forecast light category
+    - Double
   * - 32
     - PF1
     - Marginal probabilities of the forecast dry (FCST_CAT 0)
+    - Double
   * - 33
     - PF2
     - Marginal probabilities of the forecast light (FCST_CAT 1)
+    - Double
   * - 34
     - PF3
     - Marginal probabilities of the forecast heavy (FCST_CAT 2)
+    - Double
   * - 35
     - PV1
     - Marginal probabilities of the observed dry (OBS_CAT 0)
+    - Double
   * - 36
     - PV2
     - Marginal probabilities of the observed light (OBS_CAT 1)
+    - Double
   * - 37
     - PV3
     - Marginal probabilities of the observed heavy (OBS_CAT 2)
+    - Double
   * - 38
     - SEEPS
     - Averaged SEEPS (Stable Equitable Error in Probability Space) score
+    - Double
 
 
 The STAT output files described for point_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by point_stat, please see :numref:`stat-analysis`.
