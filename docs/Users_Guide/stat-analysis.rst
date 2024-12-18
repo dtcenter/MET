@@ -791,54 +791,71 @@ The SSIDX line type consists of the common STAT header columns described in :num
   * - SSIDX OUTPUT FORMAT
     -
     -
+    -
   * - Column Number
     - SSIDX Column Name
     - Description
+    - Data Type
   * - 4
     - FCST_LEAD
     - Maximum input forecast lead time
+    - Time String
   * - 5
     - FCST_VALID_BEG
     - Minimum input forecast valid start time
+    - Datetime String
   * - 6
     - FCST_VALID_END
     - Maximum input forecast valid end time
+    - Datetime String
   * - 7
     - OBS_LEAD
     - Maximum input observation lead time
+    - Time String
   * - 8
     - OBS_VALID_BEG
     - Minimum input observation valid start time
+    - Datetime String
   * - 9
     - OBS_VALID_END
     - Maximum input observation valid end time
+    - Datetime String
   * - 10
     - FCST_VAR
     - Skill score index name from the "ss_index_name" option
+    - String
   * - 11
     - OBS_VAR
     - Skill score index name from the "ss_index_name" option
+    - String
   * - 24
     - SSIDX
     - Skill score index line type
+    - String
   * - 25
     - FCST_MODEL
     - Forecast model name
+    - String
   * - 26
     - REF_MODEL
     - Reference model name
+    - String
   * - 27
     - N_INIT
     - Number of unique input model initialization times
+    - Integer
   * - 28
     - N_TERM
     - Number of skill score index terms
+    - Integer
   * - 29
     - N_VLD
     - Number of terms for which a valid skill score was computed
+    - Integer
   * - 30
     - SS_INDEX
     - Skill score index value
+    - Double
 
 Job: ramp
 ^^^^^^^^^

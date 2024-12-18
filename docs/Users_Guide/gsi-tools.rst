@@ -23,7 +23,7 @@ gsid2mpr Usage
 The usage statement for the GSID2MPR tool is shown below:
 
 .. code-block:: none
-		
+
   Usage: gsid2mpr
          gsi_file_1 [gsi_file_2 ... gsi_file_n]
          [-swap]
@@ -64,7 +64,7 @@ Optional Arguments for gsid2mpr
 An example of the gsid2mpr calling sequence is shown below:
 
 .. code-block:: none
-		
+
   gsid2mpr diag_conv_ges.mem001 \
   -set_hdr MODEL GSI_MEM001 \
   -outdir out
@@ -83,39 +83,50 @@ The GSID2MPR tool writes the same set of MPR output columns for the conventional
   :widths: auto
   :header-rows: 2
 
-  * -  
-    - 
-    - GSI DIAGNOSTIC CONVENTIONAL MPR OUTPUT FILE
+  * - GSI DIAGNOSTIC CONVENTIONAL MPR OUTPUT FILE
+    -
+    -
+    -
   * - Column Number
     - Column Name
     - Description
+    - Data Type
   * - 1-37
     - 
-    - Standard MPR columns described in :numref:`table_PS_format_info_MPR`.
+    - Standard MPR columns described in :numref:`table_PS_format_info_MPR`
+    - Varies
   * - 38
     - OBS_PRS
     - Model pressure value at the observation height (hPa)
+    - Double
   * - 39
     - OBS_ERR_IN
     - PrepBUFR inverse observation error
+    - Double
   * - 40
     - OBS_ERR_ADJ
     - read_PrepBUFR inverse observation error
+    - Double
   * - 41
     - OBS_ERR_FIN
     - Final inverse observation error
+    - Double
   * - 42
     - PREP_USE
     - read_PrepBUFR usage
+    - Integer
   * - 43
     - ANLY_USE
     - Analysis usage (1 for yes, -1 for no)
+    - Integer
   * - 44
     - SETUP_QC
     - Setup quality control
+    - Integer
   * - 45
     - QC_WGHT
     - Non-linear quality control relative weight
+    - Double
 
 
 .. role:: raw-html(raw)
@@ -125,111 +136,146 @@ The GSID2MPR tool writes the same set of MPR output columns for the conventional
   :widths: auto
   :header-rows: 2
 
-  * - 
-    - 
-    - GSI DIAGNOSTIC RADIANCE MPR OUTPUT FILE
+  * - GSI DIAGNOSTIC RADIANCE MPR OUTPUT FILE
+    -
+    -
+    -
   * - Column Number
     - Column Name
     - Description
+    - Data Type
   * - 1-37
-    -  
-    - Standard MPR columns described in :numref:`table_PS_format_info_MPR`.
+    -
+    - Standard MPR columns described in :numref:`table_PS_format_info_MPR`
+    - Varies
   * - 38
     - CHAN_USE
     - Channel used (1 for yes, -1 for no)
+    - Integer
   * - 39
     - SCAN_POS
     - Sensor scan position
+    - Integer
   * - 40
     - SAT_ZNTH
     - Satellite zenith angle (degrees)
+    - Double
   * - 41
     - SAT_AZMTH
     - Satellite azimuth angle (degrees)
+    - Double
   * - 42
     - SUN_ZNTH
     - Solar zenith angle (degrees)
+    - Double
   * - 43
     - SUN_AZMTH
     - Solar azimuth angle (degrees)
+    - Double
   * - 44
     - SUN_GLNT
     - Sun glint angle (degrees)
+    - Double
   * - 45
     - FRAC_WTR
     - Fractional coverage by water
+    - Double
   * - 46
     - FRAC_LND
     - Fractional coverage by land
+    - Double
   * - 47
     - FRAC_ICE
     - Fractional coverage by ice
+    - Double
   * - 48
     - FRAC_SNW
     - Fractional coverage by snow
+    - Double
   * - 49
     - SFC_TWTR
     - Surface temperature over water (K)
+    - Double
   * - 50
     - SFC_TLND
     - Surface temperature over land (K)
+    - Double
   * - 51
     - SFC_TICE
     - Surface temperature over ice (K)
+    - Double
   * - 52
     - SFC_TSNW
     - Surface temperature over snow (K)
+    - Double
   * - 53
     - TSOIL
     - Soil temperature (K)
+    - Double
   * - 54
     - SOILM
     - Soil moisture
+    - Double
   * - 55
     - LAND_TYPE
     - Surface land type
+    - Integer
   * - 56
     - FRAC_VEG
     - Vegetation fraction
+    - Double
   * - 57
     - SNW_DPTH
-    - Snow depth
+    - Snow depth'
+    - Double
   * - 58
     - SFC_WIND
     - Surface wind speed (m/s)
+    - Double
   * - 59
     - FRAC_CLD  CLD_LWC
     - Cloud fraction (%) :raw-html:`<br />`  Cloud liquid water (kg/m**2) (microwave only)
+    - Double
   * - 60
     - CTOP_PRS   TC_PWAT
     - Cloud top pressure (hPa) :raw-html:`<br />`  Total column precip. water (km/m**2) (microwave only)
+    - Double
   * - 61
     - TFND
     - Foundation temperature: Tr
+    - Double
   * - 62
     - TWARM
     - Diurnal warming: d(Tw) at depth zob
+    - Double
   * - 63
     - TCOOL
     - Sub-layer cooling: d(Tc) at depth zob
+    - Double
   * - 64
     - TZFND
     - d(Tz)/d(Tr)
+    - Double
   * - 65
     - OBS_ERR
     - Inverse observation error
+    - Double
   * - 66
     - FCST_NOBC
     - Brightness temperature with no bias correction (K)
+    - Double
   * - 67
     - SFC_EMIS
     - Surface emissivity
+    - Double
   * - 68
     - STABILITY
     - Stability index
+    - Double
   * - 69
     - PRS_MAX_WGT
     - Pressure of the maximum weighing function
+    - Double
 
 The gsid2mpr output may be passed to the Stat-Analysis tool to derive additional statistics. In particular, users should consider running the **aggregate_stat** job type to read MPR lines and compute partial sums (SL1L2), continuous statistics (CNT), contingency table counts (CTC), or contingency table statistics (CTS). Stat-Analysis has been enhanced to parse any extra columns found at the end of the input lines. Users can filter the values in those extra columns using the **-column_thresh**, **-column_str**, and **-column_str_exc** job command options.
 
@@ -254,7 +300,7 @@ gsidens2orank Usage
 The usage statement for the GSIDENS2ORANK tool is shown below:
 
 .. code-block:: none
-		
+
   Usage: gsidens2orank
          ens_file_1 ... ens_file_n | ens_file_list
          -out path
@@ -317,114 +363,148 @@ The GSID2MPR tool writes the same set of ORANK output columns for the convention
   :widths: auto
   :header-rows: 2
 
-  * - 
-    - 
-    - GSI DIAGNOSTIC CONVENTIONAL ORANK OUTPUT FILE
+  * - GSI DIAGNOSTIC CONVENTIONAL ORANK OUTPUT FILE
+    -
+    -
+    -
   * - Column Number
     - Column Name
     - Description
+    - Data Type
   * - 1-?
     -  
-    - Standard ORANK columns described in :numref:`table_ES_header_info_es_out_ORANK`.
+    - Standard ORANK columns described in :numref:`table_ES_header_info_es_out_ORANK`
+    - Varies
   * - Last-2
     - N_USE
     - Number of members with ANLY_USE = 1
+    - Integer
   * - Last-1
     - PREP_USE
     - read_PrepBUFR usage
+    - Integer
   * - Last
     - SETUP_QC
     - Setup quality control
+    - Integer
 
 
 .. list-table:: Format information for GSI Diagnostic Radiance ORANK (Observation Rank) output line type.
   :widths: auto
   :header-rows: 2
 
-  * - 
-    - 
-    - GSI DIAGNOSTIC RADIANCE ORANK OUTPUT FILE
+  * - GSI DIAGNOSTIC RADIANCE ORANK OUTPUT FILE
+    -
+    -
+    -
   * - Column Number
     - Column Name
     - Description
+    - Data Type
   * - 1-?
     -  
-    - Standard ORANK columns described in :numref:`table_ES_header_info_es_out_ORANK`.
+    - Standard ORANK columns described in :numref:`table_ES_header_info_es_out_ORANK`
+    - Varies
   * - Last-24
     - N_USE
     - Number of members with OBS_QC = 0
+    - Integer
   * - Last-23
     - CHAN_USE
     - Channel used (1 for yes, -1 for no)
+    - Integer
   * - Last-22
     - SCAN_POS
     - Sensor scan position
+    - Integer
   * - Last-21
     - SAT_ZNTH
     - Satellite zenith angle (degrees)
+    - Double
   * - Last-20
     - SAT_AZMTH
     - Satellite azimuth angle (degrees)
+    - Double
   * - Last-19
     - SUN_ZNTH
     - Solar zenith angle (degrees)
+    - Double
   * - Last-18
     - SUN_AZMTH
     - Solar azimuth angle (degrees)
+    - Double
   * - Last-17
     - SUN_GLNT
     - Sun glint angle (degrees)
+    - Double
   * - Last-16
     - FRAC_WTR
     - Fractional coverage by water
+    - Double
   * - Last-15
     - FRAC_LND
     - Fractional coverage by land
+    - Double
   * - Last-14
     - FRAC_ICE
     - Fractional coverage by ice
+    - Double
   * - Last-13
     - FRAC_SNW
     - Fractional coverage by snow
+    - Double
   * - Last-12
     - SFC_TWTR
     - Surface temperature over water (K)
+    - Double
   * - Last-11
     - SFC_TLND
     - Surface temperature over land (K)
+    - Double
   * - Last-10
     - SFC_TICE
     - Surface temperature over ice (K)
+    - Double
   * - Last-9
     - SFC_TSNW
     - Surface temperature over snow (K)
+    - Double
   * - Last-8
     - TSOIL
     - Soil temperature (K)
+    - Double
   * - Last-7
     - SOILM
     - Soil moisture
+    - Double
   * - Last-6
     - LAND_TYPE
     - Surface land type
+    - Integer
   * - Last-5
     - FRAC_VEG
     - Vegetation fraction
+    - Double
   * - Last-4
     - SNW_DPTH
     - Snow depth
+    - Double
   * - Last-3
     - TFND
     - Foundation temperature: Tr
+    - Double
   * - Last-2
     - TWARM
     - Diurnal warming: d(Tw) at depth zob
+    - Double
   * - Last-1
     - TCOOL
     - Sub-layer cooling: d(Tc) at depth zob
+    - Double
   * - Last
     - TZFND
     - d(Tz)/d(Tr)
+    - Double
 
 The gsidens2orank output may be passed to the Stat-Analysis tool to derive additional statistics. In particular, users should consider running the **aggregate_stat** job type to read ORANK lines and ranked histograms (RHIST), probability integral transform histograms (PHIST), and spread-skill variance output (SSVAR). Stat-Analysis has been enhanced to parse any extra columns found at the end of the input lines. Users can filter the values in those extra columns using the **-column_thresh**, **-column_str**, and **-column_str_exc** job command options.
 
