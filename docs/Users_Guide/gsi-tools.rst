@@ -218,7 +218,7 @@ The GSID2MPR tool writes the same set of MPR output columns for the conventional
     - Double
   * - 57
     - SNW_DPTH
-    - Snow depth'
+    - Snow depth
     - Double
   * - 58
     - SFC_WIND
