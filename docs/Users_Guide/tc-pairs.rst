@@ -420,54 +420,70 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
   :widths: auto
   :header-rows: 2
 
-  * - 
-    - 
-    - HEADER
+  * - HEADER
+    -
+    -
+    -
   * - Column Number
     - Header Column Name
     - Description
+    - Data Type
   * - 1
     - VERSION
     - Version number
+    - String
   * - 2
     - AMODEL
     - User-provided text string designating the forecast ATCF ID
+    - String
   * - 3
     - BMODEL
     - User-provided text string designating the reference ATCF ID
+    - String
   * - 4
     - DESC
     - User-provided description text string
+    - String
   * - 5
     - STORM_ID
     - BBCCYYYY designation of storm
+    - String
   * - 6
     - BASIN
     - Basin (BB in STORM_ID)
+    - String
   * - 7
     - CYCLONE
     - Cyclone number (CC in STORM_ID)
+    - String
   * - 8
     - STORM_NAME
     - Name of Storm
+    - String
   * - 9
     - INIT
-    - Initialization time of forecast in YYYYMMDD_HHMMSS format.
+    - Initialization time of forecast in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 10
     - LEAD
-    - Forecast lead time in HHMMSS format.
+    - Forecast lead time in HHMMSS format
+    - Time String
   * - 11
     - VALID
-    - Forecast valid time in YYYYMMDD_HHMMSS format.
+    - Forecast valid time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 12
     - INIT_MASK
     - Initialization time masking grid applied
+    - String
   * - 13
     - VALID_MASK
     - Valid time masking grid applied
+    - String
   * - 14
     - LINE_TYPE
     - Output line types described below
+    - String
 
 .. _TCMPR Line Type:
 
@@ -475,162 +491,213 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
   :widths: auto
   :header-rows: 2
 
-  * - 
-    - 
-    - TCMPR OUTPUT FORMAT
+  * - TCMPR OUTPUT FORMAT
+    -
+    -
+    -
   * - Column Number
     - Header Column Name
     - Description
+    - Data Type
   * - 14
     - TCMPR
     - Tropical Cyclone Matched Pair line type
+    - String
   * - 15
     - TOTAL
     - Total number of pairs in track
+    - Integer
   * - 16
     - INDEX
     - Index of the current track pair
+    - Integer
   * - 17
     - LEVEL
     - Level of storm classification
+    - String
   * - 18
     - WATCH_WARN
     - HU or TS watch or warning in effect
+    - String
   * - 19
     - INITIALS
     - Forecaster initials
+    - String
   * - 20
     - ALAT
     - Latitude position of adeck model
+    - Double
   * - 21
     - ALON
     - Longitude position of adeck model
+    - Double
   * - 22
     - BLAT
     - Latitude position of bdeck model
+    - Double
   * - 23
     - BLON
     - Longitude position of bdeck model
+    - Double
   * - 24
     - TK_ERR
     - Track error of adeck relative to bdeck (nm)
+    - Double
   * - 25
     - X_ERR
     - X component position error (nm)
+    - Double
   * - 26
     - Y_ERR
     - Y component position error (nm)
+    - Double
   * - 27
     - ALTK_ERR
     - Along track error (nm)
+    - Double
   * - 28
     - CRTK_ERR
     - Cross track error (nm)
+    - Double
   * - 29
     - ADLAND
     - adeck distance to land (nm)
+    - Double
   * - 30
     - BDLAND
     - bdeck distance to land (nm)
+    - Double
   * - 31
     - AMSLP
     - adeck mean sea level pressure
+    - Double
   * - 32
     - BMSLP
     - bdeck mean sea level pressure
+    - Double
   * - 33
     - AMAX_WIND
     - adeck maximum wind speed
+    - Double
   * - 34
     - BMAX_WIND
     - bdeck maximum wind speed
+    - Double
   * - 35, 36
     - A/BAL_WIND_34
     - a/bdeck 34-knot radius winds in full circle
       or the mean of the non-zero 34-knot wind quadrants
+    - Double
   * - 37, 38
     - A/BNE_WIND_34
     - a/bdeck 34-knot radius winds in NE quadrant
+    - Double
   * - 39, 40
     - A/BSE_WIND_34
     - a/bdeck 34-knot radius winds in SE quadrant
+    - Double
   * - 41, 42
     - A/BSW_WIND_34
     - a/bdeck 34-knot radius winds in SW quadrant
+    - Double
   * - 43, 44
     - A/BNW_WIND_34
     - a/bdeck 34-knot radius winds in NW quadrant
+    - Double
   * - 45, 46
     - A/BAL_WIND_50
     - a/bdeck 50-knot radius winds in full circle
       or the mean of the non-zero 50-knot wind quadrants
+    - Double
   * - 47, 48
     - A/BNE_WIND_50
     - a/bdeck 50-knot radius winds in NE quadrant
+    - Double
   * - 49, 50
     - A/BSE_WIND_50
     - a/bdeck 50-knot radius winds in SE quadrant
+    - Double
   * - 51, 52
     - A/BSW_WIND_50
     - a/bdeck 50-knot radius winds in SW quadrant
+    - Double
   * - 53, 54
     - A/BNW_WIND_50
     - a/bdeck 50-knot radius winds in NW quadrant
+    - Double
   * - 55, 56
     - A/BAL_WIND_64
     - a/bdeck 64-knot radius winds in full circle
       or the mean of the non-zero 64-knot wind quadrants
+    - Double
   * - 57, 58
     - A/BNE_WIND_64
     - a/bdeck 64-knot radius winds in NE quadrant
+    - Double
   * - 59, 60
     - A/BSE_WIND_64
     - a/bdeck 64-knot radius winds in SE quadrant
+    - Double
   * - 61, 62
     - A/BSW_WIND_64
     - a/bdeck 64-knot radius winds in SW quadrant
+    - Double
   * - 63, 64
     - A/BNW_WIND_64
     - a/bdeck 64-knot radius winds in NW quadrant
+    - Double
   * - 65, 66
     - A/BRADP
     - pressure in millibars of the last closed isobar, 900 - 1050 mb
+    - Double
   * - 67, 68
     - A/BRRP
     - radius of the last closed isobar in nm, 0 - 9999 nm
+    - Double
   * - 69, 70
     - A/BMRD
     - radius of max winds, 0 - 999 nm
+    - Double
   * - 71, 72
     - A/BGUSTS
     - gusts, 0 through 995 kts
+    - Double
   * - 73, 74
     - A/BEYE
     - eye diameter, 0 through 999 nm
+    - Double
   * - 75, 76
     - A/BDIR
     - storm direction in compass coordinates, 0 - 359 degrees
+    - Double
   * - 77, 78
     - A/BSPEED
     - storm speed, 0 - 999 kts
+    - Double
   * - 79, 80
     - A/BDEPTH
     - system depth, D-deep, M-medium, S-shallow, X-unknown
+    - Double
   * - 81
     - NUM_MEMBERS
     - consensus variable: number of models (or ensemble members) that were used to build the consensus track
+    - Double
   * - 82
     - TRACK_SPREAD
     - consensus variable: the mean of the distances from the member location to the consensus track location (nm)
+    - Double
   * - 83
     - TRACK_STDEV
     - consensus variable: the standard deviation of the distances from the member locations to the consensus track location (nm)
+    - Double
   * - 84
     - MSLP_STDEV
-    - consensus variable: the standard deviation of the member's mean sea level pressure values 
+    - consensus variable: the standard deviation of the member's mean sea level pressure values
+    - Double
   * - 85
     - MAX_WIND_STDEV
-    - consensus variable: the standard deviation of the member's maximum wind speed values 
+    - consensus variable: the standard deviation of the member's maximum wind speed values
+    - Double
 
 .. _TCDIAG Line Type:
 
@@ -638,39 +705,50 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
   :widths: auto
   :header-rows: 2
 
-  * -
+  * - TCDIAG OUTPUT FORMAT
     -
-    - TCDIAG OUTPUT FORMAT
+    -
+    -
   * - Column Number
     - Header Column Name
     - Description
+    - Data Type
   * - 14
     - TCDIAG
     - Tropical Cyclone Diagnostics line type
+    - String
   * - 15
     - TOTAL
     - Total number of pairs in track
+    - Integer
   * - 16
     - INDEX
     - Index of the current track pair
+    - Integer
   * - 17
     - DIAG_SOURCE
     - Diagnostics data source indicated by the `-diag` command line option
+    - String
   * - 18
     - TRACK_SOURCE
     - ATCF ID of the track data used to define the diagnostics
+    - String
   * - 19
     - FIELD_SOURCE
     - Description of gridded field data source used to define the diagnostics
+    - String
   * - 20
     - N_DIAG
     - Number of storm diagnostic name and value columns to follow
+    - Integer
   * - 21
     - DIAG_i
     - Name of the of the ith storm diagnostic (repeated)
+    - String
   * - 22
     - VALUE_i
     - Value of the ith storm diagnostic (repeated)
+    - Double
 
 .. _PROBRIRW Line Type:
 
@@ -678,81 +756,107 @@ TC-Pairs produces output in TCST format. The default output file name can be ove
   :widths: auto
   :header-rows: 2
 
-  * - 
-    - 
-    - PROBRIRW OUTPUT FORMAT
+  * - PROBRIRW OUTPUT FORMAT
+    -
+    -
+    -
   * - Column Number
     - Header Column Name
     - Description
+    - Data Type
   * - 14
     - PROBRIRW
     - Probability of Rapid Intensification/Weakening line type
+    - String
   * - 15
     - ALAT
     - Latitude position of edeck model
+    - Double
   * - 16
     - ALON
     - Longitude position of edeck model
+    - Double
   * - 17
     - BLAT
     - Latitude position of bdeck model
+    - Double
   * - 18
     - BLON
     - Longitude position of bdeck model
+    - Double
   * - 19
     - INITIALS
     - Forecaster initials
+    - String
   * - 20
     - TK_ERR
     - Track error of adeck relative to bdeck (nm)
+    - Double
   * - 21
     - X_ERR
     - X component position error (nm)
+    - Double
   * - 22
     - Y_ERR
     - Y component position error (nm)
+    - Double
   * - 23
     - ADLAND
     - adeck distance to land (nm)
+    - Double
   * - 24
     - BDLAND
     - bdeck distance to land (nm)
+    - Double
   * - 25
     - RI_BEG
     - Start of RI time window in HH format
+    - Time String
   * - 26
     - RI_END
     - End of RI time window in HH format
+    - Time String
   * - 27
     - RI_WINDOW
     - Width of RI time window in HH format
+    - Time String
   * - 28
     - AWIND_END
     - Forecast maximum wind speed at RI end
+    - Double
   * - 29
     - BWIND_BEG
     - Best track maximum wind speed at RI begin
+    - Double
   * - 30
     - BWIND_END
     - Best track maximum wind speed at RI end
+    - Double
   * - 31
     - BDELTA
     - Exact Best track wind speed change in RI window
+    - Double
   * - 32
     - BDELTA_MAX
     - Maximum Best track wind speed change in RI window
+    - Double
   * - 33
     - BLEVEL_BEG
     - Best track storm classification at RI begin
+    - String
   * - 34
     - BLEVEL_END
     - Best track storm classification at RI end
+    - String
   * - 35
     - N_THRESH
     - Number of probability thresholds
+    - Integer
   * - 36
     - THRESH_i
     - The ith probability threshold value (repeated)
+    - Double
   * - 37
     - PROB_i
     - The ith probability value (repeated)
+    - Double
