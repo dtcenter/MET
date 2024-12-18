@@ -494,14 +494,10 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_header_info_gs_outputs:
 
-.. list-table:: Header information for each file grid-stat outputs
+.. list-table:: Header information for Grid-Stat STAT output 
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - HEADER
-    -
-    -
-    -
   * - Column Number
     - Header Column Name
     - Description
@@ -607,12 +603,8 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. list-table:: Format information for NBRCTC (Neighborhood Contingency Table Counts) output line type
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - NBRCTC OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - NBRCTC Column Name
     - Description
@@ -649,12 +641,8 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. list-table:: Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - NBRCTS OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - NBRCTS Column Name
     - Description
@@ -707,20 +695,6 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - GSS, :raw-html:`<br />` GSS_BCL, :raw-html:`<br />` GSS_BCU
     - Gilbert Skill Score including bootstrap upper and lower confidence limits
     - Double
-
-.. _table_GS_format_info_NBRCTS_cont:
-      
-.. role:: raw-html(raw)
-    :format: html
-
-.. list-table:: Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above
-  :widths: auto
-  :header-rows: 1
-
-  * - Column Number
-    - NBRCTS Column Name
-    - Description
-    - Data Type
   * - 72-76
     - HK, :raw-html:`<br />` HK_NCL, :raw-html:`<br />` HK_NCU, :raw-html:`<br />` HK_BCL, :raw-html:`<br />` HK_BCU
     - Hanssen-Kuipers Discriminant including normal and bootstrap upper and lower confidence limits
@@ -770,12 +744,8 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. list-table:: Format information for NBRCNT(Neighborhood Continuous Statistics) output line type
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - NBRCNT OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - NBRCNT Column Name
     - Description
@@ -817,12 +787,8 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. list-table:: Format information for GRAD (Gradient Statistics) output line type
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - GRAD OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - GRAD Column Name
     - Description
@@ -876,12 +842,8 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. list-table:: Format information for DMAP (Distance Map) output line type
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - DMAP OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - DMAP Column Name
     - Description
@@ -995,10 +957,8 @@ The output NetCDF file contains the dimensions and variables shown in :numref:`t
 
 .. list-table:: Dimensions defined in NetCDF matched pair output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - grid_stat NETCDF DIMENSIONS
-    -
   * - NetCDF Dimension
     - Description
   * - Lat
@@ -1014,12 +974,8 @@ The output NetCDF file contains the dimensions and variables shown in :numref:`t
 
 .. list-table:: A selection of variables that can appear in the NetCDF matched pair output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - grid_stat NETCDF VARIABLES
-    -
-    -
-    -
   * - NetCDF Variable
     - Dimension
     - Description

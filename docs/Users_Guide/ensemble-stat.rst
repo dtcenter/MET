@@ -518,14 +518,10 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
 
 .. _table_ES_header_info_es_out:
 
-.. list-table:: Header information for each file ensemble-stat outputs
+.. list-table:: Header information for Ensemble-Stat STAT output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - HEADER
-    -
-    -
-    -
   * - Column Number
     - Header Column Name
     - Description
@@ -631,12 +627,8 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
 
 .. list-table:: Format information for ECNT (Ensemble Continuous Statistics) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - ECNT OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - ECNT Column Name
     - Description
@@ -758,12 +750,8 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
       
 .. list-table:: Format information for RPS (Ranked Probability Score) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - RPS OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - RPS Column Name
     - Description
@@ -809,12 +797,8 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
       
 .. list-table:: Format information for RHIST (Ranked Histogram) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - RHIST OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - RHIST Column Name
     - Description
@@ -840,12 +824,8 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
       
 .. list-table:: Format information for PHIST (Probability Integral Transform Histogram) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - PHIST OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - PHIST Column Name
     - Description
@@ -875,12 +855,8 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
 
 .. list-table:: Format information for RELP (Relative Position) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - RELP OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - RELP Column Name
     - Description
@@ -906,12 +882,8 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
 
 .. list-table:: Format information for ORANK (Observation Rank) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - ORANK OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - ORANK Column Name
     - Description
@@ -1020,12 +992,8 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
 
 .. list-table:: Format information for SSVAR (Spread/Skill Variance) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - SSVAR OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - SSVAR Column Name
     - Description

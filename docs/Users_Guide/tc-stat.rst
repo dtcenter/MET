@@ -421,11 +421,8 @@ The output columns are shown below in :numref:`table_columnar_output_summary_tc_
 
 .. list-table:: Columnar output of "summary" job output from the TC-Stat tool.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-
-  * - 
-    - tc_stat Summary Job Output Options
   * - Column number
     - Description
   * - 1

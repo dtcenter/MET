@@ -488,14 +488,10 @@ TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The AS
 
 .. _table_TG_header_info_tg_outputs:
 
-.. list-table:: Header information for each file tc-gen outputs
+.. list-table:: Header information for TC-Gen STAT output 
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - HEADER
-    -
-    -
-    -
   * - Column Number
     - Header Column Name
     - Description
@@ -601,12 +597,8 @@ TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The AS
 
 .. list-table:: Format information for GENMPR (Genesis Matched Pairs) output line type
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - GENMPR OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - GENMPR Column Name
     - Description
@@ -700,12 +692,8 @@ TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The AS
 
 .. list-table:: A selection of variables that can appear in the NetCDF matched pair output which can be controlled by the nc_pairs_flag configuration option.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - tc_gen NETCDF VARIABLES
-    -
-    -
-    -
   * - NetCDF Variable
     - Dimension
     - Description

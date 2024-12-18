@@ -786,12 +786,8 @@ The SSIDX line type consists of the common STAT header columns described in :num
 
 .. list-table:: Format information for the SSIDX (Skill Score Index) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - SSIDX OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - SSIDX Column Name
     - Description

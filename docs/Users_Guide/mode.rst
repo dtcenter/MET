@@ -581,14 +581,10 @@ The MODE tool creates two ASCII output files. The first ASCII file contains cont
 
 .. list-table:: Format of MODE CTS output file.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - mode ASCII
-    - CONTINGENCY TABLE
-    - OUTPUT FORMAT
-    -
   * - Column Number
-    - MODE CTS Column Name
+    - CTS Column Name
     - Description
     - Data Type
   * - 1
@@ -802,11 +798,8 @@ These object identifiers are described in :numref:`MODE_object_attribute`.
 
 .. list-table:: Object identifier descriptions for MODE object attribute output file.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - 
-    - mode ASCII OBJECT
-    - IDENTIFIER DESCRIPTIONS
   * - Object identifier (object_id)
     - Valid Data Columns
     - Description of valid data
@@ -831,14 +824,10 @@ The contents of the columns in this ASCII file are summarized in :numref:`MODE_o
 
 .. list-table:: Format of MODE object attribute output files.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - mode ASCII OBJECT
-    - ATTRIBUTE OUTPUT FORMAT
-    -
-    -
-  * - Column
-    - MODE Column Name
+  * - Column Number
+    - Object Column Name
     - Description
     - Data Type
   * - 1
@@ -1057,10 +1046,8 @@ The dimensions and variables included in the mode NetCDF files are described in 
 
 .. list-table:: NetCDF dimensions for MODE output.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - mode NETCDF DIMENSIONS
-    -
   * - NetCDF Dimension
     - Description
   * - lat
@@ -1100,12 +1087,8 @@ The dimensions and variables included in the mode NetCDF files are described in 
 
 .. list-table:: Variables contained in MODE NetCDF output.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - mode NETCDF VARIABLES
-    -
-    -
-    -
   * - NetCDF Variable
     - Dimension
     - Description

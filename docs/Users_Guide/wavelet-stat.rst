@@ -330,14 +330,10 @@ The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to t
 
 .. _table_WS_header_info_ws_outputs:
 
-.. list-table:: Header information for each file wavelet-stat outputs.
+.. list-table:: Header information for Wavelet-Stat STAT output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - HEADER
-    -
-    -
-    -
   * - Column Number
     - Header Column Name
     - Description
@@ -443,12 +439,8 @@ The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to t
    
 .. list-table:: Format information for the ISC (Intensity-Scale) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - ISC OUTPUT FORMAT
-    -
-    -
-    -
   * - Column Number
     - ISC Column Name
     - Description
@@ -514,10 +506,8 @@ The dimensions and variables included in the wavelet_stat NetCDF files are descr
 
 .. list-table:: Dimensions defined in NetCDF output.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - wavelet_stat NetCDF DIMENSIONS
-    -
   * - NetCDF Dimension
     - Description
   * - x
@@ -533,12 +523,8 @@ The dimensions and variables included in the wavelet_stat NetCDF files are descr
 
 .. list-table:: Variables defined in NetCDF output.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - wavelet-stat NetCDF VARIABLES
-    -
-    -
-    -
   * - NetCDF Variable
     - Dimension
     - Description
