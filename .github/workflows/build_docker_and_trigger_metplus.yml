@@ -44,67 +44,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_met_docker
     steps:
-      - name: Print GitHub values for reference
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      - name: Checkout code from this repo
-        uses: actions/checkout@v4
-      - name: Get METplus repo for component version script
-        uses: actions/checkout@v4
+      - uses: dtcenter/metplus-action-trigger-use-cases@v1
         with:
-          repository: 'dtcenter/METplus'
-          ref: 'develop'
-          path: 'METplus'
-      - name: Get version from ref (branch)
-        id: get_version
-        run: |
-          version=$(cut -d "/" -f3 <<< "${GITHUB_REF}")
-          echo "version=${version}" >> $GITHUB_OUTPUT
-      - id: get_metplus_branch
-        run: |
-          repo=${{ github.repository }}
-          repo=${repo#*/}
-          version=${{ steps.get_version.outputs.version }}
-
-          if [ "${version}" == "develop" ]; then
-            metplus_branch=develop
-          else
-            cmd="$GITHUB_WORKSPACE/METplus/metplus/component_versions.py -i ${repo} -v ${version} -o METplus -f main_v{X}.{Y}"
-            echo $cmd
-            metplus_branch=$($cmd)
-          fi
-
-          # if no branch can be determined, exit and error
-          if [ -z "${metplus_branch}" ]; then
-            echo "ERROR: Could not get METplus branch"
-            exit 1
-          fi
-
-          # if branch doesn't exist in remote, do not trigger METplus workflow
-          branch_exists=$(git -C $GITHUB_WORKSPACE/METplus ls-remote origin ${metplus_branch})
-          if [ -z "${branch_exists}" ]; then
-            echo "METplus branch ${metplus_branch} does not exist yet"
-            metplus_branch=none
-          fi
-
-          echo "metplus_branch=${metplus_branch}" >> $GITHUB_OUTPUT
-
-      - if: ( steps.get_metplus_branch.outputs.metplus_branch  != 'none' )
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.METPLUS_BOT_TOKEN }}
-          script: |
-            await github.rest.actions.createWorkflowDispatch({
-              owner: 'dtcenter',
-              repo: 'METplus',
-              workflow_id: 'testing.yml',
-              ref: '${{ steps.get_metplus_branch.outputs.metplus_branch }}',
-              inputs: {
-                repository: '${{ github.repository }}',
-                ref: '${{ github.ref }}',
-                actor: '${{ github.actor }}',
-                sha: '${{ github.sha }}',
-                pusher_email: '${{ github.event.pusher.email }}'
-              },
-            });
+          token: ${{ secrets.METPLUS_BOT_TOKEN }}

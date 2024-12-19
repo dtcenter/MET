@@ -384,227 +384,277 @@ The contents of the OBJECT_ID and OBJECT_CAT columns identify the objects using 
 
 .. list-table:: Text Header Columns
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - 
-    - 
-    - HEADER
   * - Column
     - Name
     - Description
+    - Data Type
   * - 1
     - VERSION
     - Version number
+    - String
   * - 2
     - MODEL
     - User-provided text string giving model name
+    - String
   * - 3
     - DESC
     - User-provided text string describing the verification task
+    - String
   * - 4
     - FCST_LEAD
     - Forecast lead time in HHMMSS format
+    - Time String
   * - 5
     - FCST_VALID
     - Forecast valid time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 6
     - OBS_LEAD
     - Observation lead time in HHMMSS format
+    - Time String
   * - 7
     - OBS_VALID
     - Observation valid time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 8
     - T_DELTA
     - Time separation between input data files in HHMMSS format
+    - Time String
   * - 9
     - FCST_T_BEG
     - Forecast time convolution begin offset
+    - Integer
   * - 10
     - FCST_T_END
     - Forecast time convolution end offset
+    - Integer
   * - 11
     - FCST_RAD
     - Forecast convolution radius in grid units
+    - Integer
   * - 12
     - FCST_THR
     - Forecast convolution threshold
+    - Threshold String
   * - 13
     - OBS_T_BEG
     - Observation time convolution begin offset
+    - Integer
   * - 14
     - OBS_T_END
     - Observation time convolution end offset
+    - Integer
   * - 15
     - OBS_RAD
     - Observation convolution radius in grid units
+    - Integer
   * - 16
     - OBS_THR
     - Observation convolution threshold
+    - Threshold String
   * - 17
     - FCST_VAR
     - Forecast variable
+    - String
   * - 18
     - FCST_UNITS
     - Units for forecast variable
+    - String
   * - 19
     - FCST_LEV
     - Forecast vertical level
+    - String
   * - 20
     - OBS_VAR
     - Observation variable
+    - String
   * - 21
     - OBS_UNITS
     - Units for observation variable
+    - String
   * - 22
     - OBS_LEV
     - Observation vertical level
+    - String
 
 .. _table_mtd-2D-Attributes:
 
-.. list-table:: 2D Attribute
+.. list-table:: 2D Object Attributes
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - 
-    - 
-    - 2D Attribute Columns
-  * - Column
-    - Name
+  * - Column Number
+    - 2D Column Name
     - Description
+    - Data Type
   * - 23
     - OBJECT_ID
     - Object number
+    - String
   * - 24
     - OBJECT_CAT
     - Object category
+    - String
   * - 25
     - TIME_INDEX
     - Time index of slice
+    - Integer
   * - 26
     - AREA
     - 2D cross-sectional area (in grid squares)
+    - Integer
   * - 27-28
     - CENTROID_X,_Y
     - Location of centroid (in grid units)
+    - Double
   * - 29-30
     - CENTROID_LAT,_LON
     - Location of centroid (in lat/lon degrees)
+    - Double
   * - 31
     - AXIS_ANG
     - Angle that the axis makes with the grid x direction (in degrees)
+    - Double
   * - 32-36
     - INTENSITY_10,_25,_50,_75,_90
     - 10th, 25th, 50th, 75th, and 90th percentile intensity in time slice (various units)
+    - Double
   * - 37
     - INTENSITY_NN
     - User-specified percentile intensity in time slice (various units)
+    - Double
 
 .. _table_mtd-3D-single-attributes:
 
-.. list-table:: 3D Single Attribute
+.. list-table:: 3D Single Object Attributes
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - 
-    - 
-    - 3D Single Attribute Columns
-  * - Column
-    - Name
+  * - Column Number
+    - 3D Single Column Name
     - Description
+    - Data Type
   * - 23
     - OBJECT_ID
     - Object number
+    - String
   * - 24
     - OBJECT_CAT
     - Object category
+    - String
   * - 25-26
     - CENTROID_X,_Y
     - Location of the centroid (in grid units)
+    - Double
   * - 27
     - CENTROID_T
     - Time coordinate of centroid (in time steps)
+    - Double
   * - 28-29
     - CENTROID_LAT,_LON
     - Location of the centroid (in lat/lon degrees)
+    - Double
   * - 30
     - X_DOT
     - X component of object velocity (in grid units per time step)
+    - Double
   * - 31
     - Y_DOT
     - Y component of object velocity (in grid units per time step)
+    - Double
   * - 32
     - AXIS_ANG
     - Angle that the axis plane of an object makes with the grid x direction (in degrees)
+    - Double
   * - 33
     - VOLUME
     - 3D object volume (integer count of 3D spacetime cells)
+    - Integer
   * - 34
     - START_TIME
     - Object start time (in time steps)
+    - Integer
   * - 35
     - END_TIME
     - Object end time (in time steps)
+    - Integer
   * - 36
     - CDIST_TRAVELLED
     - Total great circle distance travelled by the 2D spatial centroid over the lifetime of the 3D object (in kilometers)
+    - Double
   * - 37-41
     - INTENSITY_10,_25,_50,_75,_90
     - 10th, 25th, 50th, 75th, and 90th percentile intensity in spacetime object (various units)
+    - Double
   * - 42
     - INTENSITY_NN
     - User-specified percentile intensity in spacetime object (various units)
+    - Double
 
 .. _table_mtd-3D-Pair-Attribute:
 
-.. list-table:: 3D Pair Attribute
+.. list-table:: 3D Pair Object Attributes
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - 
-    - 
-    - 3D Pair Attribute Columns
-  * - Column
-    - Name
+  * - Column Number
+    - 3D Pair Column Name
     - Description
+    - Data Type
   * - 23
     - OBJECT_ID
     - Object number
+    - String
   * - 24
     - OBJECT_CAT
     - Object category
+    - String
   * - 25
     - SPACE_CENTROID_DIST
     - Cartesian distance between :math:`(x,y)` coordinates of object spacetime centroids (in grid units)
+    - Double
   * - 26
     - TIME_CENTROID_DELTA
     - Observation minus forecast difference in *t* temporal index of object spacetime centroid (in time steps)
+    - Double
   * - 27
     - AXIS_DIFF
     - Angle between the spatial axis plane angles (in degrees, from 0 to 90)
+    - Double
   * - 28
     - SPEED_DELTA
     - Forecast minus observation speed difference (in grid units per time step)
+    - Double
   * - 29
     - DIRECTION_DIFF
     - Difference in object direction of movement (in degrees, from 0 to 180)
+    - Double
   * - 30
     - VOLUME_RATIO
     - Forecast 3D object volume divided by observation 3D object volume (unitless)
+    - Double
   * - 31
     - START_TIME_DELTA
     - Forecast minus observation starting time step (in time steps)
+    - Integer
   * - 32
     - END_TIME_DELTA
     - Forecast minus observation ending time step (in time steps)
+    - Integer
   * - 33
     - INTERSECTION_VOLUME
     - 3D object intersection volume (integer count of 3D spacetime cells)
+    - Integer
   * - 34
     - DURATION_DIFF
     - Forecast minus observation difference in object lifetimes (in time steps)
+    - Integer
   * - 35
     - INTEREST
     - Total interest for this object pair (unitless)
+    - Double
 
 **NetCDF File**
 

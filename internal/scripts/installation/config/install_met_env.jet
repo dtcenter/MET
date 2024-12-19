@@ -1,11 +1,11 @@
 module load intel/2022.1.2
 module load cmake/3.28.1
 
-export FC=ifort
-export F77=ifort
-export F90=ifort
-export CC=icc
-export CXX=icpc
+export FC=ifx
+export F77=ifx
+export F90=ifx
+export CC=icx
+export CXX=icpx
 export TEST_BASE=/contrib/met/12.0.0
 export COMPILER=intel_2022.1.2
 export MET_SUBDIR=${TEST_BASE}

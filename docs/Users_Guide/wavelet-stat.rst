@@ -330,140 +330,173 @@ The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to t
 
 .. _table_WS_header_info_ws_outputs:
 
-.. list-table:: Header information for each file wavelet-stat outputs.
+.. list-table:: Header information for Wavelet-Stat STAT output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - HEADER
-    - 
-    - 
   * - Column Number
     - Header Column Name
     - Description
+    - Data Type
   * - 1
     - VERSION
     - Version number
+    - String
   * - 2
     - MODEL
     - User-provided text string designating model name
+    - String
   * - 3
     - DESC
     - User-provided text string describing the verification task
+    - String
   * - 4
     - FCST_LEAD
     - Forecast lead time in HHMMSS format
+    - Time String
   * - 5
     - FCST_VALID_BEG
     - Forecast valid start time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 6
     - FCST_VALID_END
     - Forecast valid end time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 7
     - OBS_LEAD
     - Observation lead time in HHMMSS format
+    - Time String
   * - 8
     - OBS_VALID_BEG
     - Observation valid start time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 9
     - OBS_VALID_END
     - Observation valid end time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 10
     - FCST_VAR
     - Model variable
+    - String
   * - 11
     - FCST_UNITS
     - Units for model variable
+    - String
   * - 12
     - FCST_LEV
-    - Selected Vertical level for forecast
+    - Selected vertical level for forecast
+    - String
   * - 13
     - OBS_VAR
     - Observation variable
+    - String
   * - 14
     - OBS_UNITS
     - Units for observation variable
+    - String
   * - 15
     - OBS_LEV
-    - Selected Vertical level for observations
+    - Selected vertical level for observations
+    - String
   * - 16
     - OBTYPE
     - User-provided text string designating the observation type
+    - String
   * - 17
     - VX_MASK
     - Verifying masking region indicating the masking grid or polyline region applied
+    - String
   * - 18
     - INTERP_MTHD
     - NA in Wavelet-Stat
+    - String
   * - 19
     - INTERP_PNTS
     - NA in Wavelet-Stat
+    - Integer
   * - 20
     - FCST_THRESH
     - The threshold applied to the forecast
+    - Threshold String
   * - 21
     - OBS_THRESH
     - The threshold applied to the observations
+    - Threshold String
   * - 22
     - COV_THRESH
     - NA in Wavelet-Stat
+    - Threshold String
   * - 23
     - ALPHA
     - NA in Wavelet-Stat
+    - Double
   * - 24
     - LINE_TYPE
     - See table below.
+    - String
 
 ..  _table_WS_format_info_ISC:
    
 .. list-table:: Format information for the ISC (Intensity-Scale) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - ISC OUTPUT FORMAT
-    - 
-    - 
   * - Column Number
     - ISC Column Name
     - Description
+    - Data Type
   * - 24
     - ISC
     - Intensity-Scale line type
+    - String
   * - 25
     - TOTAL
     - The number of grid points (forecast locations) used
+    - Integer
   * - 26
     - TILE_DIM
     - The dimensions of the tile
+    - Integer
   * - 27
     - TILE_XLL
     - Horizontal coordinate of the lower left corner of the tile
+    - Integer
   * - 28
     - TILE_YLL
     - Vertical coordinate of the lower left corner of the tile
+    - Integer
   * - 29
     - NSCALE
     - Total number of scales used in decomposition
+    - Integer
   * - 30
     - ISCALE
     - The scale at which all information following applies
+    - Integer
   * - 31
     - MSE
     - Mean squared error for this scale
+    - Double
   * - 32
     - ISC
     - The intensity scale skill score
+    - Double
   * - 33
     - FENERGY
     - Forecast energy squared for this scale
+    - Double
   * - 34
     - OENERGY
     - Observed energy squared for this scale
+    - Double
   * - 35
     - BASER
     - The base rate (not scale dependent)
+    - Double
   * - 36
     - FBIAS
     - The frequency bias
+    - Double
 
 The **Wavelet-Stat** tool creates a NetCDF output file containing the raw and decomposed values for the forecast, observation, and difference fields for each combination of variable and threshold value.
 
@@ -473,10 +506,8 @@ The dimensions and variables included in the wavelet_stat NetCDF files are descr
 
 .. list-table:: Dimensions defined in NetCDF output.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - wavelet_stat NetCDF DIMENSIONS
-    - 
   * - NetCDF Dimension
     - Description
   * - x
@@ -489,32 +520,35 @@ The dimensions and variables included in the wavelet_stat NetCDF files are descr
     - Dimension for the number of tiles used
 
 .. _table_variables_wave_NetCDF_output:
-      
+
 .. list-table:: Variables defined in NetCDF output.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - wavelet-stat NetCDF VARIABLES
-    - 
-    - 
   * - NetCDF Variable
     - Dimension
     - Description
+    - Data Type
   * - FCST_FIELD_LEVEL_RAW
     - tile, x, y
     - Raw values for the forecast field specified by "FIELD_LEVEL"
+    - Float
   * - OBS_FIELD_LEVEL_RAW
     - tile, x, y
     - Raw values for the observation field specified by "FIELD_LEVEL"
+    - Float
   * - DIFF_FIELD_LEVEL_RAW
     - tile, x, y
     - Raw values for the difference field (**f-o**) specified by "FIELD_LEVEL"
+    - Float
   * - FCST_FIELD_LEVEL_THRESH
     - tile, scale, x, y
     - Wavelet scale-decomposition of the forecast field specified by "FIELD_LEVEL_THRESH"
+    - Float
   * - OBS_FIELD_LEVEL_THRESH
     - tile, scale, x, y
     - Wavelet scale-decomposition of the observation field specified by "FIELD_LEVEL_THRESH"
+    - Float
 
 Lastly, the **Wavelet-Stat** tool creates a PostScript plot summarizing the scale-decomposition approach used in the verification. The PostScript plot is generated using internal libraries and does not depend on an external plotting package. The generation of this PostScript output can be disabled using the **ps_plot_flag** configuration file option.
 

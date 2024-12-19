@@ -518,474 +518,580 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
 
 .. _table_ES_header_info_es_out:
 
-.. list-table:: Header information for each file ensemble-stat outputs
+.. list-table:: Header information for Ensemble-Stat STAT output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - HEADER
-    - 
-    - 
   * - Column Number
     - Header Column Name
     - Description
+    - Data Type
   * - 1
     - VERSION
     - Version number
+    - String
   * - 2
     - MODEL
     - User-provided text string designating model name
+    - String
   * - 3
     - DESC
     - User-provided text string describing the verification task
+    - String
   * - 4
     - FCST_LEAD
     - Forecast lead time in HHMMSS format
+    - Time String
   * - 5
     - FCST_VALID_BEG
     - Forecast valid start time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 6
     - FCST_VALID_END
     - Forecast valid end time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 7
     - OBS_LEAD
     - Observation lead time in HHMMSS format
+    - Time String
   * - 8
     - OBS_VALID_BEG
     - Observation valid start time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 9
     - OBS_VALID_END
     - Observation valid end time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 10
     - FCST_VAR
     - Model variable
+    - String
   * - 11
     - FCST_UNITS
     - Units for model variable
+    - String
   * - 12
     - FCST_LEV
-    - Selected Vertical level for forecast
+    - Selected vertical level for forecast
+    - String
   * - 13
     - OBS_VAR
     - Observation variable
+    - String
   * - 14
     - OBS_UNITS
     - Units for observation variable
+    - String
   * - 15
     - OBS_LEV
-    - Selected Vertical level for observations
+    - Selected vertical level for observations
+    - String
   * - 16
     - OBTYPE
     - Type of observation selected
+    - String
   * - 17
     - VX_MASK
     - Verifying masking region indicating the masking grid or polyline region applied
+    - String
   * - 18
     - INTERP_MTHD
     - Interpolation method applied to forecasts
+    - String
   * - 19
     - INTERP_PNTS
     - Number of points used in interpolation method
+    - Integer
   * - 20
     - FCST_THRESH
     - The threshold applied to the forecast
+    - Threshold String
   * - 21
     - OBS_THRESH
     - The threshold applied to the observations
+    - Threshold String
   * - 22
     - COV_THRESH
-    - The minimum fraction of valid ensemble members required to calculate statistics.
+    - The minimum fraction of valid ensemble members required to calculate statistics
+    - Threshold String
   * - 23
     - ALPHA
     - Error percent value used in confidence intervals
+    - Double
   * - 24
     - LINE_TYPE
-    - Output line types are listed in :numref:`table_ES_header_info_es_out_RHIST` through :numref:`table_ES_header_info_es_out_SSVAR`.
+    - Output line types are listed in :numref:`table_ES_header_info_es_out_ECNT` through :numref:`table_ES_header_info_es_out_SSVAR`
+    - String
 
 .. _table_ES_header_info_es_out_ECNT:
 
 .. list-table:: Format information for ECNT (Ensemble Continuous Statistics) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - ECNT OUTPUT FORMAT
-    - 
-    - 
   * - Column Number
     - ECNT Column Name
     - Description
+    - Data Type
   * - 24
     - ECNT
     - Ensemble Continuous Statistics line type
+    - String
   * - 25
     - TOTAL
     - Count of observations
+    - Integer
   * - 26
     - N_ENS
     - Number of ensemble values
+    - Integer
   * - 27
     - CRPS
     - The Continuous Ranked Probability Score (normal distribution)
+    - Double
   * - 28
     - CRPSS
     - The Continuous Ranked Probability Skill Score (normal distribution)
+    - Double
   * - 29
     - IGN
     - The Ignorance Score
+    - Double
   * - 30
     - ME
     - The Mean Error of the ensemble mean (unperturbed or supplied)
+    - Double
   * - 31
     - RMSE
     - The Root Mean Square Error of the ensemble mean (unperturbed or supplied)
+    - Double
   * - 32
     - SPREAD
     - The square root of the mean of the variance of the unperturbed ensemble member values at each observation location
+    - Double
   * - 33
     - ME_OERR
     - The Mean Error of the PERTURBED ensemble mean (e.g. with Observation Error)
+    - Double
   * - 34
     - RMSE_OERR
     - The Root Mean Square Error of the PERTURBED ensemble mean (e.g. with Observation Error)
+    - Double
   * - 35
     - SPREAD_OERR
     - The square root of the mean of the variance of the PERTURBED ensemble member values (e.g. with Observation Error) at each observation location
+    - Double
   * - 36
     - SPREAD_PLUS_OERR
     - The square root of the sum of unperturbed ensemble variance and the observation error variance
-  * - 37 
+    - Double
+  * - 37
     - CRPSCL
     - Climatological Continuous Ranked Probability Score (normal distribution)
+    - Double
   * - 38
     - CRPS_EMP 
     - The Continuous Ranked Probability Score (empirical distribution)
+    - Double
   * - 39
     - CRPSCL_EMP 
     - Climatological Continuous Ranked Probability Score (empirical distribution)
-  * - 40 
+    - Double
+  * - 40
     - CRPSS_EMP
     - The Continuous Ranked Probability Skill Score (empirical distribution)
-  * - 41 
+    - Double
+  * - 41
     - CRPS_EMP_FAIR
     - The Continuous Ranked Probability Score (empirical distribution) adjusted by the mean absolute difference of the ensemble members
+    - Double
   * - 42
     - SPREAD_MD
     - The pairwise Mean Absolute Difference of the unperturbed ensemble members
+    - Double
   * - 43
     - MAE
     - The Mean Absolute Error of the ensemble mean (unperturbed or supplied)
+    - Double
   * - 44
     - MAE_OERR
     - The Mean Absolute Error of the PERTURBED ensemble mean (e.g. with Observation Error)
+    - Double
   * - 45
     - BIAS_RATIO
     - The Bias Ratio
+    - Double
   * - 46
     - N_GE_OBS
     - The number of ensemble values greater than or equal to their observations
+    - Integer
   * - 47
     - ME_GE_OBS
     - The Mean Error of the ensemble values greater than or equal to their observations
+    - Double
   * - 48
     - N_LT_OBS
     - The number of ensemble values less than their observations
+    - Integer
   * - 49
     - ME_LT_OBS
     - The Mean Error of the ensemble values less than or equal to their observations
+    - Double
   * - 50
     - IGN_CONV_OERR
     - Error-convolved logarithmic scoring rule (i.e. ignornance score) from Equation 5 of :ref:`Ferro, 2017 <Ferro-2017>`
+    - Double
   * - 51
     - IGN_CORR_OERR
     - Error-corrected logarithmic scoring rule (i.e. ignornance score) from Equation 7 of :ref:`Ferro, 2017 <Ferro-2017>`
+    - Double
 
 .. _table_ES_header_info_es_out_RPS:
       
 .. list-table:: Format information for RPS (Ranked Probability Score) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - RPS OUTPUT FORMAT
-    - 
-    - 
   * - Column Number
     - RPS Column Name
     - Description
+    - Data Type
   * - 24
     - RPS
     - Ranked Probability Score line type
+    - String
   * - 25
     - TOTAL
     - Count of observations
+    - Integer
   * - 26
     - N_PROB
     - Number of probability thresholds (i.e. number of ensemble members in Ensemble-Stat)
+    - Integer
   * - 27
     - RPS_REL
     - RPS Reliability, mean of the reliabilities for each RPS threshold
+    - Double
   * - 28
     - RPS_RES
     - RPS Resolution, mean of the resolutions for each RPS threshold
+    - Double
   * - 29
     - RPS_UNC
     - RPS Uncertainty, mean of the uncertainties for each RPS threshold
+    - Double
   * - 30
     - RPS
-    - Ranked Probability Score, mean of the Brier Scores for each RPS threshold OR mean of the climatology-based probabilistic ensemble members 
+    - Ranked Probability Score, mean of the Brier Scores for each RPS threshold OR mean of the climatology-based probabilistic ensemble members
+    - Double
   * - 31
     - RPSS
     - Ranked Probability Skill Score relative to external climatology OR relative to a fixed climatology value of one divided by the number of ensemble members when using climatology-based probabilistic ensemble members
+    - Double
   * - 32
     - RPSS_SMPL
     - Ranked Probability Skill Score relative to sample climatology
+    - Double
 
 .. _table_ES_header_info_es_out_RHIST:
       
 .. list-table:: Format information for RHIST (Ranked Histogram) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - RHIST OUTPUT FORMAT
-    - 
-    - 
   * - Column Number
     - RHIST Column Name
     - Description
+    - Data Type
   * - 24
     - RHIST
     - Ranked Histogram line type
+    - String
   * - 25
     - TOTAL
     - Count of observations
+    - Integer
   * - 26
     - N_RANK
     - Number of possible ranks for observation
+    - Integer
   * - 27
     - RANK_i
-    - Count of observations with the i-th rank (repeated)
+    - Count of observations with the ith rank (repeated)
+    - Integer
 
 .. _table_ES_header_info_es_out_PHIST:
       
 .. list-table:: Format information for PHIST (Probability Integral Transform Histogram) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - PHIST OUTPUT FORMAT
-    - 
-    - 
   * - Column Number
     - PHIST Column Name
     - Description
+    - Data Type
   * - 24
     - PHIST
     - Probability Integral Transform line type
+    - String
   * - 25
     - TOTAL
     - Count of observations
+    - Integer
   * - 26
     - BIN_SIZE
     - Probability interval width
+    - Double
   * - 27
     - N_BIN
     - Total number of probability intervals
+    - Integer
   * - 28
     - BIN_i
     - Count of observations in the ith probability bin (repeated)
+    - Integer
 
 .. _table_ES_header_info_es_out_RELP:
 
 .. list-table:: Format information for RELP (Relative Position) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - RELP OUTPUT FORMAT
-    - 
-    - 
   * - Column Number
     - RELP Column Name
     - Description
+    - Data Type
   * - 24
     - RELP
     - Relative Position line type
+    - String
   * - 25
     - TOTAL
     - Count of observations
+    - Integer
   * - 26
     - N_ENS
     - Number of ensemble members
+    - Integer
   * - 27
     - RELP_i
-    - Number of times the i-th ensemble member's value was closest to the observation (repeated). When n members tie, 1/n is assigned to each member.
+    - Number of times the ith ensemble member's value was closest to the observation (repeated). When n members tie, 1/n is assigned to each member.
+    - Double
 
 .. _table_ES_header_info_es_out_ORANK:
-      
+
 .. list-table:: Format information for ORANK (Observation Rank) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - ORANK OUTPUT FORMAT
-    - 
-    - 
   * - Column Number
     - ORANK Column Name
     - Description
+    - Data Type
   * - 24
     - ORANK
     - Observation Rank line type
+    - String
   * - 25
     - TOTAL
     - Count of observations
+    - Integer
   * - 26
     - INDEX
-    - Line number in ORANK file
+    - Index for the current ensemble pair
+    - Integer
   * - 27
     - OBS_SID
     - Station Identifier
+    - String
   * - 28
     - OBS_LAT
     - Latitude of the observation
+    - Double
   * - 29
     - OBS_LON
     - Longitude of the observation
+    - Double
   * - 30
     - OBS_LVL
     - Level of the observation
+    - Double
   * - 31
     - OBS_ELV
     - Elevation of the observation
+    - Double
   * - 32
     - OBS
     - Value of the observation
+    - Double
   * - 33
     - PIT
     - Probability Integral Transform
+    - Double
   * - 34
     - RANK
     - Rank of the observation
+    - Integer
   * - 35
     - N_ENS_VLD
     - Number of valid ensemble values
+    - Integer
   * - 36
     - N_ENS
     - Number of ensemble values
+    - Integer
   * - 37
     - ENS_i
     - Value of the ith ensemble member (repeated)
+    - Double
   * - Last-9
     - OBS_QC
     - Quality control string for the observation
+    - String
   * - Last-8
     - ENS_MEAN
     - The unperturbed ensemble mean value
+    - Double
   * - Last-7
     - OBS_CLIMO_MEAN
     - Observation climatological mean value (named CLIMO_MEAN prior to met-12.0.0)
+    - Double
   * - Last-6
     - SPREAD
     - The spread (standard deviation) of the unperturbed ensemble member values
+    - Double
   * - Last-5
     - ENS_MEAN _OERR
-    - The PERTURBED ensemble mean (e.g. with Observation Error).
+    - The PERTURBED ensemble mean (e.g. with Observation Error)
+    - Double
   * - Last-4
     - SPREAD_OERR
-    - The spread (standard deviation) of the PERTURBED ensemble member values (e.g. with Observation Error).
+    - The spread (standard deviation) of the PERTURBED ensemble member values (e.g. with Observation Error)
+    - Double
   * - Last-3
     - SPREAD_PLUS_OERR
-    - The square root of the sum of the unperturbed ensemble variance and the observation error variance.
+    - The square root of the sum of the unperturbed ensemble variance and the observation error variance
+    - Double
   * - Last-2
     - OBS_CLIMO_STDEV
     - Observation climatological standard deviation value (named CLIMO_STDEV prior to met-12.0.0)
+    - Double
   * - Last-1
     - FCST_CLIMO_MEAN
     - Forecast climatological mean value
+    - Double
   * - Last
     - FCST_CLIMO_STDEV
     - Forecast climatological standard deviation value
-      
+    - Double
+
 .. role:: raw-html(raw)
     :format: html
 
-.. _table_ES_header_info_es_out_SSVAR:	     
+.. _table_ES_header_info_es_out_SSVAR:
 
 .. list-table:: Format information for SSVAR (Spread/Skill Variance) output line type.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - SSVAR OUTPUT FORMAT
-    - 
-    - 
   * - Column Number
     - SSVAR Column Name
     - Description
+    - Data Type
   * - 24
     - SSVAR
     - Spread/Skill Variance line type
+    - String
   * - 25
     - TOTAL
     - Count of observations
+    - Integer
   * - 26
     - N_BIN
     - Number of bins for current forecast run
+    - Integer
   * - 27
     - BIN_i
     - Index of the current bin
+    - Integer
   * - 28
     - BIN_N
     - Number of points in bin i
+    - Integer
   * - 29
     - VAR_MIN
     - Minimum variance
+    - Double
   * - 30
     - VAR_MAX
     - Maximum variance
+    - Double
   * - 31
     - VAR_MEAN
     - Average variance
+    - Double
   * - 32
     - FBAR
     - Average forecast value
+    - Double
   * - 33
     - OBAR
     - Average observed value
+    - Double
   * - 34
     - FOBAR
     - Average product of forecast and observation
+    - Double
   * - 35
     - FFBAR
     - Average of forecast squared
+    - Double
   * - 36
     - OOBAR
     - Average of observation squared
+    - Double
   * - 37-38
     - FBAR_NCL, :raw-html:`<br />` FBAR_NCU
     - Mean forecast normal upper and lower confidence limits
+    - Double
   * - 39-41
     - FSTDEV, :raw-html:`<br />` FSTDEV_NCL, :raw-html:`<br />` FSTDEV_NCU
     - Standard deviation of the error including normal upper and lower confidence limits
+    - Double
   * - 42-43
     - OBAR_NCL, :raw-html:`<br />` OBAR_NCU
     - Mean observation normal upper and lower confidence limits
+    - Double
   * - 44-46
     - OSTDEV, :raw-html:`<br />` OSTDEV_NCL, :raw-html:`<br />` OSTDEV_NCU
     - Standard deviation of the error including normal upper and lower confidence limits
+    - Double
   * - 47-49
     - PR_CORR, :raw-html:`<br />` PR_CORR_NCL, :raw-html:`<br />` PR_CORR_NCU
     - Pearson correlation coefficient including normal upper and lower confidence limits
+    - Double
   * - 50-52
     - ME, :raw-html:`<br />` ME_NCL, :raw-html:`<br />` ME_NCU
     - Mean error including normal upper and lower confidence limits
+    - Double
   * - 53-55
     - ESTDEV, :raw-html:`<br />` ESTDEV_NCL, :raw-html:`<br />` ESTDEV_NCU
     - Standard deviation of the error including normal upper and lower confidence limits
+    - Double
   * - 56
     - MBIAS
     - Magnitude bias
+    - Double
   * - 57
     - MSE
     - Mean squared error
+    - Double
   * - 58
     - BCMSE
     - Bias corrected root mean squared error
+    - Double
   * - 59
     - RMSE
     - Root mean squared error
+    - Double
 

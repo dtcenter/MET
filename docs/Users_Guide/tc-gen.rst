@@ -488,200 +488,247 @@ TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The AS
 
 .. _table_TG_header_info_tg_outputs:
 
-.. list-table:: Header information for each file tc-gen outputs
+.. list-table:: Header information for TC-Gen STAT output 
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - HEADER
-    -
-    -
   * - Column Number
     - Header Column Name
     - Description
+    - Data Type
   * - 1
     - VERSION
     - Version number
+    - String
   * - 2
     - MODEL
     - Current ATCF Technique name
+    - String
   * - 3
     - DESC
     - User-provided text string describing the "filter" options
+    - String
   * - 4
     - FCST_LEAD
     - Forecast lead time in HHMMSS format
+    - Time String
   * - 5
     - FCST_VALID_BEG
     - Minimum forecast valid time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 6
     - FCST_VALID_END
     - Maximum forecast valid time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 7
     - OBS_LEAD
     - Does not apply and is set to NA
+    - Time String
   * - 8
     - OBS_VALID_BEG
     - Minimum Best track valid time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 9
     - OBS_VALID_END
     - Maximum Best track valid time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 10
     - FCST_VAR
     - Genesis methodology (GENESIS_DEV, GENESIS_OPS, PROB_GENESIS, or GENESIS_SHAPE)
+    - String
   * - 11
     - FCST_UNITS
     - Does not apply and is set to NA
+    - String
   * - 12
     - FCST_LEV
     - Does not apply and is set to NA
+    - String
   * - 13
     - OBS_VAR
     - Genesis methodology (GENESIS_DEV, GENESIS_OPS, PROB_GENESIS, or GENESIS_SHAPE)
+    - String
   * - 14
     - OBS_UNITS
     - Does not apply and is set to NA
+    - String
   * - 15
     - OBS_LEV
     - Does not apply and is set to NA
+    - String
   * - 16
     - OBTYPE
     - Verifying Best track technique name
+    - String
   * - 17
     - VX_MASK
     - Verifying masking region
+    - String
   * - 18
     - INTERP_MTHD
     - Does not apply and is set to NA
+    - String
   * - 19
     - INTERP_PNTS
     - Does not apply and is set to NA
+    - Integer
   * - 20
     - FCST_THRESH
     - Does not apply and is set to NA
+    - Threshold String
   * - 21
     - OBS_THRESH
     - Does not apply and is set to NA
+    - Threshold String
   * - 22
     - COV_THRESH
     - Does not apply and is set to NA
+    - Threshold String
   * - 23
     - ALPHA
     - Error percent value used in confidence intervals
+    - Double
   * - 24
     - LINE_TYPE
     - Various line type options, refer to :numref:`point_stat-output` and the tables below.
+    - String
 
 .. _table_TG_format_info_GENMPR:
 
 .. list-table:: Format information for GENMPR (Genesis Matched Pairs) output line type
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - GENMPR OUTPUT FORMAT
-    -
-    -
   * - Column Number
     - GENMPR Column Name
     - Description
+    - Data Type
   * - 5, 6
     - FCST_VALID_BEG, FCST_VALID_END
     - Forecast genesis time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 8, 9
     - OBS_VALID_BEG, OBS_VALID_END
     - Best track genesis time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 24
     - GENMPR
     - Genesis Matched Pairs line type
+    - String
   * - 25
     - TOTAL
     - Total number of genesis pairs
+    - Integer
   * - 26
     - INDEX
     - Index for the current matched pair
+    - Integer
   * - 27
     - STORM_ID
     - BBCCYYYY designation of storm (basin, cyclone number, and year)
+    - String
   * - 28
     - PROB_LEAD
     - Lead time in HHH format for the predicted probability of genesis (only for **-edeck** inputs)
+    - Time String
   * - 29
     - PROB_VAL
     - Predicted probability of genesis (only for **-edeck** inputs)
+    - Double
   * - 30
     - AGEN_INIT
     - Forecast initialization time
+    - Datetime String
   * - 31
     - AGEN_FHR
     - Forecast hour of genesis event
+    - Time String
   * - 32
     - AGEN_LAT
     - Latitude position of the forecast genesis event
+    - Double
   * - 33
     - AGEN_LON
     - Longitude position of the forecast genesis event
+    - Double
   * - 34
     - AGEN_DLAND
     - Forecast genesis event distance to land (nm)
+    - Double
   * - 35
     - BGEN_LAT
     - Latitude position of the verifying Best track genesis event
+    - Double
   * - 36
     - BGEN_LON
     - Longitude position of the verifying Best track genesis event
+    - Double
   * - 37
     - BGEN_DLAND
     - Best track genesis event distance to land (nm)
+    - Double
   * - 38
     - GEN_DIST
     - Distance between the forecast and Best track genesis events (km) (only for **-track** inputs)
+    - Double
   * - 39
     - GEN_TDIFF
     - Forecast minus Best track genesis time in HHMMSS format (only for **-track** inputs)
+    - Time String
   * - 40
     - INIT_TDIFF
     - Best track genesis minus forecast initialization time in HHMMSS format (only for **-track** inputs)
+    - Time String
   * - 41
     - DEV_CAT
     - Category for the development methodology (FYOY, FYON, FNOY, or DISCARD) (only for **-track** inputs)
+    - String
   * - 42
     - OPS_CAT
     - Category for the operational methodology (FYOY, FYON, FNOY, or DISCARD for **-track** inputs and FYOY or FYON for **-edeck** inputs)
+    - String
 
 .. _table_TG_var_NetCDF_matched_pair_out:
 
 .. list-table:: A selection of variables that can appear in the NetCDF matched pair output which can be controlled by the nc_pairs_flag configuration option.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - tc_gen NETCDF VARIABLES
-    -
-    -
   * - NetCDF Variable
     - Dimension
     - Description
+    - Data Type
   * - DESC_MODEL_GENESIS
     - lat, lon
     - For each filter entry (DESC) and forecast ATCF ID (MODEL), count the number of forecast genesis events within each grid box.
+    - Float
   * - DESC_MODEL_TRACKS
     - lat, lon
     - For each filter entry (DESC) and forecast ATCF ID (MODEL), count the number of track points within each grid box.
+    - Float
   * - DESC_BEST_GENESIS
     - lat, lon
     - For each filter entry (DESC), count the number of Best track genesis events within each grid box.
+    - Float
   * - DESC_BEST_GENESIS
     - lat, lon
     - For each filter entry (DESC), count the number of Best track points within each grid box.
+    - Float
   * - DESC_MODEL_[DEV|OPS]_FY_OY
     - lat, lon
     - For each filter entry (DESC) and forecast ATCF ID (MODEL), count the number of forecast genesis events classified as hits by the development (DEV) or operational (OPS) methodology.
+    - Float
   * - DESC_MODEL_[DEV|OPS]_FY_ON
     - lat, lon
     - For each filter entry (DESC) and forecast ATCF ID (MODEL), count the number of forecast genesis events classified as false alarms by the development (DEV) or operational (OPS) methodology.
+    - Float
   * - DESC_MODEL_BEST_[DEV|OPS]_FY_OY
     - lat, lon
     - For each filter entry (DESC) and forecast ATCF ID (MODEL), count the number of Best track genesis events classified as hits by the development (DEV) or operational (OPS) methodology.
+    - Float
   * - DESC_MODEL_BEST_[DEV|OPS]_FN_OY
     - lat, lon
     - For each filter entry (DESC) and forecast ATCF ID (MODEL), count the number of Best track genesis events classified as misses by the development (DEV) or operational (OPS) methodology.
+    - Float
 
 Like all STAT output, the output of TC-Gen may be further processed using the Stat-Analysis tool, described in :numref:`stat-analysis`.
