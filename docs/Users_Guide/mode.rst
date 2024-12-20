@@ -121,6 +121,10 @@ When regridding to the FCST or OBS field (e.g. to_grid = FCST), the first field 
 
 "file_type" can be set independently for each input in multivariate mode. If not set for an input, MET uses file names and file content to determine the type.
 
+In multivariate mode, with quilt=**FALSE**, for all inputs the number of forecast and observation convolution radii and thresholds must all match. One configuration of MODE will be run for each group of settings in those lists.
+
+In multivariate mode, with quilt=**TRUE**, for all inputs the number of forecast and observation convolution radii must match and the number of forecast and observation convolution thresholds must match. When each input has N radii and M thresholds, NxM configurations of MODE will be run.
+
 When setting a threshold to a percentile, some choices require both an observation input and a forecast input.  When this is the case, it's assumed the indices match, so for example if forecast input 1 has such a percentile setting, then observation input 1 will be used to compute the percentile.  Percentiles in which this will happen are:
 
 * SFP in an observation input.
@@ -319,7 +323,7 @@ The **conv_radius** entry defines the radius of the circular convolution applied
 
 The **conv_thresh** entry specifies the threshold values to be applied to the convolved field to define objects. By default, objects are defined using a convolution threshold of 5.0. Multiple convolution thresholds may be specified as an array (e.g. **conv_thresh = [ >=5.0, >=10.0, >=15.0 ];)**.
 
-Multiple convolution radii and thresholds and processed using the logic defined by the **quilt** entry.
+Multiple convolution radii and thresholds are processed using the logic defined by the **quilt** entry.  The logic specific to multivariate mode is described in the multivariate mode section above.
 
 The **vld_thresh** entry must be set between 0 and 1. When performing the circular convolution step if the proportion of bad data values in the convolution area is greater than or equal to this threshold, the resulting convolved value will be bad data. If the proportion is less than this threshold, the convolution will be performed on only the valid data. By default, the **vld_thresh** is set to 0.5.
 
@@ -577,158 +581,204 @@ The MODE tool creates two ASCII output files. The first ASCII file contains cont
 
 .. list-table:: Format of MODE CTS output file.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - mode ASCII
-    - CONTINGENCY TABLE
-    - OUTPUT FORMAT
   * - Column Number
-    - MODE CTS Column Name
+    - CTS Column Name
     - Description
+    - Data Type
   * - 1
     - VERSION
     - Version number
+    - String
   * - 2
     - MODEL
     - User-provided text string giving model name
+    - String
   * - 3
     - N_VALID
     - Number of valid data points
+    - Integer
   * - 4
     - GRID_RES
     - User-provided nominal grid resolution
+    - Double
   * - 5
     - DESC
     - User-provided text string describing the verification task
+    - String
   * - 6
     - FCST_LEAD
     - Forecast lead time in HHMMSS format
+    - Time String
   * - 7
     - FCST_VALID
     - Forecast valid start time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 8
     - FCST_ACCUM
     - Forecast accumulation time in HHMMSS format
+    - Time String
   * - 9
     - OBS_LEAD
     - Observation lead time in HHMMSS format; when field2 is actually an observation, this should be "000000"
+    - Time String
   * - 10
     - OBS_VALID
     - Observation valid start time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 11
     - OBS_ACCUM
     - Observation accumulation time in HHMMSS format
+    - Time String
   * - 12
     - FCST_RAD
-    - Forecast convolution radius in grid units 
+    - Forecast convolution radius in grid units
+    - Integer
   * - 13
     - FCST_THR
     - Forecast convolution threshold
+    - Threshold String
   * - 14
     - OBS_RAD
-    - Observation convolution radius in grid units 
+    - Observation convolution radius in grid units
+    - Integer
   * - 15
     - OBS_THR
     - Observation convolution threshold
+    - Threshold String
   * - 16
     - FCST_VAR
     - Forecast variable
+    - String
   * - 17
     - FCST_UNITS
     - Units for model variable
+    - String
   * - 18
     - FCST_LEV
     - Forecast vertical level
+    - String
   * - 19
     - OBS_VAR
     - Observation variable
+    - String
   * - 20
     - OBS_UNITS
     - Units for observation variable
+    - String
   * - 21
     - OBS_LEV
     - Observation vertical level
+    - String
   * - 22
     - OBTYPE
     - User-provided observation type
+    - String
   * - 23
     - FIELD
     - Field type for this line:* RAW for the raw input fields * OBJECT for the resolved object fields
+    - String
   * - 24
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 25
     - FY_OY
-    - Number of forecast yes and observation yes
+    - Number of hits (forecast yes and observation yes)
+    - Integer
   * - 26
     - FY_ON
-    - Number of forecast yes and observation no
+    - Number of false alarms (forecast yes and observation no)
+    - Integer
   * - 27
     - FN_OY
-    - Number of forecast no and observation yes
+    - Number of misses (forecast no and observation yes)
+    - Integer
   * - 28
     - FN_ON
-    - Number of forecast no and observation no
+    - Number of correct negatives (forecast no and observation no)
+    - Integer
   * - 29
     - BASER
     - Base rate
+    - Double
   * - 30
     - FMEAN
     - Forecast mean
+    - Double
   * - 31
     - ACC
     - Accuracy
+    - Double
   * - 32
     - FBIAS
     - Frequency Bias
+    - Double
   * - 33
     - PODY
     - Probability of detecting yes
+    - Double
   * - 34
     - PODN
     - Probability of detecting no
+    - Double
   * - 35
     - POFD
     - Probability of false detection
+    - Double
   * - 36
     - FAR
     - False alarm ratio
+    - Double
   * - 37
     - CSI
     - Critical Success Index
+    - Double
   * - 38
     - GSS
     - Gilbert Skill Score
+    - Double
   * - 39
     - HK
     - Hanssen-Kuipers Discriminant
+    - Double
   * - 40
     - HSS
     - Heidke Skill Score
+    - Double
   * - 41
     - ODDS
     - Odds Ratio
+    - Double
   * - 42
     - LODDS
     - Logarithm of the Odds Ratio
+    - Double
   * - 43
     - ORSS
     - Odds Ratio Skill Score
+    - Double
   * - 44
     - EDS
     - Extreme Dependency Score
+    - Double
   * - 45
     - SEDS
     - Symmetric Extreme Dependency Score
+    - Double
   * - 46
     - EDI
     - Extreme Dependency Index
+    - Double
   * - 47
     - SEDI
     - Symmetric Extremal Dependency Index
+    - Double
   * - 48
     - BAGSS
     - Bias-Adjusted Gilbert Skill Score
+    - Double
 
 This first file uses the following naming convention:
 
@@ -745,14 +795,11 @@ These object identifiers are described in :numref:`MODE_object_attribute`.
    :format: html
 
 .. _MODE_object_attribute:
-	    
+
 .. list-table:: Object identifier descriptions for MODE object attribute output file.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - 
-    - mode ASCII OBJECT
-    - IDENTIFIER DESCRIPTIONS
   * - Object identifier (object_id)
     - Valid Data Columns
     - Description of valid data
@@ -777,168 +824,217 @@ The contents of the columns in this ASCII file are summarized in :numref:`MODE_o
 
 .. list-table:: Format of MODE object attribute output files.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - mode ASCII OBJECT
-    - ATTRIBUTE OUTPUT FORMAT
-    - 
-  * - Column
-    - MODE Column Name
+  * - Column Number
+    - Object Column Name
     - Description
+    - Data Type
   * - 1
     - VERSION
     - Version number
+    - String
   * - 2
     - MODEL
     - User-provided text string designating model name
+    - String
   * - 3
     - N_VALID
     - Number of valid data points
+    - Integer
   * - 4
     - GRID_RES
     - User-provided nominal grid resolution
+    - Double
   * - 5
     - DESC
     - User-provided text string describing the verification task
+    - String
   * - 6
     - FCST_LEAD
     - Forecast lead time in HHMMSS format
+    - Time String
   * - 7
     - FCST_VALID
     - Forecast valid start time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 8
     - FCST_ACCUM
     - Forecast accumulation time in HHMMSS format
+    - Time String
   * - 9
     - OBS_LEAD
     - Observation lead time in HHMMSS format; when field2 is actually an observation, this should be "000000"
+    - Time String
   * - 10
     - OBS_VALID
     - Observation valid start time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 11
     - OBS_ACCUM
     - Observation accumulation time in HHMMSS format
+    - Time String
   * - 12
     - FCST_RAD
     - Forecast convolution radius in grid squares
+    - Integer
   * - 13
     - FCST_THR
     - Forecast convolution threshold
+    - Threshold String
   * - 14
     - OBS_RAD
     - Observation convolution radius in grid squares
+    - Integer
   * - 15
     - OBS_THR
     - Observation convolution threshold
+    - Threshold String
   * - 16
     - FCST_VAR
     - Forecast variable
+    - String
   * - 17
     - FCST_UNITS
     - Units for forecast variable
+    - String
   * - 18
     - FCST_LEV
     - Forecast vertical level
+    - String
   * - 19
     - OBS_VAR
     - Observation variable
+    - String
   * - 20
     - OBS_UNITS
     - Units for observation variable
+    - String
   * - 21
     - OBS_LEV
     - Observation vertical level
+    - String
   * - 22
     - OBTYPE
     - User-provided observation type
+    - String
   * - 23
     - OBJECT_ID
     - Object numbered from 1 to the number of objects in each field
+    - String
   * - 24
     - OBJECT_CAT
     - Object category indicating to which cluster object it belongs
+    - String
   * - 25-26
     - CENTROID_X, _Y
     - Location of the centroid (in grid units)
+    - Double
   * - 27-28
     - CENTROID_LAT, _LON
     - Location of the centroid (in lat/lon degrees)
+    - Double
   * - 29
     - AXIS_ANG
     - Object axis angle (in degrees)
+    - Double
   * - 30
     - LENGTH
     - Length of the enclosing rectangle (in grid units)
+    - Double
   * - 31
     - WIDTH
     - Width of the enclosing rectangle (in grid units)
+    - Double
   * - 32
     - AREA
     - Object area (in grid squares)
+    - Integer
   * - 33
     - AREA_THRESH
     - Area of the object containing data values in the raw field that meet the object definition threshold criteria (in grid squares)
+    - Integer
   * - 34
     - CURVATURE
     - Radius of curvature of the object defined in terms of third order moments (in grid units)
+    - Double
   * - 35-36
     - CURVATURE_X, _Y
     - Center of curvature (in grid coordinates)
+    - Double
   * - 37
     - COMPLEXITY
     - Ratio of the difference between the area of an object and the area of its convex hull divided by the area of the complex hull (unitless)
+    - Double
   * - 38-42
     - INTENSITY_10, _25, _50, _75, _90
     - 10th, 25th, 50th, 75th, and 90th percentiles of intensity of the raw field within the object (various units)
+    - Double
   * - 43
     - INTENSITY_NN
     - The percentile of intensity chosen for use in the PERCENTILE_INTENSITY_RATIO column (variable units)
+    - Double
   * - 44
     - INTENSITY_SUM
     - Sum of the intensities of the raw field within the object (variable units)
+    - Double
   * - 45
     - CENTROID_DIST
     - Distance between two objects centroids (in grid units)
+    - Double
   * - 46
     - BOUNDARY_DIST
     - Minimum distance between the boundaries of two objects (in grid units)
+    - Double
   * - 47
     - CONVEX_HULL :raw-html:`<br />` \_DIST
     - Minimum distance between the convex hulls of two objects (in grid units)
+    - Double
   * - 48
     - ANGLE_DIFF
     - Difference between the axis angles of two objects (in degrees)
+    - Double
   * - 49
     - ASPECT_DIFF
     - Absolute value of the difference between the aspect ratios of two objects (unitless)
+    - Double
   * - 50
     - AREA_RATIO
     - The forecast object area divided by the observation object area (unitless) :raw-html:`<br />`
       **NOTE:** Prior to MET version 10.0.0, the AREA_RATIO was defined as the lesser of the two object areas divided by the greater of the two.
+    - Double
   * - 51
     - INTERSECTION :raw-html:`<br />` \_AREA
     - Intersection area of two objects (in grid squares)
+    - Double
   * - 52
     - UNION_AREA
     - Union area of two objects (in grid squares)
+    - Double
   * - 53
     - SYMMETRIC_DIFF
     - Symmetric difference of two objects (in grid squares)
+    - Double
   * - 54
     - INTERSECTION :raw-html:`<br />`  \_OVER_AREA
     - Ratio of intersection area to the lesser of the forecast and observation object areas (unitless)
+    - Double
   * - 55
     - CURVATURE :raw-html:`<br />` \_RATIO
     - Ratio of the curvature of two objects defined as the lesser of the two divided by the greater of the two (unitless)
+    - Double
   * - 56
     - COMPLEXITY :raw-html:`<br />` \_RATIO
     - Ratio of complexities of two objects defined as the lesser of the forecast complexity divided by the observation complexity or its reciprocal (unitless)
+    - Double
   * - 57
     - PERCENTILE :raw-html:`<br />` \_INTENSITY :raw-html:`<br />` \_RATIO
     - Ratio of the nth percentile (INTENSITY_NN column) of intensity of the two objects defined as the lesser of the forecast intensity divided by the observation intensity or its reciprocal (unitless)
+    - Double
   * - 58
     - INTEREST
     - Total interest value computed for a pair of simple objects (unitless)
+    - Double
 
 **NetCDF Output**
 
@@ -950,10 +1046,8 @@ The dimensions and variables included in the mode NetCDF files are described in 
 
 .. list-table:: NetCDF dimensions for MODE output.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - mode NETCDF DIMENSIONS
-    - 
   * - NetCDF Dimension
     - Description
   * - lat
@@ -993,174 +1087,225 @@ The dimensions and variables included in the mode NetCDF files are described in 
 
 .. list-table:: Variables contained in MODE NetCDF output.
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - 
-    - mode NETCDF VARIABLES
-    - 
   * - NetCDF Variable
     - Dimension
     - Description
+    - Data Type
   * - lat
     - lat, lon
     - Latitude
+    - Float
   * - lon
     - lat, lon
     - Longitude
+    - Float
   * - fcst_raw
     - lat, lon
     - Forecast raw values
+    - Float
   * - fcst_obj_raw
     - lat, lon
     - Forecast Object Raw Values
+    - Float
   * - fcst_obj_id
     - lat, lon
     - Simple forecast object id number for each grid point
+    - Integer
   * - fcst_clus_id
     - lat, lon
     - Cluster forecast object id number for each grid point
+    - Integer
   * - obs_raw
     - lat, lon
     - Observation Raw Values
+    - Float
   * - obs_obj_raw
     - lat, lon
     - Observation Object Raw Values
+    - Float
   * - obs_obj_id
     - \-
     - Simple observation object id number for each grid point
+    - Integer
   * - obs_clus_id
     - \-
     - Cluster observation object id number for each grid point
+    - Integer
   * - fcst_conv_radius
     - \-
     - Forecast convolution radius
+    - Integer
   * - obs_conv_radius
     - \-
     - Observation convolution radius
+    - Integer
   * - fcst_conv :raw-html:`<br />` \_threshold
     - \-
     - Forecast convolution threshold
+    - String
   * - obs_conv :raw-html:`<br />` \_threshold
     - \-
     - Observation convolution threshold
+    - String
   * - n_fcst_simp
     - \-
     - Number of simple forecast objects
+    - Integer
   * - n_obs_simp
     - \-
     - Number of simple observation objects
+    - Integer
   * - n_clus
     - \-
     - Number of cluster objects
+    - Integer
   * - fcst_simp_bdy :raw-html:`<br />` \_start
     - fcst_simp
     - Forecast Simple Boundary Starting Index
+    - Integer
   * - fcst_simp_bdy :raw-html:`<br />` \_npts
     - fcst_simp
     - Number of Forecast Simple Boundary Points
+    - Integer
   * - fcst_simp_bdy :raw-html:`<br />` \_lat
     - fcst_simp_bdy
     - Forecast Simple Boundary Latitude
+    - Float
   * - fcst_simp_bdy :raw-html:`<br />` \_lon
     - fcst_simp_bdy
     - Forecast Simple Boundary Longitude
+    - Float
   * - fcst_simp_bdy_x
     - fcst_simp_bdy
     - Forecast Simple Boundary X-Coordinate
+    - Integer
   * - fcst_simp_bdy_y
     - fcst_simp_bdy
     - Forecast Simple Boundary Y-Coordinate
+    - Integer
   * - fcst_simp_hull :raw-html:`<br />` \_start
     - fcst_simp
     - Forecast Simple Convex Hull Starting Index
+    - Integer
   * - fcst_simp_hull :raw-html:`<br />` \_npts
     - fcst_simp
     - Number of Forecast Simple Convex Hull Points
+    - Integer
   * - fcst_simp_hull :raw-html:`<br />` \_lat
     - fcst_simp_hull
     - Forecast Simple Convex Hull Point Latitude
+    - Float
   * - fcst_simp_hull :raw-html:`<br />` \_lon
     - fcst_simp_hull
     - Forecast Simple Convex Hull Point Longitude
+    - Float
   * - fcst_simp_hull_x
     - fcst_simp_hull
     - Forecast Simple Convex Hull Point X-Coordinate
+    - Integer
   * - fcst_simp_hull_y
     - fcst_simp_hull
     - Forecast Simple Convex Hull Point Y-Coordinate
+    - Integer
   * - obs_simp_bdy :raw-html:`<br />` \_start
     - obs_simp
     - Observation Simple Boundary Starting Index
+    - Integer
   * - obs_simp_bdy    \_npts
     - obs_simp
     - Number of Observation Simple Boundary Points
+    - Integer
   * - obs_simp_bdy :raw-html:`<br />` \_lat
     - obs_simp_bdy
     - Observation Simple Boundary Point Latitude
+    - Float
   * - obs_simp_bdy :raw-html:`<br />` \_lon
     - obs_simp_bdy
     - Observation Simple Boundary Point Longitude
+    - Float
   * - obs_simp_bdy_x
     - obs_simp_bdy
     - Observation Simple Boundary Point X-Coordinate
+    - Integer
   * - obs_simp_bdy_y
     - obs_simp_bdy
     - Observation Simple Boundary Point Y-Coordinate
+    - Integer
   * - obs_simp_hull :raw-html:`<br />` \_start
     - obs_simp
     - Observation Simple Convex Hull Starting Index
+    - Integer
   * - obs_simp_hull :raw-html:`<br />` \_npts
     - obs_simp
     - Number of Observation Simple Convex Hull Points
+    - Integer
   * - obs_simp_hull :raw-html:`<br />` \_lat
     - obs_simp_hull
     - Observation Simple Convex Hull Point Latitude
+    - Float
   * - obs_simp_hull :raw-html:`<br />` \_lon
     - obs_simp_hull
     - Observation Simple Convex Hull Point Longitude
+    - Float
   * - obs_simp_hull_x
     - obs_simp_hull
     - Observation Simple Convex Hull Point X-Coordinate
+    - Integer
   * - obs_simp_hull_y
     - obs_simp_hull
     - Observation Simple Convex Hull Point Y-Coordinate
+    - Integer
   * - fcst_clus_hull :raw-html:`<br />` \_start
     - fcst_clus
     - Forecast Cluster Convex Hull Starting Index
+    - Integer
   * - fcst_clus_hull :raw-html:`<br />` \_npts
     - fcst_clus
     - Number of Forecast Cluster Convex Hull Points
+    - Integer
   * - fcst_clus_hull :raw-html:`<br />` \_lat
     - fcst_clus_hull
     - Forecast Cluster Convex Hull Point Latitude
+    - Float
   * - fcst_clus_hull :raw-html:`<br />` \_lon
     - fcst_clus_hull
     - Forecast Cluster Convex Hull Point Longitude
+    - Float
   * - fcst_clus_hull_x
     - fcst_clus_hull
     - Forecast Cluster Convex Hull Point X-Coordinate
+    - Integer
   * - fcst_clus_hull_y
     - fcst_clus_hull
     - Forecast Cluster Convex Hull Point Y-Coordinate
+    - Integer
   * - obs_clus_hull :raw-html:`<br />` \_start
     - obs_clus
     - Observation Cluster Convex Hull Starting Index
+    - Integer
   * - obs_clus_hull :raw-html:`<br />` \_npts
     - obs_clus
     - Number of Observation Cluster Convex Hull Points
+    - Integer
   * - obs_clus_hull :raw-html:`<br />` \_lat
     - obs_clus_hull
     - Observation Cluster Convex Hull Point Latitude
+    - Float
   * - obs_clus_hull :raw-html:`<br />` \_lon
     - obs_clus_hull
     - Observation Cluster Convex Hull Point Longitude
+    - Float
   * - obs_clus_hull_x
     - obs_clus_hull
     - Observation Cluster Convex Hull Point X-Coordinate
+    - Integer
   * - obs_clus_hull_y
     - obs_clus_hull
     - Observation Cluster Convex Hull Point Y-Coordinate
-      
+    - Integer
+
 **Postscript File**
 
 Lastly, the MODE tool creates a PostScript plot summarizing the features-based approach used in the verification. The PostScript plot is generated using internal libraries and does not depend on an external plotting package. The generation of this PostScript output can be disabled using the **ps_plot_flag** configuration file option.
