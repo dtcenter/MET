@@ -65,8 +65,6 @@ static constexpr char DEF_CONFIG_NAME[] = "MET_BASE/config/IODA2NCConfig_default
 
 static constexpr char program_name[] = "ioda2nc";
 
-static constexpr  int REJECT_DEBUG_LEVEL = 9;
-
 ////////////////////////////////////////////////////////////////////////
 
 //
@@ -429,13 +427,14 @@ static void process_ioda_file(int i_pb) {
       exit(1);
    }
 
-   ioda_file.read_ioda_header(f_in);
+   ioda_file.read_ioda(f_in);
 
+   e_ioda_format ioda_format_ver = ioda_file.get_format_ver();
    bool has_msg_type = ioda_file.msg_type_name.nonempty();
    bool has_station_id = ioda_file.station_id_name.nonempty();
    bool is_netcdf_ready = check_core_data(has_msg_type, has_station_id,
                                           ioda_file.dim_names, ioda_file.metadata_vars,
-                                          ioda_file.ioda_format);
+                                          ioda_format_ver);
    if(!is_netcdf_ready) {
       mlog << Error << "\n" << method_name
            << "Please check the IODA file (required dimensions or meta variables are missing).\n\n";
@@ -456,7 +455,6 @@ static void process_ioda_file(int i_pb) {
 
    int nlocs = ioda_file.nlocs;
    int nstring = ioda_file.nstring;
-   e_ioda_format ioda_format = ioda_file.ioda_format;
 
    // Compute the number of IODA records in the current file.
 
@@ -497,7 +495,7 @@ static void process_ioda_file(int i_pb) {
       unit_attr.clear();
       desc_attr.clear();
       if(IS_VALID_NC(obs_var)) {
-         get_obs_data_float(f_in, raw_var_names[idx], &obs_var, obs_data, qc_data, nlocs, ioda_format);
+         get_obs_data_float(f_in, raw_var_names[idx], &obs_var, obs_data, qc_data, nlocs, ioda_format_ver);
          get_var_units(&obs_var, unit_attr);
          get_att_value_string(&obs_var, "long_name", desc_attr);
       }
@@ -601,9 +599,8 @@ static void process_ioda_file(int i_pb) {
       }
 
       if(has_msg_type) {
-         m_strncpy(hdr_typ, ioda_file.msg_types.data()+(i_read*nstring),
+         m_strncpy(hdr_typ, ioda_file.msg_types[i_read].c_str(),
                    nstring, method_name_s, "hdr_typ");
-         m_rstrip(hdr_typ, nstring);
 
          // If the message type is not listed in the configuration
          // file and it is not the case that all message types should be
@@ -628,9 +625,8 @@ static void process_ioda_file(int i_pb) {
 
       if(has_station_id) {
          char tmp_sid[nstring+1];
-         m_strncpy(tmp_sid, ioda_file.station_ids.data()+(i_read*nstring),
+         m_strncpy(tmp_sid, ioda_file.station_ids[i_read].c_str(),
                    nstring, method_name_s, "tmp_sid");
-         m_rstrip(tmp_sid, nstring, false);
          m_replace_char(tmp_sid, ' ', '_');
          hdr_sid = tmp_sid;
       }
@@ -712,7 +708,6 @@ static void process_ioda_file(int i_pb) {
 
       // Store the index to the header data
       obs_arr[0] = (float)nc_point_obs.get_hdr_index();
-
       n_hdr_obs = 0;
       for(idx=0; idx<v_obs_data.size(); idx++ ) {
          int var_idx = 0;
@@ -841,6 +836,7 @@ static void write_netcdf_hdr_data() {
    int hdr_cnt;
 
    nc_point_obs.get_hdr_index();
+   nc_point_obs.set_nc_out_data(observations, summary_obs, conf_info.getSummaryInfo());
    nc_point_obs.get_dim_counts(&obs_cnt, &hdr_cnt);
 
    // Check for no messages retained
@@ -853,7 +849,6 @@ static void write_netcdf_hdr_data() {
       exit(1);
    }
 
-   nc_point_obs.set_nc_out_data(observations, summary_obs, conf_info.getSummaryInfo());
    nc_point_obs.init_netcdf(obs_cnt, hdr_cnt, program_name);
 
    // Make sure all obs data is processed before handling header
@@ -984,11 +979,11 @@ static bool keep_valid_time(const unixtime ut,
 
 static bool check_core_data(const bool has_msg_type, const bool has_station_id,
                             const StringArray &dim_names, const StringArray &metadata_vars,
-                            e_ioda_format ioda_format) {
+                            e_ioda_format ioda_format_ver) {
    bool is_netcdf_ready = true;
    static const char *method_name = "check_core_data() -> ";
 
-   StringArray &t_core_dims = (ioda_format == e_ioda_format::v2)
+   StringArray &t_core_dims = (ioda_format_ver == e_ioda_format::v2)
                               ? core_dims : core_dims_v1;
    for(int idx=0; idx<t_core_dims.n(); idx++) {
       if (!ioda_file.is_in_metadata_map(t_core_dims[idx], dim_names)) {
@@ -998,7 +993,7 @@ static bool check_core_data(const bool has_msg_type, const bool has_station_id,
       }
    }
 
-   if ((ioda_format == e_ioda_format::v1) && (has_msg_type || has_station_id)) {
+   if ((ioda_format_ver == e_ioda_format::v1) && (has_msg_type || has_station_id)) {
       if (!ioda_file.is_in_metadata_map("nstring", dim_names)) {
          mlog << Error << "\n" << method_name << "-> "
               << "core dimension \"nstring\" is missing.\n\n";
@@ -1037,7 +1032,7 @@ static bool get_meta_data_strings(NcVar &var, char *metadata_buf) {
 
 static bool get_obs_data_float(NcFile *f_in, const ConcatString &var_name,
                                NcVar *obs_var, float *obs_buf, int *qc_buf,
-                               const int nlocs, const e_ioda_format ioda_format) {
+                               const int nlocs, const e_ioda_format ioda_format_ver) {
    bool status = false;
    static const char *method_name = "get_obs_data_float() -> ";
    
@@ -1058,7 +1053,7 @@ static bool get_obs_data_float(NcFile *f_in, const ConcatString &var_name,
    if(var_name.nonempty()) {
       ConcatString qc_name = var_name;
       ConcatString qc_group = qc_postfix;
-      if (ioda_format == e_ioda_format::v2) {
+      if (ioda_format_ver == e_ioda_format::v2) {
          NcGroup nc_grp = get_nc_group(f_in, qc_postfix);
          if (IS_INVALID_NC(nc_grp)) qc_group = qc_group_name;
          StringArray qc_names = conf_info.obs_to_qc_map[var_name];
