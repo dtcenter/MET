@@ -36,7 +36,7 @@ struct iodaMetadata {
 
 ////////////////////////////////////////////////////////////////////////
 
-class iodaFile {
+class iodaReader {
    public:
 
       int nlocs;
@@ -75,9 +75,10 @@ class iodaFile {
       std::vector<point_pair_t> point_pairs;
 
    public:
-      iodaFile();
+      iodaReader();
+     ~iodaReader();
 
-      bool check_missing_thresh(float value) const;
+      bool check_missing_thresh(double value) const;
       void clear();
       e_ioda_format get_format_ver() const;
       std::vector<point_pair_t> &get_point_pairs(const char *var_name_f, const char *var_name_o,
@@ -86,7 +87,7 @@ class iodaFile {
                                                  const int channel=bad_data_int);
       bool is_in_metadata_map(const std::string &metadata_key, const StringArray &available_list) const;
       void read_ioda(netCDF::NcFile *f_in);
-      void set_data_config(IODADataConfInfo *_conf_info);
+      void set_data_config(const char *, const char *);
 
    private:
       e_ioda_format find_ioda_format(netCDF::NcFile *_f_in);
@@ -95,13 +96,12 @@ class iodaFile {
       bool get_meta_data_double(const char *metadata_key, double *metadata_buf);
       void get_obs_metadata_names_v1();
       void get_obs_metadata_names_v2();
-      void initialize();
-      bool read_data_to_vector(const char *var_name,
-                               std::vector<std::string> &hdr_data, int nstring);
       void read_header();
       void read_metadata_names();
       bool read_obs_data(double *data_buf, const char *var_name,
                          const char *group_name, const int channel);
+      bool read_string_data(const char *var_name,
+                            std::vector<std::string> &hdr_data, int str_length);
       bool read_time();
 
 };
@@ -109,8 +109,7 @@ class iodaFile {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline e_ioda_format iodaFile::get_format_ver() const { return ioda_format; };
-inline void iodaFile::set_data_config(IODADataConfInfo *_conf_info) { conf_info = _conf_info; };
+inline e_ioda_format iodaReader::get_format_ver() const { return ioda_format; };
 
 ////////////////////////////////////////////////////////////////////////
 

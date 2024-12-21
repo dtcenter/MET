@@ -43,110 +43,24 @@ static bool has_postfix(const std::string &, std::string const &);
 ////////////////////////////////////////////////////////////////////////
 
 
-iodaFile::iodaFile() {
-   initialize();
+iodaReader::iodaReader() {
+   clear();
+   conf_info = new IODADataConfInfo();
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-vector<point_pair_t> iodaFile::point_pairs(
-      const char *var_name1, const char *var_name2,
-      const char *group_name1, const char *group_name2, int channel) {
-   static const char *method_name = "iodaFile::point_pairs -> ";
-   NcVar obs_var1 = group_name1 ? get_var(f_in, var_name1, group_name1) : get_var(f_in, var_name1);
-   NcVar obs_var2 = group_name2 ? get_var(f_in, var_name2, group_name2) : get_var(f_in, var_name2);
 
-   if (IS_INVALID_NC(obs_var1)) {
-      mlog << Error << "\n" << method_name 
-           << "Fail to get data for " << var_name1
-           << " (" << (group_name1 ? group_name1 : " ") << ")\n\n";
-      clear();
-      exit(-1);
-   }
-
-   if (IS_INVALID_NC(obs_var2)) {
-           << "Fail to get data for " << var_name2
-           << " (" << (group_name2 ? group_name2 : " ") << ")\n\n";
-      clear();
-      exit(-1);
-   }
-
-
-   ConcatString log_group_name1;
-   ConcatString log_group_name2;
-   StringArray dimNames1;
-   StringArray dimNames2;
-   get_dim_names(&obs_var1, dimNames1);
-   get_dim_names(&obs_var2, dimNames2);
-
-   if (group_name1) {
-      log_group_name1.add("(");
-      log_group_name1.add(group_name1);
-      log_group_name1.add(")");
-   }
-   if (group_name2) {
-      log_group_name2.add("(");
-      log_group_name2.add(group_name2);
-      log_group_name2.add(")");
-   }
-   if (is_eq(channel, bad_data_int)) {
-      if (1 < dimNames1.n()) {
-         mlog << Error << "\n" << method_name 
-              << "Channel is not given for " << var_name1
-              << " " << log_group_name1 << "\n\n";
-         clear();
-         exit(-1);
-      }
-      if (1 < dimNames2.n()) {
-         mlog << Error << "\n" << method_name 
-              << "Channel is not given for " << var_name2
-              << " " << log_group_name2 << "\n\n";
-         clear();
-         exit(-1);
-      }
-   }
-   else {
-      if (channel >= dimNames1.n()) {
-         mlog << Error << "\n" << method_name 
-              << "Channel (" << channel << ") is out of bound (" << dimNames1.n()
-              << ") for " << var_name1 << " " << log_group_name1 << "\n\n";
-         clear();
-         exit(-1);
-      }
-      if (channel >= dimNames2.n()) {
-         mlog << Error << "\n" << method_name 
-              << "Channel (" << channel << ") is out of bound (" << dimNames2.n()
-              << ") for " << var_name2 << " " << log_group_name2 << "\n\n";
-         clear();
-         exit(-1);
-      }
-   }
-
-   vector<float> obs_val1(nlocs, bad_data_float);
-   vector<float> obs_val2(nlocs, bad_data_float);
-   get_dim_names(&obs_var1, dimNames1);
-   get_dim_names(&obs_var2, dimNames2);
-
-   if(!get_nc_data(&obs_var1, obs_val1.data(), nlocs)) {
-      mlog << Error << "\n" << method_name
-           << "trouble getting latitude\n\n";
-      exit(1);
-   }
-   if(!get_nc_data(&in_hdr_lon_var, lon_arr.data(), nlocs)) {
-      mlog << Error << "\n" << method_name
-           << "trouble getting longitude\n\n";
-      exit(1);
-   }
-
-
+iodaReader::~iodaReader() {
+   clear();
+   delete conf_info;
 }
-*/
+
 
 ////////////////////////////////////////////////////////////////////////
 
-bool iodaFile::check_missing_thresh(float value) const {
+bool iodaReader::check_missing_thresh(double value) const {
    bool check = false;
    for(int idx=0; idx<conf_info->missing_thresh.n(); idx++) {
       if(conf_info->missing_thresh[idx].check(value)) {
@@ -159,7 +73,7 @@ bool iodaFile::check_missing_thresh(float value) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-void iodaFile::clear() {
+void iodaReader::clear() {
    nrecs = 0;
    nlocs = 0;
    nvars = bad_data_int ;
@@ -191,7 +105,7 @@ void iodaFile::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-e_ioda_format iodaFile::find_ioda_format(NcFile *_f_in) {
+e_ioda_format iodaReader::find_ioda_format(NcFile *_f_in) {
    ioda_format = e_ioda_format::v2;
 
    if (! has_nc_group(_f_in, obs_group_name)) ioda_format = e_ioda_format::v1;
@@ -200,7 +114,7 @@ e_ioda_format iodaFile::find_ioda_format(NcFile *_f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString iodaFile::find_meta_name(const string &meta_key, const StringArray &available_names) {
+ConcatString iodaReader::find_meta_name(const string &meta_key, const StringArray &available_names) {
    ConcatString metadata_name;
 
    if (available_names.has(meta_key)) metadata_name = meta_key;
@@ -218,7 +132,7 @@ ConcatString iodaFile::find_meta_name(const string &meta_key, const StringArray 
 
 ////////////////////////////////////////////////////////////////////////
 
-bool iodaFile::get_meta_data_chars(NcVar &var, char *metadata_buf) const {
+bool iodaReader::get_meta_data_chars(NcVar &var, char *metadata_buf) const {
    bool status = false;
    static const char *method_name = "get_meta_data_chars() -> ";
 
@@ -235,9 +149,9 @@ bool iodaFile::get_meta_data_chars(NcVar &var, char *metadata_buf) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool iodaFile::get_meta_data_double(const char *metadata_key, double *metadata_buf) {
+bool iodaReader::get_meta_data_double(const char *metadata_key, double *metadata_buf) {
    bool status = false;
-   static const char *method_name = "iodaFile::get_meta_data_double() -> ";
+   static const char *method_name = "iodaReader::get_meta_data_double() -> ";
 
    ConcatString metadata_name = find_meta_name(metadata_key, metadata_vars);
    if(metadata_name.nonempty()) {
@@ -264,8 +178,8 @@ bool iodaFile::get_meta_data_double(const char *metadata_key, double *metadata_b
 
 ////////////////////////////////////////////////////////////////////////
 
-void iodaFile::get_obs_metadata_names_v1() {
-   static const char *method_name = "iodaFile::get_obs_metadata_names_v1() -> ";
+void iodaReader::get_obs_metadata_names_v1() {
+   static const char *method_name = "iodaReader::get_obs_metadata_names_v1() -> ";
    bool error_out = true;
 
    StringArray var_names;
@@ -302,7 +216,7 @@ void iodaFile::get_obs_metadata_names_v1() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void iodaFile::get_obs_metadata_names_v2() {
+void iodaReader::get_obs_metadata_names_v2() {
    StringArray group_names;
    group_names.add(metadata_group_name);
    get_var_names(f_in, &metadata_vars, group_names);
@@ -314,12 +228,12 @@ void iodaFile::get_obs_metadata_names_v2() {
 
 ////////////////////////////////////////////////////////////////////////
 
-vector<point_pair_t> &iodaFile::get_point_pairs(
+vector<point_pair_t> &iodaReader::get_point_pairs(
       const char *var_name_f, const char *var_name_o,
       const char *group_name_f, const char *group_name_o, const int channel) {
    ConcatString log_var_name_f = var_name_f;
    ConcatString log_var_name_o = var_name_o;
-   static const char *method_name = "iodaFile::get_point_pairs -> ";
+   static const char *method_name = "iodaReader::get_point_pairs -> ";
 
    vector<double> obs_val_f(nlocs, bad_data_float);
    vector<double> obs_val_o(nlocs, bad_data_float);
@@ -336,9 +250,6 @@ vector<point_pair_t> &iodaFile::get_point_pairs(
    point_pairs.clear();
    point_pairs.resize(nlocs);
    for (int i=0; i<nlocs; i++) {
-//      point_pairs.push_back(point_pair_t(msg_types[i], station_ids[i], lat_arr[i],
-//                                         lon_arr[i], vld_arr[i], obs_pres_arr[i],
-//                                         obs_hght_arr[i],obs_val_f[i], obs_val_o[i]));
       point_pairs.push_back(point_pair_t {msg_types[i], station_ids[i], lat_arr[i],
                                           lon_arr[i], vld_arr[i], obs_pres_arr[i],
       obs_hght_arr[i],obs_val_f[i], obs_val_o[i]} );
@@ -349,22 +260,17 @@ vector<point_pair_t> &iodaFile::get_point_pairs(
 
 ////////////////////////////////////////////////////////////////////////
 
-void iodaFile::initialize() {
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool iodaFile::is_in_metadata_map(const string &metadata_key,
+bool iodaReader::is_in_metadata_map(const string &metadata_key,
                                   const StringArray &available_list) const {
    bool found = available_list.has(metadata_key);
 
-   if (!found) {
-      StringArray alt_names = conf_info->metadata_map[metadata_key];
-      if (alt_names.n() > 0) {
-         for (int idx=0; idx<alt_names.n(); idx++) {
-            found = available_list.has(alt_names[idx]);
-            if (found) break;
-         }
+   if (found) return found;
+
+   StringArray alt_names = conf_info->metadata_map[metadata_key];
+   if (alt_names.n() > 0) {
+      for (int idx=0; idx<alt_names.n(); idx++) {
+         found = available_list.has(alt_names[idx]);
+         if (found) break;
       }
    }
    return found;
@@ -372,60 +278,9 @@ bool iodaFile::is_in_metadata_map(const string &metadata_key,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool iodaFile::read_data_to_vector(const char *var_name, vector<string> &hdr_data, int nstring) {
+void iodaReader::read_header() {
    bool status = false;
-   static const char *method_name = "iodaFile::read_data_to_vector() -> ";
-   static const char *method_name_s = "iodaFile::read_data_to_vector() ";
-
-   //   std::vector<char> station_ids;
-   //msg_types.resize(nlocs*(nstring+1), 0);
-   //station_ids.resize(nlocs*(nstring+1), 0);
-
-   char hdr_val[512];
-   hdr_data.clear();
-   NcVar hdr_var = get_var(f_in, var_name, metadata_group_name);
-cout << "?   metadata_group_name = " << metadata_group_name << ", var_name = " << var_name  << "\n";
-   if (IS_INVALID_NC(hdr_var)) return status;
-
-cout << "?   GET_NC_TYPE_ID(hdr_var) = " << GET_NC_TYPE_ID(hdr_var) << ", NC_STRING = " << NC_STRING << "\n";
-   if (NC_STRING == GET_NC_TYPE_ID(hdr_var)) {
-      vector<char *> hdr_data2(nlocs, nullptr);
-      for (int i=0; i<nlocs; i++ ) hdr_data2.push_back(new char[nstring+1]);
-      if ((status = get_nc_data(&hdr_var, hdr_data2.data()))) {
-cout << " if(XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n";
-         for (int i=0; i<nlocs; i++ ) {
-            m_strncpy(hdr_val, hdr_data2[i], nstring, method_name_s, "ioda_header");
-            m_rstrip(hdr_val, nstring);
-cout << "?   hdr_val = [" << hdr_val << "]\n";
-            hdr_data.push_back(hdr_val);
-            delete hdr_data2[i];
-         }
-         hdr_data2.clear();
-      }
-      else cout << " XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\n";
-   }
-   else {
-      vector<char> hdr_data2(nlocs*(nstring+1),0);
-      if ((status = get_meta_data_chars(hdr_var, hdr_data2.data()))) {
-         for (int i=0; i<nlocs; i++ ) {
-            m_strncpy(hdr_val, hdr_data2.data()+(i*nstring), nstring, method_name_s, "ioda_header");
-            m_rstrip(hdr_val, nstring);
-cout << "?   hdr_val = [" << hdr_val << "]\n";
-            hdr_data.push_back(hdr_val);
-         }
-      }
-   }
-
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void iodaFile::read_header() {
-   bool status = false;
-   bool error_out = true;
-   static const char *method_name = "iodaFile::read_header() -> ";
-   static const char *method_name_s = "iodaFile::read_header() ";
+   static const char *method_name = "iodaReader::read_header() -> ";
 
    if (!read_time()) {
       clear();
@@ -440,12 +295,14 @@ void iodaFile::read_header() {
    if(!get_nc_data(&in_hdr_lat_var, lat_arr.data(), nlocs)) {
       mlog << Error << "\n" << method_name
            << "trouble getting latitude\n\n";
-      exit(1);
+      clear();
+      exit(-1);
    }
    if(!get_nc_data(&in_hdr_lon_var, lon_arr.data(), nlocs)) {
       mlog << Error << "\n" << method_name
            << "trouble getting longitude\n\n";
-      exit(1);
+      clear();
+      exit(-1);
    }
    get_meta_data_double("elevation", elv_arr.data());
 
@@ -455,7 +312,10 @@ void iodaFile::read_header() {
    get_meta_data_double("height",   obs_hght_arr.data());
 
    if(msg_type_name.nonempty()) {
-      status = read_data_to_vector(msg_type_name.c_str(), msg_types, nstring);
+      if (!read_string_data(msg_type_name.c_str(), msg_types, nstring)) {
+         clear();
+         exit(-1);
+      }
    }
    else {
       mlog << Debug(1) << method_name
@@ -463,7 +323,10 @@ void iodaFile::read_header() {
    }
 
    if(station_id_name.nonempty()) {
-      status = read_data_to_vector(station_id_name.c_str(), station_ids, nstring);
+      if (!read_string_data(station_id_name.c_str(), station_ids, nstring)) {
+         clear();
+         exit(-1);
+      }
    }
    else {
       mlog << Debug(1) << method_name
@@ -474,11 +337,11 @@ void iodaFile::read_header() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool iodaFile::read_time() {
+bool iodaReader::read_time() {
    bool status = false;
    bool error_out = true;
-   static const char *method_name = "iodaFile::read_time() -> ";
-   static const char *method_name_s = "iodaFile::read_time() ";
+   static const char *method_name = "iodaReader::read_time() -> ";
+   static const char *method_name_s = "iodaReader::read_time() ";
 
    NcVar in_hdr_vld_var = get_var(f_in, datetime_name.c_str(), metadata_group_name);
    if (IS_INVALID_NC(in_hdr_vld_var)) {
@@ -567,8 +430,8 @@ bool iodaFile::read_time() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void iodaFile::read_ioda(netCDF::NcFile *_f_in) {
-   static const char *method_name = "iodaFile::read_ioda() -> ";
+void iodaReader::read_ioda(netCDF::NcFile *_f_in) {
+   static const char *method_name = "iodaReader::read_ioda() -> ";
    bool error_out = true;
 
    f_in = _f_in;
@@ -615,7 +478,7 @@ void iodaFile::read_ioda(netCDF::NcFile *_f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void iodaFile::read_metadata_names() {
+void iodaReader::read_metadata_names() {
    datetime_name = find_meta_name(conf_key_datetime, metadata_vars);
    lon_name = find_meta_name("longitude", metadata_vars);
    lat_name = find_meta_name("latitude", metadata_vars);
@@ -625,11 +488,11 @@ void iodaFile::read_metadata_names() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool iodaFile::read_obs_data(double *data_buf, const char *var_name,
+bool iodaReader::read_obs_data(double *data_buf, const char *var_name,
                              const char *group_name, const int channel) {
    bool status = false;
    ConcatString log_var_name = var_name;
-   static const char *method_name = "iodaFile::read_obs_data -> ";
+   static const char *method_name = "iodaReader::read_obs_data -> ";
 
    if (group_name) {
       log_var_name.add("(");
@@ -644,10 +507,10 @@ bool iodaFile::read_obs_data(double *data_buf, const char *var_name,
       return status;
    }
 
-   StringArray dim_names;
-   get_dim_names(&obs_var, &dim_names);
+   StringArray var_dim_names;
+   get_dim_names(&obs_var, &var_dim_names);
    if (is_eq(channel, bad_data_int)) {
-      if (1 < dim_names.n()) {
+      if (1 < var_dim_names.n()) {
          mlog << Error << "\n" << method_name 
               << "Channel is not given for " << log_var_name << "\n\n";
          return status;
@@ -655,13 +518,13 @@ bool iodaFile::read_obs_data(double *data_buf, const char *var_name,
       status = get_nc_data(&obs_var, data_buf, nlocs);
    }
    else {
-      if (channel >= dim_names.n()) {
+      if (channel >= var_dim_names.n()) {
          mlog << Error << "\n" << method_name 
-              << "Channel (" << channel << ") is out of bound (" << dim_names.n()
+              << "Channel (" << channel << ") is out of bound (" << var_dim_names.n()
               << ") for " << log_var_name << "\n\n";
          return status;
       }
-      if (1 == dim_names.n()) {
+      if (1 == var_dim_names.n()) {
          mlog << Debug(1) << method_name 
               << "Channel (" << channel << ") is configured to the variable "
               << log_var_name << " which does not have the chenell dimension\n";
@@ -670,7 +533,7 @@ bool iodaFile::read_obs_data(double *data_buf, const char *var_name,
       else {
          LongArray lengths;
          LongArray offsets;
-         if (nlocs_name == dim_names[0]) {
+         if (nlocs_name == var_dim_names[0]) {
             lengths.add(nlocs);
             lengths.add(1);
             offsets.add(0);
@@ -697,7 +560,55 @@ bool iodaFile::read_obs_data(double *data_buf, const char *var_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool has_postfix(const std::string &str_buf, std::string const &postfix) {
+bool iodaReader::read_string_data(const char *var_name, vector<string> &hdr_data, int str_length) {
+   bool status = false;
+   char hdr_val[512];
+   static const char *method_name_s = "iodaReader::read_string_data() ";
+
+   hdr_data.clear();
+   NcVar hdr_var = get_var(f_in, var_name, metadata_group_name);
+   if (IS_INVALID_NC(hdr_var)) return status;
+
+   if (NC_STRING == GET_NC_TYPE_ID(hdr_var)) {
+      vector<char *> hdr_data2(nlocs, nullptr);
+      for (int i=0; i<nlocs; i++ ) hdr_data2.push_back(new char[str_length+1]);
+      if ((status = get_nc_data(&hdr_var, hdr_data2.data()))) {
+         for (int i=0; i<nlocs; i++ ) {
+            m_strncpy(hdr_val, hdr_data2[i], str_length, method_name_s, "ioda_header");
+            m_rstrip(hdr_val, str_length);
+            hdr_data.push_back(hdr_val);
+         }
+         hdr_data2.clear();
+      }
+   }
+   else {
+      vector<char> hdr_data2(nlocs*(str_length+1),0);
+      if ((status = get_meta_data_chars(hdr_var, hdr_data2.data()))) {
+         for (int i=0; i<nlocs; i++ ) {
+            m_strncpy(hdr_val, hdr_data2.data()+(i*str_length), str_length, method_name_s, "ioda_header");
+            m_rstrip(hdr_val, str_length);
+            hdr_data.push_back(hdr_val);
+         }
+      }
+   }
+
+   return status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void iodaReader::set_data_config(const char *default_file_name,
+                                 const char *user_file_name) {
+   // Read the config files
+   conf_info->read_data_config(default_file_name, user_file_name);
+
+   // Process the configuration
+   conf_info->process_data_config();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static bool has_postfix(const std::string &str_buf, std::string const &postfix) {
    auto buf_len = str_buf.length();
    auto postfix_len = postfix.length();
    if(buf_len >= postfix_len) {
