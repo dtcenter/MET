@@ -71,6 +71,8 @@ static constexpr char program_name[] = "ioda2nc";
 // Variables for command line arguments
 //
 
+static iodaReader ioda_reader;
+
 // StringArray to store IODA file name
 static StringArray ioda_files;
 
@@ -124,7 +126,6 @@ static vector<Observation> observations;
 // Output NetCDF file, dimensions, and variables
 //
 static NcFile *f_out = (NcFile *) nullptr;
-static iodaFile ioda_file;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -298,6 +299,8 @@ static void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config();
 
+   ioda_reader.set_data_config(default_config_file.c_str(), config_file.c_str());
+
    // Check that valid_end_ut >= valid_beg_ut
    if(valid_beg_ut != (unixtime) 0 && valid_end_ut != (unixtime) 0
       && valid_beg_ut > valid_end_ut) {
@@ -312,7 +315,6 @@ static void process_command_line(int argc, char **argv) {
    if(do_summary) save_summary_only = !conf_info.getSummaryInfo().raw_data;
    else save_summary_only = false;
 
-   ioda_file.set_data_config(&conf_info);
    return;
 }
 
@@ -427,13 +429,13 @@ static void process_ioda_file(int i_pb) {
       exit(1);
    }
 
-   ioda_file.read_ioda(f_in);
+   ioda_reader.read_ioda(f_in);
 
-   e_ioda_format ioda_format_ver = ioda_file.get_format_ver();
-   bool has_msg_type = ioda_file.msg_type_name.nonempty();
-   bool has_station_id = ioda_file.station_id_name.nonempty();
+   e_ioda_format ioda_format_ver = ioda_reader.get_format_ver();
+   bool has_msg_type = ioda_reader.msg_type_name.nonempty();
+   bool has_station_id = ioda_reader.station_id_name.nonempty();
    bool is_netcdf_ready = check_core_data(has_msg_type, has_station_id,
-                                          ioda_file.dim_names, ioda_file.metadata_vars,
+                                          ioda_reader.dim_names, ioda_reader.metadata_vars,
                                           ioda_format_ver);
    if(!is_netcdf_ready) {
       mlog << Error << "\n" << method_name
@@ -453,8 +455,8 @@ static void process_ioda_file(int i_pb) {
    max_time_str[0] = 0;
    modified_hdr_typ[0] = 0;
 
-   int nlocs = ioda_file.nlocs;
-   int nstring = ioda_file.nstring;
+   int nlocs = ioda_reader.nlocs;
+   int nstring = ioda_reader.nstring;
 
    // Compute the number of IODA records in the current file.
 
@@ -471,7 +473,7 @@ static void process_ioda_file(int i_pb) {
    vector<float *> v_obs_data;
 
    StringArray raw_var_names;
-   if(do_all_vars || obs_var_names.n() == 0) raw_var_names = ioda_file.obs_value_vars;
+   if(do_all_vars || obs_var_names.n() == 0) raw_var_names = ioda_reader.obs_value_vars;
    else raw_var_names = obs_var_names;
 
    NcVar obs_var;
@@ -553,7 +555,7 @@ static void process_ioda_file(int i_pb) {
          }
       }
 
-      msg_ut = ioda_file.vld_arr[i_read];
+      msg_ut = ioda_reader.vld_arr[i_read];
 
       // Check to make sure that the message time hasn't changed
       // from one IODA message to the next
@@ -599,7 +601,7 @@ static void process_ioda_file(int i_pb) {
       }
 
       if(has_msg_type) {
-         m_strncpy(hdr_typ, ioda_file.msg_types[i_read].c_str(),
+         m_strncpy(hdr_typ, ioda_reader.msg_types[i_read].c_str(),
                    nstring, method_name_s, "hdr_typ");
 
          // If the message type is not listed in the configuration
@@ -625,7 +627,7 @@ static void process_ioda_file(int i_pb) {
 
       if(has_station_id) {
          char tmp_sid[nstring+1];
-         m_strncpy(tmp_sid, ioda_file.station_ids[i_read].c_str(),
+         m_strncpy(tmp_sid, ioda_reader.station_ids[i_read].c_str(),
                    nstring, method_name_s, "tmp_sid");
          m_replace_char(tmp_sid, ' ', '_');
          hdr_sid = tmp_sid;
@@ -644,13 +646,13 @@ static void process_ioda_file(int i_pb) {
       //    LON LAT DHR ELV TYP T29 ITP
 
       // Longitude
-      hdr_lon = ioda_file.lon_arr[i_read];
+      hdr_lon = ioda_reader.lon_arr[i_read];
 
       // Latitude
-      hdr_lat = ioda_file.lat_arr[i_read];
+      hdr_lat = ioda_reader.lat_arr[i_read];
 
       // Elevation
-      hdr_elv = ioda_file.elv_arr[i_read];
+      hdr_elv = ioda_reader.elv_arr[i_read];
 
       // Compute the valid time and check if it is within the
       // specified valid range
@@ -700,7 +702,7 @@ static void process_ioda_file(int i_pb) {
 
       // Check if the message elevation is within the specified range.
       // Missing data values for elevation are retained.
-      if(!ioda_file.check_missing_thresh(hdr_elv) &&
+      if(!ioda_reader.check_missing_thresh(hdr_elv) &&
          (hdr_elv < conf_info.beg_elev || hdr_elv > conf_info.end_elev) ) {
          rej_elv++;
          continue;
@@ -718,8 +720,8 @@ static void process_ioda_file(int i_pb) {
             continue;
          }
          obs_arr[1] = var_idx;
-         obs_arr[2] = ioda_file.obs_pres_arr[i_read];
-         obs_arr[3] = ioda_file.obs_hght_arr[i_read];
+         obs_arr[2] = ioda_reader.obs_pres_arr[i_read];
+         obs_arr[3] = ioda_reader.obs_hght_arr[i_read];
          obs_arr[4] = v_obs_data[idx][i_read];
          addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
                hdr_lat, hdr_lon, hdr_elv, (float)v_qc_data[idx][i_read]);
@@ -800,7 +802,7 @@ static void process_ioda_file(int i_pb) {
       }
    }
    
-   ioda_file.clear();
+   ioda_reader.clear();
 
    for(idx=0; idx<v_obs_data.size(); idx++ ) delete [] v_obs_data[idx];
    for(idx=0; idx<v_qc_data.size(); idx++ ) delete [] v_qc_data[idx];
@@ -885,7 +887,7 @@ static void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
 {
    // Write the quality flag to the netCDF file
    ConcatString obs_qty;
-   if(ioda_file.check_missing_thresh(quality_mark))
+   if(ioda_reader.check_missing_thresh(quality_mark))
       obs_qty.add("NA");
    else obs_qty.format("%d", nint(quality_mark));
 
@@ -986,7 +988,7 @@ static bool check_core_data(const bool has_msg_type, const bool has_station_id,
    StringArray &t_core_dims = (ioda_format_ver == e_ioda_format::v2)
                               ? core_dims : core_dims_v1;
    for(int idx=0; idx<t_core_dims.n(); idx++) {
-      if (!ioda_file.is_in_metadata_map(t_core_dims[idx], dim_names)) {
+      if (!ioda_reader.is_in_metadata_map(t_core_dims[idx], dim_names)) {
          mlog << Error << "\n" << method_name << "-> "
               << "core dimension \"" << t_core_dims[idx] << "\" is missing.\n\n";
          is_netcdf_ready = false;
@@ -994,7 +996,7 @@ static bool check_core_data(const bool has_msg_type, const bool has_station_id,
    }
 
    if ((ioda_format_ver == e_ioda_format::v1) && (has_msg_type || has_station_id)) {
-      if (!ioda_file.is_in_metadata_map("nstring", dim_names)) {
+      if (!ioda_reader.is_in_metadata_map("nstring", dim_names)) {
          mlog << Error << "\n" << method_name << "-> "
               << "core dimension \"nstring\" is missing.\n\n";
          is_netcdf_ready = false;
@@ -1002,7 +1004,7 @@ static bool check_core_data(const bool has_msg_type, const bool has_station_id,
    }
 
    for(int idx=0; idx<core_meta_vars.n(); idx++) {
-      if(!ioda_file.is_in_metadata_map(core_meta_vars[idx], metadata_vars)) {
+      if(!ioda_reader.is_in_metadata_map(core_meta_vars[idx], metadata_vars)) {
          mlog << Error << "\n" << method_name << "-> "
               << "core variable  \"" << core_meta_vars[idx] << "\" is missing.\n\n";
          is_netcdf_ready = false;
@@ -1040,7 +1042,7 @@ static bool get_obs_data_float(NcFile *f_in, const ConcatString &var_name,
       status = get_nc_data(obs_var, obs_buf, nlocs);
       if(status) {
          for(int idx=0; idx<nlocs; idx++)
-            if(ioda_file.check_missing_thresh(obs_buf[idx])) obs_buf[idx] = bad_data_float;
+            if(ioda_reader.check_missing_thresh(obs_buf[idx])) obs_buf[idx] = bad_data_float;
       }
       else mlog << Error << "\n" << method_name
                 << "trouble getting " << var_name << "\n\n";
@@ -1080,7 +1082,7 @@ static bool get_obs_data_float(NcFile *f_in, const ConcatString &var_name,
    }
    if(status) {
       for(int idx=0; idx<nlocs; idx++)
-         if(ioda_file.check_missing_thresh(qc_buf[idx])) qc_buf[idx] = bad_data_float;
+         if(ioda_reader.check_missing_thresh(qc_buf[idx])) qc_buf[idx] = bad_data_float;
    }
    else {
       for(int idx=0; idx<nlocs; idx++)
