@@ -34,7 +34,7 @@ struct ob_val_t {
 
 struct station_value_base_t {
 
-   void clear();
+   void clear_base();
 
    std::string typ;
    std::string sid;

@@ -39,7 +39,7 @@ static bool sort_obs(ob_val_t a, ob_val_t b) { return a.val<b.val; }
 //
 ////////////////////////////////////////////////////////////////////////
 
-void station_value_base_t::clear() {
+void station_value_base_t::clear_base() {
    typ.clear();
    sid.clear();
    lat = lon = bad_data_double;
@@ -54,7 +54,7 @@ void station_value_base_t::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void point_pair_t::clear() {
-   station_value_base_t::clear();
+   station_value_base_t::clear_base();
    fval = oval= bad_data_double;
 }
 
@@ -65,7 +65,7 @@ void point_pair_t::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void station_values_t::clear() {
-   station_value_base_t::clear();
+   station_value_base_t::clear_base();
    x = y = wgt = bad_data_double;
    fcmn = fcsd = ocmn = ocsd = bad_data_double;
    summary_val = bad_data_double;
