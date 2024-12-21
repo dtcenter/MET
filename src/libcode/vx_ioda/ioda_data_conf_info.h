@@ -24,15 +24,15 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-static const int string_data_len = 512;
+static constexpr  int string_data_len = 512;
 
-static const char *metadata_group_name = "MetaData";
-static const char *qc_group_name = "QCFlags";
-static const char *qc_postfix = "PreQC";
-static const char *obs_group_name = "ObsValue";
-static const char *derived_obs_group_name = "DerivedObsValue";
+static constexpr  char metadata_group_name[] = "MetaData";
+static constexpr  char qc_group_name[] = "QCFlags";
+static constexpr  char qc_postfix = "PreQC";
+static constexpr  char obs_group_name[] = "ObsValue";
+static constexpr  char derived_obs_group_name[] = "DerivedObsValue";
 
-static const char *DEF_DATA_CONFIG_NAME = "MET_BASE/config/IODADataConfig_default";
+static constexpr  char DEF_DATA_CONFIG_NAME[] = "MET_BASE/config/IODADataConfig_default";
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -61,8 +61,8 @@ class IODADataConfInfo {
 
       std::map<ConcatString,ConcatString> getObsVarMap() const { return obs_name_map; }
 
-      void read_config(const char *, const char *);
-      void process_config();
+      void read_data_config(const char *, const char *);
+      void process_data_config();
 };
 
 ////////////////////////////////////////////////////////////////////////

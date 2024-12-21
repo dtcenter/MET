@@ -65,8 +65,8 @@ void IODADataConfInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void IODADataConfInfo::read_config(const char *default_file_name,
-                                   const char *user_file_name) {
+void IODADataConfInfo::read_data_config(const char *default_file_name,
+                                        const char *user_file_name) {
 
    // Read the config file constants
    conf.read(replace_path(config_const_filename).c_str());
@@ -84,13 +84,13 @@ void IODADataConfInfo::read_config(const char *default_file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void IODADataConfInfo::process_config() {
+void IODADataConfInfo::process_data_config() {
    int i;
    ConcatString s;
    ConcatString mask_name;
    StringArray sa;
    Dictionary *dict = (Dictionary *) nullptr;
-   static const char *method_name = "IODADataConfInfo::process_config() -> ";
+   static const char *method_name = "IODADataConfInfo::process_data_config() -> ";
 
    // Initialize
    clear();
