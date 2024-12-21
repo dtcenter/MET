@@ -28,7 +28,7 @@ static constexpr  int string_data_len = 512;
 
 static constexpr  char metadata_group_name[] = "MetaData";
 static constexpr  char qc_group_name[] = "QCFlags";
-static constexpr  char qc_postfix = "PreQC";
+static constexpr  char qc_postfix[] = "PreQC";
 static constexpr  char obs_group_name[] = "ObsValue";
 static constexpr  char derived_obs_group_name[] = "DerivedObsValue";
 
