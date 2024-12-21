@@ -82,6 +82,8 @@ void IODA2NCConfInfo::read_config(const char *default_file_name,
    // Read the config file constants
    conf.read(replace_path(config_const_filename).c_str());
 
+   IODADataConfInfo::read_data_config(default_file_name, user_file_name);
+
    // Read the default config file
    conf.read(default_file_name);
 
@@ -109,7 +111,7 @@ void IODA2NCConfInfo::process_config() {
    // Done by the base class
    // Conf: missing_thresh
    // Conf: obs_name_map, metadata_map, obs_to_qc_map
-   IODADataConfInfo::process_config();
+   IODADataConfInfo::process_data_config();
 
    // Conf: version
    version = parse_conf_version(&conf);
