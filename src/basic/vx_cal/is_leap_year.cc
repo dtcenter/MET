@@ -166,7 +166,7 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
   double time_fraction = time_value - (double)time_value_ut;
   const char *method_name = "add_to_unixtime(double) -> ";
 
-  if (!check_time_units_and_offset(sec_per_unit, (double)time_value)) {
+  if (!check_time_units_and_offset(sec_per_unit, time_value)) {
     mlog << Error << "\n" << method_name
          << " the negative offset (" << time_value
          << ") is not supported for unit months and years\n\n";
