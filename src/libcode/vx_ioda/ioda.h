@@ -69,23 +69,20 @@ class iodaReader {
 
    private:
       netCDF::NcFile *f_in;
-      IODADataConfInfo *conf_info;
+      IODADataConfInfo conf_info;
 
       e_ioda_format ioda_format;
       std::vector<point_pair_t> point_pairs;
 
    public:
-      iodaReader();
-     ~iodaReader();
-
       bool check_missing_thresh(double value) const;
       void clear();
       e_ioda_format get_format_ver() const;
-      std::vector<point_pair_t> &get_point_pairs(const char *var_name_f, const char *var_name_o,
+      std::vector<point_pair_t> *get_point_pairs(const char *var_name_f, const char *var_name_o,
                                                  const char *group_name_f=nullptr,
                                                  const char *group_name_o=nullptr,
                                                  const int channel=bad_data_int);
-      bool is_in_metadata_map(const std::string &metadata_key, const StringArray &available_list) const;
+      bool is_in_metadata_map(const std::string &metadata_key, const StringArray &available_list);
       void read_ioda(netCDF::NcFile *f_in);
       void set_data_config(const char *, const char *);
 
@@ -103,6 +100,7 @@ class iodaReader {
       bool read_string_data(const char *var_name,
                             std::vector<std::string> &hdr_data, int str_length);
       bool read_time();
+      bool read_time_as_number(netCDF::NcVar *hdr_vld_var);
 
 };
 
