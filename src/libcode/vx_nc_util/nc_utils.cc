@@ -1315,6 +1315,14 @@ bool get_nc_data(NcVar *var, time_t *data) {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool get_nc_data(NcVar *var, unixtime *data) {
+   bool return_status = get_nc_data_(var, data, (unixtime)bad_data_int);
+
+   return return_status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool get_nc_data(NcVar *var, int *data) {
    bool return_status = get_nc_data_(var, data, bad_data_int);
    return return_status;
