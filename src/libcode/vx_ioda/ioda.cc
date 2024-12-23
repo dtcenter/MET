@@ -40,30 +40,10 @@ static bool has_postfix(const std::string &, std::string const &);
 
 ////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////
-
-
-iodaReader::iodaReader() {
-   clear();
-   conf_info = new IODADataConfInfo();
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-iodaReader::~iodaReader() {
-   clear();
-   delete conf_info;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
 bool iodaReader::check_missing_thresh(double value) const {
    bool check = false;
-   for(int idx=0; idx<conf_info->missing_thresh.n(); idx++) {
-      if(conf_info->missing_thresh[idx].check(value)) {
+   for(int idx=0; idx<conf_info.missing_thresh.n(); idx++) {
+      if(conf_info.missing_thresh[idx].check(value)) {
           check = true;
           break;
       }
@@ -114,17 +94,26 @@ e_ioda_format iodaReader::find_ioda_format(NcFile *_f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString iodaReader::find_meta_name(const string &meta_key, const StringArray &available_names) {
+ConcatString iodaReader::find_meta_name(const string &meta_key,
+                                        const StringArray &available_names) {
    ConcatString metadata_name;
+   static const char *method_name = "iodaReader::find_meta_name() -> ";
 
    if (available_names.has(meta_key)) metadata_name = meta_key;
    else {
-      StringArray alt_names = conf_info->metadata_map[meta_key];
+      StringArray alt_names = conf_info.metadata_map[meta_key];
+      mlog << Debug(9) << method_name
+           << "looking for " << meta_key << " from " << alt_names.n()<< " names\n";
       for (int idx =0; idx<alt_names.n(); idx++) {
          if (available_names.has(alt_names[idx])) {
             metadata_name = alt_names[idx];
             break;
          }
+      }
+      if(metadata_name.empty()) {
+         mlog << Debug(3) << method_name
+              << "The metadata name of " << meta_key << " does not exist (has "
+              << alt_names.n() <<" names)\n";
       }
    }
    return metadata_name;
@@ -134,11 +123,11 @@ ConcatString iodaReader::find_meta_name(const string &meta_key, const StringArra
 
 bool iodaReader::get_meta_data_chars(NcVar &var, char *metadata_buf) const {
    bool status = false;
-   static const char *method_name = "get_meta_data_chars() -> ";
 
    if(IS_VALID_NC(var)) {
       status = get_nc_data(&var, metadata_buf);
       if(!status) {
+         static const char *method_name = "get_meta_data_chars() -> ";
          mlog << Error << "\n" << method_name << " -> "
               << "trouble getting " << GET_NC_NAME(var) << "\n\n";
          exit(1);
@@ -151,27 +140,25 @@ bool iodaReader::get_meta_data_chars(NcVar &var, char *metadata_buf) const {
 
 bool iodaReader::get_meta_data_double(const char *metadata_key, double *metadata_buf) {
    bool status = false;
-   static const char *method_name = "iodaReader::get_meta_data_double() -> ";
 
    ConcatString metadata_name = find_meta_name(metadata_key, metadata_vars);
    if(metadata_name.nonempty()) {
       NcVar meta_var = get_var(f_in, metadata_name.c_str(), metadata_group_name);
       if(IS_VALID_NC(meta_var)) {
+         static const char *method_name = "iodaReader::get_meta_data_double() -> ";
          status = get_nc_data(&meta_var, metadata_buf, nlocs);
          if (!status) mlog << Debug(3) << method_name
                            << "trouble getting " << metadata_name << "\n";
       }
    }
-   else mlog << Debug(4) << method_name
-             << "Metadata for " << metadata_key << " does not exist!\n";
    if(status) {
       for(int idx=0; idx<nlocs; idx++) {
-         if(check_missing_thresh(metadata_buf[idx])) metadata_buf[idx] = bad_data_float;
+         if(check_missing_thresh(metadata_buf[idx])) metadata_buf[idx] = bad_data_double;
       }
    }
    else {
       for(int idx=0; idx<nlocs; idx++)
-         metadata_buf[idx] = bad_data_float;
+         metadata_buf[idx] = bad_data_double;
    }
    return status;
 }
@@ -201,11 +188,11 @@ void iodaReader::get_obs_metadata_names_v1() {
    ConcatString nvars_ = find_meta_name("nvars", dim_names);
    if(has_dim(f_in, nvars_.c_str())) {
       nvars = get_dim_value(f_in, nvars_.c_str(), error_out); // number of variables
-      ConcatString nstring_ = find_meta_name("nstring", dim_names);
-      if(dim_names.has(nstring_)) nstring = get_dim_value(f_in, nstring_.c_str(), error_out);
+      ConcatString tmp_nstring = find_meta_name("nstring", dim_names);
+      if(dim_names.has(tmp_nstring)) nstring = get_dim_value(f_in, tmp_nstring.c_str(), error_out);
 
-      ConcatString nrecs_ = find_meta_name("nrecs", dim_names);
-      if(dim_names.has(nrecs_)) nrecs = get_dim_value(f_in, nrecs_.c_str(), false);
+      ConcatString tmp_nrecs = find_meta_name("nrecs", dim_names);
+      if(dim_names.has(tmp_nrecs)) nrecs = get_dim_value(f_in, tmp_nrecs.c_str(), false);
       else {
          nrecs = nvars * nlocs;
          mlog << Debug(3) << "\n" << method_name
@@ -228,15 +215,14 @@ void iodaReader::get_obs_metadata_names_v2() {
 
 ////////////////////////////////////////////////////////////////////////
 
-vector<point_pair_t> &iodaReader::get_point_pairs(
+vector<point_pair_t> *iodaReader::get_point_pairs(
       const char *var_name_f, const char *var_name_o,
       const char *group_name_f, const char *group_name_o, const int channel) {
    ConcatString log_var_name_f = var_name_f;
    ConcatString log_var_name_o = var_name_o;
+   vector<double> obs_val_f(nlocs, bad_data_double);
+   vector<double> obs_val_o(nlocs, bad_data_double);
    static const char *method_name = "iodaReader::get_point_pairs -> ";
-
-   vector<double> obs_val_f(nlocs, bad_data_float);
-   vector<double> obs_val_o(nlocs, bad_data_float);
 
    if (!read_obs_data(obs_val_f.data(), var_name_f, group_name_f, channel)) {
       clear();
@@ -250,23 +236,29 @@ vector<point_pair_t> &iodaReader::get_point_pairs(
    point_pairs.clear();
    point_pairs.resize(nlocs);
    for (int i=0; i<nlocs; i++) {
-      point_pairs.push_back(point_pair_t {msg_types[i], station_ids[i], lat_arr[i],
-                                          lon_arr[i], vld_arr[i], obs_pres_arr[i],
-      obs_hght_arr[i],obs_val_f[i], obs_val_o[i]} );
+      point_pairs[i].typ = string(msg_types[i]);
+      point_pairs[i].sid = station_ids[i];
+      point_pairs[i].lat = lat_arr[i];
+      point_pairs[i].lon = lon_arr[i];
+      point_pairs[i].ut = vld_arr[i];
+      point_pairs[i].lvl = obs_pres_arr[i];
+      point_pairs[i].elv = obs_hght_arr[i];
+      point_pairs[i].fval = obs_val_f[i];
+      point_pairs[i].oval = obs_val_o[i];
    }
 
-   return point_pairs;
+   return &point_pairs;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool iodaReader::is_in_metadata_map(const string &metadata_key,
-                                  const StringArray &available_list) const {
+                                    const StringArray &available_list) {
    bool found = available_list.has(metadata_key);
 
    if (found) return found;
 
-   StringArray alt_names = conf_info->metadata_map[metadata_key];
+   StringArray alt_names = conf_info.metadata_map[metadata_key];
    if (alt_names.n() > 0) {
       for (int idx=0; idx<alt_names.n(); idx++) {
          found = available_list.has(alt_names[idx]);
@@ -279,7 +271,6 @@ bool iodaReader::is_in_metadata_map(const string &metadata_key,
 ////////////////////////////////////////////////////////////////////////
 
 void iodaReader::read_header() {
-   bool status = false;
    static const char *method_name = "iodaReader::read_header() -> ";
 
    if (!read_time()) {
@@ -311,6 +302,7 @@ void iodaReader::read_header() {
    get_meta_data_double("pressure", obs_pres_arr.data());
    get_meta_data_double("height",   obs_hght_arr.data());
 
+   msg_types.resize(nlocs, "");
    if(msg_type_name.nonempty()) {
       if (!read_string_data(msg_type_name.c_str(), msg_types, nstring)) {
          clear();
@@ -322,6 +314,7 @@ void iodaReader::read_header() {
            << "The metadata variable for message type does not exist!\n";
    }
 
+   station_ids.resize(nlocs, "");
    if(station_id_name.nonempty()) {
       if (!read_string_data(station_id_name.c_str(), station_ids, nstring)) {
          clear();
@@ -351,46 +344,8 @@ bool iodaReader::read_time() {
       exit(-1);
    }
 
-   bool is_time_offset = false;
-   bool is_time_string = false;
-   if (NC_STRING == GET_NC_TYPE_ID(in_hdr_vld_var)) {
-      is_time_string = true;
-   }
-   else if (NC_CHAR == GET_NC_TYPE_ID(in_hdr_vld_var)) {
-      if(dim_names.has("ndatetime")) ndatetime = get_dim_value(f_in, "ndatetime", error_out);
-      else {
-         NcDim datetime_dim = get_nc_dim(&in_hdr_vld_var, 1);
-         ndatetime = IS_VALID_NC(datetime_dim) ? get_dim_size(&datetime_dim) : nstring;
-         mlog << Debug(3) << "\n" << method_name
-              << "ndatetime dimension does not exist!\n";
-      }
-      mlog << Debug(5) << method_name << "dimensions: nvars=" << nvars << ", nlocs=" << nlocs
-           << ", nrecs=" << nrecs << ", nstring=" << nstring << ", ndatetime=" << ndatetime << "\n";
-   }
-   else is_time_offset = true;
-
    vld_arr.resize(nlocs);
-   if (is_time_offset) {
-      unixtime base_ut;
-      int sec_per_unit;
-      ConcatString units;
-      vector<float> hdr_ut_arr(nlocs);
-      bool no_leap_year = get_att_no_leap_year(&in_hdr_vld_var);
-      status = get_nc_data(&in_hdr_vld_var, hdr_ut_arr.data());
-      if (get_var_units(&in_hdr_vld_var, units) && units.nonempty()) {
-         parse_cf_time_string(units.c_str(), base_ut, sec_per_unit);
-      }
-      else {
-         mlog << Error << "\n" << method_name << "Fail to get time units from "
-              << GET_NC_NAME(in_hdr_vld_var) << "\n\n";
-         return status;
-      }
-      for (int i=0; i< nlocs; i++) {
-         vld_arr[i] = add_to_unixtime(base_ut, sec_per_unit,
-                                       hdr_ut_arr[i], no_leap_year);
-      }
-   }
-   else if (is_time_string) {
+   if (NC_STRING == GET_NC_TYPE_ID(in_hdr_vld_var)) {
       char valid_time[ndatetime+1];
       vector<char> hdr_vld_block(nlocs*(ndatetime+1), 0);
       vector<char *> hdr_vld_block2(nlocs, nullptr);
@@ -408,7 +363,17 @@ bool iodaReader::read_time() {
       hdr_vld_block.clear();
       hdr_vld_block2.clear();
    }
-   else {
+   else if (NC_CHAR == GET_NC_TYPE_ID(in_hdr_vld_var)) {
+      if(dim_names.has("ndatetime")) ndatetime = get_dim_value(f_in, "ndatetime", error_out);
+      else {
+         NcDim datetime_dim = get_nc_dim(&in_hdr_vld_var, 1);
+         ndatetime = IS_VALID_NC(datetime_dim) ? get_dim_size(&datetime_dim) : nstring;
+         mlog << Debug(3) << "\n" << method_name
+              << "ndatetime dimension does not exist!\n";
+      }
+      mlog << Debug(5) << method_name << "dimensions: nvars=" << nvars << ", nlocs=" << nlocs
+           << ", nrecs=" << nrecs << ", nstring=" << nstring << ", ndatetime=" << ndatetime << "\n";
+
       char valid_time[ndatetime+1];
       vector<char> hdr_vld_block(nlocs*(ndatetime+1), 0);
       status = get_nc_data(&in_hdr_vld_var, hdr_vld_block.data());
@@ -420,11 +385,58 @@ bool iodaReader::read_time() {
          vld_arr[i] = yyyymmddThhmmss_to_unix(valid_time);
       }
    }
+   else status = read_time_as_number(&in_hdr_vld_var);
+
    if(!status) {
       mlog << Error << "\n" << method_name
            << "trouble getting datetime\n\n";
    }
 
+   return status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool iodaReader::read_time_as_number(NcVar *hdr_vld_var) {
+   bool status = false;
+   static const char *method_name = "iodaReader::read_time_as_number() -> ";
+   static const char *method_name_s = "iodaReader::read_time_as_number() ";
+
+   unixtime base_ut;
+   int sec_per_unit;
+   ConcatString units;
+   bool no_leap_year = get_att_no_leap_year(hdr_vld_var);
+   if (!get_var_units(hdr_vld_var, units)) {
+      mlog << Error << "\n" << method_name << "Missing time units at "
+           << GET_NC_NAME_P(hdr_vld_var) << "\n\n";
+      return false;
+   }
+   else if (units.nonempty()) parse_cf_time_string(units.c_str(), base_ut, sec_per_unit);
+   else {
+      mlog << Error << "\n" << method_name << "Empty time units at "
+           << GET_NC_NAME_P(hdr_vld_var) << "\n\n";
+      return false;
+   }
+   if (NC_INT64 == GET_NC_TYPE_ID_P(hdr_vld_var)) {
+      vector<unixtime> hdr_ut_arr(nlocs);
+      status = get_nc_data(hdr_vld_var, hdr_ut_arr.data());
+      if (status) {
+         for (int i=0; i<nlocs; i++) {
+            vld_arr[i] = add_to_unixtime(base_ut, sec_per_unit,
+                                         hdr_ut_arr[i], no_leap_year);
+         }
+      }
+   }
+   else {
+      vector<double> hdr_ut_arr(nlocs);
+      status = get_nc_data(hdr_vld_var, hdr_ut_arr.data());
+      if (status) {
+         for (int i=0; i< nlocs; i++) {
+            vld_arr[i] = add_to_unixtime(base_ut, sec_per_unit,
+                                         hdr_ut_arr[i], no_leap_year);
+         }
+      }
+   }
    return status;
 }
 
@@ -479,6 +491,7 @@ void iodaReader::read_ioda(netCDF::NcFile *_f_in) {
 ////////////////////////////////////////////////////////////////////////
 
 void iodaReader::read_metadata_names() {
+   static const char *method_name = "iodaReader::read_metadata_names -> ";
    datetime_name = find_meta_name(conf_key_datetime, metadata_vars);
    lon_name = find_meta_name("longitude", metadata_vars);
    lat_name = find_meta_name("latitude", metadata_vars);
@@ -563,12 +576,13 @@ bool iodaReader::read_obs_data(double *data_buf, const char *var_name,
 bool iodaReader::read_string_data(const char *var_name, vector<string> &hdr_data, int str_length) {
    bool status = false;
    char hdr_val[512];
+   static const char *method_name = "iodaReader::read_string_data -> ";
    static const char *method_name_s = "iodaReader::read_string_data() ";
 
    hdr_data.clear();
    NcVar hdr_var = get_var(f_in, var_name, metadata_group_name);
    if (IS_INVALID_NC(hdr_var)) return status;
-
+   hdr_data.resize(nlocs, "");
    if (NC_STRING == GET_NC_TYPE_ID(hdr_var)) {
       vector<char *> hdr_data2(nlocs, nullptr);
       for (int i=0; i<nlocs; i++ ) hdr_data2.push_back(new char[str_length+1]);
@@ -576,7 +590,9 @@ bool iodaReader::read_string_data(const char *var_name, vector<string> &hdr_data
          for (int i=0; i<nlocs; i++ ) {
             m_strncpy(hdr_val, hdr_data2[i], str_length, method_name_s, "ioda_header");
             m_rstrip(hdr_val, str_length);
-            hdr_data.push_back(hdr_val);
+            hdr_data[i] = hdr_val;
+            mlog << Debug(9) << method_name
+                 << var_name << "[" << i<< "]: " << hdr_data[i] << " from " << hdr_val << "\n";
          }
          hdr_data2.clear();
       }
@@ -587,7 +603,9 @@ bool iodaReader::read_string_data(const char *var_name, vector<string> &hdr_data
          for (int i=0; i<nlocs; i++ ) {
             m_strncpy(hdr_val, hdr_data2.data()+(i*str_length), str_length, method_name_s, "ioda_header");
             m_rstrip(hdr_val, str_length);
-            hdr_data.push_back(hdr_val);
+            hdr_data[i] = hdr_val;
+            mlog << Debug(9) << method_name
+                 << var_name << "[" << i<< "]: " << hdr_data[i] << " from " << hdr_val << "\n";
          }
       }
    }
@@ -600,10 +618,10 @@ bool iodaReader::read_string_data(const char *var_name, vector<string> &hdr_data
 void iodaReader::set_data_config(const char *default_file_name,
                                  const char *user_file_name) {
    // Read the config files
-   conf_info->read_data_config(default_file_name, user_file_name);
+   conf_info.read_data_config(default_file_name, user_file_name);
 
    // Process the configuration
-   conf_info->process_data_config();
+   conf_info.process_data_config();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -617,7 +635,6 @@ static bool has_postfix(const std::string &str_buf, std::string const &postfix) 
       return false;
    }
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
