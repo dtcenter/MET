@@ -18,9 +18,6 @@
 
 #include "ioda_data_conf_info.h"
 
-//#include "vx_data2d_factory.h"
-//#include "apply_mask.h"
-//#include "grib_strings.h"
 #include "vx_log.h"
 
 using namespace std;
@@ -85,11 +82,6 @@ void IODADataConfInfo::read_data_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void IODADataConfInfo::process_data_config() {
-   int i;
-   ConcatString s;
-   ConcatString mask_name;
-   StringArray sa;
-   Dictionary *dict = (Dictionary *) nullptr;
    static const char *method_name = "IODADataConfInfo::process_data_config() -> ";
 
    // Initialize
@@ -103,6 +95,10 @@ void IODADataConfInfo::process_data_config() {
    metadata_map = parse_conf_metadata_map(&conf);
    obs_to_qc_map = parse_conf_obs_to_qc_map(&conf);
 
+   mlog << Debug(5) << method_name
+        << "obs_name_map: " << obs_name_map.size()
+        << ", metadata_map: " << metadata_map.size()
+        << ", obs_to_qc_map: " << obs_to_qc_map.size() << "\n";
    return;
 }
 
