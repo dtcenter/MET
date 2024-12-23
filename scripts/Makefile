@@ -33,8 +33,7 @@ export TEST_OUT_DIR
    ##    were built
    ##
 
-
-TESTS := $(shell grep "define ENABLE_" ../config.h | grep -v "ENABLE_PYTHON" | grep -v "ENABLE_UGRID" | cut -d" " -f2 | cut -b8- | tr A-Z a-z)
+TESTS := $(shell grep "define ENABLE_" ../config.h | grep -v "ENABLE_PAIR_STAT" | grep -v "ENABLE_PYTHON" | grep -v "ENABLE_UGRID" | cut -d" " -f2 | cut -b8- | tr A-Z a-z)
 
 
 ########################################################################

@@ -1,0 +1,227 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Pair-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+// Non-empty string overrides input data values
+//
+model = "";
+
+//
+// Output description to be written
+// Non-empty string overrides input data values
+// May be set separately in each "obs.pairs" entry
+//
+desc = "";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Forecast and observation pairs to be verified
+//
+fcst = {
+  pairs = [
+    {
+      name  = "TMP";
+      level = [ "Z2" ];
+    }
+  ];
+}
+
+obs = {
+  pairs = [
+    {
+      name = "TMP";
+      level = [ "Z2" ];
+    }
+  ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Forecast and observation data censoring, thresholding, and filtering options
+// May be set separately in each "fcst.pairs" or "obs.pairs" entry
+//
+censor_thresh = [];
+censor_val    = [];
+cat_thresh    = [ NA ];
+cnt_thresh    = [ NA ];
+cnt_logic     = UNION;
+wind_thresh   = [ NA ];
+wind_logic    = UNION;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Matched pairs filtering and control options
+// May be set separately in each "obs.pairs" entry
+//
+mpr_column     = [];
+mpr_thresh     = [];
+mpr_str_inc    = [];   // TODO: new for string inclusion
+mpr_str_exc    = [];   // TODO: new for string exclusion
+mpr_summary    = NONE; // TODO: new for multiple pairs in the time window
+eclv_points    = 0.05;
+hss_ec_value   = NA;
+rank_corr_flag = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Climatology mean data
+// May be set separately in the "fcst" and "obs" dictionaries
+//
+climo_mean = {
+
+   file_name = [];
+   field     = [];
+
+   time_interp_method = DW_MEAN;
+   day_interval       = 31;
+   hour_interval      = 6;
+}
+
+//
+// Climatology standard deviation data
+// May be set separately in the "fcst" and "obs" dictionaries
+//
+climo_stdev = climo_mean;
+climo_stdev = {
+   file_name = [];
+}
+
+//
+// Climatology distribution settings
+// May be set separately in each "obs.pairs" entry
+//
+climo_cdf = {
+   cdf_bins    = 1;
+   center_bins = FALSE;
+   write_bins  = TRUE;
+   direct_prob = FALSE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Land/Sea mask
+// For LANDSF message types, only use forecast grid points where land = TRUE.
+// For WATERSF message types, only use forecast grid points where land = FALSE.
+// land_mask.flag may be set separately in each "obs.pairs" entry.
+//
+land_mask = {
+   flag      = FALSE;
+   file_name = [];
+   field     = { name = "LAND"; level = "L0"; }
+   regrid    = { method = NEAREST; width = 1; }
+   thresh    = eq1;
+}
+
+//
+// Topography
+// For SURFACE message types, only use observations where the topo - station
+// elevation difference meets the use_obs_thresh threshold.
+// For the observations kept, when interpolating forecast data to the
+// observation location, only use forecast grid points where the topo - station
+// difference meets the interp_fcst_thresh threshold.
+// topo_mask.flag may be set separately in each "obs.pairs" entry.
+//
+topo_mask = {
+   flag               = FALSE;
+   file_name          = [];
+   field              = { name = "TOPO"; level = "L0"; }
+   regrid             = { method = BILIN; width = 2; }
+   use_obs_thresh     = ge-100&&le100;
+   interp_fcst_thresh = ge-50&&le50;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation time window
+// May be set separately in each "obs.pairs" entry
+//
+obs_window = {
+   beg = -5400;
+   end =  5400;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+// May be set separately in each "obs.pairs" entry
+//
+mask = {
+   grid  = [ "FULL" ];
+   poly  = [];
+   sid   = [];
+   llpnt = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+// May be set separately in each "obs.pairs" entry
+//
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 0;
+   rng      = "mt19937";
+   seed     = "";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Threshold for SEEPS p1 (Probability of being dry)
+//
+seeps_p1_thresh = >=0.1&&<=0.85;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+// May be set separately in each "obs.pairs" entry
+//
+output_flag = {
+   fho    = NONE;
+   ctc    = NONE;
+   cts    = NONE;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = NONE;
+   sl1l2  = NONE;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
+   vcnt   = NONE;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
+   eclv   = NONE;
+   mpr    = NONE;
+   seeps  = NONE;
+   seeps_mpr = NONE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+point_weight_flag = NONE;
+
+tmp_dir       = "/tmp";
+output_prefix = "";
+version       = "V12.0.0";
+
+////////////////////////////////////////////////////////////////////////////////
