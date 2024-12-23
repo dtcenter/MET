@@ -44,6 +44,7 @@ ioda2nc_LDADD = -lvx_stat_out \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \
+	-lvx_statistics \
 	$(GRIB2_DEP_LIBS) $(UGRID_DEP_LIBS) $(PYTHON_DEP_LIBS) \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas $(BLIB_NAME) \
 	$(FLIBS)
