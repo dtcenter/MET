@@ -295,11 +295,10 @@ static void process_command_line(int argc, char **argv) {
    else mlog << Debug(1)
              << "Default Config File: " << default_config_file << "\n";
    conf_info.read_config(default_config_file.c_str(), config_file.c_str());
+   ioda_reader.set_data_config(default_config_file.c_str(), config_file.c_str());
 
    // Process the configuration
    conf_info.process_config();
-
-   ioda_reader.set_data_config(default_config_file.c_str(), config_file.c_str());
 
    // Check that valid_end_ut >= valid_beg_ut
    if(valid_beg_ut != (unixtime) 0 && valid_end_ut != (unixtime) 0
@@ -1082,7 +1081,7 @@ static bool get_obs_data_float(NcFile *f_in, const ConcatString &var_name,
    }
    if(status) {
       for(int idx=0; idx<nlocs; idx++)
-         if(ioda_reader.check_missing_thresh(qc_buf[idx])) qc_buf[idx] = bad_data_float;
+         if(ioda_reader.check_missing_thresh(qc_buf[idx])) qc_buf[idx] = bad_data_int;
    }
    else {
       for(int idx=0; idx<nlocs; idx++)
