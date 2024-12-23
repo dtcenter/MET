@@ -222,7 +222,6 @@ vector<point_pair_t> *iodaReader::get_point_pairs(
    ConcatString log_var_name_o = var_name_o;
    vector<double> obs_val_f(nlocs, bad_data_double);
    vector<double> obs_val_o(nlocs, bad_data_double);
-   static const char *method_name = "iodaReader::get_point_pairs -> ";
 
    if (!read_obs_data(obs_val_f.data(), var_name_f, group_name_f, channel)) {
       clear();
@@ -400,7 +399,6 @@ bool iodaReader::read_time() {
 bool iodaReader::read_time_as_number(NcVar *hdr_vld_var) {
    bool status = false;
    static const char *method_name = "iodaReader::read_time_as_number() -> ";
-   static const char *method_name_s = "iodaReader::read_time_as_number() ";
 
    unixtime base_ut;
    int sec_per_unit;
@@ -491,7 +489,6 @@ void iodaReader::read_ioda(netCDF::NcFile *_f_in) {
 ////////////////////////////////////////////////////////////////////////
 
 void iodaReader::read_metadata_names() {
-   static const char *method_name = "iodaReader::read_metadata_names -> ";
    datetime_name = find_meta_name(conf_key_datetime, metadata_vars);
    lon_name = find_meta_name("longitude", metadata_vars);
    lat_name = find_meta_name("latitude", metadata_vars);
@@ -502,7 +499,7 @@ void iodaReader::read_metadata_names() {
 ////////////////////////////////////////////////////////////////////////
 
 bool iodaReader::read_obs_data(double *data_buf, const char *var_name,
-                             const char *group_name, const int channel) {
+                               const char *group_name, const int channel) {
    bool status = false;
    ConcatString log_var_name = var_name;
    static const char *method_name = "iodaReader::read_obs_data -> ";
