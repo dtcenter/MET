@@ -32,20 +32,34 @@ struct ob_val_t {
    std::string qc;
 };
 
-struct station_values_t {
+struct station_value_base_t {
 
-   void clear();
+   void clear_base();
 
    std::string typ;
    std::string sid;
    double lat;
    double lon;
-   double x;
-   double y;
-   double wgt;
    unixtime ut;
    double lvl;
    double elv;
+};
+
+struct point_pair_t : station_value_base_t {
+
+   void clear();
+
+   double fval;
+   double oval;
+};
+
+struct station_values_t : station_value_base_t {
+
+   void clear();
+
+   double x;
+   double y;
+   double wgt;
    double fcmn;
    double fcsd;
    double ocmn;

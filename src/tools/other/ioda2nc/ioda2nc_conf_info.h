@@ -21,10 +21,11 @@
 #include "vx_util.h"
 #include "vx_cal.h"
 #include "vx_math.h"
+#include "ioda_data_conf_info.h"
 
 ////////////////////////////////////////////////////////////////////////
 
-class IODA2NCConfInfo {
+class IODA2NCConfInfo : public IODADataConfInfo {
 
    private:
 
@@ -33,7 +34,6 @@ class IODA2NCConfInfo {
    public:
 
       // IODA2NC configuration object
-      MetConfig conf;
 
       // Store data parsed from the IODA2NC configuration object
       StringArray  message_type;        // Obseration message type
@@ -49,15 +49,11 @@ class IODA2NCConfInfo {
       double       end_elev;
       double       beg_level;           // Range of level values to be retained
       double       end_level;
-      StringArray  obs_var;             // IODA variiable names
+      StringArray  obs_var;             // IODA variable names
       int          quality_mark_thresh; // Quality marks to be retained
-      ThreshArray  missing_thresh;      // Fill value thresh array
       ConcatString version;             // Config file version
 
-      std::map<ConcatString,ConcatString> obs_name_map;
       std::map<ConcatString,ConcatString> message_type_map;
-      std::map<ConcatString,StringArray>  metadata_map;
-      std::map<ConcatString,StringArray>  obs_to_qc_map;
       StringArray                    surface_message_types;
       TimeSummaryInfo                timeSummaryInfo;
 
@@ -66,7 +62,6 @@ class IODA2NCConfInfo {
 
       void clear();
 
-      std::map<ConcatString,ConcatString> getObsVarMap() const { return obs_name_map; }
       std::map<ConcatString,ConcatString> getMessageTypeMap() const { return message_type_map; }
       TimeSummaryInfo getSummaryInfo() const { return timeSummaryInfo; };
 
