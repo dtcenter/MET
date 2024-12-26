@@ -142,7 +142,7 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
    version = parse_conf_version(&conf);
 
    // Conf: model
-   model = parse_conf_string(&conf, conf_key_model);
+   model = parse_conf_string(&conf, conf_key_model, false);
 
    // Conf: point_weight_flag
    point_weight_flag = parse_conf_point_weight_flag(&conf);
@@ -156,9 +156,9 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
    // Conf: message_type_group_map
    msg_typ_group_map = parse_conf_message_type_group_map(&conf);
 
-   // Conf: fcst.field and obs.field
-   fdict = conf.lookup_array(conf_key_fcst_field);
-   odict = conf.lookup_array(conf_key_obs_field);
+   // Conf: fcst.pairs and obs.pairs
+   fdict = conf.lookup_array(conf_key_fcst_pairs);
+   odict = conf.lookup_array(conf_key_obs_pairs);
 
    // Determine the number of fields (name/level) to be verified
    n_fvx = parse_conf_n_vx(fdict);
@@ -168,9 +168,9 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
    if(n_fvx == 0 || n_fvx != n_ovx) {
       mlog << Error << "\nPairStatConfInfo::process_config() -> "
            << "The number of verification tasks in \""
-           << conf_key_obs_field << "\" (" << n_ovx
+           << conf_key_obs_pairs << "\" (" << n_ovx
            << ") must be non-zero and match the number in \""
-           << conf_key_fcst_field << "\" (" << n_fvx << ").\n\n";
+           << conf_key_fcst_pairs << "\" (" << n_fvx << ").\n\n";
       exit(1);
    }
 
@@ -800,8 +800,8 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    clear();
 
    // Allocate new VarInfo objects
-   vx_pd.set_fcst_info(info_factory.new_var_info(FileType_None));
-   vx_pd.set_obs_info(info_factory.new_var_info(FileType_None));
+   vx_pd.set_fcst_info(info_factory.new_var_info(FileType_Pairs));
+   vx_pd.set_obs_info(info_factory.new_var_info(FileType_Pairs));
 
    // Set the VarInfo objects
    vx_pd.fcst_info->set_dict(fdict);

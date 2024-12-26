@@ -210,7 +210,12 @@ void process_command_line(int argc, char **argv) {
         << "Pairs File(s): " << write_css(pairs_files) << "\n";
 
    // Set the model name
-   shc.set_model(conf_info.model.c_str());
+   if(conf_info.model.empty()) {
+      shc.set_model(na_str);
+   }
+   else {
+      shc.set_model(conf_info.model.c_str());
+   }
 
    // Use the first verification task to set the random number generator
    // and seed value for bootstrap confidence intervals
@@ -869,7 +874,12 @@ void process_scores() {
       if(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa.n_planes() == 0) continue;
 
       // Store the description
-      shc.set_desc(conf_info.vx_opt[i_vx].vx_pd.desc.c_str());
+      if(conf_info.vx_opt[i_vx].vx_pd.desc.empty()) {
+         shc.set_desc(na_str);
+      }
+      else {
+         shc.set_desc(conf_info.vx_opt[i_vx].vx_pd.desc.c_str());
+      }
 
       // Store the forecast variable name
       shc.set_fcst_var(conf_info.vx_opt[i_vx].vx_pd.fcst_info->name_attr());
@@ -2149,6 +2159,8 @@ void usage() {
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
+
+// JHG change -pairs file to -pairs file_list to support a long list of inputs
         << "\twhere\t\"-pairs file\" is one or more files containing "
         << "forecast/observation pairs. May be used multiple times "
         << "(required).\n"

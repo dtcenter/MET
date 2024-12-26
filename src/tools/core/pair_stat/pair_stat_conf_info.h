@@ -239,7 +239,7 @@ class PairStatConfInfo {
       // Pair-Stat configuration object
       MetConfig conf;
 
-      // Store data parsed from the Pair-Stat configuration object
+      // Model name from the Pair-Stat config file
       ConcatString model;                   // Model name
 
       std::vector<PairStatVxOpt> vx_opt;    // Vector of vx options [n_vx]
