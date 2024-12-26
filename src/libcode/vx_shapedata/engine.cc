@@ -602,7 +602,6 @@ void ModeFuzzyEngine::do_fcst_convolution() {
    if(!need_fcst_conv) return;
 
    r = conf_info.Fcst->conv_radius;
-
    *fcst_conv = *fcst_raw;
 
    mlog << Debug(3) << "Applying circular convolution of radius "
@@ -645,7 +644,6 @@ void ModeFuzzyEngine::do_obs_convolution() {
    if(!need_obs_conv) return;
 
    r = conf_info.Obs->conv_radius;
-
    *obs_conv = *obs_raw;
 
    mlog << Debug(3) << "Applying circular convolution of radius "

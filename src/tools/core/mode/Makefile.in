@@ -107,7 +107,7 @@ am_mode_OBJECTS = mode-mode_usage.$(OBJEXT) \
 	mode-mode.$(OBJEXT) mode-combine_boolplanes.$(OBJEXT) \
 	mode-objects_from_netcdf.$(OBJEXT) mode-mode_ps_file.$(OBJEXT) \
 	mode-plot_engine.$(OBJEXT) mode-page_1.$(OBJEXT) \
-	mode-fcst_enlarge_page.$(OBJEXT) \
+	mode-simple_objects.$(OBJEXT) mode-fcst_enlarge_page.$(OBJEXT) \
 	mode-obs_enlarge_page.$(OBJEXT) mode-cluster_page.$(OBJEXT) \
 	mode-overlap_page.$(OBJEXT) mode-mode_exec.$(OBJEXT)
 mode_OBJECTS = $(am_mode_OBJECTS)
@@ -145,7 +145,8 @@ am__depfiles_remade = ./$(DEPDIR)/mode-cluster_page.Po \
 	./$(DEPDIR)/mode-objects_from_netcdf.Po \
 	./$(DEPDIR)/mode-obs_enlarge_page.Po \
 	./$(DEPDIR)/mode-overlap_page.Po ./$(DEPDIR)/mode-page_1.Po \
-	./$(DEPDIR)/mode-plot_engine.Po
+	./$(DEPDIR)/mode-plot_engine.Po \
+	./$(DEPDIR)/mode-simple_objects.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -361,6 +362,7 @@ mode_SOURCES = mode_usage.cc \
 	mode_ps_file.cc \
 	plot_engine.cc \
 	page_1.cc \
+	simple_objects.cc \
 	fcst_enlarge_page.cc \
 	obs_enlarge_page.cc \
 	cluster_page.cc \
@@ -515,6 +517,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-overlap_page.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-page_1.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-plot_engine.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mode-simple_objects.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -689,6 +692,20 @@ mode-page_1.obj: page_1.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='page_1.cc' object='mode-page_1.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mode-page_1.obj `if test -f 'page_1.cc'; then $(CYGPATH_W) 'page_1.cc'; else $(CYGPATH_W) '$(srcdir)/page_1.cc'; fi`
+
+mode-simple_objects.o: simple_objects.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mode-simple_objects.o -MD -MP -MF $(DEPDIR)/mode-simple_objects.Tpo -c -o mode-simple_objects.o `test -f 'simple_objects.cc' || echo '$(srcdir)/'`simple_objects.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mode-simple_objects.Tpo $(DEPDIR)/mode-simple_objects.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='simple_objects.cc' object='mode-simple_objects.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mode-simple_objects.o `test -f 'simple_objects.cc' || echo '$(srcdir)/'`simple_objects.cc
+
+mode-simple_objects.obj: simple_objects.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mode-simple_objects.obj -MD -MP -MF $(DEPDIR)/mode-simple_objects.Tpo -c -o mode-simple_objects.obj `if test -f 'simple_objects.cc'; then $(CYGPATH_W) 'simple_objects.cc'; else $(CYGPATH_W) '$(srcdir)/simple_objects.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/mode-simple_objects.Tpo $(DEPDIR)/mode-simple_objects.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='simple_objects.cc' object='mode-simple_objects.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o mode-simple_objects.obj `if test -f 'simple_objects.cc'; then $(CYGPATH_W) 'simple_objects.cc'; else $(CYGPATH_W) '$(srcdir)/simple_objects.cc'; fi`
 
 mode-fcst_enlarge_page.o: fcst_enlarge_page.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(mode_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT mode-fcst_enlarge_page.o -MD -MP -MF $(DEPDIR)/mode-fcst_enlarge_page.Tpo -c -o mode-fcst_enlarge_page.o `test -f 'fcst_enlarge_page.cc' || echo '$(srcdir)/'`fcst_enlarge_page.cc
@@ -903,6 +920,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/mode-overlap_page.Po
 	-rm -f ./$(DEPDIR)/mode-page_1.Po
 	-rm -f ./$(DEPDIR)/mode-plot_engine.Po
+	-rm -f ./$(DEPDIR)/mode-simple_objects.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -964,6 +982,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/mode-overlap_page.Po
 	-rm -f ./$(DEPDIR)/mode-page_1.Po
 	-rm -f ./$(DEPDIR)/mode-plot_engine.Po
+	-rm -f ./$(DEPDIR)/mode-simple_objects.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
