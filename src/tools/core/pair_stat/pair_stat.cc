@@ -219,8 +219,8 @@ void process_command_line(int argc, char **argv) {
 
    // List the input pair files
    mlog << Debug(1)
-        << "Reading " << pairs_files.n() << " "
-        << pairsformat_to_string(pairs_format) << " Pairs File(s): "
+        << "Reading " << pairs_files.n() << " \""
+        << pairsformat_to_string(pairs_format) << "\" format pairs file(s): "
         << write_css(pairs_files) << "\n";
 
    // Set the model name
