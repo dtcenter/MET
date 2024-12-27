@@ -150,7 +150,7 @@ class GridStatVxOpt {
                                          // nc_pairs_var_str is deprecated
 
       // Matched pair inclusion thresholds
-      std::map<string,ThreshArray> mpr_thr_inc_map;
+      std::map<ConcatString,ThreshArray> mpr_thr_inc_map;
 
       ThreshArray      fcat_ta;          // fcst categorical thresholds
       ThreshArray      ocat_ta;          // obs categorical thresholds

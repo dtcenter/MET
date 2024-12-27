@@ -693,6 +693,8 @@ void PairStatVxOpt::clear() {
    mask_llpnt.clear();
 
    mpr_thr_inc_map.clear();
+   mpr_str_inc_map.clear();
+   mpr_str_exc_map.clear();
 
    mask_name.clear();
 
@@ -763,6 +765,7 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *dict;
+   const char *method_name = "PairStatVxOpt::process_config() -> ";
 
    // Initialize
    clear();
@@ -788,14 +791,14 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    // No support for wind direction
    if(vx_pd.fcst_info->is_wind_direction() ||
       vx_pd.obs_info->is_wind_direction()) {
-      mlog << Error << "\nPairStatVxOpt::process_config() -> "
+      mlog << Error << "\n" << method_name
            << "wind direction may not be verified using pair_stat.\n\n";
       exit(1);
    }
 
    // Check that the observation field does not contain probabilities
    if(vx_pd.obs_info->is_prob()) {
-      mlog << Error << "\nPairStatVxOpt::process_config() -> "
+      mlog << Error << "\n" << method_name
            << "the observation field cannot contain probabilities.\n\n";
       exit(1);
    }
@@ -842,7 +845,7 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
 
    // Check for the same length
    if(mpr_sa.n() != mpr_ta.n()) {
-      mlog << Error << "\nPairStatVxOpt::process_config() -> "
+      mlog << Error << "\n" << method_name
            << "The length of \"" << conf_key_mpr_column << "\" and \""
            << conf_key_mpr_thresh << "\" must match (" << mpr_sa.n()
            << " != " << mpr_ta.n() << ")!\n\n";
@@ -857,6 +860,14 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
       }
       mpr_thr_inc_map[(mpr_sa[i])].add(mpr_ta[i]); 
    }
+
+   // Conf: mpr_str_inc
+   parse_add_conf_key_values_map(&odict, conf_key_mpr_str_inc,
+      &mpr_str_inc_map, method_name);
+
+   // Conf: mpr_str_exc
+   parse_add_conf_key_values_map(&odict, conf_key_mpr_str_exc,
+      &mpr_str_exc_map, method_name);
 
    // Dump the contents of the current thresholds
    if(mlog.verbosity_level() >= 5) {
@@ -883,7 +894,7 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    if(!vx_pd.fcst_info->is_prob() &&
       fcat_ta.n() != ocat_ta.n()) {
 
-      mlog << Error << "\nPairStatVxOpt::process_config() -> "
+      mlog << Error << "\n" << method_name
            << "The number of thresholds for each field in \"fcst."
            << conf_key_cat_thresh
            << "\" must match the number of thresholds for each "
@@ -986,8 +997,10 @@ void PairStatVxOpt::set_vx_pd(PairStatConfInfo *conf_info) {
    // Define the dimensions with n_msg_typ = n_interp = 1
    vx_pd.set_size(1, n_mask, 1);
 
-   // Store the MPR filtering thresholds
+   // Store the MPR filtering maps
    vx_pd.set_mpr_thr_inc_map(mpr_thr_inc_map);
+   vx_pd.set_mpr_str_inc_map(mpr_str_inc_map);
+   vx_pd.set_mpr_str_exc_map(mpr_str_exc_map);
 
    // Store the climo CDF info
    vx_pd.set_climo_cdf_info_ptr(&cdf_info);

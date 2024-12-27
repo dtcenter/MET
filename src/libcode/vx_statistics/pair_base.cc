@@ -1436,7 +1436,7 @@ void VxPairBase::set_interp(int i_interp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::set_mpr_thr_inc_map(const map<string,ThreshArray> &m) {
+void VxPairBase::set_mpr_thr_inc_map(const map<ConcatString,ThreshArray> &m) {
 
    mpr_thr_inc_map = m;
 
@@ -1445,7 +1445,7 @@ void VxPairBase::set_mpr_thr_inc_map(const map<string,ThreshArray> &m) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::set_mpr_str_inc_map(const map<string,StringArray> &m) {
+void VxPairBase::set_mpr_str_inc_map(const map<ConcatString,StringArray> &m) {
 
    mpr_str_inc_map = m;
 
@@ -1454,7 +1454,7 @@ void VxPairBase::set_mpr_str_inc_map(const map<string,StringArray> &m) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::set_mpr_str_exc_map(const map<string,StringArray> &m) {
+void VxPairBase::set_mpr_str_exc_map(const map<ConcatString,StringArray> &m) {
 
    mpr_str_exc_map = m;
 

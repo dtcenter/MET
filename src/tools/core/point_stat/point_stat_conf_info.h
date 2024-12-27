@@ -130,7 +130,7 @@ class PointStatVxOpt {
       StringArray     mask_sid;           // Masking station ID's
 
       // Matched pair inclusion thresholds
-      std::map<std::string,ThreshArray> mpr_thr_inc_map;
+      std::map<ConcatString,ThreshArray> mpr_thr_inc_map;
 
       // Vector of MaskLatLon objects defining Lat/Lon Point masks
       std::vector<MaskLatLon> mask_llpnt;

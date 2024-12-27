@@ -742,7 +742,7 @@ bool check_fo_thresh(double f, double o, const ClimoPntInfo &cpi,
 ////////////////////////////////////////////////////////////////////////
 
 bool check_mpr_thresh(double f, double o, const ClimoPntInfo &cpi,
-                      const map<string,ThreshArray> &m,
+                      const map<ConcatString,ThreshArray> &m,
                       ConcatString *reason_ptr) {
    // Initialize
    if(reason_ptr) reason_ptr->erase();
@@ -846,7 +846,7 @@ double get_mpr_column_value(double f, double o, const ClimoPntInfo &cpi,
 void apply_mpr_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
                            DataPlane &fcmn_dp, DataPlane &fcsd_dp,
                            DataPlane &ocmn_dp, DataPlane &ocsd_dp,
-                           const map<string,ThreshArray> &m) {
+                           const map<ConcatString,ThreshArray> &m) {
 
    // Check for no work to be done
    if(m.size()  == 0) return;
