@@ -75,8 +75,6 @@ static void do_mcts      (MCTSInfo   &, int, const PairDataPoint *);
 static void do_cnt_sl1l2 (const PairStatVxOpt &, const PairDataPoint *);
 static void do_vl1l2     (VL1L2Info *&, int, const PairDataPoint *, const PairDataPoint *);
 static void do_pct       (const PairStatVxOpt &, const PairDataPoint *);
-static void do_hira_ens  (              int, const PairDataPoint *);
-static void do_hira_prob (              int, const PairDataPoint *);
 
 static void finish_txt_files();
 
@@ -165,6 +163,20 @@ void process_command_line(int argc, char **argv) {
    // Check for error. There should be no arguments left
    if(cline.n() != 0) usage();
 
+   // Expand the input pairs file lists
+   StringArray tmp_src(pairs_files);
+   pairs_files.clear();
+
+   for(int i=0; i<tmp_src.n(); i++) {
+
+      // Attempt to parse each input as a file list
+      StringArray sa(parse_ascii_file_list(tmp_src[i].c_str()));
+
+      // Add list elements, if present, or the input file name, if not
+      if(sa.n() > 0) pairs_files.add(sa);
+      else           pairs_files.add(tmp_src[i]);
+   }
+
    // Check for required argruments
    if(pairs_files.n() == 0) {
       mlog << Error << "\n" << method_name
@@ -205,9 +217,11 @@ void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(pairs_format);
 
-   // List the pairs files
+   // List the input pair files
    mlog << Debug(1)
-        << "Pairs File(s): " << write_css(pairs_files) << "\n";
+        << "Reading " << pairs_files.n() << " "
+        << pairsformat_to_string(pairs_format) << " Pairs File(s): "
+        << write_css(pairs_files) << "\n";
 
    // Set the model name
    if(conf_info.model.empty()) {
@@ -257,7 +271,7 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
 
 void setup_txt_files() {
    int max_col, max_prob_col, max_mctc_col, max_orank_col;
-   int n_prob, n_cat, n_eclv, n_ens;
+   int n_prob, n_cat, n_eclv;
    ConcatString base_name;
 
    // Create output file names for the stat file and optional text files
@@ -270,15 +284,12 @@ void setup_txt_files() {
    /////////////////////////////////////////////////////////////////////
 
    // Get the maximum number of data columns
-   n_prob = max(conf_info.get_max_n_fprob_thresh(),
-                conf_info.get_max_n_hira_prob());
+   n_prob = conf_info.get_max_n_fprob_thresh();
    n_cat  = conf_info.get_max_n_cat_thresh() + 1;
    n_eclv = conf_info.get_max_n_eclv_points();
-   n_ens  = conf_info.get_max_n_hira_ens();
 
    max_prob_col  = get_n_pjc_columns(n_prob);
    max_mctc_col  = get_n_mctc_columns(n_cat);
-   max_orank_col = get_n_orank_columns(n_ens);
 
    // Determine the maximum number of data columns
    max_col = (max_prob_col  > max_stat_col ? max_prob_col  : max_stat_col);
@@ -356,10 +367,6 @@ void setup_txt_files() {
                max_col = get_n_eclv_columns(n_eclv) + n_header_columns + 1;
                break;
 
-            case i_orank:
-               max_col = get_n_orank_columns(n_ens) + n_header_columns + 1;
-               break;
-
             default:
                max_col = n_txt_columns[i] + n_header_columns + 1;
                break;
@@ -394,10 +401,6 @@ void setup_txt_files() {
 
             case i_eclv:
                write_eclv_header_row(1, n_eclv, txt_at[i], 0, 0);
-               break;
-
-            case i_orank:
-               write_orank_header_row(1, n_ens, txt_at[i], 0, 0);
                break;
 
             default:
@@ -848,7 +851,6 @@ void process_scores() {
    ConcatString cs;
 
    // Initialize pointers
-   PairDataPoint *pd_ptr     = (PairDataPoint *) nullptr;
    CTSInfo       *cts_info   = (CTSInfo *)       nullptr;
    MCTSInfo       mcts_info;
    VL1L2Info     *vl1l2_info = (VL1L2Info *)     nullptr;
@@ -870,389 +872,320 @@ void process_scores() {
    // Compute scores for each PairData object and write output
    for(int i_vx=0; i_vx<conf_info.get_n_vx(); i_vx++) {
 
+      PairStatVxOpt *vx_ptr = &conf_info.vx_opt[i_vx];
+
       // Check for no forecast fields
-      if(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa.n_planes() == 0) continue;
+      if(vx_ptr->vx_pd.fcst_dpa.n_planes() == 0) continue;
 
       // Store the description
-      if(conf_info.vx_opt[i_vx].vx_pd.desc.empty()) {
+      if(vx_ptr->vx_pd.desc.empty()) {
          shc.set_desc(na_str);
       }
       else {
-         shc.set_desc(conf_info.vx_opt[i_vx].vx_pd.desc.c_str());
+         shc.set_desc(vx_ptr->vx_pd.desc.c_str());
       }
 
       // Store the forecast variable name
-      shc.set_fcst_var(conf_info.vx_opt[i_vx].vx_pd.fcst_info->name_attr());
+      shc.set_fcst_var(vx_ptr->vx_pd.fcst_info->name_attr());
 
       // Store the forecast variable units
-      shc.set_fcst_units(conf_info.vx_opt[i_vx].vx_pd.fcst_info->units_attr());
+      shc.set_fcst_units(vx_ptr->vx_pd.fcst_info->units_attr());
 
       // Set the forecast level name
-      shc.set_fcst_lev(conf_info.vx_opt[i_vx].vx_pd.fcst_info->level_attr().c_str());
+      shc.set_fcst_lev(vx_ptr->vx_pd.fcst_info->level_attr().c_str());
 
       // Store the observation variable name
-      shc.set_obs_var(conf_info.vx_opt[i_vx].vx_pd.obs_info->name_attr());
+      shc.set_obs_var(vx_ptr->vx_pd.obs_info->name_attr());
 
       // Store the observation variable units
-      cs = conf_info.vx_opt[i_vx].vx_pd.obs_info->units_attr();
+      cs = vx_ptr->vx_pd.obs_info->units_attr();
       if(cs.empty()) cs = na_string;
       shc.set_obs_units(cs);
 
       // Set the observation level name
-      shc.set_obs_lev(conf_info.vx_opt[i_vx].vx_pd.obs_info->level_attr().c_str());
+      shc.set_obs_lev(vx_ptr->vx_pd.obs_info->level_attr().c_str());
 
       // Set the forecast lead time
-      shc.set_fcst_lead_sec(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa[0].lead());
+      shc.set_fcst_lead_sec(vx_ptr->vx_pd.fcst_dpa[0].lead());
 
       // Set the forecast valid time
-      shc.set_fcst_valid_beg(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa[0].valid());
-      shc.set_fcst_valid_end(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa[0].valid());
+      shc.set_fcst_valid_beg(vx_ptr->vx_pd.fcst_dpa[0].valid());
+      shc.set_fcst_valid_end(vx_ptr->vx_pd.fcst_dpa[0].valid());
 
       // Set the observation lead time
       shc.set_obs_lead_sec(0);
 
       // Set the observation valid time
-      shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
-      shc.set_obs_valid_end(conf_info.vx_opt[i_vx].vx_pd.end_ut);
+      shc.set_obs_valid_beg(vx_ptr->vx_pd.beg_ut);
+      shc.set_obs_valid_end(vx_ptr->vx_pd.end_ut);
 
-      // Loop through the message types
-      for(int i_msg_typ=0; i_msg_typ<conf_info.vx_opt[i_vx].get_n_msg_typ(); i_msg_typ++) {
+      // Store the message type in the obtype column
+      shc.set_obtype(na_str);
 
-         // Store the message type in the obtype column
-         shc.set_obtype(conf_info.vx_opt[i_vx].msg_typ[i_msg_typ].c_str());
+      // Loop through the verification masking regions
+      for(int i_mask=0; i_mask<vx_ptr->get_n_mask(); i_mask++) {
 
-         // Loop through the verification masking regions
-         for(int i_mask=0; i_mask<conf_info.vx_opt[i_vx].get_n_mask(); i_mask++) {
+         // Store the verification masking region
+         shc.set_mask(vx_ptr->mask_name[i_mask].c_str());
 
-            // Store the verification masking region
-            shc.set_mask(conf_info.vx_opt[i_vx].mask_name[i_mask].c_str());
+         // Store the interpolation method as nearest
+         shc.set_interp_mthd(InterpMthd::Nearest);
+         shc.set_interp_wdth(1);
 
-            // Loop through the interpolation methods
-            for(int i_interp=0; i_interp<conf_info.vx_opt[i_vx].get_n_interp(); i_interp++) {
+         PairDataPoint *pd_ptr = &vx_ptr->vx_pd.pd[i_mask];
 
-               // Store the interpolation method and width being applied
-               shc.set_interp_mthd(conf_info.vx_opt[i_vx].interp_info.method[i_interp],
-                                   conf_info.vx_opt[i_vx].interp_info.shape);
-               shc.set_interp_wdth(conf_info.vx_opt[i_vx].interp_info.width[i_interp]);
+         mlog << Debug(2)
+              << "Processing " << vx_ptr->vx_pd.fcst_info->magic_str()
+              << " versus " << vx_ptr->vx_pd.obs_info->magic_str()
+              << ", over region " << pd_ptr->mask_name
+              << "), using " << pd_ptr->n_obs << " matched pairs.\n";
 
-               int n = conf_info.vx_opt[i_vx].vx_pd.three_to_one(i_msg_typ, i_mask, i_interp);
+         // List counts for reasons why observations were rejected
+         cs << cs_erase
+            << "Number of matched pairs   = " << pd_ptr->n_obs << "\n"
+            << "Observations processed    = " << vx_ptr->vx_pd.n_try << "\n"
+            << "Rejected: station id      = " << vx_ptr->vx_pd.rej_sid << "\n"
+            << "Rejected: obs var name    = " << vx_ptr->vx_pd.rej_var << "\n"
+            << "Rejected: valid time      = " << vx_ptr->vx_pd.rej_vld << "\n"
+            << "Rejected: bad obs value   = " << vx_ptr->vx_pd.rej_obs << "\n"
+            << "Rejected: off the grid    = " << vx_ptr->vx_pd.rej_grd << "\n"
+            << "Rejected: topography      = " << vx_ptr->vx_pd.rej_topo << "\n"
+            << "Rejected: level mismatch  = " << vx_ptr->vx_pd.rej_lvl << "\n"
+            << "Rejected: quality marker  = " << vx_ptr->vx_pd.rej_qty << "\n"
+            << "Rejected: message type    = " << vx_ptr->vx_pd.rej_typ[i_mask] << "\n"
+            << "Rejected: masking region  = " << vx_ptr->vx_pd.rej_mask[i_mask] << "\n"
+            << "Rejected: bad fcst value  = " << vx_ptr->vx_pd.rej_fcst[i_mask] << "\n"
+            << "Rejected: bad climo mean  = " << vx_ptr->vx_pd.rej_cmn[i_mask] << "\n"
+            << "Rejected: bad climo stdev = " << vx_ptr->vx_pd.rej_csd[i_mask] << "\n"
+            << "Rejected: mpr filter      = " << vx_ptr->vx_pd.rej_mpr[i_mask] << "\n"
+            << "Rejected: duplicates      = " << vx_ptr->vx_pd.rej_dup[i_mask] << "\n";
 
-               pd_ptr = &conf_info.vx_opt[i_vx].vx_pd.pd[n];
+         // Print report based on the number of matched pairs
+         if(pd_ptr->n_obs > 0) mlog << Debug(3) << cs;
+         else                  mlog << Debug(2) << cs;
 
-               mlog << Debug(2)
-                    << "Processing "
-                    << conf_info.vx_opt[i_vx].vx_pd.fcst_info->magic_str()
-                    << " versus "
-                    << conf_info.vx_opt[i_vx].vx_pd.obs_info->magic_str()
-                    << ", for observation type " << pd_ptr->msg_typ
-                    << ", over region " << pd_ptr->mask_name
-                    << ", for interpolation method "
-                    << shc.get_interp_mthd() << "("
-                    << shc.get_interp_pnts_str()
-                    << "), using " << pd_ptr->n_obs << " matched pairs.\n";
+         // Process percentile thresholds
+         vx_ptr->set_perc_thresh(pd_ptr);
 
-               // List counts for reasons why observations were rejected
-               cs << cs_erase
-                  << "Number of matched pairs   = " << pd_ptr->n_obs << "\n"
-                  << "Observations processed    = " << conf_info.vx_opt[i_vx].vx_pd.n_try << "\n"
-                  << "Rejected: station id      = " << conf_info.vx_opt[i_vx].vx_pd.rej_sid << "\n"
-                  << "Rejected: obs var name    = " << conf_info.vx_opt[i_vx].vx_pd.rej_var << "\n"
-                  << "Rejected: valid time      = " << conf_info.vx_opt[i_vx].vx_pd.rej_vld << "\n"
-                  << "Rejected: bad obs value   = " << conf_info.vx_opt[i_vx].vx_pd.rej_obs << "\n"
-                  << "Rejected: off the grid    = " << conf_info.vx_opt[i_vx].vx_pd.rej_grd << "\n"
-                  << "Rejected: topography      = " << conf_info.vx_opt[i_vx].vx_pd.rej_topo << "\n"
-                  << "Rejected: level mismatch  = " << conf_info.vx_opt[i_vx].vx_pd.rej_lvl << "\n"
-                  << "Rejected: quality marker  = " << conf_info.vx_opt[i_vx].vx_pd.rej_qty << "\n"
-                  << "Rejected: message type    = " << conf_info.vx_opt[i_vx].vx_pd.rej_typ[n] << "\n"
-                  << "Rejected: masking region  = " << conf_info.vx_opt[i_vx].vx_pd.rej_mask[n] << "\n"
-                  << "Rejected: bad fcst value  = " << conf_info.vx_opt[i_vx].vx_pd.rej_fcst[n] << "\n"
-                  << "Rejected: bad climo mean  = " << conf_info.vx_opt[i_vx].vx_pd.rej_cmn[n] << "\n"
-                  << "Rejected: bad climo stdev = " << conf_info.vx_opt[i_vx].vx_pd.rej_csd[n] << "\n"
-                  << "Rejected: mpr filter      = " << conf_info.vx_opt[i_vx].vx_pd.rej_mpr[n] << "\n"
-                  << "Rejected: duplicates      = " << conf_info.vx_opt[i_vx].vx_pd.rej_dup[n] << "\n";
+         // Write out the MPR lines
+         if(vx_ptr->output_flag[i_mpr] != STATOutputType::None) {
+            write_mpr_row(shc, pd_ptr,
+               vx_ptr->output_flag[i_mpr],
+               stat_at, i_stat_row,
+               txt_at[i_mpr], i_txt_row[i_mpr], false);
 
-               // Print report based on the number of matched pairs
-               if(pd_ptr->n_obs > 0) {
-                  mlog << Debug(3) << cs;
-               }
-               // Continue for zero matched pairs
-               else {
-                  mlog << Debug(2) << cs;
-                  continue;
-               }
+            // Reset the obtype column
+            shc.set_obtype(na_str);
 
-               // Process percentile thresholds
-               conf_info.vx_opt[i_vx].set_perc_thresh(pd_ptr);
+            // Reset the observation valid time
+            shc.set_obs_valid_beg(vx_ptr->vx_pd.beg_ut);
+            shc.set_obs_valid_end(vx_ptr->vx_pd.end_ut);
+         }
 
-               // Write out the MPR lines
-               if(conf_info.vx_opt[i_vx].output_flag[i_mpr] != STATOutputType::None) {
-                  write_mpr_row(shc, pd_ptr,
-                     conf_info.vx_opt[i_vx].output_flag[i_mpr],
+         // Write out the SEEPS MPR lines
+         if(vx_ptr->output_flag[i_seeps_mpr] != STATOutputType::None) {
+            write_seeps_mpr_row(shc, pd_ptr,
+               vx_ptr->output_flag[i_seeps_mpr],
+               stat_at, i_stat_row,
+               txt_at[i_seeps_mpr], i_txt_row[i_seeps_mpr], false);
+
+            // Reset the obtype column
+            shc.set_obtype(na_str);
+
+            // Reset the observation valid time
+            shc.set_obs_valid_beg(vx_ptr->vx_pd.beg_ut);
+            shc.set_obs_valid_end(vx_ptr->vx_pd.end_ut);
+         }
+
+         // Write out the SEEPS lines
+         if(vx_ptr->output_flag[i_seeps] != STATOutputType::None) {
+            compute_aggregated_seeps(pd_ptr, &pd_ptr->seeps_agg);
+            write_seeps_row(shc, &pd_ptr->seeps_agg,
+               vx_ptr->output_flag[i_seeps],
+               stat_at, i_stat_row,
+               txt_at[i_seeps], i_txt_row[i_seeps]);
+         }
+
+         // Compute CTS scores
+         if(!vx_ptr->vx_pd.fcst_info->is_prob() &&
+             vx_ptr->fcat_ta.n() > 0            &&
+            (vx_ptr->output_flag[i_fho]  != STATOutputType::None ||
+             vx_ptr->output_flag[i_ctc]  != STATOutputType::None ||
+             vx_ptr->output_flag[i_cts]  != STATOutputType::None ||
+             vx_ptr->output_flag[i_eclv] != STATOutputType::None)) {
+
+            // Initialize
+            for(int i_cat=0; i_cat<n_cat; i_cat++) cts_info[i_cat].clear();
+
+            // Compute CTS Info
+            do_cts(cts_info, i_vx, pd_ptr);
+
+            // Loop through the categorical thresholds
+            for(int i_cat=0; i_cat<vx_ptr->fcat_ta.n(); i_cat++) {
+
+               if(cts_info[i_cat].cts.n_pairs() == 0) continue;
+
+               // Write out FHO
+               if(vx_ptr->output_flag[i_fho] != STATOutputType::None) {
+                  write_fho_row(shc, cts_info[i_cat],
+                     vx_ptr->output_flag[i_fho],
                      stat_at, i_stat_row,
-                     txt_at[i_mpr], i_txt_row[i_mpr], false);
-
-                  // Reset the obtype column
-                  shc.set_obtype(conf_info.vx_opt[i_vx].msg_typ[i_msg_typ].c_str());
-
-                  // Reset the observation valid time
-                  shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
-                  shc.set_obs_valid_end(conf_info.vx_opt[i_vx].vx_pd.end_ut);
+                     txt_at[i_fho], i_txt_row[i_fho]);
                }
 
-               // Write out the SEEPS MPR lines
-               if(conf_info.vx_opt[i_vx].output_flag[i_seeps_mpr] != STATOutputType::None) {
-                  write_seeps_mpr_row(shc, pd_ptr,
-                     conf_info.vx_opt[i_vx].output_flag[i_seeps_mpr],
+               // Write out CTC
+               if(vx_ptr->output_flag[i_ctc] != STATOutputType::None) {
+                  write_ctc_row(shc, cts_info[i_cat],
+                     vx_ptr->output_flag[i_ctc],
                      stat_at, i_stat_row,
-                     txt_at[i_seeps_mpr], i_txt_row[i_seeps_mpr], false);
-
-                  // Reset the obtype column
-                  shc.set_obtype(conf_info.vx_opt[i_vx].msg_typ[i_msg_typ].c_str());
-
-                  // Reset the observation valid time
-                  shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
-                  shc.set_obs_valid_end(conf_info.vx_opt[i_vx].vx_pd.end_ut);
+                     txt_at[i_ctc], i_txt_row[i_ctc]);
                }
 
-               // Write out the SEEPS lines
-               if(conf_info.vx_opt[i_vx].output_flag[i_seeps] != STATOutputType::None) {
-                  compute_aggregated_seeps(pd_ptr, &pd_ptr->seeps_agg);
-                  write_seeps_row(shc, &pd_ptr->seeps_agg,
-                     conf_info.vx_opt[i_vx].output_flag[i_seeps],
+               // Write out CTS
+               if(vx_ptr->output_flag[i_cts] != STATOutputType::None) {
+                  write_cts_row(shc, cts_info[i_cat],
+                     vx_ptr->output_flag[i_cts],
                      stat_at, i_stat_row,
-                     txt_at[i_seeps], i_txt_row[i_seeps]);
+                     txt_at[i_cts], i_txt_row[i_cts]);
                }
 
-               // Compute CTS scores
-               if(!conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_prob()                 &&
-                   conf_info.vx_opt[i_vx].fcat_ta.n() > 0                            &&
-                  (conf_info.vx_opt[i_vx].output_flag[i_fho]  != STATOutputType::None ||
-                   conf_info.vx_opt[i_vx].output_flag[i_ctc]  != STATOutputType::None ||
-                   conf_info.vx_opt[i_vx].output_flag[i_cts]  != STATOutputType::None ||
-                   conf_info.vx_opt[i_vx].output_flag[i_eclv] != STATOutputType::None)) {
+               // Write out ECLV
+               if(vx_ptr->output_flag[i_eclv] != STATOutputType::None) {
+                  write_eclv_row(shc, cts_info[i_cat], vx_ptr->eclv_points,
+                     vx_ptr->output_flag[i_eclv],
+                     stat_at, i_stat_row,
+                     txt_at[i_eclv], i_txt_row[i_eclv]);
+               }
+            } // end for i_cat 
+         } // end Compute CTS scores
 
-                  // Initialize
-                  for(int i_cat=0; i_cat<n_cat; i_cat++) cts_info[i_cat].clear();
+         // Compute MCTS scores
+         if(!vx_ptr->vx_pd.fcst_info->is_prob() &&
+             vx_ptr->fcat_ta.n() > 1            &&
+            (vx_ptr->output_flag[i_mctc] != STATOutputType::None ||
+             vx_ptr->output_flag[i_mcts] != STATOutputType::None)) {
 
-                  // Compute CTS Info
-                  do_cts(cts_info, i_vx, pd_ptr);
+            // Initialize
+            mcts_info.clear();
 
-                  // Loop through the categorical thresholds
-                  for(int i_cat=0; i_cat<conf_info.vx_opt[i_vx].fcat_ta.n(); i_cat++) {
+            // Compute MCTS Info
+            do_mcts(mcts_info, i_vx, pd_ptr);
 
-                     if(cts_info[i_cat].cts.n_pairs() == 0) continue;
+            if(mcts_info.cts.n_pairs() == 0) continue;
 
-                     // Write out FHO
-                     if(conf_info.vx_opt[i_vx].output_flag[i_fho] != STATOutputType::None) {
-                        write_fho_row(shc, cts_info[i_cat],
-                           conf_info.vx_opt[i_vx].output_flag[i_fho],
-                           stat_at, i_stat_row,
-                           txt_at[i_fho], i_txt_row[i_fho]);
-                     }
+            // Write out MCTC
+            if(vx_ptr->output_flag[i_mctc] != STATOutputType::None) {
+               write_mctc_row(shc, mcts_info,
+                  vx_ptr->output_flag[i_mctc],
+                  stat_at, i_stat_row,
+                  txt_at[i_mctc], i_txt_row[i_mctc]);
+            }
 
-                     // Write out CTC
-                     if(conf_info.vx_opt[i_vx].output_flag[i_ctc] != STATOutputType::None) {
-                        write_ctc_row(shc, cts_info[i_cat],
-                           conf_info.vx_opt[i_vx].output_flag[i_ctc],
-                           stat_at, i_stat_row,
-                           txt_at[i_ctc], i_txt_row[i_ctc]);
-                     }
+            // Write out MCTS
+            if(vx_ptr->output_flag[i_mcts] != STATOutputType::None) {
+               write_mcts_row(shc, mcts_info,
+                  vx_ptr->output_flag[i_mcts],
+                  stat_at, i_stat_row,
+                  txt_at[i_mcts], i_txt_row[i_mcts]);
+            }
+         } // end Compute MCTS scores
 
-                     // Write out CTS
-                     if(conf_info.vx_opt[i_vx].output_flag[i_cts] != STATOutputType::None) {
-                        write_cts_row(shc, cts_info[i_cat],
-                           conf_info.vx_opt[i_vx].output_flag[i_cts],
-                           stat_at, i_stat_row,
-                           txt_at[i_cts], i_txt_row[i_cts]);
-                     }
+         // Compute CNT, SL1L2, and SAL1L2 scores
+         if(!vx_ptr->vx_pd.fcst_info->is_prob() &&
+            (vx_ptr->output_flag[i_cnt]    != STATOutputType::None ||
+             vx_ptr->output_flag[i_sl1l2]  != STATOutputType::None ||
+             vx_ptr->output_flag[i_sal1l2] != STATOutputType::None)) {
+             do_cnt_sl1l2(*vx_ptr, pd_ptr);
+         }
 
-                     // Write out ECLV
-                     if(conf_info.vx_opt[i_vx].output_flag[i_eclv] != STATOutputType::None) {
-                        write_eclv_row(shc, cts_info[i_cat], conf_info.vx_opt[i_vx].eclv_points,
-                           conf_info.vx_opt[i_vx].output_flag[i_eclv],
-                           stat_at, i_stat_row,
-                           txt_at[i_eclv], i_txt_row[i_eclv]);
-                     }
-                  } // end for m
-               } // end Compute CTS scores
+         // Compute VL1L2 and VAL1L2 partial sums for UGRD and VGRD
+         if(!vx_ptr->vx_pd.fcst_info->is_prob()       &&
+             vx_ptr->vx_pd.fcst_info->is_v_wind()     &&
+             vx_ptr->vx_pd.fcst_info->uv_index() >= 0 &&
+            (vx_ptr->output_flag[i_vl1l2]  != STATOutputType::None ||
+             vx_ptr->output_flag[i_val1l2] != STATOutputType::None ||
+             vx_ptr->output_flag[i_vcnt]   != STATOutputType::None)) {
 
-               // Compute MCTS scores
-               if(!conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_prob()                 &&
-                   conf_info.vx_opt[i_vx].fcat_ta.n() > 1                            &&
-                  (conf_info.vx_opt[i_vx].output_flag[i_mctc] != STATOutputType::None ||
-                   conf_info.vx_opt[i_vx].output_flag[i_mcts] != STATOutputType::None)) {
+            // Store the forecast variable name
+            shc.set_fcst_var(ugrd_vgrd_abbr_str);
 
-                  // Initialize
-                  mcts_info.clear();
+            // Store the observation variable name
+            shc.set_obs_var(ugrd_vgrd_abbr_str);
 
-                  // Compute MCTS Info
-                  do_mcts(mcts_info, i_vx, pd_ptr);
+            // Initialize
+            for(int i_wind=0; i_wind<n_wind; i_wind++) vl1l2_info[i_wind].clear();
 
-                  if(mcts_info.cts.n_pairs() == 0) continue;
+            // Get the index of the matching u-component
+            int u_vx = vx_ptr->vx_pd.fcst_info->uv_index();
 
-                  // Write out MCTC
-                  if(conf_info.vx_opt[i_vx].output_flag[i_mctc] != STATOutputType::None) {
-                     write_mctc_row(shc, mcts_info,
-                        conf_info.vx_opt[i_vx].output_flag[i_mctc],
-                        stat_at, i_stat_row,
-                        txt_at[i_mctc], i_txt_row[i_mctc]);
-                  }
+            // Check to make sure the masking regions match
+            if(conf_info.vx_opt[i_vx].get_n_mask() !=
+               conf_info.vx_opt[u_vx].get_n_mask()) {
+               mlog << Warning << "\nprocess_scores() -> "
+                    << "when computing VL1L2 and/or VAL1L2 vector "
+                    << "partial sums, the U and V components must "
+                    << "be processed using the same set of mask regions. "
+                    << "Failing to do so will cause unexpected results!\n\n";
+            }
 
-                  // Write out MCTS
-                  if(conf_info.vx_opt[i_vx].output_flag[i_mcts] != STATOutputType::None) {
-                     write_mcts_row(shc, mcts_info,
-                        conf_info.vx_opt[i_vx].output_flag[i_mcts],
-                        stat_at, i_stat_row,
-                        txt_at[i_mcts], i_txt_row[i_mcts]);
-                  }
-               } // end Compute MCTS scores
+            // Compute VL1L2 and VAL1L2
+            do_vl1l2(vl1l2_info, i_vx,
+                     &conf_info.vx_opt[u_vx].vx_pd.pd[i_mask],
+                     &conf_info.vx_opt[i_vx].vx_pd.pd[i_mask]);
 
-               // Compute CNT, SL1L2, and SAL1L2 scores
-               if(!conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_prob() &&
-                  (conf_info.vx_opt[i_vx].output_flag[i_cnt]    != STATOutputType::None ||
-                   conf_info.vx_opt[i_vx].output_flag[i_sl1l2]  != STATOutputType::None ||
-                   conf_info.vx_opt[i_vx].output_flag[i_sal1l2] != STATOutputType::None)) {
-                  do_cnt_sl1l2(conf_info.vx_opt[i_vx], pd_ptr);
+            // Loop through all of the wind speed thresholds
+            for(int i_wind=0; i_wind<vx_ptr->fwind_ta.n(); i_wind++) {
+
+               // Write out VL1L2
+               if(vx_ptr->output_flag[i_vl1l2] != STATOutputType::None &&
+                  vl1l2_info[i_wind].vcount > 0) {
+                  write_vl1l2_row(shc, vl1l2_info[i_wind],
+                     vx_ptr->output_flag[i_vl1l2],
+                     stat_at, i_stat_row,
+                     txt_at[i_vl1l2], i_txt_row[i_vl1l2]);
                }
 
-               // Compute VL1L2 and VAL1L2 partial sums for UGRD and VGRD
-               if(!conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_prob() &&
-                   conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_v_wind() &&
-                   conf_info.vx_opt[i_vx].vx_pd.fcst_info->uv_index() >= 0  &&
-                  (conf_info.vx_opt[i_vx].output_flag[i_vl1l2]  != STATOutputType::None ||
-                   conf_info.vx_opt[i_vx].output_flag[i_val1l2] != STATOutputType::None ||
-                   conf_info.vx_opt[i_vx].output_flag[i_vcnt]   != STATOutputType::None)) {
-
-                  // Store the forecast variable name
-                  shc.set_fcst_var(ugrd_vgrd_abbr_str);
-
-                  // Store the observation variable name
-                  shc.set_obs_var(ugrd_vgrd_abbr_str);
-
-                  // Initialize
-                  for(int i_wind=0; i_wind<n_wind; i_wind++) vl1l2_info[i_wind].clear();
-
-                  // Get the index of the matching u-component
-                  int u_vx = conf_info.vx_opt[i_vx].vx_pd.fcst_info->uv_index();
-
-                  // Check to make sure message types, masking regions,
-                  // and interpolation methods match
-                  if(conf_info.vx_opt[i_vx].get_n_msg_typ() !=
-                     conf_info.vx_opt[u_vx].get_n_msg_typ() ||
-                     conf_info.vx_opt[i_vx].get_n_mask()    !=
-                     conf_info.vx_opt[u_vx].get_n_mask()    ||
-                     conf_info.vx_opt[i_vx].get_n_interp()  !=
-                     conf_info.vx_opt[u_vx].get_n_interp()) {
-                     mlog << Warning << "\nprocess_scores() -> "
-                          << "when computing VL1L2 and/or VAL1L2 vector "
-                          << "partial sums, the U and V components must "
-                          << "be processed using the same set of message "
-                          << "types, masking regions, and interpolation "
-                          << "methods. Failing to do so will cause "
-                          << "unexpected results!\n\n";
-                  }
-
-                  // Compute VL1L2 and VAL1L2
-                  do_vl1l2(vl1l2_info, i_vx,
-                           &conf_info.vx_opt[u_vx].vx_pd.pd[n],
-                           &conf_info.vx_opt[i_vx].vx_pd.pd[n]);
-
-                  // Loop through all of the wind speed thresholds
-                  for(int i_wind=0; i_wind<conf_info.vx_opt[i_vx].fwind_ta.n(); i_wind++) {
-
-                     // Write out VL1L2
-                     if(conf_info.vx_opt[i_vx].output_flag[i_vl1l2] != STATOutputType::None &&
-                        vl1l2_info[i_wind].vcount > 0) {
-                        write_vl1l2_row(shc, vl1l2_info[i_wind],
-                           conf_info.vx_opt[i_vx].output_flag[i_vl1l2],
-                           stat_at, i_stat_row,
-                           txt_at[i_vl1l2], i_txt_row[i_vl1l2]);
-                     }
-
-                     // Write out VAL1L2
-                     if(conf_info.vx_opt[i_vx].output_flag[i_val1l2] != STATOutputType::None &&
-                        vl1l2_info[i_wind].vacount > 0) {
-                        write_val1l2_row(shc, vl1l2_info[i_wind],
-                           conf_info.vx_opt[i_vx].output_flag[i_val1l2],
-                           stat_at, i_stat_row,
-                           txt_at[i_val1l2], i_txt_row[i_val1l2]);
-                     }
-
-                     // Write out VCNT
-                     if(conf_info.vx_opt[i_vx].output_flag[i_vcnt] != STATOutputType::None &&
-                        vl1l2_info[i_wind].vcount > 0) {
-                        write_vcnt_row(shc, vl1l2_info[i_wind],
-                           conf_info.vx_opt[i_vx].output_flag[i_vcnt],
-                           stat_at, i_stat_row,
-                           txt_at[i_vcnt], i_txt_row[i_vcnt]);
-                     }
-
-                  } // end for i
-
-                  // Reset the forecast variable name
-                  shc.set_fcst_var(conf_info.vx_opt[i_vx].vx_pd.fcst_info->name_attr());
-
-                  // Reset the observation variable name
-                  shc.set_obs_var(conf_info.vx_opt[i_vx].vx_pd.obs_info->name_attr());
-
-               } // end Compute VL1L2 and VAL1L2
-
-               // Compute PCT counts and scores
-               if(conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_prob() &&
-                  (conf_info.vx_opt[i_vx].output_flag[i_pct]  != STATOutputType::None ||
-                   conf_info.vx_opt[i_vx].output_flag[i_pstd] != STATOutputType::None ||
-                   conf_info.vx_opt[i_vx].output_flag[i_pjc]  != STATOutputType::None ||
-                   conf_info.vx_opt[i_vx].output_flag[i_prc]  != STATOutputType::None ||
-                   conf_info.vx_opt[i_vx].output_flag[i_eclv] != STATOutputType::None)) {
-                  do_pct(conf_info.vx_opt[i_vx], pd_ptr);
+               // Write out VAL1L2
+               if(vx_ptr->output_flag[i_val1l2] != STATOutputType::None &&
+                  vl1l2_info[i_wind].vacount > 0) {
+                  write_val1l2_row(shc, vl1l2_info[i_wind],
+                     vx_ptr->output_flag[i_val1l2],
+                     stat_at, i_stat_row,
+                     txt_at[i_val1l2], i_txt_row[i_val1l2]);
                }
 
-               // Reset the verification masking region
-               shc.set_mask(conf_info.vx_opt[i_vx].mask_name[i_mask].c_str());
+               // Write out VCNT
+               if(vx_ptr->output_flag[i_vcnt] != STATOutputType::None &&
+                   vl1l2_info[i_wind].vcount > 0) {
+                   write_vcnt_row(shc, vl1l2_info[i_wind],
+                      vx_ptr->output_flag[i_vcnt],
+                      stat_at, i_stat_row,
+                      txt_at[i_vcnt], i_txt_row[i_vcnt]);
+               }
+            } // end for i_wind
 
-            } // end for i_interp
+            // Reset the forecast variable name
+            shc.set_fcst_var(vx_ptr->vx_pd.fcst_info->name_attr());
 
-            // Apply HiRA ensemble verification logic
-            if(!conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_prob() &&
-                conf_info.vx_opt[i_vx].hira_info.flag             &&
-               (conf_info.vx_opt[i_vx].output_flag[i_ecnt] != STATOutputType::None ||
-                conf_info.vx_opt[i_vx].output_flag[i_rps]  != STATOutputType::None)) {
+            // Reset the observation variable name
+            shc.set_obs_var(vx_ptr->vx_pd.obs_info->name_attr());
 
-               int n = conf_info.vx_opt[i_vx].vx_pd.three_to_one(i_msg_typ, i_mask, 0);
+        } // end Compute VL1L2 and VAL1L2
 
-               pd_ptr = &conf_info.vx_opt[i_vx].vx_pd.pd[n];
+        // Compute PCT counts and scores
+        if(vx_ptr->vx_pd.fcst_info->is_prob() &&
+           (vx_ptr->output_flag[i_pct]  != STATOutputType::None ||
+            vx_ptr->output_flag[i_pstd] != STATOutputType::None ||
+            vx_ptr->output_flag[i_pjc]  != STATOutputType::None ||
+            vx_ptr->output_flag[i_prc]  != STATOutputType::None ||
+            vx_ptr->output_flag[i_eclv] != STATOutputType::None)) {
+            do_pct(conf_info.vx_opt[i_vx], pd_ptr);
+         }
 
-               // Process percentile thresholds
-               conf_info.vx_opt[i_vx].set_perc_thresh(pd_ptr);
+         // Reset the verification masking region
+         shc.set_mask(vx_ptr->mask_name[i_mask].c_str());
 
-               // Appy HiRA verification and write ensemble output
-               do_hira_ens(i_vx, pd_ptr);
-
-            } // end HiRA for ensembles
-
-            // Apply HiRA probabilistic verification logic
-            if(!conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_prob() &&
-                conf_info.vx_opt[i_vx].hira_info.flag             &&
-               (conf_info.vx_opt[i_vx].output_flag[i_mpr]  != STATOutputType::None ||
-                conf_info.vx_opt[i_vx].output_flag[i_pct]  != STATOutputType::None ||
-                conf_info.vx_opt[i_vx].output_flag[i_pstd] != STATOutputType::None ||
-                conf_info.vx_opt[i_vx].output_flag[i_pjc]  != STATOutputType::None ||
-                conf_info.vx_opt[i_vx].output_flag[i_prc]  != STATOutputType::None)) {
-
-               int n = conf_info.vx_opt[i_vx].vx_pd.three_to_one(i_msg_typ, i_mask, 0);
-
-               pd_ptr = &conf_info.vx_opt[i_vx].vx_pd.pd[n];
-
-               // Process percentile thresholds
-               conf_info.vx_opt[i_vx].set_perc_thresh(pd_ptr);
-
-               // Apply HiRA verification and write probabilistic output
-               do_hira_prob(i_vx, pd_ptr);
-
-            } // end HiRA for probabilities
-
-         } // end for i_mask
-      } // end for i_msg_typ
+      } // end for i_mask
 
       mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
@@ -1730,377 +1663,6 @@ void do_pct(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
-   PairDataEnsemble hira_pd;
-   int i, j, k, lvl_blw, lvl_abv;
-   NumArray f_ens;
-
-   // Set flag for specific humidity
-   bool spfh_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_specific_humidity() &&
-                    conf_info.vx_opt[i_vx].vx_pd.obs_info->is_specific_humidity();
-
-   shc.set_interp_mthd(InterpMthd::Nbrhd,
-                       conf_info.vx_opt[i_vx].hira_info.shape);
-
-   // Loop over the HiRA widths
-   for(i=0; i<conf_info.vx_opt[i_vx].hira_info.width.n(); i++) {
-
-      shc.set_interp_wdth(conf_info.vx_opt[i_vx].hira_info.width[i]);
-
-      // Determine the number of points in the area
-      GridTemplateFactory gtf;
-      GridTemplate* gt = gtf.buildGT(conf_info.vx_opt[i_vx].hira_info.shape,
-                                     conf_info.vx_opt[i_vx].hira_info.width[i],
-                                     grid.wrap_lon());
-      if (nullptr == gt) {
-         mlog << Warning << "\ndo_hira_ens() -> "
-              << "failed to get GridTemplate for " << i << "-th width.\n\n";
-         continue;
-      }
-
-      // Initialize
-      hira_pd.clear();
-      hira_pd.extend(pd_ptr->n_obs);
-      hira_pd.set_ens_size(gt->size());
-      hira_pd.set_climo_cdf_info_ptr(&conf_info.vx_opt[i_vx].cdf_info);
-      f_ens.extend(gt->size());
-
-      // Process each observation point
-      for(j=0; j<pd_ptr->n_obs; j++) {
-
-         // Determine the forecast level values
-         find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
-                       pd_ptr->lvl_na[j], lvl_blw, lvl_abv);
-
-         // Get the nearby forecast values
-         get_interp_points(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
-            pd_ptr->x_na[j], pd_ptr->y_na[j],
-            InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[i],
-            conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
-            conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
-            conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
-            pd_ptr->lvl_na[j], lvl_blw, lvl_abv, f_ens);
-
-         // Check for values
-         if(f_ens.n() == 0) continue;
-
-         // TODO: Add has_climo member function instead
-
-         // Skip points where climatology has been specified but is bad data
-         if((conf_info.vx_opt[i_vx].vx_pd.fcmn_dpa.n_planes() > 0 &&
-             is_bad_data(pd_ptr->fcmn_na[j]))                     ||
-            (conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa.n_planes() > 0 &&
-             is_bad_data(pd_ptr->ocmn_na[j]))) continue;
-
-         // Store climo data
-         ClimoPntInfo cpi(pd_ptr->fcmn_na[j], pd_ptr->fcsd_na[j],
-                          pd_ptr->ocmn_na[j], pd_ptr->ocsd_na[j]);
-
-         // Store the observation value
-         hira_pd.add_point_obs(
-            pd_ptr->typ_sa[j].c_str(), pd_ptr->sid_sa[j].c_str(),
-            pd_ptr->lat_na[j], pd_ptr->lon_na[j],
-            pd_ptr->x_na[j], pd_ptr->y_na[j], pd_ptr->vld_ta[j],
-            pd_ptr->lvl_na[j], pd_ptr->elv_na[j],
-            pd_ptr->o_na[j], pd_ptr->o_qc_sa[j].c_str(),
-            cpi, pd_ptr->wgt_na[j]);
-
-         // Store the ensemble mean and member values
-         hira_pd.mn_na.add(f_ens.mean());
-         for(k=0; k<f_ens.n(); k++) {
-            hira_pd.add_ens(k, f_ens[k]);
-            hira_pd.add_ens_var_sums(hira_pd.n_obs-1, f_ens[k]);
-         }
-
-      } // end for j
-
-      mlog << Debug(2)
-           << "Processing "
-           << conf_info.vx_opt[i_vx].vx_pd.fcst_info->magic_str()
-           << " versus "
-           << conf_info.vx_opt[i_vx].vx_pd.obs_info->magic_str()
-           << ", for observation type " << pd_ptr->msg_typ
-           << ", over region " << pd_ptr->mask_name
-           << ", for interpolation method HiRA Ensemble NBRHD("
-           << shc.get_interp_pnts_str()
-           << "), using " << hira_pd.n_obs << " matched pairs.\n";
-
-      // Check for zero matched pairs
-      if(hira_pd.o_na.n() == 0) {
-         if(gt) { delete gt; gt = nullptr; }
-         continue;
-      }
-
-      // Compute the pair values
-      hira_pd.compute_pair_vals(rng_ptr);
-
-      // Write out the ECNT line
-      if(conf_info.vx_opt[i_vx].output_flag[i_ecnt] != STATOutputType::None) {
-
-         // Compute ensemble statistics
-         ECNTInfo ecnt_info;
-         ecnt_info.set(hira_pd);
-
-         write_ecnt_row(shc, ecnt_info,
-            conf_info.vx_opt[i_vx].output_flag[i_ecnt],
-            stat_at, i_stat_row,
-            txt_at[i_ecnt], i_txt_row[i_ecnt]);
-      } // end if ECNT
-
-      // Write out the ORANK line
-      if(conf_info.vx_opt[i_vx].output_flag[i_orank] != STATOutputType::None) {
-
-         write_orank_row(shc, &hira_pd,
-            conf_info.vx_opt[i_vx].output_flag[i_orank],
-            stat_at, i_stat_row,
-            txt_at[i_orank], i_txt_row[i_orank], false);
-  
-         // Reset the obtype column
-         shc.set_obtype(pd_ptr->msg_typ.c_str());
-
-         // Reset the observation valid time
-         shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
-         shc.set_obs_valid_end(conf_info.vx_opt[i_vx].vx_pd.end_ut);
-      } // end if ORANK
-
-      // Write out the RPS line
-      if(conf_info.vx_opt[i_vx].output_flag[i_rps] != STATOutputType::None) {
-
-         // Store ensemble RPS thresholds
-         RPSInfo rps_info;
-         rps_info.set_prob_cat_thresh(conf_info.vx_opt[i_vx].hira_info.prob_cat_ta);
-
-         // If prob_cat_thresh is empty, try to select other thresholds
-         if(rps_info.fthresh.n() == 0) {
-
-            // Use observation climo data, if avaiable
-            if(hira_pd.ocmn_na.n_valid()                  > 0 &&
-               hira_pd.ocsd_na.n_valid()                  > 0 &&
-               conf_info.vx_opt[i_vx].cdf_info.cdf_ta.n() > 0) {
-               mlog << Debug(3) << "Resetting the empty HiRA \""
-                    << conf_key_prob_cat_thresh << "\" thresholds to "
-                    << "climatological distribution thresholds.\n";
-               rps_info.set_cdp_thresh(conf_info.vx_opt[i_vx].cdf_info.cdf_ta);
-            }
-            // Otherwise, use categorical observation thresholds
-            else {
-               mlog << Debug(3) << "Resetting the empty HiRA \""
-                    << conf_key_prob_cat_thresh << "\" thresholds to the "
-                    << "observed categorical thresholds.\n";
-               rps_info.set_prob_cat_thresh(conf_info.vx_opt[i_vx].ocat_ta);
-            }
-         }
-
-         // Check for no thresholds
-         if(rps_info.fthresh.n() == 0) {
-            mlog << Debug(3) << "Skipping HiRA RPS output since no "
-                 << "\"" << conf_key_prob_cat_thresh << "\" thresholds are "
-                 << "defined in the \"" << conf_key_hira
-                 << "\" dictionary.\n";
-            if(gt) { delete gt; gt = nullptr; }
-            break;
-         }
-
-         // Compute ensemble RPS statistics
-         rps_info.set(hira_pd);
-
-         write_rps_row(shc, rps_info,
-                       conf_info.vx_opt[i_vx].output_flag[i_rps],
-                       stat_at, i_stat_row,
-                       txt_at[i_rps], i_txt_row[i_rps]);
-      } // end if RPS
-
-      if(gt) { delete gt; gt = nullptr; }
-
-   } // end for i
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
-   PairDataPoint hira_pd;
-   int i, j, k, lvl_blw, lvl_abv;
-   double f_cov, ocmn_cov;
-   NumArray ocmn_cov_na;
-   SingleThresh cat_thresh;
-   PCTInfo pct_info;
-
-   // Set flag for specific humidity
-   bool spfh_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_specific_humidity() &&
-                    conf_info.vx_opt[i_vx].vx_pd.obs_info->is_specific_humidity();
-   bool precip_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_precipitation() &&
-                      conf_info.vx_opt[i_vx].vx_pd.obs_info->is_precipitation();
-
-   shc.set_interp_mthd(InterpMthd::Nbrhd,
-                       conf_info.vx_opt[i_vx].hira_info.shape);
-
-   // Loop over categorical thresholds and HiRA widths
-   for(i=0; i<conf_info.vx_opt[i_vx].fcat_ta.n(); i++) {
-
-      cat_thresh = conf_info.vx_opt[i_vx].fcat_ta[i];
-
-      shc.set_cov_thresh(cat_thresh);
-
-      for(j=0; j<conf_info.vx_opt[i_vx].hira_info.width.n(); j++) {
-
-         shc.set_interp_wdth(conf_info.vx_opt[i_vx].hira_info.width[j]);
-
-         // Initialize
-         hira_pd.clear();
-         pct_info.clear();
-         ocmn_cov_na.erase();
-
-         // Loop through matched pairs and replace the forecast value
-         // with the HiRA fractional coverage.
-         for(k=0; k<pd_ptr->n_obs; k++) {
-
-            // Store climo data
-            ClimoPntInfo cpi(pd_ptr->fcmn_na[k], pd_ptr->fcsd_na[k],
-                             pd_ptr->ocmn_na[k], pd_ptr->ocsd_na[k]);
-
-            // Compute the fractional coverage forecast value using the
-            // observation level value
-            find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
-                          pd_ptr->lvl_na[k], lvl_blw, lvl_abv);
-
-            f_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
-                       pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k], &cpi,
-                       InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
-                       conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
-                       conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
-                       conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
-                       pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
-
-            // Check for bad data
-            if(is_bad_data(f_cov)) continue;
-
-            // Compute the climatological event probability as the fractional
-            // coverage of the observation climatology mean field
-            if(conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa.n_planes() > 0) {
-
-               // Interpolate to the observation level
-               find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa,
-                             pd_ptr->lvl_na[k], lvl_blw, lvl_abv);
-
-               ocmn_cov = compute_interp(conf_info.vx_opt[i_vx].vx_pd.ocmn_dpa,
-                             pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->o_na[k], &cpi,
-                             InterpMthd::Nbrhd, conf_info.vx_opt[i_vx].hira_info.width[j],
-                             conf_info.vx_opt[i_vx].hira_info.shape, grid.wrap_lon(),
-                             conf_info.vx_opt[i_vx].hira_info.vld_thresh, spfh_flag,
-                             conf_info.vx_opt[i_vx].vx_pd.fcst_info->level().type(),
-                             pd_ptr->lvl_na[k], lvl_blw, lvl_abv, &cat_thresh);
-
-               // Check for bad data
-               if(is_bad_data(ocmn_cov)) continue;
-               else                     ocmn_cov_na.add(ocmn_cov);
-            }
-
-            // Store the fractional coverage pair
-            hira_pd.add_point_pair(
-               pd_ptr->typ_sa[k].c_str(),
-               pd_ptr->sid_sa[k].c_str(),
-               pd_ptr->lat_na[k], pd_ptr->lon_na[k],
-               pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->vld_ta[k],
-               pd_ptr->lvl_na[k], pd_ptr->elv_na[k],
-               f_cov, pd_ptr->o_na[k], pd_ptr->o_qc_sa[k].c_str(),
-               cpi, pd_ptr->wgt_na[k]);
-         } // end for k
-
-         mlog << Debug(2)
-              << "Processing "
-              << conf_info.vx_opt[i_vx].vx_pd.fcst_info->magic_str()
-              << conf_info.vx_opt[i_vx].fcat_ta[i].get_str()
-              << " versus "
-              << conf_info.vx_opt[i_vx].vx_pd.obs_info->magic_str()
-              << conf_info.vx_opt[i_vx].ocat_ta[i].get_str()
-              << ", for observation type " << pd_ptr->msg_typ
-              << ", over region " << pd_ptr->mask_name
-              << ", for interpolation method HiRA Probability NBRHD("
-              << shc.get_interp_pnts_str()
-              << "), using " << hira_pd.n_obs << " matched pairs.\n";
-
-         // Check for zero matched pairs
-         if(hira_pd.f_na.n() == 0 || hira_pd.o_na.n() == 0) continue;
-
-         // Set up the PCTInfo thresholds and alpha values
-         pct_info.fthresh = conf_info.vx_opt[i_vx].hira_info.cov_ta;
-         pct_info.othresh = conf_info.vx_opt[i_vx].ocat_ta[i];
-         pct_info.allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
-
-         for(k=0; k<conf_info.vx_opt[i_vx].get_n_ci_alpha(); k++) {
-            pct_info.alpha[k] = conf_info.vx_opt[i_vx].ci_alpha[k];
-         }
-
-         // Compute the probabilistic counts and statistics
-         bool pstd_flag = conf_info.vx_opt[i_vx].output_flag[i_pstd] != STATOutputType::None;
-         compute_pctinfo(hira_pd, pstd_flag, pct_info, &ocmn_cov_na);
-
-         // Set the contents of the output threshold columns
-         shc.set_fcst_thresh (conf_info.vx_opt[i_vx].fcat_ta[i]);
-         shc.set_obs_thresh  (conf_info.vx_opt[i_vx].ocat_ta[i]);
-         shc.set_thresh_logic(SetLogic::None);
-         shc.set_cov_thresh  (na_str);
-
-         // Write out the MPR lines
-         if(conf_info.vx_opt[i_vx].output_flag[i_mpr] != STATOutputType::None) {
-            write_mpr_row(shc, &hira_pd,
-               conf_info.vx_opt[i_vx].output_flag[i_mpr],
-               stat_at, i_stat_row,
-               txt_at[i_mpr], i_txt_row[i_mpr], false, false);
-
-            // Reset the obtype column
-            shc.set_obtype(pd_ptr->msg_typ.c_str());
-
-            // Reset the observation valid time
-            shc.set_obs_valid_beg(conf_info.vx_opt[i_vx].vx_pd.beg_ut);
-            shc.set_obs_valid_end(conf_info.vx_opt[i_vx].vx_pd.end_ut);
-         }
-
-         // Set cov_thresh column using the HiRA coverage thresholds
-         shc.set_cov_thresh(conf_info.vx_opt[i_vx].hira_info.cov_ta);
-
-         // Write out PCT
-         if(conf_info.vx_opt[i_vx].output_flag[i_pct] != STATOutputType::None) {
-            write_pct_row(shc, pct_info,
-               conf_info.vx_opt[i_vx].output_flag[i_pct],1, 1,
-               stat_at, i_stat_row,
-               txt_at[i_pct], i_txt_row[i_pct], false);
-         }
-
-         // Write out PSTD
-         if(conf_info.vx_opt[i_vx].output_flag[i_pstd] != STATOutputType::None) {
-            write_pstd_row(shc, pct_info,
-               conf_info.vx_opt[i_vx].output_flag[i_pstd], 1, 1,
-               stat_at, i_stat_row,
-               txt_at[i_pstd], i_txt_row[i_pstd], false);
-         }
-
-         // Write out PJC
-         if(conf_info.vx_opt[i_vx].output_flag[i_pjc] != STATOutputType::None) {
-            write_pjc_row(shc, pct_info,
-               conf_info.vx_opt[i_vx].output_flag[i_pjc], 1, 1,
-               stat_at, i_stat_row,
-               txt_at[i_pjc], i_txt_row[i_pjc], false);
-         }
-
-         // Write out PRC
-         if(conf_info.vx_opt[i_vx].output_flag[i_prc] != STATOutputType::None) {
-            write_prc_row(shc, pct_info,
-               conf_info.vx_opt[i_vx].output_flag[i_prc], 1, 1,
-               stat_at, i_stat_row,
-               txt_at[i_prc], i_txt_row[i_prc], false);
-         }
-
-      } // end for j
-   } // end for i
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void finish_txt_files() {
    int i;
 
@@ -2152,18 +1714,17 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\t-pairs file\n"
+        << "\t-pairs file_1 ... file_n | file_list\n"
         << "\t-format type\n"
         << "\t-config config_file\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-
-// JHG change -pairs file to -pairs file_list to support a long list of inputs
-        << "\twhere\t\"-pairs file\" is one or more files containing "
-        << "forecast/observation pairs. May be used multiple times "
-        << "(required).\n"
+        << "\twhere\t\"-pairs\" defines one or more input files containing "
+        << "forecast/observation pairs. May be set as a list of file names "
+        << "(file_1 ... file_n) or as an ASCII file containing a list of "
+        << "file names (file_list). May be used multiple times (required)."
 
         << "\t\t\"-format type\" defines the input pairs file format "
         << "and may be set to \"mpr\" or \"ioda\" (required).\n"

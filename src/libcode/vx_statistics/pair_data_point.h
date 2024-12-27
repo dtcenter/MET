@@ -141,7 +141,7 @@ extern bool check_fo_thresh(double, double, const ClimoPntInfo &,
                         const SetLogic);
 
 extern bool check_mpr_thresh(double, double, const ClimoPntInfo &,
-                        const StringArray &, const ThreshArray &,
+                        const std::map<std::string,ThreshArray> &,
                         ConcatString * = 0);
 
 extern double get_mpr_column_value(double, double, const ClimoPntInfo &,
@@ -150,7 +150,7 @@ extern double get_mpr_column_value(double, double, const ClimoPntInfo &,
 extern void apply_mpr_thresh_mask(DataPlane &, DataPlane &,
                         DataPlane &, DataPlane &,
                         DataPlane &, DataPlane &,
-                        const StringArray &, const ThreshArray &);
+                        const std::map<std::string,ThreshArray> &);
 
 extern bool check_seeps_thresh(double, double,
                         const StringArray &, const ThreshArray &,

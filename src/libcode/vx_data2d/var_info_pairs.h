@@ -1,0 +1,73 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2024
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+#ifndef __VAR_INFO_PAIRS_H__
+#define __VAR_INFO_PAIRS_H__
+
+///////////////////////////////////////////////////////////////////////////////
+
+#include "var_info.h"
+#include "vx_config.h"
+
+#include "data_file_type.h"
+
+///////////////////////////////////////////////////////////////////////////////
+
+class VarInfoPairs : public VarInfo {
+
+   private:
+
+      void init_from_scratch();
+      void assign(const VarInfoPairs &);
+
+   public:
+      VarInfoPairs();
+      ~VarInfoPairs();
+      VarInfoPairs(const VarInfoPairs &);
+      VarInfoPairs & operator=(const VarInfoPairs &);
+      VarInfo *clone() const;
+
+      void dump(std::ostream &) const;
+      void clear();
+
+         //
+         // get stuff
+         //
+
+      GrdFileType file_type() const;
+
+         //
+         // set stuff
+         //
+
+      void set_dict(Dictionary &);
+
+         //
+         // do stuff
+         //
+
+      bool is_precipitation()     const;
+      bool is_specific_humidity() const;
+      bool is_u_wind()            const;
+      bool is_v_wind()            const;
+      bool is_wind_speed()        const;
+      bool is_wind_direction()    const;
+};
+
+///////////////////////////////////////////////////////////////////////////////
+
+inline GrdFileType VarInfoPairs::file_type() const { return FileType_Pairs; }
+
+///////////////////////////////////////////////////////////////////////////////
+
+#endif  // __VAR_INFO_PAIRS_H__
+
+///////////////////////////////////////////////////////////////////////////////

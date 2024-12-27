@@ -15,6 +15,7 @@ libvx_data2d_a_SOURCES = \
               leveltype_to_string.cc leveltype_to_string.h \
               level_info.cc level_info.h \
               var_info.cc var_info.h \
+              var_info_pairs.cc var_info_pairs.h \
               data_class.cc data_class.h \
               data2d_utils.cc data2d_utils.h \
               table_lookup.cc table_lookup.h \

@@ -111,6 +111,7 @@ am_libvx_data2d_a_OBJECTS =  \
 	libvx_data2d_a-leveltype_to_string.$(OBJEXT) \
 	libvx_data2d_a-level_info.$(OBJEXT) \
 	libvx_data2d_a-var_info.$(OBJEXT) \
+	libvx_data2d_a-var_info_pairs.$(OBJEXT) \
 	libvx_data2d_a-data_class.$(OBJEXT) \
 	libvx_data2d_a-data2d_utils.$(OBJEXT) \
 	libvx_data2d_a-table_lookup.$(OBJEXT) \
@@ -137,7 +138,8 @@ am__depfiles_remade = ./$(DEPDIR)/libvx_data2d_a-data2d_utils.Po \
 	./$(DEPDIR)/libvx_data2d_a-leveltype_to_string.Po \
 	./$(DEPDIR)/libvx_data2d_a-mask_filters.Po \
 	./$(DEPDIR)/libvx_data2d_a-table_lookup.Po \
-	./$(DEPDIR)/libvx_data2d_a-var_info.Po
+	./$(DEPDIR)/libvx_data2d_a-var_info.Po \
+	./$(DEPDIR)/libvx_data2d_a-var_info_pairs.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -361,6 +363,7 @@ libvx_data2d_a_SOURCES = \
               leveltype_to_string.cc leveltype_to_string.h \
               level_info.cc level_info.h \
               var_info.cc var_info.h \
+              var_info_pairs.cc var_info_pairs.h \
               data_class.cc data_class.h \
               data2d_utils.cc data2d_utils.h \
               table_lookup.cc table_lookup.h \
@@ -423,6 +426,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_a-mask_filters.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_a-table_lookup.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_a-var_info.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_data2d_a-var_info_pairs.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -485,6 +489,20 @@ libvx_data2d_a-var_info.obj: var_info.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='var_info.cc' object='libvx_data2d_a-var_info.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_a-var_info.obj `if test -f 'var_info.cc'; then $(CYGPATH_W) 'var_info.cc'; else $(CYGPATH_W) '$(srcdir)/var_info.cc'; fi`
+
+libvx_data2d_a-var_info_pairs.o: var_info_pairs.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_a-var_info_pairs.o -MD -MP -MF $(DEPDIR)/libvx_data2d_a-var_info_pairs.Tpo -c -o libvx_data2d_a-var_info_pairs.o `test -f 'var_info_pairs.cc' || echo '$(srcdir)/'`var_info_pairs.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_a-var_info_pairs.Tpo $(DEPDIR)/libvx_data2d_a-var_info_pairs.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='var_info_pairs.cc' object='libvx_data2d_a-var_info_pairs.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_a-var_info_pairs.o `test -f 'var_info_pairs.cc' || echo '$(srcdir)/'`var_info_pairs.cc
+
+libvx_data2d_a-var_info_pairs.obj: var_info_pairs.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_a-var_info_pairs.obj -MD -MP -MF $(DEPDIR)/libvx_data2d_a-var_info_pairs.Tpo -c -o libvx_data2d_a-var_info_pairs.obj `if test -f 'var_info_pairs.cc'; then $(CYGPATH_W) 'var_info_pairs.cc'; else $(CYGPATH_W) '$(srcdir)/var_info_pairs.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_data2d_a-var_info_pairs.Tpo $(DEPDIR)/libvx_data2d_a-var_info_pairs.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='var_info_pairs.cc' object='libvx_data2d_a-var_info_pairs.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_data2d_a-var_info_pairs.obj `if test -f 'var_info_pairs.cc'; then $(CYGPATH_W) 'var_info_pairs.cc'; else $(CYGPATH_W) '$(srcdir)/var_info_pairs.cc'; fi`
 
 libvx_data2d_a-data_class.o: data_class.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_data2d_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_data2d_a-data_class.o -MD -MP -MF $(DEPDIR)/libvx_data2d_a-data_class.Tpo -c -o libvx_data2d_a-data_class.o `test -f 'data_class.cc' || echo '$(srcdir)/'`data_class.cc
@@ -673,6 +691,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-mask_filters.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-table_lookup.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-var_info.Po
+	-rm -f ./$(DEPDIR)/libvx_data2d_a-var_info_pairs.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -725,6 +744,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-mask_filters.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-table_lookup.Po
 	-rm -f ./$(DEPDIR)/libvx_data2d_a-var_info.Po
+	-rm -f ./$(DEPDIR)/libvx_data2d_a-var_info_pairs.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
