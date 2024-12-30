@@ -2173,7 +2173,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
             //
             if(m[key].fcst_var != cur.fcst_var ||
                m[key].obs_var  != cur.obs_var) {
-               mlog << Error << "\nread_mpr_lines() -> "
+               mlog << Error << "\naggr_mpr_lines() -> "
                     << "both the forecast and observation variable types must "
                     << "remain constant.  Try setting \"-fcst_var\" and/or "
                     << "\"-obs_var\".\n"
