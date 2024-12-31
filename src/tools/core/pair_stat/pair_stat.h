@@ -136,10 +136,6 @@ static int              i_txt_row[n_txt];
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-// Grid variables
-static Grid grid;
-static bool is_first_pass = true;
-
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
 static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) nullptr;

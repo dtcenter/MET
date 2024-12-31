@@ -58,7 +58,7 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
-static void setup_first_pass(const DataPlane &, const Grid &);
+static void setup_pairs();
 
 static void setup_txt_files();
 static void setup_table    (AsciiTable &);
@@ -217,6 +217,12 @@ void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(pairs_format);
 
+   // Process the masks
+   conf_info.process_masks();
+
+   // Setup the VxPairDataPoint objects
+   conf_info.set_vx_pd();
+
    // List the input pair files
    mlog << Debug(1)
         << "Reading " << pairs_files.n() << " \""
@@ -236,33 +242,6 @@ void process_command_line(int argc, char **argv) {
    rng_set(rng_ptr,
            conf_info.vx_opt[0].boot_info.rng.c_str(),
            conf_info.vx_opt[0].boot_info.seed.c_str());
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
-
-   // Unset the flag
-   is_first_pass = false;
-
-   // Determine the verification grid
-   grid = parse_vx_grid(conf_info.vx_opt[0].vx_pd.fcst_info->regrid(),
-                        &data_grid, &data_grid);
-
-   // Process the masks
-   conf_info.process_masks();
-
-   // Process the geography data
-   conf_info.process_geog();
-
-   // Setup the VxPairDataPoint objects
-   conf_info.set_vx_pd();
-
-   // Store the lead and valid times
-   if(fcst_valid_ut == (unixtime) 0) fcst_valid_ut = dp.valid();
-   if(is_bad_data(fcst_lead_sec))    fcst_lead_sec = dp.lead();
 
    return;
 }
@@ -469,381 +448,52 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 ////////////////////////////////////////////////////////////////////////
 
 void process_mpr_pairs(const ConcatString &file_name, PairsFormat format) {
+   LineDataFile f;
+   const char *method_name = "process_mpr_pairs() -> ";
 
-   return;
-}
-
-/* JHG
-   int j;
-   int n_fcst;
-   DataPlaneArray fcst_dpa;
-   DataPlaneArray fcmn_dpa, fcsd_dpa;
-   DataPlaneArray ocmn_dpa, ocsd_dpa;
-   unixtime file_ut, beg_ut, end_ut;
-
-   // Loop through each of the fields to be verified and extract
-   // the forecast and climatological fields for verification
-   for(int i=0; i<conf_info.get_n_vx(); i++) {
-
-      VarInfo *fcst_info = conf_info.vx_opt[i].vx_pd.fcst_info;
-      VarInfo *obs_info  = conf_info.vx_opt[i].vx_pd.obs_info;
-
-      // Read the gridded data from the input forecast file
-      n_fcst = fcst_mtddf->data_plane_array(*fcst_info, fcst_dpa);
-      mlog << Debug(2) << "\n" << sep_str << "\n\n"
-           << "Reading data for " << fcst_info->magic_str() << ".\n";
-
-      // Check for zero fields
-      if(n_fcst == 0) {
-         mlog << Warning << "\nprocess_fcst_climo_files() -> "
-              << "no fields matching " << fcst_info->magic_str()
-              << " found in file: " << fcst_file << "\n\n";
-         continue;
-      }
-
-      // MET #2795, for multiple individual forecast levels, print a
-      // warning if the observations levels are not fully covered.
-      if(n_fcst > 1 &&
-         !is_eq(fcst_info->level().lower(), fcst_info->level().upper()) &&
-         (obs_info->level().lower() < fcst_info->level().lower() ||
-          obs_info->level().upper() > fcst_info->level().upper())) {
-         mlog << Warning << "\nprocess_fcst_climo_files() -> "
-              << "The forecast level range (" << fcst_info->magic_str()
-              << ") does not fully contain the observation level range ("
-              << obs_info->magic_str() << "). No vertical interpolation "
-              << "will be performed for observations falling outside "
-              << "the range of forecast levels. Instead, they will be "
-              << "matched to the single nearest forecast level.\n\n";
-      }
-
-      // Setup the first pass through the data
-      if(is_first_pass) setup_first_pass(fcst_dpa[0], fcst_mtddf->grid());
-
-      // Regrid, if necessary
-      if(!(fcst_mtddf->grid() == grid)) {
-         mlog << Debug(1)
-              << "Regridding " << fcst_dpa.n_planes()
-              << " forecast field(s) for " << fcst_info->magic_str()
-              << " to the verification grid using "
-              << fcst_info->regrid().get_str() << ".\n";
-
-         // Loop through the forecast fields
-         for(j=0; j<fcst_dpa.n_planes(); j++) {
-            fcst_dpa[j] = met_regrid(fcst_dpa[j], fcst_mtddf->grid(), grid,
-                                     fcst_info->regrid());
-         }
-      }
-
-      // Rescale probabilities from [0, 100] to [0, 1]
-      if(fcst_info->p_flag()) {
-         for(j=0; j<fcst_dpa.n_planes(); j++) {
-            rescale_probability(fcst_dpa[j]);
-         }
-      } // end for j
-
-      // Read forecast climatology data
-      fcmn_dpa = read_climo_data_plane_array(
-                    conf_info.conf.lookup_dictionary(conf_key_fcst),
-                    conf_key_climo_mean,
-                    i, fcst_dpa[0].valid(), grid,
-                    "forecast climatology mean");
-      fcsd_dpa = read_climo_data_plane_array(
-                    conf_info.conf.lookup_dictionary(conf_key_fcst),
-                    conf_key_climo_stdev,
-                    i, fcst_dpa[0].valid(), grid,
-                    "forecast climatology standard deviation");
-
-      // Read observation climatology data
-      ocmn_dpa = read_climo_data_plane_array(
-                    conf_info.conf.lookup_dictionary(conf_key_obs),
-                    conf_key_climo_mean,
-                    i, fcst_dpa[0].valid(), grid,
-                    "observation climatology mean");
-      ocsd_dpa = read_climo_data_plane_array(
-                    conf_info.conf.lookup_dictionary(conf_key_obs),
-                    conf_key_climo_stdev,
-                    i, fcst_dpa[0].valid(), grid,
-                    "observation climatology standard deviation");
-
-      // Store data for the current verification task
-      conf_info.vx_opt[i].vx_pd.set_fcst_dpa(fcst_dpa);
-      conf_info.vx_opt[i].vx_pd.set_fcst_climo_mn_dpa(fcmn_dpa);
-      conf_info.vx_opt[i].vx_pd.set_fcst_climo_sd_dpa(fcsd_dpa);
-      conf_info.vx_opt[i].vx_pd.set_obs_climo_mn_dpa(ocmn_dpa);
-      conf_info.vx_opt[i].vx_pd.set_obs_climo_sd_dpa(ocsd_dpa);
-
-      // Get the valid time for the first field
-      file_ut = fcst_dpa[0].valid();
-
-      // If obs_valid_beg_ut and obs_valid_end_ut were set on the command
-      // line, use them.  If not, use beg_ds and end_ds.
-      if(obs_valid_beg_ut != (unixtime) 0 ||
-         obs_valid_end_ut != (unixtime) 0) {
-         beg_ut = obs_valid_beg_ut;
-         end_ut = obs_valid_end_ut;
-      }
-      else {
-         beg_ut = file_ut + conf_info.vx_opt[i].beg_ds;
-         end_ut = file_ut + conf_info.vx_opt[i].end_ds;
-      }
-
-      // Store the valid times for this VxPairDataPoint object
-      conf_info.vx_opt[i].vx_pd.set_fcst_ut(fcst_valid_ut);
-      conf_info.vx_opt[i].vx_pd.set_beg_ut(beg_ut);
-      conf_info.vx_opt[i].vx_pd.set_end_ut(end_ut);
-
-      // Dump out the number of levels found
-      mlog << Debug(2)
-           << "For " << fcst_info->magic_str() << ", found "
-           << n_fcst << " forecast levels, "
-           << fcmn_dpa.n_planes() << " forecast climatology mean and "
-           << fcsd_dpa.n_planes() << " standard deviation level(s), and "
-           << ocmn_dpa.n_planes() << " observation climatology mean and "
-           << ocsd_dpa.n_planes() << " standard deviation level(s).\n";
-
-   } // end for i
-
-   // Check for no data
-   if(is_first_pass) {
-      mlog << Error << "\nprocess_fcst_climo_files() -> "
-           << "no requested forecast data found!  Exiting...\n\n";
-      exit(1);
+   //
+   // Open the input file
+   //
+   if(!f.open(file_name.c_str())) {
+      mlog << Warning << "\n" << method_name
+           << "can't open matched pair file \"" << file_name
+           << "\" for reading!\n\n";
+      return;
    }
 
-   mlog << Debug(2)
-        << "\n" << sep_str << "\n\n";
+   //
+   // Count the number read and kept
+   //
+   int n_read = 0;
+   int n_keep = 0;
 
+   //
+   // Process the STAT lines
+   //
+   STATLine line;
+   while(f >> line) {
+
+      // Skip header and non-MPR lines
+      if(line.is_header() || line.type() != STATLineType::mpr) continue;
+
+      n_read++;
+
+      if(conf_info.add_mpr_line(line)) n_keep++;
+   }
+   
+   mlog << Debug(3) << "Keeping " << n_keep << " of " << n_read
+        << " MPR lines from \"" << file_name << "\".\n";
+ 
    return;
 }
-*/
+
 ////////////////////////////////////////////////////////////////////////
 
 void process_ioda_pairs(const ConcatString &file_name) {
-
+   // TODO: work here
    return;
 }
 
-/* JHG
-   int j, i_obs;
-   float obs_arr[OBS_ARRAY_LEN], hdr_arr[HDR_ARRAY_LEN];
-   float prev_obs_arr[OBS_ARRAY_LEN];
-   ConcatString hdr_typ_str;
-   ConcatString hdr_sid_str;
-   ConcatString hdr_vld_str;
-   ConcatString obs_qty_str;
-   unixtime hdr_ut;
-   NcFile *obs_in = (NcFile *) nullptr;
-   const char *method_name = "process_obs_file() -> ";
-
-   // Set flags for vectors
-   bool vflag = conf_info.get_vflag();
-   bool is_ugrd, is_vgrd;
-
-   // Open the observation file as a NetCDF file.
-   // The observation file must be in NetCDF format as the
-   // output of the PB2NC or ASCII2NC tool.
-   bool status;
-   bool use_var_id = true;
-   bool use_arr_vars = false;
-   bool use_python = false;
-   MetNcPointObsIn nc_point_obs;
-   MetPointData *met_point_obs = nullptr;
-
-   // Check for python format
-   string python_command = obs_file[i_nc];
-   bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
-   use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
-
-#ifdef WITH_PYTHON
-   MetPythonPointDataFile met_point_file;
-   if (use_python) {
-      int offset = python_command.find("=");
-      if (offset == std::string::npos) {
-         mlog << Error << "\n" << method_name
-              << "trouble parsing the python command " << python_command << ".\n\n";
-         exit(1);
-      }
-
-      if(!met_point_file.open(python_command.substr(offset+1).c_str(), use_xarray)) {
-         met_point_file.close();
-         mlog << Error << "\n" << method_name
-              << "trouble getting point observation file from python command "
-              << python_command << ".\n\n";
-         exit(1);
-      }
-
-      met_point_obs = met_point_file.get_met_point_data();
-      use_var_id = met_point_file.is_using_var_id();
-   }
-   else {
-#else
-   if (use_python) python_compile_error(method_name);
-#endif
-      if( !nc_point_obs.open(obs_file[i_nc].c_str()) ) {
-         nc_point_obs.close();
-      
-         mlog << Warning << "\n" << method_name
-              << "can't open observation netCDF file: "
-              << obs_file[i_nc] << "\n\n";
-         return;
-      }
-      
-      nc_point_obs.read_dim_headers();
-      nc_point_obs.check_nc(obs_file[i_nc].c_str(), method_name);
-      nc_point_obs.read_obs_data_table_lookups();
-      met_point_obs = (MetPointData *)&nc_point_obs;
-      use_var_id = nc_point_obs.is_using_var_id();
-      use_arr_vars = nc_point_obs.is_using_obs_arr();
-#ifdef WITH_PYTHON
-   }
-#endif
-
-   // Perform GRIB table lookups, if needed
-   is_vgrd = is_ugrd = false;
-
-   int hdr_count = met_point_obs->get_hdr_cnt();
-   int obs_count = met_point_obs->get_obs_cnt();
-   mlog << Debug(2)
-        << "Searching " << obs_count
-        << " observations from " << hdr_count
-        << " messages.\n";
-
-   ConcatString var_name("");
-   StringArray var_names;
-   StringArray obs_qty_array = met_point_obs->get_qty_data();
-   if(use_var_id) var_names = met_point_obs->get_var_names();
-
-   const int buf_size = (obs_count > BUFFER_SIZE) ? BUFFER_SIZE : obs_count;
-   int   obs_qty_idx_block[buf_size];
-   float obs_arr_block[buf_size][OBS_ARRAY_LEN];
-
-   // Process each observation in the file
-   int block_size;
-   int prev_grib_code = bad_data_int;
-   for(int i_block_start_idx=0; i_block_start_idx<obs_count; i_block_start_idx+=buf_size) {
-      block_size = (obs_count - i_block_start_idx);
-      if (block_size > buf_size) block_size = buf_size;
-
-#ifdef WITH_PYTHON
-      if (use_python)
-         status = met_point_obs->get_point_obs_data()->fill_obs_buf(
-                             block_size, i_block_start_idx, (float *)obs_arr_block, obs_qty_idx_block);
-      else
-#endif
-         status = nc_point_obs.read_obs_data(block_size, i_block_start_idx,
-                                            (float *)obs_arr_block,
-                                            obs_qty_idx_block, (char *)nullptr);
-      if (!status) exit(1);
-
-      int hdr_idx;
-      for(int i_block_idx=0; i_block_idx<block_size; i_block_idx++) {
-         i_obs = i_block_start_idx + i_block_idx;
-
-         for (j=0; j<OBS_ARRAY_LEN; j++) {
-            obs_arr[j] = obs_arr_block[i_block_idx][j];
-         }
-
-         int qty_offset = use_arr_vars ? i_obs : obs_qty_idx_block[i_block_idx];
-         obs_qty_str = obs_qty_array[qty_offset];
-
-         int headerOffset = met_point_obs->get_header_offset(obs_arr);
-
-         // Range check the header offset
-         if(headerOffset < 0 || headerOffset >= hdr_count) {
-            mlog << Warning << "\n" << method_name
-                 << "range check error for header index " << headerOffset
-                 << " from observation number " << i_obs
-                 << " of point observation file: " << obs_file[i_nc]
-                 << "\n\n";
-            continue;
-         }
-
-         // Read the corresponding header array for this observation
-         // - the corresponding header type, header Station ID, and valid time
-#ifdef WITH_PYTHON
-         if (use_python)
-            met_point_obs->get_header(headerOffset, hdr_arr, hdr_typ_str, hdr_sid_str, hdr_vld_str);
-         else
-#endif
-            nc_point_obs.get_header(headerOffset, hdr_arr, hdr_typ_str,
-                                    hdr_sid_str, hdr_vld_str);
-
-         // Store the variable name
-         int org_grib_code = met_point_obs->get_grib_code_or_var_index(obs_arr);
-         int grib_code = org_grib_code;
-         if (prev_grib_code != org_grib_code) {
-            if (use_var_id && grib_code < var_names.n()) {
-               var_name   = var_names[grib_code];
-               grib_code = bad_data_int;
-            }
-            else {
-               var_name = "";
-            }
-
-            // Check for wind components
-            is_ugrd = ( use_var_id &&        var_name == ugrd_abbr_str ) ||
-                      (!use_var_id && nint(grib_code) == ugrd_grib_code);
-            is_vgrd = ( use_var_id &&        var_name == vgrd_abbr_str ) ||
-                      (!use_var_id && nint(grib_code) == vgrd_grib_code);
-            prev_grib_code = org_grib_code;
-         }
-
-         // If the current observation is UGRD, save it as the
-         // previous.  If vector winds are to be computed, UGRD
-         // must be followed by VGRD
-         if(vflag && is_ugrd) {
-            for(j=0; j<4; j++) prev_obs_arr[j] = obs_arr[j];
-         }
-
-         // If the current observation is VGRD and vector
-         // winds are to be computed.  Make sure that the
-         // previous observation was UGRD with the same header
-         // and at the same vertical level.
-         if(vflag && is_vgrd) {
-
-            if(!met_point_obs->is_same_obs_values(obs_arr, prev_obs_arr)) {
-               mlog << Error << "\n" << method_name
-                    << "for observation index " << i_obs
-                    << ", when computing VL1L2 and/or VAL1L2 vector winds "
-                    << "each UGRD observation must be followed by a VGRD "
-                    << "observation with the same header and at the same "
-                    << "level.\n\n";
-               exit(1);
-            }
-         }
-
-         // Convert string to a unixtime
-         hdr_ut = timestring_to_unix(hdr_vld_str.c_str());
-
-         // Check each conf_info.vx_pd object to see if this observation
-         // should be added
-         for(j=0; j<conf_info.get_n_vx(); j++) {
-
-            // Check for no forecast fields
-            if(conf_info.vx_opt[j].vx_pd.fcst_dpa.n_planes() == 0) continue;
-
-            // Attempt to add the observation to the conf_info.vx_pd object
-            conf_info.vx_opt[j].vx_pd.add_point_obs(
-                    hdr_arr, hdr_typ_str.c_str(), hdr_sid_str.c_str(),
-                    hdr_ut, obs_qty_str.c_str(), obs_arr,
-                    grid, var_name.c_str());
-         }
-
-         met_point_obs->set_grib_code_or_var_index(obs_arr, org_grib_code);
-      }
-
-   } // end for i_block_start_idx
-
-   // Deallocate and clean up
-#ifdef WITH_PYTHON
-   if (use_python) met_point_file.close();
-   else
-#endif
-   nc_point_obs.close();
-
-   return;
-}
-*/
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
@@ -851,9 +501,9 @@ void process_scores() {
    ConcatString cs;
 
    // Initialize pointers
-   CTSInfo       *cts_info   = (CTSInfo *)       nullptr;
-   MCTSInfo       mcts_info;
-   VL1L2Info     *vl1l2_info = (VL1L2Info *)     nullptr;
+   CTSInfo   *cts_info   = (CTSInfo *)   nullptr;
+   MCTSInfo   mcts_info;
+   VL1L2Info *vl1l2_info = (VL1L2Info *) nullptr;
 
    mlog << Debug(2)
         << "\n" << sep_str << "\n\n";
@@ -870,107 +520,107 @@ void process_scores() {
    vl1l2_info = new VL1L2Info [n_wind];
 
    // Compute scores for each PairData object and write output
-   for(int i_vx=0; i_vx<conf_info.get_n_vx(); i_vx++) {
+   int i_vx = -1;
+   for(auto &vx : conf_info.vx_opt) {
 
-      PairStatVxOpt *vx_ptr = &conf_info.vx_opt[i_vx];
-
-      // Check for no forecast fields
-      if(vx_ptr->vx_pd.fcst_dpa.n_planes() == 0) continue;
+      i_vx++;
 
       // Store the description
-      if(vx_ptr->vx_pd.desc.empty()) {
+      if(vx.vx_pd.desc.empty()) {
          shc.set_desc(na_str);
       }
       else {
-         shc.set_desc(vx_ptr->vx_pd.desc.c_str());
+         shc.set_desc(vx.vx_pd.desc.c_str());
       }
 
       // Store the forecast variable name
-      shc.set_fcst_var(vx_ptr->vx_pd.fcst_info->name_attr());
+      shc.set_fcst_var(vx.vx_pd.fcst_info->name_attr());
 
       // Store the forecast variable units
-      shc.set_fcst_units(vx_ptr->vx_pd.fcst_info->units_attr());
+      shc.set_fcst_units(vx.vx_pd.fcst_info->units_attr());
 
       // Set the forecast level name
-      shc.set_fcst_lev(vx_ptr->vx_pd.fcst_info->level_attr().c_str());
+      shc.set_fcst_lev(vx.vx_pd.fcst_info->level_attr().c_str());
 
       // Store the observation variable name
-      shc.set_obs_var(vx_ptr->vx_pd.obs_info->name_attr());
+      shc.set_obs_var(vx.vx_pd.obs_info->name_attr());
 
       // Store the observation variable units
-      cs = vx_ptr->vx_pd.obs_info->units_attr();
+      cs = vx.vx_pd.obs_info->units_attr();
       if(cs.empty()) cs = na_string;
       shc.set_obs_units(cs);
 
       // Set the observation level name
-      shc.set_obs_lev(vx_ptr->vx_pd.obs_info->level_attr().c_str());
+      shc.set_obs_lev(vx.vx_pd.obs_info->level_attr().c_str());
 
+      // TODO: figure out the actual timing info!
       // Set the forecast lead time
-      shc.set_fcst_lead_sec(vx_ptr->vx_pd.fcst_dpa[0].lead());
+      shc.set_fcst_lead_sec(0);
 
+      // TODO: figure out the actual timing info!
       // Set the forecast valid time
-      shc.set_fcst_valid_beg(vx_ptr->vx_pd.fcst_dpa[0].valid());
-      shc.set_fcst_valid_end(vx_ptr->vx_pd.fcst_dpa[0].valid());
+      shc.set_fcst_valid_beg(0);
+      shc.set_fcst_valid_end(0);
 
       // Set the observation lead time
       shc.set_obs_lead_sec(0);
 
       // Set the observation valid time
-      shc.set_obs_valid_beg(vx_ptr->vx_pd.beg_ut);
-      shc.set_obs_valid_end(vx_ptr->vx_pd.end_ut);
+      shc.set_obs_valid_beg(vx.vx_pd.beg_ut);
+      shc.set_obs_valid_end(vx.vx_pd.end_ut);
 
       // Store the message type in the obtype column
       shc.set_obtype(na_str);
 
       // Loop through the verification masking regions
-      for(int i_mask=0; i_mask<vx_ptr->get_n_mask(); i_mask++) {
+      for(int i_mask=0; i_mask<vx.get_n_mask(); i_mask++) {
 
          // Store the verification masking region
-         shc.set_mask(vx_ptr->mask_name[i_mask].c_str());
+         shc.set_mask(vx.mask_name[i_mask].c_str());
 
          // Store the interpolation method as nearest
          shc.set_interp_mthd(InterpMthd::Nearest);
          shc.set_interp_wdth(1);
 
-         PairDataPoint *pd_ptr = &vx_ptr->vx_pd.pd[i_mask];
+         PairDataPoint *pd_ptr = &vx.vx_pd.pd[i_mask];
 
          mlog << Debug(2)
-              << "Processing " << vx_ptr->vx_pd.fcst_info->magic_str()
-              << " versus " << vx_ptr->vx_pd.obs_info->magic_str()
+              << "Processing " << vx.vx_pd.fcst_info->magic_str()
+              << " versus " << vx.vx_pd.obs_info->magic_str()
               << ", over region " << pd_ptr->mask_name
-              << "), using " << pd_ptr->n_obs << " matched pairs.\n";
+              << ", using " << pd_ptr->n_obs << " matched pairs.\n";
 
          // List counts for reasons why observations were rejected
          cs << cs_erase
             << "Number of matched pairs   = " << pd_ptr->n_obs << "\n"
-            << "Observations processed    = " << vx_ptr->vx_pd.n_try << "\n"
-            << "Rejected: station id      = " << vx_ptr->vx_pd.rej_sid << "\n"
-            << "Rejected: obs var name    = " << vx_ptr->vx_pd.rej_var << "\n"
-            << "Rejected: valid time      = " << vx_ptr->vx_pd.rej_vld << "\n"
-            << "Rejected: bad obs value   = " << vx_ptr->vx_pd.rej_obs << "\n"
-            << "Rejected: off the grid    = " << vx_ptr->vx_pd.rej_grd << "\n"
-            << "Rejected: topography      = " << vx_ptr->vx_pd.rej_topo << "\n"
-            << "Rejected: level mismatch  = " << vx_ptr->vx_pd.rej_lvl << "\n"
-            << "Rejected: quality marker  = " << vx_ptr->vx_pd.rej_qty << "\n"
-            << "Rejected: message type    = " << vx_ptr->vx_pd.rej_typ[i_mask] << "\n"
-            << "Rejected: masking region  = " << vx_ptr->vx_pd.rej_mask[i_mask] << "\n"
-            << "Rejected: bad fcst value  = " << vx_ptr->vx_pd.rej_fcst[i_mask] << "\n"
-            << "Rejected: bad climo mean  = " << vx_ptr->vx_pd.rej_cmn[i_mask] << "\n"
-            << "Rejected: bad climo stdev = " << vx_ptr->vx_pd.rej_csd[i_mask] << "\n"
-            << "Rejected: mpr filter      = " << vx_ptr->vx_pd.rej_mpr[i_mask] << "\n"
-            << "Rejected: duplicates      = " << vx_ptr->vx_pd.rej_dup[i_mask] << "\n";
+            << "Observations processed    = " << vx.vx_pd.n_try << "\n"
+            << "Rejected: station id      = " << vx.vx_pd.rej_sid << "\n"
+            << "Rejected: obs var name    = " << vx.vx_pd.rej_var << "\n"
+            << "Rejected: valid time      = " << vx.vx_pd.rej_vld << "\n"
+            << "Rejected: bad obs value   = " << vx.vx_pd.rej_obs << "\n"
+            << "Rejected: off the grid    = " << vx.vx_pd.rej_grd << "\n"
+            << "Rejected: topography      = " << vx.vx_pd.rej_topo << "\n"
+            << "Rejected: level mismatch  = " << vx.vx_pd.rej_lvl << "\n"
+            << "Rejected: quality marker  = " << vx.vx_pd.rej_qty << "\n"
+            << "Rejected: message type    = " << vx.vx_pd.rej_typ[i_mask] << "\n"
+            << "Rejected: masking region  = " << vx.vx_pd.rej_mask[i_mask] << "\n"
+            << "Rejected: bad fcst value  = " << vx.vx_pd.rej_fcst[i_mask] << "\n"
+            << "Rejected: bad climo mean  = " << vx.vx_pd.rej_cmn[i_mask] << "\n"
+            << "Rejected: bad climo stdev = " << vx.vx_pd.rej_csd[i_mask] << "\n"
+            << "Rejected: mpr filter      = " << vx.vx_pd.rej_mpr[i_mask] << "\n"
+            << "Rejected: duplicates      = " << vx.vx_pd.rej_dup[i_mask] << "\n";
 
          // Print report based on the number of matched pairs
          if(pd_ptr->n_obs > 0) mlog << Debug(3) << cs;
          else                  mlog << Debug(2) << cs;
 
          // Process percentile thresholds
-         vx_ptr->set_perc_thresh(pd_ptr);
+         vx.set_perc_thresh(pd_ptr);
 
          // Write out the MPR lines
-         if(vx_ptr->output_flag[i_mpr] != STATOutputType::None) {
+         if(vx.output_flag[i_mpr] != STATOutputType::None) {
             write_mpr_row(shc, pd_ptr,
-               vx_ptr->output_flag[i_mpr],
+               vx.output_flag[i_mpr],
                stat_at, i_stat_row,
                txt_at[i_mpr], i_txt_row[i_mpr], false);
 
@@ -978,14 +628,14 @@ void process_scores() {
             shc.set_obtype(na_str);
 
             // Reset the observation valid time
-            shc.set_obs_valid_beg(vx_ptr->vx_pd.beg_ut);
-            shc.set_obs_valid_end(vx_ptr->vx_pd.end_ut);
+            shc.set_obs_valid_beg(vx.vx_pd.beg_ut);
+            shc.set_obs_valid_end(vx.vx_pd.end_ut);
          }
 
          // Write out the SEEPS MPR lines
-         if(vx_ptr->output_flag[i_seeps_mpr] != STATOutputType::None) {
+         if(vx.output_flag[i_seeps_mpr] != STATOutputType::None) {
             write_seeps_mpr_row(shc, pd_ptr,
-               vx_ptr->output_flag[i_seeps_mpr],
+               vx.output_flag[i_seeps_mpr],
                stat_at, i_stat_row,
                txt_at[i_seeps_mpr], i_txt_row[i_seeps_mpr], false);
 
@@ -993,26 +643,26 @@ void process_scores() {
             shc.set_obtype(na_str);
 
             // Reset the observation valid time
-            shc.set_obs_valid_beg(vx_ptr->vx_pd.beg_ut);
-            shc.set_obs_valid_end(vx_ptr->vx_pd.end_ut);
+            shc.set_obs_valid_beg(vx.vx_pd.beg_ut);
+            shc.set_obs_valid_end(vx.vx_pd.end_ut);
          }
 
          // Write out the SEEPS lines
-         if(vx_ptr->output_flag[i_seeps] != STATOutputType::None) {
+         if(vx.output_flag[i_seeps] != STATOutputType::None) {
             compute_aggregated_seeps(pd_ptr, &pd_ptr->seeps_agg);
             write_seeps_row(shc, &pd_ptr->seeps_agg,
-               vx_ptr->output_flag[i_seeps],
+               vx.output_flag[i_seeps],
                stat_at, i_stat_row,
                txt_at[i_seeps], i_txt_row[i_seeps]);
          }
 
          // Compute CTS scores
-         if(!vx_ptr->vx_pd.fcst_info->is_prob() &&
-             vx_ptr->fcat_ta.n() > 0            &&
-            (vx_ptr->output_flag[i_fho]  != STATOutputType::None ||
-             vx_ptr->output_flag[i_ctc]  != STATOutputType::None ||
-             vx_ptr->output_flag[i_cts]  != STATOutputType::None ||
-             vx_ptr->output_flag[i_eclv] != STATOutputType::None)) {
+         if(!vx.vx_pd.fcst_info->is_prob() &&
+             vx.fcat_ta.n() > 0            &&
+            (vx.output_flag[i_fho]  != STATOutputType::None ||
+             vx.output_flag[i_ctc]  != STATOutputType::None ||
+             vx.output_flag[i_cts]  != STATOutputType::None ||
+             vx.output_flag[i_eclv] != STATOutputType::None)) {
 
             // Initialize
             for(int i_cat=0; i_cat<n_cat; i_cat++) cts_info[i_cat].clear();
@@ -1021,38 +671,38 @@ void process_scores() {
             do_cts(cts_info, i_vx, pd_ptr);
 
             // Loop through the categorical thresholds
-            for(int i_cat=0; i_cat<vx_ptr->fcat_ta.n(); i_cat++) {
+            for(int i_cat=0; i_cat<vx.fcat_ta.n(); i_cat++) {
 
                if(cts_info[i_cat].cts.n_pairs() == 0) continue;
 
                // Write out FHO
-               if(vx_ptr->output_flag[i_fho] != STATOutputType::None) {
+               if(vx.output_flag[i_fho] != STATOutputType::None) {
                   write_fho_row(shc, cts_info[i_cat],
-                     vx_ptr->output_flag[i_fho],
+                     vx.output_flag[i_fho],
                      stat_at, i_stat_row,
                      txt_at[i_fho], i_txt_row[i_fho]);
                }
 
                // Write out CTC
-               if(vx_ptr->output_flag[i_ctc] != STATOutputType::None) {
+               if(vx.output_flag[i_ctc] != STATOutputType::None) {
                   write_ctc_row(shc, cts_info[i_cat],
-                     vx_ptr->output_flag[i_ctc],
+                     vx.output_flag[i_ctc],
                      stat_at, i_stat_row,
                      txt_at[i_ctc], i_txt_row[i_ctc]);
                }
 
                // Write out CTS
-               if(vx_ptr->output_flag[i_cts] != STATOutputType::None) {
+               if(vx.output_flag[i_cts] != STATOutputType::None) {
                   write_cts_row(shc, cts_info[i_cat],
-                     vx_ptr->output_flag[i_cts],
+                     vx.output_flag[i_cts],
                      stat_at, i_stat_row,
                      txt_at[i_cts], i_txt_row[i_cts]);
                }
 
                // Write out ECLV
-               if(vx_ptr->output_flag[i_eclv] != STATOutputType::None) {
-                  write_eclv_row(shc, cts_info[i_cat], vx_ptr->eclv_points,
-                     vx_ptr->output_flag[i_eclv],
+               if(vx.output_flag[i_eclv] != STATOutputType::None) {
+                  write_eclv_row(shc, cts_info[i_cat], vx.eclv_points,
+                     vx.output_flag[i_eclv],
                      stat_at, i_stat_row,
                      txt_at[i_eclv], i_txt_row[i_eclv]);
                }
@@ -1060,10 +710,10 @@ void process_scores() {
          } // end Compute CTS scores
 
          // Compute MCTS scores
-         if(!vx_ptr->vx_pd.fcst_info->is_prob() &&
-             vx_ptr->fcat_ta.n() > 1            &&
-            (vx_ptr->output_flag[i_mctc] != STATOutputType::None ||
-             vx_ptr->output_flag[i_mcts] != STATOutputType::None)) {
+         if(!vx.vx_pd.fcst_info->is_prob() &&
+             vx.fcat_ta.n() > 1            &&
+            (vx.output_flag[i_mctc] != STATOutputType::None ||
+             vx.output_flag[i_mcts] != STATOutputType::None)) {
 
             // Initialize
             mcts_info.clear();
@@ -1074,37 +724,37 @@ void process_scores() {
             if(mcts_info.cts.n_pairs() == 0) continue;
 
             // Write out MCTC
-            if(vx_ptr->output_flag[i_mctc] != STATOutputType::None) {
+            if(vx.output_flag[i_mctc] != STATOutputType::None) {
                write_mctc_row(shc, mcts_info,
-                  vx_ptr->output_flag[i_mctc],
+                  vx.output_flag[i_mctc],
                   stat_at, i_stat_row,
                   txt_at[i_mctc], i_txt_row[i_mctc]);
             }
 
             // Write out MCTS
-            if(vx_ptr->output_flag[i_mcts] != STATOutputType::None) {
+            if(vx.output_flag[i_mcts] != STATOutputType::None) {
                write_mcts_row(shc, mcts_info,
-                  vx_ptr->output_flag[i_mcts],
+                  vx.output_flag[i_mcts],
                   stat_at, i_stat_row,
                   txt_at[i_mcts], i_txt_row[i_mcts]);
             }
          } // end Compute MCTS scores
 
          // Compute CNT, SL1L2, and SAL1L2 scores
-         if(!vx_ptr->vx_pd.fcst_info->is_prob() &&
-            (vx_ptr->output_flag[i_cnt]    != STATOutputType::None ||
-             vx_ptr->output_flag[i_sl1l2]  != STATOutputType::None ||
-             vx_ptr->output_flag[i_sal1l2] != STATOutputType::None)) {
-             do_cnt_sl1l2(*vx_ptr, pd_ptr);
+         if(!vx.vx_pd.fcst_info->is_prob() &&
+            (vx.output_flag[i_cnt]    != STATOutputType::None ||
+             vx.output_flag[i_sl1l2]  != STATOutputType::None ||
+             vx.output_flag[i_sal1l2] != STATOutputType::None)) {
+             do_cnt_sl1l2(vx, pd_ptr);
          }
 
          // Compute VL1L2 and VAL1L2 partial sums for UGRD and VGRD
-         if(!vx_ptr->vx_pd.fcst_info->is_prob()       &&
-             vx_ptr->vx_pd.fcst_info->is_v_wind()     &&
-             vx_ptr->vx_pd.fcst_info->uv_index() >= 0 &&
-            (vx_ptr->output_flag[i_vl1l2]  != STATOutputType::None ||
-             vx_ptr->output_flag[i_val1l2] != STATOutputType::None ||
-             vx_ptr->output_flag[i_vcnt]   != STATOutputType::None)) {
+         if(!vx.vx_pd.fcst_info->is_prob()       &&
+             vx.vx_pd.fcst_info->is_v_wind()     &&
+             vx.vx_pd.fcst_info->uv_index() >= 0 &&
+            (vx.output_flag[i_vl1l2]  != STATOutputType::None ||
+             vx.output_flag[i_val1l2] != STATOutputType::None ||
+             vx.output_flag[i_vcnt]   != STATOutputType::None)) {
 
             // Store the forecast variable name
             shc.set_fcst_var(ugrd_vgrd_abbr_str);
@@ -1116,7 +766,7 @@ void process_scores() {
             for(int i_wind=0; i_wind<n_wind; i_wind++) vl1l2_info[i_wind].clear();
 
             // Get the index of the matching u-component
-            int u_vx = vx_ptr->vx_pd.fcst_info->uv_index();
+            int u_vx = vx.vx_pd.fcst_info->uv_index();
 
             // Check to make sure the masking regions match
             if(conf_info.vx_opt[i_vx].get_n_mask() !=
@@ -1134,56 +784,56 @@ void process_scores() {
                      &conf_info.vx_opt[i_vx].vx_pd.pd[i_mask]);
 
             // Loop through all of the wind speed thresholds
-            for(int i_wind=0; i_wind<vx_ptr->fwind_ta.n(); i_wind++) {
+            for(int i_wind=0; i_wind<vx.fwind_ta.n(); i_wind++) {
 
                // Write out VL1L2
-               if(vx_ptr->output_flag[i_vl1l2] != STATOutputType::None &&
+               if(vx.output_flag[i_vl1l2] != STATOutputType::None &&
                   vl1l2_info[i_wind].vcount > 0) {
                   write_vl1l2_row(shc, vl1l2_info[i_wind],
-                     vx_ptr->output_flag[i_vl1l2],
+                     vx.output_flag[i_vl1l2],
                      stat_at, i_stat_row,
                      txt_at[i_vl1l2], i_txt_row[i_vl1l2]);
                }
 
                // Write out VAL1L2
-               if(vx_ptr->output_flag[i_val1l2] != STATOutputType::None &&
+               if(vx.output_flag[i_val1l2] != STATOutputType::None &&
                   vl1l2_info[i_wind].vacount > 0) {
                   write_val1l2_row(shc, vl1l2_info[i_wind],
-                     vx_ptr->output_flag[i_val1l2],
+                     vx.output_flag[i_val1l2],
                      stat_at, i_stat_row,
                      txt_at[i_val1l2], i_txt_row[i_val1l2]);
                }
 
                // Write out VCNT
-               if(vx_ptr->output_flag[i_vcnt] != STATOutputType::None &&
+               if(vx.output_flag[i_vcnt] != STATOutputType::None &&
                    vl1l2_info[i_wind].vcount > 0) {
                    write_vcnt_row(shc, vl1l2_info[i_wind],
-                      vx_ptr->output_flag[i_vcnt],
+                      vx.output_flag[i_vcnt],
                       stat_at, i_stat_row,
                       txt_at[i_vcnt], i_txt_row[i_vcnt]);
                }
             } // end for i_wind
 
             // Reset the forecast variable name
-            shc.set_fcst_var(vx_ptr->vx_pd.fcst_info->name_attr());
+            shc.set_fcst_var(vx.vx_pd.fcst_info->name_attr());
 
             // Reset the observation variable name
-            shc.set_obs_var(vx_ptr->vx_pd.obs_info->name_attr());
+            shc.set_obs_var(vx.vx_pd.obs_info->name_attr());
 
         } // end Compute VL1L2 and VAL1L2
 
         // Compute PCT counts and scores
-        if(vx_ptr->vx_pd.fcst_info->is_prob() &&
-           (vx_ptr->output_flag[i_pct]  != STATOutputType::None ||
-            vx_ptr->output_flag[i_pstd] != STATOutputType::None ||
-            vx_ptr->output_flag[i_pjc]  != STATOutputType::None ||
-            vx_ptr->output_flag[i_prc]  != STATOutputType::None ||
-            vx_ptr->output_flag[i_eclv] != STATOutputType::None)) {
+        if(vx.vx_pd.fcst_info->is_prob() &&
+           (vx.output_flag[i_pct]  != STATOutputType::None ||
+            vx.output_flag[i_pstd] != STATOutputType::None ||
+            vx.output_flag[i_pjc]  != STATOutputType::None ||
+            vx.output_flag[i_prc]  != STATOutputType::None ||
+            vx.output_flag[i_eclv] != STATOutputType::None)) {
             do_pct(conf_info.vx_opt[i_vx], pd_ptr);
          }
 
          // Reset the verification masking region
-         shc.set_mask(vx_ptr->mask_name[i_mask].c_str());
+         shc.set_mask(vx.mask_name[i_mask].c_str());
 
       } // end for i_mask
 
@@ -1722,12 +1372,12 @@ void usage() {
         << "\t[-v level]\n\n"
 
         << "\twhere\t\"-pairs\" defines one or more input files containing "
-        << "forecast/observation pairs. May be set as a list of file names "
-        << "(file_1 ... file_n) or as an ASCII file containing a list of "
-        << "file names (file_list). May be used multiple times (required)."
+        << "forecast/observation pairs (required).\n"
+        << "\t\t  Set as a list of file names (file_1 ... file_n) or as an ASCII file list (file_list).\n"
+        << "\t\t  May be used multiple times.\n"
 
-        << "\t\t\"-format type\" defines the input pairs file format "
-        << "and may be set to \"mpr\" or \"ioda\" (required).\n"
+        << "\t\t\"-format type\" defines the input pairs file format (required).\n"
+        << "\t\t  May be set to \"mpr\", \"python\", or \"ioda\".\n"
 
         << "\t\t\"-config config_file\" is a PairStatConfig file containing "
         << "the desired configuration settings (required).\n"
