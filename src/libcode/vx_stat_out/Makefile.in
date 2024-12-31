@@ -108,7 +108,8 @@ am__v_AR_1 =
 libvx_stat_out_a_AR = $(AR) $(ARFLAGS)
 libvx_stat_out_a_LIBADD =
 am_libvx_stat_out_a_OBJECTS = libvx_stat_out_a-stat_columns.$(OBJEXT) \
-	libvx_stat_out_a-stat_hdr_columns.$(OBJEXT)
+	libvx_stat_out_a-stat_hdr_columns.$(OBJEXT) \
+	libvx_stat_out_a-stat_hdr_info.$(OBJEXT)
 libvx_stat_out_a_OBJECTS = $(am_libvx_stat_out_a_OBJECTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -126,7 +127,8 @@ DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/libvx_stat_out_a-stat_columns.Po \
-	./$(DEPDIR)/libvx_stat_out_a-stat_hdr_columns.Po
+	./$(DEPDIR)/libvx_stat_out_a-stat_hdr_columns.Po \
+	./$(DEPDIR)/libvx_stat_out_a-stat_hdr_info.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -349,6 +351,7 @@ noinst_LIBRARIES = libvx_stat_out.a
 libvx_stat_out_a_SOURCES = \
               stat_columns.cc stat_columns.h \
               stat_hdr_columns.cc stat_hdr_columns.h \
+              stat_hdr_info.cc stat_hdr_info.h \
               vx_stat_out.h
 
 libvx_stat_out_a_CPPFLAGS = ${MET_CPPFLAGS}
@@ -402,6 +405,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_stat_out_a-stat_columns.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_stat_out_a-stat_hdr_columns.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libvx_stat_out_a-stat_hdr_info.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -450,6 +454,20 @@ libvx_stat_out_a-stat_hdr_columns.obj: stat_hdr_columns.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='stat_hdr_columns.cc' object='libvx_stat_out_a-stat_hdr_columns.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_stat_out_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_stat_out_a-stat_hdr_columns.obj `if test -f 'stat_hdr_columns.cc'; then $(CYGPATH_W) 'stat_hdr_columns.cc'; else $(CYGPATH_W) '$(srcdir)/stat_hdr_columns.cc'; fi`
+
+libvx_stat_out_a-stat_hdr_info.o: stat_hdr_info.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_stat_out_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_stat_out_a-stat_hdr_info.o -MD -MP -MF $(DEPDIR)/libvx_stat_out_a-stat_hdr_info.Tpo -c -o libvx_stat_out_a-stat_hdr_info.o `test -f 'stat_hdr_info.cc' || echo '$(srcdir)/'`stat_hdr_info.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_stat_out_a-stat_hdr_info.Tpo $(DEPDIR)/libvx_stat_out_a-stat_hdr_info.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='stat_hdr_info.cc' object='libvx_stat_out_a-stat_hdr_info.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_stat_out_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_stat_out_a-stat_hdr_info.o `test -f 'stat_hdr_info.cc' || echo '$(srcdir)/'`stat_hdr_info.cc
+
+libvx_stat_out_a-stat_hdr_info.obj: stat_hdr_info.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_stat_out_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libvx_stat_out_a-stat_hdr_info.obj -MD -MP -MF $(DEPDIR)/libvx_stat_out_a-stat_hdr_info.Tpo -c -o libvx_stat_out_a-stat_hdr_info.obj `if test -f 'stat_hdr_info.cc'; then $(CYGPATH_W) 'stat_hdr_info.cc'; else $(CYGPATH_W) '$(srcdir)/stat_hdr_info.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libvx_stat_out_a-stat_hdr_info.Tpo $(DEPDIR)/libvx_stat_out_a-stat_hdr_info.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='stat_hdr_info.cc' object='libvx_stat_out_a-stat_hdr_info.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libvx_stat_out_a_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libvx_stat_out_a-stat_hdr_info.obj `if test -f 'stat_hdr_info.cc'; then $(CYGPATH_W) 'stat_hdr_info.cc'; else $(CYGPATH_W) '$(srcdir)/stat_hdr_info.cc'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -577,6 +595,7 @@ clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/libvx_stat_out_a-stat_columns.Po
 	-rm -f ./$(DEPDIR)/libvx_stat_out_a-stat_hdr_columns.Po
+	-rm -f ./$(DEPDIR)/libvx_stat_out_a-stat_hdr_info.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -624,6 +643,7 @@ installcheck-am:
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/libvx_stat_out_a-stat_columns.Po
 	-rm -f ./$(DEPDIR)/libvx_stat_out_a-stat_hdr_columns.Po
+	-rm -f ./$(DEPDIR)/libvx_stat_out_a-stat_hdr_info.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
