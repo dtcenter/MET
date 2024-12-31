@@ -91,11 +91,6 @@ void PairStatConfInfo::clear() {
    // Initialize values
    model.clear();
    vx_opt.clear();
-   land_mask.clear();
-   topo_dp.clear();
-   topo_use_obs_thresh.clear();
-   topo_interp_fcst_thresh.clear();
-   msg_typ_group_map.clear();
    mask_area_map.clear();
    mask_sid_map.clear();
    point_weight_flag = PointWeightType::None;
@@ -152,9 +147,6 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
 
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
-
-   // Conf: message_type_group_map
-   msg_typ_group_map = parse_conf_message_type_group_map(&conf);
 
    // Conf: fcst.pairs and obs.pairs
    fdict = conf.lookup_array(conf_key_fcst_pairs);
@@ -332,9 +324,6 @@ void PairStatConfInfo::process_flags() {
 ////////////////////////////////////////////////////////////////////////
 
 void PairStatConfInfo::process_masks() {
-
-/* JHG need to work on this since grid is no longer defined as an input
-   int i, j;
    MaskPlane mp;
    ConcatString name;
 
@@ -352,169 +341,86 @@ void PairStatConfInfo::process_masks() {
    mask_sid_map.clear();
 
    // Process the masks for each vx task
-   for(i=0; i<n_vx; i++) {
+   for(auto &vx : vx_opt) {
 
       // Initialize
-      vx_opt[i].mask_name.clear();
+      vx.mask_name.clear();
 
       // Parse the masking grids
-      for(j=0; j<vx_opt[i].mask_grid.n(); j++) {
+      for(int i=0; i<vx.mask_grid.n(); i++) {
 
          // Process new grid masks
-         if(grid_map.count(vx_opt[i].mask_grid[j]) == 0) {
+         if(grid_map.count(vx.mask_grid[i]) == 0) {
             mlog << Debug(3)
                  << "Processing grid mask: "
-                 << vx_opt[i].mask_grid[j] << "\n";
-            parse_grid_mask(vx_opt[i].mask_grid[j], grid, mp, name);
-            grid_map[vx_opt[i].mask_grid[j]] = name;
+                 << vx.mask_grid[i] << "\n";
+            parse_grid_mask(vx.mask_grid[i], grid, mp, name);
+            grid_map[vx.mask_grid[i]] = name;
             mask_area_map[name] = mp;
          }
 
          // Store the name for the current grid mask
-         vx_opt[i].mask_name.add(grid_map[vx_opt[i].mask_grid[j]]);
+         vx.mask_name.add(grid_map[vx_opt[i].mask_grid[i]]);
 
-      } // end for j
+      } // end for i
 
       // Parse the masking polylines
-      for(j=0; j<vx_opt[i].mask_poly.n(); j++) {
+      for(int i=0; i<vx.mask_poly.n(); i++) {
 
          // Process new poly mask
-         if(poly_map.count(vx_opt[i].mask_poly[j]) == 0) {
+         if(poly_map.count(vx.mask_poly[i]) == 0) {
             mlog << Debug(3)
                  << "Processing poly mask: "
-                 << vx_opt[i].mask_poly[j] << "\n";
-            parse_poly_mask(vx_opt[i].mask_poly[j], grid, mp, name);
-            poly_map[vx_opt[i].mask_poly[j]] = name;
+                 << vx.mask_poly[i] << "\n";
+            parse_poly_mask(vx.mask_poly[i], grid, mp, name);
+            poly_map[vx.mask_poly[i]] = name;
             mask_area_map[name] = mp;
          }
 
          // Store the name for the current poly mask
-         vx_opt[i].mask_name.add(poly_map[vx_opt[i].mask_poly[j]]);
+         vx.mask_name.add(poly_map[vx.mask_poly[i]]);
 
-      } // end for j
+      } // end for i 
 
       // Parse the masking station ID's
-      for(j=0; j<vx_opt[i].mask_sid.n(); j++) {
+      for(int i=0; i<vx.mask_sid.n(); i++) {
 
          // Process new station ID mask
-         if(sid_map.count(vx_opt[i].mask_sid[j]) == 0) {
+         if(sid_map.count(vx.mask_sid[i]) == 0) {
             mlog << Debug(3)
                  << "Processing station ID mask: "
-                 << vx_opt[i].mask_sid[j] << "\n";
-            MaskSID ms = parse_sid_mask(vx_opt[i].mask_sid[j]);
-            sid_map[vx_opt[i].mask_sid[j]] = ms.name();
+                 << vx.mask_sid[i] << "\n";
+            MaskSID ms = parse_sid_mask(vx.mask_sid[i]);
+            sid_map[vx.mask_sid[i]] = ms.name();
             mask_sid_map[ms.name()] = ms;
          }
 
          // Store the name for the current station ID mask
-         vx_opt[i].mask_name.add(sid_map[vx_opt[i].mask_sid[j]]);
+         vx.mask_name.add(sid_map[vx.mask_sid[i]]);
 
-      } // end for j
+      } // end for i  
 
       // Parse the Lat/Lon point masks
-      for(j=0; j<(int) vx_opt[i].mask_llpnt.size(); j++) {
+      for(int i=0; i<(int) vx.mask_llpnt.size(); i++) {
 
          // Process new point masks -- no real work to do
-         if(point_map.count(vx_opt[i].mask_llpnt[j].name) == 0) {
+         if(point_map.count(vx.mask_llpnt[i].name) == 0) {
             mlog << Debug(3)
                  << "Processing Lat/Lon point mask: "
-                 << vx_opt[i].mask_llpnt[j].name << "\n";
-            point_map[vx_opt[i].mask_llpnt[j].name] = vx_opt[i].mask_llpnt[j];
+                 << vx.mask_llpnt[i].name << "\n";
+            point_map[vx.mask_llpnt[i].name] = vx.mask_llpnt[i];
          }
 
          // Store the name for the current Lat/Lon point mask
-         vx_opt[i].mask_name.add(vx_opt[i].mask_llpnt[j].name);
+         vx.mask_name.add(vx.mask_llpnt[i].name);
 
-      } // end for j
+      } // end for i 
 
       // Check for unique mask names
-      check_mask_names(vx_opt[i].mask_name);
+      check_mask_names(vx.mask_name);
 
-   } // end for i
-*/
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairStatConfInfo::process_geog() {
-
-/* JHG not parsing geog data right now, the grid and fcst_file were inputs that are not available in pair_stat
-   int i;
-   bool land, topo;
-   Dictionary *dict;
-   DataPlane geog_dp;
-   SurfaceInfo sfc_info;
-
-   // Loop over the verification tasks and check flags
-   for(i=0, land = topo = false; i<n_vx; i++) {
-
-      // Set to true if requested by any sub-task
-      if(vx_opt[i].land_flag) land = true;
-      if(vx_opt[i].topo_flag) topo = true;
    }
 
-   mlog << Debug(2)
-        << "Processing geography data.\n";
-
-   // Conf: land
-   if(land) {
-      dict      = conf.lookup_dictionary(conf_key_land_mask);
-      geog_dp   = parse_geog_data(dict, grid, fcst_file);
-      geog_dp.threshold(dict->lookup_thresh(conf_key_thresh));
-      land_mask = geog_dp.mask_plane();
-
-      // Conf: message_type_group_map for LANDSF and WATERSF
-      if(msg_typ_group_map.count((string)landsf_msg_typ_group_str) == 0 ||
-         msg_typ_group_map.count((string)watersf_msg_typ_group_str) == 0 ) {
-         mlog << Error << "\nPairStatConfInfo::process_geog() -> "
-              << "when \"" << conf_key_land_mask_flag << "\" is true, \""
-              << conf_key_message_type_group_map
-              << "\" must contain entries for \""
-              << landsf_msg_typ_group_str << "\" and \""
-              << watersf_msg_typ_group_str << "\".\n\n";
-         exit(1);
-      }
-   }
-
-   // Conf: topo
-   if(topo) {
-      dict                    = conf.lookup_dictionary(conf_key_topo_mask);
-      topo_dp                 = parse_geog_data(dict, grid, fcst_file);
-      topo_use_obs_thresh     = dict->lookup_thresh(conf_key_use_obs_thresh);
-      topo_interp_fcst_thresh = dict->lookup_thresh(conf_key_interp_fcst_thresh);
-
-      // Conf: message_type_group_map for SURFACE
-      if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
-         mlog << Error << "\nPairStatConfInfo::process_geog() -> "
-              << "when \"" << conf_key_topo_mask_flag << "\" is true, \""
-              << conf_key_message_type_group_map
-              << "\" must contain an entry for \""
-              << surface_msg_typ_group_str << "\".\n\n";
-         exit(1);
-      }
-   }
-
-   // Loop over the verification tasks and set the geography info
-   for(i=0; i<n_vx; i++) {
-      sfc_info.clear();
-      if(vx_opt[i].land_flag) {
-         sfc_info.land_ptr = &land_mask;
-      }
-      else {
-         sfc_info.land_ptr = nullptr;
-      }
-      if(vx_opt[i].topo_flag) {
-         sfc_info.topo_ptr = &topo_dp;
-         sfc_info.topo_use_obs_thresh = topo_use_obs_thresh;
-         sfc_info.topo_interp_fcst_thresh = topo_interp_fcst_thresh;
-      }
-      else {
-         sfc_info.topo_ptr = nullptr;
-      }
-      vx_opt[i].vx_pd.set_sfc_info(sfc_info);
-   }
-*/
    return;
 }
 
@@ -637,6 +543,19 @@ bool PairStatConfInfo::get_vflag() const {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool PairStatConfInfo::add_mpr_line(const STATLine &l) {
+   bool keep = false;
+
+   // Attempt to add line to each verification task
+   for(auto &vx : vx_opt) {
+      if(vx.add_mpr_line(l)) keep = true;
+   }
+
+   return keep;
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Code for class PairStatVxOpt
 //
@@ -684,9 +603,6 @@ void PairStatVxOpt::clear() {
    owind_ta.clear();
    wind_logic = SetLogic::None;
 
-   land_flag = false;
-   topo_flag = false;
-
    mask_grid.clear();
    mask_poly.clear();
    mask_sid.clear();
@@ -708,8 +624,6 @@ void PairStatVxOpt::clear() {
 
    hss_ec_value = bad_data_double;
    rank_corr_flag = false;
-
-   msg_typ.clear();
 
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
@@ -746,8 +660,6 @@ bool PairStatVxOpt::is_uv_match(const PairStatVxOpt &v) const {
                           v.vx_pd.obs_info->req_level_name()) ||
       !(beg_ds         == v.beg_ds        ) ||
       !(end_ds         == v.end_ds        ) ||
-      !(land_flag      == v.land_flag     ) ||
-      !(topo_flag      == v.topo_flag     ) ||
       !(mask_grid      == v.mask_grid     ) ||
       !(mask_poly      == v.mask_poly     ) ||
       !(mask_sid       == v.mask_sid      ) ||
@@ -920,12 +832,6 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
       check_mctc_thresh(ocat_ta);
    }
 
-   // Conf: land.flag
-   land_flag = odict.lookup_bool(conf_key_land_mask_flag);
-
-   // Conf: topo.flag
-   topo_flag = odict.lookup_bool(conf_key_topo_mask_flag);
-
    // Conf: mask_grid
    mask_grid = odict.lookup_string_array(conf_key_mask_grid);
 
@@ -992,36 +898,6 @@ void PairStatVxOpt::set_vx_pd(PairStatConfInfo *conf_info) {
 
    // Store the climo CDF info
    vx_pd.set_climo_cdf_info_ptr(&cdf_info);
-
-   // Store the surface message type group
-   cs = surface_msg_typ_group_str;
-   if(conf_info->msg_typ_group_map.count(cs) > 0) {
-      vx_pd.set_msg_typ_sfc(conf_info->msg_typ_group_map[cs]);
-   }
-   else {
-      sa.parse_css(default_msg_typ_group_surface);
-      vx_pd.set_msg_typ_sfc(sa);
-   }
-
-   // Store the surface land message type group
-   cs = landsf_msg_typ_group_str;
-   if(conf_info->msg_typ_group_map.count(cs) > 0) {
-      vx_pd.set_msg_typ_lnd(conf_info->msg_typ_group_map[cs]);
-   }
-   else {
-      sa.parse_css(default_msg_typ_group_landsf);
-      vx_pd.set_msg_typ_lnd(sa);
-   }
-
-   // Store the surface water message type group
-   cs = watersf_msg_typ_group_str;
-   if(conf_info->msg_typ_group_map.count(cs) > 0) {
-      vx_pd.set_msg_typ_wtr(conf_info->msg_typ_group_map[cs]);
-   }
-   else {
-      sa.parse_css(default_msg_typ_group_watersf);
-      vx_pd.set_msg_typ_wtr(sa);
-   }
 
    // Define the masking information: grid, poly, sid, point
    int n;
@@ -1279,6 +1155,66 @@ int PairStatVxOpt::get_n_fprob_thresh() const {
 int PairStatVxOpt::get_n_oprob_thresh() const {
    return (!vx_pd.fcst_info || !vx_pd.fcst_info->is_prob()) ?
            0 : ocat_ta.n();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
+   bool keep = false;
+
+   // Check name and level strings
+   if(l.fcst_var() == vx_pd.fcst_info->name_attr()  && 
+      l.fcst_lev() == vx_pd.fcst_info->level_attr() && 
+      l.obs_var()  == vx_pd.obs_info->name_attr()   && 
+      l.obs_lev()  == vx_pd.obs_info->level_attr()) {
+
+      // Parse climo data from the line
+      ClimoPntInfo cpi;
+
+      // In met-6.1 and later:
+      // - CLIMO was replaced by CLIMO_MEAN
+      if(l.has("CLIMO")) {
+         double cmn = atof(l.get_item("CLIMO"));
+         double csd = bad_data_double;
+         cpi.set(cmn, csd, cmn, csd);
+      }
+      // In met-12.0.0 and later:
+      // - CLIMO_MEAN was replaced by OBS_CLIMO_MEAN
+      // - CLIMO_STDEV was replaced by OBS_CLIMO_STDEV
+      // - CLIMO_CDF was replaced by OBS_CLIMO_CDF
+      else if(l.has("CLIMO_MEAN")) {
+         double cmn = atof(l.get_item("CLIMO_MEAN"));
+         double csd = atof(l.get_item("CLIMO_STDEV"));
+         cpi.set(cmn, csd, cmn, csd);
+      }
+      else {
+         cpi.set(atof(l.get_item("FCST_CLIMO_MEAN")),
+                 atof(l.get_item("FCST_CLIMO_STDEV")),
+                 atof(l.get_item("OBS_CLIMO_MEAN")),
+                 atof(l.get_item("OBS_CLIMO_STDEV")));
+      }
+
+      // Attempt to add pair to each masking region
+      for(auto &pairs : vx_pd.pd) {
+         if(pairs.add_point_pair(
+               l.obtype(),
+               l.get_item("OBS_SID"),
+               atof(l.get_item("OBS_LAT")),
+               atof(l.get_item("OBS_LON")),
+               bad_data_double,
+               bad_data_double,
+               timestring_to_unix(l.get_item("OBS_VALID_BEG")),
+               atof(l.get_item("OBS_LVL")),
+               atof(l.get_item("OBS_ELV")),
+               atof(l.get_item("FCST")),
+               atof(l.get_item("OBS")),
+               l.get_item("OBS_QC"),
+               cpi,
+               default_weight)) keep = true;
+      }
+   }
+
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////

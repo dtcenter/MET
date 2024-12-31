@@ -22,10 +22,14 @@
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_gsl_prob.h"
+#include "vx_analysis_util.h"
 #include "vx_statistics.h"
 #include "vx_stat_out.h"
 
 ////////////////////////////////////////////////////////////////////////
+
+// Reference global grid
+static Grid grid("G004");
 
 // Indices for the output flag types in the configuration file
 static const int i_fho       =  0;
@@ -135,9 +139,6 @@ class PairStatVxOpt {
       ThreshArray     owind_ta;           // Array for obs wind speed thresholds
       SetLogic        wind_logic;         // Array of wind speed field logic
 
-      bool            land_flag;          // Flag for land/sea mask filtering
-      bool            topo_flag;          // Flag for topography filtering
-
       StringArray     mask_grid;          // Masking grid strings
       StringArray     mask_poly;          // Masking polyline strings
       StringArray     mask_sid;           // Masking station ID's
@@ -164,8 +165,6 @@ class PairStatVxOpt {
 
       double          hss_ec_value;       // HSS expected correct value
       bool            rank_corr_flag;     // Flag for computing rank correlations
-
-      StringArray     msg_typ;            // Array of message types
 
       // Output file options
       STATOutputType  output_flag[n_txt]; // Flag for each output line type
@@ -195,6 +194,9 @@ class PairStatVxOpt {
       int get_n_eclv_points()  const;
       int get_n_cdf_bin()      const;
       int get_n_ci_alpha()     const;
+
+      // Add paired data
+      bool add_mpr_line(const STATLine &);
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -231,15 +233,6 @@ class PairStatConfInfo {
 
       std::vector<PairStatVxOpt> vx_opt;    // Vector of vx options [n_vx]
 
-      // Land/sea mask and topography info for data filtering
-      MaskPlane    land_mask;
-      DataPlane    topo_dp;
-      SingleThresh topo_use_obs_thresh;
-      SingleThresh topo_interp_fcst_thresh;
-
-      // Message type groups
-      std::map<ConcatString,StringArray> msg_typ_group_map;
-
       // Mapping of mask names to DataPlanes
       std::map<ConcatString,MaskPlane> mask_area_map;
 
@@ -267,7 +260,6 @@ class PairStatConfInfo {
       void process_config(PairsFormat);
       void process_flags();
       void process_masks();
-      void process_geog();
       void set_vx_pd();
 
       // Dump out the counts
@@ -288,6 +280,9 @@ class PairStatConfInfo {
 
       // Check for any verification of vectors
       bool get_vflag() const;
+
+      // Add paired data
+      bool add_mpr_line(const STATLine &);
 };
 
 ////////////////////////////////////////////////////////////////////////
