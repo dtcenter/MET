@@ -2015,7 +2015,7 @@ void TCStatJobSummary::clear() {
    SummaryMap.clear();
 
    // Set to default value
-   ColumnUnion = default_column_union;
+   ColumnUnion = default_tc_column_union;
    OutAlpha    = default_tc_alpha;
    FSPThresh   = default_fsp_thresh;
 
@@ -2125,7 +2125,7 @@ ConcatString TCStatJobSummary::serialize() const {
    // Add summary job-specific options
    for(i=0; i<ReqColumn.n(); i++)
       s << "-column " << ReqColumn[i] << " ";
-   if(ColumnUnion != default_column_union)
+   if(ColumnUnion != default_tc_column_union)
       s << "-column_union " << bool_to_string(ColumnUnion) << " ";
    if(!(FSPThresh == default_fsp_thresh))
       s << "-fsp_thresh " << FSPThresh.get_str();
