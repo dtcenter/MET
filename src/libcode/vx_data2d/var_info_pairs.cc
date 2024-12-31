@@ -128,7 +128,23 @@ void VarInfoPairs::dump(ostream &out) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoPairs::set_dict(Dictionary & dict) {
+
    VarInfo::set_dict(dict);
+
+   //
+   // Parse the required name and optional level strings
+   //
+   ConcatString nstr = dict.lookup_string(conf_key_name);
+   ReqName = nstr;
+   Name = nstr;
+
+   ConcatString lstr = dict.lookup_string(conf_key_level, false);
+   Level.set_req_name(lstr.c_str());
+   Level.set_name(lstr.c_str());
+
+   VarInfo::set_magic(nstr, lstr);
+
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
