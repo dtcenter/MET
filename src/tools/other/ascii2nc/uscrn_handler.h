@@ -14,16 +14,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 #include <iostream>
+#include <map>
 #include <time.h>
 
 #include "file_handler.h"
-
-////////////////////////////////////////////////////////////////////////
-
-struct UscrnObsVarInfo {
-   int _gribCode;
-   std::string _varName;
-};
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -49,19 +43,24 @@ struct UscrnObsVarInfo {
 //   - Contains 23 columns defined by:
 //     https://www.ncei.noaa.gov/pub/data/uscrn/products/subhourly01/headers.txt 
 //
-// 5. "drought01" with files named "CRNDI0101-{Location}.csv
-//   - Contains 32 NAMED columns defined by:
+// 5. "soil/soilclim01" with files named "CRNSMC0101-{Location}.csv"
+//   - Contains 30 NAMED columns described by:
+//     https://www.ncei.noaa.gov/pub/data/uscrn/products/soil/soilclim01/readme.txt
+//
+// 6. "soil/soilanom01" with files named "CRNSSM0101-{Location}.csv"
+//   - Contains 32 NAMED columns with no README file provided. 
+//
+// 7. "heat01" with files named "SCRNHE0101-{Location}.csv"
+//   - Contains 17 NAMED columns described by:
+//     https://www.ncei.noaa.gov/pub/data/uscrn/products/heat01/readme.txt
+//
+// 8. "drought01" with files named "CRNDI0101-{Location}.csv
+//   - Contains 32 NAMED columns described by:
 //     https://www.ncei.noaa.gov/pub/data/uscrn/products/drought01/readme.txt
 //
-// 6. "soil/soilclim01" with files named "CRNSMC0101-{Location}.csv"
-//   - Contains 30 NAMED columns.
-//
-// 7. "soil/soilanom01" with files named "CRNSSM0101-{Location}.csv"
-//   - Contains 32 NAMED columns.
-//
-// 8. "soil01" with files named "SOIL01_{Location}.txt"
+// 9. "soil01" with files named "SOIL01_{Location}.txt"
 //   - Contains 15 columns defined by:
-//     https://www.ncei.noaa.gov/pub/data/uscrn/products/soil01/headers.txt
+//      https://www.ncei.noaa.gov/pub/data/uscrn/products/soil01/headers.txt
 //
 // Where:
 //   - {YYYY} is the 4-digit year.
@@ -69,6 +68,44 @@ struct UscrnObsVarInfo {
 //   - {Location} is a 2-letter US state name and site name followed by direction
 //     and distance from that location.
 // 
+////////////////////////////////////////////////////////////////////////
+
+// List of USCRN variants
+enum class USCRNFormat {
+   None,
+   Monthly,
+   Daily,
+   Hourly,
+   SubHourly,
+   SoilClim,
+   SoilAnom,
+   Heat,
+   Drought,
+   Soil,
+};
+
+// Column information
+struct USCRNColInfo {
+   int _offset;
+   std::string _name;
+   std::string _units;
+   int _qcOffset = -1;
+};
+
+// Metadata for USCRN variants
+struct USCRNFormatInfo {
+   std::string _formatName;
+   std::string _filePrefix;
+   std::string _fileSuffix;
+   int _nCols;
+   int _sidOffset;
+   int _ymdOffset;
+   int _hmOffset;
+   int _lonOffset;
+   int _latOffset;
+   std::vector<USCRNColInfo> _obsInfo;
+};
+
 ////////////////////////////////////////////////////////////////////////
 
 class UscrnHandler : public FileHandler {
@@ -84,41 +121,23 @@ class UscrnHandler : public FileHandler {
 
    protected:
 
-      /////////////////////////
-      // Protected constants
-      /////////////////////////
-
-      // The number of columns in the second header line in the file.  This line
-      // is used to determine if this is a USCRN file since the first line has
-      // an indeterminate number of tokens.
-
-      static const int MIN_NUM_HDR_COLS;
-
-      // The number of columns in the observation lines in the file.
-
-      static const int NUM_OBS_COLS;
-
       ///////////////////////
       // Protected members
       ///////////////////////
-
-      // Unchanging file name information
-      UscrnObsVarInfo _obsVarInfo;
-
-      // Store list of unqiue output variable names
-      StringArray _varNames;
-
+ 
       // Unchanging header information
-      std::string _networkName;
+      USCRNFormat _format;
+      std::string _formatName;
       std::string _stationId;
       double _stationLat;
       double _stationLon;
-      double _stationElv;
-      double _depth;
 
       ///////////////////////
       // Protected methods
       ///////////////////////
+
+      // Determine the USCRN format from the file name 
+      USCRNFormat _getFileFormat(const LineDataFile &ascii_file) const;
 
       // Read and save the header information from the given file
       bool _readHeaderInfo(LineDataFile &ascii_file);

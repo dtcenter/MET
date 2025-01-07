@@ -102,18 +102,25 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
     }
 
     // Read the observations
-
     if (!_readObservations(ascii_file))
       return false;
+
+    mlog << Debug(3)
+         << "Reading File: " << *ascii_filename << "\n"
+         << "  Running total of observations kept "
+         << num_observations_in_range << " and rejected (out of range) "
+         << num_observations_out_of_range << ".\n";
+         
 
     // Close the file
 
     ascii_file.close();
   }
 
-   mlog << Debug(2) << " Kept " << num_observations_in_range
-        << " observations, rejected (out of range) " << num_observations_out_of_range
-        << " observations\n";
+   mlog << Debug(2) << "Total number of observations kept "
+        << num_observations_in_range << " and rejected (out of range) "
+        << num_observations_out_of_range << ".\n";
+
   return true;
 }
 

@@ -18,33 +18,76 @@
 
 using namespace std;
 
-
 ////////////////////////////////////////////////////////////////////////
 
-const int UscrnHandler::MIN_NUM_HDR_COLS = 8;
-const int UscrnHandler::NUM_OBS_COLS = 5;
-
-// Relevant GRIB codes
-static const int PRATE_GRIB_CODE = 59;
-static const int SNOD_GRIB_CODE = 66;
-static const int SOILW_GRIB_CODE = 144;
-static const int SMS_GRIB_CODE = -1;
-static const int WEASD_GRIB_CODE = 65;
-static const int TMP_GRIB_CODE = 11;
-static const int TSOIL_GRIB_CODE = 85;
-static const int AVSFT_GRIB_CODE = 148;
-
-// Mapping of USCRN strings to output variable names
-map<string,UscrnObsVarInfo> UscrnObsVarMap = {
-   { "p",    { PRATE_GRIB_CODE, "PRATE" } },
-   { "sd",   { SNOD_GRIB_CODE,  "SNOD"  } },
-   { "sm",   { SOILW_GRIB_CODE, "SOILW" } },
-   { "su",   { SMS_GRIB_CODE,   "SMS"   } },
-   { "sweq", { WEASD_GRIB_CODE, "WEASD" } },
-   { "ta",   { TMP_GRIB_CODE,   "TMP"   } },
-   { "ts",   { TSOIL_GRIB_CODE, "TSOIL" } },
-   { "tsf",  { AVSFT_GRIB_CODE, "AVSFT" } }
+// Mapping of USCRN variant to metadata 
+std::map<USCRNFormat,USCRNFormatInfo> USCRNFormatMap = {
+  { USCRNFormat::Monthly,
+    { "USCRN-Monthly", "CRNM0102", ".txt", 15, 0, 1, -1, 3, 4, {
+      {  5, "TMP_MAX",   "C"  },
+      {  6, "TMP_MIN",   "C"  },
+      {  7, "TMP_MEAN",  "C"  },
+      {  8, "TMP_AVG",   "C"  },
+      {  9, "APCP",      "mm" },
+      { 12, "SKINT_MAX", "C"  },
+      { 13, "SKINT_MIN", "C"  },
+      { 14, "SKINT_AVG", "C"  }}
+    }
+  },
+  { USCRNFormat::Daily,
+    { "USCRN-Daily", "CRND0103", ".txt", 28, 0, 1, -1, 3, 4, {
+      {  5, "TMP_MAX",     "C"       },
+      {  6, "TMP_MIN",     "C"       },
+      {  7, "TMP_MEAN",    "C"       },
+      {  8, "TMP_AVG",     "C"       },
+      {  9, "APCP",        "mm"      },
+      { 12, "SKINT_MAX",   "C"       },
+      { 13, "SKINT_MIN",   "C"       },
+      { 14, "SKINT_AVG",   "C"       },
+      { 15, "RH_MAX",      "%"       },
+      { 16, "RH_MIN",      "%"       },
+      { 17, "RH_AVG",      "%"       },
+      { 18, "SOILMOI_5",   "m^3/m^3" },
+      { 19, "SOILMOI_10",  "m^3/m^3" },
+      { 20, "SOILMOI_20",  "m^3/m^3" },
+      { 21, "SOILMOI_50",  "m^3/m^3" },
+      { 22, "SOILMOI_100", "m^3/m^3" },
+      { 23, "SOILTMP_5",   "C"       },
+      { 24, "SOILTMP_10",  "C"       },
+      { 25, "SOILTMP_20",  "C"       },
+      { 26, "SOILTMP_50",  "C"       },
+      { 27, "SOILTMP_100", "C"       }}
+    }
+  },
+  { USCRNFormat::Hourly,
+    { "USCRN-Hourly", "CRNH0203", ".txt", 38, 0, 1, 2, 6, 7, {
+      {  8, "TMP_CALC",    "C"         },
+      {  9, "TMP_AVG",     "C"         },
+      { 10, "TMP_MAX",     "C"         },
+      { 11, "TMP_MIN",     "C"         },
+      { 12, "APCP",        "mm"        },
+      { 13, "SOLARAD_AVG", "W/m^2", 14 },
+      { 15, "SOLARAD_MAX", "W/m^2", 16 },
+      { 17, "SOLARAD_MIN", "W/m^2", 18 },
+      { 20, "SKINT_AVG",   "C",     21 },
+      { 22, "SKINT_MAX",   "C",     23 },
+      { 24, "SKINT_MIN",   "C",     25 },
+      { 26, "RH_AVG",      "%",     27 },
+      { 28, "SOILMOI_5",   "m^3/m^3"   },
+      { 29, "SOILMOI_10",  "m^3/m^3"   },
+      { 30, "SOILMOI_20",  "m^3/m^3"   },
+      { 31, "SOILMOI_50",  "m^3/m^3"   },
+      { 32, "SOILMOI_100", "m^3/m^3"   },
+      { 33, "SOILTMP_5",   "C"         },
+      { 34, "SOILTMP_10",  "C"         },
+      { 35, "SOILTMP_20",  "C"         },
+      { 36, "SOILTMP_50",  "C"         },
+      { 37, "SOILTMP_100", "C"         }}
+    }
+  }
 };
+// TODO: Add support for other format types
+static const NumArray USCRNBadDataInput({ -99.0, -9999.0});
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -55,6 +98,7 @@ map<string,UscrnObsVarInfo> UscrnObsVarMap = {
 UscrnHandler::UscrnHandler(const string &program_name) :
   FileHandler(program_name) {
    use_var_id = true;
+   _format = USCRNFormat::None;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -64,55 +108,64 @@ UscrnHandler::~UscrnHandler() { }
 ////////////////////////////////////////////////////////////////////////
 
 bool UscrnHandler::isFileType(LineDataFile &ascii_file) const {
-
-   // USCRN files are identified by having a .stm suffix and
-   // checking the number of header and data columns.
-   // The header and data lines look like this:
-   //   MAQU MAQU NST_24 33.99908 102.13661 3449.0 0.4000 0.4000 ECH20 EC-TM
-   //   2014/10/21 07:00 -27.7 G M
-
-   // Initialize using the filename suffix
-   bool is_file_type = check_prefix_suffix(ascii_file.short_filename(),
-                           nullptr, ".stm");
-
-   // Read the header line
-   DataLine dl;
-   while(dl.n_items() == 0) ascii_file >> dl;
-
-   // Check the minimum number of header columns
-   if(dl.n_items() < MIN_NUM_HDR_COLS) is_file_type = false;
-
-   // Check the number of data line columns
-   ascii_file >> dl;
-   if(dl.n_items() != NUM_OBS_COLS) is_file_type = false;
-
-   return is_file_type;
+   return _getFileFormat(ascii_file) != USCRNFormat::None;
 }
 
 ////////////////////////////////////////////////////////////////////////
 // Private/Protected methods
 ////////////////////////////////////////////////////////////////////////
 
+USCRNFormat UscrnHandler::_getFileFormat(const LineDataFile &ascii_file) const {
+   USCRNFormat fmt = USCRNFormat::None;
+
+   // USCRN files are identified by their prefix and suffix.
+
+   // Loop over supported USCRN formats
+   for(auto &x : USCRNFormatMap) {
+
+      // Check for expected prefix and suffix
+      if(check_prefix_suffix(ascii_file.short_filename(),
+                             x.second._filePrefix.c_str(),
+                             x.second._fileSuffix.c_str())) {
+         fmt = x.first;
+         break;
+      }
+   }
+
+   return fmt;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
+
+   // Determine the format for each input file so that the same
+   // handle can process multiple USCRN formats in a single run
+   _format = _getFileFormat(ascii_file);
+
+   // Check for a match
+   if(_format == USCRNFormat::None) {
+      mlog << Error << "\nUscrnHandler::_readObservataions() -> "
+           << "unknown USCRN format for file \""
+           << ascii_file.filename() << "\"!\n\n";
+      return false; 
+   }
 
    // Read and save the header information
    if(!_readHeaderInfo(ascii_file)) return false;
 
-   // Get the var_id to use
-   int var_id = bad_data_int;
-   if(!_varNames.has(_obsVarInfo._varName, var_id)) return false;
-
-   // Process the observation lines
+   // Process the data lines
    DataLine dl;
    while(ascii_file >> dl) {
 
-      // Make sure that the line contains the correct number of tokens
-      if(dl.n_items() != NUM_OBS_COLS) {
+      // Check the expected number of columns
+      if(dl.n_items() != USCRNFormatMap[_format]._nCols) {
          mlog << Error << "\nUscrnHandler::_readObservations() -> "
-              << "unexpected number of columns (" << dl.n_items()
-              << " != " << NUM_OBS_COLS << ") on line number "
-              << dl.line_number() << " of USCRN file \""
-              << ascii_file.filename() << "\"!\n\n";
+              << "unexpected number of columns ("
+              << dl.n_items() << " != " << USCRNFormatMap[_format]._nCols
+              << ") on line number " << dl.line_number()
+              << " of USCRN file \"" << ascii_file.filename()
+              << "\"!\n\n";
          return false;
       }
 
@@ -120,40 +173,29 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
       time_t valid_time = _getValidTime(dl);
       if(valid_time == 0) return false;
 
-      // Store the observation value
-      double obs_value = atof(dl[2]);
+      // Process all observations from the line
+      for(auto &col : USCRNFormatMap[_format]._obsInfo) {
 
-      // Handle unit conversion
-      switch(_obsVarInfo._gribCode) {
+         // Get the observation
+         string obs_str(dl[col._offset]);
+         double obs_val = stod(obs_str);
 
-         // Convert precip rate in second to hours
-         case PRATE_GRIB_CODE:
-            obs_value /= 3600;
-            break;
+         // Check for missing or bad data
+         if(obs_str.empty() || USCRNBadDataInput.has(obs_val)) continue; 
 
-         // Convert mm to m
-         case SNOD_GRIB_CODE:
-            obs_value /= 1000.0;
-            break;
+         // Check for QC flag
+         string qc_str(na_str);
+         if(col._qcOffset > 0) qc_str = dl[col._qcOffset];     
 
-         // Convert C to K
-         case TMP_GRIB_CODE:
-         case TSOIL_GRIB_CODE:
-         case AVSFT_GRIB_CODE:
-            obs_value += 273.15;
-            break;
-
-         default:
-            break;
+         // Store the observation
+         _addObservations(Observation(
+            _formatName, _stationId, valid_time,
+            _stationLat, _stationLon, bad_data_double,
+            qc_str, -1, bad_data_double,
+            bad_data_double, obs_val,
+	    col._name));
+	 // TODO: Add logic to convert/store units
       }
-
-      // Store the observation
-      _addObservations(Observation(
-         _networkName, _stationId, valid_time,
-         _stationLat, _stationLon, _stationElv,
-         dl[3], var_id, bad_data_double,
-         _depth, obs_value, _obsVarInfo._varName));
-
    } // end while
 
    return true;
@@ -165,27 +207,24 @@ time_t UscrnHandler::_getValidTime(const DataLine &dl) const {
    struct tm time_struct;
    memset(&time_struct, 0, sizeof(time_struct));
 
-   // Formatted as YYYY/MM/DD HH:MM
-   string ymd_str(dl[0]);
-   string hm_str(dl[1]);
+   // YMD formatted as YYYYMM or YYYYMMDD
+   string ymd_str(dl[USCRNFormatMap[_format]._ymdOffset]);
 
-   // Validate the time strings
-   if(!check_reg_exp("^[0-9]\\{4\\}/[0-9]\\{2\\}/[0-9]\\{2\\}$", dl[0]) ||
-      !check_reg_exp("^[0-9]\\{2\\}:[0-9]\\{2\\}$", dl[1])) {
-      mlog << Warning << "\nUscrnHandler::_getValidTime() -> "
-           << "unexpected time stamp format on line number "
-           << dl.line_number() << " of USCRN input file:\n"
-           << "  " << dl << "\n\n";
-   }
-   else {
+   // Append 01 to YYYYMM string
+   if(ymd_str.length() == 6) ymd_str.append("01"); 
 
-      // Parse time components
-      time_struct.tm_year = stoi(ymd_str.substr(0, 4)) - 1900;
-      time_struct.tm_mon  = stoi(ymd_str.substr(5, 2)) - 1;
-      time_struct.tm_mday = stoi(ymd_str.substr(8, 2));
-      time_struct.tm_hour = stoi( hm_str.substr(0, 2));
-      time_struct.tm_min  = stoi( hm_str.substr(3, 2));
-   }
+   // HM is either not present (-1) or formatted as HHMM
+   string hm_str;
+   int offset = USCRNFormatMap[_format]._hmOffset;
+   if(offset > 0) hm_str = dl[offset];
+   else           hm_str = "0000";
+
+   // Parse time components
+   time_struct.tm_year = stoi(ymd_str.substr(0, 4));
+   time_struct.tm_mon  = stoi(ymd_str.substr(4, 2));
+   time_struct.tm_mday = stoi(ymd_str.substr(6, 2));
+   time_struct.tm_hour = stoi( hm_str.substr(0, 2));
+   time_struct.tm_min  = stoi( hm_str.substr(2, 2));
 
    return timegm(&time_struct);
 }
@@ -194,63 +233,29 @@ time_t UscrnHandler::_getValidTime(const DataLine &dl) const {
 
 bool UscrnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
 
-   // The file name is delimited with underscores and the variable name
-   // is the fourth item
-   ConcatString cs(ascii_file.short_filename());
-   StringArray sa = cs.split("_");
-
-   // Validate the file name
-   if(sa.n() < 4) {
-      mlog << Error << "\nUscrnHandler::_readHeaderInfo() -> "
-           << "unexpected USCRN file name \"" << ascii_file.filename()
-           << "\"!\n\n";
-      return false;
-   }
-
-   // Validate the variable name
-   if(UscrnObsVarMap.count(sa[3]) == 0) {
-      mlog << Error << "\nUscrnHandler::_readHeaderInfo() -> "
-           << "unexpected variable name (" << sa[3]
-           << ") found in USCRN file name \"" << ascii_file.filename()
-           << "\"!\n\n";
-      return false;
-   }
-
-   // Store the observation variable info
-   _obsVarInfo = UscrnObsVarMap[sa[3]];
-
-   // Store the output variable name
-   _varNames.add_uniq(_obsVarInfo._varName);
-
    // Read the header line
    DataLine dl;
    while(dl.n_items() == 0) ascii_file >> dl;
 
-   // Check the minimum number of header columns
-   if(dl.n_items() < MIN_NUM_HDR_COLS) {
+   // Check the expected number of columns
+   if(dl.n_items() != USCRNFormatMap[_format]._nCols) {
       mlog << Error << "\nUscrnHandler::_readHeaderInfo() -> "
-           << "unexpected number of header columns ("
-           << dl.n_items() << " < " << MIN_NUM_HDR_COLS
-           << ") in USCRN file \"" << ascii_file.filename()
+           << "unexpected number of columns ("
+           << dl.n_items() << " != " << USCRNFormatMap[_format]._nCols
+           << ") on line number " << dl.line_number()
+           << " of USCRN file \"" << ascii_file.filename()
            << "\"!\n\n";
       return false;
    }
 
    // Store the header information
-   _networkName = dl[1];
-   _stationId   = dl[2];
-   _stationLat  = atof(dl[3]);
-   _stationLon  = atof(dl[4]);
-   _stationElv  = atof(dl[5]);
+   _formatName = USCRNFormatMap[_format]._formatName;
+   _stationId  = dl[USCRNFormatMap[_format]._sidOffset];
+   _stationLon = atof(dl[USCRNFormatMap[_format]._lonOffset]);
+   _stationLat = atof(dl[USCRNFormatMap[_format]._latOffset]);
 
-   // Set the depth for precip as 0
-   if(_obsVarInfo._gribCode == PRATE_GRIB_CODE) {
-      _depth = 0.0;
-   }
-   // Otherwise, store the average of the two depths
-   else {
-     _depth = (atof(dl[6]) + atof(dl[7]))/2.0;
-   }
+   // Rewind to the beginning
+   ascii_file.rewind();
 
    return true;
 }
