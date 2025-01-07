@@ -50,6 +50,7 @@
 //   021    10/03/22  Prestopnik     MET #2227 Remove using namespace std from header files
 //   022    10/07/22  Dave Albo      MET #2276 Add NDBC buoy data
 //   023    11/28/23  Halley Gotway  MET #2701 Add ISMN soil moisture data
+//   024    01/06/25  Halley Gotway  MET #1019 Add USCRN quality controlled data
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -87,6 +88,7 @@
 #include "ndbc_handler.h"
 #include "ismn_handler.h"
 #include "iabp_handler.h"
+#include "uscrn_handler.h"
 
 #ifdef ENABLE_PYTHON
 #include "global_python.h"
@@ -119,6 +121,7 @@ enum class ASCIIFormat {
    NDBC_standard,
    ISMN,
    IABP,
+   USCRN,
    Aeronet_v2,
    Aeronet_v3, 
    Python, 
@@ -359,6 +362,10 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
          return((FileHandler *) new IabpHandler(program_name));
       }
 
+      case ASCIIFormat::USCRN: {
+         return((FileHandler *) new UscrnHandler(program_name));
+      }
+
       case ASCIIFormat::Aeronet_v2: {
          AeronetHandler *handler = new AeronetHandler(program_name);
          handler->setFormatVersion(2);
@@ -525,6 +532,19 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
    delete ismn_file;
 
    //
+   // See if this is a USCRN file.
+   //
+   f_in.rewind();
+   UscrnHandler *uscrn_file = new UscrnHandler(program_name);
+
+   if(uscrn_file->isFileType(f_in)) {
+     f_in.close();
+     return (FileHandler *) uscrn_file;
+   }
+
+   delete uscrn_file;
+
+   //
    // If we get here, we didn't recognize the file contents.
    //
    mlog << Error << "\ndetermine_ascii_format() -> "
@@ -543,7 +563,7 @@ void usage() {
         << program_name << "\n"
         << "\tascii_file1 [ascii_file2 ... ascii_filen]\n"
         << "\tnetcdf_file\n"
-        << "\t[-format ASCII_format]\n"
+        << "\t[-format type]\n"
         << "\t[-config file]\n"
         << "\t[-mask_grid string]\n"
         << "\t[-mask_poly file]\n"
@@ -561,26 +581,29 @@ void usage() {
         << "\t\t\"netcdf_file\" indicates the name of the output "
         << "NetCDF file to be written (required).\n"
 
-        << "\t\t\"-format ASCII_format\" may be set to \""
-        << MetHandler::getFormatString() << "\", \""
-        << LittleRHandler::getFormatString() << "\", \""
-        << SurfradHandler::getFormatString() << "\", \""
-        << WwsisHandler::getFormatString() << "\", \""
-        << AirnowHandler::getFormatStringDailyV2() << "\", \""
-        << AirnowHandler::getFormatStringHourlyAqObs() << "\", \""
-        << AirnowHandler::getFormatStringHourly() << "\", \""
-        << NdbcHandler::getFormatStringStandard() << "\", \""
-        << IsmnHandler::getFormatString() << "\", \""
-        << IabpHandler::getFormatString() << "\", \""
-        << AeronetHandler::getFormatString() << "\", \""
-        << AeronetHandler::getFormatString_v2() << "\", \""
-        << AeronetHandler::getFormatString_v3() << "\"";
+        << "\t\t\"-format type\" may be set to one of the following types (optional).\n"
+	<< "\t\t   "
+        << MetHandler::getFormatString() << ", "
+        << LittleRHandler::getFormatString() << ", "
+        << SurfradHandler::getFormatString() << ", "
+        << WwsisHandler::getFormatString() << ",\n\t\t   "
+        << AirnowHandler::getFormatStringDailyV2() << ", "
+        << AirnowHandler::getFormatStringHourlyAqObs() << ", "
+        << AirnowHandler::getFormatStringHourly() << ",\n\t\t   "
+        << NdbcHandler::getFormatStringStandard() << ", "
+        << IsmnHandler::getFormatString() << ", "
+        << IabpHandler::getFormatString() << ", "
+        << UscrnHandler::getFormatString() << ",\n\t\t   "
+        << AeronetHandler::getFormatString() << ", "
+        << AeronetHandler::getFormatString_v2() << ", "
+        << AeronetHandler::getFormatString_v3();
 
    #ifdef ENABLE_PYTHON
-   cout << ", \"" << PythonHandler::getFormatString() << "\"";
+   cout << ",\n\t\t   "
+        << PythonHandler::getFormatString();
    #endif
 
-   cout << " (optional).\n"
+   cout << "\n"
 
         << "\t\t\"-config file\" uses the specified configuration file "
         << "to generate summaries of the fields in the ASCII files (optional).\n"
@@ -665,6 +688,9 @@ void set_format(const StringArray & a) {
    }
    else if(IabpHandler::getFormatString() == a[0]) {
      ascii_format = ASCIIFormat::IABP;
+   }
+   else if(UscrnHandler::getFormatString() == a[0]) {
+     ascii_format = ASCIIFormat::USCRN;
    }
    else if(AeronetHandler::getFormatString() == a[0]
      || AeronetHandler::getFormatString_v2() == a[0]) {

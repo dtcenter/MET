@@ -450,6 +450,8 @@ While initial versions of the ASCII2NC tool only supported a simple 11 column AS
 
 • `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <http://aeronet.gsfc.nasa.gov/>`_
 
+• `U.S. Climate Reference Network (USCRN) Quality Controlled Datasets <https://www.ncei.noaa.gov/access/crn/qcdatasets.html>`_
+
 • Python embedding of point observations, as described in :numref:`pyembed-point-obs-data`. See example below in :numref:`ascii2nc-pyembed`.
 
 The default ASCII point observation format consists of one row of data per observation value. Each row of data consists of 11 columns as shown in :numref:`table_reformat-point_ascii2nc_format`.
@@ -507,7 +509,7 @@ Once the ASCII point observations have been formatted as expected, the ASCII fil
   Usage: ascii2nc
          ascii_file1 [ascii_file2 ... ascii_filen]
          netcdf_file
-         [-format ASCII_format]
+         [-format type]
          [-config file]
          [-valid_beg time]
          [-valid_end time]
@@ -530,7 +532,7 @@ Required Arguments for ascii2nc
 Optional Arguments for ascii2nc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3. The **-format ASCII_format** option may be set to "met_point", "little_r", "surfrad", "wwsis", "airnowhourlyaqobs", "airnowhourly", "airnowdaily_v2", "ndbc_standard", "ismn", "iabp", "aeronet", "aeronetv2", "aeronetv3", or "python". If passing in ISIS data, use the "surfrad" format flag.
+3. The **-format type** option may be set to "met_point", "little_r", "surfrad", "wwsis", "airnowhourlyaqobs", "airnowhourly", "airnowdaily_v2", "ndbc_standard", "ismn", "iabp", "aeronet", "aeronetv2", "aeronetv3", "uscrn", or "python". If passing in ISIS data, use the "surfrad" format flag.
 
 4. The **-config file** option is the configuration file for generating time summaries.
 
