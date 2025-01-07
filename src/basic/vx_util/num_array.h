@@ -44,6 +44,7 @@ class NumArray {
       NumArray();
      ~NumArray();
       NumArray(const NumArray &);
+      NumArray(const std::vector<double> &);
       NumArray & operator=(const NumArray &);
       bool operator==(const NumArray &) const;
 

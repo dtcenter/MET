@@ -77,6 +77,24 @@ NumArray::NumArray(const NumArray & a)
 ////////////////////////////////////////////////////////////////////////
 
 
+NumArray::NumArray(const vector<double> & a)
+
+{
+
+   clear();
+
+   e = a;
+
+   Sorted = false;
+
+   return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 NumArray & NumArray::operator=(const NumArray & a)
 
 {
