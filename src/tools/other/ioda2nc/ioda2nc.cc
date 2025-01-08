@@ -136,10 +136,10 @@ static void process_ioda_file(int);
 static void write_netcdf_hdr_data();
 static void clean_up();
 
-static void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
+static void addObservation(const double *obs_arr, const ConcatString &hdr_typ,
       const ConcatString &hdr_sid, const time_t hdr_vld,
-      const float hdr_lat, const float hdr_lon, const float hdr_elv,
-      const float quality_mark);
+      const double hdr_lat, const double hdr_lon, const double hdr_elv,
+      const double quality_mark);
 
 static bool keep_message_type(const char *);
 static bool keep_station_id(const char *);
@@ -162,12 +162,12 @@ static void set_verbosity(const StringArray &);
 static bool check_core_data(const bool, const bool,
                             const StringArray &, const StringArray &, e_ioda_format);
 static ConcatString find_meta_name(string meta_key, StringArray available_names);
-static bool get_meta_data_float(NcFile *, StringArray &, const char *, float *,
-                                const int);
+static bool get_meta_data_double(NcFile *, StringArray &, const char *, double *,
+                                 const int);
 static bool get_meta_data_strings(NcVar &, char *);
 static bool get_meta_data_strings(NcVar &, char **);
-static bool get_obs_data_float(NcFile *, const ConcatString &, NcVar *,
-                               float *, int *, const int, const e_ioda_format);
+static bool get_obs_data_double(NcFile *, const ConcatString &, NcVar *,
+                                double *, int *, const int, const e_ioda_format);
 static bool has_postfix(const std::string &, std::string const &);
 
 ////////////////////////////////////////////////////////////////////////
@@ -389,7 +389,7 @@ static void process_ioda_file(int i_pb) {
    double   hdr_lon;
    double   hdr_elv;
    unixtime hdr_vld_ut;
-   float    obs_arr[OBS_ARRAY_LEN];
+   double   obs_arr[OBS_ARRAY_LEN];
 
    const int debug_level_for_performance = 3;
    clock_t start_t;
@@ -469,7 +469,7 @@ static void process_ioda_file(int i_pb) {
    }
 
    vector<int *> v_qc_data;
-   vector<float *> v_obs_data;
+   vector<double *> v_obs_data;
 
    StringArray raw_var_names;
    if(do_all_vars || obs_var_names.n() == 0) raw_var_names = ioda_reader.obs_value_vars;
@@ -481,11 +481,11 @@ static void process_ioda_file(int i_pb) {
    ConcatString desc_attr;
    for(idx=0; idx<raw_var_names.n(); idx++ ) {
       auto qc_data = new int[nlocs];
-      auto obs_data = new float[nlocs];
+      auto obs_data = new double[nlocs];
 
       for (int idx2=0; idx2<nlocs; idx2++) {
          qc_data[idx2] = bad_data_int;
-         obs_data[idx2] = bad_data_float;
+         obs_data[idx2] = bad_data_double;
       }
       mlog << Debug(7) << method_name
            << "processing \"" << raw_var_names[idx] << "\" variable!\n";
@@ -496,7 +496,7 @@ static void process_ioda_file(int i_pb) {
       unit_attr.clear();
       desc_attr.clear();
       if(IS_VALID_NC(obs_var)) {
-         get_obs_data_float(f_in, raw_var_names[idx], &obs_var, obs_data, qc_data, nlocs, ioda_format_ver);
+         get_obs_data_double(f_in, raw_var_names[idx], &obs_var, obs_data, qc_data, nlocs, ioda_format_ver);
          get_var_units(&obs_var, unit_attr);
          get_att_value_string(&obs_var, "long_name", desc_attr);
       }
@@ -708,7 +708,7 @@ static void process_ioda_file(int i_pb) {
       }
 
       // Store the index to the header data
-      obs_arr[0] = (float)nc_point_obs.get_hdr_index();
+      obs_arr[0] = (double)nc_point_obs.get_hdr_index();
       n_hdr_obs = 0;
       for(idx=0; idx<v_obs_data.size(); idx++ ) {
          int var_idx = 0;
@@ -723,7 +723,7 @@ static void process_ioda_file(int i_pb) {
          obs_arr[3] = ioda_reader.obs_hght_arr[i_read];
          obs_arr[4] = v_obs_data[idx][i_read];
          addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
-               hdr_lat, hdr_lon, hdr_elv, (float)v_qc_data[idx][i_read]);
+               hdr_lat, hdr_lon, hdr_elv, (double)v_qc_data[idx][i_read]);
 
          // Increment the current and total observations counts
          n_file_obs++;
@@ -879,10 +879,10 @@ static void write_netcdf_hdr_data() {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
+static void addObservation(const double *obs_arr, const ConcatString &hdr_typ,
       const ConcatString &hdr_sid, const time_t hdr_vld,
-      const float hdr_lat, const float hdr_lon, const float hdr_elv,
-      const float quality_mark)
+      const double hdr_lat, const double hdr_lon, const double hdr_elv,
+      const double quality_mark)
 {
    // Write the quality flag to the netCDF file
    ConcatString obs_qty;
@@ -1031,17 +1031,17 @@ static bool get_meta_data_strings(NcVar &var, char *metadata_buf) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool get_obs_data_float(NcFile *f_in, const ConcatString &var_name,
-                               NcVar *obs_var, float *obs_buf, int *qc_buf,
-                               const int nlocs, const e_ioda_format ioda_format_ver) {
+static bool get_obs_data_double(NcFile *f_in, const ConcatString &var_name,
+                                NcVar *obs_var, double *obs_buf, int *qc_buf,
+                                const int nlocs, const e_ioda_format ioda_format_ver) {
    bool status = false;
-   static const char *method_name = "get_obs_data_float() -> ";
+   static const char *method_name = "get_obs_data_double() -> ";
    
    if(IS_VALID_NC_P(obs_var)) {
       status = get_nc_data(obs_var, obs_buf, nlocs);
       if(status) {
          for(int idx=0; idx<nlocs; idx++)
-            if(ioda_reader.check_missing_thresh(obs_buf[idx])) obs_buf[idx] = bad_data_float;
+            if(ioda_reader.check_missing_thresh(obs_buf[idx])) obs_buf[idx] = bad_data_double;
       }
       else mlog << Error << "\n" << method_name
                 << "trouble getting " << var_name << "\n\n";
