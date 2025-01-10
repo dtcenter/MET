@@ -171,7 +171,6 @@ static void setup_wrapper_path();
 int met_main(int argc, char *argv[]) {
    CommandLine cline;
 
-
    //
    // Check for zero arguments
    //
@@ -193,14 +192,14 @@ int met_main(int argc, char *argv[]) {
    //
    // Add the options function calls
    //
-   cline.add(set_format,    "-format",    1);
-   cline.add(set_config,    "-config",    1);
-   cline.add(set_mask_grid, "-mask_grid", 1);
-   cline.add(set_mask_poly, "-mask_poly", 1);
-   cline.add(set_mask_sid,  "-mask_sid",  1);
+   cline.add(set_format,         "-format",    1);
+   cline.add(set_config,         "-config",    1);
+   cline.add(set_mask_grid,      "-mask_grid", 1);
+   cline.add(set_mask_poly,      "-mask_poly", 1);
+   cline.add(set_mask_sid,       "-mask_sid",  1);
    cline.add(set_valid_beg_time, "-valid_beg", 1);
    cline.add(set_valid_end_time, "-valid_end", 1);
-   cline.add(set_compress,  "-compress",  1);
+   cline.add(set_compress,       "-compress",  1);
 
    //
    // Parse the command line
