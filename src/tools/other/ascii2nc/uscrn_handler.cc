@@ -20,73 +20,228 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-// Mapping of USCRN variant to metadata 
+//
+// U.S. Climate Reference Network (USCRN) Quality Controlled Datasets
+//    URL: https://www.ncei.noaa.gov/access/crn/qcdatasets.html
+//   Data: ftp://ftp.ncei.noaa.gov/pub/data/uscrn/products/{type}
+//
+// Mapping of USCRN {type} variants to metadata. 
+//
+
 std::map<USCRNFormat,USCRNFormatInfo> USCRNFormatMap = {
+
+  //
+  // "monthly01" with files named "CRNM0102-{Location}.txt
+  //   - Format number "02"
+  //   - Contains 15 columns defined by:
+  //     https://www.ncei.noaa.gov/pub/data/uscrn/products/monthly01/readme.txt
+  //
   { USCRNFormat::Monthly,
     { "USCRN-Monthly", "CRNM0102", ".txt", 15, 0, 1, -1, 3, 4, {
-      {  5, "TMP_MAX",   "C"  },
-      {  6, "TMP_MIN",   "C"  },
-      {  7, "TMP_MEAN",  "C"  },
-      {  8, "TMP_AVG",   "C"  },
-      {  9, "APCP",      "mm" },
-      { 12, "SKINT_MAX", "C"  },
-      { 13, "SKINT_MIN", "C"  },
-      { 14, "SKINT_AVG", "C"  }}
+      {  5, "T_MONTHLY_MAX",        "C"      },
+      {  6, "T_MONTHLY_MIN",        "C"      },
+      {  7, "T_MONTHLY_MEAN",       "C"      },
+      {  8, "T_MONTHLY_AVG",        "C"      },
+      {  9, "P_MONTHLY_CALC",       "mm"     },
+      { 10, "SOLRAD_MONTHLY_AVG",   "MJ/m^2" },
+      { 12, "SUR_TEMP_MONTHLY_MAX", "C"      },
+      { 13, "SUR_TEMP_MONTHLY_MIN", "C"      },
+      { 14, "SUR_TEMP_MONTHLY_AVG", "C"      }}
     }
   },
+
+  //
+  // "daily01" with files named "{YYYY}/CRND0103-{YYYY}-{Location}.txt
+  //   - Format number "03"
+  //   - Contains 28 columns defined by:
+  //     https://www.ncei.noaa.gov/pub/data/uscrn/products/daily01/readme.txt
+  //
   { USCRNFormat::Daily,
     { "USCRN-Daily", "CRND0103", ".txt", 28, 0, 1, -1, 3, 4, {
-      {  5, "TMP_MAX",     "C"       },
-      {  6, "TMP_MIN",     "C"       },
-      {  7, "TMP_MEAN",    "C"       },
-      {  8, "TMP_AVG",     "C"       },
-      {  9, "APCP",        "mm"      },
-      { 12, "SKINT_MAX",   "C"       },
-      { 13, "SKINT_MIN",   "C"       },
-      { 14, "SKINT_AVG",   "C"       },
-      { 15, "RH_MAX",      "%"       },
-      { 16, "RH_MIN",      "%"       },
-      { 17, "RH_AVG",      "%"       },
-      { 18, "SOILMOI_5",   "m^3/m^3" },
-      { 19, "SOILMOI_10",  "m^3/m^3" },
-      { 20, "SOILMOI_20",  "m^3/m^3" },
-      { 21, "SOILMOI_50",  "m^3/m^3" },
-      { 22, "SOILMOI_100", "m^3/m^3" },
-      { 23, "SOILTMP_5",   "C"       },
-      { 24, "SOILTMP_10",  "C"       },
-      { 25, "SOILTMP_20",  "C"       },
-      { 26, "SOILTMP_50",  "C"       },
-      { 27, "SOILTMP_100", "C"       }}
+      {  5, "T_DAILY_MAX",             "C"       },
+      {  6, "T_DAILY_MIN",             "C"       },
+      {  7, "T_DAILY_MEAN",            "C"       },
+      {  8, "T_DAILY_AVG",             "C"       },
+      {  9, "P_DAILY_CALC",            "mm"      },
+      { 10, "SOLARAD_DAILY",           "MJ/m^2"  },
+      { 12, "SUR_TEMP_DAILY_MAX",      "C"       },
+      { 13, "SUR_TEMP_DAILY_MIN",      "C"       },
+      { 14, "SUR_TEMP_DAILY_AVG",      "C"       },
+      { 15, "RH_DAILY_MAX",            "%"       },
+      { 16, "RH_DAILY_MIN",            "%"       },
+      { 17, "RH_DAILY_AVG",            "%"       },
+      { 18, "SOIL_MOISTURE_5_DAILY",   "m^3/m^3" },
+      { 19, "SOIL_MOISTURE_10_DAILY",  "m^3/m^3" },
+      { 20, "SOIL_MOISTURE_20_DAILY",  "m^3/m^3" },
+      { 21, "SOIL_MOISTURE_50_DAILY",  "m^3/m^3" },
+      { 22, "SOIL_MOISTURE_100_DAILY", "m^3/m^3" },
+      { 23, "SOIL_TEMP_5_DAILY",       "C"       },
+      { 24, "SOIL_TEMP_10_DAILY",      "C"       },
+      { 25, "SOIL_TEMP_20_DAILY",      "C"       },
+      { 26, "SOIL_TEMP_50_DAILY",      "C"       },
+      { 27, "SOIL_TEMP_100_DAILY",     "C"       }}
     }
   },
+
+  //
+  // "hourly02" with files named "{YYYY}/CRNH0203-{YYYY}-{Location}.txt
+  //   - Format number "03"
+  //   - Contains 38 columns defined by:
+  //     https://www.ncei.noaa.gov/pub/data/uscrn/products/hourly02/readme.txt
+  //
   { USCRNFormat::Hourly,
     { "USCRN-Hourly", "CRNH0203", ".txt", 38, 0, 1, 2, 6, 7, {
-      {  8, "TMP_CALC",    "C"         },
-      {  9, "TMP_AVG",     "C"         },
-      { 10, "TMP_MAX",     "C"         },
-      { 11, "TMP_MIN",     "C"         },
-      { 12, "APCP",        "mm"        },
-      { 13, "SOLARAD_AVG", "W/m^2", 14 },
-      { 15, "SOLARAD_MAX", "W/m^2", 16 },
-      { 17, "SOLARAD_MIN", "W/m^2", 18 },
-      { 20, "SKINT_AVG",   "C",     21 },
-      { 22, "SKINT_MAX",   "C",     23 },
-      { 24, "SKINT_MIN",   "C",     25 },
-      { 26, "RH_AVG",      "%",     27 },
-      { 28, "SOILMOI_5",   "m^3/m^3"   },
-      { 29, "SOILMOI_10",  "m^3/m^3"   },
-      { 30, "SOILMOI_20",  "m^3/m^3"   },
-      { 31, "SOILMOI_50",  "m^3/m^3"   },
-      { 32, "SOILMOI_100", "m^3/m^3"   },
-      { 33, "SOILTMP_5",   "C"         },
-      { 34, "SOILTMP_10",  "C"         },
-      { 35, "SOILTMP_20",  "C"         },
-      { 36, "SOILTMP_50",  "C"         },
-      { 37, "SOILTMP_100", "C"         }}
+      {  8, "T_CALC",            "C"         },
+      {  9, "T_HR_AVG",          "C"         },
+      { 10, "T_MAX",             "C"         },
+      { 11, "T_MIN",             "C"         },
+      { 12, "P_CALC",            "mm"        },
+      { 13, "SOLARAD",           "W/m^2", 14 },
+      { 15, "SOLARAD_MAX",       "W/m^2", 16 },
+      { 17, "SOLARAD_MIN",       "W/m^2", 18 },
+      { 20, "SUR_TEMP",          "C",     21 },
+      { 22, "SUR_TEMP_MAX",      "C",     23 },
+      { 24, "SUR_TEMP_MIN",      "C",     25 },
+      { 26, "RH_HR_AVG",         "%",     27 },
+      { 28, "SOIL_MOISTURE_5",   "m^3/m^3"   },
+      { 29, "SOIL_MOISTURE_10",  "m^3/m^3"   },
+      { 30, "SOIL_MOISTURE_20",  "m^3/m^3"   },
+      { 31, "SOIL_MOISTURE_50",  "m^3/m^3"   },
+      { 32, "SOIL_MOISTURE_100", "m^3/m^3"   },
+      { 33, "SOIL_TEMP_5",       "C"         },
+      { 34, "SOIL_TEMP_10",      "C"         },
+      { 35, "SOIL_TEMP_20",      "C"         },
+      { 36, "SOIL_TEMP_50",      "C"         },
+      { 37, "SOIL_TEMP_100",     "C"         }}
+    }
+  },
+
+  //
+  // "subhourly01" with files named "{YYYY}/CRNS0101-{MM}-{YYYY}-{Location}.txt
+  //   - Format number "01"
+  //   - Contains 23 columns defined by:
+  //     https://www.ncei.noaa.gov/pub/data/uscrn/products/subhourly01/readme.txt
+  //
+  { USCRNFormat::SubHourly,
+    { "USCRN-SubHourly", "CRNS0101", ".txt", 23, 0, 1, 2, 6, 7, {
+      {  8, "AIR_TEMPERATURE",     "C"         },
+      {  9, "PRECIPITATION",       "mm"        },
+      { 10, "SOLAR_RADIATION",     "W/m^2", 11 },
+      { 12, "SURFACE_TEMPERATURE", "C",     14 },
+      { 15, "RELATIVE_HUMIDITY",   "%",     16 },
+      { 17, "SOIL_MOISTURE_5",     "m^3/m^3"   },
+      { 18, "SOIL_TEMPERATURE_5",  "C"         },
+      { 19, "WETNESS",             "Ohms", 20  },
+      { 21, "WIND_1_5",            "m/s",  22  }}
+    }
+  },
+
+  //
+  // "soil/soilanom01" with files named "CRNSSM0101-{Location}.csv"
+  //   - Format number "01"
+  //   - Contains 30 NAMED columns but with no README file provided.
+  //
+  // Note that "soil/soilclim01" files named "CRNSMC0101-{Location}.csv"
+  // are not supported directly here.
+  //
+  { USCRNFormat::SoilAnom,
+    { "USCRN-SoilAnom", "CRNSSM0101", ".csv", 30, 0, 1, -1, 2, 3, {
+      {  4, "SMVWC_5_CM",    "m^3/m^3"      },
+      {  5, "SMANOM_5_CM",   "Standardized" },
+      {  6, "SMPERC_5_CM",   "fraction"     },
+      {  7, "ST_5_CM",       "C"            },
+      {  8, "SMVWC_10_CM",   "m^3/m^3"      },
+      {  9, "SMANOM_10_CM",  "Standardized" },
+      { 10, "SMPERC_10_CM",  "fraction"     },
+      { 11, "ST_10_CM",      "C"            },
+      { 12, "SMVWC_20_CM",   "m^3/m^3"      },
+      { 13, "SMANOM_20_CM",  "Standardized" },
+      { 14, "SMPERC_20_CM",  "fraction"     },
+      { 15, "ST_20_CM",      "C"            },
+      { 16, "SMVWC_50_CM",   "m^3/m^3"      },
+      { 17, "SMANOM_50_CM",  "Standardized" },
+      { 18, "SMPERC_50_CM",  "fraction"     },
+      { 19, "ST_50_CM",      "C"            },
+      { 20, "SMVWC_100_CM",  "m^3/m^3"      },
+      { 21, "SMANOM_100_CM", "Standardized" },
+      { 22, "SMPERC_100_CM", "fraction"     },
+      { 23, "ST_100_CM",     "C"            },
+      { 24, "SMVWC_TOP",     "m^3/m^3"      },
+      { 25, "SMANOM_TOP",    "Standardized" },
+      { 26, "SMPERC_TOP",    "fraction"     },
+      { 27, "SMVWC_COLUMN",  "m^3/m^3"      },
+      { 28, "SMANOM_COLUMN", "Standardized" },
+      { 29, "SMPERC_COLUMN", "fraction"     }}
+    }
+  },
+
+  //
+  // "heat01" with files named "SCRNHE0101-{Location}.csv"
+  //   - Format number "01"
+  //   - Contains 16 NAMED columns described by:
+  //     https://www.ncei.noaa.gov/pub/data/uscrn/products/heat01/readme.txt
+  //
+  { USCRNFormat::Heat,
+    { "USCRN-Heat", "CRNHE0101", ".csv", 16, 0, 1, -1, 2, 3, {
+      {  4, "RELATIVE_HUMIDITY",             "%"     },
+      {  5, "SURFACE_PRESSURE",              "hPa"   },
+      {  6, "SOLAR_RADIATION",               "W/m^2" },
+      {  7, "ESTIMATED_10_METER_WIND_SPEED", "m/s"   },
+      {  8, "DRY_BULB_TEMPERATURE_C",        "C"     },
+      {  9, "HEAT_INDEX_C",                  "C"     },
+      { 10, "APPARENT_TEMPERATURE_C",        "C"     },
+      { 11, "WET_BULB_GLOBE_TEMPERATURE_C",  "C"     },
+      { 12, "DRY_BULB_TEMPERATURE_F",        "F"     },
+      { 13, "HEAT_INDEX_F",                  "F"     },
+      { 14, "APPARENT_TEMPERATURE_F",        "F"     },
+      { 15, "WET_BULB_GLOBE_TEMPERATURE_F",  "F"     }}
+    }
+  },
+
+  //
+  // "drought01" with files named "CRNDI0101-{Location}.csv
+  //   - Format number "01"
+  //   - Contains 32 NAMED columns described by:
+  //     https://www.ncei.noaa.gov/pub/data/uscrn/products/drought01/readme.txt
+  //
+  // TODO: Consider excluding the 30COUNTS and 70COUNTS columns since they
+  //       are likely not useful for verification.
+  //
+  { USCRNFormat::Drought,
+    { "USCRN-Drought", "CRNDI0101", ".csv", 32, 0, 1, -1, 2, 3, {
+      {  4, "SMVWC_5_CM_MEAN",          "m^3/m^3"       },
+      {  5, "SMANOM_5_CM_MEAN",         "Standardized"  },
+      {  6, "SMPERC_5_CM_30COUNTS",     "fraction"      },
+      {  7, "SMPERC_5_CM_70COUNTS",     "fraction"      },
+      {  8, "SMVWC_10_CM_MEAN",         "m^3/m^3"       },
+      {  9, "SMANOM_10_CM_MEAN",        "Standardized"  },
+      { 10, "SMPERC_10_CM_30COUNTS",    "fraction"      },
+      { 11, "SMPERC_10_CM_70COUNTS",    "fraction"      },
+      { 12, "SMVWC_20_CM_MEAN",         "m^3/m^3"       },
+      { 13, "SMANOM_20_CM_MEAN",        "Standardized"  },
+      { 14, "SMPERC_20_CM_30COUNTS",    "fraction"      },
+      { 15, "SMPERC_20_CM_70COUNTS",    "fraction"      },
+      { 16, "SMVWC_50_CM_MEAN",         "m^3/m^3"       },
+      { 17, "SMANOM_50_CM_MEAN",        "Standardized"  },
+      { 18, "SMPERC_50_CM_30COUNTS",    "fraction"      },
+      { 19, "SMPERC_50_CM_70COUNTS",    "fraction"      },
+      { 20, "SMVWC_100_CM_MEAN",        "m^3/m^3"       },
+      { 21, "SMANOM_100_CM_MEAN",       "Standardized"  },
+      { 22, "SMPERC_100_CM_30COUNTS",   "fraction"      },
+      { 23, "SMPERC_100_CM_70COUNTS",   "fraction"      },
+      { 24, "SMVWC_TOP_CM_MEAN",        "m^3/m^3"       },
+      { 25, "SMANOM_TOP_CM_MEAN",        "Standardized" },
+      { 26, "SMPERC_TOP_CM_30COUNTS",    "fraction"     },
+      { 27, "SMPERC_TOP_CM_70COUNTS",    "fraction"     },
+      { 28, "SMVWC_COLUMN_CM_MEAN",      "m^3/m^3"      },
+      { 29, "SMANOM_COLUMN_CM_MEAN",     "Standardized" },
+      { 30, "SMPERC_COLUMN_CM_30COUNTS", "fraction"     },
+      { 31, "SMPERC_COLUMN_CM_70COUNTS", "fraction"     }}
     }
   }
 };
-// TODO: Add support for other format types
+
+// List of bad data input values found in USCRN data
 static const NumArray USCRNBadDataInput({ -99.0, -9999.0});
 
 ////////////////////////////////////////////////////////////////////////
@@ -154,8 +309,24 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
    // Read and save the header information
    if(!_readHeaderInfo(ascii_file)) return false;
 
-   // Process the data lines
+   // Check for .csv format:
+   // - .csv files have a header line to be skipped.
+   // - .txt files have no header line to be skipped.
    DataLine dl;
+   ConcatString file_name(ascii_file.filename());
+   if(file_name.endswith(".csv")) {
+
+      // Set the delimiter
+      dl.set_delimiter(",");
+
+      // Allow empty columns
+      dl.set_allow_empty_columns();
+
+      // Read the and skip the header line with column names
+      while(dl.n_items() == 0) ascii_file >> dl;
+   }
+
+   // Process the data lines
    while(ascii_file >> dl) {
 
       // Check the expected number of columns
@@ -178,10 +349,13 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
 
          // Get the observation
          string obs_str(dl[col._offset]);
-         double obs_val = stod(obs_str);
 
-         // Check for missing or bad data
-         if(obs_str.empty() || USCRNBadDataInput.has(obs_val)) continue; 
+	 // Check for empty string
+	 if(obs_str.empty()) continue;
+
+	 // Check for bad data value
+         double obs_val = stod(obs_str);
+         if(USCRNBadDataInput.has(obs_val)) continue; 
 
          // Check for QC flag
          string qc_str(na_str);
@@ -207,24 +381,42 @@ time_t UscrnHandler::_getValidTime(const DataLine &dl) const {
    struct tm time_struct;
    memset(&time_struct, 0, sizeof(time_struct));
 
-   // YMD formatted as YYYYMM or YYYYMMDD
-   string ymd_str(dl[USCRNFormatMap[_format]._ymdOffset]);
+   // Store date string (required)
+   string date_str(dl[USCRNFormatMap[_format]._ymdOffset]);
 
-   // Append 01 to YYYYMM string
-   if(ymd_str.length() == 6) ymd_str.append("01"); 
+   // Store time string (optional)
+   string time_str;
+   int time_offset = USCRNFormatMap[_format]._hmOffset;
+   if(time_offset > 0) time_str = dl[time_offset];
+   else                time_str = "0000";
 
-   // HM is either not present (-1) or formatted as HHMM
-   string hm_str;
-   int offset = USCRNFormatMap[_format]._hmOffset;
-   if(offset > 0) hm_str = dl[offset];
-   else           hm_str = "0000";
+   // Process date string formats
+   if(date_str.length() == 6) {
+      // Append DD to YYYYMM
+      date_str.append("01");
+   }
+   else if(date_str.length() == 8) {
+      // No work to do for YYYYMMDD format
+   }
+   else if(date_str.length() == 10) {
+      // Split YYYYMMDDHH into pieces
+      time_str = date_str.substr(8, 2);
+      time_str.append("00");
+      date_str = date_str.substr(0, 8);
+   }
+   else {
+      mlog << Error << "\nUscrnHandler::_getValidTime() -> "
+           << "unexpected date format (" << date_str
+           << ") on line number " << dl.line_number() << "!\n\n";
+      exit(1);
+   }
 
    // Parse time components
-   time_struct.tm_year = stoi(ymd_str.substr(0, 4));
-   time_struct.tm_mon  = stoi(ymd_str.substr(4, 2));
-   time_struct.tm_mday = stoi(ymd_str.substr(6, 2));
-   time_struct.tm_hour = stoi( hm_str.substr(0, 2));
-   time_struct.tm_min  = stoi( hm_str.substr(2, 2));
+   time_struct.tm_year = stoi(date_str.substr(0, 4));
+   time_struct.tm_mon  = stoi(date_str.substr(4, 2));
+   time_struct.tm_mday = stoi(date_str.substr(6, 2));
+   time_struct.tm_hour = stoi(time_str.substr(0, 2));
+   time_struct.tm_min  = stoi(time_str.substr(2, 2));
 
    return timegm(&time_struct);
 }
@@ -233,8 +425,12 @@ time_t UscrnHandler::_getValidTime(const DataLine &dl) const {
 
 bool UscrnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
 
-   // Read the header line
+   // Check for .csv format
    DataLine dl;
+   ConcatString file_name(ascii_file.filename());
+   if(file_name.endswith(".csv")) dl.set_delimiter(",");
+
+   // Read the header line
    while(dl.n_items() == 0) ascii_file >> dl;
 
    // Check the expected number of columns

@@ -25,63 +25,18 @@
 //     URL: https://www.ncei.noaa.gov/access/crn/qcdatasets.html
 //    Data: ftp://ftp.ncei.noaa.gov/pub/data/uscrn/products/{type}
 //
-// Where {type} is:
-//
-// 1. "monthly01" with files named "CRNM0102-{Location}.txt
-//   - Contains 15 columns defined by:
-//     https://www.ncei.noaa.gov/pub/data/uscrn/products/monthly01/headers.txt
-//
-// 2. "daily01" with files named "{YYYY}/CRND0103-{YYYY}-{Location}.txt
-//   - Contains 28 columns defined by:
-//     https://www.ncei.noaa.gov/pub/data/uscrn/products/daily01/headers.txt
-//
-// 3. "hourly02" with files named "{YYYY}/CRNH0203-{YYYY}-{Location}.txt
-//   - Contains 38 columns defined by:
-//     https://www.ncei.noaa.gov/pub/data/uscrn/products/hourly02/headers.txt
-//
-// 4. "subhourly01" with files named "{YYYY}/CRNS0101-{MM}-{YYYY}-{Location}.txt
-//   - Contains 23 columns defined by:
-//     https://www.ncei.noaa.gov/pub/data/uscrn/products/subhourly01/headers.txt 
-//
-// 5. "soil/soilclim01" with files named "CRNSMC0101-{Location}.csv"
-//   - Contains 30 NAMED columns described by:
-//     https://www.ncei.noaa.gov/pub/data/uscrn/products/soil/soilclim01/readme.txt
-//
-// 6. "soil/soilanom01" with files named "CRNSSM0101-{Location}.csv"
-//   - Contains 32 NAMED columns with no README file provided. 
-//
-// 7. "heat01" with files named "SCRNHE0101-{Location}.csv"
-//   - Contains 17 NAMED columns described by:
-//     https://www.ncei.noaa.gov/pub/data/uscrn/products/heat01/readme.txt
-//
-// 8. "drought01" with files named "CRNDI0101-{Location}.csv
-//   - Contains 32 NAMED columns described by:
-//     https://www.ncei.noaa.gov/pub/data/uscrn/products/drought01/readme.txt
-//
-// 9. "soil01" with files named "SOIL01_{Location}.txt"
-//   - Contains 15 columns defined by:
-//      https://www.ncei.noaa.gov/pub/data/uscrn/products/soil01/headers.txt
-//
-// Where:
-//   - {YYYY} is the 4-digit year.
-//   - {MM} is the 2-digit month.
-//   - {Location} is a 2-letter US state name and site name followed by direction
-//     and distance from that location.
-// 
 ////////////////////////////////////////////////////////////////////////
 
-// List of USCRN variants
+// List of USCRN {type} variants
 enum class USCRNFormat {
    None,
    Monthly,
    Daily,
    Hourly,
    SubHourly,
-   SoilClim,
    SoilAnom,
    Heat,
-   Drought,
-   Soil,
+   Drought
 };
 
 // Column information

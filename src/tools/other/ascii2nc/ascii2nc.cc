@@ -270,7 +270,7 @@ int met_main(int argc, char *argv[]) {
    // Read the input files
    //
    if(!file_handler->readAsciiFiles(asfile_list)) {
-      mlog << Error << "\n" << program_name << "-> "
+      mlog << Error << "\n" << program_name << " -> "
            << "encountered an error while reading input files!\n\n";
       return 1;
    }
