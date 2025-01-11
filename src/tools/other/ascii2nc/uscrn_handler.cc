@@ -38,15 +38,15 @@ std::map<USCRNFormat,USCRNFormatInfo> USCRNFormatMap = {
   //
   { USCRNFormat::Monthly,
     { "USCRN-Monthly", "CRNM0102", ".txt", 15, 0, 1, -1, 3, 4, {
-      {  5, "T_MONTHLY_MAX",        "C"      },
-      {  6, "T_MONTHLY_MIN",        "C"      },
-      {  7, "T_MONTHLY_MEAN",       "C"      },
-      {  8, "T_MONTHLY_AVG",        "C"      },
-      {  9, "P_MONTHLY_CALC",       "mm"     },
-      { 10, "SOLRAD_MONTHLY_AVG",   "MJ/m^2" },
-      { 12, "SUR_TEMP_MONTHLY_MAX", "C"      },
-      { 13, "SUR_TEMP_MONTHLY_MIN", "C"      },
-      { 14, "SUR_TEMP_MONTHLY_AVG", "C"      }}
+      {  5, "T_MONTHLY_MAX",        "Celsius" },
+      {  6, "T_MONTHLY_MIN",        "Celsius" },
+      {  7, "T_MONTHLY_MEAN",       "Celsius" },
+      {  8, "T_MONTHLY_AVG",        "Celsius" },
+      {  9, "P_MONTHLY_CALC",       "mm"      },
+      { 10, "SOLRAD_MONTHLY_AVG",   "MJ/m^2"  },
+      { 12, "SUR_TEMP_MONTHLY_MAX", "Celcius" },
+      { 13, "SUR_TEMP_MONTHLY_MIN", "Celcius" },
+      { 14, "SUR_TEMP_MONTHLY_AVG", "Celcius" }}
     }
   },
 
@@ -58,15 +58,15 @@ std::map<USCRNFormat,USCRNFormatInfo> USCRNFormatMap = {
   //
   { USCRNFormat::Daily,
     { "USCRN-Daily", "CRND0103", ".txt", 28, 0, 1, -1, 3, 4, {
-      {  5, "T_DAILY_MAX",             "C"       },
-      {  6, "T_DAILY_MIN",             "C"       },
-      {  7, "T_DAILY_MEAN",            "C"       },
-      {  8, "T_DAILY_AVG",             "C"       },
+      {  5, "T_DAILY_MAX",             "Celsius" },
+      {  6, "T_DAILY_MIN",             "Celsius" },
+      {  7, "T_DAILY_MEAN",            "Celsius" },
+      {  8, "T_DAILY_AVG",             "Celsius" },
       {  9, "P_DAILY_CALC",            "mm"      },
       { 10, "SOLARAD_DAILY",           "MJ/m^2"  },
-      { 12, "SUR_TEMP_DAILY_MAX",      "C"       },
-      { 13, "SUR_TEMP_DAILY_MIN",      "C"       },
-      { 14, "SUR_TEMP_DAILY_AVG",      "C"       },
+      { 12, "SUR_TEMP_DAILY_MAX",      "Celsius" },
+      { 13, "SUR_TEMP_DAILY_MIN",      "Celsius" },
+      { 14, "SUR_TEMP_DAILY_AVG",      "Celsius" },
       { 15, "RH_DAILY_MAX",            "%"       },
       { 16, "RH_DAILY_MIN",            "%"       },
       { 17, "RH_DAILY_AVG",            "%"       },
@@ -75,11 +75,11 @@ std::map<USCRNFormat,USCRNFormatInfo> USCRNFormatMap = {
       { 20, "SOIL_MOISTURE_20_DAILY",  "m^3/m^3" },
       { 21, "SOIL_MOISTURE_50_DAILY",  "m^3/m^3" },
       { 22, "SOIL_MOISTURE_100_DAILY", "m^3/m^3" },
-      { 23, "SOIL_TEMP_5_DAILY",       "C"       },
-      { 24, "SOIL_TEMP_10_DAILY",      "C"       },
-      { 25, "SOIL_TEMP_20_DAILY",      "C"       },
-      { 26, "SOIL_TEMP_50_DAILY",      "C"       },
-      { 27, "SOIL_TEMP_100_DAILY",     "C"       }}
+      { 23, "SOIL_TEMP_5_DAILY",       "Celsius" },
+      { 24, "SOIL_TEMP_10_DAILY",      "Celsius" },
+      { 25, "SOIL_TEMP_20_DAILY",      "Celsius" },
+      { 26, "SOIL_TEMP_50_DAILY",      "Celsius" },
+      { 27, "SOIL_TEMP_100_DAILY",     "Celsius" }}
     }
   },
 
@@ -91,28 +91,28 @@ std::map<USCRNFormat,USCRNFormatInfo> USCRNFormatMap = {
   //
   { USCRNFormat::Hourly,
     { "USCRN-Hourly", "CRNH0203", ".txt", 38, 0, 1, 2, 6, 7, {
-      {  8, "T_CALC",            "C"         },
-      {  9, "T_HR_AVG",          "C"         },
-      { 10, "T_MAX",             "C"         },
-      { 11, "T_MIN",             "C"         },
-      { 12, "P_CALC",            "mm"        },
-      { 13, "SOLARAD",           "W/m^2", 14 },
-      { 15, "SOLARAD_MAX",       "W/m^2", 16 },
-      { 17, "SOLARAD_MIN",       "W/m^2", 18 },
-      { 20, "SUR_TEMP",          "C",     21 },
-      { 22, "SUR_TEMP_MAX",      "C",     23 },
-      { 24, "SUR_TEMP_MIN",      "C",     25 },
-      { 26, "RH_HR_AVG",         "%",     27 },
-      { 28, "SOIL_MOISTURE_5",   "m^3/m^3"   },
-      { 29, "SOIL_MOISTURE_10",  "m^3/m^3"   },
-      { 30, "SOIL_MOISTURE_20",  "m^3/m^3"   },
-      { 31, "SOIL_MOISTURE_50",  "m^3/m^3"   },
-      { 32, "SOIL_MOISTURE_100", "m^3/m^3"   },
-      { 33, "SOIL_TEMP_5",       "C"         },
-      { 34, "SOIL_TEMP_10",      "C"         },
-      { 35, "SOIL_TEMP_20",      "C"         },
-      { 36, "SOIL_TEMP_50",      "C"         },
-      { 37, "SOIL_TEMP_100",     "C"         }}
+      {  8, "T_CALC",            "Celsius"     },
+      {  9, "T_HR_AVG",          "Celsius"     },
+      { 10, "T_MAX",             "Celsius"     },
+      { 11, "T_MIN",             "Celsius"     },
+      { 12, "P_CALC",            "mm"          },
+      { 13, "SOLARAD",           "W/m^2",   14 },
+      { 15, "SOLARAD_MAX",       "W/m^2",   16 },
+      { 17, "SOLARAD_MIN",       "W/m^2",   18 },
+      { 20, "SUR_TEMP",          "Celsius", 21 },
+      { 22, "SUR_TEMP_MAX",      "Celsius", 23 },
+      { 24, "SUR_TEMP_MIN",      "Celsius", 25 },
+      { 26, "RH_HR_AVG",         "%",       27 },
+      { 28, "SOIL_MOISTURE_5",   "m^3/m^3"     },
+      { 29, "SOIL_MOISTURE_10",  "m^3/m^3"     },
+      { 30, "SOIL_MOISTURE_20",  "m^3/m^3"     },
+      { 31, "SOIL_MOISTURE_50",  "m^3/m^3"     },
+      { 32, "SOIL_MOISTURE_100", "m^3/m^3"     },
+      { 33, "SOIL_TEMP_5",       "Celsius"     },
+      { 34, "SOIL_TEMP_10",      "Celsius"     },
+      { 35, "SOIL_TEMP_20",      "Celsius"     },
+      { 36, "SOIL_TEMP_50",      "Celsius"     },
+      { 37, "SOIL_TEMP_100",     "Celsius"     }}
     }
   },
 
@@ -124,15 +124,15 @@ std::map<USCRNFormat,USCRNFormatInfo> USCRNFormatMap = {
   //
   { USCRNFormat::SubHourly,
     { "USCRN-SubHourly", "CRNS0101", ".txt", 23, 0, 1, 2, 6, 7, {
-      {  8, "AIR_TEMPERATURE",     "C"         },
-      {  9, "PRECIPITATION",       "mm"        },
-      { 10, "SOLAR_RADIATION",     "W/m^2", 11 },
-      { 12, "SURFACE_TEMPERATURE", "C",     14 },
-      { 15, "RELATIVE_HUMIDITY",   "%",     16 },
-      { 17, "SOIL_MOISTURE_5",     "m^3/m^3"   },
-      { 18, "SOIL_TEMPERATURE_5",  "C"         },
-      { 19, "WETNESS",             "Ohms", 20  },
-      { 21, "WIND_1_5",            "m/s",  22  }}
+      {  8, "AIR_TEMPERATURE",     "Celsius"     },
+      {  9, "PRECIPITATION",       "mm"          },
+      { 10, "SOLAR_RADIATION",     "W/m^2",   11 },
+      { 12, "SURFACE_TEMPERATURE", "Celsius", 14 },
+      { 15, "RELATIVE_HUMIDITY",   "%",       16 },
+      { 17, "SOIL_MOISTURE_5",     "m^3/m^3"     },
+      { 18, "SOIL_TEMPERATURE_5",  "Celsius"     },
+      { 19, "WETNESS",             "Ohms", 20    },
+      { 21, "WIND_1_5",            "m/s",  22    }}
     }
   },
 
@@ -149,23 +149,23 @@ std::map<USCRNFormat,USCRNFormatInfo> USCRNFormatMap = {
       {  4, "SMVWC_5_CM",    "m^3/m^3"      },
       {  5, "SMANOM_5_CM",   "Standardized" },
       {  6, "SMPERC_5_CM",   "fraction"     },
-      {  7, "ST_5_CM",       "C"            },
+      {  7, "ST_5_CM",       "Celsius"      },
       {  8, "SMVWC_10_CM",   "m^3/m^3"      },
       {  9, "SMANOM_10_CM",  "Standardized" },
       { 10, "SMPERC_10_CM",  "fraction"     },
-      { 11, "ST_10_CM",      "C"            },
+      { 11, "ST_10_CM",      "Celsius"      },
       { 12, "SMVWC_20_CM",   "m^3/m^3"      },
       { 13, "SMANOM_20_CM",  "Standardized" },
       { 14, "SMPERC_20_CM",  "fraction"     },
-      { 15, "ST_20_CM",      "C"            },
+      { 15, "ST_20_CM",      "Celsius"      },
       { 16, "SMVWC_50_CM",   "m^3/m^3"      },
       { 17, "SMANOM_50_CM",  "Standardized" },
       { 18, "SMPERC_50_CM",  "fraction"     },
-      { 19, "ST_50_CM",      "C"            },
+      { 19, "ST_50_CM",      "Celsius"      },
       { 20, "SMVWC_100_CM",  "m^3/m^3"      },
       { 21, "SMANOM_100_CM", "Standardized" },
       { 22, "SMPERC_100_CM", "fraction"     },
-      { 23, "ST_100_CM",     "C"            },
+      { 23, "ST_100_CM",     "Celsius"      },
       { 24, "SMVWC_TOP",     "m^3/m^3"      },
       { 25, "SMANOM_TOP",    "Standardized" },
       { 26, "SMPERC_TOP",    "fraction"     },
@@ -183,18 +183,18 @@ std::map<USCRNFormat,USCRNFormatInfo> USCRNFormatMap = {
   //
   { USCRNFormat::Heat,
     { "USCRN-Heat", "CRNHE0101", ".csv", 16, 0, 1, -1, 2, 3, {
-      {  4, "RELATIVE_HUMIDITY",             "%"     },
-      {  5, "SURFACE_PRESSURE",              "hPa"   },
-      {  6, "SOLAR_RADIATION",               "W/m^2" },
-      {  7, "ESTIMATED_10_METER_WIND_SPEED", "m/s"   },
-      {  8, "DRY_BULB_TEMPERATURE_C",        "C"     },
-      {  9, "HEAT_INDEX_C",                  "C"     },
-      { 10, "APPARENT_TEMPERATURE_C",        "C"     },
-      { 11, "WET_BULB_GLOBE_TEMPERATURE_C",  "C"     },
-      { 12, "DRY_BULB_TEMPERATURE_F",        "F"     },
-      { 13, "HEAT_INDEX_F",                  "F"     },
-      { 14, "APPARENT_TEMPERATURE_F",        "F"     },
-      { 15, "WET_BULB_GLOBE_TEMPERATURE_F",  "F"     }}
+      {  4, "RELATIVE_HUMIDITY",             "%"          },
+      {  5, "SURFACE_PRESSURE",              "hPa"        },
+      {  6, "SOLAR_RADIATION",               "W/m^2"      },
+      {  7, "ESTIMATED_10_METER_WIND_SPEED", "m/s"        },
+      {  8, "DRY_BULB_TEMPERATURE_C",        "Celsius"    },
+      {  9, "HEAT_INDEX_C",                  "Celsius"    },
+      { 10, "APPARENT_TEMPERATURE_C",        "Celsius"    },
+      { 11, "WET_BULB_GLOBE_TEMPERATURE_C",  "Celsius"    },
+      { 12, "DRY_BULB_TEMPERATURE_F",        "Fahrenheit" },
+      { 13, "HEAT_INDEX_F",                  "Fahrenheit" },
+      { 14, "APPARENT_TEMPERATURE_F",        "Fahrenheit" },
+      { 15, "WET_BULB_GLOBE_TEMPERATURE_F",  "Fahrenheit" }}
     }
   },
 
@@ -367,8 +367,7 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
             _stationLat, _stationLon, bad_data_double,
             qc_str, -1, bad_data_double,
             bad_data_double, obs_val,
-	    col._name));
-	 // TODO: Add logic to convert/store units
+	    col._name, col._units));
       }
    } // end while
 

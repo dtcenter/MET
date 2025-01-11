@@ -208,8 +208,12 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
    _dataSummarized = true;
    _summaryInfo = summary_info;
    StringArray summary_vnames = summary_obs.getObsNames();
+   StringArray summary_vunits = summary_obs.getObsUnits();
    for (int idx=0; idx<summary_vnames.n(); idx++) {
-      if (!obs_names.has(summary_vnames[idx])) obs_names.add(summary_vnames[idx]);
+      if (!obs_names.has(summary_vnames[idx])) {
+         obs_names.add(summary_vnames[idx]);
+         obs_units.add(summary_vunits[idx]);
+      }
    }
    return result;
 }
@@ -316,9 +320,11 @@ bool FileHandler::_addObservations(const Observation &obs)
    _observations.push_back(obs);
    if (do_summary) summary_obs.addObservationObj(obs);
    else {
-      ConcatString var_name = obs.getVarName();
+      ConcatString var_name  = obs.getVarName();
+      ConcatString var_units = obs.getVarUnits();
       if (var_name.nonempty() && !obs_names.has(var_name)) {
          obs_names.add(var_name);
+         obs_units.add(var_units);
       }
    }
 
