@@ -41,7 +41,8 @@ public:
                        const std::string &quality_flag,
                        const int var_code, const double pressure_level_hpa,
                        const double height_m, const double value,
-                       const std::string &var_name = "");
+                       const std::string &var_name = "",
+                       const std::string &var_units = "");
    std::vector< Observation > getObservations();
    std::vector< Observation > getSummaries();
    long countHeaders();
@@ -52,6 +53,7 @@ public:
    TimeSummaryInfo getSummaryInfo();
    void setSummaryInfo(const TimeSummaryInfo &summary_info);
    StringArray getObsNames();
+   StringArray getObsUnits();
 
 
 protected:
@@ -70,6 +72,7 @@ protected:
   std::vector< Observation > observations;
   std::vector< Observation > summaries;
   StringArray obs_names;
+  StringArray obs_units;
 
   ///////////////////////
   // Protected methods //
@@ -251,11 +254,13 @@ public:
 
 };
 
-inline std::vector< Observation > SummaryObs::getObservations() { return observations; }
-inline std::vector< Observation > SummaryObs::getSummaries()    { return summaries;    }
-inline StringArray           SummaryObs::getObsNames()     { return obs_names;    }
-inline void                  SummaryObs::setSummaryInfo(const TimeSummaryInfo &summary_info) { summaryInfo = summary_info;};
-inline TimeSummaryInfo       SummaryObs::getSummaryInfo()  { return summaryInfo;};
+inline std::vector< Observation > SummaryObs::getObservations() { return observations;        }
+inline std::vector< Observation > SummaryObs::getSummaries()    { return summaries;           }
+inline StringArray           SummaryObs::getObsNames()          { return obs_names;           }
+inline StringArray           SummaryObs::getObsUnits()          { return obs_units;           }
+inline void                  SummaryObs::setSummaryInfo(const TimeSummaryInfo &summary_info)
+                                                                { summaryInfo = summary_info; }
+inline TimeSummaryInfo       SummaryObs::getSummaryInfo()       { return summaryInfo;         }
 
 ////////////////////////////////////////////////////////////////////////
 
