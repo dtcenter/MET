@@ -448,9 +448,9 @@ While initial versions of the ASCII2NC tool only supported a simple 11 column AS
 
 • `International Arctic Buoy Programme (IABP) Data format <https://iabp.apl.uw.edu/>`_.
 
-• `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <http://aeronet.gsfc.nasa.gov/>`_
+• `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <http://aeronet.gsfc.nasa.gov/>`_.
 
-• `U.S. Climate Reference Network (USCRN) Quality Controlled Datasets <https://www.ncei.noaa.gov/access/crn/qcdatasets.html>`_
+• `U.S. Climate Reference Network (USCRN) Quality Controlled Datasets <https://www.ncei.noaa.gov/access/crn/qcdatasets.html>`_, where the specific data format is determined by the prefix and suffix of the input file name.
 
 • Python embedding of point observations, as described in :numref:`pyembed-point-obs-data`. See example below in :numref:`ascii2nc-pyembed`.
 
