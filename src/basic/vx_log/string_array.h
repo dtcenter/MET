@@ -90,6 +90,8 @@ class StringArray {
    
       bool has(const std::string, int & index, bool forward=true) const;
 
+      bool all_empty() const;
+
          //
          //  parse delimited strings
          //

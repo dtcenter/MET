@@ -560,6 +560,31 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
 ////////////////////////////////////////////////////////////////////////
 
 
+bool StringArray::all_empty() const
+
+{
+
+bool all_empty = true;
+
+   //
+   // Search for non-empty string
+   //
+
+for(auto &x : s) {
+   if(!x.size() == 0) {
+      all_empty = false;
+      break;
+   }
+}
+
+return all_empty;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void StringArray::parse_wsss(const std::string text)
 
 {
