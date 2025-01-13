@@ -510,8 +510,8 @@ time_t UscrnHandler::_getValidTime(const DataLine &dl) const {
    }
 
    // Parse time components
-   time_struct.tm_year = stoi(date_str.substr(0, 4));
-   time_struct.tm_mon  = stoi(date_str.substr(4, 2));
+   time_struct.tm_year = stoi(date_str.substr(0, 4)) - 1900;
+   time_struct.tm_mon  = stoi(date_str.substr(4, 2)) - 1;
    time_struct.tm_mday = stoi(date_str.substr(6, 2));
    time_struct.tm_hour = stoi(time_str.substr(0, 2));
    time_struct.tm_min  = stoi(time_str.substr(2, 2));

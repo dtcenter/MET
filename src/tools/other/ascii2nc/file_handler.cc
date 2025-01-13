@@ -346,17 +346,6 @@ bool FileHandler::_writeObservations()
   if(!obs_units.all_empty()) units_sa = obs_units;
   if(!obs_descs.all_empty()) descs_sa = obs_descs;
 
-// JHG
-cout << "JHG obs_names...";
-obs_names.dump(cout);
-cout << "\n";
-cout << "JHG units_sa...";
-units_sa.dump(cout);
-cout << "\n";
-cout << "JHG descs_sa...";
-descs_sa.dump(cout);
-cout << "\n";
-
   nc_point_obs.write_to_netcdf(obs_names, units_sa, descs_sa);
 
   return true;
