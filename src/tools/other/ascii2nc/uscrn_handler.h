@@ -44,6 +44,7 @@ struct USCRNColInfo {
    int _offset;
    std::string _name;
    std::string _units;
+   std::string _desc;
    int _qcOffset = -1;
 };
 
