@@ -417,9 +417,6 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
 
       // Allow empty columns
       dl.set_allow_empty_columns();
-
-      // Read and skip the header line with column names
-      while(dl.n_items() == 0) ascii_file >> dl;
    }
 
    // Process the data lines
@@ -440,6 +437,9 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
       _stationId  = dl[USCRNFormatMap[_format]._sidOffset];
       _stationLon = atof(dl[USCRNFormatMap[_format]._lonOffset]);
       _stationLat = atof(dl[USCRNFormatMap[_format]._latOffset]);
+
+      // Skip header lines where station ID begins with "WBAN"
+      if(_stationId.substr(0,4) == "WBAN") continue;
 
       // Extract the valid time from the data line
       time_t valid_time = _getValidTime(dl);
