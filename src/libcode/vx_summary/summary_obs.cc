@@ -142,6 +142,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
    // Save the summary information
    const char *var_name = 0;
    const char *var_units = 0;
+   const char *var_desc = 0;
 
    //_dataSummarized = true;
    TimeSummaryInfo inputSummaryInfo = summary_info;
@@ -149,6 +150,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
    // Initialize the list of summary observations
    StringArray summary_vnames;
    StringArray summary_vunits;
+   StringArray summary_vdescs;
    StringArray printted_var_names;
    //vector< Observation > summary_obs;
 
@@ -215,7 +217,8 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
                    << "SummaryObs::summarizeObs()  Filtered variable ["
                    << curr_obs->getVarName() << "] (id: "
                    << curr_obs->getVarCode() << ", units: "
-                   << curr_obs->getVarUnits() << ")\n";
+                   << curr_obs->getVarUnits() << ", desc: "
+                   << curr_obs->getVarDesc() << ")\n";
               printted_var_names.add(curr_obs->getVarName().c_str());
            }
         }
@@ -234,14 +237,17 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
                                   curr_obs->getHeight(),
                                   curr_obs->getPressureLevel(),
                                   curr_obs->getVarName(),
-                                  curr_obs->getVarUnits());
+                                  curr_obs->getVarUnits(),
+                                  curr_obs->getVarDesc());
 
            // Collect variable names
            var_name  = curr_obs->getVarName().c_str();
            var_units = curr_obs->getVarUnits().c_str();
+           var_desc  = curr_obs->getVarDesc().c_str();
            if (0 < m_strlen(var_name) && !summary_vnames.has(var_name)) {
               summary_vnames.add(var_name);
               summary_vunits.add(var_units);
+              summary_vdescs.add(var_desc);
            }
            // If this is a new key, create a new NumArray
            if (summary_values.find(summary_key) == summary_values.end()) {
@@ -289,7 +295,8 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
                       << curr_values->first.getElevation() << ", "
                       << curr_values->first.getVarName() << ", "
                       << curr_values->first.getVarCode() << ", "
-                      << curr_values->first.getVarUnits() << "\n";
+                      << curr_values->first.getVarUnits() << ", "
+                      << curr_values->first.getVarDesc() << "\n";
                  continue;
               }
            }
@@ -310,7 +317,8 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
                        curr_values->first.getHeight(),
                        calc->calcSummary(*curr_values->second),
                        curr_values->first.getVarName(),
-                       curr_values->first.getVarUnits()));
+                       curr_values->first.getVarUnits(),
+                       curr_values->first.getVarDesc()));
            summaryCount++;
         } /* endfor - calc */
 
@@ -331,6 +339,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
       if (!obs_names.has(summary_vnames[idx])) {
          obs_names.add(summary_vnames[idx]);
          obs_units.add(summary_vunits[idx]);
+         obs_descs.add(summary_vdescs[idx]);
       }
    }
 
@@ -511,9 +520,11 @@ bool SummaryObs::addObservationObj(const Observation &obs)
 
    const ConcatString var_name  = obs.getVarName();
    const ConcatString var_units = obs.getVarUnits();
+   const ConcatString var_desc  = obs.getVarDesc();
    if (0 < var_name.length() && !obs_names.has(var_name)) {
       obs_names.add(var_name);
       obs_units.add(var_units);
+      obs_descs.add(var_desc);
    }
    result = true;
    return result;
@@ -529,13 +540,16 @@ bool SummaryObs::addObservation(
       const string &quality_flag,
       const int var_code, const double pressure_level_hpa,
       const double height_m, const double value,
-      const string &var_name, const string &var_units)
+      const string &var_name,
+      const string &var_units,
+      const string &var_desc)
 {
    return addObservationObj(
              Observation(header_type, station_id, valid_time,
                          latitude, longitude, elevation,
                          quality_flag, var_code, pressure_level_hpa,
-                         height_m, value, var_name, var_units));
+                         height_m, value,
+                         var_name, var_units, var_desc));
 }
 
 ////////////////////////////////////////////////////////////////////////

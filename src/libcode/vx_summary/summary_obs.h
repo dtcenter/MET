@@ -42,7 +42,8 @@ public:
                        const int var_code, const double pressure_level_hpa,
                        const double height_m, const double value,
                        const std::string &var_name = "",
-                       const std::string &var_units = "");
+                       const std::string &var_units = "",
+                       const std::string &var_desc = "");
    std::vector< Observation > getObservations();
    std::vector< Observation > getSummaries();
    long countHeaders();
@@ -54,7 +55,7 @@ public:
    void setSummaryInfo(const TimeSummaryInfo &summary_info);
    StringArray getObsNames();
    StringArray getObsUnits();
-
+   StringArray getObsDescs();
 
 protected:
 
@@ -73,6 +74,7 @@ protected:
   std::vector< Observation > summaries;
   StringArray obs_names;
   StringArray obs_units;
+  StringArray obs_descs;
 
   ///////////////////////
   // Protected methods //
@@ -258,6 +260,7 @@ inline std::vector< Observation > SummaryObs::getObservations() { return observa
 inline std::vector< Observation > SummaryObs::getSummaries()    { return summaries;           }
 inline StringArray           SummaryObs::getObsNames()          { return obs_names;           }
 inline StringArray           SummaryObs::getObsUnits()          { return obs_units;           }
+inline StringArray           SummaryObs::getObsDescs()          { return obs_descs;           }
 inline void                  SummaryObs::setSummaryInfo(const TimeSummaryInfo &summary_info)
                                                                 { summaryInfo = summary_info; }
 inline TimeSummaryInfo       SummaryObs::getSummaryInfo()       { return summaryInfo;         }

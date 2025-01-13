@@ -103,6 +103,7 @@ protected:
   bool  use_var_id;
   StringArray obs_names;
   StringArray obs_units;
+  StringArray obs_descs;
 
   bool do_monitor;
   int start_time, end_time;

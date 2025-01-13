@@ -45,7 +45,8 @@ public:
               const int grib_code, const double pressure_level_hpa,
               const double height_m, const double value,
               const std::string &var_name = "",
-              const std::string &var_units = "");
+              const std::string &var_units = "",
+              const std::string &var_desc = "");
 
   Observation(const std::string &header_type, const std::string &station_id,
               const time_t start_time, const time_t end_time,
@@ -55,7 +56,8 @@ public:
               const int grib_code, const double pressure_level_hpa,
               const double height_m, const double value,
               const std::string &var_name = "",
-              const std::string &var_units = "");
+              const std::string &var_units = "",
+              const std::string &var_desc = "");
 
 ////////////////////////
 #ifdef ENABLE_PYTHON
@@ -167,6 +169,11 @@ public:
     return _varUnits;
   }
 
+  std::string getVarDesc() const
+  {
+    return _varDesc;
+  }
+
   bool hasSameHeader(Observation &other) const;
   bool hasSameHeader(Observation *other) const;
 
@@ -216,6 +223,7 @@ protected:
   std::string _qualityFlag;
   std::string _varName;
   std::string _varUnits;
+  std::string _varDesc;
   int         varCode;
   long        hdrIndex;
   double      _pressureLevel;

@@ -209,10 +209,12 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
    _summaryInfo = summary_info;
    StringArray summary_vnames = summary_obs.getObsNames();
    StringArray summary_vunits = summary_obs.getObsUnits();
+   StringArray summary_vdescs = summary_obs.getObsDescs();
    for (int idx=0; idx<summary_vnames.n(); idx++) {
       if (!obs_names.has(summary_vnames[idx])) {
          obs_names.add(summary_vnames[idx]);
          obs_units.add(summary_vunits[idx]);
+         obs_descs.add(summary_vdescs[idx]);
       }
    }
    return result;
@@ -322,9 +324,11 @@ bool FileHandler::_addObservations(const Observation &obs)
    else {
       ConcatString var_name  = obs.getVarName();
       ConcatString var_units = obs.getVarUnits();
+      ConcatString var_desc  = obs.getVarDesc();
       if (var_name.nonempty() && !obs_names.has(var_name)) {
          obs_names.add(var_name);
          obs_units.add(var_units);
+         obs_descs.add(var_desc);
       }
    }
 
@@ -335,8 +339,25 @@ bool FileHandler::_addObservations(const Observation &obs)
 
 bool FileHandler::_writeObservations()
 {
-  StringArray descs;
-  nc_point_obs.write_to_netcdf(obs_names, obs_units, descs);
+  StringArray units_sa;
+  StringArray descs_sa;
+
+  // Do not write all empty strings 
+  if(!obs_units.all_empty()) units_sa = obs_units;
+  if(!obs_descs.all_empty()) descs_sa = obs_descs;
+
+// JHG
+cout << "JHG obs_names...";
+obs_names.dump(cout);
+cout << "\n";
+cout << "JHG units_sa...";
+units_sa.dump(cout);
+cout << "\n";
+cout << "JHG descs_sa...";
+descs_sa.dump(cout);
+cout << "\n";
+
+  nc_point_obs.write_to_netcdf(obs_names, units_sa, descs_sa);
 
   return true;
 }

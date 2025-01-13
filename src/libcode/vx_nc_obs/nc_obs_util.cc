@@ -342,16 +342,18 @@ void NetcdfObsVars::create_obs_vars (NcFile *f_out) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void NetcdfObsVars::create_obs_name_vars (NcFile *f_out, const int var_count, const int unit_count) {
+void NetcdfObsVars::create_obs_name_vars (NcFile *f_out, const int var_count,
+                                          const int unit_count, const int desc_count) {
    const string method_name = "  create_other_vars()";
 
    if (var_count > 0) {
       NcDim var_dim = create_var_obs_var(f_out, var_count);
       if (unit_count > 0) {
          unit_var = add_var(f_out, nc_var_unit, ncChar, var_dim, strl2_dim, deflate_level);
-         desc_var = add_var(f_out, nc_var_desc, ncChar, var_dim, strl3_dim, deflate_level);
-
          add_att(&unit_var, "long_name", "variable units");
+      }
+      if (desc_count > 0) {
+         desc_var = add_var(f_out, nc_var_desc, ncChar, var_dim, strl3_dim, deflate_level);
          add_att(&desc_var, "long_name", "variable descriptions");
       }
    }

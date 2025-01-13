@@ -33,7 +33,8 @@ public:
              const int var_code,
              const double height_m, const double pressure_level,
              const std::string &var_name = "",
-             const std::string &var_units = "");
+             const std::string &var_units = "",
+             const std::string &var_desc = "");
 
   virtual ~SummaryKey();
 
@@ -102,6 +103,11 @@ public:
     return _varUnits;
   }
 
+  std::string getVarDesc() const
+  {
+    return _varDesc;
+  }
+
   ///////////////
   // Operators //
   ///////////////
@@ -153,6 +159,10 @@ public:
     if (_varUnits != other._varUnits)
       return _varUnits < other._varUnits;
 
+    // Var desc 
+    if (_varDesc != other._varDesc)
+      return _varDesc < other._varDesc;
+
     // Grib code
 
     return _varCode < other._varCode;
@@ -175,6 +185,7 @@ protected:
   double _pressureLevel;
   std::string _varName;
   std::string _varUnits;
+  std::string _varDesc;
 
 };
 
