@@ -83,7 +83,6 @@ class UscrnHandler : public FileHandler {
  
       // Unchanging header information
       USCRNFormat _format;
-      std::string _formatName;
       std::string _stationId;
       double _stationLat;
       double _stationLon;
@@ -94,9 +93,6 @@ class UscrnHandler : public FileHandler {
 
       // Determine the USCRN format from the file name 
       USCRNFormat _getFileFormat(const LineDataFile &ascii_file) const;
-
-      // Read and save the header information from the given file
-      bool _readHeaderInfo(LineDataFile &ascii_file);
 
       // Get the valid time from the observation line
       time_t _getValidTime(const DataLine &data_line) const;

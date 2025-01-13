@@ -405,9 +405,6 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
       return false; 
    }
 
-   // Read and save the header information
-   if(!_readHeaderInfo(ascii_file)) return false;
-
    // Check for .csv format:
    // - .csv files have a header line to be skipped.
    // - .txt files have no header line to be skipped.
@@ -421,7 +418,7 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
       // Allow empty columns
       dl.set_allow_empty_columns();
 
-      // Read the and skip the header line with column names
+      // Read and skip the header line with column names
       while(dl.n_items() == 0) ascii_file >> dl;
    }
 
@@ -438,6 +435,11 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
               << "\"!\n\n";
          return false;
       }
+
+      // Store the header information
+      _stationId  = dl[USCRNFormatMap[_format]._sidOffset];
+      _stationLon = atof(dl[USCRNFormatMap[_format]._lonOffset]);
+      _stationLat = atof(dl[USCRNFormatMap[_format]._latOffset]);
 
       // Extract the valid time from the data line
       time_t valid_time = _getValidTime(dl);
@@ -462,7 +464,8 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
 
          // Store the observation
          _addObservations(Observation(
-            _formatName, _stationId, valid_time,
+            USCRNFormatMap[_format]._formatName,
+            _stationId, valid_time,
             _stationLat, _stationLon, bad_data_double,
             qc_str, -1, bad_data_double,
             bad_data_double, obs_val,
@@ -517,41 +520,6 @@ time_t UscrnHandler::_getValidTime(const DataLine &dl) const {
    time_struct.tm_min  = stoi(time_str.substr(2, 2));
 
    return timegm(&time_struct);
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool UscrnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
-
-   // Check for .csv format
-   DataLine dl;
-   ConcatString file_name(ascii_file.filename());
-   if(file_name.endswith(".csv")) dl.set_delimiter(",");
-
-   // Read the header line
-   while(dl.n_items() == 0) ascii_file >> dl;
-
-   // Check the expected number of columns
-   if(dl.n_items() != USCRNFormatMap[_format]._nCols) {
-      mlog << Error << "\nUscrnHandler::_readHeaderInfo() -> "
-           << "unexpected number of columns ("
-           << dl.n_items() << " != " << USCRNFormatMap[_format]._nCols
-           << ") on line number " << dl.line_number()
-           << " of USCRN file \"" << ascii_file.filename()
-           << "\"!\n\n";
-      return false;
-   }
-
-   // Store the header information
-   _formatName = USCRNFormatMap[_format]._formatName;
-   _stationId  = dl[USCRNFormatMap[_format]._sidOffset];
-   _stationLon = atof(dl[USCRNFormatMap[_format]._lonOffset]);
-   _stationLat = atof(dl[USCRNFormatMap[_format]._latOffset]);
-
-   // Rewind to the beginning
-   ascii_file.rewind();
-
-   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
