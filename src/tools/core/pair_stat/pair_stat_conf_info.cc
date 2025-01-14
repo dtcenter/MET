@@ -91,11 +91,6 @@ void PairStatConfInfo::clear() {
    // Initialize values
    model.clear();
    vx_opt.clear();
-   land_mask.clear();
-   topo_dp.clear();
-   topo_use_obs_thresh.clear();
-   topo_interp_fcst_thresh.clear();
-   msg_typ_group_map.clear();
    mask_area_map.clear();
    mask_sid_map.clear();
    point_weight_flag = PointWeightType::None;
@@ -142,7 +137,7 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
    version = parse_conf_version(&conf);
 
    // Conf: model
-   model = parse_conf_string(&conf, conf_key_model);
+   model = parse_conf_string(&conf, conf_key_model, false);
 
    // Conf: point_weight_flag
    point_weight_flag = parse_conf_point_weight_flag(&conf);
@@ -153,12 +148,9 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
    // Conf: output_prefix
    output_prefix = conf.lookup_string(conf_key_output_prefix);
 
-   // Conf: message_type_group_map
-   msg_typ_group_map = parse_conf_message_type_group_map(&conf);
-
-   // Conf: fcst.field and obs.field
-   fdict = conf.lookup_array(conf_key_fcst_field);
-   odict = conf.lookup_array(conf_key_obs_field);
+   // Conf: fcst.pairs and obs.pairs
+   fdict = conf.lookup_array(conf_key_fcst_pairs);
+   odict = conf.lookup_array(conf_key_obs_pairs);
 
    // Determine the number of fields (name/level) to be verified
    n_fvx = parse_conf_n_vx(fdict);
@@ -168,9 +160,9 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
    if(n_fvx == 0 || n_fvx != n_ovx) {
       mlog << Error << "\nPairStatConfInfo::process_config() -> "
            << "The number of verification tasks in \""
-           << conf_key_obs_field << "\" (" << n_ovx
+           << conf_key_obs_pairs << "\" (" << n_ovx
            << ") must be non-zero and match the number in \""
-           << conf_key_fcst_field << "\" (" << n_fvx << ").\n\n";
+           << conf_key_fcst_pairs << "\" (" << n_fvx << ").\n\n";
       exit(1);
    }
 
@@ -332,9 +324,6 @@ void PairStatConfInfo::process_flags() {
 ////////////////////////////////////////////////////////////////////////
 
 void PairStatConfInfo::process_masks() {
-
-/* JHG need to work on this since grid is no longer defined as an input
-   int i, j;
    MaskPlane mp;
    ConcatString name;
 
@@ -352,169 +341,86 @@ void PairStatConfInfo::process_masks() {
    mask_sid_map.clear();
 
    // Process the masks for each vx task
-   for(i=0; i<n_vx; i++) {
+   for(auto &vx : vx_opt) {
 
       // Initialize
-      vx_opt[i].mask_name.clear();
+      vx.mask_name.clear();
 
       // Parse the masking grids
-      for(j=0; j<vx_opt[i].mask_grid.n(); j++) {
+      for(int i=0; i<vx.mask_grid.n(); i++) {
 
          // Process new grid masks
-         if(grid_map.count(vx_opt[i].mask_grid[j]) == 0) {
+         if(grid_map.count(vx.mask_grid[i]) == 0) {
             mlog << Debug(3)
                  << "Processing grid mask: "
-                 << vx_opt[i].mask_grid[j] << "\n";
-            parse_grid_mask(vx_opt[i].mask_grid[j], grid, mp, name);
-            grid_map[vx_opt[i].mask_grid[j]] = name;
+                 << vx.mask_grid[i] << "\n";
+            parse_grid_mask(vx.mask_grid[i], grid, mp, name);
+            grid_map[vx.mask_grid[i]] = name;
             mask_area_map[name] = mp;
          }
 
          // Store the name for the current grid mask
-         vx_opt[i].mask_name.add(grid_map[vx_opt[i].mask_grid[j]]);
+         vx.mask_name.add(grid_map[vx_opt[i].mask_grid[i]]);
 
-      } // end for j
+      } // end for i
 
       // Parse the masking polylines
-      for(j=0; j<vx_opt[i].mask_poly.n(); j++) {
+      for(int i=0; i<vx.mask_poly.n(); i++) {
 
          // Process new poly mask
-         if(poly_map.count(vx_opt[i].mask_poly[j]) == 0) {
+         if(poly_map.count(vx.mask_poly[i]) == 0) {
             mlog << Debug(3)
                  << "Processing poly mask: "
-                 << vx_opt[i].mask_poly[j] << "\n";
-            parse_poly_mask(vx_opt[i].mask_poly[j], grid, mp, name);
-            poly_map[vx_opt[i].mask_poly[j]] = name;
+                 << vx.mask_poly[i] << "\n";
+            parse_poly_mask(vx.mask_poly[i], grid, mp, name);
+            poly_map[vx.mask_poly[i]] = name;
             mask_area_map[name] = mp;
          }
 
          // Store the name for the current poly mask
-         vx_opt[i].mask_name.add(poly_map[vx_opt[i].mask_poly[j]]);
+         vx.mask_name.add(poly_map[vx.mask_poly[i]]);
 
-      } // end for j
+      } // end for i 
 
       // Parse the masking station ID's
-      for(j=0; j<vx_opt[i].mask_sid.n(); j++) {
+      for(int i=0; i<vx.mask_sid.n(); i++) {
 
          // Process new station ID mask
-         if(sid_map.count(vx_opt[i].mask_sid[j]) == 0) {
+         if(sid_map.count(vx.mask_sid[i]) == 0) {
             mlog << Debug(3)
                  << "Processing station ID mask: "
-                 << vx_opt[i].mask_sid[j] << "\n";
-            MaskSID ms = parse_sid_mask(vx_opt[i].mask_sid[j]);
-            sid_map[vx_opt[i].mask_sid[j]] = ms.name();
+                 << vx.mask_sid[i] << "\n";
+            MaskSID ms = parse_sid_mask(vx.mask_sid[i]);
+            sid_map[vx.mask_sid[i]] = ms.name();
             mask_sid_map[ms.name()] = ms;
          }
 
          // Store the name for the current station ID mask
-         vx_opt[i].mask_name.add(sid_map[vx_opt[i].mask_sid[j]]);
+         vx.mask_name.add(sid_map[vx.mask_sid[i]]);
 
-      } // end for j
+      } // end for i  
 
       // Parse the Lat/Lon point masks
-      for(j=0; j<(int) vx_opt[i].mask_llpnt.size(); j++) {
+      for(int i=0; i<(int) vx.mask_llpnt.size(); i++) {
 
          // Process new point masks -- no real work to do
-         if(point_map.count(vx_opt[i].mask_llpnt[j].name) == 0) {
+         if(point_map.count(vx.mask_llpnt[i].name) == 0) {
             mlog << Debug(3)
                  << "Processing Lat/Lon point mask: "
-                 << vx_opt[i].mask_llpnt[j].name << "\n";
-            point_map[vx_opt[i].mask_llpnt[j].name] = vx_opt[i].mask_llpnt[j];
+                 << vx.mask_llpnt[i].name << "\n";
+            point_map[vx.mask_llpnt[i].name] = vx.mask_llpnt[i];
          }
 
          // Store the name for the current Lat/Lon point mask
-         vx_opt[i].mask_name.add(vx_opt[i].mask_llpnt[j].name);
+         vx.mask_name.add(vx.mask_llpnt[i].name);
 
-      } // end for j
+      } // end for i 
 
       // Check for unique mask names
-      check_mask_names(vx_opt[i].mask_name);
+      check_mask_names(vx.mask_name);
 
-   } // end for i
-*/
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void PairStatConfInfo::process_geog() {
-
-/* JHG not parsing geog data right now, the grid and fcst_file were inputs that are not available in pair_stat
-   int i;
-   bool land, topo;
-   Dictionary *dict;
-   DataPlane geog_dp;
-   SurfaceInfo sfc_info;
-
-   // Loop over the verification tasks and check flags
-   for(i=0, land = topo = false; i<n_vx; i++) {
-
-      // Set to true if requested by any sub-task
-      if(vx_opt[i].land_flag) land = true;
-      if(vx_opt[i].topo_flag) topo = true;
    }
 
-   mlog << Debug(2)
-        << "Processing geography data.\n";
-
-   // Conf: land
-   if(land) {
-      dict      = conf.lookup_dictionary(conf_key_land_mask);
-      geog_dp   = parse_geog_data(dict, grid, fcst_file);
-      geog_dp.threshold(dict->lookup_thresh(conf_key_thresh));
-      land_mask = geog_dp.mask_plane();
-
-      // Conf: message_type_group_map for LANDSF and WATERSF
-      if(msg_typ_group_map.count((string)landsf_msg_typ_group_str) == 0 ||
-         msg_typ_group_map.count((string)watersf_msg_typ_group_str) == 0 ) {
-         mlog << Error << "\nPairStatConfInfo::process_geog() -> "
-              << "when \"" << conf_key_land_mask_flag << "\" is true, \""
-              << conf_key_message_type_group_map
-              << "\" must contain entries for \""
-              << landsf_msg_typ_group_str << "\" and \""
-              << watersf_msg_typ_group_str << "\".\n\n";
-         exit(1);
-      }
-   }
-
-   // Conf: topo
-   if(topo) {
-      dict                    = conf.lookup_dictionary(conf_key_topo_mask);
-      topo_dp                 = parse_geog_data(dict, grid, fcst_file);
-      topo_use_obs_thresh     = dict->lookup_thresh(conf_key_use_obs_thresh);
-      topo_interp_fcst_thresh = dict->lookup_thresh(conf_key_interp_fcst_thresh);
-
-      // Conf: message_type_group_map for SURFACE
-      if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
-         mlog << Error << "\nPairStatConfInfo::process_geog() -> "
-              << "when \"" << conf_key_topo_mask_flag << "\" is true, \""
-              << conf_key_message_type_group_map
-              << "\" must contain an entry for \""
-              << surface_msg_typ_group_str << "\".\n\n";
-         exit(1);
-      }
-   }
-
-   // Loop over the verification tasks and set the geography info
-   for(i=0; i<n_vx; i++) {
-      sfc_info.clear();
-      if(vx_opt[i].land_flag) {
-         sfc_info.land_ptr = &land_mask;
-      }
-      else {
-         sfc_info.land_ptr = nullptr;
-      }
-      if(vx_opt[i].topo_flag) {
-         sfc_info.topo_ptr = &topo_dp;
-         sfc_info.topo_use_obs_thresh = topo_use_obs_thresh;
-         sfc_info.topo_interp_fcst_thresh = topo_interp_fcst_thresh;
-      }
-      else {
-         sfc_info.topo_ptr = nullptr;
-      }
-      vx_opt[i].vx_pd.set_sfc_info(sfc_info);
-   }
-*/
    return;
 }
 
@@ -610,26 +516,6 @@ int PairStatConfInfo::get_max_n_eclv_points() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int PairStatConfInfo::get_max_n_hira_ens() const {
-   int n = 0;
-
-   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_hira_ens());
-
-   return n;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-int PairStatConfInfo::get_max_n_hira_prob() const {
-   int n = 0;
-
-   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_hira_prob());
-
-   return n;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 bool PairStatConfInfo::get_vflag() const {
    bool vflag = false;
 
@@ -654,6 +540,19 @@ bool PairStatConfInfo::get_vflag() const {
    }
 
    return vflag;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairStatConfInfo::add_mpr_line(const STATLine &l) {
+   bool keep = false;
+
+   // Attempt to add line to each verification task
+   for(auto &vx : vx_opt) {
+      if(vx.add_mpr_line(l)) keep = true;
+   }
+
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -704,16 +603,14 @@ void PairStatVxOpt::clear() {
    owind_ta.clear();
    wind_logic = SetLogic::None;
 
-   land_flag = false;
-   topo_flag = false;
-
    mask_grid.clear();
    mask_poly.clear();
    mask_sid.clear();
    mask_llpnt.clear();
 
-   mpr_sa.clear();
-   mpr_ta.clear();
+   mpr_thr_inc_map.clear();
+   mpr_str_inc_map.clear();
+   mpr_str_exc_map.clear();
 
    mask_name.clear();
 
@@ -724,17 +621,9 @@ void PairStatVxOpt::clear() {
    ci_alpha.clear();
 
    boot_info.clear();
-   interp_info.clear();
-   hira_info.clear();
 
    hss_ec_value = bad_data_double;
    rank_corr_flag = false;
-
-   msg_typ.clear();
-
-   duplicate_flag = DuplicateType::None;
-   obs_summary = ObsSummary::None;
-   obs_perc = bad_data_int;
 
    for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
@@ -761,7 +650,7 @@ bool PairStatVxOpt::is_uv_match(const PairStatVxOpt &v) const {
    //    fcnt_ta, ocnt_ta, cnt_logic,
    //    fwind_ta, owind_ta, wind_logic,
    //    eclv_points, cdf_info, ci_alpha
-   //    boot_info, hira_info, hss_ec_value,
+   //    boot_info, hss_ec_value,
    //    rank_corr_flag, output_flag
    //
 
@@ -771,18 +660,11 @@ bool PairStatVxOpt::is_uv_match(const PairStatVxOpt &v) const {
                           v.vx_pd.obs_info->req_level_name()) ||
       !(beg_ds         == v.beg_ds        ) ||
       !(end_ds         == v.end_ds        ) ||
-      !(land_flag      == v.land_flag     ) ||
-      !(topo_flag      == v.topo_flag     ) ||
       !(mask_grid      == v.mask_grid     ) ||
       !(mask_poly      == v.mask_poly     ) ||
       !(mask_sid       == v.mask_sid      ) ||
       !(mask_llpnt     == v.mask_llpnt    ) ||
-      !(mask_name      == v.mask_name     ) ||
-      !(interp_info    == v.interp_info   ) ||
-      !(msg_typ        == v.msg_typ       ) ||
-      !(duplicate_flag == v.duplicate_flag) ||
-      !(obs_summary    == v.obs_summary   ) ||
-      !(obs_perc       == v.obs_perc      )) match = false;
+      !(mask_name      == v.mask_name     )) match = false;
 
    return match;
 }
@@ -795,13 +677,14 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *dict;
+   const char *method_name = "PairStatVxOpt::process_config() -> ";
 
    // Initialize
    clear();
 
    // Allocate new VarInfo objects
-   vx_pd.set_fcst_info(info_factory.new_var_info(FileType_None));
-   vx_pd.set_obs_info(info_factory.new_var_info(FileType_None));
+   vx_pd.set_fcst_info(info_factory.new_var_info(FileType_Pairs));
+   vx_pd.set_obs_info(info_factory.new_var_info(FileType_Pairs));
 
    // Set the VarInfo objects
    vx_pd.fcst_info->set_dict(fdict);
@@ -820,14 +703,14 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    // No support for wind direction
    if(vx_pd.fcst_info->is_wind_direction() ||
       vx_pd.obs_info->is_wind_direction()) {
-      mlog << Error << "\nPairStatVxOpt::process_config() -> "
+      mlog << Error << "\n" << method_name
            << "wind direction may not be verified using pair_stat.\n\n";
       exit(1);
    }
 
    // Check that the observation field does not contain probabilities
    if(vx_pd.obs_info->is_prob()) {
-      mlog << Error << "\nPairStatVxOpt::process_config() -> "
+      mlog << Error << "\n" << method_name
            << "the observation field cannot contain probabilities.\n\n";
       exit(1);
    }
@@ -869,8 +752,34 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
       int_to_setlogic(odict.lookup_int(conf_key_wind_logic)));
 
    // Conf: mpr_column and mpr_thresh
-   mpr_sa = odict.lookup_string_array(conf_key_mpr_column);
-   mpr_ta = odict.lookup_thresh_array(conf_key_mpr_thresh);
+   StringArray mpr_sa(odict.lookup_string_array(conf_key_mpr_column));
+   ThreshArray mpr_ta(odict.lookup_thresh_array(conf_key_mpr_thresh));
+
+   // Check for the same length
+   if(mpr_sa.n() != mpr_ta.n()) {
+      mlog << Error << "\n" << method_name
+           << "The length of \"" << conf_key_mpr_column << "\" and \""
+           << conf_key_mpr_thresh << "\" must match (" << mpr_sa.n()
+           << " != " << mpr_ta.n() << ")!\n\n";
+      exit(1);
+   }
+
+   // Store in map
+   for(int i=0; mpr_sa.n(); i++) {
+      if(mpr_thr_inc_map.count(mpr_sa[i]) == 0) {
+         ThreshArray ta;
+         mpr_thr_inc_map[(mpr_sa[i])] = ta;
+      }
+      mpr_thr_inc_map[(mpr_sa[i])].add(mpr_ta[i]); 
+   }
+
+   // Conf: mpr_str_inc
+   parse_add_conf_key_values_map(&odict, conf_key_mpr_str_inc,
+      &mpr_str_inc_map, method_name);
+
+   // Conf: mpr_str_exc
+   parse_add_conf_key_values_map(&odict, conf_key_mpr_str_exc,
+      &mpr_str_exc_map, method_name);
 
    // Dump the contents of the current thresholds
    if(mlog.verbosity_level() >= 5) {
@@ -897,7 +806,7 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    if(!vx_pd.fcst_info->is_prob() &&
       fcat_ta.n() != ocat_ta.n()) {
 
-      mlog << Error << "\nPairStatVxOpt::process_config() -> "
+      mlog << Error << "\n" << method_name
            << "The number of thresholds for each field in \"fcst."
            << conf_key_cat_thresh
            << "\" must match the number of thresholds for each "
@@ -923,12 +832,6 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
       check_mctc_thresh(ocat_ta);
    }
 
-   // Conf: land.flag
-   land_flag = odict.lookup_bool(conf_key_land_mask_flag);
-
-   // Conf: topo.flag
-   topo_flag = odict.lookup_bool(conf_key_topo_mask_flag);
-
    // Conf: mask_grid
    mask_grid = odict.lookup_string_array(conf_key_mask_grid);
 
@@ -953,68 +856,26 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    // Conf: boot
    boot_info = parse_conf_boot(&odict);
 
-   // Conf: interp
-   interp_info = parse_conf_interp(&odict, conf_key_interp);
-
-   // Conf: hira
-   hira_info = parse_conf_hira(&odict);
-
    // Conf: hss_ec_value
    hss_ec_value = odict.lookup_double(conf_key_hss_ec_value);
 
    // Conf: rank_corr_flag
    rank_corr_flag = odict.lookup_bool(conf_key_rank_corr_flag);
 
-   // Conf: message_type
-   msg_typ = parse_conf_message_type(&odict);
-
-   // Conf: duplicate_flag
-   duplicate_flag = parse_conf_duplicate_flag(&odict);
-
-   // Conf: obs_summary
-   obs_summary = parse_conf_obs_summary(&odict);
-
-   // Conf: obs_perc_value
-   obs_perc = parse_conf_percentile(&odict);
-
    // Conf: desc
-   vx_pd.set_desc(parse_conf_string(&odict, conf_key_desc).c_str());
+   vx_pd.set_desc(parse_conf_string(&odict, conf_key_desc, false).c_str());
 
-   // Conf: sid_inc
-   vx_pd.set_sid_inc_filt(parse_conf_sid_list(&odict, conf_key_sid_inc));
-
-   // Conf: sid_exc
-   vx_pd.set_sid_exc_filt(parse_conf_sid_list(&odict, conf_key_sid_exc));
-   
-   // Conf: obs_qty_inc
-   vx_pd.set_obs_qty_inc_filt(parse_conf_obs_qty_inc(&odict));
-   
-   // Conf: obs_qty_exc
-   vx_pd.set_obs_qty_exc_filt(parse_conf_obs_qty_exc(&odict));
-   
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void PairStatVxOpt::set_vx_pd(PairStatConfInfo *conf_info) {
-   int i, n;
-   int n_msg_typ = msg_typ.n();
-   int n_mask    = mask_name.n();
-   int n_interp  = interp_info.n_interp;
+   int n_mask = mask_name.n();
    ConcatString cs;
    StringArray sa;
 
-   // Setup the VxPairDataPoint object with these dimensions:
-   // [n_msg_typ][n_mask][n_interp]
-
-   // Check for at least one message type
-   if(n_msg_typ == 0) {
-      mlog << Error << "\nPairStatVxOpt::set_vx_pd() -> "
-           << "At least one output message type must be requested in \""
-           << conf_key_message_type << "\".\n\n";
-      exit(1);
-   }
+   // Setup the VxPairDataPoint object for each mask
 
    // Check for at least one masking region
    if(n_mask == 0) {
@@ -1027,106 +888,54 @@ void PairStatVxOpt::set_vx_pd(PairStatConfInfo *conf_info) {
       exit(1);
    }
 
-   // Check for at least one interpolation method
-   if(n_interp == 0) {
-      mlog << Error << "\nPairStatVxOpt::set_vx_pd() -> "
-           << "At least one interpolation method must be requested in \""
-           << conf_key_interp << "\".\n\n";
-      exit(1);
-   }
+   // Define the dimensions with n_msg_typ = n_interp = 1
+   vx_pd.set_size(1, n_mask, 1);
 
-   // Define the dimensions
-   vx_pd.set_size(n_msg_typ, n_mask, n_interp);
-
-   // Store the MPR filter threshold
-   vx_pd.set_mpr_thresh(mpr_sa, mpr_ta);
+   // Store the MPR filtering maps
+   vx_pd.set_mpr_thr_inc_map(mpr_thr_inc_map);
+   vx_pd.set_mpr_str_inc_map(mpr_str_inc_map);
+   vx_pd.set_mpr_str_exc_map(mpr_str_exc_map);
 
    // Store the climo CDF info
    vx_pd.set_climo_cdf_info_ptr(&cdf_info);
 
-   // Store the surface message type group
-   cs = surface_msg_typ_group_str;
-   if(conf_info->msg_typ_group_map.count(cs) > 0) {
-      vx_pd.set_msg_typ_sfc(conf_info->msg_typ_group_map[cs]);
-   }
-   else {
-      sa.parse_css(default_msg_typ_group_surface);
-      vx_pd.set_msg_typ_sfc(sa);
-   }
-
-   // Store the surface land message type group
-   cs = landsf_msg_typ_group_str;
-   if(conf_info->msg_typ_group_map.count(cs) > 0) {
-      vx_pd.set_msg_typ_lnd(conf_info->msg_typ_group_map[cs]);
-   }
-   else {
-      sa.parse_css(default_msg_typ_group_landsf);
-      vx_pd.set_msg_typ_lnd(sa);
-   }
-
-   // Store the surface water message type group
-   cs = watersf_msg_typ_group_str;
-   if(conf_info->msg_typ_group_map.count(cs) > 0) {
-      vx_pd.set_msg_typ_wtr(conf_info->msg_typ_group_map[cs]);
-   }
-   else {
-      sa.parse_css(default_msg_typ_group_watersf);
-      vx_pd.set_msg_typ_wtr(sa);
-   }
-
-   // Define the verifying message type name and values
-   for(i=0; i<n_msg_typ; i++) {
-      vx_pd.set_msg_typ(i, msg_typ[i].c_str());
-      sa = conf_info->msg_typ_group_map[msg_typ[i]];
-      if(sa.n() == 0) sa.add(msg_typ[i]);
-      vx_pd.set_msg_typ_vals(i, sa);
-   }
-
    // Define the masking information: grid, poly, sid, point
+   int n;
 
    // Define the grid masks
-   for(i=0; i<mask_grid.n(); i++) {
+   for(int i=0; i<mask_grid.n(); i++) {
       n = i;
       vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the poly masks
-   for(i=0; i<mask_poly.n(); i++) {
+   for(int i=0; i<mask_poly.n(); i++) {
       n = i + mask_grid.n();
       vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the station ID masks
-   for(i=0; i<mask_sid.n(); i++) {
+   for(int i=0; i<mask_sid.n(); i++) {
       n = i + mask_grid.n() + mask_poly.n();
       vx_pd.set_mask_sid(n, mask_name[n].c_str(),
                          &(conf_info->mask_sid_map[mask_name[n]]));
    }
 
    // Define the Lat/Lon point masks
-   for(i=0; i<(int) mask_llpnt.size(); i++) {
+   for(int i=0; i<(int) mask_llpnt.size(); i++) {
       n = i + mask_grid.n() + mask_poly.n() + mask_sid.n();
       vx_pd.set_mask_llpnt(n, mask_name[n].c_str(), &mask_llpnt[i]);
    }
 
-   // Define the interpolation methods
-   for(i=0; i<n_interp; i++) {
-      vx_pd.set_interp(i, interp_info.method[i].c_str(), interp_info.width[i],
-                       interp_info.shape);
-      vx_pd.set_interp_thresh(interp_info.vld_thresh);
-   }
-
    // After sizing VxPairDataPoint, add settings for each array element
-   vx_pd.set_duplicate_flag(duplicate_flag);
-   vx_pd.set_obs_summary(obs_summary);
-   vx_pd.set_obs_perc_value(obs_perc);
-   if (output_flag[i_seeps_mpr] != STATOutputType::None
-       || output_flag[i_seeps] != STATOutputType::None) {
+   if(output_flag[i_seeps_mpr] != STATOutputType::None ||
+      output_flag[i_seeps]     != STATOutputType::None) {
      vx_pd.load_seeps_climo(conf_info->seeps_climo_name);
      vx_pd.set_seeps_thresh(conf_info->seeps_p1_thresh);
    }
+
    return;
 }
 
@@ -1185,7 +994,7 @@ int PairStatVxOpt::n_txt_row(int i_txt_row) const {
    bool vect_flag = vx_pd.fcst_info->is_v_wind() &&
                     vx_pd.fcst_info->uv_index() >= 0;
 
-   int n_pd = get_n_msg_typ() * get_n_mask() * get_n_interp();
+   int n_pd = get_n_mask();
 
    // Determine row multiplier for climatology bins
    if(cdf_info.write_bins) {
@@ -1242,20 +1051,20 @@ int PairStatVxOpt::n_txt_row(int i_txt_row) const {
          n = (prob_flag ? 0 : n_pd * get_n_cnt_thresh() * n_bin);
          break;
 
-      case i_vl1l2:
-      case i_val1l2:
-         // Number of VL1L2 or VAL1L2 lines =
-         //    Message Types * Masks * Interpolations * Thresholds
-         n = (!vect_flag ? 0 : n_pd *
-              get_n_wind_thresh());
-         break;
-
       case i_vcnt:
          // Number of VCNT lines =
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Alphas
          n = (!vect_flag ? 0 : n_pd *
               get_n_wind_thresh() * get_n_ci_alpha());
+         break;
+
+      case i_vl1l2:
+      case i_val1l2:
+         // Number of VL1L2 or VAL1L2 lines =
+         //    Message Types * Masks * Interpolations * Thresholds
+         n = (!vect_flag ? 0 : n_pd *
+              get_n_wind_thresh());
          break;
 
       case i_pct:
@@ -1265,14 +1074,6 @@ int PairStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Message Types * Masks * Interpolations * Thresholds *
          //    Climo Bins
          n = (!prob_flag ? 0 : n_pd * get_n_oprob_thresh() * n_bin);
-
-         // Number of HiRA PCT, PJC, or PRC lines =
-         //    Message Types * Masks * HiRA widths * Thresholds
-         if(hira_info.flag) {
-            n += (prob_flag ? 0 : n_pd * get_n_cat_thresh() *
-                  hira_info.width.n());
-         }
-
          break;
 
       case i_pstd:
@@ -1281,44 +1082,6 @@ int PairStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Alphas * Climo Bins
          n = (!prob_flag ? 0 : n_pd *
               get_n_oprob_thresh() * get_n_ci_alpha() * n_bin);
-
-         // Number of HiRA PSTD lines =
-         //    Message Types * Masks * HiRA widths * Thresholds *
-         //    Alphas
-         if(hira_info.flag) {
-            n += (prob_flag ? 0 : n_pd *
-                  get_n_cat_thresh() * hira_info.width.n() *
-                  get_n_ci_alpha());
-         }
-
-         break;
-
-      case i_ecnt:
-      case i_rps:
-         // Number of HiRA ECNT and RPS lines =
-         //    Message Types * Masks * HiRA widths *
-         //    Alphas
-         if(hira_info.flag) {
-            n = n_pd * hira_info.width.n() * get_n_ci_alpha();
-         }
-         else {
-            n = 0;
-         }
-
-         break;
-
-      case i_orank:
-         // Number of HiRA ORANK lines possible =
-         //    Number of pairs * Categorical Thresholds *
-         //    HiRA widths
-         if(hira_info.flag) {
-            n = vx_pd.get_n_pair() * get_n_cat_thresh() *
-                hira_info.width.n();
-         }
-         else {
-            n = 0;
-         }
-
          break;
 
       case i_eclv:
@@ -1333,34 +1096,21 @@ int PairStatVxOpt::n_txt_row(int i_txt_row) const {
          //    Forecast Probability Thresholds * Climo Bins
          n += (!prob_flag ? 0 : n_pd *
                get_n_oprob_thresh() * get_n_fprob_thresh() * n_bin);
-
          break;
 
       case i_mpr:
          // Compute the number of matched pairs to be written
          n = vx_pd.get_n_pair();
-
-         // Maximum number of HiRA MPR lines possible =
-         //    Number of pairs * Max Scalar Categorical Thresholds *
-         //    HiRA widths
-         if(hira_info.flag) {
-            n += (prob_flag ? 0 :
-                  vx_pd.get_n_pair() * get_n_cat_thresh() *
-                  hira_info.width.n());
-         }
-
          break;
 
       case i_seeps_mpr:
          // Compute the number of matched pairs to be written
          n = vx_pd.get_n_pair();
-
          break;
 
       case i_seeps:
          // Compute the number of matched pairs to be written
          n = vx_pd.get_n_pair();
-
          break;
 
       default:
@@ -1409,15 +1159,62 @@ int PairStatVxOpt::get_n_oprob_thresh() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-int PairStatVxOpt::get_n_hira_ens() const {
-   int n = (hira_info.flag ? hira_info.width.max() : 0);
-   return n*n;
-}
+bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
+   bool keep = false;
 
-////////////////////////////////////////////////////////////////////////
+   // Check name and level strings
+   if(l.fcst_var() == vx_pd.fcst_info->name_attr()  && 
+      l.fcst_lev() == vx_pd.fcst_info->level_attr() && 
+      l.obs_var()  == vx_pd.obs_info->name_attr()   && 
+      l.obs_lev()  == vx_pd.obs_info->level_attr()) {
 
-int PairStatVxOpt::get_n_hira_prob() const {
-   return hira_info.flag ? hira_info.cov_ta.n() : 0;
+      // Parse climo data from the line
+      ClimoPntInfo cpi;
+
+      // In met-6.1 and later:
+      // - CLIMO was replaced by CLIMO_MEAN
+      if(l.has("CLIMO")) {
+         double cmn = atof(l.get_item("CLIMO"));
+         double csd = bad_data_double;
+         cpi.set(cmn, csd, cmn, csd);
+      }
+      // In met-12.0.0 and later:
+      // - CLIMO_MEAN was replaced by OBS_CLIMO_MEAN
+      // - CLIMO_STDEV was replaced by OBS_CLIMO_STDEV
+      // - CLIMO_CDF was replaced by OBS_CLIMO_CDF
+      else if(l.has("CLIMO_MEAN")) {
+         double cmn = atof(l.get_item("CLIMO_MEAN"));
+         double csd = atof(l.get_item("CLIMO_STDEV"));
+         cpi.set(cmn, csd, cmn, csd);
+      }
+      else {
+         cpi.set(atof(l.get_item("FCST_CLIMO_MEAN")),
+                 atof(l.get_item("FCST_CLIMO_STDEV")),
+                 atof(l.get_item("OBS_CLIMO_MEAN")),
+                 atof(l.get_item("OBS_CLIMO_STDEV")));
+      }
+
+      // Attempt to add pair to each masking region
+      for(auto &pairs : vx_pd.pd) {
+         if(pairs.add_point_pair(
+               l.obtype(),
+               l.get_item("OBS_SID"),
+               atof(l.get_item("OBS_LAT")),
+               atof(l.get_item("OBS_LON")),
+               bad_data_double,
+               bad_data_double,
+               timestring_to_unix(l.get_item("OBS_VALID_BEG")),
+               atof(l.get_item("OBS_LVL")),
+               atof(l.get_item("OBS_ELV")),
+               atof(l.get_item("FCST")),
+               atof(l.get_item("OBS")),
+               l.get_item("OBS_QC"),
+               cpi,
+               default_weight)) keep = true;
+      }
+   }
+
+   return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////

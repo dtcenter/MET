@@ -9,7 +9,7 @@ Introduction
 
 The Grid-Stat tool functions in much the same way as the Point-Stat tool, except that the verification statistics it calculates are for a matched forecast-observation grid (as opposed to a set of observation points). Neither the forecast nor the observation grid needs to be identical to the final matched grid. If the forecast grid is different from the final matched grid, then forecast values are regridded (interpolated) to the final matched grid. The same procedure is followed for observations. No regridding is necessary if the forecast and observation grids are identical but remains optional. A smoothing operation may be performed on the forecast and observation fields prior to verification. All the matched forecast-observation grid points are used to compute the verification statistics. In addition to traditional verification approaches, the Grid-Stat tool includes Fourier decompositions, gradient statistics, distance metrics, and neighborhood methods, designed to examine forecast performance as a function of spatial scale.
 
-Scientific and statistical aspects of the Grid-Stat tool are briefly described in this section, followed by practical details regarding usage and output from the tool.
+Scientific and statistical aspects of the Grid-Stat tool are briefly described in this section. Practical aspects of the Grid-Stat tool are described in :numref:`grid-stat_practical_info`.
 
 Scientific and Statistical Aspects
 ==================================
@@ -155,6 +155,8 @@ Whether or not the forecast from :numref:`grid-stat_fig6` is “good” or not d
 In some cases, a user may be interested in a much higher threshold than :math:`2.1 mmh^{-1}` of the above example. :ref:`Gilleland, 2021 (Fig. 4) <Gilleland-2021>`, for example, shows this same forecast using a threshold of :math:`40 mmh^{-1}`. Only a small area in Mississippi has such extreme rain predicted at this valid time; yet none was observed. Small spatial areas of extreme rain in the observed field, however, did occur in a location far away from Mississippi that was not predicted. Generally, for this type of verification, the Hausdorff metric is a good choice of measure. However, a small choice of :math:`\beta` will provide similar results as the Hausdorff distance (:ref:`Gilleland, 2021 <Gilleland-2021>`). The user should think about the average size of storm areas and multiply this value by the displacement distance  they are comfortable with in order to get a good initial choice for :math:`\beta`, and may have to increase or decrease its value by trial-and-error using one or two example cases from their verification set.
 
 Since :math:`G_\beta` is so sensitive to the choice of :math:`\beta`, which is defined relative to the number of points in the verification domain, :math:`G_\beta` is only computed for the full verification domain. :math:`G_\beta` is reported as a bad data value for any masking region subsets of the full verification domain.
+
+.. _grid-stat_practical_info:
 
 Practical Information
 =====================

@@ -22,10 +22,14 @@
 #include "vx_cal.h"
 #include "vx_math.h"
 #include "vx_gsl_prob.h"
+#include "vx_analysis_util.h"
 #include "vx_statistics.h"
 #include "vx_stat_out.h"
 
 ////////////////////////////////////////////////////////////////////////
+
+// Reference global grid
+static Grid grid("G004");
 
 // Indices for the output flag types in the configuration file
 static const int i_fho       =  0;
@@ -37,24 +41,22 @@ static const int i_mcts      =  4;
 static const int i_cnt       =  5;
 static const int i_sl1l2     =  6;
 static const int i_sal1l2    =  7;
-static const int i_vl1l2     =  8;
-static const int i_val1l2    =  9;
 
-static const int i_pct       = 10;
-static const int i_pstd      = 11;
-static const int i_pjc       = 12;
-static const int i_prc       = 13;
-static const int i_ecnt      = 14;
+static const int i_vcnt      =  8;
+static const int i_vl1l2     =  9;
+static const int i_val1l2    = 10;
 
-static const int i_orank     = 15;
-static const int i_rps       = 16;
-static const int i_eclv      = 17;
-static const int i_mpr       = 18;
-static const int i_vcnt      = 19;
-static const int i_seeps_mpr = 20;
-static const int i_seeps     = 21;
+static const int i_pct       = 11;
+static const int i_pstd      = 12;
+static const int i_pjc       = 13;
+static const int i_prc       = 14;
+static const int i_eclv      = 15;
 
-static const int n_txt       = 22;
+static const int i_mpr       = 16;
+static const int i_seeps_mpr = 17;
+static const int i_seeps     = 18;
+
+static const int n_txt       = 19;
 
 // Text file type
 static const STATLineType txt_file_type[n_txt] = {
@@ -68,23 +70,20 @@ static const STATLineType txt_file_type[n_txt] = {
    STATLineType::cnt,       //  5
    STATLineType::sl1l2,     //  6
    STATLineType::sal1l2,    //  7
-   STATLineType::vl1l2,     //  8
-   STATLineType::val1l2,    //  9
 
-   STATLineType::pct,       //  10   
-   STATLineType::pstd,      //  11
-   STATLineType::pjc,       //  12
-   STATLineType::prc,       //  13
-   STATLineType::ecnt,      //  14
+   STATLineType::vcnt,      //  8
+   STATLineType::vl1l2,     //  9 
+   STATLineType::val1l2,    // 10 
 
-   STATLineType::orank,     //  15
-   STATLineType::rps,       //  16
-   STATLineType::eclv,      //  17
-   STATLineType::mpr,       //  18
-   STATLineType::vcnt,      //  19
+   STATLineType::pct,       // 11   
+   STATLineType::pstd,      // 12
+   STATLineType::pjc,       // 13 
+   STATLineType::prc,       // 14
+   STATLineType::eclv,      // 15
 
-   STATLineType::seeps_mpr, //  20
-   STATLineType::seeps      //  21
+   STATLineType::mpr,       // 16
+   STATLineType::seeps_mpr, // 17 
+   STATLineType::seeps      // 18 
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -124,7 +123,7 @@ class PairStatVxOpt {
 
       //////////////////////////////////////////////////////////////////
 
-      VxPairDataPoint vx_pd;              // Matched pair data [n_msg_typ][n_mask][n_interp]
+      VxPairDataPoint vx_pd;              // Matched pair data [n_mask]
 
       int             beg_ds;             // Begin observation time window offset
       int             end_ds;             // End observation time window offset
@@ -140,15 +139,16 @@ class PairStatVxOpt {
       ThreshArray     owind_ta;           // Array for obs wind speed thresholds
       SetLogic        wind_logic;         // Array of wind speed field logic
 
-      bool            land_flag;          // Flag for land/sea mask filtering
-      bool            topo_flag;          // Flag for topography filtering
-
       StringArray     mask_grid;          // Masking grid strings
       StringArray     mask_poly;          // Masking polyline strings
       StringArray     mask_sid;           // Masking station ID's
 
-      StringArray     mpr_sa;             // MPR column names
-      ThreshArray     mpr_ta;             // MPR column thresholds
+      // Matched pair inclusion thresholds
+      std::map<ConcatString,ThreshArray> mpr_thr_inc_map;
+
+      // Matched pair inclusion and exclusion strings
+      std::map<ConcatString,StringArray> mpr_str_inc_map;
+      std::map<ConcatString,StringArray> mpr_str_exc_map;
 
       // Vector of MaskLatLon objects defining Lat/Lon Point masks
       std::vector<MaskLatLon> mask_llpnt;
@@ -162,17 +162,9 @@ class PairStatVxOpt {
       NumArray        ci_alpha;           // Alpha value for confidence intervals
 
       BootInfo        boot_info;          // Bootstrapping information
-      InterpInfo      interp_info;        // Interpolation information
-      HiRAInfo        hira_info;          // HiRA verification logic
 
       double          hss_ec_value;       // HSS expected correct value
       bool            rank_corr_flag;     // Flag for computing rank correlations
-
-      StringArray     msg_typ;            // Array of message types
-
-      DuplicateType   duplicate_flag;     // Duplicate observations
-      ObsSummary      obs_summary;        // Summarize observations
-      int             obs_perc;           // Summary percentile value
 
       // Output file options
       STATOutputType  output_flag[n_txt]; // Flag for each output line type
@@ -190,9 +182,7 @@ class PairStatVxOpt {
       // Compute the number of output lines for this task
       int n_txt_row(int i)     const;
 
-      int get_n_msg_typ()      const;
       int get_n_mask()         const;
-      int get_n_interp()       const;
 
       int get_n_cnt_thresh()   const;
       int get_n_cat_thresh()   const;
@@ -202,17 +192,16 @@ class PairStatVxOpt {
       int get_n_oprob_thresh() const;
 
       int get_n_eclv_points()  const;
-      int get_n_hira_ens()     const;
-      int get_n_hira_prob()    const;
       int get_n_cdf_bin()      const;
       int get_n_ci_alpha()     const;
+
+      // Add paired data
+      bool add_mpr_line(const STATLine &);
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int PairStatVxOpt::get_n_msg_typ()     const { return msg_typ.n();          }
 inline int PairStatVxOpt::get_n_mask()        const { return mask_name.n();        }
-inline int PairStatVxOpt::get_n_interp()      const { return interp_info.n_interp; }
 
 inline int PairStatVxOpt::get_n_eclv_points() const { return eclv_points.n();      }
 inline int PairStatVxOpt::get_n_cdf_bin()     const { return cdf_info.n_bin;       }
@@ -239,19 +228,10 @@ class PairStatConfInfo {
       // Pair-Stat configuration object
       MetConfig conf;
 
-      // Store data parsed from the Pair-Stat configuration object
+      // Model name from the Pair-Stat config file
       ConcatString model;                   // Model name
 
       std::vector<PairStatVxOpt> vx_opt;    // Vector of vx options [n_vx]
-
-      // Land/sea mask and topography info for data filtering
-      MaskPlane    land_mask;
-      DataPlane    topo_dp;
-      SingleThresh topo_use_obs_thresh;
-      SingleThresh topo_interp_fcst_thresh;
-
-      // Message type groups
-      std::map<ConcatString,StringArray> msg_typ_group_map;
 
       // Mapping of mask names to DataPlanes
       std::map<ConcatString,MaskPlane> mask_area_map;
@@ -280,7 +260,6 @@ class PairStatConfInfo {
       void process_config(PairsFormat);
       void process_flags();
       void process_masks();
-      void process_geog();
       void set_vx_pd();
 
       // Dump out the counts
@@ -298,11 +277,12 @@ class PairStatConfInfo {
       int get_max_n_fprob_thresh() const;
       int get_max_n_oprob_thresh() const;
       int get_max_n_eclv_points()  const;
-      int get_max_n_hira_ens()     const;
-      int get_max_n_hira_prob()    const;
 
       // Check for any verification of vectors
       bool get_vflag() const;
+
+      // Add paired data
+      bool add_mpr_line(const STATLine &);
 };
 
 ////////////////////////////////////////////////////////////////////////

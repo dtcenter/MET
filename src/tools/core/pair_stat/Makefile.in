@@ -107,7 +107,8 @@ pair_stat_OBJECTS = $(am_pair_stat_OBJECTS)
 am__DEPENDENCIES_1 =
 pair_stat_DEPENDENCIES = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
+	$(am__DEPENDENCIES_1)
 pair_stat_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(pair_stat_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
@@ -361,6 +362,7 @@ pair_stat_LDADD = -lvx_stat_out \
 	-lvx_color \
 	-lvx_util_math \
 	-lvx_util \
+	$(PYTHON_MET_LIBS) \
 	-lvx_math \
 	-lvx_cal \
 	-lvx_log \

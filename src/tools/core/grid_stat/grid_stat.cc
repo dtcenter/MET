@@ -823,12 +823,11 @@ void process_scores() {
            << (ocsd_dp.is_empty() ? 0 : 1) << " standard deviation field(s).\n";
 
       // Apply MPR threshold filters
-      if(conf_info.vx_opt[i].mpr_sa.n() > 0) {
+      if(conf_info.vx_opt[i].mpr_thr_inc_map.size() > 0) {
          apply_mpr_thresh_mask(fcst_dp, obs_dp,
                                fcmn_dp, fcsd_dp,
                                ocmn_dp, ocsd_dp,
-                               conf_info.vx_opt[i].mpr_sa,
-                               conf_info.vx_opt[i].mpr_ta);
+                               conf_info.vx_opt[i].mpr_thr_inc_map);
       }
 
       // Setup the first pass through the data

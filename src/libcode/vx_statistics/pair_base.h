@@ -286,8 +286,15 @@ class VxPairBase {
 
       //////////////////////////////////////////////////////////////////
 
-      StringArray mpr_column;    // Names of MPR columns or diffs of columns
-      ThreshArray mpr_thresh;    // Filtering thresholds for the MPR columns
+      // Mapping of numeric MPR columns or diffs of colums to
+      // inclusion thresholds
+      std::map<ConcatString,ThreshArray> mpr_thr_inc_map;
+
+      // Mapping of string MPR columns to list of inclusion
+      // and exclusion strings
+      std::map<ConcatString,StringArray> mpr_str_inc_map;
+      std::map<ConcatString,StringArray> mpr_str_exc_map;
+
 
       //////////////////////////////////////////////////////////////////
 
@@ -378,7 +385,9 @@ class VxPairBase {
       void set_interp(int i_interp, InterpMthd mthd,
                       int width, GridTemplateFactory::GridTemplates shape);
 
-      void set_mpr_thresh(const StringArray &, const ThreshArray &);
+      void set_mpr_thr_inc_map(const std::map<ConcatString,ThreshArray> &);
+      void set_mpr_str_inc_map(const std::map<ConcatString,StringArray> &);
+      void set_mpr_str_exc_map(const std::map<ConcatString,StringArray> &);
 
       void set_climo_cdf_info_ptr(const ClimoCDFInfo *);
 

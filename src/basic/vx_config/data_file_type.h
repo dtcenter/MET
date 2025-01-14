@@ -33,6 +33,7 @@ enum GrdFileType {
    FileType_Python_Numpy,   // Python script using numpy array and attributes dictionary
    FileType_Python_Xarray,  // Python script using xarray dataplane
    FileType_UGrid,          // Unstructured grid
+   FileType_Pairs,          // Paired data
 
 };
 

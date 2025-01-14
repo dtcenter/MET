@@ -599,8 +599,7 @@ void GridStatVxOpt::clear() {
    var_name.clear();
    var_suffix.clear();
 
-   mpr_sa.clear();
-   mpr_ta.clear();
+   mpr_thr_inc_map.clear();
 
    fcat_ta.clear();
    ocat_ta.clear();
@@ -734,8 +733,26 @@ void GridStatVxOpt::process_config(
    for(i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
 
    // Conf: mpr_column and mpr_thresh
-   mpr_sa = odict.lookup_string_array(conf_key_mpr_column);
-   mpr_ta = odict.lookup_thresh_array(conf_key_mpr_thresh);
+   StringArray mpr_sa(odict.lookup_string_array(conf_key_mpr_column));
+   ThreshArray mpr_ta(odict.lookup_thresh_array(conf_key_mpr_thresh));
+
+   // Check for the same length
+   if(mpr_sa.n() != mpr_ta.n()) {
+      mlog << Error << "\nGridStatVxOpt::process_config() -> "
+           << "The length of \"" << conf_key_mpr_column << "\" and \""
+           << conf_key_mpr_thresh << "\" must match (" << mpr_sa.n()
+           << " != " << mpr_ta.n() << ")!\n\n";
+      exit(1);
+   }
+
+   // Store in map
+   for(int i=0; mpr_sa.n(); i++) {
+      if(mpr_thr_inc_map.count(mpr_sa[i]) == 0) {
+         ThreshArray ta;
+         mpr_thr_inc_map[(mpr_sa[i])] = ta;
+      }
+      mpr_thr_inc_map[(mpr_sa[i])].add(mpr_ta[i]); 
+   }
 
    // Conf: cat_thresh
    fcat_ta = fdict.lookup_thresh_array(conf_key_cat_thresh);
@@ -1016,7 +1033,7 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
    //
    // The following do not impact matched pairs:
    //    desc, var_name, var_suffix,
-   //    mpr_sa, mpr_ta,
+   //    mpr_thr_inc_map,
    //    fcat_ta, ocat_ta,
    //    fcnt_ta, ocnt_ta, cnt_logic,
    //    fwind_ta, owind_ta, wind_logic,

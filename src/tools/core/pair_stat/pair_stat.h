@@ -60,38 +60,35 @@ static const char * ioda_data_config_filename =
 
 // Header columns
 static const char * const * txt_columns[n_txt] = {
-   fho_columns,    ctc_columns,    cts_columns,
-   mctc_columns,   mcts_columns,   cnt_columns,
-   sl1l2_columns,  sal1l2_columns, vl1l2_columns,
-   val1l2_columns, pct_columns,    pstd_columns,
-   pjc_columns,    prc_columns,    ecnt_columns,
-   orank_columns,  rps_columns,    eclv_columns,
-   mpr_columns,    vcnt_columns,   seeps_mpr_columns,
-   seeps_columns
+   fho_columns,    ctc_columns,       cts_columns,
+   mctc_columns,   mcts_columns,
+   cnt_columns,    sl1l2_columns,     sal1l2_columns,
+   vcnt_columns,   vl1l2_columns,     val1l2_columns,
+   pct_columns,    pstd_columns,      pjc_columns,
+   prc_columns,    eclv_columns,
+   mpr_columns,    seeps_mpr_columns, seeps_columns
 };
 
 // Length of header columns
 static const int n_txt_columns[n_txt] = {
-   n_fho_columns,    n_ctc_columns,    n_cts_columns,
-   n_mctc_columns,   n_mcts_columns,   n_cnt_columns,
-   n_sl1l2_columns,  n_sal1l2_columns, n_vl1l2_columns,
-   n_val1l2_columns, n_pct_columns,    n_pstd_columns,
-   n_pjc_columns,    n_prc_columns,    n_ecnt_columns,
-   n_orank_columns,  n_rps_columns,    n_eclv_columns,
-   n_mpr_columns,    n_vcnt_columns,   n_seeps_mpr_columns,
-   n_seeps_columns
+   n_fho_columns,    n_ctc_columns,       n_cts_columns,
+   n_mctc_columns,   n_mcts_columns,
+   n_cnt_columns,    n_sl1l2_columns,     n_sal1l2_columns,
+   n_vcnt_columns,   n_vl1l2_columns,     n_val1l2_columns,
+   n_pct_columns,    n_pstd_columns,      n_pjc_columns,
+   n_prc_columns,    n_eclv_columns,
+   n_mpr_columns,    n_seeps_mpr_columns, n_seeps_columns
 };
 
 // Text file abbreviations
 static const char * const txt_file_abbr[n_txt] = {
-   "fho",    "ctc",    "cts",
-   "mctc",   "mcts",   "cnt",
-   "sl1l2",  "sal1l2", "vl1l2",
-   "val1l2", "pct",    "pstd",
-   "pjc",    "prc",    "ecnt",
-   "orank",  "rps",    "eclv",
-   "mpr",    "vcnt",   "seeps_mpr",
-   "seeps"
+   "fho",    "ctc",       "cts",
+   "mctc",   "mcts",
+   "cnt",    "sl1l2",     "sal1l2",
+   "vcnt",   "vl1l2",     "val1l2",
+   "pct",    "pstd",      "pjc",
+   "prc",    "eclv",
+   "mpr",    "seeps_mpr", "seeps"
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -138,10 +135,6 @@ static int              i_txt_row[n_txt];
 // Miscellaneous Variables
 //
 ///////////////////////////////////////////////////////////////////////////////
-
-// Grid variables
-static Grid grid;
-static bool is_first_pass = true;
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
