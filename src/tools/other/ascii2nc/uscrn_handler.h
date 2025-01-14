@@ -45,7 +45,7 @@ struct USCRNColInfo {
    std::string _name;
    std::string _units;
    std::string _desc;
-   int _qcOffset = -1;
+   int _qcOffset;
 };
 
 // Metadata for USCRN variants

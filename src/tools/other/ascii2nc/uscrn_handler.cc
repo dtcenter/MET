@@ -25,319 +25,318 @@ using namespace std;
 //    URL: https://www.ncei.noaa.gov/access/crn/qcdatasets.html
 //   Data: ftp://ftp.ncei.noaa.gov/pub/data/uscrn/products/{type}
 //
-// Mapping of USCRN {type} variants to metadata. 
+
 //
-
-std::map<USCRNFormat,USCRNFormatInfo> USCRNFormatMap = {
-
-  //
-  // "monthly01" with files named "CRNM0102-{Location}.txt
-  //   - Format number "02"
-  //   - Contains 15 columns defined by:
-  //     https://www.ncei.noaa.gov/pub/data/uscrn/products/monthly01/readme.txt
-  //
-  { USCRNFormat::Monthly,
-    { "USCRN-Monthly", "CRNM0102", ".txt", 15, 0, 1, -1, 3, 4, {
-      {  5, "T_MONTHLY_MAX", "Celsius",
-            "Maximum air temperature" },
-      {  6, "T_MONTHLY_MIN", "Celsius",
-            "Minimum air temperature" },
-      {  7, "T_MONTHLY_MEAN", "Celsius",
-            "Mean air temperature, calculated as (T_MONTHLY_MAX + T_MONTHLY_MIN) / 2" },
-      {  8, "T_MONTHLY_AVG", "Celsius",
-            "Average air temperature" },
-      {  9, "P_MONTHLY_CALC", "mm",
-            "Total amount of precipitation" },
-      { 10, "SOLRAD_MONTHLY_AVG", "MJ/m^2",
-            "Average daily total solar energy received" },
-      { 12, "SUR_TEMP_MONTHLY_MAX", "Celcius",
-            "Maximum infrared surface temperature",
-            11 },
-      { 13, "SUR_TEMP_MONTHLY_MIN", "Celcius",
-            "Minimum infrared surface temperature",
-            11 },
-      { 14, "SUR_TEMP_MONTHLY_AVG", "Celcius",
-            "Average infrared surface temperature",
-            11 }}
-    }
-  },
-
-  //
-  // "daily01" with files named "{YYYY}/CRND0103-{YYYY}-{Location}.txt
-  //   - Format number "03"
-  //   - Contains 28 columns defined by:
-  //     https://www.ncei.noaa.gov/pub/data/uscrn/products/daily01/readme.txt
-  //
-  { USCRNFormat::Daily,
-    { "USCRN-Daily", "CRND0103", ".txt", 28, 0, 1, -1, 3, 4, {
-      {  5, "T_DAILY_MAX", "Celsius",
-            "Maximum air temperature" },
-      {  6, "T_DAILY_MIN", "Celsius",
-            "Minimum air temperature" },
-      {  7, "T_DAILY_MEAN", "Celsius",
-            "Mean air temperature, calculated as (T_MONTHLY_MAX + T_MONTHLY_MIN) / 2" },
-      {  8, "T_DAILY_AVG", "Celsius",
-            "Average air temperature" },
-      {  9, "P_DAILY_CALC", "mm",
-            "Total amount of precipitation" },
-      { 10, "SOLARAD_DAILY", "MJ/m^2",
-            "Total solar energy, calculated from the hourly average rates" },
-      { 12, "SUR_TEMP_DAILY_MAX", "Celsius",
-            "Maximum infrared surface temperature"},
-      { 13, "SUR_TEMP_DAILY_MIN", "Celsius",
-            "Minimum infrared surface temperature"},
-      { 14, "SUR_TEMP_DAILY_AVG", "Celsius",
-            "Average infrared surface temperature"},
-      { 15, "RH_DAILY_MAX", "%",
-            "Maximum relative humidity" },
-      { 16, "RH_DAILY_MIN", "%",
-            "Minimum relative humidity" },
-      { 17, "RH_DAILY_AVG", "%",
-            "Average relative humidity" },
-      { 18, "SOIL_MOISTURE_5_DAILY", "m^3/m^3",
-            "Average soil moisture at 5 cm below the surface" },
-      { 19, "SOIL_MOISTURE_10_DAILY", "m^3/m^3",
-            "Average soil moisture at 10 cm below the surface" },
-      { 20, "SOIL_MOISTURE_20_DAILY", "m^3/m^3",
-            "Average soil moisture at 20 cm below the surface" },
-      { 21, "SOIL_MOISTURE_50_DAILY", "m^3/m^3",
-            "Average soil moisture at 50 cm below the surface" },
-      { 22, "SOIL_MOISTURE_100_DAILY", "m^3/m^3",
-            "Average soil moisture at 100 cm below the surface" },
-      { 23, "SOIL_TEMP_5_DAILY", "Celsius",
-            "Average soil temperature at 5 cm below the surface" },
-      { 24, "SOIL_TEMP_10_DAILY", "Celsius",
-            "Average soil temperature at 10 cm below the surface" },
-      { 25, "SOIL_TEMP_20_DAILY", "Celsius",
-            "Average soil temperature at 20 cm below the surface" },
-      { 26, "SOIL_TEMP_50_DAILY", "Celsius",
-            "Average soil temperature at 50 cm below the surface" },
-      { 27, "SOIL_TEMP_100_DAILY", "Celsius",
-            "Average soil temperature at 100 cm below the surface" }}
-    }
-  },
-
-  //
-  // "hourly02" with files named "{YYYY}/CRNH0203-{YYYY}-{Location}.txt
-  //   - Format number "03"
-  //   - Contains 38 columns defined by:
-  //     https://www.ncei.noaa.gov/pub/data/uscrn/products/hourly02/readme.txt
-  //
-  { USCRNFormat::Hourly,
-    { "USCRN-Hourly", "CRNH0203", ".txt", 38, 0, 1, 2, 6, 7, {
-      {  8, "T_CALC", "Celsius",
-            "Average air temperature during the last 5 minutes of the hour" },
-      {  9, "T_HR_AVG", "Celsius",
-            "Average air temperature for the entire hour" },
-      { 10, "T_MAX", "Celsius",
-            "Maximum air temperature during the hour" },
-      { 11, "T_MIN", "Celsius",
-            "Minimum air temperature during the hour" },
-      { 12, "P_CALC", "mm",
-            "Total amount of precipitation during the hour" },
-      { 13, "SOLARAD", "W/m^2",
-            "Average global solar radiation",
-            14 },
-      { 15, "SOLARAD_MAX", "W/m^2",
-            "Maximum global solar radiation",
-            16 },
-      { 17, "SOLARAD_MIN", "W/m^2",
-            "Minimum global solar radiation",
-            18 },
-      { 20, "SUR_TEMP", "Celsius",
-            "Average infrared surface temperature",
-            21 },
-      { 22, "SUR_TEMP_MAX", "Celsius",
-            "Maximum infrared surface temperature",
-            23 },
-      { 24, "SUR_TEMP_MIN", "Celsius",
-            "Minimum infrared surface temperature",
-            25 },
-      { 26, "RH_HR_AVG", "%",
-            "Average relative humidity",
-            27 },
-      { 28, "SOIL_MOISTURE_5", "m^3/m^3",
-            "Average soil moisture at 5 cm below the surface" },
-      { 29, "SOIL_MOISTURE_10", "m^3/m^3",
-            "Average soil moisture at 10 cm below the surface" },
-      { 30, "SOIL_MOISTURE_20", "m^3/m^3",
-            "Average soil moisture at 20 cm below the surface" },
-      { 31, "SOIL_MOISTURE_50", "m^3/m^3",
-            "Average soil moisture at 50 cm below the surface" },
-      { 32, "SOIL_MOISTURE_100", "m^3/m^3",
-            "Average soil moisture at 100 cm below the surface" },
-      { 33, "SOIL_TEMP_5", "Celsius",
-            "Average soil temperature at 5 cm below the surface" },
-      { 34, "SOIL_TEMP_10", "Celsius",
-            "Average soil temperature at 10 cm below the surface" },
-      { 35, "SOIL_TEMP_20", "Celsius",
-            "Average soil temperature at 20 cm below the surface" },
-      { 36, "SOIL_TEMP_50", "Celsius",
-            "Average soil temperature at 50 cm below the surface" },
-      { 37, "SOIL_TEMP_100", "Celsius",
-            "Average soil temperature at 100 cm below the surface" }}
-    }
-  },
-
-  //
-  // "subhourly01" with files named "{YYYY}/CRNS0101-{MM}-{YYYY}-{Location}.txt
-  //   - Format number "01"
-  //   - Contains 23 columns defined by:
-  //     https://www.ncei.noaa.gov/pub/data/uscrn/products/subhourly01/readme.txt
-  //
-  { USCRNFormat::SubHourly,
-    { "USCRN-SubHourly", "CRNS0101", ".txt", 23, 0, 1, 2, 6, 7, {
-      {  8, "AIR_TEMPERATURE", "Celsius",
-            "Average air temperature" },
-      {  9, "PRECIPITATION", "mm",
-            "Total amount of precipitation" },
-      { 10, "SOLAR_RADIATION", "W/m^2",
-            "Average global solar radiation received",
-            11 },
-      { 12, "SURFACE_TEMPERATURE", "Celsius",
-            "Average infrared surface temperature",
-            14 },
-      { 15, "RELATIVE_HUMIDITY", "%",
-            "Average relative humidity",
-            16 },
-      { 17, "SOIL_MOISTURE_5", "m^3/m^3",
-            "Average soil moisture at 5 cm below the surface" },
-      { 18, "SOIL_TEMPERATURE_5", "Celsius",
-            "Average soil temperature at 5 cm below the surface" },
-      { 19, "WETNESS", "Ohms",
-            "presence or absence of moisture due to precipitation",
-            20 },
-      { 21, "WIND_1_5", "m/s",
-            "Average wind speed at a height of 1.5 meters",
-            22 }}
-    }
-  },
-
-  //
-  // "soil/soilanom01" with files named "CRNSSM0101-{Location}.csv"
-  //   - Format number "01"
-  //   - Contains 30 NAMED columns but with no README file provided.
-  //
-  // Note that "soil/soilclim01" files named "CRNSMC0101-{Location}.csv"
-  // are not supported directly here.
-  //
-  { USCRNFormat::SoilAnom,
-    { "USCRN-SoilAnom", "CRNSSM0101", ".csv", 30, 0, 1, -1, 2, 3, {
-      {  4, "SMVWC_5_CM", "m^3/m^3",
-            "Hourly average of 5 cm soil moisture conditions" },
-      {  5, "SMANOM_5_CM", "Standardized",
-            "Hourly average of 5 cm standardized soil moisture anomalies" },
-      {  7, "ST_5_CM", "Celsius",
-            "Hourly average of 5 cm soil temperatures" },
-      {  8, "SMVWC_10_CM", "m^3/m^3",
-            "Hourly average of 10 cm soil moisture conditions" },
-      {  9, "SMANOM_10_CM", "Standardized",
-            "Hourly average of 10 cm standardized soil moisture anomalies" },
-      { 11, "ST_10_CM", "Celsius",
-            "Hourly average of 10 cm soil temperatures" },
-      { 12, "SMVWC_20_CM", "m^3/m^3",
-            "Hourly average of 20 cm soil moisture conditions" },
-      { 13, "SMANOM_20_CM", "Standardized",
-            "Hourly average of 20 cm standardized soil moisture anomalies" },
-      { 15, "ST_20_CM", "Celsius",
-            "Hourly average of 20 cm soil temperatures" },
-      { 16, "SMVWC_50_CM", "m^3/m^3",
-            "Hourly average of 50 cm soil moisture conditions" },
-      { 17, "SMANOM_50_CM", "Standardized",
-            "Hourly average of 50 cm standardized soil moisture anomalies" },
-      { 19, "ST_50_CM", "Celsius",
-            "Hourly average of 50 cm soil temperatures" },
-      { 20, "SMVWC_100_CM", "m^3/m^3",
-            "Hourly average of 100 cm soil moisture conditions" },
-      { 21, "SMANOM_100_CM", "Standardized",
-            "Hourly average of 100 cm standardized soil moisture anomalies" },
-      { 23, "ST_100_CM", "Celsius",
-            "Hourly average of 100 cm soil temperatures" },
-      { 24, "SMVWC_TOP", "m^3/m^3",
-            "Hourly average of top (i.e. 5 & 10 cm) soil moisture conditions" },
-      { 25, "SMANOM_TOP", "Standardized",
-            "Hourly average of top (i.e. 5 & 10 cm) soil moisture anomalies" },
-      { 27, "SMVWC_COLUMN", "m^3/m^3",
-            "Hourly average of column (i.e. all avaliable depths) soil moisture conditions" },
-      { 28, "SMANOM_COLUMN", "Standardized",
-            "Hourly average of column (i.e. all avaliable depths) soil moisture anomalies" }}
-    }
-  },
-
-  //
-  // "heat01" with files named "SCRNHE0101-{Location}.csv"
-  //   - Format number "01"
-  //   - Contains 16 NAMED columns described by:
-  //     https://www.ncei.noaa.gov/pub/data/uscrn/products/heat01/readme.txt
-  //
-  { USCRNFormat::Heat,
-    { "USCRN-Heat", "CRNHE0101", ".csv", 16, 0, 1, -1, 2, 3, {
-      {  4, "RELATIVE_HUMIDITY", "%",
-            "Hourly average of relative humidity" },
-      {  5, "SURFACE_PRESSURE", "hPa",
-            "Hourly average of surface pressure" },
-      {  6, "SOLAR_RADIATION", "W/m^2",
-            "Hourly average of solar radiation" },
-      {  7, "ESTIMATED_10_METER_WIND_SPEED", "m/s",
-            "Hourly average of 10 meter wind speed" },
-      {  8, "DRY_BULB_TEMPERATURE_C", "Celsius",
-            "Hourly average of air temperature" },
-      {  9, "HEAT_INDEX_C", "Celsius",
-            "Hourly average of heat index" },
-      { 10, "APPARENT_TEMPERATURE_C", "Celsius",
-            "Hourly average of apparent temperature" },
-      { 11, "WET_BULB_GLOBE_TEMPERATURE_C", "Celsius",
-            "Hourly average of wet bulb temperature" },
-      { 12, "DRY_BULB_TEMPERATURE_F", "Fahrenheit",
-            "Hourly average of air temperature" },
-      { 13, "HEAT_INDEX_F", "Fahrenheit",
-            "Hourly average of heat index" },
-      { 14, "APPARENT_TEMPERATURE_F", "Fahrenheit",
-            "Hourly average of apparent temperature" },
-      { 15, "WET_BULB_GLOBE_TEMPERATURE_F", "Fahrenheit",
-            "Hourly average of wet bulb temperature" }}
-    }
-  },
-
-  //
-  // "drought01" with files named "CRNDI0101-{Location}.csv
-  //   - Format number "01"
-  //   - Contains 32 NAMED columns described by:
-  //     https://www.ncei.noaa.gov/pub/data/uscrn/products/drought01/readme.txt
-  //
-  { USCRNFormat::Drought,
-    { "USCRN-Drought", "CRNDI0101", ".csv", 32, 0, 1, -1, 2, 3, {
-      {  4, "SMVWC_5_CM_MEAN", "m^3/m^3",
-            "Weekly average of hourly 5 cm soil moisture conditions" },
-      {  5, "SMANOM_5_CM_MEAN", "Standardized",
-            "Weekly average of hourly 5 cm standardized soil moisture anomalies" },
-      {  8, "SMVWC_10_CM_MEAN", "m^3/m^3",
-            "Weekly average of hourly 10 cm soil moisture conditions" },
-      {  9, "SMANOM_10_CM_MEAN", "Standardized",
-            "Weekly average of hourly 10 cm standardized soil moisture anomalies" },
-      { 12, "SMVWC_20_CM_MEAN", "m^3/m^3",
-            "Weekly average of hourly 20 cm soil moisture conditions" },
-      { 13, "SMANOM_20_CM_MEAN", "Standardized",
-            "Weekly average of hourly 20 cm standardized soil moisture anomalies" },
-      { 16, "SMVWC_50_CM_MEAN", "m^3/m^3",
-            "Weekly average of hourly 50 cm soil moisture conditions" },
-      { 17, "SMANOM_50_CM_MEAN", "Standardized",
-            "Weekly average of hourly 50 cm standardized soil moisture anomalies" },
-      { 20, "SMVWC_100_CM_MEAN", "m^3/m^3",
-            "Weekly average of hourly 100 cm soil moisture conditions" },
-      { 21, "SMANOM_100_CM_MEAN", "Standardized",
-            "Weekly average of hourly 100 cm standardized soil moisture anomalies" },
-      { 24, "SMVWC_TOP_MEAN", "m^3/m^3",
-            "Weekly average of hourly top (i.e. 5 & 10 cm) soil moisture conditions" },
-      { 25, "SMANOM_TOP_MEAN", "Standardized",
-            "Weekly average of hourly top (i.e. 5 & 10 cm) soil moisture anomalies" },
-      { 28, "SMVWC_COLUMN_MEAN", "m^3/m^3",
-            "Weekly average of hourly column (i.e. all depths) soil moisture conditions" },
-      { 29, "SMANOM_COLUMN_MEAN", "Standardized",
-            "Weekly average of hourly column (i.e. all depths) soil moisture anomalies" }}
-    }
+// "monthly01" with files named "CRNM0102-{Location}.txt
+//   - Format number "02"
+//   - Contains 15 columns defined by:
+//     https://www.ncei.noaa.gov/pub/data/uscrn/products/monthly01/readme.txt
+//
+USCRNFormatInfo uscrn_monthly_info = {
+  "USCRN-Monthly", "CRNM0102", ".txt", 15, 0, 1, -1, 3, 4,
+  {
+    {  5, "T_MONTHLY_MAX", "Celsius",
+          "Maximum air temperature", -1 },
+    {  6, "T_MONTHLY_MIN", "Celsius",
+          "Minimum air temperature", -1 },
+    {  7, "T_MONTHLY_MEAN", "Celsius",
+          "Mean air temperature, calculated as (T_MONTHLY_MAX + T_MONTHLY_MIN) / 2", -1 },
+    {  8, "T_MONTHLY_AVG", "Celsius",
+          "Average air temperature", -1 },
+    {  9, "P_MONTHLY_CALC", "mm",
+          "Total amount of precipitation", -1 },
+    { 10, "SOLRAD_MONTHLY_AVG", "MJ/m^2",
+          "Average daily total solar energy received", -1 },
+    { 12, "SUR_TEMP_MONTHLY_MAX", "Celcius",
+          "Maximum infrared surface temperature", 11 },
+    { 13, "SUR_TEMP_MONTHLY_MIN", "Celcius",
+          "Minimum infrared surface temperature", 11 },
+    { 14, "SUR_TEMP_MONTHLY_AVG", "Celcius",
+          "Average infrared surface temperature", 11 }
   }
+};
 
+//
+// "daily01" with files named "{YYYY}/CRND0103-{YYYY}-{Location}.txt
+//   - Format number "03"
+//   - Contains 28 columns defined by:
+//     https://www.ncei.noaa.gov/pub/data/uscrn/products/daily01/readme.txt
+//
+USCRNFormatInfo uscrn_daily_info = {
+  "USCRN-Daily", "CRND0103", ".txt", 28, 0, 1, -1, 3, 4,
+  {
+    {  5, "T_DAILY_MAX", "Celsius",
+          "Maximum air temperature", -1 },
+    {  6, "T_DAILY_MIN", "Celsius",
+          "Minimum air temperature", -1 },
+    {  7, "T_DAILY_MEAN", "Celsius",
+          "Mean air temperature, calculated as (T_MONTHLY_MAX + T_MONTHLY_MIN) / 2", -1 },
+    {  8, "T_DAILY_AVG", "Celsius",
+          "Average air temperature", -1 },
+    {  9, "P_DAILY_CALC", "mm",
+          "Total amount of precipitation", -1 },
+    { 10, "SOLARAD_DAILY", "MJ/m^2",
+          "Total solar energy, calculated from the hourly average rates", -1 },
+    { 12, "SUR_TEMP_DAILY_MAX", "Celsius",
+          "Maximum infrared surface temperature", -1 },
+    { 13, "SUR_TEMP_DAILY_MIN", "Celsius",
+          "Minimum infrared surface temperature", -1 },
+    { 14, "SUR_TEMP_DAILY_AVG", "Celsius",
+          "Average infrared surface temperature", -1 },
+    { 15, "RH_DAILY_MAX", "%",
+          "Maximum relative humidity", -1 },
+    { 16, "RH_DAILY_MIN", "%",
+          "Minimum relative humidity", -1 },
+    { 17, "RH_DAILY_AVG", "%",
+          "Average relative humidity", -1 },
+    { 18, "SOIL_MOISTURE_5_DAILY", "m^3/m^3",
+          "Average soil moisture at 5 cm below the surface", -1 },
+    { 19, "SOIL_MOISTURE_10_DAILY", "m^3/m^3",
+          "Average soil moisture at 10 cm below the surface", -1 },
+    { 20, "SOIL_MOISTURE_20_DAILY", "m^3/m^3",
+          "Average soil moisture at 20 cm below the surface", -1 },
+    { 21, "SOIL_MOISTURE_50_DAILY", "m^3/m^3",
+          "Average soil moisture at 50 cm below the surface", -1 },
+    { 22, "SOIL_MOISTURE_100_DAILY", "m^3/m^3",
+          "Average soil moisture at 100 cm below the surface", -1 },
+    { 23, "SOIL_TEMP_5_DAILY", "Celsius",
+          "Average soil temperature at 5 cm below the surface", -1 },
+    { 24, "SOIL_TEMP_10_DAILY", "Celsius",
+          "Average soil temperature at 10 cm below the surface", -1 },
+    { 25, "SOIL_TEMP_20_DAILY", "Celsius",
+          "Average soil temperature at 20 cm below the surface", -1 },
+    { 26, "SOIL_TEMP_50_DAILY", "Celsius",
+          "Average soil temperature at 50 cm below the surface", -1 },
+    { 27, "SOIL_TEMP_100_DAILY", "Celsius",
+          "Average soil temperature at 100 cm below the surface", -1 }
+  }
+};
+
+//
+// "hourly02" with files named "{YYYY}/CRNH0203-{YYYY}-{Location}.txt
+//   - Format number "03"
+//   - Contains 38 columns defined by:
+//     https://www.ncei.noaa.gov/pub/data/uscrn/products/hourly02/readme.txt
+//
+USCRNFormatInfo uscrn_hourly_info = {
+  "USCRN-Hourly", "CRNH0203", ".txt", 38, 0, 1, 2, 6, 7,
+  {
+    {  8, "T_CALC", "Celsius",
+          "Average air temperature during the last 5 minutes of the hour", -1 },
+    {  9, "T_HR_AVG", "Celsius",
+          "Average air temperature for the entire hour", -1 },
+    { 10, "T_MAX", "Celsius",
+          "Maximum air temperature during the hour", -1 },
+    { 11, "T_MIN", "Celsius",
+          "Minimum air temperature during the hour", -1 },
+    { 12, "P_CALC", "mm",
+          "Total amount of precipitation during the hour", -1 },
+    { 13, "SOLARAD", "W/m^2",
+          "Average global solar radiation", 14 },
+    { 15, "SOLARAD_MAX", "W/m^2",
+          "Maximum global solar radiation", 16 },
+    { 17, "SOLARAD_MIN", "W/m^2",
+          "Minimum global solar radiation", 18 },
+    { 20, "SUR_TEMP", "Celsius",
+          "Average infrared surface temperature", 21 },
+    { 22, "SUR_TEMP_MAX", "Celsius",
+          "Maximum infrared surface temperature", 23 },
+    { 24, "SUR_TEMP_MIN", "Celsius",
+          "Minimum infrared surface temperature", 25 },
+    { 26, "RH_HR_AVG", "%",
+          "Average relative humidity", 27 },
+    { 28, "SOIL_MOISTURE_5", "m^3/m^3",
+          "Average soil moisture at 5 cm below the surface", -1 },
+    { 29, "SOIL_MOISTURE_10", "m^3/m^3",
+          "Average soil moisture at 10 cm below the surface", -1 },
+    { 30, "SOIL_MOISTURE_20", "m^3/m^3",
+          "Average soil moisture at 20 cm below the surface", -1 },
+    { 31, "SOIL_MOISTURE_50", "m^3/m^3",
+          "Average soil moisture at 50 cm below the surface", -1 },
+    { 32, "SOIL_MOISTURE_100", "m^3/m^3",
+          "Average soil moisture at 100 cm below the surface", -1 },
+    { 33, "SOIL_TEMP_5", "Celsius",
+          "Average soil temperature at 5 cm below the surface", -1 },
+    { 34, "SOIL_TEMP_10", "Celsius",
+          "Average soil temperature at 10 cm below the surface", -1 },
+    { 35, "SOIL_TEMP_20", "Celsius",
+          "Average soil temperature at 20 cm below the surface", -1 },
+    { 36, "SOIL_TEMP_50", "Celsius",
+          "Average soil temperature at 50 cm below the surface", -1 },
+    { 37, "SOIL_TEMP_100", "Celsius",
+          "Average soil temperature at 100 cm below the surface", -1 }
+  }
+};
+
+//
+// "subhourly01" with files named "{YYYY}/CRNS0101-{MM}-{YYYY}-{Location}.txt
+//   - Format number "01"
+//   - Contains 23 columns defined by:
+//     https://www.ncei.noaa.gov/pub/data/uscrn/products/subhourly01/readme.txt
+//
+USCRNFormatInfo uscrn_subhourly_info = {
+  "USCRN-SubHourly", "CRNS0101", ".txt", 23, 0, 1, 2, 6, 7,
+  {
+    {  8, "AIR_TEMPERATURE", "Celsius",
+          "Average air temperature", -1 },
+    {  9, "PRECIPITATION", "mm",
+          "Total amount of precipitation", -1 },
+    { 10, "SOLAR_RADIATION", "W/m^2",
+          "Average global solar radiation received", 11 },
+    { 12, "SURFACE_TEMPERATURE", "Celsius",
+          "Average infrared surface temperature", 14 },
+    { 15, "RELATIVE_HUMIDITY", "%",
+          "Average relative humidity", 16 },
+    { 17, "SOIL_MOISTURE_5", "m^3/m^3",
+          "Average soil moisture at 5 cm below the surface", -1 },
+    { 18, "SOIL_TEMPERATURE_5", "Celsius",
+          "Average soil temperature at 5 cm below the surface", -1 },
+    { 19, "WETNESS", "Ohms",
+          "presence or absence of moisture due to precipitation", 20 },
+    { 21, "WIND_1_5", "m/s",
+          "Average wind speed at a height of 1.5 meters", 22 }
+  }
+};
+
+//
+// "soil/soilanom01" with files named "CRNSSM0101-{Location}.csv"
+//   - Format number "01"
+//   - Contains 30 NAMED columns but with no README file provided.
+//
+// Note that "soil/soilclim01" files named "CRNSMC0101-{Location}.csv"
+// are not supported directly here.
+//
+USCRNFormatInfo uscrn_soilanom_info = {
+  "USCRN-SoilAnom", "CRNSSM0101", ".csv", 30, 0, 1, -1, 2, 3,
+  {
+    {  4, "SMVWC_5_CM", "m^3/m^3",
+           "Hourly average of 5 cm soil moisture conditions", -1 },
+    {  5, "SMANOM_5_CM", "Standardized",
+          "Hourly average of 5 cm standardized soil moisture anomalies", -1 },
+    {  7, "ST_5_CM", "Celsius",
+          "Hourly average of 5 cm soil temperatures", -1 },
+    {  8, "SMVWC_10_CM", "m^3/m^3",
+          "Hourly average of 10 cm soil moisture conditions", -1 },
+    {  9, "SMANOM_10_CM", "Standardized",
+          "Hourly average of 10 cm standardized soil moisture anomalies", -1 },
+    { 11, "ST_10_CM", "Celsius",
+          "Hourly average of 10 cm soil temperatures", -1 },
+    { 12, "SMVWC_20_CM", "m^3/m^3",
+          "Hourly average of 20 cm soil moisture conditions", -1 },
+    { 13, "SMANOM_20_CM", "Standardized",
+          "Hourly average of 20 cm standardized soil moisture anomalies", -1 },
+    { 15, "ST_20_CM", "Celsius",
+          "Hourly average of 20 cm soil temperatures", -1 },
+    { 16, "SMVWC_50_CM", "m^3/m^3",
+          "Hourly average of 50 cm soil moisture conditions", -1 },
+    { 17, "SMANOM_50_CM", "Standardized",
+          "Hourly average of 50 cm standardized soil moisture anomalies", -1 },
+    { 19, "ST_50_CM", "Celsius",
+          "Hourly average of 50 cm soil temperatures", -1 },
+    { 20, "SMVWC_100_CM", "m^3/m^3",
+          "Hourly average of 100 cm soil moisture conditions", -1 },
+    { 21, "SMANOM_100_CM", "Standardized",
+          "Hourly average of 100 cm standardized soil moisture anomalies", -1 },
+    { 23, "ST_100_CM", "Celsius",
+          "Hourly average of 100 cm soil temperatures", -1 },
+    { 24, "SMVWC_TOP", "m^3/m^3",
+          "Hourly average of top (i.e. 5 & 10 cm) soil moisture conditions", -1 },
+    { 25, "SMANOM_TOP", "Standardized",
+          "Hourly average of top (i.e. 5 & 10 cm) soil moisture anomalies", -1 },
+    { 27, "SMVWC_COLUMN", "m^3/m^3",
+          "Hourly average of column (i.e. all avaliable depths) soil moisture conditions", -1 },
+    { 28, "SMANOM_COLUMN", "Standardized",
+          "Hourly average of column (i.e. all avaliable depths) soil moisture anomalies", -1 }
+  }
+};
+
+//
+// "heat01" with files named "SCRNHE0101-{Location}.csv"
+//   - Format number "01"
+//   - Contains 16 NAMED columns described by:
+//     https://www.ncei.noaa.gov/pub/data/uscrn/products/heat01/readme.txt
+//
+USCRNFormatInfo uscrn_heat_info = {
+  "USCRN-Heat", "CRNHE0101", ".csv", 16, 0, 1, -1, 2, 3,
+  {
+    {  4, "RELATIVE_HUMIDITY", "%",
+          "Hourly average of relative humidity", -1 },
+    {  5, "SURFACE_PRESSURE", "hPa",
+          "Hourly average of surface pressure", -1 },
+    {  6, "SOLAR_RADIATION", "W/m^2",
+          "Hourly average of solar radiation", -1 },
+    {  7, "ESTIMATED_10_METER_WIND_SPEED", "m/s",
+          "Hourly average of 10 meter wind speed", -1 },
+    {  8, "DRY_BULB_TEMPERATURE_C", "Celsius",
+          "Hourly average of air temperature", -1 },
+    {  9, "HEAT_INDEX_C", "Celsius",
+          "Hourly average of heat index", -1 },
+    { 10, "APPARENT_TEMPERATURE_C", "Celsius",
+          "Hourly average of apparent temperature", -1 },
+    { 11, "WET_BULB_GLOBE_TEMPERATURE_C", "Celsius",
+          "Hourly average of wet bulb temperature", -1 },
+    { 12, "DRY_BULB_TEMPERATURE_F", "Fahrenheit",
+          "Hourly average of air temperature", -1 },
+    { 13, "HEAT_INDEX_F", "Fahrenheit",
+          "Hourly average of heat index", -1 },
+    { 14, "APPARENT_TEMPERATURE_F", "Fahrenheit",
+          "Hourly average of apparent temperature", -1 },
+    { 15, "WET_BULB_GLOBE_TEMPERATURE_F", "Fahrenheit",
+          "Hourly average of wet bulb temperature", -1 }
+  }
+};
+
+//
+// "drought01" with files named "CRNDI0101-{Location}.csv
+//   - Format number "01"
+//   - Contains 32 NAMED columns described by:
+//     https://www.ncei.noaa.gov/pub/data/uscrn/products/drought01/readme.txt
+//
+USCRNFormatInfo uscrn_drought_info = {
+  "USCRN-Drought", "CRNDI0101", ".csv", 32, 0, 1, -1, 2, 3,
+  {
+    {  4, "SMVWC_5_CM_MEAN", "m^3/m^3",
+          "Weekly average of hourly 5 cm soil moisture conditions", -1 },
+    {  5, "SMANOM_5_CM_MEAN", "Standardized",
+          "Weekly average of hourly 5 cm standardized soil moisture anomalies", -1 },
+    {  8, "SMVWC_10_CM_MEAN", "m^3/m^3",
+          "Weekly average of hourly 10 cm soil moisture conditions", -1 },
+    {  9, "SMANOM_10_CM_MEAN", "Standardized",
+          "Weekly average of hourly 10 cm standardized soil moisture anomalies", -1 },
+    { 12, "SMVWC_20_CM_MEAN", "m^3/m^3",
+          "Weekly average of hourly 20 cm soil moisture conditions", -1 },
+    { 13, "SMANOM_20_CM_MEAN", "Standardized",
+          "Weekly average of hourly 20 cm standardized soil moisture anomalies", -1 },
+    { 16, "SMVWC_50_CM_MEAN", "m^3/m^3",
+          "Weekly average of hourly 50 cm soil moisture conditions", -1 },
+    { 17, "SMANOM_50_CM_MEAN", "Standardized",
+          "Weekly average of hourly 50 cm standardized soil moisture anomalies", -1 },
+    { 20, "SMVWC_100_CM_MEAN", "m^3/m^3",
+          "Weekly average of hourly 100 cm soil moisture conditions", -1 },
+    { 21, "SMANOM_100_CM_MEAN", "Standardized",
+          "Weekly average of hourly 100 cm standardized soil moisture anomalies", -1 },
+    { 24, "SMVWC_TOP_MEAN", "m^3/m^3",
+          "Weekly average of hourly top (i.e. 5 & 10 cm) soil moisture conditions", -1 },
+    { 25, "SMANOM_TOP_MEAN", "Standardized",
+          "Weekly average of hourly top (i.e. 5 & 10 cm) soil moisture anomalies", -1 },
+    { 28, "SMVWC_COLUMN_MEAN", "m^3/m^3",
+          "Weekly average of hourly column (i.e. all depths) soil moisture conditions", -1 },
+    { 29, "SMANOM_COLUMN_MEAN", "Standardized",
+          "Weekly average of hourly column (i.e. all depths) soil moisture anomalies", -1 }
+  }
+};
+
+//
+// Mapping of USCRN format variants to metadata. 
+//
+std::map<USCRNFormat,USCRNFormatInfo> USCRNFormatMap = {
+  { USCRNFormat::Monthly,   uscrn_monthly_info   },
+  { USCRNFormat::Daily,     uscrn_daily_info     },
+  { USCRNFormat::Hourly,    uscrn_hourly_info    },
+  { USCRNFormat::SubHourly, uscrn_subhourly_info },
+  { USCRNFormat::SoilAnom,  uscrn_soilanom_info  },
+  { USCRNFormat::Heat,      uscrn_heat_info      },
+  { USCRNFormat::Drought,   uscrn_drought_info   }
 };
 
 // List of bad data input values found in USCRN data
