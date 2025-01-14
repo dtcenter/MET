@@ -8,11 +8,11 @@ MET_PROJ_DIR=/d1/projects/MET
 source /nrit/ral/intel/setvars.sh
 
 # Set the values for the compilers
-export FC=ifx
-export F77=ifx
-export F90=ifx
-export CC=icx
-export CXX=icpx
+export FC=/nrit/ral/intel-oneAPI/compiler/2023.2.0/linux/bin/ifx
+export F77=/nrit/ral/intel-oneAPI/compiler/2023.2.0/linux/bin/ifx
+export F90=/nrit/ral/intel-oneAPI/compiler/2023.2.0/linux/bin/ifx
+export CC=/nrit/ral/intel-oneAPI/compiler/2023.2.0/linux/bin/icx
+export CXX=/nrit/ral/intel-oneAPI/compiler/2023.2.0/linux/bin/icpx
 
 # Variables required to build MET
 export MET_DEVELOPMENT=true
