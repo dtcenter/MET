@@ -255,7 +255,7 @@ void StringArray::add(const std::string text)
 
 {
 
-s.push_back(text);
+s.emplace_back(text);
 
 Sorted = false;
 
@@ -277,7 +277,7 @@ void StringArray::add_uniq(const std::string text)
 
 if(!has(text)) {
 
-   s.push_back(text);
+   s.emplace_back(text);
 
    Sorted = false;
 
@@ -323,7 +323,7 @@ for(int i=0; i<a.n(); i++) {
 
    if(!has(a[i])) {
 
-      s.push_back(a[i]);
+      s.emplace_back(a[i]);
 
       Sorted = false;
 
@@ -378,7 +378,7 @@ void StringArray::set(const std::string text)
 
 s.clear();
 
-s.push_back(text);
+s.emplace_back(text);
 
 // Setting to a single value, by nature it is Sorted
 Sorted = true;
@@ -625,12 +625,12 @@ void StringArray::parse_delim(const std::string text, const char *delim)
   size_t end = str.find_first_of(delim);
   while (end != string::npos) {
       if (start != end)
-          s.push_back(str.substr(start, end-start).c_str());
+          s.emplace_back(str.substr(start, end-start).c_str());
       start = end + 1;
       end = str.find_first_of(delim, start);
   }
   if (start < str.length())
-      s.push_back(str.substr(start).c_str());
+      s.emplace_back(str.substr(start).c_str());
 
   Sorted = false;
 

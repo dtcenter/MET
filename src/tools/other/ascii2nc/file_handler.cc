@@ -319,7 +319,7 @@ bool FileHandler::_addObservations(const Observation &obs)
    }      
 
    // Save obs because the obs vector is sorted after time summary
-   _observations.push_back(obs);
+   _observations.emplace_back(obs);
    if (do_summary) summary_obs.addObservationObj(obs);
    else {
       ConcatString var_name  = obs.getVarName();

@@ -131,10 +131,10 @@ int MultivarFrontEnd::run(const StringArray & Argv)
             SimpleObjects OO;
             _create_simple_objects(ModeDataType::MvMode_Fcst, "forecast", ir, it, n_fcst_files,
                                    fcst_filenames, fcstInput, f_calc, OF);
-            fcstSimple.push_back(OF);
+            fcstSimple.emplace_back(OF);
             _create_simple_objects(ModeDataType::MvMode_Obs, "obs", ir, it, n_obs_files,
                                    obs_filenames, obsInput, o_calc, OO);
-            obsSimple.push_back(OO);
+            obsSimple.emplace_back(OO);
          }
       }
    }
@@ -144,10 +144,10 @@ int MultivarFrontEnd::run(const StringArray & Argv)
          SimpleObjects OO;
          _create_simple_objects(ModeDataType::MvMode_Fcst, "forecast", ir, ir, n_fcst_files,
                                 fcst_filenames, fcstInput, f_calc, OF);
-         fcstSimple.push_back(OF);
+         fcstSimple.emplace_back(OF);
          _create_simple_objects(ModeDataType::MvMode_Obs, "obs", ir, ir, n_obs_files,
                                 obs_filenames, obsInput, o_calc, OO);
-         obsSimple.push_back(OO);
+         obsSimple.emplace_back(OO);
       }
    }
 
@@ -488,11 +488,11 @@ void MultivarFrontEnd::_read_input(const string &name, int index, ModeDataType t
    if (type == ModeDataType::MvMode_Fcst) {
       config.process_config_field(ft, other_t, type, index);
       f->data_plane(*(config.Fcst->var_info), dp);
-      fcstInput.push_back(ModeInputData(name, dp, g));
+      fcstInput.emplace_back(ModeInputData(name, dp, g));
    } else {
       config.process_config_field(other_t, ft, type, index);
       f->data_plane(*(config.Obs->var_info), dp);
-      obsInput.push_back(ModeInputData(name, dp, g));
+      obsInput.emplace_back(ModeInputData(name, dp, g));
    }         
       
    delete f;
@@ -527,7 +527,7 @@ void MultivarFrontEnd::_create_simple_objects(ModeDataType dtype, const std::str
       MultiVarData *mvdi = _create_simple_multivar_data(dtype, rIndex, tIndex, j, n_files, 
                                                         filenames[j], input[j]);
       mvdi->print();
-      O._mvd.push_back(mvdi);
+      O._mvd.emplace_back(mvdi);
    }
    O.setSuper(dtype == ModeDataType::MvMode_Fcst, n_files, do_clusters, calc);
 }

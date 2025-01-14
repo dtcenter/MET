@@ -216,7 +216,7 @@ int met_main(int argc, char *argv[]) {
    // Store the input ASCII file name and the output NetCDF file name
    //
    for (int i = 0; i < cline.n() - 1; ++i)
-     asfile_list.push_back((string)cline[i]);
+     asfile_list.emplace_back((string)cline[i]);
    ncfile = cline[cline.n() - 1];
 
    //

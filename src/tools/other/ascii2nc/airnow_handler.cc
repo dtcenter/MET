@@ -990,7 +990,7 @@ vector<string> parseHourlyAqobsLine(const string &asciiLine, bool &ok)
       break;
     } else {
       string token = remainder.substr(0, i1);
-      tokens.push_back(token);
+      tokens.emplace_back(token);
       remainder = remainder.substr(i1+1);
     }
   }

@@ -248,9 +248,9 @@ void PairDataGenesis::add_fcst_gen(const GenesisInfo *fgi) {
    BestStormId.add(na_str);
    InitTime.add(fgi->init());
    LeadTime.add(fgi->genesis_lead());
-   FcstGen.push_back(fgi);
-   BestGen.push_back((GenesisInfo *) 0);
-   GenDiff.push_back(diff);
+   FcstGen.emplace_back(fgi);
+   BestGen.emplace_back((GenesisInfo *) 0);
+   GenDiff.emplace_back(diff);
 
    return;
 }
@@ -296,9 +296,9 @@ void PairDataGenesis::add_best_gen(const GenesisInfo *bgi,
          BestStormId.add(bgi->storm_id());
          InitTime.add(init_ut);
          LeadTime.add(bgi->genesis_time() - init_ut);
-         FcstGen.push_back((GenesisInfo *) 0);
-         BestGen.push_back(bgi);
-         GenDiff.push_back(diff);
+         FcstGen.emplace_back((GenesisInfo *) 0);
+         BestGen.emplace_back(bgi);
+         GenDiff.emplace_back(diff);
       }
    }
 
@@ -326,9 +326,9 @@ void PairDataGenesis::add_gen_pair(const GenesisInfo *fgi,
       BestStormId.add(bgi->storm_id());
       InitTime.add(fgi->init());
       LeadTime.add(fgi->genesis_lead());
-      FcstGen.push_back(fgi);
-      BestGen.push_back(bgi);
-      GenDiff.push_back(diff);
+      FcstGen.emplace_back(fgi);
+      BestGen.emplace_back(bgi);
+      GenDiff.emplace_back(diff);
    }
    
    return;

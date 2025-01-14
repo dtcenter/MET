@@ -98,12 +98,12 @@ bool AirnowLocations::initialize(const string &fileName)
     vector<string>::const_iterator it;
     it = find(monitoringSiteFullAqsid.begin(), monitoringSiteFullAqsid.end(), fullaqsid);
     if (it == monitoringSiteFullAqsid.end()) {
-      monitoringSiteAqsid.push_back(aqsid);
-      monitoringSiteFullAqsid.push_back(fullaqsid);
-      monitoringSiteStationId.push_back(stationid);
-      monitoringSiteLat.push_back(lat);
-      monitoringSiteLon.push_back(lon);
-      monitoringSiteElev.push_back(elev);
+      monitoringSiteAqsid.emplace_back(aqsid);
+      monitoringSiteFullAqsid.emplace_back(fullaqsid);
+      monitoringSiteStationId.emplace_back(stationid);
+      monitoringSiteLat.emplace_back(lat);
+      monitoringSiteLon.emplace_back(lon);
+      monitoringSiteElev.emplace_back(elev);
     } else {
       int index = (int)(it - monitoringSiteFullAqsid.begin());
       string aqsid2 = monitoringSiteAqsid[index];

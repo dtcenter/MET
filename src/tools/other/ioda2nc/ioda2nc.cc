@@ -670,8 +670,8 @@ void process_ioda_file(int i_pb) {
            << "processing \"" << raw_var_names[idx] << "\" variable!\n";
       obs_var = get_var(f_in, raw_var_names[idx].c_str(), obs_group_name);
       if (IS_INVALID_NC(obs_var)) obs_var = get_var(f_in, raw_var_names[idx].c_str(), derived_obs_group_name);
-      v_qc_data.push_back(qc_data);
-      v_obs_data.push_back(obs_data);
+      v_qc_data.emplace_back(qc_data);
+      v_obs_data.emplace_back(obs_data);
       unit_attr.clear();
       desc_attr.clear();
       if(IS_VALID_NC(obs_var)) {
@@ -1129,7 +1129,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
                                  obs_arr[2], obs_arr[3], obs_arr[4],
                                  (0<out_name.length() ? out_name : var_name));
    obs.setHeaderIndex(obs_arr[0]);
-   observations.push_back(obs);
+   observations.emplace_back(obs);
    if(do_summary) summary_obs->addObservationObj(obs);
    return;
 }

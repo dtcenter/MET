@@ -1317,7 +1317,7 @@ void Simple_Node::get_simple_nodes(vector<Simple_Node> &v) const
 
 {
 
-v.push_back(*this);
+v.emplace_back(*this);
 
 return;
 

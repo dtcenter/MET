@@ -320,7 +320,7 @@ bool MetNcFile::readFile(const int desired_grib_code,
 
       SDObservation obs(hdr_vld_buffer, obs_arr[4]);
 
-      observations.push_back(obs);
+      observations.emplace_back(obs);
     } // end for i
   }
   // Cleanup

@@ -199,7 +199,7 @@ void process_command_line(int argc, char **argv) {
       data_mtddf = get_mtddf(data_files[i], i);
 
       // Store the input data file types
-      file_types.push_back(data_mtddf->file_type());
+      file_types.emplace_back(data_mtddf->file_type());
 
       // Store the grid
       data_grid = data_mtddf->grid();
@@ -412,8 +412,8 @@ void setup_histograms(void) {
       VarInfo *data_info = conf_info.data_info[i_var];
 
       // Initialize variable min and max values
-      var_mins.push_back(bad_data_double);
-      var_maxs.push_back(bad_data_double);
+      var_mins.emplace_back(bad_data_double);
+      var_maxs.emplace_back(bad_data_double);
 
       // Find bin ranges
       NumArray range = data_info->range();
@@ -430,9 +430,9 @@ void setup_histograms(void) {
       bin_max.clear();
       bin_mid.clear();
       for(int k=0; k<n_bins; k++) {
-         bin_min.push_back(min + delta * k);
-         bin_max.push_back(min + delta * (k + 1));
-         bin_mid.push_back(min + delta * (k + 0.5));
+         bin_min.emplace_back(min + delta * k);
+         bin_max.emplace_back(min + delta * (k + 1));
+         bin_mid.emplace_back(min + delta * (k + 0.5));
       }
 
       bin_mins[i_var_str] = bin_min;
@@ -550,7 +550,7 @@ void setup_nc_file(void) {
       // Define histogram dimensions
       NcDim var_dim = add_dim(nc_out, var_name,
                               (long) data_info->n_bins());
-      data_var_dims.push_back(var_dim);
+      data_var_dims.emplace_back(var_dim);
       
       // Define histogram bins
       ConcatString var_min_name = var_name;
@@ -607,7 +607,7 @@ void setup_nc_file(void) {
       NcDim var_dim = data_var_dims[i_var];
       NcVar hist_var = add_var(nc_out, hist_name, ncInt64, var_dim,
                                deflate_level);
-      hist_vars.push_back(hist_var);
+      hist_vars.emplace_back(hist_var);
 
       // Add variable attributes
       cs << cs_erase << "Histogram of " << var_name << " values";
@@ -651,12 +651,12 @@ void setup_nc_file(void) {
          NcDim joint_dim = data_var_dims[j_var];
          vector<NcDim> dims;
          dims.clear();
-         dims.push_back(var_dim);
-         dims.push_back(joint_dim);
+         dims.emplace_back(var_dim);
+         dims.emplace_back(joint_dim);
 
          NcVar hist_var = add_var(nc_out, hist_name, ncInt64, dims,
                                   deflate_level);
-         joint_hist_vars.push_back(hist_var);
+         joint_hist_vars.emplace_back(hist_var);
 
          // Add variable attributes
          cs << cs_erase
@@ -732,10 +732,10 @@ void write_joint_histograms(void) {
 
          offsets.clear();
          counts.clear();
-         offsets.push_back(0);
-         offsets.push_back(0);
-         counts.push_back(data_info->n_bins());
-         counts.push_back(joint_info->n_bins());
+         offsets.emplace_back(0);
+         offsets.emplace_back(0);
+         counts.emplace_back(data_info->n_bins());
+         counts.emplace_back(joint_info->n_bins());
 
          NcVar hist_var = joint_hist_vars[i_hist];
          hist_var.putVar(offsets, counts, hist);
@@ -850,7 +850,7 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_data_files(const StringArray & a) {
-   data_files.push_back(a);
+   data_files.emplace_back(a);
    if(data_files.size() > 0) multiple_data_sources = true;
 }
 

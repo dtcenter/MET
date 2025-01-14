@@ -348,7 +348,7 @@ size_t len, tpos = std::string::npos;
 
 if (0 == Line.find_first_not_of(Delimiter)) { // no leading delimiter
     ++count;
-    Items.push_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
+    Items.emplace_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
 }
 while ((tpos = Line.substr(pos).find_first_of(Delimiter)) != std::string::npos)  {
     len = Line.substr(pos+tpos).find_first_not_of(Delimiter);
@@ -357,7 +357,7 @@ while ((tpos = Line.substr(pos).find_first_of(Delimiter)) != std::string::npos) 
     pos += tpos + len;
     
     ++count;
-    Items.push_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
+    Items.emplace_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
 }
 
 N_items = count;
@@ -408,7 +408,7 @@ sregex_token_iterator end;
    //
 
 while (it != end) {
-   Items.push_back(*it);
+   Items.emplace_back(*it);
    ++it;
 }
 
@@ -416,7 +416,7 @@ while (it != end) {
    // Append empty item if string ends with a delimiter
    //
 
-if ( Delimiter.find(Line.back()) != string::npos )  Items.push_back(""); 
+if ( Delimiter.find(Line.back()) != string::npos )  Items.emplace_back(""); 
 
 N_items = Items.size();
 
@@ -504,7 +504,7 @@ for( i=0; i<n_wdth; i++ )  {
      }
    }
    
-   Items.push_back(Line.substr(start, pos-start));
+   Items.emplace_back(Line.substr(start, pos-start));
 
    //
    //  null terminate the entry

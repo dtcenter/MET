@@ -834,7 +834,7 @@ void TrackInfoArray::assign(const TrackInfoArray &t) {
 
    clear();
 
-   for(i=0; i<t.n(); i++) Track.push_back(t[i]);
+   for(i=0; i<t.n(); i++) Track.emplace_back(t[i]);
 
    return;
 }
@@ -857,7 +857,7 @@ const TrackInfo & TrackInfoArray::operator[](int n) const {
 
 void TrackInfoArray::add(const TrackInfo &t) {
 
-   Track.push_back(t);
+   Track.emplace_back(t);
 
    return;
 }
@@ -909,7 +909,7 @@ bool TrackInfoArray::add(const ATCFTrackLine &l, bool check_dup, bool check_anly
    if(!found) {
       TrackInfo t;
       t.add(l, check_dup, check_anly);
-      Track.push_back(t);
+      Track.emplace_back(t);
       status = true;
    }
 

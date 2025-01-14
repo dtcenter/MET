@@ -301,7 +301,7 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
               }
            }
 
-           summaries.push_back(
+           summaries.emplace_back(
                  Observation(
                        getSummaryHeaderType(curr_values->first.getHeaderType(),
                                             calc->getType(),
@@ -371,25 +371,25 @@ vector< SummaryCalc* > SummaryObs::getSummaryCalculators(const TimeSummaryInfo &
       // Create the calculator specified
 
       if (type == "mean") {
-        calculators.push_back(new SummaryCalcMean);
+        calculators.emplace_back(new SummaryCalcMean);
       }
       else if (type == "stdev") {
-        calculators.push_back(new SummaryCalcStdev);
+        calculators.emplace_back(new SummaryCalcStdev);
       }
       else if (type == "min") {
-        calculators.push_back(new SummaryCalcMin);
+        calculators.emplace_back(new SummaryCalcMin);
       }
       else if (type == "max") {
-        calculators.push_back(new SummaryCalcMax);
+        calculators.emplace_back(new SummaryCalcMax);
       }
       else if (type == "range") {
-        calculators.push_back(new SummaryCalcRange);
+        calculators.emplace_back(new SummaryCalcRange);
       }
       else if (type == "median") {
-        calculators.push_back(new SummaryCalcMedian);
+        calculators.emplace_back(new SummaryCalcMedian);
       }
       else if (type == "sum") {
-        calculators.push_back(new SummaryCalcSum);
+        calculators.emplace_back(new SummaryCalcSum);
 
         // Check for vld_thresh = 1.0
         if (!is_eq(info.vld_thresh, 1.0)) {
@@ -400,7 +400,7 @@ vector< SummaryCalc* > SummaryObs::getSummaryCalculators(const TimeSummaryInfo &
         }
       }
       else if (type[0] == 'p') {
-        calculators.push_back(new SummaryCalcPercentile(type));
+        calculators.emplace_back(new SummaryCalcPercentile(type));
       }
    }
 
@@ -446,7 +446,7 @@ vector< TimeSummaryInterval > SummaryObs::getTimeIntervals(
       {
          // See if the current time is within the defined time intervals
          if (isInTimeInterval(interval_time, info.beg, info.end)) {
-           time_intervals.push_back(TimeSummaryInterval(interval_time, info.width_beg, info.width_end));
+           time_intervals.emplace_back(TimeSummaryInterval(interval_time, info.width_beg, info.width_end));
          }
 
          // Increment the current time
@@ -516,7 +516,7 @@ bool SummaryObs::addObservationObj(const Observation &obs)
    bool result = false;
 
    // Do not filter by grib_code or obs_var here
-   observations.push_back(obs);
+   observations.emplace_back(obs);
 
    const ConcatString var_name  = obs.getVarName();
    const ConcatString var_units = obs.getVarUnits();

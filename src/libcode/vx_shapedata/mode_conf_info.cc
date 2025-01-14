@@ -704,7 +704,7 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
             exit ( 1 );
          }
          // deal with this later
-         indices_with_both.push_back(j);
+         indices_with_both.emplace_back(j);
          break;
       case perc_thresh_freq_bias:
          // currently expect matching index in obs and fcst, so check to make sure not both
@@ -714,8 +714,8 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
                  << " out of range of obs " << N_fields_o + 1 << "\n\n";
             exit ( 1 );
          }
-         fcst_freq.push_back(j);
-         indices_with_both.push_back(j);
+         fcst_freq.emplace_back(j);
+         indices_with_both.emplace_back(j);
          break;
       default:
          break;
@@ -742,7 +742,7 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
          }
          // deal with this later
          if (find(indices_with_both.begin(), indices_with_both.end(), j) == indices_with_both.end()) {
-            indices_with_both.push_back(j);
+            indices_with_both.emplace_back(j);
          }
          break;
       case perc_thresh_freq_bias:
@@ -754,9 +754,9 @@ void ModeConfInfo::config_set_all_percentile_thresholds(const std::vector<ModeIn
             exit ( 1 );
          }
          // deal with this later
-         obs_freq.push_back(j);
+         obs_freq.emplace_back(j);
          if (find(indices_with_both.begin(), indices_with_both.end(), j) == indices_with_both.end()) {
-            indices_with_both.push_back(j);
+            indices_with_both.emplace_back(j);
          }
          break;
       default:

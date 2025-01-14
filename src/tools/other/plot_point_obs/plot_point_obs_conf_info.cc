@@ -308,7 +308,7 @@ bool PlotPointObsOpt::add(const Observation &obs) {
 
    // Update the set of locations
    n_obs++;
-   if(!has(cur_loc)) locations.push_back(cur_loc);
+   if(!has(cur_loc)) locations.emplace_back(cur_loc);
 
    return true;
 }
@@ -525,7 +525,7 @@ void PlotPointObsConfInfo::process_config(
    // Parse each array entry
    for(i=0; i<dict->n_entries(); i++) {
       opt.process_config(*((*dict)[i]->dict_value()));
-      point_opts.push_back(opt);
+      point_opts.emplace_back(opt);
 
       // Check for a colorbar
       if(opt.fill_plot_info.flag && opt.fill_plot_info.colorbar_flag) {

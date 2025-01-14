@@ -599,7 +599,7 @@ bool UGridFile::find_nc_vinfo_list(const char *var_name,
 {
   vinfo_list.clear();
   for (int i = 0; i < Nvars; i++) {
-    if (Var[i].name.startswith(var_name)) vinfo_list.push_back(&Var[i]);
+    if (Var[i].name.startswith(var_name)) vinfo_list.emplace_back(&Var[i]);
   }
   return vinfo_list.size() > 0;
 }

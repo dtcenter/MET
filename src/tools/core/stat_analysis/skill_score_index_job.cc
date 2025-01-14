@@ -131,21 +131,21 @@ void SSIndexJobInfo::add_term(const STATAnalysisJob &fcst_term,
    n_term++;
 
    // Add the jobs
-   fcst_job.push_back(fcst_term);
-   ref_job.push_back(ref_term);
+   fcst_job.emplace_back(fcst_term);
+   ref_job.emplace_back(ref_term);
 
    // Add the input line type for each job
-   job_lt.push_back(string_to_statlinetype(fcst_term.line_type[0].c_str()));
+   job_lt.emplace_back(string_to_statlinetype(fcst_term.line_type[0].c_str()));
 
    // Add partial sums
    SL1L2Info sl1l2_info;
-   fcst_sl1l2.push_back(sl1l2_info);
-   ref_sl1l2.push_back(sl1l2_info);
+   fcst_sl1l2.emplace_back(sl1l2_info);
+   ref_sl1l2.emplace_back(sl1l2_info);
 
    // Add contingency tables
    CTSInfo cts_info;
-   fcst_cts.push_back(cts_info);
-   ref_cts.push_back(cts_info);
+   fcst_cts.emplace_back(cts_info);
+   ref_cts.emplace_back(cts_info);
 
    // Add line counters
    n_fcst_lines.add(0);
