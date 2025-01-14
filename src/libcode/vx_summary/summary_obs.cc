@@ -140,9 +140,9 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
    int summaryCount = 0;
    int summaryKeyCount = 0;
    // Save the summary information
-   const char *var_name = 0;
-   const char *var_units = 0;
-   const char *var_desc = 0;
+   const char *var_name = nullptr;
+   const char *var_units = nullptr;
+   const char *var_desc = nullptr;
 
    //_dataSummarized = true;
    TimeSummaryInfo inputSummaryInfo = summary_info;

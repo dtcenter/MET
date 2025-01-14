@@ -32,7 +32,7 @@ using namespace std;
 //   - Contains 15 columns defined by:
 //     https://www.ncei.noaa.gov/pub/data/uscrn/products/monthly01/readme.txt
 //
-USCRNFormatInfo uscrn_monthly_info = {
+static const USCRNFormatInfo uscrn_monthly_info = {
   "USCRN-Monthly", "CRNM0102", ".txt", 15, 0, 1, -1, 3, 4,
   {
     {  5, "T_MONTHLY_MAX", "Celsius",
@@ -62,7 +62,7 @@ USCRNFormatInfo uscrn_monthly_info = {
 //   - Contains 28 columns defined by:
 //     https://www.ncei.noaa.gov/pub/data/uscrn/products/daily01/readme.txt
 //
-USCRNFormatInfo uscrn_daily_info = {
+static const USCRNFormatInfo uscrn_daily_info = {
   "USCRN-Daily", "CRND0103", ".txt", 28, 0, 1, -1, 3, 4,
   {
     {  5, "T_DAILY_MAX", "Celsius",
@@ -118,7 +118,7 @@ USCRNFormatInfo uscrn_daily_info = {
 //   - Contains 38 columns defined by:
 //     https://www.ncei.noaa.gov/pub/data/uscrn/products/hourly02/readme.txt
 //
-USCRNFormatInfo uscrn_hourly_info = {
+static const USCRNFormatInfo uscrn_hourly_info = {
   "USCRN-Hourly", "CRNH0203", ".txt", 38, 0, 1, 2, 6, 7,
   {
     {  8, "T_CALC", "Celsius",
@@ -174,7 +174,7 @@ USCRNFormatInfo uscrn_hourly_info = {
 //   - Contains 23 columns defined by:
 //     https://www.ncei.noaa.gov/pub/data/uscrn/products/subhourly01/readme.txt
 //
-USCRNFormatInfo uscrn_subhourly_info = {
+static const USCRNFormatInfo uscrn_subhourly_info = {
   "USCRN-SubHourly", "CRNS0101", ".txt", 23, 0, 1, 2, 6, 7,
   {
     {  8, "AIR_TEMPERATURE", "Celsius",
@@ -206,7 +206,7 @@ USCRNFormatInfo uscrn_subhourly_info = {
 // Note that "soil/soilclim01" files named "CRNSMC0101-{Location}.csv"
 // are not supported directly here.
 //
-USCRNFormatInfo uscrn_soilanom_info = {
+static const USCRNFormatInfo uscrn_soilanom_info = {
   "USCRN-SoilAnom", "CRNSSM0101", ".csv", 30, 0, 1, -1, 2, 3,
   {
     {  4, "SMVWC_5_CM", "m^3/m^3",
@@ -256,7 +256,7 @@ USCRNFormatInfo uscrn_soilanom_info = {
 //   - Contains 16 NAMED columns described by:
 //     https://www.ncei.noaa.gov/pub/data/uscrn/products/heat01/readme.txt
 //
-USCRNFormatInfo uscrn_heat_info = {
+static const USCRNFormatInfo uscrn_heat_info = {
   "USCRN-Heat", "CRNHE0101", ".csv", 16, 0, 1, -1, 2, 3,
   {
     {  4, "RELATIVE_HUMIDITY", "%",
@@ -292,7 +292,7 @@ USCRNFormatInfo uscrn_heat_info = {
 //   - Contains 32 NAMED columns described by:
 //     https://www.ncei.noaa.gov/pub/data/uscrn/products/drought01/readme.txt
 //
-USCRNFormatInfo uscrn_drought_info = {
+static const USCRNFormatInfo uscrn_drought_info = {
   "USCRN-Drought", "CRNDI0101", ".csv", 32, 0, 1, -1, 2, 3,
   {
     {  4, "SMVWC_5_CM_MEAN", "m^3/m^3",
@@ -329,7 +329,7 @@ USCRNFormatInfo uscrn_drought_info = {
 //
 // Mapping of USCRN format variants to metadata. 
 //
-std::map<USCRNFormat,USCRNFormatInfo> USCRNFormatMap = {
+static const std::map<USCRNFormat,USCRNFormatInfo> USCRNFormatMap = {
   { USCRNFormat::Monthly,   uscrn_monthly_info   },
   { USCRNFormat::Daily,     uscrn_daily_info     },
   { USCRNFormat::Hourly,    uscrn_hourly_info    },
@@ -356,10 +356,6 @@ UscrnHandler::UscrnHandler(const string &program_name) :
 
 ////////////////////////////////////////////////////////////////////////
 
-UscrnHandler::~UscrnHandler() { }
-
-////////////////////////////////////////////////////////////////////////
-
 bool UscrnHandler::isFileType(LineDataFile &ascii_file) const {
    return _getFileFormat(ascii_file) != USCRNFormat::None;
 }
@@ -374,7 +370,7 @@ USCRNFormat UscrnHandler::_getFileFormat(const LineDataFile &ascii_file) const {
    // USCRN files are identified by their prefix and suffix.
 
    // Loop over supported USCRN formats
-   for(auto &x : USCRNFormatMap) {
+   for(const auto &x : USCRNFormatMap) {
 
       // Check for expected prefix and suffix
       if(check_prefix_suffix(ascii_file.short_filename(),
@@ -422,10 +418,10 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
    while(ascii_file >> dl) {
 
       // Check the expected number of columns
-      if(dl.n_items() != USCRNFormatMap[_format]._nCols) {
+      if(dl.n_items() != USCRNFormatMap.at(_format)._nCols) {
          mlog << Error << "\nUscrnHandler::_readObservations() -> "
               << "unexpected number of columns ("
-              << dl.n_items() << " != " << USCRNFormatMap[_format]._nCols
+              << dl.n_items() << " != " << USCRNFormatMap.at(_format)._nCols
               << ") on line number " << dl.line_number()
               << " of USCRN file \"" << ascii_file.filename()
               << "\"!\n\n";
@@ -433,19 +429,19 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
       }
 
       // Store the header information
-      _stationId  = dl[USCRNFormatMap[_format]._sidOffset];
-      _stationLon = atof(dl[USCRNFormatMap[_format]._lonOffset]);
-      _stationLat = atof(dl[USCRNFormatMap[_format]._latOffset]);
+      _stationId  = dl[USCRNFormatMap.at(_format)._sidOffset];
+      _stationLon = atof(dl[USCRNFormatMap.at(_format)._lonOffset]);
+      _stationLat = atof(dl[USCRNFormatMap.at(_format)._latOffset]);
 
       // Skip header lines where station ID begins with "WBAN"
       if(_stationId.substr(0,4) == "WBAN") continue;
 
       // Extract the valid time from the data line
-      time_t valid_time = _getValidTime(dl);
+      time_t valid_time = _getUscrnValidTime(dl);
       if(valid_time == 0) return false;
 
       // Process all observations from the line
-      for(auto &col : USCRNFormatMap[_format]._obsInfo) {
+      for(const auto &col : USCRNFormatMap.at(_format)._obsInfo) {
 
          // Get the observation
          string obs_str(dl[col._offset]);
@@ -463,7 +459,7 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
 
          // Store the observation
          _addObservations(Observation(
-            USCRNFormatMap[_format]._formatName,
+            USCRNFormatMap.at(_format)._formatName,
             _stationId, valid_time,
             _stationLat, _stationLon, bad_data_double,
             qc_str, -1, bad_data_double,
@@ -477,16 +473,16 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
 
 ////////////////////////////////////////////////////////////////////////
 
-time_t UscrnHandler::_getValidTime(const DataLine &dl) const {
+time_t UscrnHandler::_getUscrnValidTime(const DataLine &dl) const {
    struct tm time_struct;
    memset(&time_struct, 0, sizeof(time_struct));
 
    // Store date string (required)
-   string date_str(dl[USCRNFormatMap[_format]._ymdOffset]);
+   string date_str(dl[USCRNFormatMap.at(_format)._ymdOffset]);
 
    // Store time string (optional)
    string time_str;
-   int time_offset = USCRNFormatMap[_format]._hmOffset;
+   int time_offset = USCRNFormatMap.at(_format)._hmOffset;
    if(time_offset > 0) time_str = dl[time_offset];
    else                time_str = "0000";
 
@@ -505,7 +501,7 @@ time_t UscrnHandler::_getValidTime(const DataLine &dl) const {
       date_str = date_str.substr(0, 8);
    }
    else {
-      mlog << Error << "\nUscrnHandler::_getValidTime() -> "
+      mlog << Error << "\nUscrnHandler::_getUscrnValidTime() -> "
            << "unexpected date format (" << date_str
            << ") on line number " << dl.line_number() << "!\n\n";
       exit(1);

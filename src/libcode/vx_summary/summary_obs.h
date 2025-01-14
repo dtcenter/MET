@@ -53,9 +53,9 @@ public:
    time_t getValidTime(const std::string &time_string) const;
    TimeSummaryInfo getSummaryInfo();
    void setSummaryInfo(const TimeSummaryInfo &summary_info);
-   StringArray getObsNames();
-   StringArray getObsUnits();
-   StringArray getObsDescs();
+   StringArray getObsNames() const;
+   StringArray getObsUnits() const;
+   StringArray getObsDescs() const;
 
 protected:
 
@@ -258,9 +258,9 @@ public:
 
 inline std::vector< Observation > SummaryObs::getObservations() { return observations;        }
 inline std::vector< Observation > SummaryObs::getSummaries()    { return summaries;           }
-inline StringArray           SummaryObs::getObsNames()          { return obs_names;           }
-inline StringArray           SummaryObs::getObsUnits()          { return obs_units;           }
-inline StringArray           SummaryObs::getObsDescs()          { return obs_descs;           }
+inline StringArray           SummaryObs::getObsNames() const    { return obs_names;           }
+inline StringArray           SummaryObs::getObsUnits() const    { return obs_units;           }
+inline StringArray           SummaryObs::getObsDescs() const    { return obs_descs;           }
 inline void                  SummaryObs::setSummaryInfo(const TimeSummaryInfo &summary_info)
                                                                 { summaryInfo = summary_info; }
 inline TimeSummaryInfo       SummaryObs::getSummaryInfo()       { return summaryInfo;         }

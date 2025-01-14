@@ -66,40 +66,32 @@ struct USCRNFormatInfo {
 
 class UscrnHandler : public FileHandler {
 
-   public:
+   private:
 
-      UscrnHandler(const std::string &program_name);
-      virtual ~UscrnHandler();
-
-      virtual bool isFileType(LineDataFile &ascii_file) const;
-
-      static std::string getFormatString() { return "uscrn"; }
-
-   protected:
-
-      ///////////////////////
-      // Protected members
-      ///////////////////////
- 
       // Unchanging header information
       USCRNFormat _format;
       std::string _stationId;
       double _stationLat;
       double _stationLon;
 
-      ///////////////////////
-      // Protected methods
-      ///////////////////////
+   public:
+
+      explicit UscrnHandler(const std::string &program_name);
+      virtual ~UscrnHandler() final = default;
+
+      virtual bool isFileType(LineDataFile &ascii_file) const final;
+
+      static std::string getFormatString() { return "uscrn"; }
 
       // Determine the USCRN format from the file name 
       USCRNFormat _getFileFormat(const LineDataFile &ascii_file) const;
 
       // Get the valid time from the observation line
-      time_t _getValidTime(const DataLine &data_line) const;
+      time_t _getUscrnValidTime(const DataLine &data_line) const;
 
       // Read the observations and add them to the
       // _observations vector
-      virtual bool _readObservations(LineDataFile &ascii_file);
+      virtual bool _readObservations(LineDataFile &ascii_file) final;
 
 };
 

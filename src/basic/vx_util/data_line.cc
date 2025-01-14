@@ -418,7 +418,7 @@ while (it != end) {
 
 if ( Delimiter.find(Line.back()) != string::npos )  Items.emplace_back(""); 
 
-N_items = Items.size();
+N_items = (int) Items.size();
 
 LineNumber = ldf->last_line_number() + 1;
 

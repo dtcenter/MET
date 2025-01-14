@@ -387,7 +387,7 @@ void UnstructuredData::build_tree() {
       for (int i=0; i<n_face; i++) {
          llh_to_ecef(points_XYZ[i].y(), points_XYZ[i].x(),
                      points_XYZ[i].z(), &x_km, &y_km, &z_km);
-         points_XYZ_km.emplace_back({x_km, y_km, z_km});
+         points_XYZ_km.push_back({x_km, y_km, z_km});
          kdtree->insert(points_XYZ_km[i], n);
          n++;
          lat_checksum += (i+1) * y_km;
@@ -483,7 +483,7 @@ void UnstructuredData::set_points(int count, const double *_lon, const double *_
    n_face = count;
    points_lonlat.reserve(count);
    for (int i=0; i<count; i++) {
-      points_lonlat.emplace_back({_lon[i], _lat[i]});
+      points_lonlat.push_back({_lon[i], _lat[i]});
    }
    if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
         << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredData::set_points(int, double *, double *) first ("
@@ -505,7 +505,7 @@ void UnstructuredData::set_points(int count, const double *_lon, const double *_
    n_face = count;
    points_XYZ.reserve(count);
    for (int i=0; i<count; i++) {
-      points_XYZ.emplace_back({_lon[i], _lat[i], _alt[i]});
+      points_XYZ.push_back({_lon[i], _lat[i], _alt[i]});
    }
    if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
         << Debug(UGRID_DEBUG_LEVEL) << "UnstructuredData::set_points(int, double *lon, double *lat, double *alt) first ("
@@ -535,7 +535,7 @@ void UnstructuredData::set_points(int count, const std::vector<PointLonLat> &poi
    n_face = count;
    points_lonlat.reserve(count);
    for (int i=0; i<count; i++) {
-      points_lonlat.emplace_back({pointsLL[i].x(), pointsLL[i].y()});
+      points_lonlat.push_back({pointsLL[i].x(), pointsLL[i].y()});
    }
    if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) mlog
         << Debug(UGRID_DEBUG_LEVEL) << method_name << " first: ("
@@ -565,7 +565,7 @@ void UnstructuredData::set_points(int count, const std::vector<PointXYZ> &points
    n_face = count;
    points_XYZ.reserve(count);
    for (int i=0; i<count; i++) {
-      points_XYZ.emplace_back({pointsXYZ[i].x(), pointsXYZ[i].y(), pointsXYZ[i].z()});
+      points_XYZ.push_back({pointsXYZ[i].x(), pointsXYZ[i].y(), pointsXYZ[i].z()});
    }
    if(mlog.verbosity_level() >= UGRID_DEBUG_LEVEL) {
       int last_i = count - 1;

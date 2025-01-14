@@ -39,13 +39,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-NumArray::NumArray()
-
-{
-
-   init_from_scratch();
-
-}
+NumArray::NumArray() {}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -67,27 +61,7 @@ NumArray::NumArray(const NumArray & a)
 
 {
 
-   init_from_scratch();
-
    assign(a);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-NumArray::NumArray(const vector<double> & a)
-
-{
-
-   clear();
-
-   e = a;
-
-   Sorted = false;
-
-   return;
 
 }
 
@@ -129,20 +103,6 @@ bool NumArray::operator==(const NumArray & a) const
    }
 
    return status;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void NumArray::init_from_scratch()
-
-{
-
-   clear();
-
-   return;
 
 }
 
