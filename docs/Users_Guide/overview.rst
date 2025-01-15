@@ -73,18 +73,18 @@ The following sections of this MET User's Guide contain usage statements for eac
 Future Development Plans
 ========================
 
-MET is an evolving verification software package. New capabilities are planned in controlled, successive version releases. Bug fixes and user-identified problems will be addressed as they are found and posted to the known issues section of the `MET User Support web page <https://dtcenter.org/community-code/model-evaluation-tools-met/user-support>`_. Plans are also in place to incorporate many new capabilities and options in future releases of MET. Please refer to the issues listed in the `MET GitHub repository <https://github.com/dtcenter/MET/issues>`_ to see our development priorities for upcoming releases.
+MET is an evolving verification software package. New capabilities are provided in controlled, successive releases using sematic version numbering. Please refer to the issues listed in the `MET GitHub repository <https://github.com/dtcenter/MET/issues>`_ to see our development priorities for upcoming releases.
 
-Code Support
+Bugs and user-identified problems are documented as GitHub issues as they are found. Typically, bug fixes are provided in the next bugfix release for the current official realease as well as the next official release. Specific details about each bug can be found in the body and/or comments of the corresponding GitHub issue.
+
+User Support
 ============
 
-MET support is provided through the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_. We will endeavor to respond to requests for help in a timely fashion. In addition, information about MET and tools that can be used with MET are provided on the `MET web page <https://dtcenter.org/community-code/model-evaluation-tools-met>`_.
+MET is the statistical component of the larger METplus system for which user support is provided through the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_, as described in the `METplus User's Guide <https://metplus.readthedocs.io/en/latest/Users_Guide/overview.html#user-support>`_. Additional information about MET are provided on the `MET web page <https://dtcenter.org/community-code/model-evaluation-tools-met>`_.
 
-We welcome comments and suggestions for improvements to MET, especially information regarding errors. Comments may be submitted using the MET Feedback form available on the MET website. In addition, comments on this document would be greatly appreciated. While we cannot promise to incorporate all suggested changes, we will certainly take all suggestions into consideration.
+.. note::
 
-**-help** and **-version** command line options are available for all of the MET tools. Typing the name of the tool with no command line options also produces the usage statement.
-
-The MET package is a "living" set of tools. Our goal is to continually enhance it and add to its capabilities. Because our time, resources, and talents are limited, we welcome contributed code for future versions of MET. These contributions may represent new verification methodologies, new analysis tools, or new plotting functions. For more information on contributing code to MET, please create a post in the `METplus GitHub Discussions Forum <https://github.com/dtcenter/METplus/discussions>`_.
+  **-help** and **-version** command line options are available for all of the MET tools. Typing the name of the tool with no command line options also produces the usage statement.
 
 Fortify and SonarQube
 =====================
