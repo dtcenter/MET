@@ -100,7 +100,7 @@ Differences are computed in both of the horizontal grid directions and is not a 
 
 As described in :ref:`Ebert-Uphoff et al., 2024 <Ebert-Uphoff-2024>`, statistics based
 on the magnitude of the forecast and observed gradients are also provided. Similiar to
-the S1 score, the root-mean-squared error the magnitude of the gradients and their
+the S1 score, the root-mean-squared error of the magnitude of the gradients and their
 divergence quantify the similarity in the texture of the fields, with 0 being a perfect
 score. These gradient-based statistics assess the difference in smoothness between the
 two fields but not the accuracy of the forecast.
