@@ -168,11 +168,7 @@ public:
     return _varCode < other._varCode;
   }
 
-protected:
-
-  ///////////////////////
-  // Protected members //
-  ///////////////////////
+private:
 
   std::string _headerType;
   std::string _stationId;

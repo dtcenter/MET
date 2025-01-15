@@ -51,20 +51,15 @@ public:
    long countHeaders(std::vector< Observation > &obs_vector);
    long countSummaryHeaders();
    time_t getValidTime(const std::string &time_string) const;
-   TimeSummaryInfo getSummaryInfo();
+   TimeSummaryInfo getSummaryInfo() const;
    void setSummaryInfo(const TimeSummaryInfo &summary_info);
    StringArray getObsNames() const;
    StringArray getObsUnits() const;
    StringArray getObsDescs() const;
 
-protected:
+private:
 
   static const float FILL_VALUE;
-
-
-  ///////////////////////
-  // Protected members //
-  ///////////////////////
 
   bool dataSummarized;
   TimeSummaryInfo summaryInfo;
@@ -75,6 +70,8 @@ protected:
   StringArray obs_names;
   StringArray obs_units;
   StringArray obs_descs;
+
+protected:
 
   ///////////////////////
   // Protected methods //
@@ -263,7 +260,7 @@ inline StringArray           SummaryObs::getObsUnits() const    { return obs_uni
 inline StringArray           SummaryObs::getObsDescs() const    { return obs_descs;           }
 inline void                  SummaryObs::setSummaryInfo(const TimeSummaryInfo &summary_info)
                                                                 { summaryInfo = summary_info; }
-inline TimeSummaryInfo       SummaryObs::getSummaryInfo()       { return summaryInfo;         }
+inline TimeSummaryInfo       SummaryObs::getSummaryInfo() const { return summaryInfo;         }
 
 ////////////////////////////////////////////////////////////////////////
 

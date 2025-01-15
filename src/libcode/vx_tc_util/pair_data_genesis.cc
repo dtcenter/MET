@@ -241,15 +241,14 @@ void PairDataGenesis::add_fcst_gen(const GenesisInfo *fgi) {
 
    if(!fgi) return;
 
-   GenesisPairDiff diff;
-
    // Add the unmatched forecast
    NPair++;
    BestStormId.add(na_str);
    InitTime.add(fgi->init());
    LeadTime.add(fgi->genesis_lead());
    FcstGen.emplace_back(fgi);
-   BestGen.emplace_back((GenesisInfo *) 0);
+   BestGen.emplace_back(nullptr);
+   GenesisPairDiff diff;
    GenDiff.emplace_back(diff);
 
    return;
@@ -296,7 +295,7 @@ void PairDataGenesis::add_best_gen(const GenesisInfo *bgi,
          BestStormId.add(bgi->storm_id());
          InitTime.add(init_ut);
          LeadTime.add(bgi->genesis_time() - init_ut);
-         FcstGen.emplace_back((GenesisInfo *) 0);
+         FcstGen.emplace_back(nullptr);
          BestGen.emplace_back(bgi);
          GenDiff.emplace_back(diff);
       }
@@ -313,7 +312,6 @@ void PairDataGenesis::add_gen_pair(const GenesisInfo *fgi,
    if(!fgi || !bgi) return;
 
    int i_case;
-   GenesisPairDiff diff;
 
    // Update an existing case
    if(has_case(bgi->storm_id(), fgi->init(), i_case)) {
@@ -328,6 +326,7 @@ void PairDataGenesis::add_gen_pair(const GenesisInfo *fgi,
       LeadTime.add(fgi->genesis_lead());
       FcstGen.emplace_back(fgi);
       BestGen.emplace_back(bgi);
+      GenesisPairDiff diff;
       GenDiff.emplace_back(diff);
    }
    

@@ -39,7 +39,7 @@ class NumArray {
 
    public:
 
-      NumArray();
+      NumArray() = default;
      ~NumArray();
       NumArray(const NumArray &);
       explicit NumArray(const std::vector<double> &a) : e(a) {};

@@ -192,11 +192,10 @@ ConcatString TrackInfo::serialize() const {
 ConcatString TrackInfo::serialize_r(int n, int indent_depth) const {
    Indent prefix(indent_depth);
    ConcatString s;
-   int i;
 
    s << prefix << "[" << n << "] " << serialize() << ", Points:\n";
 
-   for(i=0; i<NPoints; i++)
+   for(int i=0; i<NPoints; i++)
       s << Point[i].serialize_r(i+1, indent_depth+1);
 
    return s;
@@ -206,7 +205,6 @@ ConcatString TrackInfo::serialize_r(int n, int indent_depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 void TrackInfo::assign(const TrackInfo &t) {
-   int i;
 
    clear();
 
@@ -238,7 +236,7 @@ void TrackInfo::assign(const TrackInfo &t) {
 
    extend(t.NPoints);
 
-   for(i=0; i<t.NPoints; i++) Point[i] = t.Point[i];
+   for(int i=0; i<t.NPoints; i++) Point[i] = t.Point[i];
 
    NPoints = t.NPoints;
 
@@ -522,13 +520,12 @@ bool TrackInfo::add(const ATCFTrackLine &l, bool check_dup, bool check_anly) {
 
 void TrackInfo::add_watch_warn(const ConcatString &ww_sid,
                                WatchWarnType ww_type, unixtime ww_ut) {
-   int i;
 
    // Check for a matching storm id
    if(storm_id() != ww_sid) return;
 
    // Loop over the TrackPoints
-   for(i=0; i<NPoints; i++) Point[i].set_watch_warn(ww_type, ww_ut);
+   for(int i=0; i<NPoints; i++) Point[i].set_watch_warn(ww_type, ww_ut);
 
    return;
 }
@@ -784,11 +781,10 @@ void TrackInfoArray::clear() {
 
 void TrackInfoArray::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
-   int i;
 
    out << prefix << "NTracks = " << Track.size() << "\n";
 
-   for(i=0; i<Track.size(); i++) {
+   for(int i=0; i<Track.size(); i++) {
       out << prefix << "TrackInfo[" << i+1 << "]:" << "\n";
       Track[i].dump(out, indent_depth+1);
    }
@@ -816,11 +812,10 @@ ConcatString TrackInfoArray::serialize() const {
 ConcatString TrackInfoArray::serialize_r(int indent_depth) const {
    Indent prefix(indent_depth);
    ConcatString s;
-   int i;
 
    s << prefix << serialize() << ", Tracks:\n";
 
-   for(i=0; i<Track.size(); i++)
+   for(int i=0; i<Track.size(); i++)
       s << Track[i].serialize_r(i+1, indent_depth+1) << "\n";
 
    return s;
@@ -830,11 +825,10 @@ ConcatString TrackInfoArray::serialize_r(int indent_depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 void TrackInfoArray::assign(const TrackInfoArray &t) {
-   int i;
 
    clear();
 
-   for(i=0; i<t.n(); i++) Track.emplace_back(t[i]);
+   for(int i=0; i<t.n(); i++) Track.emplace_back(t[i]);
 
    return;
 }
@@ -938,10 +932,9 @@ bool TrackInfoArray::has(const ATCFTrackLine &l) const {
 
 bool TrackInfoArray::erase_storm_id(const ConcatString &s) {
    bool status = false;
-   int i;
 
    // Erase all tracks with this storm id
-   for(i=0; i<Track.size(); i++) {
+   for(int i=0; i<Track.size(); i++) {
       if(Track[i].storm_id() == s) {
          Track.erase(Track.begin()+i);
          i--;

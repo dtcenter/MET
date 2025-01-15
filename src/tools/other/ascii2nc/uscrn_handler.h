@@ -77,9 +77,9 @@ class UscrnHandler : public FileHandler {
    public:
 
       explicit UscrnHandler(const std::string &program_name);
-      virtual ~UscrnHandler() final = default;
+      ~UscrnHandler() final = default;
 
-      virtual bool isFileType(LineDataFile &ascii_file) const final;
+      bool isFileType(LineDataFile &ascii_file) const final;
 
       static std::string getFormatString() { return "uscrn"; }
 
@@ -91,7 +91,7 @@ class UscrnHandler : public FileHandler {
 
       // Read the observations and add them to the
       // _observations vector
-      virtual bool _readObservations(LineDataFile &ascii_file) final;
+      bool _readObservations(LineDataFile &ascii_file) final;
 
 };
 

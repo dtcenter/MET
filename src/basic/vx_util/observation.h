@@ -208,11 +208,7 @@ public:
 
   }
 
-protected:
-
-  ///////////////////////
-  // Protected members //
-  ///////////////////////
+private:
 
   std::string _headerType;
   std::string _stationId;
@@ -230,6 +226,7 @@ protected:
   double      _height;
   double      _value;
 
+protected:
 
   ///////////////////////
   // Protected methods //

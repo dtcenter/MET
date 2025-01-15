@@ -51,7 +51,7 @@ class DataLine {
       friend std::ostream & operator<<(std::ostream &, const DataLine &);
       friend Logger & operator<<(Logger &, const DataLine &);
 
-   protected:
+   private:
 
       std::string Line;
       std::vector<std::string> Items;
