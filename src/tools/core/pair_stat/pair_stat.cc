@@ -229,14 +229,6 @@ void process_command_line(int argc, char **argv) {
         << pairsformat_to_string(pairs_format) << "\" format pairs file(s): "
         << write_css(pairs_files) << "\n";
 
-   // Set the model name
-   if(conf_info.model.empty()) {
-      shc.set_model(na_str);
-   }
-   else {
-      shc.set_model(conf_info.model.c_str());
-   }
-
    // Use the first verification task to set the random number generator
    // and seed value for bootstrap confidence intervals
    rng_set(rng_ptr,
@@ -525,62 +517,24 @@ void process_scores() {
 
       i_vx++;
 
-      // Store the description
-      if(vx.vx_pd.desc.empty()) {
-         shc.set_desc(na_str);
-      }
-      else {
-         shc.set_desc(vx.vx_pd.desc.c_str());
-      }
-
-      // Store the forecast variable name
-      shc.set_fcst_var(vx.vx_pd.fcst_info->name_attr());
-
-      // Store the forecast variable units
-      shc.set_fcst_units(vx.vx_pd.fcst_info->units_attr());
-
-      // Set the forecast level name
-      shc.set_fcst_lev(vx.vx_pd.fcst_info->level_attr().c_str());
-
-      // Store the observation variable name
-      shc.set_obs_var(vx.vx_pd.obs_info->name_attr());
-
-      // Store the observation variable units
-      cs = vx.vx_pd.obs_info->units_attr();
-      if(cs.empty()) cs = na_string;
-      shc.set_obs_units(cs);
-
-      // Set the observation level name
-      shc.set_obs_lev(vx.vx_pd.obs_info->level_attr().c_str());
-
-      // TODO: figure out the actual timing info!
-      // Set the forecast lead time
-      shc.set_fcst_lead_sec(0);
-
-      // TODO: figure out the actual timing info!
-      // Set the forecast valid time
-      shc.set_fcst_valid_beg(0);
-      shc.set_fcst_valid_end(0);
-
-      // Set the observation lead time
-      shc.set_obs_lead_sec(0);
-
-      // Set the observation valid time
-      shc.set_obs_valid_beg(vx.vx_pd.beg_ut);
-      shc.set_obs_valid_end(vx.vx_pd.end_ut);
-
-      // Store the message type in the obtype column
-      shc.set_obtype(na_str);
+      // Store masking region as the only "case" information
+      StringArray empty_sa;
+      StringArray case_cols;
+      case_cols.add("VX_MASK");
 
       // Loop through the verification masking regions
       for(int i_mask=0; i_mask<vx.get_n_mask(); i_mask++) {
 
-         // Store the verification masking region
-         shc.set_mask(vx.mask_name[i_mask].c_str());
+         // Retrieve the header based on the inputs
+         ConcatString cur_case(vx.mask_name[i_mask]);
+         StatHdrColumns in_shc = vx.vx_hdr[i_mask].get_shc(cur_case, case_cols,
+                                    empty_sa, empty_sa, STATLineType::mpr);
 
-         // Store the interpolation method as nearest
-         shc.set_interp_mthd(InterpMthd::Nearest);
-         shc.set_interp_wdth(1);
+         // Override header columns 
+         if(conf_info.model.nonempty()) in_shc.set_model(conf_info.model.c_str());
+         if(vx.vx_pd.desc.nonempty())   in_shc.set_desc(vx.vx_pd.desc.c_str());
+         in_shc.set_mask(vx.mask_name[i_mask].c_str());
+         shc = in_shc;
 
          PairDataPoint *pd_ptr = &vx.vx_pd.pd[i_mask];
 
@@ -589,30 +543,6 @@ void process_scores() {
               << " versus " << vx.vx_pd.obs_info->magic_str()
               << ", over region " << pd_ptr->mask_name
               << ", using " << pd_ptr->n_obs << " matched pairs.\n";
-
-         // List counts for reasons why observations were rejected
-         cs << cs_erase
-            << "Number of matched pairs   = " << pd_ptr->n_obs << "\n"
-            << "Observations processed    = " << vx.vx_pd.n_try << "\n"
-            << "Rejected: station id      = " << vx.vx_pd.rej_sid << "\n"
-            << "Rejected: obs var name    = " << vx.vx_pd.rej_var << "\n"
-            << "Rejected: valid time      = " << vx.vx_pd.rej_vld << "\n"
-            << "Rejected: bad obs value   = " << vx.vx_pd.rej_obs << "\n"
-            << "Rejected: off the grid    = " << vx.vx_pd.rej_grd << "\n"
-            << "Rejected: topography      = " << vx.vx_pd.rej_topo << "\n"
-            << "Rejected: level mismatch  = " << vx.vx_pd.rej_lvl << "\n"
-            << "Rejected: quality marker  = " << vx.vx_pd.rej_qty << "\n"
-            << "Rejected: message type    = " << vx.vx_pd.rej_typ[i_mask] << "\n"
-            << "Rejected: masking region  = " << vx.vx_pd.rej_mask[i_mask] << "\n"
-            << "Rejected: bad fcst value  = " << vx.vx_pd.rej_fcst[i_mask] << "\n"
-            << "Rejected: bad climo mean  = " << vx.vx_pd.rej_cmn[i_mask] << "\n"
-            << "Rejected: bad climo stdev = " << vx.vx_pd.rej_csd[i_mask] << "\n"
-            << "Rejected: mpr filter      = " << vx.vx_pd.rej_mpr[i_mask] << "\n"
-            << "Rejected: duplicates      = " << vx.vx_pd.rej_dup[i_mask] << "\n";
-
-         // Print report based on the number of matched pairs
-         if(pd_ptr->n_obs > 0) mlog << Debug(3) << cs;
-         else                  mlog << Debug(2) << cs;
 
          // Process percentile thresholds
          vx.set_perc_thresh(pd_ptr);
@@ -623,13 +553,7 @@ void process_scores() {
                vx.output_flag[i_mpr],
                stat_at, i_stat_row,
                txt_at[i_mpr], i_txt_row[i_mpr], false);
-
-            // Reset the obtype column
-            shc.set_obtype(na_str);
-
-            // Reset the observation valid time
-            shc.set_obs_valid_beg(vx.vx_pd.beg_ut);
-            shc.set_obs_valid_end(vx.vx_pd.end_ut);
+            shc = in_shc;
          }
 
          // Write out the SEEPS MPR lines
@@ -638,13 +562,7 @@ void process_scores() {
                vx.output_flag[i_seeps_mpr],
                stat_at, i_stat_row,
                txt_at[i_seeps_mpr], i_txt_row[i_seeps_mpr], false);
-
-            // Reset the obtype column
-            shc.set_obtype(na_str);
-
-            // Reset the observation valid time
-            shc.set_obs_valid_beg(vx.vx_pd.beg_ut);
-            shc.set_obs_valid_end(vx.vx_pd.end_ut);
+            shc = in_shc;
          }
 
          // Write out the SEEPS lines
@@ -654,6 +572,7 @@ void process_scores() {
                vx.output_flag[i_seeps],
                stat_at, i_stat_row,
                txt_at[i_seeps], i_txt_row[i_seeps]);
+            shc = in_shc;
          }
 
          // Compute CTS scores
@@ -681,6 +600,7 @@ void process_scores() {
                      vx.output_flag[i_fho],
                      stat_at, i_stat_row,
                      txt_at[i_fho], i_txt_row[i_fho]);
+                  shc = in_shc;
                }
 
                // Write out CTC
@@ -689,6 +609,7 @@ void process_scores() {
                      vx.output_flag[i_ctc],
                      stat_at, i_stat_row,
                      txt_at[i_ctc], i_txt_row[i_ctc]);
+                  shc = in_shc;
                }
 
                // Write out CTS
@@ -697,6 +618,7 @@ void process_scores() {
                      vx.output_flag[i_cts],
                      stat_at, i_stat_row,
                      txt_at[i_cts], i_txt_row[i_cts]);
+                  shc = in_shc;
                }
 
                // Write out ECLV
@@ -705,6 +627,7 @@ void process_scores() {
                      vx.output_flag[i_eclv],
                      stat_at, i_stat_row,
                      txt_at[i_eclv], i_txt_row[i_eclv]);
+                  shc = in_shc;
                }
             } // end for i_cat 
          } // end Compute CTS scores
@@ -729,6 +652,7 @@ void process_scores() {
                   vx.output_flag[i_mctc],
                   stat_at, i_stat_row,
                   txt_at[i_mctc], i_txt_row[i_mctc]);
+               shc = in_shc;
             }
 
             // Write out MCTS
@@ -737,6 +661,7 @@ void process_scores() {
                   vx.output_flag[i_mcts],
                   stat_at, i_stat_row,
                   txt_at[i_mcts], i_txt_row[i_mcts]);
+               shc = in_shc;
             }
          } // end Compute MCTS scores
 
@@ -806,20 +731,15 @@ void process_scores() {
 
                // Write out VCNT
                if(vx.output_flag[i_vcnt] != STATOutputType::None &&
-                   vl1l2_info[i_wind].vcount > 0) {
-                   write_vcnt_row(shc, vl1l2_info[i_wind],
-                      vx.output_flag[i_vcnt],
-                      stat_at, i_stat_row,
-                      txt_at[i_vcnt], i_txt_row[i_vcnt]);
-               }
-            } // end for i_wind
+                  vl1l2_info[i_wind].vcount > 0) {
+                  write_vcnt_row(shc, vl1l2_info[i_wind],
+                     vx.output_flag[i_vcnt],
+                     stat_at, i_stat_row,
+                     txt_at[i_vcnt], i_txt_row[i_vcnt]);
+              }
+           } // end for i_wind
 
-            // Reset the forecast variable name
-            shc.set_fcst_var(vx.vx_pd.fcst_info->name_attr());
-
-            // Reset the observation variable name
-            shc.set_obs_var(vx.vx_pd.obs_info->name_attr());
-
+           shc = in_shc;
         } // end Compute VL1L2 and VAL1L2
 
         // Compute PCT counts and scores
@@ -831,10 +751,6 @@ void process_scores() {
             vx.output_flag[i_eclv] != STATOutputType::None)) {
             do_pct(conf_info.vx_opt[i_vx], pd_ptr);
          }
-
-         // Reset the verification masking region
-         shc.set_mask(vx.mask_name[i_mask].c_str());
-
       } // end for i_mask
 
       mlog << Debug(2) << "\n" << sep_str << "\n\n";

@@ -124,6 +124,7 @@ class PairStatVxOpt {
       //////////////////////////////////////////////////////////////////
 
       VxPairDataPoint vx_pd;              // Matched pair data [n_mask]
+      std::vector<StatHdrInfo> vx_hdr;    // Track header inputs [n_mask]
 
       int             beg_ds;             // Begin observation time window offset
       int             end_ds;             // End observation time window offset
@@ -202,7 +203,6 @@ class PairStatVxOpt {
 ////////////////////////////////////////////////////////////////////////
 
 inline int PairStatVxOpt::get_n_mask()        const { return mask_name.n();        }
-
 inline int PairStatVxOpt::get_n_eclv_points() const { return eclv_points.n();      }
 inline int PairStatVxOpt::get_n_cdf_bin()     const { return cdf_info.n_bin;       }
 inline int PairStatVxOpt::get_n_ci_alpha()    const { return ci_alpha.n();         }

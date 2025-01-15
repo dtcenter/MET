@@ -429,7 +429,7 @@ void PairStatConfInfo::process_masks() {
 void PairStatConfInfo::set_vx_pd() {
 
    // This should be called after process_masks()
-   for(int i=0; i<n_vx; i++) vx_opt[i].set_vx_pd(this);
+   for(auto &vx : vx_opt) vx.set_vx_pd(this);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -438,7 +438,7 @@ int PairStatConfInfo::n_txt_row(int i_txt_row) const {
    int n = 0;
 
    // Loop over the tasks and sum the line counts for this line type
-   for(int i=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
+   for(auto &vx : vx_opt) n += vx.n_txt_row(i_txt_row);
 
    return n;
 }
@@ -459,7 +459,7 @@ int PairStatConfInfo::n_stat_row() const {
 int PairStatConfInfo::get_max_n_cat_thresh() const {
    int n = 0;
 
-   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cat_thresh());
+   for(auto &vx : vx_opt) n = max(n, vx.get_n_cat_thresh());
 
    return n;
 }
@@ -469,7 +469,7 @@ int PairStatConfInfo::get_max_n_cat_thresh() const {
 int PairStatConfInfo::get_max_n_cnt_thresh() const {
    int n = 0;
 
-   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_cnt_thresh());
+   for(auto &vx : vx_opt) n = max(n, vx.get_n_cnt_thresh());
 
    return n;
 }
@@ -479,7 +479,7 @@ int PairStatConfInfo::get_max_n_cnt_thresh() const {
 int PairStatConfInfo::get_max_n_wind_thresh() const {
    int n = 0;
 
-   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_wind_thresh());
+   for(auto &vx : vx_opt) n = max(n, vx.get_n_wind_thresh());
 
    return n;
 }
@@ -489,7 +489,7 @@ int PairStatConfInfo::get_max_n_wind_thresh() const {
 int PairStatConfInfo::get_max_n_fprob_thresh() const {
    int n = 0;
 
-   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_fprob_thresh());
+   for(auto &vx : vx_opt) n = max(n, vx.get_n_fprob_thresh());
 
    return n;
 }
@@ -499,7 +499,7 @@ int PairStatConfInfo::get_max_n_fprob_thresh() const {
 int PairStatConfInfo::get_max_n_oprob_thresh() const {
    int n = 0;
 
-   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_oprob_thresh());
+   for(auto &vx : vx_opt) n = max(n, vx.get_n_oprob_thresh());
 
    return n;
 }
@@ -509,7 +509,7 @@ int PairStatConfInfo::get_max_n_oprob_thresh() const {
 int PairStatConfInfo::get_max_n_eclv_points() const {
    int n = 0;
 
-   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
+   for(auto &vx : vx_opt) n = max(n, vx.get_n_eclv_points());
 
    return n;
 }
@@ -526,14 +526,14 @@ bool PairStatConfInfo::get_vflag() const {
    }
 
    // Vector components must be requested
-   for(int i=0; i<n_vx; i++) {
+   for(auto &vx : vx_opt) {
 
-      if(!vx_opt[i].vx_pd.fcst_info || !vx_opt[i].vx_pd.obs_info) continue;
+      if(!vx.vx_pd.fcst_info || !vx.vx_pd.obs_info) continue;
 
-      if((vx_opt[i].vx_pd.fcst_info->is_u_wind() &&
-          vx_opt[i].vx_pd.obs_info->is_u_wind()) ||
-         (vx_opt[i].vx_pd.fcst_info->is_v_wind() &&
-          vx_opt[i].vx_pd.obs_info->is_v_wind())) {
+      if((vx.vx_pd.fcst_info->is_u_wind() &&
+          vx.vx_pd.obs_info->is_u_wind()) ||
+         (vx.vx_pd.fcst_info->is_v_wind() &&
+          vx.vx_pd.obs_info->is_v_wind())) {
          vflag = true;
          break;
       }
@@ -585,10 +585,10 @@ void PairStatVxOpt::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void PairStatVxOpt::clear() {
-   int i;
 
    // Initialize values
    vx_pd.clear();
+   vx_hdr.clear();
 
    beg_ds = end_ds = bad_data_int;
 
@@ -625,7 +625,7 @@ void PairStatVxOpt::clear() {
    hss_ec_value = bad_data_double;
    rank_corr_flag = false;
 
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
+   for(int i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    return;
 }
@@ -658,13 +658,13 @@ bool PairStatVxOpt::is_uv_match(const PairStatVxOpt &v) const {
                           v.vx_pd.fcst_info->req_level_name()) ||
       !is_req_level_match(  vx_pd.obs_info->req_level_name(),
                           v.vx_pd.obs_info->req_level_name()) ||
-      !(beg_ds         == v.beg_ds        ) ||
-      !(end_ds         == v.end_ds        ) ||
-      !(mask_grid      == v.mask_grid     ) ||
-      !(mask_poly      == v.mask_poly     ) ||
-      !(mask_sid       == v.mask_sid      ) ||
-      !(mask_llpnt     == v.mask_llpnt    ) ||
-      !(mask_name      == v.mask_name     )) match = false;
+      !(beg_ds     == v.beg_ds        ) ||
+      !(end_ds     == v.end_ds        ) ||
+      !(mask_grid  == v.mask_grid     ) ||
+      !(mask_poly  == v.mask_poly     ) ||
+      !(mask_sid   == v.mask_sid      ) ||
+      !(mask_llpnt == v.mask_llpnt    ) ||
+      !(mask_name  == v.mask_name     )) match = false;
 
    return match;
 }
@@ -871,14 +871,13 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void PairStatVxOpt::set_vx_pd(PairStatConfInfo *conf_info) {
-   int n_mask = mask_name.n();
    ConcatString cs;
    StringArray sa;
 
    // Setup the VxPairDataPoint object for each mask
 
    // Check for at least one masking region
-   if(n_mask == 0) {
+   if(get_n_mask() == 0) {
       mlog << Error << "\nPairStatVxOpt::set_vx_pd() -> "
            << "At least one output masking region must be requested in \""
            << conf_key_mask_grid  << "\", \""
@@ -889,7 +888,10 @@ void PairStatVxOpt::set_vx_pd(PairStatConfInfo *conf_info) {
    }
 
    // Define the dimensions with n_msg_typ = n_interp = 1
-   vx_pd.set_size(1, n_mask, 1);
+   vx_pd.set_size(1, get_n_mask(), 1);
+
+   // Size the header objects 
+   vx_hdr.resize(get_n_mask());
 
    // Store the MPR filtering maps
    vx_pd.set_mpr_thr_inc_map(mpr_thr_inc_map);
@@ -978,6 +980,7 @@ void PairStatVxOpt::set_perc_thresh(const PairDataPoint *pd_ptr) {
 int PairStatVxOpt::n_txt_row(int i_txt_row) const {
    int n = 0;
    int n_bin;
+   int n_pd = get_n_mask();
    const char *method_name = "PairStatVxOpt::n_txt_row(int) -> ";
 
    // Range check
@@ -993,8 +996,6 @@ int PairStatVxOpt::n_txt_row(int i_txt_row) const {
    bool prob_flag = vx_pd.fcst_info->is_prob();
    bool vect_flag = vx_pd.fcst_info->is_v_wind() &&
                     vx_pd.fcst_info->uv_index() >= 0;
-
-   int n_pd = get_n_mask();
 
    // Determine row multiplier for climatology bins
    if(cdf_info.write_bins) {
@@ -1195,8 +1196,8 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
       }
 
       // Attempt to add pair to each masking region
-      for(auto &pairs : vx_pd.pd) {
-         if(pairs.add_point_pair(
+      for(int i=0; i<get_n_mask(); i++) {
+         if(vx_pd.pd[i].add_point_pair(
                l.obtype(),
                l.get_item("OBS_SID"),
                atof(l.get_item("OBS_LAT")),
@@ -1210,7 +1211,14 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
                atof(l.get_item("OBS")),
                l.get_item("OBS_QC"),
                cpi,
-               default_weight)) keep = true;
+               default_weight)) {
+
+            // Using this line for at least one masking region
+            keep = true;
+
+	    // Track the unique headers
+            vx_hdr[i].add(l);
+         }
       }
    }
 
