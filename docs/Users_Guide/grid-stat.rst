@@ -792,7 +792,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
     - Root mean squared difference of the forecast gradient magnitude minus the observed gradient magnitude
   * - 38
     - LAPLACE_RMSE 
-    - Root mean squared difference of the sum of the forecast X and Y-gradients minus the sum of the observed forecast X and Y-gradients
+    - Root mean squared difference of the sum of the forecast X and Y-gradients minus the sum of the observed X and Y-gradients
 
 .. _table_GS_format_info_DMAP:
 
