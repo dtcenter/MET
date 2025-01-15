@@ -67,7 +67,7 @@ Q. How do I use map_data?
 	  sample.grib china_tmp_2m_admin.ps \
 	  'name="TMP"; level="Z2"; \
 	  map_data = { source = [ { file_name = \
-	  "${MET_BUILD_BASE}/data/map/admin_by_country/admin_China_data"; } \
+	  "${MET_BASE}/map/admin_by_country/admin_China_data"; } \
 	  ]; }'
 
 Q. How can I understand the number of matched pairs?
@@ -449,7 +449,7 @@ Q. Is an example of verifying forecast probabilities?
 
      .. code-block:: none
 
-		     ${MET_BUILD_BASE}/scripts/config/GridStatConfig_POP_12
+		     MET/scripts/config/GridStatConfig_POP_12
 
      The config file should look something like this:
 
@@ -720,7 +720,7 @@ Q. How do I correct a precipitation time range?
 
      .. code-block:: none
 
-		     wgrib ${MET_BUILD_BASE}/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 | grep APCP
+		     wgrib MET/data/sample_fcst/2005080700/wrfprs_ruc13_12.tm00_G212 | grep APCP
 		     1:0:d=05080700:APCP:kpds5=61:kpds6=1:kpds7=0:TR=4:P1=0: \
 		     P2=12:TimeU=1:sfc:0- 12hr acc:NAve=0
 		     2:31408:d=05080700:APCP:kpds5=61:kpds6=1:kpds7=0:TR=4: \
@@ -1512,7 +1512,7 @@ Q. How does pairwise differences using plot_tcmpr.R work?
 
      .. code-block:: none
 
-		     Rscript ${MET_BUILD_BASE}/scripts/Rscripts/plot_tcmpr.R \
+		     Rscript ${MET_BASE}/Rscripts/plot_tcmpr.R \
 		     -lookin tc_pairs_output.tcst \
 		     -filter '-amodel AHWI,GFSI' \
 		     -series AMODEL AHWI,GFSI,AHWI-GFSI \
