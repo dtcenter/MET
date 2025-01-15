@@ -248,8 +248,7 @@ void PairDataGenesis::add_fcst_gen(const GenesisInfo *fgi) {
    LeadTime.add(fgi->genesis_lead());
    FcstGen.emplace_back(fgi);
    BestGen.emplace_back(nullptr);
-   GenesisPairDiff diff;
-   GenDiff.emplace_back(diff);
+   GenDiff.emplace_back();
 
    return;
 }
@@ -265,7 +264,6 @@ void PairDataGenesis::add_best_gen(const GenesisInfo *bgi,
    if(!bgi) return;
 
    int i_case;
-   GenesisPairDiff diff;
    unixtime init_ut;
 
    // Define opportunities to forecast this event
@@ -297,7 +295,7 @@ void PairDataGenesis::add_best_gen(const GenesisInfo *bgi,
          LeadTime.add(bgi->genesis_time() - init_ut);
          FcstGen.emplace_back(nullptr);
          BestGen.emplace_back(bgi);
-         GenDiff.emplace_back(diff);
+         GenDiff.emplace_back();
       }
    }
 
@@ -326,8 +324,7 @@ void PairDataGenesis::add_gen_pair(const GenesisInfo *fgi,
       LeadTime.add(fgi->genesis_lead());
       FcstGen.emplace_back(fgi);
       BestGen.emplace_back(bgi);
-      GenesisPairDiff diff;
-      GenDiff.emplace_back(diff);
+      GenDiff.emplace_back();
    }
    
    return;

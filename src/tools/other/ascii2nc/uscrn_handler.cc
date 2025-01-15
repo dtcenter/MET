@@ -201,7 +201,7 @@ static const USCRNFormatInfo uscrn_subhourly_info = {
 //
 // "soil/soilanom01" with files named "CRNSSM0101-{Location}.csv"
 //   - Format number "01"
-//   - Contains 30 NAMED columns but with no README file provided.
+//   - Contains 30 NAMED columns but with no README file provided
 //
 // Note that "soil/soilclim01" files named "CRNSMC0101-{Location}.csv"
 // are not supported directly here.
@@ -326,9 +326,7 @@ static const USCRNFormatInfo uscrn_drought_info = {
   }
 };
 
-//
-// Mapping of USCRN format variants to metadata. 
-//
+// Mapping of USCRN format variants to metadata
 static const std::map<USCRNFormat,USCRNFormatInfo> USCRNFormatMap = {
   { USCRNFormat::Monthly,   uscrn_monthly_info   },
   { USCRNFormat::Daily,     uscrn_daily_info     },
@@ -360,8 +358,6 @@ bool UscrnHandler::isFileType(LineDataFile &ascii_file) const {
    return _getFileFormat(ascii_file) != USCRNFormat::None;
 }
 
-////////////////////////////////////////////////////////////////////////
-// Private/Protected methods
 ////////////////////////////////////////////////////////////////////////
 
 USCRNFormat UscrnHandler::_getFileFormat(const LineDataFile &ascii_file) const {
@@ -401,8 +397,8 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
    }
 
    // Check for .csv format:
-   // - .csv files have a header line to be skipped.
-   // - .txt files have no header line to be skipped.
+   // - .csv files have one header line to be skipped
+   // - .txt files have no header line to be skipped
    DataLine dl;
    ConcatString file_name(ascii_file.filename());
    if(file_name.endswith(".csv")) {

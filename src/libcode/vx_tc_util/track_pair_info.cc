@@ -331,8 +331,7 @@ void TrackPairInfo::add_tcmpr_line(const TCStatLine &l) {
 
    // Store the input TCMPR line and TCDIAG placeholder
    TCMPRLine.emplace_back(l);
-   TCStatLine empty_line;
-   TCDIAGLine.emplace_back(empty_line);
+   TCDIAGLine.emplace_back();
 
    // Increment the point and line count
    NPoints++;
