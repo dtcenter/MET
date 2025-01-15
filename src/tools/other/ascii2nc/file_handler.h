@@ -68,9 +68,17 @@ public:
   void setSummaryInfo(const TimeSummaryInfo &summary_info);
   void setValidTimeRange(const time_t &valid_beg, const time_t valid_end);
 
-privte:
+protected:
+
+  /////////////////////////
+  // Protected constants //
+  /////////////////////////
 
   static const float FILL_VALUE;
+
+  ///////////////////////
+  // Protected members //
+  ///////////////////////
 
   std::string _programName;
 
@@ -109,8 +117,6 @@ privte:
   time_t valid_beg_ut, valid_end_ut;
   int num_observations_in_range;
   int num_observations_out_of_range;
-
-protected:
 
   ///////////////////////
   // Protected methods //
