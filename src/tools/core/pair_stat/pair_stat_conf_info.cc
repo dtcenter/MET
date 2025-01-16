@@ -360,7 +360,7 @@ void PairStatConfInfo::process_masks() {
          }
 
          // Store the name for the current grid mask
-         vx.mask_name.add(grid_map[vx_opt[i].mask_grid[i]]);
+         vx.mask_name.add(grid_map[vx.mask_grid[i]]);
 
       } // end for i
 
