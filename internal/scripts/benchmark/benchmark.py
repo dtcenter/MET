@@ -17,11 +17,9 @@ import yaml
 import pandas as pd
 
 """
-   Extracts the CTRACK benchmarking information from running MET C++ code via METplus wrapper to 
-   facilitate optimizing use cases.
-
+   Extracts the CTRACK benchmarking information from running MET C++ code via METplus wrapper.
    Refer to https://github.com/Compaile/ctrack/tree/main for more information on using CTRACK to
-   benchmark your C++ code. 
+   benchmark your C++ code.
 
    Two output files are generated:
    1) Summary file
@@ -260,10 +258,18 @@ def run_benchmark():
     summary_filename = os.path.join(ctrack_path, "summary_output.txt")
     details_filename = os.path.join(ctrack_path, "detail_output.txt")
     outputpath = settings['output_path']
+    num_of_runs = settings['num_runs']
 
     # Run the use case using the METplus wrapper and the use case and system config files
-    metplus_str = os.path.join(settings['metplus_base'], 'ush/run_metplus.py')
-    subprocess.run(['python', metplus_str, settings['wrapper_conf'], settings['system_conf']])
+
+    # Set the number of times to run to 1 if this value isn't set in the YAML config file
+    if num_of_runs == '':
+        num_of_runs = 1
+
+    # Run the use case multiple times, if specified in the YAML config file
+    for _ in range(0, num_of_runs):
+       metplus_str = os.path.join(settings['metplus_base'], 'ush/run_metplus.py')
+       subprocess.run(['python', metplus_str, settings['wrapper_conf'], settings['system_conf']])
 
     # Extract the benchmark data
     summary_info = extract_summary_info(summary_filename)
