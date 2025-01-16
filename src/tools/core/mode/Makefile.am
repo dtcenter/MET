@@ -22,6 +22,7 @@ mode_SOURCES = mode_usage.cc \
 	mode_ps_file.cc \
 	plot_engine.cc \
 	page_1.cc \
+	simple_objects.cc \
 	fcst_enlarge_page.cc \
 	obs_enlarge_page.cc \
 	cluster_page.cc \

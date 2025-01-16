@@ -525,7 +525,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
 
    int time_count = time_offsets.n_elements();
    if (0 < time_count)
-      mlog << Debug(7) << method_name << " Found " << time_count
+      mlog << Debug(7) << method_name << "Found " << time_count
            << (time_count==1 ? " time" : " times") << " between "
            << unix_to_yyyymmdd_hhmmss(_file->ValidTime[0]) << " and "
            << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_dim_size-1]) << "\n";
@@ -638,11 +638,11 @@ long MetNcCFDataFile::convert_time_to_offset(long time_value) {
    }
 
    if (found)
-      mlog << Debug(7) << method_name << " Found "
+      mlog << Debug(7) << method_name << "Found "
            << unix_to_yyyymmdd_hhmmss(time_value)
            << " at index " << time_offset << " from time value\n";
    else if (found_value)
-      mlog << Debug(7) << method_name << " Found " << time_value
+      mlog << Debug(7) << method_name << "Found " << time_value
            << " at index " << time_offset << " from time value\n";
    else
       mlog << Warning << "\n" << method_name << time_value
@@ -666,6 +666,13 @@ long MetNcCFDataFile::convert_value_to_offset(double z_value, string z_dim_name)
          z_offset = idx;
          break;
       }
+   }
+
+   // Log the dimension value to index conversion
+   if(z_offset != (long) bad_data_int) {
+      mlog << Debug(7) << method_name << "Found \""
+           << z_dim_name << "\" dimension value of \"" << z_value 
+           << "\" at dimension index " << z_offset << ".\n";
    }
 
    if (!found && 0 < z_dim_name.length()) {

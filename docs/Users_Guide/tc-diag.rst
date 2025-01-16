@@ -273,10 +273,8 @@ When the **nc_diag_flag** configuration entry is set to true, a NetCDF output fi
 
 .. list-table:: Dimensions defined in NetCDF Diagnostics output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - tc_diag NETCDF DIMENSIONS
-    -
   * - NetCDF Dimension
     - Description
   * - time
@@ -291,44 +289,52 @@ When the **nc_diag_flag** configuration entry is set to true, a NetCDF output fi
 
 .. list-table:: Variables defined in NetCDF Diagnostics output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - tc_diag NETCDF VARIABLES
-    -
-    -
   * - NetCDF Variable
     - Dimension
     - Description
+    - Data Type
   * - storm_id
     - NA
     - Tropical Cyclone Storm ID (BBNNYYYY) consisting of 2-letter basin name, 2-digit storm number, and 4-digit year
+    - String
   * - model
     - NA
     - Track ATCF ID model name
+    - String
   * - init_time
     - NA
     - Track initialization time string in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - init_time_ut
     - NA
     - Track initialization time string in unixtime (seconds since January 1, 1970) format
+    - String
   * - valid_time
     - time
     - Track point valid time string in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - valid_time_ut
     - time
     - Track point valid time string in unixtime (seconds since January 1, 1970) format
+    - String
   * - lead_time
     - time
     - Track point forecast lead time string in HHMMSS format
+    - Time String
   * - lead_time_sec
     - time
     - Track point forecast lead time integer number of seconds
+    - Integer
   * - {DOMAIN}_domain
     - NA 
     - Attributes define the range/azimuth grid for the {DOMAIN} domain: **n_range**, **n_azimuth**, **delta_range_km**
+    - Integer
   * - Diagnostic values
     - time or time and pressure
     - Computed diagnostic values for each track point and, optionally, pressure level. The **units** attribute defines the units of the diagnostic values.
+    - Double
 
 **NetCDF Range-Azimuth Output**
 
@@ -346,10 +352,8 @@ The NetCDF range-azimuth file contains the dimensions and variables shown in :nu
 
 .. list-table:: Dimensions defined in NetCDF Range-Azimuth output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - tc_diag NETCDF DIMENSIONS
-    -
   * - NetCDF Dimension
     - Description
   * - track_line
@@ -370,73 +374,91 @@ The NetCDF range-azimuth file contains the dimensions and variables shown in :nu
 
 .. list-table:: Variables defined in NetCDF Range-Azimuth output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - tc_diag NETCDF VARIABLES
-    -
-    -
   * - NetCDF Variable
     - Dimension
     - Description
+    - Data Type
   * - storm_id
     - NA
     - Tropical Cyclone Storm ID (BBNNYYYY) consisting of 2-letter basin name, 2-digit storm number, and 4-digit year
+    - String
   * - model
     - NA
     - Track ATCF ID model name
+    - String
   * - TrackLines
     - track_lines
     - Raw input ATCF track lines
+    - String
   * - TrackLat
     - time
     - Track point location latitude
+    - Double
   * - TrackLon
     - time
     - Track point location longitude
+    - Double
   * - TrackMSLP
     - time
     - Track point minimum sea level pressure
+    - Double
   * - TrackVMax
     - time
     - Track point maximum wind speed
+    - Double
   * - init_time
     - NA
     - Track initialization time string in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - init_time_ut
     - NA
     - Track initialization time string in unixtime (seconds since January 1, 1970) format
+    - String
   * - valid_time
     - time
     - Track point valid time string in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - valid_time_ut
     - time
     - Track point valid time string in unixtime (seconds since January 1, 1970) format
+    - String
   * - lead_time
     - time
     - Track point forecast lead time string in HHMMSS format
+    - Time String
   * - lead_time_sec
     - time
     - Track point forecast lead time integer number of seconds
+    - Integer
   * - range
     - range
     - Range ring coordinate variable in kilometers
+    - Double
   * - azimuth
     - azimuth
     - Azimuth coordinate variable in degrees clockwise from north
+    - Double
   * - pressure
     - pressure
     - Vertical level pressure coordinate variable in millibars
+    - Double
   * - lat
     - time, range, azimuth
     - Latitude in degrees north for each range-azimuth grid point
+    - Double
   * - lon
     - time, range, azimuth
     - Longitude in degrees east for each range-azimuth grid point
+    - Double
   * - single level data
       (e.g. TMP_Z2, PRMSL_L0)
     - time, range, azimuth
     - Gridded range-azimuth data on a single level
+    - Double
   * - pressure level data
       (e.g. TMP, HGT)
     - time, pressure, range, azimuth
     - Gridded range-azimuth data on pressure levels
+    - Double
