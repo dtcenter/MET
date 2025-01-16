@@ -10,6 +10,7 @@
 
 
 import os
+import sys
 import re
 import subprocess
 from datetime import datetime
@@ -18,25 +19,45 @@ import pandas as pd
 
 """
    Extracts the CTRACK benchmarking information from running MET C++ code via METplus wrapper.
+   Benchmark values are collected by running use cases to facilitate optimizing the MET code for
+   use cases.
+   
    Refer to https://github.com/Compaile/ctrack/tree/main for more information on using CTRACK to
    benchmark your C++ code.
 
-   Two output files are generated:
+   Two output files are generated when running the use cases:
    1) Summary file
    2) Details file
-
-   The benchmarking information is retrieved from each file, then consolidated into one file.  A CSV
-   (comma separated values) and/or tabular file are also generated to enable plotting of the results. The consolidated
+   These files are located where the use case code is invoked.
+   The benchmarking information is retrieved from each file above, then consolidated into one file.  A CSV
+   (comma separated values) and tabular file are also generated to enable plotting of the results. These files
+   are saved under a subdirectory named after the use case config file (without the extension). The consolidated
    file is named by generating a timestamp and converting it to ISO 8601 Datetime with the appropriate file
-   extension (.csv, .txt).
+   extension (.csv, .txt). The summary and detail file are moved into the use case subdirectory.
+   
+   This script has an accompanying YAML config file, benchmark.yaml in which the user can specify (explicitly or by 
+   setting env variables) the following:
+   
+   - output path
+     - the base output directory, subdirectories based on use case will be created under this directory
+     - if the output path does not exist, it will be created
+   - filename
+       - if specified, the timestamp will be appended
+       - if unspecified, the timestamp will be used as the filename
+   - number of times to run the use case
+   - the system.conf file to be used 
+   - a list of one or more use case config files to be used
+      - a subdirectory will be created based on the use case config file name where output will be saved   
 
 """
 
 
-def extract_detail_info(infile) -> pd.DataFrame:
+def extract_detail_info(infile:str, subdir:str) -> pd.DataFrame:
     """
+     Extract the benchmarking information in the detail_output.txt file produced by CTRACK.
 
     :param infile: The details file containing benchmarking information
+    :param subdir: The subdirectory for the use case
     :return details_df: A pandas dataframe containing the detail output from CTRACK
     """
 
@@ -70,14 +91,20 @@ def extract_detail_info(infile) -> pd.DataFrame:
             else:
                 details_df = pd.concat([details_df, cur])
 
+    # move the summary_output.txt file to the use case subdirectory
+    os.rename(infile, os.path.join(subdir, "detail_output.txt"))
+
     return details_df
 
 
-def extract_summary_info(infile) -> pd.DataFrame:
+def extract_summary_info(infile:str, subdir:str) -> pd.DataFrame:
     """
+     Extracts the information from the summary_output.txt file into a csv formatted and
+     tabular file
 
-     :param infile: file containing the CTRACK summary information
-     :return: the dictionary with the summary values
+     :param infile: the summary_output.txt file containing the CTRACK summary information
+     :param: subdir: the use case subdirectory
+     :return: a pandas dataframe containing the summary values
      """
     # Open the file and parse information
     with open(infile, 'r') as f:
@@ -89,7 +116,6 @@ def extract_summary_info(infile) -> pd.DataFrame:
         kv_pairs = line.split("|")
         for kv in kv_pairs:
             key_values = kv.split(": ")
-            print(key_values)
             cur_key = key_values[0].replace(" ", "_")
 
             # make the value a list to enable creating a pandas dataframe directly from the summary dictionary
@@ -108,6 +134,10 @@ def extract_summary_info(infile) -> pd.DataFrame:
             counter += 1
         else:
             summary_df = pd.concat([summary_df, cur_df])
+
+    # move the summary_output.txt file to the use case subdirectory
+    os.rename(infile, os.path.join(subdir, "summary_output.txt"))
+
 
     return summary_df
 
@@ -200,14 +230,15 @@ def parse_config(path=None, data=None, tag='!ENV'):
     else:
         raise ValueError('Either a path or data should be defined as input')
 
-def save_results(consolidated:pd.DataFrame, output_dir:str, ts:str, save_file='csv') -> None:
+def save_results(consolidated:pd.DataFrame, output_dir:str, ts:str, filename, subdir:str) -> None:
     """
        Save the consolidated results into a csv file, tabular file, or both
 
     :param consolidated: pandas dataframe containing the summary and detail report results from CTRACK
     :param output_dir: the directory where the consolidated file(s) is/are saved
     :param ts: The timestamp used to create the output filename
-    :param save_file: Default is 'csv' Options are 'csv', 'table', 'both'
+    :param filename: The user-specified filename, if empty string, then the timestamp will be used
+    :param subdir: The subdir corresponding to this use case (based on the wrapper conf file name)
     :return: None
     """
 
@@ -215,23 +246,72 @@ def save_results(consolidated:pd.DataFrame, output_dir:str, ts:str, save_file='c
     c_ext = ".csv"
     t_ext = ".txt"
 
-    # if the output dir does not exist, create it
-    os.makedirs(output_dir, exist_ok=True)
-
-    save_file = save_file.lower()
-
-    c_filename = ts + c_ext
-    t_filename = ts + t_ext
-    full_csv_output_file = os.path.join(output_dir, c_filename)
-    full_table_output_file = os.path.join(output_dir, t_filename)
-
-    if save_file == 'both':
-        consolidated.to_csv(full_csv_output_file,header=True)
-        consolidated.to_csv(full_table_output_file, header=True, sep="\t")
-    elif save_file == 'text':
-        consolidated.to_csv(full_table_output_file, header=True, sep="\t")
+       # filename is either filename_<timestamp>.ext
+    # or <timestamp>.ext, where ext is .csv or .txt
+    if filename == " " or filename is None:
+       c_filename = ts + c_ext
+       t_filename = ts + t_ext
     else:
-        consolidated.to_csv(full_csv_output_file,header=True)
+        c_filename = filename + "_" + c_ext
+        t_filename = filename + "_" + t_ext
+
+    # save the csv and txt files to the use case directory
+    full_out_dir = os.path.join(output_dir, subdir)
+    full_csv_output_file = os.path.join(full_out_dir, c_filename)
+    full_table_output_file = os.path.join(full_out_dir, t_filename)
+
+    consolidated.to_csv(full_csv_output_file,header=True)
+    consolidated.to_csv(full_table_output_file, header=True, sep="\t")
+
+    # Do some checking to make sure the files were actually created and they aren't empty
+    assert os.path.isfile(full_csv_output_file), "WARNING: csv output file not created"
+    assert os.path.getsize(int(full_csv_output_file) > 0),"WARNING: csv file created but is empty"
+    assert os.path.isfile(full_table_output_file), "WARNING: tabular output file not created"
+    assert os.path.getsize(int(full_table_output_file) > 0), "WARNING: tabular file created but is empty"
+
+
+
+
+def check_settings(settings:dict) -> None:
+    """
+      Check that paths specified in the config file exist
+
+      :param settings: dictionary representation of settings specified in the YAML config file
+      :return:  None
+    """
+
+    output_dir = settings['output_path']
+    metplus_dir = settings['metplus_base']
+    sys_conf = settings['system_conf']
+    wrapper_conf = settings['wrapper_conf']
+
+    assert os.path.exists(output_dir), "ERROR|benchmark.yaml::The OUTPUT_BASE environment points to a non-existent directory."
+    assert os.path.exists(metplus_dir), "ERROR|benchmark.yaml::The METplus directory does not exist. Check your METPLUS_BASE env."
+    assert os.path.exists(sys_conf), "ERROR|benchmark.yaml::The system.conf file path does not exist."
+    assert os.path.isfile(sys_conf), "ERROR|benchmark.yaml::The system.conf file does not exist in the specified location."
+    assert os.path.exists(wrapper_conf), "ERROR|benchmark.yaml::The path to the use case config file does not exist. "
+    assert os.path.isfile(wrapper_conf), "ERROR|benchmark.yaml::The use case config file does not exist in the specified location "
+
+
+def generate_info(settings:dict, ts:str, usecase: str, subdir: str) -> None:
+    """
+       Generate a text file with information on the current benchmark run
+    :param settings: dictionary representation of the settings specified in the YAML config file
+    :param ts: timestamp
+    :param usecase: current use case
+    :param subdir: the use case subdirectory (full path)
+    :return: None, write an output text file in the output path specified in the YAML config file
+    """
+    info_file = ts + "_info.txt"
+    full_path = os.path.join(subdir, info_file)
+
+    with open(full_path, 'w') as f:
+        f.write(f"Python version info: {sys.version}")
+        f.write(f"Timestamp: {ts}")
+        f.write(f"Use case : {usecase}")
+        f.write(f"Number of times run: {settings['num_runs']}")
+        f.write(f"Output file(s) saved at: {settings['output_path']}")
+
 
 
 
@@ -258,28 +338,47 @@ def run_benchmark():
     # the wrapper command is run
     ctrack_path = os.path.dirname(__file__)
     summary_filename = os.path.join(ctrack_path, "summary_output.txt")
+    assert os.path.exists(summary_filename), "ERROR: CTRACK did not produce a summary_output.txt file for this use case"
+
     details_filename = os.path.join(ctrack_path, "detail_output.txt")
-    outputpath = settings['output_path']
+    assert os.path.exists(details_filename), "ERROR: CTRACK did not produce a detail_output.txt file for this use case"
+
+    output_base = settings['output_path']
+    # if the base output dir does not exist, create it
+    os.makedirs(output_base, exist_ok=True)
+
     num_of_runs = settings['num_runs']
-
-    # Run the use case using the METplus wrapper and the use case and system config files
-
     # Set the number of times to run to 1 if this value isn't set in the YAML config file
-    if num_of_runs == '':
+    if num_of_runs == '' or num_of_runs is None:
         num_of_runs = 1
 
-    # Run the use case multiple times, if specified in the YAML config file
-    for _ in range(0, num_of_runs):
-       metplus_str = os.path.join(settings['metplus_base'], 'ush/run_metplus.py')
-       subprocess.run(['python', metplus_str, settings['wrapper_conf'], settings['system_conf']])
+    filename = settings['filename']
 
-    # Extract the benchmark data
-    summary_info = extract_summary_info(summary_filename)
-    detail_info = extract_detail_info(details_filename)
-    consolidated_df = consolidate_info(summary_info, detail_info)
-    save_results(consolidated_df, outputpath, ts, save_file='both' )
+    wrapper_confs = settings['wrapper_conf']
+
+    # Create the subdirectory for this use case using the use case config file name
+    usecase_conf_path = settings['wrapper_conf']
+    usecase_file = os.path.basename(usecase_conf_path)
+    usecase_subdir_name = usecase_file.split(".")[0]
+    usecase_subdir = str(os.path.join(output_base, usecase_subdir_name))
+    os.makedirs(usecase_subdir, exist_ok=True)
+
+
+    # Run the use case using the METplus wrapper and the use case and system config files
+    # (for the specified number of times)
+    for use_case in wrapper_confs:
+        for _ in range(0, num_of_runs):
+           metplus_str = os.path.join(settings['metplus_base'], 'ush/run_metplus.py')
+           subprocess.run(['python', metplus_str, settings['wrapper_conf'], settings['system_conf']])
+
+        # Extract the benchmark data
+        summary_info = extract_summary_info(summary_filename, usecase_subdir)
+        detail_info = extract_detail_info(details_filename, usecase_subdir)
+        consolidated_df = consolidate_info(summary_info, detail_info)
+        save_results(consolidated_df, output_base, ts, filename, usecase_subdir)
+        check_settings(settings)
+        generate_info(settings, ts, use_case, usecase_subdir)
 
 
 if __name__ == "__main__":
-
     run_benchmark()
