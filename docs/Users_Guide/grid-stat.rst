@@ -832,11 +832,11 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
   * - 33
     - DX
     - Gradient size in the X-direction
-    - Double
+    - Integer
   * - 34
     - DY
     - Gradient size in the Y-direction
-    - Double
+    - Integer
 
 .. _table_GS_format_info_DMAP:
 
