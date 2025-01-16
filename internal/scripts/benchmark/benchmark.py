@@ -247,8 +247,10 @@ def run_benchmark():
     # read in the YAML config file
     settings = {}
     try:
+        # get the path to the YAML file
+        yaml_path = os.getcwd()
         benchmark_config = os.getenv("BENCHMARK_YAML_CONFIG_NAME", "benchmark.yaml")
-        settings = parse_config(benchmark_config)
+        settings = parse_config(benchmark_config, yaml_path)
     except yaml.YAMLError as ye:
         print(ye)
 
