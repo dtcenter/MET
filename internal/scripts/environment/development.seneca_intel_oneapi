@@ -5,14 +5,14 @@
 MET_PROJ_DIR=/d1/projects/MET
 
 # Source the setvars.sh file for updates to the $PATH and $LD_LIBRARY_PATH
-source /nrit/ral/intel/setvars.sh
+# source /nrit/ral/intel/setvars.sh
 
 # Set the values for the compilers
-export FC=ifx
-export F77=ifx
-export F90=ifx
-export CC=icx
-export CXX=icpx
+export FC=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023/compiler/2023.2.0/linux/bin/ifx
+export F77=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023/compiler/2023.2.0/linux/bin/ifx
+export F90=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023/compiler/2023.2.0/linux/bin/ifx
+export CC=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023/compiler/2023.2.0/linux/bin/icx
+export CXX=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023/compiler/2023.2.0/linux/bin/icpx
 
 # Variables required to build MET
 export MET_DEVELOPMENT=true
