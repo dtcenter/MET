@@ -30,7 +30,10 @@ class ModeSuperObject {
 
  public:
 
+   ModeSuperObject();
+
    ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
+                   int r_index, int t_index,
                    const std::vector<MultiVarData *> &mvd,
                    BoolCalc &calc);
    inline ~ModeSuperObject() {}
@@ -40,6 +43,8 @@ class ModeSuperObject {
 
    bool _isFcst;
    bool _hasUnion;
+   int _rIndex;
+   int _tIndex;
    BoolPlane _simple_result;
    ShapeData _simple_sd;
    ShapeData _merge_sd_split;

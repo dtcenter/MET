@@ -9,55 +9,50 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+#include "simple_objects.hh"
 
-#ifndef  __MODE_COMBINE_BOOLPLANES_H__
-#define  __MODE_COMBINE_BOOLPLANES_H__
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-#include "two_d_array.h"
-#include "bool_calc.h"
-#include "vx_pxm.h"
-#include <string>
-#include <vector>
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-
-//
-//  grabs the objects from a MODE output netcdf file
-//
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-extern void combine_boolplanes(const std::string &name,
-                               int rIndex, int tIndex,
-                               const BoolPlane * array, const int n_planes, 
-                               BoolCalc & calc, 
-                               BoolPlane & bp_out);
-
+SimpleObjects::SimpleObjects() :
+   _dataType(ModeDataType::MvMode_Both),
+   _rIndex(-1),
+   _tIndex(-1)
+{
+}
 
 ////////////////////////////////////////////////////////////////////////
 
-
-//
-//  useful mainly for debugging
-//
-
-
-extern void boolplane_to_pgm(const BoolPlane & in, Pgm & out);
-
+SimpleObjects::~SimpleObjects()
+{
+}
 
 ////////////////////////////////////////////////////////////////////////
 
-
-#endif   /*  __MODE_COMBINE_BOOLPLANES_H__  */
-
+void SimpleObjects::init(ModeDataType dataType, int rIndex, int tIndex)
+{
+   _dataType = dataType;
+   _rIndex = rIndex;
+   _tIndex = tIndex;
+}             
 
 ////////////////////////////////////////////////////////////////////////
 
+void SimpleObjects::setSuper(bool isFcst, int n_fcst_files, bool do_clusters,
+                             BoolCalc &f_calc)
+{
+   _super = ModeSuperObject(isFcst, n_fcst_files, do_clusters,
+                            _rIndex, _tIndex, _mvd, f_calc);
+}
 
+////////////////////////////////////////////////////////////////////////
+
+void SimpleObjects::clear(void)
+{
+   for (auto &x : _mvd) {
+      delete x;
+      x = nullptr;
+   }
+   _mvd.clear();
+}

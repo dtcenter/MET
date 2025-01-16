@@ -113,6 +113,19 @@ mask = {
    poly = "";
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Gradient statistics
+// May be set separately in each "obs.field" entry
+//
+gradient = {
+   dx = [ 1 ];
+   dy = [ 1 ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //
 // Number of grid points to be processed concurrently. Set smaller to use less
 // memory but increase the number of passes through the data. If set <= 0, all
@@ -143,6 +156,7 @@ output_stats = {
    pstd   = [];
    pjc    = [];
    prc    = [];
+   grad   = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

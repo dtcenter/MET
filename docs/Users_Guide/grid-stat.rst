@@ -98,6 +98,13 @@ The S1 score has been in historical use for verification of forecasts, particula
 
 Differences are computed in both of the horizontal grid directions and is not a true mathematical gradient. Because the S1 score focuses on differences only, any bias in the forecast will not be measured. Further, the score depends on the domain and spacing of the grid, so can only be compared on forecasts with identical grids.
 
+As described in :ref:`Ebert-Uphoff et al., 2024 <Ebert-Uphoff-2024>`, statistics based
+on the magnitude of the forecast and observed gradients are also provided. Similiar to
+the S1 score, the root-mean-squared error of the magnitude of the gradients and their
+divergence quantify the similarity in the texture of the fields, with 0 being a perfect
+score. These gradient-based statistics assess the difference in smoothness between the
+two fields but not the accuracy of the forecast.
+
 Distance Maps
 -------------
 
@@ -263,6 +270,7 @@ __________________________
   eclv_points      = 0.05;
   hss_ec_value     = NA;
   rank_corr_flag   = TRUE;
+  gradient         = { dx = [ 1 ]; dy = [ 1 ]; }
   grid_weight_flag = NONE;
   tmp_dir          = "/tmp";
   output_prefix    = "";
@@ -318,22 +326,6 @@ The available wave numbers start at 0 (the mean across each row of data) and end
 * The **wave_1d_end** entry is an array of integers specifying the last wave number to be included.
 
 _____________________
-
-.. _gradient:
-
-:ref:`gradient <gradient>`
-
-.. code-block:: none
-
-  gradient = {
-     dx = [ 1 ];
-     dy = [ 1 ];
-   }
-
-
-The **gradient** entry is a dictionary which specifies the number and size of gradients to be computed. The **dx** and **dy** entries specify the size of the gradients in grid units in the X and Y dimensions, respectively. **dx** and **dy** are arrays of integers (positive or negative) which must have the same length, and the GRAD output line type will be computed separately for each entry. When computing gradients, the value at the (x, y) grid point is replaced by the value at the (x+dx, y+dy) grid point minus the value at (x, y). This configuration option may be set separately in each **obs.field** entry.
-
-____________________
 
 .. _distance_map:
 
@@ -494,119 +486,145 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_header_info_gs_outputs:
 
-.. list-table:: Header information for each file grid-stat outputs
+.. list-table:: Header information for Grid-Stat STAT output 
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - HEADER
-    - 
-    - 
   * - Column Number
     - Header Column Name
     - Description
+    - Data Type
   * - 1
     - VERSION
     - Version number
+    - String
   * - 2
     - MODEL
     - User-provided text string designating model name
+    - String
   * - 3
     - DESC
     - User-provided text string describing the verification task
+    - String
   * - 4
     - FCST_LEAD
     - Forecast lead time in HHMMSS format
+    - Time String
   * - 5
     - FCST_VALID_BEG
     - Forecast valid start time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 6
     - FCST_VALID_END
     - Forecast valid end time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 7
     - OBS_LEAD
     - Observation lead time in HHMMSS format
+    - Time String
   * - 8
     - OBS_VALID_BEG
     - Observation valid start time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 9
     - OBS_VALID_END
     - Observation valid end time in YYYYMMDD_HHMMSS format
+    - Datetime String
   * - 10
     - FCST_VAR
     - Model variable
+    - String
   * - 11
     - FCST_UNITS
     - Units for model variable
+    - String
   * - 12
     - FCST_LEV
-    - Selected Vertical level for forecast
+    - Selected vertical level for forecast
+    - String
   * - 13
     - OBS_VAR
     - Observation variable
+    - String
   * - 14
     - OBS_UNITS
     - Units for observation variable
+    - String
   * - 15
     - OBS_LEV
-    - Selected Vertical level for observations
+    - Selected vertical level for observations
+    - String
   * - 16
     - OBTYPE
     - User-provided text string designating the observation type
+    - String
   * - 17
     - VX_MASK
     - Verifying masking region indicating the masking grid or polyline region applied
+    - String
   * - 18
     - INTERP_MTHD
     - Interpolation method applied to forecast field
+    - String
   * - 19
     - INTERP_PNTS
     - Number of points used by interpolation method
+    - Integer
   * - 20
     - FCST_THRESH
     - The threshold applied to the forecast
+    - Threshold String
   * - 21
     - OBS_THRESH
     - The threshold applied to the observations
+    - Threshold String
   * - 22
     - COV_THRESH
     - Proportion of observations in specified neighborhood which must exceed obs_thresh
+    - Threshold String
   * - 23
     - ALPHA
     - Error percent value used in confidence intervals
+    - Double
   * - 24
     - LINE_TYPE
     - Various line type options, refer to :numref:`point_stat-output` and the tables below.
+    - String
 
 .. _table_GS_format_info_NBRCTC:
 
 .. list-table:: Format information for NBRCTC (Neighborhood Contingency Table Counts) output line type
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - NBRCTC OUTPUT FORMAT
-    - 
-    - 
   * - Column Number
     - NBRCTC Column Name
     - Description
+    - Data Type
   * - 24
     - NBRCTC
     - Neighborhood Contingency Table Counts line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26
     - FY_OY
-    - Number of forecast yes and observation yes
+    - Sum of weights for hits (forecast yes and observation yes)
+    - Double
   * - 27
     - FY_ON
-    - Number of forecast yes and observation no
+    - Sum of weights for false alarms (forecast yes and observation no)
+    - Double
   * - 28
     - FN_OY
-    - Number of forecast no and observation yes
+    - Sum of weights for misses (forecast no and observation yes)
+    - Double
   * - 29
     - FN_ON
-    - Number of forecast no and observation no
+    - Sum of weights for correct negatives (forecast no and observation no)
+    - Double
 
 .. role:: raw-html(raw)
     :format: html
@@ -615,268 +633,329 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. list-table:: Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type
   :widths: auto
-  :header-rows: 2
-
-  * - NBRCTS OUTPUT FORMAT
-    - 
-    - 
-  * - Column Number
-    - NBRCTS Column Name
-    - Description
-  * - 24
-    - NBRCTS
-    - Neighborhood Contingency Table Statistics line type
-  * - 25
-    - TOTAL
-    - Total number of matched pairs
-  * - 26-30
-    - BASER, :raw-html:`<br />` BASER_NCL, :raw-html:`<br />` BASER_NCU, :raw-html:`<br />` BASER_BCL, :raw-html:`<br />` BASER_BCU
-    - Base rate including normal and bootstrap upper and lower confidence limits
-  * - 31-35
-    - FMEAN, :raw-html:`<br />` FMEAN_NCL, :raw-html:`<br />` FMEAN_NCU, :raw-html:`<br />` FMEAN_BCL, :raw-html:`<br />` FMEAN_BCU
-    - Forecast mean including normal and bootstrap upper and lower confidence limits
-  * - 36-40
-    - ACC, :raw-html:`<br />` ACC_NCL, :raw-html:`<br />` ACC_NCU, :raw-html:`<br />` ACC_BCL, :raw-html:`<br />` ACC_BCU
-    - Accuracy including normal and bootstrap upper and lower confidence limits
-  * - 41-43
-    - FBIAS, :raw-html:`<br />` FBIAS_BCL, :raw-html:`<br />` FBIAS_BCU
-    - Frequency Bias including bootstrap upper and lower confidence limits
-  * - 44-48
-    - PODY, :raw-html:`<br />` PODY_NCL, :raw-html:`<br />` PODY_NCU, :raw-html:`<br />` PODY_BCL, :raw-html:`<br />` PODY_BCU
-    - Probability of detecting yes including normal and bootstrap upper and lower confidence limits
-  * - 49-53
-    - PODN, :raw-html:`<br />` PODN_NCL, :raw-html:`<br />` PODN_NCU, :raw-html:`<br />` PODN_BCL, :raw-html:`<br />` PODN_BCU
-    - Probability of detecting no including normal and bootstrap upper and lower confidence limits
-  * - 54-58
-    - POFD, :raw-html:`<br />` POFD_NCL, :raw-html:`<br />` POFD_NCU, :raw-html:`<br />` POFD_BCL, :raw-html:`<br />` POFD_BCU
-    - Probability of false detection including normal and bootstrap upper and lower confidence limits
-  * - 59-63
-    - FAR, :raw-html:`<br />` FAR_NCL, :raw-html:`<br />` FAR_NCU, :raw-html:`<br />` FAR_BCL, :raw-html:`<br />` FAR_BCU
-    - False alarm ratio including normal and bootstrap upper and lower confidence limits
-  * - 64-68
-    - CSI, :raw-html:`<br />` CSI_NCL, :raw-html:`<br />` CSI_NCU, :raw-html:`<br />` CSI_BCL, :raw-html:`<br />` CSI_BCU
-    - Critical Success Index including normal and bootstrap upper and lower confidence limits
-  * - 69-71
-    - GSS, :raw-html:`<br />` GSS_BCL, :raw-html:`<br />` GSS_BCU
-    - Gilbert Skill Score including bootstrap upper and lower confidence limits
-
-.. _table_GS_format_info_NBRCTS_cont:
-      
-.. role:: raw-html(raw)
-    :format: html
-
-.. list-table:: Format information for NBRCTS (Neighborhood Contingency Table Statistics) output line type, continued from above
-  :widths: auto
   :header-rows: 1
 
   * - Column Number
     - NBRCTS Column Name
     - Description
+    - Data Type
+  * - 24
+    - NBRCTS
+    - Neighborhood Contingency Table Statistics line type
+    - String
+  * - 25
+    - TOTAL
+    - Total number of matched pairs
+    - Integer
+  * - 26-30
+    - BASER, :raw-html:`<br />` BASER_NCL, :raw-html:`<br />` BASER_NCU, :raw-html:`<br />` BASER_BCL, :raw-html:`<br />` BASER_BCU
+    - Base rate including normal and bootstrap upper and lower confidence limits
+    - Double
+  * - 31-35
+    - FMEAN, :raw-html:`<br />` FMEAN_NCL, :raw-html:`<br />` FMEAN_NCU, :raw-html:`<br />` FMEAN_BCL, :raw-html:`<br />` FMEAN_BCU
+    - Forecast mean including normal and bootstrap upper and lower confidence limits
+    - Double
+  * - 36-40
+    - ACC, :raw-html:`<br />` ACC_NCL, :raw-html:`<br />` ACC_NCU, :raw-html:`<br />` ACC_BCL, :raw-html:`<br />` ACC_BCU
+    - Accuracy including normal and bootstrap upper and lower confidence limits
+    - Double
+  * - 41-43
+    - FBIAS, :raw-html:`<br />` FBIAS_BCL, :raw-html:`<br />` FBIAS_BCU
+    - Frequency Bias including bootstrap upper and lower confidence limits
+    - Double
+  * - 44-48
+    - PODY, :raw-html:`<br />` PODY_NCL, :raw-html:`<br />` PODY_NCU, :raw-html:`<br />` PODY_BCL, :raw-html:`<br />` PODY_BCU
+    - Probability of detecting yes including normal and bootstrap upper and lower confidence limits
+    - Double
+  * - 49-53
+    - PODN, :raw-html:`<br />` PODN_NCL, :raw-html:`<br />` PODN_NCU, :raw-html:`<br />` PODN_BCL, :raw-html:`<br />` PODN_BCU
+    - Probability of detecting no including normal and bootstrap upper and lower confidence limits
+    - Double
+  * - 54-58
+    - POFD, :raw-html:`<br />` POFD_NCL, :raw-html:`<br />` POFD_NCU, :raw-html:`<br />` POFD_BCL, :raw-html:`<br />` POFD_BCU
+    - Probability of false detection including normal and bootstrap upper and lower confidence limits
+    - Double
+  * - 59-63
+    - FAR, :raw-html:`<br />` FAR_NCL, :raw-html:`<br />` FAR_NCU, :raw-html:`<br />` FAR_BCL, :raw-html:`<br />` FAR_BCU
+    - False alarm ratio including normal and bootstrap upper and lower confidence limits
+    - Double
+  * - 64-68
+    - CSI, :raw-html:`<br />` CSI_NCL, :raw-html:`<br />` CSI_NCU, :raw-html:`<br />` CSI_BCL, :raw-html:`<br />` CSI_BCU
+    - Critical Success Index including normal and bootstrap upper and lower confidence limits
+    - Double
+  * - 69-71
+    - GSS, :raw-html:`<br />` GSS_BCL, :raw-html:`<br />` GSS_BCU
+    - Gilbert Skill Score including bootstrap upper and lower confidence limits
+    - Double
   * - 72-76
     - HK, :raw-html:`<br />` HK_NCL, :raw-html:`<br />` HK_NCU, :raw-html:`<br />` HK_BCL, :raw-html:`<br />` HK_BCU
     - Hanssen-Kuipers Discriminant including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 77-79
     - HSS, :raw-html:`<br />` HSS_BCL, :raw-html:`<br />` HSS_BCU
     - Heidke Skill Score including bootstrap upper and lower confidence limits
+    - Double
   * - 80-84
     - ODDS, :raw-html:`<br />` ODDS_NCL, :raw-html:`<br />` ODDS_NCU, :raw-html:`<br />` ODDS_BCL, :raw-html:`<br />` ODDS_BCU
     - Odds Ratio including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 85-89
     - LODDS, :raw-html:`<br />` LODDS_NCL, :raw-html:`<br />` LODDS_NCU, :raw-html:`<br />` LODDS_BCL, :raw-html:`<br />` LODDS_BCU
     - Logarithm of the Odds Ratio including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 90-94
     - ORSS, :raw-html:`<br />` ORSS _NCL, :raw-html:`<br />` ORSS _NCU, :raw-html:`<br />` ORSS _BCL, :raw-html:`<br />` ORSS _BCU
     - Odds Ratio Skill Score including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 95-99
     - EDS, :raw-html:`<br />` EDS _NCL, :raw-html:`<br />` EDS _NCU, :raw-html:`<br />` EDS _BCL, :raw-html:`<br />` EDS _BCU
     - Extreme Dependency Score including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 100-104
     - SEDS, :raw-html:`<br />` SEDS _NCL, :raw-html:`<br />` SEDS _NCU, :raw-html:`<br />` SEDS _BCL SEDS _BCU
     - Symmetric Extreme Dependency Score including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 105-109
     - EDI, :raw-html:`<br />` EDI _NCL, :raw-html:`<br />` EDI _NCU, :raw-html:`<br />` EDI _BCL, :raw-html:`<br />` EDI _BCU
     - Extreme Dependency Index including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 110-114
     - SEDI, :raw-html:`<br />` SEDI _NCL, :raw-html:`<br />` SEDI _NCU, :raw-html:`<br />` SEDI _BCL,SEDI _BCU
     - Symmetric Extremal Dependency Index including normal and bootstrap upper and lower confidence limits
+    - Double
   * - 115-117
     - BAGSS, :raw-html:`<br />` BAGSS_BCL, :raw-html:`<br />` BAGSS_BCU
     - Bias-Adjusted Gilbert Skill Score including bootstrap upper and lower confidence limits
+    - Double
 
 
 .. role:: raw-html(raw)
     :format: html
 
 .. _table_GS_format_info_NBRCNT:
-	     
+
 .. list-table:: Format information for NBRCNT(Neighborhood Continuous Statistics) output line type
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - NBRCNT OUTPUT FORMAT
-    - 
-    - 
   * - Column Number
     - NBRCNT Column Name
     - Description
+    - Data Type
   * - 24
     - NBRCNT
     - Neighborhood Continuous statistics line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26-28
     - FBS, :raw-html:`<br />` FBS_BCL, :raw-html:`<br />` FBS_BCU
     - Fractions Brier Score including bootstrap upper and lower confidence limits
+    - Double
   * - 29-31
     - FSS, :raw-html:`<br />` FSS_BCL, :raw-html:`<br />` FSS_BCU
     - Fractions Skill Score including bootstrap upper and lower confidence limits
+    - Double
   * - 32-34
     - AFSS, :raw-html:`<br />` AFSS_BCL, :raw-html:`<br />` AFSS_BCU
     - Asymptotic Fractions Skill Score including bootstrap upper and lower confidence limits
+    - Double
   * - 35-37
     - UFSS, :raw-html:`<br />` UFSS_BCL, :raw-html:`<br />` UFSS_BCU
     - Uniform Fractions Skill Score including bootstrap upper and lower confidence limits
+    - Double
   * - 38-40
     - F_RATE, :raw-html:`<br />` F_RATE _BCL, :raw-html:`<br />` F_RATE _BCU
     - Forecast event frequency including bootstrap upper and lower confidence limits
+    - Double
   * - 41-43
     - O_RATE, :raw-html:`<br />` O _RATE _BCL, :raw-html:`<br />` O _RATE _BCU
     - Observed event frequency including bootstrap upper and lower confidence limits
+    - Double
 
 .. _table_GS_format_info_GRAD:
 
 .. list-table:: Format information for GRAD (Gradient Statistics) output line type
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - GRAD OUTPUT FORMAT
-    - 
-    - 
   * - Column Number
     - GRAD Column Name
     - Description
+    - Data Type
   * - 24
     - GRAD
     - Gradient Statistics line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26
     - FGBAR
     - Mean of absolute value of forecast gradients
+    - Double
   * - 27
     - OGBAR
     - Mean of absolute value of observed gradients
+    - Double
   * - 28
     - MGBAR
     - Mean of maximum of absolute values of forecast and observed gradients
+    - Double
   * - 29
     - EGBAR
     - Mean of absolute value of forecast minus observed gradients
+    - Double
   * - 30
     - S1
     - S1 score
+    - Double
   * - 31
     - S1_OG
     - S1 score with respect to observed gradient
+    - Double
   * - 32
     - FGOG_RATIO
     - Ratio of forecast and observed gradients
+    - Double
   * - 33
     - DX
     - Gradient size in the X-direction
+    - Integer 
   * - 34
     - DY
     - Gradient size in the Y-direction
+    - Integer 
+  * - 35
+    - FGMAG 
+    - Magnitude of the forecast gradient when the X and Y-directions are interpreted as a vector
+    - Double
+  * - 36
+    - OGMAG 
+    - Magnitude of the observed gradient when the X and Y-directions are intrepreted as a vector
+    - Double
+  * - 37
+    - MAG_RMSE 
+    - Root mean squared difference of the forecast gradient magnitude minus the observed gradient magnitude
+    - Double
+  * - 38
+    - LAPLACE_RMSE 
+    - Root mean squared difference of the sum of the forecast X and Y-gradients minus the sum of the observed X and Y-gradients
+    - Double
 
 .. _table_GS_format_info_DMAP:
 
 .. list-table:: Format information for DMAP (Distance Map) output line type
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - DMAP OUTPUT FORMAT
-    - 
-    - 
   * - Column Number
     - DMAP Column Name
     - Description
+    - Data Type
   * - 24
     - DMAP
     - Distance Map line type
+    - String
   * - 25
     - TOTAL
     - Total number of matched pairs
+    - Integer
   * - 26
     - FY
     - Number of forecast events
+    - Integer
   * - 27
     - OY
     - Number of observation events
+    - Integer
   * - 28
     - FBIAS
     - Frequency Bias
+    - Double
   * - 29
     - BADDELEY
     - Baddeley's :math:`\Delta` Metric
+    - Double
   * - 30
     - HAUSDORFF
     - Hausdorff Distance
+    - Double
   * - 31
     - MED_FO
     - Mean-error Distance from observation to forecast
+    - Double
   * - 32
     - MED_OF
     - Mean-error Distance from forecast to observation
+    - Double
   * - 33
     - MED_MIN
     - Minimum of MED_FO and MED_OF
+    - Double
   * - 34
     - MED_MAX
     - Maximum of MED_FO and MED_OF
+    - Double
   * - 35
     - MED_MEAN
     - Mean of MED_FO and MED_OF
+    - Double
   * - 36
     - FOM_FO
     - Pratt's Figure of Merit from observation to forecast
+    - Double
   * - 37
     - FOM_OF
     - Pratt's Figure of Merit from forecast to observation
+    - Double
   * - 38
     - FOM_MIN
     - Minimum of FOM_FO and FOM_OF
+    - Double
   * - 39
     - FOM_MAX
     - Maximum of FOM_FO and FOM_OF
+    - Double
   * - 40
     - FOM_MEAN
     - Mean of FOM_FO and FOM_OF
+    - Double
   * - 41
     - ZHU_FO
     - Zhu's Measure from observation to forecast
+    - Double
   * - 42
     - ZHU_OF
     - Zhu's Measure from forecast to observation
+    - Double
   * - 43
     - ZHU_MIN
     - Minimum of ZHU_FO and ZHU_OF
+    - Double
   * - 44
     - ZHU_MAX
     - Maximum of ZHU_FO and ZHU_OF
+    - Double
   * - 45
     - ZHU_MEAN
     - Mean of ZHU_FO and ZHU_OF
+    - Double
   * - 46
     - G
     - :math:`G` distance measure
+    - Double
   * - 47
     - GBETA
     - :math:`G_\beta` distance measure
+    - Double
   * - 48
     - BETA_VALUE
     - Beta value used to compute :math:`G_\beta`
+    - Double
 
 If requested using the **nc_pairs_flag** dictionary in the configuration file, a NetCDF file containing the matched pair and forecast minus observation difference fields for each combination of variable type/level and masking region applied will be generated. The contents of this file are determined by the contents of the nc_pairs_flag dictionary. The output NetCDF file is named similarly to the other output files: **grid_stat_PREFIX_ HHMMSSL_YYYYMMDD_HHMMSSV_pairs.nc**. Commonly available NetCDF utilities such as ncdump or ncview may be used to view the contents of the output file.
 
@@ -886,10 +965,8 @@ The output NetCDF file contains the dimensions and variables shown in :numref:`t
 
 .. list-table:: Dimensions defined in NetCDF matched pair output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - grid_stat NETCDF DIMENSIONS
-    -
   * - NetCDF Dimension
     - Description
   * - Lat
@@ -897,34 +974,36 @@ The output NetCDF file contains the dimensions and variables shown in :numref:`t
   * - Lon
     - Dimension of the longitude (i.e. Number of grid points in the East-West direction)
 
-      
+
 .. role:: raw-html(raw)
     :format: html
-	     
+
 .. _table_GS_var_NetCDF_matched_pair_out:
 
 .. list-table:: A selection of variables that can appear in the NetCDF matched pair output
   :widths: auto
-  :header-rows: 2
+  :header-rows: 1
 
-  * - grid_stat NETCDF VARIABLES
-    - 
-    - 
   * - NetCDF Variable
     - Dimension
     - Description
+    - Data Type
   * - FCST_VAR_LVL_MASK  _INTERP_MTHD  _INTERP_PNTS
     - lat, lon
     - For each model variable (VAR), vertical level (LVL), masking region (MASK), and, if applicable, smoothing operation (INTERP_MTHD and INTERP_PNTS), the forecast value is listed for each point in the mask.
+    - Float
   * - OBS_VAR_LVL_MASK  DIFF_FCSTVAR
     - lat, lon
-    - For each model variable (VAR), vertical level (LVL), and masking region (MASK), the observation value is listed for each point in the mask .
+    - For each model variable (VAR), vertical level (LVL), and masking region (MASK), the observation value is listed for each point in the mask.
+    - Float
   * - DIFF_FCSTVAR :raw-html:`<br />` _FCSTLVL :raw-html:`<br />` _OBSVAR :raw-html:`<br />` _OBSLVL_MASK :raw-html:`<br />` _INTERP_MTHD :raw-html:`<br />` _INTERP_PNTS
     - lat, lon
     - For each model variable (VAR), vertical level (LVL), masking region (MASK), and, if applicable, smoothing operation (INTERP_MTHD and INTERP_PNTS), the difference (forecast - observation) is computed for each point in the mask.
+    - Float
   * - FCST_XGRAD_DX  FCST_YGRAD_DX  OBS_XGRAD_DY  OBS_YGRAD_DY
     - lat, lon
     - List the gradient of the forecast and observation fields computed in the grid-x and grid-y directions where DX and DY indicate the gradient direction and size.
+    - Float
 
 
 The STAT output files described for grid_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by grid_stat, please see :numref:`stat-analysis`. 
