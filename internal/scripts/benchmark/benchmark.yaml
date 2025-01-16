@@ -1,0 +1,42 @@
+# Configuration file used to collect benchmarking in MET tools using CTRACK
+#
+
+
+
+#
+# File type to save
+#
+# Options are: csv, tabular, or both.
+# Default is csv if nothing is indicated
+save_file: 'both'
+
+#
+# Output directory where output files will be saved
+#
+output_path: !ENV '${OUTPUT_BASE}'
+
+#
+# location of METplus
+#
+metplus_base: !ENV '${METPLUS_BASE}'
+
+#
+# location of system.conf file
+#
+system_conf: "/Users/minnawin/AF_optimization/system.conf"
+#system_conf: "/d1/personal/mwin/AF_optimization/system.conf"
+
+#
+# location of METplus wrapper configuration file
+#
+#wrapper_conf: "/d1/personal/mwin/AF_optimization/GridStat_fcstRRFS_obsCCPA_1hrAPCP.conf"
+wrapper_conf: "/Users/minnawin/AF_optimization/GridStat_fcstRRFS_obsCCPA_1hrAPCP.conf"
+
+#
+# number of times to run the use case, default=1
+#
+num_runs: 1
+
+
+
+
