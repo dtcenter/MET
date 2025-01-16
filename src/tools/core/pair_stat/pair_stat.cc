@@ -443,6 +443,13 @@ void process_mpr_pairs(const ConcatString &file_name, PairsFormat format) {
    LineDataFile f;
    const char *method_name = "process_mpr_pairs() -> ";
 
+   // TODO: Add support for -format python
+   if(format == PairsFormat::Python) { 
+      mlog << Error << "\nprocess_mpr_pairs() -> "
+           << "the \"-format python\" option is not supported yet!\n\n";
+      exit(1);
+   }
+
    //
    // Open the input file
    //
@@ -482,7 +489,12 @@ void process_mpr_pairs(const ConcatString &file_name, PairsFormat format) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_ioda_pairs(const ConcatString &file_name) {
-   // TODO: work here
+
+   // TODO: Add support for -format ioda
+   mlog << Error << "\nprocess_ioda_pairs() -> "
+        << "the \"-format ioda\" option is not supported yet!\n\n";
+   exit(1);
+
    return;
 }
 
