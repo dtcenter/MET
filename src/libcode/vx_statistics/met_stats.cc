@@ -3639,6 +3639,10 @@ GRADInfo & GRADInfo::operator=(const GRADInfo &c) {
 GRADInfo & GRADInfo::operator+=(const GRADInfo &c) {
    GRADInfo g_info;
 
+   // Return if nothing to add
+   if(c.total == 0) return *this;
+
+   // Gradient definition must remain constant
    if(dx != c.dx || dy != c.dy) {
       mlog << Error << "\nGRADInfo::operator+=() -> "
            << "the gradient DX (" << dx << " vs " << c.dx
@@ -3656,6 +3660,11 @@ GRADInfo & GRADInfo::operator+=(const GRADInfo &c) {
       g_info.ogbar = (ogbar*total + c.ogbar*c.total) / g_info.total;
       g_info.mgbar = (mgbar*total + c.mgbar*c.total) / g_info.total;
       g_info.egbar = (egbar*total + c.egbar*c.total) / g_info.total;
+ 
+      g_info.fgmag   = (fgmag*total   + c.fgmag*c.total)   / g_info.total;
+      g_info.ogmag   = (ogmag*total   + c.ogmag*c.total)   / g_info.total;
+      g_info.mag_mse = (mag_mse*total + c.mag_mse*c.total) / g_info.total;
+      g_info.lap_mse = (lap_mse*total + c.lap_mse*c.total) / g_info.total;
    }
 
    assign(g_info);
@@ -3676,10 +3685,12 @@ void GRADInfo::init_from_scratch() {
 
 void GRADInfo::clear() {
 
-   dx    = dy    = 0;
-   fgbar = ogbar = 0.0;
-   mgbar = egbar = 0.0;
-   total = 0;
+   total   = 0;
+   dx      = dy      = 0;
+   fgbar   = ogbar   = 0.0;
+   mgbar   = egbar   = 0.0;
+   fgmag   = ogmag   = 0.0;
+   mag_mse = lap_mse = 0.0;
 
    return;
 }
@@ -3690,6 +3701,8 @@ void GRADInfo::assign(const GRADInfo &c) {
 
    clear();
 
+   total = c.total;
+
    // Gradient sizes
    dx = c.dx;
    dy = c.dy;
@@ -3699,7 +3712,12 @@ void GRADInfo::assign(const GRADInfo &c) {
    ogbar = c.ogbar;
    mgbar = c.mgbar;
    egbar = c.egbar;
-   total = c.total;
+
+   // Gradient vector partial sums
+   fgmag = c.fgmag;
+   ogmag = c.ogmag;
+   mag_mse = c.mag_mse;
+   lap_mse = c.lap_mse;
 
    return;
 }
@@ -3747,6 +3765,18 @@ double GRADInfo::fgog_ratio() const {
    }
 
    return v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double GRADInfo::magnitude_rmse() const {
+   return square_root(mag_mse);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double GRADInfo::laplace_rmse() const {
+   return square_root(lap_mse);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3801,6 +3831,22 @@ void GRADInfo::set(int grad_dx, int grad_dy,
                       max(fabs(fgy_na[i]), fabs(ogy_na[i])));
       egbar += wgt * (fabs(fgx_na[i] - ogx_na[i]) +
                       fabs(fgy_na[i] - ogy_na[i]));
+
+      // Gradient vector magnitude 
+      // Reference:
+      //   Ebert-Uphoff, I.: An Investigation of Metrics to Evaluate the Sharpness in
+      //     AI-Generated Meteorology Imagery
+      //     Draft version, Jan 26, 2024
+
+      double fmag = square_root(fgx_na[i] * fgx_na[i] + fgy_na[i] * fgy_na[i]);
+      double omag = square_root(ogx_na[i] * ogx_na[i] + ogy_na[i] * ogy_na[i]);
+ 
+      // Gradient vector sums
+      fgmag += wgt * fmag;
+      ogmag += wgt * omag;
+      mag_mse += wgt * (fmag - omag)*(fmag - omag);
+      double diff = (fgx_na[i] + fgy_na[i]) - (ogx_na[i] + ogy_na[i]);
+      lap_mse += wgt * (diff * diff);
       total++;
    }
 
@@ -3811,6 +3857,72 @@ void GRADInfo::set(int grad_dx, int grad_dy,
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GRADInfo::set_stat(const string &stat_name, double v) {
+
+   // Store the statistic by name
+        if(stat_name == "TOTAL"       ) total   = nint(v);
+   else if(stat_name == "FGBAR"       ) fgbar   = v;
+   else if(stat_name == "OGBAR"       ) ogbar   = v;
+   else if(stat_name == "MGBAR"       ) mgbar   = v;
+   else if(stat_name == "EGBAR"       ) egbar   = v;
+   else if(stat_name == "DX"          ) dx      = nint(v);
+   else if(stat_name == "DY"          ) dy      = nint(v);
+   else if(stat_name == "FGMAG"       ) fgmag   = v;
+   else if(stat_name == "OGMAG"       ) ogmag   = v;
+   else if(stat_name == "MAG_RMSE"    ) mag_mse = v*v;
+   else if(stat_name == "LAPLACE_RMSE") lap_mse = v*v;
+   else if(stat_name == "S1"    ||
+           stat_name == "S1_OG" ||
+           stat_name == "FGOG_RATIO") {
+      // Ignore derived quantities
+   }
+   else {
+      mlog << Error << "\nGRADInfo::set_stat() -> "
+           << "unknown gradient statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double GRADInfo::get_stat(const string &stat_name) const {
+   double v = bad_data_double;
+
+   // Find the statistic by name
+        if(stat_name == "TOTAL"       ) v = (double) total;
+   else if(stat_name == "FGBAR"       ) v = fgbar;
+   else if(stat_name == "OGBAR"       ) v = ogbar;
+   else if(stat_name == "MGBAR"       ) v = mgbar;
+   else if(stat_name == "EGBAR"       ) v = egbar;
+   else if(stat_name == "S1"          ) v = s1();
+   else if(stat_name == "S1_OG"       ) v = s1_og();
+   else if(stat_name == "FGOG_RATIO"  ) v = fgog_ratio();
+   else if(stat_name == "DX"          ) v = (double) dx;
+   else if(stat_name == "DY"          ) v = (double) dy;
+   else if(stat_name == "FGMAG"       ) v = fgmag;
+   else if(stat_name == "OGMAG"       ) v = ogmag;
+   else if(stat_name == "MAG_RMSE"    ) v = magnitude_rmse();
+   else if(stat_name == "LAPLACE_RMSE") v = laplace_rmse();
+   else {
+      mlog << Error << "\nGRADInfo::get_stat() -> "
+           << "unknown gradient statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   // Return bad data for 0 pairs 
+   if(total == 0 && stat_name != "TOTAL") {
+      v = bad_data_double;
+   }
+
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////

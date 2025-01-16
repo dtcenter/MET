@@ -2232,6 +2232,32 @@ This dictionary may include the following entries:
      prob_cat_thresh = [];
   }
 
+
+.. _gradient:
+
+gradient
+--------
+
+:ref:`gradient <gradient>`
+
+The "gradient" entry is a dictionary which specifies the number and size
+of gradients to be computed and applies to both Grid-Stat and
+Series-Analysis. The "dx" and "dy" entries specify the size of the
+gradients in grid units in the X and Y dimensions, respectively. "dx"
+and "dy" are arrays of integers (positive or negative) which must have the
+same length, and the GRAD output line type will be computed separately for
+each entry. When computing gradients, the value at the (x, y) grid point
+is replaced by the value at the (x+dx, y+dy) grid point minus the value at
+(x, y). This configuration option may be set separately in each "obs.field"
+entry.
+
+.. code-block:: none
+
+  gradient = {
+     dx = [ 1 ];
+     dy = [ 1 ];
+   }
+
 output_flag
 -----------
 
