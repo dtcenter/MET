@@ -27,17 +27,17 @@ metplus_base: !ENV '${METPLUS_BASE}'
 system_conf: "/d1/personal/mwin/AF_optimization/system.conf"
 
 #
-# location of METplus wrapper configuration file
+# location of METplus wrapper configuration file(s)
 #
 wrapper_conf: 
-   - "/d1/personal/mwin/AF_optimization/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP.conf"
-   - "/d1/personal/mwin/AF_optimization/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP_nbhrd.conf"
-   - "/d1/personal/mwin/AF_optimization/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP_prob.conf"
-   - "/d1/personal/mwin/AF_optimization/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP_prob.conf"
-   - "/d1/personal/mwin/AF_optimization/point_stat/PointStat_fcstRRFS_obsNDAS_TMP.conf"
-   - "/d1/personal/mwin/AF_optimization/point_stat/PointStat_fcstRRFS_obsNDAS_TMP_prob.conf"
-   - "/d1/personal/mwin/AF_optimization/ensemble_stat/EnsembleStat_fcstRRFS_obsCCPA_1hrAPCP.conf"
-   - "/d1/personal/mwin/AF_optimization/ensemble_stat/EnsembleStat_fcstRRFS_obsNDAS_TMP.conf"
+   - "/d1/personal/mwin/AF_optimization/usecase_confs/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP.conf"
+   - "/d1/personal/mwin/AF_optimization/usecase_confs/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP_nbrhd.conf"
+   - "/d1/personal/mwin/AF_optimization/usecase_confs/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP_prob.conf"
+   - "/d1/personal/mwin/AF_optimization/usecase_confs/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP_prob.conf"
+   - "/d1/personal/mwin/AF_optimization/usecase_confs/point_stat/PointStat_fcstRRFS_obsNDAS_TMP.conf"
+   - "/d1/personal/mwin/AF_optimization/usecase_confs/point_stat/PointStat_fcstRRFS_obsNDAS_TMP_prob.conf"
+   - "/d1/personal/mwin/AF_optimization/usecase_confs/ensemble_stat/EnsembleStat_fcstRRFS_obsCCPA_1hrAPCP.conf"
+   - "/d1/personal/mwin/AF_optimization/usecase_confs/ensemble_stat/EnsembleStat_fcstRRFS_obsNDAS_TMP.conf"
   
 
 #
