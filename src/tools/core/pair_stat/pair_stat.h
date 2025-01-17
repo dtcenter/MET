@@ -106,7 +106,7 @@ static ConcatString     config_file;
 static PairStatConfInfo conf_info;
 
 // Optional arguments
-static ConcatString out_dir;
+static ConcatString out_base;
 
 ///////////////////////////////////////////////////////////////////////////////
 //

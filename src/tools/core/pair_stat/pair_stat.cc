@@ -85,7 +85,7 @@ static void usage();
 static void set_pairs(const StringArray &);
 static void set_format(const StringArray &);
 static void set_config(const StringArray &);
-static void set_outdir(const StringArray &);
+static void set_out(const StringArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -139,7 +139,8 @@ const string get_tool_name() {
 void process_command_line(int argc, char **argv) {
    const char *method_name = "process_command_line() -> ";
 
-   out_dir = ".";
+   // Default output file base
+   out_base = "./pair_stat";
 
    // Check for zero arguments
    if(argc == 1) usage();
@@ -155,7 +156,7 @@ void process_command_line(int argc, char **argv) {
    cline.add(set_pairs,  "-pairs", -1);
    cline.add(set_format, "-format", 1);
    cline.add(set_config, "-config", 1);
-   cline.add(set_outdir, "-outdir", 1);
+   cline.add(set_out,    "-out", 1);
 
    // Parse the command line
    cline.parse();
@@ -420,16 +421,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
    //
 
    // Append the output directory and program name
-   str << cs_erase << out_dir << "/" << program_name;
-
-   // Append the output prefix, if defined
-   if(conf_info.output_prefix.nonempty())
-      str << "_" << conf_info.output_prefix;
-
-   // Append the timing information
-   str << "_"
-       << sec_to_hhmmss(lead_sec) << "L_"
-       << unix_to_yyyymmdd_hhmmss(valid_ut) << "V";
+   str << cs_erase << out_base;
 
    // Append the suffix
    str << suffix;
@@ -1295,7 +1287,7 @@ void usage() {
         << "\t-pairs file_1 ... file_n | file_list\n"
         << "\t-format type\n"
         << "\t-config config_file\n"
-        << "\t[-outdir path]\n"
+        << "\t[-out base]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
@@ -1310,8 +1302,8 @@ void usage() {
         << "\t\t\"-config config_file\" is a PairStatConfig file containing "
         << "the desired configuration settings (required).\n"
 
-        << "\t\t\"-outdir path\" overrides the default output "
-        << "directory (" << out_dir << ") (optional).\n"
+        << "\t\t\"-out base\" overrides the default output "
+        << "file base (./tc_gen) (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
@@ -1342,8 +1334,8 @@ void set_config(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_outdir(const StringArray & a) {
-   out_dir = a[0];
+void set_out(const StringArray & a) {
+   out_base = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////

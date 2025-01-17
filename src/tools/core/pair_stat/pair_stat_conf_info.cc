@@ -95,7 +95,6 @@ void PairStatConfInfo::clear() {
    mask_sid_map.clear();
    point_weight_flag = PointWeightType::None;
    tmp_dir.clear();
-   output_prefix.clear();
    version.clear();
    seeps_climo_name.clear();
    seeps_p1_thresh.clear();
@@ -144,9 +143,6 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
 
    // Conf: tmp_dir
    tmp_dir = parse_conf_tmp_dir(&conf);
-
-   // Conf: output_prefix
-   output_prefix = conf.lookup_string(conf_key_output_prefix);
 
    // Conf: fcst.pairs and obs.pairs
    fdict = conf.lookup_array(conf_key_fcst_pairs);
