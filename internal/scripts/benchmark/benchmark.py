@@ -91,8 +91,6 @@ def extract_detail_info(infile:str, subdir:str) -> pd.DataFrame:
             else:
                 details_df = pd.concat([details_df, cur])
 
-    # move the detail_output.txt file to the use case subdirectory
-    os.rename(infile, os.path.join(subdir, "detail_output.txt"))
 
     return details_df
 
@@ -135,8 +133,6 @@ def extract_summary_info(infile:str, subdir:str) -> pd.DataFrame:
         else:
             summary_df = pd.concat([summary_df, cur_df])
 
-    # move the summary_output.txt file to the use case subdirectory
-    os.rename(infile, os.path.join(subdir, "summary_output.txt"))
 
     return summary_df
 
@@ -245,14 +241,14 @@ def save_results(consolidated:pd.DataFrame, output_dir:str, ts:str, filename, su
     c_ext = ".csv"
     t_ext = ".txt"
 
-       # filename is either filename_<timestamp>.ext
+    # filename is either filename_<timestamp>.ext
     # or <timestamp>.ext, where ext is .csv or .txt
     if filename == " " or filename is None:
        c_filename = ts + c_ext
        t_filename = ts + t_ext
     else:
-        c_filename = filename + "_" + c_ext
-        t_filename = filename + "_" + t_ext
+        c_filename = filename + "_" + ts + c_ext
+        t_filename = filename + "_" + ts + t_ext
 
     # save the csv and txt files to the use case directory
     full_out_dir = os.path.join(output_dir, subdir)
@@ -264,9 +260,9 @@ def save_results(consolidated:pd.DataFrame, output_dir:str, ts:str, filename, su
 
     # Do some checking to make sure the files were actually created and they aren't empty
     assert os.path.isfile(full_csv_output_file), "WARNING: csv output file not created"
-    assert os.path.getsize(int(full_csv_output_file) > 0),"WARNING: csv file created but is empty"
+    assert os.path.getsize(int(full_csv_output_file) == 0),"WARNING: csv file created but is empty"
     assert os.path.isfile(full_table_output_file), "WARNING: tabular output file not created"
-    assert os.path.getsize(int(full_table_output_file) > 0), "WARNING: tabular file created but is empty"
+    assert os.path.getsize(int(full_table_output_file) == 0), "WARNING: tabular file created but is empty"
 
 
 
@@ -357,6 +353,7 @@ def run_benchmark():
     # Run the use case using the METplus wrapper and the use case and system config files
     # (for the specified number of times)
     for use_case in wrapper_confs:
+
         # Create the subdirectory for this use case using the use case config file name
         usecase_file = os.path.basename(use_case)
         usecase_subdir_name = usecase_file.split(".")[0]
