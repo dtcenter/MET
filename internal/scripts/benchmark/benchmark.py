@@ -91,7 +91,7 @@ def extract_detail_info(infile:str, subdir:str) -> pd.DataFrame:
             else:
                 details_df = pd.concat([details_df, cur])
 
-    # move the summary_output.txt file to the use case subdirectory
+    # move the detail_output.txt file to the use case subdirectory
     os.rename(infile, os.path.join(subdir, "detail_output.txt"))
 
     return details_df
@@ -137,7 +137,6 @@ def extract_summary_info(infile:str, subdir:str) -> pd.DataFrame:
 
     # move the summary_output.txt file to the use case subdirectory
     os.rename(infile, os.path.join(subdir, "summary_output.txt"))
-
 
     return summary_df
 
@@ -338,10 +337,7 @@ def run_benchmark():
     # the wrapper command is run
     ctrack_path = os.path.dirname(__file__)
     summary_filename = os.path.join(ctrack_path, "summary_output.txt")
-    assert os.path.exists(summary_filename), "ERROR: CTRACK did not produce a summary_output.txt file for this use case"
-
     details_filename = os.path.join(ctrack_path, "detail_output.txt")
-    assert os.path.exists(details_filename), "ERROR: CTRACK did not produce a detail_output.txt file for this use case"
 
     output_base = settings['output_path']
     # if the base output dir does not exist, create it
@@ -356,20 +352,20 @@ def run_benchmark():
 
     wrapper_confs = settings['wrapper_conf']
 
-    # Create the subdirectory for this use case using the use case config file name
-    usecase_conf_path = settings['wrapper_conf']
-    usecase_file = os.path.basename(usecase_conf_path)
-    usecase_subdir_name = usecase_file.split(".")[0]
-    usecase_subdir = str(os.path.join(output_base, usecase_subdir_name))
-    os.makedirs(usecase_subdir, exist_ok=True)
 
 
     # Run the use case using the METplus wrapper and the use case and system config files
     # (for the specified number of times)
     for use_case in wrapper_confs:
+        # Create the subdirectory for this use case using the use case config file name
+        usecase_file = os.path.basename(use_case)
+        usecase_subdir_name = usecase_file.split(".")[0]
+        usecase_subdir = str(os.path.join(output_base, usecase_subdir_name))
+        os.makedirs(usecase_subdir, exist_ok=True)
+
         for _ in range(0, num_of_runs):
            metplus_str = os.path.join(settings['metplus_base'], 'ush/run_metplus.py')
-           subprocess.run(['python', metplus_str, settings['wrapper_conf'], settings['system_conf']])
+           subprocess.run(['python', metplus_str, use_case, settings['system_conf']])
 
         # Extract the benchmark data
         summary_info = extract_summary_info(summary_filename, usecase_subdir)
