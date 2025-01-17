@@ -2,14 +2,6 @@
 #
 
 
-
-#
-# File type to save
-#
-# Options are: csv, tabular, or both.
-# Default is csv if nothing is indicated
-save_file: 'both'
-
 #
 # filename
 # Timestamp in ISO 1806 format is used to generate output filename
@@ -38,7 +30,15 @@ system_conf: "/d1/personal/mwin/AF_optimization/system.conf"
 # location of METplus wrapper configuration file
 #
 wrapper_conf: 
-   - "/d1/personal/mwin/AF_optimization/gGridStat_fcstRRFS_obsCCPA_1hrAPCP.conf"
+   - "/d1/personal/mwin/AF_optimization/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP.conf"
+   - "/d1/personal/mwin/AF_optimization/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP_nbhrd.conf"
+   - "/d1/personal/mwin/AF_optimization/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP_prob.conf"
+   - "/d1/personal/mwin/AF_optimization/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP_prob.conf"
+   - "/d1/personal/mwin/AF_optimization/point_stat/PointStat_fcstRRFS_obsNDAS_TMP.conf"
+   - "/d1/personal/mwin/AF_optimization/point_stat/PointStat_fcstRRFS_obsNDAS_TMP_prob.conf"
+   - "/d1/personal/mwin/AF_optimization/ensemble_stat/EnsembleStat_fcstRRFS_obsCCPA_1hrAPCP.conf"
+   - "/d1/personal/mwin/AF_optimization/ensemble_stat/EnsembleStat_fcstRRFS_obsNDAS_TMP.conf"
+  
 
 #
 # number of times to run the use case, default=1
