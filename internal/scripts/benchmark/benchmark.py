@@ -260,9 +260,7 @@ def save_results(consolidated:pd.DataFrame, output_dir:str, ts:str, filename, su
 
     # Do some checking to make sure the files were actually created and they aren't empty
     assert os.path.isfile(full_csv_output_file), "WARNING: csv output file not created"
-    assert os.path.getsize(int(full_csv_output_file) == 0),"WARNING: csv file created but is empty"
     assert os.path.isfile(full_table_output_file), "WARNING: tabular output file not created"
-    assert os.path.getsize(int(full_table_output_file) == 0), "WARNING: tabular file created but is empty"
 
 
 
@@ -278,14 +276,11 @@ def check_settings(settings:dict) -> None:
     output_dir = settings['output_path']
     metplus_dir = settings['metplus_base']
     sys_conf = settings['system_conf']
-    wrapper_conf = settings['wrapper_conf']
 
     assert os.path.exists(output_dir), "ERROR|benchmark.yaml::The OUTPUT_BASE environment points to a non-existent directory."
     assert os.path.exists(metplus_dir), "ERROR|benchmark.yaml::The METplus directory does not exist. Check your METPLUS_BASE env."
     assert os.path.exists(sys_conf), "ERROR|benchmark.yaml::The system.conf file path does not exist."
     assert os.path.isfile(sys_conf), "ERROR|benchmark.yaml::The system.conf file does not exist in the specified location."
-    assert os.path.exists(wrapper_conf), "ERROR|benchmark.yaml::The path to the use case config file does not exist. "
-    assert os.path.isfile(wrapper_conf), "ERROR|benchmark.yaml::The use case config file does not exist in the specified location "
 
 
 def generate_info(settings:dict, ts:str, usecase: str, subdir: str) -> None:
