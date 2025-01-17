@@ -49,6 +49,17 @@ import pandas as pd
    - a list of one or more use case config files to be used
       - a subdirectory will be created based on the use case config file name where output will be saved   
 
+    ****
+   * Usage:
+    ****
+       -update the benchmark.yaml file to indicate:
+          - output base directory
+          - filename to apply to the benchmark output files (the timestamp will be added)
+             - if no filename is specified, the ISO 1806 formatted timestamp will be used
+          - a list of 1 or more use case config files
+             - full file path and name
+          - the number of times each use case is to be run
+          - the system.conf file location (full path)
 """
 
 
@@ -56,7 +67,7 @@ def extract_detail_info(infile:str, subdir:str) -> pd.DataFrame:
     """
      Extract the benchmarking information in the detail_output.txt file produced by CTRACK.
 
-    :param infile: The details file containing benchmarking information
+    :param infile: The detail_output.txt file containing benchmarking information
     :param subdir: The subdirectory for the use case
     :return details_df: A pandas dataframe containing the detail output from CTRACK
     """
@@ -91,6 +102,10 @@ def extract_detail_info(infile:str, subdir:str) -> pd.DataFrame:
             else:
                 details_df = pd.concat([details_df, cur])
 
+    # move the detail_output.txt file to the use case subdirectory
+    curdir = os.cwd()
+    infile_dir = os.path.join(curdir, infile)
+    os.rename(infile_dir, os.path.join(subdir, "detail_output.txt"))
 
     return details_df
 
@@ -132,6 +147,11 @@ def extract_summary_info(infile:str, subdir:str) -> pd.DataFrame:
             counter += 1
         else:
             summary_df = pd.concat([summary_df, cur_df])
+
+    # move the summary_output.txt file to the use case subdirectory
+    curdir = os.getcwd()
+    infile_dir = os.path.join(curdir, infile)
+    os.rename(infile_dir, os.path.join(subdir, "summary_output.txt"))
 
 
     return summary_df
@@ -227,7 +247,7 @@ def parse_config(path=None, data=None, tag='!ENV'):
 
 def save_results(consolidated:pd.DataFrame, output_dir:str, ts:str, filename, subdir:str) -> None:
     """
-       Save the consolidated results into a csv file, tabular file, or both
+       Save the consolidated results into a csv file and a tabular file
 
     :param consolidated: pandas dataframe containing the summary and detail report results from CTRACK
     :param output_dir: the directory where the consolidated file(s) is/are saved
@@ -264,7 +284,6 @@ def save_results(consolidated:pd.DataFrame, output_dir:str, ts:str, filename, su
 
 
 
-
 def check_settings(settings:dict) -> None:
     """
       Check that paths specified in the config file exist
@@ -273,14 +292,15 @@ def check_settings(settings:dict) -> None:
       :return:  None
     """
 
-    output_dir = settings['output_path']
     metplus_dir = settings['metplus_base']
     sys_conf = settings['system_conf']
+    wrapper_confs = settings['wrapper_conf']
 
-    assert os.path.exists(output_dir), "ERROR|benchmark.yaml::The OUTPUT_BASE environment points to a non-existent directory."
-    assert os.path.exists(metplus_dir), "ERROR|benchmark.yaml::The METplus directory does not exist. Check your METPLUS_BASE env."
-    assert os.path.exists(sys_conf), "ERROR|benchmark.yaml::The system.conf file path does not exist."
-    assert os.path.isfile(sys_conf), "ERROR|benchmark.yaml::The system.conf file does not exist in the specified location."
+    assert os.path.exists(metplus_dir), "fERROR|benchmark.yaml::The METplus base directory {metplus_dir} does not exist"
+    assert os.path.exists(sys_conf), "fERROR|benchmark.yaml::The system.conf file {sys_conf}  does not exist."
+
+    for cur_conf in wrapper_confs:
+        assert os.path.exists(cur_conf), "fERROR|benchmark.yaml:: The {cur_conf} use case config file does not exist. "
 
 
 def generate_info(settings:dict, ts:str, usecase: str, subdir: str) -> None:
@@ -292,15 +312,14 @@ def generate_info(settings:dict, ts:str, usecase: str, subdir: str) -> None:
     :param subdir: the use case subdirectory (full path)
     :return: None, write an output text file in the output path specified in the YAML config file
     """
-    info_file = ts + "_info.txt"
+    info_file = "info_"+ usecase+ '_' + ts + ".txt"
     full_path = os.path.join(subdir, info_file)
 
     with open(full_path, 'w') as f:
-        f.write(f"Python version info: {sys.version}")
-        f.write(f"Timestamp: {ts}")
-        f.write(f"Use case : {usecase}")
-        f.write(f"Number of times run: {settings['num_runs']}")
-        f.write(f"Output file(s) saved at: {settings['output_path']}")
+        f.write(f"Python version info: {sys.version}\n")
+        f.write(f"Timestamp: {ts}\n")
+        f.write(f"Use case : {usecase}\n")
+        f.write(f"Number of times run: {settings['num_runs']}\n")
 
 
 
@@ -321,6 +340,7 @@ def run_benchmark():
         yaml_path = os.getcwd()
         benchmark_config = os.getenv("BENCHMARK_YAML_CONFIG_NAME", "benchmark.yaml")
         settings = parse_config(benchmark_config, yaml_path)
+        check_settings(settings)
     except yaml.YAMLError as ye:
         print(ye)
 
@@ -341,14 +361,10 @@ def run_benchmark():
 
     filename = settings['filename']
 
-    wrapper_confs = settings['wrapper_conf']
-
-
-
     # Run the use case using the METplus wrapper and the use case and system config files
     # (for the specified number of times)
+    wrapper_confs = settings['wrapper_conf']
     for use_case in wrapper_confs:
-
         # Create the subdirectory for this use case using the use case config file name
         usecase_file = os.path.basename(use_case)
         usecase_subdir_name = usecase_file.split(".")[0]
@@ -364,7 +380,8 @@ def run_benchmark():
         detail_info = extract_detail_info(details_filename, usecase_subdir)
         consolidated_df = consolidate_info(summary_info, detail_info)
         save_results(consolidated_df, output_base, ts, filename, usecase_subdir)
-        check_settings(settings)
+
+        # provide information about this run: Python version, etc.
         generate_info(settings, ts, use_case, usecase_subdir)
 
 
