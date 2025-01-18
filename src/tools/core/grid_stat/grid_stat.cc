@@ -140,6 +140,8 @@
 #include "vx_log.h"
 #include "seeps.h"
 
+#include "ctrack.hpp"
+
 #ifdef WITH_UGRID
 #include "vx_data2d_ugrid.h"
 #endif
@@ -233,6 +235,7 @@ const string get_tool_name()
 ////////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
+   CTRACK;
    CommandLine cline;
    GrdFileType ftype, otype;
    ConcatString default_config_file;
@@ -399,6 +402,7 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_first_pass(const DataPlane &dp) {
+   CTRACK;
 
    // Unset the flag
    is_first_pass = false;
@@ -424,6 +428,7 @@ void setup_first_pass(const DataPlane &dp) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files(unixtime valid_ut, int lead_sec) {
+   CTRACK;
    int  i, max_col, max_prob_col, max_mctc_col, n_prob, n_cat, n_eclv;
    ConcatString base_name;
 
@@ -573,6 +578,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_table(AsciiTable &at) {
+   CTRACK;
 
    // Justify the STAT AsciiTable objects
    justify_stat_cols(at);
@@ -596,6 +602,7 @@ void setup_table(AsciiTable &at) {
 
 void setup_nc_file(const GridStatNcOutInfo & nc_info,
                    unixtime valid_ut, int lead_sec) {
+   CTRACK;
 
    // Create output NetCDF file name
    build_outfile_name(valid_ut, lead_sec, "_pairs.nc", out_nc_file);
@@ -638,6 +645,7 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
 
 void build_outfile_name(unixtime valid_ut, int lead_sec,
                         const char *suffix, ConcatString &str) {
+   CTRACK;
 
    //
    // Create output file name
@@ -664,6 +672,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
+   CTRACK;
    int i, j, k, m, n;
    int n_cat, n_wind, n_cov;
    double dmin, dmax;
@@ -2081,6 +2090,7 @@ void get_mask_points(const GridStatVxOpt &vx_opt,
                      const DataPlane *fcmn_ptr, const DataPlane *fcsd_ptr,
                      const DataPlane *ocmn_ptr, const DataPlane *ocsd_ptr,
                      const DataPlane *wgt_ptr,  PairDataPoint &pd) {
+   CTRACK;
 
    // Initialize
    pd.erase();
@@ -2113,6 +2123,7 @@ void get_mask_points(const GridStatVxOpt &vx_opt,
 
 void do_cts(CTSInfo *&cts_info, int i_vx,
             const PairDataPoint *pd_ptr) {
+   CTRACK;
    int i, j, n_cts;
 
    //
@@ -2159,6 +2170,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx,
 
 void do_mcts(MCTSInfo &mcts_info, int i_vx,
              const PairDataPoint *pd_ptr) {
+   CTRACK;
    int i;
 
    //
@@ -2207,6 +2219,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx,
 ////////////////////////////////////////////////////////////////////////
 
 void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
+   CTRACK;
    int i, j, k, n_bin;
    PairDataPoint pd_thr, pd;
    SL1L2Info *sl1l2_info = (SL1L2Info *) nullptr;
@@ -2399,6 +2412,7 @@ void do_cnt_sl1l2(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 void do_vl1l2(VL1L2Info *&v_info, int i_vx,
               const PairDataPoint *pd_u_ptr,
               const PairDataPoint *pd_v_ptr) {
+   CTRACK;
    int i, j;
 
    mlog << Debug(2)
@@ -2444,6 +2458,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
 ////////////////////////////////////////////////////////////////////////
 
 void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
+   CTRACK;
    int i, j, k, n_bin;
    PairDataPoint pd;
    PCTInfo *pct_info = (PCTInfo *) nullptr;
@@ -2567,6 +2582,7 @@ void do_pct(const GridStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 void do_nbrcts(NBRCTSInfo *&nbrcts_info,
                int i_vx, int i_wdth, int i_thresh,
                const PairDataPoint *pd_ptr) {
+   CTRACK;
    int i, j, n_nbrcts;
    FieldType field = conf_info.vx_opt[i_vx].nbrhd_info.field;
 
@@ -2643,6 +2659,7 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
                int i_vx, int i_wdth, int i_thresh,
                const PairDataPoint *pd_ptr,
                const PairDataPoint *pd_thr_ptr) {
+   CTRACK;
    int i;
    FieldType field = conf_info.vx_opt[i_vx].nbrhd_info.field;
 
@@ -2703,6 +2720,7 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
 void write_nc(const ConcatString &field_name, const DataPlane &dp,
               int i_vx, const ConcatString &interp_mthd,
               int interp_pnts, FieldType field_type) {
+   CTRACK;
    int i, x, y, n, n_masks;
    ConcatString var_name, var_suffix, interp_str, mask_str;
    ConcatString fcst_name, obs_name, fcst_obs_name;
@@ -3031,6 +3049,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
 void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
                     int i_vx, const SingleThresh &fcst_st,
                     const SingleThresh &obs_st, int i_mask, int wdth) {
+   CTRACK;
    int n, x, y;
    int fcst_flag, obs_flag;
    ConcatString fcst_var_name, obs_var_name, var_suffix, mask_str;
@@ -3194,6 +3213,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 void add_var_att_local(NcVar *var, const char *att_name,
                        const ConcatString att_value) {
 
+   CTRACK;
    if(att_value.nonempty()) add_att(var, att_name, att_value.c_str());
    else                     add_att(var, att_name, na_str);
 
@@ -3203,6 +3223,7 @@ void add_var_att_local(NcVar *var, const char *att_name,
 ////////////////////////////////////////////////////////////////////////
 
 void finish_txt_files() {
+   CTRACK;
    int i;
 
    // Write out the contents of the STAT AsciiTable and
@@ -3232,6 +3253,7 @@ void finish_txt_files() {
 ////////////////////////////////////////////////////////////////////////
 
 void clean_up() {
+   CTRACK;
 
    // Close the output text files that were open for writing
    finish_txt_files();
@@ -3331,6 +3353,7 @@ void set_compress(const StringArray & a) {
 bool read_data_plane(VarInfo *info, DataPlane &dp, Met2dDataFile *mtddf,
                      const ConcatString &filename, const char *desc) {
 
+   CTRACK;
    bool status = mtddf->data_plane(*info, dp);
 
    if(!status) {

@@ -22,6 +22,8 @@
 #include "vx_data2d_factory.h"
 #include "vx_log.h"
 
+#include "ctrack.hpp"
+
 using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
@@ -45,6 +47,7 @@ GridStatConfInfo::~GridStatConfInfo() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatConfInfo::init_from_scratch() {
+   CTRACK;
 
    // Initialize pointers
    vx_opt = (GridStatVxOpt *) nullptr;
@@ -60,6 +63,7 @@ void GridStatConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatConfInfo::clear() {
+   CTRACK;
    int i;
 
    // Initialize values
@@ -101,6 +105,7 @@ void GridStatConfInfo::clear() {
 void GridStatConfInfo::read_config(const char *default_file_name,
                                    const char *user_file_name) {
 
+   CTRACK;
    // Read the config file constants
    conf.read(replace_path(config_const_filename).c_str());
 
@@ -117,7 +122,7 @@ void GridStatConfInfo::read_config(const char *default_file_name,
 
 #ifdef WITH_UGRID
 void GridStatConfInfo::read_ugrid_configs(StringArray ugrid_config_names, const char * user_config) {
-
+   CTRACK;
    ConcatString file_name;
    for (int i=0; i<ugrid_config_names.n_elements(); i++) {
       file_name = replace_path(ugrid_config_names[i].c_str());
@@ -139,6 +144,7 @@ void GridStatConfInfo::read_ugrid_configs(StringArray ugrid_config_names, const 
 
 void GridStatConfInfo::process_config(GrdFileType ftype,
                                       GrdFileType otype) {
+   CTRACK;
    int i, j, n_fvx, n_ovx;
    Dictionary *fdict = (Dictionary *) nullptr;
    Dictionary *odict = (Dictionary *) nullptr;
@@ -331,6 +337,7 @@ void GridStatConfInfo::process_config(GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatConfInfo::process_flags() {
+   CTRACK;
 
    // Initialize
    for(int i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
@@ -393,6 +400,7 @@ void GridStatConfInfo::process_flags() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatConfInfo::process_masks(const Grid &grid) {
+   CTRACK;
    MaskPlane mp;
    ConcatString name;
 
@@ -578,6 +586,7 @@ GridStatVxOpt::~GridStatVxOpt() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatVxOpt::init_from_scratch() {
+   CTRACK;
 
    // Initialize pointers
    fcst_info   = (VarInfo *)    nullptr;
@@ -591,6 +600,7 @@ void GridStatVxOpt::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatVxOpt::clear() {
+   CTRACK;
    int i;
 
    // Initialize values
@@ -658,6 +668,7 @@ void GridStatVxOpt::clear() {
 void GridStatVxOpt::process_config(
         GrdFileType ftype, Dictionary &fdict,
         GrdFileType otype, Dictionary &odict) {
+   CTRACK;
    int i, n;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
@@ -949,6 +960,7 @@ void GridStatVxOpt::process_config(
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatVxOpt::parse_nc_info(Dictionary &odict) {
+   CTRACK;
    const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
    e = odict.lookup(conf_key_nc_pairs_flag);
@@ -1041,6 +1053,7 @@ bool GridStatVxOpt::is_uv_match(const GridStatVxOpt &v) const {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatVxOpt::set_perc_thresh(const PairDataPoint &pd) {
+   CTRACK;
 
    //
    // Compute percentiles for forecast and observation thresholds,
@@ -1302,6 +1315,7 @@ GridStatNcOutInfo::GridStatNcOutInfo() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatNcOutInfo::clear() {
+   CTRACK;
 
    set_all_true();
 
