@@ -80,8 +80,7 @@ if [ -z ${MET_TEST_INPUT+x} ]; then
 fi
 
 # Run the unit tests
-export MET_BUILD_BASE=$(pwd)
-export MET_BASE=$MET_BUILD_BASE/share/met
+export MET_BASE=$(pwd)/share/met
 export MET_TEST_BASE=$(pwd)/internal/test_unit
 export MET_TEST_OUTPUT=$(pwd)/test_output
 export MET_TMP_DIR=$(pwd)/internal/test_unit/tmp
