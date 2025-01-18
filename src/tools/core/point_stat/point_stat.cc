@@ -135,6 +135,8 @@
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
+#include "ctrack.hpp"
+
 #ifdef WITH_UGRID
 #include "vx_data2d_ugrid.h"
 #endif
@@ -366,6 +368,7 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
+   CTRACK;
 
    // Unset the flag
    is_first_pass = false;
@@ -393,6 +396,7 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
+   CTRACK;
    int max_col, max_prob_col, max_mctc_col, max_orank_col;
    int n_prob, n_cat, n_eclv, n_ens;
    ConcatString base_name;
@@ -603,6 +607,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 ////////////////////////////////////////////////////////////////////////
 
 void process_fcst_climo_files() {
+   CTRACK;
    int j;
    int n_fcst;
    DataPlaneArray fcst_dpa;
@@ -748,6 +753,7 @@ void process_fcst_climo_files() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_obs_file(int i_nc) {
+   CTRACK;
    int j, i_obs;
    float obs_arr[OBS_ARRAY_LEN], hdr_arr[HDR_ARRAY_LEN];
    float prev_obs_arr[OBS_ARRAY_LEN];
@@ -972,6 +978,7 @@ void process_obs_file(int i_nc) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
+   CTRACK;
    int n_cat, n_wind;
    ConcatString cs;
 
@@ -1393,6 +1400,7 @@ void process_scores() {
 ////////////////////////////////////////////////////////////////////////
 
 void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
+   CTRACK;
    int i, j, n_cat;
 
    mlog << Debug(2)
@@ -1446,6 +1454,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 void do_mcts(MCTSInfo &mcts_info, int i_vx, const PairDataPoint *pd_ptr) {
+   CTRACK;
    int i;
 
    mlog << Debug(2)
@@ -1497,6 +1506,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, const PairDataPoint *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
+   CTRACK;
    int i, j, k, n_bin;
    PairDataPoint pd_thr, pd;
    SL1L2Info *sl1l2_info = (SL1L2Info *) nullptr;
@@ -1688,6 +1698,7 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
 void do_vl1l2(VL1L2Info *&v_info, int i_vx,
               const PairDataPoint *pd_u_ptr, const PairDataPoint *pd_v_ptr) {
+   CTRACK;
    int i, j;
 
    mlog << Debug(2)
@@ -1735,6 +1746,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
 ////////////////////////////////////////////////////////////////////////
 
 void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
+   CTRACK;
    int i, j, k, n_bin;
    PairDataPoint pd;
    PCTInfo *pct_info = (PCTInfo *) nullptr;
@@ -1856,6 +1868,7 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
+   CTRACK;
    PairDataEnsemble hira_pd;
    int i, j, k, lvl_blw, lvl_abv;
    NumArray f_ens;
@@ -2046,6 +2059,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
+   CTRACK;
    PairDataPoint hira_pd;
    int i, j, k, lvl_blw, lvl_abv;
    double f_cov, ocmn_cov;
@@ -2230,6 +2244,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 void finish_txt_files() {
+   CTRACK;
    int i;
 
    // Write out the contents of the STAT AsciiTable and
@@ -2333,6 +2348,7 @@ void usage() {
 #ifdef WITH_UGRID
 void set_ugrid_config(const StringArray & a)
 {
+   CTRACK;
    ugrid_config_files.add(a[0]);
 }
 #endif
@@ -2341,6 +2357,7 @@ void set_ugrid_config(const StringArray & a)
 
 void set_point_obs(const StringArray & a)
 {
+   CTRACK;
    obs_file.add(a[0]);
 }
 
@@ -2348,6 +2365,7 @@ void set_point_obs(const StringArray & a)
 
 void set_ncfile(const StringArray & a)
 {
+   CTRACK;
    obs_file.add(a[0]);
 }
 
@@ -2355,6 +2373,7 @@ void set_ncfile(const StringArray & a)
 
 void set_obs_valid_beg_time(const StringArray & a)
 {
+   CTRACK;
    obs_valid_beg_ut = timestring_to_unix(a[0].c_str());
 }
 
@@ -2362,6 +2381,7 @@ void set_obs_valid_beg_time(const StringArray & a)
 
 void set_obs_valid_end_time(const StringArray & a)
 {
+   CTRACK;
    obs_valid_end_ut = timestring_to_unix(a[0].c_str());
 }
 
