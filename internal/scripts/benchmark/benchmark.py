@@ -103,8 +103,8 @@ def extract_detail_info(infile:str, subdir:str) -> pd.DataFrame:
                 details_df = pd.concat([details_df, cur])
 
     # move the detail_output.txt file to the use case subdirectory
-    curdir = os.cwd()
-    infile_dir = os.path.join(curdir, infile)
+    cur_dir = os.path.dirname(__file__)
+    infile_dir = os.path.join(cur_dir, infile)
     os.rename(infile_dir, os.path.join(subdir, "detail_output.txt"))
 
     return details_df
@@ -149,8 +149,8 @@ def extract_summary_info(infile:str, subdir:str) -> pd.DataFrame:
             summary_df = pd.concat([summary_df, cur_df])
 
     # move the summary_output.txt file to the use case subdirectory
-    curdir = os.getcwd()
-    infile_dir = os.path.join(curdir, infile)
+    cur_dir = os.path.dirname(__file__)
+    infile_dir = os.path.join(cur_dir, infile)
     os.rename(infile_dir, os.path.join(subdir, "summary_output.txt"))
 
 
