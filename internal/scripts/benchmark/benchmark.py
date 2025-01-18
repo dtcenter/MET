@@ -314,7 +314,7 @@ def generate_info(settings:dict, ts:str, usecase: str, subdir: str) -> None:
     """
     info_file = "info_"+ usecase+ '_' + ts + ".txt"
     full_path = os.path.join(subdir, info_file)
-
+    # info_/d1/personal/mwin/AF_optimization/usecase_confs/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP.conf_2025-01-18T01:08:29.txt'
     with open(full_path, 'w') as f:
         f.write(f"Python version info: {sys.version}\n")
         f.write(f"Timestamp: {ts}\n")
@@ -382,7 +382,7 @@ def run_benchmark():
         save_results(consolidated_df, output_base, ts, filename, usecase_subdir)
 
         # provide information about this run: Python version, etc.
-        generate_info(settings, ts, use_case, usecase_subdir)
+        generate_info(settings, ts, usecase_subdir_name, usecase_subdir)
 
 
 if __name__ == "__main__":
