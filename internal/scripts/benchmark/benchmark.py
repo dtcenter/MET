@@ -11,6 +11,7 @@
 
 import os
 import sys
+import shutil
 import re
 import subprocess
 from datetime import datetime
@@ -33,7 +34,7 @@ import pandas as pd
    (comma separated values) and tabular file are also generated to enable plotting of the results. These files
    are saved under a subdirectory named after the use case config file (without the extension). The consolidated
    file is named by generating a timestamp and converting it to ISO 8601 Datetime with the appropriate file
-   extension (.csv, .txt). The summary and detail file are moved into the use case subdirectory.
+   extension (.csv, .txt). The summary and detail file are copied into the use case subdirectory.
    
    This script has an accompanying YAML config file, benchmark.yaml in which the user can specify (explicitly or by 
    setting env variables) the following:
@@ -102,10 +103,10 @@ def extract_detail_info(infile:str, subdir:str) -> pd.DataFrame:
             else:
                 details_df = pd.concat([details_df, cur])
 
-    # move the detail_output.txt file to the use case subdirectory
+    # copy the detail_output.txt file to the use case subdirectory
     cur_dir = os.path.dirname(__file__)
-    infile_dir = os.path.join(cur_dir, infile)
-    os.rename(infile_dir, os.path.join(subdir, "detail_output.txt"))
+    infile_path = os.path.join(cur_dir, infile)
+    shutil.copy(infile_path, os.path.join(subdir, "detail_output.txt"))
 
     return details_df
 
@@ -148,10 +149,10 @@ def extract_summary_info(infile:str, subdir:str) -> pd.DataFrame:
         else:
             summary_df = pd.concat([summary_df, cur_df])
 
-    # move the summary_output.txt file to the use case subdirectory
+    # copy the summary_output.txt file to the use case subdirectory
     cur_dir = os.path.dirname(__file__)
-    infile_dir = os.path.join(cur_dir, infile)
-    os.rename(infile_dir, os.path.join(subdir, "summary_output.txt"))
+    infile_path = os.path.join(cur_dir, infile)
+    shutil.copy(infile_path, os.path.join(subdir, "summary_output.txt"))
 
 
     return summary_df
