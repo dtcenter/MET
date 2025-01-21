@@ -28,8 +28,10 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-// Reference global grid
-static Grid grid("G004");
+// Reference global 1/10-th degree grid
+static const LatLonData GlobalTenthData =
+   { "GlobalTenthDegree", -90.0, -0.0, 0.1, 0.1, 1801, 3601 };
+static Grid grid(GlobalTenthData);
 
 // Indices for the output flag types in the configuration file
 static const int i_fho       =  0;
