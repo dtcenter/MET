@@ -579,6 +579,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
 
 void setup_table(AsciiTable &at) {
    CTRACK;
+   
 
    // Justify the STAT AsciiTable objects
    justify_stat_cols(at);
@@ -645,8 +646,8 @@ void setup_nc_file(const GridStatNcOutInfo & nc_info,
 
 void build_outfile_name(unixtime valid_ut, int lead_sec,
                         const char *suffix, ConcatString &str) {
-   CTRACK;
 
+   CTRACK;
    //
    // Create output file name
    //
@@ -2090,8 +2091,8 @@ void get_mask_points(const GridStatVxOpt &vx_opt,
                      const DataPlane *fcmn_ptr, const DataPlane *fcsd_ptr,
                      const DataPlane *ocmn_ptr, const DataPlane *ocsd_ptr,
                      const DataPlane *wgt_ptr,  PairDataPoint &pd) {
-   CTRACK;
 
+   CTRACK;
    // Initialize
    pd.erase();
 
@@ -3212,8 +3213,8 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
 void add_var_att_local(NcVar *var, const char *att_name,
                        const ConcatString att_value) {
-
    CTRACK;
+
    if(att_value.nonempty()) add_att(var, att_name, att_value.c_str());
    else                     add_att(var, att_name, na_str);
 
@@ -3253,7 +3254,6 @@ void finish_txt_files() {
 ////////////////////////////////////////////////////////////////////////
 
 void clean_up() {
-   CTRACK;
 
    // Close the output text files that were open for writing
    finish_txt_files();
@@ -3353,7 +3353,6 @@ void set_compress(const StringArray & a) {
 bool read_data_plane(VarInfo *info, DataPlane &dp, Met2dDataFile *mtddf,
                      const ConcatString &filename, const char *desc) {
 
-   CTRACK;
    bool status = mtddf->data_plane(*info, dp);
 
    if(!status) {
