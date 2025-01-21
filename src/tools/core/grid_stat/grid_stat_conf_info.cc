@@ -47,7 +47,6 @@ GridStatConfInfo::~GridStatConfInfo() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatConfInfo::init_from_scratch() {
-   CTRACK;
 
    // Initialize pointers
    vx_opt = (GridStatVxOpt *) nullptr;
@@ -63,7 +62,6 @@ void GridStatConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatConfInfo::clear() {
-   CTRACK;
    int i;
 
    // Initialize values
@@ -104,8 +102,8 @@ void GridStatConfInfo::clear() {
 
 void GridStatConfInfo::read_config(const char *default_file_name,
                                    const char *user_file_name) {
-
    CTRACK;
+
    // Read the config file constants
    conf.read(replace_path(config_const_filename).c_str());
 
@@ -123,6 +121,7 @@ void GridStatConfInfo::read_config(const char *default_file_name,
 #ifdef WITH_UGRID
 void GridStatConfInfo::read_ugrid_configs(StringArray ugrid_config_names, const char * user_config) {
    CTRACK;
+
    ConcatString file_name;
    for (int i=0; i<ugrid_config_names.n_elements(); i++) {
       file_name = replace_path(ugrid_config_names[i].c_str());
@@ -586,7 +585,6 @@ GridStatVxOpt::~GridStatVxOpt() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatVxOpt::init_from_scratch() {
-   CTRACK;
 
    // Initialize pointers
    fcst_info   = (VarInfo *)    nullptr;
@@ -600,7 +598,6 @@ void GridStatVxOpt::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatVxOpt::clear() {
-   CTRACK;
    int i;
 
    // Initialize values
@@ -1315,7 +1312,6 @@ GridStatNcOutInfo::GridStatNcOutInfo() {
 ////////////////////////////////////////////////////////////////////////
 
 void GridStatNcOutInfo::clear() {
-   CTRACK;
 
    set_all_true();
 
