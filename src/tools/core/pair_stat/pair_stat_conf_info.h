@@ -196,6 +196,9 @@ class PairStatVxOpt {
       int get_n_cdf_bin()      const;
       int get_n_ci_alpha()     const;
 
+      // Check for matches
+      bool is_keeper_mpr(const STATLine &) const;
+
       // Add paired data
       bool add_mpr_line(const STATLine &);
 };

@@ -64,9 +64,8 @@ wind_logic    = UNION;
 //
 mpr_column     = [];
 mpr_thresh     = [];
-mpr_str_inc    = [];   // TODO: new for string inclusion
-mpr_str_exc    = [];   // TODO: new for string exclusion
-mpr_summary    = NONE; // TODO: new for multiple pairs in the time window
+mpr_str_inc    = [];
+mpr_str_exc    = [];
 eclv_points    = 0.05;
 hss_ec_value   = NA;
 rank_corr_flag = FALSE;

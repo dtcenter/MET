@@ -17,6 +17,7 @@
 #include <cmath>
 
 #include "pair_stat_conf_info.h"
+#include "nc_obs_util.h"
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
 #include "vx_log.h"
@@ -1156,14 +1157,39 @@ int PairStatVxOpt::get_n_oprob_thresh() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool PairStatVxOpt::is_keeper_mpr(const STATLine &l) const {
+
+   // Check name and level strings
+   if(l.fcst_var() != vx_pd.fcst_info->name_attr()  || 
+      l.fcst_lev() != vx_pd.fcst_info->level_attr() || 
+      l.obs_var()  != vx_pd.obs_info->name_attr()   || 
+      l.obs_lev()  != vx_pd.obs_info->level_attr()) return false;
+
+   // Check MPR thresholds
+   for(auto &m : mpr_thr_inc_map) {
+      if(!m.second.check_dbl(atof(l.get_item(m.first.c_str())))) return false;
+   }
+
+   // Check MPR string inclusions
+   for(auto &m : mpr_str_inc_map) {
+      if(!m.second.has(l.get_item(m.first.c_str()))) return false;
+   }
+
+   // Check MPR string exclusions
+   for(auto &m : mpr_str_exc_map) {
+      if(m.second.has(l.get_item(m.first.c_str()))) return false;
+   }
+ 
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
    bool keep = false;
 
-   // Check name and level strings
-   if(l.fcst_var() == vx_pd.fcst_info->name_attr()  && 
-      l.fcst_lev() == vx_pd.fcst_info->level_attr() && 
-      l.obs_var()  == vx_pd.obs_info->name_attr()   && 
-      l.obs_lev()  == vx_pd.obs_info->level_attr()) {
+   // Check filtering options
+   if(is_keeper_mpr(l)) {
 
       // Parse climo data from the line
       ClimoPntInfo cpi;
@@ -1191,31 +1217,49 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
                  atof(l.get_item("OBS_CLIMO_STDEV")));
       }
 
-      // Attempt to add pair to each masking region
-      for(int i=0; i<get_n_mask(); i++) {
-         if(vx_pd.pd[i].add_point_pair(
+      // Attempt to add to each masking region
+      for(int i_mask=0; i_mask<get_n_mask(); i_mask++) {
+
+         // Convert lat/lon to x/y
+         double obs_lat = atof(l.get_item("OBS_LAT")); 
+         double obs_lon = -1.0*atof(l.get_item("OBS_LON"));
+         double obs_x;
+         double obs_y;
+         grid.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
+
+         // Check masking region
+         if(!vx_pd.is_keeper_mask(
+               l.get_line(), 0, i_mask,
+               nint(obs_x),
+               nint(obs_y),
+               l.get_item("OBS_SID"),
+               obs_lat,
+               obs_lon)) continue;
+
+         // Add the pair 
+         if(vx_pd.pd[i_mask].add_point_pair(
                l.obtype(),
                l.get_item("OBS_SID"),
-               atof(l.get_item("OBS_LAT")),
-               atof(l.get_item("OBS_LON")),
+               obs_lat,
+               obs_lon,
                bad_data_double,
                bad_data_double,
                timestring_to_unix(l.get_item("OBS_VALID_BEG")),
-               atof(l.get_item("OBS_LVL")),
+	       atof(l.get_item("OBS_LVL")),
                atof(l.get_item("OBS_ELV")),
                atof(l.get_item("FCST")),
                atof(l.get_item("OBS")),
                l.get_item("OBS_QC"),
                cpi,
-               default_weight)) {
+               1.0)) { 
 
             // Using this line for at least one masking region
             keep = true;
 
-	    // Track the unique headers
-            vx_hdr[i].add(l);
+            // Track the unique headers
+            vx_hdr[i_mask].add(l);
          }
-      }
+      } // end for i_mask
    }
 
    return keep;
