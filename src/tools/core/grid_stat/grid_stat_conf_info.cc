@@ -746,7 +746,7 @@ void GridStatVxOpt::process_config(
    }
 
    // Store in map
-   for(int i=0; mpr_sa.n(); i++) {
+   for(int i=0; i<mpr_sa.n(); i++) {
       if(mpr_thr_inc_map.count(mpr_sa[i]) == 0) {
          ThreshArray ta;
          mpr_thr_inc_map[(mpr_sa[i])] = ta;
