@@ -27,10 +27,18 @@ desc = "";
 fcst = {
   pairs = [
     {
-      name  = "TMP";
-      level = [ "Z2" ];
-      cnt_thresh = [ NA, >273 ];
-    }
+      name        = "TMP";
+      level       = "Z2";
+      cnt_thresh  = [ NA, >273 ];
+      mpr_str_inc = [ { key = "VX_MASK"; val = "DTC165,DTC166"; },
+                      { key = "OBTYPE";  val = "ADPSFC";        } ];
+    },
+    {
+      name        = "TMP";
+      level       = "P850-700";
+      mpr_str_inc = [ { key = "VX_MASK"; val = "DTC165,DTC166"; },
+                      { key = "OBTYPE";  val = "ADPUPA";        } ];
+    } 
   ];
 }
 
