@@ -7,6 +7,8 @@ The MET/src/tools/core/grid_stat, MET/src/tools/core/point_stat, and MET/src/too
 copying the ctrack.hpp header file into each tool's directory, including ctrack.hpp in the .cpp files of interest, 
 and placing 'CTRACK;' at the beginning of the functions of interest.  The CTRACK tool generates a table of results (for both
 summary and detail) to stdout.  The ctrack.hpp file was modified to instead create summary_output.txt and detail_output.txt files.
+In the tool's main method (e.g. int main() or int met_main()), be sure to add the *ctrack::result_print(); * before exiting to ensure
+that the summary_output.txt and detail_output.txt files are being saved.
 
 The MET tool was then rebuilt and used to run the METplus use cases.  
 
