@@ -48,8 +48,8 @@ export CFLAGS="-O2"
 export CXXFLAGS=" -std=c++17"
 
 # Set LDFLAGS to include -rpath settings when compiling MET
-#export ADDTL_DIR=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023.2.0.49397/compiler/2023.2.0/linux/compiler/lib/intel64_lin
-#export ADDTL_DIR2=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023.2.0.49397/mkl/2023.2.0/lib/intel64
+export ADDTL_DIR=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2024.2.1.100/compiler/2024.2/lib
+export ADDTL_DIR2=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2024.2.1.100/mkl/2024.2/lib
 #export ADDTL_DIR3=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023.2.0.49397/mpi/2021.10.0/lib
 #export ADDTL_DIR4=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023.2.0.49397/mpi/2021.10.0/lib/release/
 export LDFLAGS="-Wl,--disable-new-dtags"
