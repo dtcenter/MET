@@ -105,8 +105,8 @@ Name = NAME;
 
 for (int j=0; j<Npoints; ++j)  {
 
-   X.push_back(XX[j]);
-   Y.push_back(YY[j]);
+   X.emplace_back(XX[j]);
+   Y.emplace_back(YY[j]);
 
 }
 
@@ -266,8 +266,8 @@ void PiecewiseLinear::add_point(double xx, double yy)
 
 {
 
-X.push_back(xx);
-Y.push_back(yy);
+X.emplace_back(xx);
+Y.emplace_back(yy);
 
 return;
 

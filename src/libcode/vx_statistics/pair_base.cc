@@ -473,7 +473,7 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
         }
      }
 
-     (*it).second.obs.push_back(ob_val);
+     (*it).second.obs.emplace_back(ob_val);
 
    }
    else {
@@ -493,7 +493,7 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
       val.ocmn = cpi.ocmn;
       val.ocsd = cpi.ocsd;
 
-      val.obs.push_back(ob_val);
+      val.obs.emplace_back(ob_val);
       map_key.add(obs_key.c_str());
       map_val.insert( pair<string,station_values_t>(obs_key, val) );
       ret = true;

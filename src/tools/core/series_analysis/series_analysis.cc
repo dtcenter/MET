@@ -2494,7 +2494,7 @@ static void add_stat_data(const ConcatString &var_name,
 
    // Store the new NcVarData object
    stat_data[var_name] = data;
-   stat_data_keys.push_back(var_name);
+   stat_data_keys.emplace_back(var_name);
 
    return;
 }

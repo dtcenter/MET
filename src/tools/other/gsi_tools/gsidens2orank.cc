@@ -264,7 +264,7 @@ void process_conv_data(ConvData &d, int i_mem) {
       add_key(key);
 
       // Store the current pair data
-      conv_data.push_back(d);
+      conv_data.emplace_back(d);
 
       // Store the current observation info
       ClimoPntInfo cpi(bad_data_double, bad_data_double,
@@ -424,7 +424,7 @@ void process_rad_data(RadData &d, int i_mem) {
       add_key(key);
 
       // Store the current pair data
-      rad_data.push_back(d);
+      rad_data.emplace_back(d);
 
       // Store the current observation info
       ClimoPntInfo cpi(bad_data_double, bad_data_double,

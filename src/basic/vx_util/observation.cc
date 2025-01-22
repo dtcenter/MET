@@ -37,7 +37,9 @@ Observation::Observation(const string &header_type, const string &station_id,
                          const string &quality_flag,
                          const int var_code, const double pressure_level_hpa,
                          const double height_m, const double value,
-                         const string &var_name) :
+                         const string &var_name,
+                         const string &var_units,
+                         const string &var_desc) :
   _headerType(header_type),
   _stationId(station_id),
   _validTime(valid_time),
@@ -46,6 +48,8 @@ Observation::Observation(const string &header_type, const string &station_id,
   _elevation(elevation),
   _qualityFlag(quality_flag),
   _varName(var_name),
+  _varUnits(var_units),
+  _varDesc(var_desc),
   varCode(var_code),
   hdrIndex(0),
   _pressureLevel(pressure_level_hpa),
@@ -146,6 +150,14 @@ _elevation   = pyobject_as_double(list[5]);
       //////////////////////// 
 
 _varName     = pyobject_as_string(list[6]);
+
+      //////////////////////// 
+
+_varUnits    = "";
+
+      //////////////////////// 
+
+_varDesc     = "";
 
       //////////////////////// 
 

@@ -152,7 +152,7 @@ for (size_t j=0; j<P.size(); ++j) {
    if (tok.type == tok_local_var) {
       int index = tok.number_1b - 1;
       if (find(args.begin(), args.end(), index) == args.end()) {
-         args.push_back(index);
+         args.emplace_back(index);
       }
    }
 }

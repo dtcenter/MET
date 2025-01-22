@@ -78,7 +78,7 @@ for (j=0; j<(filenames.n()); ++j)  {
 
    }
 
-   valid_times.push_back(plane.valid());
+   valid_times.emplace_back(plane.valid());
 
    if ( j == 0 )  {
 
@@ -114,10 +114,10 @@ unixtime dt_start;
 vector<unixtime> dtVector; 
 
 dt_start = valid_times[1] - valid_times[0];
-dtVector.push_back(dt_start);
+dtVector.emplace_back(dt_start);
 
 for (size_t k=2; k<valid_times.size(); ++k) {
-  dtVector.push_back(valid_times[k] - valid_times[k - 1]);
+  dtVector.emplace_back(valid_times[k] - valid_times[k - 1]);
 }
 
 bool variableTimeIncs = false;

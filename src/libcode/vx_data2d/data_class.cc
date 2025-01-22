@@ -349,7 +349,7 @@ for(int i=0; i<vi_list.size(); i++) {
    // Store the result
    //
 
-   dp_list.push_back(cur_dp);
+   dp_list.emplace_back(cur_dp);
 
 }
 

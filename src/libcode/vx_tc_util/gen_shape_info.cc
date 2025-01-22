@@ -359,7 +359,7 @@ bool GenShapeInfoArray::add(const GenShapeInfo &gsi, bool check_dup) {
    } // end if
 
    // Store the genesis shape object
-   GenShape.push_back(gsi);
+   GenShape.emplace_back(gsi);
 
    return true;
 }

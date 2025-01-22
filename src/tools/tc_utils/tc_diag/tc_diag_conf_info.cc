@@ -306,7 +306,7 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
       // Conf: field.name and field.level
       VarInfo *vi = vi_factory.new_var_info(file_type);
       vi->set_dict(i_dict);
-      var_info.push_back(vi);
+      var_info.emplace_back(vi);
 
       // Unique list of requested pressure levels
       if(vi->level().type() == LevelType_Pres) {
@@ -326,7 +326,7 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
       // Store domain-specific VarInfo pointers
       for(j=0; j<domain_info.size(); j++) {
          if(sa.n() == 0 || sa.has(domain_info[j].domain)) {
-            domain_info[j].var_info_ptr.push_back(var_info.back());
+            domain_info[j].var_info_ptr.emplace_back(var_info.back());
          }
       }
    }
@@ -415,7 +415,7 @@ void TCDiagConfInfo::parse_domain_info(map<string,DataOptInfo> dmap) {
       }
 
       // Store new entry
-      domain_info.push_back(di);
+      domain_info.emplace_back(di);
    }
 
    // Make sure all -data domains appear in the config file

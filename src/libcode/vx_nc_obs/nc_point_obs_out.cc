@@ -597,10 +597,11 @@ bool MetNcPointObsOut::write_to_netcdf(StringArray obs_names, StringArray obs_un
       int var_count = obs_names.n_elements();
       if (var_count > 0) {
          int unit_count = obs_units.n();
-         obs_vars.create_obs_name_vars (obs_nc, var_count, unit_count);
+         int desc_count = obs_descs.n();
+         obs_vars.create_obs_name_vars (obs_nc, var_count, unit_count, desc_count);
          obs_vars.write_obs_var_names(obs_names);
-         if( unit_count > 0 ) obs_vars.write_obs_var_units(obs_units);
-         if( obs_descs.n() > 0 ) obs_vars.write_obs_var_descriptions(obs_descs);
+         if(unit_count > 0) obs_vars.write_obs_var_units(obs_units);
+         if(desc_count > 0) obs_vars.write_obs_var_descriptions(obs_descs);
          mlog << Debug(7) << method_name << var_count
               << " variable names were saved\n";
       }
