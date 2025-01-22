@@ -130,13 +130,13 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return "pair_stat";
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+static void process_command_line(int argc, char **argv) {
    const char *method_name = "process_command_line() -> ";
 
    // Default output file base
@@ -241,9 +241,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_txt_files() {
-   int max_col, max_prob_col, max_mctc_col, max_orank_col;
-   int n_prob, n_cat, n_eclv;
+static void setup_txt_files() {
    ConcatString base_name;
 
    // Create output file names for the stat file and optional text files
@@ -256,17 +254,16 @@ void setup_txt_files() {
    /////////////////////////////////////////////////////////////////////
 
    // Get the maximum number of data columns
-   n_prob = conf_info.get_max_n_fprob_thresh();
-   n_cat  = conf_info.get_max_n_cat_thresh() + 1;
-   n_eclv = conf_info.get_max_n_eclv_points();
+   int n_prob = conf_info.get_max_n_fprob_thresh();
+   int n_cat  = conf_info.get_max_n_cat_thresh() + 1;
+   int n_eclv = conf_info.get_max_n_eclv_points();
 
-   max_prob_col  = get_n_pjc_columns(n_prob);
-   max_mctc_col  = get_n_mctc_columns(n_cat);
+   int max_prob_col  = get_n_pjc_columns(n_prob);
+   int max_mctc_col  = get_n_mctc_columns(n_cat);
 
    // Determine the maximum number of data columns
-   max_col = (max_prob_col  > max_stat_col ? max_prob_col  : max_stat_col);
-   if (max_mctc_col  > max_col) max_col = max_mctc_col;
-   if (max_orank_col > max_col) max_col = max_orank_col;
+   int max_col = (max_prob_col  > max_stat_col ? max_prob_col  : max_stat_col);
+   if (max_mctc_col > max_col) max_col = max_mctc_col;
 
    // Add the header columns
    max_col += n_header_columns + 1;
@@ -285,7 +282,7 @@ void setup_txt_files() {
    setup_table(stat_at);
 
    // Write the text header row
-   write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
+   write_header_row(nullptr, 0, 1, stat_at, 0, 0);
 
    // Initialize the row index to 1 to account for the header
    i_stat_row = 1;
@@ -406,7 +403,7 @@ void setup_table(AsciiTable &at) {
    at.set_bad_data_str(na_str);
 
    // Don't write out trailing blank rows
-   at.set_delete_trailing_blank_rows(1);
+   at.set_delete_trailing_blank_rows(true);
 
    return;
 }

@@ -1264,7 +1264,7 @@ void TCStatJob::dump_pair(const TrackPairInfo &pair, ofstream *out,
    out_at.set_precision(get_precision());
    out_at.set_bad_data_value(bad_data_double);
    out_at.set_bad_data_str(na_str);
-   out_at.set_delete_trailing_blank_rows(1);
+   out_at.set_delete_trailing_blank_rows(true);
 
    // Setup header columns
    tchc.clear();
@@ -2443,7 +2443,7 @@ void TCStatJobSummary::do_output(ostream &out) {
    out_at.set_precision(get_precision());
    out_at.set_bad_data_value(bad_data_double);
    out_at.set_bad_data_str(na_str);
-   out_at.set_delete_trailing_blank_rows(1);
+   out_at.set_delete_trailing_blank_rows(true);
 
    // Set up CIInfo objects
    mean_ci.allocate_n_alpha(1);
@@ -3750,7 +3750,7 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
       stat_at.set_precision(Precision);
       stat_at.set_bad_data_value(bad_data_double);
       stat_at.set_bad_data_str(na_str);
-      stat_at.set_delete_trailing_blank_rows(1);
+      stat_at.set_delete_trailing_blank_rows(true);
 
       //
       // Write the STAT header row
@@ -3800,7 +3800,7 @@ void TCStatJobRIRW::setup_stat_file(int n_row) {
          stat_at.set_precision(Precision);
          stat_at.set_bad_data_value(bad_data_double);
          stat_at.set_bad_data_str(na_str);
-         stat_at.set_delete_trailing_blank_rows(1);
+         stat_at.set_delete_trailing_blank_rows(true);
       }
    }
    
@@ -4119,7 +4119,7 @@ void TCStatJobProbRIRW::close_dump_file() {
    out_at.set_precision(get_precision());
    out_at.set_bad_data_value(bad_data_double);
    out_at.set_bad_data_str(na_str);
-   out_at.set_delete_trailing_blank_rows(1);
+   out_at.set_delete_trailing_blank_rows(true);
 
    // Open the dump file back up for reading
    if(!f.open(DumpFile.c_str())) {
@@ -4502,7 +4502,7 @@ void setup_table(AsciiTable &at, int n_hdr_cols, int prec) {
    at.set_bad_data_str(na_str);
 
    // Don't write out trailing blank rows
-   at.set_delete_trailing_blank_rows(1);
+   at.set_delete_trailing_blank_rows(true);
 
    return;
 }

@@ -587,7 +587,7 @@ void setup_table(AsciiTable &at) {
    at.set_bad_data_str(na_str);
 
    // Don't write out trailing blank rows
-   at.set_delete_trailing_blank_rows(1);
+   at.set_delete_trailing_blank_rows(true);
 
    return;
 }
