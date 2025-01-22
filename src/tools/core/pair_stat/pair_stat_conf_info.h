@@ -121,7 +121,6 @@ class PairStatVxOpt {
    public:
 
       PairStatVxOpt();
-     ~PairStatVxOpt();
 
       //////////////////////////////////////////////////////////////////
 
@@ -170,7 +169,7 @@ class PairStatVxOpt {
       bool            rank_corr_flag;     // Flag for computing rank correlations
 
       // Output file options
-      STATOutputType  output_flag[n_txt]; // Flag for each output line type
+      STATOutputType output_flag[n_txt];  // Flag for each output line type
 
       //////////////////////////////////////////////////////////////////
 
@@ -226,7 +225,6 @@ class PairStatConfInfo {
    public:
 
       PairStatConfInfo();
-     ~PairStatConfInfo();
 
       //////////////////////////////////////////////////////////////////
 
