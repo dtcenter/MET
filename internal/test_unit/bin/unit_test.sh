@@ -2,18 +2,16 @@
 
 # Check that required unit test environment variables are set
 if [[ -z "${MET_BASE}"       ||
-      -z "${MET_BUILD_BASE}" ||
       -z "${MET_TEST_BASE}"  ||
       -z "${MET_TEST_INPUT}" ||
       -z "${MET_TEST_OUTPUT}" ]]; then
   echo
   echo "ERROR: Required environment variable(s) unset:"
-  echo "ERROR: \${MET_BASE}, \${MET_BUILD_BASE}, \${MET_TEST_BASE}, \${MET_TEST_INPUT}, \${MET_TEST_OUTPUT}"
+  echo "ERROR: \${MET_BASE}, \${MET_TEST_BASE}, \${MET_TEST_INPUT}, \${MET_TEST_OUTPUT}"
   echo
   exit
 else
   echo "export MET_BASE=${MET_BASE}"
-  echo "export MET_BUILD_BASE=${MET_BUILD_BASE}"
   echo "export MET_TEST_BASE=${MET_TEST_BASE}"
   echo "export MET_TEST_INPUT=${MET_TEST_INPUT}"
   echo "export MET_TEST_OUTPUT=${MET_TEST_OUTPUT}"
