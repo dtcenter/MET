@@ -5,14 +5,14 @@
 MET_PROJ_DIR=/d1/projects/MET
 
 # Source the setvars.sh file for updates to the $PATH and $LD_LIBRARY_PATH
-# source /nrit/ral/intel/setvars.sh
+source /nrit/ral/intel/setvars.sh
 
 # Set the values for the compilers
-export FC=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023/compiler/2023.2.0/linux/bin/ifx
-export F77=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023/compiler/2023.2.0/linux/bin/ifx
-export F90=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023/compiler/2023.2.0/linux/bin/ifx
-export CC=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023/compiler/2023.2.0/linux/bin/icx
-export CXX=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023/compiler/2023.2.0/linux/bin/icpx
+export FC=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2024.2.1.100/compiler/2024.2/bin/ifx
+export F77=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2024.2.1.100/compiler/2024.2/bin/ifx
+export F90=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2024.2.1.100/compiler/2024.2/bin/ifx
+export CC=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2024.2.1.100/compiler/2024.2/bin/icx
+export CXX=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2024.2.1.100/compiler/2024.2/bin/icpx
 
 # Variables required to build MET
 export MET_DEVELOPMENT=true
@@ -20,9 +20,6 @@ export MET_DST=/d1/projects/MET/intel/external_libs/
 export MET_PROJ=${MET_DST}
 export MET_NETCDF=${MET_DST}
 export MET_HDF5=${MET_DST}
-#export MET_HDFINC=${MET_DST}
-#export MET_HDFLIB=${MET_DST}
-#export MET_HDFEOS=${MET_DST}
 export MET_BUFR=${MET_DST}
 export BUFRLIB_NAME=-lbufr_4
 export MET_GRIB2C=${MET_DST}
@@ -36,6 +33,9 @@ export MET_FREETYPELIB=${MET_DST}/lib
 export MET_ATLAS=${MET_DST}
 export MET_ECKIT=${MET_DST}
 export JASPER=${MET_DST}
+#export MET_HDFINC=${MET_DST}
+#export MET_HDFLIB=${MET_DST}
+#export MET_HDFEOS=${MET_DST}
 
 # For Python 3 in MET 12.0,0
 export MET_PYTHON=/nrit/ral/met-python3
@@ -48,10 +48,10 @@ export CFLAGS="-O2"
 export CXXFLAGS=" -std=c++17"
 
 # Set LDFLAGS to include -rpath settings when compiling MET
-export ADDTL_DIR=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023.2.0.49397/compiler/2023.2.0/linux/compiler/lib/intel64_lin
-export ADDTL_DIR2=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023.2.0.49397/mkl/2023.2.0/lib/intel64
-export ADDTL_DIR3=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023.2.0.49397/mpi/2021.10.0/lib
-export ADDTL_DIR4=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023.2.0.49397/mpi/2021.10.0/lib/release/
+#export ADDTL_DIR=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023.2.0.49397/compiler/2023.2.0/linux/compiler/lib/intel64_lin
+#export ADDTL_DIR2=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023.2.0.49397/mkl/2023.2.0/lib/intel64
+#export ADDTL_DIR3=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023.2.0.49397/mpi/2021.10.0/lib
+#export ADDTL_DIR4=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023.2.0.49397/mpi/2021.10.0/lib/release/
 export LDFLAGS="-Wl,--disable-new-dtags"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_DST}/lib:${MET_HDFEOS}/lib:${MET_PROJ}/lib:${MET_NETCDF}/lib:${MET_DST}/zlib-1.2.11/lib:${MET_DST}/szip-2.1.1/lib"
 export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_HDFLIB}:${MET_HDF5}/lib:${MET_GSL}/lib:${MET_PYTHON}/lib:${JASPER}/lib"
