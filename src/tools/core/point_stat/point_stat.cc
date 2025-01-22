@@ -217,6 +217,10 @@ int met_main(int argc, char *argv[]) {
    // Compute the scores and write them out
    process_scores();
 
+
+   // Write out the CTRACK metrics
+   ctrack::result_print();
+
    // Close the text files and deallocate memory
    clean_up();
 
