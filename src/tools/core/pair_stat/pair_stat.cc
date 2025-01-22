@@ -63,17 +63,16 @@ static void setup_pairs();
 static void setup_txt_files();
 static void setup_table    (AsciiTable &);
 
-static void build_outfile_name(unixtime, int, const char *,
-                               ConcatString &);
+static ConcatString build_outfile_name(const char *);
 
 static void process_mpr_pairs(const ConcatString &, PairsFormat);
 static void process_ioda_pairs(const ConcatString &);
 static void process_scores();
 
-static void do_cts       (CTSInfo   *&, int, const PairDataPoint *);
+static void do_cts       (vector<CTSInfo> &, int, const PairDataPoint *);
 static void do_mcts      (MCTSInfo   &, int, const PairDataPoint *);
 static void do_cnt_sl1l2 (const PairStatVxOpt &, const PairDataPoint *);
-static void do_vl1l2     (VL1L2Info *&, int, const PairDataPoint *, const PairDataPoint *);
+static void do_vl1l2     (vector<VL1L2Info> &, int, const PairDataPoint *, const PairDataPoint *);
 static void do_pct       (const PairStatVxOpt &, const PairDataPoint *);
 
 static void finish_txt_files();
@@ -242,10 +241,9 @@ static void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 static void setup_txt_files() {
-   ConcatString base_name;
 
    // Create output file names for the stat file and optional text files
-   build_outfile_name(fcst_valid_ut, fcst_lead_sec, "", base_name);
+   ConcatString base_name(build_outfile_name(""));
 
    /////////////////////////////////////////////////////////////////////
    //
@@ -388,7 +386,7 @@ static void setup_txt_files() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_table(AsciiTable &at) {
+static void setup_table(AsciiTable &at) {
 
    // Justify the STAT AsciiTable objects
    justify_stat_cols(at);
@@ -410,29 +408,23 @@ void setup_table(AsciiTable &at) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void build_outfile_name(unixtime valid_ut, int lead_sec,
-                        const char *suffix, ConcatString &str) {
-
-   //
-   // Create output file name
-   //
-
-   // Append the output directory and program name
-   str << cs_erase << out_base;
+static ConcatString build_outfile_name(const char *suffix) {
+   ConcatString cs(out_base);
 
    // Append the suffix
-   str << suffix;
+   cs << suffix;
 
-   return;
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_mpr_pairs(const ConcatString &file_name, PairsFormat format) {
+static void process_mpr_pairs(const ConcatString &file_name,
+                              PairsFormat format) {
    LineDataFile f;
    const char *method_name = "process_mpr_pairs() -> ";
 
-   // TODO: Add support for -format python
+   // Add support for -format python
    if(format == PairsFormat::Python) { 
       mlog << Error << "\nprocess_mpr_pairs() -> "
            << "the \"-format python\" option is not supported yet!\n\n";
@@ -477,9 +469,9 @@ void process_mpr_pairs(const ConcatString &file_name, PairsFormat format) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_ioda_pairs(const ConcatString &file_name) {
+static void process_ioda_pairs(const ConcatString &) {
 
-   // TODO: Add support for -format ioda
+   // Add support for -format ioda
    mlog << Error << "\nprocess_ioda_pairs() -> "
         << "the \"-format ioda\" option is not supported yet!\n\n";
    exit(1);
@@ -489,14 +481,13 @@ void process_ioda_pairs(const ConcatString &file_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_scores() {
-   int n_cat, n_wind;
+static void process_scores() {
    ConcatString cs;
 
    // Initialize pointers
-   CTSInfo   *cts_info   = (CTSInfo *)   nullptr;
-   MCTSInfo   mcts_info;
-   VL1L2Info *vl1l2_info = (VL1L2Info *) nullptr;
+   vector<CTSInfo>   cts_info;
+   vector<VL1L2Info> vl1l2_info;
+   MCTSInfo          mcts_info;
 
    mlog << Debug(2)
         << "\n" << sep_str << "\n\n";
@@ -505,12 +496,12 @@ void process_scores() {
    setup_txt_files();
 
    // Store the maximum number of each threshold type
-   n_cat  = conf_info.get_max_n_cat_thresh();
-   n_wind = conf_info.get_max_n_wind_thresh();
+   int n_cat  = conf_info.get_max_n_cat_thresh();
+   int n_wind = conf_info.get_max_n_wind_thresh();
 
    // Allocate space for output statistics types
-   cts_info   = new CTSInfo   [n_cat];
-   vl1l2_info = new VL1L2Info [n_wind];
+   cts_info.resize(n_cat);
+   vl1l2_info.resize(n_wind);
 
    // Compute scores for each PairData object and write output
    int i_vx = -1;
@@ -758,17 +749,12 @@ void process_scores() {
 
    } // end for i_vx
 
-   // Deallocate memory
-   if(cts_info)   { delete [] cts_info;   cts_info   = (CTSInfo *)   nullptr; }
-   if(vl1l2_info) { delete [] vl1l2_info; vl1l2_info = (VL1L2Info *) nullptr; }
-
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
-   int i, j, n_cat;
+static void do_cts(vector<CTSInfo> &cts_info, int i_vx, const PairDataPoint *pd_ptr) {
 
    mlog << Debug(2)
         << "Computing Categorical Statistics.\n";
@@ -776,14 +762,14 @@ void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
    //
    // Set up the CTSInfo thresholds and alpha values
    //
-   n_cat = conf_info.vx_opt[i_vx].fcat_ta.n();
-   for(i=0; i<n_cat; i++) {
+   int n_cat = conf_info.vx_opt[i_vx].fcat_ta.n();
+   for(int i=0; i<n_cat; i++) {
       cts_info[i].cts.set_ec_value(conf_info.vx_opt[i_vx].hss_ec_value);
       cts_info[i].fthresh = conf_info.vx_opt[i_vx].fcat_ta[i];
       cts_info[i].othresh = conf_info.vx_opt[i_vx].ocat_ta[i];
       cts_info[i].allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
 
-      for(j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
+      for(int j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
          cts_info[i].alpha[j] = conf_info.vx_opt[i_vx].ci_alpha[j];
       }
    }
@@ -797,10 +783,11 @@ void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
    // Compute the stats, normal confidence intervals, and bootstrap
    // bootstrap confidence intervals
    //
+   CTSInfo *cts_info_ptr = cts_info.data();
    if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType::BCA) {
       compute_cts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
-         cts_info, n_cat,
+         cts_info_ptr, n_cat,
          conf_info.vx_opt[i_vx].output_flag[i_cts] != STATOutputType::None,
          conf_info.vx_opt[i_vx].rank_corr_flag,
          conf_info.tmp_dir.c_str());
@@ -809,7 +796,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
       compute_cts_stats_ci_perc(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          conf_info.vx_opt[i_vx].boot_info.rep_prop,
-         cts_info, n_cat,
+         cts_info_ptr, n_cat,
          conf_info.vx_opt[i_vx].output_flag[i_cts] != STATOutputType::None,
          conf_info.vx_opt[i_vx].rank_corr_flag,
          conf_info.tmp_dir.c_str());
@@ -820,8 +807,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_mcts(MCTSInfo &mcts_info, int i_vx, const PairDataPoint *pd_ptr) {
-   int i;
+static void do_mcts(MCTSInfo &mcts_info, int i_vx, const PairDataPoint *pd_ptr) {
 
    mlog << Debug(2)
         << "Computing Multi-Category Statistics.\n";
@@ -835,7 +821,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, const PairDataPoint *pd_ptr) {
    mcts_info.set_othresh(conf_info.vx_opt[i_vx].ocat_ta);
    mcts_info.allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
 
-   for(i=0; i<conf_info.vx_opt[i_vx].get_n_ci_alpha(); i++) {
+   for(int i=0; i<conf_info.vx_opt[i_vx].get_n_ci_alpha(); i++) {
       mcts_info.alpha[i] = conf_info.vx_opt[i_vx].ci_alpha[i];
    }
 
@@ -871,19 +857,15 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cnt_sl1l2(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
-   int i, j, k, n_bin;
-   PairDataPoint pd_thr, pd;
-   SL1L2Info *sl1l2_info = (SL1L2Info *) nullptr;
-   CNTInfo   *cnt_info   = (CNTInfo *)   nullptr;
+static void do_cnt_sl1l2(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
    mlog << Debug(2)
         << "Computing Scalar Partial Sums and Continuous Statistics.\n";
 
    // Determine the number of observation climo CDF bins
-   n_bin = (pd_ptr->ocmn_na.n_valid() > 0 &&
-            pd_ptr->ocsd_na.n_valid() > 0 ?
-            vx_opt.get_n_cdf_bin() : 1);
+   int n_bin = (pd_ptr->ocmn_na.n_valid() > 0 &&
+                pd_ptr->ocsd_na.n_valid() > 0 ?
+                vx_opt.get_n_cdf_bin() : 1);
 
    if(n_bin > 1) {
       mlog << Debug(2)
@@ -897,29 +879,31 @@ void do_cnt_sl1l2(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    bool precip_flag = (vx_opt.vx_pd.fcst_info->is_precipitation() &&
                        vx_opt.vx_pd.obs_info->is_precipitation());
 
-   // Allocate memory
-   cnt_info   = new CNTInfo   [n_bin];
-   sl1l2_info = new SL1L2Info [n_bin];
+   // Create statistics objects
+   vector<CNTInfo>   cnt_info(n_bin);
+   vector<SL1L2Info> sl1l2_info(n_bin);
 
    // Process each continuous filtering threshold
-   for(i=0; i<vx_opt.fcnt_ta.n(); i++) {
+   for(int i=0; i<vx_opt.fcnt_ta.n(); i++) {
 
       // Apply continuous filtering thresholds to subset pairs
-      pd_thr = pd_ptr->subset_pairs_cnt_thresh(vx_opt.fcnt_ta[i],
-                                               vx_opt.ocnt_ta[i],
-                                               vx_opt.cnt_logic);
+      PairDataPoint pd_thr = pd_ptr->subset_pairs_cnt_thresh(
+                                        vx_opt.fcnt_ta[i],
+                                        vx_opt.ocnt_ta[i],
+                                        vx_opt.cnt_logic);
 
       // Check for no matched pairs to process
       if(pd_thr.n_obs == 0) continue;
 
       // Process the climo CDF bins
-      for(j=0; j<n_bin; j++) {
+      for(int j=0; j<n_bin; j++) {
 
          // Initialize
          if(do_sl1l2) sl1l2_info[j].clear();
          if(do_cnt)   cnt_info[j].clear();
 
          // Apply climo CDF bins logic to subset pairs
+         PairDataPoint pd;
          if(n_bin > 1) pd = subset_climo_cdf_bin(pd_thr,
                                vx_opt.cdf_info.cdf_ta, j);
          else          pd = pd_thr;
@@ -971,7 +955,7 @@ void do_cnt_sl1l2(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
             // Setup the CNTInfo alpha values
             cnt_info[j].allocate_n_alpha(vx_opt.get_n_ci_alpha());
-            for(k=0; k<vx_opt.get_n_ci_alpha(); k++) {
+            for(int k=0; k<vx_opt.get_n_ci_alpha(); k++) {
                cnt_info[j].alpha[k] = vx_opt.ci_alpha[k];
             }
 
@@ -1011,7 +995,7 @@ void do_cnt_sl1l2(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
             vx_opt.output_flag[i_sal1l2] != STATOutputType::None) {
 
             SL1L2Info sl1l2_mean;
-            compute_sl1l2_mean(sl1l2_info, n_bin, sl1l2_mean);
+            compute_sl1l2_mean((SL1L2Info *) sl1l2_info.data(), n_bin, sl1l2_mean);
 
             // Write out SL1L2
             if(vx_opt.output_flag[i_sl1l2]  != STATOutputType::None &&
@@ -1038,7 +1022,7 @@ void do_cnt_sl1l2(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          if(vx_opt.output_flag[i_cnt] != STATOutputType::None) {
 
             CNTInfo cnt_mean;
-            compute_cnt_mean(cnt_info, n_bin, cnt_mean);
+            compute_cnt_mean((CNTInfo *) cnt_info.data(), n_bin, cnt_mean);
 
             if(cnt_mean.n > 0) {
 
@@ -1052,18 +1036,14 @@ void do_cnt_sl1l2(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
    } // end for i (fcnt_ta)
 
-   // Dealloate memory
-   if(sl1l2_info) { delete [] sl1l2_info; sl1l2_info = (SL1L2Info *) nullptr; }
-   if(cnt_info)   { delete [] cnt_info;   cnt_info   = (CNTInfo *)   nullptr;  }
-
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_vl1l2(VL1L2Info *&v_info, int i_vx,
-              const PairDataPoint *pd_u_ptr, const PairDataPoint *pd_v_ptr) {
-   int i, j;
+static void do_vl1l2(vector<VL1L2Info> &v_info, int i_vx,
+                     const PairDataPoint *pd_u_ptr,
+                     const PairDataPoint *pd_v_ptr) {
 
    mlog << Debug(2)
         << "Computing Vector Partial Sums and Continuous Vector Statistics.\n";
@@ -1082,7 +1062,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
    //
    // Set all of the VL1L2Info objects
    //
-   for(i=0; i<conf_info.vx_opt[i_vx].fwind_ta.n(); i++) {
+   for(int i=0; i<conf_info.vx_opt[i_vx].fwind_ta.n(); i++) {
 
       //
       // Store thresholds
@@ -1093,7 +1073,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
       v_info[i].logic   = conf_info.vx_opt[i_vx].wind_logic;
       v_info[i].allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
 
-      for(j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
+      for(int j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
          v_info[i].alpha[j] = conf_info.vx_opt[i_vx].ci_alpha[j];
       }
 
@@ -1109,37 +1089,35 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_pct(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
-   int i, j, k, n_bin;
-   PairDataPoint pd;
-   PCTInfo *pct_info = (PCTInfo *) nullptr;
+static void do_pct(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
    mlog << Debug(2)
         << "Computing Probabilistic Statistics.\n";
 
    // Determine the number of observation climo CDF bins
-   n_bin = (pd_ptr->ocmn_na.n_valid() > 0 &&
-            pd_ptr->ocsd_na.n_valid() > 0 ?
-            vx_opt.get_n_cdf_bin() : 1);
+   int n_bin = (pd_ptr->ocmn_na.n_valid() > 0 &&
+                pd_ptr->ocsd_na.n_valid() > 0 ?
+                vx_opt.get_n_cdf_bin() : 1);
 
    if(n_bin > 1) {
       mlog << Debug(2)
            << "Applying " << n_bin << " climatology bins.\n";
    }
 
-   // Allocate memory
-   pct_info = new PCTInfo [n_bin];
+   // Create statistics objects
+   vector<PCTInfo> pct_info(n_bin);
 
    // Process each probabilistic observation threshold
-   for(i=0; i<vx_opt.ocat_ta.n(); i++) {
+   for(int i=0; i<vx_opt.ocat_ta.n(); i++) {
 
       // Process the climo CDF bins
-      for(j=0; j<n_bin; j++) {
+      for(int j=0; j<n_bin; j++) {
 
          // Initialize
          pct_info[j].clear();
 
          // Apply climo CDF bins logic to subset pairs
+         PairDataPoint pd;
          if(n_bin > 1) pd = subset_climo_cdf_bin(*pd_ptr,
                                vx_opt.cdf_info.cdf_ta, j);
          else          pd = *pd_ptr;
@@ -1149,7 +1127,7 @@ void do_pct(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          pct_info[j].othresh = vx_opt.ocat_ta[i];
          pct_info[j].allocate_n_alpha(vx_opt.get_n_ci_alpha());
 
-         for(k=0; k<vx_opt.get_n_ci_alpha(); k++) {
+         for(int k=0; k<vx_opt.get_n_ci_alpha(); k++) {
             pct_info[j].alpha[k] = vx_opt.ci_alpha[k];
          }
 
@@ -1209,7 +1187,7 @@ void do_pct(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
       if(n_bin > 1) {
 
          PCTInfo pct_mean;
-         compute_pct_mean(pct_info, n_bin, pct_mean);
+         compute_pct_mean((PCTInfo *) pct_info.data(), n_bin, pct_mean);
 
          // Write out PSTD
          if(vx_opt.output_flag[i_pstd] != STATOutputType::None) {
@@ -1222,16 +1200,12 @@ void do_pct(const PairStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
    } // end for i (ocnt_ta)
 
-   // Dealloate memory
-   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) nullptr; }
-
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void finish_txt_files() {
-   int i;
+static void finish_txt_files() {
 
    // Write out the contents of the STAT AsciiTable and
    // close the STAT output files
@@ -1241,7 +1215,7 @@ void finish_txt_files() {
    }
 
    // Finish up each of the optional text files
-   for(i=0; i<n_txt; i++) {
+   for(int i=0; i<n_txt; i++) {
 
       // Only write the table if requested in the config file
       if(conf_info.output_flag[i] == STATOutputType::Both) {
@@ -1259,7 +1233,7 @@ void finish_txt_files() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void clean_up() {
+static void clean_up() {
 
    // Close the output text files that were open for writing
    finish_txt_files();
@@ -1275,7 +1249,7 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+static void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -1313,25 +1287,25 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_pairs(const StringArray & a) {
+static void set_pairs(const StringArray & a) {
    pairs_files.add(a);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_format(const StringArray & a) {
+static void set_format(const StringArray & a) {
    pairs_format = string_to_pairsformat(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray & a) {
+static void set_config(const StringArray & a) {
    config_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out(const StringArray & a) {
+static void set_out(const StringArray & a) {
    out_base = a[0];
 }
 
