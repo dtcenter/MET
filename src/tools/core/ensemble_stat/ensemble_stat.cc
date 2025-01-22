@@ -196,6 +196,9 @@ int met_main(int argc, char *argv[]) {
    // Perform verification
    process_vx();
 
+   // Write out the CTRACK metrics
+   ctrack::result_print();
+
    // Close the text files and deallocate memory
    clean_up();
 
