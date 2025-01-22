@@ -205,19 +205,19 @@ void setup() {
     // Get dimension coordinates
     vector<size_t> start;
     vector<size_t> count;
-    start.push_back(0);
+    start.emplace_back(0);
 
     ConcatString s;
 
     NcVar range_var = get_nc_var(nc_in, "range");
     count.clear();
-    count.push_back(n_range);
+    count.emplace_back(n_range);
     range_coord.resize(n_range);
     range_var.getVar(start, count, range_coord.data());
 
     NcVar azimuth_var = get_nc_var(nc_in, "azimuth");
     count.clear();
-    count.push_back(n_azimuth);
+    count.emplace_back(n_azimuth);
     azimuth_coord.resize(n_azimuth);
     azimuth_var.getVar(start, count, azimuth_coord.data());
     get_att_value_string(&azimuth_var, "units", s);
@@ -225,7 +225,7 @@ void setup() {
 
     NcVar level_var = get_nc_var(nc_in, level_name.c_str());
     count.clear();
-    count.push_back(n_level);
+    count.emplace_back(n_level);
     level_coord.resize(n_level);
     level_var.getVar(start, count, level_coord.data());
     get_att_value_string(&level_var, "units", s);
@@ -233,16 +233,16 @@ void setup() {
 
     // Read variable information
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
-        data_names.push_back(conf_info.data_info[i_var]->name().string());
+        data_names.emplace_back(conf_info.data_info[i_var]->name().string());
         NcVar var = get_nc_var(
             nc_in, conf_info.data_info[i_var]->name().c_str());
         int n_dim = get_dim_count(&var) - 1;
-        data_n_dims.push_back(n_dim);
+        data_n_dims.emplace_back(n_dim);
         ConcatString s;
         get_att_value_string(&var, "long_name", s);
-        data_long_names.push_back(s.string());
+        data_long_names.emplace_back(s.string());
         get_att_value_string(&var, "units", s);
-        data_units.push_back(s.string());
+        data_units.emplace_back(s.string());
     }
 
     // Initialize statistical data cube lists
@@ -268,11 +268,11 @@ void setup() {
             data_max_2d->set_constant(-1.0e6);
             data_min_2d->set_constant(1.0e6);
 
-            data_counts.push_back(data_count_2d);
-            data_means.push_back(data_mean_2d);
-            data_stdevs.push_back(data_stdev_2d);
-            data_mins.push_back(data_min_2d);
-            data_maxs.push_back(data_max_2d);
+            data_counts.emplace_back(data_count_2d);
+            data_means.emplace_back(data_mean_2d);
+            data_stdevs.emplace_back(data_stdev_2d);
+            data_mins.emplace_back(data_min_2d);
+            data_maxs.emplace_back(data_max_2d);
         }
         if (data_n_dims[i_var] == 3) {
             // Size data cubes
@@ -294,11 +294,11 @@ void setup() {
             data_max_3d->set_constant(-1.0e6);
             data_min_3d->set_constant(1.0e6);
 
-            data_counts.push_back(data_count_3d);
-            data_means.push_back(data_mean_3d);
-            data_stdevs.push_back(data_stdev_3d);
-            data_mins.push_back(data_min_3d);
-            data_maxs.push_back(data_max_3d);
+            data_counts.emplace_back(data_count_3d);
+            data_means.emplace_back(data_mean_3d);
+            data_stdevs.emplace_back(data_stdev_3d);
+            data_mins.emplace_back(data_min_3d);
+            data_maxs.emplace_back(data_max_3d);
         }
     }
 }
@@ -323,20 +323,20 @@ void process_files() {
     vector<size_t> count_2d;
     vector<size_t> start_3d;
     vector<size_t> count_3d;
-    start_2d.push_back(0);
-    start_2d.push_back(0);
-    start_2d.push_back(0);
-    count_2d.push_back(1);
-    count_2d.push_back(n_range);
-    count_2d.push_back(n_azimuth);
-    start_3d.push_back(0);
-    start_3d.push_back(0);
-    start_3d.push_back(0);
-    start_3d.push_back(0);
-    count_3d.push_back(1);
-    count_3d.push_back(n_level);
-    count_3d.push_back(n_range);
-    count_3d.push_back(n_azimuth);
+    start_2d.emplace_back(0);
+    start_2d.emplace_back(0);
+    start_2d.emplace_back(0);
+    count_2d.emplace_back(1);
+    count_2d.emplace_back(n_range);
+    count_2d.emplace_back(n_azimuth);
+    start_3d.emplace_back(0);
+    start_3d.emplace_back(0);
+    start_3d.emplace_back(0);
+    start_3d.emplace_back(0);
+    count_3d.emplace_back(1);
+    count_3d.emplace_back(n_level);
+    count_3d.emplace_back(n_range);
+    count_3d.emplace_back(n_azimuth);
 
     for(int i_file = 0; i_file < data_files.n_elements(); i_file++) {
         mlog << Debug(1) << "Processing "
@@ -439,13 +439,13 @@ void write_stats() {
     level_dim = add_dim(nc_out, level_name, n_level);
 
     vector<NcDim> dims_2d;
-    dims_2d.push_back(range_dim);
-    dims_2d.push_back(azimuth_dim);
+    dims_2d.emplace_back(range_dim);
+    dims_2d.emplace_back(azimuth_dim);
 
     vector<NcDim> dims_3d;
-    dims_3d.push_back(level_dim);
-    dims_3d.push_back(range_dim);
-    dims_3d.push_back(azimuth_dim);
+    dims_3d.emplace_back(level_dim);
+    dims_3d.emplace_back(range_dim);
+    dims_3d.emplace_back(azimuth_dim);
 
     NcVar level_var = nc_out->addVar(level_name, ncDouble, level_dim);
     NcVar range_var = nc_out->addVar("range", ncDouble, range_dim);
@@ -455,10 +455,10 @@ void write_stats() {
     vector<size_t> count_range;
     vector<size_t> count_azimuth;
     vector<size_t> count_level;
-    offset.push_back(0);
-    count_level.push_back(n_level);
-    count_range.push_back(n_range);
-    count_azimuth.push_back(n_azimuth);
+    offset.emplace_back(0);
+    count_level.emplace_back(n_level);
+    count_range.emplace_back(n_range);
+    count_azimuth.emplace_back(n_azimuth);
 
     for (int r = 0; r < n_range; r++) {
         range_coord[r] = r;
@@ -478,17 +478,17 @@ void write_stats() {
     vector<size_t> offset_3d;
     vector<size_t> count_3d;
 
-    offset_2d.push_back(0);
-    offset_2d.push_back(0);
-    count_2d.push_back(n_range);
-    count_2d.push_back(n_azimuth);
+    offset_2d.emplace_back(0);
+    offset_2d.emplace_back(0);
+    count_2d.emplace_back(n_range);
+    count_2d.emplace_back(n_azimuth);
 
-    offset_3d.push_back(0);
-    offset_3d.push_back(0);
-    offset_3d.push_back(0);
-    count_3d.push_back(n_level);
-    count_3d.push_back(n_range);
-    count_3d.push_back(n_azimuth);
+    offset_3d.emplace_back(0);
+    offset_3d.emplace_back(0);
+    offset_3d.emplace_back(0);
+    count_3d.emplace_back(n_level);
+    count_3d.emplace_back(n_range);
+    count_3d.emplace_back(n_azimuth);
 
     for(int i_var = 0; i_var < data_names.size(); i_var++) {
         if (data_n_dims[i_var] == 2) {
@@ -726,9 +726,9 @@ void read_nc_tracks(NcFile* nc_in) {
 
     for(int i = 0; i < n_track_line; i++) {
         offsets.clear();
-        offsets.push_back(i);
+        offsets.emplace_back(i);
         counts.clear();
-        counts.push_back(1);
+        counts.emplace_back(1);
 
         char* track_line_str;
         track_lines_var.getVar(offsets, counts, &track_line_str);

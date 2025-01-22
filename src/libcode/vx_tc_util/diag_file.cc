@@ -372,7 +372,7 @@ void DiagFile::read_cira_rt(const ConcatString &path,
       // Store the name and values
       else {
          DiagName.add(cs);
-         DiagVal.push_back(data);
+         DiagVal.emplace_back(data);
       }
    } // end while
 
@@ -524,7 +524,7 @@ void DiagFile::read_ships_rt(const ConcatString &path,
       // Store the name and values
       else {
          DiagName.add(cs);
-         DiagVal.push_back(data);
+         DiagVal.emplace_back(data);
       }
    } // end while
 

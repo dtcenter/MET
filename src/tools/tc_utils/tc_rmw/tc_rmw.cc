@@ -612,7 +612,7 @@ void setup_nc_file() {
         data_info = conf_info.data_info[i_var];
         mlog << Debug(4) << "Processing field: " << data_info->magic_str() << "\n";
         string fname = data_info->name_attr();
-        variable_levels[fname].push_back(data_info->level_attr());
+        variable_levels[fname].emplace_back(data_info->level_attr());
         variable_long_names[fname] = data_info->long_name_attr();
         variable_units[fname] = data_info->units_attr();
         wind_converter.update_input(fname, data_info->units_attr());

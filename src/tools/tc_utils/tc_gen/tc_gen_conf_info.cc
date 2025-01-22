@@ -773,14 +773,14 @@ void TCGenConfInfo::process_config() {
    // If no filters are specified, use the top-level settings
    if(dict->n_entries() == 0) {
       vx_opt.process_config(Conf);
-      VxOpt.push_back(vx_opt);
+      VxOpt.emplace_back(vx_opt);
    }
    // Loop through the array entries
    else {
       for(i=0; i<dict->n_entries(); i++) {
          vx_opt.clear();
          vx_opt.process_config(*((*dict)[i]->dict_value()));
-         VxOpt.push_back(vx_opt);
+         VxOpt.emplace_back(vx_opt);
       }
    }
 
@@ -1380,10 +1380,10 @@ void ProbGenPCTInfo::add_probgen(const ProbGenInfo &pgi, int index,
    }
 
    // Update map entries
-   ProbGenMap[lead_hr].push_back(&pgi);
-   ProbIdxMap[lead_hr].push_back(index);
-   BestGenMap[lead_hr].push_back(bgi);
-   BestEvtMap[lead_hr].push_back(is_event);
+   ProbGenMap[lead_hr].emplace_back(&pgi);
+   ProbIdxMap[lead_hr].emplace_back(index);
+   BestGenMap[lead_hr].emplace_back(bgi);
+   BestEvtMap[lead_hr].emplace_back(is_event);
 
    // Increment counts
    if(is_event) PCTMap[lead_hr].pct.inc_event   (prob);
@@ -1435,10 +1435,10 @@ void ProbGenPCTInfo::add_genshape(const GenShapeInfo &gsi, int index,
    }
 
    // Update map entries
-   GenShapeMap[lead_hr].push_back(&gsi);
-   ProbIdxMap[lead_hr].push_back(index);
-   BestGenMap[lead_hr].push_back(bgi);
-   BestEvtMap[lead_hr].push_back(is_event);
+   GenShapeMap[lead_hr].emplace_back(&gsi);
+   ProbIdxMap[lead_hr].emplace_back(index);
+   BestGenMap[lead_hr].emplace_back(bgi);
+   BestEvtMap[lead_hr].emplace_back(is_event);
 
    // Increment counts
    if(is_event) PCTMap[lead_hr].pct.inc_event   (gsi.prob_val(index));

@@ -129,7 +129,7 @@ void MultiVarData1::_print_summary(const string &name, int *data, const ShapeDat
    for (int i=0; i<_nx*_ny; ++i) {
       if (data[i] > 0) {
          if (find(values.begin(), values.end(), data[i]) == values.end()) {
-            values.push_back(data[i]);
+            values.emplace_back(data[i]);
          }
       }
    }
@@ -327,8 +327,8 @@ static void  _debug_shape_examine(const string &name, const ShapeData &sd, int n
          vector<double>::iterator vi;
          vi = find(values.begin(), values.end(), v);
          if (vi == values.end()) {
-            values.push_back(v);
-            count.push_back(1);
+            values.emplace_back(v);
+            count.emplace_back(1);
          } else {
             int ii = vi - values.begin();
             count[ii] = count[ii] + 1;

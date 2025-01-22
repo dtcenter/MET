@@ -31,20 +31,20 @@ int main(int argc, char *argv[]) {
     map<string, vector<string> > variable_levels;
 
     vector<string> u_levels;
-    u_levels.push_back("P1000");
-    u_levels.push_back("P800");
-    u_levels.push_back("P500");
+    u_levels.emplace_back("P1000");
+    u_levels.emplace_back("P800");
+    u_levels.emplace_back("P500");
     variable_levels["U"] = u_levels;
 
     vector<string> v_levels;
-    v_levels.push_back("P1000");
-    v_levels.push_back("P900");
-    v_levels.push_back("P700");
-    v_levels.push_back("P500");
-    v_levels.push_back("P300");
-    v_levels.push_back("P100");
-    v_levels.push_back("P50");
-    v_levels.push_back("P10");
+    v_levels.emplace_back("P1000");
+    v_levels.emplace_back("P900");
+    v_levels.emplace_back("P700");
+    v_levels.emplace_back("P500");
+    v_levels.emplace_back("P300");
+    v_levels.emplace_back("P100");
+    v_levels.emplace_back("P50");
+    v_levels.emplace_back("P10");
     variable_levels["V"] = v_levels;
 
     for (map<string, vector<string> >::iterator i = variable_levels.begin();

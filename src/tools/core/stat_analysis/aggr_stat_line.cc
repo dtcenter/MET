@@ -3424,7 +3424,7 @@ void aggr_seeps_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
          // Allocated here but deallocated by PairDataPoint
          SeepsScore *score = new SeepsScore;
          *score = cur.seeps_mpr;
-         m[key].pd.seeps_mpr.push_back(score);
+         m[key].pd.seeps_mpr.emplace_back(score);
 
          //
          // Keep track of the unique header column entries

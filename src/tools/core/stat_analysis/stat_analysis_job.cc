@@ -653,7 +653,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //
    in_lt  = string_to_statlinetype(job.line_type[0].c_str());
    for(i=0; i<job.out_line_type.n(); i++) {
-      out_lt.push_back(string_to_statlinetype(job.out_line_type[i].c_str()));
+      out_lt.emplace_back(string_to_statlinetype(job.out_line_type[i].c_str()));
    }
 
    //

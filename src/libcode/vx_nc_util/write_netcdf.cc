@@ -165,8 +165,8 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    vector<float> lon_data(grid.nx()*grid.ny());
 
    // Define Variables
-   dims.push_back(*lat_dim);
-   dims.push_back(*lon_dim);
+   dims.emplace_back(*lat_dim);
+   dims.emplace_back(*lon_dim);
    lat_var = add_var(f_out, "lat", ncFloat, dims);
    lon_var = add_var(f_out, "lon", ncFloat, dims);
 
@@ -213,8 +213,8 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    vector<float> wgt_data(wgt_dp.nx()*wgt_dp.ny());
 
    // Define Variables
-   dims.push_back(*lat_dim);
-   dims.push_back(*lon_dim);
+   dims.emplace_back(*lat_dim);
+   dims.emplace_back(*lon_dim);
    wgt_var = add_var(f_out, "grid_weight", ncFloat, dims);
 
    // Add variable attributes
@@ -248,8 +248,8 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    }
 
    // Write the weights
-   count.push_back(wgt_dp.ny());
-   count.push_back(wgt_dp.nx());
+   count.emplace_back(wgt_dp.ny());
+   count.emplace_back(wgt_dp.nx());
    put_nc_data_with_dims(&wgt_var, wgt_data.data(), wgt_dp.ny(), wgt_dp.nx());
 
    // Clean up

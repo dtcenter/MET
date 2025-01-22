@@ -876,7 +876,7 @@ while ( line.read_line(in) )  {
    //  store entry and increment counter
    //
 
-   g1e.push_back(e);
+   g1e.emplace_back(e);
 
    j++;
 
@@ -951,7 +951,7 @@ while ( line.read_line(in) )  {
    //  store entry and increment counter
    //
 
-   g2e.push_back(e);
+   g2e.emplace_back(e);
 
    j++;
 
@@ -1066,7 +1066,7 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
          continue;
 
       if( n_matches++ == 0 ) e = g1e[j];
-      matches.push_back( g1e[j] );
+      matches.emplace_back( g1e[j] );
 
    }
 
@@ -1128,7 +1128,7 @@ bool TableFlatFile::lookup_grib1(const char * parm_name, int table_number, int c
          continue;
 
       if( n_matches++ == 0 ) e = g1e[j];
-      matches.push_back( g1e[j] );
+      matches.emplace_back( g1e[j] );
 
    }
 
@@ -1264,7 +1264,7 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
          continue;
 
       if( n_matches++ == 0 ) e = g2e[j];
-      matches.push_back( g2e[j] );
+      matches.emplace_back( g2e[j] );
 
    }
 
@@ -1328,7 +1328,7 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
          continue;
 
       if( n_matches++ == 0 ) e = g2e[j];
-      matches.push_back( g2e[j] );
+      matches.emplace_back( g2e[j] );
 
    }
 
