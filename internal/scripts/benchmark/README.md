@@ -31,7 +31,7 @@ The benchmarking results are extracted and consolidated into one data structure 
 
 *python benchmark.py*
 
-*!!!NOTE!!!* the benchmark.py and benchmark.yaml files **must** reside in the same directory
+*!!!NOTE!!!* the benchmark.py and benchmark.yaml files **must** reside in the same directory (but the benchmark.yaml file does NOT need to be specified at the command line)
 Modify the benchmark.yaml file to indicate the following:
 
 - benchmark output directory (benchmark_output_path)
