@@ -98,6 +98,13 @@ The S1 score has been in historical use for verification of forecasts, particula
 
 Differences are computed in both of the horizontal grid directions and is not a true mathematical gradient. Because the S1 score focuses on differences only, any bias in the forecast will not be measured. Further, the score depends on the domain and spacing of the grid, so can only be compared on forecasts with identical grids.
 
+As described in :ref:`Ebert-Uphoff et al., 2024 <Ebert-Uphoff-2024>`, statistics based
+on the magnitude of the forecast and observed gradients are also provided. Similiar to
+the S1 score, the root-mean-squared error of the magnitude of the gradients and their
+divergence quantify the similarity in the texture of the fields, with 0 being a perfect
+score. These gradient-based statistics assess the difference in smoothness between the
+two fields but not the accuracy of the forecast.
+
 Distance Maps
 -------------
 
@@ -265,6 +272,7 @@ __________________________
   eclv_points      = 0.05;
   hss_ec_value     = NA;
   rank_corr_flag   = TRUE;
+  gradient         = { dx = [ 1 ]; dy = [ 1 ]; }
   grid_weight_flag = NONE;
   tmp_dir          = "/tmp";
   output_prefix    = "";
@@ -320,22 +328,6 @@ The available wave numbers start at 0 (the mean across each row of data) and end
 * The **wave_1d_end** entry is an array of integers specifying the last wave number to be included.
 
 _____________________
-
-.. _gradient:
-
-:ref:`gradient <gradient>`
-
-.. code-block:: none
-
-  gradient = {
-     dx = [ 1 ];
-     dy = [ 1 ];
-   }
-
-
-The **gradient** entry is a dictionary which specifies the number and size of gradients to be computed. The **dx** and **dy** entries specify the size of the gradients in grid units in the X and Y dimensions, respectively. **dx** and **dy** are arrays of integers (positive or negative) which must have the same length, and the GRAD output line type will be computed separately for each entry. When computing gradients, the value at the (x, y) grid point is replaced by the value at the (x+dx, y+dy) grid point minus the value at (x, y). This configuration option may be set separately in each **obs.field** entry.
-
-____________________
 
 .. _distance_map:
 
@@ -834,10 +826,26 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
   * - 33
     - DX
     - Gradient size in the X-direction
-    - Double
+    - Integer 
   * - 34
     - DY
     - Gradient size in the Y-direction
+    - Integer 
+  * - 35
+    - FGMAG 
+    - Magnitude of the forecast gradient when the X and Y-directions are interpreted as a vector
+    - Double
+  * - 36
+    - OGMAG 
+    - Magnitude of the observed gradient when the X and Y-directions are intrepreted as a vector
+    - Double
+  * - 37
+    - MAG_RMSE 
+    - Root mean squared difference of the forecast gradient magnitude minus the observed gradient magnitude
+    - Double
+  * - 38
+    - LAPLACE_RMSE 
+    - Root mean squared difference of the sum of the forecast X and Y-gradients minus the sum of the observed X and Y-gradients
     - Double
 
 .. _table_GS_format_info_DMAP:
