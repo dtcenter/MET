@@ -766,7 +766,7 @@ void PairDataEnsemble::compute_ssvar() {
       string ssvar_min = str_format("%.5e", j*ssvar_bin_size).contents();
       if( !bins.count(ssvar_min) ){
          ssvar_pt_list pts;
-         pts.push_back(pt);
+         pts.emplace_back(pt);
          bins[ssvar_min] = pts;
 
          // Print warning for too many bins
@@ -779,7 +779,7 @@ void PairDataEnsemble::compute_ssvar() {
          }
 
       } else {
-         bins[ssvar_min].push_back(pt);
+         bins[ssvar_min].emplace_back(pt);
       }
 
    } // end for i

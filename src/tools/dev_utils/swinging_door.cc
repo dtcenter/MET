@@ -181,8 +181,8 @@ bool run_algorithm(const vector< SDObservation > &observations,
   vector< pair< SDObservation, SDObservation > >::const_iterator ramp;
   for (ramp = ramps.begin(); ramp != ramps.end(); ++ramp)
   {
-    compressed_observations.push_back(ramp->first);
-    compressed_observations.push_back(ramp->second);
+    compressed_observations.emplace_back(ramp->first);
+    compressed_observations.emplace_back(ramp->second);
   }
 
   return true;

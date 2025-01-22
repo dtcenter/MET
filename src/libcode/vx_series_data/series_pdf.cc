@@ -32,7 +32,7 @@ void init_pdf(
     vector<long long>& pdf) {
 
     for(int k = 0; k < n; k++) {
-        pdf.push_back(0);
+        pdf.emplace_back(0);
     }
 }
 
@@ -46,7 +46,7 @@ void init_pdf(
 
     int n = (max - min) / delta;
     for(int k = 0; k < n; k++) {
-        pdf.push_back(0);
+        pdf.emplace_back(0);
     }
 }
 
@@ -58,7 +58,7 @@ void init_joint_pdf(
     vector<long long>& pdf) {
 
     for(int k = 0; k < n_A * n_B; k++) {
-        pdf.push_back(0);
+        pdf.emplace_back(0);
     }
 }
 
@@ -146,9 +146,9 @@ void write_nc_pdf(
     vector<double> bin_mid;
 
     for(int k = 0; k < pdf.size(); k++) {
-        bin_min.push_back(min + delta * k);
-        bin_max.push_back(min + delta * (k + 1));
-        bin_mid.push_back(min + delta * (k + 0.5));
+        bin_min.emplace_back(min + delta * k);
+        bin_max.emplace_back(min + delta * (k + 1));
+        bin_mid.emplace_back(min + delta * (k + 0.5));
     }
 
     ConcatString var_name = info.name();

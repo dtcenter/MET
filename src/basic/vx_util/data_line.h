@@ -51,14 +51,10 @@ class DataLine {
       friend std::ostream & operator<<(std::ostream &, const DataLine &);
       friend Logger & operator<<(Logger &, const DataLine &);
 
-   protected:
-
       std::string Line;
       std::vector<std::string> Items;
       
       int N_chars;
-
-      std::vector<int> Offset;
 
       int N_ints;
 
@@ -67,6 +63,8 @@ class DataLine {
       std::string Delimiter;
 
       LineDataFile * File;  //  not allocated
+
+      bool AllowEmptyColumns;
 
       bool IsHeader;
 
@@ -130,9 +128,15 @@ class DataLine {
 
       virtual int read_line(LineDataFile *);
 
+      virtual int read_line_empty_columns(LineDataFile *);
+
       virtual int read_fwf_line(LineDataFile *, const int *wdth, int n_wdth);
 
       virtual bool is_ok() const;
+
+      bool allow_empty_columns() const;
+
+      void set_allow_empty_columns(bool = true);
 
       virtual bool is_header() const;
 
@@ -153,6 +157,10 @@ inline  int           DataLine::line_number  () const { return LineNumber; }
 inline  const char *  DataLine::get_line     () const { return Line.c_str(); }
 
 inline  const char *  DataLine::get_delimiter() const { return Delimiter.c_str(); }
+
+inline bool           DataLine::allow_empty_columns() const { return AllowEmptyColumns; }
+
+inline void           DataLine::set_allow_empty_columns(bool __tf__) { AllowEmptyColumns = __tf__;  return; }
 
 inline  void          DataLine::set_is_header(bool __tf__) { IsHeader = __tf__;  return; }
 

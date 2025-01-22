@@ -140,13 +140,17 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
    int summaryCount = 0;
    int summaryKeyCount = 0;
    // Save the summary information
-   const char *var_name = 0;
+   const char *var_name = nullptr;
+   const char *var_units = nullptr;
+   const char *var_desc = nullptr;
 
    //_dataSummarized = true;
    TimeSummaryInfo inputSummaryInfo = summary_info;
 
    // Initialize the list of summary observations
    StringArray summary_vnames;
+   StringArray summary_vunits;
+   StringArray summary_vdescs;
    StringArray printted_var_names;
    //vector< Observation > summary_obs;
 
@@ -211,7 +215,10 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
            if (!printted_var_names.has(curr_obs->getVarName().c_str())) {
               mlog << Debug(10)
                    << "SummaryObs::summarizeObs()  Filtered variable ["
-                   << curr_obs->getVarName() << "] (id: " << curr_obs->getVarCode() << ")\n";
+                   << curr_obs->getVarName() << "] (id: "
+                   << curr_obs->getVarCode() << ", units: "
+                   << curr_obs->getVarUnits() << ", desc: "
+                   << curr_obs->getVarDesc() << ")\n";
               printted_var_names.add(curr_obs->getVarName().c_str());
            }
         }
@@ -229,12 +236,18 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
                                   curr_obs->getVarCode(),
                                   curr_obs->getHeight(),
                                   curr_obs->getPressureLevel(),
-                                  curr_obs->getVarName());
+                                  curr_obs->getVarName(),
+                                  curr_obs->getVarUnits(),
+                                  curr_obs->getVarDesc());
 
            // Collect variable names
-           var_name = curr_obs->getVarName().c_str();
+           var_name  = curr_obs->getVarName().c_str();
+           var_units = curr_obs->getVarUnits().c_str();
+           var_desc  = curr_obs->getVarDesc().c_str();
            if (0 < m_strlen(var_name) && !summary_vnames.has(var_name)) {
               summary_vnames.add(var_name);
+              summary_vunits.add(var_units);
+              summary_vdescs.add(var_desc);
            }
            // If this is a new key, create a new NumArray
            if (summary_values.find(summary_key) == summary_values.end()) {
@@ -281,12 +294,14 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
                       << curr_values->first.getLongitude() << ", "
                       << curr_values->first.getElevation() << ", "
                       << curr_values->first.getVarName() << ", "
-                      << curr_values->first.getVarCode() << "\n";
+                      << curr_values->first.getVarCode() << ", "
+                      << curr_values->first.getVarUnits() << ", "
+                      << curr_values->first.getVarDesc() << "\n";
                  continue;
               }
            }
 
-           summaries.push_back(
+           summaries.emplace_back(
                  Observation(
                        getSummaryHeaderType(curr_values->first.getHeaderType(),
                                             calc->getType(),
@@ -301,7 +316,9 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
                        curr_values->first.getPressureLevel(),
                        curr_values->first.getHeight(),
                        calc->calcSummary(*curr_values->second),
-                       curr_values->first.getVarName()));
+                       curr_values->first.getVarName(),
+                       curr_values->first.getVarUnits(),
+                       curr_values->first.getVarDesc()));
            summaryCount++;
         } /* endfor - calc */
 
@@ -319,7 +336,11 @@ bool SummaryObs::summarizeObs(const TimeSummaryInfo &summary_info)
 
    //observations = summary_obs;
    for (int idx=0; idx<summary_vnames.n_elements(); idx++) {
-      if (!obs_names.has(summary_vnames[idx])) obs_names.add(summary_vnames[idx]);
+      if (!obs_names.has(summary_vnames[idx])) {
+         obs_names.add(summary_vnames[idx]);
+         obs_units.add(summary_vunits[idx]);
+         obs_descs.add(summary_vdescs[idx]);
+      }
    }
 
    // Reclaim memory
@@ -350,25 +371,25 @@ vector< SummaryCalc* > SummaryObs::getSummaryCalculators(const TimeSummaryInfo &
       // Create the calculator specified
 
       if (type == "mean") {
-        calculators.push_back(new SummaryCalcMean);
+        calculators.emplace_back(new SummaryCalcMean);
       }
       else if (type == "stdev") {
-        calculators.push_back(new SummaryCalcStdev);
+        calculators.emplace_back(new SummaryCalcStdev);
       }
       else if (type == "min") {
-        calculators.push_back(new SummaryCalcMin);
+        calculators.emplace_back(new SummaryCalcMin);
       }
       else if (type == "max") {
-        calculators.push_back(new SummaryCalcMax);
+        calculators.emplace_back(new SummaryCalcMax);
       }
       else if (type == "range") {
-        calculators.push_back(new SummaryCalcRange);
+        calculators.emplace_back(new SummaryCalcRange);
       }
       else if (type == "median") {
-        calculators.push_back(new SummaryCalcMedian);
+        calculators.emplace_back(new SummaryCalcMedian);
       }
       else if (type == "sum") {
-        calculators.push_back(new SummaryCalcSum);
+        calculators.emplace_back(new SummaryCalcSum);
 
         // Check for vld_thresh = 1.0
         if (!is_eq(info.vld_thresh, 1.0)) {
@@ -379,7 +400,7 @@ vector< SummaryCalc* > SummaryObs::getSummaryCalculators(const TimeSummaryInfo &
         }
       }
       else if (type[0] == 'p') {
-        calculators.push_back(new SummaryCalcPercentile(type));
+        calculators.emplace_back(new SummaryCalcPercentile(type));
       }
    }
 
@@ -425,7 +446,7 @@ vector< TimeSummaryInterval > SummaryObs::getTimeIntervals(
       {
          // See if the current time is within the defined time intervals
          if (isInTimeInterval(interval_time, info.beg, info.end)) {
-           time_intervals.push_back(TimeSummaryInterval(interval_time, info.width_beg, info.width_end));
+           time_intervals.emplace_back(TimeSummaryInterval(interval_time, info.width_beg, info.width_end));
          }
 
          // Increment the current time
@@ -495,11 +516,15 @@ bool SummaryObs::addObservationObj(const Observation &obs)
    bool result = false;
 
    // Do not filter by grib_code or obs_var here
-   observations.push_back(obs);
+   observations.emplace_back(obs);
 
-   const ConcatString var_name = obs.getVarName();
+   const ConcatString var_name  = obs.getVarName();
+   const ConcatString var_units = obs.getVarUnits();
+   const ConcatString var_desc  = obs.getVarDesc();
    if (0 < var_name.length() && !obs_names.has(var_name)) {
       obs_names.add(var_name);
+      obs_units.add(var_units);
+      obs_descs.add(var_desc);
    }
    result = true;
    return result;
@@ -515,13 +540,16 @@ bool SummaryObs::addObservation(
       const string &quality_flag,
       const int var_code, const double pressure_level_hpa,
       const double height_m, const double value,
-      const string &var_name)
+      const string &var_name,
+      const string &var_units,
+      const string &var_desc)
 {
    return addObservationObj(
              Observation(header_type, station_id, valid_time,
                          latitude, longitude, elevation,
                          quality_flag, var_code, pressure_level_hpa,
-                         height_m, value, var_name));
+                         height_m, value,
+                         var_name, var_units, var_desc));
 }
 
 ////////////////////////////////////////////////////////////////////////

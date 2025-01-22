@@ -679,7 +679,7 @@ void get_shapefile_records() {
               << "Using shape number " << i << " with "
               << pr.n_points << " points.\n";
          pr.toggle_longitudes();
-         shape_recs.push_back(pr);
+         shape_recs.emplace_back(pr);
       }
    }
 
@@ -1354,7 +1354,7 @@ static void apply_shape_mask(DataPlane & dp) {
    vector<GridClosedPolyArray> poly_list;
    for(const auto& cur_rec: shape_recs) {
       poly.set(cur_rec, grid);
-      poly_list.push_back(poly);
+      poly_list.emplace_back(poly);
    }
 
    // Check grid points
@@ -1807,7 +1807,7 @@ static void set_type(const StringArray & a) {
    StringArray sa;
    sa.parse_css(a[0]);
    for(int i=0; i<sa.n(); i++) {
-      mask_type_opts.push_back(string_to_masktype(sa[i].c_str()));
+      mask_type_opts.emplace_back(string_to_masktype(sa[i].c_str()));
    }
 }
 

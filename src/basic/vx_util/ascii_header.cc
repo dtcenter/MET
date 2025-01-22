@@ -450,7 +450,7 @@ void AsciiHeader::read(const char *version) {
          header_line.set_col_names(line[3]);
 
          // Store the current line
-         Headers.push_back(header_line);
+         Headers.emplace_back(header_line);
       }
 
       // Store the version we just loaded

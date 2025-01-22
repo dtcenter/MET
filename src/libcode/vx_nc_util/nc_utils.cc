@@ -1051,8 +1051,8 @@ char get_char_val(NcVar *var, const int index) {
    //
    // Retrieve the character array value from the NetCDF variable.
    //
-   start.push_back(index);
-   count.push_back(1);
+   start.emplace_back(index);
+   count.emplace_back(1);
    var->getVar(start, count, &k);
 
    return k;
@@ -1097,10 +1097,10 @@ ConcatString* get_string_val(NcVar *var, const int index,
    //
    // Retrieve the character array value from the NetCDF variable.
    //
-   start.push_back(index);
-   start.push_back(0);
-   count.push_back(1);
-   count.push_back(len);
+   start.emplace_back(index);
+   start.emplace_back(0);
+   count.emplace_back(1);
+   count.emplace_back(len);
    var->getVar(start, count, &tmp_str);
 
    //
@@ -1147,8 +1147,8 @@ int get_int_var(NcVar * var, const int index) {
          exit(1);
       }
 
-      start.push_back(index);
-      count.push_back(1);
+      start.emplace_back(index);
+      count.emplace_back(1);
       var->getVar(start, count, &k);
    }
 
@@ -1194,8 +1194,8 @@ double get_nc_time(NcVar * var, const int index) {
       char *tmp_buf = new char[512];
       int dataType = GET_NC_TYPE_ID_P(var);
 
-      start.push_back(index);
-      count.push_back(1);
+      start.emplace_back(index);
+      count.emplace_back(1);
       tmp_buf[0] = 0;
 
       switch (dataType) {
@@ -1217,8 +1217,8 @@ double get_nc_time(NcVar * var, const int index) {
          case NC_CHAR:
             if (2 == get_dim_count(var)) {
                buf_len = get_dim_size(var, 1);
-               start.push_back(0);
-               count.push_back(buf_len);
+               start.emplace_back(0);
+               count.emplace_back(buf_len);
             }
             for (int i=0; i<buf_len; i++) tmp_buf[i] = 0;
             var->getVar(start, count, tmp_buf);
@@ -1289,8 +1289,8 @@ float get_float_var(NcVar * var, const int index) {
          exit(1);
       }
 
-      start.push_back(index);
-      count.push_back(1);
+      start.emplace_back(index);
+      count.emplace_back(1);
       var->getVar(start, count, &k);
    }
 
@@ -2988,8 +2988,8 @@ NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
 NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
               const NcDim ncDim1, const NcDim ncDim2, const int deflate_level) {
    vector<NcDim> ncDims;
-   ncDims.push_back(ncDim1);
-   ncDims.push_back(ncDim2);
+   ncDims.emplace_back(ncDim1);
+   ncDims.emplace_back(ncDim2);
    return add_var(nc, var_name, ncType, ncDims, deflate_level);
 }
 
@@ -2998,9 +2998,9 @@ NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
 NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
               const NcDim ncDim1, const NcDim ncDim2, const NcDim ncDim3, const int deflate_level) {
    vector<NcDim> ncDims;
-   ncDims.push_back(ncDim1);
-   ncDims.push_back(ncDim2);
-   ncDims.push_back(ncDim3);
+   ncDims.emplace_back(ncDim1);
+   ncDims.emplace_back(ncDim2);
+   ncDims.emplace_back(ncDim3);
    return add_var(nc, var_name, ncType, ncDims, deflate_level);
 }
 
@@ -3010,10 +3010,10 @@ NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
               const NcDim ncDim1, const NcDim ncDim2, const NcDim ncDim3,
               const NcDim ncDim4, const int deflate_level) {
    vector<NcDim> ncDims;
-   ncDims.push_back(ncDim1);
-   ncDims.push_back(ncDim2);
-   ncDims.push_back(ncDim3);
-   ncDims.push_back(ncDim4);
+   ncDims.emplace_back(ncDim1);
+   ncDims.emplace_back(ncDim2);
+   ncDims.emplace_back(ncDim3);
+   ncDims.emplace_back(ncDim4);
    return add_var(nc, var_name, ncType, ncDims, deflate_level);
 }
 

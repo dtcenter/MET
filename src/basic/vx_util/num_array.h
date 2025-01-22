@@ -31,19 +31,19 @@ class NumArray {
 
    private:
 
-      void init_from_scratch();
-
       void assign(const NumArray &);
 
       std::vector<double> e;
 
-      bool Sorted;
+      bool Sorted = false;
 
    public:
 
-      NumArray();
+      NumArray() = default;
      ~NumArray();
       NumArray(const NumArray &);
+      explicit NumArray(const std::vector<double> &a) : e(a) {};
+
       NumArray & operator=(const NumArray &);
       bool operator==(const NumArray &) const;
 

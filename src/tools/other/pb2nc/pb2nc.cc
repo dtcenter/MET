@@ -1630,7 +1630,7 @@ void process_pbfile(int i_pb) {
 
                   if (has_uv) pqtzuv_map_uv[pqtzuv[0]] = tmp_pqtzuv;
                   if (has_tq) pqtzuv_map_tq[pqtzuv[0]] = tmp_pqtzuv;
-                  pqtzuv_list.push_back(tmp_pqtzuv);
+                  pqtzuv_list.emplace_back(tmp_pqtzuv);
                   excluded = false;
                }
             }
@@ -2461,7 +2461,7 @@ void process_pbfile_metadata(int i_pb) {
    if (has_prepbufr_vars) {
       for (int vIdx=0; vIdx< prepbufr_derive_vars.n(); vIdx++) {
          tmp_var_name = prepbufr_derive_vars[vIdx].c_str();
-         bufr_derive_cfgs.push_back(derive_var_cfg(tmp_var_name));
+         bufr_derive_cfgs.emplace_back(derive_var_cfg(tmp_var_name));
          if (do_all_vars || bufr_target_variables.has(tmp_var_name)) {
             // Set the variable index if requested
             bufr_obs_name_arr.add(tmp_var_name);
@@ -2598,7 +2598,7 @@ void addObservation(const float *obs_arr, const ConcatString &hdr_typ,
                                  obs_arr[2], obs_arr[3], obs_arr[4],
                                  var_name);
    obs.setHeaderIndex(obs_arr[0]);
-   observations.push_back(obs);
+   observations.emplace_back(obs);
    if (do_summary) summary_obs->addObservationObj(obs);
    return;
 }
@@ -3056,7 +3056,7 @@ int combine_tqz_and_uv(map<float, float*> pqtzuv_map_tq,
           it!=pqtzuv_map_merged.end(); ++it) {
         float *new_pqtzuv = new float[mxr8vt];
         for (int i=0; i<mxr8vt; i++) new_pqtzuv[i] = it->second[i];
-        pqtzuv_merged_array.push_back(new_pqtzuv);
+        pqtzuv_merged_array.emplace_back(new_pqtzuv);
       }
 
       if(mlog.verbosity_level() >= PBL_DEBUG_LEVEL) {

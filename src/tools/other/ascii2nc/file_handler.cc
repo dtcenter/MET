@@ -101,19 +101,27 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
       return false;
     }
 
+    mlog << Debug(3)
+         << "Reading File: " << *ascii_filename << "\n";
+ 
     // Read the observations
-
     if (!_readObservations(ascii_file))
       return false;
+
+    mlog << Debug(3)
+         << "  Running total of "
+         << num_observations_in_range << " observations kept and "
+         << num_observations_out_of_range << " rejected.\n";
 
     // Close the file
 
     ascii_file.close();
   }
 
-   mlog << Debug(2) << " Kept " << num_observations_in_range
-        << " observations, rejected (out of range) " << num_observations_out_of_range
-        << " observations\n";
+   mlog << Debug(2) << "Total number of "
+        << num_observations_in_range << " observations kept and " 
+        << num_observations_out_of_range << " rejected.\n";
+
   return true;
 }
 
@@ -200,8 +208,14 @@ bool FileHandler::summarizeObs(const TimeSummaryInfo &summary_info)
    _dataSummarized = true;
    _summaryInfo = summary_info;
    StringArray summary_vnames = summary_obs.getObsNames();
+   StringArray summary_vunits = summary_obs.getObsUnits();
+   StringArray summary_vdescs = summary_obs.getObsDescs();
    for (int idx=0; idx<summary_vnames.n(); idx++) {
-      if (!obs_names.has(summary_vnames[idx])) obs_names.add(summary_vnames[idx]);
+      if (!obs_names.has(summary_vnames[idx])) {
+         obs_names.add(summary_vnames[idx]);
+         obs_units.add(summary_vunits[idx]);
+         obs_descs.add(summary_vdescs[idx]);
+      }
    }
    return result;
 }
@@ -305,12 +319,16 @@ bool FileHandler::_addObservations(const Observation &obs)
    }      
 
    // Save obs because the obs vector is sorted after time summary
-   _observations.push_back(obs);
+   _observations.emplace_back(obs);
    if (do_summary) summary_obs.addObservationObj(obs);
    else {
-      ConcatString var_name = obs.getVarName();
+      ConcatString var_name  = obs.getVarName();
+      ConcatString var_units = obs.getVarUnits();
+      ConcatString var_desc  = obs.getVarDesc();
       if (var_name.nonempty() && !obs_names.has(var_name)) {
          obs_names.add(var_name);
+         obs_units.add(var_units);
+         obs_descs.add(var_desc);
       }
    }
 
@@ -321,8 +339,14 @@ bool FileHandler::_addObservations(const Observation &obs)
 
 bool FileHandler::_writeObservations()
 {
-  StringArray descs;
-  nc_point_obs.write_to_netcdf(obs_names, obs_units, descs);
+  StringArray units_sa;
+  StringArray descs_sa;
+
+  // Do not write all empty strings 
+  if(!obs_units.all_empty()) units_sa = obs_units;
+  if(!obs_descs.all_empty()) descs_sa = obs_descs;
+
+  nc_point_obs.write_to_netcdf(obs_names, units_sa, descs_sa);
 
   return true;
 }

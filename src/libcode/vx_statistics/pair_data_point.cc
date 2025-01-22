@@ -120,7 +120,7 @@ void PairDataPoint::extend(int n) {
 
    f_na.extend(n);
    for (int idx=seeps_mpr.size(); idx<n; idx++) {
-      seeps_mpr.push_back(nullptr);
+      seeps_mpr.emplace_back(nullptr);
    }
 
    return;
@@ -188,7 +188,7 @@ bool PairDataPoint::add_point_pair(const char *typ, const char *sid,
                      cpi, wgt)) return false;
 
    f_na.add(f);
-   seeps_mpr.push_back(nullptr);
+   seeps_mpr.emplace_back(nullptr);
 
    return true;
 }
@@ -269,7 +269,7 @@ bool PairDataPoint::add_grid_pair(double f, double o,
    add_grid_obs(o, cpi, wgt);
 
    f_na.add(f);
-   seeps_mpr.push_back(nullptr);
+   seeps_mpr.emplace_back(nullptr);
 
    return true;
 }

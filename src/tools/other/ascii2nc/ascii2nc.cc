@@ -50,6 +50,7 @@
 //   021    10/03/22  Prestopnik     MET #2227 Remove using namespace std from header files
 //   022    10/07/22  Dave Albo      MET #2276 Add NDBC buoy data
 //   023    11/28/23  Halley Gotway  MET #2701 Add ISMN soil moisture data
+//   024    01/06/25  Halley Gotway  MET #1019 Add USCRN quality controlled data
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -87,6 +88,7 @@
 #include "ndbc_handler.h"
 #include "ismn_handler.h"
 #include "iabp_handler.h"
+#include "uscrn_handler.h"
 
 #ifdef ENABLE_PYTHON
 #include "global_python.h"
@@ -119,6 +121,7 @@ enum class ASCIIFormat {
    NDBC_standard,
    ISMN,
    IABP,
+   USCRN,
    Aeronet_v2,
    Aeronet_v3, 
    Python, 
@@ -168,7 +171,6 @@ static void setup_wrapper_path();
 int met_main(int argc, char *argv[]) {
    CommandLine cline;
 
-
    //
    // Check for zero arguments
    //
@@ -190,14 +192,14 @@ int met_main(int argc, char *argv[]) {
    //
    // Add the options function calls
    //
-   cline.add(set_format,    "-format",    1);
-   cline.add(set_config,    "-config",    1);
-   cline.add(set_mask_grid, "-mask_grid", 1);
-   cline.add(set_mask_poly, "-mask_poly", 1);
-   cline.add(set_mask_sid,  "-mask_sid",  1);
+   cline.add(set_format,         "-format",    1);
+   cline.add(set_config,         "-config",    1);
+   cline.add(set_mask_grid,      "-mask_grid", 1);
+   cline.add(set_mask_poly,      "-mask_poly", 1);
+   cline.add(set_mask_sid,       "-mask_sid",  1);
    cline.add(set_valid_beg_time, "-valid_beg", 1);
    cline.add(set_valid_end_time, "-valid_end", 1);
-   cline.add(set_compress,  "-compress",  1);
+   cline.add(set_compress,       "-compress",  1);
 
    //
    // Parse the command line
@@ -214,7 +216,7 @@ int met_main(int argc, char *argv[]) {
    // Store the input ASCII file name and the output NetCDF file name
    //
    for (int i = 0; i < cline.n() - 1; ++i)
-     asfile_list.push_back((string)cline[i]);
+     asfile_list.emplace_back((string)cline[i]);
    ncfile = cline[cline.n() - 1];
 
    //
@@ -268,7 +270,7 @@ int met_main(int argc, char *argv[]) {
    // Read the input files
    //
    if(!file_handler->readAsciiFiles(asfile_list)) {
-      mlog << Error << "\n" << program_name << "-> "
+      mlog << Error << "\n" << program_name << " -> "
            << "encountered an error while reading input files!\n\n";
       return 1;
    }
@@ -357,6 +359,10 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
 
       case ASCIIFormat::IABP: {
          return((FileHandler *) new IabpHandler(program_name));
+      }
+
+      case ASCIIFormat::USCRN: {
+         return((FileHandler *) new UscrnHandler(program_name));
       }
 
       case ASCIIFormat::Aeronet_v2: {
@@ -525,6 +531,19 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
    delete ismn_file;
 
    //
+   // See if this is a USCRN file.
+   //
+   f_in.rewind();
+   UscrnHandler *uscrn_file = new UscrnHandler(program_name);
+
+   if(uscrn_file->isFileType(f_in)) {
+     f_in.close();
+     return (FileHandler *) uscrn_file;
+   }
+
+   delete uscrn_file;
+
+   //
    // If we get here, we didn't recognize the file contents.
    //
    mlog << Error << "\ndetermine_ascii_format() -> "
@@ -543,7 +562,7 @@ void usage() {
         << program_name << "\n"
         << "\tascii_file1 [ascii_file2 ... ascii_filen]\n"
         << "\tnetcdf_file\n"
-        << "\t[-format ASCII_format]\n"
+        << "\t[-format type]\n"
         << "\t[-config file]\n"
         << "\t[-mask_grid string]\n"
         << "\t[-mask_poly file]\n"
@@ -561,26 +580,29 @@ void usage() {
         << "\t\t\"netcdf_file\" indicates the name of the output "
         << "NetCDF file to be written (required).\n"
 
-        << "\t\t\"-format ASCII_format\" may be set to \""
-        << MetHandler::getFormatString() << "\", \""
-        << LittleRHandler::getFormatString() << "\", \""
-        << SurfradHandler::getFormatString() << "\", \""
-        << WwsisHandler::getFormatString() << "\", \""
-        << AirnowHandler::getFormatStringDailyV2() << "\", \""
-        << AirnowHandler::getFormatStringHourlyAqObs() << "\", \""
-        << AirnowHandler::getFormatStringHourly() << "\", \""
-        << NdbcHandler::getFormatStringStandard() << "\", \""
-        << IsmnHandler::getFormatString() << "\", \""
-        << IabpHandler::getFormatString() << "\", \""
-        << AeronetHandler::getFormatString() << "\", \""
-        << AeronetHandler::getFormatString_v2() << "\", \""
-        << AeronetHandler::getFormatString_v3() << "\"";
+        << "\t\t\"-format type\" may be set to one of the following types (optional).\n"
+	<< "\t\t   "
+        << MetHandler::getFormatString() << ", "
+        << LittleRHandler::getFormatString() << ", "
+        << SurfradHandler::getFormatString() << ", "
+        << WwsisHandler::getFormatString() << ",\n\t\t   "
+        << AirnowHandler::getFormatStringDailyV2() << ", "
+        << AirnowHandler::getFormatStringHourlyAqObs() << ", "
+        << AirnowHandler::getFormatStringHourly() << ",\n\t\t   "
+        << NdbcHandler::getFormatStringStandard() << ", "
+        << IsmnHandler::getFormatString() << ", "
+        << IabpHandler::getFormatString() << ", "
+        << UscrnHandler::getFormatString() << ",\n\t\t   "
+        << AeronetHandler::getFormatString() << ", "
+        << AeronetHandler::getFormatString_v2() << ", "
+        << AeronetHandler::getFormatString_v3();
 
    #ifdef ENABLE_PYTHON
-   cout << ", \"" << PythonHandler::getFormatString() << "\"";
+   cout << ",\n\t\t   "
+        << PythonHandler::getFormatString();
    #endif
 
-   cout << " (optional).\n"
+   cout << "\n"
 
         << "\t\t\"-config file\" uses the specified configuration file "
         << "to generate summaries of the fields in the ASCII files (optional).\n"
@@ -665,6 +687,9 @@ void set_format(const StringArray & a) {
    }
    else if(IabpHandler::getFormatString() == a[0]) {
      ascii_format = ASCIIFormat::IABP;
+   }
+   else if(UscrnHandler::getFormatString() == a[0]) {
+     ascii_format = ASCIIFormat::USCRN;
    }
    else if(AeronetHandler::getFormatString() == a[0]
      || AeronetHandler::getFormatString_v2() == a[0]) {

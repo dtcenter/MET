@@ -285,7 +285,7 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
               << " of GRIB2 file \"" << Filename << "\"\n";
       }
 
-      listRead.push_back( listMatchExact[0] );
+      listRead.emplace_back( listMatchExact[0] );
    }
 
    //  otherwise, if range matches were found, use them
@@ -569,8 +569,8 @@ void MetGrib2DataFile::find_record_matches(VarInfoGrib2* vinfo,
       }  //  END: else if( parameter match )
 
       //  add the record to the result lists, depending on the match type
-      if( rec_match_ex )                 listMatchExact.push_back(*it);
-      if( rec_match_ex || rec_match_rn ) listMatchRange.push_back(*it);
+      if( rec_match_ex )                 listMatchExact.emplace_back(*it);
+      if( rec_match_ex || rec_match_rn ) listMatchRange.emplace_back(*it);
 
    }  //  END:  for( vector<Grib2Record*>::iterator it = RecList.begin(); ...)
 
@@ -954,7 +954,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
          }
 
          //  add the record to the list
-         RecList.push_back(rec);
+         RecList.emplace_back(rec);
 
          //  build data structure for U/V wind pairs
          string rec_mag = build_magic(rec).text();

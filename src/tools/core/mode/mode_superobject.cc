@@ -98,8 +98,8 @@ static void _debug_shape_examine(const string &name, const ShapeData &sd,
          vector<double>::iterator vi;
          vi = find(values.begin(), values.end(), v);
          if (vi == values.end()) {
-            values.push_back(v);
-            count.push_back(1);
+            values.emplace_back(v);
+            count.emplace_back(1);
          } else {
             auto ii = (int) (vi - values.begin());
             count[ii] = count[ii] + 1;

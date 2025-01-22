@@ -1466,7 +1466,7 @@ void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg)
          else if (seeps_mpr->obs_cat == 1) c_olfh++;
          else count_diagonal++;
       }
-      seeps_mprs.push_back(seeps_mpr);
+      seeps_mprs.emplace_back(seeps_mpr);
    }
    if (count > 0) {
 
@@ -1860,7 +1860,7 @@ void compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps,
    if (seeps_idx < seeps_cnt) seeps_cnt = seeps_idx;
    density_vector.reserve(seeps_cnt);
    for(int j=0; j<seeps_cnt; j++) {
-      density_vector.push_back(0.);
+      density_vector.emplace_back(0.);
       for(int i=0; i<seeps_cnt; i++) {
          // Make n by n matrix: clat_m = clat#transpose(clat), slat_m = slat#transpose(slat) by IDL
          clat_m[i][j] = clat[i] * clat[j];
