@@ -264,7 +264,7 @@ def save_results(consolidated:pd.DataFrame, output_dir:str, ts:str, filename, su
 
     # filename is either filename_<timestamp>.ext
     # or <timestamp>.ext, where ext is .csv or .txt
-    if filename == " " or filename is None:
+    if filename == "" or filename == " " or filename is None:
        c_filename = ts + c_ext
        t_filename = ts + t_ext
     else:
@@ -315,7 +315,6 @@ def generate_info(settings:dict, ts:str, usecase: str, subdir: str) -> None:
     """
     info_file = "info_"+ usecase+ '_' + ts + ".txt"
     full_path = os.path.join(subdir, info_file)
-    # info_/d1/personal/mwin/AF_optimization/usecase_confs/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP.conf_2025-01-18T01:08:29.txt'
     with open(full_path, 'w') as f:
         f.write(f"Python version info: {sys.version}\n")
         f.write(f"Timestamp: {ts}\n")
@@ -338,9 +337,10 @@ def run_benchmark():
     settings = {}
     try:
         # get the path to the YAML file
-        yaml_path = os.getcwd()
-        benchmark_config = os.getenv("BENCHMARK_YAML_CONFIG_NAME", "benchmark.yaml")
-        settings = parse_config(benchmark_config, yaml_path)
+        yaml_path = os.path.dirname(__file__)
+        config = os.path.join(yaml_path, "benchmark.yaml")
+        benchmark_config = os.getenv("BENCHMARK_YAML_CONFIG_NAME", config)
+        settings = parse_config(benchmark_config)
         check_settings(settings)
     except yaml.YAMLError as ye:
         print(ye)
@@ -351,7 +351,7 @@ def run_benchmark():
     summary_filename = os.path.join(ctrack_path, "summary_output.txt")
     details_filename = os.path.join(ctrack_path, "detail_output.txt")
 
-    output_base = settings['output_path']
+    output_base = settings['benchmark_output_path']
     # if the base output dir does not exist, create it
     os.makedirs(output_base, exist_ok=True)
 
