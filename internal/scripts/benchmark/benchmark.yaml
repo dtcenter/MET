@@ -14,7 +14,7 @@ filename: ''
 #
 # Output directory where output files will be saved
 #
-output_path: !ENV '${OUTPUT_BASE}'
+benchmark_output_path: !ENV '${BENCHMARK_OUTPUT_BASE}'
 
 #
 # location of METplus
@@ -24,26 +24,21 @@ metplus_base: !ENV '${METPLUS_BASE}'
 #
 # location of system.conf file
 #
-system_conf: "/d1/personal/mwin/AF_optimization/system.conf"
+system_conf: "path-to/system.conf"
 
 #
 # location of METplus wrapper configuration file(s)
 #
 wrapper_conf: 
-   - "/d1/personal/mwin/AF_optimization/usecase_confs/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP.conf"
-   - "/d1/personal/mwin/AF_optimization/usecase_confs/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP_nbrhd.conf"
-   - "/d1/personal/mwin/AF_optimization/usecase_confs/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP_prob.conf"
-   - "/d1/personal/mwin/AF_optimization/usecase_confs/grid_stat/GridStat_fcstRRFS_obsCCPA_1hrAPCP_prob.conf"
-   - "/d1/personal/mwin/AF_optimization/usecase_confs/point_stat/PointStat_fcstRRFS_obsNDAS_TMP.conf"
-   - "/d1/personal/mwin/AF_optimization/usecase_confs/point_stat/PointStat_fcstRRFS_obsNDAS_TMP_prob.conf"
-   - "/d1/personal/mwin/AF_optimization/usecase_confs/ensemble_stat/EnsembleStat_fcstRRFS_obsCCPA_1hrAPCP.conf"
-   - "/d1/personal/mwin/AF_optimization/usecase_confs/ensemble_stat/EnsembleStat_fcstRRFS_obsNDAS_TMP.conf"
-  
+   - "path-to/GridStat_fcstRRFS_obsCCPA_1hrAPCP.conf"
+   - "path-to/GridStat_fcstRRFS_obsCCPA_1hrAPCP_nbrhd.conf"
+   - "path-to/GridStat_fcstRRFS_obsCCPA_1hrAPCP_prob.conf"
+
 
 #
 # number of times to run the use case, default=1
 #
-num_runs: 2
+num_runs: 1
 
 
 
