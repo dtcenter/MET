@@ -16,6 +16,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <cmath>
+#include <array>
 
 #include "vx_cal.h"
 #include "vx_log.h"
@@ -34,7 +35,15 @@ static constexpr double DAY_EPSILON = 0.00002;
 
 ////////////////////////////////////////////////////////////////////////
 
+const array<int, NO_OF_MONTHS> monthly_days = {
+  31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
+};
 
+////////////////////////////////////////////////////////////////////////
+
+bool check_time_units_and_offset(int sec_per_unit, double time_value);
+
+////////////////////////////////////////////////////////////////////////
 int is_leap_year(int year)
 
 {
@@ -53,12 +62,6 @@ return 1;
 
 }
 
-
-////////////////////////////////////////////////////////////////////////
-
-const int monthly_days[NO_OF_MONTHS] = {
-  31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31
-};
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -98,11 +101,11 @@ void increase_one_month(int &year, int &month) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void adjuste_day_for_month_year_units(int &day, int &month, int &year, double month_fraction) {
+void adjust_day_for_month_year_units(int &day, int &month, int &year, double month_fraction) {
   // Compute remaining days from the month fraction
   bool day_adjusted = false;
-  const int day_offset = (int)(month_fraction * DAYS_PER_MONTH + 0.5);
-  const char *method_name = "adjuste_day_for_month_year_units() -> ";
+  const auto day_offset = (int)(month_fraction * DAYS_PER_MONTH + 0.5);
+  const char *method_name = "adjust_day_for_month_year_units() -> ";
 
   day += day_offset;
   if (day == 1 && abs(month_fraction-0.5) < DAY_EPSILON) {
@@ -130,8 +133,8 @@ void adjuste_day_for_month_year_units(int &day, int &month, int &year, double mo
 
 ////////////////////////////////////////////////////////////////////////
 
-void adjuste_day_for_day_units(int &day, int &month, int &year, double time_value) {
-  int day_offset = day + (int)time_value;
+void adjust_day_for_day_units(int &day, int &month, int &year, int time_value) {
+  int day_offset = day + time_value;
   if (day_offset < 0) {
     while (day_offset < 0) {
       decrease_one_month(year, month);
@@ -146,7 +149,6 @@ void adjuste_day_for_day_units(int &day, int &month, int &year, double time_valu
   }
   day = day_offset;
   if (day == 0) day = 1;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -162,25 +164,27 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
   unixtime ut;
   auto time_value_ut = (unixtime)time_value;
   double time_fraction = time_value - (double)time_value_ut;
-  const char *method_name = "add_to_unixtime() -> ";
+  const char *method_name = "add_to_unixtime(double) -> ";
+
+  if (!check_time_units_and_offset(sec_per_unit, time_value)) {
+    mlog << Error << "\n" << method_name
+         << " the negative offset (" << time_value
+         << ") is not supported for unit months and years\n\n";
+    exit(-1);
+  }
 
   if (sec_per_unit == SEC_MONTH || sec_per_unit == SEC_YEAR) {
-    if (time_value < 0) {
-      mlog << Error << "\n" << method_name
-           << " the negative offset (" << time_value
-           << ") is not supported for unit months and years\n\n";
-      exit(-1);
-    }
 
     unix_to_mdyhms(base_unixtime, month, day, year, hour, minute, second);
 
     // Update year and compute remaining months
     int month_offset;
+    double month_fraction = time_fraction;
     if (sec_per_unit == SEC_YEAR) {
       year += time_value_ut;
-      time_fraction *= NO_OF_MONTHS;    // 12 months/year
-      month_offset = (int)time_fraction;
-      time_fraction -= month_offset;
+      month_fraction *= NO_OF_MONTHS;    // 12 months/year
+      month_offset = (int)month_fraction;
+      month_fraction -= month_offset;
     }
     else month_offset = (int)time_value_ut;
 
@@ -189,44 +193,8 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
       increase_one_month(year, month);
     }
     // Compute remaining days
-    //adjuste_day_for_month_year_units(day, month, year, time_fraction);
-    //ut = mdyhms_to_unix(month, day, year, hour, minute, second);
-    double day_offset;
-    if (day == 1) {
-      if (abs(time_fraction-0.5) < DAY_EPSILON) day = 15;
-      else {
-        day_offset = time_fraction * DAYS_PER_MONTH;
-        day += (int)day_offset;
-        if (day_offset - (int)day_offset > 0.5) day++;
-      }
-    }
-    else {
-      day_offset = time_fraction * DAYS_PER_MONTH;
-      time_value_ut = (int)day_offset;
-      day += time_value_ut;
-      if (day_offset - time_value_ut > 0.5) day++;
-      if (day > DAYS_PER_MONTH) {
-         day -= DAYS_PER_MONTH;
-         increase_one_month(year, month);
-      }
-    }
-
-    int day_org = day;
-    bool day_adjusted = false;
-    int max_day = monthly_days[month-1];
-    if (day > max_day) {
-      day = max_day;
-      day_adjusted = true;
-      if (month == 2 && is_leap_year(year)) {
-        if (day_org == 29) day_adjusted = false;
-        day = 29;
-      }
-    }
+    adjust_day_for_month_year_units(day, month, year, month_fraction);
     ut = mdyhms_to_unix(month, day, year, hour, minute, second);
-    if (day_adjusted) {
-      mlog << Debug(2) << method_name << "adjusted day " << day_org
-           << " to " << day << " for " << year << "-" << month << "\n";
-    }
   }
   else if (!no_leap || sec_per_unit != 86400) {
     // seconds, minute, hours, and day unit with leap year
@@ -241,10 +209,59 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
   }
   else {    //  no_leap year && unit = day
     unix_to_mdyhms(base_unixtime, month, day, year, hour, minute, second);
-    adjuste_day_for_day_units(day, month, year, time_value);
+    adjust_day_for_day_units(day, month, year, (int)time_value);
     ut = mdyhms_to_unix(month, day, year, hour, minute, second);
     if (time_fraction > (1-TIME_EPSILON) ) ut += (unixtime)sec_per_unit;
     else if (time_fraction > TIME_EPSILON) ut += (unixtime)(time_fraction * sec_per_unit);
+  }
+  mlog << Debug(5) << method_name
+       << unix_to_yyyymmdd_hhmmss(base_unixtime)
+       << " plus " << time_value << " times " << sec_per_unit
+       << " seconds = " << unix_to_yyyymmdd_hhmmss(ut) << "\n";
+
+  return ut;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
+                         unixtime time_value, bool no_leap) {
+  int month;
+  int day;
+  int year;
+  int hour;
+  int minute;
+  int second;
+  unixtime ut;
+  const char *method_name = "add_to_unixtime(unixtime) -> ";
+
+  if (!check_time_units_and_offset(sec_per_unit, (double)time_value)) {
+    mlog << Error << "\n" << method_name
+         << " the negative offset (" << time_value
+         << ") is not supported for unit months and years\n\n";
+    exit(-1);
+  }
+
+  if (sec_per_unit == SEC_YEAR) {
+    unix_to_mdyhms(base_unixtime, month, day, year, hour, minute, second);
+    year += time_value;
+    ut = mdyhms_to_unix(month, day, year, hour, minute, second);
+  }
+  else if (sec_per_unit == SEC_MONTH) {
+    unix_to_mdyhms(base_unixtime, month, day, year, hour, minute, second);
+    for (int idx=0; idx<time_value; idx++) {
+      increase_one_month(year, month);
+    }
+    ut = mdyhms_to_unix(month, day, year, hour, minute, second);
+  }
+  else if (!no_leap || sec_per_unit != 86400) {
+    // seconds, minute, hours, and day unit with leap year
+    ut = base_unixtime + sec_per_unit * time_value;
+  }
+  else {    //  no_leap year && unit = day
+    unix_to_mdyhms(base_unixtime, month, day, year, hour, minute, second);
+    adjust_day_for_day_units(day, month, year, (int)time_value);
+    ut = mdyhms_to_unix(month, day, year, hour, minute, second);
   }
   mlog << Debug(5) << method_name
        << unix_to_yyyymmdd_hhmmss(base_unixtime)
@@ -256,3 +273,12 @@ unixtime add_to_unixtime(unixtime base_unixtime, int sec_per_unit,
 
 ////////////////////////////////////////////////////////////////////////
 
+bool check_time_units_and_offset(int sec_per_unit, double time_value) {
+  bool valid = true;
+  if (sec_per_unit == SEC_MONTH || sec_per_unit == SEC_YEAR) {
+    valid = (time_value >= 0);
+  }
+  return valid;
+}
+
+////////////////////////////////////////////////////////////////////////

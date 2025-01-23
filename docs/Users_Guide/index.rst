@@ -54,6 +54,7 @@ The National Center for Atmospheric Research (NCAR) is sponsored by NSF. The DTC
    gen-ens-prod
    masking
    point-stat
+   pair-stat
    grid-stat
    ensemble-stat
    wavelet-stat

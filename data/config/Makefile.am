@@ -27,6 +27,7 @@ config_DATA = \
 	GridStatConfig_default \
 	GridDiagConfig_default \
 	IODA2NCConfig_default \
+	IODADataConfig_default \
 	Madis2NcConfig_default \
 	MODEAnalysisConfig_default \
 	MODEConfig_default \
@@ -34,6 +35,7 @@ config_DATA = \
 	MTDConfig_default \
 	PB2NCConfig_default \
 	PointStatConfig_default \
+	PairStatConfig_default \
 	SeriesAnalysisConfig_default \
 	STATAnalysisConfig_default \
 	STATAnalysisConfig_GO_Index \

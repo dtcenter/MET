@@ -367,16 +367,16 @@ elif [[ ${COMPILER_FAMILY} == *intel* && ${CC} == "icc" ]] || \
   if [ -z ${F77} ]; then export F77=`which ifort`; fi
   if [ -z ${F90} ]; then export F90=`which ifort`; fi
 elif [[ ${COMPILER_FAMILY} == *intel* ]] && [[ ${CC} == *icx* ]]; then
-  export CXX=`which icpx`
-  export FC=`which ifx`
-  export F77=`which ifx`
-  export F90=`which ifx`
+  if [ -z ${CXX} ]; then export CXX=`which icpx`; fi
+  if [ -z ${FC} ]; then export FC=`which ifx`; fi
+  if [ -z ${F77} ]; then export F77=`which ifx`; fi
+  if [ -z ${F90} ]; then export F90=`which ifx`; fi
 elif [[ ${COMPILER_FAMILY_SUFFIX} == oneapi ]]; then
-  export CC=`which icx`
-  export CXX=`which icpx`
-  export FC=`which ifx`
-  export F77=`which ifx`
-  export F90=`which ifx`
+  if [ -z ${CC} ]; then export CC=`which icc`; fi
+  if [ -z ${CXX} ]; then export CC=`which icx`; fi
+  if [ -z ${FC} ]; then export CXX=`which icpx`; fi
+  if [ -z ${F77} ]; then export FC=`which ifx`; fi
+  if [ -z ${F90} ]; then export F90=`which ifx`; fi
 else
   echo "ERROR: \${COMPILER} must start with gnu, intel, ics, ips, intel-classic, PrgEnv-intel, or pgi"
   exit

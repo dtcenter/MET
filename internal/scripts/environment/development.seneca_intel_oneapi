@@ -1,0 +1,84 @@
+# Define the development environment for NCAR project machine seneca using the Intel oneAPI compilers
+# Based on settings in development.seneca, modified for the Intel oneAPI compilers
+
+# Top-level MET project directory
+MET_PROJ_DIR=/d1/projects/MET
+
+# Source the setvars.sh file for updates to the $PATH and $LD_LIBRARY_PATH
+source /nrit/ral/intel/setvars.sh
+
+# Set the values for the compilers
+export FC=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2024.2.1.100/compiler/2024.2/bin/ifx
+export F77=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2024.2.1.100/compiler/2024.2/bin/ifx
+export F90=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2024.2.1.100/compiler/2024.2/bin/ifx
+export CC=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2024.2.1.100/compiler/2024.2/bin/icx
+export CXX=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2024.2.1.100/compiler/2024.2/bin/icpx
+
+# Variables required to build MET
+export MET_DEVELOPMENT=true
+export MET_DST=/d1/projects/MET/intel/external_libs/
+export MET_PROJ=${MET_DST}
+export MET_NETCDF=${MET_DST}
+export MET_HDF5=${MET_DST}
+export MET_BUFR=${MET_DST}
+export BUFRLIB_NAME=-lbufr_4
+export MET_GRIB2C=${MET_DST}
+export GRIB2CLIB_NAME=-lg2c
+export MET_GSLINC=${MET_DST}
+export MET_GSLLIB=${MET_DST}
+export MET_CAIROINC=${MET_DST}/include/cairo
+export MET_CAIROLIB=${MET_DST}/lib/cairo
+export MET_FREETYPEINC=${MET_DST}/include/freetype2
+export MET_FREETYPELIB=${MET_DST}/lib
+export MET_ATLAS=${MET_DST}
+export MET_ECKIT=${MET_DST}
+export JASPER=${MET_DST}
+#export MET_HDFINC=${MET_DST}
+#export MET_HDFLIB=${MET_DST}
+#export MET_HDFEOS=${MET_DST}
+
+# For Python 3 in MET 12.0,0
+export MET_PYTHON=/nrit/ral/met-python3
+export MET_PYTHON_BIN_EXE=${MET_PYTHON}/bin/python3.10
+export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.10"
+export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.10 -lcrypt -lpthread -ldl -lutil -lm"
+
+# -D__64BIT__ is required because we've compiled libgrib2c.a with that flag
+export CFLAGS="-O2"
+export CXXFLAGS=" -std=c++17"
+
+# Set LDFLAGS to include -rpath settings when compiling MET
+export ADDTL_DIR=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2024.2.1.100/compiler/2024.2/lib
+export ADDTL_DIR2=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2024.2.1.100/mkl/2024.2/lib
+#export ADDTL_DIR3=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023.2.0.49397/mpi/2021.10.0/lib
+#export ADDTL_DIR4=/var/autofs/mnt/linux-amd64/debian/bookworm/local/intel-2023.2.0.49397/mpi/2021.10.0/lib/release/
+export LDFLAGS="-Wl,--disable-new-dtags"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_DST}/lib:${MET_HDFEOS}/lib:${MET_PROJ}/lib:${MET_NETCDF}/lib:${MET_DST}/zlib-1.2.11/lib:${MET_DST}/szip-2.1.1/lib"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_HDFLIB}:${MET_HDF5}/lib:${MET_GSL}/lib:${MET_PYTHON}/lib:${JASPER}/lib"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${ADDTL_DIR}"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${ADDTL_DIR2}"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${ADDTL_DIR3}"
+export LDFLAGS="${LDFLAGS} -Wl,-rpath,${ADDTL_DIR4}"
+export LDFLAGS="${LDFLAGS} -L${ADDTL_DIR} -L${ADDTL_DIR2} -L${ADDTL_DIR3} -L${ADDTL_DIR4} -L${JASPER}/lib -Wl,-rpath,${MET_ATLAS}/lib -Wl,-rpath,${MET_ECKIT}/lib"
+
+# Variables required to run MET
+export MET_TEST_INPUT=${MET_PROJ_DIR}/MET_test_data/unit_test
+export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
+
+# Define Rscript to use a version with the ncdf4 package 1.17 or later 
+export MET_TEST_RSCRIPT=/nrit/ral/R-4.4.0/bin/Rscript
+
+# Define runtime Python version
+export MET_TEST_MET_PYTHON_EXE=${MET_PYTHON_BIN_EXE}
+
+# This is a cron script -- create the shell environment for this job
+# - NCO is for ncdiff
+# - NetCDF is for ncdump.
+export PATH="/nrit/ral/nco/bin:/nrit/ral/netcdf4/bin:\
+             /nrit/ral/sbin:/nrit/ral/bin:/usr/sbin:\
+             /usr/bin:/sbin:/bin:/usr/bin/X11:/opt/bin:$PATH"
+
+# SonarQube
+export SONARQUBE_DIR=/d1/projects/SonarQube/
+export SONARQUBE_WRAPPER_BIN=$SONARQUBE_DIR/build-wrapper-linux-x86
+export SONARQUBE_SCANNER_BIN=$SONARQUBE_DIR/sonar-scanner-linux/bin

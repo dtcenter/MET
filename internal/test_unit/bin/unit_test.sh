@@ -32,6 +32,75 @@ done
 UNIT=${MET_TEST_BASE}/python/unit.py
 
 # Unit test XML
+UNIT_XML_ORG="unit_ascii2nc.xml \
+          unit_ascii2nc_indy.xml \
+          unit_madis2nc.xml \
+          unit_trmm2nc.xml \
+          unit_pb2nc.xml \
+          unit_pb2nc_indy.xml \
+          unit_gen_vx_mask.xml \
+          unit_gen_ens_prod.xml \
+          unit_pcp_combine.xml \
+          unit_wwmca_regrid.xml \
+          unit_point_stat.xml \
+          unit_stat_analysis_ps.xml \
+          unit_pair_stat.xml \
+          unit_duplicate_flag.xml \
+          unit_obs_summary.xml \
+          unit_grid_stat.xml \
+          unit_stat_analysis_gs.xml \
+          unit_wavelet_stat.xml \
+          unit_stat_analysis_ws.xml \
+          unit_ensemble_stat.xml \
+          unit_stat_analysis_es.xml \
+          unit_mode.xml \
+          unit_mode_multivar.xml \
+          unit_mode_analysis.xml \
+          unit_plot_point_obs.xml \
+          unit_plot_data_plane.xml \
+          unit_wwmca_plot.xml \
+          unit_series_analysis.xml \
+          unit_tc_dland.xml \
+          unit_tc_pairs.xml \
+          unit_tc_stat.xml \
+          unit_plot_tc.xml \
+          unit_tc_rmw.xml \
+          unit_rmw_analysis.xml \
+          unit_tc_diag.xml \
+          unit_tc_gen.xml \
+          unit_met_test_scripts.xml  \
+          unit_modis.xml  \
+          unit_ref_config_lead_00.xml \
+          unit_ref_config_lead_12.xml \
+          unit_ref_config_lead_24.xml \
+          unit_ref_config_lead_36.xml \
+          unit_ref_config_lead_48.xml \
+          unit_ref_config.xml \
+          unit_mode_graphics.xml \
+          unit_regrid.xml \
+          unit_gsi_tools.xml \
+          unit_aeronet.xml \
+          unit_shift_data_plane.xml \
+          unit_mtd.xml \
+          unit_climatology_1.0deg.xml \
+          unit_climatology_1.5deg.xml \
+          unit_climatology_2.5deg.xml \
+          unit_climatology_mixed.xml \
+          unit_grib_tables.xml \
+          unit_grid_weight.xml \
+          unit_netcdf.xml \
+          unit_hira.xml \
+          unit_interp_shape.xml \
+          unit_lidar2nc.xml \
+          unit_ioda2nc.xml \
+          unit_airnow.xml \
+          unit_python.xml \
+          unit_point2grid.xml \
+          unit_perc_thresh.xml \
+          unit_gaussian.xml \
+          unit_grid_diag.xml \
+          unit_quality_filter.xml"
+
 UNIT_XML="unit_ascii2nc.xml \
           unit_ascii2nc_indy.xml \
           unit_madis2nc.xml \

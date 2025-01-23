@@ -301,7 +301,7 @@ jobs:
       matrix:
         include:
           - jobid: 'job1'
-            tests: 'point_stat stat_analysis_ps'
+            tests: 'point_stat stat_analysis_ps pair_stat'
           - jobid: 'job2'
             tests: 'grid_stat stat_analysis_gs'
           - jobid: 'job3'

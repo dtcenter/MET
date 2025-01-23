@@ -22,6 +22,7 @@ MET_CPPFLAGS = -I${top_builddir}/src/basic/vx_cal \
 	     -I${top_builddir}/src/libcode/vx_gnomon \
 	     -I${top_builddir}/src/libcode/vx_grid \
 	     -I${top_builddir}/src/libcode/vx_gsl_prob \
+	     -I${top_builddir}/src/libcode/vx_ioda \
 	     -I${top_builddir}/src/libcode/vx_nav \
 	     -I${top_builddir}/src/libcode/vx_nc_obs \
 	     -I${top_builddir}/src/libcode/vx_nc_util \
@@ -69,6 +70,7 @@ MET_LDFLAGS = -L${top_builddir}/src/basic/vx_cal \
 	     -L${top_builddir}/src/libcode/vx_gnomon \
 	     -L${top_builddir}/src/libcode/vx_grid \
 	     -L${top_builddir}/src/libcode/vx_gsl_prob \
+	     -L${top_builddir}/src/libcode/vx_ioda \
 	     -L${top_builddir}/src/libcode/vx_nav \
 	     -L${top_builddir}/src/libcode/vx_nc_obs \
 	     -L${top_builddir}/src/libcode/vx_nc_util \

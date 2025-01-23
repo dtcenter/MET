@@ -64,6 +64,7 @@ SUBDIRS += vx_data2d_factory \
 	vx_nc_obs \
 	vx_solar \
 	vx_bool_calc \
-	vx_seeps
+	vx_seeps \
+	vx_ioda
 
 MAINTAINERCLEANFILES 	= Makefile.in
