@@ -185,7 +185,6 @@ bool UGridFile::open(const char * filepath)
   }
 
   return get_var_info();
-
 }
 
 
