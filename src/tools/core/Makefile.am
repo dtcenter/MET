@@ -42,6 +42,10 @@ if ENABLE_POINT_STAT
   SUBDIRS += point_stat
 endif
 
+if ENABLE_PAIR_STAT
+  SUBDIRS += pair_stat
+endif
+
 if ENABLE_STAT_ANALYSIS
   SUBDIRS += stat_analysis
 endif

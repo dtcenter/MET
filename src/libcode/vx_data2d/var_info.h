@@ -106,7 +106,7 @@ class VarInfo
          // get stuff
          //
 
-      virtual GrdFileType  file_type() const = 0;
+      virtual GrdFileType file_type() const = 0;
 
       ConcatString magic_str()      const;
       ConcatString magic_time_str() const;

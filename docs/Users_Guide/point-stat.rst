@@ -9,7 +9,7 @@ Introduction
 
 The Point-Stat tool provides verification statistics for forecasts at observation points (as opposed to over gridded analyses). The Point-Stat tool matches gridded forecasts to point observation locations and supports several different interpolation options. The tool then computes continuous, categorical, spatial, and probabilistic verification statistics. The categorical and probabilistic statistics generally are derived by applying a threshold to the forecast and observation values. Confidence intervals - representing the uncertainty in the verification measures - are computed for the verification statistics.
 
-Scientific and statistical aspects of the Point-Stat tool are discussed in the following section. Practical aspects of the Point-Stat tool are described in :numref:`tc-stat_practical-information`.
+Scientific and statistical aspects of the Point-Stat tool are discussed in the following section. Practical aspects of the Point-Stat tool are described in :numref:`point-stat_practical_info`.
 
 Scientific and Statistical Aspects
 ==================================
@@ -257,7 +257,7 @@ MET provides non-parametric bootstrap confidence intervals for many categorical 
 
 For more information on confidence intervals pertaining to verification measures, see :ref:`Wilks (2011) <Wilks-2011>`, :ref:`Jolliffe and Stephenson (2012) <Jolliffe-2012>`, and Bradley (2008).
 
-.. _tc-stat_practical-information:
+.. _point-stat_practical_info:
 
 Practical Information
 =====================

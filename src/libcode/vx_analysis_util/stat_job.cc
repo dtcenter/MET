@@ -2042,7 +2042,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
       stat_at.set_precision(precision);
       stat_at.set_bad_data_value(bad_data_double);
       stat_at.set_bad_data_str(na_str);
-      stat_at.set_delete_trailing_blank_rows(1);
+      stat_at.set_delete_trailing_blank_rows(true);
 
       //
       // Write the STAT header row
@@ -2121,7 +2121,7 @@ void STATAnalysisJob::setup_stat_file(int n_row, int n) {
          stat_at.set_precision(precision);
          stat_at.set_bad_data_value(bad_data_double);
          stat_at.set_bad_data_str(na_str);
-         stat_at.set_delete_trailing_blank_rows(1);
+         stat_at.set_delete_trailing_blank_rows(true);
       }
    }
 
@@ -2171,7 +2171,7 @@ void STATAnalysisJob::dump_stat_line(const STATLine &line,
       dump_at.set_precision(precision);
       dump_at.set_bad_data_value(bad_data_double);
       dump_at.set_bad_data_str(na_str);
-      dump_at.set_delete_trailing_blank_rows(1);
+      dump_at.set_delete_trailing_blank_rows(true);
 
       //
       // If the line_type is set to a single value

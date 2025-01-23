@@ -35,15 +35,38 @@ static bool sort_obs(ob_val_t a, ob_val_t b) { return a.val<b.val; }
 
 ////////////////////////////////////////////////////////////////////////
 //
+// Code for struct station_value_base_t
+//
+////////////////////////////////////////////////////////////////////////
+
+void station_value_base_t::clear_base() {
+   typ.clear();
+   sid.clear();
+   lat = lon = bad_data_double;
+   ut = (unixtime) 0;
+   lvl = elv = bad_data_double;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Code for struct point_pair_t
+//
+////////////////////////////////////////////////////////////////////////
+
+void point_pair_t::clear() {
+   station_value_base_t::clear_base();
+   fval = oval= bad_data_double;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
 // Code for struct station_values_t
 //
 ////////////////////////////////////////////////////////////////////////
 
 void station_values_t::clear() {
-   sid.clear();
-   lat = lon = x = y = wgt = bad_data_double;
-   ut = (unixtime) 0;
-   lvl = elv = bad_data_double;
+   station_value_base_t::clear_base();
+   x = y = wgt = bad_data_double;
    fcmn = fcsd = ocmn = ocsd = bad_data_double;
    summary_val = bad_data_double;
    obs.clear();
@@ -966,8 +989,9 @@ void VxPairBase::clear() {
    obs_qty_inc_filt.clear();
    obs_qty_exc_filt.clear();
 
-   mpr_column.clear();
-   mpr_thresh.clear();
+   mpr_thr_inc_map.clear();
+   mpr_str_inc_map.clear();
+   mpr_str_exc_map.clear();
 
    fcst_ut = (unixtime) 0;
    beg_ut  = (unixtime) 0;
@@ -1038,8 +1062,9 @@ void VxPairBase::assign(const VxPairBase &vx_pb) {
    obs_qty_inc_filt = vx_pb.obs_qty_inc_filt;
    obs_qty_exc_filt = vx_pb.obs_qty_exc_filt;
 
-   mpr_column = vx_pb.mpr_column;
-   mpr_thresh = vx_pb.mpr_thresh;
+   mpr_thr_inc_map = vx_pb.mpr_thr_inc_map;
+   mpr_str_inc_map = vx_pb.mpr_str_inc_map;
+   mpr_str_exc_map = vx_pb.mpr_str_exc_map;
 
    msg_typ_sfc = vx_pb.msg_typ_sfc;
    msg_typ_lnd = vx_pb.msg_typ_lnd;
@@ -1411,20 +1436,27 @@ void VxPairBase::set_interp(int i_interp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::set_mpr_thresh(const StringArray &sa, const ThreshArray &ta) {
+void VxPairBase::set_mpr_thr_inc_map(const map<ConcatString,ThreshArray> &m) {
 
-   // Check for constant length
-   if(sa.n() != ta.n()) {
-      mlog << Error << "\nVxPairBase::set_mpr_thresh() -> "
-           << "the \"" << conf_key_mpr_column << "\" ("
-           << write_css(sa) << ") and \"" << conf_key_mpr_thresh
-           << "\" (" << write_css(ta)
-           << ") config file entries must have the same length!\n\n";
-      exit(1);
-   }
+   mpr_thr_inc_map = m;
 
-   mpr_column = sa;
-   mpr_thresh = ta;
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairBase::set_mpr_str_inc_map(const map<ConcatString,StringArray> &m) {
+
+   mpr_str_inc_map = m;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairBase::set_mpr_str_exc_map(const map<ConcatString,StringArray> &m) {
+
+   mpr_str_exc_map = m;
 
    return;
 }

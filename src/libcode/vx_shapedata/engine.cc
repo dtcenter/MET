@@ -3029,7 +3029,7 @@ void write_engine_stats(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable & a
       eng.conf_info.conf.output_precision());
    at.set_bad_data_value(bad_data_double);    // Set the bad data value
    at.set_bad_data_str(na_str);               // Set the bad data string
-   at.set_delete_trailing_blank_rows(1);      // No trailing blank rows
+   at.set_delete_trailing_blank_rows(true);   // No trailing blank rows
 
    //
    //  calculate n_valid

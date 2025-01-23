@@ -213,7 +213,7 @@ class VarInfoNcWrf : public VarInfo
          // get stuff
          //
 
-      GrdFileType file_type() const;
+      GrdFileType       file_type()      const;
       const LongArray & dimension()      const;
       int               dimension(int i) const;
       const NumArray  & dim_value()      const;

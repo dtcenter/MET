@@ -2510,7 +2510,7 @@ void ModeExecutive::write_ct_stats()
                         engine.conf_info.conf.output_precision());
    cts_at.set_bad_data_value(bad_data_double);   // Set the bad data value
    cts_at.set_bad_data_str(na_str);              // Set the bad data string
-   cts_at.set_delete_trailing_blank_rows(1);     // No trailing blank rows
+   cts_at.set_delete_trailing_blank_rows(true);  // No trailing blank rows
 
    //
    // Write out the MODE header columns

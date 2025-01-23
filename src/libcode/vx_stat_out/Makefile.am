@@ -14,5 +14,6 @@ noinst_LIBRARIES = libvx_stat_out.a
 libvx_stat_out_a_SOURCES = \
               stat_columns.cc stat_columns.h \
               stat_hdr_columns.cc stat_hdr_columns.h \
+              stat_hdr_info.cc stat_hdr_info.h \
               vx_stat_out.h
 libvx_stat_out_a_CPPFLAGS = ${MET_CPPFLAGS}
