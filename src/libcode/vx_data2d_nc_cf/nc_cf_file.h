@@ -157,7 +157,11 @@ class NcCfFile {
       NcCfFile & operator=(const NcCfFile &);
 
       // Determine the file times from the filename
-      // Moved to vx_nc_util/nc_utils.h & vx_nc_util/nc_utils.cc
+      unixtime get_valid_time_from_file_path(const std::string &filepath) const;
+      unixtime get_init_time_from_file_path(const std::string &filepath) const;
+      unixtime get_time_from_TRMM_3B42_3hourly_filename(const std::string &filename) const;
+      unixtime get_time_from_TRMM_3B42_daily_filename(const std::string &filename) const;
+
 
       // Read the grid information from the netCDF file and fill in the
       // grid member with that information.

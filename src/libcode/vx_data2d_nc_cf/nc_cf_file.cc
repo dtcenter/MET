@@ -382,7 +382,19 @@ bool NcCfFile::open(const char * filepath)
     else ValidTime.add(0);  //Initialize
   }
 
-  InitTime = get_init_time(_ncFile, filepath);
+  InitTime = get_init_time(_ncFile);
+  if (InitTime == 0) {
+    // Time not in file, get from the file name
+    InitTime = get_init_time_from_file_path(filepath);
+    if (InitTime == 0) {
+       mlog << Debug(4) << method_name
+            << "could not extract init time from file name.\n";
+    }
+    else {
+       mlog << Debug(4) << method_name
+            << "get InitTime (" << unix_to_yyyymmdd_hhmmss(InitTime) << ") from the file name.\n";
+    }
+  }
 
   // Pull out the grid.  This must be done after pulling out the dimension
   // and variable information since this information is used to pull out the
@@ -480,6 +492,228 @@ bool NcCfFile::open(const char * filepath)
 }
 
 
+////////////////////////////////////////////////////////////////////////
+
+
+unixtime NcCfFile::get_valid_time_from_file_path(const string &filepath) const
+{
+  // Extract the file name from the path
+
+  string filename;
+  size_t slash_pos = filepath.rfind('/');
+
+  if (slash_pos == string::npos)
+    filename = filepath;
+  else
+    filename = filepath.substr(slash_pos+1);
+
+  // See if this is a TRMM 3hourly precip file
+
+  unixtime file_time;
+
+  if ((file_time = get_time_from_TRMM_3B42_3hourly_filename(filename)) != 0)
+    return file_time + (int)(1.5 * 3600.0);
+
+  // See if this is a TRMM daily precip file
+
+  if ((file_time = get_time_from_TRMM_3B42_daily_filename(filename)) != 0)
+    return file_time + (int)(22.5 * 3600.0);
+
+  // If we get here, we couldn't get the time from the filename
+
+  return 0;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+unixtime NcCfFile::get_init_time_from_file_path(const string &filepath) const
+{
+  // Extract the file name from the path
+
+  string filename;
+  size_t slash_pos = filepath.rfind('/');
+
+  if (slash_pos == string::npos)
+    filename = filepath;
+  else
+    filename = filepath.substr(slash_pos+1);
+
+  // See if this is a TRMM 3hourly precip file
+
+  unixtime file_time;
+
+  if ((file_time = get_time_from_TRMM_3B42_3hourly_filename(filename)) != 0)
+    return file_time - (int)(1.5 * 3600.0);
+
+  // See if this is a TRMM daily precip file
+
+  if ((file_time = get_time_from_TRMM_3B42_daily_filename(filename)) != 0)
+    return file_time - (int)(1.5 * 3600.0);
+
+  // If we get here, we couldn't get the time from the filename
+
+  return 0;
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+unixtime NcCfFile::get_time_from_TRMM_3B42_3hourly_filename(const string &filename) const
+{
+  // The format of the TRMM 3hourly files is:
+  //      3B42.<yyyymmdd>.<hh>.7.G3.nc
+  // See if the tokens in this filename seem to match
+
+  ConcatString fn_string(filename.c_str());
+  StringArray tokens = fn_string.split(".");
+
+  if (tokens.n_elements() != 6)
+    return 0;
+
+  // 3B42
+
+  if ( tokens[0] != "3B42" )
+    return 0;
+
+  // <yyyymmdd>
+
+  if ( tokens[1].length() != 8)
+    return 0;
+
+  for (int i = 0; i < 8; ++i)
+  {
+    if (!isdigit(tokens[1][i]))
+      return 0;
+  }
+
+  // <hh>
+
+  if (tokens[2].length() != 2)
+    return 0;
+
+  for (int i = 0; i < 2; ++i)
+  {
+    if (!isdigit(tokens[2][i]))
+      return 0;
+  }
+
+  // 7
+
+  if ( tokens[3] != "7" )
+    return 0;
+
+  // G3
+
+  if ( tokens[4] != "G3" )
+    return 0;
+
+  // nc
+
+  if ( tokens[5] != "nc" )
+    return 0;
+
+  // If we get here, this is a TRMM 3B42 3hourly file.  Extract the file time.
+
+  string date_string = tokens[1];
+  string hour_string = tokens[2];
+
+  struct tm time_struct;
+  memset(&time_struct, 0, sizeof(time_struct));
+
+  time_struct.tm_year = atoi(date_string.substr(0, 4).c_str()) - 1900;
+  time_struct.tm_mon = atoi(date_string.substr(4, 2).c_str()) - 1;
+  time_struct.tm_mday = atoi(date_string.substr(6, 2).c_str());
+  time_struct.tm_hour = atoi(hour_string.c_str());
+
+  return (unixtime)timegm(&time_struct);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+unixtime NcCfFile::get_time_from_TRMM_3B42_daily_filename(const string &filename) const
+{
+  // The format of the TRMM 3hourly files is:
+  //      3B42_daily.<yyyy>.<mm>.<dd>.7.G3.nc
+  // See if the tokens in this filename seem to match
+
+  ConcatString fn_string(filename.c_str());
+  StringArray tokens = fn_string.split(".");
+
+  if (tokens.n_elements() != 7)
+    return 0;
+
+  // 3B42_daily
+
+  if ( tokens[0] != "3B42_daily" )
+    return 0;
+
+  // <yyyy>
+
+  if ( tokens[1].length() != 4)
+    return 0;
+
+  for (int i = 0; i < 4; ++i)
+  {
+    if (!isdigit(tokens[1][i]))
+      return 0;
+  }
+
+  // <mm>
+
+  if (tokens[2].length() != 2)
+    return 0;
+
+  for (int i = 0; i < 2; ++i)
+  {
+    if (!isdigit(tokens[2][i]))
+      return 0;
+  }
+
+  // <dd>
+
+  if ( tokens[3].length() != 2)
+    return 0;
+
+  for (int i = 0; i < 2; ++i)
+  {
+    if (!isdigit(tokens[3][i]))
+      return 0;
+  }
+
+  // 7
+
+  if ( tokens[4] != "7" )
+    return 0;
+
+  // G3
+
+  if ( tokens[5] != "G3" )
+    return 0;
+
+  // nc
+
+  if ( tokens[6] != "nc" )
+    return 0;
+
+  // If we get here, this is a TRMM 3B42 daily file.  Extract the file time.
+
+  struct tm time_struct;
+  memset(&time_struct, 0, sizeof(time_struct));
+
+  time_struct.tm_year = atoi(tokens[1].c_str()) - 1900;
+  time_struct.tm_mon = atoi(tokens[2].c_str()) - 1;
+  time_struct.tm_mday = atoi(tokens[3].c_str());
+
+  return (unixtime)timegm(&time_struct);
+}
+
+
+////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////
 
 

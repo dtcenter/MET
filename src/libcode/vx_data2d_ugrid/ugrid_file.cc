@@ -315,15 +315,6 @@ bool UGridFile::open_metadata(const char * filepath)
          << "could not extract valid time from the "
          << "time variable from " << filepath << "\n";
 
-    // Time not in file, get from file name
-    ut = get_valid_time_from_file_path(filepath);
-    if (ut == 0) {
-       mlog << Debug(4) << method_name
-            << "could not extract valid time from file name.\n";
-       mlog << Warning << "\n" << method_name
-            << "could not determine the valid time, using 0.\n\n";
-    }
-
     ValidTime.add(ut);
   }
   else {
@@ -407,8 +398,8 @@ bool UGridFile::open_metadata(const char * filepath)
     else ValidTime.add(0);  //Initialize
   }
 
-  // Get InitTime from the forecast_reference_time or the filename
-  InitTime = get_init_time(_ncFile, filepath);
+  // Get InitTime from the forecast_reference_time
+  InitTime = get_init_time(_ncFile);
 
   // Pull out the grid.  This must be done after pulling out the dimension
   // and variable information since this information is used to pull out the

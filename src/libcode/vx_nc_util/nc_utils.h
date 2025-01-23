@@ -334,8 +334,7 @@ extern int    get_index_at_nc_data(netCDF::NcVar *var, double value, const std::
 extern netCDF::NcFile* open_ncfile(const char * nc_name, bool write = false);
 
 // Moved from nc_cf_file.cc
-extern unixtime get_init_time(netCDF::NcFile *nc_file, const std::string &filepath);
-extern unixtime get_valid_time_from_file_path(const std::string &filepath);
+extern unixtime get_init_time(netCDF::NcFile *nc_file);
 
 extern unixtime get_reference_unixtime(netCDF::NcVar *time_var, int &sec_per_unit,
                                        bool &no_leap_year);
