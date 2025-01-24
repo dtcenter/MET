@@ -179,8 +179,7 @@ bool UGridFile::open(const char * filepath)
   // Open the file
   _ncFile = open_ncfile(filepath);
 
-  if (IS_INVALID_NC_P(_ncFile))
-  {
+  if (IS_INVALID_NC_P(_ncFile)) {
     close();
     return false;
   }
@@ -397,6 +396,9 @@ bool UGridFile::open_metadata(const char * filepath)
     }
     else ValidTime.add(0);  //Initialize
   }
+
+  // Get InitTime from the forecast_reference_time
+  InitTime = get_init_time(_ncFile);
 
   // Pull out the grid.  This must be done after pulling out the dimension
   // and variable information since this information is used to pull out the
