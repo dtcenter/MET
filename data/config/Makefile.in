@@ -342,6 +342,7 @@ config_DATA = \
 	PlotModeFieldConfig_default \
 	Point2GridConfig_default \
 	UGridConfig_lfric \
+	UGridConfig_lfric_pressure_levels \
 	UGridConfig_mpas \
 	PlotPointObsConfig_default
 

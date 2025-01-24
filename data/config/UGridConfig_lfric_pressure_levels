@@ -2,8 +2,8 @@
 //
 // Unstructured grid configuration file.
 //
-// UGridConfig_lfric in the current working directory overrides the settings
-// here for reading native model level data from the LFRic modeling system.
+// UGridConfig_lfric_pressure_levels in the current working directory overrides
+// the settings here for reading pressure level data from LFRic modeling system.
 // For additional or updated information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -12,14 +12,23 @@
 // Dimensions and variables mapping for LFRic dataset
 //
 ugrid_metadata_map = [
-   { key = "dim_face";  val = "nMesh2d_face"; },
+   { key = "dim_face";  val = "dim1"; },
+   { key = "dim_node";  val = "nMesh2d_node"; },
+   { key = "dim_edge";  val = "nMesh2d_edge"; },
    { key = "dim_time";  val = "time_counter"; },
-   { key = "dim_vert";  val = ""; },            // optional
+   { key = "dim_vert";  val = "pressure"; },
+   { key = "cell_id";   val = "indexToCellID"; },
    { key = "lat_face";  val = "Mesh2d_face_y"; },
    { key = "lon_face";  val = "Mesh2d_face_x"; },
-   { key = "vert_face"; val = ""; },            // optional
+   { key = "vert_face"; val = "pressure"; },
+   { key = "lat_edge";  val = "Mesh2d_edge_y"; },
+   { key = "lon_edge";  val = "Mesh2d_edge_x"; },
+   { key = "lat_node";  val = "Mesh2d_node_y"; },
+   { key = "lon_node";  val = "Mesh2d_node_x"; },
    { key = "time";      val = "time_instant"; }
 ];
+
+ugrid_max_distance_km = 30;
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -3517,6 +3517,46 @@ int get_data_size(NcVar *var) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+// Moved from nc_cf_file.cc
+// init_time or valid_time from filename`
+
+string init_time_var_name = "forecast_reference_time";
+unixtime get_init_time(NcFile *nc_file) {
+   unixtime init_time = 0;
+   NcVar init_time_var = get_var(nc_file, init_time_var_name.c_str());
+   const char *method_name = "get_init_time(NcFile *, string &) -> ";
+
+   if (IS_INVALID_NC(init_time_var)) {
+      mlog << Debug(4) << method_name
+           << "could not extract init time from the "
+           << "\"" << init_time_var_name << "\" variable.\n";
+   }
+   else {
+      unixtime ut = 0;
+      int sec_per_unit = 0;
+      ConcatString units;
+
+      // Parse the units for the time variable.
+      if (get_var_units(&init_time_var, units)) {
+         if (units.empty()) {
+            mlog << Warning << "\n" << method_name
+                 << "the \"" << init_time_var_name << "\" variable must contain a \"units\" attribute.\n\n";
+         }
+         else {
+            parse_cf_time_string(units.c_str(), ut, sec_per_unit);
+         }
+      }
+
+      double time_value = get_nc_time(&init_time_var,0);
+      init_time = ut + (unixtime)(sec_per_unit * time_value);
+      mlog << Debug(4) << method_name
+           << "get InitTime (" << unix_to_yyyymmdd_hhmmss(init_time)
+           << ") from \"" << init_time_var_name << "\" variable (value=" << time_value<< ").\n";
+   }
+   return init_time;
+}
+
+////////////////////////////////////////////////////////////////////////
 
 unixtime get_reference_unixtime(NcVar *time_var, int &sec_per_unit,
                                 bool &no_leap_year) {
