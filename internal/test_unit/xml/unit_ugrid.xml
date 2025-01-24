@@ -122,24 +122,24 @@
     </output>
   </test>
 
-  <test name="point_stat_ugrid_lfric2_config">
+  <test name="point_stat_ugrid_lfric_pressure_levels">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
       <pair><name>BEG_DS</name>         <value>-180000</value></pair>
       <pair><name>END_DS</name>         <value>180000</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>  <value>UGRID_LFRIC2</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>  <value>UGRID_LFRIC_PRESSURE_LEVELS</value></pair>
       <pair><name>CONFIG_DIR</name>     <value>&CONFIG_DIR;</value></pair>
     </env>
     <param> \
       &DATA_DIR_UGRID;/lfric/lfric_2012-04-09_00.00.00.nc \
       &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
-      &CONFIG_DIR;/PointStatConfig_ugrid_lfric2 \
-      -ugrid_config ${MET_BASE}/config/UGridConfig_lfric2 \
+      &CONFIG_DIR;/PointStatConfig_ugrid_lfric_pressure_levels \
+      -ugrid_config ${MET_BASE}/config/UGridConfig_lfric_pressure_levels \
       -outdir &OUTPUT_DIR;/point_stat_ugrid -v 4
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_LFRIC2_180000L_20120409_180000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_LFRIC2_180000L_20120409_180000V_mpr.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_LFRIC_PRESSURE_LEVELS_180000L_20120409_180000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_LFRIC_PRESSURE_LEVELS_180000L_20120409_180000V_mpr.txt</stat>
     </output>
   </test>
 
