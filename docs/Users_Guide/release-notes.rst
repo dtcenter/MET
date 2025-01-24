@@ -73,18 +73,17 @@ MET Version 12.1.0 Upgrade Instructions
 
    * Pair-Stat configuration:
 
-     * New **Pair-Stat** tool is added with a new configuration file.
+     * Adds new **Pair-Stat** tool with a new configuration file.
 
    * MODE configuration:
 
-     * Multivariate MODE now supports the use of **multiple convolution radii and thresholds**,
+     * Supports **multiple convolution radii and thresholds** for Multivariate MODE,
        but does not require changes to existing MODE configuration files.
 
    * Series-Analysis configuration:
 
-     * The **output_stats.grad** entry is added to enable gradient statistic computation.
-     * The **gradient** dictionary is added to configure gradient statistic computation.
-
+     * Adds a new **output_stats.grad** entry to enable gradient statistic computation.
+     * Adds a new **gradient** dictionary to configure gradient statistic computation.
 
 .. dropdown:: Output format changes
 
@@ -95,7 +94,7 @@ MET Version 12.1.0 Upgrade Instructions
      * Adds 4 new columns to the end of the GRAD line type:
        * FGMAG, OGMAG, MAG_RMSE, LAPLACE_RMSE
      * Grid-Stat writes the updated GRAD line type output.
-     * Series-Analysis adds variables to its NetCDF output for the requested gradient statistics.
+     * Series-Analysis adds gradient statistic variables to its NetCDF output, if requested.
 
 .. dropdown:: Output data changes
 
@@ -103,13 +102,13 @@ MET Version 12.1.0 Upgrade Instructions
 
    * NetCDF library code:
 
-     * Improved handling of leap years in the MET library code may corrects timestamps parsed
-       from NetCDF files that define times using a **monthly** offset.
+     * Improves handling of leap years and corrects time values parsed from NetCDF files that
+       define times using a **monthly** offset.
 
    * IODA2NC tool:
 
-     * Bugfix corrects timestamps parsed from input files that store time using the **int64**
-       data type for which variable overflow was occurring.
+     * Corrects time values parsed from input files that store time using the **int64** data type
+       for which variable overflow was occurring.
 
 .. dropdown:: Additional upgrade instructions
 
