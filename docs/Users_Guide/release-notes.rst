@@ -92,7 +92,9 @@ MET Version 12.1.0 Upgrade Instructions
    * Gradient (**GRAD**) line type:
 
      * Adds 4 new columns to the end of the GRAD line type:
+
        * FGMAG, OGMAG, MAG_RMSE, LAPLACE_RMSE
+
      * Grid-Stat writes the updated GRAD line type output.
      * Series-Analysis adds gradient statistic variables to its NetCDF output, if requested.
 
