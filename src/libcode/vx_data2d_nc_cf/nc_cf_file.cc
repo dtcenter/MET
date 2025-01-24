@@ -1159,7 +1159,7 @@ bool NcCfFile::getData(const char *var_name,
 
   //  store the times
   unixtime valid_ut;
-  if(info->t_slot >= 0) valid_ut = ValidTime[a[(int)info->t_slot]];
+  if(info->t_slot >= 0) valid_ut = ValidTime[a[info->t_slot]];
   else                  valid_ut = ValidTime[0];
 
   //  if unset, set the init time to the valid time
