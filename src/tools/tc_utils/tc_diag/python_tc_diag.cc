@@ -431,7 +431,7 @@ bool parse_python_string_value_map(PyObject *dict,
       else {
          mlog << Debug(5) << "Adding to map \""
               << key_str << "\" = " << val << "\n";
-         k.push_back(key_str);
+         k.emplace_back(key_str);
          m[key_str] = val;
       }
    } // end while

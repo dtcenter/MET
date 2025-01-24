@@ -521,7 +521,7 @@ void CgFontCollection::add(const CgFont & f)
 
 extend(Nelements + 1);
 
-e.push_back(f);
+e.emplace_back(f);
 
 ++Nelements;
 
@@ -542,7 +542,7 @@ if ( have_it(f) )  return;
 
 extend(Nelements + 1);
 
-e.push_back(f);
+e.emplace_back(f);
 
 ++Nelements;
 

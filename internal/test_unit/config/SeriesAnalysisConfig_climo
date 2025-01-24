@@ -113,6 +113,19 @@ mask = {
    poly = "";
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Gradient statistics
+// May be set separately in each "obs.field" entry
+//
+gradient = {
+   dx = [ 1 ];
+   dy = [ 1 ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 //
 // Number of grid points to be processed concurrently. Set smaller to use less
 // memory but increase the number of passes through the data. If set <= 0, all
@@ -133,16 +146,17 @@ vld_thresh = 0.5;
 output_stats = {
    fho    = [ "TOTAL", "F_RATE", "H_RATE", "O_RATE" ];
    ctc    = [ "ALL" ];
-   cts    = [ ];
-   mctc   = [ ];
-   mcts   = [ ];
+   cts    = [];
+   mctc   = [];
+   mcts   = [];
    cnt    = [ "TOTAL", "RMSE", "ANOM_CORR", "RMSFA", "RMSOA" ];
    sl1l2  = [ "ALL" ];
    sal1l2 = [ "ALL" ];
-   pct    = [ ];
-   pstd   = [ ];
-   pjc    = [ ];
-   prc    = [ ];
+   pct    = [];
+   pstd   = [];
+   pjc    = [];
+   prc    = [];
+   grad   = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -150,6 +164,6 @@ output_stats = {
 hss_ec_value   = NA;
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
-version        = "V12.0.0";
+version        = "V12.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

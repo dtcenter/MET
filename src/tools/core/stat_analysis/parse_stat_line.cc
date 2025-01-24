@@ -315,6 +315,18 @@ void parse_grad_line(STATLine &l, GRADInfo &grad_info) {
    grad_info.egbar = atof(l.get_item("EGBAR"));
    grad_info.dx    = atoi(l.get_item("DX"));
    grad_info.dy    = atoi(l.get_item("DY"));
+   grad_info.fgmag = atof(l.get_item("FGMAG"));
+   grad_info.ogmag = atof(l.get_item("OGMAG"));
+
+   double mag_rmse   = atof(l.get_item("MAG_RMSE"));
+   grad_info.mag_mse = (is_bad_data(mag_rmse) ?
+                        bad_data_double :
+                        mag_rmse * mag_rmse);
+
+   double lap_rmse   = atof(l.get_item("LAPLACE_RMSE"));
+   grad_info.lap_mse = (is_bad_data(lap_rmse) ?
+                        bad_data_double :
+                        lap_rmse * lap_rmse);
 
    return;
 }

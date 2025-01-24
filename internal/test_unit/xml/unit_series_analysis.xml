@@ -40,6 +40,7 @@
       <pair><name>PSTD_STATS</name>      <value></value></pair>
       <pair><name>PJC_STATS</name>       <value></value></pair>
       <pair><name>PRC_STATS</name>       <value></value></pair>
+      <pair><name>GRAD_STATS</name>      <value>"ALL"</value></pair>
     </env>
     <param> \
       -fcst   &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F006.grib \
@@ -81,6 +82,7 @@
       <pair><name>PSTD_STATS</name>      <value></value></pair>
       <pair><name>PJC_STATS</name>       <value></value></pair>
       <pair><name>PRC_STATS</name>       <value></value></pair>
+      <pair><name>GRAD_STATS</name>      <value>"ALL"</value></pair>
     </env>
     <param> \
       -fcst   &DATA_DIR_MODEL;/grib1/gfs_hmt/gfs_2012040900_F030.grib \
@@ -131,6 +133,7 @@
       <pair><name>PSTD_STATS</name>      <value>"TOTAL", "ROC_AUC", "BRIER", "BRIER_NCL", "BRIER_NCU"</value></pair>
       <pair><name>PJC_STATS</name>       <value>"CALIBRATION_1", "REFINEMENT_1"</value></pair>
       <pair><name>PRC_STATS</name>       <value>"PODY_1", "POFD_1"</value></pair>
+      <pair><name>GRAD_STATS</name>      <value></value></pair>
     </env>
     <param> \
       -fcst   &OUTPUT_DIR;/series_analysis/input_fcst_file_list \
@@ -174,6 +177,7 @@
       <pair><name>PSTD_STATS</name>      <value>"TOTAL", "ROC_AUC", "BRIER", "BRIER_NCL", "BRIER_NCU"</value></pair>
       <pair><name>PJC_STATS</name>       <value>"CALIBRATION_1", "REFINEMENT_1"</value></pair>
       <pair><name>PRC_STATS</name>       <value>"PODY_1", "POFD_1"</value></pair>
+      <pair><name>GRAD_STATS</name>      <value></value></pair>
     </env>
     <param> \
       -fcst   &OUTPUT_DIR;/series_analysis/aggregate_fcst_file_list \
@@ -210,6 +214,7 @@
       <pair><name>PSTD_STATS</name>      <value></value></pair>
       <pair><name>PJC_STATS</name>       <value></value></pair>
       <pair><name>PRC_STATS</name>       <value></value></pair>
+      <pair><name>GRAD_STATS</name>      <value></value></pair>
     </env>
     <param> \
       -fcst   &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040900_F012.grib \

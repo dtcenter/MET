@@ -20,6 +20,7 @@
 
 #include "stat_columns.h"
 #include "stat_hdr_columns.h"
+#include "stat_hdr_info.h"
 
 
 ////////////////////////////////////////////////////////////////////////

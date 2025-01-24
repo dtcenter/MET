@@ -771,8 +771,7 @@ void PointStatVxOpt::clear() {
    mask_sid.clear();
    mask_llpnt.clear();
 
-   mpr_sa.clear();
-   mpr_ta.clear();
+   mpr_thr_inc_map.clear();
 
    mask_name.clear();
 
@@ -929,8 +928,26 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
       int_to_setlogic(odict.lookup_int(conf_key_wind_logic)));
 
    // Conf: mpr_column and mpr_thresh
-   mpr_sa = odict.lookup_string_array(conf_key_mpr_column);
-   mpr_ta = odict.lookup_thresh_array(conf_key_mpr_thresh);
+   StringArray mpr_sa(odict.lookup_string_array(conf_key_mpr_column));
+   ThreshArray mpr_ta(odict.lookup_thresh_array(conf_key_mpr_thresh));
+
+   // Check for the same length
+   if(mpr_sa.n() != mpr_ta.n()) {
+      mlog << Error << "\nPointStatVxOpt::process_config() -> "
+           << "The length of \"" << conf_key_mpr_column << "\" and \""
+           << conf_key_mpr_thresh << "\" must match (" << mpr_sa.n()
+           << " != " << mpr_ta.n() << ")!\n\n";
+      exit(1);
+   }
+
+   // Store in map
+   for(int i=0; i<mpr_sa.n(); i++) {
+      if(mpr_thr_inc_map.count(mpr_sa[i]) == 0) {
+         ThreshArray ta;
+         mpr_thr_inc_map[(mpr_sa[i])] = ta;
+      }
+      mpr_thr_inc_map[(mpr_sa[i])].add(mpr_ta[i]); 
+   }
 
    // Dump the contents of the current thresholds
    if(mlog.verbosity_level() >= 5) {
@@ -1100,7 +1117,7 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    vx_pd.set_size(n_msg_typ, n_mask, n_interp);
 
    // Store the MPR filter threshold
-   vx_pd.set_mpr_thresh(mpr_sa, mpr_ta);
+   vx_pd.set_mpr_thr_inc_map(mpr_thr_inc_map);
 
    // Store the climo CDF info
    vx_pd.set_climo_cdf_info_ptr(&cdf_info);

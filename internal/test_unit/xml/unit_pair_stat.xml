@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
+  <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
+]>
+
+<!-- Requires: unit_point_stat.xml -->
+
+<met_test>
+
+  <!--                                    -->
+  <!--  pair_stat                         -->
+  <!--                                    -->
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <test name="pair_stat_MPR">
+    <exec>&MET_BIN;/pair_stat</exec>
+    <param> \
+      -pairs  &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -format mpr \
+      -config &CONFIG_DIR;/PairStatConfig_mpr \
+      -out    &OUTPUT_DIR;/pair_stat/pair_stat_format_mpr -v 1 
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/pair_stat/pair_stat_format_mpr.stat</stat>
+      <stat>&OUTPUT_DIR;/pair_stat/pair_stat_format_mpr_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/pair_stat/pair_stat_format_mpr_sl1l2.txt</stat>
+    </output>
+  </test>
+
+  <!-- Returns bad status since '-format python' not supported -->
+  <test name="pair_stat_PYTHON">
+    <exec>&MET_BIN;/pair_stat</exec>
+    <retval>1</retval>
+    <param> \
+      -pairs python_input \
+      -format python \
+      -config &CONFIG_DIR;/PairStatConfig_mpr
+    </param>
+    <output>
+    </output>
+  </test>
+
+  <!-- Returns bad status since '-format ioda' not supported -->
+  <test name="pair_stat_IODA">
+    <exec>&MET_BIN;/pair_stat</exec>
+    <retval>1</retval>
+    <param> \
+      -pairs ioda_input \
+      -format ioda \
+      -config &CONFIG_DIR;/PairStatConfig_mpr
+    </param>
+    <output>
+    </output>
+  </test>
+
+</met_test>

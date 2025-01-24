@@ -120,7 +120,7 @@ void PairDataPoint::extend(int n) {
 
    f_na.extend(n);
    for (int idx=seeps_mpr.size(); idx<n; idx++) {
-      seeps_mpr.push_back(nullptr);
+      seeps_mpr.emplace_back(nullptr);
    }
 
    return;
@@ -188,7 +188,7 @@ bool PairDataPoint::add_point_pair(const char *typ, const char *sid,
                      cpi, wgt)) return false;
 
    f_na.add(f);
-   seeps_mpr.push_back(nullptr);
+   seeps_mpr.emplace_back(nullptr);
 
    return true;
 }
@@ -269,7 +269,7 @@ bool PairDataPoint::add_grid_pair(double f, double o,
    add_grid_obs(o, cpi, wgt);
 
    f_na.add(f);
-   seeps_mpr.push_back(nullptr);
+   seeps_mpr.emplace_back(nullptr);
 
    return true;
 }
@@ -606,7 +606,7 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             // Check matched pair filtering options
             ConcatString reason_cs;
             if(!check_mpr_thresh(fcst_v, obs_v, cpi,
-                                 mpr_column, mpr_thresh, &reason_cs)) {
+                                 mpr_thr_inc_map, &reason_cs)) {
 
                if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
                   mlog << Debug(REJECT_DEBUG_LEVEL)
@@ -742,13 +742,13 @@ bool check_fo_thresh(double f, double o, const ClimoPntInfo &cpi,
 ////////////////////////////////////////////////////////////////////////
 
 bool check_mpr_thresh(double f, double o, const ClimoPntInfo &cpi,
-                      const StringArray &col_sa, const ThreshArray &col_ta,
+                      const map<ConcatString,ThreshArray> &m,
                       ConcatString *reason_ptr) {
    // Initialize
    if(reason_ptr) reason_ptr->erase();
 
    // Check arrays
-   if(col_sa.n() == 0 || col_ta.n() == 0) return true;
+   if(m.size() == 0) return true;
 
    bool keep = true;
    bool absv = false;
@@ -756,18 +756,18 @@ bool check_mpr_thresh(double f, double o, const ClimoPntInfo &cpi,
    ConcatString cs;
    double v, v_cur;
 
-   // Loop over all the column filter names
-   for(int i=0; i<col_sa.n(); i++) {
+   // Loop over all the map entries
+   for(const auto &col : m) {
 
       // Check for absolute value
-      if(strncasecmp(col_sa[i].c_str(), "ABS", 3) == 0) {
+      if(strncasecmp(col.first.c_str(), "ABS", 3) == 0) {
          absv = true;
-         cs   = col_sa[i];
+         cs   = col.first;
          sa   = cs.split("()");
          cs   = sa[1];
       }
       else {
-         cs = col_sa[i];
+         cs = col.first;
       }
 
       // Split the input column name on hyphens for differences
@@ -794,16 +794,19 @@ bool check_mpr_thresh(double f, double o, const ClimoPntInfo &cpi,
       // Apply absolute value, if requested
       if(absv && !is_bad_data(v)) v = fabs(v);
 
-      // Check the threshold
-      if(!col_ta[i].check(v)) {
-         if(reason_ptr) {
-            (*reason_ptr) << cs_erase << col_sa[i] << " = " << v
-                          << " is not " << col_ta[i].get_str();
+      // Check all of the thresholds
+      for(int i=0; i<col.second.n(); i++) {
+
+         if(!col.second[i].check(v)) {
+            if(reason_ptr) {
+               (*reason_ptr) << cs_erase << col.first << " = " << v
+                             << " is not " << col.second.get_str();
+            }
+            keep = false;
          }
-         keep = false;
-         break;
-      }
-   } // end for i
+         if(!keep) break;
+      } // end for i
+   }
 
    return keep;
 }
@@ -843,20 +846,10 @@ double get_mpr_column_value(double f, double o, const ClimoPntInfo &cpi,
 void apply_mpr_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
                            DataPlane &fcmn_dp, DataPlane &fcsd_dp,
                            DataPlane &ocmn_dp, DataPlane &ocsd_dp,
-                           const StringArray &col_sa, const ThreshArray &col_ta) {
+                           const map<ConcatString,ThreshArray> &m) {
 
    // Check for no work to be done
-   if(col_sa.n() == 0 && col_ta.n() == 0) return;
-
-   // Check for constant length
-   if(col_sa.n() != col_ta.n()) {
-      mlog << Error << "\napply_mpr_thresh_mask() -> "
-           << "the \"" << conf_key_mpr_column << "\" ("
-           << write_css(col_sa) << ") and \"" << conf_key_mpr_thresh
-           << "\" (" << write_css(col_ta)
-           << ") config file entries must have the same length!\n\n";
-      exit(1);
-   }
+   if(m.size()  == 0) return;
 
    int  nxy = fcst_dp.nx() * fcst_dp.ny();
    int  n_skip = 0;
@@ -884,8 +877,7 @@ void apply_mpr_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
          (ocsd_flag && is_bad_data(cpi.ocsd))) continue;
 
       // Discard pairs which do not meet the threshold criteria
-      if(!check_mpr_thresh(fcst_dp.buf()[i], obs_dp.buf()[i], cpi,
-                           col_sa, col_ta)) {
+      if(!check_mpr_thresh(fcst_dp.buf()[i], obs_dp.buf()[i], cpi, m)) {
 
          // Increment skip counter
          n_skip++;
@@ -902,9 +894,7 @@ void apply_mpr_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
 
    mlog << Debug(3)
         << "Discarded " << n_skip << " of " << nxy
-        << " pairs for matched pair filtering columns ("
-        << write_css(col_sa) << ") and thresholds ("
-        << col_ta.get_str() << ").\n";
+        << " pairs when applying matched pair filtering thresholds.\n";
 
    return;
 }

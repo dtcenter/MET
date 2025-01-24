@@ -265,7 +265,7 @@ void process_command_line(int argc, char **argv) {
    // Store the input MADIS file name and the output NetCDF file name
    //
    for (i = 0; i < cline.n() - 1; ++i)
-     md_files.push_back((string)cline[i]);
+     md_files.emplace_back((string)cline[i]);
    ncfile = cline[cline.n() - 1];
 
    conf_info.read_config(DEFAULT_CONFIG_FILENAME, config_filename.text());
@@ -649,7 +649,7 @@ int process_obs(const int in_gc, const float conversion,
             obs_arr[2], obs_arr[3], obs_arr[4],
             var_name);
 
-      obs_vector.push_back(obs);
+      obs_vector.emplace_back(obs);
       if (do_summary) summary_obs->addObservationObj(obs);
 
       i_obs++;

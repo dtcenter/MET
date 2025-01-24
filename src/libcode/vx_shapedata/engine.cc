@@ -602,7 +602,6 @@ void ModeFuzzyEngine::do_fcst_convolution() {
    if(!need_fcst_conv) return;
 
    r = conf_info.Fcst->conv_radius;
-
    *fcst_conv = *fcst_raw;
 
    mlog << Debug(3) << "Applying circular convolution of radius "
@@ -645,7 +644,6 @@ void ModeFuzzyEngine::do_obs_convolution() {
    if(!need_obs_conv) return;
 
    r = conf_info.Obs->conv_radius;
-
    *obs_conv = *obs_raw;
 
    mlog << Debug(3) << "Applying circular convolution of radius "
@@ -3031,7 +3029,7 @@ void write_engine_stats(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable & a
       eng.conf_info.conf.output_precision());
    at.set_bad_data_value(bad_data_double);    // Set the bad data value
    at.set_bad_data_str(na_str);               // Set the bad data string
-   at.set_delete_trailing_blank_rows(1);      // No trailing blank rows
+   at.set_delete_trailing_blank_rows(true);   // No trailing blank rows
 
    //
    //  calculate n_valid

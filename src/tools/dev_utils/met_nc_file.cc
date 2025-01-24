@@ -315,12 +315,9 @@ bool MetNcFile::readFile(const int desired_grib_code,
 
       // Get the corresponding header valid time
 
-
       // If we get here, this is an observation that we want to use
 
-      SDObservation obs(hdr_vld_buffer, obs_arr[4]);
-
-      observations.push_back(obs);
+      observations.emplace_back(SDObservation(hdr_vld_buffer, obs_arr[4]));
     } // end for i
   }
   // Cleanup

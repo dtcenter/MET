@@ -816,7 +816,7 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
       }
 
       // Add current MaskLatLon to the vector
-      v.push_back(m);
+      v.emplace_back(m);
    }
 
    return v;

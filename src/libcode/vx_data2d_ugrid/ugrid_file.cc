@@ -179,8 +179,7 @@ bool UGridFile::open(const char * filepath)
   // Open the file
   _ncFile = open_ncfile(filepath);
 
-  if (IS_INVALID_NC_P(_ncFile))
-  {
+  if (IS_INVALID_NC_P(_ncFile)) {
     close();
     return false;
   }
@@ -398,6 +397,9 @@ bool UGridFile::open_metadata(const char * filepath)
     else ValidTime.add(0);  //Initialize
   }
 
+  // Get InitTime from the forecast_reference_time
+  InitTime = get_init_time(_ncFile);
+
   // Pull out the grid.  This must be done after pulling out the dimension
   // and variable information since this information is used to pull out the
   // grid.  This call sets the _faceDim and _edgeDim pointers.
@@ -599,7 +601,7 @@ bool UGridFile::find_nc_vinfo_list(const char *var_name,
 {
   vinfo_list.clear();
   for (int i = 0; i < Nvars; i++) {
-    if (Var[i].name.startswith(var_name)) vinfo_list.push_back(&Var[i]);
+    if (Var[i].name.startswith(var_name)) vinfo_list.emplace_back(&Var[i]);
   }
   return vinfo_list.size() > 0;
 }

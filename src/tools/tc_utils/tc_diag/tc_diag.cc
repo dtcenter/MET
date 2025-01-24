@@ -988,7 +988,7 @@ void process_fields(const TrackInfoArray &tracks,
       // Make a local VarInfo copy to store the valid time
       vi = vi_factory.new_copy(di.var_info_ptr[i]);
       vi->set_valid(vld_ut);
-      vi_list.push_back(vi);
+      vi_list.emplace_back(vi);
    }
 
    // Read all data at the same time if they are all in the same file
@@ -1017,7 +1017,7 @@ void process_fields(const TrackInfoArray &tracks,
          if(!status) dp.clear();
 
          // Append current DataPlane to the vector
-         dp_list.push_back(dp);
+         dp_list.emplace_back(dp);
 
       } // end for i
    }
@@ -1140,7 +1140,7 @@ void process_out_files(const TrackInfoArray& tracks) {
             }
 
             // Update list of domain-specific temp files
-            domain_tmp_file_list.push_back(&tmp_file_map[tmp_key]);
+            domain_tmp_file_list.emplace_back(&tmp_file_map[tmp_key]);
 
             // Store the diagnostics for each track point
             out_file_map[out_key].add_tmp_file_info(tmp_file_map[tmp_key],
@@ -1302,7 +1302,7 @@ void copy_time_vars(NcFile *to_nc, NcFile *from_nc, int i_time) {
       if(!has_var(to_nc, var_names[i].c_str())) {
          vector<NcDim> dims;
          for(j=0; j<dim_names.n(); j++) {
-            dims.push_back(get_nc_dim(to_nc, dim_names[j]));
+            dims.emplace_back(get_nc_dim(to_nc, dim_names[j]));
          }
          NcVar new_var = to_nc->addVar(var_names[i], ncDouble, dims);
          copy_nc_atts(&from_var, &new_var);
@@ -1318,15 +1318,15 @@ void copy_time_vars(NcFile *to_nc, NcFile *from_nc, int i_time) {
 
       for(j=0; j<dim_names.n(); j++) {
          if(dim_names[j] == "time") {
-            offsets.push_back(i_time);
-            counts.push_back(1);
+            offsets.emplace_back(i_time);
+            counts.emplace_back(1);
          }
          else {
-            offsets.push_back(0);
+            offsets.emplace_back(0);
             NcDim cur_dim = get_nc_dim(to_nc, dim_names[j]);
             int dim_size = get_dim_size(&cur_dim);
             buf_size *= dim_size;
-            counts.push_back(dim_size);
+            counts.emplace_back(dim_size);
          }
       }
 
@@ -1532,7 +1532,7 @@ void OutFileInfo::add_diag_data(const vector<string> &k_src,
       if(diag_list.n() > 0 && !diag_list.has(*it)) continue;
 
       // Store this key
-      if(add_keys) k_dst.push_back(*it);
+      if(add_keys) k_dst.emplace_back(*it);
 
       // Add new destination map entry, if needed
       if(m_dst.count(*it) == 0) {
@@ -1716,10 +1716,10 @@ void OutFileInfo::write_nc_domain_info(const DomainInfo &di) {
    vector<NcDim> dims;
 
    vector<size_t> offsets;
-   offsets.push_back(0);
+   offsets.emplace_back(0);
 
    vector<size_t> counts;
-   counts.push_back(1);
+   counts.emplace_back(1);
 
    ConcatString name(di.domain);
    name << "_domain";
@@ -1749,13 +1749,13 @@ void OutFileInfo::write_nc_diag_vals(const string &name,
 
    // Setup dimensions
    vector<NcDim> dims;
-   dims.push_back(vld_dim);
+   dims.emplace_back(vld_dim);
 
    vector<size_t> offsets;
-   offsets.push_back(0);
+   offsets.emplace_back(0);
 
    vector<size_t> counts;
-   counts.push_back(get_dim_size(&vld_dim));
+   counts.emplace_back(get_dim_size(&vld_dim));
 
    // Define new variable
    NcVar diag_var = nc_diag_out->addVar(name, ncDouble, dims);
@@ -1785,16 +1785,16 @@ void OutFileInfo::write_nc_diag_prs_vals(const string &name,
 
    // Setup dimensions
    vector<NcDim> dims;
-   dims.push_back(vld_dim);
-   dims.push_back(prs_dim);
+   dims.emplace_back(vld_dim);
+   dims.emplace_back(prs_dim);
 
    vector<size_t> offsets;
-   offsets.push_back(0);
-   offsets.push_back(0);
+   offsets.emplace_back(0);
+   offsets.emplace_back(0);
 
    vector<size_t> counts;
-   counts.push_back(get_dim_size(&vld_dim));
-   counts.push_back(get_dim_size(&prs_dim));
+   counts.emplace_back(get_dim_size(&vld_dim));
+   counts.emplace_back(get_dim_size(&prs_dim));
 
    // Add variable attributes
    NcVar diag_var = nc_diag_out->addVar(name, ncDouble, dims);
@@ -2295,10 +2295,10 @@ void TmpFileInfo::write_nc_data(const VarInfo *vi, const DataPlane &dp_in,
 
    // Setup dimensions
    vector<NcDim> dims;
-   dims.push_back(vld_dim);
-   if(is_prs) dims.push_back(prs_dim);
-   dims.push_back(rng_dim);
-   dims.push_back(azi_dim);
+   dims.emplace_back(vld_dim);
+   if(is_prs) dims.emplace_back(prs_dim);
+   dims.emplace_back(rng_dim);
+   dims.emplace_back(azi_dim);
 
    // Create the output variable name
    ConcatString var_name;

@@ -52,7 +52,9 @@ export MAKE_ARGS="-j 5"
 # in the external_libs directory, no further edits are needed; however, users
 # that have the pre-existing libraries not in the external_libs directory will
 # need to update the paths to the appropriate location.
-#export EXTERNAL_LIBS=${TEST_BASE}/external_libs
+export EXTERNAL_LIBS=${TEST_BASE}/external_libs
+#export COMPILE_ECKIT=1
+#export COMPILE_ATLAS=1
 #export MET_PROJ=${EXTERNAL_LIBS}
 #export TIFF_INCLUDE_DIR=${EXTERNAL_LIBS}/include
 #export TIFF_LIB_DIR=${EXTERNAL_LIBS}/lib

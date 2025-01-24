@@ -225,6 +225,7 @@ extern bool get_nc_data(netCDF::NcVar *, uchar  *data, bool allow_conversion=fal
 extern bool get_nc_data(netCDF::NcVar *, float  *data);
 extern bool get_nc_data(netCDF::NcVar *, double *data);
 extern bool get_nc_data(netCDF::NcVar *, time_t *data);
+extern bool get_nc_data(netCDF::NcVar *, unixtime *data);
 extern bool get_nc_data(netCDF::NcVar *, unsigned short *data);
 
 extern bool get_nc_data(netCDF::NcVar *, int    *data, const LongArray &curs);
@@ -332,6 +333,9 @@ extern netCDF::NcVar  get_nc_var_lon(const netCDF::NcFile *nc);
 extern netCDF::NcVar  get_nc_var_time(const netCDF::NcFile *nc);
 extern int    get_index_at_nc_data(netCDF::NcVar *var, double value, const std::string dim_name, bool is_time=false);
 extern netCDF::NcFile* open_ncfile(const char * nc_name, bool write = false);
+
+// Moved from nc_cf_file.cc
+extern unixtime get_init_time(netCDF::NcFile *nc_file);
 
 extern unixtime get_reference_unixtime(netCDF::NcVar *time_var, int &sec_per_unit,
                                        bool &no_leap_year);

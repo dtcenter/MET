@@ -2,7 +2,8 @@
 //
 // Unstructured grid configuration file.
 //
-// UGridConfig_mpas at the current working directory replaces the settings here.
+// UGridConfig_mpas in the current working directory overrides the settings
+// here for reading data from the MPAS modeling system.
 // For additional or updated information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
@@ -22,6 +23,6 @@ ugrid_metadata_map = [
 
 ////////////////////////////////////////////////////////////////////////////////
 
-version = "V12.0.0";
+version = "V12.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

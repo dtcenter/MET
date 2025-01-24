@@ -93,9 +93,10 @@ host_triplet = @host@
 @ENABLE_MODE_ANALYSIS_TRUE@am__append_4 = mode_analysis
 @ENABLE_PCP_COMBINE_TRUE@am__append_5 = pcp_combine
 @ENABLE_POINT_STAT_TRUE@am__append_6 = point_stat
-@ENABLE_STAT_ANALYSIS_TRUE@am__append_7 = stat_analysis
-@ENABLE_WAVELET_STAT_TRUE@am__append_8 = wavelet_stat
-@ENABLE_SERIES_ANALYSIS_TRUE@am__append_9 = series_analysis
+@ENABLE_PAIR_STAT_TRUE@am__append_7 = pair_stat
+@ENABLE_STAT_ANALYSIS_TRUE@am__append_8 = stat_analysis
+@ENABLE_WAVELET_STAT_TRUE@am__append_9 = wavelet_stat
+@ENABLE_SERIES_ANALYSIS_TRUE@am__append_10 = series_analysis
 subdir = src/tools/core
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -159,7 +160,8 @@ am__define_uniq_tagged_files = \
     if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
   done | $(am__uniquify_input)`
 DIST_SUBDIRS = ensemble_stat grid_stat mode mode_analysis pcp_combine \
-	point_stat stat_analysis wavelet_stat series_analysis
+	point_stat pair_stat stat_analysis wavelet_stat \
+	series_analysis
 am__DIST_COMMON = $(srcdir)/Makefile.in
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
@@ -348,7 +350,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = $(am__append_1) $(am__append_2) $(am__append_3) \
 	$(am__append_4) $(am__append_5) $(am__append_6) \
-	$(am__append_7) $(am__append_8) $(am__append_9)
+	$(am__append_7) $(am__append_8) $(am__append_9) \
+	$(am__append_10)
 MAINTAINERCLEANFILES = Makefile.in
 all: all-recursive
 

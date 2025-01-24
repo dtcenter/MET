@@ -226,7 +226,7 @@
   <test name="ascii2nc_iabp">
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
-    -format iabp  \
+    -format iabp \
     -valid_beg 20140101 -valid_end 20140201 \
     &DATA_DIR_OBS;/iabp/090629.dat \
     &DATA_DIR_OBS;/iabp/109320.dat  \
@@ -235,6 +235,25 @@
     </param>
     <output>
       <point_nc>&OUTPUT_DIR;/ascii2nc/iabp_20140101_20140201.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="ascii2nc_uscrn">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <param> \
+    -format uscrn \
+    -valid_beg 20240801 -valid_end 20240801 \
+    &DATA_DIR_OBS;/uscrn/monthly01/CRNM0102-CO_Boulder_14_W.txt \
+    &DATA_DIR_OBS;/uscrn/daily01/2024/CRND0103-2024-CO_Boulder_14_W.txt \
+    &DATA_DIR_OBS;/uscrn/hourly02/2024/CRNH0203-2024-CO_Boulder_14_W.txt \
+    &DATA_DIR_OBS;/uscrn/subhourly01/2024/CRNS0101-05-2024-CO_Boulder_14_W.txt \
+    &DATA_DIR_OBS;/uscrn/soil/soilanom01/CRNSSM0101-CO_Boulder_14_W.csv \
+    &DATA_DIR_OBS;/uscrn/drought01/CRNDI0101-CO_Boulder_14_W.csv \
+    &DATA_DIR_OBS;/uscrn/heat01/CRNHE0101-CO_Boulder_14_W.csv \
+    &OUTPUT_DIR;/ascii2nc/USCRN_Boulder_20240801.nc
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/ascii2nc/USCRN_Boulder_20240801.nc</point_nc>
     </output>
   </test>
 

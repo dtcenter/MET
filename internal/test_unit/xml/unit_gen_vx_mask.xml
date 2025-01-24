@@ -439,6 +439,27 @@
   </test>
 
   <!--                                                                  -->
+  <!-- SOLAR_TIME: Solar time                                           -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_SOLAR_TIME">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      'G004' \
+      '20050808_12' \
+      &OUTPUT_DIR;/gen_vx_mask/SOLAR_MIDNIGHT_NH.nc \
+      -type solar_time,solar_alt,lat \
+      -thresh 'ge21||le3,le0,ge0' \
+      -intersection \
+      -name SOLAR_MIDNIGHT_NH \
+      -v 3 
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/SOLAR_MIDNIGHT_NH.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
   <!-- LAT: latitude band                                               -->
   <!--                                                                  -->
 
@@ -469,6 +490,27 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/gen_vx_mask/LON_mask.nc</grid_nc>
+    </output>
+  </test>
+
+  <!--                                                                  -->
+  <!-- DATA/DATA/LAT/LON: freezing western hemisphere land points       -->
+  <!--                                                                  -->
+
+  <test name="gen_vx_mask_DATA_DATA_LAT_LON">
+    <exec>&MET_BIN;/gen_vx_mask</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/gen_vx_mask/DATA_DATA_LAT_LON_mask.nc \
+      -type data,data,lat,lon \
+      -mask_field 'name="LAND"; level="L0";' \
+      -mask_field 'name="TMP"; level="L0";' \
+      -thresh eq1,lt273,gt0,lt0 \
+      -intersection -v 5
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/gen_vx_mask/DATA_DATA_LAT_LON_mask.nc</grid_nc>
     </output>
   </test>
 

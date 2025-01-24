@@ -33,14 +33,14 @@ class SeriesAnalysisConfInfo {
 
       void init_from_scratch();
 
-      // Counts based on the contents of the config file
-      int n_fcst;                          // Number of forecast fields
-      int n_obs;                           // Number of observation fields
-
    public:
 
       // Series-Analysis configuration object
       MetConfig conf;
+
+      // Counts based on the contents of the config file
+      int n_fcst;                          // Number of forecast fields
+      int n_obs;                           // Number of observation fields
 
       // Store data parsed from the Series-Analysis configuration object
       ConcatString     model;              // Model name
@@ -72,6 +72,9 @@ class SeriesAnalysisConfInfo {
       ConcatString     mask_poly_name;     // Name of masking poly area
       MaskPlane        mask_area;
 
+      IntArray         grad_dx;            // Gradient step size in the X direction
+      IntArray         grad_dy;            // Gradient step size in the Y direction
+
       int              block_size;         // Number of grid points to read concurrently
       double           vld_data_thresh;    // Minimum valid data ratio for each point
       double           hss_ec_value;       // HSS expected correct value
@@ -96,13 +99,15 @@ class SeriesAnalysisConfInfo {
       // Dump out the counts
       int get_n_fcst() const;
       int get_n_obs()  const;
+      int get_n_grad() const;
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int SeriesAnalysisConfInfo::get_n_fcst() const { return n_fcst; }
-inline int SeriesAnalysisConfInfo::get_n_obs()  const { return n_obs;  }
 inline int SeriesAnalysisConfInfo::get_compression_level()  { return conf.nc_compression(); }
+inline int SeriesAnalysisConfInfo::get_n_fcst() const { return n_fcst;      }
+inline int SeriesAnalysisConfInfo::get_n_obs()  const { return n_obs;       }
+inline int SeriesAnalysisConfInfo::get_n_grad() const { return grad_dx.n(); }
 
 ////////////////////////////////////////////////////////////////////////
 
