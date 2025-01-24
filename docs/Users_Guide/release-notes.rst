@@ -71,19 +71,45 @@ MET Version 12.1.0 Upgrade Instructions
 
    MET version 12.1.0 adds, modifies, or removes the following configuration options:
 
-   * None
+   * Pair-Stat configuration:
+
+     * New **Pair-Stat** tool is added with a new configuration file.
+
+   * MODE configuration:
+
+     * Multivariate MODE now supports the use of **multiple convolution radii and thresholds**,
+       but does not require changes to existing MODE configuration files.
+
+   * Series-Analysis configuration:
+
+     * The **output_stats.grad** entry is added to enable gradient statistic computation.
+     * The **gradient** dictionary is added to configure gradient statistic computation.
+
 
 .. dropdown:: Output format changes
 
    MET version 12.1.0 adds or modifies the following output file formats:
 
-   * None
+   * Gradient (**GRAD**) line type:
+
+     * Adds 4 new columns to the end of the GRAD line type:
+       * FGMAG, OGMAG, MAG_RMSE, LAPLACE_RMSE
+     * Grid-Stat writes the updated GRAD line type output.
+     * Series-Analysis adds variables to its NetCDF output for the requested gradient statistics.
 
 .. dropdown:: Output data changes
 
    MET version 12.1.0 modifies existing output data values in the following ways:
 
-   * None
+   * NetCDF library code:
+
+     * Improved handling of leap years in the MET library code may corrects timestamps parsed
+       from NetCDF files that define times using a **monthly** offset.
+
+   * IODA2NC tool:
+
+     * Bugfix corrects timestamps parsed from input files that store time using the **int64**
+       data type for which variable overflow was occurring.
 
 .. dropdown:: Additional upgrade instructions
 
