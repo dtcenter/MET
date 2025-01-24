@@ -139,7 +139,6 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_LFRIC_PRESSURE_LEVELS_180000L_20120409_180000V.stat</stat>
-      <stat>&OUTPUT_DIR;/point_stat_ugrid/point_stat_UGRID_LFRIC_PRESSURE_LEVELS_180000L_20120409_180000V_mpr.txt</stat>
     </output>
   </test>
 

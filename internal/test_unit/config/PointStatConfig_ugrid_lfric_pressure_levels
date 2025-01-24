@@ -58,10 +58,8 @@ fcst = {
    file_type = NETCDF_UGRID;
 
    field = [
-      {
-         name       = "u_in_w3";
-         level      = "(0,*)";
-      }
+      { name = "u_in_w3"; level = "(21,*)"; set_attr_level = "P500"; },
+      { name = "u_in_w3"; level = "(24,*)"; set_attr_level = "P850"; }
    ];
 }
 obs = {
@@ -71,10 +69,8 @@ obs = {
    obs_quality_exc  = [];
 
    field = [
-      { 
-         name = "UGRD";
-         level = "P1000-500";
-      }
+      { name = "UGRD"; level = "P500"; },
+      { name = "UGRD"; level = "P850"; }
    ];
 }
 
@@ -172,7 +168,7 @@ output_flag = {
    orank  = NONE; // Only for HiRA.
    rps    = NONE; // Only for HiRA.
    eclv   = NONE;
-   mpr    = BOTH;
+   mpr    = STAT;
    seeps  = NONE;
    seeps_mpr = NONE;
 }
