@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -21,7 +21,6 @@
 #include "vx_data2d.h"
 #include "vx_log.h"
 
-#include "ctrack.hpp"
 
 using namespace std;
 
@@ -100,7 +99,6 @@ void PointStatConfInfo::clear() {
 
 void PointStatConfInfo::read_config(const char *default_file_name,
                                     const char *user_file_name) {
-   CTRACK;
 
    // Read the config file constants
    conf.read(replace_path(config_const_filename).c_str());
@@ -119,7 +117,6 @@ void PointStatConfInfo::read_config(const char *default_file_name,
 #ifdef WITH_UGRID
 void PointStatConfInfo::read_ugrid_configs(StringArray ugrid_config_names, const char * user_config) {
 
-   CTRACK;
    ConcatString file_name;
    for (int i=0; i<ugrid_config_names.n_elements(); i++) {
       file_name = replace_path(ugrid_config_names[i].c_str());
@@ -140,7 +137,6 @@ void PointStatConfInfo::read_ugrid_configs(StringArray ugrid_config_names, const
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatConfInfo::process_config(GrdFileType ftype) {
-   CTRACK;
    int i, j, n_fvx, n_ovx;
    Dictionary *fdict = (Dictionary *) nullptr;
    Dictionary *odict = (Dictionary *) nullptr;
@@ -326,7 +322,6 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatConfInfo::process_grib_codes() {
-   CTRACK;
 
    // Only needs to be set once
    if(grib_codes_set) return;
@@ -353,7 +348,6 @@ void PointStatConfInfo::process_grib_codes() {
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatConfInfo::process_flags() {
-   CTRACK;
    int i, j;
    bool output_ascii_flag = false;
 
@@ -392,7 +386,6 @@ void PointStatConfInfo::process_flags() {
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatConfInfo::process_masks(const Grid &grid) {
-   CTRACK;
    int i, j;
    MaskPlane mp;
    ConcatString name;
@@ -498,7 +491,6 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
 
 void PointStatConfInfo::process_geog(const Grid &grid,
                                      const char *fcst_file) {
-   CTRACK;
    int i;
    bool land, topo;
    Dictionary *dict;
@@ -849,7 +841,6 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
 
 void PointStatVxOpt::process_config(GrdFileType ftype,
         Dictionary &fdict, Dictionary &odict) {
-   CTRACK;
    int n;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
@@ -1075,7 +1066,6 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
-   CTRACK;
    int i, n;
    int n_msg_typ = msg_typ.n();
    int n_mask    = mask_name.n();
@@ -1211,7 +1201,6 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatVxOpt::set_perc_thresh(const PairDataPoint *pd_ptr) {
-   CTRACK;
 
    //
    // Compute percentiles for forecast and observation thresholds,
