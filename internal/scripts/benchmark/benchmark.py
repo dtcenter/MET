@@ -36,7 +36,7 @@ import pandas as pd
    file is named by generating a timestamp and converting it to ISO 8601 Datetime with the appropriate file
    extension (.csv, .txt). The summary and detail file are copied into the use case subdirectory.
    
-   This script has an accompanying YAML config file, latest_benchmark.yaml in which the user can specify (explicitly or by 
+   This script has an accompanying YAML config file, benchmark.yaml in which the user can specify (explicitly or by 
    setting env variables) the following:
    
    - output path
