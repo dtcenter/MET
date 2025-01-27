@@ -53,7 +53,7 @@ import pandas as pd
     ****
    * Usage:
     ****
-       -update the latest_benchmark.yaml file to indicate:
+       -update the benchmark.yaml file to indicate:
           - output base directory
           - filename to apply to the benchmark output files (the timestamp will be added)
              - if no filename is specified, the ISO 1806 formatted timestamp will be used
@@ -297,11 +297,11 @@ def check_settings(settings:dict) -> None:
     sys_conf = settings['system_conf']
     wrapper_confs = settings['wrapper_conf']
 
-    assert os.path.exists(metplus_dir), "fERROR|latest_benchmark.yaml::The METplus base directory {metplus_dir} does not exist"
-    assert os.path.exists(sys_conf), "fERROR|latest_benchmark.yaml::The system.conf file {sys_conf}  does not exist."
+    assert os.path.exists(metplus_dir), "fERROR|benchmark.yaml::The METplus base directory {metplus_dir} does not exist"
+    assert os.path.exists(sys_conf), "fERROR|benchmark.yaml::The system.conf file {sys_conf}  does not exist."
 
     for cur_conf in wrapper_confs:
-        assert os.path.exists(cur_conf), "fERROR|latest_benchmark.yaml:: The {cur_conf} use case config file does not exist. "
+        assert os.path.exists(cur_conf), "fERROR|benchmark.yaml:: The {cur_conf} use case config file does not exist. "
 
 
 def generate_info(settings:dict, ts:str, usecase: str, subdir: str) -> None:
@@ -338,7 +338,7 @@ def run_benchmark():
     try:
         # get the path to the YAML file
         yaml_path = os.path.dirname(__file__)
-        config = os.path.join(yaml_path, "latest_benchmark.yaml")
+        config = os.path.join(yaml_path, "benchmark.yaml")
         benchmark_config = os.getenv("BENCHMARK_YAML_CONFIG_NAME", config)
         settings = parse_config(benchmark_config)
         check_settings(settings)
