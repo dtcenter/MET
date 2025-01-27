@@ -24,21 +24,25 @@ metplus_base: !ENV '${METPLUS_BASE}'
 #
 # location of system.conf file
 #
-system_conf: "path-to/system.conf"
+system_conf: "/d1/personal/mwin/working_AF_optimization/MET/internal/scripts/benchmark/system.conf"
 
 #
 # location of METplus wrapper configuration file(s)
 #
 wrapper_conf: 
-   - "path-to/GridStat_fcstRRFS_obsCCPA_1hrAPCP.conf"
-   - "path-to/GridStat_fcstRRFS_obsCCPA_1hrAPCP_nbrhd.conf"
-   - "path-to/GridStat_fcstRRFS_obsCCPA_1hrAPCP_prob.conf"
+   - "/d1/personal/mwin/working_AF_optimization/usecase_confs/truncated/EnsembleStat_fcstRRFS_obsCCPA_1hrAPCP_truncated.conf"
 
+
+#
+# run MET command instead of using METplus
+#
+run_met_directly: False
+met_command: ''
 
 #
 # number of times to run the use case, default=1
 #
-num_runs: 1
+num_runs: 3
 
 
 
