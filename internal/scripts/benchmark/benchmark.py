@@ -36,7 +36,7 @@ import pandas as pd
    file is named by generating a timestamp and converting it to ISO 8601 Datetime with the appropriate file
    extension (.csv, .txt). The summary and detail file are copied into the use case subdirectory.
    
-   This script has an accompanying YAML config file, benchmark.yaml in which the user can specify (explicitly or by 
+   This script has an accompanying YAML config file, latest_benchmark.yaml in which the user can specify (explicitly or by 
    setting env variables) the following:
    
    - output path
@@ -53,7 +53,7 @@ import pandas as pd
     ****
    * Usage:
     ****
-       -update the benchmark.yaml file to indicate:
+       -update the latest_benchmark.yaml file to indicate:
           - output base directory
           - filename to apply to the benchmark output files (the timestamp will be added)
              - if no filename is specified, the ISO 1806 formatted timestamp will be used
@@ -297,11 +297,11 @@ def check_settings(settings:dict) -> None:
     sys_conf = settings['system_conf']
     wrapper_confs = settings['wrapper_conf']
 
-    assert os.path.exists(metplus_dir), "fERROR|benchmark.yaml::The METplus base directory {metplus_dir} does not exist"
-    assert os.path.exists(sys_conf), "fERROR|benchmark.yaml::The system.conf file {sys_conf}  does not exist."
+    assert os.path.exists(metplus_dir), "fERROR|latest_benchmark.yaml::The METplus base directory {metplus_dir} does not exist"
+    assert os.path.exists(sys_conf), "fERROR|latest_benchmark.yaml::The system.conf file {sys_conf}  does not exist."
 
     for cur_conf in wrapper_confs:
-        assert os.path.exists(cur_conf), "fERROR|benchmark.yaml:: The {cur_conf} use case config file does not exist. "
+        assert os.path.exists(cur_conf), "fERROR|latest_benchmark.yaml:: The {cur_conf} use case config file does not exist. "
 
 
 def generate_info(settings:dict, ts:str, usecase: str, subdir: str) -> None:
@@ -338,7 +338,7 @@ def run_benchmark():
     try:
         # get the path to the YAML file
         yaml_path = os.path.dirname(__file__)
-        config = os.path.join(yaml_path, "benchmark.yaml")
+        config = os.path.join(yaml_path, "latest_benchmark.yaml")
         benchmark_config = os.getenv("BENCHMARK_YAML_CONFIG_NAME", config)
         settings = parse_config(benchmark_config)
         check_settings(settings)
@@ -362,6 +362,10 @@ def run_benchmark():
 
     filename = settings['filename']
 
+    run_met = settings['run_met_directly']
+    met_cmd = settings['met_command']
+
+
     # Run the use case using the METplus wrapper and the use case and system config files
     # (for the specified number of times)
     wrapper_confs = settings['wrapper_conf']
@@ -373,8 +377,12 @@ def run_benchmark():
         os.makedirs(usecase_subdir, exist_ok=True)
 
         for _ in range(0, num_of_runs):
-           metplus_str = os.path.join(settings['metplus_base'], 'ush/run_metplus.py')
-           subprocess.run(['python', metplus_str, use_case, settings['system_conf']])
+            if run_met:
+                print("running single MET command")
+                subprocess.run([met_cmd])
+            else:
+               metplus_str = os.path.join(settings['metplus_base'], 'ush/run_metplus.py')
+               subprocess.run(['python', metplus_str, use_case, settings['system_conf']])
 
         # Extract the benchmark data
         summary_info = extract_summary_info(summary_filename, usecase_subdir)
