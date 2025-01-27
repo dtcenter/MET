@@ -304,7 +304,7 @@ def check_settings(settings:dict) -> None:
     for cur_conf in wrapper_confs:
         assert os.path.exists(cur_conf), "fERROR|benchmark.yaml:: The {cur_conf} use case config file does not exist. "
 
-     num_of_runs = settings['num_runs']
+    num_of_runs = settings['num_runs']
     # Set the number of times to run to 1 if this value isn't set in the YAML config file
     if num_of_runs == '' or num_of_runs is None:
         num_of_runs = 1
@@ -425,7 +425,7 @@ def run_benchmark():
     run_met = settings['run_met_directly']
 
     if run_met is True:
-        run_met_cli(settings, ts,  files_from_ctrack)
+        run_met_cli(settings, ts, files_from_ctrack)
     else:
         run_usecases(settings, ts, files_from_ctrack)
 
