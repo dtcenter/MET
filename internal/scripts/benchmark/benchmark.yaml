@@ -32,12 +32,17 @@ system_conf: "/d1/personal/mwin/working_AF_optimization/MET/internal/scripts/ben
 wrapper_conf: 
    - "/d1/personal/mwin/working_AF_optimization/usecase_confs/truncated/EnsembleStat_fcstRRFS_obsCCPA_1hrAPCP_truncated.conf"
 
-
 #
 # run MET command instead of using METplus
 #
 run_met_directly: False
 met_command: ''
+
+# subdirectory to save the consolidated information, if empty, the
+# MET tool name will be used
+met_subdir_name: 'EnsembleStat_fcstRRFS_obsCCPA_1hrAPCP'
+
+
 
 #
 # number of times to run the use case, default=1
