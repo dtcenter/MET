@@ -311,7 +311,7 @@ Required Arguments for gsidens2orank
 
 1. The **ens_file_1 ... ens_file_n** argument is a list of ensemble binary GSI diagnostic files to be reformatted.
 
-2. The **ens_file_list** argument is an ASCII file containing a list of ensemble GSI diagnostic files.
+2. The **ens_file_list** argument is an ASCII file containing a list of ensemble GSI diagnostic files, as described in :numref:`ascii_file_lists`.
 
 3. The **-out path** argument specifies the name of the output **.stat** file.
 

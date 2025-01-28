@@ -33,7 +33,7 @@ _______________________
 Required Arguments for rmw_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-data file_1 ... file_n | data_file_list** argument is the NetCDF output of TC-RMW to be processed or an ASCII file containing a list of files.
+1. The **-data file_1 ... file_n | data_file_list** argument is the NetCDF output of TC-RMW to be processed or an ASCII file containing a list of files, as described in :numref:`ascii_file_lists`.
 
 2. The **-config file** argument is the **RMWAnalysisConfig** to be used. The contents of the configuration file are discussed below.
 

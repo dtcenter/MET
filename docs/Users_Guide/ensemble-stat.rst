@@ -109,7 +109,7 @@ Required Arguments ensemble_stat
 
 1. The **n_ens ens_file_1 ... ens_file_n** is the number of ensemble members followed by a list of ensemble member file names. This argument is not required when ensemble files are specified in the **ens_file_list**, detailed below.
 
-2. The **ens_file_list** is an ASCII file containing a list of ensemble member file names. This is not required when a file list is included on the command line, as described above.
+2. The **ens_file_list** is an ASCII file containing a list of ensemble member file names, as described in :numref:`ascii_file_lists`. This is not required when a file list is included on the command line, as described above.
 
 3. The **config_file** is an **EnsembleStatConfig** file containing the desired configuration settings.
 

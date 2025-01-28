@@ -208,16 +208,16 @@ The MODE-TD tool has three required arguments and can accept several optional ar
 Required Arguments for mtd
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. **-fcst file\_list** gives a list of forecast 2D data files to be processed by MTD. The files should have equally-spaced intervals of valid time. 
+1. The **-fcst file_1 ... file_n | file_list** option specifies the gridded forecast files or ASCII file list of file names to be used, as described in :numref:`ascii_file_lists`. The files should have equally-spaced intervals of valid time.
 
-2. **-obs file\_list** gives a list of observation 2D data files to be processed by MTD. As with the {\cb -fcst} option, the files should have equally-spaced intervals of valid time. This valid time spacing should be the same as for the forecast files. 
+2. The **-obs file_1 ... file_n | file_list** option specifies the gridded observation files or ASCII file list of file names to be used, as described in :numref:`ascii_file_lists`. The files should have equally-spaced intervals of valid time. This valid time spacing should be the same as for the forecast files.
 
 3. **-config config\_file** gives the path to a local configuration file that is specific to this particular run of MTD. The default MTD configuration file will be read first, followed by this one. Thus, only configuration options that are different from the default settings need be specified. Options set in this file will override any corresponding options set in the default configuration file. 
 
 Optional Arguments for mtd
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. **-single file\_list** command line option may be used instead of the **-fcst** and **-obs** command line options to define objects in a single field.
+4. The **-single file_1 ... file_n | file_list** option may be used instead of the **-fcst** and **-obs** command line options to define objects in a single field.
 
 .. note:: When the **-single** command line option is used, data specified in the **fcst** configuration file entry is read from those input files.
 

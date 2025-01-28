@@ -48,7 +48,7 @@ tc_diag has required arguments and can accept several optional arguments.
 Required Arguments for tc_diag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-data domain tech_id_list [ file_1 ... file_n | data_file_list ]** option specifies a domain name, a comma-separated list of ATCF tech ID's, and a list of gridded data files or an ASCII file containing a list of files to be used. Specify **-data** one for each gridded data source.
+1. The **-data domain tech_id_list [ file_1 ... file_n | data_file_list ]** option specifies a domain name, a comma-separated list of ATCF tech ID's, and a list of gridded data files or an ASCII file containing a list of files to be used, as described in :numref:`ascii_file_lists`. Specify **-data** one for each gridded data source.
 
 2. The **-deck source** option is the ATCF format track data source.
 

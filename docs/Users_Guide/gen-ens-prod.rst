@@ -47,7 +47,7 @@ The usage statement for the Ensemble Stat tool is shown below:
 .. code-block:: none
 
   Usage: gen_ens_prod
-         -ens file_1 ... file_n | ens_file_list
+         -ens file_1 ... file_n | file_list
          -out file
          -config file
          [-ctrl file]
@@ -59,9 +59,9 @@ gen_ens_prod has three required arguments and accepts several optional ones.
 Required Arguments gen_ens_prod
 -------------------------------
 
-1. The **-ens file_1 ... file_n** option specifies the ensemble member file names. This argument is not required when ensemble files are specified in the **ens_file_list**, detailed below.
+1. The **-ens file_1 ... file_n** option specifies the ensemble member file names. This argument is not required when ensemble files are specified in the **file_list**, detailed below.
 
-2. The **ens_file_list** option is an ASCII file containing a list of ensemble member file names. This is not required when a file list is included on the command line, as described above.
+2. The **file_list** option is an ASCII file containing a list of ensemble member file names, as described in :numref:`ascii_file_lists`. This is not required when a file list is included on the command line, as described above.
 
 3. The **-out file** option specifies the NetCDF output file name to be written.
 

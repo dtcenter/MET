@@ -358,6 +358,8 @@ The first argument for the Plot-Data-Plane tool is the gridded data file to be r
                 'grid': { ... } } 
    DEBUG 1: Creating postscript file: fcst.ps
 
+.. _met-python-input-arg:
+
 Special Case for Gen-Ens-Prod, Ensemble-Stat, Series-Analysis, and MTD
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -384,13 +386,13 @@ In the event the user requires command line arguments to their Python script, th
    gen_ens_prod ens1.nc,arg1,arg2 ens2.nc,arg1,arg2 ens3.nc,arg1,arg2 ens4.nc,arg1,arg2 \
    -out ens_prod.nc -config GenEnsProd_config
 
-In this case, the user's Python script will receive "ens1.nc,arg1,arg2" as a single command line argument for each execution of the Python script (i.e. 1 time per file). The user must parse this argument inside their Python script to obtain **arg1** and **arg2** as separate arguments. The list of input files and optionally, any command line arguments can be written to a single file called **file_list** that is substituted for the file names and command line arguments. For example:
+In this case, the user's Python script will receive "ens1.nc,arg1,arg2" as a single command line argument for each execution of the Python script (i.e. 1 time per file). The user must parse this argument inside their Python script to obtain **arg1** and **arg2** as separate arguments. The list of input files and optionally, any command line arguments can be written to a single file (called **python_input_list** in the example below) that is substituted for the file names and command line arguments. ASCII file list elements are white-space separated (space-separated in the example below), as described in :numref:`ascii_file_lists`. For example:
 
 .. code-block::
    :caption: Gen-Ens-Prod File List
 
-   echo "ens1.nc,arg1,arg2 ens2.nc,arg1,arg2 ens3.nc,arg1,arg2 ens4.nc,arg1,arg2" > file_list
-   gen_ens_prod file_list -out ens_prod.nc -config GenEnsProd_config
+   echo "file_list ens1.nc,arg1,arg2 ens2.nc,arg1,arg2 ens3.nc,arg1,arg2 ens4.nc,arg1,arg2" > python_input_list
+   gen_ens_prod python_input_list -out ens_prod.nc -config GenEnsProd_config
 
 Finally, the above tools do not require data files to be present on a local disk. If the user wishes, their Python script can obtain data from other sources based upon only the command line arguments to their Python script. For example:
 

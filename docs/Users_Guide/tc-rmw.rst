@@ -32,7 +32,7 @@ tc_rmw has required arguments and can accept several optional arguments.
 Required Arguments for tc_rmw
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing a list of files to be used.
+1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing a list of files to be used, as described in :numref:`ascii_file_lists`.
 
 2. The **-deck source** argument is the ATCF format data source.
 

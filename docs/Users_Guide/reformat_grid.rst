@@ -122,7 +122,7 @@ The input files for the add, subtract, and derive command can be specified in on
 
 2. Use **file_1 ... file_n** to specify the list of input files to be processed on the command line. Rather than specifying a separate configuration string for each input file, the "-field" command line option is required to specify the data to be processed.
 
-3. Use **input_file_list** to specify the name of an ASCII file which contains the paths for the gridded data files to be processed. As in the previous option, the "-field" command line option is required to specify the data to be processed.
+3. Use **input_file_list** to specify the name of an ASCII file which contains the paths for the gridded data files to be processed, as described in :numref:`ascii_file_lists`. As in the previous option, the "-field" command line option is required to specify the data to be processed.
 
 An example of the pcp_combine calling sequence is presented below:
 
