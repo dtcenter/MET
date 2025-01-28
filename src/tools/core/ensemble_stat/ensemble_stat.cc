@@ -105,8 +105,6 @@
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
-#include "ctrack.hpp"
-
 #ifdef WITH_PYTHON
 #include "data2d_nc_met.h"
 #include "pointdata_python.h"
@@ -196,9 +194,6 @@ int met_main(int argc, char *argv[]) {
    // Perform verification
    process_vx();
 
-   // Write out the CTRACK metrics
-   ctrack::result_print();
-
    // Close the text files and deallocate memory
    clean_up();
 
@@ -215,7 +210,6 @@ const string get_tool_name()
 ////////////////////////////////////////////////////////////////////////
 
 void process_command_line(int argc, char **argv) {
-   CTRACK;
    int i;
    CommandLine cline;
    ConcatString default_config_file;
@@ -493,7 +487,6 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_grid(const Grid &fcst_grid) {
-   CTRACK;
    Grid obs_grid;
 
    // Parse regridding logic
@@ -551,7 +544,6 @@ void process_grid(const Grid &fcst_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_n_vld() {
-   CTRACK;
    int i_var, i_ens, j, n_vld, n_ens_inputs;
    DataPlane dp;
    DataPlaneArray dpa;
@@ -744,7 +736,6 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void process_vx() {
-   CTRACK;
 
    // Process masks Grids and Polylines in the config file
    conf_info.process_masks(grid);
@@ -768,7 +759,6 @@ void process_vx() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_point_vx() {
-   CTRACK;
    int i, j, i_file, n_miss;
    unixtime beg_ut, end_ut;
    DataPlaneArray fcst_dpa, emn_dpa;
@@ -954,7 +944,6 @@ void process_point_vx() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_point_obs(int i_nc) {
-   CTRACK;
    int i_obs, j;
    unixtime hdr_ut;
    NcFile *obs_in = (NcFile *) nullptr;
@@ -1161,7 +1150,6 @@ bool process_point_ens(int i_vx, int i_ens, DataPlaneArray &fcst_dpa) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_point_scores() {
-   CTRACK;
    PairDataEnsemble *pd_ptr = (PairDataEnsemble *) nullptr;
    PairDataEnsemble pd;
    ConcatString cs;
@@ -1276,7 +1264,6 @@ void process_point_scores() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_grid_vx() {
-   CTRACK;
    int i, j, k, n_miss, i_file;
    bool found;
    MaskPlane  mask_mp;
@@ -1686,7 +1673,6 @@ void process_grid_scores(int i_vx,
         const DataPlane &ocmn_dp, const DataPlane &ocsd_dp,
         const MaskPlane &mask_mp,
         ObsErrorEntry *oerr_ptr,  PairDataEnsemble &pd) {
-   CTRACK;
    int i, j, x, y, n_miss;
    ObsErrorEntry *e = (ObsErrorEntry *) nullptr;
 
@@ -1781,7 +1767,6 @@ void process_grid_scores(int i_vx,
 void do_ecnt(const EnsembleStatVxOpt &vx_opt,
              const SingleThresh &othresh,
              const PairDataEnsemble *pd_ptr) {
-   CTRACK;
    ECNTInfo ecnt_info;
 
    // Check for valid pointer
@@ -1809,7 +1794,6 @@ void do_ecnt(const EnsembleStatVxOpt &vx_opt,
 void do_rps(const EnsembleStatVxOpt &vx_opt,
             const SingleThresh &othresh,
             const PairDataEnsemble *pd_ptr) {
-   CTRACK;
    RPSInfo rps_info;
 
    // Check for valid pointer
@@ -1851,7 +1835,6 @@ void do_rps(const EnsembleStatVxOpt &vx_opt,
 ////////////////////////////////////////////////////////////////////////
 
 void setup_nc_file(unixtime valid_ut, const char *suffix) {
-   CTRACK;
 
    // Create output NetCDF file name
    build_outfile_name(ens_valid_ut, suffix, out_nc_file);
@@ -1890,7 +1873,6 @@ void setup_nc_file(unixtime valid_ut, const char *suffix) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_txt_files() {
-   CTRACK;
    int  i, n, n_phist_bin, n_prob, n_eclv, max_n_ens, max_col;
    ConcatString tmp_str;
 
@@ -2081,7 +2063,6 @@ void setup_txt_files() {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_table(AsciiTable &at) {
-   CTRACK;
 
    // Justify the STAT AsciiTable objects
    justify_stat_cols(at);
@@ -2104,7 +2085,6 @@ void setup_table(AsciiTable &at) {
 ////////////////////////////////////////////////////////////////////////
 
 void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
-   CTRACK;
    int mon, day, yr, hr, min, sec;
    char tmp_str[max_str_len];
 
@@ -2136,7 +2116,6 @@ void build_outfile_name(unixtime ut, const char *suffix, ConcatString &str) {
 void write_txt_files(const EnsembleStatVxOpt &vx_opt,
                      const PairDataEnsemble &pd_all,
                      bool is_point_vx) {
-   CTRACK;
    int i, j;
    PairDataEnsemble pd;
 
@@ -2284,7 +2263,6 @@ void write_txt_files(const EnsembleStatVxOpt &vx_opt,
 
 void do_pct(const EnsembleStatVxOpt &vx_opt,
             const PairDataEnsemble &pd_ens) {
-   CTRACK;
 
    // If forecast probability thresholds were specified, use them.
    if(vx_opt.fcat_ta.n() > 0) {
@@ -2306,7 +2284,6 @@ void do_pct(const EnsembleStatVxOpt &vx_opt,
 
 void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
                        const PairDataEnsemble &pd_ens) {
-   CTRACK;
    int i, i_thr, i_bin, i_obs, i_ens;
    int n_vld, n_evt, n_bin;
    PCTInfo *pct_info = (PCTInfo *) nullptr;
@@ -2419,7 +2396,6 @@ void do_pct_cat_thresh(const EnsembleStatVxOpt &vx_opt,
 
 void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
                        const PairDataEnsemble &pd_ens) {
-   CTRACK;
    int i, i_thr, i_bin, i_obs, i_ens;
    int n_vld, n_evt, n_bin;
    PCTInfo *pct_info = (PCTInfo *) nullptr;
@@ -2509,7 +2485,6 @@ void do_pct_cdp_thresh(const EnsembleStatVxOpt &vx_opt,
 void write_pct_info(const EnsembleStatVxOpt &vx_opt,
                     const PCTInfo *pct_info, int n_bin,
                     bool ocdp_thresh) {
-   CTRACK;
 
    // Write output for each bin
    for(int i_bin=0; i_bin<n_bin; i_bin++) {
@@ -2592,7 +2567,6 @@ void write_pct_info(const EnsembleStatVxOpt &vx_opt,
 
 void write_orank_nc(PairDataEnsemble &pd, DataPlane &dp,
                     int i_vx, int i_interp, int i_mask) {
-   CTRACK;
    int i, n;
 
    // Arrays for storing observation rank data
@@ -2661,7 +2635,6 @@ void write_orank_var_float(int i_vx, int i_interp, int i_mask,
                            float *data, DataPlane &dp,
                            const char *type_str,
                            const char *long_name_str) {
-   CTRACK;
    NcVar nc_var;
    int wdth;
    ConcatString mthd_str, var_name, var_str, name_str;
@@ -2729,7 +2702,6 @@ void write_orank_var_int(int i_vx, int i_interp, int i_mask,
                          int *data, DataPlane &dp,
                          const char *type_str,
                          const char *long_name_str) {
-   CTRACK;
    NcVar nc_var;
    int wdth;
    ConcatString mthd_str, var_name, var_str, name_str;
@@ -2793,7 +2765,6 @@ void add_var_att_local(VarInfo *info, NcVar *nc_var, bool is_int,
                        const DataPlane &dp,
                        const char *name_str,
                        const char *long_name_str) {
-   CTRACK;
    ConcatString att_str;
 
    // Construct the long name
@@ -2820,7 +2791,6 @@ void add_var_att_local(VarInfo *info, NcVar *nc_var, bool is_int,
 ////////////////////////////////////////////////////////////////////////
 
 void finish_txt_files() {
-   CTRACK;
    int i;
 
    // Write out the contents of the STAT AsciiTable and

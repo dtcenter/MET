@@ -23,8 +23,6 @@
 #include "vx_data2d.h"
 #include "vx_log.h"
 
-#include "ctrack.hpp"
-
 #include "GridTemplate.h"
 
 using namespace std;
@@ -102,7 +100,6 @@ void EnsembleStatConfInfo::clear() {
 
 void EnsembleStatConfInfo::read_config(const ConcatString default_file_name,
                                        const ConcatString user_file_name) {
-   CTRACK;
 
    // Read the config file constants
    conf.read(replace_path(config_const_filename).c_str());
@@ -123,7 +120,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
                                           bool grid_vx, bool point_vx,
                                           StringArray * ens_files,
                                           bool use_ctrl) {
-   CTRACK;
    int i, j, n_ens_files;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
@@ -316,7 +312,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::process_grib_codes() {
-   CTRACK;
 
    // Only needs to be set once
    if(grib_codes_set) return;
@@ -343,7 +338,6 @@ void EnsembleStatConfInfo::process_grib_codes() {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::process_flags() {
-   CTRACK;
    int i, j;
    bool output_ascii_flag = false;
 
@@ -390,7 +384,6 @@ void EnsembleStatConfInfo::process_flags() {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::process_masks(const Grid &grid) {
-   CTRACK;
    int i, j;
    MaskPlane mp;
    ConcatString name;
@@ -556,7 +549,6 @@ int EnsembleStatConfInfo::get_max_n_eclv_points() const {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size, int ctrl_index) {
-   CTRACK;
 
    // This should be called after process_masks()
    for(int i=0; i<n_vx; i++) {
@@ -651,7 +643,6 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
                                        StringArray ens_member_ids,
                                        StringArray * ens_files,
                                        bool use_ctrl, ConcatString control_id) {
-   CTRACK;
    int i, j;
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
@@ -871,7 +862,6 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatVxOpt::parse_nc_info(Dictionary &odict) {
-   CTRACK;
    const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
    e = odict.lookup(conf_key_nc_orank_flag);
@@ -920,7 +910,6 @@ void EnsembleStatVxOpt::parse_nc_info(Dictionary &odict) {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_index) {
-   CTRACK;
    int i, j, n;
    int n_msg_typ = msg_typ.n();
    int n_mask    = mask_name.n();
@@ -1025,7 +1014,6 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
-   CTRACK;
 
    //
    // Check if percentile thresholds were requested
