@@ -29,7 +29,7 @@ Several MET tools read multiple gridded input data files in a single run. For ex
 1. Directly on the command line, for a relatively small number of files.
 2. In a single ASCII file containing a list of file names of arbitrary length.
 
-ASCII file lists consist of a white-space separated list of paths to the input files. While relative paths may work, users are encouraged to provide full paths for more consistent peformance. Note that environment variables can also be used in the file lists.
+ASCII file lists consist of a white-space separated list of paths to the input files. While relative paths may work, users are encouraged to provide full paths for more consistent behavior. Note that environment variables can also be used in the file lists.
 
 The file list elements can be separated by spaces, tabs, or newlines, but not commas. Users are encouraged to add the optional **file_list** keyword as the first element of each list to clearly identify it as such. When **file_list** is the first item, no validation logic is applied to the file names. When **file_list** is not present, MET checks whether each input file actually exists on the file system and errors out if it encounters too many missing input files.
 
