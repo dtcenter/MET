@@ -41,6 +41,8 @@
 #include "memory.h"
 #include "logger.h"
 
+#include "ctrack.hpp"
+
 using namespace std;
 
 
@@ -76,6 +78,9 @@ int main(int argc, char *argv[]) {
    int return_code = met_main(argc, argv);
 
    do_post_process();
+ 
+   // Write out the CTRACK metrics
+   ctrack::result_print();
 
    return return_code;
 
@@ -84,6 +89,7 @@ int main(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 void do_pre_process(int argc, char *argv[]) {
+   CTRACK;
    ConcatString msg, msg2;
 
    store_arguments(argc, argv);
@@ -102,6 +108,7 @@ void do_pre_process(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 void do_post_process() {
+   CTRACK;
    ConcatString msg;
    msg << "Finish " << met_tool_name << " by " << met_user_name
        << "(" << met_user_id << ") at " << get_current_time();
