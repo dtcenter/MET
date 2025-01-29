@@ -81,6 +81,14 @@ MetPythonDataFile * p = nullptr;
          mtddf = new MetNcMetDataFile;
          break;
 
+      case FileType_NcMetRA:
+        // TODO add support for RA data
+	// mtddf = new MetNcMetRADataFile;
+         mlog << Error << "\n" << method_name
+              << "Support for MetNcRADataFile has not been implemented yet!\n\n";
+         exit(1);
+         break;
+
       case FileType_NcWrf:
       case FileType_NcPinterp:
          mtddf = new MetNcWrfDataFile;

@@ -87,6 +87,10 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
          vi = new VarInfoNcMet;
          break;
 
+      case FileType_NcMetRA:
+         vi = new VarInfoNcMet;
+         break;
+
       case FileType_NcWrf:
       case FileType_NcPinterp:
          vi = new VarInfoNcWrf;

@@ -46,18 +46,20 @@ switch ( t )  {
    case FileType_Gb1:              s = "FileType_Gb1";              break;
    case FileType_Gb2:              s = "FileType_Gb2";              break;
    case FileType_NcMet:            s = "FileType_NcMet";            break;
-   case FileType_General_Netcdf:   s = "FileType_General_Netcdf";   break;
+   case FileType_NcMetRA:          s = "FileType_NcMetRA";          break;
 
+   case FileType_General_Netcdf:   s = "FileType_General_Netcdf";   break;
    case FileType_NcWrf:            s = "FileType_NcWrf";            break;
    case FileType_NcPinterp:        s = "FileType_NcPinterp";        break;
    case FileType_NcCF:             s = "FileType_NcCF";             break;
    case FileType_HdfEos:           s = "FileType_HdfEos";           break;
-   case FileType_Bufr:             s = "FileType_Bufr";             break;
 
+   case FileType_Bufr:             s = "FileType_Bufr";             break;
    case FileType_Python_Numpy:     s = "FileType_Python_Numpy";     break;
    case FileType_Python_Xarray:    s = "FileType_Python_Xarray";    break;
    case FileType_UGrid:            s = "FileType_UGrid";            break;
    case FileType_Pairs:            s = "FileType_Pairs";            break;
+
 
    default:
       s = "(bad value)";
@@ -82,14 +84,15 @@ bool string_to_grdfiletype(const char * text, GrdFileType & t)
 else if ( strcmp(text, "FileType_Gb1"           ) == 0 )   { t = FileType_Gb1;              return true; }
 else if ( strcmp(text, "FileType_Gb2"           ) == 0 )   { t = FileType_Gb2;              return true; }
 else if ( strcmp(text, "FileType_NcMet"         ) == 0 )   { t = FileType_NcMet;            return true; }
-else if ( strcmp(text, "FileType_General_Netcdf") == 0 )   { t = FileType_General_Netcdf;   return true; }
+else if ( strcmp(text, "FileType_NcMetRA"       ) == 0 )   { t = FileType_NcMetRA;          return true; }
 
+else if ( strcmp(text, "FileType_General_Netcdf") == 0 )   { t = FileType_General_Netcdf;   return true; }
 else if ( strcmp(text, "FileType_NcWrf"         ) == 0 )   { t = FileType_NcWrf;            return true; }
 else if ( strcmp(text, "FileType_NcPinterp"     ) == 0 )   { t = FileType_NcPinterp;        return true; }
 else if ( strcmp(text, "FileType_NcCF"          ) == 0 )   { t = FileType_NcCF;             return true; }
 else if ( strcmp(text, "FileType_HdfEos"        ) == 0 )   { t = FileType_HdfEos;           return true; }
-else if ( strcmp(text, "FileType_Bufr"          ) == 0 )   { t = FileType_Bufr;             return true; }
 
+else if ( strcmp(text, "FileType_Bufr"          ) == 0 )   { t = FileType_Bufr;             return true; }
 else if ( strcmp(text, "FileType_Python_Numpy"  ) == 0 )   { t = FileType_Python_Numpy;     return true; }
 else if ( strcmp(text, "FileType_Python_Xarray" ) == 0 )   { t = FileType_Python_Xarray;    return true; }
 else if ( strcmp(text, "FileType_UGrid"         ) == 0 )   { t = FileType_UGrid;            return true; }

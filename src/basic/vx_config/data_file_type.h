@@ -24,6 +24,7 @@ enum GrdFileType {
    FileType_Gb1,            // GRIB version 1
    FileType_Gb2,            // GRIB version 2
    FileType_NcMet,          // NetCDF MET format
+   FileType_NcMetRA,        // NetCDF MET Range/Azimuth file from TC-RMW or RMW-Analysis
    FileType_General_Netcdf, // NetCDF
    FileType_NcWrf,          // NetCDF output directly from WRF-ARW
    FileType_NcPinterp,      // NetCDF output of WRF-ARW pinterp tool
@@ -41,10 +42,11 @@ enum GrdFileType {
 
 inline bool is_netcdf_grdfiletype(const GrdFileType _t) {
    return(_t == FileType_NcMet          ||
+          _t == FileType_NcMetRA        ||
           _t == FileType_General_Netcdf ||
           _t == FileType_NcWrf          ||
           _t == FileType_NcPinterp      ||
-          _t == FileType_NcCF);
+          _t == FileType_NcCF); 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
