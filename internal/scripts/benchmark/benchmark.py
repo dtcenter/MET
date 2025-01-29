@@ -314,21 +314,21 @@ def check_settings(settings:dict) -> None:
     # if the base output dir does not exist, create it
     os.makedirs(output_base, exist_ok=True)
 
-def generate_info(settings:dict, ts:str, usecase: str, subdir: str) -> None:
+def generate_info(settings:dict, ts:str, description: str, subdir: str) -> None:
     """
        Generate a text file with information on the current benchmark run
     :param settings: dictionary representation of the settings specified in the YAML config file
     :param ts: timestamp
-    :param usecase: current use case
+    :param description: a name of either the current use case or MET invocation
     :param subdir: the use case subdirectory (full path)
     :return: None, write an output text file in the output path specified in the YAML config file
     """
-    info_file = "info_"+ usecase+ '_' + ts + ".txt"
+    info_file = "info_"+ description + '_' + ts + ".txt"
     full_path = os.path.join(subdir, info_file)
     with open(full_path, 'w') as f:
         f.write(f"Python version info: {sys.version}\n")
         f.write(f"Timestamp: {ts}\n")
-        f.write(f"Use case : {usecase}\n")
+        f.write(f"Description of Use case or MET invocation : {description}\n")
         f.write(f"Number of times run: {settings['num_runs']}\n")
 
 def run_usecases(settings:dict, ts:str, files_from_ctrack:tuple)->None:
@@ -389,10 +389,23 @@ def run_met_cli(settings:dict, ts, files_from_ctrack:tuple) -> None:
 
     print("inside run_met")
     met_cmd = settings['met_cmd']
-    subprocess.run([met_cmd])
-    summary_output_file, details_output_file = files_from_ctrack
+    summary_filename, details_filename = files_from_ctrack
 
+    # Run the MET command for the specified number of runs
+    for _ in range(settings['num_runs']):
+        subprocess.run([met_cmd])
 
+    # Extract the benchmark data
+    full_filename = ts
+    if len(settings['filename'])  > 0 :
+        full_filename = settings['filename'].join(ts)
+    summary_info = extract_summary_info(summary_filename, settings['met_subdir_name'])
+    detail_info = extract_detail_info(details_filename,settings['met_subdir_name'])
+    consolidated_df = consolidate_info(summary_info, detail_info)
+    save_results(consolidated_df, settings['benchmark_output_path'], ts, full_filename, settings['met_subdir_name'])
+
+    # provide information about this run: Python version, etc.
+    generate_info(settings, ts, "direct MET invocation" ,  settings['met_subdir_name'])
 
 def run_benchmark():
     """
