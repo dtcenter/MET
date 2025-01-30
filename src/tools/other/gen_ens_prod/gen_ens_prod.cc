@@ -1262,17 +1262,17 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\t-ens file_1 ... file_n | ens_file_list\n"
+        << "\t-ens file_1 ... file_n | file_list\n"
         << "\t-out file\n"
         << "\t-config file\n"
         << "\t[-ctrl file]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"-ens file_1 ... file_n\" are the gridded ensemble "
-        << "data files to be used (required).\n"
+        << "\twhere\t\"-ens file_1 ... file_n\" is a list of ensemble "
+        << "member file names (required).\n"
 
-        << "\t\t\"ens_file_list\" is an ASCII file containing a list "
+        << "\t\t\"-ens ens_file_list\" is an ASCII file containing a list "
         << "of ensemble member file names (required).\n"
 
         << "\t\t\"-out file\" is the NetCDF output file for the derived "

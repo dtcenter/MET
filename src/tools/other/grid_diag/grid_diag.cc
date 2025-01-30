@@ -813,14 +813,14 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: "<< program_name<< "\n"
-        << "\t-data  file_1 ... file_n | data_file_list\n"
+        << "\t-data  file_1 ... file_n | file_list\n"
         << "\t-out file\n"
         << "\t-config file\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"-data file_1 ... file_n\" are the gridded "
+        << "\twhere\t\"-data file_1 ... file_n\" is a list of gridded "
         << "data files to be used (required).\n"
 
         << "\t\t\"-data data_file_list\" is an ASCII file containing "

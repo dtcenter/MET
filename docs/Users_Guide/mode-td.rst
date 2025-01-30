@@ -197,7 +197,7 @@ The usage statement for the MODE-TD tool is listed below: The command line switc
   Usage: mtd
          -fcst    file_1 ... file_n | file_list
          -obs     file_1 ... file_n | file_list
-         -single  file_1 ... file_n | file_list
+         [-single  file_1 ... file_n | file_list]
          -config  config_file
          [-outdir path]
          [-log    file]

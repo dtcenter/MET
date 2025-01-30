@@ -59,13 +59,11 @@ gen_ens_prod has three required arguments and accepts several optional ones.
 Required Arguments gen_ens_prod
 -------------------------------
 
-1. The **-ens file_1 ... file_n** option specifies the ensemble member file names. This argument is not required when ensemble files are specified in the **file_list**, detailed below.
+1. The **-ens file_1 ... file_n | file_list** option specifies the ensemble member files or ASCII file list of file names to be used, as described in :numref:`ascii_file_lists`.
 
-2. The **file_list** option is an ASCII file containing a list of ensemble member file names, as described in :numref:`ascii_file_lists`. This is not required when a file list is included on the command line, as described above.
+2. The **-out file** option specifies the NetCDF output file name to be written.
 
-3. The **-out file** option specifies the NetCDF output file name to be written.
-
-4. The **-config file** option is a **GenEnsProdConfig** file containing the desired configuration settings.
+3. The **-config file** option is a **GenEnsProdConfig** file containing the desired configuration settings.
 
 Optional Arguments for gen_ens_prod
 -----------------------------------
