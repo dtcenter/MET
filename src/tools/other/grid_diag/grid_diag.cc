@@ -823,7 +823,7 @@ void usage() {
         << "\twhere\t\"-data file_1 ... file_n\" is a list of gridded "
         << "data files to be used (required).\n"
 
-        << "\t\t\"-data data_file_list\" is an ASCII file containing "
+        << "\t\t\"-data file_list\" is an ASCII file containing "
         << "a list of gridded data files to be used (required).\n"
 
         << "\t\t\"-out file\" is the NetCDF output file containing "

@@ -2648,7 +2648,7 @@ __attribute__((noreturn)) static void usage() {
         << "observation files to be used (required).\n"
 
         << "\t\t"
-        << R"("-obs  obs_file_list" is an ASCII file containing )"
+        << R"("-obs  file_list" is an ASCII file containing )"
         << "a list of gridded observation files to be used (required).\n"
 
         << "\t\t"
