@@ -705,22 +705,21 @@ void PairBase::calc_obs_summary(){
    if(!IsPointVx) return;
 
    //  iterate over the keys in the unique station id map
-   for(int i=0; i<map_key.n(); i++) {
-
-      station_values_t svt = map_val[map_key[i]];
+   for(auto &v : map_val) {
 
       //  parse the single key string
       char** mat = nullptr;
       if( 5 != regex_apply("^([^:]+):([^:]+):([^:]+):([^:]+)$", 5,
-                           map_key[i].c_str(), mat) ){
+                           v.first.c_str(), mat) ){
          mlog << Error << "\nPairBase::calc_obs_summary() -> "
               << "regex_apply failed to parse '"
-              << map_key[i] << "'\n\n";
+              << v.first << "'\n\n";
          exit(1);
       }
 
-      string msg_key = str_format("%s:%s:%s:%s", mat[1], mat[2], mat[3],
-                                  mat[4]).text();
+      string msg_key = str_format("%s:%s:%s:%s",
+                                  mat[1], mat[2],
+                                  mat[3], mat[4]).text();
 
       ob_val_t ob;
 
@@ -754,21 +753,22 @@ void PairBase::calc_obs_summary(){
       }
 
       // Store summarized value in the map
-      svt.summary_val = ob.val;
+      v.second.summary_val = ob.val;
 
-      typ_sa.add    (svt.typ.c_str());
-      sid_sa.add    (svt.sid.c_str());
-      lat_na.add    (svt.lat);
-      lon_na.add    (svt.lon);
-      x_na.add      (svt.x);
-      y_na.add      (svt.y);
-      wgt_na.add    (svt.wgt);
+      typ_sa.add    (v.second.typ.c_str());
+      sid_sa.add    (v.second.sid.c_str());
+      lat_na.add    (v.second.lat);
+      lon_na.add    (v.second.lon);
+      x_na.add      (v.second.x);
+      y_na.add      (v.second.y);
+      wgt_na.add    (v.second.wgt);
       vld_ta.add    (ob.ut);
-      lvl_na.add    (svt.lvl);
-      elv_na.add    (svt.elv);
+      lvl_na.add    (v.second.lvl);
+      elv_na.add    (v.second.elv);
       o_na.add      (ob.val);
       o_qc_sa.add   (ob.qc.c_str());
-      ClimoPntInfo cpi(svt.fcmn, svt.fcsd, svt.ocmn, svt.ocsd);
+      ClimoPntInfo cpi(v.second.fcmn, v.second.fcsd,
+                       v.second.ocmn, v.second.ocsd);
       add_climo(ob.val, cpi);
 
       // Increment the number of pairs
