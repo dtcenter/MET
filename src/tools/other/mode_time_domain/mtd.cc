@@ -915,13 +915,13 @@ cout << "\n*** Model Evaluation Tools (MET" << met_version
      << "\twhere\t\"-fcst file_1 ... file_n\" are the gridded "
      << "forecast files to be used (required).\n"
 
-     << "\t\t\"-fcst fcst_file_list\" is an ASCII file containing "
+     << "\t\t\"-fcst file_list\" is an ASCII file containing "
      << "a list of gridded forecast files to be used (required).\n"
 
      << "\t\t\"-obs  file_1 ... file_n\" are the gridded "
      << "observation files to be used (required).\n"
 
-     << "\t\t\"-obs  obs_file_list\" is an ASCII file containing "
+     << "\t\t\"-obs  file_list\" is an ASCII file containing "
      << "a list of gridded observation files to be used (required).\n"
 
      << "\t\t\"-single\" instead of \"-fcst\" and \"-obs\" to run on "
