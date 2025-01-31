@@ -9,6 +9,19 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.0.1 Release Notes (20250131)
+-------------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * Fix the PARUSR BUFRLIB failure when PB2NC is compiled with "-O2" optimization
+       (`#3054 <https://github.com/dtcenter/MET/issues/3054>`_).
+
+  .. dropdown:: Repository, build, and test
+
+     * Decouple the MET unit tests from the MET installation location
+       (`#3051 <https://github.com/dtcenter/MET/issues/3051>`_).
+
 MET Version 12.0.0 Release Notes (20241218)
 -------------------------------------------
 
