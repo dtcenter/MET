@@ -83,15 +83,15 @@ void usage() {
     cout << "\n*** Model Evaluation Tools (MET" << met_version
          << ") ***\n\n"
          << "Usage: " << program_name << "\n"
-         << "\t-data file_1 ... file_n | data_file_list\n"
+         << "\t-data file_1 ... file_n | file_list\n"
          << "\t-config file\n"
          << "\t-out file\n"
          << "\t[-log file]\n"
          << "\t[-v level]\n\n"
 
-         << "\twhere\t\"-data file_1 ... file_n | data_file_list\" "
-         << "is the NetCDF output of TC-RMW to be processed or an "
-         << "ASCII file containing a list of files (required).\n"
+         << "\twhere\t\"-data file_1 ... file_n | file_list\" "
+         << "is a list of the NetCDF TC-RMW output files to be processed "
+         << "or an ASCII file containing a list of file names (required).\n"
 
          << "\t\t\"-config file\" is the RMWAnalysisConfig to be used "
          << "(required).\n"

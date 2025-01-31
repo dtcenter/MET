@@ -1671,7 +1671,7 @@ void usage() {
         << "\tINPUT_FILES:\n"
         << "\t\tfile_1 config_str_1 ... file_n config_str_n | \n"
         << "\t\tfile_1 ... file_n |\n"
-        << "\t\tinput_file_list\n\n"
+        << "\t\tfile_list\n\n"
 
         << "\t\twhere\t\"file_i\" is the name of the i-th input "
         << "gridded data file.\n"
@@ -1679,7 +1679,7 @@ void usage() {
         << "\t\t\t\"config_str_i\" is the field to be extracted from "
         << "the i-th gridded data file.\n"
 
-        << "\t\t\t\"input_file_list\" is an ASCII file containing a list of "
+        << "\t\t\t\"file_list\" is an ASCII file containing a list of "
         << "gridded data files.\n\n"
 
         << "\t\tNote:\tFor \"-subtract\", exactly 2 input files must "

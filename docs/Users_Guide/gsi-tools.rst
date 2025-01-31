@@ -294,7 +294,7 @@ The usage statement for the GSIDENS2ORANK tool is shown below:
 .. code-block:: none
 
   Usage: gsidens2orank
-         ens_file_1 ... ens_file_n | ens_file_list
+         file_1 ... file_n | file_list
          -out path
          [-ens_mean path]
          [-swap]
@@ -304,35 +304,33 @@ The usage statement for the GSIDENS2ORANK tool is shown below:
          [-log file]
          [-v level]
 
-gsidens2orank has three required arguments and accepts several optional ones.
+gsidens2orank has two required arguments and accepts several optional ones.
 
 Required Arguments for gsidens2orank
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **ens_file_1 ... ens_file_n** argument is a list of ensemble binary GSI diagnostic files to be reformatted.
+1. The **file_1 ... file_n | file_list** argument specifies the ensemble binary GSI diagnostic files to be reformatted or ASCII file list of file names to be used, as described in :numref:`ascii_file_lists`.
 
-2. The **ens_file_list** argument is an ASCII file containing a list of ensemble GSI diagnostic files.
-
-3. The **-out path** argument specifies the name of the output **.stat** file.
+2. The **-out path** argument specifies the name of the output **.stat** file.
 
 Optional Arguments for gsidens2orank
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The **-ens_mean path** option is the ensemble mean binary GSI diagnostic file.
+3. The **-ens_mean path** option is the ensemble mean binary GSI diagnostic file.
 
-5. The **-swap** option switches the endianness when reading the input binary files.
+4. The **-swap** option switches the endianness when reading the input binary files.
 
-6. The **-channel n** option overrides the default processing of all radiance channels with a comma-separated list.
+5. The **-channel n** option overrides the default processing of all radiance channels with a comma-separated list.
 
-7. The **-rng_name str** option overrides the default random number generator name (mt19937).
+6. The **-rng_name str** option overrides the default random number generator name (mt19937).
 
-8. The **-rng_seed str** option overrides the default random number generator seed.
+7. The **-rng_seed str** option overrides the default random number generator seed.
 
-9. The **-set_hdr col_name value** option specifies what should be written to the output header columns.
+8. The **-set_hdr col_name value** option specifies what should be written to the output header columns.
 
-10. The **-log file** option outputs log messages to the specified file.
+9. The **-log file** option outputs log messages to the specified file.
 
-11. The **-v level** option overrides the default level of logging (2).
+10. The **-v level** option overrides the default level of logging (2).
 
 An example of the gsidens2orank calling sequence is shown below:
 

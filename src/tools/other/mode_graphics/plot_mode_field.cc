@@ -612,7 +612,10 @@ cout << "\n*** Model Evaluation Tools (MET" << met_version
      << "\t[-log file]\n"
      << "\t[-v level]\n\n"
 
-     << "\twhere\t\"-raw | -simple | -cluster\" plots the raw, simple, "
+     << "\twhere\t\"mode_nc_file_list\" specifies the NetCDF MODE "
+     << "output files to be used for plotting (required).\n"
+
+     << "\t\t\"-raw | -simple | -cluster\" plots the raw, simple, "
      << "or cluster object field (required).\n"
 
      << "\t\t\"-obs | -fcst\" plots the forecast or observation field "
