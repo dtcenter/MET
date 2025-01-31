@@ -728,15 +728,17 @@ void PairBase::calc_obs_summary(){
    if(!IsPointVx) return;
 
    //  iterate over the keys in the unique station id map
-   for(auto &v : map_val) {
+   for(int i=0; i<map_key.n(); i++) {
+
+      station_values_t * svt = &map_val[map_key[i]];
 
       //  parse the single key string
       char** mat = nullptr;
       if( 5 != regex_apply("^([^:]+):([^:]+):([^:]+):([^:]+)$", 5,
-                           v.first.c_str(), mat) ){
+                           map_key[i].c_str(), mat) ){
          mlog << Error << "\nPairBase::calc_obs_summary() -> "
               << "regex_apply failed to parse '"
-              << v.first << "'\n\n";
+              << map_key[i] << "'\n\n";
          exit(1);
       }
 
@@ -776,22 +778,22 @@ void PairBase::calc_obs_summary(){
       }
 
       // Store summarized value in the map
-      v.second.summary_val = ob.val;
+      svt->summary_val = ob.val;
 
-      typ_sa.add    (v.second.typ.c_str());
-      sid_sa.add    (v.second.sid.c_str());
-      lat_na.add    (v.second.lat);
-      lon_na.add    (v.second.lon);
-      x_na.add      (v.second.x);
-      y_na.add      (v.second.y);
-      wgt_na.add    (v.second.wgt);
+      typ_sa.add    (svt->typ.c_str());
+      sid_sa.add    (svt->sid.c_str());
+      lat_na.add    (svt->lat);
+      lon_na.add    (svt->lon);
+      x_na.add      (svt->x);
+      y_na.add      (svt->y);
+      wgt_na.add    (svt->wgt);
       vld_ta.add    (ob.ut);
-      lvl_na.add    (v.second.lvl);
-      elv_na.add    (v.second.elv);
+      lvl_na.add    (svt->lvl);
+      elv_na.add    (svt->elv);
       o_na.add      (ob.val);
       o_qc_sa.add   (ob.qc.c_str());
-      ClimoPntInfo cpi(v.second.fcmn, v.second.fcsd,
-                       v.second.ocmn, v.second.ocsd);
+      ClimoPntInfo cpi(svt->fcmn, svt->fcsd,
+                       svt->ocmn, svt->ocsd);
       add_climo(ob.val, cpi);
 
       // Increment the number of pairs
