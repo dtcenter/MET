@@ -19,6 +19,7 @@
 #include "grdfiletype_to_string.h"
 #include "data2d_grib.h"
 #include "data2d_nc_met.h"
+#include "data2d_nc_met_ra.h"
 #include "data2d_nc_wrf.h"
 #include "data2d_nc_cf.h"
 #ifdef WITH_UGRID
@@ -82,11 +83,7 @@ MetPythonDataFile * p = nullptr;
          break;
 
       case FileType_NcMetRA:
-        // TODO add support for RA data
-	// mtddf = new MetNcMetRADataFile;
-         mlog << Error << "\n" << method_name
-              << "Support for MetNcRADataFile has not been implemented yet!\n\n";
-         exit(1);
+	 mtddf = new MetNcMetRADataFile;
          break;
 
       case FileType_NcWrf:

@@ -1359,6 +1359,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_data2d_grib/Makefile
                  src/libcode/vx_data2d_grib2/Makefile
                  src/libcode/vx_data2d_nc_met/Makefile
+                 src/libcode/vx_data2d_nc_met_ra/Makefile
                  src/libcode/vx_data2d_nc_wrf/Makefile
                  src/libcode/vx_data2d_nc_cf/Makefile
                  src/libcode/vx_data2d_ugrid/Makefile
