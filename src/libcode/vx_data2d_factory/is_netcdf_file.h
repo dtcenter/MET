@@ -27,6 +27,8 @@ extern bool is_nccf_file(const char * filename);
 
 extern bool is_ncmet_file(const char * filename);
 
+extern bool is_ncmetra_file(const char * filename);
+
 extern bool is_ncpinterp_file(const char * filename);
 
 extern bool is_ncwrf_file(const char * filename);

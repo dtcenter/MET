@@ -47,6 +47,9 @@ static const string ugrid_att_value = "UGRID";
 static const string ncmet_att_version    = "MET_version";
 static const string ncmet_att_projection = "Projection";
 
+static const string ncmetra_range   = "range";
+static const string ncmetra_azimuth = "azimuth";
+
 static const string nctitle_att_name     = "TITLE";
 static const char ncpinterp_att_value [] = "ON PRES LEVELS";
 static const char ncwrf_att_value []     = "OUTPUT FROM WRF";
@@ -132,6 +135,36 @@ bool is_ncmet_file(const char * filename)
       if (!IS_INVALID_NC_P(nc_file)) {
          status = (get_global_att(nc_file, ncmet_att_version,    att_val) ||
                    get_global_att(nc_file, ncmet_att_projection, att_val));
+      }
+
+      delete nc_file;
+
+   }catch(...) {
+   }
+
+   return status;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_ncmetra_file(const char * filename)
+{
+   bool status = false;
+   try {
+      ConcatString att_val;
+
+      NcFile *nc_file = open_ncfile(filename);
+
+      if (!IS_INVALID_NC_P(nc_file)) {
+
+         // Check for range and azimuth coordinate variables
+         status = (has_dim(nc_file, ncmetra_range.c_str())   &&
+                   has_var(nc_file, ncmetra_range.c_str())   &&
+                   has_dim(nc_file, ncmetra_azimuth.c_str()) &&
+                   has_var(nc_file, ncmetra_azimuth.c_str()));
       }
 
       delete nc_file;

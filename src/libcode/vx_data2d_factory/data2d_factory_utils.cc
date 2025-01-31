@@ -101,6 +101,7 @@ else if ( is_ncpinterp_file (filename) ) data_type = FileType_NcPinterp;
 else if ( is_ncwrf_file     (filename) ) data_type = FileType_NcWrf;
 else if ( is_nccf_file      (filename) ) data_type = FileType_NcCF;
 else if ( is_ncmet_file     (filename) ) data_type = FileType_NcMet;
+else if ( is_ncmetra_file   (filename) ) data_type = FileType_NcMetRA;
 else if ( is_bufr_file      (filename) ) data_type = FileType_Bufr;
 else if ( is_ugrid_file     (filename) ) data_type = FileType_UGrid;
 else                                     data_type = FileType_None;
