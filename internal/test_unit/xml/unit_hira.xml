@@ -14,6 +14,9 @@
 
 <met_test>
 
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
   <!--                                    -->
   <!--  point_stat                        -->
   <!--                                    -->
