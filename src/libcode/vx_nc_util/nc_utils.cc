@@ -165,24 +165,10 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
    static const char *method_name = "get_att_value_chars(NcAtt) -> ";
    if (IS_VALID_NC_P(att)) {
       nc_type attType = GET_NC_TYPE_ID_P(att);
-      if (attType == NC_CHAR) {
-         try {
-            char att_value[tmp_buf_size];
-            memset(att_value, 0, tmp_buf_size);
-            att->getValues(att_value);
-            value = att_value;
-         }
-         catch (exceptions::NcChar &ex) {
-            value = "";
-            // Handle netCDF::exceptions::NcChar:  NetCDF: Attempt to convert between text & numbers
-            mlog << Warning << "\n" << method_name
-                 << "Exception: " << ex.what() << "\n"
-                 << "Fail to read " << GET_NC_NAME_P(att) << " attribute ("
-                 << GET_NC_TYPE_NAME_P(att) << " type).\n"
-                 << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
-         }
-      }
-      else if (attType == NC_STRING) {
+
+      // MET #3075 store attribute in a string rather than a character array
+      if (attType == NC_CHAR ||
+          attType == NC_STRING) {
          try {
             string att_value;
             att->getValues(att_value);
