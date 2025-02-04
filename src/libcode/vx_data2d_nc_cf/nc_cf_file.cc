@@ -1494,13 +1494,12 @@ void NcCfFile::read_netcdf_grid()
   // the x_dim_var_name and y_dim_var_name strings are both set.
 
   if (nullptr == _xDim && nullptr == _yDim && _latVar && _lonVar) {
-    int dim_offset = get_dim_count(_lonVar) - 1;
-    NcDim lon_dim = get_nc_dim(_lonVar, dim_offset);
-    NcDim lat_dim = get_nc_dim(_latVar, 0);
-    x_dim_var_name = GET_NC_NAME(lon_dim);
-    y_dim_var_name = GET_NC_NAME(lat_dim);
 
-    // MET #3075 point _xDim and _yDim to class variables rather than local variables
+    // MET #3075 the _xDim and _yDim pointers should reference class
+    //           members rather than local variables that go out of scope
+    int dim_offset = get_dim_count(_lonVar) - 1;
+    x_dim_var_name = GET_NC_NAME(get_nc_dim(_lonVar, dim_offset));
+    y_dim_var_name = GET_NC_NAME(get_nc_dim(_latVar, 0));
     for (int dim_num = 0; dim_num < _numDims; ++dim_num) {
        if(x_dim_var_name == GET_NC_NAME_P(_dims[dim_num])) _xDim = _dims[dim_num];
        if(y_dim_var_name == GET_NC_NAME_P(_dims[dim_num])) _yDim = _dims[dim_num];
