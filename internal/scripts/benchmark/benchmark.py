@@ -391,7 +391,7 @@ def run_met_cli(settings:dict, ts, files_from_ctrack:tuple) -> None:
              detail_output.txt files.
     """
 
-    met_command = settings['met_cmd']
+    met_command = settings['met_command']
     summary_filename, details_filename = files_from_ctrack
 
     # Run the MET command for the specified number of runs
