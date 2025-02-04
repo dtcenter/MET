@@ -2844,7 +2844,7 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\tn_ens ens_file_1 ... ens_file_n | ens_file_list\n"
+        << "\tn_ens file_1 ... file_n | file_list\n"
         << "\tconfig_file\n"
         << "\t[-grid_obs file]\n"
         << "\t[-point_obs file]\n"
@@ -2857,11 +2857,11 @@ void usage() {
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"n_ens ens_file_1 ... ens_file_n\" is the number "
+        << "\twhere\t\"n_ens file_1 ... file_n\" is the number "
         << "of ensemble members followed by a list of ensemble member "
         << "file names (required).\n"
 
-        << "\t\t\"ens_file_list\" is an ASCII file containing a list "
+        << "\t\t\"file_list\" is an ASCII file containing a list "
         << "of ensemble member file names (required).\n"
 
         << "\t\t\"config_file\" is an EnsembleStatConfig file "

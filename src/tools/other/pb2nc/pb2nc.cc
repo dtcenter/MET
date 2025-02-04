@@ -59,6 +59,7 @@
 //   019    07/21/23  Prestopnik, J. MET #2615 Add #include <array> to compile
 //                                   successfully using gcc12
 //   020    08/26/24  Halley Gotway  MET #2938 Silence center time warnings
+//   021    01/30/25  Halley Gotway  MET #3054 Fix PARUSR BUFRLIB error
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2444,10 +2445,9 @@ void process_pbfile_metadata(int i_pb) {
 
    int bufr_var_index = 0;
    bool has_prepbufr_vars = false;
-   const char * tmp_var_name;
    bufr_obs_name_arr.clear();
    for (index=0; index<prepbufr_vars.n(); index++) {
-      tmp_var_name = prepbufr_vars[index].c_str();
+      const string tmp_var_name = prepbufr_vars[index].c_str();
       if (do_all_vars || bufr_target_variables.has(tmp_var_name, false)) {
          if (tableB_vars.has(tmp_var_name)) {
             bufr_obs_name_arr.add(tmp_var_name);
@@ -2460,7 +2460,7 @@ void process_pbfile_metadata(int i_pb) {
    bufr_derive_cfgs.clear();
    if (has_prepbufr_vars) {
       for (int vIdx=0; vIdx< prepbufr_derive_vars.n(); vIdx++) {
-         tmp_var_name = prepbufr_derive_vars[vIdx].c_str();
+         const string tmp_var_name = prepbufr_derive_vars[vIdx].c_str();
          bufr_derive_cfgs.emplace_back(derive_var_cfg(tmp_var_name));
          if (do_all_vars || bufr_target_variables.has(tmp_var_name)) {
             // Set the variable index if requested
