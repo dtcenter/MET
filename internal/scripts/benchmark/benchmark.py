@@ -298,11 +298,16 @@ def check_settings(settings:dict) -> None:
     sys_conf = settings['system_conf']
     wrapper_confs = settings['wrapper_conf']
 
-    assert os.path.exists(metplus_dir), "fERROR|benchmark.yaml::The METplus base directory {metplus_dir} does not exist"
-    assert os.path.exists(sys_conf), "fERROR|benchmark.yaml::The system.conf file {sys_conf}  does not exist."
+    if settings['run_met_directly']:
+        # Check for empty string or only whitespace for MET command
+        assert len(settings['met_command']) > 0
+        assert not settings['met_command'].isspace()
+    else:
+        assert os.path.exists(metplus_dir), "fERROR|benchmark.yaml::The METplus base directory {metplus_dir} does not exist"
+        assert os.path.exists(sys_conf), "fERROR|benchmark.yaml::The system.conf file {sys_conf}  does not exist."
 
-    for cur_conf in wrapper_confs:
-        assert os.path.exists(cur_conf), "fERROR|benchmark.yaml:: The {cur_conf} use case config file does not exist. "
+        for cur_conf in wrapper_confs:
+            assert os.path.exists(cur_conf), "fERROR|benchmark.yaml:: The {cur_conf} use case config file does not exist. "
 
     num_of_runs = settings['num_runs']
     # Set the number of times to run to 1 if this value isn't set in the YAML config file
@@ -341,7 +346,6 @@ def run_usecases(settings:dict, ts:str, files_from_ctrack:tuple)->None:
                               by CTRACK
     :return:
     """
-    print("inside run_usecases")
 
     # Retrieve the settings from benchmark.yaml
     output_base = settings['benchmark_output_path']
@@ -387,13 +391,12 @@ def run_met_cli(settings:dict, ts, files_from_ctrack:tuple) -> None:
              detail_output.txt files.
     """
 
-    print("inside run_met")
-    met_cmd = settings['met_cmd']
+    met_command = settings['met_cmd']
     summary_filename, details_filename = files_from_ctrack
 
     # Run the MET command for the specified number of runs
     for _ in range(settings['num_runs']):
-        subprocess.run([met_cmd])
+        subprocess.run(met_command, shell=True)
 
     # Extract the benchmark data
     full_filename = ts
