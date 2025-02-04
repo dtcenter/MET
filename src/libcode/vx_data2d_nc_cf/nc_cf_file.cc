@@ -1497,10 +1497,14 @@ void NcCfFile::read_netcdf_grid()
     int dim_offset = get_dim_count(_lonVar) - 1;
     NcDim lon_dim = get_nc_dim(_lonVar, dim_offset);
     NcDim lat_dim = get_nc_dim(_latVar, 0);
-    _xDim = &lon_dim;
-    _yDim = &lat_dim;
     x_dim_var_name = GET_NC_NAME(lon_dim);
     y_dim_var_name = GET_NC_NAME(lat_dim);
+
+    // MET #3075 point _xDim and _yDim to class variables rather than local variables
+    for (int dim_num = 0; dim_num < _numDims; ++dim_num) {
+       if(x_dim_var_name == GET_NC_NAME_P(_dims[dim_num])) _xDim = _dims[dim_num];
+       if(y_dim_var_name == GET_NC_NAME_P(_dims[dim_num])) _yDim = _dims[dim_num];
+    }
     get_grid_from_lat_lon_vars(_latVar, _lonVar, _yDim->getSize(), _xDim->getSize());
     status = true;
   }
