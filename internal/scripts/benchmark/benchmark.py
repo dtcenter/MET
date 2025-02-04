@@ -328,12 +328,12 @@ def generate_info(settings:dict, ts:str, description: str, subdir: str) -> None:
     :param subdir: the use case subdirectory (full path)
     :return: None, write an output text file in the output path specified in the YAML config file
     """
-    info_file = "info_"+ description + '_' + ts + ".txt"
+    info_file = "info_" + ts + ".txt"
     full_path = os.path.join(subdir, info_file)
     with open(full_path, 'w') as f:
         f.write(f"Python version info: {sys.version}\n")
         f.write(f"Timestamp: {ts}\n")
-        f.write(f"Description of Use case or MET invocation : {description}\n")
+        f.write(f"Description of Use case or MET invocation (optional) : {description}\n")
         f.write(f"Number of times run: {settings['num_runs']}\n")
 
 def run_usecases(settings:dict, ts:str, files_from_ctrack:tuple)->None:
