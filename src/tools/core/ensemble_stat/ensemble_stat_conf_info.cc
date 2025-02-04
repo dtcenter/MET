@@ -22,8 +22,8 @@
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
 #include "vx_log.h"
-
 #include "GridTemplate.h"
+#include "ctrack.hpp"
 
 using namespace std;
 
@@ -312,7 +312,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::process_grib_codes() {
-
+   CTRACK;
    // Only needs to be set once
    if(grib_codes_set) return;
 
@@ -338,6 +338,7 @@ void EnsembleStatConfInfo::process_grib_codes() {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::process_flags() {
+   CTRACK;
    int i, j;
    bool output_ascii_flag = false;
 
@@ -384,6 +385,7 @@ void EnsembleStatConfInfo::process_flags() {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::process_masks(const Grid &grid) {
+   CTRACK;
    int i, j;
    MaskPlane mp;
    ConcatString name;
@@ -549,6 +551,7 @@ int EnsembleStatConfInfo::get_max_n_eclv_points() const {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::set_vx_pd(const IntArray &ens_size, int ctrl_index) {
+   CTRACK;
 
    // This should be called after process_masks()
    for(int i=0; i<n_vx; i++) {
@@ -862,6 +865,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatVxOpt::parse_nc_info(Dictionary &odict) {
+   CTRACK;
    const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
 
    e = odict.lookup(conf_key_nc_orank_flag);
@@ -1014,6 +1018,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
+   CTRACK;
 
    //
    // Check if percentile thresholds were requested
