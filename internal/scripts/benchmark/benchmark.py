@@ -408,7 +408,7 @@ def run_met_cli(settings:dict, ts, files_from_ctrack:tuple) -> None:
     save_results(consolidated_df, settings['benchmark_output_path'], ts, full_filename, settings['met_subdir_name'])
 
     # provide information about this run: Python version, etc.
-    generate_info(settings, ts, "direct MET invocation" ,  settings['met_subdir_name'])
+    generate_info(settings, ts, "met_command" ,  settings['met_subdir_name'])
 
 def run_benchmark():
     """
