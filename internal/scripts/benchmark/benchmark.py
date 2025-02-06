@@ -324,7 +324,7 @@ def generate_info(settings:dict, ts:str, description: str, subdir: str) -> None:
        Generate a text file with information on the current benchmark run
     :param settings: dictionary representation of the settings specified in the YAML config file
     :param ts: timestamp
-    :param description: a name of either the current use case or MET invocation
+    :param description: a description of the run
     :param subdir: the use case subdirectory (full path)
     :return: None, write an output text file in the output path specified in the YAML config file
     """
@@ -411,7 +411,7 @@ def run_met_cli(settings:dict, ts, files_from_ctrack:tuple) -> None:
     save_results(consolidated_df, settings['benchmark_output_path'], ts, full_filename, settings['met_subdir_name'])
 
     # provide information about this run: Python version, etc.
-    generate_info(settings, ts, "met_command" ,  full_benchmark_path)
+    generate_info(settings, ts, met_command ,  full_benchmark_path)
 
 def run_benchmark():
     """
