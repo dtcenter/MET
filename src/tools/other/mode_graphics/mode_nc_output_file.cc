@@ -448,7 +448,7 @@ int ModeNcOutputFile::count_objects(NcVar * var) const
 int x, y, n, k;
 
 n = 0;
-int v[Ny][Nx];
+vector<vector<int>> v(Ny, vector<int>(Nx));
 LongArray offsets;  // { 0,  0};
 LongArray lengths;  // {Ny, Nx};   //  NOT (x, y)!
 
@@ -462,7 +462,6 @@ if (get_nc_data(var, (int *)&v, lengths, offsets)) {
    
       for (y=0; y<Ny; ++y)  {
    
-         //k = get_int(var, x, y);
          k = v[y][x];
    
          if ( k > n )  n = k;
