@@ -243,8 +243,8 @@ void process_point_obs(const char *point_obs_filename) {
    // Allocate space to store the data
    float hdr_arr[HDR_ARRAY_LEN];
    float obs_arr[OBS_ARRAY_LEN];
-   int obs_qty_block[buf_size];
-   float obs_arr_block[buf_size][OBS_ARRAY_LEN];
+   vector<int> obs_qty_block(buf_size);
+   vector<float[OBS_ARRAY_LEN]> obs_arr_block(buf_size);
 
    use_var_id = met_point_obs->is_using_var_id();
    if(use_var_id) var_list = met_point_obs->get_var_names();
@@ -271,11 +271,14 @@ void process_point_obs(const char *point_obs_filename) {
 #ifdef WITH_PYTHON
       if (use_python)
          status = met_point_obs->get_point_obs_data()->fill_obs_buf(
-                             buf_size2, i_start, (float *)obs_arr_block, obs_qty_block);
+                             buf_size2, i_start,
+                             (float *)obs_arr_block.data(),
+                             obs_qty_block.data());
       else
 #endif
-      status = nc_point_obs.read_obs_data(buf_size2, i_start, (float *)obs_arr_block,
-                                          obs_qty_block, (char *)0);
+      status = nc_point_obs.read_obs_data(buf_size2, i_start,
+                                          (float *)obs_arr_block.data(),
+                                          obs_qty_block.data(), nullptr);
       if (!status) exit(1);
 
       for(int i_offset=0; i_offset<buf_size2; i_offset++) {
