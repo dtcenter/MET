@@ -741,19 +741,18 @@ void process_ioda_file(int i_pb) {
                                   hdr_time_arr[i_read], no_leap_year);
       }
       else if (is_time_string) {
-         char valid_time[nstring+1];
-
-         m_strncpy(valid_time, (const char *)hdr_vld_block2[i_read],
+         vector<char> valid_time(nstring+1);
+         m_strncpy(valid_time.data(), (const char *)hdr_vld_block2[i_read],
                    nstring, method_name_s, "valid_time", true);
          valid_time[nstring] = 0;
-         msg_ut = yyyymmddThhmmss_to_unix(valid_time);
+         msg_ut = yyyymmddThhmmss_to_unix(valid_time.data());
       }
       else {
-         char valid_time[ndatetime+1];
-         m_strncpy(valid_time, (const char *)(hdr_vld_block + (i_read * ndatetime)),
+         vector<char> valid_time(ndatetime+1);
+         m_strncpy(valid_time.data(), (const char *)(hdr_vld_block + (i_read * ndatetime)),
                    ndatetime, method_name_s, "valid_time", true);
          valid_time[ndatetime] = 0;
-         msg_ut = yyyymmddThhmmss_to_unix(valid_time);
+         msg_ut = yyyymmddThhmmss_to_unix(valid_time.data());
       }
 
       // Check to make sure that the message time hasn't changed
@@ -831,16 +830,16 @@ void process_ioda_file(int i_pb) {
       }
 
       if(has_station_id) {
-         char tmp_sid[nstring+1];
+         vector<char> tmp_sid(nstring+1);
          if (nullptr != hdr_station_ids2) {
-            m_strncpy(tmp_sid, hdr_station_ids2[i_read], nstring, method_name_s, "tmp_sid2");
+            m_strncpy(tmp_sid.data(), hdr_station_ids2[i_read], nstring, method_name_s, "tmp_sid2");
          }
          else {
-            m_strncpy(tmp_sid, hdr_station_ids+(i_read*nstring), nstring, method_name_s, "tmp_sid");
+            m_strncpy(tmp_sid.data(), hdr_station_ids+(i_read*nstring), nstring, method_name_s, "tmp_sid");
          }
-         m_rstrip(tmp_sid, nstring, false);
-         m_replace_char(tmp_sid, ' ', '_');
-         hdr_sid = tmp_sid;
+         m_rstrip(tmp_sid.data(), nstring, false);
+         m_replace_char(tmp_sid.data(), ' ', '_');
+         hdr_sid = tmp_sid.data();
       }
       else hdr_sid.clear();
 
