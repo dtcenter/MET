@@ -399,13 +399,14 @@ def run_met_cli(settings:dict, ts, files_from_ctrack:tuple) -> None:
         subprocess.run(met_command, shell=True)
 
     # Extract the benchmark data
+    full_subdir_path = str(os.path.join(settings['benchmark_output_path'], settings['met_subdir_name']))
     full_filename = ts
     if len(settings['filename'])  > 0 :
         full_filename = settings['filename'].join(ts)
-    summary_info = extract_summary_info(summary_filename, settings['met_subdir_name'])
-    detail_info = extract_detail_info(details_filename,settings['met_subdir_name'])
+    summary_info = extract_summary_info(summary_filename, full_subdir_path)
+    detail_info = extract_detail_info(details_filename, full_subdir_path)
+
     consolidated_df = consolidate_info(summary_info, detail_info)
-    full_subdir_path = str(os.path.join(settings['benchmark_output_path'], settings['met_subdir_name']))
     save_results(consolidated_df, settings['benchmark_output_path'], ts, full_filename, settings['met_subdir_name'])
 
     # provide information about this run: Python version, etc.
