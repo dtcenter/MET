@@ -405,10 +405,11 @@ def run_met_cli(settings:dict, ts, files_from_ctrack:tuple) -> None:
     summary_info = extract_summary_info(summary_filename, settings['met_subdir_name'])
     detail_info = extract_detail_info(details_filename,settings['met_subdir_name'])
     consolidated_df = consolidate_info(summary_info, detail_info)
+    full_subdir_path = str(os.path.join(settings['benchmark_output_path'], settings['met_subdir_name']))
     save_results(consolidated_df, settings['benchmark_output_path'], ts, full_filename, settings['met_subdir_name'])
 
     # provide information about this run: Python version, etc.
-    generate_info(settings, ts, "met_command" ,  settings['met_subdir_name'])
+    generate_info(settings, ts, "met_command" ,  full_subdir_path)
 
 def run_benchmark():
     """
