@@ -393,24 +393,25 @@ def run_met_cli(settings:dict, ts, files_from_ctrack:tuple) -> None:
 
     met_command = settings['met_command']
     summary_filename, details_filename = files_from_ctrack
+    full_benchmark_path = str(os.path.join(settings['benchmark_output_path'], settings['met_subdir_name']))
+    os.makedirs(full_benchmark_path, exist_ok=True)
 
     # Run the MET command for the specified number of runs
     for _ in range(settings['num_runs']):
         subprocess.run(met_command, shell=True)
 
     # Extract the benchmark data
-    full_subdir_path = str(os.path.join(settings['benchmark_output_path'], settings['met_subdir_name']))
     full_filename = ts
     if len(settings['filename'])  > 0 :
         full_filename = settings['filename'].join(ts)
-    summary_info = extract_summary_info(summary_filename, full_subdir_path)
-    detail_info = extract_detail_info(details_filename, full_subdir_path)
+    summary_info = extract_summary_info(summary_filename, full_benchmark_path)
+    detail_info = extract_detail_info(details_filename, full_benchmark_path)
 
     consolidated_df = consolidate_info(summary_info, detail_info)
     save_results(consolidated_df, settings['benchmark_output_path'], ts, full_filename, settings['met_subdir_name'])
 
     # provide information about this run: Python version, etc.
-    generate_info(settings, ts, "met_command" ,  full_subdir_path)
+    generate_info(settings, ts, "met_command" ,  full_benchmark_path)
 
 def run_benchmark():
     """
