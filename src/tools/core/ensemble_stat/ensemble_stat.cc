@@ -1021,10 +1021,11 @@ void process_point_obs(int i_nc) {
 
    const int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : obs_count);
 
-   int   obs_qty_idx_block[buf_size];
-   float obs_arr_block[buf_size][OBS_ARRAY_LEN];
-   float obs_arr[OBS_ARRAY_LEN], hdr_arr[HDR_ARRAY_LEN];
-   int  hdr_typ_arr[HDR_TYPE_ARR_LEN];
+   vector<int> obs_qty_idx_block(buf_size);
+   vector<float[OBS_ARRAY_LEN]> obs_arr_block(buf_size);
+   float obs_arr[OBS_ARRAY_LEN];
+   float hdr_arr[HDR_ARRAY_LEN];
+   int   hdr_typ_arr[HDR_TYPE_ARR_LEN];
    ConcatString hdr_typ_str;
    ConcatString hdr_sid_str;
    ConcatString hdr_vld_str;
@@ -1041,11 +1042,14 @@ void process_point_obs(int i_nc) {
 #ifdef WITH_PYTHON
       if (use_python)
          status = met_point_obs->get_point_obs_data()->fill_obs_buf(
-                             buf_size2, i_start, (float *)obs_arr_block, obs_qty_idx_block);
+                             buf_size2, i_start,
+                             (float *) obs_arr_block.data(),
+                             obs_qty_idx_block.data());
       else
 #endif
-         status = nc_point_obs.read_obs_data(buf_size2, i_start, (float *)obs_arr_block,
-                                             obs_qty_idx_block, (char *)0);
+         status = nc_point_obs.read_obs_data(buf_size2, i_start,
+                                             (float *) obs_arr_block.data(),
+                                             obs_qty_idx_block.data(), nullptr);
       if (!status) exit(1);
 
       // Process each observation in the file
