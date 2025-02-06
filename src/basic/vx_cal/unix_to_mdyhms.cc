@@ -115,7 +115,7 @@ transform(t_month_str.begin(), t_month_str.end(),
 
 for (int idx=1; idx<=12; idx++) {
    if (t_month_str == short_month_name[idx] ||
-      t_month_str == month_name[idx]) {
+       t_month_str == month_name[idx]) {
       month = idx;
       break;
    }
