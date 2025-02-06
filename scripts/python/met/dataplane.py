@@ -9,6 +9,15 @@ from met.logger import met_base, met_base_tools
 
 ###########################################
 
+# define JSON encoder to convert numpy types to python
+class NumpyTypeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.generic):
+            return obj.item()
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
+
 class dataplane(met_base):
 
    KEEP_XARRAY = True
@@ -229,7 +238,7 @@ class dataplane(met_base):
       else:
          attrs = met_in.attrs
       with open(tmp_filename,'w') as json_fh:
-          json.dump(str(attrs), json_fh)
+          json.dump(attrs, json_fh, cls=NumpyTypeEncoder)
 
       met_dp_data = met_base_tools.convert_to_ndarray(met_in.met_data)
       numpy_dump_name = met_base_tools.get_numpy_filename(tmp_filename)
