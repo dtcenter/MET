@@ -2251,8 +2251,8 @@ static unixtime find_valid_time(NcVar time_var) {
    if( IS_VALID_NC(time_var) || get_dim_count(&time_var) < 2) {
       int time_count = get_dim_size(&time_var, 0);
 
-      double time_values [time_count + 1];
-      if (get_nc_data(&time_var, time_values)) {
+      vector<double> time_values(time_count + 1);
+      if (get_nc_data(&time_var, time_values.data())) {
          valid_time = compute_unixtime(&time_var, time_values[0]);
       }
       else {
@@ -3050,10 +3050,8 @@ static void set_adp_gc_values(NcVar var_adp_qc) {
 
    if (get_nc_att_value(&var_adp_qc, (ConcatString)"flag_meanings", att_flag_meanings)) {
       StringArray flag_meanings = to_lower(att_flag_meanings).split(" ");
-      unsigned short flag_values[flag_meanings.n()+128];    /* reserve enough storage */
-      for (int i=0; i<flag_meanings.n(); i++) flag_values[i] = (unsigned short)-1;
-
-      if (get_nc_att_values(&var_adp_qc, att_name_values, flag_values)) {
+      vector<unsigned short> flag_values(flag_meanings.n() + 128, (unsigned short) -1);
+      if (get_nc_att_values(&var_adp_qc, att_name_values, flag_values.data())) {
          int idx;
          if (flag_meanings.has("low_confidence_smoke_detection_qf", idx)) {
             adp_qc_low = (flag_values[idx] >> 2) & 0x03;

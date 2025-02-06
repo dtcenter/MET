@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 
 #include <netcdf>
+#include <vector>
 
 #include "vx_log.h"
 #include "nc_utils.h"
@@ -175,15 +176,10 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
             value = att_value;
          }
          catch (exceptions::NcChar &ex) {
-            int num_elements_sub = 8096;
-            int num_elements = att->getAttLength();;
-            char *att_value[num_elements];
-            for (int i = 0; i < num_elements; i++ ) {
-               att_value[i] = (char*) calloc(num_elements_sub, sizeof(char));
-            }
+            vector<char> att_value(att->getAttLength());
             try {
-               att->getValues(att_value);
-               value = att_value[0];
+               att->getValues(att_value.data());
+               value = att_value.data();
             }
             catch (exceptions::NcException &ex2) {
                mlog << Warning << "\n" << method_name
@@ -192,7 +188,6 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
                     << GET_NC_TYPE_NAME_P(att) << " type).\n"
                     << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
             }
-            for (int i = 0; i < num_elements; i++ ) delete att_value[i];
          }
       }
       else { // MET-788: to handle a custom modified NetCDF
@@ -232,12 +227,6 @@ void get_att_value_doubles(const NcAtt *att, NumArray &value) {
    return;
 }
 
-double *get_att_value_doubles(const NcAtt *att) {
-   double *values = new double[att->getAttLength()];
-   att->getValues(values);
-   return values;
-}
-
 ////////////////////////////////////////////////////////////////////////
 
 float get_att_value_float(const NcAtt *att) {
@@ -253,6 +242,8 @@ short get_att_value_short(const NcAtt *att) {
    att->getValues(&value);
    return value;
 }
+
+////////////////////////////////////////////////////////////////////////
 
 unsigned short get_att_value_ushort(const NcAtt *att) {
    unsigned short value = bad_data_int;
@@ -1057,7 +1048,7 @@ ConcatString* get_string_val(NcFile * nc, const char * var_name, const int index
 
 ConcatString* get_string_val(NcVar *var, const int index,
                              const int len, ConcatString &tmp_cs) {
-   char tmp_str[len];
+   vector<char> tmp_str(len);
    vector<size_t> start;
    vector<size_t> count;
    const char *method_name = "get_string_val() ";
@@ -1087,12 +1078,12 @@ ConcatString* get_string_val(NcVar *var, const int index,
    start.push_back(0);
    count.push_back(1);
    count.push_back(len);
-   var->getVar(start, count, &tmp_str);
+   var->getVar(start, count, tmp_str.data());
 
    //
    // Store the character array as a ConcatString
    //
-   tmp_cs = tmp_str;
+   tmp_cs = tmp_str.data();
 
    return &tmp_cs;
 }
@@ -1177,7 +1168,7 @@ double get_nc_time(NcVar * var, const int index) {
       long long vl;
       unixtime ref_ut;
       int buf_len = 512;
-      char *tmp_buf = new char[512];
+      vector<char> tmp_buf(buf_len);
       int dataType = GET_NC_TYPE_ID_P(var);
 
       start.push_back(index);
@@ -1207,8 +1198,8 @@ double get_nc_time(NcVar * var, const int index) {
                count.push_back(buf_len);
             }
             for (int i=0; i<buf_len; i++) tmp_buf[i] = 0;
-            var->getVar(start, count, tmp_buf);
-            parse_time_string(tmp_buf, ref_ut);
+            var->getVar(start, count, tmp_buf.data());
+            parse_time_string(tmp_buf.data(), ref_ut);
             k = ref_ut;
             break;
          case NC_INT:
@@ -1233,7 +1224,6 @@ double get_nc_time(NcVar * var, const int index) {
                  << GET_NC_NAME_P(var) << "\".\n\n";
             exit(1);
       }
-      if (tmp_buf) delete [] tmp_buf;
    }
 
    return k;
@@ -1770,12 +1760,13 @@ bool get_nc_data(NcVar *var, unsigned short *data) {
    if (NC_USHORT == data_type) return_status = get_nc_data_t(var, data);
    else if (NC_SHORT == data_type && has_unsigned_attribute(var)) {
       short fill_value = (short)bad_data_int;
-      NcVarAtt *att_fill_value  = get_nc_att(var, (string)"_FillValue");
+      NcVarAtt *att_fill_value = get_nc_att(var, (string)"_FillValue");
       bool has_fill_value = IS_VALID_NC_P(att_fill_value);
       if (has_fill_value) fill_value = get_att_value_int(att_fill_value);
 
       vector<short> short_data(cell_count);
-      if (return_status = get_nc_data_t(var, short_data.data())) {
+      return_status = get_nc_data_t(var, short_data.data());
+      if (return_status) {
          for (int idx=0; idx<cell_count; idx++) {
             if (has_fill_value && fill_value == short_data[idx])
                data[idx] = (unsigned short)bad_data_int;
@@ -1949,7 +1940,7 @@ bool get_nc_data_to_array(NcVar *var, StringArray *array_buf) {
          NcDim str_dim = var->getDim(dim_count-1);
          int count = get_dim_size(&count_dim);
          int str_len = get_dim_size(&str_dim);
-         char str_buffer[str_len+1];
+         vector<char> str_buffer(str_len+1);
 
          offsets.add(0);
          offsets.add(0);
@@ -1958,12 +1949,12 @@ bool get_nc_data_to_array(NcVar *var, StringArray *array_buf) {
 
          result = true;
          for (int idx=0; idx<count; idx++) {
-            if(!get_nc_data(var, str_buffer, lengths, offsets)) {
+            if(!get_nc_data(var, str_buffer.data(), lengths, offsets)) {
                result = false;
                break;
             }
             else {
-               array_buf->add(str_buffer);
+               array_buf->add(str_buffer.data());
             }
             offsets[0]++;
          }
@@ -2353,16 +2344,16 @@ NcVar get_nc_var(NcFile *nc, const ConcatString &var_name, const char *group_nam
 
 void copy_nc_att_byte(NcFile *nc_to, NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
-   ncbyte value[att_length];
-   from_att->getValues((void *)&value);
-   nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, (void *)value);
+   vector<ncbyte> value(att_length);
+   from_att->getValues(value.data());
+   nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
 
 void copy_nc_att_char(NcFile *nc_to, NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
-   char value[att_length];
-   from_att->getValues((void *)&value);
-   nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, (void *)value);
+   vector<char> value(att_length);
+   from_att->getValues(value.data());
+   nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
 
 void copy_nc_att_double(NcFile *nc_to, NcGroupAtt *from_att) {
@@ -2373,9 +2364,9 @@ void copy_nc_att_double(NcFile *nc_to, NcGroupAtt *from_att) {
       nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      double values[att_length];
-      from_att->getValues(&values);
-      nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<double> values(att_length);
+      from_att->getValues(values.data());
+      nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 
@@ -2387,9 +2378,9 @@ void copy_nc_att_float(NcFile *nc_to, NcGroupAtt *from_att) {
       nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      float values[att_length];
-      from_att->getValues(&values);
-      nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<float> values(att_length);
+      from_att->getValues(values.data());
+      nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 
@@ -2401,9 +2392,9 @@ void copy_nc_att_int(NcFile *nc_to, NcGroupAtt *from_att) {
       nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      int values[att_length];
-      from_att->getValues(&values);
-      nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<int> values(att_length);
+      from_att->getValues(values.data());
+      nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 
@@ -2415,9 +2406,9 @@ void copy_nc_att_int64(NcFile *nc_to, NcGroupAtt *from_att) {
       nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      long long values[att_length];
-      from_att->getValues(&values);
-      nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<long long> values(att_length);
+      from_att->getValues(values.data());
+      nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 
@@ -2429,9 +2420,9 @@ void copy_nc_att_short(NcFile *nc_to, NcGroupAtt *from_att) {
       nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      short values[att_length];
-      from_att->getValues(&values);
-      nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<short> values(att_length);
+      from_att->getValues(values.data());
+      nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 
@@ -2439,9 +2430,9 @@ void copy_nc_att_short(NcFile *nc_to, NcGroupAtt *from_att) {
 
 void copy_nc_att_char(NcVar *var_to, NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
-   char value[att_length];
-   from_att->getValues((void *)&value);
-   var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, (void *)value);
+   vector<char> value(att_length);
+   from_att->getValues(value.data());
+   var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
 
 void copy_nc_att_double(NcVar *var_to, NcGroupAtt *from_att) {
@@ -2452,9 +2443,9 @@ void copy_nc_att_double(NcVar *var_to, NcGroupAtt *from_att) {
       var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      double values[att_length];
-      from_att->getValues(&values);
-      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<double> values(att_length);
+      from_att->getValues(values.data());
+      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 void copy_nc_att_float(NcVar *var_to, NcGroupAtt *from_att) {
@@ -2465,9 +2456,9 @@ void copy_nc_att_float(NcVar *var_to, NcGroupAtt *from_att) {
       var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      float values[att_length];
-      from_att->getValues(&values);
-      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<float> values(att_length);
+      from_att->getValues(values.data());
+      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 
@@ -2479,9 +2470,9 @@ void copy_nc_att_int(NcVar *var_to, NcGroupAtt *from_att) {
       var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      int values[att_length];
-      from_att->getValues(&values);
-      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<int> values(att_length);
+      from_att->getValues(values.data());
+      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 
@@ -2493,9 +2484,9 @@ void copy_nc_att_int64(NcVar *var_to, NcGroupAtt *from_att) {
       var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      long long values[att_length];
-      from_att->getValues(&values);
-      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<long long> values(att_length);
+      from_att->getValues(values.data());
+      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 
@@ -2507,9 +2498,9 @@ void copy_nc_att_short(NcVar *var_to, NcGroupAtt *from_att) {
       var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      short values[att_length];
-      from_att->getValues(&values);
-      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<short> values(att_length);
+      from_att->getValues(values.data());
+      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 
@@ -2517,16 +2508,16 @@ void copy_nc_att_short(NcVar *var_to, NcGroupAtt *from_att) {
 
 void copy_nc_att_byte(NcVar *var_to, NcVarAtt *from_att) {
    size_t att_length = from_att->getAttLength();
-   ncbyte value[att_length];
-   from_att->getValues((void *)&value);
-   var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, (void *)value);
+   vector<ncbyte> value(att_length);
+   from_att->getValues(value.data());
+   var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
 
 void copy_nc_att_char(NcVar *var_to, NcVarAtt *from_att) {
    size_t att_length = from_att->getAttLength();
-   char value[att_length];
-   from_att->getValues((void *)&value);
-   var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, (void *)value);
+   vector<char> value(att_length);
+   from_att->getValues(value.data());
+   var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
 
 void copy_nc_att_double(NcVar *var_to, NcVarAtt *from_att) {
@@ -2537,9 +2528,9 @@ void copy_nc_att_double(NcVar *var_to, NcVarAtt *from_att) {
       var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      double values[att_length];
-      from_att->getValues(&values);
-      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<double> values(att_length);
+      from_att->getValues(values.data());
+      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 
@@ -2551,9 +2542,9 @@ void copy_nc_att_float(NcVar *var_to, NcVarAtt *from_att) {
       var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      float values[att_length];
-      from_att->getValues(&values);
-      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<float> values(att_length);
+      from_att->getValues(values.data());
+      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 
@@ -2565,9 +2556,9 @@ void copy_nc_att_int(NcVar *var_to, NcVarAtt *from_att) {
       var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      int values[att_length];
-      from_att->getValues(&values);
-      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<int> values(att_length);
+      from_att->getValues(values.data());
+      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 
@@ -2579,9 +2570,9 @@ void copy_nc_att_int64(NcVar *var_to, NcVarAtt *from_att) {
       var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      long long values[att_length];
-      from_att->getValues(&values);
-      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<long long> values(att_length);
+      from_att->getValues(values.data());
+      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 
@@ -2593,9 +2584,9 @@ void copy_nc_att_short(NcVar *var_to, NcVarAtt *from_att) {
       var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), value);
    }
    else {
-      short values[att_length];
-      from_att->getValues(&values);
-      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values);
+      vector<short> values(att_length);
+      from_att->getValues(values.data());
+      var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
 
@@ -2780,7 +2771,6 @@ void copy_nc_atts(NcVar *var_from, NcVar *var_to, const bool all_attrs) {
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_char(NcVar *var_from, NcVar *var_to, int data_size) {
-   //const string method_name = "copy_nc_data_char";
    vector<char> data(data_size);
    var_from->getVar(data.data());
    var_to->putVar(data.data());
@@ -2789,7 +2779,6 @@ void copy_nc_data_char(NcVar *var_from, NcVar *var_to, int data_size) {
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_double(NcVar *var_from, NcVar *var_to, int data_size) {
-   //const string method_name = "copy_nc_data_double";
    vector<double> data(data_size);
    var_from->getVar(data.data());
    var_to->putVar(data.data());
@@ -2798,7 +2787,6 @@ void copy_nc_data_double(NcVar *var_from, NcVar *var_to, int data_size) {
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_float(NcVar *var_from, NcVar *var_to, int data_size) {
-   //const string method_name = "copy_nc_data_float";
    vector<float> data(data_size);
    var_from->getVar(data.data());
    var_to->putVar(data.data());
@@ -2807,7 +2795,6 @@ void copy_nc_data_float(NcVar *var_from, NcVar *var_to, int data_size) {
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_int(NcVar *var_from, NcVar *var_to, int data_size) {
-   //const string method_name = "copy_nc_data_int";
    vector<int> data(data_size);
    var_from->getVar(data.data());
    var_to->putVar(data.data());
@@ -2816,7 +2803,6 @@ void copy_nc_data_int(NcVar *var_from, NcVar *var_to, int data_size) {
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_short(NcVar *var_from, NcVar *var_to, int data_size) {
-   //const string method_name = "copy_nc_data_double";
    vector<short> data(data_size);
    var_from->getVar(data.data());
    var_to->putVar(data.data());
@@ -2825,11 +2811,9 @@ void copy_nc_data_short(NcVar *var_from, NcVar *var_to, int data_size) {
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_string(NcVar *var_from, NcVar *var_to, int data_size) {
-   //const string method_name = "copy_nc_data_string";
-   string *data = new string[data_size];
-   var_from->getVar(data);
-   var_to->putVar(data);
-   delete[] data;
+   vector<string> data(data_size);
+   var_from->getVar(data.data());
+   var_to->putVar(data.data());
 }
 
 ////////////////////////////////////////////////////////////////////////
