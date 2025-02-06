@@ -229,7 +229,7 @@ class dataplane(met_base):
       else:
          attrs = met_in.attrs
       with open(tmp_filename,'w') as json_fh:
-          json.dump(attrs, json_fh)
+          json.dump(str(attrs), json_fh)
 
       met_dp_data = met_base_tools.convert_to_ndarray(met_in.met_data)
       numpy_dump_name = met_base_tools.get_numpy_filename(tmp_filename)
