@@ -446,7 +446,7 @@ int ModeNcOutputFile::count_objects(NcVar * var) const
 {
 
 int n = 0;
-int Nxy = Ny * Ny;
+int Nxy = Nx * Ny;
 vector<int> v(Nxy);
 LongArray offsets;  // { 0,  0};
 LongArray lengths;  // {Ny, Nx}; and NOT (x, y)!
