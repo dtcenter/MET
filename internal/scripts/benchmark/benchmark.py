@@ -319,13 +319,14 @@ def check_settings(settings:dict) -> None:
     # if the base output dir does not exist, create it
     os.makedirs(output_base, exist_ok=True)
 
-def generate_info(settings:dict, ts:str, description: str, subdir: str) -> None:
+def generate_info(settings:dict, ts:str, description: str, subdir: str, additional:str=None) -> None:
     """
        Generate a text file with information on the current benchmark run
     :param settings: dictionary representation of the settings specified in the YAML config file
     :param ts: timestamp
     :param description: a description of the run
     :param subdir: the use case subdirectory (full path)
+    :param additional: any other descriptive information, such as current env variables. Default is None
     :return: None, write an output text file in the output path specified in the YAML config file
     """
     info_file = "info_" + ts + ".txt"
@@ -334,6 +335,8 @@ def generate_info(settings:dict, ts:str, description: str, subdir: str) -> None:
         f.write(f"Python version info: {sys.version}\n")
         f.write(f"Timestamp: {ts}\n")
         f.write(f"Description of Use case or MET invocation (optional) : {description}\n")
+        if additional:
+            f.write(f"Additional information: {additional}")
         f.write(f"Number of times run: {settings['num_runs']}\n")
 
 def run_usecases(settings:dict, ts:str, files_from_ctrack:tuple)->None:
@@ -411,7 +414,23 @@ def run_met_cli(settings:dict, ts, files_from_ctrack:tuple) -> None:
     save_results(consolidated_df, settings['benchmark_output_path'], ts, full_filename, settings['met_subdir_name'])
 
     # provide information about this run: Python version, etc.
-    generate_info(settings, ts, met_command ,  full_benchmark_path)
+
+    #get the METPLUS_ envs set for this MET run
+    all_envs = os.environ
+    mp_envs: str = "METPLUS Environment variables in this run: "
+    newline = '\n'
+
+    for cur in all_envs:
+        if cur.startswith("METPLUS_"):
+            mp_envs = f"{mp_envs} {newline} {cur}"
+
+    metplus_env = []
+    for cur_env in all_envs:
+        if cur_env.startswith("METPLUS_"):
+            metplus_env.append(cur_env)
+
+
+    generate_info(settings, ts, met_command, mp_envs, full_benchmark_path)
 
 def run_benchmark():
     """
