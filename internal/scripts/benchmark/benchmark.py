@@ -331,13 +331,12 @@ def generate_info(settings:dict, ts:str, description: str, subdir: str, addition
     """
     info_file = "info_" + ts + ".txt"
     full_path = os.path.join(subdir, info_file)
-    if additional is None:
-        additional = "None "
     with open(full_path, 'w') as f:
         f.write(f"Python version info: {sys.version}\n")
         f.write(f"Timestamp: {ts}\n")
         f.write(f"Description of Use case or MET invocation (optional) : {description}\n")
-        f.write(f"Additional information: {additional}")
+        if additional:
+            f.write(f"Additional information: {additional}")
         f.write(f"Number of times run: {settings['num_runs']}\n")
 
 def run_usecases(settings:dict, ts:str, files_from_ctrack:tuple)->None:
@@ -431,7 +430,7 @@ def run_met_cli(settings:dict, ts, files_from_ctrack:tuple) -> None:
             metplus_env.append(cur_env)
 
 
-    generate_info(settings, ts, met_command, mp_envs, full_benchmark_path)
+    generate_info(settings, ts, met_command, full_benchmark_path, mp_envs)
 
 def run_benchmark():
     """
