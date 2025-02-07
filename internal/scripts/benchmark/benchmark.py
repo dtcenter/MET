@@ -422,7 +422,7 @@ def run_met_cli(settings:dict, ts, files_from_ctrack:tuple) -> None:
 
     for cur in all_envs:
         if cur.startswith("METPLUS_"):
-            mp_envs = f"{mp_envs} {newline} {cur}"
+            mp_envs = f"{mp_envs} {newline} {cur}: {os.environ[cur]}"
 
     metplus_env = []
     for cur_env in all_envs:
