@@ -945,10 +945,10 @@ void process_madis_metar(NcFile *&f_in) {
       vector<char> hdr_typ_arr(buf_size * hdr_typ_len);
       vector<char> hdr_sid_arr(buf_size * hdr_sid_len);
 
-      get_nc_data(&in_hdr_vld_var, &tmp_dbl_arr[0], buf_size, i_hdr_s);
-      get_nc_data(&in_hdr_lat_var, &hdr_lat_arr[0], buf_size, i_hdr_s);
-      get_nc_data(&in_hdr_lon_var, &hdr_lon_arr[0], buf_size, i_hdr_s);
-      get_filtered_nc_data(in_hdr_elv_var, &hdr_elv_arr[0], buf_size, i_hdr_s, "elevation");
+      get_nc_data(&in_hdr_vld_var, tmp_dbl_arr.data(), buf_size, i_hdr_s);
+      get_nc_data(&in_hdr_lat_var, hdr_lat_arr.data(), buf_size, i_hdr_s);
+      get_nc_data(&in_hdr_lon_var, hdr_lon_arr.data(), buf_size, i_hdr_s);
+      get_filtered_nc_data(in_hdr_elv_var, hdr_elv_arr.data(), buf_size, i_hdr_s, "elevation");
 
       if (IS_VALID_NC(seaLevelPressQty_var)) get_nc_data(&seaLevelPressQty_var, seaLevelPressQty.data(), buf_size, i_hdr_s);
       if (IS_VALID_NC(visibilityQty_var))    get_nc_data(&visibilityQty_var, visibilityQty.data(), buf_size, i_hdr_s);
@@ -1018,7 +1018,7 @@ void process_madis_metar(NcFile *&f_in) {
          //
          // Process the station name.
          //
-         hdr_sid = hdr_sid_arr.data()[i_idx * hdr_sid_len];
+         hdr_sid = &hdr_sid_arr.data()[i_idx * hdr_sid_len];
 
          //
          // Check masking regions.
@@ -1030,7 +1030,7 @@ void process_madis_metar(NcFile *&f_in) {
          // For METAR or SPECI, encode as ADPSFC.
          // Otherwise, use value from file.
          //
-         hdr_typ = hdr_typ_arr.data()[i_idx * hdr_typ_len];
+         hdr_typ = &hdr_typ_arr.data()[i_idx * hdr_typ_len];
          if(hdr_typ == metar_str || hdr_typ == "SPECI") hdr_typ = "ADPSFC";
 
          //
@@ -1566,7 +1566,7 @@ void process_madis_raob(NcFile *&f_in) {
 	 //
          // Process the station name.
          //
-         hdr_sid = hdr_sid_arr.data()[i_idx * hdr_sid_len];
+         hdr_sid = &hdr_sid_arr.data()[i_idx * hdr_sid_len];
 
          //
          // Check masking regions.
@@ -2137,7 +2137,7 @@ void process_madis_profiler(NcFile *&f_in) {
          //
          // Process the station name.
          //
-         hdr_sid = hdr_sid_arr.data()[i_idx * hdr_sid_len];
+         hdr_sid = &hdr_sid_arr.data()[i_idx * hdr_sid_len];
 
          //
          // Check masking regions.
@@ -2457,7 +2457,7 @@ void process_madis_maritime(NcFile *&f_in) {
          //
          // Process the station name.
          //
-         hdr_sid = hdr_sid_arr.data()[i_idx * hdr_sid_len];
+         hdr_sid = &hdr_sid_arr.data()[i_idx * hdr_sid_len];
 
          //
          // Check masking regions.
@@ -2906,7 +2906,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          //
          // Process the station name.
          //
-         hdr_sid = hdr_sid_arr.data()[i_idx * hdr_sid_len];
+         hdr_sid = &hdr_sid_arr.data()[i_idx * hdr_sid_len];
 
          //
          // Check masking regions.
@@ -3243,7 +3243,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    cur[0] = rec_beg;
    dim[0] = buf_size;
    get_nc_data(&in_var, levels.data(), buf_size, cur[0]);
-   if (IS_VALID_NC(in_nLevelsQty_var)) get_nc_data(&in_nLevelsQty_var, (char *)&levelsQty, buf_size, cur[0]);
+   if (IS_VALID_NC(in_nLevelsQty_var)) get_nc_data(&in_nLevelsQty_var, levelsQty.data(), buf_size, cur[0]);
    for(i_hdr=0; i_hdr<buf_size; i_hdr++) {
       nlvl1 += levels[i_hdr];
    }
@@ -3302,11 +3302,11 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       if (IS_VALID_NC(in_windSpeedQty_var))   get_nc_data(&in_windSpeedQty_var, windSpeedQty_arr.data(), dim, cur);
       if (IS_VALID_NC(in_altitudeQty_var))    get_nc_data(&in_altitudeQty_var, altitudeQty_arr.data(), dim, cur);
 
-      get_filtered_nc_data_2d(in_hdr_tob_var,     (int *)&obsTimeOfDay_arr,  dim, cur, "obsTimeOfDay", data_cnt);
-      get_filtered_nc_data_2d(in_temperature_var, (float *)&temperature_arr, dim, cur, "temperature", data_cnt);
-      get_filtered_nc_data_2d(in_dewpoint_var,    (float *)&dewpoint_arr,    dim, cur, "dewpoint", data_cnt);
-      get_filtered_nc_data_2d(in_windDir_var,     (float *)&windDir_arr,     dim, cur, "windDir", data_cnt);
-      get_filtered_nc_data_2d(in_windSpeed_var,   (float *)&windSpeed_arr,   dim, cur, "windSpeed", data_cnt);
+      get_filtered_nc_data_2d(in_hdr_tob_var,     obsTimeOfDay_arr.data(), dim, cur, "obsTimeOfDay", data_cnt);
+      get_filtered_nc_data_2d(in_temperature_var, temperature_arr.data(),  dim, cur, "temperature", data_cnt);
+      get_filtered_nc_data_2d(in_dewpoint_var,    dewpoint_arr.data(),     dim, cur, "dewpoint", data_cnt);
+      get_filtered_nc_data_2d(in_windDir_var,     windDir_arr.data(),      dim, cur, "windDir", data_cnt);
+      get_filtered_nc_data_2d(in_windSpeed_var,   windSpeed_arr.data(),    dim, cur, "windSpeed", data_cnt);
 
       dim[1] = hdr_sid_len;
       get_nc_data(&in_hdr_sid_var, hdr_sid_arr.data(), dim, cur);
@@ -3325,7 +3325,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
          //
          // Process the station i.e. airport name.
          //
-         hdr_sid = hdr_sid_arr.data()[i_idx * hdr_sid_len];
+         hdr_sid = &hdr_sid_arr.data()[i_idx * hdr_sid_len];
 
          //
          // Process the observation time.
