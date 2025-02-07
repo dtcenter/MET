@@ -5,18 +5,9 @@ import numpy as np
 import xarray as xr
 
 from importlib import util as import_util
-from met.logger import met_base, met_base_tools
+from met.logger import met_base, met_base_tools, NumpyTypeEncoder
 
 ###########################################
-
-# define JSON encoder to convert numpy types to python
-class NumpyTypeEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.generic):
-            return obj.item()
-        elif isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return json.JSONEncoder.default(self, obj)
 
 class dataplane(met_base):
 

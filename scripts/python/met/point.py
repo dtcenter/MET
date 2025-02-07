@@ -52,7 +52,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 import pandas as pd
 
-from met.logger import met_base, met_base_tools
+from met.logger import met_base, met_base_tools, NumpyTypeEncoder
 
 
 COUNT_SHOW = 30
@@ -388,7 +388,7 @@ class met_base_point(met_base):
       point_array_list[11] = self.convert_to_ndarray(self.obs_qty)
 
       with open(tmp_filename,'w') as json_fh:
-         json.dump(json_dict, json_fh)
+         json.dump(json_dict, json_fh, cls=NumpyTypeEncoder)
 
       numpy_dump_name = met_base_tools.get_numpy_filename(tmp_filename)
       #np.save(numpy_dump_name, self.convert_to_ndarray(point_array_list))
