@@ -927,23 +927,23 @@ void process_madis_metar(NcFile *&f_in) {
       vector<float> precip24Hour(buf_size);
       vector<float> snowCover(buf_size);
 
-      vector<char> seaLevelPressQty(buf_size);
-      vector<char> visibilityQty(buf_size);
-      vector<char> temperatureQty(buf_size);
-      vector<char> dewpointQty(buf_size);
-      vector<char> windDirQty(buf_size);
-      vector<char> windSpeedQty(buf_size);
-      vector<char> windGustQty(buf_size);
-      vector<char> minTemp24HourQty(buf_size);
-      vector<char> maxTemp24HourQty(buf_size);
-      vector<char> precip1HourQty(buf_size);
-      vector<char> precip3HourQty(buf_size);
-      vector<char> precip6HourQty(buf_size);
-      vector<char> precip24HourQty(buf_size);
-      vector<char> snowCoverQty(buf_size);
+      vector<char> seaLevelPressQty(buf_size, 0);
+      vector<char> visibilityQty(buf_size, 0);
+      vector<char> temperatureQty(buf_size, 0);
+      vector<char> dewpointQty(buf_size, 0);
+      vector<char> windDirQty(buf_size, 0);
+      vector<char> windSpeedQty(buf_size, 0);
+      vector<char> windGustQty(buf_size, 0);
+      vector<char> minTemp24HourQty(buf_size, 0);
+      vector<char> maxTemp24HourQty(buf_size, 0);
+      vector<char> precip1HourQty(buf_size, 0);
+      vector<char> precip3HourQty(buf_size, 0);
+      vector<char> precip6HourQty(buf_size, 0);
+      vector<char> precip24HourQty(buf_size, 0);
+      vector<char> snowCoverQty(buf_size, 0);
 
-      vector<vector<char>> hdr_typ_arr(buf_size, vector<char>(hdr_typ_len));
-      vector<vector<char>> hdr_sid_arr(buf_size, vector<char>(hdr_sid_len));
+      vector<char> hdr_typ_arr(buf_size * hdr_typ_len);
+      vector<char> hdr_sid_arr(buf_size * hdr_sid_len);
 
       get_nc_data(&in_hdr_vld_var, &tmp_dbl_arr[0], buf_size, i_hdr_s);
       get_nc_data(&in_hdr_lat_var, &hdr_lat_arr[0], buf_size, i_hdr_s);
@@ -951,33 +951,19 @@ void process_madis_metar(NcFile *&f_in) {
       get_filtered_nc_data(in_hdr_elv_var, &hdr_elv_arr[0], buf_size, i_hdr_s, "elevation");
 
       if (IS_VALID_NC(seaLevelPressQty_var)) get_nc_data(&seaLevelPressQty_var, seaLevelPressQty.data(), buf_size, i_hdr_s);
-      else memset(seaLevelPressQty.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(visibilityQty_var))    get_nc_data(&visibilityQty_var, visibilityQty.data(), buf_size, i_hdr_s);
-      else memset(visibilityQty.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(temperatureQty_var))   get_nc_data(&temperatureQty_var, temperatureQty.data(), buf_size, i_hdr_s);
-      else memset(temperatureQty.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(dewpointQty_var))      get_nc_data(&dewpointQty_var, dewpointQty.data(), buf_size, i_hdr_s);
-      else memset(dewpointQty.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(windDirQty_var))       get_nc_data(&windDirQty_var, windDirQty.data(), buf_size, i_hdr_s);
-      else memset(windDirQty.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(windSpeedQty_var))     get_nc_data(&windSpeedQty_var, windSpeedQty.data(), buf_size, i_hdr_s);
-      else memset(windSpeedQty.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(windGustQty_var))      get_nc_data(&windGustQty_var, windGustQty.data(), buf_size, i_hdr_s);
-      else memset(windGustQty.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(minTemp24HourQty_var)) get_nc_data(&minTemp24HourQty_var, minTemp24HourQty.data(), buf_size, i_hdr_s);
-      else memset(minTemp24HourQty.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(maxTemp24HourQty_var)) get_nc_data(&maxTemp24HourQty_var, maxTemp24HourQty.data(), buf_size, i_hdr_s);
-      else memset(maxTemp24HourQty.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(precip1HourQty_var))   get_nc_data(&precip1HourQty_var, precip1HourQty.data(), buf_size, i_hdr_s);
-      else memset(precip1HourQty.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(precip3HourQty_var))   get_nc_data(&precip3HourQty_var, precip3HourQty.data(), buf_size, i_hdr_s);
-      else memset(precip3HourQty.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(precip6HourQty_var))   get_nc_data(&precip6HourQty_var, precip6HourQty.data(), buf_size, i_hdr_s);
-      else memset(precip6HourQty.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(precip24HourQty_var))  get_nc_data(&precip24HourQty_var, precip24HourQty.data(), buf_size, i_hdr_s);
-      else memset(precip24HourQty.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(snowCoverQty_var))     get_nc_data(&snowCoverQty_var, snowCoverQty.data(), buf_size, i_hdr_s);
-      else memset(snowCoverQty.data(), 0, buf_size*sizeof(char));
 
       get_filtered_nc_data(seaLevelPress_var,  seaLevelPress.data(), buf_size, i_hdr_s, "seaLevelPress" );
       get_filtered_nc_data(visibility_var,     visibility.data(),    buf_size, i_hdr_s, "visibility"    );
@@ -996,9 +982,9 @@ void process_madis_metar(NcFile *&f_in) {
 
       dim[0] = buf_size;
       dim[1] = hdr_typ_len;
-      get_nc_data(&in_hdr_typ_var, (char *)&hdr_typ_arr[0], dim, cur);
+      get_nc_data(&in_hdr_typ_var, hdr_typ_arr.data(), dim, cur);
       dim[1] = hdr_sid_len;
-      get_nc_data(&in_hdr_sid_var, (char *)&hdr_sid_arr[0], dim, cur);
+      get_nc_data(&in_hdr_sid_var, hdr_sid_arr.data(), dim, cur);
 
       for (i_idx=0; i_idx<buf_size; i_idx++) {
 
@@ -1030,22 +1016,22 @@ void process_madis_metar(NcFile *&f_in) {
          hdr_arr[2] = hdr_elv_arr[i_idx];
 
          //
+         // Process the station name.
+         //
+         hdr_sid = hdr_sid_arr.data()[i_idx * hdr_sid_len];
+
+         //
          // Check masking regions.
          //
-         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid_arr[i_idx].data())) continue;
+         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid.c_str())) continue;
 
          //
          // Process the header type.
          // For METAR or SPECI, encode as ADPSFC.
          // Otherwise, use value from file.
          //
-         hdr_typ = hdr_typ_arr[i_idx].data();
+         hdr_typ = hdr_typ_arr.data()[i_idx * hdr_typ_len];
          if(hdr_typ == metar_str || hdr_typ == "SPECI") hdr_typ = "ADPSFC";
-
-         //
-         // Process the station name.
-         //
-         hdr_sid = hdr_sid_arr[i_idx].data();
 
          //
          // Process the observation time.
@@ -1412,55 +1398,55 @@ void process_madis_raob(NcFile *&f_in) {
       vector<float> hdr_elv_arr(buf_size);
       vector<double> tmp_dbl_arr(buf_size);
 
-      vector<vector<float>> prMan(buf_size, vector<float>(maxlvl_manLevel));
-      vector<vector<float>> htMan(buf_size, vector<float>(maxlvl_manLevel));
-      vector<vector<float>> tpMan(buf_size, vector<float>(maxlvl_manLevel));
-      vector<vector<float>> tdMan(buf_size, vector<float>(maxlvl_manLevel));
-      vector<vector<float>> wdMan(buf_size, vector<float>(maxlvl_manLevel));
-      vector<vector<float>> wsMan(buf_size, vector<float>(maxlvl_manLevel));
-      vector<vector<float>> prSigT(buf_size, vector<float>(maxlvl_sigTLevel));
-      vector<vector<float>> tpSigT(buf_size, vector<float>(maxlvl_sigTLevel));
-      vector<vector<float>> tdSigT(buf_size, vector<float>(maxlvl_sigTLevel));
-      vector<vector<float>> htSigW(buf_size, vector<float>(maxlvl_sigWLevel));
-      vector<vector<float>> wdSigW(buf_size, vector<float>(maxlvl_sigWLevel));
-      vector<vector<float>> wsSigW(buf_size, vector<float>(maxlvl_sigWLevel));
-      vector<vector<float>> prSigW(buf_size, vector<float>(maxlvl_sigPresWLevel));
-      vector<vector<float>> wdSigPrW(buf_size, vector<float>(maxlvl_sigPresWLevel));
-      vector<vector<float>> wsSigPrW(buf_size, vector<float>(maxlvl_sigPresWLevel));
-      vector<vector<float>> prTrop(buf_size, vector<float>(maxlvl_mTropNum));
-      vector<vector<float>> tpTrop(buf_size, vector<float>(maxlvl_mTropNum));
-      vector<vector<float>> tdTrop(buf_size, vector<float>(maxlvl_mTropNum));
-      vector<vector<float>> wdTrop(buf_size, vector<float>(maxlvl_mTropNum));
-      vector<vector<float>> wsTrop(buf_size, vector<float>(maxlvl_mTropNum));
-      vector<vector<float>> prMaxW(buf_size, vector<float>(maxlvl_mWndNum));
-      vector<vector<float>> wdMaxW(buf_size, vector<float>(maxlvl_mWndNum));
-      vector<vector<float>> wsMaxW(buf_size, vector<float>(maxlvl_mWndNum));
+      vector<float> prMan(buf_size * maxlvl_manLevel);
+      vector<float> htMan(buf_size * maxlvl_manLevel);
+      vector<float> tpMan(buf_size * maxlvl_manLevel);
+      vector<float> tdMan(buf_size * maxlvl_manLevel);
+      vector<float> wdMan(buf_size * maxlvl_manLevel);
+      vector<float> wsMan(buf_size * maxlvl_manLevel);
+      vector<float> prSigT(buf_size * maxlvl_sigTLevel);
+      vector<float> tpSigT(buf_size * maxlvl_sigTLevel);
+      vector<float> tdSigT(buf_size * maxlvl_sigTLevel);
+      vector<float> htSigW(buf_size * maxlvl_sigWLevel);
+      vector<float> wdSigW(buf_size * maxlvl_sigWLevel);
+      vector<float> wsSigW(buf_size * maxlvl_sigWLevel);
+      vector<float> prSigW(buf_size * maxlvl_sigPresWLevel);
+      vector<float> wdSigPrW(buf_size * maxlvl_sigPresWLevel);
+      vector<float> wsSigPrW(buf_size * maxlvl_sigPresWLevel);
+      vector<float> prTrop(buf_size * maxlvl_mTropNum);
+      vector<float> tpTrop(buf_size * maxlvl_mTropNum);
+      vector<float> tdTrop(buf_size * maxlvl_mTropNum);
+      vector<float> wdTrop(buf_size * maxlvl_mTropNum);
+      vector<float> wsTrop(buf_size * maxlvl_mTropNum);
+      vector<float> prMaxW(buf_size * maxlvl_mWndNum);
+      vector<float> wdMaxW(buf_size * maxlvl_mWndNum);
+      vector<float> wsMaxW(buf_size * maxlvl_mWndNum);
 
-      vector<vector<char>> prManQty(buf_size, vector<char>(maxlvl_manLevel));
-      vector<vector<char>> htManQty(buf_size, vector<char>(maxlvl_manLevel));
-      vector<vector<char>> tpManQty(buf_size, vector<char>(maxlvl_manLevel));
-      vector<vector<char>> tdManQty(buf_size, vector<char>(maxlvl_manLevel));
-      vector<vector<char>> wdManQty(buf_size, vector<char>(maxlvl_manLevel));
-      vector<vector<char>> wsManQty(buf_size, vector<char>(maxlvl_manLevel));
-      vector<vector<char>> prSigTQty(buf_size, vector<char>(maxlvl_sigTLevel));
-      vector<vector<char>> tpSigTQty(buf_size, vector<char>(maxlvl_sigTLevel));
-      vector<vector<char>> tdSigTQty(buf_size, vector<char>(maxlvl_sigTLevel));
-      vector<vector<char>> htSigWQty(buf_size, vector<char>(maxlvl_sigWLevel));
-      vector<vector<char>> wdSigWQty(buf_size, vector<char>(maxlvl_sigWLevel));
-      vector<vector<char>> wsSigWQty(buf_size, vector<char>(maxlvl_sigWLevel));
-      vector<vector<char>> prSigWQty(buf_size, vector<char>(maxlvl_sigPresWLevel));
-      vector<vector<char>> wdSigPrWQty(buf_size, vector<char>(maxlvl_sigPresWLevel));
-      vector<vector<char>> wsSigPrWQty(buf_size, vector<char>(maxlvl_sigPresWLevel));
-      vector<vector<char>> prTropQty(buf_size, vector<char>(maxlvl_mTropNum));
-      vector<vector<char>> tpTropQty(buf_size, vector<char>(maxlvl_mTropNum));
-      vector<vector<char>> tdTropQty(buf_size, vector<char>(maxlvl_mTropNum));
-      vector<vector<char>> wdTropQty(buf_size, vector<char>(maxlvl_mTropNum));
-      vector<vector<char>> wsTropQty(buf_size, vector<char>(maxlvl_mTropNum));
-      vector<vector<char>> prMaxWQty(buf_size, vector<char>(maxlvl_mWndNum));
-      vector<vector<char>> wdMaxWQty(buf_size, vector<char>(maxlvl_mWndNum));
-      vector<vector<char>> wsMaxWQty(buf_size, vector<char>(maxlvl_mWndNum));
+      vector<char> prManQty(buf_size * maxlvl_manLevel, 0);
+      vector<char> htManQty(buf_size * maxlvl_manLevel, 0);
+      vector<char> tpManQty(buf_size * maxlvl_manLevel, 0);
+      vector<char> tdManQty(buf_size * maxlvl_manLevel, 0);
+      vector<char> wdManQty(buf_size * maxlvl_manLevel, 0);
+      vector<char> wsManQty(buf_size * maxlvl_manLevel, 0);
+      vector<char> prSigTQty(buf_size * maxlvl_sigTLevel, 0);
+      vector<char> tpSigTQty(buf_size * maxlvl_sigTLevel, 0);
+      vector<char> tdSigTQty(buf_size * maxlvl_sigTLevel, 0);
+      vector<char> htSigWQty(buf_size * maxlvl_sigWLevel, 0);
+      vector<char> wdSigWQty(buf_size * maxlvl_sigWLevel, 0);
+      vector<char> wsSigWQty(buf_size * maxlvl_sigWLevel, 0);
+      vector<char> prSigWQty(buf_size * maxlvl_sigPresWLevel, 0);
+      vector<char> wdSigPrWQty(buf_size * maxlvl_sigPresWLevel, 0);
+      vector<char> wsSigPrWQty(buf_size * maxlvl_sigPresWLevel, 0);
+      vector<char> prTropQty(buf_size * maxlvl_mTropNum, 0);
+      vector<char> tpTropQty(buf_size * maxlvl_mTropNum, 0);
+      vector<char> tdTropQty(buf_size * maxlvl_mTropNum, 0);
+      vector<char> wdTropQty(buf_size * maxlvl_mTropNum, 0);
+      vector<char> wsTropQty(buf_size * maxlvl_mTropNum, 0);
+      vector<char> prMaxWQty(buf_size * maxlvl_mWndNum, 0);
+      vector<char> wdMaxWQty(buf_size * maxlvl_mWndNum, 0);
+      vector<char> wsMaxWQty(buf_size * maxlvl_mWndNum, 0);
 
-      vector<vector<char>> hdr_sid_arr(buf_size, vector<char>(hdr_sid_len));
+      vector<char> hdr_sid_arr(buf_size * hdr_sid_len);
 
       cur[0] = i_hdr_s;
 
@@ -1484,91 +1470,68 @@ void process_madis_raob(NcFile *&f_in) {
 
       dim[0] = buf_size;
       dim[1] = hdr_sid_len;
-      get_nc_data(&in_hdr_sid_var, (char *)&hdr_sid_arr, dim, cur);
+      get_nc_data(&in_hdr_sid_var, hdr_sid_arr.data(), dim, cur);
 
       dim[0] = buf_size;
       dim[1] = maxlvl_manLevel;
-      if (IS_VALID_NC(prManQty_var)) get_nc_data(&prManQty_var, (char *)&prManQty, dim, cur);
-      else memset(prManQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(htManQty_var)) get_nc_data(&htManQty_var, (char *)&htManQty, dim, cur);
-      else memset(htManQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(tpManQty_var)) get_nc_data(&tpManQty_var, (char *)&tpManQty, dim, cur);
-      else memset(tpManQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(tdManQty_var)) get_nc_data(&tdManQty_var, (char *)&tdManQty, dim, cur);
-      else memset(tdManQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(wdManQty_var)) get_nc_data(&wdManQty_var, (char *)&wdManQty, dim, cur);
-      else memset(wdManQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(wsManQty_var)) get_nc_data(&wsManQty_var, (char *)&wsManQty, dim, cur);
-      else memset(wsManQty.data(), 0, buf_size*dim[1]*sizeof(char));
+      if (IS_VALID_NC(prManQty_var)) get_nc_data(&prManQty_var, prManQty.data(), dim, cur);
+      if (IS_VALID_NC(htManQty_var)) get_nc_data(&htManQty_var, htManQty.data(), dim, cur);
+      if (IS_VALID_NC(tpManQty_var)) get_nc_data(&tpManQty_var, tpManQty.data(), dim, cur);
+      if (IS_VALID_NC(tdManQty_var)) get_nc_data(&tdManQty_var, tdManQty.data(), dim, cur);
+      if (IS_VALID_NC(wdManQty_var)) get_nc_data(&wdManQty_var, wdManQty.data(), dim, cur);
+      if (IS_VALID_NC(wsManQty_var)) get_nc_data(&wsManQty_var, wsManQty.data(), dim, cur);
       dim[1] = maxlvl_sigTLevel;
-      if (IS_VALID_NC(prSigTQty_var)) get_nc_data(&prSigTQty_var, (char *)&prSigTQty, dim, cur);
-      else memset(prSigTQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(tpSigTQty_var)) get_nc_data(&tpSigTQty_var, (char *)&tpSigTQty, dim, cur);
-      else memset(tpSigTQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(tdSigTQty_var)) get_nc_data(&tdSigTQty_var, (char *)&tdSigTQty, dim, cur);
-      else memset(tdSigTQty.data(), 0, buf_size*dim[1]*sizeof(char));
+      if (IS_VALID_NC(prSigTQty_var)) get_nc_data(&prSigTQty_var, prSigTQty.data(), dim, cur);
+      if (IS_VALID_NC(tpSigTQty_var)) get_nc_data(&tpSigTQty_var, tpSigTQty.data(), dim, cur);
+      if (IS_VALID_NC(tdSigTQty_var)) get_nc_data(&tdSigTQty_var, tdSigTQty.data(), dim, cur);
       dim[1] = maxlvl_sigWLevel;
-      if (IS_VALID_NC(htSigWQty_var)) get_nc_data(&htSigWQty_var, (char *)&htSigWQty, dim, cur);
-      else memset(htSigWQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(wdSigWQty_var)) get_nc_data(&wdSigWQty_var, (char *)&wdSigWQty, dim, cur);
-      else memset(wdSigWQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(wsSigWQty_var)) get_nc_data(&wsSigWQty_var, (char *)&wsSigWQty, dim, cur);
-      else memset(wsSigWQty.data(), 0, buf_size*dim[1]*sizeof(char));
+      if (IS_VALID_NC(htSigWQty_var)) get_nc_data(&htSigWQty_var, htSigWQty.data(), dim, cur);
+      if (IS_VALID_NC(wdSigWQty_var)) get_nc_data(&wdSigWQty_var, wdSigWQty.data(), dim, cur);
+      if (IS_VALID_NC(wsSigWQty_var)) get_nc_data(&wsSigWQty_var, wsSigWQty.data(), dim, cur);
       dim[1] = maxlvl_sigPresWLevel;
-      if (IS_VALID_NC(prSigWQty_var  )) get_nc_data(&prSigWQty_var  ,   (char *)&prSigWQty, dim, cur);
-      else memset(prSigWQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(wdSigPrWQty_var)) get_nc_data(&wdSigPrWQty_var, (char *)&wdSigPrWQty, dim, cur);
-      else memset(wdSigPrWQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(wsSigPrWQty_var)) get_nc_data(&wsSigPrWQty_var, (char *)&wsSigPrWQty, dim, cur);
-      else memset(wsSigPrWQty.data(), 0, buf_size*dim[1]*sizeof(char));
+      if (IS_VALID_NC(prSigWQty_var  )) get_nc_data(&prSigWQty_var  ,   prSigWQty.data(), dim, cur);
+      if (IS_VALID_NC(wdSigPrWQty_var)) get_nc_data(&wdSigPrWQty_var, wdSigPrWQty.data(), dim, cur);
+      if (IS_VALID_NC(wsSigPrWQty_var)) get_nc_data(&wsSigPrWQty_var, wsSigPrWQty.data(), dim, cur);
       dim[1] = maxlvl_mTropNum;
-      if (IS_VALID_NC(prTropQty_var)) get_nc_data(&prTropQty_var, (char *)&prTropQty, dim, cur);
-      else memset(prTropQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(tpTropQty_var)) get_nc_data(&tpTropQty_var, (char *)&tpTropQty, dim, cur);
-      else memset(tpTropQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(tdTropQty_var)) get_nc_data(&tdTropQty_var, (char *)&tdTropQty, dim, cur);
-      else memset(tdTropQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(wdTropQty_var)) get_nc_data(&wdTropQty_var, (char *)&wdTropQty, dim, cur);
-      else memset(wdTropQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(wsTropQty_var)) get_nc_data(&wsTropQty_var, (char *)&wsTropQty, dim, cur);
-      else memset(wsTropQty.data(), 0, buf_size*dim[1]*sizeof(char));
+      if (IS_VALID_NC(prTropQty_var)) get_nc_data(&prTropQty_var, prTropQty.data(), dim, cur);
+      if (IS_VALID_NC(tpTropQty_var)) get_nc_data(&tpTropQty_var, tpTropQty.data(), dim, cur);
+      if (IS_VALID_NC(tdTropQty_var)) get_nc_data(&tdTropQty_var, tdTropQty.data(), dim, cur);
+      if (IS_VALID_NC(wdTropQty_var)) get_nc_data(&wdTropQty_var, wdTropQty.data(), dim, cur);
+      if (IS_VALID_NC(wsTropQty_var)) get_nc_data(&wsTropQty_var, wsTropQty.data(), dim, cur);
       dim[1] = maxlvl_mWndNum;
-      if (IS_VALID_NC(prMaxWQty_var)) get_nc_data(&prMaxWQty_var, (char *)&prMaxWQty, dim, cur);
-      else memset(prMaxWQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(wdMaxWQty_var)) get_nc_data(&wdMaxWQty_var, (char *)&wdMaxWQty, dim, cur);
-      else memset(wdMaxWQty.data(), 0, buf_size*dim[1]*sizeof(char));
-      if (IS_VALID_NC(wsMaxWQty_var)) get_nc_data(&wsMaxWQty_var, (char *)&wsMaxWQty, dim, cur);
-      else memset(wsMaxWQty.data(), 0, buf_size*dim[1]*sizeof(char));
+      if (IS_VALID_NC(prMaxWQty_var)) get_nc_data(&prMaxWQty_var, prMaxWQty.data(), dim, cur);
+      if (IS_VALID_NC(wdMaxWQty_var)) get_nc_data(&wdMaxWQty_var, wdMaxWQty.data(), dim, cur);
+      if (IS_VALID_NC(wsMaxWQty_var)) get_nc_data(&wsMaxWQty_var, wsMaxWQty.data(), dim, cur);
       
       dim[1] = maxlvl_manLevel;
-      get_filtered_nc_data_2d(prMan_var, (float *)&prMan[0], dim, cur, "prMan");
-      get_filtered_nc_data_2d(htMan_var, (float *)&htMan[0], dim, cur, "htMan");
-      get_filtered_nc_data_2d(tpMan_var, (float *)&tpMan[0], dim, cur, "tpMan");
-      get_filtered_nc_data_2d(tdMan_var, (float *)&tdMan[0], dim, cur, "tdMan");
-      get_filtered_nc_data_2d(wdMan_var, (float *)&wdMan[0], dim, cur, "wdMan");
-      get_filtered_nc_data_2d(wsMan_var, (float *)&wsMan[0], dim, cur, "wsMan");
+      get_filtered_nc_data_2d(prMan_var, prMan.data(), dim, cur, "prMan");
+      get_filtered_nc_data_2d(htMan_var, htMan.data(), dim, cur, "htMan");
+      get_filtered_nc_data_2d(tpMan_var, tpMan.data(), dim, cur, "tpMan");
+      get_filtered_nc_data_2d(tdMan_var, tdMan.data(), dim, cur, "tdMan");
+      get_filtered_nc_data_2d(wdMan_var, wdMan.data(), dim, cur, "wdMan");
+      get_filtered_nc_data_2d(wsMan_var, wsMan.data(), dim, cur, "wsMan");
       dim[1] = maxlvl_sigTLevel;
-      get_filtered_nc_data_2d(prSigT_var, (float *)&prSigT, dim, cur, "prSigT");
-      get_filtered_nc_data_2d(tpSigT_var, (float *)&tpSigT, dim, cur, "tpSigT");
-      get_filtered_nc_data_2d(tdSigT_var, (float *)&tdSigT, dim, cur, "tdSigT");
+      get_filtered_nc_data_2d(prSigT_var, prSigT.data(), dim, cur, "prSigT");
+      get_filtered_nc_data_2d(tpSigT_var, tpSigT.data(), dim, cur, "tpSigT");
+      get_filtered_nc_data_2d(tdSigT_var, tdSigT.data(), dim, cur, "tdSigT");
       dim[1] = maxlvl_sigWLevel;
-      get_filtered_nc_data_2d(htSigW_var, (float *)&htSigW, dim, cur, "htSigW");
-      get_filtered_nc_data_2d(wdSigW_var, (float *)&wdSigW, dim, cur, "wdSigW");
-      get_filtered_nc_data_2d(wsSigW_var, (float *)&wsSigW, dim, cur, "wsSigW");
+      get_filtered_nc_data_2d(htSigW_var, htSigW.data(), dim, cur, "htSigW");
+      get_filtered_nc_data_2d(wdSigW_var, wdSigW.data(), dim, cur, "wdSigW");
+      get_filtered_nc_data_2d(wsSigW_var, wsSigW.data(), dim, cur, "wsSigW");
       dim[1] = maxlvl_sigPresWLevel;
-      get_filtered_nc_data_2d(prSigW_var  ,   (float *)&prSigW, dim, cur,   "prSigW");
-      get_filtered_nc_data_2d(wdSigPrW_var, (float *)&wdSigPrW, dim, cur, "wdSigPrW");
-      get_filtered_nc_data_2d(wsSigPrW_var, (float *)&wsSigPrW, dim, cur, "wsSigPrW");
+      get_filtered_nc_data_2d(prSigW_var,     prSigW.data(), dim, cur,   "prSigW");
+      get_filtered_nc_data_2d(wdSigPrW_var, wdSigPrW.data(), dim, cur, "wdSigPrW");
+      get_filtered_nc_data_2d(wsSigPrW_var, wsSigPrW.data(), dim, cur, "wsSigPrW");
       dim[1] = maxlvl_mTropNum;
-      get_filtered_nc_data_2d(prTrop_var, (float *)&prTrop, dim, cur, "prTrop");
-      get_filtered_nc_data_2d(tpTrop_var, (float *)&tpTrop, dim, cur, "tpTrop");
-      get_filtered_nc_data_2d(tdTrop_var, (float *)&tdTrop, dim, cur, "tdTrop");
-      get_filtered_nc_data_2d(wdTrop_var, (float *)&wdTrop, dim, cur, "wdTrop");
-      get_filtered_nc_data_2d(wsTrop_var, (float *)&wsTrop, dim, cur, "wsTrop");
+      get_filtered_nc_data_2d(prTrop_var, prTrop.data(), dim, cur, "prTrop");
+      get_filtered_nc_data_2d(tpTrop_var, tpTrop.data(), dim, cur, "tpTrop");
+      get_filtered_nc_data_2d(tdTrop_var, tdTrop.data(), dim, cur, "tdTrop");
+      get_filtered_nc_data_2d(wdTrop_var, wdTrop.data(), dim, cur, "wdTrop");
+      get_filtered_nc_data_2d(wsTrop_var, wsTrop.data(), dim, cur, "wsTrop");
       dim[1] = maxlvl_mWndNum;
-      get_filtered_nc_data_2d(prMaxW_var, (float *)&prMaxW, dim, cur, "prMaxW");
-      get_filtered_nc_data_2d(wdMaxW_var, (float *)&wdMaxW, dim, cur, "wdMaxW");
-      get_filtered_nc_data_2d(wsMaxW_var, (float *)&wsMaxW, dim, cur, "wsMaxW");
+      get_filtered_nc_data_2d(prMaxW_var, prMaxW.data(), dim, cur, "prMaxW");
+      get_filtered_nc_data_2d(wdMaxW_var, wdMaxW.data(), dim, cur, "wdMaxW");
+      get_filtered_nc_data_2d(wsMaxW_var, wsMaxW.data(), dim, cur, "wsMaxW");
 
       for (int i_idx=0; i_idx<buf_size; i_idx++) {
 
@@ -1600,10 +1563,15 @@ void process_madis_raob(NcFile *&f_in) {
          hdr_arr[1] = hdr_lon_arr[i_idx];
          hdr_arr[2] = hdr_elv_arr[i_idx];
 
+	 //
+         // Process the station name.
+         //
+         hdr_sid = hdr_sid_arr.data()[i_idx * hdr_sid_len];
+
          //
          // Check masking regions.
          //
-         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid_arr[i_idx].data())) continue;
+         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid.c_str())) continue;
 
          //
          // Process the observation time.
@@ -1616,15 +1584,9 @@ void process_madis_raob(NcFile *&f_in) {
          hdr_idx = nc_point_obs.get_obs_index();
 
          //
-         // Process the station name.
-         //
-         hdr_sid = hdr_sid_arr[i_idx].data();
-
-         //
          // Initialize the observation array: hdr_id
          //
          obs_arr[0] = (float) (hdr_idx);
-
 
          //
          // Loop through the mandatory levels
@@ -1634,6 +1596,8 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Mandatory Level: " << i_lvl << "\n";
 
+            int i_buf = (i_idx * buf_size) + i_lvl;
+
             //
             // Use cur to index into the NetCDF variables.
             //
@@ -1642,8 +1606,8 @@ void process_madis_raob(NcFile *&f_in) {
             //
             // Get the pressure and height for this level
             //
-            obs_arr[2] = prMan[i_idx][i_lvl];
-            obs_arr[3] = htMan[i_idx][i_lvl];
+            obs_arr[2] = prMan[i_buf];
+            obs_arr[3] = htMan[i_buf];
 
             //
             // Check for bad data
@@ -1651,39 +1615,39 @@ void process_madis_raob(NcFile *&f_in) {
             if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
             // Pressure
-            obs_arr[4] = prMan[i_idx][i_lvl];
-            count += process_obs(1, conversion, obs_arr, prManQty[i_idx][i_lvl],
+            obs_arr[4] = prMan[i_buf];
+            count += process_obs(1, conversion, obs_arr, prManQty[i_buf],
                                  prMan_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
             // Height
-            obs_arr[4] = htMan[i_idx][i_lvl];
-            count += process_obs(7, conversion, obs_arr, htManQty[i_idx][i_lvl],
+            obs_arr[4] = htMan[i_buf];
+            count += process_obs(7, conversion, obs_arr, htManQty[i_buf],
                                  htMan_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
             // Temperature
-            obs_arr[4] = tpMan[i_idx][i_lvl];
-            count += process_obs(11, conversion, obs_arr, tpManQty[i_idx][i_lvl],
+            obs_arr[4] = tpMan[i_buf];
+            count += process_obs(11, conversion, obs_arr, tpManQty[i_buf],
                                  tpMan_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
             // Dewpoint
-            obs_arr[4] = tdMan[i_idx][i_lvl];
-            count += process_obs(17, conversion, obs_arr, tdManQty[i_idx][i_lvl],
+            obs_arr[4] = tdMan[i_buf];
+            count += process_obs(17, conversion, obs_arr, tdManQty[i_buf],
                                  tdMan_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
             // Wind Direction
-            obs_arr[4] = wdMan[i_idx][i_lvl];
-            count += process_obs(31, conversion, obs_arr, wdManQty[i_idx][i_lvl],
+            obs_arr[4] = wdMan[i_buf];
+            count += process_obs(31, conversion, obs_arr, wdManQty[i_buf],
                                  wdMan_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
             wdir = obs_arr[4];
 
             // Wind Speed
-            qty = wsManQty[i_idx][i_lvl];
-            obs_arr[4] = wsMan[i_idx][i_lvl];
+            qty = wsManQty[i_buf];
+            obs_arr[4] = wsMan[i_buf];
             count += process_obs(32, conversion, obs_arr, qty, wsMan_var,
                                  hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
@@ -1719,10 +1683,12 @@ void process_madis_raob(NcFile *&f_in) {
             //
             cur[1] = i_lvl;
 
+            int i_buf = (i_idx * buf_size) + i_lvl;
+
             //
             // Get the pressure and height for this level
             //
-            obs_arr[2] = prSigT[i_idx][i_lvl];
+            obs_arr[2] = prSigT[i_buf];
             obs_arr[3] = bad_data_float;
 
             //
@@ -1731,14 +1697,14 @@ void process_madis_raob(NcFile *&f_in) {
             if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
             // Temperature
-            obs_arr[4] = tpSigT[i_idx][i_lvl];
-            count += process_obs(11, conversion, obs_arr, tpSigTQty[i_idx][i_lvl],
+            obs_arr[4] = tpSigT[i_buf];
+            count += process_obs(11, conversion, obs_arr, tpSigTQty[i_buf],
                                  tpSigT_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
             // Dewpoint
-            obs_arr[4] = tdSigT[i_idx][i_lvl];
-            count += process_obs(17, conversion, obs_arr, tdSigTQty[i_idx][i_lvl],
+            obs_arr[4] = tdSigT[i_buf];
+            count += process_obs(17, conversion, obs_arr, tdSigTQty[i_buf],
                                  tdSigT_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
@@ -1752,6 +1718,8 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Significant W Level: " << i_lvl << "\n";
 
+            int i_buf = (i_idx * buf_size) + i_lvl;
+
             //
             // Use cur to index into the NetCDF variables.
             //
@@ -1761,7 +1729,7 @@ void process_madis_raob(NcFile *&f_in) {
             // Get the pressure and height for this level
             //
             obs_arr[2] = bad_data_float;
-            obs_arr[3] = htSigW[i_idx][i_lvl];
+            obs_arr[3] = htSigW[i_buf];
 
             //
             // Check for bad data
@@ -1769,15 +1737,15 @@ void process_madis_raob(NcFile *&f_in) {
             if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
             // Wind Direction
-            obs_arr[4] = wdSigW[i_idx][i_lvl];
-            count += process_obs(31, conversion, obs_arr, wdSigWQty[i_idx][i_lvl],
+            obs_arr[4] = wdSigW[i_buf];
+            count += process_obs(31, conversion, obs_arr, wdSigWQty[i_buf],
                                  wdSigW_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
             wdir = obs_arr[4];
 
             // Wind Speed
-            qty = wsSigWQty[i_idx][i_lvl];
-            obs_arr[4] = wsSigW[i_idx][i_lvl];
+            qty = wsSigWQty[i_buf];
+            obs_arr[4] = wsSigW[i_buf];
             count += process_obs(32, conversion, obs_arr, qty,
                                  wsSigW_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
@@ -1808,6 +1776,8 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Significant W-by-P Level: " << i_lvl << "\n";
 
+            int i_buf = (i_idx * buf_size) + i_lvl;
+
             //
             // Use cur to index into the NetCDF variables.
             //
@@ -1816,7 +1786,7 @@ void process_madis_raob(NcFile *&f_in) {
             //
             // Get the pressure and height for this level
             //
-            obs_arr[2] = prSigW[i_idx][i_lvl];
+            obs_arr[2] = prSigW[i_buf];
             obs_arr[3] = bad_data_float;
 
             //
@@ -1825,15 +1795,15 @@ void process_madis_raob(NcFile *&f_in) {
             if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
             // Wind Direction
-            obs_arr[4] = wdSigPrW[i_idx][i_lvl];
-            count += process_obs(31, conversion, obs_arr, wdSigPrWQty[i_idx][i_lvl],
+            obs_arr[4] = wdSigPrW[i_buf];
+            count += process_obs(31, conversion, obs_arr, wdSigPrWQty[i_buf],
                                  wdSigPrW_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
             wdir = obs_arr[4];
 
             // Wind Speed
-            qty = wsSigPrWQty[i_idx][i_lvl];
-            obs_arr[4] = wsSigPrW[i_idx][i_lvl];
+            qty = wsSigPrWQty[i_buf];
+            obs_arr[4] = wsSigPrW[i_buf];
             count += process_obs(32, conversion, obs_arr, qty,
                                  wsSigPrW_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
@@ -1864,6 +1834,8 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Tropopause Level: " << i_lvl << "\n";
 
+            int i_buf = (i_idx * buf_size) + i_lvl;
+
             //
             // Use cur to index into the NetCDF variables.
             //
@@ -1872,7 +1844,7 @@ void process_madis_raob(NcFile *&f_in) {
             //
             // Get the pressure and height for this level
             //
-            obs_arr[2] = prTrop[i_idx][i_lvl];
+            obs_arr[2] = prTrop[i_buf];
             obs_arr[3] = bad_data_float;
 
             //
@@ -1881,27 +1853,27 @@ void process_madis_raob(NcFile *&f_in) {
             if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
             // Temperature
-            obs_arr[4] = tpTrop[i_idx][i_lvl];
-            count += process_obs(11, conversion, obs_arr, tpTropQty[i_idx][i_lvl],
+            obs_arr[4] = tpTrop[i_buf];
+            count += process_obs(11, conversion, obs_arr, tpTropQty[i_buf],
                                  tpTrop_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
             // Dewpoint
-            obs_arr[4] = tdTrop[i_idx][i_lvl];
-            count += process_obs(17, conversion, obs_arr, tdTropQty[i_idx][i_lvl],
+            obs_arr[4] = tdTrop[i_buf];
+            count += process_obs(17, conversion, obs_arr, tdTropQty[i_buf],
                                  tdTrop_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
             // Wind Direction
-            obs_arr[4] = wdTrop[i_idx][i_lvl];
-            count += process_obs(31, conversion, obs_arr, wdTropQty[i_idx][i_lvl],
+            obs_arr[4] = wdTrop[i_buf];
+            count += process_obs(31, conversion, obs_arr, wdTropQty[i_buf],
                                  wdTrop_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
             wdir = obs_arr[4];
 
             // Wind Speed
-            qty = wsTropQty[i_idx][i_lvl];
-            obs_arr[4] = wsTrop[i_idx][i_lvl];
+            qty = wsTropQty[i_buf];
+            obs_arr[4] = wsTrop[i_buf];
             count += process_obs(32, conversion, obs_arr, qty,
                                  wsTrop_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
@@ -1932,6 +1904,8 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Maximum Wind Level: " << i_lvl << "\n";
 
+            int i_buf = (i_idx * buf_size) + i_lvl;
+
             //
             // Use cur to index into the NetCDF variables.
             //
@@ -1940,7 +1914,7 @@ void process_madis_raob(NcFile *&f_in) {
             //
             // Get the pressure and height for this level
             //
-            obs_arr[2] = prMaxW[i_idx][i_lvl];
+            obs_arr[2] = prMaxW[i_buf];
             obs_arr[3] = bad_data_float;
 
             //
@@ -1949,15 +1923,15 @@ void process_madis_raob(NcFile *&f_in) {
             if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
             // Wind Direction
-            obs_arr[4] = wdMaxW[i_idx][i_lvl];
-            count += process_obs(31, conversion, obs_arr, wdMaxWQty[i_idx][i_lvl],
+            obs_arr[4] = wdMaxW[i_buf];
+            count += process_obs(31, conversion, obs_arr, wdMaxWQty[i_buf],
                                  wdMaxW_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
             wdir = obs_arr[4];
 
             // Wind Speed
-            qty = wsMaxWQty[i_idx][i_lvl];
-            obs_arr[4] = wsMaxW[i_idx][i_lvl];
+            qty = wsMaxWQty[i_buf];
+            obs_arr[4] = wsMaxW[i_buf];
             count += process_obs(32, conversion, obs_arr, qty,
                                  wsMaxW_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
@@ -2104,14 +2078,14 @@ void process_madis_profiler(NcFile *&f_in) {
       vector<float> hdr_lon_arr(buf_size);
       vector<float> hdr_elv_arr(buf_size);
       vector<double> tmp_dbl_arr(buf_size);
-      vector<vector<char>> hdr_sid_arr(buf_size, vector<char>(hdr_sid_len));
+      vector<char> hdr_sid_arr(buf_size * hdr_sid_len);
 
       vector<float> pressure_arr(buf_size);
-      vector<vector<float>> levels_arr(buf_size, vector<float>(nlvl));
-      vector<vector<float>> uComponent_arr(buf_size, vector<float>(nlvl));
-      vector<vector<float>> vComponent_arr(buf_size, vector<float>(nlvl));
-      vector<vector<char>> uComponentQty_arr(buf_size, vector<char>(nlvl));
-      vector<vector<char>> vComponentQty_arr(buf_size, vector<char>(nlvl));
+      vector<float> levels_arr(buf_size * nlvl);
+      vector<float> uComponent_arr(buf_size * nlvl);
+      vector<float> vComponent_arr(buf_size * nlvl);
+      vector<char> uComponentQty_arr(buf_size * nlvl, 0);
+      vector<char> vComponentQty_arr(buf_size * nlvl, 0);
 
       // 1D variables
       get_nc_data(&in_hdr_vld_var, tmp_dbl_arr.data(), buf_size, i_hdr_s);
@@ -2124,19 +2098,17 @@ void process_madis_profiler(NcFile *&f_in) {
       dim[0] = buf_size;
 
       dim[1] = hdr_sid_len;
-      get_nc_data(&in_hdr_sid_var, (char *)hdr_sid_arr.data(), dim, cur);
+      get_nc_data(&in_hdr_sid_var, hdr_sid_arr.data(), dim, cur);
 
       dim[1] = nlvl;
-      get_nc_data(&var_levels, (float *)levels_arr.data(), dim, cur);
+      get_nc_data(&var_levels, levels_arr.data(), dim, cur);
 
       int data_cnt = buf_size * nlvl;
-      if (IS_VALID_NC(in_uComponentQty_var)) get_nc_data(&in_uComponentQty_var, (char *)uComponentQty_arr.data(), dim, cur);
-      else memset(uComponentQty_arr.data(), 0, data_cnt*sizeof(char));
-      if (IS_VALID_NC(in_vComponentQty_var)) get_nc_data(&in_vComponentQty_var, (char *)vComponentQty_arr.data(), dim, cur);
-      else memset(vComponentQty_arr.data(), 0, data_cnt*sizeof(char));
+      if (IS_VALID_NC(in_uComponentQty_var)) get_nc_data(&in_uComponentQty_var, uComponentQty_arr.data(), dim, cur);
+      if (IS_VALID_NC(in_vComponentQty_var)) get_nc_data(&in_vComponentQty_var, vComponentQty_arr.data(), dim, cur);
 
-      get_filtered_nc_data_2d(in_uComponent_var, (float *)uComponent_arr.data(), dim, cur, "uComponent", data_cnt);
-      get_filtered_nc_data_2d(in_vComponent_var, (float *)vComponent_arr.data(), dim, cur, "vComponent", data_cnt);
+      get_filtered_nc_data_2d(in_uComponent_var, uComponent_arr.data(), dim, cur, "uComponent", data_cnt);
+      get_filtered_nc_data_2d(in_vComponent_var, vComponent_arr.data(), dim, cur, "vComponent", data_cnt);
 
       for (int i_idx=0; i_idx<buf_size; i_idx++) {
 
@@ -2163,14 +2135,14 @@ void process_madis_profiler(NcFile *&f_in) {
          hdr_arr[2] = hdr_elv_arr[i_idx];
 
          //
-         // Check masking regions.
-         //
-         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid_arr[i_idx].data())) continue;
-
-         //
          // Process the station name.
          //
-         hdr_sid = hdr_sid_arr[i_idx].data();
+         hdr_sid = hdr_sid_arr.data()[i_idx * hdr_sid_len];
+
+         //
+         // Check masking regions.
+         //
+         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid.c_str())) continue;
 
          //
          // Process the observation time.
@@ -2199,11 +2171,13 @@ void process_madis_profiler(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Level: " << i_lvl << "\n";
 
-            //
+            int i_buf = (i_idx * buf_size) + i_lvl;
+
+	    //
             // Set the pressure and height for this level
             //
             obs_arr[2] = pressure;
-            obs_arr[3] = levels_arr[i_idx][i_lvl];
+            obs_arr[3] = levels_arr[i_buf];
 
             //
             // Check for bad data
@@ -2211,14 +2185,14 @@ void process_madis_profiler(NcFile *&f_in) {
             if(is_bad_data(obs_arr[2]) && is_bad_data(obs_arr[3])) continue;
 
             // Wind U
-            obs_arr[4] = uComponent_arr[i_idx][i_lvl];
-            count += process_obs(33, conversion, obs_arr, uComponentQty_arr[i_idx][i_lvl],
+            obs_arr[4] = uComponent_arr[i_buf];
+            count += process_obs(33, conversion, obs_arr, uComponentQty_arr[i_buf],
                                  in_uComponent_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
             // Wind V
-            obs_arr[4] = vComponent_arr[i_idx][i_lvl];
-            count += process_obs(34, conversion, obs_arr, vComponentQty_arr[i_idx][i_lvl],
+            obs_arr[4] = vComponent_arr[i_buf];
+            count += process_obs(34, conversion, obs_arr, vComponentQty_arr[i_buf],
                                  in_vComponent_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
@@ -2385,7 +2359,7 @@ void process_madis_maritime(NcFile *&f_in) {
       vector<float> hdr_lon_arr(buf_size);
       vector<float> hdr_elv_arr(buf_size);
       vector<double> tmp_dbl_arr(buf_size);
-      vector<vector<char>> hdr_sid_arr(buf_size, vector<char>(hdr_sid_len));
+      vector<char> hdr_sid_arr(buf_size * hdr_sid_len);
 
       vector<float> pressure_arr(buf_size);
 
@@ -2400,17 +2374,17 @@ void process_madis_maritime(NcFile *&f_in) {
       vector<float> precip12Hour_arr(buf_size);
       vector<float> precip18Hour_arr(buf_size);
       vector<float> precip24Hour_arr(buf_size);
-      vector<char> windDirQty_arr(buf_size);
-      vector<char> windSpeedQty_arr(buf_size);
-      vector<char> temperatureQty_arr(buf_size);
-      vector<char> dewpointQty_arr(buf_size);
-      vector<char> seaLevelPressQty_arr(buf_size);
-      vector<char> windGustQty_arr(buf_size);
-      vector<char> precip1HourQty_arr(buf_size);
-      vector<char> precip6HourQty_arr(buf_size);
-      vector<char> precip12HourQty_arr(buf_size);
-      vector<char> precip18HourQty_arr(buf_size);
-      vector<char> precip24HourQty_arr(buf_size);
+      vector<char> windDirQty_arr(buf_size, 0);
+      vector<char> windSpeedQty_arr(buf_size, 0);
+      vector<char> temperatureQty_arr(buf_size, 0);
+      vector<char> dewpointQty_arr(buf_size, 0);
+      vector<char> seaLevelPressQty_arr(buf_size, 0);
+      vector<char> windGustQty_arr(buf_size, 0);
+      vector<char> precip1HourQty_arr(buf_size, 0);
+      vector<char> precip6HourQty_arr(buf_size, 0);
+      vector<char> precip12HourQty_arr(buf_size, 0);
+      vector<char> precip18HourQty_arr(buf_size, 0);
+      vector<char> precip24HourQty_arr(buf_size, 0);
 
       cur[0] = i_hdr_s;
       dim[0] = buf_size;
@@ -2420,27 +2394,16 @@ void process_madis_maritime(NcFile *&f_in) {
       get_filtered_nc_data(in_hdr_elv_var, hdr_elv_arr.data(), buf_size, i_hdr_s, "elevation");
 
       if (IS_VALID_NC(in_windDirQty_var))       get_nc_data(&in_windDirQty_var, windDirQty_arr.data(), buf_size, i_hdr_s);
-      else memset(windDirQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_windSpeedQty_var))     get_nc_data(&in_windSpeedQty_var, windSpeedQty_arr.data(), buf_size, i_hdr_s);
-      else memset(windSpeedQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_temperatureQty_var))   get_nc_data(&in_temperatureQty_var, temperatureQty_arr.data(), buf_size, i_hdr_s);
-      else memset(temperatureQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_dewpointQty_var))      get_nc_data(&in_dewpointQty_var, dewpointQty_arr.data(), buf_size, i_hdr_s);
-      else memset(dewpointQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_seaLevelPressQty_var)) get_nc_data(&in_seaLevelPressQty_var, seaLevelPressQty_arr.data(), buf_size, i_hdr_s);
-      else memset(seaLevelPressQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_windGustQty_var))      get_nc_data(&in_windGustQty_var, windGustQty_arr.data(), buf_size, i_hdr_s);
-      else memset(windGustQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_precip1HourQty_var))   get_nc_data(&in_precip1HourQty_var, precip1HourQty_arr.data(), buf_size, i_hdr_s);
-      else memset(precip1HourQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_precip6HourQty_var))   get_nc_data(&in_precip6HourQty_var, precip6HourQty_arr.data(), buf_size, i_hdr_s);
-      else memset(precip6HourQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_precip12HourQty_var))  get_nc_data(&in_precip12HourQty_var, precip12HourQty_arr.data(), buf_size, i_hdr_s);
-      else memset(precip12HourQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_precip18HourQty_var))  get_nc_data(&in_precip18HourQty_var, precip18HourQty_arr.data(), buf_size, i_hdr_s);
-      else memset(precip18HourQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_precip24HourQty_var))  get_nc_data(&in_precip24HourQty_var, precip24HourQty_arr.data(), buf_size, i_hdr_s);
-      else memset(precip24HourQty_arr.data(), 0, buf_size*sizeof(char));
 
       get_filtered_nc_data(in_pressure_var,      pressure_arr.data(),      buf_size, i_hdr_s, "pressure"     );
       get_filtered_nc_data(in_windDir_var,       windDir_arr.data(),       buf_size, i_hdr_s, "windDir"      );
@@ -2456,7 +2419,7 @@ void process_madis_maritime(NcFile *&f_in) {
       get_filtered_nc_data(in_precip24Hour_var,  precip24Hour_arr.data(),  buf_size, i_hdr_s, "precip24Hour" );
 
       dim[1] = hdr_sid_len;
-      get_nc_data(&in_hdr_sid_var, (char *)hdr_sid_arr.data(), dim, cur);
+      get_nc_data(&in_hdr_sid_var, hdr_sid_arr.data(), dim, cur);
 
       dim[0] = 1;
       dim[1] = 1;
@@ -2492,14 +2455,14 @@ void process_madis_maritime(NcFile *&f_in) {
          hdr_arr[2] = hdr_elv_arr[i_idx];
 
          //
-         // Check masking regions.
-         //
-         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid_arr[i_idx].data())) continue;
-
-         //
          // Process the station name.
          //
-         hdr_sid = hdr_sid_arr[i_idx].data();
+         hdr_sid = hdr_sid_arr.data()[i_idx * hdr_sid_len];
+
+         //
+         // Check masking regions.
+         //
+         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid.c_str())) continue;
 
          //
          // Process the observation time.
@@ -2799,7 +2762,7 @@ void process_madis_mesonet(NcFile *&f_in) {
       vector<float> hdr_lon_arr(buf_size);
       vector<float> hdr_elv_arr(buf_size);
       vector<double> tmp_dbl_arr(buf_size);
-      vector<vector<char>> hdr_sid_arr(buf_size, vector<char>(hdr_sid_len));
+      vector<char> hdr_sid_arr(buf_size * hdr_sid_len);
 
       vector<float> temperature_arr(buf_size);
       vector<float> dewpoint_arr(buf_size);
@@ -2825,29 +2788,29 @@ void process_madis_mesonet(NcFile *&f_in) {
       vector<float> windDir10_arr(buf_size);
       vector<float> windSpeed10_arr(buf_size);
 
-      vector<char> temperatureQty_arr(buf_size);
-      vector<char> dewpointQty_arr(buf_size);
-      vector<char> relHumidityQty_arr(buf_size);
-      vector<char> stationPressureQty_arr(buf_size);
-      vector<char> seaLevelPressureQty_arr(buf_size);
-      vector<char> windDirQty_arr(buf_size);
-      vector<char> windSpeedQty_arr(buf_size);
-      vector<char> windGustQty_arr(buf_size);
-      vector<char> visibilityQty_arr(buf_size);
-      vector<char> precipRateQty_arr(buf_size);
-      vector<char> solarRadiationQty_arr(buf_size);
-      vector<char> seaSurfaceTempQty_arr(buf_size);
-      vector<char> totalColumnPWVQty_arr(buf_size);
-      vector<char> soilTemperatureQty_arr(buf_size);
-      vector<char> minTemp24HourQty_arr(buf_size);
-      vector<char> maxTemp24HourQty_arr(buf_size);
-      vector<char> precip3hrQty_arr(buf_size);
-      vector<char> precip6hrQty_arr(buf_size);
-      vector<char> precip12hrQty_arr(buf_size);
-      vector<char> precip10minQty_arr(buf_size);
-      vector<char> precip1minQty_arr(buf_size);
-      vector<char> windDir10Qty_arr(buf_size);
-      vector<char> windSpeed10Qty_arr(buf_size);
+      vector<char> temperatureQty_arr(buf_size, 0);
+      vector<char> dewpointQty_arr(buf_size, 0);
+      vector<char> relHumidityQty_arr(buf_size, 0);
+      vector<char> stationPressureQty_arr(buf_size, 0);
+      vector<char> seaLevelPressureQty_arr(buf_size, 0);
+      vector<char> windDirQty_arr(buf_size, 0);
+      vector<char> windSpeedQty_arr(buf_size, 0);
+      vector<char> windGustQty_arr(buf_size, 0);
+      vector<char> visibilityQty_arr(buf_size, 0);
+      vector<char> precipRateQty_arr(buf_size, 0);
+      vector<char> solarRadiationQty_arr(buf_size, 0);
+      vector<char> seaSurfaceTempQty_arr(buf_size, 0);
+      vector<char> totalColumnPWVQty_arr(buf_size, 0);
+      vector<char> soilTemperatureQty_arr(buf_size, 0);
+      vector<char> minTemp24HourQty_arr(buf_size, 0);
+      vector<char> maxTemp24HourQty_arr(buf_size, 0);
+      vector<char> precip3hrQty_arr(buf_size, 0);
+      vector<char> precip6hrQty_arr(buf_size, 0);
+      vector<char> precip12hrQty_arr(buf_size, 0);
+      vector<char> precip10minQty_arr(buf_size, 0);
+      vector<char> precip1minQty_arr(buf_size, 0);
+      vector<char> windDir10Qty_arr(buf_size, 0);
+      vector<char> windSpeed10Qty_arr(buf_size, 0);
 
       cur[0] = i_hdr_s;
       dim[0] = buf_size;
@@ -2858,51 +2821,28 @@ void process_madis_mesonet(NcFile *&f_in) {
       get_filtered_nc_data(in_hdr_elv_var, hdr_elv_arr.data(), buf_size, i_hdr_s, "elevation");
 
       if (IS_VALID_NC(in_temperatureQty_var))      get_nc_data(&in_temperatureQty_var, temperatureQty_arr.data(), buf_size, i_hdr_s);
-      else memset(temperatureQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_dewpointQty_var))         get_nc_data(&in_dewpointQty_var, dewpointQty_arr.data(), buf_size, i_hdr_s);
-      else memset(dewpointQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_relHumidityQty_var))      get_nc_data(&in_relHumidityQty_var, relHumidityQty_arr.data(), buf_size, i_hdr_s);
-      else memset(relHumidityQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_stationPressureQty_var))  get_nc_data(&in_stationPressureQty_var, stationPressureQty_arr.data(), buf_size, i_hdr_s);
-      else memset(stationPressureQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_seaLevelPressureQty_var)) get_nc_data(&in_seaLevelPressureQty_var, seaLevelPressureQty_arr.data(), buf_size, i_hdr_s);
-      else memset(seaLevelPressureQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_windDirQty_var))          get_nc_data(&in_windDirQty_var, windDirQty_arr.data(), buf_size, i_hdr_s);
-      else memset(windDirQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_windSpeedQty_var))        get_nc_data(&in_windSpeedQty_var, windSpeedQty_arr.data(), buf_size, i_hdr_s);
-      else memset(windSpeedQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_windGustQty_var))         get_nc_data(&in_windGustQty_var, windGustQty_arr.data(), buf_size, i_hdr_s);
-      else memset(windGustQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_visibilityQty_var))       get_nc_data(&in_visibilityQty_var, visibilityQty_arr.data(), buf_size, i_hdr_s);
-      else memset(visibilityQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_precipRateQty_var))       get_nc_data(&in_precipRateQty_var, precipRateQty_arr.data(), buf_size, i_hdr_s);
-      else memset(precipRateQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_solarRadiationQty_var))   get_nc_data(&in_solarRadiationQty_var, solarRadiationQty_arr.data(), buf_size, i_hdr_s);
-      else memset(solarRadiationQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_seaSurfaceTempQty_var))   get_nc_data(&in_seaSurfaceTempQty_var, seaSurfaceTempQty_arr.data(), buf_size, i_hdr_s);
-      else memset(seaSurfaceTempQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_totalColumnPWVQty_var))   get_nc_data(&in_totalColumnPWVQty_var, totalColumnPWVQty_arr.data(), buf_size, i_hdr_s);
-      else memset(totalColumnPWVQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_soilTemperatureQty_var))  get_nc_data(&in_soilTemperatureQty_var, soilTemperatureQty_arr.data(), buf_size, i_hdr_s);
-      else memset(soilTemperatureQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_minTemp24HourQty_var))    get_nc_data(&in_minTemp24HourQty_var, minTemp24HourQty_arr.data(), buf_size, i_hdr_s);
-      else memset(minTemp24HourQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_maxTemp24HourQty_var))    get_nc_data(&in_maxTemp24HourQty_var, maxTemp24HourQty_arr.data(), buf_size, i_hdr_s);
-      else memset(maxTemp24HourQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_precip3hrQty_var))        get_nc_data(&in_precip3hrQty_var, precip3hrQty_arr.data(), buf_size, i_hdr_s);
-      else memset(precip3hrQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_precip6hrQty_var))        get_nc_data(&in_precip6hrQty_var, precip6hrQty_arr.data(), buf_size, i_hdr_s);
-      else memset(precip6hrQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_precip12hrQty_var))       get_nc_data(&in_precip12hrQty_var, precip12hrQty_arr.data(), buf_size, i_hdr_s);
-      else memset(precip12hrQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_precip10minQty_var))      get_nc_data(&in_precip10minQty_var, precip10minQty_arr.data(), buf_size, i_hdr_s);
-      else memset(precip10minQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_precip1minQty_var))       get_nc_data(&in_precip1minQty_var, precip1minQty_arr.data(), buf_size, i_hdr_s);
-      else memset(precip1minQty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_windDir10Qty_var))        get_nc_data(&in_windDir10Qty_var, windDir10Qty_arr.data(), buf_size, i_hdr_s);
-      else memset(windDir10Qty_arr.data(), 0, buf_size*sizeof(char));
       if (IS_VALID_NC(in_windSpeed10Qty_var))      get_nc_data(&in_windSpeed10Qty_var, windSpeed10Qty_arr.data(), buf_size, i_hdr_s);
-      else memset(windSpeed10Qty_arr.data(), 0, buf_size*sizeof(char));
 
       get_filtered_nc_data(in_temperature_var,      temperature_arr.data(),      buf_size, i_hdr_s, "temperature"     );
       get_filtered_nc_data(in_dewpoint_var,         dewpoint_arr.data(),         buf_size, i_hdr_s, "dewpoint"        );
@@ -2929,7 +2869,7 @@ void process_madis_mesonet(NcFile *&f_in) {
       get_filtered_nc_data(in_windSpeed10_var,      windSpeed10_arr.data(),      buf_size, i_hdr_s, "windSpeed10"     );
 
       dim[1] = hdr_sid_len;
-      get_nc_data(&in_hdr_sid_var, (char *)hdr_sid_arr.data(), dim, cur);
+      get_nc_data(&in_hdr_sid_var, hdr_sid_arr.data(), dim, cur);
 
       dim[0] = 1;
       dim[1] = 1;
@@ -2964,14 +2904,14 @@ void process_madis_mesonet(NcFile *&f_in) {
          hdr_arr[2] = hdr_elv_arr[i_idx];
 
          //
-         // Check masking regions.
-         //
-         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid_arr[i_idx].data())) continue;
-
-         //
          // Process the station name.
          //
-         hdr_sid = hdr_sid_arr[i_idx].data();
+         hdr_sid = hdr_sid_arr.data()[i_idx * hdr_sid_len];
+
+         //
+         // Check masking regions.
+         //
+         if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid.c_str())) continue;
 
          //
          // Process the observation time.
@@ -3232,7 +3172,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    NcVar in_nLevelsQty_var = get_var(f_in, "nLevelsDD");
    NcVar in_altitudeQty_var = get_var(f_in, "altitudeDD");
 
-
    if (IS_INVALID_NC(in_hdr_sid_var)) missing_vars.add("profileAirport");
    if (IS_INVALID_NC(in_hdr_vld_var)) missing_vars.add("profileTime");
    if (IS_INVALID_NC(in_hdr_lat_var)) missing_vars.add("trackLat");
@@ -3329,22 +3268,22 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
 
       vector<double> tmp_dbl_arr(buf_size);
-      vector<vector<float>> hdr_lat_arr(buf_size, vector<float>(maxLevels));
-      vector<vector<float>> hdr_lon_arr(buf_size, vector<float>(maxLevels));
-      vector<vector<float>> hdr_elv_arr(buf_size, vector<float>(maxLevels));
-      vector<vector<char>> hdr_sid_arr(buf_size, vector<char>(hdr_sid_len));
+      vector<float> hdr_lat_arr(buf_size * maxLevels);
+      vector<float> hdr_lon_arr(buf_size * maxLevels);
+      vector<float> hdr_elv_arr(buf_size * maxLevels);
+      vector<char> hdr_sid_arr(buf_size * hdr_sid_len);
 
-      vector<vector<int>> obsTimeOfDay_arr(buf_size, vector<int>(maxLevels));
-      vector<vector<float>> temperature_arr(buf_size, vector<float>(maxLevels));
-      vector<vector<float>> dewpoint_arr(buf_size, vector<float>(maxLevels));
-      vector<vector<float>> windDir_arr(buf_size, vector<float>(maxLevels));
-      vector<vector<float>> windSpeed_arr(buf_size, vector<float>(maxLevels));
+      vector<int> obsTimeOfDay_arr(buf_size * maxLevels);
+      vector<float> temperature_arr(buf_size * maxLevels);
+      vector<float> dewpoint_arr(buf_size * maxLevels);
+      vector<float> windDir_arr(buf_size * maxLevels);
+      vector<float> windSpeed_arr(buf_size * maxLevels);
 
-      vector<vector<char>> temperatureQty_arr(buf_size, vector<char>(maxLevels));
-      vector<vector<char>> dewpointQty_arr(buf_size, vector<char>(maxLevels));
-      vector<vector<char>> windDirQty_arr(buf_size, vector<char>(maxLevels));
-      vector<vector<char>> windSpeedQty_arr(buf_size, vector<char>(maxLevels));
-      vector<vector<char>> altitudeQty_arr(buf_size, vector<char>(maxLevels));
+      vector<char> temperatureQty_arr(buf_size * maxLevels, 0);
+      vector<char> dewpointQty_arr(buf_size * maxLevels, 0);
+      vector<char> windDirQty_arr(buf_size * maxLevels, 0);
+      vector<char> windSpeedQty_arr(buf_size * maxLevels, 0);
+      vector<char> altitudeQty_arr(buf_size * maxLevels, 0);
 
       cur[0] = i_hdr_s;
       dim[0] = buf_size;
@@ -3352,21 +3291,16 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       int data_cnt = buf_size * maxLevels;
 
       get_nc_data(&in_hdr_vld_var, tmp_dbl_arr.data(), dim, cur);
-      get_nc_data(&in_hdr_lat_var, (float *)hdr_lat_arr.data(), dim, cur);
-      get_nc_data(&in_hdr_lon_var, (float *)hdr_lon_arr.data(), dim, cur);
-      get_filtered_nc_data_2d(in_hdr_elv_var, (float *)hdr_elv_arr.data(), dim, cur, "elevation", data_cnt);
+      get_nc_data(&in_hdr_lat_var, hdr_lat_arr.data(), dim, cur);
+      get_nc_data(&in_hdr_lon_var, hdr_lon_arr.data(), dim, cur);
+      get_filtered_nc_data_2d(in_hdr_elv_var, hdr_elv_arr.data(), dim, cur, "elevation", data_cnt);
 
 
-      if (IS_VALID_NC(in_temperatureQty_var)) get_nc_data(&in_temperatureQty_var, (char *)&temperatureQty_arr, dim, cur);
-      else memset(temperatureQty_arr.data(), 0, data_cnt*sizeof(char));
-      if (IS_VALID_NC(in_dewpointQty_var))    get_nc_data(&in_dewpointQty_var, (char *)&dewpointQty_arr, dim, cur);
-      else memset(dewpointQty_arr.data(), 0, data_cnt*sizeof(char));
-      if (IS_VALID_NC(in_windDirQty_var))     get_nc_data(&in_windDirQty_var, (char *)&windDirQty_arr, dim, cur);
-      else memset(windDirQty_arr.data(), 0, data_cnt*sizeof(char));
-      if (IS_VALID_NC(in_windSpeedQty_var))   get_nc_data(&in_windSpeedQty_var, (char *)&windSpeedQty_arr, dim, cur);
-      else memset(windSpeedQty_arr.data(), 0, data_cnt*sizeof(char));
-      if (IS_VALID_NC(in_altitudeQty_var))    get_nc_data(&in_altitudeQty_var, (char *)&altitudeQty_arr, dim, cur);
-      else memset(altitudeQty_arr.data(), 0, data_cnt*sizeof(char));
+      if (IS_VALID_NC(in_temperatureQty_var)) get_nc_data(&in_temperatureQty_var, temperatureQty_arr.data(), dim, cur);
+      if (IS_VALID_NC(in_dewpointQty_var))    get_nc_data(&in_dewpointQty_var, dewpointQty_arr.data(), dim, cur);
+      if (IS_VALID_NC(in_windDirQty_var))     get_nc_data(&in_windDirQty_var, windDirQty_arr.data(), dim, cur);
+      if (IS_VALID_NC(in_windSpeedQty_var))   get_nc_data(&in_windSpeedQty_var, windSpeedQty_arr.data(), dim, cur);
+      if (IS_VALID_NC(in_altitudeQty_var))    get_nc_data(&in_altitudeQty_var, altitudeQty_arr.data(), dim, cur);
 
       get_filtered_nc_data_2d(in_hdr_tob_var,     (int *)&obsTimeOfDay_arr,  dim, cur, "obsTimeOfDay", data_cnt);
       get_filtered_nc_data_2d(in_temperature_var, (float *)&temperature_arr, dim, cur, "temperature", data_cnt);
@@ -3375,7 +3309,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       get_filtered_nc_data_2d(in_windSpeed_var,   (float *)&windSpeed_arr,   dim, cur, "windSpeed", data_cnt);
 
       dim[1] = hdr_sid_len;
-      get_nc_data(&in_hdr_sid_var, (char *)hdr_sid_arr.data(), dim, cur);
+      get_nc_data(&in_hdr_sid_var, hdr_sid_arr.data(), dim, cur);
 
       //
       // Process the header type.
@@ -3391,14 +3325,13 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
          //
          // Process the station i.e. airport name.
          //
-         hdr_sid = hdr_sid_arr[i_idx].data();
+         hdr_sid = hdr_sid_arr.data()[i_idx * hdr_sid_len];
 
          //
          // Process the observation time.
          //
          tmp_dbl1 = tmp_dbl_arr[i_idx];
          if(is_bad_data(tmp_dbl1)) continue;
-
 
          //
          // Process the number of levels
@@ -3423,7 +3356,9 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             i_cnt++;
             mlog << Debug(3) << "  Mandatory Level: " << i_lvl << "\n";
 
-            hdr_idx = nc_point_obs.get_obs_index();
+            int i_buf = (i_idx * buf_size) + i_lvl;
+
+	    hdr_idx = nc_point_obs.get_obs_index();
 
             //
             // Use cur to index into the NetCDF variables.
@@ -3434,12 +3369,12 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             //
             // Process the latitude, longitude, and elevation.
             //
-            check_quality_control_flag(hdr_elv_arr[i_idx][i_lvl],
-                                       altitudeQty_arr[i_idx][i_lvl],
+            check_quality_control_flag(hdr_elv_arr[i_buf],
+                                       altitudeQty_arr[i_buf],
                                        GET_NC_NAME(in_hdr_elv_var).c_str());
-            hdr_arr[0] = hdr_lat_arr[i_idx][i_lvl];
-            hdr_arr[1] = hdr_lon_arr[i_idx][i_lvl];
-            hdr_arr[2] = hdr_elv_arr[i_idx][i_lvl];
+            hdr_arr[0] = hdr_lat_arr[i_buf];
+            hdr_arr[1] = hdr_lon_arr[i_buf];
+            hdr_arr[2] = hdr_elv_arr[i_buf];
 
             //
             // Check masked regions
@@ -3447,10 +3382,9 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             if(!check_masks(hdr_arr[0], hdr_arr[1], hdr_sid.c_str())) continue;
 
             //
-            // Get the number of levels  and height for this level
+            // Get the number of levels and height for this level
             //
-            obs_arr[3] = hdr_elv_arr[i_idx][i_lvl];
-
+            obs_arr[3] = hdr_elv_arr[i_buf];
 
             //
             // Check for bad data
@@ -3460,7 +3394,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             //
             // Process the observation time.
             //
-            tmp_dbl2 = obsTimeOfDay_arr[i_idx][i_lvl];
+            tmp_dbl2 = obsTimeOfDay_arr[i_buf];
 
             //
             // Write header type
@@ -3483,27 +3417,27 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             obs_arr[2] = pressure;
 
             // Temperature
-            obs_arr[4] = temperature_arr[i_idx][i_lvl];
-            count += process_obs(11, conversion, obs_arr, temperatureQty_arr[i_idx][i_lvl],
+            obs_arr[4] = temperature_arr[i_buf];
+            count += process_obs(11, conversion, obs_arr, temperatureQty_arr[i_buf],
                                  in_temperature_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
             // Dewpoint
-            obs_arr[4] = dewpoint_arr[i_idx][i_lvl];
-            count += process_obs(17, conversion, obs_arr, dewpointQty_arr[i_idx][i_lvl],
+            obs_arr[4] = dewpoint_arr[i_buf];
+            count += process_obs(17, conversion, obs_arr, dewpointQty_arr[i_buf],
                                  in_dewpoint_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
             // Wind Direction
-            obs_arr[4] = windDir_arr[i_idx][i_lvl];
-            count += process_obs(31, conversion, obs_arr, windDirQty_arr[i_idx][i_lvl],
+            obs_arr[4] = windDir_arr[i_buf];
+            count += process_obs(31, conversion, obs_arr, windDirQty_arr[i_buf],
                                  in_windDir_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
             wdir = obs_arr[4];
 
             // Wind Speed
-            obs_arr[4] = windSpeed_arr[i_idx][i_lvl];
-            qty = windSpeedQty_arr[i_idx][i_lvl];
+            obs_arr[4] = windSpeed_arr[i_buf];
+            qty = windSpeedQty_arr[i_buf];
             count += process_obs(32, conversion, obs_arr, qty,
                                  in_windSpeed_var, hdr_typ, hdr_sid, hdr_vld,
                                  hdr_arr[0], hdr_arr[1], hdr_arr[2]);
@@ -3520,9 +3454,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
 
             // Write V-component of wind
             obs_arr[4] = vgrd;
-            //count += process_obs(34, conversion, obs_arr, qty, in_windSpeed_var,
-            //                     hdr_typ, hdr_sid, hdr_vld,
-            //                     hdr_arr[0], hdr_arr[1], hdr_arr[2]);
             process_obs(34, conversion, obs_arr, qty, in_windSpeed_var,
                         hdr_typ, hdr_sid, hdr_vld,
                         hdr_arr[0], hdr_arr[1], hdr_arr[2]);
