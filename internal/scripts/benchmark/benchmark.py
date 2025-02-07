@@ -430,7 +430,7 @@ def run_met_cli(settings:dict, ts, files_from_ctrack:tuple) -> None:
             metplus_env.append(cur_env)
 
 
-    generate_info(settings, ts, met_command, mp_envs, full_benchmark_path)
+    generate_info(settings, ts, met_command, full_benchmark_path, mp_envs)
 
 def run_benchmark():
     """
