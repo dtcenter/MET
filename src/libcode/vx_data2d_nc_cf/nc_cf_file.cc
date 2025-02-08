@@ -1504,8 +1504,12 @@ void NcCfFile::read_netcdf_grid()
        if(x_dim_var_name == GET_NC_NAME_P(_dims[dim_num])) _xDim = _dims[dim_num];
        if(y_dim_var_name == GET_NC_NAME_P(_dims[dim_num])) _yDim = _dims[dim_num];
     }
-    get_grid_from_lat_lon_vars(_latVar, _lonVar, _yDim->getSize(), _xDim->getSize());
-    status = true;
+    if (_xDim != nullptr && _yDim != nullptr) {
+       get_grid_from_lat_lon_vars(_latVar, _lonVar,
+                                  _yDim->getSize(),
+                                  _xDim->getSize());
+       status = true;
+    }
   }
 
   if (!status ||

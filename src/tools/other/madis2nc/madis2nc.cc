@@ -614,6 +614,7 @@ int process_obs(const int in_gc, const float conversion,
                 const time_t valid_time, const double latitude,
                 const double longitude, const double elevation) {
    int cur_processed_count = 0;
+
    //
    // Check that the input variable contains valid data.
    //
@@ -774,7 +775,7 @@ void process_madis_metar(NcFile *&f_in) {
    ConcatString hdr_typ, hdr_sid;
    float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
    float wdir, wind, ugrd, vgrd;
-   int count;
+   int count = 0;
    StringArray missing_vars, missing_qty_vars;
    const char *method_name = "process_madis_metar() ";
 
@@ -1185,7 +1186,7 @@ void process_madis_raob(NcFile *&f_in) {
    ConcatString hdr_typ, hdr_sid;
    float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
    float wdir, wind, ugrd, vgrd;
-   int count;
+   int count = 0;
    StringArray missing_vars, missing_qty_vars;
    const char *method_name = "process_madis_raob() ";
 
@@ -1981,7 +1982,7 @@ void process_madis_profiler(NcFile *&f_in) {
    ConcatString hdr_typ, hdr_sid;
    float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
    float pressure;
-   int count;
+   int count = 0;
    StringArray missing_vars, missing_qty_vars;
    const char *method_name = "process_madis_profiler() ";
 
@@ -2225,7 +2226,7 @@ void process_madis_maritime(NcFile *&f_in) {
    ConcatString hdr_typ, hdr_sid;
    float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
    float pressure;
-   int count;
+   int count = 0;
    StringArray missing_vars, missing_qty_vars;
    const char *method_name = "process_madis_maritime() ";
 
@@ -2594,7 +2595,7 @@ void process_madis_mesonet(NcFile *&f_in) {
    ConcatString hdr_typ, hdr_sid;
    float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
    float wdir, wind, ugrd, vgrd;
-   int count;
+   int count = 0;
    StringArray missing_vars, missing_qty_vars;
    const char *method_name = "process_madis_mesonet() ";
 
@@ -3145,7 +3146,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    ConcatString hdr_typ, hdr_sid;
    float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
    float pressure, wdir, wind, ugrd, vgrd;
-   int count;
+   int count = 0;
    StringArray missing_vars, missing_qty_vars;
    const char * method_name = "process_madis_acarsProfiles() -> ";
 

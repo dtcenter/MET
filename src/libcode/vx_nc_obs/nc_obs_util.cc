@@ -1300,7 +1300,7 @@ int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_le
          data_buf.data()[buf_index + idx] = 0;  // erase previous data
 
       buf_index += str_len;
-      if ((buf_index/str_len) >= buf_size) {
+      if (buf_index >= (buf_size * str_len)) {
          mlog << Debug(7) << method_name << " save to NetCDF. index: " << index
               << "  buf_index: " << buf_index << "  offsets: "
               << offsets[0] << " lengths: " << lengths[0] << "\n";
