@@ -165,19 +165,31 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
    bool status = false;
    static const char *method_name = "get_att_value_chars(NcAtt) -> ";
    if (IS_VALID_NC_P(att)) {
-      nc_type attType = GET_NC_TYPE_ID_P(att);
-
-      // MET #3075 store attribute in a string rather than a character array
-      if (attType == NC_CHAR ||
-          attType == NC_STRING) {
+      nc_type attType = GET_NC_TYPE_ID_P(att); 
+      if (attType == NC_CHAR) {
+         try {
+            vector<char> att_value(att->getAttLength());
+            att->getValues(att_value.data());
+            value = att_value.data();
+         }
+         catch (exceptions::NcChar &ex) {
+            value = "";
+            mlog << Warning << "\n" << method_name
+                 << "Exception: " << ex.what() << "\n"
+                 << "Fail to read " << GET_NC_NAME_P(att) << " attribute ("
+                 << GET_NC_TYPE_NAME_P(att) << " type).\n"
+                 << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
+         }
+      }
+      else if (attType == NC_STRING) {
          try {
             string att_value;
             att->getValues(att_value);
             value = att_value;
          }
          catch (exceptions::NcChar &ex) {
-            vector<char> att_value(att->getAttLength());
             try {
+               vector<char> att_value(att->getAttLength());
                att->getValues(att_value.data());
                value = att_value.data();
             }
@@ -1007,7 +1019,6 @@ bool get_var_standard_name(const NcVar *var, ConcatString &att_val) {
 ////////////////////////////////////////////////////////////////////////
 
 bool get_var_units(const NcVar *var, ConcatString &att_val) {
-
    return get_nc_att_value(var, units_att_name, att_val);
 }
 
