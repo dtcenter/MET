@@ -26,22 +26,25 @@ using namespace netCDF::exceptions;
 
 ////////////////////////////////////////////////////////////////////////
 
-void patch_nc_name(string *var_name) {
+void patch_nc_name(string &var_name) {
    size_t offset;
 
+   cout << "JHG patch_nc_name input = \"" << var_name << "\"\n";
+
    // Replace commas with underscores
-   offset = var_name->find(',');
+   offset = var_name.find(',');
    while (offset != string::npos) {
-      var_name->replace(offset, 1, "_");
-      offset = var_name->find(',', offset);
+      var_name.replace(offset, 1, "_");
+      offset = var_name.find(',', offset);
    }
 
    // Replaces stars with the word all
-   offset = var_name->find('*');
+   offset = var_name.find('*');
    while (offset != string::npos) {
-      var_name->replace(offset, 1, "all");
-      offset = var_name->find('*', offset);
+      var_name.replace(offset, 1, "all");
+      offset = var_name.find('*', offset);
    }
+   cout << "JHG patch_nc_name output = \"" << var_name << "\"\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -168,7 +171,7 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
       nc_type attType = GET_NC_TYPE_ID_P(att); 
       if (attType == NC_CHAR) {
          try {
-            vector<char> att_value(att->getAttLength());
+            vector<char> att_value(att->getAttLength() + 1);
             att->getValues(att_value.data());
             value = att_value.data();
          }
@@ -189,7 +192,7 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
          }
          catch (exceptions::NcChar &ex) {
             try {
-               vector<char> att_value(att->getAttLength());
+               vector<char> att_value(att->getAttLength() + 1);
                att->getValues(att_value.data());
                value = att_value.data();
             }
@@ -1059,7 +1062,7 @@ ConcatString* get_string_val(NcFile * nc, const char * var_name, const int index
 
 ConcatString* get_string_val(NcVar *var, const int index,
                              const int len, ConcatString &tmp_cs) {
-   vector<char> tmp_str(len);
+   vector<char> tmp_str(len + 1);
    vector<size_t> start;
    vector<size_t> count;
    const char *method_name = "get_string_val() ";
@@ -1951,7 +1954,7 @@ bool get_nc_data_to_array(NcVar *var, StringArray *array_buf) {
          NcDim str_dim = var->getDim(dim_count-1);
          int count = get_dim_size(&count_dim);
          int str_len = get_dim_size(&str_dim);
-         vector<char> str_buffer(str_len+1);
+         vector<char> str_buffer(str_len + 1);
 
          offsets.add(0);
          offsets.add(0);
@@ -2218,7 +2221,7 @@ NcGroup get_nc_group(NcFile *nc, const char *group_name) {
 
 NcVar get_var(NcFile *nc, const char *var_name) {
    string new_var_name = var_name;
-   patch_nc_name(&new_var_name);
+   patch_nc_name(new_var_name);
 
    //
    // Retrieve the variable from the NetCDF file.
@@ -2244,7 +2247,7 @@ NcVar get_var(NcFile *nc, const char *var_name) {
 NcVar get_var(NcFile *nc, const char *var_name, const char *group_name) {
    string nc_var_name;
    string new_var_name = var_name;
-   patch_nc_name(&new_var_name);
+   patch_nc_name(new_var_name);
 
    //
    // Retrieve the variable from the NetCDF file.
@@ -2278,7 +2281,7 @@ NcVar get_var(NcFile *nc, const char *var_name, const char *group_name) {
 
 NcVar get_nc_var(NcFile *nc, const char *var_name, bool log_as_error) {
    string new_var_name = var_name;
-   patch_nc_name(&new_var_name);
+   patch_nc_name(new_var_name);
 
    //
    // Retrieve the variable from the NetCDF file.
@@ -2311,7 +2314,7 @@ NcVar get_nc_var(NcFile *nc, const char *var_name, const char *group_name,
                  bool log_as_error) {
    string nc_var_name;
    string new_var_name = var_name;
-   patch_nc_name(&new_var_name);
+   patch_nc_name(new_var_name);
 
    //
    // Retrieve the variable from the NetCDF file.
@@ -2362,7 +2365,7 @@ void copy_nc_att_byte(NcFile *nc_to, NcGroupAtt *from_att) {
 
 void copy_nc_att_char(NcFile *nc_to, NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
-   vector<char> value(att_length);
+   vector<char> value(att_length + 1);
    from_att->getValues(value.data());
    nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
@@ -2441,7 +2444,7 @@ void copy_nc_att_short(NcFile *nc_to, NcGroupAtt *from_att) {
 
 void copy_nc_att_char(NcVar *var_to, NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
-   vector<char> value(att_length);
+   vector<char> value(att_length + 1);
    from_att->getValues(value.data());
    var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
@@ -2526,7 +2529,7 @@ void copy_nc_att_byte(NcVar *var_to, NcVarAtt *from_att) {
 
 void copy_nc_att_char(NcVar *var_to, NcVarAtt *from_att) {
    size_t att_length = from_att->getAttLength();
-   vector<char> value(att_length);
+   vector<char> value(att_length + 1);
    from_att->getValues(value.data());
    var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
@@ -2782,7 +2785,7 @@ void copy_nc_atts(NcVar *var_from, NcVar *var_to, const bool all_attrs) {
 ////////////////////////////////////////////////////////////////////////
 
 void copy_nc_data_char(NcVar *var_from, NcVar *var_to, int data_size) {
-   vector<char> data(data_size);
+   vector<char> data(data_size + 1);
    var_from->getVar(data.data());
    var_to->putVar(data.data());
 }
@@ -2884,7 +2887,7 @@ bool has_nc_group(NcFile *nc, const char *group_name) {
 
 bool has_var(NcFile *nc, const char *var_name) {
    string new_var_name = var_name;
-   patch_nc_name(&new_var_name);
+   patch_nc_name(new_var_name);
    NcVar v = get_var(nc, new_var_name.c_str());
    return IS_VALID_NC(v);
 }
@@ -2900,7 +2903,7 @@ bool has_var(NcFile *nc, const ConcatString var_name) {
 bool has_var(NcFile *nc, const char *var_name, const char *group_name) {
    string nc_var_name;
    string new_var_name = var_name;
-   patch_nc_name(&new_var_name);
+   patch_nc_name(new_var_name);
 
    //
    // Retrieve the variable from the NetCDF file.
@@ -2931,7 +2934,7 @@ bool has_var(NcFile *nc, const ConcatString var_name, const char *group_name) {
 NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType, const int deflate_level) {
    vector<NcDim> ncDimVector;
    string new_var_name = var_name;
-   patch_nc_name(&new_var_name);
+   patch_nc_name(new_var_name);
    NcVar var = nc->addVar(new_var_name, ncType, ncDimVector);
 
    if (deflate_level > 0) {
@@ -2946,7 +2949,7 @@ NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType, const int
 NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
               const NcDim ncDim, const int deflate_level) {
    string new_var_name = var_name;
-   patch_nc_name(&new_var_name);
+   patch_nc_name(new_var_name);
    NcVar var = nc->addVar(new_var_name, ncType, ncDim);
 
    if (deflate_level > 0) {
@@ -2995,7 +2998,8 @@ NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
 NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
               const vector<NcDim> ncDims, const int deflate_level) {
    string new_var_name = var_name;
-   patch_nc_name(&new_var_name);
+   patch_nc_name(new_var_name);
+   cout << "JHG adding new name -> \"" << new_var_name << "\"\n";
    NcVar var = nc->addVar(new_var_name, ncType, ncDims);
    if (deflate_level > 0) {
       mlog << Debug(3) << "    nc_utils.add_var() deflate_level: " << deflate_level << "\n";
@@ -3028,7 +3032,7 @@ NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
 
 NcDim add_dim(NcFile *nc, const string &dim_name) {
    string new_dim_name = dim_name;
-   patch_nc_name(&new_dim_name);
+   patch_nc_name(new_dim_name);
    return nc->addDim(new_dim_name);
 }
 
@@ -3036,7 +3040,7 @@ NcDim add_dim(NcFile *nc, const string &dim_name) {
 
 NcDim add_dim(NcFile *nc, const string &dim_name, const size_t dim_size) {
    string new_dim_name = dim_name;
-   patch_nc_name(&new_dim_name);
+   patch_nc_name(new_dim_name);
    return nc->addDim(new_dim_name, dim_size);
 }
 

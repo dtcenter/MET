@@ -741,14 +741,14 @@ void process_ioda_file(int i_pb) {
                                   hdr_time_arr[i_read], no_leap_year);
       }
       else if (is_time_string) {
-         vector<char> valid_time(nstring+1);
+         vector<char> valid_time(nstring + 1);
          m_strncpy(valid_time.data(), (const char *)hdr_vld_block2[i_read],
                    nstring, method_name_s, "valid_time", true);
          valid_time[nstring] = 0;
          msg_ut = yyyymmddThhmmss_to_unix(valid_time.data());
       }
       else {
-         vector<char> valid_time(ndatetime+1);
+         vector<char> valid_time(ndatetime + 1);
          m_strncpy(valid_time.data(), (const char *)(hdr_vld_block + (i_read * ndatetime)),
                    ndatetime, method_name_s, "valid_time", true);
          valid_time[ndatetime] = 0;
@@ -830,7 +830,7 @@ void process_ioda_file(int i_pb) {
       }
 
       if(has_station_id) {
-         vector<char> tmp_sid(nstring+1);
+         vector<char> tmp_sid(nstring + 1);
          if (nullptr != hdr_station_ids2) {
             m_strncpy(tmp_sid.data(), hdr_station_ids2[i_read], nstring, method_name_s, "tmp_sid2");
          }
