@@ -29,8 +29,6 @@ using namespace netCDF::exceptions;
 void patch_nc_name(string &var_name) {
    size_t offset;
 
-   cout << "JHG patch_nc_name input = \"" << var_name << "\"\n";
-
    // Replace commas with underscores
    offset = var_name.find(',');
    while (offset != string::npos) {
@@ -44,7 +42,6 @@ void patch_nc_name(string &var_name) {
       var_name.replace(offset, 1, "all");
       offset = var_name.find('*', offset);
    }
-   cout << "JHG patch_nc_name output = \"" << var_name << "\"\n";
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2999,7 +2996,6 @@ NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
               const vector<NcDim> ncDims, const int deflate_level) {
    string new_var_name = var_name;
    patch_nc_name(new_var_name);
-   cout << "JHG adding new name -> \"" << new_var_name << "\"\n";
    NcVar var = nc->addVar(new_var_name, ncType, ncDims);
    if (deflate_level > 0) {
       mlog << Debug(3) << "    nc_utils.add_var() deflate_level: " << deflate_level << "\n";
