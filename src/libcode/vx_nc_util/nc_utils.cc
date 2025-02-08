@@ -188,10 +188,16 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
             value = att_value;
          }
          catch (exceptions::NcChar &ex) {
+            // NC_STRING attributes do not parse well with Intel compilers
+            int num_elements_sub = 8096;
+            int num_elements = att->getAttLength();
+            vector <char *> att_value(num_elements);
+            for(int i=0; i<num_elements; i++) {
+               att_value[i] = (char*) calloc(num_elements_sub, sizeof(char));
+            }
             try {
-               vector<char> att_value(att->getAttLength() + 1);
                att->getValues(att_value.data());
-               value = att_value.data();
+               value = att_value[0];
             }
             catch (exceptions::NcException &ex2) {
                mlog << Warning << "\n" << method_name
@@ -200,6 +206,8 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
                     << GET_NC_TYPE_NAME_P(att) << " type).\n"
                     << "Please check the encoding of the "<< GET_NC_NAME_P(att) << " attribute.\n\n";
             }
+            // Cleanup
+            for(int i=0; i<num_elements; i++) delete att_value[i];
          }
       }
       else { // MET-788: to handle a custom modified NetCDF
