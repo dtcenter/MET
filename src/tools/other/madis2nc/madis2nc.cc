@@ -1564,7 +1564,7 @@ void process_madis_raob(NcFile *&f_in) {
          hdr_arr[1] = hdr_lon_arr[i_idx];
          hdr_arr[2] = hdr_elv_arr[i_idx];
 
-	 //
+         //
          // Process the station name.
          //
          hdr_sid = &hdr_sid_arr.data()[i_idx * hdr_sid_len];
@@ -2174,7 +2174,7 @@ void process_madis_profiler(NcFile *&f_in) {
 
             int i_buf = (i_idx * buf_size) + i_lvl;
 
-	    //
+            //
             // Set the pressure and height for this level
             //
             obs_arr[2] = pressure;
@@ -3359,7 +3359,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
 
             int i_buf = (i_idx * buf_size) + i_lvl;
 
-	    hdr_idx = nc_point_obs.get_obs_index();
+            hdr_idx = nc_point_obs.get_obs_index();
 
             //
             // Use cur to index into the NetCDF variables.

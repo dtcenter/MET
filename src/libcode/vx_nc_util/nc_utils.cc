@@ -165,13 +165,13 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
    bool status = false;
    static const char *method_name = "get_att_value_chars(NcAtt) -> ";
    if (IS_VALID_NC_P(att)) {
-      nc_type attType = GET_NC_TYPE_ID_P(att); 
+      nc_type attType = GET_NC_TYPE_ID_P(att);
       if (attType == NC_CHAR) {
          try {
             size_t att_length = att->getAttLength();
             vector<char> att_value(att_length + 1);
             att->getValues(att_value.data());
-            att_value[att_length] = '\0'; 
+            att_value[att_length] = '\0';
             value = att_value.data();
          }
          catch (exceptions::NcChar &ex) {
