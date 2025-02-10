@@ -154,7 +154,10 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
                                     const Grid to_grid);
 static void open_nc(const Grid &grid, const ConcatString run_cs);
 static void write_nc(const DataPlane &dp, const Grid &grid,
-                     const VarInfo *vinfo, const char *vname);
+                     const VarInfo *vinfo, const char *vname,
+                     bool add_gaussian_atts = false,
+                     NcFile *in_goes_nc = nullptr,
+                     NcVar *in_var_nc = nullptr);
 static void write_nc_int(const DataPlane &dp, const Grid &grid,
                          const VarInfo *vinfo, const char *vname);
 static void close_nc();
@@ -1108,15 +1111,10 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          tmp_long_name = vname_prob;
          tmp_long_name << dim_string;
          vinfo->set_long_name(tmp_long_name.c_str());
-         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str());
-         if (do_gaussian_filter) {
-            NcVar prob_var = get_var(nc_out, vname_prob.c_str());
-            if (IS_VALID_NC(prob_var)) {
-               add_att(&prob_var, "gaussian_radius", RGInfo.gaussian.radius);
-               add_att(&prob_var, "gaussian_dx", RGInfo.gaussian.dx);
-               add_att(&prob_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
-            }
-         }
+
+         // Write the probability data
+         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
+                  do_gaussian_filter);
 
          tmp_long_name = vname_prob_mask;
          tmp_long_name << dim_string;
@@ -1265,7 +1263,6 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    int filtered_by_time = 0;
    int time_from_size = 1;
    clock_t start_clock =  clock();
-   bool opt_all_attrs = false;
    Grid fr_grid = fr_mtddf->grid();
    static const char *method_name = "process_point_nccf_file() -> ";
 
@@ -1458,8 +1455,6 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       // Write the regridded data
       write_nc(to_dp, to_grid, vinfo, vname.c_str());
 
-      NcVar to_var = get_nc_var(nc_out, vname.c_str());
-
       bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
       if (has_prob_thresh || do_gaussian_filter) {
          DataPlane prob_dp;
@@ -1484,19 +1479,10 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
          }
 
          if (do_gaussian_filter) interp_gaussian_dp(prob_dp, RGInfo.gaussian, RGInfo.vld_thresh);
-         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str());
-         if(IS_VALID_NC(var_data)) {
-            NcVar out_var = get_nc_var(nc_out, vname.c_str());
-            copy_nc_atts(&var_data, &out_var, opt_all_attrs);
-            if (do_gaussian_filter) {
-               NcVar prob_var = get_var(nc_out, vname_prob.c_str());
-               if (IS_VALID_NC(prob_var)) {
-                  add_att(&prob_var, "gaussian_radius", RGInfo.gaussian.radius);
-                  add_att(&prob_var, "gaussian_dx", RGInfo.gaussian.dx);
-                  add_att(&prob_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
-               }
-            }
-         }
+
+         // Write the probability data
+         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
+                  do_gaussian_filter, nullptr, &var_data);
       }
 
    } // end for i
@@ -1739,13 +1725,19 @@ void write_nc_data_int(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
 ////////////////////////////////////////////////////////////////////////
 
 static void write_nc(const DataPlane &dp, const Grid &grid,
-                     const VarInfo *vinfo, const char *vname) {
+                     const VarInfo *vinfo, const char *vname,
+                     bool add_gaussian_atts,
+                     NcFile *in_goes_nc,
+                     NcVar *in_var_nc) {
 
    int deflate_level = compress_level;
-   if (deflate_level < 0) deflate_level = 0;
+   if(deflate_level < 0) deflate_level = 0;
 
+   // Create the output variable
    NcVar data_var = add_var(nc_out, (string)vname, ncFloat,
                             lat_dim, lon_dim, deflate_level);
+
+   // Add standard attributes
    add_att(&data_var, "name", (string)vname);
    add_att(&data_var, "long_name", (string)vinfo->long_name());
    add_att(&data_var, "level", (string)vinfo->level_name());
@@ -1753,6 +1745,27 @@ static void write_nc(const DataPlane &dp, const Grid &grid,
    add_att(&data_var, "_FillValue", bad_data_float);
    write_netcdf_var_times(&data_var, dp);
 
+   // If requested, add global GOES attributes
+   if(in_goes_nc) {
+      for(size_t idx=0; idx<GOES_global_attr_names.size(); idx++) {
+         copy_nc_att(in_goes_nc, &data_var, (string)GOES_global_attr_names[idx]);
+      }
+   }
+
+   // If requested, add input variable attributes
+   if(IS_VALID_NC_P(in_var_nc)) {
+      bool opt_all_attrs = false;
+      copy_nc_atts(in_var_nc, &data_var, opt_all_attrs);
+   }
+
+   // If requested, add gaussian attributes
+   if(add_gaussian_atts) {
+      add_att(&data_var, "gaussian_radius", RGInfo.gaussian.radius);
+      add_att(&data_var, "gaussian_dx", RGInfo.gaussian.dx);
+      add_att(&data_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
+   }
+
+   // Write the output data 
    write_nc_data(dp, grid, &data_var);
 
    return;
@@ -1790,8 +1803,6 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                               const Grid fr_grid, const Grid to_grid) {
    DataPlane fr_dp, to_dp;
    ConcatString vname;
-   const size_t global_attr_count = GOES_global_attr_names.size();
-   bool opt_all_attrs = false;
    clock_t start_clock =  clock();
    auto nc_adp = (NcFile *) nullptr;
    static const char *method_name = "process_goes_file() -> ";
@@ -1857,17 +1868,12 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          vname = VarNameSA[i];
       }
 
-      // Write the regridded data
-      write_nc(to_dp, to_grid, vinfo, vname.c_str());
+      // Get the input GOES variable 
+      NcVar in_goes_var = get_goes_nc_var(nc_in, vinfo->name());
 
-      NcVar to_var = get_nc_var(nc_out, vname.c_str());
-      NcVar var_data = get_goes_nc_var(nc_in, vinfo->name());
-      if(IS_VALID_NC(var_data)) {
-         for (size_t idx=0; idx<global_attr_count; idx++) {
-            copy_nc_att(nc_in, &to_var, (string)GOES_global_attr_names[idx]);
-         }
-         copy_nc_atts(&var_data, &to_var, opt_all_attrs);
-      }
+      // Write the regridded data
+      write_nc(to_dp, to_grid, vinfo, vname.c_str(),
+               false, nc_in, &in_goes_var);
 
       bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
       if (has_prob_thresh || do_gaussian_filter) {
@@ -1893,22 +1899,10 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          }
 
          if (do_gaussian_filter) interp_gaussian_dp(prob_dp, RGInfo.gaussian, RGInfo.vld_thresh);
-         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str());
-         if(IS_VALID_NC(var_data)) {
-            NcVar out_var = get_nc_var(nc_out, vname.c_str());
-            for (size_t idx=0; idx<global_attr_count; idx++) {
-               copy_nc_att(nc_in, &out_var, (string)GOES_global_attr_names[idx]);
-            }
-            copy_nc_atts(&var_data, &out_var, opt_all_attrs);
-            if (do_gaussian_filter) {
-               NcVar prob_var = get_var(nc_out, vname_prob.c_str());
-               if (IS_VALID_NC(prob_var)) {
-                  add_att(&prob_var, "gaussian_radius", RGInfo.gaussian.radius);
-                  add_att(&prob_var, "gaussian_dx", RGInfo.gaussian.dx);
-                  add_att(&prob_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
-               }
-            }
-         }
+
+         // Write the probability data
+         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
+                  do_gaussian_filter, nc_in, &in_goes_var);
       }
 
    } // end for i
@@ -3003,7 +2997,7 @@ __attribute__((noreturn)) static void usage() {
         << "to generate gridded data (optional).\n"
 
         << "\t\t\"-goes_qc flags\" specifies a comma-separated list of QC flags, "
-	<< "for example \"0,1\" (optional).\n"
+        << "for example \"0,1\" (optional).\n"
         << "\t\t\tOnly used if grid_mapping is set to \"goes_imager_projection\" "
         << "and the QC variable exists.\n"
 
