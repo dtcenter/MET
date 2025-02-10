@@ -168,8 +168,10 @@ bool get_att_value_chars(const NcAtt *att, ConcatString &value) {
       nc_type attType = GET_NC_TYPE_ID_P(att); 
       if (attType == NC_CHAR) {
          try {
-            vector<char> att_value(att->getAttLength() + 1);
+            size_t att_length = att->getAttLength();
+            vector<char> att_value(att_length + 1);
             att->getValues(att_value.data());
+            att_value[att_length] = '\0'; 
             value = att_value.data();
          }
          catch (exceptions::NcChar &ex) {
@@ -1098,6 +1100,7 @@ ConcatString* get_string_val(NcVar *var, const int index,
    count.push_back(1);
    count.push_back(len);
    var->getVar(start, count, tmp_str.data());
+   tmp_str[len] = '\0';
 
    //
    // Store the character array as a ConcatString
@@ -1973,6 +1976,7 @@ bool get_nc_data_to_array(NcVar *var, StringArray *array_buf) {
                break;
             }
             else {
+               str_buffer[str_len] = '\0';
                array_buf->add(str_buffer.data());
             }
             offsets[0]++;
@@ -2372,6 +2376,7 @@ void copy_nc_att_char(NcFile *nc_to, NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    vector<char> value(att_length + 1);
    from_att->getValues(value.data());
+   value[att_length] = '\0';
    nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
 
@@ -2451,6 +2456,7 @@ void copy_nc_att_char(NcVar *var_to, NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    vector<char> value(att_length + 1);
    from_att->getValues(value.data());
+   value[att_length] = '\0';
    var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
 
@@ -2536,6 +2542,7 @@ void copy_nc_att_char(NcVar *var_to, NcVarAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    vector<char> value(att_length + 1);
    from_att->getValues(value.data());
+   value[att_length] = '\0';
    var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
 
@@ -2792,6 +2799,7 @@ void copy_nc_atts(NcVar *var_from, NcVar *var_to, const bool all_attrs) {
 void copy_nc_data_char(NcVar *var_from, NcVar *var_to, int data_size) {
    vector<char> data(data_size + 1);
    var_from->getVar(data.data());
+   data[data_size] = '\0';
    var_to->putVar(data.data());
 }
 
