@@ -1482,7 +1482,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
 
          // Write the probability data
          write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
-                  do_gaussian_filter, nullptr, &var_data);
+                  do_gaussian_filter);
       }
 
    } // end for i
@@ -1868,7 +1868,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          vname = VarNameSA[i];
       }
 
-      // Get the input GOES variable 
+      // Get the input GOES variable to copy variable attributes
       NcVar in_goes_var = get_goes_nc_var(nc_in, vinfo->name());
 
       // Write the regridded data
@@ -1902,7 +1902,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
 
          // Write the probability data
          write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
-                  do_gaussian_filter, nc_in, &in_goes_var);
+                  do_gaussian_filter);
       }
 
    } // end for i
