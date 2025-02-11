@@ -13,7 +13,6 @@ export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.10 -lcrypt -lpthread -ldl -l
 
 export CFLAGS="-DUNDERSCORE -fPIC"
 export CXXFLAGS=${CFLAGS}
-export FFLAGS="-O2"
 
 # Set LDFLAGS to include -rpath settings when compiling MET
 export LDFLAGS="-Wl,--disable-new-dtags"
