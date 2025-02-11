@@ -1597,7 +1597,7 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Mandatory Level: " << i_lvl << "\n";
 
-            int i_buf = (i_idx * buf_size) + i_lvl;
+            int i_buf = (i_idx * nlvl) + i_lvl;
 
             //
             // Use cur to index into the NetCDF variables.
@@ -1684,7 +1684,7 @@ void process_madis_raob(NcFile *&f_in) {
             //
             cur[1] = i_lvl;
 
-            int i_buf = (i_idx * buf_size) + i_lvl;
+            int i_buf = (i_idx * nlvl) + i_lvl;
 
             //
             // Get the pressure and height for this level
@@ -1719,7 +1719,7 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Significant W Level: " << i_lvl << "\n";
 
-            int i_buf = (i_idx * buf_size) + i_lvl;
+            int i_buf = (i_idx * nlvl) + i_lvl;
 
             //
             // Use cur to index into the NetCDF variables.
@@ -1777,7 +1777,7 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Significant W-by-P Level: " << i_lvl << "\n";
 
-            int i_buf = (i_idx * buf_size) + i_lvl;
+            int i_buf = (i_idx * nlvl) + i_lvl;
 
             //
             // Use cur to index into the NetCDF variables.
@@ -1835,7 +1835,7 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Tropopause Level: " << i_lvl << "\n";
 
-            int i_buf = (i_idx * buf_size) + i_lvl;
+            int i_buf = (i_idx * nlvl) + i_lvl;
 
             //
             // Use cur to index into the NetCDF variables.
@@ -1905,7 +1905,7 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Maximum Wind Level: " << i_lvl << "\n";
 
-            int i_buf = (i_idx * buf_size) + i_lvl;
+            int i_buf = (i_idx * nlvl) + i_lvl;
 
             //
             // Use cur to index into the NetCDF variables.
@@ -2172,7 +2172,7 @@ void process_madis_profiler(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Level: " << i_lvl << "\n";
 
-            int i_buf = (i_idx * buf_size) + i_lvl;
+            int i_buf = (i_idx * nlvl) + i_lvl;
 
             //
             // Set the pressure and height for this level
@@ -3357,7 +3357,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             i_cnt++;
             mlog << Debug(3) << "  Mandatory Level: " << i_lvl << "\n";
 
-            int i_buf = (i_idx * buf_size) + i_lvl;
+            int i_buf = (i_idx * nlvl) + i_lvl;
 
             hdr_idx = nc_point_obs.get_obs_index();
 
