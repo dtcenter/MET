@@ -1597,7 +1597,7 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Mandatory Level: " << i_lvl << "\n";
 
-            int i_buf = (i_idx * nlvl) + i_lvl;
+            int i_buf = (i_idx * maxlvl_manLevel) + i_lvl;
 
             //
             // Use cur to index into the NetCDF variables.
@@ -1684,7 +1684,7 @@ void process_madis_raob(NcFile *&f_in) {
             //
             cur[1] = i_lvl;
 
-            int i_buf = (i_idx * nlvl) + i_lvl;
+            int i_buf = (i_idx * maxlvl_sigTLevel) + i_lvl;
 
             //
             // Get the pressure and height for this level
@@ -1719,7 +1719,7 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Significant W Level: " << i_lvl << "\n";
 
-            int i_buf = (i_idx * nlvl) + i_lvl;
+            int i_buf = (i_idx * maxlvl_sigWLevel) + i_lvl;
 
             //
             // Use cur to index into the NetCDF variables.
@@ -1777,7 +1777,7 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Significant W-by-P Level: " << i_lvl << "\n";
 
-            int i_buf = (i_idx * nlvl) + i_lvl;
+            int i_buf = (i_idx * maxlvl_sigPresWLevel) + i_lvl;
 
             //
             // Use cur to index into the NetCDF variables.
@@ -1835,7 +1835,7 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Tropopause Level: " << i_lvl << "\n";
 
-            int i_buf = (i_idx * nlvl) + i_lvl;
+            int i_buf = (i_idx * maxlvl_mTropNum) + i_lvl;
 
             //
             // Use cur to index into the NetCDF variables.
@@ -1905,7 +1905,7 @@ void process_madis_raob(NcFile *&f_in) {
 
             mlog << Debug(3) << "  Maximum Wind Level: " << i_lvl << "\n";
 
-            int i_buf = (i_idx * nlvl) + i_lvl;
+            int i_buf = (i_idx * maxlvl_mWndNum) + i_lvl;
 
             //
             // Use cur to index into the NetCDF variables.
@@ -3318,7 +3318,6 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       //
       hdr_typ = "AIRCFT";
 
-
       for (int i_idx=0; i_idx<buf_size; i_idx++) {
          i_hdr = i_hdr_s + i_idx;
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
@@ -3357,7 +3356,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             i_cnt++;
             mlog << Debug(3) << "  Mandatory Level: " << i_lvl << "\n";
 
-            int i_buf = (i_idx * nlvl) + i_lvl;
+            int i_buf = (i_idx * maxLevels) + i_lvl;
 
             hdr_idx = nc_point_obs.get_obs_index();
 
