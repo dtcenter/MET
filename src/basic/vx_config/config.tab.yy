@@ -209,34 +209,29 @@ static void do_user_function_def();
 }
 
 
-%token IDENTIFIER QUOTED_STRING INTEGER FLOAT BOOLEAN
-%token COMPARISON NA_COMPARISON
 %token LOGICAL_OP_NOT LOGICAL_OP_AND LOGICAL_OP_OR
-%token FORTRAN_THRESHOLD
-%token BUILTIN
-%token LOCAL_VAR
-%token SIMPLE_PERC_THRESH
 
-%token USER_FUNCTION
 %token PRINT
 
 
-%type <text> IDENTIFIER QUOTED_STRING assign_prefix array_prefix FORTRAN_THRESHOLD
+%token <text> IDENTIFIER QUOTED_STRING FORTRAN_THRESHOLD
+%type  <text> assign_prefix array_prefix
 
-%type <nval> INTEGER FLOAT number
+%token <nval> INTEGER FLOAT
+%type  <nval> number
 
-%type <index> BUILTIN
-%type <index> LOCAL_VAR
+%token <index> BUILTIN
+%token <index> LOCAL_VAR
 
-%type <entry> USER_FUNCTION
+%token <entry> USER_FUNCTION
 
-%type <bval> BOOLEAN
+%token <bval> BOOLEAN
 
-%type <cval> COMPARISON NA_COMPARISON
+%token <cval> COMPARISON NA_COMPARISON
 
-%type <node> simple_thresh thresh_node
+%type  <node> simple_thresh thresh_node
 
-%type <pc_info> SIMPLE_PERC_THRESH
+%token <pc_info> SIMPLE_PERC_THRESH
 
 
 %left '+' '-'

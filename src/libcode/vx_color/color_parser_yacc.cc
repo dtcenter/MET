@@ -226,15 +226,15 @@ enum yysymbol_kind_t
   YYSYMBOL_YYEOF = 0,                      /* "end of file"  */
   YYSYMBOL_YYerror = 1,                    /* error  */
   YYSYMBOL_YYUNDEF = 2,                    /* "invalid token"  */
-  YYSYMBOL_ID = 3,                         /* ID  */
-  YYSYMBOL_COLOR_NAME = 4,                 /* COLOR_NAME  */
-  YYSYMBOL_INTEGER = 5,                    /* INTEGER  */
-  YYSYMBOL_QUOTED_STRING = 6,              /* QUOTED_STRING  */
-  YYSYMBOL_FLOAT = 7,                      /* FLOAT  */
-  YYSYMBOL_BLEND = 8,                      /* BLEND  */
-  YYSYMBOL_HSV = 9,                        /* HSV  */
-  YYSYMBOL_GRAYVALUE = 10,                 /* GRAYVALUE  */
-  YYSYMBOL_CMYK = 11,                      /* CMYK  */
+  YYSYMBOL_QUOTED_STRING = 3,              /* QUOTED_STRING  */
+  YYSYMBOL_BLEND = 4,                      /* BLEND  */
+  YYSYMBOL_HSV = 5,                        /* HSV  */
+  YYSYMBOL_GRAYVALUE = 6,                  /* GRAYVALUE  */
+  YYSYMBOL_CMYK = 7,                       /* CMYK  */
+  YYSYMBOL_ID = 8,                         /* ID  */
+  YYSYMBOL_INTEGER = 9,                    /* INTEGER  */
+  YYSYMBOL_COLOR_NAME = 10,                /* COLOR_NAME  */
+  YYSYMBOL_FLOAT = 11,                     /* FLOAT  */
   YYSYMBOL_12_ = 12,                       /* '='  */
   YYSYMBOL_13_ = 13,                       /* '{'  */
   YYSYMBOL_14_ = 14,                       /* ','  */
@@ -575,7 +575,7 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  12
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   66
+#define YYLAST   63
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  18
@@ -634,8 +634,8 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   161,   161,   162,   166,   167,   171,   172,   176,   177,
-     181,   182,   183,   184,   185,   186,   190,   191
+       0,   155,   155,   156,   160,   161,   165,   166,   170,   171,
+     175,   176,   177,   178,   179,   180,   184,   185
 };
 #endif
 
@@ -651,10 +651,11 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "\"end of file\"", "error", "\"invalid token\"", "ID", "COLOR_NAME",
-  "INTEGER", "QUOTED_STRING", "FLOAT", "BLEND", "HSV", "GRAYVALUE", "CMYK",
-  "'='", "'{'", "','", "'}'", "'('", "')'", "$accept", "statement_list",
-  "statement", "ctable_entry", "color_assignment", "color", "number", YY_NULLPTR
+  "\"end of file\"", "error", "\"invalid token\"", "QUOTED_STRING",
+  "BLEND", "HSV", "GRAYVALUE", "CMYK", "ID", "INTEGER", "COLOR_NAME",
+  "FLOAT", "'='", "'{'", "','", "'}'", "'('", "')'", "$accept",
+  "statement_list", "statement", "ctable_entry", "color_assignment",
+  "color", "number", YY_NULLPTR
 };
 
 static const char *
@@ -678,12 +679,12 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-      -1,   -11,     1,   -12,   -12,    59,   -12,   -12,   -12,    39,
-      47,    47,   -12,   -12,   -12,    -5,    -4,     4,     5,     0,
-     -12,    47,   -12,   -12,    47,     0,     0,     0,     9,   -12,
-      10,    12,    -3,    14,     0,    47,     0,   -12,     0,    16,
-      17,    18,    24,     0,     0,     0,     0,    25,    22,    36,
-      27,   -12,   -12,   -12,     0,    37,   -12
+      -4,   -11,   -12,   -10,   -12,     3,   -12,   -12,   -12,    37,
+      47,    47,   -12,   -12,    -1,     4,     8,    10,   -12,    12,
+     -12,    47,   -12,   -12,    47,    12,    12,    12,    14,   -12,
+      16,    17,    15,    24,    12,    47,    12,   -12,    12,    25,
+      26,    35,    41,    12,    12,    12,    12,    43,    39,    42,
+      48,   -12,   -12,   -12,    12,    44,   -12
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -691,8 +692,8 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,    16,    17,     0,     2,     5,     4,     0,
-       0,     0,     1,     3,    15,     0,     0,     0,     0,     0,
+       0,     0,    16,     0,    17,     0,     2,     5,     4,     0,
+       0,     0,     1,     3,     0,     0,     0,     0,    15,     0,
        6,     0,     8,     9,     0,     0,     0,     0,     0,     7,
        0,     0,     0,     0,     0,     0,     0,    14,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
@@ -702,7 +703,7 @@ static const yytype_int8 yydefact[] =
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -12,   -12,    56,   -12,   -12,    -2,    -9
+     -12,   -12,    58,   -12,   -12,    -2,    -9
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
@@ -716,32 +717,32 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      21,    10,     1,     2,     3,     3,     4,     4,    22,    23,
-      28,    24,    25,    11,    37,     0,    31,    32,    33,    29,
-      26,    27,    30,    34,    35,    39,    36,    41,    38,    42,
-      43,    44,    45,    40,    47,    48,    49,    50,    46,    52,
-      51,    54,     0,    14,     3,    55,     4,    15,    16,    17,
-      18,    14,    19,    53,    56,    15,    16,    17,    18,    12,
-      19,    13,     1,     2,     3,     0,     4
+      21,    10,    11,    12,     1,     2,     3,     4,    22,    23,
+      28,     1,     2,     3,     4,    24,    31,    32,    33,    29,
+      25,     2,    30,     4,    26,    39,    27,    41,    34,    42,
+      35,    36,    37,    40,    47,    48,    49,    50,    38,    43,
+      44,    14,    15,    16,    17,    55,     2,    18,     4,    45,
+      19,    14,    15,    16,    17,    46,    52,    18,    51,    53,
+      19,    56,    54,    13
 };
 
 static const yytype_int8 yycheck[] =
 {
-       9,    12,     3,     4,     5,     5,     7,     7,    10,    11,
-      19,    16,    16,    12,    17,    -1,    25,    26,    27,    21,
-      16,    16,    24,    14,    14,    34,    14,    36,    14,    38,
-      14,    14,    14,    35,    43,    44,    45,    46,    14,    17,
-      15,    14,    -1,     4,     5,    54,     7,     8,     9,    10,
-      11,     4,    13,    17,    17,     8,     9,    10,    11,     0,
-      13,     5,     3,     4,     5,    -1,     7
+       9,    12,    12,     0,     8,     9,    10,    11,    10,    11,
+      19,     8,     9,    10,    11,    16,    25,    26,    27,    21,
+      16,     9,    24,    11,    16,    34,    16,    36,    14,    38,
+      14,    14,    17,    35,    43,    44,    45,    46,    14,    14,
+      14,     4,     5,     6,     7,    54,     9,    10,    11,    14,
+      13,     4,     5,     6,     7,    14,    17,    10,    15,    17,
+      13,    17,    14,     5
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,     4,     5,     7,    19,    20,    21,    22,    24,
-      12,    12,     0,    20,     4,     8,     9,    10,    11,    13,
+       0,     8,     9,    10,    11,    19,    20,    21,    22,    24,
+      12,    12,     0,    20,     4,     5,     6,     7,    10,    13,
       23,    24,    23,    23,    16,    16,    16,    16,    24,    23,
       23,    24,    24,    24,    14,    14,    14,    17,    14,    24,
       23,    24,    24,    14,    14,    14,    14,    24,    24,    24,
@@ -1223,79 +1224,79 @@ yyreduce:
   switch (yyn)
     {
   case 6: /* ctable_entry: number color  */
-#line 171 "color_parser_yacc.yy"
+#line 165 "color_parser_yacc.yy"
                                          { add_to_table((yyvsp[-1].nval), (yyvsp[0].cval)); }
-#line 1229 "color_parser_yacc.cc"
+#line 1230 "color_parser_yacc.cc"
     break;
 
   case 7: /* ctable_entry: number number color  */
-#line 172 "color_parser_yacc.yy"
+#line 166 "color_parser_yacc.yy"
                                          { add_2_to_table((yyvsp[-2].nval), (yyvsp[-1].nval), (yyvsp[0].cval)); }
-#line 1235 "color_parser_yacc.cc"
+#line 1236 "color_parser_yacc.cc"
     break;
 
   case 8: /* color_assignment: ID '=' color  */
-#line 176 "color_parser_yacc.yy"
+#line 170 "color_parser_yacc.yy"
                                          { assign_color_1((yyvsp[-2].text), (yyvsp[0].cval)); }
-#line 1241 "color_parser_yacc.cc"
+#line 1242 "color_parser_yacc.cc"
     break;
 
   case 9: /* color_assignment: COLOR_NAME '=' color  */
-#line 177 "color_parser_yacc.yy"
+#line 171 "color_parser_yacc.yy"
                                          { assign_color_2((yyvsp[-2].ival), (yyvsp[0].cval)); }
-#line 1247 "color_parser_yacc.cc"
+#line 1248 "color_parser_yacc.cc"
     break;
 
   case 10: /* color: '{' number ',' number ',' number '}'  */
-#line 181 "color_parser_yacc.yy"
+#line 175 "color_parser_yacc.yy"
                                                                  { (yyval.cval) = do_simple_color((yyvsp[-5].nval), (yyvsp[-3].nval), (yyvsp[-1].nval)); }
-#line 1253 "color_parser_yacc.cc"
+#line 1254 "color_parser_yacc.cc"
     break;
 
   case 11: /* color: BLEND '(' color ',' color ',' number ')'  */
-#line 182 "color_parser_yacc.yy"
+#line 176 "color_parser_yacc.yy"
                                                                  { (yyval.cval) = blend((yyvsp[-5].cval), (yyvsp[-3].cval), (yyvsp[-1].nval)); }
-#line 1259 "color_parser_yacc.cc"
+#line 1260 "color_parser_yacc.cc"
     break;
 
   case 12: /* color: HSV '(' number ',' number ',' number ')'  */
-#line 183 "color_parser_yacc.yy"
+#line 177 "color_parser_yacc.yy"
                                                                  { (yyval.cval) = hsv((yyvsp[-5].nval), (yyvsp[-3].nval), (yyvsp[-1].nval)); }
-#line 1265 "color_parser_yacc.cc"
+#line 1266 "color_parser_yacc.cc"
     break;
 
   case 13: /* color: CMYK '(' number ',' number ',' number ',' number ')'  */
-#line 184 "color_parser_yacc.yy"
+#line 178 "color_parser_yacc.yy"
                                                                  { (yyval.cval) = cmyk((yyvsp[-7].nval), (yyvsp[-5].nval), (yyvsp[-3].nval), (yyvsp[-1].nval)); }
-#line 1271 "color_parser_yacc.cc"
+#line 1272 "color_parser_yacc.cc"
     break;
 
   case 14: /* color: GRAYVALUE '(' number ')'  */
-#line 185 "color_parser_yacc.yy"
+#line 179 "color_parser_yacc.yy"
                                                                  { (yyval.cval) = do_gray((yyvsp[-1].nval)); }
-#line 1277 "color_parser_yacc.cc"
+#line 1278 "color_parser_yacc.cc"
     break;
 
   case 15: /* color: COLOR_NAME  */
-#line 186 "color_parser_yacc.yy"
+#line 180 "color_parser_yacc.yy"
                                                                  { (yyval.cval) = color_lookup((yyvsp[0].ival)); }
-#line 1283 "color_parser_yacc.cc"
+#line 1284 "color_parser_yacc.cc"
     break;
 
   case 16: /* number: INTEGER  */
-#line 190 "color_parser_yacc.yy"
+#line 184 "color_parser_yacc.yy"
                    { (yyval.nval) = int_to_num((yyvsp[0].ival)); }
-#line 1289 "color_parser_yacc.cc"
+#line 1290 "color_parser_yacc.cc"
     break;
 
   case 17: /* number: FLOAT  */
-#line 191 "color_parser_yacc.yy"
+#line 185 "color_parser_yacc.yy"
                    { (yyval.nval) = int_to_double((yyvsp[0].dval)); }
-#line 1295 "color_parser_yacc.cc"
+#line 1296 "color_parser_yacc.cc"
     break;
 
 
-#line 1299 "color_parser_yacc.cc"
+#line 1300 "color_parser_yacc.cc"
 
       default: break;
     }
@@ -1488,7 +1489,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 196 "color_parser_yacc.yy"
+#line 190 "color_parser_yacc.yy"
 
 
 

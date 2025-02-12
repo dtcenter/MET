@@ -138,21 +138,15 @@ static Color dcolor_to_color(const Dcolor &);
 }
 
 
-
-
-%token ID COLOR_NAME INTEGER QUOTED_STRING
-%token FLOAT
+%token QUOTED_STRING
 %token BLEND HSV GRAYVALUE CMYK
 
-
-
-%type <text>  ID
-%type <ival>  INTEGER
-%type <ival>  COLOR_NAME
-%type <dval>  FLOAT
-%type <cval>  color
-%type <nval>  number
-
+%token <text> ID
+%token <ival> INTEGER
+%token <ival> COLOR_NAME
+%token <dval> FLOAT
+%type  <cval> color
+%type  <nval> number
 
 
 %%

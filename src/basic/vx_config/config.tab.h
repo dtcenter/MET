@@ -54,22 +54,22 @@ extern int configdebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    IDENTIFIER = 258,              /* IDENTIFIER  */
-    QUOTED_STRING = 259,           /* QUOTED_STRING  */
-    INTEGER = 260,                 /* INTEGER  */
-    FLOAT = 261,                   /* FLOAT  */
-    BOOLEAN = 262,                 /* BOOLEAN  */
-    COMPARISON = 263,              /* COMPARISON  */
-    NA_COMPARISON = 264,           /* NA_COMPARISON  */
-    LOGICAL_OP_NOT = 265,          /* LOGICAL_OP_NOT  */
-    LOGICAL_OP_AND = 266,          /* LOGICAL_OP_AND  */
-    LOGICAL_OP_OR = 267,           /* LOGICAL_OP_OR  */
-    FORTRAN_THRESHOLD = 268,       /* FORTRAN_THRESHOLD  */
-    BUILTIN = 269,                 /* BUILTIN  */
-    LOCAL_VAR = 270,               /* LOCAL_VAR  */
-    SIMPLE_PERC_THRESH = 271,      /* SIMPLE_PERC_THRESH  */
-    USER_FUNCTION = 272,           /* USER_FUNCTION  */
-    PRINT = 273,                   /* PRINT  */
+    LOGICAL_OP_NOT = 258,          /* LOGICAL_OP_NOT  */
+    LOGICAL_OP_AND = 259,          /* LOGICAL_OP_AND  */
+    LOGICAL_OP_OR = 260,           /* LOGICAL_OP_OR  */
+    PRINT = 261,                   /* PRINT  */
+    IDENTIFIER = 262,              /* IDENTIFIER  */
+    QUOTED_STRING = 263,           /* QUOTED_STRING  */
+    FORTRAN_THRESHOLD = 264,       /* FORTRAN_THRESHOLD  */
+    INTEGER = 265,                 /* INTEGER  */
+    FLOAT = 266,                   /* FLOAT  */
+    BUILTIN = 267,                 /* BUILTIN  */
+    LOCAL_VAR = 268,               /* LOCAL_VAR  */
+    USER_FUNCTION = 269,           /* USER_FUNCTION  */
+    BOOLEAN = 270,                 /* BOOLEAN  */
+    COMPARISON = 271,              /* COMPARISON  */
+    NA_COMPARISON = 272,           /* NA_COMPARISON  */
+    SIMPLE_PERC_THRESH = 273,      /* SIMPLE_PERC_THRESH  */
     UNARY_MINUS = 274              /* UNARY_MINUS  */
   };
   typedef enum yytokentype yytoken_kind_t;
@@ -79,22 +79,22 @@ extern int configdebug;
 #define YYEOF 0
 #define YYerror 256
 #define YYUNDEF 257
-#define IDENTIFIER 258
-#define QUOTED_STRING 259
-#define INTEGER 260
-#define FLOAT 261
-#define BOOLEAN 262
-#define COMPARISON 263
-#define NA_COMPARISON 264
-#define LOGICAL_OP_NOT 265
-#define LOGICAL_OP_AND 266
-#define LOGICAL_OP_OR 267
-#define FORTRAN_THRESHOLD 268
-#define BUILTIN 269
-#define LOCAL_VAR 270
-#define SIMPLE_PERC_THRESH 271
-#define USER_FUNCTION 272
-#define PRINT 273
+#define LOGICAL_OP_NOT 258
+#define LOGICAL_OP_AND 259
+#define LOGICAL_OP_OR 260
+#define PRINT 261
+#define IDENTIFIER 262
+#define QUOTED_STRING 263
+#define FORTRAN_THRESHOLD 264
+#define INTEGER 265
+#define FLOAT 266
+#define BUILTIN 267
+#define LOCAL_VAR 268
+#define USER_FUNCTION 269
+#define BOOLEAN 270
+#define COMPARISON 271
+#define NA_COMPARISON 272
+#define SIMPLE_PERC_THRESH 273
 #define UNARY_MINUS 274
 
 /* Value type.  */
