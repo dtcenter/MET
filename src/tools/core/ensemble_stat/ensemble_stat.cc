@@ -1022,7 +1022,7 @@ void process_point_obs(int i_nc) {
    const int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : obs_count);
 
    vector<int> obs_qty_idx_block(buf_size);
-   vector<float[OBS_ARRAY_LEN]> obs_arr_block(buf_size);
+   vector<std::array<float, OBS_ARRAY_LEN>> obs_arr_block(buf_size);
    float obs_arr[OBS_ARRAY_LEN];
    float hdr_arr[HDR_ARRAY_LEN];
    int   hdr_typ_arr[HDR_TYPE_ARR_LEN];
