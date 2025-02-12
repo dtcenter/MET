@@ -244,7 +244,7 @@ void process_point_obs(const char *point_obs_filename) {
    float hdr_arr[HDR_ARRAY_LEN];
    float obs_arr[OBS_ARRAY_LEN];
    vector<int> obs_qty_block(buf_size);
-   vector<float[OBS_ARRAY_LEN]> obs_arr_block(buf_size);
+   vector<std::array<float, OBS_ARRAY_LEN>> obs_arr_block(buf_size);
 
    use_var_id = met_point_obs->is_using_var_id();
    if(use_var_id) var_list = met_point_obs->get_var_names();
