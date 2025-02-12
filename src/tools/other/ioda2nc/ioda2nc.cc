@@ -625,11 +625,11 @@ static void process_ioda_file(int i_pb) {
       }
 
       if(has_station_id) {
-         char tmp_sid[nstring+1];
-         m_strncpy(tmp_sid, ioda_reader.station_ids[i_read].c_str(),
+         vector<char> tmp_sid(nstring + 1);
+         m_strncpy(tmp_sid.data(), ioda_reader.station_ids[i_read].c_str(),
                    nstring, method_name_s, "tmp_sid");
-         m_replace_char(tmp_sid, ' ', '_');
-         hdr_sid = tmp_sid;
+         m_replace_char(tmp_sid.data(), ' ', '_');
+         hdr_sid = tmp_sid.data();
       }
       else hdr_sid.clear();
 
