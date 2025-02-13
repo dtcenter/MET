@@ -29,7 +29,7 @@ using namespace netCDF;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-float  hdr_arr_block[NC_BUFFER_SIZE_32K][HDR_ARRAY_LEN];
+float hdr_arr_block[NC_BUFFER_SIZE_32K][HDR_ARRAY_LEN];
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -600,9 +600,9 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
    //
    // Allocate space to store the data
    //
-   char hdr_typ_block[buf_size][typ_len];
-   char hdr_sid_block[buf_size][sid_len];
-   char hdr_vld_block[buf_size][vld_len];
+   vector<char> hdr_typ_block(buf_size * typ_len);
+   vector<char> hdr_sid_block(buf_size * sid_len);
+   vector<char> hdr_vld_block(buf_size * vld_len);
    vector<int> hdr_typ_idx_block(buf_size);
    vector<int> hdr_sid_idx_block(buf_size);
    vector<int> hdr_vld_idx_block(buf_size);
@@ -635,7 +635,7 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
       if (has_array_vars) {
          lengths[1] = typ_len;
          if(!get_nc_data(&hdr_typ_var,
-               (char *)&hdr_typ_block[0], lengths, offsets)) {
+               hdr_typ_block.data(), lengths, offsets)) {
             mlog << Error << "\n" << method_name
                  << "trouble getting hdr_typ\n\n";
             exit(1);
@@ -646,7 +646,7 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
          //
          lengths[1] = sid_len;
          if(!get_nc_data(&hdr_sid_var,
-               (char *)&hdr_sid_block[0], lengths, offsets)) {
+               hdr_sid_block.data(), lengths, offsets)) {
             mlog << Error << "\n" << method_name
                  << "trouble getting hdr_sid\n\n";
             exit(1);
@@ -657,7 +657,7 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
          //
          lengths[1] = vld_len;
          if(!get_nc_data(&hdr_vld_var,
-               (char *)&hdr_vld_block[0], lengths, offsets)) {
+               hdr_vld_block.data(), lengths, offsets)) {
             mlog << Error << "\nget_nc_header() -> "
                  << "trouble getting hdr_vld\n\n";
             exit(1);
@@ -674,9 +674,9 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
             exit(1);
          }
          for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-            hdr_data.typ_array.add(hdr_typ_block[hIndex]);
-            hdr_data.sid_array.add(hdr_sid_block[hIndex]);
-            hdr_data.vld_array.add(hdr_vld_block[hIndex]);
+            hdr_data.typ_array.add(&hdr_typ_block.data()[hIndex*typ_len]);
+            hdr_data.sid_array.add(&hdr_sid_block.data()[hIndex*sid_len]);
+            hdr_data.vld_array.add(&hdr_vld_block.data()[hIndex*vld_len]);
             hdr_data.lat_array.add(hdr_arr_block[hIndex][0]);
             hdr_data.lon_array.add(hdr_arr_block[hIndex][1]);
             hdr_data.elv_array.add(hdr_arr_block[hIndex][2]);
@@ -752,13 +752,13 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
 
          // Get the corresponding header message type (string)
          if(!get_nc_data(&hdr_typ_tbl_var,
-               (char *)&hdr_typ_block[0], lengths, offsets)) {
+               hdr_typ_block.data(), lengths, offsets)) {
             mlog << Error << "\n" << method_name
                  << "trouble getting hdr_typ\n\n";
             exit(1);
          }
          for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-            hdr_data.typ_array.add(hdr_typ_block[hIndex]);
+            hdr_data.typ_array.add(&hdr_typ_block.data()[hIndex*typ_len]);
          }
       }
 
@@ -772,13 +772,13 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
 
          // Get the corresponding header station id (string)
          if(!get_nc_data(&hdr_sid_tbl_var,
-               (char *)&hdr_sid_block[0], lengths, offsets)) {
+               hdr_sid_block.data(), lengths, offsets)) {
             mlog << Error << "\n" << method_name
                  << "trouble getting hdr_typ\n\n";
             exit(1);
          }
          for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-            hdr_data.sid_array.add(hdr_sid_block[hIndex]);
+            hdr_data.sid_array.add(&hdr_sid_block.data()[hIndex*sid_len]);
          }
       }
 
@@ -798,7 +798,7 @@ void NetcdfObsVars::read_header_data(MetPointHeader &hdr_data) {
             exit(1);
          }
          for (int hIndex = 0; hIndex < buf_size; hIndex++) {
-            hdr_data.vld_array.add(hdr_vld_block[hIndex]);
+            hdr_data.vld_array.add(&hdr_vld_block.data()[hIndex*vld_len]);
          }
       }
    }
@@ -1278,38 +1278,33 @@ int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_le
    int data_count = strArray.n_elements();
    int max_buf_size = (1024 * 8);
    int buf_size = (data_count > max_buf_size ? max_buf_size : data_count);
-   char data_buf[buf_size][str_len];
+   vector<char> data_buf(buf_size * str_len, 0);
    long offsets[2] = { 0, 0 };
    long lengths[2] = { buf_size, str_len } ;
 
    mlog << Debug(7) << method_name << " " << GET_NC_NAME_P(ncVar)
         << "  data count: " << data_count << "\n";
 
-   // Initialize data_buf
-   for (int indexX=0; indexX<buf_size; indexX++)
-      for (int indexY=0; indexY<str_len; indexY++)
-        data_buf[indexX][indexY] = 0;
-
    int buf_index = 0;
    int processed_count = 0;
    for (int index=0; index<data_count; index++) {
       int len_n, len_p;
-      const string string_data= strArray[index];
+      const string string_data = strArray[index];
 
       processed_count++;
       len_n = string_data.length();
-      len_p = strnlen(data_buf[buf_index], str_len);
+      len_p = strnlen(&data_buf.data()[buf_index], str_len);
       if (len_n > str_len) len_n = str_len;
-      m_strncpy(data_buf[buf_index], string_data.c_str(), len_n, method_name.c_str());
+      m_strncpy(&data_buf.data()[buf_index], string_data.c_str(), len_n, method_name.c_str());
       for (int idx=len_n; idx<len_p; idx++)
-         data_buf[buf_index][idx] = 0;  // erase previous data
+         data_buf.data()[buf_index + idx] = 0;  // erase previous data
 
-      buf_index++;
-      if (buf_index >= buf_size) {
+      buf_index += str_len;
+      if (buf_index >= (buf_size * str_len)) {
          mlog << Debug(7) << method_name << " save to NetCDF. index: " << index
               << "  buf_index: " << buf_index << "  offsets: "
               << offsets[0] << " lengths: " << lengths[0] << "\n";
-         if(!put_nc_data(ncVar, (char*)data_buf[0], lengths, offsets)) {
+         if(!put_nc_data(ncVar, data_buf.data(), lengths, offsets)) {
             mlog << Error << "\n" << method_name << "-> "
                  << "error writing the variable " << GET_NC_NAME_P(ncVar)
                  << " to the netCDF file\n\n";
@@ -1324,7 +1319,7 @@ int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_le
       lengths[0] = (data_count <= max_buf_size) ? data_count : (data_count % buf_size);
       mlog << Debug(7) << method_name << " Save to NetCDF. offsets: " << offsets[0]
            << " lengths: " << lengths[0] << "\n";
-      if(!put_nc_data(ncVar, (char*)data_buf[0], lengths, offsets)) {
+      if(!put_nc_data(ncVar, data_buf.data(), lengths, offsets)) {
          mlog << Error << "\n" << method_name << "-> "
               << "error writing the variable " << GET_NC_NAME_P(ncVar)
               << " to the netCDF file\n\n";

@@ -114,60 +114,11 @@ if ( !e )  {
 
 e->dump(cout);
 
-// ed = e->dict_value();
-
 cout << "\n\n";
 
 ConcatString foo;
 
 foo = parse_conf_string(&config, lookup_key);
-
-
-/*
-   //
-   //  get mid
-   //
-/*
-m = ed->lookup("mid");
-
-if ( !e )  {
-
-   cerr << "\n\n  " << program_name << ": can't find mid!\n\n";
-
-   exit ( 1 );
-
-}
-
-// m->dump(cout);
-
-md = m->dict_value();
-
-   //
-   //  try to get hello from mid
-   //
-
-h = md->lookup("hello");
-
-if ( !h )  {
-
-   cerr << "\n\n  " << program_name << ": can't find entry!\n\n";
-
-   exit ( 1 );
-
-}
-
-h->dump(cout);
-*/
-
-
-
-
-
-
-
-
-
-
 
 cout << "\n\n";
 

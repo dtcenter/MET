@@ -1552,8 +1552,8 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    d = conf_info.get_tile_dim();
 
    int dim_count = get_dim_count(&fcst_var);
-   long lengths[dim_count];
-   long offsets[dim_count];
+   vector<long> lengths(dim_count);
+   vector<long> offsets(dim_count);
 
    offsets[0] = i_tile;
    offsets[1] = 0;
@@ -1565,7 +1565,7 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
 
    if ( nc_info.do_raw )  {
       // Write out the forecast field
-      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths, offsets)) {
+      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the fcst_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1573,7 +1573,7 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       }
 
       // Write out the observation field
-      if(!put_nc_data(&obs_var, &obs_data[0], lengths, offsets)) {
+      if(!put_nc_data(&obs_var, &obs_data[0], lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the obs_var->put for field "
               << shc.get_obs_var() << "\n\n";
@@ -1585,7 +1585,7 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    if ( nc_info.do_diff )  {
 
       // Write out the difference field
-      if(!put_nc_data(&diff_var, &diff_data[0], lengths, offsets)) {
+      if(!put_nc_data(&diff_var, &diff_data[0], lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the diff_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1800,8 +1800,8 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    d = conf_info.get_tile_dim();
 
    int dim_count = get_dim_count(&fcst_var);
-   long lengths[dim_count];
-   long offsets[dim_count];
+   vector<long> lengths(dim_count);
+   vector<long> offsets(dim_count);
 
    offsets[0] = i_tile;
    offsets[1] = i_scale+1;
@@ -1814,7 +1814,7 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    if ( nc_info.do_raw )  {
 
       // Write out the forecast field
-      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths, offsets)) {
+      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_wav() -> "
               << "error with the fcst_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1822,7 +1822,7 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       }
 
       // Write out the observation field
-      if(!put_nc_data(&obs_var, &obs_data[0], lengths, offsets)) {
+      if(!put_nc_data(&obs_var, &obs_data[0], lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_wav() -> "
               << "error with the obs_var->put for field "
               << shc.get_obs_var() << "\n\n";
@@ -1835,7 +1835,7 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
 
 
       // Write out the difference field
-      if(!put_nc_data(&diff_var, &diff_data[0], lengths, offsets)) {
+      if(!put_nc_data(&diff_var, &diff_data[0], lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc()_wav -> "
               << "error with the diff_var->put for field "
               << shc.get_fcst_var() << "\n\n";

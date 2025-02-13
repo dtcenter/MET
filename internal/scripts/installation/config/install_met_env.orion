@@ -1,10 +1,16 @@
-module load intel/2020.2
+module load intel-oneapi-compilers/2022.2.1
 module load cmake/3.22.1
 
-export TEST_BASE=/apps/contrib/MET/12.0.0
-export COMPILER=intel_2020
+export CC=icx
+export CXX=icpx
+export FC=ifx
+export F77=ifx
+export F90=ifx
+
+export TEST_BASE=/apps/contrib/MET/12.0.2
+export COMPILER=intel-oneapi-compilers_2022.2.1
 export MET_SUBDIR=${TEST_BASE}/
-export MET_TARBALL=v12.0.0.tar.gz
+export MET_TARBALL=v12.0.2.tar.gz
 export USE_MODULES=TRUE
 export MET_PYTHON=/work/noaa/ovp/miniconda/miniconda3/envs/metplus_v5.1_py3.10
 export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.10

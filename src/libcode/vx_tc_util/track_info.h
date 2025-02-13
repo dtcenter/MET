@@ -156,7 +156,7 @@ class TrackInfo {
       const ConcatString & field_source()     const;
       int                  n_diag()           const;
       const StringArray &  diag_name()        const;
-      const char *         diag_name(int)     const;
+      const std::string    diag_name(int)     const;
 
       StringArray          track_lines()      const;
 
