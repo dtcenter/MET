@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -270,9 +270,11 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
 {
    const char *method_name = "regex_apply() ";
    //  compile the regex pattern
-   int rc = 0, num_act = 0, num_pmat = ( 0 == num_mat ? 1 : num_mat );
+   int rc = 0;
+   int num_act = 0;
+   int num_pmat = ( 0 == num_mat ? 1 : num_mat );
    regex_t *re = new regex_t;
-   regmatch_t pmatch[num_pmat];
+   vector<regmatch_t> pmatch(num_pmat);
    if(0 != (rc = regcomp(re, pat, REG_EXTENDED))){
       regfree(re);
       if( re ) { delete re; re = 0; }
@@ -281,7 +283,7 @@ int regex_apply(const char* pat, int num_mat, const char* str, char** &mat)
    }
 
    //  apply the pattern to the input string
-   rc = regexec(re, str, num_pmat, pmatch, 0);
+   rc = regexec(re, str, num_pmat, pmatch.data(), 0);
 
    //  if the match succeeded, build the data for return
    if( 0 == rc ){

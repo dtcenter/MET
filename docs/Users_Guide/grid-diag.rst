@@ -20,7 +20,7 @@ The following sections describe the usage statement, required arguments, and opt
 .. code-block:: none
 
   Usage: grid_diag
-         -data file_1 ... file_n | data_file_list
+         -data file_1 ... file_n | file_list
          -out file
          -config file
          [-log file]
@@ -36,7 +36,7 @@ grid_diag has required arguments and can accept several optional arguments.
 Required Arguments for grid_diag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-data file_1 ... file_n | data_file_list** options specify the gridded data files or an ASCII file containing a list of file names to be used.
+1. The **-data file_1 ... file_n | file_list** options specify the gridded data files or an ASCII file containing a list of file names to be used, as described in :numref:`ascii_file_lists`.
 
 When **-data** is used once, all fields are read from each input file. When used multiple times, it must match the number of fields to be processed.
 In this case the first field in the config data field list is read from the files designated by the first **-data**, the second field in the field list is read from files designated by the second **-data**, and so forth.  All files within each set must be of the same file type, but the file types of each set may differ.

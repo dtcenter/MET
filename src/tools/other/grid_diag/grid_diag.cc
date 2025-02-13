@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -242,7 +242,7 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_series(void) {
-   DataPlane data_dp[conf_info.get_n_data()];
+   vector<DataPlane> data_dp(conf_info.get_n_data());
    double min, max;
    StringArray *cur_files;
    GrdFileType *cur_ftype;
@@ -813,17 +813,17 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: "<< program_name<< "\n"
-        << "\t-data  file_1 ... file_n | data_file_list\n"
+        << "\t-data  file_1 ... file_n | file_list\n"
         << "\t-out file\n"
         << "\t-config file\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"-data file_1 ... file_n\" are the gridded "
+        << "\twhere\t\"-data file_1 ... file_n\" is a list of gridded "
         << "data files to be used (required).\n"
 
-        << "\t\t\"-data data_file_list\" is an ASCII file containing "
+        << "\t\t\"-data file_list\" is an ASCII file containing "
         << "a list of gridded data files to be used (required).\n"
 
         << "\t\t\"-out file\" is the NetCDF output file containing "

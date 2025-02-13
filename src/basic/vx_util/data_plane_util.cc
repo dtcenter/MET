@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -697,8 +697,10 @@ DataPlane distance_map(const DataPlane &dp) {
    
    // Meijster second phase
    if (0 < event_count) {
-      int iq, iw;
-      int s[nx], t[nx];
+      int iq;
+      int iw;
+      vector<int> s(nx);
+      vector<int> t(nx);
       
       // Initialize s and t array
       for (ix=0; ix<nx; ix++) {

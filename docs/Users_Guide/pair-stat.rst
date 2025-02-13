@@ -52,7 +52,8 @@ Required Arguments for pair_stat
 
 1. The **-pairs** argument defines one or more input files containing forecast/observation pairs.
    May be set as a list of file names (**file_1 ... file_n**) or as an ASCII file containing
-   a list file names (**file_list**). May be used multiple times (required).
+   a list file names (**file_list**), as described in :numref:`ascii_file_lists`.
+   May be used multiple times (required).
 
 2. The **format type** argument defines the input pairs file format and may be set to
    "mpr" or "ioda" (required).

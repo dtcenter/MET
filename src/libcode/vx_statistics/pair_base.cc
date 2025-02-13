@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -730,7 +730,7 @@ void PairBase::calc_obs_summary(){
    //  iterate over the keys in the unique station id map
    for(int i=0; i<map_key.n(); i++) {
 
-      station_values_t svt = map_val[map_key[i]];
+      station_values_t * svt = &map_val[map_key[i]];
 
       //  parse the single key string
       char** mat = nullptr;
@@ -742,8 +742,9 @@ void PairBase::calc_obs_summary(){
          exit(1);
       }
 
-      string msg_key = str_format("%s:%s:%s:%s", mat[1], mat[2], mat[3],
-                                  mat[4]).text();
+      string msg_key = str_format("%s:%s:%s:%s",
+                                  mat[1], mat[2],
+                                  mat[3], mat[4]).text();
 
       ob_val_t ob;
 
@@ -777,21 +778,22 @@ void PairBase::calc_obs_summary(){
       }
 
       // Store summarized value in the map
-      svt.summary_val = ob.val;
+      svt->summary_val = ob.val;
 
-      typ_sa.add    (svt.typ.c_str());
-      sid_sa.add    (svt.sid.c_str());
-      lat_na.add    (svt.lat);
-      lon_na.add    (svt.lon);
-      x_na.add      (svt.x);
-      y_na.add      (svt.y);
-      wgt_na.add    (svt.wgt);
+      typ_sa.add    (svt->typ.c_str());
+      sid_sa.add    (svt->sid.c_str());
+      lat_na.add    (svt->lat);
+      lon_na.add    (svt->lon);
+      x_na.add      (svt->x);
+      y_na.add      (svt->y);
+      wgt_na.add    (svt->wgt);
       vld_ta.add    (ob.ut);
-      lvl_na.add    (svt.lvl);
-      elv_na.add    (svt.elv);
+      lvl_na.add    (svt->lvl);
+      elv_na.add    (svt->elv);
       o_na.add      (ob.val);
       o_qc_sa.add   (ob.qc.c_str());
-      ClimoPntInfo cpi(svt.fcmn, svt.fcsd, svt.ocmn, svt.ocsd);
+      ClimoPntInfo cpi(svt->fcmn, svt->fcsd,
+                       svt->ocmn, svt->ocsd);
       add_climo(ob.val, cpi);
 
       // Increment the number of pairs

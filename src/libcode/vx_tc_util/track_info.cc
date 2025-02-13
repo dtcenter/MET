@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -402,8 +402,8 @@ int TrackInfo::warm_core_dur() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-const char * TrackInfo::diag_name(int i) const {
-   return(i>=0 && i<DiagName.n() ? DiagName[i].c_str() : na_str);
+const string TrackInfo::diag_name(int i) const {
+   return(i>=0 && i<DiagName.n() ? DiagName[i] : na_str);
 }
 
 ////////////////////////////////////////////////////////////////////////

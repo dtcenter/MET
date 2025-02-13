@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1305,7 +1305,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
             // Add the observation value
             // Weight is from the nearest grid point
             int n = three_to_one(i_msg_typ, i_mask, i_interp);
-	    if(!pd[n].add_point_obs(hdr_typ_str, hdr_sid_str,
+            if(!pd[n].add_point_obs(hdr_typ_str, hdr_sid_str,
                   hdr_lat, hdr_lon, obs_x, obs_y,
                   hdr_ut, obs_lvl, obs_hgt,
                   obs_v, obs_qty, cpi, default_weight)) {

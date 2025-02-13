@@ -30,9 +30,9 @@ The usage statement for the Series-Analysis tool is shown below:
 .. code-block:: none
 
   Usage: series_analysis
-         -fcst  file_1 ... file_n | fcst_file_list
-         -obs   file_1 ... file_n | obs_file_list
-         [-both file_1 ... file_n | both_file_list]
+         -fcst  file_1 ... file_n | file_list
+         -obs   file_1 ... file_n | file_list
+         [-both file_1 ... file_n | file_list]
          [-aggr file]
          [-paired]
          -out file
@@ -46,9 +46,9 @@ series_analysis has four required arguments and accepts several optional ones.
 Required Arguments series_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-fcst file_1 ... file_n | fcst_file_list** options specify the gridded forecast files or ASCII files containing lists of file names to be used.
+1. The **-fcst file_1 ... file_n | file_list** option specifies the gridded forecast files or ASCII file list of file names to be used, as described in :numref:`ascii_file_lists`.
 
-2. The **-obs file_1 ... file_n | obs_file_list** are the gridded observation files or ASCII files containing lists of file names to be used.
+2. The **-obs file_1 ... file_n | file_list** option specifies the gridded observation files or ASCII file list of file names to be used, as described in :numref:`ascii_file_lists`.
 
 3. The **-out file** is the NetCDF output file containing computed statistics.
 
@@ -57,19 +57,19 @@ Required Arguments series_stat
 Optional Arguments for series_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. To set both the forecast and observations to the same set of files, use the optional -both file_1 ... file_n | both_file_list option to the same set of files. This is useful when reading the NetCDF matched pair output of the Grid-Stat tool which contains both forecast and observation data.
+5. To set both the forecast and observations to the same set of files, use the optional **-both file_1 ... file_n | file_list** option to the same set of files. This is useful when reading the NetCDF matched pair output of the Grid-Stat tool which contains both forecast and observation data.
 
-6. The -aggr option specifies the path to an existing Series-Analysis output file. When computing statistics for the input forecast and observation data, Series-Analysis aggregates the partial sums (SL1L2, SAL1L2 line types) and contingency table counts (CTC, MCTC, and PCT line types) with data provided in the aggregate file. This option enables Series-Analysis to run iteratively and update existing partial sums, counts, and statistics with new data.
+6. The **-aggr** option specifies the path to an existing Series-Analysis output file. When computing statistics for the input forecast and observation data, Series-Analysis aggregates the partial sums (SL1L2, SAL1L2 line types) and contingency table counts (CTC, MCTC, and PCT line types) with data provided in the aggregate file. This option enables Series-Analysis to run iteratively and update existing partial sums, counts, and statistics with new data.
 
-.. note:: When the -aggr option is used, only statistics that are derivable from partial sums and contingency table counts can be requested. Runtimes are generally much slower when aggregating data since it requires many additional NetCDF variables containing the scalar partial sums and contingency table counts to be read and written.
+.. note:: When the **-aggr** option is used, only statistics that are derivable from partial sums and contingency table counts can be requested. Runtimes are generally much slower when aggregating data since it requires many additional NetCDF variables containing the scalar partial sums and contingency table counts to be read and written.
 
-7. The -paired option indicates that the -fcst and -obs file lists are already paired, meaning there is a one-to-one correspondence between the files in those lists. This option affects how missing data is handled. When -paired is not used, missing or incomplete files result in a runtime error with no output file being created. When -paired is used, missing or incomplete files result in a warning with output being created using the available data.
+7. The **-paired** option indicates that the **-fcst** and **-obs** file lists are already paired, meaning there is a one-to-one correspondence between the files in those lists. This option affects how missing data is handled. When **-paired** is not used, missing or incomplete files result in a runtime error with no output file being created. When **-paired** is used, missing or incomplete files result in a warning with output being created using the available data.
 
-8. The -log file outputs log messages to the specified file.
+8. The **-log** file outputs log messages to the specified file.
 
-9. The -v level overrides the default level of logging (2).
+9. The **-v** level overrides the default level of logging (2).
 
-10. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+10. The **-compress** level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the series_analysis calling sequence is shown below:
 

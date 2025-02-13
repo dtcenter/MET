@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -116,14 +116,14 @@ void usage() {
     cout << "\n*** Model Evaluation Tools (MET" << met_version
          << ") ***\n\n"
          << "Usage: " << program_name << "\n"
-         << "\t-data file_1 ... file_n | data_file_list\n"
+         << "\t-data file_1 ... file_n | file_list\n"
          << "\t-deck file\n"
          << "\t-config file\n"
          << "\t-out file\n"
          << "\t[-log file]\n"
          << "\t[-v level]\n\n"
 
-         << "\twhere\t\"-data file_1 ... file_n | data_file_list\" "
+         << "\twhere\t\"-data file_1 ... file_n | file_list\" "
          << "specifies the gridded data files or an ASCII file "
          << "containing a list of files to be used (required).\n"
 

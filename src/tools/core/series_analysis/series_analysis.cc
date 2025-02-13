@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -2624,9 +2624,9 @@ __attribute__((noreturn)) static void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\t-fcst  file_1 ... file_n | fcst_file_list\n"
-        << "\t-obs   file_1 ... file_n | obs_file_list\n"
-        << "\t[-both file_1 ... file_n | both_file_list]\n"
+        << "\t-fcst  file_1 ... file_n | file_list\n"
+        << "\t-obs   file_1 ... file_n | file_list\n"
+        << "\t[-both file_1 ... file_n | file_list]\n"
         << "\t[-aggr file]\n"
         << "\t[-paired]\n"
         << "\t-out file\n"
@@ -2636,19 +2636,19 @@ __attribute__((noreturn)) static void usage() {
         << "\t[-compress level]\n\n"
 
         << "\twhere\t"
-        << R"("-fcst file_1 ... file_n" are the gridded )"
+        << R"("-fcst file_1 ... file_n" is a list of gridded )"
         << "forecast files to be used (required).\n"
 
         << "\t\t"
-        << R"("-fcst fcst_file_list" is an ASCII file containing )"
+        << R"("-fcst file_list" is an ASCII file containing )"
         << "a list of gridded forecast files to be used (required).\n"
 
         << "\t\t"
-        << R"("-obs  file_1 ... file_n" are the gridded )"
+        << R"("-obs  file_1 ... file_n" is a list of gridded )"
         << "observation files to be used (required).\n"
 
         << "\t\t"
-        << R"("-obs  obs_file_list" is an ASCII file containing )"
+        << R"("-obs  file_list" is an ASCII file containing )"
         << "a list of gridded observation files to be used (required).\n"
 
         << "\t\t"
