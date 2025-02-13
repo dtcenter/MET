@@ -2975,8 +2975,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       nc_var_sa.add(var_name);
 
       // Define the variable
-      nc_var = add_var(nc_out, (string) var_name,
-                       ncFloat, lat_dim, lon_dim, deflate_level);
+      nc_var = add_var(nc_out, var_name.string(), ncFloat,
+                       lat_dim, lon_dim, deflate_level);
 
       // Add variable attributes
       add_var_att_local(&nc_var, "name", nc_var.getName());
@@ -3094,7 +3094,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    if(fcst_flag) {
 
       // Define the forecast variable
-      fcst_var = add_var(nc_out, (string) fcst_var_name, ncFloat,
+      fcst_var = add_var(nc_out, fcst_var_name.string(), ncFloat,
                          lat_dim, lon_dim, deflate_level);
 
       // Add to the list of previously defined variables
@@ -3120,8 +3120,8 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    if(obs_flag) {
 
       // Define the observation variable
-      obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
-                            lat_dim, lon_dim, deflate_level);
+      obs_var = add_var(nc_out, obs_var_name.string(), ncFloat,
+                        lat_dim, lon_dim, deflate_level);
 
       // Add to the list of previously defined variables
       nc_var_sa.add(obs_var_name);
