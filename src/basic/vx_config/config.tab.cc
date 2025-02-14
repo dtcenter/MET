@@ -1184,7 +1184,7 @@ int yynerrs;
 int
 yyparse (void)
 {
-    yy_state_fast_t yystate = 8;
+    yy_state_fast_t yystate = 0;
     /* Number of tokens to shift before error messages enabled.  */
     int yyerrstatus = 0;
 
