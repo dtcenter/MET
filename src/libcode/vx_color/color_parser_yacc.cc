@@ -1655,11 +1655,9 @@ C += K;
 M += K;
 Y += K;
 
-double R, G, B;
-
-R = 1.0 - C;
-G = 1.0 - M;
-B = 1.0 - Y;
+double R = 1.0 - C;
+double G = 1.0 - M;
+double B = 1.0 - Y;
 
 d.r = 255.0*R;
 d.g = 255.0*G;
@@ -1883,7 +1881,7 @@ void yyerror(const char * s)
 
 {
 
-int c = (int) (color_file_column - strlen(colortext));
+auto c = (int) (color_file_column - strlen(colortext));
 
 cout << "\n\n"
      << "  syntax error in file \"" << input_filename << "\"\n\n"
@@ -1911,9 +1909,9 @@ cout << "\n\n"
      << line
      << "\n";
 
-int line_len = strlen(line);
+auto line_len = (int) strlen(line);
 
-int text_len = strlen(colortext);
+auto text_len = (int) strlen(colortext);
 
 int j1 = c;
 int j2 = c + text_len - 1;

@@ -2019,7 +2019,7 @@ void yyerror(const char * s)
 
 {
 
-int c = (int) (Column - strlen(configtext));
+auto c = (int) (Column - strlen(configtext));
 
 mlog << Error
      << "\n"
@@ -2047,9 +2047,9 @@ in.close();
 mlog << Error
      << "\n" << line << "\n";
 
-int line_len = strlen(line);
+auto line_len = (int) strlen(line);
 
-int text_len = strlen(configtext);
+auto text_len = (int) strlen(configtext);
 
 int j1 = c;
 int j2 = c + text_len - 1;
@@ -2769,7 +2769,7 @@ void set_number_string(const char * text)
 
 {
 
-const int k = (int) (sizeof(number_string));
+const auto k = (int) (sizeof(number_string));
 
 strncpy(number_string, text, k);
 
