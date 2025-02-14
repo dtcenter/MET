@@ -1575,6 +1575,7 @@ if ( p > 1.0 )  p = 1.0;
 q = 1.0 - p;
 
 Dcolor result;
+
 result.r = q*(c1.r) + p*(c2.r);
 result.g = q*(c1.g) + p*(c2.g);
 result.b = q*(c1.b) + p*(c2.b);
@@ -1608,9 +1609,11 @@ if ( V > 1.0 )  V = 1.0;
 double R;
 double G;
 double B;
+
 dhsv_to_drgb(H, S, V, R, G, B);
 
 Dcolor result;
+
 result.r = 255.0*R;
 result.g = 255.0*G;
 result.b = 255.0*B;
@@ -1630,6 +1633,7 @@ Dcolor cmyk(const ColorNumber & Cyan, const ColorNumber & Magenta, const ColorNu
 {
 
 Dcolor d;
+
 d.r = d.g = d.b = 0.0;
 
 double C = number_to_double(Cyan);
@@ -1652,6 +1656,7 @@ M += K;
 Y += K;
 
 double R, G, B;
+
 R = 1.0 - C;
 G = 1.0 - M;
 B = 1.0 - Y;
@@ -1697,7 +1702,8 @@ Dcolor color_lookup(int index)
 
 if ( (index < 0) || (index >= clist.n_elements()) )  {
 
-   cerr << "\n\n  color_lookup(int) -> bad index ... " << index << "\n\n";
+   cerr << "\ncolor_lookup(int) -> "
+        << "bad index ... " << index << "\n\n";
 
    exit ( 1 );
 
@@ -1797,6 +1803,7 @@ double value = number_to_double(number);
 Color color = dcolor_to_color(d);
 
 CtableEntry ce;
+
 ce.set_value(value);
 
 ce.set_color(color);
@@ -1821,6 +1828,7 @@ double value2 = number_to_double(n2);
 Color color = dcolor_to_color(d);
 
 CtableEntry ce;
+
 ce.set_values(value1, value2);
 
 ce.set_color(color);
@@ -1852,6 +1860,7 @@ if ( G > 255 )  G = 255;
 if ( B > 255 )  B = 255;
 
 Color color;
+
 color.set_rgb((unsigned char) R, (unsigned char) G, (unsigned char) B);
 
 return ( color );
@@ -1883,6 +1892,7 @@ cout << "\n\n"
      << "      text   = \"" << colortext << "\"\n\n";
 
 ifstream in;
+
 in.open(input_filename);
 
 char line[512];
