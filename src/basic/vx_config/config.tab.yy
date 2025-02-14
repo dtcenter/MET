@@ -242,7 +242,7 @@ static void do_user_function_def();
 statement_list :  /*  allows for empty input  */
                | statement                { is_lhs = true; }
                | statement_list statement { is_lhs = true; }
-               ; 
+               ;
 
 
 statement : assign_stmt   { is_lhs = true; }
