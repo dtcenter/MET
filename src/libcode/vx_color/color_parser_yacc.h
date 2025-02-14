@@ -85,7 +85,7 @@ extern int colordebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 126 "color_parser_yacc.yy"
+#line 119 "color_parser_yacc.yy"
 
 
    char text[129];

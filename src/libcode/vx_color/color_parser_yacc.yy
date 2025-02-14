@@ -12,8 +12,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -30,6 +28,8 @@ using namespace std;
 #include "color_parser.h"
 #include "color.h"
 
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -39,16 +39,11 @@ using namespace std;
    //
 
 
-extern int            yylex();
+extern int     yylex();
 
-extern void           yyerror(const char *);
+extern void    yyerror(const char *);
 
-extern "C" int        colorwrap();
-
-
-
-
-// extern char *         colortext;
+extern "C" int colorwrap();
 
 char *         colortext;
 
@@ -96,8 +91,6 @@ static Dcolor blend(const Dcolor & c1, const Dcolor & c2, const ColorNumber & nu
 static Dcolor hsv(const ColorNumber &, const ColorNumber &, const ColorNumber &);
 
 static Dcolor cmyk(const ColorNumber &, const ColorNumber &, const ColorNumber &, const ColorNumber &);
-
-// static double min3(double, double, double);
 
 static Dcolor do_gray(const ColorNumber &);
 
@@ -152,7 +145,8 @@ static Color dcolor_to_color(const Dcolor &);
 %%
 
 
-statement_list : statement
+statement_list :  /*  allows for empty input  */
+               | statement
                | statement_list statement
                ;
 
@@ -186,7 +180,6 @@ number : INTEGER   { $$ = int_to_num($1); }
        ;
 
 
-
 %%
 
 
@@ -203,9 +196,7 @@ d.r = number_to_double(r);
 d.g = number_to_double(g);
 d.b = number_to_double(b);
 
-
 range_check(d);
-
 
 return ( d );
 
@@ -260,7 +251,6 @@ double x;
 if ( n.is_int )  x = (double) (n.i);
 else             x = n.d;
 
-
 return ( x );
 
 }
@@ -273,16 +263,15 @@ Dcolor blend(const Dcolor & c1, const Dcolor & c2, const ColorNumber & num)
 
 {
 
-double p, q;
-Dcolor result;
-
-p = number_to_double(num);
+double p = number_to_double(num);
+double q;
 
 if ( p < 0.0 )  p = 0.0;
 if ( p > 1.0 )  p = 1.0;
 
 q = 1.0 - p;
 
+Dcolor result;
 result.r = q*(c1.r) + p*(c2.r);
 result.g = q*(c1.g) + p*(c2.g);
 result.b = q*(c1.b) + p*(c2.b);
@@ -301,22 +290,11 @@ Dcolor hsv(const ColorNumber & h, const ColorNumber & s, const ColorNumber & v)
 
 {
 
-double H, S, V;
-double R, G, B;
-Dcolor result;
-
-// cout << "\n\n  In hsv!\n\n" << flush;
-
-
-H = number_to_double(h);
-S = number_to_double(s);
-V = number_to_double(v);
-
+double H = number_to_double(h);
+double S = number_to_double(s);
+double V = number_to_double(v);
 
 H -= floor(H);
-
-// S -= floor(S);
-// V -= floor(V);
 
 if ( S < 0.0 )  S = 0.0;
 if ( S > 1.0 )  S = 1.0;
@@ -324,14 +302,15 @@ if ( S > 1.0 )  S = 1.0;
 if ( V < 0.0 )  V = 0.0;
 if ( V > 1.0 )  V = 1.0;
 
-
+double R;
+double G;
+double B;
 dhsv_to_drgb(H, S, V, R, G, B);
 
-
+Dcolor result;
 result.r = 255.0*R;
 result.g = 255.0*G;
 result.b = 255.0*B;
-
 
 range_check(result);
 
@@ -348,16 +327,12 @@ Dcolor cmyk(const ColorNumber & Cyan, const ColorNumber & Magenta, const ColorNu
 {
 
 Dcolor d;
-double C, M, Y, K;
-double R, G, B;
-
-
 d.r = d.g = d.b = 0.0;
 
-C = number_to_double(Cyan);
-M = number_to_double(Magenta);
-Y = number_to_double(Yellow);
-K = number_to_double(Black);
+double C = number_to_double(Cyan);
+double M = number_to_double(Magenta);
+double Y = number_to_double(Yellow);
+double K = number_to_double(Black);
 
 if ( C < 0.0 )  C = 0.0;
 if ( M < 0.0 )  M = 0.0;
@@ -369,14 +344,11 @@ if ( M > 1.0 )  M = 1.0;
 if ( Y > 1.0 )  Y = 1.0;
 if ( K > 1.0 )  K = 1.0;
 
-// R = (1.0 - C)*(1.0 - K);
-// G = (1.0 - M)*(1.0 - K);
-// B = (1.0 - Y)*(1.0 - K);
-
 C += K;
 M += K;
 Y += K;
 
+double R, G, B;
 R = 1.0 - C;
 G = 1.0 - M;
 B = 1.0 - Y;
@@ -394,42 +366,19 @@ return ( d );
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-double min3(double a, double b, double c)
-
-{
-
-double m, min_ab;
-
-
-min_ab = ( (a < b) ? a : b );
-
-m = ( (c < min_ab) ? c : min_ab );
-
-
-return ( m );
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 Dcolor do_gray(const ColorNumber & n)
 
 {
 
-Dcolor d;
-double x;
-
-x = number_to_double(n);
+double x = number_to_double(n);
 
 if ( x < 0.0 )  x = 0.0;
 
 if ( x > 255.0 )  x = 255.0;
 
+Dcolor d;
 d.r = d.g = d.b = x;
-
 
 return ( d );
 
@@ -483,7 +432,6 @@ if ( x < 0.0 )  x = 0.0;
 
 if ( x > 255.0 )  x = 255.0;
 
-
 return;
 
 }
@@ -497,7 +445,6 @@ void assign_color_1(const std::string name, const Dcolor & d)
 {
 
 ClistEntry e;
-
 
 e.set_name(name);
 
@@ -519,7 +466,8 @@ void assign_color_2(int index, const Dcolor & d)
 
 if ( (index < 0) || (index >= clist.n_elements()) )  {
 
-   cerr << "\n\n  void assign_color_2(int, const Dcolor &) -> bad index ... " << index << "\n\n";
+   cerr << "\nvoid assign_color_2(int, const Dcolor &) -> "
+        << "bad index ... " << index << "\n\n";
 
    exit ( 1 );
 
@@ -541,26 +489,16 @@ void add_to_table(const ColorNumber & number, const Dcolor & d)
 
 {
 
+double value = number_to_double(number);
+
+Color color = dcolor_to_color(d);
+
 CtableEntry ce;
-double value;
-Color color;
-
-
-value = number_to_double(number);
-
-color = dcolor_to_color(d);
-
 ce.set_value(value);
 
 ce.set_color(color);
 
 the_table->add_entry(ce);
-
-
-
-   //
-   //  done
-   //
 
 return;
 
@@ -574,26 +512,17 @@ void add_2_to_table(const ColorNumber & n1, const ColorNumber & n2, const Dcolor
 
 {
 
+double value1 = number_to_double(n1);
+double value2 = number_to_double(n2);
+
+Color color = dcolor_to_color(d);
+
 CtableEntry ce;
-double value1, value2;
-Color color;
-
-
-value1 = number_to_double(n1);
-value2 = number_to_double(n2);
-
-color = dcolor_to_color(d);
-
 ce.set_values(value1, value2);
 
 ce.set_color(color);
 
 the_table->add_entry(ce);
-
-
-   //
-   //  done
-   //
 
 return;
 
@@ -607,12 +536,9 @@ Color dcolor_to_color(const Dcolor & d)
 
 {
 
-int R, G, B;
-Color color;
-
-R = nint(d.r);
-G = nint(d.g);
-B = nint(d.b);
+int R = nint(d.r);
+int G = nint(d.g);
+int B = nint(d.b);
 
 if ( R < 0 )  R = 0;
 if ( G < 0 )  G = 0;
@@ -622,31 +548,12 @@ if ( R > 255 )  R = 255;
 if ( G > 255 )  G = 255;
 if ( B > 255 )  B = 255;
 
+Color color;
 color.set_rgb((unsigned char) R, (unsigned char) G, (unsigned char) B);
 
 return ( color );
 
 }
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -664,14 +571,7 @@ void yyerror(const char * s)
 
 {
 
-int j, j1, j2;
-int line_len, text_len;
-int c;
-char line[512];
-ifstream in;
-
-
-c = (int) (color_file_column - strlen(colortext));
+int c = (int) (color_file_column - strlen(colortext));
 
 cout << "\n\n"
      << "  syntax error in file \"" << input_filename << "\"\n\n"
@@ -679,9 +579,12 @@ cout << "\n\n"
      << "      color_file_column = " << c << "\n\n"
      << "      text   = \"" << colortext << "\"\n\n";
 
+ifstream in;
 in.open(input_filename);
 
-for (j=1; j<color_file_line_number; ++j)  {   //  j starts at one here, not zero
+char line[512];
+
+for (int j=1; j<color_file_line_number; ++j)  {   //  j starts at one here, not zero
 
    in.getline(line, sizeof(line));
 
@@ -691,31 +594,23 @@ in.getline(line, sizeof(line));
 
 in.close();
 
-
-
-
 cout << "\n\n"
      << line
      << "\n";
 
-line_len = strlen(line);
+int line_len = strlen(line);
 
-text_len = strlen(colortext);
+int text_len = strlen(colortext);
 
-j1 = c;
-j2 = c + text_len - 1;
+int j1 = c;
+int j2 = c + text_len - 1;
 
-
-for (j=1; j<=line_len; ++j)  {   //  j starts a one here, not zero
+for (int j=1; j<=line_len; ++j)  {   //  j starts a one here, not zero
 
    if ( (j >= j1) && (j <= j2) )  cout.put('^');
    else                           cout.put('_');
 
 }
-
-
-
-
 
 cout << "\n\n";
 
@@ -739,13 +634,4 @@ return ( 1 );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
 

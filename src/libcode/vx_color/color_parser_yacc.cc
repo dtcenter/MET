@@ -87,8 +87,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -105,6 +103,8 @@ using namespace std;
 #include "color_parser.h"
 #include "color.h"
 
+using namespace std;
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -114,16 +114,11 @@ using namespace std;
    //
 
 
-extern int            yylex();
+extern int     yylex();
 
-extern void           yyerror(const char *);
+extern void    yyerror(const char *);
 
-extern "C" int        colorwrap();
-
-
-
-
-// extern char *         colortext;
+extern "C" int colorwrap();
 
 char *         colortext;
 
@@ -172,8 +167,6 @@ static Dcolor hsv(const ColorNumber &, const ColorNumber &, const ColorNumber &)
 
 static Dcolor cmyk(const ColorNumber &, const ColorNumber &, const ColorNumber &, const ColorNumber &);
 
-// static double min3(double, double, double);
-
 static Dcolor do_gray(const ColorNumber &);
 
 static Dcolor color_lookup(int);
@@ -195,7 +188,7 @@ static Color dcolor_to_color(const Dcolor &);
 
 
 
-#line 199 "color_parser_yacc.cc"
+#line 192 "color_parser_yacc.cc"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -582,7 +575,7 @@ union yyalloc
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  7
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  17
+#define YYNRULES  18
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  57
 
@@ -634,8 +627,8 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   155,   155,   156,   160,   161,   165,   166,   170,   171,
-     175,   176,   177,   178,   179,   180,   184,   185
+       0,   148,   148,   149,   150,   154,   155,   159,   160,   164,
+     165,   169,   170,   171,   172,   173,   174,   178,   179
 };
 #endif
 
@@ -692,12 +685,12 @@ static const yytype_int8 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,    16,     0,    17,     0,     2,     5,     4,     0,
-       0,     0,     1,     3,     0,     0,     0,     0,    15,     0,
-       6,     0,     8,     9,     0,     0,     0,     0,     0,     7,
-       0,     0,     0,     0,     0,     0,     0,    14,     0,     0,
+       2,     0,    17,     0,    18,     0,     3,     6,     5,     0,
+       0,     0,     1,     4,     0,     0,     0,     0,    16,     0,
+       7,     0,     9,    10,     0,     0,     0,     0,     0,     8,
+       0,     0,     0,     0,     0,     0,     0,    15,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,    10,    11,    12,     0,     0,    13
+       0,    11,    12,    13,     0,     0,    14
 };
 
 /* YYPGOTO[NTERM-NUM].  */
@@ -752,15 +745,15 @@ static const yytype_int8 yystos[] =
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    18,    19,    19,    20,    20,    21,    21,    22,    22,
-      23,    23,    23,    23,    23,    23,    24,    24
+       0,    18,    19,    19,    19,    20,    20,    21,    21,    22,
+      22,    23,    23,    23,    23,    23,    23,    24,    24
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     2,     1,     1,     2,     3,     3,     3,
-       7,     8,     8,    10,     4,     1,     1,     1
+       0,     2,     0,     1,     2,     1,     1,     2,     3,     3,
+       3,     7,     8,     8,    10,     4,     1,     1,     1
 };
 
 
@@ -1223,80 +1216,80 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 6: /* ctable_entry: number color  */
-#line 165 "color_parser_yacc.yy"
+  case 7: /* ctable_entry: number color  */
+#line 159 "color_parser_yacc.yy"
                                          { add_to_table((yyvsp[-1].nval), (yyvsp[0].cval)); }
-#line 1230 "color_parser_yacc.cc"
+#line 1223 "color_parser_yacc.cc"
     break;
 
-  case 7: /* ctable_entry: number number color  */
-#line 166 "color_parser_yacc.yy"
+  case 8: /* ctable_entry: number number color  */
+#line 160 "color_parser_yacc.yy"
                                          { add_2_to_table((yyvsp[-2].nval), (yyvsp[-1].nval), (yyvsp[0].cval)); }
-#line 1236 "color_parser_yacc.cc"
+#line 1229 "color_parser_yacc.cc"
     break;
 
-  case 8: /* color_assignment: ID '=' color  */
-#line 170 "color_parser_yacc.yy"
+  case 9: /* color_assignment: ID '=' color  */
+#line 164 "color_parser_yacc.yy"
                                          { assign_color_1((yyvsp[-2].text), (yyvsp[0].cval)); }
-#line 1242 "color_parser_yacc.cc"
+#line 1235 "color_parser_yacc.cc"
     break;
 
-  case 9: /* color_assignment: COLOR_NAME '=' color  */
-#line 171 "color_parser_yacc.yy"
+  case 10: /* color_assignment: COLOR_NAME '=' color  */
+#line 165 "color_parser_yacc.yy"
                                          { assign_color_2((yyvsp[-2].ival), (yyvsp[0].cval)); }
-#line 1248 "color_parser_yacc.cc"
+#line 1241 "color_parser_yacc.cc"
     break;
 
-  case 10: /* color: '{' number ',' number ',' number '}'  */
-#line 175 "color_parser_yacc.yy"
+  case 11: /* color: '{' number ',' number ',' number '}'  */
+#line 169 "color_parser_yacc.yy"
                                                                  { (yyval.cval) = do_simple_color((yyvsp[-5].nval), (yyvsp[-3].nval), (yyvsp[-1].nval)); }
-#line 1254 "color_parser_yacc.cc"
+#line 1247 "color_parser_yacc.cc"
     break;
 
-  case 11: /* color: BLEND '(' color ',' color ',' number ')'  */
-#line 176 "color_parser_yacc.yy"
+  case 12: /* color: BLEND '(' color ',' color ',' number ')'  */
+#line 170 "color_parser_yacc.yy"
                                                                  { (yyval.cval) = blend((yyvsp[-5].cval), (yyvsp[-3].cval), (yyvsp[-1].nval)); }
-#line 1260 "color_parser_yacc.cc"
+#line 1253 "color_parser_yacc.cc"
     break;
 
-  case 12: /* color: HSV '(' number ',' number ',' number ')'  */
-#line 177 "color_parser_yacc.yy"
+  case 13: /* color: HSV '(' number ',' number ',' number ')'  */
+#line 171 "color_parser_yacc.yy"
                                                                  { (yyval.cval) = hsv((yyvsp[-5].nval), (yyvsp[-3].nval), (yyvsp[-1].nval)); }
-#line 1266 "color_parser_yacc.cc"
+#line 1259 "color_parser_yacc.cc"
     break;
 
-  case 13: /* color: CMYK '(' number ',' number ',' number ',' number ')'  */
-#line 178 "color_parser_yacc.yy"
+  case 14: /* color: CMYK '(' number ',' number ',' number ',' number ')'  */
+#line 172 "color_parser_yacc.yy"
                                                                  { (yyval.cval) = cmyk((yyvsp[-7].nval), (yyvsp[-5].nval), (yyvsp[-3].nval), (yyvsp[-1].nval)); }
-#line 1272 "color_parser_yacc.cc"
+#line 1265 "color_parser_yacc.cc"
     break;
 
-  case 14: /* color: GRAYVALUE '(' number ')'  */
-#line 179 "color_parser_yacc.yy"
+  case 15: /* color: GRAYVALUE '(' number ')'  */
+#line 173 "color_parser_yacc.yy"
                                                                  { (yyval.cval) = do_gray((yyvsp[-1].nval)); }
-#line 1278 "color_parser_yacc.cc"
+#line 1271 "color_parser_yacc.cc"
     break;
 
-  case 15: /* color: COLOR_NAME  */
-#line 180 "color_parser_yacc.yy"
+  case 16: /* color: COLOR_NAME  */
+#line 174 "color_parser_yacc.yy"
                                                                  { (yyval.cval) = color_lookup((yyvsp[0].ival)); }
-#line 1284 "color_parser_yacc.cc"
+#line 1277 "color_parser_yacc.cc"
     break;
 
-  case 16: /* number: INTEGER  */
-#line 184 "color_parser_yacc.yy"
+  case 17: /* number: INTEGER  */
+#line 178 "color_parser_yacc.yy"
                    { (yyval.nval) = int_to_num((yyvsp[0].ival)); }
-#line 1290 "color_parser_yacc.cc"
+#line 1283 "color_parser_yacc.cc"
     break;
 
-  case 17: /* number: FLOAT  */
-#line 185 "color_parser_yacc.yy"
+  case 18: /* number: FLOAT  */
+#line 179 "color_parser_yacc.yy"
                    { (yyval.nval) = int_to_double((yyvsp[0].dval)); }
-#line 1296 "color_parser_yacc.cc"
+#line 1289 "color_parser_yacc.cc"
     break;
 
 
-#line 1300 "color_parser_yacc.cc"
+#line 1293 "color_parser_yacc.cc"
 
       default: break;
     }
@@ -1489,7 +1482,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 190 "color_parser_yacc.yy"
+#line 183 "color_parser_yacc.yy"
 
 
 
@@ -1506,9 +1499,7 @@ d.r = number_to_double(r);
 d.g = number_to_double(g);
 d.b = number_to_double(b);
 
-
 range_check(d);
-
 
 return ( d );
 
@@ -1563,7 +1554,6 @@ double x;
 if ( n.is_int )  x = (double) (n.i);
 else             x = n.d;
 
-
 return ( x );
 
 }
@@ -1576,16 +1566,15 @@ Dcolor blend(const Dcolor & c1, const Dcolor & c2, const ColorNumber & num)
 
 {
 
-double p, q;
-Dcolor result;
-
-p = number_to_double(num);
+double p = number_to_double(num);
+double q;
 
 if ( p < 0.0 )  p = 0.0;
 if ( p > 1.0 )  p = 1.0;
 
 q = 1.0 - p;
 
+Dcolor result;
 result.r = q*(c1.r) + p*(c2.r);
 result.g = q*(c1.g) + p*(c2.g);
 result.b = q*(c1.b) + p*(c2.b);
@@ -1604,22 +1593,11 @@ Dcolor hsv(const ColorNumber & h, const ColorNumber & s, const ColorNumber & v)
 
 {
 
-double H, S, V;
-double R, G, B;
-Dcolor result;
-
-// cout << "\n\n  In hsv!\n\n" << flush;
-
-
-H = number_to_double(h);
-S = number_to_double(s);
-V = number_to_double(v);
-
+double H = number_to_double(h);
+double S = number_to_double(s);
+double V = number_to_double(v);
 
 H -= floor(H);
-
-// S -= floor(S);
-// V -= floor(V);
 
 if ( S < 0.0 )  S = 0.0;
 if ( S > 1.0 )  S = 1.0;
@@ -1627,14 +1605,15 @@ if ( S > 1.0 )  S = 1.0;
 if ( V < 0.0 )  V = 0.0;
 if ( V > 1.0 )  V = 1.0;
 
-
+double R;
+double G;
+double B;
 dhsv_to_drgb(H, S, V, R, G, B);
 
-
+Dcolor result;
 result.r = 255.0*R;
 result.g = 255.0*G;
 result.b = 255.0*B;
-
 
 range_check(result);
 
@@ -1651,16 +1630,12 @@ Dcolor cmyk(const ColorNumber & Cyan, const ColorNumber & Magenta, const ColorNu
 {
 
 Dcolor d;
-double C, M, Y, K;
-double R, G, B;
-
-
 d.r = d.g = d.b = 0.0;
 
-C = number_to_double(Cyan);
-M = number_to_double(Magenta);
-Y = number_to_double(Yellow);
-K = number_to_double(Black);
+double C = number_to_double(Cyan);
+double M = number_to_double(Magenta);
+double Y = number_to_double(Yellow);
+double K = number_to_double(Black);
 
 if ( C < 0.0 )  C = 0.0;
 if ( M < 0.0 )  M = 0.0;
@@ -1672,14 +1647,11 @@ if ( M > 1.0 )  M = 1.0;
 if ( Y > 1.0 )  Y = 1.0;
 if ( K > 1.0 )  K = 1.0;
 
-// R = (1.0 - C)*(1.0 - K);
-// G = (1.0 - M)*(1.0 - K);
-// B = (1.0 - Y)*(1.0 - K);
-
 C += K;
 M += K;
 Y += K;
 
+double R, G, B;
 R = 1.0 - C;
 G = 1.0 - M;
 B = 1.0 - Y;
@@ -1697,42 +1669,19 @@ return ( d );
 
 ////////////////////////////////////////////////////////////////////////
 
-/*
-double min3(double a, double b, double c)
-
-{
-
-double m, min_ab;
-
-
-min_ab = ( (a < b) ? a : b );
-
-m = ( (c < min_ab) ? c : min_ab );
-
-
-return ( m );
-
-}
-*/
-
-////////////////////////////////////////////////////////////////////////
-
 
 Dcolor do_gray(const ColorNumber & n)
 
 {
 
-Dcolor d;
-double x;
-
-x = number_to_double(n);
+double x = number_to_double(n);
 
 if ( x < 0.0 )  x = 0.0;
 
 if ( x > 255.0 )  x = 255.0;
 
+Dcolor d;
 d.r = d.g = d.b = x;
-
 
 return ( d );
 
@@ -1786,7 +1735,6 @@ if ( x < 0.0 )  x = 0.0;
 
 if ( x > 255.0 )  x = 255.0;
 
-
 return;
 
 }
@@ -1800,7 +1748,6 @@ void assign_color_1(const std::string name, const Dcolor & d)
 {
 
 ClistEntry e;
-
 
 e.set_name(name);
 
@@ -1822,7 +1769,8 @@ void assign_color_2(int index, const Dcolor & d)
 
 if ( (index < 0) || (index >= clist.n_elements()) )  {
 
-   cerr << "\n\n  void assign_color_2(int, const Dcolor &) -> bad index ... " << index << "\n\n";
+   cerr << "\nvoid assign_color_2(int, const Dcolor &) -> "
+        << "bad index ... " << index << "\n\n";
 
    exit ( 1 );
 
@@ -1844,26 +1792,16 @@ void add_to_table(const ColorNumber & number, const Dcolor & d)
 
 {
 
+double value = number_to_double(number);
+
+Color color = dcolor_to_color(d);
+
 CtableEntry ce;
-double value;
-Color color;
-
-
-value = number_to_double(number);
-
-color = dcolor_to_color(d);
-
 ce.set_value(value);
 
 ce.set_color(color);
 
 the_table->add_entry(ce);
-
-
-
-   //
-   //  done
-   //
 
 return;
 
@@ -1877,26 +1815,17 @@ void add_2_to_table(const ColorNumber & n1, const ColorNumber & n2, const Dcolor
 
 {
 
+double value1 = number_to_double(n1);
+double value2 = number_to_double(n2);
+
+Color color = dcolor_to_color(d);
+
 CtableEntry ce;
-double value1, value2;
-Color color;
-
-
-value1 = number_to_double(n1);
-value2 = number_to_double(n2);
-
-color = dcolor_to_color(d);
-
 ce.set_values(value1, value2);
 
 ce.set_color(color);
 
 the_table->add_entry(ce);
-
-
-   //
-   //  done
-   //
 
 return;
 
@@ -1910,12 +1839,9 @@ Color dcolor_to_color(const Dcolor & d)
 
 {
 
-int R, G, B;
-Color color;
-
-R = nint(d.r);
-G = nint(d.g);
-B = nint(d.b);
+int R = nint(d.r);
+int G = nint(d.g);
+int B = nint(d.b);
 
 if ( R < 0 )  R = 0;
 if ( G < 0 )  G = 0;
@@ -1925,31 +1851,12 @@ if ( R > 255 )  R = 255;
 if ( G > 255 )  G = 255;
 if ( B > 255 )  B = 255;
 
+Color color;
 color.set_rgb((unsigned char) R, (unsigned char) G, (unsigned char) B);
 
 return ( color );
 
 }
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -1967,14 +1874,7 @@ void yyerror(const char * s)
 
 {
 
-int j, j1, j2;
-int line_len, text_len;
-int c;
-char line[512];
-ifstream in;
-
-
-c = (int) (color_file_column - strlen(colortext));
+int c = (int) (color_file_column - strlen(colortext));
 
 cout << "\n\n"
      << "  syntax error in file \"" << input_filename << "\"\n\n"
@@ -1982,9 +1882,12 @@ cout << "\n\n"
      << "      color_file_column = " << c << "\n\n"
      << "      text   = \"" << colortext << "\"\n\n";
 
+ifstream in;
 in.open(input_filename);
 
-for (j=1; j<color_file_line_number; ++j)  {   //  j starts at one here, not zero
+char line[512];
+
+for (int j=1; j<color_file_line_number; ++j)  {   //  j starts at one here, not zero
 
    in.getline(line, sizeof(line));
 
@@ -1994,31 +1897,23 @@ in.getline(line, sizeof(line));
 
 in.close();
 
-
-
-
 cout << "\n\n"
      << line
      << "\n";
 
-line_len = strlen(line);
+int line_len = strlen(line);
 
-text_len = strlen(colortext);
+int text_len = strlen(colortext);
 
-j1 = c;
-j2 = c + text_len - 1;
+int j1 = c;
+int j2 = c + text_len - 1;
 
-
-for (j=1; j<=line_len; ++j)  {   //  j starts a one here, not zero
+for (int j=1; j<=line_len; ++j)  {   //  j starts a one here, not zero
 
    if ( (j >= j1) && (j <= j2) )  cout.put('^');
    else                           cout.put('_');
 
 }
-
-
-
-
 
 cout << "\n\n";
 
@@ -2042,13 +1937,4 @@ return ( 1 );
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
 
