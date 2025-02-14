@@ -11,8 +11,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -36,6 +34,8 @@ using namespace std;
 
 #include "scanner_stuff.h"
 #include "threshold.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -247,8 +247,10 @@ static void do_user_function_def();
 %%
 
 
-statement_list : statement                { is_lhs = true; }
+statement_list :  /*  allows for empty input  */
+               | statement                { is_lhs = true; }
                | statement_list statement { is_lhs = true; }
+               ; 
 
 
 statement : assign_stmt   { is_lhs = true; }
@@ -264,7 +266,6 @@ print_stmt : print_prefix expression                         ';' { do_print( 0);
 
 print_prefix : PRINT   { is_lhs = false; }
              ;
-
 
 
 assign_stmt : assign_prefix BOOLEAN            ';'      { do_assign_boolean   ($1, $2); }
@@ -286,7 +287,6 @@ assign_stmt : assign_prefix BOOLEAN            ';'      { do_assign_boolean   ($
             | function_prefix expression       ';'      { do_user_function_def(); }
 
             ;
-
 
 
 id_list : IDENTIFIER             { ida.add($1); }
@@ -324,6 +324,7 @@ threshold_list : threshold
                | threshold_list ',' threshold
                ;
 
+
 threshold : thresh_node            { do_thresh    ($1); }
           | NA_COMPARISON          { do_na_thresh (); }
           ;
@@ -350,7 +351,7 @@ number : INTEGER { set_number_string(); }
 
 
 boolean_list : BOOLEAN                   { do_boolean($1); }
-            | boolean_list ',' BOOLEAN   { do_boolean($3); }
+             | boolean_list ',' BOOLEAN   { do_boolean($3); }
             ;
 
 
@@ -378,7 +379,6 @@ expression : number                                                { do_number($
            ;
 
 
-
 expression_list : expression                     { store_exp(); }
                 | expression_list ',' expression { store_exp(); }
                 ;
@@ -394,7 +394,6 @@ point_list : point              { }
 
 
 point : '(' expression ',' expression ')'   { add_point(); }
-
 
 
 %%

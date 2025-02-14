@@ -86,8 +86,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -111,6 +109,8 @@ using namespace std;
 
 #include "scanner_stuff.h"
 #include "threshold.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -686,7 +686,7 @@ union yyalloc
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  29
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  74
+#define YYNRULES  75
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  144
 
@@ -739,14 +739,14 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   250,   250,   251,   254,   255,   256,   260,   261,   265,
-     270,   271,   272,   273,   275,   276,   277,   279,   280,   281,
-     282,   283,   284,   286,   292,   293,   297,   301,   305,   305,
-     309,   313,   314,   318,   319,   323,   324,   327,   328,   332,
-     333,   334,   335,   336,   340,   341,   342,   343,   347,   348,
-     352,   353,   357,   358,   362,   363,   367,   368,   369,   370,
-     371,   372,   373,   374,   375,   376,   376,   377,   377,   382,
-     383,   387,   391,   392,   396
+       0,   250,   250,   251,   252,   256,   257,   258,   262,   263,
+     267,   271,   272,   273,   274,   276,   277,   278,   280,   281,
+     282,   283,   284,   285,   287,   292,   293,   297,   301,   305,
+     305,   309,   313,   314,   318,   319,   323,   324,   328,   329,
+     333,   334,   335,   336,   337,   341,   342,   343,   344,   348,
+     349,   353,   354,   358,   359,   363,   364,   368,   369,   370,
+     371,   372,   373,   374,   375,   376,   377,   377,   378,   378,
+     382,   383,   387,   391,   392,   396
 };
 #endif
 
@@ -819,21 +819,21 @@ static const yytype_int16 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     9,     0,    47,     0,    38,     0,     0,     2,
-       5,     0,     4,     0,    28,     0,     6,    37,    39,    42,
-       0,    27,    48,    49,    45,    44,     0,     1,     3,    55,
-       0,    57,     0,     0,     0,    56,     0,     0,     0,     0,
-       0,     0,     0,     0,    16,     0,     0,     0,    33,    50,
-       0,     0,    31,     0,     0,     0,    35,     0,    69,     0,
-       0,     0,    24,     0,     0,    43,    54,     0,    65,    67,
-      63,     0,     0,     0,     0,     0,     0,     7,    23,    12,
-      15,    10,     0,     0,    72,     0,    29,    14,    11,    13,
-      22,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,    40,    41,     0,     0,     0,     0,     0,     0,    64,
-      58,    59,    60,    61,    62,     0,     0,    71,    73,    53,
-      21,    32,    19,    34,    20,    36,    17,    51,    18,    70,
-      25,    26,    46,     8,     0,     0,     0,     0,    52,    30,
-      66,    68,     0,    74
+       2,     0,    10,     0,    48,     0,    39,     0,     0,     3,
+       6,     0,     5,     0,    29,     0,     7,    38,    40,    43,
+       0,    28,    49,    50,    46,    45,     0,     1,     4,    56,
+       0,    58,     0,     0,     0,    57,     0,     0,     0,     0,
+       0,     0,     2,     0,    17,     0,     0,     0,    34,    51,
+       0,     0,    32,     0,     0,     0,    36,     0,    70,     0,
+       0,     0,    25,     0,     0,    44,    55,     0,    66,    68,
+      64,     0,     0,     0,     0,     0,     0,     8,    24,    13,
+      16,    11,     0,     0,    73,     0,    30,    15,    12,    14,
+      23,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,    41,    42,     0,     0,     0,     0,     0,     0,    65,
+      59,    60,    61,    62,    63,     0,     0,    72,    74,    54,
+      22,    33,    20,    35,    21,    37,    18,    52,    19,    71,
+      26,    27,    47,     9,     0,     0,     0,     0,    53,    31,
+      67,    69,     0,    75
 };
 
 /* YYPGOTO[NTERM-NUM].  */
@@ -939,27 +939,27 @@ static const yytype_int8 yystos[] =
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    34,    35,    35,    36,    36,    36,    37,    37,    38,
-      39,    39,    39,    39,    39,    39,    39,    39,    39,    39,
-      39,    39,    39,    39,    40,    40,    41,    42,    44,    43,
-      45,    46,    46,    47,    47,    48,    48,    49,    49,    50,
-      50,    50,    50,    50,    51,    51,    51,    51,    52,    52,
-      53,    53,    54,    54,    55,    55,    56,    56,    56,    56,
-      56,    56,    56,    56,    56,    57,    56,    58,    56,    59,
-      59,    60,    61,    61,    62
+       0,    34,    35,    35,    35,    36,    36,    36,    37,    37,
+      38,    39,    39,    39,    39,    39,    39,    39,    39,    39,
+      39,    39,    39,    39,    39,    40,    40,    41,    42,    44,
+      43,    45,    46,    46,    47,    47,    48,    48,    49,    49,
+      50,    50,    50,    50,    50,    51,    51,    51,    51,    52,
+      52,    53,    53,    54,    54,    55,    55,    56,    56,    56,
+      56,    56,    56,    56,    56,    56,    57,    56,    58,    56,
+      59,    59,    60,    61,    61,    62
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     2,     1,     1,     1,     3,     5,     1,
-       3,     3,     3,     3,     3,     3,     2,     4,     4,     4,
-       4,     4,     3,     3,     1,     3,     5,     2,     0,     3,
-       4,     1,     3,     1,     3,     1,     3,     1,     1,     1,
-       3,     3,     2,     3,     2,     2,     5,     1,     1,     1,
-       1,     3,     1,     0,     1,     0,     1,     1,     3,     3,
-       3,     3,     3,     2,     3,     0,     5,     0,     5,     1,
-       3,     3,     1,     2,     5
+       0,     2,     0,     1,     2,     1,     1,     1,     3,     5,
+       1,     3,     3,     3,     3,     3,     3,     2,     4,     4,
+       4,     4,     4,     3,     3,     1,     3,     5,     2,     0,
+       3,     4,     1,     3,     1,     3,     1,     3,     1,     1,
+       1,     3,     3,     2,     3,     2,     2,     5,     1,     1,
+       1,     1,     3,     1,     0,     1,     0,     1,     1,     3,
+       3,     3,     3,     3,     2,     3,     0,     5,     0,     5,
+       1,     3,     3,     1,     2,     5
 };
 
 
@@ -1183,7 +1183,7 @@ int yynerrs;
 int
 yyparse (void)
 {
-    yy_state_fast_t yystate = 8;
+    yy_state_fast_t yystate = 0;
     /* Number of tokens to shift before error messages enabled.  */
     int yyerrstatus = 0;
 
@@ -1422,391 +1422,391 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 2: /* statement_list: statement  */
-#line 250 "config.tab.yy"
+  case 3: /* statement_list: statement  */
+#line 251 "config.tab.yy"
                                           { is_lhs = true; }
 #line 1429 "config.tab.cc"
     break;
 
-  case 3: /* statement_list: statement_list statement  */
-#line 251 "config.tab.yy"
+  case 4: /* statement_list: statement_list statement  */
+#line 252 "config.tab.yy"
                                           { is_lhs = true; }
 #line 1435 "config.tab.cc"
     break;
 
-  case 4: /* statement: assign_stmt  */
-#line 254 "config.tab.yy"
+  case 5: /* statement: assign_stmt  */
+#line 256 "config.tab.yy"
                           { is_lhs = true; }
 #line 1441 "config.tab.cc"
     break;
 
-  case 5: /* statement: print_stmt  */
-#line 255 "config.tab.yy"
+  case 6: /* statement: print_stmt  */
+#line 257 "config.tab.yy"
                           { is_lhs = true; }
 #line 1447 "config.tab.cc"
     break;
 
-  case 6: /* statement: threshold  */
-#line 256 "config.tab.yy"
+  case 7: /* statement: threshold  */
+#line 258 "config.tab.yy"
                           { }
 #line 1453 "config.tab.cc"
     break;
 
-  case 7: /* print_stmt: print_prefix expression ';'  */
-#line 260 "config.tab.yy"
+  case 8: /* print_stmt: print_prefix expression ';'  */
+#line 262 "config.tab.yy"
                                                                  { do_print( 0); }
 #line 1459 "config.tab.cc"
     break;
 
-  case 8: /* print_stmt: print_prefix QUOTED_STRING opt_comma expression ';'  */
-#line 261 "config.tab.yy"
+  case 9: /* print_stmt: print_prefix QUOTED_STRING opt_comma expression ';'  */
+#line 263 "config.tab.yy"
                                                                  { do_print((yyvsp[-3].text)); }
 #line 1465 "config.tab.cc"
     break;
 
-  case 9: /* print_prefix: PRINT  */
-#line 265 "config.tab.yy"
+  case 10: /* print_prefix: PRINT  */
+#line 267 "config.tab.yy"
                        { is_lhs = false; }
 #line 1471 "config.tab.cc"
     break;
 
-  case 10: /* assign_stmt: assign_prefix BOOLEAN ';'  */
-#line 270 "config.tab.yy"
+  case 11: /* assign_stmt: assign_prefix BOOLEAN ';'  */
+#line 271 "config.tab.yy"
                                                         { do_assign_boolean   ((yyvsp[-2].text), (yyvsp[-1].bval)); }
 #line 1477 "config.tab.cc"
     break;
 
-  case 11: /* assign_stmt: assign_prefix expression ';'  */
-#line 271 "config.tab.yy"
+  case 12: /* assign_stmt: assign_prefix expression ';'  */
+#line 272 "config.tab.yy"
                                                         { do_assign_exp       ((yyvsp[-2].text)); }
 #line 1483 "config.tab.cc"
     break;
 
-  case 12: /* assign_stmt: assign_prefix IDENTIFIER ';'  */
-#line 272 "config.tab.yy"
+  case 13: /* assign_stmt: assign_prefix IDENTIFIER ';'  */
+#line 273 "config.tab.yy"
                                                         { do_assign_id        ((yyvsp[-2].text), (yyvsp[-1].text)); }
 #line 1489 "config.tab.cc"
     break;
 
-  case 13: /* assign_stmt: assign_prefix piecewise_linear ';'  */
-#line 273 "config.tab.yy"
+  case 14: /* assign_stmt: assign_prefix piecewise_linear ';'  */
+#line 274 "config.tab.yy"
                                                         { do_pwl              ((yyvsp[-2].text)); }
 #line 1495 "config.tab.cc"
     break;
 
-  case 14: /* assign_stmt: assign_prefix threshold ';'  */
-#line 275 "config.tab.yy"
+  case 15: /* assign_stmt: assign_prefix threshold ';'  */
+#line 276 "config.tab.yy"
                                                         { do_assign_threshold ((yyvsp[-2].text)); }
 #line 1501 "config.tab.cc"
     break;
 
-  case 15: /* assign_stmt: assign_prefix QUOTED_STRING ';'  */
-#line 276 "config.tab.yy"
+  case 16: /* assign_stmt: assign_prefix QUOTED_STRING ';'  */
+#line 277 "config.tab.yy"
                                                         { do_assign_string    ((yyvsp[-2].text), (yyvsp[-1].text)); }
 #line 1507 "config.tab.cc"
     break;
 
-  case 16: /* assign_stmt: assign_prefix dictionary  */
-#line 277 "config.tab.yy"
+  case 17: /* assign_stmt: assign_prefix dictionary  */
+#line 278 "config.tab.yy"
                                                         { do_assign_dict      ((yyvsp[-1].text)); }
 #line 1513 "config.tab.cc"
     break;
 
-  case 17: /* assign_stmt: array_prefix boolean_list ']' ';'  */
-#line 279 "config.tab.yy"
+  case 18: /* assign_stmt: array_prefix boolean_list ']' ';'  */
+#line 280 "config.tab.yy"
                                                         { do_assign_dict((yyvsp[-3].text)); }
 #line 1519 "config.tab.cc"
     break;
 
-  case 18: /* assign_stmt: array_prefix expression_list ']' ';'  */
-#line 280 "config.tab.yy"
+  case 19: /* assign_stmt: array_prefix expression_list ']' ';'  */
+#line 281 "config.tab.yy"
                                                         { do_assign_exp_array((yyvsp[-3].text)); }
 #line 1525 "config.tab.cc"
     break;
 
-  case 19: /* assign_stmt: array_prefix string_list ']' ';'  */
-#line 281 "config.tab.yy"
+  case 20: /* assign_stmt: array_prefix string_list ']' ';'  */
+#line 282 "config.tab.yy"
                                                         { do_assign_dict((yyvsp[-3].text)); }
 #line 1531 "config.tab.cc"
     break;
 
-  case 20: /* assign_stmt: array_prefix threshold_list ']' ';'  */
-#line 282 "config.tab.yy"
+  case 21: /* assign_stmt: array_prefix threshold_list ']' ';'  */
+#line 283 "config.tab.yy"
                                                         { do_assign_dict((yyvsp[-3].text)); }
 #line 1537 "config.tab.cc"
     break;
 
-  case 21: /* assign_stmt: array_prefix dictionary_list ']' ';'  */
-#line 283 "config.tab.yy"
+  case 22: /* assign_stmt: array_prefix dictionary_list ']' ';'  */
+#line 284 "config.tab.yy"
                                                         { do_assign_dict((yyvsp[-3].text)); }
 #line 1543 "config.tab.cc"
     break;
 
-  case 22: /* assign_stmt: array_prefix ']' ';'  */
-#line 284 "config.tab.yy"
+  case 23: /* assign_stmt: array_prefix ']' ';'  */
+#line 285 "config.tab.yy"
                                                         { do_assign_dict((yyvsp[-2].text)); }
 #line 1549 "config.tab.cc"
     break;
 
-  case 23: /* assign_stmt: function_prefix expression ';'  */
-#line 286 "config.tab.yy"
+  case 24: /* assign_stmt: function_prefix expression ';'  */
+#line 287 "config.tab.yy"
                                                         { do_user_function_def(); }
 #line 1555 "config.tab.cc"
     break;
 
-  case 24: /* id_list: IDENTIFIER  */
+  case 25: /* id_list: IDENTIFIER  */
 #line 292 "config.tab.yy"
                                  { ida.add((yyvsp[0].text)); }
 #line 1561 "config.tab.cc"
     break;
 
-  case 25: /* id_list: id_list ',' IDENTIFIER  */
+  case 26: /* id_list: id_list ',' IDENTIFIER  */
 #line 293 "config.tab.yy"
                                  { ida.add((yyvsp[0].text)); }
 #line 1567 "config.tab.cc"
     break;
 
-  case 26: /* function_prefix: IDENTIFIER '(' id_list ')' '='  */
+  case 27: /* function_prefix: IDENTIFIER '(' id_list ')' '='  */
 #line 297 "config.tab.yy"
                                                     { is_lhs = false;  function_name = (yyvsp[-4].text);  is_function_def = true; }
 #line 1573 "config.tab.cc"
     break;
 
-  case 27: /* assign_prefix: IDENTIFIER '='  */
+  case 28: /* assign_prefix: IDENTIFIER '='  */
 #line 301 "config.tab.yy"
                                    { is_lhs = false;  strcpy((yyval.text), (yyvsp[-1].text)); }
 #line 1579 "config.tab.cc"
     break;
 
-  case 28: /* $@1: %empty  */
+  case 29: /* $@1: %empty  */
 #line 305 "config.tab.yy"
                              { mark(apm); }
 #line 1585 "config.tab.cc"
     break;
 
-  case 29: /* array_prefix: assign_prefix $@1 '['  */
+  case 30: /* array_prefix: assign_prefix $@1 '['  */
 #line 305 "config.tab.yy"
                                                   { is_lhs = false;  strcpy((yyval.text), (yyvsp[-2].text)); }
 #line 1591 "config.tab.cc"
     break;
 
-  case 30: /* dictionary: '{' statement_list '}' opt_semi  */
+  case 31: /* dictionary: '{' statement_list '}' opt_semi  */
 #line 309 "config.tab.yy"
                                                { do_dict(); }
 #line 1597 "config.tab.cc"
     break;
 
-  case 33: /* string_list: QUOTED_STRING  */
+  case 34: /* string_list: QUOTED_STRING  */
 #line 318 "config.tab.yy"
                                              { do_string((yyvsp[0].text)); }
 #line 1603 "config.tab.cc"
     break;
 
-  case 34: /* string_list: string_list ',' QUOTED_STRING  */
+  case 35: /* string_list: string_list ',' QUOTED_STRING  */
 #line 319 "config.tab.yy"
                                              { do_string((yyvsp[0].text)); }
 #line 1609 "config.tab.cc"
     break;
 
-  case 37: /* threshold: thresh_node  */
-#line 327 "config.tab.yy"
+  case 38: /* threshold: thresh_node  */
+#line 328 "config.tab.yy"
                                    { do_thresh    ((yyvsp[0].node)); }
 #line 1615 "config.tab.cc"
     break;
 
-  case 38: /* threshold: NA_COMPARISON  */
-#line 328 "config.tab.yy"
+  case 39: /* threshold: NA_COMPARISON  */
+#line 329 "config.tab.yy"
                                    { do_na_thresh (); }
 #line 1621 "config.tab.cc"
     break;
 
-  case 39: /* thresh_node: simple_thresh  */
-#line 332 "config.tab.yy"
+  case 40: /* thresh_node: simple_thresh  */
+#line 333 "config.tab.yy"
                                                      { (yyval.node) = (yyvsp[0].node); }
 #line 1627 "config.tab.cc"
     break;
 
-  case 40: /* thresh_node: thresh_node LOGICAL_OP_AND thresh_node  */
-#line 333 "config.tab.yy"
+  case 41: /* thresh_node: thresh_node LOGICAL_OP_AND thresh_node  */
+#line 334 "config.tab.yy"
                                                      { (yyval.node) = do_and_thresh   ((yyvsp[-2].node), (yyvsp[0].node)); }
 #line 1633 "config.tab.cc"
     break;
 
-  case 41: /* thresh_node: thresh_node LOGICAL_OP_OR thresh_node  */
-#line 334 "config.tab.yy"
+  case 42: /* thresh_node: thresh_node LOGICAL_OP_OR thresh_node  */
+#line 335 "config.tab.yy"
                                                      { (yyval.node) = do_or_thresh    ((yyvsp[-2].node), (yyvsp[0].node)); }
 #line 1639 "config.tab.cc"
     break;
 
-  case 42: /* thresh_node: LOGICAL_OP_NOT thresh_node  */
-#line 335 "config.tab.yy"
+  case 43: /* thresh_node: LOGICAL_OP_NOT thresh_node  */
+#line 336 "config.tab.yy"
                                                      { (yyval.node) = do_not_thresh   ((yyvsp[0].node));     }
 #line 1645 "config.tab.cc"
     break;
 
-  case 43: /* thresh_node: '(' thresh_node ')'  */
-#line 336 "config.tab.yy"
+  case 44: /* thresh_node: '(' thresh_node ')'  */
+#line 337 "config.tab.yy"
                                                      { (yyval.node) = do_paren_thresh ((yyvsp[-1].node));     }
 #line 1651 "config.tab.cc"
     break;
 
-  case 44: /* simple_thresh: COMPARISON number  */
-#line 340 "config.tab.yy"
+  case 45: /* simple_thresh: COMPARISON number  */
+#line 341 "config.tab.yy"
                                                                    { (yyval.node) = do_simple_thresh((yyvsp[-1].cval), (yyvsp[0].nval));     }
 #line 1657 "config.tab.cc"
     break;
 
-  case 45: /* simple_thresh: COMPARISON SIMPLE_PERC_THRESH  */
-#line 341 "config.tab.yy"
+  case 46: /* simple_thresh: COMPARISON SIMPLE_PERC_THRESH  */
+#line 342 "config.tab.yy"
                                                                    { (yyval.node) = do_simple_perc_thresh((yyvsp[-1].cval), (yyvsp[0].pc_info)); }
 #line 1663 "config.tab.cc"
     break;
 
-  case 46: /* simple_thresh: COMPARISON SIMPLE_PERC_THRESH '(' number ')'  */
-#line 342 "config.tab.yy"
+  case 47: /* simple_thresh: COMPARISON SIMPLE_PERC_THRESH '(' number ')'  */
+#line 343 "config.tab.yy"
                                                                    { (yyval.node) = do_compound_perc_thresh((yyvsp[-4].cval), (yyvsp[-3].pc_info), (yyvsp[-1].nval)); }
 #line 1669 "config.tab.cc"
     break;
 
-  case 47: /* simple_thresh: FORTRAN_THRESHOLD  */
-#line 343 "config.tab.yy"
+  case 48: /* simple_thresh: FORTRAN_THRESHOLD  */
+#line 344 "config.tab.yy"
                                                                    { (yyval.node) = do_fortran_thresh((yyvsp[0].text));        }
 #line 1675 "config.tab.cc"
     break;
 
-  case 48: /* number: INTEGER  */
-#line 347 "config.tab.yy"
+  case 49: /* number: INTEGER  */
+#line 348 "config.tab.yy"
                  { set_number_string(); }
 #line 1681 "config.tab.cc"
     break;
 
-  case 49: /* number: FLOAT  */
-#line 348 "config.tab.yy"
+  case 50: /* number: FLOAT  */
+#line 349 "config.tab.yy"
                  { set_number_string(); }
 #line 1687 "config.tab.cc"
     break;
 
-  case 50: /* boolean_list: BOOLEAN  */
-#line 352 "config.tab.yy"
+  case 51: /* boolean_list: BOOLEAN  */
+#line 353 "config.tab.yy"
                                          { do_boolean((yyvsp[0].bval)); }
 #line 1693 "config.tab.cc"
     break;
 
-  case 51: /* boolean_list: boolean_list ',' BOOLEAN  */
-#line 353 "config.tab.yy"
-                                         { do_boolean((yyvsp[0].bval)); }
+  case 52: /* boolean_list: boolean_list ',' BOOLEAN  */
+#line 354 "config.tab.yy"
+                                          { do_boolean((yyvsp[0].bval)); }
 #line 1699 "config.tab.cc"
     break;
 
-  case 56: /* expression: number  */
-#line 367 "config.tab.yy"
+  case 57: /* expression: number  */
+#line 368 "config.tab.yy"
                                                                    { do_number((yyvsp[0].nval)); }
 #line 1705 "config.tab.cc"
     break;
 
-  case 57: /* expression: LOCAL_VAR  */
-#line 368 "config.tab.yy"
+  case 58: /* expression: LOCAL_VAR  */
+#line 369 "config.tab.yy"
                                                                    { do_local_var((yyvsp[0].index)); }
 #line 1711 "config.tab.cc"
     break;
 
-  case 58: /* expression: expression '+' expression  */
-#line 369 "config.tab.yy"
+  case 59: /* expression: expression '+' expression  */
+#line 370 "config.tab.yy"
                                                                    { do_op('+'); }
 #line 1717 "config.tab.cc"
     break;
 
-  case 59: /* expression: expression '-' expression  */
-#line 370 "config.tab.yy"
+  case 60: /* expression: expression '-' expression  */
+#line 371 "config.tab.yy"
                                                                    { do_op('-'); }
 #line 1723 "config.tab.cc"
     break;
 
-  case 60: /* expression: expression '*' expression  */
-#line 371 "config.tab.yy"
+  case 61: /* expression: expression '*' expression  */
+#line 372 "config.tab.yy"
                                                                    { do_op('*'); }
 #line 1729 "config.tab.cc"
     break;
 
-  case 61: /* expression: expression '/' expression  */
-#line 372 "config.tab.yy"
+  case 62: /* expression: expression '/' expression  */
+#line 373 "config.tab.yy"
                                                                    { do_op('/'); }
 #line 1735 "config.tab.cc"
     break;
 
-  case 62: /* expression: expression '^' expression  */
-#line 373 "config.tab.yy"
+  case 63: /* expression: expression '^' expression  */
+#line 374 "config.tab.yy"
                                                                    { do_op('^'); }
 #line 1741 "config.tab.cc"
     break;
 
-  case 63: /* expression: '-' expression  */
-#line 374 "config.tab.yy"
+  case 64: /* expression: '-' expression  */
+#line 375 "config.tab.yy"
                                                                    { do_negate(); }
 #line 1747 "config.tab.cc"
     break;
 
-  case 64: /* expression: '(' expression ')'  */
-#line 375 "config.tab.yy"
+  case 65: /* expression: '(' expression ')'  */
+#line 376 "config.tab.yy"
                                                                    { do_paren_exp(); }
 #line 1753 "config.tab.cc"
     break;
 
-  case 65: /* $@2: %empty  */
-#line 376 "config.tab.yy"
+  case 66: /* $@2: %empty  */
+#line 377 "config.tab.yy"
                                { mark(fcm); }
 #line 1759 "config.tab.cc"
     break;
 
-  case 66: /* expression: BUILTIN '(' $@2 expression_list ')'  */
-#line 376 "config.tab.yy"
+  case 67: /* expression: BUILTIN '(' $@2 expression_list ')'  */
+#line 377 "config.tab.yy"
                                                                    { do_builtin_call((yyvsp[-4].index));  }
 #line 1765 "config.tab.cc"
     break;
 
-  case 67: /* $@3: %empty  */
-#line 377 "config.tab.yy"
+  case 68: /* $@3: %empty  */
+#line 378 "config.tab.yy"
                                { mark(fcm); }
 #line 1771 "config.tab.cc"
     break;
 
-  case 68: /* expression: USER_FUNCTION '(' $@3 expression_list ')'  */
-#line 377 "config.tab.yy"
+  case 69: /* expression: USER_FUNCTION '(' $@3 expression_list ')'  */
+#line 378 "config.tab.yy"
                                                                    { do_user_function_call((yyvsp[-4].entry)); }
 #line 1777 "config.tab.cc"
     break;
 
-  case 69: /* expression_list: expression  */
+  case 70: /* expression_list: expression  */
 #line 382 "config.tab.yy"
                                                  { store_exp(); }
 #line 1783 "config.tab.cc"
     break;
 
-  case 70: /* expression_list: expression_list ',' expression  */
+  case 71: /* expression_list: expression_list ',' expression  */
 #line 383 "config.tab.yy"
                                                  { store_exp(); }
 #line 1789 "config.tab.cc"
     break;
 
-  case 71: /* piecewise_linear: '(' point_list ')'  */
+  case 72: /* piecewise_linear: '(' point_list ')'  */
 #line 387 "config.tab.yy"
                                         { }
 #line 1795 "config.tab.cc"
     break;
 
-  case 72: /* point_list: point  */
+  case 73: /* point_list: point  */
 #line 391 "config.tab.yy"
                                 { }
 #line 1801 "config.tab.cc"
     break;
 
-  case 73: /* point_list: point_list point  */
+  case 74: /* point_list: point_list point  */
 #line 392 "config.tab.yy"
                                 { }
 #line 1807 "config.tab.cc"
     break;
 
-  case 74: /* point: '(' expression ',' expression ')'  */
+  case 75: /* point: '(' expression ',' expression ')'  */
 #line 396 "config.tab.yy"
                                             { add_point(); }
 #line 1813 "config.tab.cc"
@@ -2006,7 +2006,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 400 "config.tab.yy"
+#line 399 "config.tab.yy"
 
 
 
