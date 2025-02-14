@@ -14,7 +14,7 @@ MET Version 12.0.2 Release Notes (20250214)
 
   .. dropdown:: Bugfixes
 
-     * Fix remaining runtime issues when MET is compiled with optimization
+     * Fix memory management issues by replacing variable length arrays with STL vectors and arrays
        (`#3075 <https://github.com/dtcenter/MET/issues/3075>`_).
      * Fix intermittent configuration string parsing "yyerror" failure
        (`#3077 <https://github.com/dtcenter/MET/issues/3077>`_).
