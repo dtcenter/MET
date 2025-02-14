@@ -46,11 +46,11 @@ using namespace std;
    //
 
 
-extern int            yylex();
+extern int         yylex();
 
-extern void           yyerror(const char *);
+extern void        yyerror(const char *);
 
-extern "C" int        configwrap();
+extern "C" int     configwrap();
 
 
    //
@@ -99,10 +99,7 @@ static SingleThresh STH;
 
 static const char default_print_prefix [] = "config";
 
-
-static ICVStack         icvs;
-
-
+static ICVStack icvs;
 
 static ConcatString function_name;
 
@@ -125,7 +122,6 @@ static void do_negate();
 static void do_paren_exp();
 
 static void do_builtin_call(int which);
-
 
 static void do_assign_boolean   (const char * name, bool);
 static void do_assign_exp       (const char * name);
@@ -158,7 +154,6 @@ static void do_number(const Number &);
 
 static void do_local_var(int);
 
-
 static ThreshNode * do_and_thresh    (ThreshNode *, ThreshNode *);
 static ThreshNode * do_or_thresh     (ThreshNode *, ThreshNode *);
 static ThreshNode * do_not_thresh    (ThreshNode *);
@@ -168,7 +163,6 @@ static ThreshNode * do_simple_thresh (ThreshType, const Number &);
 static ThreshNode * do_simple_perc_thresh (const ThreshType, const PC_info &);
 static ThreshNode * do_compound_perc_thresh (const ThreshType, const PC_info &, const Number &);
 static ThreshNode * do_fortran_thresh(const char *);
-
 
 static void set_number_string();
 static void set_number_string(const char *);
@@ -213,7 +207,6 @@ static void do_user_function_def();
 
 %token PRINT
 
-
 %token <text> IDENTIFIER QUOTED_STRING FORTRAN_THRESHOLD
 %type  <text> assign_prefix array_prefix
 
@@ -232,7 +225,6 @@ static void do_user_function_def();
 %type  <node> simple_thresh thresh_node
 
 %token <pc_info> SIMPLE_PERC_THRESH
-
 
 %left '+' '-'
 %left '*' '/'
@@ -414,15 +406,7 @@ void yyerror(const char * s)
 
 {
 
-int j, j1, j2;
-int line_len, text_len;
-int c;
-char line[max_id_length + 1];
-ifstream in;
-ConcatString msg;
-
-
-c = (int) (Column - strlen(configtext));
+int c = (int) (Column - strlen(configtext));
 
 mlog << Error
      << "\n"
@@ -431,9 +415,13 @@ mlog << Error
      << "   column = " << c << "\n\n"
      << "   text   = \"" << configtext << "\"\n\n";
 
+ifstream in;
+
 met_open(in, bison_input_filename);
 
-for (j=1; j<LineNumber; ++j)  {   //  j starts at one here, not zero
+char line[max_id_length + 1];
+
+for (int j=1; j<LineNumber; ++j)  {   //  j starts at one here, not zero
 
    in.getline(line, sizeof(line));
 
@@ -443,21 +431,19 @@ in.getline(line, sizeof(line));
 
 in.close();
 
-
-
-
 mlog << Error
      << "\n" << line << "\n";
 
-line_len = strlen(line);
+int line_len = strlen(line);
 
-text_len = strlen(configtext);
+int text_len = strlen(configtext);
 
-j1 = c;
-j2 = c + text_len - 1;
+int j1 = c;
+int j2 = c + text_len - 1;
 
-msg.erase();
-for (j=1; j<=line_len; ++j)  {   //  j starts at one here, not zero
+ConcatString msg;
+
+for (int j=1; j<=line_len; ++j)  {   //  j starts at one here, not zero
 
    if ( (j >= j1) && (j <= j2) )  msg << '^';
    else                           msg << '_';
@@ -466,7 +452,6 @@ for (j=1; j<=line_len; ++j)  {   //  j starts at one here, not zero
 
 mlog << Error
      << msg << "\n\n";
-
 
 exit ( 1 );
 
@@ -492,13 +477,11 @@ void do_op(char op)
 
 {
 
+
+IcodeVector R = icvs.pop();
+IcodeVector L = icvs.pop();
+
 IcodeCell cell;
-IcodeVector L, R;
-
-
-R = icvs.pop();
-L = icvs.pop();
-
 
 switch ( op )  {
 
@@ -518,7 +501,8 @@ switch ( op )  {
 
 
    default:
-      cerr << "\n\n  do_op() -> unrecognized op ... \"" << op << "\"\n\n";
+      cerr << "\ndo_op() -> "
+           << "unrecognized op ... \"" << op << "\"\n\n";
       exit ( 1 );
 
 }   //  switch
@@ -528,10 +512,6 @@ if ( cell.type != op_square )   L.add(R);
 L.add(cell);
 
 icvs.push(L);
-
-   //
-   //  done
-   //
 
 return;
 
@@ -545,11 +525,9 @@ Number do_integer_op(char op, const Number & a, const Number & b)
 
 {
 
-Number c;
-int A, B, C;
-
-A = a.i;
-B = b.i;
+int A = a.i;
+int B = b.i;
+int C;
 
 switch ( op )  {
 
@@ -572,11 +550,9 @@ switch ( op )  {
 
 }
 
-set_int(c, C);
+Number c;
 
-   //
-   //  done
-   //
+set_int(c, C);
 
 return ( c );
 
@@ -590,12 +566,11 @@ void do_negate()
 
 {
 
-IcodeVector v;
 IcodeCell cell;
 
 cell.type = op_negate;
 
-v = icvs.pop();
+IcodeVector v = icvs.pop();
 
 v.add(cell);
 
@@ -667,21 +642,18 @@ void do_assign_exp(const char * name)
 
 {
 
-DictionaryEntry entry;
-IcodeVector v;
-Number n;
-
-v = icvs.pop();
+IcodeVector v = icvs.pop();
 
 hp.run(v);
 
-n = hp.pop();
+Number n = hp.pop();
+
+DictionaryEntry entry;
 
 if ( n.is_int)  entry.set_int    (name, n.i);
 else            entry.set_double (name, n.d);
 
 dict_stack->store(entry);
-
 
 return;
 
@@ -799,19 +771,15 @@ void do_assign_exp_array(const char * name)
 
 {
 
-int j, count;
-IcodeVector v;
 Number n;
 NumberStack ns;
 DictionaryEntry e;
 
-
-
-count = 0;
+int count = 0;
 
 while ( true )  {
 
-   v = icvs.pop();
+   IcodeVector v = icvs.pop();
 
    if ( v.is_mark() )  break;
 
@@ -826,7 +794,7 @@ while ( true )  {
 }   //  while
 
 
-for (j=0; j<count; ++j)  {
+for (int j=0; j<count; ++j)  {
 
    e.clear();
 
@@ -842,7 +810,6 @@ for (j=0; j<count; ++j)  {
 dict_stack->set_top_is_array(true);
 
 dict_stack->pop_dict(name);
-
 
 DD.clear();
 
@@ -897,23 +864,6 @@ return;
 void store_exp()
 
 {
-
-
-// DictionaryEntry e;
-// IcodeVector v;
-// Number n;
-//
-// v = icvs.pop();
-//
-// hp.run(v);
-//
-// n = hp.pop();
-//
-// if ( n.is_int )  e.set_int    (0, n.i);
-// else             e.set_double (0, n.d);
-//
-// dict_stack->store(e);
-
 
 return;
 
@@ -973,10 +923,6 @@ e.set_threshold("", T);
 
 dict_stack->store(e);
 
-   //
-   //  done
-   //
-
 return;
 
 }
@@ -989,24 +935,20 @@ void add_point()
 
 {
 
-double x, y;
-IcodeVector xv, yv;
-Number n;
-
-yv = icvs.pop();
-xv = icvs.pop();
+IcodeVector yv = icvs.pop();
+IcodeVector xv = icvs.pop();
 
 hp.run(xv);
 
-n = hp.pop();
+Number n = hp.pop();
 
-x = as_double(n);
+double x = as_double(n);
 
 hp.run(yv);
 
 n = hp.pop();
 
-y = as_double(n);
+double y = as_double(n);
 
 pwl.add_point(x, y);
 
@@ -1027,11 +969,6 @@ DictionaryEntry e;
 e.set_pwl(LHS, pwl);
 
 dict_stack->store(e);
-
-
-   //
-   //  done
-   //
 
 pwl.clear();
 
@@ -1165,9 +1102,6 @@ const char * p = text + 2;         //  we know that all the prefixes
                                    //  (like "le" or "gt") are two
                                    //  characters long
 
-  //  foo
-
-
      if ( strncmp(text, "le", 2) == 0 )  op = thresh_le;
 else if ( strncmp(text, "lt", 2) == 0 )  op = thresh_lt;
 
@@ -1243,7 +1177,6 @@ void mark(int k)
 IcodeVector v;
 IcodeCell cell;
 
-
 cell.type = cell_mark;
 
 cell.i = k;
@@ -1282,7 +1215,6 @@ v.add(cell);
 
 icvs.push(v);
 
-
 return;
 
 }
@@ -1304,8 +1236,6 @@ v.add(cell);
 
 icvs.push(v);
 
-
-
 return;
 
 }
@@ -1318,10 +1248,6 @@ void do_print(const char * s)
 
 {
 
-IcodeVector v;
-Number n;
-
-
 if ( bison_input_filename )  cout << bison_input_filename;
 else                         cout << default_print_prefix;
 
@@ -1329,16 +1255,14 @@ cout << ": ";
 
 if ( s )  cout << s;
 
-v = icvs.pop();
+IcodeVector v = icvs.pop();
 
 hp.run(v);
 
-n = hp.pop();
+Number n = hp.pop();
 
 if ( n.is_int )  cout << (n.i) << "\n";
 else             cout << (n.d) << "\n";
-
-
 
 cout.flush();
 
@@ -1354,19 +1278,17 @@ void do_builtin_call(int which)
 
 {
 
-int j;
 IcodeVector v;
 IcodeCell cell;
 const BuiltinInfo & info = binfo[which];
-
 
 if ( is_function_def )  {
 
    IcodeVector vv;
 
-      //  pop the args (in reverse order) from the icodevector stack
+   //  pop the args (in reverse order) from the icodevector stack
 
-   for (j=0; j<(info.n_args); ++j)  {
+   for (int j=0; j<(info.n_args); ++j)  {
 
       vv = icvs.pop();
 
@@ -1376,13 +1298,9 @@ if ( is_function_def )  {
 
    if ( icvs.top_is_mark(fcm) )  icvs.toss();
 
-      //
-
    cell.set_builtin(which);
 
    v.add(cell);
-
-      //
 
    icvs.push(v);
 
@@ -1399,13 +1317,14 @@ Number cur_result;
    //  pop the args (in reverse order) from the icodevector stack
    //
 
-for (j=0; j<(info.n_args); ++j)  {
+for (int j=0; j<(info.n_args); ++j)  {
 
    v = icvs.pop();
 
    if ( v.is_mark() )  {
 
-      cerr << "\n\n  do_builtin_call(int) -> too few arguments to builtin function \""
+      cerr << "\ndo_builtin_call(int) -> "
+           << "too few arguments to builtin function \""
            << info.name << "\"\n\n";
 
       exit ( 1 );
@@ -1426,7 +1345,8 @@ v = icvs.pop();
 
 if ( ! (v.is_mark()) )  {
 
-   cerr << "\n\n  do_builtin_call(int) -> too many arguments to builtin function \""
+   cerr << "\ndo_builtin_call(int) -> "
+        << "too many arguments to builtin function \""
         << info.name << "\"\n\n";
 
    exit ( 1 );
@@ -1450,11 +1370,6 @@ v.add(cell);
 
 icvs.push(v);
 
-
-   //
-   //  done
-   //
-
 return;
 
 }
@@ -1467,7 +1382,6 @@ void do_user_function_call(const DictionaryEntry * e)
 
 {
 
-int j;
 IcodeVector v;
 IcodeCell cell;
 const int Nargs = e->n_args();
@@ -1479,7 +1393,7 @@ if ( is_function_def )  {
 
       //  pop the args (in reverse order) from the icodevector stack
 
-   for (j=0; j<Nargs; ++j)  {
+   for (int j=0; j<Nargs; ++j)  {
 
       vv = icvs.pop();
 
@@ -1513,7 +1427,7 @@ Number cur_result;
    //  pop the args (in reverse order) from the icodevector stack
    //
 
-for (j=0; j<Nargs; ++j)  {
+for (int j=0; j<Nargs; ++j)  {
 
    v = icvs.pop();
 
@@ -1532,9 +1446,7 @@ for (j=0; j<Nargs; ++j)  {
 
 }
 
-
 if ( icvs.top_is_mark(fcm) )  icvs.toss();
-
 
    //
    //  call the function
@@ -1552,17 +1464,6 @@ v.clear();
 v.add(cell);
 
 icvs.push(v);
-
-
-
-
-
-
-   //
-   //  done
-   //
-
-// if ( icvs.top_is_mark(fcm) )  icvs.toss();
 
 return;
 
@@ -1590,10 +1491,6 @@ if ( ida.n_elements() > max_user_function_args )  {
 e.set_user_function(function_name.c_str(), icvs.pop(), ida.n_elements());
 
 dict_stack->store(e);
-
-   //
-   //  done
-   //
 
 is_function_def = false;
 
@@ -1670,10 +1567,6 @@ if ( op >= 0 )  {
 
 }
 
-   //
-   //  done
-   //
-
 return ( s );
 
 }
@@ -1744,10 +1637,6 @@ if ( op >= 0 )  {
    s->abbr_s << thresh_abbr_str[op] << cs;
 
 }
-
-   //
-   //  done
-   //
 
 return ( s );
 
