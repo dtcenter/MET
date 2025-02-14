@@ -1433,7 +1433,8 @@ for (int j=0; j<Nargs; ++j)  {
 
    if ( v.is_mark() )  {
 
-      cerr << "\n\n  do_user_function_call(int) -> too few arguments to user function \""
+      cerr << "\ndo_user_function_call(int) -> "
+           << "too few arguments to user function \""
            << (e->name()) << "\"\n\n";
 
       exit ( 1 );
@@ -1481,7 +1482,8 @@ DictionaryEntry e;
 
 if ( ida.n_elements() > max_user_function_args )  {
 
-   cerr << "\n\n  do_user_function_def() -> too many arguments to function \""
+   cerr << "\ndo_user_function_def() -> "
+        << "too many arguments to function \""
         << function_name << "\" definition\n\n";
 
    exit ( 1 );
