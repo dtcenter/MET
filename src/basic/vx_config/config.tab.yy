@@ -252,8 +252,10 @@ static void do_user_function_def();
 %%
 
 
-statement_list : statement                { is_lhs = true; }
+statement_list : /* allows for empty input */
+               | statement                { is_lhs = true; }
                | statement_list statement { is_lhs = true; }
+               ; 
 
 
 statement : assign_stmt   { is_lhs = true; }
@@ -269,7 +271,6 @@ print_stmt : print_prefix expression                         ';' { do_print( 0);
 
 print_prefix : PRINT   { is_lhs = false; }
              ;
-
 
 
 assign_stmt : assign_prefix BOOLEAN            ';'      { do_assign_boolean   ($1, $2); }
@@ -291,7 +292,6 @@ assign_stmt : assign_prefix BOOLEAN            ';'      { do_assign_boolean   ($
             | function_prefix expression       ';'      { do_user_function_def(); }
 
             ;
-
 
 
 id_list : IDENTIFIER             { ida.add($1); }
@@ -328,6 +328,7 @@ string_list : QUOTED_STRING                  { do_string($1); }
 threshold_list : threshold
                | threshold_list ',' threshold
                ;
+
 
 threshold : thresh_node            { do_thresh    ($1); }
           | NA_COMPARISON          { do_na_thresh (); }
@@ -383,7 +384,6 @@ expression : number                                                { do_number($
            ;
 
 
-
 expression_list : expression                     { store_exp(); }
                 | expression_list ',' expression { store_exp(); }
                 ;
@@ -399,7 +399,6 @@ point_list : point              { }
 
 
 point : '(' expression ',' expression ')'   { add_point(); }
-
 
 
 %%

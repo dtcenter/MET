@@ -108,10 +108,10 @@ int month = -1;
 
 // Convert to camel case
 string t_month_str(month_str);
-transform(t_month_str.begin(), t_month_str.begin() + 1,
-          t_month_str.begin(), ::toupper);
 transform(t_month_str.begin(), t_month_str.end(),
           t_month_str.begin(), ::tolower);
+transform(t_month_str.begin(), t_month_str.begin() + 1,
+          t_month_str.begin(), ::toupper);
 
 for (int idx=1; idx<=12; idx++) {
    if (t_month_str == short_month_name[idx] ||
