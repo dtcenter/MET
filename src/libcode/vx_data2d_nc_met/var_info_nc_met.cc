@@ -160,16 +160,8 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    set_req_name(nstr.c_str());
    set_name(nstr);
 
-   // If there's no level specification, assume (*, *)
-   if(strchr(lstr.c_str(), '(') == nullptr) {
-      Level.set_req_name("*,*");
-      Level.set_name("*,*");
-      Dimension.clear();
-      Dimension.add(vx_data2d_star);
-      Dimension.add(vx_data2d_star);
-   }
-   // Parse the level specification
-   else {
+   // Parse the level dimensions, if specified
+   if(lstr.string().find_first_of("(") != std::string::npos) {
 
       // Initialize the temp string
       tmp_str = lstr;
@@ -217,8 +209,23 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
          // Set ptr to nullptr for next call to strtok
          ptr = nullptr;
       } // end while
+   }
+   // Otherwise, assume (*,*) level dimensions
+   else {
 
-   } // end else
+      // MET #3087 Store the level string for U/V vector level matching
+      if(lstr.nonempty()) {
+         Level.set_req_name(lstr.c_str());
+         Level.set_name(lstr.c_str());
+      }
+      else {
+         Level.set_req_name("*,*");
+         Level.set_name("*,*");
+      }
+      Dimension.clear();
+      Dimension.add(vx_data2d_star);
+      Dimension.add(vx_data2d_star);
+   }
 
    // Check for "/PROB" to indicate a probability forecast
    if(strstr(MagicStr.c_str(), "/PROB") != nullptr) PFlag = 1;
