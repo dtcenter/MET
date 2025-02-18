@@ -11,7 +11,7 @@
   <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
 ]>
 
-<!-- Requires: unit_pcp_combine.xml unit_gen_ens_prod.xml -->
+<!-- Requires: unit_pcp_combine.xml unit_gen_ens_prod.xml unit_regrid.xml -->
 
 <met_test>
 
@@ -343,6 +343,22 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_GEN_ENS_PROD_240000L_20120410_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="grid_stat_MET_NC_VECTOR_LEVELS">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>MET_NC_VECTOR_LEVELS</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_MET_NC_VECTOR_LEVELS.nc \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_MET_NC_VECTOR_LEVELS.nc \
+      &CONFIG_DIR;/GridStatConfig_nc_vector_levels \
+      -outdir &OUTPUT_DIR;/grid_stat -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_MET_NC_VECTOR_LEVELS_240000L_20120410_120000V.stat</stat>
     </output>
   </test>
 
