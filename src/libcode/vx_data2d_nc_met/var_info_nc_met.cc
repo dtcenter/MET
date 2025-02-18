@@ -213,14 +213,16 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    // Otherwise, assume (*,*) level dimensions
    else {
 
-      // MET #3087 Store the level string for U/V vector level matching
-      if(lstr.nonempty()) {
-         Level.set_req_name(lstr.c_str());
-         Level.set_name(lstr.c_str());
-      }
-      else {
+      // MET #3087 Set the level name string:
+      //   - If empty or '*' from Point2Grid, set to *,* to indicate gridded output
+      //   - If nonempty, use the input level string to support U/V vector level matching
+      if(lstr.empty() || lstr == "*") {
          Level.set_req_name("*,*");
          Level.set_name("*,*");
+      }
+      else {     
+         Level.set_req_name(lstr.c_str());
+         Level.set_name(lstr.c_str());
       }
       Dimension.clear();
       Dimension.add(vx_data2d_star);
