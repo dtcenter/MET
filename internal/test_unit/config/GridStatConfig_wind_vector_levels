@@ -60,16 +60,19 @@ rank_corr_flag      = FALSE;
 // Forecast and observation fields to be verified
 //
 fcst = {
-
    field = [
       { name = "UGRD_P500"; level = "P500"; is_u_wind = true; },
-      { name = "VGRD_P500"; level = "P500"; is_v_wind = true; },
       { name = "UGRD_P850"; level = "P850"; is_u_wind = true; },
+      { name = "VGRD_P500"; level = "P500"; is_v_wind = true; },
       { name = "VGRD_P850"; level = "P850"; is_v_wind = true; }
    ];
-
 }
-obs = fcst;
+obs = {
+   field = [
+      { name = "UGRD"; level = [ "P500", "P850" ]; },
+      { name = "VGRD"; level = [ "P500", "P850" ]; }
+   ];
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

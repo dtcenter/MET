@@ -346,19 +346,19 @@
     </output>
   </test>
 
-  <test name="grid_stat_MET_NC_VECTOR_LEVELS">
+  <test name="grid_stat_WIND_VECTOR_LEVELS">
     <exec>&MET_BIN;/grid_stat</exec>
     <env>
-      <pair><name>OUTPUT_PREFIX</name> <value>MET_NC_VECTOR_LEVELS</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>WIND_VECTOR_LEVELS</value></pair>
     </env>
     <param> \
-      &OUTPUT_DIR;/regrid/regrid_data_plane_MET_NC_VECTOR_LEVELS.nc \
-      &OUTPUT_DIR;/regrid/regrid_data_plane_MET_NC_VECTOR_LEVELS.nc \
-      &CONFIG_DIR;/GridStatConfig_nc_vector_levels \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_WIND_VECTOR_LEVELS.nc \
+      &DATA_DIR_MODEL;/grib2/gfsanl/gfsanl_4_20120409_1200_000.grb2 \
+      &CONFIG_DIR;/GridStatConfig_wind_vector_levels \
       -outdir &OUTPUT_DIR;/grid_stat -v 1
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_MET_NC_VECTOR_LEVELS_240000L_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_WIND_VECTOR_LEVELS_120000L_20120409_120000V.stat</stat>
     </output>
   </test>
 
