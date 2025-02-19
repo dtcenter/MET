@@ -29,25 +29,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-   //
-   //  minimum and default allocation increment for the ConcatString class
-   //
+static const int max_str_len                     = 512;
 
-
-static const int min_cs_alloc_inc     =  32;
-
-static const int default_cs_alloc_inc = 128;
-
-static const int max_str_len          = 512;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const int concat_string_default_precision =  5;
+static const int concat_string_default_precision = 5;
 
 static const int concat_string_max_precision     = 12;
-static const int concat_string_buf_size          = concat_string_max_precision + 4;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -74,14 +60,13 @@ class ConcatString {
 
       int Precision;
 
-      char FloatFormat[concat_string_buf_size];
+      std::string FloatFormat;
 
-      std::string *s;
+      std::string s;
 
    public:
 
       ConcatString();
-      ConcatString(int _alloc_inc);
      ~ConcatString();
       ConcatString(const ConcatString &);
       ConcatString(const std::string &);
@@ -89,6 +74,7 @@ class ConcatString {
       ConcatString & operator=(const ConcatString &);
       ConcatString & operator=(const std::string &);
       ConcatString & operator=(const char *);
+      ConcatString & operator=(const char);
       bool operator==(const ConcatString &) const;
       bool operator==(const char *) const;
 
@@ -109,17 +95,15 @@ class ConcatString {
 
       const char * c_str() const;
 
-      const std::string & string() const;
+      std::string string() const;
 
-      const std::string contents(const char *str = nullptr) const;   //  returns str or "(nul)" if the string is empty
+      std::string contents(const char *str = nullptr) const;   //  returns str or "(nul)" if the string is empty
 
       int length() const;   //  not including trailing nul
 
       int precision() const;
 
       const char * float_format() const;
-
-      int alloc_inc() const;
 
       bool empty() const;
       bool nonempty() const;
@@ -157,6 +141,8 @@ class ConcatString {
 
       void strip_paren();   //  strip contents of trailing parenthesis, if any
 
+      void strip_chars_from(const char *);   //  strip contents of characters specified, if any
+
       StringArray split(const char * delim) const;
 
       ConcatString dirname() const;
@@ -174,6 +160,7 @@ class ConcatString {
       bool read_line(std::istream &);   //  read a line from the input stream
 
       void replace_char(int i, char c);
+
       //  replace all occurences of target with replacement
       //  if "replacement" is an environment variable, use it's value
       void replace(const char * target, const char * replacement, bool check_env = true);
@@ -181,7 +168,7 @@ class ConcatString {
       void set_upper();
       void set_lower();
 
-      int find(int c);
+      int find(int c) const;
       int compare(size_t pos, size_t len, std::string str);
       int comparecase(size_t pos, size_t len, std::string str);
       int comparecase(const char *);
@@ -192,20 +179,20 @@ class ConcatString {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline const char * ConcatString::text()          const { return ( s ? s->c_str() : nullptr); }
-inline const char * ConcatString::c_str()         const { return ( s ? s->c_str() : nullptr); }
-inline const std::string & ConcatString::string() const { return ( *s ); }
+inline const char * ConcatString::text()         const { return s.c_str(); }
+inline const char * ConcatString::c_str()        const { return s.c_str(); }
+inline std::string  ConcatString::string()       const { return s; }
 
-inline int          ConcatString::length()       const { return (int) (s ? s->length() : 0); }
+inline int          ConcatString::length()       const { return (int) s.length(); }
 
 inline int          ConcatString::precision()    const { return Precision; }
 
-inline const char * ConcatString::float_format() const { return FloatFormat; }
+inline const char * ConcatString::float_format() const { return FloatFormat.c_str(); }
 
-inline bool         ConcatString::empty()        const { return ( s ?  s->empty() : true ); }
-inline bool         ConcatString::nonempty()     const { return ( s ? !s->empty() : false ); }
+inline bool         ConcatString::empty()        const { return  s.empty(); }
+inline bool         ConcatString::nonempty()     const { return !s.empty(); }
 
-inline              ConcatString::operator std::string () const { return ( s ? *s : nullptr ); }
+inline              ConcatString::operator std::string () const { return s; }
 
 
 ////////////////////////////////////////////////////////////////////////
