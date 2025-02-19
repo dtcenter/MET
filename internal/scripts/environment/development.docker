@@ -11,7 +11,7 @@ export MET_PYTHON_BIN_EXE=${MET_PYTHON}/bin/python3
 export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.12"
 export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.12 -lcrypt -lpthread -ldl -lutil -lm"
 
-export CFLAGS="-DUNDERSCORE -fPIC -g"
+export CFLAGS="-DUNDERSCORE -fPIC"
 export CXXFLAGS=${CFLAGS}
 
 # Set LDFLAGS to include -rpath settings when compiling MET

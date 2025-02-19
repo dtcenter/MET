@@ -231,8 +231,8 @@ DataHandle handle;
 const int time_radius = time_end - time_beg + 1;
 
 double * p = nullptr;
-double * ss [time_radius];
-bool   * ok [time_radius];
+vector<double *> ss(time_radius);
+vector<bool *> ok(time_radius);
 
 const int trp1 = 2*spatial_R + 1;
 const double scale = 1.0/(trp1*trp1);
@@ -802,7 +802,7 @@ const int data_bytes = (in.nxy())*sizeof(double);
 const int   tf_bytes = (in.nxy())*sizeof(bool);
 const int nxy = in.nxy();
 const int time_radius = time_end - time_beg + 1;
-bool new_loaded[time_radius];
+vector<bool> new_loaded(time_radius);
 
 
 handle.t = t;
