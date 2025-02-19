@@ -760,8 +760,8 @@ ConcatString & operator<<(ConcatString & a, CSInlineCommand c)
 
 switch ( c )  {
 
-   case CSInlineCommand::cs_erase:  a.erase();  break;
-   case CSInlineCommand::cs_clear:  a.clear();  break;
+   case cs_erase:  a.erase();  break;
+   case cs_clear:  a.clear();  break;
 
    default:
      mlog << Error << "\noperator<<(ostream &, CSInlineCommand) -> "
@@ -1228,7 +1228,7 @@ int ConcatString::find(int c) const
 ////////////////////////////////////////////////////////////////////////
 
 
-int ConcatString::compare(size_t pos, size_t len, std::string &str) const
+int ConcatString::compare(size_t pos, size_t len, const std::string &str) const
 
 {
    return s.compare(pos, len, str);
@@ -1238,7 +1238,7 @@ int ConcatString::compare(size_t pos, size_t len, std::string &str) const
 ////////////////////////////////////////////////////////////////////////
 
 
-int ConcatString::comparecase(size_t pos, size_t len, std::string &str) const
+int ConcatString::comparecase(size_t pos, size_t len, const std::string &str) const
 
 {
    std::string lower_s = s;

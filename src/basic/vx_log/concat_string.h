@@ -39,7 +39,7 @@ static const int concat_string_max_precision     = 12;
 ////////////////////////////////////////////////////////////////////////
 
 
-enum class CSInlineCommand {
+enum CSInlineCommand {
 
    cs_erase,
    cs_clear
@@ -69,8 +69,8 @@ class ConcatString {
       ConcatString();
      ~ConcatString();
       ConcatString(const ConcatString &);
-      explicit ConcatString(const std::string &);
-      explicit ConcatString(const char *);
+      ConcatString(const std::string &);
+      ConcatString(const char *);
       ConcatString & operator=(const ConcatString &);
       ConcatString & operator=(const std::string &);
       ConcatString & operator=(const char *);
@@ -169,8 +169,8 @@ class ConcatString {
       void set_lower();
 
       int find(int c) const;
-      int compare(size_t pos, size_t len, std::string &str) const;
-      int comparecase(size_t pos, size_t len, std::string &str) const;
+      int compare(size_t pos, size_t len, const std::string &str) const;
+      int comparecase(size_t pos, size_t len, const std::string &str) const;
       int comparecase(const char *) const;
 
 };
