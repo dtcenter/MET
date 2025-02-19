@@ -300,6 +300,15 @@ def main(argv):
       if hasattr(met_in, 'user_fill_value'):
          fill_value = met_in.user_fill_value
 
+   # convert any numpy types in attrs to python types
+   for key, value in attrs.items():
+      if isinstance(value, np.generic):
+         attrs[key] = value.item()
+      elif isinstance(value, dict):
+         for key2, value2 in value.items():
+            if isinstance(value2, np.generic):
+               attrs[key][key2] = value2.item()
+
    fill_value = attrs.get('fill_value', None)
    met_base.log_message('validating the dataplane array...')
    met_data = dataplane.validate_met_data(init_met_data, fill_value)
