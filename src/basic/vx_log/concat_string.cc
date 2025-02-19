@@ -527,8 +527,9 @@ void ConcatString::replace(const char * target, const char * replacement,
 
 void ConcatString::set_upper()
 {
-   for (auto c = s.begin(); s.end() != c; ++c)
-      *c = toupper(*c);
+   for_each(s.begin(), s.end(), [](char &c) {
+      c = (char) toupper(c);
+   });
 }
 
 
@@ -537,8 +538,9 @@ void ConcatString::set_upper()
 
 void ConcatString::set_lower()
 {
-   for (auto c = s.begin(); s.end() != c; ++c)
-      *c = tolower(*c);
+   for_each(s.begin(), s.end(), [](char &c) {
+      c = (char) tolower(c);
+   });
 }
 
 
@@ -758,8 +760,8 @@ ConcatString & operator<<(ConcatString & a, CSInlineCommand c)
 
 switch ( c )  {
 
-   case cs_erase:  a.erase();  break;
-   case cs_clear:  a.clear();  break;
+   case CSInlineCommand::cs_erase:  a.erase();  break;
+   case CSInlineCommand::cs_clear:  a.clear();  break;
 
    default:
      mlog << Error << "\noperator<<(ostream &, CSInlineCommand) -> "
@@ -1226,7 +1228,7 @@ int ConcatString::find(int c) const
 ////////////////////////////////////////////////////////////////////////
 
 
-int ConcatString::compare(size_t pos, size_t len, std::string str)
+int ConcatString::compare(size_t pos, size_t len, std::string &str) const
 
 {
    return s.compare(pos, len, str);
@@ -1236,7 +1238,7 @@ int ConcatString::compare(size_t pos, size_t len, std::string str)
 ////////////////////////////////////////////////////////////////////////
 
 
-int ConcatString::comparecase(size_t pos, size_t len, std::string str)
+int ConcatString::comparecase(size_t pos, size_t len, std::string &str) const
 
 {
    std::string lower_s = s;
@@ -1250,7 +1252,7 @@ int ConcatString::comparecase(size_t pos, size_t len, std::string str)
 ////////////////////////////////////////////////////////////////////////
 
 
-int ConcatString::comparecase(const char * str)
+int ConcatString::comparecase(const char * str) const
 
 {
   std::string lower_s = s;
