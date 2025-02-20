@@ -58,7 +58,7 @@ ConcatString replace_path(const ConcatString path) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString replace_path(const char * path) {
-  return replace_path((string)path);
+   return replace_path(ConcatString(path));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -70,20 +70,20 @@ ConcatString replace_path(const char * path) {
 ////////////////////////////////////////////////////////////////////////
 
 int met_open(const char *path, int oflag) {
-  return open(replace_path(path).c_str(), oflag);
+   return open(replace_path(path).c_str(), oflag);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void met_open(ifstream &in, const char *path) {
-  in.open(replace_path(path).c_str());
+   in.open(replace_path(path).c_str());
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void met_open(ofstream &out, const char *path) {
-  out.open(replace_path(path).c_str());
+   out.open(replace_path(path).c_str());
    return;
 }
 

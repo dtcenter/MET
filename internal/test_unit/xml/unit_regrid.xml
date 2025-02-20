@@ -389,4 +389,22 @@
     </output>
   </test>
 
+  <!-- Multiple U/V pressure levels -->
+
+  <test name="regrid_data_plane_WIND_VECTOR_LEVELS">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+      &DATA_DIR_MODEL;/grib2/gfs/gfs_2012040900_F012.grib2 \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_WIND_VECTOR_LEVELS.nc \
+      -field 'name="UGRD"; level="P500";' \
+      -field 'name="VGRD"; level="P500";' \
+      -field 'name="UGRD"; level="P850";' \
+      -field 'name="VGRD"; level="P850";'
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_WIND_VECTOR_LEVELS.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>
