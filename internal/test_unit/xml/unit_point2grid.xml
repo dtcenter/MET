@@ -129,7 +129,7 @@
       &DATA_DIR_OBS;/point_obs/prepbufr.gdas.2017060300.nc \
       G212 \
       &OUTPUT_DIR;/point2grid/pb2nc_TMP_big_input.nc \
-      -field 'name="TMP"; level="Z2";' \
+      -field 'name="TMP"; level="*";' \
       -v 1
     </param>
     <output>

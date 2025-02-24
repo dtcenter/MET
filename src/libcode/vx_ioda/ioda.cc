@@ -345,22 +345,20 @@ bool iodaReader::read_time() {
 
    vld_arr.resize(nlocs);
    if (NC_STRING == GET_NC_TYPE_ID(in_hdr_vld_var)) {
-      char valid_time[ndatetime+1];
+      vector<char> valid_time(ndatetime+1);
       vector<char> hdr_vld_block(nlocs*(ndatetime+1), 0);
       vector<char *> hdr_vld_block2(nlocs, nullptr);
       for (int i=0; i<nlocs; i++) {
-         hdr_vld_block2.push_back(hdr_vld_block.data() + i*ndatetime);
+         hdr_vld_block2.emplace_back(hdr_vld_block.data() + i*ndatetime);
       }
       status = get_nc_data(&in_hdr_vld_var, hdr_vld_block2.data());
 
       for (int i=0; i<nlocs; i++ ) {
-         m_strncpy(valid_time, (const char *)hdr_vld_block2[i],
+         m_strncpy(valid_time.data(), (const char *)hdr_vld_block2[i],
                    ndatetime, method_name_s, "valid_time", true);
-         valid_time[ndatetime] = 0;
-         vld_arr[i] = yyyymmddThhmmss_to_unix(valid_time);
+         valid_time[ndatetime] = '\0';
+         vld_arr[i] = yyyymmddThhmmss_to_unix(valid_time.data());
       }
-      hdr_vld_block.clear();
-      hdr_vld_block2.clear();
    }
    else if (NC_CHAR == GET_NC_TYPE_ID(in_hdr_vld_var)) {
       if(dim_names.has("ndatetime")) ndatetime = get_dim_value(f_in, "ndatetime", error_out);
@@ -373,15 +371,15 @@ bool iodaReader::read_time() {
       mlog << Debug(5) << method_name << "dimensions: nvars=" << nvars << ", nlocs=" << nlocs
            << ", nrecs=" << nrecs << ", nstring=" << nstring << ", ndatetime=" << ndatetime << "\n";
 
-      char valid_time[ndatetime+1];
+      vector<char> valid_time(ndatetime+1);
       vector<char> hdr_vld_block(nlocs*(ndatetime+1), 0);
       status = get_nc_data(&in_hdr_vld_var, hdr_vld_block.data());
 
       for (int i=0; i<nlocs; i++ ) {
-         m_strncpy(valid_time, (const char *)(hdr_vld_block.data() + (i * ndatetime)),
+         m_strncpy(valid_time.data(), (const char *)(hdr_vld_block.data() + (i * ndatetime)),
                    ndatetime, method_name_s, "valid_time", true);
-         valid_time[ndatetime] = 0;
-         vld_arr[i] = yyyymmddThhmmss_to_unix(valid_time);
+         valid_time[ndatetime] = '\0';
+         vld_arr[i] = yyyymmddThhmmss_to_unix(valid_time.data());
       }
    }
    else status = read_time_as_number(&in_hdr_vld_var);
@@ -582,7 +580,7 @@ bool iodaReader::read_string_data(const char *var_name, vector<string> &hdr_data
    hdr_data.resize(nlocs, "");
    if (NC_STRING == GET_NC_TYPE_ID(hdr_var)) {
       vector<char *> hdr_data2(nlocs, nullptr);
-      for (int i=0; i<nlocs; i++ ) hdr_data2.push_back(new char[str_length+1]);
+      for (int i=0; i<nlocs; i++ ) hdr_data2.emplace_back(new char[str_length+1]);
       if ((status = get_nc_data(&hdr_var, hdr_data2.data()))) {
          for (int i=0; i<nlocs; i++ ) {
             m_strncpy(hdr_val, hdr_data2[i], str_length, method_name_s, "ioda_header");

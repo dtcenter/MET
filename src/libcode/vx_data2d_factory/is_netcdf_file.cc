@@ -66,18 +66,18 @@ bool is_netcdf_file(const char * filename)
 
    int fd = -1;
    int n_read;
-   char buf[netcdf_magic_len];
+   vector<char> buf(netcdf_magic_len);
 
    if ( (fd = open(filename, O_RDONLY)) < 0 )  return false;
 
-   n_read = read(fd, buf, netcdf_magic_len);
+   n_read = read(fd, buf.data(), netcdf_magic_len);
 
    close(fd);
 
    if ( n_read != netcdf_magic_len )  return false;
 
-   if ( strncmp(buf, netcdf_magic, netcdf_magic_len) == 0
-     || strncmp(buf, hdf_magic, netcdf_magic_len) == 0)  return true;
+   if ( strncmp(buf.data(), netcdf_magic, netcdf_magic_len) == 0
+     || strncmp(buf.data(), hdf_magic, netcdf_magic_len) == 0)  return true;
 
    //
    //  done
