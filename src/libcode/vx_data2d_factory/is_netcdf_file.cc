@@ -150,7 +150,7 @@ bool is_ncmet_file(const char * filename)
 ////////////////////////////////////////////////////////////////////////
 
 
-bool is_ncmetra_file(const char * filename)
+bool is_ncmet_range_azimuth_file(const char * filename)
 {
    bool status = false;
    try {

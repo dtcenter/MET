@@ -12,7 +12,6 @@ MET_CPPFLAGS = -I${top_builddir}/src/basic/vx_cal \
 	     -I${top_builddir}/src/libcode/vx_data2d_grib \
 	     -I${top_builddir}/src/libcode/vx_data2d_grib2 \
 	     -I${top_builddir}/src/libcode/vx_data2d_nc_met \
-	     -I${top_builddir}/src/libcode/vx_data2d_nc_met_ra \
 	     -I${top_builddir}/src/libcode/vx_data2d_nc_wrf \
 	     -I${top_builddir}/src/libcode/vx_data2d_nc_cf \
 	     -I${top_builddir}/src/libcode/vx_data2d_python \
@@ -61,7 +60,6 @@ MET_LDFLAGS = -L${top_builddir}/src/basic/vx_cal \
 	     -L${top_builddir}/src/libcode/vx_data2d_grib \
 	     -L${top_builddir}/src/libcode/vx_data2d_grib2 \
 	     -L${top_builddir}/src/libcode/vx_data2d_nc_met \
-	     -L${top_builddir}/src/libcode/vx_data2d_nc_met_ra \
 	     -L${top_builddir}/src/libcode/vx_data2d_nc_wrf \
 	     -L${top_builddir}/src/libcode/vx_data2d_nc_cf \
 	     -L${top_builddir}/src/libcode/vx_data2d_python \
