@@ -19,7 +19,6 @@
 #include "grdfiletype_to_string.h"
 #include "data2d_grib.h"
 #include "data2d_nc_met.h"
-#include "data2d_nc_met_ra.h"
 #include "data2d_nc_wrf.h"
 #include "data2d_nc_cf.h"
 #ifdef WITH_UGRID
@@ -80,10 +79,6 @@ MetPythonDataFile * p = nullptr;
 
       case FileType_NcMet:
          mtddf = new MetNcMetDataFile;
-         break;
-
-      case FileType_NcMetRA:
-	 mtddf = new MetNcMetRADataFile;
          break;
 
       case FileType_NcWrf:
