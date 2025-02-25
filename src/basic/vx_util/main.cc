@@ -40,6 +40,7 @@
 #include "concat_string.h"
 #include "memory.h"
 #include "logger.h"
+#include "util_constants.h"
 
 using namespace std;
 
@@ -91,8 +92,9 @@ void do_pre_process(int argc, char *argv[]) {
    set_user_id();
    met_tool_name = get_tool_name();
 
-   msg << "Start " << met_tool_name << " by " << met_user_name
-       << "(" << met_user_id << ") at " << get_current_time();
+   msg << "Start " << met_tool_name << " " << met_version << " by "
+       << met_user_name << "(" << met_user_id << ") at "
+       << get_current_time();
    msg2 << "  cmd: " << met_cmdline;
    mlog << Debug(1) << msg << msg2 << "\n";
 
@@ -103,8 +105,9 @@ void do_pre_process(int argc, char *argv[]) {
 
 void do_post_process() {
    ConcatString msg;
-   msg << "Finish " << met_tool_name << " by " << met_user_name
-       << "(" << met_user_id << ") at " << get_current_time();
+   msg << "Finish " << met_tool_name << " " << met_version << " by "
+       << met_user_name << "(" << met_user_id << ") at "
+       << get_current_time();
    mlog << Debug(1) << msg << "\n";
 }
 
