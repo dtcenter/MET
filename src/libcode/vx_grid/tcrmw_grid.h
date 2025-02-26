@@ -10,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __VX_MET_TCRMW_GRID_H__
-#define  __VX_MET_TCRMW_GRID_H__
+#ifndef  __TCRMW_GRID_H__
+#define  __TCRMW_GRID_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -27,15 +27,20 @@
 
 class TcrmwGrid : public RotatedLatLonGrid {
 
-   private:
+      friend class Grid;
 
-      void init_from_scratch();
+   private:
 
       void assign(const TcrmwGrid &);
 
-      void calc_ijk();   //  calculate rotated basis vectors
+   public:
 
-      TcrmwData TData;
+      TcrmwGrid();
+     ~TcrmwGrid();
+      TcrmwGrid(const TcrmwData &);
+      TcrmwGrid & operator=(const TcrmwGrid &);
+
+      void calc_ijk();   //  calculate rotated basis vectors
 
       Vector Ir, Jr, Kr;
 
@@ -46,13 +51,7 @@ class TcrmwGrid : public RotatedLatLonGrid {
       double Lat_Center_Deg;
       double Lon_Center_Deg;    //  + west, - east
 
-   public:
-
-      TcrmwGrid();
-      virtual ~TcrmwGrid();
-      TcrmwGrid(const TcrmwGrid &);
-      TcrmwGrid(const TcrmwData &);
-      TcrmwGrid & operator=(const TcrmwGrid &);
+      TcrmwData TData;
 
       void clear();
 
@@ -94,6 +93,11 @@ class TcrmwGrid : public RotatedLatLonGrid {
                          const double u_wind, const double v_wind, 
                          double & radial_wind, double & tangential_wind) const;
 
+      ConcatString serialize(const char *sep=" ") const;
+
+      GridInfo info() const;
+
+      GridRep * copy() const;
 
 };
 
@@ -117,7 +121,7 @@ inline double TcrmwGrid::lon_center_deg () const { return Lon_Center_Deg; }
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __VX_MET_TCRMW_GRID_H__  */
+#endif   /*  __TCRMW_GRID_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

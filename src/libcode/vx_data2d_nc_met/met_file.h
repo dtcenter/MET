@@ -32,8 +32,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char nc_met_lat_var_name [] = "lat";
-static const char nc_met_lon_var_name [] = "lon";
+static const std::string nc_met_lat_name     = "lat";
+static const std::string nc_met_lon_name     = "lon";
+static const std::string nc_met_range_name   = "range";
+static const std::string nc_met_azimuth_name = "azimuth";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -59,7 +61,7 @@ class MetNcFile {
 
       void dump(std::ostream &, int = 0) const;
 
-      netCDF::NcFile * Nc;      //  allocated
+      netCDF::NcFile * Nc;    //  allocated
 
          //
          //  dimensions
@@ -92,6 +94,8 @@ class MetNcFile {
          //  data
          //
 
+      bool is_range_azimuth() const;
+
       double data(netCDF::NcVar *, const LongArray &) const;
 
       bool data(netCDF::NcVar *, const LongArray &, DataPlane &) const;
@@ -102,6 +106,13 @@ class MetNcFile {
 
 };
 
+////////////////////////////////////////////////////////////////////////
+
+inline bool MetNcFile::is_range_azimuth() const { return grid.is_set() && grid.info().tc; }
+
+////////////////////////////////////////////////////////////////////////
+
+extern bool is_ncmet_range_azimuth_file(netCDF::NcFile *);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -113,5 +124,4 @@ class MetNcFile {
 
 
 ////////////////////////////////////////////////////////////////////////
-
 

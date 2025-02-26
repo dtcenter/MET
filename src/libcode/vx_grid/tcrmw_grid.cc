@@ -48,21 +48,7 @@ TcrmwGrid::TcrmwGrid()
 
 {
 
-init_from_scratch();
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-TcrmwGrid::TcrmwGrid(const TcrmwData & d)
-
-{
-
-init_from_scratch();
-
-set_from_data(d);
+clear();
 
 }
 
@@ -74,23 +60,7 @@ TcrmwGrid::~TcrmwGrid()
 
 {
 
-   //
-   //  should be inline
-   //
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-TcrmwGrid::TcrmwGrid(const TcrmwGrid & tg)
-
-{
-
-init_from_scratch();
-
-assign(tg);
+clear();
 
 }
 
@@ -114,20 +84,6 @@ return *this;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TcrmwGrid::init_from_scratch()
-
-{
-
-clear();
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void TcrmwGrid::clear()
 
 {
@@ -143,20 +99,18 @@ Range_max_km = 0.0;
 
 Lat_Center_Deg = Lon_Center_Deg = 0.0;
 
-
-
 return;
 
 }
 
 
 ////////////////////////////////////////////////////////////////////////
-
+ 
 
 void TcrmwGrid::assign(const TcrmwGrid & tg)
-
+ 
 {
-
+ 
 clear();
 
 Ir = tg.Ir;
@@ -171,8 +125,19 @@ Range_max_km = tg.Range_max_km;
 Lat_Center_Deg = tg.Lat_Center_Deg;
 Lon_Center_Deg = tg.Lon_Center_Deg;
 
-
 return;
+ 
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+TcrmwGrid::TcrmwGrid(const TcrmwData & data)
+
+{
+
+set_from_data(data);
 
 }
 
@@ -180,26 +145,24 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TcrmwGrid::set_from_data(const TcrmwData & d)
+void TcrmwGrid::set_from_data(const TcrmwData & data)
 
 {
 
 clear();
 
 
-TData = d;
+TData = data;
 
-Range_n = d.range_n;
+Range_n = data.range_n;
 
-Azimuth_n = d.azimuth_n;
+Azimuth_n = data.azimuth_n;
 
-Range_max_km = d.range_max_km;
+Range_max_km = data.range_max_km;
 
-Lat_Center_Deg = d.lat_center;
+Lat_Center_Deg = data.lat_center;
 
-Lon_Center_Deg = d.lon_center;
-
-
+Lon_Center_Deg = data.lon_center;
 
 calc_ijk();
 
@@ -207,7 +170,7 @@ const double range_max_deg = Range_max_km*deg_per_km;
 
 RotatedLatLonData RLLD;
 
-RLLD.name       = d.name;
+RLLD.name       = data.name;
 
 RLLD.rot_lat_ll = 90.0 - range_max_deg;
 RLLD.rot_lon_ll =  0.0;
@@ -225,13 +188,9 @@ RLLD.true_lon_south_pole = Lon_Center_Deg + 180.0;
 
 RLLD.aux_rotation = 180.0 - Lon_Center_Deg;
 
-
-
 RotatedLatLonGrid::set_from_rdata(RLLD);
 
-
 er.set_tcrmw(Lat_Center_Deg, Lon_Center_Deg);
-
 
 return;
 
@@ -406,6 +365,60 @@ y -= Ny*floor(y/Ny);
 RotatedLatLonGrid::xy_to_latlon(x, y, true_lat, true_lon);
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString TcrmwGrid::serialize(const char *sep) const
+
+{
+
+ConcatString a;
+a.set_precision(3);
+
+a << "Projection: Range/Azimuth" << sep;
+a << "Nx (Azimuth): " << Azimuth_n << sep;
+a << "Ny (Range): " << Range_n << sep;
+a << "Range_max_km: " << Range_max_km << sep;
+a << "Lat_Center_Deg: " << Lat_Center_Deg << sep;
+a << "Lon_Center_Deg: " << Lon_Center_Deg << sep;
+
+return a;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+GridInfo TcrmwGrid::info() const
+
+{
+
+GridInfo i;
+
+i.set( TData );
+
+return i;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+GridRep * TcrmwGrid::copy() const
+
+{
+
+TcrmwGrid * p = new TcrmwGrid (TData);
+
+p->Name = Name;
+
+return p;
 
 }
 

@@ -305,6 +305,7 @@ extern bool is_eq(const RotatedLatLonData *, const RotatedLatLonData *);
 extern bool is_eq(const MercatorData *,      const MercatorData *);
 extern bool is_eq(const GaussianData *,      const GaussianData *);
 extern bool is_eq(const GoesImagerData *,    const GoesImagerData *);
+extern bool is_eq(const TcrmwData *,         const TcrmwData *);
 extern bool is_eq(const LaeaData *,          const LaeaData *);
 extern bool is_eq(const SemiLatLonData *,    const SemiLatLonData *);
 #ifdef WITH_UGRID

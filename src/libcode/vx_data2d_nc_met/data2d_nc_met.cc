@@ -135,8 +135,8 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
       // Store the name of the first data variable
       for(i=0; i<MetNc->Nvars; i++) {
-         if( MetNc->Var[i].name != nc_met_lat_var_name &&
-             MetNc->Var[i].name != nc_met_lon_var_name ) {
+         if( MetNc->Var[i].name != nc_met_lat_name &&
+             MetNc->Var[i].name != nc_met_lon_name ) {
             vinfo_nc->set_req_name(MetNc->Var[i].name.c_str());
             break;
          }

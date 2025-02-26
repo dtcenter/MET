@@ -477,6 +477,7 @@ if ( info.m   )  set( *(info.m)   );
 if ( info.g   )  set( *(info.g)   );
 if ( info.gi  )  set( *(info.gi)  );
 if ( info.la  )  set( *(info.la)  );
+if ( info.tc  )  set( *(info.tc)  );
 if ( info.sl  )  set( *(info.sl)  );
 #ifdef WITH_UGRID
 if ( info.us  )  set( *(info.us)  );
@@ -504,6 +505,7 @@ if ( m   ) ++count;
 if ( g   ) ++count;
 if ( gi  ) ++count;
 if ( la  ) ++count;
+if ( tc  ) ++count;
 if ( sl  ) ++count;
 #ifdef WITH_UGRID
 if ( us  ) ++count;
@@ -537,6 +539,7 @@ else if ( m   )  gg.set( *m   );
 else if ( g   )  gg.set( *g   );
 else if ( gi  )  gg.set( *gi  );
 else if ( la  )  gg.set( *la  );
+else if ( tc  )  gg.set( *tc  );
 else if ( sl  )  gg.set( *sl  );
 #ifdef WITH_UGRID
 else if ( us  )  gg.set( *us  );
@@ -695,6 +698,28 @@ D = new GoesImagerData;
 memcpy(D, &data, sizeof(data));
 
 gi = D;  D = nullptr;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void GridInfo::set(const TcrmwData & data)
+
+{
+
+clear();
+
+TcrmwData * D = nullptr;
+
+D = new TcrmwData;
+
+memcpy(D, &data, sizeof(data));
+
+tc = D;  D = nullptr;
 
 return;
 
@@ -1431,6 +1456,7 @@ else if ( i1.rll && i2.rll )  return ( is_eq(i1.rll, i2.rll) );
 else if ( i1.m   && i2.m   )  return ( is_eq(i1.m,   i2.m  ) );
 else if ( i1.g   && i2.g   )  return ( is_eq(i1.g,   i2.g  ) );
 else if ( i1.gi  && i2.gi  )  return ( is_eq(i1.gi,  i2.gi ) );
+else if ( i1.tc  && i2.tc  )  return ( is_eq(i1.tc,  i2.tc ) );
 else if ( i1.la  && i2.la  )  return ( is_eq(i1.la,  i2.la ) );
 else if ( i1.sl  && i2.sl  )  return ( is_eq(i1.sl,  i2.sl ) );
 #ifdef WITH_UGRID
@@ -1633,6 +1659,33 @@ if ( gi1->nx           == gi2->nx             &&
              gi2->lon_of_projection_origin, loose_tol) &&
      is_eq  (gi1->dx_rad, gi2->dx_rad, loose_tol) &&
      is_eq  (gi1->dy_rad, gi2->dy_rad, loose_tol) )  status = true;
+
+return status;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_eq(const TcrmwData * g1, const TcrmwData * g2)
+
+{
+
+if ( !g1 || !g2 ) return false;
+
+bool status = false;
+
+if ( g1->range_n == g2->range_n &&
+     g1->azimuth_n == g2->azimuth_n &&
+     is_eq (g1->range_max_km,
+            g2->range_max_km) &&
+     is_eq (g1->lat_center,
+            g2->lat_center,
+            loose_tol) &&
+     is_eq (rescale_lon(g1->lon_center),
+            rescale_lon(g2->lon_center),
+            loose_tol) )  status = true;
 
 return status;
 
