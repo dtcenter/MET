@@ -372,6 +372,37 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
+void TcrmwGrid::dump(ostream & out, int depth) const
+
+{
+
+Indent prefix(depth);
+
+out << prefix << "Name         = ";
+
+if ( Name.length() > 0 )  out << '\"' << Name << '\"';
+else                      out << "(nul)\n";
+
+out << '\n';
+
+out << prefix << "Nx (Azimuth)   = " << Azimuth_n << "\n";
+out << prefix << "Ny (Range)     = " << Range_n << "\n";
+
+out << prefix << "Range_max_km   = " << Range_max_km << "\n";
+
+out << prefix << "Lat_Center_Deg = " << Lat_Center_Deg << "\n"; 
+out << prefix << "Lon_Center_Deg = " << Lon_Center_Deg << "\n";
+
+out.flush();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 ConcatString TcrmwGrid::serialize(const char *sep) const
 
 {

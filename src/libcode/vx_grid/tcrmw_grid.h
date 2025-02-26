@@ -93,6 +93,8 @@ class TcrmwGrid : public RotatedLatLonGrid {
                          const double u_wind, const double v_wind, 
                          double & radial_wind, double & tangential_wind) const;
 
+      void dump(std::ostream &, int = 0) const;
+
       ConcatString serialize(const char *sep=" ") const;
 
       GridInfo info() const;
