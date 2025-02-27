@@ -238,6 +238,20 @@ void RngAziGrid::rng_azi_to_latlon(const double rng_km, const double azi_deg, do
 
 {
 
+   //
+   //  sanity check that the center location is set
+   //
+
+if ( is_bad_data(Lat_Center_Deg) || is_bad_data(Lon_Center_Deg) ) {
+
+   mlog << Error << "\nRngAziGrid::rng_azi_to_latlon() -> "
+        << "the grid center location (" << Lat_Center_Deg << ", "
+        << Lon_Center_Deg << ") is not set!\n\n";
+
+   exit ( 1 );
+
+}
+
 const double rng_deg = deg_per_km*rng_km;
 const double lat_rot = 90.0 - rng_deg;
 const double lon_rot = azi_deg;
@@ -264,8 +278,23 @@ void RngAziGrid::latlon_to_rng_azi(const double lat, const double lon, double & 
 
 {
 
+   //
+   //  sanity check that the center location is set
+   //
+
+if ( is_bad_data(Lat_Center_Deg) || is_bad_data(Lon_Center_Deg) ) {
+
+   mlog << Error << "\nRngAziGrid::latlon_to_rng_azi() -> "
+        << "the grid center location (" << Lat_Center_Deg << ", "
+        << Lon_Center_Deg << ") is not set!\n\n";
+
+   exit ( 1 );
+
+}
+
 double rng_deg;
-double x, y;
+double x;
+double y;
 const double rng_max_deg = deg_per_km*Range_max_km;
 
 RotatedLatLonGrid::latlon_to_xy(lat, lon, x, y);
@@ -336,12 +365,13 @@ void RngAziGrid::latlon_to_xy(double true_lat, double true_lon, double & x, doub
 
 {
 
-RotatedLatLonGrid::latlon_to_xy(true_lat, true_lon, x, y);
+double rng_km;
+double azi_deg;
 
-// x is azimuth and y is range
-x -= Nx*floor(x/Nx);
+latlon_to_rng_azi(true_lat, true_lon, rng_km, azi_deg);
 
-x = Nx - x; // MET #2841 switch from counterclockwise to clockwise
+x = azi_deg / azimuth_delta_deg();
+y = rng_km  / range_delta_km();
 
 return;
 
@@ -355,12 +385,9 @@ void RngAziGrid::xy_to_latlon(double x, double y, double & true_lat, double & tr
 
 {
 
-// x is azimuth and y is range
-x -= Nx*floor(x/Nx);
-
-x = Nx - x; // MET #2841 switch from counterclockwise to clockwise
-
-RotatedLatLonGrid::xy_to_latlon(x, y, true_lat, true_lon);
+rng_azi_to_latlon(y * range_delta_km(),
+                  x * azimuth_delta_deg(),
+                  true_lat, true_lon);
 
 return;
 

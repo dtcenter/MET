@@ -168,7 +168,7 @@ if ( rdata.aux_rotation != 0.0 )  {   //  rotate about grid center
    double lat, lon;
    double x, y, z;
 
-   xy_to_latlon((rdata.Nlon)/2, (rdata.Nlat)/2, lat, lon);
+   RotatedLatLonGrid::xy_to_latlon((rdata.Nlon)/2, (rdata.Nlat)/2, lat, lon);
 
    grid_latlon_to_xyz(lat, lon, x, y, z);
 

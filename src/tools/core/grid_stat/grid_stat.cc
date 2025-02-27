@@ -352,7 +352,7 @@ void process_command_line(int argc, char **argv) {
 #endif
    }
 
-   // For python inputs and range/azimuth grids, read the first field to set the grid
+   // For python types and range/azimuth grids, read the first field to set the grid
    if(is_python_grdfiletype(ftype) ||
       fcst_mtddf->grid().info().ra) {
       if(!fcst_mtddf->data_plane(*conf_info.vx_opt[0].fcst_info, dp)) {
