@@ -644,7 +644,7 @@ void compute_lat_lon(RngAziGrid& rng_azi_grid,
         for(int ia = 0; ia < rng_azi_grid.azimuth_n(); ia++) {
             double lat, lon;
             int i = ir * rng_azi_grid.azimuth_n() + ia;
-            rng_azi_grid.range_azi_to_latlon(
+            rng_azi_grid.rng_azi_to_latlon(
                 ir * rng_azi_grid.range_delta_km(),
                 ia * rng_azi_grid.azimuth_delta_deg(),
                 lat, lon);

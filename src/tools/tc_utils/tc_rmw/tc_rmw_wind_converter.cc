@@ -225,11 +225,11 @@ void wind_ne_to_rt(const RngAziGrid& rng_azi_grid,
       // Store data in reverse order
       int i_rev = (n_rng - ir - 1) * n_azi + ia;
 
-      double azi_deg  = ia * rng_azi_grid.azimuth_delta_deg();
-      double range_km = ir * rng_azi_grid.range_delta_km();
+      double azi_deg = ia * rng_azi_grid.azimuth_delta_deg();
+      double rng_km  = ir * rng_azi_grid.range_delta_km();
 
       double lat, lon;
-      rng_azi_grid.range_azi_to_latlon(range_km, azi_deg, lat, lon);
+      rng_azi_grid.rng_azi_to_latlon(rng_km, azi_deg, lat, lon);
 
       rng_azi_grid.wind_ne_to_rt(azi_deg, u_dp.data()[i_rev], v_dp.data()[i_rev],
                                wind_r_arr[i_rev], wind_t_arr[i_rev]);
@@ -237,7 +237,7 @@ void wind_ne_to_rt(const RngAziGrid& rng_azi_grid,
       mlog << Debug(4) << "wind_ne_to_rt() -> "
            << "center lat/lon (" << rng_azi_grid.lat_center_deg()
            << ", " << rng_azi_grid.lon_center_deg()
-           << "), range (km): " << range_km
+           << "), range (km): " << rng_km
            << ", azimuth (deg): " << azi_deg
            << ", point lat/lon (" << lat << ", " << lon
            << "), uv (" << u_dp.data()[i_rev] << ", " << v_dp.data()[i_rev]

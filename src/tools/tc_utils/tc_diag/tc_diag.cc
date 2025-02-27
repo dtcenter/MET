@@ -862,7 +862,7 @@ void compute_lat_lon(RngAziGrid& grid,
       for(int ia=0; ia<grid.azimuth_n(); ia++) {
          double lat, lon;
          int i = ir * grid.azimuth_n() + ia;
-         grid.range_azi_to_latlon(
+         grid.rng_azi_to_latlon(
             ir * grid.range_delta_km(),
             ia * grid.azimuth_delta_deg(),
             lat, lon);

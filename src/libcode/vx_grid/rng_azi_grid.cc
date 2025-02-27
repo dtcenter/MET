@@ -166,16 +166,16 @@ Lon_Center_Deg = data.lon_center;
 
 calc_ijk();
 
-const double range_max_deg = Range_max_km*deg_per_km;
+const double rng_max_deg = Range_max_km*deg_per_km;
 
 RotatedLatLonData RLLD;
 
 RLLD.name       = data.name;
 
-RLLD.rot_lat_ll = 90.0 - range_max_deg;
+RLLD.rot_lat_ll = 90.0 - rng_max_deg;
 RLLD.rot_lon_ll =  0.0;
 
-RLLD.delta_rot_lat = range_max_deg/(Range_n - 1);
+RLLD.delta_rot_lat = rng_max_deg/(Range_n - 1);
 
 // MET #2833 divide by n rather than n-1 for the azimuth increment
 RLLD.delta_rot_lon = 360.0/Azimuth_n;
@@ -234,13 +234,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void RngAziGrid::range_azi_to_latlon(const double range_km, const double azi_deg, double & lat, double & lon) const
+void RngAziGrid::rng_azi_to_latlon(const double rng_km, const double azi_deg, double & lat, double & lon) const
 
 {
 
-const double range_deg = deg_per_km*range_km;
-const double lat_rot   = 90.0 - range_deg;
-const double lon_rot   = azi_deg;
+const double rng_deg = deg_per_km*rng_km;
+const double lat_rot = 90.0 - rng_deg;
+const double lon_rot = azi_deg;
 double x, y;
 
 y = (lat_rot - RData.rot_lat_ll)/(RData.delta_rot_lat);
@@ -260,13 +260,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void RngAziGrid::latlon_to_range_azi(const double lat, const double lon, double & range_km, double & azi_deg) const
+void RngAziGrid::latlon_to_rng_azi(const double lat, const double lon, double & rng_km, double & azi_deg) const
 
 {
 
-double range_deg;
+double rng_deg;
 double x, y;
-const double range_max_deg = deg_per_km*Range_max_km;
+const double rng_max_deg = deg_per_km*Range_max_km;
 
 RotatedLatLonGrid::latlon_to_xy(lat, lon, x, y);
 
@@ -274,9 +274,9 @@ x = Nx - x; // MET #2841 switch from counterclockwise to clockwise
 
 azi_deg = x*(RData.delta_rot_lon);
 
-range_deg = range_max_deg - y*(RData.delta_rot_lat);
+rng_deg = rng_max_deg - y*(RData.delta_rot_lat);
 
-range_km = range_deg*km_per_deg;
+rng_km = rng_deg*km_per_deg;
 
 return;
 
@@ -318,9 +318,9 @@ void RngAziGrid::wind_ne_to_rt (const double lat, const double lon,
 
 {
 
-double range_km, azi_deg;
+double rng_km, azi_deg;
 
-latlon_to_range_azi(lat, lon, range_km, azi_deg);
+latlon_to_rng_azi(lat, lon, rng_km, azi_deg);
 
 wind_ne_to_rt(azi_deg, u_wind, v_wind, radial_wind, tangential_wind);
 
@@ -338,11 +338,10 @@ void RngAziGrid::latlon_to_xy(double true_lat, double true_lon, double & x, doub
 
 RotatedLatLonGrid::latlon_to_xy(true_lat, true_lon, x, y);
 
+// x is azimuth and y is range
 x -= Nx*floor(x/Nx);
 
 x = Nx - x; // MET #2841 switch from counterclockwise to clockwise
-
-y -= Ny*floor(y/Ny);
 
 return;
 
@@ -356,11 +355,10 @@ void RngAziGrid::xy_to_latlon(double x, double y, double & true_lat, double & tr
 
 {
 
+// x is azimuth and y is range
 x -= Nx*floor(x/Nx);
 
 x = Nx - x; // MET #2841 switch from counterclockwise to clockwise
-
-y -= Ny*floor(y/Ny);
 
 RotatedLatLonGrid::xy_to_latlon(x, y, true_lat, true_lon);
 
@@ -434,6 +432,18 @@ GridInfo i;
 i.set( Data );
 
 return i;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool RngAziGrid::wrap_lon() const
+
+{
+
+return false;
 
 }
 

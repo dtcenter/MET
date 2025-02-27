@@ -76,9 +76,9 @@ class RngAziGrid : public RotatedLatLonGrid {
          //  do stuff
          //
 
-      void range_azi_to_latlon(const double range_km, const double azi_deg, double & lat, double & lon) const;
+      void rng_azi_to_latlon(const double rng_km, const double azi_deg, double & lat, double & lon) const;
 
-      void latlon_to_range_azi(const double lat, const double lon, double & range_km, double & azi_deg) const;
+      void latlon_to_rng_azi(const double lat, const double lon, double & rng_km, double & azi_deg) const;
 
 
       void latlon_to_xy(double true_lat, double true_lon, double & x, double & y) const;
@@ -98,6 +98,8 @@ class RngAziGrid : public RotatedLatLonGrid {
       ConcatString serialize(const char *sep=" ") const;
 
       GridInfo info() const;
+
+      bool wrap_lon() const;
 
       GridRep * copy() const;
 
