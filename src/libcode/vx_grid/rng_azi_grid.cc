@@ -470,7 +470,7 @@ bool RngAziGrid::wrap_lon() const
 
 {
 
-return false;
+return true;
 
 }
 
