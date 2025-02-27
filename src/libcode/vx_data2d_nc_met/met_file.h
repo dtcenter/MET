@@ -108,7 +108,7 @@ class MetNcFile {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline bool MetNcFile::is_range_azimuth() const { return grid.is_set() && grid.info().tc; }
+inline bool MetNcFile::is_range_azimuth() const { return grid.is_set() && grid.info().ra; }
 
 ////////////////////////////////////////////////////////////////////////
 

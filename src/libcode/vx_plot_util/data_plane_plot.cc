@@ -147,7 +147,7 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
       // skip for range/azimuth grids
       //
 
-   if ( !grid.info().tc ) {
+   if ( !grid.info().ra ) {
 
       plot.comment("start drawing map");
 

@@ -152,7 +152,7 @@ void RngAziGrid::set_from_data(const RngAziData & data)
 clear();
 
 
-TData = data;
+Data = data;
 
 Range_n = data.range_n;
 
@@ -431,7 +431,7 @@ GridInfo RngAziGrid::info() const
 
 GridInfo i;
 
-i.set( TData );
+i.set( Data );
 
 return i;
 
@@ -445,7 +445,7 @@ GridRep * RngAziGrid::copy() const
 
 {
 
-auto * p = new RngAziGrid (TData);
+auto * p = new RngAziGrid (Data);
 
 p->Name = Name;
 

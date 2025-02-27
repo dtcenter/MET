@@ -71,7 +71,7 @@ class GridInfo {
       void set(const MercatorData      &);
       void set(const GaussianData      &);
       void set(const GoesImagerData    &);
-      void set(const RngAziData         &);
+      void set(const RngAziData        &);
       void set(const LaeaData          &);
       void set(const SemiLatLonData    &);
 #ifdef WITH_UGRID
@@ -91,7 +91,7 @@ class GridInfo {
       const MercatorData      * m;    //  allocated
       const GaussianData      * g;    //  allocated
       const GoesImagerData    * gi;   //  allocated
-      const RngAziData         * tc;   //  allocated
+      const RngAziData        * ra;   //  allocated
       const LaeaData          * la;   //  allocated
       const SemiLatLonData    * sl;   //  allocated
 #ifdef WITH_UGRID
@@ -214,7 +214,7 @@ class Grid : public GridInterface {
       Grid(const MercatorData      &);
       Grid(const GaussianData      &);
       Grid(const GoesImagerData    &);
-      Grid(const RngAziData         &);
+      Grid(const RngAziData        &);
       Grid(const LaeaData          &);
       Grid(const LaeaNetcdfData    &);
       Grid(const SemiLatLonData    &);
@@ -239,7 +239,7 @@ class Grid : public GridInterface {
       void set (const MercatorData      &);
       void set (const GaussianData      &);
       void set (const GoesImagerData    &);
-      void set (const RngAziData         &);
+      void set (const RngAziData        &);
       void set (const LaeaData          &);
       void set (const LaeaNetcdfData    &);
       void set (const SemiLatLonData    &);
@@ -305,7 +305,7 @@ extern bool is_eq(const RotatedLatLonData *, const RotatedLatLonData *);
 extern bool is_eq(const MercatorData *,      const MercatorData *);
 extern bool is_eq(const GaussianData *,      const GaussianData *);
 extern bool is_eq(const GoesImagerData *,    const GoesImagerData *);
-extern bool is_eq(const RngAziData *,         const RngAziData *);
+extern bool is_eq(const RngAziData *,        const RngAziData *);
 extern bool is_eq(const LaeaData *,          const LaeaData *);
 extern bool is_eq(const SemiLatLonData *,    const SemiLatLonData *);
 #ifdef WITH_UGRID

@@ -51,7 +51,7 @@ class RngAziGrid : public RotatedLatLonGrid {
       double Lat_Center_Deg;
       double Lon_Center_Deg;    //  + west, - east
 
-      RngAziData TData;
+      RngAziData Data;
 
       void clear();
 

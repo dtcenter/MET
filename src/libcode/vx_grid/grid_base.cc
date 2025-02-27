@@ -423,7 +423,7 @@ m   = (const MercatorData *)      nullptr;
 g   = (const GaussianData *)      nullptr;
 gi  = (const GoesImagerData *)    nullptr;
 la  = (const LaeaData *)          nullptr;
-tc  = (const RngAziData *)         nullptr;
+ra  = (const RngAziData *)        nullptr;
 sl  = (const SemiLatLonData *)    nullptr;
 #ifdef WITH_UGRID
 us  = (const UnstructuredData *)  nullptr;
@@ -451,7 +451,7 @@ if ( m   )  { delete m;    m   = (const MercatorData *)      nullptr; }
 if ( g   )  { delete g;    g   = (const GaussianData *)      nullptr; }
 if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    nullptr; }
 if ( la  )  { delete la;   la  = (const LaeaData *)          nullptr; }
-if ( tc  )  { delete tc;   tc  = (const RngAziData *)         nullptr; }
+if ( ra  )  { delete ra;   ra  = (const RngAziData *)        nullptr; }
 if ( sl  )  { delete sl;   sl  = (const SemiLatLonData *)    nullptr; }
 #ifdef WITH_UGRID
 if ( us  )  { delete us;   us  = (const UnstructuredData *)  nullptr; }
@@ -477,7 +477,7 @@ if ( info.m   )  set( *(info.m)   );
 if ( info.g   )  set( *(info.g)   );
 if ( info.gi  )  set( *(info.gi)  );
 if ( info.la  )  set( *(info.la)  );
-if ( info.tc  )  set( *(info.tc)  );
+if ( info.ra  )  set( *(info.ra)  );
 if ( info.sl  )  set( *(info.sl)  );
 #ifdef WITH_UGRID
 if ( info.us  )  set( *(info.us)  );
@@ -505,7 +505,7 @@ if ( m   ) ++count;
 if ( g   ) ++count;
 if ( gi  ) ++count;
 if ( la  ) ++count;
-if ( tc  ) ++count;
+if ( ra  ) ++count;
 if ( sl  ) ++count;
 #ifdef WITH_UGRID
 if ( us  ) ++count;
@@ -539,7 +539,7 @@ else if ( m   )  gg.set( *m   );
 else if ( g   )  gg.set( *g   );
 else if ( gi  )  gg.set( *gi  );
 else if ( la  )  gg.set( *la  );
-else if ( tc  )  gg.set( *tc  );
+else if ( ra  )  gg.set( *ra  );
 else if ( sl  )  gg.set( *sl  );
 #ifdef WITH_UGRID
 else if ( us  )  gg.set( *us  );
@@ -719,7 +719,7 @@ D = new RngAziData;
 
 memcpy(D, &data, sizeof(data));
 
-tc = D;  D = nullptr;
+ra = D;  D = nullptr;
 
 return;
 
@@ -1456,7 +1456,7 @@ else if ( i1.rll && i2.rll )  return ( is_eq(i1.rll, i2.rll) );
 else if ( i1.m   && i2.m   )  return ( is_eq(i1.m,   i2.m  ) );
 else if ( i1.g   && i2.g   )  return ( is_eq(i1.g,   i2.g  ) );
 else if ( i1.gi  && i2.gi  )  return ( is_eq(i1.gi,  i2.gi ) );
-else if ( i1.tc  && i2.tc  )  return ( is_eq(i1.tc,  i2.tc ) );
+else if ( i1.ra  && i2.ra  )  return ( is_eq(i1.ra,  i2.ra ) );
 else if ( i1.la  && i2.la  )  return ( is_eq(i1.la,  i2.la ) );
 else if ( i1.sl  && i2.sl  )  return ( is_eq(i1.sl,  i2.sl ) );
 #ifdef WITH_UGRID
