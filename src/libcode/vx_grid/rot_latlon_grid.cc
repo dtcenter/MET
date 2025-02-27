@@ -393,7 +393,7 @@ GridRep * RotatedLatLonGrid::copy() const
 
 {
 
-RotatedLatLonGrid * p = new RotatedLatLonGrid (RData);
+auto * p = new RotatedLatLonGrid (RData);
 
 p->Name = Name;
 

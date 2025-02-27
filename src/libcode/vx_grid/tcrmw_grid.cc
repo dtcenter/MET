@@ -380,8 +380,8 @@ Indent prefix(depth);
 
 out << prefix << "Name         = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << '\n';
 
@@ -445,7 +445,7 @@ GridRep * TcrmwGrid::copy() const
 
 {
 
-TcrmwGrid * p = new TcrmwGrid (TData);
+auto * p = new TcrmwGrid (TData);
 
 p->Name = Name;
 

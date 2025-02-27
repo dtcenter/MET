@@ -457,8 +457,8 @@ Indent prefix(depth);
 
 out << prefix << "Name       = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << '\n';
 
@@ -595,7 +595,7 @@ GridRep * MercatorGrid::copy() const
 
 {
 
-MercatorGrid * p = new MercatorGrid (Data);
+auto * p = new MercatorGrid (Data);
 
 p->Name = Name;
 
