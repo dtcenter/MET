@@ -125,7 +125,6 @@ void MetNcMetDataFile::dump(ostream & out, int depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 void MetNcMetDataFile::set_range_azimuth_grid_center(int i_track_point) {
-   const char *method_name = "MetNcMetDataFile::set_range_azimuth_grid_center() -> ";
 
    if(!MetNc->is_range_azimuth() || i_track_point < 0) return;
 
@@ -161,7 +160,6 @@ void MetNcMetDataFile::set_range_azimuth_grid_center(int i_track_point) {
 ////////////////////////////////////////////////////////////////////////
 
 void MetNcMetDataFile::set_range_azimuth_times(int i_track_point, DataPlane &plane) {
-   const char *method_name = "MetNcMetDataFile::set_range_azimuth_times() -> ";
 
    if(!MetNc->is_range_azimuth() || i_track_point < 0) return;
 
@@ -225,7 +223,7 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
       // Update the range/azimuth times and grid location, if possible 
       if(MetNc->is_range_azimuth() && info->t_slot >= 0) {
-         int i_track_point = (int) vinfo_nc->dimension()[info->t_slot];
+         auto i_track_point = (int) vinfo_nc->dimension()[info->t_slot];
          set_range_azimuth_grid_center(i_track_point);
          set_range_azimuth_times(i_track_point, plane);
       } 

@@ -29,25 +29,25 @@ using namespace netCDF;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static void read_netcdf_grid_range_azimuth (NcFile *, Grid &);
-static void read_netcdf_grid_v3 (NcFile *, Grid &);
-static void read_netcdf_grid_v2 (NcFile *, Grid &);
+static void read_netcdf_grid_range_azimuth         (NcFile *, Grid &);
+static void read_netcdf_grid_v3                    (NcFile *, Grid &);
+static void read_netcdf_grid_v2                    (const NcFile *, Grid &);
 
-static LatLonData        get_latlon_data           (NcFile *);
-static RotatedLatLonData get_rot_latlon_data       (NcFile *);
-static LambertData       get_lambert_data          (NcFile *);
+static LatLonData        get_latlon_data           (const NcFile *);
+static RotatedLatLonData get_rot_latlon_data       (const NcFile *);
+static LambertData       get_lambert_data          (const NcFile *);
 static TcrmwData         get_tcrmw_data            (NcFile *);
-static LaeaData          get_laea_data             (NcFile *);
-static StereographicData get_stereographic_data    (NcFile *);
-static MercatorData      get_mercator_data         (NcFile *);
-static GaussianData      get_gaussian_data         (NcFile *);
+static LaeaData          get_laea_data             (const NcFile *);
+static StereographicData get_stereographic_data    (const NcFile *);
+static MercatorData      get_mercator_data         (const NcFile *);
+static GaussianData      get_gaussian_data         (const NcFile *);
 static SemiLatLonData    get_semilatlon_data       (NcFile *);
 static void              get_semilatlon_var        (NcFile *, const char *, NumArray &);
 
-static LatLonData        get_latlon_data_v2        (NcFile *);
-static LambertData       get_lambert_data_v2       (NcFile *);
-static StereographicData get_stereographic_data_v2 (NcFile *);
-static MercatorData      get_mercator_data_v2      (NcFile *);
+static LatLonData        get_latlon_data_v2        (const NcFile *);
+static LambertData       get_lambert_data_v2       (const NcFile *);
+static StereographicData get_stereographic_data_v2 (const NcFile *);
+static MercatorData      get_mercator_data_v2      (const NcFile *);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -149,7 +149,7 @@ static void read_netcdf_grid_v3(NcFile * f_in, Grid & gr) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static void read_netcdf_grid_v2(NcFile * f_in, Grid & gr)
+static void read_netcdf_grid_v2(const NcFile * f_in, Grid & gr)
 {
 
    //
@@ -196,7 +196,7 @@ static void read_netcdf_grid_v2(NcFile * f_in, Grid & gr)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static LatLonData get_latlon_data(NcFile * ncfile) {
+static LatLonData get_latlon_data(const NcFile * ncfile) {
 
    LatLonData data;
 
@@ -229,7 +229,7 @@ static LatLonData get_latlon_data(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static RotatedLatLonData get_rot_latlon_data(NcFile * ncfile) {
+static RotatedLatLonData get_rot_latlon_data(const NcFile * ncfile) {
 
    RotatedLatLonData data;
 
@@ -270,7 +270,7 @@ static RotatedLatLonData get_rot_latlon_data(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static LambertData get_lambert_data(NcFile * ncfile) {
+static LambertData get_lambert_data(const NcFile * ncfile) {
 
    LambertData data;
    ConcatString att_value;
@@ -358,7 +358,7 @@ static TcrmwData get_tcrmw_data(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static LaeaData get_laea_data(NcFile * ncfile) {
+static LaeaData get_laea_data(const NcFile * ncfile) {
 
    const char * method_name = "get_laea_data() -> ";
 
@@ -418,7 +418,7 @@ static LaeaData get_laea_data(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static StereographicData get_stereographic_data(NcFile * ncfile) {
+static StereographicData get_stereographic_data(const NcFile * ncfile) {
 
    StereographicData data;
    ConcatString att_value;
@@ -475,7 +475,7 @@ static StereographicData get_stereographic_data(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static MercatorData get_mercator_data(NcFile * ncfile) {
+static MercatorData get_mercator_data(const NcFile * ncfile) {
 
    MercatorData data;
 
@@ -509,7 +509,7 @@ static MercatorData get_mercator_data(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static LatLonData get_latlon_data_v2(NcFile * ncfile) {
+static LatLonData get_latlon_data_v2(const NcFile * ncfile) {
 
    LatLonData data;
 
@@ -542,7 +542,7 @@ static LatLonData get_latlon_data_v2(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static LambertData get_lambert_data_v2(NcFile * ncfile) {
+static LambertData get_lambert_data_v2(const NcFile * ncfile) {
 
    LambertData data;
 
@@ -594,7 +594,7 @@ static LambertData get_lambert_data_v2(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static StereographicData get_stereographic_data_v2(NcFile * ncfile) {
+static StereographicData get_stereographic_data_v2(const NcFile * ncfile) {
 
    StereographicData data;
 
@@ -649,7 +649,7 @@ static StereographicData get_stereographic_data_v2(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static MercatorData get_mercator_data_v2(NcFile * ncfile) {
+static MercatorData get_mercator_data_v2(const NcFile * ncfile) {
 
    MercatorData data;
 
@@ -684,7 +684,7 @@ static MercatorData get_mercator_data_v2(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static GaussianData get_gaussian_data (NcFile * ncfile) {
+static GaussianData get_gaussian_data(const NcFile * ncfile) {
 
    GaussianData data;
 
@@ -707,7 +707,7 @@ static GaussianData get_gaussian_data (NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static SemiLatLonData get_semilatlon_data (NcFile * ncfile) {
+static SemiLatLonData get_semilatlon_data(NcFile * ncfile) {
 
    SemiLatLonData data;
 
