@@ -25,7 +25,7 @@ void copy_nc_data_as_double(double *to_array, const T *from_array,
       for (int y=0; y<ny; ++y) {
          int start_offset = y * nx;
          for (int x=0; x<nx; ++x) {
-            double value = (double)from_array[x + start_offset];
+            auto value = (double) from_array[x + start_offset];
             if(is_eq(value, missing_value) || is_eq(value, fill_value))
                value = bad_data_double;
             to_array[offset++] = value;
@@ -36,7 +36,7 @@ void copy_nc_data_as_double(double *to_array, const T *from_array,
       for (int x=0; x<nx; ++x) {
          int start_offset = x * ny;
          for (int y=0; y<ny; ++y) {
-            double value = (double)from_array[y + start_offset];
+            auto value = (double) from_array[y + start_offset];
             if(is_eq(value, missing_value) || is_eq(value, fill_value))
                value = bad_data_double;
             to_array[offset++] = value;
