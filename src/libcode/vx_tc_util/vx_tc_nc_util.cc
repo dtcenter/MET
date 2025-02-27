@@ -306,7 +306,7 @@ void def_tc_pressure(NcFile* nc_out,
 
 void def_tc_range_azimuth(NcFile* nc_out,
     const NcDim& range_dim, const NcDim& azimuth_dim,
-    const TcrmwGrid& grid, double rmw_scale) {
+    const RngAziGrid& grid, double rmw_scale) {
 
     NcVar range_var;
     NcVar azimuth_var;
@@ -633,7 +633,7 @@ void def_tc_azi_mean_data(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_data(NcFile* nc_out, const TcrmwGrid& grid,
+void write_tc_data(NcFile* nc_out, const RngAziGrid& grid,
     const int& i_point, const NcVar& var, const double* data) {
 
     vector<size_t> offsets;
@@ -654,7 +654,7 @@ void write_tc_data(NcFile* nc_out, const TcrmwGrid& grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_data_rev(NcFile* nc_out, const TcrmwGrid& grid,
+void write_tc_data_rev(NcFile* nc_out, const RngAziGrid& grid,
     const int& i_point, const NcVar& var, const double* data) {
 
     vector<size_t> offsets;
@@ -685,7 +685,7 @@ void write_tc_data_rev(NcFile* nc_out, const TcrmwGrid& grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_azi_mean_data(NcFile* nc_out, const TcrmwGrid& grid,
+void write_tc_azi_mean_data(NcFile* nc_out, const RngAziGrid& grid,
     const int& i_point, const NcVar& var, const double* data) {
 
     vector<size_t> offsets;
@@ -723,7 +723,7 @@ void write_tc_azi_mean_data(NcFile* nc_out, const TcrmwGrid& grid,
 ////////////////////////////////////////////////////////////////////////
 
 extern void write_tc_pressure_level_data(
-    NcFile* nc_out, const TcrmwGrid& grid,
+    NcFile* nc_out, const RngAziGrid& grid,
     map<string, int> pressure_level_indices, const string& level_str,
     const int& i_point, const NcVar& var, const double* data) {
 
@@ -734,7 +734,7 @@ extern void write_tc_pressure_level_data(
 ////////////////////////////////////////////////////////////////////////
 
 extern void write_tc_pressure_level_data(
-    NcFile* nc_out, const TcrmwGrid& grid,
+    NcFile* nc_out, const RngAziGrid& grid,
     const int& i_point, const int& i_level,
     const NcVar& var, const double* data) {
 

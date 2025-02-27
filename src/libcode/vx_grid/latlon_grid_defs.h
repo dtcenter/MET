@@ -74,7 +74,7 @@ struct RotatedLatLonData {
 ////////////////////////////////////////////////////////////////////////
 
 
-struct TcrmwData {
+struct RngAziData {
 
    const char * name;   //  not allocated
 

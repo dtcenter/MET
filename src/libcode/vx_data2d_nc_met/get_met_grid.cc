@@ -36,7 +36,7 @@ static void read_netcdf_grid_v2                    (const NcFile *, Grid &);
 static LatLonData        get_latlon_data           (const NcFile *);
 static RotatedLatLonData get_rot_latlon_data       (const NcFile *);
 static LambertData       get_lambert_data          (const NcFile *);
-static TcrmwData         get_tcrmw_data            (NcFile *);
+static RngAziData         get_tcrmw_data            (NcFile *);
 static LaeaData          get_laea_data             (const NcFile *);
 static StereographicData get_stereographic_data    (const NcFile *);
 static MercatorData      get_mercator_data         (const NcFile *);
@@ -327,9 +327,9 @@ static LambertData get_lambert_data(const NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static TcrmwData get_tcrmw_data(NcFile * ncfile) {
+static RngAziData get_tcrmw_data(NcFile * ncfile) {
 
-   TcrmwData data;
+   RngAziData data;
 
    // Store the grid name
    data.name = range_azimuth_proj_type;

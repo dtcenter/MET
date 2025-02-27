@@ -114,7 +114,7 @@ static void write_tc_times(NcFile *, const NcDim &,
                            const TrackInfo *,
                            const TrackPoint *);
 
-static void compute_lat_lon(TcrmwGrid&, double *, double *);
+static void compute_lat_lon(RngAziGrid&, double *, double *);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -854,7 +854,7 @@ void write_tc_times(NcFile *nc_out, const NcDim &vld_dim,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_lat_lon(TcrmwGrid& grid,
+void compute_lat_lon(RngAziGrid& grid,
                      double *lat_arr, double *lon_arr) {
 
    // Compute lat and lon coordinate arrays
@@ -2190,7 +2190,7 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    write_netcdf_global(tmp_out, tmp_file.c_str(), program_name);
 
    // Define latitude and longitude arrays
-   TcrmwData d = di.data;
+   RngAziData d = di.data;
    int nra = d.range_n * d.azimuth_n;
    vector<double> lat_arr(nra);
    vector<double> lon_arr(nra);

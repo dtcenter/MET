@@ -10,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __TCRMW_GRID_H__
-#define  __TCRMW_GRID_H__
+#ifndef  __RNG_AZI_GRID_H__
+#define  __RNG_AZI_GRID_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -25,20 +25,20 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-class TcrmwGrid : public RotatedLatLonGrid {
+class RngAziGrid : public RotatedLatLonGrid {
 
       friend class Grid;
 
    private:
 
-      void assign(const TcrmwGrid &);
+      void assign(const RngAziGrid &);
 
    public:
 
-      TcrmwGrid();
-     ~TcrmwGrid();
-      TcrmwGrid(const TcrmwData &);
-      TcrmwGrid & operator=(const TcrmwGrid &);
+      RngAziGrid();
+     ~RngAziGrid();
+      RngAziGrid(const RngAziData &);
+      RngAziGrid & operator=(const RngAziGrid &);
 
       void calc_ijk();   //  calculate rotated basis vectors
 
@@ -51,11 +51,11 @@ class TcrmwGrid : public RotatedLatLonGrid {
       double Lat_Center_Deg;
       double Lon_Center_Deg;    //  + west, - east
 
-      TcrmwData TData;
+      RngAziData TData;
 
       void clear();
 
-      void set_from_data(const TcrmwData &);
+      void set_from_data(const RngAziData &);
 
          //
          //  get stuff
@@ -107,23 +107,23 @@ class TcrmwGrid : public RotatedLatLonGrid {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int TcrmwGrid::range_n  () const { return Range_n; }
-inline int TcrmwGrid::azimuth_n () const { return Azimuth_n; }
+inline int RngAziGrid::range_n  () const { return Range_n; }
+inline int RngAziGrid::azimuth_n () const { return Azimuth_n; }
 
-inline double TcrmwGrid::range_max_km () const { return Range_max_km; }
+inline double RngAziGrid::range_max_km () const { return Range_max_km; }
 
-inline double TcrmwGrid::range_delta_km () const { return Range_max_km/(Range_n - 1); }
+inline double RngAziGrid::range_delta_km () const { return Range_max_km/(Range_n - 1); }
 
-inline double TcrmwGrid::azimuth_delta_deg () const { return 360.0/Azimuth_n; }
+inline double RngAziGrid::azimuth_delta_deg () const { return 360.0/Azimuth_n; }
 
-inline double TcrmwGrid::lat_center_deg () const { return Lat_Center_Deg; }
-inline double TcrmwGrid::lon_center_deg () const { return Lon_Center_Deg; }
+inline double RngAziGrid::lat_center_deg () const { return Lat_Center_Deg; }
+inline double RngAziGrid::lon_center_deg () const { return Lon_Center_Deg; }
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __TCRMW_GRID_H__  */
+#endif   /*  __RNG_AZI_GRID_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

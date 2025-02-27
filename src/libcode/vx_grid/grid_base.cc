@@ -423,7 +423,7 @@ m   = (const MercatorData *)      nullptr;
 g   = (const GaussianData *)      nullptr;
 gi  = (const GoesImagerData *)    nullptr;
 la  = (const LaeaData *)          nullptr;
-tc  = (const TcrmwData *)         nullptr;
+tc  = (const RngAziData *)         nullptr;
 sl  = (const SemiLatLonData *)    nullptr;
 #ifdef WITH_UGRID
 us  = (const UnstructuredData *)  nullptr;
@@ -451,7 +451,7 @@ if ( m   )  { delete m;    m   = (const MercatorData *)      nullptr; }
 if ( g   )  { delete g;    g   = (const GaussianData *)      nullptr; }
 if ( gi  )  { delete gi;   gi  = (const GoesImagerData *)    nullptr; }
 if ( la  )  { delete la;   la  = (const LaeaData *)          nullptr; }
-if ( tc  )  { delete tc;   tc  = (const TcrmwData *)         nullptr; }
+if ( tc  )  { delete tc;   tc  = (const RngAziData *)         nullptr; }
 if ( sl  )  { delete sl;   sl  = (const SemiLatLonData *)    nullptr; }
 #ifdef WITH_UGRID
 if ( us  )  { delete us;   us  = (const UnstructuredData *)  nullptr; }
@@ -707,15 +707,15 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void GridInfo::set(const TcrmwData & data)
+void GridInfo::set(const RngAziData & data)
 
 {
 
 clear();
 
-TcrmwData * D = nullptr;
+RngAziData * D = nullptr;
 
-D = new TcrmwData;
+D = new RngAziData;
 
 memcpy(D, &data, sizeof(data));
 
@@ -1668,7 +1668,7 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool is_eq(const TcrmwData * g1, const TcrmwData * g2)
+bool is_eq(const RngAziData * g1, const RngAziData * g2)
 
 {
 

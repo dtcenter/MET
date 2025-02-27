@@ -38,7 +38,7 @@
 #include "main.h"
 #include "tc_rmw.h"
 
-#include "tcrmw_grid.h"
+#include "rng_azi_grid.h"
 #include "series_data.h"
 
 #include "vx_grid.h"
@@ -81,7 +81,7 @@ static void setup_grid();
 static void setup_nc_file();
 static void build_outfile_name(const ConcatString&,
                 const char*, ConcatString&);
-static void compute_lat_lon(TcrmwGrid&, double*, double*);
+static void compute_lat_lon(RngAziGrid&, double*, double*);
 static void process_fields(const TrackInfoArray&);
 
 ////////////////////////////////////////////////////////////////////////
@@ -636,7 +636,7 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_lat_lon(TcrmwGrid& tcrmw_grid,
+void compute_lat_lon(RngAziGrid& tcrmw_grid,
     double* lat_arr, double* lon_arr) {
 
     // Compute lat and lon coordinate arrays

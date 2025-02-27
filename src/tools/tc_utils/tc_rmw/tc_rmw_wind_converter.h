@@ -116,7 +116,7 @@ class TCRMW_WindConverter {
                                    const Grid &grid_in,
                                    const Grid &grid_out,
                                    const DataPlane &u_wind_dp,
-                                   const TcrmwGrid &tcrmw_grid);
+                                   const RngAziGrid &tcrmw_grid);
 };
 
 

@@ -15,7 +15,7 @@
 #include <stdlib.h>
 #include <cmath>
 
-#include "tcrmw_grid.h"
+#include "rng_azi_grid.h"
 
 #include "trig.h"
 
@@ -37,14 +37,14 @@ static const double deg_per_km = 1.0/km_per_deg;
 
 
    //
-   //  Code for class TcrmwGrid
+   //  Code for class RngAziGrid
    //
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-TcrmwGrid::TcrmwGrid()
+RngAziGrid::RngAziGrid()
 
 {
 
@@ -56,7 +56,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-TcrmwGrid::~TcrmwGrid()
+RngAziGrid::~RngAziGrid()
 
 {
 
@@ -68,7 +68,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-TcrmwGrid & TcrmwGrid::operator=(const TcrmwGrid & tg)
+RngAziGrid & RngAziGrid::operator=(const RngAziGrid & tg)
 
 {
 
@@ -84,7 +84,7 @@ return *this;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TcrmwGrid::clear()
+void RngAziGrid::clear()
 
 {
 
@@ -107,7 +107,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
  
 
-void TcrmwGrid::assign(const TcrmwGrid & tg)
+void RngAziGrid::assign(const RngAziGrid & tg)
  
 {
  
@@ -133,7 +133,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-TcrmwGrid::TcrmwGrid(const TcrmwData & data)
+RngAziGrid::RngAziGrid(const RngAziData & data)
 
 {
 
@@ -145,7 +145,7 @@ set_from_data(data);
 ////////////////////////////////////////////////////////////////////////
 
 
-void TcrmwGrid::set_from_data(const TcrmwData & data)
+void RngAziGrid::set_from_data(const RngAziData & data)
 
 {
 
@@ -190,7 +190,7 @@ RLLD.aux_rotation = 180.0 - Lon_Center_Deg;
 
 RotatedLatLonGrid::set_from_rdata(RLLD);
 
-er.set_tcrmw(Lat_Center_Deg, Lon_Center_Deg);
+er.set_rng_azi_center(Lat_Center_Deg, Lon_Center_Deg);
 
 return;
 
@@ -200,7 +200,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TcrmwGrid::calc_ijk()
+void RngAziGrid::calc_ijk()
 
 {
 
@@ -214,7 +214,7 @@ double len = Ir.abs();
 
 if ( len < tol )  {
 
-   mlog << Error << "\nTcrmwGrid::calc_ijk() -> "
+   mlog << Error << "\nRngAziGrid::calc_ijk() -> "
         << "rotated poles too close to original poles!\n\n";
 
    exit ( 1 );
@@ -234,7 +234,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TcrmwGrid::range_azi_to_latlon(const double range_km, const double azi_deg, double & lat, double & lon) const
+void RngAziGrid::range_azi_to_latlon(const double range_km, const double azi_deg, double & lat, double & lon) const
 
 {
 
@@ -260,7 +260,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TcrmwGrid::latlon_to_range_azi(const double lat, const double lon, double & range_km, double & azi_deg) const
+void RngAziGrid::latlon_to_range_azi(const double lat, const double lon, double & range_km, double & azi_deg) const
 
 {
 
@@ -286,7 +286,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TcrmwGrid::wind_ne_to_rt (const double azi_deg,
+void RngAziGrid::wind_ne_to_rt (const double azi_deg,
                                const double u_wind, const double v_wind,
                                double & radial_wind, double & tangential_wind) const
 
@@ -312,7 +312,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TcrmwGrid::wind_ne_to_rt (const double lat, const double lon, 
+void RngAziGrid::wind_ne_to_rt (const double lat, const double lon, 
                                const double u_wind, const double v_wind,
                                double & radial_wind, double & tangential_wind) const
 
@@ -332,7 +332,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TcrmwGrid::latlon_to_xy(double true_lat, double true_lon, double & x, double & y) const
+void RngAziGrid::latlon_to_xy(double true_lat, double true_lon, double & x, double & y) const
 
 {
 
@@ -352,7 +352,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TcrmwGrid::xy_to_latlon(double x, double y, double & true_lat, double & true_lon) const
+void RngAziGrid::xy_to_latlon(double x, double y, double & true_lat, double & true_lon) const
 
 {
 
@@ -372,7 +372,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void TcrmwGrid::dump(ostream & out, int depth) const
+void RngAziGrid::dump(ostream & out, int depth) const
 
 {
 
@@ -403,7 +403,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString TcrmwGrid::serialize(const char *sep) const
+ConcatString RngAziGrid::serialize(const char *sep) const
 
 {
 
@@ -425,7 +425,7 @@ return a;
 ////////////////////////////////////////////////////////////////////////
 
 
-GridInfo TcrmwGrid::info() const
+GridInfo RngAziGrid::info() const
 
 {
 
@@ -441,11 +441,11 @@ return i;
 ////////////////////////////////////////////////////////////////////////
 
 
-GridRep * TcrmwGrid::copy() const
+GridRep * RngAziGrid::copy() const
 
 {
 
-auto * p = new TcrmwGrid (TData);
+auto * p = new RngAziGrid (TData);
 
 p->Name = Name;
 
@@ -465,7 +465,7 @@ return p;
 ////////////////////////////////////////////////////////////////////////
 
 
-Grid::Grid(const TcrmwData & data)
+Grid::Grid(const RngAziData & data)
 
 {
 
@@ -479,17 +479,17 @@ set(data);
 ////////////////////////////////////////////////////////////////////////
 
 
-void Grid::set(const TcrmwData & data)
+void Grid::set(const RngAziData & data)
 
 {
 
 clear();
 
-rep = new TcrmwGrid ( data );
+rep = new RngAziGrid ( data );
 
 if ( !rep )  {
 
-   mlog << Error << "\nGrid::set(const TcrmwData &) -> "
+   mlog << Error << "\nGrid::set(const RngAziData &) -> "
         << "memory allocation error\n\n";
 
    exit ( 1 );

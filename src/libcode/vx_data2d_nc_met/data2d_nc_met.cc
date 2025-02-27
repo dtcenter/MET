@@ -128,8 +128,8 @@ void MetNcMetDataFile::set_range_azimuth_grid_center(int i_track_point) {
 
    if(!MetNc->is_range_azimuth() || i_track_point < 0) return;
 
-   // Get current TcrmwData object
-   TcrmwData d = *(MetNc->grid.info().tc);
+   // Get current RngAziData object
+   RngAziData d = *(MetNc->grid.info().tc);
    d.lat_center = bad_data_double;
    d.lon_center = bad_data_double;
 

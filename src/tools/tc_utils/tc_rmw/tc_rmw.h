@@ -135,10 +135,10 @@ static std::map<std::string, int> pressure_level_indices;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static Grid      grid_in;
-static TcrmwData tcrmw_data;
-static TcrmwGrid tcrmw_grid;
-static Grid      grid_out;
+static Grid       grid_in;
+static RngAziData tcrmw_data;
+static RngAziGrid tcrmw_grid;
+static Grid       grid_out;
 
 // Grid coordinate arrays
 static double* lat_arr;

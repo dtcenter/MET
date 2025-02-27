@@ -29,7 +29,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static void wind_ne_to_rt(const TcrmwGrid&,
+static void wind_ne_to_rt(const RngAziGrid&,
                           const DataPlane&, const DataPlane&,
                           double*, double*);
 
@@ -171,7 +171,7 @@ bool TCRMW_WindConverter::compute_winds_if_input_is_u(int i_point,
                                                       const Grid &grid_in,
                                                       const Grid &grid_out,
                                                       const DataPlane &u_wind_dp,
-                                                      const TcrmwGrid &tcrmw_grid) {
+                                                      const RngAziGrid &tcrmw_grid) {
   if (!_computeWinds) {
     return false;
   }
@@ -211,7 +211,7 @@ bool TCRMW_WindConverter::compute_winds_if_input_is_u(int i_point,
 
 ////////////////////////////////////////////////////////////////////////
 
-void wind_ne_to_rt(const TcrmwGrid& tcrmw_grid,
+void wind_ne_to_rt(const RngAziGrid& tcrmw_grid,
                    const DataPlane& u_dp, const DataPlane& v_dp,
                    double* wind_r_arr, double* wind_t_arr) {
 
