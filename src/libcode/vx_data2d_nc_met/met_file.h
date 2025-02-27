@@ -32,10 +32,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const std::string nc_met_lat_name     = "lat";
-static const std::string nc_met_lon_name     = "lon";
-static const std::string nc_met_range_name   = "range";
-static const std::string nc_met_azimuth_name = "azimuth";
+static const std::string nc_met_lat_name         = "lat";
+static const std::string nc_met_lon_name         = "lon";
+static const std::string nc_met_range_name       = "range";
+static const std::string nc_met_azimuth_name     = "azimuth";
+static const std::string nc_met_track_point_name = "track_point";
+static const std::string nc_met_pressure_name    = "pressure";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -75,6 +77,8 @@ class MetNcFile {
 
       netCDF::NcDim * Xdim;   //  not allocated
       netCDF::NcDim * Ydim;   //  not allocated
+      netCDF::NcDim * Tdim;   //  not allocated
+      netCDF::NcDim * Zdim;   //  not allocated
 
          //
          //  variables

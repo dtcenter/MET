@@ -123,7 +123,10 @@ Ndims = 0;
 
 DimNames.clear();
 
-Xdim = Ydim = (NcDim *) nullptr;
+Xdim = nullptr;
+Ydim = nullptr;
+Tdim = nullptr;
+Zdim = nullptr;
 
 Nvars = 0;
 
@@ -168,6 +171,8 @@ bool MetNcFile::open(const char * filename)
 
    string x_dim_name;
    string y_dim_name;
+   string t_dim_name;
+   string z_dim_name;
 
    //
    //  semilatlon dimension names
@@ -198,6 +203,8 @@ bool MetNcFile::open(const char * filename)
 
       x_dim_name = nc_met_azimuth_name;
       y_dim_name = nc_met_range_name;
+      t_dim_name = nc_met_track_point_name;
+      z_dim_name = nc_met_pressure_name;
 
    }
 
@@ -222,6 +229,12 @@ bool MetNcFile::open(const char * filename)
       }
       if ( c.compare(y_dim_name) == 0 ) {
          Ydim = &dim;
+      }
+      if ( c.compare(t_dim_name) == 0 ) {
+         Tdim = &dim;
+      }
+      if ( c.compare(z_dim_name) == 0 ) {
+         Zdim = &dim;
       }
 
    }
@@ -278,6 +291,8 @@ bool MetNcFile::open(const char * filename)
 
          if ( c.compare(x_dim_name) == 0 ) Var[j].x_slot = k;
          if ( c.compare(y_dim_name) == 0 ) Var[j].y_slot = k;
+         if ( c.compare(t_dim_name) == 0 ) Var[j].t_slot = k;
+         if ( c.compare(z_dim_name) == 0 ) Var[j].z_slot = k;
 
       }   //  for k
 
@@ -327,6 +342,8 @@ out << prefix << "\n";
 
 out << prefix << "Xdim = " << (Xdim ? GET_NC_NAME_P(Xdim) : "(nul)") << "\n";
 out << prefix << "Ydim = " << (Ydim ? GET_NC_NAME_P(Ydim) : "(nul)") << "\n";
+out << prefix << "Tdim = " << (Xdim ? GET_NC_NAME_P(Tdim) : "(nul)") << "\n";
+out << prefix << "Zdim = " << (Ydim ? GET_NC_NAME_P(Zdim) : "(nul)") << "\n";
 
 out << prefix << "\n";
 
@@ -340,6 +357,8 @@ for (j=0; j<Nvars; ++j)  {
 
            if ( Var[j].Dims[k] == Xdim )  out << 'X';
       else if ( Var[j].Dims[k] == Ydim )  out << 'Y';
+      else if ( Var[j].Dims[k] == Tdim )  out << 'T';
+      else if ( Var[j].Dims[k] == Zdim )  out << 'Z';
       else                                out << GET_NC_NAME_P(Var[j].Dims[k]);
 
       if ( k < Var[j].Ndims - 1)  out << ", ";
