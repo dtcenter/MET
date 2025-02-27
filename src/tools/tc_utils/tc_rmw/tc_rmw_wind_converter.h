@@ -44,7 +44,7 @@ using std::string;
 //
 ////////////////////////////////////////////////////////////////////////
 
-class TCRMW_WindConverter {
+class TCRMWWindConverter {
 
  private:
 
@@ -75,10 +75,10 @@ class TCRMW_WindConverter {
   map<string, int> _vIndexMap;
 
   // constructor
-  TCRMW_WindConverter(void);
+  TCRMWWindConverter(void);
 
   // destructor
-  ~TCRMW_WindConverter(void);
+  ~TCRMWWindConverter(void);
 
   // return the tangential wind array, computed and stored locally
   inline const double *get_wind_t_arr(void) const {return _windT;}

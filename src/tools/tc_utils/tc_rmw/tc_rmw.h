@@ -82,7 +82,7 @@ static StringArray   deck_source, deck_model_suffix;
 static ConcatString  config_file;
 static TCRMWConfInfo conf_info;
 static GrdFileType   ftype;
-static TCRMW_WindConverter wind_converter;
+static TCRMWWindConverter wind_converter;
 
 // Optional arguments
 static ConcatString out_dir;
@@ -136,8 +136,8 @@ static std::map<std::string, int> pressure_level_indices;
 ////////////////////////////////////////////////////////////////////////
 
 static Grid       grid_in;
-static RngAziData tcrmw_data;
-static RngAziGrid tcrmw_grid;
+static RngAziData rng_azi_data;
+static RngAziGrid rng_azi_grid;
 static Grid       grid_out;
 
 // Grid coordinate arrays

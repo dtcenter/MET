@@ -549,19 +549,19 @@ void set_out(const StringArray& a) {
 
 void setup_grid() {
 
-    tcrmw_data.name = "TCRMW";
-    tcrmw_data.range_n = conf_info.n_range;
-    tcrmw_data.azimuth_n = conf_info.n_azimuth;
+    rng_azi_data.name = "TCRMW";
+    rng_azi_data.range_n = conf_info.n_range;
+    rng_azi_data.azimuth_n = conf_info.n_azimuth;
 
     // Define the maximum range in km based on the fixed increment 
     if(is_bad_data(conf_info.rmw_scale)) {
-        tcrmw_data.range_max_km =
+        rng_azi_data.range_max_km =
             conf_info.delta_range_km *
             (conf_info.n_range - 1);
     }
 
-    tcrmw_grid.set_from_data(tcrmw_data);
-    grid_out.set(tcrmw_data);
+    rng_azi_grid.set_from_data(rng_azi_data);
+    grid_out.set(rng_azi_data);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -580,13 +580,13 @@ void setup_nc_file() {
     }
 
     mlog << Debug(4)
-         << "Range = " << tcrmw_grid.range_n()
-         << ", Azimuth = " << tcrmw_grid.azimuth_n() << "\n";
+         << "Range = " << rng_azi_grid.range_n()
+         << ", Azimuth = " << rng_azi_grid.azimuth_n() << "\n";
 
     // Define dimensions
     track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
-    range_dim = add_dim(nc_out, "range", (long) tcrmw_grid.range_n());
-    azimuth_dim = add_dim(nc_out, "azimuth", (long) tcrmw_grid.azimuth_n());
+    range_dim = add_dim(nc_out, "range", (long) rng_azi_grid.range_n());
+    azimuth_dim = add_dim(nc_out, "azimuth", (long) rng_azi_grid.azimuth_n());
 
     // Define init, lead, and valid time variables
     def_tc_init_time(nc_out,
@@ -599,7 +599,7 @@ void setup_nc_file() {
     // Define range and azimuth dimensions
     def_tc_range_azimuth(nc_out,
         range_dim, azimuth_dim,
-        tcrmw_grid, conf_info.rmw_scale);
+        rng_azi_grid, conf_info.rmw_scale);
 
     // Define latitude and longitude arrays
     def_tc_lat_lon(nc_out,
@@ -636,17 +636,17 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_lat_lon(RngAziGrid& tcrmw_grid,
+void compute_lat_lon(RngAziGrid& rng_azi_grid,
     double* lat_arr, double* lon_arr) {
 
     // Compute lat and lon coordinate arrays
-    for(int ir = 0; ir < tcrmw_grid.range_n(); ir++) {
-        for(int ia = 0; ia < tcrmw_grid.azimuth_n(); ia++) {
+    for(int ir = 0; ir < rng_azi_grid.range_n(); ir++) {
+        for(int ia = 0; ia < rng_azi_grid.azimuth_n(); ia++) {
             double lat, lon;
-            int i = ir * tcrmw_grid.azimuth_n() + ia;
-            tcrmw_grid.range_azi_to_latlon(
-                ir * tcrmw_grid.range_delta_km(),
-                ia * tcrmw_grid.azimuth_delta_deg(),
+            int i = ir * rng_azi_grid.azimuth_n() + ia;
+            rng_azi_grid.range_azi_to_latlon(
+                ir * rng_azi_grid.range_delta_km(),
+                ia * rng_azi_grid.azimuth_delta_deg(),
                 lat, lon);
             lat_arr[i] =  lat;
             lon_arr[i] = -lon; // degrees west to east
@@ -662,9 +662,9 @@ void process_fields(const TrackInfoArray& tracks) {
 
     // Define latitude and longitude arrays
     lat_arr = new double[
-        tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
+        rng_azi_grid.range_n() * rng_azi_grid.azimuth_n()];
     lon_arr = new double[
-        tcrmw_grid.range_n() * tcrmw_grid.azimuth_n()];
+        rng_azi_grid.range_n() * rng_azi_grid.azimuth_n()];
 
     // Take only first track
     TrackInfo track = tracks[0];
@@ -690,29 +690,29 @@ void process_fields(const TrackInfoArray& tracks) {
              << point.lon() << ").\n";
 
         // Set grid center
-        tcrmw_data.lat_center = point.lat();
-        tcrmw_data.lon_center = -1.0*point.lon(); // internal sign change
+        rng_azi_data.lat_center = point.lat();
+        rng_azi_data.lon_center = -1.0*point.lon(); // internal sign change
 
         // Define the maximum range in km relative to the radius of maximum winds
         if(!is_bad_data(conf_info.rmw_scale)) {
-            tcrmw_data.range_max_km =
+            rng_azi_data.range_max_km =
                 conf_info.rmw_scale *
                 point.mrd() * tc_km_per_nautical_miles *
                 (conf_info.n_range - 1);
         }
 
         // Re-define the range/azimuth grid
-        tcrmw_grid.clear();
-        tcrmw_grid.set_from_data(tcrmw_data);
+        rng_azi_grid.clear();
+        rng_azi_grid.set_from_data(rng_azi_data);
         grid_out.clear();
-        grid_out.set(tcrmw_data);
+        grid_out.set(rng_azi_data);
 
         // Compute lat and lon coordinate arrays
-        compute_lat_lon(tcrmw_grid, lat_arr, lon_arr);
+        compute_lat_lon(rng_azi_grid, lat_arr, lon_arr);
 
         // Write coordinate arrays
-        write_tc_data(nc_out, tcrmw_grid, i_point, lat_arr_var, lat_arr);
-        write_tc_data(nc_out, tcrmw_grid, i_point, lon_arr_var, lon_arr);
+        write_tc_data(nc_out, rng_azi_grid, i_point, lat_arr_var, lat_arr);
+        write_tc_data(nc_out, rng_azi_grid, i_point, lon_arr_var, lon_arr);
 
         // Write valid and lead times
         write_tc_valid_time(nc_out, i_point,
@@ -747,12 +747,12 @@ void process_fields(const TrackInfoArray& tracks) {
 
             // if this is "U", setup everything for matching "V" and compute the radial/tangential
             if(wind_converter.compute_winds_if_input_is_u(i_point, sname, slevel, valid_time, data_files, ftype,
-                   grid_in, grid_out, data_dp, tcrmw_grid)) {
-                write_tc_pressure_level_data(nc_out, tcrmw_grid,
+                   grid_in, grid_out, data_dp, rng_azi_grid)) {
+                write_tc_pressure_level_data(nc_out, rng_azi_grid,
                     pressure_level_indices, data_info->level_attr(), i_point,
                     data_3d_vars[conf_info.radial_velocity_field_name.string()],
                     wind_converter.get_wind_r_arr());
-                write_tc_pressure_level_data(nc_out, tcrmw_grid,
+                write_tc_pressure_level_data(nc_out, rng_azi_grid,
                     pressure_level_indices, data_info->level_attr(), i_point,
                     data_3d_vars[conf_info.tangential_velocity_field_name.string()],
                     wind_converter.get_wind_t_arr());
@@ -760,12 +760,12 @@ void process_fields(const TrackInfoArray& tracks) {
 
             // Write data
             if(has_pressure_level(variable_levels[data_info->name_attr()])) {
-                write_tc_pressure_level_data(nc_out, tcrmw_grid,
+                write_tc_pressure_level_data(nc_out, rng_azi_grid,
                     pressure_level_indices, data_info->level_attr(),
                     i_point, data_3d_vars[data_info->name_attr()], data_dp.data());
             }
             else {
-                write_tc_data_rev(nc_out, tcrmw_grid, i_point,
+                write_tc_data_rev(nc_out, rng_azi_grid, i_point,
                     data_3d_vars[data_info->name_attr()], data_dp.data());
             }
         }
