@@ -51,4 +51,65 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_RANGE_AZIMUTH">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo.nc \
+      &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo_2014101412_RH_P850.ps \
+      'name="RH"; level="(4,0,*,*)";'
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo_2014101412_RH_P850.ps</ps>
+    </output>
+  </test>
+
+  <test name="grid_stat_RANGE_AZIMUTH">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>RANGE_AZIMUTH</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo.nc \
+      &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f024.grb2 \
+      &CONFIG_DIR;/GridStatConfig_range_azimuth \
+      -outdir &OUTPUT_DIR;/tc_rmw -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V.stat</stat>
+    </output>
+  </test>
+
+  <test name="plot_point_obs_RANGE_AZIMUTH">
+    <exec>&MET_BIN;/plot_point_obs</exec>
+    <param> \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &OUTPUT_DIR;/tc_rmw/gdas1.20120409.t12z.prepbufr_RANGE_AZIMUTH.ps \
+      -plot_grid &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo.nc \
+      -config &CONFIG_DIR;/PlotPointObsConfig_range_azimuth \
+      -obs_var RH
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/tc_rmw/gdas1.20120409.t12z.prepbufr_RANGE_AZIMUTH.ps</ps>
+    </output>
+  </test>
+
+
+  <test name="point_stat_RANGE_AZIMUTH">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>RANGE_AZIMUTH</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo.nc \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_range_azimuth \
+      -obs_valid_beg 20120409_06 \
+      -obs_valid_end 20120409_18 \
+      -outdir &OUTPUT_DIR;/tc_rmw -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_rmw/point_stat_RANGE_AZIMUTH_240000L_20141014_120000V.stat</stat>
+    </output>
+  </test>
+
 </met_test>
