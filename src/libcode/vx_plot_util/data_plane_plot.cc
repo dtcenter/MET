@@ -144,20 +144,15 @@ void data_plane_plot(const ConcatString & inname, const ConcatString & outname,
 
       //
       // draw the map on top of the image and put a border around it
-      // skip for range/azimuth grids
       //
 
-   if ( !grid.info().ra ) {
+   plot.comment("start drawing map");
 
-      plot.comment("start drawing map");
+   if ( use_flate )  plot.begin_flate();
+   draw_map(grid, grid_bb, plot, map_box, conf);
+   if ( use_flate )  plot.end_flate();
 
-      if ( use_flate )  plot.begin_flate();
-      draw_map(grid, grid_bb, plot, map_box, conf);
-      if ( use_flate )  plot.end_flate();
-
-      plot.comment("end drawing map");
-
-   }
+   plot.comment("end drawing map");
 
    draw_border(plot, map_box, 2.0);
 
