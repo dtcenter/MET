@@ -440,7 +440,7 @@ a << "Nx (Azimuth): " << Azimuth_n << sep;
 a << "Ny (Range): " << Range_n << sep;
 a << "Range_max_km: " << Range_max_km << sep;
 a << "Lat_Center_Deg: " << Lat_Center_Deg << sep;
-a << "Lon_Center_Deg: " << Lon_Center_Deg << sep;
+a << "Lon_Center_Deg: " << Lon_Center_Deg;
 
 return a;
 
