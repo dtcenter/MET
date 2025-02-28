@@ -42,20 +42,23 @@ class RngAziGrid : public RotatedLatLonGrid {
 
       void calc_ijk();   //  calculate rotated basis vectors
 
-      Vector Ir, Jr, Kr;
+      Vector Ir;
+      Vector Jr;
+      Vector Kr;
 
-      int Range_n, Azimuth_n;   //  # of points in the radial and azimuthal directions
+      int Range_n;     //  # of points in the radial direction
+      int Azimuth_n;   //  # of points in the azimuthal direction
 
       double Range_max_km;
 
       double Lat_Center_Deg;
       double Lon_Center_Deg;    //  + west, - east
 
-      RngAziData Data;
+      RngAziData RAData;
 
-      void clear();
+      void clear_rng_azi();
 
-      void set_from_data(const RngAziData &);
+      void set_from_rng_azi_data(const RngAziData &);
 
          //
          //  get stuff

@@ -48,7 +48,7 @@ RngAziGrid::RngAziGrid()
 
 {
 
-clear();
+clear_rng_azi();
 
 }
 
@@ -60,7 +60,7 @@ RngAziGrid::~RngAziGrid()
 
 {
 
-clear();
+clear_rng_azi();
 
 }
 
@@ -84,9 +84,11 @@ return *this;
 ////////////////////////////////////////////////////////////////////////
 
 
-void RngAziGrid::clear()
+void RngAziGrid::clear_rng_azi()
 
 {
+
+RotatedLatLonGrid::clear();
 
 Ir.set_xyz(1.0, 0.0, 0.0);
 Jr.set_xyz(0.0, 1.0, 0.0);
@@ -111,7 +113,7 @@ void RngAziGrid::assign(const RngAziGrid & tg)
  
 {
  
-clear();
+clear_rng_azi();
 
 Ir = tg.Ir;
 Jr = tg.Jr;
@@ -137,7 +139,7 @@ RngAziGrid::RngAziGrid(const RngAziData & data)
 
 {
 
-set_from_data(data);
+set_from_rng_azi_data(data);
 
 }
 
@@ -145,14 +147,13 @@ set_from_data(data);
 ////////////////////////////////////////////////////////////////////////
 
 
-void RngAziGrid::set_from_data(const RngAziData & data)
+void RngAziGrid::set_from_rng_azi_data(const RngAziData & data)
 
 {
 
-clear();
+clear_rng_azi();
 
-
-Data = data;
+RAData = data;
 
 Range_n = data.range_n;
 
@@ -255,11 +256,10 @@ if ( is_bad_data(Lat_Center_Deg) || is_bad_data(Lon_Center_Deg) ) {
 const double rng_deg = deg_per_km*rng_km;
 const double lat_rot = 90.0 - rng_deg;
 const double lon_rot = azi_deg;
-double x, y;
 
-y = (lat_rot - RData.rot_lat_ll)/(RData.delta_rot_lat);
+double y = (lat_rot - RData.rot_lat_ll)/(RData.delta_rot_lat);
 
-x = lon_rot/(RData.delta_rot_lon);
+double x = lon_rot/(RData.delta_rot_lon);
 
 x = Nx - x; // MET #2841 switch from counterclockwise to clockwise
 
@@ -456,7 +456,7 @@ GridInfo RngAziGrid::info() const
 
 GridInfo i;
 
-i.set( Data );
+i.set( RAData );
 
 return i;
 
@@ -482,7 +482,7 @@ GridRep * RngAziGrid::copy() const
 
 {
 
-auto * p = new RngAziGrid (Data);
+auto * p = new RngAziGrid (RAData);
 
 p->Name = Name;
 

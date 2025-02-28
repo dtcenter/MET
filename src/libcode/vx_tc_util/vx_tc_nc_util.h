@@ -89,34 +89,34 @@ extern void def_tc_azi_mean_data(netCDF::NcFile*,
     const netCDF::NcDim&, const netCDF::NcDim&,
     netCDF::NcVar&, VarInfo*);
 
-extern void write_tc_init_time(netCDF::NcFile*,
+extern void write_tc_init_time(
     const netCDF::NcVar&, const netCDF::NcVar&,
     const unixtime&);
 
-extern void write_tc_valid_time(netCDF::NcFile*,
+extern void write_tc_valid_time(
     const int&,
     const netCDF::NcVar&, const netCDF::NcVar&,
     const unixtime&);
 
-extern void write_tc_lead_time(netCDF::NcFile*,
+extern void write_tc_lead_time(
     const int&,
     const netCDF::NcVar&, const netCDF::NcVar&,
     const int&);
 
-extern void write_tc_data(netCDF::NcFile*, const RngAziGrid&,
+extern void write_tc_data(const RngAziGrid&,
     const int&, const netCDF::NcVar&, const double*);
 
-extern void write_tc_data_rev(netCDF::NcFile*, const RngAziGrid&,
+extern void write_tc_data_rev(const RngAziGrid&,
     const int&, const netCDF::NcVar&, const double*);
 
-extern void write_tc_azi_mean_data(netCDF::NcFile*, const RngAziGrid&,
+extern void write_tc_azi_mean_data(const RngAziGrid&,
     const int&, const netCDF::NcVar&, const double*);
 
-extern void write_tc_pressure_level_data(netCDF::NcFile*, const RngAziGrid&,
+extern void write_tc_pressure_level_data(const RngAziGrid&,
     std::map<std::string, int>, const std::string&,
     const int&, const netCDF::NcVar&, const double*);
 
-extern void write_tc_pressure_level_data(netCDF::NcFile*, const RngAziGrid&,
+extern void write_tc_pressure_level_data(const RngAziGrid&,
     const int&, const int&, const netCDF::NcVar&, const double*);
 
 ////////////////////////////////////////////////////////////////////////

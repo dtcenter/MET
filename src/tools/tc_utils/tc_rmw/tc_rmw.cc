@@ -560,7 +560,7 @@ void setup_grid() {
             (conf_info.n_range - 1);
     }
 
-    rng_azi_grid.set_from_data(rng_azi_data);
+    rng_azi_grid.set_from_rng_azi_data(rng_azi_data);
     grid_out.set(rng_azi_data);
 }
 
@@ -673,7 +673,7 @@ void process_fields(const TrackInfoArray& tracks) {
          << track.n_points() << " points.\n";
 
     // Write the track initialization time
-    write_tc_init_time(nc_out,
+    write_tc_init_time(
         init_time_str_var, init_time_ut_var,
         track.init());
 
@@ -702,8 +702,8 @@ void process_fields(const TrackInfoArray& tracks) {
         }
 
         // Re-define the range/azimuth grid
-        rng_azi_grid.clear();
-        rng_azi_grid.set_from_data(rng_azi_data);
+        rng_azi_grid.clear_rng_azi();
+        rng_azi_grid.set_from_rng_azi_data(rng_azi_data);
         grid_out.clear();
         grid_out.set(rng_azi_data);
 
@@ -711,14 +711,14 @@ void process_fields(const TrackInfoArray& tracks) {
         compute_lat_lon(rng_azi_grid, lat_arr, lon_arr);
 
         // Write coordinate arrays
-        write_tc_data(nc_out, rng_azi_grid, i_point, lat_arr_var, lat_arr);
-        write_tc_data(nc_out, rng_azi_grid, i_point, lon_arr_var, lon_arr);
+        write_tc_data(rng_azi_grid, i_point, lat_arr_var, lat_arr);
+        write_tc_data(rng_azi_grid, i_point, lon_arr_var, lon_arr);
 
         // Write valid and lead times
-        write_tc_valid_time(nc_out, i_point,
+        write_tc_valid_time(i_point,
             valid_time_str_var, valid_time_ut_var,
             valid_time);
-        write_tc_lead_time(nc_out, i_point,
+        write_tc_lead_time(i_point,
             lead_time_str_var, lead_time_sec_var,
             point.lead());
 
@@ -748,11 +748,11 @@ void process_fields(const TrackInfoArray& tracks) {
             // if this is "U", setup everything for matching "V" and compute the radial/tangential
             if(wind_converter.compute_winds_if_input_is_u(i_point, sname, slevel, valid_time, data_files, ftype,
                    grid_in, grid_out, data_dp, rng_azi_grid)) {
-                write_tc_pressure_level_data(nc_out, rng_azi_grid,
+                write_tc_pressure_level_data(rng_azi_grid,
                     pressure_level_indices, data_info->level_attr(), i_point,
                     data_3d_vars[conf_info.radial_velocity_field_name.string()],
                     wind_converter.get_wind_r_arr());
-                write_tc_pressure_level_data(nc_out, rng_azi_grid,
+                write_tc_pressure_level_data(rng_azi_grid,
                     pressure_level_indices, data_info->level_attr(), i_point,
                     data_3d_vars[conf_info.tangential_velocity_field_name.string()],
                     wind_converter.get_wind_t_arr());
@@ -760,12 +760,12 @@ void process_fields(const TrackInfoArray& tracks) {
 
             // Write data
             if(has_pressure_level(variable_levels[data_info->name_attr()])) {
-                write_tc_pressure_level_data(nc_out, rng_azi_grid,
+                write_tc_pressure_level_data(rng_azi_grid,
                     pressure_level_indices, data_info->level_attr(),
                     i_point, data_3d_vars[data_info->name_attr()], data_dp.data());
             }
             else {
-                write_tc_data_rev(nc_out, rng_azi_grid, i_point,
+                write_tc_data_rev(rng_azi_grid, i_point,
                     data_3d_vars[data_info->name_attr()], data_dp.data());
             }
         }

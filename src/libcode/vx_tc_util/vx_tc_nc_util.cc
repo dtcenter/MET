@@ -438,7 +438,7 @@ void def_tc_lat_lon(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_init_time(NcFile* nc_out,
+void write_tc_init_time(
     const NcVar& var_str, const NcVar& var_ut,
     const unixtime& ut) {
 
@@ -458,7 +458,7 @@ void write_tc_init_time(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_valid_time(NcFile* nc_out, const int& i_point,
+void write_tc_valid_time(const int& i_point,
     const NcVar& var_str, const NcVar& var_ut,
     const unixtime& ut) {
 
@@ -488,7 +488,7 @@ void write_tc_valid_time(NcFile* nc_out, const int& i_point,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_lead_time(NcFile* nc_out, const int& i_point,
+void write_tc_lead_time(const int& i_point,
     const NcVar& var_str, const NcVar& var_sec,
     const int& sec) {
 
@@ -633,7 +633,7 @@ void def_tc_azi_mean_data(NcFile* nc_out,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_data(NcFile* nc_out, const RngAziGrid& grid,
+void write_tc_data(const RngAziGrid& grid,
     const int& i_point, const NcVar& var, const double* data) {
 
     vector<size_t> offsets;
@@ -654,7 +654,7 @@ void write_tc_data(NcFile* nc_out, const RngAziGrid& grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_data_rev(NcFile* nc_out, const RngAziGrid& grid,
+void write_tc_data_rev(const RngAziGrid& grid,
     const int& i_point, const NcVar& var, const double* data) {
 
     vector<size_t> offsets;
@@ -685,7 +685,7 @@ void write_tc_data_rev(NcFile* nc_out, const RngAziGrid& grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_azi_mean_data(NcFile* nc_out, const RngAziGrid& grid,
+void write_tc_azi_mean_data(const RngAziGrid& grid,
     const int& i_point, const NcVar& var, const double* data) {
 
     vector<size_t> offsets;
@@ -723,18 +723,18 @@ void write_tc_azi_mean_data(NcFile* nc_out, const RngAziGrid& grid,
 ////////////////////////////////////////////////////////////////////////
 
 extern void write_tc_pressure_level_data(
-    NcFile* nc_out, const RngAziGrid& grid,
+    const RngAziGrid& grid,
     map<string, int> pressure_level_indices, const string& level_str,
     const int& i_point, const NcVar& var, const double* data) {
 
-    write_tc_pressure_level_data(nc_out, grid, i_point,
+    write_tc_pressure_level_data(grid, i_point,
        pressure_level_indices[level_str], var, data);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 extern void write_tc_pressure_level_data(
-    NcFile* nc_out, const RngAziGrid& grid,
+    const RngAziGrid& grid,
     const int& i_point, const int& i_level,
     const NcVar& var, const double* data) {
 

@@ -90,7 +90,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void lambert_grid_output(const GridInfo & info, NcFile * ncfile)
+static void lambert_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
@@ -218,7 +218,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void latlon_grid_output(const GridInfo & info, NcFile * ncfile)
+static void latlon_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
@@ -295,7 +295,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void rotated_latlon_grid_output(const GridInfo & info, NcFile * ncfile)
+static void rotated_latlon_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
@@ -401,7 +401,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void stereographic_grid_output(const GridInfo & info, NcFile * ncfile)
+static void stereographic_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
@@ -520,7 +520,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void mercator_grid_output(const GridInfo & info, NcFile * ncfile)
+static void mercator_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
@@ -599,7 +599,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void gaussian_grid_output(const GridInfo & info, NcFile * ncfile)
+static void gaussian_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
@@ -647,7 +647,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void laea_grid_output(const GridInfo & info, NcFile * ncfile)
+static void laea_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
@@ -775,8 +775,8 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void range_azimuth_grid_output(const GridInfo & info, NcFile * ncfile,
-                               NcDim & range_dim, NcDim & azimuth_dim)
+static void range_azimuth_grid_output(const GridInfo &, NcFile *,
+                                      NcDim &, NcDim &)
 
 {
 
@@ -795,8 +795,8 @@ exit ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-void semilatlon_grid_output(const GridInfo & info, NcFile * ncfile,
-                            NcDim & lat_dim, NcDim & lon_dim)
+static void semilatlon_grid_output(const GridInfo & info, NcFile * ncfile,
+                                   NcDim & lat_dim, NcDim & lon_dim)
 
 {
 
