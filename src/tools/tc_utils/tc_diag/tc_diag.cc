@@ -2333,8 +2333,8 @@ void TmpFileInfo::write_nc_data(const VarInfo *vi, const DataPlane &dp_in,
    }
    // Write single level data
    else {
-      write_tc_data_rev(ra_grid,
-         0, cur_var, dp_out.data());
+      write_tc_data(ra_grid, 0,
+         cur_var, dp_out.data());
    }
 
    return;

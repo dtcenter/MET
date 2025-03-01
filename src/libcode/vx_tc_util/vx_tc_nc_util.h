@@ -106,9 +106,6 @@ extern void write_tc_lead_time(
 extern void write_tc_data(const RngAziGrid&,
     const int&, const netCDF::NcVar&, const double*);
 
-extern void write_tc_data_rev(const RngAziGrid&,
-    const int&, const netCDF::NcVar&, const double*);
-
 extern void write_tc_azi_mean_data(const RngAziGrid&,
     const int&, const netCDF::NcVar&, const double*);
 

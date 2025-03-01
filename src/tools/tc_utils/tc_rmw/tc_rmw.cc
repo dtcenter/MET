@@ -765,7 +765,7 @@ void process_fields(const TrackInfoArray& tracks) {
                     i_point, data_3d_vars[data_info->name_attr()], data_dp.data());
             }
             else {
-                write_tc_data_rev(rng_azi_grid, i_point,
+                write_tc_data(rng_azi_grid, i_point,
                     data_3d_vars[data_info->name_attr()], data_dp.data());
             }
         }

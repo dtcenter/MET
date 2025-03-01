@@ -112,7 +112,7 @@ return;
 void RngAziGrid::assign(const RngAziGrid & tg)
  
 {
- 
+
 clear_rng_azi();
 
 Ir = tg.Ir;
@@ -128,7 +128,7 @@ Lat_Center_Deg = tg.Lat_Center_Deg;
 Lon_Center_Deg = tg.Lon_Center_Deg;
 
 return;
- 
+
 }
 
 

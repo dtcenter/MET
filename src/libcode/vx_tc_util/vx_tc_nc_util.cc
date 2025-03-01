@@ -654,44 +654,12 @@ void write_tc_data(const RngAziGrid& grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_tc_data_rev(const RngAziGrid& grid,
-    const int& i_point, const NcVar& var, const double* data) {
-
-    vector<size_t> offsets;
-    vector<size_t> counts;
-    vector<double> data_rev(grid.range_n() * grid.azimuth_n());
-
-    offsets.clear();
-    offsets.emplace_back(i_point);
-    offsets.emplace_back(0);
-    offsets.emplace_back(0);
-
-    counts.clear();
-    counts.emplace_back(1);
-    counts.emplace_back(grid.range_n());
-    counts.emplace_back(grid.azimuth_n());
-
-    for(int ir = 0; ir < grid.range_n(); ir++) {
-        for(int ia = 0; ia < grid.azimuth_n(); ia++) {
-            int i = ir * grid.azimuth_n() + ia;
-            int i_rev = (grid.range_n() - ir - 1) * grid.azimuth_n() + ia;
-            data_rev[i_rev] = data[i];
-        }
-    }
-
-    var.putVar(offsets, counts, data_rev.data());
-
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void write_tc_azi_mean_data(const RngAziGrid& grid,
     const int& i_point, const NcVar& var, const double* data) {
 
     vector<size_t> offsets;
     vector<size_t> counts;
 
-    vector<double> data_rev(grid.range_n() * grid.azimuth_n());
     vector<double> data_azi_mean(grid.range_n(), 0.0);
 
     offsets.clear();
@@ -706,9 +674,7 @@ void write_tc_azi_mean_data(const RngAziGrid& grid,
         data_azi_mean[ir] = 0.;
         for(int ia = 0; ia < grid.azimuth_n(); ia++) {
             int i = ir * grid.azimuth_n() + ia;
-            int i_rev = (grid.range_n() - ir - 1) * grid.azimuth_n() + ia;
-            data_rev[i_rev] = data[i];
-            data_azi_mean[ir] += data_rev[i];
+            data_azi_mean[ir] += data[i];
         }
     }
 
@@ -740,7 +706,6 @@ extern void write_tc_pressure_level_data(
 
     vector<size_t> offsets_3d;
     vector<size_t> counts_3d;
-    vector<double> data_rev(grid.range_n() * grid.azimuth_n());
 
     offsets_3d.clear();
     offsets_3d.emplace_back(i_point);
@@ -754,16 +719,7 @@ extern void write_tc_pressure_level_data(
     counts_3d.emplace_back(grid.range_n());
     counts_3d.emplace_back(grid.azimuth_n());
 
-    for(int ir = 0; ir < grid.range_n(); ir++) {
-        for(int ia = 0; ia < grid.azimuth_n(); ia++) {
-            int i = ir * grid.azimuth_n() + ia;
-            int i_rev = (grid.range_n() - ir - 1) * grid.azimuth_n() + ia;
-            data_rev[i_rev] = data[i];
-        }
-    }
-
-    var.putVar(offsets_3d, counts_3d, data_rev.data());
-
+    var.putVar(offsets_3d, counts_3d, data);
 }
 
 ////////////////////////////////////////////////////////////////////////
