@@ -81,7 +81,7 @@ static void setup_grid();
 static void setup_nc_file();
 static void build_outfile_name(const ConcatString&,
                 const char*, ConcatString&);
-static void compute_lat_lon(RngAziGrid&, double*, double*);
+static void compute_lat_lon(vector<double> &, vector<double> &);
 static void process_fields(const TrackInfoArray&);
 
 ////////////////////////////////////////////////////////////////////////
@@ -604,7 +604,7 @@ void setup_nc_file() {
     // Define latitude and longitude arrays
     def_tc_lat_lon(nc_out,
         track_point_dim, range_dim, azimuth_dim,
-        lat_arr_var, lon_arr_var);
+        lats_var, lons_var);
 
     // Find all variable levels, long names, and units
     for(int i_var = 0; i_var < conf_info.get_n_data(); i_var++) {
@@ -636,8 +636,12 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_lat_lon(RngAziGrid& rng_azi_grid,
-    double* lat_arr, double* lon_arr) {
+void compute_lat_lon(vector<double> &lats, vector<double> &lons) {
+
+    // Set the size
+    int nxy = rng_azi_grid.range_n() * rng_azi_grid.azimuth_n();
+    lats.resize(nxy, bad_data_double);
+    lons.resize(nxy, bad_data_double);
 
     // Compute lat and lon coordinate arrays
     for(int ir = 0; ir < rng_azi_grid.range_n(); ir++) {
@@ -648,8 +652,8 @@ void compute_lat_lon(RngAziGrid& rng_azi_grid,
                 ir * rng_azi_grid.range_delta_km(),
                 ia * rng_azi_grid.azimuth_delta_deg(),
                 lat, lon);
-            lat_arr[i] =  lat;
-            lon_arr[i] = -lon; // degrees west to east
+            lats[i] =  lat;
+            lons[i] = -lon; // degrees west to east
         }
     }
 }
@@ -659,12 +663,6 @@ void compute_lat_lon(RngAziGrid& rng_azi_grid,
 void process_fields(const TrackInfoArray& tracks) {
     VarInfo *data_info = (VarInfo *) nullptr;
     DataPlane data_dp;
-
-    // Define latitude and longitude arrays
-    lat_arr = new double[
-        rng_azi_grid.range_n() * rng_azi_grid.azimuth_n()];
-    lon_arr = new double[
-        rng_azi_grid.range_n() * rng_azi_grid.azimuth_n()];
 
     // Take only first track
     TrackInfo track = tracks[0];
@@ -707,12 +705,16 @@ void process_fields(const TrackInfoArray& tracks) {
         grid_out.clear();
         grid_out.set(rng_azi_data);
 
+        // Define latitude and longitude arrays
+        vector<double> lats;
+        vector<double> lons;
+
         // Compute lat and lon coordinate arrays
-        compute_lat_lon(rng_azi_grid, lat_arr, lon_arr);
+        compute_lat_lon(lats, lons);
 
         // Write coordinate arrays
-        write_tc_data(rng_azi_grid, i_point, lat_arr_var, lat_arr);
-        write_tc_data(rng_azi_grid, i_point, lon_arr_var, lon_arr);
+        write_tc_data(rng_azi_grid, i_point, lats_var, lats.data());
+        write_tc_data(rng_azi_grid, i_point, lons_var, lons.data());
 
         // Write valid and lead times
         write_tc_valid_time(i_point,
@@ -771,8 +773,6 @@ void process_fields(const TrackInfoArray& tracks) {
         }
     } // Close loop over track points
 
-    delete[] lat_arr;
-    delete[] lon_arr;
 }
 
 ////////////////////////////////////////////////////////////////////////

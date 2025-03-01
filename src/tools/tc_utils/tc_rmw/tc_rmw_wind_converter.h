@@ -27,6 +27,7 @@
 #include "tc_rmw_conf_info.h"
 
 #include <string>
+#include <vector>
 #include <map>
 
 using std::map;
@@ -48,13 +49,13 @@ class TCRMWWindConverter {
 
  private:
 
-  void _free_winds_arrays(void);
+  void _clear_winds_arrays(void);
 
  public:
 
   // Wind arrays are created locally
-  double* _windR;
-  double* _windT;
+  std::vector<double> _windR;
+  std::vector<double> _windT;
 
   // flag when searching input data for U and V data
   bool _foundUInInput;
@@ -81,10 +82,10 @@ class TCRMWWindConverter {
   ~TCRMWWindConverter(void);
 
   // return the tangential wind array, computed and stored locally
-  inline const double *get_wind_t_arr(void) const {return _windT;}
+  inline const double *get_wind_t_arr(void) const {return _windT.data();}
 
   // return the radial wind array, computed and stored locally
-  inline const double *get_wind_r_arr(void) const {return _windR;}
+  inline const double *get_wind_r_arr(void) const {return _windR.data();}
 
   // initialize using the configuation
   void init(const TCRMWConfInfo *conf);

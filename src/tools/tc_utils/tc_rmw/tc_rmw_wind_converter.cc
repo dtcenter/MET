@@ -31,26 +31,18 @@ using namespace std;
 
 static void wind_ne_to_rt(const RngAziGrid&,
                           const DataPlane&, const DataPlane&,
-                          double*, double*);
+                          vector<double> &, vector<double> &);
 
 ////////////////////////////////////////////////////////////////////////
 
-void TCRMWWindConverter::_free_winds_arrays(void) {
-  if (_windR != nullptr) {
-    delete [] _windR;
-    _windR = nullptr;
-  }
-  if (_windT != nullptr) {
-    delete [] _windT;
-    _windT = nullptr;
-  }
+void TCRMWWindConverter::_clear_winds_arrays(void) {
+  _windR.clear();
+  _windT.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 TCRMWWindConverter::TCRMWWindConverter(void) :
-  _windR(nullptr),
-  _windT(nullptr),
   _foundUInInput(false),
   _foundVInInput(false),
   _unitsU("Unknown"),
@@ -61,7 +53,7 @@ TCRMWWindConverter::TCRMWWindConverter(void) :
 ////////////////////////////////////////////////////////////////////////
 
 TCRMWWindConverter::~TCRMWWindConverter(void) {
-  _free_winds_arrays();
+  _clear_winds_arrays();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -69,9 +61,9 @@ TCRMWWindConverter::~TCRMWWindConverter(void) {
 void TCRMWWindConverter::init(const TCRMWConfInfo *conf) {
   _conf = conf;
   _computeWinds = _conf->compute_tangential_and_radial_winds;
-  _free_winds_arrays();
-  _windR = new double[_conf->n_range*_conf->n_azimuth];
-  _windT = new double[_conf->n_range*_conf->n_azimuth];
+  _clear_winds_arrays();
+  _windR.resize(_conf->n_range*_conf->n_azimuth);
+  _windT.resize(_conf->n_range*_conf->n_azimuth);
   _foundUInInput = false;
   _foundVInInput = false;
   _unitsU = "Unknown";
@@ -213,7 +205,8 @@ bool TCRMWWindConverter::compute_winds_if_input_is_u(int i_point,
 
 void wind_ne_to_rt(const RngAziGrid& rng_azi_grid,
                    const DataPlane& u_dp, const DataPlane& v_dp,
-                   double* wind_r_arr, double* wind_t_arr) {
+                   vector<double> &wind_r_arr,
+                   vector<double> &wind_t_arr) {
 
   int n_rng = rng_azi_grid.range_n();
   int n_azi = rng_azi_grid.azimuth_n(); 
@@ -232,7 +225,7 @@ void wind_ne_to_rt(const RngAziGrid& rng_azi_grid,
       rng_azi_grid.rng_azi_to_latlon(rng_km, azi_deg, lat, lon);
 
       rng_azi_grid.wind_ne_to_rt(azi_deg, u_dp.data()[i_rev], v_dp.data()[i_rev],
-                               wind_r_arr[i_rev], wind_t_arr[i_rev]);
+                                 wind_r_arr[i_rev], wind_t_arr[i_rev]);
 
       mlog << Debug(4) << "wind_ne_to_rt() -> "
            << "center lat/lon (" << rng_azi_grid.lat_center_deg()

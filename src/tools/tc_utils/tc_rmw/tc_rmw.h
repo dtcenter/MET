@@ -107,8 +107,8 @@ static netCDF::NcVar        valid_time_str_var;
 static netCDF::NcVar        valid_time_ut_var;
 static netCDF::NcVar        lead_time_str_var;
 static netCDF::NcVar        lead_time_sec_var;
-static netCDF::NcVar        lat_arr_var;
-static netCDF::NcVar        lon_arr_var;
+static netCDF::NcVar        lats_var;
+static netCDF::NcVar        lons_var;
 static netCDF::NcVar        data_var;
 static netCDF::NcVar        wind_r_var;
 static netCDF::NcVar        wind_a_var;
@@ -139,10 +139,6 @@ static Grid       grid_in;
 static RngAziData rng_azi_data;
 static RngAziGrid rng_azi_grid;
 static Grid       grid_out;
-
-// Grid coordinate arrays
-static double* lat_arr;
-static double* lon_arr;
 
 ////////////////////////////////////////////////////////////////////////
 
