@@ -7,6 +7,7 @@
   <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
   <!ENTITY DATA_DIR       "&INPUT_DIR;/tc_data">
   <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
 <!-- Requires: None -->
@@ -79,20 +80,38 @@
     </output>
   </test>
 
+  <test name="pb2nc_GDAS_RANGE_AZIMUTH">
+    <exec>&MET_BIN;/pb2nc</exec>
+    <env>
+      <pair><name>STATION_ID</name>          <value></value></pair>
+      <pair><name>MASK_GRID</name>           <value>&DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f024.grb2</value></pair>
+      <pair><name>MASK_POLY</name>           <value></value></pair>
+      <pair><name>QUALITY_MARK_THRESH</name> <value>9</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/prepbufr/gdas/prepbufr.gdas.20141014.t12z.nr \
+      &OUTPUT_DIR;/tc_rmw/prepbufr.gdas.20141014.t12z.nc \
+      &CONFIG_DIR;/PB2NCConfig \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/tc_rmw/prepbufr.gdas.20141014.t12z.nc</point_nc>
+    </output>
+  </test>
+
   <test name="plot_point_obs_RANGE_AZIMUTH">
     <exec>&MET_BIN;/plot_point_obs</exec>
     <param> \
-      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
-      &OUTPUT_DIR;/tc_rmw/gdas1.20120409.t12z.prepbufr_RANGE_AZIMUTH.ps \
+      &OUTPUT_DIR;/tc_rmw/prepbufr.gdas.20141014.t12z.nc \
+      &OUTPUT_DIR;/tc_rmw/prepbufr.gdas.20141014.t12z_RANGE_AZIMUTH.ps \
       -plot_grid &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo.nc \
       -config &CONFIG_DIR;/PlotPointObsConfig_range_azimuth \
       -obs_var RH
     </param>
     <output>
-      <ps>&OUTPUT_DIR;/tc_rmw/gdas1.20120409.t12z.prepbufr_RANGE_AZIMUTH.ps</ps>
+      <ps>&OUTPUT_DIR;/tc_rmw/prepbufr.gdas.20141014.t12z_RANGE_AZIMUTH.ps</ps>
     </output>
   </test>
-
 
   <test name="point_stat_RANGE_AZIMUTH">
     <exec>&MET_BIN;/point_stat</exec>
@@ -101,10 +120,8 @@
     </env>
     <param> \
       &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo.nc \
-      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &OUTPUT_DIR;/tc_rmw/prepbufr.gdas.20141014.t12z.nc \
       &CONFIG_DIR;/PointStatConfig_range_azimuth \
-      -obs_valid_beg 20120409_06 \
-      -obs_valid_end 20120409_18 \
       -outdir &OUTPUT_DIR;/tc_rmw -v 3
     </param>
     <output>
