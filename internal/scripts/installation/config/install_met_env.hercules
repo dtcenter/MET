@@ -7,10 +7,10 @@ export FC=ifx
 export F77=ifx
 export F90=ifx
 
-export TEST_BASE=/apps/contrib/MET/12.0.0-beta3
+export TEST_BASE=/apps/contrib/MET/12.1.0
 export COMPILER=intel-oneapi-compilers_2022.2.1
 export MET_SUBDIR=${TEST_BASE}/
-export MET_TARBALL=v12.0.0-beta3.tar.gz
+export MET_TARBALL=v12.1.0.tar.gz
 export USE_MODULES=TRUE
 export MET_PYTHON=/work/noaa/ovp/miniconda/miniconda3/envs/metplus_v5.1_py3.10
 export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.10
