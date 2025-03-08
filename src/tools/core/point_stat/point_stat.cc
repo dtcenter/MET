@@ -840,7 +840,7 @@ void process_obs_file(int i_nc) {
 
    const int buf_size = (obs_count > BUFFER_SIZE) ? BUFFER_SIZE : obs_count;
    vector<int> obs_qty_idx_block(buf_size);
-  vector<std::array<float, OBS_ARRAY_LEN>> obs_arr_block(buf_size);
+   vector<std::array<float, OBS_ARRAY_LEN>> obs_arr_block(buf_size);
 
    // Process each observation in the file
    int block_size;
