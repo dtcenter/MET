@@ -36,9 +36,10 @@
 #include <netcdf>
 
 #include "main.h"
-#include "apply_mask.h"
-#include "ioda.h"
 #include "ioda2nc_conf_info.h"
+
+#include "apply_mask.h"
+#include "vx_ioda.h"
 #include "vx_log.h"
 #include "vx_nc_util.h"
 #include "vx_util.h"
@@ -71,7 +72,7 @@ static constexpr char program_name[] = "ioda2nc";
 // Variables for command line arguments
 //
 
-static iodaReader ioda_reader;
+static IODAReader ioda_reader;
 
 // StringArray to store IODA file name
 static StringArray ioda_files;
