@@ -6,9 +6,7 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <iostream>
 #include <unistd.h>
@@ -30,13 +28,48 @@
 using namespace std;
 using namespace netCDF;
 
-
-////////////////////////////////////////////////////////////////////////
-
-
 ////////////////////////////////////////////////////////////////////////
 
 static bool has_postfix(const std::string &, std::string const &);
+
+////////////////////////////////////////////////////////////////////////
+
+bool IODAReader::validate_metadata() const {
+   static const char *method_name = "IODAReader::validate_contents() -> ";
+   bool status = true;
+
+   // Required IODA dimensions based on the version
+   vector<string> req_dims({"nlocs"});
+   if(ioda_format == e_ioda_format::v1) {
+      req_dims.emplace_back("nvars");
+      req_dims.emplace_back("nstring");
+   }
+
+   // Check for required dimensions
+   for(auto &cur_dim : req_dims) {
+      if(!is_in_metadata_map(cur_dim, dim_names)) {
+         mlog << Warning << "\n" << method_name
+              << "required dimension \"" << cur_dim
+              << "\" is missing.\n\n";
+         status = false;	 
+      }
+   }
+
+   // Required IODA variables
+   vector<string> req_vars({"datetime", "latitude", "longitude"});
+
+   // Check required variables 
+   for(auto &cur_var : req_vars) {
+      if(!is_in_metadata_map(cur_var, metadata_vars)) {
+         mlog << Warning << "\n" << method_name
+              << "required metadata variable \"" << cur_var
+              << "\" is missing.\n\n";
+         status = false;	 
+      }
+   }
+
+   return status;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -75,7 +108,7 @@ void IODAReader::clear() {
    lat_arr.clear();
    lon_arr.clear();
    elv_arr.clear();
-   vld_arr.clear();   // valid times`
+   vld_arr.clear();   // valid times
 
    msg_types.clear();
    station_ids.clear();
@@ -95,13 +128,13 @@ e_ioda_format IODAReader::find_ioda_format(NcFile *_f_in) {
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString IODAReader::find_meta_name(const string &meta_key,
-                                        const StringArray &available_names) {
+                                        const StringArray &available_names) const {
    ConcatString metadata_name;
    static const char *method_name = "IODAReader::find_meta_name() -> ";
 
    if (available_names.has(meta_key)) metadata_name = meta_key;
    else {
-      StringArray alt_names = conf_info.metadata_map[meta_key];
+      StringArray alt_names = conf_info.metadata_map.at(meta_key);
       mlog << Debug(9) << method_name
            << "looking for " << meta_key << " from " << alt_names.n()<< " names\n";
       for (int idx =0; idx<alt_names.n(); idx++) {
@@ -116,6 +149,7 @@ ConcatString IODAReader::find_meta_name(const string &meta_key,
               << alt_names.n() <<" names)\n";
       }
    }
+
    return metadata_name;
 }
 
@@ -252,18 +286,19 @@ vector<point_pair_t> *IODAReader::get_point_pairs(
 ////////////////////////////////////////////////////////////////////////
 
 bool IODAReader::is_in_metadata_map(const string &metadata_key,
-                                    const StringArray &available_list) {
+                                    const StringArray &available_list) const {
    bool found = available_list.has(metadata_key);
 
    if (found) return found;
 
-   StringArray alt_names = conf_info.metadata_map[metadata_key];
+   StringArray alt_names = conf_info.metadata_map.at(metadata_key);
    if (alt_names.n() > 0) {
       for (int idx=0; idx<alt_names.n(); idx++) {
          found = available_list.has(alt_names[idx]);
          if (found) break;
       }
    }
+
    return found;
 }
 

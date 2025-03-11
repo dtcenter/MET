@@ -60,7 +60,7 @@ class IODAReader {
       std::vector<double> lat_arr;
       std::vector<double> lon_arr;
       std::vector<double> elv_arr;
-      std::vector<unixtime> vld_arr;   // valid times`
+      std::vector<unixtime> vld_arr;   // valid times
 
       std::vector<std::string> msg_types;
       std::vector<std::string> station_ids;
@@ -76,6 +76,7 @@ class IODAReader {
       std::vector<point_pair_t> point_pairs;
 
    public:
+      bool validate_metadata() const;
       bool check_missing_thresh(double value) const;
       void clear();
       e_ioda_format get_format_ver() const;
@@ -83,13 +84,15 @@ class IODAReader {
                                                  const char *group_name_f=nullptr,
                                                  const char *group_name_o=nullptr,
                                                  const int channel=bad_data_int);
-      bool is_in_metadata_map(const std::string &metadata_key, const StringArray &available_list);
+      bool is_in_metadata_map(const std::string &metadata_key,
+                              const StringArray &available_list) const;
       void read_ioda(netCDF::NcFile *f_in);
       void set_data_config(const char *, const char *);
 
    private:
       e_ioda_format find_ioda_format(netCDF::NcFile *_f_in);
-      ConcatString find_meta_name(const std::string &meta_key, const StringArray &available_names);
+      ConcatString find_meta_name(const std::string &meta_key,
+                                  const StringArray &available_names) const;
       bool get_meta_data_chars(netCDF::NcVar &var, char *metadata_buf) const;
       bool get_meta_data_double(const char *metadata_key, double *metadata_buf);
       void get_obs_metadata_names_v1();
