@@ -202,6 +202,7 @@ class PairStatVxOpt {
 
       // Add paired data
       bool add_mpr_line(const STATLine &);
+      bool add_ioda_pair(const point_pair_t &);
 };
 
 ////////////////////////////////////////////////////////////////////////

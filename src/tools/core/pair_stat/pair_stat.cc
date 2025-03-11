@@ -20,6 +20,7 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    11/07/24  Halley Gotway  MET #3006 New
+//   001    03/10/25  Halley Gotway  MET #3059 Add -format ioda support
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -38,6 +39,7 @@
 #include "main.h"
 #include "pair_stat.h"
 
+#include "vx_ioda.h"
 #include "vx_statistics.h"
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
@@ -117,6 +119,8 @@ int met_main(int argc, char *argv[]) {
       conf_info.vx_opt[i].vx_pd.print_obs_summary();
       conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_flag);
    }
+
+   // TODO: Add climo data to pairs?
 
    // Compute the scores and write them out
    process_scores();
@@ -421,12 +425,12 @@ static ConcatString build_outfile_name(const char *suffix) {
 
 static void process_mpr_pairs(const ConcatString &file_name,
                               PairsFormat format) {
-   LineDataFile f;
    const char *method_name = "process_mpr_pairs() -> ";
+   LineDataFile f;
 
    // Add support for -format python
    if(format == PairsFormat::Python) { 
-      mlog << Error << "\nprocess_mpr_pairs() -> "
+      mlog << Error << "\n" << method_name
            << "the \"-format python\" option is not supported yet!\n\n";
       exit(1);
    }
@@ -459,8 +463,9 @@ static void process_mpr_pairs(const ConcatString &file_name,
       n_read++;
 
       if(conf_info.add_mpr_line(line)) n_keep++;
-   }
-   
+
+   } // end while
+
    mlog << Debug(3) << "Keeping " << n_keep << " of " << n_read
         << " MPR lines from \"" << file_name << "\".\n";
  
@@ -469,13 +474,80 @@ static void process_mpr_pairs(const ConcatString &file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_ioda_pairs(const ConcatString &) {
+static void process_ioda_pairs(const ConcatString &file_name) {
+   const char *method_name = "process_ioda_pairs() -> ";
 
-   // Add support for -format ioda
-   mlog << Error << "\nprocess_ioda_pairs() -> "
-        << "the \"-format ioda\" option is not supported yet!\n\n";
-   exit(1);
+   // Set the configuration
+   IODAReader ioda_reader; 
+   ioda_reader.set_data_config(default_config_filename,
+                               config_file.c_str());
 
+   NcFile *f_in = open_ncfile(file_name.c_str());
+
+   // Check for a valid file
+   if(IS_INVALID_NC_P(f_in)) {
+      mlog << Error << "\n" << method_name
+           << "can't open input NetCDF file \"" << file_name
+           << "\" for reading.\n\n";
+      delete f_in;
+      f_in = (NcFile *) nullptr;
+      clean_up();
+      exit(1);
+   }
+
+   // Read the IODA file
+   ioda_reader.read_ioda(f_in);
+
+   // Error out for missing metadata
+   if(!ioda_reader.validate_metadata()) {
+      mlog << Error << "\n" << method_name
+           << "Required dimensions and/or metadata variables "
+           << "missing from IODA file \"" << file_name << "\".\n\n"; 
+      delete f_in;
+      f_in = (NcFile *) nullptr;
+      clean_up();
+      exit(1);
+   }
+ 
+   //
+   // Count the number read and kept
+   //
+   int n_read = 0;
+   int n_keep = 0;
+
+   //
+   // Loop over the verification tasks
+   //
+   for(auto &vx : conf_info.vx_opt) {
+
+      // Get point pairs
+      vector<point_pair_t> *pairs =
+         ioda_reader.get_point_pairs(
+            vx.vx_pd.fcst_info->name().c_str(),
+            vx.vx_pd.obs_info->name().c_str(),
+	    bad_data_int);
+
+      // Check for valid pairs
+      if(pairs) n_read += pairs->size();
+
+      mlog << Debug(4) << "Read " << n_read << " IODA pairs for "
+           << vx.vx_pd.fcst_info->name_attr() << " versus "
+           << vx.vx_pd.obs_info->name_attr() << " from \""
+           << file_name << "\".\n";
+
+      // Continue if no pairs read
+      if(n_read == 0) continue;
+
+      // Add each IODA pair 
+      for(auto &x : *pairs) {
+         if(vx.add_ioda_pair(x)) n_keep++;
+      }
+
+   }
+
+   mlog << Debug(3) << "Keeping " << n_keep << " of " << n_read
+        << " IODA pairs from \"" << file_name << "\".\n";
+ 
    return;
 }
 
