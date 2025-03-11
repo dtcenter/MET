@@ -80,9 +80,8 @@ class IODAReader {
       bool check_missing_thresh(double value) const;
       void clear();
       e_ioda_format get_format_ver() const;
-      std::vector<point_pair_t> *get_point_pairs(const char *var_name_f, const char *var_name_o,
-                                                 const char *group_name_f=nullptr,
-                                                 const char *group_name_o=nullptr,
+      std::vector<point_pair_t> *get_point_pairs(const ConcatString &fcst_name,
+                                                 const ConcatString &obs_name,
                                                  const int channel=bad_data_int);
       bool is_in_metadata_map(const std::string &metadata_key,
                               const StringArray &available_list) const;
@@ -99,8 +98,8 @@ class IODAReader {
       void get_obs_metadata_names_v2();
       void read_header();
       void read_metadata_names();
-      bool read_obs_data(double *data_buf, const char *var_name,
-                         const char *group_name, const int channel);
+      bool read_point_data(double *data_buf, const ConcatString &data_name,
+                           const int channel);
       bool read_string_data(const char *var_name,
                             std::vector<std::string> &hdr_data, int str_length);
       bool read_time();

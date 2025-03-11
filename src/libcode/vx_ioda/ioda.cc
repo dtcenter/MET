@@ -250,32 +250,38 @@ void IODAReader::get_obs_metadata_names_v2() {
 ////////////////////////////////////////////////////////////////////////
 
 vector<point_pair_t> *IODAReader::get_point_pairs(
-      const char *var_name_f, const char *var_name_o,
-      const char *group_name_f, const char *group_name_o, const int channel) {
-   ConcatString log_var_name_f = var_name_f;
-   ConcatString log_var_name_o = var_name_o;
+      const ConcatString &fcst_name,
+      const ConcatString &obs_name,
+      const int channel) {
+   static const char *method_name = "IODAReader::get_point_pairs() -> ";
    vector<double> obs_val_f(nlocs, bad_data_double);
    vector<double> obs_val_o(nlocs, bad_data_double);
+   bool status = true;
 
-   if (!read_obs_data(obs_val_f.data(), var_name_f, group_name_f, channel)) {
-      clear();
-      exit(-1);
+   // Read both inputs to print useful log messages
+   if (!read_point_data(obs_val_f.data(), fcst_name, channel)) {
+      status = false;
    }
-   if (!read_obs_data(obs_val_o.data(), var_name_o, group_name_o, channel)) {
+   if (!read_point_data(obs_val_o.data(), obs_name, channel)) {
+      status = false;
+   }
+
+   // Check for missing data
+   if(!status) {
       clear();
-      exit(-1);
+      return nullptr;
    }
 
    point_pairs.clear();
    point_pairs.resize(nlocs);
    for (int i=0; i<nlocs; i++) {
-      point_pairs[i].typ = string(msg_types[i]);
-      point_pairs[i].sid = station_ids[i];
-      point_pairs[i].lat = lat_arr[i];
-      point_pairs[i].lon = lon_arr[i];
-      point_pairs[i].ut = vld_arr[i];
-      point_pairs[i].lvl = obs_pres_arr[i];
-      point_pairs[i].elv = obs_hght_arr[i];
+      point_pairs[i].typ  = string(msg_types[i]);
+      point_pairs[i].sid  = station_ids[i];
+      point_pairs[i].lat  = lat_arr[i];
+      point_pairs[i].lon  = lon_arr[i];
+      point_pairs[i].ut   = vld_arr[i];
+      point_pairs[i].lvl  = obs_pres_arr[i];
+      point_pairs[i].elv  = obs_hght_arr[i];
       point_pairs[i].fval = obs_val_f[i];
       point_pairs[i].oval = obs_val_o[i];
    }
@@ -373,7 +379,7 @@ bool IODAReader::read_time() {
    NcVar in_hdr_vld_var = get_var(f_in, datetime_name.c_str(), metadata_group_name);
    if (IS_INVALID_NC(in_hdr_vld_var)) {
       clear();
-      mlog << Error << "\n" << method_name << "Fail to get datetime variable ("
+      mlog << Error << "\n" << method_name << "Failed to get datetime variable ("
            << datetime_name << ")\n\n";
       exit(-1);
    }
@@ -531,22 +537,41 @@ void IODAReader::read_metadata_names() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool IODAReader::read_obs_data(double *data_buf, const char *var_name,
-                               const char *group_name, const int channel) {
+bool IODAReader::read_point_data(double *data_buf,
+                                 const ConcatString &data_name,
+                                 const int channel) {
    bool status = false;
-   ConcatString log_var_name = var_name;
-   static const char *method_name = "IODAReader::read_obs_data -> ";
+   static const char *method_name = "IODAReader::read_point_data -> ";
 
-   if (group_name) {
-      log_var_name.add("(");
-      log_var_name.add(group_name);
-      log_var_name.add(")");
+   // Parse the group and variable name
+   StringArray sa = data_name.split("/");
+   string group_name;
+   string var_name;
+
+   // No slashes for classic format
+   if(sa.n() == 1) {
+      group_name.clear();
+      var_name = sa[0];
+   }
+   // Support /group_name/variable_name format
+   else if(sa.n() == 2) {
+      group_name = sa[0];
+      var_name   = sa[1];
+   }
+   else {
+      mlog << Error << "\n" << method_name
+           << "unexpected variable name \"" << data_name
+           << "\" should be reformatted as \"/group_name/variable_name\".\n\n";
+      return status;
    }
 
-   NcVar obs_var = group_name ? get_var(f_in, var_name, group_name) : get_var(f_in, var_name);
+   NcVar obs_var = (group_name.empty() ?
+                    get_var(f_in, var_name.c_str()) :
+                    get_var(f_in, var_name.c_str(), group_name.c_str()));
+
    if (IS_INVALID_NC(obs_var)) {
-      mlog << Error << "\n" << method_name 
-           << "Fail to get data for " << log_var_name << "\n\n";
+      mlog << Warning << "\n" << method_name
+           << "Failed to get data for \"" << data_name << "\".\n\n";
       return status;
    }
 
@@ -555,7 +580,7 @@ bool IODAReader::read_obs_data(double *data_buf, const char *var_name,
    if (is_eq(channel, bad_data_int)) {
       if (1 < var_dim_names.n()) {
          mlog << Error << "\n" << method_name 
-              << "Channel is not given for " << log_var_name << "\n\n";
+              << "Channel is not given for " << data_name << "\n\n";
          return status;
       }
       status = get_nc_data(&obs_var, data_buf, nlocs);
@@ -564,13 +589,13 @@ bool IODAReader::read_obs_data(double *data_buf, const char *var_name,
       if (channel >= var_dim_names.n()) {
          mlog << Error << "\n" << method_name 
               << "Channel (" << channel << ") is out of bound (" << var_dim_names.n()
-              << ") for " << log_var_name << "\n\n";
+              << ") for " << data_name << "\n\n";
          return status;
       }
       if (1 == var_dim_names.n()) {
          mlog << Debug(1) << method_name 
               << "Channel (" << channel << ") is configured to the variable "
-              << log_var_name << " which does not have the chenell dimension\n";
+              << data_name << " which does not have the chenell dimension\n";
          status = get_nc_data(&obs_var, data_buf, nlocs);
       }
       else {
@@ -594,11 +619,10 @@ bool IODAReader::read_obs_data(double *data_buf, const char *var_name,
 
    if (!status) {
       mlog << Error << "\n" << method_name
-           << "trouble getting " << log_var_name<< "\n\n";
+           << "trouble getting " << data_name<< "\n\n";
    }
 
    return status;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
