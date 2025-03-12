@@ -20,9 +20,20 @@
 #include "nc_obs_util.h"
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
+#include "vx_cal.h"
 #include "vx_log.h"
 
 using namespace std;
+
+////////////////////////////////////////////////////////////////////////
+
+static double get_ioda_mpr_val(const string &,
+                               const point_pair_t &,
+                               bool print_warning = false);
+
+static string get_ioda_mpr_str(const string &,
+                               const point_pair_t &,
+                               bool print_warning = false);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -753,7 +764,8 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
          ThreshArray ta;
          mpr_thr_inc_map[(mpr_sa[i])] = ta;
       }
-      mpr_thr_inc_map[(mpr_sa[i])].add(mpr_ta[i]); 
+      mpr_thr_inc_map[(mpr_sa[i])].add(mpr_ta[i]);
+      cout << "JHG added " << mpr_sa[i] << "\n";
    }
 
    // Conf: mpr_str_inc
@@ -763,6 +775,14 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    // Conf: mpr_str_exc
    parse_add_conf_key_values_map(&odict, conf_key_mpr_str_exc,
       &mpr_str_exc_map, method_name);
+
+   // Print warnings about unexpected IODA MPR column names
+   if(ftype == PairsFormat::IODA) {
+      point_pair_t p;
+      for(auto &m : mpr_thr_inc_map) get_ioda_mpr_val(m.first, p, true);
+      for(auto &m : mpr_str_inc_map) get_ioda_mpr_str(m.first, p, true);
+      for(auto &m : mpr_str_exc_map) get_ioda_mpr_str(m.first, p, true);
+   }
 
    // Dump the contents of the current thresholds
    if(mlog.verbosity_level() >= 5) {
@@ -1171,6 +1191,32 @@ bool PairStatVxOpt::is_keeper_mpr(const STATLine &l) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool PairStatVxOpt::is_keeper_ioda(const point_pair_t &p) const {
+
+   // Check for bad data in required spots
+   if(is_bad_data(p.lat)  || is_bad_data(p.lon) ||
+      is_bad_data(p.fval) || is_bad_data(p.oval)) return false;
+
+   // Check MPR thresholds
+   for(auto &m : mpr_thr_inc_map) {
+      if(!m.second.check_dbl(get_ioda_mpr_val(m.first, p))) return false;
+   }
+
+   // Check MPR string inclusions
+   for(auto &m : mpr_str_inc_map) {
+      if(!m.second.has(get_ioda_mpr_str(m.first, p))) return false;
+   }
+
+   // Check MPR string exclusions
+   for(auto &m : mpr_str_exc_map) {
+      if(m.second.has(get_ioda_mpr_str(m.first, p))) return false;
+   }
+ 
+   return true;
+}
+ 
+////////////////////////////////////////////////////////////////////////
+
 bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
    bool keep = false;
 
@@ -1254,8 +1300,129 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
 ////////////////////////////////////////////////////////////////////////
 
 bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
-   // TODO: Add pair data here
-   return true;
+   bool keep = false;
+
+   // Check filtering options
+   if(is_keeper_ioda(p)) {
+
+      // No climo data in IODA pairs
+      ClimoPntInfo cpi;
+
+      // Attempt to add to each masking region
+      for(int i_mask=0; i_mask<get_n_mask(); i_mask++) {
+
+         // Convert lat/lon to x/y
+         double obs_lat = p.lat;
+         double obs_lon = rescale_lon(-1.0*p.lon);
+         double obs_x;
+         double obs_y;
+         grid.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
+
+         // Check masking region
+         if(!vx_pd.is_keeper_mask(
+               "IODA pair data", 0, i_mask,
+               nint(obs_x),
+               nint(obs_y),
+               p.sid.c_str(),
+               obs_lat,
+               obs_lon)) continue;
+
+         // Add the pair:
+	 // - Convert pressure from Pa to HPa
+         if(vx_pd.pd[i_mask].add_point_pair(
+               p.typ.c_str(), p.sid.c_str(),
+               obs_lat, obs_lon,
+               bad_data_double, bad_data_double,
+               p.ut, p.lvl/100.0, p.elv, p.fval, p.oval,
+               na_str, cpi, 1.0)) {
+
+            // Using this pair for at least one masking region
+            keep = true;
+         }
+      } // end for i_mask
+   }
+
+   return keep;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Begin utility functions
+//
+////////////////////////////////////////////////////////////////////////
+
+static double get_ioda_mpr_val(const string &mpr_col,
+                               const point_pair_t &p,
+                               bool print_warning) {
+   const char *method_name = "get_ioda_mpr_val() -> ";
+   double val = bad_data_double;
+
+   // Get the numeric value
+   if(mpr_col == "OBS_LAT") {
+      val = p.lat;
+   }
+   else if(mpr_col == "OBS_LON") {
+      val = p.lon;
+   }
+   else if(mpr_col == "FCST_VALID_BEG" ||
+           mpr_col == "FCST_VALID_END" ||
+           mpr_col == "OBS_VALID_BEG"  ||
+           mpr_col == "OBS_VALID_END") {
+      val = (double) p.ut;
+   }
+   else if(mpr_col == "OBS_LEV") {
+      // Convert Pa to HPa
+      val = p.lvl/100.0;
+   }
+   else if(mpr_col == "OBS_ELV") {
+      val = p.elv;
+   }
+   else if(mpr_col == "FCST") {
+      val = p.fval;
+   }
+   else if(mpr_col == "OBS") {
+      val = p.oval;
+   }
+   else if(print_warning) {
+      mlog << Warning << "\n" << method_name
+           << "non-numeric column (" << mpr_col
+           << ") requested in the \"" << conf_key_mpr_column
+           << "\" configuration option.\n\n";
+   }
+
+   return val;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static string get_ioda_mpr_str(const string &mpr_col,
+                               const point_pair_t &p,
+                               bool print_warning) {
+   const char *method_name = "get_ioda_mpr_str() -> ";
+   string str(na_str);
+
+   // Get the string value
+   if(mpr_col == "OBTYPE") {
+      str = p.typ;
+   }
+   else if(mpr_col == "OBS_SID") {
+      str = p.sid;
+   }
+   else if(mpr_col == "FCST_VALID_BEG" ||
+           mpr_col == "FCST_VALID_END" ||
+           mpr_col == "OBS_VALID_BEG"  ||
+           mpr_col == "OBS_VALID_END") {
+      str = unix_to_yyyymmdd_hhmmss(p.ut);
+   }
+   else if(print_warning) {
+      mlog << Warning << "\n" << method_name
+           << "non-string column (" << mpr_col
+           << ") requested in the \"" << conf_key_mpr_str_inc
+           << "\" or \"" << conf_key_mpr_str_exc
+           << "\" configuration option.\n\n";
+   }
+
+   return str;
 }
 
 ////////////////////////////////////////////////////////////////////////

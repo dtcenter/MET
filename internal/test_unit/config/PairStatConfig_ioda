@@ -27,20 +27,16 @@ desc = "";
 fcst = {
   pairs = [
     {
-      name        = "/hofx/air_temperature";
-      cnt_thresh  = [ NA, >273 ];
-      mpr_str_inc = [ { key = "VX_MASK"; val = "DTC165,DTC166"; },
-                      { key = "OBTYPE";  val = "ADPSFC";        } ];
+      name          = "/hofx/air_temperature";
+      set_attr_name = "HOFX_TMP";
     }
   ];
 }
 obs = {
   pairs = [
     {
-      name        = "/ObsValue/air_temperature";
-      cnt_thresh  = [ NA, >273 ];
-      mpr_str_inc = [ { key = "VX_MASK"; val = "DTC165,DTC166"; },
-                      { key = "OBTYPE";  val = "ADPSFC";        } ];
+      name          = "/ObsValue/air_temperature";
+      set_attr_name = "OBSV_TMP";
     }
   ];
 }
@@ -67,7 +63,7 @@ wind_logic    = UNION;
 //
 mpr_column     = [];
 mpr_thresh     = [];
-mpr_str_inc    = [ { key = "VX_MASK"; val = "DTC165,DTC166"; } ];
+mpr_str_inc    = [];
 mpr_str_exc    = [];
 eclv_points    = 0.05;
 hss_ec_value   = NA;
@@ -127,7 +123,7 @@ obs_window = {
 // May be set separately in each "obs.pairs" entry
 //
 mask = {
-   grid  = [ "FULL", "DTC165", "DTC166" ];
+   grid  = [ "FULL" ];
    poly  = [];
    sid   = [];
    llpnt = [];
@@ -168,7 +164,7 @@ output_flag = {
    cts    = NONE;
    mctc   = NONE;
    mcts   = NONE;
-   cnt    = BOTH;
+   cnt    = NONE;
    sl1l2  = BOTH;
    sal1l2 = NONE;
    vl1l2  = NONE;
@@ -179,7 +175,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    eclv   = NONE;
-   mpr    = NONE;
+   mpr    = BOTH;
    seeps  = NONE;
    seeps_mpr = NONE;
 }

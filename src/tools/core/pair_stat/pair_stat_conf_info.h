@@ -199,6 +199,7 @@ class PairStatVxOpt {
 
       // Check for matches
       bool is_keeper_mpr(const STATLine &) const;
+      bool is_keeper_ioda(const point_pair_t &) const;
 
       // Add paired data
       bool add_mpr_line(const STATLine &);

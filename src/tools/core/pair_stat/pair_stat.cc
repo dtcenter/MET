@@ -586,6 +586,8 @@ static void process_scores() {
       StringArray case_cols;
       case_cols.add("VX_MASK");
 
+      // TODO: Populate output header columns for IODA inputs
+
       // Loop through the verification masking regions
       for(int i_mask=0; i_mask<vx.get_n_mask(); i_mask++) {
 

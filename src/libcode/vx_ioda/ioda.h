@@ -98,8 +98,9 @@ class IODAReader {
       void get_obs_metadata_names_v2();
       void read_header();
       void read_metadata_names();
-      bool read_point_data(double *data_buf, const ConcatString &data_name,
-                           const int channel);
+      bool read_point_data(const ConcatString &data_name,
+                           const int channel,
+                           std::vector<double> &vals);
       bool read_string_data(const char *var_name,
                             std::vector<std::string> &hdr_data, int str_length);
       bool read_time();

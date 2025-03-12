@@ -14,6 +14,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <cmath>
+#include <cfloat>
 #include <time.h>
 
 #include <netcdf>
@@ -259,14 +260,10 @@ vector<point_pair_t> *IODAReader::get_point_pairs(
    bool status = true;
 
    // Read both inputs to print useful log messages
-   if (!read_point_data(obs_val_f.data(), fcst_name, channel)) {
-      status = false;
-   }
-   if (!read_point_data(obs_val_o.data(), obs_name, channel)) {
-      status = false;
-   }
+   if (!read_point_data(fcst_name, channel, obs_val_f)) status = false;
+   if (!read_point_data(obs_name, channel, obs_val_o))  status = false;
 
-   // Check for missing data
+   // Check for bad read status
    if(!status) {
       clear();
       return nullptr;
@@ -284,7 +281,7 @@ vector<point_pair_t> *IODAReader::get_point_pairs(
       point_pairs[i].elv  = obs_hght_arr[i];
       point_pairs[i].fval = obs_val_f[i];
       point_pairs[i].oval = obs_val_o[i];
-   }
+   } 
 
    return &point_pairs;
 }
@@ -537,11 +534,11 @@ void IODAReader::read_metadata_names() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool IODAReader::read_point_data(double *data_buf,
-                                 const ConcatString &data_name,
-                                 const int channel) {
-   bool status = false;
+bool IODAReader::read_point_data(const ConcatString &data_name,
+                                 const int channel,
+                                 vector<double> &vals) {
    static const char *method_name = "IODAReader::read_point_data -> ";
+   bool status = false;
 
    // Parse the group and variable name
    StringArray sa = data_name.split("/");
@@ -583,7 +580,7 @@ bool IODAReader::read_point_data(double *data_buf,
               << "Channel is not given for " << data_name << "\n\n";
          return status;
       }
-      status = get_nc_data(&obs_var, data_buf, nlocs);
+      status = get_nc_data(&obs_var, vals.data(), nlocs);
    }
    else {
       if (channel >= var_dim_names.n()) {
@@ -596,7 +593,7 @@ bool IODAReader::read_point_data(double *data_buf,
          mlog << Debug(1) << method_name 
               << "Channel (" << channel << ") is configured to the variable "
               << data_name << " which does not have the chenell dimension\n";
-         status = get_nc_data(&obs_var, data_buf, nlocs);
+         status = get_nc_data(&obs_var, vals.data(), nlocs);
       }
       else {
          LongArray lengths;
@@ -613,13 +610,24 @@ bool IODAReader::read_point_data(double *data_buf,
             offsets.add(0);
             offsets.add(channel);
          }
-         status = get_nc_data(&obs_var, data_buf, lengths, offsets);
+         status = get_nc_data(&obs_var, vals.data(), lengths, offsets);
       }
    }
 
    if (!status) {
       mlog << Error << "\n" << method_name
            << "trouble getting " << data_name<< "\n\n";
+   }
+   // Check for IODA bad data values
+   //  Reference:
+   //    https://jointcenterforsatellitedataassimilation-jedi-docs.readthedocs-hosted.com/
+   //            en/latest/inside/conventions/objects_and_layouts.html
+   //            #storage-type-and-missing-values
+   else {
+      for(auto &x : vals) {
+         if(x < -0.95 * FLT_MAX ||
+            x >  0.95 * FLT_MAX) x = bad_data_double;
+      }
    }
 
    return status;
