@@ -9,6 +9,19 @@ from met.logger import met_base, met_base_tools, NumpyTypeEncoder
 
 ###########################################
 
+def convert_numpy_attrs(attr_dict):
+   """!convert any numpy types in attr_dict to python types
+
+   @param attr_dict dictionary of attributes to convert
+   """
+   for key, value in attr_dict.items():
+      if isinstance(value, np.generic):
+         attr_dict[key] = value.item()
+      elif isinstance(value, dict):
+         for key2, value2 in value.items():
+            if isinstance(value2, np.generic):
+               attr_dict[key][key2] = value2.item()
+
 class dataplane(met_base):
 
    KEEP_XARRAY = True
@@ -21,12 +34,12 @@ class dataplane(met_base):
        # argv[0] is the python wrapper script (caller)
        met_base.log_message(f"Module:\t{repr(argv[0])}")
        if 1 == len(argv):
-          met_base.quit_msg(f"User python command is missing")
+          met_base.quit_msg("User python command is missing")
           sys.exit(1)
 
        met_base.log_message(f"User python command:\t{repr(' '.join(argv[1:]))}")
        if not argv[1] or not argv[1].strip():
-          met_base.quit_msg(f"User python command is empty")
+          met_base.quit_msg("User python command is empty")
           sys.exit(1)
 
        # argv[1] contains the user defined python script
@@ -117,7 +130,7 @@ class dataplane(met_base):
    @staticmethod
    def read_dataplane_json_numpy(tmp_filename):
       if met_base_tools.is_debug_enabled("dataplane"):
-         met_base.log_message(f"Read from a temporary JSON file and a temporary numpy output (dataplane)")
+         met_base.log_message("Read from a temporary JSON file and a temporary numpy output (dataplane)")
 
       met_info = {}
       with open(tmp_filename) as json_fh:
@@ -135,7 +148,7 @@ class dataplane(met_base):
       import netCDF4 as nc
 
       if met_base_tools.is_debug_enabled("dataplane"):
-         met_base.log_message(f"Read from a temporary NetCDF file (dataplane)")
+         met_base.log_message("Read from a temporary NetCDF file (dataplane)")
 
       # read NetCDF file
       ds = nc.Dataset(netcdf_filename, 'r')
@@ -181,11 +194,11 @@ class dataplane(met_base):
          met_base.quit(f"{method_name} The met_data is None")
          sys.exit(1)
 
-      if hasattr(met_data, 'shape'):
-          nx, ny = met_data.shape
-      else:
+      if not hasattr(met_data, 'shape'):
          met_base.quit(f"{method_name} The met_data does not have the shape property")
          sys.exit(1)
+
+      nx, ny = met_data.shape
 
       met_fill_value = met_base.MET_FILL_VALUE
       if dataplane.is_xarray_dataarray(met_data):
@@ -223,7 +236,7 @@ class dataplane(met_base):
    @staticmethod
    def write_dataplane_json_numpy(met_in, tmp_filename):
       if met_base_tools.is_debug_enabled("dataplane"):
-         met_base.log_message(f"Save to a temporary JSON file and a temporary numpy output (dataplane)")
+         met_base.log_message("Save to a temporary JSON file and a temporary numpy output (dataplane)")
       if hasattr(met_in.met_data, 'attrs') and met_in.met_data.attrs:
          attrs = met_in.met_data.attrs
       else:
@@ -240,7 +253,7 @@ class dataplane(met_base):
       import netCDF4 as nc
 
       if met_base_tools.is_debug_enabled("dataplane"):
-         met_base.log_message(f"Save to a temporary NetCDF file (dataplane)")
+         met_base.log_message("Save to a temporary NetCDF file (dataplane)")
 
       met_info = {'met_data': met_in.met_data}
       if hasattr(met_in.met_data, 'attrs') and met_in.met_data.attrs:
@@ -278,7 +291,6 @@ class dataplane(met_base):
       ds.close()
 
 
-
 def main(argv):
    global attrs, met_data, met_info
 
@@ -301,13 +313,7 @@ def main(argv):
          fill_value = met_in.user_fill_value
 
    # convert any numpy types in attrs to python types
-   for key, value in attrs.items():
-      if isinstance(value, np.generic):
-         attrs[key] = value.item()
-      elif isinstance(value, dict):
-         for key2, value2 in value.items():
-            if isinstance(value2, np.generic):
-               attrs[key][key2] = value2.item()
+   convert_numpy_attrs(attrs)
 
    fill_value = attrs.get('fill_value', None)
    met_base.log_message('validating the dataplane array...')
