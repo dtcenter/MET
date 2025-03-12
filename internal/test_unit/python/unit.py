@@ -353,7 +353,7 @@ def repl_env(string_with_ref):
     # define logger
     logger = logging.getLogger(__name__)
 
-    envar_ref_list = re.findall('\$\{\w+}', string_with_ref)
+    envar_ref_list = re.findall(r'\$\{\w+}', string_with_ref)
     envar_ref_unique = [
         envar_ref_list[i] for i in list(range(len(envar_ref_list))) if (
             envar_ref_list[i] not in envar_ref_list[:i])]

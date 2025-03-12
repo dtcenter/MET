@@ -68,7 +68,7 @@ class DiagComputation:
             self.kwargs = {}
 
     def get_missing_result(self) -> List[float]:
-        return [np.NaN] * len(self.output_vars)
+        return [np.nan] * len(self.output_vars)
 
 
 @dataclasses.dataclass
