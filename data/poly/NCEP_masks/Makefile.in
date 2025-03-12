@@ -317,7 +317,7 @@ ncepmasks_DATA = \
 	CAR_mask.nc \
 	ECA_mask.nc \
 	GLF_mask.nc \
-	GMC_mask.nc \
+	GAC_mask.nc \
 	GRB_mask.nc \
 	HWI_mask.nc \
 	LMV_mask.nc \

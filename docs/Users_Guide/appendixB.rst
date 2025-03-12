@@ -120,9 +120,9 @@ The NCEP verification regions that are implemented in MET as lat/lon polylines a
 
 * ECA.poly for Eastern Canada
 
-* GLF.poly for the Gulf of Mexico
+* GLF.poly for the Gulf of America 
 
-* GMC.poly for the Gulf of Mexico Coast
+* GMC.poly for the Gulf of America Coast
 
 * GRB.poly for the Great Basin
 
