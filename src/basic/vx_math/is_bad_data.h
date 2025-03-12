@@ -52,8 +52,10 @@ inline int is_bad_data(char a) {
 }
 
 inline int is_eq(double a, double b, double tol) {
-   if(fabs(a - b) < tol) return 1;
-   else                  return 0;
+   if(fabs(a - b) < tol ||
+      (is_bad_data(a) &&
+       is_bad_data(b))) return 1;
+   else                 return 0;
 }
 
 inline int is_eq(double a, double b) {
