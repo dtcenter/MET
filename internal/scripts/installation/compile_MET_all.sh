@@ -87,6 +87,18 @@ function run_cmd {
   fi
 }
 
+# print command, run it, then error and but don't exit if non-zero value is returned
+function run_cmd_no_exit {
+  echo $*
+  eval "$@"
+  ret=$?
+  if [ $ret != 0 ]; then
+    echo "ERROR: Command returned with non-zero ($ret) status: $*"
+  fi
+
+  return $ret
+}
+
 if [ -z $1 ]; then
   echo
   echo "No environment configuration file provided (e.g. install_met_env.<machine_name>). Starting compilation with current environment."
@@ -190,7 +202,8 @@ if [ -z ${MET_BUFRLIB} ]; then COMPILE_BUFRLIB=1; else COMPILE_BUFRLIB=0; fi
 
 if [ -z ${MET_NETCDF} ]; then COMPILE_NETCDF=1; else COMPILE_NETCDF=0; fi
 
-if [ -z ${MET_PROJ} ]; then COMPILE_PROJ=1; else COMPILE_PROJ=0; fi
+
+if [ -z ${MET_PROJ} ] && ( [[ -z ${MET_PROJLIB} ]] && [[ -z ${MET_PROJINC} ]] ); then COMPILE_PROJ=1; else COMPILE_PROJ=0; fi
 
 if [ -z ${MET_GSL} ]; then COMPILE_GSL=1; else COMPILE_GSL=0; fi
 
@@ -489,8 +502,13 @@ if [ $COMPILE_PROJ -eq 1 ]; then
   if [[ ! -z "$TIFF_INCLUDE_DIR" ]]; then
     tiff_arg+=" -DTIFF_INCLUDE_DIR=${TIFF_INCLUDE_DIR}"
   fi
+  if [[ ! -z "$TIFF_LIB_DIR" ]]; then
+    tiff_arg+=" -DTIFF_LIBRARY=${TIFF_LIB_DIR}/libtiff.${dynamic_lib_ext}"
+  fi
 
-  cmd="cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.${dynamic_lib_ext} ${tiff_arg} .. > $(pwd)/proj.cmake.log 2>&1"
+  
+  #cmd="cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.${dynamic_lib_ext} ${tiff_arg} .. > $(pwd)/proj.cmake.log 2>&1"
+  cmd="cmake -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_CXX_FLAGS='-include cstdint' -DSQLITE3_INCLUDE_DIR=${SQLITE_INCLUDE_DIR} -DSQLITE3_LIBRARY=${SQLITE_LIB_DIR}/libsqlite3.${dynamic_lib_ext} ${tiff_arg} .. > $(pwd)/proj.cmake.log 2>&1"
   run_cmd ${cmd}
   run_cmd "cmake --build . > $(pwd)/proj.cmake_build.log 2>&1"
   run_cmd "cmake --build . --target install > $(pwd)/proj.cmake_install.log 2>&1"
@@ -589,9 +607,14 @@ if [ $COMPILE_JASPER -eq 1 ]; then
   export SOURCE_DIR=${LIB_DIR}/jasper/jasper-version-${vrs}
   echo "cd `pwd`"
   export BUILD_DIR=${LIB_DIR}/jasper/jasper-version-${vrs}/build
-  run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DJAS_ENABLE_DOC=false > $(pwd)/jasper.cmake.log 2>&1"
-  run_cmd "cd ${BUILD_DIR}"
-  run_cmd "make clean all > $(pwd)/jasper.make.log 2>&1"
+  status=0
+  run_cmd_no_exit "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DJAS_ENABLE_DOC=false > $(pwd)/jasper.cmake.log 2>&1; cd ${BUILD_DIR}; make clean all > $(pwd)/jasper.make.log 2>&1"
+  status=$?
+  if [ "$status" -ne 0 ]; then
+    run_cmd "cmake -G \"Unix Makefiles\" -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DJAS_ENABLE_DOC=false -DCMAKE_EXE_LINKER_FLAGS=\"-lglut\" > $(pwd)/jasper.cmake.log 2>&1" 
+    run_cmd "cd ${BUILD_DIR}"
+    run_cmd "make clean all > $(pwd)/jasper.make.log 2>&1" 
+  fi
   # Commented out due to “which: no opj2_compress in …” error, which causes one of four tests to fail
   # This is a known problem, so skipping tests for now: https://github.com/AAROC/CODE-RADE/issues/36#issuecomment-359744351
   #run_cmd "make ${MAKE_ARGS} test > $(pwd)/jasper.make_test.log 2>&1"

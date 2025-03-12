@@ -1,14 +1,23 @@
-module load intel-oneapi/2022.0.2
+# Unloading libsci per: https://docs.rdhpcs.noaa.gov/systems/gaea_user_guide.html
+# There is a known incompatibility with the cray-libsci module and the following intel modules:
+#   intel-classic/2022.0.2
+#   intel-oneapi/2022.0.2
+# A recommended workaround to this issue is to either module unload cray-libsci or use another intel compiler.
 
-export FC=ifx
-export F77=ifx
-export F90=ifx
-export CC=icx
-export CXX=icpx
-export TEST_BASE=/usw/met/12.0.0
-export COMPILER=intel-oneapi_2022.0.2
+module unload cray-libsci/24.07.0
+module load intel/2023.2.0
+module load cmake/3.23.1
+
+export FC=ifort
+export F77=ifort
+export F90=ifort
+export CC=icc
+export CXX=icpc
+
+export TEST_BASE=/usw/met/12.1.0
+export COMPILER=intel_2023.2.0
 export MET_SUBDIR=${TEST_BASE}
-export MET_TARBALL=v12.0.0.tar.gz
+export MET_TARBALL=v12.1.0.tar.gz
 export USE_MODULES=TRUE
 export MET_PYTHON=/gpfs/f5/esrl/proj-shared/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v5.1_py3.10/
 export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.10
