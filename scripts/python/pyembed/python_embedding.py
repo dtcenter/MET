@@ -22,18 +22,9 @@ import sys
 import json
 import math
 from importlib import util as import_util
-import numpy as np
 
-# define JSON encoder to convert numpy types to python
-# note: this also exists in python.met.logger
-# can this be imported instead of redefined?
-class NumpyTypeEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.generic):
-            return obj.item()
-        elif isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return json.JSONEncoder.default(self, obj)
+from met.logger import NumpyTypeEncoder
+
 
 class pyembed_tools():
 
