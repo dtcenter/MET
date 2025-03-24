@@ -234,8 +234,9 @@ void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(ftype, otype);
 
-   // For python types read the first field to set the grid
-   if(is_python_grdfiletype(ftype)) {
+   // For python types and range/azimuth grids, read the first field to set the grid
+   if(is_python_grdfiletype(ftype) ||
+      fcst_mtddf->grid().info().ra) {
       if(!fcst_mtddf->data_plane(*conf_info.fcst_info[0], dp)) {
          mlog << Error << "\nTrouble reading data from forecast file \""
               << fcst_file << "\"\n\n";
@@ -243,7 +244,8 @@ void process_command_line(int argc, char **argv) {
       }
    }
 
-   if(is_python_grdfiletype(otype)) {
+   if(is_python_grdfiletype(otype) ||
+      obs_mtddf->grid().info().ra) {
       if(!obs_mtddf->data_plane(*conf_info.obs_info[0], dp)) {
          mlog << Error << "\nTrouble reading data from observation file \""
               << obs_file << "\"\n\n";

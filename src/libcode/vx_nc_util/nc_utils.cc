@@ -1076,7 +1076,7 @@ ConcatString* get_string_val(NcVar *var, const int index,
 
    if (2 != get_dim_count(var)) {
       mlog << Error << "\n" << method_name << GET_NC_NAME_P(var)
-           << " is not a two dimensional variablle. start offset and count: ("
+           << " is not a two dimensional variable. start offset and count: ("
            << index << ", " << len << ").\n\n";
       exit(1);
    }

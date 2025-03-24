@@ -17,14 +17,12 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-// #include "grid_base.h"
-
 #include "st_grid.h"
 #include "lc_grid.h"
 #include "latlon_grid.h"
 #include "merc_grid.h"
 #include "gaussian_grid.h"
-#include "tcrmw_grid.h"
+#include "rng_azi_grid.h"
 #include "laea_grid.h"
 #include "semilatlon_grid.h"
 

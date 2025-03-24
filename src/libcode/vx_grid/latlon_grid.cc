@@ -259,8 +259,8 @@ Indent prefix(depth);
 
 out << prefix << "Name         = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << '\n';
 
@@ -399,7 +399,7 @@ GridRep * LatLonGrid::copy() const
 
 {
 
-LatLonGrid * p = new LatLonGrid (Data);
+auto * p = new LatLonGrid (Data);
 
 p->Name = Name;
 

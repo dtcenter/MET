@@ -4,8 +4,18 @@
 import os
 import sys
 import re
+import json
 
 import numpy as np
+
+# define JSON encoder to convert numpy types to python
+class NumpyTypeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.generic):
+            return obj.item()
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
 
 class logger():
 

@@ -57,8 +57,8 @@ class DomainInfo {
       // Domain name
       std::string domain;
 
-      // TcrmwData struct for creating a TcrmwGrid object
-      TcrmwData data;
+      // RngAziData struct for creating a RngAziGrid object
+      RngAziData data;
       double delta_range_km;
 
       // Vector of VarInfo pointers (not allocated)
