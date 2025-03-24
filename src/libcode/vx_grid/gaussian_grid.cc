@@ -342,8 +342,8 @@ Indent prefix(depth);
 
 out << prefix << "Name         = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << '\n';
 
@@ -457,7 +457,7 @@ GridRep * GaussianGrid::copy() const
 
 {
 
-GaussianGrid * p = new GaussianGrid (Data);
+auto * p = new GaussianGrid (Data);
 
 p->Name = Name;
 

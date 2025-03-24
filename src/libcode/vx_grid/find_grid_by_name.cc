@@ -63,7 +63,7 @@ if ( i.m   ) { g.set( *(i.m)   ); status = true; }
 if ( i.g   ) { g.set( *(i.g)   ); status = true; }
 if ( i.gi  ) { g.set( *(i.gi)  ); status = true; }
 if ( i.la  ) { g.set( *(i.la)  ); status = true; }
-if ( i.tc  ) { g.set( *(i.tc)  ); status = true; }
+if ( i.ra  ) { g.set( *(i.ra)  ); status = true; }
 if ( i.sl  ) { g.set( *(i.sl)  ); status = true; }
 #ifdef WITH_UGRID
 if ( i.us  ) { g.set( *(i.us)  ); status = true; }
@@ -86,7 +86,7 @@ int j;
 i.clear();
 
    //
-   //  try dtc lambert grids
+   //  try DTC lambert grids
    //
 
 for (j=0; j<n_dtc_lambert_grids; ++j)  {

@@ -518,13 +518,13 @@ Indent prefix(depth);
 
 out << prefix << "Name         = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << prefix << "SpheroidName = ";
 
-if ( SpheroidName.length() > 0 )  out << '\"' << SpheroidName << '\"';
-else                              out << "(nul)\n";
+if ( !SpheroidName.empty() )  out << '\"' << SpheroidName << '\"';
+else                          out << "(nul)\n";
 
 out << '\n';   //  no prefix
 
@@ -631,9 +631,7 @@ GridRep * LaeaGrid::copy() const
 
 {
 
-LaeaGrid * p = nullptr;
-
-p = new LaeaGrid (Data);
+auto * p = new LaeaGrid (Data);
 
 return p;
 

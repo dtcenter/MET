@@ -25,6 +25,7 @@
 
 #include "is_netcdf_file.h"
 
+#include "met_file.h"
 #include "vx_nc_util.h"
 
 using namespace std;
@@ -131,7 +132,8 @@ bool is_ncmet_file(const char * filename)
 
       if (!IS_INVALID_NC_P(nc_file)) {
          status = (get_global_att(nc_file, ncmet_att_version,    att_val) ||
-                   get_global_att(nc_file, ncmet_att_projection, att_val));
+                   get_global_att(nc_file, ncmet_att_projection, att_val) ||
+                   is_ncmet_range_azimuth_file(nc_file));
       }
 
       delete nc_file;
