@@ -10,8 +10,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#ifndef  __VX_MET_TCRMW_GRID_H__
-#define  __VX_MET_TCRMW_GRID_H__
+#ifndef  __RNG_AZI_GRID_H__
+#define  __RNG_AZI_GRID_H__
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -25,38 +25,40 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-class TcrmwGrid : public RotatedLatLonGrid {
+class RngAziGrid : public RotatedLatLonGrid {
+
+      friend class Grid;
 
    private:
 
-      void init_from_scratch();
+      void assign(const RngAziGrid &);
 
-      void assign(const TcrmwGrid &);
+   public:
+
+      RngAziGrid();
+     ~RngAziGrid();
+      RngAziGrid(const RngAziData &);
+      RngAziGrid & operator=(const RngAziGrid &);
 
       void calc_ijk();   //  calculate rotated basis vectors
 
-      TcrmwData TData;
+      Vector Ir;
+      Vector Jr;
+      Vector Kr;
 
-      Vector Ir, Jr, Kr;
-
-      int Range_n, Azimuth_n;   //  # of points in the radial and azimuthal directions
+      int Range_n;     //  # of points in the radial direction
+      int Azimuth_n;   //  # of points in the azimuthal direction
 
       double Range_max_km;
 
       double Lat_Center_Deg;
       double Lon_Center_Deg;    //  + west, - east
 
-   public:
+      RngAziData RAData;
 
-      TcrmwGrid();
-      virtual ~TcrmwGrid();
-      TcrmwGrid(const TcrmwGrid &);
-      TcrmwGrid(const TcrmwData &);
-      TcrmwGrid & operator=(const TcrmwGrid &);
+      void clear_rng_azi();
 
-      void clear();
-
-      void set_from_data(const TcrmwData &);
+      void set_from_rng_azi_data(const RngAziData &);
 
          //
          //  get stuff
@@ -77,9 +79,9 @@ class TcrmwGrid : public RotatedLatLonGrid {
          //  do stuff
          //
 
-      void range_azi_to_latlon(const double range_km, const double azi_deg, double & lat, double & lon) const;
+      void rng_azi_to_latlon(const double rng_km, const double azi_deg, double & lat, double & lon) const;
 
-      void latlon_to_range_azi(const double lat, const double lon, double & range_km, double & azi_deg) const;
+      void latlon_to_rng_azi(const double lat, const double lon, double & rng_km, double & azi_deg) const;
 
 
       void latlon_to_xy(double true_lat, double true_lon, double & x, double & y) const;
@@ -94,6 +96,15 @@ class TcrmwGrid : public RotatedLatLonGrid {
                          const double u_wind, const double v_wind, 
                          double & radial_wind, double & tangential_wind) const;
 
+      void dump(std::ostream &, int = 0) const;
+
+      ConcatString serialize(const char *sep=" ") const;
+
+      GridInfo info() const;
+
+      bool wrap_lon() const;
+
+      GridRep * copy() const;
 
 };
 
@@ -101,23 +112,23 @@ class TcrmwGrid : public RotatedLatLonGrid {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int TcrmwGrid::range_n  () const { return Range_n; }
-inline int TcrmwGrid::azimuth_n () const { return Azimuth_n; }
+inline int RngAziGrid::range_n  () const { return Range_n; }
+inline int RngAziGrid::azimuth_n () const { return Azimuth_n; }
 
-inline double TcrmwGrid::range_max_km () const { return Range_max_km; }
+inline double RngAziGrid::range_max_km () const { return Range_max_km; }
 
-inline double TcrmwGrid::range_delta_km () const { return Range_max_km/(Range_n - 1); }
+inline double RngAziGrid::range_delta_km () const { return Range_max_km/(Range_n - 1); }
 
-inline double TcrmwGrid::azimuth_delta_deg () const { return 360.0/Azimuth_n; }
+inline double RngAziGrid::azimuth_delta_deg () const { return 360.0/Azimuth_n; }
 
-inline double TcrmwGrid::lat_center_deg () const { return Lat_Center_Deg; }
-inline double TcrmwGrid::lon_center_deg () const { return Lon_Center_Deg; }
+inline double RngAziGrid::lat_center_deg () const { return Lat_Center_Deg; }
+inline double RngAziGrid::lon_center_deg () const { return Lon_Center_Deg; }
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-#endif   /*  __VX_MET_TCRMW_GRID_H__  */
+#endif   /*  __RNG_AZI_GRID_H__  */
 
 
 ////////////////////////////////////////////////////////////////////////

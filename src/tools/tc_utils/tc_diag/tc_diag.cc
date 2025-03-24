@@ -114,7 +114,7 @@ static void write_tc_times(NcFile *, const NcDim &,
                            const TrackInfo *,
                            const TrackPoint *);
 
-static void compute_lat_lon(TcrmwGrid&, double *, double *);
+static void compute_lat_lon(RngAziGrid&, double *, double *);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -825,7 +825,7 @@ void write_tc_times(NcFile *nc_out, const NcDim &vld_dim,
 
    // Define and write the track initialization time
    def_tc_init_time(nc_out, init_str_var, init_ut_var);
-   write_tc_init_time(nc_out, init_str_var, init_ut_var,
+   write_tc_init_time(init_str_var, init_ut_var,
                       trk_ptr->init());
 
    // Define valid and lead times
@@ -834,17 +834,17 @@ void write_tc_times(NcFile *nc_out, const NcDim &vld_dim,
 
    // Write valid and lead times for a single point
    if(pnt_ptr) {
-      write_tc_valid_time(nc_out, 0, vld_str_var, vld_ut_var,
+      write_tc_valid_time(0, vld_str_var, vld_ut_var,
                           pnt_ptr->valid());
-      write_tc_lead_time(nc_out, 0, lead_str_var, lead_sec_var,
+      write_tc_lead_time(0, lead_str_var, lead_sec_var,
                          pnt_ptr->lead());
    }
    // Write valid and lead times for all track points
    else {
       for(int i_pnt=0; i_pnt<trk_ptr->n_points(); i_pnt++) {
-         write_tc_valid_time(nc_out, i_pnt, vld_str_var, vld_ut_var,
+         write_tc_valid_time(i_pnt, vld_str_var, vld_ut_var,
                              (*trk_ptr)[i_pnt].valid());
-         write_tc_lead_time(nc_out, i_pnt, lead_str_var, lead_sec_var,
+         write_tc_lead_time(i_pnt, lead_str_var, lead_sec_var,
                             (*trk_ptr)[i_pnt].lead());
       }
    }
@@ -854,7 +854,7 @@ void write_tc_times(NcFile *nc_out, const NcDim &vld_dim,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_lat_lon(TcrmwGrid& grid,
+void compute_lat_lon(RngAziGrid& grid,
                      double *lat_arr, double *lon_arr) {
 
    // Compute lat and lon coordinate arrays
@@ -862,7 +862,7 @@ void compute_lat_lon(TcrmwGrid& grid,
       for(int ia=0; ia<grid.azimuth_n(); ia++) {
          double lat, lon;
          int i = ir * grid.azimuth_n() + ia;
-         grid.range_azi_to_latlon(
+         grid.rng_azi_to_latlon(
             ir * grid.range_delta_km(),
             ia * grid.azimuth_delta_deg(),
             lat, lon);
@@ -2155,7 +2155,7 @@ void TmpFileInfo::clear() {
    pressure_levels.clear();
 
    grid_out.clear();
-   ra_grid.clear();
+   ra_grid.clear_rng_azi();
 
    domain.clear();
 
@@ -2190,7 +2190,7 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    write_netcdf_global(tmp_out, tmp_file.c_str(), program_name);
 
    // Define latitude and longitude arrays
-   TcrmwData d = di.data;
+   RngAziData d = di.data;
    int nra = d.range_n * d.azimuth_n;
    vector<double> lat_arr(nra);
    vector<double> lon_arr(nra);
@@ -2204,7 +2204,7 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
 
    // Instantiate the grid
    grid_out.set(d);
-   ra_grid.set_from_data(d);
+   ra_grid.set_from_rng_azi_data(d);
 
    mlog << Debug(3)
         << "Defining cylindrical coordinates for (Lat, Lon) = ("
@@ -2259,8 +2259,8 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    compute_lat_lon(ra_grid, lat_arr.data(), lon_arr.data());
 
    // Write coordinate arrays
-   write_tc_data(tmp_out, ra_grid, 0, lat_var, lat_arr.data());
-   write_tc_data(tmp_out, ra_grid, 0, lon_var, lon_arr.data());
+   write_tc_data(ra_grid, 0, lat_var, lat_arr.data());
+   write_tc_data(ra_grid, 0, lon_var, lon_arr.data());
 
    // Write track point values
    write_tc_track_point(tmp_out, vld_dim, *pnt_ptr);
@@ -2328,13 +2328,13 @@ void TmpFileInfo::write_nc_data(const VarInfo *vi, const DataPlane &dp_in,
          if(is_eq(vi->level().lower(), *it)) break;
       }
 
-      write_tc_pressure_level_data(tmp_out, ra_grid,
+      write_tc_pressure_level_data(ra_grid,
          0, i_level, cur_var, dp_out.data());
    }
    // Write single level data
    else {
-      write_tc_data_rev(tmp_out, ra_grid,
-         0, cur_var, dp_out.data());
+      write_tc_data(ra_grid, 0,
+         cur_var, dp_out.data());
    }
 
    return;

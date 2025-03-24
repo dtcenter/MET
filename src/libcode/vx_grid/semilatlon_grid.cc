@@ -326,8 +326,8 @@ Indent prefix(depth);
 
 out << prefix << "Name   = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << '\n';
 
@@ -455,7 +455,7 @@ GridRep * SemiLatLonGrid::copy() const
 
 {
 
-SemiLatLonGrid * p = new SemiLatLonGrid (Data);
+auto * p = new SemiLatLonGrid (Data);
 
 p->Name = Name;
 

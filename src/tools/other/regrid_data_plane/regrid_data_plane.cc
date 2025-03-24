@@ -264,8 +264,9 @@ void process_data_file() {
       exit(1);
    }
 
-   // For python types read the first field to set the grid
-   if(is_python_grdfiletype(ftype)) {
+   // For python types and range/azimuth grids, read the first field to set the grid
+   if(is_python_grdfiletype(ftype) ||
+      fr_mtddf->grid().info().ra) {
       config.read_string(FieldSA[0].c_str());
       vinfo->set_dict(config);
       if(!fr_mtddf->data_plane(*vinfo, fr_dp)) {

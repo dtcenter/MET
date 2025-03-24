@@ -51,6 +51,9 @@ class MetNcMetDataFile : public Met2dDataFile {
          //  set stuff
          //
 
+      void set_range_azimuth_grid_center(int);
+      void set_range_azimuth_times(int, DataPlane &);
+
          //
          //  get stuff
          //

@@ -144,7 +144,7 @@ class TmpFileInfo {
 
       // Range azimuth grid
       Grid      grid_out;
-      TcrmwGrid ra_grid;
+      RngAziGrid ra_grid;
 
       // Domain name
       std::string domain;

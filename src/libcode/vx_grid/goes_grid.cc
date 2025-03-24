@@ -224,8 +224,8 @@ Indent prefix(depth);
 
 out << prefix << "Name       = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << '\n';
 
@@ -341,7 +341,7 @@ GridRep * GoesImagerGrid::copy() const
 
 {
 
-GoesImagerGrid * p = new GoesImagerGrid (Data);
+auto * p = new GoesImagerGrid (Data);
 
 p->Name = Name;
 
