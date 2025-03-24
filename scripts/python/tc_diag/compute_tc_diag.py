@@ -118,8 +118,9 @@ def main():
         results = post_resample_driver.diag_calcs(
                       config, data_filename, suppress_exceptions=True,
                       land_lut_override=land_filename)
-    except:
+    except Exception as err:
         print("Error computing diagnostics with command (", ' '.join(sys.argv), ")", sep="")
+        print(err)
         sys.exit(1)
 
     # Process storm data diagnostics in the expected order

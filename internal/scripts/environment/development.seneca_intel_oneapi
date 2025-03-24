@@ -38,10 +38,10 @@ export JASPER=${MET_DST}
 #export MET_HDFEOS=${MET_DST}
 
 # For Python 3 in MET 12.0,0
-export MET_PYTHON=/nrit/ral/met-python3
-export MET_PYTHON_BIN_EXE=${MET_PYTHON}/bin/python3.10
-export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.10"
-export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.10 -lcrypt -lpthread -ldl -lutil -lm"
+export MET_PYTHON=/nrit/ral/met-python3.12
+export MET_PYTHON_BIN_EXE=${MET_PYTHON}/bin/python3.12
+export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.12"
+export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.12 -lcrypt -lpthread -ldl -lutil -lm"
 
 # -D__64BIT__ is required because we've compiled libgrib2c.a with that flag
 export CFLAGS="-O2"
