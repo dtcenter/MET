@@ -49,6 +49,7 @@ struct point_pair_t : station_value_base_t {
 
    void clear();
 
+   int lead;
    double fval;
    double oval;
 };

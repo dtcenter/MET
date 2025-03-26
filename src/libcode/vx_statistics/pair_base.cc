@@ -55,6 +55,7 @@ void station_value_base_t::clear_base() {
 
 void point_pair_t::clear() {
    station_value_base_t::clear_base();
+   lead = bad_data_int;
    fval = oval= bad_data_double;
 }
 
