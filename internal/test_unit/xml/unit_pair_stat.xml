@@ -46,7 +46,6 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/pair_stat/pair_stat_format_ioda.stat</stat>
-      <stat>&OUTPUT_DIR;/pair_stat/pair_stat_format_ioda_cnt.txt</stat>
       <stat>&OUTPUT_DIR;/pair_stat/pair_stat_format_ioda_sl1l2.txt</stat>
     </output>
   </test>
