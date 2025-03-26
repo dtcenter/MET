@@ -57,6 +57,8 @@ class IODAReader {
       ConcatString msg_type_name;
       ConcatString station_id_name;
 
+      unixtime ref_time_ut;
+
       std::vector<double> lat_arr;
       std::vector<double> lon_arr;
       std::vector<double> elv_arr;

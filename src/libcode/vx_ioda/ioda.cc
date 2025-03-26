@@ -98,13 +98,14 @@ void IODAReader::clear() {
    metadata_vars.clear();
    obs_value_vars.clear();
 
-
    nlocs_name.clear();
    datetime_name.clear();
    lon_name.clear();
    lat_name.clear();
    msg_type_name.clear();
    station_id_name.clear();
+
+   ref_time_ut = 0;
 
    lat_arr.clear();
    lon_arr.clear();
@@ -281,6 +282,9 @@ vector<point_pair_t> *IODAReader::get_point_pairs(
       point_pairs[i].elv  = obs_hght_arr[i];
       point_pairs[i].fval = obs_val_f[i];
       point_pairs[i].oval = obs_val_o[i];
+      if(!is_bad_data(vld_arr[i]) && ref_time_ut != 0) {
+         point_pairs[i].lead = vld_arr[i] - ref_time_ut;
+      }
    } 
 
    return &point_pairs;
@@ -372,6 +376,18 @@ bool IODAReader::read_time() {
    bool error_out = true;
    static const char *method_name = "IODAReader::read_time() -> ";
    static const char *method_name_s = "IODAReader::read_time() ";
+
+   // Parse global reference time attribute, if present
+   ConcatString ref_time_str;
+   if(get_att_value_string(f_in, "datetimeReference", ref_time_str)) {
+      parse_time_string(ref_time_str.c_str(), ref_time_ut);
+      mlog << Debug(3) << method_name << "parsed reference time as \""
+           << unix_to_yyyymmdd_hhmmss(ref_time_ut) << "\".\n";
+   }
+   else {
+      ref_time_ut = 0;
+      mlog << Debug(5) << method_name << "no reference time defined.\n";
+   }
 
    NcVar in_hdr_vld_var = get_var(f_in, datetime_name.c_str(), metadata_group_name);
    if (IS_INVALID_NC(in_hdr_vld_var)) {
