@@ -65,7 +65,7 @@ void StatHdrInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Keep track the unique STAT header entries for each line.
+// Keep track the unique STAT header entries for each input STAT line.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -118,6 +118,39 @@ void StatHdrInfo::add(const STATLine &line) {
    if(!cov_thresh.has(cs)) cov_thresh.add(cs);
    if(!alpha.has(line.alpha()))
       alpha.add(line.alpha());
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Keep track the unique STAT header entries for each pair.
+//
+////////////////////////////////////////////////////////////////////////
+
+void StatHdrInfo::add(
+   const int &lead_sec, const unixtime &valid_ut,
+   const string &fcst_var_str, const string &obs_var_str,
+   const string &obtype_str) {
+
+   if(!fcst_lead.has(lead_sec))
+      fcst_lead.add(lead_sec);
+   if(fcst_valid_beg == (unixtime) 0 || valid_ut < fcst_valid_beg)
+      fcst_valid_beg = valid_ut;
+   if(fcst_valid_end == (unixtime) 0 || valid_ut > fcst_valid_end)
+      fcst_valid_end = valid_ut;
+   if(!obs_lead.has(lead_sec))
+      obs_lead.add(lead_sec);
+   if(obs_valid_beg == (unixtime) 0 || valid_ut < obs_valid_beg)
+      obs_valid_beg = valid_ut;
+   if(obs_valid_end == (unixtime) 0 || valid_ut > obs_valid_end)
+      obs_valid_end = valid_ut;
+   if(!fcst_var.has(fcst_var_str))
+      fcst_var.add(fcst_var_str);
+   if(!obs_var.has(obs_var_str))
+      obs_var.add(obs_var_str);
+   if(!obtype.has(obtype_str))
+      obtype.add(obtype_str);
 
    return;
 }
