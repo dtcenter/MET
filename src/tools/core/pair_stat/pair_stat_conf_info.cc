@@ -1271,10 +1271,9 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
          if(vx_pd.pd[i_mask].add_point_pair(
                l.obtype(),
                l.get_item("OBS_SID"),
-               obs_lat,
-               obs_lon,
-               bad_data_double,
-               bad_data_double,
+               obs_lat, obs_lon,
+               bad_data_double, bad_data_double,
+               timestring_to_sec(l.get_item("FCST_LEAD")),
                timestring_to_unix(l.get_item("OBS_VALID_BEG")),
 	       atof(l.get_item("OBS_LVL")),
                atof(l.get_item("OBS_ELV")),
@@ -1328,18 +1327,19 @@ bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
 
          // Add the pair:
 	 // - Convert pressure from Pa to HPa
+         double obs_lvl = (is_bad_data(p.lvl) ? bad_data_double : p.lvl/100.0);
          if(vx_pd.pd[i_mask].add_point_pair(
                p.typ.c_str(), p.sid.c_str(),
                obs_lat, obs_lon,
                bad_data_double, bad_data_double,
-               p.ut, p.lvl/100.0, p.elv, p.fval, p.oval,
-               na_str, cpi, 1.0)) {
+               p.lead, p.ut, obs_lvl, p.elv,
+               p.fval, p.oval, na_str, cpi, 1.0)) {
 
             // Using this pair for at least one masking region
             keep = true;
 
             // Track the unique headers
-            vx_hdr[i_mask].add(0, p.ut,
+            vx_hdr[i_mask].add(p.lead, p.ut,
                vx_pd.fcst_info->name_attr(),
                vx_pd.obs_info->name_attr(),
                p.typ);
