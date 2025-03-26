@@ -347,10 +347,14 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    StatHdrColumns shc;
 
    // MODEL
-   shc.set_model(get_col_css(cur_case, "MODEL", model, false).c_str());
+   if(!hdr_cols.has("MODEL")) {
+      shc.set_model(get_col_css(cur_case, "MODEL", model, false).c_str());
+   }
 
    // DESC
-   shc.set_desc(get_col_css(cur_case, "DESC", desc, false).c_str());
+   if(!hdr_cols.has("DESC")) {
+      shc.set_desc(get_col_css(cur_case, "DESC", desc, false).c_str());
+   }
 
    // FCST_LEAD
    css = write_css_hhmmss(fcst_lead);
@@ -381,74 +385,102 @@ StatHdrColumns StatHdrInfo::get_shc(const ConcatString &cur_case,
    shc.set_obs_valid_end(obs_valid_end);
 
    // FCST_VAR
-   shc.set_fcst_var(get_col_css(cur_case, "FCST_VAR", fcst_var, false));
+   if(!hdr_cols.has("FCST_VAR")) {
+      shc.set_fcst_var(get_col_css(cur_case, "FCST_VAR", fcst_var, false));
+   }
 
    // FCST_UNITS
-   shc.set_fcst_units(get_col_css(cur_case, "FCST_UNITS", fcst_units, false));
+   if(!hdr_cols.has("FCST_UNITS")) {
+      shc.set_fcst_units(get_col_css(cur_case, "FCST_UNITS", fcst_units, false));
+   }
 
    // FCST_LEV
-   shc.set_fcst_lev(get_col_css(cur_case, "FCST_LEV", fcst_lev, false).c_str());
+   if(!hdr_cols.has("FCST_LEV")) {
+      shc.set_fcst_lev(get_col_css(cur_case, "FCST_LEV", fcst_lev, false).c_str());
+   }
 
    // OBS_VAR
-   shc.set_obs_var(get_col_css(cur_case, "OBS_VAR", obs_var, false));
+   if(!hdr_cols.has("OBS_VAR")) {
+      shc.set_obs_var(get_col_css(cur_case, "OBS_VAR", obs_var, false));
+   }
 
    // OBS_UNITS
-   shc.set_obs_units(get_col_css(cur_case, "OBS_UNITS", obs_units, false));
+   if(!hdr_cols.has("OBS_UNITS")) {
+      shc.set_obs_units(get_col_css(cur_case, "OBS_UNITS", obs_units, false));
+   }
 
    // OBS_LEV
-   shc.set_obs_lev(get_col_css(cur_case, "OBS_LEV", obs_lev, false).c_str());
+   if(!hdr_cols.has("OBS_LEV")) {
+      shc.set_obs_lev(get_col_css(cur_case, "OBS_LEV", obs_lev, false).c_str());
+   }
 
    // OBTYPE
-   shc.set_obtype(get_col_css(cur_case, "OBTYPE", obtype, false).c_str());
+   if(!hdr_cols.has("OBTYPE")) {
+      shc.set_obtype(get_col_css(cur_case, "OBTYPE", obtype, false).c_str());
+   }
 
    // VX_MASK
-   shc.set_mask(get_col_css(cur_case, "VX_MASK", vx_mask, false).c_str());
+   if(!hdr_cols.has("VX_MASK")) {
+      shc.set_mask(get_col_css(cur_case, "VX_MASK", vx_mask, false).c_str());
+   }
 
    // INTERP_MTHD
-   shc.set_interp_mthd(get_col_css(cur_case, "INTERP_MTHD", interp_mthd, true));
+   if(!hdr_cols.has("INTERP_MTHD")) {
+      shc.set_interp_mthd(get_col_css(cur_case, "INTERP_MTHD", interp_mthd, true));
+   }
 
    // INTERP_PNTS
-   css = write_css(interp_pnts);
-   if(interp_pnts.n() == 0 || interp_pnts.n() > 1) {
-      mlog << Warning
-           << "For case \"" << cur_case << "\", found "
-           << interp_pnts.n()
-           << " unique INTERP_PNTS values: " << css << ".\n";
-      wdth = bad_data_int;
+   if(!hdr_cols.has("INTERP_PNTS")) {
+      css = write_css(interp_pnts);
+      if(interp_pnts.n() == 0 || interp_pnts.n() > 1) {
+         mlog << Warning
+              << "For case \"" << cur_case << "\", found "
+              << interp_pnts.n()
+              << " unique INTERP_PNTS values: " << css << ".\n";
+         wdth = bad_data_int;
+      }
+      else {
+         wdth = nint(sqrt(interp_pnts[0]));
+      }
+      shc.set_interp_wdth(wdth);
    }
-   else {
-      wdth = nint(sqrt(interp_pnts[0]));
-   }
-   shc.set_interp_wdth(wdth);
 
    // FCST_THRESH
-   ta.clear();
-   ta.add_css(get_col_css(cur_case, "FCST_THRESH", fcst_thresh, true).c_str());
-   shc.set_fcst_thresh(ta);
+   if(!hdr_cols.has("FCST_THRESH")) {
+      ta.clear();
+      ta.add_css(get_col_css(cur_case, "FCST_THRESH", fcst_thresh, true).c_str());
+      shc.set_fcst_thresh(ta);
+   }
 
    // OBS_THRESH
-   ta.clear();
-   ta.add_css(get_col_css(cur_case, "OBS_THRESH", obs_thresh, true).c_str());
-   shc.set_obs_thresh(ta);
+   if(!hdr_cols.has("OBS_THRESH")) {
+      ta.clear();
+      ta.add_css(get_col_css(cur_case, "OBS_THRESH", obs_thresh, true).c_str());
+      shc.set_obs_thresh(ta);
+   }
 
    // COV_THRESH
-   ta.clear();
-   ta.add_css(get_col_css(cur_case, "COV_THRESH", cov_thresh, true).c_str());
-   shc.set_cov_thresh(ta);
+   if(!hdr_cols.has("COV_THRESH")) {
+      ta.clear();
+      ta.add_css(get_col_css(cur_case, "COV_THRESH", cov_thresh, true).c_str());
+      shc.set_cov_thresh(ta);
+   }
 
    // ALPHA
-   css = write_css(alpha);
-   if(alpha.n() == 0 || alpha.n() > 1) {
-      mlog << Warning
-           << "For case \"" << cur_case << "\", found "
-           << alpha.n()
-           << " unique ALPHA values: " << css << ".\n";
-      out_alpha = bad_data_double;
+   if(!hdr_cols.has("ALPHA")) {
+      css = write_css(alpha);
+      if(alpha.n() == 0 || alpha.n() > 1) {
+         mlog << Warning
+              << "For case \"" << cur_case << "\", found "
+              << alpha.n()
+              << " unique ALPHA values: " << css << ".\n";
+         out_alpha = bad_data_double;
+      }
+      else {
+         out_alpha = alpha[0];
+      }
+      shc.set_alpha(out_alpha);
    }
-   else {
-      out_alpha = alpha[0];
-   }
-   shc.set_alpha(out_alpha);
 
    // LINE_TYPE
    shc.set_line_type(statlinetype_to_string(lt));

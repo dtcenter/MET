@@ -70,6 +70,8 @@ static ConcatString build_outfile_name(const char *);
 static void process_mpr_pairs(const ConcatString &, PairsFormat);
 static void process_ioda_pairs(const ConcatString &);
 static void process_scores();
+static void store_hdr_col_val(const string &, const string &,
+                              StringArray &, StringArray &);
 
 static void do_cts       (vector<CTSInfo> &, int, const PairDataPoint *);
 static void do_mcts      (MCTSInfo   &, int, const PairDataPoint *);
@@ -575,23 +577,33 @@ static void process_scores() {
    cts_info.resize(n_cat);
    vl1l2_info.resize(n_wind);
 
+   // Output header columns
+   StringArray hdr_cols;
+   StringArray hdr_vals;
+
+   // Update header columns
+   store_hdr_col_val("MODEL", conf_info.model, hdr_cols, hdr_vals);
+   if(pairs_format == PairsFormat::IODA) {
+      store_hdr_col_val("FCST_UNITS",  na_str, hdr_cols, hdr_vals);
+      store_hdr_col_val("FCST_LEV",    na_str, hdr_cols, hdr_vals);
+      store_hdr_col_val("OBS_UNITS",   na_str, hdr_cols, hdr_vals);
+      store_hdr_col_val("OBS_LEV",     na_str, hdr_cols, hdr_vals);
+      store_hdr_col_val("OBS_LEV",     na_str, hdr_cols, hdr_vals);
+      store_hdr_col_val("INTERP_MTHD", interpmthd_nearest_str,
+                                               hdr_cols, hdr_vals);
+      store_hdr_col_val("INTERP_PNTS", "1",    hdr_cols, hdr_vals);
+      store_hdr_col_val("ALPHA",       na_str, hdr_cols, hdr_vals);
+   }
+
    // Compute scores for each PairData object and write output
    int i_vx = -1;
    for(auto &vx : conf_info.vx_opt) {
 
       i_vx++;
 
-      // Store header columns 
-      StringArray hdr_cols;
-      StringArray hdr_vals;
-      if(conf_info.model.nonempty()) {
-         hdr_cols.add("MODEL");
-         hdr_vals.add(conf_info.model);
-      }
-      if(vx.vx_pd.desc.nonempty()) {
-         hdr_cols.add("DESC");
-         hdr_vals.add(vx.vx_pd.desc);
-      }
+      // Update header columns
+      store_hdr_col_val("DESC", vx.vx_pd.desc, hdr_cols, hdr_vals);
+
 
       // Store masking region as the only "case" information
       StringArray case_cols;
@@ -599,6 +611,9 @@ static void process_scores() {
  
       // Loop through the verification masking regions
       for(int i_mask=0; i_mask<vx.get_n_mask(); i_mask++) {
+
+         // Update header columns
+         store_hdr_col_val("VX_MASK", vx.mask_name[i_mask], hdr_cols, hdr_vals);
 
          // Retrieve the header based on the inputs
          ConcatString cur_case(vx.mask_name[i_mask]);
@@ -829,6 +844,25 @@ static void process_scores() {
       mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
    } // end for i_vx
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void store_hdr_col_val(const string &col_name, const string &col_val,
+                              StringArray &hdr_cols, StringArray &hdr_vals) {
+   int index;
+
+   // Update existing header column value
+   if(hdr_cols.has(col_name, index)) {
+      hdr_vals.set(index, col_val);
+   }
+   // Add new header column name and value
+   else {
+      hdr_cols.add(col_name);
+      hdr_vals.add(col_val);
+   }
 
    return;
 }
