@@ -273,8 +273,8 @@ vector<point_pair_t> *IODAReader::get_point_pairs(
    point_pairs.clear();
    point_pairs.resize(nlocs);
    for (int i=0; i<nlocs; i++) {
-      point_pairs[i].typ  = string(msg_types[i]);
-      point_pairs[i].sid  = station_ids[i];
+      point_pairs[i].typ  = (msg_types[i].empty()   ? na_str : msg_types[i]);
+      point_pairs[i].sid  = (station_ids[i].empty() ? na_str : station_ids[i]);
       point_pairs[i].lat  = lat_arr[i];
       point_pairs[i].lon  = lon_arr[i];
       point_pairs[i].ut   = vld_arr[i];
