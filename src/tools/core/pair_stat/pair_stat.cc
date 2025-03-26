@@ -581,24 +581,31 @@ static void process_scores() {
 
       i_vx++;
 
+      // Store header columns 
+      StringArray hdr_cols;
+      StringArray hdr_vals;
+      if(conf_info.model.nonempty()) {
+         hdr_cols.add("MODEL");
+         hdr_vals.add(conf_info.model);
+      }
+      if(vx.vx_pd.desc.nonempty()) {
+         hdr_cols.add("DESC");
+         hdr_vals.add(vx.vx_pd.desc);
+      }
+
       // Store masking region as the only "case" information
-      StringArray empty_sa;
       StringArray case_cols;
       case_cols.add("VX_MASK");
-
-      // TODO: Populate output header columns for IODA inputs
-
+ 
       // Loop through the verification masking regions
       for(int i_mask=0; i_mask<vx.get_n_mask(); i_mask++) {
 
          // Retrieve the header based on the inputs
          ConcatString cur_case(vx.mask_name[i_mask]);
          StatHdrColumns in_shc = vx.vx_hdr[i_mask].get_shc(cur_case, case_cols,
-                                    empty_sa, empty_sa, STATLineType::mpr);
+                                    hdr_cols, hdr_vals, STATLineType::mpr);
 
          // Override header columns 
-         if(conf_info.model.nonempty()) in_shc.set_model(conf_info.model.c_str());
-         if(vx.vx_pd.desc.nonempty())   in_shc.set_desc(vx.vx_pd.desc.c_str());
          in_shc.set_mask(vx.mask_name[i_mask].c_str());
          shc = in_shc;
 

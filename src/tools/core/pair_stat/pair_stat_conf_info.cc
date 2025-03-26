@@ -765,7 +765,6 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
          mpr_thr_inc_map[(mpr_sa[i])] = ta;
       }
       mpr_thr_inc_map[(mpr_sa[i])].add(mpr_ta[i]);
-      cout << "JHG added " << mpr_sa[i] << "\n";
    }
 
    // Conf: mpr_str_inc
@@ -1338,6 +1337,12 @@ bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
 
             // Using this pair for at least one masking region
             keep = true;
+
+            // Track the unique headers
+            vx_hdr[i_mask].add(0, p.ut,
+               vx_pd.fcst_info->name_attr(),
+               vx_pd.obs_info->name_attr(),
+               p.typ);
          }
       } // end for i_mask
    }
