@@ -33,6 +33,7 @@ typedef CRC_Array<int> IntArray;
 
 
 extern ConcatString write_css(const IntArray &);
+extern ConcatString write_css_hhmmss(const IntArray &);
 
 
 ////////////////////////////////////////////////////////////////////////
