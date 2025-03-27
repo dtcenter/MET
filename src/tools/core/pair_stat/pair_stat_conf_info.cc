@@ -584,8 +584,6 @@ void PairStatVxOpt::clear() {
    vx_pd.clear();
    vx_hdr.clear();
 
-   beg_ds = end_ds = bad_data_int;
-
    fcat_ta.clear();
    ocat_ta.clear();
 
@@ -652,8 +650,6 @@ bool PairStatVxOpt::is_uv_match(const PairStatVxOpt &v) const {
                           v.vx_pd.fcst_info->req_level_name()) ||
       !is_req_level_match(  vx_pd.obs_info->req_level_name(),
                           v.vx_pd.obs_info->req_level_name()) ||
-      !(beg_ds     == v.beg_ds        ) ||
-      !(end_ds     == v.end_ds        ) ||
       !(mask_grid  == v.mask_grid     ) ||
       !(mask_poly  == v.mask_poly     ) ||
       !(mask_sid   == v.mask_sid      ) ||
@@ -714,10 +710,6 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
 
    // Populate the output_flag array with map values
    for(int i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
-
-   // Conf: beg_ds and end_ds
-   dict = odict.lookup_dictionary(conf_key_obs_window);
-   parse_conf_range_int(dict, beg_ds, end_ds);
 
    // Conf: cat_thresh
    fcat_ta = fdict.lookup_thresh_array(conf_key_cat_thresh);

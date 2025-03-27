@@ -127,9 +127,6 @@ class PairStatVxOpt {
       VxPairDataPoint vx_pd;              // Matched pair data [n_mask]
       std::vector<StatHdrInfo> vx_hdr;    // Track header inputs [n_mask]
 
-      int             beg_ds;             // Begin observation time window offset
-      int             end_ds;             // End observation time window offset
-
       ThreshArray     fcat_ta;            // Array for fcst categorical thresholds
       ThreshArray     ocat_ta;            // Array for obs categorical thresholds
 
