@@ -27,6 +27,11 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
+static ConcatString get_time_str(
+                               const unixtime beg, const unixtime end,
+                               const TimeArray &inc, const TimeArray &exc,
+                               const IntArray &hour);
+
 static double get_ioda_mpr_val(const string &,
                                const point_pair_t &,
                                bool print_warning = false);
@@ -604,6 +609,33 @@ void PairStatVxOpt::clear() {
    mpr_str_inc_map.clear();
    mpr_str_exc_map.clear();
 
+   fcst_lead.clear();
+   obs_lead.clear();
+
+   fcst_valid_beg = 0;
+   fcst_valid_end = 0;
+   fcst_valid_inc.clear();
+   fcst_valid_exc.clear();
+   fcst_valid_hour.clear();
+
+   obs_valid_beg = 0;
+   obs_valid_end = 0;
+   obs_valid_inc.clear();
+   obs_valid_exc.clear();
+   obs_valid_hour.clear();
+
+   fcst_init_beg = 0;
+   fcst_init_end = 0;
+   fcst_init_inc.clear();
+   fcst_init_exc.clear();
+   fcst_init_hour.clear();
+
+   obs_init_beg = 0;
+   obs_init_end = 0;
+   obs_init_inc.clear();
+   obs_init_exc.clear();
+   obs_init_hour.clear();
+
    mask_name.clear();
 
    eclv_points.clear();
@@ -775,12 +807,54 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
       for(auto &m : mpr_str_exc_map) get_ioda_mpr_str(m.first, p, true);
    }
 
+   // Parse time filtering options
+   fcst_lead       = odict.lookup_seconds_array(conf_key_fcst_lead);
+   obs_lead        = odict.lookup_seconds_array(conf_key_obs_lead);
+
+   fcst_valid_beg  = odict.lookup_unixtime(conf_key_fcst_valid_beg);
+   fcst_valid_end  = odict.lookup_unixtime(conf_key_fcst_valid_end);
+   fcst_valid_inc  = odict.lookup_unixtime_array(conf_key_fcst_valid_inc);
+   fcst_valid_exc  = odict.lookup_unixtime_array(conf_key_fcst_valid_exc);
+   fcst_valid_hour = odict.lookup_seconds_array(conf_key_fcst_valid_hour);
+
+   obs_valid_beg   = odict.lookup_unixtime(conf_key_obs_valid_beg);
+   obs_valid_end   = odict.lookup_unixtime(conf_key_obs_valid_end);
+   obs_valid_inc   = odict.lookup_unixtime_array(conf_key_obs_valid_inc);
+   obs_valid_exc   = odict.lookup_unixtime_array(conf_key_obs_valid_exc);
+   obs_valid_hour  = odict.lookup_seconds_array(conf_key_obs_valid_hour);
+
+   fcst_init_beg   = odict.lookup_unixtime(conf_key_fcst_init_beg);
+   fcst_init_end   = odict.lookup_unixtime(conf_key_fcst_init_end);
+   fcst_init_inc   = odict.lookup_unixtime_array(conf_key_fcst_init_inc);
+   fcst_init_exc   = odict.lookup_unixtime_array(conf_key_fcst_init_exc);
+   fcst_init_hour  = odict.lookup_seconds_array(conf_key_fcst_init_hour);
+
+   obs_init_beg    = odict.lookup_unixtime(conf_key_obs_init_beg);
+   obs_init_end    = odict.lookup_unixtime(conf_key_obs_init_end);
+   obs_init_inc    = odict.lookup_unixtime_array(conf_key_obs_init_inc);
+   obs_init_exc    = odict.lookup_unixtime_array(conf_key_obs_init_exc);
+   obs_init_hour   = odict.lookup_seconds_array(conf_key_obs_init_hour);
+
    // Dump the contents of the current thresholds
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << "Parsed thresholds:\n"
            << "Matched pair filter columns:     " << write_css(mpr_sa) << "\n"
            << "Matched pair filter thresholds:  " << mpr_ta.get_str() << "\n"
+           << "Matched pair fcst lead time:     " << write_css_hhmmss(fcst_lead) << "\n"
+           << "Matched pair obs lead time:      " << write_css_hhmmss(obs_lead) << "\n"
+           << "Matched pair fcst valid time:    " << get_time_str(fcst_valid_beg, fcst_valid_end,
+                                                                  fcst_valid_inc, fcst_valid_exc,
+                                                                  fcst_valid_hour) << "\n"
+           << "Matched pair obs valid time:     " << get_time_str(obs_valid_beg, obs_valid_end,
+                                                                  obs_valid_inc, obs_valid_exc,
+                                                                  obs_valid_hour) << "\n"
+           << "Matched pair fcst init time:     " << get_time_str(fcst_init_beg, fcst_init_end,
+                                                                  fcst_init_inc, fcst_init_exc,
+                                                                  fcst_init_hour) << "\n"
+           << "Matched pair obs init time:      " << get_time_str(obs_init_beg, obs_init_end,
+                                                                  obs_init_inc, obs_init_exc,
+                                                                  obs_init_hour) << "\n"
            << "Forecast categorical thresholds: " << fcat_ta.get_str() << "\n"
            << "Observed categorical thresholds: " << ocat_ta.get_str() << "\n"
            << "Forecast continuous thresholds:  " << fcnt_ta.get_str() << "\n"
@@ -1346,6 +1420,22 @@ bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
 //
 // Begin utility functions
 //
+////////////////////////////////////////////////////////////////////////
+
+static ConcatString get_time_str(
+                       const unixtime beg, const unixtime end,
+                       const TimeArray &inc, const TimeArray &exc,
+                       const IntArray &hr) {
+   ConcatString cs;
+   cs << "("  << (beg == 0 ? na_str : unix_to_yyyymmdd_hhmmss(beg))
+      << ", " << (end == 0 ? na_str : unix_to_yyyymmdd_hhmmss(end))
+      << "), inc: "  << (inc.n() == 0 ? "(nul)" : write_css(inc))
+      <<  ", exc: "  << (exc.n() == 0 ? "(nul)" : write_css(exc))
+      <<  ", hour: " << (hr.n()  == 0 ? "(nul)" : write_css_hhmmss(hr));
+
+   return cs;
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 static double get_ioda_mpr_val(const string &mpr_col,
