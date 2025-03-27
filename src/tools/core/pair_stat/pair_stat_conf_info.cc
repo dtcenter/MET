@@ -32,6 +32,11 @@ static ConcatString get_time_str(
                                const TimeArray &inc, const TimeArray &exc,
                                const IntArray &hour);
 
+static bool is_keeper_unixtime(const unixtime, const unixtime,
+                               const unixtime, const unixtime,
+                               const TimeArray &, const TimeArray &,
+                               const IntArray &);
+
 static double get_ioda_mpr_val(const string &,
                                const point_pair_t &,
                                bool print_warning = false);
@@ -1250,7 +1255,27 @@ bool PairStatVxOpt::is_keeper_mpr(const STATLine &l) const {
    for(auto &m : mpr_str_exc_map) {
       if(m.second.has(l.get_item(m.first.c_str()))) return false;
    }
- 
+
+   // Check lead time filters
+   if(!is_keeper_lead_time(
+      l.fcst_lead(), l.obs_lead())) return false;
+
+   // Check forecast valid time filters
+   if(!is_keeper_fcst_valid_time(
+      l.fcst_valid_beg(), l.fcst_valid_end())) return false;
+
+   // Check observation valid time filters
+   if(!is_keeper_obs_valid_time(
+      l.obs_valid_beg(), l.obs_valid_end())) return false;
+
+   // Check forecast init time filters
+   if(!is_keeper_fcst_init_time(
+      l.fcst_init_beg(), l.fcst_init_end())) return false;
+
+   // Check observation init time filters
+   if(!is_keeper_obs_init_time(
+      l.obs_init_beg(), l.obs_init_end())) return false;
+
    return true;
 }
 
@@ -1276,10 +1301,83 @@ bool PairStatVxOpt::is_keeper_ioda(const point_pair_t &p) const {
    for(auto &m : mpr_str_exc_map) {
       if(m.second.has(get_ioda_mpr_str(m.first, p))) return false;
    }
- 
+
+   // Check timing filters for IODA data.
+   // Assume an observation lead time of 0 and observation
+   // initialization time equal to the valid time.
+
+   // Check lead time filters
+   if(!is_keeper_lead_time(p.lead, 0)) return false;
+
+   // Check forecast valid time filters
+   if(!is_keeper_fcst_valid_time(p.ut, p.ut)) return false;
+
+   // Check observation valid time filters
+   if(!is_keeper_obs_valid_time(p.ut, p.ut)) return false;
+
+   // Check forecast init time filters
+   unixtime fcst_init_ut = (p.ut == 0 || is_bad_data(p.lead) ?
+                            0 : p.ut - p.lead);
+   if(!is_keeper_fcst_init_time(fcst_init_ut, fcst_init_ut)) return false;
+
+   // Check observation init time filters
+   if(!is_keeper_obs_init_time(p.ut, p.ut)) return false;
+
    return true;
 }
- 
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairStatVxOpt::is_keeper_lead_time(const int f_sec,
+                                        const int o_sec) const {
+   // Check lead times
+   if((fcst_lead.n() > 0 && !fcst_lead.has(f_sec)) ||
+      (obs_lead.n() > 0 && !obs_lead.has(o_sec))) return false;
+
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairStatVxOpt::is_keeper_fcst_valid_time(const unixtime beg_ut,
+                                              const unixtime end_ut) const {
+   return is_keeper_unixtime(beg_ut, end_ut,
+                             fcst_valid_beg, fcst_valid_end,
+                             fcst_valid_inc, fcst_valid_exc,
+                             fcst_valid_hour);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairStatVxOpt::is_keeper_obs_valid_time(const unixtime beg_ut,
+                                             const unixtime end_ut) const {
+   return is_keeper_unixtime(beg_ut, end_ut,
+                             obs_valid_beg, obs_valid_end,
+                             obs_valid_inc, obs_valid_exc,
+                             obs_valid_hour);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairStatVxOpt::is_keeper_fcst_init_time(const unixtime beg_ut,
+                                             const unixtime end_ut) const {
+   return is_keeper_unixtime(beg_ut, end_ut,
+                             fcst_init_beg, fcst_init_end,
+                             fcst_init_inc, fcst_init_exc,
+                             fcst_init_hour);
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairStatVxOpt::is_keeper_obs_init_time(const unixtime beg_ut,
+                                            const unixtime end_ut) const {
+   return is_keeper_unixtime(beg_ut, end_ut,
+                             obs_init_beg, obs_init_end,
+                             obs_init_inc, obs_init_exc,
+                             obs_init_hour);
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
@@ -1434,6 +1532,33 @@ static ConcatString get_time_str(
       <<  ", hour: " << (hr.n()  == 0 ? "(nul)" : write_css_hhmmss(hr));
 
    return cs;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static bool is_keeper_unixtime(const unixtime beg_ut, const unixtime end_ut,
+                               const unixtime conf_beg_ut, const unixtime conf_end_ut,
+                               const TimeArray &conf_inc, const TimeArray &conf_exc,
+                               const IntArray &conf_hour) {
+
+   // Check configuration time limits
+   if((conf_beg_ut != 0 && beg_ut < conf_beg_ut) ||
+      (conf_end_ut != 0 && beg_ut > conf_end_ut)) return false;
+
+   // Check inclusion list
+   if(conf_inc.n() > 0 &&
+      !conf_inc.has(beg_ut) && !conf_inc.has(end_ut)) return false;
+
+   // Check exclusion list
+   if(conf_exc.n() > 0 &&
+      (conf_exc.has(beg_ut) || conf_exc.has(end_ut))) return false;
+
+   // Check hour
+   if(conf_hour.n() > 0 &&
+      !conf_hour.has(unix_to_sec_of_day(beg_ut)) &&
+      !conf_hour.has(unix_to_sec_of_day(end_ut))) return false;
+
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////

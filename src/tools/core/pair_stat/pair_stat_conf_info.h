@@ -226,6 +226,13 @@ class PairStatVxOpt {
       bool is_keeper_mpr(const STATLine &) const;
       bool is_keeper_ioda(const point_pair_t &) const;
 
+      // Check time filters
+      bool is_keeper_lead_time      (const int,      const int)      const;
+      bool is_keeper_fcst_valid_time(const unixtime, const unixtime) const;
+      bool is_keeper_obs_valid_time (const unixtime, const unixtime) const;
+      bool is_keeper_fcst_init_time (const unixtime, const unixtime) const;
+      bool is_keeper_obs_init_time  (const unixtime, const unixtime) const;
+
       // Add paired data
       bool add_mpr_line(const STATLine &);
       bool add_ioda_pair(const point_pair_t &);
