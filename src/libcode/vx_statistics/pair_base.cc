@@ -2170,7 +2170,7 @@ bool VxPairBase::is_keeper_fcst(
 
       // Check for a single forecast DataPlane
       if(fcst_dpa.n_planes() != 1) {
-         mlog << Error << "\nVxPairBase::add_point_obs() -> "
+         mlog << Error << "\nVxPairBase::is_keeper_fcst() -> "
               << "unexpected number of forecast levels ("
               << fcst_dpa.n_planes()
               << ") for surface verification! Set \"land_mask.flag\" and "
