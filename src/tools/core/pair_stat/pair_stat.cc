@@ -50,8 +50,7 @@
 #include "nc_point_obs_in.h"
 
 #ifdef WITH_PYTHON
-#include "data2d_nc_met.h"
-#include "pointdata_python.h"
+#include "python_line.h"
 #endif
 
 using namespace std;
@@ -67,8 +66,10 @@ static void setup_table    (AsciiTable &);
 
 static ConcatString build_outfile_name(const char *);
 
-static void process_mpr_pairs(const ConcatString &, PairsFormat);
+static void process_mpr_pairs(const ConcatString &);
+static void process_python_pairs(const ConcatString &);
 static void process_ioda_pairs(const ConcatString &);
+
 static void process_scores();
 static void store_hdr_col_val(const string &, const string &,
                               StringArray &, StringArray &);
@@ -100,9 +101,11 @@ int met_main(int argc, char *argv[]) {
    // Process each pairs file
    for(int i=0; i<pairs_files.n(); i++) {
 
-      if(pairs_format == PairsFormat::MPR ||
-         pairs_format == PairsFormat::Python) {
-         process_mpr_pairs(pairs_files[i], pairs_format);
+      if(pairs_format == PairsFormat::MPR) {
+         process_mpr_pairs(pairs_files[i]);
+      }
+      else if(pairs_format == PairsFormat::Python) {
+         process_python_pairs(pairs_files[i]);
       }
       else if(pairs_format == PairsFormat::IODA) {
          process_ioda_pairs(pairs_files[i]);
@@ -425,17 +428,9 @@ static ConcatString build_outfile_name(const char *suffix) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_mpr_pairs(const ConcatString &file_name,
-                              PairsFormat format) {
+static void process_mpr_pairs(const ConcatString &file_name) {
    const char *method_name = "process_mpr_pairs() -> ";
    LineDataFile f;
-
-   // Add support for -format python
-   if(format == PairsFormat::Python) { 
-      mlog << Error << "\n" << method_name
-           << "the \"-format python\" option is not supported yet!\n\n";
-      exit(1);
-   }
 
    //
    // Open the input file
@@ -471,6 +466,68 @@ static void process_mpr_pairs(const ConcatString &file_name,
    mlog << Debug(3) << "Keeping " << n_keep << " of " << n_read
         << " MPR lines from \"" << file_name << "\".\n";
  
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void process_python_pairs(const ConcatString &python_command) {
+   const char *method_name = "process_python_pairs() -> ";
+
+#ifndef WITH_PYTHON
+   // Python support not compiled
+   python_compile_error(method_name);
+#else
+
+   // Parse the python script and any arguments
+   ConcatString user_script_path;
+   StringArray  user_script_args;
+   user_script_args.parse_wsss(python_command);
+   if(user_script_args.n() > 0) {
+      user_script_path = user_script_args[0];
+      user_script_args.shift_down(0, 1);
+   }
+
+   PyLineDataFile *pldf = new PyLineDataFile;
+
+   if(!pldf->open(user_script_path.c_str(), user_script_args)) {
+      mlog << Error << "\n" << method_name
+           << "unable to open user script file \""
+           << user_script_path << "\"\n\n";
+      exit(1);
+   }
+
+   //
+   // Count the number read and kept
+   //
+   int n_read = 0;
+   int n_keep = 0;
+
+   //
+   // Process the STAT lines
+   //
+   STATLine line;
+   LineDataFile *f = pldf;
+   while((*f) >> line) {
+
+      // Skip header and non-MPR lines
+      if(line.is_header() || line.type() != STATLineType::mpr) continue;
+
+      n_read++;
+
+      if(conf_info.add_mpr_line(line)) n_keep++;
+
+   } // end while
+
+   mlog << Debug(3) << "Keeping " << n_keep << " of " << n_read
+        << " MPR lines read with Python command \"" << python_command
+	<< "\".\n";
+
+   f->close();
+   if(pldf) { delete pldf; pldf = (PyLineDataFile *) nullptr; } 
+
+#endif
+
    return;
 }
 

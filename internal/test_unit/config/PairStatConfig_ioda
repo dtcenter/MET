@@ -186,7 +186,7 @@ output_flag = {
    mctc   = NONE;
    mcts   = NONE;
    cnt    = NONE;
-   sl1l2  = BOTH;
+   sl1l2  = STAT;
    sal1l2 = NONE;
    vl1l2  = NONE;
    val1l2 = NONE;
@@ -196,7 +196,7 @@ output_flag = {
    pjc    = NONE;
    prc    = NONE;
    eclv   = NONE;
-   mpr    = BOTH;
+   mpr    = STAT;
    seeps  = NONE;
    seeps_mpr = NONE;
 }
