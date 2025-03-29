@@ -20,7 +20,8 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    11/07/24  Halley Gotway  MET #3006 New
-//   001    03/10/25  Halley Gotway  MET #3059 Add -format ioda support
+//   001    03/10/25  Halley Gotway  MET #3059 Add ioda, python, and
+//                                   climo support
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -66,6 +67,7 @@ static void setup_table    (AsciiTable &);
 
 static ConcatString build_outfile_name(const char *);
 
+static void setup_first_pass(unixtime);
 static void process_mpr_pairs(const ConcatString &);
 static void process_python_pairs(const ConcatString &);
 static void process_ioda_pairs(const ConcatString &);
@@ -428,6 +430,66 @@ static ConcatString build_outfile_name(const char *suffix) {
 
 ////////////////////////////////////////////////////////////////////////
 
+static void setup_first_pass(unixtime vld_ut) {
+
+   // Store the verification valid time
+   vx_valid_ut = vld_ut;
+
+   mlog << Debug(2) << "Getting climatology data for the " 
+        << unix_to_yyyymmdd_hhmmss(vld_ut) << " valid time.\n"; 
+
+   // Loop over the verification tasks and extract the climo data
+   for(int i_vx=0; i_vx<conf_info.get_n_vx(); i_vx++) {
+
+      // Read forecast climatology data
+      DataPlaneArray fcmn_dpa(
+         read_climo_data_plane_array(
+            conf_info.conf.lookup_dictionary(conf_key_fcst),
+            conf_key_climo_mean,
+            i_vx, vx_valid_ut, conf_info.vx_opt[i_vx].grid_climo,
+            "forecast climatology mean"));
+      DataPlaneArray fcsd_dpa(
+         read_climo_data_plane_array(
+            conf_info.conf.lookup_dictionary(conf_key_fcst),
+            conf_key_climo_stdev,
+            i_vx, vx_valid_ut, conf_info.vx_opt[i_vx].grid_climo,
+            "forecast climatology standard deviation"));
+
+      // Read observation climatology data
+      DataPlaneArray ocmn_dpa(
+         read_climo_data_plane_array(
+            conf_info.conf.lookup_dictionary(conf_key_obs),
+            conf_key_climo_mean,
+            i_vx, vx_valid_ut, conf_info.vx_opt[i_vx].grid_climo,
+            "observation climatology mean"));
+      DataPlaneArray ocsd_dpa(
+         read_climo_data_plane_array(
+            conf_info.conf.lookup_dictionary(conf_key_obs),
+            conf_key_climo_stdev,
+            i_vx, vx_valid_ut, conf_info.vx_opt[i_vx].grid_climo,
+            "observation climatology standard deviation"));
+
+      // Store data for the current verification task
+      conf_info.vx_opt[i_vx].vx_pd.set_fcst_climo_mn_dpa(fcmn_dpa);
+      conf_info.vx_opt[i_vx].vx_pd.set_fcst_climo_sd_dpa(fcsd_dpa);
+      conf_info.vx_opt[i_vx].vx_pd.set_obs_climo_mn_dpa(ocmn_dpa);
+      conf_info.vx_opt[i_vx].vx_pd.set_obs_climo_sd_dpa(ocsd_dpa);
+
+      // Dump out the number of levels found
+      mlog << Debug(2)
+           << "For " << conf_info.vx_opt[i_vx].vx_pd.fcst_info->name_attr()
+           << ", found "
+           << fcmn_dpa.n_planes() << " forecast climatology mean and "
+           << fcsd_dpa.n_planes() << " standard deviation level(s), and "
+           << ocmn_dpa.n_planes() << " observation climatology mean and "
+           << ocsd_dpa.n_planes() << " standard deviation level(s).\n";
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 static void process_mpr_pairs(const ConcatString &file_name) {
    const char *method_name = "process_mpr_pairs() -> ";
    LineDataFile f;
@@ -458,6 +520,11 @@ static void process_mpr_pairs(const ConcatString &file_name) {
       if(line.is_header() || line.type() != STATLineType::mpr) continue;
 
       n_read++;
+
+      // Store the first valid time encountered
+      if(vx_valid_ut == 0) {
+         setup_first_pass(timestring_to_unix(line.get_item("OBS_VALID_BEG")));
+      }
 
       if(conf_info.add_mpr_line(line)) n_keep++;
 
@@ -515,6 +582,11 @@ static void process_python_pairs(const ConcatString &python_command) {
 
       n_read++;
 
+      // Store the first valid time encountered
+      if(vx_valid_ut == 0) {
+         setup_first_pass(timestring_to_unix(line.get_item("OBS_VALID_BEG")));
+      }
+ 
       if(conf_info.add_mpr_line(line)) n_keep++;
 
    } // end while
@@ -596,6 +668,11 @@ static void process_ioda_pairs(const ConcatString &file_name) {
 
       // Continue if no pairs read
       if(n_read == 0) continue;
+
+      // Store the first valid time encountered
+      if(vx_valid_ut == 0) {
+         setup_first_pass(pairs->begin()->ut);
+      }
 
       // Add each IODA pair 
       for(auto &x : *pairs) {

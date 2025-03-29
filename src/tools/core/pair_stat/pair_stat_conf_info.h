@@ -28,10 +28,13 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-// Reference global 1/10-th degree grid
+// Reference global 1/10-th degree grid for applying masking regions
 static const LatLonData GlobalTenthData =
    { "GlobalTenthDegree", -90.0, -0.0, 0.1, 0.1, 1801, 3601 };
-static Grid grid(GlobalTenthData);
+static Grid grid_mask(GlobalTenthData);
+
+// Reference valid time for climatology data
+static unixtime vx_valid_ut = 0;
 
 // Indices for the output flag types in the configuration file
 static const int i_fho       =  0;
@@ -126,6 +129,8 @@ class PairStatVxOpt {
 
       VxPairDataPoint vx_pd;              // Matched pair data [n_mask]
       std::vector<StatHdrInfo> vx_hdr;    // Track header inputs [n_mask]
+
+      Grid grid_climo;                    // Grid for climatology data
 
       ThreshArray     fcat_ta;            // Array for fcst categorical thresholds
       ThreshArray     ocat_ta;            // Array for obs categorical thresholds

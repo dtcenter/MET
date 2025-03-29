@@ -365,7 +365,7 @@ void PairStatConfInfo::process_masks() {
             mlog << Debug(3)
                  << "Processing grid mask: "
                  << vx.mask_grid[i] << "\n";
-            parse_grid_mask(vx.mask_grid[i], grid, mp, name);
+            parse_grid_mask(vx.mask_grid[i], grid_mask, mp, name);
             grid_map[vx.mask_grid[i]] = name;
             mask_area_map[name] = mp;
          }
@@ -383,7 +383,7 @@ void PairStatConfInfo::process_masks() {
             mlog << Debug(3)
                  << "Processing poly mask: "
                  << vx.mask_poly[i] << "\n";
-            parse_poly_mask(vx.mask_poly[i], grid, mp, name);
+            parse_poly_mask(vx.mask_poly[i], grid_mask, mp, name);
             poly_map[vx.mask_poly[i]] = name;
             mask_area_map[name] = mp;
          }
@@ -974,6 +974,10 @@ void PairStatVxOpt::set_vx_pd(PairStatConfInfo *conf_info) {
    // Store the climo CDF info
    vx_pd.set_climo_cdf_info_ptr(&cdf_info);
 
+   // Set interpolation options for climatology data as nearest neighbor
+   vx_pd.set_interp(0, InterpMthd::Nearest, 1,
+                    GridTemplateFactory::GridTemplates::Square);
+
    // Define the masking information: grid, poly, sid, point
    int n;
 
@@ -1386,41 +1390,58 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
    // Check filtering options
    if(is_keeper_mpr(l)) {
 
-      // Parse climo data from the line
+      // Store values
+      double obs_lat = atof(l.get_item("OBS_LAT"));
+      double obs_lon = -1.0*atof(l.get_item("OBS_LON"));
+      double obs_val = atof(l.get_item("OBS"));
+      double obs_lvl = atof(l.get_item("OBS_LVL"));
+      double obs_elv = atof(l.get_item("OBS_ELV"));
+
+      // Climo data for this pair
       ClimoPntInfo cpi;
 
-      // In met-6.1 and later:
-      // - CLIMO was replaced by CLIMO_MEAN
-      if(l.has("CLIMO")) {
-         double cmn = atof(l.get_item("CLIMO"));
-         double csd = bad_data_double;
-         cpi.set(cmn, csd, cmn, csd);
+      // Parse climo data from the config file
+      if(grid_climo.nxy() > 0) {
+         double obs_x;
+         double obs_y;
+         grid_climo.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
+         cpi = vx_pd.get_climo_pnt_info(0, grid_climo, obs_x, obs_y,
+                                        obs_val, obs_lvl, obs_elv);
       }
-      // In met-12.0.0 and later:
-      // - CLIMO_MEAN was replaced by OBS_CLIMO_MEAN
-      // - CLIMO_STDEV was replaced by OBS_CLIMO_STDEV
-      // - CLIMO_CDF was replaced by OBS_CLIMO_CDF
-      else if(l.has("CLIMO_MEAN")) {
-         double cmn = atof(l.get_item("CLIMO_MEAN"));
-         double csd = atof(l.get_item("CLIMO_STDEV"));
-         cpi.set(cmn, csd, cmn, csd);
-      }
+      // Otherwise, parse from the input line
       else {
-         cpi.set(atof(l.get_item("FCST_CLIMO_MEAN")),
-                 atof(l.get_item("FCST_CLIMO_STDEV")),
-                 atof(l.get_item("OBS_CLIMO_MEAN")),
-                 atof(l.get_item("OBS_CLIMO_STDEV")));
+
+         // In met-6.1 and later:
+         // - CLIMO was replaced by CLIMO_MEAN
+         if(l.has("CLIMO")) {
+            double cmn = atof(l.get_item("CLIMO"));
+            double csd = bad_data_double;
+            cpi.set(cmn, csd, cmn, csd);
+         }
+         // In met-12.0.0 and later:
+         // - CLIMO_MEAN was replaced by OBS_CLIMO_MEAN
+         // - CLIMO_STDEV was replaced by OBS_CLIMO_STDEV
+         // - CLIMO_CDF was replaced by OBS_CLIMO_CDF
+         else if(l.has("CLIMO_MEAN")) {
+            double cmn = atof(l.get_item("CLIMO_MEAN"));
+            double csd = atof(l.get_item("CLIMO_STDEV"));
+            cpi.set(cmn, csd, cmn, csd);
+         }
+         else {
+            cpi.set(atof(l.get_item("FCST_CLIMO_MEAN")),
+                    atof(l.get_item("FCST_CLIMO_STDEV")),
+                    atof(l.get_item("OBS_CLIMO_MEAN")),
+                    atof(l.get_item("OBS_CLIMO_STDEV")));
+         }
       }
 
       // Attempt to add to each masking region
       for(int i_mask=0; i_mask<get_n_mask(); i_mask++) {
 
          // Convert lat/lon to x/y
-         double obs_lat = atof(l.get_item("OBS_LAT")); 
-         double obs_lon = -1.0*atof(l.get_item("OBS_LON"));
          double obs_x;
          double obs_y;
-         grid.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
+         grid_mask.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
 
          // Check masking region
          if(!vx_pd.is_keeper_mask(
@@ -1439,10 +1460,9 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
                bad_data_double, bad_data_double,
                timestring_to_sec(l.get_item("FCST_LEAD")),
                timestring_to_unix(l.get_item("OBS_VALID_BEG")),
-	       atof(l.get_item("OBS_LVL")),
-               atof(l.get_item("OBS_ELV")),
+               obs_lvl, obs_elv,
                atof(l.get_item("FCST")),
-               atof(l.get_item("OBS")),
+               obs_val,
                l.get_item("OBS_QC"),
                cpi,
                1.0)) { 
@@ -1467,18 +1487,30 @@ bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
    // Check filtering options
    if(is_keeper_ioda(p)) {
 
-      // No climo data in IODA pairs
+      // Store values
+      double obs_lat = p.lat;
+      double obs_lon = rescale_lon(-1.0*p.lon);
+      double obs_val = p.oval;
+      double obs_lvl = (is_bad_data(p.lvl) ? bad_data_double : p.lvl/100.0);
+      double obs_elv = p.elv;
+
+      // Parse climo data from the config file
       ClimoPntInfo cpi;
+      if(grid_climo.nxy() > 0) {
+         double obs_x;
+         double obs_y;
+         grid_climo.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
+         cpi = vx_pd.get_climo_pnt_info(0, grid_climo, obs_x, obs_y,
+                                        obs_val, obs_lvl, obs_elv);
+      }
 
       // Attempt to add to each masking region
       for(int i_mask=0; i_mask<get_n_mask(); i_mask++) {
 
          // Convert lat/lon to x/y
-         double obs_lat = p.lat;
-         double obs_lon = rescale_lon(-1.0*p.lon);
          double obs_x;
          double obs_y;
-         grid.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
+         grid_mask.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
 
          // Check masking region
          if(!vx_pd.is_keeper_mask(
@@ -1489,15 +1521,14 @@ bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
                obs_lat,
                obs_lon)) continue;
 
-         // Add the pair:
+         // Add the pair
 	 // - Convert pressure from Pa to HPa
-         double obs_lvl = (is_bad_data(p.lvl) ? bad_data_double : p.lvl/100.0);
          if(vx_pd.pd[i_mask].add_point_pair(
                p.typ.c_str(), p.sid.c_str(),
                obs_lat, obs_lon,
                bad_data_double, bad_data_double,
-               p.lead, p.ut, obs_lvl, p.elv,
-               p.fval, p.oval, na_str, cpi, 1.0)) {
+               p.lead, p.ut, obs_lvl, obs_elv,
+               p.fval, obs_val, na_str, cpi, 1.0)) {
 
             // Using this pair for at least one masking region
             keep = true;
