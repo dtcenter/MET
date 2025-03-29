@@ -87,13 +87,11 @@ assign(a);
 ////////////////////////////////////////////////////////////////////////
 
 
-StringArray::StringArray(const vector<string> & a)
+StringArray::StringArray(const vector<string> & a) : s(a)
 
 {
 
 init_from_scratch();
-
-s = a;
 
 }
 

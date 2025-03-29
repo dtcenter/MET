@@ -1246,17 +1246,17 @@ bool PairStatVxOpt::is_keeper_mpr(const STATLine &l) const {
       l.obs_lev()  != vx_pd.obs_info->level_attr()) return false;
 
    // Check MPR thresholds
-   for(auto &m : mpr_thr_inc_map) {
+   for(const auto &m : mpr_thr_inc_map) {
       if(!m.second.check_dbl(atof(l.get_item(m.first.c_str())))) return false;
    }
 
    // Check MPR string inclusions
-   for(auto &m : mpr_str_inc_map) {
+   for(const auto &m : mpr_str_inc_map) {
       if(!m.second.has(l.get_item(m.first.c_str()))) return false;
    }
 
    // Check MPR string exclusions
-   for(auto &m : mpr_str_exc_map) {
+   for(const auto &m : mpr_str_exc_map) {
       if(m.second.has(l.get_item(m.first.c_str()))) return false;
    }
 

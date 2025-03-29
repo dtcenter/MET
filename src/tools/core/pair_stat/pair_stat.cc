@@ -127,8 +127,6 @@ int met_main(int argc, char *argv[]) {
       conf_info.vx_opt[i].vx_pd.set_point_weight(conf_info.point_weight_flag);
    }
 
-   // TODO: Add climo data to pairs?
-
    // Compute the scores and write them out
    process_scores();
 
@@ -555,7 +553,7 @@ static void process_python_pairs(const ConcatString &python_command) {
       user_script_args.shift_down(0, 1);
    }
 
-   PyLineDataFile *pldf = new PyLineDataFile;
+   auto *pldf = new PyLineDataFile;
 
    if(!pldf->open(user_script_path.c_str(), user_script_args)) {
       mlog << Error << "\n" << method_name
@@ -659,26 +657,30 @@ static void process_ioda_pairs(const ConcatString &file_name) {
 	    bad_data_int);
 
       // Check for valid pairs
-      if(pairs) n_read += pairs->size();
+      int n_read_cur = 0;
+      if(pairs) n_read_cur = pairs->size();
 
-      mlog << Debug(4) << "Read " << n_read << " IODA pairs for "
+      // Increment total read counter
+      n_read += n_read_cur; 
+
+      mlog << Debug(4) << "Read " << n_read_cur << " IODA pairs for "
            << vx.vx_pd.fcst_info->name_attr() << " versus "
            << vx.vx_pd.obs_info->name_attr() << " from \""
            << file_name << "\".\n";
 
-      // Continue if no pairs read
-      if(n_read == 0) continue;
+      // Process pairs
+      if(pairs) {
 
-      // Store the first valid time encountered
-      if(vx_valid_ut == 0) {
-         setup_first_pass(pairs->begin()->ut);
+         // Store the first valid time encountered
+         if(vx_valid_ut == 0 && !pairs->empty()) {
+            setup_first_pass(pairs->begin()->ut);
+         }
+
+         // Add each IODA pair 
+         for(const auto &x : *pairs) {
+            if(vx.add_ioda_pair(x)) n_keep++;
+         }
       }
-
-      // Add each IODA pair 
-      for(auto &x : *pairs) {
-         if(vx.add_ioda_pair(x)) n_keep++;
-      }
-
    }
 
    mlog << Debug(3) << "Keeping " << n_keep << " of " << n_read

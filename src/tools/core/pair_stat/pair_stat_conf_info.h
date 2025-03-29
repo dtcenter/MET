@@ -31,7 +31,7 @@
 // Reference global 1/10-th degree grid for applying masking regions
 static const LatLonData GlobalTenthData =
    { "GlobalTenthDegree", -90.0, -0.0, 0.1, 0.1, 1801, 3601 };
-static Grid grid_mask(GlobalTenthData);
+static const Grid grid_mask(GlobalTenthData);
 
 // Reference valid time for climatology data
 static unixtime vx_valid_ut = 0;

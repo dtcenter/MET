@@ -47,7 +47,7 @@ bool IODAReader::validate_metadata() const {
    }
 
    // Check for required dimensions
-   for(auto &cur_dim : req_dims) {
+   for(const auto &cur_dim : req_dims) {
       if(!is_in_metadata_map(cur_dim, dim_names)) {
          mlog << Warning << "\n" << method_name
               << "required dimension \"" << cur_dim
@@ -60,7 +60,7 @@ bool IODAReader::validate_metadata() const {
    vector<string> req_vars({"datetime", "latitude", "longitude"});
 
    // Check required variables 
-   for(auto &cur_var : req_vars) {
+   for(const auto &cur_var : req_vars) {
       if(!is_in_metadata_map(cur_var, metadata_vars)) {
          mlog << Warning << "\n" << method_name
               << "required metadata variable \"" << cur_var
@@ -255,7 +255,6 @@ vector<point_pair_t> *IODAReader::get_point_pairs(
       const ConcatString &fcst_name,
       const ConcatString &obs_name,
       const int channel) {
-   static const char *method_name = "IODAReader::get_point_pairs() -> ";
    vector<double> obs_val_f(nlocs, bad_data_double);
    vector<double> obs_val_o(nlocs, bad_data_double);
    bool status = true;
@@ -283,7 +282,7 @@ vector<point_pair_t> *IODAReader::get_point_pairs(
       point_pairs[i].fval = obs_val_f[i];
       point_pairs[i].oval = obs_val_o[i];
       if(!is_bad_data(vld_arr[i]) && ref_time_ut != 0) {
-         point_pairs[i].lead = vld_arr[i] - ref_time_ut;
+         point_pairs[i].lead = (int) vld_arr[i] - ref_time_ut;
       }
    } 
 

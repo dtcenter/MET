@@ -2131,7 +2131,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                pd_ptr->sid_sa[k].c_str(),
                pd_ptr->lat_na[k], pd_ptr->lon_na[k],
                pd_ptr->x_na[k], pd_ptr->y_na[k],
-               pd_ptr->f_lead_na[k], pd_ptr->vld_ta[k],
+               nint(pd_ptr->f_lead_na[k]), pd_ptr->vld_ta[k],
                pd_ptr->lvl_na[k], pd_ptr->elv_na[k],
                f_cov, pd_ptr->o_na[k], pd_ptr->o_qc_sa[k].c_str(),
                cpi, pd_ptr->wgt_na[k]);
