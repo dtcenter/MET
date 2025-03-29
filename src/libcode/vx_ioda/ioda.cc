@@ -408,10 +408,7 @@ bool IODAReader::read_time() {
       status = get_nc_data(&in_hdr_vld_var, hdr_vld_block2.data());
 
       for (int i=0; i<nlocs; i++ ) {
-         m_strncpy(valid_time.data(), (const char *)hdr_vld_block2[i],
-                   ndatetime, method_name_s, "valid_time", true);
-         valid_time[ndatetime] = '\0';
-         vld_arr[i] = yyyymmddThhmmss_to_unix(valid_time.data());
+         vld_arr[i] = yyyymmddThhmmss_to_unix((const char *)hdr_vld_block2[i]);
       }
    }
    else if (NC_CHAR == GET_NC_TYPE_ID(in_hdr_vld_var)) {
