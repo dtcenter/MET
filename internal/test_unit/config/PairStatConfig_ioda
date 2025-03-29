@@ -29,6 +29,16 @@ fcst = {
     {
       name          = "/hofx/air_temperature";
       set_attr_name = "HOFX_TMP";
+    },
+    {
+      name          = "/hofx/eastward_wind";
+      set_attr_name = "HOFX_UWIND";
+      is_u_wind = TRUE;
+    },
+    {
+      name          = "/hofx/northward_wind";
+      set_attr_name = "HOFX_VWIND";
+      is_v_wind = TRUE;
     }
   ];
 }
@@ -37,6 +47,16 @@ obs = {
     {
       name          = "/ObsValue/air_temperature";
       set_attr_name = "OBSV_TMP";
+    },
+    {
+      name          = "/ObsValue/eastward_wind";
+      set_attr_name = "OBSV_UWIND";
+      is_u_wind = TRUE;
+    },
+    {
+      name          = "/ObsValue/northward_wind";
+      set_attr_name = "OBSV_VWIND";
+      is_v_wind = TRUE;
     }
   ];
 }
@@ -109,12 +129,21 @@ rank_corr_flag = FALSE;
 //
 climo_mean = {
 
-   file_name = [];
-   field     = [];
+   file_name = [ ${CLIMO_MEAN_FILE_LIST} ];
+   field     = [ { name = "TMP";  level = "Z2"; },
+                 { name = "UGRD"; level = "Z10"; },
+                 { name = "VGRD"; level = "Z10"; } ];
 
-   time_interp_method = DW_MEAN;
-   day_interval       = 31;
-   hour_interval      = 6;
+   regrid = {
+      method     = NEAREST;
+      width      = 1;
+      vld_thresh = 0.5;
+      shape      = SQUARE;
+   }
+
+   time_interp_method = NEAREST;
+   day_interval       = ${DAY_INTERVAL};
+   hour_interval      = ${HOUR_INTERVAL};
 }
 
 //
@@ -123,7 +152,7 @@ climo_mean = {
 //
 climo_stdev = climo_mean;
 climo_stdev = {
-   file_name = [];
+   file_name = [ ${CLIMO_STDEV_FILE_LIST} ];
 }
 
 //
@@ -187,10 +216,10 @@ output_flag = {
    mcts   = NONE;
    cnt    = NONE;
    sl1l2  = STAT;
-   sal1l2 = NONE;
-   vl1l2  = NONE;
-   val1l2 = NONE;
-   vcnt   = NONE;
+   sal1l2 = STAT;
+   vl1l2  = STAT;
+   val1l2 = STAT;
+   vcnt   = STAT;
    pct    = NONE;
    pstd   = NONE;
    pjc    = NONE;

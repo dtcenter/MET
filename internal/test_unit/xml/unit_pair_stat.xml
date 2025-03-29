@@ -8,6 +8,7 @@
 
   <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
   <!ENTITY DATA_DIR_PAIR  "&INPUT_DIR;/pair_data">
+  <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
 ]>
 
 <!-- Requires: unit_point_stat.xml -->
@@ -51,6 +52,20 @@
   <!-- Read paired IODA data -->
   <test name="pair_stat_IODA">
     <exec>&MET_BIN;/pair_stat</exec>
+    <env>
+      <pair><name>DAY_INTERVAL</name>  <value>1</value></pair>
+      <pair><name>HOUR_INTERVAL</name> <value>6</value></pair>
+      <pair><name>CLIMO_MEAN_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cmean_1d.19590414",
+                "&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cmean_1d.19590415"
+         </value>
+      </pair>
+      <pair><name>CLIMO_STDEV_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cstdv_1d.19590414",
+                "&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cstdv_1d.19590415"
+         </value>
+      </pair>
+    </env>
     <param> \
       -pairs  &DATA_DIR_PAIR;/ioda/sample_hofx_output_sondes.nc4 \
       -format ioda \

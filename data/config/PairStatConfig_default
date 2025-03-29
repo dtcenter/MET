@@ -113,6 +113,13 @@ climo_mean = {
    file_name = [];
    field     = [];
 
+   regrid = {
+      method     = NEAREST;
+      width      = 1;
+      vld_thresh = 0.5;
+      shape      = SQUARE;
+   }
+
    time_interp_method = DW_MEAN;
    day_interval       = 31;
    hour_interval      = 6;
