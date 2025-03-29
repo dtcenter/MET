@@ -433,6 +433,10 @@ class VxPairBase {
                           double, double, double,
                           const ClimoPntInfo &, double &);
 
+      // Retrieve climo data for this point 
+      ClimoPntInfo get_climo_pnt_info(int, const Grid &gr, double, double,
+                                      double, double, double);
+
       // Member functions for incrementing the counts
       void inc_count(std::vector<int> &, int);
       void inc_count(std::vector<int> &, int, int);

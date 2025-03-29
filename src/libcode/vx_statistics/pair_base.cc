@@ -2009,141 +2009,64 @@ bool VxPairBase::is_keeper_climo(
 
    int n = three_to_one(i_msg_typ, i_mask, i_interp);
 
-   bool spfh_flag = fcst_info->is_specific_humidity() &&
-                    obs_info->is_specific_humidity();
-
-   // Compute the interpolated forecast value using the
-   // observation pressure level or height
-   double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
-                    obs_lvl : obs_hgt);
-   int lvl_blw, lvl_abv;
-
-   // Initialize
-   cpi.clear();
+   // Get the climo data for this point
+   cpi = get_climo_pnt_info(n, gr, obs_x, obs_y,
+                            obs_v, obs_lvl, obs_hgt);
 
    // Forecast climatology mean
-   if(keep && fcmn_dpa.n_planes() > 0) {
-
-      find_vert_lvl(fcmn_dpa, to_lvl, lvl_blw, lvl_abv);
-
-      cpi.fcmn = compute_interp(fcmn_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
-                    interp_thresh, spfh_flag,
-                    fcst_info->level().type(),
-                    to_lvl, lvl_blw, lvl_abv);
-
-      // Check for bad data
-      if(is_bad_data(cpi.fcmn)) {
-
-         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-            mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << fcst_info->magic_str() << " versus "
-                 << obs_info->magic_str() << ", skipping observation "
-                 << "based on bad forecast climatological mean value:\n"
-                 << pnt_obs_str << "\n";
-         }
-
-         inc_count(rej_cmn, i_msg_typ, i_mask, i_interp);
-         keep = false;
+   if(keep && fcmn_dpa.n_planes() > 0 && is_bad_data(cpi.fcmn)) {
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
+              << "based on bad forecast climatological mean value:\n"
+              << pnt_obs_str << "\n";
       }
+
+      inc_count(rej_cmn, i_msg_typ, i_mask, i_interp);
+      keep = false;
    }
 
    // Observation climatology mean
-   if(keep && ocmn_dpa.n_planes() > 0) {
-
-      find_vert_lvl(ocmn_dpa, to_lvl, lvl_blw, lvl_abv);
-
-      cpi.ocmn = compute_interp(ocmn_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
-                    interp_thresh, spfh_flag,
-                    fcst_info->level().type(),
-                    to_lvl, lvl_blw, lvl_abv);
-
-      // Check for bad data
-      if(is_bad_data(cpi.ocmn)) {
-
-         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-            mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << fcst_info->magic_str() << " versus "
-                 << obs_info->magic_str() << ", skipping observation "
-                 << "based on bad observation climatological mean value:\n"
-                 << pnt_obs_str << "\n";
-         }
-
-         inc_count(rej_cmn, i_msg_typ, i_mask, i_interp);
-         keep = false;
+   if(keep && ocmn_dpa.n_planes() > 0 && is_bad_data(cpi.ocmn)) {
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
+              << "based on bad observation climatological mean value:\n"
+              << pnt_obs_str << "\n";
       }
-   }
 
-   // Check for valid interpolation options
-   if((fcsd_dpa.n_planes() > 0                 ||
-       ocsd_dpa.n_planes() > 0)                &&
-      (pb_ptr[n]->interp_mthd == InterpMthd::Min    ||
-       pb_ptr[n]->interp_mthd == InterpMthd::Max    ||
-       pb_ptr[n]->interp_mthd == InterpMthd::Median ||
-       pb_ptr[n]->interp_mthd == InterpMthd::Best)) {
-      mlog << Warning << "\nVxPairBase::add_point_obs() -> "
-           << "applying the " << interpmthd_to_string(pb_ptr[n]->interp_mthd)
-           << " interpolation method to climatological spread "
-           << "may cause unexpected results.\n\n";
+      inc_count(rej_cmn, i_msg_typ, i_mask, i_interp);
+      keep = false;
    }
 
    // Forecast climatology spread
-   if(keep && fcsd_dpa.n_planes() > 0) {
-
-      find_vert_lvl(fcsd_dpa, to_lvl, lvl_blw, lvl_abv);
-
-      cpi.fcsd = compute_interp(fcsd_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
-                    interp_thresh, spfh_flag,
-                    fcst_info->level().type(),
-                    to_lvl, lvl_blw, lvl_abv);
-
-      // Check for bad data
-      if(is_bad_data(cpi.fcsd)) {
-
-         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-            mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << fcst_info->magic_str() << " versus "
-                 << obs_info->magic_str() << ", skipping observation "
-                 << "based on bad forecast climatological spread value:\n"
-                 << pnt_obs_str << "\n";
-         }
-
-         inc_count(rej_csd, i_msg_typ, i_mask, i_interp);
-         keep = false;
+   if(keep && fcsd_dpa.n_planes() > 0 && is_bad_data(cpi.fcsd)) {
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
+              << "based on bad forecast climatological spread value:\n"
+              << pnt_obs_str << "\n";
       }
+
+      inc_count(rej_csd, i_msg_typ, i_mask, i_interp);
+      keep = false;
    }
 
    // Observation climatology spread
-   if(keep && ocsd_dpa.n_planes() > 0) {
-
-      find_vert_lvl(ocsd_dpa, to_lvl, lvl_blw, lvl_abv);
-
-      cpi.ocsd = compute_interp(ocsd_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
-                    interp_thresh, spfh_flag,
-                    fcst_info->level().type(),
-                    to_lvl, lvl_blw, lvl_abv);
-
-      // Check for bad data
-      if(is_bad_data(cpi.ocsd)) {
-
-         if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-            mlog << Debug(REJECT_DEBUG_LEVEL)
-                 << "For " << fcst_info->magic_str() << " versus "
-                 << obs_info->magic_str() << ", skipping observation "
-                 << "based on bad observation climatological spread value:\n"
-                 << pnt_obs_str << "\n";
-         }
-
-         inc_count(rej_csd, i_msg_typ, i_mask, i_interp);
-         keep = false;
+   if(keep && ocsd_dpa.n_planes() > 0 && is_bad_data(cpi.ocsd)) {
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping observation "
+              << "based on bad observation climatological spread value:\n"
+              << pnt_obs_str << "\n";
       }
+
+      inc_count(rej_csd, i_msg_typ, i_mask, i_interp);
+      keep = false;
    }
 
    return keep;
@@ -2224,6 +2147,92 @@ bool VxPairBase::is_keeper_fcst(
    }
 
    return keep;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ClimoPntInfo VxPairBase::get_climo_pnt_info(
+        int n, const Grid &gr, double obs_x, double obs_y,
+        double obs_v, double obs_lvl, double obs_hgt) {
+   ClimoPntInfo cpi;
+
+   // Check for specific humidity
+   bool spfh_flag = fcst_info->is_specific_humidity() &&
+                    obs_info->is_specific_humidity();
+
+   // Compute the interpolated forecast value using the
+   // observation pressure level or height
+   double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
+                    obs_lvl : obs_hgt);
+   int lvl_blw;
+   int lvl_abv; 
+
+   // Forecast climatology mean
+   if(fcmn_dpa.n_planes() > 0) {
+
+      find_vert_lvl(fcmn_dpa, to_lvl, lvl_blw, lvl_abv);
+
+      cpi.fcmn = compute_interp(fcmn_dpa, obs_x, obs_y, obs_v, nullptr,
+                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
+                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    interp_thresh, spfh_flag,
+                    fcst_info->level().type(),
+                    to_lvl, lvl_blw, lvl_abv);
+   }
+
+   // Observation climatology mean
+   if(ocmn_dpa.n_planes() > 0) {
+
+      find_vert_lvl(ocmn_dpa, to_lvl, lvl_blw, lvl_abv);
+
+      cpi.ocmn = compute_interp(ocmn_dpa, obs_x, obs_y, obs_v, nullptr,
+                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
+                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    interp_thresh, spfh_flag,
+                    fcst_info->level().type(),
+                    to_lvl, lvl_blw, lvl_abv);
+   }
+
+   // Check for valid interpolation options
+   if((fcsd_dpa.n_planes() > 0                      ||
+       ocsd_dpa.n_planes() > 0)                     &&
+      (pb_ptr[n]->interp_mthd == InterpMthd::Min    ||
+       pb_ptr[n]->interp_mthd == InterpMthd::Max    ||
+       pb_ptr[n]->interp_mthd == InterpMthd::Median ||
+       pb_ptr[n]->interp_mthd == InterpMthd::Best)) {
+      mlog << Warning << "\nVxPairBase::get_climo_pnt_info() -> "
+           << "applying the " << interpmthd_to_string(pb_ptr[n]->interp_mthd)
+           << " interpolation method to climatological spread "
+           << "may cause unexpected results.\n\n";
+   }
+
+   // Forecast climatology spread
+   if(fcsd_dpa.n_planes() > 0) {
+
+      find_vert_lvl(fcsd_dpa, to_lvl, lvl_blw, lvl_abv);
+
+      cpi.fcsd = compute_interp(fcsd_dpa, obs_x, obs_y, obs_v, nullptr,
+                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
+                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    interp_thresh, spfh_flag,
+                    fcst_info->level().type(),
+                    to_lvl, lvl_blw, lvl_abv);
+   }
+
+   // Observation climatology spread
+   if(ocsd_dpa.n_planes() > 0) {
+
+      find_vert_lvl(ocsd_dpa, to_lvl, lvl_blw, lvl_abv);
+
+      cpi.ocsd = compute_interp(ocsd_dpa, obs_x, obs_y, obs_v, nullptr,
+                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
+                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    interp_thresh, spfh_flag,
+                    fcst_info->level().type(),
+                    to_lvl, lvl_blw, lvl_abv);
+   }
+
+   return cpi;
 }
 
 ////////////////////////////////////////////////////////////////////////
