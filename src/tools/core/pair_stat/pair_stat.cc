@@ -658,7 +658,7 @@ static void process_ioda_pairs(const ConcatString &file_name) {
 
       // Check for valid pairs
       int n_read_cur = 0;
-      if(pairs) n_read_cur = pairs->size();
+      if(pairs) n_read_cur = (int) pairs->size();
 
       // Increment total read counter
       n_read += n_read_cur; 

@@ -807,9 +807,9 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    // Print warnings about unexpected IODA MPR column names
    if(ftype == PairsFormat::IODA) {
       point_pair_t p;
-      for(auto &m : mpr_thr_inc_map) get_ioda_mpr_val(m.first, p, true);
-      for(auto &m : mpr_str_inc_map) get_ioda_mpr_str(m.first, p, true);
-      for(auto &m : mpr_str_exc_map) get_ioda_mpr_str(m.first, p, true);
+      for(const auto &m : mpr_thr_inc_map) get_ioda_mpr_val(m.first, p, true);
+      for(const auto &m : mpr_str_inc_map) get_ioda_mpr_str(m.first, p, true);
+      for(const auto &m : mpr_str_exc_map) get_ioda_mpr_str(m.first, p, true);
    }
 
    // Parse time filtering options
