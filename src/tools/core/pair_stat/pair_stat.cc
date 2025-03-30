@@ -1525,7 +1525,7 @@ static void usage() {
         << "the desired configuration settings (required).\n"
 
         << "\t\t\"-out base\" overrides the default output "
-        << "file base (./tc_gen) (optional).\n"
+        << "file base (./pair_stat) (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"
