@@ -282,7 +282,7 @@ vector<point_pair_t> *IODAReader::get_point_pairs(
       point_pairs[i].fval = obs_val_f[i];
       point_pairs[i].oval = obs_val_o[i];
       if(!is_bad_data(vld_arr[i]) && ref_time_ut != 0) {
-         point_pairs[i].lead = (int) vld_arr[i] - ref_time_ut;
+         point_pairs[i].lead = (int) (vld_arr[i] - ref_time_ut);
       }
    } 
 
