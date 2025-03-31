@@ -28,10 +28,13 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-// Reference global 1/10-th degree grid
+// Reference global 1/10-th degree grid for applying masking regions
 static const LatLonData GlobalTenthData =
    { "GlobalTenthDegree", -90.0, -0.0, 0.1, 0.1, 1801, 3601 };
-static Grid grid(GlobalTenthData);
+static const Grid grid_mask(GlobalTenthData);
+
+// Reference valid time for climatology data
+static unixtime vx_valid_ut = 0;
 
 // Indices for the output flag types in the configuration file
 static const int i_fho       =  0;
@@ -127,8 +130,7 @@ class PairStatVxOpt {
       VxPairDataPoint vx_pd;              // Matched pair data [n_mask]
       std::vector<StatHdrInfo> vx_hdr;    // Track header inputs [n_mask]
 
-      int             beg_ds;             // Begin observation time window offset
-      int             end_ds;             // End observation time window offset
+      Grid grid_climo;                    // Grid for climatology data
 
       ThreshArray     fcat_ta;            // Array for fcst categorical thresholds
       ThreshArray     ocat_ta;            // Array for obs categorical thresholds
@@ -151,6 +153,34 @@ class PairStatVxOpt {
       // Matched pair inclusion and exclusion strings
       std::map<ConcatString,StringArray> mpr_str_inc_map;
       std::map<ConcatString,StringArray> mpr_str_exc_map;
+
+      // Matched pair time inclusion and exclusion logic
+      IntArray  fcst_lead; // stored in seconds
+      IntArray  obs_lead;  // stored in seconds
+
+      unixtime  fcst_valid_beg;
+      unixtime  fcst_valid_end;
+      TimeArray fcst_valid_inc;
+      TimeArray fcst_valid_exc;
+      IntArray  fcst_valid_hour; // stored in seconds
+
+      unixtime  obs_valid_beg;
+      unixtime  obs_valid_end;
+      TimeArray obs_valid_inc;
+      TimeArray obs_valid_exc;
+      IntArray  obs_valid_hour; // stored in seconds
+
+      unixtime  fcst_init_beg;
+      unixtime  fcst_init_end;
+      TimeArray fcst_init_inc;
+      TimeArray fcst_init_exc;
+      IntArray  fcst_init_hour; // stored in seconds
+
+      unixtime  obs_init_beg;
+      unixtime  obs_init_end;
+      TimeArray obs_init_inc;
+      TimeArray obs_init_exc;
+      IntArray  obs_init_hour;  // stored in seconds
 
       // Vector of MaskLatLon objects defining Lat/Lon Point masks
       std::vector<MaskLatLon> mask_llpnt;
@@ -199,9 +229,18 @@ class PairStatVxOpt {
 
       // Check for matches
       bool is_keeper_mpr(const STATLine &) const;
+      bool is_keeper_ioda(const point_pair_t &) const;
+
+      // Check time filters
+      bool is_keeper_lead_time      (const int,      const int)      const;
+      bool is_keeper_fcst_valid_time(const unixtime, const unixtime) const;
+      bool is_keeper_obs_valid_time (const unixtime, const unixtime) const;
+      bool is_keeper_fcst_init_time (const unixtime, const unixtime) const;
+      bool is_keeper_obs_init_time  (const unixtime, const unixtime) const;
 
       // Add paired data
       bool add_mpr_line(const STATLine &);
+      bool add_ioda_pair(const point_pair_t &);
 };
 
 ////////////////////////////////////////////////////////////////////////

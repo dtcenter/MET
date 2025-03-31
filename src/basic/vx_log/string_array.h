@@ -48,6 +48,7 @@ class StringArray {
       StringArray();
      ~StringArray();
       StringArray(const StringArray &);
+      explicit StringArray(const std::vector<std::string> &);
       StringArray & operator=(const StringArray &);
       bool operator==(const StringArray &) const;
 

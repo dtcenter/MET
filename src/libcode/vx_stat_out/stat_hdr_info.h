@@ -35,6 +35,9 @@ struct StatHdrInfo {
 
    void clear();
    void add(const STATLine &line);
+   void add(const int &, const unixtime &,
+            const std::string &, const std::string &,
+            const std::string &);
    void check_shc(const ConcatString &cur_case);
    StatHdrColumns   get_shc(const ConcatString &cur_case,
                             const StringArray  &case_cols,
