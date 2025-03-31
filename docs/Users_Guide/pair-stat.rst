@@ -7,7 +7,7 @@ Pair-Stat Tool
 Introduction
 ============
 
-The Pair-Stat tool provides verification statistics for forecast and observation data that has already been paired. While no smoothing, regridding, or interpolation methods apply to the forecast and observation pairs, the Pair-Stat tool filters and groups the pairs temporally and spatially. It then computes continuous, categorical, and probabilistic verification statistics. The categorical and probabilistic statistics generally are derived by applying a threshold to the forecast and observation values. Confidence intervals - representing the uncertainty in the verification measures - are computed for the verification statistics.
+The Pair-Stat tool provides verification statistics for forecast and observation data that has already been paired. While no smoothing, regridding, or interpolation methods apply to the forecast and observation pairs, the Pair-Stat tool filters and groups the pairs temporally and spatially. It then computes continuous, categorical, and probabilistic verification statistics. The categorical and probabilistic statistics are generally derived by applying a threshold to the forecast and observation values. Confidence intervals - representing the uncertainty in the verification measures - are computed for the verification statistics.
 
 Scientific and statistical aspects of the Pair-Stat tool are discussed in the following section. Practical aspects of the Pair-Stat tool are described in :numref:`pair-stat_practical_info`.
 
