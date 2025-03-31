@@ -14,7 +14,7 @@ Scientific and statistical aspects of the Pair-Stat tool are discussed in the fo
 Scientific and Statistical Aspects
 ==================================
 
-The statistics and measures computed by the Pair-Stat tool are a subset of those computed by the Point-Stat tool which are described briefly in :numref:`PS_Statistical-measures` and in more detail in :numref:`Appendix C, Section %s <appendixC>`. :numref:`PS_Statistical-confidence-intervals` describes the methods for computing confidence intervals that are applied to some of the measures computed by the Pair-Stat tool; more detail on confidence intervals is provided in :numref:`Appendix D, Section %s <App_D-Confidence-Intervals>`.
+The statistics and measures computed by the Pair-Stat tool are a subset of those computed by the Point-Stat tool which are described briefly in :numref:`PS_Statistical-measures` and in more detail in :numref:`Appendix C, Section %s <appendixC>`. Additionally, :numref:`PS_Statistical-confidence-intervals` describes the methods for computing confidence intervals that are applied to some of the measures computed by the Pair-Stat tool; more detail on confidence intervals is provided in :numref:`Appendix D, Section %s <App_D-Confidence-Intervals>`.
 
 .. _pair-stat_practical_info:
 
