@@ -557,7 +557,7 @@ Python Embedding for MPR Data
 
 The MET Stat-Analysis tool also supports Python embedding. By using the command line option **-lookin python**, Stat-Analysis can read matched pair (MPR) data formatted in the MET MPR line-type format via Python.
 
-The MET Pair-Stat tool also supports Python embedding of matched pair (MPR) data using the **-format python** command line option.
+The MET Pair-Stat tool also supports Python embedding of matched pair (MPR) data using the **-format python** command line option. Similar to the Stat-Analysis tool, this functionality expects data formatted in the MET MPR format within Python prior to passing to Pair-Stat.
 
 .. note::
 

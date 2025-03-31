@@ -7,7 +7,7 @@ Pair-Stat Tool
 Introduction
 ============
 
-The Pair-Stat tool provides verification statistics for forecast and observation data that has already been paired. While no smoothing, regridding, or interpolation methods apply to the forecast and observation pairs, the Pair-Stat tool filters and groups the pairs temporally and spatially. It then computes continuous, categorical, and probabilistic verification statistics. The categorical and probabilistic statistics are generally derived by applying a threshold to the forecast and observation values. Confidence intervals - representing the uncertainty in the verification measures - are computed for the verification statistics.
+The Pair-Stat tool provides verification statistics for forecast and observation data that has already been paired in time and space. While no smoothing, regridding, or interpolation methods apply to the forecast and observation pairs, the Pair-Stat tool filters and groups the pairs temporally and spatially. It then computes continuous, categorical, and probabilistic verification statistics. The categorical and probabilistic statistics are generally derived by applying a threshold to the forecast and observation values. Confidence intervals - representing the uncertainty in the verification measures - are computed for the verification statistics.
 
 Scientific and statistical aspects of the Pair-Stat tool are discussed in the following section. Practical aspects of the Pair-Stat tool are described in :numref:`pair-stat_practical_info`.
 
@@ -290,8 +290,10 @@ array length.
 
 .. note::
 
-  When interpolating climatological data to pair data locations, the **nearest neighbor**
-  interpolation method is used and that cannot currently be overridden.
+  When interpolating climatological data to pair data locations, the grid on which the
+  climatological data is defined is used with the **nearest neighbor** interpolation method
+  and that cannot currently be overridden. A future enhancement may make these interpolation
+  options configurable.
 
 _________________________
 
@@ -312,8 +314,9 @@ common to multiple MET tools and are described in :numref:`config_options`.
 .. note::
 
   The **mask.grid** and **mask.poly** options are currently defined relative to a reference grid. Since no
-  grid applies to the input paired data, a global 1/10 degree reference grid is used by default and
-  that grid cannot currently be overridden.
+  grid applies to the input paired data, a **global 1/10 degree reference grid** is used by default and
+  that grid cannot currently be overridden. A future enhancement may eliminate the use of a reference grid
+  in this context. 
 
 
 ________________________
