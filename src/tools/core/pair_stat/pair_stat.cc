@@ -988,9 +988,12 @@ static void process_scores() {
 
 static void store_hdr_col_val(const string &col_name, const string &col_val,
                               StringArray &hdr_cols, StringArray &hdr_vals) {
-   int index;
+
+   // Ignore empty column value strings
+   if(col_val.empty()) return;
 
    // Update existing header column value
+   int index;
    if(hdr_cols.has(col_name, index)) {
       hdr_vals.set(index, col_val);
    }
