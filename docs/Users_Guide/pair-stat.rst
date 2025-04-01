@@ -7,28 +7,23 @@ Pair-Stat Tool
 Introduction
 ============
 
-The Pair-Stat tool provides verification statistics for forecast and observation data that has already been paired. While no smoothing, regridding, or interpolation methods apply, the Pair-Stat tool filters and groups the pairs temporally and spatially. It then computes continuous, categorical, and probabilistic verification statistics. The categorical and probabilistic statistics generally are derived by applying a threshold to the forecast and observation values. Confidence intervals - representing the uncertainty in the verification measures - are computed for the verification statistics.
+The Pair-Stat tool provides verification statistics for forecast and observation data that has already been paired in time and space. While no smoothing, regridding, or interpolation methods apply to the forecast and observation pairs, the Pair-Stat tool filters and groups the pairs temporally and spatially. It then computes continuous, categorical, and probabilistic verification statistics. The categorical and probabilistic statistics are generally derived by applying a threshold to the forecast and observation values. Confidence intervals - representing the uncertainty in the verification measures - are computed for the verification statistics.
 
 Scientific and statistical aspects of the Pair-Stat tool are discussed in the following section. Practical aspects of the Pair-Stat tool are described in :numref:`pair-stat_practical_info`.
 
 Scientific and Statistical Aspects
 ==================================
 
-The statistical methods and measures computed by the Pair-Stat tool are described briefly in this section. In addition, :numref:`matching-methods` discusses the various interpolation options available for matching the forecast grid point values to the observation points. The statistical measures computed by the Pair-Stat tool are described briefly in :numref:`PS_Statistical-measures` and in more detail in :numref:`Appendix C, Section %s <appendixC>`. :numref:`PS_Statistical-confidence-intervals` describes the methods for computing confidence intervals that are applied to some of the measures computed by the Pair-Stat tool; more detail on confidence intervals is provided in :numref:`Appendix D, Section %s <App_D-Confidence-Intervals>`.
+The statistics and measures computed by the Pair-Stat tool are a subset of those computed by the Point-Stat tool which are described briefly in :numref:`PS_Statistical-measures` and in more detail in :numref:`Appendix C, Section %s <appendixC>`. Additionally, :numref:`PS_Statistical-confidence-intervals` describes the methods for computing confidence intervals that are applied to some of the measures computed by the Pair-Stat tool; more detail on confidence intervals is provided in :numref:`Appendix D, Section %s <App_D-Confidence-Intervals>`.
 
 .. _pair-stat_practical_info:
 
 Practical Information
 =====================
 
-.. note::
+The Pair-Stat tool performs verification for forecast and observation data that has already been paired in time and space. The paired data is supplied via one of the supported input formats, including the :ref:`MET MPR Line Type<table_PS_format_info_MPR>` written by the Point-Stat tool with the **-format mpr** command line option, through :ref:`Python embedding<pyembed-mpr-data>` with the **-format python** command line option, and from IODA (Interface for Observation Data Access) files described in the :ref:`IODA2NC Tool<IODA2NC tool>` with the **-format ioda** command line option. The Stat-Analysis tool also processes MPR data, so the functionality of Pair-Stat and Stat-Analysis overlap in this way. Based on configuration file settings, paired data for each verification task requested is extracted from one or more input files, subsetted temporally and spatially, and used to compute and write a variety of statistics and measures. If forecast and/or observation climatology data is provided in the configuration file, it is interpolated to the location of each pair and used in the computation of statistics.
 
-  Only **-format mpr** is supported at this time. Support for **-format python** and **-format ioda** will be added in future development cycles.
-
-
-The Pair-Stat tool is used to perform verification of a gridded model field using point observations. The gridded model field to be verified must be in one of the supported file formats. The point observations must be formatted as the NetCDF output of the point reformatting tools described in :numref:`reformat_point`. The Pair-Stat tool provides the capability of interpolating the gridded forecast data to the observation points using a variety of methods as described in :numref:`matching-methods`. The Pair-Stat tool computes a number of continuous statistics on the matched pair data as well as discrete statistics once the matched pair data have been thresholded.
-
-If no matched pairs are found for a particular verification task, a report listing counts for reasons why the observations were not used is written to the log output at the default verbosity level of 2. If matched pairs are found, this report is written at verbosity level 3. Inspecting these rejection reason counts is the first step in determining why Pair-Stat found no matched pairs. The order of the log messages matches the order in which the processing logic is applied. Start from the last log message and work your way up, considering each of the non-zero rejection reason counts. Verbosity level 9 prints a very detailed explanation about why each observation is used or skipped for each verification task.
+If no matched pairs are found for a particular verification task, no statistics are computed or written to the output.
 
 pair_stat Usage
 ---------------
@@ -41,7 +36,7 @@ The usage statement for the Pair-Stat tool is shown below:
          -pairs file_1 ... file_n | file_list
          -format type
          -config config_file
-         [-outdir path]
+         [-out base]
          [-log file]
          [-v level]
 
@@ -52,11 +47,15 @@ Required Arguments for pair_stat
 
 1. The **-pairs** argument defines one or more input files containing forecast/observation pairs.
    May be set as a list of file names (**file_1 ... file_n**) or as an ASCII file containing
-   a list file names (**file_list**), as described in :numref:`ascii_file_lists`.
-   May be used multiple times (required).
+   a list file names (**file_list**), as described in :numref:`ascii_file_lists` (required).
+   
+   This option can be used multiple times but all inputs must follow the same **-format type**, described below.
+   
+   For **-format python**, the **-pairs file** defines the path to a Python embedding script to be
+   run followed by any arguments to that script and enclosed in single or double quotes.
 
-2. The **format type** argument defines the input pairs file format and may be set to
-   "mpr" or "ioda" (required).
+2. The **-format type** argument defines the input pairs file format and may be set to
+   "mpr", "python", or "ioda" (required).
 
 3. The **-config config_file** argument is a PairStatConfig file containing the desired
    configuration settings (required).
@@ -64,8 +63,11 @@ Required Arguments for pair_stat
 Optional Arguments for pair_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The **-outdir path** option overrides the output directory which defaults to the current
-   working directory (optional).
+4. The **-out base** option overrides the default output file base (./pair_stat) (optional).
+
+   Each output file begins with this output file base followed by the ".stat" or "_TYPE.txt"
+   suffix, where TYPE is a specific output line type. Users should set **-out base** appropriately
+   to avoid overwriting output generated by previous runs of the Pair-Stat tool.
 
 5. The **-log file** option directs output and errors to the specified log file.
    All messages will be written to that file as well as standard out and error.
@@ -82,18 +84,283 @@ An example of the pair_stat calling sequence is shown below:
 .. code-block:: none
 
   pair_stat \
-  -pairs point_stat_mpr.txt \
+  -pairs point_stat_run1_mpr.txt point_stat_run2.stat \
   -format mpr \
   -config PairStatConfig
 
-In this example, the Pair-Stat tool reads matched pair data (**-format mpr**) from **point_stat_mpr.txt**
+In this example, the Pair-Stat tool reads matched pair data (**-format mpr**) from
+**point_stat_run1_mpr.txt** and **point_stat_run2.stat** files
 and applies the configuration options specified in the **PairStatConfig** file.
+
+.. _pair_stat-configuration_file:
 
 pair_stat Configuration File
 -----------------------------
 
-The default configuration file for the Pair-Stat tool named **PairStatConfig_default** can be found in the installed *share/met/config* directory. Users are encouraged to make a copy prior to modifying its contents. The configuration file options are described in the subsections below.
+The default configuration file for the Pair-Stat tool named **PairStatConfig_default** can be found
+in the installed *share/met/config* directory. Users are encouraged to make a copy prior to modifying
+its contents. The configuration file options are described in the subsections below.
 
-Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
+Note that environment variables may be used when editing configuration files, as described in the
+:numref:`config_env_vars`.
 
-TODO: Complete documentation
+________________________
+
+.. code-block:: none
+
+  model             = "FCST";
+  desc              = "NA";
+  point_weight_flag = NONE;
+  tmp_dir           = "/tmp";
+  version           = "VN.N";
+
+
+The configuration options listed above are common to multiple MET tools and are described in :numref:`config_options`.
+
+_________________________
+
+.. code-block:: none
+
+  fcst = {
+    pairs = [
+      {
+        name  = "TMP";
+        level = [ "Z2" ];
+      }
+    ];
+  }
+
+  obs = {
+    pairs = [
+      {
+        name = "TMP";
+        level = [ "Z2" ];
+      }
+    ];
+  }
+
+
+The **fcst** and **obs** entries are dictionaries containing the **pairs** entry
+which is an array of dictionaries. The **fcst.pairs** and **obs.pairs** arrays must
+have the same non-zero length. The formatting of **fcst.pairs** is the same as
+**fcst.field**, described in :numref:`config_options-fcst`. The **name** and **level**
+entries in each array entry vary based on the input file format:
+
+  - For the **mpr** and **python** formats, set **name** and **level** based on the
+    desired values of the input :ref:`MET MPR Line Type<table_PS_format_info_MPR>`.
+    Set **fcst.pairs.name** and **obs.pairs.name** to the desired values of the
+    **FCST_VAR** and **OBS_VAR** columns, respectively. Set **fcst.pairs.level** and
+    and **obs.pairs.level** to one or more desired values of the **FCST_LEV**
+    and **OBS_LEV** columns, respectively. Only MPR lines whose variable names match those
+    requested and whose level strings appear in the list of requested level strings will
+    be used for that verification task.
+
+  - For the **ioda** format, the **name** entry specifies the input IODA NetCDF
+    variable to be read. The **level** entry does not apply. IODA files contain multiple
+    variables indexed by a point location dimension. Data read from the **fcst.pairs.name**
+    and **obs.pairs.name** variables define the matched pairs for that verification task.
+
+.. note::
+
+  IODA files typically use NetCDF4 groups, and the **name** entry should specify both the
+  group and variable names, formatted as ``name = "/GROUP_NAME/VARIABLE_NAME";``
+  (e.g. ``name = "/hofx/air_temperature";``).
+
+_________________________
+
+.. code-block:: none
+
+  censor_thresh = [];
+  censor_val    = [];
+  cat_thresh    = [ NA ];
+  cnt_thresh    = [ NA ];
+  cnt_logic     = UNION;
+  wind_thresh   = [ NA ];
+  wind_logic    = UNION;
+
+
+The configuration options listed above are used to process the input paired data and define
+thresholds for filtering data and for categorical verification. They can be speficied separately
+for each verification task inside in each **fcst.pairs** or **obs.pairs** array entry.
+They are common to multiple MET tools and are described in :numref:`config_options`.
+
+_________________________
+
+.. code-block:: none
+
+  mpr_column = [];
+  mpr_thresh = [];
+
+The configuration options listed above filter the input paired data using numeric thresholds.
+They can be specified separately for each verification task inside each **obs.pairs** array entry.
+They are common to multiple MET tools and are described in :numref:`config_options`.
+
+_________________________
+
+.. code-block:: none
+
+  mpr_str_inc = [];
+  mpr_str_exc = [];
+
+
+The configuration options listed above filter the input paired data by specifying input
+column strings to be included or excluded. They can be specified separately for each verification
+task inside each **obs.pairs** array entry. The options define arrays of dictionaries with each
+dictionary containing a **key** and **val** entry. The **key** entry defines the input MPR
+column name to be filtered and the **val** entry defines a comma-separated list of values.
+
+For example, the following settings *include* only MPR lines with the **OBTYPE** column set
+to **ADPUPA** and *exclude* any MPR lines with the **VX_MASK** column set to **DTC165** or
+**DTC166**.
+
+.. code-block:: none
+
+  mpr_str_inc = [ { key = "OBTYPE";  val = "ADPUPA";        } ];
+  mpr_str_exc = [ { key = "VX_MASK"; val = "DTC165,DTC166"; } ];
+
+
+_________________________
+
+.. code-block:: none
+
+  fcst_lead       = [];
+  obs_lead        = [];
+
+  fcst_valid_beg  = "";
+  fcst_valid_end  = "";
+  fcst_valid_inc  = [];
+  fcst_valid_exc  = [];
+  fcst_valid_hour = [];
+
+  obs_valid_beg   = "";
+  obs_valid_end   = "";
+  obs_valid_inc   = [];
+  obs_valid_exc   = [];
+  obs_valid_hour  = [];
+
+  fcst_init_beg   = "";
+  fcst_init_end   = "";
+  fcst_init_inc   = [];
+  fcst_init_exc   = [];
+  fcst_init_hour  = [];
+
+  obs_init_beg    = "";
+  obs_init_end    = "";
+  obs_init_inc    = [];
+  obs_init_exc    = [];
+  obs_init_hour   = [];
+
+
+The configuration options listed above filter the input paired data temporally. They can
+be specified separately for each verificaiton task inside each **obs.pairs** array entry.
+They are also supported for the Stat-Analysis tool and are described in :numref:`stat_analysis-configuration-file`.
+
+_________________________
+
+.. code-block:: none
+
+  eclv_points     = 0.05;
+  hss_ec_value    = NA;
+  rank_corr_flag  = FALSE;
+  ci_alpha        = [ 0.05 ];
+  boot            = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
+                      rng = "mt19937"; seed = ""; }
+  seeps_p1_thresh = >=0.1&&<=0.85;
+
+
+The configuration options listed above define verification logic options. They can be specified
+separately for each verification task inside each **obs.pairs** array entry. They are common to
+multiple MET tools and are described in :numref:`config_options`.
+
+_________________________
+
+.. code-block:: none
+
+  climo_mean  = { ... }
+  climo_stdev = { ... }
+  climo_cdf   = { ... }
+
+The configuration options listed above specify climatological input data. They can be specified
+separately inside the **fcst** and **obs** dictionaries. They are common to multiple MET tools
+and are described in :numref:`config_options`.
+
+The length of the **climo_mean.field** and **climo_stdev.field** arrays must match and
+can either be zero (for no climatological data) or match the **fcst.pairs** and **obs.pairs**
+array length.
+
+.. note::
+
+  When interpolating climatological data to pair data locations, the grid on which the
+  climatological data is defined is used with the **nearest neighbor** interpolation method
+  and that cannot currently be overridden. A future enhancement may make these interpolation
+  options configurable.
+
+_________________________
+
+.. code-block:: none
+
+  mask = {
+    grid  = [ "FULL", "DTC165", "DTC166" ];
+    poly  = [];
+    sid   = [];
+    llpnt = [];
+  }
+
+
+The **mask** dictionary defines how the input paired data is aggregated spatially when computing statistics.
+For each verification task, output statistics will be computed for each masking region defined. This is
+common to multiple MET tools and are described in :numref:`config_options`.
+
+.. note::
+
+  The **mask.grid** and **mask.poly** options are currently defined relative to a reference grid. Since no
+  grid applies to the input paired data, a **global 1/10 degree reference grid** is used by default and
+  that grid cannot currently be overridden. A future enhancement may eliminate the use of a reference grid
+  in this context. 
+
+
+________________________
+
+.. code-block:: none
+
+  output_flag = {
+     fho    = BOTH;
+     ctc    = BOTH;
+     cts    = BOTH;
+     mctc   = BOTH;
+     mcts   = BOTH;
+     cnt    = BOTH;
+     sl1l2  = BOTH;
+     sal1l2 = BOTH;
+     vl1l2  = BOTH;
+     vcnt   = BOTH;
+     val1l2 = BOTH;
+     pct    = BOTH;
+     pstd   = BOTH;
+     pjc    = BOTH;
+     prc    = BOTH;
+     eclv   = BOTH;
+     mpr    = BOTH;
+     seeps  = NONE;
+     seeps_mpr = NONE;
+  }
+
+The **output_flag** array controls the type of output that the Pair-Stat tool generates.
+These output types are a subset of those supported by the Point-Stat tool and are
+described in :numref:`point_stat-configuration_file`.
+
+.. _pair_stat-output:
+
+pair_stat Output
+----------------
+
+The Pair-Stat tool produces output in STAT and, optionally, ASCII format. The ASCII output
+duplicates the STAT output but has the data organized by line type. The output files names
+begin with **./pair_stat** or the string specified with the **-out base** command line option.
+Users should set the **-out base** command line option appropriately to avoid overwriting
+output generated by previous runs of the Pair-Stat tool.
+
+The output STAT file is named by appending **.stat** to the output base string.
+
+The output ASCII files are named by appending **_TYPE.txt** to the output base string
+for each output line TYPE set to **BOTH** in the **output_flag** configuration dictionary.

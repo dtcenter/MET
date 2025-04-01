@@ -323,6 +323,8 @@ An example of the point_stat calling sequence is shown below:
 
 In this example, the Point-Stat tool evaluates the model data in the sample_fcst.grb GRIB file using the observations in the NetCDF output of PB2NC, sample_pb.nc, applying the configuration options specified in the **PointStatConfig file**.
 
+.. _point_stat-configuration_file:
+
 point_stat Configuration File
 -----------------------------
 

@@ -737,7 +737,7 @@ class met_point_tools(met_base_tools):
    @staticmethod
    # Read the input file which is 11 column text file as the first argument
    def read_text_point_obs(input_file, header=None,
-                           delim_whitespace=True, keep_default_na=False):
+                           sep=r'\s+', keep_default_na=False):
       # Read and format the input 11-column observations:
       #   (1)  string:  Message_Type
       #   (2)  string:  Station_ID
@@ -752,7 +752,7 @@ class met_point_tools(met_base_tools):
       #   (11) numeric: Observation_Value
       ascii_point_data = pd.read_csv(
             input_file, header=header,
-            delim_whitespace=delim_whitespace,
+            sep=sep,
             keep_default_na=keep_default_na,
             names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs'],
             dtype={'typ':'string', 'sid':'string', 'vld':'string', 'var':'string', 'qc':'string'}).values.tolist()
