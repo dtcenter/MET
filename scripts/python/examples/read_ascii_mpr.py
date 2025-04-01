@@ -23,9 +23,8 @@ try:
 
    # Read MPR lines by using the Pandas Python package,
    # skipping the header row and first column.
-   # Input should be a 39 column text data matching the MPR line-type
-   # output from MET tools.
-   mpr_data = mpr_data.read_mpr(input_file, col_start=1, col_last=38, skiprows=1)
+   # Input should be text data in the MET MPR line type format.
+   mpr_data = mpr_data.read_mpr(input_file, col_start=1, skiprows=1)
    print("Data Length:\t" + repr(len(mpr_data)))
    print("Data Type:\t" + repr(type(mpr_data)))
 except NameError:
