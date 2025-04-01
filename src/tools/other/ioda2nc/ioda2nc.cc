@@ -36,9 +36,10 @@
 #include <netcdf>
 
 #include "main.h"
-#include "apply_mask.h"
-#include "ioda.h"
 #include "ioda2nc_conf_info.h"
+
+#include "apply_mask.h"
+#include "vx_ioda.h"
 #include "vx_log.h"
 #include "vx_nc_util.h"
 #include "vx_util.h"
@@ -71,7 +72,7 @@ static constexpr char program_name[] = "ioda2nc";
 // Variables for command line arguments
 //
 
-static iodaReader ioda_reader;
+static IODAReader ioda_reader;
 
 // StringArray to store IODA file name
 static StringArray ioda_files;
@@ -159,8 +160,6 @@ static void set_valid_beg_time(const StringArray &);
 static void set_valid_end_time(const StringArray &);
 static void set_verbosity(const StringArray &);
 
-static bool check_core_data(const bool, const bool,
-                            const StringArray &, const StringArray &, e_ioda_format);
 static ConcatString find_meta_name(string meta_key, StringArray available_names);
 static bool get_meta_data_double(NcFile *, StringArray &, const char *, double *,
                                  const int);
@@ -428,17 +427,14 @@ static void process_ioda_file(int i_pb) {
       exit(1);
    }
 
+   // Read the IODA file
    ioda_reader.read_ioda(f_in);
 
-   e_ioda_format ioda_format_ver = ioda_reader.get_format_ver();
-   bool has_msg_type = ioda_reader.msg_type_name.nonempty();
-   bool has_station_id = ioda_reader.station_id_name.nonempty();
-   bool is_netcdf_ready = check_core_data(has_msg_type, has_station_id,
-                                          ioda_reader.dim_names, ioda_reader.metadata_vars,
-                                          ioda_format_ver);
-   if(!is_netcdf_ready) {
+   // Error out for missing metadata
+   if(!ioda_reader.validate_metadata()) {
       mlog << Error << "\n" << method_name
-           << "Please check the IODA file (required dimensions or meta variables are missing).\n\n";
+           << "Required dimensions and/or metadata variables "
+           << "missing from IODA file \"" << ioda_files[i_pb] << "\".\n\n";
       delete f_in;
       f_in = (NcFile *) nullptr;
       clean_up();
@@ -496,7 +492,8 @@ static void process_ioda_file(int i_pb) {
       unit_attr.clear();
       desc_attr.clear();
       if(IS_VALID_NC(obs_var)) {
-         get_obs_data_double(f_in, raw_var_names[idx], &obs_var, obs_data, qc_data, nlocs, ioda_format_ver);
+         get_obs_data_double(f_in, raw_var_names[idx], &obs_var, obs_data, qc_data, nlocs,
+                             ioda_reader.get_format_ver());
          get_var_units(&obs_var, unit_attr);
          get_att_value_string(&obs_var, "long_name", desc_attr);
       }
@@ -599,7 +596,7 @@ static void process_ioda_file(int i_pb) {
          if(!diff_file_times.has(msg_ut)) diff_file_times.add(msg_ut);
       }
 
-      if(has_msg_type) {
+      if(ioda_reader.msg_type_name.nonempty()) {
          m_strncpy(hdr_typ, ioda_reader.msg_types[i_read].c_str(),
                    nstring, method_name_s, "hdr_typ");
 
@@ -624,7 +621,7 @@ static void process_ioda_file(int i_pb) {
                    method_name_s, "modified_hdr_typ");
       }
 
-      if(has_station_id) {
+      if(ioda_reader.station_id_name.nonempty()) {
          vector<char> tmp_sid(nstring + 1);
          m_strncpy(tmp_sid.data(), ioda_reader.station_ids[i_read].c_str(),
                    nstring, method_name_s, "tmp_sid");
@@ -974,42 +971,6 @@ static bool keep_valid_time(const unixtime ut,
    }
 
    return keep;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static bool check_core_data(const bool has_msg_type, const bool has_station_id,
-                            const StringArray &dim_names, const StringArray &metadata_vars,
-                            e_ioda_format ioda_format_ver) {
-   bool is_netcdf_ready = true;
-   static const char *method_name = "check_core_data() -> ";
-
-   StringArray &t_core_dims = (ioda_format_ver == e_ioda_format::v2)
-                              ? core_dims : core_dims_v1;
-   for(int idx=0; idx<t_core_dims.n(); idx++) {
-      if (!ioda_reader.is_in_metadata_map(t_core_dims[idx], dim_names)) {
-         mlog << Error << "\n" << method_name << "-> "
-              << "core dimension \"" << t_core_dims[idx] << "\" is missing.\n\n";
-         is_netcdf_ready = false;
-      }
-   }
-
-   if ((ioda_format_ver == e_ioda_format::v1) && (has_msg_type || has_station_id)) {
-      if (!ioda_reader.is_in_metadata_map("nstring", dim_names)) {
-         mlog << Error << "\n" << method_name << "-> "
-              << "core dimension \"nstring\" is missing.\n\n";
-         is_netcdf_ready = false;
-      }
-   }
-
-   for(int idx=0; idx<core_meta_vars.n(); idx++) {
-      if(!ioda_reader.is_in_metadata_map(core_meta_vars[idx], metadata_vars)) {
-         mlog << Error << "\n" << method_name << "-> "
-              << "core variable  \"" << core_meta_vars[idx] << "\" is missing.\n\n";
-         is_netcdf_ready = false;
-      }
-   }
-   return is_netcdf_ready;
 }
 
 ////////////////////////////////////////////////////////////////////////

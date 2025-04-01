@@ -45,7 +45,8 @@ class PairDataPoint : public PairBase {
       //////////////////////////////////////////////////////////////////
 
       // Forecast values
-      NumArray f_na; // Forecast [n_obs]
+      NumArray f_na;      // Forecast [n_obs]
+      NumArray f_lead_na; // Forecast lead time in seconds [n_obs]
       std::vector<SeepsScore *> seeps_mpr;
       SeepsAggScore seeps_agg;
 
@@ -58,7 +59,7 @@ class PairDataPoint : public PairBase {
 
       bool add_point_pair(const char *, const char *,
                           double, double, double, double,
-                          unixtime, double, double, double, double,
+                          int, unixtime, double, double, double, double,
                           const char *, const ClimoPntInfo &, double);
 
       void load_seeps_climo(const ConcatString &seeps_climo_name);
@@ -67,7 +68,7 @@ class PairDataPoint : public PairBase {
 
       void set_point_pair(int, const char *, const char *,
                           double, double, double, double,
-                          unixtime, double, double, double, double,
+                          int, unixtime, double, double, double, double,
                           const char *, const ClimoPntInfo &,
                           double, const SeepsScore *);
 

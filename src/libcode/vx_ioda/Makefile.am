@@ -13,5 +13,6 @@ include ${top_srcdir}/Make-include
 noinst_LIBRARIES = libvx_ioda.a
 libvx_ioda_a_SOURCES = \
               ioda.cc ioda.h \
-              ioda_data_conf_info.cc ioda_data_conf_info.h
+              ioda_data_conf_info.cc ioda_data_conf_info.h \
+              vx_ioda.h
 libvx_ioda_a_CPPFLAGS = ${MET_CPPFLAGS}
