@@ -50,8 +50,8 @@ Describe the steps to reproduce the behavior:
 
 ### Milestone and Projects ###
 - [ ] Select **Milestone** as the next bugfix version
-- [ ] Select **Coordinated METplus-X.Y Support** project for support of the current coordinated release
-- [ ] Select **MET-X.Y.Z Development** project for development toward the next official release
+- [ ] Select **METplus-X.Y Support** project for support of the current coordinated release
+- [ ] Select **MET-X.Y Development** project for development toward the next coordinated release
 
 ## Define Related Issue(s) ##
 Consider the impact to the other METplus components.
@@ -72,7 +72,7 @@ Pull request: `bugfix <Issue Number> main_<Version> <Description>`
 - [ ] Define the pull request metadata, as permissions allow.
 Select: **Reviewer(s)** and **Development** issue
 Select: **Milestone** as the next bugfix version
-Select: **Coordinated METplus-X.Y Support** project for support of the current coordinated release
+Select: **METplus-X.Y Support** project for support of the current coordinated release
 - [ ] Iterate until the reviewer(s) accept and merge your changes.
 - [ ] Delete your fork or branch.
 - [ ] Complete the steps above to fix the bug on the **develop** branch.
@@ -80,5 +80,5 @@ Branch name:  `bugfix_<Issue Number>_develop_<Description>`
 Pull request: `bugfix <Issue Number> develop <Description>`
 Select: **Reviewer(s)** and **Development** issue
 Select: **Milestone** as the next official version
-Select: **MET-X.Y.Z Development** project for development toward the next official release
+Select: **MET-X.Y Development** project for development toward the next coordinated release
 - [ ] Close this issue.
