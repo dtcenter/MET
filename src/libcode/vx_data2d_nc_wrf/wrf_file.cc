@@ -648,19 +648,29 @@ if ( !found )  {
 
          // track fields that need to be de-staggered in the X dimension
          if ( c.compare(x_dim_stag_name) == 0 ) {
-
             var->x_stag = true;
-
          }
 
-         // error if unsupported subgrid
-           if ( c.compare(x_dim_subgrid_name) == 0 ) {
+        // error if env var is set and non-subgrid requested
+        if(getenv("MET_USE_WRF_SUBGRID") != nullptr && c != x_dim_subgrid_name) {
+           mlog << Error << "\n" << method_name
+                << "MET_USE_WRF_SUBGRID is set, but non-subgrid requested for variable "
+                << var_name << "\n\n";
+           return false;
+        }
 
-              mlog << Error << "\n" << method_name
-                   << "X Dimension \"" << x_dim_subgrid_name << "\" is not supported.\n\n";
-              return false;
+         // track fields that are on a subgrid
+         if ( c.compare(x_dim_subgrid_name) == 0 ) {
+            var->x_subgrid = true;
 
+           // error if subgrid field is requested but subgrid grid was not read via env var
+           if(getenv("MET_USE_WRF_SUBGRID") == nullptr) {
+             mlog << Error << "\n" << method_name
+                 << "MET_USE_WRF_SUBGRID is not set, but subgrid requested for variable "
+                 << var_name << "\n\n";
+             return false;
            }
+         }
 
       }
          // Y dimension
@@ -677,14 +687,10 @@ if ( !found )  {
 
          }
 
-         // error if unsupported subgrid
-           if ( c.compare(y_dim_subgrid_name) == 0 ) {
-
-              mlog << Error << "\n" << method_name
-                   << "Y Dimension \"" << y_dim_subgrid_name << "\" is not supported.\n\n";
-              return false;
-
-           }
+         // track fields that are on a subgrid
+         if ( c.compare(y_dim_subgrid_name) == 0 ) {
+            var->y_subgrid = true;
+         }
 
       }
          // Z dimension

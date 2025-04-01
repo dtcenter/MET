@@ -42,6 +42,9 @@ static const char mercator_proj_var_name    [] = "Mercator";
 static const string nx_dimension_name          = "west_east";
 static const string ny_dimension_name          = "south_north";
 
+static const string nx_subgrid_dimension_name  = "west_east_subgrid";
+static const string ny_subgrid_dimension_name  = "south_north_subgrid";
+
 static const char ps_default_gridname       [] = "polar";
 static const char lambert_default_gridname  [] = "lambert";
 static const char mercator_default_gridname [] = "mercator";
@@ -237,9 +240,19 @@ else                           data.hemisphere = 'N';
    //
    //  Nx, Ny
    //
+   // check env var and read nx/ny from subgrid if set
 
-get_dim(&nc, nx_dimension_name, data.nx, true);
-get_dim(&nc, ny_dimension_name, data.ny, true);
+   if(getenv("MET_USE_WRF_SUBGRID") == nullptr) {
+      get_dim(&nc, nx_dimension_name, data.nx, true);
+      get_dim(&nc, ny_dimension_name, data.ny, true);
+   }
+   else {
+      mlog << Debug(3) << "Reading grid info from subgrid ("
+          << nx_subgrid_dimension_name << ", " << ny_subgrid_dimension_name
+          << ") because MET_USE_WRF_SUBGRID is set\n";
+      get_dim(&nc, nx_subgrid_dimension_name, data.nx, true);
+      get_dim(&nc, ny_subgrid_dimension_name, data.ny, true);
+   }
 
    //
    //  pin point
@@ -263,7 +276,16 @@ data.lon_orient *= -1.0;
    //  D, R
    //
 
-get_global_att(&nc, (string)"DX", data.d_km, true);
+get_global_att(&nc, (string) "DX", data.d_km, true);
+
+// if using WRF subgrid, calculate dx of subgrid
+if(getenv("MET_USE_WRF_SUBGRID") != nullptr){
+  int nx_full;
+  get_dim(&nc, nx_dimension_name, nx_full, true);
+  data.d_km = data.d_km * (double)nx_full / (double)data.nx;
+}
+
+// convert m to km
 data.d_km *= 0.001;
 
 data.r_km = default_grib_radius_km;
