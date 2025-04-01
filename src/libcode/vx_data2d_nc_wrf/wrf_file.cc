@@ -47,6 +47,10 @@ static const char z_dim_wrf_stag_name  [] = "bottom_top_stag";
 static const char z_dim_wrf_name       [] = "bottom_top";
 static const char z_dim_wrf_pres_name  [] = "num_press_levels_stag";
 static const char z_dim_wrf_z_name     [] = "num_z_levels_stag";
+static const char z_dim_bio_name       [] = "bio_emissions_dimension_stag";
+static const char z_dim_klevs_name     [] = "klevs_for_dvel";
+static const char z_dim_soil_name      [] = "soil_layers_stag";
+static const char z_dim_seed_dim_name  [] = "seed_dim_stag";
 static const string strl_dim_name         = "DateStrLen";
 
 static const char  times_var_name      [] = "Times";
@@ -197,11 +201,11 @@ mlog << Debug(5) << "\n" << method_name
 
 if ( IS_INVALID_NC_P(Nc) )  { close();  return false; }
 
-   //
-   //  grid
-   //
+  //
+  //  grid
+  //
 
-if ( !get_wrf_grid(*Nc, grid) )  { close();  return false; }
+  if ( !get_wrf_grid(*Nc, grid) )  { close();  return false; }
 
    //
    //  dimensions
@@ -215,8 +219,8 @@ for (j=0; j<Ndims; ++j)  {
    c = to_lower(DimNames[j]);
    NcDim dim = get_nc_dim(Nc, DimNames[j]);
 
-   if ( c.compare(t_dim_name) == 0 )  Ntimes = GET_NC_SIZE(dim);
-   if ( c.compare(t_dim_name) == 0 )            Tdim = &dim;
+   if ( c == t_dim_name )  Ntimes = GET_NC_SIZE(dim);
+   if ( c == t_dim_name )    Tdim = &dim;
 
 }
 
@@ -409,20 +413,24 @@ for (j=0; j<Nvars; ++j)  {
 
    for (k=0; k<(Var[j].Ndims); ++k)  {
       c = to_lower(DimNames[k]);
-           if ( c.compare(x_dim_name) == 0 )           out << "X";
-      else if ( c.compare(x_dim_stag_name) == 0 )      out << "X (staggered)";
-      else if ( c.compare(x_dim_subgrid_name) == 0 )   out << "X (subgrid)";
-      else if ( c.compare(y_dim_name) == 0 )           out << "Y";
-      else if ( c.compare(y_dim_stag_name) == 0 )      out << "Y (staggered)";
-      else if ( c.compare(y_dim_subgrid_name) == 0 )   out << "Y (subgrid)";
-      else if ( c.compare(z_dim_p_interp_name) == 0 ||
-                c.compare(z_dim_wrf_interp_name) == 0 ||
-                c.compare(z_dim_wrf_name) == 0 ||
-                c.compare(z_dim_wrf_pres_name) == 0 ||
-                c.compare(z_dim_wrf_z_name) == 0 )     out << "Z";
-      else if ( c.compare(z_dim_wrf_stag_name) == 0 )  out << "Z (staggered)";
-      else if ( Var[j].Dims[k] == Tdim )                  out << 'T';
-      else                                                out << GET_NC_NAME_P(Var[j].Dims[k]);
+           if ( c == x_dim_name )           out << "X";
+      else if ( c == x_dim_stag_name )      out << "X (staggered)";
+      else if ( c == x_dim_subgrid_name )   out << "X (subgrid)";
+      else if ( c == y_dim_name )           out << "Y";
+      else if ( c == y_dim_stag_name )      out << "Y (staggered)";
+      else if ( c == y_dim_subgrid_name )   out << "Y (subgrid)";
+      else if ( c == z_dim_p_interp_name ||
+                c == z_dim_wrf_interp_name ||
+                c == z_dim_wrf_name ||
+                c == z_dim_wrf_pres_name ||
+                c == z_dim_wrf_z_name ||
+                c == z_dim_bio_name ||
+                c == z_dim_klevs_name ||
+                c == z_dim_soil_name ||
+                c == z_dim_seed_dim_name )  out << "Z";
+      else if ( c == z_dim_wrf_stag_name )  out << "Z (staggered)";
+      else if ( Var[j].Dims[k] == Tdim )    out << 'T';
+      else                                  out << GET_NC_NAME_P(Var[j].Dims[k]);
 
       if ( k < Var[j].Ndims - 1)  out << ", ";
 
@@ -640,14 +648,12 @@ if ( !found )  {
       c = to_lower(varDimNames[k]);
 
       // X dimension
-      if ( c.compare(x_dim_name) == 0 ||
-           c.compare(x_dim_stag_name) == 0 ||
-           c.compare(x_dim_subgrid_name) == 0) {
+      if ( c == x_dim_name || c == x_dim_stag_name || c == x_dim_subgrid_name ) {
 
          var->x_slot = k;
 
          // track fields that need to be de-staggered in the X dimension
-         if ( c.compare(x_dim_stag_name) == 0 ) {
+         if ( c == x_dim_stag_name ) {
             var->x_stag = true;
          }
 
@@ -660,7 +666,7 @@ if ( !found )  {
         }
 
          // track fields that are on a subgrid
-         if ( c.compare(x_dim_subgrid_name) == 0 ) {
+         if ( c == x_dim_subgrid_name ) {
             var->x_subgrid = true;
 
            // error if subgrid field is requested but subgrid grid was not read via env var
@@ -674,39 +680,41 @@ if ( !found )  {
 
       }
          // Y dimension
-      else if ( c.compare(y_dim_name) == 0 ||
-                c.compare(y_dim_stag_name) == 0 ||
-                c.compare(y_dim_subgrid_name) == 0 ) {
+      else if ( c == y_dim_name || c == y_dim_stag_name || c == y_dim_subgrid_name ) {
 
          var->y_slot = k;
 
          // track fields that need to be de-staggered in the Y dimension
-         if ( c.compare(y_dim_stag_name) == 0 ) {
+         if ( c == y_dim_stag_name ) {
 
             var->y_stag = true;
 
          }
 
          // track fields that are on a subgrid
-         if ( c.compare(y_dim_subgrid_name) == 0 ) {
+         if ( c == y_dim_subgrid_name ) {
             var->y_subgrid = true;
          }
 
       }
          // Z dimension
-      else if ( c.compare(z_dim_p_interp_name  ) == 0 ||
-                c.compare(z_dim_wrf_interp_name) == 0 ||
-                c.compare(z_dim_wrf_name  ) == 0 ||
-                c.compare(z_dim_wrf_stag_name) == 0 ||
-                c.compare(z_dim_wrf_pres_name) == 0 ||
-                c.compare(z_dim_wrf_z_name ) == 0 ) {
+      else if ( c == z_dim_p_interp_name ||
+                c == z_dim_wrf_interp_name ||
+                c == z_dim_wrf_name ||
+                c == z_dim_wrf_stag_name ||
+                c == z_dim_wrf_pres_name ||
+                c == z_dim_wrf_z_name ||
+                c == z_dim_bio_name ||
+                c == z_dim_klevs_name ||
+                c == z_dim_soil_name ||
+                c == z_dim_seed_dim_name) {
 
          var->z_slot = k;
 
          // track fields that are on pressure levels
-         if ( c.compare(z_dim_p_interp_name) == 0 ||
-              c.compare(z_dim_wrf_interp_name) == 0 ||
-              c.compare(z_dim_wrf_pres_name) == 0 ) {
+         if ( c == z_dim_p_interp_name ||
+              c == z_dim_wrf_interp_name ||
+              c == z_dim_wrf_pres_name ) {
 
             var->is_pressure = true;
             z_name = c;
@@ -714,14 +722,14 @@ if ( !found )  {
          }
 
          // track fields that need to be de-staggered in the Z dimension
-         if ( c.compare(z_dim_wrf_stag_name) == 0 ) {
+         if ( c == z_dim_wrf_stag_name ) {
 
             var->z_stag = true;
 
          }
       }
          // T dimension
-      else if ( c.compare(t_dim_name) == 0 ) {
+      else if ( c == t_dim_name ) {
 
          var->t_slot = k;
 
@@ -787,7 +795,7 @@ if ( !found )  {
    //  check x_slot and y_slot
    //
 
-if ( var == nullptr || (var->x_slot < 0) || (var->y_slot < 0) )  {
+if ( var->x_slot < 0 || var->y_slot < 0 )  {
 
    mlog << Error << "\n" << method_name
         << "can't find needed dimensions(s) for variable \""
