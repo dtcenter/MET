@@ -55,9 +55,9 @@ static const double default_grib_radius_km     = 6371.20;
 ////////////////////////////////////////////////////////////////////////
 
 
-static bool   get_ps_grid       (NcFile & nc, Grid & grid);
-static bool   get_lambert_grid  (NcFile & nc, Grid & grid);
-static bool   get_mercator_grid (NcFile & nc, Grid & grid);
+static bool   get_ps_grid       (const NcFile & nc, Grid & grid);
+static bool   get_lambert_grid  (const NcFile & nc, Grid & grid);
+static bool   get_mercator_grid (const NcFile & nc, Grid & grid);
 
 static double mercator_lon_to_u(double lon);
 static double mercator_lat_to_v(double lat);
@@ -129,7 +129,7 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool get_ps_grid (NcFile & nc, Grid & grid)
+static bool get_ps_grid(const NcFile & nc, Grid & grid)
 
 {
 
@@ -210,7 +210,7 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool get_lambert_grid (NcFile & nc, Grid & grid)
+static bool get_lambert_grid (const NcFile & nc, Grid & grid)
 
 {
 
@@ -312,7 +312,7 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool get_mercator_grid (NcFile & nc, Grid & grid)
+static bool get_mercator_grid (const NcFile & nc, Grid & grid)
 
 {
 
@@ -417,7 +417,7 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-double mercator_lon_to_u(double lon)
+static double mercator_lon_to_u(double lon)
 
 {
 
@@ -435,7 +435,7 @@ return u;
 ////////////////////////////////////////////////////////////////////////
 
 
-double mercator_lat_to_v(double lat)
+static double mercator_lat_to_v(double lat)
 
 {
 
@@ -451,7 +451,7 @@ return v;
 ////////////////////////////////////////////////////////////////////////
 
 
-double mercator_u_to_lon(double u)
+static double mercator_u_to_lon(double u)
 
 {
 
@@ -469,7 +469,7 @@ return lon_deg;
 ////////////////////////////////////////////////////////////////////////
 
 
-double mercator_v_to_lat(double v)
+static double mercator_v_to_lat(double v)
 
 {
 
