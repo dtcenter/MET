@@ -30,4 +30,4 @@ This is a sub-issue of #*List the parent issue number here*.
 
 ### Milestone and Projects ###
 - [ ] Select **Milestone** as a **MET-X.Y.Z** version, **Consider for Next Release**, or **Backlog of Development Ideas**
-- [ ] For a **MET-X.Y.Z** version, select the **MET-X.Y.Z Development** project
+- [ ] For a **MET-X.Y.Z** version, select the **MET-X.Y Development** project
