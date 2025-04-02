@@ -694,4 +694,20 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_WRF_fire_subgrid">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <env>
+      <pair><name>MET_USE_WRF_SUBGRID</name> <value>yes</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/wrf/wrfout_fire_d02_2018-06-01_20:00:00 \
+      &OUTPUT_DIR;/plot_data_plane/wrf_fire_subgrid.ps \
+      'name="FIRE_AREA";level="0,*,*";' \
+      -title "WRF Fire Area subgrid" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/wrf_fire_subgrid.ps</ps>
+    </output>
+  </test>
 </met_test>
