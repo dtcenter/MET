@@ -55,6 +55,7 @@ To run all of the unit tests, call the *bin/unit_test.sh* script::
     ./bin/unit_test.sh
 
 To run a single unit test group, call the *python/unit.py* script, passing it an XML test config file::
+
     ./python/unit.py ./xml/unit_pcp_combine.xml
 
 .. note::
