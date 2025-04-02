@@ -13,7 +13,55 @@ Unit Tests
 Running Unit Tests
 ------------------
 
-Coming Soon!
+Obtain Input Data
+^^^^^^^^^^^^^^^^^
+
+To run the MET unit tests locally, the input data must be obtained. It can be downloaded
+`here <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/MET_unit_test/develop/unit_test-all.tgz>`_.
+Extract the data into a directory that will be used to set the **MET_TEST_INPUT** environment variable.
+
+Set Up Environment
+^^^^^^^^^^^^^^^^^^
+
+Set the required environment variables needed to run.
+
+* **MET_BASE** - Path to the *share/met* directory where MET is installed. This is used to find the MET executables.
+* **MET_TEST_BASE** - Path to the MET/internal/test_unit directory that contains the unit test files
+* **MET_TEST_INPUT** - Directory containing unit test input data.
+* **MET_TEST_OUTPUT** - Directory to write test output
+
+Example::
+
+    export MET_BASE=/path/to/install/MET/share/met
+    export MET_TEST_BASE=/path/to/src/MET/internal/test_unit
+    export MET_TEST_INPUT=/path/to/MET_unit_test
+    export MET_TEST_OUTPUT=/path/to/my/output_dir
+
+Other environment variables that may need to be set include:
+
+* **MET_TEST_MET_PYTHON_EXE** - Path to Python executable to use for Python Embedding tests
+* **MET_TEST_RSCRIPT** - Path to Rscript executable used to run R script tests
+* **MET_FONT_DIR** - Path to font files, e.g. ${MET_TEST_INPUT}/fonts
+
+Run the tests
+^^^^^^^^^^^^^
+
+Navigate to the *internal/test_unit* directory of the MET repository::
+
+    cd ${MET_TEST_BASE}
+
+To run all of the unit tests, call the *bin/unit_test.sh* script::
+
+    ./bin/unit_test.sh
+
+To run a single unit test group, call the *python/unit.py* script, passing it an XML test config file::
+    ./python/unit.py ./xml/unit_pcp_combine.xml
+
+.. note::
+
+   Some unit tests depend on the output of other unit tests.
+   For example, *unit_plot_data_plane.xml* requires output from *unit_pcp_combine.xml*.
+
 
 Input Data
 ----------
