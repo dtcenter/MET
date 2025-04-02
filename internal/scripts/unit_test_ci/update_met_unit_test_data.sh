@@ -1,4 +1,4 @@
-#/bin/bash
+#! /bin/bash
 
 ################################################################################
 # Script: update_met_unit_test_data.sh
@@ -35,7 +35,7 @@ NEXT_RELEASE_DIR=${UNIT_TEST_DATA_DIR}/${NEXT_RELEASE}
 
 # exit if next release directory (e.g. v12.1) does not exist
 
-if [ ! -d ${NEXT_RELEASE_DIR} ]; then
+if [ ! -d "${NEXT_RELEASE_DIR}" ]; then
     echo "Next release directory does not exist: ${NEXT_RELEASE_DIR}"
     echo "Exiting..."
     exit 0
@@ -45,7 +45,7 @@ fi
 # check if vX.Y/unit_test-all.tgz exists and exit if not
 
 UPDATE_DATA_TARFILE_PATH=${NEXT_RELEASE_DIR}/${INPUT_DATA_TARFILE_NAME}
-if [ ! -f ${UPDATE_DATA_TARFILE_PATH} ]; then
+if [ ! -f "${UPDATE_DATA_TARFILE_PATH}" ]; then
     echo "ERROR: Tarfile must exist in ${NEXT_RELEASE} dir: ${UPDATE_DATA_TARFILE_PATH}"
     exit 1
 fi
@@ -53,8 +53,8 @@ fi
 
 # save a copy of the tarfile in case it needs to be recovered
 save_path=${UPDATE_DATA_TARFILE_PATH}.$(date +%Y%m%d)
-echo Saving a copy of ${UPDATE_DATA_TARFILE_PATH} to ${save_path}
-mv ${UPDATE_DATA_TARFILE_PATH} ${save_path}
+echo "Saving a copy of ${UPDATE_DATA_TARFILE_PATH} to ${save_path}"
+mv "${UPDATE_DATA_TARFILE_PATH}" "${save_path}"
 
-echo Creating ${INPUT_DATA_TARFILE_NAME} from unit_test directory in ${NEXT_RELEASE_DIR}
-(cd ${NEXT_RELEASE_DIR} && tar -cvzf ${INPUT_DATA_TARFILE_NAME} unit_test)
+echo "Creating ${INPUT_DATA_TARFILE_NAME} from unit_test directory in ${NEXT_RELEASE_DIR}"
+(cd "${NEXT_RELEASE_DIR}" && tar -cvzf ${INPUT_DATA_TARFILE_NAME} unit_test)
