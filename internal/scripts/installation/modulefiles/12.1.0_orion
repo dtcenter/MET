@@ -7,7 +7,7 @@ proc ModulesHelp { } {
      *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
 }
 
-prereq intel-oneapi-compilers/2022.2.1
+prereq intel-oneapi-compilers/2024.1.0
 
 set base /apps/contrib/MET
 set ver 12.1.0
