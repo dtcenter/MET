@@ -70,10 +70,10 @@ fi
 # copy tarfile into next version directory and extract its contents
 
 echo "Copying tarfile ${INPUT_DATA_TARFILE_PATH} into ${NEXT_RELEASE_DIR}"
-cp ${INPUT_DATA_TARFILE_PATH} ${NEXT_RELEASE_DIR}/
+cp ${INPUT_DATA_TARFILE_PATH} "${NEXT_RELEASE_DIR}"/
 
 echo "Extracting tarfile into ${NEXT_RELEASE_DIR}"
-tar zxf ${NEXT_RELEASE_DIR}/${INPUT_DATA_TARFILE_NAME} -C ${NEXT_RELEASE_DIR}
+tar zxf "${NEXT_RELEASE_DIR}/${INPUT_DATA_TARFILE_NAME}" -C "${NEXT_RELEASE_DIR}"
 
 # if develop tarfile is a symbolic link, unlink it, otherwise save a copy
 if [ -h ${INPUT_DATA_TARFILE_PATH} ]; then
@@ -82,7 +82,7 @@ if [ -h ${INPUT_DATA_TARFILE_PATH} ]; then
 else
     save_path=${INPUT_DATA_TARFILE_PATH}.$(date +%Y%m%d)
     echo "Saving a copy of ${INPUT_DATA_TARFILE_PATH} to ${save_path}"
-    mv ${INPUT_DATA_TARFILE_PATH} ${save_path}
+    mv ${INPUT_DATA_TARFILE_PATH} "${save_path}"
 fi
 
 # create symbolic link from develop files to next release version
@@ -93,15 +93,15 @@ ln -s ${NEXT_RELEASE_DIR}/${INPUT_DATA_TARFILE_NAME} ${INPUT_DATA_TARFILE_PATH}
 # do the same for the volume_mount_directories file
 
 echo "Copying volume mount file ${volume_mount_path} into ${NEXT_RELEASE_DIR}"
-cp ${volume_mount_path} ${NEXT_RELEASE_DIR}/
+cp ${volume_mount_path} "${NEXT_RELEASE_DIR}"/
 
 if [ -h ${volume_mount_path} ]; then
     echo Unlinking ${volume_mount_path}
     unlink ${volume_mount_path}
 else
     save_path=${volume_mount_path}.$(date +%Y%m%d)
-    echo Saving a copy of ${volume_mount_path} to ${save_path}
-    mv ${volume_mount_path} ${save_path}
+    echo "Saving a copy of ${volume_mount_path} to ${save_path}"
+    mv ${volume_mount_path} "${save_path}"
 fi
 
 # create symbolic link from develop files to next release version
