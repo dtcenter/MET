@@ -86,8 +86,9 @@ else
 fi
 
 # create symbolic link from develop files to next release version
-echo "Creating sym link from ${INPUT_DATA_TARFILE_PATH} to ${NEXT_RELEASE_DIR}/${INPUT_DATA_TARFILE_NAME}"
-ln -s ${NEXT_RELEASE_DIR}/${INPUT_DATA_TARFILE_NAME} ${INPUT_DATA_TARFILE_PATH}
+tarfile_realpath=$(realpath "${NEXT_RELEASE_DIR}/${INPUT_DATA_TARFILE_NAME}")
+echo "Creating sym link from ${INPUT_DATA_TARFILE_PATH} to ${tarfile_realpath}"
+ln -s "${tarfile_realpath}" ${INPUT_DATA_TARFILE_PATH}
 
 
 # do the same for the volume_mount_directories file
@@ -105,5 +106,6 @@ else
 fi
 
 # create symbolic link from develop files to next release version
-echo "Creating sym link from ${volume_mount_path} to ${NEXT_RELEASE_DIR}/${VOLUME_MOUNT_FILE_NAME}"
-ln -s ${NEXT_RELEASE_DIR}/${VOLUME_MOUNT_FILE_NAME} ${volume_mount_path}
+vmd_realpath=$(realpath "${NEXT_RELEASE_DIR}/${VOLUME_MOUNT_FILE_NAME}")
+echo "Creating sym link from ${volume_mount_path} to ${vmd_realpath}"
+ln -s "${vmd_realpath}" ${volume_mount_path}
