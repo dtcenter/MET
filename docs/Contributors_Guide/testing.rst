@@ -59,6 +59,7 @@ To run all of the unit tests, call the *bin/unit_test.sh* script::
 To run a single unit test group, call the *python/unit.py* script, passing it an XML test config file::
 
     ./python/unit.py ./xml/unit_pcp_combine.xml
+
 To generate commands corresponding to a single unit test group, but not actually execute those commands, add the *-cmd* command line argument and redirect the output to a file::
 
     ./python/unit.py ./xml/unit_pcp_combine.xml -cmd > unit_pcp_combine.sh
@@ -68,7 +69,8 @@ Extracting individual commands to be executed in this way can be convenient duri
 .. note::
 
    Some unit tests depend on the output of other unit tests.
-   For example, *unit_plot_data_plane.xml* requires output from *unit_pcp_combine.xml*. Those dependencies are generally noted in comments at the top of each unit test xml file.
+   For example, *unit_plot_data_plane.xml* requires output from *unit_pcp_combine.xml*.
+   Those dependencies are generally noted in comments at the top of each unit test xml file.
 
 
 Input Data
