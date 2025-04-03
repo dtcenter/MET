@@ -132,6 +132,7 @@ return status;
 static bool get_ps_grid(const NcFile & nc, Grid & grid)
 
 {
+  const char *method_name = "get_ps_grid(const NcFile & nc, Grid & grid) -> ";
 
 StereographicData data;
 
@@ -157,6 +158,11 @@ else                         data.hemisphere = 'N';
    //
    //  Nx, Ny
    //
+  if(getenv("MET_USE_WRF_SUBGRID") != nullptr) {
+    mlog << Error << "\n" << method_name
+         << "MET_USE_WRF_SUBGRID is set, but subgrid is not supported for StereographicData grid\n\n";
+    return false;
+  }
 
 get_dim(&nc, nx_dimension_name, data.nx, true);
 get_dim(&nc, ny_dimension_name, data.ny, true);
@@ -315,6 +321,7 @@ return true;
 static bool get_mercator_grid (const NcFile & nc, Grid & grid)
 
 {
+  const char *method_name = "get_mercator_grid (const NcFile & nc, Grid & grid) -> ";
 
 double D_km;
 double scale_factor, scale_lat;
@@ -332,6 +339,11 @@ data.name = mercator_default_gridname;
    //
    //  nx, ny
    //
+  if(getenv("MET_USE_WRF_SUBGRID") != nullptr) {
+    mlog << Error << "\n" << method_name
+         << "MET_USE_WRF_SUBGRID is set, but subgrid is not supported for MercatorData grid\n\n";
+    return false;
+  }
 
 get_dim(&nc, nx_dimension_name, data.nx, true);
 get_dim(&nc, ny_dimension_name, data.ny, true);
