@@ -242,7 +242,7 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_series(void) {
-   DataPlane data_dp[conf_info.get_n_data()];
+   vector<DataPlane> data_dp(conf_info.get_n_data());
    double min, max;
    StringArray *cur_files;
    GrdFileType *cur_ftype;

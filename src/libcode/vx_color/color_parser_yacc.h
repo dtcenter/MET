@@ -54,15 +54,15 @@ extern int colordebug;
     YYEOF = 0,                     /* "end of file"  */
     YYerror = 256,                 /* error  */
     YYUNDEF = 257,                 /* "invalid token"  */
-    ID = 258,                      /* ID  */
-    COLOR_NAME = 259,              /* COLOR_NAME  */
-    INTEGER = 260,                 /* INTEGER  */
-    QUOTED_STRING = 261,           /* QUOTED_STRING  */
-    FLOAT = 262,                   /* FLOAT  */
-    BLEND = 263,                   /* BLEND  */
-    HSV = 264,                     /* HSV  */
-    GRAYVALUE = 265,               /* GRAYVALUE  */
-    CMYK = 266                     /* CMYK  */
+    QUOTED_STRING = 258,           /* QUOTED_STRING  */
+    BLEND = 259,                   /* BLEND  */
+    HSV = 260,                     /* HSV  */
+    GRAYVALUE = 261,               /* GRAYVALUE  */
+    CMYK = 262,                    /* CMYK  */
+    ID = 263,                      /* ID  */
+    INTEGER = 264,                 /* INTEGER  */
+    COLOR_NAME = 265,              /* COLOR_NAME  */
+    FLOAT = 266                    /* FLOAT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -71,21 +71,21 @@ extern int colordebug;
 #define YYEOF 0
 #define YYerror 256
 #define YYUNDEF 257
-#define ID 258
-#define COLOR_NAME 259
-#define INTEGER 260
-#define QUOTED_STRING 261
-#define FLOAT 262
-#define BLEND 263
-#define HSV 264
-#define GRAYVALUE 265
-#define CMYK 266
+#define QUOTED_STRING 258
+#define BLEND 259
+#define HSV 260
+#define GRAYVALUE 261
+#define CMYK 262
+#define ID 263
+#define INTEGER 264
+#define COLOR_NAME 265
+#define FLOAT 266
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 126 "color_parser_yacc.yy"
+#line 119 "color_parser_yacc.yy"
 
 
    char text[129];

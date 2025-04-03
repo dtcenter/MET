@@ -1,0 +1,46 @@
+To install a release:
+
+# Switch to the met_test user (email ral-help@ucar.edu if you do not have permission to switch to that user)
+runas met_test
+
+# Change to the local installation directory:
+
+#cd /d1/projects/MET/MET_releases
+cd /d1/personal/mwin/AF_optimization/MET
+
+# Download the MET release tarfile from the METplus Downloads page
+# https://dtcenter.org/community-code/metplus/download
+# EXAMPLE:
+# wget https://github.com/dtcenter/MET/releases/download/v10.1.0-beta1/met-10.1.0-beta1.20210613.tar.gz
+
+# untar the release tarfile
+# EXAMPLE: tar xzf v11.0.0-beta4.tar.gz
+# EXAMPLE: tar zxf met-10.1.0-beta1.20210613.tar.gz
+
+# Store the downloaded tar file in a sub-directory to keep things tidy
+# Note the tar file may or may not include the met- prefix, so
+# adjust the mv command accordingly
+
+# EXAMPLE: mv v*.tar.gz tar_files/.
+# EXAMPLE: mv met-*.tar.gz tar_files/.
+
+# change directory into the release directory
+# EXAMPLE: cd MET-11.0.0-beta4
+# EXAMPLE: cd met-10.1.0-beta1
+
+# source the development environment file
+
+source ./internal/scripts/environment/development.seneca
+
+# unset MET_DEVELOPMENT
+unset MET_DEVELOPMENT
+
+# run configure setting the prefix to the current directory
+
+./configure --prefix=`pwd` --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python --enable-ugrid
+
+# run make and save the output to a log file
+
+make install test >& make.log &
+tail -f make.log
+

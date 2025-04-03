@@ -17,7 +17,7 @@ obs_name_map = [];
 //
 metadata_map = [
    { key = "message_type"; val = "msg_type,station_ob"; },
-   { key = "station_id";   val = "station_id,report_identifier"; },
+   { key = "station_id";   val = "station_id,report_identifier,stationIdentifier"; },
    { key = "pressure";     val = "air_pressure,pressure"; },
    { key = "height";       val = "height,height_above_mean_sea_level"; },
    { key = "datetime";     val = "datetime,dateTime"; },

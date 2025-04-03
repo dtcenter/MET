@@ -224,8 +224,8 @@ Indent prefix(depth);
 
 out << prefix << "Name         = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << '\n';
 
@@ -304,7 +304,7 @@ void UnstructuredGrid::shift_right(int N)
 
 GridRep * UnstructuredGrid::copy() const {
 
-  UnstructuredGrid *p = new UnstructuredGrid (Data);
+  auto * p = new UnstructuredGrid (Data);
 
   p->Name = Name;
 

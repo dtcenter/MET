@@ -49,6 +49,7 @@ struct point_pair_t : station_value_base_t {
 
    void clear();
 
+   int lead;
    double fval;
    double oval;
 };
@@ -431,6 +432,10 @@ class VxPairBase {
                           double, double, double,
                           double, double, double,
                           const ClimoPntInfo &, double &);
+
+      // Retrieve climo data for this point 
+      ClimoPntInfo get_climo_pnt_info(int, const Grid &gr, double, double,
+                                      double, double, double);
 
       // Member functions for incrementing the counts
       void inc_count(std::vector<int> &, int);

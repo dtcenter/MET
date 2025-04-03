@@ -59,13 +59,45 @@ wind_logic    = UNION;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Matched pairs filtering and control options
+// Matched pairs filtering options
 // May be set separately in each "obs.pairs" entry
 //
-mpr_column     = [];
-mpr_thresh     = [];
-mpr_str_inc    = [];
-mpr_str_exc    = [];
+mpr_column      = [];
+mpr_thresh      = [];
+mpr_str_inc     = [];
+mpr_str_exc     = [];
+
+fcst_lead       = [];
+obs_lead        = [];
+
+fcst_valid_beg  = "";
+fcst_valid_end  = "";
+fcst_valid_inc  = [];
+fcst_valid_exc  = [];
+fcst_valid_hour = [];
+
+obs_valid_beg   = "";
+obs_valid_end   = "";
+obs_valid_inc   = [];
+obs_valid_exc   = [];
+obs_valid_hour  = [];
+
+fcst_init_beg   = "";
+fcst_init_end   = "";
+fcst_init_inc   = [];
+fcst_init_exc   = [];
+fcst_init_hour  = [];
+
+obs_init_beg    = "";
+obs_init_end    = "";
+obs_init_inc    = [];
+obs_init_exc    = [];
+obs_init_hour   = [];
+
+//
+// Matched pairs control options
+// May be set separately in each "obs.pairs" entry
+//
 eclv_points    = 0.05;
 hss_ec_value   = NA;
 rank_corr_flag = FALSE;
@@ -80,6 +112,13 @@ climo_mean = {
 
    file_name = [];
    field     = [];
+
+   regrid = {
+      method     = NEAREST;
+      width      = 1;
+      vld_thresh = 0.5;
+      shape      = SQUARE;
+   }
 
    time_interp_method = DW_MEAN;
    day_interval       = 31;
@@ -104,17 +143,6 @@ climo_cdf = {
    center_bins = FALSE;
    write_bins  = TRUE;
    direct_prob = FALSE;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Point observation time window
-// May be set separately in each "obs.pairs" entry
-//
-obs_window = {
-   beg = -5400;
-   end =  5400;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

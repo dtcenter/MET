@@ -25,7 +25,7 @@ export MET_SUBDIR=${TEST_BASE}
 # Required
 # The name of the met tarbal usually downloaded with version from dtcenter.org and includes a version
 #  example - v12.0.0.tar.gz
-export MET_TARBALL=v12.0.0.tar.gz
+export MET_TARBALL=v12.1.0.tar.gz
 
 # Required
 # Specify if machine useds modules for loading software
@@ -52,9 +52,7 @@ export MAKE_ARGS="-j 5"
 # in the external_libs directory, no further edits are needed; however, users
 # that have the pre-existing libraries not in the external_libs directory will
 # need to update the paths to the appropriate location.
-export EXTERNAL_LIBS=${TEST_BASE}/external_libs
-#export COMPILE_ECKIT=1
-#export COMPILE_ATLAS=1
+#export EXTERNAL_LIBS=${TEST_BASE}/external_libs
 #export MET_PROJ=${EXTERNAL_LIBS}
 #export TIFF_INCLUDE_DIR=${EXTERNAL_LIBS}/include
 #export TIFF_LIB_DIR=${EXTERNAL_LIBS}/lib

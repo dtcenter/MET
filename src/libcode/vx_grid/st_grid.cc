@@ -439,8 +439,8 @@ ConcatString junk;
 
 out << prefix << "Name       = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << '\n';   //  no prefix
 
@@ -588,7 +588,7 @@ GridRep * StereographicGrid::copy() const
 
 {
 
-StereographicGrid * p = new StereographicGrid (Data);
+auto * p = new StereographicGrid (Data);
 
 p->Name = Name;
 

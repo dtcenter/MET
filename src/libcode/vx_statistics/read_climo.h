@@ -20,12 +20,12 @@
 
 extern DataPlane read_climo_data_plane(
                     Dictionary *, const char *,
-                    int, unixtime, const Grid &,
+                    int, unixtime, Grid &,
                     const char *);
 
 extern DataPlaneArray read_climo_data_plane_array(
                          Dictionary *, const char *,
-                         int, unixtime, const Grid &,
+                         int, unixtime, Grid &,
                          const char *);
 
 ////////////////////////////////////////////////////////////////////////

@@ -871,23 +871,38 @@ static const char conf_val_uniform[]     = "UNIFORM";
 static const char conf_val_beta[]        = "BETA";
 
 //
+// STAT-Analysis and Pair-Stat specific parameter key names
+//
+static const char conf_key_fcst_lead[] = "fcst_lead";
+static const char conf_key_obs_lead[]  = "obs_lead";
+
+static const char conf_key_fcst_valid_beg[]  = "fcst_valid_beg";
+static const char conf_key_fcst_valid_end[]  = "fcst_valid_end";
+static const char conf_key_fcst_valid_inc[]  = "fcst_valid_inc";
+static const char conf_key_fcst_valid_exc[]  = "fcst_valid_exc";
+static const char conf_key_fcst_valid_hour[] = "fcst_valid_hour";
+
+static const char conf_key_obs_valid_beg[]  = "obs_valid_beg";
+static const char conf_key_obs_valid_end[]  = "obs_valid_end";
+static const char conf_key_obs_valid_inc[]  = "obs_valid_inc";
+static const char conf_key_obs_valid_exc[]  = "obs_valid_exc";
+static const char conf_key_obs_valid_hour[] = "obs_valid_hour";
+
+static const char conf_key_fcst_init_beg[]  = "fcst_init_beg";
+static const char conf_key_fcst_init_end[]  = "fcst_init_end";
+static const char conf_key_fcst_init_inc[]  = "fcst_init_inc";
+static const char conf_key_fcst_init_exc[]  = "fcst_init_exc";
+static const char conf_key_fcst_init_hour[] = "fcst_init_hour";
+
+static const char conf_key_obs_init_beg[]  = "obs_init_beg";
+static const char conf_key_obs_init_end[]  = "obs_init_end";
+static const char conf_key_obs_init_inc[]  = "obs_init_inc";
+static const char conf_key_obs_init_exc[]  = "obs_init_exc";
+static const char conf_key_obs_init_hour[] = "obs_init_hour";
+
+//
 // STAT-Analysis specific parameter key names
 //
-
-static const char conf_key_fcst_lead[]           = "fcst_lead";
-static const char conf_key_obs_lead[]            = "obs_lead";
-static const char conf_key_fcst_valid_beg[]      = "fcst_valid_beg";
-static const char conf_key_fcst_valid_end[]      = "fcst_valid_end";
-static const char conf_key_fcst_valid_hour[]     = "fcst_valid_hour";
-static const char conf_key_obs_valid_beg[]       = "obs_valid_beg";
-static const char conf_key_obs_valid_end[]       = "obs_valid_end";
-static const char conf_key_obs_valid_hour[]      = "obs_valid_hour";
-static const char conf_key_fcst_init_beg[]       = "fcst_init_beg";
-static const char conf_key_fcst_init_end[]       = "fcst_init_end";
-static const char conf_key_fcst_init_hour[]      = "fcst_init_hour";
-static const char conf_key_obs_init_beg[]        = "obs_init_beg";
-static const char conf_key_obs_init_end[]        = "obs_init_end";
-static const char conf_key_obs_init_hour[]       = "obs_init_hour";
 static const char conf_key_fcst_var[]            = "fcst_var";
 static const char conf_key_obs_var[]             = "obs_var";
 static const char conf_key_fcst_units[]          = "fcst_units";

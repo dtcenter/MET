@@ -52,7 +52,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 import pandas as pd
 
-from met.logger import met_base, met_base_tools
+from met.logger import met_base, met_base_tools, NumpyTypeEncoder
 
 
 COUNT_SHOW = 30
@@ -388,7 +388,7 @@ class met_base_point(met_base):
       point_array_list[11] = self.convert_to_ndarray(self.obs_qty)
 
       with open(tmp_filename,'w') as json_fh:
-         json.dump(json_dict, json_fh)
+         json.dump(json_dict, json_fh, cls=NumpyTypeEncoder)
 
       numpy_dump_name = met_base_tools.get_numpy_filename(tmp_filename)
       #np.save(numpy_dump_name, self.convert_to_ndarray(point_array_list))
@@ -737,7 +737,7 @@ class met_point_tools(met_base_tools):
    @staticmethod
    # Read the input file which is 11 column text file as the first argument
    def read_text_point_obs(input_file, header=None,
-                           delim_whitespace=True, keep_default_na=False):
+                           sep=r'\s+', keep_default_na=False):
       # Read and format the input 11-column observations:
       #   (1)  string:  Message_Type
       #   (2)  string:  Station_ID
@@ -752,7 +752,7 @@ class met_point_tools(met_base_tools):
       #   (11) numeric: Observation_Value
       ascii_point_data = pd.read_csv(
             input_file, header=header,
-            delim_whitespace=delim_whitespace,
+            sep=sep,
             keep_default_na=keep_default_na,
             names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs'],
             dtype={'typ':'string', 'sid':'string', 'vld':'string', 'var':'string', 'qc':'string'}).values.tolist()

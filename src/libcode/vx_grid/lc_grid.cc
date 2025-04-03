@@ -505,8 +505,8 @@ Indent prefix(depth);
 
 out << prefix << "Name       = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << '\n';
 
@@ -667,7 +667,7 @@ GridRep * LambertGrid::copy() const
 
 {
 
-LambertGrid * p = new LambertGrid (Data);
+auto * p = new LambertGrid (Data);
 
 p->Name = Name;
 

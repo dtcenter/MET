@@ -882,6 +882,8 @@ using the following entries:
      censor_val      = [];
   }
 
+.. _config_options-fcst:
+
 fcst
 ----
 

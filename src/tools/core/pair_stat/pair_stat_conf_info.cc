@@ -20,9 +20,30 @@
 #include "nc_obs_util.h"
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
+#include "vx_cal.h"
 #include "vx_log.h"
 
 using namespace std;
+
+////////////////////////////////////////////////////////////////////////
+
+static ConcatString get_time_str(
+                               const unixtime beg, const unixtime end,
+                               const TimeArray &inc, const TimeArray &exc,
+                               const IntArray &hour);
+
+static bool is_keeper_unixtime(const unixtime, const unixtime,
+                               const unixtime, const unixtime,
+                               const TimeArray &, const TimeArray &,
+                               const IntArray &);
+
+static double get_ioda_mpr_val(const string &,
+                               const point_pair_t &,
+                               bool print_warning = false);
+
+static string get_ioda_mpr_str(const string &,
+                               const point_pair_t &,
+                               bool print_warning = false);
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -344,7 +365,7 @@ void PairStatConfInfo::process_masks() {
             mlog << Debug(3)
                  << "Processing grid mask: "
                  << vx.mask_grid[i] << "\n";
-            parse_grid_mask(vx.mask_grid[i], grid, mp, name);
+            parse_grid_mask(vx.mask_grid[i], grid_mask, mp, name);
             grid_map[vx.mask_grid[i]] = name;
             mask_area_map[name] = mp;
          }
@@ -362,7 +383,7 @@ void PairStatConfInfo::process_masks() {
             mlog << Debug(3)
                  << "Processing poly mask: "
                  << vx.mask_poly[i] << "\n";
-            parse_poly_mask(vx.mask_poly[i], grid, mp, name);
+            parse_poly_mask(vx.mask_poly[i], grid_mask, mp, name);
             poly_map[vx.mask_poly[i]] = name;
             mask_area_map[name] = mp;
          }
@@ -573,8 +594,6 @@ void PairStatVxOpt::clear() {
    vx_pd.clear();
    vx_hdr.clear();
 
-   beg_ds = end_ds = bad_data_int;
-
    fcat_ta.clear();
    ocat_ta.clear();
 
@@ -594,6 +613,33 @@ void PairStatVxOpt::clear() {
    mpr_thr_inc_map.clear();
    mpr_str_inc_map.clear();
    mpr_str_exc_map.clear();
+
+   fcst_lead.clear();
+   obs_lead.clear();
+
+   fcst_valid_beg = 0;
+   fcst_valid_end = 0;
+   fcst_valid_inc.clear();
+   fcst_valid_exc.clear();
+   fcst_valid_hour.clear();
+
+   obs_valid_beg = 0;
+   obs_valid_end = 0;
+   obs_valid_inc.clear();
+   obs_valid_exc.clear();
+   obs_valid_hour.clear();
+
+   fcst_init_beg = 0;
+   fcst_init_end = 0;
+   fcst_init_inc.clear();
+   fcst_init_exc.clear();
+   fcst_init_hour.clear();
+
+   obs_init_beg = 0;
+   obs_init_end = 0;
+   obs_init_inc.clear();
+   obs_init_exc.clear();
+   obs_init_hour.clear();
 
    mask_name.clear();
 
@@ -641,8 +687,6 @@ bool PairStatVxOpt::is_uv_match(const PairStatVxOpt &v) const {
                           v.vx_pd.fcst_info->req_level_name()) ||
       !is_req_level_match(  vx_pd.obs_info->req_level_name(),
                           v.vx_pd.obs_info->req_level_name()) ||
-      !(beg_ds     == v.beg_ds        ) ||
-      !(end_ds     == v.end_ds        ) ||
       !(mask_grid  == v.mask_grid     ) ||
       !(mask_poly  == v.mask_poly     ) ||
       !(mask_sid   == v.mask_sid      ) ||
@@ -704,10 +748,6 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    // Populate the output_flag array with map values
    for(int i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
 
-   // Conf: beg_ds and end_ds
-   dict = odict.lookup_dictionary(conf_key_obs_window);
-   parse_conf_range_int(dict, beg_ds, end_ds);
-
    // Conf: cat_thresh
    fcat_ta = fdict.lookup_thresh_array(conf_key_cat_thresh);
    ocat_ta = odict.lookup_thresh_array(conf_key_cat_thresh);
@@ -753,7 +793,7 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
          ThreshArray ta;
          mpr_thr_inc_map[(mpr_sa[i])] = ta;
       }
-      mpr_thr_inc_map[(mpr_sa[i])].add(mpr_ta[i]); 
+      mpr_thr_inc_map[(mpr_sa[i])].add(mpr_ta[i]);
    }
 
    // Conf: mpr_str_inc
@@ -764,12 +804,62 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    parse_add_conf_key_values_map(&odict, conf_key_mpr_str_exc,
       &mpr_str_exc_map, method_name);
 
+   // Print warnings about unexpected IODA MPR column names
+   if(ftype == PairsFormat::IODA) {
+      point_pair_t p;
+      for(const auto &m : mpr_thr_inc_map) get_ioda_mpr_val(m.first, p, true);
+      for(const auto &m : mpr_str_inc_map) get_ioda_mpr_str(m.first, p, true);
+      for(const auto &m : mpr_str_exc_map) get_ioda_mpr_str(m.first, p, true);
+   }
+
+   // Parse time filtering options
+   fcst_lead       = odict.lookup_seconds_array(conf_key_fcst_lead);
+   obs_lead        = odict.lookup_seconds_array(conf_key_obs_lead);
+
+   fcst_valid_beg  = odict.lookup_unixtime(conf_key_fcst_valid_beg);
+   fcst_valid_end  = odict.lookup_unixtime(conf_key_fcst_valid_end);
+   fcst_valid_inc  = odict.lookup_unixtime_array(conf_key_fcst_valid_inc);
+   fcst_valid_exc  = odict.lookup_unixtime_array(conf_key_fcst_valid_exc);
+   fcst_valid_hour = odict.lookup_seconds_array(conf_key_fcst_valid_hour);
+
+   obs_valid_beg   = odict.lookup_unixtime(conf_key_obs_valid_beg);
+   obs_valid_end   = odict.lookup_unixtime(conf_key_obs_valid_end);
+   obs_valid_inc   = odict.lookup_unixtime_array(conf_key_obs_valid_inc);
+   obs_valid_exc   = odict.lookup_unixtime_array(conf_key_obs_valid_exc);
+   obs_valid_hour  = odict.lookup_seconds_array(conf_key_obs_valid_hour);
+
+   fcst_init_beg   = odict.lookup_unixtime(conf_key_fcst_init_beg);
+   fcst_init_end   = odict.lookup_unixtime(conf_key_fcst_init_end);
+   fcst_init_inc   = odict.lookup_unixtime_array(conf_key_fcst_init_inc);
+   fcst_init_exc   = odict.lookup_unixtime_array(conf_key_fcst_init_exc);
+   fcst_init_hour  = odict.lookup_seconds_array(conf_key_fcst_init_hour);
+
+   obs_init_beg    = odict.lookup_unixtime(conf_key_obs_init_beg);
+   obs_init_end    = odict.lookup_unixtime(conf_key_obs_init_end);
+   obs_init_inc    = odict.lookup_unixtime_array(conf_key_obs_init_inc);
+   obs_init_exc    = odict.lookup_unixtime_array(conf_key_obs_init_exc);
+   obs_init_hour   = odict.lookup_seconds_array(conf_key_obs_init_hour);
+
    // Dump the contents of the current thresholds
    if(mlog.verbosity_level() >= 5) {
       mlog << Debug(5)
            << "Parsed thresholds:\n"
            << "Matched pair filter columns:     " << write_css(mpr_sa) << "\n"
            << "Matched pair filter thresholds:  " << mpr_ta.get_str() << "\n"
+           << "Matched pair fcst lead time:     " << write_css_hhmmss(fcst_lead) << "\n"
+           << "Matched pair obs lead time:      " << write_css_hhmmss(obs_lead) << "\n"
+           << "Matched pair fcst valid time:    " << get_time_str(fcst_valid_beg, fcst_valid_end,
+                                                                  fcst_valid_inc, fcst_valid_exc,
+                                                                  fcst_valid_hour) << "\n"
+           << "Matched pair obs valid time:     " << get_time_str(obs_valid_beg, obs_valid_end,
+                                                                  obs_valid_inc, obs_valid_exc,
+                                                                  obs_valid_hour) << "\n"
+           << "Matched pair fcst init time:     " << get_time_str(fcst_init_beg, fcst_init_end,
+                                                                  fcst_init_inc, fcst_init_exc,
+                                                                  fcst_init_hour) << "\n"
+           << "Matched pair obs init time:      " << get_time_str(obs_init_beg, obs_init_end,
+                                                                  obs_init_inc, obs_init_exc,
+                                                                  obs_init_hour) << "\n"
            << "Forecast categorical thresholds: " << fcat_ta.get_str() << "\n"
            << "Observed categorical thresholds: " << ocat_ta.get_str() << "\n"
            << "Forecast continuous thresholds:  " << fcnt_ta.get_str() << "\n"
@@ -883,6 +973,10 @@ void PairStatVxOpt::set_vx_pd(PairStatConfInfo *conf_info) {
 
    // Store the climo CDF info
    vx_pd.set_climo_cdf_info_ptr(&cdf_info);
+
+   // Set interpolation options for climatology data as nearest neighbor
+   vx_pd.set_interp(0, InterpMthd::Nearest, 1,
+                    GridTemplateFactory::GridTemplates::Square);
 
    // Define the masking information: grid, poly, sid, point
    int n;
@@ -1152,21 +1246,140 @@ bool PairStatVxOpt::is_keeper_mpr(const STATLine &l) const {
       l.obs_lev()  != vx_pd.obs_info->level_attr()) return false;
 
    // Check MPR thresholds
-   for(auto &m : mpr_thr_inc_map) {
+   for(const auto &m : mpr_thr_inc_map) {
       if(!m.second.check_dbl(atof(l.get_item(m.first.c_str())))) return false;
    }
 
    // Check MPR string inclusions
-   for(auto &m : mpr_str_inc_map) {
+   for(const auto &m : mpr_str_inc_map) {
       if(!m.second.has(l.get_item(m.first.c_str()))) return false;
    }
 
    // Check MPR string exclusions
-   for(auto &m : mpr_str_exc_map) {
+   for(const auto &m : mpr_str_exc_map) {
       if(m.second.has(l.get_item(m.first.c_str()))) return false;
    }
- 
+
+   // Check lead time filters
+   if(!is_keeper_lead_time(
+      l.fcst_lead(), l.obs_lead())) return false;
+
+   // Check forecast valid time filters
+   if(!is_keeper_fcst_valid_time(
+      l.fcst_valid_beg(), l.fcst_valid_end())) return false;
+
+   // Check observation valid time filters
+   if(!is_keeper_obs_valid_time(
+      l.obs_valid_beg(), l.obs_valid_end())) return false;
+
+   // Check forecast init time filters
+   if(!is_keeper_fcst_init_time(
+      l.fcst_init_beg(), l.fcst_init_end())) return false;
+
+   // Check observation init time filters
+   if(!is_keeper_obs_init_time(
+      l.obs_init_beg(), l.obs_init_end())) return false;
+
    return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairStatVxOpt::is_keeper_ioda(const point_pair_t &p) const {
+
+   // Check for bad data in required spots
+   if(is_bad_data(p.lat)  || is_bad_data(p.lon) ||
+      is_bad_data(p.fval) || is_bad_data(p.oval)) return false;
+
+   // Check MPR thresholds
+   for(auto &m : mpr_thr_inc_map) {
+      if(!m.second.check_dbl(get_ioda_mpr_val(m.first, p))) return false;
+   }
+
+   // Check MPR string inclusions
+   for(auto &m : mpr_str_inc_map) {
+      if(!m.second.has(get_ioda_mpr_str(m.first, p))) return false;
+   }
+
+   // Check MPR string exclusions
+   for(auto &m : mpr_str_exc_map) {
+      if(m.second.has(get_ioda_mpr_str(m.first, p))) return false;
+   }
+
+   // Check timing filters for IODA data.
+   // Assume an observation lead time of 0 and observation
+   // initialization time equal to the valid time.
+
+   // Check lead time filters
+   if(!is_keeper_lead_time(p.lead, 0)) return false;
+
+   // Check forecast valid time filters
+   if(!is_keeper_fcst_valid_time(p.ut, p.ut)) return false;
+
+   // Check observation valid time filters
+   if(!is_keeper_obs_valid_time(p.ut, p.ut)) return false;
+
+   // Check forecast init time filters
+   unixtime fcst_init_ut = (p.ut == 0 || is_bad_data(p.lead) ?
+                            0 : p.ut - p.lead);
+   if(!is_keeper_fcst_init_time(fcst_init_ut, fcst_init_ut)) return false;
+
+   // Check observation init time filters
+   if(!is_keeper_obs_init_time(p.ut, p.ut)) return false;
+
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairStatVxOpt::is_keeper_lead_time(const int f_sec,
+                                        const int o_sec) const {
+   // Check lead times
+   if((fcst_lead.n() > 0 && !fcst_lead.has(f_sec)) ||
+      (obs_lead.n() > 0 && !obs_lead.has(o_sec))) return false;
+
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairStatVxOpt::is_keeper_fcst_valid_time(const unixtime beg_ut,
+                                              const unixtime end_ut) const {
+   return is_keeper_unixtime(beg_ut, end_ut,
+                             fcst_valid_beg, fcst_valid_end,
+                             fcst_valid_inc, fcst_valid_exc,
+                             fcst_valid_hour);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairStatVxOpt::is_keeper_obs_valid_time(const unixtime beg_ut,
+                                             const unixtime end_ut) const {
+   return is_keeper_unixtime(beg_ut, end_ut,
+                             obs_valid_beg, obs_valid_end,
+                             obs_valid_inc, obs_valid_exc,
+                             obs_valid_hour);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairStatVxOpt::is_keeper_fcst_init_time(const unixtime beg_ut,
+                                             const unixtime end_ut) const {
+   return is_keeper_unixtime(beg_ut, end_ut,
+                             fcst_init_beg, fcst_init_end,
+                             fcst_init_inc, fcst_init_exc,
+                             fcst_init_hour);
+
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairStatVxOpt::is_keeper_obs_init_time(const unixtime beg_ut,
+                                            const unixtime end_ut) const {
+   return is_keeper_unixtime(beg_ut, end_ut,
+                             obs_init_beg, obs_init_end,
+                             obs_init_inc, obs_init_exc,
+                             obs_init_hour);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1177,41 +1390,58 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
    // Check filtering options
    if(is_keeper_mpr(l)) {
 
-      // Parse climo data from the line
+      // Store values
+      double obs_lat = atof(l.get_item("OBS_LAT"));
+      double obs_lon = -1.0*atof(l.get_item("OBS_LON"));
+      double obs_val = atof(l.get_item("OBS"));
+      double obs_lvl = atof(l.get_item("OBS_LVL"));
+      double obs_elv = atof(l.get_item("OBS_ELV"));
+
+      // Climo data for this pair
       ClimoPntInfo cpi;
 
-      // In met-6.1 and later:
-      // - CLIMO was replaced by CLIMO_MEAN
-      if(l.has("CLIMO")) {
-         double cmn = atof(l.get_item("CLIMO"));
-         double csd = bad_data_double;
-         cpi.set(cmn, csd, cmn, csd);
+      // Parse climo data from the config file
+      if(grid_climo.nxy() > 0) {
+         double obs_x;
+         double obs_y;
+         grid_climo.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
+         cpi = vx_pd.get_climo_pnt_info(0, grid_climo, obs_x, obs_y,
+                                        obs_val, obs_lvl, obs_elv);
       }
-      // In met-12.0.0 and later:
-      // - CLIMO_MEAN was replaced by OBS_CLIMO_MEAN
-      // - CLIMO_STDEV was replaced by OBS_CLIMO_STDEV
-      // - CLIMO_CDF was replaced by OBS_CLIMO_CDF
-      else if(l.has("CLIMO_MEAN")) {
-         double cmn = atof(l.get_item("CLIMO_MEAN"));
-         double csd = atof(l.get_item("CLIMO_STDEV"));
-         cpi.set(cmn, csd, cmn, csd);
-      }
+      // Otherwise, parse from the input line
       else {
-         cpi.set(atof(l.get_item("FCST_CLIMO_MEAN")),
-                 atof(l.get_item("FCST_CLIMO_STDEV")),
-                 atof(l.get_item("OBS_CLIMO_MEAN")),
-                 atof(l.get_item("OBS_CLIMO_STDEV")));
+
+         // In met-6.1 and later:
+         // - CLIMO was replaced by CLIMO_MEAN
+         if(l.has("CLIMO")) {
+            double cmn = atof(l.get_item("CLIMO"));
+            double csd = bad_data_double;
+            cpi.set(cmn, csd, cmn, csd);
+         }
+         // In met-12.0.0 and later:
+         // - CLIMO_MEAN was replaced by OBS_CLIMO_MEAN
+         // - CLIMO_STDEV was replaced by OBS_CLIMO_STDEV
+         // - CLIMO_CDF was replaced by OBS_CLIMO_CDF
+         else if(l.has("CLIMO_MEAN")) {
+            double cmn = atof(l.get_item("CLIMO_MEAN"));
+            double csd = atof(l.get_item("CLIMO_STDEV"));
+            cpi.set(cmn, csd, cmn, csd);
+         }
+         else {
+            cpi.set(atof(l.get_item("FCST_CLIMO_MEAN")),
+                    atof(l.get_item("FCST_CLIMO_STDEV")),
+                    atof(l.get_item("OBS_CLIMO_MEAN")),
+                    atof(l.get_item("OBS_CLIMO_STDEV")));
+         }
       }
 
       // Attempt to add to each masking region
       for(int i_mask=0; i_mask<get_n_mask(); i_mask++) {
 
          // Convert lat/lon to x/y
-         double obs_lat = atof(l.get_item("OBS_LAT")); 
-         double obs_lon = -1.0*atof(l.get_item("OBS_LON"));
          double obs_x;
          double obs_y;
-         grid.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
+         grid_mask.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
 
          // Check masking region
          if(!vx_pd.is_keeper_mask(
@@ -1226,15 +1456,13 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
          if(vx_pd.pd[i_mask].add_point_pair(
                l.obtype(),
                l.get_item("OBS_SID"),
-               obs_lat,
-               obs_lon,
-               bad_data_double,
-               bad_data_double,
+               obs_lat, obs_lon,
+               bad_data_double, bad_data_double,
+               timestring_to_sec(l.get_item("FCST_LEAD")),
                timestring_to_unix(l.get_item("OBS_VALID_BEG")),
-	       atof(l.get_item("OBS_LVL")),
-               atof(l.get_item("OBS_ELV")),
+               obs_lvl, obs_elv,
                atof(l.get_item("FCST")),
-               atof(l.get_item("OBS")),
+               obs_val,
                l.get_item("OBS_QC"),
                cpi,
                1.0)) { 
@@ -1249,6 +1477,195 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
    }
 
    return keep;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
+   bool keep = false;
+
+   // Check filtering options
+   if(is_keeper_ioda(p)) {
+
+      // Store values
+      double obs_lat = p.lat;
+      double obs_lon = rescale_lon(-1.0*p.lon);
+      double obs_val = p.oval;
+      double obs_lvl = (is_bad_data(p.lvl) ? bad_data_double : p.lvl/100.0);
+      double obs_elv = p.elv;
+
+      // Parse climo data from the config file
+      ClimoPntInfo cpi;
+      if(grid_climo.nxy() > 0) {
+         double obs_x;
+         double obs_y;
+         grid_climo.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
+         cpi = vx_pd.get_climo_pnt_info(0, grid_climo, obs_x, obs_y,
+                                        obs_val, obs_lvl, obs_elv);
+      }
+
+      // Attempt to add to each masking region
+      for(int i_mask=0; i_mask<get_n_mask(); i_mask++) {
+
+         // Convert lat/lon to x/y
+         double obs_x;
+         double obs_y;
+         grid_mask.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
+
+         // Check masking region
+         if(!vx_pd.is_keeper_mask(
+               "IODA pair data", 0, i_mask,
+               nint(obs_x),
+               nint(obs_y),
+               p.sid.c_str(),
+               obs_lat,
+               obs_lon)) continue;
+
+         // Add the pair
+	 // - Convert pressure from Pa to HPa
+         if(vx_pd.pd[i_mask].add_point_pair(
+               p.typ.c_str(), p.sid.c_str(),
+               obs_lat, obs_lon,
+               bad_data_double, bad_data_double,
+               p.lead, p.ut, obs_lvl, obs_elv,
+               p.fval, obs_val, na_str, cpi, 1.0)) {
+
+            // Using this pair for at least one masking region
+            keep = true;
+
+            // Track the unique headers
+            vx_hdr[i_mask].add(p.lead, p.ut,
+               vx_pd.fcst_info->name_attr(),
+               vx_pd.obs_info->name_attr(),
+               p.typ);
+         }
+      } // end for i_mask
+   }
+
+   return keep;
+}
+
+////////////////////////////////////////////////////////////////////////
+//
+// Begin utility functions
+//
+////////////////////////////////////////////////////////////////////////
+
+static ConcatString get_time_str(
+                       const unixtime beg, const unixtime end,
+                       const TimeArray &inc, const TimeArray &exc,
+                       const IntArray &hr) {
+   ConcatString cs;
+   cs << "("  << (beg == 0 ? na_str : unix_to_yyyymmdd_hhmmss(beg))
+      << ", " << (end == 0 ? na_str : unix_to_yyyymmdd_hhmmss(end))
+      << "), inc: "  << (inc.n() == 0 ? "(nul)" : write_css(inc))
+      <<  ", exc: "  << (exc.n() == 0 ? "(nul)" : write_css(exc))
+      <<  ", hour: " << (hr.n()  == 0 ? "(nul)" : write_css_hhmmss(hr));
+
+   return cs;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static bool is_keeper_unixtime(const unixtime beg_ut, const unixtime end_ut,
+                               const unixtime conf_beg_ut, const unixtime conf_end_ut,
+                               const TimeArray &conf_inc, const TimeArray &conf_exc,
+                               const IntArray &conf_hour) {
+
+   // Check configuration time limits
+   if((conf_beg_ut != 0 && beg_ut < conf_beg_ut) ||
+      (conf_end_ut != 0 && beg_ut > conf_end_ut)) return false;
+
+   // Check inclusion list
+   if(conf_inc.n() > 0 &&
+      !conf_inc.has(beg_ut) && !conf_inc.has(end_ut)) return false;
+
+   // Check exclusion list
+   if(conf_exc.n() > 0 &&
+      (conf_exc.has(beg_ut) || conf_exc.has(end_ut))) return false;
+
+   // Check hour
+   if(conf_hour.n() > 0 &&
+      !conf_hour.has(unix_to_sec_of_day(beg_ut)) &&
+      !conf_hour.has(unix_to_sec_of_day(end_ut))) return false;
+
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static double get_ioda_mpr_val(const string &mpr_col,
+                               const point_pair_t &p,
+                               bool print_warning) {
+   const char *method_name = "get_ioda_mpr_val() -> ";
+   double val = bad_data_double;
+
+   // Get the numeric value
+   if(mpr_col == "OBS_LAT") {
+      val = p.lat;
+   }
+   else if(mpr_col == "OBS_LON") {
+      val = p.lon;
+   }
+   else if(mpr_col == "FCST_VALID_BEG" ||
+           mpr_col == "FCST_VALID_END" ||
+           mpr_col == "OBS_VALID_BEG"  ||
+           mpr_col == "OBS_VALID_END") {
+      val = (double) p.ut;
+   }
+   else if(mpr_col == "OBS_LEV") {
+      // Convert Pa to HPa
+      val = p.lvl/100.0;
+   }
+   else if(mpr_col == "OBS_ELV") {
+      val = p.elv;
+   }
+   else if(mpr_col == "FCST") {
+      val = p.fval;
+   }
+   else if(mpr_col == "OBS") {
+      val = p.oval;
+   }
+   else if(print_warning) {
+      mlog << Warning << "\n" << method_name
+           << "non-numeric column (" << mpr_col
+           << ") requested in the \"" << conf_key_mpr_column
+           << "\" configuration option.\n\n";
+   }
+
+   return val;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static string get_ioda_mpr_str(const string &mpr_col,
+                               const point_pair_t &p,
+                               bool print_warning) {
+   const char *method_name = "get_ioda_mpr_str() -> ";
+   string str(na_str);
+
+   // Get the string value
+   if(mpr_col == "OBTYPE") {
+      str = p.typ;
+   }
+   else if(mpr_col == "OBS_SID") {
+      str = p.sid;
+   }
+   else if(mpr_col == "FCST_VALID_BEG" ||
+           mpr_col == "FCST_VALID_END" ||
+           mpr_col == "OBS_VALID_BEG"  ||
+           mpr_col == "OBS_VALID_END") {
+      str = unix_to_yyyymmdd_hhmmss(p.ut);
+   }
+   else if(print_warning) {
+      mlog << Warning << "\n" << method_name
+           << "non-string column (" << mpr_col
+           << ") requested in the \"" << conf_key_mpr_str_inc
+           << "\" or \"" << conf_key_mpr_str_exc
+           << "\" configuration option.\n\n";
+   }
+
+   return str;
 }
 
 ////////////////////////////////////////////////////////////////////////

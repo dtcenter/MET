@@ -36,7 +36,6 @@ class RotatedLatLonGrid : public LatLonGrid {
      ~RotatedLatLonGrid();
       RotatedLatLonGrid(const RotatedLatLonData &);
 
-
       void clear();
 
       void set_from_rdata(const RotatedLatLonData &);
