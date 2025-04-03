@@ -617,8 +617,6 @@ if (dim_count >= max_wrf_args )  {
 
 }
 
-
-int j;
 bool found = false;
 auto * var = (NcVarInfo *) nullptr;
 auto * P   = (NcVarInfo *) nullptr;
@@ -629,9 +627,7 @@ pressure = bad_data_double;
    //  find varinfo's
    //
 
-found = false;
-
-for (j=0; j<Nvars; ++j)  {
+for (int j=0; j<Nvars; ++j)  {
 
    if ( Var[j].var == v )  { found = true;  var = Var + j;  break; }
 
@@ -689,9 +685,8 @@ if ( !found )  {
 void WrfFile::setup_dataplane(NcVar* v, const LongArray& a, DataPlane& plane, int dim_count, const NcVarInfo* var) const
 {
    double value;
-   //LongArray b = a;
 
-  //
+   //
    // set nx and ny based on staggering of dimensions of the variable to read
    //
    const int Nx = var->x_stag ? grid.nx() + 1 : grid.nx();
@@ -721,8 +716,6 @@ void WrfFile::setup_dataplane(NcVar* v, const LongArray& a, DataPlane& plane, in
    for (int x=0; x<Nx; ++x)  {
       offsets[var->x_slot] = x;
       get_nc_data(v, d.data(), lengths, offsets);
-
-      //b[var->x_slot] = x;
 
       for (int y=0; y<Ny; ++y)  {
          value = d[y];
@@ -781,13 +774,11 @@ void WrfFile::handle_pressure(const NcVarInfo* var, const string& z_name, NcVarI
       return;
    }
 
-   int j;
-   int k;
    bool found;
    StringArray varNames;
    get_var_names(Nc, &varNames);
    StringArray varDimNames;
-   for (j = 0; j < Nvars; ++j) {
+   for (int j = 0; j < Nvars; ++j) {
       //
       //  get the pressure variable and store the hPa conversion factor
       //
@@ -801,7 +792,7 @@ void WrfFile::handle_pressure(const NcVarInfo* var, const string& z_name, NcVarI
 
          // check that the z dimension matches the var to read
          found = false;
-         for(k=0; k< Var[j].Ndims; k++){
+         for(int k=0; k< Var[j].Ndims; k++){
             if(varDimNames[k] == z_name) {
                found = true;
                break;
@@ -828,117 +819,135 @@ void WrfFile::handle_pressure(const NcVarInfo* var, const string& z_name, NcVarI
 
 bool WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string& z_name)
 {
-  const char *method_name = "WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string& z_name) const -> ";
-  string c;
-  StringArray varDimNames;
-  get_dim_names(var->var, &varDimNames);
-  for (int k =0; k<(var->Ndims); ++k)  {
-     c = to_lower(varDimNames[k]);
+   const char *method_name = "WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string& z_name) const -> ";
+   string c;
+   StringArray varDimNames;
+   get_dim_names(var->var, &varDimNames);
+   for (int k =0; k<(var->Ndims); ++k)  {
+      c = to_lower(varDimNames[k]);
 
-     // X dimension
-     if ( c == x_dim_name || c == x_dim_stag_name || c == x_dim_subgrid_name ) {
+      // X dimension
+      if ( c == x_dim_name || c == x_dim_stag_name || c == x_dim_subgrid_name ) {
 
-        var->x_slot = k;
+         if(!parse_dim_x(var_name, var, c, k)) return false;
 
-        // track fields that need to be de-staggered in the X dimension
-        if ( c == x_dim_stag_name ) {
-           var->x_stag = true;
-        }
+      }
+      // Y dimension
+      else if ( c == y_dim_name || c == y_dim_stag_name || c == y_dim_subgrid_name ) {
 
-       // error if env var is set and non-subgrid requested
-       if(getenv("MET_USE_WRF_SUBGRID") != nullptr && c != x_dim_subgrid_name) {
-          mlog << Error << "\n" << method_name
-               << "MET_USE_WRF_SUBGRID is set, but non-subgrid requested for variable "
-               << var_name << "\n\n";
-          return false;
-       }
+         parse_dim_y(var, c, k);
 
-        // track fields that are on a subgrid
-        if ( c == x_dim_subgrid_name ) {
-           var->x_subgrid = true;
+      }
+      // Z dimension
+      else if ( c == z_dim_p_interp_name ||
+                c == z_dim_wrf_interp_name ||
+                c == z_dim_wrf_name ||
+                c == z_dim_wrf_stag_name ||
+                c == z_dim_wrf_pres_name ||
+                c == z_dim_wrf_z_name ||
+                c == z_dim_bio_name ||
+                c == z_dim_klevs_name ||
+                c == z_dim_soil_name ||
+                c == z_dim_seed_dim_name) {
 
-          // error if subgrid field is requested but subgrid grid was not read via env var
-          if(getenv("MET_USE_WRF_SUBGRID") == nullptr) {
-            mlog << Error << "\n" << method_name
-                << "MET_USE_WRF_SUBGRID is not set, but subgrid requested for variable "
-                << var_name << "\n\n";
-            return false;
-          }
-        }
+         parse_z_dim(var, z_name, c, k);
 
-     }
-        // Y dimension
-     else if ( c == y_dim_name || c == y_dim_stag_name || c == y_dim_subgrid_name ) {
+      }
+      // T dimension
+      else if ( c == t_dim_name ) {
 
-        var->y_slot = k;
+         var->t_slot = k;
 
-        // track fields that need to be de-staggered in the Y dimension
-        if ( c == y_dim_stag_name ) {
+      }
 
-           var->y_stag = true;
+   } // end if k
 
-        }
+   //
+   //  check x_slot and y_slot
+   //
 
-        // track fields that are on a subgrid
-        if ( c == y_dim_subgrid_name ) {
-           var->y_subgrid = true;
-        }
+   if ( var->x_slot < 0 || var->y_slot < 0 )  {
 
-     }
-        // Z dimension
-     else if ( c == z_dim_p_interp_name ||
-               c == z_dim_wrf_interp_name ||
-               c == z_dim_wrf_name ||
-               c == z_dim_wrf_stag_name ||
-               c == z_dim_wrf_pres_name ||
-               c == z_dim_wrf_z_name ||
-               c == z_dim_bio_name ||
-               c == z_dim_klevs_name ||
-               c == z_dim_soil_name ||
-               c == z_dim_seed_dim_name) {
+      mlog << Error << "\n" << method_name
+           << "can't find needed dimensions(s) for variable \""
+           << var_name << "\" ... one of the dimensions may be staggered.\n\n";
 
-        var->z_slot = k;
+      return false;
 
-        // track fields that are on pressure levels
-        if ( c == z_dim_p_interp_name ||
-             c == z_dim_wrf_interp_name ||
-             c == z_dim_wrf_pres_name ) {
+   }
 
-           var->is_pressure = true;
-           z_name = c;
+   return true;
+}
 
-        }
+void WrfFile::parse_z_dim(NcVarInfo* var, string& z_name, string& c, int k)
+{
+  var->z_slot = k;
 
-        // track fields that need to be de-staggered in the Z dimension
-        if ( c == z_dim_wrf_stag_name ) {
+  // track fields that are on pressure levels
+  if ( c == z_dim_p_interp_name ||
+       c == z_dim_wrf_interp_name ||
+       c == z_dim_wrf_pres_name ) {
 
-           var->z_stag = true;
-
-        }
-     }
-        // T dimension
-     else if ( c == t_dim_name ) {
-
-        var->t_slot = k;
-
-     }
-
-  } // end if k
-
-  //
-  //  check x_slot and y_slot
-  //
-
-  if ( var->x_slot < 0 || var->y_slot < 0 )  {
-
-    mlog << Error << "\n" << method_name
-         << "can't find needed dimensions(s) for variable \""
-         << var_name << "\" ... one of the dimensions may be staggered.\n\n";
-
-    return false;
+     var->is_pressure = true;
+     z_name = c;
 
   }
 
+  // track fields that need to be de-staggered in the Z dimension
+  if ( c == z_dim_wrf_stag_name ) {
+
+     var->z_stag = true;
+
+  }
+}
+
+void WrfFile::parse_dim_y(NcVarInfo* var, const string& c, int k)
+{
+  var->y_slot = k;
+
+  // track fields that need to be de-staggered in the Y dimension
+  if ( c == y_dim_stag_name ) {
+
+     var->y_stag = true;
+
+  }
+
+  // track fields that are on a subgrid
+  if ( c == y_dim_subgrid_name ) {
+     var->y_subgrid = true;
+  }
+}
+
+bool WrfFile::parse_dim_x(const string& var_name, NcVarInfo* var, const string& c, int k)
+{
+  const char *method_name = "WrfFile::parse_dim_x(const string& var_name, NcVarInfo* var, const string& c, int k) -> ";
+  var->x_slot = k;
+
+  // track fields that need to be de-staggered in the X dimension
+  if ( c == x_dim_stag_name ) {
+     var->x_stag = true;
+  }
+
+  // error if env var is set and non-subgrid requested
+  if(getenv("MET_USE_WRF_SUBGRID") != nullptr && c != x_dim_subgrid_name) {
+     mlog << Error << "\n" << method_name
+          << "MET_USE_WRF_SUBGRID is set, but non-subgrid requested for variable "
+          << var_name << "\n\n";
+     return false;
+  }
+
+  // track fields that are on a subgrid
+  if ( c == x_dim_subgrid_name ) {
+     var->x_subgrid = true;
+
+    // error if subgrid field is requested but subgrid grid was not read via env var
+    if(getenv("MET_USE_WRF_SUBGRID") == nullptr) {
+      mlog << Error << "\n" << method_name
+          << "MET_USE_WRF_SUBGRID is not set, but subgrid requested for variable "
+          << var_name << "\n\n";
+      return false;
+    }
+  }
   return true;
 }
 

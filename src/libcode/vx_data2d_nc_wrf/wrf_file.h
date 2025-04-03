@@ -43,6 +43,16 @@ class WrfFile {
       WrfFile(const WrfFile &);
       WrfFile & operator=(const WrfFile &);
 
+      static bool parse_dims_for_var(const std::string& var_name, NcVarInfo* var, std::string& z_name);
+      void handle_pressure(const NcVarInfo* var, const std::string& z_name, NcVarInfo*& P,
+                           bool& time_in_pressure, double& pressure_unit_conversion) const;
+      static bool check_star_position_and_count(const LongArray& a, const NcVarInfo* var);
+      void setup_dataplane(netCDF::NcVar* v, const LongArray& a, DataPlane& plane, int dim_count, const NcVarInfo* var) const;
+      void dump_dims(std::ostream& out, int j, std::string& c) const;
+      static bool parse_dim_x(const std::string& var_name, NcVarInfo* var, const std::string& c, int k);
+      static void parse_dim_y(NcVarInfo* var, const std::string& c, int k);
+      static void parse_z_dim(NcVarInfo* var, std::string& z_name, std::string& c, int k);
+
    public:
 
       WrfFile();
@@ -108,12 +118,7 @@ class WrfFile {
                 double & pressure, NcVarInfo *&) const;
 
       bool get_nc_var_info(const char *var_name, NcVarInfo *&info) const;
-      static bool parse_dims_for_var(const std::string& var_name, NcVarInfo* var, std::string& z_name);
-      void handle_pressure(const NcVarInfo* var, const std::string& z_name, NcVarInfo*& P,
-                           bool& time_in_pressure, double& pressure_unit_conversion) const;
-      static bool check_star_position_and_count(const LongArray& a, const NcVarInfo* var);
-      void setup_dataplane(netCDF::NcVar* v, const LongArray& a, DataPlane& plane, int dim_count, const NcVarInfo* var) const;
-      void dump_dims(std::ostream& out, int j, std::string& c) const;
+
 };
 
 
