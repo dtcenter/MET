@@ -5,11 +5,13 @@ Testing
 make test
 =========
 
-Coming Soon!
+After MET has been compiled, run ``make test`` from the top-level directory to execute the scripts found in the ``scripts/examples`` directory. These scripts run a subset of the MET tools reading input data from the top-level ``data`` directory and configuration files from the ``scripts/config`` directory and write output to top-level ``out`` directory. Successful completion of these tests provides reasonable assurance that MET has been compiled well and is running properly. However, these sample scripts are not comprehensive and do not exercise all possible configuration options. So it's possible for the ``make test`` scripts to run without error, but for users to later encounter issues when running MET with new inputs files and configuration options.
 
 Unit Tests
 ==========
 
+The MET unit tests offer much more thorough testing coverage of the MET tools than running ``make test``, as described above. These units tests provide the basis for the regression testing performed for each pull request. Logic exists in GitHub automation to run these unit tests and check for differences in the output. However, these unit tests can also be run locally and instructions for doing so are provided in this section.
+ 
 Running Unit Tests
 ------------------
 
@@ -25,9 +27,9 @@ Set Up Environment
 
 Set the required environment variables needed to run.
 
-* **MET_BASE** - Path to the *share/met* directory where MET is installed. This is used to find the MET executables.
-* **MET_TEST_BASE** - Path to the MET/internal/test_unit directory that contains the unit test files
-* **MET_TEST_INPUT** - Directory containing unit test input data.
+* **MET_BASE** - Path to the *share/met* directory where MET is installed. This is used to find the MET executables and static data files.
+* **MET_TEST_BASE** - Path to the *MET/internal/test_unit* directory that contains the unit test files
+* **MET_TEST_INPUT** - Directory containing unit test input data
 * **MET_TEST_OUTPUT** - Directory to write test output
 
 Example::
@@ -37,7 +39,7 @@ Example::
     export MET_TEST_INPUT=/path/to/MET_unit_test
     export MET_TEST_OUTPUT=/path/to/my/output_dir
 
-Other environment variables that may need to be set include:
+Other environment variables required for some of the unit tests include:
 
 * **MET_TEST_MET_PYTHON_EXE** - Path to Python executable to use for Python Embedding tests
 * **MET_TEST_RSCRIPT** - Path to Rscript executable used to run R script tests
@@ -55,12 +57,20 @@ To run all of the unit tests, call the *bin/unit_test.sh* script::
     ./bin/unit_test.sh
 
 To run a single unit test group, call the *python/unit.py* script, passing it an XML test config file::
+
     ./python/unit.py ./xml/unit_pcp_combine.xml
+
+To generate commands corresponding to a single unit test group, but not actually execute those commands, add the *-cmd* command line argument and redirect the output to a file::
+
+    ./python/unit.py ./xml/unit_pcp_combine.xml -cmd > unit_pcp_combine.sh
+
+Extracting individual commands to be executed in this way can be convenient during the software development process.
 
 .. note::
 
    Some unit tests depend on the output of other unit tests.
    For example, *unit_plot_data_plane.xml* requires output from *unit_pcp_combine.xml*.
+   Those dependencies are generally noted in comments at the top of each unit test xml file.
 
 
 Input Data
@@ -167,12 +177,14 @@ These files are the full set of fields and fields used for the unit tests.
 First, add any new files to the *unit_test* directory so they will be available to the MET regression tests.
 
 Example::
+
     cp /path/to/my/file.ext MET_unit_test/unit_test/DIRNAME/
 
 Next, add the new input files in the *unit_test* directory under the *vX.Y* directory that
 corresponds to the current development cycle.
 
 Example::
+
     cp /path/to/my/file.ext MET_unit_test/v23.1/unit_test/DIRNAME/
 
 If any of the files are very large, consider creating a subset of these files.
