@@ -5,7 +5,7 @@ Testing
 make test
 =========
 
-After MET has been compiled, run ``make test`` from the top-level directory to execute the scripts found in the ``scripts/examples`` directory. These scripts run a subset of the MET tools reading input data from the top-level ``data`` directory and configuration files from the ``scripts/config`` directory and write output to top-level ``out`` directory. Successful completion of these tests provides reasonable assurance that MET has been compiled well and is running properly. However, these sample scripts are not comprehensive and do not exercise all possible configuration options. So its possible for the ``make test`` scripts to run without error, but for users to later encounter issues when running MET with new inputs files and configuration options.
+After MET has been compiled, run ``make test`` from the top-level directory to execute the scripts found in the ``scripts/examples`` directory. These scripts run a subset of the MET tools reading input data from the top-level ``data`` directory and configuration files from the ``scripts/config`` directory and write output to top-level ``out`` directory. Successful completion of these tests provides reasonable assurance that MET has been compiled well and is running properly. However, these sample scripts are not comprehensive and do not exercise all possible configuration options. So it's possible for the ``make test`` scripts to run without error, but for users to later encounter issues when running MET with new inputs files and configuration options.
 
 Unit Tests
 ==========
@@ -28,7 +28,7 @@ Set Up Environment
 Set the required environment variables needed to run.
 
 * **MET_BASE** - Path to the *share/met* directory where MET is installed. This is used to find the MET executables and static data files.
-* **MET_TEST_BASE** - Path to the MET/internal/test_unit directory that contains the unit test files
+* **MET_TEST_BASE** - Path to the *MET/internal/test_unit* directory that contains the unit test files
 * **MET_TEST_INPUT** - Directory containing unit test input data
 * **MET_TEST_OUTPUT** - Directory to write test output
 
