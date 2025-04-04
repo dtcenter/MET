@@ -782,38 +782,38 @@ void WrfFile::handle_pressure(const NcVarInfo* var, const string& z_name, NcVarI
       //
       //  get the pressure variable and store the hPa conversion factor
       //
-
-      if (varNames[j] == pressure_var_p_interp_name ||
-          varNames[j] == pressure_var_wrf_interp_name ||
-          varNames[j] == pressure_var_wrf_name) {
-
-         varDimNames.clear();
-         get_dim_names(Var[j].var, &varDimNames);
-
-         // check that the z dimension matches the var to read
-         found = false;
-         for(int k=0; k< Var[j].Ndims; k++){
-            if(varDimNames[k] == z_name) {
-               found = true;
-               break;
-            }
-         }
-
-         if(!found) {
-            continue;
-         }
-
-         // set pressure field
-         P = Var + j;
-
-         if (varNames[j] == pressure_var_wrf_name) {
-
-            time_in_pressure = true;
-
-         }
-         if (strcasecmp(Var[j].units_att.c_str(), pa_units_str) == 0) pressure_unit_conversion = 0.01;
-         else if (strcasecmp(Var[j].units_att.c_str(), hpa_units_str) == 0) pressure_unit_conversion = 1.0;
+      if (varNames[j] != pressure_var_p_interp_name &&
+          varNames[j] != pressure_var_wrf_interp_name &&
+          varNames[j] != pressure_var_wrf_name) {
+         continue;
       }
+
+      varDimNames.clear();
+      get_dim_names(Var[j].var, &varDimNames);
+
+      // check that the z dimension matches the var to read
+      found = false;
+      for(int k=0; k< Var[j].Ndims; k++){
+         if(varDimNames[k] == z_name){
+            found = true;
+            break;
+         }
+      }
+
+      if(!found) {
+         continue;
+      }
+
+      // set pressure field
+      P = Var + j;
+
+      if (varNames[j] == pressure_var_wrf_name) {
+
+         time_in_pressure = true;
+
+      }
+      if (strcasecmp(Var[j].units_att.c_str(), pa_units_str) == 0) pressure_unit_conversion = 0.01;
+      else if (strcasecmp(Var[j].units_att.c_str(), hpa_units_str) == 0) pressure_unit_conversion = 1.0;
    }
 }
 
@@ -879,7 +879,7 @@ bool WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string&
    return true;
 }
 
-void WrfFile::parse_z_dim(NcVarInfo* var, string& z_name, string& c, int k)
+void WrfFile::parse_z_dim(NcVarInfo* var, string& z_name, const string& c, int k)
 {
   var->z_slot = k;
 

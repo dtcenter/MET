@@ -51,7 +51,7 @@ class WrfFile {
       void dump_dims(std::ostream& out, int j, std::string& c) const;
       static bool parse_dim_x(const std::string& var_name, NcVarInfo* var, const std::string& c, int k);
       static void parse_dim_y(NcVarInfo* var, const std::string& c, int k);
-      static void parse_z_dim(NcVarInfo* var, std::string& z_name, std::string& c, int k);
+      static void parse_z_dim(NcVarInfo* var, std::string& z_name, const std::string& c, int k);
 
    public:
 
