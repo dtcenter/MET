@@ -152,7 +152,7 @@ if ( Dims )  { delete [] Dims;  Dims = (NcDim **) nullptr; }
 
 x_slot = y_slot = z_slot = t_slot = -1;
 
-x_stag = y_stag = z_stag = false;
+x_stag = y_stag = z_stag = x_subgrid = y_subgrid = false;
 
 is_pressure = false;
 
@@ -220,9 +220,11 @@ if ( Dims )  {
 
 out << prefix << "x_slot = " << x_slot;
 if (x_stag) out << " (staggered)";
+else if(x_subgrid) out << " (subgrid)";
 out << "\n";
 out << prefix << "y_slot = " << y_slot;
 if (y_stag) out << " (staggered)";
+else if(y_subgrid) out << " (subgrid)";
 out << "\n";
 out << prefix << "z_slot = " << z_slot;
 if (z_stag) out << " (staggered)";
@@ -285,6 +287,9 @@ t_slot = i.t_slot;
 x_stag = i.x_stag;
 y_stag = i.y_stag;
 z_stag = i.z_stag;
+
+x_subgrid = i.x_subgrid;
+y_subgrid = i.y_subgrid;
 
 is_pressure = i.is_pressure;
 
