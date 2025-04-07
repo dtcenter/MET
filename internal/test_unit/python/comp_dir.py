@@ -4,21 +4,17 @@ import os
 import shutil
 import sys
 
-metplus_util_path = os.getenv('METPLUS_UTIL')
+# Add the METplus util path to module search path 
+# to import compare_dir function from METplus's diff_util.py 
+try:
+    metplus_util_path = os.path.join(os.getenv('METPLUS_DIR'), 'metplus', 'util')
+except TypeError as e:
+    print('*** env var METPLUS_DIR must be defined ***')
+    raise e
 sys.path.append(metplus_util_path)
 
 from diff_util import compare_dir
 
-# note: this is how compare_dir is imported in run_diff_docker.py in METplus...
-# GITHUB_WORKSPACE = os.environ.get('GITHUB_WORKSPACE')
-# # add util directory to sys path to get diff utility
-# diff_util_dir = os.path.join(GITHUB_WORKSPACE,
-#                              'metplus',
-#                              'util')
-# sys.path.insert(0, diff_util_dir)
-# from diff_util import compare_dir
-
-# Assume the command run is ./comp_dir.py MET-${1}/test_output MET-${2}/test_output
 
 def comp_dir(truth_dir, output_dir, diff_dir='', debug=True, save_diff=True):
     """
