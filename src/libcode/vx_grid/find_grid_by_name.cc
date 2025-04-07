@@ -36,6 +36,8 @@ static bool parse_mercator_grid(const StringArray &, Grid &);
 
 static bool parse_gaussian_grid(const StringArray &, Grid &);
 
+static bool parse_rngazi_grid(const StringArray &, Grid &);
+
 static bool parse_laea_grid(const StringArray &, Grid &);
 
 
@@ -241,6 +243,7 @@ else if ( strcasecmp(grid_strings[0].c_str(), "rotlatlon") == 0 )  status = pars
 else if ( strcasecmp(grid_strings[0].c_str(), "stereo")    == 0 )  status = parse_stereographic_grid(grid_strings, g);
 else if ( strcasecmp(grid_strings[0].c_str(), "mercator")  == 0 )  status = parse_mercator_grid(grid_strings, g);
 else if ( strcasecmp(grid_strings[0].c_str(), "gaussian")  == 0 )  status = parse_gaussian_grid(grid_strings, g);
+else if ( strcasecmp(grid_strings[0].c_str(), "rngazi")    == 0 )  status = parse_rngazi_grid(grid_strings, g);
 else                                                               status = false;
 
    //
@@ -818,5 +821,63 @@ return true;
 
 }
 
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool parse_rngazi_grid(const StringArray &grid_strings, Grid & g)
+
+{
+
+Grid * ToGrid = (Grid *) nullptr;
+
+RngAziData radata;
+
+if ( grid_strings.n() != 6 )  {
+
+   mlog << Error << "\nparse_rngazi_grid() -> "
+        << "range/azimuth grid spec should have 6 entries\n\n";
+
+   exit ( 1 );
+
+}
+
+int j = 1;
+
+   //
+   //  get info from the strings
+   //
+
+radata.azimuth_n    = stoi(grid_strings[j++]);
+radata.range_n      = stoi(grid_strings[j++]);
+radata.range_max_km = stof(grid_strings[j++]);
+radata.lat_center   = stof(grid_strings[j++]);
+radata.lon_center   = stof(grid_strings[j++]);
+
+   //
+   //  load up the struct
+   //
+
+radata.name = "To (range/azimuth)";
+
+if ( !west_longitude_positive )  {
+
+   radata.lon_center *= -1.0;
+
+}
+
+ToGrid = new Grid ( radata );
+
+g = *ToGrid;
+
+if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
+
+   //
+   //  done
+   //
+
+return true;
+
+}
 
 ////////////////////////////////////////////////////////////////////////
