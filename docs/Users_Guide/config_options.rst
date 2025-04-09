@@ -568,6 +568,24 @@ By default, they are written using JSON for attributes and NumPy serialization f
 to avoid NetCDF library conflicts between MET and Python. Setting this environment
 variable to :code:`netcdf` enables the use of temporary NetCDF files instead.
 
+
+.. _met_use_wrf_subgrid:
+
+MET_USE_WRF_SUBGRID
+-------------------
+
+The MET_USE_WRF_SUBGRID environment variable controls how the grid information is
+read from WRF files.
+Some WRF files contain fields that are on a subgrid, which contain more grid points
+and require a computation to determine the d_km value.
+MET reads the grid information from a file before any fields are read and assumes
+that there is one grid definition per file.
+To avoid a complicated refactor to read the grid information after a field is read,
+this environment variable is used to tell MET that it should create the grid using
+the subgrid dimensions.
+If the environment variable is set to any value, the subgrid values will be read.
+
+
 Settings Common to Multiple Tools
 =================================
 

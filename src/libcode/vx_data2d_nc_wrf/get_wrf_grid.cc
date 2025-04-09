@@ -42,6 +42,9 @@ static const char mercator_proj_var_name    [] = "Mercator";
 static const string nx_dimension_name          = "west_east";
 static const string ny_dimension_name          = "south_north";
 
+static const string nx_subgrid_dimension_name  = "west_east_subgrid";
+static const string ny_subgrid_dimension_name  = "south_north_subgrid";
+
 static const char ps_default_gridname       [] = "polar";
 static const char lambert_default_gridname  [] = "lambert";
 static const char mercator_default_gridname [] = "mercator";
@@ -52,9 +55,9 @@ static const double default_grib_radius_km     = 6371.20;
 ////////////////////////////////////////////////////////////////////////
 
 
-static bool   get_ps_grid       (NcFile & nc, Grid & grid);
-static bool   get_lambert_grid  (NcFile & nc, Grid & grid);
-static bool   get_mercator_grid (NcFile & nc, Grid & grid);
+static bool   get_ps_grid       (const NcFile & nc, Grid & grid);
+static bool   get_lambert_grid  (const NcFile & nc, Grid & grid);
+static bool   get_mercator_grid (const NcFile & nc, Grid & grid);
 
 static double mercator_lon_to_u(double lon);
 static double mercator_lat_to_v(double lat);
@@ -126,9 +129,10 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool get_ps_grid (NcFile & nc, Grid & grid)
+static bool get_ps_grid(const NcFile & nc, Grid & grid)
 
 {
+  const char *method_name = "get_ps_grid(const NcFile & nc, Grid & grid) -> ";
 
 StereographicData data;
 
@@ -154,6 +158,11 @@ else                         data.hemisphere = 'N';
    //
    //  Nx, Ny
    //
+  if(getenv("MET_USE_WRF_SUBGRID") != nullptr) {
+    mlog << Error << "\n" << method_name
+         << "MET_USE_WRF_SUBGRID is set, but subgrid is not supported for StereographicData grid\n\n";
+    return false;
+  }
 
 get_dim(&nc, nx_dimension_name, data.nx, true);
 get_dim(&nc, ny_dimension_name, data.ny, true);
@@ -207,7 +216,7 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool get_lambert_grid (NcFile & nc, Grid & grid)
+static bool get_lambert_grid (const NcFile & nc, Grid & grid)
 
 {
 
@@ -237,9 +246,19 @@ else                           data.hemisphere = 'N';
    //
    //  Nx, Ny
    //
+   // check env var and read nx/ny from subgrid if set
 
-get_dim(&nc, nx_dimension_name, data.nx, true);
-get_dim(&nc, ny_dimension_name, data.ny, true);
+   if(getenv("MET_USE_WRF_SUBGRID") == nullptr) {
+      get_dim(&nc, nx_dimension_name, data.nx, true);
+      get_dim(&nc, ny_dimension_name, data.ny, true);
+   }
+   else {
+      mlog << Debug(3) << "Reading grid info from subgrid ("
+          << nx_subgrid_dimension_name << ", " << ny_subgrid_dimension_name
+          << ") because MET_USE_WRF_SUBGRID is set\n";
+      get_dim(&nc, nx_subgrid_dimension_name, data.nx, true);
+      get_dim(&nc, ny_subgrid_dimension_name, data.ny, true);
+   }
 
    //
    //  pin point
@@ -263,7 +282,16 @@ data.lon_orient *= -1.0;
    //  D, R
    //
 
-get_global_att(&nc, (string)"DX", data.d_km, true);
+get_global_att(&nc, (string) "DX", data.d_km, true);
+
+// if using WRF subgrid, calculate dx of subgrid
+if(getenv("MET_USE_WRF_SUBGRID") != nullptr){
+  int nx_full;
+  get_dim(&nc, nx_dimension_name, nx_full, true);
+  data.d_km = data.d_km * (double)nx_full / (double)data.nx;
+}
+
+// convert m to km
 data.d_km *= 0.001;
 
 data.r_km = default_grib_radius_km;
@@ -290,9 +318,10 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool get_mercator_grid (NcFile & nc, Grid & grid)
+static bool get_mercator_grid (const NcFile & nc, Grid & grid)
 
 {
+  const char *method_name = "get_mercator_grid (const NcFile & nc, Grid & grid) -> ";
 
 double D_km;
 double scale_factor, scale_lat;
@@ -310,6 +339,11 @@ data.name = mercator_default_gridname;
    //
    //  nx, ny
    //
+  if(getenv("MET_USE_WRF_SUBGRID") != nullptr) {
+    mlog << Error << "\n" << method_name
+         << "MET_USE_WRF_SUBGRID is set, but subgrid is not supported for MercatorData grid\n\n";
+    return false;
+  }
 
 get_dim(&nc, nx_dimension_name, data.nx, true);
 get_dim(&nc, ny_dimension_name, data.ny, true);
@@ -395,7 +429,7 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-double mercator_lon_to_u(double lon)
+static double mercator_lon_to_u(double lon)
 
 {
 
@@ -413,7 +447,7 @@ return u;
 ////////////////////////////////////////////////////////////////////////
 
 
-double mercator_lat_to_v(double lat)
+static double mercator_lat_to_v(double lat)
 
 {
 
@@ -429,7 +463,7 @@ return v;
 ////////////////////////////////////////////////////////////////////////
 
 
-double mercator_u_to_lon(double u)
+static double mercator_u_to_lon(double u)
 
 {
 
@@ -447,7 +481,7 @@ return lon_deg;
 ////////////////////////////////////////////////////////////////////////
 
 
-double mercator_v_to_lat(double v)
+static double mercator_v_to_lat(double v)
 
 {
 
