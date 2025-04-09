@@ -28,7 +28,7 @@ poly_DATA = \
 	CAR.poly \
 	ECA.poly \
 	GLF.poly \
-	GMC.poly \
+	GAC.poly \
 	GRB.poly \
 	HWI.poly \
 	LMV.poly \

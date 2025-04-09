@@ -20,6 +20,8 @@
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
 //   000    11/07/24  Halley Gotway  MET #3006 New
+//   001    03/10/25  Halley Gotway  MET #3059 Add ioda, python, and
+//                                   climo support
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -38,6 +40,7 @@
 #include "main.h"
 #include "pair_stat.h"
 
+#include "vx_ioda.h"
 #include "vx_statistics.h"
 #include "vx_nc_util.h"
 #include "vx_regrid.h"
@@ -48,8 +51,7 @@
 #include "nc_point_obs_in.h"
 
 #ifdef WITH_PYTHON
-#include "data2d_nc_met.h"
-#include "pointdata_python.h"
+#include "python_line.h"
 #endif
 
 using namespace std;
@@ -65,9 +67,14 @@ static void setup_table    (AsciiTable &);
 
 static ConcatString build_outfile_name(const char *);
 
-static void process_mpr_pairs(const ConcatString &, PairsFormat);
+static void setup_first_pass(unixtime);
+static void process_mpr_pairs(const ConcatString &);
+static void process_python_pairs(const ConcatString &);
 static void process_ioda_pairs(const ConcatString &);
+
 static void process_scores();
+static void store_hdr_col_val(const string &, const string &,
+                              StringArray &, StringArray &);
 
 static void do_cts       (vector<CTSInfo> &, int, const PairDataPoint *);
 static void do_mcts      (MCTSInfo   &, int, const PairDataPoint *);
@@ -96,9 +103,11 @@ int met_main(int argc, char *argv[]) {
    // Process each pairs file
    for(int i=0; i<pairs_files.n(); i++) {
 
-      if(pairs_format == PairsFormat::MPR ||
-         pairs_format == PairsFormat::Python) {
-         process_mpr_pairs(pairs_files[i], pairs_format);
+      if(pairs_format == PairsFormat::MPR) {
+         process_mpr_pairs(pairs_files[i]);
+      }
+      else if(pairs_format == PairsFormat::Python) {
+         process_python_pairs(pairs_files[i]);
       }
       else if(pairs_format == PairsFormat::IODA) {
          process_ioda_pairs(pairs_files[i]);
@@ -419,17 +428,69 @@ static ConcatString build_outfile_name(const char *suffix) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_mpr_pairs(const ConcatString &file_name,
-                              PairsFormat format) {
-   LineDataFile f;
-   const char *method_name = "process_mpr_pairs() -> ";
+static void setup_first_pass(unixtime vld_ut) {
 
-   // Add support for -format python
-   if(format == PairsFormat::Python) { 
-      mlog << Error << "\nprocess_mpr_pairs() -> "
-           << "the \"-format python\" option is not supported yet!\n\n";
-      exit(1);
+   // Store the verification valid time
+   vx_valid_ut = vld_ut;
+
+   mlog << Debug(2) << "Getting climatology data for the " 
+        << unix_to_yyyymmdd_hhmmss(vld_ut) << " valid time.\n"; 
+
+   // Loop over the verification tasks and extract the climo data
+   for(int i_vx=0; i_vx<conf_info.get_n_vx(); i_vx++) {
+
+      // Read forecast climatology data
+      DataPlaneArray fcmn_dpa(
+         read_climo_data_plane_array(
+            conf_info.conf.lookup_dictionary(conf_key_fcst),
+            conf_key_climo_mean,
+            i_vx, vx_valid_ut, conf_info.vx_opt[i_vx].grid_climo,
+            "forecast climatology mean"));
+      DataPlaneArray fcsd_dpa(
+         read_climo_data_plane_array(
+            conf_info.conf.lookup_dictionary(conf_key_fcst),
+            conf_key_climo_stdev,
+            i_vx, vx_valid_ut, conf_info.vx_opt[i_vx].grid_climo,
+            "forecast climatology standard deviation"));
+
+      // Read observation climatology data
+      DataPlaneArray ocmn_dpa(
+         read_climo_data_plane_array(
+            conf_info.conf.lookup_dictionary(conf_key_obs),
+            conf_key_climo_mean,
+            i_vx, vx_valid_ut, conf_info.vx_opt[i_vx].grid_climo,
+            "observation climatology mean"));
+      DataPlaneArray ocsd_dpa(
+         read_climo_data_plane_array(
+            conf_info.conf.lookup_dictionary(conf_key_obs),
+            conf_key_climo_stdev,
+            i_vx, vx_valid_ut, conf_info.vx_opt[i_vx].grid_climo,
+            "observation climatology standard deviation"));
+
+      // Store data for the current verification task
+      conf_info.vx_opt[i_vx].vx_pd.set_fcst_climo_mn_dpa(fcmn_dpa);
+      conf_info.vx_opt[i_vx].vx_pd.set_fcst_climo_sd_dpa(fcsd_dpa);
+      conf_info.vx_opt[i_vx].vx_pd.set_obs_climo_mn_dpa(ocmn_dpa);
+      conf_info.vx_opt[i_vx].vx_pd.set_obs_climo_sd_dpa(ocsd_dpa);
+
+      // Dump out the number of levels found
+      mlog << Debug(2)
+           << "For " << conf_info.vx_opt[i_vx].vx_pd.fcst_info->name_attr()
+           << ", found "
+           << fcmn_dpa.n_planes() << " forecast climatology mean and "
+           << fcsd_dpa.n_planes() << " standard deviation level(s), and "
+           << ocmn_dpa.n_planes() << " observation climatology mean and "
+           << ocsd_dpa.n_planes() << " standard deviation level(s).\n";
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void process_mpr_pairs(const ConcatString &file_name) {
+   const char *method_name = "process_mpr_pairs() -> ";
+   LineDataFile f;
 
    //
    // Open the input file
@@ -458,9 +519,15 @@ static void process_mpr_pairs(const ConcatString &file_name,
 
       n_read++;
 
+      // Store the first valid time encountered
+      if(vx_valid_ut == 0) {
+         setup_first_pass(timestring_to_unix(line.get_item("OBS_VALID_BEG")));
+      }
+
       if(conf_info.add_mpr_line(line)) n_keep++;
-   }
-   
+
+   } // end while
+
    mlog << Debug(3) << "Keeping " << n_keep << " of " << n_read
         << " MPR lines from \"" << file_name << "\".\n";
  
@@ -469,13 +536,156 @@ static void process_mpr_pairs(const ConcatString &file_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void process_ioda_pairs(const ConcatString &) {
+static void process_python_pairs(const ConcatString &python_command) {
+   const char *method_name = "process_python_pairs() -> ";
 
-   // Add support for -format ioda
-   mlog << Error << "\nprocess_ioda_pairs() -> "
-        << "the \"-format ioda\" option is not supported yet!\n\n";
-   exit(1);
+#ifndef WITH_PYTHON
+   // Python support not compiled
+   python_compile_error(method_name);
+#else
 
+   // Parse the python script and any arguments
+   ConcatString user_script_path;
+   StringArray  user_script_args;
+   user_script_args.parse_wsss(python_command);
+   if(user_script_args.n() > 0) {
+      user_script_path = user_script_args[0];
+      user_script_args.shift_down(0, 1);
+   }
+
+   auto *pldf = new PyLineDataFile;
+
+   if(!pldf->open(user_script_path.c_str(), user_script_args)) {
+      mlog << Error << "\n" << method_name
+           << "unable to open user script file \""
+           << user_script_path << "\"\n\n";
+      exit(1);
+   }
+
+   //
+   // Count the number read and kept
+   //
+   int n_read = 0;
+   int n_keep = 0;
+
+   //
+   // Process the STAT lines
+   //
+   STATLine line;
+   LineDataFile *f = pldf;
+   while((*f) >> line) {
+
+      // Skip header and non-MPR lines
+      if(line.is_header() || line.type() != STATLineType::mpr) continue;
+
+      n_read++;
+
+      // Store the first valid time encountered
+      if(vx_valid_ut == 0) {
+         setup_first_pass(timestring_to_unix(line.get_item("OBS_VALID_BEG")));
+      }
+ 
+      if(conf_info.add_mpr_line(line)) n_keep++;
+
+   } // end while
+
+   mlog << Debug(3) << "Keeping " << n_keep << " of " << n_read
+        << " MPR lines read with Python command \"" << python_command
+	<< "\".\n";
+
+   f->close();
+   if(pldf) { delete pldf; pldf = (PyLineDataFile *) nullptr; } 
+
+#endif
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void process_ioda_pairs(const ConcatString &file_name) {
+   const char *method_name = "process_ioda_pairs() -> ";
+
+   // Set the configuration
+   IODAReader ioda_reader; 
+   ioda_reader.set_data_config(default_config_filename,
+                               config_file.c_str());
+
+   NcFile *f_in = open_ncfile(file_name.c_str());
+
+   // Check for a valid file
+   if(IS_INVALID_NC_P(f_in)) {
+      mlog << Error << "\n" << method_name
+           << "can't open input NetCDF file \"" << file_name
+           << "\" for reading.\n\n";
+      delete f_in;
+      f_in = (NcFile *) nullptr;
+      clean_up();
+      exit(1);
+   }
+
+   // Read the IODA file
+   ioda_reader.read_ioda(f_in);
+
+   // Error out for missing metadata
+   if(!ioda_reader.validate_metadata()) {
+      mlog << Error << "\n" << method_name
+           << "Required dimensions and/or metadata variables "
+           << "missing from IODA file \"" << file_name << "\".\n\n"; 
+      delete f_in;
+      f_in = (NcFile *) nullptr;
+      clean_up();
+      exit(1);
+   }
+ 
+   //
+   // Count the number read and kept
+   //
+   int n_read = 0;
+   int n_keep = 0;
+
+   //
+   // Loop over the verification tasks
+   //
+   for(auto &vx : conf_info.vx_opt) {
+
+      // Get point pairs
+      vector<point_pair_t> *pairs =
+         ioda_reader.get_point_pairs(
+            vx.vx_pd.fcst_info->name().c_str(),
+            vx.vx_pd.obs_info->name().c_str(),
+	    bad_data_int);
+
+      // Check for valid pairs
+      int n_read_cur = 0;
+      if(pairs) n_read_cur = (int) pairs->size();
+
+      // Increment total read counter
+      n_read += n_read_cur; 
+
+      mlog << Debug(4) << "Read " << n_read_cur << " IODA pairs for "
+           << vx.vx_pd.fcst_info->name_attr() << " versus "
+           << vx.vx_pd.obs_info->name_attr() << " from \""
+           << file_name << "\".\n";
+
+      // Process pairs
+      if(pairs) {
+
+         // Store the first valid time encountered
+         if(vx_valid_ut == 0 && !pairs->empty()) {
+            setup_first_pass(pairs->begin()->ut);
+         }
+
+         // Add each IODA pair 
+         for(const auto &x : *pairs) {
+            if(vx.add_ioda_pair(x)) n_keep++;
+         }
+      }
+   }
+
+   mlog << Debug(3) << "Keeping " << n_keep << " of " << n_read
+        << " IODA pairs from \"" << file_name << "\".\n";
+ 
    return;
 }
 
@@ -503,28 +713,50 @@ static void process_scores() {
    cts_info.resize(n_cat);
    vl1l2_info.resize(n_wind);
 
+   // Output header columns
+   StringArray hdr_cols;
+   StringArray hdr_vals;
+
+   // Update header columns
+   store_hdr_col_val("MODEL", conf_info.model, hdr_cols, hdr_vals);
+   if(pairs_format == PairsFormat::IODA) {
+      store_hdr_col_val("FCST_UNITS",  na_str, hdr_cols, hdr_vals);
+      store_hdr_col_val("FCST_LEV",    na_str, hdr_cols, hdr_vals);
+      store_hdr_col_val("OBS_UNITS",   na_str, hdr_cols, hdr_vals);
+      store_hdr_col_val("OBS_LEV",     na_str, hdr_cols, hdr_vals);
+      store_hdr_col_val("OBS_LEV",     na_str, hdr_cols, hdr_vals);
+      store_hdr_col_val("INTERP_MTHD", interpmthd_nearest_str,
+                                               hdr_cols, hdr_vals);
+      store_hdr_col_val("INTERP_PNTS", "1",    hdr_cols, hdr_vals);
+      store_hdr_col_val("ALPHA",       na_str, hdr_cols, hdr_vals);
+   }
+
    // Compute scores for each PairData object and write output
    int i_vx = -1;
    for(auto &vx : conf_info.vx_opt) {
 
       i_vx++;
 
+      // Update header columns
+      store_hdr_col_val("DESC", vx.vx_pd.desc, hdr_cols, hdr_vals);
+
+
       // Store masking region as the only "case" information
-      StringArray empty_sa;
       StringArray case_cols;
       case_cols.add("VX_MASK");
-
+ 
       // Loop through the verification masking regions
       for(int i_mask=0; i_mask<vx.get_n_mask(); i_mask++) {
+
+         // Update header columns
+         store_hdr_col_val("VX_MASK", vx.mask_name[i_mask], hdr_cols, hdr_vals);
 
          // Retrieve the header based on the inputs
          ConcatString cur_case(vx.mask_name[i_mask]);
          StatHdrColumns in_shc = vx.vx_hdr[i_mask].get_shc(cur_case, case_cols,
-                                    empty_sa, empty_sa, STATLineType::mpr);
+                                    hdr_cols, hdr_vals, STATLineType::mpr);
 
          // Override header columns 
-         if(conf_info.model.nonempty()) in_shc.set_model(conf_info.model.c_str());
-         if(vx.vx_pd.desc.nonempty())   in_shc.set_desc(vx.vx_pd.desc.c_str());
          in_shc.set_mask(vx.mask_name[i_mask].c_str());
          shc = in_shc;
 
@@ -748,6 +980,28 @@ static void process_scores() {
       mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
    } // end for i_vx
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void store_hdr_col_val(const string &col_name, const string &col_val,
+                              StringArray &hdr_cols, StringArray &hdr_vals) {
+
+   // Ignore empty column value strings
+   if(col_val.empty()) return;
+
+   // Update existing header column value
+   int index;
+   if(hdr_cols.has(col_name, index)) {
+      hdr_vals.set(index, col_val);
+   }
+   // Add new header column name and value
+   else {
+      hdr_cols.add(col_name);
+      hdr_vals.add(col_val);
+   }
 
    return;
 }
@@ -1274,7 +1528,7 @@ static void usage() {
         << "the desired configuration settings (required).\n"
 
         << "\t\t\"-out base\" overrides the default output "
-        << "file base (./tc_gen) (optional).\n"
+        << "file base (./pair_stat) (optional).\n"
 
         << "\t\t\"-log file\" outputs log messages to the specified "
         << "file (optional).\n"

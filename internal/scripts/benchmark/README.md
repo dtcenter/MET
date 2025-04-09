@@ -21,7 +21,10 @@ The benchmark.py script reads the YAML config file (benchmark.yaml) to obtain th
 the name of the output filename (containing the benchmarking information and statistics).  A subdirectory under the output base directory is created
 for each use case (based on the use case config filename).  
 
-In addition, one or more METplus wrapper config files and a system.conf file will be required (to run the METplus use case wrapper).
+If **running use cases**, one or more METplus wrapper config files and a system.conf file will be required (to run the METplus use case wrapper).
+If **running MET command line commands**, the benchmark.yaml file is the only configuration file needed. 
+
+Currently, the benchmarking tool supports **running code once** (i.e. no stress-testing support is available).  
 
 The benchmarking results are extracted and consolidated into one data structure (pandas dataframe).  The information is saved as a .csv and a .txt file 
 (comma separated format and tabular format).  

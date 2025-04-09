@@ -1,0 +1,542 @@
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2025
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+#include <iostream>
+#include <unistd.h>
+#include <stdlib.h>
+#include <cmath>
+
+#include "rng_azi_grid.h"
+
+#include "trig.h"
+
+using namespace std;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+
+static const double tol = 1.0e-4;
+
+static const double km_per_deg = (pi/180.0)*earth_radius_km;
+
+static const double deg_per_km = 1.0/km_per_deg;
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for class RngAziGrid
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+RngAziGrid::RngAziGrid()
+
+{
+
+clear_rng_azi();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+RngAziGrid::~RngAziGrid()
+
+{
+
+clear_rng_azi();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+RngAziGrid & RngAziGrid::operator=(const RngAziGrid & tg)
+
+{
+
+if ( this == &tg )   return *this;
+
+assign(tg);
+
+return *this;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void RngAziGrid::clear_rng_azi()
+
+{
+
+RotatedLatLonGrid::clear();
+
+Ir.set_xyz(1.0, 0.0, 0.0);
+Jr.set_xyz(0.0, 1.0, 0.0);
+Kr.set_xyz(0.0, 0.0, 1.0);
+
+Range_n = 0;
+Azimuth_n = 0;
+
+Range_max_km = 0.0;
+
+Lat_Center_Deg = Lon_Center_Deg = 0.0;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+ 
+
+void RngAziGrid::assign(const RngAziGrid & tg)
+ 
+{
+
+clear_rng_azi();
+
+Ir = tg.Ir;
+Jr = tg.Jr;
+Kr = tg.Kr;
+
+Range_n  = tg.Range_n;
+Azimuth_n = tg.Azimuth_n;
+
+Range_max_km = tg.Range_max_km;
+
+Lat_Center_Deg = tg.Lat_Center_Deg;
+Lon_Center_Deg = tg.Lon_Center_Deg;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+RngAziGrid::RngAziGrid(const RngAziData & data)
+
+{
+
+set_from_rng_azi_data(data);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void RngAziGrid::set_from_rng_azi_data(const RngAziData & data)
+
+{
+
+clear_rng_azi();
+
+RAData = data;
+
+Range_n = data.range_n;
+
+Azimuth_n = data.azimuth_n;
+
+Range_max_km = data.range_max_km;
+
+Lat_Center_Deg = data.lat_center;
+
+Lon_Center_Deg = data.lon_center;
+
+calc_ijk();
+
+const double rng_max_deg = Range_max_km*deg_per_km;
+
+RotatedLatLonData RLLD;
+
+RLLD.name       = data.name;
+
+RLLD.rot_lat_ll = 90.0 - rng_max_deg;
+RLLD.rot_lon_ll =  0.0;
+
+RLLD.delta_rot_lat = rng_max_deg/(Range_n - 1);
+
+// MET #2833 divide by n rather than n-1 for the azimuth increment
+RLLD.delta_rot_lon = 360.0/Azimuth_n;
+
+RLLD.Nlat = Range_n;
+RLLD.Nlon = Azimuth_n;
+
+RLLD.true_lat_south_pole = -Lat_Center_Deg;
+RLLD.true_lon_south_pole = Lon_Center_Deg + 180.0;
+
+RLLD.aux_rotation = 180.0 - Lon_Center_Deg;
+
+RotatedLatLonGrid::set_from_rdata(RLLD);
+
+er.set_rng_azi_center(Lat_Center_Deg, Lon_Center_Deg);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void RngAziGrid::calc_ijk()
+
+{
+
+const Vector K (0.0, 0.0, 1.0);
+
+Kr.set_latlon(Lat_Center_Deg, Lon_Center_Deg);
+
+Ir = cross(K, Kr);
+
+double len = Ir.abs();
+
+if ( len < tol )  {
+
+   mlog << Error << "\nRngAziGrid::calc_ijk() -> "
+        << "rotated poles too close to original poles!\n\n";
+
+   exit ( 1 );
+
+}
+
+Ir.normalize();
+
+Jr = cross(Kr, Ir);
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void RngAziGrid::rng_azi_to_latlon(const double rng_km, const double azi_deg, double & lat, double & lon) const
+
+{
+
+   //
+   //  sanity check that the center location is set
+   //
+
+if ( is_bad_data(Lat_Center_Deg) || is_bad_data(Lon_Center_Deg) ) {
+
+   mlog << Error << "\nRngAziGrid::rng_azi_to_latlon() -> "
+        << "the grid center location (" << Lat_Center_Deg << ", "
+        << Lon_Center_Deg << ") is not set!\n\n";
+
+   exit ( 1 );
+
+}
+
+const double rng_deg = deg_per_km*rng_km;
+const double lat_rot = 90.0 - rng_deg;
+const double lon_rot = azi_deg;
+
+double y = (lat_rot - RData.rot_lat_ll)/(RData.delta_rot_lat);
+
+double x = lon_rot/(RData.delta_rot_lon);
+
+x = Nx - x; // MET #2841 switch from counterclockwise to clockwise
+
+RotatedLatLonGrid::xy_to_latlon(x, y, lat, lon);
+
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void RngAziGrid::latlon_to_rng_azi(const double lat, const double lon, double & rng_km, double & azi_deg) const
+
+{
+
+   //
+   //  sanity check that the center location is set
+   //
+
+if ( is_bad_data(Lat_Center_Deg) || is_bad_data(Lon_Center_Deg) ) {
+
+   mlog << Error << "\nRngAziGrid::latlon_to_rng_azi() -> "
+        << "the grid center location (" << Lat_Center_Deg << ", "
+        << Lon_Center_Deg << ") is not set!\n\n";
+
+   exit ( 1 );
+
+}
+
+double rng_deg;
+double x;
+double y;
+const double rng_max_deg = deg_per_km*Range_max_km;
+
+RotatedLatLonGrid::latlon_to_xy(lat, lon, x, y);
+
+x = Nx - x; // MET #2841 switch from counterclockwise to clockwise
+
+azi_deg = x*(RData.delta_rot_lon);
+
+rng_deg = rng_max_deg - y*(RData.delta_rot_lat);
+
+rng_km = rng_deg*km_per_deg;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void RngAziGrid::wind_ne_to_rt (const double azi_deg,
+                               const double u_wind, const double v_wind,
+                               double & radial_wind, double & tangential_wind) const
+
+{
+
+double rcos = cosd(azi_deg);
+double rsin = sind(azi_deg);
+
+if (is_bad_data(u_wind) || is_bad_data(v_wind)) {
+   radial_wind     = bad_data_double;
+   tangential_wind = bad_data_double;   
+}
+else {
+   radial_wind     =      rcos*u_wind + rsin*v_wind;
+   tangential_wind = -1.0*rsin*u_wind + rcos*v_wind;
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void RngAziGrid::wind_ne_to_rt (const double lat, const double lon, 
+                               const double u_wind, const double v_wind,
+                               double & radial_wind, double & tangential_wind) const
+
+{
+
+double rng_km, azi_deg;
+
+latlon_to_rng_azi(lat, lon, rng_km, azi_deg);
+
+wind_ne_to_rt(azi_deg, u_wind, v_wind, radial_wind, tangential_wind);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void RngAziGrid::latlon_to_xy(double true_lat, double true_lon, double & x, double & y) const
+
+{
+
+double rng_km;
+double azi_deg;
+
+latlon_to_rng_azi(true_lat, true_lon, rng_km, azi_deg);
+
+x = azi_deg / azimuth_delta_deg();
+y = rng_km  / range_delta_km();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void RngAziGrid::xy_to_latlon(double x, double y, double & true_lat, double & true_lon) const
+
+{
+
+rng_azi_to_latlon(y * range_delta_km(),
+                  x * azimuth_delta_deg(),
+                  true_lat, true_lon);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void RngAziGrid::dump(ostream & out, int depth) const
+
+{
+
+Indent prefix(depth);
+
+out << prefix << "Name         = ";
+
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
+
+out << '\n';
+
+out << prefix << "Nx (Azimuth)   = " << Azimuth_n << "\n";
+out << prefix << "Ny (Range)     = " << Range_n << "\n";
+
+out << prefix << "Range_max_km   = " << Range_max_km << "\n";
+
+out << prefix << "Lat_Center_Deg = " << Lat_Center_Deg << "\n"; 
+out << prefix << "Lon_Center_Deg = " << Lon_Center_Deg << "\n";
+
+out.flush();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString RngAziGrid::serialize(const char *sep) const
+
+{
+
+ConcatString a;
+a.set_precision(3);
+
+a << "Projection: Range/Azimuth" << sep;
+a << "Nx (Azimuth): " << Azimuth_n << sep;
+a << "Ny (Range): " << Range_n << sep;
+a << "Range_max_km: " << Range_max_km << sep;
+a << "Lat_Center_Deg: " << Lat_Center_Deg << sep;
+a << "Lon_Center_Deg: " << Lon_Center_Deg;
+
+return a;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+GridInfo RngAziGrid::info() const
+
+{
+
+GridInfo i;
+
+i.set( RAData );
+
+return i;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool RngAziGrid::wrap_lon() const
+
+{
+
+return true;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+GridRep * RngAziGrid::copy() const
+
+{
+
+auto * p = new RngAziGrid (RAData);
+
+p->Name = Name;
+
+return p;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
+   //  Code for misc functions
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+Grid::Grid(const RngAziData & data)
+
+{
+
+init_from_scratch();
+
+set(data);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void Grid::set(const RngAziData & data)
+
+{
+
+clear();
+
+rep = new RngAziGrid ( data );
+
+if ( !rep )  {
+
+   mlog << Error << "\nGrid::set(const RngAziData &) -> "
+        << "memory allocation error\n\n";
+
+   exit ( 1 );
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+

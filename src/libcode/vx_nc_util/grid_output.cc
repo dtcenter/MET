@@ -37,6 +37,7 @@ static void stereographic_grid_output  (const GridInfo &, NcFile * ncfile);
 static void mercator_grid_output       (const GridInfo &, NcFile * ncfile);
 static void gaussian_grid_output       (const GridInfo &, NcFile * ncfile);
 static void laea_grid_output           (const GridInfo &, NcFile * ncfile);
+static void range_azimuth_grid_output  (const GridInfo &, NcFile * ncfile, NcDim &, NcDim &);
 static void semilatlon_grid_output     (const GridInfo &, NcFile * ncfile, NcDim &, NcDim &);
 static void write_semilatlon_var       (NcFile * ncfile, const char *,
                                         NcDim *, const NumArray &, const char *,
@@ -67,6 +68,7 @@ else if ( info.rll )  rotated_latlon_grid_output  (info, ncfile);
 else if ( info.m   )  mercator_grid_output        (info, ncfile);
 else if ( info.g   )  gaussian_grid_output        (info, ncfile);
 else if ( info.la  )  laea_grid_output            (info, ncfile);
+else if ( info.ra  )  range_azimuth_grid_output   (info, ncfile, lat_dim, lon_dim);
 else if ( info.sl  )  semilatlon_grid_output      (info, ncfile, lat_dim, lon_dim);
 else {
 
@@ -88,7 +90,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void lambert_grid_output(const GridInfo & info, NcFile * ncfile)
+static void lambert_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
@@ -216,7 +218,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void latlon_grid_output(const GridInfo & info, NcFile * ncfile)
+static void latlon_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
@@ -293,7 +295,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void rotated_latlon_grid_output(const GridInfo & info, NcFile * ncfile)
+static void rotated_latlon_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
@@ -399,7 +401,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void stereographic_grid_output(const GridInfo & info, NcFile * ncfile)
+static void stereographic_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
@@ -518,7 +520,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void mercator_grid_output(const GridInfo & info, NcFile * ncfile)
+static void mercator_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
@@ -597,7 +599,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void gaussian_grid_output(const GridInfo & info, NcFile * ncfile)
+static void gaussian_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
@@ -645,7 +647,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void laea_grid_output(const GridInfo & info, NcFile * ncfile)
+static void laea_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
@@ -773,8 +775,28 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void semilatlon_grid_output(const GridInfo & info, NcFile * ncfile,
-                            NcDim & lat_dim, NcDim & lon_dim)
+static void range_azimuth_grid_output(const GridInfo &, NcFile *,
+                                      NcDim &, NcDim &)
+
+{
+
+   //
+   //  Range/azimuth grids are not fully supported yet 
+   //
+
+mlog << Error << "\nrange_azimuth_grid_output() -> "
+     << "support for writing NetCDF range/azimuth files is currently "
+     << "limited to the tc_rmw, rmw_analysis, and tc_diag tools!\n\n";
+
+exit ( 1 );
+
+}
+   
+////////////////////////////////////////////////////////////////////////
+
+
+static void semilatlon_grid_output(const GridInfo & info, NcFile * ncfile,
+                                   NcDim & lat_dim, NcDim & lon_dim)
 
 {
 

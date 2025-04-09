@@ -28,7 +28,7 @@ using namespace std;
 
 static void read_climo_file(
           const char *, GrdFileType, Dictionary *, unixtime,
-          int, int, const Grid &, const RegridInfo &,
+          int, int, Grid &, const RegridInfo &,
           DataPlaneArray &dpa, const char *);
 
 static DataPlaneArray climo_time_interp(
@@ -43,7 +43,7 @@ DataPlane read_climo_data_plane(Dictionary *dict,
                                 const char *entry_name,
                                 int i_vx,
                                 unixtime vld_ut,
-                                const Grid &vx_grid,
+                                Grid &vx_grid,
                                 const char *desc) {
    DataPlane dp;
    DataPlaneArray dpa;
@@ -74,7 +74,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
                                            const char *climo_name,
                                            int i_vx,
                                            unixtime vld_ut,
-                                           const Grid &vx_grid,
+                                           Grid &vx_grid,
                                            const char *desc) {
 
    const char *method_name = "read_climo_data_plane_array() -> ";
@@ -192,7 +192,7 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
 
 void read_climo_file(const char *climo_file, GrdFileType ctype,
                      Dictionary *dict, unixtime vld_ut,
-                     int day_ts, int hour_ts, const Grid &vx_grid,
+                     int day_ts, int hour_ts, Grid &vx_grid,
                      const RegridInfo &regrid_default,
                      DataPlaneArray &dpa, const char *desc) {
 
@@ -264,6 +264,9 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
            << " day, " << (double) hms_diff_sec / sec_per_hour << " hour offset as time "
            << unix_to_yyyymmdd_hhmmss(clm_vld_ut) << " from file "
            << climo_file << ".\n";
+
+      // Store grid, if not already set
+      if(vx_grid.nxy() == 0) vx_grid = mtddf->grid();
 
       // Regrid, if needed
       if(!(mtddf->grid() == vx_grid)) {

@@ -483,6 +483,9 @@ void PlotPointObsConfInfo::process_config(
             exit(1);
          }
 
+	 // Update the grid defintion, as needed for range/azimuth grids
+         grid = met_ptr->grid();
+
          // Regrid, if requested
          if(grid_data_info->regrid().enable) {
             mlog << Debug(1) << "Regridding field "

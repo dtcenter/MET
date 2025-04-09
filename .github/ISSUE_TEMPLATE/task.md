@@ -40,7 +40,7 @@ Consider breaking the task down into sub-issues.
 
 ### Milestone and Projects ###
 - [ ] Select **Milestone** as a **MET-X.Y.Z** version, **Consider for Next Release**, or **Backlog of Development Ideas**
-- [ ] For a **MET-X.Y.Z** version, select the **MET-X.Y.Z Development** project
+- [ ] For a **MET-X.Y.Z** version, select the **MET-X.Y Development** project
 
 ## Define Related Issue(s) ##
 Consider the impact to the other METplus components.
@@ -61,7 +61,7 @@ Pull request: `feature <Issue Number> <Description>`
 - [ ] Define the pull request metadata, as permissions allow.
 Select: **Reviewer(s)** and **Development** issue
 Select: **Milestone** as the next official version
-Select: **MET-X.Y.Z Development** project for development toward the next official release
+Select: **MET-X.Y Development** project for development toward the next coordinated release
 - [ ] Iterate until the reviewer(s) accept and merge your changes.
 - [ ] Delete your fork or branch.
 - [ ] Close this issue.

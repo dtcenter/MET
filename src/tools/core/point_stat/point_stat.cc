@@ -841,8 +841,8 @@ void process_obs_file(int i_nc) {
    if(use_var_id) var_names = met_point_obs->get_var_names();
 
    const int buf_size = (obs_count > BUFFER_SIZE) ? BUFFER_SIZE : obs_count;
-   int   obs_qty_idx_block[buf_size];
-   float obs_arr_block[buf_size][OBS_ARRAY_LEN];
+   vector<int> obs_qty_idx_block(buf_size);
+   vector<std::array<float, OBS_ARRAY_LEN>> obs_arr_block(buf_size);
 
    // Process each observation in the file
    int block_size;
@@ -854,12 +854,14 @@ void process_obs_file(int i_nc) {
 #ifdef WITH_PYTHON
       if (use_python)
          status = met_point_obs->get_point_obs_data()->fill_obs_buf(
-                             block_size, i_block_start_idx, (float *)obs_arr_block, obs_qty_idx_block);
+                             block_size, i_block_start_idx,
+                             (float *)obs_arr_block.data(),
+                             obs_qty_idx_block.data());
       else
 #endif
          status = nc_point_obs.read_obs_data(block_size, i_block_start_idx,
-                                            (float *)obs_arr_block,
-                                            obs_qty_idx_block, (char *)nullptr);
+                                            (float *)obs_arr_block.data(),
+                                            obs_qty_idx_block.data(), nullptr);
       if (!status) exit(1);
 
       int hdr_idx;
@@ -2130,7 +2132,8 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                pd_ptr->typ_sa[k].c_str(),
                pd_ptr->sid_sa[k].c_str(),
                pd_ptr->lat_na[k], pd_ptr->lon_na[k],
-               pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->vld_ta[k],
+               pd_ptr->x_na[k], pd_ptr->y_na[k],
+               nint(pd_ptr->f_lead_na[k]), pd_ptr->vld_ta[k],
                pd_ptr->lvl_na[k], pd_ptr->elv_na[k],
                f_cov, pd_ptr->o_na[k], pd_ptr->o_qc_sa[k].c_str(),
                cpi, pd_ptr->wgt_na[k]);

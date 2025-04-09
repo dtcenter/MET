@@ -697,8 +697,10 @@ DataPlane distance_map(const DataPlane &dp) {
    
    // Meijster second phase
    if (0 < event_count) {
-      int iq, iw;
-      int s[nx], t[nx];
+      int iq;
+      int iw;
+      vector<int> s(nx);
+      vector<int> t(nx);
       
       // Initialize s and t array
       for (ix=0; ix<nx; ix++) {

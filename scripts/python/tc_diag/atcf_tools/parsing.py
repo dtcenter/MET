@@ -49,7 +49,7 @@ def parse_coord(text: str) -> float:
             coordinate *= -1
         return coordinate
     except (AttributeError, ValueError):
-        return np.NaN
+        return np.nan
 
 
 def get_dataframe(filepath_or_buffer: Union[str, TextIO],

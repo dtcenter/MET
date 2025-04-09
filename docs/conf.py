@@ -20,11 +20,11 @@ print(sys.path)
 project = 'MET'
 author = 'UCAR/NCAR, NOAA, CSU/CIRA, and CU/CIRES'
 author_list = 'Prestopnik, J., H. Soh, L. Goodrich, B. Brown, R. Bullock, J. Halley Gotway, K. Newman, J. Opatz, T. Jensen'
-version = '12.1.0-beta1'
+version = '12.1.0-beta2'
 verinfo = version
 release = f'{version}'
 release_year = '2025'
-release_date = f'{release_year}-01-24'
+release_date = f'{release_year}-04-01'
 copyright = f'{release_year}, {author}'
 
 # -- General configuration ---------------------------------------------------
@@ -98,18 +98,18 @@ suppress_warnings = ['ref.citation']
 
 # -- Options for HTML output -------------------------------------------------
 
+# Add any paths that contain custom static files (such as style sheets) here,
+# relative to this directory. They are copied after the builtin static files,
+# so a file named "default.css" will overwrite the builtin "default.css".
+html_static_path = ['_static']
+
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
 html_theme_path = ["_themes", ]
 html_js_files = ['pop_ver.js']
-html_css_files = ['theme_override.css']
-
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_css_files = ['theme_override.css','custom.css']
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.

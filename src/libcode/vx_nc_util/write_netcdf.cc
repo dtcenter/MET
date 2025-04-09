@@ -71,10 +71,21 @@ void write_netcdf_proj(NcFile * f_out, const Grid & grid, NcDim & lat_dim, NcDim
 const GridInfo info = grid.info();
 
    //
+   //  add range and azimuth dimensions for Range/Azimuth grids
+   //
+
+if ( info.ra )  {
+
+   lat_dim = add_dim(f_out, "range",   (long) grid.ny() );
+   lon_dim = add_dim(f_out, "azimuth", (long) grid.nx() );
+
+}
+
+   //
    //  add lat and lon dimensions for non-SemiLatLon grids
    //
 
-if ( !info.sl )  {
+else if ( !info.sl )  {
 
    lat_dim = add_dim(f_out, "lat", (long) grid.ny() );
    lon_dim = add_dim(f_out, "lon", (long) grid.nx() );

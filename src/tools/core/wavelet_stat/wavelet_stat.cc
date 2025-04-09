@@ -234,8 +234,9 @@ void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(ftype, otype);
 
-   // For python types read the first field to set the grid
-   if(is_python_grdfiletype(ftype)) {
+   // For python types and range/azimuth grids, read the first field to set the grid
+   if(is_python_grdfiletype(ftype) ||
+      fcst_mtddf->grid().info().ra) {
       if(!fcst_mtddf->data_plane(*conf_info.fcst_info[0], dp)) {
          mlog << Error << "\nTrouble reading data from forecast file \""
               << fcst_file << "\"\n\n";
@@ -243,7 +244,8 @@ void process_command_line(int argc, char **argv) {
       }
    }
 
-   if(is_python_grdfiletype(otype)) {
+   if(is_python_grdfiletype(otype) ||
+      obs_mtddf->grid().info().ra) {
       if(!obs_mtddf->data_plane(*conf_info.obs_info[0], dp)) {
          mlog << Error << "\nTrouble reading data from observation file \""
               << obs_file << "\"\n\n";
@@ -1552,8 +1554,8 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    d = conf_info.get_tile_dim();
 
    int dim_count = get_dim_count(&fcst_var);
-   long lengths[dim_count];
-   long offsets[dim_count];
+   vector<long> lengths(dim_count);
+   vector<long> offsets(dim_count);
 
    offsets[0] = i_tile;
    offsets[1] = 0;
@@ -1565,7 +1567,7 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
 
    if ( nc_info.do_raw )  {
       // Write out the forecast field
-      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths, offsets)) {
+      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the fcst_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1573,7 +1575,7 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       }
 
       // Write out the observation field
-      if(!put_nc_data(&obs_var, &obs_data[0], lengths, offsets)) {
+      if(!put_nc_data(&obs_var, &obs_data[0], lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the obs_var->put for field "
               << shc.get_obs_var() << "\n\n";
@@ -1585,7 +1587,7 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    if ( nc_info.do_diff )  {
 
       // Write out the difference field
-      if(!put_nc_data(&diff_var, &diff_data[0], lengths, offsets)) {
+      if(!put_nc_data(&diff_var, &diff_data[0], lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the diff_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1800,8 +1802,8 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    d = conf_info.get_tile_dim();
 
    int dim_count = get_dim_count(&fcst_var);
-   long lengths[dim_count];
-   long offsets[dim_count];
+   vector<long> lengths(dim_count);
+   vector<long> offsets(dim_count);
 
    offsets[0] = i_tile;
    offsets[1] = i_scale+1;
@@ -1814,7 +1816,7 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    if ( nc_info.do_raw )  {
 
       // Write out the forecast field
-      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths, offsets)) {
+      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_wav() -> "
               << "error with the fcst_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1822,7 +1824,7 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       }
 
       // Write out the observation field
-      if(!put_nc_data(&obs_var, &obs_data[0], lengths, offsets)) {
+      if(!put_nc_data(&obs_var, &obs_data[0], lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_wav() -> "
               << "error with the obs_var->put for field "
               << shc.get_obs_var() << "\n\n";
@@ -1835,7 +1837,7 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
 
 
       // Write out the difference field
-      if(!put_nc_data(&diff_var, &diff_data[0], lengths, offsets)) {
+      if(!put_nc_data(&diff_var, &diff_data[0], lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc()_wav -> "
               << "error with the diff_var->put for field "
               << shc.get_fcst_var() << "\n\n";

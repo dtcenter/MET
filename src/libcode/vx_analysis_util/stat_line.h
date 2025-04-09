@@ -51,7 +51,7 @@ class STATLine : public DataLine {
 
       void dump(std::ostream &, int depth = 0) const;
 
-      int read_line(LineDataFile *);   //  virtual from base class
+      int read_line(LineDataFile *);    //  virtual from base class
 
       bool is_ok() const;               //  virtual from base class
 

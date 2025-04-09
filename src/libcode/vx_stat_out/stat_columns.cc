@@ -1569,7 +1569,15 @@ void write_mpr_row(StatHdrColumns &shc, const PairDataPoint *pd_ptr,
    for(int i=0; i<pd_ptr->n_obs; i++) {
 
       // MET #2893 write individual obs message type
-      if(update_obtype) shc.set_obtype(pd_ptr->typ_sa[i].c_str());
+      if(update_obtype) {
+         shc.set_obtype(pd_ptr->typ_sa[i].c_str());
+      }
+
+      // Set individual forecast lead times, if specified 
+      if(pd_ptr->f_lead_na.n() > i &&
+         !is_bad_data(pd_ptr->f_lead_na[i])) {
+         shc.set_fcst_lead_sec(nint(pd_ptr->f_lead_na[i]));
+      }
 
       // Set the observation valid time
       shc.set_obs_valid_beg(pd_ptr->vld_ta[i]);
