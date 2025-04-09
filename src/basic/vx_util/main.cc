@@ -90,11 +90,7 @@ int main(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 void do_pre_process(int argc, char *argv[]) {
-<<<<<<< HEAD
    CTRACK;
-   ConcatString msg, msg2;
-=======
->>>>>>> aefe3d5c69536b501a10224eefcc6a0b5213b205
 
    store_arguments(argc, argv);
 
