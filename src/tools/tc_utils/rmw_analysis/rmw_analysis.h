@@ -110,11 +110,6 @@ std::vector<double> range_coord;
 std::vector<double> azimuth_coord;
 std::vector<double> level_coord;
 
-std::vector<unixtime> track_valid_time;
-std::vector<double> track_lat;
-std::vector<double> track_lon;
-std::vector<double> track_rmw;
-
 // Variable information
 static std::vector<std::string> data_names;
 static std::vector<int>    data_n_dims;
