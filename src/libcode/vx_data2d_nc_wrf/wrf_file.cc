@@ -350,7 +350,7 @@ void WrfFile::dump(ostream & out, int depth) const
 
 int j, k;
 int month, day, year, hour, minute, second;
-char junk[256];
+ConcatString cs;
 string c;
 Indent prefix(depth);
 Indent p2(depth + 1);
@@ -389,9 +389,9 @@ for (j=0; j<Ntimes; ++j)  {
 
    unix_to_mdyhms(Time[j], month, day, year, hour, minute, second);
 
-   snprintf(junk, sizeof(junk), "%s %d, %d   %2d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   cs.format("%s %d, %d   %2d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
-   out << junk << "\n";
+   out << cs << "\n";
 
 }
 
@@ -401,9 +401,9 @@ out << prefix << "Init Time = ";
 
 unix_to_mdyhms(InitTime, month, day, year, hour, minute, second);
 
-snprintf(junk, sizeof(junk), "%s %d, %d   %2d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+cs.format("%s %d, %d   %2d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
-out << junk << "\n";
+out << cs << "\n";
 
 out << prefix << "\n";
 

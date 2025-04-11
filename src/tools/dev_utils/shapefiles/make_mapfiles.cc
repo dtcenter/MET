@@ -269,7 +269,7 @@ int j;
 const int start_index = gr.start_index(part);
 const int  stop_index = gr.stop_index(part);
 const int n = stop_index - start_index + 1;
-char junk[256];
+ConcatString cs;
 
    //
    //  first line
@@ -293,9 +293,9 @@ out << '\n';
 
 for (j=start_index; j<=stop_index; ++j)  {
 
-   snprintf(junk, sizeof(junk), " %.5f %.5f", gr.lat(j), gr.lon(j));
+   cs.format(" %.5f %.5f", gr.lat(j), gr.lon(j));
 
-   out << junk << '\n';
+   out << cs << '\n';
 
 }
 

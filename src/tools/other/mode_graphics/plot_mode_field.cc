@@ -191,8 +191,6 @@ static double       get_dict_double (Dictionary *, const char * id);
 static ConcatString get_dict_string (Dictionary *, const char * id);
 static bool         get_dict_bool   (Dictionary *, const char * id);
 
-static void time_string(int seconds, char * out, const int len);
-
 static void annotate(const ModeNcOutputFile &, Cgraph &, const Box &, const Box &);
 
 static double calc_text_scale(Cgraph &, const double target_width, const char *);
@@ -1269,36 +1267,14 @@ return c;
 ////////////////////////////////////////////////////////////////////////
 
 
-void time_string(int seconds, char * out, const int len)
-
-{
-
-int h, m, s;
-
-h = seconds/3600;
-m = (seconds%3600)/60;
-s = seconds%60;
-
-     if ( (m == 0) && (s == 0) )  snprintf(out, len, "%02dh",          h);
-else if ( s == 0 )                snprintf(out, len, "%02d:%02d",      h, m);
-else                              snprintf(out, len, "%02d:%02d:%02d", h, m, s);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void annotate(const ModeNcOutputFile & mode_in, Cgraph & plot, const Box & anno_box, const Box & map_box)
 
 {
 
 ConcatString title;
 ConcatString fcst_obs, raw_obj;
-ConcatString s;
-char junk[256], ts[256];
+ConcatString cs;
+ConcatString ts;
 int month, day, year, hour, minute, second;
 int lead_seconds;
 double scale, delta;
@@ -1350,16 +1326,15 @@ if ( fabs(scale - 1.0) > scale_tol )  plot.bold(scale*title_font_size);
 
 plot.write_centered_text(1, 1, 0.5*(plot.page_width()), anno_height - plot.current_font_size() - 10.0, 0.5, 0.0, title.c_str());
 
-
 plot.roman(anno_font_size);
 
-s = mode_in.short_filename();
+cs = mode_in.short_filename();
 
-scale = calc_text_scale(plot, map_width - 10.0, s.c_str());
+scale = calc_text_scale(plot, map_width - 10.0, cs.c_str());
 
 if ( fabs(scale - 1.0) > scale_tol )  plot.bold(scale*anno_font_size);
 
-plot.write_centered_text(1, 1, 0.5*(plot.page_width()), 25.0, 0.5, 0.0, s.c_str());
+plot.write_centered_text(1, 1, 0.5*(plot.page_width()), 25.0, 0.5, 0.0, cs.c_str());
 
 
 vtab1 = anno_height + 0.5*anno_font_size;
@@ -1392,9 +1367,9 @@ plot.set_color(anno_text_color);
 
 lead_seconds = (int) (mode_in.valid_time() - mode_in.init_time());
 
-time_string(lead_seconds, ts, sizeof(ts));
+ts = sec_to_timestring(lead_seconds);
 
-plot.write_centered_text(1, 1, htab2, vtab1, 0.0, 0.0, ts);
+plot.write_centered_text(1, 1, htab2, vtab1, 0.0, 0.0, ts.c_str());
 
    //
    //  valid time
@@ -1405,11 +1380,11 @@ plot.set_color(anno_text_color);
 
 unix_to_mdyhms(mode_in.valid_time(), month, day, year, hour, minute, second);
 
-time_string((int) (mode_in.valid_time()%86400), ts, sizeof(ts));
+ts = sec_to_timestring((int) (mode_in.valid_time()%86400));
 
-snprintf(junk, sizeof(junk), "%s %d, %d  %s", short_month_name[month], day, year, ts);
+cs.format("%s %d, %d  %s", short_month_name[month], day, year, ts);
 
-plot.write_centered_text(1, 1, htab2, vtab2, 0.0, 0.0, junk);
+plot.write_centered_text(1, 1, htab2, vtab2, 0.0, 0.0, cs.c_str());
 
 
    //
@@ -1462,7 +1437,7 @@ CtableEntry e;
 double x, y;
 const double dy = (map_box.height())/Nobjs;
 Box b;
-char junk[256];
+ConcatString cs;
 
 
 if ( Nobjs > ctable.n_entries() )  {
@@ -1486,9 +1461,9 @@ for (j=0; j<Nobjs; ++j)  {
 
    fill_box(b, e.color(), plot);
 
-   snprintf(junk, sizeof(junk), "%d", j+1);
+   cs.format("%d", j+1);
 
-   plot.write_centered_text(2, 1, x + ctable_width + 2.0, y + 0.5*dy, 0.0, 0.5, junk);
+   plot.write_centered_text(2, 1, x + ctable_width + 2.0, y + 0.5*dy, 0.0, 0.5, cs.c_str());
 
    y += dy;
 
@@ -1531,7 +1506,7 @@ CtableEntry e;
 double x, y;
 const double dy = (map_box.height())/(ctable.n_entries());
 Box b;
-char junk[256];
+ConcatString cs;
 double t;
 const int N = ctable.n_entries();
 
@@ -1555,9 +1530,9 @@ for (j=0; j<N; ++j)  {
 
    t = (t - B)/M;
 
-   snprintf(junk, sizeof(junk), "%.2f", t);
+   cs.format("%.2f", t);
 
-   plot.write_centered_text(2, 1, x + ctable_width + 2.0, y + 0.5*dy, 0.0, 0.5, junk);
+   plot.write_centered_text(2, 1, x + ctable_width + 2.0, y + 0.5*dy, 0.0, 0.5, cs.c_str());
 
    y += dy;
 

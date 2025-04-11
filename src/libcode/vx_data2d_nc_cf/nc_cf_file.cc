@@ -720,7 +720,7 @@ unixtime NcCfFile::get_time_from_TRMM_3B42_daily_filename(const string &filename
 
 void NcCfFile::dump(ostream & out, int depth) const
 {
-  char junk[256];
+  ConcatString cs;
 
   Indent prefix(depth);
   Indent p2(depth + 1);
@@ -758,19 +758,19 @@ void NcCfFile::dump(ostream & out, int depth) const
 
   unix_to_mdyhms(InitTime, month, day, year, hour, minute, second);
 
-  snprintf(junk, sizeof(junk), "%s %d, %d   %2d:%02d:%02d",
-          short_month_name[month], day, year, hour, minute, second);
+  cs.format("%s %d, %d   %2d:%02d:%02d",
+            short_month_name[month], day, year, hour, minute, second);
 
-  out << junk << "\n";
+  out << cs << "\n";
 
   out << prefix << "\n";
 
   if (AccumTime > 0) {
     unix_to_mdyhms(AccumTime, month, day, year, hour, minute, second);
-    snprintf(junk, sizeof(junk), "%2d:%02d:%02d (%d seconds)",
-             hour, minute, second, (int)AccumTime);
+    cs.format("%2d:%02d:%02d (%d seconds)",
+              hour, minute, second, (int)AccumTime);
     out << prefix << "Accum Time = ";
-    out << junk << "\n";
+    out << cs << "\n";
     out << prefix << "\n";
   }
 
