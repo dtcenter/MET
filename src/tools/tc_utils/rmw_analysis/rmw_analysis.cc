@@ -38,15 +38,14 @@ static void set_data_files(const StringArray&);
 static void set_config(const StringArray&);
 static void set_out(const StringArray&);
 static void setup();
-static void process_files();
+static void process_data_files();
 static void normalize_stats();
 static void write_stats();
 static void clean_up();
-static void process_track_file(const ConcatString&,
-   TrackInfoArray&);
+static void parse_track_file(const ConcatString&, TrackInfoArray&);
 static bool is_keeper(const ATCFLineBase*);
 static void filter_tracks(TrackInfoArray&);
-static void read_nc_tracks(NcFile*);
+static void read_nc_tracks(NcFile*, TrackInfoArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -58,8 +57,8 @@ int met_main(int argc, char *argv[]) {
    // Set up
    setup();
 
-   // Process files
-   process_files();
+   // Process data files
+   process_data_files();
 
    normalize_stats();
 
@@ -173,11 +172,18 @@ void set_out(const StringArray& a) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup() {
+   const char *method_name = "setup() -> ";
 
    // Open first data file
+   mlog << Debug(1) << "Reading dimensions: "
+        << data_files[0] << "\n";
    nc_in = open_ncfile(data_files[0].c_str());
-   mlog << Debug(1) << "Reading dimensions from"
-       << data_files[0] << "\n";
+   if(!nc_in) {
+      mlog << Error << "\n" << method_name
+          << "unable to open data file \""
+          << data_files[0] << "\"\n\n";
+      exit(1);
+   }
 
    // Get dimension sizes
    get_dim(nc_in, "range", n_range, true);
@@ -187,11 +193,11 @@ void setup() {
    azimuth_dim = get_nc_dim(nc_in, "azimuth");
 
    if (get_dim(nc_in, "height", n_level)) {
-      mlog << Debug(1) << "Found height vertical dimension.\n";
+      mlog << Debug(3) << "Found height vertical dimension.\n";
       level_dim = get_nc_dim(nc_in, "height");
       level_name = "height";
    } else if (get_dim(nc_in, "pressure", n_level)) {
-      mlog << Debug(1) << "Found pressure vertical dimension.\n";
+      mlog << Debug(3) << "Found pressure vertical dimension.\n";
       level_dim = get_nc_dim(nc_in, "pressure");
       level_name = "pressure";
    } else {
@@ -199,7 +205,7 @@ void setup() {
    }
 
    mlog << Debug(2)
-       << "(n_level, n_range, n_azimuth) = ("
+       << "Range/Azimuth dimensions (n_level, n_range, n_azimuth) = ("
        << n_level << ", " << n_range << ", " << n_azimuth << ")\n";
 
    // Get dimension coordinates
@@ -305,7 +311,8 @@ void setup() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_files() {
+void process_data_files() {
+   const char *method_name = "process_data_files() -> ";
 
    // Size data cubes
    DataCube data_2d;
@@ -339,71 +346,85 @@ void process_files() {
    count_3d.emplace_back(n_azimuth);
 
    for(int i_file = 0; i_file < data_files.n_elements(); i_file++) {
-      mlog << Debug(1) << "Processing "
-          << data_files[i_file] << "\n";
+
+      // Open current data file
       nc_in = open_ncfile(data_files[i_file].c_str());
+      if(!nc_in) {
+         mlog << Error << "\n" << method_name
+              << "unable to open data file \""
+              << data_files[0] << "\"\n\n";
+         exit(1);
+      }
 
       get_dim(nc_in, "track_point", n_track_point, true);
       track_point_dim = get_nc_dim(nc_in, "track_point");
-      mlog << Debug(1) << "Number of track points "
-          << n_track_point << "\n";
+
+      mlog << Debug(2) << "Found " << n_track_point << " track points in: "
+           << data_files[i_file] << "\n";
 
       // Read track information
-      read_nc_tracks(nc_in);
+      TrackInfoArray tracks;
+      read_nc_tracks(nc_in, tracks);
 
       // Filter tracks
-      filter_tracks(adeck_tracks);
+      filter_tracks(tracks);
 
-      if (adeck_tracks.n() > 0) {
+      // No work to do without a track
+      if (tracks.n() == 0) return;
 
-         for(int i_var = 0; i_var < data_names.size(); i_var++) {
-            NcVar var = get_nc_var(nc_in, data_names[i_var].c_str());
-            mlog << Debug(2) << "Processing "
-                 << data_names[i_var] << "\n";
+      // Store track point locations
+      for(int i_track = 0; i_track < tracks.n(); i_track++) {
+         for(int i_point = 0; i_point < tracks[i_track].n_points(); i_point++) {
+            track_lat.add(tracks[i_track][i_point].lat());
+            track_lon.add(tracks[i_track][i_point].lon());
+         }
+      }
 
-            for(int i_track = 0; i_track < n_track_point; i_track++) {
-               if (data_n_dims[i_var] == 2) {
-                  start_2d[0] = (size_t) i_track;
-                  mlog << Debug(4) << data_names[i_var] << i_track << "\n";
-                  var.getVar(start_2d, count_2d, data_2d.data());
+      // Loop over variables to be processed 
+      for(int i_var = 0; i_var < data_names.size(); i_var++) {
+         NcVar var = get_nc_var(nc_in, data_names[i_var].c_str());
 
-                  // Update partial sums
-                  data_2d_sq = data_2d;
-                  data_2d_sq.square();
-                  data_counts[i_var]->increment();
-                  mlog << Debug(4) << i_track << " "
-                       << data_counts[i_var]->data()[0] << "\n";
-                  mlog << Debug(4) << i_track << " "
-                       << data_2d.data()[0] << "\n";
-                  data_means[i_var]->add_assign(data_2d);
-                  mlog << Debug(4) << i_track << " "
-                       << data_means[i_var]->data()[0] << "\n";
-                  data_stdevs[i_var]->add_assign(data_2d_sq);
-                  data_mins[i_var]->min_assign(data_2d);
-                  mlog << Debug(4) << i_track << " "
-                       << data_mins[i_var]->data()[0] << "\n";
-                  data_maxs[i_var]->max_assign(data_2d);
-                  mlog << Debug(4) << i_track << " "
-                       << data_maxs[i_var]->data()[0] << "\n";
-               }
-               if (data_n_dims[i_var] == 3) {
-                  mlog << Debug(4) << data_names[i_var] << i_track << "\n";
-                  start_3d[0] = (size_t) i_track;
-                  var.getVar(start_3d, count_3d, data_3d.data());
+         mlog << Debug(3) << "Processing field: "
+              << data_names[i_var] << "\n";
 
-                  // Update partial sums
-                  data_3d_sq = data_3d;
-                  data_3d_sq.square();
-                  data_counts[i_var]->increment();
-                  data_means[i_var]->add_assign(data_3d);
-                  data_stdevs[i_var]->add_assign(data_3d_sq);
-                  data_mins[i_var]->min_assign(data_3d);
-                  data_maxs[i_var]->max_assign(data_3d);
-               }
-            } // end loop over track points
-         } // end loop over variables
-      } // end if have tracks
+         // Loop over track points
+         for(int i_point = 0; i_point < n_track_point; i_point++) {
+
+            if (data_n_dims[i_var] == 2) {
+               mlog << Debug(4) << "Processing 2D " << data_names[i_var]
+                    << " for track point " << i_point + 1 << ".\n";
+               start_2d[0] = (size_t) i_point;
+               var.getVar(start_2d, count_2d, data_2d.data());
+
+               // Update partial sums
+               data_2d_sq = data_2d;
+               data_2d_sq.square();
+               data_counts[i_var]->increment();
+               data_means[i_var]->add_assign(data_2d);
+               data_stdevs[i_var]->add_assign(data_2d_sq);
+               data_mins[i_var]->min_assign(data_2d);
+               data_maxs[i_var]->max_assign(data_2d);
+            }
+            if (data_n_dims[i_var] == 3) {
+               mlog << Debug(4) << "Processing 3D " << data_names[i_var]
+                    << " for track point " << i_point + 1 << ".\n";
+               start_3d[0] = (size_t) i_point;
+               var.getVar(start_3d, count_3d, data_3d.data());
+
+               // Update partial sums
+               data_3d_sq = data_3d;
+               data_3d_sq.square();
+               data_counts[i_var]->increment();
+               data_means[i_var]->add_assign(data_3d);
+               data_stdevs[i_var]->add_assign(data_3d_sq);
+               data_mins[i_var]->min_assign(data_3d);
+               data_maxs[i_var]->max_assign(data_3d);
+            }
+         } // end loop over track points
+      } // end loop over variables
    } // end loop over files
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -447,6 +468,7 @@ void write_stats() {
    dims_3d.emplace_back(range_dim);
    dims_3d.emplace_back(azimuth_dim);
 
+   // Define variables
    NcVar level_var = nc_out->addVar(level_name, ncDouble, level_dim);
    NcVar range_var = nc_out->addVar("range", ncDouble, range_dim);
    NcVar azimuth_var = nc_out->addVar("azimuth", ncDouble, azimuth_dim);
@@ -568,6 +590,22 @@ void write_stats() {
       }
    }
 
+   // Add the average track point latitude
+   NcVar lat_var = nc_out->addVar("TrackLat_mean", ncDouble);
+   add_att(&lat_var, "long_name", "Track Point Latitude Mean");
+   add_att(&lat_var, "units", "degrees_north");
+   add_att(&lat_var, "standard_name", "latitude_track");
+   double lat_mean = track_lat.mean();
+   lat_var.putVar(&lat_mean);
+
+   // Add the average track point latitude
+   NcVar lon_var = nc_out->addVar("TrackLon_mean", ncDouble);
+   add_att(&lon_var, "long_name", "Track Point Longitude Mean");
+   add_att(&lon_var, "units", "degrees_east");
+   add_att(&lon_var, "standard_name", "longitude_track");
+   double lon_mean = track_lon.mean();
+   lon_var.putVar(&lon_mean);
+
    nc_out->close();
 }
 
@@ -586,8 +624,9 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_track_file(const ConcatString& filename,
-                    TrackInfoArray& tracks) {
+void parse_track_file(const ConcatString& filename,
+                      TrackInfoArray& tracks) {
+   const char *method_name = "process_track_file() -> ";
 
    // Initialize
    tracks.clear();
@@ -595,9 +634,8 @@ void process_track_file(const ConcatString& filename,
    // Open the file
    LineDataFile f;
    if(!f.open(filename.c_str())) {
-      mlog << Error
-          << "\nprocess_track_file() -> "
-          << "unable to open file \""
+      mlog << Error << "\n" << method_name
+          << "unable to open track file \""
           << filename << "\"\n\n";
       exit(1);
    }
@@ -609,7 +647,6 @@ void process_track_file(const ConcatString& filename,
    // Read each line in the file
    ATCFTrackLine line;
    while(f >> line) {
-      mlog << Debug(3) << line << "\n";
 
       // Increment the line counts
       cur_read++;
@@ -627,7 +664,7 @@ void process_track_file(const ConcatString& filename,
 
    // Dump out the track information
    mlog << Debug(3)
-       << "Identified " << tracks.n() << " track(s).\n";
+       << "Read " << tracks.n() << " track(s).\n";
 
    remove(adeck_source.c_str());
 
@@ -702,20 +739,18 @@ void filter_tracks(TrackInfoArray& tracks) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void read_nc_tracks(NcFile* nc_in) {
+void read_nc_tracks(NcFile* nc_in, TrackInfoArray &tracks) {
 
-   mlog << Debug(3) << adeck_source << "\n";
+   mlog << Debug(3) << "Temporary track file: "
+        << adeck_source << "\n";
 
    ofstream f;
    f.open(adeck_source.c_str());
 
-   adeck_tracks.clear();
-
    NcDim track_line_dim;
    get_dim(nc_in, "track_line", n_track_line, true);
 
-   mlog << Debug(3) << "Number of track lines "
-       << n_track_line << "\n";
+   mlog << Debug(3) << "Reading " << n_track_line << " track lines.\n";
 
    NcVar track_lines_var = get_nc_var(nc_in, "TrackLines");
 
@@ -731,14 +766,15 @@ void read_nc_tracks(NcFile* nc_in) {
       char* track_line_str;
       track_lines_var.getVar(offsets, counts, &track_line_str);
       ConcatString track_line(track_line_str);
-      mlog << Debug(3) << track_line << "\n";
+
+      mlog << Debug(4) << "[Line " << i+1 << " of " << n_track_line << "] "
+           << track_line << "\n";
 
       f << track_line << "\n";
    }
    f.close();
 
-   adeck_tracks.clear();
-   process_track_file(adeck_source, adeck_tracks);
+   parse_track_file(adeck_source, tracks);
 }
 
 ////////////////////////////////////////////////////////////////////////

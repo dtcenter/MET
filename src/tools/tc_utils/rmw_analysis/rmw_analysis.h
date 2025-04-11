@@ -89,6 +89,8 @@ static netCDF::NcDim range_dim;
 static netCDF::NcDim azimuth_dim;
 static netCDF::NcDim level_dim;
 static netCDF::NcDim track_point_dim;
+static NumArray track_lat;
+static NumArray track_lon;
 
 static std::string range_name;
 static std::string range_units;
@@ -112,7 +114,7 @@ std::vector<double> level_coord;
 
 // Variable information
 static std::vector<std::string> data_names;
-static std::vector<int>    data_n_dims;
+static std::vector<int>         data_n_dims;
 static std::vector<std::string> data_long_names;
 static std::vector<std::string> data_units;
 
@@ -124,7 +126,6 @@ static std::vector<DataCube*> data_mins;
 static std::vector<DataCube*> data_maxs;
 
 // Track information
-static TrackInfoArray adeck_tracks;
 static ConcatString adeck_source = "adeck.tmp";
 
 #endif  //  __RMW_ANALYSIS_H__
