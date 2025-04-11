@@ -96,12 +96,12 @@ in the main.cpp code in the basic/vx_util directory.
 
 * Add the **CTRACK** directive to any functions of interest:
 
-`   void some_interesting_function(){
-       CTRACK;
+     void some_interesting_function(){
+         CTRACK;
 
-       //Do some stuff...
-       return something;
-    }`
+         //Do some stuff...
+         return something;
+      }
 
 * To write the summary and detail benchmark metrics to text files:
 
