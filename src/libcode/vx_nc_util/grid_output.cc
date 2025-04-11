@@ -37,7 +37,7 @@ static void stereographic_grid_output  (const GridInfo &, NcFile * ncfile);
 static void mercator_grid_output       (const GridInfo &, NcFile * ncfile);
 static void gaussian_grid_output       (const GridInfo &, NcFile * ncfile);
 static void laea_grid_output           (const GridInfo &, NcFile * ncfile);
-static void range_azimuth_grid_output  (const GridInfo &, NcFile * ncfile, NcDim &, NcDim &);
+static void range_azimuth_grid_output  (const GridInfo &, NcFile * ncfile);
 static void semilatlon_grid_output     (const GridInfo &, NcFile * ncfile, NcDim &, NcDim &);
 static void write_semilatlon_var       (NcFile * ncfile, const char *,
                                         NcDim *, const NumArray &, const char *,
@@ -68,7 +68,7 @@ else if ( info.rll )  rotated_latlon_grid_output  (info, ncfile);
 else if ( info.m   )  mercator_grid_output        (info, ncfile);
 else if ( info.g   )  gaussian_grid_output        (info, ncfile);
 else if ( info.la  )  laea_grid_output            (info, ncfile);
-else if ( info.ra  )  range_azimuth_grid_output   (info, ncfile, lat_dim, lon_dim);
+else if ( info.ra  )  range_azimuth_grid_output   (info, ncfile);
 else if ( info.sl  )  semilatlon_grid_output      (info, ncfile, lat_dim, lon_dim);
 else {
 
@@ -775,20 +775,65 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void range_azimuth_grid_output(const GridInfo &, NcFile *,
-                                      NcDim &, NcDim &)
+static void range_azimuth_grid_output(const GridInfo & info, NcFile * ncfile)
 
 {
 
+ConcatString cs;
+
+const RngAziData & data = *(info.ra);
+
+ncfile->putAtt("Projection", range_azimuth_proj_type);
+
    //
-   //  Range/azimuth grids are not fully supported yet 
+   //  range_n
    //
 
-mlog << Error << "\nrange_azimuth_grid_output() -> "
-     << "support for writing NetCDF range/azimuth files is currently "
-     << "limited to the tc_rmw, rmw_analysis, and tc_diag tools!\n\n";
+cs.format("%d", data.range_n);
 
-exit ( 1 );
+ncfile->putAtt("range_n", cs.c_str());
+
+   //
+   //  azimuth_n
+   //
+
+cs.format("%d", data.azimuth_n);
+
+ncfile->putAtt("azimuth_n", cs.c_str());
+
+   //
+   //  range_max_km
+   //
+
+cs.format("%f", data.range_max_km);
+
+ncfile->putAtt("range_max_km", cs.c_str());
+
+   //
+   //  lat_center
+   //
+
+cs.format("%f degrees_north", data.lat_center);
+
+ncfile->putAtt("lat_center", cs.c_str());
+
+   //
+   //  lon_center
+   //
+
+double t = data.lon_center;
+
+if ( !west_longitude_positive )  t = -t;
+
+cs.format("%f degrees_east", t);
+
+ncfile->putAtt("lon_center", cs.c_str());
+
+   //
+   //  done
+   //
+
+return;
 
 }
    

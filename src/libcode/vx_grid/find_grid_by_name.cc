@@ -848,8 +848,8 @@ int j = 1;
    //  get info from the strings
    //
 
-radata.azimuth_n    = stoi(grid_strings[j++]);
 radata.range_n      = stoi(grid_strings[j++]);
+radata.azimuth_n    = stoi(grid_strings[j++]);
 radata.range_max_km = stof(grid_strings[j++]);
 radata.lat_center   = stof(grid_strings[j++]);
 radata.lon_center   = stof(grid_strings[j++]);
