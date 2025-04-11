@@ -291,7 +291,7 @@ ConcatString LatLonGrid::serialize(const char *sep) const
 {
 
 ConcatString a;
-char junk[256];
+ConcatString cs;
 
 
 a << "Projection: Lat/Lon" << sep;
@@ -299,13 +299,13 @@ a << "Projection: Lat/Lon" << sep;
 a << "Nx: " << Nx << sep;
 a << "Ny: " << Ny << sep;
 
-snprintf(junk, sizeof(junk), "lat_ll: %.3f", lat_ll);   a << junk << sep;
-snprintf(junk, sizeof(junk), "lon_ll: %.3f", lon_ll);   a << junk << sep;
+cs.format("lat_ll: %.3f", lat_ll);   a << cs << sep;
+cs.format("lon_ll: %.3f", lon_ll);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "delta_lat: %.3f", delta_lat);   a << junk << sep;
-snprintf(junk, sizeof(junk), "delta_lon: %.3f", delta_lon);   a << junk << sep;
+cs.format("delta_lat: %.3f", delta_lat);   a << cs << sep;
+cs.format("delta_lon: %.3f", delta_lon);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "wrapLon: %s", bool_to_string(wrapLon));   a << junk;
+cs.format("wrapLon: %s", bool_to_string(wrapLon));   a << cs;
 
    //
    //  done
