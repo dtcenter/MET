@@ -169,8 +169,8 @@ int second;
 
 unix_to_mdyhms(u, month, day, year, hour, minute, second);
 
- snprintf(junk, len, "%.4i%.2i%.2i_%.2i%.2i%.2i",
-        year, month, day, hour, minute, second);
+snprintf(junk, len, "%.4i%.2i%.2i_%.2i%.2i%.2i",
+         year, month, day, hour, minute, second);
 
 return;
 
@@ -200,44 +200,16 @@ unixtime yyyymmdd_hhmmss_to_unix(const char * text)
 
 {
 
-int month;
-int day;
-int year;
-int hour;
-int minute;
-int second;
-unixtime t;
-char junk[32];
+string s(text);
 
+int year   = stoi(s.substr(0,  4));
+int month  = stoi(s.substr(4,  2));
+int day    = stoi(s.substr(6,  2));
+int hour   = stoi(s.substr(9,  2));
+int minute = stoi(s.substr(11, 2));
+int second = stoi(s.substr(13, 2));
 
-substring_vx_cal(text, junk, 0, 3);
-
-year = atoi(junk);
-
-substring_vx_cal(text, junk, 4, 5);
-
-month = atoi(junk);
-
-substring_vx_cal(text, junk, 6, 7);
-
-day = atoi(junk);
-
-substring_vx_cal(text, junk, 9, 10);
-
-hour = atoi(junk);
-
-substring_vx_cal(text, junk, 11, 12);
-
-minute = atoi(junk);
-
-substring_vx_cal(text, junk, 13, 14);
-
-second = atoi(junk);
-
-
-t = mdyhms_to_unix(month, day, year, hour, minute, second);
-
-return t;
+return mdyhms_to_unix(month, day, year, hour, minute, second);
 
 }
 
@@ -249,44 +221,16 @@ unixtime yyyymmddThhmmss_to_unix(const char * text)
 
 {
 
-int month;
-int day;
-int year;
-int hour;
-int minute;
-int second;
-unixtime t;
-char junk[32];
+string s(text);
 
+int year   = stoi(s.substr(0,  4));
+int month  = stoi(s.substr(4,  2));
+int day    = stoi(s.substr(6,  2));
+int hour   = stoi(s.substr(9,  2));
+int minute = stoi(s.substr(11, 2));
+int second = stoi(s.substr(13, 2));
 
-substring_vx_cal(text, junk, 0, 3);
-
-year = atoi(junk);
-
-substring_vx_cal(text, junk, 5, 6);
-
-month = atoi(junk);
-
-substring_vx_cal(text, junk, 8, 9);
-
-day = atoi(junk);
-
-substring_vx_cal(text, junk, 11, 12);
-
-hour = atoi(junk);
-
-substring_vx_cal(text, junk, 14, 15);
-
-minute = atoi(junk);
-
-substring_vx_cal(text, junk, 17, 18);
-
-second = atoi(junk);
-
-
-t = mdyhms_to_unix(month, day, year, hour, minute, second);
-
-return t;
+return mdyhms_to_unix(month, day, year, hour, minute, second);
 
 }
 
@@ -298,39 +242,14 @@ unixtime yyyymmdd_hh_to_unix(const char * text)
 
 {
 
-int month;
-int day;
-int year;
-int hour;
-unixtime t;
-char junk[32];
+string s(text);
 
+int year  = stoi(s.substr(0, 4));
+int month = stoi(s.substr(4, 2));
+int day   = stoi(s.substr(6, 2));
+int hour  = stoi(s.substr(9, 2));
 
-substring_vx_cal(text, junk, 0, 3);
-
-year  = atoi(junk);
-
-substring_vx_cal(text, junk, 4, 5);
-
-month = atoi(junk);
-
-substring_vx_cal(text, junk, 6, 7);
-
-day   = atoi(junk);
-
-   //
-   //  skip the "_"
-   //
-
-substring_vx_cal(text, junk, 9, 10);
-
-hour   = atoi(junk);
-
-
-
-t = mdyhms_to_unix(month, day, year, hour, 0, 0);
-
-return t;
+return mdyhms_to_unix(month, day, year, hour, 0, 0);
 
 }
 
@@ -342,29 +261,13 @@ unixtime yyyymmdd_to_unix(const char * text)
 
 {
 
-int month;
-int day;
-int year;
-unixtime t;
-char junk[32];
+string s(text);
 
+int year  = stoi(s.substr(0, 4));
+int month = stoi(s.substr(4, 2));
+int day   = stoi(s.substr(6, 2));
 
-substring_vx_cal(text, junk, 0, 3);
-
-year  = atoi(junk);
-
-substring_vx_cal(text, junk, 4, 5);
-
-month = atoi(junk);
-
-substring_vx_cal(text, junk, 6, 7);
-
-day   = atoi(junk);
-
-
-t = mdyhms_to_unix(month, day, year, 0, 0, 0);
-
-return t;
+return mdyhms_to_unix(month, day, year, 0, 0, 0);
 
 }
 
@@ -445,75 +348,16 @@ unixtime yyyymmddhhmmss_to_unix(const char * text)
 
 {
 
-int month;
-int day;
-int year;
-int hour;
-int minute;
-int second;
-unixtime t;
-char junk[32];
+string s(text);
 
+int year   = stoi(s.substr(0,  4));
+int month  = stoi(s.substr(4,  2));
+int day    = stoi(s.substr(6,  2));
+int hour   = stoi(s.substr(8,  2));
+int minute = stoi(s.substr(10, 2));
+int second = stoi(s.substr(12, 2));
 
-substring_vx_cal(text, junk, 0, 3);
-
-year = atoi(junk);
-
-substring_vx_cal(text, junk, 4, 5);
-
-month = atoi(junk);
-
-substring_vx_cal(text, junk, 6, 7);
-
-day = atoi(junk);
-
-substring_vx_cal(text, junk, 8, 9);
-
-hour = atoi(junk);
-
-substring_vx_cal(text, junk, 10, 11);
-
-minute = atoi(junk);
-
-substring_vx_cal(text, junk, 12, 13);
-
-second = atoi(junk);
-
-t = mdyhms_to_unix(month, day, year, hour, minute, second);
-
-return t;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void substring_vx_cal(const char * text, char * out, int first, int last)
-
-{
-
-if ( first > last )  {
-
-   mlog << Error << "\nsubstring_vx_cal() -> bad input values!\n\n";
-
-   exit ( 1 );
-
-}
-
-int n;
-
-n = last - first + 1;
-
-for (int j=0; j<n; ++j)  {
-
-   out[j] = text[first + j];
-
-}
-
-out[n] = (char) 0;
-
-return;
+return mdyhms_to_unix(month, day, year, hour, minute, second);
 
 }
 
@@ -535,9 +379,9 @@ int second;
 
 unix_to_mdyhms(t, month, day, year, hour, minute, second);
 
- str.format("%s %2d, %d  %02d:%02d:%02d",
-        short_month_name[month], day, year,
-        hour, minute, second);
+str.format("%s %2d, %d  %02d:%02d:%02d",
+           short_month_name[month], day, year,
+           hour, minute, second);
 
 return;
 
