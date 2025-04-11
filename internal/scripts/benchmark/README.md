@@ -92,22 +92,21 @@ in the main.cpp code in the basic/vx_util directory.
 
 * For each .cpp file to be measured, include the ctrack.hpp header:
 
-     **\#include 'ctrack.hpp'**
+   `#include 'ctrack.hpp'`
 
 * Add the **CTRACK** directive to any functions of interest:
 
   `void some_interesting_function(){
      CTRACK;
      //Do some stuff...
-     
-     return something;`
+     return something;
+   }`
 
 * To write the summary and detail benchmark metrics to text files:
 
  ` void met_main(){
      //Do some stuff...
      ctrack::result_print();
-
      //Do cleanup
      return return_code
   }`
