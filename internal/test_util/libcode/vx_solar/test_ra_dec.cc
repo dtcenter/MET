@@ -55,7 +55,7 @@ double Ra, Dec;
 double ra_error, dec_error;
 double max_error;
 unixtime gmt;
-char junk[256];
+ConcatString cs;
 const char * format = "%10.5f";
 
 
@@ -71,11 +71,11 @@ max_error = (ra_error > dec_error) ? ra_error : dec_error;
 
 cout << "\n\n";
 
-snprintf(junk, sizeof(junk), format, Ra);
-cout << "Right Ascension          = " << junk << " degrees\n\n";
+cs.format(format, Ra);
+cout << "Right Ascension          = " << cs << " degrees\n\n";
 
-snprintf(junk, sizeof(junk), format, Dec);
-cout << "Declination              = " << junk << " degrees\n\n";
+cs.format(format, Dec);
+cout << "Declination              = " << cs << " degrees\n\n";
 
 cout << "\n\n";
 
