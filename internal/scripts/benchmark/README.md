@@ -107,6 +107,8 @@ in the main.cpp code in the basic/vx_util directory.
 
 * To write the summary and detail benchmark metrics to text files:
 
+  In the main() or met_main() function, invoke the ctrack::result_print()
+
        void met_main(){
 
           //Do some stuff...
@@ -116,9 +118,7 @@ in the main.cpp code in the basic/vx_util directory.
          return return_code
        }
 
-  
-  In the main() or met_main() function, invoke the ctrack::result_print() function to consolidate the metrics
-  from the summary and detail tables and save them to csv and tabular text files
+ 
 
 
 #### Recompile MET code
