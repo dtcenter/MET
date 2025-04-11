@@ -258,11 +258,11 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_lambert_grid(const StringArray &grid_strings, Grid & g)
+static bool parse_lambert_grid(const StringArray &grid_strings, Grid & g)
 
 {
 
-Grid * ToGrid = (Grid *) nullptr;
+Grid * ToGrid = nullptr;
 
 LambertData ldata;
 
@@ -289,23 +289,23 @@ j = 1;
    //  get info from the strings
    //
 
-Nx         = atoi(grid_strings[j++].c_str());
-Ny         = atoi(grid_strings[j++].c_str());
+Nx         = atoi(grid_strings[j].c_str()); j++;
+Ny         = atoi(grid_strings[j].c_str()); j++;
 
-lat_ll     = atof(grid_strings[j++].c_str());
-lon_ll     = atof(grid_strings[j++].c_str());
+lat_ll     = atof(grid_strings[j].c_str()); j++;
+lon_ll     = atof(grid_strings[j].c_str()); j++;
 
-lon_orient = atof(grid_strings[j++].c_str());
+lon_orient = atof(grid_strings[j].c_str()); j++;
 
-D_km       = atof(grid_strings[j++].c_str());
-R_km       = atof(grid_strings[j++].c_str());
+D_km       = atof(grid_strings[j].c_str()); j++;
+R_km       = atof(grid_strings[j].c_str()); j++;
 
-phi_1      = atof(grid_strings[j++].c_str());
+phi_1      = atof(grid_strings[j].c_str()); j++;
 
-if ( N == 11 )  phi_2 = atof(grid_strings[j++].c_str());
-else            phi_2 = phi_1;
+if ( N == 11 )  { phi_2 = atof(grid_strings[j].c_str()); j++; }
+else            { phi_2 = phi_1; }
 
-c          = grid_strings[j++].c_str();
+c          = grid_strings[j].c_str(); j++;
 
 if ( m_strlen(c) != 1 )  {
 
@@ -380,11 +380,11 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_stereographic_grid(const StringArray &grid_strings, Grid & g)
+static bool parse_stereographic_grid(const StringArray &grid_strings, Grid & g)
 
 {
 
-Grid * ToGrid = (Grid *) nullptr;
+Grid * ToGrid = nullptr;
 
 StereographicData sdata;
 
@@ -413,20 +413,20 @@ j = 1;
    //  get info from the strings
    //
 
-Nx         = atoi(grid_strings[j++].c_str());
-Ny         = atoi(grid_strings[j++].c_str());
+Nx         = atoi(grid_strings[j].c_str()); j++;
+Ny         = atoi(grid_strings[j].c_str()); j++;
 
-lat_ll     = atof(grid_strings[j++].c_str());
-lon_ll     = atof(grid_strings[j++].c_str());
+lat_ll     = atof(grid_strings[j].c_str()); j++;
+lon_ll     = atof(grid_strings[j].c_str()); j++;
 
-lon_orient = atof(grid_strings[j++].c_str());
+lon_orient = atof(grid_strings[j].c_str()); j++;
 
-D_km       = atof(grid_strings[j++].c_str());
-R_km       = atof(grid_strings[j++].c_str());
+D_km       = atof(grid_strings[j].c_str()); j++;
+R_km       = atof(grid_strings[j].c_str()); j++;
 
-lat_scale  = atof(grid_strings[j++].c_str());
+lat_scale  = atof(grid_strings[j].c_str()); j++;
 
-c          = grid_strings[j++].c_str();
+c          = grid_strings[j].c_str(); j++;
 
 if ( m_strlen(c) != 1 )  {
 
@@ -504,11 +504,11 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_latlon_grid(const StringArray &grid_strings, Grid & g)
+static bool parse_latlon_grid(const StringArray &grid_strings, Grid & g)
 
 {
 
-Grid * ToGrid = (Grid *) nullptr;
+Grid * ToGrid = nullptr;
 
 LatLonData ldata;
 
@@ -534,14 +534,14 @@ j = 1;
    //  get info from the strings
    //
 
-Nx        = atoi(grid_strings[j++].c_str());
-Ny        = atoi(grid_strings[j++].c_str());
+Nx        = atoi(grid_strings[j].c_str()); j++;
+Ny        = atoi(grid_strings[j].c_str()); j++;
 
-lat_ll    = atof(grid_strings[j++].c_str());
-lon_ll    = atof(grid_strings[j++].c_str());
+lat_ll    = atof(grid_strings[j].c_str()); j++;
+lon_ll    = atof(grid_strings[j].c_str()); j++;
 
-delta_lat = atof(grid_strings[j++].c_str());
-delta_lon = atof(grid_strings[j++].c_str());
+delta_lat = atof(grid_strings[j].c_str()); j++;
+delta_lon = atof(grid_strings[j].c_str()); j++;
 
    //
    //  load up the struct
@@ -584,11 +584,11 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_rotlatlon_grid(const StringArray &grid_strings, Grid & g)
+static bool parse_rotlatlon_grid(const StringArray &grid_strings, Grid & g)
 
 {
 
-Grid * ToGrid = (Grid *) nullptr;
+Grid * ToGrid = nullptr;
 
 RotatedLatLonData rdata;
 
@@ -615,18 +615,18 @@ j = 1;
    //  get info from the strings
    //
 
-Nx          = atoi(grid_strings[j++].c_str());
-Ny          = atoi(grid_strings[j++].c_str());
+Nx          = atoi(grid_strings[j].c_str()); j++;
+Ny          = atoi(grid_strings[j].c_str()); j++;
 
-lat_ll      = atof(grid_strings[j++].c_str());
-lon_ll      = atof(grid_strings[j++].c_str());
+lat_ll      = atof(grid_strings[j].c_str()); j++;
+lon_ll      = atof(grid_strings[j].c_str()); j++;
 
-delta_lat   = atof(grid_strings[j++].c_str());
-delta_lon   = atof(grid_strings[j++].c_str());
+delta_lat   = atof(grid_strings[j].c_str()); j++;
+delta_lon   = atof(grid_strings[j].c_str()); j++;
 
-true_lat_sp = atof(grid_strings[j++].c_str());
-true_lon_sp = atof(grid_strings[j++].c_str());
-aux_rot     = atof(grid_strings[j++].c_str());
+true_lat_sp = atof(grid_strings[j].c_str()); j++;
+true_lon_sp = atof(grid_strings[j].c_str()); j++;
+aux_rot     = atof(grid_strings[j].c_str()); j++;
 
    //
    //  load up the struct
@@ -675,11 +675,11 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_mercator_grid(const StringArray &grid_strings, Grid & g)
+static bool parse_mercator_grid(const StringArray &grid_strings, Grid & g)
 
 {
 
-Grid * ToGrid = (Grid *) nullptr;
+Grid * ToGrid = nullptr;
 
 MercatorData mdata;
 
@@ -705,14 +705,14 @@ j = 1;
    //  get info from the strings
    //
 
-Nx     = atoi(grid_strings[j++].c_str());
-Ny     = atoi(grid_strings[j++].c_str());
+Nx     = atoi(grid_strings[j].c_str()); j++;
+Ny     = atoi(grid_strings[j].c_str()); j++;
 
-lat_ll = atof(grid_strings[j++].c_str());
-lon_ll = atof(grid_strings[j++].c_str());
+lat_ll = atof(grid_strings[j].c_str()); j++;
+lon_ll = atof(grid_strings[j].c_str()); j++;
 
-lat_ur = atof(grid_strings[j++].c_str());
-lon_ur = atof(grid_strings[j++].c_str());
+lat_ur = atof(grid_strings[j].c_str()); j++;
+lon_ur = atof(grid_strings[j].c_str()); j++;
 
 
    //
@@ -756,11 +756,11 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_gaussian_grid(const StringArray &grid_strings, Grid & g)
+static bool parse_gaussian_grid(const StringArray &grid_strings, Grid & g)
 
 {
 
-Grid * ToGrid = (Grid *) nullptr;
+Grid * ToGrid = nullptr;
 
 GaussianData gdata;
 
@@ -786,9 +786,9 @@ j = 1;
    //  get info from the strings
    //
 
-lon_zero = atof(grid_strings[j++].c_str());
-Nx       = atoi(grid_strings[j++].c_str());
-Ny       = atoi(grid_strings[j++].c_str());
+lon_zero = atof(grid_strings[j].c_str()); j++;
+Nx       = atoi(grid_strings[j].c_str()); j++;
+Ny       = atoi(grid_strings[j].c_str()); j++;
 
    //
    //  load up the struct
@@ -825,11 +825,11 @@ return true;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool parse_rngazi_grid(const StringArray &grid_strings, Grid & g)
+static bool parse_rngazi_grid(const StringArray &grid_strings, Grid & g)
 
 {
 
-Grid * ToGrid = (Grid *) nullptr;
+Grid * ToGrid = nullptr;
 
 RngAziData radata;
 
@@ -848,11 +848,11 @@ int j = 1;
    //  get info from the strings
    //
 
-radata.range_n      = stoi(grid_strings[j++]);
-radata.azimuth_n    = stoi(grid_strings[j++]);
-radata.range_max_km = stof(grid_strings[j++]);
-radata.lat_center   = stof(grid_strings[j++]);
-radata.lon_center   = stof(grid_strings[j++]);
+radata.range_n      = stoi(grid_strings[j]); j++;
+radata.azimuth_n    = stoi(grid_strings[j]); j++;
+radata.range_max_km = stof(grid_strings[j]); j++;
+radata.lat_center   = stof(grid_strings[j]); j++;
+radata.lon_center   = stof(grid_strings[j]); j++;
 
    //
    //  load up the struct

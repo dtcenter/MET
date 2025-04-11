@@ -579,7 +579,7 @@ bool all_empty = true;
    //
 
 for(auto &x : s) {
-   if(x.size() != 0) {
+   if(!x.empty()) {
       all_empty = false;
       break;
    }
