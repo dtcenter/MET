@@ -146,7 +146,6 @@ void WwmcaRegridder::dump(ostream & out, int depth) const
 {
 
 Indent prefix(depth);
-char junk[256];
 
 out << prefix << "grid_strings ...\n";
 
@@ -154,9 +153,7 @@ grid_strings.dump(out, depth + 1);
 
 out << prefix << '\n';
 
-gridhemisphere_to_string(Hemi, junk);
-
-out << prefix << "Hemi = " << junk << '\n';
+out << prefix << "Hemi = " << gridhemisphere_to_string(Hemi) << '\n';
 
 if ( NHgrid )  {
 
@@ -455,9 +452,7 @@ void WwmcaRegridder::get_interpolated_data(DataPlane & dp) const
 
 {
 
-char junk[256];
 InterpolationValue value;
-
 
 switch ( Hemi )  {
 
@@ -474,9 +469,8 @@ switch ( Hemi )  {
       break;
 
    default:
-      gridhemisphere_to_string(Hemi, junk);
       mlog << Error << "\nWwmcaRegridder::get_interpolated_data(DataPlane &) const -> "
-           << "bad hemisphere ... " << junk << "\n\n";
+           << "bad hemisphere ... " << gridhemisphere_to_string(Hemi) << "\n\n";
       exit ( 1 );
 
 }   //  switch
