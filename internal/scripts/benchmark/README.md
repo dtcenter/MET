@@ -96,7 +96,9 @@ in the main.cpp code in the basic/vx_util directory.
 
 * Add the **CTRACK** directive to any functions of interest:
 
+
      void some_interesting_function(){
+
          CTRACK;
 
          //Do some stuff...
