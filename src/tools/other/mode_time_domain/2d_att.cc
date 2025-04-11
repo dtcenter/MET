@@ -479,7 +479,7 @@ void SingleAtt2D::write_txt(AsciiTable & table, const int row) const
 int c = n_header_3d_cols;
 int k;
 const char * format = 0;
-char junk[512];
+ConcatString cs;
 ConcatString s;
 
    //
@@ -496,9 +496,9 @@ if ( is_cluster() )  s << 'C';
 if ( IsFcst )  s << 'F';
 else           s << 'O';
 
-snprintf(junk, sizeof(junk), format_int, k);
+cs.format(format_int, k);
 
-s << junk;
+s << cs;
 
 table.set_entry(row, c++, s.text());
 
@@ -515,9 +515,9 @@ s << 'C';
 if ( is_fcst() )  s << 'F';
 else              s << 'O';
 
-snprintf(junk, sizeof(junk), format_int, k);
+cs.format(format_int, k);
 
-s << junk;
+s << cs;
 
 table.set_entry(row, c++, s.text());
 
@@ -539,13 +539,13 @@ table.set_entry(row, c++, Area);
 
 format = format_2_decimals;
 
-snprintf(junk, sizeof(junk), format, Xbar);
+cs.format(format, Xbar);
 
-table.set_entry(row, c++, junk);
+table.set_entry(row, c++, cs.c_str());
 
-snprintf(junk, sizeof(junk), format, Ybar);
+cs.format(format, Ybar);
 
-table.set_entry(row, c++, junk);
+table.set_entry(row, c++, cs.c_str());
 
    //
    //  centroid lat/lon
@@ -553,13 +553,13 @@ table.set_entry(row, c++, junk);
 
 format = format_2_decimals;
 
-snprintf(junk, sizeof(junk), format, CentroidLat);
+cs.format(format, CentroidLat);
 
-table.set_entry(row, c++, junk);
+table.set_entry(row, c++, cs.c_str());
 
-snprintf(junk, sizeof(junk), format, -CentroidLon);   //  toggle sign
+cs.format(format, -CentroidLon);   //  toggle sign
 
-table.set_entry(row, c++, junk);
+table.set_entry(row, c++, cs.c_str());
 
    //
    //  axis angle
@@ -567,9 +567,9 @@ table.set_entry(row, c++, junk);
 
 format = format_2_decimals;
 
-snprintf(junk, sizeof(junk), format, AxisAngle);
+cs.format(format, AxisAngle);
 
-table.set_entry(row, c++, junk);
+table.set_entry(row, c++, cs.c_str());
 
 
    //
@@ -578,33 +578,33 @@ table.set_entry(row, c++, junk);
 
    format = format_2_decimals;
 
-snprintf(junk, sizeof(junk), format, Ptile_10);
+cs.format(format, Ptile_10);
 
-   table.set_entry(row, c++, junk);
+   table.set_entry(row, c++, cs.c_str());
 
-snprintf(junk, sizeof(junk), format, Ptile_25);
+cs.format(format, Ptile_25);
 
-   table.set_entry(row, c++, junk);
+   table.set_entry(row, c++, cs.c_str());
 
-snprintf(junk, sizeof(junk), format, Ptile_50);
+cs.format(format, Ptile_50);
 
-   table.set_entry(row, c++, junk);
+   table.set_entry(row, c++, cs.c_str());
 
-snprintf(junk, sizeof(junk), format, Ptile_75);
+cs.format(format, Ptile_75);
 
-   table.set_entry(row, c++, junk);
+   table.set_entry(row, c++, cs.c_str());
 
-snprintf(junk, sizeof(junk), format, Ptile_90);
+cs.format(format, Ptile_90);
 
-   table.set_entry(row, c++, junk);
+   table.set_entry(row, c++, cs.c_str());
 
    //
    //  custom intensity value
    //
 
-snprintf(junk, sizeof(junk), format, Ptile_User);
+cs.format(format, Ptile_User);
 
-   table.set_entry(row, c++, junk);
+   table.set_entry(row, c++, cs.c_str());
 
    //
    //  done

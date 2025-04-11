@@ -2607,7 +2607,7 @@ void set_dim(Box &dim, double y_ll, double y_ur, double x_cen) {
 
 void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
    int i;
-   char label[max_str_len];
+   ConcatString label;
    double bar_width, bar_height, x_ll, y_ll, step, v;
    ColorTable *ct_ptr = (ColorTable *) nullptr;
    Color c;
@@ -2670,9 +2670,9 @@ void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
      //
      // Add text
      //
-     snprintf(label, sizeof(label), "%.1f", v);
+     label.format("%.1f", v);
      p->write_centered_text(2, 1,  x_ll + 0.5*bar_width,
-                            y_ll + 0.5*bar_height, 0.5, 0.5, label);
+                            y_ll + 0.5*bar_height, 0.5, 0.5, label.c_str());
 
      v    += step;
      y_ll += bar_height;
@@ -2725,7 +2725,7 @@ void draw_tiles(PSfile *p, Box &dim,
                 int tile_start, int tile_end, int label_flag) {
    int i;
    double page_x, page_y;
-   char label[128];
+   ConcatString label;
    Box tile_bb;
    double bb_x, bb_y;
 
@@ -2787,12 +2787,12 @@ void draw_tiles(PSfile *p, Box &dim,
          page_y = (tile_bb.y_ll() + tile_bb.y_ur())/2.0,
 
          p->choose_font(28, 20.0);
-         snprintf(label, sizeof(label), "%i", i+1);
-         p->write_centered_text(2, 1, page_x, page_y, 0.5, 0.5, label);
+         label.format("%i", i+1);
+         p->write_centered_text(2, 1, page_x, page_y, 0.5, 0.5, label.c_str());
 
          // Draw outline in black
          p->setrgbcolor(0.0, 0.0, 0.0);
-         p->write_centered_text(2, 0, page_x, page_y, 0.5, 0.5, label);
+         p->write_centered_text(2, 0, page_x, page_y, 0.5, 0.5, label.c_str());
       } // end if
    } // end for
 

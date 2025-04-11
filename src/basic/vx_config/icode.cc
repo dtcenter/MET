@@ -317,7 +317,6 @@ void IcodeCell::dump(ostream & out, int indent_depth) const
 
 {
 
-// char junk[128];
 Indent prefix;
 
 
