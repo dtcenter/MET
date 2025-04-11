@@ -90,7 +90,7 @@ in the main.cpp code in the basic/vx_util directory.
 
 #### Instrument the C/C++ MET code
 
-* For each .cpp file, include the ctrack.hpp header:
+* For each .cpp file to be measured, include the ctrack.hpp header:
 
      **\#include 'ctrack.hpp'**
 
