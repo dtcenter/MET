@@ -86,7 +86,8 @@
     <param> \
       &OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs.nc \
       &OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs_OBS_RH_P500.ps \
-      'name="OBS_RH_P500_FULL"; level="(*,*)";'
+      'name="OBS_RH_P500_FULL"; level="(*,*)";' \
+      -title "Observation RH/P500"
     </param>
     <output>
       <ps>&OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs_OBS_RH_P500.ps</ps>
