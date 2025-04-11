@@ -77,6 +77,19 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs.nc</stat>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_RANGE_AZIMUTH_GRID_STAT_PAIRS">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs.nc \
+      &OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs_OBS_RH_P500.ps \
+      'name="OBS_RH_P500_FULL"; level="(*,*)";'
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs_OBS_RH_P500.ps</ps>
     </output>
   </test>
 
