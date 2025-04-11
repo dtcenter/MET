@@ -679,6 +679,8 @@ YACC
 FC_LIBS
 ENABLE_DEVELOPMENT_FALSE
 ENABLE_DEVELOPMENT_TRUE
+ENABLE_PROFILER_FALSE
+ENABLE_PROFILER_TRUE
 UGRID_DEP_LIBS
 UGRID_MET_LIBS
 ENABLE_UGRID_FALSE
@@ -928,6 +930,7 @@ enable_gsi_tools
 enable_grib2
 enable_python
 enable_ugrid
+enable_profiler
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1664,6 +1667,7 @@ Optional Features:
   --enable-python         Enable compilation of Python embedding support
   --enable-ugrid          Enable compilation of unstructured grid support with
                           the Atlas and ecKit libraries
+  --enable-profiler       Enable compilation of profiling support with CTRACK
 
 Some influential environment variables:
   CC          C compiler command
@@ -7034,6 +7038,46 @@ fi
 
 
 
+# Profiling component with CTRACK
+
+# Check whether --enable-profiler was given.
+if test ${enable_profiler+y}
+then :
+  enableval=$enable_profiler; case "${enableval}" in
+     yes | no ) ENABLE_PROFILER="${enableval}" ;;
+     *) as_fn_error $? "bad value ${enableval} for --enable-profiler" "$LINENO" 5 ;;
+   esac
+else $as_nop
+  ENABLE_PROFILER="no"
+
+fi
+
+
+ if test "x$ENABLE_PROFILER" = "xyes"; then
+  ENABLE_PROFILER_TRUE=
+  ENABLE_PROFILER_FALSE='#'
+else
+  ENABLE_PROFILER_TRUE='#'
+  ENABLE_PROFILER_FALSE=
+fi
+
+
+if test "x$ENABLE_PROFILER" = "xyes" ; then
+
+printf "%s\n" "#define ENABLE_PROFILER /**/" >>confdefs.h
+
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: profiling support will be compiled" >&5
+printf "%s\n" "$as_me: profiling support will be compiled" >&6;}
+  CPPFLAGS="${CPPFLAGS} -DWITH_PROFILER"
+else
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: profiling support will not be compiled" >&5
+printf "%s\n" "$as_me: profiling support will not be compiled" >&6;}
+fi
+#PROFILER_MET_LIBS=
+#PROFILER_DEP_LIBS=
+#AC_SUBST([PROFILER_MET_LIBS])
+#AC_SUBST([PROFILER_DEP_LIBS])
+
 ########################################################################
 
 # Check for the MET_DEVELOPMENT environment variable
@@ -10484,6 +10528,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_UGRID_TRUE}" && test -z "${ENABLE_UGRID_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_UGRID\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_PROFILER_TRUE}" && test -z "${ENABLE_PROFILER_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_PROFILER\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_DEVELOPMENT_TRUE}" && test -z "${ENABLE_DEVELOPMENT_FALSE}"; then

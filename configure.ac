@@ -1187,6 +1187,31 @@ fi
 AC_SUBST([UGRID_MET_LIBS])
 AC_SUBST([UGRID_DEP_LIBS])
 
+# Profiling component with CTRACK
+
+AC_ARG_ENABLE(profiler,
+	  [AS_HELP_STRING([--enable-profiler], [Enable compilation of profiling support with CTRACK])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_PROFILER="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --enable-profiler) ;;
+   esac],
+  [ENABLE_PROFILER="no"]
+)
+
+AM_CONDITIONAL([ENABLE_PROFILER], [test "x$ENABLE_PROFILER" = "xyes"])
+
+if test "x$ENABLE_PROFILER" = "xyes" ; then
+  AC_DEFINE([ENABLE_PROFILER], [], ["build profiling support"])
+  AC_MSG_NOTICE([profiling support will be compiled])
+  CPPFLAGS="${CPPFLAGS} -DWITH_PROFILER"
+else
+  AC_MSG_NOTICE([profiling support will not be compiled])
+fi
+#PROFILER_MET_LIBS=
+#PROFILER_DEP_LIBS=
+#AC_SUBST([PROFILER_MET_LIBS])
+#AC_SUBST([PROFILER_DEP_LIBS])
+
 ########################################################################
 
 # Check for the MET_DEVELOPMENT environment variable
