@@ -408,6 +408,42 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
+bool Grib2TableEntry::is_eq(Grib2TableEntry &e) const
+
+{
+   return (index_a == e.index_a) &&
+          (index_b == e.index_b) &&
+          (index_c == e.index_c) &&
+          (parm_name == e.parm_name) &&
+          (mtab_set == e.mtab_set) &&
+          (mtab_low == e.mtab_low) &&
+          (mtab_high == e.mtab_high);
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+GribEntryMatch Grib2TableEntry::match(int mtab, int _cntr, int _ltab) const
+
+{
+
+   GribEntryMatch status = GribEntryMatch::not_match;
+
+   // Check master table
+   if ((bad_data_int != mtab && mtab_low <= mtab && mtab_high >= mtab) &&
+       bad_data_int != _cntr && bad_data_int != _ltab) {
+      // Check center, and local table
+      if (cntr == _cntr && ltab == _ltab) status = GribEntryMatch::exact_match;
+      else if (cntr == 0 && ltab == 0) status = GribEntryMatch::match;
+   }
+
+   return status;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 
 bool Grib2TableEntry::parse_line(const char * line)
 
@@ -651,13 +687,12 @@ void TableFlatFile::dump(ostream & out, int depth) const
 
 {
 
-int j;
 Indent prefix(depth);
 
 
 out << prefix << "N_grib1_elements = " << N_grib1_elements << "\n";
 
-for (j=0; j<N_grib1_elements; ++j)  {
+for (int j=0; j<N_grib1_elements; ++j)  {
 
    out << prefix << "Grib1 Element # " << j << " ...\n";
 
@@ -667,7 +702,7 @@ for (j=0; j<N_grib1_elements; ++j)  {
 
 out << prefix << "N_grib2_elements = " << N_grib2_elements << "\n";
 
-for (j=0; j<N_grib2_elements; ++j)  {
+for (int j=0; j<N_grib2_elements; ++j)  {
 
    out << prefix << "Grib2 Element # " << j << " ...\n";
 
@@ -689,9 +724,6 @@ void TableFlatFile::assign(const TableFlatFile & f)
 {
 
 clear();
-
-int j;
-
 
 if ( f.N_grib1_elements != 0 )  {
 
@@ -746,6 +778,26 @@ g2e.reserve(n);
 N_grib2_alloc = n;
 
 return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool TableFlatFile::is_new_entry(vector<Grib2TableEntry> &matches, Grib2TableEntry & e) const
+
+{
+
+bool status = true;
+for (auto e_tmp : matches) {
+  if( e.is_eq(e_tmp) ) {
+     status = false;
+     break;
+  }
+}
+
+return status;
 
 }
 
@@ -1214,30 +1266,38 @@ bool TableFlatFile::lookup_grib2(int a, int b, int c,
                                  Grib2TableEntry & e)
 
 {
-   int j;
+
+   bool has_def_entry = false;
+   Grib2TableEntry e_def_match;
 
    e.clear();
 
-   for (j=0; j<N_grib2_elements; ++j)  {
+   for (int j=0; j<N_grib2_elements; ++j)  {
 
       // Check discipline, parm_cat, and cat
       if ( g2e[j].index_a != a ||
            g2e[j].index_b != b ||
            g2e[j].index_c != c ) continue;
 
-      // Check master table, center, and local table
-      if ( (bad_data_int != mtab && g2e[j].mtab_low  > mtab) ||
-           (bad_data_int != mtab && g2e[j].mtab_high < mtab) ||
-           (bad_data_int != cntr && g2e[j].cntr > 0 && g2e[j].cntr != cntr) ||
-           (bad_data_int != ltab && g2e[j].ltab > 0 && g2e[j].ltab != ltab) ) continue;
-
-      e = g2e[j];
-
-      return true;
+      GribEntryMatch match_status = g2e[j].match(mtab, cntr, ltab);
+      if (GribEntryMatch::exact_match == match_status) {
+         e = g2e[j];
+         return true;
+      }
+      else if (GribEntryMatch::match == match_status && !has_def_entry) {
+         has_def_entry = true;
+         e_def_match = g2e[j];
+      }
 
    }
 
+   if (has_def_entry) {
+      e = e_def_match;
+      return true;
+   }
+
    return false;
+
 }
 
 
@@ -1263,8 +1323,13 @@ bool TableFlatFile::lookup_grib2(const char * parm_name, int a, int b, int c,
           (bad_data_int != c && g2e[j].index_c != c) )
          continue;
 
-      if( n_matches++ == 0 ) e = g2e[j];
-      matches.emplace_back( g2e[j] );
+      bool is_new = true;
+      if( n_matches == 0 ) e = g2e[j];
+      else is_new = is_new_entry(matches, g2e[j]);
+      if (is_new) {
+         matches.emplace_back( g2e[j] );
+         n_matches++;
+      }
 
    }
 
@@ -1309,6 +1374,9 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
                                  Grib2TableEntry & e, int & n_matches)
 
 {
+   bool found_def_entry = false;
+   Grib2TableEntry e_def_match; // match indexes and full_name
+
    //  clear the by-reference arguments
    e.clear();
    n_matches = 0;
@@ -1320,16 +1388,28 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
       if( g2e[j].parm_name != parm_name ||
           (bad_data_int != a    && g2e[j].index_a != a) ||
           (bad_data_int != b    && g2e[j].index_b != b) ||
-          (bad_data_int != c    && g2e[j].index_c != c) ||
-          (bad_data_int != mtab && g2e[j].mtab_low  > mtab) ||
-          (bad_data_int != mtab && g2e[j].mtab_high < mtab) ||
-          (bad_data_int != cntr && g2e[j].cntr > 0 && g2e[j].cntr != cntr) ||
-          (bad_data_int != ltab && g2e[j].ltab > 0 && g2e[j].ltab != ltab) )
+          (bad_data_int != c    && g2e[j].index_c != c) )
          continue;
 
-      if( n_matches++ == 0 ) e = g2e[j];
-      matches.emplace_back( g2e[j] );
+      GribEntryMatch match_status = g2e[j].match(mtab, cntr, ltab);
+      if (match_status == GribEntryMatch::exact_match) {
+         bool is_new = true;
+         if( n_matches == 0 ) e = g2e[j];
+         else is_new = is_new_entry(matches, g2e[j]);
+         if (is_new) {
+            matches.emplace_back( g2e[j] );
+            n_matches++;
+         }
+      }
+      else if (match_status == GribEntryMatch::match and !found_def_entry) {
+         e_def_match = g2e[j];
+         found_def_entry = true;
+      }
+   }
 
+   if( 0 == n_matches && found_def_entry) {
+      e = e_def_match;
+      n_matches++;
    }
 
    //  if there are multiple matches, print a descriptive message
@@ -1337,7 +1417,7 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
 
       ConcatString msg;
       msg << "Multiple GRIB2 table entries match lookup criteria ("
-      << "parm_name = " << parm_name;
+          << "parm_name = " << parm_name;
       if( bad_data_int != a ) msg << ", index_a = " << a;
       if( bad_data_int != mtab ) msg << ", grib2_mtab = " << mtab;
       if( bad_data_int != cntr ) msg << ", grib2_cntr = " << cntr;
@@ -1368,6 +1448,19 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
                        << ", index_c = "    << e.index_c
                        << "\n\n";
 
+   }
+   else {
+      ConcatString msg;
+      msg << "No entry match lookup criteria ("
+          << "parm_name = " << parm_name;
+      if( bad_data_int != a ) msg << ", index_a = " << a;
+      if( bad_data_int != mtab ) msg << ", grib2_mtab = " << mtab;
+      if( bad_data_int != cntr ) msg << ", grib2_cntr = " << cntr;
+      if( bad_data_int != ltab ) msg << ", grib2_ltab = " << ltab;
+      if( bad_data_int != b ) msg << ", index_b = " << b;
+      if( bad_data_int != c ) msg << ", index_c = " << c;
+      msg << ")\n";
+      mlog << Debug(7) << "\n" << msg;
    }
 
    return (n_matches > 0);
