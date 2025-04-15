@@ -454,6 +454,9 @@ void write_stats() {
 
    mlog << Debug(1) << "Writing output file: " << out_file << "\n";
 
+   // Add global attributes
+   write_netcdf_global(nc_out, out_file.c_str(), program_name);
+
    // Define dimensions
    range_dim = add_dim(nc_out, "range", n_range);
    azimuth_dim = add_dim(nc_out, "azimuth", n_azimuth);
