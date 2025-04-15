@@ -1382,7 +1382,7 @@ unix_to_mdyhms(mode_in.valid_time(), month, day, year, hour, minute, second);
 
 ts = sec_to_timestring((int) (mode_in.valid_time()%86400));
 
-cs.format("%s %d, %d  %s", short_month_name[month], day, year, ts);
+cs.format("%s %d, %d  %s", short_month_name[month], day, year, ts.c_str());
 
 plot.write_centered_text(1, 1, htab2, vtab2, 0.0, 0.0, cs.c_str());
 

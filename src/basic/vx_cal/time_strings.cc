@@ -223,12 +223,13 @@ unixtime yyyymmddThhmmss_to_unix(const char * text)
 
 string s(text);
 
+// Parse format YYYY-MM-DDTHH:MM:SS
 int year   = stoi(s.substr(0,  4));
-int month  = stoi(s.substr(4,  2));
-int day    = stoi(s.substr(6,  2));
-int hour   = stoi(s.substr(9,  2));
-int minute = stoi(s.substr(11, 2));
-int second = stoi(s.substr(13, 2));
+int month  = stoi(s.substr(5,  2));
+int day    = stoi(s.substr(8,  2));
+int hour   = stoi(s.substr(11, 2));
+int minute = stoi(s.substr(14, 2));
+int second = stoi(s.substr(17, 2));
 
 return mdyhms_to_unix(month, day, year, hour, minute, second);
 
