@@ -94,7 +94,6 @@
     </output>
   </test>
 
-  <!-- New test for series-analysis 
   <test name="series_analysis_RANGE_AZIMUTH">
     <exec>echo "&DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f000.grb2  \
                 &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f006.grb2  \
@@ -113,7 +112,6 @@
       <grid_nc>&OUTPUT_DIR;/tc_rmw/series_analysis_RANGE_AZIMUTH_hwrf_gonzalo.nc</grid_nc>
     </output>
   </test>
-  -->
 
   <test name="pb2nc_GDAS_RANGE_AZIMUTH">
     <exec>&MET_BIN;/pb2nc</exec>

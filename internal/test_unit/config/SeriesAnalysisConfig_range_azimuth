@@ -29,8 +29,8 @@ obtype = "ANALYS";
 //
 regrid = {
    to_grid    = FCST;
-   method     = NEAREST;
-   width      = 1;
+   method     = BILIN;
+   width      = 2;
    vld_thresh = 0.5;
    shape      = SQUARE;
 }
@@ -57,7 +57,6 @@ fcst = {
       { level = "(3,*,*)"; },
       { level = "(4,*,*)"; }
    ];
-
 }
 obs = {
    field = [
@@ -168,7 +167,7 @@ output_stats = {
    cts    = [];
    mctc   = [];
    mcts   = [];
-   cnt    = [ "TOTAL", "RMSE", "FBAR", "OBAR" ];
+   cnt    = [ "TOTAL", "FBAR", "OBAR", "ME" ];
    sl1l2  = [];
    sal1l2 = [];
    pct    = [];
