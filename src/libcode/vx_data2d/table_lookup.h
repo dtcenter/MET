@@ -25,6 +25,17 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+enum class GribEntryMatch {
+
+   not_match,
+   match,           // Match but 0 for center and local table
+   exact_match      // Match all
+
+};
+
+////////////////////////////////////////////////////////////////////////
+
+
 
 class Grib1TableEntry {
 
@@ -95,15 +106,17 @@ class Grib2TableEntry {
       void clear();
 
       void dump(std::ostream &, int = 0) const;
+      bool is_eq(Grib2TableEntry &) const;
+      GribEntryMatch match(int mtab, int _cntr, int _ltab) const;
 
       int index_a;     // Section 0 Discipline
       int mtab_set;    // Section 1 Master Tables Version Number used by set_var
       int mtab_low;    // Section 1 Master Tables Version Number low range of tables
       int mtab_high;   // Section 1 Master Tables Version Number high range of tables
-      int cntr;        //Section 1 originating centre, used for local tables
-      int ltab;        //Section 1 Local Tables Version Number
+      int cntr;        // Section 1 originating centre, used for local tables
+      int ltab;        // Section 1 Local Tables Version Number
       int index_b;     // Section 4 Template 4.0 Parameter category
-      int index_c;     //Section 4 Template 4.0 Parameter number
+      int index_c;     // Section 4 Template 4.0 Parameter number
 
       ConcatString parm_name;
 
@@ -138,6 +151,8 @@ class TableFlatFile {
       void init_from_scratch();
 
       void assign(const TableFlatFile &);
+
+      bool is_new_entry(std::vector<Grib2TableEntry> &matches, Grib2TableEntry & e) const;
 
       bool read_grib1(std::istream &, const char * filename, const int n);
       bool read_grib2(std::istream &, const char * filename, const int n);
