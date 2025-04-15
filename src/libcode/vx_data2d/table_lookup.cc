@@ -791,7 +791,7 @@ bool TableFlatFile::is_new_entry(const vector<Grib2TableEntry> &matches,
 {
 
 bool status = true;
-for (auto e_tmp : matches) {
+for (auto &e_tmp : matches) {
   if( e.is_eq(e_tmp) ) {
      status = false;
      break;
@@ -1402,25 +1402,22 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
 
       GribEntryMatch match_status = g2e[j].match(mtab, cntr, ltab);
       if (match_status == GribEntryMatch::exact_match) {
-         bool is_new = true;
          if( n_matches == 0 ) e = g2e[j];
-         else is_new = is_new_entry(matches, g2e[j]);
-         if (is_new) {
+         if(is_new_entry(matches, g2e[j])) {
             matches.emplace_back( g2e[j] );
             n_matches++;
          }
       }
-      else if (match_status == GribEntryMatch::match) {
-         if (is_new_entry(partial_matches, g2e[j])) {
-            partial_matches.emplace_back( g2e[j] );
-         }
+      else if (match_status == GribEntryMatch::match &&
+               is_new_entry(partial_matches, g2e[j])) {
+         partial_matches.emplace_back( g2e[j] );
       }
    }
 
    if( 0 == n_matches && !partial_matches.empty()) {
       e = partial_matches[0];
       matches = partial_matches;
-      n_matches = matches.size();
+      n_matches = (int)matches.size();
    }
 
    //  if there are multiple matches, print a descriptive message
@@ -1454,7 +1451,7 @@ bool TableFlatFile::lookup_grib2(const char * parm_name,
    else if( 0 == n_matches ){
       mlog << Debug(3) << "No match, lookup criteria ("
            << log_arguments(parm_name, a, b, c, mtab, cntr, ltab)
-           << "):\n";
+           << ")\n";
    }
 
    return (n_matches > 0);
