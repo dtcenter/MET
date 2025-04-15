@@ -107,7 +107,7 @@ class Grib2TableEntry {
 
       void dump(std::ostream &, int = 0) const;
       bool is_eq(const Grib2TableEntry &) const;
-      GribEntryMatch match(int &mtab, int &_cntr, int &_ltab) const;
+      GribEntryMatch match(const int &mtab, const int &_cntr, const int &_ltab) const;
 
       int index_a;     // Section 0 Discipline
       int mtab_set;    // Section 1 Master Tables Version Number used by set_var
