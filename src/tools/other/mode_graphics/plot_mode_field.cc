@@ -191,6 +191,8 @@ static double       get_dict_double (Dictionary *, const char * id);
 static ConcatString get_dict_string (Dictionary *, const char * id);
 static bool         get_dict_bool   (Dictionary *, const char * id);
 
+static ConcatString time_string(int seconds);
+
 static void annotate(const ModeNcOutputFile &, Cgraph &, const Box &, const Box &);
 
 static double calc_text_scale(Cgraph &, const double target_width, const char *);
@@ -1267,6 +1269,26 @@ return c;
 ////////////////////////////////////////////////////////////////////////
 
 
+ConcatString time_string(int seconds)
+
+{
+
+ConcatString cs;
+int h = seconds/3600;
+int m = (seconds%3600)/60;
+int s = seconds%60;
+
+     if ( m == 0 && s == 0 )  cs.format("%02dh",          h);
+else if ( s == 0 )            cs.format("%02d:%02d",      h, m);
+else                          cs.format("%02d:%02d:%02d", h, m, s);
+
+return cs;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
 void annotate(const ModeNcOutputFile & mode_in, Cgraph & plot, const Box & anno_box, const Box & map_box)
 
 {
@@ -1367,7 +1389,7 @@ plot.set_color(anno_text_color);
 
 lead_seconds = (int) (mode_in.valid_time() - mode_in.init_time());
 
-ts = sec_to_timestring(lead_seconds);
+ts = time_string(lead_seconds);
 
 plot.write_centered_text(1, 1, htab2, vtab1, 0.0, 0.0, ts.c_str());
 
@@ -1380,7 +1402,7 @@ plot.set_color(anno_text_color);
 
 unix_to_mdyhms(mode_in.valid_time(), month, day, year, hour, minute, second);
 
-ts = sec_to_timestring((int) (mode_in.valid_time()%86400));
+ts = time_string((int) (mode_in.valid_time()%86400));
 
 cs.format("%s %d, %d  %s", short_month_name[month], day, year, ts.c_str());
 
