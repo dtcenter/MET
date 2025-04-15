@@ -106,8 +106,8 @@ class Grib2TableEntry {
       void clear();
 
       void dump(std::ostream &, int = 0) const;
-      bool is_eq(Grib2TableEntry &) const;
-      GribEntryMatch match(int mtab, int _cntr, int _ltab) const;
+      bool is_eq(const Grib2TableEntry &) const;
+      GribEntryMatch match(int &mtab, int &_cntr, int &_ltab) const;
 
       int index_a;     // Section 0 Discipline
       int mtab_set;    // Section 1 Master Tables Version Number used by set_var
@@ -152,7 +152,9 @@ class TableFlatFile {
 
       void assign(const TableFlatFile &);
 
-      bool is_new_entry(std::vector<Grib2TableEntry> &matches, Grib2TableEntry & e) const;
+      bool is_new_entry(const std::vector<Grib2TableEntry> &matches, const Grib2TableEntry & e) const;
+      ConcatString log_arguments(const char * parm_name, int a, int b, int c,
+                                 int mtab, int cntr, int ltab) const;
 
       bool read_grib1(std::istream &, const char * filename, const int n);
       bool read_grib2(std::istream &, const char * filename, const int n);
