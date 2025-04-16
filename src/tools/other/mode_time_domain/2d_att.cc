@@ -500,7 +500,7 @@ cs.format(format_int, k);
 
 s << cs;
 
-table.set_entry(row, c++, s.text());
+table.set_entry(row, c, s.text()); c++;
 
    //
    //   cluster number
@@ -519,19 +519,19 @@ cs.format(format_int, k);
 
 s << cs;
 
-table.set_entry(row, c++, s.text());
+table.set_entry(row, c, s.text()); c++;
 
    //
    //  time index
    //
 
-table.set_entry(row, c++, TimeIndex);
+table.set_entry(row, c, TimeIndex); c++;
 
    //
    //  area
    //
 
-table.set_entry(row, c++, Area);
+table.set_entry(row, c, Area); c++;
 
    //
    //  centroid (x, y)
@@ -541,11 +541,11 @@ format = format_2_decimals;
 
 cs.format(format, Xbar);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, Ybar);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  centroid lat/lon
@@ -555,11 +555,11 @@ format = format_2_decimals;
 
 cs.format(format, CentroidLat);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, -CentroidLon);   //  toggle sign
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  axis angle
@@ -569,7 +569,7 @@ format = format_2_decimals;
 
 cs.format(format, AxisAngle);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
 
    //
@@ -580,23 +580,23 @@ table.set_entry(row, c++, cs.c_str());
 
 cs.format(format, Ptile_10);
 
-   table.set_entry(row, c++, cs.c_str());
+   table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, Ptile_25);
 
-   table.set_entry(row, c++, cs.c_str());
+   table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, Ptile_50);
 
-   table.set_entry(row, c++, cs.c_str());
+   table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, Ptile_75);
 
-   table.set_entry(row, c++, cs.c_str());
+   table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, Ptile_90);
 
-   table.set_entry(row, c++, cs.c_str());
+   table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  custom intensity value
@@ -604,7 +604,7 @@ cs.format(format, Ptile_90);
 
 cs.format(format, Ptile_User);
 
-   table.set_entry(row, c++, cs.c_str());
+   table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  done

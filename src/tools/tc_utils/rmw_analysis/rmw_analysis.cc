@@ -45,7 +45,7 @@ static void clean_up();
 static void parse_track_file(const ConcatString&, TrackInfoArray&);
 static bool is_keeper(const ATCFLineBase*);
 static void filter_tracks(TrackInfoArray&);
-static void read_nc_tracks(NcFile*, TrackInfoArray &);
+static void read_nc_tracks(TrackInfoArray &);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -77,7 +77,7 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+static void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
        << ") ***\n\n"
@@ -109,7 +109,7 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+static void process_command_line(int argc, char **argv) {
 
    CommandLine cline;
    ConcatString default_config_file;
@@ -153,25 +153,25 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_data_files(const StringArray& a) {
+static void set_data_files(const StringArray& a) {
    data_files = a;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray& a) {
+static void set_config(const StringArray& a) {
    config_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out(const StringArray& a) {
+static void set_out(const StringArray& a) {
    out_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup() {
+static void setup() {
    const char *method_name = "setup() -> ";
 
    // Open first data file
@@ -311,7 +311,7 @@ void setup() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_data_files() {
+static void process_data_files() {
    const char *method_name = "process_data_files() -> ";
 
    // Size data cubes
@@ -364,7 +364,7 @@ void process_data_files() {
 
       // Read track information
       TrackInfoArray tracks;
-      read_nc_tracks(nc_in, tracks);
+      read_nc_tracks(tracks);
 
       // Filter tracks
       filter_tracks(tracks);
@@ -429,7 +429,7 @@ void process_data_files() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void normalize_stats() {
+static void normalize_stats() {
 
    for(int i_var = 0; i_var < data_names.size(); i_var++) {
 
@@ -447,7 +447,7 @@ void normalize_stats() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_stats() {
+static void write_stats() {
 
    // Create output file
    nc_out = open_ncfile(out_file.c_str(), true);
@@ -614,7 +614,7 @@ void write_stats() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void clean_up() {
+static void clean_up() {
 
    // Delete allocated memory
    int i;
@@ -627,8 +627,8 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void parse_track_file(const ConcatString& filename,
-                      TrackInfoArray& tracks) {
+static void parse_track_file(const ConcatString& filename,
+                             TrackInfoArray& tracks) {
    const char *method_name = "process_track_file() -> ";
 
    // Initialize
@@ -676,7 +676,7 @@ void parse_track_file(const ConcatString& filename,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_keeper(const ATCFLineBase* line) {
+static bool is_keeper(const ATCFLineBase* line) {
    bool keep = true;
 
    // Check model
@@ -686,25 +686,25 @@ bool is_keeper(const ATCFLineBase* line) {
 
    // Check storm id
    else if(conf_info.StormId.n_elements() > 1 &&
-         !has_storm_id(conf_info.StormId, line->basin(),
-                      line->cyclone_number(), line->warning_time()))
+           !has_storm_id(conf_info.StormId, line->basin(),
+                         line->cyclone_number(), line->warning_time()))
       keep = false;
 
    // Check basin
    else if(conf_info.Basin.n_elements() > 1 &&
-         !conf_info.Basin.has(line->basin()))
+           !conf_info.Basin.has(line->basin()))
       keep = false;
 
    // Check cyclone
    else if(conf_info.Cyclone.n_elements() > 1 &&
-         !conf_info.Cyclone.has(line->cyclone_number()))
+           !conf_info.Cyclone.has(line->cyclone_number()))
       keep = false;
 
    // Initialization time window
    else if((conf_info.InitBeg > 1 &&
-          conf_info.InitBeg > line->warning_time()) ||
-         (conf_info.InitEnd > 1 &&
-          conf_info.InitEnd < line->warning_time()))
+            conf_info.InitBeg > line->warning_time()) ||
+           (conf_info.InitEnd > 1 &&
+            conf_info.InitEnd < line->warning_time()))
       keep = false;
 
    return keep;
@@ -712,7 +712,7 @@ bool is_keeper(const ATCFLineBase* line) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void filter_tracks(TrackInfoArray& tracks) {
+static void filter_tracks(TrackInfoArray& tracks) {
 
    TrackInfoArray t = tracks;
 
@@ -723,9 +723,9 @@ void filter_tracks(TrackInfoArray& tracks) {
    for(int i = 0; i < t.n(); i++) {
       // Valid time window
       if((conf_info.ValidBeg > 0 &&
-         conf_info.ValidBeg > t[i].valid_min()) ||
+          conf_info.ValidBeg > t[i].valid_min()) ||
          (conf_info.ValidEnd > 0 &&
-         conf_info.ValidEnd < t[i].valid_max())) {
+          conf_info.ValidEnd < t[i].valid_max())) {
           mlog << Debug(4)
               << "Discarding track " << i+1
               << " for falling outside the "
@@ -742,7 +742,7 @@ void filter_tracks(TrackInfoArray& tracks) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void read_nc_tracks(NcFile* nc_in, TrackInfoArray &tracks) {
+static void read_nc_tracks(TrackInfoArray &tracks) {
 
    mlog << Debug(3) << "Temporary track file: "
         << adeck_source << "\n";

@@ -266,7 +266,7 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 
-void read_config()
+static void read_config()
 
 {
 
@@ -415,7 +415,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_plot(const char * mode_nc_filename)
+static void do_plot(const char * mode_nc_filename)
 
 {
 
@@ -597,7 +597,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage()
+static void usage()
 
 {
 
@@ -637,7 +637,7 @@ cout << "\n*** Model Evaluation Tools (MET" << met_version
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_config (const StringArray & a)
+static void set_config (const StringArray & a)
 
 {
 
@@ -651,7 +651,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_raw(const StringArray &)
+static void set_raw(const StringArray &)
 
 {
 
@@ -667,7 +667,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_obs(const StringArray &)
+static void set_obs(const StringArray &)
 
 {
 
@@ -683,7 +683,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_fcst(const StringArray &)
+static void set_fcst(const StringArray &)
 
 {
 
@@ -699,7 +699,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_simple(const StringArray &)
+static void set_simple(const StringArray &)
 
 {
 
@@ -713,7 +713,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_cluster(const StringArray &)
+static void set_cluster(const StringArray &)
 
 {
 
@@ -727,7 +727,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void sanity_check()
+static void sanity_check()
 
 {
 
@@ -784,7 +784,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void get_data_ppm(ModeNcOutputFile & mode_in, Ppm & image)
+static void get_data_ppm(ModeNcOutputFile & mode_in, Ppm & image)
 
 {
 
@@ -866,7 +866,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void fill_box(const Box & b, const Color & c, Cgraph & plot)
+static void fill_box(const Box & b, const Color & c, Cgraph & plot)
 
 {
 
@@ -895,7 +895,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void clip_box(const Box & b, Cgraph & plot)
+static void clip_box(const Box & b, Cgraph & plot)
 
 {
 
@@ -918,7 +918,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_map(Cgraph & plot, const Box & map_box, const Grid & grid)
+static void draw_map(Cgraph & plot, const Box & map_box, const Grid & grid)
 
 {
 
@@ -961,7 +961,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_mapfile(Cgraph & plot, const Box & map_box, const Grid & grid, Dictionary * dict)
+static void draw_mapfile(Cgraph & plot, const Box & map_box, const Grid & grid, Dictionary * dict)
 
 {
 
@@ -1023,7 +1023,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_region(Cgraph & plot, const Grid & grid, const Box & map_box, const MapRegion & r)
+static void draw_region(Cgraph & plot, const Grid & grid, const Box & map_box, const MapRegion & r)
 
 {
 
@@ -1085,7 +1085,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString get_dict_string (Dictionary * dict, const char * id)
+static ConcatString get_dict_string (Dictionary * dict, const char * id)
 
 {
 
@@ -1125,7 +1125,7 @@ return s;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool get_dict_bool(Dictionary * dict, const char * id)
+static bool get_dict_bool(Dictionary * dict, const char * id)
 
 {
 
@@ -1155,7 +1155,7 @@ return tf;
 ////////////////////////////////////////////////////////////////////////
 
 
-int get_dict_int(Dictionary * dict, const char * id)
+static int get_dict_int(Dictionary * dict, const char * id)
 
 {
 
@@ -1185,7 +1185,7 @@ return k;
 ////////////////////////////////////////////////////////////////////////
 
 
-double get_dict_double(Dictionary * dict, const char * id)
+static double get_dict_double(Dictionary * dict, const char * id)
 
 {
 
@@ -1227,7 +1227,7 @@ return t;
 ////////////////////////////////////////////////////////////////////////
 
 
-Color get_dict_color(Dictionary * dict, const char * id)
+static Color get_dict_color(Dictionary * dict, const char * id)
 
 {
 
@@ -1269,7 +1269,7 @@ return c;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString time_string(int seconds)
+static ConcatString time_string(int seconds)
 
 {
 
@@ -1289,7 +1289,7 @@ return cs;
 
 ////////////////////////////////////////////////////////////////////////
 
-void annotate(const ModeNcOutputFile & mode_in, Cgraph & plot, const Box & anno_box, const Box & map_box)
+static void annotate(const ModeNcOutputFile & mode_in, Cgraph & plot, const Box & anno_box, const Box & map_box)
 
 {
 
@@ -1421,7 +1421,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double calc_text_scale(Cgraph & plot, const double target_width, const char * text)
+static double calc_text_scale(Cgraph & plot, const double target_width, const char * text)
 
 {
 
@@ -1450,7 +1450,7 @@ return s;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_obj_colortable(Cgraph & plot, const Box & map_box, const int Nobjs)
+static void draw_obj_colortable(Cgraph & plot, const Box & map_box, const int Nobjs)
 
 {
 
@@ -1519,7 +1519,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_raw_colortable(Cgraph & plot, const Box & map_box)
+static void draw_raw_colortable(Cgraph & plot, const Box & map_box)
 
 {
 

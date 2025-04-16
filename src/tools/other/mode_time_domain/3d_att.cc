@@ -539,7 +539,7 @@ cs.format(format_int_0, ObjectNumber);
 
 s << cs;
 
-table.set_entry(row, c++, s.text());
+table.set_entry(row, c, s.text()); c++;
 
    //
    //  cluster number
@@ -558,7 +558,7 @@ cs.format(format_int_0, k);
 
 s << cs;
 
-table.set_entry(row, c++, s.text());
+table.set_entry(row, c, s.text()); c++;
 
    //
    //  centroid x, y, t
@@ -568,15 +568,15 @@ format = format_2_decimals;
 
 cs.format(format, Xbar);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, Ybar);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, Tbar);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  space centroid lat, lon
@@ -586,11 +586,11 @@ format = format_2_decimals;
 
 cs.format(format, Centroid_Lat);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, -Centroid_Lon);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  velocity xdot, ydot
@@ -600,11 +600,11 @@ format = format_2_decimals;
 
 cs.format(format, Xvelocity);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, Yvelocity);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  spatial axis angle
@@ -614,7 +614,7 @@ format = format_2_decimals;
 
 cs.format(format, SpatialAxisAngle);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  volume
@@ -622,7 +622,7 @@ table.set_entry(row, c++, cs.c_str());
 
 cs.format(format_int, Volume);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  start time, end time
@@ -632,11 +632,11 @@ format = format_int;
 
 cs.format(format, Tmin);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, Tmax);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  centroid distance travelled
@@ -646,7 +646,7 @@ format = format_3_decimals;
 
 cs.format(format, CdistTravelled);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  intensities 10, 25, 50, 75, 90
@@ -656,23 +656,23 @@ format = format_2_decimals;
 
 cs.format(format, Ptile_10);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, Ptile_25);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, Ptile_50);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, Ptile_75);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
 cs.format(format, Ptile_90);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  custom intensity value
@@ -680,7 +680,7 @@ table.set_entry(row, c++, cs.c_str());
 
 cs.format(format, Ptile_User);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  done
@@ -1077,7 +1077,7 @@ int c = n_header_3d_cols;
 if ( is_simple() )  cs.format("F%03d_O%03d",   FcstObjectNumber, ObsObjectNumber);
 else                cs.format("CF%03d_CO%03d", FcstObjectNumber, ObsObjectNumber);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  cluster number
@@ -1088,7 +1088,7 @@ else                                          k = 0;
 
 cs.format("CF%03d_CO%03d", k, k);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    ////////////////////////////
 
@@ -1096,37 +1096,37 @@ table.set_entry(row, c++, cs.c_str());
 
 cs.format(format_2_decimals, SpaceCentroidDist);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //  time centroid delta
 
 cs.format(format_2_decimals, TimeCentroidDelta);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //  axis diff
 
 cs.format(format_3_decimals, AxisDiff);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //  speed delta
 
 cs.format(format_2_decimals, SpeedDelta);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //  direction diff
 
 cs.format(format_2_decimals, DirectionDifference);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //  volume ratio
 
 cs.format(format_2_decimals, VolumeRatio);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //  start time delta
 
@@ -1134,7 +1134,7 @@ k = nint(StartTimeDelta);
 
 cs.format(format_int, k);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //  end time delta
 
@@ -1142,25 +1142,25 @@ k = nint(EndTimeDelta);
 
 cs.format(format_int, k);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //  intersection volume
 
 cs.format(format_int, IntersectionVol);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //  duration difference
 
 cs.format(format_int, DurationDifference);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //  total interest
 
 cs.format(format_3_decimals, TotalInterest);
 
-table.set_entry(row, c++, cs.c_str());
+table.set_entry(row, c, cs.c_str()); c++;
 
    //
    //  done
