@@ -1625,6 +1625,7 @@ Optional Features:
   --enable-all            Enable compilation options --enable-grib2
                           --enable-python --enable-ugrid --enable-lidar2nc
                           --enable-modis --enable-mode_graphics
+                          Note: --enable-profiler is not included
   --disable-block4        Disable use of BLOCK4 in the compilation. Use this
                           if you have trouble using PrepBufr files.
   --enable-static_linking Enable static linking of the applications
