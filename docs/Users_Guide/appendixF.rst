@@ -280,6 +280,13 @@ When specified as a dictionary, the contents of the **grid** entry vary based up
   • lon_zero (double)
   • nx, ny   (int)
 
+• **Range/Azimuth** grid dictionary entries:
+
+  • type                   ("Range Azimuth")
+  • range_n, azimuth_n     (int)
+  • range_max_km           (double)
+  • lat_center, lon_center (double)
+
 • **SemiLatLon** grid dictionary entries:
 
   • type     ("SemiLatLon")
