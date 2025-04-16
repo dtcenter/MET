@@ -461,7 +461,7 @@ fi
 # Enable all compilation options 
 
 AC_ARG_ENABLE(all,
-	  [AS_HELP_STRING([--enable-all], [Enable compilation options --enable-grib2 --enable-python --enable-ugrid --enable-lidar2nc --enable-modis --enable-mode_graphics])],
+	      [AS_HELP_STRING([--enable-all], [Enable compilation options --enable-grib2 --enable-python --enable-ugrid --enable-lidar2nc --enable-modis --enable-mode_graphics, but not --enable-profiler])],
   [case "${enableval}" in
      yes | no ) ENABLE_ALL="${enableval}" ;;
      *) AC_MSG_ERROR(bad value ${enableval} for --enable-all) ;;
@@ -1207,10 +1207,6 @@ if test "x$ENABLE_PROFILER" = "xyes" ; then
 else
   AC_MSG_NOTICE([profiling support will not be compiled])
 fi
-#PROFILER_MET_LIBS=
-#PROFILER_DEP_LIBS=
-#AC_SUBST([PROFILER_MET_LIBS])
-#AC_SUBST([PROFILER_DEP_LIBS])
 
 ########################################################################
 

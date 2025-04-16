@@ -1624,8 +1624,8 @@ Optional Features:
                           speeds up one-time build
   --enable-all            Enable compilation options --enable-grib2
                           --enable-python --enable-ugrid --enable-lidar2nc
-                          --enable-modis --enable-mode_graphics
-                          Note: --enable-profiler is not included
+                          --enable-modis --enable-mode_graphics, but not
+                          --enable-profiler
   --disable-block4        Disable use of BLOCK4 in the compilation. Use this
                           if you have trouble using PrepBufr files.
   --enable-static_linking Enable static linking of the applications
@@ -7074,10 +7074,6 @@ else
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: profiling support will not be compiled" >&5
 printf "%s\n" "$as_me: profiling support will not be compiled" >&6;}
 fi
-#PROFILER_MET_LIBS=
-#PROFILER_DEP_LIBS=
-#AC_SUBST([PROFILER_MET_LIBS])
-#AC_SUBST([PROFILER_DEP_LIBS])
 
 ########################################################################
 
