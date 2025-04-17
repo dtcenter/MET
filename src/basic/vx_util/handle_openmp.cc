@@ -23,30 +23,29 @@ void init_openmp() {
 
 #ifdef _OPENMP
 
-  // If OMP_NUM_THREADS was not set, use the OpenMP API to set the thread count
-  // to 1 thread only.
-  const char* env_omp_num_threads = std::getenv("OMP_NUM_THREADS");
-  if (!env_omp_num_threads) {
-    mlog << Debug(2) << "OMP_NUM_THREADS is not set." 
-         << " Defaulting to 1 thread."
-         << " Recommend setting OMP_NUM_THREADS for faster runtimes.\n";
-    omp_set_num_threads(1);
-  }
+   // If OMP_NUM_THREADS was not set, use the OpenMP API to set the thread
+   // count to 1 thread only.
+   const char* env_omp_num_threads = std::getenv("OMP_NUM_THREADS");
+   if (!env_omp_num_threads) {
+      mlog << Debug(2) << "OMP_NUM_THREADS is not set." 
+           << " Defaulting to 1 thread."
+           << " Recommend setting OMP_NUM_THREADS for faster runtimes.\n";
+      omp_set_num_threads(1);
+   }
 
 #pragma omp parallel
 #pragma omp single
-  {
-     mlog << Debug(2) << "OpenMP running on " 
-       << omp_get_num_threads() << " thread(s).\n";
-  }
+   {
+       mlog << Debug(2) << "OpenMP running on " 
+            << omp_get_num_threads() << " thread(s).\n";
+   }
 
 #else  /* _OPENMP */
 
-  mlog << Debug(2) << "OpenMP disabled.\n";
+   mlog << Debug(2) << "OpenMP disabled.\n";
 
 #endif  /* _OPENMP */
 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-
