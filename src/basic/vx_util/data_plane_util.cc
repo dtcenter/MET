@@ -214,7 +214,6 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
         const DataPlane *ocmn, const DataPlane *ocsd,
         double vld_t) {
    GridPoint *gp = nullptr;
-   int x, y;
    int n_vld = 0;
    int n_thr = 0;
    double v;
@@ -275,7 +274,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 #pragma omp parallel default(none)                      \
    shared(mlog, dp, frac_dp, shape, width, wrap_lon, t) \
    shared(use_climo, fcmn, fcsd, ocmn, ocsd, vld_t, bad)\
-   private(x, y, n_vld, n_thr, gp, v)
+   private(n_vld, n_thr, gp, v)
    {
 
      // Build the grid template
@@ -297,8 +296,8 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
 
      // Compute the fractional coverage meeting the threshold criteria
 #pragma omp for schedule (static)
-     for(x=0; x<dp.nx(); x++) {
-        for(y=0; y<dp.ny(); y++) {
+     for(int x=0; x<dp.nx(); x++) {
+        for(int y=0; y<dp.ny(); y++) {
 
            // For a new column, reset the grid template and counts.
            if(y == 0) {

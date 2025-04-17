@@ -510,8 +510,10 @@ double ShapeData::get_attr(const ConcatString &attr_name,
 void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
    const char *method_name = "ShapeData::conv_filter_circ() -> ";
    GridPoint *gp = nullptr;
-   int x, y, count, n_vld;
-   double v, v_sum;
+   int count;
+   int n_vld;
+   double v;
+   double v_sum;
    DataPlane conv_dp;
 
    // Check the diameter
@@ -524,7 +526,7 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
 
 #pragma omp parallel default(none)                   \
    shared(mlog, data, conv_dp, diameter, vld_thresh) \
-   private(x, y, count, n_vld, v, v_sum, gp)
+   private(count, n_vld, v, v_sum, gp)
    {
 
       // Build the grid template with shape circle and wrap_lon false
