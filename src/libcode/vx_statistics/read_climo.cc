@@ -32,7 +32,7 @@ static void read_climo_file(
           DataPlaneArray &dpa, const char *);
 
 static DataPlaneArray climo_time_interp(
-          const DataPlaneArray &, int, unixtime, InterpMthd);
+          DataPlaneArray &, int, unixtime, InterpMthd);
 
 static DataPlane climo_hms_interp(
           const DataPlaneArray &, const IntArray&, unixtime, InterpMthd);
@@ -298,7 +298,7 @@ void read_climo_file(const char *climo_file, GrdFileType ctype,
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlaneArray climo_time_interp(const DataPlaneArray &dpa, int day_ts,
+DataPlaneArray climo_time_interp(DataPlaneArray &dpa, int day_ts,
                                  unixtime vld_ut, InterpMthd mthd) {
    DataPlaneArray interp_dpa;
    ConcatString cs;
@@ -365,8 +365,8 @@ DataPlaneArray climo_time_interp(const DataPlaneArray &dpa, int day_ts,
                  << " to " << unix_to_yyyymmdd_hhmmss(ut1 + shift_sec)
                  << " and " << unix_to_yyyymmdd_hhmmss(ut2)
                  << " to " << unix_to_yyyymmdd_hhmmss(ut2 + shift_sec) << ".\n";
-            dpa[it->second[0]].set_valid(ut1 + shift_sec);
-            dpa[it->second[1]].set_valid(ut2 + shift_sec);
+            dpa.at(it->second[0]).set_valid(ut1 + shift_sec);
+            dpa.at(it->second[1]).set_valid(ut2 + shift_sec);
          }
 
          mlog << Debug(3)

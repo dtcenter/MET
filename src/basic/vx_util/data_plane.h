@@ -134,13 +134,12 @@ class DataPlane {
 
       MaskPlane mask_plane() const;
 
-      void shift_right  (int n);
-      void destagger (bool x_stag, bool y_stag);
+      void shift_right(int n);
+      void destagger(bool x_stag, bool y_stag);
 
       void put(const double, const int __x__, const int __y__);
 
-      bool fitwav_1d_old (const int start_wave, const int end_wave);
-      bool fitwav_1d     (const int start_wave, const int end_wave);
+      bool fitwav_1d(const int start_wave, const int end_wave);
 
 };
 
@@ -164,10 +163,6 @@ inline std::vector<double> & DataPlane::buf() { return Data; }
 
 ////////////////////////////////////////////////////////////////////////
 
-static const int dataplane_default_alloc_inc = 20;
-
-////////////////////////////////////////////////////////////////////////
-
 class DataPlaneArray {
 
    protected:
@@ -176,21 +171,15 @@ class DataPlaneArray {
 
       void assign(const DataPlaneArray &);
 
-      void extend(int, bool exact = true);
+      void extend(int);
 
       void check_xy_size(const DataPlane &) const;   //  check to make sure all planes added are same size
 
-
-      double * Lower;       //  allocated
-
-      double * Upper;       //  allocated
-
-      DataPlane ** Plane;   //  allocated
+      std::vector<double>    Lower;
+      std::vector<double>    Upper;
+      std::vector<DataPlane> Plane;
 
       int Nplanes;
-      int Nalloc;
-
-      int AllocInc;
 
    public:
 
@@ -208,8 +197,6 @@ class DataPlaneArray {
          //
          //  set stuff
          //
-
-     void set_alloc_inc(int);
 
      void set_levels (int, double _low, double _up);
 
@@ -231,7 +218,9 @@ class DataPlaneArray {
       double data (int plane, int x, int y) const;
       void   set  (double, int plane, int x, int y);
 
-      DataPlane & operator[](int) const;
+      const DataPlane & operator[](int) const;
+
+      DataPlane & at(int);
 
          //
          //  do stuff

@@ -333,6 +333,7 @@ void DataPlane::set(double v, int x, int y) {
 
 void DataPlane::set_block(double *v, int nx, int ny) {
    const char *method_name = "DataPlane::set_block() -> ";
+   int nxy = nx*ny;
    
    if (nx > Nx) {
       mlog << Error << "\n" << method_name << "nx is too big ("
@@ -345,15 +346,15 @@ void DataPlane::set_block(double *v, int nx, int ny) {
       exit(1);
    }
 
-#pragma omp parallel default(none) \
-   shared(Data, v, nx, ny, DefaultTO)
+#pragma omp parallel default(none)         \
+   shared(Data, v, nx, ny, nxy, DefaultTO)
    {
 
 #pragma omp for schedule (static)
 
       // Note: v should be a row first & the size is (nx * ny).
       //       implemented based on two_to_one("n = y*Nx + x").
-      for(int offset=0; offset < nx*ny; offset++) {
+      for(int offset=0; offset < nxy; offset++) {
          int x;
          int y;
          DefaultTO.one_to_two(nx, ny, offset, x, y);
@@ -420,6 +421,7 @@ void DataPlane::set_times(const DataPlane &dp) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void DataPlane::set_all(float *data, int nx, int ny) {
+
    if (nx != Nx || ny != Ny) {
       mlog << Error << "\nDataPlane::set_all() -> "
            << "the data dimensions do not match: ("
@@ -427,26 +429,30 @@ void DataPlane::set_all(float *data, int nx, int ny) {
            << nx << ", " << ny << ")!\n\n";
       exit(1);
    }
-   for (int x=0; x<nx; ++x) {
-      for (int y=0; y<ny; ++y) {
-         int index = two_to_one(x, y);
-         Data[index] = data[index];
+
+#pragma omp parallel default(none) \
+   shared(Data, data, nx, ny)
+   {
+
+#pragma omp for schedule (static)
+
+      for(int x=0; x<nx; ++x) {
+         for(int y=0; y<ny; ++y) {
+            int index = two_to_one(x, y);
+            Data[index] = data[index];
+         }
       }
-   }
+   } // End omp parallel
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool DataPlane::is_all_bad_data() const {
-   int j;
    bool status = true;
 
-   //
    // Check for no valid data
-   //
-
-   for(j=0; j<Nxy; ++j) {
-      if( !is_bad_data(Data[j]) ) {
+   for(int j=0; j<Nxy; ++j) {
+      if(!is_bad_data(Data[j])) {
          status = false;
          break;
       }
@@ -458,15 +464,19 @@ bool DataPlane::is_all_bad_data() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 int DataPlane::n_good_data() const {
-   int j, n;
+   int n = 0;
 
-   //
-   // Count number of good data values
-   //
+#pragma omp parallel default(none) \
+   shared(Data, n)
+   {
 
-   for(j=0,n=0; j<Nxy; ++j) {
-      if(!is_bad_data(Data[j])) n++;
-   }
+#pragma omp for schedule (static)
+
+      // Count number of good data values
+      for(int j=0; j<Nxy; ++j) {
+         if(!is_bad_data(Data[j])) n++;
+      }
+   } // End omp parallel
 
    return n;
 }
@@ -484,7 +494,6 @@ double DataPlane::get(int x, int y) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void DataPlane::threshold(const SingleThresh &st) {
-   int j;
 
    //
    // Loop through the data and apply the threshold to all valid values
@@ -492,13 +501,18 @@ void DataPlane::threshold(const SingleThresh &st) {
    //   0.0 if it does not
    //
 
-   for(j=0; j<Nxy; ++j) {
+#pragma omp parallel default(none) \
+   shared(Data, Nxy, st)
+   {
 
-      if( is_bad_data(Data[j]) )  continue;
-      if( st.check(Data[j]) )     Data[j] = 1.0;
-      else                        Data[j] = 0.0;
+#pragma omp for schedule (static)
 
-   }
+      for(int j=0; j<Nxy; ++j) {
+         if(is_bad_data(Data[j])) continue;
+         if(st.check(Data[j]))    Data[j] = 1.0;
+         else                     Data[j] = 0.0;
+      }
+   } // End omp parallel
 
    return;
 }
@@ -510,10 +524,17 @@ void DataPlane::convert(const UserFunc_1Arg &convert_fx) {
    if(!convert_fx.is_set()) return;
 
    mlog << Debug(3) << "Applying conversion function.\n";
+ 
+#pragma omp parallel default(none) \
+   shared(Data, Nxy, convert_fx)
+   {
 
-   for(int i=0; i<Nxy; i++) {
-      if(!is_bad_data(buf()[i])) buf()[i] = convert_fx(buf()[i]);
-   }
+#pragma omp for schedule (static)
+
+      for(int i=0; i<Nxy; i++) {
+         if(!is_bad_data(buf()[i])) buf()[i] = convert_fx(buf()[i]);
+      }
+   } // End omp parallel
 
    return;
 }
@@ -522,7 +543,6 @@ void DataPlane::convert(const UserFunc_1Arg &convert_fx) {
 
 void DataPlane::censor(const ThreshArray &censor_thresh,
                        const NumArray &censor_val) {
-   int i, j, count;
    ThreshArray ta = censor_thresh;
 
    // Check for no work to do
@@ -532,9 +552,18 @@ void DataPlane::censor(const ThreshArray &censor_thresh,
    if(ta.need_perc()) {
       NumArray d;
       d.extend(Nxy);
-      for(i=0; i<Nxy; i++) {
+
+#pragma omp parallel default(none) \
+   shared(Data, d)
+   {
+
+#pragma omp for schedule (static)
+
+      for(int i=0; i<Nxy; i++) {
          if(!is_bad_data(Data[i])) d.add(Data[i]);
       }
+   } // End omp parallel
+
       ta.set_perc(&d, &d, &d, &d);
    }
 
@@ -543,19 +572,27 @@ void DataPlane::censor(const ThreshArray &censor_thresh,
         << "\" and replacing with values \"" << censor_val.serialize()
         << "\".\n";
 
-   // Loop through the points and apply all the censor thresholds.
-   for(i=0,count=0; i<Nxy; i++) {
+   int count = 0;
 
-      for(j=0; j<ta.n_elements(); j++) {
+#pragma omp parallel default(none)          \
+   shared(Data, Nxy, ta, censor_val, count)
+   {
 
-         // Break out after the first match.
-         if(ta[j].check(Data[i])) {
-            Data[i] = censor_val[j];
-            count++;
-            break;
+#pragma omp for schedule (static)
+
+      // Loop through the points and apply all the censor thresholds
+      for(int i=0; i<Nxy; i++) {
+         for(int j=0; j<ta.n_elements(); j++) {
+
+            // Break out after the first match
+            if(ta[j].check(Data[i])) {
+               Data[i] = censor_val[j];
+               count++;
+               break;
+            }
          }
       }
-   }
+   } // End omp parallel
 
    mlog << Debug(3)
         << "Censored values for " << count << " of " << Nxy
@@ -577,15 +614,22 @@ void DataPlane::anomaly(const DataPlane &mn) {
       exit(1);
    }
 
-   // Subtract the mean
-   for(int i=0; i<Nxy; i++) {
-      if(is_bad_data(Data[i]) || is_bad_data(mn.Data[i])) {
-         Data[i] = bad_data_double;
+#pragma omp parallel default(none) \
+   shared(Data, Nxy, mn)
+   {
+
+#pragma omp for schedule (static)
+
+      // Subtract the mean
+      for(int i=0; i<Nxy; i++) {
+         if(is_bad_data(Data[i]) || is_bad_data(mn.Data[i])) {
+            Data[i] = bad_data_double;
+         }
+         else {
+            Data[i] -= mn.Data[i];
+         }
       }
-      else {
-         Data[i] -= mn.Data[i];
-      }
-   }
+   } // End omp parallel
 
    return;
 }
@@ -605,18 +649,25 @@ void DataPlane::standard_anomaly(const DataPlane &mn,
       exit(1);
    }
 
-   // Subtract the mean and divide by the standard deviation
-   for(int i=0; i<Nxy; i++) {
-      if(is_bad_data(Data[i])    ||
-         is_bad_data(mn.Data[i]) ||
-         is_bad_data(sd.Data[i]) ||
-         is_eq(sd.Data[i], 0.0)) {
-         Data[i] = bad_data_double;
+#pragma omp parallel default(none) \
+   shared(Data, Nxy, mn, sd)
+   {
+
+#pragma omp for schedule (static)
+
+      // Subtract the mean and divide by the standard deviation
+      for(int i=0; i<Nxy; i++) {
+         if(is_bad_data(Data[i])    ||
+            is_bad_data(mn.Data[i]) ||
+            is_bad_data(sd.Data[i]) ||
+            is_eq(sd.Data[i], 0.0)) {
+            Data[i] = bad_data_double;
+         }
+         else {
+            Data[i] = (Data[i] - mn.Data[i])/sd.Data[i];
+         }
       }
-      else {
-         Data[i] = (Data[i] - mn.Data[i])/sd.Data[i];
-      }
-   }
+   } // End omp parallel
 
    return;
 }
@@ -625,9 +676,16 @@ void DataPlane::standard_anomaly(const DataPlane &mn,
 
 void DataPlane::replace_bad_data(const double value) {
 
-   for(int i=0; i<Nxy; i++) {
-      if(is_bad_data(Data[i])) Data[i] = value;
-   }
+#pragma omp parallel default(none) \
+   shared(Data, Nxy, value)
+   {
+
+#pragma omp for schedule (static)
+
+      for(int i=0; i<Nxy; i++) {
+         if(is_bad_data(Data[i])) Data[i] = value;
+      }
+   } // End omp parallel
 
    return;
 }
@@ -636,11 +694,18 @@ void DataPlane::replace_bad_data(const double value) {
 
 void DataPlane::set_all_to_bad_data() {
 
-   for(int i=0; i<Nxy; i++) {
-      Data[i] = bad_data_double;
-   }
-   return;
+#pragma omp parallel default(none) \
+   shared(Data, Nxy)
+   {
 
+#pragma omp for schedule (static)
+
+      for(int i=0; i<Nxy; i++) {
+         Data[i] = bad_data_double;
+      }
+   } // End omp parallel
+ 
+   return;
 }   
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -655,7 +720,8 @@ int DataPlane::two_to_one(int x, int y, bool to_north) const {
       exit(1);
    }
 
-   n = (to_north ? y : (Ny-1-y))*Nx + x;    //  don't change this!  lots of downstream code depends on this!
+   //  don't change this!  lots of downstream code depends on this!
+   n = (to_north ? y : (Ny-1-y))*Nx + x;
 
    return n;
 }
@@ -711,27 +777,33 @@ bool DataPlane::f_is_on(int x, int y) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void DataPlane::data_range(double & data_min, double & data_max) const {
-   int j;
-   double value;
    bool first_set = true;
 
+   // Initialize
    data_min = data_max = bad_data_double;
 
-   for(j=0; j<Nxy; ++j) {
+#pragma omp parallel default(none)                  \
+   shared(Data, Nxy, data_min, data_max, first_set)
+   {
 
-      value = Data[j];
+#pragma omp for schedule (static)
 
-      if(is_bad_data(value)) continue;
+      for(int j=0; j<Nxy; ++j) {
 
-      if(first_set) {
-         data_min = data_max = value;
-         first_set = false;
-      }
-      else {
-         data_min = min(value, data_min);
-         data_max = max(value, data_max);
-      }
-   }   //  for j
+         double value = Data[j];
+
+         if(is_bad_data(value)) continue;
+
+         if(first_set) {
+            data_min = data_max = value;
+            first_set = false;
+         }
+         else {
+            data_min = min(value, data_min);
+            data_max = max(value, data_max);
+         }
+      } // for j
+   } // End omp parallel
 
    return;
 }
@@ -747,529 +819,268 @@ MaskPlane DataPlane::mask_plane() const {
 
    mp.set_size(Nx, Ny);
 
-   for(int i=0; i<Nxy; i++) {
-      mp.buf()[i] = (is_bad_data(Data[i]) ? false : !is_eq(Data[i], 0.0));
-   }
+#pragma omp parallel default(none) \
+   shared(Data, Nxy, mp)
+   {
+
+#pragma omp for schedule (static)
+
+      for(int i=0; i<Nxy; i++) {
+         mp.buf()[i] = (is_bad_data(Data[i]) ? false : !is_eq(Data[i], 0.0));
+      }
+   } // End omp parallel
 
    return mp;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void DataPlane::shift_right(int N) {
+   const char *method_name = "DataPlane::shift_right(int) -> ";
 
-void DataPlane::shift_right(int N)
+   mlog << Debug(3) << "Shifting dataplane to the right " << N
+        << " grid squares.\n";
 
-{
+   // Check some stuff
+   if(Data.empty()) {
+      mlog << Error << "\n" << method_name
+           << "data plane is empty!\n\n";
+      exit(1);
+   }
 
-   mlog << Debug(3)
-        << "Shifting dataplane to the right " << N << " grid squares.\n";
+   N %= Nx;
 
-   //
-   //  check some stuff
-   //
+   if(N < 0) N += Nx;
 
-
-if ( Data.empty() )  {
-
-   mlog << Error
-        << "\n\n  DataPlane::shift_right(int) -> data plane is empty!\n\n";
-
-   exit ( 1 );
-
-}
-
-N %= Nx;
-
-if ( N < 0 )  N += Nx;
-
-if ( N == 0 )  return;   //  no shift, so do nothing
+   if(N == 0) return;   //  no shift, so do nothing
 
    //
    //  ok, get to work
    //
 
-int x, y, x_new;
-int index_old, index_new;
-vector<double> new_data(Nxy);
+   vector<double> new_data(Nxy);
 
-for (x=0; x<Nx; ++x)  {
+#pragma omp parallel default(none)   \
+   shared(Data, new_data, N, Nx, Ny)
+   {
 
-   x_new = (x + N)%Nx;
+#pragma omp for schedule (static)
 
-   for (y=0; y<Ny; ++y)  {
+      for(int x=0; x<Nx; ++x) {
 
-      index_old = two_to_one(x,     y);
-      index_new = two_to_one(x_new, y);
+         int x_new = (x + N)%Nx;
 
-      new_data[index_new] = Data[index_old];
+         for(int y=0; y<Ny; ++y) {
+            int index_old = two_to_one(x,     y);
+            int index_new = two_to_one(x_new, y);
+            new_data[index_new] = Data[index_old];
+         }
+      }
+   } // End omp parallel
 
+   Data = new_data;
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlane::destagger(bool x_stag, bool y_stag) {
+
+   // don't do anything if data is not staggered in x or y dimension
+   if(!x_stag && !y_stag) return;
+
+   const char *method_name = "DataPlane::destagger(bool, bool) -> ";
+
+   if(Data.empty()) {
+      mlog << Error << "\n" << method_name
+           << " data plane is empty!\n\n";
+      exit(1);
+   } 
+
+   int nx_new = Nx;
+   int ny_new = Ny;
+   int weight = 0;
+
+   // set nx and weight based on which dimensions are staggered
+   if(x_stag) {
+      mlog << Debug(3) << "De-staggering dataplane in X dimension\n";
+      nx_new = Nx - 1;
+      weight += 2;
    }
 
-}
+   if(y_stag) {
+      mlog << Debug(3) << "De-staggering dataplane in Y dimension\n";
+      ny_new = Ny - 1;
+      weight += 2;
+   }
 
-Data = new_data;
+   // allocate vector to store output data
+   int nxy_new = nx_new * ny_new;
+   vector<double> new_data(nxy_new);
 
-   //
-   //  done
-   //
+#pragma omp parallel default(none)                                \
+   shared(Data, new_data, ny_new, nx_new, x_stag, y_stag, weight)
+   {
 
-return;
+#pragma omp for schedule (static)
 
-}
+      for(int y=0; y < ny_new; y++) {
+         for(int x=0; x < nx_new; x++) {
 
-///////////////////////////////////////////////////////////////////////////////
-
-
-void DataPlane::destagger(bool x_stag, bool y_stag)
-{
-    // don't do anything if data is not staggered in x or y dimension
-    if (!x_stag && !y_stag) return;
-
-    const char *method_name = "DataPlane::destagger(bool, bool) -> ";
-
-    if ( Data.empty() )  {
-
-        mlog << Error << "\n\n  " << method_name << " data plane is empty!\n\n";
-        exit ( 1 );
-
-    }
-
-    int nx_new = Nx;
-    int ny_new = Ny;
-    int nxy_new;
-    int weight = 0;
-    int x, y, index_new;
-    double total;
-    vector<double> new_data;
-
-    // set nx and weight based on which dimensions are staggered
-
-    if (x_stag) {
-
-        mlog << Debug(3) << "De-staggering dataplane in X dimension\n";
-        nx_new = Nx - 1;
-        weight += 2;
-
-    }
-
-    if (y_stag) {
-
-        mlog << Debug(3) << "De-staggering dataplane in Y dimension\n";
-        ny_new = Ny - 1;
-        weight += 2;
-
-    }
-
-    // allocate vector to store output data
-
-    nxy_new = nx_new * ny_new;
-    new_data.resize(nxy_new);
-
-    for (y=0; y < ny_new; y++)  {
-        for (x=0; x < nx_new; x++)  {
-
-            index_new = y*nx_new + x;
+            int index_new = y*nx_new + x;
 
             // always add data from current grid point
-            total = Data[two_to_one(x, y)];
+            double total = Data[two_to_one(x, y)];
 
             // add data from neighboring grid points based on staggered dimension
-
-            if (x_stag) {
-                total += Data[two_to_one(x+1,y)];
-            }
-            if (y_stag) {
-                total += Data[two_to_one(x,y+1)];
-            }
+            if(x_stag) total += Data[two_to_one(x+1,y)];
+            if(y_stag) total += Data[two_to_one(x,y+1)];
 
             // add diagonal point if staggered in both dimensions (may not occur)
-
-            if (x_stag && y_stag) {
-                total += Data[two_to_one(x+1,y+1)];
-            }
+            if(x_stag && y_stag) total += Data[two_to_one(x+1,y+1)];
 
             // divide the sum of the values by the weight to compute the average
-
             new_data[index_new] = total / weight;
+         }
+      }
+   } // End omp parallel
 
-        }
-    }
-
-    // replace data vector and size variables
-
-    Data = new_data;
-    Nx = nx_new;
-    Ny = ny_new;
-    Nxy = nxy_new;
+   // Replace data vector and size variables
+   Data = new_data;
+   Nx = nx_new;
+   Ny = ny_new;
+   Nxy = nxy_new;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void DataPlane::put(const double value, const int x, const int y) {
 
-void DataPlane::put(const double value, const int x, const int y)
+   if(Data.empty()) {
+      mlog << Error << "\nDataPlane::put() -> "
+           << "no data plane allocated!\n\n";
+      exit(1);
+   }
 
-{
+   //  the two_to_one function does range checking on x and y
+   const int n = two_to_one(x, y);
 
-if ( Data.empty() )  {
+   Data[n] = value;
 
-   mlog << Error
-        << "\n\n  DataPlane::put() -> no data plane allocated!\n\n";
-
-   exit ( 1 );
-
+   return;
 }
-
-const int n = two_to_one(x, y);   //  the two_to_one function does range checking on x and y
-
-Data[n] = value;
-
-return;
-
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
-   //
-   //  Note: this function could be speeded up a lot, I think
-   //
+bool DataPlane::fitwav_1d(const int start_wave, const int end_wave) {
+   const int unsigned mnw = (Nx + 1)/2;
 
-bool DataPlane::fitwav_1d_old(const int start_wave, const int end_wave)
-
-{
-
-int i, j, k;
-double * a = 0;
-double * b = 0;
-double * xa = 0;
-double * xb = 0;
-double xa0, value, angle;
-const unsigned int mnw = (Nx + 1)/2;
-
-   //
    // Check for bad data
-   //
+   for(int i=0; i<Nxy; ++i) {
+      if(is_bad_data(Data[i])) return false;
+   }
 
-for (j=0; j<Nxy; ++j)  {
-   if (is_bad_data(Data[j])) return false;
-}
-
-   //
    // Range check the requested wave numbers
-   //
+   if(start_wave < 0   || end_wave < 0 ||
+      start_wave > mnw || end_wave > mnw) {
+      mlog << Error << "\nDataPlane::fitwav_1d() -> "
+           << "Requested wave numbers (" << start_wave << " to " << end_wave
+           << ") must be between 0 and " << mnw << " for data with dimension "
+           << "(Nx, Ny) = (" << Nx << ", " << Ny << ")!\n\n";
+      exit(1);
+   }
 
-if ( start_wave < 0   || end_wave < 0 ||
-     start_wave > mnw || end_wave > mnw )  {
+   // Working vectors
+   vector<double> a  (mnw + 1);
+   vector<double> b  (mnw + 1);
+   vector<double> xa (mnw + 1);
+   vector<double> xb (mnw + 1);
+   vector<double> C  (Nx);
+   vector<double> S  (Nx);
 
-   mlog << Error << "\nDataPlane::fitwav_1d_old() -> "
-        << "Requested wave numbers (" << start_wave << " to " << end_wave
-        << ") must be between 0 and " << mnw << " for data with dimension "
-        << "(Nx, Ny) = (" << Nx << ", " << Ny << ")!\n\n";
+#pragma omp parallel default(none)         \
+   shared(a, b, xa, xb, C, S, Nx, Ny, mnw) \
+   shared(start_wave, end_wave)
+   {
 
-   exit ( 1 );
+#pragma omp for schedule (static)
 
+      for(int x=0; x<Nx; ++x) {
+         double angle = (twopi*x)/Nx;
+         C[x] = cos(angle);
+         S[x] = sin(angle);
+      } // for x
+
+      double xa0;
+      for(int y=0; y<Ny; ++y) {
+         xa0 = 0.0;
+         for(int x=0; x<Nx; ++x) {
+            xa0 += get(x, y);
+         } // for x
+
+         a[0] = xa0/Nx;
+         b[0] = 0.0;
+
+         for(int i=1; i<=mnw; ++i) {
+            xa[i] = xb[i] = 0.0;
+            for(int x=0; x<Nx; ++x)  {
+               int m = (i*x)%Nx;
+               xa[i] += (get(x, y))*(C[m]);
+               xb[i] += (get(x, y))*(S[m]);
+            } // for x
+
+            a[i] = (2.0*xa[i])/Nx;
+            b[i] = (2.0*xb[i])/Nx;
+
+         } // for i
+
+         for(int x=0; x<Nx; ++x) {
+            double value = 0.0;
+            for(int i=start_wave; i<=end_wave; ++i) {
+               int m = (i*x)%Nx;
+               value += (a[i])*(C[m]);
+               value += (b[i])*(S[m]);
+            } // for i
+
+            put(value, x, y);
+
+         } // for x
+      } // for y 
+   } // End omp parallel
+
+   return true;
 }
-
-   //
-   // Allocate memory
-   //
-
-a  = new double [mnw+1];
-b  = new double [mnw+1];
-xa = new double [mnw+1];
-xb = new double [mnw+1];
-
-for (j=0; j<Ny; ++j)  {
-
-   xa0 = 0.0;
-
-   for (k=0; k<Nx; ++k)  {
-
-      xa0 += get(k, j);
-
-   }   //  for k
-
-   a[0] = xa0/Nx;
-   b[0] = 0.0;
-
-   /////////////////////////////
-
-   for (i=1; i<=mnw; ++i)  {
-
-      xa[i] = xb[i] = 0.0;
-
-      for (k=0; k<Nx; ++k)  {
-
-         angle = (twopi*i*k)/Nx;
-
-         xa[i] += (get(k, j))*cos(angle);
-         xb[i] += (get(k, j))*sin(angle);
-
-      }   //  for k
-
-      a[i] = (2.0*xa[i])/Nx;
-      b[i] = (2.0*xb[i])/Nx;
-
-   }   //  for i
-
-   /////////////////////////////
-
-   for (k=0; k<Nx; ++k)  {
-
-      value = 0.0;
-
-      for (i=start_wave; i<=end_wave; ++i)  {
-
-         angle = (twopi*i*k)/Nx;
-
-         value += (a[i])*cos(angle);
-
-         value += (a[i])*sin(angle);
-
-      }   //  for i
-
-      put(value, k, j);
-
-   }   //  for k
-
-   /////////////////////////////
-
-}   //  for j
-
-
-   //
-   //  done
-   //
-
-if ( a )  { delete [] a;  a = 0; }
-if ( b )  { delete [] b;  b = 0; }
-
-if ( xa )  { delete [] xa;  xa = 0; }
-if ( xb )  { delete [] xb;  xb = 0; }
-
-return true;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-bool DataPlane::fitwav_1d(const int start_wave, const int end_wave)
-
-{
-
-int i, m, x, y;
-double *  a = 0;
-double *  b = 0;
-double * xa = 0;
-double * xb = 0;
-double *  C = 0;
-double *  S = 0;
-double xa0, value, angle;
-const int unsigned mnw = (Nx + 1)/2;
-// const int mnw = Nx - 1;
-
-// const time_t start_time = time(0);
-
-   //
-   // Check for bad data
-   //
-
-for (i=0; i<Nxy; ++i)  {
-   if (is_bad_data(Data[i])) return false;
-}
-
-   //
-   // Range check the requested wave numbers
-   //
-
-if ( start_wave < 0   || end_wave < 0 ||
-     start_wave > mnw || end_wave > mnw )  {
-
-   mlog << Error << "\nDataPlane::fitwav_1d() -> "
-        << "Requested wave numbers (" << start_wave << " to " << end_wave
-        << ") must be between 0 and " << mnw << " for data with dimension "
-        << "(Nx, Ny) = (" << Nx << ", " << Ny << ")!\n\n";
-
-   exit ( 1 );
-
-}
-
-   //
-   // Allocate memory
-   //
-
-a  = new double [ mnw + 1 ];
-b  = new double [ mnw + 1 ];
-xa = new double [ mnw + 1 ];
-xb = new double [ mnw + 1 ];
-
-C  = new double [ Nx ];
-S  = new double [ Nx ];
-
-for (x=0; x<Nx; ++x)  {
-
-   angle = (twopi*x)/Nx;
-
-   C[x] = cos(angle);
-
-   S[x] = sin(angle);
-
-}
-
-
-
-for (y=0; y<Ny; ++y)  {
-
-   xa0 = 0.0;
-
-   for (x=0; x<Nx; ++x)  {
-
-      xa0 += get(x, y);
-
-   }   //  for x
-
-   a[0] = xa0/Nx;
-   b[0] = 0.0;
-
-   /////////////////////////////
-
-   for (i=1; i<=mnw; ++i)  {
-
-      xa[i] = xb[i] = 0.0;
-
-      for (x=0; x<Nx; ++x)  {
-
-         m = (i*x)%Nx;
-
-         // angle = (twopi*i*x)/Nx;
-
-         // xa[i] += (get(x, y))*cos(angle);
-         // xb[i] += (get(x, y))*sin(angle);
-
-         xa[i] += (get(x, y))*(C[m]);
-         xb[i] += (get(x, y))*(S[m]);
-
-      }   //  for x
-
-      a[i] = (2.0*xa[i])/Nx;
-      b[i] = (2.0*xb[i])/Nx;
-
-   }   //  for i
-
-   /////////////////////////////
-
-   for (x=0; x<Nx; ++x)  {
-
-      value = 0.0;
-
-      for (i=start_wave; i<=end_wave; ++i)  {
-
-         m = (i*x)%Nx;
-
-         // angle = (twopi*i*x)/Nx;
-
-         // value += (a[i])*cos(angle);
-         // value += (b[i])*sin(angle);
-
-         value += (a[i])*(C[m]);
-         value += (b[i])*(S[m]);
-
-      }   //  for i
-
-      put(value, x, y);
-
-   }   //  for x
-
-   /////////////////////////////
-
-}   //  for y
-
-
-   //
-   //  done
-   //
-
-if ( a )  { delete [] a;  a = 0; }
-if ( b )  { delete [] b;  b = 0; }
-
-if ( xa )  { delete [] xa;  xa = 0; }
-if ( xb )  { delete [] xb;  xb = 0; }
-
-if ( C )  { delete [] C;  C = 0; }
-if ( S )  { delete [] S;  S = 0; }
-
-   //
-   //  done
-   //
-
-return true;
-
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-//  End Code for class DataPlane
+// Begin Code for class DataPlaneArray
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-   //
-   //  Code for class DataPlaneArray
-   //
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-DataPlaneArray::DataPlaneArray()
-
-{
-
-init_from_scratch();
-
+DataPlaneArray::DataPlaneArray() {
+   init_from_scratch();
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
-DataPlaneArray::~DataPlaneArray()
-
-{
-
-clear();
-
+DataPlaneArray::~DataPlaneArray() {
+   clear();
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
-DataPlaneArray::DataPlaneArray(const DataPlaneArray & a)
-
-{
-
-init_from_scratch();
-
-assign(a);
-
+DataPlaneArray::DataPlaneArray(const DataPlaneArray & a) {
+   init_from_scratch();
+   assign(a);
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
-DataPlaneArray & DataPlaneArray::operator=(const DataPlaneArray & a)
-
-{
-
-if ( this == &a )  return *this;
-
-assign(a);
-
-return *this;
-
+DataPlaneArray & DataPlaneArray::operator=(const DataPlaneArray & a) {
+   if(this == &a) return *this;
+   assign(a);
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1285,21 +1096,28 @@ DataPlaneArray & DataPlaneArray::operator+=(const DataPlaneArray &d) {
       exit(1);
    }
 
-   double v;
-   for(int i=0; i<Nplanes; i++) {
+#pragma omp parallel default(none)         \
+   shared(mlog, Error, method_name)        \
+   shared(Nplanes, Lower, Upper, Plane, d)
+   {
 
-      // Check for matching level values
-      if(Lower[i] != d.Lower[i] || Upper[i] != d.Upper[i]) {
-         mlog << Error << "\n" << method_name
-              << "for level " << i+1 << " the lower and upper values do not match: ("
-              << Lower[i] << ", " << Upper[i] << ") != ("
-              << d.Lower[i] << ", " << d.Upper[i] << ")\n\n";
-         exit(1);
+#pragma omp for schedule (static)
+
+      for(int i=0; i<Nplanes; i++) {
+
+         // Check for matching level values
+         if(Lower[i] != d.Lower[i] || Upper[i] != d.Upper[i]) {
+            mlog << Error << "\n" << method_name
+                 << "for level " << i+1 << " the lower and upper values do not match: ("
+                 << Lower[i] << ", " << Upper[i] << ") != ("
+                 << d.Lower[i] << ", " << d.Upper[i] << ")\n\n";
+            exit(1);
+         }
+
+         // Increment values for each level
+         Plane[i] += d.Plane[i];
       }
-
-      // Increment values for each level
-      *Plane[i] += *d.Plane[i];
-   }
+   } // End omp parallel
 
    return *this;
 }
@@ -1308,524 +1126,304 @@ DataPlaneArray & DataPlaneArray::operator+=(const DataPlaneArray &d) {
 
 DataPlaneArray & DataPlaneArray::operator/=(const double v) {
 
-   for(int i=0; i<Nplanes; i++) *Plane[i] /= v;
+#pragma omp parallel default(none) \
+   shared(Nplanes, Plane, v)
+   {
+
+#pragma omp for schedule (static)
+
+      for(int i=0; i<Nplanes; i++) Plane[i] /= v;
+
+   } // End omp parallel
 
    return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void DataPlaneArray::init_from_scratch() {
 
-void DataPlaneArray::init_from_scratch()
+   clear();
 
-{
-
-Lower = (double *) nullptr;
-Upper = (double *) nullptr;
-
-Plane = (DataPlane **) nullptr;
-
-Nplanes = 0;
-
-clear();
-
-return;
-
+   return;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void DataPlaneArray::clear() {
 
-void DataPlaneArray::clear()
+   Lower.clear();
+   Upper.clear();
+   Plane.clear();
+   Nplanes = 0;
 
-{
+   return;
+}
 
-if ( Nplanes > 0 )  {
+///////////////////////////////////////////////////////////////////////////////
 
-   int j;
+void DataPlaneArray::assign(const DataPlaneArray & a) {
 
-   for (j=0; j<Nplanes; ++j)  {
+   Lower   = a.Lower;
+   Upper   = a.Upper;
+   Plane   = a.Plane;
+   Nplanes = a.Nplanes;
 
-      if ( Plane[j] )  { delete Plane[j];  Plane[j] = (DataPlane *) nullptr; }
+   return;
+}
 
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlaneArray::extend(int n) {
+
+   if(n <= Nplanes)  return;
+
+   Lower.reserve(n);
+   Upper.reserve(n);
+   Plane.reserve(n);
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlaneArray::add(const DataPlane & p, double _low, double _up) {
+
+   check_xy_size(p);
+
+   Lower.emplace_back(_low);
+   Upper.emplace_back(_up);
+   Plane.emplace_back(p);
+
+   Nplanes++;
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlaneArray::check_xy_size(const DataPlane & p) const {
+
+   if(Nplanes == 0) return;
+
+   if((p.nx() != Plane[0].nx()) || (p.ny() != Plane[0].ny())) {
+      mlog << Error << "\nDataPlaneArray::check_xy_size(const DataPlane &) const -> "
+           << "(Nx, Ny) dimensions does not match ("
+           << p.nx() << ", " << p.ny() << ") != ("
+           << Plane[0].nx() << ", " << Plane[0].ny() << ")!\n\n";
+      exit(1);
    }
 
-   delete [] Plane;  Plane = (DataPlane **) nullptr;
-
+   return;
 }
 
-Nplanes = 0;
-Nalloc  = 0;
+///////////////////////////////////////////////////////////////////////////////
 
-AllocInc = dataplane_default_alloc_inc;
+double DataPlaneArray::data(int p, int x, int y) const {
 
-   //
-   //  done
-   //
+   // Range check
+   if((p < 0) || (p >= Nplanes)) {
+      mlog << Error << "\nDataPlaneArray::data() -> "
+           << "range check error for " << p << " in (0, " << Nplanes
+           << ")!\n\n";
+      exit(1);
+   }
 
-return;
+   return Plane[p].get(x,y);
+}
 
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlaneArray::set(double v, int p, int x, int y) {
+
+   // Range check
+   if((p < 0) || (p >= Nplanes)) {
+      mlog << Error << "\nDataPlaneArray::set() -> "
+           << "range check error for " << p << " in (0, " << Nplanes
+           << ")!\n\n";
+      exit(1);
+   }
+
+   Plane[p].set(v, x, y);
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlaneArray::set_levels(int n, double _low, double _up) {
+
+   // Range check
+   if((n < 0) || (n >= Nplanes)) {
+      mlog << Error << "\nDataPlaneArray::set_levels() -> "
+           << "range check error for " << n << " in (0, " << Nplanes
+           << ")!\n\n";
+      exit(1);
+   }
+
+   if(_low > _up) {
+      mlog << Error << "\nDataPlaneArray::set_levels() -> "
+           << "low level (" << _low << ") > up level (" << _up << ")!\n\n";
+      exit(1);
+   }
+
+   Lower[n] = _low;
+   Upper[n] = _up;
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlaneArray::levels(int n, double & _low, double & _up) const {
+
+   // Range check
+   if((n < 0) || (n >= Nplanes)) {
+      mlog << Error << "\nDataPlaneArray::levels() -> "
+           << "range check error for " << n << " in (0, " << Nplanes
+           << ")!\n\n";
+      exit(1);
+   }
+
+   _up  = Upper [n];
+   _low = Lower [n];
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlaneArray::level_range(double & _low, double & _up) const {
+
+   _low = _up = bad_data_int;
+
+   for(int j=0; j<Nplanes; ++j)  {
+      if(is_bad_data(_low) || Lower[j] <= _low) _low = Lower[j];
+      if(is_bad_data(_up)  || Upper[j] >= _up ) _up  = Upper[j];
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+int DataPlaneArray::nx() const {
+
+   // Range check
+   if(Nplanes == 0) {
+      mlog << Error << "\nDataPlaneArray::nx() const -> "
+           << "array is empty!\n\n";
+      exit(1);
+   }
+
+   return Plane[0].nx();
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
+int DataPlaneArray::ny() const {
 
-void DataPlaneArray::assign(const DataPlaneArray & a)
+   // Range check
+   if(Nplanes == 0) {
+      mlog << Error << "\nDataPlaneArray::ny() const -> "
+           << "array is empty!\n\n";
+      exit(1);
+   }
 
-{
-
-clear();
-
-if ( a.Nplanes == 0 )  return;
-
-extend(a.Nplanes);
-
-AllocInc = a.AllocInc;
-
-int j;
-
-for (j=0; j<a.Nplanes; ++j)  {
-
-   add( *(a.Plane[j]), a.Lower[j], a.Upper[j] );
-
+   return Plane[0].ny();
 }
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void DataPlaneArray::dump(ostream & out, int depth) const {
 
-void DataPlaneArray::extend(int n, bool exact)
+   Indent prefix(depth);
 
-{
+   out << prefix << "Nplanes  = " << Nplanes                    << '\n';
+   out << prefix << "Nx       = " << ((Nplanes > 0) ? nx() : 0) << '\n';
+   out << prefix << "Ny       = " << ((Nplanes > 0) ? ny() : 0) << '\n';
 
-if ( Nalloc >= n )  return;
+   for(int j=0; j<Nplanes; ++j)  {
+      out << prefix << "Level " << j << "  = "
+          << '[' << Lower[j] << ", " << Upper[j] << ']'
+          << '\n';
+   } // for j
 
-int j, k;
-DataPlane ** p = (DataPlane **) nullptr;
-double * b = (double *) nullptr;
-double * t = (double *) nullptr;
+   out.flush();
 
-if ( ! exact )  {
-
-   k = (n + AllocInc - 1)/AllocInc;
-   n = k*AllocInc;
-
+   return;
 }
-
-p = new DataPlane * [n];
-b = new double      [n];
-t = new double      [n];
-
-for (j=0; j<n; ++j)  {
-
-   p[j] = (DataPlane *) nullptr;
-
-   b[j] = t[j] = 0.0;
-
-}
-
-if ( Plane )  {
-
-   for (j=0; j<Nplanes; ++j)  {
-
-      p[j] = Plane[j];
-
-      b[j] = Lower[j];
-
-      t[j] = Upper[j];
-
-   }   //  for j;
-
-   delete [] Plane;  Plane = (DataPlane **) nullptr;
-   delete [] Lower;  Lower = (double *)     nullptr;
-   delete [] Upper;  Upper = (double *)     nullptr;
-}
-
-Plane = p;
-
-Lower = b;
-
-Upper = t;
-
-p = (DataPlane **) nullptr;
-b = (double *)     nullptr;
-t = (double *)     nullptr;
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
+double DataPlaneArray::lower(int n) const {
 
-void DataPlaneArray::add(const DataPlane & p, double _low, double _up)
+   // Range check
+   if((n < 0) || (n >= Nplanes)) {
+      mlog << Error << "\nDataPlaneArray::lower() -> "
+           << "range check error for " << n << " in (0, " << Nplanes
+           << ")!\n\n";
+      exit(1);
+   }
 
-{
-
-check_xy_size(p);
-
-extend(Nplanes + 1, false);
-
-Plane[Nplanes] = new DataPlane;
-
-*(Plane[Nplanes]) = p;
-
-Lower[Nplanes] = _low;
-Upper[Nplanes] = _up;
-
-++Nplanes;
-
-
-   //
-   //  done
-   //
-
-return;
-
+   return Lower[n];
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
+double DataPlaneArray::upper(int n) const {
 
-void DataPlaneArray::check_xy_size(const DataPlane & p) const
+   // Range check
+   if((n < 0) || (n >= Nplanes)) {
+      mlog << Error << "\nDataPlaneArray::upper() -> "
+           << "range check error for " << n << " in (0, " << Nplanes
+           << ")!\n\n";
+      exit(1);
+   }
 
-{
-
-if ( Nplanes == 0 )  return;
-
-if ( (p.nx() != Plane[0]->nx()) || (p.ny() != Plane[0]->ny()) )  {
-
-   mlog << Error << "\nDataPlaneArray::check_xy_size(const DataPlane &) const -> wrong size!\n\n";
-
-   exit ( 1 );
-
+   return Upper[n];
 }
-
-return;
-
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
+const DataPlane & DataPlaneArray::operator[](int n) const {
 
-double DataPlaneArray::data(int p, int x, int y) const
+   // Range check
+   if((n < 0) || (n >= Nplanes)) {
+      mlog << Error << "\nDataPlaneArray::operator[](int) const -> "
+           << "range check error for " << n << " in (0, " << Nplanes
+           << ")!\n\n";
+      exit(1);
+   }
 
-{
-
-if ( (p < 0) || (p >= Nplanes) )  {
-
-   mlog << Error << "\nDataPlaneArray::data() -> range check error!\n\n";
-
-   exit ( 1 );
-
+   return Plane[n];
 }
-
-double value = Plane[p]->get(x, y);
-
-return value;
-
-}
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
+DataPlane & DataPlaneArray::at(int n) {
 
-void DataPlaneArray::set(double v, int p, int x, int y)
+   // Range check
+   if((n < 0) || (n >= Nplanes)) {
+      mlog << Error << "\nDataPlaneArray::at(int) const -> "
+           << "range check error for " << n << " in (0, " << Nplanes
+           << ")!\n\n";
+      exit(1);
+   }
 
-{
-
-if ( (p < 0) || (p >= Nplanes) )  {
-
-   mlog << Error << "\nDataPlaneArray::set() -> range check error!\n\n";
-
-   exit ( 1 );
-
+   return Plane[n];
 }
-
-Plane[p]->set(v, x, y);
-
-return;
-
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void DataPlaneArray::replace_bad_data(const double value) {
 
-void DataPlaneArray::set_alloc_inc(int n)
+   for(int j=0; j<Nplanes; ++j)  {
+      Plane[j].replace_bad_data(value);
+   }
 
-{
-
-if ( n <= 0 )  {
-
-   mlog << Error << "\nvoid DataPlaneArray::set_alloc_inc(int) -> bad value ... " << n << "\n\n";
-
-   exit ( 1 );
-
+   return;
 }
-
-AllocInc = n;
-
-return;
-
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
-
-
-void DataPlaneArray::set_levels(int n, double _low, double _up)
-
-{
-
-if ( (n < 0) || (n >= Nplanes) )  {
-
-   mlog << Error << "\nDataPlaneArray::set_levels(int, double, double) -> bad level index ... " << n << "\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( _low > _up )  {
-
-   mlog << Error << "\nDataPlaneArray::set_levels(int, double, double) -> lowtom level > up level!\n\n";
-
-   exit ( 1 );
-}
-
-Lower[n] = _low;
-Upper[n] = _up;
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void DataPlaneArray::levels(int n, double & _low, double & _up) const
-
-{
-
-if ( (n < 0) || (n >= Nplanes) )  {
-
-   mlog << Error << "\nDataPlaneArray::level(int, double &, double &) -> bad plane index ... " << n << "\n\n";
-
-   exit ( 1 );
-
-}
-
-_up  = Upper [n];
-_low = Lower [n];
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void DataPlaneArray::level_range(double & _low, double & _up) const
-
-{
-
-int j;
-
-_low = _up = bad_data_int;
-
-for (j=0; j<Nplanes; ++j)  {
-
-   if ( is_bad_data(_low) || Lower[j] <= _low ) _low = Lower[j];
-   if ( is_bad_data(_up)  || Upper[j] >= _up  ) _up  = Upper[j];
-
-}
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-int DataPlaneArray::nx() const
-
-{
-
-if ( Nplanes == 0 )  {
-
-   mlog << Error << "\nDataPlaneArray::nx() const -> array is empty!\n\n";
-
-   exit ( 1 );
-
-}
-
-return ( Plane[0]->nx() );
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-int DataPlaneArray::ny() const
-
-{
-
-if ( Nplanes == 0 )  {
-
-   mlog << Error << "\nDataPlaneArray::ny() const -> array is empty!\n\n";
-
-   exit ( 1 );
-
-}
-
-return ( Plane[0]->ny() );
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void DataPlaneArray::dump(ostream & out, int depth) const
-
-{
-
-Indent prefix(depth);
-
-out << prefix << "Nplanes  = " << Nplanes    << '\n';
-out << prefix << "Nalloc   = " << Nalloc     << '\n';
-out << prefix << "AllocInc = " << AllocInc   << '\n';
-out << prefix << "Nx       = " << ((Nplanes > 0) ? nx() : 0) << '\n';
-out << prefix << "Ny       = " << ((Nplanes > 0) ? ny() : 0) << '\n';
-
-int j;
-
-for (j=0; j<Nplanes; ++j)  {
-
-   out << prefix << "Level " << j << "  = "
-       << '[' << Lower[j] << ", " << Upper[j] << ']'
-       << '\n';
-
-}   //  for j
-
-
-
-   //
-   //  done
-   //
-
-out.flush();
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-double DataPlaneArray::lower(int n) const
-
-{
-
-if ( (n < 0) || (n >= Nplanes) )  {
-
-   mlog << Error << "\nDataPlaneArray::lower(int) const -> bad plane index ... " << n << "\n\n";
-
-   exit ( 1 );
-
-}
-
-return ( Lower[n] );
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-double DataPlaneArray::upper(int n) const
-
-{
-
-if ( (n < 0) || (n >= Nplanes) )  {
-
-   mlog << Error << "\nDataPlaneArray::upper(int) const -> bad plane index ... " << n << "\n\n";
-
-   exit ( 1 );
-
-}
-
-return ( Upper[n] );
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-DataPlane & DataPlaneArray::operator[](int n) const
-
-{
-
-if ( (n < 0) || (n >= Nplanes) )  {
-
-   mlog << Error << "\nDataPlaneArray::operator[](int) const -> bad plane index ... " << n << "\n\n";
-
-   exit ( 1 );
-
-}
-
-return ( *(Plane[n]) );
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void DataPlaneArray::replace_bad_data(const double value)
-
-{
-
-int j;
-
-for (j=0; j<Nplanes; ++j)  {
-
-   Plane[j]->replace_bad_data(value);
-
-}
-
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-
-
