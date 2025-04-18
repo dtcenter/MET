@@ -1416,10 +1416,7 @@ static DataPlane combine(const DataPlane &dp_data,
    }
 
    // Pass timing information through
-   dp.set_init (dp_data.init());
-   dp.set_valid(dp_data.valid());
-   dp.set_lead (dp_data.lead());
-   dp.set_accum(dp_data.accum());
+   dp.set_times(dp_data);
 
    // Set the output data plane size
    dp.set_size(grid.nx(), grid.ny());
