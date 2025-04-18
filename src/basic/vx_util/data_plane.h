@@ -84,6 +84,7 @@ class DataPlane {
       void set_valid(unixtime);
       void set_lead(int);
       void set_accum(int);
+      void set_times(const DataPlane &);
 
       void set_all(float *data, int nx, int ny);
 
@@ -133,8 +134,8 @@ class DataPlane {
 
       MaskPlane mask_plane() const;
 
-    void shift_right  (int n);
-    void destagger (bool x_stag, bool y_stag);
+      void shift_right  (int n);
+      void destagger (bool x_stag, bool y_stag);
 
       void put(const double, const int __x__, const int __y__);
 

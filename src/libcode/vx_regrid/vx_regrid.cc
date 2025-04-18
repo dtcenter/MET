@@ -100,10 +100,7 @@ DataPlane met_regrid_generic(const DataPlane & from_data,
       {
          // Set the size and timing info
          to_data.set_size (to_grid.nx(), to_grid.ny());
-         to_data.set_init (from_data.init());
-         to_data.set_valid(from_data.valid());
-         to_data.set_lead (from_data.lead());
-         to_data.set_accum(from_data.accum());
+         to_data.set_times(from_data);
       }
 
 #pragma omp for schedule (static)
@@ -167,10 +164,7 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
          // Set the size and timinig info
          to_data.set_size (to_grid.nx(), to_grid.ny());
          wt_data.set_size (to_grid.nx(), to_grid.ny());
-         to_data.set_init (from_data.init());
-         to_data.set_valid(from_data.valid());
-         to_data.set_lead (from_data.lead());
-         to_data.set_accum(from_data.accum());
+         to_data.set_times(from_data);
 
          // Initialize the values
          to_data.set_constant(0.0);
@@ -265,10 +259,7 @@ DataPlane met_regrid_maxgauss(const DataPlane & from_data,
       {
          // Set the size and timing info
          to_data.set_size (to_grid.nx(), to_grid.ny());
-         to_data.set_init (from_data.init());
-         to_data.set_valid(from_data.valid());
-         to_data.set_lead (from_data.lead());
-         to_data.set_accum(from_data.accum());
+         to_data.set_times(from_data);
       }
 
 #pragma omp for schedule (static)

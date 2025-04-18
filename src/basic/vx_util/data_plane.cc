@@ -15,8 +15,9 @@
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
-//   000    11-01-11  Halley Gotway
-//   001    22-09-29  Prestopnik     MET #2227 Remove namespace std from header files
+//   000    01-11-11  Halley Gotway
+//   001    09-29-22  Prestopnik     MET #2227 Remove namespace std from header files
+//   002    04-18-25  Halley Gotway  MET #3132 OpenMP
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -343,17 +344,23 @@ void DataPlane::set_block(double *v, int nx, int ny) {
            << ny << " should be equal or less than " << Ny << "\n\n\n";
       exit(1);
    }
-   
-   int offset = 0;
-   //Note: v should be a row first & the size is (nx * ny).
-   //      implemented based on two_to_one("n = y*Nx + x").
-   for (int y=0; y < ny; y++) {
-      int dp_offset = two_to_one(0, y);
-      for (int x=0; x < nx; x++) {
-         Data[dp_offset+x] = v[offset++];
+
+#pragma omp parallel default(none) \
+   shared(Data, v, nx, ny, DefaultTO)
+   {
+
+#pragma omp for schedule (static)
+
+      // Note: v should be a row first & the size is (nx * ny).
+      //       implemented based on two_to_one("n = y*Nx + x").
+      for(int offset=0; offset < nx*ny; offset++) {
+         int x;
+         int y;
+         DefaultTO.one_to_two(nx, ny, offset, x, y);
+         Data[two_to_one(x, y)] = v[offset];
       }
-   }
-   
+   } // End of omp parallel
+
    return;
 }
 
@@ -397,6 +404,16 @@ void DataPlane::set_lead(int s) {
 
 void DataPlane::set_accum(int s) {
    AccumTime = s;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void DataPlane::set_times(const DataPlane &dp) {
+   InitTime  = dp.InitTime;
+   ValidTime = dp.ValidTime;
+   LeadTime  = dp.LeadTime;
+   AccumTime = dp.AccumTime;
    return;
 }
 
