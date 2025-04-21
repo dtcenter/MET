@@ -521,15 +521,9 @@ void DataPlane::convert(const UserFunc_1Arg &convert_fx) {
 
    mlog << Debug(3) << "Applying conversion function.\n";
  
-#pragma omp parallel default(none) \
-   shared(Data, Nxy, convert_fx)
-   {
-
-#pragma omp for schedule(static)
-      for(int i=0; i<Nxy; i++) {
-         if(!is_bad_data(buf()[i])) buf()[i] = convert_fx(buf()[i]);
-      }
-   } // End omp parallel
+   for(int i=0; i<Nxy; i++) {
+      if(!is_bad_data(Data[i])) Data[i] = convert_fx(Data[i]);
+   }
 
    return;
 }
