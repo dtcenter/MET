@@ -42,6 +42,7 @@ on:
 
 env:
   DOCKERHUB_REPO: dtcenter/met-dev
+  OMP_NUM_THREADS: 4
 
 jobs:
 
