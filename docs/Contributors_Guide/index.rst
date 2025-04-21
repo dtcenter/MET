@@ -15,6 +15,7 @@ Welcome to the Model Evaluation Tools (MET) Contributor's Guide.
    github_workflow
    testing
    continuous_integration
+   code_profiling
    dockerhub
    documentation
    templates
