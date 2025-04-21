@@ -27,7 +27,6 @@
 
 using namespace std;
 
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Code for struct SurfaceInfo
@@ -53,7 +52,8 @@ SurfaceInfo::SurfaceInfo() {
 //
 ////////////////////////////////////////////////////////////////////////
 
-NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, double x_dbl, double y_dbl) {
+NumArray interp_points(const DataPlane &dp, const GridTemplate &gt,
+                       double x_dbl, double y_dbl) {
    int x = nint(x_dbl);
    int y = nint(y_dbl);
 
@@ -68,12 +68,13 @@ NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, double x_dbl
 
 ////////////////////////////////////////////////////////////////////////
 
-NumArray interp_points(const DataPlane &dp, const GridTemplate &gt, int x, int y) {
+NumArray interp_points(const DataPlane &dp, const GridTemplate &gt,
+                       int x, int y) {
    NumArray points;
+   points.extend(gt.size());
 
    // Search the neighborhood, storing any points off the grid as bad data
-   GridPoint *gp = nullptr;
-   for(gp = gt.getFirst(x, y, dp.nx(), dp.ny());
+   for(GridPoint *gp = gt.getFirst(x, y, dp.nx(), dp.ny());
        gp != nullptr; gp = gt.getNext()) {
       if(gp->x < 0 || gp->x >= dp.nx() ||
          gp->y < 0 || gp->y >= dp.ny()) {
@@ -97,14 +98,11 @@ double interp_min(const DataPlane &dp, const GridTemplate &gt,
    double min_v = bad_data_double;
 
    // Search the neighborhood
-   GridPoint *gp = nullptr;
-   for(gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
-      if(mp) {
-         if(!(*mp)(gp->x, gp->y)) continue;
-      }
+      if(mp && !(*mp)(gp->x, gp->y)) continue;
 
       double v = dp.get(gp->x, gp->y);
       if(is_bad_data(v)) continue;
@@ -170,9 +168,7 @@ double interp_max(const DataPlane &dp, const GridTemplate &gt,
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
-      if(mp) {
-         if(!(*mp)(gp->x, gp->y)) continue;
-      }
+      if(mp && !(*mp)(gp->x, gp->y)) continue;
 
       double v = dp.get(gp->x, gp->y);
       if(is_bad_data(v)) continue;
@@ -228,83 +224,60 @@ double interp_max_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t
 double interp_median(const DataPlane &dp, const GridTemplate &gt,
                      int x, int y, double t, const MaskPlane *mp) {
 
-   double *data = (double *) nullptr;
-   int num_good_points = 0;
-   int num_points = gt.size();
-   double median_v;
+   // Points for sorting
+   NumArray points;
+   points.extend(gt.size());
 
-   // Allocate space to store the data points for sorting
-   data = new double [gt.size()];
-
-   // Search the neighborhood
+   // Store the neighborhood points
    for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
-      if(mp) {
-         if(!(*mp)(gp->x, gp->y)) continue;
-      }
+      if(mp && !(*mp)(gp->x, gp->y)) continue;
 
       double v = dp.get(gp->x, gp->y);
-      if(is_bad_data(v)) continue;
 
-      data[num_good_points] = v;
-      num_good_points++;
+      // Store valid data
+      if(!is_bad_data(v)) points.add(v);
    }
 
-   // Check whether enough valid grid points were found to trust
-   // the value computed
-   if((num_points == 0) ||
-      ((static_cast<double>(num_good_points) / num_points) < t )) {
-      median_v = bad_data_double;
+   // Check valid data threshold
+   double median_v = bad_data_double;
+   if((double) points.n()/gt.size() >= t) {
+      median_v = points.percentile_array(0.50);
    }
-   else {
-      sort(data, num_good_points);
-      median_v = percentile(data, num_good_points, 0.50);
-   }
-
-   delete[] data;
 
    return median_v;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
 double interp_median_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, double t) {
-   double *data = (double *) nullptr;
-   int x, y, count;
-   double v, median_v;
 
-   // Allocate space to store the data points
-   data = new double [wdth*wdth];
+   // Points for sorting
+   NumArray points;
+   points.extend(wdth*wdth);
 
    // Search the neighborhood for valid data points
-   count = 0;
-   for(x=x_ll; x<x_ll+wdth; x++) {
+   int count = 0;
+   for(int x=x_ll; x<x_ll+wdth; x++) {
       if(x < 0 || x >= dp.nx()) continue;
 
-      for(y=y_ll; y<y_ll+wdth; y++) {
-         if(y < 0 || y >= dp.ny())     continue;
-         if(is_bad_data(dp.get(x, y))) continue;
+      for(int y=y_ll; y<y_ll+wdth; y++) {
+         if(y < 0 || y >= dp.ny()) continue;
 
-         v = dp.get(x, y);
-         data[count] = v;
-         count++;
+         double v = dp.get(x, y);
+ 
+         // Store valid data
+         if(!is_bad_data(v)) points.add(v);
       } // end for y
    } // end for x
 
-   // Check whether enough valid grid points were found to compute
-   // a median value
-   if((double) count/(wdth*wdth) < t || count == 0) {
-      median_v = bad_data_double;
+   // Check valid data threshold
+   double median_v = bad_data_double;
+   if((double) points.n()/(wdth*wdth) >= t) {
+      median_v = points.percentile_array(0.50);
    }
-   else {
-      sort(data, count);
-      median_v = percentile(data, count, 0.50);
-   }
-
-   if(data) { delete [] data; data = (double *) nullptr; }
 
    return median_v;
 }
@@ -313,7 +286,6 @@ double interp_median_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, doubl
 
 double interp_uw_mean(const DataPlane &dp, const GridTemplate &gt,
                       int x, int y, double t, const MaskPlane *mp) {
-
    double sum = 0;
    int num_good_points = 0;
    int num_points = gt.size();
@@ -324,9 +296,7 @@ double interp_uw_mean(const DataPlane &dp, const GridTemplate &gt,
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
-      if(mp) {
-         if(!(*mp)(gp->x, gp->y)) continue;
-      }
+      if(mp && !(*mp)(gp->x, gp->y)) continue;
 
       double v = dp.get(gp->x, gp->y);
       if (is_bad_data(v)) continue;
@@ -410,9 +380,7 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
-      if(mp) {
-         if(!(*mp)(gp->x, gp->y)) continue;
-      }
+      if(mp && !(*mp)(gp->x, gp->y)) continue;
 
       x = gp->x;
       y = gp->y;
@@ -511,9 +479,7 @@ double interp_ls_fit(const DataPlane &dp, const GridTemplate &gt,
          if(is_bad_data(dp.get(x, y))) continue;
 
          // Check the optional mask
-         if(mp) {
-            if(!(*mp)(x, y)) continue;
-         }
+         if(mp && !(*mp)(x, y)) continue;
 
          z = dp.get(x, y);
          count++;
@@ -661,9 +627,7 @@ double interp_geog_match(const DataPlane &dp, const GridTemplate &gt,
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
-      if(mp) {
-         if(!(*mp)(gp->x, gp->y)) continue;
-      }
+      if(mp && !(*mp)(gp->x, gp->y)) continue;
 
       // Get the current value
       x = gp->x;
@@ -715,9 +679,7 @@ double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
-      if(mp) {
-         if(!(*mp)(gp->x, gp->y)) continue;
-      }
+      if(mp && !(*mp)(gp->x, gp->y)) continue;
 
       double data = dp.get(gp->x, gp->y);
       if(is_bad_data(data)) continue;
@@ -850,9 +812,7 @@ double interp_xy(const DataPlane &dp, bool wrap_lon, int x, int y,
    x = (wrap_lon ? positive_modulo(x, dp.nx()) : x);
 
    // Check the optional mask
-   if(mp) {
-      if(!(*mp)(x, y)) return bad_data_double;
-   }
+   if(mp && !(*mp)(x, y)) return bad_data_double;
 
    if(x < 0 || x >= dp.nx() || y < 0 || y >= dp.ny()) v = bad_data_double;
    else                                               v = dp.get(x, y);
@@ -879,9 +839,7 @@ double interp_best(const DataPlane &dp, const GridTemplate &gt,
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
-      if(mp) {
-         if(!(*mp)(x, y)) continue;
-      }
+      if(mp && !(*mp)(x, y)) continue;
 
       v = dp.get(gp->x, gp->y);
       if (is_bad_data(v)) continue;
