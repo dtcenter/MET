@@ -350,10 +350,9 @@ void DataPlane::set_block(double *v, int nx, int ny) {
    shared(Data, v, nx, ny, nxy, DefaultTO)
    {
 
-#pragma omp for schedule(static)
-
       // Note: v should be a row first & the size is (nx * ny).
       //       implemented based on two_to_one("n = y*Nx + x").
+#pragma omp for schedule(static)
       for(int offset=0; offset < nxy; offset++) {
          int x;
          int y;
@@ -435,7 +434,6 @@ void DataPlane::set_all(float *data, int nx, int ny) {
    {
 
 #pragma omp for schedule(static)
-
       for(int x=0; x<nx; ++x) {
          for(int y=0; y<ny; ++y) {
             int index = two_to_one(x, y);
@@ -470,9 +468,8 @@ int DataPlane::n_good_data() const {
    shared(Data, n)
    {
 
-#pragma omp for schedule(static)
-
       // Count number of good data values
+#pragma omp for schedule(static)
       for(int j=0; j<Nxy; ++j) {
          if(!is_bad_data(Data[j])) n++;
       }
@@ -506,7 +503,6 @@ void DataPlane::threshold(const SingleThresh &st) {
    {
 
 #pragma omp for schedule(static)
-
       for(int j=0; j<Nxy; ++j) {
          if(is_bad_data(Data[j])) continue;
          if(st.check(Data[j]))    Data[j] = 1.0;
@@ -530,7 +526,6 @@ void DataPlane::convert(const UserFunc_1Arg &convert_fx) {
    {
 
 #pragma omp for schedule(static)
-
       for(int i=0; i<Nxy; i++) {
          if(!is_bad_data(buf()[i])) buf()[i] = convert_fx(buf()[i]);
       }
@@ -553,16 +548,10 @@ void DataPlane::censor(const ThreshArray &censor_thresh,
       NumArray d;
       d.extend(Nxy);
 
-#pragma omp parallel default(none) \
-   shared(Data, d)
-   {
-
-#pragma omp for schedule(static)
-
+      // Store valid data values
       for(int i=0; i<Nxy; i++) {
          if(!is_bad_data(Data[i])) d.add(Data[i]);
       }
-   } // End omp parallel
 
       ta.set_perc(&d, &d, &d, &d);
    }
@@ -578,9 +567,8 @@ void DataPlane::censor(const ThreshArray &censor_thresh,
    shared(Data, Nxy, ta, censor_val, count)
    {
 
-#pragma omp for schedule(static)
-
       // Loop through the points and apply all the censor thresholds
+#pragma omp for schedule(static)
       for(int i=0; i<Nxy; i++) {
          for(int j=0; j<ta.n_elements(); j++) {
 
@@ -618,9 +606,8 @@ void DataPlane::anomaly(const DataPlane &mn) {
    shared(Data, Nxy, mn)
    {
 
-#pragma omp for schedule(static)
-
       // Subtract the mean
+#pragma omp for schedule(static)
       for(int i=0; i<Nxy; i++) {
          if(is_bad_data(Data[i]) || is_bad_data(mn.Data[i])) {
             Data[i] = bad_data_double;
@@ -653,9 +640,8 @@ void DataPlane::standard_anomaly(const DataPlane &mn,
    shared(Data, Nxy, mn, sd)
    {
 
-#pragma omp for schedule(static)
-
       // Subtract the mean and divide by the standard deviation
+#pragma omp for schedule(static)
       for(int i=0; i<Nxy; i++) {
          if(is_bad_data(Data[i])    ||
             is_bad_data(mn.Data[i]) ||
@@ -681,7 +667,6 @@ void DataPlane::replace_bad_data(const double value) {
    {
 
 #pragma omp for schedule(static)
-
       for(int i=0; i<Nxy; i++) {
          if(is_bad_data(Data[i])) Data[i] = value;
       }
@@ -699,7 +684,6 @@ void DataPlane::set_all_to_bad_data() {
    {
 
 #pragma omp for schedule(static)
-
       for(int i=0; i<Nxy; i++) {
          Data[i] = bad_data_double;
       }
@@ -787,7 +771,6 @@ void DataPlane::data_range(double & data_min, double & data_max) const {
    {
 
 #pragma omp for schedule(static)
-
       for(int j=0; j<Nxy; ++j) {
 
          double value = Data[j];
@@ -824,7 +807,6 @@ MaskPlane DataPlane::mask_plane() const {
    {
 
 #pragma omp for schedule(static)
-
       for(int i=0; i<Nxy; i++) {
          mp.buf()[i] = (is_bad_data(Data[i]) ? false : !is_eq(Data[i], 0.0));
       }
@@ -865,7 +847,6 @@ void DataPlane::shift_right(int N) {
    {
 
 #pragma omp for schedule(static)
-
       for(int x=0; x<Nx; ++x) {
 
          int x_new = (x + N)%Nx;
@@ -924,7 +905,6 @@ void DataPlane::destagger(bool x_stag, bool y_stag) {
    {
 
 #pragma omp for schedule(static)
-
       for(int y=0; y < ny_new; y++) {
          for(int x=0; x < nx_new; x++) {
 
@@ -1005,7 +985,6 @@ bool DataPlane::fitwav_1d(const int start_wave, const int end_wave) {
    {
 
 #pragma omp for schedule(static)
-
       for(int x=0; x<Nx; ++x) {
          double angle = (twopi*x)/Nx;
          C[x] = cos(angle);
@@ -1102,7 +1081,6 @@ DataPlaneArray & DataPlaneArray::operator+=(const DataPlaneArray &d) {
    {
 
 #pragma omp for schedule(static)
-
       for(int i=0; i<Nplanes; i++) {
 
          // Check for matching level values
@@ -1131,7 +1109,6 @@ DataPlaneArray & DataPlaneArray::operator/=(const double v) {
    {
 
 #pragma omp for schedule(static)
-
       for(int i=0; i<Nplanes; i++) Plane[i] /= v;
 
    } // End omp parallel

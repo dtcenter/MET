@@ -413,20 +413,15 @@ void apply_mask(const DataPlane &in, const MaskPlane &mask,
 
    int Nxy = mask.nx() * mask.ny();
 
-#pragma omp parallel default(none)            \
-   shared(in, mask, na, Nxy, bad_data_double)
-   {
+   // Do not parallelize to preserve output order
+   for(int i=0; i<Nxy; i++) {
 
-#pragma omp for schedule(static)
-      for(int i=0; i<Nxy; i++) {
-
-         // Store the values where the mask in on
-         if(mask.data()[i]) {
-            na.add(in.nx() == 0 && in.ny() == 0 ?
-                   bad_data_double : in.data()[i]);
-         }
+      // Store the values where the mask is on
+      if(mask.data()[i]) {
+         na.add(in.nx() == 0 && in.ny() == 0 ?
+                bad_data_double : in.data()[i]);
       }
-   } // End omp parallel
+   }
 
    return;
 }
