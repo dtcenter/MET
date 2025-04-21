@@ -131,7 +131,7 @@ Instrumenting the C/C++ MET code
 .. code-block:: ini
 
     #ifdef WITH_PROFILER
-   `#include 'ctrack.hpp'`
+    #include "ctrack.hpp"
     #endif
 
 * Add the **CTRACK** directive to any functions of interest:
