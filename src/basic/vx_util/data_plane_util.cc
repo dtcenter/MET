@@ -747,7 +747,7 @@ DataPlane distance_map(const DataPlane &dp) {
             event_count++;
          }
       
-         for(int iy = 1; iy<ny; iy++) {
+         for(int iy=1; iy<ny; iy++) {
             if(dp.get(ix, iy) > 0) {
                distance_value = 0.0;
                event_count++;
@@ -759,7 +759,7 @@ DataPlane distance_map(const DataPlane &dp) {
          } // end for iy
       
          // Meijster scan 2
-         for(int iy = ny-2; iy>=0; iy--) {
+         for(int iy=ny-2; iy>=0; iy--) {
             distance_value = g_distance.get(ix, (iy+1));
             if(g_distance.get(ix, iy) > distance_value) {
                g_distance.set((1.0 + distance_value), ix, iy);
@@ -771,7 +771,7 @@ DataPlane distance_map(const DataPlane &dp) {
       if(event_count > 0) {
 
 #pragma omp for schedule(static)
-         for(int iy = 0; iy<ny; iy++) {
+         for(int iy=0; iy<ny; iy++) {
 
             // Initialize s and t arrays
             int iq = 0;
