@@ -769,17 +769,14 @@ DataPlane distance_map(const DataPlane &dp) {
 
       // Meijster second phase
       if(event_count > 0) {
-         int iq;
-         int iw;
-
-         // Initialize s and t arrays
-         vector<int> s(nx, 0);
-         vector<int> t(nx, 0);
 
 #pragma omp for schedule(static)
          for(int iy = 0; iy<ny; iy++) {
-            iq = 0;
-            s[iq] = t[iq] = 0;
+
+            // Initialize s and t arrays
+            int iq = 0;
+            vector<int> s(nx, 0);
+            vector<int> t(nx, 0);
 
             // Meijster Scan 3
             for(int ix=1; ix<nx; ix++) {
@@ -792,9 +789,9 @@ DataPlane distance_map(const DataPlane &dp) {
                   s[0] = ix;
                }
                else {
-                  iw = 1 + meijster_sep(ix, s[iq],
-                              g_distance.get(ix, iy),
-                              g_distance.get(s[iq], iy));
+                  int iw = 1 + meijster_sep(ix, s[iq],
+                                 g_distance.get(ix, iy),
+                                 g_distance.get(s[iq], iy));
                   if(iw < nx) {
                      iq++;
                      s[iq] = ix;
@@ -807,7 +804,7 @@ DataPlane distance_map(const DataPlane &dp) {
             for(int ix=nx-1; ix>=0; ix--) {
                distance_value = euclide_distance((ix-s[iq]), g_distance.get(s[iq],iy));
                dm.set(distance_value,ix,iy);
-               if (ix == t[iq]) iq--;
+               if(ix == t[iq]) iq--;
             } // end for ix
          } // end for iy
       }
