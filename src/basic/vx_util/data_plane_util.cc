@@ -78,6 +78,7 @@ void rescale_probability(DataPlane &dp) {
          //
          // Divide each value by 100
          //
+#pragma omp for schedule(static) 
          for(int x=0; x<dp.nx(); x++) {
             for(int y=0; y<dp.ny(); y++) {
 

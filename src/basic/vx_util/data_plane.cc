@@ -954,16 +954,11 @@ bool DataPlane::fitwav_1d(const int start_wave, const int end_wave) {
    }
 
    // Working vectors
-   vector<double> a  (mnw + 1);
-   vector<double> b  (mnw + 1);
-   vector<double> xa (mnw + 1);
-   vector<double> xb (mnw + 1);
-   vector<double> C  (Nx);
-   vector<double> S  (Nx);
+   vector<double> C(Nx);
+   vector<double> S(Nx);
 
-#pragma omp parallel default(none)         \
-   shared(a, b, xa, xb, C, S, Nx, Ny, mnw) \
-   shared(start_wave, end_wave)
+#pragma omp parallel default(none)              \
+shared(Nx, Ny, mnw, start_wave, end_wave, C, S)
    {
 
 #pragma omp for schedule(static)
@@ -973,12 +968,18 @@ bool DataPlane::fitwav_1d(const int start_wave, const int end_wave) {
          S[x] = sin(angle);
       } // for x
 
-      double xa0;
+#pragma omp for schedule(static)
       for(int y=0; y<Ny; ++y) {
-         xa0 = 0.0;
+         double xa0 = 0.0;
          for(int x=0; x<Nx; ++x) {
             xa0 += get(x, y);
          } // for x
+
+         // Working vectors
+         vector<double> a (mnw + 1);
+         vector<double> b (mnw + 1);
+         vector<double> xa(mnw + 1);
+         vector<double> xb(mnw + 1);
 
          a[0] = xa0/Nx;
          b[0] = 0.0;
