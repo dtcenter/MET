@@ -49,5 +49,6 @@ RUN if [ ! -e "${MET_REPO_DIR}/configure.ac" ]; then \
   fi
 
 RUN cd ${MET_REPO_DIR} \
+ && export MAKE_ARGS="-j" \
  && internal/scripts/docker/build_met_docker.sh
 
