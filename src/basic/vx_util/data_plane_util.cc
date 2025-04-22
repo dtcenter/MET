@@ -680,7 +680,7 @@ DataPlane gradient(const DataPlane &dp, int dim, int delta) {
    shared(dp, dim, delta, grad_dp, bad_data_double)
    {
 
-      // Compute the inverse of the normal CDF for each grid point
+      // Compute the gradient for each grid point
 #pragma omp for schedule(static)
       for(int x=0; x<dp.nx(); x++) {
          for(int y=0; y<dp.ny(); y++) {

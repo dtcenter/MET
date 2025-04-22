@@ -557,24 +557,18 @@ void DataPlane::censor(const ThreshArray &censor_thresh,
 
    int count = 0;
 
-#pragma omp parallel default(none)          \
-   shared(Data, Nxy, ta, censor_val, count)
-   {
+   // Loop through the points and apply all the censor thresholds
+   for(int i=0; i<Nxy; i++) {
+      for(int j=0; j<ta.n_elements(); j++) {
 
-      // Loop through the points and apply all the censor thresholds
-#pragma omp for schedule(static)
-      for(int i=0; i<Nxy; i++) {
-         for(int j=0; j<ta.n_elements(); j++) {
-
-            // Break out after the first match
-            if(ta[j].check(Data[i])) {
-               Data[i] = censor_val[j];
-               count++;
-               break;
-            }
+         // Break out after the first match
+         if(ta[j].check(Data[i])) {
+            Data[i] = censor_val[j];
+            count++;
+            break;
          }
       }
-   } // End omp parallel
+   }
 
    mlog << Debug(3)
         << "Censored values for " << count << " of " << Nxy
@@ -760,27 +754,21 @@ void DataPlane::data_range(double & data_min, double & data_max) const {
    // Initialize
    data_min = data_max = bad_data_double;
 
-#pragma omp parallel default(none)                  \
-   shared(Data, Nxy, data_min, data_max, first_set)
-   {
+   for(int j=0; j<Nxy; ++j) {
 
-#pragma omp for schedule(static)
-      for(int j=0; j<Nxy; ++j) {
+      double value = Data[j];
 
-         double value = Data[j];
+      if(is_bad_data(value)) continue;
 
-         if(is_bad_data(value)) continue;
-
-         if(first_set) {
-            data_min = data_max = value;
-            first_set = false;
-         }
-         else {
-            data_min = min(value, data_min);
-            data_max = max(value, data_max);
-         }
-      } // for j
-   } // End omp parallel
+      if(first_set) {
+         data_min = data_max = value;
+         first_set = false;
+      }
+      else {
+         data_min = min(value, data_min);
+         data_max = max(value, data_max);
+      }
+   } // for j
 
    return;
 }
@@ -1080,7 +1068,8 @@ DataPlaneArray & DataPlaneArray::operator+=(const DataPlaneArray &d) {
          // Check for matching level values
          if(Lower[i] != d.Lower[i] || Upper[i] != d.Upper[i]) {
             mlog << Error << "\n" << method_name
-                 << "for level " << i+1 << " the lower and upper values do not match: ("
+                 << "for level " << i+1
+                 << " the lower and upper values do not match: ("
                  << Lower[i] << ", " << Upper[i] << ") != ("
                  << d.Lower[i] << ", " << d.Upper[i] << ")\n\n";
             exit(1);
