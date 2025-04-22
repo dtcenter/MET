@@ -469,7 +469,7 @@ int DataPlane::n_good_data() const {
    {
 
       // Count number of good data values
-#pragma omp for schedule(static)
+#pragma omp for reduction(+:n)
       for(int j=0; j<Nxy; ++j) {
          if(!is_bad_data(Data[j])) n++;
       }
