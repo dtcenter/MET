@@ -40,15 +40,6 @@ void init_openmp() {
            << "setting OMP_NUM_THREADS for faster runtimes.\n";
       omp_set_num_threads(1);
    }
-   // If OMP_NUM_THREADS <= 0, use all available threads
-   else {
-      if(atoi(env_omp_num_threads) <= 0) {
-         mlog << Debug(2) << "Resetting OMP_NUM_THREADS ("
-              << env_omp_num_threads << ") to " << omp_get_max_threads()
-              << ", the maximum number of threads available.\n";
-         omp_set_num_threads(omp_get_max_threads());
-      } 
-   }
 
 #pragma omp parallel
 #pragma omp single

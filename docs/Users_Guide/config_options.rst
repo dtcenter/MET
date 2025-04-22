@@ -470,10 +470,8 @@ itself. For example:
 
   OMP_NUM_THREADS=4 <exec>
 
-The case where this variable remains unset or it is set to a non-integer is
-handled inside the code, which defaults to a single thread. If it is set to
-an integer less than or equal to 0, it is automatically reset to use the 
-maximum number of available threads.
+The case where this variable remains unset is handled inside the code, which
+defaults to a single thread.
 
 There are choices when deciding how many threads to use. To perform a single run
 as fast as possible, it would likely be appropriate to use as many threads as
