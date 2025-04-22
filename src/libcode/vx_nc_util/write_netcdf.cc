@@ -118,11 +118,11 @@ void write_netcdf_latlon(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 
 void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                             const Grid &grid) {
-   int i;
    double lat;
    double lon;
    NcVar lat_var;
    NcVar lon_var;
+
    // Allocate space for lat/lon values
    vector<float> lat_data(grid.ny());
    vector<float> lon_data(grid.nx());
@@ -140,17 +140,25 @@ void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    add_att(&lon_var, units_att_name, "degrees_east");
    add_att(&lon_var, standard_name_att_name, "longitude");
 
-   // Compute latitude values
-   for(i=0; i<grid.ny(); i++) {
-      grid.xy_to_latlon(0, i, lat, lon);
-      lat_data[i] = (float) lat;
-   }
+#pragma omp parallel default(none)  \
+   shared(grid, lat_data, lon_data) \
+   private(lat, lon)
+   {
 
-   // Compute longitude values (convert degrees west to east)
-   for(i=0; i<grid.nx(); i++) {
-      grid.xy_to_latlon(i, 0, lat, lon);
-      lon_data[i] = (float) -1.0*lon;
-   }
+      // Compute latitude values
+#pragma omp for schedule(static)
+      for(int i=0; i<grid.ny(); i++) {
+         grid.xy_to_latlon(0, i, lat, lon);
+         lat_data[i] = (float) lat;
+      }
+
+      // Compute longitude values (convert degrees west to east)
+#pragma omp for schedule(static)
+      for(int i=0; i<grid.nx(); i++) {
+         grid.xy_to_latlon(i, 0, lat, lon);
+         lon_data[i] = (float) -1.0*lon;
+      }
+   } // End omp parallel
 
    // Write the lat data
    put_nc_data(&lat_var, lat_data.data(), lat_dim->getSize(), 0);
@@ -165,12 +173,12 @@ void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 
 void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                             const Grid &grid) {
-   int i, x, y;
-   double lat, lon;
-   NcVar lat_var, lon_var;
+   NcVar lat_var;
+   NcVar lon_var;
    vector<NcDim> dims;
    long  counts[2] = {grid.ny(), grid.nx()};
    long offsets[2] = {0 , 0};
+
    // Allocate space for lat/lon values
    vector<float> lat_data(grid.nx()*grid.ny());
    vector<float> lon_data(grid.nx()*grid.ny());
@@ -190,18 +198,26 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    add_att(&lon_var, units_att_name, "degrees_east");
    add_att(&lon_var, standard_name_att_name, "longitude");
 
-   // Compute lat/lon values
-   for(x=0; x<grid.nx(); x++) {
-      for(y=0; y<grid.ny(); y++) {
+#pragma omp parallel default(none)             \
+   shared(grid, lat_data, lon_data, DefaultTO)
+   {
 
-         grid.xy_to_latlon(x, y, lat, lon);
-         i = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+      // Compute lat/lon values
+#pragma omp for schedule(static)
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
 
-         // Multiple by -1.0 to convert from degrees west to degrees east
-         lat_data[i] = (float) lat;
-         lon_data[i] = (float) -1.0*lon;
+            double lat;
+            double lon;
+            grid.xy_to_latlon(x, y, lat, lon);
+            int i = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+
+            // Multiple by -1.0 to convert from degrees west to degrees east
+            lat_data[i] = (float) lat;
+            lon_data[i] = (float) -1.0*lon;
+         }
       }
-   }
+   } // End omp parallel
 
    // Write the lat data
    put_nc_data(&lat_var, lat_data.data(), counts, offsets);
@@ -216,10 +232,10 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
 
 void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
                               const GridWeightType t, const DataPlane &wgt_dp) {
-   int i;
-   NcVar wgt_var  ;
+   NcVar wgt_var;
    vector<NcDim> dims;
    vector<size_t> count;
+
    // Allocate space for weight values
    vector<float> wgt_data(wgt_dp.nx()*wgt_dp.ny());
 
@@ -249,14 +265,19 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
          break;
    }
 
+#pragma omp parallel default(none)     \
+   shared(wgt_dp, wgt_data, DefaultTO)
+   {
 
-   // Store weight values
-   for(int x=0; x<wgt_dp.nx(); x++) {
-      for(int y=0; y<wgt_dp.ny(); y++) {
-         i = DefaultTO.two_to_one(wgt_dp.nx(), wgt_dp.ny(), x, y);
-         wgt_data[i] = (float) wgt_dp(x, y);
+      // Store weight values
+#pragma omp for schedule(static)
+      for(int x=0; x<wgt_dp.nx(); x++) {
+         for(int y=0; y<wgt_dp.ny(); y++) {
+            int i = DefaultTO.two_to_one(wgt_dp.nx(), wgt_dp.ny(), x, y);
+            wgt_data[i] = (float) wgt_dp(x, y);
+         }
       }
-   }
+   } // End omp parallel
 
    // Write the weights
    count.emplace_back(wgt_dp.ny());
