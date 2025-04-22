@@ -119,33 +119,41 @@ Grid parse_grid_string(const char *grid_str) {
 
 void parse_grid_weight(const Grid &grid, const GridWeightType t,
                        DataPlane &wgt_dp) {
-   int x, y;
-   double w, lat, lon;
 
    // Initialize
    wgt_dp.clear();
    wgt_dp.set_size(grid.nx(), grid.ny());
 
+#pragma omp parallel default(none) \
+   shared(grid, t, wgt_dp)
+   {
+
    // Compute weight for each grid point
-   for(x=0; x<grid.nx(); x++) {
-      for(y=0; y<grid.ny(); y++) {
+#pragma omp for schedule(static)
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
 
-         if(t == GridWeightType::Cos_Lat) {
-            grid.xy_to_latlon(x, y, lat, lon);
-            w = cosd(lat);
-         }
-         else if(t == GridWeightType::Area) {
-            w = grid.calc_area(x, y);
-         }
-         else {
-            w = default_weight;
-         }
+            double w;
 
-         // Store the current weight
-         wgt_dp.set(w, x, y);
+            if(t == GridWeightType::Cos_Lat) {
+               double lat;
+               double lon;
+               grid.xy_to_latlon(x, y, lat, lon);
+               w = cosd(lat);
+            }
+            else if(t == GridWeightType::Area) {
+               w = grid.calc_area(x, y);
+            }
+            else {
+               w = default_weight;
+            }
 
-      } // end for y
-   } // end for x
+            // Store the current weight
+            wgt_dp.set(w, x, y);
+
+         } // end for y
+      } // end for x
+   } // End omp parallel
 
    return;
 }
@@ -484,9 +492,6 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
 ////////////////////////////////////////////////////////////////////////
 
 void apply_grid_mask(const Grid &grid, const Grid &mask_grid, DataPlane &dp) {
-   int x, y;
-   double lat, lon, mask_x, mask_y;
-   int in_count, out_count;
 
    //
    // If the masking grid's dimensions are zero, there's nothing to be done
@@ -498,28 +503,33 @@ void apply_grid_mask(const Grid &grid, const Grid &mask_grid, DataPlane &dp) {
       return;
    }
 
-   //
-   // For each point of the original grid, convert it to (lat, lon) and then
-   // to an (x, y) point on the mask grid. If the (x, y) is within the
-   // bounds of the mask grid, retain it's value.  Otherwise, mask it out.
-   //
-   in_count = out_count = 0;
-   for(x=0; x<dp.nx(); x++) {
-      for(y=0; y<dp.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(grid, mask_grid, dp)
+   {
 
-         grid.xy_to_latlon(x, y, lat, lon);
-         mask_grid.latlon_to_xy(lat, lon, mask_x, mask_y);
-
-         if(mask_x < 0 || mask_x >= mask_grid.nx() ||
-            mask_y < 0 || mask_y >= mask_grid.ny()) {
-            out_count++;
-            dp.set(mask_off_value, x, y);
-         }
-         else {
-            in_count++;
-         }
-      } // for y
-   } // for x
+      //
+      // Compute weight for each grid point
+      //
+      // For each point of the original grid, convert it to (lat, lon) and then
+      // to an (x, y) point on the mask grid. If the (x, y) is within the
+      // bounds of the mask grid, retain it's value.  Otherwise, mask it out.
+      //
+#pragma omp for schedule(static)
+      for(int x=0; x<dp.nx(); x++) {
+         for(int y=0; y<dp.ny(); y++) {
+            double lat;
+            double lon;
+            double mask_x;
+            double mask_y;
+            grid.xy_to_latlon(x, y, lat, lon);
+            mask_grid.latlon_to_xy(lat, lon, mask_x, mask_y);
+            if(mask_x < 0 || mask_x >= mask_grid.nx() ||
+               mask_y < 0 || mask_y >= mask_grid.ny()) {
+               dp.set(mask_off_value, x, y);
+            }
+         } // for y
+      } // for x
+   } // End omp parallel
 
    return;
 }
@@ -527,9 +537,6 @@ void apply_grid_mask(const Grid &grid, const Grid &mask_grid, DataPlane &dp) {
 ////////////////////////////////////////////////////////////////////////
 
 void apply_poly_mask_latlon(const MaskPoly &poly, const Grid &grid, DataPlane &dp) {
-   int x, y;
-   double lat, lon;
-   int in_count, out_count;
 
    //
    // If the polyline contains less than 3 points, no masking region is
@@ -542,25 +549,28 @@ void apply_poly_mask_latlon(const MaskPoly &poly, const Grid &grid, DataPlane &d
       return;
    }
 
-   //
-   // Mask out any grid points whose corresponding lat/lon coordinates are
-   // not inside the masking lat/lon polygon.
-   //
-   in_count = out_count = 0;
-   for(x=0; x<dp.nx(); x++) {
-      for(y=0; y<dp.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(poly, grid, dp)
+   {
 
-         grid.xy_to_latlon(x, y, lat, lon);
+      //
+      // Mask out any grid points whose corresponding lat/lon coordinates are
+      // not inside the masking lat/lon polygon.
+      //
+#pragma omp for schedule(static)
+      for(int x=0; x<dp.nx(); x++) {
+        for(int y=0; y<dp.ny(); y++) {
 
-         if(!(poly.latlon_is_inside(lat, lon))) {
-            out_count++;
-            dp.set(mask_off_value, x, y);
-         }
-         else {
-            in_count++;
-         }
-      } // for y
-   } // for x
+            double lat;
+            double lon;
+            grid.xy_to_latlon(x, y, lat, lon);
+
+            if(!(poly.latlon_is_inside(lat, lon))) {
+               dp.set(mask_off_value, x, y);
+            }
+         } // for y
+      } // for x
+   } // End omp parallel
 
    return;
 }
