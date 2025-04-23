@@ -114,7 +114,7 @@ bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
             double u = u2d.get(x, y);
             double v = v2d.get(x, y);
 
-	    double wdir = bad_data_double;
+            double wdir = bad_data_double;
 
             //
             // Compute wind direction and rescale to [0, 360)
@@ -179,7 +179,7 @@ bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
             double u = u2d.get(x, y);
             double v = v2d.get(x, y);
 
-	    double wind = bad_data_double;
+            double wind = bad_data_double;
 
             //
             // Compute wind direction and rescale to [0, 360)
