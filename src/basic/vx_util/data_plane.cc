@@ -749,26 +749,29 @@ bool DataPlane::f_is_on(int x, int y) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void DataPlane::data_range(double & data_min, double & data_max) const {
-   bool first_set = true;
 
    // Initialize
-   data_min = data_max = bad_data_double;
+   data_min =  1.0e30;
+   data_max = -1.0e30;
 
-   for(int j=0; j<Nxy; ++j) {
+#pragma omp parallel default(none)       \
+   shared(Data, Nxy, data_min, data_max)
+   {
 
-      double value = Data[j];
+#pragma omp for reduction(min: data_min) \
+                reduction(max: data_max)
+      for(int j=0; j<Nxy; ++j) {
 
-      if(is_bad_data(value)) continue;
+         if(is_bad_data(Data[j])) continue;
 
-      if(first_set) {
-         data_min = data_max = value;
-         first_set = false;
+         data_min = min(data_min, Data[j]);
+         data_max = max(data_max, Data[j]);
       }
-      else {
-         data_min = min(value, data_min);
-         data_max = max(value, data_max);
-      }
-   } // for j
+   } // end omp parallel
+
+   // Check for all bad data
+   if(is_eq(data_min,  1.0e30)) data_min = bad_data_double;
+   if(is_eq(data_max, -1.0e30)) data_max = bad_data_double;
 
    return;
 }
