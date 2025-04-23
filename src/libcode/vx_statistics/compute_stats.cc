@@ -189,9 +189,9 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    shared(err_bar, abs_err_bar, err_sq_bar) 
    {
 
-#pragma omp for reduction(+:n, f_bar, o_bar, ff_bar, oo_bar, fo_bar,      \
-                               fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar, \
-                               err_bar, abs_err_bar, err_sq_bar)
+#pragma omp for reduction(+: n, f_bar, o_bar, ff_bar, oo_bar, fo_bar,   \
+                             fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar, \
+                             err_bar, abs_err_bar, err_sq_bar)
       for(int i=0; i<i_na.n(); i++) {
 
          //
@@ -313,13 +313,21 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    cnt_info.e90.v  = err_na.percentile_array(0.90);
    cnt_info.eiqr.v = cnt_info.e75.v - cnt_info.e25.v;
 
-   //
-   // Compute the median absolute deviation
-   //
    NumArray dev_na(err_na);
-   for(int i=0; i<err_na.n(); i++) {
-      dev_na.add(fabs(err_na[i] - cnt_info.e50.v));
-   }
+
+#pragma omp parallel default(none)  \
+   shared(dev_na, err_na, cnt_info)
+   {
+
+      //
+      // Compute the median absolute deviation
+      //
+#pragma omp for schedule(static)
+      for(int i=0; i<dev_na.n(); i++) {
+         dev_na.set(i, fabs(err_na[i] - cnt_info.e50.v));
+      }
+   } // End omp parallel
+
    cnt_info.mad.v = dev_na.percentile_array(0.50);
 
    //
@@ -439,19 +447,19 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       wgt_sum = wgt_na2.sum();
 
+      // Initialize sums
+      f_bar = o_bar = ff_bar = oo_bar = fo_bar = 0.0;
+
 #pragma omp parallel default(none)                             \
       shared(f_na_rank, o_na_rank, n_f_rank, wgt_na2, wgt_sum) \
       shared(f_bar, o_bar, ff_bar, oo_bar, fo_bar)
       {
 
-         // Initialize sums
-         f_bar = o_bar = ff_bar = oo_bar = fo_bar = 0.0;
-
          //
          // Compute sums for the ranks for use in computing Spearman's
          // Rank correlation coefficient
          //
-#pragma omp for reduction(+:f_bar, o_bar, ff_bar, oo_bar, fo_bar)
+#pragma omp for reduction(+: f_bar, o_bar, ff_bar, oo_bar, fo_bar)
          for(int i=0; i<n_f_rank; i++) {
 
             double f   = f_na_rank[i];
@@ -496,7 +504,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
          // comparison as extra_f.  A tie between the f's counts as an extra_o.  If there
          // is a tie in both the f's and o's, don't count the comparison as anything.
          //
-#pragma omp for reduction(+:concordant, discordant, extra_f, extra_o)
+#pragma omp for reduction(+: concordant, discordant, extra_f, extra_o)
          for(int i=0; i<n; i++) {
             for(int j=i+1; j<n; j++) {
 
@@ -887,9 +895,6 @@ void compute_nbrcntinfo(const PairDataPoint &pd,
                         const PairDataPoint &pd_thr,
                         const NumArray &i_na,
                         NBRCNTInfo &nbrcnt_info, bool nbrcnt_flag) {
-   int i, j, n;
-   double f, o, wgt, wgt_sum, ff_bar, oo_bar, fo_bar;
-   double f_thr_bar, o_thr_bar;
 
    //
    // Check that the input arrays have the same length
@@ -907,36 +912,51 @@ void compute_nbrcntinfo(const PairDataPoint &pd,
    //
    // Loop over the length of the index array
    //
-   n = i_na.n();
+   int n = i_na.n();
 
    //
    // Get the sum of the weights
    //
-   wgt_sum = pd.wgt_na.sum();
+   double wgt_sum = pd.wgt_na.sum();
 
    //
-   // Compute the continuous statistics from the fcst and obs arrays
+   // Initialize sums
    //
-   ff_bar = oo_bar = fo_bar = 0.0;
-   f_thr_bar = o_thr_bar = 0.0;
-   for(i=0; i<n; i++) {
+   double ff_bar    = 0.0;
+   double oo_bar    = 0.0;
+   double fo_bar    = 0.0;
+   double f_thr_bar = 0.0;
+   double o_thr_bar = 0.0;
+
+#pragma omp parallel default(none)      \
+   shared(pd, pd_thr, i_na, n, wgt_sum) \
+   shared(ff_bar, oo_bar, fo_bar)       \
+   shared(f_thr_bar, o_thr_bar)    
+   {
 
       //
-      // Get the index to be used from the index num array
+      // Compute the continuous statistics from the fcst and obs arrays
       //
-      j = nint(i_na[i]);
+#pragma omp for reduction(+: ff_bar, oo_bar, fo_bar, f_thr_bar, o_thr_bar)
+      for(int i=0; i<n; i++) {
 
-      f   = pd.f_na[j];
-      o   = pd.o_na[j];
-      wgt = pd.wgt_na[i]/wgt_sum;
+         //
+         // Get the index to be used from the index num array
+         //
+         int j = nint(i_na[i]);
 
-      ff_bar += wgt*f*f;
-      oo_bar += wgt*o*o;
-      fo_bar += wgt*f*o;
+         double f   = pd.f_na[j];
+         double o   = pd.o_na[j];
+         double wgt = pd.wgt_na[i]/wgt_sum;
 
-      f_thr_bar += wgt*pd_thr.f_na[j];
-      o_thr_bar += wgt*pd_thr.o_na[j];
-   } // end for i
+         ff_bar += wgt*f*f;
+         oo_bar += wgt*o*o;
+         fo_bar += wgt*f*o;
+
+         f_thr_bar += wgt*pd_thr.f_na[j];
+         o_thr_bar += wgt*pd_thr.o_na[j];
+      }
+   } // End omp parallel
 
    //
    // Store the sample size
@@ -1010,31 +1030,39 @@ void compute_i_nbrcntinfo(const PairDataPoint &pd,
 void compute_mean_stdev(const NumArray &v_na, const NumArray &i_na,
                         bool normal_ci_flag, double alpha,
                         CIInfo &mean_ci, CIInfo &stdev_ci) {
-   int i, j, n;
-   double v, sum, sum_sq;
-   double cv_normal_l, cv_normal_u;
 
    //
    // Loop over the length of the index array
    //
-   n = i_na.n();
+   int n = i_na.n();
 
    //
-   // Loop over the values provided
+   // Initialize sums
    //
-   sum = sum_sq = 0.0;
-   for(i=0; i<n; i++) {
+   double sum = 0.0;
+   double sum_sq = 0.0;
+
+#pragma omp parallel default(none)    \
+   shared(v_na, i_na, n, sum, sum_sq)
+   {
 
       //
-      // Get the index to be used from the index num array
+      // Loop over the values provided
       //
-      j = nint(i_na[i]);
+#pragma omp for reduction(+: sum, sum_sq)
+      for(int i=0; i<n; i++) {
 
-      v = v_na[j];
+         //
+         // Get the index to be used from the index num array
+         //
+         int j = nint(i_na[i]);
 
-      sum    += v;
-      sum_sq += v*v;
-   } // end for i
+         double v = v_na[j];
+
+         sum    += v;
+         sum_sq += v*v;
+      }
+   } // End omp parallel
 
    //
    // Compute the mean
@@ -1060,6 +1088,8 @@ void compute_mean_stdev(const NumArray &v_na, const NumArray &i_na,
          mean_ci.v_ncl[0] = mean_ci.v_ncu[0] = bad_data_double;
       }
       else {
+         double cv_normal_l;
+         double cv_normal_u;
 
          //
          // Compute the critical values for the Normal or Student's-T
