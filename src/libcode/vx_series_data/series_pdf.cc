@@ -48,12 +48,18 @@ void init_joint_pdf(int n_A, int n_B, vector<long long>& pdf) {
 void update_pdf(double min, double delta, vector<long long>& pdf,
                 const DataPlane& dp, const MaskPlane& mp) {
 
+#pragma omp declare reduction(vec_long_long_plus : vector<long long> :    \
+                              transform(omp_out.begin(), omp_out.end(),   \
+                                         omp_in.begin(), omp_out.begin(), \
+                                        plus<long long>()))               \
+                    initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
+
 #pragma omp parallel default(none) \
    shared(min, delta, pdf, dp, mp)
    {
 
       // Update pdf counts
-#pragma omp for schedule(static)
+#pragma omp for reduction(vec_long_long_plus : pdf)
       for(int x=0; x<dp.nx(); x++) {
          for(int y=0; y<dp.ny(); y++) {
             double value = dp.get(x, y);
@@ -78,13 +84,19 @@ void update_joint_pdf(int n_A, int n_B, double min_A, double min_B,
                       const DataPlane& dp_A, const DataPlane& dp_B,
                       const MaskPlane& mp) {
 
+#pragma omp declare reduction(vec_long_long_plus : vector<long long> :    \
+                              transform(omp_out.begin(), omp_out.end(),   \
+                                         omp_in.begin(), omp_out.begin(), \
+                                        plus<long long>()))               \
+                    initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
+
 #pragma omp parallel default(none)                  \
    shared(n_A, n_B, min_A, min_B, delta_A, delta_B) \
    shared(pdf, dp_A, dp_B, mp)
    {
 
       // Update joint pdf counts
-#pragma omp for schedule(static)
+#pragma omp for reduction(vec_long_long_plus : pdf)
       for(int x=0; x<dp_A.nx(); x++) {
          for(int y=0; y<dp_A.ny(); y++) {
             double value_A = dp_A.get(x, y);
