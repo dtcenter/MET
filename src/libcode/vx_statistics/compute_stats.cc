@@ -134,18 +134,6 @@ void compute_cntinfo(const SL1L2Info &s, CNTInfo &cnt_info) {
 void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
                      bool precip_flag, bool rank_flag, bool normal_ci_flag,
                      CNTInfo &cnt_info) {
-   int i, j, n;
-   double f, o, fc, oc, wgt, wgt_sum;
-   double f_bar, o_bar, ff_bar, oo_bar, fo_bar;
-   double fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar;
-   double err, err_bar, abs_err_bar, err_sq_bar, den;
-
-   //
-   // Allocate memory to store the differences
-   //
-   NumArray err_na, dev_na;
-   err_na.extend(pd.f_na.n());
-   dev_na.extend(pd.f_na.n());
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -166,65 +154,96 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    //
    // Get the sum of the weights
    //
-   wgt_sum = pd.wgt_na.sum();
+   double wgt_sum = pd.wgt_na.sum();
+
+   //
+   // Array to store the differences
+   //
+   NumArray err_na(vector<double>(i_na.n(), 0.0));
 
    //
    // Compute the continuous statistics from the fcst and obs arrays
    //
-   n       = 0;
-   f_bar   = o_bar       = ff_bar     = oo_bar  = fo_bar  = 0.0;
-   fa_bar  = oa_bar      = ffa_bar    = ooa_bar = foa_bar = 0.0;
-   err_bar = abs_err_bar = err_sq_bar = 0.0;
-   for(i=0; i<i_na.n(); i++) {
+   int n = 0;
 
-      //
-      // Get the index to be used from the index num array
-      //
-      j = nint(i_na[i]);
+   double f_bar  = 0.0;
+   double o_bar  = 0.0;
+   double ff_bar = 0.0;
+   double oo_bar = 0.0;
+   double fo_bar = 0.0;
 
-      f   = pd.f_na[j];
-      o   = pd.o_na[j];
-      fc  = (cmn_flag ? pd.fcmn_na[j] : bad_data_double);
-      oc  = (cmn_flag ? pd.ocmn_na[j] : bad_data_double);
-      wgt = pd.wgt_na[i]/wgt_sum;
+   double fa_bar  = 0.0;
+   double oa_bar  = 0.0;
+   double ffa_bar = 0.0;
+   double ooa_bar = 0.0;
+   double foa_bar = 0.0;
+ 
+   double err_bar     = 0.0;
+   double abs_err_bar = 0.0;
+   double err_sq_bar  = 0.0;
 
-      //
-      // Should be no bad data, but checking to be sure
-      //
-      if(is_bad_data(f) ||
-         is_bad_data(o) ||
-         (cmn_flag && is_bad_data(fc)) ||
-         (cmn_flag && is_bad_data(oc))) continue;
+#pragma omp parallel default(none)                   \
+   shared(pd, i_na, cmn_flag, wgt_sum, err_na, n)    \
+   shared(f_bar, o_bar, ff_bar, oo_bar, fo_bar)      \
+   shared(fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar) \
+   shared(err_bar, abs_err_bar, err_sq_bar) 
+   {
 
-      //
-      // Compute the error
-      //
-      err = f-o;
-      err_na.add(err);
+#pragma omp for reduction(+:n, f_bar, o_bar, ff_bar, oo_bar, fo_bar,      \
+                               fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar, \
+                               err_bar, abs_err_bar, err_sq_bar)
+      for(int i=0; i<i_na.n(); i++) {
 
-      f_bar       += wgt*f;
-      o_bar       += wgt*o;
-      ff_bar      += wgt*f*f;
-      oo_bar      += wgt*o*o;
-      fo_bar      += wgt*f*o;
-      err_bar     += wgt*err;
-      abs_err_bar += wgt*fabs(err);
-      err_sq_bar  += wgt*err*err;
-      n++;
+         //
+         // Get the index to be used from the index num array
+         //
+         int j = nint(i_na[i]);
 
-      if(cmn_flag) {
-         fa_bar  += wgt*(f-fc);
-         oa_bar  += wgt*(o-oc);
-         foa_bar += wgt*(f-fc)*(o-oc);
-         ffa_bar += wgt*(f-fc)*(f-fc);
-         ooa_bar += wgt*(o-oc)*(o-oc);
-      }
-   } // end for i
+         double f   = pd.f_na[j];
+         double o   = pd.o_na[j];
+         double fc  = (cmn_flag ? pd.fcmn_na[j] : bad_data_double);
+         double oc  = (cmn_flag ? pd.ocmn_na[j] : bad_data_double);
+         double wgt = pd.wgt_na[j]/wgt_sum;
+
+         //
+         // Should be no bad data, but checking to be sure
+         //
+         if(is_bad_data(f) ||
+            is_bad_data(o) ||
+            (cmn_flag && is_bad_data(fc)) ||
+            (cmn_flag && is_bad_data(oc))) continue;
+
+         //
+         // Compute the error
+         //
+         double err = f-o;
+         err_na.set(i, err);
+
+         f_bar       += wgt*f;
+         o_bar       += wgt*o;
+         ff_bar      += wgt*f*f;
+         oo_bar      += wgt*o*o;
+         fo_bar      += wgt*f*o;
+         err_bar     += wgt*err;
+         abs_err_bar += wgt*fabs(err);
+         err_sq_bar  += wgt*err*err;
+         n++;
+
+         if(cmn_flag) {
+            fa_bar  += wgt*(f-fc);
+            oa_bar  += wgt*(o-oc);
+            foa_bar += wgt*(f-fc)*(o-oc);
+            ffa_bar += wgt*(f-fc)*(f-fc);
+            ooa_bar += wgt*(o-oc)*(o-oc);
+         }
+      } // end for i
+   } // End omp parallel
 
    //
    // Store the sample size
    //
-   if((cnt_info.n = n) == 0) return;
+   cnt_info.n = n;
+   if(cnt_info.n == 0) return;
 
    //
    // Compute forecast mean and standard deviation
@@ -297,7 +316,8 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    //
    // Compute the median absolute deviation
    //
-   for(i=0; i<err_na.n(); i++) {
+   NumArray dev_na(err_na);
+   for(int i=0; i<err_na.n(); i++) {
       dev_na.add(fabs(err_na[i] - cnt_info.e50.v));
    }
    cnt_info.mad.v = dev_na.percentile_array(0.50);
@@ -326,15 +346,15 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    //
    // Compute mean squared error skill score
    //
-   den = cnt_info.ostdev.v * cnt_info.ostdev.v;
+   double den = cnt_info.ostdev.v * cnt_info.ostdev.v;
    cnt_info.msess.v = (is_eq(den, 0.0) ? bad_data_double :
                        1.0 - (cnt_info.mse.v / den));
 
    //
    // Compute bias corrected mean squared error (decomposition of MSE)
    //
-   f = cnt_info.fbar.v;
-   o = cnt_info.obar.v;
+   double f = cnt_info.fbar.v;
+   double o = cnt_info.obar.v;
    cnt_info.bcmse.v = cnt_info.mse.v - (f-o)*(f-o);
 
    //
@@ -352,29 +372,28 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       cnt_info.si.v = bad_data_double;
    }
 
-   
    //
    // Only compute the Kendall Tau and Spearman's Rank corrleation
    // coefficients if the rank_flag is set.
    //
    if(rank_flag) {
-      int concordant, discordant, extra_f, extra_o;
-      int n_f_rank, n_o_rank, n_f_rank_ties, n_o_rank_ties;
-      NumArray f_na2, o_na2, f_na_rank, o_na_rank, wgt_na2;
 
       //
       // Allocate memory
       //
+      NumArray f_na2;
       f_na2.extend(pd.f_na.n());
+      NumArray o_na2;
       o_na2.extend(pd.f_na.n());
+      NumArray wgt_na2;
       wgt_na2.extend(pd.f_na.n());
 
-      for(i=0; i<n; i++) {
+      for(int i=0; i<n; i++) {
 
          //
          // Get the index to be used from the index num array
          //
-         j = nint(i_na[i]);
+         int j = nint(i_na[i]);
 
          //
          // Skip (0, 0) cases for precipitation
@@ -392,10 +411,12 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       // Compute ranks of the remaining raw data values
       // in the fcst and obs arrays
       //
-      f_na_rank = f_na2;
-      o_na_rank = o_na2;
-      n_f_rank  = f_na_rank.rank_array(n_f_rank_ties);
-      n_o_rank  = o_na_rank.rank_array(n_o_rank_ties);
+      NumArray f_na_rank(f_na2);
+      NumArray o_na_rank(o_na2);
+      int n_f_rank_ties;
+      int n_f_rank = f_na_rank.rank_array(n_f_rank_ties);
+      int n_o_rank_ties;
+      int n_o_rank = o_na_rank.rank_array(n_o_rank_ties);
 
       if(n_f_rank != n_o_rank) {
          mlog << Error << "\ncompute_cntinfo() -> "
@@ -418,23 +439,32 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       wgt_sum = wgt_na2.sum();
 
-      //
-      // Compute sums for the ranks for use in computing Spearman's
-      // Rank correlation coefficient
-      //
-      f_bar = o_bar = ff_bar = oo_bar = fo_bar = 0.0;
-      for(i=0; i<n_f_rank; i++) {
+#pragma omp parallel default(none)                             \
+      shared(f_na_rank, o_na_rank, n_f_rank, wgt_na2, wgt_sum) \
+      shared(f_bar, o_bar, ff_bar, oo_bar, fo_bar)
+      {
 
-         f   = f_na_rank[i];
-         o   = o_na_rank[i];
-         wgt = wgt_na2[i]/wgt_sum;
+         // Initialize sums
+         f_bar = o_bar = ff_bar = oo_bar = fo_bar = 0.0;
 
-         f_bar  += wgt*f;
-         o_bar  += wgt*o;
-         ff_bar += wgt*f*f;
-         oo_bar += wgt*o*o;
-         fo_bar += wgt*f*o;
-      } // end for i
+         //
+         // Compute sums for the ranks for use in computing Spearman's
+         // Rank correlation coefficient
+         //
+#pragma omp for reduction(+:f_bar, o_bar, ff_bar, oo_bar, fo_bar)
+         for(int i=0; i<n_f_rank; i++) {
+
+            double f   = f_na_rank[i];
+            double o   = o_na_rank[i];
+            double wgt = wgt_na2[i]/wgt_sum;
+
+            f_bar  += wgt*f;
+            o_bar  += wgt*o;
+            ff_bar += wgt*f*f;
+            oo_bar += wgt*o*o;
+            fo_bar += wgt*f*o;
+         } // end for i
+      } // End omp parallel
 
       //
       // Compute Spearman's Rank correlation coefficient
@@ -444,41 +474,56 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
                                         fo_bar*n, n);
 
       //
-      // Compute Kendall Tau Rank correlation coefficient:
-      // For each pair of ranked data points (fi, oi), compare it to all other pairs
-      // of ranked data points (fj, oj) where j > i.  If the relative ordering of the
-      // ranks of the f's is the same as the relative ordering of the ranks of the o's,
-      // count the comparison as concordant.  If the previous is not the case, count
-      // the comparison as discordant.  If there is a tie between the o's, count the
-      // comparison as extra_f.  A tie between the f's counts as an extra_o.  If there
-      // is a tie in both the f's and o's, don't count the comparison as anything.
+      // Initialize counts
       //
-      concordant = discordant = extra_f = extra_o = 0;
-      for(i=0; i<n; i++) {
-         for(j=i+1; j<n; j++) {
+      int concordant = 0;
+      int discordant = 0;
+      int extra_f    = 0;
+      int extra_o    = 0;
 
-            //
-            // Check for agreement in the relative ordering of ranks
-            //
-            if(      (f_na_rank[i] > f_na_rank[j] && o_na_rank[i] > o_na_rank[j]) ||
-                     (f_na_rank[i] < f_na_rank[j] && o_na_rank[i] < o_na_rank[j]) ) concordant++;
-            //
-            // Check for disagreement in the relative ordering of ranks
-            //
-            else if( (f_na_rank[i] > f_na_rank[j] && o_na_rank[i] < o_na_rank[j]) ||
-                     (f_na_rank[i] < f_na_rank[j] && o_na_rank[i] > o_na_rank[j]) ) discordant++;
-            //
-            // Check for ties in the forecast rank
-            //
-            else if(is_eq(f_na_rank[i], f_na_rank[j]) && !is_eq(o_na_rank[i], o_na_rank[j])) extra_o++;
-            //
-            // Check for ties in the observation rank
-            //
-            else if(!is_eq(f_na_rank[i], f_na_rank[j]) && is_eq(o_na_rank[i], o_na_rank[j])) extra_f++;
+#pragma omp parallel default(none)                     \
+      shared(f_na_rank, o_na_rank, n)                  \
+      shared(concordant, discordant, extra_f, extra_o)
+      {
+
+         //
+         // Compute Kendall Tau Rank correlation coefficient:
+         // For each pair of ranked data points (fi, oi), compare it to all other pairs
+         // of ranked data points (fj, oj) where j > i.  If the relative ordering of the
+         // ranks of the f's is the same as the relative ordering of the ranks of the o's,
+         // count the comparison as concordant.  If the previous is not the case, count
+         // the comparison as discordant.  If there is a tie between the o's, count the
+         // comparison as extra_f.  A tie between the f's counts as an extra_o.  If there
+         // is a tie in both the f's and o's, don't count the comparison as anything.
+         //
+#pragma omp for reduction(+:concordant, discordant, extra_f, extra_o)
+         for(int i=0; i<n; i++) {
+            for(int j=i+1; j<n; j++) {
+
+               //
+               // Check for agreement in the relative ordering of ranks
+               //
+               if(      (f_na_rank[i] > f_na_rank[j] && o_na_rank[i] > o_na_rank[j]) ||
+                        (f_na_rank[i] < f_na_rank[j] && o_na_rank[i] < o_na_rank[j]) ) concordant++;
+               //
+               // Check for disagreement in the relative ordering of ranks
+               //
+               else if( (f_na_rank[i] > f_na_rank[j] && o_na_rank[i] < o_na_rank[j]) ||
+                        (f_na_rank[i] < f_na_rank[j] && o_na_rank[i] > o_na_rank[j]) ) discordant++;
+               //
+               // Check for ties in the forecast rank
+               //
+               else if(is_eq(f_na_rank[i], f_na_rank[j]) && !is_eq(o_na_rank[i], o_na_rank[j])) extra_o++;
+               //
+               // Check for ties in the observation rank
+               //
+               else if(!is_eq(f_na_rank[i], f_na_rank[j]) && is_eq(o_na_rank[i], o_na_rank[j])) extra_f++;
+            }
          }
-      }
-      den = sqrt((double) concordant+discordant+extra_f)*
-            sqrt((double) concordant+discordant+extra_o);
+      } // end omp parallel
+
+      double den = sqrt((double) concordant+discordant+extra_f)*
+                   sqrt((double) concordant+discordant+extra_o);
       if(is_eq(den, 0.0)) cnt_info.kt_corr.v = bad_data_double;
       else                cnt_info.kt_corr.v = (concordant - discordant)/den;
    } // end if rank_flag
