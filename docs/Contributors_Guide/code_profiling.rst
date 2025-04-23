@@ -56,27 +56,30 @@ The benchmarking.py script invokes MET code either via **MET command line comman
 specified by the **run_met_directly** setting in the benchmark.yaml configuration file.
 The metrics from the summary and detail tables are consolidated into csv and tabular text files
 (the locations of these consolidated metrics text files are specified in the benchmark.yaml configuration file).
-The CTRACK summary.txt and details.txt reports (containing the performance metrics) are written to the directory
+The CTRACK summary_output.txt and detail_output.txt reports (containing the performance metrics) are written to the directory
 from which the benchmarking.py script was executed.
 
 Overview of Steps for Performing Benchmarking
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Instrument the C/C++ code of interest
+1. Instrument the MET code of interest
 2. Compile MET code
-3. Modify the benchmark.yaml config file based on one of the two methods to execute MET code and to indicate location
-   of input data, etc.:
-   - MET commands
-   - METplus use case (METplus wrapper code)
-
+3. Edit the benchmark.yaml configuration file
 4. Invoke the Python script *benchmark.py* to collect the benchmarking metrics
+5. View results
+6. Identify and implement any code changes to improve performance
+7. Repeat step 2-5 until desired performance enhancements are achieved
 
-Instrumenting the MET code of interest
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Instrument the MET code of interest
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The ctrack.hpp file is saved in the $HOME/MET/src/basic/vx_util directory and does not need to be modified or added to any
-other location.  This version of ctrack.hpp has been modified to write the summary and detail tables to text files.
-By default, CTRACK is disabled and is enabled at compilation time via the **--enable-profiler flag**.
+.. note::
+
+   The ctrack.hpp file is saved in the $HOME/MET/src/basic/vx_util directory and does not need to be modified or added to any
+   other location.  This version of ctrack.hpp has been modified to write the summary and detail tables to text files.
+   By default, CTRACK is disabled and is enabled at compilation time via the **--enable-profiler flag**.
+
+   $HOME refers to the path to where the MET source code is saved.
 
 The ctrack.hpp file must be included in the source code of interest:
 
@@ -87,7 +90,7 @@ The ctrack.hpp file must be included in the source code of interest:
     #endif
 
 
-The CTRACK directive is placed at the top of the function of interest and the ctrack::result_print is placed
+The CTRACK directive is placed at the top of the function of interest and the *ctrack::result_print* is placed
 within the main()/met_main()functions.  Use the preprocessor directive for WITH_PROFILER:
 
   e.g. ensemble_stat.cc:
@@ -120,49 +123,8 @@ within the main()/met_main()functions.  Use the preprocessor directive for WITH_
 
 .. note ::
 
- The summary_output.txt and detail_output.txt files will only be saved when the ctrack::result_print() function is called.
-
-
-Instrumenting the C/C++ MET code
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* For each .cpp file to be considered for benchmarking, include the ctrack.hpp header:
-
-.. code-block:: ini
-
-    #ifdef WITH_PROFILER
-    #include "ctrack.hpp"
-    #endif
-
-* Add the **CTRACK** directive to any functions of interest:
-
-.. code-block:: ini
-
-      void some_interesting_function(){
-         #ifdef WITH_PROFILER
-         CTRACK;
-         #endif
-
-         //Do some stuff...
-         return something;
-      }
-
-* To write the summary and detail benchmark metrics to text files:
-
-  In the main() or met_main() function, invoke the ctrack::result_print()
-
-  .. code-block:: ini
-
-       void met_main(){
-
-          //Do some stuff...
-          #ifdef WITH_PROFILER
-          ctrack::result_print();
-          #endif
-
-         //Do cleanup
-         return return_code
-       }
+ The summary_output.txt and detail_output.txt files will only be saved when the ctrack::result_print() function is
+ called within main() or met_main().
 
 Compile MET code
 ^^^^^^^^^^^^^^^^
@@ -207,8 +169,23 @@ correspond to the MET tool that was instrumented.
 
 From the command line:
 
-* *cat make.log*
+.. code-block:: ini
 
+   cat make.log
+
+.. note::
+
+   There will be an error message like the following:
+
+   make[1]: *** No rule to make target 'profiler', needed by 'all'.  Stop.
+
+   make[1]: Leaving directory '/d1/personal/mwin/AF_optimization/feature_3065_benchmarking_ensemble_stat/MET/scripts'
+
+   make: *** [Makefile:880: test] Error 2
+
+
+This does not indicate an error with the compilation.  The --enable-profiler option does not have a build target,
+it is used to turn on the CTRACK tool.
 
 .. note::
 
@@ -288,9 +265,12 @@ Edit the benchmark.yaml configuration file
 The following settings **must** be specified:
 
 - **filename**
+
   - the supplied filename prepended with a Timestamp that follows ISO 1806 format
   - if left empty, the timestamp alone will be used as the filename
+
 - **benchmark_output_path**
+
   - output directory where the output files will be saved
   - specify in one of two ways:
 
@@ -319,38 +299,129 @@ The following settings **must** be specified:
   - location of the METplus source code, specified by one of the following methods:
 
      - indicated as a full path e.g. /home/username/METplus
-     - setting the METPLUS_BASE environment variable and use the current environment syntax (!ENV '$ENV'
+     - setting the METPLUS_BASE environment variable and use the current environment syntax like the following:
+
+        .. code-block:: ini
+
+           !ENV '${SOME_ENV_NAME}'
+
+        Make sure that the SOME_ENV_NAME environment variable is defined
+
 - system.conf
+
   - file location of the system_conf
   - full path and file name
   - pre-condition: generate a system.conf file
+
 - wrapper_conf
+
   - the location of the METplus wrapper use case config file(s)
   - more than one use case can be run
   - full path and file name
   - pre-condition: generate the necessary wrapper config file(s)
 
 
-Run the Python code to consolidate benchmarking metrics
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Invoke the Python script *benchmark.py* to collect the benchmarking metrics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. note::
+ 
+   Use Python 3.12 or above for running the benchmark.py script
+
+
+.. note::
+
+   When collecting benchmarking metrics via the MET command line commands, first
+   define the necessary environment variables for the corresponding MET tool (e.g. Ensemble-Stat tool environment
+   variables specified in the $HOME/METplus/metplus/parm/met_config/EnsembleStatConfig_wrapped)
+
+For example, the following example bash script has been used to set the necessary environment variables for a
+specific Ensemble-Stat run:
+
+.. code-block:: ini
+
+   #!/usr/bin/bash
+
+   export METPLUS_CENSOR_THRESH="";
+   export METPLUS_CENSOR_VAL="";
+   export METPLUS_CI_ALPHA="ci_alpha = [0.05];";
+   export METPLUS_CLIMO_CDF_DICT="";
+   export METPLUS_CLIMO_MEAN_DICT=“”;
+   export METPLUS_CLIMO_STDEV_DICT="";
+   export METPLUS_CONTROL_ID="";
+   export METPLUS_DESC="desc = \"NA\";";
+   export METPLUS_DUPLICATE_FLAG="";
+   export METPLUS_ECLV_POINTS="";
+   export METPLUS_ENS_MEMBER_IDS="";
+   export METPLUS_ENS_PHIST_BIN_SIZE="";
+   export METPLUS_ENS_SSVAR_BIN_SIZE="";
+   export METPLUS_ENS_THRESH="ens_thresh = 1.0;";
+   export METPLUS_FCST_CLIMO_STDEV_DICT="";
+   export METPLUS_FCST_FIELD="field = [{ name=\"APCP\"; level=\"A01\"; }];";
+   export METPLUS_FCST_FILE_TYPE=""; export METPLUS_GRID_WEIGHT_FLAG="";
+   export METPLUS_INTERP_DICT="interp = {vld_thresh = 1.0;shape = SQUARE;type = {method = [NEAREST];width = [1];}}";
+   export METPLUS_MASK_GRID="";
+   export METPLUS_MASK_POLY="";
+   export METPLUS_MESSAGE_TYPE="";
+   export METPLUS_MET_CONFIG_OVERRIDES="";
+   export METPLUS_MODEL="model = \"RRFS\";";
+   export METPLUS_NC_ORANK_FLAG_DICT="nc_orank_flag = {latlon = TRUE;mean = TRUE;raw = TRUE;rank = TRUE;pit = TRUE;vld_count = TRUE;weight = FALSE;}";
+   export METPLUS_OBS_CLIMO_MEAN_DICT="";
+   export METPLUS_OBS_CLIMO_STDEV_DICT="";
+   export METPLUS_OBS_ERROR_FLAG="";
+   export METPLUS_OBS_FIELD="field = [{ name=\"APCP\"; level=\"A01\"; }];";
+   export METPLUS_OBS_FILE_TYPE=""; export METPLUS_OBS_QUALITY_EXC="";
+   export METPLUS_OBS_QUALITY_INC=""; export METPLUS_OBS_THRESH="";
+   export METPLUS_OBS_WINDOW_DICT="obs_window = {beg = -1800;end = 1800;}";
+   export METPLUS_OBTYPE="obtype = \"CCPA\";";
+   export METPLUS_OBTYPE_AS_GROUP_VAL_FLAG="";
+   export METPLUS_OUTPUT_FLAG_DICT="output_flag = {ecnt = NONE;rps = NONE;rhist = STAT;phist = STAT;orank = STAT;ssvar = STAT;relp = STAT;}";
+   export METPLUS_OUTPUT_PREFIX="";
+   export METPLUS_POINT_WEIGHT_FLAG="";
+   export METPLUS_PROB_CAT_THRESH="";
+   export METPLUS_PROB_PCT_THRESH="";
+   export METPLUS_REGRID_DICT="regrid = {to_grid = OBS;method = NEAREST;width = 1;vld_thresh = 0.5;shape = SQUARE;}";
+   export METPLUS_SKIP_CONST=""; exp
+
 
 Run the following from the command line (from the location where the benchmark.py file is located):
 
-*python benchmark.py*
+.. code-block:: ini
+
+  python benchmark.py
 
 or, if running from any other directory:
 
-*python /path/to/benchmark.py*
+.. code-block:: init
+
+  python /path/to/benchmark.py
 
 replacing */path/to* with the full path to the benchmark.py code from your current working directory
 
 .. note::
 
-   The intermediate summary.txt and details.txt files that contain the CTRACK benchmark metrics are found in the
+   The intermediate summary_output.txt and detail_output.txt files that contain the CTRACK benchmark metrics are found in the
    directory from which the benchmark.py script was invoked.  The final, consolidated report is saved as a .csv and
    a tabular .txt file as specified in the **benchmark_output_path** setting.
 
+View the results
+^^^^^^^^^^^^^^^^
 
+The benchmark.py script creates .csv and .txt files with consolidated metrics from the summary and details tables
+(generated by the CTRACK tool).
+
+View the consolidated metrics to identify potential performance enhancements.  Refer to the CTRACK documentation to
+learn about the metrics collected, under the **Metrics & Output** section:
+
+     https://github.com/Compaile/ctrack?tab=readme-ov-file#metrics--output
+
+
+.. note:
+
+
+  The consolidated files will be named *filename*_*timestamp*.csv and *filename*_*timestamp*.txt if the filename
+  setting is specified in the benchmark.yaml configuration file.  If the filename setting is not specified, then the files
+  will be named *timestamp*.csv and *timestamp*.txt.
 
 
 Keywords
