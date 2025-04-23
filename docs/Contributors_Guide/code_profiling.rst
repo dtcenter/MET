@@ -167,6 +167,12 @@ These tables created by CTRACK can be viewed in the make.log before they are con
 Use the *cat* (concatenation) tool to view the make.log file to view the CTRACK-generated metrics tables that
 correspond to the MET tool that was instrumented.
 
+.. note::
+
+   **Concatenation** (vs viewing via a text editor like vim) **must** be used when viewing the logs,
+   as the CTRACK reformatted output is formatted using *BeautifulTable*.
+
+
 From the command line:
 
 .. code-block:: ini
@@ -187,10 +193,6 @@ From the command line:
 This does not indicate an error with the compilation.  The --enable-profiler option does not have a build target,
 it is used to turn on the CTRACK tool.
 
-.. note::
-
-   **Concatenation** (vs viewing via a text editor like vim) **must** be used when viewing the logs,
-   as the CTRACK reformatted output is formatted using *BeautifulTable*.
 
 
 Edit the benchmark.yaml configuration file
