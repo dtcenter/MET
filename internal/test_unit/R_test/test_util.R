@@ -360,13 +360,24 @@ compareStatLty = function(stat1, stat2, lty, verb=0, strict=0){
 	dfV2 = readStatData(stat2, strV2, lty);
 
 	# replace NA with bad data value in the data columns
+	# replace tiny numbers with 0 in the data columns
 	for(i in 22:ncol(dfV1)){
 		ind = is.na(dfV1[,i]);
 		if(sum(ind) > 0) { dfV1[ind,i] = -9999.0; }
+		boolNum = is.numeric(dfV1[,i]);
+		if(boolNum) {
+			ind = abs(dfV1[,i]) < isZeroTol;
+			if(sum(ind) > 0) { dfV1[ind,i] = 0.0; }
+		}
 	}
 	for(i in 22:ncol(dfV2)){
 		ind = is.na(dfV2[,i]);
 		if(sum(ind) > 0) { dfV2[ind,i] = -9999.0; }
+		boolNum = is.numeric(dfV2[,i]);
+		if(boolNum) {
+			ind = abs(dfV2[,i]) < isZeroTol;
+			if(sum(ind) > 0) { dfV2[ind,i] = 0.0; }
+		}
 	}
 
 	# check for a mis-match on number of rows, and report if any are found
