@@ -210,7 +210,7 @@ def parse_config(path=None, data=None, tag='!ENV'):
     :param str tag: the tag to look for
     """
     # pattern for global vars: look for ${word}
-    pattern = re.compile('.*?\${(\w+)}.*?')
+    pattern = re.compile(r'.*?\${(\w+)}.*?')
     loader = yaml.SafeLoader
 
     # the tag will be used to mark where to start searching for the pattern
