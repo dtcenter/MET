@@ -181,7 +181,7 @@ Overview of Steps for Performing Benchmarking
          The CTRACK output is formatted using *BeautifulTable*.
          Therefore **concatenation** (vs viewing via a text editor like vim) facilitates viewing the human-readable
          version of the tables. The human-readable form of the tables is also available while running the
-         *tail -f* command when viewing the make.log
+         *tail -f* command when viewing the make.log during compilation.
 
       From the command line:
 
