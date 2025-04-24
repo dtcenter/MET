@@ -192,6 +192,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
 #pragma omp for reduction(+: n, f_bar, o_bar, ff_bar, oo_bar, fo_bar,   \
                              fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar, \
                              err_bar, abs_err_bar, err_sq_bar)
+
       for(int i=0; i<i_na.n(); i++) {
 
          //
@@ -203,7 +204,9 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
          double o   = pd.o_na[j];
          double fc  = (cmn_flag ? pd.fcmn_na[j] : bad_data_double);
          double oc  = (cmn_flag ? pd.ocmn_na[j] : bad_data_double);
-         double wgt = pd.wgt_na[j]/wgt_sum;
+
+         // Weight indexed with i, not j
+         double wgt = pd.wgt_na[i]/wgt_sum;
 
          //
          // Should be no bad data, but checking to be sure
@@ -947,6 +950,8 @@ void compute_nbrcntinfo(const PairDataPoint &pd,
 
          double f   = pd.f_na[j];
          double o   = pd.o_na[j];
+
+         // Weight indexed with i, not j
          double wgt = pd.wgt_na[i]/wgt_sum;
 
          ff_bar += wgt*f*f;
