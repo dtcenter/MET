@@ -765,32 +765,26 @@ DataPlane add_obs_error_inc(const gsl_rng *r, FieldType t,
       exit(1);
    }
 
-#pragma omp parallel default(none)           \
-   shared(r, t, in_e, in_dp, out_dp, obs_dp) \
-   shared(obs_error_table, var_name, obtype)
-   {
+   // Apply random perturbation to each grid point
+   // Do not parallelize loops that use the random number generator
+   for(int x=0; x<out_dp.nx(); x++) {
+      for(int y=0; y<out_dp.ny(); y++) {
 
-      // Apply random perturbation to each grid point
-#pragma omp for schedule(static)
-      for(int x=0; x<out_dp.nx(); x++) {
-         for(int y=0; y<out_dp.ny(); y++) {
+         // Current observation value
+         double obs_v = obs_dp.get(x, y);
 
-            // Current observation value
-            double obs_v = obs_dp.get(x, y);
+         // For a nullptr pointer, do a table lookup
+         const ObsErrorEntry *e = (in_e ? in_e :
+                  obs_error_table.lookup(var_name, obtype,
+                                         obs_v));
 
-            // For a nullptr pointer, do a table lookup
-            const ObsErrorEntry *e = (in_e ? in_e :
-                     obs_error_table.lookup(var_name, obtype,
-                                            obs_v));
+         // Get current data value
+         double in_v = in_dp.get(x, y);
 
-            // Get current data value
-            double in_v = in_dp.get(x, y);
-
-            // Store perturbed value
-            out_dp.set(add_obs_error_inc(r, t, e, obs_v, in_v), x, y);
-         }
+         // Store perturbed value
+         out_dp.set(add_obs_error_inc(r, t, e, obs_v, in_v), x, y);
       }
-   } // End omp parallel
+   }
 
    return out_dp;
 }
@@ -853,29 +847,23 @@ DataPlane add_obs_error_bc(const gsl_rng *r, FieldType t,
       exit(1);
    }
 
-#pragma omp parallel default(none)           \
-   shared(r, t, in_e, in_dp, out_dp, obs_dp) \
-   shared(obs_error_table, var_name, obtype)
-   {
+   // Apply bias correction to each grid point
+   // Do not parallelize loops that use the random number generator
+   for(int x=0; x<out_dp.nx(); x++) {
+      for(int y=0; y<out_dp.ny(); y++) {
 
-      // Apply bias correction to each grid point
-#pragma omp for schedule(static)
-      for(int x=0; x<out_dp.nx(); x++) {
-         for(int y=0; y<out_dp.ny(); y++) {
+         // For a nullptr pointer, do a table lookup
+         const ObsErrorEntry *e = (in_e ? in_e :
+                  obs_error_table.lookup(var_name, obtype,
+                                         obs_dp.get(x,y)));
 
-            // For a nullptr pointer, do a table lookup
-            const ObsErrorEntry *e = (in_e ? in_e :
-                     obs_error_table.lookup(var_name, obtype,
-                                            obs_dp.get(x,y)));
+         // Get current data value
+         double v = in_dp.get(x, y);
 
-            // Get current data value
-            double v = in_dp.get(x, y);
-
-            // Store perturbed value
-            out_dp.set(add_obs_error_bc(r, t, e, v), x, y);
-         }
+         // Store perturbed value
+         out_dp.set(add_obs_error_bc(r, t, e, v), x, y);
       }
-   } // End omp parallel
+   }
 
    return out_dp;
 }
