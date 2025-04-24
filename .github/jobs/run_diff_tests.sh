@@ -13,23 +13,27 @@ source ${MET_REPO_DIR}/.github/jobs/test_env_vars.sh
 ###
 
 echo "Cloning METplus"
-time_command git clone https://github.com/dtcenter/METplus
+time_command git clone --single-branch https://github.com/dtcenter/METplus ${METPLUS_DIR}
 
 echo "Running comparison on test output"
 CMD_LOGFILE=/met/logs/comp_dir.log
-time_command ${MET_TEST_BASE}/bin/comp_dir.py ${MET_TEST_TRUTH} ${MET_TEST_OUTPUT}
+# CMD_LOGFILE=logs/comp_dir.log
+time_command ${MET_TEST_BASE}/python/comp_dir.py ${MET_TEST_TRUTH} ${MET_TEST_OUTPUT}
 if [ $? != 0 ]; then
     echo "ERROR: Test output comparison failed"
     cat /met/logs/comp_dir.log
+    # cat logs/comp_dir.log
     exit 1
 fi
 
 echo "Running copy_diff_files.py"
 CMD_LOGFILE=/met/logs/copy_diff_files.log
+# CMD_LOGFILE=logs/copy_diff_files.log
 time_command ${MET_REPO_DIR}/.github/jobs/copy_diff_files.py
 if [ $? != 0 ]; then
     echo "ERROR: Copy diff files script failed"
     cat /met/logs/copy_diff_files.log
+    # cat logs/copy_diff_files.log
     exit 1
 fi
 
