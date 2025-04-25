@@ -183,6 +183,9 @@ sub-directory, or the MET Online Tutorial:
       Enable compilation of unstructured grid
       Requires $MET_ATLAS and $MET_ECKIT
 
+  --enable-profiler
+      Enable compilation of profiler (CTRACK)
+
   To configure MET to install all of the available tools in the "bin"
   subdirectory of your current directory, you would use the following command:
 
