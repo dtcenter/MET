@@ -4477,7 +4477,7 @@ double compute_corr(double f, double o, double ff, double oo, double fo,
    v = (n*ff - f*f)*(n*oo - o*o);
 
    // Check for divide by zero
-   if(v < 0 || is_eq(v, 0.0, loose_tol)) {
+   if(v < 0 || is_eq(v, 0.0)) {
       c = bad_data_double;
    }
    else {
