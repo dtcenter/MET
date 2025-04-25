@@ -747,7 +747,7 @@ DataPlane distance_map(const DataPlane &dp) {
             event_count++;
          }
       
-         for(int iy=1; iy<ny; iy++) {
+         for(iy=1; iy<ny; iy++) {
             if(dp.get(ix, iy) > 0) {
                distance_value = 0.0;
                event_count++;
@@ -759,7 +759,7 @@ DataPlane distance_map(const DataPlane &dp) {
          } // end for iy
       
          // Meijster scan 2
-         for(int iy=ny-2; iy>=0; iy--) {
+         for(iy=ny-2; iy>=0; iy--) {
             distance_value = g_distance.get(ix, (iy+1));
             if(g_distance.get(ix, iy) > distance_value) {
                g_distance.set((1.0 + distance_value), ix, iy);
@@ -781,8 +781,10 @@ DataPlane distance_map(const DataPlane &dp) {
             // Meijster Scan 3
             for(int ix=1; ix<nx; ix++) {
                while(iq >= 0 &&
-                     euclide_distance((t[iq]-s[iq]), g_distance.get(s[iq], iy)) >
-                     euclide_distance((t[iq]-ix), g_distance.get(ix, iy))) iq--;
+                     euclide_distance((t[iq]-s[iq]),
+                        nint(g_distance.get(s[iq], iy))) >
+                     euclide_distance((t[iq]-ix),
+                        nint(g_distance.get(ix, iy)))) iq--;
 
                if(iq < 0) {
                   iq = 0;
@@ -790,8 +792,8 @@ DataPlane distance_map(const DataPlane &dp) {
                }
                else {
                   int iw = 1 + meijster_sep(ix, s[iq],
-                                 g_distance.get(ix, iy),
-                                 g_distance.get(s[iq], iy));
+                                  g_distance.get(ix, iy),
+                                  g_distance.get(s[iq], iy));
                   if(iw < nx) {
                      iq++;
                      s[iq] = ix;
@@ -802,7 +804,8 @@ DataPlane distance_map(const DataPlane &dp) {
 
             // Meijster Scan 4
             for(int ix=nx-1; ix>=0; ix--) {
-               distance_value = euclide_distance((ix-s[iq]), g_distance.get(s[iq],iy));
+               distance_value = euclide_distance((ix-s[iq]),
+                                   nint(g_distance.get(s[iq],iy)));
                dm.set(distance_value,ix,iy);
                if(ix == t[iq]) iq--;
             } // end for ix
