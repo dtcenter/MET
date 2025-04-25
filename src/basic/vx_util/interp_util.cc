@@ -74,7 +74,7 @@ NumArray interp_points(const DataPlane &dp, const GridTemplate &gt,
    points.extend(gt.size());
 
    // Search the neighborhood, storing any points off the grid as bad data
-   for(GridPoint *gp = gt.getFirst(x, y, dp.nx(), dp.ny());
+   for(const GridPoint *gp = gt.getFirst(x, y, dp.nx(), dp.ny());
        gp != nullptr; gp = gt.getNext()) {
       if(gp->x < 0 || gp->x >= dp.nx() ||
          gp->y < 0 || gp->y >= dp.ny()) {
@@ -98,7 +98,7 @@ double interp_min(const DataPlane &dp, const GridTemplate &gt,
    double min_v = bad_data_double;
 
    // Search the neighborhood
-   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+   for(const GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
@@ -164,7 +164,7 @@ double interp_max(const DataPlane &dp, const GridTemplate &gt,
    double max_v = bad_data_double;
 
    // Search the neighborhood
-   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+   for(const GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
@@ -229,7 +229,7 @@ double interp_median(const DataPlane &dp, const GridTemplate &gt,
    points.extend(gt.size());
 
    // Store the neighborhood points
-   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+   for(const GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
@@ -259,7 +259,6 @@ double interp_median_ll(const DataPlane &dp, int x_ll, int y_ll, int wdth, doubl
    points.extend(wdth*wdth);
 
    // Search the neighborhood for valid data points
-   int count = 0;
    for(int x=x_ll; x<x_ll+wdth; x++) {
       if(x < 0 || x >= dp.nx()) continue;
 
@@ -292,7 +291,7 @@ double interp_uw_mean(const DataPlane &dp, const GridTemplate &gt,
    double uw_mean_v;
 
    // Sum the valid data in the neighborhood
-   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+   for(const GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
@@ -376,7 +375,7 @@ double interp_dw_mean(const DataPlane &dp, const GridTemplate &gt,
       y = floor(obs_y);
    }
 
-   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+   for(const GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
@@ -623,7 +622,7 @@ double interp_geog_match(const DataPlane &dp, const GridTemplate &gt,
    interp_x = interp_y = bad_data_int;
    interp_d = interp_v = bad_data_double;
 
-   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+   for(const GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
@@ -675,7 +674,7 @@ double interp_nbrhd(const DataPlane &dp, const GridTemplate &gt, int x, int y,
    // Compute the ratio of events within the neighborhood
    count = count_thr = 0;
 
-   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+   for(const GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
@@ -835,7 +834,7 @@ double interp_best(const DataPlane &dp, const GridTemplate &gt,
    // Search the neighborhood for the best match to the observation
    count = 0;
    min_d = min_v = bad_data_double;
-   for(GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
+   for(const GridPoint *gp = gt.getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the optional mask
@@ -1016,8 +1015,7 @@ MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
    // Search the neighborhood
    //
    mp.set_size(nx, ny, false);
-   GridPoint *gp = nullptr;
-   for(gp = gt.getFirstInGrid(x, y, nx, ny);
+   for(const GridPoint *gp = gt.getFirstInGrid(x, y, nx, ny);
        gp != nullptr; gp = gt.getNextInGrid()) {
 
       // Check the land mask
