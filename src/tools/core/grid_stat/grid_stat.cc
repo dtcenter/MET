@@ -130,7 +130,6 @@
 
 #include <netcdf>
 #include "main.h"
-#include "handle_openmp.h"
 
 #include "grid_stat.h"
 
@@ -207,9 +206,6 @@ static void set_ugrid_config(const StringArray &);
 ////////////////////////////////////////////////////////////////////////
 
 int met_main(int argc, char *argv[]) {
-
-   // Set up OpenMP (if enabled)
-   init_openmp();
 
    // Process the command line arguments
    process_command_line(argc, argv);

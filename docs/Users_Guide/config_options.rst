@@ -499,12 +499,10 @@ Regions of parallelized code are:
     * Called by `mode` to apply a convolution smoothing operation when
       defining objects.
 
-Only the following top-level executables can presently benefit from OpenMP
-parallelization:
+  * :code:`met_regrid_* (vx_regrid.cc)`
 
-  * :code:`grid_stat`
-  * :code:`grid_ens_prod`
-  * :code:`mode`
+    * Called by `regrid_data_plane` and all MET tools that support automated
+      regridding logic.
 
 **Thread Binding**
 
