@@ -1406,6 +1406,7 @@ void NcCfFile::read_netcdf_grid()
   NcVar *data_var = nullptr;
   NcVar *tmp_data_var = nullptr;
   IntArray var_index_list;
+  static const string method_name = "NcCfFile::read_netcdf_grid() -> ";
 
   for (int i = 0; i < Nvars; ++i)
   {
@@ -1418,7 +1419,7 @@ void NcCfFile::read_netcdf_grid()
 
     int num_dims = get_dim_count(var);
 
-    if (num_dims < 2 || num_dims > 4)
+    if (num_dims < 2)
       continue;
 
     // Skip the latitude and longitude variables, if they are present
@@ -1467,7 +1468,11 @@ void NcCfFile::read_netcdf_grid()
     } /* endfor - i */
   }
 
-  if (data_var == nullptr) data_var = tmp_data_var;
+  if (data_var == nullptr) {
+    mlog << Error << "\n" << method_name
+         << "The data variable was not identified to find dimensions.\n\n";
+    exit(1);
+  }
 
   // Pull the grid projection from the variable information.  First, look for
   // a grid_mapping attribute.
