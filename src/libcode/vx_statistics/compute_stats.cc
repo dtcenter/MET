@@ -453,7 +453,6 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       // Initialize sums
       f_bar = o_bar = ff_bar = oo_bar = fo_bar = 0.0;
 
-/* JHG comment out this parallization to see if the SP_CORR diff goes away
 #pragma omp parallel default(none)                             \
       shared(f_na_rank, o_na_rank, n_f_rank, wgt_na2, wgt_sum) \
       shared(f_bar, o_bar, ff_bar, oo_bar, fo_bar)
@@ -464,7 +463,6 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
          // Rank correlation coefficient
          //
 #pragma omp for reduction(+: f_bar, o_bar, ff_bar, oo_bar, fo_bar)
-*/
          for(int i=0; i<n_f_rank; i++) {
 
             double f   = f_na_rank[i];
@@ -477,7 +475,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
             oo_bar += wgt*o*o;
             fo_bar += wgt*f*o;
          } // end for i
-// JHG      } // End omp parallel
+      } // End omp parallel
 
       //
       // Compute Spearman's Rank correlation coefficient
