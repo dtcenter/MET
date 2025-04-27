@@ -684,13 +684,13 @@ namespace ctrack {
 			template<typename StreamType>
 			void write_summary_table(StreamType& stream, bool use_color = false) {
 
-                                std::ofstream out("summary_output.txt");
+                                std::ofstream summary_out("summary_output.txt", std::ios::app);
 				BeautifulTable table({ "filename", "function", "line","calls","ae" + center_intervall_str + "%","ae[0-100]%",
 					"time ae[0-100]" ,"time a[0-100]" }, use_color, alternate_colors);
 				for (auto& entry : sorted_events) {
 
                                          // Write out the summary information to the summary_output.txt file
-                                         out << "filename: " << BeautifulTable::stable_shortenPath(entry->filename)
+                                         summary_out << "filename: " << BeautifulTable::stable_shortenPath(entry->filename)
                                                 << "|function: " << entry->function_name 
                                                 << "|line: " << entry->line 
                                                 << "|start_time: " << BeautifulTable::table_timepoint(track_start_time) 
@@ -709,14 +709,14 @@ namespace ctrack {
                                                 << "\n";
 				}
 
-                                out.close();
+                                summary_out.close();
 				//table.print(stream);
                                 
 			}
 
 
 			template<typename StreamType>
-			void get_detail_table(StreamType& stream, bool use_color = false, bool reverse_vector = false) {
+			void get_detail_table(StreamType& stream, bool use_color = false, bool reverse_vector = true) {
 				if (reverse_vector) {
 					std::reverse(sorted_events.begin(), sorted_events.end());
 				}
@@ -754,7 +754,7 @@ namespace ctrack {
 					std::reverse(sorted_events.begin(), sorted_events.end());
 				}
 
-                                std::ofstream out("detail_output.txt");
+                                std::ofstream out("detail_output.txt", std::ios::app);
 
 				for (int i = static_cast<int>(sorted_events.size()) - 1; i >= 0; i--) {
 					auto& entry = sorted_events[i];
