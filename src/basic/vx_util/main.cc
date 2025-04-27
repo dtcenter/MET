@@ -26,10 +26,11 @@
 //      void initialize();
 //      void process_command_line(int argc, char **argv);
 //
-//   Mod#   Date      Name        Description
-//   ----   ----      ----        -----------
-//   000    07-06-22  Soh         New
-//   001    09-06-22  Prestopnik  MET #2227 Remove namespace std from header files
+//   Mod#   Date      Name          Description
+//   ----   ----      ----          -----------
+//   000    07-06-22  Soh           New
+//   001    09-06-22  Prestopnik    MET #2227 Remove namespace std from header files
+//   002    04-17-25  Halley Gotway MET #3120 Initialize OpenMP
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -37,6 +38,7 @@
 #include <pwd.h>
 
 #include "main.h"
+#include "handle_openmp.h"
 #include "concat_string.h"
 #include "memory.h"
 #include "logger.h"
@@ -110,6 +112,9 @@ void do_pre_process(int argc, char *argv[]) {
    mlog << Debug(1) << msg << "\n";
 
    set_handlers();
+
+   // Set up OpenMP (if enabled)
+   init_openmp();
 }
 
 ////////////////////////////////////////////////////////////////////////

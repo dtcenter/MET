@@ -48,8 +48,6 @@
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
-#include "handle_openmp.h"
-
 using namespace std;
 using namespace netCDF;
 
@@ -92,9 +90,6 @@ static void set_ctrl_file  (const StringArray &);
 ////////////////////////////////////////////////////////////////////////
 
 int met_main(int argc, char *argv[]) {
-
-   // Set up OpenMP (if enabled)
-   init_openmp();
 
    // Process the command line arguments
    process_command_line(argc, argv);
