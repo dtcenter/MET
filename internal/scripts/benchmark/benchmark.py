@@ -167,9 +167,9 @@ def consolidate_info(summary_df:pd.DataFrame, detail_df:pd.DataFrame) -> pd.Data
     :param detail_df: pandas dataframe containing detail benchmark info
     :return:  pandas Dataframe
    """
-    summary_df['new_index'] = summary_df.groupby(['filename', 'function', 'line']).ngroup()
-    detail_df['new_index'] = detail_df.groupby(['filename', 'function', 'line']).ngroup()
-    merged = summary_df.merge(detail_df, on=["new_index"], how="left")
+    summary_df['profiler_index'] = summary_df.groupby(['filename', 'function', 'line']).ngroup()
+    detail_df['profiler_index'] = detail_df.groupby(['filename', 'function', 'line']).ngroup()
+    merged = summary_df.merge(detail_df, on=["profiler_index"], how="left")
 
     # clean up redundant filename/function/line number columns
     merged.drop(['filename_y', 'function_y', 'line_y'], axis=1, inplace=True)
@@ -466,8 +466,13 @@ def run_benchmark():
 
     if run_met is True:
         run_met_cli(settings, ts, files_from_ctrack)
+        os.remove(summary_filename)
+        os.remove(details_filename)
+
     else:
         run_usecases(settings, ts, files_from_ctrack)
+        os.remove(summary_filename)
+        os.remove(details_filename)
 
 
 if __name__ == "__main__":
