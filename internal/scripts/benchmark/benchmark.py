@@ -161,14 +161,19 @@ def extract_summary_info(infile:str, subdir:str) -> pd.DataFrame:
 def consolidate_info(summary_df:pd.DataFrame, detail_df:pd.DataFrame) -> pd.DataFrame:
     """
        Consolidate the summary and detail information for each filename/function/line combination.
-       Create a
+
 
     :param summary_df: pandas dataframe containing summary benchmark info
     :param detail_df: pandas dataframe containing detail benchmark info
     :return:  pandas Dataframe
    """
+    summary_df['new_index'] = summary_df.groupby(['filename', 'function', 'line']).ngroup()
+    detail_df['new_index'] = detail_df.groupby(['filename', 'function', 'line']).ngroup()
+    merged = summary_df.merge(detail_df, on=["new_index"], how="left")
 
-    merged = summary_df.merge(detail_df, on=["filename", "function", "line"], how="left")
+    # clean up redundant filename/function/line number columns
+    merged.drop(['filename_y', 'function_y', 'line_y'], axis=1, inplace=True)
+    merged.rename(columns={"filename_x":"filename", "function_x":"function", "line_x":"line"}, inplace=True)
 
     return merged
 
@@ -404,14 +409,11 @@ def run_met_cli(settings:dict, ts, files_from_ctrack:tuple) -> None:
         subprocess.run(met_command, shell=True)
 
     # Extract the benchmark data
-    full_filename = ts
-    if len(settings['filename'])  > 0 :
-        full_filename = settings['filename'].join(ts)
     summary_info = extract_summary_info(summary_filename, full_benchmark_path)
     detail_info = extract_detail_info(details_filename, full_benchmark_path)
 
     consolidated_df = consolidate_info(summary_info, detail_info)
-    save_results(consolidated_df, settings['benchmark_output_path'], ts, full_filename, settings['met_subdir_name'])
+    save_results(consolidated_df, settings['benchmark_output_path'], ts, settings['filename'], settings['met_subdir_name'])
 
     # provide information about this run: Python version, etc.
 
