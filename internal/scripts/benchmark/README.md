@@ -1,1 +1,0 @@
-Refer to the MET ReadTheDocs Contributor's Guide: https://app.readthedocs.org/projects/met/
