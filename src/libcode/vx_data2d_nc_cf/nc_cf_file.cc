@@ -1469,9 +1469,9 @@ void NcCfFile::read_netcdf_grid()
   }
 
   if (data_var == nullptr) {
-    mlog << Error << "\n" << method_name
-         << "The data variable was not identified to find dimensions.\n\n";
-    exit(1);
+    mlog << Warning << "\n" << method_name
+         << "The data variable was not identified to find dimensions. This may cause the segmentation fault.\n\n";
+    data_var = tmp_data_var;
   }
 
   // Pull the grid projection from the variable information.  First, look for
