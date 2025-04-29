@@ -1464,12 +1464,8 @@ return;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-double dot(double x_1, double y_1, double x_2, double y_2)
-
-{
-
-return x_1*x_2 + y_1*y_2;
-
+double dot(double x_1, double y_1, double x_2, double y_2) {
+   return x_1*x_2 + y_1*y_2;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1612,41 +1608,40 @@ StepCase get_step_case(bool lr, bool ur, bool ul, bool ll) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void apply_mask(ShapeData &f, ShapeData &mask)
-
-{
+void apply_mask(ShapeData &f, ShapeData &mask) {
 
    if(f.data.nx() != mask.data.nx() ||
       f.data.ny() != mask.data.ny() ) {
-
       mlog << Error << "\napply_mask() -> "
            << "grid dimensions do not match\n\n";
       exit(1);
    }
 
-   for(int x=0; x<f.data.nx(); x++) {
-      for(int y=0; y<f.data.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(f, mask, bad_data_float)
+   {
 
-         //
-         // Put bad data everywhere the mask is turned off
-         //
-         if(!mask.s_is_on(x, y)) f.data.set(bad_data_float, x, y);
+      //
+      // Put bad data everywhere the mask is turned off
+      //
+#pragma omp for schedule(static)
+      for(int x=0; x<f.data.ny(); x++) {
+         for(int y=0; y<f.data.ny(); y++) {
+            if(!mask.s_is_on(x, y)) f.data.set(bad_data_float, x, y);
+         }
       }
-   }
+   } // End omp parallel
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int ShapeData::n_objects() const
-
-{
-   int n;
-   ShapeData sd;
+int ShapeData::n_objects() const {
 
    // Split the field to number the shapes
-   sd = split(*this, n);
+   int n;
+   ShapeData sd(split(*this, n));
 
    return n;
 }
@@ -1768,9 +1763,7 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ShapeData::threshold_area(SingleThresh t)
-
-{
+void ShapeData::threshold_area(SingleThresh t) {
 
    // Split the field to number the shapes
    int n;
@@ -1808,9 +1801,8 @@ void ShapeData::threshold_area(SingleThresh t)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThresh t)
-
-{
+void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc,
+                                    SingleThresh t) {
 
    if(perc < 0 || perc > 102) {
       mlog << Error << "\nShapeData:threshold_intensity() -> "
@@ -2084,12 +2076,10 @@ return out;
 
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-ShapeData select(const ShapeData &id, int n)
+ShapeData select(const ShapeData &id, int n) {
 
-{
    ShapeData d(id);
 
    int nxy = d.data.nxy();
@@ -2101,9 +2091,9 @@ ShapeData select(const ShapeData &id, int n)
 #pragma for schedule(static)
       for(int j=0; j<nxy; j++) {
 
-         int k = nint(d.data.buf()[j]);
+         int obj_id = nint(d.data.buf()[j]);
 
-         if(k == n) d.data.buf()[j] = (k == n ? 1 : 0);
+         d.data.buf()[j] = (obj_id == n ? 1 : 0);
       }
    } // End omp parallel
 
@@ -2113,9 +2103,7 @@ ShapeData select(const ShapeData &id, int n)
 
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 void ShapeData::filter(SingleThresh t) {
 
@@ -2139,9 +2127,7 @@ void ShapeData::filter(SingleThresh t) {
    return;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 int ShapeData_intersection(const ShapeData &f1, const ShapeData &f2) {
 
@@ -2171,7 +2157,6 @@ int ShapeData_intersection(const ShapeData &f1, const ShapeData &f2) {
 
    return intersection;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //
