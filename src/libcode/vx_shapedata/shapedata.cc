@@ -195,9 +195,7 @@ bool ShapeData::f_is_on(int x, int y) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ShapeData::calc_moments()
-
-{
+void ShapeData::calc_moments() {
 
    int s_area = 0;
    int f_area = 0;
