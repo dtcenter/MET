@@ -32,6 +32,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <numeric>
 
 #include "shapedata.h"
 #include "mode_columns.h"
@@ -47,8 +48,6 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-static const bool use_new = true;
 
 static const int split_enlarge = 4;   //  used for ShapeData  shrink and expand
 
@@ -200,39 +199,65 @@ void ShapeData::calc_moments()
 
 {
 
-   double xx, yy;
+   int s_area = 0;
+   int f_area = 0;
+   vector<double> psum(9, 0.0);
 
-   mom.clear();
+#pragma omp declare reduction(vec_dbl_plus : vector<double> :             \
+                              transform(omp_out.begin(), omp_out.end(),   \
+                                         omp_in.begin(), omp_out.begin(), \
+                                        plus<double>()))                  \
+                    initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
 
-   for(int x=0; x<data.nx(); ++x) {
+#pragma omp parallel default(none)    \
+   shared(data, s_area, f_area, psum)
+   {
 
-      xx = ((double) x);
+#pragma omp for reduction(+: s_area, f_area)   \
+                reduction(vec_dbl_plus : psum)
+      for(int x=0; x<data.nx(); ++x) {
 
-      for(int y=0; y<data.ny(); ++y) {
+         auto xx = ((double) x);
 
-         yy =((double) y);
+         for(int y=0; y<data.ny(); ++y) {
 
-         // Object area based on s_is_on() logic
-         if(s_is_on(x, y)) mom.s_area += 1;
+            auto yy = ((double) y);
 
-         if(f_is_on(x, y)) {
+            // Object area based on s_is_on() logic
+            if(s_is_on(x, y)) s_area += 1;
 
-            mom.f_area += 1;
+            if(f_is_on(x, y)) {
 
-            mom.sx     += xx;
-            mom.sy     += yy;
+               f_area += 1;
 
-            mom.sxx    += xx*xx;
-            mom.sxy    += xx*yy;
-            mom.syy    += yy*yy;
+               psum[0] += xx;
+               psum[1] += yy;
 
-            mom.sxxx   += xx*xx*xx;
-            mom.sxxy   += xx*xx*yy;
-            mom.sxyy   += xx*yy*yy;
-            mom.syyy   += yy*yy*yy;
-         }
-      } // for y
-   } // for x
+               psum[2] += xx*xx;
+               psum[3] += xx*yy;
+               psum[4] += yy*yy;
+
+               psum[5] += xx*xx*xx;
+               psum[6] += xx*xx*yy;
+               psum[7] += xx*yy*yy;
+               psum[8] += yy*yy*yy;
+            }
+         } // for y
+      } // for x
+   } // End omp parallel
+
+   // Store result
+   mom.s_area = s_area;
+   mom.f_area = f_area;
+   mom.sx     = psum[0];
+   mom.sy     = psum[1];
+   mom.sxx    = psum[2];
+   mom.sxy    = psum[3];
+   mom.syy    = psum[4];
+   mom.sxxx   = psum[5];
+   mom.sxxy   = psum[6];
+   mom.sxyy   = psum[7];
+   mom.syyy   = psum[8];
 
    return;
 }
@@ -277,9 +302,16 @@ double ShapeData::area_thresh(const ShapeData *raw_ptr,
    const int Nxy = data.nx()*data.ny();
 
    // Number of points inside the object that meet the threshold criteria
-   for(int i=0; i<Nxy; i++) {
-      if(data.data()[i] > 0 && obj_thresh.check(raw_ptr->data.data()[i])) cur_area++;
-   }
+#pragma omp parallel default(none)                  \
+   shared(raw_ptr, obj_thresh, Nxy, data, cur_area)
+   {
+
+#pragma omp for reduction(+: cur_area)
+      for(int i=0; i<Nxy; i++) {
+         if(data.data()[i] > 0 &&
+            obj_thresh.check(raw_ptr->data.data()[i])) cur_area++;
+      }
+   } // End omp parallel
 
    return cur_area;
 }
@@ -356,13 +388,8 @@ double ShapeData::width() const {
 ////////////////////////////////////////////////////////////////////////
 
 double ShapeData::complexity() const {
-   int count;
-   double shape;
-   double hull;
-   double u = 0.;
-   Polyline poly;
 
-   count = nint(mom.s_area);
+   int count = nint(mom.s_area);
 
    if(count == 0) {
       mlog << Error << "\nShapeData::complexity() const -> "
@@ -370,9 +397,9 @@ double ShapeData::complexity() const {
       exit(1);
    }
 
-   shape = (double) count;
-   poly  = convex_hull();
-   hull  = fabs(poly.uv_signed_area());
+   Polyline poly(convex_hull());
+   double hull  = fabs(poly.uv_signed_area());
+   double shape = (double) count;
 
    //
    // Complexity is defined as the difference in area between the
@@ -380,7 +407,8 @@ double ShapeData::complexity() const {
    // convex hull.  0 <= Complexity < 1, and complexity = 0 indicates
    // that the shape is convex.
    //
-   if (!is_eq(hull, 0.)) u = (hull - shape)/hull;
+   double u = 0.0;
+   if(!is_eq(hull, 0.0)) u = (hull - shape)/hull;
 
    return u;
 }
@@ -389,10 +417,6 @@ double ShapeData::complexity() const {
 
 double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
                                        bool precip_flag) const {
-   int n = 0;
-   double v;
-   double val_sum = 0.0;
-   const int Nxy = data.nx()*data.ny();
 
    if(perc < 0 || perc > 102) {
       mlog << Error << "\nShapeData::intensity_percentile() -> "
@@ -400,7 +424,9 @@ double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
       exit(1);
    }
 
-   vector<double> val(Nxy);
+   const int Nxy = data.nx()*data.ny();
+   vector<double> val;
+   val.reserve(Nxy);
 
    // Compute the requested percentile of intensity
    for(int i=0; i<Nxy; i++) {
@@ -408,30 +434,29 @@ double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
       // Process points for the current object
       if(data.data()[i] > 0) {
 
-         v = raw_ptr->data.data()[i];
+         double v = raw_ptr->data.data()[i];
 
          // Skip bad data and zero precip
          if(::is_bad_data(v) || (precip_flag && is_eq(v, 0.0))) continue;
 
          // Store current value
-         val[n] = v;
-         val_sum += v;
-         n++;
+         val.emplace_back(v);
       }
    }
 
    // Compute the mean of the intensities
+   double v = 0.0;
    if(perc == 101) {
-      v = val_sum/n;
+      v = accumulate(val.begin(), val.end(), 0.0)/val.size();
    }
    // Compute the sum of the intensities
    else if(perc == 102) {
-      v = val_sum;
+      v = accumulate(val.begin(), val.end(), 0.0);
    }
    // Compute a percentile of intensity
    else {
-      sort(val.data(), n);
-      v = percentile(val.data(), n, (double) perc/100.0);
+      sort(val.begin(), val.end());
+      v = percentile(val.data(), val.size(), (double) perc/100.0);
    }
 
    return v;
@@ -622,274 +647,53 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
 
 ////////////////////////////////////////////////////////////////////////
 
+Polyline ShapeData::convex_hull() const {
 
-Polyline ShapeData::convex_hull_new() const
+   vector<IntPoint> in(2*(data.ny() + 1));
+   int n_in = 0;
 
-{
+   for(int y=0; y<(data.ny()); y++) {
 
-int j, k;
-int n_in, n_out;
-Polyline hull_poly;
-IntPoint * in = new IntPoint [2*(data.ny() + 1)];
+      int j = x_left(y);
 
+      if(j < 0) continue;
 
-n_in = 0;
+      in[n_in].x = j;
+      in[n_in].y = y;
 
-for (int y=0; y<(data.ny()); ++y)  {
+      n_in++;
 
-   j = x_left(y);
+      int k = x_right(y);
 
-   if ( j < 0 )  continue;
+      if(k < 0) continue;
 
-   in[n_in].x = j;
-   in[n_in].y = y;
+      if(j == k) continue;
 
-   ++n_in;
+      in[n_in].x = k;
+      in[n_in].y = y;
 
-   k = x_right(y);
+      n_in++;
 
-   if ( k < 0 )  continue;
+   }   //  for y
 
-   if ( j == k )  continue;
+   vector<IntPoint> out(n_in + 2);
 
-   // ++k;
+   int n_out;
+   ihull(in.data(), n_in, out.data(), n_out);
 
-   // if ( k >= data.ny() )  k = data.ny() - 1;
+   Polyline hull_poly;
+   hull_poly.extend_points(n_out);
 
-   in[n_in].x = k;
-   in[n_in].y = y;
-
-   ++n_in;
-
-}   //  for y
-
-IntPoint * out = new IntPoint [n_in + 2];
-
-ihull(in, n_in, out, n_out);
-
-hull_poly.extend_points(n_out);
-
-for (j=0; j<n_out; ++j)  {
-
-   hull_poly.add_point(out[j].x, out[j].y);
-
-}
-
+   for(int j=0; j<n_out; j++) {
+      hull_poly.add_point(out[j].x, out[j].y);
+   }
 
    //
    //  done
    //
 
-if ( out )  { delete [] out;  out = nullptr; }
-if (  in )  { delete []  in;   in = nullptr; }
-
-return hull_poly;
-
+   return hull_poly;
 }
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-Polyline ShapeData::convex_hull() const
-
-{
-
-Polyline p;
-
-if ( use_new )  p = convex_hull_new ();
-else            p = convex_hull_old ();
-
-return p;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-Polyline ShapeData::convex_hull_old() const
-
-{
-
-   int j, k, n, y;
-   int done;
-   Polyline outline;
-   Polyline hull;
-   double e1u, e1v, e2u, e2v;
-   double angle_low, v_low, alpha, beta;
-   double t, angle, p1u, p1v, p2u, p2v;
-
-   hull.clear();
-   outline.clear();
-
-   if(area() <= 0) {
-
-      mlog << Error << "\nShapedata::convex_hull() -> "
-           << "attempting to fit convex hull to a shape with area = 0\n\n";
-      exit(1);
-   }
-
-   hull.extend_points(2*data.ny());
-   outline.extend_points(2*data.ny());
-
-   vector<int> Index(2*data.ny());
-
-   if ( Index.size() < 2*data.ny() )  {
-
-      mlog << Error << "\nShapedata::convex_hull() -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
-
-   n = 0;
-
-   for (y=0; y<data.ny(); ++y)  {
-
-      j = x_left(y);
-
-      if ( j < 0 )  continue;
-
-      outline.u[n] = (double) j;
-      outline.v[n] = (double) y;
-
-      ++n;
-
-      k = x_right(y);
-
-      if ( k < 0 )  continue;
-
-      if ( j == k )  continue;
-
-      outline.u[n] = (double) k;
-      outline.v[n] = (double) y;
-
-      ++n;
-
-   }   //  for y
-
-   outline.n_points = n;
-
-      //
-      //  find "lowest" point in outline
-      //
-
-   v_low = 1.0e10;
-
-   j = -1;
-
-   for (k=0; k<(outline.n_points); ++k)  {
-
-      if ( outline.v[k] < v_low )  { v_low = outline.v[k];  j = k; }
-
-   }
-
-   if ( j < 0 )  {
-
-      mlog << Error << "\nShapedata::convex_hull() -> "
-           << "can't find lowest point\n\n";
-      exit(1);
-
-   }
-
-   n = 1;
-
-   Index[0] = j;
-
-      //
-      //  find hull
-      //
-
-   e1u = 1.0;
-   e1v = 0.0;
-
-   done = 0;
-
-   while ( !done  )  {
-
-      e2u = -e1v;
-      e2v =  e1u;
-
-      angle_low = 1.0e10;
-
-      p1u = outline.u[Index[n - 1]];
-      p1v = outline.v[Index[n - 1]];
-
-      j = -1;
-
-      for (k=0; k<(outline.n_points); ++k)  {
-
-         if ( k == Index[n - 1] )  continue;
-
-         p2u = outline.u[k];
-         p2v = outline.v[k];
-
-         alpha = (p2u - p1u)*e1u + (p2v - p1v)*e1v;
-         beta  = (p2u - p1u)*e2u + (p2v - p1v)*e2v;
-
-         if ( alpha == 0 && beta == 0 )  continue;
-
-         angle = deg_per_rad*atan2(beta, alpha);
-
-         angle -= 360.0*floor(angle/360.0);
-
-            //
-            //  reset angle very close to 360 to be 0
-            //
-
-         if ( angle > 359.9999 )   { angle = 0.0; }
-
-         if ( angle < angle_low )  { angle_low = angle;  j = k; }
-
-      }   //  for k
-
-      if ( j < 0 )  {
-
-         mlog << Error << "\nShapedata::convex_hull() -> "
-              << "can't find next hull point\n\n";
-         exit(1);
-      }
-
-      p2u = outline.u[j];
-      p2v = outline.v[j];
-
-      e1u = p2u - p1u;
-      e1v = p2v - p1v;
-
-      t = sqrt( e1u*e1u + e1v*e1v );
-
-      e1u /= t;
-      e1v /= t;
-
-      Index[n++] = j;
-
-      if ( (n >= 3) && (Index[n - 1] == Index[0]) ) done = 1;
-
-   }   //  while
-
-      //
-      //  load up hull
-      //
-
-   --n;
-
-   hull.n_points = n;
-
-   for (j=0; j<n; ++j)  {
-
-      hull.u[j] = outline.u[Index[j]];
-      hull.v[j] = outline.v[Index[j]];
-
-   }
-
-      //
-      //  done
-      //
-
-   return hull;
-
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -950,20 +754,16 @@ Polyline ShapeData::single_boundary_offset(double d) const {
 
 Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
                                            double d) const {
-   Polyline boundary, temp;
-   int x, y, x0, y0, xn, yn;
-   int direction, new_direction;
-   bool found;
-
-   // Initialize
-   boundary.clear();
+   Polyline boundary;
 
    //
    // Find the first point in the object
    //
-   found = false;
-   for(x=0; x<data.nx(); x++) {
-      for(y=0; y<data.ny(); y++) {
+   int x0 = 0;
+   int y0 = 0;
+   bool found = false;
+   for(int x=0; x<data.nx(); x++) {
+      for(int y=0; y<data.ny(); y++) {
 
          if(f_is_on(x, y)) {
             x0 = x;
@@ -986,15 +786,15 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
    //
    // Due to the search order, the initial direction will be plus_x
    //
-   direction = plus_x;
-   new_direction = direction;
+   int direction = plus_x;
+   int new_direction = direction;
    boundary.add_point(x0+d, y0+d);
 
    //
    // Initialize xn and yn to starting point
    //
-   xn = x0;
-   yn = y0;
+   int xn = x0;
+   int yn = y0;
 
    //
    // Find next point along boundary
@@ -1005,9 +805,8 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
    // Store only points where a change of direction occurs
    // or all points if so indicated
    //
-   if( all_points ||
-      (!all_points && direction != new_direction) ) {
-
+   if(all_points ||
+      (!all_points && direction != new_direction)) {
       boundary.add_point(xn+d, yn+d);
    }
    direction = new_direction;
@@ -1024,8 +823,8 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
       // Store only points where a change of direction occurs
       // or all points if so indicated
       //
-      if( all_points ||
-         (!all_points && direction != new_direction) ) {
+      if(all_points ||
+         (!all_points && direction != new_direction)) {
          boundary.add_point(xn+d, yn+d);
       }
       direction = new_direction;
@@ -1036,11 +835,10 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
    // counter-clockwise
    //
    if(!clockwise) {
-      temp = boundary;
+      Polyline temp(boundary);
       boundary.clear();
 
       for(int i=temp.n_points-1; i>=0; i--) {
-
          boundary.add_point(temp.u[i], temp.v[i]);
       }
    }
@@ -1552,10 +1350,6 @@ void Partition::merge_cells(int j_1, int j_2)
 
 {
 
-int nn;
-int j_min, j_max;
-
-
 if ( (j_1 < 0) || (j_1 >= n) || (j_2 < 0) || (j_2 >= n) ) {
 
    mlog << Error
@@ -1568,6 +1362,8 @@ if ( (j_1 < 0) || (j_1 >= n) || (j_2 < 0) || (j_2 >= n) ) {
 
 if ( j_1 == j_2 )  return;
 
+int j_min;
+int j_max;
 
 
 if ( j_1 < j_2 ) {
@@ -1582,7 +1378,7 @@ if ( j_1 < j_2 ) {
 
 }
 
-nn = c[j_max]->n;
+int nn = c[j_max]->n;
 
 for (int k=0; k<nn; ++k) {
 
@@ -1674,11 +1470,7 @@ double dot(double x_1, double y_1, double x_2, double y_2)
 
 {
 
-double d;
-
-d = x_1*x_2 + y_1*y_2;
-
-return d;
+return x_1*x_2 + y_1*y_2;
 
 }
 
@@ -1864,29 +1656,25 @@ int ShapeData::n_objects() const
 ///////////////////////////////////////////////////////////////////////////////
 
 void ShapeData::threshold(SingleThresh t) {
-   int j, x, y;
-   double v;
-   const int nx = data.nx();
-   const int ny = data.ny();
 
    //
    // Compare the threshold double value to the double values for the
    // ShapeData field
    //
-   for(x=0; x<nx; x++) {
-      for(y=0; y<ny; y++) {
+   int nxy = data.nxy();
 
-         v = data(x, y);
+#pragma omp parallel default(none) \
+   shared(t, data, nxy)
+   {
 
-         if(t.check(v) && ! ::is_bad_data(v)) {
-            j = 1;
-         }
-         else {
-            j = 0;
-         }
-         data.set((double) j, x, y);
-      } // end for y
-   } // end for x
+#pragma omp for schedule(static)
+      for(int j=0; j<nxy; j++) {
+
+         double v = data.buf()[j];
+
+         data.buf()[j] = (t.check(v) && ! ::is_bad_data(v) ? 1.0 : 0.0);
+      }
+   } // End omp parallel
 
    return;
 }
@@ -1895,24 +1683,21 @@ void ShapeData::threshold(SingleThresh t) {
 
 void ShapeData::set_to_1_or_0()
 {
-   int j;
-   double v;
-   const int nx = data.nx();
-   const int ny = data.ny();
 
-   for(int x=0; x<nx; x++) {
-      for(int y=0; y<ny; y++) {
+   int nxy = data.nxy();
 
-         //v = data(x, y);
-         if(is_bad_data(x, y)) {
-            j = 0;
-         }
-         else {
-            j = 1;
-         }
-         data.set((double) j, x, y);
-      } // end for y
-   } // end for x
+#pragma omp parallel default(none) \
+   shared(data, nxy)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<nxy; j++) {
+
+         double v = data.buf()[j];
+
+         data.buf()[j] = (::is_bad_data(v) ? 0.0 : 1.0);
+      }
+   } // End omp parallel
 
    return;
 }
@@ -1924,31 +1709,29 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
                                const SingleThresh &obj_thresh,
                                const Grid *grid,
                                bool precip_flag) {
-   int i, j, n;
-   ShapeData sd_split, sd_object;
-   map<ConcatString,ThreshArray>::const_iterator it;
-   double attr_val;
 
    // Split the field to number the shapes
-   sd_split = split(*this, n);
+   int n;
+   ShapeData sd_split(split(*this, n));
 
-   bool * keep_object = new bool [1 + n];  // keep_object[0] is ignored
+   vector<bool> keep_object(n+1);  // keep_object[0] is ignored
 
    // Apply attribute filtering logic to each object
-   for(i=1; i<=n; i++) {
+   for(int i=1; i<=n; i++) {
 
       // Select the current object
-      sd_object = select(sd_split, i);
+      ShapeData sd_object(select(sd_split, i));
       keep_object[i] = true;
 
       // Loop over attribute filter map
-      for(it=attr_map.begin(); it!= attr_map.end(); it++) {
+      for(map<ConcatString,ThreshArray>::const_iterator it=attr_map.begin();
+          it!= attr_map.end(); it++) {
 
-         attr_val = sd_object.get_attr(it->first, raw_ptr, obj_thresh, grid,
-                                       precip_flag);
+         double attr_val = sd_object.get_attr(it->first, raw_ptr, obj_thresh,
+                                              grid, precip_flag);
 
          // Discard objects whose attributes do not meet the threshold criteria
-         for(j=0; j<it->second.n_elements(); j++) {
+         for(int j=0; j<it->second.n_elements(); j++) {
 
             keep_object[i] = it->second[j].check(attr_val);
 
@@ -1969,42 +1752,39 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
    } // end for i
 
    // Zero out discarded shapes
-   int Nxy = data.nx()*data.ny();
-   for(i=0; i<Nxy; i++) {
-      if(!keep_object[nint(sd_split.data.buf()[i])]) data.buf()[i] = 0.0;
-   }
+   int nxy = data.nx()*data.ny();
 
-   // Clean up
-   if(keep_object) { delete [] keep_object; keep_object = (bool *) nullptr; }
+#pragma omp parallel default(none)          \
+   shared(keep_object, sd_split, data, nxy)
+   {
+
+#pragma omp for schedule(static)
+      for(int i=0; i<nxy; i++) {
+         int obj_id = nint(sd_split.data.buf()[i]);
+         if(!keep_object[obj_id]) data.buf()[i] = 0.0;
+      }
+   } // End omp parallel
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 void ShapeData::threshold_area(SingleThresh t)
 
 {
 
-   int j, n, x, y, v_int;
-   ShapeData sd_split, sd_object;
-   const int nx = data.nx();
-   const int ny = data.ny();
-
    // Split the field to number the shapes
-   sd_split = split(*this, n);
+   int n;
+   ShapeData sd_split(split(*this, n));
 
-   double * area_object = new double [1 + n];  // area_object[0] is ignored
-
-   // Zero out area array
-   for(j=0; j<=n; j++) area_object[j] = 0;   // want <= here, not <
+   vector<double> area_object(n+1);  // area_object[0] is ignored
 
    //
    // Compute the area of each object
    //
-   for(j=1; j<=n; j++) {
-      sd_object = select(sd_split, j);
+   for(int j=1; j<=n; j++) {
+      ShapeData sd_object(select(sd_split, j));
       area_object[j] = sd_object.area();
    }
 
@@ -2012,36 +1792,27 @@ void ShapeData::threshold_area(SingleThresh t)
    // Zero out any shapes with an area that doesn't meet the
    // threshold criteria
    //
-   for(x=0; x<nx; x++) {
-      for(y=0; y<ny; y++) {
+   int nxy = data.nx()*data.ny();
 
-         v_int = nint(sd_split.data(x, y));
+#pragma omp parallel default(none)             \
+   shared(t, area_object, sd_split, data, nxy)
+   {
 
-         if(!t.check(area_object[v_int])) {
-            data.set(0.0, x, y);
-         }
-
-      } // end for y
-   } // end for x
-
-   if ( area_object )  { delete [] area_object;  area_object = (double *) nullptr; }
+#pragma omp for schedule(static)
+      for(int i=0; i<nxy; i++) {
+         int obj_id = nint(sd_split.data.buf()[i]);
+         if(!t.check(area_object[obj_id])) data.buf()[i] = 0.0;
+      }
+   } // End omp parallel
 
    return;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThresh t)
 
 {
-   int i, n, x, y, v_int, n_obj_inten;
-   ShapeData s;
-   double *obj_inten = (double *) nullptr;
-   double obj_inten_sum;
-   const int nx = data.nx();
-   const int ny = data.ny();
 
    if(perc < 0 || perc > 102) {
       mlog << Error << "\nShapeData:threshold_intensity() -> "
@@ -2049,56 +1820,56 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThr
       exit(1);
    }
 
-   obj_inten = new double [nx*ny];
-
    //
    // Split the field to number the shapes
    //
-   s = split(*this, n);
+   int n;
+   ShapeData sd_split(split(*this, n));
 
-   double * inten_object = new double [1 + n];  // area_object[0] is ignored
+   vector<double> inten_object(n+1);  // inten_object[0] is ignored
+
+   int nx = data.nx();
+   int ny = data.ny();
 
    //
    // For each object, compute the requested percentile of intensity
    //
-   for(i=0; i<n; i++) {
+   for(int i=0; i<n; i++) {
+   
+      vector<double> raw_v;
+      raw_v.reserve(nx*ny);
 
-      n_obj_inten = 0;
-      obj_inten_sum = 0.0;
-      for(x=0; x<nx; x++) {
-         for(y=0; y<ny; y++) {
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
 
-            v_int = nint(s.data(x, y));
+            int obj_id = nint(sd_split.data(x, y));
 
-            if(v_int != i+1) continue;
+            if(obj_id != i+1) continue;
 
             if(sd_ptr->is_valid_xy(x, y)) {
-               obj_inten[n_obj_inten] = sd_ptr->data(x, y);
-               obj_inten_sum += obj_inten[n_obj_inten];
-               n_obj_inten++;
+               raw_v.emplace_back(sd_ptr->data(x, y));
             }
          } // end for y
       } // end for x
-
-      sort(obj_inten, n_obj_inten);
 
       //
       // Compute the mean of the intensities
       //
       if(perc == 101) {
-         inten_object[i+1] = obj_inten_sum/n_obj_inten;
+         inten_object[i+1] = accumulate(raw_v.begin(), raw_v.end(), 0.0)/raw_v.size();
       }
       //
       // Compute the sum of the intensities
       //
       else if(perc == 102) {
-         inten_object[i+1] = obj_inten_sum;
+         inten_object[i+1] = accumulate(raw_v.begin(), raw_v.end(), 0.0);
       }
       //
       // Compute a percentile of intensity
       //
       else {
-         inten_object[i+1] = percentile(obj_inten, n_obj_inten, (double) perc/100.0);
+         sort(raw_v.begin(), raw_v.end());
+         inten_object[i+1] = percentile(raw_v.data(), raw_v.size(), (double) perc/100.0);
       }
    }
 
@@ -2106,21 +1877,18 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThr
    // Zero out any shapes with an intensity that doesn't meet the
    // threshold criteria
    //
-   for(x=0; x<nx; x++) {
-      for(y=0; y<ny; y++) {
+   int nxy = data.nx()*data.ny();
 
-         v_int = nint(s.data(x, y));
+#pragma omp parallel default(none)             \
+   shared(t, inten_object, sd_split, data, nxy)
+   {
 
-         if(!t.check(inten_object[v_int])) {
-            data.set(0.0, x, y);
-         }
-
-      } // end for y
-   } // end for x
-
-   if(obj_inten) { delete [] obj_inten; obj_inten = (double *) nullptr; }
-
-   if ( inten_object )  { delete [] inten_object;   inten_object = (double *) nullptr; }
+#pragma omp for schedule(static)
+      for(int i=0; i<nxy; i++) {
+         int obj_id = nint(sd_split.data.buf()[i]);
+         if(!t.check(inten_object[obj_id])) data.buf()[i] = 0.0;
+      }
+   } // End omp parallel
 
    return;
 }
@@ -2324,31 +2092,23 @@ return out;
 ShapeData select(const ShapeData &id, int n)
 
 {
-   int k;
-   int nx, ny;
-   int count;
-   ShapeData d = id;
+   ShapeData d(id);
 
-   nx = id.data.nx();
-   ny = id.data.ny();
+   int nxy = d.data.nxy();
 
-   count = 0;
+#pragma omp parallel default(none) \
+   shared(n, nxy, d) 
+   {
 
-   for(int x=0; x<nx; ++x) {
-      for(int y=0; y<ny; ++y) {
+#pragma for schedule(static)
+      for(int j=0; j<nxy; j++) {
 
-         k = nint(id.data(x, y));
+         int k = nint(d.data.buf()[j]);
 
-         if(k == n) {
-            d.data.set(1, x, y);
-
-            ++count;
-         }
-         else {
-            d.data.set(0, x, y);
-         }
+         if(k == n) d.data.buf()[j] = (k == n ? 1 : 0);
       }
-   }
+   } // End omp parallel
+
    d.calc_moments();
 
    return d;
@@ -2360,21 +2120,23 @@ ShapeData select(const ShapeData &id, int n)
 
 
 void ShapeData::filter(SingleThresh t) {
-   double v;
-   const int nx = data.nx();
-   const int ny = data.ny();
 
-   for (int x=0; x<nx; ++x) {
-      for (int y=0; y<ny; ++y) {
+   int nxy = data.nxy();
 
-         v = data(x, y);
+#pragma omp parallel default(none) \
+   shared(t, data, nxy)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<nxy; j++) {
+
+         double v = data.buf()[j];
 
          if(!t.check(v) && ! ::is_bad_data(v)) {
-            data.set(0.0, x, y);
+            data.buf()[j] = 0.0;
          }
-
-      } // end for y
-   } // end for x
+      }
+   } // End omp parallel
 
    return;
 }
@@ -2384,26 +2146,30 @@ void ShapeData::filter(SingleThresh t) {
 
 
 int ShapeData_intersection(const ShapeData &f1, const ShapeData &f2) {
-   int intersection;
 
    //
    // Check for the same grid dimension
    //
    if(f1.data.nx() != f2.data.nx() ||
       f1.data.ny() != f2.data.ny() ) {
-
       mlog << Error << "\nShapeData_intersection() -> "
            << "grid dimensions do not match\n\n";
       exit(1);
    }
 
-   intersection = 0;
-   for(int x=0; x<f1.data.nx(); x++) {
-      for(int y=0; y<f1.data.ny(); y++) {
+   int intersection = 0;
 
-         if(f1.s_is_on(x, y) && f2.s_is_on(x, y)) intersection++;
-      } // end for y
-   } // end for x
+#pragma omp parallel default(none) \
+   shared(f1, f2, intersection)
+   {
+
+#pragma omp for reduction(+: intersection)   
+      for(int x=0; x<f1.data.nx(); x++) {
+         for(int y=0; y<f1.data.ny(); y++) {
+            if(f1.s_is_on(x, y) && f2.s_is_on(x, y)) intersection++;
+         }
+      }
+   } // End omp parallel
 
    return intersection;
 }

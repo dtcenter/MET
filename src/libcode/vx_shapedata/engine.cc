@@ -1301,8 +1301,7 @@ void ModeFuzzyEngine::do_match_merge() {
 
    for(int j=0; j<n; j++) {
 
-      if(info_singles[j].interest_value < conf_info.total_interest_thresh)
-         continue;
+      if(info_singles[j].interest_value < conf_info.total_interest_thresh) continue;
 
       collection.add_pair(info_singles[j].fcst_number, info_singles[j].obs_number);
    }
@@ -3137,24 +3136,24 @@ void write_engine_stats(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable & a
    at.set_delete_trailing_blank_rows(true);   // No trailing blank rows
 
    //
-   //  calculate n_valid
+   // Calculate n_valid
    //
+   int n_valid = 0;
+   int nxy = eng.fcst_raw->data.nxy();
 
-int x, y;
+#pragma omp parallel default(none) \
+   shared(nxy, eng, n_valid)       \
+   private(j)
+   {
 
-eng.n_valid = 0;
+#pragma omp for reduction(+: n_valid)
+      for(j=0; j<nxy; j++) {
+         if(!is_bad_data(eng.fcst_raw->data.buf()[j]) &&
+            !is_bad_data(eng.obs_raw->data.buf()[j])) n_valid++;
+      }
+   } // End omp parallel
 
-for (x=0; x<(grid.nx()); ++x)  {
-
-   for (y=0; y<(grid.ny()); ++y)  {
-
-      if ( eng.fcst_raw->is_bad_data(x, y) || eng.obs_raw->is_bad_data(x, y) )  continue;
-
-      ++(eng.n_valid);
-
-   }
-
-}
+   eng.n_valid = n_valid;
 
    //
    // Initialize row count

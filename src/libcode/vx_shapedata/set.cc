@@ -115,17 +115,12 @@ void FcstObsSet::clear()
 
 {
 
-// if ( fcst_number )  { delete [] fcst_number;  fcst_number = 0; }
-// if (  obs_number )  { delete []  obs_number;   obs_number = 0; }
-
 int j;
 
 for (j=0; j<n_fcst_alloc; ++j)  fcst_number[j] = 0;
 for (j=0; j<n_obs_alloc;  ++j)   obs_number[j] = 0;
 
 n_fcst = n_obs = 0;
-
-// n_fcst_alloc = n_obs_alloc = 0;
 
 return;
 
@@ -416,16 +411,11 @@ void SetCollection::clear()
 
 {
 
-// if ( set )  { delete [] set;  set = 0; }
-
 n_sets  = 0;
 
 int j;
 
 for (j=0; j<n_alloc; ++j)  set[j].clear();
-
-// n_alloc = 0;
-
 
 return;
 

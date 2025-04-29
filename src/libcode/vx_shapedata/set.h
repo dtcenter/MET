@@ -96,8 +96,6 @@ extern std::ostream & operator<<(std::ostream &, const FcstObsSet &);
 ///////////////////////////////////////////////////////////////////////////////
 
 
-// static const int max_fcst_obs_sets = 300;
-
 static const int set_alloc_inc = 50;
 
 
