@@ -29,12 +29,9 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 class FcstObsSet {
 
    protected:
-
-      void init_from_scratch();
 
       void assign(const FcstObsSet &);
 
@@ -63,33 +60,27 @@ class FcstObsSet {
 
       void add_pair(int fcst, int obs);
 
-      int has_fcst(int) const;
-      int has_obs(int) const;
+      bool has_fcst(int) const;
+      bool has_obs(int) const;
 
       void add_fcst(int);
       void add_obs(int);
-
 
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 extern FcstObsSet union_fcst_obs_sets(const FcstObsSet &, const FcstObsSet &);
 
-extern int fcst_obs_sets_overlap(const FcstObsSet &, const FcstObsSet &);
+extern bool fcst_obs_sets_overlap(const FcstObsSet &, const FcstObsSet &);
 
 extern std::ostream & operator<<(std::ostream &, const FcstObsSet &);
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 static const int set_alloc_inc = 50;
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 class SetCollection {
 
@@ -124,13 +115,13 @@ class SetCollection {
       void     clear();
       void all_clear();
 
-      int merge();
+      bool merge();
 
       int fcst_set_number (int fcst_number) const;
       int  obs_set_number (int obs_number)  const;
 
-      int is_fcst_matched (int fcst_number) const;
-      int  is_obs_matched (int obs_number)  const;
+      bool is_fcst_matched (int fcst_number) const;
+      bool  is_obs_matched (int obs_number)  const;
 
       void merge_two(int, int);
 
@@ -138,20 +129,15 @@ class SetCollection {
 
       void clear_empty_sets();
 
-
       void make_room(const int = 1);
-
 };
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 extern std::ostream & operator<<(std::ostream &, const SetCollection &);
 
-
 inline void SetCollection::make_room(const int __n)  { if ( __n > 0 )  extend(n_sets + __n);  return; }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
