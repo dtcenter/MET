@@ -218,7 +218,7 @@ int met_main(int argc, char *argv[]) {
 
    return 0;
 }
-   
+
 ////////////////////////////////////////////////////////////////////////
 
 const string get_tool_name()
@@ -571,7 +571,6 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_table(AsciiTable &at) {
-   
 
    // Justify the STAT AsciiTable objects
    justify_stat_cols(at);
