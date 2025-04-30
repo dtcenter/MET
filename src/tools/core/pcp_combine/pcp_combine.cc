@@ -79,6 +79,7 @@
 //   025    09/29/22  Prestopnik     MET #2227 Remove namespace netCDF from header files.
 //   026    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings.
 //   027    05/09/24  Halley Gotway  MET #2883 Allow missing input files.
+//   028    04/30/25  Prestopnik     MET #3120 Add OpenMP 
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -699,23 +700,31 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
          // Increment the precipitation sums keeping track of the bad
          // data values.
          //
-         for(int x=0; x<grid.nx(); x++) {
-            for(int y=0; y<grid.ny(); y++) {
+#pragma omp parallel for default(none) \
+   shared(grid, plane, part) \
+   private(x, y, v_sum, v_part)
+         {
+           
+#pragma omp for schedule (static)
+           
+            for(int x=0; x<grid.nx(); x++) {
+               for(int y=0; y<grid.ny(); y++) {
 
-               v_sum = plane(x, y);
+                  v_sum = plane(x, y);
 
-               if(is_bad_data(v_sum)) continue;
+                  if(is_bad_data(v_sum)) continue;
 
-               v_part = part(x, y);
+                  v_part = part(x, y);
 
-               if(is_bad_data(v_part) ) {
-                  plane.set(bad_data_float, x, y);
-                  continue;
-               }
+                  if(is_bad_data(v_part) ) {
+                     plane.set(bad_data_float, x, y);
+                     continue;
+                  }
 
-               plane.set(v_sum + v_part, x, y);
-            } // for y
-         } // for x
+                  plane.set(v_sum + v_part, x, y);
+               } // for y
+            } // for x
+         } // End of omp parallel   
       } // end else
    } // end for i
 
