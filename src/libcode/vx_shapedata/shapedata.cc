@@ -935,23 +935,18 @@ void ShapeData::shrink(const int W) {
 ///////////////////////////////////////////////////////////////////////////////
 
 Cell::Cell() {
-
-   init_from_scratch();
+   clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 Cell::~Cell() {
-
    clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 Cell::Cell(const Cell & c) {
-
-   init_from_scratch();
-
    assign(c);
 }
 
@@ -968,23 +963,9 @@ Cell & Cell::operator=(const Cell & c) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Cell::init_from_scratch() {
-
-   e = 0;
-
-   clear();
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 void Cell::clear() {
 
-   if(e) { delete [] e; e = nullptr; }
-
-   n = 0;
-   n_alloc = 0;
+   e.clear();
 
    return;
 }
@@ -993,82 +974,29 @@ void Cell::clear() {
 
 void Cell::assign(const Cell & c) {
 
-   clear();
-
-   if(c.n == 0) return;
-
-   extend(c.n);
-
-   for(int j=0; j<(c.n); j++) e[j] = c.e[j];
-
-   n = c.n;
+   e = c.e;
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Cell::extend(int N) {
+bool Cell::has(int k) const {
 
-if ( n_alloc >= N )  return;
+   for(const auto &j : e) {
+      if(j == k) return true;
+   }
 
-N = (N + cell_alloc_inc - 1)/cell_alloc_inc;
-
-N *= cell_alloc_inc;
-
-int j;
-int * u = 0;
-
-u = new int [N];
-
-for (j=0; j<n; ++j)  u[j] = e[j];
-
-for (j=n; j<N; ++j)  u[j] = -1;
-
-if ( e )  { delete [] e;  e = 0; }
-
-e = u;
-
-n_alloc = N;
-
-   //
-   //  done
-   //
-
-return;
-
+   return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool Cell::has(int k) const
+void Cell::add(int k) {
 
-{
+   if(!has(k)) e.emplace_back(k);
 
-for (int j=0; j<n; ++j) {
-
-   if ( e[j] == k )  return true;
-
-}
-
-return false;
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void Cell::add(int k)
-
-{
-
-if ( has(k) )  return;
-
-extend(n + 1);
-
-e[n++] = k;
-
-return;
-
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1083,296 +1011,142 @@ return;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-Partition::Partition()
-
-{
-
-init_from_scratch();
-
+Partition::Partition() {
+   clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Partition::~Partition()
-
-{
-
-clear();
-
+Partition::~Partition() {
+   clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Partition::Partition(const Partition & p)
-
-{
-
-init_from_scratch();
-
-assign(p);
-
+Partition::Partition(const Partition & p) {
+   assign(p);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Partition & Partition::operator=(const Partition & p)
+Partition & Partition::operator=(const Partition & p) {
 
-{
+   if(this == &p) return *this;
 
-if ( this == &p )  return *this;
+   assign(p);
 
-assign(p);
-
-return *this;
-
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void Partition::clear() {
 
-void Partition::init_from_scratch()
-
-{
-
-c = (Cell **) nullptr;
-
-clear();
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-void Partition::clear()
-
-{
-
-if ( c )  {
-
-   for (int j=0; j<n_alloc; ++j)  {
-
-     if ( c[j] )  { delete c[j];  c[j] = (Cell *) nullptr; }
-
-   }
-
-   delete [] c;  c = (Cell **) nullptr;
-
-}
-
-n = 0;
-
-n_alloc = 0;
-
-return;
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void Partition::assign(const Partition & p)
-
-{
-
-clear();
-
-if ( !(p.c) )  return;
-
-int j;
-
-extend(p.n);
-
-for (j=0; j<(p.n); ++j)  {
-
-   c[j] = new Cell;
-
-   *(c[j]) = *(p.c[j]);
-
-}
-
-n = p.n;
-
-return;
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void Partition::extend(int N)
-
-{
-
-if ( N <= n_alloc )  return;
-
-Cell ** u = (Cell **) nullptr;
-
-N = partition_alloc_inc*((N + partition_alloc_inc - 1)/partition_alloc_inc);
-
-u = new Cell * [N];
-
-memset(u, 0, N*(sizeof(Cell *)));
-
-if ( c )  {
-
-   for(int j=0; j<n; ++j)  u[j] = c[j];
-
-   delete [] c;  c = (Cell **) nullptr;
-
-}
-
-
-c = u;  u = (Cell **) nullptr;
-
-n_alloc = N;
-
-
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-bool Partition::has(int k) const
-
-{
-
-for (int j=0; j<n; ++j) {
-
-   if ( c[j]->has(k) )  return true;
-
-}
-
-return false;
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-int Partition::which_cell(int k) const
-
-{
-
-for (int j=0; j<n; ++j) {
-
-   if ( c[j]->has(k) )  return j;
-
-}
-
-return -1;
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void Partition::merge_cells(int j_1, int j_2)
-
-{
-
-if ( (j_1 < 0) || (j_1 >= n) || (j_2 < 0) || (j_2 >= n) ) {
-
-   mlog << Error
-        << "\nPartition::merge_cells() -> "
-        << "range check error\n\n";
-
-   exit(1);
-
-}
-
-if ( j_1 == j_2 )  return;
-
-int j_min;
-int j_max;
-
-
-if ( j_1 < j_2 ) {
-
-   j_min = j_1;
-   j_max = j_2;
-
-} else {
-
-   j_min = j_2;
-   j_max = j_1;
-
-}
-
-int nn = c[j_max]->n;
-
-for (int k=0; k<nn; ++k) {
-
-   c[j_min]->add(c[j_max]->e[k]);
-
-}
-
-*(c[j_max]) = *(c[n - 1]);
-
-c[n - 1]->clear();
-
---n;
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void Partition::merge_values(int v1, int v2)
-
-{
-
-int j_1, j_2;
-
-if ( v1 == v2 )  return;
-
-j_1 = which_cell(v1);
-j_2 = which_cell(v2);
-
-if ( (j_1 < 0) || (j_2 < 0) ) {
-
-   mlog << Error
-        << "\nvoid Partition::merge_values() -> "
-        << "bad values: (v1, v2) = (" << v1 << ", " << v2
-        << "), (j1, j2) = (" << j_1 << ", " << j_2 << ")\n\n";
+   c.clear();
 
    return;
-
-}
-
-merge_cells(j_1, j_2);
-
-   //
-   //  done
-   //
-
-return;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Partition::add(int k)
+void Partition::assign(const Partition & p) {
 
-{
+   c = p.c;
 
-if ( has(k) )  return;
+   return;
+}
 
-extend(n + 1);
+///////////////////////////////////////////////////////////////////////////////
 
-c[n] = new Cell;
+bool Partition::has(int k) const {
 
-c[n]->add(k);
+   for(const auto &j : c) {
+      if(j.has(k)) return true;
+   }
 
-++n;
+   return false;
+}
 
-return;
+///////////////////////////////////////////////////////////////////////////////
+
+int Partition::which_cell(int k) const {
+
+   for(int j=0; j<c.size(); j++) {
+      if(c[j].has(k)) return j;
+   }
+
+   return -1;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Partition::merge_cells(int j_1, int j_2) {
+
+   if(j_1 < 0 || j_1 >= c.size() || j_2 < 0 || j_2 >= c.size()) {
+      mlog << Error << "\nPartition::merge_cells() -> "
+           << "range check error\n\n";
+      exit(1);
+   }
+
+   if( j_1 == j_2) return;
+
+   int j_min;
+   int j_max;
+
+   if(j_1 < j_2) {
+      j_min = j_1;
+      j_max = j_2;
+   }
+   else {
+      j_min = j_2;
+      j_max = j_1;
+   }
+
+   int nn = c[j_max].e.size();
+
+   for(int k=0; k<nn; k++) {
+      c[j_min].add(c[j_max].e[k]);
+   }
+
+   c[j_max] = c.back();
+   c.pop_back();
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Partition::merge_values(int v1, int v2) {
+
+   if(v1 == v2) return;
+
+   int j_1 = which_cell(v1);
+   int j_2 = which_cell(v2);
+
+   if(j_1 < 0 || j_2 < 0) {
+      mlog << Error << "\nvoid Partition::merge_values() -> "
+           << "bad values: (v1, v2) = (" << v1 << ", " << v2
+           << "), (j1, j2) = (" << j_1 << ", " << j_2 << ")\n\n";
+      return;
+   }
+
+   merge_cells(j_1, j_2);
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Partition::add(int k) {
+
+   if(has(k)) return;
+
+   Cell new_c;
+   new_c.add(k);
+
+   c.emplace_back(new_c);
+
+   return;
 
 }
 
@@ -1938,8 +1712,8 @@ ShapeData split(const ShapeData & wfd, int & n_shapes) {
 
          out.data.set(0, x, y);
 
-         for(int k=0; k<(p.n); k++) {
-            if(p.c[k]->has(nint(d.data(x, y)))) {
+         for(int k=0; k<(p.c.size()); k++) {
+            if(p.c[k].has(nint(d.data(x, y)))) {
                out.data.set(k + 1, x, y);
             }
          }
@@ -1948,7 +1722,7 @@ ShapeData split(const ShapeData & wfd, int & n_shapes) {
 
      ///////////////////////////////////
 
-   n_shapes = p.n;
+   n_shapes = p.c.size();
 
    out.calc_moments();
 

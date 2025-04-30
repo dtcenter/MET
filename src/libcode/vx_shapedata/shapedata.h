@@ -27,6 +27,7 @@
 
 #include <map>
 #include <string>
+#include <vector>
 
 #include "moments.h"
 #include "vx_util.h"
@@ -58,7 +59,6 @@ enum StepDirection {
 };
 
 ///////////////////////////////////////////////////////////////////////////////
-
 
 class ShapeData {
 
@@ -185,7 +185,6 @@ class ShapeData {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 inline Moments ShapeData::moments() const { return mom; }
 
 inline bool ShapeData::is_valid_xy (int x, int y) const { return ! ::is_bad_data(data(x, y) ); }
@@ -197,35 +196,15 @@ inline bool ShapeData::is_nonzero (int x, int y) const { return !is_eq(data(x, y
 inline void ShapeData::debug_examine() const { data.debug_examine(); }
 inline std::string ShapeData::sdebug_examine() const { return data.sdebug_examine(); }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
-static const int      cell_alloc_inc = 500;
-
-static const int partition_alloc_inc = 500;
-
-
-///////////////////////////////////////////////////////////////////////////////
-
 
 class Cell {
 
    public:
 
-      void init_from_scratch();
-
       void assign(const Cell &);
 
-      void extend(int);
-
-
-      int * e;
-
-      int n;
-
-      int n_alloc;
-
+      std::vector<int> e;
 
    public:
 
@@ -235,10 +214,6 @@ class Cell {
       Cell & operator=(const Cell &);
 
       void clear();
-
-         //
-         //  set stuff
-         //
 
          //
          //  get stuff
@@ -251,36 +226,21 @@ class Cell {
          //
 
       void add(int);
-
-
 };
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 extern std::ostream & operator<<(std::ostream &, const Cell &);
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 class Partition {
 
    public:
 
-      void init_from_scratch();
-
       void assign(const Partition &);
 
-      void extend(int);
-
-
-      Cell ** c;
-
-      int n;
-
-      int n_alloc;
+      std::vector<Cell> c;
 
    public:
 
@@ -290,10 +250,6 @@ class Partition {
       Partition & operator=(const Partition &);
 
       void clear();
-
-         //
-         //  set stuff
-         //
 
          //
          //  get stuff
@@ -311,20 +267,14 @@ class Partition {
       void merge_values(int, int);
 
       void add(int);
-
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 extern int ShapeData_intersection(const ShapeData &, const ShapeData &);
-
 extern ShapeData select(const ShapeData &, int);
-
 extern ShapeData split(const ShapeData &, int &);
-
 extern void apply_mask(ShapeData &, ShapeData &);
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
