@@ -135,7 +135,6 @@
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
-
 #ifdef WITH_UGRID
 #include "vx_data2d_ugrid.h"
 #endif
@@ -215,7 +214,6 @@ int met_main(int argc, char *argv[]) {
 
    // Compute the scores and write them out
    process_scores();
-
 
    // Close the text files and deallocate memory
    clean_up();
