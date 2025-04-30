@@ -41,7 +41,7 @@ FcstObsSet::FcstObsSet()
 
 {
 
-init_from_scratch();
+clear();
 
 }
 
@@ -53,7 +53,7 @@ FcstObsSet::~FcstObsSet()
 
 {
 
-all_clear();
+clear();
 
 }
 
@@ -64,8 +64,6 @@ all_clear();
 FcstObsSet::FcstObsSet(const FcstObsSet & s)
 
 {
-
-init_from_scratch();
 
 assign(s);
 
@@ -90,56 +88,15 @@ return *this;
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void FcstObsSet::init_from_scratch()
-
-{
-
-fcst_number = 0;
-
- obs_number = 0;
-
-all_clear();
-
-extend_fcst (50);
-extend_obs  (50);
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
 void FcstObsSet::clear()
 
 {
 
-int j;
+fcst_number.clear();
+obs_number.clear();
 
-for (j=0; j<n_fcst_alloc; ++j)  fcst_number[j] = 0;
-for (j=0; j<n_obs_alloc;  ++j)   obs_number[j] = 0;
-
-n_fcst = n_obs = 0;
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void FcstObsSet::all_clear()
-
-{
-
-if ( fcst_number )  { delete [] fcst_number;  fcst_number = 0; }
-if (  obs_number )  { delete []  obs_number;   obs_number = 0; }
-
-n_fcst = n_obs = 0;
-
-n_fcst_alloc = n_obs_alloc = 0;
+n_fcst = 0;
+n_obs = 0;
 
 return;
 
@@ -153,94 +110,11 @@ void FcstObsSet::assign(const FcstObsSet & s)
 
 {
 
-clear();
-
-
-if ( s.n_fcst_alloc > 0 )  {
-
-   extend_fcst (s.n_fcst_alloc);
-
-   memcpy(fcst_number, s.fcst_number, (s.n_fcst_alloc)*sizeof(int));
-
-}
-
-
-if ( s.n_obs_alloc > 0 )   {
-
-   extend_obs  (s.n_obs_alloc);
-
-   memcpy(obs_number,  s.obs_number,  (s.n_obs_alloc)*sizeof(int));
-
-}
-
+fcst_number = s.fcst_number;
+obs_number = s.obs_number;
 
 n_fcst = s.n_fcst;
 n_obs  = s.n_obs;
-
-
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void FcstObsSet::extend_fcst(int N)
-
-{
-
-extend(fcst_number, n_fcst_alloc, N);
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void FcstObsSet::extend_obs(int N)
-
-{
-
-extend(obs_number, n_obs_alloc, N);
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void FcstObsSet::extend(int * & a, int & n_alloc, const int N)
-
-{
-
-if ( N <= n_alloc )  return;
-
-int j, k;
-int * u = 0;
-
-k = N/fcst_obs_set_alloc_inc;
-
-if ( N%fcst_obs_set_alloc_inc )  ++k;
-
-k *= fcst_obs_set_alloc_inc;
-
-u = new int [k];
-
-if ( a )  memcpy(u, a, n_alloc*sizeof(int));
-
-for (j=((n_alloc < 0) ? 0 : n_alloc); j<k; ++j) u[j] = 0;
-
-if ( a )  { delete [] a;  a = 0; }
-
-a = u;  u = 0;
-
-n_alloc = k;
 
 return;
 
@@ -300,9 +174,9 @@ void FcstObsSet::add_fcst(int k) {
 
    if ( has_fcst(k) ) return;
 
-   extend_fcst(n_fcst + 1);
+   fcst_number.emplace_back(k);
 
-   fcst_number[n_fcst++] = k;
+   n_fcst++;
 
    return;
 }
@@ -315,9 +189,9 @@ void FcstObsSet::add_obs(int k) {
 
    if ( has_obs(k) ) return;
 
-   extend_obs(n_obs + 1);
+   obs_number.emplace_back(k);
 
-   obs_number[n_obs++] = k;
+   n_obs++;
 
    return;
 
@@ -477,6 +351,8 @@ if ( N <= n_alloc )  return;
 
 int j, k;
 FcstObsSet * u = 0;
+
+int fcst_obs_set_alloc_inc = 50;
 
 k = N/fcst_obs_set_alloc_inc;
 

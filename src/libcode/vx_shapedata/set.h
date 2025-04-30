@@ -25,9 +25,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-static const int fcst_obs_set_alloc_inc  = 50;
-
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -40,32 +38,23 @@ class FcstObsSet {
 
       void assign(const FcstObsSet &);
 
-      void extend(int * &, int & n_alloc, const int n_new);
-
    public:
 
          //
          //  data
          //
 
-      int * fcst_number;   //  allocated
-      int * obs_number;    //  allocated
+      std::vector<int> fcst_number;
+      std::vector<int> obs_number;
 
       int n_fcst;
       int n_obs;
-
-      int n_fcst_alloc;
-      int n_obs_alloc;
 
          //
          //  functions
          //
 
-      void     clear();
-      void all_clear();
-
-      void extend_fcst (int);
-      void extend_obs  (int);
+      void clear();
 
       FcstObsSet();
      ~FcstObsSet();
