@@ -700,9 +700,9 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
          // Increment the precipitation sums keeping track of the bad
          // data values.
          //
-#pragma omp parallel for default(none) \
+#pragma omp parallel default(none) \
    shared(grid, plane, part) \
-   private(x, y, v_sum, v_part)
+   private(v_sum, v_part)
          {
            
 #pragma omp for schedule (static)
@@ -724,7 +724,7 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
                   plane.set(v_sum + v_part, x, y);
                } // for y
             } // for x
-         } // End of omp parallel   
+         } // end of omp parallel   
       } // end else
    } // end for i
 
@@ -936,16 +936,25 @@ void do_sub_command() {
    //
    // Update value for each grid point.
    //
-   int nxy = grid1.nxy();
-   for(int i=0; i<nxy; i++) {
-      if(is_bad_data( diff.data()[i]) ||
-         is_bad_data(minus.data()[i])) {
-         diff.buf()[i] = bad_data_double;
-      }
-      else {
-         diff.buf()[i] -= minus.data()[i];
-      }
-   }
+
+#pragma omp parallel default(none) \
+   shared(grid1, diff, minus)
+   {
+
+      int nxy = grid1.nxy();
+      
+#pragma omp for schedule (static)
+     
+      for(int i=0; i<nxy; i++) {
+         if(is_bad_data( diff.data()[i]) ||
+            is_bad_data(minus.data()[i])) {
+            diff.buf()[i] = bad_data_double;
+         }
+         else {
+            diff.buf()[i] -= minus.data()[i];
+         } // end else
+      } // end for
+   }  // end of omp parallel   
 
    //
    // Write output.
@@ -1077,27 +1086,36 @@ void do_derive_command() {
       //
       // Update sums and counts.
       //
-      for(int j=0; j<nxy; j++) {
 
-         // Get current data value.
-         v = cur_dp.data()[j];
+#pragma omp parallel default(none) \
+   shared(nxy, cur_dp, vld_dp, min_dp, max_dp, sum_dp, sum_sq_dp) \
+   private(v)
+      {
 
-         // Update valid counts.
-         if(!is_bad_data(v)) vld_dp.buf()[j] += 1;
-         else                continue;
+#pragma omp for schedule (static)
+        
+         for(int j=0; j<nxy; j++) {
 
-         // Update min/max fields which may contain bad data.
-         if(is_bad_data(min_dp.data()[j]) || v < min_dp.data()[j]) {
-            min_dp.buf()[j] = v;
-         }
-         if(is_bad_data(max_dp.data()[j]) || v > max_dp.data()[j]) {
-            max_dp.buf()[j] = v;
-         }
+            // Get current data value.
+            v = cur_dp.data()[j];
 
-         // Update the sums which do not have bad data.
-         sum_dp.buf()[j]    += v;
-         sum_sq_dp.buf()[j] += v*v;
-      }
+            // Update valid counts.
+            if(!is_bad_data(v)) vld_dp.buf()[j] += 1;
+            else                continue;
+
+            // Update min/max fields which may contain bad data.
+            if(is_bad_data(min_dp.data()[j]) || v < min_dp.data()[j]) {
+               min_dp.buf()[j] = v;
+            }
+            if(is_bad_data(max_dp.data()[j]) || v > max_dp.data()[j]) {
+               max_dp.buf()[j] = v;
+            }
+
+            // Update the sums which do not have bad data.
+            sum_dp.buf()[j]    += v;
+            sum_sq_dp.buf()[j] += v*v;
+         } // end for
+      } // end of omp parallel   
    } // end for i in n_files
 
    // Check for enough valid input files.
@@ -1114,10 +1132,18 @@ void do_derive_command() {
    //
    mask.set_size(grid.nx(), grid.ny());
    int n_skip = 0;
-   for(int j=0; j<nxy; j++) {
-      mask.buf()[j] = (vld_dp.data()[j]/n_vld) >= vld_thresh;
-      if(!mask.data()[j]) n_skip++;
-   }
+      
+#pragma omp parallel default(none) \
+   shared(nxy, mask, vld_dp, n_vld, vld_thresh, n_skip)
+   {
+     
+#pragma omp for reduction(+:n_skip)
+
+      for(int j=0; j<nxy; j++) {
+         mask.buf()[j] = (vld_dp.data()[j]/n_vld) >= vld_thresh;
+         if(!mask.data()[j]) n_skip++;
+      } // end for
+   } // end of omp parallel
 
    mlog << Debug(2)
         << "Skipping " << n_skip << " of " << nxy << " grid points which "
@@ -1159,49 +1185,74 @@ void do_derive_command() {
       }
       else if(strcasecmp(derive_list[i].c_str(), "range") == 0) {
          der_dp = max_dp;
-         for(int j=0; j<nxy; j++) {
-            if(is_bad_data(max_dp.data()[j]) ||
-               is_bad_data(min_dp.data()[j])) {
-               der_dp.buf()[j] = bad_data_double;
-            }
-            else {
-               der_dp.buf()[j] = max_dp.data()[j] - min_dp.data()[j];
-            }
-         }
+
+#pragma omp parallel default(none) \
+   shared(nxy, max_dp, min_dp, bad_data_double, der_dp)
+         {
+
+#pragma omp for schedule (static)
+         
+            for(int j=0; j<nxy; j++) {
+               if(is_bad_data(max_dp.data()[j]) ||
+                  is_bad_data(min_dp.data()[j])) {
+                  der_dp.buf()[j] = bad_data_double;
+               }
+               else {
+                  der_dp.buf()[j] = max_dp.data()[j] - min_dp.data()[j];
+               } // end else
+            } // end for
+         } // end of omp parallel   
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
                        der_dp, derive_list[i].c_str(), "Range of ");
       }
       else if(strcasecmp(derive_list[i].c_str(), "mean") == 0) {
          der_dp = sum_dp;
-         for(int j=0; j<nxy; j++) {
-            if(is_bad_data(sum_dp.data()[j]) ||
-               is_bad_data(vld_dp.data()[j]) ||
-               is_eq(vld_dp.data()[j], 0.0)) {
-               der_dp.buf()[j] = bad_data_double;
-            }
-            else {
-               der_dp.buf()[j] = sum_dp.data()[j]/vld_dp.data()[j];
-            }
-         }
+
+#pragma omp parallel default(none) \
+   shared(nxy, sum_dp, vld_dp, bad_data_double, der_dp)
+         {
+
+#pragma omp for schedule (static)
+         
+            for(int j=0; j<nxy; j++) {
+               if(is_bad_data(sum_dp.data()[j]) ||
+                  is_bad_data(vld_dp.data()[j]) ||
+                  is_eq(vld_dp.data()[j], 0.0)) {
+                  der_dp.buf()[j] = bad_data_double;
+               }
+               else {
+                  der_dp.buf()[j] = sum_dp.data()[j]/vld_dp.data()[j];
+               } // end else
+            } // end for
+         } // end of omp parallel   
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
                        der_dp, derive_list[i].c_str(), "Mean Value of ");
       }
       else if(strcasecmp(derive_list[i].c_str(), "stdev") == 0) {
          der_dp = sum_dp;
-         for(int j=0; j<nxy; j++) {
-            double s  = sum_dp.data()[j];
-            double sq = sum_sq_dp.data()[j];
-            double nd  = vld_dp.data()[j];
-            if(is_bad_data(s) || is_bad_data(sq) ||
-               is_bad_data(nd) || nd <= 1) {
-               der_dp.buf()[j] = bad_data_double;
-            }
-            else {
-               v = (sq - s*s/nd)/(nd-1);
-               if(is_eq(v, 0.0)) v = 0.0;
-               der_dp.buf()[j] = sqrt(v);
-            }
-         }
+
+#pragma omp parallel default(none) \
+   shared(nxy, sum_dp, sum_sq_dp, vld_dp, bad_data_double, der_dp)        \
+   private(v)
+         {
+
+#pragma omp for schedule (static)
+         
+            for(int j=0; j<nxy; j++) {
+               double s  = sum_dp.data()[j];
+               double sq = sum_sq_dp.data()[j];
+               double nd  = vld_dp.data()[j];
+               if(is_bad_data(s) || is_bad_data(sq) ||
+                  is_bad_data(nd) || nd <= 1) {
+                  der_dp.buf()[j] = bad_data_double;
+               }
+               else {
+                  v = (sq - s*s/nd)/(nd-1);
+                  if(is_eq(v, 0.0)) v = 0.0;
+                  der_dp.buf()[j] = sqrt(v);
+               } // end else
+            } // end for
+         } // end of omp parallel   
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
                        der_dp, derive_list[i].c_str(),
                        "Standard Deviation of ");
