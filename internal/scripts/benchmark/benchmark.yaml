@@ -52,7 +52,7 @@ met_subdir_name: 'EnsembleStat_fcstRRFS_obsCCPA_1hrAPCP'
 # number of times to run the use case for stress-testing
 # The default=1 if this setting is missing or unspecified
 #
-num_runs: 3
+num_runs: 1
 
 
 
