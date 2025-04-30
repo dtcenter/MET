@@ -69,6 +69,8 @@ jobs:
             config: '--enable-all MET_CXX_STANDARD=14'
           - jobid:  'job11'
             config: '--enable-profiler'
+          - jobid:  'job12'
+            config: '--disable-openmp'
       fail-fast: false
     steps:
       - uses: actions/checkout@v4
