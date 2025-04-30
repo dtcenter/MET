@@ -17,6 +17,10 @@
 #include <set>
 #include <map>
 
+#ifdef _OPENMP
+  #include "omp.h"
+#endif
+
 #include "enum_as_int.hpp"
 #include "engine.h"
 #include "mode_columns.h"
