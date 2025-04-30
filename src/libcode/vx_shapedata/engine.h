@@ -374,7 +374,6 @@ class ModeFuzzyEngine {
       int get_matched_obs(int)    const;
       int get_unmatched_obs(int)  const;
 
-
       SetCollection collection;
 
       ModeDataType data_type;

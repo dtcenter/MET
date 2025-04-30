@@ -2331,6 +2331,7 @@ void ModeFuzzyEngine::do_match_only() {
    shared(n_fcst, n_obs, info_singles, conf_info)
    {
 
+
 #pragma omp for schedule(static)
       for(int j=0; j<n_fcst; j++) {
          for(int k=0; k<n_obs; k++) {
@@ -2691,9 +2692,7 @@ int ModeFuzzyEngine::get_unmatched_obs(int area) const {
 }
 
 ///////////////////////////////////////////////////////////////////////
-// JHG, there's a problem here. When total_interest is called in parallel,
-// all the log messages get garbled. How should we handle this issue?
-// Buffer them all up maybe? Or just disable log output when OMP_NUM_THREADS > 1?
+
 double total_interest(ModeConfInfo &mc, const PairFeature &p,
                       int fcst_num, int obs_num, bool is_single) {
    double attribute;
@@ -2704,7 +2703,17 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    double term, sum, weight_sum;
    double total;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   int n_threads = 1;
+
+#ifdef _OPENMP
+   n_threads = omp_get_num_threads();
+#endif /* x _OPENMP x */
+
+   // Only print log messages for a single thread
+   bool do_logging = mlog.verbosity_level() >= print_interest_log_level &&
+                     n_threads == 1; 
+
+   if(do_logging) {
 
       ConcatString cs;
       if(is_single) {
@@ -2729,7 +2738,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    if(is_single && p.centroid_dist > mc.max_centroid_dist) {
       total = bad_data_double;
 
-      if(mlog.verbosity_level() >= print_interest_log_level) {
+      if(do_logging) {
          mlog << Debug(print_interest_log_level)
               << "Total Interest = " << total << "\n"
               << "Centroid Distance (" << p.centroid_dist
@@ -2756,7 +2765,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Centroid Distance:\n"
            << "------------------\n"
@@ -2782,7 +2791,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Boundary Distance:\n"
            << "------------------\n"
@@ -2808,7 +2817,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Convex Hull Distance:\n"
            << "---------------------\n"
@@ -2838,7 +2847,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Angle Difference:\n"
            << "-----------------\n"
@@ -2864,7 +2873,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Aspect Ratio Difference:\n"
            << "------------------------\n"
@@ -2890,7 +2899,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Area Ratio:\n"
            << "-----------\n"
@@ -2916,7 +2925,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Intersection/Area Ratio:\n"
            << "------------------------\n"
@@ -2942,7 +2951,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Curvature Ratio:\n"
            << "----------------\n"
@@ -2968,7 +2977,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Complexity Ratio:\n"
            << "-----------------\n"
@@ -2994,7 +3003,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Percentile (" << mc.inten_perc_value
            << "th) Intensity Ratio:\n"
@@ -3015,7 +3024,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
 
    total = sum/weight_sum;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Total Interest = (sum of terms)/(sum of weights*confidence)\n\n"
            << "               = " << sum << "/" << weight_sum << "\n\n"
