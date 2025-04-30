@@ -644,14 +644,18 @@ void get_percentiles(DistributionPercentiles &ptile,
    ptile.p90 = percentile(v.data(), n_values, 0.90);
 
    //
+   // Compute the sum
+   //
+   ptile.sum = accumulate(v.begin(), v.end(), 0.0);
+
+   //
    // User-specified percentile
    //
    if(perc == 101) { // mean
-      ptile.sum = accumulate(v.begin(), v.end(), 0.0);
-      ptile.pth = ptile.sum / n_values;
+      ptile.pth = (n_values == 0 ? bad_data_double :
+                                   ptile.sum/n_values);
    }
    else if(perc == 102) { // sum
-      ptile.sum = accumulate(v.begin(), v.end(), 0.0);
       ptile.pth = ptile.sum;
    }
    else {

@@ -2691,7 +2691,9 @@ int ModeFuzzyEngine::get_unmatched_obs(int area) const {
 }
 
 ///////////////////////////////////////////////////////////////////////
-
+// JHG, there's a problem here. When total_interest is called in parallel,
+// all the log messages get garbled. How should we handle this issue?
+// Buffer them all up maybe? Or just disable log output when OMP_NUM_THREADS > 1?
 double total_interest(ModeConfInfo &mc, const PairFeature &p,
                       int fcst_num, int obs_num, bool is_single) {
    double attribute;

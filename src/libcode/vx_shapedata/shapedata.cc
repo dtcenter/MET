@@ -851,120 +851,76 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-void ShapeData::zero_field()
+void ShapeData::zero_field() {
 
-{
+   data.set_constant(0.0);
 
-data.set_constant(0.0);
-
-return;
-
+   return;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void ShapeData::expand(const int W) {
 
-void ShapeData::expand(const int W)
-
-{
-
-if ( W <= 0 )  {
-
-   mlog << Error
-        << "\n\n  ShapeData::expand(const int) -> bad value ... " << W << "\n\n";
-
-   exit ( 1 );
-
-}
-
-
-int x_old, y_old, x_new, y_new;
-const int nx_old = data.nx();
-const int ny_old = data.ny();
-const int nx_new = nx_old + 2*W;
-const int ny_new = ny_old + 2*W;
-DataPlane old = data;
-
-data.set_size(nx_new, ny_new);
-
-data.set_constant(0.0);
-
-for (x_old=0; x_old<nx_old; ++x_old)  {
-
-   x_new = x_old + W;
-
-   for (y_old=0; y_old<ny_old; ++y_old)  {
-
-      y_new = y_old + W;
-
-      data.put(old.get(x_old, y_old), x_new, y_new);
-
-   }   //  for y_old
-
-}   //  for x_old
-
-
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void ShapeData::shrink(const int W)
-
-{
-
-if ( W <= 0 )  {
-
-   mlog << Error
-        << "\n\n  ShapeData::shrink(const int) -> bad value ... " << W << "\n\n";
-
-   exit ( 1 );
-
-}
-
-const int nx_old = data.nx();
-const int ny_old = data.ny();
-const int nx_new = nx_old - 2*W;
-const int ny_new = ny_old - 2*W;
-
-if ( (nx_new <= 0) || (ny_new <= 0) )  {
-
-   mlog << Error
-        << "\n\n  ShapeData::shrink(const int) -> value too large ... new grid is empty\n\n";
-
-   exit ( 1 );
-
-}
-
-
-int x_old, y_old;
-DataPlane old = data;
-
-
-for (int x_new=0; x_new<nx_new; ++x_new)  {
-
-   x_old = x_new + W;
-
-   for (int y_new=0; y_new<ny_new; ++y_new)  {
-
-      y_old = y_new + W;
-
-      data.put(old.get(x_old, y_old), x_new, y_new);
-
+   if(W <= 0) {
+      mlog << Error << "\nShapeData::expand(const int) -> "
+           << "bad value ... " << W << "\n\n";
+      exit(1);
    }
 
+   const int nx_old = data.nx();
+   const int ny_old = data.ny();
+   DataPlane old(data);
+
+   const int nx_new = nx_old + 2*W;
+   const int ny_new = ny_old + 2*W;
+   data.set_size(nx_new, ny_new);
+   data.set_constant(0.0);
+
+   for(int x_old=0; x_old<nx_old; x_old++) {
+      int x_new = x_old + W;
+      for(int y_old=0; y_old<ny_old; y_old++) {
+         int y_new = y_old + W;
+         data.put(old.get(x_old, y_old), x_new, y_new);
+      }
+   }
+
+   return;
 }
 
-return;
+///////////////////////////////////////////////////////////////////////////////
 
+void ShapeData::shrink(const int W) {
+
+   if(W <= 0) {
+      mlog << Error << "\nShapeData::shrink(const int) -> "
+           << "bad value ... " << W << "\n\n";
+      exit(1);
+   }
+
+   const int nx_old = data.nx();
+   const int ny_old = data.ny();
+   const int nx_new = nx_old - 2*W;
+   const int ny_new = ny_old - 2*W;
+
+   if(nx_new <= 0 || ny_new <= 0) {
+      mlog << Error << "\nShapeData::shrink(const int) -> "
+           << "value too large ... new grid is empty\n\n";
+      exit(1);
+   }
+
+   DataPlane old(data);
+
+   for(int x_new=0; x_new<nx_new; x_new++) {
+      int x_old = x_new + W;
+      for(int y_new=0; y_new<ny_new; y_new++) {
+         int y_old = y_new + W;
+         data.put(old.get(x_old, y_old), x_new, y_new);
+      }
+   }
+
+   return;
 }
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -978,112 +934,81 @@ return;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-Cell::Cell()
+Cell::Cell() {
 
-{
-
-init_from_scratch();
-
-return;
-
+   init_from_scratch();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Cell::~Cell()
+Cell::~Cell() {
 
-{
-
-clear();
-
+   clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Cell::Cell(const Cell & c)
+Cell::Cell(const Cell & c) {
 
-{
+   init_from_scratch();
 
-init_from_scratch();
-
-assign(c);
-
+   assign(c);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Cell & Cell::operator=(const Cell & c)
+Cell & Cell::operator=(const Cell & c) {
 
-{
+   if(this == &c) return *this;
 
-if ( this == &c )  return *this;
+   assign(c);
 
-assign(c);
-
-return *this;
-
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void Cell::init_from_scratch() {
 
-void Cell::init_from_scratch()
+   e = 0;
 
-{
+   clear();
 
-e = 0;
-
-clear();
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-void Cell::clear()
-
-{
-
-if ( e )  { delete [] e;  e = (int *) nullptr; }
-
-n = 0;
-
-n_alloc = 0;
-
-return;
-
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Cell::assign(const Cell & c)
+void Cell::clear() {
 
-{
+   if(e) { delete [] e; e = nullptr; }
 
-int j;
+   n = 0;
+   n_alloc = 0;
 
-clear();
-
-if ( c.n == 0 )  return;
-
-extend(c.n);
-
-for (j=0; j<(c.n); ++j)  e[j] = c.e[j];
-
-n = c.n;
-
-return;
-
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void Cell::assign(const Cell & c) {
 
-void Cell::extend(int N)
+   clear();
 
-{
+   if(c.n == 0) return;
+
+   extend(c.n);
+
+   for(int j=0; j<(c.n); j++) e[j] = c.e[j];
+
+   n = c.n;
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Cell::extend(int N) {
 
 if ( n_alloc >= N )  return;
 
@@ -1113,7 +1038,6 @@ n_alloc = N;
 return;
 
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -1625,7 +1549,7 @@ void apply_mask(ShapeData &f, ShapeData &mask) {
       // Put bad data everywhere the mask is turned off
       //
 #pragma omp for schedule(static)
-      for(int x=0; x<f.data.ny(); x++) {
+      for(int x=0; x<f.data.nx(); x++) {
          for(int y=0; y<f.data.ny(); y++) {
             if(!mask.s_is_on(x, y)) f.data.set(bad_data_float, x, y);
          }
@@ -1641,7 +1565,7 @@ int ShapeData::n_objects() const {
 
    // Split the field to number the shapes
    int n;
-   ShapeData sd(split(*this, n));
+   ShapeData sd_split(split(*this, n));
 
    return n;
 }
@@ -1674,8 +1598,7 @@ void ShapeData::threshold(SingleThresh t) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ShapeData::set_to_1_or_0()
-{
+void ShapeData::set_to_1_or_0() {
 
    int nxy = data.nxy();
 
@@ -1885,195 +1808,155 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc,
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ShapeData split(const ShapeData & wfd, int & n_shapes) {
+   int current_shape;
+   bool shape_assigned = false;
+   ShapeData out(wfd);
+   ShapeData fat(wfd);
+   Partition p;
 
-ShapeData split(const ShapeData & wfd, int & n_shapes)
+   if(do_split_fatten) fat.expand(split_enlarge);
 
-{
+   int nx = fat.data.nx();
+   int ny = fat.data.ny();
 
-int k, x, y;
-int s;
-int xx, yy, nx, ny;
-int current_shape;
-bool shape_assigned = false;
-ShapeData d;
-ShapeData out = wfd;
-ShapeData fat = wfd;
-Partition p;
+   ShapeData d;
+   d.data.set_size(nx, ny);
 
-
-if ( do_split_fatten )  fat.expand(split_enlarge);
-
-
-nx = fat.data.nx();
-ny = fat.data.ny();
-
-d.data.set_size(nx, ny);
-
-n_shapes = 0;
+   n_shapes = 0;
 
    //
-   //  shape numbers start at ONE here!!
+   // Shape numbers start at ONE here!!
    //
+   current_shape = 0;
 
-current_shape = 0;
+   for(int y=(fat.data.ny() - 2); y>=0; --y) {
+      for(int x=(fat.data.nx() - 2); x>=0; --x) {
 
-for (y=(fat.data.ny() - 2); y>=0; --y) {
+         if(!fat.s_is_on(x,y)) continue;
 
-   for (x=(fat.data.nx() - 2); x>=0; --x) {
-
-      s = fat.s_is_on(x, y);
-
-      if ( !s ) continue;
-
-      shape_assigned = false;
+         shape_assigned = false;
 
          //
-         //  check above left
+         // Check above left
          //
+         int xx = x - 1;
+         int yy = y + 1;
 
-      xx = x - 1;
-      yy = y + 1;
+         if((xx >= 0) && (yy < ny)) {
 
-      if ( (xx >= 0) && (yy < ny) ) {
-
-         s = fat.s_is_on(xx, yy);
-
-         if ( s ) {
-
-            if ( shape_assigned )
-               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-            else
-               d.data.set(d.data(xx, yy), x, y);
-
-            shape_assigned = true;
-
+            if(fat.s_is_on(xx, yy)) {
+               if(shape_assigned) {
+                  p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
+               }
+               else {
+                  d.data.set(d.data(xx, yy), x, y);
+               }
+               shape_assigned = true;
+            }
          }
 
-      }
-
          //
-         //  check above
+         // Check above
          //
+         xx = x;
+         yy = y + 1;
 
-      xx = x;
-      yy = y + 1;
+         if(yy < ny) {
 
-      if ( yy < ny ) {
-
-         s = fat.s_is_on(xx, yy);
-
-         if ( s ) {
-
-            if ( shape_assigned )
-               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-            else
-               d.data.set(d.data(xx, yy), x, y);
-
-            shape_assigned = true;
-
+            if(fat.s_is_on(xx, yy)) {
+               if(shape_assigned) {
+                  p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
+               }
+               else {
+                  d.data.set(d.data(xx, yy), x, y);
+               }
+               shape_assigned = true;
+            }
          }
 
-      }
-
          //
-         //  check upper right
+         // Check upper right
          //
+         xx = x + 1;
+         yy = y + 1;
 
-      xx = x + 1;
-      yy = y + 1;
+         if((xx < nx) && (yy < ny)) {
 
-      if ( (xx < nx) && (yy < ny) ) {
-
-         s = fat.s_is_on(xx, yy);
-
-         if ( s ) {
-
-            if ( shape_assigned )
-               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-            else
-               d.data.set(d.data(xx, yy), x, y);
-
-            shape_assigned = true;
+            if(fat.s_is_on(xx, yy)) {
+               if(shape_assigned) {
+                  p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
+               }
+               else {
+                  d.data.set(d.data(xx, yy), x, y);
+               }
+               shape_assigned = true;
+            }
          }
-      }
 
          //
-         //  check to the right
+         // Check to the right
          //
+         xx = x + 1;
+         yy = y;
 
-      xx = x + 1;
-      yy = y;
+         if(xx < nx) {
 
-      if ( xx < nx ) {
-
-         s = fat.s_is_on(xx, yy);
-
-         if ( s ) {
-
-            if ( shape_assigned )
-               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-            else
-               d.data.set(d.data(xx, yy), x, y);
-
-            shape_assigned = true;
+            if(fat.s_is_on(xx, yy)) {
+               if(shape_assigned) {
+                  p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
+               }
+               else {
+                  d.data.set(d.data(xx, yy), x, y);
+               }
+               shape_assigned = true;
+            }
          }
-      }
 
          //
-         //  is it a new shape?
+         // Is it a new shape?
          //
 
-      if ( !shape_assigned ) {
+         if(!shape_assigned) {
 
-         d.data.set(++current_shape, x, y);
-
-         p.add(nint(d.data(x, y)));
-
-      }
-
-   } // for x
-
-} // for y
-
-
-if ( do_split_fatten )  d.shrink(split_enlarge);
-
-
-     ///////////////////////////////////
-
-nx = wfd.data.nx();
-ny = wfd.data.ny();
-
-for (x=0; x<nx; ++x) {
-
-   for (y=0; y<ny; ++y) {
-
-      out.data.set(0, x, y);
-
-      for (k=0; k<(p.n); ++k) {
-
-         if ( p.c[k]->has(nint(d.data(x, y))) )   out.data.set(k + 1, x, y);
-
-      }
-
+            current_shape++;
+            d.data.set(current_shape, x, y);
+            p.add(nint(d.data(x, y)));
+         }
+      } // for x
    } // for y
 
-} // for x
-
+   if(do_split_fatten) d.shrink(split_enlarge);
 
      ///////////////////////////////////
 
+   nx = wfd.data.nx();
+   ny = wfd.data.ny();
 
-n_shapes = p.n;
+   for(int x=0; x<nx; x++) {
+      for(int y=0; y<ny; y++) {
 
-out.calc_moments();
+         out.data.set(0, x, y);
+
+         for(int k=0; k<(p.n); k++) {
+            if(p.c[k]->has(nint(d.data(x, y)))) {
+               out.data.set(k + 1, x, y);
+            }
+         }
+      } // for y
+   } // for x
+
+     ///////////////////////////////////
+
+   n_shapes = p.n;
+
+   out.calc_moments();
 
    //
    //  done
    //
 
-return out;
-
+   return out;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2081,26 +1964,23 @@ return out;
 ShapeData select(const ShapeData &id, int n) {
 
    ShapeData d(id);
-
-   int nxy = d.data.nxy();
-
+   int nxy = id.data.nxy();
+ 
 #pragma omp parallel default(none) \
-   shared(n, nxy, d) 
+   shared(id, d, n, nxy)
    {
 
 #pragma for schedule(static)
       for(int j=0; j<nxy; j++) {
-
-         int obj_id = nint(d.data.buf()[j]);
-
-         d.data.buf()[j] = (obj_id == n ? 1 : 0);
+         int obj_id = nint(id.data.data()[j]);
+         if(obj_id == n) d.data.buf()[j] = 1;
+         else            d.data.buf()[j] = 0;
       }
    } // End omp parallel
 
    d.calc_moments();
 
    return d;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
