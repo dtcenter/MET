@@ -945,49 +945,41 @@ static void apply_circle_mask(DataPlane &dp) {
    }
 
    // For each grid point, compute minumum distance to polyline points
-#pragma omp parallel default(none) \
-   shared(grid, poly_mask, complement, thresh, dp, n_in) \
-   private(lat, lon, dist, v)
-   {
+   for(int x=0; x<grid.nx(); x++) {
+      for(int y=0; y<grid.ny(); y++) {
 
-#pragma omp for reduction(+:n_in)
+         // Lat/Lon value for the current grid point
+         grid.xy_to_latlon(x, y, lat, lon);
+         lon -= 360.0*floor((lon + 180.0)/360.0);
 
-      for(int x=0; x<grid.nx(); x++) {
-         for(int y=0; y<grid.ny(); y++) {
+         // Find the minimum distance to a polyline point
+         dist = 1.0E10;
+         for(int i=0; i<poly_mask.n_points(); i++) {
+            dist = min(dist, gc_dist(lat, lon, poly_mask.lat(i), poly_mask.lon(i)));
+         }
 
-            // Lat/Lon value for the current grid point
-            grid.xy_to_latlon(x, y, lat, lon);
-            lon -= 360.0*floor((lon + 180.0)/360.0);
+         // Apply threshold, if specified
+         if(thresh.get_type() != thresh_na) {
 
-            // Find the minimum distance to a polyline point
-            dist = 1.0E10;
-            for(int i=0; i<poly_mask.n_points(); i++) {
-               dist = min(dist, gc_dist(lat, lon, poly_mask.lat(i), poly_mask.lon(i)));
-            }
+            bool check = thresh.check(dist);
 
-            // Apply threshold, if specified
-            if(thresh.get_type() != thresh_na) {
+            // Check the complement
+            if(complement) check = !check;
 
-               bool check = thresh.check(dist);
+            // Increment count
+            if(check) n_in++;
 
-               // Check the complement
-               if(complement) check = !check;
+            v = (check ? 1.0 : 0.0);
+         }
+         else {
+            v = dist;
+         }
 
-               // Increment count
-               if(check) n_in++;
+         // Store the result
+         dp.set(v, x, y);
 
-               v = (check ? 1.0 : 0.0);
-            }
-            else {
-               v = dist;
-            }
-
-            // Store the result
-            dp.set(v, x, y);
-
-         } // end for y
-      } // end for x
-   } // end of omp parallel
+      } // end for y
+   } // end for x
       
    if(thresh.get_type() != thresh_na && complement) {
       mlog << Debug(3)
@@ -1036,53 +1028,45 @@ static void apply_track_mask(DataPlane &dp) {
    }
 
    // For each grid point, compute minumum distance to track
-#pragma omp parallel default(none) \
-   shared(grid, poly_mask, complement, thresh, dp, n_in) \
-   private(lat, lon, dist, v)
-   {
+   for(int x=0; x<grid.nx(); x++) {
+      for(int y=0; y<grid.ny(); y++) {
 
-#pragma omp for reduction(+:n_in)
+         // Lat/Lon value for the current grid point
+         grid.xy_to_latlon(x, y, lat, lon);
+         lon -= 360.0*floor((lon + 180.0)/360.0);
 
-      for(int x=0; x<grid.nx(); x++) {
-         for(int y=0; y<grid.ny(); y++) {
+         // Find the minimum distance to the track
+         dist = 1.0E10;
+         for(int i=1; i<poly_mask.n_points(); i++) {
+            dist = min(dist,
+                       gc_dist_to_line(poly_mask.lat(i-1), poly_mask.lon(i-1),
+                                       poly_mask.lat(i),   poly_mask.lon(i),
+                                       lat, lon));
+         }
 
-            // Lat/Lon value for the current grid point
-            grid.xy_to_latlon(x, y, lat, lon);
-            lon -= 360.0*floor((lon + 180.0)/360.0);
+         // Apply threshold, if specified
+         if(thresh.get_type() != thresh_na) {
 
-            // Find the minimum distance to the track
-            dist = 1.0E10;
-            for(int i=1; i<poly_mask.n_points(); i++) {
-               dist = min(dist,
-                          gc_dist_to_line(poly_mask.lat(i-1), poly_mask.lon(i-1),
-                                          poly_mask.lat(i),   poly_mask.lon(i),
-                                          lat, lon));
-            }
+            bool check = thresh.check(dist);
 
-            // Apply threshold, if specified
-            if(thresh.get_type() != thresh_na) {
+            // Check the complement
+            if(complement) check = !check;
 
-               bool check = thresh.check(dist);
+            // Increment count
+            if(check) n_in++;
 
-               // Check the complement
-               if(complement) check = !check;
+            v = (check ? 1.0 : 0.0);
+         }
+         else {
+            v = dist;
+         }
 
-               // Increment count
-               if(check) n_in++;
+         // Store the result
+         dp.set(v, x, y);
 
-               v = (check ? 1.0 : 0.0);
-            }
-            else {
-               v = dist;
-            }
-
-            // Store the result
-            dp.set(v, x, y);
-
-         } // end for y
-      } // end for x
-   } // end of omp parallel
-      
+      } // end for y
+   } // end for x
+       
    if(thresh.get_type() != thresh_na && complement) {
       mlog << Debug(3)
            << "Applying complement of the "
