@@ -32,6 +32,7 @@
 //   014    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files
 //   015    05/03/23  Halley Gotway   MET #1060 Support multiple shapes
 //   016    11/04/24  Halley Gotway   MET #2966 Add solar time option.
+//   017    05/01/25  Prestopnik      MET #3120 Add OpenMP
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -737,26 +738,34 @@ static void apply_poly_mask(DataPlane & dp) {
    double lon;
 
    // Check the Lat/Lon of each grid point being inside the polyline
-   for(int x=0; x<grid.nx(); x++) {
-      for(int y=0; y<grid.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(grid, poly_mask, complement, dp, n_in) \
+   private(lat, lon, inside)
+   {
 
-         // Lat/Lon value for the current grid point
-         grid.xy_to_latlon(x, y, lat, lon);
+#pragma omp for reduction(+:n_in)
+     
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
 
-         // Check current grid point inside polyline
-         inside = poly_mask.latlon_is_inside(lat, lon);   //  returns bool
+            // Lat/Lon value for the current grid point
+            grid.xy_to_latlon(x, y, lat, lon);
 
-         // Check the complement
-         if(complement) inside = !inside;
+            // Check current grid point inside polyline
+            inside = poly_mask.latlon_is_inside(lat, lon);   //  returns bool
 
-         // Increment count
-         if(inside) n_in++;
+            // Check the complement
+            if(complement) inside = !inside;
 
-         // Store the current mask value
-         dp.set((inside ? 1.0 : 0.0), x, y);
+            // Increment count
+            if(inside) n_in++;
 
-      } // end for y
-   } // end for x
+            // Store the current mask value
+            dp.set((inside ? 1.0 : 0.0), x, y);
+
+         } // end for y
+      } // end for x
+   } // end of omp parallel   
 
    if(complement) {
       mlog << Debug(3)
@@ -783,30 +792,46 @@ static void apply_poly_xy_mask(DataPlane & dp) {
    GridClosedPoly poly_xy;
 
    // Convert MaskPoly Lat/Lon coordinates to Grid X/Y
-   for(int i=0; i<poly_mask.n_points(); i++) {
-      grid.latlon_to_xy(poly_mask.lat(i), poly_mask.lon(i), x_dbl, y_dbl);
-      poly_xy.add_point(x_dbl, y_dbl);
-   }
+#pragma omp parallel default(none) \
+   shared(grid, poly_mask) \
+   private(x_dbl, y_dbl, poly_xy)
+   {
 
-   // Check the X/Y of each grid point being inside the polyline
-   for(int x=0; x<grid.nx(); x++) {
-      for(int y=0; y<grid.ny(); y++) {
+#pragma omp for schedule (static)
+     
+      for(int i=0; i<poly_mask.n_points(); i++) {
+         grid.latlon_to_xy(poly_mask.lat(i), poly_mask.lon(i), x_dbl, y_dbl);
+         poly_xy.add_point(x_dbl, y_dbl);
+      } // end for
+   } // end omp parallel   
 
-         // Check current grid point inside polyline
-         inside = (poly_xy.is_inside((double) x, (double) y) != 0);
+#pragma omp parallel default(none) \
+   shared(grid, poly_mask, complement, n_in, dp) \
+   private(inside, poly_xy)
+   {
 
-         // Check the complement
-         if(complement) inside = !inside;
+#pragma omp for reduction(+:n_in)
+     
+      // Check the X/Y of each grid point being inside the polyline
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
 
-         // Increment count
-         if(inside) n_in++;
+            // Check current grid point inside polyline
+            inside = (poly_xy.is_inside((double) x, (double) y) != 0);
 
-         // Store the current mask value
-         dp.set((inside ? 1.0 : 0.0), x, y);
+            // Check the complement
+            if(complement) inside = !inside;
 
-      } // end for y
-   } // end for x
+            // Increment count
+            if(inside) n_in++;
 
+            // Store the current mask value
+            dp.set((inside ? 1.0 : 0.0), x, y);
+
+         } // end for y
+      } // end for x
+   } // end of omp parallel
+   
    if(complement) {
       mlog << Debug(3)
            << "Applying complement of the "
@@ -844,47 +869,62 @@ static void apply_box_mask(DataPlane &dp) {
    }
 
    // Process each lat/lon point
-   for(int i=0; i<poly_mask.n_points(); i++) {
+#pragma omp parallel default(none) \
+   shared(poly_mask, grid, height, width, dp) \
+   private(cen_x, cen_y) 
+   {
 
-      // Convert box lat/lon to grid x/y
-      grid.latlon_to_xy(poly_mask.lat(i), poly_mask.lon(i), cen_x, cen_y);
+#pragma omp for schedule (static)
+     
+      for(int i=0; i<poly_mask.n_points(); i++) {
 
-      // Get the lower-left x, y
-      int x_ll;
-      int y_ll;
-      get_xy_ll(cen_x, cen_y, width, height, x_ll, y_ll);
+         // Convert box lat/lon to grid x/y
+         grid.latlon_to_xy(poly_mask.lat(i), poly_mask.lon(i), cen_x, cen_y);
 
-      // Set mask value for points within the box
-      for(int x=x_ll; x<x_ll+width; x++) {
-         if(x < 0 || x >= dp.nx()) continue;
+         // Get the lower-left x, y
+         int x_ll;
+         int y_ll;
+         get_xy_ll(cen_x, cen_y, width, height, x_ll, y_ll);
 
-         for(int y=y_ll; y<y_ll+height; y++) {
-            if(y < 0 || y >= dp.ny()) continue;
+         // Set mask value for points within the box
+         for(int x=x_ll; x<x_ll+width; x++) {
+            if(x < 0 || x >= dp.nx()) continue;
 
-            // Set the mask
-            dp.set(1, x, y);
+            for(int y=y_ll; y<y_ll+height; y++) {
+               if(y < 0 || y >= dp.ny()) continue;
+
+               // Set the mask
+               dp.set(1, x, y);
+
+            } // end for y
+         } // end for x
+      } // end for i
+   } // end of omp parallel
+
+   // Loop through the field, handle the complement, and count up points
+#pragma omp parallel default(none) \
+   shared(dp, complement, n_in)
+   {
+
+#pragma omp for reduction(+:n_in)
+
+      for(int x=0; x<dp.nx(); x++) {
+         for(int y=0; y<dp.ny(); y++) {
+
+            bool inside = (dp(x, y) == 1);
+
+            // Check the complement
+            if(complement) inside = !inside;
+
+            // Increment count
+            if(inside) n_in++;
+
+            // Store the current mask value
+            dp.set(inside, x, y);
 
          } // end for y
       } // end for x
-   } // end for i
-
-   // Loop through the field, handle the complement, and count up points
-   for(int x=0; x<dp.nx(); x++) {
-      for(int y=0; y<dp.ny(); y++) {
-
-         bool inside = (dp(x, y) == 1);
-
-         // Check the complement
-         if(complement) inside = !inside;
-
-         // Increment count
-         if(inside) n_in++;
-
-         // Store the current mask value
-         dp.set(inside, x, y);
-
-      } // end for y
-   } // end for x
+   } // end of omp parallel   
 
    if(complement) {
       mlog << Debug(3)
@@ -920,43 +960,51 @@ static void apply_circle_mask(DataPlane &dp) {
       units_cs = "km";
    }
 
-   // For each grid point, compute mimumum distance to polyline points
-   for(int x=0; x<grid.nx(); x++) {
-      for(int y=0; y<grid.ny(); y++) {
+   // For each grid point, compute minumum distance to polyline points
+#pragma omp parallel default(none) \
+   shared(grid, poly_mask, complement, thresh, dp, n_in) \
+   private(lat, lon, dist, v)
+   {
 
-         // Lat/Lon value for the current grid point
-         grid.xy_to_latlon(x, y, lat, lon);
-         lon -= 360.0*floor((lon + 180.0)/360.0);
+#pragma omp for reduction(+:n_in)
 
-         // Find the minimum distance to a polyline point
-         dist = 1.0E10;
-         for(int i=0; i<poly_mask.n_points(); i++) {
-            dist = min(dist, gc_dist(lat, lon, poly_mask.lat(i), poly_mask.lon(i)));
-         }
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
 
-         // Apply threshold, if specified
-         if(thresh.get_type() != thresh_na) {
+            // Lat/Lon value for the current grid point
+            grid.xy_to_latlon(x, y, lat, lon);
+            lon -= 360.0*floor((lon + 180.0)/360.0);
 
-            bool check = thresh.check(dist);
+            // Find the minimum distance to a polyline point
+            dist = 1.0E10;
+            for(int i=0; i<poly_mask.n_points(); i++) {
+               dist = min(dist, gc_dist(lat, lon, poly_mask.lat(i), poly_mask.lon(i)));
+            }
 
-            // Check the complement
-            if(complement) check = !check;
+            // Apply threshold, if specified
+            if(thresh.get_type() != thresh_na) {
 
-            // Increment count
-            if(check) n_in++;
+               bool check = thresh.check(dist);
 
-            v = (check ? 1.0 : 0.0);
-         }
-         else {
-            v = dist;
-         }
+               // Check the complement
+               if(complement) check = !check;
 
-         // Store the result
-         dp.set(v, x, y);
+               // Increment count
+               if(check) n_in++;
 
-      } // end for y
-   } // end for x
+               v = (check ? 1.0 : 0.0);
+            }
+            else {
+               v = dist;
+            }
 
+            // Store the result
+            dp.set(v, x, y);
+
+         } // end for y
+      } // end for x
+   } // end of omp parallel
+      
    if(thresh.get_type() != thresh_na && complement) {
       mlog << Debug(3)
            << "Applying complement of the "
@@ -1003,46 +1051,54 @@ static void apply_track_mask(DataPlane &dp) {
       units_cs = "km";
    }
 
-   // For each grid point, compute mimumum distance to track
-   for(int x=0; x<grid.nx(); x++) {
-      for(int y=0; y<grid.ny(); y++) {
+   // For each grid point, compute minumum distance to track
+#pragma omp parallel default(none) \
+   shared(grid, poly_mask, complement, thresh, dp, n_in) \
+   private(lat, lon, dist, v)
+   {
 
-         // Lat/Lon value for the current grid point
-         grid.xy_to_latlon(x, y, lat, lon);
-         lon -= 360.0*floor((lon + 180.0)/360.0);
+#pragma omp for reduction(+:n_in)
 
-         // Find the minimum distance to the track
-         dist = 1.0E10;
-         for(int i=1; i<poly_mask.n_points(); i++) {
-            dist = min(dist,
-                       gc_dist_to_line(poly_mask.lat(i-1), poly_mask.lon(i-1),
-                                       poly_mask.lat(i),   poly_mask.lon(i),
-                                       lat, lon));
-         }
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
 
-         // Apply threshold, if specified
-         if(thresh.get_type() != thresh_na) {
+            // Lat/Lon value for the current grid point
+            grid.xy_to_latlon(x, y, lat, lon);
+            lon -= 360.0*floor((lon + 180.0)/360.0);
 
-            bool check = thresh.check(dist);
+            // Find the minimum distance to the track
+            dist = 1.0E10;
+            for(int i=1; i<poly_mask.n_points(); i++) {
+               dist = min(dist,
+                          gc_dist_to_line(poly_mask.lat(i-1), poly_mask.lon(i-1),
+                                          poly_mask.lat(i),   poly_mask.lon(i),
+                                          lat, lon));
+            }
 
-            // Check the complement
-            if(complement) check = !check;
+            // Apply threshold, if specified
+            if(thresh.get_type() != thresh_na) {
 
-            // Increment count
-            if(check) n_in++;
+               bool check = thresh.check(dist);
 
-            v = (check ? 1.0 : 0.0);
-         }
-         else {
-            v = dist;
-         }
+               // Check the complement
+               if(complement) check = !check;
 
-         // Store the result
-         dp.set(v, x, y);
+               // Increment count
+               if(check) n_in++;
 
-      } // end for y
-   } // end for x
+               v = (check ? 1.0 : 0.0);
+            }
+            else {
+               v = dist;
+            }
 
+            // Store the result
+            dp.set(v, x, y);
+
+         } // end for y
+      } // end for x
+   } // end of omp parallel
+      
    if(thresh.get_type() != thresh_na && complement) {
       mlog << Debug(3)
            << "Applying complement of the "
@@ -1076,36 +1132,43 @@ static void apply_grid_mask(DataPlane &dp) {
    int n_in = 0;
 
    // Check each grid point being inside the masking grid
-   for(int x=0; x<grid.nx(); x++) {
-      for(int y=0; y<grid.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(grid, grid_mask, complement, dp, n_in)
+   {
 
-         // Lat/Lon value for the current grid point
-         double lat;
-         double lon;
-         grid.xy_to_latlon(x, y, lat, lon);
-         lon -= 360.0*floor((lon + 180.0)/360.0);
+#pragma omp for reduction(+:n_in)
 
-         // Convert Lat/Lon to masking grid x/y
-         double mask_x;
-         double mask_y;
-         grid_mask.latlon_to_xy(lat, lon, mask_x, mask_y);
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
 
-         // Check for point falling within the masking grid
-         bool inside = (mask_x >= 0 && mask_x < grid_mask.nx() &&
-                        mask_y >= 0 && mask_y < grid_mask.ny());
+            // Lat/Lon value for the current grid point
+            double lat;
+            double lon;
+            grid.xy_to_latlon(x, y, lat, lon);
+            lon -= 360.0*floor((lon + 180.0)/360.0);
 
-         // Apply the complement
-         if(complement) inside = !inside;
+            // Convert Lat/Lon to masking grid x/y
+            double mask_x;
+            double mask_y;
+            grid_mask.latlon_to_xy(lat, lon, mask_x, mask_y);
 
-         // Increment count
-         if(inside) n_in++;
+            // Check for point falling within the masking grid
+            bool inside = (mask_x >= 0 && mask_x < grid_mask.nx() &&
+                           mask_y >= 0 && mask_y < grid_mask.ny());
 
-         // Store the current mask value
-         dp.set(inside, x, y);
+            // Apply the complement
+            if(complement) inside = !inside;
 
-      } // end for y
-   } // end for x
+            // Increment count
+            if(inside) n_in++;
 
+            // Store the current mask value
+            dp.set(inside, x, y);
+
+         } // end for y
+      } // end for x
+   } // end of omp parallel
+      
    if(complement) {
       mlog << Debug(3)
            << "Applying complement of the "
