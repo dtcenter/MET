@@ -274,7 +274,7 @@ class Partition {
 extern int ShapeData_intersection(const ShapeData &, const ShapeData &);
 extern ShapeData select(const ShapeData &, int);
 extern ShapeData split(const ShapeData &, int &);
-extern void apply_mask(ShapeData &, ShapeData &);
+extern void apply_mask(ShapeData &, const ShapeData &);
 
 ///////////////////////////////////////////////////////////////////////////////
 

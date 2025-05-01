@@ -33,6 +33,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <numeric>
+#include <algorithm>
 
 #include "shapedata.h"
 #include "mode_columns.h"
@@ -397,7 +398,7 @@ double ShapeData::complexity() const {
 
    Polyline poly(convex_hull());
    double hull  = fabs(poly.uv_signed_area());
-   double shape = (double) count;
+   auto shape = (double) count;
 
    //
    // Complexity is defined as the difference in area between the
@@ -445,7 +446,7 @@ double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
    // Compute the mean of the intensities
    double v = 0.0;
    if(perc == 101) {
-      v = accumulate(val.begin(), val.end(), 0.0)/val.size();
+      v = accumulate(val.begin(), val.end(), 0.0)/(double) val.size();
    }
    // Compute the sum of the intensities
    else if(perc == 102) {
@@ -454,7 +455,7 @@ double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
    // Compute a percentile of intensity
    else {
       sort(val.begin(), val.end());
-      v = percentile(val.data(), val.size(), (double) perc/100.0);
+      v = percentile(val.data(), (int) val.size(), (double) perc/100.0);
    }
 
    return v;
@@ -982,12 +983,8 @@ void Cell::assign(const Cell & c) {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool Cell::has(int k) const {
-
-   for(const auto &j : e) {
-      if(j == k) return true;
-   }
-
-   return false;
+ 
+   return any_of(e.begin(), e.end(), [k](int j){ return j == k; });
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1060,11 +1057,7 @@ void Partition::assign(const Partition & p) {
 
 bool Partition::has(int k) const {
 
-   for(const auto &j : c) {
-      if(j.has(k)) return true;
-   }
-
-   return false;
+   return any_of(c.begin(), c.end(), [k](Cell e){ return e.has(k); });
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1102,7 +1095,7 @@ void Partition::merge_cells(int j_1, int j_2) {
       j_max = j_1;
    }
 
-   int nn = c[j_max].e.size();
+   auto nn = (int) c[j_max].e.size();
 
    for(int k=0; k<nn; k++) {
       c[j_min].add(c[j_max].e[k]);
@@ -1162,13 +1155,13 @@ void Partition::add(int k) {
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-double dot(double x_1, double y_1, double x_2, double y_2) {
+static double dot(double x_1, double y_1, double x_2, double y_2) {
    return x_1*x_2 + y_1*y_2;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
+static void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
    bool lr, ur, ul, ll;
 
    lr = ur = ul = ll = false;
@@ -1306,7 +1299,7 @@ StepCase get_step_case(bool lr, bool ur, bool ul, bool ll) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void apply_mask(ShapeData &f, ShapeData &mask) {
+void apply_mask(ShapeData &f, const ShapeData &mask) {
 
    if(f.data.nx() != mask.data.nx() ||
       f.data.ny() != mask.data.ny() ) {
@@ -1414,22 +1407,21 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
       keep_object[i] = true;
 
       // Loop over attribute filter map
-      for(map<ConcatString,ThreshArray>::const_iterator it=attr_map.begin();
-          it!= attr_map.end(); it++) {
+      for(auto it : attr_map) {
 
-         double attr_val = sd_object.get_attr(it->first, raw_ptr, obj_thresh,
+         double attr_val = sd_object.get_attr(it.first, raw_ptr, obj_thresh,
                                               grid, precip_flag);
 
          // Discard objects whose attributes do not meet the threshold criteria
-         for(int j=0; j<it->second.n_elements(); j++) {
+         for(int j=0; j<it.second.n_elements(); j++) {
 
-            keep_object[i] = it->second[j].check(attr_val);
+            keep_object[i] = it.second[j].check(attr_val);
 
             // Break out of the ThreshArray loop
             if(!keep_object[i]) {
                mlog << Debug(4)
-                    << "Discarding object since " << it->first << " of "
-                    << attr_val << " is not " << it->second[j].get_str()
+                    << "Discarding object since " << it.first << " of "
+                    << attr_val << " is not " << it.second[j].get_str()
                     << ".\n";
                break;
             }
@@ -1543,7 +1535,7 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc,
       // Compute the mean of the intensities
       //
       if(perc == 101) {
-         inten_object[i+1] = accumulate(raw_v.begin(), raw_v.end(), 0.0)/raw_v.size();
+         inten_object[i+1] = accumulate(raw_v.begin(), raw_v.end(), 0.0)/(double) raw_v.size();
       }
       //
       // Compute the sum of the intensities
@@ -1556,7 +1548,7 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc,
       //
       else {
          sort(raw_v.begin(), raw_v.end());
-         inten_object[i+1] = percentile(raw_v.data(), raw_v.size(), (double) perc/100.0);
+         inten_object[i+1] = percentile(raw_v.data(), (int) raw_v.size(), (double) perc/100.0);
       }
    }
 
@@ -1617,17 +1609,17 @@ ShapeData split(const ShapeData & wfd, int & n_shapes) {
          int xx = x - 1;
          int yy = y + 1;
 
-         if((xx >= 0) && (yy < ny)) {
+         if(xx >= 0 &&
+            yy < ny &&
+            fat.s_is_on(xx, yy)) {
 
-            if(fat.s_is_on(xx, yy)) {
-               if(shape_assigned) {
-                  p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-               }
-               else {
-                  d.data.set(d.data(xx, yy), x, y);
-               }
-               shape_assigned = true;
+            if(shape_assigned) {
+               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
             }
+            else {
+               d.data.set(d.data(xx, yy), x, y);
+            }
+            shape_assigned = true;
          }
 
          //
@@ -1636,17 +1628,16 @@ ShapeData split(const ShapeData & wfd, int & n_shapes) {
          xx = x;
          yy = y + 1;
 
-         if(yy < ny) {
+         if(yy < ny &&
+            fat.s_is_on(xx, yy)) {
 
-            if(fat.s_is_on(xx, yy)) {
-               if(shape_assigned) {
-                  p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-               }
-               else {
-                  d.data.set(d.data(xx, yy), x, y);
-               }
-               shape_assigned = true;
+            if(shape_assigned) {
+               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
             }
+            else {
+               d.data.set(d.data(xx, yy), x, y);
+            }
+            shape_assigned = true;
          }
 
          //
@@ -1655,17 +1646,17 @@ ShapeData split(const ShapeData & wfd, int & n_shapes) {
          xx = x + 1;
          yy = y + 1;
 
-         if((xx < nx) && (yy < ny)) {
+         if(xx < nx &&
+            yy < ny &&
+            fat.s_is_on(xx, yy)) {
 
-            if(fat.s_is_on(xx, yy)) {
-               if(shape_assigned) {
-                  p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-               }
-               else {
-                  d.data.set(d.data(xx, yy), x, y);
-               }
-               shape_assigned = true;
+            if(shape_assigned) {
+               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
             }
+            else {
+               d.data.set(d.data(xx, yy), x, y);
+            }
+            shape_assigned = true;
          }
 
          //
@@ -1674,17 +1665,16 @@ ShapeData split(const ShapeData & wfd, int & n_shapes) {
          xx = x + 1;
          yy = y;
 
-         if(xx < nx) {
+         if(xx < nx &&
+            fat.s_is_on(xx, yy)) {
 
-            if(fat.s_is_on(xx, yy)) {
-               if(shape_assigned) {
-                  p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-               }
-               else {
-                  d.data.set(d.data(xx, yy), x, y);
-               }
-               shape_assigned = true;
+            if(shape_assigned) {
+               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
             }
+            else {
+               d.data.set(d.data(xx, yy), x, y);
+            }
+            shape_assigned = true;
          }
 
          //
@@ -1692,7 +1682,6 @@ ShapeData split(const ShapeData & wfd, int & n_shapes) {
          //
 
          if(!shape_assigned) {
-
             current_shape++;
             d.data.set(current_shape, x, y);
             p.add(nint(d.data(x, y)));
@@ -1722,7 +1711,7 @@ ShapeData split(const ShapeData & wfd, int & n_shapes) {
 
      ///////////////////////////////////
 
-   n_shapes = p.c.size();
+   n_shapes = (int) p.c.size();
 
    out.calc_moments();
 

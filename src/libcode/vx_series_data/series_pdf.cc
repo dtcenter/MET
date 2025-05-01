@@ -65,9 +65,9 @@ void update_pdf(double min, double delta, vector<long long>& pdf,
             double value = dp.get(x, y);
             if(mp.s_is_on(x, y) && !is_bad_data(value)) {
 
-               int bin = floor((value - min) / delta);
+               auto bin = (int) floor((value - min) / delta);
                     if(bin < 0)           bin = 0;
-               else if(bin >= pdf.size()) bin = pdf.size() - 1;
+               else if(bin >= pdf.size()) bin = (int) pdf.size() - 1;
 
                pdf[bin]++;
             }
@@ -105,11 +105,11 @@ void update_joint_pdf(int n_A, int n_B, double min_A, double min_B,
                !is_bad_data(value_A) && 
                !is_bad_data(value_B)) {
 
-               int k_A = floor((value_A - min_A) / delta_A);
+               auto k_A = (int) floor((value_A - min_A) / delta_A);
                     if(k_A < 0)    k_A = 0;
                else if(k_A >= n_A) k_A = n_A - 1;
 
-               int k_B = floor((value_B - min_B) / delta_B);
+               auto k_B = (int) floor((value_B - min_B) / delta_B);
                     if(k_B < 0) k_B = 0;
                else if(k_B >= n_B) k_B = n_B - 1;
 
@@ -137,7 +137,7 @@ void print_pdf(double min, double delta,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_pdf(NcFile* nc_out, const VarInfo& info,
+void write_nc_pdf(const NcFile* nc_out, const VarInfo& info,
                   double min, double delta,
                   const vector<long long>& pdf) {
 

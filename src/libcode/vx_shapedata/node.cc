@@ -496,11 +496,11 @@ double node_dist(const Node &a, const Node &b) {
 #pragma omp for reduction(min: min_dist)
       for(int i_a=0; i_a<num_a; i_a++) {
 
-         Node *a_ptr = a.get_child(i_a);
+         const Node *a_ptr = a.get_child(i_a);
 
          for(int i_b=0; i_b<num_b; i_b++) {
 
-            Node *b_ptr = b.get_child(i_b);
+            const Node *b_ptr = b.get_child(i_b);
 
             double dist = polyline_dist(a_ptr->p, b_ptr->p);
 
@@ -536,7 +536,7 @@ double node_polyline_dist(const Node &a, const Polyline &b) {
 #pragma omp for reduction(min: min_dist)
       for(int i_a=0; i_a<num_a; i_a++) {
 
-         Node *a_ptr = a.get_child(i_a);
+         const Node *a_ptr = a.get_child(i_a);
 
          double dist = polyline_dist(a_ptr->p, b);
 

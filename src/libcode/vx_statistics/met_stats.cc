@@ -2162,9 +2162,6 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
          double uoc = pd_u.ocmn_na[i];
          double voc = pd_v.ocmn_na[i];
 
-         double u_diff = uf - uo;
-         double v_diff = vf - vo;
-
          double wgt = pd_u.wgt_na[i]/wgt_sum;
 
          // VL1L2 sums
@@ -4566,8 +4563,8 @@ int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int
    // Arrays to store the raw data values to be ranked, their locations,
    // and their computed ranks.  The ranks are stored as doubles since
    // they can be set to 0.5 in the case of ties.
-   double *data  = new double [dp.nx()*dp.ny()];
-   int *data_loc = new int    [dp.nx()*dp.ny()];
+   vector<double> data(dp.nx()*dp.ny());
+   vector<int> data_loc(dp.nx()*dp.ny());
 
    // Search the input field for valid data and keep track of its location
    int n = 0;
@@ -4584,7 +4581,7 @@ int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int
 
    // Compute the rank of the data and store the ranks in the data_rank array
    // Keep track of the number of ties in the ranks
-   ties = do_rank(data, data_rank, n);
+   ties = do_rank(data.data(), data_rank, n);
 
    // Set up the dp_rank object
    dp_rank.set_size(dp.nx(), dp.ny());
@@ -4596,10 +4593,6 @@ int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int
       dp_rank.one_to_two(data_loc[i], x, y);
       dp_rank.set(data_rank[i], x, y);
    }
-
-   // Deallocate memory
-   if(data)      { delete [] data;      data     = nullptr; }
-   if(data_loc)  { delete [] data_loc;  data_loc = nullptr; }
 
    return n;
 }

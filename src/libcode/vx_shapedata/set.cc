@@ -248,7 +248,7 @@ void SetCollection::extend(int N) {
 
    k *= set_alloc_inc;
 
-   FcstObsSet *u = new FcstObsSet [k];
+   auto *u = new FcstObsSet [k];
 
    if(set) {
       for(int j=0; j<n_alloc; j++) u[j] = set[j];
@@ -375,9 +375,7 @@ bool SetCollection::is_fcst_matched(int fcst_number) const {
    //
    // Check to see if the set contains obs objects
    //
-   if(j != -1) {
-      if(set[j].n_obs > 0) matched = true;
-   }
+   if(j != -1 && set[j].n_obs > 0) matched = true;
 
    return matched;
 }
@@ -396,9 +394,7 @@ bool SetCollection::is_obs_matched(int obs_number) const {
    //
    // Check to see if the set contains fcst objects
    //
-   if(j != -1) {
-      if(set[j].n_fcst > 0) matched = true;
-   }
+   if(j != -1 && set[j].n_fcst > 0) matched = true;
 
    return matched;
 }

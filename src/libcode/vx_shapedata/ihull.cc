@@ -143,16 +143,15 @@ static bool lex_compare(const IntPoint &a, const IntPoint &b)
 
 {
 
-if ( a.x < b.x )  return true;
-if ( a.x > b.x )  return false;
+     if ( a.x < b.x )  return true;
+else if ( a.x > b.x )  return false;
 
    //
    //  now we know that a.x = b.x
    //
 
-if ( a.y < b.y )  return true;
-if ( a.y > b.y )  return false;
-
+     if ( a.y < b.y )  return true;
+else if ( a.y > b.y )  return false;
 
    //
    //  done
@@ -164,5 +163,4 @@ return false;
 
 
 ////////////////////////////////////////////////////////////////////////
-
 

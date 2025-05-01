@@ -461,8 +461,8 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       //
       for(int i=0; i<n_f_rank; i++) {
 
-         double f   = f_na_rank[i];
-         double o   = o_na_rank[i];
+         f = f_na_rank[i];
+         o = o_na_rank[i];
          double wgt = wgt_na2[i]/wgt_sum;
 
          f_bar  += wgt*f;
@@ -528,8 +528,8 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
          }
       } // end omp parallel
 
-      double den = sqrt((double) concordant+discordant+extra_f)*
-                   sqrt((double) concordant+discordant+extra_o);
+      den = sqrt((double) concordant+discordant+extra_f)*
+            sqrt((double) concordant+discordant+extra_o);
       if(is_eq(den, 0.0)) cnt_info.kt_corr.v = bad_data_double;
       else                cnt_info.kt_corr.v = (concordant - discordant)/den;
    } // end if rank_flag

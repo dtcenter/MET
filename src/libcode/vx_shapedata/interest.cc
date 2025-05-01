@@ -636,7 +636,7 @@ void get_percentiles(DistributionPercentiles &ptile,
    //
    // Get percentiles
    //
-   int n_values = v.size();
+   auto n_values = (int) v.size();
    ptile.p10 = percentile(v.data(), n_values, 0.10);
    ptile.p25 = percentile(v.data(), n_values, 0.25);
    ptile.p50 = percentile(v.data(), n_values, 0.50);
