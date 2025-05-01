@@ -792,18 +792,10 @@ static void apply_poly_xy_mask(DataPlane & dp) {
    GridClosedPoly poly_xy;
 
    // Convert MaskPoly Lat/Lon coordinates to Grid X/Y
-#pragma omp parallel default(none) \
-   shared(grid, poly_mask) \
-   private(x_dbl, y_dbl, poly_xy)
-   {
-
-#pragma omp for schedule (static)
-     
-      for(int i=0; i<poly_mask.n_points(); i++) {
-         grid.latlon_to_xy(poly_mask.lat(i), poly_mask.lon(i), x_dbl, y_dbl);
-         poly_xy.add_point(x_dbl, y_dbl);
-      } // end for
-   } // end omp parallel   
+   for(int i=0; i<poly_mask.n_points(); i++) {
+      grid.latlon_to_xy(poly_mask.lat(i), poly_mask.lon(i), x_dbl, y_dbl);
+      poly_xy.add_point(x_dbl, y_dbl);
+   } // end for
 
 #pragma omp parallel default(none) \
    shared(grid, poly_mask, complement, n_in, dp) \
@@ -869,37 +861,29 @@ static void apply_box_mask(DataPlane &dp) {
    }
 
    // Process each lat/lon point
-#pragma omp parallel default(none) \
-   shared(poly_mask, grid, height, width, dp) \
-   private(cen_x, cen_y) 
-   {
+   for(int i=0; i<poly_mask.n_points(); i++) {
 
-#pragma omp for schedule (static)
-     
-      for(int i=0; i<poly_mask.n_points(); i++) {
+      // Convert box lat/lon to grid x/y
+      grid.latlon_to_xy(poly_mask.lat(i), poly_mask.lon(i), cen_x, cen_y);
 
-         // Convert box lat/lon to grid x/y
-         grid.latlon_to_xy(poly_mask.lat(i), poly_mask.lon(i), cen_x, cen_y);
+      // Get the lower-left x, y
+      int x_ll;
+      int y_ll;
+      get_xy_ll(cen_x, cen_y, width, height, x_ll, y_ll);
 
-         // Get the lower-left x, y
-         int x_ll;
-         int y_ll;
-         get_xy_ll(cen_x, cen_y, width, height, x_ll, y_ll);
+      // Set mask value for points within the box
+      for(int x=x_ll; x<x_ll+width; x++) {
+         if(x < 0 || x >= dp.nx()) continue;
 
-         // Set mask value for points within the box
-         for(int x=x_ll; x<x_ll+width; x++) {
-            if(x < 0 || x >= dp.nx()) continue;
+         for(int y=y_ll; y<y_ll+height; y++) {
+            if(y < 0 || y >= dp.ny()) continue;
 
-            for(int y=y_ll; y<y_ll+height; y++) {
-               if(y < 0 || y >= dp.ny()) continue;
+            // Set the mask
+            dp.set(1, x, y);
 
-               // Set the mask
-               dp.set(1, x, y);
-
-            } // end for y
-         } // end for x
-      } // end for i
-   } // end of omp parallel
+         } // end for y
+      } // end for x
+   } // end for i
 
    // Loop through the field, handle the complement, and count up points
 #pragma omp parallel default(none) \
@@ -1211,16 +1195,9 @@ static void apply_data_mask(DataPlane &dp) {
       NumArray d;
       int nxy = dp.nx()*dp.ny();
       d.extend(nxy);
-#pragma omp parallel default(none) \
-   shared(nxy, dp, d)
-      {
-
-#pragma omp for schedule (static)
-      
-         for(int i=0; i<nxy; i++) {
-            if(!is_bad_data(dp.data()[i])) d.add(dp.data()[i]);
-         } // end for i
-      } // end of omp parallel
+      for(int i=0; i<nxy; i++) {
+         if(!is_bad_data(dp.data()[i])) d.add(dp.data()[i]);
+      } // end for i
       
       d.sort_array();
       thresh.set_perc(&d, &d, &d, &d);
@@ -1291,7 +1268,7 @@ static void apply_solar_mask(DataPlane &dp) {
 
             // Lat/Lon value for the current grid point
             double lat;
-	    double lon;
+            double lon;
             grid.xy_to_latlon(x, y, lat, lon);
             lon -= 360.0*floor((lon + 180.0)/360.0);
 
@@ -1452,29 +1429,37 @@ static void apply_shape_mask(DataPlane & dp) {
    }
 
    // Check grid points
-   for(int x=0; x<(grid.nx()); x++) {
-      for(int y=0; y<(grid.ny()); y++) {
+#pragma omp parallel default(none) \
+   shared(grid, poly_list, complement, dp, n_in) \
+   private(status)
+   {
 
-         for(const auto& cur_poly: poly_list) {
+#pragma omp for reduction(+:n_in)
+     
+      for(int x=0; x<(grid.nx()); x++) {
+         for(int y=0; y<(grid.ny()); y++) {
 
-            // Check if point is inside
-            status = cur_poly.is_inside(x, y);
+            for(const auto& cur_poly: poly_list) {
 
-            // Break after the first match
-            if(status) break;
-         }
+               // Check if point is inside
+               status = cur_poly.is_inside(x, y);
 
-         // Check the complement
-         if(complement) status = !status;
+               // Break after the first match
+               if(status) break;
+            }
 
-         // Increment count
-         if(status) n_in++;
+            // Check the complement
+            if(complement) status = !status;
 
-         // Store the current mask value
-         dp.set((status ? 1.0 : 0.0 ), x, y);
+            // Increment count
+            if(status) n_in++;
 
-      } // end for y
-   } // end for x
+            // Store the current mask value
+            dp.set((status ? 1.0 : 0.0 ), x, y);
+
+         } // end for y
+      } // end for x
+   } // end of omp parallel
 
    if(complement) {
       mlog << Debug(3)
@@ -1516,46 +1501,54 @@ static DataPlane combine(const DataPlane &dp_data,
    dp.set_size(grid.nx(), grid.ny());
 
    // Process each point
-   for(int x=0; x<grid.nx(); x++) {
-      for(int y=0; y<grid.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(grid, dp_data, dp_mask, dp, logic, mask_val,  n_in) \
+   private(v)
+   {
 
-         // Get the two input data values
-         bool v_data = !is_eq(dp_data(x, y), 0.0);
-         bool v_mask = !is_eq(dp_mask(x, y), 0.0);
+#pragma omp for reduction(+:n_in)
 
-         switch(logic) {
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
 
-            case SetLogic::Union:
-               if(v_data || v_mask) v = mask_val;
-               else                 v = 0.0;
-               break;
+            // Get the two input data values
+            bool v_data = !is_eq(dp_data(x, y), 0.0);
+            bool v_mask = !is_eq(dp_mask(x, y), 0.0);
 
-            case SetLogic::Intersection:
-               if(v_data && v_mask) v = mask_val;
-               else                 v = 0.0;
-               break;
+            switch(logic) {
 
-            case SetLogic::SymDiff:
-               if((v_data && !v_mask) || (!v_data && v_mask)) v = mask_val;
-               else                                           v = 0.0;
-               break;
+               case SetLogic::Union:
+                  if(v_data || v_mask) v = mask_val;
+                  else                 v = 0.0;
+                  break;
 
-            // Default behavior is to apply the mask value or pass through
-            // the data value
-            default:
-               if(v_mask) v = mask_val;
-               else       v = dp_data(x, y);
-               break;
-         }
+               case SetLogic::Intersection:
+                  if(v_data && v_mask) v = mask_val;
+                  else                 v = 0.0;
+                  break;
 
-         // Increment count
-         if(!is_eq(v, 0.0)) n_in++;
+               case SetLogic::SymDiff:
+                  if((v_data && !v_mask) || (!v_data && v_mask)) v = mask_val;
+                  else                                           v = 0.0;
+                  break;
 
-         // Store the result
-         dp.set(v, x, y);
+               // Default behavior is to apply the mask value or pass through
+               // the data value
+               default:
+                  if(v_mask) v = mask_val;
+                  else       v = dp_data(x, y);
+                  break;
+            }
 
-      } // end for y
-   } // end for x
+            // Increment count
+            if(!is_eq(v, 0.0)) n_in++;
+
+            // Store the result
+            dp.set(v, x, y);
+
+         } // end for y
+      } // end for x
+   } // end of omp parallel
 
    // List the number of points inside the mask
    if(logic != SetLogic::None) {
