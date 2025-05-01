@@ -1407,7 +1407,7 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
       keep_object[i] = true;
 
       // Loop over attribute filter map
-      for(auto it : attr_map) {
+      for(const auto it : attr_map) {
 
          double attr_val = sd_object.get_attr(it.first, raw_ptr, obj_thresh,
                                               grid, precip_flag);
