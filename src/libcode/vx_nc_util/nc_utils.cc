@@ -425,12 +425,11 @@ NcVarAtt *get_nc_att(const NcVar * var, const ConcatString &att_name, bool exit_
    if(IS_INVALID_NC_P(var)) {
       mlog << Error << "\n" << method_name
            << "can't read attribute \"" << att_name
-           << "\" from because variable is invalid.\n\n";
+           << "\" from invalid variable.\n\n";
    }
    else {
-      multimap<string,NcVarAtt>::iterator itAtt;
-      map<string,NcVarAtt> mapAttrs = var->getAtts();
-      for (itAtt = mapAttrs.begin(); itAtt != mapAttrs.end(); ++itAtt) {
+      auto mapAttrs = var->getAtts();
+      for (auto itAtt = mapAttrs.begin(); itAtt != mapAttrs.end(); ++itAtt) {
          if ( att_name == (*itAtt).first) {
             att = new NcVarAtt();
             *att = (*itAtt).second;
