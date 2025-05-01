@@ -256,7 +256,7 @@ bool NcCfFile::open(const char * filepath)
       else if( "latitude" == att_value ) _latVar = Var[j].var;
       else if( "longitude" == att_value ) _lonVar = Var[j].var;
       else if( ("air_pressure" == att_value || "height" == att_value)
-               && (nullptr==z_var && 1==get_dim_count(Var[j].var))) z_var = Var[j].var;
+               && (nullptr==z_var && 1==Var[j].Ndims)) z_var = Var[j].var;
     }
     if ( Var[j].name == "time" && (valid_time_var == nullptr)) {
       valid_time_var = Var[j].var;
@@ -1365,10 +1365,8 @@ void NcCfFile::read_netcdf_grid()
   // grids, but with how the gridded information is used in MET, I'm making the
   // assumption that all fields are on the same grid.
 
-  bool do_ignore;
   int max_dim = 0;
   NcVar *data_var = nullptr;
-  NcVar *tmp_data_var = nullptr;
   IntArray var_index_list;
   static const string method_name = "NcCfFile::read_netcdf_grid() -> ";
 
@@ -1378,26 +1376,24 @@ void NcCfFile::read_netcdf_grid()
 
     NcVar *var = Var[i].var;
 
-    // A gridded data variable can have anywhere from 2 to 4 dimensions (the
-    // fourth being time).  Any other variables can be ignored
+    // A gridded data variable should be at least 2 dimensions.
+    // One dimensional variables can be ignored
 
-    int num_dims = get_dim_count(var);
+    int num_dims = Var[i].Ndims;
 
-    if (num_dims < 2)
-      continue;
+    if (num_dims < 2) continue;
 
-    // Skip the latitude and longitude variables, if they are present
+    // Skip the coordinate variables like latitude and longitude,
+    // if they are present
 
     ConcatString std_name;
     bool has_standard_name = get_var_standard_name(var, std_name);
 
-    do_ignore = false;
     if (has_standard_name &&
         (std_name == "" || std_name == "latitude"
          || std_name == "longitude" || std_name == "time")) {
-      do_ignore = true;
+      continue;
     }
-    if (do_ignore) continue;
 
     if (max_dim < num_dims) max_dim = num_dims;
 
@@ -1406,26 +1402,22 @@ void NcCfFile::read_netcdf_grid()
       break;
     }
 
-    // If we get here, this should be a gridded data variable
-    if (tmp_data_var == nullptr) tmp_data_var = var;
-    if (!has_standard_name) continue;   // Skip if no standard name
+    // If we get here, this may be a gridded data variable
     var_index_list.add(i);
 
   } /* endfor - i */
 
   if (data_var == nullptr)
   {
+    // Select the first variable with the most dimensions
     for (int i = 0; i < var_index_list.n(); ++i)
     {
-      // Get a pointer to the variable
-      NcVar *var = Var[i].var;
-
+      int var_i = var_index_list[i];
       // Exclude with less dimensions
-      if (get_dim_count(var) < max_dim) continue;
-
-      // If we get here, this should be a gridded data variable
-      data_var = var;
-      break;
+      if (max_dim == Var[var_i].Ndims) {
+        data_var = Var[var_i].var;
+        break;
+      }
 
     } /* endfor - i */
   }
