@@ -32,7 +32,7 @@
 //   014    09/28/22  Prestopnik      MET #2227 Remove namespace std and netCDF from header files
 //   015    05/03/23  Halley Gotway   MET #1060 Support multiple shapes
 //   016    11/04/24  Halley Gotway   MET #2966 Add solar time option.
-//   017    05/01/25  Prestopnik      MET #3120 Add OpenMP
+//   017    05/01/25  Prestopnik      MET #3120 Add OpenMP 
 //
 ////////////////////////////////////////////////////////////////////////
 
