@@ -1211,31 +1211,46 @@ static void apply_data_mask(DataPlane &dp) {
       NumArray d;
       int nxy = dp.nx()*dp.ny();
       d.extend(nxy);
-      for(int i=0; i<nxy; i++) {
-         if(!is_bad_data(dp.data()[i])) d.add(dp.data()[i]);
-      }
+#pragma omp parallel default(none) \
+   shared(nxy, dp, d)
+      {
+
+#pragma omp for schedule (static)
+      
+         for(int i=0; i<nxy; i++) {
+            if(!is_bad_data(dp.data()[i])) d.add(dp.data()[i]);
+         } // end for i
+      } // end of omp parallel
+      
       d.sort_array();
       thresh.set_perc(&d, &d, &d, &d);
    }
 
    // For each grid point, apply the data threshold
-   for(int x=0; x<grid.nx(); x++) {
-      for(int y=0; y<grid.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(grid, complement, thresh, dp, n_in)
+   {
 
-         // Apply the threshold
-         bool check = thresh.check(dp(x,y));
+#pragma omp for reduction(+:n_in)
 
-         // Check the complement
-         if(complement) check = !check;
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
 
-         // Increment count
-         if(check) n_in++;
+            // Apply the threshold
+            bool check = thresh.check(dp(x,y));
 
-         // Store the result
-         dp.set(check ? 1.0 : 0.0, x, y);
+            // Check the complement
+            if(complement) check = !check;
 
-      } // end for y
-   } // end for x
+            // Increment count
+            if(check) n_in++;
+
+            // Store the result
+            dp.set(check ? 1.0 : 0.0, x, y);
+
+         } // end for y
+      } // end for x
+   } // end of omp paralell
 
    // List number of points inside the mask
    mlog << Debug(3)
@@ -1264,46 +1279,54 @@ static void apply_solar_mask(DataPlane &dp) {
    }
 
    // Compute solar value for each grid point Lat/Lon
-   for(int x=0; x<grid.nx(); x++) {
-      for(int y=0; y<grid.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(grid, mask_type, solar_ut, thresh, complement, dp, n_in) \
+   private(v)
+   {
 
-         // Lat/Lon value for the current grid point
-         double lat;
-	 double lon;
-         grid.xy_to_latlon(x, y, lat, lon);
-         lon -= 360.0*floor((lon + 180.0)/360.0);
+#pragma omp for reduction(+:n_in)
 
-         // Compute the solar time in hours
-         if(mask_type == MaskType::Solar_Time) {
-            v = solar_time(solar_ut, lon);
-         }
-         // Compute the solar altitude and azimuth
-         else {
-            double alt;
-            double azi;
-            solar_altaz(solar_ut, lat, lon, alt, azi);
-            v = (mask_type == MaskType::Solar_Alt ? alt : azi);
-         }
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
 
-         // Apply threshold, if specified
-         if(thresh.get_type() != thresh_na) {
+            // Lat/Lon value for the current grid point
+            double lat;
+	    double lon;
+            grid.xy_to_latlon(x, y, lat, lon);
+            lon -= 360.0*floor((lon + 180.0)/360.0);
 
-            bool check = thresh.check(v);
+            // Compute the solar time in hours
+            if(mask_type == MaskType::Solar_Time) {
+               v = solar_time(solar_ut, lon);
+            }
+            // Compute the solar altitude and azimuth
+            else {
+               double alt;
+               double azi;
+               solar_altaz(solar_ut, lat, lon, alt, azi);
+               v = (mask_type == MaskType::Solar_Alt ? alt : azi);
+            }
 
-            // Check the complement
-            if(complement) check = !check;
+            // Apply threshold, if specified
+            if(thresh.get_type() != thresh_na) {
 
-            // Increment count
-            if(check) n_in++;
+               bool check = thresh.check(v);
 
-            v = (check ? 1.0 : 0.0);
-         }
+               // Check the complement
+               if(complement) check = !check;
 
-         // Store the current solar value
-         dp.set(v, x, y);
+               // Increment count
+               if(check) n_in++;
 
-      } // end for y
-   } // end for x
+               v = (check ? 1.0 : 0.0);
+            }
+
+            // Store the current solar value
+            dp.set(v, x, y);
+
+         } // end for y
+      } // end for x
+   } // end of omp parallel
 
    if(thresh.get_type() != thresh_na && complement) {
       mlog << Debug(3)
@@ -1349,36 +1372,44 @@ static void apply_lat_lon_mask(DataPlane &dp) {
    }
 
    // Compute Lat/Lon value for each grid point
-   for(int x=0; x<grid.nx(); x++) {
-      for(int y=0; y<grid.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(grid, mask_type, thresh, complement, dp, n_in) \
+   private(v)
+   {
 
-         // Lat/Lon value for the current grid point
-         double lat;
-         double lon;
-         grid.xy_to_latlon(x, y, lat, lon);
-         v = (mask_type == MaskType::Lat ? lat :
-              rescale_deg(-1.0*lon, -180.0, 180.0));
+#pragma omp for reduction(+:n_in)
 
-         // Apply threshold, if specified
-         if(thresh.get_type() != thresh_na) {
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
 
-            bool check = thresh.check(v);
+            // Lat/Lon value for the current grid point
+            double lat;
+            double lon;
+            grid.xy_to_latlon(x, y, lat, lon);
+            v = (mask_type == MaskType::Lat ? lat :
+                 rescale_deg(-1.0*lon, -180.0, 180.0));
 
-            // Check the complement
-            if(complement) check = !check;
+            // Apply threshold, if specified
+            if(thresh.get_type() != thresh_na) {
 
-            // Increment count
-            if(check) n_in++;
+               bool check = thresh.check(v);
 
-            v = (check ? 1.0 : 0.0);
-         }
+               // Check the complement
+               if(complement) check = !check;
 
-         // Store the current solar value
-         dp.set(v, x, y);
+               // Increment count
+               if(check) n_in++;
 
-      } // end for y
-   } // end for x
+               v = (check ? 1.0 : 0.0);
+            }
 
+            // Store the current solar value
+            dp.set(v, x, y);
+
+         } // end for y
+      } // end for x
+   } // end of omp parallel
+      
    if(thresh.get_type() != thresh_na && complement) {
       mlog << Debug(3)
            << "Applying complement of the "
@@ -1614,13 +1645,21 @@ static void write_netcdf(const DataPlane &dp) {
    vector<float> mask_data(grid.nx()*grid.ny());
 
    // Loop through each grid point
-   for(int x=0; x<grid.nx(); x++) {
-      for(int y=0; y<grid.ny(); y++) {
-         n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-         mask_data[n] = (float) dp(x, y);
-      } // end for y
-   } // end for x
+#pragma omp parallel default(none) \
+   shared(grid, DefaultTO, mask_data, dp) \
+   private(n)
+   {
 
+#pragma omp for schedule (static)
+
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
+            n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+            mask_data[n] = (float) dp(x, y);
+         } // end for y
+      } // end for x
+   } // end of parallel
+      
    if(!put_nc_data_with_dims(&mask_var, mask_data.data(), grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "error with mask_var->put\n\n";
