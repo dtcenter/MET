@@ -1414,7 +1414,7 @@ void NcCfFile::read_netcdf_grid()
     {
       int var_i = var_index_list[i];
       // Exclude with less dimensions
-      if (max_dim == Var[var_i].Ndims) {
+      if (max_dim <= Var[var_i].Ndims) {
         data_var = Var[var_i].var;
         break;
       }
