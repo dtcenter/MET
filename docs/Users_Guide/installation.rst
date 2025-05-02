@@ -385,6 +385,12 @@ External Library Handling in compile_MET_all.sh
     |                   |                                |                              |
     | Support           |                                |                              |
     +-------------------+--------------------------------+------------------------------+
+    | *Optional*        | :code:`--enable-profiler`      |                              |
+    |                   |                                |                              |
+    | Profiler          |                                |                              |
+    |                   |                                |                              |
+    | Support           |                                |                              |
+    +-------------------+--------------------------------+------------------------------+
   	  
     Generally speaking, for each library there is a set of three
     environment variables that can  

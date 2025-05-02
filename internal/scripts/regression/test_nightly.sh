@@ -21,7 +21,7 @@
 #=======================================================================
 
 # Constants
-EMAIL_LIST="johnhg@ucar.edu hsoh@ucar.edu jpresto@ucar.edu linden@ucar.edu mccabe@ucar.edu"
+EMAIL_LIST="johnhg@ucar.edu hsoh@ucar.edu jpresto@ucar.edu mccabe@ucar.edu"
 KEEP_DAYS=5
 
 # Usage statement
@@ -94,6 +94,9 @@ if [[ $N_ERR -gt 0 ]]; then
   echo "Nightly Build Log: `hostname`:${LOGFILE}" | \
   mail -s "MET Nightly Build Failed for ${1} in `basename ${RUN_DIR}` (autogen msg)" ${EMAIL_LIST}
   exit 1
+# Update the latest link
+else
+  ln -sf ${RUN_DIR}/MET-${1} ${RUN_DIR}/../latest
 fi
 
 exit 0
