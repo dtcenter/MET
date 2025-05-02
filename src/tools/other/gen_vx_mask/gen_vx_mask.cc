@@ -798,8 +798,8 @@ static void apply_poly_xy_mask(DataPlane & dp) {
    } // end for
 
 #pragma omp parallel default(none) \
-   shared(grid, poly_mask, complement, n_in, dp) \
-   private(inside, poly_xy)
+   shared(grid, poly_xy, complement, n_in, dp) \
+   private(inside)
    {
 
 #pragma omp for reduction(+:n_in)
