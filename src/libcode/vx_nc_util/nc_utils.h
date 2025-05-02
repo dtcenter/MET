@@ -286,7 +286,7 @@ extern bool put_nc_data_with_dims(netCDF::NcVar *, const double *data, const int
 extern bool put_nc_data_with_dims(netCDF::NcVar *, const double *data, const long len0,
                                   const long len1=0, const long len2=0);
 
-extern netCDF::NcGroup  get_nc_group(netCDF::NcFile *, const char *group_name);     // continue even though not exists
+extern netCDF::NcGroup  get_nc_group(const netCDF::NcFile *, const char *group_name);     // continue even though not exists
 
 extern netCDF::NcVar    get_var(netCDF::NcFile *, const char *var_name);    // exit if exists but invalid
 extern netCDF::NcVar    get_var(netCDF::NcFile *, const char *var_name,
@@ -302,15 +302,15 @@ extern netCDF::NcVar get_nc_var(netCDF::NcFile *, const ConcatString &var_name,
 
 extern netCDF::NcVar *copy_nc_var(netCDF::NcFile *,  netCDF::NcVar *,
                                   const int deflate_level=DEF_DEFLATE_LEVEL, const bool all_attrs=true);
-extern void   copy_nc_att(netCDF::NcFile *, netCDF::NcVar *, const ConcatString attr_name);
-extern void   copy_nc_att( netCDF::NcVar *,  netCDF::NcVar *, const ConcatString attr_name);
-extern void  copy_nc_atts(netCDF::NcFile *, netCDF::NcFile *, const bool all_attrs=true);
-extern void  copy_nc_atts( netCDF::NcVar *,  netCDF::NcVar *, const bool all_attrs=true);
-extern void copy_nc_var_data(netCDF::NcVar *, netCDF::NcVar *);
+extern void   copy_nc_att(const netCDF::NcFile *, netCDF::NcVar *, const ConcatString attr_name);
+extern void   copy_nc_att(const  netCDF::NcVar *,  netCDF::NcVar *, const ConcatString attr_name);
+extern void  copy_nc_atts(const netCDF::NcFile *, netCDF::NcFile *, const bool all_attrs=true);
+extern void  copy_nc_atts(const  netCDF::NcVar *,  netCDF::NcVar *, const bool all_attrs=true);
+extern void copy_nc_var_data(const netCDF::NcVar *, netCDF::NcVar *);
 
-extern bool has_nc_group(netCDF::NcFile *, const char *group_name);
-extern bool has_var(netCDF::NcFile *, const char *var_name);
-extern bool has_var(netCDF::NcFile *, const char *var_name, const char *group_name);
+extern bool has_nc_group(const netCDF::NcFile *, const char *group_name);
+extern bool has_var(const netCDF::NcFile *, const char *var_name);
+extern bool has_var(const netCDF::NcFile *, const char *var_name, const char *group_name);
 
 extern netCDF::NcVar  add_var(netCDF::NcFile *, const std::string &, const netCDF::NcType, const int deflate_level=DEF_DEFLATE_LEVEL);
 extern netCDF::NcVar  add_var(netCDF::NcFile *, const std::string &, const netCDF::NcType, const netCDF::NcDim, const int deflate_level=DEF_DEFLATE_LEVEL);
@@ -319,9 +319,9 @@ extern netCDF::NcVar  add_var(netCDF::NcFile *, const std::string &, const netCD
 extern netCDF::NcVar  add_var(netCDF::NcFile *, const std::string &, const netCDF::NcType, const netCDF::NcDim, const netCDF::NcDim, const netCDF::NcDim, const netCDF::NcDim, const int deflate_level=DEF_DEFLATE_LEVEL);
 extern netCDF::NcVar  add_var(netCDF::NcFile *, const std::string &, const netCDF::NcType, const std::vector<netCDF::NcDim>, const int deflate_level=DEF_DEFLATE_LEVEL);
 
-extern netCDF::NcDim  add_dim(netCDF::NcFile *, const std::string &);
-extern netCDF::NcDim  add_dim(netCDF::NcFile *, const std::string &, const size_t);
-extern bool   has_dim(netCDF::NcFile *, const char *dim_name);
+extern netCDF::NcDim  add_dim(const netCDF::NcFile *, const std::string &);
+extern netCDF::NcDim  add_dim(const netCDF::NcFile *, const std::string &, const size_t);
+extern bool   has_dim(const netCDF::NcFile *, const char *dim_name);
 extern bool   get_dim(const netCDF::NcFile *, const ConcatString &, int &, bool error_out = false);
 extern int    get_dim_count(const netCDF::NcFile *);
 extern int    get_dim_value(const netCDF::NcFile *, const std::string &, const bool error_out = false);
@@ -337,7 +337,7 @@ extern netCDF::NcFile* open_ncfile(const char * nc_name, bool write = false);
 // Moved from nc_cf_file.cc
 extern unixtime get_init_time(netCDF::NcFile *nc_file);
 
-extern unixtime get_reference_unixtime(netCDF::NcVar *time_var, int &sec_per_unit,
+extern unixtime get_reference_unixtime(const netCDF::NcVar *time_var, int &sec_per_unit,
                                        bool &no_leap_year);
 
 extern bool is_nc_unit_time(const char *units);

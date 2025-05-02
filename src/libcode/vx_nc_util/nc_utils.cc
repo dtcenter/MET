@@ -429,7 +429,7 @@ NcVarAtt *get_nc_att(const NcVar * var, const ConcatString &att_name, bool exit_
    }
    else {
       auto mapAttrs = var->getAtts();
-      for (auto itAtt : mapAttrs) {
+      for (const auto itAtt : mapAttrs) {
          if ( att_name == itAtt.first) {
             att = new NcVarAtt();
             *att = itAtt.second;
@@ -2224,7 +2224,7 @@ bool args_ok(const LongArray & a) {
 ////////////////////////////////////////////////////////////////////////
 // Continue even though not exists
 
-NcGroup get_nc_group(NcFile *nc, const char *group_name) {
+NcGroup get_nc_group(const NcFile *nc, const char *group_name) {
    NcGroup nc_group;
    multimap<string,NcGroup> group_map = nc->getGroups();
    multimap<string,NcGroup>::iterator it = group_map.find(group_name);
@@ -2235,7 +2235,7 @@ NcGroup get_nc_group(NcFile *nc, const char *group_name) {
 ////////////////////////////////////////////////////////////////////////
 // Exit if exists but invalid
 
-NcVar get_var(NcFile *nc, const char *var_name) {
+NcVar get_var(const NcFile *nc, const char *var_name) {
    string new_var_name = var_name;
    patch_nc_name(new_var_name);
 
@@ -2260,7 +2260,7 @@ NcVar get_var(NcFile *nc, const char *var_name) {
 ////////////////////////////////////////////////////////////////////////
 // Exit if exists but invalid
 
-NcVar get_var(NcFile *nc, const char *var_name, const char *group_name) {
+NcVar get_var(const NcFile *nc, const char *var_name, const char *group_name) {
    string nc_var_name;
    string new_var_name = var_name;
    patch_nc_name(new_var_name);
@@ -2295,7 +2295,7 @@ NcVar get_var(NcFile *nc, const char *var_name, const char *group_name) {
 ////////////////////////////////////////////////////////////////////////
 // Continue even though not exists
 
-NcVar get_nc_var(NcFile *nc, const char *var_name, bool log_as_error) {
+NcVar get_nc_var(const NcFile *nc, const char *var_name, bool log_as_error) {
    string new_var_name = var_name;
    patch_nc_name(new_var_name);
 
@@ -2319,14 +2319,14 @@ NcVar get_nc_var(NcFile *nc, const char *var_name, bool log_as_error) {
 ////////////////////////////////////////////////////////////////////////
 // Continue even though not exists
 
-NcVar get_nc_var(NcFile *nc, const ConcatString &var_name, bool log_as_error) {
+NcVar get_nc_var(const NcFile *nc, const ConcatString &var_name, bool log_as_error) {
    return get_nc_var(nc, var_name.c_str(), log_as_error);
 }
 
 ////////////////////////////////////////////////////////////////////////
 // Continue even though not exists
 
-NcVar get_nc_var(NcFile *nc, const char *var_name, const char *group_name,
+NcVar get_nc_var(const NcFile *nc, const char *var_name, const char *group_name,
                  bool log_as_error) {
    string nc_var_name;
    string new_var_name = var_name;
@@ -2365,21 +2365,21 @@ NcVar get_nc_var(NcFile *nc, const char *var_name, const char *group_name,
 ////////////////////////////////////////////////////////////////////////
 // Continue even though not exists
 
-NcVar get_nc_var(NcFile *nc, const ConcatString &var_name, const char *group_name,
+NcVar get_nc_var(const NcFile *nc, const ConcatString &var_name, const char *group_name,
                  bool log_as_error) {
    return get_nc_var(nc, var_name.c_str(), group_name, log_as_error);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_att_byte(NcFile *nc_to, NcGroupAtt *from_att) {
+void copy_nc_att_byte(NcFile *nc_to, const NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    vector<ncbyte> value(att_length);
    from_att->getValues(value.data());
    nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
 
-void copy_nc_att_char(NcFile *nc_to, NcGroupAtt *from_att) {
+void copy_nc_att_char(NcFile *nc_to, const NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    vector<char> value(att_length + 1);
    from_att->getValues(value.data());
@@ -2387,7 +2387,7 @@ void copy_nc_att_char(NcFile *nc_to, NcGroupAtt *from_att) {
    nc_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
 
-void copy_nc_att_double(NcFile *nc_to, NcGroupAtt *from_att) {
+void copy_nc_att_double(NcFile *nc_to, const NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       double value;
@@ -2401,7 +2401,7 @@ void copy_nc_att_double(NcFile *nc_to, NcGroupAtt *from_att) {
    }
 }
 
-void copy_nc_att_float(NcFile *nc_to, NcGroupAtt *from_att) {
+void copy_nc_att_float(NcFile *nc_to, const NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       float value;
@@ -2415,7 +2415,7 @@ void copy_nc_att_float(NcFile *nc_to, NcGroupAtt *from_att) {
    }
 }
 
-void copy_nc_att_int(NcFile *nc_to, NcGroupAtt *from_att) {
+void copy_nc_att_int(NcFile *nc_to, const NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       int value;
@@ -2429,7 +2429,7 @@ void copy_nc_att_int(NcFile *nc_to, NcGroupAtt *from_att) {
    }
 }
 
-void copy_nc_att_int64(NcFile *nc_to, NcGroupAtt *from_att) {
+void copy_nc_att_int64(NcFile *nc_to, const NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       long long value;
@@ -2443,7 +2443,7 @@ void copy_nc_att_int64(NcFile *nc_to, NcGroupAtt *from_att) {
    }
 }
 
-void copy_nc_att_short(NcFile *nc_to, NcGroupAtt *from_att) {
+void copy_nc_att_short(NcFile *nc_to, const NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       short value;
@@ -2459,7 +2459,7 @@ void copy_nc_att_short(NcFile *nc_to, NcGroupAtt *from_att) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_att_char(NcVar *var_to, NcGroupAtt *from_att) {
+void copy_nc_att_char(NcVar *var_to, const NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    vector<char> value(att_length + 1);
    from_att->getValues(value.data());
@@ -2467,7 +2467,7 @@ void copy_nc_att_char(NcVar *var_to, NcGroupAtt *from_att) {
    var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
 
-void copy_nc_att_double(NcVar *var_to, NcGroupAtt *from_att) {
+void copy_nc_att_double(NcVar *var_to, const NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       double value;
@@ -2480,7 +2480,7 @@ void copy_nc_att_double(NcVar *var_to, NcGroupAtt *from_att) {
       var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, values.data());
    }
 }
-void copy_nc_att_float(NcVar *var_to, NcGroupAtt *from_att) {
+void copy_nc_att_float(NcVar *var_to, const NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       float value;
@@ -2494,7 +2494,7 @@ void copy_nc_att_float(NcVar *var_to, NcGroupAtt *from_att) {
    }
 }
 
-void copy_nc_att_int(NcVar *var_to, NcGroupAtt *from_att) {
+void copy_nc_att_int(NcVar *var_to, const NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       int value;
@@ -2508,7 +2508,7 @@ void copy_nc_att_int(NcVar *var_to, NcGroupAtt *from_att) {
    }
 }
 
-void copy_nc_att_int64(NcVar *var_to, NcGroupAtt *from_att) {
+void copy_nc_att_int64(NcVar *var_to, const NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       long long value;
@@ -2522,7 +2522,7 @@ void copy_nc_att_int64(NcVar *var_to, NcGroupAtt *from_att) {
    }
 }
 
-void copy_nc_att_short(NcVar *var_to, NcGroupAtt *from_att) {
+void copy_nc_att_short(NcVar *var_to, const NcGroupAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       short value;
@@ -2538,14 +2538,14 @@ void copy_nc_att_short(NcVar *var_to, NcGroupAtt *from_att) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_att_byte(NcVar *var_to, NcVarAtt *from_att) {
+void copy_nc_att_byte(NcVar *var_to, const NcVarAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    vector<ncbyte> value(att_length);
    from_att->getValues(value.data());
    var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
 
-void copy_nc_att_char(NcVar *var_to, NcVarAtt *from_att) {
+void copy_nc_att_char(NcVar *var_to, const NcVarAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    vector<char> value(att_length + 1);
    from_att->getValues(value.data());
@@ -2553,7 +2553,7 @@ void copy_nc_att_char(NcVar *var_to, NcVarAtt *from_att) {
    var_to->putAtt(GET_NC_NAME_P(from_att), from_att->getType(), att_length, value.data());
 }
 
-void copy_nc_att_double(NcVar *var_to, NcVarAtt *from_att) {
+void copy_nc_att_double(NcVar *var_to, const NcVarAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       double value;
@@ -2567,7 +2567,7 @@ void copy_nc_att_double(NcVar *var_to, NcVarAtt *from_att) {
    }
 }
 
-void copy_nc_att_float(NcVar *var_to, NcVarAtt *from_att) {
+void copy_nc_att_float(NcVar *var_to, const NcVarAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       float value;
@@ -2581,7 +2581,7 @@ void copy_nc_att_float(NcVar *var_to, NcVarAtt *from_att) {
    }
 }
 
-void copy_nc_att_int(NcVar *var_to, NcVarAtt *from_att) {
+void copy_nc_att_int(NcVar *var_to, const NcVarAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       int value;
@@ -2595,7 +2595,7 @@ void copy_nc_att_int(NcVar *var_to, NcVarAtt *from_att) {
    }
 }
 
-void copy_nc_att_int64(NcVar *var_to, NcVarAtt *from_att) {
+void copy_nc_att_int64(NcVar *var_to, const NcVarAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       long long value;
@@ -2609,7 +2609,7 @@ void copy_nc_att_int64(NcVar *var_to, NcVarAtt *from_att) {
    }
 }
 
-void copy_nc_att_short(NcVar *var_to, NcVarAtt *from_att) {
+void copy_nc_att_short(NcVar *var_to, const NcVarAtt *from_att) {
    size_t att_length = from_att->getAttLength();
    if (att_length == 1) {
       short value;
@@ -2625,7 +2625,7 @@ void copy_nc_att_short(NcVar *var_to, NcVarAtt *from_att) {
 
 ////////////////////////////////////////////////////////////////////////
 
-NcVar *copy_nc_var(NcFile *to_nc, NcVar *from_var,
+NcVar *copy_nc_var(NcFile *to_nc, const NcVar *from_var,
       const int deflate_level, const bool all_attrs) {
    vector<NcDim> dims = from_var->getDims();
    for(unsigned int idx=0; idx<dims.size(); idx++) {
@@ -2644,7 +2644,7 @@ NcVar *copy_nc_var(NcFile *to_nc, NcVar *from_var,
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_att(NcFile *nc_from, NcVar *var_to, const ConcatString attr_name) {
+void copy_nc_att(const NcFile *nc_from, NcVar *var_to, const ConcatString attr_name) {
    NcGroupAtt *from_att = get_nc_att(nc_from, attr_name);
    if (IS_VALID_NC_P(from_att)) {
       int dataType = GET_NC_TYPE_ID_P(from_att);
@@ -2678,7 +2678,7 @@ void copy_nc_att(NcFile *nc_from, NcVar *var_to, const ConcatString attr_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_att(NcVar *var_from, NcVar *var_to, const ConcatString attr_name) {
+void copy_nc_att(const NcVar *var_from, NcVar *var_to, const ConcatString attr_name) {
    NcVarAtt *from_att = get_nc_att(var_from, attr_name);
    if (IS_VALID_NC_P(from_att)) {
       int dataType = GET_NC_TYPE_ID_P(from_att);
@@ -2713,7 +2713,7 @@ void copy_nc_att(NcVar *var_from, NcVar *var_to, const ConcatString attr_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_atts(NcFile *nc_from, NcFile *nc_to, const bool all_attrs) {
+void copy_nc_atts(const NcFile *nc_from, NcFile *nc_to, const bool all_attrs) {
    multimap<string,NcGroupAtt> ncAttMap = nc_from->getAtts();
    for (multimap<string,NcGroupAtt>::iterator itr = ncAttMap.begin();
          itr != ncAttMap.end(); ++itr) {
@@ -2752,7 +2752,7 @@ void copy_nc_atts(NcFile *nc_from, NcFile *nc_to, const bool all_attrs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_atts(NcVar *var_from, NcVar *var_to, const bool all_attrs) {
+void copy_nc_atts(const NcVar *var_from, NcVar *var_to, const bool all_attrs) {
    map<string,NcVarAtt> ncAttMap = var_from->getAtts();
    for (map<string,NcVarAtt>::iterator itr = ncAttMap.begin();
          itr != ncAttMap.end(); ++itr) {
@@ -2803,7 +2803,7 @@ void copy_nc_atts(NcVar *var_from, NcVar *var_to, const bool all_attrs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_data_char(NcVar *var_from, NcVar *var_to, int data_size) {
+void copy_nc_data_char(const NcVar *var_from, NcVar *var_to, int data_size) {
    vector<char> data(data_size + 1);
    var_from->getVar(data.data());
    data[data_size] = '\0';
@@ -2812,7 +2812,7 @@ void copy_nc_data_char(NcVar *var_from, NcVar *var_to, int data_size) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_data_double(NcVar *var_from, NcVar *var_to, int data_size) {
+void copy_nc_data_double(const NcVar *var_from, NcVar *var_to, int data_size) {
    vector<double> data(data_size);
    var_from->getVar(data.data());
    var_to->putVar(data.data());
@@ -2820,7 +2820,7 @@ void copy_nc_data_double(NcVar *var_from, NcVar *var_to, int data_size) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_data_float(NcVar *var_from, NcVar *var_to, int data_size) {
+void copy_nc_data_float(const NcVar *var_from, NcVar *var_to, int data_size) {
    vector<float> data(data_size);
    var_from->getVar(data.data());
    var_to->putVar(data.data());
@@ -2828,7 +2828,7 @@ void copy_nc_data_float(NcVar *var_from, NcVar *var_to, int data_size) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_data_int(NcVar *var_from, NcVar *var_to, int data_size) {
+void copy_nc_data_int(const NcVar *var_from, NcVar *var_to, int data_size) {
    vector<int> data(data_size);
    var_from->getVar(data.data());
    var_to->putVar(data.data());
@@ -2836,7 +2836,7 @@ void copy_nc_data_int(NcVar *var_from, NcVar *var_to, int data_size) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_data_short(NcVar *var_from, NcVar *var_to, int data_size) {
+void copy_nc_data_short(const NcVar *var_from, NcVar *var_to, int data_size) {
    vector<short> data(data_size);
    var_from->getVar(data.data());
    var_to->putVar(data.data());
@@ -2844,7 +2844,7 @@ void copy_nc_data_short(NcVar *var_from, NcVar *var_to, int data_size) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_data_string(NcVar *var_from, NcVar *var_to, int data_size) {
+void copy_nc_data_string(const NcVar *var_from, NcVar *var_to, int data_size) {
    vector<string> data(data_size);
    var_from->getVar(data.data());
    var_to->putVar(data.data());
@@ -2852,7 +2852,7 @@ void copy_nc_data_string(NcVar *var_from, NcVar *var_to, int data_size) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_var_data(NcVar *var_from, NcVar *var_to) {
+void copy_nc_var_data(const NcVar *var_from, NcVar *var_to) {
    const string method_name = "copy_nc_var_data()";
    int data_size = get_data_size(var_from);
    int dataType = GET_NC_TYPE_ID_P(var_from);
@@ -2887,7 +2887,7 @@ void copy_nc_var_data(NcVar *var_from, NcVar *var_to) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void copy_nc_var_dims(NcVar *var_from, NcVar *var_to) {
+void copy_nc_var_dims(const NcVar *var_from, NcVar *var_to) {
    int dim_count = var_from->getDimCount();
    for (int idx=0; idx<dim_count; idx++) {
       NcDim fromDim = var_from->getDim(idx);
@@ -2897,7 +2897,7 @@ void copy_nc_var_dims(NcVar *var_from, NcVar *var_to) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool has_nc_group(NcFile *nc, const char *group_name) {
+bool has_nc_group(const NcFile *nc, const char *group_name) {
    multimap<string,NcGroup> group_map = nc->getGroups();
    multimap<string,NcGroup>::iterator it = group_map.find(group_name);
    return (it != group_map.end());
@@ -2905,7 +2905,7 @@ bool has_nc_group(NcFile *nc, const char *group_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool has_var(NcFile *nc, const char *var_name) {
+bool has_var(const NcFile *nc, const char *var_name) {
    string new_var_name = var_name;
    patch_nc_name(new_var_name);
    NcVar v = get_var(nc, new_var_name.c_str());
@@ -2914,13 +2914,13 @@ bool has_var(NcFile *nc, const char *var_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool has_var(NcFile *nc, const ConcatString var_name) {
+bool has_var(const NcFile *nc, const ConcatString var_name) {
    return has_var(nc, var_name.c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool has_var(NcFile *nc, const char *var_name, const char *group_name) {
+bool has_var(const NcFile *nc, const char *var_name, const char *group_name) {
    string nc_var_name;
    string new_var_name = var_name;
    patch_nc_name(new_var_name);
@@ -2945,13 +2945,13 @@ bool has_var(NcFile *nc, const char *var_name, const char *group_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool has_var(NcFile *nc, const ConcatString var_name, const char *group_name) {
+bool has_var(const NcFile *nc, const ConcatString var_name, const char *group_name) {
    return has_var(nc, var_name.c_str(), group_name);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType, const int deflate_level) {
+NcVar add_var(const NcFile *nc, const string &var_name, const NcType ncType, const int deflate_level) {
    vector<NcDim> ncDimVector;
    string new_var_name = var_name;
    patch_nc_name(new_var_name);
@@ -3016,7 +3016,7 @@ NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
 ////////////////////////////////////////////////////////////////////////
 
 NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
-              const vector<NcDim> ncDims, const int deflate_level) {
+              const vector<NcDim> &ncDims, const int deflate_level) {
    string new_var_name = var_name;
    patch_nc_name(new_var_name);
    NcVar var = nc->addVar(new_var_name, ncType, ncDims);
@@ -3027,10 +3027,11 @@ NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
 
    // Check for lat and lon dimensions
    ConcatString cs;
-   bool has_lat_dim, has_lon_dim;
+   bool has_lat_dim;
+   bool has_lon_dim;
    vector<NcDim>::const_iterator itDim;
-   for (itDim = ncDims.begin(), has_lat_dim = has_lon_dim = false;
-        itDim != ncDims.end(); ++itDim) {
+   has_lat_dim = has_lon_dim = false;
+   for (itDim = ncDims.begin(); itDim != ncDims.end(); ++itDim) {
            if (itDim->getName() == "lat") has_lat_dim = true;
       else if (itDim->getName() == "lon") has_lon_dim = true;
       if (itDim != ncDims.begin()) cs << " ";
@@ -3049,7 +3050,7 @@ NcVar add_var(NcFile *nc, const string &var_name, const NcType ncType,
 
 ////////////////////////////////////////////////////////////////////////
 
-NcDim add_dim(NcFile *nc, const string &dim_name) {
+NcDim add_dim(const NcFile *nc, const string &dim_name) {
    string new_dim_name = dim_name;
    patch_nc_name(new_dim_name);
    return nc->addDim(new_dim_name);
@@ -3057,7 +3058,7 @@ NcDim add_dim(NcFile *nc, const string &dim_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-NcDim add_dim(NcFile *nc, const string &dim_name, const size_t dim_size) {
+NcDim add_dim(const NcFile *nc, const string &dim_name, const size_t dim_size) {
    string new_dim_name = dim_name;
    patch_nc_name(new_dim_name);
    return nc->addDim(new_dim_name, dim_size);
@@ -3065,7 +3066,7 @@ NcDim add_dim(NcFile *nc, const string &dim_name, const size_t dim_size) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool has_dim(NcFile *nc, const char * dim_name) {
+bool has_dim(const NcFile *nc, const char * dim_name) {
    NcDim d = nc->getDim(dim_name);
    return IS_VALID_NC(d);
 }
@@ -3113,7 +3114,7 @@ int get_dim_count(const NcVar *var) {
 
 int get_dim_size(const NcDim *dim) {
 
-   return IS_INVALID_NC_P(dim) ? -1 : dim->getSize();
+   return IS_INVALID_NC_P(dim) ? -1 : (int)dim->getSize();
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -3122,7 +3123,7 @@ int get_dim_size(const NcVar *var, const int dim_offset) {
    int dim_size = -1;
    if(IS_VALID_NC_P(var)) {
       NcDim nc_dim = get_nc_dim(var, dim_offset);
-      if (IS_VALID_NC(nc_dim)) dim_size = nc_dim.getSize();
+      if (IS_VALID_NC(nc_dim)) dim_size = (int)nc_dim.getSize();
    }
 
    return dim_size;
@@ -3193,13 +3194,11 @@ NcDim get_nc_dim(const NcVar *var, const int dim_offset) {
 
 bool get_dim_names(const NcFile *nc, StringArray *dimNames) {
 
-   int i, dimCount;
-   //NcDim dim;
    bool status = false;
 
-   dimCount = nc->getDimCount();
+   int dimCount = nc->getDimCount();
 
-   i = 0;
+   int i = 0;
    multimap<string, NcDim>::iterator itDim;
    multimap<string, NcDim> dims = nc->getDims();
    for (itDim = dims.begin(); itDim != dims.end(); ++itDim) {
@@ -3218,17 +3217,14 @@ bool get_dim_names(const NcFile *nc, StringArray *dimNames) {
 
 bool get_dim_names(const NcVar *var, StringArray *dimNames) {
 
-   int i, dimCount;
    NcDim dim;
    bool status = false;
 
-   dimCount = var->getDimCount();
+   int dimCount = var->getDimCount();
 
-   i = 0;
-   vector<NcDim>::iterator itDim;
-   vector<NcDim> dims = var->getDims();
-   for (itDim = dims.begin(); itDim != dims.end(); ++itDim) {
-      dim = (*itDim);
+   int i = 0;
+   for (const auto &itDim : var->getDims()) {
+      dim = itDim;
       dimNames->add(dim.getName());
       i++;
    }
@@ -3254,7 +3250,7 @@ vector<NcDim> get_dims(const NcVar *var, int *dim_count) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_nc_name_lat(const ConcatString name) {
+bool is_nc_name_lat(const ConcatString &name) {
    ConcatString name_l = to_lower(name);
    bool is_latitude = (name_l == "lat" || name_l == "latitude");
    return is_latitude;
@@ -3262,7 +3258,7 @@ bool is_nc_name_lat(const ConcatString name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_nc_name_lon(const ConcatString name) {
+bool is_nc_name_lon(const ConcatString &name) {
    ConcatString name_l = to_lower(name);
    bool is_longitude = (name_l == "lon" || name_l == "longitude");
    return is_longitude;
@@ -3270,7 +3266,7 @@ bool is_nc_name_lon(const ConcatString name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_nc_name_time(const ConcatString name) {
+bool is_nc_name_time(const ConcatString &name) {
    ConcatString name_l = to_lower(name);
    bool is_time = (name == "t" || name_l == "time" || name_l == "datetime");
    return is_time;
@@ -3278,21 +3274,21 @@ bool is_nc_name_time(const ConcatString name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_nc_attr_lat(const ConcatString name) {
+bool is_nc_attr_lat(const ConcatString &name) {
    bool is_latitude = (is_nc_name_lat(name) || name == "y" || name == "Y");
    return is_latitude;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_nc_attr_lon(const ConcatString name) {
+bool is_nc_attr_lon(const ConcatString &name) {
    bool is_longitude = (is_nc_name_lon(name) || name == "x" || name == "X");
    return is_longitude;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_nc_attr_time(const ConcatString name) {
+bool is_nc_attr_time(const ConcatString &name) {
    return is_nc_name_time(name);
 }
 
@@ -3428,7 +3424,7 @@ NcVar get_nc_var_time(const NcFile *nc) {
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc);
    static const char *method_name = "get_nc_var_time() ";
 
-   for (auto &kv : mapVar) {
+   for (const auto &kv : mapVar) {
       ConcatString name = kv.first;
       if (!found && is_nc_name_time(name)) found = true;
       if (get_var_standard_name(&kv.second, att_val)) {
@@ -3442,8 +3438,9 @@ NcVar get_nc_var_time(const NcFile *nc) {
             if (is_nc_attr_time(att_val)) found = true;
          }
          else if (get_nc_att_value(&kv.second,
-                                   coordinate_axis_type_att_name, att_val)) {
-            if (is_nc_attr_time(att_val)) found = true;
+                                   coordinate_axis_type_att_name, att_val)
+                  && is_nc_attr_time(att_val)) {
+            found = true;
          }
       }
       if (found) {
@@ -3482,7 +3479,7 @@ NcVar get_nc_var_time(const NcFile *nc) {
 ////////////////////////////////////////////////////////////////////////
 
 NcFile *open_ncfile(const char * nc_name, bool write) {
-   NcFile *nc = (NcFile *) nullptr;
+   auto nc = (NcFile *) nullptr;
 
    try {
       if (write) {
@@ -3503,7 +3500,7 @@ NcFile *open_ncfile(const char * nc_name, bool write) {
 ////////////////////////////////////////////////////////////////////////
 // Implement the old API var->num_vals()
 
-int get_data_size(NcVar *var) {
+int get_data_size(const NcVar *var) {
    int data_size = 1;
    int dimCount = var->getDimCount();
    for (int i=0; i<dimCount; i++) {
@@ -3554,11 +3551,10 @@ unixtime get_init_time(NcFile *nc_file) {
 
 ////////////////////////////////////////////////////////////////////////
 
-unixtime get_reference_unixtime(NcVar *time_var, int &sec_per_unit,
+unixtime get_reference_unixtime(const NcVar *time_var, int &sec_per_unit,
                                 bool &no_leap_year) {
    unixtime ref_ut = 0;
    ConcatString time_unit_str;
-   static const char *method_name = "get_reference_unixtime() -> ";
 
    if (get_var_units(time_var, time_unit_str)) {
       parse_cf_time_string(time_unit_str.c_str(), ref_ut, sec_per_unit);
@@ -3655,7 +3651,8 @@ void parse_cf_time_string(const char *str, unixtime &ref_ut,
       }
 
       // Parse the reference time
-      StringArray ymd, hms;
+      StringArray ymd;
+      StringArray hms;
       ymd.parse_delim(tok[2], "-");
       if(tok.n_elements() > 3) hms.parse_delim(tok[3], ":");
       else                     hms.parse_delim("00:00:00", ":");
