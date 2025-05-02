@@ -730,7 +730,7 @@
     <param> \
       &DATA_DIR_MODEL;/nccf/2t-heightAboveGround-0002.nc \
       &OUTPUT_DIR;/plot_data_plane/nccf_t2m_5_dimension_var.ps \
-      'name="T2M"; level="(0,0,0,*,*)";' \
+      'name="T2M"; level="(0,@20240401_04,0,*,*)";' \
       -title "air_temperature - 5 dimension var" \
       -v 1
     </param>
