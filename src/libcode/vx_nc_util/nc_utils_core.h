@@ -61,7 +61,7 @@ static const std::string missing_value_att_name = "missing_value";
 ////////////////////////////////////////////////////////////////////////
 
 
-extern int get_data_size(const netCDF::NcVar *);
+extern int get_data_size(netCDF::NcVar *);
 extern int get_dim_count(const netCDF::NcVar *);
 extern int get_dim_size(const netCDF::NcDim *);
 extern int get_dim_size(const netCDF::NcVar *, const int dim_offset);
