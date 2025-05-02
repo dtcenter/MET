@@ -429,10 +429,10 @@ NcVarAtt *get_nc_att(const NcVar * var, const ConcatString &att_name, bool exit_
    }
    else {
       auto mapAttrs = var->getAtts();
-      for (auto itAtt = mapAttrs.begin(); itAtt != mapAttrs.end(); ++itAtt) {
-         if ( att_name == (*itAtt).first) {
+      for (auto itAtt : mapAttrs) {
+         if ( att_name == itAtt.first) {
             att = new NcVarAtt();
-            *att = (*itAtt).second;
+            *att = itAtt.second;
             break;
          }
       }
