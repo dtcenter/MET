@@ -896,7 +896,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   }
 
   for (int k=0; k<dim_count; k++) {
-    int dim_size = (int)var->getDim(k).getSize();
+    auto dim_size = (int)var->getDim(k).getSize();
     if (dim_size < a[k]) {
       mlog << Error << "\n" << method_name
            << "offset (" << a[k] << ") at " << k
@@ -2434,10 +2434,10 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   data.ny = (int)_yDim->getSize();
 
   bool is_north_hemisphere = proj_origin_lat > 0;
-  double false_east;
-  double false_north;
+  double eccentricity = 0.;
+  double false_east = 0.;
+  double false_north = 0.;
   double scale_factor = proj_origin_scale_factor;
-  double eccentricity = false_east = false_north = 0.;
   if(!has_scale_factor && has_standard_parallel) {
     double lat;
     double lon;
@@ -3387,8 +3387,8 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
   bool lat_first = false;
   if (two_dim_coord) {
     lat_first = (lat_counts == get_dim_size(lat_var, 0));
-    LongArray cur;      // sets {0,0}
-    LongArray length;   // sets {1,1}
+    LongArray cur;
+    LongArray length;
     cur.add(0);
     cur.add(0);
     length.add(1);
