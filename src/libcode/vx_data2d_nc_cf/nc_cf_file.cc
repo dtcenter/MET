@@ -1741,8 +1741,8 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
 
   // Calculate dx and dy
 
-  double dx_m = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
-  double dy_m = (y_values[y_counts-1] - y_values[0]) / (y_counts - 1);
+  double dx_m = (x_values[x_counts-1] - x_values[0]) / ((int)x_counts - 1);
+  double dy_m = (y_values[y_counts-1] - y_values[0]) / ((int)y_counts - 1);
   double dx_m_a = fabs(dx_m);
   double dy_m_a = fabs(dy_m);
 
@@ -1852,8 +1852,8 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
 
   data.dx_km = dx_m / m_per_km;
   data.dy_km = dy_m / m_per_km;
-  data.nx = _xDim->getSize();
-  data.ny = _yDim->getSize();
+  data.nx = (int)_xDim->getSize();
+  data.ny = (int)_yDim->getSize();
 
   data.dump();
 
@@ -1995,8 +1995,8 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   // Calculate dx and dy assuming they are constant.  MET requires that dx be
   // equal to dy
 
-  double dx_m = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
-  double dy_m = (y_values[y_counts-1] - y_values[0]) / (y_counts - 1);
+  double dx_m = (x_values[x_counts-1] - x_values[0]) / ((int)x_counts - 1);
+  double dy_m = (y_values[y_counts-1] - y_values[0]) / ((int)y_counts - 1);
   double dx_m_a = fabs(dx_m);
   double dy_m_a = fabs(dy_m);
 
@@ -2062,8 +2062,8 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   data.lon_orient = -double_datas[0];
   data.d_km = dx_m / 1000.0;
   data.r_km = EARTH_MAJOR_AXIS_km;
-  data.nx = _xDim->getSize();
-  data.ny = _yDim->getSize();
+  data.nx = (int)_xDim->getSize();
+  data.ny = (int)_yDim->getSize();
   data.so2_angle = 0.0;
 
   data.dump();
@@ -3019,7 +3019,6 @@ void NcCfFile::get_grid_mapping_geostationary(
   NumArray double_datas;
   data.reset();
 
-  //data.name = grid_mapping_var->getName().c_str();
   data.name = grid_mapping_name_geostationary;
   data.perspective_point_height = get_att_value_double(perspective_point_height_att);
   data.semi_major_axis = get_att_value_double(semi_major_axis_att);
