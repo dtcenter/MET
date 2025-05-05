@@ -330,7 +330,7 @@ void ModeExecutive::setup_traditional_fcst_obs_data()
 
       if(engine.conf_info.conf.time_offset_warning(
            (int) (Fcst_sd.data.valid() - Obs_sd.data.valid()))) {
-         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_traditional() ->"
+         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_traditional() -> "
               << cs << "\n\n";
       }
       else {
@@ -602,7 +602,7 @@ void ModeExecutive::setup_multivar_fcst_obs_data_intensities(const MultiVarData 
 
       if(engine.conf_info.conf.time_offset_warning(
            (int) (Fcst_sd.data.valid() - Obs_sd.data.valid()))) {
-         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_intensities() ->"
+         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_intensities() -> "
               << cs << "\n\n";
       }
       else {
@@ -712,7 +712,7 @@ void ModeExecutive::setup_multivar_fcst_obs_data_super(const ShapeData &f_super,
 
       if(engine.conf_info.conf.time_offset_warning(
            (int) (Fcst_sd.data.valid() != Obs_sd.data.valid()))) {
-         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_super() ->"
+         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_super() -> "
               << cs << "\n\n";
       }
       else {
@@ -1667,7 +1667,8 @@ MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
       mvd->set_merge_thresh_array(engine.conf_info.Fcst->merge_thresh_array, simple);
       break;
    default:
-      mlog << Error << "\nModeExecutive::get_multivar_data() -> wrong data type "
+      mlog << Error << "\nModeExecutive::get_multivar_data() -> "
+           << "wrong data type "
            << sprintModeDataType(dtype) << "\n\n";
       exit(1);
    }
@@ -1697,7 +1698,8 @@ void ModeExecutive::add_multivar_merge_data(MultiVarData *mvd, ModeDataType dtyp
       mvd->set_merge_thresh_array(engine.conf_info.Fcst->merge_thresh_array, simple);
       break;
    default:
-      mlog << Error << "\nModeExecutive::add_multivar_merge_data() -> wrong data type "
+      mlog << Error << "\nModeExecutive::add_multivar_merge_data() -> "
+           << "wrong data type "
            << sprintModeDataType(dtype) << "\n\n";
       exit(1);
    }
@@ -1766,8 +1768,8 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    f_out = open_ncfile(out_file.c_str(), true);
 
    if(IS_INVALID_NC_P(f_out)) {
-      mlog << Error << "\nModeExecutive::write_obj_netcdf() -> trouble opening output file "
-           << out_file << "\n\n";
+      mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
+           << "trouble opening output file " << out_file << "\n\n";
       delete f_out;
       f_out = (NcFile *) nullptr;
 
