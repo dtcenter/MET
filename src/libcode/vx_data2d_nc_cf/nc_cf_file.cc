@@ -256,7 +256,7 @@ bool NcCfFile::open(const char * filepath)
       else if( "latitude" == att_value ) _latVar = Var[j].var;
       else if( "longitude" == att_value ) _lonVar = Var[j].var;
       else if( ("air_pressure" == att_value || "height" == att_value)
-               && (nullptr==z_var && 1==get_dim_count(Var[j].var))) z_var = Var[j].var;
+               && (nullptr==z_var && 1==Var[j].Ndims)) z_var = Var[j].var;
     }
     if ( Var[j].name == "time" && (valid_time_var == nullptr)) {
       valid_time_var = Var[j].var;
@@ -418,13 +418,13 @@ bool NcCfFile::open(const char * filepath)
   for (int j=0; j<Nvars; ++j) {
 
     int dim_count = Var[j].Ndims;
-    NcVar *v = Var[j].var;
+    const NcVar *v = Var[j].var;
 
     dimNames.clear();
     get_dim_names(v, &dimNames);
 
     for (int k=0; k<dim_count; ++k)  {
-      NcDim *dim = Var[j].Dims[k];
+      const NcDim *dim = Var[j].Dims[k];
       const ConcatString dim_name = dimNames[k];
       if      ((dim && dim == _xDim) || dim_name == var_x_dim_name || dim_name == x_dim_var_name) {
          Var[j].x_slot = k;
@@ -439,7 +439,7 @@ bool NcCfFile::open(const char * filepath)
          Var[j].z_slot = k;
       }
       else if (dim_count == max_dim_count) {
-         NcVarInfo *info = find_var_by_dim_name(dim_name.c_str());
+         const NcVarInfo *info = find_var_by_dim_name(dim_name.c_str());
          if (info) {
             if (is_nc_unit_time(info->units_att.c_str())) {
                Var[j].t_slot = k;
@@ -754,7 +754,12 @@ void NcCfFile::dump(ostream & out, int depth) const
 
   out << prefix << "Init Time = ";
 
-  int month, day, year, hour, minute, second;
+  int month;
+  int day;
+  int year;
+  int hour;
+  int minute;
+  int second;
 
   unix_to_mdyhms(InitTime, month, day, year, hour, minute, second);
 
@@ -891,7 +896,7 @@ double NcCfFile::getData(NcVar * var, const LongArray & a) const
   }
 
   for (int k=0; k<dim_count; k++) {
-    int dim_size = var->getDim(k).getSize();
+    auto dim_size = (int)var->getDim(k).getSize();
     if (dim_size < a[k]) {
       mlog << Error << "\n" << method_name
            << "offset (" << a[k] << ") at " << k
@@ -1159,7 +1164,7 @@ bool NcCfFile::getData(const char *var_name,
 
   //  store the times
   unixtime valid_ut;
-  if(info->t_slot >= 0) valid_ut = ValidTime[a[info->t_slot]];
+  if(info->t_slot >= 0) valid_ut = ValidTime[(int)a[info->t_slot]];
   else                  valid_ut = ValidTime[0];
 
   //  if unset, set the init time to the valid time
@@ -1365,11 +1370,10 @@ void NcCfFile::read_netcdf_grid()
   // grids, but with how the gridded information is used in MET, I'm making the
   // assumption that all fields are on the same grid.
 
-  bool do_ignore;
   int max_dim = 0;
-  NcVar *data_var = nullptr;
-  NcVar *tmp_data_var = nullptr;
+  const NcVar *data_var = nullptr;
   IntArray var_index_list;
+  static const string method_name = "NcCfFile::read_netcdf_grid() -> ";
 
   for (int i = 0; i < Nvars; ++i)
   {
@@ -1377,26 +1381,24 @@ void NcCfFile::read_netcdf_grid()
 
     NcVar *var = Var[i].var;
 
-    // A gridded data variable can have anywhere from 2 to 4 dimensions (the
-    // fourth being time).  Any other variables can be ignored
+    // A gridded data variable should be at least 2 dimensions.
+    // One dimensional variables can be ignored
 
-    int num_dims = get_dim_count(var);
+    int num_dims = Var[i].Ndims;
 
-    if (num_dims < 2 || num_dims > 4)
-      continue;
+    if (num_dims < 2) continue;
 
-    // Skip the latitude and longitude variables, if they are present
+    // Skip the coordinate variables like latitude and longitude,
+    // if they are present
 
     ConcatString std_name;
     bool has_standard_name = get_var_standard_name(var, std_name);
 
-    do_ignore = false;
     if (has_standard_name &&
         (std_name == "" || std_name == "latitude"
          || std_name == "longitude" || std_name == "time")) {
-      do_ignore = true;
+      continue;
     }
-    if (do_ignore) continue;
 
     if (max_dim < num_dims) max_dim = num_dims;
 
@@ -1405,31 +1407,31 @@ void NcCfFile::read_netcdf_grid()
       break;
     }
 
-    // If we get here, this should be a gridded data variable
-    if (tmp_data_var == nullptr) tmp_data_var = var;
-    if (!has_standard_name) continue;   // Skip if no standard name
+    // If we get here, this may be a gridded data variable
     var_index_list.add(i);
 
   } /* endfor - i */
 
   if (data_var == nullptr)
   {
+    // Select the first variable with the most dimensions
     for (int i = 0; i < var_index_list.n(); ++i)
     {
-      // Get a pointer to the variable
-      NcVar *var = Var[i].var;
-
+      int var_i = var_index_list[i];
       // Exclude with less dimensions
-      if (get_dim_count(var) < max_dim) continue;
-
-      // If we get here, this should be a gridded data variable
-      data_var = var;
-      break;
+      if (max_dim <= Var[var_i].Ndims) {
+        data_var = Var[var_i].var;
+        break;
+      }
 
     } /* endfor - i */
   }
 
-  if (data_var == nullptr) data_var = tmp_data_var;
+  if (data_var == nullptr) {
+    mlog << Error << "\n" << method_name
+         << "The data variable was not identified to find dimensions.\n\n";
+    exit(1);
+  }
 
   // Pull the grid projection from the variable information.  First, look for
   // a grid_mapping attribute.
@@ -1478,7 +1480,7 @@ void NcCfFile::read_netcdf_grid()
       !((_xDim && _yDim) ||
         (x_dim_var_name.nonempty() && y_dim_var_name.nonempty())))
   {
-     mlog << Warning << "\nNcCfFile::read_netcdf_grid() -> "
+     mlog << Warning << "\n" << method_name
           << "Couldn't figure out projection from information in netCDF file.\n\n";
      return;
   }
@@ -1526,7 +1528,7 @@ void NcCfFile::get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att)
     return;
   }
 
-  NcVar *grid_mapping_var = nullptr;
+  const NcVar *grid_mapping_var = nullptr;
 
   for (int i = 0; i < Nvars; ++i)
   {
@@ -1557,7 +1559,6 @@ void NcCfFile::get_grid_from_grid_mapping(const NcVarAtt *grid_mapping_att)
     return;
   }
 
-  //string grid_mapping_name = grid_mapping_name_att->getValues(att->as_string(0);
   ConcatString grid_mapping_name;
   get_att_value_chars(grid_mapping_name_att, grid_mapping_name);
   if (grid_mapping_name_att) delete grid_mapping_name_att;
@@ -1740,8 +1741,8 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
 
   // Calculate dx and dy
 
-  double dx_m = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
-  double dy_m = (y_values[y_counts-1] - y_values[0]) / (y_counts - 1);
+  double dx_m = (x_values[x_counts-1] - x_values[0]) / ((int)x_counts - 1);
+  double dy_m = (y_values[y_counts-1] - y_values[0]) / ((int)y_counts - 1);
   double dx_m_a = fabs(dx_m);
   double dy_m_a = fabs(dy_m);
 
@@ -1851,8 +1852,8 @@ void NcCfFile::get_grid_mapping_lambert_azimuthal_equal_area(const NcVar *grid_m
 
   data.dx_km = dx_m / m_per_km;
   data.dy_km = dy_m / m_per_km;
-  data.nx = _xDim->getSize();
-  data.ny = _yDim->getSize();
+  data.nx = (int)_xDim->getSize();
+  data.ny = (int)_yDim->getSize();
 
   data.dump();
 
@@ -1994,8 +1995,8 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   // Calculate dx and dy assuming they are constant.  MET requires that dx be
   // equal to dy
 
-  double dx_m = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
-  double dy_m = (y_values[y_counts-1] - y_values[0]) / (y_counts - 1);
+  double dx_m = (x_values[x_counts-1] - x_values[0]) / ((int)x_counts - 1);
+  double dy_m = (y_values[y_counts-1] - y_values[0]) / ((int)y_counts - 1);
   double dx_m_a = fabs(dx_m);
   double dy_m_a = fabs(dy_m);
 
@@ -2061,8 +2062,8 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
   data.lon_orient = -double_datas[0];
   data.d_km = dx_m / 1000.0;
   data.r_km = EARTH_MAJOR_AXIS_km;
-  data.nx = _xDim->getSize();
-  data.ny = _yDim->getSize();
+  data.nx = (int)_xDim->getSize();
+  data.ny = (int)_yDim->getSize();
   data.so2_angle = 0.0;
 
   data.dump();
@@ -2393,8 +2394,8 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   // Calculate dx and dy assuming they are constant.  MET requires that dx be
   // equal to dy
 
-  double dx_m = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
-  double dy_m = (y_values[y_counts-1] - y_values[0]) / (y_counts - 1);
+  double dx_m = (x_values[x_counts-1] - x_values[0]) / ((int)x_counts - 1);
+  double dy_m = (y_values[y_counts-1] - y_values[0]) / ((int)y_counts - 1);
   double dx_m_a = fabs(dx_m);
   double dy_m_a = fabs(dy_m);
 
@@ -2429,13 +2430,14 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
   data.d_km = dx_m / m_per_km;
   data.dy_km = dy_m / m_per_km;
   data.r_km = semi_major_axis / m_per_km;
-  data.nx = _xDim->getSize();
-  data.ny = _yDim->getSize();
+  data.nx = (int)_xDim->getSize();
+  data.ny = (int)_yDim->getSize();
 
   bool is_north_hemisphere = proj_origin_lat > 0;
-  double eccentricity, false_east,false_north, scale_factor;
-  scale_factor = proj_origin_scale_factor;
-  eccentricity = false_east = false_north = 0.;
+  double eccentricity = 0.;
+  double false_east = 0.;
+  double false_north = 0.;
+  double scale_factor = proj_origin_scale_factor;
   if(!has_scale_factor && has_standard_parallel) {
     double lat;
     double lon;
@@ -2592,7 +2594,8 @@ void NcCfFile::get_grid_mapping_polar_stereographic(const NcVar *grid_mapping_va
            << ", is_north_hemisphere=" << is_north_hemisphere << "\n";
       for (int ix=0; ix<data.nx; ix++) {
         for (int iy=0; iy<data.ny; iy++) {
-          double x_diff, y_diff;
+          double x_diff;
+          double y_diff;
           x1 = x_values[ix];
           y1 = y_values[iy];
 
@@ -2794,8 +2797,8 @@ void NcCfFile::get_grid_mapping_rotated_latitude_longitude(const NcVar *grid_map
   data.delta_rot_lon = ll_data.delta_lon;
 
   // Grid dimension
-  data.Nlon = _xDim->getSize();
-  data.Nlat = _yDim->getSize();
+  data.Nlon = (int)_xDim->getSize();
+  data.Nlat = (int)_yDim->getSize();
 
   data.aux_rotation = 0;
 
@@ -2996,12 +2999,12 @@ void NcCfFile::get_grid_mapping_geostationary(
   int bound_count = 0;
   for (int j=0; j<_numDims; ++j)  {
      if (0 == strcmp(_dims[j]->getName().c_str(), "number_of_image_bounds")) {
-        bound_count = _dims[j]->getSize();
+        bound_count = (int)_dims[j]->getSize();
         break;
      }
   }
-  NcVar *var_x_bound = (NcVar *)nullptr;
-  NcVar *var_y_bound = (NcVar *)nullptr;
+  auto var_x_bound = (NcVar *)nullptr;
+  auto var_y_bound = (NcVar *)nullptr;
   for (int j=0; j<Nvars; ++j)  {
     if ( Var[j].name == "x_image_bounds" ) var_x_bound = Var[j].var;
     else if ( Var[j].name == "y_image_bounds" ) var_y_bound = Var[j].var;
@@ -3016,7 +3019,6 @@ void NcCfFile::get_grid_mapping_geostationary(
   NumArray double_datas;
   data.reset();
 
-  //data.name = grid_mapping_var->getName().c_str();
   data.name = grid_mapping_name_geostationary;
   data.perspective_point_height = get_att_value_double(perspective_point_height_att);
   data.semi_major_axis = get_att_value_double(semi_major_axis_att);
@@ -3024,10 +3026,10 @@ void NcCfFile::get_grid_mapping_geostationary(
   data.inverse_flattening = get_att_value_double(inverse_flattening_att);
   data.lat_of_projection_origin = get_att_value_double(proj_origin_lat_att);
   data.lon_of_projection_origin = get_att_value_double(proj_origin_lon_att);
-  data.nx = x_counts;
-  data.ny = y_counts;
-  data.dx_rad = (x_values[x_counts-1] - x_values[0]) / (x_counts - 1);
-  data.dy_rad = (y_values[y_counts-1] - y_values[0]) / (y_counts - 1);
+  data.nx = (int)x_counts;
+  data.ny = (int)y_counts;
+  data.dx_rad = (x_values[x_counts-1] - x_values[0]) / ((int)x_counts - 1);
+  data.dy_rad = (y_values[y_counts-1] - y_values[0]) / ((int)y_counts - 1);
   if (bound_count > 0) {
     data.x_image_bounds = new double[bound_count];
     data.y_image_bounds = new double[bound_count];
@@ -3050,7 +3052,7 @@ void NcCfFile::get_grid_mapping_geostationary(
   // Get scene_id: "Full Disk", "CONUS", or "Mesoscale"
   ConcatString scene_id;
   if (get_global_att(_ncFile, (string)"scene_id", scene_id)) {
-    char* scene_id_str = new char[scene_id.length()+1];
+    auto scene_id_str = new char[scene_id.length()+1];
     m_strncpy(scene_id_str, scene_id.text(), scene_id.length(), method_name.c_str());
     scene_id_str[scene_id.length()] = 0;
     data.scene_id = scene_id_str;
@@ -3088,7 +3090,9 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
   NcVarAtt *coordinates_att = get_nc_att(data_var, coordinates_att_name);
 
   if (IS_VALID_NC_P(coordinates_att)) {
-    ConcatString coordinates_value, units_value, axis_value;
+    ConcatString axis_value;
+    ConcatString coordinates_value;
+    ConcatString units_value;
     get_att_value_chars(coordinates_att, coordinates_value);
     StringArray sa = coordinates_value.split(" ");
     int count = sa.n_elements();
@@ -3097,7 +3101,8 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
       y_dim_var_name = sa[count-1];
     }
 
-    bool is_x_dim_var, is_y_dim_var;
+    bool is_x_dim_var;
+    bool is_y_dim_var;
     float lat_missing_value = bad_data_double;
     float lon_missing_value = bad_data_double;
     for (int var_num = 0; var_num < Nvars; ++var_num) {
@@ -3117,13 +3122,12 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
               mlog << Debug(4) << method_name << " -> "
                    << "found the longitude variable \"" << Var[var_num].name << "\"\n";
             }
-            else if (!is_nc_unit_time(units_value.c_str())) {
-              if (!get_var_axis(Var[var_num].var, axis_value)
-                  || (axis_value != "Z" && axis_value != "z")) {
-                mlog << Debug(4) << "\n" << method_name << " -> "
-                     << "unknown units [" << units_value << "] for the coordinate variable ["
-                     << Var[var_num].name << "]\n\n";
-              }
+            else if (!is_nc_unit_time(units_value.c_str())
+                     && (!get_var_axis(Var[var_num].var, axis_value)
+                         || (axis_value != "Z" && axis_value != "z"))) {
+              mlog << Debug(4) << "\n" << method_name << " -> "
+                   << "unknown units [" << units_value << "] for the coordinate variable ["
+                   << Var[var_num].name << "]\n\n";
             }
           }
           break;
@@ -3157,7 +3161,8 @@ bool NcCfFile::get_grid_from_coordinates(const NcVar *data_var) {
 
     StringArray dimNames;
     get_dim_names(_xCoordVar, &dimNames);
-    NcDim cur_xDim, cur_yDim;
+    NcDim cur_xDim;
+    NcDim cur_yDim;
     int dim_count = dimNames.n_elements();
     if (dim_count == 2) {
       x_dim_var_name = dimNames[dim_count-1];
@@ -3254,14 +3259,14 @@ bool NcCfFile::get_grid_from_dimensions()
           if ( Var[var_num].name == y_dim_var_name)
           {
             _yCoordVar = Var[var_num].var;
-            break;
           }
-          if (( Var[var_num].name == var_lat_nt)
-              && ( y_dim_var_name == dim_lat_nt)) {
+          else if (( Var[var_num].name == var_lat_nt)
+                   && ( y_dim_var_name == dim_lat_nt)) {
             y_dim_var_name = dim_lat_nt;
             _yCoordVar = Var[var_num].var;
-            break;
           }
+          else continue;
+          break;
         }
       }
       else
@@ -3283,14 +3288,14 @@ bool NcCfFile::get_grid_from_dimensions()
           if ( Var[var_num].name == x_dim_var_name)
           {
             _xCoordVar = Var[var_num].var;
-            break;
           }
-          if (( Var[var_num].name == var_lon_nt)
+          else if (( Var[var_num].name == var_lon_nt)
               && (x_dim_var_name == dim_lon_nt)) {
             x_dim_var_name = dim_lon_nt;
             _xCoordVar = Var[var_num].var;
-            break;
           }
+          else continue;
+          break;
         }
       }
       else
@@ -3381,7 +3386,8 @@ LatLonData NcCfFile::get_data_from_lat_lon_vars(NcVar *lat_var, NcVar *lon_var,
   bool lat_first = false;
   if (two_dim_coord) {
     lat_first = (lat_counts == get_dim_size(lat_var, 0));
-    LongArray cur, length;  // {0,0}, {1,1}
+    LongArray cur;
+    LongArray length;
     cur.add(0);
     cur.add(0);
     length.add(1);
