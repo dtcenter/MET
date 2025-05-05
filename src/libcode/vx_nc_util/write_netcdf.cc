@@ -140,7 +140,7 @@ void write_netcdf_latlon_1d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    add_att(&lon_var, units_att_name, "degrees_east");
    add_att(&lon_var, standard_name_att_name, "longitude");
 
-#pragma omp parallel default(none)  \
+#pragma omp parallel default(none) \
    shared(grid, lat_data, lon_data) \
    private(lat, lon)
    {
@@ -198,12 +198,13 @@ void write_netcdf_latlon_2d(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
    add_att(&lon_var, units_att_name, "degrees_east");
    add_att(&lon_var, standard_name_att_name, "longitude");
 
-#pragma omp parallel default(none)             \
+#pragma omp parallel default(none) \
    shared(grid, lat_data, lon_data, DefaultTO)
    {
 
       // Compute lat/lon values
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
 
@@ -265,12 +266,13 @@ void write_netcdf_grid_weight(NcFile *f_out, NcDim *lat_dim, NcDim *lon_dim,
          break;
    }
 
-#pragma omp parallel default(none)     \
+#pragma omp parallel default(none) \
    shared(wgt_dp, wgt_data, DefaultTO)
    {
 
       // Store weight values
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int x=0; x<wgt_dp.nx(); x++) {
          for(int y=0; y<wgt_dp.ny(); y++) {
             int i = DefaultTO.two_to_one(wgt_dp.nx(), wgt_dp.ny(), x, y);

@@ -346,7 +346,7 @@ void DataPlane::set_block(double *v, int nx, int ny) {
       exit(1);
    }
 
-#pragma omp parallel default(none)         \
+#pragma omp parallel default(none) \
    shared(Data, v, nx, ny, nxy, DefaultTO)
    {
 
@@ -433,7 +433,8 @@ void DataPlane::set_all(float *data, int nx, int ny) {
    shared(Data, data, nx, ny)
    {
 
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int x=0; x<nx; ++x) {
          for(int y=0; y<ny; ++y) {
             int index = two_to_one(x, y);
@@ -469,7 +470,8 @@ int DataPlane::n_good_data() const {
    {
 
       // Count number of good data values
-#pragma omp for reduction(+:n)
+#pragma omp for schedule(static) \
+                reduction(+:n)
       for(int j=0; j<Nxy; ++j) {
          if(!is_bad_data(Data[j])) n++;
       }
@@ -754,11 +756,12 @@ void DataPlane::data_range(double & data_min, double & data_max) const {
    data_min =  1.0e30;
    data_max = -1.0e30;
 
-#pragma omp parallel default(none)       \
+#pragma omp parallel default(none) \
    shared(Data, Nxy, data_min, data_max)
    {
 
-#pragma omp for reduction(min: data_min) \
+#pragma omp for schedule(static) \
+                reduction(min: data_min) \
                 reduction(max: data_max)
       for(int j=0; j<Nxy; ++j) {
 
@@ -885,13 +888,14 @@ void DataPlane::destagger(bool x_stag, bool y_stag) {
    int nxy_new = nx_new * ny_new;
    vector<double> new_data(nxy_new);
 
-#pragma omp parallel default(none)                                \
+#pragma omp parallel default(none) \
    shared(Data, new_data, ny_new, nx_new, x_stag, y_stag, weight)
    {
 
-#pragma omp for schedule(static)
-      for(int y=0; y < ny_new; y++) {
-         for(int x=0; x < nx_new; x++) {
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int y=0; y<ny_new; y++) {
+         for(int x=0; x<nx_new; x++) {
 
             int index_new = y*nx_new + x;
 
@@ -960,7 +964,7 @@ bool DataPlane::fitwav_1d(const int start_wave, const int end_wave) {
    vector<double> C(Nx);
    vector<double> S(Nx);
 
-#pragma omp parallel default(none)              \
+#pragma omp parallel default(none) \
 shared(Nx, Ny, mnw, start_wave, end_wave, C, S)
    {
 
@@ -1061,8 +1065,8 @@ DataPlaneArray & DataPlaneArray::operator+=(const DataPlaneArray &d) {
       exit(1);
    }
 
-#pragma omp parallel default(none)         \
-   shared(mlog, Error, method_name)        \
+#pragma omp parallel default(none) \
+   shared(mlog, Error, method_name) \
    shared(Nplanes, Lower, Upper, Plane, d)
    {
 

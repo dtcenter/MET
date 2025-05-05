@@ -78,7 +78,8 @@ void rescale_probability(DataPlane &dp) {
          //
          // Divide each value by 100
          //
-#pragma omp for schedule(static) 
+#pragma omp for schedule(static) \
+                collapse(2) 
          for(int x=0; x<dp.nx(); x++) {
             for(int y=0; y<dp.ny(); y++) {
 
@@ -113,8 +114,8 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    // For nearest neighbor, no work to do.
    if(width == 1 && mthd == InterpMthd::Nearest) return;
 
-#pragma omp parallel default(none)                   \
-   shared(mlog, Error, dp, smooth_dp)                \
+#pragma omp parallel default(none) \
+   shared(mlog, Error, dp, smooth_dp) \
    shared(mthd, width, shape, wrap_lon, t, gaussian) \
    private(v)
    {
@@ -284,9 +285,9 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
       }
    }
 
-#pragma omp parallel default(none)                      \
+#pragma omp parallel default(none) \
    shared(mlog, dp, frac_dp, shape, width, wrap_lon, t) \
-   shared(use_climo, fcmn, fcsd, ocmn, ocsd, vld_t, bad)\
+   shared(use_climo, fcmn, fcsd, ocmn, ocsd, vld_t, bad) \
    private(n_vld, n_thr, gp, v)
    {
 
@@ -443,7 +444,7 @@ void apply_mask(DataPlane &in, const MaskPlane &mask) {
 
    int Nxy = mask.nx() * mask.ny();
 
-#pragma omp parallel default(none)        \
+#pragma omp parallel default(none) \
    shared(in, mask, Nxy, bad_data_double)
    {
 
@@ -560,11 +561,12 @@ DataPlane subtract(const DataPlane &dp1, const DataPlane &dp2) {
       exit(1);
    }
 
-#pragma omp parallel default(none)         \
+#pragma omp parallel default(none) \
    shared(dp1, dp2, diff, bad_data_double)
    {
 
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int x=0; x<dp1.nx(); x++) {
          for(int y=0; y<dp1.ny(); y++) {
             double v = (is_bad_data(dp1.get(x,y)) ||
@@ -593,12 +595,13 @@ DataPlane normal_cdf(const DataPlane &dp, const DataPlane &mn,
       exit(1);
    }
 
-#pragma omp parallel default(none)          \
+#pragma omp parallel default(none) \
    shared(dp, mn, sd, cdf, bad_data_double)
    {
 
    // Compute the normal CDF for each grid point
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int x=0; x<dp.nx(); x++) {
          for(int y=0; y<dp.ny(); y++) {
             double v;
@@ -639,12 +642,13 @@ DataPlane normal_cdf_inv(const double area, const DataPlane &mn,
       exit(1);
    }
 
-#pragma omp parallel default(none)                \
+#pragma omp parallel default(none) \
    shared(area, mn, sd, cdf_inv, bad_data_double)
    {
 
    // Compute the inverse of the normal CDF for each grid point
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int x=0; x<mn.nx(); x++) {
          for(int y=0; y<mn.ny(); y++) {
             double v;
@@ -677,12 +681,13 @@ DataPlane gradient(const DataPlane &dp, int dim, int delta) {
    // Initialize to bad data values
    grad_dp.set_constant(bad_data_double);
 
-#pragma omp parallel default(none)                  \
+#pragma omp parallel default(none) \
    shared(dp, dim, delta, grad_dp, bad_data_double)
    {
 
       // Compute the gradient for each grid point
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int x=0; x<dp.nx(); x++) {
          for(int y=0; y<dp.ny(); y++) {
 
@@ -731,7 +736,7 @@ DataPlane distance_map(const DataPlane &dp) {
    
    int event_count = 0;
 
-#pragma omp parallel default(none)                 \
+#pragma omp parallel default(none) \
    shared(dp, nx, ny, g_distance, dm, event_count) \
    private(distance_value)
    {

@@ -1654,14 +1654,15 @@ void SL1L2Info::set(const PairDataPoint &pd_all) {
    // Get the sum of the weights
    double wgt_sum = pd.wgt_na.sum();
 
-#pragma omp parallel default(none)                              \
-   shared(pd, wgt_sum)                                          \
-   shared(fbar, obar, fobar, ffbar, oobar, smae, scount)        \
+#pragma omp parallel default(none) \
+   shared(pd, wgt_sum) \
+   shared(fbar, obar, fobar, ffbar, oobar, smae, scount) \
    shared(fabar, oabar, foabar, ffabar, ooabar, samae, sacount)
    {
 
       // Loop through the pair data and compute sums
-#pragma omp for reduction(+: fbar, obar, fobar, ffbar, oobar, smae, scount)        \
+#pragma omp for schedule(static) \
+                reduction(+: fbar, obar, fobar, ffbar, oobar, smae, scount) \
                 reduction(+: fabar, oabar, foabar, ffabar, ooabar, samae, sacount)
       for(int i=0; i<pd.n_obs; i++) {
 
@@ -2133,21 +2134,22 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
    double dir_wgt_sum = 0.0;
    double dira_wgt_sum = 0.0;
 
-#pragma omp parallel default(none)                                     \
-   shared(pd_u, pd_v, wgt_sum)                                         \
-   shared(vcount, uf_bar, vf_bar, uo_bar, vo_bar)                      \
-   shared(uvfo_bar, uvff_bar, uvoo_bar, f_speed_bar, o_speed_bar)      \
-   shared(dcount, dir_wgt_sum, dir_bar, absdir_bar, dir2_bar)          \
-   shared(vacount, ufa_bar, vfa_bar, uoa_bar, voa_bar)                 \
+#pragma omp parallel default(none) \
+   shared(pd_u, pd_v, wgt_sum) \
+   shared(vcount, uf_bar, vf_bar, uo_bar, vo_bar) \
+   shared(uvfo_bar, uvff_bar, uvoo_bar, f_speed_bar, o_speed_bar) \
+   shared(dcount, dir_wgt_sum, dir_bar, absdir_bar, dir2_bar) \
+   shared(vacount, ufa_bar, vfa_bar, uoa_bar, voa_bar) \
    shared(uvfoa_bar, uvffa_bar, uvooa_bar, fa_speed_bar, oa_speed_bar) \
    shared(dacount, dira_wgt_sum, dira_bar, absdira_bar, dira2_bar)
    {
 
       // Loop through the filtered pair data compute partial sums
-#pragma omp for reduction(+: vcount, uf_bar, vf_bar, uo_bar, vo_bar)                      \
-                reduction(+: uvfo_bar, uvff_bar, uvoo_bar, f_speed_bar, o_speed_bar)      \
-                reduction(+: dcount, dir_wgt_sum, dir_bar, absdir_bar, dir2_bar)          \
-                reduction(+: vacount, ufa_bar, vfa_bar, uoa_bar, voa_bar)                 \
+#pragma omp for schedule(static) \
+                reduction(+: vcount, uf_bar, vf_bar, uo_bar, vo_bar) \
+                reduction(+: uvfo_bar, uvff_bar, uvoo_bar, f_speed_bar, o_speed_bar) \
+                reduction(+: dcount, dir_wgt_sum, dir_bar, absdir_bar, dir2_bar) \
+                reduction(+: vacount, ufa_bar, vfa_bar, uoa_bar, voa_bar) \
                 reduction(+: uvfoa_bar, uvffa_bar, uvooa_bar, fa_speed_bar, oa_speed_bar) \
                 reduction(+: dacount, dira_wgt_sum, dira_bar, absdira_bar, dira2_bar)
       for(int i=0; i<pd_u.f_na.n(); i++) {
@@ -3830,12 +3832,13 @@ void GRADInfo::set(int grad_dx, int grad_dy,
    // Get the sum of the weights
    double wgt_sum = wgt_na.sum();
 
-#pragma omp parallel default(none)                         \
+#pragma omp parallel default(none) \
    shared(fgx_na, fgy_na, ogx_na, ogy_na, wgt_na, wgt_sum)
    {
 
       // Loop through the pairs and compute sums
-#pragma omp for reduction(+: fgbar, ogbar, mgbar, egbar)            \
+#pragma omp for schedule(static) \
+                reduction(+: fgbar, ogbar, mgbar, egbar) \
                 reduction(+: fgmag, ogmag, mag_mse, lap_mse, total)
       for(int i=0; i<fgx_na.n(); i++) {
 

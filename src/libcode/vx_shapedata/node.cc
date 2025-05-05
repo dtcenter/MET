@@ -489,11 +489,12 @@ double node_dist(const Node &a, const Node &b) {
 
    double min_dist = -1.0;
 
-#pragma omp parallel default(none)      \
+#pragma omp parallel default(none) \
    shared(a, b, num_a, num_b, min_dist)
    {
 
-#pragma omp for reduction(min: min_dist)
+#pragma omp for schedule(static) \
+                reduction(min: min_dist)
       for(int i_a=0; i_a<num_a; i_a++) {
 
          const Node *a_ptr = a.get_child(i_a);
@@ -533,7 +534,8 @@ double node_polyline_dist(const Node &a, const Polyline &b) {
    shared(a, b, num_a, min_dist)
    {
 
-#pragma omp for reduction(min: min_dist)
+#pragma omp for schedule(static) \
+                reduction(min: min_dist)
       for(int i_a=0; i_a<num_a; i_a++) {
 
          const Node *a_ptr = a.get_child(i_a);

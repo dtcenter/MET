@@ -208,11 +208,12 @@ void ShapeData::calc_moments() {
                                         plus<double>()))                  \
                     initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
 
-#pragma omp parallel default(none)    \
+#pragma omp parallel default(none) \
    shared(data, s_area, f_area, psum)
    {
 
-#pragma omp for reduction(+: s_area, f_area)   \
+#pragma omp for schedule(static) \
+                reduction(+: s_area, f_area) \
                 reduction(vec_dbl_plus : psum)
       for(int x=0; x<data.nx(); ++x) {
 
@@ -301,11 +302,12 @@ double ShapeData::area_thresh(const ShapeData *raw_ptr,
    const int Nxy = data.nx()*data.ny();
 
    // Number of points inside the object that meet the threshold criteria
-#pragma omp parallel default(none)                  \
+#pragma omp parallel default(none) \
    shared(raw_ptr, obj_thresh, Nxy, data, cur_area)
    {
 
-#pragma omp for reduction(+: cur_area)
+#pragma omp for schedule(static) \
+                reduction(+: cur_area)
       for(int i=0; i<Nxy; i++) {
          if(data.data()[i] > 0 &&
             obj_thresh.check(raw_ptr->data.data()[i])) cur_area++;
@@ -548,7 +550,7 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
       exit(1);
    }
 
-#pragma omp parallel default(none)                   \
+#pragma omp parallel default(none) \
    shared(mlog, data, conv_dp, diameter, vld_thresh) \
    private(count, n_vld, v, v_sum, gp)
    {
@@ -566,7 +568,7 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
       }
 
       // Compute the convolved values
-#pragma omp for schedule (static)
+#pragma omp for schedule(static)
       for(int x=0; x<data.nx(); x++) {
          for(int y=0; y<data.ny(); y++) {
 
@@ -1315,7 +1317,8 @@ void apply_mask(ShapeData &f, const ShapeData &mask) {
       //
       // Put bad data everywhere the mask is turned off
       //
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int x=0; x<f.data.nx(); x++) {
          for(int y=0; y<f.data.ny(); y++) {
             if(!mask.s_is_on(x, y)) f.data.set(bad_data_float, x, y);
@@ -1436,7 +1439,7 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
    // Zero out discarded shapes
    int nxy = data.nx()*data.ny();
 
-#pragma omp parallel default(none)          \
+#pragma omp parallel default(none) \
    shared(keep_object, sd_split, data, nxy)
    {
 
@@ -1474,7 +1477,7 @@ void ShapeData::threshold_area(SingleThresh t) {
    //
    int nxy = data.nx()*data.ny();
 
-#pragma omp parallel default(none)             \
+#pragma omp parallel default(none) \
    shared(t, area_object, sd_split, data, nxy)
    {
 
@@ -1558,7 +1561,7 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc,
    //
    int nxy = data.nx()*data.ny();
 
-#pragma omp parallel default(none)             \
+#pragma omp parallel default(none) \
    shared(t, inten_object, sd_split, data, nxy)
    {
 
@@ -1790,7 +1793,8 @@ int ShapeData_intersection(const ShapeData &f1, const ShapeData &f2) {
    shared(f1, f2, intersection)
    {
 
-#pragma omp for reduction(+: intersection)   
+#pragma omp for schedule(static) \
+                reduction(+: intersection)   
       for(int x=0; x<f1.data.nx(); x++) {
          for(int y=0; y<f1.data.ny(); y++) {
             if(f1.s_is_on(x, y) && f2.s_is_on(x, y)) intersection++;

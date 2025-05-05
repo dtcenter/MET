@@ -267,7 +267,7 @@ void SingleFeature::set(const ShapeData &raw_sd, const ShapeData &thresh_sd,
    ShapeData cur_split_sd = split(mask_sd, n_bdy);
    boundary = new Polyline [n_bdy];
 
-#pragma omp parallel default(none)      \
+#pragma omp parallel default(none) \
    shared(n_bdy, cur_split_sd, boundary)
    {
 
@@ -469,11 +469,12 @@ void PairFeature::set(const SingleFeature &fcst,
    symmetric_diff = 0.0;
    int nxy = Fcst->Split->data.nxy();
 
-#pragma omp parallel default(none)                                       \
+#pragma omp parallel default(none) \
    shared(nxy, Fcst, Obs, intersection_area, union_area, symmetric_diff)
    {
 
-#pragma omp for reduction(+: intersection_area, union_area, symmetric_diff)
+#pragma omp for schedule(static) \
+                reduction(+: intersection_area, union_area, symmetric_diff)
       for(int i=0; i<nxy; ++i) {
 
          bool fcst_on = (nint(Fcst->Split->data.data()[i]) == Fcst->object_number ? true : false);

@@ -1104,7 +1104,7 @@ void ModeFuzzyEngine::do_no_match() {
    //
    fcst_single.set_size(n_fcst);
 
-#pragma omp parallel default(none)                       \
+#pragma omp parallel default(none) \
    shared(fcst_raw, fcst_thresh, fcst_split, conf_info) \
    shared(fcst_single, n_fcst)
    {
@@ -1122,7 +1122,7 @@ void ModeFuzzyEngine::do_no_match() {
 
    obs_single.set_size(n_obs);
 
-#pragma omp parallel default(none)                   \
+#pragma omp parallel default(none) \
    shared(obs_raw, obs_thresh, obs_split, conf_info) \
    shared(obs_single, n_obs)
    {
@@ -1143,11 +1143,12 @@ void ModeFuzzyEngine::do_no_match() {
    //
    info_singles.set_size(n_fcst*n_obs);
 
-#pragma omp parallel default(none)                \
+#pragma omp parallel default(none) \
    shared(n_fcst, n_obs, info_singles, conf_info)
    {
 
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int j=0; j<n_fcst; j++) {
          for(int k=0; k<n_obs; k++) {
 
@@ -1200,7 +1201,7 @@ void ModeFuzzyEngine::do_match_merge() {
    //
    fcst_single.set_size(n_fcst);
 
-#pragma omp parallel default(none)                       \
+#pragma omp parallel default(none) \
    shared(fcst_raw, fcst_thresh, fcst_split, conf_info) \
    shared(fcst_single, n_fcst)
    {
@@ -1218,7 +1219,7 @@ void ModeFuzzyEngine::do_match_merge() {
 
    obs_single.set_size(n_obs);
 
-#pragma omp parallel default(none)                   \
+#pragma omp parallel default(none) \
    shared(obs_raw, obs_thresh, obs_split, conf_info) \
    shared(obs_single, n_obs)
    {
@@ -1239,11 +1240,12 @@ void ModeFuzzyEngine::do_match_merge() {
    //
    pair_single.set_size(n_fcst*n_obs);
 
-#pragma omp parallel default(none)                           \
+#pragma omp parallel default(none) \
    shared(n_fcst, n_obs, fcst_single, obs_single, conf_info)
    {
 
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int j=0; j<n_fcst; j++) {
          for(int k=0; k<n_obs; k++) {
 
@@ -1261,11 +1263,12 @@ void ModeFuzzyEngine::do_match_merge() {
    //
    info_singles.set_size(n_fcst*n_obs);
 
-#pragma omp parallel default(none)                \
+#pragma omp parallel default(none) \
    shared(n_fcst, n_obs, info_singles, conf_info)
    {
 
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int j=0; j<n_fcst; j++) {
          for(int k=0; k<n_obs; k++) {
 
@@ -2081,7 +2084,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    //
    fcst_single.set_size(n_fcst);
 
-#pragma omp parallel default(none)                       \
+#pragma omp parallel default(none) \
    shared(fcst_raw, fcst_thresh, fcst_split, conf_info) \
    shared(fcst_single, n_fcst)
    {
@@ -2099,7 +2102,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
 
    obs_single.set_size(n_obs);
 
-#pragma omp parallel default(none)                   \
+#pragma omp parallel default(none) \
    shared(obs_raw, obs_thresh, obs_split, conf_info) \
    shared(obs_single, n_obs)
    {
@@ -2120,11 +2123,12 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    //
    pair_single.set_size(n_fcst*n_obs);
 
-#pragma omp parallel default(none)                           \
+#pragma omp parallel default(none) \
    shared(n_fcst, n_obs, fcst_single, obs_single, conf_info)
    {
 
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int j=0; j<n_fcst; j++) {
          for(int k=0; k<n_obs; k++) {
 
@@ -2142,11 +2146,12 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    //
    info_singles.set_size(n_fcst*n_obs);
 
-#pragma omp parallel default(none)                \
+#pragma omp parallel default(none) \
    shared(n_fcst, n_obs, info_singles, conf_info)
    {
 
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int j=0; j<n_fcst; j++) {
          for(int k=0; k<n_obs; k++) {
 
@@ -2270,7 +2275,7 @@ void ModeFuzzyEngine::do_match_only() {
    //
    fcst_single.set_size(n_fcst);
 
-#pragma omp parallel default(none)                       \
+#pragma omp parallel default(none) \
    shared(fcst_raw, fcst_thresh, fcst_split, conf_info) \
    shared(fcst_single, n_fcst)
    {
@@ -2288,7 +2293,7 @@ void ModeFuzzyEngine::do_match_only() {
 
    obs_single.set_size(n_obs);
 
-#pragma omp parallel default(none)                   \
+#pragma omp parallel default(none) \
    shared(obs_raw, obs_thresh, obs_split, conf_info) \
    shared(obs_single, n_obs)
    {
@@ -2309,11 +2314,12 @@ void ModeFuzzyEngine::do_match_only() {
    //
    pair_single.set_size(n_fcst*n_obs);
 
-#pragma omp parallel default(none)                           \
+#pragma omp parallel default(none) \
    shared(n_fcst, n_obs, fcst_single, obs_single, conf_info)
    {
 
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int j=0; j<n_fcst; j++) {
          for(int k=0; k<n_obs; k++) {
 
@@ -2331,12 +2337,13 @@ void ModeFuzzyEngine::do_match_only() {
    //
    info_singles.set_size(n_fcst*n_obs);
 
-#pragma omp parallel default(none)                \
+#pragma omp parallel default(none) \
    shared(n_fcst, n_obs, info_singles, conf_info)
    {
 
 
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int j=0; j<n_fcst; j++) {
          for(int k=0; k<n_obs; k++) {
 
@@ -2534,7 +2541,7 @@ void ModeFuzzyEngine::do_cluster_features() {
    fcst_cluster.set_size(n_clus);
     obs_cluster.set_size(n_clus);
 
-#pragma omp parallel default(none)                           \
+#pragma omp parallel default(none) \
    shared(fcst_raw, fcst_thresh, fcst_clus_split, conf_info) \
    shared(fcst_cluster, n_clus)
    {
@@ -2562,7 +2569,7 @@ void ModeFuzzyEngine::do_cluster_features() {
    //
    pair_cluster.set_size(n_clus);
 
-#pragma omp parallel default(none)                                    \
+#pragma omp parallel default(none) \
    shared(n_clus, fcst_cluster, obs_cluster, pair_cluster, conf_info)
    {
 
@@ -2579,7 +2586,7 @@ void ModeFuzzyEngine::do_cluster_features() {
    //
    info_clus.set_size(n_clus);
 
-#pragma omp parallel default(none)                    \
+#pragma omp parallel default(none) \
    shared(n_clus, info_clus, pair_cluster, conf_info)
    {
 
@@ -3157,11 +3164,12 @@ void write_engine_stats(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable & a
    int nxy = eng.fcst_raw->data.nxy();
 
 #pragma omp parallel default(none) \
-   shared(nxy, eng, n_valid)       \
+   shared(nxy, eng, n_valid) \
    private(j)
    {
 
-#pragma omp for reduction(+: n_valid)
+#pragma omp for schedule(static) \
+                reduction(+: n_valid)
       for(j=0; j<nxy; j++) {
          if(!is_bad_data(eng.fcst_raw->data.buf()[j]) &&
             !is_bad_data(eng.obs_raw->data.buf()[j])) n_valid++;

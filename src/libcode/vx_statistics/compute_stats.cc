@@ -182,17 +182,17 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
    double abs_err_bar = 0.0;
    double err_sq_bar  = 0.0;
 
-#pragma omp parallel default(none)                   \
-   shared(pd, i_na, cmn_flag, wgt_sum, err_na, n)    \
-   shared(f_bar, o_bar, ff_bar, oo_bar, fo_bar)      \
+#pragma omp parallel default(none) \
+   shared(pd, i_na, cmn_flag, wgt_sum, err_na, n) \
+   shared(f_bar, o_bar, ff_bar, oo_bar, fo_bar) \
    shared(fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar) \
-   shared(err_bar, abs_err_bar, err_sq_bar) 
+   shared(err_bar, abs_err_bar, err_sq_bar)
    {
 
-#pragma omp for reduction(+: n, f_bar, o_bar, ff_bar, oo_bar, fo_bar,   \
-                             fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar, \
-                             err_bar, abs_err_bar, err_sq_bar)
-
+#pragma omp for schedule(static) \
+                reduction(+: n, f_bar, o_bar, ff_bar, oo_bar, fo_bar) \
+                reduction(+: fa_bar, oa_bar, ffa_bar, ooa_bar, foa_bar) \
+                reduction(+: err_bar, abs_err_bar, err_sq_bar)
       for(int i=0; i<i_na.n(); i++) {
 
          //
@@ -318,7 +318,7 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
 
    NumArray dev_na(err_na);
 
-#pragma omp parallel default(none)  \
+#pragma omp parallel default(none) \
    shared(dev_na, err_na, cnt_info)
    {
 
@@ -487,8 +487,8 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
       int extra_f    = 0;
       int extra_o    = 0;
 
-#pragma omp parallel default(none)                     \
-      shared(f_na_rank, o_na_rank, n)                  \
+#pragma omp parallel default(none) \
+      shared(f_na_rank, o_na_rank, n) \
       shared(concordant, discordant, extra_f, extra_o)
       {
 
@@ -502,7 +502,8 @@ void compute_cntinfo(const PairDataPoint &pd, const NumArray &i_na,
          // comparison as extra_f.  A tie between the f's counts as an extra_o.  If there
          // is a tie in both the f's and o's, don't count the comparison as anything.
          //
-#pragma omp for reduction(+: concordant, discordant, extra_f, extra_o)
+#pragma omp for schedule(static) \
+                reduction(+: concordant, discordant, extra_f, extra_o)
          for(int i=0; i<n; i++) {
             for(int j=i+1; j<n; j++) {
 
@@ -926,16 +927,17 @@ void compute_nbrcntinfo(const PairDataPoint &pd,
    double f_thr_bar = 0.0;
    double o_thr_bar = 0.0;
 
-#pragma omp parallel default(none)      \
+#pragma omp parallel default(none) \
    shared(pd, pd_thr, i_na, n, wgt_sum) \
-   shared(ff_bar, oo_bar, fo_bar)       \
+   shared(ff_bar, oo_bar, fo_bar) \
    shared(f_thr_bar, o_thr_bar)    
    {
 
       //
       // Compute the continuous statistics from the fcst and obs arrays
       //
-#pragma omp for reduction(+: ff_bar, oo_bar, fo_bar, f_thr_bar, o_thr_bar)
+#pragma omp for schedule(static) \
+                reduction(+: ff_bar, oo_bar, fo_bar, f_thr_bar, o_thr_bar)
       for(int i=0; i<n; i++) {
 
          //
@@ -1042,14 +1044,15 @@ void compute_mean_stdev(const NumArray &v_na, const NumArray &i_na,
    double sum = 0.0;
    double sum_sq = 0.0;
 
-#pragma omp parallel default(none)    \
+#pragma omp parallel default(none) \
    shared(v_na, i_na, n, sum, sum_sq)
    {
 
       //
       // Loop over the values provided
       //
-#pragma omp for reduction(+: sum, sum_sq)
+#pragma omp for schedule(static) \
+                reduction(+: sum, sum_sq)
       for(int i=0; i<n; i++) {
 
          //

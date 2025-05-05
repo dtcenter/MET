@@ -129,7 +129,8 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
    {
 
    // Compute weight for each grid point
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
 
@@ -514,7 +515,8 @@ void apply_grid_mask(const Grid &grid, const Grid &mask_grid, DataPlane &dp) {
       // to an (x, y) point on the mask grid. If the (x, y) is within the
       // bounds of the mask grid, retain it's value.  Otherwise, mask it out.
       //
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int x=0; x<dp.nx(); x++) {
          for(int y=0; y<dp.ny(); y++) {
             double lat;
@@ -557,7 +559,8 @@ void apply_poly_mask_latlon(const MaskPoly &poly, const Grid &grid, DataPlane &d
       // Mask out any grid points whose corresponding lat/lon coordinates are
       // not inside the masking lat/lon polygon.
       //
-#pragma omp for schedule(static)
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int x=0; x<dp.nx(); x++) {
         for(int y=0; y<dp.ny(); y++) {
 
