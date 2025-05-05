@@ -134,7 +134,8 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    } 
 
       // Otherwise, apply smoothing to each grid point
-#pragma omp for schedule(static) 
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int x=0; x<dp.nx(); x++) {
          for(int y=0; y<dp.ny(); y++) {
 

@@ -60,7 +60,8 @@ void update_pdf(double min, double delta, vector<long long>& pdf,
 
       // Update pdf counts
 #pragma omp for schedule(static) \
-                reduction(vec_long_long_plus : pdf)
+                reduction(vec_long_long_plus : pdf) \
+                collapse(2)
       for(int x=0; x<dp.nx(); x++) {
          for(int y=0; y<dp.ny(); y++) {
             double value = dp.get(x, y);
@@ -98,7 +99,8 @@ void update_joint_pdf(int n_A, int n_B, double min_A, double min_B,
 
       // Update joint pdf counts
 #pragma omp for schedule(static) \
-                reduction(vec_long_long_plus : pdf)
+                reduction(vec_long_long_plus : pdf) \
+                collapse(2)
       for(int x=0; x<dp_A.nx(); x++) {
          for(int y=0; y<dp_A.ny(); y++) {
             double value_A = dp_A.get(x, y);

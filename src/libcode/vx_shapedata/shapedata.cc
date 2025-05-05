@@ -1794,7 +1794,8 @@ int ShapeData_intersection(const ShapeData &f1, const ShapeData &f2) {
    {
 
 #pragma omp for schedule(static) \
-                reduction(+: intersection)   
+                reduction(+: intersection) \
+                collapse(2)
       for(int x=0; x<f1.data.nx(); x++) {
          for(int y=0; y<f1.data.ny(); y++) {
             if(f1.s_is_on(x, y) && f2.s_is_on(x, y)) intersection++;
