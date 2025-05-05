@@ -41,10 +41,7 @@ DataPlane met_regrid_budget(const DataPlane & from_data,
       {
          // Set the size and timing info 
          to_data.set_size (to_grid.nx(), to_grid.ny());
-         to_data.set_init (from_data.init());
-         to_data.set_valid(from_data.valid());
-         to_data.set_lead (from_data.lead());
-         to_data.set_accum(from_data.accum());
+         to_data.set_times(from_data);
       }
 
 #pragma omp for schedule (static)

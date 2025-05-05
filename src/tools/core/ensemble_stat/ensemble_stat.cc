@@ -700,15 +700,15 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
 
          // Loop through the forecast fields
          for(i=0; i<dpa.n_planes(); i++) {
-            dpa[i] = met_regrid(dpa[i], mtddf->grid(), grid,
-                                info->regrid());
+            dpa.at(i) = met_regrid(dpa[i], mtddf->grid(), grid,
+                                   info->regrid());
          }
       }
 
       // Rescale probabilities from [0, 100] to [0, 1]
       if(info->is_prob()) {
          for(i=0; i<dpa.n_planes(); i++) {
-            rescale_probability(dpa[i]);
+            rescale_probability(dpa.at(i));
          }
       } // end for i
 

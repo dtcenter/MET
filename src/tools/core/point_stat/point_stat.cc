@@ -658,15 +658,15 @@ void process_fcst_climo_files() {
 
          // Loop through the forecast fields
          for(j=0; j<fcst_dpa.n_planes(); j++) {
-            fcst_dpa[j] = met_regrid(fcst_dpa[j], fcst_mtddf->grid(), grid,
-                                     fcst_info->regrid());
+            fcst_dpa.at(j) = met_regrid(fcst_dpa[j], fcst_mtddf->grid(), grid,
+                                        fcst_info->regrid());
          }
       }
 
       // Rescale probabilities from [0, 100] to [0, 1]
       if(fcst_info->p_flag()) {
          for(j=0; j<fcst_dpa.n_planes(); j++) {
-            rescale_probability(fcst_dpa[j]);
+            rescale_probability(fcst_dpa.at(j));
          }
       } // end for j
 

@@ -8,14 +8,15 @@
 
 ////////////////////////////////////////////////////////////////////////
 //
-//    Filename:  data_cube.cc
+//   Filename:  data_cube.cc
 //
-//    Description:
-//        Definition of the DataCube class.
+//   Description:
+//      Definition of the DataCube class.
 //
-//    Mod    Date      Name           Description
-//    ----   ----      ----           -----------
-//    000    02-11-20  Fillmore       Initial definition
+//   Mod   Date      Name           Description
+//   ----  ----      ----           -----------
+//   000   02-11-20  Fillmore       Initial definition
+//   001   04-18-25  Halley Gotway  MET #3132 OpenMP
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -30,328 +31,394 @@ using namespace std;
 
 DataCube::DataCube() {
 
-    init_from_scratch();
+   init_from_scratch();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 DataCube::DataCube(const DataCube& other) {
 
-    init_from_scratch();
+   init_from_scratch();
 
-    assign(other);
+   assign(other);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 DataCube::~DataCube() {
 
-    clear();
+   clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::clear() {
 
-    Data.clear();
+   Data.clear();
 
-    Nx = 0;
-    Ny = 0;
-    Nz = 0;
-    Nxyz = 0;
+   Nx = 0;
+   Ny = 0;
+   Nz = 0;
+   Nxyz = 0;
 
-    return;
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::erase() {
 
-    Data.resize(Nxyz);
-    Data.assign(Nxyz, 0);
+   Data.resize(Nxyz);
+   Data.assign(Nxyz, 0);
 
-    return;
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::set_size(int nx, int ny, int nz) {
 
-    Nx = nx;
-    Ny = ny;
-    Nz = nz;
-    Nxyz = nx * ny * nz;
+   Nx = nx;
+   Ny = ny;
+   Nz = nz;
+   Nxyz = nx * ny * nz;
 
-    Data.resize(Nxyz);
-    Data.assign(Nxyz, 0);
+   Data.resize(Nxyz);
+   Data.assign(Nxyz, 0);
 
-    return;
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::set(double value, int i, int j, int k) {
 
-    /*  note when i = Nx - 1, j = Ny - 1, k = Nz - 1
-     *  n = Ny * Nz * (Nx - 1) + Nz * (Ny - 1) + Nz - 1
-     *    = Nx * Ny * Nz - 1
-     */
-    int n = Ny * Nz * i + Nz * j + k;
+   /*  note when i = Nx - 1, j = Ny - 1, k = Nz - 1
+    *  n = Ny * Nz * (Nx - 1) + Nz * (Ny - 1) + Nz - 1
+    *   = Nx * Ny * Nz - 1
+    */
+   int n = Ny * Nz * i + Nz * j + k;
 
-    Data[n] = value;
+   Data[n] = value;
 
-    return;
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::set_constant(double value) {
 
-    if (Data.empty()) {
-        mlog << Error << "\nDataCube::set_constant-> "
-             << "data array is empty.\n\n";
-        exit(1);
-    }
+   if(Data.empty()) {
+      mlog << Error << "\nDataCube::set_constant-> "
+          << "data array is empty.\n\n";
+      exit(1);
+   }
 
-    for (int n = 0; n < Nxyz; n++) {
-        Data[n] = value;
-    }
+   for(int n = 0; n < Nxyz; n++) {
+      Data[n] = value;
+   }
 
-    return;
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool DataCube::shape_equal(const DataCube& other) {
 
-    return (Nx == other.Nx) && (Ny == other.Ny) && (Nz == other.Nz);
+   return (Nx == other.Nx) && (Ny == other.Ny) && (Nz == other.Nz);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::check_shape_equal(const DataCube& other) {
 
-    if (!(this->shape_equal(other))) {
-        mlog << Error << "\nDataCube::check_shape_equal-> "
-             << "(" << Nx << ", " << Ny << ", " << Nz << ") != ("
-             << other.Nx << ", " << other.Ny << ", " << other.Nz << ")"
-             << "\n\n";
-        exit(1);
-    }
+   if(!(this->shape_equal(other))) {
+      mlog << Error << "\nDataCube::check_shape_equal-> "
+          << "(" << Nx << ", " << Ny << ", " << Nz << ") != ("
+          << other.Nx << ", " << other.Ny << ", " << other.Nz << ")"
+          << "\n\n";
+      exit(1);
+   }
 
-    return;
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double DataCube::get(int i, int j, int k) const {
 
-    int n = Ny * Nz * i + Nz * j + k;
+   int n = Ny * Nz * i + Nz * j + k;
 
-    return Data[n];
+   return Data[n];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::assign(const DataCube& other) {
 
-    clear();
+   clear();
 
-    set_size(other.Nx, other.Ny, other.Nz);
+   set_size(other.Nx, other.Ny, other.Nz);
 
-    for (int n = 0; n < Nxyz; n++) {
-        Data[n] = other.Data[n];
-    }
+#pragma omp parallel default(none) \
+   shared(Data, Nxyz, other)
+   {
 
-    return;
+#pragma omp for schedule(static)
+      for(int n = 0; n < Nxyz; n++) {
+         Data[n] = other.Data[n];
+      }
+   } // End omp parallel
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::increment(void) {
 
-    for (int n = 0; n < Nxyz; n++) {
-        Data[n]++;
-    }
+#pragma omp parallel default(none) \
+   shared(Data, Nxyz)
+   {
 
-    return;
+#pragma omp for schedule(static)
+      for(int n = 0; n < Nxyz; n++) {
+         Data[n]++;
+      }
+   } // End omp parallel
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::add_assign(const DataCube& other) {
 
-    this->check_shape_equal(other);
+   this->check_shape_equal(other);
 
-    for (int n = 0; n < Nxyz; n++) {
-        Data[n] += other.Data[n];
-    }
+#pragma omp parallel default(none) \
+   shared(Data, Nxyz, other)
+   {
 
-    return;
+#pragma omp for schedule(static)
+      for(int n = 0; n < Nxyz; n++) {
+         Data[n] += other.Data[n];
+      }
+   } // End omp parallel
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::subtract_assign(const DataCube& other) {
 
-    this->check_shape_equal(other);
+   this->check_shape_equal(other);
 
-    for (int n = 0; n < Nxyz; n++) {
-        Data[n] -= other.Data[n];
-    }
+#pragma omp parallel default(none) \
+   shared(Data, Nxyz, other)
+   {
 
-    return;
+#pragma omp for schedule(static)
+      for(int n = 0; n < Nxyz; n++) {
+         Data[n] -= other.Data[n];
+      }
+   } // End omp parallel
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::multiply_assign(const DataCube& other) {
 
-    this->check_shape_equal(other);
+   this->check_shape_equal(other);
 
-    for (int n = 0; n < Nxyz; n++) {
-        Data[n] *= other.Data[n];
-    }
+#pragma omp parallel default(none) \
+   shared(Data, Nxyz, other)
+   {
 
-    return;
+#pragma omp for schedule(static)
+      for(int n = 0; n < Nxyz; n++) {
+         Data[n] *= other.Data[n];
+      }
+   } // End omp parallel
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::divide_assign(int denom) {
 
-    for (int n = 0; n < Nxyz; n++) {
-        Data[n] = Data[n] / denom;
-    }
+#pragma omp parallel default(none) \
+   shared(Data, Nxyz, denom)
+   {
 
-    return;
+#pragma omp for schedule(static)
+      for(int n = 0; n < Nxyz; n++) {
+         Data[n] = Data[n] / denom;
+      }
+   } // End omp parallel
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::divide_assign(const DataCube& other) {
 
-    this->check_shape_equal(other);
+   this->check_shape_equal(other);
 
-    for (int n = 0; n < Nxyz; n++) {
-        Data[n] /= other.Data[n];
-    }
+#pragma omp parallel default(none) \
+   shared(Data, Nxyz, other)
+   {
 
-    return;
+#pragma omp for schedule(static)
+      for(int n = 0; n < Nxyz; n++) {
+         Data[n] /= other.Data[n];
+      }
+   } // End omp parallel
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::min_assign(const DataCube& other) {
 
-    this->check_shape_equal(other);
+   this->check_shape_equal(other);
 
-    for (int n = 0; n < Nxyz; n++) {
-        Data[n] = min(Data[n], other.Data[n]);
-    }
+#pragma omp parallel default(none) \
+   shared(Data, Nxyz, other)
+   {
 
-    return;
+#pragma omp for schedule(static)
+      for(int n = 0; n < Nxyz; n++) {
+         Data[n] = min(Data[n], other.Data[n]);
+      }
+   } // End omp parallel
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::max_assign(const DataCube& other) {
 
-    this->check_shape_equal(other);
+   this->check_shape_equal(other);
 
-    for (int n = 0; n < Nxyz; n++) {
-        Data[n] = max(Data[n], other.Data[n]);
-    }
+#pragma omp parallel default(none) \
+   shared(Data, Nxyz, other)
+   {
 
-    return;
+#pragma omp for schedule(static)
+      for(int n = 0; n < Nxyz; n++) {
+         Data[n] = max(Data[n], other.Data[n]);
+      }
+   } // End omp parallel
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::square() {
 
-    for (int n = 0; n < Nxyz; n++) {
-        Data[n] = Data[n] * Data[n];
-    }
+#pragma omp parallel default(none) \
+   shared(Data, Nxyz)
+   {
 
-    return;
+#pragma omp for schedule(static)
+      for(int n = 0; n < Nxyz; n++) {
+         Data[n] = Data[n] * Data[n];
+      }
+   } // End omp parallel
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::square_root() {
 
-    for (int n = 0; n < Nxyz; n++) {
-        Data[n] = sqrt(Data[n]);
-    }
+#pragma omp parallel default(none) \
+   shared(Data, Nxyz)
+   {
 
-    return;
+#pragma omp for schedule(static)
+      for(int n = 0; n < Nxyz; n++) {
+         Data[n] = sqrt(Data[n]);
+      }
+   } // End omp parallel
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 double DataCube::operator()(int i, int j, int k) const {
 
-    return get(i, j, k);
+   return get(i, j, k);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 DataCube& DataCube::operator=(const DataCube& other) {
 
-    if (this == &other) return *this;
+   if(this == &other) return *this;
 
-    assign(other);
+   assign(other);
 
-    return *this;
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 DataCube& DataCube::operator+=(const DataCube& other) {
 
-    add_assign(other);
+   add_assign(other);
 
-    return *this;
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 DataCube& DataCube::operator-=(const DataCube& other) {
 
-    subtract_assign(other);
+   subtract_assign(other);
 
-    return *this;
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 DataCube& DataCube::operator*=(const DataCube& other) {
 
-    multiply_assign(other);
+   multiply_assign(other);
 
-    return *this;
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 DataCube& DataCube::operator/=(const DataCube& other) {
 
-    divide_assign(other);
+   divide_assign(other);
 
-    return *this;
+   return *this;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void DataCube::init_from_scratch() {
 
-    Nx = 0;
-    Ny = 0;
-    Nz = 0;
-    Nxyz = 0;
+   Nx = 0;
+   Ny = 0;
+   Nz = 0;
+   Nxyz = 0;
 
-    clear();
+   clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
