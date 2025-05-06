@@ -38,6 +38,7 @@
 //   017    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
 //   018    07/26/24  Halley Gotway  MET #1371 Aggregate previous output.
 //   019    12/09/24  Halley Gotway  MET #3030 Add GRAD output.
+//   020    05/05/24  Halley Gotway  MET #3145 Add OpenMP.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2529,13 +2530,20 @@ static void write_stat_data() {
       if(!ptr->obs_thresh.empty())  add_att(&nc_var, "obs_thresh", ptr->obs_thresh);
       if(!is_bad_data(ptr->alpha))  add_att(&nc_var, "alpha", ptr->alpha);
 
-      // Store the data
-      for(int x=0; x<grid.nx(); x++) {
-         for(int y=0; y<grid.ny(); y++) {
-            int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-            data[n] = (float) ptr->dp(x, y);
-         } // end for y
-      } // end for x
+#pragma omp parallel default(none) \
+      shared(grid, DefaultTO, data, ptr)
+      {
+
+         // Store the data
+#pragma omp for schedule(static) \
+                collapse(2)
+         for(int x=0; x<grid.nx(); x++) {
+            for(int y=0; y<grid.ny(); y++) {
+               int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+               data[n] = (float) ptr->dp(x, y);
+            } // end for y
+         } // end for x
+      } // End omp parallel
 
       // Write out the data
       if(!put_nc_data_with_dims(&nc_var, data.data(), grid.ny(), grid.nx())) {
