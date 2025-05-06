@@ -743,7 +743,9 @@ static void apply_poly_mask(DataPlane & dp) {
    private(lat, lon, inside)
    {
 
-#pragma omp for reduction(+:n_in)
+#pragma omp for schedule(static) \
+                reduction(+:n_in) \
+                collapse(2)
      
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
@@ -802,7 +804,9 @@ static void apply_poly_xy_mask(DataPlane & dp) {
    private(inside)
    {
 
-#pragma omp for reduction(+:n_in)
+#pragma omp for schedule(static) \
+                reduction(+:n_in) \
+                collapse(2)
      
       // Check the X/Y of each grid point being inside the polyline
       for(int x=0; x<grid.nx(); x++) {
@@ -890,7 +894,9 @@ static void apply_box_mask(DataPlane &dp) {
    shared(dp, complement, n_in)
    {
 
-#pragma omp for reduction(+:n_in)
+#pragma omp for schedule(static) \
+                reduction(+:n_in) \
+                collapse(2)
 
       for(int x=0; x<dp.nx(); x++) {
          for(int y=0; y<dp.ny(); y++) {
@@ -950,7 +956,9 @@ static void apply_circle_mask(DataPlane &dp) {
    private(lat, lon, dist, v)
    {
 
-#pragma omp for reduction(+:n_in)
+#pragma omp for schedule(static) \
+                reduction(+:n_in) \
+                collapse(2)
 
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
@@ -1041,7 +1049,9 @@ static void apply_track_mask(DataPlane &dp) {
    private(lat, lon, dist, v)
    {
 
-#pragma omp for reduction(+:n_in)
+#pragma omp for schedule(static) \
+                reduction(+:n_in) \
+                collapse(2)
 
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
@@ -1120,7 +1130,9 @@ static void apply_grid_mask(DataPlane &dp) {
    shared(grid, grid_mask, complement, dp, n_in)
    {
 
-#pragma omp for reduction(+:n_in)
+#pragma omp for schedule(static) \
+                reduction(+:n_in) \
+                collapse(2)
 
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
@@ -1208,7 +1220,9 @@ static void apply_data_mask(DataPlane &dp) {
    shared(grid, complement, thresh, dp, n_in)
    {
 
-#pragma omp for reduction(+:n_in)
+#pragma omp for schedule(static) \
+                reduction(+:n_in) \
+                collapse(2)
 
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
@@ -1261,7 +1275,9 @@ static void apply_solar_mask(DataPlane &dp) {
    private(v)
    {
 
-#pragma omp for reduction(+:n_in)
+#pragma omp for schedule(static) \
+                reduction(+:n_in) \
+                collapse(2)
 
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
@@ -1354,7 +1370,9 @@ static void apply_lat_lon_mask(DataPlane &dp) {
    private(v)
    {
 
-#pragma omp for reduction(+:n_in)
+#pragma omp for schedule(static) \
+                reduction(+:n_in) \
+                collapse(2)
 
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
@@ -1434,7 +1452,9 @@ static void apply_shape_mask(DataPlane & dp) {
    private(status)
    {
 
-#pragma omp for reduction(+:n_in)
+#pragma omp for schedule(static) \
+                reduction(+:n_in) \
+                collapse(2)
      
       for(int x=0; x<(grid.nx()); x++) {
          for(int y=0; y<(grid.ny()); y++) {
@@ -1506,7 +1526,9 @@ static DataPlane combine(const DataPlane &dp_data,
    private(v)
    {
 
-#pragma omp for reduction(+:n_in)
+#pragma omp for schedule(static) \
+                reduction(+:n_in) \
+                collapse(2)
 
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
@@ -1643,7 +1665,8 @@ static void write_netcdf(const DataPlane &dp) {
    private(n)
    {
 
-#pragma omp for schedule (static)
+#pragma omp for schedule(static) \
+                collapse(2)
 
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {

@@ -705,7 +705,8 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
    private(v_sum, v_part)
          {
            
-#pragma omp for schedule (static)
+#pragma omp for schedule(static) \
+                collapse(2)
            
             for(int x=0; x<grid.nx(); x++) {
                for(int y=0; y<grid.ny(); y++) {
@@ -943,7 +944,7 @@ void do_sub_command() {
 
       int nxy = grid1.nxy();
       
-#pragma omp for schedule (static)
+#pragma omp for schedule(static)
      
       for(int i=0; i<nxy; i++) {
          if(is_bad_data( diff.data()[i]) ||
@@ -1092,7 +1093,7 @@ void do_derive_command() {
    private(v)
       {
 
-#pragma omp for schedule (static)
+#pragma omp for schedule(static)
         
          for(int j=0; j<nxy; j++) {
 
@@ -1137,7 +1138,8 @@ void do_derive_command() {
    shared(nxy, mask, vld_dp, n_vld, vld_thresh, n_skip)
    {
      
-#pragma omp for reduction(+:n_skip)
+#pragma omp for schedule(static) \
+                reduction(+:n_skip)
 
       for(int j=0; j<nxy; j++) {
          mask.buf()[j] = (vld_dp.data()[j]/n_vld) >= vld_thresh;
@@ -1190,7 +1192,7 @@ void do_derive_command() {
    shared(nxy, max_dp, min_dp, bad_data_double, der_dp)
          {
 
-#pragma omp for schedule (static)
+#pragma omp for schedule(static)
          
             for(int j=0; j<nxy; j++) {
                if(is_bad_data(max_dp.data()[j]) ||
@@ -1212,7 +1214,7 @@ void do_derive_command() {
    shared(nxy, sum_dp, vld_dp, bad_data_double, der_dp)
          {
 
-#pragma omp for schedule (static)
+#pragma omp for schedule(static)
          
             for(int j=0; j<nxy; j++) {
                if(is_bad_data(sum_dp.data()[j]) ||
@@ -1236,7 +1238,7 @@ void do_derive_command() {
    private(v)
          {
 
-#pragma omp for schedule (static)
+#pragma omp for schedule(static)
          
             for(int j=0; j<nxy; j++) {
                double s  = sum_dp.data()[j];
