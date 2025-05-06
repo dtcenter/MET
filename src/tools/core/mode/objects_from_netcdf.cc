@@ -149,36 +149,33 @@ void populate_bool_plane(const int * buf, const int nx, const int ny, BoolPlane 
 
 {
 
-   int x, y, n, k;
-   bool tf;
-   double nyes=0.0;
    double ntotal = (double)(nx*ny);
    bp_out.set_size(nx, ny);
 
-   for (x=0; x<nx; ++x)  {
+   int nyes = 0.0;
 
-      for (y=0; y<ny; ++y)  {
+#pragma omp parallel default(none) \
+   shared(nx, ny, buf, nyes, bp_out)
+   {
 
-         n = y*nx + x;
+#pragma omp for schedule(static) \
+                reduction(+: nyes) \
+                collapse(2)
+      for(int x=0; x<nx; ++x)  {
+         for(int y=0; y<ny; ++y)  {
+            int n = y*nx + x;
+            int k = buf[n];
+            bool tf = (k > 0);
+            if(tf) nyes++;
+            bp_out.put(tf, x, y);
+         } // for y
+      } // for x
+   } // End omp parallel
 
-         k = buf[n];
-
-         tf = ( k > 0 );
-         if (tf) ++nyes;
-         bp_out.put(tf, x, y);
-
-      }   //  for y
-
-   }   //  for x
-
-   mlog << Debug(1) << nyes/ntotal << " of the data was true\n";
+   mlog << Debug(1) << (double) nyes/ntotal << " of the data was true\n";
 
    return;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
-
-

@@ -8,13 +8,11 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
 #include <vector>
 
 #include "combine_boolplanes.h"
 
 using namespace std;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -26,88 +24,64 @@ void combine_boolplanes(const string &name,
                         int rIndex, int tIndex,
                         const BoolPlane * bpa, const int n_planes, 
                         BoolCalc & calc, 
-                        BoolPlane & bp_out)
-
-
-{
-
-   int j, x, y;
+                        BoolPlane & bp_out) {
    const int nx = bp_out.nx();
    const int ny = bp_out.ny();
    vector<bool> v(n_planes);
-   bool tf = false;
    double nTotal = (double)(nx*ny);
    double nTrue = 0.0;
 
+#pragma omp parallel default(none) \
+   shared(nx, ny, n_planes, v, bpa, calc, nTrue, bp_out)
+   {
 
-   for (x=0; x<nx; ++x)  {
+#pragma omp for schedule(static) \
+                reduction(+: nTrue) \
+                collapse(2)
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
+            for(int j=0; j<n_planes; j++) {
+               v[j] = bpa[j].get(x, y);
+            } // for j
 
-      for (y=0; y<ny; ++y)  {
+            bool tf = calc.run(v);
+            if (tf) nTrue++;
+            bp_out.put(tf, x, y);
 
-         for (j=0; j<n_planes; ++j)  {
+         } // for y
+      } // for x
+   } // End omp parallel
 
-            v[j] = bpa[j].get(x, y);
-
-         }   //  for j
-
-         tf = calc.run(v);
-         if (tf) ++ nTrue;
-         bp_out.put(tf, x, y);
-
-      }   //  for y
-
-   }   //  for x
-
-   mlog << Debug(1) << name << " has " << nTrue << " superobject points.  rIndex[" << rIndex << "] tIndex[" << tIndex << "]\n";
-
-   //
-   //  done
-   //
+   mlog << Debug(1) << name << " has " << nTrue << " superobject points. "
+        << " rIndex[" << rIndex << "] tIndex[" << tIndex << "]\n";
 
    return;
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void boolplane_to_pgm(const BoolPlane & in, Pgm & out)
-
-{
-
-   int x, y;
-   bool tf = false;
-   const Color white (255, 255, 255);
-   const Color black (  0,   0,   0);
-
+void boolplane_to_pgm(const BoolPlane & in, Pgm & out) {
+   const Color white(255, 255, 255);
+   const Color black(  0,   0,   0);
 
    out.set_size_xy(in.nx(), in.ny());
-
    out.all_white();
 
-   for (x=0; x<(out.nx()); ++x)  {
+#pragma omp parallel default(none) \
+   shared(out, in, black, white)
+   {
 
-      for (y=0; y<(out.ny()); ++y)  {
-
-         tf = in.get(x, y);
-
-         out.putxy ( (tf ? black : white), x, y);
-
-      }   //  for y
-
-   }   //  for s
-
-
-
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<(out.nx()); x++) {
+         for(int y=0; y<(out.ny()); y++) {
+            bool tf = in.get(x, y);
+            out.putxy((tf ? black : white), x, y);
+         } // for y
+      } // for x 
+   } // End omp parallel
 
    return;
-
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
