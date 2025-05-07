@@ -390,21 +390,9 @@ void open_nc(const Grid &grid, ConcatString run_cs) {
 
 void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
 
-   // Allocate memory to store data values for each grid point
-   vector<float> data(grid.nx()*grid.ny());
-
-   // Store the data
-   int grid_nx = grid.nx();
-   int grid_ny = grid.ny();
-   for(int x=0; x<grid_nx; x++) {
-      for(int y=0; y<grid_ny; y++) {
-         int n = DefaultTO.two_to_one(grid_nx, grid_ny, x, y);
-         data[n] = (float) dp(x, y);
-      } // end for y
-   } // end for x
-
    // Write out the data
-   if(!put_nc_data_with_dims(data_var, data.data(), grid.ny(), grid.nx())) {
+   if(!put_nc_data_with_dims(data_var, (float *) dp.data(),
+                             grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_nc_data() -> "
            << "error writing data to the output file.\n\n";
       exit(1);
@@ -412,6 +400,8 @@ void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
 
    return;
 }
+
+////////////////////////////////////////////////////////////////////////
 
 void write_nc(const DataPlane &dp, const Grid &grid,
               const VarInfo *vinfo, const char *vname) {
