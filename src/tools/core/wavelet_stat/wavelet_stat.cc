@@ -40,9 +40,9 @@
 //   015    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   016    10/03/22  Prestopnik      MET #2227 Remove using namespace netCDF from header files
 //   017    01/29/24  Halley Gotway   MET #2801 Configure time difference warnings
+//   018    05/07/25  Halley Gotway   MET #3145 Add OpenMP
 //
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <cstdio>
 #include <cstdlib>
@@ -70,13 +70,10 @@
 using namespace std;
 using namespace netCDF;
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 static const bool use_flate = true;
 static int compress_level = -1;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -775,30 +772,37 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 ////////////////////////////////////////////////////////////////////////
 
 double get_fill_value(const DataPlane &dp, int i_vx) {
-   int x, y, count;
-   double fill_val, sum;
+   double fill_val;
 
    //
    // If verifying precipitation, fill bad data points with zero.
-   // Otherwise, fill them with the mean of the valid data.
    //
    if(conf_info.fcst_info[i_vx]->is_precipitation() ||
       conf_info.obs_info[i_vx]->is_precipitation()) {
       fill_val = 0.0;
    }
+   //
+   // Otherwise, fill them with the mean of the valid data.
+   //
    else {
+      int count = 0;
+      double sum = 0.0;
+      int nxy = dp.nxy();
 
-      count = 0;
-      sum = 0.0;
-      for(x=0; x<dp.nx(); x++) {
-         for(y=0; y<dp.ny(); y++) {
+#pragma omp parallel default(none) \
+      shared(nxy, dp, sum, count)
+      {
 
-            if(is_bad_data(dp.get(x, y))) continue;
-
-            sum += dp.get(x, y);
-            count++;
-         } // end for y
-      } // end for x
+#pragma omp for schedule(static) \
+                reduction(+: sum, count)
+         for(int i=0; i<nxy; i++) {
+            double v = dp.data()[i];
+	    if(!is_bad_data(v)) {
+               sum += v;
+               count++;
+            }
+         } // end for i
+      } // End omp parallel 
 
       if(count > 0) fill_val = sum/count;
       else          fill_val = 0.0;
@@ -810,24 +814,31 @@ double get_fill_value(const DataPlane &dp, int i_vx) {
 ////////////////////////////////////////////////////////////////////////
 
 void fill_bad_data(DataPlane &dp, double fill_val) {
-   int x, y, count;
 
    //
    // Replace any bad data values with the fill value
    //
-   count = 0;
-   for(x=0; x<dp.nx(); x++) {
-      for(y=0; y<dp.ny(); y++) {
-         if(is_bad_data(dp.get(x, y))) {
-            dp.set(fill_val, x, y);
+   int count = 0;
+   int nxy = dp.nxy();
+
+#pragma omp parallel default(none) \
+   shared(nxy, dp, fill_val, count)
+   {
+
+#pragma omp for schedule(static) \
+                reduction(+: count)
+      for(int i=0; i<nxy; i++ ) {
+         double v = dp.data()[i];
+         if(is_bad_data(v)) {
+            dp.buf()[i] = fill_val;
             count++;
          }
-      } // end for y
-   } // end for x
+      } // end for i 
+   } // Emd omp parallel
 
    if(count > 0) {
-      mlog << "Replaced " << count << " bad data values out of "
-           << dp.nx()*dp.ny()
+      mlog << Debug(2) << "Replaced " << count
+           << " bad data values out of " << nxy
            << " points with fill value of "
            << fill_val << ".\n";
    }
@@ -838,30 +849,34 @@ void fill_bad_data(DataPlane &dp, double fill_val) {
 ////////////////////////////////////////////////////////////////////////
 
 void pad_field(DataPlane &dp, double pad_val) {
-   int x, y, in_x, in_y;
    DataPlane dp_pad;
 
    // Set up the DataPlane object
    dp_pad.set_size(conf_info.get_tile_dim(), conf_info.get_tile_dim());
 
-   // Fill the DataPlane object
-   for(x=0; x<dp_pad.nx(); x++) {
-      for(y=0; y<dp_pad.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(dp, pad_val, conf_info, dp_pad)
+   {
 
-         // If in the region of valid data
-         if(x >= conf_info.pad_bb.x_ll() && x < conf_info.pad_bb.x_ur() &&
-            y >= conf_info.pad_bb.y_ll() && y < conf_info.pad_bb.y_ur()) {
+      // Fill the DataPlane object
+#pragma omp for schedule(static)
+      for(int x=0; x<dp_pad.nx(); x++) {
+         for(int y=0; y<dp_pad.ny(); y++) {
 
-            in_x = nint(x - conf_info.pad_bb.x_ll());
-            in_y = nint(y - conf_info.pad_bb.y_ll());
-            dp_pad.set(dp.get(in_x, in_y), x, y);
-         }
-         // Else, in the pad
-         else {
-            dp_pad.set(pad_val, x, y);
-         }
-      } // end for y
-   } // end for x
+            // If in the region of valid data
+            if(x >= conf_info.pad_bb.x_ll() && x < conf_info.pad_bb.x_ur() &&
+               y >= conf_info.pad_bb.y_ll() && y < conf_info.pad_bb.y_ur()) {
+               int in_x = nint(x - conf_info.pad_bb.x_ll());
+               int in_y = nint(y - conf_info.pad_bb.y_ll());
+               dp_pad.set(dp.get(in_x, in_y), x, y);
+            }
+            // Else, in the pad
+            else {
+               dp_pad.set(pad_val, x, y);
+            }
+         } // end for y
+      } // end for x
+   } // End omp parallel
 
    dp = dp_pad;
 
@@ -873,7 +888,6 @@ void pad_field(DataPlane &dp, double pad_val) {
 void get_tile(const DataPlane &fcst_dp, const DataPlane &obs_dp,
               int i_vx, int i_tile,
               NumArray &f_na, NumArray &o_na) {
-   int x, y, x_ll, y_ll, x_ur, y_ur;
 
    //
    // Initialize the NumArray objects
@@ -884,10 +898,10 @@ void get_tile(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    //
    // Check the bounds to make sure this is a valid mask
    //
-   x_ll = nint(conf_info.tile_xll[i_tile]);
-   y_ll = nint(conf_info.tile_yll[i_tile]);
-   x_ur = x_ll + conf_info.get_tile_dim();
-   y_ur = y_ll + conf_info.get_tile_dim();
+   int x_ll = nint(conf_info.tile_xll[i_tile]);
+   int y_ll = nint(conf_info.tile_yll[i_tile]);
+   int x_ur = x_ll + conf_info.get_tile_dim();
+   int y_ur = y_ll + conf_info.get_tile_dim();
 
    if(x_ll < 0 || x_ll > fcst_dp.nx() ||
       y_ll < 0 || y_ll > fcst_dp.ny() ||
@@ -910,8 +924,8 @@ void get_tile(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    //
    // Store the pairs in NumArray objects
    //
-   for(y=y_ll; y<y_ur; y++) {
-      for(x=x_ll; x<x_ur; x++) {
+   for(int y=y_ll; y<y_ur; y++) {
+      for(int x=x_ll; x<x_ur; x++) {
          f_na.add(fcst_dp.get(x, y));
          o_na.add(obs_dp.get(x, y));
       } // end for x
@@ -923,30 +937,37 @@ void get_tile(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 ////////////////////////////////////////////////////////////////////////
 
 int get_tile_tot_count() {
-   int x, y, nx, ny, i, count;
 
    // Get grid dimensions
-   nx = grid.nx();
-   ny = grid.ny();
+   int nx = grid.nx();
+   int ny = grid.ny();
 
-   count = 0;
+   int count = 0;
+
+#pragma omp parallel default(none) \
+   shared(nx, ny, conf_info, count)
+   {
 
    // Check each point in the grid
-   for(x=0; x<nx; x++) {
-      for(y=0; y<ny; y++) {
+#pragma omp for schedule(static) \
+                reduction(+: count) \
+                collapse(2)
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
 
-         // Check if the point resides in a tile
-         for(i=0; i<conf_info.get_n_tile(); i++) {
+            // Check if the point resides in a tile
+            for(int i=0; i<conf_info.get_n_tile(); i++) {
 
-            // Check if the current point is inside the current tile
-            if(x >= conf_info.tile_xll[i] && x < conf_info.tile_xll[i] + conf_info.get_tile_dim() &&
-               y >= conf_info.tile_yll[i] && y < conf_info.tile_yll[i] + conf_info.get_tile_dim()) {
-               count++;
-               break;
-            }
-         } // end for i
-      } // end for y
-   } // end for x
+               // Check if the current point is inside the current tile
+               if(x >= conf_info.tile_xll[i] && x < conf_info.tile_xll[i] + conf_info.get_tile_dim() &&
+                  y >= conf_info.tile_yll[i] && y < conf_info.tile_yll[i] + conf_info.get_tile_dim()) {
+                  count++;
+                  break;
+               }
+            } // end for i
+         } // end for y
+      } // end for x
+   } // End omp parallel
 
    return count;
 }
@@ -2565,18 +2586,13 @@ void set_xy_bb() {
    //
    if(!is_eq(conf_info.pad_bb.x_ll(), 0.0) &&
       !is_eq(conf_info.pad_bb.y_ll(), 0.0)) {
-
       double x_ll = 0 - conf_info.pad_bb.x_ll();
       double y_ll = 0 - conf_info.pad_bb.y_ll();
-
-      xy_bb.set_lrbt ( x_ll, x_ll + conf_info.get_tile_dim(),
-                       y_ll, y_ll + conf_info.get_tile_dim() );
-
+      xy_bb.set_lrbt(x_ll, x_ll + conf_info.get_tile_dim(),
+                     y_ll, y_ll + conf_info.get_tile_dim());
    }
    else {
-
       xy_bb.set_lrbt(0, grid.nx(), 0, grid.ny());
-
    }
 
    return;
@@ -2585,19 +2601,8 @@ void set_xy_bb() {
 ////////////////////////////////////////////////////////////////////////
 
 void set_dim(Box &dim, double y_ll, double y_ur, double x_cen) {
-   double width;
 
-   /*
-   dim.y_ll   = y_ll;
-   dim.y_ur   = y_ur;
-   dim.height = dim.y_ur - dim.y_ll;
-   mag        = dim.height/xy_bb.height;
-   dim.width  = mag*xy_bb.width;
-   dim.x_ll   = x_cen - 0.5*dim.width;
-   dim.x_ur   = x_cen + 0.5*dim.width;
-   */
-
-   width = ( (y_ur - y_ll) / xy_bb.height() ) * xy_bb.width();
+   double width = ((y_ur - y_ll)/xy_bb.height()) * xy_bb.width();
    dim.set_lrbt(x_cen - 0.5*width, x_cen + 0.5*width, y_ll, y_ur);
 
    return;
