@@ -21,7 +21,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include <ctime>
 #include <iostream>
 #include <fstream>
@@ -46,20 +45,15 @@
 
 using namespace std;
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 static const int split_enlarge = 4;   //  used for ShapeData  shrink and expand
 
 static const bool do_split_fatten = true;
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #define  STANDARD_XY_YO_N(Nx, x, y) ((y)*(Nx) + (x))
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -74,62 +68,50 @@ static StepCase get_step_case(bool, bool, bool, bool);
 ///////////////////////////////////////////////////////////////////////////////
 
 ShapeData::ShapeData() {
-
    clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ShapeData::~ShapeData() {
-
    clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ShapeData::ShapeData(const ShapeData &f) {
-
    assign(f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ShapeData & ShapeData::operator=(const ShapeData &f) {
-
-   if ( this == &f )  return *this;
-
+   if(this == &f) return *this;
    assign(f);
-
    return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void ShapeData::clear() {
-
    data.clear();
    mom.clear();
-
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void ShapeData::assign(const ShapeData &d) {
-
    clear();
-
    data = d.data;
    mom  = d.mom;
-
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 int ShapeData::x_left(int y) const {
-
-   if((y < 0) || (y >= data.ny())) {
+   if(y < 0 || y >= data.ny()) {
       mlog << Error << "\nShapeData::x_left(int) -> "
            << "range check error\n\n";
       exit(1);
@@ -145,8 +127,7 @@ int ShapeData::x_left(int y) const {
 ////////////////////////////////////////////////////////////////////////
 
 int ShapeData::x_right(int y) const {
-
-   if((y < 0) || (y >= data.ny())) {
+   if(y < 0 || y >= data.ny()) {
       mlog << Error << "\nShapeData::x_right(int) -> "
            << "range check error\n\n";
       exit(1);
@@ -161,31 +142,22 @@ int ShapeData::x_right(int y) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool ShapeData::s_is_on(int x, int y, bool error_out) const
-
-{
+bool ShapeData::s_is_on(int x, int y, bool error_out) const {
 
    // Unless error out is true, return bad status for being off the grid
-
    if(!error_out) {
       if(x < 0 || x >= data.nx() || y < 0 || y >= data.ny()) return false;
    }
 
    // Check if the current point is non-zero
-
    return data(x, y) > 0.0;
-
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool ShapeData::f_is_on(int x, int y) const
-
-{
+bool ShapeData::f_is_on(int x, int y) const {
 
    // Check if the current point or any of of it's neighbors are non-zero
-
    if(s_is_on(x, y))                            return true;
    if((x > 0) && s_is_on(x-1, y))               return true;
    if((x > 0) && (y > 0) && s_is_on(x-1, y-1))  return true;
@@ -197,7 +169,6 @@ bool ShapeData::f_is_on(int x, int y) const
 ///////////////////////////////////////////////////////////////////////////////
 
 void ShapeData::calc_moments() {
-
    int s_area = 0;
    int f_area = 0;
    vector<double> psum(9, 0.0);
@@ -216,11 +187,8 @@ void ShapeData::calc_moments() {
                 reduction(+: s_area, f_area) \
                 reduction(vec_dbl_plus : psum)
       for(int x=0; x<data.nx(); ++x) {
-
          auto xx = ((double) x);
-
          for(int y=0; y<data.ny(); ++y) {
-
             auto yy = ((double) y);
 
             // Object area based on s_is_on() logic
@@ -265,33 +233,26 @@ void ShapeData::calc_moments() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void ShapeData::centroid(double &xbar, double &ybar) const {
-
    mom.centroid(xbar, ybar);
-
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 double ShapeData::angle_degrees() const {
-
    return mom.angle_degrees();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 double ShapeData::curvature(double &xcurv, double &ycurv) const {
-
    return mom.curvature(xcurv, ycurv);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 double ShapeData::area() const {
-
-   double x = (double) (mom.s_area);
-
-   return x;
+   return (double) mom.s_area;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -299,16 +260,17 @@ double ShapeData::area() const {
 double ShapeData::area_thresh(const ShapeData *raw_ptr,
                               const SingleThresh &obj_thresh) const {
    int cur_area = 0;
-   const int Nxy = data.nx()*data.ny();
+   const int nxy = data.nxy();
 
    // Number of points inside the object that meet the threshold criteria
 #pragma omp parallel default(none) \
-   shared(raw_ptr, obj_thresh, Nxy, data, cur_area)
+   shared(raw_ptr, obj_thresh, nxy, data, cur_area)
    {
 
 #pragma omp for schedule(static) \
                 reduction(+: cur_area)
-      for(int i=0; i<Nxy; i++) {
+
+      for(int i=0; i<nxy; i++) {
          if(data.data()[i] > 0 &&
             obj_thresh.check(raw_ptr->data.data()[i])) cur_area++;
       }
@@ -320,34 +282,30 @@ double ShapeData::area_thresh(const ShapeData *raw_ptr,
 ///////////////////////////////////////////////////////////////////////////////
 
 void ShapeData::calc_length_width(double &l, double &w) const {
-   double xx, yy;
-   double u, v, u_max, u_min, v_max, v_min;
-   double u_extent, v_extent;
-   double angle_rad, angle_deg;
-   double e1x, e1y, e2x, e2y;
+   double angle_deg = angle_degrees();
+   double angle_rad = angle_deg/deg_per_rad;
 
-   angle_deg = angle_degrees();
-   angle_rad = angle_deg/deg_per_rad;
+   double e1x = cos(angle_rad);
+   double e1y = sin(angle_rad);
 
-   e1x = cos(angle_rad);
-   e1y = sin(angle_rad);
+   double e2x = cos(angle_rad + piover2);
+   double e2y = sin(angle_rad + piover2);
 
-   e2x = cos(angle_rad + piover2);
-   e2y = sin(angle_rad + piover2);
+   double u_max = -1.0e30; 
+   double v_max = -1.0e30;
+   double u_min =  1.0e30;
+   double v_min =  1.0e30;
 
-   u_max = v_max = -1.0e30;
-   u_min = v_min =  1.0e30;
-
-   for (int x=0; x<data.nx(); ++x) {
-      for (int y=0; y<data.ny(); ++y) {
+   for(int x=0; x<data.nx(); x++) {
+      for(int y=0; y<data.ny(); y++) {
 
          if(!f_is_on(x, y)) continue;
 
-         xx = (double) x;
-         yy = (double) y;
+         double xx = (double) x;
+         double yy = (double) y;
 
-         u = dot(e1x, e1y, xx, yy);
-         v = dot(e2x, e2y, xx, yy);
+         double u = dot(e1x, e1y, xx, yy);
+         double v = dot(e2x, e2y, xx, yy);
 
          if(u > u_max) u_max = u;
          if(u < u_min) u_min = u;
@@ -357,8 +315,8 @@ void ShapeData::calc_length_width(double &l, double &w) const {
       } // for y
    } // for x
 
-   u_extent = u_max - u_min;
-   v_extent = v_max - v_min;
+   double u_extent = u_max - u_min;
+   double v_extent = v_max - v_min;
 
    if(u_extent > v_extent) { l = u_extent;  w = v_extent; }
    else                    { l = v_extent;  w = u_extent; }
@@ -369,7 +327,8 @@ void ShapeData::calc_length_width(double &l, double &w) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 double ShapeData::length() const {
-   double l, w;
+   double l;
+   double w;
 
    calc_length_width(l, w);
 
@@ -379,7 +338,8 @@ double ShapeData::length() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 double ShapeData::width() const {
-   double l, w;
+   double l;
+   double w;
 
    calc_length_width(l, w);
 
@@ -418,19 +378,18 @@ double ShapeData::complexity() const {
 
 double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
                                        bool precip_flag) const {
-
    if(perc < 0 || perc > 102) {
       mlog << Error << "\nShapeData::intensity_percentile() -> "
            << "the intensity percentile requested must be between 0 and 102.\n\n";
       exit(1);
    }
 
-   const int Nxy = data.nx()*data.ny();
+   const int nxy = data.nxy();
    vector<double> val;
-   val.reserve(Nxy);
+   val.reserve(nxy);
 
    // Compute the requested percentile of intensity
-   for(int i=0; i<Nxy; i++) {
+   for(int i=0; i<nxy; i++) {
 
       // Process points for the current object
       if(data.data()[i] > 0) {
@@ -470,7 +429,10 @@ double ShapeData::get_attr(const ConcatString &attr_name,
                            const SingleThresh &obj_thresh,
                            const Grid *grid,
                            bool precip_flag) const {
-   double v1, v2, v3, attr_val;
+   double v1;
+   double v2;
+   double v3;
+   double attr_val;
 
    if(strcasecmp(attr_name.c_str(), "CENTROID_X") == 0) {
       centroid(attr_val, v2);
@@ -649,7 +611,6 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
 ////////////////////////////////////////////////////////////////////////
 
 Polyline ShapeData::convex_hull() const {
-
    vector<IntPoint> in(2*(data.ny() + 1));
    int n_in = 0;
 
@@ -688,10 +649,6 @@ Polyline ShapeData::convex_hull() const {
    for(int j=0; j<n_out; j++) {
       hull_poly.add_point(out[j].x, out[j].y);
    }
-
-   //
-   //  done
-   //
 
    return hull_poly;
 }
@@ -855,9 +812,7 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
 ///////////////////////////////////////////////////////////////////////////////
 
 void ShapeData::zero_field() {
-
    data.set_constant(0.0);
-
    return;
 }
 
@@ -956,28 +911,43 @@ Cell::Cell(const Cell & c) {
 ///////////////////////////////////////////////////////////////////////////////
 
 Cell & Cell::operator=(const Cell & c) {
-
    if(this == &c) return *this;
-
    assign(c);
-
    return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void Cell::clear() {
-
    e.clear();
-
+   n = 0;
+   n_alloc = 0;
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void Cell::assign(const Cell & c) {
-
+   clear();
+   if(c.n == 0) return;
+   extend(c.n);
    e = c.e;
+   n = c.n;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Cell::extend(int N) {
+
+   if(n_alloc >= N) return;
+
+   N  = (N + cell_alloc_inc - 1)/cell_alloc_inc;
+   N *= cell_alloc_inc;
+
+   e.resize(N);
+
+   n_alloc = N;
 
    return;
 }
@@ -985,16 +955,19 @@ void Cell::assign(const Cell & c) {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool Cell::has(int k) const {
- 
-   return any_of(e.begin(), e.end(), [k](int j){ return j == k; });
+   for(int j=0; j<n; j++) {
+      if(e[j] == k) return true;
+   }
+   return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void Cell::add(int k) {
-
-   if(!has(k)) e.emplace_back(k);
-
+   if(has(k)) return;
+   extend(n + 1);
+   e[n] = k;
+   n++;
    return;
 }
 
@@ -1029,28 +1002,43 @@ Partition::Partition(const Partition & p) {
 ///////////////////////////////////////////////////////////////////////////////
 
 Partition & Partition::operator=(const Partition & p) {
-
    if(this == &p) return *this;
-
    assign(p);
-
    return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void Partition::clear() {
-
    c.clear();
-
+   n = 0;
+   n_alloc = 0;
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void Partition::assign(const Partition & p) {
-
+   clear();
+   if(p.c.empty()) return;
+   extend(p.n);
    c = p.c;
+   n = p.n;
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Partition::extend(int N) {
+
+   if(N <= n_alloc) return;
+
+   N  = (N + partition_alloc_inc - 1)/partition_alloc_inc;
+   N *= partition_alloc_inc;
+
+   c.resize(N);
+
+   n_alloc = N;
 
    return;
 }
@@ -1058,18 +1046,18 @@ void Partition::assign(const Partition & p) {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool Partition::has(int k) const {
-
-   return any_of(c.begin(), c.end(), [k](Cell e){ return e.has(k); });
+   for(int j=0; j<n; j++) {
+      if(c[j].has(k)) return true;
+   }
+   return false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 int Partition::which_cell(int k) const {
-
-   for(int j=0; j<c.size(); j++) {
+   for(int j=0; j<n; j++) {
       if(c[j].has(k)) return j;
    }
-
    return -1;
 }
 
@@ -1077,17 +1065,16 @@ int Partition::which_cell(int k) const {
 
 void Partition::merge_cells(int j_1, int j_2) {
 
-   if(j_1 < 0 || j_1 >= c.size() || j_2 < 0 || j_2 >= c.size()) {
+   if (j_1 < 0 || j_1 >= n || j_2 < 0 || j_2 >= n) {
       mlog << Error << "\nPartition::merge_cells() -> "
            << "range check error\n\n";
       exit(1);
    }
 
-   if( j_1 == j_2) return;
+   if(j_1 == j_2) return;
 
    int j_min;
    int j_max;
-
    if(j_1 < j_2) {
       j_min = j_1;
       j_max = j_2;
@@ -1097,14 +1084,14 @@ void Partition::merge_cells(int j_1, int j_2) {
       j_max = j_1;
    }
 
-   auto nn = (int) c[j_max].e.size();
-
+   int nn = c[j_max].n;
    for(int k=0; k<nn; k++) {
       c[j_min].add(c[j_max].e[k]);
    }
 
-   c[j_max] = c.back();
-   c.pop_back();
+   c[j_max] = c[n - 1];
+   c[n - 1].clear();
+   n--;
 
    return;
 }
@@ -1122,7 +1109,7 @@ void Partition::merge_values(int v1, int v2) {
       mlog << Error << "\nvoid Partition::merge_values() -> "
            << "bad values: (v1, v2) = (" << v1 << ", " << v2
            << "), (j1, j2) = (" << j_1 << ", " << j_2 << ")\n\n";
-      return;
+      exit(1);
    }
 
    merge_cells(j_1, j_2);
@@ -1133,16 +1120,11 @@ void Partition::merge_values(int v1, int v2) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void Partition::add(int k) {
-
    if(has(k)) return;
-
-   Cell new_c;
-   new_c.add(k);
-
-   c.emplace_back(new_c);
-
+   extend(n + 1);
+   c[n].add(k);
+   n++;
    return;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1164,9 +1146,10 @@ static double dot(double x_1, double y_1, double x_2, double y_2) {
 ///////////////////////////////////////////////////////////////////////////////
 
 static void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
-   bool lr, ur, ul, ll;
-
-   lr = ur = ul = ll = false;
+   bool lr = false;
+   bool ur = false;
+   bool ul = false;
+   bool ll = false;
 
    //
    // Based on the direction of travel turn on/off lr, ur, ul, ll cells
@@ -1296,7 +1279,6 @@ StepCase get_step_case(bool lr, bool ur, bool ul, bool ll) {
            << ur << ", " << ul << ", " << ll << ")\n\n";
       exit(1);
    }
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1348,7 +1330,7 @@ void ShapeData::threshold(SingleThresh t) {
    // Compare the threshold double value to the double values for the
    // ShapeData field
    //
-   int nxy = data.nxy();
+   const int nxy = data.nxy();
 
 #pragma omp parallel default(none) \
    shared(t, data, nxy)
@@ -1370,7 +1352,7 @@ void ShapeData::threshold(SingleThresh t) {
 
 void ShapeData::set_to_1_or_0() {
 
-   int nxy = data.nxy();
+   const int nxy = data.nxy();
 
 #pragma omp parallel default(none) \
    shared(data, nxy)
@@ -1437,7 +1419,7 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
    } // end for i
 
    // Zero out discarded shapes
-   int nxy = data.nx()*data.ny();
+   const int nxy = data.nxy();
 
 #pragma omp parallel default(none) \
    shared(keep_object, sd_split, data, nxy)
@@ -1475,7 +1457,7 @@ void ShapeData::threshold_area(SingleThresh t) {
    // Zero out any shapes with an area that doesn't meet the
    // threshold criteria
    //
-   int nxy = data.nx()*data.ny();
+   const int nxy = data.nxy();
 
 #pragma omp parallel default(none) \
    shared(t, area_object, sd_split, data, nxy)
@@ -1559,7 +1541,7 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc,
    // Zero out any shapes with an intensity that doesn't meet the
    // threshold criteria
    //
-   int nxy = data.nx()*data.ny();
+   const int nxy = data.nxy();
 
 #pragma omp parallel default(none) \
    shared(t, inten_object, sd_split, data, nxy)
@@ -1704,7 +1686,7 @@ ShapeData split(const ShapeData & wfd, int & n_shapes) {
 
          out.data.set(0, x, y);
 
-         for(int k=0; k<(p.c.size()); k++) {
+         for(int k=0; k<(p.n); k++) {
             if(p.c[k].has(nint(d.data(x, y)))) {
                out.data.set(k + 1, x, y);
             }
@@ -1714,7 +1696,7 @@ ShapeData split(const ShapeData & wfd, int & n_shapes) {
 
      ///////////////////////////////////
 
-   n_shapes = (int) p.c.size();
+   n_shapes = p.n;
 
    out.calc_moments();
 
@@ -1730,8 +1712,8 @@ ShapeData split(const ShapeData & wfd, int & n_shapes) {
 ShapeData select(const ShapeData &id, int n) {
 
    ShapeData d(id);
-   int nxy = id.data.nxy();
- 
+   const int nxy = id.data.nxy();
+
 #pragma omp parallel default(none) \
    shared(id, d, n, nxy)
    {
@@ -1753,7 +1735,7 @@ ShapeData select(const ShapeData &id, int n) {
 
 void ShapeData::filter(SingleThresh t) {
 
-   int nxy = data.nxy();
+   const int nxy = data.nxy();
 
 #pragma omp parallel default(none) \
    shared(t, data, nxy)

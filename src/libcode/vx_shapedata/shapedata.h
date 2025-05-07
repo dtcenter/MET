@@ -198,13 +198,26 @@ inline std::string ShapeData::sdebug_examine() const { return data.sdebug_examin
 
 ///////////////////////////////////////////////////////////////////////////////
 
+static const int      cell_alloc_inc = 500;
+static const int partition_alloc_inc = 500;
+
+///////////////////////////////////////////////////////////////////////////////
+
 class Cell {
 
    public:
 
+      void init_from_scratch();
+
       void assign(const Cell &);
 
+      void extend(int);
+
       std::vector<int> e;
+
+      int n;
+
+      int n_alloc;
 
    public:
 
@@ -214,6 +227,10 @@ class Cell {
       Cell & operator=(const Cell &);
 
       void clear();
+
+         //
+         //  set stuff
+         //
 
          //
          //  get stuff
@@ -238,9 +255,17 @@ class Partition {
 
    public:
 
+      void init_from_scratch();
+
       void assign(const Partition &);
 
+      void extend(int);
+
       std::vector<Cell> c;
+
+      int n;
+
+      int n_alloc;
 
    public:
 
@@ -250,6 +275,10 @@ class Partition {
       Partition & operator=(const Partition &);
 
       void clear();
+
+         //
+         //  set stuff
+         //
 
          //
          //  get stuff
