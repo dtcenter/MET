@@ -696,7 +696,9 @@ void get_shapefile_records() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_shape_str_match(const int i_shape, const StringArray &names, const StringArray &values) {
+bool is_shape_str_match(const int i_shape,
+                        const StringArray &names,
+                        const StringArray &values) {
    bool match = true;
    int i_match;
 
@@ -733,14 +735,10 @@ bool is_shape_str_match(const int i_shape, const StringArray &names, const Strin
 
 static void apply_poly_mask(DataPlane & dp) {
    int n_in = 0;
-   bool inside;
-   double lat;
-   double lon;
 
    // Check the Lat/Lon of each grid point being inside the polyline
 #pragma omp parallel default(none) \
-   shared(grid, poly_mask, complement, dp, n_in) \
-   private(lat, lon, inside)
+   shared(grid, poly_mask, complement, dp, n_in)
    {
 
 #pragma omp for schedule(static) \
@@ -750,11 +748,14 @@ static void apply_poly_mask(DataPlane & dp) {
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
 
+            double lat;
+            double lon;
+
             // Lat/Lon value for the current grid point
             grid.xy_to_latlon(x, y, lat, lon);
 
             // Check current grid point inside polyline
-            inside = poly_mask.latlon_is_inside(lat, lon);   //  returns bool
+            bool inside = poly_mask.latlon_is_inside(lat, lon);   //  returns bool
 
             // Check the complement
             if(complement) inside = !inside;
@@ -788,20 +789,20 @@ static void apply_poly_mask(DataPlane & dp) {
 
 static void apply_poly_xy_mask(DataPlane & dp) {
    int n_in = 0;
-   bool inside;
-   double x_dbl;
-   double y_dbl;
    GridClosedPoly poly_xy;
 
    // Convert MaskPoly Lat/Lon coordinates to Grid X/Y
    for(int i=0; i<poly_mask.n_points(); i++) {
+
+      double x_dbl;
+      double y_dbl;
+      
       grid.latlon_to_xy(poly_mask.lat(i), poly_mask.lon(i), x_dbl, y_dbl);
       poly_xy.add_point(x_dbl, y_dbl);
    } // end for
 
 #pragma omp parallel default(none) \
-   shared(grid, poly_xy, complement, n_in, dp) \
-   private(inside)
+   shared(grid, poly_xy, complement, n_in, dp)
    {
 
 #pragma omp for schedule(static) \
@@ -811,6 +812,8 @@ static void apply_poly_xy_mask(DataPlane & dp) {
       // Check the X/Y of each grid point being inside the polyline
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
+
+            bool inside;
 
             // Check current grid point inside polyline
             inside = (poly_xy.is_inside((double) x, (double) y) != 0);
@@ -935,10 +938,6 @@ static void apply_box_mask(DataPlane &dp) {
 
 static void apply_circle_mask(DataPlane &dp) {
    int n_in = 0;
-   double lat;
-   double lon;
-   double dist;
-   double v;
 
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
@@ -952,8 +951,7 @@ static void apply_circle_mask(DataPlane &dp) {
 
    // For each grid point, compute minumum distance to polyline points
 #pragma omp parallel default(none) \
-   shared(grid, poly_mask, complement, thresh, dp, n_in) \
-   private(lat, lon, dist, v)
+   shared(grid, poly_mask, complement, thresh, dp, n_in)
    {
 
 #pragma omp for schedule(static) \
@@ -963,17 +961,21 @@ static void apply_circle_mask(DataPlane &dp) {
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
 
+            double lat;
+            double lon;
+            
             // Lat/Lon value for the current grid point
             grid.xy_to_latlon(x, y, lat, lon);
             lon -= 360.0*floor((lon + 180.0)/360.0);
 
             // Find the minimum distance to a polyline point
-            dist = 1.0E10;
+            double dist = 1.0E10;
             for(int i=0; i<poly_mask.n_points(); i++) {
                dist = min(dist, gc_dist(lat, lon, poly_mask.lat(i), poly_mask.lon(i)));
             }
 
             // Apply threshold, if specified
+            double v;
             if(thresh.get_type() != thresh_na) {
 
                bool check = thresh.check(dist);
@@ -1028,10 +1030,6 @@ static void apply_circle_mask(DataPlane &dp) {
 
 static void apply_track_mask(DataPlane &dp) {
    int n_in = 0;
-   double lat;
-   double lon;
-   double dist;
-   double v;
 
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
@@ -1045,8 +1043,7 @@ static void apply_track_mask(DataPlane &dp) {
 
    // For each grid point, compute minumum distance to track
 #pragma omp parallel default(none) \
-   shared(grid, poly_mask, complement, thresh, dp, n_in) \
-   private(lat, lon, dist, v)
+   shared(grid, poly_mask, complement, thresh, dp, n_in)
    {
 
 #pragma omp for schedule(static) \
@@ -1055,13 +1052,17 @@ static void apply_track_mask(DataPlane &dp) {
 
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
+            
+            double lat;
+            double lon;
 
             // Lat/Lon value for the current grid point
             grid.xy_to_latlon(x, y, lat, lon);
             lon -= 360.0*floor((lon + 180.0)/360.0);
 
             // Find the minimum distance to the track
-            dist = 1.0E10;
+            double dist = 1.0E10;
+            
             for(int i=1; i<poly_mask.n_points(); i++) {
                dist = min(dist,
                           gc_dist_to_line(poly_mask.lat(i-1), poly_mask.lon(i-1),
@@ -1070,6 +1071,7 @@ static void apply_track_mask(DataPlane &dp) {
             }
 
             // Apply threshold, if specified
+            double v;
             if(thresh.get_type() != thresh_na) {
 
                bool check = thresh.check(dist);
@@ -1256,7 +1258,6 @@ static void apply_data_mask(DataPlane &dp) {
 
 static void apply_solar_mask(DataPlane &dp) {
    int n_in = 0;
-   double v;
 
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
@@ -1271,8 +1272,7 @@ static void apply_solar_mask(DataPlane &dp) {
 
    // Compute solar value for each grid point Lat/Lon
 #pragma omp parallel default(none) \
-   shared(grid, mask_type, solar_ut, thresh, complement, dp, n_in) \
-   private(v)
+   shared(grid, mask_type, solar_ut, thresh, complement, dp, n_in)
    {
 
 #pragma omp for schedule(static) \
@@ -1289,6 +1289,7 @@ static void apply_solar_mask(DataPlane &dp) {
             lon -= 360.0*floor((lon + 180.0)/360.0);
 
             // Compute the solar time in hours
+            double v;
             if(mask_type == MaskType::Solar_Time) {
                v = solar_time(solar_ut, lon);
             }
@@ -1352,7 +1353,6 @@ static void apply_solar_mask(DataPlane &dp) {
 
 static void apply_lat_lon_mask(DataPlane &dp) {
    int n_in = 0;
-   double v;
 
    // Check for no threshold
    if(thresh.get_type() == thresh_na) {
@@ -1366,8 +1366,7 @@ static void apply_lat_lon_mask(DataPlane &dp) {
 
    // Compute Lat/Lon value for each grid point
 #pragma omp parallel default(none) \
-   shared(grid, mask_type, thresh, complement, dp, n_in) \
-   private(v)
+   shared(grid, mask_type, thresh, complement, dp, n_in)
    {
 
 #pragma omp for schedule(static) \
@@ -1380,6 +1379,7 @@ static void apply_lat_lon_mask(DataPlane &dp) {
             // Lat/Lon value for the current grid point
             double lat;
             double lon;
+            double v;
             grid.xy_to_latlon(x, y, lat, lon);
             v = (mask_type == MaskType::Lat ? lat :
                  rescale_deg(-1.0*lon, -180.0, 180.0));
@@ -1502,7 +1502,6 @@ static DataPlane combine(const DataPlane &dp_data,
                          const DataPlane &dp_mask,
                          SetLogic logic) {
    int n_in = 0;
-   double v;
    DataPlane dp;
 
    // Check that the input data planes have the same dimension
@@ -1522,8 +1521,7 @@ static DataPlane combine(const DataPlane &dp_data,
 
    // Process each point
 #pragma omp parallel default(none) \
-   shared(grid, dp_data, dp_mask, dp, logic, mask_val,  n_in) \
-   private(v)
+   shared(grid, dp_data, dp_mask, dp, logic, mask_val,  n_in)
    {
 
 #pragma omp for schedule(static) \
@@ -1537,6 +1535,8 @@ static DataPlane combine(const DataPlane &dp_data,
             bool v_data = !is_eq(dp_data(x, y), 0.0);
             bool v_mask = !is_eq(dp_mask(x, y), 0.0);
 
+            double v;
+            
             switch(logic) {
 
                case SetLogic::Union:
@@ -1587,7 +1587,6 @@ static DataPlane combine(const DataPlane &dp_data,
 ////////////////////////////////////////////////////////////////////////
 
 static void write_netcdf(const DataPlane &dp) {
-   int n;
    ConcatString cs;
 
    NcFile *f_out = nullptr;
@@ -1661,8 +1660,7 @@ static void write_netcdf(const DataPlane &dp) {
 
    // Loop through each grid point
 #pragma omp parallel default(none) \
-   shared(grid, DefaultTO, mask_data, dp) \
-   private(n)
+   shared(grid, DefaultTO, mask_data, dp)
    {
 
 #pragma omp for schedule(static) \
@@ -1670,7 +1668,7 @@ static void write_netcdf(const DataPlane &dp) {
 
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
-            n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+            int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
             mask_data[n] = (float) dp(x, y);
          } // end for y
       } // end for x

@@ -575,7 +575,6 @@ void do_sum_command() {
 void sum_data_files(Grid & grid, DataPlane & plane) {
    int n_vld = 0;
    DataPlane part;
-   double v_sum, v_part;
    Grid cur_grid;
    vector<unixtime> pcp_times;
    vector<int> pcp_recs;
@@ -701,8 +700,7 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
          // data values.
          //
 #pragma omp parallel default(none) \
-   shared(grid, plane, part) \
-   private(v_sum, v_part)
+   shared(grid, plane, part)
          {
            
 #pragma omp for schedule(static) \
@@ -710,6 +708,9 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
            
             for(int x=0; x<grid.nx(); x++) {
                for(int y=0; y<grid.ny(); y++) {
+
+                  double v_sum;
+                  double v_part;                 
 
                   v_sum = plane(x, y);
 
@@ -846,8 +847,11 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
 ////////////////////////////////////////////////////////////////////////
 
 void do_sub_command() {
-   DataPlane plus, minus, diff;
-   Grid grid1, grid2;
+   DataPlane plus;
+   DataPlane minus;
+   DataPlane diff;
+   Grid grid1;
+   Grid grid2;
 
    //
    // Check for exactly two input files.
@@ -970,9 +974,15 @@ void do_sub_command() {
 ////////////////////////////////////////////////////////////////////////
 
 void do_derive_command() {
-   Grid grid, cur_grid;
-   DataPlane cur_dp, der_dp;
-   DataPlane min_dp, max_dp, sum_dp, sum_sq_dp, vld_dp;
+   Grid grid;
+   Grid cur_grid;
+   DataPlane cur_dp;
+   DataPlane der_dp;
+   DataPlane min_dp;
+   DataPlane max_dp;
+   DataPlane sum_dp;
+   DataPlane sum_sq_dp;
+   DataPlane vld_dp;
    MaskPlane mask;
    unixtime nc_init_time = (unixtime) 0;
    unixtime nc_valid_time = (unixtime) 0;
@@ -982,7 +992,7 @@ void do_derive_command() {
    int nxy = 0;
    ConcatString derive_list_css;
    double v;
-
+   
    //
    // List of all requested field derivations.
    //
@@ -1234,7 +1244,7 @@ void do_derive_command() {
          der_dp = sum_dp;
 
 #pragma omp parallel default(none) \
-   shared(nxy, sum_dp, sum_sq_dp, vld_dp, bad_data_double, der_dp)        \
+   shared(nxy, sum_dp, sum_sq_dp, vld_dp, bad_data_double, der_dp) \
    private(v)
          {
 
@@ -1270,9 +1280,13 @@ void do_derive_command() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_field(const char *filename, const char *cur_field,
-               const unixtime get_init_ut, const unixtime get_valid_ut,
-               Grid & grid, DataPlane & plane, bool error_out) {
+bool get_field(const char *filename,
+               const char *cur_field,
+               const unixtime get_init_ut,
+               const unixtime get_valid_ut,
+               Grid & grid,
+               DataPlane & plane,
+               bool error_out) {
    Met2dDataFileFactory factory;
    Met2dDataFile *mtddf = nullptr;
    GrdFileType ftype;
@@ -1460,8 +1474,11 @@ void open_nc(const Grid &grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
-                   const DataPlane &cur_dp, const char *derive_str,
+void write_nc_data(unixtime nc_init,
+                   unixtime nc_valid,
+                   int nc_accum,
+                   const DataPlane &cur_dp,
+                   const char *derive_str,
                    const char *long_name_prefix) {
    ConcatString var_str, cs;
    StringArray sa;
