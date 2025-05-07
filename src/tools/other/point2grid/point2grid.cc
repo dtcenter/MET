@@ -1466,12 +1466,12 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
          prob_dp.set_init(to_dp.init());
          prob_dp.set_valid(to_dp.valid());
          prob_dp.set_constant(0);
-	 int nxy = to_dp.nxy();
+         int nxy = to_dp.nxy();
 
 #pragma omp parallel default(none) \
          shared(nxy, to_dp, prob_dp) \
-	 shared(has_prob_thresh, prob_cat_thresh, do_gaussian_filter)
-	 {
+         shared(has_prob_thresh, prob_cat_thresh, do_gaussian_filter)
+         {
 
 #pragma omp for schedule(static)
             for(int i=0; i<nxy; i++) {
@@ -1486,7 +1486,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
 
          if(do_gaussian_filter) {
             interp_gaussian_dp(prob_dp, RGInfo.gaussian, RGInfo.vld_thresh);
-	 }
+         }
 
          // Write the probability data
          write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
@@ -1869,12 +1869,12 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          prob_dp.set_init(to_dp.init());
          prob_dp.set_valid(to_dp.valid());
          prob_dp.set_constant(0);
-	 int nxy = to_dp.nxy();
+         int nxy = to_dp.nxy();
 
 #pragma omp parallel default(none) \
          shared(nxy, to_dp, prob_dp) \
-	 shared(has_prob_thresh, prob_cat_thresh, do_gaussian_filter)
-	 {
+         shared(has_prob_thresh, prob_cat_thresh, do_gaussian_filter)
+         {
 
 #pragma omp for schedule(static)
             for(int i=0; i<nxy; i++) {

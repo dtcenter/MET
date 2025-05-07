@@ -1977,7 +1977,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
             //
             // Get raw values and object ID's for each grid box
             // Extra nullptr checks to satisfy Fortify
-	    //
+            //
 
             if ( info.do_raw ) {
                fcst_raw_data[n] = (float) engine.fcst_raw->data (x, y);

@@ -797,7 +797,7 @@ double get_fill_value(const DataPlane &dp, int i_vx) {
                 reduction(+: sum, count)
          for(int i=0; i<nxy; i++) {
             double v = dp.data()[i];
-	    if(!is_bad_data(v)) {
+            if(!is_bad_data(v)) {
                sum += v;
                count++;
             }
@@ -959,8 +959,10 @@ int get_tile_tot_count() {
             for(int i=0; i<conf_info.get_n_tile(); i++) {
 
                // Check if the current point is inside the current tile
-               if(x >= conf_info.tile_xll[i] && x < conf_info.tile_xll[i] + conf_info.get_tile_dim() &&
-                  y >= conf_info.tile_yll[i] && y < conf_info.tile_yll[i] + conf_info.get_tile_dim()) {
+               if(x >= conf_info.tile_xll[i] &&
+                  x < conf_info.tile_xll[i] + conf_info.get_tile_dim() &&
+                  y >= conf_info.tile_yll[i] &&
+                  y < conf_info.tile_yll[i] + conf_info.get_tile_dim()) {
                   count++;
                   break;
                }
