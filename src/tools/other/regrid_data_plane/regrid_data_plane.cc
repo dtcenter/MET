@@ -404,7 +404,7 @@ void write_nc(const DataPlane &dp, const Grid &grid,
    write_netcdf_var_times(&data_var, dp);
 
    // Write out the data
-   if(!put_nc_data_plane_float(data_var, dp)) {
+   if(!put_nc_data_plane_float(&data_var, dp)) {
       mlog << Error << "\nwrite_nc() -> "
            << "error writing data to the output file.\n\n";
       exit(1);
