@@ -19,7 +19,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -183,13 +182,11 @@ void Node::add_child(const Polyline * poly) {
 ///////////////////////////////////////////////////////////////////////////////
 
 int Node::n_children() const {
-   int count;
-   Node *n_ptr = (Node *) nullptr;
 
-   count = 0;
+   int count = 0;
 
    // Search through all children
-   n_ptr = child;
+   Node *n_ptr = child;
 
    while(n_ptr) {
       count++;
@@ -207,10 +204,10 @@ int Node::n_children() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 Node *Node::get_child(int n) const {
-   int children_count, i;
-   Node *n_ptr = (Node *) nullptr;
 
-   if( n >= (children_count = n_children()) ) {
+   int children_count = n_children();
+
+   if( n >= children_count ) {
 
       mlog << Error << "\nNode::get_child(int) -> "
            << "attempting to access child number " << n << " when only "
@@ -219,9 +216,9 @@ Node *Node::get_child(int n) const {
       exit(1);
    }
 
-   n_ptr = child;
+   Node *n_ptr = child;
 
-   for(i=0; i<n; i++) n_ptr = n_ptr->sibling;
+   for(int i=0; i<n; i++) n_ptr = n_ptr->sibling;
 
    return n_ptr;
 }
@@ -229,14 +226,12 @@ Node *Node::get_child(int n) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 int Node::is_closed() const {
-   int closed;
-   Node *n_ptr = (Node *) nullptr;
 
    // Check if the current polyline is closed
-   closed = p.is_closed();
+   int closed = p.is_closed();
 
    // Search through all descendants
-   n_ptr = child;
+   Node *n_ptr = child;
 
    while(n_ptr) {
       closed *= n_ptr->is_closed();
@@ -250,16 +245,16 @@ int Node::is_closed() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void Node::centroid(double &ubar, double &vbar) const {
-   double sa, sum_x, sum_y;
 
-   sum_x = sum_y = 0.0;
+   double sum_x = 0.0;
+   double sum_y = 0.0;
 
    sum_first_moments(sum_x, sum_y);
 
    sum_x /= 6.0;
    sum_y /= 6.0;
 
-   sa = uv_signed_area();
+   double sa = uv_signed_area();
 
    ubar = sum_x/sa;
    vbar = sum_y/sa;
@@ -270,13 +265,12 @@ void Node::centroid(double &ubar, double &vbar) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void Node::translate(double du, double dv) {
-   Node *n_ptr = (Node *) nullptr;
 
    // Translate each point of the current polyline
    p.translate(du, dv);
 
    // Apply translation to all descendants
-   n_ptr = child;
+   Node *n_ptr = child;
 
    while(n_ptr) {
       n_ptr->translate(du, dv);
@@ -290,7 +284,6 @@ void Node::translate(double du, double dv) {
 ///////////////////////////////////////////////////////////////////////////////
 
 double Node::angle() const {
-   double a, sa, Ixx, Ixy, Iyy, x_bar, y_bar;
 
    if(p.n_points < 3 && n_children() == 0) {
 
@@ -300,27 +293,25 @@ double Node::angle() const {
       exit(1);
    }
 
-   if(p.n_points == 0) {
+   double x_bar = 0.0;
+   double y_bar = 0.0;
 
-      x_bar = y_bar = 0.0;
-   }
-   else {
+   // Get the centroid of the current polyline
+   if(p.n_points > 0) p.centroid(x_bar, y_bar);
 
-      // Get the centroid of the current polyline
-      p.centroid(x_bar, y_bar);
-   }
-
-   Ixx = Ixy = Iyy = 0.0;
+   double Ixx = 0.0;
+   double Ixy = 0.0;
+   double Iyy = 0.0;
 
    sum_second_moments(x_bar, y_bar, Ixx, Ixy, Iyy);
 
-   sa = uv_signed_area();
+   double sa = uv_signed_area();
 
    Ixx /= 12.0*sa;
    Iyy /= 12.0*sa;
    Ixy /= 24.0*sa;
 
-   a = 0.5*deg_per_rad*atan2( 2.0*Ixy, Ixx - Iyy );
+   double a = 0.5*deg_per_rad*atan2( 2.0*Ixy, Ixx - Iyy );
 
    return a;
 }
@@ -328,7 +319,8 @@ double Node::angle() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void Node::rotate(double deg) {
-   double ubar, vbar;
+   double ubar;
+   double vbar;
 
    centroid(ubar, vbar);
 
@@ -340,12 +332,11 @@ void Node::rotate(double deg) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void Node::rotate(double deg, double ubar, double vbar) {
-   Node *n_ptr = (Node *) nullptr;
 
    p.rotate(deg, ubar, vbar);
 
    // Calculate area for all descendants
-   n_ptr = child;
+   Node *n_ptr = child;
 
    while(n_ptr) {
       n_ptr->rotate(deg, ubar, vbar);
@@ -359,13 +350,11 @@ void Node::rotate(double deg, double ubar, double vbar) {
 ///////////////////////////////////////////////////////////////////////////////
 
 double Node::uv_signed_area() const {
-   double sum;
-   Node *n_ptr = (Node *) nullptr;
 
-   sum = p.uv_signed_area();
+   double sum = p.uv_signed_area();
 
    // Calculate area for all descendants
-   n_ptr = child;
+   Node *n_ptr = child;
 
    while(n_ptr) {
       sum += n_ptr->uv_signed_area();
@@ -379,8 +368,8 @@ double Node::uv_signed_area() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 int Node::is_inside(double u_test, double v_test) const {
-   int count;
-   Node *n_ptr = (Node *) nullptr;
+
+   int count = 0;
 
    if(p.is_inside(u_test, v_test)) {
 
@@ -391,12 +380,9 @@ int Node::is_inside(double u_test, double v_test) const {
          count = -1;
       }
    }
-   else {
-      count = 0;
-   }
 
    // Apply is_inside function for all descendants
-   n_ptr = child;
+   Node *n_ptr = child;
 
    while(n_ptr) {
 
@@ -411,13 +397,11 @@ int Node::is_inside(double u_test, double v_test) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 int Node::is_polyline_point(double u_test, double v_test) const {
-   int poly_point;
-   Node *n_ptr = (Node *) nullptr;
 
-   poly_point = p.is_polyline_point(u_test, v_test);
+   int poly_point = p.is_polyline_point(u_test, v_test);
 
    // Check if it's contained in the Polyline of descendants
-   n_ptr = child;
+   Node *n_ptr = child;
 
    while(n_ptr) {
 
@@ -432,12 +416,11 @@ int Node::is_polyline_point(double u_test, double v_test) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 void Node::bounding_box(Box &bb) const {
-   Node *n_ptr = (Node *) nullptr;
 
    p.bounding_box(bb);
 
    // Search for min and max for all descendents
-   n_ptr = child;
+   Node *n_ptr = child;
 
    while(n_ptr) {
 
@@ -446,22 +429,17 @@ void Node::bounding_box(Box &bb) const {
       n_ptr = n_ptr->sibling;
    }
 
-   // Calculate width and height
-   // bb.width = bb.x_ur - bb.x_ll;
-   // bb.height = bb.y_ur - bb.y_ll;
-
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void Node::sum_first_moments(double &sum_x, double &sum_y) const {
-   Node *n_ptr = (Node *) nullptr;
 
    p.sum_first_moments(sum_x, sum_y);
 
    // Sum the first moments for all descendants
-   n_ptr = child;
+   Node *n_ptr = child;
 
    while(n_ptr) {
       n_ptr->sum_first_moments(sum_x, sum_y);
@@ -476,12 +454,11 @@ void Node::sum_first_moments(double &sum_x, double &sum_y) const {
 
 void Node::sum_second_moments(double x_bar, double y_bar,
                               double &Ixx, double &Ixy, double &Iyy) const {
-   Node *n_ptr = (Node *) nullptr;
 
    p.sum_second_moments(x_bar, y_bar, Ixx, Ixy, Iyy);
 
    // Sum the second moments for all descendants
-   n_ptr = child;
+   Node *n_ptr = child;
 
    while(n_ptr) {
       n_ptr->sum_second_moments(x_bar, y_bar, Ixx, Ixy, Iyy);
@@ -499,13 +476,9 @@ void Node::sum_second_moments(double x_bar, double y_bar,
 ///////////////////////////////////////////////////////////////////////////////
 
 double node_dist(const Node &a, const Node &b) {
-   double min_dist, dist;
-   int i_a, i_b, num_a, num_b;
-   Node *a_ptr = (Node *) nullptr;
-   Node *b_ptr = (Node *) nullptr;
 
-   num_a = a.n_children();
-   num_b = b.n_children();
+   int num_a = a.n_children();
+   int num_b = b.n_children();
 
    if(num_a == 0 || num_b == 0) {
       mlog << Error << "\ndouble node_dist(Node &, Node &) -> "
@@ -514,23 +487,30 @@ double node_dist(const Node &a, const Node &b) {
       exit(1);
    }
 
-   min_dist = -1.0;
+   double min_dist = -1.0;
 
-   for(i_a=0; i_a<num_a; i_a++) {
+#pragma omp parallel default(none) \
+   shared(a, b, num_a, num_b, min_dist)
+   {
 
-      a_ptr = a.get_child(i_a);
+#pragma omp for schedule(static) \
+                reduction(min: min_dist)
+      for(int i_a=0; i_a<num_a; i_a++) {
 
-      for(i_b=0; i_b<num_b; i_b++) {
+         const Node *a_ptr = a.get_child(i_a);
 
-         b_ptr = b.get_child(i_b);
+         for(int i_b=0; i_b<num_b; i_b++) {
 
-         dist = polyline_dist(a_ptr->p, b_ptr->p);
+            const Node *b_ptr = b.get_child(i_b);
 
-         if(is_eq(min_dist, -1.0)) min_dist = dist;
-         else if(dist < min_dist)  min_dist = dist;
+            double dist = polyline_dist(a_ptr->p, b_ptr->p);
 
-      } // end for i_b
-   } // end for i_a
+            if(is_eq(min_dist, -1.0)) min_dist = dist;
+            else if(dist < min_dist)  min_dist = dist;
+
+         } // end for i_b
+      } // end for i_a
+   } // End omp parallel
 
    return min_dist;
 }
@@ -538,11 +518,8 @@ double node_dist(const Node &a, const Node &b) {
 ///////////////////////////////////////////////////////////////////////////////
 
 double node_polyline_dist(const Node &a, const Polyline &b) {
-   double min_dist, dist;
-   int i_a, num_a;
-   Node *a_ptr = (Node *) nullptr;
 
-   num_a = a.n_children();
+   int num_a = a.n_children();
 
    if(num_a == 0) {
       mlog << Error << "\ndouble node_polyline_dist(Node &, Node &) -> "
@@ -551,18 +528,25 @@ double node_polyline_dist(const Node &a, const Polyline &b) {
       exit(1);
    }
 
-   min_dist = -1.0;
+   double min_dist = -1.0;
 
-   for(i_a=0; i_a<num_a; i_a++) {
+#pragma omp parallel default(none) \
+   shared(a, b, num_a, min_dist)
+   {
 
-      a_ptr = a.get_child(i_a);
+#pragma omp for schedule(static) \
+                reduction(min: min_dist)
+      for(int i_a=0; i_a<num_a; i_a++) {
 
-      dist = polyline_dist(a_ptr->p, b);
+         const Node *a_ptr = a.get_child(i_a);
 
-      if(is_eq(min_dist, -1.0)) min_dist = dist;
-      else if(dist < min_dist)  min_dist = dist;
+         double dist = polyline_dist(a_ptr->p, b);
 
-   } // end for i_a
+         if(is_eq(min_dist, -1.0)) min_dist = dist;
+         else if(dist < min_dist)  min_dist = dist;
+
+      } // end for i_a
+   } // End omp parallel
 
    return min_dist;
 }
