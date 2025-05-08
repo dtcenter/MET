@@ -1280,13 +1280,13 @@ void do_derive_command() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_field(const char *filename,
-               const char *cur_field,
-               const unixtime get_init_ut,
-               const unixtime get_valid_ut,
-               Grid & grid,
-               DataPlane & plane,
-               bool error_out) {
+static bool get_field(const char *filename,
+                      const char *cur_field,
+                      const unixtime get_init_ut,
+                      const unixtime get_valid_ut,
+                      Grid & grid,
+                      DataPlane & plane,
+                      bool error_out) {
    Met2dDataFileFactory factory;
    Met2dDataFile *mtddf = nullptr;
    GrdFileType ftype;
@@ -1474,12 +1474,12 @@ void open_nc(const Grid &grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_data(unixtime nc_init,
-                   unixtime nc_valid,
-                   int nc_accum,
-                   const DataPlane &cur_dp,
-                   const char *derive_str,
-                   const char *long_name_prefix) {
+static void write_nc_data(unixtime nc_init,
+                          unixtime nc_valid,
+                          int nc_accum,
+                          const DataPlane &cur_dp,
+                          const char *derive_str,
+                          const char *long_name_prefix) {
    ConcatString var_str, cs;
    StringArray sa;
    NcVar nc_var;

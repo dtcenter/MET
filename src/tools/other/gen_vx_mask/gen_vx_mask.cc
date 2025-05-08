@@ -696,9 +696,9 @@ void get_shapefile_records() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_shape_str_match(const int i_shape,
-                        const StringArray &names,
-                        const StringArray &values) {
+static bool is_shape_str_match(const int i_shape,
+                               const StringArray &names,
+                               const StringArray &values) {
    bool match = true;
    int i_match;
 
