@@ -17,7 +17,7 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 //
-//  assumes all the input BoolPlanes (and the output BoolPlane) are the same size
+// Assumes all the input BoolPlanes (and the output BoolPlane) are the same size
 //
 
 void combine_boolplanes(const string &name,
@@ -27,30 +27,22 @@ void combine_boolplanes(const string &name,
                         BoolPlane & bp_out) {
    const int nx = bp_out.nx();
    const int ny = bp_out.ny();
-   vector<bool> v(n_planes);
-   double nTotal = (double)(nx*ny);
    double nTrue = 0.0;
 
-#pragma omp parallel default(none) \
-   shared(nx, ny, n_planes, v, bpa, calc, nTrue, bp_out)
-   {
+   // Do not parallelize since BoolCalc segfaults
+   for(int x=0; x<nx; x++) {
+      for(int y=0; y<ny; y++) {
+         vector<bool> v(n_planes);
+         for(int j=0; j<n_planes; j++) {
+            v[j] = bpa[j].get(x, y);
+         } // for j
 
-#pragma omp for schedule(static) \
-                reduction(+: nTrue) \
-                collapse(2)
-      for(int x=0; x<nx; x++) {
-         for(int y=0; y<ny; y++) {
-            for(int j=0; j<n_planes; j++) {
-               v[j] = bpa[j].get(x, y);
-            } // for j
+         bool tf = calc.run(v);
+         if(tf) nTrue++;
+         bp_out.put(tf, x, y);
 
-            bool tf = calc.run(v);
-            if (tf) nTrue++;
-            bp_out.put(tf, x, y);
-
-         } // for y
-      } // for x
-   } // End omp parallel
+      } // for y
+   } // for x
 
    mlog << Debug(1) << name << " has " << nTrue << " superobject points. "
         << " rIndex[" << rIndex << "] tIndex[" << tIndex << "]\n";
