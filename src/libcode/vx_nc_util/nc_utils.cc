@@ -2209,6 +2209,28 @@ bool put_nc_data_with_dims(NcVar *var, const double *data,
 
 ////////////////////////////////////////////////////////////////////////
 
+bool put_nc_data_plane_int(NcVar *var, const DataPlane &dp) {
+ 
+   // Copy the data to int
+   vector<int> v(dp.const_buf().size());
+   copy(dp.const_buf().begin(), dp.const_buf().end(), v.begin());
+
+   return put_nc_data_with_dims(var, v.data(), dp.ny(), dp.nx());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool put_nc_data_plane_float(NcVar *var, const DataPlane &dp) {
+
+   // Copy the data to float
+   vector<float> v(dp.const_buf().size());
+   copy(dp.const_buf().begin(), dp.const_buf().end(), v.begin());
+
+   return put_nc_data_with_dims(var, v.data(), dp.ny(), dp.nx());
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool args_ok(const LongArray & a) {
    int k;
 

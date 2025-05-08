@@ -2515,9 +2515,7 @@ void write_nc(GenCTCInfo &gci) {
       add_att(&nc_var, "valid_end", unix_to_yyyymmdd_hhmmss(valid_end));
 
       // Write out the data
-      if(!put_nc_data_with_dims(&nc_var,
-            (const float *) gci.DpMap[(ncout_str[i])].data(),
-            gci.NcOutGrid->ny(), gci.NcOutGrid->nx())) {
+      if(!put_nc_data_plane_float(&nc_var, gci.DpMap[(ncout_str[i])])) {
          mlog << Error << "\nwrite_nc() -> "
               << "error writing NetCDF variable name " << var_name
               << "\n\n";

@@ -346,8 +346,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    add_att(&data_var, "smoothing_shape", gtf.enum2String(Shape));
 
    // Write out the data
-   if(!put_nc_data_with_dims(&data_var, (const float *) dp.data(),
-                             grid.ny(), grid.nx())) {
+   if(!put_nc_data_plane_float(&data_var, dp)) {
       mlog << Error << "\nwrite_nc() -> "
            << "error writing data to the output file.\n\n";
       exit(1);

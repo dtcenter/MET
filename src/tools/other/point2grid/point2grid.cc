@@ -1678,36 +1678,6 @@ static void open_nc(const Grid &grid, ConcatString run_cs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
-
-   // Write out the data
-   if(!put_nc_data_with_dims(data_var, (const float *) dp.data(),
-                             grid.ny(), grid.nx())) {
-      mlog << Error << "\nwrite_nc_data() -> "
-           << "error writing data to the output file.\n\n";
-      exit(1);
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void write_nc_data_int(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
-
-   // Write out the data
-   if(!put_nc_data_with_dims(data_var, (const int *) dp.data(),
-                             grid.ny(), grid.nx())) {
-      mlog << Error << "\nwrite_nc_data_int() -> "
-           << "error writing data to the output file.\n\n";
-      exit(1);
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 static void write_nc(const DataPlane &dp, const Grid &grid,
                      const VarInfo *vinfo, const char *vname,
                      bool add_gaussian_atts,
@@ -1749,8 +1719,12 @@ static void write_nc(const DataPlane &dp, const Grid &grid,
       add_att(&data_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
    }
 
-   // Write the output data 
-   write_nc_data(dp, grid, &data_var);
+   // Write out the data
+   if(!put_nc_data_plane_float(&data_var, dp)) {
+      mlog << Error << "\nwrite_nc() -> "
+           << "error writing data to the output file.\n\n";
+      exit(1);
+   }
 
    return;
 }
@@ -1772,7 +1746,12 @@ static void write_nc_int(const DataPlane &dp, const Grid &grid,
    add_att(&data_var, "_FillValue", bad_data_int);
    write_netcdf_var_times(&data_var, dp);
 
-   write_nc_data_int(dp, grid, &data_var);
+   // Write out the data
+   if(!put_nc_data_plane_int(&data_var, dp)) {
+      mlog << Error << "\nwrite_nc_int() -> "
+           << "error writing data to the output file.\n\n";
+      exit(1);
+   }
 
    return;
 }
