@@ -191,7 +191,7 @@ static void close_nc();
 static ConcatString parse_config_str(const char *);
 static bool is_timestring(const char *);
 
-static void usage();
+[[noreturn]] static void usage();
 static void set_sum(const StringArray &);
 static void set_add(const StringArray &);
 static void set_subtract(const StringArray &);
@@ -253,13 +253,13 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return "pcp_combine";
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+static void process_command_line(int argc, char **argv) {
    CommandLine cline;
 
    //
@@ -352,7 +352,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_sum_args(const CommandLine & cline) {
+static void process_sum_args(const CommandLine & cline) {
 
    //
    // Check for enough command line arguments:
@@ -416,7 +416,7 @@ void process_sum_args(const CommandLine & cline) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_add_sub_derive_args(const CommandLine & cline) {
+static void process_add_sub_derive_args(const CommandLine & cline) {
 
    //
    // Check for enough command line arguments
@@ -491,7 +491,7 @@ void process_add_sub_derive_args(const CommandLine & cline) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_sum_command() {
+static void do_sum_command() {
    DataPlane plane;
    Grid grid;
    ConcatString init_time_str;
@@ -499,7 +499,7 @@ void do_sum_command() {
    //
    // Compute the lead time.
    //
-   int lead_time = (int) (valid_time - init_time);
+   auto lead_time = (int) (valid_time - init_time);
 
    //
    // Build init time string.
@@ -572,7 +572,7 @@ void do_sum_command() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void sum_data_files(Grid & grid, DataPlane & plane) {
+static void sum_data_files(Grid & grid, DataPlane & plane) {
    int n_vld = 0;
    DataPlane part;
    Grid cur_grid;
@@ -735,9 +735,9 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
+static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
                    ConcatString & cur_file) {
-   struct dirent *dirp = (struct dirent *) nullptr;
+   auto *dirp = (struct dirent *) nullptr;
    DIR *dp = (DIR *) nullptr;
 
    //
@@ -846,7 +846,7 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_sub_command() {
+static void do_sub_command() {
    DataPlane plus;
    DataPlane minus;
    DataPlane diff;
@@ -973,7 +973,7 @@ void do_sub_command() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_derive_command() {
+static void do_derive_command() {
    Grid grid;
    Grid cur_grid;
    DataPlane cur_dp;
@@ -984,8 +984,8 @@ void do_derive_command() {
    DataPlane sum_sq_dp;
    DataPlane vld_dp;
    MaskPlane mask;
-   unixtime nc_init_time = (unixtime) 0;
-   unixtime nc_valid_time = (unixtime) 0;
+   auto nc_init_time = (unixtime) 0;
+   auto nc_valid_time = (unixtime) 0;
    int nc_accum = 0;
    int nc_accum_sum = 0;
    int n_vld = 0;
@@ -1419,7 +1419,7 @@ static bool get_field(const char *filename,
 
 ////////////////////////////////////////////////////////////////////////
 
-void open_nc(const Grid &grid) {
+static void open_nc(const Grid &grid) {
    ConcatString command_str;
 
    // List the output file.
@@ -1480,7 +1480,8 @@ static void write_nc_data(unixtime nc_init,
                           const DataPlane &cur_dp,
                           const char *derive_str,
                           const char *long_name_prefix) {
-   ConcatString var_str, cs;
+   ConcatString var_str;
+   ConcatString cs;
    StringArray sa;
    NcVar nc_var;
 
@@ -1608,7 +1609,7 @@ static void write_nc_data(unixtime nc_init,
 
 ////////////////////////////////////////////////////////////////////////
 
-void close_nc() {
+static void close_nc() {
 
    //
    // List the output file.
@@ -1627,11 +1628,11 @@ void close_nc() {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString parse_config_str(const char *s) {
+static ConcatString parse_config_str(const char *s) {
    ConcatString config_str;
 
    if(is_timestring(s)) {
-      config_str.format("name=\"APCP\"; level=\"A%s\";", s);
+      config_str.format(R"(name="APCP"; level="A%s";)", s);
    }
    else {
       config_str = s;
@@ -1642,7 +1643,7 @@ ConcatString parse_config_str(const char *s) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_timestring(const char * text) {
+static bool is_timestring(const char * text) {
 
    if(is_hh(text))     return true;
    if(is_hhmmss(text)) return true;
@@ -1652,7 +1653,7 @@ bool is_timestring(const char * text) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+[[noreturn]] static void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -1777,7 +1778,7 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_sum(const StringArray &) {
+static void set_sum(const StringArray &) {
    run_command = RunCommand::sum;
    derive_list.clear();
    derive_list.add("sum");
@@ -1785,7 +1786,7 @@ void set_sum(const StringArray &) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_add(const StringArray &) {
+static void set_add(const StringArray &) {
    run_command = RunCommand::add;
    derive_list.clear();
    derive_list.add("sum");
@@ -1793,7 +1794,7 @@ void set_add(const StringArray &) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_subtract(const StringArray &) {
+static void set_subtract(const StringArray &) {
    run_command = RunCommand::sub;
    derive_list.clear();
    derive_list.add("diff");
@@ -1801,7 +1802,7 @@ void set_subtract(const StringArray &) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_derive(const StringArray & a) {
+static void set_derive(const StringArray & a) {
    run_command = RunCommand::der;
    derive_list.clear();
 
@@ -1824,32 +1825,32 @@ void set_derive(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_pcpdir(const StringArray & a) {
+static void set_pcpdir(const StringArray & a) {
    pcp_dir.add(a);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_pcprx(const StringArray & a) {
+static void set_pcprx(const StringArray & a) {
    pcp_reg_exp = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_field(const StringArray & a) {
+static void set_field(const StringArray & a) {
    req_field_list.add(a[0]);
    field_option_used = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_name(const StringArray & a) {
+static void set_name(const StringArray & a) {
    req_out_var_name.add_css(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_input_thresh(const StringArray & a) {
+static void set_input_thresh(const StringArray & a) {
    input_thresh = atof(a[0].c_str());
    if(input_thresh > 1 || input_thresh < 0) {
       mlog << Error << "\nset_input_thresh() -> "
@@ -1861,7 +1862,7 @@ void set_input_thresh(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_vld_thresh(const StringArray & a) {
+static void set_vld_thresh(const StringArray & a) {
    vld_thresh = atof(a[0].c_str());
    if(vld_thresh > 1 || vld_thresh < 0) {
       mlog << Error << "\nset_vld_thresh() -> "
@@ -1873,7 +1874,7 @@ void set_vld_thresh(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+static void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
 

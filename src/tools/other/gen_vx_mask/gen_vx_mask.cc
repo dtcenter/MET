@@ -361,10 +361,10 @@ static void process_mask_file(DataPlane &dp) {
    if(is_solar_masktype(mask_type) && solar_ut == (unixtime) 0) {
 
       if(mask_field_str.empty()) {
-         mlog << Error << "\nprocess_mask_file() -> "
-              << "use \"-mask_field\" to specify the data whose valid "
-              << "time should be used for \"solar_alt\", \"solar_azi\", "
-              << "and \"solar_time\" masking.\n\n";
+         mlog << Error << R"(process_mask_file() -> )"
+              << R"(use "-mask_field" to specify the data whose valid )"
+              << R"(time should be used for "solar_alt", "solar_azi", )"
+              << R"(and "solar_time" masking.)";
          exit(1);
       }
       solar_ut = dp.valid();
@@ -633,7 +633,7 @@ static void get_shapefile_strings() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_shapefile_records() {
+static void get_shapefile_records() {
    const char * const shape_filename = mask_filename.c_str();
    ShpFile f;
    ShpPolyRecord pr;
@@ -703,8 +703,7 @@ static bool is_shape_str_match(const int i_shape,
    int i_match;
 
    // Check each map entry
-   map<string,StringArray>::const_iterator it;
-   for(it  = shape_str_map.begin();
+   for(map<string,StringArray>::const_iterator it = shape_str_map.begin();
        it != shape_str_map.end(); it++) {
 
       // Ignore names that do not exist in the shapefile
