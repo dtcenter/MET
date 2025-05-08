@@ -252,7 +252,7 @@ double ShapeData::curvature(double &xcurv, double &ycurv) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 double ShapeData::area() const {
-   return (double) mom.s_area;
+   return mom.s_area;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -301,8 +301,8 @@ void ShapeData::calc_length_width(double &l, double &w) const {
 
          if(!f_is_on(x, y)) continue;
 
-         double xx = (double) x;
-         double yy = (double) y;
+         auto xx = (double) x;
+         auto yy = (double) y;
 
          double u = dot(e1x, e1y, xx, yy);
          double v = dot(e2x, e2y, xx, yy);
@@ -1392,7 +1392,7 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
       keep_object[i] = true;
 
       // Loop over attribute filter map
-      for(const auto it : attr_map) {
+      for(const auto &it : attr_map) {
 
          double attr_val = sd_object.get_attr(it.first, raw_ptr, obj_thresh,
                                               grid, precip_flag);
