@@ -1401,6 +1401,7 @@ void ModeExecutive::compute_ct_stats()
       } // End omp parallel
 
       // Store results
+      cts[i].set_n_pairs(fy_oy + fy_on + fn_oy + fn_on);
       cts[i].set_fy_oy((double) fy_oy);
       cts[i].set_fy_on((double) fy_on);
       cts[i].set_fn_oy((double) fn_oy);
