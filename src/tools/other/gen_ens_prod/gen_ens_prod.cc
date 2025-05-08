@@ -341,7 +341,6 @@ static void process_ensemble() {
             need_reset = false;
 
             // Reset the running sums and counts
-	    // JHG clear_counts() operates on global variables
             clear_counts();
 
             // Read climatology data for this field
