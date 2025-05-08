@@ -70,9 +70,11 @@ static void track_counts(GenEnsProdVarInfo *, const DataPlane &, bool,
 static void setup_nc_file();
 static void write_ens_nc(GenEnsProdVarInfo *, int, const DataPlane &,
                          const DataPlane &, const DataPlane &);
-static void write_ens_var_float(GenEnsProdVarInfo *, float *, const DataPlane &,
+static void write_ens_var_float(GenEnsProdVarInfo *, const float *,
+                                const DataPlane &,
                                 const char *, const char *);
-static void write_ens_var_int(GenEnsProdVarInfo *, int *, const DataPlane &,
+static void write_ens_var_int(GenEnsProdVarInfo *, const int *,
+                              const DataPlane &,
                               const char *, const char *);
 
 static void add_var_att_local(GenEnsProdVarInfo *, NcVar *, bool is_int,
@@ -110,8 +112,7 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
-   int i;
+static void process_command_line(int argc, char **argv) {
    CommandLine cline;
    ConcatString default_config_file;
    const char *method_name = "process_command_line() -> ";
@@ -202,14 +203,14 @@ void process_command_line(int argc, char **argv) {
    thresh_cnt_na       = new NumArray   [conf_info.get_max_n_cat()];
    thresh_nbrhd_cnt_na = new NumArray * [conf_info.get_max_n_cat()];
 
-   for(i=0; i<conf_info.get_max_n_cat(); i++) {
+   for(int i=0; i<conf_info.get_max_n_cat(); i++) {
       thresh_nbrhd_cnt_na[i] = new NumArray [conf_info.get_n_nbrhd()];
    }
 
    // List the input ensemble files
    mlog << Debug(1) << "Ensemble Files["
         << n_ens_files << "]:\n";
-   for(i=0; i<n_ens_files; i++) {
+   for(int i=0; i<n_ens_files; i++) {
       mlog << "   " << ens_files[i]  << "\n";
    }
 
@@ -226,7 +227,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Check for missing non-python ensemble files
-   for(i=0; i<n_ens_files; i++) {
+   for(int i=0; i<n_ens_files; i++) {
       if(!file_exists(ens_files[i].c_str()) &&
          !is_python_grdfiletype(etype)) {
          log_missing_file(method_name, "input ensemble file", ens_files[i]);
@@ -248,7 +249,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_grid(const Grid &fcst_grid) {
+static void process_grid(const Grid &fcst_grid) {
    Grid obs_grid;
 
    // Parse regridding logic
@@ -271,7 +272,7 @@ void process_grid(const Grid &fcst_grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_ensemble() {
+static void process_ensemble() {
    int i_var, i_ens, n_ens_vld, n_ens_inputs;
    bool need_reset, set_climo_ens_mem_id;
    DataPlane ens_dp, ctrl_dp;
@@ -340,6 +341,7 @@ void process_ensemble() {
             need_reset = false;
 
             // Reset the running sums and counts
+	    // JHG clear_counts() operates on global variables
             clear_counts();
 
             // Read climatology data for this field
@@ -448,9 +450,9 @@ void process_ensemble() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_climo_mean_stdev(GenEnsProdVarInfo *ens_info, int i_var,
-                          bool set_ens_mem_id, int i_ens,
-                          DataPlane &cmn_dp, DataPlane &csd_dp) {
+static void get_climo_mean_stdev(GenEnsProdVarInfo *ens_info, int i_var,
+                                 bool set_ens_mem_id, int i_ens,
+                                 DataPlane &cmn_dp, DataPlane &csd_dp) {
 
    // Set the MET_ENS_MEMBER_ID environment variable
    if(set_ens_mem_id) {
@@ -487,9 +489,8 @@ void get_climo_mean_stdev(GenEnsProdVarInfo *ens_info, int i_var,
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
-                        DataPlane &emn_dp, DataPlane &esd_dp) {
-   double ens;
+static void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
+                               DataPlane &emn_dp, DataPlane &esd_dp) {
    VarInfo *var_info;
    ConcatString ens_file;
    DataPlane ens_dp;
@@ -505,7 +506,7 @@ void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
         << "Computing the ensemble mean and standard deviation for "
         << ens_info->raw_magic_str << ".\n";
 
-   int nxy = 0;
+   nxy = 0;
    vector<double> emn_cnt;
    vector<double> emn_sum;
    vector<double> esd_cnt;
@@ -538,7 +539,7 @@ void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
       }
 
       // Initialize sums, if needed
-      if(nxy == 0) {
+      if(emn_cnt.empty()) {
          nxy = ens_dp.nx()*ens_dp.ny();
          emn_cnt.resize(nxy, 0.0);
          emn_sum.resize(nxy, 0.0);
@@ -651,8 +652,8 @@ void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_data_plane(const char *infile, GrdFileType ftype,
-                    VarInfo *info, DataPlane &dp) {
+static bool get_data_plane(const char *infile, GrdFileType ftype,
+                           VarInfo *info, DataPlane &dp) {
    bool found;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
@@ -704,7 +705,7 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
 
 ////////////////////////////////////////////////////////////////////////
 
-void clear_counts() {
+static void clear_counts() {
    int i, j;
 
    cnt_na.set_const(0.0, nxy);
@@ -728,8 +729,10 @@ void clear_counts() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void track_counts(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, bool is_ctrl,
-                  const DataPlane &cmn_dp, const DataPlane &csd_dp) {
+static void track_counts(GenEnsProdVarInfo *ens_info,
+                         const DataPlane &ens_dp, bool is_ctrl,
+                         const DataPlane &cmn_dp,
+                         const DataPlane &csd_dp) {
 
    // Ensemble thresholds
    const int n_thr = ens_info->cat_ta.n();
@@ -807,7 +810,7 @@ void track_counts(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, bool is_
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file() {
+static void setup_nc_file() {
 
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_file.c_str(), true);
@@ -836,10 +839,10 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
-                  const DataPlane &ens_dp,
-                  const DataPlane &cmn_dp,
-                  const DataPlane &csd_dp) {
+static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
+                         const DataPlane &ens_dp,
+                         const DataPlane &cmn_dp,
+                         const DataPlane &csd_dp) {
    char type_str[max_str_len];
 
    // Allocate memory for storing ensemble data
@@ -1040,7 +1043,7 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                         conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j],
                         conf_info.nmep_smooth.method[k].c_str(),
                         conf_info.nmep_smooth.width[k]*conf_info.nmep_smooth.width[k]);
-               write_ens_var_float(ens_info, (float *) nbrhd_dp.data(), ens_dp, type_str,
+               write_ens_var_float(ens_info, (const float *) nbrhd_dp.data(), ens_dp, type_str,
                                    "Neighborhood Maximum Ensemble Probability");
             } // end for k
          } // end for j
@@ -1049,14 +1052,14 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
 
    // Write the climo mean field, if requested
    if(ens_info->nc_info.do_climo && !cmn_dp.is_empty()) {
-      write_ens_var_float(ens_info, (float *) cmn_dp.data(), ens_dp,
+      write_ens_var_float(ens_info, (const float *) cmn_dp.data(), ens_dp,
                           "CLIMO_MEAN",
                           "Climatology mean");
    }
 
    // Write the climo stdev field, if requested
    if(ens_info->nc_info.do_climo && !csd_dp.is_empty()) {
-      write_ens_var_float(ens_info, (float *) csd_dp.data(), ens_dp,
+      write_ens_var_float(ens_info, (const float *) csd_dp.data(), ens_dp,
                           "CLIMO_STDEV",
                           "Climatology standard deviation");
    }
@@ -1078,7 +1081,7 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
             snprintf(type_str, sizeof(type_str), "CLIMO_FCDP%i",
                      nint(it->pvalue()));
             cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
-            write_ens_var_float(ens_info, (float *) cdp_dp.data(), ens_dp, type_str,
+            write_ens_var_float(ens_info, (const float *) cdp_dp.data(), ens_dp, type_str,
                                 "Forecast climatology distribution percentile");
          }
          else if(it->ptype() == perc_thresh_obs_climo_dist &&
@@ -1087,7 +1090,7 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
             snprintf(type_str, sizeof(type_str), "CLIMO_OCDP%i",
                      nint(it->pvalue()));
             cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
-            write_ens_var_float(ens_info, (float *) cdp_dp.data(), ens_dp, type_str,
+            write_ens_var_float(ens_info, (const float *) cdp_dp.data(), ens_dp, type_str,
                                 "Observation climatology distribution percentile");
          }
       } // end for it
@@ -1098,10 +1101,11 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_float(GenEnsProdVarInfo *ens_info, float *ens_data,
-                         const DataPlane &dp,
-                         const char *type_str,
-                         const char *long_name_str) {
+static void write_ens_var_float(GenEnsProdVarInfo *ens_info,
+                                const float *ens_data,
+                                const DataPlane &dp,
+                                const char *type_str,
+                                const char *long_name_str) {
    NcVar ens_var;
    ConcatString ens_var_name, var_str, name_str, cs;
 
@@ -1155,10 +1159,11 @@ void write_ens_var_float(GenEnsProdVarInfo *ens_info, float *ens_data,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_int(GenEnsProdVarInfo *ens_info, int *ens_data,
-                       const DataPlane &dp,
-                       const char *type_str,
-                       const char *long_name_str) {
+static void write_ens_var_int(GenEnsProdVarInfo *ens_info,
+                              const int *ens_data,
+                              const DataPlane &dp,
+                              const char *type_str,
+                              const char *long_name_str) {
    NcVar ens_var;
    ConcatString ens_var_name, var_str, name_str, cs;
 
@@ -1203,11 +1208,11 @@ void write_ens_var_int(GenEnsProdVarInfo *ens_info, int *ens_data,
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att_local(GenEnsProdVarInfo *ens_info,
-                       NcVar *nc_var, bool is_int,
-                       const DataPlane &dp,
-                       const char *name_str,
-                       const char *long_name_str) {
+static void add_var_att_local(GenEnsProdVarInfo *ens_info,
+                              NcVar *nc_var, bool is_int,
+                              const DataPlane &dp,
+                              const char *name_str,
+                              const char *long_name_str) {
    ConcatString att_str;
    VarInfo *info = ens_info->get_var_info();
 
@@ -1234,7 +1239,7 @@ void add_var_att_local(GenEnsProdVarInfo *ens_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void clean_up() {
+static void clean_up() {
    int i, j;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
@@ -1270,7 +1275,7 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+static void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -1309,25 +1314,25 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_ens_files(const StringArray & a) {
+static void set_ens_files(const StringArray & a) {
    ens_files.add(parse_file_list(a));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out_file(const StringArray & a) {
+static void set_out_file(const StringArray & a) {
    out_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config_file(const StringArray & a) {
+static void set_config_file(const StringArray & a) {
    config_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_ctrl_file(const StringArray & a) {
+static void set_ctrl_file(const StringArray & a) {
    ctrl_file = a[0];
 }
 

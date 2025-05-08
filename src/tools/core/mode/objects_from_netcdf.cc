@@ -47,19 +47,6 @@ static void populate_bool_plane(const int * buf, const int nx, const int ny, Boo
 ////////////////////////////////////////////////////////////////////////
 
 
-// void  objects_from_arrays(bool do_clusters,
-//                           int *fcst_objects, int *obs_objects, int nx, int ny,
-//                           BoolPlane & fcst_out, 
-//                           BoolPlane & obs_out)
-// {
-//    populate_bool_plane(fcst_objects, nx, ny, fcst_out);
-//    populate_bool_plane(obs_objects, nx, ny, obs_out);
-// }  
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void objects_from_netcdf(const char * netcdf_filename, 
                          bool do_clusters,     //  do we look at cluster objects or simple objects?
                          BoolPlane & fcst_out, 
@@ -145,7 +132,7 @@ void objects_from_netcdf(const char * netcdf_filename,
 ////////////////////////////////////////////////////////////////////////
 
 
-void populate_bool_plane(const int * buf, const int nx, const int ny, BoolPlane & bp_out)
+static void populate_bool_plane(const int * buf, const int nx, const int ny, BoolPlane & bp_out)
 
 {
 

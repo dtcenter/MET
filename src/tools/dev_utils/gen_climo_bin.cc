@@ -306,7 +306,7 @@ void write_nc_bin(const DataPlane &dp, int i_cdf, double cdf_y) {
    }
 
    // Write out the gridded field of CDF X-values
-   if(!put_nc_data(&cdf_x_var, (float *) dp.data(),
+   if(!put_nc_data(&cdf_x_var, (const float *) dp.data(),
                    lengths, offsets)) {
       mlog << Error << "\nwrite_nc_bin() -> "
            << "error writing NetCDF variable name \""

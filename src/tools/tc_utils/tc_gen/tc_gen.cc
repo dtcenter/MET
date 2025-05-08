@@ -2516,7 +2516,7 @@ void write_nc(GenCTCInfo &gci) {
 
       // Write out the data
       if(!put_nc_data_with_dims(&nc_var,
-            (float *) gci.DpMap[(ncout_str[i])].data(),
+            (const float *) gci.DpMap[(ncout_str[i])].data(),
             gci.NcOutGrid->ny(), gci.NcOutGrid->nx())) {
          mlog << Error << "\nwrite_nc() -> "
               << "error writing NetCDF variable name " << var_name

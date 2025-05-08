@@ -102,6 +102,7 @@ static int nxy = 0;
 static Met2dDataFileFactory mtddf_factory;
 
 // Arrays to store running sums and counts
+// JHG, would be better to get rid of these global vars
 static NumArray cnt_na, min_na, max_na, sum_na;
 static NumArray stdev_cnt_na, stdev_sum_na, stdev_ssq_na;
 static NumArray *thresh_cnt_na = (NumArray *) nullptr; // [n_thresh]

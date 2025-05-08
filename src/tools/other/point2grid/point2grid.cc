@@ -1474,12 +1474,12 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
          {
 
 #pragma omp for schedule(static)
-            for(int i=0; i<nxy; i++) {
-               double v = to_dp.data()[i];
+            for(int j=0; j<nxy; j++) {
+               double v = to_dp.data()[j];
                if(is_bad_data(v)) continue;
                if(( has_prob_thresh && prob_cat_thresh.check(v)) ||
                   (!has_prob_thresh && do_gaussian_filter)) {
-                  prob_dp.buf()[i] = 1;
+                  prob_dp.buf()[j] = 1;
                }
             }
          } // End omp parallel
@@ -1493,7 +1493,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
                   do_gaussian_filter);
       }
 
-   } // end for i
+   } // end for j 
 
    if( 0 < filtered_by_time ) {
       mlog << Debug(3) << method_name << "Filtered by time: " << filtered_by_time
@@ -1681,7 +1681,7 @@ static void open_nc(const Grid &grid, ConcatString run_cs) {
 void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
 
    // Write out the data
-   if(!put_nc_data_with_dims(data_var, (float *) dp.data(),
+   if(!put_nc_data_with_dims(data_var, (const float *) dp.data(),
                              grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_nc_data() -> "
            << "error writing data to the output file.\n\n";
@@ -1696,7 +1696,7 @@ void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
 void write_nc_data_int(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
 
    // Write out the data
-   if(!put_nc_data_with_dims(data_var, (int *) dp.data(),
+   if(!put_nc_data_with_dims(data_var, (const int *) dp.data(),
                              grid.ny(), grid.nx())) {
       mlog << Error << "\nwrite_nc_data_int() -> "
            << "error writing data to the output file.\n\n";
@@ -1877,12 +1877,12 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          {
 
 #pragma omp for schedule(static)
-            for(int i=0; i<nxy; i++) {
-               double v = to_dp.data()[i];
+            for(int j=0; j<nxy; j++) {
+               double v = to_dp.data()[j];
                if(is_bad_data(v)) continue;
                if(( has_prob_thresh && prob_cat_thresh.check(v)) ||
                   (!has_prob_thresh && do_gaussian_filter)) {
-                  prob_dp.buf()[i] = 1;
+                  prob_dp.buf()[j] = 1;
                }
             }
          } // End omp parallel
@@ -1896,7 +1896,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                   do_gaussian_filter);
       }
 
-   } // end for i
+   } // end for j 
 
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc_in);
    for (const auto &kv : mapVar) {
