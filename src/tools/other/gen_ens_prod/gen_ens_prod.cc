@@ -64,8 +64,8 @@ static void get_ens_mean_stdev(GenEnsProdVarInfo *, DataPlane &, DataPlane &);
 static bool get_data_plane(const char *, GrdFileType, VarInfo *, DataPlane &);
 
 static void clear_counts();
-static void track_counts(GenEnsProdVarInfo *, const DataPlane &, bool,
-                         const DataPlane &, const DataPlane &);
+static void track_counts(const GenEnsProdVarInfo *, const DataPlane &,
+                         bool, const DataPlane &, const DataPlane &);
 
 static void setup_nc_file();
 static void write_ens_nc(GenEnsProdVarInfo *, int, const DataPlane &,
@@ -76,6 +76,9 @@ static void write_ens_var_float(GenEnsProdVarInfo *, const float *,
 static void write_ens_var_int(GenEnsProdVarInfo *, const int *,
                               const DataPlane &,
                               const char *, const char *);
+static void write_ens_data_plane(GenEnsProdVarInfo *,
+                                 const DataPlane &, const DataPlane &,
+                                 const char *, const char *);
 
 static void add_var_att_local(GenEnsProdVarInfo *, NcVar *, bool is_int,
                               const DataPlane &, const char *, const char *);
@@ -728,7 +731,7 @@ static void clear_counts() {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void track_counts(GenEnsProdVarInfo *ens_info,
+static void track_counts(const GenEnsProdVarInfo *ens_info,
                          const DataPlane &ens_dp, bool is_ctrl,
                          const DataPlane &cmn_dp,
                          const DataPlane &csd_dp) {
@@ -975,8 +978,8 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
          if(ens_info->nc_info.do_freq) {
             snprintf(type_str, sizeof(type_str), "ENS_FREQ_%s",
                      ens_info->cat_ta[i].get_abbr_str().contents().c_str());
-            write_ens_var_float(ens_info, (float *) prob_dp.data(), ens_dp, type_str,
-                                "Ensemble Relative Frequency");
+            write_ens_data_plane(ens_info, prob_dp, ens_dp, type_str,
+                                 "Ensemble Relative Frequency");
          }
 
          // Process the neighborhood ensemble probability
@@ -996,8 +999,8 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                         ens_info->cat_ta[i].get_abbr_str().contents().c_str(),
                         interpmthd_to_string(InterpMthd::Nbrhd).c_str(),
                         conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j]);
-               write_ens_var_float(ens_info, (float *) nbrhd_dp.data(), ens_dp, type_str,
-                                   "Neighborhood Ensemble Probability");
+               write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str,
+                                    "Neighborhood Ensemble Probability");
             } // end for k
          } // end if do_nep
       } // end for i
@@ -1042,8 +1045,8 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                         conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j],
                         conf_info.nmep_smooth.method[k].c_str(),
                         conf_info.nmep_smooth.width[k]*conf_info.nmep_smooth.width[k]);
-               write_ens_var_float(ens_info, (const float *) nbrhd_dp.data(), ens_dp, type_str,
-                                   "Neighborhood Maximum Ensemble Probability");
+               write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str,
+                                    "Neighborhood Maximum Ensemble Probability");
             } // end for k
          } // end for j
       } // end for i
@@ -1051,16 +1054,16 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
 
    // Write the climo mean field, if requested
    if(ens_info->nc_info.do_climo && !cmn_dp.is_empty()) {
-      write_ens_var_float(ens_info, (const float *) cmn_dp.data(), ens_dp,
-                          "CLIMO_MEAN",
-                          "Climatology mean");
+      write_ens_data_plane(ens_info, cmn_dp, ens_dp,
+                           "CLIMO_MEAN",
+                           "Climatology mean");
    }
 
    // Write the climo stdev field, if requested
    if(ens_info->nc_info.do_climo && !csd_dp.is_empty()) {
-      write_ens_var_float(ens_info, (const float *) csd_dp.data(), ens_dp,
-                          "CLIMO_STDEV",
-                          "Climatology standard deviation");
+      write_ens_data_plane(ens_info, csd_dp, ens_dp,
+                           "CLIMO_STDEV",
+                           "Climatology standard deviation");
    }
 
    // Write the climo distribution percentile thresholds, if requested
@@ -1080,8 +1083,8 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
             snprintf(type_str, sizeof(type_str), "CLIMO_FCDP%i",
                      nint(it->pvalue()));
             cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
-            write_ens_var_float(ens_info, (const float *) cdp_dp.data(), ens_dp, type_str,
-                                "Forecast climatology distribution percentile");
+            write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
+                                 "Forecast climatology distribution percentile");
          }
          else if(it->ptype() == perc_thresh_obs_climo_dist &&
                  !is_eq(it->pvalue(), 0.0) &&
@@ -1089,8 +1092,8 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
             snprintf(type_str, sizeof(type_str), "CLIMO_OCDP%i",
                      nint(it->pvalue()));
             cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
-            write_ens_var_float(ens_info, (const float *) cdp_dp.data(), ens_dp, type_str,
-                                "Observation climatology distribution percentile");
+            write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
+                                 "Observation climatology distribution percentile");
          }
       } // end for it
    }
@@ -1201,6 +1204,26 @@ static void write_ens_var_int(GenEnsProdVarInfo *ens_info,
            << " field.\n\n";
       exit(1);
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void write_ens_data_plane(GenEnsProdVarInfo *ens_info,
+                                 const DataPlane &ens_dp,
+                                 const DataPlane &dp,
+                                 const char *type_str,
+                                 const char *long_name_str) {
+
+   // Copy the data to float
+   vector<float> ens_data(ens_dp.const_buf().size());
+   copy(ens_dp.const_buf().begin(), ens_dp.const_buf().end(),
+        ens_data.begin());
+
+   // Write the output
+   write_ens_var_float(ens_info, ens_data.data(), dp,
+                       type_str, long_name_str);
 
    return;
 }

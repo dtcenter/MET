@@ -324,8 +324,9 @@ void MultiVarData::_clear()
 
 ////////////////////////////////////////////////////////////////////////
 
-void populate_bool_plane(const string &name, const int * buf,
-                         const int nx, const int ny, BoolPlane & bp_out)
+static void populate_bool_plane(const string &name, const int * buf,
+                                const int nx, const int ny,
+                                BoolPlane & bp_out)
 
 {
    bp_out.set_size(nx, ny);
