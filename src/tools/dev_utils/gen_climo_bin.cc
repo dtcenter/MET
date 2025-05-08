@@ -219,11 +219,11 @@ void process_binary() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_mean_stdev() {
+   double cdf_y;
+   DataPlane mn_dp, sd_dp, cur_dp;
 
    // Read the climo mean and standard deviation fields
-   DataPlane mn_dp;
    get_field(mean_file.c_str(), field_str.c_str(), mn_dp);
-   DataPlane sd_dp;
    get_field(stdev_file.c_str(), field_str.c_str(), sd_dp);
 
    // Setup the output file
@@ -231,8 +231,9 @@ void process_mean_stdev() {
 
    // Loop over each of the climo bins
    for(int i=0; i<n_bin-1; i++) {
-      double cdf_y  = (double) (i+1)/n_bin;
-      write_nc_bin(normal_cdf_inv(cdf_y, mn_dp, sd_dp), i, cdf_y);
+      cdf_y  = (double) (i+1)/n_bin;
+      cur_dp = normal_cdf_inv(cdf_y, mn_dp, sd_dp);
+      write_nc_bin(cur_dp, i, cdf_y);
    }
 
    return;
@@ -276,14 +277,26 @@ void setup_nc_file() {
 ////////////////////////////////////////////////////////////////////////
 
 void write_nc_bin(const DataPlane &dp, int i_cdf, double cdf_y) {
+   int x, y, n;
+   double dmin, dmax;
 
-   double dmin;
-   double dmax;
+   // Allocate memory
+   n = grid.nx() * grid.ny();
+   vector<float> data(n);
+
    dp.data_range(dmin, dmax);
    mlog << Debug(2)
         << "[" << i_cdf+1 << " of " << n_bin-1
         << "] Range of CDF X-values for CDF Y-value = "
         << cdf_y << ": " << dmin << " to " << dmax << "\n";
+
+   // Store the data
+   for(x=0; x<grid.nx(); x++) {
+      for(y=0; y<grid.ny(); y++) {
+         n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+         data[n] = dp(x, y);
+      } // end for y
+   } // end for x
 
    // Set up the lenghts and offsets
    long lengths[3];
@@ -306,8 +319,7 @@ void write_nc_bin(const DataPlane &dp, int i_cdf, double cdf_y) {
    }
 
    // Write out the gridded field of CDF X-values
-   if(!put_nc_data(&cdf_x_var, (const float *) dp.data(),
-                   lengths, offsets)) {
+   if(!put_nc_data(&cdf_x_var, data.data(), lengths, offsets)) {
       mlog << Error << "\nwrite_nc_bin() -> "
            << "error writing NetCDF variable name \""
            << var_name << "\" for the " << i_cdf
