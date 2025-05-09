@@ -924,6 +924,9 @@ void get_tile(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    //
    // Store the pairs in NumArray objects
    //
+   int npts = (y_ur - y_ll) * (x_ur - x_ll);
+   f_na.extend(npts);
+   o_na.extend(npts);
    for(int y=y_ll; y<y_ur; y++) {
       for(int x=x_ll; x<x_ur; x++) {
          f_na.add(fcst_dp.get(x, y));
@@ -1025,11 +1028,18 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    vector<double> o_scl(n); // Binary field decomposed by scale
    vector<double> diff (n); // Difference field
 
+#pragma omp parallel default(none) \
+   shared(n, f_na, o_na, f_dat, o_dat) \
+   private(i)
+   {
+
    // Initialize f_dat and o_dat
-   for(i=0; i<n; i++) {
-      f_dat[i] = f_na[i];
-      o_dat[i] = o_na[i];
-   } // end for j
+#pragma omp for schedule(static)
+      for(i=0; i<n; i++) {
+         f_dat[i] = f_na[i];
+         o_dat[i] = o_na[i];
+      }
+   } // End omp parallel
 
    // Write out the raw fields to NetCDF
    if( conf_info.nc_info.do_raw || conf_info.nc_info.do_diff ) {
@@ -1063,16 +1073,27 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
            << conf_info.obs_info[i_vx]->magic_str() << " "
            << obs_thresh_str << ".\n";
 
-      // Apply the threshold, if specified
-      for(j=0, mad=bad_data_double; j<n; j++) {
-         f_dat[j] = (apply_fcst_thresh ? isc_info[i].fthresh.check(f_na[j]) : f_na[j]);
-         o_dat[j] = (apply_obs_thresh  ? isc_info[i].othresh.check(o_na[j]) : o_na[j]);
-         diff[j]  = f_dat[j] - o_dat[j];
+      // Initialize
+      mad = 0.0;
 
-         // Find the maximum absolute difference
-         if(is_bad_data(mad))         mad = fabs(diff[j]);
-         else if(fabs(diff[j]) > mad) mad = fabs(diff[j]);
-      } // end for j
+#pragma omp parallel default(none) \
+      shared(n, i, f_na, o_na, f_dat, o_dat, diff, mad) \
+      shared(apply_fcst_thresh, apply_obs_thresh, isc_info) \
+      private(j)
+      {
+
+         // Apply the threshold, if specified
+#pragma omp for schedule(static) \
+                reduction(+: mad)
+         for(j=0; j<n; j++) {
+            f_dat[j] = (apply_fcst_thresh ? isc_info[i].fthresh.check(f_na[j]) : f_na[j]);
+            o_dat[j] = (apply_obs_thresh  ? isc_info[i].othresh.check(o_na[j]) : o_na[j]);
+            diff[j]  = f_dat[j] - o_dat[j];
+
+            // Find the maximum absolute difference
+            if(fabs(diff[j]) > mad) mad = fabs(diff[j]);
+         } // end for j
+      } // End omp parallel
 
       // Compute the contingency table for the binary fields
       compute_cts(f_dat.data(), o_dat.data(), n, isc_info[i]);
@@ -1347,23 +1368,40 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
 
 void compute_cts(const double *f_arr, const double *o_arr, int n,
                  ISCInfo &isc_info) {
-   int i, f, o;
+   int fy_oy = 0;
+   int fy_on = 0;
+   int fn_oy = 0;
+   int fn_on = 0;
 
-   // Increment the contingency table counts for each grid point
-   for(i=0; i<n; i++) {
+#pragma omp parallel default(none) \
+   shared(n, fy_oy, fy_on, fn_oy, fn_on) \
+   shared(f_arr, o_arr)
+   {
 
-      if(is_bad_data(f_arr[i]) ||
-         is_bad_data(o_arr[i])) continue;
+      // Increment the contingency table counts for each grid point
+#pragma omp for schedule(static) \
+                reduction(+: fy_oy, fy_on, fn_oy, fn_on)
+      for(int i=0; i<n; i++) {
 
-      f = nint(f_arr[i]);
-      o = nint(o_arr[i]);
+         if(is_bad_data(f_arr[i]) ||
+            is_bad_data(o_arr[i])) continue;
 
-      if(      f &&  o) isc_info.cts.inc_fy_oy();
-      else if( f && !o) isc_info.cts.inc_fy_on();
-      else if(!f &&  o) isc_info.cts.inc_fn_oy();
-      else if(!f && !o) isc_info.cts.inc_fn_on();
+         int f = nint(f_arr[i]);
+         int o = nint(o_arr[i]);
 
-   } // end for i
+         if(      f &&  o) fy_oy++;
+         else if( f && !o) fy_on++;
+         else if(!f &&  o) fn_oy++;
+         else if(!f && !o) fn_on++;
+      } // end for i
+   } // End omp parallel
+
+   // Store the counts
+   isc_info.cts.set_n_pairs(fy_oy + fy_on + fn_oy + fn_on);
+   isc_info.cts.set_fy_oy(fy_oy);
+   isc_info.cts.set_fy_on(fy_on);
+   isc_info.cts.set_fn_oy(fn_oy);
+   isc_info.cts.set_fn_on(fn_on);
 
    return;
 }
@@ -1372,19 +1410,28 @@ void compute_cts(const double *f_arr, const double *o_arr, int n,
 
 void compute_mse(const double *f, const double *o,
                  int n, double &mse) {
-   int i, count;
-   double err, sum_sq;
+   int count = 0;
+   double sum_sq = 0.0;
 
-   for(i=0, count=0, sum_sq=0.0; i<n; i++) {
+#pragma omp parallel default(none) \
+   shared(n, f, o) \
+   shared(count, sum_sq)
+   {
 
-      if(is_bad_data(f[i]) ||
-         is_bad_data(o[i])) continue;
+      // Compute partial sums
+#pragma omp for schedule(static) \
+                reduction(+: count, sum_sq)
+      for(int i=0; i<n; i++) {
 
-      err     = f[i] - o[i];
-      sum_sq += err*err;
+         if(is_bad_data(f[i]) ||
+            is_bad_data(o[i])) continue;
 
-      count++;
-   } // end for i
+         double err = f[i] - o[i];
+         sum_sq += err*err;
+
+         count++;
+      } // end for i
+   } // End omp parallel
 
    if(count == 0) mse = bad_data_double;
    else           mse = sum_sq/count;
@@ -1395,17 +1442,26 @@ void compute_mse(const double *f, const double *o,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_energy(const double *arr, int n, double &en) {
-   int i, count;
-   double sum_sq;
+   int count = 0;
+   double sum_sq = 0.0;
 
-   for(i=0, count=0, sum_sq=0.0; i<n; i++) {
+#pragma omp parallel default(none) \
+   shared(n, arr) \
+   shared(count, sum_sq)
+   {
 
-      if(is_bad_data(arr[i])) continue;
+      // Compute partial sums
+#pragma omp for schedule(static) \
+                reduction(+: count, sum_sq)
+      for(int i=0; i<n; i++) {
 
-      sum_sq += arr[i]*arr[i];
+         if(is_bad_data(arr[i])) continue;
 
-      count++;
-   } // end for i
+         sum_sq += arr[i]*arr[i];
+
+         count++;
+      } // end for i
+   } // End omp parallel
 
    if(count == 0) en = bad_data_double;
    else           en = sum_sq/count;
