@@ -271,7 +271,6 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_scores() {
-   int i, j, k;
    bool status;
    double fcst_fill, obs_fill;
 
@@ -283,7 +282,7 @@ void process_scores() {
    Grid fcst_grid, obs_grid;
 
    // Loop through each of the fields to be verified
-   for(i=0; i<conf_info.get_n_vx(); i++) {
+   for(int i=0; i<conf_info.get_n_vx(); i++) {
 
       // Read the gridded data from the input forecast file
       status = fcst_mtddf->data_plane(*conf_info.fcst_info[i], fcst_dp);
@@ -441,7 +440,7 @@ void process_scores() {
 
       // Allocate memory for ISCInfo objects sized as [n_tile][n_thresh]
       isc_info = new ISCInfo * [conf_info.get_n_tile()];
-      for(j=0; j<conf_info.get_n_tile(); j++) {
+      for(int j=0; j<conf_info.get_n_tile(); j++) {
          isc_info[j] = new ISCInfo [conf_info.fcat_ta[i].n()];
       }
 
@@ -449,7 +448,7 @@ void process_scores() {
       conf_info.set_perc_thresh(fcst_dp, obs_dp);
 
       // Loop through the tiles to be applied
-      for(j=0; j<conf_info.get_n_tile(); j++) {
+      for(int j=0; j<conf_info.get_n_tile(); j++) {
 
          // Set the mask name
          ConcatString mask = (string)"TILE_TOT";
@@ -466,7 +465,7 @@ void process_scores() {
             do_intensity_scale(f_na, o_na, isc_info[j], i, j);
 
             // Write out the ISC statistics
-            for(k=0; k<conf_info.fcat_ta[i].n(); k++) {
+            for(int k=0; k<conf_info.fcat_ta[i].n(); k++) {
 
                // Store the tile definition parameters
                isc_info[j][k].tile_dim = conf_info.get_tile_dim();
@@ -490,7 +489,7 @@ void process_scores() {
          // Set the mask name
          shc.set_mask("TILE_TOT");
 
-         for(j=0; j<conf_info.fcat_ta[i].n(); j++) {
+         for(int j=0; j<conf_info.fcat_ta[i].n(); j++) {
 
             // Set the forecast and observation thresholds
             shc.set_fcst_thresh(conf_info.fcat_ta[i][j]);
@@ -506,7 +505,7 @@ void process_scores() {
       }
 
       // Deallocate memory for ISCInfo objects
-      for(j=0; j<conf_info.get_n_tile(); j++) {
+      for(int j=0; j<conf_info.get_n_tile(); j++) {
          if(isc_info[j]) {
             delete [] isc_info[j];
             isc_info[j] = (ISCInfo *) nullptr;
@@ -654,7 +653,6 @@ void setup_table(AsciiTable &at) {
 ////////////////////////////////////////////////////////////////////////
 
 void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int lead_sec) {
-   int i, x, y;
 
    // Create output NetCDF file name
    build_outfile_name(valid_ut, lead_sec, ".nc", out_nc_file);
@@ -693,10 +691,10 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
    x_ll_var = add_var(nc_out, "x_ll", ncInt, tile_dim, deflate_level);
    y_ll_var = add_var(nc_out, "y_ll", ncInt, tile_dim, deflate_level);
 
-   for(i=0; i<conf_info.get_n_tile(); i++) {
+   for(int i=0; i<conf_info.get_n_tile(); i++) {
 
-      x = nint(conf_info.tile_xll[i]);
-      y = nint(conf_info.tile_yll[i]);
+      int x = nint(conf_info.tile_xll[i]);
+      int y = nint(conf_info.tile_yll[i]);
 
       // Write the x_ll value
       if(!put_nc_data(&x_ll_var, &x, 1, i)) {
@@ -981,15 +979,9 @@ int get_tile_tot_count() {
 
 void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
                         ISCInfo *&isc_info, int i_vx, int i_tile) {
-   double mse, fen, oen, mad;
-   int n, ns, n_isc;
-   int bnd, row, col;
-   int i, j, k;
-   ConcatString fcst_thresh_str, obs_thresh_str;
-   bool apply_fcst_thresh, apply_obs_thresh;
 
    // Check the NumArray lengths
-   n = f_na.n();
+   int n = f_na.n();
    if(n != o_na.n()) {
       mlog << Error << "\ndo_intensity_scale() -> "
            << "the forecast and observation arrays must have equal "
@@ -1008,11 +1000,11 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    }
 
    // Get the number of scales
-   ns = conf_info.get_n_scale();
+   int ns = conf_info.get_n_scale();
 
    // Set up the ISCInfo thresholds and n_scale
-   n_isc = conf_info.fcat_ta[i_vx].n();
-   for(i=0; i<n_isc; i++) {
+   int n_isc = conf_info.fcat_ta[i_vx].n();
+   for(int i=0; i<n_isc; i++) {
       isc_info[i].clear();
       isc_info[i].fthresh = conf_info.fcat_ta[i_vx][i];
       isc_info[i].othresh = conf_info.ocat_ta[i_vx][i];
@@ -1029,31 +1021,31 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    vector<double> diff (n); // Difference field
 
 #pragma omp parallel default(none) \
-   shared(n, f_na, o_na, f_dat, o_dat) \
-   private(i)
+   shared(n, f_na, o_na, f_dat, o_dat)
    {
 
    // Initialize f_dat and o_dat
 #pragma omp for schedule(static)
-      for(i=0; i<n; i++) {
+      for(int i=0; i<n; i++) {
          f_dat[i] = f_na[i];
          o_dat[i] = o_na[i];
       }
    } // End omp parallel
 
    // Write out the raw fields to NetCDF
-   if( conf_info.nc_info.do_raw || conf_info.nc_info.do_diff ) {
+   if(conf_info.nc_info.do_raw || conf_info.nc_info.do_diff ) {
       write_nc_raw(conf_info.nc_info, f_dat.data(), o_dat.data(), n, i_vx, i_tile);
    }
 
    // Apply each threshold
-   for(i=0; i<conf_info.fcat_ta[i_vx].n(); i++) {
+   for(int i=0; i<conf_info.fcat_ta[i_vx].n(); i++) {
 
       // Initialize to true
-      apply_fcst_thresh = apply_obs_thresh = true;
+      bool apply_fcst_thresh = true;
+      bool apply_obs_thresh = true;
 
-      fcst_thresh_str = isc_info[i].fthresh.get_abbr_str();
-      obs_thresh_str  = isc_info[i].othresh.get_abbr_str();
+      ConcatString fcst_thresh_str(isc_info[i].fthresh.get_abbr_str());
+      ConcatString obs_thresh_str (isc_info[i].othresh.get_abbr_str());
 
       // If the forecast threshold is set to NA skip masking below
       if(isc_info[i].fthresh.get_type() == thresh_na) {
@@ -1074,18 +1066,17 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
            << obs_thresh_str << ".\n";
 
       // Initialize
-      mad = 0.0;
+      double mad = 0.0;
 
 #pragma omp parallel default(none) \
       shared(n, i, f_na, o_na, f_dat, o_dat, diff, mad) \
-      shared(apply_fcst_thresh, apply_obs_thresh, isc_info) \
-      private(j)
+      shared(apply_fcst_thresh, apply_obs_thresh, isc_info)
       {
 
          // Apply the threshold, if specified
 #pragma omp for schedule(static) \
-                reduction(+: mad)
-         for(j=0; j<n; j++) {
+                reduction(max: mad)
+         for(int j=0; j<n; j++) {
             f_dat[j] = (apply_fcst_thresh ? isc_info[i].fthresh.check(f_na[j]) : f_na[j]);
             o_dat[j] = (apply_obs_thresh  ? isc_info[i].othresh.check(o_na[j]) : o_na[j]);
             diff[j]  = f_dat[j] - o_dat[j];
@@ -1139,17 +1130,17 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
       // Construct the decomposed forecast and observation images
       // for each scale
-      for(j=0; j<=ns; j++) {
+      for(int j=0; j<=ns; j++) {
 
          // Compute the bound for this scale
-         bnd = nint(pow(2.0, ns-j));
+         int bnd = nint(pow(2.0, ns-j));
 
          // Figure out which coefficients apply to this scale
-         for(k=0; k<n; k++) {
+         for(int k=0; k<n; k++) {
 
             // Compute the row and column for the current point
-            row = k/conf_info.get_tile_dim();
-            col = k%conf_info.get_tile_dim();
+            int row = k/conf_info.get_tile_dim();
+            int col = k%conf_info.get_tile_dim();
 
             if((row <  bnd/2 && col < bnd/2) ||
                 row >= bnd ||
@@ -1175,11 +1166,14 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
                                      conf_info.wvlt_work_ptr);
 
          // Compute the MSE for the decomposed fields
+         double mse;
          compute_mse(f_scl.data(), o_scl.data(), n, mse);
          isc_info[i].mse_scale[j] = mse;
 
          // Compute the energy for the decomposed fields
+         double fen;
          compute_energy(f_scl.data(), n, fen);
+         double oen;
          compute_energy(o_scl.data(), n, oen);
 
          isc_info[i].fen_scale[j] = fen;
@@ -1197,7 +1191,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
          }
 
          // Compute the difference field for this scale
-         for(k=0; k<n; k++) diff[k] = f_scl[k] - o_scl[k];
+         for(int k=0; k<n; k++) diff[k] = f_scl[k] - o_scl[k];
 
          // Write the decomposed difference field for this scale to PostScript
          if(conf_info.ps_plot_flag) {
@@ -1224,7 +1218,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
           << "OEN[" << thresh_str << "]\t\t= "
           << isc_info[i].oen << "\n";
 
-      for(j=0; j<=ns; j++) {
+      for(int j=0; j<=ns; j++) {
          msg << "SCALE_" << j+1 << "[" << thresh_str
              << "] MSE, ISC, FEN, OEN = "
              << isc_info[i].mse_scale[j] << ", "
@@ -1253,16 +1247,13 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
 void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
                         ISCInfo &isc_aggr) {
-   int i, j;
-   int fy_oy, fy_on, fn_oy, fn_on;
-   ConcatString fcst_thresh_str, obs_thresh_str;
 
    // Set up the aggregated ISCInfo object
    isc_aggr = isc_info[0][i_thresh];
    isc_aggr.zero_out();
 
-   fcst_thresh_str = isc_aggr.fthresh.get_abbr_str();
-   obs_thresh_str  = isc_aggr.othresh.get_abbr_str();
+   ConcatString fcst_thresh_str(isc_aggr.fthresh.get_abbr_str());
+   ConcatString obs_thresh_str (isc_aggr.othresh.get_abbr_str());
 
    mlog << Debug(2) << "Aggregating ISC for "
         << conf_info.fcst_info[i_vx]->magic_str() << " " << fcst_thresh_str
@@ -1271,10 +1262,13 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
         << " using " << conf_info.get_n_tile() << " tiles.\n";
 
    // Initialize the Contingency Table counts
-   fy_oy = fy_on = fn_oy = fn_on = 0;
+   int fy_oy = 0;
+   int fy_on = 0;
+   int fn_oy = 0;
+   int fn_on = 0;
 
    // Sum up the other ISCInfo objects
-   for(i=0; i<conf_info.get_n_tile(); i++) {
+   for(int i=0; i<conf_info.get_n_tile(); i++) {
 
       // Increment the contingency table counts
       fy_oy += isc_info[i][i_thresh].cts.fy_oy();
@@ -1288,7 +1282,7 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
       isc_aggr.oen += isc_info[i][i_thresh].oen;
 
       // Sum the MSE, FEN, and OEN values for each scale
-      for(j=0; j<=isc_aggr.n_scale; j++) {
+      for(int j=0; j<=isc_aggr.n_scale; j++) {
          isc_aggr.mse_scale[j] += isc_info[i][i_thresh].mse_scale[j];
          isc_aggr.fen_scale[j] += isc_info[i][i_thresh].fen_scale[j];
          isc_aggr.oen_scale[j] += isc_info[i][i_thresh].oen_scale[j];
@@ -1308,7 +1302,7 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
    isc_aggr.oen /= conf_info.get_n_tile();
 
    // Compute the means for MSE, FEN, and OEN for each scale
-   for(i=0; i<=isc_aggr.n_scale; i++) {
+   for(int i=0; i<=isc_aggr.n_scale; i++) {
       isc_aggr.mse_scale[i] /= conf_info.get_n_tile();
       isc_aggr.fen_scale[i] /= conf_info.get_n_tile();
       isc_aggr.oen_scale[i] /= conf_info.get_n_tile();
@@ -1332,7 +1326,7 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
         << "OEN[" << fcst_thresh_str << ", " << obs_thresh_str << "]\t\t= "
         << isc_aggr.oen << "\n";
 
-   for(j=0; j<=isc_aggr.n_scale; j++) {
+   for(int j=0; j<=isc_aggr.n_scale; j++) {
       msg << "SCALE_" << j+1 << "["
           << fcst_thresh_str<< ", " << obs_thresh_str
           << "] MSE, ISC, FEN, OEN = "
@@ -1471,20 +1465,16 @@ void compute_energy(const double *arr, int n, double &en) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, const double *odata, int n,
+void write_nc_raw(const WaveletStatNcOutInfo &nc_info,
+                  const double *fdata, const double *odata, int n,
                   int i_vx, int i_tile) {
-   int i, d;
-   float *fcst_data = (float *) nullptr;
-   float *obs_data  = (float *) nullptr;
-   float *diff_data = (float *) nullptr;
    ConcatString fcst_var_name;
    ConcatString obs_var_name;
    ConcatString diff_var_name;
    ConcatString val;
 
    // Build the variable names
-
-   if ( nc_info.do_raw)  {
+   if(nc_info.do_raw) {
       fcst_var_name.format("FCST_%s_%s_%s_%s_RAW",
               conf_info.fcst_info[i_vx]->name_attr().text(),
               conf_info.fcst_info[i_vx]->level_attr().text(),
@@ -1497,32 +1487,34 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
               conf_info.obs_info[i_vx]->level_attr().text());
    }
 
-   if ( nc_info.do_diff )  {
+   if(nc_info.do_diff) {
       diff_var_name.format("DIFF_%s_%s_%s_%s_RAW",
               conf_info.fcst_info[i_vx]->name_attr().text(),
               conf_info.fcst_info[i_vx]->level_attr().text(),
               conf_info.obs_info[i_vx]->name_attr().text(),
               conf_info.obs_info[i_vx]->level_attr().text());
-
    }
 
    // If this is the first tile, define new variables
    if(i_tile == 0) {
 
       // Define the forecast and difference variables
-
       int deflate_level = compress_level;
-      if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
+      if(deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
-      if ( nc_info.do_raw )  {
-         fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat, tile_dim, x_dim, y_dim, deflate_level);
-         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat, tile_dim, x_dim, y_dim, deflate_level);
+      if(nc_info.do_raw) {
+         fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
+                            tile_dim, x_dim, y_dim, deflate_level);
+         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
+                            tile_dim, x_dim, y_dim, deflate_level);
       }
-      if ( nc_info.do_diff )  diff_var = add_var(nc_out, (string)diff_var_name, ncFloat, tile_dim, x_dim, y_dim, deflate_level);
+      if(nc_info.do_diff) {
+         diff_var = add_var(nc_out, (string)diff_var_name, ncFloat,
+                            tile_dim, x_dim, y_dim, deflate_level);
+      }
 
       // Add variable attributes for the observation field
-
-      if ( nc_info.do_raw )  {
+      if(nc_info.do_raw) {
          add_var_att_local(&obs_var, "type", "Observation");
          add_var_att_local(&obs_var, "name", shc.get_obs_var().c_str());
          val.format("%s at %s",
@@ -1551,10 +1543,9 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
             shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
             shc.get_fcst_valid_beg(), 0);
          add_var_att_local(&fcst_var, "desc", conf_info.desc[i_vx].c_str());
-
       }
 
-      if ( nc_info.do_diff )  {
+      if(nc_info.do_diff) {
 
          // Add variable attributes for the difference field
          add_var_att_local(&diff_var, "type", "Difference (F-O)");
@@ -1581,56 +1572,65 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
             shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
             shc.get_fcst_valid_beg(), 0);
          add_var_att_local(&diff_var, "desc", conf_info.desc[i_vx].c_str());
-
       }
-
    }
    // Otherwise, retrieve the previously defined variables
    else {
-
-      if ( nc_info.do_raw )  {
+      if(nc_info.do_raw) {
          fcst_var = get_var(nc_out, fcst_var_name.c_str());
          obs_var  = get_var(nc_out, obs_var_name.c_str());
       }
-      if ( nc_info.do_diff )  diff_var = get_var(nc_out, diff_var_name.c_str());
+      if(nc_info.do_diff) {
+         diff_var = get_var(nc_out, diff_var_name.c_str());
+      }
    }
 
-   // Allocate memory for the forecast, observation, and difference
-   // fields
-   if ( nc_info.do_raw )  {
-      fcst_data = new float [n];
-      obs_data  = new float [n];
+   // Allocate memory for the fcst, obs, and diff data
+   vector<float> fcst_data;
+   vector<float> obs_data;
+   vector<float> diff_data;
+   if(nc_info.do_raw) {
+      fcst_data.resize(n, bad_data_float);
+      obs_data.resize(n, bad_data_float);
    }
-   if ( nc_info.do_diff )  diff_data = new float [n];
+   if(nc_info.do_diff) {
+      diff_data.resize(n, bad_data_float);
+   }
 
-   // Store the forecast, observation, and difference fields
-   for(i=0; i<n; i++) {
+#pragma omp parallel default(none) \
+   shared(n, nc_info, fdata, odata, fcst_data, obs_data, diff_data)
+   {
 
-      if ( nc_info.do_raw && fcst_data != nullptr && obs_data != nullptr)  {
+      // Store the forecast, observation, and difference fields
+#pragma omp for schedule(static)
+      for(int i=0; i<n; i++) {
 
-         // Set the forecast data
-         if(fdata == nullptr || is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
-         else                      fcst_data[i] = (float) fdata[i];
+         if(nc_info.do_raw) {
 
-         // Set the observation data
-         if(odata == nullptr || is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
-         else                      obs_data[i]  = (float) odata[i];
+            // Set the forecast data
+            if(fdata || !is_bad_data(fdata[i])) {
+               fcst_data[i] = (float) fdata[i];
+            }
 
-      }
+            // Set the observation data
+            if(odata || is_bad_data(odata[i])) {
+               obs_data[i] = (float) odata[i];
+            }
+         }
 
-      if ( nc_info.do_diff && fdata != nullptr && odata != nullptr && diff_data != nullptr)  {
-         // Set the difference data
-         if(is_bad_data(fdata[i]) ||
-            is_bad_data(odata[i]))
-            diff_data[i] = bad_data_float;
-         else
-            diff_data[i] = (float) (fdata[i] - odata[i]);
-      }
+         if(nc_info.do_diff && fdata && odata) {
 
-   } // end for i
+            // Set the difference data
+            if(!is_bad_data(fdata[i]) &&  
+               !is_bad_data(odata[i])) {
+               diff_data[i] = (float) (fdata[i] - odata[i]);
+            }
+         }
+      } // end for i
+   } // End omp parallel
 
    // Retrieve the tile dimension
-   d = conf_info.get_tile_dim();
+   int d = conf_info.get_tile_dim();
 
    int dim_count = get_dim_count(&fcst_var);
    vector<long> lengths(dim_count);
@@ -1644,9 +1644,11 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    lengths[1] = d;
    lengths[2] = d;
 
-   if ( nc_info.do_raw )  {
+   if(nc_info.do_raw) {
+
       // Write out the forecast field
-      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths.data(), offsets.data())) {
+      if(!put_nc_data(&fcst_var, fcst_data.data(),
+                      lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the fcst_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1654,54 +1656,46 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       }
 
       // Write out the observation field
-      if(!put_nc_data(&obs_var, &obs_data[0], lengths.data(), offsets.data())) {
+      if(!put_nc_data(&obs_var, obs_data.data(),
+                      lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the obs_var->put for field "
               << shc.get_obs_var() << "\n\n";
          exit(1);
       }
-
    }
 
-   if ( nc_info.do_diff )  {
+   if(nc_info.do_diff) {
 
       // Write out the difference field
-      if(!put_nc_data(&diff_var, &diff_data[0], lengths.data(), offsets.data())) {
+      if(!put_nc_data(&diff_var, diff_data.data(),
+                      lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the diff_var->put for field "
               << shc.get_fcst_var() << "\n\n";
          exit(1);
       }
-
    }
 
-   // Deallocate and clean up
-   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) nullptr; }
-   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) nullptr; }
-   if(diff_data) { delete [] diff_data; diff_data = (float *) nullptr; }
-
    return;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, const double *odata, int n,
+void write_nc_wav(const WaveletStatNcOutInfo &nc_info,
+                  const double *fdata, const double *odata, int n,
                   int i_vx, int i_tile, int i_scale,
                   SingleThresh &fcst_st, SingleThresh &obs_st) {
-   int i, d;
-   float *fcst_data = (float *) nullptr;
-   float *obs_data  = (float *) nullptr;
-   float *diff_data = (float *) nullptr;
-   ConcatString fcst_var_name, obs_var_name, diff_var_name;
-   ConcatString fcst_thresh_str, obs_thresh_str;
+   ConcatString fcst_var_name;
+   ConcatString obs_var_name;
+   ConcatString diff_var_name;
    ConcatString val;
 
    // Get the string for the threshold applied
-   fcst_thresh_str = fcst_st.get_abbr_str();
-   obs_thresh_str  = obs_st.get_abbr_str();
+   ConcatString fcst_thresh_str(fcst_st.get_abbr_str());
+   ConcatString obs_thresh_str (obs_st.get_abbr_str());
 
-   if ( nc_info.do_raw )  {
+   if(nc_info.do_raw) {
 
       // Build the variable names
       fcst_var_name.format("FCST_%s_%s_%s_%s_%s_%s",
@@ -1720,7 +1714,7 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
               obs_thresh_str.text());
    }
 
-   if ( nc_info.do_diff )  {
+   if(nc_info.do_diff) {
 
       diff_var_name.format("DIFF_%s_%s_%s_%s_%s_%s",
               conf_info.fcst_info[i_vx]->name_attr().text(),
@@ -1729,7 +1723,6 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
               conf_info.obs_info[i_vx]->name_attr().text(),
               conf_info.obs_info[i_vx]->level_attr().text(),
               obs_thresh_str.text());
-
    }
 
    // If this is the binary field, define new variables
@@ -1739,18 +1732,19 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
       // Define the forecast and difference variables
-
-      if ( nc_info.do_raw )  {
+      if(nc_info.do_raw) {
          fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
                             tile_dim, scale_dim, x_dim, y_dim, deflate_level);
          obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
                             tile_dim, scale_dim, x_dim, y_dim, deflate_level);
       }
 
-      if ( nc_info.do_diff )  diff_var = add_var(nc_out, (string)diff_var_name, ncFloat,
-                                                 tile_dim, scale_dim, x_dim, y_dim, deflate_level);
+      if(nc_info.do_diff) {
+         diff_var = add_var(nc_out, (string)diff_var_name, ncFloat,
+                            tile_dim, scale_dim, x_dim, y_dim, deflate_level);
+      } 
 
-      if ( nc_info.do_raw )  {
+      if(nc_info.do_raw) {
 
          // Add variable attributes for the observation field
          add_var_att_local(&obs_var, "type", "Observation");
@@ -1787,10 +1781,9 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
             shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
             shc.get_fcst_valid_beg(), 0);
          add_var_att_local(&fcst_var, "desc", conf_info.desc[i_vx].c_str());
-
       }
 
-      if ( nc_info.do_diff )  {
+      if(nc_info.do_diff) {
 
          // Add variable attributes for the difference field
          add_var_att_local(&diff_var, "type", "Difference (F-O)");
@@ -1824,61 +1817,65 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
             shc.get_fcst_valid_beg(), 0);
          add_var_att_local(&diff_var, "desc", conf_info.desc[i_vx].c_str());
       }
-
    }
    // Otherwise, retrieve the previously defined variables
    else {
 
-      if ( nc_info.do_raw )  {
-
+      if(nc_info.do_raw) {
          fcst_var = get_var(nc_out, fcst_var_name.c_str());
          obs_var  = get_var(nc_out, obs_var_name.c_str());
-
       }
-
-      if ( nc_info.do_diff )  diff_var = get_var(nc_out, diff_var_name.c_str());
-
+      if(nc_info.do_diff) {
+         diff_var = get_var(nc_out, diff_var_name.c_str());
+      } 
    }
 
-   // Allocate memory for the forecast, observation, and difference
-   // fields
-
-   if ( nc_info.do_raw )  {
-      fcst_data = new float [n];
-      obs_data  = new float [n];
+   // Allocate memory for the fcst, obs, and diff data
+   vector<float> fcst_data;
+   vector<float> obs_data;
+   vector<float> diff_data;
+   if(nc_info.do_raw) {
+      fcst_data.resize(n, bad_data_float);
+      obs_data.resize(n, bad_data_float);
    }
-   if ( nc_info.do_diff )  diff_data = new float [n];
+   if(nc_info.do_diff) {
+      diff_data.resize(n, bad_data_float);
+   }
 
-   // Store the forecast, observation, and difference fields
-   for(i=0; i<n; i++) {
+#pragma omp parallel default(none) \
+   shared(n, nc_info, fdata, odata, fcst_data, obs_data, diff_data)
+   {
 
-      if ( nc_info.do_raw && fcst_data != nullptr && obs_data != nullptr)  {
+      // Store the forecast, observation, and difference fields
+#pragma omp for schedule(static)
+      for(int i=0; i<n; i++) {
 
-         // Set the forecast data
-         if(fdata == nullptr || is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
-         else                      fcst_data[i] = (float) fdata[i];
+         if(nc_info.do_raw) {
 
-         // Set the observation data
-         if(odata == nullptr || is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
-         else                      obs_data[i]  = (float) odata[i];
+            // Set the forecast data
+            if(fdata || !is_bad_data(fdata[i])) {
+               fcst_data[i] = (float) fdata[i];
+            }
 
-      }
+            // Set the observation data
+            if(odata || is_bad_data(odata[i])) {
+               obs_data[i] = (float) odata[i];
+            }
+         }
 
-      if ( nc_info.do_diff && fdata != nullptr && odata != nullptr && diff_data != nullptr)  {
+         if(nc_info.do_diff && fdata && odata) {
 
-         // Set the difference data
-         if(is_bad_data(fdata[i]) ||
-            is_bad_data(odata[i]))
-            diff_data[i] = bad_data_float;
-         else
-            diff_data[i] = (float) (fdata[i] - odata[i]);
-
-      }
-
-   } // end for i
+            // Set the difference data
+            if(!is_bad_data(fdata[i]) &&  
+               !is_bad_data(odata[i])) {
+               diff_data[i] = (float) (fdata[i] - odata[i]);
+            }
+         }
+      } // end for i
+   } // End omp parallel
 
    // Retrieve the tile dimensions
-   d = conf_info.get_tile_dim();
+   int d = conf_info.get_tile_dim();
 
    int dim_count = get_dim_count(&fcst_var);
    vector<long> lengths(dim_count);
@@ -1892,10 +1889,12 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    lengths[1] = 1;
    lengths[2] = d;
    lengths[3] = d;
-   if ( nc_info.do_raw )  {
+
+   if(nc_info.do_raw) {
 
       // Write out the forecast field
-      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths.data(), offsets.data())) {
+      if(!put_nc_data(&fcst_var, fcst_data.data(),
+                      lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_wav() -> "
               << "error with the fcst_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1903,32 +1902,26 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       }
 
       // Write out the observation field
-      if(!put_nc_data(&obs_var, &obs_data[0], lengths.data(), offsets.data())) {
+      if(!put_nc_data(&obs_var, obs_data.data(),
+                      lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_wav() -> "
               << "error with the obs_var->put for field "
               << shc.get_obs_var() << "\n\n";
          exit(1);
       }
-
    }
 
-   if ( nc_info.do_diff )  {
-
+   if(nc_info.do_diff) {
 
       // Write out the difference field
-      if(!put_nc_data(&diff_var, &diff_data[0], lengths.data(), offsets.data())) {
+      if(!put_nc_data(&diff_var, diff_data.data(),
+                      lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc()_wav -> "
               << "error with the diff_var->put for field "
               << shc.get_fcst_var() << "\n\n";
          exit(1);
       }
-
    }
-
-   // Deallocate and clean up
-   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) nullptr; }
-   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) nullptr; }
-   if(diff_data) { delete [] diff_data; diff_data = (float *) nullptr; }
 
    return;
 }
@@ -1992,7 +1985,7 @@ double sum_array(double *d, int n) {
    int i;
    double sum;
 
-   for(i=0, sum=0.0; i<n; i++) sum += d[i];
+   for(int i=0, sum=0.0; i<n; i++) sum += d[i];
 
    return sum;
 }
@@ -2003,7 +1996,7 @@ double mean_array(double *d, int n) {
    int i;
    double sum;
 
-   for(i=0, sum=0.0; i<n; i++) sum += d[i];
+   for(int i=0, sum=0.0; i<n; i++) sum += d[i];
 
    return (sum/n);
 }
@@ -2340,7 +2333,7 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    //
    ps_out->write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                                "Tile Corner:");
-   for(i=0; i<conf_info.get_n_tile(); i++) {
+   for(int i=0; i<conf_info.get_n_tile(); i++) {
       label.format("(%i, %i) ",
               nint(conf_info.tile_xll[i]),
               nint(conf_info.tile_yll[i]));
@@ -2669,7 +2662,6 @@ void set_dim(Box &dim, double y_ll, double y_ur, double x_cen) {
 ////////////////////////////////////////////////////////////////////////
 
 void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
-   int i;
    char label[max_str_len];
    double bar_width, bar_height, x_ll, y_ll, step, v;
    ColorTable *ct_ptr = (ColorTable *) nullptr;
@@ -2702,7 +2694,7 @@ void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
            - ct_ptr->data_min(bad_data_double))/n_color_bars;
    v = ct_ptr->data_min(bad_data_double);
 
-   for(i=0; i<=n_color_bars; i++) {
+   for(int i=0; i<=n_color_bars; i++) {
 
      c = ct_ptr->nearest(v);
 
@@ -2869,7 +2861,6 @@ void draw_tiles(PSfile *p, Box &dim,
 void render_image(PSfile *p, const DataPlane &dp, Box &dim, int fcst) {
    RenderInfo render_info;
    Ppm ppm_image;
-   int x, y, grid_x, grid_y;
    double mag;
    Color c;
    Color *c_fill_ptr = (Color *) nullptr;
@@ -2899,8 +2890,8 @@ void render_image(PSfile *p, const DataPlane &dp, Box &dim, int fcst) {
    if(nint(xy_bb.width())  == dp.nx() &&
       nint(xy_bb.height()) == dp.ny()) {
 
-      for(x=0; x<dp.nx(); x++) {
-         for(y=0; y<dp.ny(); y++) {
+      for(int x=0; x<dp.nx(); x++) {
+         for(int y=0; y<dp.ny(); y++) {
 
             if(is_bad_data(dp.get(x, y)))
                c = *c_fill_ptr;
@@ -2916,14 +2907,14 @@ void render_image(PSfile *p, const DataPlane &dp, Box &dim, int fcst) {
    //
    else {
 
-      for(x=nint(xy_bb.x_ll()); x<xy_bb.x_ur(); x++) {
-         for(y=nint(xy_bb.y_ll()); y<xy_bb.y_ur(); y++) {
+      for(int x=nint(xy_bb.x_ll()); x<xy_bb.x_ur(); x++) {
+         for(int y=nint(xy_bb.y_ll()); y<xy_bb.y_ur(); y++) {
 
             //
             // Compute grid relative x, y values
             //
-            grid_x = nint(x + xy_bb.x_ll());
-            grid_y = nint(y + xy_bb.y_ll());
+            int grid_x = nint(x + xy_bb.x_ll());
+            int grid_y = nint(y + xy_bb.y_ll());
 
             if(grid_x < 0 || grid_x >= dp.nx() ||
                grid_y < 0 || grid_y >= dp.ny()) continue;
@@ -2959,7 +2950,7 @@ void render_tile(PSfile *p, const double *data, int n, int i_tile,
                  Box &dim) {
    RenderInfo render_info;
    Ppm ppm_image;
-   int i, x, y;
+   int x, y;
    double mag;
    Color c;
    Color *c_fill_ptr = (Color *) nullptr;
@@ -2977,7 +2968,7 @@ void render_tile(PSfile *p, const double *data, int n, int i_tile,
    //
    ppm_image.set_size_xy((int) xy_bb.width(), (int) xy_bb.height());
 
-   for(i=0; i<n; i++) {
+   for(int i=0; i<n; i++) {
 
       x = nint(conf_info.tile_xll[i_tile] + i%conf_info.get_tile_dim());
       y = nint(conf_info.tile_yll[i_tile] + i/conf_info.get_tile_dim());
