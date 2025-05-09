@@ -178,7 +178,7 @@ void process_command_line(int argc, char **argv) {
    if(cline.n() != 1) usage();
 
    // Store the required arguments
-   out_filename  = cline[0];
+   out_filename = cline[0];
 
    return;
 }
@@ -190,7 +190,7 @@ void process_land_data() {
    for(int i=0; i<land_data_files.n_elements(); i++) {
       mlog << Debug(2)
            << "Reading TC land data file: "
-           << replace_path(land_data_files[i]) << "\n";
+           << land_data_files[i] << "\n";
       land_array.add_file(replace_path(land_data_files[i]).c_str());
    }
 
@@ -260,6 +260,8 @@ void process_distances() {
    {
 
       // Loop over the grid and compute the distance to land for each point   
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int x=0; x<grid.nx(); x++) {
          for(int y=0; y<grid.ny(); y++) {
 
