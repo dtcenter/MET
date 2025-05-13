@@ -159,14 +159,6 @@ Overview of Steps for Performing Benchmarking
              make install test >& make.log &
              tail -f make.log
 
-       .. note::
-
-        There will be an error message like the following:
-
-        No rule to make target 'profiler', needed by 'all'.  Stop.
-
-        This is **not** an error with the compilation.  The --enable-profiler option does not have a build target,
-        as it is used to turn on the CTRACK tool.
 
 
     .. dropdown:: Verify that the expected code is being measured
