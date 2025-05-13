@@ -45,7 +45,7 @@ static void _mask_super(const string &name, int nx, int ny, DataPlane &data)
       }
    }
    
-   mlog << Debug(1) << name << " Superobject masking.."
+   mlog << Debug(1) << name << " Superobject masking... "
         << nkeep << " points of "
         << nmasked + nkeep << " are in superobjects\n";
 }
@@ -77,7 +77,7 @@ static void _mask(const string &name, int nx, int ny, const BoolPlane &bp,
       }
    }
    
-   mlog << Debug(1) << name << " Superobject masking.."
+   mlog << Debug(1) << name << " Superobject masking... "
         << nkeep << " points of "
         << nmasked + nkeep << " are in superobjects\n";
 }
@@ -107,7 +107,7 @@ static void _debug_shape_examine(const string &name, const ShapeData &sd,
       }
    }
    for (size_t i=0; i<values.size(); ++i) {
-      mlog << Debug(1) << name << " shape value=" << values[i] << " count=" << count[i] << "\n";
+      mlog << Debug(4) << name << " shape value=" << values[i] << " count=" << count[i] << "\n";
    }
 }   
 
@@ -188,7 +188,9 @@ ModeSuperObject::ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
    
    int n_shapes;
    _merge_sd_split = split(merge_sd, n_shapes);
-   _debug_shape_examine(merge_name, _merge_sd_split, nx, ny);
+   if(mlog.verbosity_level() >= 4) {
+       _debug_shape_examine(merge_name, _merge_sd_split, nx, ny);
+   }
 
    delete [] simple_plane;
    delete [] merge_plane;
