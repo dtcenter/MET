@@ -780,9 +780,9 @@ using the following entries:
 to_grid
 ^^^^^^^
 
-* The "to_grid" entry may be set to NONE, FCST, OBS, a named grid, the path
-  to a gridded data file defining the grid, or an explicit grid specification
-  string.
+The "to_grid" entry may be set to NONE, FCST, OBS, a named grid, the path
+to a gridded data file defining the grid, or an explicit grid specification
+string.
 
   * to_grid = NONE;   To disable regridding.
 
@@ -797,13 +797,19 @@ to_grid
   * to_grid = "spec"; To define a grid specification string, as
     described in :ref:`appendixB`.
 
-* The "vld_thresh" entry specifies a proportion between 0 and 1 to define
-  the required ratio of valid data points. When regridding, compute
-  a ratio of the number of valid data points to the total number of
-  points in the neighborhood. If that ratio is less than this threshold,
-  write bad data for the current point.
+vld_thresh
+^^^^^^^^^^
 
-* The "method" entry defines the regridding method to be used.
+The "vld_thresh" entry specifies a proportion between 0 and 1 to define
+the required ratio of valid data points. When regridding, compute
+a ratio of the number of valid data points to the total number of
+points in the neighborhood. If that ratio is less than this threshold,
+write bad data for the current point.
+
+method
+^^^^^^
+
+The "method" entry defines the regridding method to be used.
 
   * Valid regridding methods:
 
@@ -856,29 +862,40 @@ to_grid
 
     The BEST, GEOG_MATCH, and HIRA options are not valid for regridding.
 
-* The "width" entry specifies a regridding width, when applicable.
-  - width = 4;    To regrid using a 4x4 box or circle with diameter 4.
+width
+^^^^^
+The "width" entry specifies a regridding width, when applicable.
+:code: `width = 4;`  To regrid using a 4x4 box or circle with diameter 4.
 
-* The "shape" entry defines the shape of the neighborhood.
-  Valid values are SQUARE or CIRCLE
+shape
+^^^^^
+The "shape" entry defines the shape of the neighborhood.
+Valid values are :code: `SQUARE` or :code: `CIRCLE`
 
-* The "gaussian_dx" entry specifies a delta distance for Gaussian
-  smoothing. The default is 81.271. Ignored if not Gaussian method.
+gaussian_dx
+^^^^^^^^^^^
+The "gaussian_dx" entry specifies a delta distance for Gaussian
+smoothing. The default is 81.271. Ignored if not Gaussian method.
 
-* The "gaussian_radius" entry defines the radius of influence for Gaussian
-  smoothing. The default is 120. Ignored if not Gaussian method.
+gaussian_radius
+^^^^^^^^^^^^^^^
+The "gaussian_radius" entry defines the radius of influence for Gaussian
+smoothing. The default is 120. Ignored if not Gaussian method.
 
-* The "gaussian_dx" and "gaussian_radius" settings must be in the same
+.. note::
+  The "gaussian_dx" and "gaussian_radius" settings must be in the same
   units, such as kilometers or degress. Their ratio
   (sigma = gaussian_radius / gaussian_dx) determines the Guassian weighting
   function.
 
-* The "convert", "censor_thresh", and "censor_val" entries are described
-  below. When specified, these operations are applied to the output of the
-  regridding step. The conversion operation is applied first, followed by
-  the censoring operation. Note that these operations are limited in scope.
-  They are only applied if defined within the regrid dictionary itself.
-  Settings defined at higher levels of config file context are not applied.
+convert, censor_thresh, and censor_val
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The "convert", "censor_thresh", and "censor_val" entries are described
+below. When specified, these operations are applied to the output of the
+regridding step. The conversion operation is applied first, followed by
+the censoring operation. Note that these operations are limited in scope.
+They are only applied if defined within the regrid dictionary itself.
+Settings defined at higher levels of config file context are not applied.
 
 .. code-block:: none
 
@@ -903,8 +920,11 @@ fcst
 The "fcst" entry is a dictionary containing information about the field(s)
 to be verified. This dictionary may include the following entries:
 
-* The "field" entry is an array of dictionaries, each specifying a
-  verification task. Each of these dictionaries may include:
+field
+^^^^^
+
+The "field" entry is an array of dictionaries, each specifying a
+verification task. Each of these dictionaries may include:
 
   * The "name" entry specifies a name for the field.
 
@@ -1101,13 +1121,16 @@ to be verified. This dictionary may include the following entries:
     settings are combined when filtering matched pairs of forecast and
     observed values.
 
-* The "file_type" entry specifies the input gridded data file type rather
-  than letting the code determine it. MET determines the file type by
-  checking for known suffixes and examining the file contents. Use this
-  option to override the code's choice. The valid file_type values are
-  listed the "data/config/ConfigConstants" file and are described below.
-  This entry should be defined within the "fcst" and/or "obs" dictionaries.
-  For example:
+file_type
+^^^^^^^^^
+
+The "file_type" entry specifies the input gridded data file type rather
+than letting the code determine it. MET determines the file type by
+checking for known suffixes and examining the file contents. Use this
+option to override the code's choice. The valid file_type values are
+listed the "data/config/ConfigConstants" file and are described below.
+This entry should be defined within the "fcst" and/or "obs" dictionaries.
+For example:
 
   .. code-block:: none
 
@@ -1131,45 +1154,58 @@ to be verified. This dictionary may include the following entries:
                                   an xarray object.
     }
 
-* The "wind_thresh" entry is an array of thresholds used to filter wind
-  speed values when computing VL1L2 vector partial sums. Only those U/V
-  pairs that meet this wind speed criteria will be included in the sums.
-  Setting this threshold to NA will result in all U/V pairs being used.
+wind_thresh
+^^^^^^^^^^^
+The "wind_thresh" entry is an array of thresholds used to filter wind
+speed values when computing VL1L2 vector partial sums. Only those U/V
+pairs that meet this wind speed criteria will be included in the sums.
+Setting this threshold to NA will result in all U/V pairs being used.
 
-* The "wind_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
-  and controls the logic for how the forecast and observed wind_thresh
-  settings are combined when filtering matched pairs of forecast and
-  observed wind speeds.
+wind_logic
+^^^^^^^^^^
+The "wind_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
+and controls the logic for how the forecast and observed wind_thresh
+settings are combined when filtering matched pairs of forecast and
+observed wind speeds.
 
-* The "eclv_points" entry specifies the economic cost/loss ratio points
-  to be evaluated. For each cost/loss ratio specified, the relative value
-  will be computed and written to the ECLV output line. This entry may
-  either be specified as an array of numbers between 0 and 1 or as a single
-  number. For an array, each array entry will be evaluated. For a single
-  number, all evenly spaced points between 0 and 1 will be evaluated, where
-  eclv_points defines the spacing. Cost/loss values are omitted for
-  ratios of 0.0 and 1.0 since they are undefined.
+eclv_points
+^^^^^^^^^^^
+The "eclv_points" entry specifies the economic cost/loss ratio points
+to be evaluated. For each cost/loss ratio specified, the relative value
+will be computed and written to the ECLV output line. This entry may
+either be specified as an array of numbers between 0 and 1 or as a single
+number. For an array, each array entry will be evaluated. For a single
+number, all evenly spaced points between 0 and 1 will be evaluated, where
+eclv_points defines the spacing. Cost/loss values are omitted for
+ratios of 0.0 and 1.0 since they are undefined.
 
-* The "init_time" entry specifies the initialization time in
-  YYYYMMDD[_HH[MMSS]]
-  format. This entry can be included in the "fcst" entry as shown below or
-  included in the "field" entry if the user would like to use different
-  initialization times for different fields.
+init_time
+^^^^^^^^^
+The "init_time" entry specifies the initialization time in
+YYYYMMDD[_HH[MMSS]]
+format. This entry can be included in the "fcst" entry as shown below or
+included in the "field" entry if the user would like to use different
+initialization times for different fields.
 
-* The "valid_time" entry specifies the valid time in YYYYMMDD[_HH[MMSS]]
-  format. This entry can be included in the "fcst" entry as shown below or
-  included in the "field" entry if the user would like to use different
-  valid times for different fields.
+valid_time
+^^^^^^^^^^
+The "valid_time" entry specifies the valid time in YYYYMMDD[_HH[MMSS]]
+format. This entry can be included in the "fcst" entry as shown below or
+included in the "field" entry if the user would like to use different
+valid times for different fields.
 
-* The "lead_time" entry specifies the lead time in HH[MMSS]
-  format. This entry can be included in the "fcst" entry as shown below or
-  included in the "field" entry if the user would like to use different
-  lead times for different fields.
+lead_time
+^^^^^^^^^
+The "lead_time" entry specifies the lead time in HH[MMSS]
+format. This entry can be included in the "fcst" entry as shown below or
+included in the "field" entry if the user would like to use different
+lead times for different fields.
 
-It is only necessary to use the "init_time", "valid_time", and/or "lead_time"
-settings when verifying a file containing data for multiple output times.
-For example, to verify a GRIB file containing data for many lead times, you
-could use "lead_time" to specify the record to be verified.
+.. note::
+  It is only necessary to use the "init_time", "valid_time", and/or "lead_time"
+  settings when verifying a file containing data for multiple output times.
+  For example, to verify a GRIB file containing data for many lead times, you
+  could use "lead_time" to specify the record to be verified.
 
 File-format specific settings for the "field" entry:
 
@@ -1184,7 +1220,7 @@ File-format specific settings for the "field" entry:
       * `GRIB2 Product Definition Section <http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc>`_
 
     * The "level" entry specifies a level type and value:
-
+x
       * ANNN for accumulation interval NNN
 
       * ZNNN for vertical level NNN
