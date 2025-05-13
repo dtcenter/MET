@@ -831,10 +831,8 @@ void ModeExecutive::do_conv_thresh_multivar_super(int rIndexF, int tIndexF,
    SingleThresh s("ne-9999");
    conf.set_fcst_conv_thresh(s);
    conf.set_fcst_conv_radius(0.0);
-   conf.set_fcst_merge_thresh(s);
    conf.set_obs_conv_thresh(s);
    conf.set_obs_conv_radius(0.0);
-   conf.set_obs_merge_thresh(s);
 
    //
    //  Set up the engine with these raw fields
@@ -994,13 +992,10 @@ void ModeExecutive::do_merging_multivar(const ShapeData &f_merge,
                                         Processing_t p)
 {
    if (p == MULTIVAR_SUPER) {
-      // set the merge flag and merge_thresh appropriately
+      // No threshold merging applies to super objects
       ModeConfInfo & conf = engine.conf_info;
-      SingleThresh s("ne-9999");
-      conf.set_fcst_merge_flag(MergeType::Thresh);
-      conf.set_fcst_merge_thresh(s);
-      conf.set_obs_merge_flag(MergeType::Thresh);
-      conf.set_obs_merge_thresh(s);
+      conf.set_fcst_merge_flag(MergeType::None);
+      conf.set_obs_merge_flag(MergeType::None);
    } else if (p != MULTIVAR_INTENSITY) {
       mlog << Error << "\nModeExecutive::do_merging(shapedata, shapedata, p) -> "
            << "wrong method for processing type " << stype(p) << "\n\n";
