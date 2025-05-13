@@ -994,8 +994,11 @@ void ModeExecutive::do_merging_multivar(const ShapeData &f_merge,
    if (p == MULTIVAR_SUPER) {
       // No threshold merging applies to super objects
       ModeConfInfo & conf = engine.conf_info;
+      SingleThresh s("ne-9999");
       conf.set_fcst_merge_flag(MergeType::None);
+      conf.set_fcst_merge_thresh(s);
       conf.set_obs_merge_flag(MergeType::None);
+      conf.set_obs_merge_thresh(s);
    } else if (p != MULTIVAR_INTENSITY) {
       mlog << Error << "\nModeExecutive::do_merging(shapedata, shapedata, p) -> "
            << "wrong method for processing type " << stype(p) << "\n\n";
