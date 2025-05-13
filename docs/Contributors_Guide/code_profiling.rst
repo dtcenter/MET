@@ -6,7 +6,7 @@ Benchmarking (also referred to as profiling) of MET tools is accomplished using 
   https://github.com/Compaile/ctrack
 
 This code is licensed under the MIT License:
-https://github.com/Compaile/ctrack/blob/main/LICENSE
+  https://github.com/Compaile/ctrack/blob/main/LICENSE
 
 Benchmarking uses a macro and the C++ source code is readily instrumented by
 including ctrack.hpp and by adding **CTRACK** at the top of the function of interest.
