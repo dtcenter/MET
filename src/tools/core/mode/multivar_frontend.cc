@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
 #include "multivar_frontend.h"
 #include "mode_usage.h"
 
@@ -18,9 +17,7 @@
 
 using namespace std;
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 extern const char * const program_name;
 
@@ -371,7 +368,6 @@ void MultivarFrontEnd::_setup_inputs()
       exit ( 1 );
    }
 
-
    if (config.fcst_multivar_compare_index.n() != config.obs_multivar_compare_index.n()) {
       mlog << Error << "\nMultivarFrontEnd::_setup_inputs() ->"
            << " Need equal number of multivar_compare_index entries for obs and fcst\n\n";
@@ -466,8 +462,10 @@ int MultivarFrontEnd::_mkdir(const char *dir) const
 
 ////////////////////////////////////////////////////////////////////////
 
-void MultivarFrontEnd::_read_input(const string &name, int index, ModeDataType type,
-                                   GrdFileType f_t, GrdFileType other_t, int shift)
+void MultivarFrontEnd::_read_input(
+                          const string &name, int index,
+                          ModeDataType type, GrdFileType f_t,
+                          GrdFileType other_t, int shift)
 {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *f = mtddf_factory.new_met_2d_data_file(name.c_str(), f_t);
@@ -514,11 +512,12 @@ void MultivarFrontEnd::_create_verif_grid()
 
 ////////////////////////////////////////////////////////////////////////
 
-void MultivarFrontEnd::_create_simple_objects(ModeDataType dtype, const std::string &name,
-                                              int rIndex, int tIndex, int n_files,
-                                              const StringArray &filenames,
-                                              const std::vector<ModeInputData> &input,
-                                              BoolCalc &calc, SimpleObjects &O) const
+void MultivarFrontEnd::_create_simple_objects(
+                          ModeDataType dtype, const std::string &name,
+                          int rIndex, int tIndex, int n_files,
+                          const StringArray &filenames,
+                          const std::vector<ModeInputData> &input,
+                          BoolCalc &calc, SimpleObjects &O) const
 {
    O.init(dtype, rIndex, tIndex);
    for (int j=0; j<n_files; ++j)  {
@@ -536,11 +535,12 @@ void MultivarFrontEnd::_create_simple_objects(ModeDataType dtype, const std::str
 
 ////////////////////////////////////////////////////////////////////////
 
-MultiVarData *MultivarFrontEnd::_create_simple_multivar_data(ModeDataType dtype,
-                                                             int rIndex, int tIndex,
-                                                             int j, int n_files,
-                                                             const string &filename,
-                                                             const ModeInputData &input) const
+MultiVarData *MultivarFrontEnd::_create_simple_multivar_data(
+                                   ModeDataType dtype,
+                                   int rIndex, int tIndex,
+                                   int j, int n_files,
+                                   const string &filename,
+                                   const ModeInputData &input) const
 {
    //
    // create simple non merged objects
@@ -562,11 +562,12 @@ MultiVarData *MultivarFrontEnd::_create_simple_multivar_data(ModeDataType dtype,
 
 ////////////////////////////////////////////////////////////////////////
 
-void MultivarFrontEnd::_simple_objects(ModeExecutive::Processing_t p,
-                                       ModeDataType dtype, int rIndex, 
-                                       int tIndex, int j, int n_files,
-                                       const string &filename,
-                                      const ModeInputData &input) const
+void MultivarFrontEnd::_simple_objects(
+                          ModeExecutive::Processing_t p,
+                          ModeDataType dtype, int rIndex, 
+                          int tIndex, int j, int n_files,
+                          const string &filename,
+                          const ModeInputData &input) const
 {
    if (dtype == ModeDataType::MvMode_Fcst) {
       _init_exec(p, filename, "None");
@@ -596,11 +597,11 @@ void MultivarFrontEnd::_simple_mode_algorithm(ModeExecutive::Processing_t p,
 
 ////////////////////////////////////////////////////////////////////////
 
-void
-MultivarFrontEnd::_create_intensity_comparisons(SimpleObjects &fcsts, int findex,
-                                                SimpleObjects &obs, int oindex,
-                                               const string &fcst_filename,
-                                               const string &obs_filename)
+void MultivarFrontEnd::_create_intensity_comparisons(
+                          SimpleObjects &fcsts, int findex,
+                          SimpleObjects &obs, int oindex,
+                          const string &fcst_filename,
+                          const string &obs_filename)
 {
    MultiVarData *mvdf = fcsts._mvd[findex];
    MultiVarData *mvdo = obs._mvd[oindex];
@@ -654,13 +655,13 @@ MultivarFrontEnd::_create_intensity_comparisons(SimpleObjects &fcsts, int findex
 
 ////////////////////////////////////////////////////////////////////////
 
-void
-MultivarFrontEnd::_intensity_compare_mode_algorithm(int rIndexF, int tIndexF, 
-                                                    int rIndexO, int tIndexO,
-                                                    const MultiVarData &mvdf,
-                                                    const MultiVarData &mvdo,
-                                                    const ModeSuperObject &fsuper,
-                                                    const ModeSuperObject &osuper)
+void MultivarFrontEnd::_intensity_compare_mode_algorithm(
+                          int rIndexF, int tIndexF, 
+                          int rIndexO, int tIndexO,
+                          const MultiVarData &mvdf,
+                          const MultiVarData &mvdo,
+                          const ModeSuperObject &fsuper,
+                          const ModeSuperObject &osuper)
 {
    mode_exec->do_conv_thresh_multivar_intensity_compare(rIndexF, tIndexF, rIndexO, tIndexO);
    mode_exec->do_match_merge_multivar(fsuper._merge_sd_split, osuper._merge_sd_split,
@@ -716,11 +717,11 @@ void MultivarFrontEnd::_process_superobjects(SimpleObjects &fcsts, SimpleObjects
 
 ////////////////////////////////////////////////////////////////////////
 
-void
-MultivarFrontEnd::_superobject_mode_algorithm(int rIndexF, int tIndexF,
-                                              int rIndexO, int tIndexO,
-                                              const ModeSuperObject &fsuper,
-                                              const ModeSuperObject &osuper)
+void MultivarFrontEnd::_superobject_mode_algorithm(
+                          int rIndexF, int tIndexF,
+                          int rIndexO, int tIndexO,
+                          const ModeSuperObject &fsuper,
+                          const ModeSuperObject &osuper)
 
 {
    mode_exec->clear_internal_r_index();
@@ -736,9 +737,10 @@ MultivarFrontEnd::_superobject_mode_algorithm(int rIndexF, int tIndexF,
 
 ////////////////////////////////////////////////////////////////////////
 
-void MultivarFrontEnd::_init_exec(ModeExecutive::Processing_t p,
-                                  const string &ffile,
-                                  const string &ofile) const
+void MultivarFrontEnd::_init_exec(
+                          ModeExecutive::Processing_t p,
+                          const string &ffile,
+                          const string &ofile) const
 {
    mlog << Debug(4) << "Running multivar front end for " << ModeExecutive::stype(p) << "\n";
 
@@ -752,4 +754,4 @@ void MultivarFrontEnd::_init_exec(ModeExecutive::Processing_t p,
    mode_exec->out_dir = output_path;
 }
 
-
+////////////////////////////////////////////////////////////////////////
