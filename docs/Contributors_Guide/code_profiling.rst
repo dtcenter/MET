@@ -72,7 +72,7 @@ Overview of Steps for Performing Benchmarking
          The ctrack.hpp file is saved in the $HOME/MET/src/basic/vx_util directory and does not need to be modified
          or added to any other location.  This version of ctrack.hpp has been modified to write the summary and detail
          tables to text files. By default, CTRACK is disabled and is enabled at compilation time via the
-         **--enable-profiler flag**.
+         :code:`--enable-profiler` flag.
 
          $HOME refers to the path to where the MET source code is saved.
 
