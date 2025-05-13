@@ -58,7 +58,7 @@ void combine_boolplanes(const string &name,
 
    }   //  for x
 
-   mlog << Debug(1) << name << " has " << nTrue << " superobject points.  rIndex[" << rIndex << "] tIndex[" << tIndex << "]\n";
+   mlog << Debug(4) << name << " has " << nTrue << " superobject points.  rIndex[" << rIndex << "] tIndex[" << tIndex << "]\n";
 
    //
    //  done
