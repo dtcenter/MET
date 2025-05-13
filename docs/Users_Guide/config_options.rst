@@ -398,14 +398,11 @@ The following lines consist of 4 integers followed by 3 strings:
 | Column 5: variable name
 | Column 6: variable description
 | Column 7: units
-|
-
 
 References:
-
 | `Office Note 388 GRIB1 <http://www.nco.ncep.noaa.gov/pmb/docs/on388>`_
 | `A Guide to the Code Form FM 92-IX Ext. GRIB Edition 1 <http://www.wmo.int/pages/prog/www/WMOCodes/Guides/GRIB/GRIB1-Contents.html>`_
-|
+
 
 GRIB2 table files begin with "grib2" prefix and end with a ".txt" suffix.
 The first line of the file must contain GRIB2.
@@ -422,12 +419,9 @@ The following lines consist of 8 integers followed by 3 strings.
 | Column 9:  variable name
 | Column 10: variable description
 | Column 11: units
-|
 
 References:
-
 | `NCEP WMO GRIB2 Documentation <http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc>`_
-|
 
 OMP_NUM_THREADS
 ---------------
@@ -782,6 +776,9 @@ regrid
 The "regrid" entry is a dictionary containing information about how to handle
 input gridded data files. The "regrid" entry specifies regridding logic
 using the following entries:
+
+to_grid
+^^^^^^^
 
 * The "to_grid" entry may be set to NONE, FCST, OBS, a named grid, the path
   to a gridded data file defining the grid, or an explicit grid specification
