@@ -476,22 +476,24 @@ void MultivarFrontEnd::_read_input(const string &name, int index, ModeDataType t
            << "\nTrouble reading fcst file \"" << name << "\"\n\n";
       exit(1);
    }
-   Grid g = f->grid();
    GrdFileType ft = f->file_type();
 
-   //?
+   // store shift right setting
    f->set_shift_right(shift);
 
    // update config now that we know file type (this sets Fcst to index i)
    DataPlane dp;
+   Grid g;
 
    if (type == ModeDataType::MvMode_Fcst) {
       config.process_config_field(ft, other_t, type, index);
       f->data_plane(*(config.Fcst->var_info), dp);
+      if(g.nxy() == 0) g = f->grid();
       fcstInput.emplace_back(ModeInputData(name, dp, g));
    } else {
       config.process_config_field(other_t, ft, type, index);
       f->data_plane(*(config.Obs->var_info), dp);
+      if(g.nxy() == 0) g = f->grid();
       obsInput.emplace_back(ModeInputData(name, dp, g));
    }         
       
