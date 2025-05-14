@@ -161,7 +161,7 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+static void process_command_line(int argc, char **argv) {
    CommandLine cline;
    GrdFileType ftype, otype;
    ConcatString default_config_file;
@@ -270,7 +270,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_scores() {
+static void process_scores() {
    bool status;
    double fcst_fill, obs_fill;
 
@@ -525,7 +525,7 @@ void process_scores() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void clean_up() {
+static void clean_up() {
 
    // Close the output files
    close_out_files();
@@ -535,7 +535,7 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_first_pass(const DataPlane &dp) {
+static void setup_first_pass(const DataPlane &dp) {
 
    // Unset the flag
    is_first_pass = false;
@@ -561,7 +561,7 @@ void setup_first_pass(const DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_txt_files(unixtime valid_ut, int lead_sec) {
+static void setup_txt_files(unixtime valid_ut, int lead_sec) {
    ConcatString tmp_str;
 
    // Create output file names for the stat file and optional text files
@@ -630,7 +630,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_table(AsciiTable &at) {
+static void setup_table(AsciiTable &at) {
 
    // Justify the STAT AsciiTable objects
    justify_stat_cols(at);
@@ -652,7 +652,8 @@ void setup_table(AsciiTable &at) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int lead_sec) {
+static void setup_nc_file(const WaveletStatNcOutInfo & nc_info,
+                          unixtime valid_ut, int lead_sec) {
 
    // Create output NetCDF file name
    build_outfile_name(valid_ut, lead_sec, ".nc", out_nc_file);
@@ -720,7 +721,7 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_ps_file(unixtime valid_ut, int lead_sec) {
+static void setup_ps_file(unixtime valid_ut, int lead_sec) {
 
    // Create output PostScript file name
    build_outfile_name(valid_ut, lead_sec, ".ps", out_ps_file);
@@ -742,8 +743,8 @@ void setup_ps_file(unixtime valid_ut, int lead_sec) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void build_outfile_name(unixtime valid_ut, int lead_sec,
-                        const char *suffix, ConcatString &str) {
+static void build_outfile_name(unixtime valid_ut, int lead_sec,
+                               const char *suffix, ConcatString &str) {
 
    //
    // Create output file name
@@ -769,7 +770,7 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 
 ////////////////////////////////////////////////////////////////////////
 
-double get_fill_value(const DataPlane &dp, int i_vx) {
+static double get_fill_value(const DataPlane &dp, int i_vx) {
    double fill_val;
 
    //
@@ -811,7 +812,7 @@ double get_fill_value(const DataPlane &dp, int i_vx) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void fill_bad_data(DataPlane &dp, double fill_val) {
+static void fill_bad_data(DataPlane &dp, double fill_val) {
 
    //
    // Replace any bad data values with the fill value
@@ -846,7 +847,7 @@ void fill_bad_data(DataPlane &dp, double fill_val) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void pad_field(DataPlane &dp, double pad_val) {
+static void pad_field(DataPlane &dp, double pad_val) {
    DataPlane dp_pad;
 
    // Set up the DataPlane object
@@ -883,9 +884,9 @@ void pad_field(DataPlane &dp, double pad_val) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_tile(const DataPlane &fcst_dp, const DataPlane &obs_dp,
-              int i_vx, int i_tile,
-              NumArray &f_na, NumArray &o_na) {
+static void get_tile(const DataPlane &fcst_dp, const DataPlane &obs_dp,
+                     int i_vx, int i_tile,
+                     NumArray &f_na, NumArray &o_na) {
 
    //
    // Initialize the NumArray objects
@@ -937,7 +938,7 @@ void get_tile(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-int get_tile_tot_count() {
+static int get_tile_tot_count() {
 
    // Get grid dimensions
    int nx = grid.nx();
@@ -977,8 +978,10 @@ int get_tile_tot_count() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
-                        ISCInfo *&isc_info, int i_vx, int i_tile) {
+static void do_intensity_scale(const NumArray &f_na,
+                               const NumArray &o_na,
+                               ISCInfo *&isc_info, int i_vx,
+                               int i_tile) {
 
    // Check the NumArray lengths
    int n = f_na.n();
@@ -1245,8 +1248,8 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
-                        ISCInfo &isc_aggr) {
+static void aggregate_isc_info(ISCInfo **isc_info, int i_vx,
+                               int i_thresh, ISCInfo &isc_aggr) {
 
    // Set up the aggregated ISCInfo object
    isc_aggr = isc_info[0][i_thresh];
@@ -1360,8 +1363,8 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_cts(const double *f_arr, const double *o_arr, int n,
-                 ISCInfo &isc_info) {
+static void compute_cts(const double *f_arr, const double *o_arr, int n,
+                        ISCInfo &isc_info) {
    int fy_oy = 0;
    int fy_on = 0;
    int fn_oy = 0;
@@ -1402,8 +1405,8 @@ void compute_cts(const double *f_arr, const double *o_arr, int n,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_mse(const double *f, const double *o,
-                 int n, double &mse) {
+static void compute_mse(const double *f, const double *o,
+                        int n, double &mse) {
    int count = 0;
    double sum_sq = 0.0;
 
@@ -1435,7 +1438,7 @@ void compute_mse(const double *f, const double *o,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_energy(const double *arr, int n, double &en) {
+static void compute_energy(const double *arr, int n, double &en) {
    int count = 0;
    double sum_sq = 0.0;
 
@@ -1465,9 +1468,9 @@ void compute_energy(const double *arr, int n, double &en) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_raw(const WaveletStatNcOutInfo &nc_info,
-                  const double *fdata, const double *odata, int n,
-                  int i_vx, int i_tile) {
+static void write_nc_raw(const WaveletStatNcOutInfo &nc_info,
+                         const double *fdata, const double *odata, int n,
+                         int i_vx, int i_tile) {
    ConcatString fcst_var_name;
    ConcatString obs_var_name;
    ConcatString diff_var_name;
@@ -1608,23 +1611,21 @@ void write_nc_raw(const WaveletStatNcOutInfo &nc_info,
          if(nc_info.do_raw) {
 
             // Set the forecast data
-            if(fdata || !is_bad_data(fdata[i])) {
+            if(fdata && !is_bad_data(fdata[i])) {
                fcst_data[i] = (float) fdata[i];
             }
 
             // Set the observation data
-            if(odata || is_bad_data(odata[i])) {
+            if(odata && !is_bad_data(odata[i])) {
                obs_data[i] = (float) odata[i];
             }
          }
 
-         if(nc_info.do_diff && fdata && odata) {
-
-            // Set the difference data
-            if(!is_bad_data(fdata[i]) &&  
-               !is_bad_data(odata[i])) {
-               diff_data[i] = (float) (fdata[i] - odata[i]);
-            }
+         // Set the difference data
+         if(nc_info.do_diff &&
+            fdata && !is_bad_data(fdata[i]) &&
+            odata && !is_bad_data(odata[i])) {
+            diff_data[i] = (float) (fdata[i] - odata[i]);
          }
       } // end for i
    } // End omp parallel
@@ -1665,16 +1666,14 @@ void write_nc_raw(const WaveletStatNcOutInfo &nc_info,
       }
    }
 
-   if(nc_info.do_diff) {
-
-      // Write out the difference field
-      if(!put_nc_data(&diff_var, diff_data.data(),
-                      lengths.data(), offsets.data())) {
-         mlog << Error << "\nwrite_nc_raw() -> "
-              << "error with the diff_var->put for field "
-              << shc.get_fcst_var() << "\n\n";
-         exit(1);
-      }
+   // Write out the difference field
+   if(nc_info.do_diff &&
+      !put_nc_data(&diff_var, diff_data.data(),
+                   lengths.data(), offsets.data())) {
+      mlog << Error << "\nwrite_nc_raw() -> "
+           << "error with the diff_var->put for field "
+           << shc.get_fcst_var() << "\n\n";
+      exit(1);
    }
 
    return;
@@ -1682,10 +1681,10 @@ void write_nc_raw(const WaveletStatNcOutInfo &nc_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_wav(const WaveletStatNcOutInfo &nc_info,
-                  const double *fdata, const double *odata, int n,
-                  int i_vx, int i_tile, int i_scale,
-                  SingleThresh &fcst_st, SingleThresh &obs_st) {
+static void write_nc_wav(const WaveletStatNcOutInfo &nc_info,
+                         const double *fdata, const double *odata, int n,
+                         int i_vx, int i_tile, int i_scale,
+                         SingleThresh &fcst_st, SingleThresh &obs_st) {
    ConcatString fcst_var_name;
    ConcatString obs_var_name;
    ConcatString diff_var_name;
@@ -1853,23 +1852,21 @@ void write_nc_wav(const WaveletStatNcOutInfo &nc_info,
          if(nc_info.do_raw) {
 
             // Set the forecast data
-            if(fdata || !is_bad_data(fdata[i])) {
+            if(fdata && !is_bad_data(fdata[i])) {
                fcst_data[i] = (float) fdata[i];
             }
 
             // Set the observation data
-            if(odata || is_bad_data(odata[i])) {
+            if(odata && !is_bad_data(odata[i])) {
                obs_data[i] = (float) odata[i];
             }
          }
 
-         if(nc_info.do_diff && fdata && odata) {
-
-            // Set the difference data
-            if(!is_bad_data(fdata[i]) &&  
-               !is_bad_data(odata[i])) {
-               diff_data[i] = (float) (fdata[i] - odata[i]);
-            }
+         // Set the difference data
+         if(nc_info.do_diff &&
+            fdata && !is_bad_data(fdata[i]) &&
+            odata && !is_bad_data(odata[i])) {
+            diff_data[i] = (float) (fdata[i] - odata[i]);
          }
       } // end for i
    } // End omp parallel
@@ -1911,16 +1908,14 @@ void write_nc_wav(const WaveletStatNcOutInfo &nc_info,
       }
    }
 
-   if(nc_info.do_diff) {
-
-      // Write out the difference field
-      if(!put_nc_data(&diff_var, diff_data.data(),
-                      lengths.data(), offsets.data())) {
-         mlog << Error << "\nwrite_nc()_wav -> "
-              << "error with the diff_var->put for field "
-              << shc.get_fcst_var() << "\n\n";
-         exit(1);
-      }
+   // Write out the difference field
+   if(nc_info.do_diff &&
+      !put_nc_data(&diff_var, diff_data.data(),
+                   lengths.data(), offsets.data())) {
+      mlog << Error << "\nwrite_nc()_wav -> "
+           << "error with the diff_var->put for field "
+           << shc.get_fcst_var() << "\n\n";
+      exit(1);
    }
 
    return;
@@ -1928,7 +1923,8 @@ void write_nc_wav(const WaveletStatNcOutInfo &nc_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att_local(NcVar *var, const char *att_name, const char *att_value) {
+static void add_var_att_local(NcVar *var, const char *att_name,
+                              const char *att_value) {
 
    if(att_value) add_att(var, att_name, att_value);
    else          add_att(var, att_name, na_str);
@@ -1938,7 +1934,7 @@ void add_var_att_local(NcVar *var, const char *att_name, const char *att_value) 
 
 ////////////////////////////////////////////////////////////////////////
 
-void close_out_files() {
+static void close_out_files() {
 
    // Write out the contents of the STAT AsciiTable and
    // close the STAT output files
@@ -1981,22 +1977,22 @@ void close_out_files() {
 
 ////////////////////////////////////////////////////////////////////////
 
-double sum_array(double *d, int n) {
+static double sum_array(double *d, int n) {
    int i;
-   double sum;
+   double sum = 0.0;
 
-   for(int i=0, sum=0.0; i<n; i++) sum += d[i];
+   for(int i=0; i<n; i++) sum += d[i];
 
    return sum;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-double mean_array(double *d, int n) {
+static double mean_array(double *d, int n) {
    int i;
-   double sum;
+   double sum = 0.0;
 
-   for(int i=0, sum=0.0; i<n; i++) sum += d[i];
+   for(int i=0; i<n; i++) sum += d[i];
 
    return (sum/n);
 }
@@ -2007,18 +2003,18 @@ double mean_array(double *d, int n) {
 //
 ////////////////////////////////////////////////////////////////////////
 
-void plot_ps_raw(const DataPlane &fcst_dp,
-                 const DataPlane &obs_dp,
-                 const DataPlane &fcst_dp_fill,
-                 const DataPlane &obs_dp_fill,
-                 int i_vx) {
+static void plot_ps_raw(const DataPlane &fcst_dp,
+                        const DataPlane &obs_dp,
+                        const DataPlane &fcst_dp_fill,
+                        const DataPlane &obs_dp_fill,
+                        int i_vx) {
    ConcatString label;
    ConcatString tmp_str;
    ConcatString fcst_str, fcst_short_str;
    ConcatString obs_str, obs_short_str;
    double v_tab, h_tab_a, h_tab_b;
    double data_min, data_max;
-   int i, mon, day, yr, hr, minute, sec;
+   int mon, day, yr, hr, minute, sec;
    Box dim;
 
    //
@@ -2372,10 +2368,10 @@ void plot_ps_raw(const DataPlane &fcst_dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void plot_ps_wvlt(const double *diff, double mad,
-                  int n, int i_vx, int i_tile,
-                  ISCInfo &isc_info,
-                  int i_scale, int n_scale) {
+static void plot_ps_wvlt(const double *diff, double mad,
+                         int n, int i_vx, int i_tile,
+                         ISCInfo &isc_info,
+                         int i_scale, int n_scale) {
    ConcatString label;
    ConcatString fcst_thresh_str, obs_thresh_str;
    Box dim;
@@ -2580,7 +2576,7 @@ void plot_ps_wvlt(const double *diff, double mad,
 
 ////////////////////////////////////////////////////////////////////////
 
-double compute_percentage(double num, double den) {
+static double compute_percentage(double num, double den) {
    double percentage;
 
    if(is_bad_data(num) || is_bad_data(den) || is_eq(den, 0.0)) {
@@ -2595,7 +2591,7 @@ double compute_percentage(double num, double den) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_plot_dims(int nx, int ny) {
+static void set_plot_dims(int nx, int ny) {
    double grid_ar, plot_ar, w;
 
    w = full_pane_bb.width();
@@ -2630,7 +2626,7 @@ void set_plot_dims(int nx, int ny) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_xy_bb() {
+static void set_xy_bb() {
 
    //
    // Check if padding was performed
@@ -2651,7 +2647,7 @@ void set_xy_bb() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_dim(Box &dim, double y_ll, double y_ur, double x_cen) {
+static void set_dim(Box &dim, double y_ll, double y_ur, double x_cen) {
 
    double width = ((y_ur - y_ll)/xy_bb.height()) * xy_bb.width();
    dim.set_lrbt(x_cen - 0.5*width, x_cen + 0.5*width, y_ll, y_ur);
@@ -2661,11 +2657,10 @@ void set_dim(Box &dim, double y_ll, double y_ur, double x_cen) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
+static void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
    char label[max_str_len];
    double bar_width, bar_height, x_ll, y_ll, step, v;
    ColorTable *ct_ptr = (ColorTable *) nullptr;
-   Color c;
 
    //
    // Set up the pointer to the appropriate colortable
@@ -2678,7 +2673,7 @@ void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
    // Draw colorbar in the bottom-right corner of the Bounding Box
    //
 
-   if ( use_flate )  p->begin_flate();
+   if(use_flate) p->begin_flate();
 
    p->gsave();
    p->setlinewidth(l_width);
@@ -2696,7 +2691,7 @@ void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
 
    for(int i=0; i<=n_color_bars; i++) {
 
-     c = ct_ptr->nearest(v);
+     Color c = ct_ptr->nearest(v);
 
      //
      // Color box
@@ -2735,14 +2730,14 @@ void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
 
    p->grestore();
 
-   if ( use_flate )  p->end_flate();
+   if(use_flate) p->end_flate();
 
   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void draw_border(PSfile *p, Box &dim) {
+static void draw_border(PSfile *p, Box &dim) {
 
    p->gsave();
    p->setlinewidth(l_width);
@@ -2760,23 +2755,23 @@ void draw_border(PSfile *p, Box &dim) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void draw_map(PSfile *p, Box &dim) {
+static void draw_map(PSfile *p, Box &dim) {
 
-   if ( use_flate )  p->begin_flate();
+   if(use_flate) p->begin_flate();
 
    p->gsave();
    p->setlinewidth(l_width);
    draw_map(grid, xy_bb, *p, dim, &conf_info.conf);
    p->grestore();
 
-   if ( use_flate )  p->end_flate();
+   if(use_flate) p->end_flate();
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void draw_tiles(PSfile *p, Box &dim,
+static void draw_tiles(PSfile *p, Box &dim,
                 int tile_start, int tile_end, int label_flag) {
    int i;
    double page_x, page_y;
@@ -2858,18 +2853,17 @@ void draw_tiles(PSfile *p, Box &dim,
 
 ////////////////////////////////////////////////////////////////////////
 
-void render_image(PSfile *p, const DataPlane &dp, Box &dim, int fcst) {
+static void render_image(PSfile *p, const DataPlane &dp, Box &dim,
+                         int fcst) {
    RenderInfo render_info;
    Ppm ppm_image;
-   double mag;
-   Color c;
-   Color *c_fill_ptr = (Color *) nullptr;
-   ColorTable *ct_ptr = (ColorTable *) nullptr;
 
    //
    // Set up pointers to the appropriate colortable and fill color
    // values.
    //
+   Color *c_fill_ptr = (Color *) nullptr;
+   ColorTable *ct_ptr = (ColorTable *) nullptr;
    if(fcst == 1) {
       ct_ptr     = &fcst_ct;
       c_fill_ptr = &c_fcst_fill;
@@ -2893,10 +2887,8 @@ void render_image(PSfile *p, const DataPlane &dp, Box &dim, int fcst) {
       for(int x=0; x<dp.nx(); x++) {
          for(int y=0; y<dp.ny(); y++) {
 
-            if(is_bad_data(dp.get(x, y)))
-               c = *c_fill_ptr;
-            else
-               c = ct_ptr->nearest(dp.get(x, y));
+            Color c = (is_bad_data(dp.get(x, y)) ?
+                       *c_fill_ptr : ct_ptr->nearest(dp.get(x, y)));
 
             ppm_image.putxy(c, x, y);
          }
@@ -2919,24 +2911,22 @@ void render_image(PSfile *p, const DataPlane &dp, Box &dim, int fcst) {
             if(grid_x < 0 || grid_x >= dp.nx() ||
                grid_y < 0 || grid_y >= dp.ny()) continue;
 
-            if(is_bad_data(dp.get(grid_x, grid_y)))
-               c = *c_fill_ptr;
-            else
-               c = ct_ptr->nearest(dp.get(grid_x, grid_y));
+            Color c = (is_bad_data(dp.get(grid_x, grid_y)) ?
+                       *c_fill_ptr : ct_ptr->nearest(dp.get(grid_x, grid_y)));
 
             ppm_image.putxy(c, x, y);
          }
       }
    }
 
-   mag = (dim.x_ur() - dim.x_ll())/xy_bb.width();
+   double mag = (dim.x_ur() - dim.x_ll())/xy_bb.width();
 
    render_info.set_ll(dim.x_ll(), dim.y_ll());
    render_info.set_mag(mag);
    render_info.set_color();
 
-   if ( use_flate )  render_info.add_filter(FlateEncode);
-   else              render_info.add_filter(RunLengthEncode);
+   if(use_flate) render_info.add_filter(FlateEncode);
+   else          render_info.add_filter(RunLengthEncode);
 
    render_info.add_filter(ASCII85Encode);
    render(*p, ppm_image, render_info);
@@ -2946,22 +2936,17 @@ void render_image(PSfile *p, const DataPlane &dp, Box &dim, int fcst) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void render_tile(PSfile *p, const double *data, int n, int i_tile,
-                 Box &dim) {
+static void render_tile(PSfile *p, const double *data, int n,
+                        int i_tile, Box &dim) {
    RenderInfo render_info;
    Ppm ppm_image;
-   int x, y;
-   double mag;
-   Color c;
-   Color *c_fill_ptr = (Color *) nullptr;
-   ColorTable *ct_ptr = (ColorTable *) nullptr;
 
    //
    // Set up pointers to the appropriate colortable and fill color
    // values.
    //
-   ct_ptr = &wvlt_ct;
-   c_fill_ptr = &c_wvlt_fill;
+   ColorTable *ct_ptr = &wvlt_ct;
+   Color *c_fill_ptr = &c_wvlt_fill;
 
    //
    // Convert the DataPlane object to PPM
@@ -2970,25 +2955,23 @@ void render_tile(PSfile *p, const double *data, int n, int i_tile,
 
    for(int i=0; i<n; i++) {
 
-      x = nint(conf_info.tile_xll[i_tile] + i%conf_info.get_tile_dim());
-      y = nint(conf_info.tile_yll[i_tile] + i/conf_info.get_tile_dim());
+      Color c = (is_bad_data(data[i]) ?
+                 *c_fill_ptr : ct_ptr->nearest(data[i]));
 
-      if(is_bad_data(data[i]))
-         c = *c_fill_ptr;
-      else
-         c = ct_ptr->nearest(data[i]);
+      int x = nint(conf_info.tile_xll[i_tile] + i%conf_info.get_tile_dim());
+      int y = nint(conf_info.tile_yll[i_tile] + i/conf_info.get_tile_dim());
 
       ppm_image.putxy(c, x, y);
    }
 
-   mag = (dim.x_ur() - dim.x_ll())/xy_bb.width();
+   double mag = (dim.x_ur() - dim.x_ll())/xy_bb.width();
 
    render_info.set_ll(dim.x_ll(), dim.y_ll());
    render_info.set_mag(mag);
    render_info.set_color();
 
-   if ( use_flate )  render_info.add_filter(FlateEncode);
-   else              render_info.add_filter(RunLengthEncode);
+   if(use_flate) render_info.add_filter(FlateEncode);
+   else          render_info.add_filter(RunLengthEncode);
 
    render_info.add_filter(ASCII85Encode);
    render(*p, ppm_image, render_info);
@@ -2998,7 +2981,7 @@ void render_tile(PSfile *p, const double *data, int n, int i_tile,
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+static void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -3038,14 +3021,14 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_outdir(const StringArray & a)
+static void set_outdir(const StringArray & a)
 {
    out_dir = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a)
+static void set_compress(const StringArray & a)
 {
    compress_level = atoi(a[0].c_str());
 }
