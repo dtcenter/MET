@@ -4750,7 +4750,7 @@ member
 The "member" entry specifies the wavelet shape.
 See: `Discrete Wavelet Transforms (DWT) initialization <https://www.gnu.org/software/gsl/doc/html/dwt.html#initialization>`_
 
-Valid combinations of type and member
+Valid Combinations of type and member
 """""""""""""""""""""""""""""""""""""
 
 * HAAR for Haar wavelet (member = 2)
