@@ -2381,8 +2381,6 @@ the obs.cat_thresh thresholds will be used instead.
 gradient
 --------
 
-:ref:`gradient <gradient>`
-
 The "gradient" entry is a dictionary which specifies the number and size
 of gradients to be computed and applies to both Grid-Stat and
 Series-Analysis. The "dx" and "dy" entries specify the size of the
