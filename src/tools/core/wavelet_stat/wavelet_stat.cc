@@ -114,8 +114,8 @@ static void add_var_att_local(NcVar *, const char *, const char *);
 
 static void close_out_files();
 
-static double sum_array(double *, int);
-static double mean_array(double *, int);
+static double sum_array(const double *, int);
+static double mean_array(const double *, int);
 
 static void plot_ps_raw(const DataPlane &, const DataPlane &,
                         const DataPlane &, const DataPlane &, int);
@@ -126,12 +126,12 @@ static double compute_percentage(double, double);
 static void set_plot_dims(int, int);
 static void set_xy_bb();
 static void set_dim(Box &, double, double, double);
-static void draw_colorbar(PSfile *, Box &, int, int);
-static void draw_border(PSfile *, Box &);
-static void draw_map(PSfile *, Box &);
-static void draw_tiles(PSfile *, Box &, int, int, int);
-static void render_image(PSfile *, const DataPlane &, Box &, int);
-static void render_tile(PSfile *, const double *, int, int, Box &);
+static void draw_colorbar(PSfile *, const Box &, int, int);
+static void draw_border(PSfile *, const Box &);
+static void draw_map(PSfile *, const Box &);
+static void draw_tiles(PSfile *, const Box &, int, int, int);
+static void render_image(PSfile *, const DataPlane &, const Box &, int);
+static void render_tile(PSfile *, const double *, int, int, const Box &);
 
 static void usage();
 static void set_outdir(const StringArray &);
@@ -1977,8 +1977,7 @@ static void close_out_files() {
 
 ////////////////////////////////////////////////////////////////////////
 
-static double sum_array(double *d, int n) {
-   int i;
+static double sum_array(const double *d, int n) {
    double sum = 0.0;
 
    for(int i=0; i<n; i++) sum += d[i];
@@ -1988,8 +1987,7 @@ static double sum_array(double *d, int n) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static double mean_array(double *d, int n) {
-   int i;
+static double mean_array(const double *d, int n) {
    double sum = 0.0;
 
    for(int i=0; i<n; i++) sum += d[i];
@@ -2008,14 +2006,6 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
                         const DataPlane &fcst_dp_fill,
                         const DataPlane &obs_dp_fill,
                         int i_vx) {
-   ConcatString label;
-   ConcatString tmp_str;
-   ConcatString fcst_str, fcst_short_str;
-   ConcatString obs_str, obs_short_str;
-   double v_tab, h_tab_a, h_tab_b;
-   double data_min, data_max;
-   int mon, day, yr, hr, minute, sec;
-   Box dim;
 
    //
    // Compute the min and max data values across both raw fields for use
@@ -2046,6 +2036,7 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    //
    // Load the raw forecast color table
    //
+   ConcatString tmp_str;
    tmp_str = replace_path(conf_info.fcst_raw_pi.color_table.c_str());
    mlog << Debug(2) << "Loading forecast raw color table: " << tmp_str << "\n";
    fcst_ct.read(tmp_str.c_str());
@@ -2068,8 +2059,8 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    // Compute the min and max data values across both raw fields for use
    // in setting up the color table
    //
-   data_min = raw_plot_min;
-   data_max = raw_plot_max;
+   double data_min = raw_plot_min;
+   double data_max = raw_plot_max;
 
    //
    // If the forecast and observation fields are the same and if the range
@@ -2142,6 +2133,7 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
 
    ps_out->pagenumber(n_page);
 
+   ConcatString label;
    label.format("Wavelet-Stat: %s vs %s",
                 conf_info.fcst_info[i_vx]->magic_str().text(),
                 conf_info.obs_info[i_vx]->magic_str().text());
@@ -2149,10 +2141,10 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    ps_out->choose_font(31, 24.0);
    ps_out->write_centered_text(1, 1, h_tab_cen, 752.0, 0.5, 0.5, label.c_str());
 
-   fcst_str       = "Forecast";
-   fcst_short_str = "Fcst";
-   obs_str        = "Observation";
-   obs_short_str  = "Obs";
+   ConcatString fcst_str("Forecast");
+   ConcatString fcst_short_str("Fcst");
+   ConcatString obs_str("Observation");
+   ConcatString obs_short_str("Obs");
 
    ps_out->choose_font(31, 18.0);
    ps_out->write_centered_text(1, 1, h_tab_1, 727.0, 0.5, 0.5,
@@ -2166,6 +2158,7 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    //
    ////////////////////////////////////////////////////////////////////////////
 
+   Box dim;
    set_dim(dim, v_tab_1, v_tab_1 + sm_plot_height, h_tab_1);
    render_image(ps_out, fcst_dp, dim, 1);
    draw_map(ps_out, dim);
@@ -2230,9 +2223,9 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
 
    ps_out->choose_font(31, 12.0);
 
-   v_tab = v_tab_2 - 1.0*plot_text_sep;
-   h_tab_a = h_tab_1 - 0.5*dim.width();
-   h_tab_b = h_tab_a + 5.0*plot_text_sep;
+   double v_tab   = v_tab_2 - 1.0*plot_text_sep;
+   double h_tab_a = h_tab_1 - 0.5*dim.width();
+   double h_tab_b = h_tab_a + 5.0*plot_text_sep;
 
    //
    // Model Name
@@ -2247,6 +2240,13 @@ static void plot_ps_raw(const DataPlane &fcst_dp,
    // Blank line
    //
    v_tab -= plot_text_sep;
+
+   int mon;
+   int day;
+   int yr;
+   int hr;
+   int minute;
+   int sec;
 
    //
    // Initialization Time
@@ -2657,10 +2657,10 @@ static void set_dim(Box &dim, double y_ll, double y_ur, double x_cen) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
+static void draw_colorbar(PSfile *p, const Box &dim, int fcst, int raw) {
    char label[max_str_len];
    double bar_width, bar_height, x_ll, y_ll, step, v;
-   ColorTable *ct_ptr = (ColorTable *) nullptr;
+   const ColorTable *ct_ptr = (ColorTable *) nullptr;
 
    //
    // Set up the pointer to the appropriate colortable
@@ -2685,8 +2685,8 @@ static void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
    x_ll = dim.x_ur();
    y_ll = dim.y_ll();
 
-   step = (ct_ptr->data_max(bad_data_double)
-           - ct_ptr->data_min(bad_data_double))/n_color_bars;
+   step = (ct_ptr->data_max(bad_data_double) -
+           ct_ptr->data_min(bad_data_double))/n_color_bars;
    v = ct_ptr->data_min(bad_data_double);
 
    for(int i=0; i<=n_color_bars; i++) {
@@ -2737,7 +2737,7 @@ static void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void draw_border(PSfile *p, Box &dim) {
+static void draw_border(PSfile *p, const Box &dim) {
 
    p->gsave();
    p->setlinewidth(l_width);
@@ -2755,7 +2755,7 @@ static void draw_border(PSfile *p, Box &dim) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void draw_map(PSfile *p, Box &dim) {
+static void draw_map(PSfile *p, const Box &dim) {
 
    if(use_flate) p->begin_flate();
 
@@ -2771,8 +2771,8 @@ static void draw_map(PSfile *p, Box &dim) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void draw_tiles(PSfile *p, Box &dim,
-                int tile_start, int tile_end, int label_flag) {
+static void draw_tiles(PSfile *p, const Box &dim,
+                       int tile_start, int tile_end, int label_flag) {
    int i;
    double page_x, page_y;
    char label[128];
@@ -2853,7 +2853,7 @@ static void draw_tiles(PSfile *p, Box &dim,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void render_image(PSfile *p, const DataPlane &dp, Box &dim,
+static void render_image(PSfile *p, const DataPlane &dp, const Box &dim,
                          int fcst) {
    RenderInfo render_info;
    Ppm ppm_image;
@@ -2862,8 +2862,9 @@ static void render_image(PSfile *p, const DataPlane &dp, Box &dim,
    // Set up pointers to the appropriate colortable and fill color
    // values.
    //
-   Color *c_fill_ptr = (Color *) nullptr;
-   ColorTable *ct_ptr = (ColorTable *) nullptr;
+   const ColorTable *ct_ptr = (ColorTable *) nullptr;
+   const Color *c_fill_ptr = (Color *) nullptr;
+
    if(fcst == 1) {
       ct_ptr     = &fcst_ct;
       c_fill_ptr = &c_fcst_fill;
@@ -2937,7 +2938,7 @@ static void render_image(PSfile *p, const DataPlane &dp, Box &dim,
 ////////////////////////////////////////////////////////////////////////
 
 static void render_tile(PSfile *p, const double *data, int n,
-                        int i_tile, Box &dim) {
+                        int i_tile, const Box &dim) {
    RenderInfo render_info;
    Ppm ppm_image;
 
@@ -2945,8 +2946,8 @@ static void render_tile(PSfile *p, const double *data, int n,
    // Set up pointers to the appropriate colortable and fill color
    // values.
    //
-   ColorTable *ct_ptr = &wvlt_ct;
-   Color *c_fill_ptr = &c_wvlt_fill;
+   const ColorTable *ct_ptr = &wvlt_ct;
+   const Color *c_fill_ptr = &c_wvlt_fill;
 
    //
    // Convert the DataPlane object to PPM
