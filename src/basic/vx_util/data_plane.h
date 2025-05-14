@@ -165,7 +165,7 @@ inline std::vector<double> & DataPlane::buf() { return Data; }
 
 class DataPlaneArray {
 
-   protected:
+   private:
 
       void init_from_scratch();
 

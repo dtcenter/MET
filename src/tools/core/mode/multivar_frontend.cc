@@ -96,18 +96,18 @@ int MultivarFrontEnd::run(const StringArray & Argv)
    int NCRO = config.n_conv_radii_obs();
 
    if (NCTF != NCTO) {
-      mlog << Error << "\nMultivarFrontEnd::run() ->"
+      mlog << Error << "\nMultivarFrontEnd::run() -> "
            << "all convolution threshold arrays must have the same number of elements\n\n";
       exit ( 1 );
    }
    if (NCRF != NCRO) {
-      mlog << Error << "\nMultivarFrontEnd::run() ->"
+      mlog << Error << "\nMultivarFrontEnd::run() -> "
            << "all convolution radius arrays must have the same number of elements\n\n";
       exit ( 1 );
    }
 
    if ((!config.quilt) && (NCTF != NCRF || NCTO != NCRO)) {
-      mlog << Error << "\nMultivarFrontEnd::run() ->"
+      mlog << Error << "\nMultivarFrontEnd::run() -> "
            << "all convolution radius and threshold arrays must have the same number of elements without quilting\n\n";
       exit ( 1 );
    }
@@ -323,7 +323,7 @@ void MultivarFrontEnd::_setup_inputs()
 
    if ( config.fcst_multivar_logic.empty() )  {
 
-      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() ->"
+      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() -> "
            << "fcst multivar logic not specified in multivar mode!\n\n";
       exit ( 1 );
 
@@ -331,7 +331,7 @@ void MultivarFrontEnd::_setup_inputs()
 
    if ( config.obs_multivar_logic.empty() )  {
 
-      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() ->"
+      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() -> "
            << "obs multivar logic not specified in multivar mode!\n\n";
       exit ( 1 );
 
@@ -348,7 +348,7 @@ void MultivarFrontEnd::_setup_inputs()
    //
    if ( n_fcst_files < 2 && n_obs_files < 2) {
 
-      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() ->"
+      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() -> "
            << "Want at least 2 input files for fcst or obs in multivar mode, neither had 2 or more\n\n";
       exit ( 1 );
    }
@@ -369,8 +369,8 @@ void MultivarFrontEnd::_setup_inputs()
    }
 
    if (config.fcst_multivar_compare_index.n() != config.obs_multivar_compare_index.n()) {
-      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() ->"
-           << " Need equal number of multivar_compare_index entries for obs and fcst\n\n";
+      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() -> "
+           << "Need equal number of multivar_compare_index entries for obs and fcst\n\n";
       exit(1);
    }
 
@@ -380,14 +380,14 @@ void MultivarFrontEnd::_setup_inputs()
       int findex = config.fcst_multivar_compare_index[k];
       int oindex = config.obs_multivar_compare_index[k];
       if (findex <= 0 || findex > n_fcst_files) {
-         mlog << Error << "\nMultivarFrontEnd::_setup_inputs() ->"
-              << " forecast index " << findex
+         mlog << Error << "\nMultivarFrontEnd::_setup_inputs() -> "
+              << "forecast index " << findex
               << " out of range, " << conf_key_fcst_multivar_compare_index << " array\n";
          badIndex = true;
       }
       if (oindex <= 0 || oindex > n_obs_files) {
-         mlog << Error << "\nMultivarFrontEnd::_setup_inputs() ->"
-              << " obs index " << oindex
+         mlog << Error << "\nMultivarFrontEnd::_setup_inputs() -> "
+              << "obs index " << oindex
               << " out of range, " << conf_key_obs_multivar_compare_index << " array\n";
          badIndex = true;
       }
@@ -424,8 +424,8 @@ void MultivarFrontEnd::_set_output_path()
 
       if ( status < 0 )  {
 
-         mlog << Error << "\nMultivarFrontEnd::_set_output_path() ->"
-              << " unable to create output directory \""
+         mlog << Error << "\nMultivarFrontEnd::_set_output_path() -> "
+              << "unable to create output directory \""
               << output_path << "\"\n\n";
 
          exit ( 1 );
@@ -450,7 +450,7 @@ int MultivarFrontEnd::_mkdir(const char *dir) const
          string s = tmp;
          if (s != "." &&
              mkdir(tmp, dir_creation_mode) < 0) {
-            mlog << Error << "\nMultivarFrontEnd::_mkdir() ->"
+            mlog << Error << "\nMultivarFrontEnd::_mkdir() -> "
                  << "Error making " << tmp << "\n";
             return -1;
          }
@@ -470,8 +470,8 @@ void MultivarFrontEnd::_read_input(
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *f = mtddf_factory.new_met_2d_data_file(name.c_str(), f_t);
    if (!f) {
-      mlog << Error << "\nMultivarFrontEnd::_read_input() ->"
-           << "\nTrouble reading fcst file \"" << name << "\"\n\n";
+      mlog << Error << "\nMultivarFrontEnd::_read_input() -> "
+           << "Trouble reading fcst file \"" << name << "\"\n\n";
       exit(1);
    }
    GrdFileType ft = f->file_type();

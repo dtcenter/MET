@@ -92,7 +92,7 @@ DataPlane met_regrid_generic(const DataPlane & from_data,
                              const RegridInfo & info) {
    DataPlane to_data;
 
-#pragma omp parallel default(none)                            \
+#pragma omp parallel default(none) \
    shared(from_data, from_grid, to_grid, info, to_data) 
    {
 
@@ -103,8 +103,8 @@ DataPlane met_regrid_generic(const DataPlane & from_data,
          to_data.set_times(from_data);
       }
 
-#pragma omp for schedule (static)
-
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int xt=0; xt<(to_grid.nx()); xt++) {
          for(int yt=0; yt<(to_grid.ny()); yt++) {
 
@@ -155,7 +155,7 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
    //  weights are determined by the area of the from_grid boxes.
    //
 
-#pragma omp parallel default(none)                                     \
+#pragma omp parallel default(none) \
    shared(from_data, from_grid, to_grid, info, to_data, wt_data)
    { 
 
@@ -172,9 +172,9 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
 
       }
 
-#pragma omp for schedule (static)
-
       // loop over the from grid to accumulate sums and area weights
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int xf=0; xf<(from_grid.nx()); xf++) {
          for(int yf=0; yf<(from_grid.ny()); yf++) {
 
@@ -251,7 +251,7 @@ DataPlane met_regrid_maxgauss(const DataPlane & from_data,
                               const RegridInfo & info) {
    DataPlane to_data;
 
-#pragma omp parallel default(none)                      \
+#pragma omp parallel default(none) \
    shared(from_data, from_grid, to_grid, info, to_data)
    {
 
@@ -262,8 +262,8 @@ DataPlane met_regrid_maxgauss(const DataPlane & from_data,
          to_data.set_times(from_data);
       }
 
-#pragma omp for schedule (static)
-
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int xt=0; xt<(to_grid.nx()); xt++) {
          for(int yt=0; yt<(to_grid.ny()); yt++) {
 
