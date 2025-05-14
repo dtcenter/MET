@@ -155,7 +155,7 @@ MultiVarData::~MultiVarData()
 void MultiVarData::init(ModeDataType dataType,
                         const string &name, 
                         const Grid &grid,
-                         const string &units,
+                        const string &units,
                         const string &level,
                         double data_min, double data_max)
 {
