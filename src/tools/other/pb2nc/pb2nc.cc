@@ -21,34 +21,35 @@
 //   ----   ----      ----           -----------
 //   000    03-27-07  Halley Gotway  New
 //   001    12-19-07  Halley Gotway  Add support for ANYAIR, ANYSFC,
-//                    and ONLYSF message types.
+//                                   and ONLYSF message types.
 //   002    12-20-07  Halley Gotway  Derive PRMSL.
 //   003    01-31-08  Halley Gotway  Remove unused array elements from
-//                    the hdr_arr and obs_arr and allow it to run on
-//                    multiple PrepBufr files at once.
+//                                   the hdr_arr and obs_arr and allow
+//                                   it to run on multiple PrepBufr files
+//                                   at once.
 //   004    08-22-08  Halley Gotway  Change the arguments to dumppb
-//                    function for it to work with Fortran90/95
-//                    compilers.
+//                                   function for it to work with
+//                                   Fortran90/95 compilers.
 //   005    02-12-09  Halley Gotway  Fix npbmsg bug when reading
-//                    multiple PrepBufr files and use of valid_beg and
-//                    valid_end options.
+//                                   multiple PrepBufr files and use of
+//                                   valid_beg and valid_end options.
 //   006    06-01-10  Halley Gotway  Pass flags to dumppb to only dump
-//                    observation for requested message types.
+//                                   observation for requested message types.
 //   007    02-15-11  Halley Gotway  Fix event_stack bug for which the
-//                    logic was reversed.
+//                                   logic was reversed.
 //   008    02-28-11  Halley Gotway  Modify relative humidity derivation
-//                    to match the Unified-PostProcessor.
+//                                   to match the Unified-PostProcessor.
 //   009    06-01-11  Halley Gotway  Call closepb for input file
-//                    descriptor.
+//                                   descriptor.
 //   010    10/28/11  Holmes         Added use of command line class to
-//                    parse the command line arguments.
+//                                   parse the command line arguments.
 //   011    11/14/11  Holmes         Added code to enable reading of
-//                    multiple config files.
+//                                   multiple config files.
 //   012    05/11/12  Halley Gotway  Switch to using vx_config library.
-//   013    07/12/13  Halley Gotway  Use observations of sensible
-//                    temperature instead of virtual temperature.
+//   013    07/12/13  Halley Gotway  Use observations of sensible temperature
+//                                   instead of virtual temperature.
 //   014    07/23/13  Halley Gotway  Update sensible temperature fix
-//                    to handle older GDAS PREPBUFR files.
+//                                   to handle older GDAS PREPBUFR files.
 //          06/07/17  Howard Soh     Added more options: -vars, -all, and -index.
 //          09/15/17  Howard Soh     Removed options: -all, and -use_var_id.
 //   015    02/10/18  Halley Gotway  Add message_type_group_map.
@@ -60,6 +61,8 @@
 //                                   successfully using gcc12
 //   020    08/26/24  Halley Gotway  MET #2938 Silence center time warnings
 //   021    01/30/25  Halley Gotway  MET #3054 Fix PARUSR BUFRLIB error
+//   022    05/14/25  Halley Gotway  MET #3099 Write units and descriptions
+//                                   for derived variables
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -268,13 +271,37 @@ static const char *default_hms_name = "HOUR MINU SECO";
 
 static const char *airnow_aux_vars = "TPHR QCIND";
 
-// Pick the latter one if exists multiuple variables
+// Pick the latter one if exists multiple variables
 static const char *bufr_avail_sid_names = "SID SAID RPID";
 static const char *bufr_avail_latlon_names = "XOB CLON CLONH YOB CLAT CLATH";
 static const char *derived_mlcape = "D_MLCAPE";
 static const char *derived_cape = "D_CAPE";
 static const char *derived_pbl  = "D_PBL";
 constexpr float MLCAPE_INTERVAL = 3000.;
+
+// Derived variable metadata maps
+static const map<string,string> derived_var_units_map = {
+   { "D_DPT",    "KELVIN" }, 
+   { "D_WDIR",   "DEGREES" }, 
+   { "D_WIND",   "M/S" }, 
+   { "D_RH",     "PERCENT" }, 
+   { "D_MIXR",   "KG/KG" }, 
+   { "D_PRMSL",  "PASCALS" }, 
+   { "D_PBL",    "METER" }, 
+   { "D_CAPE",   "J/KG" }, 
+   { "D_MLCAPE", "J/KG" }
+};
+static const map<string,string> derived_var_desc_map = {
+   { "D_DPT",    "DERIVED DEWPOINT OBSERVATION" }, 
+   { "D_WDIR",   "DERIVED WIND DIRECTION OBSERVATION" }, 
+   { "D_WIND",   "DERIVED WIND SPEED OBSERVATION" }, 
+   { "D_RH",     "DERIVED RELATIVE HUMIDITY OBSERVATION" }, 
+   { "D_MIXR",   "DERIVED MIXING RATIO OBSERVATION" }, 
+   { "D_PRMSL",  "DERIVED MEAN SEA-LEVEL PRESSURE OBSERVATION" }, 
+   { "D_PBL",    "DERIVED PLANETARY BOUNDARY LAYER HEIGHT OBSERVATION" }, 
+   { "D_CAPE",   "DERIVED CONVECTIVE AVAILABLE POTENTIAL ENERGY OBSERVATION" },
+   { "D_MLCAPE", "DERIVED MIXED LAYER CONVECTIVE AVAIALBLE POTENTIAL ENERGY OBSERVATION" }
+};
 
 static double bufr_obs[mxr8lv][mxr8pm];
 static double bufr_obs_extra[mxr8lv][mxr8pm];
@@ -750,7 +777,7 @@ void get_variable_info(ConcatString blk_file, int unit) {
          tableB_descs.add(var_desc);
       }
 
-      // Skip  section 2
+      // Skip section 2
       while (getline(&line, &len, fp) != -1) {
          if (nullptr != strstr(line,"MNEMONIC")) break;
          if (nullptr == strstr(line,"EVENT")) continue;
@@ -820,6 +847,16 @@ void get_variable_info(ConcatString blk_file, int unit) {
    }
 
    remove_temp_file(tbl_filename);
+
+   // Append units and descriptions for derived variables
+   for(const auto &m : derived_var_units_map) {
+      var_names.add(m.first);
+      var_units.add(m.second);
+   }
+   for(const auto &m : derived_var_desc_map) {
+      tableB_vars.add(m.first);
+      tableB_descs.add(m.second);
+   }
 
    return;
 }
