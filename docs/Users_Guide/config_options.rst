@@ -777,7 +777,7 @@ The "regrid" entry is a dictionary containing information about how to handle
 input gridded data files. The "regrid" entry specifies regridding logic
 using the following entries:
 
-.. regrid_to_grid::
+.. _regrid_to_grid:
 
 to_grid
 ^^^^^^^
