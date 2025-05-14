@@ -22,7 +22,6 @@
 #include "vx_data2d_factory.h"
 #include "vx_data2d.h"
 #include "vx_log.h"
-
 #include "GridTemplate.h"
 
 using namespace std;
@@ -1014,7 +1013,6 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatVxOpt::set_perc_thresh(const PairDataEnsemble *pd_ptr) {
-
    //
    // Check if percentile thresholds were requested
    //
