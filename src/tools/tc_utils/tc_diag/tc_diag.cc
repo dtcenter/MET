@@ -31,12 +31,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
 #include <netcdf>
-
-#ifdef _OPENMP
-  #include "omp.h"
-#endif
 
 #include "main.h"
 #include "tc_diag.h"

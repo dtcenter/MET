@@ -18,6 +18,7 @@ strDirTest  = met_test_base;
 strDirHdr   = paste(strDirTest, "/hdr", sep="");
 strDirTmp   = paste(strDirTest, "/tmp", sep="");
 
+isZeroTol   = 1.0e-10;
 intSigFig   = 6;
 intSigFigBc = 1;
 intAbsDifBc = 5;

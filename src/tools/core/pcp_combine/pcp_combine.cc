@@ -79,6 +79,7 @@
 //   025    09/29/22  Prestopnik     MET #2227 Remove namespace netCDF from header files.
 //   026    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings.
 //   027    05/09/24  Halley Gotway  MET #2883 Allow missing input files.
+//   028    04/30/25  Prestopnik     MET #3120 Add OpenMP 
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -190,7 +191,7 @@ static void close_nc();
 static ConcatString parse_config_str(const char *);
 static bool is_timestring(const char *);
 
-static void usage();
+[[noreturn]] static void usage();
 static void set_sum(const StringArray &);
 static void set_add(const StringArray &);
 static void set_subtract(const StringArray &);
@@ -252,13 +253,13 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return "pcp_combine";
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+static void process_command_line(int argc, char **argv) {
    CommandLine cline;
 
    //
@@ -351,7 +352,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_sum_args(const CommandLine & cline) {
+static void process_sum_args(const CommandLine & cline) {
 
    //
    // Check for enough command line arguments:
@@ -415,7 +416,7 @@ void process_sum_args(const CommandLine & cline) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_add_sub_derive_args(const CommandLine & cline) {
+static void process_add_sub_derive_args(const CommandLine & cline) {
 
    //
    // Check for enough command line arguments
@@ -490,7 +491,7 @@ void process_add_sub_derive_args(const CommandLine & cline) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_sum_command() {
+static void do_sum_command() {
    DataPlane plane;
    Grid grid;
    ConcatString init_time_str;
@@ -498,7 +499,7 @@ void do_sum_command() {
    //
    // Compute the lead time.
    //
-   int lead_time = (int) (valid_time - init_time);
+   auto lead_time = (int) (valid_time - init_time);
 
    //
    // Build init time string.
@@ -571,10 +572,9 @@ void do_sum_command() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void sum_data_files(Grid & grid, DataPlane & plane) {
+static void sum_data_files(Grid & grid, DataPlane & plane) {
    int n_vld = 0;
    DataPlane part;
-   double v_sum, v_part;
    Grid cur_grid;
    vector<unixtime> pcp_times;
    vector<int> pcp_recs;
@@ -699,23 +699,34 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
          // Increment the precipitation sums keeping track of the bad
          // data values.
          //
-         for(int x=0; x<grid.nx(); x++) {
-            for(int y=0; y<grid.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(grid, plane, part)
+         {
+           
+#pragma omp for schedule(static) \
+                collapse(2)
+           
+            for(int x=0; x<grid.nx(); x++) {
+               for(int y=0; y<grid.ny(); y++) {
 
-               v_sum = plane(x, y);
+                  double v_sum;
+                  double v_part;                 
 
-               if(is_bad_data(v_sum)) continue;
+                  v_sum = plane(x, y);
 
-               v_part = part(x, y);
+                  if(is_bad_data(v_sum)) continue;
 
-               if(is_bad_data(v_part) ) {
-                  plane.set(bad_data_float, x, y);
-                  continue;
-               }
+                  v_part = part(x, y);
 
-               plane.set(v_sum + v_part, x, y);
-            } // for y
-         } // for x
+                  if(is_bad_data(v_part) ) {
+                     plane.set(bad_data_float, x, y);
+                     continue;
+                  }
+
+                  plane.set(v_sum + v_part, x, y);
+               } // for y
+            } // for x
+         } // end of omp parallel   
       } // end else
    } // end for i
 
@@ -724,9 +735,9 @@ void sum_data_files(Grid & grid, DataPlane & plane) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
+static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
                    ConcatString & cur_file) {
-   struct dirent *dirp = (struct dirent *) nullptr;
+   auto *dirp = (struct dirent *) nullptr;
    DIR *dp = (DIR *) nullptr;
 
    //
@@ -835,9 +846,12 @@ int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_sub_command() {
-   DataPlane plus, minus, diff;
-   Grid grid1, grid2;
+static void do_sub_command() {
+   DataPlane plus;
+   DataPlane minus;
+   DataPlane diff;
+   Grid grid1;
+   Grid grid2;
 
    //
    // Check for exactly two input files.
@@ -927,16 +941,25 @@ void do_sub_command() {
    //
    // Update value for each grid point.
    //
-   int nxy = grid1.nxy();
-   for(int i=0; i<nxy; i++) {
-      if(is_bad_data( diff.data()[i]) ||
-         is_bad_data(minus.data()[i])) {
-         diff.buf()[i] = bad_data_double;
-      }
-      else {
-         diff.buf()[i] -= minus.data()[i];
-      }
-   }
+
+#pragma omp parallel default(none) \
+   shared(grid1, diff, minus)
+   {
+
+      int nxy = grid1.nxy();
+      
+#pragma omp for schedule(static)
+     
+      for(int i=0; i<nxy; i++) {
+         if(is_bad_data( diff.data()[i]) ||
+            is_bad_data(minus.data()[i])) {
+            diff.buf()[i] = bad_data_double;
+         }
+         else {
+            diff.buf()[i] -= minus.data()[i];
+         } // end else
+      } // end for
+   }  // end of omp parallel   
 
    //
    // Write output.
@@ -950,20 +973,26 @@ void do_sub_command() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_derive_command() {
-   Grid grid, cur_grid;
-   DataPlane cur_dp, der_dp;
-   DataPlane min_dp, max_dp, sum_dp, sum_sq_dp, vld_dp;
+static void do_derive_command() {
+   Grid grid;
+   Grid cur_grid;
+   DataPlane cur_dp;
+   DataPlane der_dp;
+   DataPlane min_dp;
+   DataPlane max_dp;
+   DataPlane sum_dp;
+   DataPlane sum_sq_dp;
+   DataPlane vld_dp;
    MaskPlane mask;
-   unixtime nc_init_time = (unixtime) 0;
-   unixtime nc_valid_time = (unixtime) 0;
+   auto nc_init_time = (unixtime) 0;
+   auto nc_valid_time = (unixtime) 0;
    int nc_accum = 0;
    int nc_accum_sum = 0;
    int n_vld = 0;
    int nxy = 0;
    ConcatString derive_list_css;
    double v;
-
+   
    //
    // List of all requested field derivations.
    //
@@ -1068,27 +1097,36 @@ void do_derive_command() {
       //
       // Update sums and counts.
       //
-      for(int j=0; j<nxy; j++) {
 
-         // Get current data value.
-         v = cur_dp.data()[j];
+#pragma omp parallel default(none) \
+   shared(nxy, cur_dp, vld_dp, min_dp, max_dp, sum_dp, sum_sq_dp) \
+   private(v)
+      {
 
-         // Update valid counts.
-         if(!is_bad_data(v)) vld_dp.buf()[j] += 1;
-         else                continue;
+#pragma omp for schedule(static)
+        
+         for(int j=0; j<nxy; j++) {
 
-         // Update min/max fields which may contain bad data.
-         if(is_bad_data(min_dp.data()[j]) || v < min_dp.data()[j]) {
-            min_dp.buf()[j] = v;
-         }
-         if(is_bad_data(max_dp.data()[j]) || v > max_dp.data()[j]) {
-            max_dp.buf()[j] = v;
-         }
+            // Get current data value.
+            v = cur_dp.data()[j];
 
-         // Update the sums which do not have bad data.
-         sum_dp.buf()[j]    += v;
-         sum_sq_dp.buf()[j] += v*v;
-      }
+            // Update valid counts.
+            if(!is_bad_data(v)) vld_dp.buf()[j] += 1;
+            else                continue;
+
+            // Update min/max fields which may contain bad data.
+            if(is_bad_data(min_dp.data()[j]) || v < min_dp.data()[j]) {
+               min_dp.buf()[j] = v;
+            }
+            if(is_bad_data(max_dp.data()[j]) || v > max_dp.data()[j]) {
+               max_dp.buf()[j] = v;
+            }
+
+            // Update the sums which do not have bad data.
+            sum_dp.buf()[j]    += v;
+            sum_sq_dp.buf()[j] += v*v;
+         } // end for
+      } // end of omp parallel   
    } // end for i in n_files
 
    // Check for enough valid input files.
@@ -1105,10 +1143,19 @@ void do_derive_command() {
    //
    mask.set_size(grid.nx(), grid.ny());
    int n_skip = 0;
-   for(int j=0; j<nxy; j++) {
-      mask.buf()[j] = (vld_dp.data()[j]/n_vld) >= vld_thresh;
-      if(!mask.data()[j]) n_skip++;
-   }
+      
+#pragma omp parallel default(none) \
+   shared(nxy, mask, vld_dp, n_vld, vld_thresh, n_skip)
+   {
+     
+#pragma omp for schedule(static) \
+                reduction(+:n_skip)
+
+      for(int j=0; j<nxy; j++) {
+         mask.buf()[j] = (vld_dp.data()[j]/n_vld) >= vld_thresh;
+         if(!mask.data()[j]) n_skip++;
+      } // end for
+   } // end of omp parallel
 
    mlog << Debug(2)
         << "Skipping " << n_skip << " of " << nxy << " grid points which "
@@ -1150,49 +1197,74 @@ void do_derive_command() {
       }
       else if(strcasecmp(derive_list[i].c_str(), "range") == 0) {
          der_dp = max_dp;
-         for(int j=0; j<nxy; j++) {
-            if(is_bad_data(max_dp.data()[j]) ||
-               is_bad_data(min_dp.data()[j])) {
-               der_dp.buf()[j] = bad_data_double;
-            }
-            else {
-               der_dp.buf()[j] = max_dp.data()[j] - min_dp.data()[j];
-            }
-         }
+
+#pragma omp parallel default(none) \
+   shared(nxy, max_dp, min_dp, bad_data_double, der_dp)
+         {
+
+#pragma omp for schedule(static)
+         
+            for(int j=0; j<nxy; j++) {
+               if(is_bad_data(max_dp.data()[j]) ||
+                  is_bad_data(min_dp.data()[j])) {
+                  der_dp.buf()[j] = bad_data_double;
+               }
+               else {
+                  der_dp.buf()[j] = max_dp.data()[j] - min_dp.data()[j];
+               } // end else
+            } // end for
+         } // end of omp parallel   
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
                        der_dp, derive_list[i].c_str(), "Range of ");
       }
       else if(strcasecmp(derive_list[i].c_str(), "mean") == 0) {
          der_dp = sum_dp;
-         for(int j=0; j<nxy; j++) {
-            if(is_bad_data(sum_dp.data()[j]) ||
-               is_bad_data(vld_dp.data()[j]) ||
-               is_eq(vld_dp.data()[j], 0.0)) {
-               der_dp.buf()[j] = bad_data_double;
-            }
-            else {
-               der_dp.buf()[j] = sum_dp.data()[j]/vld_dp.data()[j];
-            }
-         }
+
+#pragma omp parallel default(none) \
+   shared(nxy, sum_dp, vld_dp, bad_data_double, der_dp)
+         {
+
+#pragma omp for schedule(static)
+         
+            for(int j=0; j<nxy; j++) {
+               if(is_bad_data(sum_dp.data()[j]) ||
+                  is_bad_data(vld_dp.data()[j]) ||
+                  is_eq(vld_dp.data()[j], 0.0)) {
+                  der_dp.buf()[j] = bad_data_double;
+               }
+               else {
+                  der_dp.buf()[j] = sum_dp.data()[j]/vld_dp.data()[j];
+               } // end else
+            } // end for
+         } // end of omp parallel   
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
                        der_dp, derive_list[i].c_str(), "Mean Value of ");
       }
       else if(strcasecmp(derive_list[i].c_str(), "stdev") == 0) {
          der_dp = sum_dp;
-         for(int j=0; j<nxy; j++) {
-            double s  = sum_dp.data()[j];
-            double sq = sum_sq_dp.data()[j];
-            double nd  = vld_dp.data()[j];
-            if(is_bad_data(s) || is_bad_data(sq) ||
-               is_bad_data(nd) || nd <= 1) {
-               der_dp.buf()[j] = bad_data_double;
-            }
-            else {
-               v = (sq - s*s/nd)/(nd-1);
-               if(is_eq(v, 0.0)) v = 0.0;
-               der_dp.buf()[j] = sqrt(v);
-            }
-         }
+
+#pragma omp parallel default(none) \
+   shared(nxy, sum_dp, sum_sq_dp, vld_dp, bad_data_double, der_dp) \
+   private(v)
+         {
+
+#pragma omp for schedule(static)
+         
+            for(int j=0; j<nxy; j++) {
+               double s  = sum_dp.data()[j];
+               double sq = sum_sq_dp.data()[j];
+               double nd  = vld_dp.data()[j];
+               if(is_bad_data(s) || is_bad_data(sq) ||
+                  is_bad_data(nd) || nd <= 1) {
+                  der_dp.buf()[j] = bad_data_double;
+               }
+               else {
+                  v = (sq - s*s/nd)/(nd-1);
+                  if(is_eq(v, 0.0)) v = 0.0;
+                  der_dp.buf()[j] = sqrt(v);
+               } // end else
+            } // end for
+         } // end of omp parallel   
          write_nc_data(nc_init_time, nc_valid_time, nc_accum,
                        der_dp, derive_list[i].c_str(),
                        "Standard Deviation of ");
@@ -1208,9 +1280,13 @@ void do_derive_command() {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_field(const char *filename, const char *cur_field,
-               const unixtime get_init_ut, const unixtime get_valid_ut,
-               Grid & grid, DataPlane & plane, bool error_out) {
+static bool get_field(const char *filename,
+                      const char *cur_field,
+                      const unixtime get_init_ut,
+                      const unixtime get_valid_ut,
+                      Grid & grid,
+                      DataPlane & plane,
+                      bool error_out) {
    Met2dDataFileFactory factory;
    Met2dDataFile *mtddf = nullptr;
    GrdFileType ftype;
@@ -1343,7 +1419,7 @@ bool get_field(const char *filename, const char *cur_field,
 
 ////////////////////////////////////////////////////////////////////////
 
-void open_nc(const Grid &grid) {
+static void open_nc(const Grid &grid) {
    ConcatString command_str;
 
    // List the output file.
@@ -1398,10 +1474,14 @@ void open_nc(const Grid &grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
-                   const DataPlane &cur_dp, const char *derive_str,
-                   const char *long_name_prefix) {
-   ConcatString var_str, cs;
+static void write_nc_data(unixtime nc_init,
+                          unixtime nc_valid,
+                          int nc_accum,
+                          const DataPlane &cur_dp,
+                          const char *derive_str,
+                          const char *long_name_prefix) {
+   ConcatString var_str;
+   ConcatString cs;
    StringArray sa;
    NcVar nc_var;
 
@@ -1529,7 +1609,7 @@ void write_nc_data(unixtime nc_init, unixtime nc_valid, int nc_accum,
 
 ////////////////////////////////////////////////////////////////////////
 
-void close_nc() {
+static void close_nc() {
 
    //
    // List the output file.
@@ -1548,11 +1628,11 @@ void close_nc() {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString parse_config_str(const char *s) {
+static ConcatString parse_config_str(const char *s) {
    ConcatString config_str;
 
    if(is_timestring(s)) {
-      config_str.format("name=\"APCP\"; level=\"A%s\";", s);
+      config_str.format(R"(name="APCP"; level="A%s";)", s);
    }
    else {
       config_str = s;
@@ -1563,7 +1643,7 @@ ConcatString parse_config_str(const char *s) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool is_timestring(const char * text) {
+static bool is_timestring(const char * text) {
 
    if(is_hh(text))     return true;
    if(is_hhmmss(text)) return true;
@@ -1573,7 +1653,7 @@ bool is_timestring(const char * text) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+[[noreturn]] static void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -1698,7 +1778,7 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_sum(const StringArray &) {
+static void set_sum(const StringArray &) {
    run_command = RunCommand::sum;
    derive_list.clear();
    derive_list.add("sum");
@@ -1706,7 +1786,7 @@ void set_sum(const StringArray &) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_add(const StringArray &) {
+static void set_add(const StringArray &) {
    run_command = RunCommand::add;
    derive_list.clear();
    derive_list.add("sum");
@@ -1714,7 +1794,7 @@ void set_add(const StringArray &) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_subtract(const StringArray &) {
+static void set_subtract(const StringArray &) {
    run_command = RunCommand::sub;
    derive_list.clear();
    derive_list.add("diff");
@@ -1722,7 +1802,7 @@ void set_subtract(const StringArray &) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_derive(const StringArray & a) {
+static void set_derive(const StringArray & a) {
    run_command = RunCommand::der;
    derive_list.clear();
 
@@ -1745,32 +1825,32 @@ void set_derive(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_pcpdir(const StringArray & a) {
+static void set_pcpdir(const StringArray & a) {
    pcp_dir.add(a);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_pcprx(const StringArray & a) {
+static void set_pcprx(const StringArray & a) {
    pcp_reg_exp = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_field(const StringArray & a) {
+static void set_field(const StringArray & a) {
    req_field_list.add(a[0]);
    field_option_used = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_name(const StringArray & a) {
+static void set_name(const StringArray & a) {
    req_out_var_name.add_css(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_input_thresh(const StringArray & a) {
+static void set_input_thresh(const StringArray & a) {
    input_thresh = atof(a[0].c_str());
    if(input_thresh > 1 || input_thresh < 0) {
       mlog << Error << "\nset_input_thresh() -> "
@@ -1782,7 +1862,7 @@ void set_input_thresh(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_vld_thresh(const StringArray & a) {
+static void set_vld_thresh(const StringArray & a) {
    vld_thresh = atof(a[0].c_str());
    if(vld_thresh > 1 || vld_thresh < 0) {
       mlog << Error << "\nset_vld_thresh() -> "
@@ -1794,7 +1874,7 @@ void set_vld_thresh(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+static void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
 

@@ -456,7 +456,7 @@ for faster runtimes.
 **Setting the number of threads**
 
 The number of threads is controlled by the environment variable
-*OMP_NUM_THREADS* . For example, on a quad core machine, the user might choose
+*OMP_NUM_THREADS*. For example, on a quad core machine, the user might choose
 to run on 4 threads:
 
 .. code :: bash

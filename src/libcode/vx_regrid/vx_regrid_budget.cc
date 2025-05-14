@@ -31,9 +31,9 @@ DataPlane met_regrid_budget(const DataPlane & from_data,
    const int NN = N*N;
    const double delta = 1.0/N;
 
-#pragma omp parallel default(none)                      \
+#pragma omp parallel default(none) \
    shared(from_data, from_grid, to_grid, info, to_data) \
-   shared(Radius, N, NN, delta)                         \
+   shared(Radius, N, NN, delta) \
    private(count, value, sum)
    {
 
@@ -41,14 +41,11 @@ DataPlane met_regrid_budget(const DataPlane & from_data,
       {
          // Set the size and timing info 
          to_data.set_size (to_grid.nx(), to_grid.ny());
-         to_data.set_init (from_data.init());
-         to_data.set_valid(from_data.valid());
-         to_data.set_lead (from_data.lead());
-         to_data.set_accum(from_data.accum());
+         to_data.set_times(from_data);
       }
 
-#pragma omp for schedule (static)
-
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int ixt=0; ixt<(to_grid.nx()); ixt++) {
          for(int iyt=0; iyt<(to_grid.ny()); iyt++) {
 

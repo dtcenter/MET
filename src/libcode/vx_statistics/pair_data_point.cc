@@ -872,39 +872,47 @@ void apply_mpr_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
    bool ocmn_flag = !(ocmn_dp.is_empty());
    bool ocsd_flag = !(ocsd_dp.is_empty());
 
-   // Loop over the pairs
-   for(int i=0; i<nxy; i++) {
+#pragma omp parallel default(none)                                 \
+   shared(fcst_dp, obs_dp, fcmn_dp, fcsd_dp, ocmn_dp, ocsd_dp, m)  \
+   shared(nxy, n_skip, fcmn_flag, fcsd_flag, ocmn_flag, ocsd_flag) \
+   shared(bad_data_double)
+   {
 
-      // Store the climo data
-      ClimoPntInfo cpi(
-         (fcmn_flag ? fcmn_dp.buf()[i] : bad_data_double),
-         (fcsd_flag ? fcsd_dp.buf()[i] : bad_data_double),
-         (ocmn_flag ? ocmn_dp.buf()[i] : bad_data_double),
-         (ocsd_flag ? ocsd_dp.buf()[i] : bad_data_double));
+      // Loop over the pairs
+#pragma for reduction(+: n_skip)
+      for(int i=0; i<nxy; i++) {
 
-      // Check for bad data
-      if(is_bad_data(fcst_dp.buf()[i])        ||
-         is_bad_data(obs_dp.buf()[i])         ||
-         (fcmn_flag && is_bad_data(cpi.fcmn)) ||
-         (fcsd_flag && is_bad_data(cpi.fcsd)) ||
-         (ocmn_flag && is_bad_data(cpi.ocmn)) ||
-         (ocsd_flag && is_bad_data(cpi.ocsd))) continue;
+         // Store the climo data
+         ClimoPntInfo cpi(
+            (fcmn_flag ? fcmn_dp.buf()[i] : bad_data_double),
+            (fcsd_flag ? fcsd_dp.buf()[i] : bad_data_double),
+            (ocmn_flag ? ocmn_dp.buf()[i] : bad_data_double),
+            (ocsd_flag ? ocsd_dp.buf()[i] : bad_data_double));
 
-      // Discard pairs which do not meet the threshold criteria
-      if(!check_mpr_thresh(fcst_dp.buf()[i], obs_dp.buf()[i], cpi, m)) {
+         // Check for bad data
+         if(is_bad_data(fcst_dp.buf()[i])        ||
+            is_bad_data(obs_dp.buf()[i])         ||
+            (fcmn_flag && is_bad_data(cpi.fcmn)) ||
+            (fcsd_flag && is_bad_data(cpi.fcsd)) ||
+            (ocmn_flag && is_bad_data(cpi.ocmn)) ||
+            (ocsd_flag && is_bad_data(cpi.ocsd))) continue;
 
-         // Increment skip counter
-         n_skip++;
+         // Discard pairs which do not meet the threshold criteria
+         if(!check_mpr_thresh(fcst_dp.buf()[i], obs_dp.buf()[i], cpi, m)) {
 
-         // Set point to bad data
-         fcst_dp.buf()[i]               = bad_data_double;
-         obs_dp.buf()[i]                = bad_data_double;
-         if(fcmn_flag) fcmn_dp.buf()[i] = bad_data_double;
-         if(fcsd_flag) fcsd_dp.buf()[i] = bad_data_double;
-         if(ocmn_flag) ocmn_dp.buf()[i] = bad_data_double;
-         if(ocsd_flag) ocsd_dp.buf()[i] = bad_data_double;
-      }
-   } // end for i
+            // Increment skip counter
+            n_skip++;
+
+            // Set point to bad data
+            fcst_dp.buf()[i]               = bad_data_double;
+            obs_dp.buf()[i]                = bad_data_double;
+            if(fcmn_flag) fcmn_dp.buf()[i] = bad_data_double;
+            if(fcsd_flag) fcsd_dp.buf()[i] = bad_data_double;
+            if(ocmn_flag) ocmn_dp.buf()[i] = bad_data_double;
+            if(ocsd_flag) ocsd_dp.buf()[i] = bad_data_double;
+         }
+      } // end for i
+   } // End omp parallel
 
    mlog << Debug(3)
         << "Discarded " << n_skip << " of " << nxy
