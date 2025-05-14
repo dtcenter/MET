@@ -44,6 +44,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_wwmca_regrid.xml \
           unit_point_stat.xml \
           unit_stat_analysis_ps.xml \
+          unit_pair_stat.xml \
           unit_duplicate_flag.xml \
           unit_obs_summary.xml \
           unit_grid_stat.xml \
@@ -86,6 +87,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_climatology_mixed.xml \
           unit_grib_tables.xml \
           unit_grid_weight.xml \
+          unit_point_weight.xml \
           unit_netcdf.xml \
           unit_hira.xml \
           unit_interp_shape.xml \
