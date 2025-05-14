@@ -15,14 +15,12 @@ storm_id
 Specify a comma-separated list of storm id's to be used:
 
 | 2-letter basin, 2-digit cyclone number, 4-digit year
-|
 
 An empty list indicates that all should be used.
 
 For example:
 
-| storm_id = [ "AL092011" ];
-| 
+| storm_id = [ "AL092011" ]; 
 
 This may also be set using basin, cyclone, and timing information below.
 
@@ -37,12 +35,10 @@ Specify a comma-separated list of basins to be used. Expected format is
 a 2-letter basin identifier. An empty list indicates that all should be used.
 
 |  Valid basins: "WP", "IO", "SH", "CP", "EP", "AL", "SL"
-|
 
 For example:
 
 | basin = [ "AL", "EP" ];
-|
 
 .. code-block:: none
 		
@@ -58,7 +54,6 @@ An empty list indicates that all should be used.
 For example:
 
 | cyclone = [ "01", "02", "03" ];
-| 
 
 .. code-block:: none
 		
@@ -72,8 +67,7 @@ indicates that all should be used.
 
 For example:
 
-| storm_name = [ "KATRINA" ];
-| 
+| storm_name = [ "KATRINA" ]; 
 
 .. code-block:: none
 		
@@ -96,7 +90,6 @@ For example:
 | init_end = "20101231";
 | init_inc = [ "20101231_06" ];
 | init_exc = [ "20101231_00" ];
-| 
 
 .. code-block:: none
 
@@ -124,7 +117,6 @@ For example:
 | valid_end = "20101231_12";
 | valid_inc = [ "20101231_06" ];
 | valid_exc = [ "20101231_00" ];
-|
 
 .. code-block:: none
 
@@ -142,7 +134,6 @@ in HH[MMSS] format. An empty list indicates that all hours should be used.
 For example:
 
 | init_hour = [ "00", "06", "12", "18" ];
-| 
 
 .. code-block:: none
 		
@@ -190,7 +181,6 @@ to distinguish between their output.
 For example:
 		
 | model = [ "AHW4", "AHWI" ];
-| 
 
 .. code-block:: none
 		  
@@ -206,7 +196,6 @@ Tracks for which all locations fall within valid_mask will be used.
 For example:
 
 | init_mask  = "MET_BASE/poly/EAST.poly";
-|
 
 .. code-block:: none
 
@@ -222,7 +211,6 @@ building tracks.  Setting this to FALSE makes the parsing of tracks quicker.
 For example:
 
 | check_dup = FALSE;
-| 
 
 .. code-block:: none
 		
@@ -256,7 +244,6 @@ Specify how consensus forecasts should be defined:
 | members = array of consensus member model names
 | required = array of TRUE/FALSE for each member if empty, default is FALSE
 | min_req = minimum number of members required for the consensus
-| 
 
 For example:
 
@@ -268,7 +255,6 @@ For example:
 |       min_req  = 2;
 |    }
 | ];
-| 
 
 .. code-block:: none
 
@@ -285,7 +271,6 @@ for each entry listed.
 For example:
 
 | lag_time = [ "06", "12" ];
-| 
 
 .. code-block:: none
 		
@@ -303,12 +288,10 @@ best_technique and oper_technique settings.
 |   BCLP, BCS5, BCD5, BCLA
 | Derived from OPER tracks:
 |   OCLP, OCS5, OCD5, OCDT
-|
 
 For example:
 		
 | best_technique = [ "BEST" ];
-| 
 
 .. code-block:: none
 		
@@ -330,7 +313,6 @@ or BOTH. Use BOTH to create pairs using two different analysis tracks.
 For example:
 
 | anly_track = BDECK;
-| 
 
 .. code-block:: none
 		
@@ -347,7 +329,6 @@ tracks should be written out.
 For example:
 
 | match_points = FALSE;
-| 
 
 .. code-block:: none
 		
@@ -437,7 +418,6 @@ For example:
 
 | amodel = [ "AHW4" ];
 | bmodel = [ "BEST" ];
-| 
 
 .. code-block:: none
 		
@@ -459,7 +439,6 @@ For example:
 | valid_hour = [ "12" ];
 | lead       = [ "24", "36" ];
 | lead_req   = [ "72", "84", "96", "108" ];
-| 
 
 .. code-block:: none
 		
@@ -479,7 +458,6 @@ options.
 For example:
 
 | init_mask  = [ "AL_BASIN", "EP_BASIN" ];
-|
 
 .. code-block:: none
 
@@ -495,7 +473,6 @@ job command option.
 For example:
 
 | line_type = [ "TCMPR" ];
-| 
 
 .. code-block:: none
 		
@@ -515,7 +492,6 @@ The value "ALL" matches HUWARN, TSWARN, HUWATCH, and TSWATCH.
 For example:
 
 |  track_watch_warn = [ "HUWATCH", "HUWARN" ];
-| 
 
 .. code-block:: none
 		
@@ -534,7 +510,6 @@ For example:
 
 | column_thresh_name = [ "ADLAND", "BDLAND" ];
 | column_thresh_val  = [ >200,     >200     ];
-| 
 
 .. code-block:: none
 		
@@ -553,7 +528,6 @@ For example:
 
 | column_str_name = [ "LEVEL", "LEVEL" ];
 | column_str_val  = [ "HU",    "TS"    ];
-|
 
 .. code-block:: none
 		
@@ -572,7 +546,6 @@ For example:
 
 | column_str_exc_name = [ "LEVEL" ];
 | column_str_exc_val  = [ "TD"    ];
-|
 
 .. code-block:: none
 		
@@ -591,7 +564,6 @@ For example:
 
 | init_thresh_name = [ "ADLAND" ];
 | init_thresh_val  = [ >200     ];
-| 
 
 .. code-block:: none
 		
@@ -609,7 +581,6 @@ For example:
 
 | init_str_name = [ "LEVEL" ];
 | init_str_val  = [ "HU"    ];
-| 
 
 .. code-block:: none
 
@@ -627,7 +598,6 @@ For example:
 
 | init_str_exc_name = [ "LEVEL" ];
 | init_str_exc_val  = [ "HU"    ];
-|
 
 .. code-block:: none
 
@@ -643,7 +613,6 @@ BDECK track encounters land, discard the remainder of the track.
 For example:
 
 | water_only = FALSE;
-| 
 
 .. code-block:: none
 		
@@ -665,7 +634,6 @@ May modify using the following job command options:
 | "-rirw_time" for both or "-rirw_time_adeck" and "-rirw_time_bdeck"
 | "-rirw_exact" for both or "-rirw_exact_adeck" and "-rirw_exact_bdeck"
 | "-rirw_thresh" for both or "-rirw_thresh_adeck" and "-rirw_thresh_bdeck"
-| 
 
 .. code-block:: none
 
@@ -706,7 +674,6 @@ For example:
 | landfall     = FALSE;
 | landfall_beg = "-24"; (24 hours prior to landfall)
 | landfall_end = "00";
-| 
 
 .. code-block:: none
 
@@ -723,7 +690,6 @@ be retained.  May modify using the "-event_equal" job command option.
 For example:
 
 | event_equal = FALSE;
-| 
 
 .. code-block:: none
 		
@@ -751,7 +717,6 @@ May modify using the "-out_init_mask" job command option.
 For example:
 
 | out_init_mask = "";
-| 
 
 .. code-block:: none
 
@@ -768,7 +733,6 @@ point.  May modify using the "-out_valid_mask" job command option.
 For example:
 
 | out_valid_mask = "";
-| 
 
 .. code-block:: none
 
@@ -783,168 +747,163 @@ job to be performed.  The format for an analysis job is as follows:
 
 | -job job_name   
 | OPTIONAL ARGS
-| 
 
 Where "job_name" is set to one of the following:
 
-* "filter"
+filter
+""""""  
+To filter out the TCST lines matching the job filtering criteria
+specified above and using the optional arguments below.  The
+output TCST lines are written to the file specified using the
+"-dump_row" argument.
   
-  To filter out the TCST lines matching the job filtering criteria
-  specified above and using the optional arguments below.  The
-  output TCST lines are written to the file specified using the
-  "-dump_row" argument.
-  
-  Required Args: -dump_row
+Required Args: -dump_row
 
-  To further refine the TCST data: Each optional argument may be used
-  in the job specification multiple times unless otherwise indicated.
-  When multiple optional arguments of the same type are indicated, the
-  analysis will be performed over their union.
+To further refine the TCST data: Each optional argument may be used
+in the job specification multiple times unless otherwise indicated.
+When multiple optional arguments of the same type are indicated, the
+analysis will be performed over their union.
 
-  .. code-block:: none
+.. code-block:: none
 		  
-    "-amodel            name"
-    "-bmodel            name"
-    "-lead        HHMMSS"
-    "-valid_beg   YYYYMMDD[_HH[MMSS]]" (use once)
-    "-valid_end   YYYYMMDD[_HH[MMSS]]" (use once)
-    "-valid_inc   YYYYMMDD[_HH[MMSS]]" (use once)
-    "-valid_exc   YYYYMMDD[_HH[MMSS]]" (use once)
-    "-init_beg    YYYYMMDD[_HH[MMSS]]" (use once)
-    "-init_end    YYYYMMDD[_HH[MMSS]]" (use once)
-    "-init_inc    YYYYMMDD[_HH[MMSS]]" (use once)
-    "-init_exc    YYYYMMDD[_HH[MMSS]]" (use once)
-    "-init_hour   HH[MMSS]"
-    "-valid_hour  HH[MMSS]
-    "-init_mask          name"
-    "-valid_mask         name"
-    "-line_type          name"
-    "-track_watch_warn   name"
-    "-column_thresh      name thresh"
-    "-column_str         name string"
-    "-column_str_exc     name string"
-    "-init_thresh        name thresh"
-    "-init_str           name string"
-    "-init_str_exc       name string"
+  "-amodel            name"
+  "-bmodel            name"
+  "-lead        HHMMSS"
+  "-valid_beg   YYYYMMDD[_HH[MMSS]]" (use once)
+  "-valid_end   YYYYMMDD[_HH[MMSS]]" (use once)
+  "-valid_inc   YYYYMMDD[_HH[MMSS]]" (use once)
+  "-valid_exc   YYYYMMDD[_HH[MMSS]]" (use once)
+  "-init_beg    YYYYMMDD[_HH[MMSS]]" (use once)
+  "-init_end    YYYYMMDD[_HH[MMSS]]" (use once)
+  "-init_inc    YYYYMMDD[_HH[MMSS]]" (use once)
+  "-init_exc    YYYYMMDD[_HH[MMSS]]" (use once)
+  "-init_hour   HH[MMSS]"
+  "-valid_hour  HH[MMSS]
+  "-init_mask          name"
+  "-valid_mask         name"
+  "-line_type          name"
+  "-track_watch_warn   name"
+  "-column_thresh      name thresh"
+  "-column_str         name string"
+  "-column_str_exc     name string"
+  "-init_thresh        name thresh"
+  "-init_str           name string"
+  "-init_str_exc       name string"
 
-  Additional filtering options that may be used only when -line_type
-  has been listed only once. These options take two arguments: the name
-  of the data column to be used and the min, max, or exact value for
-  that column. If multiple column eq/min/max/str options are listed,
-  the job will be performed on their intersection:
+Additional filtering options that may be used only when -line_type
+has been listed only once. These options take two arguments: the name
+of the data column to be used and the min, max, or exact value for
+that column. If multiple column eq/min/max/str options are listed,
+the job will be performed on their intersection:
 
-  .. code-block:: none
+.. code-block:: none
 		  
-    "-column_min     col_name value" For example: -column_min TK_ERR 100.00
-    "-column_max     col_name value"
-    "-column_eq      col_name value"
-    "-column_str     col_name string" separate multiple filtering strings
-                                      with commas
-    "-column_str_exc col_name string" separate multiple filtering strings
-                                      with commas
+  "-column_min     col_name value" For example: -column_min TK_ERR 100.00
+  "-column_max     col_name value"
+  "-column_eq      col_name value"
+  "-column_str     col_name string" separate multiple filtering strings
+                                    with commas
+  "-column_str_exc col_name string" separate multiple filtering strings
+                                    with commas
 
-  Required Args: -dump_row
+Required Args: -dump_row 
+
+summary
+"""""""  
+To compute the mean, standard deviation, and percentiles
+(0th, 10th, 25th, 50th, 75th, 90th, and 100th) for the statistic
+specified using the "-line_type" and "-column" arguments.
+For TCStat, the "-column" argument may be set to:
+
+* TRACK for track, along-track, and cross-track errors.
+* WIND for all wind radius errors.
+* TI for track and maximum wind intensity errors.
+* AC for along-track and cross-track errors.
+* XY for x-track and y-track errors.
+* "col" for a specific column name.
+* "col1-col2" for a difference of two columns.
+* "ABS(col or col1-col2)" for the absolute value.
+
+Use the -column_union TRUE/FALSE job command option to compute
+summary statistics across the union of input columns rather than
+processing them separately.
+
+Required Args: -line_type, -column
+
+Optional Args:
+
+.. code-block:: none
+
+  -by column_name to specify case information
+  -out_alpha to override default alpha value
+  -column_union to summarize multiple columns
+
+rirw
+""""
   
-| 
+To define rapid intensification/weakening contingency table using
+the ADECK and BDECK RI/RW settings and the matching time window
+and output contingency table counts and statistics.
 
-* "summary"
-  
-  To compute the mean, standard deviation, and percentiles
-  (0th, 10th, 25th, 50th, 75th, 90th, and 100th) for the statistic
-  specified using the "-line_type" and "-column" arguments.
-  For TCStat, the "-column" argument may be set to:
+Optional Args:
 
-  * TRACK for track, along-track, and cross-track errors.
-  * WIND for all wind radius errors.
-  * TI for track and maximum wind intensity errors.
-  * AC for along-track and cross-track errors.
-  * XY for x-track and y-track errors.
-  * "col" for a specific column name.
-  * "col1-col2" for a difference of two columns.
-  * "ABS(col or col1-col2)" for the absolute value.
-
-  Use the -column_union TRUE/FALSE job command option to compute
-  summary statistics across the union of input columns rather than
-  processing them separately.
-
-  Required Args: -line_type, -column
-
-  Optional Args:
-
-  .. code-block:: none
-
-    -by column_name to specify case information
-    -out_alpha to override default alpha value
-    -column_union to summarize multiple columns
-
-* "rirw"
-  
-  To define rapid intensification/weakening contingency table using
-  the ADECK and BDECK RI/RW settings and the matching time window
-  and output contingency table counts and statistics.
-
-  Optional Args:
-
-  .. code-block:: none
+.. code-block:: none
 		  
-    -rirw_window width in HH[MMSS] format to define a symmetric time window
-    -rirw_window beg end in HH[MMSS] format to define an asymmetric time window
-     Default search time window is 0 0, requiring exact match
-    -rirw_time or -rirw_time_adeck and -rirw_time_bdeck to override defaults
-    -rirw_exact or -rirw_exact_adeck and -rirw_exact_bdeck to override defaults
-    -rirw_thresh or -rirw_thresh_adeck and -rirw_thresh_bdeck to override
-    defaults
-    -by column_name to specify case information
-    -out_alpha to override default alpha value
-    -out_line_type to specify output line types (CTC, CTS, and MPR)
+  -rirw_window width in HH[MMSS] format to define a symmetric time window
+  -rirw_window beg end in HH[MMSS] format to define an asymmetric time window
+   Default search time window is 0 0, requiring exact match
+  -rirw_time or -rirw_time_adeck and -rirw_time_bdeck to override defaults
+  -rirw_exact or -rirw_exact_adeck and -rirw_exact_bdeck to override defaults
+  -rirw_thresh or -rirw_thresh_adeck and -rirw_thresh_bdeck to override defaults
+  -by column_name to specify case information
+  -out_alpha to override default alpha value
+  -out_line_type to specify output line types (CTC, CTS, and MPR)
 
 
-  Note that the "-dump_row path" option results in 4 files being
-  created:
+Note that the "-dump_row path" option results in 4 files being
+created:
 
 | path_FY_OY.tcst, path_FY_ON.tcst, path_FN_OY.tcst, and
 | path_FN_ON.tcst, containing the TCST lines that were hits, false
 | alarms, misses, and correct negatives,  respectively.  These files
 | may be used as input for additional TC-Stat analysis.
-| 
 
-* "probrirw"
-       
-  To define an Nx2 probabilistic contingency table by reading the
-  PROBRIRW line type, binning the forecast probabilities, and writing
-  output probabilistic counts and statistics.
+probrirw
+""""""""       
+To define an Nx2 probabilistic contingency table by reading the
+PROBRIRW line type, binning the forecast probabilities, and writing
+output probabilistic counts and statistics.
 
-  Required Args:
+Required Args:
 
-  .. code-block:: none
+.. code-block:: none
 		  
-    -probrirw_thresh to define the forecast probabilities to be
-       evaluated (For example: -probrirw_thresh 30)
+  -probrirw_thresh to define the forecast probabilities to be
+     evaluated (For example: -probrirw_thresh 30)
 
-  Optional Args:
+Optional Args:
 
-  .. code-block:: none
+.. code-block:: none
 		  
-    -probrirw_exact TRUE/FALSE to verify against the exact (for example:
-       BDELTA column) or maximum (for example: BDELTA_MAX column) intensity
-       change in the BEST track
-    -probrirw_bdelta_thresh to define BEST track change event
-       threshold (For example: -probrirw_bdelta_thresh >=30)
-    -probrirw_prob_thresh to define output probability thresholds
-       (for example: -probrirw_prob_thresh ==0.1)
-    -by column_name to specify case information
-    -out_alpha to override default alpha value
-    -out_line_type to specify output line types (PCT, PSTD, PRC, and PJC)
+  -probrirw_exact TRUE/FALSE to verify against the exact (for example:
+     BDELTA column) or maximum (for example: BDELTA_MAX column) intensity
+     change in the BEST track
+  -probrirw_bdelta_thresh to define BEST track change event
+     threshold (For example: -probrirw_bdelta_thresh >=30)
+  -probrirw_prob_thresh to define output probability thresholds
+     (for example: -probrirw_prob_thresh ==0.1)
+  -by column_name to specify case information
+  -out_alpha to override default alpha value
+  -out_line_type to specify output line types (PCT, PSTD, PRC, and PJC)
 
 
-  For the PROBRIRW line type, PROBRIRW_PROB is a derived column name.
-  For example, the following options select 30 kt probabilities and match
-  probability values greater than 0:
+For the PROBRIRW line type, PROBRIRW_PROB is a derived column name.
+For example, the following options select 30 kt probabilities and match
+probability values greater than 0:
   
 |   -probrirw_thresh 30 -column_thresh PROBRIRW_PROB >0
-|
 
-  For example:
+For example:
 
 | jobs = [
 |   "-job filter -amodel AHW4 -dumprow ./tc_filter_job.tcst",
