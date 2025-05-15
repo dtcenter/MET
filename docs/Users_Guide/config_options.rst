@@ -928,18 +928,18 @@ field
 The "field" entry is an array of dictionaries, each specifying a
 verification task. Each of these dictionaries may include:
 
-name
-""""
+field.name
+""""""""""
 The "name" entry specifies a name for the field. Setting "name" is
 file-format specific.  See :ref:`file-format`.
 
-level
-"""""
+field.level
+"""""""""""
 The "level" entry specifies level information for the field. Setting
 "level" is file-format specific. See :ref:`file-format`.
 
-prob
-""""
+field.prob
+""""""""""
 The "prob" entry in the forecast dictionary defines probability
 information. It may either be set as a boolean (i.e. TRUE or FALSE)
 or as a dictionary defining probabilistic field information.
@@ -1017,8 +1017,8 @@ provided to do so. The following options are supported.
   width between the values 0, 0.5, 0.75, and 1.0. By convention, the
   greater-than-or-equal-to (">=" or "ge") inequality type is required.
 
-prob_as_scalar
-""""""""""""""
+field.prob_as_scalar
+""""""""""""""""""""
 Set "prob_as_scalar = TRUE" to override the processing of probability
 data. When the "prob" entry is set as a dictionary to define the
 field of interest, setting "prob_as_scalar = TRUE" indicates that this
@@ -1029,8 +1029,8 @@ probability data. It can also be used to compare two probability
 fields directly. When this flag is set, probability values are
 automatically rescaled from the range [0, 100] to [0, 1].
 
-convert
-"""""""
+field.convert
+"""""""""""""
 The "convert" entry is a user-defined function of a single variable
 for processing input data values. Any input values that are not bad
 data are replaced by the value of this function. The convert function
@@ -1051,8 +1051,8 @@ Examples of user-defined conversion functions include:
   convert(x) = K_to_C(x); where K_to_C(x) is defined in
                           ConfigConstants
 
-censor_thresh
-"""""""""""""
+field.censor_thresh and field.censor_val
+""""""""""""""""""""""""""""""""""""""""
 The "censor_thresh" entry is an array of thresholds to be applied
 to the input data. The "censor_val" entry is an array of numbers
 and must be the same length as "censor_thresh". These arguments must
@@ -1074,8 +1074,8 @@ Examples of user-defined data censoring operations include:
   censor_thresh = [ >12000 ];
   censor_val    = [  12000 ];
 
-mpr_column and mpr_thresh
-"""""""""""""""""""""""""
+field.mpr_column and field.mpr_thresh
+"""""""""""""""""""""""""""""""""""""
 The "mpr_column" and "mpr_thresh" entries are arrays of strings and
 thresholds to specify which matched pairs should be included in the
 statistics. These options apply to the Point-Stat and Grid-Stat tools.
@@ -1095,18 +1095,18 @@ mean values by more than 10:
   mpr_column = [ "ABS(OBS-FCST)", "ABS(OBS-CLIMO_MEAN)" ];
   mpr_thresh = [ <=10, <=10 ];
 
-cat_thresh
-""""""""""
+field.cat_thresh
+""""""""""""""""
 The "cat_thresh" entry is an array of thresholds to be used when
 computing categorical statistics.
 
-cnt_thresh
-""""""""""
+field.cnt_thresh
+""""""""""""""""
 The "cnt_thresh" entry is an array of thresholds for filtering
 data prior to computing continuous statistics and partial sums.
 
-cnt_logic
-"""""""""
+field.cnt_logic
+"""""""""""""""
 The "cnt_logic" entry may be set to UNION, INTERSECTION, or SYMDIFF
 and controls the logic for how the forecast and observed cnt_thresh
 settings are combined when filtering matched pairs of forecast and
@@ -2172,8 +2172,8 @@ interpolation methods and widths. Interpolation is performed over an N by N
 box centered on each point, where N is the width specified. Each of these
 dictionaries must include:
 
-width
-"""""
+type.width
+""""""""""
 The "width" entry is an array of integers to specify the size of the
 interpolation area. The area is either a square or circle containing
 the observation point. The width value specifies the width of the
@@ -2187,8 +2187,8 @@ and so on. For odd widths in grid-to-point comparisons
 grid point closest to the observation point. For grid-to-grid
 comparisons (i.e. Grid-Stat), the width must be odd.
 
-method
-""""""
+type.method
+"""""""""""
 The "method" entry is an array of interpolation procedures to be
 applied to the points in the box:
 
@@ -2903,26 +2903,26 @@ The "ens" entry is a dictionary that specifies the fields for which ensemble
 products should be generated. This is very similar to the "fcst" and "obs"
 entries. This dictionary may include the following entries:
 
-censor_thresh and censor_val
-""""""""""""""""""""""""""""
+ens.censor_thresh and ens.censor_val
+""""""""""""""""""""""""""""""""""""
 The "censor_thresh" and "censor_val" entries are described above.
 
-ens_thresh
-""""""""""
+ens.ens_thresh
+""""""""""""""
 The "ens_thresh" entry specifies a proportion between 0 and 1 to define
 the required ratio of valid input ensemble member files. If the ratio
 of valid input ensemble files to expected ones is too low, the tool
 will error out.
 
-vld_thresh
-""""""""""
+ens.vld_thresh
+""""""""""""""
 The "vld_thresh" entry specifies a proportion between 0 and 1 to
 define the required ratio of valid data points. When computing
 ensemble products, if the ratio of valid data values is too low, the
 ensemble product will be set to bad data for that point.
 
-field
-"""""
+ens.field
+"""""""""
 The "field" entry is as described above. However, in this case, the
 cat_thresh entry is used for calculating probabilities of exceeding
 the given threshold. In the default shown below, the probability of
@@ -3062,22 +3062,22 @@ compute rank histograms, probability integral transform histograms,
 spread-skill variance, relative position histograms, economic value, and
 other statistics.
 
-ens_ssvar_bin_size
-""""""""""""""""""
+obs.ens_ssvar_bin_size
+""""""""""""""""""""""
 The "ens_ssvar_bin_size" entry sets the width of the variance bins. Smaller
 bin sizes provide the user with more flexibility in how data are binned
 during analysis. The actual variance of the ensemble data will determine the
 number of bins written to the SSVAR output lines.
 
-ens_phist_bin_size
-""""""""""""""""""
+obs.ens_phist_bin_size
+""""""""""""""""""""""
 The "ens_phist_bin_size" is set to a value between 0 and 1. The number of
 bins for the probability integral transform histogram in the PHIST line type
 is defined as the ceiling of 1.0 / ens_phist_bin_size. For example, a bin
 size of 0.05 results in 20 PHIST bins.
 
-prob_cat_thresh
-"""""""""""""""
+fcst.prob_cat_thresh and obs.prob_cat_thresh
+""""""""""""""""""""""""""""""""""""""""""""
 The "prob_cat_thresh" entry is an array of thresholds to be applied in the
 computation of the ranked probability score.  If left empty, but climatology
 data is provided, the climo_cdf thresholds will be used instead.
@@ -3102,9 +3102,8 @@ data is provided, the climo_cdf thresholds will be used instead.
 nc_var_str
 ^^^^^^^^^^
 
-The "nc_var_str" entry specifies a string for each ensemble field and
-verification task in Ensemble-Stat. This string is parsed from each
-"ens.field" and "obs.field" dictionary entry and is used to customize
+The "nc_var_str" entry specifies a string for each Ensemble-Stat verification task.
+It is parsed from each "obs.field" dictionary entry and is used to customize
 the variable names written to the NetCDF output file. The default is an
 empty string, meaning that no customization is applied to the output variable
 names. When the Ensemble-Stat config file contains two fields with the same
@@ -3147,17 +3146,17 @@ random.
 obs_error
 ^^^^^^^^^
 
-Observation error options
+Observation error options:
 
-flag
-""""
+obs_error.flag
+""""""""""""""
 The "flag" entry toggles the observation error logic on (TRUE) and off (FALSE).
 When flag is TRUE, random observation error perturbations are applied to the
 ensemble member values. No perturbation is applied to the observation values
 but the bias scale and offset values, if specified, are applied.
 
-dist_type
-"""""""""
+obs_error.dist_type
+"""""""""""""""""""
 Set "dist_type" to NONE to use the observation error table instead.
 May be set separately in each "obs.field" entry.
 The obs_error dictionary controls how observation error information should be
@@ -3172,8 +3171,8 @@ GAMMA, UNIFORM, or BETA. The default value of NONE indicates that the
 observation error table file should be used rather than the configuration
 file settings.
 
-dist_parm
-"""""""""
+obs_error.dist_parm
+"""""""""""""""""""
 The "dist_parm" entry is an array of length 1 or 2 specifying the parameters
 for the distribution selected in dist_type. The NORMAL, EXPONENTIAL, and
 CHISQUARED distributions are defined by a single parameter. The GAMMA,
@@ -3181,12 +3180,11 @@ UNIFORM, and BETA distributions are defined by two parameters. See the
 `GNU Scientific Library Reference Manual <https://www.gnu.org/software/gsl/manual>`_
 for more information on these distributions.
 
-inst_bias_scale and inst_bias_offset
-""""""""""""""""""""""""""""""""""""
+obs_error.inst_bias_scale and obs_error.inst_bias_offset
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 The "inst_bias_scale" and "inst_bias_offset" entries specify bias scale and
 offset values that should be applied to observation values prior to
 perturbing them. These entries enable bias-correction on the fly.
-
 
 Defining the observation error information in the configuration file is
 convenient but limited. If defined this way, the random perturbations for all
@@ -3571,13 +3569,13 @@ fcst, obs
 The object definition settings for MODE are contained within the "fcst" and
 "obs" entries:
 
-censor_thresh and censor_val
-""""""""""""""""""""""""""""
+fcst/obs.censor_thresh and fcst/obs.censor_val
+""""""""""""""""""""""""""""""""""""""""""""""
 The "censor_thresh" and "censor_val" entries are described above.
 The entries replace the previously supported "raw_thresh" entry.
 
-conv_radius
-"""""""""""
+fcst/obs.conv_radius
+""""""""""""""""""""
 The "conv_radius" entry specifies the convolution radius in grid
 squares. The larger the convolution radius, the smoother the objects.
 Multiple convolution radii may be specified as an array. For example:
@@ -3586,8 +3584,8 @@ Multiple convolution radii may be specified as an array. For example:
 
   conv_radius = [ 5, 10, 15 ];
 
-conv_thresh
-"""""""""""
+fcst/obs.conv_thresh
+""""""""""""""""""""
 The "conv_thresh" entry specifies the convolution threshold used to
 define MODE objects. The lower the threshold, the larger the objects.
 Multiple convolution thresholds may be specified as an array. For example:
@@ -3596,12 +3594,12 @@ Multiple convolution thresholds may be specified as an array. For example:
 
   conv_thresh = [ >=5.0, >=10.0, >=15.0 ];
 
-vld_thresh
-""""""""""
+fcst/obs.vld_thresh
+"""""""""""""""""""
 The "vld_thresh" entry is described above.
 
-filter_attr_name and filter_attr_thresh
-"""""""""""""""""""""""""""""""""""""""
+fcst/obs.filter_attr_name and fcst/obs.filter_attr_thresh
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 The "filter_attr_name" and "filter_attr_thresh" entries are arrays of
 the same length which specify object filtering criteria. By default, no
 object filtering criteria is defined.
@@ -3621,8 +3619,8 @@ Note that the "area_thresh" and "inten_perc_thresh" entries form
 earlier versions of MODE are replaced by these options and are now
 deprecated.
 
-merge_thresh
-""""""""""""
+fcst/obs.merge_thresh
+"""""""""""""""""""""
 The "merge_thresh" entry specifies a lower convolution threshold used
 when the double-threshold merging method is applied. The number of
 merge thresholds must match the number of convolution thresholds.
@@ -3632,8 +3630,8 @@ Multiple merge thresholds may be specified as an array. For example:
 
   merge_thresh = [ >=1.0, >=2.0, >=3.0 ];
 
-merge_flag
-""""""""""
+fcst/obs.merge_flag
+"""""""""""""""""""
 The "merge_flag" entry specifies the merging methods to be applied:
 
  * NONE for no merging
@@ -4219,12 +4217,11 @@ job to be performed. The format for an analysis job is as follows:
 
 | -job job_name
 | OPTIONAL ARGS
-|
 
-Where "job_name" is set to one of the following:
+The following types of jobs are supported:
 
-filter
-""""""
+-job filter
+"""""""""""
 To filter out the STAT lines matching the job filtering criteria
 specified below and using the optional arguments below.
 The output STAT lines are written to the file specified using the
@@ -4240,8 +4237,8 @@ Optional Args:
      May be used multiple times to override data written to the
      output dump_row file.
 
-summary
-"""""""
+-job summary
+""""""""""""
 To compute summary information for a set of statistics.
 The summary output includes the mean, standard deviation,
 percentiles (0th, 10th, 25th, 50th, 75th, 90th, and 100th), range,
@@ -4299,9 +4296,8 @@ Optional Args:
   -column_union
      To summarize multiple columns.
 
-aggregate
-"""""""""
-
+-job aggregate
+""""""""""""""
 To aggregate the STAT data for the STAT line type specified using
 the "-line_type" argument. The output of the job will be in the
 same format as the input line type specified. The following line
@@ -4316,9 +4312,8 @@ types may be aggregated:
 
 Required Args: -line_type
 
-aggregate_stat
-""""""""""""""
-
+-job aggregate_stat
+"""""""""""""""""""
 To aggregate the STAT data for the STAT line type specified using
 the "-line_type" argument. The output of the job will be the line
 type specified using the "-out_line_type" argument. The valid
@@ -4378,9 +4373,8 @@ Additional Optional Args for:
   -out_line_type ECLV ...
   -out_eclv_points
 
-ss_index
-""""""""
-
+-job ss_index
+"""""""""""""
 The skill score index job can be configured to compute a weighted
 average of skill scores derived from a configurable set of
 variables, levels, lead times, and statistics. The skill score
@@ -4410,9 +4404,8 @@ Required Args:
   Where -line_type is CNT or CTS and -column is the statistic.
   Optionally, specify other filters for each term, -fcst_thresh.
 
-go_index
-""""""""
-
+-job go_index
+"""""""""""""
 The GO Index is a special case of the skill score index consisting
 of a predefined set of variables, levels, lead times, statistics,
 and weights.
@@ -4431,8 +4424,8 @@ For lead times of 12, 24, 36, and 48 hours, it contains RMSE for:
 
 Required Args: None
 
-ramp
-""""
+-job ramp
+"""""""""
 
 The ramp job operates on a time-series of forecast and observed
 values and is analogous to the RIRW (Rapid Intensification and
@@ -4666,18 +4659,27 @@ of the output .stat output file:
       -dump_row job_aggregate_stat_ORANK_RHIST_in.stat"
   ];
 
-List of statistics by the logic that should be applied when computing their
-WMO mean value in the summary job. Each entry is a line type followed by the
-statistic name. Statistics using the default arithemtic mean method do not
-need to be listed.
+wmo_sqrt_stats and wmo_fisher_stats
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The "wmo_sqrt_stats" and "wmo_fisher_stats" entries are arrays of strings to
+control the logic used to compute the WMO mean value for the summary job type,
+as described in the `:ref:-job summary` section. Each entry is a line type
+followed by a statistic column name. Statistics computed using the default
+arithmetic mean method do not need to be listed.
 
 .. code-block:: none
 
-  wmo_sqrt_stats   = [];
-  wmo_fisher_stats = [];
+   wmo_sqrt_stats   = [ "CNT:FSTDEV",  "CNT:OSTDEV",  "CNT:ESTDEV",
+                        "CNT:RMSE",    "CNT:RMSFA",   "CNT:RMSOA",
+                        "VCNT:FS_RMS", "VCNT:OS_RMS", "VCNT:RMSVE",
+                        "VCNT:FSTDEV", "VCNT:OSTDEV" ];
+
+   wmo_fisher_stats = [ "CNT:PR_CORR", "CNT:SP_CORR",
+                        "CNT:KT_CORR", "CNT:ANOM_CORR",
+                        "CNT:ANOM_CORR_UNCNTR" ];
 
 vif_flag
-""""""""
+^^^^^^^^
 The "vif_flag" entry is a boolean to indicate whether a variance inflation
 factor should be computed when aggregating a time series of contingency
 table counts or partial sums. The VIF is used to adjust the normal
@@ -4712,13 +4714,13 @@ tile
 The "tile" entry is a dictionary that specifies how tiles should be defined
 in Wavelet-Stat when the "grid_decomp_flag" is set to TILE:
 
-width
-"""""
+tile.width
+""""""""""
 The "width" entry specifies the dimension for all tiles and must be
 an integer power of 2.
 
-location
-""""""""
+tile.location
+"""""""""""""
 The "location" entry is an array of dictionaries where each element
 consists of an "x_ll" and "y_ll" entry specifying the lower-left (x,y)
 coordinates of the tile.
@@ -4741,12 +4743,12 @@ wavelet
 The "wavelet" entry is a dictionary in Wavelet-Stat that specifies how the
 wavelet decomposition should be performed:
 
-type
-""""
+wavelet.type
+""""""""""""
 The "type" entry specifies which wavelet should be used.
 
-member
-""""""
+wavelet.member
+""""""""""""""
 The "member" entry specifies the wavelet shape.
 See: `Discrete Wavelet Transforms (DWT) initialization <https://www.gnu.org/software/gsl/doc/html/dwt.html#initialization>`_
 

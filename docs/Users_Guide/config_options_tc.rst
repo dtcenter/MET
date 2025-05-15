@@ -748,10 +748,10 @@ job to be performed.  The format for an analysis job is as follows:
 | -job job_name
 | OPTIONAL ARGS
 
-Where "job_name" is set to one of the following:
+The following types of jobs are supported:
 
-filter
-""""""
+-job filter
+"""""""""""
 To filter out the TCST lines matching the job filtering criteria
 specified above and using the optional arguments below.  The
 output TCST lines are written to the file specified using the
@@ -808,8 +808,8 @@ the job will be performed on their intersection:
 
 Required Args: -dump_row
 
-summary
-"""""""
+-job summary
+""""""""""""
 To compute the mean, standard deviation, and percentiles
 (0th, 10th, 25th, 50th, 75th, 90th, and 100th) for the statistic
 specified using the "-line_type" and "-column" arguments.
@@ -838,9 +838,8 @@ Optional Args:
   -out_alpha to override default alpha value
   -column_union to summarize multiple columns
 
-rirw
-""""
-
+-job rirw
+"""""""""
 To define rapid intensification/weakening contingency table using
 the ADECK and BDECK RI/RW settings and the matching time window
 and output contingency table counts and statistics.
@@ -868,8 +867,8 @@ created:
 | alarms, misses, and correct negatives,  respectively.  These files
 | may be used as input for additional TC-Stat analysis.
 
-probrirw
-""""""""
+-job probrirw
+"""""""""""""
 To define an Nx2 probabilistic contingency table by reading the
 PROBRIRW line type, binning the forecast probabilities, and writing
 output probabilistic counts and statistics.
