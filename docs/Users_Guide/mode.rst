@@ -20,7 +20,7 @@ MODE may be used in a generalized way to compare any two fields. For simplicity,
 Scientific and Statistical Aspects
 ==================================
 
-The methods used by the MODE tool to identify and match forecast and observed objects are briefly described in this section. 
+The methods used by the MODE tool to identify and match forecast and observed objects are briefly described in this section.
 
 Resolving Objects
 -----------------
@@ -33,7 +33,7 @@ In this formula, :math:`f` is the raw data field, :math:`\phi` is the filter fun
 
 .. math:: \phi (x,y) = \begin{align}\begin{cases} H &\text{if } x^2 + y^2\leq R^2\\ 0 &\text{otherwise.} \end{cases}\end{align}
 
-The parameters :math:`R` and :math:`H` are not independent. They are related by the requirement that the integral of :math:`\phi` over the grid be unity: 
+The parameters :math:`R` and :math:`H` are not independent. They are related by the requirement that the integral of :math:`\phi` over the grid be unity:
 
 .. math:: \pi R^2 H\text{ = 1.}
 
@@ -62,15 +62,15 @@ An example of the steps involved in resolving objects is shown in :numref:`mode-
 Attributes
 ----------
 
-Object attributes are defined both for single objects and for object pairs. One of the objects in a pair is from the forecast field and the other is taken from the observed field. 
+Object attributes are defined both for single objects and for object pairs. One of the objects in a pair is from the forecast field and the other is taken from the observed field.
 
 **Area** is simply a count of the number of grid squares an object occupies. If desired, a true area (say, in :math:`km^2`) can be obtained by adding up the true areas of all the grid squares inside an object, but in practice this is seldom necessary.
 
-Moments are used in the calculation of several object attributes. If we define :math:`\xi(x,y)` to be 1 for points :math:`(x,y)` inside our object, and zero for points outside, then the first-order moments, :math:`S_x` and :math:`S_y`, are defined as 
+Moments are used in the calculation of several object attributes. If we define :math:`\xi(x,y)` to be 1 for points :math:`(x,y)` inside our object, and zero for points outside, then the first-order moments, :math:`S_x` and :math:`S_y`, are defined as
 
 .. math:: S_x = \sum_{x,y} x\xi(x,y) {}\ \text{and } {}\ S_y = \sum_{x,y} y\xi(x,y)
 
-Higher order moments are similarly defined and are used in the calculation of some of the other attributes. For example, the **centroid** is a kind of geometric center of an object, and can be calculated from first moments. It allows one to assign a single point location to what may be a large, extended object. 
+Higher order moments are similarly defined and are used in the calculation of some of the other attributes. For example, the **centroid** is a kind of geometric center of an object, and can be calculated from first moments. It allows one to assign a single point location to what may be a large, extended object.
 
 **Axis Angle**, denoted by :math:`\theta`, is calculated from the second-order moments. It gives information on the orientation or "tilt" of an object. **Curvature** is another attribute that uses moments in its calculation, specifically, third-order moments.
 
@@ -111,7 +111,7 @@ Multi-Variate MODE
 
 Traditionally, MODE defines objects by smoothing and thresholding data from a single input field. MET version 10.1.0 extends MODE by adding the option to define objects using multiple input fields.
 
-As described in :numref:`MODE-configuration-file`, the **field** entry in the forecast and observation dictionaries define the input data to be processed. If **field** is defined as a dictionary, the traditional method for running MODE is invoked, where objects are defined using a single input field. If **field** is defined as an array of dictionaries, each specifying a different input field, then the multi-variate MODE logic is invoked and requires the **multivar_logic** configuration entry to be set. Traditional MODE is run once for each input field to define objects for that field. Note that the object definition criteria can be defined separately for each field array entry. The objects from each input field are combined into forecast and observation data *super* objects 
+As described in :numref:`MODE-configuration-file`, the **field** entry in the forecast and observation dictionaries define the input data to be processed. If **field** is defined as a dictionary, the traditional method for running MODE is invoked, where objects are defined using a single input field. If **field** is defined as an array of dictionaries, each specifying a different input field, then the multi-variate MODE logic is invoked and requires the **multivar_logic** configuration entry to be set. Traditional MODE is run once for each input field to define objects for that field. Note that the object definition criteria can be defined separately for each field array entry. The objects from each input field are combined into forecast and observation data *super* objects
 
 The **multivar_logic** configuration entry, described in :numref:`MODE-configuration-file`, defines the boolean logic for combining objects from multiple fields into *super* objects. It can be defined once to apply to both the forecast and observation dictionaries if the field array lengths are the same, or defined separately within each dictionary. If defined separately within each dictionary, the field array lengths do not need to be the same for the forecast and observations. Note that the multi-variate MODE forecast and observation input fields and combination logic do not need to match.
 
@@ -139,7 +139,7 @@ When setting a threshold to a percentile, some choices require both an observati
 * "==FBIAS" in a forecast input.
   * e.g. "==FBIAS1" in a forecast input to automatically de-bias the data, using a simple threshold in the matching observation input. For example, when forecast input 2 has "==FBIAS1", and observation input 2 has ">5.0", MET applies the >5.0 threshold to the observation and then chooses a forecast threshold which results in a frequency bias of 1.  The frequency bias can be any float value > 0.0.
 
-  
+
 Practical Information
 =====================
 
@@ -182,7 +182,7 @@ Optional Arguments for mode
 
 5. The **-outdir path** option indicates the directory where output files should be written.
 
-6. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+6. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
 7. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
@@ -219,7 +219,7 @@ mode Configuration File
 
 The default configuration file for the MODE tool, **MODEConfig_default**, can be found in the installed *share/met/config* directory. Another version of the configuration file is provided in *scripts/config*. We encourage users to make a copy of the configuration files prior to modifying their contents. Descriptions of **MODEConfig_default** and the required variables for any MODE configuration file are also provided below. While the configuration file contains many entries, most users will only need to change a few for their use. Specific options are described in the following subsections.
 
-A second default configuration file for the multivar MODE option, **MODEMultivarConfig_default**, is also found in the installed *share/met/config* directory. We encourage users to make a copy of this default configuration file when setting up a multivar configuration prior to modifying content. The two default config files **MODEConfig_default** and **MODEMultivarConfig_default** are similar, with **MODEMultivarConfig_default** having example multivar specific content. 
+A second default configuration file for the multivar MODE option, **MODEMultivarConfig_default**, is also found in the installed *share/met/config* directory. We encourage users to make a copy of this default configuration file when setting up a multivar configuration prior to modifying content. The two default config files **MODEConfig_default** and **MODEMultivarConfig_default** are similar, with **MODEMultivarConfig_default** having example multivar specific content.
 
 Note that environment variables may be used when editing configuration files, as described in the :numref:`config_env_vars`.
 
@@ -274,7 +274,7 @@ _____________________
    multivar_intensity_compare_fcst = [1,2];
    multivar_intensity_compare_obs = [2,3];
 
-The **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** entries appear only in the **MODEMultivarConfig_default** file. These entries define an index in the field arrays to be compared for forecast and observation intensities and must be the same length. For example, in the above example, forecast field 1 will be compared to observation field 2 for computing intensity attribute statistics. If the **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty, traditional mode output is created for the super objects, but with no intensity information. 
+The **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** entries appear only in the **MODEMultivarConfig_default** file. These entries define an index in the field arrays to be compared for forecast and observation intensities and must be the same length. For example, in the above example, forecast field 1 will be compared to observation field 2 for computing intensity attribute statistics. If the **multivar_intensity_compare_fcst** and **multivar_intensity_compare_obs** are empty, traditional mode output is created for the super objects, but with no intensity information.
 
 _____________________
 
@@ -311,7 +311,7 @@ _____________________
      merge_thresh       = >=1.25;
      merge_flag         = THRESH;
   }
-  obs = fcst; 
+  obs = fcst;
 
 The **field** entries in the forecast and observation dictionaries specify the model and observation variables and level to be compared. See a more complete description of them in :numref:`config_options`. In the above example, the forecast settings are copied into the observation dictionary using **obs = fcst;.**
 
@@ -333,19 +333,19 @@ The **filter_attr_name** entry is an array of strings specifying the MODE output
 
 The **filter_attr_thresh** entry is an array of thresholds for these object attributes. Any simple objects not meeting all of the filtering criteria are discarded.
 
-Note that the **area_thresh** and **inten_perc_thresh** entries from earlier versions of MODE are replaced by these options and are now deprecated. 
+Note that the **area_thresh** and **inten_perc_thresh** entries from earlier versions of MODE are replaced by these options and are now deprecated.
 
 The **merge_thresh** entry is used to define larger objects for use in merging the original objects. It defines the threshold value used in the double thresholding merging technique. Note that in order to use this merging technique, it must be requested for both the forecast and observation fields. These thresholds should be chosen to define larger objects that fully contain the originally defined objects. For example, for objects defined as >=5.0, a merge threshold of >=2.5 will define larger objects that fully contain the original objects. Any two original objects contained within the same larger object will be merged. By default, the merge thresholds are set to be greater than or equal to 1.25. Multiple merge thresholds may be specified as an array (e.g. **merge_thresh = [ >=1.0, >=2.0, >=3.0 ];**). The number of **merge_thresh** entries must match the number of **conv_thresh** entries.
 
-The **merge_flag** entry controls what type of merging techniques will be applied to the objects defined in each field. 
+The **merge_flag** entry controls what type of merging techniques will be applied to the objects defined in each field.
 
-• **NONE** indicates that no merging should be applied. 
+• **NONE** indicates that no merging should be applied.
 
-• **THRESH** indicates that the double thresholding merging technique should be applied. 
+• **THRESH** indicates that the double thresholding merging technique should be applied.
 
-• **ENGINE** indicates that objects in each field should be merged by comparing the objects to themselves using a fuzzy engine approach. 
+• **ENGINE** indicates that objects in each field should be merged by comparing the objects to themselves using a fuzzy engine approach.
 
-• **BOTH** indicates that both techniques should be used. 
+• **BOTH** indicates that both techniques should be used.
 
 By default, the double thresholding **THRESH** merging technique is applied in single variable mode.  The merging defaults to **NONE** with multivariate mode.
 
@@ -355,13 +355,13 @@ _____________________
 
   mask_missing_flag = NONE;
 
-The **mask_missing_flag** entry specifies how missing data in the raw model and observation fields will be treated. 
+The **mask_missing_flag** entry specifies how missing data in the raw model and observation fields will be treated.
 
-• **NONE** indicates no additional processing is to be done. 
+• **NONE** indicates no additional processing is to be done.
 
-• **FCST** indicates missing data in the observation field should be used to mask the forecast field. 
+• **FCST** indicates missing data in the observation field should be used to mask the forecast field.
 
-• **OBS** indicates missing data in the forecast field should be used to mask the observation field. 
+• **OBS** indicates missing data in the forecast field should be used to mask the observation field.
 
 • **BOTH** indicates masking should be performed in both directions (i.e., mask the forecast field with the observation field and vice-versa).
 
@@ -374,15 +374,15 @@ _____________________
 
   match_flag = MERGE_BOTH;
 
-The **match_flag** entry controls how matching will be performed when comparing objects from the forecast field to objects from the observation field. An interest value is computed for each possible pair of forecast/observation objects. The interest values are then thresholded to define which objects match. If two objects in one field happen to match the same object in the other field, then those two objects could be merged. The **match_flag** entry controls what type of merging is allowed in this context. 
+The **match_flag** entry controls how matching will be performed when comparing objects from the forecast field to objects from the observation field. An interest value is computed for each possible pair of forecast/observation objects. The interest values are then thresholded to define which objects match. If two objects in one field happen to match the same object in the other field, then those two objects could be merged. The **match_flag** entry controls what type of merging is allowed in this context.
 
-• **NONE** indicates that no matching should be performed between the fields at all. 
+• **NONE** indicates that no matching should be performed between the fields at all.
 
-• **MERGE_BOTH** indicates that additional merging is allowed in both fields. 
+• **MERGE_BOTH** indicates that additional merging is allowed in both fields.
 
-• **MERGE_FCST** indicates that additional merging is allowed only in the forecast field. 
+• **MERGE_FCST** indicates that additional merging is allowed only in the forecast field.
 
-• **NO_MERGE** indicates that no additional merging is allowed in either field, meaning that each object will match at most one object in the other field. 
+• **NO_MERGE** indicates that no additional merging is allowed in either field, meaning that each object will match at most one object in the other field.
 
 By default, additional merging is allowed in both fields.
 
@@ -409,13 +409,13 @@ Defining a **grid** and **poly** masking region is described in :numref:`config_
 
 The **grid_flag** and **poly_flag** entries specify how the grid and polyline masking should be applied:
 
-• **NONE** indicates that the masking grid should not be applied. 
+• **NONE** indicates that the masking grid should not be applied.
 
-• **FCST** indicates that the masking grid should be applied to the forecast field. 
+• **FCST** indicates that the masking grid should be applied to the forecast field.
 
-• **OBS** indicates that the masking grid should be applied to the observation field. 
+• **OBS** indicates that the masking grid should be applied to the observation field.
 
-• **BOTH** indicates that the masking grid should be applied to both fields. 
+• **BOTH** indicates that the masking grid should be applied to both fields.
 
 By default, no masking grid or polyline is applied.
 
@@ -436,7 +436,7 @@ _____________________
      complexity_ratio = 0.0;
      inten_perc_ratio = 0.0;
      inten_perc_value = 50;
-  } 
+  }
 
 The **weight** entries listed above control how much weight is assigned to each pairwise attribute when computing a total interest value for object pairs. The weights listed above correspond to the **centroid distance** between the objects, the **boundary distance** (or minimum distance), the **convex hull distance** (or minimum distance between the convex hulls of the objects), the **orientation angle** difference, the **aspect ratio** difference, the **object area ratio** (minimum area divided by maximum area), the **intersection divided by the minimum object area ratio**, the **curvature ratio**, the **complexity ratio**, and the **intensity ratio**. The weights need not sum to any particular value. When the total interest value is computed, the weighted sum is normalized by the sum of the weights listed above.
 
@@ -512,7 +512,7 @@ _____________________
 
   plot_valid_flag = FALSE;
 
-When applied, the **plot_valid_flag entry** indicates that only the region containing valid data after masking is applied should be plotted. 
+When applied, the **plot_valid_flag entry** indicates that only the region containing valid data after masking is applied should be plotted.
 
 • **FALSE** indicates the entire domain should be plotted.
 
@@ -788,7 +788,7 @@ where *PREFIX* indicates the user-defined output prefix, *FCST\_VAR\_LVL* is the
 
 The second ASCII file the MODE tool generates contains all of the attributes for simple objects, the merged cluster objects, and pairs of objects. Each line in this file contains the same number of columns, though those columns not applicable to a given line contain fill data. The first row of every MODE object attribute file is a header containing the column names. The number of lines in this file depends on the number of objects defined. This file contains lines of 6 types that are indicated by the contents of the **OBJECT_ID** column. The **OBJECT_ID** can take the following 6 forms: **FNN, ONN, FNNN_ONNN, CFNNN, CONNN, CFNNN_CONNN**. In each case, **NNN** is a three-digit number indicating the object index. While all lines have the first 18 header columns in common, these 6 forms for **OBJECT_ID** can be divided into two types - one for single objects and one for pairs of objects. The single object lines **(FNN, ONN, CFNNN**, and **CONNN)** contain valid data in columns 19-39 and fill data in columns 40-51. The object pair lines **(FNNN_ONNN** and **CFNNN_CONNN)** contain valid data in columns 40-51 and fill data in columns 19-39.
 
-These object identifiers are described in :numref:`MODE_object_attribute`. 
+These object identifiers are described in :numref:`MODE_object_attribute`.
 
 
 .. role:: raw-html(raw)

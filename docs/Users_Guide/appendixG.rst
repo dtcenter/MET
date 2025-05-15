@@ -6,7 +6,7 @@ Appendix G Vectors and Vector Statistics
 
 In this appendix, we discuss some basic properties of vectors, concentrating on the two-dimensional case. To keep the discussion simple, we will assume we are using a Cartesian coordinate system.
 
-Traditionally, vectors have been defined as quantities having both magnitude and direction, exemplified by a directed line segment. The magnitude of the vector is shown by the length of the segment, and the direction of the vector is usually shown by drawing an arrowhead on one end of the segment. Computers (and, in the author's experience, people) are usually more comfortable working with numbers, and so instead of the usual graphical definition of a vector, we will take the definition used in analytic geometry: A (two-dimensional) vector is an ordered pair of numbers. We will use boldface type to denote vectors, and so we can write 
+Traditionally, vectors have been defined as quantities having both magnitude and direction, exemplified by a directed line segment. The magnitude of the vector is shown by the length of the segment, and the direction of the vector is usually shown by drawing an arrowhead on one end of the segment. Computers (and, in the author's experience, people) are usually more comfortable working with numbers, and so instead of the usual graphical definition of a vector, we will take the definition used in analytic geometry: A (two-dimensional) vector is an ordered pair of numbers. We will use boldface type to denote vectors, and so we can write
 
 .. math:: \mathbf{v} = (a,b)
 
@@ -72,7 +72,7 @@ _________________________
 
 FBAR and OBAR are the average values of the forecast and observed wind speed.
 
-.. math:: 
+.. math::
 
    \text{FBAR} = \frac{1}{N} \sum_i s_{fi}
 
@@ -102,7 +102,7 @@ ___________________________
 
 MSVE and RMSVE are, respectively, the mean squared, and root mean squared, lengths of the vector difference between the forecast and observed wind vectors.
 
-.. math:: 
+.. math::
 
    \text{MSVE} = \frac{1}{N} \sum_i | \mathbf{F}_i - \mathbf{O}_i|^2
 
@@ -114,7 +114,7 @@ FSTDEV and OSTDEV are the standard deviations of the forecast and observed wind 
 
 .. math:: \text{FSTDEV } = \frac{1}{N} \sum_i (s_{fi} - \text{FBAR})^2 = \frac{1}{N} \sum_i s_{fi}^2 - \text{FBAR}^2
 
- \text{OSTDEV } = \frac{1}{N} \sum_i (s_{oi} - \text{OBAR})^2 = \frac{1}{N} \sum_i s_{oi}^2 - \text{OBAR}^2 
+ \text{OSTDEV } = \frac{1}{N} \sum_i (s_{oi} - \text{OBAR})^2 = \frac{1}{N} \sum_i s_{oi}^2 - \text{OBAR}^2
 
 ___________________________
 

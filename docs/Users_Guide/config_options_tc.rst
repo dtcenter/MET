@@ -20,7 +20,7 @@ An empty list indicates that all should be used.
 
 For example:
 
-| storm_id = [ "AL092011" ]; 
+| storm_id = [ "AL092011" ];
 
 This may also be set using basin, cyclone, and timing information below.
 
@@ -41,7 +41,7 @@ For example:
 | basin = [ "AL", "EP" ];
 
 .. code-block:: none
-		
+
    basin = [];
 
 
@@ -56,7 +56,7 @@ For example:
 | cyclone = [ "01", "02", "03" ];
 
 .. code-block:: none
-		
+
   cyclone = [];
 
 storm_name
@@ -67,10 +67,10 @@ indicates that all should be used.
 
 For example:
 
-| storm_name = [ "KATRINA" ]; 
+| storm_name = [ "KATRINA" ];
 
 .. code-block:: none
-		
+
   storm_name = [];
 
 init_beg end inc exc
@@ -100,7 +100,7 @@ For example:
 
 valid_beg end inc exc
 ---------------------
-  
+
 Specify a model valid time window in YYYYMMDD[_HH[MMSS]] format or provide a
 list of specific valid times to include (inc) or exclude (exc). If a time
 window is specified, only tracks for which all points are contained within
@@ -136,7 +136,7 @@ For example:
 | init_hour = [ "00", "06", "12", "18" ];
 
 .. code-block:: none
-		
+
   init_hour = [];
 
 lead_req
@@ -150,7 +150,7 @@ are required to determine which tracks are to be used;
 all lead times will be used.
 
 .. code-block:: none
-		
+
   lead_req  = [];
 
 version
@@ -160,7 +160,7 @@ Indicate the version number for the contents of this configuration file.
 The value should generally not be modified.
 
 .. code-block:: none
-		
+
   version = "VN.N";
 
 
@@ -179,11 +179,11 @@ verifying multiple models, choose descriptive model names (no whitespace)
 to distinguish between their output.
 
 For example:
-		
+
 | model = [ "AHW4", "AHWI" ];
 
 .. code-block:: none
-		  
+
   model  = [];
 
 init_mask, valid_mask
@@ -213,7 +213,7 @@ For example:
 | check_dup = FALSE;
 
 .. code-block:: none
-		
+
   check_dup = FALSE;
 
 interp12
@@ -227,12 +227,12 @@ name ends in '2' (e.g. AHW2) and apply the following logic:
 
 * FILL to create a copy of '2' track and rename it as 'I' only when the
   'I' track does not already exist.
-     
+
 * REPLACE to create a copy of the '2' track and rename it as 'I' in all
   cases, replacing any 'I' tracks that may already exist.
 
 .. code-block:: none
-		
+
   interp12 = REPLACE;
 
 consensus
@@ -273,7 +273,7 @@ For example:
 | lag_time = [ "06", "12" ];
 
 .. code-block:: none
-		
+
   lag_time = [];
 
 
@@ -290,11 +290,11 @@ best_technique and oper_technique settings.
 |   OCLP, OCS5, OCD5, OCDT
 
 For example:
-		
+
 | best_technique = [ "BEST" ];
 
 .. code-block:: none
-		
+
   best_technique = [ "BEST" ];
   best_baseline  = [];
   oper_technique = [ "CARQ" ];
@@ -315,7 +315,7 @@ For example:
 | anly_track = BDECK;
 
 .. code-block:: none
-		
+
   anly_track = BDECK;
 
 
@@ -331,7 +331,7 @@ For example:
 | match_points = FALSE;
 
 .. code-block:: none
-		
+
   match_points = FALSE;
 
 
@@ -420,7 +420,7 @@ For example:
 | bmodel = [ "BEST" ];
 
 .. code-block:: none
-		
+
   amodel = [];
   bmodel = [];
 
@@ -441,7 +441,7 @@ For example:
 | lead_req   = [ "72", "84", "96", "108" ];
 
 .. code-block:: none
-		
+
   init_hour  = [];
   valid_hour = [];
   lead       = [];
@@ -475,7 +475,7 @@ For example:
 | line_type = [ "TCMPR" ];
 
 .. code-block:: none
-		
+
   line_type = [];
 
 track_watch_warn
@@ -494,7 +494,7 @@ For example:
 |  track_watch_warn = [ "HUWATCH", "HUWARN" ];
 
 .. code-block:: none
-		
+
   track_watch_warn = [];
 
 
@@ -512,7 +512,7 @@ For example:
 | column_thresh_val  = [ >200,     >200     ];
 
 .. code-block:: none
-		
+
   column_thresh_name = [];
   column_thresh_val  = [];
 
@@ -530,13 +530,13 @@ For example:
 | column_str_val  = [ "HU",    "TS"    ];
 
 .. code-block:: none
-		
+
   column_str_name = [];
   column_str_val  = [];
 
 column_str_name val
 ^^^^^^^^^^^^^^^^^^^
-  
+
 Stratify by performing string matching on non-numeric data columns.
 Specify a comma-separated list of columns names and values
 to be excluded from the analysis.
@@ -548,7 +548,7 @@ For example:
 | column_str_exc_val  = [ "TD"    ];
 
 .. code-block:: none
-		
+
   column_str_exc_name = [];
   column_str_exc_val  = [];
 
@@ -566,10 +566,10 @@ For example:
 | init_thresh_val  = [ >200     ];
 
 .. code-block:: none
-		
+
   init_thresh_name = [];
   init_thresh_val  = [];
-  
+
 init_str_name, init_str_val
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -615,7 +615,7 @@ For example:
 | water_only = FALSE;
 
 .. code-block:: none
-		
+
   water_only = FALSE;
 
 rirw
@@ -692,7 +692,7 @@ For example:
 | event_equal = FALSE;
 
 .. code-block:: none
-		
+
   event_equal = FALSE;
 
 
@@ -745,18 +745,18 @@ The "jobs" entry is an array of TCStat jobs to be performed.
 Each element in the array contains the specifications for a single analysis
 job to be performed.  The format for an analysis job is as follows:
 
-| -job job_name   
+| -job job_name
 | OPTIONAL ARGS
 
 Where "job_name" is set to one of the following:
 
 filter
-""""""  
+""""""
 To filter out the TCST lines matching the job filtering criteria
 specified above and using the optional arguments below.  The
 output TCST lines are written to the file specified using the
 "-dump_row" argument.
-  
+
 Required Args: -dump_row
 
 To further refine the TCST data: Each optional argument may be used
@@ -765,7 +765,7 @@ When multiple optional arguments of the same type are indicated, the
 analysis will be performed over their union.
 
 .. code-block:: none
-		  
+
   "-amodel            name"
   "-bmodel            name"
   "-lead        HHMMSS"
@@ -797,7 +797,7 @@ that column. If multiple column eq/min/max/str options are listed,
 the job will be performed on their intersection:
 
 .. code-block:: none
-		  
+
   "-column_min     col_name value" For example: -column_min TK_ERR 100.00
   "-column_max     col_name value"
   "-column_eq      col_name value"
@@ -806,10 +806,10 @@ the job will be performed on their intersection:
   "-column_str_exc col_name string" separate multiple filtering strings
                                     with commas
 
-Required Args: -dump_row 
+Required Args: -dump_row
 
 summary
-"""""""  
+"""""""
 To compute the mean, standard deviation, and percentiles
 (0th, 10th, 25th, 50th, 75th, 90th, and 100th) for the statistic
 specified using the "-line_type" and "-column" arguments.
@@ -840,7 +840,7 @@ Optional Args:
 
 rirw
 """"
-  
+
 To define rapid intensification/weakening contingency table using
 the ADECK and BDECK RI/RW settings and the matching time window
 and output contingency table counts and statistics.
@@ -848,7 +848,7 @@ and output contingency table counts and statistics.
 Optional Args:
 
 .. code-block:: none
-		  
+
   -rirw_window width in HH[MMSS] format to define a symmetric time window
   -rirw_window beg end in HH[MMSS] format to define an asymmetric time window
    Default search time window is 0 0, requiring exact match
@@ -869,7 +869,7 @@ created:
 | may be used as input for additional TC-Stat analysis.
 
 probrirw
-""""""""       
+""""""""
 To define an Nx2 probabilistic contingency table by reading the
 PROBRIRW line type, binning the forecast probabilities, and writing
 output probabilistic counts and statistics.
@@ -877,14 +877,14 @@ output probabilistic counts and statistics.
 Required Args:
 
 .. code-block:: none
-		  
+
   -probrirw_thresh to define the forecast probabilities to be
      evaluated (For example: -probrirw_thresh 30)
 
 Optional Args:
 
 .. code-block:: none
-		  
+
   -probrirw_exact TRUE/FALSE to verify against the exact (for example:
      BDELTA column) or maximum (for example: BDELTA_MAX column) intensity
      change in the BEST track
@@ -900,7 +900,7 @@ Optional Args:
 For the PROBRIRW line type, PROBRIRW_PROB is a derived column name.
 For example, the following options select 30 kt probabilities and match
 probability values greater than 0:
-  
+
 |   -probrirw_thresh 30 -column_thresh PROBRIRW_PROB >0
 
 For example:
@@ -912,7 +912,7 @@ For example:
 |   "-job summary -line_type TCMPR -column AC \
 |   -dumprow  ./tc_summary_job.tcst",
 |   "-job rirw -amodel AHW4 -dump_row ./tc_rirw_job" ]
-| 
+|
 
 .. code-block:: none
 
@@ -1019,7 +1019,7 @@ desc
 Description written to output DESC column
 
 .. code-block:: none
-		
+
   desc = "NA";
 
 model
@@ -1030,7 +1030,7 @@ If empty, all ATCF ID's found will be processed.
 Statistics will be generated separately for each ATCF ID.
 
 .. code-block:: none
-		
+
   model = [];
 
 init_beg, init_end
@@ -1049,7 +1049,7 @@ valid_beg, valid_end
 Forecast, BEST, and operational valid time window, as strings in YYYYMMDD[_HH[MMSS]] format
 
 .. code-block:: none
-		
+
   valid_beg = "";
   valid_end = "";
 
@@ -1086,7 +1086,7 @@ genesis_window
 Genesis matching time window, in hours relative to the forecast genesis time
 
 .. code-block:: none
-		
+
   genesis_window = {
      beg = -24;
      end =  24;
@@ -1098,7 +1098,7 @@ genesis_radius
 Genesis matching search radius in km.
 
 .. code-block:: none
-		
+
   genesis_radius = 300;
 
 ci_alpha
@@ -1107,7 +1107,7 @@ ci_alpha
 Confidence interval alpha value
 
 .. code-block:: none
-		
+
   ci_alpha = 0.05;
 
 output_flag

@@ -106,11 +106,11 @@ The "go_index" job is a special case of the "ss_index" job, described in :numref
   * - Variable
     - Level
     - Weights by Lead time
-    - 
     -
-    - 
-  * -  
-    -  
+    -
+    -
+  * -
+    -
     - 12 h
     - 24 h
     - 36 h
@@ -121,19 +121,19 @@ The "go_index" job is a special case of the "ss_index" job, described in :numref
     - 3
     - 2
     - 1
-  * -  
+  * -
     - 400 hPa
     - 4
     - 3
     - 2
     - 1
-  * -  
+  * -
     - 850 hPa
     - 4
     - 3
     - 2
     - 1
-  * -  
+  * -
     - Surface
     - 8
     - 6
@@ -145,19 +145,19 @@ The "go_index" job is a special case of the "ss_index" job, described in :numref
     - 6
     - 4
     - 2
-  * -  
+  * -
     - 700 hPa
     - 8
     - 6
     - 4
     - 2
-  * -  
+  * -
     - 850 hPa
     - 8
     - 6
     - 4
     - 2
-  * -  
+  * -
     - Surface
     - 8
     - 6
@@ -169,7 +169,7 @@ The "go_index" job is a special case of the "ss_index" job, described in :numref
     - 3
     - 2
     - 1
-  * -  
+  * -
     - Surface
     - 8
     - 6
@@ -280,7 +280,7 @@ The usage statement for the Stat-Analysis tool is shown below:
          [-v level]
          [-config config_file] | [JOB COMMAND LINE]
 
-stat_analysis has two required arguments and accepts several optional ones. 
+stat_analysis has two required arguments and accepts several optional ones.
 
 In the usage statement for the Stat-Analysis tool, some additional terminology is introduced. In the Stat-Analysis tool, the term "job" refers to a set of tasks to be performed after applying user-specified options (i.e., "filters"). The filters are used to pare down a collection of output from the MET statistics tools to only those lines that are desired for the analysis. The job and its filters together comprise the "job command line". The "job command line" may be specified either on the command line to run a single analysis job or within the configuration file to run multiple analysis jobs at the same time. If jobs are specified in both the configuration file and the command line, only the jobs indicated in the configuration file will be run. The various jobs types are described in :numref:`Des_components_STAT_analysis_tool` and the filtering options are described in :numref:`stat_analysis-configuration-file`.
 
@@ -298,11 +298,11 @@ Optional Arguments for stat_analysis
 
 4. The **-out file** option indicates the file to which output data should be written. If this option is not used, the output is directed to standard output.
 
-5. The **-tmp_dir path** option selects the directory for writing out temporary files. 
+5. The **-tmp_dir path** option selects the directory for writing out temporary files.
 
-6. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+6. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-7. The **-v level** indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging. 
+7. The **-v level** indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
 An example of the stat_analysis calling sequence is shown below.
 
@@ -318,7 +318,7 @@ In this example, the Stat-Analysis tool will search for valid STAT lines located
 stat_analysis Configuration File
 --------------------------------
 
-The default configuration file for the Stat-Analysis tool named **STATAnalysisConfig_default** can be found in the installed *share/met/config* directory. The version used for the example run in :numref:`installation` is also available in *scripts/config*. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents. 
+The default configuration file for the Stat-Analysis tool named **STATAnalysisConfig_default** can be found in the installed *share/met/config* directory. The version used for the example run in :numref:`installation` is also available in *scripts/config*. Like the other configuration files described in this document, it is recommended that users make a copy of these files prior to modifying their contents.
 
 The configuration file for the Stat-Analysis tool is optional. Users may find it more convenient initially to run Stat-Analysis jobs on the command line specifying job command options directly. Once the user has a set of or more jobs they would like to run routinely on the output of the MET statistics tools, they may find grouping those jobs together into a configuration file to be more convenient.
 
@@ -449,7 +449,7 @@ ___________________
 
   vx_mask = [];
 
-The user may specify a comma-separated list of verification masking regions to be used for all analyses. If multiple verification masking regions are listed, the analyses will be performed on their union. These selections may be further refined by using the **"-vx_mask"** option within the job command line. 
+The user may specify a comma-separated list of verification masking regions to be used for all analyses. If multiple verification masking regions are listed, the analyses will be performed on their union. These selections may be further refined by using the **"-vx_mask"** option within the job command line.
 
 ___________________
 
@@ -491,7 +491,7 @@ ___________________
 
   line_type = [];
 
-The user may specify a comma-separated list of line types to be used for all analyses. If multiple line types are listed, the analyses will be performed on their union. These selections may be further refined by using the **"-line_type"** option within the job command line. 
+The user may specify a comma-separated list of line types to be used for all analyses. If multiple line types are listed, the analyses will be performed on their union. These selections may be further refined by using the **"-line_type"** option within the job command line.
 
 ___________________
 
@@ -529,7 +529,7 @@ All possible tasks for **job_name** are listed in :numref:`Des_components_STAT_a
     :format: html
 
 .. _Des_components_STAT_analysis_tool:
-	 
+
 .. list-table:: Description of components of the job command lines for the Stat-Analysis tool.Variables, levels, and weights used to compute the GO Index.
   :widths: 15 55 20
   :header-rows: 1
@@ -560,7 +560,7 @@ All possible tasks for **job_name** are listed in :numref:`Des_components_STAT_a
     - \-model forecast :raw-html:`<br />`   \-model reference
   * - ramp
     - Defines a ramp event on a time-series of forecast and observed values. The amount of change from one time to the next is computed for forecast and observed values. Those changes are thresholded to define events which are used to populate a 2x2 contingency table.
-    - \-ramp_type :raw-html:`<br />` \-ramp_thresh :raw-html:`<br />` \-out_line_type :raw-html:`<br />` \-column :raw-html:`<br />` \-ramp_time :raw-html:`<br />` \-ramp_exact :raw-html:`<br />` \-ramp_window 
+    - \-ramp_type :raw-html:`<br />` \-ramp_thresh :raw-html:`<br />` \-out_line_type :raw-html:`<br />` \-column :raw-html:`<br />` \-ramp_time :raw-html:`<br />` \-ramp_exact :raw-html:`<br />` \-ramp_window
 
 ___________________
 
@@ -575,7 +575,7 @@ ___________________
 .. code-block:: none
 
   wmo_sqrt_stats = [ "CNT:FSTDEV",  "CNT:OSTDEV",  "CNT:ESTDEV",
-                     "CNT:RMSE",    "CNT:RMSFA",   "CNT:RMSOA", 
+                     "CNT:RMSE",    "CNT:RMSFA",   "CNT:RMSOA",
                      "VCNT:FS_RMS", "VCNT:OS_RMS", "VCNT:RMSVE",
                      "VCNT:FSTDEV", "VCNT:OSTDEV" ];
 
@@ -686,7 +686,7 @@ The "**-by column**" job command option may be used to run the same job multiple
 Job: filter
 ^^^^^^^^^^^
 
-This job command finds and filters STAT lines down to those meeting criteria specified by the filter's options. The filtered STAT lines are written to a file specified by the "**-dump_row**" option. 
+This job command finds and filters STAT lines down to those meeting criteria specified by the filter's options. The filtered STAT lines are written to a file specified by the "**-dump_row**" option.
 
 The output of this job is the same STAT format described in sections :numref:`point_stat-output`, :numref:`grid_stat-output`, and :numref:`wavelet_stat-output`.
 
@@ -702,7 +702,7 @@ This job produces summary statistics for the column name and line type specified
   :header-rows: 1
 
   * - Column Number
-    - Description 
+    - Description
   * - 1
     - SUMMARY: (job type)
   * - 2
@@ -774,7 +774,7 @@ This job is similar to the "**aggregate**" job listed above, however the format 
     - CNT, SL1L2, SAL1L2, WDIR
   * - MPR
     - FHO, CTC, CTS, MCTC, MCTS, PCT, PSTD, PJC, or PRC  (must specify "**-out_fcst_thresh**" and "**-out_obs_thresh**" arguments)
-    
+
 Job: ss_index, go_index, cbs_index
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

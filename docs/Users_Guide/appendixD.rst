@@ -16,7 +16,7 @@ The most commonly used confidence interval about an estimate for a statistic (or
 
 where :math:`z_{\alpha / 2}` is the :math:`\alpha - \text{th}` quantile of the standard normal distribution, and :math:`V(\theta )` is the standard error of the statistic (or parameter), :math:`\theta`. For example, the most common example is for the mean of a sample, :math:`X_1,\cdots,X_n`, of independent and identically distributed (iid) normal random variables with mean :math:`\mu` and variance :math:`\sigma`. Here, the mean is estimated by :math:`\frac{1}{n} \sum_{i=1}^n X_i = \bar{X}`, and the standard error is just the standard deviation of the random variables divided by the square root of the sample size. That is, :math:`V( \theta ) = V ( \bar{X} ) = \frac{\sigma}{\sqrt{n}}`, and this must be estimated by :math:`\hat{V} (\bar{X} )`, which is obtained here by replacing :math:`\sigma` by its estimate, :math:`\hat{\sigma}`, where :math:`\hat{\sigma} = \frac{1}{n - 1} \sum_{i=1}^n (X_i - \bar{X})^2`.
 
-Mostly, the normal approximation is used as an asymptotic approximation. That is, the interval for :math:`\theta` may only be appropriate for large **n**. For small **n**, the mean has an interval based on the Student's **t** distribution with **n-1** degrees of freedom. Essentially, :math:`z_{\alpha / 2}` of the question is replaced with the quantile of this **t** distribution. That is, the interval is given by 
+Mostly, the normal approximation is used as an asymptotic approximation. That is, the interval for :math:`\theta` may only be appropriate for large **n**. For small **n**, the mean has an interval based on the Student's **t** distribution with **n-1** degrees of freedom. Essentially, :math:`z_{\alpha / 2}` of the question is replaced with the quantile of this **t** distribution. That is, the interval is given by
 
 .. math:: \mu \pm t_{\alpha / 2,\nu - 1} \cdot \frac{\sigma}{\sqrt{n}}
 
@@ -46,7 +46,7 @@ where again, :math:`\sigma` is replaced by its estimate, :math:`\hat{\sigma}`, a
 
 Other statistics in MET having parametric CIs that rely on the underlying sample to be at least approximately iid normal, but have a different form derived from the normality assumption on the sample include the variance, standard deviation, and the linear correlation coefficient. These are addressed subsequently.
 
-Generally, the normal interval around :math:`\theta` is appropriate for statistics of continuous variables, but a limit law for the binomial distribution allows for use of this interval with proportions. The most intuitive estimate for :math:`V(\theta )` in this case is given by :math:`V(p) = \sqrt{\hat{p} (1 - \hat{p}) / n}`. However, this only applies when the sample size is large. A better approximation to the CI for proportions is given by Wilson's interval, which is 
+Generally, the normal interval around :math:`\theta` is appropriate for statistics of continuous variables, but a limit law for the binomial distribution allows for use of this interval with proportions. The most intuitive estimate for :math:`V(\theta )` in this case is given by :math:`V(p) = \sqrt{\hat{p} (1 - \hat{p}) / n}`. However, this only applies when the sample size is large. A better approximation to the CI for proportions is given by Wilson's interval, which is
 
 .. math:: \frac{\hat{p} + z_{\alpha / 2}^2 + z_{\alpha / 2} \sqrt{\hat{p} (1 - \hat{p}) / 4n}}{1 + z_{\alpha / 2}^2 / n}
 
@@ -59,7 +59,7 @@ The forecast/observation variance has CIs derived from the underlying sample bei
 
 respectively, where :math:`\chi_{\alpha , \nu}^2` is the :math:`\alpha - \text{th}` quantile of the chi-square distribution with **n-1** degrees of freedom. Taking the square roots of the limits of :math:`l` yields the CI for the forecast/observation standard deviation.
 
-Finally, the linear correlation coefficient has limits given by 
+Finally, the linear correlation coefficient has limits given by
 
 .. math:: (\frac{e^{2c_l} - 1}{e^{2c_l} + 1}, \frac{e^{2c_u} - 1}{e^{2c_u} + 1})
 
@@ -68,13 +68,13 @@ where :math:`c_l = v - \frac{z_{\alpha / 2}}{\sqrt{n - 3}}` and :math:`c_u = v +
 
 All other verification scores with CIs in MET must be obtained through bootstrap resampling. However, it is also possible to obtain bootstrap CIs for any of the statistics given above, and indeed it has been proven that the bootstrap intervals have better accuracy for the mean than the normal approximation. The bootstrap algorithm is described below.
 
-1. Assume the sample is representative of the population. 
+1. Assume the sample is representative of the population.
 
-2. Resample with replacement from the sample (see text below). 
+2. Resample with replacement from the sample (see text below).
 
-3. Estimate the parameter(s) of interest for the current replicated sample. 
+3. Estimate the parameter(s) of interest for the current replicated sample.
 
-4. Repeat steps 2 and 3 numerous times, say B times, so that you now have a sample of size B of the parameter(s). 
+4. Repeat steps 2 and 3 numerous times, say B times, so that you now have a sample of size B of the parameter(s).
 
 5. Calculate CIs for the parameters directly from the sample (see text below for more details)
 
