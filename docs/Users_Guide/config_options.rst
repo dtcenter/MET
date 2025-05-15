@@ -867,12 +867,12 @@ The "method" entry defines the regridding method to be used.
 width
 ^^^^^
 The "width" entry specifies a regridding width, when applicable.
-:code: `width = 4;`  To regrid using a 4x4 box or circle with diameter 4.
+:code:`width = 4;`  To regrid using a 4x4 box or circle with diameter 4.
 
 shape
 ^^^^^
 The "shape" entry defines the shape of the neighborhood.
-Valid values are :code: `SQUARE` or :code: `CIRCLE`
+Valid values are :code:`SQUARE` or :code:`CIRCLE`
 
 gaussian_dx
 ^^^^^^^^^^^
