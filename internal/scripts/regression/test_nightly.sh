@@ -83,6 +83,9 @@ if [[ $? -ne 0 ]]; then
   exit 1
 fi
 
+# Remove write permissions for groups and others
+chmod -R g-w,o-w ${1}-ref ${1}
+
 # Look for errors and/or warnings
 N_ERR=`egrep "ERROR:"   ${LOGFILE} | wc -l`
 N_WRN=`egrep "WARNING:" ${LOGFILE} | wc -l`
@@ -96,7 +99,9 @@ if [[ $N_ERR -gt 0 ]]; then
   exit 1
 # Update the latest link
 else
+  echo "$0: Updating 'latest' link to ${RUN_DIR}/MET-${1}" >> ${LOGFILE}
   ln -sf ${RUN_DIR}/MET-${1} ${RUN_DIR}/../latest
+  ls -l ${RUN_DIR}/../latest >> ${LOGFILE}
 fi
 
 exit 0
