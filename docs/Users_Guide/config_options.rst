@@ -447,8 +447,8 @@ parallel region, the code returns to single-thread execution.
 
 The number of code regions parallelized in both the MET application and library
 code was significantly increased for version 12.1.0. Generally, parallelism
-has been applied to compute intensive algorithms that loop over the grid
-dimensions. Further expanded use of parallelism is planned for future versions.
+has been applied to compute-intensive algorithms that loop over grid dimensions.
+Further expanded use of parallelism is planned for future versions of MET.
 
 Due to the broad application of OpenMP, nearly all MET applications benefit
 from it. However, initializing OpenMP threads does incur some overhead cost.
@@ -459,9 +459,8 @@ optimal number of threads for any single run of a MET tool is data dependent.
 Setting the number of threads
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The number of threads is controlled by the environment variable
-*OMP_NUM_THREADS*. For example, on a quad core machine, the user might choose
-to run on 4 threads:
+The number of threads is controlled by the OMP_NUM_THREADS environment variable.
+For example, on a quad core machine, the user might choose to run on 4 threads:
 
 .. code :: bash
 
@@ -475,7 +474,7 @@ itself. For example:
   OMP_NUM_THREADS=4 <exec>
 
 Since OpenMP is initialized by all MET applications, they print common log
-messages about the runtime settings. If *OMP_NUM_THREADS* is set, the number of
+messages about the runtime settings. If OMP_NUM_THREADS is set, the number of
 threads is reported:
 
 .. code :: bash
@@ -487,7 +486,8 @@ defaults to a single thread. A log message invites users to set it:
 
 .. code :: bash
 
-  DEBUG 2: Defaulting unset OMP_NUM_THREADS to use 1 of 40 available threads. Recommend setting OMP_NUM_THREADS for faster runtimes.
+  DEBUG 2: Defaulting unset OMP_NUM_THREADS to use 1 of 40 available threads.
+           Recommend setting OMP_NUM_THREADS for faster runtimes.
   DEBUG 2: OpenMP running on 1 thread(s). 
 
 There are choices when deciding how many threads to use. To perform a single run
