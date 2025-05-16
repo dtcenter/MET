@@ -38,6 +38,7 @@
 //   017    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
 //   018    07/26/24  Halley Gotway  MET #1371 Aggregate previous output.
 //   019    12/09/24  Halley Gotway  MET #3030 Add GRAD output.
+//   020    05/05/24  Halley Gotway  MET #3145 Add OpenMP.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -2510,9 +2511,6 @@ static void write_stat_data() {
    int deflate_level = compress_level;
    if(deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
-   // Allocate memory to store data values for each grid point
-   vector<float> data(grid.nx()*grid.ny());
-
    // Write output for each stat_data map entry
    for(const auto &key : stat_data_keys) {
 
@@ -2529,16 +2527,8 @@ static void write_stat_data() {
       if(!ptr->obs_thresh.empty())  add_att(&nc_var, "obs_thresh", ptr->obs_thresh);
       if(!is_bad_data(ptr->alpha))  add_att(&nc_var, "alpha", ptr->alpha);
 
-      // Store the data
-      for(int x=0; x<grid.nx(); x++) {
-         for(int y=0; y<grid.ny(); y++) {
-            int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-            data[n] = (float) ptr->dp(x, y);
-         } // end for y
-      } // end for x
-
       // Write out the data
-      if(!put_nc_data_with_dims(&nc_var, data.data(), grid.ny(), grid.nx())) {
+      if(!put_nc_data_plane_float(&nc_var, ptr->dp)) {
          mlog << Error << "\nwrite_stat_data() -> "
               << R"(error writing ")" << key
               << R"(" data to the output file.)" << "\n\n";

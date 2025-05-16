@@ -432,7 +432,8 @@ References:
 OMP_NUM_THREADS
 ---------------
 
-**Introduction**
+Introduction
+^^^^^^^^^^^^
 
 There are a number of different ways of parallelizing code. OpenMP offers
 parallelism within a single shared-memory workstation or supercomputer node.
@@ -444,20 +445,22 @@ parallel region, a number of threads are spawned and work is shared among them.
 Running on different cores, this reduces the execution time. At the end of the
 parallel region, the code returns to single-thread execution.
 
-A limited number of code regions are parallelized in MET. As a consequence,
-there are limits to the overall speed gains acheivable. Only the parallel
-regions of code will get faster with more threads, leaving the remaining
-serial portions to dominate the runtime.
+The number of code regions parallelized in both the MET application and library
+code was significantly increased for version 12.1.0. Generally, parallelism
+has been applied to compute-intensive algorithms that loop over grid dimensions.
+Further expanded use of parallelism is planned for future versions of MET.
 
-Not all top-level executables use parallelized code. If OpenMP is available,
-a log message will appear inviting the user to increase the number of threads
-for faster runtimes.
+Due to the broad application of OpenMP, nearly all MET applications benefit
+from it. However, initializing OpenMP threads does incur some overhead cost.
+Typically the runtime benefit dramatically outweighs the setup cost. Generally,
+more threads produces faster runtimes, but that is not always the case. The
+optimal number of threads for any single run of a MET tool is data dependent.
 
-**Setting the number of threads**
+Setting the number of threads
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The number of threads is controlled by the environment variable
-*OMP_NUM_THREADS*. For example, on a quad core machine, the user might choose
-to run on 4 threads:
+The number of threads is controlled by the OMP_NUM_THREADS environment variable.
+For example, on a quad core machine, the user might choose to run on 4 threads:
 
 .. code :: bash
 
@@ -470,8 +473,22 @@ itself. For example:
 
   OMP_NUM_THREADS=4 <exec>
 
+Since OpenMP is initialized by all MET applications, they print common log
+messages about the runtime settings. If OMP_NUM_THREADS is set, the number of
+threads is reported:
+
+.. code :: bash
+
+  DEBUG 2: OpenMP running on 16 thread(s).
+
 The case where this variable remains unset is handled inside the code, which
-defaults to a single thread.
+defaults to a single thread. A log message invites users to set it:
+
+.. code :: bash
+
+  DEBUG 2: Defaulting unset OMP_NUM_THREADS to use 1 of 40 available threads.
+           Recommend setting OMP_NUM_THREADS for faster runtimes.
+  DEBUG 2: OpenMP running on 1 thread(s). 
 
 There are choices when deciding how many threads to use. To perform a single run
 as fast as possible, it would likely be appropriate to use as many threads as
@@ -485,26 +502,8 @@ A lower thread count is appropriate when time-to-solution is not so critical,
 because cores remain idle when the code is not inside a parallel region. Fewer
 threads typically means better resource utilization.
 
-**Which code is parallelized?**
-
-Regions of parallelized code are:
-
-  * :code:`fractional_coverage (data_plane_util.cc)`
-
-    * Called by `gen_ens_prod` to compute NMEP outputs.
-    * Called by `grid_stat` when applying neighborhood verification methods.
-
-  * :code:`ShapeData::conv_filter_circ() (shapedata.cc)`
-
-    * Called by `mode` to apply a convolution smoothing operation when
-      defining objects.
-
-  * :code:`met_regrid_* (vx_regrid.cc)`
-
-    * Called by `regrid_data_plane` and all MET tools that support automated
-      regridding logic.
-
-**Thread Binding**
+Thread Binding
+^^^^^^^^^^^^^^
 
 It is normally beneficial to bind threads to particular cores, sometimes called
 *affinitization*. There are a few reasons for this, but at the very least it

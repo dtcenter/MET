@@ -20,6 +20,7 @@
 //   002    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   003    09/28/22  Prestopnik      MET #2227 Remove namspace std and netCDF
 //                                    from header files
+//   004    05/07/25  Halley Gotway   MET #3145 Add OpenMP
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -177,7 +178,7 @@ void process_command_line(int argc, char **argv) {
    if(cline.n() != 1) usage();
 
    // Store the required arguments
-   out_filename  = cline[0];
+   out_filename = cline[0];
 
    return;
 }
@@ -189,7 +190,7 @@ void process_land_data() {
    for(int i=0; i<land_data_files.n_elements(); i++) {
       mlog << Debug(2)
            << "Reading TC land data file: "
-           << replace_path(land_data_files[i]) << "\n";
+           << land_data_files[i] << "\n";
       land_array.add_file(replace_path(land_data_files[i]).c_str());
    }
 
@@ -201,8 +202,6 @@ void process_land_data() {
 ////////////////////////////////////////////////////////////////////////
 
 void process_distances() {
-   int n, x, y, c, npts, nlog, imin;
-   double lat, lon;
 
    // Instantiate the grid
    Grid grid(GridData);
@@ -256,40 +255,35 @@ void process_distances() {
         << "Computing distances for " << grid.nx() * grid.ny()
         << " points in grid (" << grid.serialize() << ")...\n";
 
-   // Determine how often to update the status
-   npts = grid.nx()*grid.ny();
-   nlog = npts/20;
+#pragma omp parallel default(none) \
+   shared(DefaultTO, grid, dland, land_array, nautical_miles_per_km)
+   {
 
-   // Loop over the grid and compute the distance to land for each point   
-   for(x=0,c=0; x<grid.nx(); x++) {
-      for(y=0; y<grid.ny(); y++) {
+      // Loop over the grid and compute the distance to land for each point   
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
 
-         if(++c % nlog == 0 && mlog.verbosity_level() == 3) {
-            cout << nint((double) c/npts*100.0) << "% " << flush;
-         }
+            // Call two_to_one
+            int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
 
-         // Call two_to_one
-         n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+            // Convert x,y to lat,lon
+            double lat;
+            double lon;
+            grid.xy_to_latlon(x, y, lat, lon);
+            lon = rescale_deg(lon, -180.0, 180.0);
 
-         // Convert x,y to lat,lon
-         grid.xy_to_latlon(x, y, lat, lon);
-         lon = rescale_deg(lon, -180.0, 180.0);
+            // Compute distance to land
+            int imin;
+            dland[n] = land_array.min_dist(lat, lon, imin);
 
-         // Compute distance to land
-         dland[n] = land_array.min_dist(lat, lon, imin);
+            // Convert to nuatical miles
+            if(!is_bad_data(dland[n])) dland[n] *= nautical_miles_per_km;
 
-         // Convert to nuatical miles
-         if(!is_bad_data(dland[n])) dland[n] *= nautical_miles_per_km;
-
-         mlog << Debug(4)
-              << "Lat = " << lat << ", Lon = " << lon
-              << ", Dist from \"" << land_array[imin].name()
-              << "\" = " << dland[n] << " nm\n";
-
-      } // end for y
-   } // end for x
-
-   if(mlog.verbosity_level() == 3) cout << "\n" << flush;
+         } // end for y
+      } // end for x
+   } // End omp parallel
 
    // Write the computed distances to the output file
    mlog << Debug(3) << "Writing distance to land variable.\n";
