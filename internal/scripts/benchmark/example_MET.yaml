@@ -1,0 +1,54 @@
+# Configuration file used to collect benchmarking in MET tools using CTRACK
+#
+
+
+#
+# filename
+# Timestamp in ISO 1806 format is used to generate output filename
+# If filename setting is empty string, then timestamp is used.
+# Otherwise, the specified filename followed by the timestamp will
+# be used for the output filename.
+#
+filename: ''
+
+#
+# Output directory where output files will be saved
+#
+benchmark_output_path: !ENV '${BENCHMARK_OUTPUT_BASE}/direct'
+
+#
+# location of METplus
+#
+metplus_base: !ENV '${METPLUS_BASE}'
+
+#
+# location of system.conf file
+#
+system_conf: "/path/to/system.conf"
+
+#
+# location of METplus wrapper configuration file(s)
+#
+wrapper_conf: 
+   - "/path/to/EnsembleStat_fcstRRFS_obsCCPA_1hrAPCP_truncated.conf"
+
+#
+# run MET command instead of using METplus
+#
+run_met_directly: True
+met_command: '/path/to/met/binary/MET/bin/ensemble_stat -v 2 /path/to/file/list/file_lists.20250130003727/20220501000000_24_ensemble_stat.txt /path/to/METplus/config/file/EnsembleStatConfig_wrapped -grid_obs /path/to/gribfile/obs/ccpa/20220502/ccpa.t00z.01h.hrap.conus.gb2 -outdir /path/to/output/dir/ensemble_stat_grid' 
+
+# subdirectory to save the consolidated information, if empty, the
+# MET tool name will be used
+met_subdir_name: 'EnsembleStat_fcstRRFS_obsCCPA_1hrAPCP'
+
+
+
+#
+# number of times to run the use case, default=1
+#
+num_runs: 1
+
+
+
+

@@ -105,6 +105,10 @@
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
+#ifdef WITH_PROFILER
+#include "ctrack.hpp"
+#endif
+
 #ifdef WITH_PYTHON
 #include "data2d_nc_met.h"
 #include "pointdata_python.h"
@@ -193,6 +197,11 @@ int met_main(int argc, char *argv[]) {
 
    // Perform verification
    process_vx();
+
+  // Save the CTRACK metrics 
+  #ifdef WITH_PROFILER
+  ctrack::result_print();
+  #endif
 
    // Close the text files and deallocate memory
    clean_up();
@@ -544,6 +553,9 @@ void process_grid(const Grid &fcst_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_n_vld() {
+   #ifdef WITH_PROFILER
+   CTRACK;
+   #endif
    int i_var, i_ens, j, n_vld, n_ens_inputs;
    DataPlane dp;
    DataPlaneArray dpa;
@@ -736,6 +748,9 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void process_vx() {
+   #ifdef WITH_PROFILER
+   CTRACK;
+   #endif
 
    // Process masks Grids and Polylines in the config file
    conf_info.process_masks(grid);

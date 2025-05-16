@@ -1592,8 +1592,7 @@ static void write_nc_data(unixtime nc_init,
    //
    // Write the data.
    //
-   if(!put_nc_data_with_dims(&nc_var, cur_dp.data(),
-                             cur_dp.ny(), cur_dp.nx())) {
+   if(!put_nc_data_plane_float(&nc_var, cur_dp)) {
       mlog << Error << "\nwrite_nc_data() -> "
            << "error with nc_var->put()\n\n";
       exit(1);
