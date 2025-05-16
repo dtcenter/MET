@@ -96,6 +96,7 @@ if [[ $N_ERR -gt 0 ]]; then
   exit 1
 # Update the latest link
 else
+  echo "$0: Updating 'latest' link to ${RUN_DIR}/MET-${1}" >> ${LOGFILE}
   ln -sf ${RUN_DIR}/MET-${1} ${RUN_DIR}/../latest
 fi
 
