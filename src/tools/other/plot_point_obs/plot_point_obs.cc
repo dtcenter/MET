@@ -228,7 +228,7 @@ static void process_point_obs(const char *point_obs_filename) {
    }
 
    long nhdr_count = met_point_obs->get_hdr_cnt();
-   int nobs_count = (int)met_point_obs->get_obs_cnt();
+   auto nobs_count = (int)met_point_obs->get_obs_cnt();
 
    mlog << Debug(2) << "Processing " << nobs_count
         << " observations at " << nhdr_count << " locations.\n";
@@ -454,13 +454,12 @@ static void create_plot() {
    }
 
    // Loop through the options and add a colorbar
-   for(vector<PlotPointObsOpt>::iterator it_ppo = conf_info.point_opts.begin();
-       it_ppo != conf_info.point_opts.end(); it_ppo++) {
+   for(auto &it_ppo : conf_info.point_opts) {
 
       // Draw a colorbar, if specified
-      if(it_ppo->fill_plot_info.flag &&
-         it_ppo->fill_plot_info.colorbar_flag) {
-         add_colorbar(plot, cbar_box, it_ppo->fill_ctable);
+      if(it_ppo.fill_plot_info.flag &&
+         it_ppo.fill_plot_info.colorbar_flag) {
+         add_colorbar(plot, cbar_box, it_ppo.fill_ctable);
       }
    }
     
@@ -491,20 +490,18 @@ static void create_plot() {
    int i = 0;
    int plot_count = 0;
    int skip_count = 0;
-   for(vector<PlotPointObsOpt>::iterator it_ppo = conf_info.point_opts.begin();
-       it_ppo != conf_info.point_opts.end(); it_ppo++) {
+   for(auto &it_ppo = conf_info.point_opts) {
 
       mlog << Debug(3) << "For point data group " << ++i
-           << ", plotting " << it_ppo->locations.size()
-           << " locations for " << it_ppo->n_obs << " observations.\n";
+           << ", plotting " << it_ppo.locations.size()
+           << " locations for " << it_ppo.n_obs << " observations.\n";
 
       // Loop over the locations
-      for(vector<LocationInfo>::iterator it_loc = it_ppo->locations.begin();
-          it_loc != it_ppo->locations.end(); it_loc++) {
+      for(auto &it_loc : it_ppo.locations) {
 
          // Convert lat/lon to grid x/y
-         double lat = it_loc->lat;
-         double lon = (-1.0*it_loc->lon);
+         double lat = it_loc.lat;
+         double lon = (-1.0*it_loc.lon);
          conf_info.grid.latlon_to_xy(lat, lon, grid_x, grid_y);
 
          // Track the number of points off the grid
@@ -519,29 +516,29 @@ static void create_plot() {
                           page_x, page_y, map_box);
 
          // Get the size of the circle
-         double size = it_ppo->dotsize_fx(it_loc->val);
+         double size = it_ppo.dotsize_fx(it_loc.val);
 
          // Draw a circle and fill it
-         if(it_ppo->fill_point) {
-            plot.set_color(it_ppo->fill_plot_info.flag ?
-                           it_ppo->fill_ctable.nearest(it_loc->val) :
-                           it_ppo->fill_color);
+         if(it_ppo.fill_point) {
+            plot.set_color(it_ppo.fill_plot_info.flag ?
+                           it_ppo.fill_ctable.nearest(it_loc.val) :
+                           it_ppo.fill_color);
             plot.circle(page_x, page_y, size, false);
             plot.fill();
          }
         
          // Outline the circle
-         if(it_ppo->outline_point) {
-            plot.setlinewidth(it_ppo->line_width);
-            plot.set_color(it_ppo->line_color);
+         if(it_ppo.outline_point) {
+            plot.setlinewidth(it_ppo.line_width);
+            plot.set_color(it_ppo.line_color);
             plot.circle(page_x, page_y, size, true);
          }
 
          // Dump out the location being plotted
          mlog << Debug(4) << "[" << ++plot_count
               << "] Plotting location [ lat, lon, val ] = [ "
-              << it_loc->lat << ", " << it_loc->lon << ", "
-              << it_loc->val << " ]\n";
+              << it_loc.lat << ", " << it_loc.lon << ", "
+              << it_loc.val << " ]\n";
 
       } // end locations
    } // end point_opts
