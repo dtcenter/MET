@@ -20,7 +20,7 @@ The following sections describe the usage statement, required arguments, and opt
 _______________________
 
 .. code-block:: none
-		
+
   Usage: rmw_analysis
          -data file_1 ... file_n | file_list
          -config file
@@ -42,7 +42,7 @@ Required Arguments for rmw_analysis
 Optional Arguments for rmw_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile. 
+4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile.
 
 5. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 

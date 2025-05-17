@@ -9,21 +9,21 @@ Boulder, CO
 
 In Memoriam
 -----------
-This coordinated release is dedicated to three remarkable team members 
-we lost in 2024, whose contributions have left an indelible mark on our work. 
+This coordinated release is dedicated to three remarkable team members
+we lost in 2024, whose contributions have left an indelible mark on our work.
 
-To `Tara Jensen <https://dtcenter.org/news/2024/04#3032>`_, 
-for her vision and leadership in creating METplus as well as her 
-dedication, dogged determination, and mentorship that shaped its growth and 
+To `Tara Jensen <https://dtcenter.org/news/2024/04#3032>`_,
+for her vision and leadership in creating METplus as well as her
+dedication, dogged determination, and mentorship that shaped its growth and
 trajectory, leaving a legacy of innovation in the field of verification.
 
-To `Randy Bullock <https://dtcenter.org/news/2024/04#3031>`_, 
-whose verification libraries formed the basis of MET and 
-whose mathematical brilliance, passion for maps, grid projections, and 
+To `Randy Bullock <https://dtcenter.org/news/2024/04#3031>`_,
+whose verification libraries formed the basis of MET and
+whose mathematical brilliance, passion for maps, grid projections, and
 graphics enriched and inspired new capabilities.
 
-To `Venita Hagerty <https://sites.gsl.noaa.gov/authors/365>`_, 
-for her pivotal expertise, support, and attention to 
+To `Venita Hagerty <https://sites.gsl.noaa.gov/authors/365>`_,
+for her pivotal expertise, support, and attention to
 detail that ensured the success of METdataio and METexpress.
 
 Their contributions to METplus continue to guide and inspire us each day.
@@ -140,7 +140,7 @@ To cite this documentation in publications, please refer to the MET User's Guide
 * Michelle Harrold [#NCAR]_
 * Tara Jensen [#NCAR]_
 * Christina Kalb [#NCAR]_
-* Seth Linden [#NCAR]_ 
+* Seth Linden [#NCAR]_
 * George McCabe [#NCAR]_
 * Kathryn Newman [#NCAR]_
 * Paul Oldenburg
@@ -167,7 +167,7 @@ To cite this documentation in publications, please refer to the MET User's Guide
    METplus Tutorial <https://metplus-training.readthedocs.io/en/latest/Tutorial/index.html>
    Training Series <https://metplus-training.readthedocs.io/en/latest/Training_Series/index.html>
    Featured Topics <https://metplus-training.readthedocs.io/en/latest/Featured_Topics/index.html>
-	     
+
 .. toctree::
    :hidden:
    :caption: METplus
@@ -200,7 +200,7 @@ To cite this documentation in publications, please refer to the MET User's Guide
 .. toctree::
    :hidden:
    :caption: METplotpy
-   
+
    User's Guide <https://metplus.readthedocs.io/projects/metplotpy/en/latest/Users_Guide/index.html>
    Contributor's Guide <https://metplus.readthedocs.io/projects/metplotpy/en/latest/Contributors_Guide/index.html>
 
@@ -210,7 +210,7 @@ To cite this documentation in publications, please refer to the MET User's Guide
 
    User's Guide <https://metplus.readthedocs.io/projects/metcalcpy/en/latest/Users_Guide/index.html>
    Contributor's Guide <https://metplus.readthedocs.io/projects/metcalcpy/en/latest/Contributors_Guide/index.html>
-   
+
 .. toctree::
    :hidden:
    :caption: METdataio
@@ -218,7 +218,7 @@ To cite this documentation in publications, please refer to the MET User's Guide
    User's Guide <https://metplus.readthedocs.io/projects/metdataio/en/latest/Users_Guide/index.html>
    Contributor's Guide <https://metplus.readthedocs.io/projects/metdataio/en/latest/Contributors_Guide/index.html>
 
-   
+
 Index
 =====
 

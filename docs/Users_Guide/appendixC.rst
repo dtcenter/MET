@@ -56,7 +56,7 @@ MET Verification Measures for Categorical (Dichotomous) Variables
 =================================================================
 
 
-The verification statistics for dichotomous variables are formulated using a contingency table such as the one shown in :numref:`table_2X2`. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in :numref:`table_2X2` are counts of the number of occurrences of the four possible combinations of forecasts and observations. 
+The verification statistics for dichotomous variables are formulated using a contingency table such as the one shown in :numref:`table_2X2`. In this table f represents the forecasts and o represents the observations; the two possible forecast and observation values are represented by the values 0 and 1. The values in :numref:`table_2X2` are counts of the number of occurrences of the four possible combinations of forecasts and observations.
 
 .. _table_2X2:
 
@@ -86,7 +86,7 @@ The verification statistics for dichotomous variables are formulated using a con
     - :math:`T = \mathbf{n}_{11} + \mathbf{n}_{10} + \mathbf{n}_{01} + \mathbf{n}_{00}`
 
 
-The counts, :math:`n_{11}, n_{10}, n_{01}, \text{and } n_{00},` are sometimes called the "Hits", "False alarms", "Misses", and "Correct rejections", respectively. 
+The counts, :math:`n_{11}, n_{10}, n_{01}, \text{and } n_{00},` are sometimes called the "Hits", "False alarms", "Misses", and "Correct rejections", respectively.
 
 By dividing the counts in the cells by the overall total, T, the joint proportions, :math:`\mathbf{p}_{11}, \mathbf{p}_{10}, \mathbf{p}_{01}, \text{and } \mathbf{p}_{00}` can be computed. Note that :math:`\mathbf{p}_{11} + \mathbf{p}_{10} + \mathbf{p}_{01} + \mathbf{p}_{00} = 1.` Similarly, if the counts are divided by the row (column) totals, conditional proportions, based on the forecasts (observations) can be computed. All of these combinations and the basic counts can be produced by the Point-Stat tool.
 
@@ -124,7 +124,7 @@ Accuracy
 
 Called "ACC" in CTS output :numref:`table_PS_format_info_CTS`
 
-Accuracy for a 2x2 contingency table is defined as 
+Accuracy for a 2x2 contingency table is defined as
 
 .. math:: \text{ACC } = \frac{n_{11} + n_{00}}{T}.
 
@@ -163,7 +163,7 @@ Probability of Detection (POD)
 
 Called "PODY" in CTS output :numref:`table_PS_format_info_CTS`
 
-POD is defined as 
+POD is defined as
 
 .. math:: \text{POD } = \frac{n_{11}}{n_{11} + n_{01}} = \frac{n_{11}}{n_1}.
 
@@ -175,7 +175,7 @@ Probability of False Detection (POFD)
 
 Called "POFD" in CTS output :numref:`table_PS_format_info_CTS`
 
-POFD is defined as 
+POFD is defined as
 
 .. math:: \text{POFD } = \frac{n_{10}}{n_{10} + n_{00}} = \frac{n_{10}}{n_{.0}}.
 
@@ -187,7 +187,7 @@ Probability of Detection of the Non-Event (PODn)
 
 Called "PODN" in CTS output :numref:`table_PS_format_info_CTS`
 
-PODn is defined as 
+PODn is defined as
 
 .. math:: \text{PODN } = \frac{n_{00}}{n_{10} + n_{00}} = \frac{n_{00}}{n_{.0}}.
 
@@ -198,7 +198,7 @@ False Alarm Ratio (FAR)
 
 Called "FAR" in CTS output :numref:`table_PS_format_info_CTS`
 
-FAR is defined as 
+FAR is defined as
 
 .. math:: \text{FAR } = \frac{n_{10}}{n_{10} + n_{11}} = \frac{n_{10}}{n_{1.}}.
 
@@ -209,7 +209,7 @@ Critical Success Index (CSI)
 
 Called "CSI" in CTS output :numref:`table_PS_format_info_CTS`
 
-CSI is defined as 
+CSI is defined as
 
 .. math:: \text{CSI } = \frac{n_{11}}{n_{11} + n_{10} + n_{01}}.
 
@@ -220,7 +220,7 @@ Gilbert Skill Score (GSS)
 
 Called "GSS" in CTS output :numref:`table_PS_format_info_CTS`
 
-GSS is based on the CSI, corrected for the number of hits that would be expected by chance. In particular, 
+GSS is based on the CSI, corrected for the number of hits that would be expected by chance. In particular,
 
 .. math:: \text{GSS } = \frac{n_{11} - C_1}{n_{11} + n_{10} + n_{01} - C_1},
 
@@ -235,7 +235,7 @@ Hanssen-Kuipers Discriminant (HK)
 
 Called "HK" in CTS output :numref:`table_PS_format_info_CTS`
 
-HK is defined as 
+HK is defined as
 
 .. math:: \text{HK } = \frac{n_{11} n_{00} - n_{10} n_{01}}{(n_{11} + n_{01}) (n_{10} + n_{00})}.
 
@@ -248,7 +248,7 @@ Heidke Skill Score (HSS)
 
 Called "HSS" in CTS output :numref:`table_PS_format_info_CTS` and "HSS" in MCTS output :numref:`table_PS_format_info_MCTS`
 
-HSS is a skill score based on Accuracy, where the Accuracy is compared to the number of correct forecasts that would be expected by chance. In particular, 
+HSS is a skill score based on Accuracy, where the Accuracy is compared to the number of correct forecasts that would be expected by chance. In particular,
 
 .. math:: \text{HSS } = \frac{n_{11} + n_{00} - C_2}{T - C_2},
 
@@ -256,7 +256,7 @@ where
 
 .. math:: C_2 = \frac{(n_{11} + n_{10}) (n_{11} + n_{01}) + (n_{01} + n_{00}) (n_{10} + n_{00})}{T}.
 
-Note that the C_2 value is calculated based on the data fields supplied by the user. Therefore, for C2 to appropriately represent a random forecast, 
+Note that the C_2 value is calculated based on the data fields supplied by the user. Therefore, for C2 to appropriately represent a random forecast,
 a sufficiently large sized dataset of forecasts and observations would be needed.
 
 HSS can range from minus infinity to 1. A perfect forecast would have HSS = 1.
@@ -266,13 +266,13 @@ Heidke Skill Score - Expected Correct (HSS_EC)
 
 Called "HSS_EC" in CTS output :numref:`table_PS_format_info_CTS` and MCTS output :numref:`table_PS_format_info_MCTS`
 
-HSS_EC calculates the HSS as described above, but with a C2 value based on a set expected chance (EC) value. 
-Instead of C2 being calculated by the user’s dataset, 
+HSS_EC calculates the HSS as described above, but with a C2 value based on a set expected chance (EC) value.
+Instead of C2 being calculated by the user’s dataset,
 
 .. math:: \text{HSS } = \text{T*EC },
 
-where EC is allowed to be prescribed by the user ranging from 0 to 1. By default the EC is set to 1 divided by the number of contingency table categories, 
-e.g. EC is set to 0.33333 for a 3 category (tercile) forecast and 0.5 for a two category (binary) forecast. 
+where EC is allowed to be prescribed by the user ranging from 0 to 1. By default the EC is set to 1 divided by the number of contingency table categories,
+e.g. EC is set to 0.33333 for a 3 category (tercile) forecast and 0.5 for a two category (binary) forecast.
 
 HSS_EC can range from minus infinity to 1. A perfect forecast would have HSS_EC = 1.
 
@@ -281,7 +281,7 @@ Odds Ratio (OR)
 
 Called "ODDS" in CTS output :numref:`table_PS_format_info_CTS`
 
-OR measures the ratio of the odds of a forecast of the event being correct to the odds of a forecast of the event being wrong. OR is defined as 
+OR measures the ratio of the odds of a forecast of the event being correct to the odds of a forecast of the event being wrong. OR is defined as
 
 .. math:: \text{OR } = \frac{n_{11} \times n_{00}}{n_{10} \times n_{01}} = \frac{(\frac{\text{POD}}{1 - \text{POD}})}{(\frac{\text{POFD}}{1 - \text{POFD}})}.
 
@@ -299,7 +299,7 @@ Odds Ratio Skill Score (ORSS)
 
 Called "ORSS" in CTS output :numref:`table_PS_format_info_CTS`
 
-ORSS is a skill score based on the odds ratio. ORSS is defined as 
+ORSS is a skill score based on the odds ratio. ORSS is defined as
 
 .. math:: \text{ORSS } = \frac{OR - 1}{OR + 1}.
 
@@ -325,7 +325,7 @@ The extreme dependency index measures the association between forecast and obser
 
 .. math:: \text{EDI } = \frac{\log F - \log H}{\log F + \log H},
 
-where *H* and *F* are the Hit Rate and False Alarm Rate, respectively. 
+where *H* and *F* are the Hit Rate and False Alarm Rate, respectively.
 
 EDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of EDI = 1 (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
 
@@ -334,7 +334,7 @@ Symmetric Extreme Dependency Score (SEDS)
 
 Called "SEDS" in CTS output :numref:`table_PS_format_info_CTS`
 
-The symmetric extreme dependency score measures the association between forecast and observed rare events. SEDS is defined as 
+The symmetric extreme dependency score measures the association between forecast and observed rare events. SEDS is defined as
 
 .. math:: \text{SEDS } = \frac{2 \ln [\frac{(n_{11} + n_{01}) (n_{11} + n_{10})}{T^2}]}{\ln (\frac{n_{11}}{T})} - 1.
 
@@ -345,11 +345,11 @@ Symmetric Extremal Dependency Index (SEDI)
 
 Called "SEDI" in CTS output :numref:`table_PS_format_info_CTS`
 
-The symmetric extremal dependency index measures the association between forecast and observed rare events. SEDI is defined as 
+The symmetric extremal dependency index measures the association between forecast and observed rare events. SEDI is defined as
 
-.. math:: \text{SEDI } = \frac{\ln F - \ln H + \ln (1 - H) - \ln (1 - F)}{\ln F + \ln H + \ln (1 - H) + \ln (1 - F)}, 
+.. math:: \text{SEDI } = \frac{\ln F - \ln H + \ln (1 - H) - \ln (1 - F)}{\ln F + \ln H + \ln (1 - H) + \ln (1 - F)},
 
-where :math:`H = \frac{n_{11}}{n_{11} + n_{01}}` and :math:`F = \frac{n_{10}}{n_{00} + n_{10}}` are the Hit Rate and False Alarm Rate, respectively. 
+where :math:`H = \frac{n_{11}}{n_{11} + n_{01}}` and :math:`F = \frac{n_{10}}{n_{00} + n_{10}}` are the Hit Rate and False Alarm Rate, respectively.
 
 SEDI can range from :math:`-\infty` to 1, with 0 representing no skill. A perfect forecast would have a value of SEDI = 1. SEDI approaches 1 only as the forecast approaches perfection (:ref:`Ferro and Stephenson, 2011 <Stephenson-2008>`).
 
@@ -367,11 +367,11 @@ Included in ECLV output :numref:`table_PS_format_info_ECLV`
 
 The Economic Cost Loss Relative Value (ECLV) applies a weighting to the contingency table counts to determine the relative value of a forecast based on user-specific information. The cost is incurred to protect against an undesirable outcome, whether that outcome occurs or not. No cost is incurred if no protection is undertaken. Then, if the event occurs, the user sustains a loss. If the event does not occur, there is neither a cost nor a loss. The maximum forecast value is achieved when the cost/loss ratio equals the climatological probability. When this occurs, the ECLV is equal to the Hanssen and Kuipers discriminant. The Economic Cost Loss Relative Value is defined differently depending on whether the cost / loss ratio is lower than the base rate or higher. The ECLV is a function of the cost / loss ratio (cl), the hit rate (h), the false alarm rate (f), the miss rate (m), and the base rate (b).
 
-For cost / loss ratio below the base rate, the ECLV is defined as: 
+For cost / loss ratio below the base rate, the ECLV is defined as:
 
 .. math:: \text{ECLV } = \frac{(cl \ast (h + f - 1)) + m}{cl \ast (b - 1)}.
 
-For cost / loss ratio above the base rate, the ECLV is defined as: 
+For cost / loss ratio above the base rate, the ECLV is defined as:
 
 .. math:: \text{ECLV } = \frac{(cl \ast (h + f)) + m - b}{b \ast (cl - 1)}.
 
@@ -428,7 +428,7 @@ Forecast Standard Deviation
 
 Called "FSTDEV" in CNT output :numref:`table_PS_format_info_CNT`
 
-The sample variance of the forecasts is defined as 
+The sample variance of the forecasts is defined as
 
 .. math:: s_f^2 = \frac{1}{T - 1} \sum_{i=1}^T (f_i - \bar{f})^2 .
 
@@ -439,7 +439,7 @@ Observation Standard Deviation
 
 Called "OSTDEV" in CNT output :numref:`table_PS_format_info_CNT`
 
-The sample variance of the observations is defined as 
+The sample variance of the observations is defined as
 
 .. math:: s_o^2 = \frac{1}{T-1} \sum_{i=1}^T (o_i - \bar{o})^2 .
 
@@ -450,11 +450,11 @@ Pearson Correlation Coefficient
 
 Called "PR_CORR" in CNT output :numref:`table_PS_format_info_CNT`
 
-The Pearson correlation coefficient, **r**, measures the strength of linear association between the forecasts and observations. The Pearson correlation coefficient is defined as: 
+The Pearson correlation coefficient, **r**, measures the strength of linear association between the forecasts and observations. The Pearson correlation coefficient is defined as:
 
 .. math:: r = \frac{\sum_{i=1}^T (f_i - \bar{f})(o_i - \bar{o})}{\sqrt{\sum(f_i - \bar{f})^2} \sqrt{\sum(o_i - \bar{o})^2 }}
 
-**r** can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
+**r** can range between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated.
 
 Spearman Rank Correlation Coefficient :math:`(\rho_{s})`
 --------------------------------------------------------
@@ -467,20 +467,20 @@ A simpler formulation of the Spearman-rank correlation is based on differences b
 
 .. math:: \rho_{s} = \frac{6}{n(n^2 - 1)} \sum_{i=1}^n d_i^2
 
-Like **r**, the Spearman rank correlation coefficient ranges between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated. 
+Like **r**, the Spearman rank correlation coefficient ranges between -1 and 1; a value of 1 indicates perfect correlation and a value of -1 indicates perfect negative correlation. A value of 0 indicates that the forecasts and observations are not correlated.
 
 Kendall's Tau Statistic ( :math:`\tau`)
 ---------------------------------------
 
 Called "KT_CORR" in CNT output :numref:`table_PS_format_info_CNT`
 
-Kendall's Tau statistic ( :math:`\tau`) is a robust measure of the level of association between the forecast and observation pairs. It is defined as 
+Kendall's Tau statistic ( :math:`\tau`) is a robust measure of the level of association between the forecast and observation pairs. It is defined as
 
 .. math:: \tau = \frac{N_C - N_D}{n(n - 1) / 2}
 
 where :math:`N_C` is the number of "concordant" pairs and :math:`N_D` is the number of "discordant" pairs. Concordant pairs are identified by comparing each pair with all other pairs in the sample; this can be done most easily by ordering all of the ( :math:`f_{i}, o_{i}`) pairs according to :math:`f_{i}`, in which case the :math:`o_{i}` values won't necessarily be in order. The number of concordant matches of a particular pair with other pairs is computed by counting the number of pairs (with larger values) for which the value of :math:`o_i` for the current pair is exceeded (that is, pairs for which the values of **f** and **o** are both larger than the value for the current pair). Once this is done, :math:`N_C` is computed by summing the counts for all pairs. The total number of possible pairs is :math:`N_C`; thus, the number of discordant pairs is :math:`N_D`.
 
-Like **r** and :math:`\rho_{s}`, Kendall's Tau ( :math:`\tau`) ranges between -1 and 1; a value of 1 indicates perfect association (concordance) and a value of -1 indicates perfect negative association. A value of 0 indicates that the forecasts and observations are not associated. 
+Like **r** and :math:`\rho_{s}`, Kendall's Tau ( :math:`\tau`) ranges between -1 and 1; a value of 1 indicates perfect association (concordance) and a value of -1 indicates perfect negative association. A value of 0 indicates that the forecasts and observations are not associated.
 
 Mean Error (ME)
 ---------------
@@ -488,7 +488,7 @@ Mean Error (ME)
 Called "ME" in CNT output :numref:`table_PS_format_info_CNT`
 Called "ME_OERR", "ME_GE_OBS", and "ME_LT_OBS" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-The Mean Error, ME, is a measure of overall bias for continuous variables; in particular ME = Bias. It is defined as 
+The Mean Error, ME, is a measure of overall bias for continuous variables; in particular ME = Bias. It is defined as
 
 .. math:: \text{ME} = \frac{1}{n} \sum_{i=1}^n (f_i - o_i) = \bar{f} - \bar{o} .
 
@@ -523,7 +523,7 @@ Root-Mean-Squared Error (RMSE)
 Called "RMSE" in CNT output :numref:`table_PS_format_info_CNT`
 Called "RMSE" and "RMSE_OERR" in ECNT output :numref:`table_ES_header_info_es_out_ECNT`
 
-RMSE is simply the square root of the MSE, :math:`\text{RMSE} = \sqrt{\text{MSE}}`. 
+RMSE is simply the square root of the MSE, :math:`\text{RMSE} = \sqrt{\text{MSE}}`.
 
 
 Scatter Index (SI)
@@ -549,7 +549,7 @@ MSE and RMSE are strongly impacted by large errors. They also are strongly impac
 
 MSE can be re-written as :math:`\text{MSE} = (\bar{f} - \bar{o})^{2} + s_{f}^{2} + s_{o}^{2} - 2s_{f} s_{o} r_{fo}`, where :math:`\bar{f} - \bar{o} = \text{ME}` and :math:`s_f^2 + s_o^2 - 2 s_f s_o r_{fo}` is the estimated variance of the error, :math:`s_{fo}^2`. Thus, :math:`\text{MSE} = \text{ME}^2 + s_{f-o}^2`. To understand the behavior of MSE, it is important to examine both of the terms of MSE, rather than examining MSE alone. Moreover, MSE can be strongly influenced by ME, as shown by this decomposition.
 
-The standard deviation of the error, :math:`s_{f-o}`, is :math:`s_{f-o} = \sqrt{s_{f-o}^{2}} = \sqrt{s_{f}^{2} + s_{o}^{2} - 2 s_{f} s_{o} r_{fo}}`. 
+The standard deviation of the error, :math:`s_{f-o}`, is :math:`s_{f-o} = \sqrt{s_{f-o}^{2}} = \sqrt{s_{f}^{2} + s_{o}^{2} - 2 s_{f} s_{o} r_{fo}}`.
 
 Note that the square of the standard deviation of the error (ESTDEV2) is sometimes called the "Bias-corrected MSE" (BCMSE) because it removes the effect of overall bias from the forecast-observation squared differences.
 
@@ -620,7 +620,7 @@ The anomaly correlation coefficient is equivalent to the Pearson correlation coe
 
 .. math:: \text{Anomaly Correlation} = \frac{\sum(f_i - {c_f}_i)(o_i - {c_o}_i)}{\sqrt{\sum(f_i - {c_f}_i)^2} \sqrt{\sum(o_i - {c_o}_i)^2}} .
 
-The centered anomaly correlation coefficient (ANOM_CORR) which includes the mean error is defined as: 
+The centered anomaly correlation coefficient (ANOM_CORR) which includes the mean error is defined as:
 
 .. only:: latex
 
@@ -630,7 +630,7 @@ The centered anomaly correlation coefficient (ANOM_CORR) which includes the mean
 
   .. math:: \text{ANOM_CORR } = \frac{ \overline{[(f - c_f) - \overline{(f - c_f)}][(o - c_o) - \overline{(o - c_o)}]}}{ \sqrt{ \overline{( (f - c_f) - \overline{(f - c_f)})^2} \overline{( (o - c_o) - \overline{(o - c_o)})^2}}}
 
-The uncentered anomaly correlation coefficient (ANOM_CORR_UNCNTR) which does not include the mean errors is defined as: 
+The uncentered anomaly correlation coefficient (ANOM_CORR_UNCNTR) which does not include the mean errors is defined as:
 
 .. math:: \text{Anomaly Correlation Raw } = \frac{ \overline{(f - c_f)(o - c_o)}}{ \sqrt{\overline{(f - c_f)^2} \overline{(o - c_o)^2}}}
 
@@ -654,7 +654,7 @@ Called "FBAR", "OBAR", "FOBAR", "FFBAR", "OOBAR", and "MAE" in SL1L2 output :num
 
 These statistics are simply the 1st and 2nd moments of the forecasts, observations and errors:
 
-.. math:: 
+.. math::
   \text{FBAR} = \text{Mean}(f) = \frac{1}{n} \sum_{i=1}^n f_i
 
   \text{OBAR} = \text{Mean}(o) = \frac{1}{n} \sum_{i=1}^n o_i
@@ -676,7 +676,7 @@ Called "FABAR", "OABAR", "FOABAR", "FFABAR", "OOABAR", and "MAE" in SAL1L2 outpu
 
 Computation of these statistics requires climatological values, where :math:`c_f` is the forecast climatology value and :math:`c_o` is the observation climatology value. These statistics are the 1st and 2nd moments of the scalar anomalies. The moments are defined as:
 
-.. math:: 
+.. math::
   \text{FABAR} = \text{Mean}(f - c_f) = \frac{1}{n} \sum_{i=1}^n (f_i - {c_f}_i)
 
   \text{OABAR} = \text{Mean}(o - c_o) = \frac{1}{n} \sum_{i=1}^n (o_i - {c_o}_i)
@@ -696,7 +696,7 @@ Called "UFBAR", "VFBAR", "UOBAR", "VOBAR", "UVFOBAR", "UVFFBAR", and "UVOOBAR" i
 
 These statistics are the moments for wind vector values, where :math:`u` is the E-W wind component and :math:`v` is the N-S wind component ( :math:`u_f` is the forecast E-W wind component; :math:`u_o` is the observed E-W wind component; :math:`v_f` is the forecast N-S wind component; and :math:`v_o` is the observed N-S wind component). The following measures are computed:
 
-.. math:: 
+.. math::
   \text{UFBAR} = \text{Mean}(u_f) = \frac{1}{n} \sum_{i=1}^n u_{fi}
 
   \text{VFBAR} = \text{Mean}(v_f) = \frac{1}{n} \sum_{i=1}^n v_{fi}
@@ -718,7 +718,7 @@ Called "UFABAR", "VFABAR", "UOABAR", "VOABAR", "UVFOABAR", "UVFFABAR", and "UVOO
 
 These statistics require climatological values for the wind vector components, where :math:`{u_c}_f` and :math:`{v_c}_f` are the forecast climatology vectors and :math:`{u_c}_o` and :math:`{v_c}_o` are the observation climatology vectors. The measures are defined below:
 
-.. math:: 
+.. math::
   \text{UFABAR} = \text{Mean}(u_f - {u_c}_f) = \frac{1}{n} \sum_{i=1}^n ({u_f}_i - {{u_c}_f}_i)
 
   \text{VFBAR} = \text{Mean}(v_f - {v_c}_f) = \frac{1}{n} \sum_{i=1}^n ({v_f}_i - {{v_c}_f}_i)
@@ -743,7 +743,7 @@ Called "TOTAL", "FGBAR", "OGBAR", "MGBAR", "EGBAR", "S1", "S1_OG", "FGOG_RATIO",
 
 These statistics are only computed by the Grid-Stat tool and require vectors. Here :math:`\nabla` is the gradient operator, which in this applications signifies the difference between adjacent grid points in both the grid-x and grid-y directions. TOTAL is the count of grid locations used in the calculations. The remaining measures are defined below:
 
-.. math:: 
+.. math::
   \text{FGBAR} = \text{Mean}|\nabla f| = \frac{1}{n} \sum_{i=1}^n | \nabla f_i|
 
   \text{OGBAR} = \text{Mean}|\nabla o| = \frac{1}{n} \sum_{i=1}^n | \nabla o_i|
@@ -754,7 +754,7 @@ These statistics are only computed by the Grid-Stat tool and require vectors. He
 
   \text{S1} = 100 \frac{\sum_{i=1}^n (w_i (e_g))}{\sum_{i=1}^n (w_i (G_L))}_i ,
 
-where the weights are applied at each grid location, with values assigned according to the weight option specified in the configuration file. The components of the :math:`S1` equation are as follows: 
+where the weights are applied at each grid location, with values assigned according to the weight option specified in the configuration file. The components of the :math:`S1` equation are as follows:
 
 .. math::
   e_g = (\vert \frac{\delta}{\delta x}(f - o)\vert + \vert \frac{\delta}{\delta y}(f - o)\vert)
@@ -829,7 +829,7 @@ The verification statistics for probabilistic forecasts of dichotomous variables
     - Observation
     -
     - Total
-  * -  
+  * -
     - **o = 1** (e.g., "Yes")
     - **o = 0** (e.g., "No")
     -
@@ -891,7 +891,7 @@ The Brier score is the mean squared probability error. In MET, the Brier Score (
 
 .. math:: \text{BS} = \frac{1}{T} \sum_{i=1}^K [n_{i1} (1 - p_i)^2 + n_{i0} p_i^2]
 
-The equation you will most often see in references uses the individual probability forecasts ( :math:`\rho_{i}`) and the corresponding observations ( :math:`o_{i}`), and is given as :math:`\text{BS} = \frac{1}{T}\sum (p_i - o_i)^2`. This equation is equivalent when the midpoints of the binned probability values are used as the :math:`p_i` . 
+The equation you will most often see in references uses the individual probability forecasts ( :math:`\rho_{i}`) and the corresponding observations ( :math:`o_{i}`), and is given as :math:`\text{BS} = \frac{1}{T}\sum (p_i - o_i)^2`. This equation is equivalent when the midpoints of the binned probability values are used as the :math:`p_i` .
 
 BS can be partitioned into three terms: (1) reliability, (2) resolution, and (3) uncertainty (:ref:`Murphy, 1987 <Murphy-1987>`).
 
@@ -904,7 +904,7 @@ Brier Skill Score (BSS)
 
 Called "BSS" and "BSS_SMPL" in PSTD output :numref:`table_PS_format_info_PSTD`
 
-BSS is a skill score based on the Brier Scores of the forecast and a reference forecast, such as climatology. BSS is defined as 
+BSS is a skill score based on the Brier Scores of the forecast and a reference forecast, such as climatology. BSS is defined as
 
 .. math:: \text{BSS} = 1 - \frac{\text{BS}_{fcst}}{\text{BS}_{ref}}.
 
@@ -976,7 +976,7 @@ The ideal forecast (i.e., one with perfect reliability) has conditional observed
 .. _appendixC-rel_diag:
 
 .. figure:: figure/appendixC-rel_diag.jpg
-	    
+
 	    Example of Reliability Diagram
 
 Receiver Operating Characteristic
@@ -986,12 +986,12 @@ MET produces hit rate (POD) and false alarm rate (POFD) values for each user-spe
 
 A ROC plot is shown for an example set of forecasts, with a solid line connecting the points for six user-specified thresholds (0.25, 0.35, 0.55, 0.65, 0.75, 0.85). The diagonal dashed line indicates no skill while the dash-dot line shows the ROC for a perfect forecast.
 
-A ROC curve shows how well the forecast discriminates between two outcomes, so it is a measure of resolution. The ROC is invariant to linear transformations of the forecast, and is thus unaffected by bias. An unbiased (i.e., well-calibrated) forecast can have the same ROC as a biased forecast, though most would agree that an unbiased forecast is "better". Since the ROC is conditioned on the observations, it is often paired with the reliability diagram, which is conditioned on the forecasts. 
+A ROC curve shows how well the forecast discriminates between two outcomes, so it is a measure of resolution. The ROC is invariant to linear transformations of the forecast, and is thus unaffected by bias. An unbiased (i.e., well-calibrated) forecast can have the same ROC as a biased forecast, though most would agree that an unbiased forecast is "better". Since the ROC is conditioned on the observations, it is often paired with the reliability diagram, which is conditioned on the forecasts.
 
 .. _appendixC-roc_example:
 
 .. figure:: figure/appendixC-roc_example.jpg
-	    
+
 	    Example of ROC Curve
 
 Area Under the ROC Curve (AUC)
@@ -1041,7 +1041,7 @@ Closed form expressions for the CRPS are difficult to define when using data rat
 
 .. math:: \text{crps}_i (N( \mu, \sigma^2),y) = \sigma ( \frac{y - \mu}{\sigma} (2 \Phi (\frac{y - \mu}{\sigma}) -1) + 2 \phi (\frac{y - \mu}{\sigma}) - \frac{1}{\sqrt{\pi}})
 
-In this equation, the y represents the event threshold. The estimated mean and standard deviation of the ensemble forecasts ( :math:`\mu \text{ and } \sigma`) are used as the parameters of the normal distribution. The values of the normal distribution are represented by the probability density function (PDF) denoted by :math:`\Phi` and the cumulative distribution function (CDF), denoted in the above equation by :math:`\phi`. 
+In this equation, the y represents the event threshold. The estimated mean and standard deviation of the ensemble forecasts ( :math:`\mu \text{ and } \sigma`) are used as the parameters of the normal distribution. The values of the normal distribution are represented by the probability density function (PDF) denoted by :math:`\Phi` and the cumulative distribution function (CDF), denoted in the above equation by :math:`\phi`.
 
 The overall CRPS is calculated as the average of the individual measures. In equation form:
 
@@ -1095,7 +1095,7 @@ The overall SPREAD_MD is calculated as the average of the individual measures. I
   .. math:: \text{SPREAD_MD} = \text{average(spread_md) } = \frac{1}{N} \sum_{i=1}^N \text{spread_md}_i
 
 A perfect forecast would have ensemble mean absolute difference = 0.
-          
+
 CRPS Skill Score
 ----------------
 
@@ -1246,7 +1246,7 @@ Called "FSS" in NBRCNT output :numref:`table_GS_format_info_NBRCNT`
 
 The Fractions Skill Score (FSS) is defined as
 
-.. math:: \text{FSS} = 1 - \frac{\text{FBS}}{\frac{1}{N} [\sum_N \langle P_f \rangle_s^2 + \sum_N \langle P_o \rangle_s^2 ]} , 
+.. math:: \text{FSS} = 1 - \frac{\text{FBS}}{\frac{1}{N} [\sum_N \langle P_f \rangle_s^2 + \sum_N \langle P_o \rangle_s^2 ]} ,
 
 where the denominator represents the worst possible forecast (i.e., with no overlap between forecast and observed events). FSS ranges between 0 and 1, with 0 representing no overlap and 1 representing complete overlap between forecast and observed events, respectively.
 
@@ -1302,16 +1302,16 @@ The results of the distance map verification approaches that are included in the
 Baddeley's :math:`\Delta` Metric and Hausdorff Distance
 -------------------------------------------------------
 
-Called "BADDELEY" and "HAUSDORFF" in the DMAP 
+Called "BADDELEY" and "HAUSDORFF" in the DMAP
 output :numref:`table_GS_format_info_DMAP`
 
 The Baddeley's :math:`\Delta` Metric is given by
 
 .. math:: \Delta_{p,w} (A,B) = [ \frac{1}{N} \sum_{s \in D} | w(d(s,A)) - w(d(s,B))|]^{\frac{1}{P}}
 
-where :math:`d(s,\cdot)` is the distance map for the respective event area, :math:`w(\cdot)` is an optional concave function (i.e., :math:`w( t + u) \leq w(t)+w(u))` that is strictly increasing at zero with :math:`w(t)=0` if and only if :math:`t=0`, *N* is the size of the domain, and *p* is a user chosen parameter for the :math:`L_{p}` norm. The default choice of :math:`p = 2` corresponds to a Euclidean average, :math:`p = 1` is a simple average of the difference in distance maps, and the limiting case of :math:`p= \infty` gives the maximum difference between the two distance maps and is called the Hausdorff distance, denoted as :math:`H(A,B)`, and is the metric that motivated the development of Baddeley's :math:`\Delta` metric. A typical choice, and the only available with MET, for :math:`w(\cdot) \text{ is } w(t)= \min\{t,c\}`, where *c* is a user-chosen constant with :math:`c = \infty` meaning that :math:`w(\cdot)` is not applied. This choice of :math:`w(\cdot)` provides a cutoff for distances beyond the pre-specified amount given by *c*. 
+where :math:`d(s,\cdot)` is the distance map for the respective event area, :math:`w(\cdot)` is an optional concave function (i.e., :math:`w( t + u) \leq w(t)+w(u))` that is strictly increasing at zero with :math:`w(t)=0` if and only if :math:`t=0`, *N* is the size of the domain, and *p* is a user chosen parameter for the :math:`L_{p}` norm. The default choice of :math:`p = 2` corresponds to a Euclidean average, :math:`p = 1` is a simple average of the difference in distance maps, and the limiting case of :math:`p= \infty` gives the maximum difference between the two distance maps and is called the Hausdorff distance, denoted as :math:`H(A,B)`, and is the metric that motivated the development of Baddeley's :math:`\Delta` metric. A typical choice, and the only available with MET, for :math:`w(\cdot) \text{ is } w(t)= \min\{t,c\}`, where *c* is a user-chosen constant with :math:`c = \infty` meaning that :math:`w(\cdot)` is not applied. This choice of :math:`w(\cdot)` provides a cutoff for distances beyond the pre-specified amount given by *c*.
 
-In terms of distance maps, Baddeley's :math:`\Delta` is the :math:`L_{p}` norm of the top left panel in :numref:`grid-stat_fig4` provided :math:`c= \infty`. If :math:`0<c< \infty`, then the distance maps in the bottom row of :numref:`grid-stat_fig3` would be replaced by *c* wherever they would otherwise exceed *c* before calculating their absolute differences in the top left panel of :numref:`grid-stat_fig4`. 
+In terms of distance maps, Baddeley's :math:`\Delta` is the :math:`L_{p}` norm of the top left panel in :numref:`grid-stat_fig4` provided :math:`c= \infty`. If :math:`0<c< \infty`, then the distance maps in the bottom row of :numref:`grid-stat_fig3` would be replaced by *c* wherever they would otherwise exceed *c* before calculating their absolute differences in the top left panel of :numref:`grid-stat_fig4`.
 
 The range for BADDELEY and HAUSDORFF is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
@@ -1334,7 +1334,7 @@ Unlike Baddeley's :math:`\Delta` metric, the MED is not a mathematical metric be
 
  mean \text{MED}(A,B) = \frac{1}{2}(\text{MED}(A,B) + \text{MED}(B,A))
 
-From the distance map perspective, MED *(A,B)* is the average of the values in :numref:`grid-stat_fig4` (top right), and MED *(B,A)* is the average of the values in :numref:`grid-stat_fig4` (bottom left). Note that the average is only over the circular regions depicted in the figure. 
+From the distance map perspective, MED *(A,B)* is the average of the values in :numref:`grid-stat_fig4` (top right), and MED *(B,A)* is the average of the values in :numref:`grid-stat_fig4` (bottom left). Note that the average is only over the circular regions depicted in the figure.
 
 The range for MED is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
@@ -1349,7 +1349,7 @@ Pratt's Figure of Merit (FOM) is given by
 
 where :math:`n_{A} \text{and } n_{B}` are the number of events within event areas *A* and *B*, respectively, :math:`d(s,A)` is the distance map related to the event area *A*, and :math:`\alpha` is a user-defined scaling constant. The default, and usual choice, is :math:`\alpha = \frac{1}{9}` when the distances of the distance map are normalized so that the smallest nonzero distance between grid point neighbors equals one. Clearly, FOM is not a metric because like MED, it is not symmetric. Like MED, MET computes the minimum, maximum, and average of FOM_FO and FOM_OF.
 
-Note that :math:`d(s,A)` in the denominator is summed only over the grid squares falling within the event set *B*. That is, it represents the circular area in the top right panel of :numref:`grid-stat_fig4`. 
+Note that :math:`d(s,A)` in the denominator is summed only over the grid squares falling within the event set *B*. That is, it represents the circular area in the top right panel of :numref:`grid-stat_fig4`.
 
 The range for FOM is 0 to 1, with a score of 1 indicating a perfect forecast.
 
@@ -1362,7 +1362,7 @@ Another measure incorporates the amount of actual overlap between the event sets
 
 .. math:: Z(A,B) = \lambda \sqrt{ \frac{1}{N} \sum_{s \in D} (I_F (s) - I_O (s))^2} + (1 - \lambda ) \cdot \text{MED} (A,B)
 
-where MED *(A,B)* is as in the Mean-error distance, *N* is the total number of grid squares as in Baddeley's :math:`\Delta` metric, :math:`I_{F}(s) ((I_{O}(s))` is the binary field derived from the forecast (observation), and :math:`\lambda` is a user-chosen weight. The first term is just the RMSE of the binary forecast and observed fields, so it measures the average amount of overlap of event areas where zero would be a perfect score. It is not a metric because of the MED in the second term. A user might choose different weights depending on whether they want to emphasize the overlap or the MED terms more, but generally equal weight :math:`(\lambda=\frac{1}{2})` is sufficient. In Zhu et al (2011), they actually only consider :math:`Z(F,O)` and not :math:`Z(O,F)`, but both are included in MET for the same reasons as argued with MED. Similar to MED, the average of these two directions (avg Z), as well as the min and max are also provided for convenience. 
+where MED *(A,B)* is as in the Mean-error distance, *N* is the total number of grid squares as in Baddeley's :math:`\Delta` metric, :math:`I_{F}(s) ((I_{O}(s))` is the binary field derived from the forecast (observation), and :math:`\lambda` is a user-chosen weight. The first term is just the RMSE of the binary forecast and observed fields, so it measures the average amount of overlap of event areas where zero would be a perfect score. It is not a metric because of the MED in the second term. A user might choose different weights depending on whether they want to emphasize the overlap or the MED terms more, but generally equal weight :math:`(\lambda=\frac{1}{2})` is sufficient. In Zhu et al (2011), they actually only consider :math:`Z(F,O)` and not :math:`Z(O,F)`, but both are included in MET for the same reasons as argued with MED. Similar to MED, the average of these two directions (avg Z), as well as the min and max are also provided for convenience.
 
 The range for ZHU is 0 to infinity, with a score of 0 indicating a perfect forecast.
 
@@ -1402,6 +1402,6 @@ Suppose now that we have a collection of *N* data points :math:`x_i \text{for } 
 
  \Delta = (N - 1)t - I
 
-Then the value *p* of the percentile is 
+Then the value *p* of the percentile is
 
 .. math:: p = (1 - \Delta) x_I + \Delta x_{I+1}

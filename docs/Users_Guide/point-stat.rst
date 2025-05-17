@@ -25,7 +25,7 @@ This section provides information about the various methods available in MET to 
 
 In the vertical, if forecasts and observations are at the same vertical level, then they are paired as-is. If any discrepancy exists between the vertical levels, then the forecasts are interpolated to the level of the observation. The vertical interpolation is done in the natural log of pressure coordinates, except for specific humidity, which is interpolated using the natural log of specific humidity in the natural log of pressure coordinates. Vertical interpolation for heights above ground are done linear in height coordinates. When forecasts are for the surface, no interpolation is done. They are matched to observations with message types that are mapped to "SURFACE" in the **message_type_group_map** configuration option. By default, the surface message types include ADPSFC, SFCSHP, and MSONET. The regular expression is applied to the message type list at the message_type_group_map. The derived message types from the time summary ("ADPSFC_MIN_hhmmss" and "ADPSFC_MAX_hhmmss") are accepted as "ADPSFC".
 
-To match forecasts and observations in the horizontal plane, the user can select from a number of methods described below. Many of these methods require the user to define the width of the forecast grid W, around each observation point P, that should be considered. In addition, the user can select the interpolation shape, either a SQUARE or a CIRCLE. For example, a square of width 2 defines the 2 x 2 set of grid points enclosing P, or simply the 4 grid points closest to P. A square of width of 3 defines a 3 x 3 square consisting of 9 grid points centered on the grid point closest to P. :numref:`point_stat_fig1`  provides illustration. The point P denotes the observation location where the interpolated value is calculated. The interpolation width W, shown is five. 
+To match forecasts and observations in the horizontal plane, the user can select from a number of methods described below. Many of these methods require the user to define the width of the forecast grid W, around each observation point P, that should be considered. In addition, the user can select the interpolation shape, either a SQUARE or a CIRCLE. For example, a square of width 2 defines the 2 x 2 set of grid points enclosing P, or simply the 4 grid points closest to P. A square of width of 3 defines a 3 x 3 square consisting of 9 grid points centered on the grid point closest to P. :numref:`point_stat_fig1`  provides illustration. The point P denotes the observation location where the interpolated value is calculated. The interpolation width W, shown is five.
 
 This section describes the options for interpolation in the horizontal.
 
@@ -197,7 +197,7 @@ For continuous fields (e.g., temperature), it is possible to estimate confidence
 
 For the measures relating the two fields (i.e., mean error, correlation and standard deviation of the errors), confidence intervals are based on either the joint distributions of the two fields (e.g., with correlation) or on a function of the two fields. For the correlation, the underlying assumption is that the two fields follow a bivariate normal distribution. In the case of the mean error and the standard deviation of the mean error, the assumption is that the errors are normally distributed, which for continuous variables, is usually a reasonable assumption, even for the standard deviation of the errors.
 
-Bootstrap confidence intervals for any verification statistic are available in MET. Bootstrapping is a nonparametric statistical method for estimating parameters and uncertainty information. The idea is to obtain a sample of the verification statistic(s) of interest (e.g., bias, ETS, etc.) so that inferences can be made from this sample. The assumption is that the original sample of matched forecast-observation pairs is representative of the population. Several replicated samples are taken with replacement from this set of forecast-observation pairs of variables (e.g., precipitation, temperature, etc.), and the statistic(s) are calculated for each replicate. That is, given a set of n forecast-observation pairs, we draw values at random from these pairs, allowing the same pair to be drawn more than once, and the statistic(s) is (are) calculated for each replicated sample. This yields a sample of the statistic(s) based solely on the data without making any assumptions about the underlying distribution of the sample. It should be noted, however, that if the observed sample of matched pairs is dependent, then this dependence should be taken into account somehow. Currently, the confidence interval methods in MET do not take into account dependence, but future releases will support a robust method allowing for dependence in the original sample. More detailed information about the bootstrap algorithm is found in the :numref:`Appendix D, Section %s <appendixD>`. Note that MET writes temporary files whenever bootstrap confidence intervals are computed, as described in :numref:`Contributor's Guide Section %s <tmp_files_bootstrap>`. 
+Bootstrap confidence intervals for any verification statistic are available in MET. Bootstrapping is a nonparametric statistical method for estimating parameters and uncertainty information. The idea is to obtain a sample of the verification statistic(s) of interest (e.g., bias, ETS, etc.) so that inferences can be made from this sample. The assumption is that the original sample of matched forecast-observation pairs is representative of the population. Several replicated samples are taken with replacement from this set of forecast-observation pairs of variables (e.g., precipitation, temperature, etc.), and the statistic(s) are calculated for each replicate. That is, given a set of n forecast-observation pairs, we draw values at random from these pairs, allowing the same pair to be drawn more than once, and the statistic(s) is (are) calculated for each replicated sample. This yields a sample of the statistic(s) based solely on the data without making any assumptions about the underlying distribution of the sample. It should be noted, however, that if the observed sample of matched pairs is dependent, then this dependence should be taken into account somehow. Currently, the confidence interval methods in MET do not take into account dependence, but future releases will support a robust method allowing for dependence in the original sample. More detailed information about the bootstrap algorithm is found in the :numref:`Appendix D, Section %s <appendixD>`. Note that MET writes temporary files whenever bootstrap confidence intervals are computed, as described in :numref:`Contributor's Guide Section %s <tmp_files_bootstrap>`.
 
 Confidence intervals can be calculated from the sample of verification statistics obtained through the bootstrap algorithm. The most intuitive method is to simply take the appropriate quantiles of the sample of statistic(s). For example, if one wants a 95% CI, then one would take the 2.5 and 97.5 percentiles of the resulting sample. This method is called the percentile method, and has some nice properties. However, if the original sample is biased and/or has non-constant variance, then it is well known that this interval is too optimistic. The most robust, accurate, and well-behaved way to obtain accurate CIs from bootstrapping is to use the bias corrected and adjusted percentile method (or BCa). If there is no bias, and the variance is constant, then this method will yield the usual percentile interval. The only drawback to the approach is that it is computationally intensive. Therefore, both the percentile and BCa methods are available in MET, with the considerably more efficient percentile method being the default.
 
@@ -307,9 +307,9 @@ Optional Arguments for point_stat
 
 7. The **-obs_valid_end** time option in YYYYMMDD[_HH[MMSS]] format sets the end of the observation matching time window, overriding the configuration file setting.
 
-8. The **-outdir path** indicates the directory where output files should be written. 
+8. The **-outdir path** indicates the directory where output files should be written.
 
-9. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+9. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
 10. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
@@ -1405,7 +1405,7 @@ The first set of header columns are common to all of the output files generated 
     - Mean observed wind speed
     - Double
   * - 35
-    - TOTAL_DIR 
+    - TOTAL_DIR
     - Total number of matched pairs for which both the forecast and observation wind directions are well-defined (i.e. non-zero vectors)
     - Double
   * - 36
@@ -1476,7 +1476,7 @@ The first set of header columns are common to all of the output files generated 
     - Mean observed wind speed anomaly
     - Double
   * - 35
-    - TOTAL_DIR 
+    - TOTAL_DIR
     - Total number of matched pairs for which the forecast, observation, forecast climatology, and observation climatology wind directions are well-defined (i.e. non-zero vectors)
     - Double
   * - 36
@@ -1591,7 +1591,7 @@ The first set of header columns are common to all of the output files generated 
     - Uncentered vector Anomaly Correlation excluding mean error including bootstrap upper and lower confidence limits
     - Double
   * - 88
-    - TOTAL_DIR 
+    - TOTAL_DIR
     - Total number of matched pairs for which both the forecast and observation wind directions are well-defined (i.e. non-zero vectors)
     - Double
   * - 89-91

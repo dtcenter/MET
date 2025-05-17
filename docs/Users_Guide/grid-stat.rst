@@ -80,7 +80,7 @@ The Stable Equitable Error in Probability Space (SEEPS) was devised for monitori
 
 The capability to calculate the SEEPS has also been added to Grid-Stat. This follows the method described in :ref:`North et al, 2022 <North-2022>`, which uses the TRMM 3B42 v7 gridded satellite product for the climatological values and interpolates the forecast and observed products onto this grid for evaluation. A 24-hour TRMM climatology (valid at 00 UTC) constructed from data over the time period 1998-2015 is supplied with the release. Expansion of the capability to other fields will occur as well vetted examples and funding allow.
 
-The gridded climatology required to compute SEEPS is not distributed as part of the code release and can be downloaded from 
+The gridded climatology required to compute SEEPS is not distributed as part of the code release and can be downloaded from
 `Zenodo <https://zenodo.org/records/13121064>`_. The path to the file needs to be specified using MET_SEEPS_GRID_CLIMO_NAME.
 
 Fourier Decomposition
@@ -253,7 +253,7 @@ __________________________
 
   model            = "FCST";
   desc             = "NA";
-  obtype           = "ANALYS"; 
+  obtype           = "ANALYS";
   fcst             = { ... }
   obs              = { ... }
   regrid           = { ... }
@@ -489,7 +489,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_header_info_gs_outputs:
 
-.. list-table:: Header information for Grid-Stat STAT output 
+.. list-table:: Header information for Grid-Stat STAT output
   :widths: auto
   :header-rows: 1
 
@@ -827,25 +827,25 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
   * - 33
     - DX
     - Gradient size in the X-direction
-    - Integer 
+    - Integer
   * - 34
     - DY
     - Gradient size in the Y-direction
-    - Integer 
+    - Integer
   * - 35
-    - FGMAG 
+    - FGMAG
     - Magnitude of the forecast gradient when the X and Y-directions are interpreted as a vector
     - Double
   * - 36
-    - OGMAG 
+    - OGMAG
     - Magnitude of the observed gradient when the X and Y-directions are intrepreted as a vector
     - Double
   * - 37
-    - MAG_RMSE 
+    - MAG_RMSE
     - Root mean squared difference of the forecast gradient magnitude minus the observed gradient magnitude
     - Double
   * - 38
-    - LAPLACE_RMSE 
+    - LAPLACE_RMSE
     - Root mean squared difference of the sum of the forecast X and Y-gradients minus the sum of the observed X and Y-gradients
     - Double
 
@@ -1009,4 +1009,4 @@ The output NetCDF file contains the dimensions and variables shown in :numref:`t
     - Float
 
 
-The STAT output files described for grid_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by grid_stat, please see :numref:`stat-analysis`. 
+The STAT output files described for grid_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by grid_stat, please see :numref:`stat-analysis`.

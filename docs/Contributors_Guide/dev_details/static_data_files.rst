@@ -5,7 +5,7 @@ Static Data Files
 
 The MET software package includes static data files that are read at
 runtime and impact the behavior of the MET tools. These static data
-files are organized into subdirectories of the top-level :code:`data` 
+files are organized into subdirectories of the top-level :code:`data`
 directory. When the MET :code:`configure` script is run, the
 :code:`--prefix path` option (default :code:`/usr/local`) defines
 the directory where the resulting executables and data files should
@@ -18,7 +18,7 @@ unless the **MET_BASE** environment variable, described in
 override the default location.
 
 Depending on their type, the content of these data files grows stale
-over time and requires updates. Listed below are descriptions of some 
+over time and requires updates. Listed below are descriptions of some
 of the static data sources found in :code:`share/met`, along with
 recommended update frequency and method.
 
