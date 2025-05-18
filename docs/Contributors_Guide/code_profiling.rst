@@ -310,9 +310,9 @@ Overview of Steps for Performing Benchmarking
 
         - num_runs
 
-          - **not yet supported**
+          - **optional**
           - to be used for stress-testing/running command multiple times
-          - set to 1
+          - if not set, default value is 1
 
      .. dropdown:: Config settings for running via METplus usecase(s):
 
