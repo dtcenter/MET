@@ -13,7 +13,7 @@ source ${MET_REPO_DIR}/.github/jobs/test_env_vars.sh
 ###
 
 echo "Cloning METplus"
-time_command git clone --single-branch https://github.com/dtcenter/METplus ${METPLUS_DIR}
+time_command git clone --single-branch --branch ${METPLUS_BRANCH} https://github.com/dtcenter/METplus ${METPLUS_DIR}
 
 echo "Running comparison on test output"
 CMD_LOGFILE=/met/logs/comp_dir.log
