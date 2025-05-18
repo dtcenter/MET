@@ -716,15 +716,15 @@ namespace ctrack {
 
 
 			template<typename StreamType>
-			void get_detail_table(StreamType& stream, bool use_color = false, bool reverse_vector = true) {
+			void get_detail_table(StreamType& stream, bool use_color = false, bool reverse_vector = false) {
 				if (reverse_vector) {
 					std::reverse(sorted_events.begin(), sorted_events.end());
 				}
 				for (int i = static_cast<int>(sorted_events.size()) - 1; i >= 0; i--) {
 					auto& entry = sorted_events[i];
 
-					BeautifulTable info({ "filename", "function", "line","time acc","sd","cv","calls","threads" }, use_color, default_colors);
-					info.addRow({ BeautifulTable::stable_shortenPath(entry->filename), entry->function_name,BeautifulTable::table_string(entry->line),
+					BeautifulTable info({ "Start","End","filename", "function", "line","time acc","sd","cv","calls","threads" }, use_color, default_colors);
+					info.addRow({ BeautifulTable::table_timepoint(track_start_time), BeautifulTable::table_timepoint(track_end_time),BeautifulTable::stable_shortenPath(entry->filename), entry->function_name,BeautifulTable::table_string(entry->line),
 						BeautifulTable::table_time(entry->all_time_acc),
 						BeautifulTable::table_time(sorted_events[i]->all_st),BeautifulTable::table_string(sorted_events[i]->all_cv),
 						BeautifulTable::table_string(sorted_events[i]->all_cnt),	BeautifulTable::table_string(sorted_events[i]->all_thread_cnt) });
@@ -762,7 +762,9 @@ namespace ctrack {
                                          // Write out the detail information to the detail_output.txt file
                                          out << "filename: " << entry->filename 
                                                 << "|function: " << entry->function_name 
-                                                << "|line: " << entry->line 
+                                                << "|line: " << entry->line
+                                                 << "|start_time: " << BeautifulTable::table_timepoint(track_start_time)
+                                                << "|end_time: " << BeautifulTable::table_timepoint(track_end_time)
                                                 << "|time accumulated: " << BeautifulTable::table_time(entry->all_time_acc)
                                                 << "|std deviation: " << BeautifulTable::table_time(sorted_events[i]->all_st)
                                                 << "|coefficient of variation: " << BeautifulTable::table_time(sorted_events[i]->all_cv)
