@@ -571,7 +571,6 @@ def calc_means_for_metrics(input_df: pd.DataFrame) -> pd.DataFrame:
             # Check for mixed units (i.e. mixture of sec, microsecs, milliseconds, etc.)
             # in the current column of data
             homogeneous_df = homogeneous_units(unique_df, col)
-            unique_df.to_csv("/d1/projects/GRID_DIAG_OPTIMIZATION/v1/MET/internal/scripts/benchmark/df_before_check.txt", sep='\t', header=True, index=False)
 
             # Calculate the mean values for metrics based on unique
             # filename/function/line number combination
