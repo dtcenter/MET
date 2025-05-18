@@ -87,7 +87,8 @@ ModePsFile::ModePsFile(const ModePsFile &)
 
 {
 
-   mlog << Error << "\n\n  ModePsFile::ModePsFile(const ModePsFile &) -> shoule never be called!\n\n";
+   mlog << Error << "\nModePsFile::ModePsFile(const ModePsFile &) -> "
+        << "should never be called!\n\n";
 
    exit ( 1 );
 
@@ -101,7 +102,8 @@ ModePsFile & ModePsFile::operator=(const ModePsFile &)
 
 {
 
-   mlog << Error << "\n\n  ModePsFile::operator=(const ModePsFile &) -> should never be called!\n\n";
+   mlog << Error << "\nModePsFile::operator=(const ModePsFile &) -> "
+        << "should never be called!\n\n";
 
    exit ( 1 );
 
@@ -1297,39 +1299,43 @@ Box valid_xy_bb(const ShapeData * wd_ptr, const Grid & grid)
 
 {
 
-   int x, y;
-   int L, R, B, T;
    Box bb;
 
    //
    // Initialize the x/y bounding box
    //
 
-   L = grid.nx();
-   B = grid.ny();
-   R = 0;
-   T = 0;
+   int L = grid.nx();
+   int B = grid.ny();
+   int R = 0;
+   int T = 0;
 
    const int data_nx = wd_ptr->data.nx();
    const int data_ny = wd_ptr->data.ny();
 
-   for(x=0; x<data_nx; x++) {
+#pragma omp parallel default(none) \
+   shared(data_nx, data_ny, wd_ptr) \
+   shared(L, B, R, T)
+   {
 
-      for(y=0; y<data_ny; y++) {
+#pragma omp for schedule(static) \
+                reduction(min: L, B) \
+                reduction(max: R, T) \
+                collapse(2)
+      for(int x=0; x<data_nx; x++) {
+         for(int y=0; y<data_ny; y++) {
+            if(wd_ptr->is_valid_xy(x, y)) {
 
-         if(wd_ptr->is_valid_xy(x, y)) {
+               if(x < L) L = x;
+               if(x > R) R = x;
 
-            if(x < L) L = x;
-            if(x > R) R = x;
+               if(y < B) B = y;
+               if(y > T) T = y;
 
-            if(y < B) B = y;
-            if(y > T) T = y;
-
-         }
-
-      }
-
-   }
+            } // end if
+         } // for y 
+      } // for x 
+   } // End omp parallel
 
    bb.set_lrbt(L, R, B, T);
 
@@ -1339,9 +1345,3 @@ Box valid_xy_bb(const ShapeData * wd_ptr, const Grid & grid)
 
 
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-

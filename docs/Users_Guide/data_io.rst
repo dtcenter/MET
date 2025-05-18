@@ -403,7 +403,7 @@ The following is a summary of the input and output formats for each of the tools
     * **Output**: ASCII description of their contents printed to the screen.
 
 .. _Configuration File Details:
-  
+
 Configuration File Details
 ==========================
 

@@ -48,9 +48,9 @@ Required Arguments for pair_stat
 1. The **-pairs** argument defines one or more input files containing forecast/observation pairs.
    May be set as a list of file names (**file_1 ... file_n**) or as an ASCII file containing
    a list file names (**file_list**), as described in :numref:`ascii_file_lists` (required).
-   
+
    This option can be used multiple times but all inputs must follow the same **-format type**, described below.
-   
+
    For **-format python**, the **-pairs file** defines the path to a Python embedding script to be
    run followed by any arguments to that script and enclosed in single or double quotes.
 
@@ -316,7 +316,7 @@ common to multiple MET tools and are described in :numref:`config_options`.
   The **mask.grid** and **mask.poly** options are currently defined relative to a reference grid. Since no
   grid applies to the input paired data, a **global 1/10 degree reference grid** is used by default and
   that grid cannot currently be overridden. A future enhancement may eliminate the use of a reference grid
-  in this context. 
+  in this context.
 
 
 ________________________

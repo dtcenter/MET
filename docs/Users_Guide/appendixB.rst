@@ -47,7 +47,7 @@ Here, **Nx** and **Ny** are the number of points in, respectively, the **x** and
 As an example of specifying a Lambert grid, suppose you have a northern hemisphere Lambert grid with 614 points in the x direction and 428 points in the y direction. The lower left corner of the grid is at latitude :math:`12.190^\circ` north and longitude :math:`133.459^\circ` west. The orientation longitude is :math:`95^\circ` west. The grid spacing is :math:`12.19058^\circ` km. The radius of the Earth is the default value used in many grib files: 6367.47 km. Both standard parallels are at :math:`25^\circ` north. To specify this grid in the config file, you would write
 
 .. code-block:: none
-        
+
   To grid = "lambert 614 428 12.190 -133.459 -95.0 12.19058 6367.47 25.0 N";
 
 For a Lambert Azimuthal Equal Area grid, grid specification strings are not supported.
@@ -55,7 +55,7 @@ For a Lambert Azimuthal Equal Area grid, grid specification strings are not supp
 For a Polar Stereographic grid, the syntax is
 
 .. code-block:: none
-        
+
   stereo Nx Ny lat_ll lon_ll lon_orient D_km R_km lat_scale N|S
 
 Here, **Nx, Ny, lat_ll, lon_ll, lon_orient, D_km** and **R_km** have the same meaning as in the Lambert case. **lat_scale** is the latitude where the grid scale **D_km** is true, while **N|S** means to write either **N** or **S** depending on whether the stereographic projection is from the north pole or the south pole.
@@ -79,7 +79,7 @@ The parameters **Nx, Ny, lat_ll, lon_ll, delta_lat,** and **delta_lon** are as b
 For a Mercator grid, the syntax is
 
 .. code-block:: none
-        
+
   mercator Nx Ny lat_ll lon_ll lat_ur lon_ur
 
 The parameters **Nx, Ny, lat_ll** and **lon_ll** are again as before, while **lat_ur** and **lon_ur** are the latitude and longitude of the upper right corner of the grid.
@@ -116,7 +116,7 @@ Polylines for NCEP Regions
 
 Many of NCEP's pre-defined verification regions are implemented in MET as lat/lon polyline files. The user may specify one of these NCEP verification regions in the configuration files by pointing to the lat/lon polyline file in the installed *share/met/poly* directory. Users may also easily define their own lat/lon polyline files.
 
-See `NCEP's website for a description and plot of these predefined verification regions <http://www.emc.ncep.noaa.gov/mmb/research/nearsfc/nearsfc.verf.html>`_. 
+See `NCEP's website for a description and plot of these predefined verification regions <http://www.emc.ncep.noaa.gov/mmb/research/nearsfc/nearsfc.verf.html>`_.
 
 The NCEP verification regions that are implemented in MET as lat/lon polylines are listed below:
 
@@ -130,7 +130,7 @@ The NCEP verification regions that are implemented in MET as lat/lon polylines a
 
 * ECA.poly for Eastern Canada
 
-* GLF.poly for the Gulf of America 
+* GLF.poly for the Gulf of America
 
 * GMC.poly for the Gulf of America Coast
 

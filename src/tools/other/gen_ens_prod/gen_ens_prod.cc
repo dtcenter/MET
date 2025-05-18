@@ -21,6 +21,7 @@
 //   004    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   005    10/03/22  Prestopnik     MET #2227 Remove using namespace std and netCDF from header files
 //   006    04/29/24  Halley Gotway  MET #2870 Ignore MISSING keyword.
+//   007    05/07/25  Halley Gotway  MET #3145 Add OpenMP.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -48,8 +49,6 @@
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
 
-#include "handle_openmp.h"
-
 using namespace std;
 using namespace netCDF;
 
@@ -65,17 +64,20 @@ static void get_ens_mean_stdev(GenEnsProdVarInfo *, DataPlane &, DataPlane &);
 static bool get_data_plane(const char *, GrdFileType, VarInfo *, DataPlane &);
 
 static void clear_counts();
-static void track_counts(GenEnsProdVarInfo *, const DataPlane &, bool,
-                         const DataPlane &, const DataPlane &);
+static void track_counts(const GenEnsProdVarInfo *, const DataPlane &,
+                         bool, const DataPlane &, const DataPlane &);
 
 static void setup_nc_file();
 static void write_ens_nc(GenEnsProdVarInfo *, int, const DataPlane &,
                          const DataPlane &, const DataPlane &);
-static void write_ens_var_float(GenEnsProdVarInfo *, float *, const DataPlane &,
+static void write_ens_var_float(GenEnsProdVarInfo *, const float *,
+                                const DataPlane &,
                                 const char *, const char *);
-static void write_ens_var_int(GenEnsProdVarInfo *, int *, const DataPlane &,
+static void write_ens_var_int(GenEnsProdVarInfo *, const int *,
+                              const DataPlane &,
                               const char *, const char *);
-static void write_ens_data_plane(GenEnsProdVarInfo *, const DataPlane &, const DataPlane &,
+static void write_ens_data_plane(GenEnsProdVarInfo *,
+                                 const DataPlane &, const DataPlane &,
                                  const char *, const char *);
 
 static void add_var_att_local(GenEnsProdVarInfo *, NcVar *, bool is_int,
@@ -92,9 +94,6 @@ static void set_ctrl_file  (const StringArray &);
 ////////////////////////////////////////////////////////////////////////
 
 int met_main(int argc, char *argv[]) {
-
-   // Set up OpenMP (if enabled)
-   init_openmp();
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -116,8 +115,7 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
-   int i;
+static void process_command_line(int argc, char **argv) {
    CommandLine cline;
    ConcatString default_config_file;
    const char *method_name = "process_command_line() -> ";
@@ -208,14 +206,14 @@ void process_command_line(int argc, char **argv) {
    thresh_cnt_na       = new NumArray   [conf_info.get_max_n_cat()];
    thresh_nbrhd_cnt_na = new NumArray * [conf_info.get_max_n_cat()];
 
-   for(i=0; i<conf_info.get_max_n_cat(); i++) {
+   for(int i=0; i<conf_info.get_max_n_cat(); i++) {
       thresh_nbrhd_cnt_na[i] = new NumArray [conf_info.get_n_nbrhd()];
    }
 
    // List the input ensemble files
    mlog << Debug(1) << "Ensemble Files["
         << n_ens_files << "]:\n";
-   for(i=0; i<n_ens_files; i++) {
+   for(int i=0; i<n_ens_files; i++) {
       mlog << "   " << ens_files[i]  << "\n";
    }
 
@@ -232,7 +230,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Check for missing non-python ensemble files
-   for(i=0; i<n_ens_files; i++) {
+   for(int i=0; i<n_ens_files; i++) {
       if(!file_exists(ens_files[i].c_str()) &&
          !is_python_grdfiletype(etype)) {
          log_missing_file(method_name, "input ensemble file", ens_files[i]);
@@ -254,7 +252,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_grid(const Grid &fcst_grid) {
+static void process_grid(const Grid &fcst_grid) {
    Grid obs_grid;
 
    // Parse regridding logic
@@ -277,7 +275,7 @@ void process_grid(const Grid &fcst_grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_ensemble() {
+static void process_ensemble() {
    int i_var, i_ens, n_ens_vld, n_ens_inputs;
    bool need_reset, set_climo_ens_mem_id;
    DataPlane ens_dp, ctrl_dp;
@@ -454,9 +452,9 @@ void process_ensemble() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_climo_mean_stdev(GenEnsProdVarInfo *ens_info, int i_var,
-                          bool set_ens_mem_id, int i_ens,
-                          DataPlane &cmn_dp, DataPlane &csd_dp) {
+static void get_climo_mean_stdev(GenEnsProdVarInfo *ens_info, int i_var,
+                                 bool set_ens_mem_id, int i_ens,
+                                 DataPlane &cmn_dp, DataPlane &csd_dp) {
 
    // Set the MET_ENS_MEMBER_ID environment variable
    if(set_ens_mem_id) {
@@ -493,12 +491,8 @@ void get_climo_mean_stdev(GenEnsProdVarInfo *ens_info, int i_var,
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
-                        DataPlane &emn_dp, DataPlane &esd_dp) {
-   int i_ens, nxy, j;
-   double ens;
-   NumArray emn_cnt_na, emn_sum_na;
-   NumArray esd_cnt_na, esd_sum_na, esd_ssq_na;
+static void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
+                               DataPlane &emn_dp, DataPlane &esd_dp) {
    VarInfo *var_info;
    ConcatString ens_file;
    DataPlane ens_dp;
@@ -515,8 +509,20 @@ void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
         << ens_info->raw_magic_str << ".\n";
 
    nxy = 0;
+   vector<double> emn_cnt;
+   vector<double> emn_sum;
+   vector<double> esd_cnt;
+   vector<double> esd_sum;
+   vector<double> esd_ssq;
+
+#pragma omp declare reduction(vec_double_plus : vector<double> :          \
+                              transform(omp_out.begin(), omp_out.end(),   \
+                                         omp_in.begin(), omp_out.begin(), \
+                                        plus<double>()))                  \
+                    initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
+
    // Loop over the ensemble inputs
-   for(i_ens=0; i_ens < ens_info->inputs_n(); i_ens++) {
+   for(int i_ens=0; i_ens<ens_info->inputs_n(); i_ens++) {
 
       // Get file and VarInfo to process
       ens_file = ens_info->get_file(i_ens);
@@ -535,31 +541,40 @@ void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
       }
 
       // Initialize sums, if needed
-      if(emn_cnt_na.n() == 0) {
+      if(emn_cnt.empty()) {
          nxy = ens_dp.nx()*ens_dp.ny();
-         emn_cnt_na.set_const(0.0, nxy);
-         emn_sum_na = emn_cnt_na;
-         esd_cnt_na = emn_cnt_na;
-         esd_sum_na = emn_cnt_na;
-         esd_ssq_na = emn_cnt_na;
+         emn_cnt.resize(nxy, 0.0);
+         emn_sum.resize(nxy, 0.0);
+         esd_cnt.resize(nxy, 0.0);
+         esd_sum.resize(nxy, 0.0);
+         esd_ssq.resize(nxy, 0.0);
       }
 
-      // Update the counts and sums
-      for(j=0; j<nxy; j++) {
+#pragma omp parallel default(none) \
+      shared(nxy, ens_dp, emn_cnt, emn_sum) \
+      shared(esd_cnt, esd_sum, esd_ssq)
+      {      
 
-         ens = ens_dp.buf()[j];
+         // Update the counts and sums
+#pragma omp for schedule(static) \
+                reduction(vec_double_plus: emn_cnt, emn_sum) \
+                reduction(vec_double_plus: esd_cnt, esd_sum, esd_ssq)
+         for(int j=0; j<nxy; j++) {
 
-         // Skip bad data
-         if(is_bad_data(ens) || is_bad_data(emn_sum_na[j])) continue;
+            double ens = ens_dp.buf()[j];
 
-         // Update counts and sums
-         emn_cnt_na.buf()[j] += 1;
-         emn_sum_na.buf()[j] += ens;
-         esd_cnt_na.buf()[j] += 1;
-         esd_sum_na.buf()[j] += ens;
-         esd_ssq_na.buf()[j] += ens*ens;
+            // Skip bad data
+            if(is_bad_data(ens) || is_bad_data(emn_sum[j])) continue;
 
-      } // end for j
+            // Update counts and sums
+            emn_cnt[j] += 1;
+            emn_sum[j] += ens;
+            esd_cnt[j] += 1;
+            esd_sum[j] += ens;
+            esd_ssq[j] += ens*ens;
+
+         } // end for j
+      } // End omp parallel
    } // end for i_ens
 
    // Read ensemble control member data, if provided
@@ -576,56 +591,71 @@ void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
          exit(1);
       }
 
-      // Update counts and sums
-      for(j=0; j<nxy; j++) {
+#pragma omp parallel default(none) \
+      shared(nxy, ens_dp, emn_cnt, emn_sum)
+      {      
 
-         ens = ens_dp.buf()[j];
+         // Update the counts and sums
+#pragma omp for schedule(static) \
+                reduction(vec_double_plus: emn_cnt, emn_sum)
+         for(int j=0; j<nxy; j++) {
 
-         // Skip bad data
-         if(is_bad_data(ens) || is_bad_data(emn_sum_na[j])) continue;
+            double ens = ens_dp.buf()[j];
 
-         // Update counts and sums
-         emn_cnt_na.buf()[j] += 1;
-         emn_sum_na.buf()[j] += ens;
+            // Skip bad data
+            if(is_bad_data(ens) || is_bad_data(emn_sum[j])) continue;
 
-      } // end for j
+            // Update counts and sums
+            emn_cnt[j] += 1;
+            emn_sum[j] += ens;
+
+         } // end for j
+      } // End omp parallel
    } // end if ctrl
 
    // Compute the ensemble mean and standard deviation
    emn_dp.set_size(ens_dp.nx(), ens_dp.ny());
    esd_dp.set_size(ens_dp.nx(), ens_dp.ny());
 
-   for(j=0; j<nxy; j++) {
+#pragma omp parallel default(none) \
+   shared(nxy, emn_dp, esd_dp) \
+   shared(emn_cnt, emn_sum) \
+   shared(esd_cnt, esd_sum, esd_ssq) \
+   shared(bad_data_double)
+   {      
 
-      // Ensemble mean
-      if(is_bad_data(emn_sum_na.buf()[j]) ||
-         is_eq(emn_cnt_na.buf()[j], 0.0)) {
-         emn_dp.buf()[j] = bad_data_double;
-      }
-      else {
-         emn_dp.buf()[j] = emn_sum_na.buf()[j] / emn_cnt_na.buf()[j];
-      }
+#pragma omp for schedule(static)
+      for(int j=0; j<nxy; j++) {
 
-      // Ensemble standard deviation
-      if(is_bad_data(esd_sum_na.buf()[j]) ||
-         is_eq(esd_cnt_na.buf()[j], 0.0)) {
-         esd_dp.buf()[j] = bad_data_double;
-      }
-      else {
-         esd_dp.buf()[j] = compute_stdev(
-                              esd_sum_na[j], esd_ssq_na[j],
-                              nint(esd_cnt_na[j]));
-      }
+         // Ensemble mean
+         if(is_bad_data(emn_sum[j]) ||
+            is_eq(emn_cnt[j], 0.0)) {
+            emn_dp.buf()[j] = bad_data_double;
+         }
+         else {
+            emn_dp.buf()[j] = emn_sum[j] / emn_cnt[j];
+         }
 
-   } // end for j
+         // Ensemble standard deviation
+         if(is_bad_data(esd_sum[j]) ||
+            is_eq(esd_cnt[j], 0.0)) {
+            esd_dp.buf()[j] = bad_data_double;
+         }
+         else {
+            esd_dp.buf()[j] = compute_stdev(
+                                 esd_sum[j], esd_ssq[j],
+                                 nint(esd_cnt[j]));
+         }
+      } // end for j
+   } // End omp parallel
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-bool get_data_plane(const char *infile, GrdFileType ftype,
-                    VarInfo *info, DataPlane &dp) {
+static bool get_data_plane(const char *infile, GrdFileType ftype,
+                           VarInfo *info, DataPlane &dp) {
    bool found;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
 
@@ -677,7 +707,7 @@ bool get_data_plane(const char *infile, GrdFileType ftype,
 
 ////////////////////////////////////////////////////////////////////////
 
-void clear_counts() {
+static void clear_counts() {
    int i, j;
 
    cnt_na.set_const(0.0, nxy);
@@ -701,22 +731,22 @@ void clear_counts() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void track_counts(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, bool is_ctrl,
-                  const DataPlane &cmn_dp, const DataPlane &csd_dp) {
-   int i, j, k;
-   double ens, cmn, csd;
+static void track_counts(const GenEnsProdVarInfo *ens_info,
+                         const DataPlane &ens_dp, bool is_ctrl,
+                         const DataPlane &cmn_dp,
+                         const DataPlane &csd_dp) {
 
    // Ensemble thresholds
    const int n_thr = ens_info->cat_ta.n();
    SingleThresh *thr_buf = ens_info->cat_ta.buf();
 
    // Increment counts for each grid point
-   for(i=0; i<nxy; i++) {
+   for(int i=0; i<nxy; i++) {
 
       // Get current values
-      ens = ens_dp.data()[i];
-      cmn = (cmn_dp.is_empty() ? bad_data_double : cmn_dp.data()[i]);
-      csd = (csd_dp.is_empty() ? bad_data_double : csd_dp.data()[i]);
+      double ens = ens_dp.data()[i];
+      double cmn = (cmn_dp.is_empty() ? bad_data_double : cmn_dp.data()[i]);
+      double csd = (csd_dp.is_empty() ? bad_data_double : csd_dp.data()[i]);
 
       // MET #2924 Use the same data for the forecast and observation climatologies
       ClimoPntInfo cpi(cmn, csd, cmn, csd);
@@ -745,7 +775,7 @@ void track_counts(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, bool is_
          }
 
          // Event frequency
-         for(j=0; j<n_thr; j++) {
+         for(int j=0; j<n_thr; j++) {
             if(thr_buf[j].check(ens, &cpi)) thresh_cnt_na[j].inc(i, 1);
          }
       } // end else
@@ -756,10 +786,10 @@ void track_counts(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, bool is_
       DataPlane frac_dp;
 
       // Loop over thresholds
-      for(i=0; i<n_thr; i++) {
+      for(int i=0; i<n_thr; i++) {
 
          // Loop over neighborhood sizes
-         for(j=0; j<conf_info.get_n_nbrhd(); j++) {
+         for(int j=0; j<conf_info.get_n_nbrhd(); j++) {
 
             // Compute fractional coverage
             fractional_coverage(ens_dp, frac_dp,
@@ -769,7 +799,7 @@ void track_counts(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, bool is_
                conf_info.nbrhd_prob.vld_thresh);
 
             // Increment counts
-            for(k=0; k<nxy; k++) {
+            for(int k=0; k<nxy; k++) {
                if(frac_dp.data()[k] > 0) thresh_nbrhd_cnt_na[i][j].inc(k, 1);
             } // end for k
 
@@ -782,7 +812,7 @@ void track_counts(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, bool is_
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file() {
+static void setup_nc_file() {
 
    // Create a new NetCDF file and open it
    nc_out = open_ncfile(out_file.c_str(), true);
@@ -811,14 +841,11 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
-                  const DataPlane &ens_dp,
-                  const DataPlane &cmn_dp,
-                  const DataPlane &csd_dp) {
-   int i, j, k;
-   double t;
+static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
+                         const DataPlane &ens_dp,
+                         const DataPlane &cmn_dp,
+                         const DataPlane &csd_dp) {
    char type_str[max_str_len];
-   DataPlane prob_dp, nbrhd_dp;
 
    // Allocate memory for storing ensemble data
    vector<float> ens_mean  (nxy);
@@ -831,37 +858,45 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
    vector<int  > ens_vld   (nxy);
 
    // Store the threshold for the ratio of valid data points
-   t = conf_info.vld_data_thresh;
+   double t = conf_info.vld_data_thresh;
 
-   // Store the data
-   for(i=0; i<cnt_na.n(); i++) {
+#pragma omp parallel default(none) \
+   shared(ens_vld, n_ens_vld, t, bad_data_float) \
+   shared(ens_mean, ens_stdev, ens_minus, ens_plus, ens_min, ens_max, ens_range) \
+   shared(sum_na, cnt_na, min_na, max_na, stdev_sum_na, stdev_ssq_na, stdev_cnt_na)
+   {
 
-      // Valid data count
-      ens_vld[i] = nint(cnt_na[i]);
+      // Store the data
+#pragma omp for schedule(static)
+      for(int i=0; i<cnt_na.n(); i++) {
 
-      // Check for too much missing data
-      if((double) (cnt_na[i]/n_ens_vld) < t) {
-         ens_mean[i]  = bad_data_float;
-         ens_stdev[i] = bad_data_float;
-         ens_minus[i] = bad_data_float;
-         ens_plus[i]  = bad_data_float;
-         ens_min[i]   = bad_data_float;
-         ens_max[i]   = bad_data_float;
-         ens_range[i] = bad_data_float;
-      }
-      else {
+         // Valid data count
+         ens_vld[i] = nint(cnt_na[i]);
 
-         // Compute ensemble summary
-         ens_mean[i]  = (float) (sum_na[i]/cnt_na[i]);
-         ens_stdev[i] = (float) compute_stdev(stdev_sum_na[i], stdev_ssq_na[i], nint(stdev_cnt_na[i]));
-         ens_minus[i] = (float) ens_mean[i] - ens_stdev[i];
-         ens_plus[i]  = (float) ens_mean[i] + ens_stdev[i];
-         ens_min[i]   = (float) min_na[i];
-         ens_max[i]   = (float) max_na[i];
-         ens_range[i] = (is_eq(max_na[i], min_na[i]) ?
-                         0.0 : (float) max_na[i] - min_na[i]);
-      }
-   } // end for i
+         // Check for too much missing data
+         if((double) (cnt_na[i]/n_ens_vld) < t) {
+            ens_mean[i]  = bad_data_float;
+            ens_stdev[i] = bad_data_float;
+            ens_minus[i] = bad_data_float;
+            ens_plus[i]  = bad_data_float;
+            ens_min[i]   = bad_data_float;
+            ens_max[i]   = bad_data_float;
+            ens_range[i] = bad_data_float;
+         }
+         else {
+
+            // Compute ensemble summary
+            ens_mean[i]  = (float) (sum_na[i]/cnt_na[i]);
+            ens_stdev[i] = (float) compute_stdev(stdev_sum_na[i], stdev_ssq_na[i], nint(stdev_cnt_na[i]));
+            ens_minus[i] = (float) ens_mean[i] - ens_stdev[i];
+            ens_plus[i]  = (float) ens_mean[i] + ens_stdev[i];
+            ens_min[i]   = (float) min_na[i];
+            ens_max[i]   = (float) max_na[i];
+            ens_range[i] = (is_eq(max_na[i], min_na[i]) ?
+                            0.0 : (float) max_na[i] - min_na[i]);
+         }
+      } // end for i
+   } // End omp parallel
 
    // Add the ensemble mean, if requested
    if(ens_info->nc_info.do_mean) {
@@ -923,16 +958,17 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
    if(ens_info->nc_info.do_freq ||
       ens_info->nc_info.do_nep) {
 
+      DataPlane prob_dp;
       prob_dp.set_size(grid.nx(), grid.ny());
 
       // Loop through each threshold
-      for(i=0; i<ens_info->cat_ta.n(); i++) {
+      for(int i=0; i<ens_info->cat_ta.n(); i++) {
 
          // Initialize
          prob_dp.erase();
 
          // Compute the ensemble relative frequency
-         for(j=0; j<cnt_na.n(); j++) {
+         for(int j=0; j<cnt_na.n(); j++) {
             prob_dp.buf()[j] = ((double) (cnt_na[j]/n_ens_vld) < t ?
                                 bad_data_double :
                                 (double) (thresh_cnt_na[i][j]/cnt_na[j]));
@@ -951,12 +987,12 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
             GaussianInfo info;
 
             // Loop over the neighborhoods
-            for(j=0; j<conf_info.get_n_nbrhd(); j++) {
+            for(int j=0; j<conf_info.get_n_nbrhd(); j++) {
 
-               nbrhd_dp = smooth_field(prob_dp, InterpMthd::UW_Mean,
-                             conf_info.nbrhd_prob.width[j],
-                             conf_info.nbrhd_prob.shape, grid.wrap_lon(),
-                             conf_info.nbrhd_prob.vld_thresh, info);
+               DataPlane nbrhd_dp(smooth_field(prob_dp, InterpMthd::UW_Mean,
+                                     conf_info.nbrhd_prob.width[j],
+                                     conf_info.nbrhd_prob.shape, grid.wrap_lon(),
+                                     conf_info.nbrhd_prob.vld_thresh, info));
 
                // Write neighborhood ensemble probability
                snprintf(type_str, sizeof(type_str), "ENS_NEP_%s_%s%i",
@@ -973,33 +1009,34 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
    // Add the neighborhood maximum ensemble probabilities, if requested
    if(ens_info->nc_info.do_nmep) {
 
+      DataPlane prob_dp;
       prob_dp.set_size(grid.nx(), grid.ny());
 
       // Loop through each threshold
-      for(i=0; i<ens_info->cat_ta.n(); i++) {
+      for(int i=0; i<ens_info->cat_ta.n(); i++) {
 
          // Loop through each neigbhorhood size
-         for(j=0; j<conf_info.get_n_nbrhd(); j++) {
+         for(int j=0; j<conf_info.get_n_nbrhd(); j++) {
 
             // Initialize
             prob_dp.erase();
 
             // Compute the neighborhood maximum ensemble probability
-            for(k=0; k<cnt_na.n(); k++) {
+            for(int k=0; k<cnt_na.n(); k++) {
                prob_dp.buf()[k] = ((double) (cnt_na[k]/n_ens_vld) < t ?
                                    bad_data_double :
                                    (double) (thresh_nbrhd_cnt_na[i][j][k]/cnt_na[k]));
             }
 
             // Loop through the requested NMEP smoothers
-            for(k=0; k<conf_info.nmep_smooth.n_interp; k++) {
+            for(int k=0; k<conf_info.nmep_smooth.n_interp; k++) {
 
-               nbrhd_dp = smooth_field(prob_dp,
-                             string_to_interpmthd(conf_info.nmep_smooth.method[k].c_str()),
-                             conf_info.nmep_smooth.width[k],
-                             conf_info.nmep_smooth.shape, grid.wrap_lon(),
-                             conf_info.nmep_smooth.vld_thresh,
-                             conf_info.nmep_smooth.gaussian);
+               DataPlane nbrhd_dp(smooth_field(prob_dp,
+                                     string_to_interpmthd(conf_info.nmep_smooth.method[k].c_str()),
+                                     conf_info.nmep_smooth.width[k],
+                                     conf_info.nmep_smooth.shape, grid.wrap_lon(),
+                                     conf_info.nmep_smooth.vld_thresh,
+                                     conf_info.nmep_smooth.gaussian));
 
                // Write neighborhood maximum ensemble probability
                snprintf(type_str, sizeof(type_str), "ENS_NMEP_%s_%s%i_%s%i",
@@ -1025,8 +1062,8 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
    // Write the climo stdev field, if requested
    if(ens_info->nc_info.do_climo && !csd_dp.is_empty()) {
       write_ens_data_plane(ens_info, csd_dp, ens_dp,
-                          "CLIMO_STDEV",
-                          "Climatology standard deviation");
+                           "CLIMO_STDEV",
+                           "Climatology standard deviation");
    }
 
    // Write the climo distribution percentile thresholds, if requested
@@ -1047,7 +1084,7 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                      nint(it->pvalue()));
             cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
             write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
-                                "Forecast climatology distribution percentile");
+                                 "Forecast climatology distribution percentile");
          }
          else if(it->ptype() == perc_thresh_obs_climo_dist &&
                  !is_eq(it->pvalue(), 0.0) &&
@@ -1056,7 +1093,7 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                      nint(it->pvalue()));
             cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
             write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
-                                "Observation climatology distribution percentile");
+                                 "Observation climatology distribution percentile");
          }
       } // end for it
    }
@@ -1066,9 +1103,11 @@ void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_float(GenEnsProdVarInfo *ens_info, float *ens_data, const DataPlane &dp,
-                         const char *type_str,
-                         const char *long_name_str) {
+static void write_ens_var_float(GenEnsProdVarInfo *ens_info,
+                                const float *ens_data,
+                                const DataPlane &dp,
+                                const char *type_str,
+                                const char *long_name_str) {
    NcVar ens_var;
    ConcatString ens_var_name, var_str, name_str, cs;
 
@@ -1122,9 +1161,11 @@ void write_ens_var_float(GenEnsProdVarInfo *ens_info, float *ens_data, const Dat
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_var_int(GenEnsProdVarInfo *ens_info, int *ens_data, const DataPlane &dp,
-                       const char *type_str,
-                       const char *long_name_str) {
+static void write_ens_var_int(GenEnsProdVarInfo *ens_info,
+                              const int *ens_data,
+                              const DataPlane &dp,
+                              const char *type_str,
+                              const char *long_name_str) {
    NcVar ens_var;
    ConcatString ens_var_name, var_str, name_str, cs;
 
@@ -1169,31 +1210,31 @@ void write_ens_var_int(GenEnsProdVarInfo *ens_info, int *ens_data, const DataPla
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_ens_data_plane(GenEnsProdVarInfo *ens_info, const DataPlane &ens_dp, const DataPlane &dp,
-                          const char *type_str, const char *long_name_str) {
+static void write_ens_data_plane(GenEnsProdVarInfo *ens_info,
+                                 const DataPlane &ens_dp,
+                                 const DataPlane &dp,
+                                 const char *type_str,
+                                 const char *long_name_str) {
 
-   // Allocate memory for this data
-   float *ens_data = new float [nxy];
-
-   // Store the data in an array of floats
-   for(int i=0; i<nxy; i++) ens_data[i] = ens_dp.data()[i];
+   // Copy the data to float
+   vector<float> ens_data(ens_dp.const_buf().size());
+   copy(ens_dp.const_buf().begin(), ens_dp.const_buf().end(),
+        ens_data.begin());
 
    // Write the output
-   write_ens_var_float(ens_info, ens_data, dp, type_str, long_name_str);
-
-   // Cleanup
-   if(ens_data) { delete [] ens_data; ens_data = (float *) nullptr; }
+   write_ens_var_float(ens_info, ens_data.data(), dp,
+                       type_str, long_name_str);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att_local(GenEnsProdVarInfo *ens_info,
-                       NcVar *nc_var, bool is_int,
-                       const DataPlane &dp,
-                       const char *name_str,
-                       const char *long_name_str) {
+static void add_var_att_local(GenEnsProdVarInfo *ens_info,
+                              NcVar *nc_var, bool is_int,
+                              const DataPlane &dp,
+                              const char *name_str,
+                              const char *long_name_str) {
    ConcatString att_str;
    VarInfo *info = ens_info->get_var_info();
 
@@ -1220,7 +1261,7 @@ void add_var_att_local(GenEnsProdVarInfo *ens_info,
 
 ////////////////////////////////////////////////////////////////////////
 
-void clean_up() {
+static void clean_up() {
    int i, j;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
@@ -1256,7 +1297,7 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+static void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -1295,25 +1336,25 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_ens_files(const StringArray & a) {
+static void set_ens_files(const StringArray & a) {
    ens_files.add(parse_file_list(a));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out_file(const StringArray & a) {
+static void set_out_file(const StringArray & a) {
    out_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config_file(const StringArray & a) {
+static void set_config_file(const StringArray & a) {
    config_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_ctrl_file(const StringArray & a) {
+static void set_ctrl_file(const StringArray & a) {
    ctrl_file = a[0];
 }
 

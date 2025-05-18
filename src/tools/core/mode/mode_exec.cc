@@ -330,7 +330,7 @@ void ModeExecutive::setup_traditional_fcst_obs_data()
 
       if(engine.conf_info.conf.time_offset_warning(
            (int) (Fcst_sd.data.valid() - Obs_sd.data.valid()))) {
-         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_traditional() ->"
+         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_traditional() -> "
               << cs << "\n\n";
       }
       else {
@@ -602,7 +602,7 @@ void ModeExecutive::setup_multivar_fcst_obs_data_intensities(const MultiVarData 
 
       if(engine.conf_info.conf.time_offset_warning(
            (int) (Fcst_sd.data.valid() - Obs_sd.data.valid()))) {
-         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_intensities() ->"
+         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_intensities() -> "
               << cs << "\n\n";
       }
       else {
@@ -712,7 +712,7 @@ void ModeExecutive::setup_multivar_fcst_obs_data_super(const ShapeData &f_super,
 
       if(engine.conf_info.conf.time_offset_warning(
            (int) (Fcst_sd.data.valid() != Obs_sd.data.valid()))) {
-         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_super() ->"
+         mlog << Warning << "\nModeExecutive::setup_fcst_obs_data_multivar_super() -> "
               << cs << "\n\n";
       }
       else {
@@ -1371,21 +1371,42 @@ void ModeExecutive::compute_ct_stats()
          obs_mask  = *engine.obs_mask;
       }
 
+      int fy_oy = 0;
+      int fy_on = 0;
+      int fn_oy = 0;
+      int fn_on = 0;
+
+#pragma omp parallel default(none) \
+      shared(fcst_mask, obs_mask, engine) \
+      shared(fy_oy, fy_on, fn_oy, fn_on)
+      {
+
       // Compute contingency table counts
-      for(int x=0; x<fcst_mask.data.nx(); x++) {
-         for(int y=0; y<fcst_mask.data.ny(); y++) {
+#pragma omp for	schedule(static) \
+                reduction(+: fy_oy, fy_on, fn_oy, fn_on) \
+                collapse(2)
+         for(int x=0; x<fcst_mask.data.nx(); x++) {
+            for(int y=0; y<fcst_mask.data.ny(); y++) {
 
-            // Key off of the bad data values in the raw field
-            if(engine.fcst_raw->is_bad_data(x, y) ||
-               engine.obs_raw->is_bad_data(x, y)) continue;
+               // Key off of the bad data values in the raw field
+               if(engine.fcst_raw->is_bad_data(x, y) ||
+                  engine.obs_raw->is_bad_data(x, y)) continue;
 
-            else if( fcst_mask.s_is_on(x, y) &&  obs_mask.s_is_on(x, y)) cts[i].inc_fy_oy();
-            else if( fcst_mask.s_is_on(x, y) && !obs_mask.s_is_on(x, y)) cts[i].inc_fy_on();
-            else if(!fcst_mask.s_is_on(x, y) &&  obs_mask.s_is_on(x, y)) cts[i].inc_fn_oy();
-            else if(!fcst_mask.s_is_on(x, y) && !obs_mask.s_is_on(x, y)) cts[i].inc_fn_on();
+               else if( fcst_mask.s_is_on(x, y) &&  obs_mask.s_is_on(x, y)) fy_oy++;
+               else if( fcst_mask.s_is_on(x, y) && !obs_mask.s_is_on(x, y)) fy_on++;
+               else if(!fcst_mask.s_is_on(x, y) &&  obs_mask.s_is_on(x, y)) fn_oy++;
+               else if(!fcst_mask.s_is_on(x, y) && !obs_mask.s_is_on(x, y)) fn_on++; 
+            }
          }
-      }
-   }
+      } // End omp parallel
+
+      // Store results
+      cts[i].set_n_pairs(fy_oy + fy_on + fn_oy + fn_on);
+      cts[i].set_fy_oy((double) fy_oy);
+      cts[i].set_fy_on((double) fy_on);
+      cts[i].set_fn_oy((double) fn_oy);
+      cts[i].set_fn_on((double) fn_on);
+   } // for i
 
    return;
 }
@@ -1667,7 +1688,8 @@ MultiVarData *ModeExecutive::get_multivar_data(ModeDataType dtype)
       mvd->set_merge_thresh_array(engine.conf_info.Fcst->merge_thresh_array, simple);
       break;
    default:
-      mlog << Error << "\nModeExecutive::get_multivar_data() -> wrong data type "
+      mlog << Error << "\nModeExecutive::get_multivar_data() -> "
+           << "wrong data type "
            << sprintModeDataType(dtype) << "\n\n";
       exit(1);
    }
@@ -1697,7 +1719,8 @@ void ModeExecutive::add_multivar_merge_data(MultiVarData *mvd, ModeDataType dtyp
       mvd->set_merge_thresh_array(engine.conf_info.Fcst->merge_thresh_array, simple);
       break;
    default:
-      mlog << Error << "\nModeExecutive::add_multivar_merge_data() -> wrong data type "
+      mlog << Error << "\nModeExecutive::add_multivar_merge_data() -> "
+           << "wrong data type "
            << sprintModeDataType(dtype) << "\n\n";
       exit(1);
    }
@@ -1716,16 +1739,6 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    ConcatString s;
    const ConcatString fcst_thresh = engine.conf_info.Fcst->conv_thresh.get_str(5);
    const ConcatString  obs_thresh = engine.conf_info.Obs->conv_thresh.get_str(5);
-
-   float *fcst_raw_data      = nullptr;
-   float *fcst_obj_raw_data  = nullptr;
-   int   *fcst_obj_data      = nullptr;
-   int   *fcst_clus_data     = nullptr;
-
-   float *obs_raw_data       = nullptr;
-   float *obs_obj_raw_data   = nullptr;
-   int   *obs_obj_data       = nullptr;
-   int   *obs_clus_data      = nullptr;
 
    NcFile *f_out             = nullptr;
 
@@ -1766,8 +1779,8 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    f_out = open_ncfile(out_file.c_str(), true);
 
    if(IS_INVALID_NC_P(f_out)) {
-      mlog << Error << "\nModeExecutive::write_obj_netcdf() -> trouble opening output file "
-           << out_file << "\n\n";
+      mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
+           << "trouble opening output file " << out_file << "\n\n";
       delete f_out;
       f_out = (NcFile *) nullptr;
 
@@ -1844,24 +1857,18 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    //  write the radius and threshold values
    //
 
-   if ( !put_nc_data(&fcst_radius_var, &engine.conf_info.Fcst->conv_radius)
-        || !put_nc_data(&obs_radius_var, &engine.conf_info.Obs->conv_radius) )  {
-
+   if ( !put_nc_data(&fcst_radius_var, &engine.conf_info.Fcst->conv_radius) ||
+        !put_nc_data(&obs_radius_var, &engine.conf_info.Obs->conv_radius) )  {
       mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
            << "error writing fcst/obs convolution radii\n\n";
-
       exit(1);
-
    }
 
-   if (    ! put_nc_data(&fcst_thresh_var, fcst_thresh.c_str())
-           || ! put_nc_data(& obs_thresh_var, obs_thresh.c_str()) )  {
-
+   if ( !put_nc_data(&fcst_thresh_var, fcst_thresh.c_str()) ||
+        !put_nc_data(& obs_thresh_var, obs_thresh.c_str()) )  {
       mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
            << "error writing fcst/obs thresholds\n\n";
-
       exit(1);
-
    }
 
    //
@@ -1925,145 +1932,146 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    }
 
    //
-   // Allocate memory for the raw values and object ID's for each grid box
+   // Resize vectors for the raw values and object ID's for each grid box
    //
-
+   vector<float> fcst_raw_data;
+   vector<float> obs_raw_data;
    if ( info.do_raw )  {
-
-      fcst_raw_data      = new float [grid.nx()*grid.ny()];
-      obs_raw_data       = new float [grid.nx()*grid.ny()];
-
+      fcst_raw_data.resize(grid.nxy());
+      obs_raw_data.resize(grid.nxy());
    }
 
+   vector<float> fcst_obj_raw_data;
+   vector<float> obs_obj_raw_data;
    if ( info.do_object_raw )  {
-
-      fcst_obj_raw_data  = new float [grid.nx()*grid.ny()];
-      obs_obj_raw_data   = new float [grid.nx()*grid.ny()];
-
+      fcst_obj_raw_data.resize(grid.nxy());
+      obs_obj_raw_data.resize(grid.nxy());
    }
 
+   vector<int> fcst_obj_data;
+   vector<int> obs_obj_data;
    if ( info.do_object_id )  {
-
-      fcst_obj_data      = new int   [grid.nx()*grid.ny()];
-      obs_obj_data       = new int   [grid.nx()*grid.ny()];
-
+      fcst_obj_data.resize(grid.nxy());
+      obs_obj_data.resize(grid.nxy());
    }
 
+   vector<int> fcst_clus_data;
+   vector<int> obs_clus_data;
    if ( info.do_cluster_id )  {
-
-      fcst_clus_data     = new int   [grid.nx()*grid.ny()];
-      obs_clus_data      = new int   [grid.nx()*grid.ny()];
-
+      fcst_clus_data.resize(grid.nxy());
+      obs_clus_data.resize(grid.nxy());
    }
 
-   for(int x=0; x<grid.nx(); x++) {
+#pragma omp parallel default(none) \
+   shared(grid, info, DefaultTO, unmatched_id, bad_data_int) \
+   shared(fcst_raw_data, obs_raw_data) \
+   shared(fcst_obj_raw_data, fcst_obj_data) \
+   shared(obs_obj_raw_data, obs_obj_data) \
+   shared(fcst_clus_data, obs_clus_data)
+   {
 
-      for(int y=0; y<grid.ny(); y++) {
+#pragma omp for	schedule(static) \
+                collapse(2)
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
 
-         int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+            int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
 
-         //
-         // Get raw values and object ID's for each grid box
-         // Extra nullptr checks to satisfy Fortify
+            //
+            // Get raw values and object ID's for each grid box
+            // Extra nullptr checks to satisfy Fortify
+            //
 
-         if ( info.do_raw &&
-              fcst_raw_data != nullptr && obs_raw_data != nullptr &&
-              engine.fcst_raw != nullptr && engine.obs_raw != nullptr  )  {
-
-            fcst_raw_data[n] = (float) engine.fcst_raw->data (x, y);
-            obs_raw_data[n] = (float) engine.obs_raw->data  (x, y);
-
-         }
-
-         if(engine.fcst_split->is_nonzero(x, y) ) {
-            if ( info.do_object_raw && fcst_obj_raw_data != nullptr && engine.fcst_raw != nullptr ) {
-               fcst_obj_raw_data[n] = (float) engine.fcst_raw->data(x, y);
+            if ( info.do_raw ) {
+               fcst_raw_data[n] = (float) engine.fcst_raw->data (x, y);
+                obs_raw_data[n] = (float) engine.obs_raw->data  (x, y);
             }
-            if ( info.do_object_id && fcst_obj_data != nullptr && engine.fcst_split != nullptr ) {
-               fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
-            }
-         }
-         else {
-            if ( info.do_object_raw && fcst_obj_raw_data != nullptr ) {
-               fcst_obj_raw_data[n] = bad_data_float;
-            }
-            if ( info.do_object_id && fcst_obj_data != nullptr ) {
-               fcst_obj_data[n] = bad_data_int;
-            }
-         }
 
-         if(engine.obs_split->is_nonzero(x, y) ) {
-            if ( info.do_object_raw && obs_obj_raw_data != nullptr ) {
-               obs_obj_raw_data[n] = (float) engine.obs_raw->data(x, y);
+            if ( engine.fcst_split->is_nonzero(x, y) ) {
+               if ( info.do_object_raw ) {
+                  fcst_obj_raw_data[n] = (float) engine.fcst_raw->data(x, y);
+               }
+               if ( info.do_object_id ) {
+                  fcst_obj_data[n] = nint(engine.fcst_split->data(x, y));
+               }
             }
-            if ( info.do_object_id && obs_obj_data != nullptr ) {
-               obs_obj_data[n] = nint(engine.obs_split->data(x, y));
-            }
-         }
-         else {
-            if ( info.do_object_raw && obs_obj_raw_data != nullptr) {
-               obs_obj_raw_data[n] = bad_data_float;
-            }
-            if ( info.do_object_id && obs_obj_data != nullptr ) {
-               obs_obj_data[n] = bad_data_int;
-            }
-         }
-
-         //
-         // Get cluster object ID's for each grid box
-         //
-
-         if ( info.do_cluster_id && fcst_clus_data != nullptr && obs_clus_data != nullptr)  {
-
-            // Write the index of the cluster object
-            if ( engine.fcst_clus_split->data(x, y) > 0 ) {
-               fcst_clus_data[n] = nint(engine.fcst_clus_split->data(x, y));
-            }
-            // Write a value of 0 for unmatched simple objects
-            else if(engine.fcst_split->data(x, y) > 0) {
-               fcst_clus_data[n] = unmatched_id;
-            }
-            // Otherwise, write bad data
             else {
-               fcst_clus_data[n] = bad_data_int;
+               if ( info.do_object_raw ) {
+                  fcst_obj_raw_data[n] = bad_data_float;
+               }
+               if ( info.do_object_id ) {
+                  fcst_obj_data[n] = bad_data_int;
+               }
             }
 
-            // Write the index of the cluster object
-            if(engine.obs_clus_split->data(x, y) > 0) {
-               obs_clus_data[n] = nint(engine.obs_clus_split->data(x, y));
+            if(engine.obs_split->is_nonzero(x, y) ) {
+               if ( info.do_object_raw ) {
+                  obs_obj_raw_data[n] = (float) engine.obs_raw->data(x, y);
+               }
+               if ( info.do_object_id ) {
+                  obs_obj_data[n] = nint(engine.obs_split->data(x, y));
+               }
             }
-            // Write a value of 0 for unmatched simple objects
-            else if(engine.obs_split->data(x, y) > 0) {
-               obs_clus_data[n] = unmatched_id;
-            }
-            // Otherwise, write bad data
             else {
-               obs_clus_data[n] = bad_data_int;
+               if ( info.do_object_raw ) {
+                  obs_obj_raw_data[n] = bad_data_float;
+               }
+               if ( info.do_object_id ) {
+                  obs_obj_data[n] = bad_data_int;
+               }
             }
 
-         }    //  if info.do_cluster_id
+            //
+            // Get cluster object ID's for each grid box
+            //
 
-      }   //  for y
+            if ( info.do_cluster_id ) {
 
-   }   //  for x
+               // Write the index of the cluster object
+               if ( engine.fcst_clus_split->data(x, y) > 0 ) {
+                  fcst_clus_data[n] = nint(engine.fcst_clus_split->data(x, y));
+               }
+               // Write a value of 0 for unmatched simple objects
+               else if(engine.fcst_split->data(x, y) > 0) {
+                  fcst_clus_data[n] = unmatched_id;
+               }
+               // Otherwise, write bad data
+               else {
+                  fcst_clus_data[n] = bad_data_int;
+               }
+
+               // Write the index of the cluster object
+               if(engine.obs_clus_split->data(x, y) > 0) {
+                  obs_clus_data[n] = nint(engine.obs_clus_split->data(x, y));
+               }
+               // Write a value of 0 for unmatched simple objects
+               else if(engine.obs_split->data(x, y) > 0) {
+                  obs_clus_data[n] = unmatched_id;
+               }
+               // Otherwise, write bad data
+               else {
+                  obs_clus_data[n] = bad_data_int;
+               }
+            } // if info.do_cluster_id
+         } // for y
+      } // for x
+   } // End omp parallel
 
    //
    // Write the forecast and observation raw value variables
    //
 
    if( info.do_raw &&
-       (!put_nc_data_with_dims(&fcst_raw_var, &fcst_raw_data[0], grid.ny(), grid.nx()) ||
-        !put_nc_data_with_dims(&obs_raw_var, &obs_raw_data[0], grid.ny(), grid.nx())) ) {
-
+       (!put_nc_data_with_dims(&fcst_raw_var, fcst_raw_data.data(), grid.ny(), grid.nx()) ||
+        !put_nc_data_with_dims( &obs_raw_var,  obs_raw_data.data(), grid.ny(), grid.nx())) ) {
       mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
            << "error with the fcst_raw_var->put or obs_raw_var->put\n\n";
       exit(1);
    }
 
    if ( info.do_object_raw && 
-       (!put_nc_data_with_dims(&fcst_obj_raw_var, &fcst_obj_raw_data[0], grid.ny(), grid.nx()) ||
-        !put_nc_data_with_dims(&obs_obj_raw_var, &obs_obj_raw_data[0], grid.ny(), grid.nx())) ) {
-
+       (!put_nc_data_with_dims(&fcst_obj_raw_var, fcst_obj_raw_data.data(), grid.ny(), grid.nx()) ||
+        !put_nc_data_with_dims( &obs_obj_raw_var,  obs_obj_raw_data.data(), grid.ny(), grid.nx())) ) {
       mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
            << "error with the fcst_obj_raw_var->put or obs_obj_raw_var->put\n\n";
       exit(1);
@@ -2074,9 +2082,8 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    //
 
    if ( info.do_object_id &&
-       (!put_nc_data_with_dims(&fcst_obj_var, &fcst_obj_data[0], grid.ny(), grid.nx()) ||
-        !put_nc_data_with_dims(&obs_obj_var, &obs_obj_data[0], grid.ny(), grid.nx())) ) {
-
+       (!put_nc_data_with_dims(&fcst_obj_var, fcst_obj_data.data(), grid.ny(), grid.nx()) ||
+        !put_nc_data_with_dims( &obs_obj_var,  obs_obj_data.data(), grid.ny(), grid.nx())) ) {
       mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
            << "error with the fcst_obj_var->put or obs_obj_var->put\n\n";
       exit(1);
@@ -2087,27 +2094,12 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    //
 
    if ( info.do_cluster_id && 
-       (!put_nc_data_with_dims(&fcst_clus_var, &fcst_clus_data[0], grid.ny(), grid.nx()) ||
-        !put_nc_data_with_dims(&obs_clus_var, &obs_clus_data[0], grid.ny(), grid.nx())) ) {
-
+       (!put_nc_data_with_dims(&fcst_clus_var, fcst_clus_data.data(), grid.ny(), grid.nx()) ||
+        !put_nc_data_with_dims( &obs_clus_var,  obs_clus_data.data(), grid.ny(), grid.nx())) ) {
       mlog << Error << "\nModeExecutive::write_obj_netcdf() -> "
            << "error with the fcst_clus_var->put or obs_clus_var->put\n\n";
       exit(1);
    }
-
-   //
-   // Delete allocated memory
-   //
-
-   if (fcst_raw_data)      { delete [] fcst_raw_data;      fcst_raw_data     = nullptr; }
-   if (fcst_obj_raw_data)  { delete [] fcst_obj_raw_data;  fcst_obj_raw_data = nullptr; }
-   if (fcst_obj_data)      { delete [] fcst_obj_data;      fcst_obj_data     = nullptr; }
-   if (fcst_clus_data)     { delete [] fcst_clus_data;     fcst_clus_data    = nullptr; }
-
-   if (obs_raw_data)       { delete [] obs_raw_data;       obs_raw_data      = nullptr; }
-   if (obs_obj_raw_data)   { delete [] obs_obj_raw_data;   obs_obj_raw_data  = nullptr; }
-   if (obs_obj_data)       { delete [] obs_obj_data;       obs_obj_data      = nullptr; }
-   if (obs_clus_data)      { delete [] obs_clus_data;      obs_clus_data     = nullptr; }
 
    //
    // Write out the values of the vertices of the polylines.

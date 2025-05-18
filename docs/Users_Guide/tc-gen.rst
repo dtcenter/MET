@@ -48,7 +48,7 @@ The usage statement for tc_gen is shown below:
          -genesis source
          -edeck source
          -shape source
-         -track source 
+         -track source
          -config file
          [-out base]
          [-log file]
@@ -94,21 +94,21 @@ The TC-Gen tool implements the following logic:
  * Loop over the filters defined in the configuration file and apply the following logic for each.
 
   * For each Best track genesis event meeting the filter critera, determine the initialization and lead times for which the model had an opportunity to forecast that genesis event. Store an unmatched genesis pair for each case.
- 
+
   * For each forecast genesis event, search for a matching Best track. A configurable boolean option controls whether all Best track points are considered for a match or only the single Best track genesis point. A match occurs if the Best track point valid time is within a configurable window around the forecast genesis time and the Best track point location is within a configurable radius of the forecast genesis location. If a Best track match is found, store the storm ID.
- 
+
   * If no Best track match is found, apply the same logic to search the operational track points with lead time of 0 hours. If an operational match is found, store the storm ID.
- 
+
   * If a matching storm ID is found, match the forecast genesis event to the Best track genesis event for that storm ID.
- 
+
   * If no matching storm ID is found, store an unmatched pair for the genesis forecast.
 
   * Loop through the genesis pairs and populate contingency tables using two methods, the development (dev) and operational (ops) methods. For each pair, if the forecast genesis event is unmatched, score it as a dev and ops FALSE ALARM. If the Best track genesis event is unmatched, score it as a dev and ops MISS. Score each matched genesis pair as follows:
 
    * If the forecast initialization time is at or after the Best track genesis event, DISCARD this case and exclude it from the statistics.
-  
+
    * Compute the difference between the forecast and Best track genesis events in time and space. If they are both within the configurable tolerance, score it as a dev HIT. If not, score it as a dev FALSE ALARM.
-  
+
    * Compute the difference between the Best track genesis time and model initialization time. If it is within the configurable tolerance, score it as an ops HIT. If not, score it as an ops FALSE ALARM.
 
   * Do not count any CORRECT NEGATIVES.
@@ -488,7 +488,7 @@ TC-Gen produces output in STAT and, optionally, ASCII and NetCDF formats. The AS
 
 .. _table_TG_header_info_tg_outputs:
 
-.. list-table:: Header information for TC-Gen STAT output 
+.. list-table:: Header information for TC-Gen STAT output
   :widths: auto
   :header-rows: 1
 

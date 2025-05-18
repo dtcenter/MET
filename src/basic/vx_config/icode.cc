@@ -595,9 +595,8 @@ void IcodeVector::init_from_scratch()
 
 {
 
-Cell = (IcodeCell *) nullptr;
 
-Ncells = Nalloc = 0;
+Ncells = 0;
 
 
 return;
@@ -614,17 +613,9 @@ void IcodeVector::assign(const IcodeVector & i)
 
 clear();
 
-if ( i.Nalloc == 0 )  return;
-
-extend(i.Ncells);
+Cell = i.Cell;
 
 Ncells = i.Ncells;
-
-for (int j=0; j<Ncells; ++j)  {
-
-   Cell[j] = i.Cell[j];
-
-}
 
 
 return;
@@ -639,64 +630,9 @@ void IcodeVector::clear()
 
 {
 
-if ( Cell )  { delete [] Cell;  Cell = (IcodeCell *) nullptr; }
+Cell.clear();
 
-
-Nalloc = Ncells = 0;
-
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void IcodeVector::extend(int n)
-
-{
-
-if ( n <= Nalloc )  return;
-
-int k;
-IcodeCell * u = (IcodeCell *) nullptr;
-
-
-k = n/icodevector_alloc_inc;
-
-if ( n%icodevector_alloc_inc ) ++k;
-
-n = k*icodevector_alloc_inc;
-
-u = new IcodeCell [n];
-
-if ( !u )  {
-
-   cerr << "\n\n  void IcodeVector::extend(int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( Cell )  {
-
-   for (k=0; k<Ncells; ++k)  {
-
-      u[k] = Cell[k];
-
-   }
-
-   delete [] Cell;   Cell = (IcodeCell *) nullptr;
-
-}
-
-Cell = u;
-
-u = (IcodeCell *) nullptr;
-
-Nalloc = n;
-
+Ncells = 0;
 
 
 return;
@@ -751,10 +687,9 @@ void IcodeVector::add(const IcodeCell & c)
 
 {
 
-extend(Ncells + 1);
+Cell.emplace_back(c);
 
-Cell[Ncells++] = c;
-
+Ncells++;
 
 return;
 
@@ -770,7 +705,7 @@ void IcodeVector::add(const IcodeVector & v)
 
 if ( v.Ncells == 0 )  return;
 
-extend(Ncells + v.Ncells);
+Cell.resize(Ncells + v.Ncells);
 
 int j;
 
@@ -822,8 +757,7 @@ void IcodeVector::dump(ostream & out, int indent_depth) const
 {
 
 int j;
-// const char * sep = "/////////////////////////////////\n";
-   const char * sep = "---------------------------------\n";
+const char * sep = "---------------------------------\n";
 Indent prefix;
 
 

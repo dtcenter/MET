@@ -172,7 +172,7 @@ The **level_category** variable is used to specify a comma-separated list of Pre
 
 .. _table_reformat-point_pb2nc_level_category:
 
-.. list-table:: Values for the level_category option. 
+.. list-table:: Values for the level_category option.
    :widths: auto
    :header-rows: 1
 
@@ -187,16 +187,16 @@ The **level_category** variable is used to specify a comma-separated list of Pre
    * - 3
      - Winds-by-pressure level
    * - 4
-     - Winds-by-height level 
+     - Winds-by-height level
    * - 5
-     - Tropopause level 
+     - Tropopause level
    * - 6
-     - Reports on a single level     
+     - Reports on a single level
    * - 7
      - Auxiliary levels generated via interpolation from spanning levels
 
 _____________________
-       
+
 .. code-block:: none
 
   obs_bufr_var = [ 'QOB', 'TOB', 'ZOB', 'UOB', 'VOB' ];
@@ -438,7 +438,7 @@ While initial versions of the ASCII2NC tool only supported a simple 11 column AS
 
 • `SURFace RADiation (SURFRAD) <http://www.esrl.noaa.gov/gmd/grad/surfrad/>`_ and Integrated Surface Irradiance Study (ISIS) formats
 
-• Western Wind and Solar Integration Study (WWSIS) format. WWSIS data are available by request from National Renewable Energy Laboratory (NREL) in Boulder, CO. 
+• Western Wind and Solar Integration Study (WWSIS) format. WWSIS data are available by request from National Renewable Energy Laboratory (NREL) in Boulder, CO.
 
 • `AirNow DailyData_v2, AirNow HourlyData, and AirNow HourlyAQObs formats <https://www.epa.gov/outdoor-air-quality-data>`_. See the :ref:`MET_AIRNOW_STATIONS` environment variable.
 
@@ -498,7 +498,7 @@ The default ASCII point observation format consists of one row of data per obser
   * - 11
     - Observation_Value
     - Observation value in units consistent with the GRIB code definition.
-      
+
 ascii2nc Usage
 --------------
 
@@ -1055,7 +1055,7 @@ When processing GOES data, the **-goes_qc** option may also be used to specify t
 The grid name or the grid definition can be given with the -field option when the grid information is missing from the input NetCDF file for the latitude_longitude projection. The latitude and longitude variable names should be defined by the user, and the grid information from the set_attr_grid is ignored in this case except nx and ny.
 
 .. code-block:: none
-		
+
    point2grid \
       iceh.2018-01-03.c00.tlat_tlon.nc \
       G231 \

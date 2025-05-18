@@ -36,7 +36,7 @@ extern void write_netcdf_grid_weight(netCDF::NcFile *, netCDF::NcDim *, netCDF::
 extern void write_netcdf_var_times  (netCDF::NcVar *, const DataPlane &);
 extern void write_netcdf_var_times  (netCDF::NcVar *, const unixtime, const unixtime, const int);
 
-      
+////////////////////////////////////////////////////////////////////////
 
 #endif   //  __WRITE_NETCDF_H__
 

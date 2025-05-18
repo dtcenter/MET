@@ -23,6 +23,7 @@
 #include "long_array.h"
 #include "num_array.h"
 #include "nc_var_info.h"
+#include "data_plane.h"
 
 #include "nc_utils.hpp"
 
@@ -285,6 +286,9 @@ extern bool put_nc_data_with_dims(netCDF::NcVar *, const double *data, const int
                                   const int len1=0, const int len2=0);
 extern bool put_nc_data_with_dims(netCDF::NcVar *, const double *data, const long len0,
                                   const long len1=0, const long len2=0);
+
+extern bool put_nc_data_plane_int(netCDF::NcVar *, const DataPlane &);
+extern bool put_nc_data_plane_float(netCDF::NcVar *, const DataPlane &);
 
 extern netCDF::NcGroup  get_nc_group(netCDF::NcFile *, const char *group_name);     // continue even though not exists
 

@@ -47,19 +47,6 @@ static void populate_bool_plane(const int * buf, const int nx, const int ny, Boo
 ////////////////////////////////////////////////////////////////////////
 
 
-// void  objects_from_arrays(bool do_clusters,
-//                           int *fcst_objects, int *obs_objects, int nx, int ny,
-//                           BoolPlane & fcst_out, 
-//                           BoolPlane & obs_out)
-// {
-//    populate_bool_plane(fcst_objects, nx, ny, fcst_out);
-//    populate_bool_plane(obs_objects, nx, ny, obs_out);
-// }  
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 void objects_from_netcdf(const char * netcdf_filename, 
                          bool do_clusters,     //  do we look at cluster objects or simple objects?
                          BoolPlane & fcst_out, 
@@ -145,40 +132,37 @@ void objects_from_netcdf(const char * netcdf_filename,
 ////////////////////////////////////////////////////////////////////////
 
 
-void populate_bool_plane(const int * buf, const int nx, const int ny, BoolPlane & bp_out)
+static void populate_bool_plane(const int * buf, const int nx, const int ny, BoolPlane & bp_out)
 
 {
 
-   int x, y, n, k;
-   bool tf;
-   double nyes=0.0;
    double ntotal = (double)(nx*ny);
    bp_out.set_size(nx, ny);
 
-   for (x=0; x<nx; ++x)  {
+   int nyes = 0.0;
 
-      for (y=0; y<ny; ++y)  {
+#pragma omp parallel default(none) \
+   shared(nx, ny, buf, nyes, bp_out)
+   {
 
-         n = y*nx + x;
+#pragma omp for schedule(static) \
+                reduction(+: nyes) \
+                collapse(2)
+      for(int x=0; x<nx; ++x)  {
+         for(int y=0; y<ny; ++y)  {
+            int n = y*nx + x;
+            int k = buf[n];
+            bool tf = (k > 0);
+            if(tf) nyes++;
+            bp_out.put(tf, x, y);
+         } // for y
+      } // for x
+   } // End omp parallel
 
-         k = buf[n];
-
-         tf = ( k > 0 );
-         if (tf) ++nyes;
-         bp_out.put(tf, x, y);
-
-      }   //  for y
-
-   }   //  for x
-
-   mlog << Debug(1) << nyes/ntotal << " of the data was true\n";
+   mlog << Debug(1) << (double) nyes/ntotal << " of the data was true\n";
 
    return;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
-
-

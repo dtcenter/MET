@@ -26,10 +26,11 @@
 //      void initialize();
 //      void process_command_line(int argc, char **argv);
 //
-//   Mod#   Date      Name        Description
-//   ----   ----      ----        -----------
-//   000    07-06-22  Soh         New
-//   001    09-06-22  Prestopnik  MET #2227 Remove namespace std from header files
+//   Mod#   Date      Name          Description
+//   ----   ----      ----          -----------
+//   000    07-06-22  Soh           New
+//   001    09-06-22  Prestopnik    MET #2227 Remove namespace std from header files
+//   002    04-17-25  Halley Gotway MET #3120 Initialize OpenMP
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -37,10 +38,14 @@
 #include <pwd.h>
 
 #include "main.h"
+#include "handle_openmp.h"
 #include "concat_string.h"
 #include "memory.h"
 #include "logger.h"
 #include "util_constants.h"
+#ifdef WITH_PROFILER
+#include "ctrack.hpp"
+#endif
 
 using namespace std;
 
@@ -77,6 +82,11 @@ int main(int argc, char *argv[]) {
    int return_code = met_main(argc, argv);
 
    do_post_process();
+ 
+   // Write out the CTRACK metrics
+   #ifdef WITH_PROFILER
+   ctrack::result_print();
+   #endif
 
    return return_code;
 
@@ -85,6 +95,9 @@ int main(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 void do_pre_process(int argc, char *argv[]) {
+   #ifdef WITH_PROFILER
+   CTRACK;
+   #endif 
 
    store_arguments(argc, argv);
 
@@ -99,11 +112,18 @@ void do_pre_process(int argc, char *argv[]) {
    mlog << Debug(1) << msg << "\n";
 
    set_handlers();
+
+   // Set up OpenMP (if enabled)
+   init_openmp();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void do_post_process() {
+   #ifdef WITH_PROFILER
+   CTRACK;
+   #endif
+
    ConcatString msg;
    msg << "Finish " << met_tool_name << " " << met_version
        << " by " << met_user_name << "(" << met_user_id

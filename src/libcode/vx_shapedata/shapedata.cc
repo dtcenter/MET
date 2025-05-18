@@ -21,7 +21,6 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #include <ctime>
 #include <iostream>
 #include <fstream>
@@ -32,6 +31,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <numeric>
+#include <algorithm>
 
 #include "shapedata.h"
 #include "mode_columns.h"
@@ -44,22 +45,15 @@
 
 using namespace std;
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
-static const bool use_new = true;
 
 static const int split_enlarge = 4;   //  used for ShapeData  shrink and expand
 
 static const bool do_split_fatten = true;
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #define  STANDARD_XY_YO_N(Nx, x, y) ((y)*(Nx) + (x))
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -74,62 +68,50 @@ static StepCase get_step_case(bool, bool, bool, bool);
 ///////////////////////////////////////////////////////////////////////////////
 
 ShapeData::ShapeData() {
-
    clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ShapeData::~ShapeData() {
-
    clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ShapeData::ShapeData(const ShapeData &f) {
-
    assign(f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 ShapeData & ShapeData::operator=(const ShapeData &f) {
-
-   if ( this == &f )  return *this;
-
+   if(this == &f) return *this;
    assign(f);
-
    return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void ShapeData::clear() {
-
    data.clear();
    mom.clear();
-
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void ShapeData::assign(const ShapeData &d) {
-
    clear();
-
    data = d.data;
    mom  = d.mom;
-
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 int ShapeData::x_left(int y) const {
-
-   if((y < 0) || (y >= data.ny())) {
+   if(y < 0 || y >= data.ny()) {
       mlog << Error << "\nShapeData::x_left(int) -> "
            << "range check error\n\n";
       exit(1);
@@ -145,8 +127,7 @@ int ShapeData::x_left(int y) const {
 ////////////////////////////////////////////////////////////////////////
 
 int ShapeData::x_right(int y) const {
-
-   if((y < 0) || (y >= data.ny())) {
+   if(y < 0 || y >= data.ny()) {
       mlog << Error << "\nShapeData::x_right(int) -> "
            << "range check error\n\n";
       exit(1);
@@ -161,31 +142,22 @@ int ShapeData::x_right(int y) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool ShapeData::s_is_on(int x, int y, bool error_out) const
-
-{
+bool ShapeData::s_is_on(int x, int y, bool error_out) const {
 
    // Unless error out is true, return bad status for being off the grid
-
    if(!error_out) {
       if(x < 0 || x >= data.nx() || y < 0 || y >= data.ny()) return false;
    }
 
    // Check if the current point is non-zero
-
    return data(x, y) > 0.0;
-
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool ShapeData::f_is_on(int x, int y) const
-
-{
+bool ShapeData::f_is_on(int x, int y) const {
 
    // Check if the current point or any of of it's neighbors are non-zero
-
    if(s_is_on(x, y))                            return true;
    if((x > 0) && s_is_on(x-1, y))               return true;
    if((x > 0) && (y > 0) && s_is_on(x-1, y-1))  return true;
@@ -196,43 +168,64 @@ bool ShapeData::f_is_on(int x, int y) const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ShapeData::calc_moments()
+void ShapeData::calc_moments() {
+   int s_area = 0;
+   int f_area = 0;
+   vector<double> psum(9, 0.0);
 
-{
+#pragma omp declare reduction(vec_dbl_plus : vector<double> :             \
+                              transform(omp_out.begin(), omp_out.end(),   \
+                                         omp_in.begin(), omp_out.begin(), \
+                                        plus<double>()))                  \
+                    initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
 
-   double xx, yy;
+#pragma omp parallel default(none) \
+   shared(data, s_area, f_area, psum)
+   {
 
-   mom.clear();
+#pragma omp for schedule(static) \
+                reduction(+: s_area, f_area) \
+                reduction(vec_dbl_plus : psum)
+      for(int x=0; x<data.nx(); ++x) {
+         auto xx = ((double) x);
+         for(int y=0; y<data.ny(); ++y) {
+            auto yy = ((double) y);
 
-   for(int x=0; x<data.nx(); ++x) {
+            // Object area based on s_is_on() logic
+            if(s_is_on(x, y)) s_area += 1;
 
-      xx = ((double) x);
+            if(f_is_on(x, y)) {
 
-      for(int y=0; y<data.ny(); ++y) {
+               f_area += 1;
 
-         yy =((double) y);
+               psum[0] += xx;
+               psum[1] += yy;
 
-         // Object area based on s_is_on() logic
-         if(s_is_on(x, y)) mom.s_area += 1;
+               psum[2] += xx*xx;
+               psum[3] += xx*yy;
+               psum[4] += yy*yy;
 
-         if(f_is_on(x, y)) {
+               psum[5] += xx*xx*xx;
+               psum[6] += xx*xx*yy;
+               psum[7] += xx*yy*yy;
+               psum[8] += yy*yy*yy;
+            }
+         } // for y
+      } // for x
+   } // End omp parallel
 
-            mom.f_area += 1;
-
-            mom.sx     += xx;
-            mom.sy     += yy;
-
-            mom.sxx    += xx*xx;
-            mom.sxy    += xx*yy;
-            mom.syy    += yy*yy;
-
-            mom.sxxx   += xx*xx*xx;
-            mom.sxxy   += xx*xx*yy;
-            mom.sxyy   += xx*yy*yy;
-            mom.syyy   += yy*yy*yy;
-         }
-      } // for y
-   } // for x
+   // Store result
+   mom.s_area = s_area;
+   mom.f_area = f_area;
+   mom.sx     = psum[0];
+   mom.sy     = psum[1];
+   mom.sxx    = psum[2];
+   mom.sxy    = psum[3];
+   mom.syy    = psum[4];
+   mom.sxxx   = psum[5];
+   mom.sxxy   = psum[6];
+   mom.sxyy   = psum[7];
+   mom.syyy   = psum[8];
 
    return;
 }
@@ -240,33 +233,26 @@ void ShapeData::calc_moments()
 ///////////////////////////////////////////////////////////////////////////////
 
 void ShapeData::centroid(double &xbar, double &ybar) const {
-
    mom.centroid(xbar, ybar);
-
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 double ShapeData::angle_degrees() const {
-
    return mom.angle_degrees();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 double ShapeData::curvature(double &xcurv, double &ycurv) const {
-
    return mom.curvature(xcurv, ycurv);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 double ShapeData::area() const {
-
-   double x = (double) (mom.s_area);
-
-   return x;
+   return mom.s_area;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -274,12 +260,21 @@ double ShapeData::area() const {
 double ShapeData::area_thresh(const ShapeData *raw_ptr,
                               const SingleThresh &obj_thresh) const {
    int cur_area = 0;
-   const int Nxy = data.nx()*data.ny();
+   const int nxy = data.nxy();
 
    // Number of points inside the object that meet the threshold criteria
-   for(int i=0; i<Nxy; i++) {
-      if(data.data()[i] > 0 && obj_thresh.check(raw_ptr->data.data()[i])) cur_area++;
-   }
+#pragma omp parallel default(none) \
+   shared(raw_ptr, obj_thresh, nxy, data, cur_area)
+   {
+
+#pragma omp for schedule(static) \
+                reduction(+: cur_area)
+
+      for(int i=0; i<nxy; i++) {
+         if(data.data()[i] > 0 &&
+            obj_thresh.check(raw_ptr->data.data()[i])) cur_area++;
+      }
+   } // End omp parallel
 
    return cur_area;
 }
@@ -287,34 +282,30 @@ double ShapeData::area_thresh(const ShapeData *raw_ptr,
 ///////////////////////////////////////////////////////////////////////////////
 
 void ShapeData::calc_length_width(double &l, double &w) const {
-   double xx, yy;
-   double u, v, u_max, u_min, v_max, v_min;
-   double u_extent, v_extent;
-   double angle_rad, angle_deg;
-   double e1x, e1y, e2x, e2y;
+   double angle_deg = angle_degrees();
+   double angle_rad = angle_deg/deg_per_rad;
 
-   angle_deg = angle_degrees();
-   angle_rad = angle_deg/deg_per_rad;
+   double e1x = cos(angle_rad);
+   double e1y = sin(angle_rad);
 
-   e1x = cos(angle_rad);
-   e1y = sin(angle_rad);
+   double e2x = cos(angle_rad + piover2);
+   double e2y = sin(angle_rad + piover2);
 
-   e2x = cos(angle_rad + piover2);
-   e2y = sin(angle_rad + piover2);
+   double u_max = -1.0e30; 
+   double v_max = -1.0e30;
+   double u_min =  1.0e30;
+   double v_min =  1.0e30;
 
-   u_max = v_max = -1.0e30;
-   u_min = v_min =  1.0e30;
-
-   for (int x=0; x<data.nx(); ++x) {
-      for (int y=0; y<data.ny(); ++y) {
+   for(int x=0; x<data.nx(); x++) {
+      for(int y=0; y<data.ny(); y++) {
 
          if(!f_is_on(x, y)) continue;
 
-         xx = (double) x;
-         yy = (double) y;
+         auto xx = (double) x;
+         auto yy = (double) y;
 
-         u = dot(e1x, e1y, xx, yy);
-         v = dot(e2x, e2y, xx, yy);
+         double u = dot(e1x, e1y, xx, yy);
+         double v = dot(e2x, e2y, xx, yy);
 
          if(u > u_max) u_max = u;
          if(u < u_min) u_min = u;
@@ -324,8 +315,8 @@ void ShapeData::calc_length_width(double &l, double &w) const {
       } // for y
    } // for x
 
-   u_extent = u_max - u_min;
-   v_extent = v_max - v_min;
+   double u_extent = u_max - u_min;
+   double v_extent = v_max - v_min;
 
    if(u_extent > v_extent) { l = u_extent;  w = v_extent; }
    else                    { l = v_extent;  w = u_extent; }
@@ -336,7 +327,8 @@ void ShapeData::calc_length_width(double &l, double &w) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 double ShapeData::length() const {
-   double l, w;
+   double l;
+   double w;
 
    calc_length_width(l, w);
 
@@ -346,7 +338,8 @@ double ShapeData::length() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 double ShapeData::width() const {
-   double l, w;
+   double l;
+   double w;
 
    calc_length_width(l, w);
 
@@ -356,13 +349,8 @@ double ShapeData::width() const {
 ////////////////////////////////////////////////////////////////////////
 
 double ShapeData::complexity() const {
-   int count;
-   double shape;
-   double hull;
-   double u = 0.;
-   Polyline poly;
 
-   count = nint(mom.s_area);
+   int count = nint(mom.s_area);
 
    if(count == 0) {
       mlog << Error << "\nShapeData::complexity() const -> "
@@ -370,9 +358,9 @@ double ShapeData::complexity() const {
       exit(1);
    }
 
-   shape = (double) count;
-   poly  = convex_hull();
-   hull  = fabs(poly.uv_signed_area());
+   Polyline poly(convex_hull());
+   double hull  = fabs(poly.uv_signed_area());
+   auto shape = (double) count;
 
    //
    // Complexity is defined as the difference in area between the
@@ -380,7 +368,8 @@ double ShapeData::complexity() const {
    // convex hull.  0 <= Complexity < 1, and complexity = 0 indicates
    // that the shape is convex.
    //
-   if (!is_eq(hull, 0.)) u = (hull - shape)/hull;
+   double u = 0.0;
+   if(!is_eq(hull, 0.0)) u = (hull - shape)/hull;
 
    return u;
 }
@@ -389,49 +378,45 @@ double ShapeData::complexity() const {
 
 double ShapeData::intensity_percentile(const ShapeData *raw_ptr, int perc,
                                        bool precip_flag) const {
-   int n = 0;
-   double v;
-   double val_sum = 0.0;
-   const int Nxy = data.nx()*data.ny();
-
    if(perc < 0 || perc > 102) {
       mlog << Error << "\nShapeData::intensity_percentile() -> "
            << "the intensity percentile requested must be between 0 and 102.\n\n";
       exit(1);
    }
 
-   vector<double> val(Nxy);
+   const int nxy = data.nxy();
+   vector<double> val;
+   val.reserve(nxy);
 
    // Compute the requested percentile of intensity
-   for(int i=0; i<Nxy; i++) {
+   for(int i=0; i<nxy; i++) {
 
       // Process points for the current object
       if(data.data()[i] > 0) {
 
-         v = raw_ptr->data.data()[i];
+         double v = raw_ptr->data.data()[i];
 
          // Skip bad data and zero precip
          if(::is_bad_data(v) || (precip_flag && is_eq(v, 0.0))) continue;
 
          // Store current value
-         val[n] = v;
-         val_sum += v;
-         n++;
+         val.emplace_back(v);
       }
    }
 
    // Compute the mean of the intensities
+   double v = 0.0;
    if(perc == 101) {
-      v = val_sum/n;
+      v = accumulate(val.begin(), val.end(), 0.0)/(double) val.size();
    }
    // Compute the sum of the intensities
    else if(perc == 102) {
-      v = val_sum;
+      v = accumulate(val.begin(), val.end(), 0.0);
    }
    // Compute a percentile of intensity
    else {
-      sort(val.data(), n);
-      v = percentile(val.data(), n, (double) perc/100.0);
+      sort(val.begin(), val.end());
+      v = percentile(val.data(), (int) val.size(), (double) perc/100.0);
    }
 
    return v;
@@ -444,7 +429,10 @@ double ShapeData::get_attr(const ConcatString &attr_name,
                            const SingleThresh &obj_thresh,
                            const Grid *grid,
                            bool precip_flag) const {
-   double v1, v2, v3, attr_val;
+   double v1;
+   double v2;
+   double v3;
+   double attr_val;
 
    if(strcasecmp(attr_name.c_str(), "CENTROID_X") == 0) {
       centroid(attr_val, v2);
@@ -510,8 +498,10 @@ double ShapeData::get_attr(const ConcatString &attr_name,
 void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
    const char *method_name = "ShapeData::conv_filter_circ() -> ";
    GridPoint *gp = nullptr;
-   int x, y, count, n_vld;
-   double v, v_sum;
+   int count;
+   int n_vld;
+   double v;
+   double v_sum;
    DataPlane conv_dp;
 
    // Check the diameter
@@ -522,9 +512,9 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
       exit(1);
    }
 
-#pragma omp parallel default(none)                   \
+#pragma omp parallel default(none) \
    shared(mlog, data, conv_dp, diameter, vld_thresh) \
-   private(x, y, count, n_vld, v, v_sum, gp)
+   private(count, n_vld, v, v_sum, gp)
    {
 
       // Build the grid template with shape circle and wrap_lon false
@@ -540,7 +530,7 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
       }
 
       // Compute the convolved values
-#pragma omp for schedule (static)
+#pragma omp for schedule(static)
       for(int x=0; x<data.nx(); x++) {
          for(int y=0; y<data.ny(); y++) {
 
@@ -620,274 +610,48 @@ void ShapeData::conv_filter_circ(int diameter, double vld_thresh) {
 
 ////////////////////////////////////////////////////////////////////////
 
+Polyline ShapeData::convex_hull() const {
+   vector<IntPoint> in(2*(data.ny() + 1));
+   int n_in = 0;
 
-Polyline ShapeData::convex_hull_new() const
+   for(int y=0; y<(data.ny()); y++) {
 
-{
+      int j = x_left(y);
 
-int j, k;
-int n_in, n_out;
-Polyline hull_poly;
-IntPoint * in = new IntPoint [2*(data.ny() + 1)];
+      if(j < 0) continue;
 
+      in[n_in].x = j;
+      in[n_in].y = y;
 
-n_in = 0;
+      n_in++;
 
-for (int y=0; y<(data.ny()); ++y)  {
+      int k = x_right(y);
 
-   j = x_left(y);
+      if(k < 0) continue;
 
-   if ( j < 0 )  continue;
+      if(j == k) continue;
 
-   in[n_in].x = j;
-   in[n_in].y = y;
+      in[n_in].x = k;
+      in[n_in].y = y;
 
-   ++n_in;
-
-   k = x_right(y);
-
-   if ( k < 0 )  continue;
-
-   if ( j == k )  continue;
-
-   // ++k;
-
-   // if ( k >= data.ny() )  k = data.ny() - 1;
-
-   in[n_in].x = k;
-   in[n_in].y = y;
-
-   ++n_in;
-
-}   //  for y
-
-IntPoint * out = new IntPoint [n_in + 2];
-
-ihull(in, n_in, out, n_out);
-
-hull_poly.extend_points(n_out);
-
-for (j=0; j<n_out; ++j)  {
-
-   hull_poly.add_point(out[j].x, out[j].y);
-
-}
-
-
-   //
-   //  done
-   //
-
-if ( out )  { delete [] out;  out = nullptr; }
-if (  in )  { delete []  in;   in = nullptr; }
-
-return hull_poly;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-Polyline ShapeData::convex_hull() const
-
-{
-
-Polyline p;
-
-if ( use_new )  p = convex_hull_new ();
-else            p = convex_hull_old ();
-
-return p;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-Polyline ShapeData::convex_hull_old() const
-
-{
-
-   int j, k, n, y;
-   int done;
-   Polyline outline;
-   Polyline hull;
-   double e1u, e1v, e2u, e2v;
-   double angle_low, v_low, alpha, beta;
-   double t, angle, p1u, p1v, p2u, p2v;
-
-   hull.clear();
-   outline.clear();
-
-   if(area() <= 0) {
-
-      mlog << Error << "\nShapedata::convex_hull() -> "
-           << "attempting to fit convex hull to a shape with area = 0\n\n";
-      exit(1);
-   }
-
-   hull.extend_points(2*data.ny());
-   outline.extend_points(2*data.ny());
-
-   vector<int> Index(2*data.ny());
-
-   if ( Index.size() < 2*data.ny() )  {
-
-      mlog << Error << "\nShapedata::convex_hull() -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
-
-   n = 0;
-
-   for (y=0; y<data.ny(); ++y)  {
-
-      j = x_left(y);
-
-      if ( j < 0 )  continue;
-
-      outline.u[n] = (double) j;
-      outline.v[n] = (double) y;
-
-      ++n;
-
-      k = x_right(y);
-
-      if ( k < 0 )  continue;
-
-      if ( j == k )  continue;
-
-      outline.u[n] = (double) k;
-      outline.v[n] = (double) y;
-
-      ++n;
+      n_in++;
 
    }   //  for y
 
-   outline.n_points = n;
+   vector<IntPoint> out(n_in + 2);
 
-      //
-      //  find "lowest" point in outline
-      //
+   int n_out;
+   ihull(in.data(), n_in, out.data(), n_out);
 
-   v_low = 1.0e10;
+   Polyline hull_poly;
+   hull_poly.extend_points(n_out);
 
-   j = -1;
-
-   for (k=0; k<(outline.n_points); ++k)  {
-
-      if ( outline.v[k] < v_low )  { v_low = outline.v[k];  j = k; }
-
+   for(int j=0; j<n_out; j++) {
+      hull_poly.add_point(out[j].x, out[j].y);
    }
 
-   if ( j < 0 )  {
-
-      mlog << Error << "\nShapedata::convex_hull() -> "
-           << "can't find lowest point\n\n";
-      exit(1);
-
-   }
-
-   n = 1;
-
-   Index[0] = j;
-
-      //
-      //  find hull
-      //
-
-   e1u = 1.0;
-   e1v = 0.0;
-
-   done = 0;
-
-   while ( !done  )  {
-
-      e2u = -e1v;
-      e2v =  e1u;
-
-      angle_low = 1.0e10;
-
-      p1u = outline.u[Index[n - 1]];
-      p1v = outline.v[Index[n - 1]];
-
-      j = -1;
-
-      for (k=0; k<(outline.n_points); ++k)  {
-
-         if ( k == Index[n - 1] )  continue;
-
-         p2u = outline.u[k];
-         p2v = outline.v[k];
-
-         alpha = (p2u - p1u)*e1u + (p2v - p1v)*e1v;
-         beta  = (p2u - p1u)*e2u + (p2v - p1v)*e2v;
-
-         if ( alpha == 0 && beta == 0 )  continue;
-
-         angle = deg_per_rad*atan2(beta, alpha);
-
-         angle -= 360.0*floor(angle/360.0);
-
-            //
-            //  reset angle very close to 360 to be 0
-            //
-
-         if ( angle > 359.9999 )   { angle = 0.0; }
-
-         if ( angle < angle_low )  { angle_low = angle;  j = k; }
-
-      }   //  for k
-
-      if ( j < 0 )  {
-
-         mlog << Error << "\nShapedata::convex_hull() -> "
-              << "can't find next hull point\n\n";
-         exit(1);
-      }
-
-      p2u = outline.u[j];
-      p2v = outline.v[j];
-
-      e1u = p2u - p1u;
-      e1v = p2v - p1v;
-
-      t = sqrt( e1u*e1u + e1v*e1v );
-
-      e1u /= t;
-      e1v /= t;
-
-      Index[n++] = j;
-
-      if ( (n >= 3) && (Index[n - 1] == Index[0]) ) done = 1;
-
-   }   //  while
-
-      //
-      //  load up hull
-      //
-
-   --n;
-
-   hull.n_points = n;
-
-   for (j=0; j<n; ++j)  {
-
-      hull.u[j] = outline.u[Index[j]];
-      hull.v[j] = outline.v[Index[j]];
-
-   }
-
-      //
-      //  done
-      //
-
-   return hull;
-
+   return hull_poly;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -948,20 +712,16 @@ Polyline ShapeData::single_boundary_offset(double d) const {
 
 Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
                                            double d) const {
-   Polyline boundary, temp;
-   int x, y, x0, y0, xn, yn;
-   int direction, new_direction;
-   bool found;
-
-   // Initialize
-   boundary.clear();
+   Polyline boundary;
 
    //
    // Find the first point in the object
    //
-   found = false;
-   for(x=0; x<data.nx(); x++) {
-      for(y=0; y<data.ny(); y++) {
+   int x0 = 0;
+   int y0 = 0;
+   bool found = false;
+   for(int x=0; x<data.nx(); x++) {
+      for(int y=0; y<data.ny(); y++) {
 
          if(f_is_on(x, y)) {
             x0 = x;
@@ -984,15 +744,15 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
    //
    // Due to the search order, the initial direction will be plus_x
    //
-   direction = plus_x;
-   new_direction = direction;
+   int direction = plus_x;
+   int new_direction = direction;
    boundary.add_point(x0+d, y0+d);
 
    //
    // Initialize xn and yn to starting point
    //
-   xn = x0;
-   yn = y0;
+   int xn = x0;
+   int yn = y0;
 
    //
    // Find next point along boundary
@@ -1003,9 +763,8 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
    // Store only points where a change of direction occurs
    // or all points if so indicated
    //
-   if( all_points ||
-      (!all_points && direction != new_direction) ) {
-
+   if(all_points ||
+      (!all_points && direction != new_direction)) {
       boundary.add_point(xn+d, yn+d);
    }
    direction = new_direction;
@@ -1022,8 +781,8 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
       // Store only points where a change of direction occurs
       // or all points if so indicated
       //
-      if( all_points ||
-         (!all_points && direction != new_direction) ) {
+      if(all_points ||
+         (!all_points && direction != new_direction)) {
          boundary.add_point(xn+d, yn+d);
       }
       direction = new_direction;
@@ -1034,11 +793,10 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
    // counter-clockwise
    //
    if(!clockwise) {
-      temp = boundary;
+      Polyline temp(boundary);
       boundary.clear();
 
       for(int i=temp.n_points-1; i>=0; i--) {
-
          boundary.add_point(temp.u[i], temp.v[i]);
       }
    }
@@ -1053,120 +811,74 @@ Polyline ShapeData::single_boundary_offset(bool all_points, int clockwise,
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-void ShapeData::zero_field()
-
-{
-
-data.set_constant(0.0);
-
-return;
-
+void ShapeData::zero_field() {
+   data.set_constant(0.0);
+   return;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void ShapeData::expand(const int W) {
 
-void ShapeData::expand(const int W)
-
-{
-
-if ( W <= 0 )  {
-
-   mlog << Error
-        << "\n\n  ShapeData::expand(const int) -> bad value ... " << W << "\n\n";
-
-   exit ( 1 );
-
-}
-
-
-int x_old, y_old, x_new, y_new;
-const int nx_old = data.nx();
-const int ny_old = data.ny();
-const int nx_new = nx_old + 2*W;
-const int ny_new = ny_old + 2*W;
-DataPlane old = data;
-
-data.set_size(nx_new, ny_new);
-
-data.set_constant(0.0);
-
-for (x_old=0; x_old<nx_old; ++x_old)  {
-
-   x_new = x_old + W;
-
-   for (y_old=0; y_old<ny_old; ++y_old)  {
-
-      y_new = y_old + W;
-
-      data.put(old.get(x_old, y_old), x_new, y_new);
-
-   }   //  for y_old
-
-}   //  for x_old
-
-
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-void ShapeData::shrink(const int W)
-
-{
-
-if ( W <= 0 )  {
-
-   mlog << Error
-        << "\n\n  ShapeData::shrink(const int) -> bad value ... " << W << "\n\n";
-
-   exit ( 1 );
-
-}
-
-const int nx_old = data.nx();
-const int ny_old = data.ny();
-const int nx_new = nx_old - 2*W;
-const int ny_new = ny_old - 2*W;
-
-if ( (nx_new <= 0) || (ny_new <= 0) )  {
-
-   mlog << Error
-        << "\n\n  ShapeData::shrink(const int) -> value too large ... new grid is empty\n\n";
-
-   exit ( 1 );
-
-}
-
-
-int x_old, y_old;
-DataPlane old = data;
-
-
-for (int x_new=0; x_new<nx_new; ++x_new)  {
-
-   x_old = x_new + W;
-
-   for (int y_new=0; y_new<ny_new; ++y_new)  {
-
-      y_old = y_new + W;
-
-      data.put(old.get(x_old, y_old), x_new, y_new);
-
+   if(W <= 0) {
+      mlog << Error << "\nShapeData::expand(const int) -> "
+           << "bad value ... " << W << "\n\n";
+      exit(1);
    }
 
+   const int nx_old = data.nx();
+   const int ny_old = data.ny();
+   DataPlane old(data);
+
+   const int nx_new = nx_old + 2*W;
+   const int ny_new = ny_old + 2*W;
+   data.set_size(nx_new, ny_new);
+   data.set_constant(0.0);
+
+   for(int x_old=0; x_old<nx_old; x_old++) {
+      int x_new = x_old + W;
+      for(int y_old=0; y_old<ny_old; y_old++) {
+         int y_new = y_old + W;
+         data.put(old.get(x_old, y_old), x_new, y_new);
+      }
+   }
+
+   return;
 }
 
-return;
+///////////////////////////////////////////////////////////////////////////////
 
+void ShapeData::shrink(const int W) {
+
+   if(W <= 0) {
+      mlog << Error << "\nShapeData::shrink(const int) -> "
+           << "bad value ... " << W << "\n\n";
+      exit(1);
+   }
+
+   const int nx_old = data.nx();
+   const int ny_old = data.ny();
+   const int nx_new = nx_old - 2*W;
+   const int ny_new = ny_old - 2*W;
+
+   if(nx_new <= 0 || ny_new <= 0) {
+      mlog << Error << "\nShapeData::shrink(const int) -> "
+           << "value too large ... new grid is empty\n\n";
+      exit(1);
+   }
+
+   DataPlane old(data);
+
+   for(int x_new=0; x_new<nx_new; x_new++) {
+      int x_old = x_new + W;
+      for(int y_new=0; y_new<ny_new; y_new++) {
+         int y_old = y_new + W;
+         data.put(old.get(x_old, y_old), x_new, y_new);
+      }
+   }
+
+   return;
 }
-
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -1180,173 +892,83 @@ return;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-Cell::Cell()
-
-{
-
-init_from_scratch();
-
-return;
-
+Cell::Cell() {
+   clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Cell::~Cell()
-
-{
-
-clear();
-
+Cell::~Cell() {
+   clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Cell::Cell(const Cell & c)
-
-{
-
-init_from_scratch();
-
-assign(c);
-
+Cell::Cell(const Cell & c) {
+   assign(c);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Cell & Cell::operator=(const Cell & c)
-
-{
-
-if ( this == &c )  return *this;
-
-assign(c);
-
-return *this;
-
+Cell & Cell::operator=(const Cell & c) {
+   if(this == &c) return *this;
+   assign(c);
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-void Cell::init_from_scratch()
-
-{
-
-e = 0;
-
-clear();
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-void Cell::clear()
-
-{
-
-if ( e )  { delete [] e;  e = (int *) nullptr; }
-
-n = 0;
-
-n_alloc = 0;
-
-return;
-
+void Cell::clear() {
+   e.clear();
+   n = 0;
+   n_alloc = 0;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Cell::assign(const Cell & c)
-
-{
-
-int j;
-
-clear();
-
-if ( c.n == 0 )  return;
-
-extend(c.n);
-
-for (j=0; j<(c.n); ++j)  e[j] = c.e[j];
-
-n = c.n;
-
-return;
-
+void Cell::assign(const Cell & c) {
+   clear();
+   if(c.n == 0) return;
+   extend(c.n);
+   e = c.e;
+   n = c.n;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void Cell::extend(int N) {
 
-void Cell::extend(int N)
+   if(n_alloc >= N) return;
 
-{
+   N  = (N + cell_alloc_inc - 1)/cell_alloc_inc;
+   N *= cell_alloc_inc;
 
-if ( n_alloc >= N )  return;
+   e.resize(N);
 
-N = (N + cell_alloc_inc - 1)/cell_alloc_inc;
+   n_alloc = N;
 
-N *= cell_alloc_inc;
-
-int j;
-int * u = 0;
-
-u = new int [N];
-
-for (j=0; j<n; ++j)  u[j] = e[j];
-
-for (j=n; j<N; ++j)  u[j] = -1;
-
-if ( e )  { delete [] e;  e = 0; }
-
-e = u;
-
-n_alloc = N;
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-bool Cell::has(int k) const
-
-{
-
-for (int j=0; j<n; ++j) {
-
-   if ( e[j] == k )  return true;
-
-}
-
-return false;
-
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Cell::add(int k)
+bool Cell::has(int k) const {
+   for(int j=0; j<n; j++) {
+      if(e[j] == k) return true;
+   }
+   return false;
+}
 
-{
+///////////////////////////////////////////////////////////////////////////////
 
-if ( has(k) )  return;
-
-extend(n + 1);
-
-e[n++] = k;
-
-return;
-
+void Cell::add(int k) {
+   if(has(k)) return;
+   extend(n + 1);
+   e[n] = k;
+   n++;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1361,299 +983,148 @@ return;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-Partition::Partition()
-
-{
-
-init_from_scratch();
-
+Partition::Partition() {
+   clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Partition::~Partition()
-
-{
-
-clear();
-
+Partition::~Partition() {
+   clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Partition::Partition(const Partition & p)
-
-{
-
-init_from_scratch();
-
-assign(p);
-
+Partition::Partition(const Partition & p) {
+   assign(p);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-Partition & Partition::operator=(const Partition & p)
-
-{
-
-if ( this == &p )  return *this;
-
-assign(p);
-
-return *this;
-
+Partition & Partition::operator=(const Partition & p) {
+   if(this == &p) return *this;
+   assign(p);
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-void Partition::init_from_scratch()
-
-{
-
-c = (Cell **) nullptr;
-
-clear();
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-void Partition::clear()
-
-{
-
-if ( c )  {
-
-   for (int j=0; j<n_alloc; ++j)  {
-
-     if ( c[j] )  { delete c[j];  c[j] = (Cell *) nullptr; }
-
-   }
-
-   delete [] c;  c = (Cell **) nullptr;
-
-}
-
-n = 0;
-
-n_alloc = 0;
-
-return;
-
+void Partition::clear() {
+   c.clear();
+   n = 0;
+   n_alloc = 0;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Partition::assign(const Partition & p)
-
-{
-
-clear();
-
-if ( !(p.c) )  return;
-
-int j;
-
-extend(p.n);
-
-for (j=0; j<(p.n); ++j)  {
-
-   c[j] = new Cell;
-
-   *(c[j]) = *(p.c[j]);
-
-}
-
-n = p.n;
-
-return;
-
+void Partition::assign(const Partition & p) {
+   clear();
+   if(p.c.empty()) return;
+   extend(p.n);
+   c = p.c;
+   n = p.n;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void Partition::extend(int N) {
 
-void Partition::extend(int N)
+   if(N <= n_alloc) return;
 
-{
+   N  = (N + partition_alloc_inc - 1)/partition_alloc_inc;
+   N *= partition_alloc_inc;
 
-if ( N <= n_alloc )  return;
+   c.resize(N);
 
-Cell ** u = (Cell **) nullptr;
-
-N = partition_alloc_inc*((N + partition_alloc_inc - 1)/partition_alloc_inc);
-
-u = new Cell * [N];
-
-memset(u, 0, N*(sizeof(Cell *)));
-
-if ( c )  {
-
-   for(int j=0; j<n; ++j)  u[j] = c[j];
-
-   delete [] c;  c = (Cell **) nullptr;
-
-}
-
-
-c = u;  u = (Cell **) nullptr;
-
-n_alloc = N;
-
-
-
-return;
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-bool Partition::has(int k) const
-
-{
-
-for (int j=0; j<n; ++j) {
-
-   if ( c[j]->has(k) )  return true;
-
-}
-
-return false;
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-int Partition::which_cell(int k) const
-
-{
-
-for (int j=0; j<n; ++j) {
-
-   if ( c[j]->has(k) )  return j;
-
-}
-
-return -1;
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void Partition::merge_cells(int j_1, int j_2)
-
-{
-
-int nn;
-int j_min, j_max;
-
-
-if ( (j_1 < 0) || (j_1 >= n) || (j_2 < 0) || (j_2 >= n) ) {
-
-   mlog << Error
-        << "\nPartition::merge_cells() -> "
-        << "range check error\n\n";
-
-   exit(1);
-
-}
-
-if ( j_1 == j_2 )  return;
-
-
-
-if ( j_1 < j_2 ) {
-
-   j_min = j_1;
-   j_max = j_2;
-
-} else {
-
-   j_min = j_2;
-   j_max = j_1;
-
-}
-
-nn = c[j_max]->n;
-
-for (int k=0; k<nn; ++k) {
-
-   c[j_min]->add(c[j_max]->e[k]);
-
-}
-
-*(c[j_max]) = *(c[n - 1]);
-
-c[n - 1]->clear();
-
---n;
-
-   //
-   //  done
-   //
-
-return;
-
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void Partition::merge_values(int v1, int v2)
-
-{
-
-int j_1, j_2;
-
-if ( v1 == v2 )  return;
-
-j_1 = which_cell(v1);
-j_2 = which_cell(v2);
-
-if ( (j_1 < 0) || (j_2 < 0) ) {
-
-   mlog << Error
-        << "\nvoid Partition::merge_values() -> "
-        << "bad values: (v1, v2) = (" << v1 << ", " << v2
-        << "), (j1, j2) = (" << j_1 << ", " << j_2 << ")\n\n";
+   n_alloc = N;
 
    return;
-
-}
-
-merge_cells(j_1, j_2);
-
-   //
-   //  done
-   //
-
-return;
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void Partition::add(int k)
+bool Partition::has(int k) const {
+   for(int j=0; j<n; j++) {
+      if(c[j].has(k)) return true;
+   }
+   return false;
+}
 
-{
+///////////////////////////////////////////////////////////////////////////////
 
-if ( has(k) )  return;
+int Partition::which_cell(int k) const {
+   for(int j=0; j<n; j++) {
+      if(c[j].has(k)) return j;
+   }
+   return -1;
+}
 
-extend(n + 1);
+///////////////////////////////////////////////////////////////////////////////
 
-c[n] = new Cell;
+void Partition::merge_cells(int j_1, int j_2) {
 
-c[n]->add(k);
+   if (j_1 < 0 || j_1 >= n || j_2 < 0 || j_2 >= n) {
+      mlog << Error << "\nPartition::merge_cells() -> "
+           << "range check error\n\n";
+      exit(1);
+   }
 
-++n;
+   if(j_1 == j_2) return;
 
-return;
+   int j_min;
+   int j_max;
+   if(j_1 < j_2) {
+      j_min = j_1;
+      j_max = j_2;
+   }
+   else {
+      j_min = j_2;
+      j_max = j_1;
+   }
 
+   int nn = c[j_max].n;
+   for(int k=0; k<nn; k++) {
+      c[j_min].add(c[j_max].e[k]);
+   }
+
+   c[j_max] = c[n - 1];
+   c[n - 1].clear();
+   n--;
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Partition::merge_values(int v1, int v2) {
+
+   if(v1 == v2) return;
+
+   int j_1 = which_cell(v1);
+   int j_2 = which_cell(v2);
+
+   if(j_1 < 0 || j_2 < 0) {
+      mlog << Error << "\nvoid Partition::merge_values() -> "
+           << "bad values: (v1, v2) = (" << v1 << ", " << v2
+           << "), (j1, j2) = (" << j_1 << ", " << j_2 << ")\n\n";
+      exit(1);
+   }
+
+   merge_cells(j_1, j_2);
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void Partition::add(int k) {
+   if(has(k)) return;
+   extend(n + 1);
+   c[n].add(k);
+   n++;
+   return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1668,24 +1139,17 @@ return;
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-double dot(double x_1, double y_1, double x_2, double y_2)
-
-{
-
-double d;
-
-d = x_1*x_2 + y_1*y_2;
-
-return d;
-
+static double dot(double x_1, double y_1, double x_2, double y_2) {
+   return x_1*x_2 + y_1*y_2;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
-   bool lr, ur, ul, ll;
-
-   lr = ur = ul = ll = false;
+static void boundary_step(const ShapeData &sd, int &xn, int &yn, int &direction) {
+   bool lr = false;
+   bool ur = false;
+   bool ul = false;
+   bool ll = false;
 
    //
    // Based on the direction of travel turn on/off lr, ur, ul, ll cells
@@ -1815,46 +1279,45 @@ StepCase get_step_case(bool lr, bool ur, bool ul, bool ll) {
            << ur << ", " << ul << ", " << ll << ")\n\n";
       exit(1);
    }
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void apply_mask(ShapeData &f, ShapeData &mask)
-
-{
+void apply_mask(ShapeData &f, const ShapeData &mask) {
 
    if(f.data.nx() != mask.data.nx() ||
       f.data.ny() != mask.data.ny() ) {
-
       mlog << Error << "\napply_mask() -> "
            << "grid dimensions do not match\n\n";
       exit(1);
    }
 
-   for(int x=0; x<f.data.nx(); x++) {
-      for(int y=0; y<f.data.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(f, mask, bad_data_float)
+   {
 
-         //
-         // Put bad data everywhere the mask is turned off
-         //
-         if(!mask.s_is_on(x, y)) f.data.set(bad_data_float, x, y);
+      //
+      // Put bad data everywhere the mask is turned off
+      //
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<f.data.nx(); x++) {
+         for(int y=0; y<f.data.ny(); y++) {
+            if(!mask.s_is_on(x, y)) f.data.set(bad_data_float, x, y);
+         }
       }
-   }
+   } // End omp parallel
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int ShapeData::n_objects() const
-
-{
-   int n;
-   ShapeData sd;
+int ShapeData::n_objects() const {
 
    // Split the field to number the shapes
-   sd = split(*this, n);
+   int n;
+   ShapeData sd_split(split(*this, n));
 
    return n;
 }
@@ -1862,55 +1325,47 @@ int ShapeData::n_objects() const
 ///////////////////////////////////////////////////////////////////////////////
 
 void ShapeData::threshold(SingleThresh t) {
-   int j, x, y;
-   double v;
-   const int nx = data.nx();
-   const int ny = data.ny();
 
    //
    // Compare the threshold double value to the double values for the
    // ShapeData field
    //
-   for(x=0; x<nx; x++) {
-      for(y=0; y<ny; y++) {
+   const int nxy = data.nxy();
 
-         v = data(x, y);
+#pragma omp parallel default(none) \
+   shared(t, data, nxy)
+   {
 
-         if(t.check(v) && ! ::is_bad_data(v)) {
-            j = 1;
-         }
-         else {
-            j = 0;
-         }
-         data.set((double) j, x, y);
-      } // end for y
-   } // end for x
+#pragma omp for schedule(static)
+      for(int j=0; j<nxy; j++) {
+
+         double v = data.buf()[j];
+
+         data.buf()[j] = (t.check(v) && ! ::is_bad_data(v) ? 1.0 : 0.0);
+      }
+   } // End omp parallel
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void ShapeData::set_to_1_or_0()
-{
-   int j;
-   double v;
-   const int nx = data.nx();
-   const int ny = data.ny();
+void ShapeData::set_to_1_or_0() {
 
-   for(int x=0; x<nx; x++) {
-      for(int y=0; y<ny; y++) {
+   const int nxy = data.nxy();
 
-         //v = data(x, y);
-         if(is_bad_data(x, y)) {
-            j = 0;
-         }
-         else {
-            j = 1;
-         }
-         data.set((double) j, x, y);
-      } // end for y
-   } // end for x
+#pragma omp parallel default(none) \
+   shared(data, nxy)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<nxy; j++) {
+
+         double v = data.buf()[j];
+
+         data.buf()[j] = (::is_bad_data(v) ? 0.0 : 1.0);
+      }
+   } // End omp parallel
 
    return;
 }
@@ -1922,39 +1377,36 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
                                const SingleThresh &obj_thresh,
                                const Grid *grid,
                                bool precip_flag) {
-   int i, j, n;
-   ShapeData sd_split, sd_object;
-   map<ConcatString,ThreshArray>::const_iterator it;
-   double attr_val;
 
    // Split the field to number the shapes
-   sd_split = split(*this, n);
+   int n;
+   ShapeData sd_split(split(*this, n));
 
-   bool * keep_object = new bool [1 + n];  // keep_object[0] is ignored
+   vector<bool> keep_object(n+1);  // keep_object[0] is ignored
 
    // Apply attribute filtering logic to each object
-   for(i=1; i<=n; i++) {
+   for(int i=1; i<=n; i++) {
 
       // Select the current object
-      sd_object = select(sd_split, i);
+      ShapeData sd_object(select(sd_split, i));
       keep_object[i] = true;
 
       // Loop over attribute filter map
-      for(it=attr_map.begin(); it!= attr_map.end(); it++) {
+      for(const auto &it : attr_map) {
 
-         attr_val = sd_object.get_attr(it->first, raw_ptr, obj_thresh, grid,
-                                       precip_flag);
+         double attr_val = sd_object.get_attr(it.first, raw_ptr, obj_thresh,
+                                              grid, precip_flag);
 
          // Discard objects whose attributes do not meet the threshold criteria
-         for(j=0; j<it->second.n_elements(); j++) {
+         for(int j=0; j<it.second.n_elements(); j++) {
 
-            keep_object[i] = it->second[j].check(attr_val);
+            keep_object[i] = it.second[j].check(attr_val);
 
             // Break out of the ThreshArray loop
             if(!keep_object[i]) {
                mlog << Debug(4)
-                    << "Discarding object since " << it->first << " of "
-                    << attr_val << " is not " << it->second[j].get_str()
+                    << "Discarding object since " << it.first << " of "
+                    << attr_val << " is not " << it.second[j].get_str()
                     << ".\n";
                break;
             }
@@ -1967,42 +1419,37 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
    } // end for i
 
    // Zero out discarded shapes
-   int Nxy = data.nx()*data.ny();
-   for(i=0; i<Nxy; i++) {
-      if(!keep_object[nint(sd_split.data.buf()[i])]) data.buf()[i] = 0.0;
-   }
+   const int nxy = data.nxy();
 
-   // Clean up
-   if(keep_object) { delete [] keep_object; keep_object = (bool *) nullptr; }
+#pragma omp parallel default(none) \
+   shared(keep_object, sd_split, data, nxy)
+   {
+
+#pragma omp for schedule(static)
+      for(int i=0; i<nxy; i++) {
+         int obj_id = nint(sd_split.data.buf()[i]);
+         if(!keep_object[obj_id]) data.buf()[i] = 0.0;
+      }
+   } // End omp parallel
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-void ShapeData::threshold_area(SingleThresh t)
-
-{
-
-   int j, n, x, y, v_int;
-   ShapeData sd_split, sd_object;
-   const int nx = data.nx();
-   const int ny = data.ny();
+void ShapeData::threshold_area(SingleThresh t) {
 
    // Split the field to number the shapes
-   sd_split = split(*this, n);
+   int n;
+   ShapeData sd_split(split(*this, n));
 
-   double * area_object = new double [1 + n];  // area_object[0] is ignored
-
-   // Zero out area array
-   for(j=0; j<=n; j++) area_object[j] = 0;   // want <= here, not <
+   vector<double> area_object(n+1);  // area_object[0] is ignored
 
    //
    // Compute the area of each object
    //
-   for(j=1; j<=n; j++) {
-      sd_object = select(sd_split, j);
+   for(int j=1; j<=n; j++) {
+      ShapeData sd_object(select(sd_split, j));
       area_object[j] = sd_object.area();
    }
 
@@ -2010,36 +1457,26 @@ void ShapeData::threshold_area(SingleThresh t)
    // Zero out any shapes with an area that doesn't meet the
    // threshold criteria
    //
-   for(x=0; x<nx; x++) {
-      for(y=0; y<ny; y++) {
+   const int nxy = data.nxy();
 
-         v_int = nint(sd_split.data(x, y));
+#pragma omp parallel default(none) \
+   shared(t, area_object, sd_split, data, nxy)
+   {
 
-         if(!t.check(area_object[v_int])) {
-            data.set(0.0, x, y);
-         }
-
-      } // end for y
-   } // end for x
-
-   if ( area_object )  { delete [] area_object;  area_object = (double *) nullptr; }
+#pragma omp for schedule(static)
+      for(int i=0; i<nxy; i++) {
+         int obj_id = nint(sd_split.data.buf()[i]);
+         if(!t.check(area_object[obj_id])) data.buf()[i] = 0.0;
+      }
+   } // End omp parallel
 
    return;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
-void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThresh t)
-
-{
-   int i, n, x, y, v_int, n_obj_inten;
-   ShapeData s;
-   double *obj_inten = (double *) nullptr;
-   double obj_inten_sum;
-   const int nx = data.nx();
-   const int ny = data.ny();
+void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc,
+                                    SingleThresh t) {
 
    if(perc < 0 || perc > 102) {
       mlog << Error << "\nShapeData:threshold_intensity() -> "
@@ -2047,56 +1484,56 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThr
       exit(1);
    }
 
-   obj_inten = new double [nx*ny];
-
    //
    // Split the field to number the shapes
    //
-   s = split(*this, n);
+   int n;
+   ShapeData sd_split(split(*this, n));
 
-   double * inten_object = new double [1 + n];  // area_object[0] is ignored
+   vector<double> inten_object(n+1);  // inten_object[0] is ignored
+
+   int nx = data.nx();
+   int ny = data.ny();
 
    //
    // For each object, compute the requested percentile of intensity
    //
-   for(i=0; i<n; i++) {
+   for(int i=0; i<n; i++) {
+   
+      vector<double> raw_v;
+      raw_v.reserve(nx*ny);
 
-      n_obj_inten = 0;
-      obj_inten_sum = 0.0;
-      for(x=0; x<nx; x++) {
-         for(y=0; y<ny; y++) {
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
 
-            v_int = nint(s.data(x, y));
+            int obj_id = nint(sd_split.data(x, y));
 
-            if(v_int != i+1) continue;
+            if(obj_id != i+1) continue;
 
             if(sd_ptr->is_valid_xy(x, y)) {
-               obj_inten[n_obj_inten] = sd_ptr->data(x, y);
-               obj_inten_sum += obj_inten[n_obj_inten];
-               n_obj_inten++;
+               raw_v.emplace_back(sd_ptr->data(x, y));
             }
          } // end for y
       } // end for x
-
-      sort(obj_inten, n_obj_inten);
 
       //
       // Compute the mean of the intensities
       //
       if(perc == 101) {
-         inten_object[i+1] = obj_inten_sum/n_obj_inten;
+         inten_object[i+1] = accumulate(raw_v.begin(), raw_v.end(), 0.0)/(double) raw_v.size();
       }
       //
       // Compute the sum of the intensities
       //
       else if(perc == 102) {
-         inten_object[i+1] = obj_inten_sum;
+         inten_object[i+1] = accumulate(raw_v.begin(), raw_v.end(), 0.0);
       }
       //
       // Compute a percentile of intensity
       //
       else {
-         inten_object[i+1] = percentile(obj_inten, n_obj_inten, (double) perc/100.0);
+         sort(raw_v.begin(), raw_v.end());
+         inten_object[i+1] = percentile(raw_v.data(), (int) raw_v.size(), (double) perc/100.0);
       }
    }
 
@@ -2104,308 +1541,252 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc, SingleThr
    // Zero out any shapes with an intensity that doesn't meet the
    // threshold criteria
    //
-   for(x=0; x<nx; x++) {
-      for(y=0; y<ny; y++) {
+   const int nxy = data.nxy();
 
-         v_int = nint(s.data(x, y));
+#pragma omp parallel default(none) \
+   shared(t, inten_object, sd_split, data, nxy)
+   {
 
-         if(!t.check(inten_object[v_int])) {
-            data.set(0.0, x, y);
-         }
-
-      } // end for y
-   } // end for x
-
-   if(obj_inten) { delete [] obj_inten; obj_inten = (double *) nullptr; }
-
-   if ( inten_object )  { delete [] inten_object;   inten_object = (double *) nullptr; }
+#pragma omp for schedule(static)
+      for(int i=0; i<nxy; i++) {
+         int obj_id = nint(sd_split.data.buf()[i]);
+         if(!t.check(inten_object[obj_id])) data.buf()[i] = 0.0;
+      }
+   } // End omp parallel
 
    return;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
+ShapeData split(const ShapeData & wfd, int & n_shapes) {
+   int current_shape;
+   bool shape_assigned = false;
+   ShapeData out(wfd);
+   ShapeData fat(wfd);
+   Partition p;
 
-ShapeData split(const ShapeData & wfd, int & n_shapes)
+   if(do_split_fatten) fat.expand(split_enlarge);
 
-{
+   int nx = fat.data.nx();
+   int ny = fat.data.ny();
 
-int k, x, y;
-int s;
-int xx, yy, nx, ny;
-int current_shape;
-bool shape_assigned = false;
-ShapeData d;
-ShapeData out = wfd;
-ShapeData fat = wfd;
-Partition p;
+   ShapeData d;
+   d.data.set_size(nx, ny);
 
-
-if ( do_split_fatten )  fat.expand(split_enlarge);
-
-
-nx = fat.data.nx();
-ny = fat.data.ny();
-
-d.data.set_size(nx, ny);
-
-n_shapes = 0;
+   n_shapes = 0;
 
    //
-   //  shape numbers start at ONE here!!
+   // Shape numbers start at ONE here!!
    //
+   current_shape = 0;
 
-current_shape = 0;
+   for(int y=(fat.data.ny() - 2); y>=0; --y) {
+      for(int x=(fat.data.nx() - 2); x>=0; --x) {
 
-for (y=(fat.data.ny() - 2); y>=0; --y) {
+         if(!fat.s_is_on(x,y)) continue;
 
-   for (x=(fat.data.nx() - 2); x>=0; --x) {
-
-      s = fat.s_is_on(x, y);
-
-      if ( !s ) continue;
-
-      shape_assigned = false;
+         shape_assigned = false;
 
          //
-         //  check above left
+         // Check above left
          //
+         int xx = x - 1;
+         int yy = y + 1;
 
-      xx = x - 1;
-      yy = y + 1;
+         if(xx >= 0 &&
+            yy < ny &&
+            fat.s_is_on(xx, yy)) {
 
-      if ( (xx >= 0) && (yy < ny) ) {
-
-         s = fat.s_is_on(xx, yy);
-
-         if ( s ) {
-
-            if ( shape_assigned )
+            if(shape_assigned) {
                p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-            else
+            }
+            else {
                d.data.set(d.data(xx, yy), x, y);
-
-            shape_assigned = true;
-
-         }
-
-      }
-
-         //
-         //  check above
-         //
-
-      xx = x;
-      yy = y + 1;
-
-      if ( yy < ny ) {
-
-         s = fat.s_is_on(xx, yy);
-
-         if ( s ) {
-
-            if ( shape_assigned )
-               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-            else
-               d.data.set(d.data(xx, yy), x, y);
-
-            shape_assigned = true;
-
-         }
-
-      }
-
-         //
-         //  check upper right
-         //
-
-      xx = x + 1;
-      yy = y + 1;
-
-      if ( (xx < nx) && (yy < ny) ) {
-
-         s = fat.s_is_on(xx, yy);
-
-         if ( s ) {
-
-            if ( shape_assigned )
-               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-            else
-               d.data.set(d.data(xx, yy), x, y);
-
+            }
             shape_assigned = true;
          }
-      }
 
          //
-         //  check to the right
+         // Check above
          //
+         xx = x;
+         yy = y + 1;
 
-      xx = x + 1;
-      yy = y;
+         if(yy < ny &&
+            fat.s_is_on(xx, yy)) {
 
-      if ( xx < nx ) {
-
-         s = fat.s_is_on(xx, yy);
-
-         if ( s ) {
-
-            if ( shape_assigned )
+            if(shape_assigned) {
                p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
-            else
+            }
+            else {
                d.data.set(d.data(xx, yy), x, y);
-
+            }
             shape_assigned = true;
          }
-      }
 
          //
-         //  is it a new shape?
+         // Check upper right
+         //
+         xx = x + 1;
+         yy = y + 1;
+
+         if(xx < nx &&
+            yy < ny &&
+            fat.s_is_on(xx, yy)) {
+
+            if(shape_assigned) {
+               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
+            }
+            else {
+               d.data.set(d.data(xx, yy), x, y);
+            }
+            shape_assigned = true;
+         }
+
+         //
+         // Check to the right
+         //
+         xx = x + 1;
+         yy = y;
+
+         if(xx < nx &&
+            fat.s_is_on(xx, yy)) {
+
+            if(shape_assigned) {
+               p.merge_values(nint(d.data(x, y)), nint(d.data(xx, yy)));
+            }
+            else {
+               d.data.set(d.data(xx, yy), x, y);
+            }
+            shape_assigned = true;
+         }
+
+         //
+         // Is it a new shape?
          //
 
-      if ( !shape_assigned ) {
-
-         d.data.set(++current_shape, x, y);
-
-         p.add(nint(d.data(x, y)));
-
-      }
-
-   } // for x
-
-} // for y
-
-
-if ( do_split_fatten )  d.shrink(split_enlarge);
-
-
-     ///////////////////////////////////
-
-nx = wfd.data.nx();
-ny = wfd.data.ny();
-
-for (x=0; x<nx; ++x) {
-
-   for (y=0; y<ny; ++y) {
-
-      out.data.set(0, x, y);
-
-      for (k=0; k<(p.n); ++k) {
-
-         if ( p.c[k]->has(nint(d.data(x, y))) )   out.data.set(k + 1, x, y);
-
-      }
-
+         if(!shape_assigned) {
+            current_shape++;
+            d.data.set(current_shape, x, y);
+            p.add(nint(d.data(x, y)));
+         }
+      } // for x
    } // for y
 
-} // for x
-
+   if(do_split_fatten) d.shrink(split_enlarge);
 
      ///////////////////////////////////
 
+   nx = wfd.data.nx();
+   ny = wfd.data.ny();
 
-n_shapes = p.n;
+   for(int x=0; x<nx; x++) {
+      for(int y=0; y<ny; y++) {
 
-out.calc_moments();
+         out.data.set(0, x, y);
+
+         for(int k=0; k<(p.n); k++) {
+            if(p.c[k].has(nint(d.data(x, y)))) {
+               out.data.set(k + 1, x, y);
+            }
+         }
+      } // for y
+   } // for x
+
+     ///////////////////////////////////
+
+   n_shapes = p.n;
+
+   out.calc_moments();
 
    //
    //  done
    //
 
-return out;
-
+   return out;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ShapeData select(const ShapeData &id, int n)
+ShapeData select(const ShapeData &id, int n) {
 
-{
-   int k;
-   int nx, ny;
-   int count;
-   ShapeData d = id;
+   ShapeData d(id);
+   const int nxy = id.data.nxy();
 
-   nx = id.data.nx();
-   ny = id.data.ny();
+#pragma omp parallel default(none) \
+   shared(id, d, n, nxy)
+   {
 
-   count = 0;
-
-   for(int x=0; x<nx; ++x) {
-      for(int y=0; y<ny; ++y) {
-
-         k = nint(id.data(x, y));
-
-         if(k == n) {
-            d.data.set(1, x, y);
-
-            ++count;
-         }
-         else {
-            d.data.set(0, x, y);
-         }
+#pragma for schedule(static)
+      for(int j=0; j<nxy; j++) {
+         int obj_id = nint(id.data.data()[j]);
+         if(obj_id == n) d.data.buf()[j] = 1;
+         else            d.data.buf()[j] = 0;
       }
-   }
+   } // End omp parallel
+
    d.calc_moments();
 
    return d;
-
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 void ShapeData::filter(SingleThresh t) {
-   double v;
-   const int nx = data.nx();
-   const int ny = data.ny();
 
-   for (int x=0; x<nx; ++x) {
-      for (int y=0; y<ny; ++y) {
+   const int nxy = data.nxy();
 
-         v = data(x, y);
+#pragma omp parallel default(none) \
+   shared(t, data, nxy)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<nxy; j++) {
+
+         double v = data.buf()[j];
 
          if(!t.check(v) && ! ::is_bad_data(v)) {
-            data.set(0.0, x, y);
+            data.buf()[j] = 0.0;
          }
-
-      } // end for y
-   } // end for x
+      }
+   } // End omp parallel
 
    return;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-
 int ShapeData_intersection(const ShapeData &f1, const ShapeData &f2) {
-   int intersection;
 
    //
    // Check for the same grid dimension
    //
    if(f1.data.nx() != f2.data.nx() ||
       f1.data.ny() != f2.data.ny() ) {
-
       mlog << Error << "\nShapeData_intersection() -> "
            << "grid dimensions do not match\n\n";
       exit(1);
    }
 
-   intersection = 0;
-   for(int x=0; x<f1.data.nx(); x++) {
-      for(int y=0; y<f1.data.ny(); y++) {
+   int intersection = 0;
 
-         if(f1.s_is_on(x, y) && f2.s_is_on(x, y)) intersection++;
-      } // end for y
-   } // end for x
+#pragma omp parallel default(none) \
+   shared(f1, f2, intersection)
+   {
+
+#pragma omp for schedule(static) \
+                reduction(+: intersection) \
+                collapse(2)
+      for(int x=0; x<f1.data.nx(); x++) {
+         for(int y=0; y<f1.data.ny(); y++) {
+            if(f1.s_is_on(x, y) && f2.s_is_on(x, y)) intersection++;
+         }
+      }
+   } // End omp parallel
 
    return intersection;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //

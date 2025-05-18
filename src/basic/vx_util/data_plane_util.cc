@@ -38,7 +38,6 @@ using namespace std;
 //
 ////////////////////////////////////////////////////////////////////////
 
-
 ////////////////////////////////////////////////////////////////////////
 //
 // Check the range of probability values and make sure it's either
@@ -47,12 +46,12 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 void rescale_probability(DataPlane &dp) {
-   double v, min_v, max_v;
-   int x, y;
 
    //
    // Get the range of data values in the field
    //
+   double min_v;
+   double max_v;
    dp.data_range(min_v, max_v);
 
    //
@@ -73,18 +72,23 @@ void rescale_probability(DataPlane &dp) {
       mlog << Debug(3)
            << "Rescaling probabilistic field from [0,100] to [0,1].\n";
 
-      //
-      // Divide each value by 100
-      //
-      for(x=0; x<dp.nx(); x++) {
-         for(y=0; y<dp.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(dp)
+      {
+         //
+         // Divide each value by 100
+         //
+#pragma omp for schedule(static) \
+                collapse(2) 
+         for(int x=0; x<dp.nx(); x++) {
+            for(int y=0; y<dp.ny(); y++) {
 
-            v = dp.get(x, y);
-            if(!is_bad_data(v)) dp.set(v/100.0, x, y);
+               double v = dp.get(x, y);
+               if(!is_bad_data(v)) dp.set(v/100.0, x, y);
 
-         } // end for y
-      } // end for x
-
+            } // end for y
+         } // end for x
+      } // End omp parallel
    }
 
    return;
@@ -102,8 +106,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
                   InterpMthd mthd, int width,
                   const GridTemplateFactory::GridTemplates shape,
                   bool wrap_lon, double t, const GaussianInfo &gaussian) {
-   double v = 0.0;
-   int x, y;
+   double v;
 
    // Initialize the smoothed field to the raw field
    smooth_dp = dp;
@@ -111,73 +114,85 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    // For nearest neighbor, no work to do.
    if(width == 1 && mthd == InterpMthd::Nearest) return;
 
-   // build the grid template
-   GridTemplateFactory gtf;
-   GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
+#pragma omp parallel default(none) \
+   shared(mlog, Error, dp, smooth_dp) \
+   shared(mthd, width, shape, wrap_lon, t, gaussian) \
+   private(v)
+   {
 
-   mlog << Debug(3)
-        << "Smoothing " << (wrap_lon ? "global" : "non-global")
-        << " field using the " << interpmthd_to_string(mthd)
-        << "(" << gt->size() << ") " << gt->getClassName()
-        << " interpolation method.\n";
+      // build the grid template
+      GridTemplateFactory gtf;
+      GridTemplate* gt = gtf.buildGT(shape, width, wrap_lon);
 
-   // Otherwise, apply smoothing to each grid point
-   for(x=0; x<dp.nx(); x++) {
-      for(y=0; y<dp.ny(); y++) {
+#pragma omp single
+   {
+      mlog << Debug(3)
+           << "Smoothing " << (wrap_lon ? "global" : "non-global")
+           << " field using the " << interpmthd_to_string(mthd)
+           << "(" << gt->size() << ") " << gt->getClassName()
+           << " interpolation method.\n";
+   } 
 
-         // Compute the smoothed value based on the interpolation method
-         switch(mthd) {
+      // Otherwise, apply smoothing to each grid point
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<dp.nx(); x++) {
+         for(int y=0; y<dp.ny(); y++) {
 
-            case InterpMthd::Min:      // Minimum
-               v = interp_min(dp, *gt, x, y, t);
-               break;
+            // Compute the smoothed value based on the interpolation method
+            switch(mthd) {
 
-            case InterpMthd::Max:      // Maximum
-               v = interp_max(dp, *gt, x, y, t);
-               break;
+               case InterpMthd::Min:      // Minimum
+                  v = interp_min(dp, *gt, x, y, t);
+                  break;
 
-            case InterpMthd::Median:   // Median
-               v = interp_median(dp, *gt, x, y, t);
-               break;
+               case InterpMthd::Max:      // Maximum
+                  v = interp_max(dp, *gt, x, y, t);
+                  break;
 
-            case InterpMthd::UW_Mean:  // Unweighted Mean
-               v = interp_uw_mean(dp, *gt, x, y, t);
-               break;
+               case InterpMthd::Median:   // Median
+                  v = interp_median(dp, *gt, x, y, t);
+                  break;
 
-            case InterpMthd::Gaussian: // For Gaussian, pass the data through
-               v = dp.get(x, y);
-               break;
+               case InterpMthd::UW_Mean:  // Unweighted Mean
+                  v = interp_uw_mean(dp, *gt, x, y, t);
+                  break;
 
-            case InterpMthd::MaxGauss: // For Max Gaussian, compute the max
-               v = interp_max(dp, *gt, x, y, 0);
-               break;
+               case InterpMthd::Gaussian: // For Gaussian, pass the data through
+                  v = dp.get(x, y);
+                  break;
 
-            // Distance-weighted mean, area-weighted mean, least-squares
-            // fit, and bilinear are omitted here since they are not
-            // options for gridded data.
+               case InterpMthd::MaxGauss: // For Max Gaussian, compute the max
+                  v = interp_max(dp, *gt, x, y, 0);
+                  break;
 
-            default:
-               mlog << Error << "\nsmooth_field() -> "
-                    << "unsupported interpolation method encountered: "
-                    << interpmthd_to_string(mthd) << "(" << enum_class_as_int(mthd)
-                    << ")\n\n";
-               exit(1);
-         }
+               // Distance-weighted mean, area-weighted mean, least-squares
+               // fit, and bilinear are omitted here since they are not
+               // options for gridded data.
+               default:
+                  mlog << Error << "\nsmooth_field() -> "
+                       << "unsupported interpolation method encountered: "
+                       << interpmthd_to_string(mthd) << "(" << enum_class_as_int(mthd)
+                       << ")\n\n";
+                  exit(1);
+            }
 
-         // Store the smoothed value
-         smooth_dp.set(v, x, y);
+            // Store the smoothed value
+            smooth_dp.set(v, x, y);
 
-      } // end for y
-   } // end for x
+         } // end for y
+      } // end for x
 
-   // Apply the Gaussian smoother 
-   if(mthd == InterpMthd::Gaussian ||
-      mthd == InterpMthd::MaxGauss) {
-      interp_gaussian_dp(smooth_dp, gaussian, t);
-   }
+      // Apply the Gaussian smoother 
+      if(mthd == InterpMthd::Gaussian ||
+         mthd == InterpMthd::MaxGauss) {
+         interp_gaussian_dp(smooth_dp, gaussian, t);
+      }
 
-   // Cleanup
-   delete gt;
+      // Cleanup
+      delete gt;
+
+   } // End omp parallel
 
    return;
 }
@@ -214,7 +229,6 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
         const DataPlane *ocmn, const DataPlane *ocsd,
         double vld_t) {
    GridPoint *gp = nullptr;
-   int x, y;
    int n_vld = 0;
    int n_thr = 0;
    double v;
@@ -272,10 +286,10 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
       }
    }
 
-#pragma omp parallel default(none)                      \
+#pragma omp parallel default(none) \
    shared(mlog, dp, frac_dp, shape, width, wrap_lon, t) \
-   shared(use_climo, fcmn, fcsd, ocmn, ocsd, vld_t, bad)\
-   private(x, y, n_vld, n_thr, gp, v)
+   shared(use_climo, fcmn, fcsd, ocmn, ocsd, vld_t, bad) \
+   private(n_vld, n_thr, gp, v)
    {
 
      // Build the grid template
@@ -296,9 +310,9 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
      }
 
      // Compute the fractional coverage meeting the threshold criteria
-#pragma omp for schedule (static)
-     for(x=0; x<dp.nx(); x++) {
-        for(y=0; y<dp.ny(); y++) {
+#pragma omp for schedule(static)
+     for(int x=0; x<dp.nx(); x++) {
+        for(int y=0; y<dp.ny(); y++) {
 
            // For a new column, reset the grid template and counts.
            if(y == 0) {
@@ -402,9 +416,10 @@ void apply_mask(const DataPlane &in, const MaskPlane &mask,
 
    int Nxy = mask.nx() * mask.ny();
 
+   // Do not parallelize to preserve output order
    for(int i=0; i<Nxy; i++) {
 
-      // Store the values where the mask in on
+      // Store the values where the mask is on
       if(mask.data()[i]) {
          na.add(in.nx() == 0 && in.ny() == 0 ?
                 bad_data_double : in.data()[i]);
@@ -430,11 +445,17 @@ void apply_mask(DataPlane &in, const MaskPlane &mask) {
 
    int Nxy = mask.nx() * mask.ny();
 
-   for(int i=0; i<Nxy; i++) {
-      if(!is_bad_data(in.data()[i]) && !mask.data()[i]) {
-         in.buf()[i] = bad_data_double;
+#pragma omp parallel default(none) \
+   shared(in, mask, Nxy, bad_data_double)
+   {
+
+#pragma omp for schedule(static)
+      for(int i=0; i<Nxy; i++) {
+         if(!is_bad_data(in.data()[i]) && !mask.data()[i]) {
+            in.buf()[i] = bad_data_double;
+         }
       }
-   }
+   } // End omp parallel
 
    return;
 }
@@ -455,9 +476,15 @@ void apply_mask(MaskPlane &in, const MaskPlane &mask) {
 
    int Nxy = mask.nx() * mask.ny();
 
-   for(int i=0; i<Nxy; i++) {
-      if(!mask.data()[i]) in.buf()[i] = false;
-   }
+#pragma omp parallel default(none) \
+   shared(in, mask, Nxy)
+   {
+
+#pragma omp for schedule(static)
+      for(int i=0; i<Nxy; i++) {
+         if(!mask.data()[i]) in.buf()[i] = false;
+      }
+   } // End omp parallel
 
    return;
 }
@@ -478,11 +505,17 @@ void mask_bad_data(DataPlane &dp, const DataPlane &mask_dp, double v) {
 
    int Nxy = mask_dp.nx() * mask_dp.ny();
 
-   for(int i=0; i<Nxy; i++) {
-      if(is_bad_data(mask_dp.data()[i])) {
-         dp.buf()[i] = v;
+#pragma omp parallel default(none) \
+   shared(dp, mask_dp, v, Nxy)
+   {
+
+#pragma omp for schedule(static)
+      for(int i=0; i<Nxy; i++) {
+         if(is_bad_data(mask_dp.data()[i])) {
+            dp.buf()[i] = v;
+         }
       }
-   }
+   } // End omp parallel
 
    return;
 }
@@ -503,11 +536,17 @@ void mask_bad_data(MaskPlane &mp, const DataPlane &dp) {
 
    int Nxy = dp.nx() * dp.ny();
 
-   for(int i=0; i<Nxy; i++) {
-      if(is_bad_data(dp.data()[i])) {
-         mp.buf()[i] = false;
+#pragma omp parallel default(none) \
+   shared(mp, dp, Nxy)
+   {
+
+#pragma omp for schedule(static)
+      for(int i=0; i<Nxy; i++) {
+         if(is_bad_data(dp.data()[i])) {
+            mp.buf()[i] = false;
+         }
       }
-   }
+   } // End omp parallel
 
    return;
 }
@@ -515,8 +554,7 @@ void mask_bad_data(MaskPlane &mp, const DataPlane &dp) {
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane subtract(const DataPlane &dp1, const DataPlane &dp2) {
-   DataPlane diff = dp1;
-   double v;
+   DataPlane diff(dp1);
 
    if(dp1.nx() != dp2.nx() || dp1.ny() != dp2.ny()) {
       mlog << Error << "\nsubtract() -> "
@@ -524,13 +562,22 @@ DataPlane subtract(const DataPlane &dp1, const DataPlane &dp2) {
       exit(1);
    }
 
-   for(int x=0; x<dp1.nx(); x++) {
-      for(int y=0; y<dp1.ny(); y++) {
-         v = (is_bad_data(dp1.get(x,y)) || is_bad_data(dp2.get(x,y)) ?
-              bad_data_double : dp1.get(x,y) - dp2.get(x,y));
-         diff.set(v, x, y);
+#pragma omp parallel default(none) \
+   shared(dp1, dp2, diff, bad_data_double)
+   {
+
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<dp1.nx(); x++) {
+         for(int y=0; y<dp1.ny(); y++) {
+            double v = (is_bad_data(dp1.get(x,y)) ||
+                        is_bad_data(dp2.get(x,y)) ?
+                        bad_data_double :
+                        dp1.get(x,y) - dp2.get(x,y));
+            diff.set(v, x, y);
+         }
       }
-   }
+   } // End omp parallel
 
    return diff;
 }
@@ -539,8 +586,7 @@ DataPlane subtract(const DataPlane &dp1, const DataPlane &dp2) {
 
 DataPlane normal_cdf(const DataPlane &dp, const DataPlane &mn,
                      const DataPlane &sd) {
-   DataPlane cdf = mn;
-   double v;
+   DataPlane cdf(mn);
 
    // Check grid dimensions
    if(dp.nx() != mn.nx() || dp.ny() != mn.ny() ||
@@ -550,17 +596,28 @@ DataPlane normal_cdf(const DataPlane &dp, const DataPlane &mn,
       exit(1);
    }
 
+#pragma omp parallel default(none) \
+   shared(dp, mn, sd, cdf, bad_data_double)
+   {
+
    // Compute the normal CDF for each grid point
-   for(int x=0; x<dp.nx(); x++) {
-      for(int y=0; y<dp.ny(); y++) {
-         v = (is_bad_data(dp.get(x,y)) ||
-              is_bad_data(mn.get(x,y)) ||
-              is_bad_data(sd.get(x,y)) ?
-              bad_data_double :
-              normal_cdf(dp.get(x,y), mn.get(x,y), sd.get(x,y)));
-         cdf.set(v, x, y);
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<dp.nx(); x++) {
+         for(int y=0; y<dp.ny(); y++) {
+            double v;
+            if(is_bad_data(dp.get(x,y)) ||
+               is_bad_data(mn.get(x,y)) ||
+               is_bad_data(sd.get(x,y))) {
+               v = bad_data_double;
+            }
+            else {
+               v = normal_cdf(dp.get(x,y), mn.get(x,y), sd.get(x,y));
+            }
+            cdf.set(v, x, y);
+         }
       }
-   }
+   } // End omp parallel
 
    return cdf;
 }
@@ -569,8 +626,7 @@ DataPlane normal_cdf(const DataPlane &dp, const DataPlane &mn,
 
 DataPlane normal_cdf_inv(const double area, const DataPlane &mn,
                          const DataPlane &sd) {
-   DataPlane cdf_inv = mn;
-   double v;
+   DataPlane cdf_inv(mn);
 
    // Check grid dimensions
    if(mn.nx() != sd.nx() || mn.ny() != sd.ny()) {
@@ -587,16 +643,27 @@ DataPlane normal_cdf_inv(const double area, const DataPlane &mn,
       exit(1);
    }
 
+#pragma omp parallel default(none) \
+   shared(area, mn, sd, cdf_inv, bad_data_double)
+   {
+
    // Compute the inverse of the normal CDF for each grid point
-   for(int x=0; x<mn.nx(); x++) {
-      for(int y=0; y<mn.ny(); y++) {
-         v = (is_bad_data(mn.get(x,y)) ||
-              is_bad_data(sd.get(x,y)) ?
-              bad_data_double :
-              normal_cdf_inv(area, mn.get(x,y), sd.get(x,y)));
-         cdf_inv.set(v, x, y);
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<mn.nx(); x++) {
+         for(int y=0; y<mn.ny(); y++) {
+            double v;
+            if(is_bad_data(mn.get(x,y)) ||
+               is_bad_data(sd.get(x,y))) {
+               v = bad_data_double;
+            }
+            else {
+               v = normal_cdf_inv(area, mn.get(x,y), sd.get(x,y));
+            }
+            cdf_inv.set(v, x, y);
+         }
       }
-   }
+   } // End omp parallel
 
    return cdf_inv;
 }
@@ -604,9 +671,7 @@ DataPlane normal_cdf_inv(const double area, const DataPlane &mn,
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane gradient(const DataPlane &dp, int dim, int delta) {
-   int x, y, x1, y1;
-   double v, v1, gr;
-   DataPlane grad_dp;
+   DataPlane grad_dp(dp);
 
    if(dim != 0 && dim != 1) {
       mlog << Error << "\ngradient() -> "
@@ -615,24 +680,31 @@ DataPlane gradient(const DataPlane &dp, int dim, int delta) {
    }
 
    // Initialize to bad data values
-   grad_dp = dp;
    grad_dp.set_constant(bad_data_double);
 
-   for(x=0; x<dp.nx(); x++) {
-      for(y=0; y<dp.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(dp, dim, delta, grad_dp, bad_data_double)
+   {
 
-         // dim: 0 for x-dimension, 1 for y-dimension
-         x1 = (dim == 0 ? x+delta : x  );
-         y1 = (dim == 0 ? y       : y+delta);
-         v1 = (x1 < 0 || x1 >= dp.nx() ||
-               y1 < 0 || y1 >= dp.ny() ?
-               bad_data_double : dp.get(x1, y1));
-         v  = dp.get(x, y);
-         gr = (is_bad_data(v1) || is_bad_data(v) ?
-               bad_data_double : v1 - v);
-         grad_dp.set(gr, x, y);
+      // Compute the gradient for each grid point
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<dp.nx(); x++) {
+         for(int y=0; y<dp.ny(); y++) {
+
+            // dim: 0 for x-dimension, 1 for y-dimension
+            int    x1 = (dim == 0 ? x+delta : x      );
+            int    y1 = (dim == 0 ? y       : y+delta);
+            double v1 = (x1 < 0 || x1 >= dp.nx() ||
+                         y1 < 0 || y1 >= dp.ny() ?
+                         bad_data_double : dp.get(x1, y1));
+            double v  = dp.get(x, y);
+            double gr = (is_bad_data(v1) || is_bad_data(v) ?
+                         bad_data_double : v1 - v);
+            grad_dp.set(gr, x, y);
+         }
       }
-   }
+   } // End omp parallel
 
    return grad_dp;
 }
@@ -644,6 +716,8 @@ int meijster_sep(int u_index, int i_index, double u_distance, double i_distance)
          / (2 * (u_index-i_index)));
 }
 
+////////////////////////////////////////////////////////////////////////
+
 double euclide_distance(int x, int y) {
    return sqrt(x*x + y*y);
 }
@@ -651,118 +725,99 @@ double euclide_distance(int x, int y) {
 ////////////////////////////////////////////////////////////////////////
 
 DataPlane distance_map(const DataPlane &dp) {
-   DataPlane g_distance, dm;
-   bool debug_g_distance = false;
    double distance_value;
-   int ix, iy;
    int nx = dp.nx();
    int ny = dp.ny();
-   int max_distance = nx + ny;
 
    // Initialize to the maximum distance   
-   g_distance = dp;
-   g_distance.set_constant(max_distance);
-   dm = dp;
-   dm.set_constant(max_distance);
+   DataPlane g_distance(dp);
+   g_distance.set_constant(nx + ny);
+   DataPlane dm(dp);
+   dm.set_constant(nx + ny);
    
    int event_count = 0;
-   // Meijster first phase
-   for (ix=0; ix<nx; ix++) {
-      // Meijster scan 1
-      iy = 0;
-      if (0 < dp.get(ix, iy)) {
-         g_distance.set(0.0, ix, iy);
-         event_count++;
-      }
-      
-      for (iy = 1; iy<ny; iy++) {
-         if (0 < dp.get(ix, iy)) {
-            distance_value = 0.0;
+
+#pragma omp parallel default(none) \
+   shared(dp, nx, ny, g_distance, dm, event_count) \
+   private(distance_value)
+   {
+
+      // Meijster first phase
+#pragma omp for schedule(static)
+      for(int ix=0; ix<nx; ix++) {
+
+         // Meijster scan 1
+         int iy = 0;
+         if(dp.get(ix, iy) > 0) {
+            g_distance.set(0.0, ix, iy);
             event_count++;
          }
-         else {
-            distance_value = (1.0 + g_distance.get(ix, (iy-1)));
-         }
-         g_distance.set(distance_value, ix, iy);
-      }
       
-      // Meijster scan 2
-      for (iy = ny-2; iy>=0; iy--) {
-         distance_value = g_distance.get(ix, (iy+1));
-         if (distance_value < g_distance.get(ix, iy)) {
-            g_distance.set((1.0 + distance_value), ix, iy);
-         }
-      }
-   }
-   
-   // Meijster second phase
-   if (0 < event_count) {
-      int iq;
-      int iw;
-      vector<int> s(nx);
-      vector<int> t(nx);
-      
-      // Initialize s and t array
-      for (ix=0; ix<nx; ix++) {
-         s[ix] = t[ix] = 0;
-      }
-      
-      for (iy = 0; iy<ny; iy++) {
-         iq = 0;
-         s[iq] = t[iq] = 0;
-      
-         // Meijster Scan 3
-         for (ix=1; ix<nx; ix++) {
-            while ((0 <= iq)
-                 && euclide_distance((t[iq]-s[iq]), g_distance.get(s[iq], iy))
-                    > euclide_distance((t[iq]-ix), g_distance.get(ix, iy)))
-               iq--;
-                
-            if (0 > iq) {
-               iq = 0;
-               s[0] = ix;
+         for(iy=1; iy<ny; iy++) {
+            if(dp.get(ix, iy) > 0) {
+               distance_value = 0.0;
+               event_count++;
             }
             else {
-               iw = 1 + meijster_sep(ix, s[iq],
-                     g_distance.get(ix, iy), g_distance.get(s[iq], iy));
-               if (iw < nx) {
-                  iq++;
-                  s[iq] = ix;
-                  t[iq] = iw;
+               distance_value = (1.0 + g_distance.get(ix, (iy-1)));
+            }
+            g_distance.set(distance_value, ix, iy);
+         } // end for iy
+      
+         // Meijster scan 2
+         for(iy=ny-2; iy>=0; iy--) {
+            distance_value = g_distance.get(ix, (iy+1));
+            if(g_distance.get(ix, iy) > distance_value) {
+               g_distance.set((1.0 + distance_value), ix, iy);
+            }
+         } // end for iy
+      } // end for ix
+
+      // Meijster second phase
+      if(event_count > 0) {
+
+#pragma omp for schedule(static)
+         for(int iy=0; iy<ny; iy++) {
+
+            // Initialize s and t arrays
+            int iq = 0;
+            vector<int> s(nx, 0);
+            vector<int> t(nx, 0);
+
+            // Meijster Scan 3
+            for(int ix=1; ix<nx; ix++) {
+               while(iq >= 0 &&
+                     euclide_distance((t[iq]-s[iq]),
+                        nint(g_distance.get(s[iq], iy))) >
+                     euclide_distance((t[iq]-ix),
+                        nint(g_distance.get(ix, iy)))) iq--;
+
+               if(iq < 0) {
+                  iq = 0;
+                  s[0] = ix;
                }
-            }
-         }
-         
-         // Meijster Scan 4
-         for (ix=nx-1; ix>=0; ix--) {
-            distance_value = euclide_distance((ix-s[iq]), g_distance.get(s[iq],iy));
-            dm.set(distance_value,ix,iy);
-            if (ix == t[iq]) iq--;
-         }
+               else {
+                  int iw = 1 + meijster_sep(ix, s[iq],
+                                  g_distance.get(ix, iy),
+                                  g_distance.get(s[iq], iy));
+                  if(iw < nx) {
+                     iq++;
+                     s[iq] = ix;
+                     t[iq] = iw;
+                  }
+               }
+            } // end for ix
+
+            // Meijster Scan 4
+            for(int ix=nx-1; ix>=0; ix--) {
+               distance_value = euclide_distance((ix-s[iq]),
+                                   nint(g_distance.get(s[iq],iy)));
+               dm.set(distance_value,ix,iy);
+               if(ix == t[iq]) iq--;
+            } // end for ix
+         } // end for iy
       }
-   }
-   
-   int debug_level = 7;
-   if(mlog.verbosity_level() >= debug_level) {
-      if (debug_g_distance) {
-         for (ix=0; ix<nx; ix++) {
-            ConcatString message;
-            message << " g_distance: " ;
-            for (iy = 0; iy<ny; iy++) {
-               message << "  " << g_distance.get(ix, iy);
-            }
-            mlog << Debug(debug_level) << message << "\n";
-         }
-      }
-      for (ix=0; ix<nx; ix++) {
-         ConcatString message;
-         message << " distance: " ;
-         for (iy = 0; iy<ny; iy++) {
-            message << "  " << dm.get(ix, iy);
-         }
-         mlog << Debug(debug_level) << message << "\n";
-      }
-   }
+   } // End omp parallel
 
    // Mask the distance map with bad data values of the input field
    mask_bad_data(dm, dp);

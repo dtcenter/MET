@@ -10,3 +10,6 @@ export MET_TEST_DIFF=/data/output/met_test_diff
 
 export MET_TEST_RSCRIPT=/usr/bin/Rscript
 export MET_TEST_MET_PYTHON_EXE=/usr/local/bin/python3
+
+# Set OMP_NUM_THREADS as the number of processors available
+export OMP_NUM_THREADS=$(nproc)
