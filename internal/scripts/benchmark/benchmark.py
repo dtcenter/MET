@@ -602,8 +602,6 @@ def calc_means_for_metrics(input_df: pd.DataFrame) -> pd.DataFrame:
         final_mean_df = pd.concat([final_mean_df, mean_df])
         final_mean_df.drop(['new_index'], axis=1, inplace=True)
 
-    final_mean_df.to_csv("./final_mean.txt",
-                         sep='\t', header=True, index=False)
     return final_mean_df
 
 
