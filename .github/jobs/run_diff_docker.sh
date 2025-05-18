@@ -5,7 +5,7 @@ source ${GITHUB_WORKSPACE}/.github/jobs/test_env_vars.sh
 
 # Docker image to use for running diffs
 #DOCKERHUB_TAG=$(get_dockerhub_tag)
-VERSION_EXT=.v6.1     #Note: this comes from METplus/.github/jobs/docker_utils.py
+export VERSION_EXT=.v6.1     #Note: this comes from METplus/.github/jobs/docker_utils.py
 DOCKERHUB_TAG=dtcenter/metplus-envs:diff${VERSION_EXT}
 
 # METplus branch to use for diff testing script
