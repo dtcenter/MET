@@ -18,7 +18,8 @@ source ${MET_REPO_DIR}/.github/jobs/test_env_vars.sh
 echo "Running comparison on test output"
 CMD_LOGFILE=/met/logs/comp_dir.log
 # CMD_LOGFILE=logs/comp_dir.log
-time_command ${MET_TEST_BASE}/python/comp_dir.py ${MET_TEST_TRUTH} ${MET_TEST_OUTPUT}
+ENV_PYTHON=/usr/local/conda/envs/diff${VERSION_EXT}/bin/python3
+time_command ${ENV_PYTHON} ${MET_TEST_BASE}/python/comp_dir.py ${MET_TEST_TRUTH} ${MET_TEST_OUTPUT}
 if [ $? != 0 ]; then
     echo "ERROR: Test output comparison failed"
     cat /met/logs/comp_dir.log

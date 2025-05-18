@@ -47,8 +47,8 @@ mount_args_repos="-v ${LOCAL_REPO_DIR}:${DOCKER_REPO_DIR} -v ${LOCAL_METPLUS_DIR
 # Set up data volumes
 volumes_from="--volumes-from met_truth"
 
-# set MET_REPO_DIR env var in Docker to mounted directory
-env_arg="-e MET_REPO_DIR=${DOCKER_REPO_DIR}"
+# set MET_REPO_DIR env var in Docker to mounted directory & pass other necessary env vars
+env_arg="-e MET_REPO_DIR=${DOCKER_REPO_DIR} -e VERSION_EXT"
 
 # run unit test script inside Docker, mount MET output and truth data
 cmd="\${MET_REPO_DIR}/.github/jobs/run_diff_tests.sh"
