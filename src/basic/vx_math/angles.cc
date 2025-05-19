@@ -5,11 +5,6 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
-using namespace std;
-
-
 //////////////////////////////////////////////////////////////////
 
 
@@ -23,6 +18,8 @@ using namespace std;
 #include "trig.h"
 #include "is_bad_data.h"
 #include "vx_log.h"
+
+using namespace std;
 
 
 //////////////////////////////////////////////////////////////////
