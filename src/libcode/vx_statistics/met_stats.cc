@@ -3833,7 +3833,9 @@ void GRADInfo::set(int grad_dx, int grad_dy,
    double wgt_sum = wgt_na.sum();
 
 #pragma omp parallel default(none) \
-   shared(fgx_na, fgy_na, ogx_na, ogy_na, wgt_na, wgt_sum)
+   shared(fgx_na, fgy_na, ogx_na, ogy_na, wgt_na, wgt_sum) \
+   shared(fgbar, ogbar, mgbar, egbar) \
+   shared(fgmag, ogmag, mag_mse, lap_mse, total)
    {
 
       // Loop through the pairs and compute sums
