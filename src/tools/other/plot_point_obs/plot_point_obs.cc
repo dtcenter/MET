@@ -227,8 +227,8 @@ static void process_point_obs(const char *point_obs_filename) {
       met_point_obs = (MetPointData *)&nc_point_obs;
    }
 
-   long nhdr_count = met_point_obs->get_hdr_cnt();
-   auto nobs_count = (int)met_point_obs->get_obs_cnt();
+   int nhdr_count = met_point_obs->get_hdr_cnt();
+   int nobs_count = met_point_obs->get_obs_cnt();
 
    mlog << Debug(2) << "Processing " << nobs_count
         << " observations at " << nhdr_count << " locations.\n";
@@ -490,7 +490,7 @@ static void create_plot() {
    int i = 0;
    int plot_count = 0;
    int skip_count = 0;
-   for(auto &it_ppo = conf_info.point_opts) {
+   for(auto &it_ppo : conf_info.point_opts) {
 
       mlog << Debug(3) << "For point data group " << ++i
            << ", plotting " << it_ppo.locations.size()
