@@ -29,10 +29,10 @@ libvx_gis_a_CPPFLAGS = ${MET_CPPFLAGS}
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
-    shapetype_to_string.h shapetype_to_string.cc: shp_types.h
+shapetype_to_string.h shapetype_to_string.cc: shp_types.h
 	${ENUM_TO_STRING} -concat_string shp_types.h
 
-   clean-local:
+clean-local:
 	-rm -f shapetype_to_string.cc
 	-rm -f shapetype_to_string.h
 endif

@@ -643,9 +643,11 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
+@ENABLE_DEVELOPMENT_FALSE@clean-local:
 clean: clean-am
 
-clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
+clean-am: clean-generic clean-local clean-noinstLIBRARIES \
+	mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/libvx_gis_a-dbf_file.Po
@@ -725,8 +727,8 @@ uninstall-am:
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-am clean \
-	clean-generic clean-noinstLIBRARIES cscopelist-am ctags \
-	ctags-am distclean distclean-compile distclean-generic \
+	clean-generic clean-local clean-noinstLIBRARIES cscopelist-am \
+	ctags ctags-am distclean distclean-compile distclean-generic \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
@@ -748,10 +750,10 @@ include ${top_srcdir}/Make-include
 # clean them up in a "make clean".  We don't want to do either of these
 # in a distribution because the enum_to_string utility isn't available.
 
-@ENABLE_DEVELOPMENT_TRUE@    shapetype_to_string.h shapetype_to_string.cc: shp_types.h
+@ENABLE_DEVELOPMENT_TRUE@shapetype_to_string.h shapetype_to_string.cc: shp_types.h
 @ENABLE_DEVELOPMENT_TRUE@	${ENUM_TO_STRING} -concat_string shp_types.h
 
-@ENABLE_DEVELOPMENT_TRUE@   clean-local:
+@ENABLE_DEVELOPMENT_TRUE@clean-local:
 @ENABLE_DEVELOPMENT_TRUE@	-rm -f shapetype_to_string.cc
 @ENABLE_DEVELOPMENT_TRUE@	-rm -f shapetype_to_string.h
 

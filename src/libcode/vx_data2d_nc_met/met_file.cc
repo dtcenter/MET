@@ -203,8 +203,13 @@ bool MetNcFile::open(const char * filename)
 
       x_dim_name = nc_met_azimuth_name;
       y_dim_name = nc_met_range_name;
-      t_dim_name = nc_met_track_point_name;
       z_dim_name = nc_met_pressure_name;
+
+      // Time dimension:
+      //   - TC-Diag writes the track_point dimension
+      //   - TC-RMW writes the time dimension
+      if ( gDimNames.has("track_point") ) t_dim_name = "track_point";
+      else                                t_dim_name = "time";
 
    }
 

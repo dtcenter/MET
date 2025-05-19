@@ -1524,11 +1524,11 @@ void ModeExecutive::build_outfile_name(const char *suffix, ConcatString &str)
    //  append the radius and threshold indices
    //
 
-   char junk[256];
+   ConcatString cs;
 
-   snprintf(junk, sizeof(junk), "R%d_T%d", R_index + 1, T_index + 1);
+   cs.format("R%d_T%d", R_index + 1, T_index + 1);
 
-   str << '_' << junk;
+   str << '_' << cs;
 
    // Append the suffix
 

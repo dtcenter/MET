@@ -265,11 +265,11 @@ if ( (n < 0) || (n >= total_predef_fonts) )  {
 
 }
 
-char junk[256];
+ConcatString cs;
 
-snprintf(junk, sizeof(junk), "%02d.afm", n);
+cs.format("%02d.afm", n);
 
-short_afm_name = junk;
+short_afm_name = cs;
 
 full_afm_name << gs_font_dir << '/' << gs_font_dir << '/' << short_afm_name;
 

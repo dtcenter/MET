@@ -902,9 +902,11 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 	-rm -f config.tab.cc
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
+@ENABLE_DEVELOPMENT_FALSE@clean-local:
 clean: clean-am
 
-clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
+clean-am: clean-generic clean-local clean-noinstLIBRARIES \
+	mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/libvx_config_a-builtin.Po
@@ -1004,8 +1006,8 @@ uninstall-am:
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-am clean \
-	clean-generic clean-noinstLIBRARIES cscopelist-am ctags \
-	ctags-am distclean distclean-compile distclean-generic \
+	clean-generic clean-local clean-noinstLIBRARIES cscopelist-am \
+	ctags ctags-am distclean distclean-compile distclean-generic \
 	distclean-tags distdir dvi dvi-am html html-am info info-am \
 	install install-am install-data install-data-am install-dvi \
 	install-dvi-am install-exec install-exec-am install-html \
@@ -1027,16 +1029,16 @@ include ${top_srcdir}/Make-include
 # clean them up in a "make clean".  We don't want to do either of these
 # in a distribution because the enum_to_string utility isn't available.
 
-@ENABLE_DEVELOPMENT_TRUE@    configobjecttype_to_string.cc configobjecttype_to_string.h: object_types.h
+@ENABLE_DEVELOPMENT_TRUE@configobjecttype_to_string.cc configobjecttype_to_string.h: object_types.h
 @ENABLE_DEVELOPMENT_TRUE@	${ENUM_TO_STRING} -concat_string object_types.h
 
-@ENABLE_DEVELOPMENT_TRUE@    grdfiletype_to_string.cc grdfiletype_to_string.h: data_file_type.h
+@ENABLE_DEVELOPMENT_TRUE@grdfiletype_to_string.cc grdfiletype_to_string.h: data_file_type.h
 @ENABLE_DEVELOPMENT_TRUE@	${ENUM_TO_STRING} -concat_string -reverse data_file_type.h
 
-@ENABLE_DEVELOPMENT_TRUE@    celltype_to_string.cc celltype_to_string.h: icode.h
+@ENABLE_DEVELOPMENT_TRUE@celltype_to_string.cc celltype_to_string.h: icode.h
 @ENABLE_DEVELOPMENT_TRUE@	${ENUM_TO_STRING} -concat_string -reverse icode.h
 
-@ENABLE_DEVELOPMENT_TRUE@    clean-local:
+@ENABLE_DEVELOPMENT_TRUE@clean-local:
 @ENABLE_DEVELOPMENT_TRUE@	-rm -r configobjecttype_to_string.cc
 @ENABLE_DEVELOPMENT_TRUE@	-rm -r configobjecttype_to_string.h
 @ENABLE_DEVELOPMENT_TRUE@	-rm -r grdfiletype_to_string.cc

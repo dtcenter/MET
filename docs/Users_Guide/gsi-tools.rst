@@ -41,7 +41,7 @@ Required Arguments for gsid2mpr
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. The **gsi_file_1 [gsi_file2 ... gsi_file_n]** argument indicates the GSI diagnostic files (conventional or radiance) to be reformatted.
-   
+
 Optional Arguments for gsid2mpr
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -88,7 +88,7 @@ The GSID2MPR tool writes the same set of MPR output columns for the conventional
     - Description
     - Data Type
   * - 1-37
-    - 
+    -
     - Standard MPR columns described in :numref:`table_PS_format_info_MPR`
     - Varies
   * - 38
@@ -130,7 +130,7 @@ The GSID2MPR tool writes the same set of MPR output columns for the conventional
 
 .. list-table:: Format information for GSI Diagnostic Radiance MPR (Matched Pair) output line type.
   :widths: auto
-  :header-rows: 1 
+  :header-rows: 1
 
   * - Column Number
     - Column Name
@@ -358,7 +358,7 @@ The GSID2MPR tool writes the same set of ORANK output columns for the convention
     - Description
     - Data Type
   * - 1-?
-    -  
+    -
     - Standard ORANK columns described in :numref:`table_ES_header_info_es_out_ORANK`
     - Varies
   * - Last-2
@@ -384,7 +384,7 @@ The GSID2MPR tool writes the same set of ORANK output columns for the convention
     - Description
     - Data Type
   * - 1-?
-    -  
+    -
     - Standard ORANK columns described in :numref:`table_ES_header_info_es_out_ORANK`
     - Varies
   * - Last-24

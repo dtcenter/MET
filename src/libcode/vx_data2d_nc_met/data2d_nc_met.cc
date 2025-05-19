@@ -126,28 +126,51 @@ void MetNcMetDataFile::dump(ostream & out, int depth) const {
 
 void MetNcMetDataFile::set_range_azimuth_grid_center(int i_track_point) {
 
-   if(!MetNc->is_range_azimuth() || i_track_point < 0) return;
+   if(!MetNc->is_range_azimuth()) return;
 
    // Get current RngAziData object
    RngAziData d = *(MetNc->grid.info().ra);
    d.lat_center = bad_data_double;
    d.lon_center = bad_data_double;
 
-   // Get the track_point dimension
-   int npnt = bad_data_int;
-   get_dim(MetNc->Nc, nc_met_track_point_name, npnt, true);
+   // Output with no track point dimension
+   if(i_track_point < 0) {
 
-   vector<size_t> start(1, i_track_point);
-   vector<size_t> count(1, 1);
+      // RMW-Analysis writes TrackLat_mean and TrackLon_mean variables
+      if(has_var(MetNc->Nc, "TrackLat_mean") &&
+         has_var(MetNc->Nc, "TrackLon_mean")) {
+         NcVar var_lat = get_nc_var(MetNc->Nc, "TrackLat_mean");
+         var_lat.getVar(&d.lat_center);
+         NcVar var_lon = get_nc_var(MetNc->Nc, "TrackLon_mean");
+         var_lon.getVar(&d.lon_center);
+         d.lon_center *= -1.0;
+      }
+   }
+   // Output with a track point dimension
+   else {
 
-   // FullTrackLat
-   NcVar var_lat = get_nc_var(MetNc->Nc, "FullTrackLat");
-   var_lat.getVar(start, count, &d.lat_center);
+      vector<size_t> start(1, i_track_point);
+      vector<size_t> count(1, 1);
 
-   // FullTrackLon
-   NcVar var_lon = get_nc_var(MetNc->Nc, "FullTrackLon");
-   var_lon.getVar(start, count, &d.lon_center);
-   d.lon_center *= -1.0;
+      // TC-RMW writes FullTrackLat and FullTrackLon variables
+      if(has_var(MetNc->Nc, "FullTrackLat") &&
+         has_var(MetNc->Nc, "FullTrackLon")) {
+         NcVar var_lat = get_nc_var(MetNc->Nc, "FullTrackLat");
+         var_lat.getVar(start, count, &d.lat_center);
+         NcVar var_lon = get_nc_var(MetNc->Nc, "FullTrackLon");
+         var_lon.getVar(start, count, &d.lon_center);
+         d.lon_center *= -1.0;
+      }
+      // TC-Diag writes TrackLat and TrackLon variables
+      else if(has_var(MetNc->Nc, "TrackLat") &&
+              has_var(MetNc->Nc, "TrackLon")) {
+         NcVar var_lat = get_nc_var(MetNc->Nc, "TrackLat");
+         var_lat.getVar(start, count, &d.lat_center);
+         NcVar var_lon = get_nc_var(MetNc->Nc, "TrackLon");
+         var_lon.getVar(start, count, &d.lon_center);
+         d.lon_center *= -1.0;
+      }
+   }
 
    // Reset the range/azimuth grid
    if(!is_bad_data(d.lat_center) &&
@@ -162,10 +185,6 @@ void MetNcMetDataFile::set_range_azimuth_grid_center(int i_track_point) {
 void MetNcMetDataFile::set_range_azimuth_times(int i_track_point, DataPlane &plane) {
 
    if(!MetNc->is_range_azimuth() || i_track_point < 0) return;
-
-   // Get the track_point dimension
-   int npnt = bad_data_int;
-   get_dim(MetNc->Nc, nc_met_track_point_name, npnt, true);
 
    string ymd_hms_str("19700101_000000");
    vector<size_t> start(1, i_track_point);
@@ -222,8 +241,10 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    if(status) {
 
       // Update the range/azimuth times and grid location, if possible 
-      if(MetNc->is_range_azimuth() && info->t_slot >= 0) {
-         auto i_track_point = (int) vinfo_nc->dimension()[info->t_slot];
+      if(MetNc->is_range_azimuth()) {
+         auto i_track_point = (int) (info->t_slot >=0 ?
+                                     vinfo_nc->dimension()[info->t_slot] :
+                                     bad_data_int);
          set_range_azimuth_grid_center(i_track_point);
          set_range_azimuth_times(i_track_point, plane);
       } 

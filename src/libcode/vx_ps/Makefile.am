@@ -25,11 +25,11 @@ libvx_ps_a_CPPFLAGS = ${MET_CPPFLAGS}
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
-    documentmedia_to_string.cc documentmedia_to_string.h \
-    documentorientation_to_string.cc documentorientation_to_string.h : vx_ps.h
+documentmedia_to_string.cc documentmedia_to_string.h \
+documentorientation_to_string.cc documentorientation_to_string.h : vx_ps.h
 	${ENUM_TO_STRING} -concat_string vx_ps.h
 
-    clean-local:
+clean-local:
 	-rm -f documentmedia_to_string.cc
 	-rm -f documentmedia_to_string.h
 	-rm -f documentorientation_to_string.cc

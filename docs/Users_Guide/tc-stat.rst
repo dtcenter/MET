@@ -89,7 +89,7 @@ The usage statement for tc_stat is shown below:
          [-v level]
          [-config file] | [JOB COMMAND LINE]
 
-TC-Stat has one required argument and accepts optional ones. 
+TC-Stat has one required argument and accepts optional ones.
 
 The usage statement for the TC-Stat tool includes the "job" term, which refers to the set of tasks to be performed after applying user-specified filtering options. The filtering options are used to pare down the TC-Pairs output to only those lines that are desired for the analysis. The job and its filters together comprise a "job command line". The "job command line" may be specified either on the command line to run a single analysis job or within the configuration file to run multiple analysis jobs at the same time. If jobs are specified in both the configuration file and the command line, only the jobs indicated in the configuration file will be run. The various jobs are described in :numref:`table_columnar_output_summary_tc_stat` and the filtering options are described in :numref:`tc_stat-configuration-file`.
 
@@ -105,7 +105,7 @@ Optional Arguments for tc_stat
 
 3. The **-out file** argument indicates the desired name of the TCST format output file.
 
-4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
 5. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
@@ -204,31 +204,31 @@ The following filtering options can be achieved by the following:
 Option 1. A forecast is issued when a watch/warning is in effect
 
 .. code-block:: none
-		
+
   init_str_name = ["WATCH_WARN"];
   init_str_val = ["ALL"];
- 
+
 Option 2. A forecast is verifying when a watch/warning is in effect
 
 .. code-block:: none
 
-  column_str_name = ["WATCH_WARN"];  
+  column_str_name = ["WATCH_WARN"];
   column_str_val = ["ALL"];
-   
+
 Option 3. A forecast is issued when a watch/warning is NOT in effect
 
 .. code-block:: none
 
-  init_str_name = ["WATCH_WARN"];  
+  init_str_name = ["WATCH_WARN"];
   init_str_val = ["NA"];
-    
+
 Option 4. A forecast is verified when a watch/warning is NOT in effect
 
 .. code-block:: none
 
   column_str_name = ["WATCH_WARN"];
   column_str_val = ["NA"];
-    
+
 Further information on the **column_str** and **init_str** fields are described below. Listing a comma-separated list of watch/warning types in the **column_str_val** field will be stratified by a single or multiple types of warnings.
 
 _________________________
@@ -322,7 +322,7 @@ _________________________
      thresh = >=30.0;
   }
 
-The **rirw** field specifies those track points for which rapid intensification (RI) or rapid weakening (RW) occurred, based on user defined RI/RW thresholds. The **track** entry specifies that RI/RW is not turned on **(NONE)**, is computed based on the bmodel only **(BDECK)**, is computed based on the amodel only **(ADECK)**, or computed when both the amodel and bmodel (the union of the two) indicate RI/RW (BOTH). If **track** is set to **ADECK, BDECK**, or **BOTH**, only tracks exhibiting rapid intensification will be retained. Rapid intensification is officially defined as when the change in the maximum wind speed over a 24-hour period is greater than or equal to 30 kts. This is the default setting, however flexibility in this definition is provided through the use of the **time, exact** and **thresh** options. The **time** field specifies the time window (HH[MMSS] format) for which the RI/RW occurred. The **exact** field specifies whether to only count RI/RW when the intensity change is over the exact time window (TRUE), which follows the official RI definition, or if the intensity threshold is met anytime during the time window (FALSE). Finally, the **thresh** field specifies the user defined intensity threshold (where ">=" indicates RI, and "<=" indicates RW). 
+The **rirw** field specifies those track points for which rapid intensification (RI) or rapid weakening (RW) occurred, based on user defined RI/RW thresholds. The **track** entry specifies that RI/RW is not turned on **(NONE)**, is computed based on the bmodel only **(BDECK)**, is computed based on the amodel only **(ADECK)**, or computed when both the amodel and bmodel (the union of the two) indicate RI/RW (BOTH). If **track** is set to **ADECK, BDECK**, or **BOTH**, only tracks exhibiting rapid intensification will be retained. Rapid intensification is officially defined as when the change in the maximum wind speed over a 24-hour period is greater than or equal to 30 kts. This is the default setting, however flexibility in this definition is provided through the use of the **time, exact** and **thresh** options. The **time** field specifies the time window (HH[MMSS] format) for which the RI/RW occurred. The **exact** field specifies whether to only count RI/RW when the intensity change is over the exact time window (TRUE), which follows the official RI definition, or if the intensity threshold is met anytime during the time window (FALSE). Finally, the **thresh** field specifies the user defined intensity threshold (where ">=" indicates RI, and "<=" indicates RW).
 
 Using the **-rirw_track, -rirw_time_adeck, -rirw_time_bdeck, -rirw_exact_adeck, -rirw_exact_bdeck, -rirw_thresh_adeck, -rirw_thresh_bdeck** options within the job command lines may further refine these selections. See :numref:`config_options_tc` for how to use these options.
 
@@ -334,7 +334,7 @@ _________________________
   landfall_beg = "-24";
   landfall_end = "00";
 
-The **landfall, landfall_beg**, and **landfall_end** fields specify whether only those track points occurring near landfall should be retained. The landfall retention window is defined as the hours offset from the time of landfall. Landfall is defined as the last bmodel track point before the distance to land switches from water to land. When **landfall_end** is set to zero, the track is retained from the **landfall_beg** to the time of landfall. Using the **-landfall_window** option with the job command lines may further refine these selections. The **-landfall_window** job command option takes one or two arguments in HH[MMSS] format. Use one argument to define a symmetric time window. For example, **-landfall_window 06** defines the time window +/- six hours around the landfall time. Use two arguments to define an asymmetric time window. For example, **-landfall_window 00 12** defines the time window from the landfall event to twelve hours after. 
+The **landfall, landfall_beg**, and **landfall_end** fields specify whether only those track points occurring near landfall should be retained. The landfall retention window is defined as the hours offset from the time of landfall. Landfall is defined as the last bmodel track point before the distance to land switches from water to land. When **landfall_end** is set to zero, the track is retained from the **landfall_beg** to the time of landfall. Using the **-landfall_window** option with the job command lines may further refine these selections. The **-landfall_window** job command option takes one or two arguments in HH[MMSS] format. Use one argument to define a symmetric time window. For example, **-landfall_window 06** defines the time window +/- six hours around the landfall time. Use two arguments to define an asymmetric time window. For example, **-landfall_window 00 12** defines the time window from the landfall event to twelve hours after.
 
 _________________________
 
@@ -381,11 +381,11 @@ _________________________
 .. code-block:: none
 
   -job job_name REQUIRED and OPTIONAL ARGUMENTS
-  
+
   e.g.: -job filter  -line_type TCMPR  -amodel HWFI   -dump_row ./tc_filter_job.tcst
         -job summary -line_type TCMPR  -column TK_ERR -dump_row ./tc_summary_job.tcst
         -job rirw    -line_type TCMPR  -rirw_time 24 -rirw_exact false -rirw_thresh ge20
-        -job rirw    -line_type TCMPR  -rirw_time 24 -rirw_exact false -rirw_thresh ge20 -out_stat ./tc_rirw.stat 
+        -job rirw    -line_type TCMPR  -rirw_time 24 -rirw_exact false -rirw_thresh ge20 -out_stat ./tc_rirw.stat
         -job probrirw -line_type PROBRIRW -column_thresh RI_WINDOW ==24 \
                       -probrirw_thresh 30 -probrirw_prob_thresh ==0.25
 
@@ -415,7 +415,7 @@ This job produces summary statistics for the column name specified by the **-col
 3.
 "SUMMARY", which is followed by the total, mean (with confidence intervals), standard deviation, minimum value, percentiles (10th, 25th, 50th, 75th, 90th), maximum value, interquartile range, range, sum, time to independence, and frequency of superior performance.
 
-The output columns are shown below in :numref:`table_columnar_output_summary_tc_stat` The **-by** option can also be used one or more times to make this job more powerful. Rather than running the specified job once, it will be run once for each unique combination of the entries found in the column(s) specified with the **-by** option. 
+The output columns are shown below in :numref:`table_columnar_output_summary_tc_stat` The **-by** option can also be used one or more times to make this job more powerful. Rather than running the specified job once, it will be run once for each unique combination of the entries found in the column(s) specified with the **-by** option.
 
 .. _table_columnar_output_summary_tc_stat:
 

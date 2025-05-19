@@ -272,6 +272,24 @@ mlog << Debug(grid_debug_level)
 ////////////////////////////////////////////////////////////////////////
 
 
+void RngAziData::dump() const
+
+{
+
+mlog << Debug(grid_debug_level)
+     << "\nRange/Azimuth Grid Data:\n"
+     << "      range_n: " << range_n << "\n"
+     << "    azimuth_n: " << azimuth_n << "\n"
+     << " range_max_km: " << range_max_km << "\n"
+     << "   lat_center: " << lat_center << "\n"
+     << "   lon_center: " << lon_center << "\n\n";
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void SemiLatLonData::dump() const
 
 {

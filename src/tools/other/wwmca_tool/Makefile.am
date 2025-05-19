@@ -116,10 +116,10 @@ wwmca_plot_LDADD = -lvx_pxm \
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
-    gridhemisphere_to_string.cc gridhemisphere_to_string.h: wwmca_ref.h
-	${ENUM_TO_STRING} wwmca_ref.h
+gridhemisphere_to_string.cc gridhemisphere_to_string.h: wwmca_ref.h
+	${ENUM_TO_STRING} -concat_string wwmca_ref.h
 
-   clean-local:
+clean-local:
 	-rm -f gridhemisphere_to_string.cc
 	-rm -f gridhemisphere_to_string.h
 endif

@@ -682,7 +682,7 @@ int j, k;
 double ms, lat;
 double x_grid, y_grid, x_page, y_page;
 const int N = 10;
-char junk[256];
+ConcatString cs;
 
 
 if ( hemisphere == 'N' )  ms =  1.0;
@@ -727,8 +727,8 @@ k = nint(lon);
 
 if ( k == -180 )  k = -k;
 
-if ( k >= 0 )  snprintf(junk, sizeof(junk), "%d W",  k);
-else           snprintf(junk, sizeof(junk), "%d E", -k);
+if ( k >= 0 )  cs.format("%d W",  k);
+else           cs.format("%d E", -k);
 
 
 grid->latlon_to_xy(ms, lon, x_grid, y_grid);
@@ -759,11 +759,11 @@ plot.gsave();
 
    plot.setlinewidth(2.0);
 
-   plot.write_centered_text(2, 0, 0.0, 0.0, 0.5, 0.5, junk);
+   plot.write_centered_text(2, 0, 0.0, 0.0, 0.5, 0.5, cs.c_str());
 
    plot.setgray(0.0);
 
-   plot.write_centered_text(2, 1, 0.0, 0.0, 0.5, 0.5, junk);
+   plot.write_centered_text(2, 1, 0.0, 0.0, 0.5, 0.5, cs.c_str());
 
 plot.grestore();
 

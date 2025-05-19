@@ -15,11 +15,11 @@ The Intensity-Scale technique is one of the recently developed verification appr
 
 The Intensity-Scale verification technique, as most of the spatial verification approaches, compares a forecast field to an observation field. To apply the Intensity-Scale verification approach, observations need to be defined over the same spatial domain of the forecast to be verified.
 
-Within the spatial verification approaches, the Intensity-Scale technique belongs to the scale-decomposition (or scale-separation) verification approaches. The scale-decomposition approaches enable users to perform the verification on different spatial scales. Weather phenomena on different scales (e.g. frontal systems versus convective showers) are often driven by different physical processes. Verification on different spatial scales can therefore provide deeper insights into model performance at simulating these different processes. 
+Within the spatial verification approaches, the Intensity-Scale technique belongs to the scale-decomposition (or scale-separation) verification approaches. The scale-decomposition approaches enable users to perform the verification on different spatial scales. Weather phenomena on different scales (e.g. frontal systems versus convective showers) are often driven by different physical processes. Verification on different spatial scales can therefore provide deeper insights into model performance at simulating these different processes.
 
-The spatial scale components are obtained usually by applying a single band spatial filter to the forecast and observation fields (e.g. Fourier, Wavelets). The scale-decomposition approaches measure error, bias and skill of the forecast on each different scale component. The scale-decomposition approaches therefore provide feedback on the scale dependency of the error and skill, on the no-skill to skill transition scale, and on the capability of the forecast of reproducing the observed scale structure. 
+The spatial scale components are obtained usually by applying a single band spatial filter to the forecast and observation fields (e.g. Fourier, Wavelets). The scale-decomposition approaches measure error, bias and skill of the forecast on each different scale component. The scale-decomposition approaches therefore provide feedback on the scale dependency of the error and skill, on the no-skill to skill transition scale, and on the capability of the forecast of reproducing the observed scale structure.
 
-The Intensity-Scale technique evaluates the forecast skill as a function of the intensity values and of the spatial scale of the error. The scale components are obtained by applying a two dimensional Haar wavelet filter. Note that wavelets, because of their locality, are suitable for representing discontinuous fields characterized by few sparse non-zero features, such as precipitation. Moreover, the technique is based on a categorical approach, which is a robust and resistant approach, suitable for non-normally distributed variables, such as precipitation. The intensity-scale technique was specifically designed to cope with the difficult characteristics of precipitation fields, and for the verification of spatial precipitation forecasts. However, the intensity-scale technique can also be applied to verify other variables, such as cloud fraction. 
+The Intensity-Scale technique evaluates the forecast skill as a function of the intensity values and of the spatial scale of the error. The scale components are obtained by applying a two dimensional Haar wavelet filter. Note that wavelets, because of their locality, are suitable for representing discontinuous fields characterized by few sparse non-zero features, such as precipitation. Moreover, the technique is based on a categorical approach, which is a robust and resistant approach, suitable for non-normally distributed variables, such as precipitation. The intensity-scale technique was specifically designed to cope with the difficult characteristics of precipitation fields, and for the verification of spatial precipitation forecasts. However, the intensity-scale technique can also be applied to verify other variables, such as cloud fraction.
 
 Scientific and Statistical Aspects
 ==================================
@@ -57,12 +57,12 @@ The Intensity-Scale (IS) skill score evaluates the forecast skill as a function 
 
   * - Forecast
     - Observation
-    -  
+    -
     - Total
-  * -  
+  * -
     - o = 1 (e.g., "Yes")
     - o = 0 (e.g., "No")
-    -  
+    -
   * - f = 1 (e.g., "Yes")
     - Hits **= a**
     - False Alarms **= b**
@@ -120,7 +120,7 @@ The En2 bias for each threshold and scale is assessed by the En2 relative differ
 
 As for the MSE, the sum of the energy of the scale components is equal to the energy of the original binary field: :math:`{En2}(t) = j \ {En2}(t,j)`. Therefore, the percentage that the En2 for each scale contributes the total En2 may be computed: for a given threshold, **t**, :math:`{En2\%}(t,j) = {En2}(t,j)/ {En2}(t)`. Usually, for precipitation fields, low thresholds exhibit most of the energy percentage on large scales (and less percentage on the small scales), since low thresholds are associated with large scale features, such as fronts. On the other hand, for higher thresholds, the energy percentage is usually larger on small scales, since intense events are associated with small scales features, such as convective cells or showers. The comparison of the forecast and observation squared energy percentages provides feedback on how the events are distributed across the scales, and enables the comparison of forecast and observation scale structure.
 
-For the NIMROD case illustrated, the scale structure is assessed again by the relative difference, but calculated of the squared energy percentages. For small thresholds the forecast overestimates the number of large scale events and underestimates the number of small scale events, in proportion to the total number of events. On the other hand, for larger thresholds the forecast underestimates the number of large scale events and overestimates the number of small scale events, again in proportion to the total number of events. Overall it appears that the forecast overestimates the percentage of events associated with high occurrence, and underestimates the percentage of events associated with low occurrence. The En2% for the 64 mm/h thresholds is homogeneously underestimated for all the scales, since the forecast does not have any event exceeding this threshold. 
+For the NIMROD case illustrated, the scale structure is assessed again by the relative difference, but calculated of the squared energy percentages. For small thresholds the forecast overestimates the number of large scale events and underestimates the number of small scale events, in proportion to the total number of events. On the other hand, for larger thresholds the forecast underestimates the number of large scale events and overestimates the number of small scale events, again in proportion to the total number of events. Overall it appears that the forecast overestimates the percentage of events associated with high occurrence, and underestimates the percentage of events associated with low occurrence. The En2% for the 64 mm/h thresholds is homogeneously underestimated for all the scales, since the forecast does not have any event exceeding this threshold.
 
 Note that the energy squared of the observation binary field is identical to the sample climatology :math:`{Br}=(a+c)/n`. Similarly, the energy squared of the forecast binary field is equal to :math:`(a+b)/n`. The ratio of the squared energies of the forecast and observation binary fields is equal to the :math:`{FBI}=(a+b)/(a+c)`, for the contingency table (:numref:`contingency_table_counts`) obtained from the original forecast and observation fields by thresholding with the same threshold used to obtain the binary forecast and observation fields.
 
@@ -165,7 +165,7 @@ The usage statement for the Wavelet-Stat tool is shown below:
          [-v level]
          [-compress level]
 
-wavelet_stat has three required arguments and accepts several optional ones. 
+wavelet_stat has three required arguments and accepts several optional ones.
 
 Required Arguments for wavelet_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -181,7 +181,7 @@ Optional Arguments for wavelet_stat
 
 4. The **-outdir path** indicates the directory where output files should be written.
 
-5. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file. 
+5. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
 6. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
@@ -239,25 +239,25 @@ _______________________
   // Or explicitly set the NA threshold type
   cat_thresh = [>0.0, >=5.0, NA];
 
-   
+
 The **cat_thresh** option defines an array of thresholds for each field defined in the fcst and obs dictionaries. The number of forecast and observation categorical thresholds must match. If set to an empty list, the thresholds will not be applied (no binary masking) and all the raw grid-point values will be used for downstream statistics.
 
 If the array of thresholds is an empty list, the application will set the threshold to NA internally and skip applying the thresholds. If the threshold is set to NA explicitly in the list, the application will also skip applying the threshold.
 
 Since the application has the ability to loop through multiple thresholds (for multiple fields), a user can include NA in the list of thresholds to produce statistics for the raw data values for the given field.
-		
+
 _______________________
 
 .. code-block:: none
-		
+
   grid_decomp_flag = AUTO;
-  
+
   tile = {
      width    = 0;
      location = [ { x_ll = 0; y_ll = 0; } ];
   }
 
-The **grid_decomp_flag** variable specifies how tiling should be performed: 
+The **grid_decomp_flag** variable specifies how tiling should be performed:
 
 • **AUTO** indicates that the automated-tiling should be done.
 
@@ -316,13 +316,13 @@ The nc_pairs_flag is described in :numref:`grid_stat-configuration-file`
 wavelet_stat Output
 -------------------
 
-wavelet_stat produces output in STAT and, optionally, ASCII and NetCDF and PostScript formats. The ASCII output duplicates the STAT output but has the data organized by line type. While the Wavelet-Stat tool currently only outputs one STAT line type, additional line types may be added in future releases. The output files are written to the default output directory or the directory specified by the -outdir command line option. 
+wavelet_stat produces output in STAT and, optionally, ASCII and NetCDF and PostScript formats. The ASCII output duplicates the STAT output but has the data organized by line type. While the Wavelet-Stat tool currently only outputs one STAT line type, additional line types may be added in future releases. The output files are written to the default output directory or the directory specified by the -outdir command line option.
 
-The output STAT file is named using the following naming convention: 
+The output STAT file is named using the following naming convention:
 
 wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV.stat where PREFIX indicates the user-defined output prefix, HHMMSS indicates the forecast lead time, and YYYYMMDD_HHMMSS indicates the forecast valid time.
 
-The output ASCII files are named similarly: 
+The output ASCII files are named similarly:
 
 wavelet_stat_PREFIX_HHMMSSL_YYYYMMDD_HHMMSSV_TYPE.txt where TYPE is isc to indicate that this is an intensity-scale line type.
 
@@ -436,7 +436,7 @@ The format of the STAT and ASCII output of the Wavelet-Stat tool is similar to t
     - String
 
 ..  _table_WS_format_info_ISC:
-   
+
 .. list-table:: Format information for the ISC (Intensity-Scale) output line type.
   :widths: auto
   :header-rows: 1
