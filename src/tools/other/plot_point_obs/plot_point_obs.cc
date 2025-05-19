@@ -454,7 +454,7 @@ static void create_plot() {
    }
 
    // Loop through the options and add a colorbar
-   for(auto &it_ppo : conf_info.point_opts) {
+   for(const auto &it_ppo : conf_info.point_opts) {
 
       // Draw a colorbar, if specified
       if(it_ppo.fill_plot_info.flag &&
@@ -490,14 +490,14 @@ static void create_plot() {
    int i = 0;
    int plot_count = 0;
    int skip_count = 0;
-   for(auto &it_ppo : conf_info.point_opts) {
+   for(const auto &it_ppo : conf_info.point_opts) {
 
       mlog << Debug(3) << "For point data group " << ++i
            << ", plotting " << it_ppo.locations.size()
            << " locations for " << it_ppo.n_obs << " observations.\n";
 
       // Loop over the locations
-      for(auto &it_loc : it_ppo.locations) {
+      for(const auto &it_loc : it_ppo.locations) {
 
          // Convert lat/lon to grid x/y
          double lat = it_loc.lat;
