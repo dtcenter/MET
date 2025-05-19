@@ -64,7 +64,7 @@ struct USCRNFormatInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-class UscrnHandler : public FileHandler {
+class UscrnHandler final : public FileHandler {
 
    private:
 
