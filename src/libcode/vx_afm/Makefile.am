@@ -26,13 +26,13 @@ libvx_afm_a_CPPFLAGS = ${MET_CPPFLAGS}
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
-    afmkeyword_to_string.h afmkeyword_to_string.cc: afm_keywords.h
+afmkeyword_to_string.h afmkeyword_to_string.cc: afm_keywords.h
 	${ENUM_TO_STRING} -concat_string afm_keywords.h
 
-    afmtokentype_to_string.h afmtokentype_to_string.cc: afm_token_types.h
+afmtokentype_to_string.h afmtokentype_to_string.cc: afm_token_types.h
 	${ENUM_TO_STRING} -concat_string afm_token_types.h
 
-   clean-local:
+clean-local:
 	-rm -f afmkeyword_to_string.cc
 	-rm -f afmkeyword_to_string.h
 	-rm -f afmtokentype_to_string.cc

@@ -52,7 +52,7 @@ The ranked probability score (RPS) is included in the Ranked Probability Score (
 
 The Ensemble-Stat tool can derive ensemble relative frequencies and verify them as probability forecasts all in the same run. Note however that these simple ensemble relative frequencies are not actually calibrated probability forecasts. If probabilistic line types are requested (output_flag), this logic is applied to each pair of fields listed in the forecast (fcst) and observation (obs) dictionaries of the configuration file. Each probability category threshold (prob_cat_thresh) listed for the forecast field is applied to the input ensemble members to derive a relative frequency forecast. The probability category threshold (prob_cat_thresh) parsed from the corresponding observation entry is applied to the (gridded or point) observations to determine whether or not the event actually occurred. The paired ensemble relative frequencies and observation events are used to populate an Nx2 probabilistic contingency table. The dimension of that table is determined by the probability PCT threshold (prob_pct_thresh) configuration file option parsed from the forecast dictionary. All probabilistic output types requested are derived from this Nx2 table and written to the ascii output files. Note that the FCST_VAR name header column is automatically reset as "PROB({FCST_VAR}{THRESH})" where {FCST_VAR} is the current field being evaluated and {THRESH} is the threshold that was applied.
 
-Note that if no probability category thresholds (prob_cat_thresh) are defined, but climatological mean and standard deviation data is provided along with climatological bins, climatological distribution percentile thresholds are automatically derived and used to compute probabilistic outputs. 
+Note that if no probability category thresholds (prob_cat_thresh) are defined, but climatological mean and standard deviation data is provided along with climatological bins, climatological distribution percentile thresholds are automatically derived and used to compute probabilistic outputs.
 
 Climatology Data
 ----------------
@@ -441,7 +441,7 @@ The **nc_orank_flag** specifies which gridded verification output types should b
 __________________
 
 .. code-block:: none
-		
+
     nc_var_str = "";
 
 
@@ -686,11 +686,11 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Climatological Continuous Ranked Probability Score (normal distribution)
     - Double
   * - 38
-    - CRPS_EMP 
+    - CRPS_EMP
     - The Continuous Ranked Probability Score (empirical distribution)
     - Double
   * - 39
-    - CRPSCL_EMP 
+    - CRPSCL_EMP
     - Climatological Continuous Ranked Probability Score (empirical distribution)
     - Double
   * - 40
@@ -743,7 +743,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Double
 
 .. _table_ES_header_info_es_out_RPS:
-      
+
 .. list-table:: Format information for RPS (Ranked Probability Score) output line type.
   :widths: auto
   :header-rows: 1
@@ -790,7 +790,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Double
 
 .. _table_ES_header_info_es_out_RHIST:
-      
+
 .. list-table:: Format information for RHIST (Ranked Histogram) output line type.
   :widths: auto
   :header-rows: 1
@@ -817,7 +817,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Integer
 
 .. _table_ES_header_info_es_out_PHIST:
-      
+
 .. list-table:: Format information for PHIST (Probability Integral Transform Histogram) output line type.
   :widths: auto
   :header-rows: 1

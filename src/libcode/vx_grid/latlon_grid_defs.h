@@ -86,6 +86,8 @@ struct RngAziData {
    double lat_center;
    double lon_center;
 
+   void dump() const;
+
 };
 
 

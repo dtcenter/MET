@@ -183,6 +183,14 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
          if(strchr(ptr2, '*') != nullptr) Dimension.add(vx_data2d_star);
          else {
 
+            // @value notation not supported in vx_data_nc_met
+            if(*ptr2 == '@') {
+               mlog << Warning << "\nVarInfoNcMet::set_magic() -> "
+                    << "problem parsing \"" << MagicStr << "\" for the vx_data2d_nc_met library.\n"
+                    << "NetCDF dimensions must be specified as 0-based integer indices rather "
+                    << "than using the NetCDF dimension \"@value\" notation.\n\n";
+            }
+
             // Check for a range of levels
             if((ptr3 = strchr(ptr2, '-')) != nullptr) {
 

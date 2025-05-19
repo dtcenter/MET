@@ -38,6 +38,7 @@
 //   017    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
 //   018    07/26/24  Halley Gotway  MET #1371 Aggregate previous output.
 //   019    12/09/24  Halley Gotway  MET #3030 Add GRAD output.
+//   020    05/05/24  Halley Gotway  MET #3145 Add OpenMP.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -71,10 +72,10 @@ using namespace netCDF;
 static void process_command_line(int, char **);
 static void process_grid        (const Grid &, const Grid &);
 
-static Met2dDataFile *get_mtddf(const StringArray &,
-                                const GrdFileType);
-static bool           file_is_ok(const ConcatString &,
-                                 const GrdFileType);
+static GrdFileType get_mtddf_file_type(const StringArray &,
+                                       const GrdFileType);
+static bool        file_is_ok(const ConcatString &,
+                              const GrdFileType);
 
 static void get_series_data(int, VarInfo *, VarInfo *,
                             DataPlane &, DataPlane &);
@@ -290,13 +291,9 @@ static void process_command_line(int argc, char **argv) {
    ftype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_fcst));
    otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
-   // Get mtddf
-   fcst_mtddf = get_mtddf(fcst_files, ftype);
-   obs_mtddf  = get_mtddf(obs_files,  otype);
-
-   // Store the input data file types
-   ftype = fcst_mtddf->file_type();
-   otype = obs_mtddf->file_type();
+   // Get the input data file types
+   ftype = get_mtddf_file_type(fcst_files, ftype);
+   otype = get_mtddf_file_type(obs_files,  otype);
 
    // Process the configuration
    conf_info.process_config(ftype, otype);
@@ -439,10 +436,9 @@ static void process_grid(const Grid &fcst_grid, const Grid &obs_grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static Met2dDataFile *get_mtddf(const StringArray &file_list,
-                                const GrdFileType type) {
+static GrdFileType get_mtddf_file_type(const StringArray &file_list,
+                                       const GrdFileType type) {
    int i;
-   Met2dDataFile *mtddf = nullptr;
 
    // Find the first file that actually exists
    for(i=0; i<file_list.n(); i++) {
@@ -456,13 +452,19 @@ static Met2dDataFile *get_mtddf(const StringArray &file_list,
    }
 
    // Read first valid file
+   Met2dDataFile *mtddf = nullptr;
    if(!(mtddf = mtddf_factory.new_met_2d_data_file(file_list[i].c_str(), type))) {
       mlog << Error << "\nTrouble reading data file: "
            << file_list[i] << "\n\n";
       exit(1);
    }
 
-   return mtddf;
+   GrdFileType file_type = mtddf->file_type();
+
+   // Clean up 
+   if(mtddf) { delete mtddf; mtddf = nullptr; }
+
+   return file_type;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -561,6 +563,20 @@ static void get_series_data(int i_series,
 
    // Setup the verification grid
    if(!grid.is_set()) process_grid(fcst_grid, obs_grid);
+
+   // MET #3096 range/azimuth regridding logic
+   if(grid.info().ra) {
+
+      // Use the same range/azimuth grid if the dimensions match
+      if(fcst_grid.info().ra &&
+         obs_grid.info().ra &&
+         fcst_grid.nx() == obs_grid.nx() &&
+         fcst_grid.ny() == obs_grid.ny()) obs_grid = fcst_grid;
+
+      // Reset the verification grid with the current range/azimuth grid
+           if(fcst_grid.info().ra) grid = fcst_grid;
+      else if( obs_grid.info().ra) grid = obs_grid;
+   }
 
    // Regrid the forecast, if necessary
    if(!(fcst_grid == grid)) {
@@ -716,8 +732,6 @@ static void get_series_entry(int i_series, VarInfo *info,
 static bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
                               const GrdFileType type, DataPlane &dp,
                               Grid &cur_grid) {
-   Met2dDataFile *mtddf = nullptr;
-   bool found = false;
 
    // Check that the file exists
    if(!file_is_ok(cur_file, type)) {
@@ -727,10 +741,10 @@ static bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
    }
 
    // Open the data file
-   mtddf = mtddf_factory.new_met_2d_data_file(cur_file.c_str(), type);
+   Met2dDataFile * mtddf = mtddf_factory.new_met_2d_data_file(cur_file.c_str(), type);
 
    // Attempt to read the gridded data from the current file
-   found = mtddf->data_plane(*info, dp);
+   bool found = mtddf->data_plane(*info, dp);
 
    // Store the current grid
    if(found) cur_grid = mtddf->grid();
@@ -2510,9 +2524,6 @@ static void write_stat_data() {
    int deflate_level = compress_level;
    if(deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
-   // Allocate memory to store data values for each grid point
-   vector<float> data(grid.nx()*grid.ny());
-
    // Write output for each stat_data map entry
    for(const auto &key : stat_data_keys) {
 
@@ -2529,16 +2540,8 @@ static void write_stat_data() {
       if(!ptr->obs_thresh.empty())  add_att(&nc_var, "obs_thresh", ptr->obs_thresh);
       if(!is_bad_data(ptr->alpha))  add_att(&nc_var, "alpha", ptr->alpha);
 
-      // Store the data
-      for(int x=0; x<grid.nx(); x++) {
-         for(int y=0; y<grid.ny(); y++) {
-            int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-            data[n] = (float) ptr->dp(x, y);
-         } // end for y
-      } // end for x
-
       // Write out the data
-      if(!put_nc_data_with_dims(&nc_var, data.data(), grid.ny(), grid.nx())) {
+      if(!put_nc_data_plane_float(&nc_var, ptr->dp)) {
          mlog << Error << "\nwrite_stat_data() -> "
               << R"(error writing ")" << key
               << R"(" data to the output file.)" << "\n\n";
@@ -2605,10 +2608,6 @@ static void clean_up() {
 
    // Close the aggregate NetCDF file
    if(aggr_nc.MetNc) aggr_nc.close();
-
-   // Deallocate memory for data files
-   if(fcst_mtddf) { delete fcst_mtddf; fcst_mtddf = nullptr; }
-   if(obs_mtddf)  { delete obs_mtddf;  obs_mtddf  = nullptr; }
 
    // Deallocate memory for the random number generator
    rng_free(rng_ptr);

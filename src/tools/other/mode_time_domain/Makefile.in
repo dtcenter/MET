@@ -1005,9 +1005,10 @@ maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
 	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
+@ENABLE_DEVELOPMENT_FALSE@clean-local:
 clean: clean-am
 
-clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-local mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/mtd-2d_att.Po
@@ -1121,18 +1122,18 @@ uninstall-am: uninstall-binPROGRAMS
 .MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-am clean \
-	clean-binPROGRAMS clean-generic cscopelist-am ctags ctags-am \
-	distclean distclean-compile distclean-generic distclean-tags \
-	distdir dvi dvi-am html html-am info info-am install \
-	install-am install-binPROGRAMS install-data install-data-am \
-	install-dvi install-dvi-am install-exec install-exec-am \
-	install-html install-html-am install-info install-info-am \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic pdf pdf-am \
-	ps ps-am tags tags-am uninstall uninstall-am \
-	uninstall-binPROGRAMS
+	clean-binPROGRAMS clean-generic clean-local cscopelist-am \
+	ctags ctags-am distclean distclean-compile distclean-generic \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic pdf pdf-am ps ps-am tags tags-am uninstall \
+	uninstall-am uninstall-binPROGRAMS
 
 .PRECIOUS: Makefile
 
@@ -1145,10 +1146,10 @@ include ${top_srcdir}/Make-include
 # clean them up in a "make clean".  We don't want to do either of these
 # in a distribution because the enum_to_string utility isn't available.
 
-@ENABLE_DEVELOPMENT_TRUE@    mtdfiletype_to_string.cc mtdfiletype_to_string.h : mtd_file_base.h
+@ENABLE_DEVELOPMENT_TRUE@mtdfiletype_to_string.cc mtdfiletype_to_string.h : mtd_file_base.h
 @ENABLE_DEVELOPMENT_TRUE@	${ENUM_TO_STRING} -concat_string -reverse mtd_file_base.h
 
-@ENABLE_DEVELOPMENT_TRUE@    clean-local:
+@ENABLE_DEVELOPMENT_TRUE@clean-local:
 @ENABLE_DEVELOPMENT_TRUE@	-rm -f mtdfiletype_to_string.cc
 @ENABLE_DEVELOPMENT_TRUE@	-rm -f mtdfiletype_to_string.h
 

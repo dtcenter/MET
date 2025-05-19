@@ -349,7 +349,7 @@ References
 
 .. _Skamarock-2012:
 
-| Skamarock, W. C., J. B. Klemp, M. G. Duda, L. D. Fowler, S. Park, and 
+| Skamarock, W. C., J. B. Klemp, M. G. Duda, L. D. Fowler, S. Park, and
 |   T. Ringler, 2012: A Multiscale Nonhydrostatic Atmospheric Model Using
 |   Centroidal Voronoi Tesselations and C-Grid Staggering. *Mon. Wea. Rev.*,
 |   **140**, 3090-3105, doi: https://doi.org/10.1175/MWR-D-11-00215.1.

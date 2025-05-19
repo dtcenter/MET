@@ -1654,26 +1654,8 @@ static void write_netcdf(const DataPlane &dp) {
       write_netcdf_var_times(&mask_var, dp);
    }
 
-   // Allocate memory to store the mask values for each grid point
-   vector<float> mask_data(grid.nx()*grid.ny());
-
-   // Loop through each grid point
-#pragma omp parallel default(none) \
-   shared(grid, DefaultTO, mask_data, dp)
-   {
-
-#pragma omp for schedule(static) \
-                collapse(2)
-
-      for(int x=0; x<grid.nx(); x++) {
-         for(int y=0; y<grid.ny(); y++) {
-            int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-            mask_data[n] = (float) dp(x, y);
-         } // end for y
-      } // end for x
-   } // end of parallel
-      
-   if(!put_nc_data_with_dims(&mask_var, mask_data.data(), grid.ny(), grid.nx())) {
+   // Write the data
+   if(!put_nc_data_plane_float(&mask_var, dp)) {
       mlog << Error << "\nwrite_netcdf() -> "
            << "error with mask_var->put\n\n";
       exit(1);

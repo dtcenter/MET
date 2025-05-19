@@ -207,7 +207,20 @@ output_flag = {
 // NetCDF matched pairs output file
 // May be set separately in each "obs.field" entry
 //
-nc_pairs_flag = FALSE; 
+nc_pairs_flag = {
+   latlon       = TRUE;
+   raw          = TRUE;
+   diff         = TRUE;
+   climo        = FALSE;
+   climo_cdp    = FALSE;
+   seeps        = FALSE;
+   weight       = FALSE;
+   nbrhd        = FALSE;
+   fourier      = FALSE;
+   gradient     = FALSE;
+   distance_map = FALSE;
+   apply_mask   = FALSE;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 

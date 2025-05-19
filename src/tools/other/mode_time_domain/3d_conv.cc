@@ -567,7 +567,7 @@ if ( spatial_conv_radius == 0 )  {
 int j, x, y, n;
 int bad_count;
 static int t_count = 0;
-char junk[256];
+ConcatString cs;
 double value, value_front, value_back;
 bool   ok, ok_front, ok_back;
 double moving_sum;
@@ -679,13 +679,13 @@ for (y=0; y<ny; ++y)  {
 
 if ( do_ppms )  {
 
-   snprintf(junk, sizeof(junk), "sum_a_%02d.ppm", t_count);
+   cs.format("sum_a_%02d.ppm", t_count);
 
-   data_handle_ppm(data_out_p, nx, ny, junk);
+   data_handle_ppm(data_out_p, nx, ny, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "ok_a_%02d.ppm", t_count);
+   cs.format("ok_a_%02d.ppm", t_count);
 
-   ok_handle_ppm(ok_out_p, nx, ny, junk);
+   ok_handle_ppm(ok_out_p, nx, ny, cs.c_str());
 
 }
 
@@ -767,13 +767,13 @@ for (x=0; x<nx; ++x)  {
 
 if ( do_ppms )  {
 
-   snprintf(junk, sizeof(junk), "sum_b_%02d.ppm", t_count);
+   cs.format("sum_b_%02d.ppm", t_count);
 
-   data_handle_ppm(data_out_p, nx, ny, junk);
+   data_handle_ppm(data_out_p, nx, ny, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "ok_b_%02d.ppm", t_count);
+   cs.format("ok_b_%02d.ppm", t_count);
 
-   ok_handle_ppm(ok_out_p, nx, ny, junk);
+   ok_handle_ppm(ok_out_p, nx, ny, cs.c_str());
 
 }
 

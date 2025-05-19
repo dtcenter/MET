@@ -108,6 +108,7 @@ class DataPlane {
       double   operator() (int x, int y) const;
 
       const double * data() const;
+      const std::vector<double> & const_buf() const;
       std::vector<double> & buf();
 
          //
@@ -159,6 +160,7 @@ inline int      DataPlane::accum() const { return AccumTime; }
 inline double DataPlane::operator()(int x, int y) const { return get(x, y); }
 
 inline const double * DataPlane::data() const { return Data.data(); }
+inline const std::vector<double> & DataPlane::const_buf() const { return Data; }
 inline std::vector<double> & DataPlane::buf() { return Data; }
 
 ////////////////////////////////////////////////////////////////////////

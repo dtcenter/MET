@@ -43,6 +43,9 @@
 #include "memory.h"
 #include "logger.h"
 #include "util_constants.h"
+#ifdef WITH_PROFILER
+#include "ctrack.hpp"
+#endif
 
 using namespace std;
 
@@ -79,6 +82,11 @@ int main(int argc, char *argv[]) {
    int return_code = met_main(argc, argv);
 
    do_post_process();
+ 
+   // Write out the CTRACK metrics
+   #ifdef WITH_PROFILER
+   ctrack::result_print();
+   #endif
 
    return return_code;
 
@@ -87,6 +95,9 @@ int main(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 void do_pre_process(int argc, char *argv[]) {
+   #ifdef WITH_PROFILER
+   CTRACK;
+   #endif 
 
    store_arguments(argc, argv);
 
@@ -109,6 +120,10 @@ void do_pre_process(int argc, char *argv[]) {
 ////////////////////////////////////////////////////////////////////////
 
 void do_post_process() {
+   #ifdef WITH_PROFILER
+   CTRACK;
+   #endif
+
    ConcatString msg;
    msg << "Finish " << met_tool_name << " " << met_version
        << " by " << met_user_name << "(" << met_user_id

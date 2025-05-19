@@ -553,7 +553,7 @@ ConcatString LaeaGrid::serialize(const char *sep) const
 {
 
 ConcatString a;
-char junk[256];
+ConcatString cs;
 
 a << "Projection: Lambert Azimuthal Equal Area" << sep;
 
@@ -562,11 +562,11 @@ a << "Ny: " << Ny << sep;
 
 a << "SpheroidName: " << SpheroidName << sep;
 
-snprintf(junk, sizeof(junk), "Lat_LL: %.3f", lat_LL);   a << junk << sep;
-snprintf(junk, sizeof(junk), "Lon_LL: %.3f", lon_LL);   a << junk << sep;
+cs.format("Lat_LL: %.3f", lat_LL);   a << cs << sep;
+cs.format("Lon_LL: %.3f", lon_LL);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "Lat_Pole: %.3f", lat_pole);   a << junk << sep;
-snprintf(junk, sizeof(junk), "Lon_Pole: %.3f", lon_pole);   a << junk << sep;
+cs.format("Lat_Pole: %.3f", lat_pole);   a << cs << sep;
+cs.format("Lon_Pole: %.3f", lon_pole);   a << cs << sep;
 
    //
    //  done

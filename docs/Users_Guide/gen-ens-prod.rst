@@ -173,7 +173,7 @@ Each value in the array will replace the text **MET_ENS_MEMBER_ID**.
     ];
   }
 
-This replacement behavior can also be applied to climatology file name entry, in the 
+This replacement behavior can also be applied to climatology file name entry, in the
 climo_mean and climo_stdev dictionaries.
 
 .. code-block:: none
@@ -181,8 +181,8 @@ climo_mean and climo_stdev dictionaries.
   climo_mean = {
      file_name = ["/path/to/file/memberMET_ENS_MEMBER_ID-mean.nc"];
      }
-     
-This substitution method can only be used if **ens_member_ids** has at least one entry 
+
+This substitution method can only be used if **ens_member_ids** has at least one entry
 and the **normalize** option is set to **CLIMO_ANOM** or **CLIMO_STD_ANOM**.
 
 **control_id** is a string that is substituted in the same way as the **ens_member_ids** values
@@ -249,7 +249,7 @@ If **ensemble_flag.nmep** is set to TRUE, NMEP output is created for each combin
 _____________________
 
 .. code-block:: none
-		
+
   ensemble_flag = {
     latlon    = TRUE;
 	 mean      = TRUE;
