@@ -552,24 +552,24 @@ ConcatString LambertGrid::serialize(const char *sep) const
 {
 
 ConcatString a;
-char junk[256];
+ConcatString cs;
 
 a << "Projection: Lambert Conformal" << sep;
 
 a << "Nx: " << Nx << sep;
 a << "Ny: " << Ny << sep;
 
-snprintf(junk, sizeof(junk), "Lat_LL: %.3f", Lat_LL);   a << junk << sep;
-snprintf(junk, sizeof(junk), "Lon_LL: %.3f", Lon_LL);   a << junk << sep;
+cs.format("Lat_LL: %.3f", Lat_LL);   a << cs << sep;
+cs.format("Lon_LL: %.3f", Lon_LL);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "Lon_orient: %.3f", Lon_orient);   a << junk << sep;
+cs.format("Lon_orient: %.3f", Lon_orient);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "Alpha: %.3f", Alpha);   a << junk << sep;
+cs.format("Alpha: %.3f", Alpha);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "Cone: %.3f", Cone);   a << junk << sep;
+cs.format("Cone: %.3f", Cone);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "Bx: %.4f", Bx);   a << junk << sep;
-snprintf(junk, sizeof(junk), "By: %.4f", By);   a << junk;
+cs.format("Bx: %.4f", Bx);   a << cs << sep;
+cs.format("By: %.4f", By);   a << cs;
 
    //
    //  done

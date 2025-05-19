@@ -28,10 +28,10 @@ libvx_data2d_a_CPPFLAGS = ${MET_CPPFLAGS}
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
-    leveltype_to_string.cc leveltype_to_string.h: level_info.h
+leveltype_to_string.cc leveltype_to_string.h: level_info.h
 	${ENUM_TO_STRING} -concat_string -reverse level_info.h
 
-    clean-local:
+clean-local:
 	-rm -f leveltype_to_string.cc
 	-rm -f leveltype_to_string.h
 endif

@@ -402,7 +402,7 @@ if ( ! TheGraph )  {
 }
 
 int r, c, j, k;
-char junk[256];
+ConcatString cs;
 const int fcst_start = 1;
 const int fcst_stop  = fcst_start + N_fcst - 1;
 const int  obs_start = fcst_stop + 2;
@@ -430,10 +430,10 @@ k = 0;
 
 for (c=fcst_start; c<=fcst_stop; ++c)  {
 
-   snprintf(junk, sizeof(junk), "F%d", k++);
+   cs.format("F%d", k++);
 
-   table.set_entry(r, c, junk);
-   table.set_entry(c, r, junk);
+   table.set_entry(r, c, cs.c_str());
+   table.set_entry(c, r, cs.c_str());
 
 }
 
@@ -441,10 +441,10 @@ k = 0;
 
 for (c=obs_start; c<=obs_stop; ++c)  {
 
-   snprintf(junk, sizeof(junk), "O%d", k++);
+   cs.format("O%d", k++);
 
-   table.set_entry(r, c, junk);
-   table.set_entry(c, r, junk);
+   table.set_entry(r, c, cs.c_str());
+   table.set_entry(c, r, cs.c_str());
 
 }
 

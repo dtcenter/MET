@@ -84,7 +84,7 @@ c = 0;
 
 for (j=0; j<n_header_3d_cols; ++j)  {
 
-   table.set_entry(r, c++, header_3d_cols[j]);
+   table.set_entry(r, c, header_3d_cols[j]); c++;
 
 }
 
@@ -95,12 +95,12 @@ for (j=0; j<n_3d_single_cols; ++j)  {
       ConcatString cs;
       cs.format("INTENSITY_%d", config.inten_perc_value);
 
-      table.set_entry(r, c++, cs.c_str());
+      table.set_entry(r, c, cs.c_str()); c++;
 
    }
    else {
     
-      table.set_entry(r, c++, att_3d_single_cols[j]);
+      table.set_entry(r, c, att_3d_single_cols[j]); c++;
 
    }
 
@@ -200,7 +200,7 @@ c = 0;
 
 for (j=0; j<n_header_3d_cols; ++j)  {
 
-   table.set_entry(r, c++, header_3d_cols[j]);
+   table.set_entry(r, c, header_3d_cols[j]); c++;
 
 }
 
@@ -211,12 +211,12 @@ for (j=0; j<n_3d_single_cols; ++j)  {
       ConcatString cs;
       cs.format("INTENSITY_%d", config.inten_perc_value);
 
-      table.set_entry(r, c++, cs.c_str());
+      table.set_entry(r, c, cs.c_str()); c++;
 
    }
    else {
 
-      table.set_entry(r, c++, att_3d_single_cols[j]);
+      table.set_entry(r, c, att_3d_single_cols[j]); c++;
 
    }
 
@@ -346,13 +346,13 @@ c = 0;
 
 for (j=0; j<n_header_3d_cols; ++j)  {
 
-   table.set_entry(r, c++, header_3d_cols[j]);
+   table.set_entry(r, c, header_3d_cols[j]); c++;
 
 }
 
 for (j=0; j<n_att_3d_pair_cols; ++j)  {
 
-   table.set_entry(r, c++, att_3d_pair_cols[j]);
+   table.set_entry(r, c, att_3d_pair_cols[j]); c++;
 
 }
 
@@ -444,7 +444,7 @@ c = 0;
 
 for (j=0; j<n_header_3d_cols; ++j)  {
 
-   table.set_entry(r, c++, header_3d_cols[j]);
+   table.set_entry(r, c, header_3d_cols[j]); c++;
 
 }
 
@@ -455,12 +455,12 @@ for (j=0; j<n_2d_cols; ++j)  {
       ConcatString cs;
       cs.format("INTENSITY_%d", config.inten_perc_value);
 
-      table.set_entry(r, c++, cs.c_str());
+      table.set_entry(r, c, cs.c_str()); c++;
 
    }
    else {
 
-      table.set_entry(r, c++, att_2d_cols[j]);
+      table.set_entry(r, c, att_2d_cols[j]); c++;
 
    }
 
@@ -642,7 +642,7 @@ c = 0;
 
 for (j=0; j<n_header_3d_cols; ++j)  {
 
-   table.set_entry(r, c++, header_3d_cols[j]);
+   table.set_entry(r, c, header_3d_cols[j]); c++;
 
 }
 
@@ -653,12 +653,12 @@ for (j=0; j<n_2d_cols; ++j)  {
       ConcatString cs;
       cs.format("INTENSITY_%d", config.inten_perc_value);
 
-      table.set_entry(r, c++, cs.c_str());
+      table.set_entry(r, c, cs.c_str()); c++;
 
    }
    else {
 
-      table.set_entry(r, c++, att_2d_cols[j]);
+      table.set_entry(r, c, att_2d_cols[j]); c++;
 
    }
 

@@ -546,111 +546,111 @@ ConcatString s;
 
    //  version
 
-table.set_entry(row, c++, (string)met_version);
+table.set_entry(row, c, (string)met_version); c++;
 
    //  model
 
 s = check_hdr_str(conf_key_model, model);
 
-table.set_entry(row, c++, s.text());
+table.set_entry(row, c, s.text()); c++;
 
    //  description
 
 s = check_hdr_str(conf_key_desc, desc);
 
-table.set_entry(row, c++, s.text());
+table.set_entry(row, c, s.text()); c++;
 
    //  fcst lead
 
-table.set_entry(row, c++, sec_to_hhmmss(fcst_info->lead()));
+table.set_entry(row, c, sec_to_hhmmss(fcst_info->lead())); c++;
 
    //  fcst valid
 
-table.set_entry(row, c++, unix_to_yyyymmdd_hhmmss(fcst_info->valid()));
+table.set_entry(row, c, unix_to_yyyymmdd_hhmmss(fcst_info->valid())); c++;
 
    //  obs lead
 
-table.set_entry(row, c++, sec_to_hhmmss(obs_info->lead()));
+table.set_entry(row, c, sec_to_hhmmss(obs_info->lead())); c++;
 
    //  obs valid
 
-table.set_entry(row, c++, unix_to_yyyymmdd_hhmmss(obs_info->valid()));
+table.set_entry(row, c, unix_to_yyyymmdd_hhmmss(obs_info->valid())); c++;
 
    //  time delta
 
-table.set_entry(row, c++, sec_to_hhmmss(delta_t_seconds));
+table.set_entry(row, c, sec_to_hhmmss(delta_t_seconds)); c++;
 
    //  fcst time convolution begin
 
-table.set_entry(row, c++, fcst_conv_time_beg);
+table.set_entry(row, c, fcst_conv_time_beg); c++;
 
    //  fcst time convolution end
 
-table.set_entry(row, c++, fcst_conv_time_end);
+table.set_entry(row, c, fcst_conv_time_end); c++;
 
    //  fcst radius
 
-table.set_entry(row, c++, fcst_conv_radius);
+table.set_entry(row, c, fcst_conv_radius); c++;
 
    //  fcst threshold
 
 s = fcst_conv_thresh.get_str();
 
-table.set_entry(row, c++, s.text());
+table.set_entry(row, c, s.text()); c++;
 
    //  obs time convolution begin
 
-table.set_entry(row, c++, obs_conv_time_beg);
+table.set_entry(row, c, obs_conv_time_beg); c++;
 
    //  obs time convolution end
 
-table.set_entry(row, c++, obs_conv_time_end);
+table.set_entry(row, c, obs_conv_time_end); c++;
 
    //  obs radius
 
-table.set_entry(row, c++, obs_conv_radius);
+table.set_entry(row, c, obs_conv_radius); c++;
 
    //  obs threshold
 
 s = obs_conv_thresh.get_str();
 
-table.set_entry(row, c++, s.text());
+table.set_entry(row, c, s.text()); c++;
 
    //  fcst var
 
 s = check_hdr_str(conf_key_fcst_var, fcst_info->name_attr());
 
-table.set_entry(row, c++, s.text());
+table.set_entry(row, c, s.text()); c++;
 
    //  fcst units
 
 s = check_hdr_str(conf_key_fcst_units, fcst_info->units_attr(), true);
 
-table.set_entry(row, c++, s.text());
+table.set_entry(row, c, s.text()); c++;
 
    //  fcst level
 
 s = check_hdr_str(conf_key_fcst_lev, fcst_info->level_attr(), true);
 
-table.set_entry(row, c++, s.text());
+table.set_entry(row, c, s.text()); c++;
 
    //  obs var
 
 s = check_hdr_str(conf_key_obs_var, obs_info->name_attr());
 
-table.set_entry(row, c++, s.text());
+table.set_entry(row, c, s.text()); c++;
 
    //  obs units
 
 s = check_hdr_str(conf_key_obs_units, obs_info->units_attr(), true);
 
-table.set_entry(row, c++, s.text());
+table.set_entry(row, c, s.text()); c++;
 
    //  obs level
 
 s = check_hdr_str(conf_key_obs_lev, obs_info->level_attr(), true);
 
-table.set_entry(row, c++, s.text());
+table.set_entry(row, c, s.text()); c++;
 
    //
    //  done

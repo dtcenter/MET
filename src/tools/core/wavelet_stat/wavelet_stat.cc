@@ -2658,13 +2658,11 @@ static void set_dim(Box &dim, double y_ll, double y_ur, double x_cen) {
 ////////////////////////////////////////////////////////////////////////
 
 static void draw_colorbar(PSfile *p, const Box &dim, int fcst, int raw) {
-   char label[max_str_len];
-   double bar_width, bar_height, x_ll, y_ll, step, v;
-   const ColorTable *ct_ptr = (ColorTable *) nullptr;
 
    //
    // Set up the pointer to the appropriate colortable
    //
+   const ColorTable *ct_ptr = nullptr;
    if     (raw == 1 && fcst == 1) ct_ptr = &fcst_ct;
    else if(raw == 1 && fcst == 0) ct_ptr = &obs_ct;
    else                           ct_ptr = &wvlt_ct;
@@ -2679,15 +2677,15 @@ static void draw_colorbar(PSfile *p, const Box &dim, int fcst, int raw) {
    p->setlinewidth(l_width);
    p->choose_font(28, 8.0);
 
-   bar_width = h_margin;
-   bar_height = (dim.y_ur() - dim.y_ll())/(n_color_bars + 1);
+   double bar_width = h_margin;
+   double bar_height = (dim.y_ur() - dim.y_ll())/(n_color_bars + 1);
 
-   x_ll = dim.x_ur();
-   y_ll = dim.y_ll();
+   double x_ll = dim.x_ur();
+   double y_ll = dim.y_ll();
 
-   step = (ct_ptr->data_max(bad_data_double) -
-           ct_ptr->data_min(bad_data_double))/n_color_bars;
-   v = ct_ptr->data_min(bad_data_double);
+   double step = (ct_ptr->data_max(bad_data_double) -
+                 ct_ptr->data_min(bad_data_double))/n_color_bars;
+   double v = ct_ptr->data_min(bad_data_double);
 
    for(int i=0; i<=n_color_bars; i++) {
 
@@ -2720,9 +2718,10 @@ static void draw_colorbar(PSfile *p, const Box &dim, int fcst, int raw) {
      //
      // Add text
      //
-     snprintf(label, sizeof(label), "%.1f", v);
+     ConcatString label;
+     label.format("%.1f", v);
      p->write_centered_text(2, 1,  x_ll + 0.5*bar_width,
-                            y_ll + 0.5*bar_height, 0.5, 0.5, label);
+                            y_ll + 0.5*bar_height, 0.5, 0.5, label.c_str());
 
      v    += step;
      y_ll += bar_height;
@@ -2773,16 +2772,13 @@ static void draw_map(PSfile *p, const Box &dim) {
 
 static void draw_tiles(PSfile *p, const Box &dim,
                        int tile_start, int tile_end, int label_flag) {
-   int i;
-   double page_x, page_y;
-   char label[128];
-   Box tile_bb;
-   double bb_x, bb_y;
 
    p->gsave();
 
    // Loop through the tiles to be applied
-   for(i=tile_start; i<=tile_end; i++) {
+   for(int i=tile_start; i<=tile_end; i++) {
+
+      Box tile_bb;
 
       // If padding was performed, the tile is the size of the domain
       if(conf_info.grid_decomp_flag == GridDecompType::Pad) {
@@ -2790,6 +2786,9 @@ static void draw_tiles(PSfile *p, const Box &dim,
       }
       // Find the lower-left and upper-right corners of the tile
       else {
+
+         double bb_x;
+         double bb_y;
 
          // Compute the page x/y coordinates for this tile
          gridxy_to_pagexy(grid, xy_bb,
@@ -2833,16 +2832,17 @@ static void draw_tiles(PSfile *p, const Box &dim,
          // Plot the tile number in the center
          p->setlinewidth(0.0);
 
-         page_x = (tile_bb.x_ll() + tile_bb.x_ur())/2.0,
-         page_y = (tile_bb.y_ll() + tile_bb.y_ur())/2.0,
+         double page_x = (tile_bb.x_ll() + tile_bb.x_ur())/2.0;
+         double page_y = (tile_bb.y_ll() + tile_bb.y_ur())/2.0;
 
          p->choose_font(28, 20.0);
-         snprintf(label, sizeof(label), "%i", i+1);
-         p->write_centered_text(2, 1, page_x, page_y, 0.5, 0.5, label);
+         ConcatString label;
+         label.format("%i", i+1);
+         p->write_centered_text(2, 1, page_x, page_y, 0.5, 0.5, label.c_str());
 
          // Draw outline in black
          p->setrgbcolor(0.0, 0.0, 0.0);
-         p->write_centered_text(2, 0, page_x, page_y, 0.5, 0.5, label);
+         p->write_centered_text(2, 0, page_x, page_y, 0.5, 0.5, label.c_str());
       } // end if
    } // end for
 

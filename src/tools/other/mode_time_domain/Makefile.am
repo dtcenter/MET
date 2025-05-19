@@ -77,10 +77,10 @@ mtd_LDADD = -lvx_pxm \
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
-    mtdfiletype_to_string.cc mtdfiletype_to_string.h : mtd_file_base.h
+mtdfiletype_to_string.cc mtdfiletype_to_string.h : mtd_file_base.h
 	${ENUM_TO_STRING} -concat_string -reverse mtd_file_base.h
 
-    clean-local:
+clean-local:
 	-rm -f mtdfiletype_to_string.cc
 	-rm -f mtdfiletype_to_string.h
 endif

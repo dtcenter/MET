@@ -32,10 +32,10 @@ libvx_math_a_CPPFLAGS = ${MET_CPPFLAGS}
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
-    affine.cc viewgravity_to_string.cc viewgravity_to_string.h: affine.h
+viewgravity_to_string.cc viewgravity_to_string.h: affine.h
 	${ENUM_TO_STRING} -concat_string affine.h
 
-    clean-local:
-	-rm -f affine.cc viewgravity_to_string.cc
-	-rm -f affine.cc viewgravity_to_string.h
+clean-local:
+	-rm -f viewgravity_to_string.cc
+	-rm -f viewgravity_to_string.h
 endif

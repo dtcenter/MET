@@ -29,6 +29,7 @@ static void get_merc_grid           (const Python3_Dict & dict, Grid & g);
 static void get_latlon_grid         (const Python3_Dict & dict, Grid & g);
 static void get_rotated_latlon_grid (const Python3_Dict & dict, Grid & g);
 static void get_gaussian_grid       (const Python3_Dict & dict, Grid & g);
+static void get_range_azimuth_grid  (const Python3_Dict & dict, Grid & g);
 static void get_semilatlon_grid     (const Python3_Dict & dict, Grid & g);
 
 static void lookup_python_num_array(const Python3_Dict &, const char *, NumArray &);
@@ -65,6 +66,7 @@ else if ( proj_type ==       mercator_proj_type )  get_merc_grid           (dict
 else if ( proj_type ==         latlon_proj_type )  get_latlon_grid         (dict, g);
 else if ( proj_type == rotated_latlon_proj_type )  get_rotated_latlon_grid (dict, g);
 else if ( proj_type ==       gaussian_proj_type )  get_gaussian_grid       (dict, g);
+else if ( proj_type ==  range_azimuth_proj_type )  get_range_azimuth_grid  (dict, g);
 else if ( proj_type ==     semilatlon_proj_type )  get_semilatlon_grid     (dict, g);
 else {
 
@@ -102,7 +104,7 @@ return;
    //  nx, ny                          (int)
    //
 
-void get_lc_grid     (const Python3_Dict & dict, Grid & g)
+static void get_lc_grid     (const Python3_Dict & dict, Grid & g)
 
 {
 
@@ -177,7 +179,7 @@ return;
    //
 
 
-void get_st_grid     (const Python3_Dict & dict, Grid & g)
+static void get_st_grid     (const Python3_Dict & dict, Grid & g)
 
 {
 
@@ -252,7 +254,7 @@ return;
    //  nx, ny      (int)
    //
 
-void get_merc_grid   (const Python3_Dict & dict, Grid & g)
+static void get_merc_grid   (const Python3_Dict & dict, Grid & g)
 
 {
 
@@ -306,7 +308,7 @@ return;
    // Nlat, Nlon              (int)
    //
 
-void get_latlon_grid (const Python3_Dict & dict, Grid & g)
+static void get_latlon_grid (const Python3_Dict & dict, Grid & g)
 
 {
 
@@ -361,7 +363,7 @@ return;
    // aux_rotation                              (double)
    //
 
-void get_rotated_latlon_grid (const Python3_Dict & dict, Grid & g)
+static void get_rotated_latlon_grid (const Python3_Dict & dict, Grid & g)
 
 {
 
@@ -416,7 +418,7 @@ return;
    // nx, ny    (int)
    //
 
-void get_gaussian_grid (const Python3_Dict & dict, Grid & g)
+static void get_gaussian_grid (const Python3_Dict & dict, Grid & g)
 
 {
 
@@ -454,6 +456,56 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
    //
+   // name                   (string)
+   //
+   // range_n, azimuth_n     (int)
+   //
+   // range_max_km           (double)
+   //
+   // lat_center, lon_center (double)
+   //
+
+static void get_range_azimuth_grid (const Python3_Dict & dict, Grid & g)
+
+{
+
+RngAziData data;
+ConcatString s;
+
+s = dict.lookup_string("name");
+
+set_string(data.name, s);
+
+data.range_n   = dict.lookup_int("range_n");
+data.azimuth_n = dict.lookup_int("azimuth_n");
+
+data.range_max_km = dict.lookup_double("range_max_km");
+
+data.lat_center = dict.lookup_double("lat_center");
+data.lon_center = rescale_lon(dict.lookup_double("lon_center"));
+
+if ( ! west_longitude_positive )  {
+
+   toggle_sign(data.lon_center);
+
+}
+
+   //
+   //  done
+   //
+
+g.set(data);
+
+if ( data.name )  { delete [] data.name;  data.name = (const char *) nullptr; }
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+   //
    //  name        (string)
    //
    //  lats        (array of double)
@@ -465,7 +517,7 @@ return;
    //  times       (array of double)
    //
 
-void get_semilatlon_grid   (const Python3_Dict & dict, Grid & g)
+static void get_semilatlon_grid   (const Python3_Dict & dict, Grid & g)
 
 {
 
@@ -497,7 +549,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void lookup_python_num_array(const Python3_Dict & dict, const char *key, NumArray &vals)
+static void lookup_python_num_array(const Python3_Dict & dict, const char *key, NumArray &vals)
 
 {
 
@@ -546,7 +598,7 @@ return;
    //    just "char *" is the only thing that makes this tricky
    //
 
-void set_string(const char * & dest, const ConcatString & src)
+static void set_string(const char * & dest, const ConcatString & src)
 
 {
 
