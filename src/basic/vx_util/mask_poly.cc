@@ -175,7 +175,7 @@ if ( Name.empty() )  return;
 
 int j;
 char NS, EW;
-char junk[256];
+ConcatString cs;
 
 Indent prefix(depth);
 Indent p2(depth + 1);
@@ -194,9 +194,9 @@ for (j=0; j<Npoints; ++j)  {
    if ( Lon[j] >= 0.0 )  EW = 'W';
    else                  EW = 'E';
 
-   snprintf(junk, sizeof(junk), "Point # %2d -> %7.2f %c   %8.2f %c", j, fabs(Lat[j]), NS, fabs(Lon[j]), EW);
+   cs.format("Point # %2d -> %7.2f %c   %8.2f %c", j, fabs(Lat[j]), NS, fabs(Lon[j]), EW);
 
-   out << p2 << junk << "\n";
+   out << p2 << cs << "\n";
 
 }
 

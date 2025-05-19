@@ -11,7 +11,7 @@ Unit Tests
 ==========
 
 The MET unit tests offer much more thorough testing coverage of the MET tools than running ``make test``, as described above. These units tests provide the basis for the regression testing performed for each pull request. Logic exists in GitHub automation to run these unit tests and check for differences in the output. However, these unit tests can also be run locally and instructions for doing so are provided in this section.
- 
+
 Running Unit Tests
 ------------------
 

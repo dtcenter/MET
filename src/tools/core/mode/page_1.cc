@@ -43,8 +43,7 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
 {
 
    int j;
-   const int buf_len = 1024;
-   char junk[buf_len + 1];
+   ConcatString cs;
    ConcatString label, thresh_str;
    ConcatString tmp1_str, tmp2_str, tmp3_str;
    int i, mon, day, yr, hr, minute, sec;
@@ -209,13 +208,13 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
 
    for(i=0; i<n; i++) {
 
-      snprintf(junk, sizeof(junk), "%d", eng.info_singles[i].fcst_number);
+      cs.format("%d", eng.info_singles[i].fcst_number);
 
-      t0.write_xy1_to_cell(i + 1, 0, x, dy, 0.5, 0.0, junk);
+      t0.write_xy1_to_cell(i + 1, 0, x, dy, 0.5, 0.0, cs.c_str());
 
-      snprintf(junk, sizeof(junk), "%d", eng.info_singles[i].obs_number);
+      cs.format("%d", eng.info_singles[i].obs_number);
 
-      t0.write_xy1_to_cell(i + 1, 1, x, dy, 0.5, 0.0, junk);
+      t0.write_xy1_to_cell(i + 1, 1, x, dy, 0.5, 0.0, cs.c_str());
 
       if ( eng.info_singles[i].interest_value < 0 ) label = na_str;
       else {
@@ -361,22 +360,22 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
 
    unix_to_mdyhms(t, mon, day, yr, hr, minute, sec);
 
-   snprintf(junk, sizeof(junk), "%04d %02d %02d", yr, mon, day);
+   cs.format("%04d %02d %02d", yr, mon, day);
 
-   t1.write_xy1_to_cell(5, 1, dx, dy, 0.0, 0.0, junk);
+   t1.write_xy1_to_cell(5, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%02d:%.02d:%02d", hr, minute, sec);
+   cs.format("%02d:%.02d:%02d", hr, minute, sec);
 
-   t1.write_xy1_to_cell(6, 1, dx, dy, 0.0, 0.0, junk);
+   t1.write_xy1_to_cell(6, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
    t = eng.obs_raw->data.valid() - eng.obs_raw->data.lead();
 
    unix_to_mdyhms(t, mon, day, yr, hr, minute, sec);
 
-   snprintf(junk, sizeof(junk), "%04d %02d %02d", yr, mon, day);
-   t1.write_xy1_to_cell(5, 2, dx, dy, 0.0, 0.0, junk);
-   snprintf(junk, sizeof(junk), "%02d:%02d:%02d", hr, minute, sec);
-   t1.write_xy1_to_cell(6, 2, dx, dy, 0.0, 0.0, junk);
+   cs.format("%04d %02d %02d", yr, mon, day);
+   t1.write_xy1_to_cell(5, 2, dx, dy, 0.0, 0.0, cs.c_str());
+   cs.format("%02d:%02d:%02d", hr, minute, sec);
+   t1.write_xy1_to_cell(6, 2, dx, dy, 0.0, 0.0, cs.c_str());
    text_y -= 2.0*TextSep;
 
    //
@@ -387,25 +386,25 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
 
    unix_to_mdyhms(t, mon, day, yr, hr, minute, sec);
 
-   snprintf(junk, sizeof(junk), "%04d %02d %02d", yr, mon, day);
+   cs.format("%04d %02d %02d", yr, mon, day);
 
-   t1.write_xy1_to_cell(7, 1, dx, dy, 0.0, 0.0, junk);
+   t1.write_xy1_to_cell(7, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%02d:%02d:%02d", hr, minute, sec);
+   cs.format("%02d:%02d:%02d", hr, minute, sec);
 
-   t1.write_xy1_to_cell(8, 1, dx, dy, 0.0, 0.0, junk);
+   t1.write_xy1_to_cell(8, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
    t = eng.obs_raw->data.valid();
 
    unix_to_mdyhms(t, mon, day, yr, hr, minute, sec);
 
-   snprintf(junk, sizeof(junk), "%04d %02d %02d", yr, mon, day);
+   cs.format("%04d %02d %02d", yr, mon, day);
 
-   t1.write_xy1_to_cell(7, 2, dx, dy, 0.0, 0.0, junk);
+   t1.write_xy1_to_cell(7, 2, dx, dy, 0.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%02d:%02d:%02d", hr, minute, sec);
+   cs.format("%02d:%02d:%02d", hr, minute, sec);
 
-   t1.write_xy1_to_cell(8, 2, dx, dy, 0.0, 0.0, junk);
+   t1.write_xy1_to_cell(8, 2, dx, dy, 0.0, 0.0, cs.c_str());
 
    text_y -= 2.0*TextSep;
 
@@ -413,13 +412,14 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
    // Accumulation time
    //
 
-   m_strncpy(junk, sec_to_hhmmss_colon(eng.fcst_raw->data.accum()).c_str(),
-             buf_len, method_name, "fcst_raw->data.accum()");
-   t1.write_xy1_to_cell(9, 1, dx, dy, 0.0, 0.0, junk);
+   cs = sec_to_hhmmss_colon(eng.fcst_raw->data.accum());
 
-   m_strncpy(junk, sec_to_hhmmss_colon(eng.obs_raw->data.accum()).c_str(),
-             buf_len, method_name, "obs_raw->data.accum()");
-   t1.write_xy1_to_cell(9, 2, dx, dy, 0.0, 0.0, junk);
+   t1.write_xy1_to_cell(9, 1, dx, dy, 0.0, 0.0, cs.c_str());
+
+   cs = sec_to_hhmmss_colon(eng.obs_raw->data.accum());
+
+   t1.write_xy1_to_cell(9, 2, dx, dy, 0.0, 0.0, cs.c_str());
+
    nextline();
 
    ////////////////////////////////////////////////////////////////////
@@ -497,11 +497,11 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
 
    r = 0;
 
-   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.centroid_dist_wt);
-   t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+   cs.format("%.2f", eng.conf_info.centroid_dist_wt);
+   t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.boundary_dist_wt);
-   t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+   cs.format("%.2f", eng.conf_info.boundary_dist_wt);
+   t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, cs.c_str());
    ++r;
    nextline();
 
@@ -509,11 +509,11 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
    // Convex Hull Distance and Angle Difference Weights
    //
 
-   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.convex_hull_dist_wt);
-   t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+   cs.format("%.2f", eng.conf_info.convex_hull_dist_wt);
+   t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.angle_diff_wt);
-   t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+   cs.format("%.2f", eng.conf_info.angle_diff_wt);
+   t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, cs.c_str());
    ++r;
    nextline();
 
@@ -521,11 +521,11 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
    // Aspect Ratio Difference and Area Ratio Weights
    //
 
-   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.aspect_diff_wt);
-   t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+   cs.format("%.2f", eng.conf_info.aspect_diff_wt);
+   t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.area_ratio_wt);
-   t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+   cs.format("%.2f", eng.conf_info.area_ratio_wt);
+   t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, cs.c_str());
    ++r;
    nextline();
 
@@ -533,11 +533,11 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
    // Intesection Over Minimum Area Weights and Curvature Ratio Weights
    //
 
-   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.int_area_ratio_wt);
-   t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+   cs.format("%.2f", eng.conf_info.int_area_ratio_wt);
+   t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.curvature_ratio_wt);
-   t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+   cs.format("%.2f", eng.conf_info.curvature_ratio_wt);
+   t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, cs.c_str());
    ++r;
    nextline();
 
@@ -545,11 +545,11 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
    // Complexity Ratio and Intensity Ratio Weights
    //
 
-   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.complexity_ratio_wt);
-   t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+   cs.format("%.2f", eng.conf_info.complexity_ratio_wt);
+   t2.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.inten_perc_ratio_wt);
-   t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+   cs.format("%.2f", eng.conf_info.inten_perc_ratio_wt);
+   t2.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, cs.c_str());
    ++r;
    nextline();
 
@@ -557,9 +557,9 @@ void ModePsFile::do_page_1(ModeFuzzyEngine & eng, EngineType eng_type, const cha
    // Total Interest Threshold
    //
 
-   snprintf(junk, sizeof(junk), "%.2f", eng.conf_info.total_interest_thresh);
+   cs.format("%.2f", eng.conf_info.total_interest_thresh);
 
-   t2.write_xy1_to_cell(r, 2, 0.0, dy, 0.5, 0.0, junk);
+   t2.write_xy1_to_cell(r, 2, 0.0, dy, 0.5, 0.0, cs.c_str());
 
    nextline();
 
@@ -594,7 +594,7 @@ void ModePsFile::do_page_1_FOEng(ModeFuzzyEngine & eng, EngineType eng_type, con
 {
 
    int j, r;
-   char junk[1024];
+   ConcatString cs;
    ConcatString label, thresh_str;
    ConcatString tmp1_str, tmp2_str, tmp3_str;
    double v;
@@ -720,11 +720,11 @@ void ModePsFile::do_page_1_FOEng(ModeFuzzyEngine & eng, EngineType eng_type, con
    //
    // Convolution Radius
    //
-   snprintf(junk, sizeof(junk), "%d", eng.conf_info.Fcst->conv_radius);
-   t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+   cs.format("%d", eng.conf_info.Fcst->conv_radius);
+   t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%d", eng.conf_info.Obs->conv_radius);
-   t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+   cs.format("%d", eng.conf_info.Obs->conv_radius);
+   t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, cs.c_str());
 
    ++r;
    nextline();
@@ -745,11 +745,11 @@ void ModePsFile::do_page_1_FOEng(ModeFuzzyEngine & eng, EngineType eng_type, con
    // Object Filters
    //
 
-   snprintf(junk, sizeof(junk), "%i", (int) eng.conf_info.Fcst->filter_attr_map.size());
-   t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+   cs.format("%i", (int) eng.conf_info.Fcst->filter_attr_map.size());
+   t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%i", (int) eng.conf_info.Obs->filter_attr_map.size());
-   t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+   cs.format("%i", (int) eng.conf_info.Obs->filter_attr_map.size());
+   t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, cs.c_str());
 
    ++r;
    nextline();
@@ -761,8 +761,8 @@ void ModePsFile::do_page_1_FOEng(ModeFuzzyEngine & eng, EngineType eng_type, con
    if(nint(eng.conf_info.inten_perc_value) == 101) label = "mean";
    else if(nint(eng.conf_info.inten_perc_value) == 102) label = "sum";
    else {
-      snprintf(junk, sizeof(junk), "p%d", eng.conf_info.inten_perc_value);
-      label = junk;
+      cs.format("p%d", eng.conf_info.inten_perc_value);
+      label = cs;
    }
    t.write_xy1_to_cell(r, 2, 0.0, dy, 0.5, 0.0, label.c_str());
 
@@ -830,13 +830,13 @@ void ModePsFile::do_page_1_FOEng(ModeFuzzyEngine & eng, EngineType eng_type, con
    // Simple objects counts (Matched Simples/Unmatched Simples)
    //
 
-   snprintf(junk, sizeof(junk), "%i/%i/%i", eng.n_fcst,
+   cs.format("%i/%i/%i", eng.n_fcst,
             eng.get_matched_fcst(0), eng.get_unmatched_fcst(0));
-   t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+   t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%i/%i/%i", eng.n_obs,
+   cs.format("%i/%i/%i", eng.n_obs,
             eng.get_matched_obs(0), eng.get_unmatched_obs(0));
-   t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+   t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, cs.c_str());
 
    ++r;
    nextline();
@@ -845,11 +845,11 @@ void ModePsFile::do_page_1_FOEng(ModeFuzzyEngine & eng, EngineType eng_type, con
    // Area counts
    //
 
-   snprintf(junk, sizeof(junk), "%d", eng.get_matched_fcst(1) + eng.get_unmatched_fcst(1));
-   t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+   cs.format("%d", eng.get_matched_fcst(1) + eng.get_unmatched_fcst(1));
+   t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%d", eng.get_matched_obs(1) + eng.get_unmatched_obs(1));
-   t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+   cs.format("%d", eng.get_matched_obs(1) + eng.get_unmatched_obs(1));
+   t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, cs.c_str());
 
    ++r;
    nextline();
@@ -858,13 +858,13 @@ void ModePsFile::do_page_1_FOEng(ModeFuzzyEngine & eng, EngineType eng_type, con
    // Area counts (Matched Simple/Unmatched Simples)
    //
 
-   snprintf(junk, sizeof(junk), "%i/%i",
+   cs.format("%i/%i",
             eng.get_matched_fcst(1),  eng.get_unmatched_fcst(1));
-   t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+   t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%i/%i",
+   cs.format("%i/%i",
             eng.get_matched_obs(1),  eng.get_unmatched_obs(1));
-   t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+   t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, cs.c_str());
 
    ++r;
    nextline();
@@ -873,11 +873,11 @@ void ModePsFile::do_page_1_FOEng(ModeFuzzyEngine & eng, EngineType eng_type, con
    // Cluster object counts
    //
 
-   snprintf(junk, sizeof(junk), "%i", eng.collection.n_sets);
-   t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+   cs.format("%i", eng.collection.n_sets);
+   t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%i", eng.collection.n_sets);
-   t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+   cs.format("%i", eng.collection.n_sets);
+   t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, cs.c_str());
 
    ++r;
    nextline();
@@ -893,12 +893,12 @@ void ModePsFile::do_page_1_FOEng(ModeFuzzyEngine & eng, EngineType eng_type, con
    //
 
    v = interest_percentile(eng, 50.0, 1);
-   snprintf(junk, sizeof(junk), "%.4f", v);
-   t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, junk);
+   cs.format("%.4f", v);
+   t.write_xy1_to_cell(r, 1, dx, dy, 0.0, 0.0, cs.c_str());
 
    v = interest_percentile(eng, 50.0, 2);
-   snprintf(junk, sizeof(junk), "%.4f", v);
-   t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, junk);
+   cs.format("%.4f", v);
+   t.write_xy1_to_cell(r, 2, dx, dy, 0.0, 0.0, cs.c_str());
 
    ++r;
    nextline();
@@ -908,8 +908,8 @@ void ModePsFile::do_page_1_FOEng(ModeFuzzyEngine & eng, EngineType eng_type, con
    //
 
    v = interest_percentile(eng, 50.0, 3);
-   snprintf(junk, sizeof(junk), "%.4f", v);
-   t.write_xy1_to_cell(r, 2, 0.0, dy, 0.5, 0.0, junk);
+   cs.format("%.4f", v);
+   t.write_xy1_to_cell(r, 2, 0.0, dy, 0.5, 0.0, cs.c_str());
 
    ++r;
    nextline();
@@ -929,7 +929,7 @@ void ModePsFile::do_page_1_other(ModeFuzzyEngine & eng, EngineType eng_type, con
 {
 
    int j, c;
-   char junk[1024];
+   ConcatString cs;
    TableHelper t;
    const int simple_row  = 1;
    const int cluster_row = 2;
@@ -980,13 +980,13 @@ void ModePsFile::do_page_1_other(ModeFuzzyEngine & eng, EngineType eng_type, con
    t.write_xy1_to_cell(cluster_row, 0, dx, dy, 0.0, 0.0, "Cluster");
    t.write_xy1_to_cell(area_row,    0, dx, dy, 0.0, 0.0, "Area");
    roman();
-   snprintf(junk, sizeof(junk), "%d", eng.n_fcst);
+   cs.format("%d", eng.n_fcst);
    c = fcst_col;
-   t.write_xy1_to_cell(simple_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, junk);
+   t.write_xy1_to_cell(simple_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%d", eng.n_obs);
+   cs.format("%d", eng.n_obs);
    c = obs_col;
-   t.write_xy1_to_cell(simple_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, junk);
+   t.write_xy1_to_cell(simple_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, cs.c_str());
 
    nextline();
 
@@ -994,13 +994,13 @@ void ModePsFile::do_page_1_other(ModeFuzzyEngine & eng, EngineType eng_type, con
    // Area counts
    //
 
-   snprintf(junk, sizeof(junk), "%d", eng.get_matched_fcst(1) + eng.get_unmatched_fcst(1));
+   cs.format("%d", eng.get_matched_fcst(1) + eng.get_unmatched_fcst(1));
    c = fcst_col;
-   t.write_xy1_to_cell(area_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, junk);
+   t.write_xy1_to_cell(area_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%d", eng.get_matched_obs(1) + eng.get_unmatched_obs(1));
+   cs.format("%d", eng.get_matched_obs(1) + eng.get_unmatched_obs(1));
    c = obs_col;
-   t.write_xy1_to_cell(area_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, junk);
+   t.write_xy1_to_cell(area_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, cs.c_str());
 
    nextline();
 
@@ -1008,13 +1008,13 @@ void ModePsFile::do_page_1_other(ModeFuzzyEngine & eng, EngineType eng_type, con
    // Cluster object counts
    //
 
-   snprintf(junk, sizeof(junk), "%d", eng.collection.n_sets);
+   cs.format("%d", eng.collection.n_sets);
    c = fcst_col;
-   t.write_xy1_to_cell(cluster_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, junk);
+   t.write_xy1_to_cell(cluster_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, cs.c_str());
 
-   snprintf(junk, sizeof(junk), "%d", eng.collection.n_sets);
+   cs.format("%d", eng.collection.n_sets);
    c = obs_col;
-   t.write_xy1_to_cell(cluster_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, junk);
+   t.write_xy1_to_cell(cluster_row, c, t.col_width(c) - 5.0, dy, 1.0, 0.0, cs.c_str());
 
    nextline();
 

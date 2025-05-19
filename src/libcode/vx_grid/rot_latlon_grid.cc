@@ -305,7 +305,7 @@ ConcatString RotatedLatLonGrid::serialize(const char *sep) const
 {
 
 ConcatString a;
-char junk[256];
+ConcatString cs;
 
 
 a << "Projection: Rotated Lat/Lon" << sep;
@@ -313,18 +313,18 @@ a << "Projection: Rotated Lat/Lon" << sep;
 a << "Nx: " << Nx << sep;
 a << "Ny: " << Ny << sep;
 
-snprintf(junk, sizeof(junk), "rot_lat_ll: %.3f", RData.rot_lat_ll);   a << junk << sep;
-snprintf(junk, sizeof(junk), "rot_lon_ll: %.3f", RData.rot_lon_ll);   a << junk << sep;
+cs.format("rot_lat_ll: %.3f", RData.rot_lat_ll);   a << cs << sep;
+cs.format("rot_lon_ll: %.3f", RData.rot_lon_ll);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "delta_rot_lat: %.3f", RData.delta_rot_lat);   a << junk << sep;
-snprintf(junk, sizeof(junk), "delta_rot_lon: %.3f", RData.delta_rot_lon);   a << junk << sep;
+cs.format("delta_rot_lat: %.3f", RData.delta_rot_lat);   a << cs << sep;
+cs.format("delta_rot_lon: %.3f", RData.delta_rot_lon);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "wrapLon: %s", bool_to_string(wrapLon));   a << junk << sep;
+cs.format("wrapLon: %s", bool_to_string(wrapLon));   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "true_lat_south_pole: %.3f", RData.true_lat_south_pole);   a << junk << sep;
-snprintf(junk, sizeof(junk), "true_lon_south_pole: %.3f", RData.true_lon_south_pole);   a << junk << sep;
+cs.format("true_lat_south_pole: %.3f", RData.true_lat_south_pole);   a << cs << sep;
+cs.format("true_lon_south_pole: %.3f", RData.true_lon_south_pole);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "aux_rotation: %.3f", RData.aux_rotation);   a << junk;
+cs.format("aux_rotation: %.3f", RData.aux_rotation);   a << cs;
 
    //
    //  done

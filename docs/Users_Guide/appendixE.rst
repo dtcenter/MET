@@ -57,7 +57,7 @@ The next two config file parameters have to do with specifying the interpolation
 The other interpolation parameter is **interp_width**. This specifies the width of the interpolation box used in the above interpolation method. An example value could be
 
 .. code-block:: none
-		
+
   interp_width = 5;
 
 The value must be odd and :math:`\geqq` 1. If a value of 1 is specified, then nearest neighbor interpolation will be used regardless of the value assigned to **interp_method**.
@@ -67,15 +67,15 @@ The fact that an interpolation box is used has one subtle implication-the "To" g
 The next variable, **good_percent**, tells what fraction of the values in the interpolation square needs to be "good" in order for the interpolation scheme to return a "good" result. Example:
 
 .. code-block:: none
-		
+
   good percent = 0;
 
 The rest of the config file parameters have to do with how the output netCDF file represents the data. These should be self-explanatory, so I'll just give an example:
 
 .. code-block:: none
-		
+
   variable_name = "Cloud Pct";
   long_name     = "cloud cover percent";
   grib_code     = 100;
   units         = "percent";
-  level         = "SFC"; 
+  level         = "SFC";

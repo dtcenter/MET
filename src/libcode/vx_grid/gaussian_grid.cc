@@ -371,11 +371,11 @@ ConcatString GaussianGrid::serialize(const char *sep) const
 {
     
 ConcatString a;
-char junk[256];
+ConcatString cs;
 
 a << "Projection: Gaussian" << sep;
 
-snprintf(junk, sizeof(junk), " Lon_Zero: %.4f", Lon_Zero);   a << junk;
+cs.format(" Lon_Zero: %.4f", Lon_Zero);   a << cs;
 
 a << "Nx: " << Nx << sep;
 a << "Ny: " << Ny;

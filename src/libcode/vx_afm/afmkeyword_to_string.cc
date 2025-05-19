@@ -28,7 +28,6 @@
 
 #include "afmkeyword_to_string.h"
 
-
 using namespace std;
 
 

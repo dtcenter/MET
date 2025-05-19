@@ -154,7 +154,7 @@ void MtdFileBase::dump(ostream & out, int depth) const
 
 Indent prefix(depth);
 int month, day, year, hour, minute, second;
-char junk[256];
+ConcatString cs;
 
 out << prefix << "Filename          = ";
 
@@ -163,10 +163,9 @@ else                        out << "(nul)\n";
 
 unix_to_mdyhms(StartValidTime, month, day, year, hour, minute, second);
 
-snprintf(junk, sizeof(junk), "%s %d, %d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+cs.format("%s %d, %d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
-
-out << prefix << "StartValidTime    = " << StartValidTime << " ... (" << junk << ")\n";
+out << prefix << "StartValidTime    = " << StartValidTime << " ... (" << cs << ")\n";
 out << prefix << "DeltaT            = " << DeltaT    << '\n';
 out << prefix << "FileType          = " << mtdfiletype_to_string(FileType) << '\n';
 
@@ -479,7 +478,7 @@ void MtdFileBase::write(NcFile & f) const
 
 {
 
-char junk[256];
+ConcatString cs;
 ConcatString s;
 
    //  Add the time dimension
@@ -500,9 +499,9 @@ s = unix_to_yyyymmdd_hhmmss(StartValidTime);
 add_att(&f, start_time_att_name, s.text());
 
 
-snprintf(junk, sizeof(junk), "%d", DeltaT);
+cs.format("%d", DeltaT);
 
-add_att(&f, delta_t_att_name, junk);
+add_att(&f, delta_t_att_name, cs.c_str());
 
    //  FileType
 

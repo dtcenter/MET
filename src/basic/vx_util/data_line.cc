@@ -179,7 +179,7 @@ void DataLine::dump(ostream & out, int depth) const
 {
 
 int j;
-char junk[256];
+ConcatString cs;
 Indent prefix(depth);
 
 
@@ -194,9 +194,9 @@ if ( N_items == 0 )  { out.flush();  return; }
 
 for (j=0; j<N_items; ++j)  {
 
-   snprintf(junk, sizeof(junk), "Item[%2d]       = \"", j);
+   cs.format("Item[%2d]       = \"", j);
 
-   out << prefix << junk << Items[j] << "\"\n";
+   out << prefix << cs << Items[j] << "\"\n";
 
    if ( (j%5) == 4 )  out << prefix << '\n';
 

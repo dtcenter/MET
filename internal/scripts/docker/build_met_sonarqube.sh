@@ -95,6 +95,9 @@ if [ "$MET_GIT_NAME" != "$SONAR_REFERENCE_BRANCH" ]; then
   echo "sonar.newCode.referenceBranch=${SONAR_REFERENCE_BRANCH}" >> $SONAR_PROPERTIES
 fi
 
+# Disable development mode so that auto-generated code will not be recreated 
+unset MET_DEVELOPMENT
+
 # Run the MET configure script
 time_command ./configure \
   BUFRLIB_NAME=${BUFRLIB_NAME} \
