@@ -414,7 +414,7 @@ void DiagFile::read_ships_rt(const ConcatString &path,
    dl.read_line(this);
 
    // Check for the expected number of items
-   if(dl.n_items() != 9 || strncasecmp(dl[8], "HEAD", strlen("HEAD") != 0)) {
+   if(dl.n_items() != 9 || strncasecmp(dl[8], "HEAD", strlen("HEAD")) != 0) {
       mlog << Error << "\nDiagFile::read_ships_rt() -> "
            << "unexpected header line: " << path << "\n\n";
       exit(1);

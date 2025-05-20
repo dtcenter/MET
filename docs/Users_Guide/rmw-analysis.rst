@@ -82,7 +82,7 @@ ____________________
   valid_mask = "";
   version    = "VN.N";
 
-The track filter options available in rmw_analysis and listed above are described in :numref:`config_options`.
+The track filter options available in rmw_analysis and listed above are described in :numref:`config_options_tc`.
 
 
 
