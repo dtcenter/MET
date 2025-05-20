@@ -14,10 +14,6 @@ By default, the tool generates summary and detail metrics to stdout (standard ou
 in easy to read, well-formatted tables.  The ctrack.hpp file has been modified to permit
 saving these tables to their respective text files (summary_output.txt and detail_output.txt).
 
-.. note::
-  The benchmarking tool currently supports **collecting benchmarking metrics for running the code once**
-  (i.e. no stress-testing support is available).
-
 
 
 Overview
@@ -49,6 +45,7 @@ The following code is instrumented using CTRACK:
    - do_post_process function
 - MET/src/tools/core/ensemble_stat/ensemble_stat.cc
 - MET/src/tools/core/ensemble_stat/ensemble_stat_conf.cc
+- MET/src/tools/other/grid_diag/grid_diag.cc
 
 Benchmarking with Python script
 -------------------------------
