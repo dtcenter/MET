@@ -1023,8 +1023,7 @@ ConcatString make_output_prefix(const MtdConfigInfo & config, unixtime start_tim
 
 ConcatString prefix;
 int year, month, day, hour, minute, second;
-char junk[256];
-
+ConcatString cs;
 
 prefix << cs_erase << default_prefix << '_';
 
@@ -1032,11 +1031,9 @@ if ( config.output_prefix.nonempty() )  prefix << config.output_prefix << '_';
 
 unix_to_mdyhms(start_time, month, day, year, hour, minute, second);
 
-snprintf(junk, sizeof(junk), "%04d%02d%02d_%02d%02d%02dV", year, month, day, hour, minute, second);
+cs.format("%04d%02d%02d_%02d%02d%02dV", year, month, day, hour, minute, second);
 
-prefix << junk;
-
-
+prefix << cs;
 
 return prefix;
 

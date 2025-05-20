@@ -56,23 +56,23 @@ class StringArray {
 
       void dump(std::ostream &, int depth = 0) const;
 
-      const std::string operator[](int) const;
+      std::string operator[](int) const;
 
       void set_ignore_case(const bool);
 
-      void add(const std::string text);
+      void add(const std::string &text);
 
-      void add_uniq(const std::string text);
+      void add_uniq(const std::string &text);
 
       void add(const StringArray &);
 
       void add_uniq(const StringArray &);
 
-      void add_css(const std::string);
+      void add_css(const std::string &);
 
-      void set(const std::string);
+      void set(const std::string &);
 
-      void set(int i, const std::string);
+      void set(int i, const std::string &);
 
       void insert(int i, const char *);
 
@@ -85,11 +85,11 @@ class StringArray {
 
       int length(int) const;
 
-      bool has(const std::string) const;
+      bool has(const std::string &) const;
 
-      bool has(const std::string, bool forward) const;
+      bool has(const std::string &, bool forward) const;
    
-      bool has(const std::string, int & index, bool forward=true) const;
+      bool has(const std::string &, int & index, bool forward=true) const;
 
       bool all_empty() const;
 
@@ -97,11 +97,11 @@ class StringArray {
          //  parse delimited strings
          //
 
-      void parse_wsss(const std::string);
+      void parse_wsss(const std::string &);
 
-      void parse_css(const std::string);
+      void parse_css(const std::string &);
 
-      void parse_delim(const std::string, const char *delim);
+      void parse_delim(const std::string &, const char *delim);
 
          //
          //  for use when parsing command-line switches

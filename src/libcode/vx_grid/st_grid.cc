@@ -490,7 +490,7 @@ ConcatString StereographicGrid::serialize(const char *sep) const
 {
 
 ConcatString a;
-char junk[256];
+ConcatString cs;
 
 a << "Projection: Stereographic" << sep;
 
@@ -499,12 +499,12 @@ a << "Ny: " << Ny << sep;
 
 a << "IsNorthHemisphere: " << ( IsNorthHemisphere ? "true" : "false") << sep;
 
-snprintf(junk, sizeof(junk), "Lon_orient: %.3f", Lon_orient);   a << junk << sep;
+cs.format("Lon_orient: %.3f", Lon_orient);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "Bx: %.3f", Bx);   a << junk << sep;
-snprintf(junk, sizeof(junk), "By: %.3f", By);   a << junk << sep;
+cs.format("Bx: %.3f", Bx);   a << cs << sep;
+cs.format("By: %.3f", By);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "Alpha: %.4f", Alpha);   a << junk;
+cs.format("Alpha: %.4f", Alpha);   a << cs;
 
    //
    //  done

@@ -583,6 +583,9 @@ void setup_nc_file() {
          << "Range = " << rng_azi_grid.range_n()
          << ", Azimuth = " << rng_azi_grid.azimuth_n() << "\n";
 
+    // Add global attributes
+    write_netcdf_global(nc_out, out_file.c_str(), program_name);
+
     // Define dimensions
     track_point_dim = add_dim(nc_out, "track_point", NC_UNLIMITED);
     range_dim = add_dim(nc_out, "range", (long) rng_azi_grid.range_n());

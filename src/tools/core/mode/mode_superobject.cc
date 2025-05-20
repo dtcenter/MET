@@ -116,6 +116,7 @@ static void _debug_shape_examine(const string &name, const ShapeData &sd,
          }
       }
    }
+
    for(size_t i=0; i<values.size(); ++i) {
       mlog << Debug(1) << name << " shape value=" << values[i]
            << " count=" << count[i] << "\n";
@@ -219,7 +220,9 @@ ModeSuperObject::ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
    
    int n_shapes;
    _merge_sd_split = split(merge_sd, n_shapes);
-   _debug_shape_examine(merge_name, _merge_sd_split, nx, ny);
+   if(mlog.verbosity_level() >= 4) {
+       _debug_shape_examine(merge_name, _merge_sd_split, nx, ny);
+   }
 
 }
 

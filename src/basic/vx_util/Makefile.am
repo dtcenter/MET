@@ -83,10 +83,10 @@ libvx_util_a_CPPFLAGS = ${MET_CPPFLAGS}
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
-    asciitablejust_to_string.cc asciitablejust_to_string.h: ascii_table.h
+asciitablejust_to_string.cc asciitablejust_to_string.h: ascii_table.h
 	${ENUM_TO_STRING} -concat_string ascii_table.h
 
-    clean-local:
+clean-local:
 	-rm -f asciitablejust_to_string.cc
 	-rm -f asciitablejust_to_string.h
 endif

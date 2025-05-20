@@ -77,6 +77,39 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_RANGE_AZIMUTH_GRID_STAT_PAIRS">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs.nc \
+      &OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs_OBS_RH_P500.ps \
+      'name="OBS_RH_P500_FULL"; level="(*,*)";' \
+      -title "Observation RH/P500"
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs_OBS_RH_P500.ps</ps>
+    </output>
+  </test>
+
+  <test name="series_analysis_RANGE_AZIMUTH">
+    <exec>echo "&DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f000.grb2  \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f006.grb2  \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f012.grb2  \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f018.grb2  \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f024.grb2" \
+                > &OUTPUT_DIR;/tc_rmw/gonzalo_file_list; \
+         &MET_BIN;/series_analysis</exec>
+    <param> \
+      -fcst &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo.nc \
+      -obs &OUTPUT_DIR;/tc_rmw/gonzalo_file_list \
+      -config &CONFIG_DIR;/SeriesAnalysisConfig_range_azimuth \
+      -out &OUTPUT_DIR;/tc_rmw/series_analysis_RANGE_AZIMUTH_hwrf_gonzalo.nc
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/tc_rmw/series_analysis_RANGE_AZIMUTH_hwrf_gonzalo.nc</grid_nc>
     </output>
   </test>
 

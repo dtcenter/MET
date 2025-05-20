@@ -84,12 +84,12 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # Remove write permissions for groups and others
-chmod -R g-w,o-w ${1}-ref ${1}
+chmod -R g-w,o-w MET-${1}-ref MET-${1}
 
 # Look for errors and/or warnings
 N_ERR=`egrep "ERROR:"   ${LOGFILE} | wc -l`
 N_WRN=`egrep "WARNING:" ${LOGFILE} | wc -l`
-echo "$0: Found $N_WRN WARNINGS and $N_ERR ERRORS in regtest" >> ${LOGFILE}
+echo "Found $N_WRN WARNINGS and $N_ERR ERRORS in regtest" >> ${LOGFILE}
 
 # Check for non-zero errors
 if [[ $N_ERR -gt 0 ]]; then
@@ -99,8 +99,9 @@ if [[ $N_ERR -gt 0 ]]; then
   exit 1
 # Update the latest link
 else
-  echo "$0: Updating 'latest' link to ${RUN_DIR}/MET-${1}" >> ${LOGFILE}
-  ln -sf ${RUN_DIR}/MET-${1} ${RUN_DIR}/../latest
+  echo "Updating 'latest' link to ${RUN_DIR}/MET-${1}" >> ${LOGFILE}
+  echo "ln -sfn ${RUN_DIR}/MET-${1} ${RUN_DIR}/../latest" >> ${LOGFILE}
+  ln -sfn ${RUN_DIR}/MET-${1} ${RUN_DIR}/../latest
   ls -l ${RUN_DIR}/../latest >> ${LOGFILE}
 fi
 

@@ -41,6 +41,7 @@ static LaeaData          get_laea_data             (const NcFile *);
 static StereographicData get_stereographic_data    (const NcFile *);
 static MercatorData      get_mercator_data         (const NcFile *);
 static GaussianData      get_gaussian_data         (const NcFile *);
+static RngAziData        get_range_azimuth_data    (const NcFile *);
 static SemiLatLonData    get_semilatlon_data       (NcFile *);
 static void              get_semilatlon_var        (NcFile *, const char *, NumArray &);
 
@@ -123,6 +124,9 @@ static void read_netcdf_grid_v3(NcFile * f_in, Grid & gr) {
                              gaussian_proj_type) == 0 )  {
          gr.set(get_gaussian_data(f_in));
       } else if ( strcasecmp(proj_att_name.c_str(),
+                             range_azimuth_proj_type) == 0 )  {
+         gr.set(get_range_azimuth_data(f_in));
+      } else if ( strcasecmp(proj_att_name.c_str(),
                              semilatlon_proj_type) == 0 )  {
          gr.set(get_semilatlon_data(f_in));
       } else {   // Unsupported projection type
@@ -137,6 +141,7 @@ static void read_netcdf_grid_v3(NcFile * f_in, Grid & gr) {
               << laea_proj_type << ", "
               << stereographic_proj_type << ", "
               << gaussian_proj_type << ", "
+              << range_azimuth_proj_type << ", "
               << semilatlon_proj_type << ").\n\n";
 
          exit(1);
@@ -699,6 +704,35 @@ static GaussianData get_gaussian_data(const NcFile * ncfile) {
 
    // ny
    get_global_att(ncfile, string("ny"), data.ny);
+
+   data.dump();
+
+   return data;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static RngAziData get_range_azimuth_data(const NcFile * ncfile) {
+
+   RngAziData data;
+
+   // Store the grid name
+   data.name = range_azimuth_proj_type;
+
+   // range_n
+   get_global_att(ncfile, string("range_n"), data.range_n);
+
+   // azimuth_n
+   get_global_att(ncfile, string("azimuth_n"), data.azimuth_n);
+
+   // range_max_km
+   get_global_att(ncfile, string("range_max_km"), data.range_max_km);
+
+   // Center Latitude
+   get_global_att(ncfile, string("lat_center"), data.lat_center);
+
+   // Center Longitude
+   get_global_att(ncfile, string("lon_center"), data.lon_center);
 
    data.dump();
 
