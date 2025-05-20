@@ -383,15 +383,20 @@ def check_settings(settings:dict) -> None:
     wrapper_confs = settings['wrapper_conf']
 
     if settings['run_met_directly']:
+        # Check that the script is invoked within the MET/internal/scripts/benchmark directory
+        expected_path = os.path.abspath(os.path.dirname(__file__))   
+        invoked_path = os.getcwd()
+        assert invoked_path == expected_path, f"ERROR You must invoke benchmark.py within the {expected_path} directory"
+
         # Check for empty string or only whitespace for MET command
         assert len(settings['met_command']) > 0
         assert not settings['met_command'].isspace()
     else:
-        assert os.path.exists(metplus_dir), "fERROR|benchmark.yaml::The METplus base directory {metplus_dir} does not exist"
-        assert os.path.exists(sys_conf), "fERROR|benchmark.yaml::The system.conf file {sys_conf}  does not exist."
+        assert os.path.exists(metplus_dir), f"ERROR|benchmark.yaml::The METplus base directory {metplus_dir} does not exist"
+        assert os.path.exists(sys_conf), f"ERROR|benchmark.yaml::The system.conf file {sys_conf}  does not exist."
 
         for cur_conf in wrapper_confs:
-            assert os.path.exists(cur_conf), "fERROR|benchmark.yaml:: The {cur_conf} use case config file does not exist. "
+            assert os.path.exists(cur_conf), f"ERROR|benchmark.yaml:: The {cur_conf} use case config file does not exist. "
 
     output_base = settings['benchmark_output_path']
     # if the base output dir does not exist, create it
