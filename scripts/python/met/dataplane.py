@@ -62,11 +62,6 @@ class dataplane(met_base):
        sys.argv = argv_org  # restore sys.argv
        return met_in
 
-   #@staticmethod
-   #def get_numpy_filename(tmp_filename):
-   #   return met_base_tools.replace_extension(tmp_filename, "json", "npy") if tmp_filename.endswith(".json") else \
-   #          met_base_tools.replace_extension(tmp_filename, "nc", "npy") if tmp_filename.endswith(".nc") else f'{tmp_filename}.npy'
-
    @staticmethod
    def is_integer(a_data):
       return isinstance(a_data, int)
@@ -123,6 +118,8 @@ class dataplane(met_base):
 
    @staticmethod
    def read_dataplane(tmp_filename):
+      if met_base_tools.is_debug_enabled("dataplane"):
+         met_base.log_message(f"Called dataplane.read_dataplane({tmp_filename})")
       # Default is JSON for attributes and NUMPY serialization for 2D array
       return dataplane.read_dataplane_nc(tmp_filename) if met_base_tools.use_netcdf_format() \
              else dataplane.read_dataplane_json_numpy(tmp_filename)
@@ -189,7 +186,6 @@ class dataplane(met_base):
       #met_base.log_msg(f"{method_name} type(met_data)= {type(met_data)}")
       attrs = None
       from_xarray = False
-      from_ndarray = False
       if met_data is None:
          met_base.quit(f"{method_name} The met_data is None")
          sys.exit(1)
@@ -205,9 +201,7 @@ class dataplane(met_base):
          from_xarray = True
          attrs = met_data.attrs
          met_data = met_data.data
-         modified_met_data = True
       if isinstance(met_data, np.ndarray):
-         from_ndarray = True
          met_data = np.ma.array(met_data)
 
       if isinstance(met_data, np.ma.MaskedArray):
@@ -282,7 +276,7 @@ class dataplane(met_base):
             setattr(ds, 'name_str', attr_val)
          elif attr == 'fill_value':
             setattr(dp, dataplane.ATTR_USER_FILL_VALUE, attr_val)
-         elif type(attr_val) == dict:
+         elif isinstance(attr_val, dict):
             for key in attr_val:
                setattr(ds, attr + '.' + key, attr_val[key])
          else:
@@ -294,9 +288,8 @@ class dataplane(met_base):
 def main(argv):
    global attrs, met_data, met_info
 
-   met_in = dataplane.call_python(sys.argv)
+   met_in = dataplane.call_python(argv)
 
-   user_fill_value = None
    try:
       met_info = met_in.met_info
       attrs = met_info['attrs']
@@ -320,10 +313,29 @@ def main(argv):
    met_data = dataplane.validate_met_data(init_met_data, fill_value)
    met_info['met_data'] = met_data
 
-   if os.environ.get('MET_PYTHON_DEBUG', None) is not None:
+   if met_base_tools.is_debug_enabled('dataplane'):
       met_base.log_message('--- met_data after validating ---')
       met_base.log_message(met_data)
 
-if __name__ == '__main__' or __name__ == sys.argv[0]:
-   main(sys.argv)
+sys_argv = sys.argv
+if sys_argv[0] == sys_argv[1] == __name__:
+   sys_argv.pop(0)
+
+if __name__ == '__main__' or __name__ == sys_argv[0]:
+   try:
+      main(sys_argv)
+   except Exception as ex:
+      import logging
+      import traceback
+      ex_logger = logging.getLogger(__name__)
+      logging.basicConfig(filename='dataplane_py.err', level=logging.INFO,
+                          format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                          datefmt='%Y-%m-%d %H:%M')
+      ex_console = logging.StreamHandler()
+      ex_console.setLevel(logging.INFO)
+      logging.getLogger().addHandler(ex_console)
+      ex_logger.error(f'Exception {ex}')
+      ex_logger.error(traceback.format_exc())
    met_base.log_message(f'{__name__} complete')
+else:
+   met_base.log_message(f'dataplane.py bypassed len(sys.argv)={len(sys.argv)} sys.argv = {sys.argv}')

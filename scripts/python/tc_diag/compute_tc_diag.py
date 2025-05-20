@@ -2,6 +2,7 @@ import os
 import sys
 import numpy as np
 import argparse
+import logging
 import pathlib
 from tc_diag_driver import post_resample_driver
 
@@ -76,6 +77,30 @@ diag_data = {
 
 ###########################################
 
+met_debug_value = os.environ.get('MET_PYTHON_DEBUG', 'no')
+met_debug_enabled = (met_debug_value == 'all' or met_debug_value == 'tc_diag')
+
+def error_msg(message):
+    print(message)
+    if met_debug_enabled:
+        logger.error(message)
+
+def log_msg(message):
+    print(message)
+    if met_debug_enabled:
+        logger.info(message)
+
+def setup_logger():
+    logger = logging.getLogger(__name__)
+    log_file_name = f'{__name__}_py.log'
+    logging.basicConfig(filename=log_file_name, level=logging.INFO,
+                        format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
+                        datefmt='%Y-%m-%d %H:%M', filemode='w')
+    if met_debug_enabled:
+        logger.info(f'len(sys.argv) = {len(sys.argv)} sys.argv = {sys.argv}')
+
+###########################################
+
 def main():
 
     # Handle arguments
@@ -87,23 +112,23 @@ def main():
 
     # Validate inputs
     if not os.path.isfile(config_filename):
-        print("Error: Input Config File (" + config_filename + ") does not exist!")
+        error_msg(f"Input Config File ({config_filename}) does not exist!")
         sys.exit(1)
 
     if not os.path.isfile(land_filename):
-        print("Error: Input Land File (" + land_filename + ")does not exist!")
+        error_msg(f"Input Land File ({land_filename})does not exist!")
         sys.exit(1)
 
     if not os.path.isfile(data_filename):
-        print("Error: Input Data File (" + data_filename + ") does not exist!")
+        error_msg("Input Data File ({data_filename}) does not exist!")
         sys.exit(1)
 
     # Print verbose arguments
     if args.verbose:
-        print("Python Script:\t" + os.path.expandvars(sys.argv[0]))
-        print("Config File:\t"   + config_filename)
-        print("Land File:\t"     + land_filename)
-        print("Data File:\t"     + data_filename)
+        log_msg(f"Python Script:\t{os.path.expandvars(sys.argv[0])}")
+        log_msg(f"Config File:\t{config_filename}")
+        log_msg(f"Land File:\t{land_filename}")
+        log_msg(f"Data File:\t{data_filename}")
 
     # Read config file and return a DriverConfig object
     config = post_resample_driver.config_from_file(
@@ -119,8 +144,10 @@ def main():
                       config, data_filename, suppress_exceptions=True,
                       land_lut_override=land_filename)
     except Exception as err:
-        print("Error computing diagnostics with command (", ' '.join(sys.argv), ")", sep="")
-        print(err)
+        import traceback
+        error_msg(f"Error computing diagnostics with command ({' '.join(sys.argv)})")
+        error_msg(err)
+        error_msg(traceback.format_exc())
         sys.exit(1)
 
     # Process storm data diagnostics in the expected order
@@ -197,7 +224,7 @@ def main():
 
     # Print verbose dictionary contents
     if args.verbose:
-        print(f"\nDiagnostics Data:\n", diag_data)
+        log_msg(f"\nDiagnostics Data:\n{diag_data}")
 
 def _get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -227,6 +254,9 @@ def _get_args() -> argparse.Namespace:
     )
 
     return parser.parse_args()
+
+
+setup_logger()
 
 # Always run the main function
 main()

@@ -44,6 +44,7 @@ class GlobalPython {
       void initialize();
       void finalize();
 
+      PyConfig config;
       bool is_initialized;
 
 };
@@ -56,7 +57,6 @@ inline GlobalPython::~GlobalPython()  { is_initialized = false; };
 
 
 inline void GlobalPython::initialize()
-
 { 
 
 if ( ! is_initialized )  {
@@ -64,8 +64,15 @@ if ( ! is_initialized )  {
    mlog << Debug(3) << "Initializing MET compile time python instance: " << MET_PYTHON_BIN_EXE << "\n";
 
    wchar_t *python_path = Py_DecodeLocale(MET_PYTHON_BIN_EXE, nullptr);
-   Py_SetProgramName(python_path);
-   Py_Initialize();
+   PyConfig_InitPythonConfig(&config);
+   PyStatus status = PyConfig_SetString(&config, &config.program_name, python_path);
+   if (! PyStatus_Exception(status)) {
+      status = Py_InitializeFromConfig(&config);
+   }
+   if (PyStatus_Exception(status)) {
+      PyConfig_Clear(&config);
+      Py_ExitStatusException(status);
+   }
 
    is_initialized = true;
 
@@ -98,7 +105,6 @@ return;
 
 
 inline void GlobalPython::finalize()
-
 { 
 
 if ( is_initialized )  {

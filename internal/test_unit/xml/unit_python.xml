@@ -188,6 +188,32 @@
     </output>
   </test>
 
+  <test name="python_mode_multivar">
+    <exec>echo "file_list \
+                PYTHON_NUMPY \
+                PYTHON_NUMPY" \
+                > &OUTPUT_DIR;/python/mode_multivar_fcst_file_list; \
+          echo "file_list \
+                PYTHON_NUMPY \
+                PYTHON_NUMPY" \
+                > &OUTPUT_DIR;/python/mode_multivar_obs_file_list; \
+          &MET_BIN;/mode</exec>
+    <env>
+      <pair><name>FCST_FIELD</name> <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/fcst.txt FCST</value></pair>
+      <pair><name>OBS_FIELD</name>  <value>&MET_BASE;/python/examples/read_ascii_numpy.py &DATA_DIR_PYTHON;/obs.txt OBS</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/python/mode_multivar_fcst_file_list \
+      &OUTPUT_DIR;/python/mode_multivar_obs_file_list \
+      &CONFIG_DIR;/MODEConfig_multivar_python \
+      -outdir &OUTPUT_DIR;/python -v 3
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/mode_Fcst_Super_LO_Obs_Super_LO_multivar_python_120000L_20050807_120000V_120000A.ps</ps>
+      <stat>&OUTPUT_DIR;/python/mode_Fcst_Super_LO_Obs_Super_LO_multivar_python_120000L_20050807_120000V_120000A_obj.txt</stat>
+    </output>
+  </test>
+
   <test name="python_numpy_grid_stat_mixed">
     <exec>&MET_BIN;/grid_stat</exec>
     <env>
