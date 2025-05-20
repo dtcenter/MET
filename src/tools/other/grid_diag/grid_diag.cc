@@ -47,6 +47,10 @@
 #include "vx_regrid.h"
 #include "vx_log.h"
 
+#ifdef WITH_PROFILER
+#include "ctrack.hpp"
+#endif
+
 using namespace std;
 using namespace netCDF;
 
@@ -97,6 +101,10 @@ int met_main(int argc, char *argv[]) {
    // Write joint variable histograms
    write_joint_histograms();
 
+   // Write benchmarking metrics
+   #ifdef WITH_PROFILER
+   ctrack::result_print();
+   #endif 
    // Close files and deallocate memory
    clean_up();
 
@@ -404,6 +412,9 @@ void process_series(void) {
 
 void setup_histograms(void) {
    ConcatString i_var_str;
+   #ifdef WITH_PROFILER
+   CTRACK;
+   #endif
 
    for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
@@ -460,6 +471,9 @@ void setup_histograms(void) {
 
 void setup_joint_histograms(void) {
    ConcatString i_var_str, j_var_str, ij_var_str;
+   #ifdef WITH_PROFILER
+   CTRACK;
+   #endif
 
    for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
