@@ -448,6 +448,11 @@ Overview of Steps for Performing Benchmarking
     Run the following from the command line (from the location where the benchmark.py file is located):
    
 
+    .. note::
+       An AssertionError message is printed to the terminal if the benchmark.py script is not run in the $BASE/MET/internal/scripts/benchmark
+       directory.
+
+
     .. code-block:: ini
    
       cd $BASE/MET/internal/scripts/benchmark
