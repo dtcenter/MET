@@ -56,7 +56,7 @@ class MetConfig : public Dictionary {
 
       void clear() override;
 
-      void dump(std::ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const override;
 
       void debug_dump(int = 0) const;
 

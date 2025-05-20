@@ -156,7 +156,8 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
    //
 
 #pragma omp parallel default(none) \
-   shared(from_data, from_grid, to_grid, info, to_data, wt_data)
+   shared(from_data, from_grid, to_grid, info, to_data, wt_data) \
+   shared(bad_data_double)
    { 
 
 #pragma omp single
@@ -205,6 +206,8 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
       } // for xf
 
       // loop over the to grid to compute the area weighted average
+#pragma omp for schedule(static) \
+                collapse(2)
       for(int xt=0; xt<(to_grid.nx()); xt++) {
          for(int yt=0; yt<(to_grid.ny()); yt++) {
             if(is_eq(wt_data(xt, yt), 0.0)) {
