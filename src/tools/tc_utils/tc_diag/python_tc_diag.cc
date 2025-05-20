@@ -27,7 +27,7 @@ extern GlobalPython GP;   //  this needs external linkage
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char * user_ppath               = nullptr;
+static const char *user_ppath                = nullptr;
 static const char write_tmp_diag          [] = "MET_BASE/python/pyembed/write_tmp_diag.py";
 static const char read_tmp_diag           [] = "pyembed.read_tmp_diag";   //  NO ".py" suffix
 static const char python_tc_diag_dir      [] = "MET_BASE/python/tc_diag";
@@ -72,12 +72,12 @@ static bool parse_python_string(
 
 ////////////////////////////////////////////////////////////////////////
 
-bool python_tc_diag(const ConcatString &script_name,
-        TmpFileInfo &tmp_info) {
+bool python_tc_diag(const ConcatString &script_name, TmpFileInfo &tmp_info) {
    bool status = false;
 
    // Check for MET_PYTHON_EXE
-   if ((user_ppath = getenv(user_python_path_env)) != nullptr ) {
+   user_ppath = getenv(user_python_path_env);
+   if(user_ppath != nullptr) {
       status = user_python_tc_diag(script_name, tmp_info);
    }
    // Use compiled python instance
@@ -90,8 +90,8 @@ bool python_tc_diag(const ConcatString &script_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool straight_python_tc_diag(const ConcatString &diag_script,
-        TmpFileInfo &tmp_info) {
+static bool straight_python_tc_diag(const ConcatString &diag_script,
+                                    TmpFileInfo &tmp_info) {
    const char *method_name = "straight_python_tc_diag() -> ";
 
    mlog << Debug(3) << "Running MET compile time python instance ("
@@ -101,6 +101,7 @@ bool straight_python_tc_diag(const ConcatString &diag_script,
    // Prepare arguments
    StringArray arg_sa = diag_script.split(" ");
    arg_sa.add(tmp_info.tmp_file);
+   arg_sa.insert(0, arg_sa[0].c_str()); // Kludge with PyConfig_SetArgv
    Wchar_Argv wa;
    wa.set(arg_sa);
 
@@ -143,7 +144,16 @@ bool straight_python_tc_diag(const ConcatString &diag_script,
    }
 
    if(arg_sa.n() > 0) {
-      PySys_SetArgv(wa.wargc(), wa.wargv());
+      PyStatus p_status = PyConfig_SetArgv(&GP.config, wa.wargc(), wa.wargv());
+      if (PyStatus_Exception(p_status)) {
+         PyConfig_Clear(&GP.config);
+         mlog << Warning << "\n" << method_name
+              << "error setting python arguments\n\n";
+         return false;
+      }
+
+      // Initialize Python interpreter
+      Py_InitializeFromConfig(&GP.config);
    }
 
    // Import the python script as a module
@@ -178,14 +188,11 @@ bool straight_python_tc_diag(const ConcatString &diag_script,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool user_python_tc_diag(const ConcatString &diag_script,
-        TmpFileInfo &tmp_info) {
+static bool user_python_tc_diag(const ConcatString &diag_script,
+                                TmpFileInfo &tmp_info) {
    const char *method_name = "user_python_tc_diag() -> ";
-   int i, status;
    ConcatString command;
    ConcatString path;
-   ConcatString tmp_file_name;
-   const char * tmp_dir = nullptr;
    Wchar_Argv wa;
 
    mlog << Debug(3) << "Running user-specified python instance (MET_PYTHON_EXE="
@@ -193,14 +200,14 @@ bool user_python_tc_diag(const ConcatString &diag_script,
         << diag_script << " " << tmp_info.tmp_file << ").\n";
 
    // Create a temp file
-   tmp_dir = getenv ("MET_TMP_DIR");
+   const char *tmp_dir = getenv ("MET_TMP_DIR");
    if(!tmp_dir) tmp_dir = default_tmp_dir;
 
    path << cs_erase
         << tmp_dir << '/'
         << tmp_diag_base_name;
 
-   tmp_file_name = make_temp_file_name(path.text(), 0);
+   ConcatString tmp_file_name = make_temp_file_name(path.text(), nullptr);
 
    // Construct the system command
    command << cs_erase
@@ -213,7 +220,7 @@ bool user_python_tc_diag(const ConcatString &diag_script,
    mlog << Debug(4) << "Writing temporary Python diagnostics file:\n\t"
         << command << "\n";
 
-   status = system(command.text());
+   int status = system(command.text());
 
    if(status) {
       mlog << Error << "\n" << method_name
@@ -251,14 +258,23 @@ bool user_python_tc_diag(const ConcatString &diag_script,
    a.add(tmp_file_name);
    wa.set(a);
 
-   PySys_SetArgv(wa.wargc(), wa.wargv());
+   PyStatus p_status = PyConfig_SetArgv(&GP.config, wa.wargc(), wa.wargv());
+   if (PyStatus_Exception(p_status)) {
+      PyConfig_Clear(&GP.config);
+      mlog << Warning << "\n" << method_name
+           << "error setting python arguments\n\n";
+      return false;
+   }
+
+   // Initialize Python interpreter
+   Py_InitializeFromConfig(&GP.config);
 
    mlog << Debug(4) << "Reading temporary Python diagnostics data file: "
         << tmp_file_name << "\n";
 
    // Import the python wrapper script as a module
    path = get_short_name(read_tmp_diag);
-   PyObject * module_obj = PyImport_ImportModule (path.text());
+   PyObject *module_obj = PyImport_ImportModule (path.text());
 
    // If needed, reload the module
    if(do_reload) {
@@ -290,8 +306,8 @@ bool user_python_tc_diag(const ConcatString &diag_script,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool parse_python_diag_data(PyObject *module_obj,
-        TmpFileInfo &tmp_info) {
+static bool parse_python_diag_data(PyObject *module_obj,
+                                   TmpFileInfo &tmp_info) {
    const char *method_name = "parse_python_diag_data() -> ";
    bool status = true;
 
@@ -370,10 +386,10 @@ bool parse_python_diag_data(PyObject *module_obj,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool parse_python_string_value_map(PyObject *dict,
-        const char *name,
-        vector<string> &k,
-        map<string,double> &m) {
+static bool parse_python_string_value_map(PyObject *dict,
+                                          const char *name,
+                                          vector<string> &k,
+                                          map<string,double> &m) {
 
    const char *method_name = "parse_python_string_value_map() -> ";
 
@@ -441,14 +457,14 @@ bool parse_python_string_value_map(PyObject *dict,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool parse_python_string_string_map(PyObject *dict,
-        const char *name, map<string,string> &m) {
+static bool parse_python_string_string_map(PyObject *dict,
+                                           const char *name,
+                                           map<string,string> &m) {
 
    const char *method_name = "parse_python_string_string_map() -> ";
 
    PyObject *key_obj = nullptr;
    PyObject *val_obj = nullptr;
-   int status;
    long pos;
 
    PyObject *data_obj = PyDict_GetItem(dict,
@@ -465,7 +481,7 @@ bool parse_python_string_string_map(PyObject *dict,
    pos = 0;
 
    // Loop through the dictionary entries
-   while((status = PyDict_Next(data_obj, &pos, &key_obj, &val_obj)) != 0) {
+   while(0 != PyDict_Next(data_obj, &pos, &key_obj, &val_obj)) {
 
       // All keys and values must be strings
       if(!PyUnicode_Check(key_obj) || !PyUnicode_Check(val_obj)) {
@@ -497,8 +513,8 @@ bool parse_python_string_string_map(PyObject *dict,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool parse_python_string(PyObject *dict,
-        const char *name, string &s) {
+static bool parse_python_string(PyObject *dict,
+                                const char *name, string &s) {
 
    const char *method_name = "parse_python_string() -> ";
 

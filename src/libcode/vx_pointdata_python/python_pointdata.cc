@@ -28,23 +28,20 @@ extern GlobalPython GP;   //  this needs external linkage
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char * user_ppath            = 0;
-
-static const char write_tmp_nc         [] = "MET_BASE/python/pyembed/write_tmp_point_nc.py";
-
-static const char read_tmp_nc          [] = "pyembed.read_tmp_point_nc";   //  NO ".py" suffix
+static const char *user_ppath    = nullptr;
+static const char write_tmp_nc[] = "MET_BASE/python/pyembed/write_tmp_point_nc.py";
+static const char read_tmp_nc [] = "pyembed.read_tmp_point_nc";   //  NO ".py" suffix
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static bool tmp_nc_point_obs(const char * script_name, int user_script_argc,
-                             char ** user_script_argv, MetPointDataPython &met_pd_out,
-                             MaskFilters *filters);
+static bool tmp_nc_point_obs(const char *script_name, const StringArray &user_script_argv,
+                             MetPointDataPython &met_pd_out, MaskFilters *filters);
 
-static bool straight_python_point_data(const char * script_name,
-                                      int script_argc, char ** script_argv,
-                                      MetPointDataPython &met_pd_out,
-                                      MaskFilters *filters);
+static bool straight_python_point_data(const char *script_name,
+                                       StringArray &user_script,
+                                       MetPointDataPython &met_pd_out,
+                                       MaskFilters *filters);
 
 bool process_point_data(PyObject *module_obj, MetPointDataPython &met_pd_out);
 bool process_point_data_list(PyObject *python_obj, MetPointDataPython &met_pd_out,
@@ -163,24 +160,23 @@ static void set_str_array_from_python(PyObject *python_data, const char *python_
 ////////////////////////////////////////////////////////////////////////
 
 
-bool python_point_data(const char * script_name, int script_argc, char ** script_argv,
-                       MetPointDataPython &met_pd_out, MaskFilters *filters)
-
-{
+bool python_point_data(const ConcatString &python_command,
+                       MetPointDataPython &met_pd_out, MaskFilters *filters) {
 
 bool status = false;
 
-if ( user_ppath == 0 ) user_ppath = getenv(user_python_path_env);
+if(user_ppath == nullptr) user_ppath = getenv(user_python_path_env);
 
-if ( user_ppath != 0 ) {    //  do_tmp_nc = true;
+StringArray sa = python_command.split(" ");
 
-   status = tmp_nc_point_obs(script_name, script_argc, script_argv,
-                             met_pd_out, filters);
+ConcatString script_name(sa[0]);
+script_name.chomp(".py");   //  remove possible ".py" suffix from script filename
+
+if(user_ppath != nullptr) {    // use temporary output
+   status = tmp_nc_point_obs(script_name.c_str(), sa, met_pd_out, filters);
 }
 else {
-
-   status = straight_python_point_data(script_name, script_argc, script_argv,
-                                       met_pd_out, filters);
+   status = straight_python_point_data(script_name.c_str(), sa, met_pd_out, filters);
 }
 
 return status;
@@ -191,12 +187,8 @@ return status;
 
 bool process_point_data(PyObject *python_met_point_data,
                         MetPointDataPython &met_pd_out)
-
 {
 
-int int_value;
-PyObject *python_value;
-ConcatString cs, user_dir, user_base;
 const char *method_name = "process_point_data -> ";
 const char *method_name_s = "process_point_data()";
 
@@ -204,7 +196,7 @@ const char *method_name_s = "process_point_data()";
    //  get handles to the objects of interest from the module_dict
    //
 
-python_value = PyDict_GetItemString (python_met_point_data, python_use_var_id);
+PyObject *python_value = PyDict_GetItemString (python_met_point_data, python_use_var_id);
 
 bool use_var_id = pyobject_as_bool(python_value);
 met_pd_out.set_use_var_id(use_var_id);
@@ -213,7 +205,7 @@ mlog << Debug(9) << method_name << "use_var_id: \"" << use_var_id
 
 python_value = PyDict_GetItemString (python_met_point_data, python_key_nhdr);
 
-int_value = pyobject_as_int(python_value);
+int int_value = pyobject_as_int(python_value);
 if (int_value == 0) {
    mlog << Error << "\n" << method_name
         << "The header is empty. Please check if python input exists\n\n";
@@ -285,11 +277,12 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
                              MaskFilters *filters)
 {
 
-   bool use_var_id;
    Observation obs;
-   time_t vld_time;
-   int hid, vid, qid, sid, typ_idx, vld_idx;
-   double prev_lat, prev_lon, prev_elv, prev_vld, prev_typ, prev_sid;
+   int vid;
+   int qid;
+   int sid;
+   int typ_idx;
+   int vld_idx;
    Python3_List list(python_point_data);
    const char *method_name = "process_point_data_list -> ";
    const char *method_name_s = "process_point_data_list()";
@@ -305,10 +298,14 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
    //  initialize use_var_id to false
    //
 
-   use_var_id = false;
-   hid = -1;   // starts from -1 to be 0 for the first header
-   prev_lat = prev_lon = prev_elv = bad_data_double;
-   prev_vld = prev_typ = prev_sid = bad_data_double;
+   bool use_var_id = false;
+   int hid = -1;   // starts from -1 to be 0 for the first header
+   double prev_lat = bad_data_double;
+   double prev_lon = bad_data_double;
+   double prev_elv = bad_data_double;
+   double prev_vld = bad_data_double;
+   double prev_typ = bad_data_double;
+   double prev_sid = bad_data_double;
 
    met_pd_out.allocate(obs_cnt);
    MetPointHeader *header_data = met_pd_out.get_header_data();
@@ -348,11 +345,11 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
       }
 
       // get valid time index
-      vld_time = obs.getValidTime();
-      if ( !header_data->vld_num_array.has(vld_time, vld_idx) )  {
+      time_t vld_time = obs.getValidTime();
+      if ( !header_data->vld_num_array.has((int)vld_time, vld_idx) )  {
          // MET #2897 keep vld_array and vld_num_array in sync
          header_data->vld_array.add(obs.getValidTimeString());
-         header_data->vld_num_array.add(vld_time);
+         header_data->vld_num_array.add((int)vld_time);
          vld_idx = header_data->vld_num_array.n() - 1;
       }
 
@@ -399,9 +396,9 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
          obs_data->qty_names.has(str_data, qid);
       }
       obs_data->obs_qids[j] = qid;
-      obs_data->obs_lvls[j] = obs.getPressureLevel();
-      obs_data->obs_hgts[j] = obs.getHeight();
-      obs_data->obs_vals[j] = obs.getValue();
+      obs_data->obs_lvls[j] = (float)obs.getPressureLevel();
+      obs_data->obs_hgts[j] = (float)obs.getHeight();
+      obs_data->obs_vals[j] = (float)obs.getValue();
 
    }   //  for j
 
@@ -436,24 +433,22 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
 
 ////////////////////////////////////////////////////////////////////////
 
-
-bool straight_python_point_data(const char * script_name, int script_argc, char ** script_argv,
-                                MetPointDataPython &met_pd_out, MaskFilters *filters)
+static bool straight_python_point_data(const char *script_name,
+                                       StringArray &user_script,
+                                       MetPointDataPython &met_pd_out,
+                                       MaskFilters *filters)
 {
 
-int int_value;
-PyObject *module_obj;
-ConcatString cs, user_dir, user_base;
 const char *method_name = "straight_python_point_data -> ";
 
+ConcatString cs        (script_name);
+ConcatString user_dir  (cs.dirname());
+ConcatString user_base (cs.basename());
 
-cs        = script_name;
-user_dir  = cs.dirname();
-user_base = cs.basename();
+user_script.insert(0, script_name);     // Kludge to use PyConfig_SetArgv
 
 Wchar_Argv wa;
-
-wa.set(script_argc, script_argv);
+wa.set(user_script);
 
    //
    //  if the global python object has already been initialized,
@@ -500,17 +495,24 @@ command << cs_erase
 
 run_python_string(command.text());
 
-if ( script_argc > 0 )  {
+if ( wa.wargc() > 0 )  {
+   PyStatus p_status = PyConfig_SetArgv(&GP.config, wa.wargc(), wa.wargv());
+   if (PyStatus_Exception(p_status)) {
+      PyConfig_Clear(&GP.config);
+      mlog << Warning << "\n" << method_name
+           << "error setting python arguments\n\n";
+      return false;
+   }
 
-   PySys_SetArgv (wa.wargc(), wa.wargv());
-
+   // Initialize Python interpreter
+   Py_InitializeFromConfig(&GP.config);
 }
 
    //
    //  import the python script as a module
    //
 
-module_obj = PyImport_ImportModule (user_base.c_str());
+PyObject *module_obj = PyImport_ImportModule (user_base.c_str());
 
    //
    //  if needed, reload the module
@@ -568,19 +570,14 @@ return result;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool tmp_nc_point_obs(const char * user_script_name, int user_script_argc,
-                      char ** user_script_argv, MetPointDataPython &met_pd_out,
-                      MaskFilters *filters)
-
+static bool tmp_nc_point_obs(const char *script_name,
+                             const StringArray &user_script_argv,
+                             MetPointDataPython &met_pd_out,
+                             MaskFilters *filters)
 {
 
-int j;
-int status;
 ConcatString command;
 ConcatString path;
-ConcatString tmp_nc_path;
-const char * tmp_dir = nullptr;
-Wchar_Argv wa;
 const char *method_name = "tmp_nc_point_obs() -> ";
 
    //
@@ -616,38 +613,33 @@ run_python_string(command.text());
 mlog << Debug(3) << method_name << "added python path ("
      << replace_path(python_dir) << ") to python interpreter\n";
 
-//setenv(env_PYTHONPATH, python_dir.c_str(),1);
-
 mlog << Debug(3) << "Running user-specified python instance (MET_PYTHON_EXE=" << user_ppath
-     << ") to run user's python script (" << user_script_name << ").\n";
+     << ") to run user's python script (" << script_name << ").\n";
 
 
-tmp_dir = getenv ("MET_TMP_DIR");
-
-if ( ! tmp_dir )  tmp_dir = default_tmp_dir;
+const char *tmp_dir = getenv("MET_TMP_DIR");
+if(!tmp_dir) tmp_dir = default_tmp_dir;
 
 path << cs_erase
      << tmp_dir << '/'
      << tmp_py_base_name;
 
-tmp_nc_path = make_temp_file_name(path.text(), 0);
+ConcatString tmp_nc_path = make_temp_file_name(path.text(), nullptr);
 
 command << cs_erase
-        << user_ppath                    << ' '    //  user's path to python
-        << replace_path(write_tmp_nc)    << ' '    //  write_tmp_nc.py
-        << tmp_nc_path                   << ' '    //  tmp_nc output filename
-        << user_script_name;                       //  user's script name
+        << user_ppath                    << ' '    // user's path to python
+        << replace_path(write_tmp_nc)    << ' '    // write_tmp_nc.py
+        << tmp_nc_path                   << ' '    // tmp_nc output filename
+        << script_name;                            // user's script name
 
-for (j=1; j<user_script_argc; ++j)  {   //  j starts at one, here
-
+for (int j=1; j<user_script_argv.n(); ++j)  {   //  j starts at one, here
    command << ' ' << user_script_argv[j];
-
 }
 
 mlog << Debug(4) << "Writing temporary Python point data file:\n\t"
      << command << "\n";
 
-status = system(command.text());
+int status = system(command.text());
 
 if ( status )  {
 
@@ -664,14 +656,23 @@ if ( status )  {
    //
 
 StringArray a;
-
 a.add(read_tmp_nc);
-
+a.add(read_tmp_nc); // Kludge to use PyConfig_SetArgv
 a.add(tmp_nc_path);
 
+Wchar_Argv wa;
 wa.set(a);
 
-PySys_SetArgv (wa.wargc(), wa.wargv());
+PyStatus p_status = PyConfig_SetArgv(&GP.config, wa.wargc(), wa.wargv());
+if (PyStatus_Exception(p_status)) {
+   PyConfig_Clear(&GP.config);
+   mlog << Warning << "\n" << method_name
+        << "error setting python arguments\n\n";
+   return false;
+}
+
+// Initialize Python interpreter
+Py_InitializeFromConfig(&GP.config);
 
 mlog << Debug(4) << "Reading temporary Python point data file: "
      << tmp_nc_path << "\n";
@@ -682,19 +683,19 @@ mlog << Debug(4) << "Reading temporary Python point data file: "
 
 path = get_short_name(read_tmp_nc);
 
-PyObject * module_obj = PyImport_ImportModule (path.text());
+PyObject *module_obj = PyImport_ImportModule (path.text());
 
    //
    //  if needed, reload the module
    //
 
-if ( do_reload )  {
+if(do_reload) {
 
    module_obj = PyImport_ReloadModule (module_obj);
 
 }
 
-if ( PyErr_Occurred() )  {
+if(PyErr_Occurred()) {
 
    PyErr_Print();
 
@@ -706,7 +707,7 @@ if ( PyErr_Occurred() )  {
 
 }
 
-if ( ! module_obj )  {
+if(!module_obj) {
 
    mlog << Warning << "\n" << method_name
         << "error running python script\n\n";
@@ -725,7 +726,7 @@ if ( ! module_obj )  {
 
 
 PyObject *met_point_data = get_python_object(module_obj, tmp_point_var_name);
-if ( met_point_data ) {
+if(met_point_data) {
    process_point_data(met_point_data, met_pd_out);
 }
 else {
@@ -750,9 +751,10 @@ return true;
 
 ////////////////////////////////////////////////////////////////////////
 
-void print_met_data(MetPointObsData *obs_data, MetPointHeader *header_data,
+void print_met_data(const MetPointObsData *obs_data,
+                    const MetPointHeader *header_data,
                     const char *caller, int debug_level) {
-   int log_count, count;
+   int count;
    const int min_count = 20;
    const char *method_name = "print_met_data() ";
 
@@ -773,7 +775,7 @@ void print_met_data(MetPointObsData *obs_data, MetPointHeader *header_data,
         << header_data->inst_typ_array.n() << " &header_data=" <<  header_data
         << "\n";
 
-   log_count = (header_data->hdr_count > min_count) ? min_count : header_data->hdr_count;
+   int log_count = (header_data->hdr_count > min_count) ? min_count : header_data->hdr_count;
    mlog << Debug(debug_level) << method_name
         << "header_data: message_type,station_id,time_time,lat,lon,elv\n";
    for (int idx=0; idx<log_count; idx++) {

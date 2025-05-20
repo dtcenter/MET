@@ -183,16 +183,16 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
          } // end for y
       } // end for x
 
-      // Apply the Gaussian smoother 
-      if(mthd == InterpMthd::Gaussian ||
-         mthd == InterpMthd::MaxGauss) {
-         interp_gaussian_dp(smooth_dp, gaussian, t);
-      }
-
       // Cleanup
       delete gt;
 
    } // End omp parallel
+
+   // Apply the Gaussian smoother 
+   if(mthd == InterpMthd::Gaussian ||
+      mthd == InterpMthd::MaxGauss) {
+      interp_gaussian_dp(smooth_dp, gaussian, t);
+   }
 
    return;
 }
