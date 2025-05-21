@@ -16,7 +16,7 @@ MET Version 12.1.0-rc1 Release Notes (20250522)
 
      * Bugfix: Fix the MET NetCDF library to support variables with more that 4 dimensions
        (`#3112 <https://github.com/dtcenter/MET/issues/3112>`_).
-     * Bugfix: Multiple definitions at the GRIB2 tables
+     * Bugfix: Refine the MET GRIB2 library logic to find a single GRIB2 table match rather multiple ones
        (`#3107 <https://github.com/dtcenter/MET/issues/3107>`_).
 
   .. dropdown:: Enhancements
