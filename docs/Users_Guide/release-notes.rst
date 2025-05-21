@@ -198,6 +198,9 @@ MET Version 12.1.0 Upgrade Instructions
 
      * Grid-Stat writes the updated GRAD line type output.
      * Series-Analysis adds gradient statistic variables to its NetCDF output, if requested.
+ 
+   * TC-RMW and RMW-Analysis add standard global attributes for FileOrigins, MET_version, and MET_tool.
+   * RMW-Analysis adds TrackLat_mean and TrackLon_mean variables to report the average track location.
 
 .. dropdown:: Output data changes
 
@@ -217,4 +220,20 @@ MET Version 12.1.0 Upgrade Instructions
 
    Recommendations when upgrading to MET version 12.1.0:
 
-   * None
+   * Users are *strongly encouraged* to **set the OMP_NUM_THREADS environment variable**, as described in
+     :numref:`omp_num_threads`, to take advantage of the dramatic increase in OpenMP use, from 2 
+     parallelized loops in version 12.0.0 to 151 in 12.1.0. The parallelization primarily targets more
+     efficient looping over grid dimensions. Users should expect improvements in runtimes, particularly
+     when processing dense grids with a large number of threads. If not set, look for log messages with
+     advice on how to set it.
+
+   * The **range/azimuth grids** created by the TC-RMW, RMW-Analysis, and TC-Diag tools and described in
+     :numref:`range/azimuth_grid` are now fully supported in MET. For example, Point-Stat, Grid-Stat
+     and Series-Analysis can read range/azimuth inputs, define matched pairs, and compute statistics.
+     Verifying gridded analysis on regular grids can be automatically regridded on the fly to match the
+     range/azimuth grid of the model data, or vice-versa.
+
+   * The addition of the **CTRACK** benchmarking tool is intended as a developer utility to help identify
+     bottlenecks and track runtime efficiency improvements. It is disabled by default at compilation time
+     and users, in general, should NOT use the `--enable-profiler` configuration option to enable it. 
+
