@@ -9,6 +9,63 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.1.0-rc1 Release Notes (20250522)
+-----------------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * Bugfix: Fix the MET NetCDF library to support variables with more that 4 dimensions
+       (`#3112 <https://github.com/dtcenter/MET/issues/3112>`_).
+     * Bugfix: Multiple definitions at the GRIB2 tables
+       (`#3107 <https://github.com/dtcenter/MET/issues/3107>`_).
+
+  .. dropdown:: Enhancements
+
+     * Enhance MET library code to support reading WRF subgrid files
+       (`#2794 <https://github.com/dtcenter/MET/issues/2794>`_).
+     * Enhance MET library code to support additional vertical level types in WRF files
+       (`#2818 <https://github.com/dtcenter/MET/issues/2818>`_).
+     * Enhance multivariate MODE to support Python embedding inputs
+       (`#2940 <https://github.com/dtcenter/MET/issues/2940>`_).
+
+     * **Add support for the CTRACK benchmarking tool and instrument the Ensemble-Stat tool to report metrics**
+       (`#3065 <https://github.com/dtcenter/MET/issues/3065>`_).
+
+       * Enhance the benchmarking logic to support multiple runs and instrument the Grid-Diag tool to report metrics
+         (`#3109 <https://github.com/dtcenter/MET/issues/3109>`_).
+       * Add the `--enable-profiler` configuration option to make the compilation of CTRACK support optional
+         (`#3125 <https://github.com/dtcenter/MET/issues/3125>`_).
+ 
+     * **Enhance the MET tools to fully support writing gridded range/azimuth data to NetCDF output files**
+       (`#3096 <https://github.com/dtcenter/MET/issues/3096>`_).
+     * Enhance PB2NC to write unit and description strings for derived variables
+       (`#3099 <https://github.com/dtcenter/MET/issues/3099>`_).
+ 
+     * Resolve Python deprecation warnings introduced during the switch to Python 3.12
+       (`#3106 <https://github.com/dtcenter/MET/issues/3106>`_).
+ 
+     * **Enhance MET using OpenMP parallelization in both the library and application code**
+       (`#3120 <https://github.com/dtcenter/MET/issues/3120>`_).
+
+       * Apply OpenMP to the `vx_regrid` library and initialize OpenMP for all applications
+         (`#3131 <https://github.com/dtcenter/MET/issues/3131>`_).
+       * Apply OpenMP to the `vx_util` library
+         (`#3132 <https://github.com/dtcenter/MET/issues/3132>`_).
+       * Apply OpenMP to remaining MET library code
+         (`#3134 <https://github.com/dtcenter/MET/issues/3134>`_).
+       * Apply OpenMP to parallelize loops over grid dimensions in MET Applications
+         (`#3140 <https://github.com/dtcenter/MET/issues/3140>`_).
+       * Apply OpenMP to parallelize loops over grid dimensions in the remaining MET applications
+         (`#3145 <https://github.com/dtcenter/MET/issues/3145>`_).
+
+  .. dropdown:: Documentation
+
+     * Enhance the MET User's Guide by adding linkable sub-sections to the configuration file overview chapters
+       (`#3149 <https://github.com/dtcenter/MET/issues/3149>`_).
+
+  .. dropdown:: METbaseimage testing environment
+
+
 MET Version 12.1.0-beta2 Release Notes (20250401)
 -------------------------------------------------
 
