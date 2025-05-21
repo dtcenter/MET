@@ -63,9 +63,6 @@ MET Version 12.1.0-rc1 Release Notes (20250522)
      * Enhance the MET User's Guide by adding linkable sub-sections to the configuration file overview chapters
        (`#3149 <https://github.com/dtcenter/MET/issues/3149>`_).
 
-  .. dropdown:: METbaseimage testing environment
-
-
 MET Version 12.1.0-beta2 Release Notes (20250401)
 -------------------------------------------------
 
