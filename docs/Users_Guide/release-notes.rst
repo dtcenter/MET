@@ -33,7 +33,7 @@ MET Version 12.1.0-rc1 Release Notes (20250522)
 
        * Enhance the benchmarking logic to support multiple runs and instrument the Grid-Diag tool to report metrics
          (`#3109 <https://github.com/dtcenter/MET/issues/3109>`_).
-       * Add the `--enable-profiler` configuration option to make the compilation of CTRACK support optional
+       * Add the :code:`--enable-profiler` configuration option to make the compilation of CTRACK support optional
          (`#3125 <https://github.com/dtcenter/MET/issues/3125>`_).
  
      * **Enhance the MET tools to fully support writing gridded range/azimuth data to NetCDF output files**
@@ -47,9 +47,9 @@ MET Version 12.1.0-rc1 Release Notes (20250522)
      * **Enhance MET using OpenMP parallelization in both the library and application code**
        (`#3120 <https://github.com/dtcenter/MET/issues/3120>`_).
 
-       * Apply OpenMP to the `vx_regrid` library and initialize OpenMP for all applications
+       * Apply OpenMP to the vx_regrid library and initialize OpenMP for all applications
          (`#3131 <https://github.com/dtcenter/MET/issues/3131>`_).
-       * Apply OpenMP to the `vx_util` library
+       * Apply OpenMP to the vx_util library
          (`#3132 <https://github.com/dtcenter/MET/issues/3132>`_).
        * Apply OpenMP to remaining MET library code
          (`#3134 <https://github.com/dtcenter/MET/issues/3134>`_).
@@ -73,11 +73,11 @@ MET Version 12.1.0-beta2 Release Notes (20250401)
 
      * Bugfix: Fix incorrect polar stereographic projection handling for sea ice dataset
        (`#3023 <https://github.com/dtcenter/MET/issues/3023>`_).
-     * Bugfix: Fix the PARUSR BUFRLIB failure when PB2NC is compiled with `-O2` optimization
+     * Bugfix: Fix the PARUSR BUFRLIB failure when PB2NC is compiled with :code:`-O2` optimization
        (`#3054 <https://github.com/dtcenter/MET/issues/3054>`_).
      * Bugfix: Fix memory management issues by replacing variable length arrays with STL vectors and arrays
        (`#3075 <https://github.com/dtcenter/MET/issues/3075>`_).
-     * Bugfix: Fix intermittent configuration string parsing `yyerror` failure
+     * Bugfix: Fix intermittent configuration string parsing :code:`yyerror` failure
        (`#3077 <https://github.com/dtcenter/MET/issues/3077>`_).
      * Bugfix: Fix compilation script logic for successful dependent library compilations
        (`#3092 <https://github.com/dtcenter/MET/issues/3092>`_).
@@ -235,5 +235,5 @@ MET Version 12.1.0 Upgrade Instructions
 
    * The addition of the **CTRACK** benchmarking tool is intended as a developer utility to help identify
      bottlenecks and track runtime efficiency improvements. It is disabled by default at compilation time
-     and users, in general, should NOT use the `--enable-profiler` configuration option to enable it. 
+     and users, in general, should NOT use the :code:`--enable-profiler` configuration option to enable it. 
 
