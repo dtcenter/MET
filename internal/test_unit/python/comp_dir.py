@@ -71,29 +71,31 @@ def copy_diff_files(diff_files, truth_dir, output_dir, diff_dir=''):
     None
     """
 
-    if diff_files:
-        if not diff_dir:
-            diff_dir = os.path.join(output_dir, 'diff')
+    print(f"\n\nCopying {len(diff_files)} diff files...")
 
-        for truth_file, out_file, _, diff_file in diff_files:
-            if truth_file:
-                copy_to_diff_dir(
-                    file_path=truth_file, 
-                    file_label='_truth', 
-                    data_dir=truth_dir, 
-                    diff_dir=diff_dir)
-            if out_file:
-                copy_to_diff_dir(
-                    file_path=out_file, 
-                    file_label='_output', 
-                    data_dir=output_dir, 
-                    diff_dir=diff_dir)
-            if diff_file:
-                copy_to_diff_dir(
-                    file_path=diff_file, 
-                    file_label='', 
-                    data_dir=output_dir, 
-                    diff_dir=diff_dir)
+    if not diff_dir:
+        diff_dir = os.path.join(output_dir, 'diff')
+
+    for n, (truth_file, out_file, _, diff_file) in enumerate(diff_files):
+        print(f"\n[{n}]", end="")
+        if truth_file:
+            copy_to_diff_dir(
+                file_path=truth_file, 
+                file_label='_truth', 
+                data_dir=truth_dir, 
+                diff_dir=diff_dir)
+        if out_file:
+            copy_to_diff_dir(
+                file_path=out_file, 
+                file_label='_output', 
+                data_dir=output_dir, 
+                diff_dir=diff_dir)
+        if diff_file:
+            copy_to_diff_dir(
+                file_path=diff_file, 
+                file_label='', 
+                data_dir=output_dir, 
+                diff_dir=diff_dir)
 
     
 def copy_to_diff_dir(file_path, file_label, data_dir, diff_dir):
@@ -127,6 +129,7 @@ def copy_to_diff_dir(file_path, file_label, data_dir, diff_dir):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
+    print(f"\tCopying {file_path} to {output_path}")
     try:
         shutil.copyfile(file_path, output_path)
     except OSError as err:
