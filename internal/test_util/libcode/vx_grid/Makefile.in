@@ -90,7 +90,7 @@ build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = test_grid_area$(EXEEXT) $(am__EXEEXT_1)
 @ENABLE_UGRID_TRUE@am__append_1 = search_3d_kdtree \
-@ENABLE_UGRID_TRUE@  	search_3d_kdtree_api
+@ENABLE_UGRID_TRUE@	search_3d_kdtree_api
 
 subdir = internal/test_util/libcode/vx_grid
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -370,7 +370,7 @@ search_3d_kdtree_SOURCES = search_3d_kdtree.cc
 search_3d_kdtree_CPPFLAGS = ${MET_CPPFLAGS}
 search_3d_kdtree_LDFLAGS = -L. ${MET_LDFLAGS}
 search_3d_kdtree_LDADD = \
-  	$(UGRID_MET_LIBS) \
+	$(UGRID_MET_LIBS) \
 	-lvx_nc_util \
 	-lvx_geodesy \
 	-lvx_nav \
