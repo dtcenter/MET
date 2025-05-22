@@ -12,7 +12,6 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
 
 #include <iostream>
 #include <sstream>
@@ -25,6 +24,8 @@ using namespace std;
 #include "info.h"
 #include "code.h"
 #include "scope.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
