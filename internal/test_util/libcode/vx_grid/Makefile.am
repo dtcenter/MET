@@ -51,7 +51,7 @@ search_3d_kdtree_LDADD = \
 	-lnetcdf_c++4 -lnetcdf
 
 search_3d_kdtree_api_SOURCES =  search_3d_kdtree_api.cc
-earch_3d_kdtree_api_CPPFLAGS = ${MET_CPPFLAGS}
+search_3d_kdtree_api_CPPFLAGS = ${MET_CPPFLAGS}
 search_3d_kdtree_api_LDFLAGS = -L. ${MET_LDFLAGS}
 search_3d_kdtree_api_LDADD = \
 	$(UGRID_MET_LIBS) \
