@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -16,6 +14,8 @@ using namespace std;
 #include <cmath>
 
 #include "thermo.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

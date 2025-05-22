@@ -18,7 +18,6 @@ static const char lookup_key [] = "str";
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
 
 #include <iostream>
 #include <unistd.h>
@@ -29,6 +28,8 @@ using namespace std;
 
 #include "config_file.h"
 #include "config_util.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
