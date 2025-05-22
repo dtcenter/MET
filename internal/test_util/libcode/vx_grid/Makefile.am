@@ -10,9 +10,12 @@ include ${top_srcdir}/Make-include
 
 # Test programs
 
-noinst_PROGRAMS = test_grid_area \
-	search_3d_kdtree \
+noinst_PROGRAMS = test_grid_area
+
+if ENABLE_UGRID
+noinst_PROGRAMS += search_3d_kdtree \
 	search_3d_kdtree_api
+endif
 
 test_grid_area_SOURCES = test_grid_area.cc
 test_grid_area_CPPFLAGS = ${MET_CPPFLAGS}
@@ -48,7 +51,7 @@ search_3d_kdtree_LDADD = \
 	-lnetcdf_c++4 -lnetcdf
 
 search_3d_kdtree_api_SOURCES =  search_3d_kdtree_api.cc
-search_3d_kdtree_api_CPPFLAGS = ${MET_CPPFLAGS}
+earch_3d_kdtree_api_CPPFLAGS = ${MET_CPPFLAGS}
 search_3d_kdtree_api_LDFLAGS = -L. ${MET_LDFLAGS}
 search_3d_kdtree_api_LDADD = \
 	$(UGRID_MET_LIBS) \

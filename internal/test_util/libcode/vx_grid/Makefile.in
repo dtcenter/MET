@@ -88,8 +88,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = test_grid_area$(EXEEXT) search_3d_kdtree$(EXEEXT) \
-	search_3d_kdtree_api$(EXEEXT)
+noinst_PROGRAMS = test_grid_area$(EXEEXT) $(am__EXEEXT_1)
+@ENABLE_UGRID_TRUE@am__append_1 = search_3d_kdtree \
+@ENABLE_UGRID_TRUE@  	search_3d_kdtree_api
+
 subdir = internal/test_util/libcode/vx_grid
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -100,6 +102,8 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+@ENABLE_UGRID_TRUE@am__EXEEXT_1 = search_3d_kdtree$(EXEEXT) \
+@ENABLE_UGRID_TRUE@	search_3d_kdtree_api$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am_search_3d_kdtree_OBJECTS =  \
 	search_3d_kdtree-search_3d_kdtree.$(OBJEXT)
@@ -109,8 +113,7 @@ search_3d_kdtree_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
 search_3d_kdtree_LINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) \
 	$(search_3d_kdtree_LDFLAGS) $(LDFLAGS) -o $@
-am_search_3d_kdtree_api_OBJECTS =  \
-	search_3d_kdtree_api-search_3d_kdtree_api.$(OBJEXT)
+am_search_3d_kdtree_api_OBJECTS = search_3d_kdtree_api.$(OBJEXT)
 search_3d_kdtree_api_OBJECTS = $(am_search_3d_kdtree_api_OBJECTS)
 search_3d_kdtree_api_DEPENDENCIES = $(am__DEPENDENCIES_1) \
 	$(am__DEPENDENCIES_1)
@@ -139,7 +142,7 @@ depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade =  \
 	./$(DEPDIR)/search_3d_kdtree-search_3d_kdtree.Po \
-	./$(DEPDIR)/search_3d_kdtree_api-search_3d_kdtree_api.Po \
+	./$(DEPDIR)/search_3d_kdtree_api.Po \
 	./$(DEPDIR)/test_grid_area-test_grid_area.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -367,7 +370,7 @@ search_3d_kdtree_SOURCES = search_3d_kdtree.cc
 search_3d_kdtree_CPPFLAGS = ${MET_CPPFLAGS}
 search_3d_kdtree_LDFLAGS = -L. ${MET_LDFLAGS}
 search_3d_kdtree_LDADD = \
-	$(UGRID_MET_LIBS) \
+  	$(UGRID_MET_LIBS) \
 	-lvx_nc_util \
 	-lvx_geodesy \
 	-lvx_nav \
@@ -381,7 +384,7 @@ search_3d_kdtree_LDADD = \
 	-lnetcdf_c++4 -lnetcdf
 
 search_3d_kdtree_api_SOURCES = search_3d_kdtree_api.cc
-search_3d_kdtree_api_CPPFLAGS = ${MET_CPPFLAGS}
+earch_3d_kdtree_api_CPPFLAGS = ${MET_CPPFLAGS}
 search_3d_kdtree_api_LDFLAGS = -L. ${MET_LDFLAGS}
 search_3d_kdtree_api_LDADD = \
 	$(UGRID_MET_LIBS) \
@@ -454,7 +457,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/search_3d_kdtree-search_3d_kdtree.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/search_3d_kdtree_api-search_3d_kdtree_api.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/search_3d_kdtree_api.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/test_grid_area-test_grid_area.Po@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
@@ -490,20 +493,6 @@ search_3d_kdtree-search_3d_kdtree.obj: search_3d_kdtree.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='search_3d_kdtree.cc' object='search_3d_kdtree-search_3d_kdtree.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(search_3d_kdtree_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o search_3d_kdtree-search_3d_kdtree.obj `if test -f 'search_3d_kdtree.cc'; then $(CYGPATH_W) 'search_3d_kdtree.cc'; else $(CYGPATH_W) '$(srcdir)/search_3d_kdtree.cc'; fi`
-
-search_3d_kdtree_api-search_3d_kdtree_api.o: search_3d_kdtree_api.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(search_3d_kdtree_api_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT search_3d_kdtree_api-search_3d_kdtree_api.o -MD -MP -MF $(DEPDIR)/search_3d_kdtree_api-search_3d_kdtree_api.Tpo -c -o search_3d_kdtree_api-search_3d_kdtree_api.o `test -f 'search_3d_kdtree_api.cc' || echo '$(srcdir)/'`search_3d_kdtree_api.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/search_3d_kdtree_api-search_3d_kdtree_api.Tpo $(DEPDIR)/search_3d_kdtree_api-search_3d_kdtree_api.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='search_3d_kdtree_api.cc' object='search_3d_kdtree_api-search_3d_kdtree_api.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(search_3d_kdtree_api_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o search_3d_kdtree_api-search_3d_kdtree_api.o `test -f 'search_3d_kdtree_api.cc' || echo '$(srcdir)/'`search_3d_kdtree_api.cc
-
-search_3d_kdtree_api-search_3d_kdtree_api.obj: search_3d_kdtree_api.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(search_3d_kdtree_api_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT search_3d_kdtree_api-search_3d_kdtree_api.obj -MD -MP -MF $(DEPDIR)/search_3d_kdtree_api-search_3d_kdtree_api.Tpo -c -o search_3d_kdtree_api-search_3d_kdtree_api.obj `if test -f 'search_3d_kdtree_api.cc'; then $(CYGPATH_W) 'search_3d_kdtree_api.cc'; else $(CYGPATH_W) '$(srcdir)/search_3d_kdtree_api.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/search_3d_kdtree_api-search_3d_kdtree_api.Tpo $(DEPDIR)/search_3d_kdtree_api-search_3d_kdtree_api.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='search_3d_kdtree_api.cc' object='search_3d_kdtree_api-search_3d_kdtree_api.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(search_3d_kdtree_api_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o search_3d_kdtree_api-search_3d_kdtree_api.obj `if test -f 'search_3d_kdtree_api.cc'; then $(CYGPATH_W) 'search_3d_kdtree_api.cc'; else $(CYGPATH_W) '$(srcdir)/search_3d_kdtree_api.cc'; fi`
 
 test_grid_area-test_grid_area.o: test_grid_area.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(test_grid_area_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT test_grid_area-test_grid_area.o -MD -MP -MF $(DEPDIR)/test_grid_area-test_grid_area.Tpo -c -o test_grid_area-test_grid_area.o `test -f 'test_grid_area.cc' || echo '$(srcdir)/'`test_grid_area.cc
@@ -644,7 +633,7 @@ clean-am: clean-generic clean-noinstPROGRAMS mostlyclean-am
 
 distclean: distclean-am
 		-rm -f ./$(DEPDIR)/search_3d_kdtree-search_3d_kdtree.Po
-	-rm -f ./$(DEPDIR)/search_3d_kdtree_api-search_3d_kdtree_api.Po
+	-rm -f ./$(DEPDIR)/search_3d_kdtree_api.Po
 	-rm -f ./$(DEPDIR)/test_grid_area-test_grid_area.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -692,7 +681,7 @@ installcheck-am:
 
 maintainer-clean: maintainer-clean-am
 		-rm -f ./$(DEPDIR)/search_3d_kdtree-search_3d_kdtree.Po
-	-rm -f ./$(DEPDIR)/search_3d_kdtree_api-search_3d_kdtree_api.Po
+	-rm -f ./$(DEPDIR)/search_3d_kdtree_api.Po
 	-rm -f ./$(DEPDIR)/test_grid_area-test_grid_area.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
