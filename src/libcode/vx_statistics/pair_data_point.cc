@@ -879,7 +879,7 @@ void apply_mpr_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
    {
 
       // Loop over the pairs
-#pragma for reduction(+: n_skip)
+#pragma omp for reduction(+: n_skip)
       for(int i=0; i<nxy; i++) {
 
          // Store the climo data

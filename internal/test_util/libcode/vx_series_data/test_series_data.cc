@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -21,6 +19,8 @@ using namespace std;
 #include "vx_data2d_factory.h"
 #include "vx_grid.h"
 #include "series_pdf.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
