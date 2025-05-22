@@ -16,7 +16,7 @@ sys.path.append(metplus_util_path)
 from diff_util import compare_dir
 
 
-def comp_dir(truth_dir, output_dir, diff_dir='', debug=True, save_diff=True):
+def comp_dir(truth_dir, output_dir, debug=True, save_diff=True):
     """
     Compare test output between two MET versions.
     
@@ -30,9 +30,6 @@ def comp_dir(truth_dir, output_dir, diff_dir='', debug=True, save_diff=True):
         Directory containing test output from reference version
     output_dir : path-like
         Directory containing test output from test version
-    diff_dir : path-like, default=''
-        Directory where to save files containing differences between two versions
-        If not provided, will be set to output_dir/diff
     debug : bool, default=True
         More verbose option (based on settings of compare_dir function)
     save_diff : bool, default=True
@@ -40,18 +37,40 @@ def comp_dir(truth_dir, output_dir, diff_dir='', debug=True, save_diff=True):
     
     Returns
     -------
-    None
+    diff_files : list
 
     """
 
     print('******************************')
     print("Comparing output to truth data")
     diff_files = compare_dir(truth_dir, output_dir,
-                             debug=True,
-                             save_diff=True)
+                             debug=debug,
+                             save_diff=save_diff)
+    
+    return diff_files
 
-    # copy difference files into directory
-    # so it can be easily downloaded and compared
+def copy_diff_files(diff_files, truth_dir, output_dir, diff_dir=''):
+    """
+    Copy difference files into directory, so they can be easily downloaded and compared.
+    Intended for use in docker container in github actions, but can also be used locally/elsewhere.
+
+    Parameters
+    -----------
+    diff_files : list
+        Output from comp_dir()
+    truth_dir : path-like
+        Directory containing test output from reference version
+    output_dir : path-like
+        Directory containing test output from test version
+    diff_dir : path-like, default=''
+        Directory where to save files containing differences between two versions
+        If not provided, will be set to output_dir/diff
+
+    Returns
+    -------
+    None
+    """
+
     if diff_files:
         if not diff_dir:
             diff_dir = os.path.join(output_dir, 'diff')
@@ -123,16 +142,23 @@ if __name__ == "__main__":
                         help='"truth" or "ref" version test_output directory')
     parser.add_argument('dir_2',
                         help='"test" version test_output directory')
-    #note: the args below are not currently supported (legacy options from comp_dir.R)
-    parser.add_argument('-v', default=1, choices=[0,1,2,3],
-                        help='indicates verbosity level (0-3), default 1 (not currently supported)')
-    parser.add_argument('-hist', default=0, choices=[0,1],
-                        help='1 to produce histogram error plots for each file (not currently supported)')
-    parser.add_argument('-nc_var', action='store_true',
-                        help='if present, compare NetCDF variables (not currently supported)')
-    parser.add_argument('-strict', action='store_true',
-                        help='applies strict equality when comparing numerical values (not currently supported)')
+    parser.add_argument('-d', '--diff_dir', default=None,
+                        help='if present, copy diff files into this directory')
+    
+    # the args below are not currently supported (legacy options from comp_dir.R)
+    # parser.add_argument('-v', default=1, choices=[0,1,2,3],
+    #                     help='indicates verbosity level (0-3), default 1 (not currently supported)')
+    # parser.add_argument('-hist', default=0, choices=[0,1],
+    #                     help='1 to produce histogram error plots for each file (not currently supported)')
+    # parser.add_argument('-nc_var', action='store_true',
+    #                     help='if present, compare NetCDF variables (not currently supported)')
+    # parser.add_argument('-strict', action='store_true',
+    #                     help='applies strict equality when comparing numerical values (not currently supported)')
+    
     args = parser.parse_args()
 
-    comp_dir(truth_dir=args.dir_1, output_dir=args.dir_2)
+    diff_files = comp_dir(truth_dir=args.dir_1, output_dir=args.dir_2)
+
+    if diff_files and args.diff_dir:
+        copy_diff_files(diff_files, truth_dir=args.dir_1, output_dir=args.dir_2, diff_dir=args.diff_dir)
 

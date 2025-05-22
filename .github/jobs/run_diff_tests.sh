@@ -19,7 +19,7 @@ echo "Running comparison on test output"
 CMD_LOGFILE=/met/logs/comp_dir.log
 # CMD_LOGFILE=logs/comp_dir.log
 ENV_PYTHON=/usr/local/conda/envs/diff${VERSION_EXT}/bin/python3
-time_command ${ENV_PYTHON} ${MET_TEST_BASE}/python/comp_dir.py ${MET_TEST_TRUTH} ${MET_TEST_OUTPUT}
+time_command ${ENV_PYTHON} ${MET_TEST_BASE}/python/comp_dir.py ${MET_TEST_TRUTH} ${MET_TEST_OUTPUT} -d ${MET_TEST_DIFF}
 if [ $? != 0 ]; then
     echo "ERROR: Test output comparison failed"
     cat /met/logs/comp_dir.log
@@ -27,15 +27,15 @@ if [ $? != 0 ]; then
     exit 1
 fi
 
-echo "Running copy_diff_files.py"
-CMD_LOGFILE=/met/logs/copy_diff_files.log
-# CMD_LOGFILE=logs/copy_diff_files.log
-time_command ${MET_REPO_DIR}/.github/jobs/copy_diff_files.py
-if [ $? != 0 ]; then
-    echo "ERROR: Copy diff files script failed"
-    cat /met/logs/copy_diff_files.log
-    # cat logs/copy_diff_files.log
-    exit 1
-fi
+# echo "Running copy_diff_files.py"
+# CMD_LOGFILE=/met/logs/copy_diff_files.log
+# # CMD_LOGFILE=logs/copy_diff_files.log
+# time_command ${MET_REPO_DIR}/.github/jobs/copy_diff_files.py
+# if [ $? != 0 ]; then
+#     echo "ERROR: Copy diff files script failed"
+#     cat /met/logs/copy_diff_files.log
+#     # cat logs/copy_diff_files.log
+#     exit 1
+# fi
 
 echo "Success"
