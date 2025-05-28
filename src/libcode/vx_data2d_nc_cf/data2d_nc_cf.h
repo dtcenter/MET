@@ -57,7 +57,7 @@ class MetNcCFDataFile : public Met2dDataFile {
       //
       //  NetCDF file
       //
-      
+
       NcCfFile *_file;          // allocated
       long cur_time_index;      // current time index to get the data plane (for array of data_plane)
       long cur_z_index;         // current vlevel index to get the data plane (for array of data_plane)
@@ -70,18 +70,18 @@ class MetNcCFDataFile : public Met2dDataFile {
       virtual int nx() const
       {
          if (_file == nullptr) return 0;
-    
+
          return _file->getNx();
       }
-      
+
 
       virtual int ny() const
       {
          if (_file == nullptr) return 0;
-    
+
          return _file->getNy();
       }
-      
+
 
       //
       //  set stuff
