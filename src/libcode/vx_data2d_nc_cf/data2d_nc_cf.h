@@ -49,9 +49,9 @@ class MetNcCFDataFile : public Met2dDataFile {
                          const std::string &method_name) const;
       NcVarInfo *find_first_data_var();
       long find_time_offset(VarInfo &vinfo, const NcVarInfo *data_var);
-      long find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var);
-      NcVarInfo *get_data_var(const VarInfo &vinfo) const;
-      std::string get_z_dim_name(NcVarInfo *data_var);
+      long find_z_offset(VarInfo &vinfo, NcVarInfo *data_var);
+      NcVarInfo *get_data_var(VarInfo &vinfo);
+      std::string get_z_dim_name(NcVarInfo *data_var) const;
       void nccf_init_from_scratch();
 
       //

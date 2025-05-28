@@ -515,7 +515,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
                }
             }
             else {
-               auto next_time = (unixtime)(time_lower + time_inc;)
+               auto next_time = (unixtime)(time_lower + time_inc);
                if (found_lower) time_offsets.add(first_idx);
                for (int idx=next_offset; idx<time_dim_size; idx++) {
                   if (_file->ValidTime[idx] > time_upper) break;
@@ -771,7 +771,7 @@ LongArray MetNcCFDataFile::collect_z_offsets(VarInfo &vinfo) {
 
 ////////////////////////////////////////////////////////////////////////
 
-long MetNcCFDataFile::convert_time_to_offset(uniztime time_value) {
+long MetNcCFDataFile::convert_time_to_offset(unixtime time_value) {
    bool found = false;
    bool found_value = false;
    long time_offset = bad_data_int;
@@ -964,7 +964,7 @@ long MetNcCFDataFile::find_time_offset(VarInfo &vinfo, const NcVarInfo *data_var
 
 ////////////////////////////////////////////////////////////////////////
 
-long MetNcCFDataFile::find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var) {
+long MetNcCFDataFile::find_z_offset(VarInfo &vinfo, NcVarInfo *data_var) {
    static const string method_name
          = "MetNcCFDataFile::find_z_offset() -> ";
 
@@ -1019,7 +1019,7 @@ NcVarInfo *MetNcCFDataFile::get_data_var(VarInfo &vinfo) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-string MetNcCFDataFile::get_z_dim_name(const NcVarInfo *data_var) const {
+string MetNcCFDataFile::get_z_dim_name(NcVarInfo *data_var) const {
    string z_dim_name;
    if (0 <= data_var->z_slot) {
       NcDim z_dim = get_nc_dim(data_var->var, data_var->z_slot);
