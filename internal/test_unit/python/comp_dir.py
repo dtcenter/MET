@@ -71,7 +71,7 @@ def copy_diff_files(diff_files, truth_dir, output_dir, diff_dir=''):
     None
     """
 
-    print(f"\n\nCopying {len(diff_files)} diff files...")
+    print(f"\nCopying {len(diff_files)} diff files...")
 
     if not diff_dir:
         diff_dir = os.path.join(output_dir, 'diff')
@@ -96,6 +96,8 @@ def copy_diff_files(diff_files, truth_dir, output_dir, diff_dir=''):
                 file_label='', 
                 data_dir=output_dir, 
                 diff_dir=diff_dir)
+    
+    print(f"\nDone copying files!")
 
     
 def copy_to_diff_dir(file_path, file_label, data_dir, diff_dir):
