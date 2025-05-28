@@ -19,6 +19,31 @@ Input point observation files in PrepBUFR format are available through NCEP. The
 
 Tropical cyclone forecasts and observations are typically provided in a specific ATCF (Automated Tropical Cyclone Forecasting) ASCII format, in A-deck, B-deck, and E-deck files.
 
+.. _ascii_file_lists:
+
+ASCII File Lists
+----------------
+
+Several MET tools read multiple gridded input data files in a single run. For example, multiple gridded input files can define a time series of data for Series-Analysis and MTD or multiple ensemble members for Gen-Ens-Prod and Ensemble-Stat. Generally, users have two options for defining that list of input files:
+
+1. Directly on the command line, for a relatively small number of files.
+2. In a single ASCII file containing a list of file names of arbitrary length.
+
+ASCII file lists consist of a white-space separated list of paths to the input files. While relative paths may work, users are encouraged to provide full paths for more consistent behavior. Note that environment variables can also be used in the file lists.
+
+The file list elements can be separated by spaces, tabs, or newlines, but not commas. Users are encouraged to add the optional **file_list** keyword as the first element of each list to clearly identify it as such. When **file_list** is the first item, no validation of the file existence is performed. When **file_list** is not present, MET checks whether each input file actually exists on the file system and errors out if it encounters too many missing input files.
+
+While validating file existence is useful for standard input file formats, it can cause problems when providing a list of arguments for a Python embedding script since a **file_list** used for Python embedding can contain optional command line arguments in addition to file names on each line. Please see the description of :ref:`MET_PYTHON_INPUT_ARG <met-python-input-arg>` for additional details.
+
+Here is an example ASCII file list for three input files, each listed on a separate line:
+
+.. code-block::
+
+ file_list
+ /path/to/file1
+ /path/to/file2
+ /path/to/file3
+
 Requirements for CF Compliant NetCDF
 ------------------------------------
 
@@ -378,7 +403,7 @@ The following is a summary of the input and output formats for each of the tools
     * **Output**: ASCII description of their contents printed to the screen.
 
 .. _Configuration File Details:
-  
+
 Configuration File Details
 ==========================
 

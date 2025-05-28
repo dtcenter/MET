@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -990,7 +990,7 @@ vector<string> parseHourlyAqobsLine(const string &asciiLine, bool &ok)
       break;
     } else {
       string token = remainder.substr(0, i1);
-      tokens.push_back(token);
+      tokens.emplace_back(token);
       remainder = remainder.substr(i1+1);
     }
   }

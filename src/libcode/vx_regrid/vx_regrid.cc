@@ -1,190 +1,152 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
-
 ////////////////////////////////////////////////////////////////////////
 
-
 #include "vx_regrid.h"
-
 #include "interp_mthd.h"
-
 #include "GridTemplate.h"
 
 using namespace std;
 
-
 ////////////////////////////////////////////////////////////////////////
 
+DataPlane met_regrid(const DataPlane & in, const Grid & from_grid,
+                     const Grid & to_grid, const RegridInfo & info) {
 
-DataPlane met_regrid (const DataPlane & in, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
+   DataPlane out;
 
-{
+   switch(info.method) {
+      case InterpMthd::Min:
+      case InterpMthd::Max:
+      case InterpMthd::Median:
+      case InterpMthd::UW_Mean:
+      case InterpMthd::DW_Mean:
+      case InterpMthd::LS_Fit:
+      case InterpMthd::Bilin:
+      case InterpMthd::Nearest:
+      case InterpMthd::Upper_Left:
+      case InterpMthd::Upper_Right:
+      case InterpMthd::Lower_Right:
+      case InterpMthd::Lower_Left:
+         out = met_regrid_generic (in, from_grid, to_grid, info);
+         break;
 
-DataPlane out;
+      case InterpMthd::Budget:
+         out = met_regrid_budget (in, from_grid, to_grid, info);
+         break;
 
+      case InterpMthd::AW_Mean:
+         out = met_regrid_area_weighted (in, from_grid, to_grid, info);
+         break;
 
-switch ( info.method )  {
+      case InterpMthd::Force:
+         out = met_regrid_force (in, from_grid, to_grid, info);
+         break;
 
-   case InterpMthd::Min:
-   case InterpMthd::Max:
-   case InterpMthd::Median:
-   case InterpMthd::UW_Mean:
-   case InterpMthd::DW_Mean:
-   case InterpMthd::LS_Fit:
-   case InterpMthd::Bilin:
-   case InterpMthd::Nearest:
-   case InterpMthd::Upper_Left:
-   case InterpMthd::Upper_Right:
-   case InterpMthd::Lower_Right:
-   case InterpMthd::Lower_Left:
-      out = met_regrid_generic (in, from_grid, to_grid, info);
-      break;
+      case InterpMthd::MaxGauss:
+         out = met_regrid_maxgauss (in, from_grid, to_grid, info);
+         break;
 
-   case InterpMthd::Budget:
-      out = met_regrid_budget (in, from_grid, to_grid, info);
-      break;
+      default:
+         mlog << Error << "\nmet_regrid() -> "
+              << "bad interpolation method ... "
+              << interpmthd_to_string(info.method) << "\n\n";
+         exit(1);
 
-   case InterpMthd::AW_Mean:
-      out = met_regrid_area_weighted (in, from_grid, to_grid, info);
-      break;
+   } // switch info.method
 
-   case InterpMthd::Force:
-      out = met_regrid_force (in, from_grid, to_grid, info);
-      break;
+   // apply conversion logic
+   out.convert(info.convert_fx);
 
-   case InterpMthd::MaxGauss:
-      out = met_regrid_maxgauss (in, from_grid, to_grid, info);
-      break;
+   // apply censor logic
+   out.censor(info.censor_thresh, info.censor_val);
 
-   default:
-      mlog << Error << "\nmet_regrid() -> "
-           << "bad interpolation method ... "
-           << interpmthd_to_string(info.method) << "\n\n";
-      exit(1);
-
-}   //  switch info.method
-
-   //
-   //  apply convert logic
-   //
-
-out.convert(info.convert_fx);
-
-   //
-   //  apply censor logic
-   //
-
-out.censor(info.censor_thresh, info.censor_val);
-
-   //
-   //  done
-   //
-
-return out;
-
+   return out;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
+DataPlane met_regrid_nearest(const DataPlane & from_data,
+                             const Grid & from_grid,
+                             const Grid & to_grid) {
+   RegridInfo ri;
+   ri.enable = true;
+   ri.method = InterpMthd::Nearest;
+   ri.width  = 1;
+   ri.shape  = GridTemplateFactory::GridTemplates::Square;
 
-DataPlane met_regrid_nearest (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid)
-
-{
-
-RegridInfo ri;
-ri.enable = true;
-ri.method = InterpMthd::Nearest;
-ri.width  = 1;
-ri.shape  = GridTemplateFactory::GridTemplates::Square;
-
-return met_regrid_generic(from_data, from_grid, to_grid, ri);
-
+   return met_regrid_generic(from_data, from_grid, to_grid, ri);
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
+DataPlane met_regrid_generic(const DataPlane & from_data,
+                             const Grid & from_grid,
+                             const Grid & to_grid,
+                             const RegridInfo & info) {
+   DataPlane to_data;
 
-DataPlane met_regrid_generic (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
+#pragma omp parallel default(none) \
+   shared(from_data, from_grid, to_grid, info, to_data) 
+   {
 
-{
-
-int xt, yt;
-int xf, yf;
-double value, lat, lon;
-double x_from, y_from;
-DataPlane to_data;
-
-to_data.set_size(to_grid.nx(), to_grid.ny());
-
-   //
-   //  copy timing info
-   //
-
-to_data.set_init  (from_data.init());
-to_data.set_valid (from_data.valid());
-to_data.set_lead  (from_data.lead());
-to_data.set_accum (from_data.accum());
-
-   //
-   //  copy data
-   //
-for (xt=0; xt<(to_grid.nx()); ++xt)  {
-
-   for (yt=0; yt<(to_grid.ny()); ++yt)  {
-
-      to_grid.xy_to_latlon(xt, yt, lat, lon);
-
-      from_grid.latlon_to_xy(lat, lon, x_from, y_from);
-
-      xf = nint(x_from);
-      yf = nint(y_from);
-
-      if ( ( (xf < 0 || xf >= from_grid.nx()) && !from_grid.wrap_lon() ) ||
-              yf < 0 || yf >= from_grid.ny() )  {
-         value = bad_data_float;
-      }
-      else  {
-         value = compute_horz_interp(from_data, x_from, y_from,
-                    bad_data_double, info.method, info.width,
-                    info.shape, from_grid.wrap_lon(), info.vld_thresh);
+#pragma omp single
+      {
+         // Set the size and timing info
+         to_data.set_size (to_grid.nx(), to_grid.ny());
+         to_data.set_times(from_data);
       }
 
-      to_data.put(value, xt, yt);
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int xt=0; xt<(to_grid.nx()); xt++) {
+         for(int yt=0; yt<(to_grid.ny()); yt++) {
 
-   }   //  for yt
+            double lat;
+            double lon;
+            to_grid.xy_to_latlon(xt, yt, lat, lon);
 
-}   //  for xt
+            double x_from;
+            double y_from;
+            from_grid.latlon_to_xy(lat, lon, x_from, y_from);
 
-   //
-   //  done
-   //
+            int xf = nint(x_from);
+            int yf = nint(y_from);
 
-return to_data;
+            double value;
+            if(((xf < 0 || xf >= from_grid.nx()) && !from_grid.wrap_lon()) ||
+                 yf < 0 || yf >= from_grid.ny()) {
+                value = bad_data_float;
+            }
+            else {
+               value = compute_horz_interp(from_data, x_from, y_from,
+                          bad_data_double, info.method, info.width,
+                          info.shape, from_grid.wrap_lon(), info.vld_thresh);
+            }
 
+            to_data.put(value, xt, yt);
+
+         } // for yt
+      } // for xt
+   } // End of omp parallel
+
+   return to_data;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-DataPlane met_regrid_area_weighted (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
-
-{
-
-int xt, yt;
-int xf, yf;
-double value, weight, lat, lon;
-double x_to, y_to;
-DataPlane to_data, wt_data;
+DataPlane met_regrid_area_weighted(const DataPlane & from_data,
+                                   const Grid & from_grid,
+                                   const Grid & to_grid,
+                                   const RegridInfo & info) {
+   DataPlane to_data;
+   DataPlane wt_data;
 
    //
    //  The interpolation width and shape do not apply here.  The output
@@ -193,177 +155,153 @@ DataPlane to_data, wt_data;
    //  weights are determined by the area of the from_grid boxes.
    //
 
-   //
-   //  set output size and initialize to 0
-   //
+#pragma omp parallel default(none) \
+   shared(from_data, from_grid, to_grid, info, to_data, wt_data) \
+   shared(bad_data_double)
+   { 
 
-to_data.set_size(to_grid.nx(), to_grid.ny());
-wt_data.set_size(to_grid.nx(), to_grid.ny());
+#pragma omp single
+      {
+         // Set the size and timinig info
+         to_data.set_size (to_grid.nx(), to_grid.ny());
+         wt_data.set_size (to_grid.nx(), to_grid.ny());
+         to_data.set_times(from_data);
 
-to_data.set_constant(0.0);
-wt_data.set_constant(0.0);
-
-   //
-   //  copy timing info
-   //
-
-to_data.set_init  (from_data.init());
-to_data.set_valid (from_data.valid());
-to_data.set_lead  (from_data.lead());
-to_data.set_accum (from_data.accum());
-
-   //
-   //  loop over the from grid to accumulate sums and area weights
-   //
-
-for (xf=0; xf<(from_grid.nx()); ++xf)  {
-
-   for (yf=0; yf<(from_grid.ny()); ++yf)  {
-
-      from_grid.xy_to_latlon(xf, yf, lat, lon);
-
-      to_grid.latlon_to_xy(lat, lon, x_to, y_to);
-
-      xt = nint(x_to);
-      yt = nint(y_to);
-
-      if ( (xt < 0) || (xt >= to_grid.nx()) || (yt < 0) || (yt >= to_grid.ny()) )  {
-
-         continue;
-
-      } else {
-
-         if ( is_bad_data(value = from_data(xf, yf)) )  continue;
-         weight = from_grid.calc_area(xf, yf);
-
-         to_data.set(to_data(xt, yt) + value*weight, xt, yt);
-         wt_data.set(wt_data(xt, yt) + weight,       xt, yt);
+         // Initialize the values
+         to_data.set_constant(0.0);
+         wt_data.set_constant(0.0);
 
       }
 
-   }   //  for yf
+      // loop over the from grid to accumulate sums and area weights
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int xf=0; xf<(from_grid.nx()); xf++) {
+         for(int yf=0; yf<(from_grid.ny()); yf++) {
 
-}   //  for xf
+            double lat;
+            double lon;
+            from_grid.xy_to_latlon(xf, yf, lat, lon);
 
-   //
-   //  loop over the to grid to compute the area weighted average
-   //
+            double x_to;
+            double y_to;
+            to_grid.latlon_to_xy(lat, lon, x_to, y_to);
 
-for (xt=0; xt<(to_grid.nx()); ++xt)  {
+            int xt = nint(x_to);
+            int yt = nint(y_to);
 
-   for (yt=0; yt<(to_grid.ny()); ++yt)  {
+            double value;
+            if((xt < 0) || (xt >= to_grid.nx()) ||
+               (yt < 0) || (yt >= to_grid.ny()) ) {
+               continue;
+            }
+            else {
+               if(is_bad_data(value = from_data(xf, yf))) continue;
+               double weight = from_grid.calc_area(xf, yf);
 
-      if ( is_eq(wt_data(xt, yt), 0.0) )  {
+               to_data.set(to_data(xt, yt) + value*weight, xt, yt);
+               wt_data.set(wt_data(xt, yt) + weight,       xt, yt);
+            }
+         } // for yf
+      } // for xf
 
-         to_data.set(bad_data_double, xt, yt);
+      // loop over the to grid to compute the area weighted average
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int xt=0; xt<(to_grid.nx()); xt++) {
+         for(int yt=0; yt<(to_grid.ny()); yt++) {
+            if(is_eq(wt_data(xt, yt), 0.0)) {
+               to_data.set(bad_data_double, xt, yt);
+            }
+            else {
+               to_data.set(to_data(xt, yt) / wt_data(xt, yt), xt, yt);
+            }
+         } // for yt
+      } // for xt
+   } // End of omp parallel
 
-      } else {
+   return to_data;
+}
 
-         to_data.set(to_data(xt, yt) / wt_data(xt, yt), xt, yt);
+////////////////////////////////////////////////////////////////////////
 
+DataPlane met_regrid_force(const DataPlane & from_data,
+                           const Grid & from_grid,
+                           const Grid & to_grid,
+                           const RegridInfo & info) {
+
+   // Check grid dimensions
+   if(from_grid.nx() != to_grid.nx() ||
+      from_grid.ny() != to_grid.ny()) {
+
+      mlog << Error << "\nmet_regrid_force() -> "
+           << "the " << interpmthd_to_string(info.method)
+           << " interpolation method may only be used when the grid "
+           << "dimensions match: ("
+           << from_grid.nx() << ", " << from_grid.ny() << ") != ("
+           << to_grid.nx() << ", " << to_grid.ny() << ")\n\n";
+      exit(1);
+   }
+
+   return from_data;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+DataPlane met_regrid_maxgauss(const DataPlane & from_data,
+                              const Grid & from_grid,
+                              const Grid & to_grid,
+                              const RegridInfo & info) {
+   DataPlane to_data;
+
+#pragma omp parallel default(none) \
+   shared(from_data, from_grid, to_grid, info, to_data)
+   {
+
+#pragma omp single
+      {
+         // Set the size and timing info
+         to_data.set_size (to_grid.nx(), to_grid.ny());
+         to_data.set_times(from_data);
       }
 
-   }   //  for yt
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int xt=0; xt<(to_grid.nx()); xt++) {
+         for(int yt=0; yt<(to_grid.ny()); yt++) {
 
-}   //  for xt
+            double lat;
+            double lon;
+            to_grid.xy_to_latlon(xt, yt, lat, lon);
 
-   //
-   //  done
-   //
+            double x_from;
+            double y_from;
+            from_grid.latlon_to_xy(lat, lon, x_from, y_from);
 
-return to_data;
+            int xf = nint(x_from);
+            int yf = nint(y_from);
 
+            double value;
+            if(((xf < 0 || xf >= from_grid.nx()) && !from_grid.wrap_lon()) ||
+                 yf < 0 || yf >= from_grid.ny()) {
+               value = bad_data_float;
+            }
+            else {
+               value = compute_horz_interp(from_data, x_from, y_from,
+                          bad_data_double, InterpMthd::Max, info.width,
+                          info.shape, from_grid.wrap_lon(), info.vld_thresh);
+            }
+
+            to_data.put(value, xt, yt);
+
+         } // for yt
+      } // for xt
+   } // End of omp parallel
+
+   interp_gaussian_dp(to_data, info.gaussian, info.vld_thresh);
+
+   return to_data;
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-DataPlane met_regrid_force (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
-
-{
-
-   //
-   //  check grid dimensions
-   //
-
-if ( from_grid.nx() != to_grid.nx() || from_grid.ny() != to_grid.ny() ) {
-
-   mlog << Error << "\nmet_regrid_force() -> "
-        << "the " << interpmthd_to_string(info.method)
-        << " interpolation method may only be used when the grid "
-        << "dimensions match: ("
-        << from_grid.nx() << ", " << from_grid.ny() << ") != ("
-        << to_grid.nx() << ", " << to_grid.ny() << ")\n\n";
-   exit(1);
-
-}
-
-return from_data;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-DataPlane met_regrid_maxgauss (const DataPlane & from_data, const Grid & from_grid, const Grid & to_grid, const RegridInfo & info)
-
-{
-
-int xt, yt;
-int xf, yf;
-double value, lat, lon;
-double x_from, y_from;
-DataPlane to_data;
-
-to_data.set_size(to_grid.nx(), to_grid.ny());
-
-   //
-   //  copy timing info
-   //
-
-to_data.set_init  (from_data.init());
-to_data.set_valid (from_data.valid());
-to_data.set_lead  (from_data.lead());
-to_data.set_accum (from_data.accum());
-
-   //
-   //  copy data
-   //
-
-for (xt=0; xt<(to_grid.nx()); ++xt)  {
-
-   for (yt=0; yt<(to_grid.ny()); ++yt)  {
-
-      to_grid.xy_to_latlon(xt, yt, lat, lon);
-
-      from_grid.latlon_to_xy(lat, lon, x_from, y_from);
-
-      xf = nint(x_from);
-      yf = nint(y_from);
-
-      if ( ( (xf < 0 || xf >= from_grid.nx()) && !from_grid.wrap_lon() ) ||
-              yf < 0 || yf >= from_grid.ny() )  {
-         value = bad_data_float;
-
-      } else {
-         value = compute_horz_interp(from_data, x_from, y_from,
-                    bad_data_double, InterpMthd::Max, info.width,
-                    info.shape, from_grid.wrap_lon(), info.vld_thresh);
-      }
-
-      to_data.put(value, xt, yt);
-
-   }   //  for yt
-
-}   //  for xt
-
-interp_gaussian_dp(to_data, info.gaussian, info.vld_thresh);
-
-return to_data;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////

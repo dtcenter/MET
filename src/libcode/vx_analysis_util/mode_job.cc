@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -323,7 +323,7 @@ if ( n_dump == 0 )  {
    dump_at.set_precision(get_precision());
    dump_at.set_bad_data_value(bad_data_double);
    dump_at.set_bad_data_str(na_str);
-   dump_at.set_delete_trailing_blank_rows(1);
+   dump_at.set_delete_trailing_blank_rows(true);
 
    // Write out the MODE header columns
    for (j=0; j<n_mode_hdr_columns; ++j)  {
@@ -489,7 +489,7 @@ for (j=1; j<table.ncols(); ++j) table.set_column_just(j, RightJust);
 
 table.set_bad_data_value(bad_data_double);
 table.set_bad_data_str(na_str);
-table.set_delete_trailing_blank_rows(1);
+table.set_delete_trailing_blank_rows(true);
 table.set_ics(3);
 
 
@@ -841,7 +841,7 @@ for (j=1; j<table.ncols(); ++j) table.set_column_just(j, RightJust);
 
 table.set_bad_data_value(bad_data_double);
 table.set_bad_data_str(na_str);
-table.set_delete_trailing_blank_rows(1);
+table.set_delete_trailing_blank_rows(true);
 table.set_ics(3);
 
    //

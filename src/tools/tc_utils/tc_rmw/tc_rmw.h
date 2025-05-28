@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -82,7 +82,7 @@ static StringArray   deck_source, deck_model_suffix;
 static ConcatString  config_file;
 static TCRMWConfInfo conf_info;
 static GrdFileType   ftype;
-static TCRMW_WindConverter wind_converter;
+static TCRMWWindConverter wind_converter;
 
 // Optional arguments
 static ConcatString out_dir;
@@ -107,8 +107,8 @@ static netCDF::NcVar        valid_time_str_var;
 static netCDF::NcVar        valid_time_ut_var;
 static netCDF::NcVar        lead_time_str_var;
 static netCDF::NcVar        lead_time_sec_var;
-static netCDF::NcVar        lat_arr_var;
-static netCDF::NcVar        lon_arr_var;
+static netCDF::NcVar        lats_var;
+static netCDF::NcVar        lons_var;
 static netCDF::NcVar        data_var;
 static netCDF::NcVar        wind_r_var;
 static netCDF::NcVar        wind_a_var;
@@ -135,14 +135,10 @@ static std::map<std::string, int> pressure_level_indices;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static Grid      grid_in;
-static TcrmwData tcrmw_data;
-static TcrmwGrid tcrmw_grid;
-static Grid      grid_out;
-
-// Grid coordinate arrays
-static double* lat_arr;
-static double* lon_arr;
+static Grid       grid_in;
+static RngAziData rng_azi_data;
+static RngAziGrid rng_azi_grid;
+static Grid       grid_out;
 
 ////////////////////////////////////////////////////////////////////////
 

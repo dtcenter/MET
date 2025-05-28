@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -387,8 +387,9 @@ offset = HdrLine->col_offset(col_str, dim);
    // If not found, check extra header columns
    //
 
-if ( is_bad_data(offset) ) {
-   if ( !get_file()->header().has(col_str, offset) ) offset = bad_data_int;
+if ( is_bad_data(offset) && get_file() &&
+     !get_file()->header().has(col_str, offset) ) {
+   offset = bad_data_int;
 }
 
    //

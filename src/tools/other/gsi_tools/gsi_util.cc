@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -351,7 +351,7 @@ void setup_table(AsciiTable &at) {
    at.set_bad_data_str(na_str);
 
    // Don't write out trailing blank rows
-   at.set_delete_trailing_blank_rows(1);
+   at.set_delete_trailing_blank_rows(true);
 
    return;
 }

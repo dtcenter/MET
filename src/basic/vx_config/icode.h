@@ -4,7 +4,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -24,6 +24,7 @@
 
 
 #include <iostream>
+#include <vector>
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -171,17 +172,13 @@ class IcodeVector {
 
    private:
 
-      IcodeCell * Cell;
+      std::vector<IcodeCell> Cell;
 
       int Ncells;
-
-      int Nalloc;
 
       void assign(const IcodeVector &);
 
       void init_from_scratch();
-
-      void extend(int);
 
    public:
 

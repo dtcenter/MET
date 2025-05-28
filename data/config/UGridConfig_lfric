@@ -2,13 +2,14 @@
 //
 // Unstructured grid configuration file.
 //
-// UGridConfig_lfric at the current working directory replaces the settings here.
+// UGridConfig_lfric in the current working directory overrides the settings
+// here for reading native model level data from the LFRic modeling system.
 // For additional or updated information, please see the MET User's Guide.
 //
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Dimensions and variables mapping for LFric dataset
+// Dimensions and variables mapping for LFRic dataset
 //
 ugrid_metadata_map = [
    { key = "dim_face";  val = "nMesh2d_face"; },

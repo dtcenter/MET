@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -33,8 +33,6 @@ static const double correct_dec =     -(  7.0 + 47.0/60.0 +  1.740/3600.0 );   /
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -42,6 +40,8 @@ using namespace std;
 #include <cmath>
 
 #include "solar.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -55,7 +55,7 @@ double Ra, Dec;
 double ra_error, dec_error;
 double max_error;
 unixtime gmt;
-char junk[256];
+ConcatString cs;
 const char * format = "%10.5f";
 
 
@@ -71,11 +71,11 @@ max_error = (ra_error > dec_error) ? ra_error : dec_error;
 
 cout << "\n\n";
 
-snprintf(junk, sizeof(junk), format, Ra);
-cout << "Right Ascension          = " << junk << " degrees\n\n";
+cs.format(format, Ra);
+cout << "Right Ascension          = " << cs << " degrees\n\n";
 
-snprintf(junk, sizeof(junk), format, Dec);
-cout << "Declination              = " << junk << " degrees\n\n";
+cs.format(format, Dec);
+cout << "Declination              = " << cs << " degrees\n\n";
 
 cout << "\n\n";
 

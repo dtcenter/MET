@@ -1,14 +1,12 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 ///////////////////////////////////////////////////////////////////////
-
 
 #include <cstdio>
 #include <cstdlib>
@@ -29,15 +27,15 @@
 
 using namespace std;
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-static void populate_bool_plane(const string &name, const int * buf, const int nx, const int ny,
+static void populate_bool_plane(const string &name, const int * buf,
+                                const int nx, const int ny,
                                 BoolPlane & bp_out);
+static void _debug_shape_examine(const string &name, const ShapeData &sd,
+                                 int nx, int ny);
 
-static void  _debug_shape_examine(const string &name, const ShapeData &sd, int nx, int ny);
-
+////////////////////////////////////////////////////////////////////////
 
 void MultiVarData1::set_obj(ShapeData *sd)
 {
@@ -52,6 +50,8 @@ void MultiVarData1::set_obj(ShapeData *sd)
    _obj_data = _fill_int_array(sd);
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void MultiVarData1::set_raw(ShapeData *sd)
 {
    if (_raw_data) {
@@ -60,21 +60,29 @@ void MultiVarData1::set_raw(ShapeData *sd)
    _raw_data = _fill_float_array(sd);
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void MultiVarData1::set_shapedata(const ShapeData &sd)
 {
    if (_sd) delete _sd;
    _sd = new ShapeData(sd);
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void MultiVarData1::set_conv_thresh_array(const ThreshArray &t)
 {
    _convThreshArray = t;
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void MultiVarData1::set_merge_thresh_array(const ThreshArray &t)
 {
    _mergeThreshArray = t;
 }
+
+////////////////////////////////////////////////////////////////////////
 
 void  MultiVarData1::objects_from_arrays(bool do_clusters,
                                          BoolPlane & out)
@@ -83,59 +91,88 @@ void  MultiVarData1::objects_from_arrays(bool do_clusters,
    populate_bool_plane(name, _obj_data, _nx, _ny, out);
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void MultiVarData1::print(const string &name) const
 {
    string n;
    n = name + "_" + _name + "_" + sprintModeDataType(_dataType) + "_Obj";
-   if (_obj_data) {
+   if(_obj_data) {
       _print_summary(n, _obj_data, *_obj_sd);
    } else {
       mlog << Debug(2) << n << " is empty\n";
    }
 }           
 
+////////////////////////////////////////////////////////////////////////
 
 int *MultiVarData1::_fill_int_array(ShapeData *sd)
 {
    int *ret = new int [_nx*_ny];
-   for (int x=0; x<_nx; ++x) {
-      for (int y=0; y<_ny; ++y) {
-         int n = DefaultTO.two_to_one(_nx, _ny, x, y);
-         if (sd->is_nonzero(x,y) ) {
-            ret[n] = nint(sd->data(x, y));
-         } else {
-            ret[n] = bad_data_int;
-         }
-      }
-   }
+
+#pragma omp parallel default(none) \
+   shared(_nx, _ny, DefaultTO, sd, ret)
+   {
+
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<_nx; x++) {
+         for(int y=0; y<_ny; y++) {
+            int n = DefaultTO.two_to_one(_nx, _ny, x, y);
+            if(sd->is_nonzero(x,y)) {
+               ret[n] = nint(sd->data(x, y));
+            }
+            else {
+               ret[n] = bad_data_int;
+            }
+         } // for y
+      } // for x
+   } // End omp parallel
+
    return ret;
 }
+
+////////////////////////////////////////////////////////////////////////
 
 float *MultiVarData1::_fill_float_array(ShapeData *sd)
 {
    float *ret = new float [_nx*_ny];
-   for (int x=0; x<_nx; ++x) {
-      for (int y=0; y<_ny; ++y) {
-         int n = DefaultTO.two_to_one(_nx, _ny, x, y);
-         ret[n] = sd->data(x, y);
-      }
-   }
+
+#pragma omp parallel default(none) \
+   shared(_nx, _ny, DefaultTO, sd, ret)
+   {
+
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<_nx; x++) {
+         for(int y=0; y<_ny; y++) {
+            int n = DefaultTO.two_to_one(_nx, _ny, x, y);
+            ret[n] = sd->data(x, y);
+         } // for y
+      } // for x
+   } // End omp parallel
+
    return ret;
 }
 
-void MultiVarData1::_print_summary(const string &name, int *data, const ShapeData &sd) const
+////////////////////////////////////////////////////////////////////////
+
+void MultiVarData1::_print_summary(const string &name, int *data,
+                                   const ShapeData &sd) const
 {
    vector<int> values;
-   for (int i=0; i<_nx*_ny; ++i) {
-      if (data[i] > 0) {
-         if (find(values.begin(), values.end(), data[i]) == values.end()) {
-            values.push_back(data[i]);
+   for(int i=0; i<_nx*_ny; i++) {
+      if(data[i] > 0) {
+         if(find(values.begin(), values.end(), data[i]) == values.end()) {
+            values.emplace_back(data[i]);
          }
       }
    }
    mlog << Debug(4) << name << " has " << values.size() << " unique values\n";
    _debug_shape_examine(name, sd, _nx, _ny);
 }
+
+////////////////////////////////////////////////////////////////////////
 
 MultiVarData::MultiVarData() :
    _dataType(ModeDataType::MvMode_Both),
@@ -145,17 +182,21 @@ MultiVarData::MultiVarData() :
    _nx(0), _ny(0),
    _grid(0)
 {
-}   
+}
+
+////////////////////////////////////////////////////////////////////////
 
 MultiVarData::~MultiVarData() 
 {
    _clear();
 }   
 
+////////////////////////////////////////////////////////////////////////
+
 void MultiVarData::init(ModeDataType dataType,
                         const string &name, 
                         const Grid &grid,
-                         const string &units,
+                        const string &units,
                         const string &level,
                         double data_min, double data_max)
 {
@@ -174,6 +215,8 @@ void MultiVarData::init(ModeDataType dataType,
    _merge = new MultiVarData1(_nx, _ny, "Merge", _dataType);
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void MultiVarData::set_obj(ShapeData *sd, bool simple)
 {
    if (simple) {
@@ -183,6 +226,8 @@ void MultiVarData::set_obj(ShapeData *sd, bool simple)
       _merge->set_obj(sd);
    }
 }
+
+////////////////////////////////////////////////////////////////////////
       
 void MultiVarData::set_raw(ShapeData *sd, bool simple)
 {
@@ -192,6 +237,8 @@ void MultiVarData::set_raw(ShapeData *sd, bool simple)
       _merge->set_raw(sd);
    }
 }
+
+////////////////////////////////////////////////////////////////////////
       
 void MultiVarData::set_shapedata(const ShapeData &sd, bool simple)
 {
@@ -202,6 +249,8 @@ void MultiVarData::set_shapedata(const ShapeData &sd, bool simple)
    }
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void MultiVarData::set_conv_thresh_array(const ThreshArray &t, bool simple)
 {
    if (simple) {
@@ -211,6 +260,8 @@ void MultiVarData::set_conv_thresh_array(const ThreshArray &t, bool simple)
    }
 }
 
+////////////////////////////////////////////////////////////////////////
+
 void MultiVarData::set_merge_thresh_array(const ThreshArray &t, bool simple)
 {
    if (simple) {
@@ -219,6 +270,8 @@ void MultiVarData::set_merge_thresh_array(const ThreshArray &t, bool simple)
       _merge->set_merge_thresh_array(t);
    }
 }
+
+////////////////////////////////////////////////////////////////////////
 
 const ShapeData *MultiVarData::shapedata_ptr(bool simple) const
 {
@@ -231,7 +284,6 @@ const ShapeData *MultiVarData::shapedata_ptr(bool simple) const
 
 ////////////////////////////////////////////////////////////////////////
 
-
 void  MultiVarData::objects_from_arrays(bool do_clusters,
                                          bool simple,
                                          BoolPlane & out)
@@ -243,9 +295,7 @@ void  MultiVarData::objects_from_arrays(bool do_clusters,
    }
 }  
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void  MultiVarData::print(void) const
 {
@@ -253,9 +303,7 @@ void  MultiVarData::print(void) const
    _merge->print(_name);
 }  
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void MultiVarData::_clear()
 {
@@ -274,68 +322,68 @@ void MultiVarData::_clear()
    _nx = _ny = 0;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-void populate_bool_plane(const string &name, const int * buf, const int nx, const int ny, BoolPlane & bp_out)
+static void populate_bool_plane(const string &name, const int * buf,
+                                const int nx, const int ny,
+                                BoolPlane & bp_out)
 
 {
-
-   int x, y, n, k;
-   bool tf;
-   double nyes=0.0;
-   double ntotal = (double)(nx*ny);
    bp_out.set_size(nx, ny);
 
-   for (x=0; x<nx; ++x)  {
+   int nyes=0;
 
-      for (y=0; y<ny; ++y)  {
+#pragma omp parallel default(none) \
+   shared(nx, ny, buf, nyes, bp_out)
+   {
 
-         n = y*nx + x;
+#pragma omp for schedule(static) \
+                reduction(+: nyes) \
+                collapse(2)
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
+            int n = y*nx + x;
+            int k = buf[n];
+            bool tf = (k > 0);
+            if(tf) nyes++;
+            bp_out.put(tf, x, y);
+         } // for y
+      } // for x
+   } // End omp parallel
 
-         k = buf[n];
-
-         tf = ( k > 0 );
-         if (tf) ++nyes;
-         bp_out.put(tf, x, y);
-
-      }   //  for y
-
-   }   //  for x
-
-   mlog << Debug(4) << " Bool plane for " << name << " has " << nyes << " true values\n";
+   mlog << Debug(4) << " Bool plane for " << name << " has " << nyes
+                    << " true values\n";
 
    return;
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-
-static void  _debug_shape_examine(const string &name, const ShapeData &sd, int nx, int ny)
+static void _debug_shape_examine(const string &name, const ShapeData &sd,
+                                 int nx, int ny)
 {
    vector<double> values;
    vector<int> count;
-   for (int x=0; x<nx; ++x) {
-      for (int y=0; y<ny; ++y) {
+   for(int x=0; x<nx; x++) {
+      for(int y=0; y<ny; y++) {
          double v = sd.data.get(x,y);
-         if (v == 0.0) {
-            continue;
-         }
+         if(v == 0.0) continue;
          vector<double>::iterator vi;
          vi = find(values.begin(), values.end(), v);
          if (vi == values.end()) {
-            values.push_back(v);
-            count.push_back(1);
-         } else {
+            values.emplace_back(v);
+            count.emplace_back(1);
+         }
+         else {
             int ii = vi - values.begin();
             count[ii] = count[ii] + 1;
          }
       }
    }
-   for (size_t i=0; i<values.size(); ++i) {
-      mlog << Debug(4) << name << " shapeid=" << values[i] << " npt=" << count[i] << "\n";
+   for(size_t i=0; i<values.size(); i++) {
+      mlog << Debug(4) << name << " shapeid=" << values[i]
+           << " npt=" << count[i] << "\n";
    }
 }   
+
+////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -19,8 +19,8 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef  __DATA2D_UTIL_NODE_H__
-#define  __DATA2D_UTIL_NODE_H__
+#ifndef  __SHAPEDATA_NODE_H__
+#define  __SHAPEDATA_NODE_H__
 
 ///////////////////////////////////////////////////////////////////////////////
 

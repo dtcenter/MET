@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -860,9 +860,6 @@ void SeepsClimoGrid::read_seeps_climo_grid(const ConcatString &filename) {
       dims.add(1);
       dims.add(ny);
       dims.add(nx);
-
-      mlog << Debug(9) << method_name
-           << "var_odfl_00 = " << &var_odfl_00 << "\n";
 
       if (IS_INVALID_NC(var_p1_00) || !get_nc_data(&var_p1_00, p1_buf.data(), dims, curs)) {
          mlog << Error << "\n" << method_name

@@ -1,13 +1,11 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <iostream>
 #include <fstream>
@@ -17,6 +15,8 @@ using namespace std;
 
 #include "vx_util.h"
 #include "vx_tc_nc_util.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -31,20 +31,20 @@ int main(int argc, char *argv[]) {
     map<string, vector<string> > variable_levels;
 
     vector<string> u_levels;
-    u_levels.push_back("P1000");
-    u_levels.push_back("P800");
-    u_levels.push_back("P500");
+    u_levels.emplace_back("P1000");
+    u_levels.emplace_back("P800");
+    u_levels.emplace_back("P500");
     variable_levels["U"] = u_levels;
 
     vector<string> v_levels;
-    v_levels.push_back("P1000");
-    v_levels.push_back("P900");
-    v_levels.push_back("P700");
-    v_levels.push_back("P500");
-    v_levels.push_back("P300");
-    v_levels.push_back("P100");
-    v_levels.push_back("P50");
-    v_levels.push_back("P10");
+    v_levels.emplace_back("P1000");
+    v_levels.emplace_back("P900");
+    v_levels.emplace_back("P700");
+    v_levels.emplace_back("P500");
+    v_levels.emplace_back("P300");
+    v_levels.emplace_back("P100");
+    v_levels.emplace_back("P50");
+    v_levels.emplace_back("P10");
     variable_levels["V"] = v_levels;
 
     for (map<string, vector<string> >::iterator i = variable_levels.begin();

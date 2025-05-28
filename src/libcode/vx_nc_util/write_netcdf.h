@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -36,7 +36,7 @@ extern void write_netcdf_grid_weight(netCDF::NcFile *, netCDF::NcDim *, netCDF::
 extern void write_netcdf_var_times  (netCDF::NcVar *, const DataPlane &);
 extern void write_netcdf_var_times  (netCDF::NcVar *, const unixtime, const unixtime, const int);
 
-      
+////////////////////////////////////////////////////////////////////////
 
 #endif   //  __WRITE_NETCDF_H__
 

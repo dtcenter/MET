@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -470,7 +470,7 @@ void CRC_Array<T>::add(const T & k)
 
 extend(Nelements + 1, false);
 
-e.push_back(k);
+e.emplace_back(k);
 
 Nelements++;
 
@@ -494,7 +494,7 @@ int j;
 
 for (j=0; j<(a.Nelements); ++j)  {
 
-   e.push_back(a.e[j]);
+   e.emplace_back(a.e[j]);
 
    Nelements++;
 

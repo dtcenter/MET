@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!DOCTYPE met_test [
+  <!ENTITY MET_BASE       "${MET_BASE}">
+  <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
+  <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
+  <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
+  <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}">
+
+  <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
+  <!ENTITY DATA_DIR_PAIR  "&INPUT_DIR;/pair_data">
+  <!ENTITY DATA_DIR_CLIMO "&INPUT_DIR;/climatology_data">
+]>
+
+<!-- Requires: unit_point_stat.xml -->
+
+<met_test>
+
+  <!--                                    -->
+  <!--  pair_stat                         -->
+  <!--                                    -->
+  <test_dir>&TEST_DIR;</test_dir>
+  <exit_on_fail>true</exit_on_fail>
+
+  <!-- Read MPR output from Point-Stat -->
+  <test name="pair_stat_MPR">
+    <exec>&MET_BIN;/pair_stat</exec>
+    <param> \
+      -pairs  &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat \
+      -format mpr \
+      -config &CONFIG_DIR;/PairStatConfig_mpr \
+      -out    &OUTPUT_DIR;/pair_stat/pair_stat_format_mpr
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/pair_stat/pair_stat_format_mpr.stat</stat>
+    </output>
+  </test>
+
+  <!-- Read MPR data provided with Python embedding -->
+  <test name="pair_stat_PYTHON">
+    <exec>&MET_BIN;/pair_stat</exec>
+    <param> \
+      -pairs  "&MET_BASE;/python/examples/read_ascii_mpr.py &OUTPUT_DIR;/point_stat/point_stat_GRIB1_NAM_GDAS_120000L_20120409_120000V.stat" \
+      -format python \
+      -config &CONFIG_DIR;/PairStatConfig_mpr \
+      -out    &OUTPUT_DIR;/pair_stat/pair_stat_format_python
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/pair_stat/pair_stat_format_python.stat</stat>
+    </output>
+  </test>
+
+  <!-- Read paired IODA data -->
+  <test name="pair_stat_IODA">
+    <exec>&MET_BIN;/pair_stat</exec>
+    <env>
+      <pair><name>DAY_INTERVAL</name>  <value>1</value></pair>
+      <pair><name>HOUR_INTERVAL</name> <value>6</value></pair>
+      <pair><name>CLIMO_MEAN_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cmean_1d.19590414",
+                "&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cmean_1d.19590415"
+         </value>
+      </pair>
+      <pair><name>CLIMO_STDEV_FILE_LIST</name>
+         <value>"&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cstdv_1d.19590414",
+                "&DATA_DIR_CLIMO;/NCEP_NCAR_40YR_1.0deg/cstdv_1d.19590415"
+         </value>
+      </pair>
+    </env>
+    <param> \
+      -pairs  &DATA_DIR_PAIR;/ioda/sample_hofx_output_sondes.nc4 \
+      -format ioda \
+      -config &CONFIG_DIR;/PairStatConfig_ioda \
+      -out    &OUTPUT_DIR;/pair_stat/pair_stat_format_ioda 
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/pair_stat/pair_stat_format_ioda.stat</stat>
+    </output>
+  </test>
+
+</met_test>

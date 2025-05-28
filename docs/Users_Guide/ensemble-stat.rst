@@ -52,7 +52,7 @@ The ranked probability score (RPS) is included in the Ranked Probability Score (
 
 The Ensemble-Stat tool can derive ensemble relative frequencies and verify them as probability forecasts all in the same run. Note however that these simple ensemble relative frequencies are not actually calibrated probability forecasts. If probabilistic line types are requested (output_flag), this logic is applied to each pair of fields listed in the forecast (fcst) and observation (obs) dictionaries of the configuration file. Each probability category threshold (prob_cat_thresh) listed for the forecast field is applied to the input ensemble members to derive a relative frequency forecast. The probability category threshold (prob_cat_thresh) parsed from the corresponding observation entry is applied to the (gridded or point) observations to determine whether or not the event actually occurred. The paired ensemble relative frequencies and observation events are used to populate an Nx2 probabilistic contingency table. The dimension of that table is determined by the probability PCT threshold (prob_pct_thresh) configuration file option parsed from the forecast dictionary. All probabilistic output types requested are derived from this Nx2 table and written to the ascii output files. Note that the FCST_VAR name header column is automatically reset as "PROB({FCST_VAR}{THRESH})" where {FCST_VAR} is the current field being evaluated and {THRESH} is the threshold that was applied.
 
-Note that if no probability category thresholds (prob_cat_thresh) are defined, but climatological mean and standard deviation data is provided along with climatological bins, climatological distribution percentile thresholds are automatically derived and used to compute probabilistic outputs. 
+Note that if no probability category thresholds (prob_cat_thresh) are defined, but climatological mean and standard deviation data is provided along with climatological bins, climatological distribution percentile thresholds are automatically derived and used to compute probabilistic outputs.
 
 Climatology Data
 ----------------
@@ -89,7 +89,7 @@ The usage statement for the Ensemble Stat tool is shown below:
 .. code-block:: none
 
   Usage: ensemble_stat
-         n_ens ens_file_1 ... ens_file_n | ens_file_list
+         n_ens file_1 ... file_n | file_list
          config_file
          [-grid_obs file]
          [-point_obs file]
@@ -102,39 +102,37 @@ The usage statement for the Ensemble Stat tool is shown below:
          [-v level]
          [-compress level]
 
-ensemble_stat has three required arguments and accepts several optional ones.
+ensemble_stat has two required arguments and accepts several optional ones.
 
 Required Arguments ensemble_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **n_ens ens_file_1 ... ens_file_n** is the number of ensemble members followed by a list of ensemble member file names. This argument is not required when ensemble files are specified in the **ens_file_list**, detailed below.
+1. The **n_ens file_1 ... file_n | file_list** specifies either the number of ensemble members followed by a list of ensemble member file names or an ASCII file list of the file names to be used, as described in :numref:`ascii_file_lists`.
 
-2. The **ens_file_list** is an ASCII file containing a list of ensemble member file names. This is not required when a file list is included on the command line, as described above.
-
-3. The **config_file** is an **EnsembleStatConfig** file containing the desired configuration settings.
+2. The **config_file** is an **EnsembleStatConfig** file containing the desired configuration settings.
 
 Optional Arguments for ensemble_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. To produce ensemble statistics using gridded observations, use the **-grid_obs file** option to specify a gridded observation file. This option may be used multiple times if your observations are in several files.
+3. To produce ensemble statistics using gridded observations, use the **-grid_obs file** option to specify a gridded observation file. This option may be used multiple times if your observations are in several files.
 
-5. To produce ensemble statistics using point observations, use the **-point_obs file** option to specify a NetCDF point observation file. This option may be used multiple times if your observations are in several files. Python embedding for point observations is also supported, as described in :numref:`pyembed-point-obs-data`.
+4. To produce ensemble statistics using point observations, use the **-point_obs file** option to specify a NetCDF point observation file. This option may be used multiple times if your observations are in several files. Python embedding for point observations is also supported, as described in :numref:`pyembed-point-obs-data`.
 
-6. To override the simple ensemble mean value of the input ensemble members for the ECNT, SSVAR, and ORANK line types, the **-ens_mean file** option specifies an ensemble mean model data file. This option replaces the **-ssvar_mean file** option from earlier versions of MET.
+5. To override the simple ensemble mean value of the input ensemble members for the ECNT, SSVAR, and ORANK line types, the **-ens_mean file** option specifies an ensemble mean model data file. This option replaces the **-ssvar_mean file** option from earlier versions of MET.
 
-7. The **-ctrl file** option specifies an ensemble control member data file. The control member is included in the computation of the ensemble mean but excluded from the spread. The control file should not appear in the list of ensemble member files (unless processing a single file that contains all ensemble members).
+6. The **-ctrl file** option specifies an ensemble control member data file. The control member is included in the computation of the ensemble mean but excluded from the spread. The control file should not appear in the list of ensemble member files (unless processing a single file that contains all ensemble members).
 
-8. To filter point observations by time, use **-obs_valid_beg time** in YYYYMMDD[_HH[MMSS]] format to set the beginning of the matching observation time window.
+7. To filter point observations by time, use **-obs_valid_beg time** in YYYYMMDD[_HH[MMSS]] format to set the beginning of the matching observation time window.
 
-9. As above, use **-obs_valid_end time** in YYYYMMDD[_HH[MMSS]] format to set the end of the matching observation time window.
+8. As above, use **-obs_valid_end time** in YYYYMMDD[_HH[MMSS]] format to set the end of the matching observation time window.
 
-10. Specify the **-outdir path** option to override the default output directory (./).
+9. Specify the **-outdir path** option to override the default output directory (./).
 
-11. The **-log** file outputs log messages to the specified file.
+10. The **-log** file outputs log messages to the specified file.
 
-12. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
+11. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity will increase the amount of logging.
 
-13. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+12. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the ensemble_stat calling sequence is shown below:
 
@@ -312,8 +310,6 @@ ____________________
 
 Setting up the **fcst** and **obs** dictionaries of the configuration file is described in :numref:`config_options`. The following are some special considerations for the Ensemble-Stat tool.
 
-The **ens** and **fcst** dictionaries do not need to include the same fields. Users may specify any number of ensemble fields to be summarized, but generally there are many fewer fields with verifying observations available. The **ens** dictionary specifies the fields to be summarized while the **fcst** dictionary specifies the fields to be verified.
-
 The **obs** dictionary looks very similar to the **fcst** dictionary. If verifying against point observations which are assigned GRIB1 codes, the observation section must be defined following GRIB1 conventions. When verifying GRIB1 forecast data, one can easily copy over the forecast settings to the observation dictionary using **obs = fcst;**. However, when verifying non-GRIB1 forecast data, users will need to specify the **fcst** and **obs** sections separately.
 
 The **ens_ssvar_bin_size** and **ens_phist_bin_size** specify the width of the categorical bins used to accumulate frequencies for spread-skill-variance or probability integral transform statistics, respectively.
@@ -445,7 +441,7 @@ The **nc_orank_flag** specifies which gridded verification output types should b
 __________________
 
 .. code-block:: none
-		
+
     nc_var_str = "";
 
 
@@ -690,11 +686,11 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Climatological Continuous Ranked Probability Score (normal distribution)
     - Double
   * - 38
-    - CRPS_EMP 
+    - CRPS_EMP
     - The Continuous Ranked Probability Score (empirical distribution)
     - Double
   * - 39
-    - CRPSCL_EMP 
+    - CRPSCL_EMP
     - Climatological Continuous Ranked Probability Score (empirical distribution)
     - Double
   * - 40
@@ -747,7 +743,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Double
 
 .. _table_ES_header_info_es_out_RPS:
-      
+
 .. list-table:: Format information for RPS (Ranked Probability Score) output line type.
   :widths: auto
   :header-rows: 1
@@ -794,7 +790,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Double
 
 .. _table_ES_header_info_es_out_RHIST:
-      
+
 .. list-table:: Format information for RHIST (Ranked Histogram) output line type.
   :widths: auto
   :header-rows: 1
@@ -821,7 +817,7 @@ The format of the STAT and ASCII output of the Ensemble-Stat tool are described 
     - Integer
 
 .. _table_ES_header_info_es_out_PHIST:
-      
+
 .. list-table:: Format information for PHIST (Probability Integral Transform Histogram) output line type.
   :widths: auto
   :header-rows: 1

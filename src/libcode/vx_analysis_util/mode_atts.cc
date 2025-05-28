@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -742,9 +742,8 @@ void ModeAttributes::dump(ostream & out, int depth) const
 
 int j;
 int month, day, year, hour, minute, second;
-char junk[256];
+ConcatString cs;
 Indent prefix(depth);
-
 
    //
    //  toggles
@@ -777,9 +776,6 @@ if ( is_matched_toggle_set )  {
    else                out << prefix << "unmatched toggle set\n";
 
 }
-
-
-
 
    //
    //  string array members
@@ -945,9 +941,6 @@ if ( obs_lev.n_elements() > 0 )  {
 
 }
 
-
-
-
    //
    //  int array members
    //
@@ -1112,9 +1105,6 @@ if ( obs_rad.n_elements() > 0 )  {
 
 }
 
-
-
-
    //
    //  int max/min members
    //
@@ -1134,9 +1124,6 @@ if ( union_area_max_set )  out << prefix << "union_area_max = " << union_area_ma
 if ( symmetric_diff_min_set )  out << prefix << "symmetric_diff_min = " << symmetric_diff_min << "\n";
 if ( symmetric_diff_max_set )  out << prefix << "symmetric_diff_max = " << symmetric_diff_max << "\n";
 
-
-
-
    //
    //  unixtime max/min members
    //
@@ -1145,9 +1132,9 @@ if ( fcst_valid_min_set )  {
 
    unix_to_mdyhms(fcst_valid_min, month, day, year, hour, minute, second);
 
-   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   cs.format("%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
-   out << prefix << "fcst_valid_min = " << junk << "\n";
+   out << prefix << "fcst_valid_min = " << cs << "\n";
 
 }
 
@@ -1155,9 +1142,9 @@ if ( fcst_valid_max_set )  {
 
    unix_to_mdyhms(fcst_valid_max, month, day, year, hour, minute, second);
 
-   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   cs.format("%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
-   out << prefix << "fcst_valid_max = " << junk << "\n";
+   out << prefix << "fcst_valid_max = " << cs << "\n";
 
 }
 
@@ -1165,9 +1152,9 @@ if ( obs_valid_min_set )  {
 
    unix_to_mdyhms(obs_valid_min, month, day, year, hour, minute, second);
 
-   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   cs.format("%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
-   out << prefix << "obs_valid_min = " << junk << "\n";
+   out << prefix << "obs_valid_min = " << cs << "\n";
 
 }
 
@@ -1175,9 +1162,9 @@ if ( obs_valid_max_set )  {
 
    unix_to_mdyhms(obs_valid_max, month, day, year, hour, minute, second);
 
-   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   cs.format("%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
-   out << prefix << "obs_valid_max = " << junk << "\n";
+   out << prefix << "obs_valid_max = " << cs << "\n";
 
 }
 
@@ -1185,9 +1172,9 @@ if ( fcst_init_min_set )  {
 
    unix_to_mdyhms(fcst_init_min, month, day, year, hour, minute, second);
 
-   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   cs.format("%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
-   out << prefix << "fcst_init_min = " << junk << "\n";
+   out << prefix << "fcst_init_min = " << cs << "\n";
 
 }
 
@@ -1195,9 +1182,9 @@ if ( fcst_init_max_set )  {
 
    unix_to_mdyhms(fcst_init_max, month, day, year, hour, minute, second);
 
-   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   cs.format("%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
-   out << prefix << "fcst_init_max = " << junk << "\n";
+   out << prefix << "fcst_init_max = " << cs << "\n";
 
 }
 
@@ -1205,9 +1192,9 @@ if ( obs_init_min_set )  {
 
    unix_to_mdyhms(obs_init_min, month, day, year, hour, minute, second);
 
-   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   cs.format("%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
-   out << prefix << "obs_init_min = " << junk << "\n";
+   out << prefix << "obs_init_min = " << cs << "\n";
 
 }
 
@@ -1215,15 +1202,11 @@ if ( obs_init_max_set )  {
 
    unix_to_mdyhms(obs_init_max, month, day, year, hour, minute, second);
 
-   snprintf(junk, sizeof(junk), "%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   cs.format("%s %2d, %4d   %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
-   out << prefix << "obs_init_max = " << junk << "\n";
+   out << prefix << "obs_init_max = " << cs << "\n";
 
 }
-
-
-
-
 
    //
    //  double max/min members
@@ -1319,9 +1302,6 @@ if ( percentile_intensity_ratio_max_set )  out << prefix << "percentile_intensit
 if ( interest_min_set )  out << prefix << "interest_min = " << interest_min << "\n";
 if ( interest_max_set )  out << prefix << "interest_max = " << interest_max << "\n";
 
-
-
-
    //
    //  misc
    //
@@ -1333,7 +1313,6 @@ if ( poly )  {
    poly->dump(out, depth + 1);
 
 }
-
 
    //
    //  done

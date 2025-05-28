@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -191,7 +191,7 @@ static double       get_dict_double (Dictionary *, const char * id);
 static ConcatString get_dict_string (Dictionary *, const char * id);
 static bool         get_dict_bool   (Dictionary *, const char * id);
 
-static void time_string(int seconds, char * out, const int len);
+static ConcatString time_string(int seconds);
 
 static void annotate(const ModeNcOutputFile &, Cgraph &, const Box &, const Box &);
 
@@ -266,7 +266,7 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 
-void read_config()
+static void read_config()
 
 {
 
@@ -415,7 +415,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void do_plot(const char * mode_nc_filename)
+static void do_plot(const char * mode_nc_filename)
 
 {
 
@@ -597,7 +597,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage()
+static void usage()
 
 {
 
@@ -612,7 +612,10 @@ cout << "\n*** Model Evaluation Tools (MET" << met_version
      << "\t[-log file]\n"
      << "\t[-v level]\n\n"
 
-     << "\twhere\t\"-raw | -simple | -cluster\" plots the raw, simple, "
+     << "\twhere\t\"mode_nc_file_list\" specifies the NetCDF MODE "
+     << "output files to be used for plotting (required).\n"
+
+     << "\t\t\"-raw | -simple | -cluster\" plots the raw, simple, "
      << "or cluster object field (required).\n"
 
      << "\t\t\"-obs | -fcst\" plots the forecast or observation field "
@@ -634,7 +637,7 @@ cout << "\n*** Model Evaluation Tools (MET" << met_version
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_config (const StringArray & a)
+static void set_config (const StringArray & a)
 
 {
 
@@ -648,7 +651,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_raw(const StringArray &)
+static void set_raw(const StringArray &)
 
 {
 
@@ -664,7 +667,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_obs(const StringArray &)
+static void set_obs(const StringArray &)
 
 {
 
@@ -680,7 +683,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_fcst(const StringArray &)
+static void set_fcst(const StringArray &)
 
 {
 
@@ -696,7 +699,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_simple(const StringArray &)
+static void set_simple(const StringArray &)
 
 {
 
@@ -710,7 +713,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void set_cluster(const StringArray &)
+static void set_cluster(const StringArray &)
 
 {
 
@@ -724,7 +727,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void sanity_check()
+static void sanity_check()
 
 {
 
@@ -781,7 +784,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void get_data_ppm(ModeNcOutputFile & mode_in, Ppm & image)
+static void get_data_ppm(ModeNcOutputFile & mode_in, Ppm & image)
 
 {
 
@@ -863,7 +866,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void fill_box(const Box & b, const Color & c, Cgraph & plot)
+static void fill_box(const Box & b, const Color & c, Cgraph & plot)
 
 {
 
@@ -892,7 +895,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void clip_box(const Box & b, Cgraph & plot)
+static void clip_box(const Box & b, Cgraph & plot)
 
 {
 
@@ -915,7 +918,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_map(Cgraph & plot, const Box & map_box, const Grid & grid)
+static void draw_map(Cgraph & plot, const Box & map_box, const Grid & grid)
 
 {
 
@@ -958,7 +961,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_mapfile(Cgraph & plot, const Box & map_box, const Grid & grid, Dictionary * dict)
+static void draw_mapfile(Cgraph & plot, const Box & map_box, const Grid & grid, Dictionary * dict)
 
 {
 
@@ -1020,7 +1023,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_region(Cgraph & plot, const Grid & grid, const Box & map_box, const MapRegion & r)
+static void draw_region(Cgraph & plot, const Grid & grid, const Box & map_box, const MapRegion & r)
 
 {
 
@@ -1082,7 +1085,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-ConcatString get_dict_string (Dictionary * dict, const char * id)
+static ConcatString get_dict_string (Dictionary * dict, const char * id)
 
 {
 
@@ -1122,7 +1125,7 @@ return s;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool get_dict_bool(Dictionary * dict, const char * id)
+static bool get_dict_bool(Dictionary * dict, const char * id)
 
 {
 
@@ -1152,7 +1155,7 @@ return tf;
 ////////////////////////////////////////////////////////////////////////
 
 
-int get_dict_int(Dictionary * dict, const char * id)
+static int get_dict_int(Dictionary * dict, const char * id)
 
 {
 
@@ -1182,7 +1185,7 @@ return k;
 ////////////////////////////////////////////////////////////////////////
 
 
-double get_dict_double(Dictionary * dict, const char * id)
+static double get_dict_double(Dictionary * dict, const char * id)
 
 {
 
@@ -1224,7 +1227,7 @@ return t;
 ////////////////////////////////////////////////////////////////////////
 
 
-Color get_dict_color(Dictionary * dict, const char * id)
+static Color get_dict_color(Dictionary * dict, const char * id)
 
 {
 
@@ -1266,36 +1269,34 @@ return c;
 ////////////////////////////////////////////////////////////////////////
 
 
-void time_string(int seconds, char * out, const int len)
+static ConcatString time_string(int seconds)
 
 {
 
-int h, m, s;
+ConcatString cs;
+int h = seconds/3600;
+int m = (seconds%3600)/60;
+int s = seconds%60;
 
-h = seconds/3600;
-m = (seconds%3600)/60;
-s = seconds%60;
+     if ( m == 0 && s == 0 )  cs.format("%02dh",          h);
+else if ( s == 0 )            cs.format("%02d:%02d",      h, m);
+else                          cs.format("%02d:%02d:%02d", h, m, s);
 
-     if ( (m == 0) && (s == 0) )  snprintf(out, len, "%02dh",          h);
-else if ( s == 0 )                snprintf(out, len, "%02d:%02d",      h, m);
-else                              snprintf(out, len, "%02d:%02d:%02d", h, m, s);
-
-return;
+return cs;
 
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void annotate(const ModeNcOutputFile & mode_in, Cgraph & plot, const Box & anno_box, const Box & map_box)
+static void annotate(const ModeNcOutputFile & mode_in, Cgraph & plot, const Box & anno_box, const Box & map_box)
 
 {
 
 ConcatString title;
 ConcatString fcst_obs, raw_obj;
-ConcatString s;
-char junk[256], ts[256];
+ConcatString cs;
+ConcatString ts;
 int month, day, year, hour, minute, second;
 int lead_seconds;
 double scale, delta;
@@ -1347,16 +1348,15 @@ if ( fabs(scale - 1.0) > scale_tol )  plot.bold(scale*title_font_size);
 
 plot.write_centered_text(1, 1, 0.5*(plot.page_width()), anno_height - plot.current_font_size() - 10.0, 0.5, 0.0, title.c_str());
 
-
 plot.roman(anno_font_size);
 
-s = mode_in.short_filename();
+cs = mode_in.short_filename();
 
-scale = calc_text_scale(plot, map_width - 10.0, s.c_str());
+scale = calc_text_scale(plot, map_width - 10.0, cs.c_str());
 
 if ( fabs(scale - 1.0) > scale_tol )  plot.bold(scale*anno_font_size);
 
-plot.write_centered_text(1, 1, 0.5*(plot.page_width()), 25.0, 0.5, 0.0, s.c_str());
+plot.write_centered_text(1, 1, 0.5*(plot.page_width()), 25.0, 0.5, 0.0, cs.c_str());
 
 
 vtab1 = anno_height + 0.5*anno_font_size;
@@ -1389,9 +1389,9 @@ plot.set_color(anno_text_color);
 
 lead_seconds = (int) (mode_in.valid_time() - mode_in.init_time());
 
-time_string(lead_seconds, ts, sizeof(ts));
+ts = time_string(lead_seconds);
 
-plot.write_centered_text(1, 1, htab2, vtab1, 0.0, 0.0, ts);
+plot.write_centered_text(1, 1, htab2, vtab1, 0.0, 0.0, ts.c_str());
 
    //
    //  valid time
@@ -1402,11 +1402,11 @@ plot.set_color(anno_text_color);
 
 unix_to_mdyhms(mode_in.valid_time(), month, day, year, hour, minute, second);
 
-time_string((int) (mode_in.valid_time()%86400), ts, sizeof(ts));
+ts = time_string((int) (mode_in.valid_time()%86400));
 
-snprintf(junk, sizeof(junk), "%s %d, %d  %s", short_month_name[month], day, year, ts);
+cs.format("%s %d, %d  %s", short_month_name[month], day, year, ts.c_str());
 
-plot.write_centered_text(1, 1, htab2, vtab2, 0.0, 0.0, junk);
+plot.write_centered_text(1, 1, htab2, vtab2, 0.0, 0.0, cs.c_str());
 
 
    //
@@ -1421,7 +1421,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-double calc_text_scale(Cgraph & plot, const double target_width, const char * text)
+static double calc_text_scale(Cgraph & plot, const double target_width, const char * text)
 
 {
 
@@ -1450,7 +1450,7 @@ return s;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_obj_colortable(Cgraph & plot, const Box & map_box, const int Nobjs)
+static void draw_obj_colortable(Cgraph & plot, const Box & map_box, const int Nobjs)
 
 {
 
@@ -1459,7 +1459,7 @@ CtableEntry e;
 double x, y;
 const double dy = (map_box.height())/Nobjs;
 Box b;
-char junk[256];
+ConcatString cs;
 
 
 if ( Nobjs > ctable.n_entries() )  {
@@ -1483,9 +1483,9 @@ for (j=0; j<Nobjs; ++j)  {
 
    fill_box(b, e.color(), plot);
 
-   snprintf(junk, sizeof(junk), "%d", j+1);
+   cs.format("%d", j+1);
 
-   plot.write_centered_text(2, 1, x + ctable_width + 2.0, y + 0.5*dy, 0.0, 0.5, junk);
+   plot.write_centered_text(2, 1, x + ctable_width + 2.0, y + 0.5*dy, 0.0, 0.5, cs.c_str());
 
    y += dy;
 
@@ -1519,7 +1519,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void draw_raw_colortable(Cgraph & plot, const Box & map_box)
+static void draw_raw_colortable(Cgraph & plot, const Box & map_box)
 
 {
 
@@ -1528,7 +1528,7 @@ CtableEntry e;
 double x, y;
 const double dy = (map_box.height())/(ctable.n_entries());
 Box b;
-char junk[256];
+ConcatString cs;
 double t;
 const int N = ctable.n_entries();
 
@@ -1552,9 +1552,9 @@ for (j=0; j<N; ++j)  {
 
    t = (t - B)/M;
 
-   snprintf(junk, sizeof(junk), "%.2f", t);
+   cs.format("%.2f", t);
 
-   plot.write_centered_text(2, 1, x + ctable_width + 2.0, y + 0.5*dy, 0.0, 0.5, junk);
+   plot.write_centered_text(2, 1, x + ctable_width + 2.0, y + 0.5*dy, 0.0, 0.5, cs.c_str());
 
    y += dy;
 

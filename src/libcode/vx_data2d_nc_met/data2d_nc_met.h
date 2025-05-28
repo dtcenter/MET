@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -50,6 +50,9 @@ class MetNcMetDataFile : public Met2dDataFile {
          //
          //  set stuff
          //
+
+      void set_range_azimuth_grid_center(int);
+      void set_range_azimuth_times(int, DataPlane &);
 
          //
          //  get stuff

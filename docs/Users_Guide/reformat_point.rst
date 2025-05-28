@@ -172,7 +172,7 @@ The **level_category** variable is used to specify a comma-separated list of Pre
 
 .. _table_reformat-point_pb2nc_level_category:
 
-.. list-table:: Values for the level_category option. 
+.. list-table:: Values for the level_category option.
    :widths: auto
    :header-rows: 1
 
@@ -187,16 +187,16 @@ The **level_category** variable is used to specify a comma-separated list of Pre
    * - 3
      - Winds-by-pressure level
    * - 4
-     - Winds-by-height level 
+     - Winds-by-height level
    * - 5
-     - Tropopause level 
+     - Tropopause level
    * - 6
-     - Reports on a single level     
+     - Reports on a single level
    * - 7
      - Auxiliary levels generated via interpolation from spanning levels
 
 _____________________
-       
+
 .. code-block:: none
 
   obs_bufr_var = [ 'QOB', 'TOB', 'ZOB', 'UOB', 'VOB' ];
@@ -438,7 +438,7 @@ While initial versions of the ASCII2NC tool only supported a simple 11 column AS
 
 • `SURFace RADiation (SURFRAD) <http://www.esrl.noaa.gov/gmd/grad/surfrad/>`_ and Integrated Surface Irradiance Study (ISIS) formats
 
-• Western Wind and Solar Integration Study (WWSIS) format. WWSIS data are available by request from National Renewable Energy Laboratory (NREL) in Boulder, CO. 
+• Western Wind and Solar Integration Study (WWSIS) format. WWSIS data are available by request from National Renewable Energy Laboratory (NREL) in Boulder, CO.
 
 • `AirNow DailyData_v2, AirNow HourlyData, and AirNow HourlyAQObs formats <https://www.epa.gov/outdoor-air-quality-data>`_. See the :ref:`MET_AIRNOW_STATIONS` environment variable.
 
@@ -448,7 +448,9 @@ While initial versions of the ASCII2NC tool only supported a simple 11 column AS
 
 • `International Arctic Buoy Programme (IABP) Data format <https://iabp.apl.uw.edu/>`_.
 
-• `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <http://aeronet.gsfc.nasa.gov/>`_
+• `AErosol RObotic NEtwork (AERONET) versions 2 and 3 format <http://aeronet.gsfc.nasa.gov/>`_.
+
+• `U.S. Climate Reference Network (USCRN) Quality Controlled Datasets <https://www.ncei.noaa.gov/access/crn/qcdatasets.html>`_, where the specific data format is determined by the prefix and suffix of the input file name.
 
 • Python embedding of point observations, as described in :numref:`pyembed-point-obs-data`. See example below in :numref:`ascii2nc-pyembed`.
 
@@ -496,7 +498,7 @@ The default ASCII point observation format consists of one row of data per obser
   * - 11
     - Observation_Value
     - Observation value in units consistent with the GRIB code definition.
-      
+
 ascii2nc Usage
 --------------
 
@@ -507,7 +509,7 @@ Once the ASCII point observations have been formatted as expected, the ASCII fil
   Usage: ascii2nc
          ascii_file1 [ascii_file2 ... ascii_filen]
          netcdf_file
-         [-format ASCII_format]
+         [-format type]
          [-config file]
          [-valid_beg time]
          [-valid_end time]
@@ -530,7 +532,7 @@ Required Arguments for ascii2nc
 Optional Arguments for ascii2nc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3. The **-format ASCII_format** option may be set to "met_point", "little_r", "surfrad", "wwsis", "airnowhourlyaqobs", "airnowhourly", "airnowdaily_v2", "ndbc_standard", "ismn", "iabp", "aeronet", "aeronetv2", "aeronetv3", or "python". If passing in ISIS data, use the "surfrad" format flag.
+3. The **-format type** option may be set to "met_point", "little_r", "surfrad", "wwsis", "airnowhourlyaqobs", "airnowhourly", "airnowdaily_v2", "ndbc_standard", "ismn", "iabp", "aeronet", "aeronetv2", "aeronetv3", "uscrn", or "python". If passing in ISIS data, use the "surfrad" format flag.
 
 4. The **-config file** option is the configuration file for generating time summaries.
 
@@ -816,6 +818,8 @@ We will not give a detailed description of each CALIPSO data product that lidar2
     - NA
     - Horizontal_Averaging
 
+.. _IODA2NC tool:
+
 IODA2NC Tool
 ============
 
@@ -1051,7 +1055,7 @@ When processing GOES data, the **-goes_qc** option may also be used to specify t
 The grid name or the grid definition can be given with the -field option when the grid information is missing from the input NetCDF file for the latitude_longitude projection. The latitude and longitude variable names should be defined by the user, and the grid information from the set_attr_grid is ignored in this case except nx and ny.
 
 .. code-block:: none
-		
+
    point2grid \
       iceh.2018-01-03.c00.tlat_tlon.nc \
       G231 \

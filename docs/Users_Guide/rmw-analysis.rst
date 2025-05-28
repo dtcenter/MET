@@ -20,20 +20,20 @@ The following sections describe the usage statement, required arguments, and opt
 _______________________
 
 .. code-block:: none
-		
+
   Usage: rmw_analysis
-         -data file_1 ... file_n | data_file_list
+         -data file_1 ... file_n | file_list
          -config file
          -out file
          [-log file]
          [-v level]
 
-**rmw_analysis** has required arguments and can accept several optional arguments.
+**rmw_analysis** has three required arguments and can accept several optional arguments.
 
 Required Arguments for rmw_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-data file_1 ... file_n | data_file_list** argument is the NetCDF output of TC-RMW to be processed or an ASCII file containing a list of files.
+1. The **-data file_1 ... file_n | file_list** option specifies the NetCDF TC-RMW output files or ASCII file list of file names to be processed, as described in :numref:`ascii_file_lists`.
 
 2. The **-config file** argument is the **RMWAnalysisConfig** to be used. The contents of the configuration file are discussed below.
 
@@ -42,7 +42,7 @@ Required Arguments for rmw_analysis
 Optional Arguments for rmw_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile. 
+4. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no logfile.
 
 5. The **-v level** option indicates the desired level of verbosity. The contents of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
@@ -82,7 +82,7 @@ ____________________
   valid_mask = "";
   version    = "VN.N";
 
-The track filter options available in rmw_analysis and listed above are described in :numref:`config_options`.
+The track filter options available in rmw_analysis and listed above are described in :numref:`config_options_tc`.
 
 
 

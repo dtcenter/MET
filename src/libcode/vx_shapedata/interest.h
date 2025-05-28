@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -9,8 +9,8 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef  __VX_WRFMODE_INTEREST_H__
-#define  __VX_WRFMODE_INTEREST_H__
+#ifndef  __SHAPEDATA_INTEREST_H__
+#define  __SHAPEDATA_INTEREST_H__
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -138,6 +138,6 @@ extern std::ostream & operator<<(std::ostream &, const PairFeature &);
 
 ////////////////////////////////////////////////////////////////////////
 
-#endif   //  __VX_WRFMODE_INTEREST_H__
+#endif   //  __SHAPEDATA_INTEREST_H__
 
 ////////////////////////////////////////////////////////////////////////

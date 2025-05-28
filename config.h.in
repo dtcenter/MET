@@ -48,6 +48,9 @@
 /* "build modis" */
 #undef ENABLE_MODIS
 
+/* "build pair_stat" */
+#undef ENABLE_PAIR_STAT
+
 /* "build pb2nc" */
 #undef ENABLE_PB2NC
 
@@ -65,6 +68,9 @@
 
 /* "build point_stat" */
 #undef ENABLE_POINT_STAT
+
+/* "build profiling support" */
+#undef ENABLE_PROFILER
 
 /* "build Python embedding support" */
 #undef ENABLE_PYTHON

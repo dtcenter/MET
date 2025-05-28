@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -16,6 +16,10 @@
 #include <cmath>
 #include <set>
 #include <map>
+
+#ifdef _OPENMP
+  #include "omp.h"
+#endif
 
 #include "enum_as_int.hpp"
 #include "engine.h"
@@ -1089,8 +1093,6 @@ void ModeFuzzyEngine::do_matching() {
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_no_match() {
-   int j, k, n;
-   ShapeData cur_shape;
 
    do_fcst_splitting();
    do_obs_splitting();
@@ -1102,43 +1104,64 @@ void ModeFuzzyEngine::do_no_match() {
    //
    fcst_single.set_size(n_fcst);
 
-   for(j=0; j<n_fcst; j++) {
-      cur_shape = select(*fcst_split, j+1);
-      fcst_single[j].set(*fcst_raw, *fcst_thresh,
-                         *fcst_split, cur_shape,
-                         conf_info.inten_perc_value,
-                         conf_info.Fcst->var_info->is_precipitation());
-      fcst_single[j].object_number = j+1;
-   }
+#pragma omp parallel default(none) \
+   shared(fcst_raw, fcst_thresh, fcst_split, conf_info) \
+   shared(fcst_single, n_fcst)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<n_fcst; j++) {
+         ShapeData cur_shape = select(*fcst_split, j+1);
+         fcst_single[j].set(*fcst_raw, *fcst_thresh,
+                            *fcst_split, cur_shape,
+                            conf_info.inten_perc_value,
+                            conf_info.Fcst->var_info->is_precipitation());
+         fcst_single[j].object_number = j+1;
+      }
+   } // End omp parallel
 
    obs_single.set_size(n_obs);
 
-   for(j=0; j<n_obs; j++) {
-      cur_shape = select(*obs_split, j+1);
-      obs_single[j].set(*obs_raw, *obs_thresh,
-                        *obs_split, cur_shape,
-                        conf_info.inten_perc_value,
-                        conf_info.Obs->var_info->is_precipitation());
-      obs_single[j].object_number = j+1;
-   }
+#pragma omp parallel default(none) \
+   shared(obs_raw, obs_thresh, obs_split, conf_info) \
+   shared(obs_single, n_obs)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<n_obs; j++) {
+         ShapeData cur_shape = select(*obs_split, j+1);
+         obs_single[j].set(*obs_raw, *obs_thresh,
+                           *obs_split, cur_shape,
+                           conf_info.inten_perc_value,
+                           conf_info.Obs->var_info->is_precipitation());
+         obs_single[j].object_number = j+1;
+      }
+   } // End omp parallel
 
    //
    // Set all interest values to zero
    //
    info_singles.set_size(n_fcst*n_obs);
 
-   for(j=0; j<n_fcst; j++) {
-      for(k=0; k<n_obs; k++) {
+#pragma omp parallel default(none) \
+   shared(n_fcst, n_obs, info_singles, conf_info)
+   {
 
-         n = two_to_one(j, k);
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int j=0; j<n_fcst; j++) {
+         for(int k=0; k<n_obs; k++) {
 
-         info_singles[n].fcst_number    = (j+1);
-         info_singles[n].obs_number     = (k+1);
-         info_singles[n].pair_number    = n;
-         info_singles[n].interest_value = 0.0;
+            int n = two_to_one(j, k);
 
+            info_singles[n].fcst_number    = (j+1);
+            info_singles[n].obs_number     = (k+1);
+            info_singles[n].pair_number    = n;
+            info_singles[n].interest_value = 0.0;
+
+         }
       }
-   }
+   } // End omp parallel
 
    //
    // Clear out any empty sets
@@ -1150,11 +1173,11 @@ void ModeFuzzyEngine::do_no_match() {
    //
    fcst_color.extend(n_fcst);
 
-   for(j=0; j<n_fcst; j++) fcst_color.add(unmatched_color);
+   for(int j=0; j<n_fcst; j++) fcst_color.add(unmatched_color);
 
    obs_color.extend(n_obs);
 
-   for(j=0; j<n_obs; j++) obs_color.add(unmatched_color);
+   for(int j=0; j<n_obs; j++) obs_color.add(unmatched_color);
 
    //
    // Done
@@ -1166,9 +1189,7 @@ void ModeFuzzyEngine::do_no_match() {
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_match_merge() {
-   int j, k, n;
    InterestInfo junkinfo;
-   ShapeData cur_shape;
 
    do_fcst_splitting();
    do_obs_splitting();
@@ -1180,69 +1201,96 @@ void ModeFuzzyEngine::do_match_merge() {
    //
    fcst_single.set_size(n_fcst);
 
-   for(j=0; j<n_fcst; j++) {
-      cur_shape = select(*fcst_split, j+1);
-      fcst_single[j].set(*fcst_raw, *fcst_thresh,
-                         *fcst_split, cur_shape,
-                         conf_info.inten_perc_value,
-                         conf_info.Fcst->var_info->is_precipitation());
-      fcst_single[j].object_number = j+1;
-   }
+#pragma omp parallel default(none) \
+   shared(fcst_raw, fcst_thresh, fcst_split, conf_info) \
+   shared(fcst_single, n_fcst)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<n_fcst; j++) {
+         ShapeData cur_shape = select(*fcst_split, j+1);
+         fcst_single[j].set(*fcst_raw, *fcst_thresh,
+                            *fcst_split, cur_shape,
+                            conf_info.inten_perc_value,
+                            conf_info.Fcst->var_info->is_precipitation());
+         fcst_single[j].object_number = j+1;
+      }
+   } // End omp parallel
 
    obs_single.set_size(n_obs);
 
-   for(j=0; j<n_obs; j++) {
-      cur_shape = select(*obs_split, j+1);
-      obs_single[j].set(*obs_raw, *obs_thresh,
-                        *obs_split, cur_shape,
-                        conf_info.inten_perc_value,
-                        conf_info.Obs->var_info->is_precipitation());
-      obs_single[j].object_number = j+1;
-   }
+#pragma omp parallel default(none) \
+   shared(obs_raw, obs_thresh, obs_split, conf_info) \
+   shared(obs_single, n_obs)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<n_obs; j++) {
+         ShapeData cur_shape = select(*obs_split, j+1);
+         obs_single[j].set(*obs_raw, *obs_thresh,
+                           *obs_split, cur_shape,
+                           conf_info.inten_perc_value,
+                           conf_info.Obs->var_info->is_precipitation());
+         obs_single[j].object_number = j+1;
+      }
+   } // End omp parallel
 
    //
    // Do the pair features
    //
    pair_single.set_size(n_fcst*n_obs);
 
-   for(j=0; j<n_fcst; j++) {
-      for(k=0; k<n_obs; k++) {
+#pragma omp parallel default(none) \
+   shared(n_fcst, n_obs, fcst_single, obs_single, conf_info)
+   {
 
-         n = two_to_one(j, k);
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int j=0; j<n_fcst; j++) {
+         for(int k=0; k<n_obs; k++) {
 
-         pair_single[n].set(fcst_single[j], obs_single[k],
-                     conf_info.max_centroid_dist);
-         pair_single[n].pair_number = n;
+            int n = two_to_one(j, k);
+
+            pair_single[n].set(fcst_single[j], obs_single[k],
+                               conf_info.max_centroid_dist);
+            pair_single[n].pair_number = n;
+         }
       }
-   }
+   } // End omp parallel
 
    //
    // Calculate the interest values
    //
    info_singles.set_size(n_fcst*n_obs);
 
-   for(j=0; j<n_fcst; j++) {
-      for(k=0; k<n_obs; k++) {
+#pragma omp parallel default(none) \
+   shared(n_fcst, n_obs, info_singles, conf_info)
+   {
 
-         n = two_to_one(j, k);
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int j=0; j<n_fcst; j++) {
+         for(int k=0; k<n_obs; k++) {
 
-         info_singles[n].fcst_number    = (j+1);
-         info_singles[n].obs_number     = (k+1);
-         info_singles[n].pair_number    = n;
-         info_singles[n].interest_value = total_interest(conf_info,
-                                             pair_single[n], j+1, k+1,
-                                             true);
+            int n = two_to_one(j, k);
 
+            info_singles[n].fcst_number    = (j+1);
+            info_singles[n].obs_number     = (k+1);
+            info_singles[n].pair_number    = n;
+            info_singles[n].interest_value = total_interest(conf_info,
+                                                pair_single[n], j+1, k+1,
+                                                true);
+         }
       }
-   }
+   } // End omp parallel
 
    //
    // Sort the interest values in decreasing order
    //
-   n = n_fcst*n_obs;
+   int n = n_fcst*n_obs;
 
-   for(j=0; j<(n-1); j++) {
-      for(k=(j+1); k<n; k++) {
+   for(int j=0; j<(n-1); j++) {
+      for(int k=(j+1); k<n; k++) {
 
          if(info_singles[j].interest_value < info_singles[k].interest_value) {
 
@@ -1258,10 +1306,9 @@ void ModeFuzzyEngine::do_match_merge() {
    //
    n = n_fcst*n_obs;
 
-   for(j=0; j<n; j++) {
+   for(int j=0; j<n; j++) {
 
-      if(info_singles[j].interest_value < conf_info.total_interest_thresh)
-         continue;
+      if(info_singles[j].interest_value < conf_info.total_interest_thresh) continue;
 
       collection.add_pair(info_singles[j].fcst_number, info_singles[j].obs_number);
    }
@@ -1283,10 +1330,10 @@ void ModeFuzzyEngine::do_match_merge() {
 
    fcst_color.extend(n_fcst);
 
-   for(j=0; j<n_fcst; j++) {
+   for(int j=0; j<n_fcst; j++) {
       fcst_color.add(unmatched_color);
 
-      for(k=0; k<(collection.n_sets); k++) {
+      for(int k=0; k<(collection.n_sets); k++) {
 
          if(collection.set[k].has_fcst(j+1)) {
             fcst_color[j] = ctable.nearest((k%ctable.n_entries())+1);
@@ -1297,10 +1344,10 @@ void ModeFuzzyEngine::do_match_merge() {
 
    obs_color.extend(n_obs);
 
-   for(j=0; j<n_obs; j++) {
+   for(int j=0; j<n_obs; j++) {
       obs_color.add(unmatched_color);
 
-      for(k=0; k<(collection.n_sets); k++) {
+      for(int k=0; k<(collection.n_sets); k++) {
 
          if(collection.set[k].has_obs(j+1)) {
             obs_color[j] = ctable.nearest((k%ctable.n_entries())+1);
@@ -2025,9 +2072,7 @@ void ModeFuzzyEngine::do_obs_merge_engine(const char *default_config,
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_match_fcst_merge() {
-   int j, k, n;
    InterestInfo junkinfo;
-   ShapeData cur_shape;
 
    do_fcst_splitting();
    do_obs_splitting();
@@ -2039,69 +2084,96 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    //
    fcst_single.set_size(n_fcst);
 
-   for(j=0; j<n_fcst; j++) {
-      cur_shape = select(*fcst_split, j+1);
-      fcst_single[j].set(*fcst_raw, *fcst_thresh,
-                         *fcst_split, cur_shape,
-                         conf_info.inten_perc_value,
-                         conf_info.Fcst->var_info->is_precipitation());
-      fcst_single[j].object_number = j+1;
-   }
+#pragma omp parallel default(none) \
+   shared(fcst_raw, fcst_thresh, fcst_split, conf_info) \
+   shared(fcst_single, n_fcst)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<n_fcst; j++) {
+         ShapeData cur_shape = select(*fcst_split, j+1);
+         fcst_single[j].set(*fcst_raw, *fcst_thresh,
+                            *fcst_split, cur_shape,
+                            conf_info.inten_perc_value,
+                            conf_info.Fcst->var_info->is_precipitation());
+         fcst_single[j].object_number = j+1;
+      }
+   } // End omp parallel
 
    obs_single.set_size(n_obs);
 
-   for(j=0; j<n_obs; j++) {
-      cur_shape = select(*obs_split, j+1);
-      obs_single[j].set(*obs_raw, *obs_thresh,
-                        *obs_split, cur_shape,
-                        conf_info.inten_perc_value,
-                        conf_info.Obs->var_info->is_precipitation());
-      obs_single[j].object_number = j+1;
-   }
+#pragma omp parallel default(none) \
+   shared(obs_raw, obs_thresh, obs_split, conf_info) \
+   shared(obs_single, n_obs)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<n_obs; j++) {
+         ShapeData cur_shape = select(*obs_split, j+1);
+         obs_single[j].set(*obs_raw, *obs_thresh,
+                           *obs_split, cur_shape,
+                           conf_info.inten_perc_value,
+                           conf_info.Obs->var_info->is_precipitation());
+         obs_single[j].object_number = j+1;
+      }
+   } // End omp parallel
 
    //
    // Do the pair features
    //
    pair_single.set_size(n_fcst*n_obs);
 
-   for(j=0; j<n_fcst; j++) {
-      for(k=0; k<n_obs; k++) {
+#pragma omp parallel default(none) \
+   shared(n_fcst, n_obs, fcst_single, obs_single, conf_info)
+   {
 
-         n = two_to_one(j, k);
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int j=0; j<n_fcst; j++) {
+         for(int k=0; k<n_obs; k++) {
 
-         pair_single[n].set(fcst_single[j], obs_single[k],
-                     conf_info.max_centroid_dist);
-         pair_single[n].pair_number = n;
+            int n = two_to_one(j, k);
+
+            pair_single[n].set(fcst_single[j], obs_single[k],
+                               conf_info.max_centroid_dist);
+            pair_single[n].pair_number = n;
+         }
       }
-   }
+   } // End omp parallel
 
    //
    // Calculate the interest values
    //
    info_singles.set_size(n_fcst*n_obs);
 
-   for(j=0; j<n_fcst; j++) {
-      for(k=0; k<n_obs; k++) {
+#pragma omp parallel default(none) \
+   shared(n_fcst, n_obs, info_singles, conf_info)
+   {
 
-         n = two_to_one(j, k);
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int j=0; j<n_fcst; j++) {
+         for(int k=0; k<n_obs; k++) {
 
-         info_singles[n].fcst_number    = (j+1);
-         info_singles[n].obs_number     = (k+1);
-         info_singles[n].pair_number    = n;
-         info_singles[n].interest_value = total_interest(conf_info,
-                                             pair_single[n], j+1, k+1,
-                                             true);
+            int n = two_to_one(j, k);
 
+            info_singles[n].fcst_number    = (j+1);
+            info_singles[n].obs_number     = (k+1);
+            info_singles[n].pair_number    = n;
+            info_singles[n].interest_value = total_interest(conf_info,
+                                                pair_single[n], j+1, k+1,
+                                                true);
+         }
       }
-   }
+   } // End omp parallel
 
    //
    // Sort the interest values in decreasing order
    //
-   n = n_fcst*n_obs;
+   int n = n_fcst*n_obs;
 
-   for(j=0; j<(n-1); j++) {
-      for(k=(j+1); k<n; k++) {
+   for(int j=0; j<(n-1); j++) {
+      for(int k=(j+1); k<n; k++) {
 
          if(info_singles[j].interest_value < info_singles[k].interest_value) {
 
@@ -2118,7 +2190,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    //
    n = n_fcst*n_obs;
 
-   for(j=0; j<n; j++) {
+   for(int j=0; j<n; j++) {
 
       if(info_singles[j].interest_value < conf_info.total_interest_thresh) {
          continue;
@@ -2149,10 +2221,10 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
 
    fcst_color.extend(n_fcst);
 
-   for(j=0; j<n_fcst; j++) {
+   for(int j=0; j<n_fcst; j++) {
       fcst_color.add(unmatched_color);
 
-      for(k=0; k<(collection.n_sets); k++) {
+      for(int k=0; k<(collection.n_sets); k++) {
 
          if(collection.set[k].has_fcst(j+1)) {
             fcst_color[j] = ctable.nearest((k%ctable.n_entries())+1);
@@ -2164,10 +2236,10 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
 
    obs_color.extend(n_obs);
 
-   for(j=0; j<n_obs; j++) {
+   for(int j=0; j<n_obs; j++) {
       obs_color.add(unmatched_color);
 
-      for(k=0; k<(collection.n_sets); k++) {
+      for(int k=0; k<(collection.n_sets); k++) {
 
          if(collection.set[k].has_obs(j+1)) {
             obs_color[j] = ctable.nearest((k%ctable.n_entries())+1);
@@ -2191,9 +2263,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_match_only() {
-   int j, k, n;
    InterestInfo junkinfo;
-   ShapeData cur_shape;
 
    do_fcst_splitting();
    do_obs_splitting();
@@ -2205,67 +2275,96 @@ void ModeFuzzyEngine::do_match_only() {
    //
    fcst_single.set_size(n_fcst);
 
-   for(j=0; j<n_fcst; j++) {
-      cur_shape = select(*fcst_split, j+1);
-      fcst_single[j].set(*fcst_raw, *fcst_thresh,
-                         *fcst_split, cur_shape,
-                         conf_info.inten_perc_value,
-                         conf_info.Fcst->var_info->is_precipitation());
-      fcst_single[j].object_number = j+1;
-   }
+#pragma omp parallel default(none) \
+   shared(fcst_raw, fcst_thresh, fcst_split, conf_info) \
+   shared(fcst_single, n_fcst)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<n_fcst; j++) {
+         ShapeData cur_shape = select(*fcst_split, j+1);
+         fcst_single[j].set(*fcst_raw, *fcst_thresh,
+                            *fcst_split, cur_shape,
+                            conf_info.inten_perc_value,
+                            conf_info.Fcst->var_info->is_precipitation());
+         fcst_single[j].object_number = j+1;
+      }
+   } // End omp parallel
 
    obs_single.set_size(n_obs);
 
-   for(j=0; j<n_obs; j++) {
-      cur_shape = select(*obs_split, j+1);
-      obs_single[j].set(*obs_raw, *obs_thresh,
-                        *obs_split, cur_shape,
-                        conf_info.inten_perc_value,
-                        conf_info.Obs->var_info->is_precipitation());
-      obs_single[j].object_number = j+1;
-   }
+#pragma omp parallel default(none) \
+   shared(obs_raw, obs_thresh, obs_split, conf_info) \
+   shared(obs_single, n_obs)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<n_obs; j++) {
+         ShapeData cur_shape = select(*obs_split, j+1);
+         obs_single[j].set(*obs_raw, *obs_thresh,
+                           *obs_split, cur_shape,
+                           conf_info.inten_perc_value,
+                           conf_info.Obs->var_info->is_precipitation());
+         obs_single[j].object_number = j+1;
+      }
+   } // End omp parallel
 
    //
    // Do the pair features
    //
    pair_single.set_size(n_fcst*n_obs);
 
-   for(j=0; j<n_fcst; j++) {
-      for(k=0; k<n_obs; k++) {
+#pragma omp parallel default(none) \
+   shared(n_fcst, n_obs, fcst_single, obs_single, conf_info)
+   {
 
-         n = two_to_one(j, k);
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int j=0; j<n_fcst; j++) {
+         for(int k=0; k<n_obs; k++) {
 
-         pair_single[n].set(fcst_single[j], obs_single[k],
-                     conf_info.max_centroid_dist);
-         pair_single[n].pair_number = n;
+            int n = two_to_one(j, k);
+
+            pair_single[n].set(fcst_single[j], obs_single[k],
+                               conf_info.max_centroid_dist);
+            pair_single[n].pair_number = n;
+         }
       }
-   }
+   } // End omp parallel
 
    //
    // Calculate the interest values
    //
    info_singles.set_size(n_fcst*n_obs);
 
-   for(j=0; j<n_fcst; j++) {
-      for(k=0; k<n_obs; k++) {
+#pragma omp parallel default(none) \
+   shared(n_fcst, n_obs, info_singles, conf_info)
+   {
 
-         n = two_to_one(j, k);
 
-         info_singles[n].fcst_number    = (j+1);
-         info_singles[n].obs_number     = (k+1);
-         info_singles[n].pair_number    = n;
-         info_singles[n].interest_value = total_interest(conf_info,
-                                             pair_single[n], j+1, k+1,
-                                             true);
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int j=0; j<n_fcst; j++) {
+         for(int k=0; k<n_obs; k++) {
+
+            int n = two_to_one(j, k);
+
+            info_singles[n].fcst_number    = (j+1);
+            info_singles[n].obs_number     = (k+1);
+            info_singles[n].pair_number    = n;
+            info_singles[n].interest_value = total_interest(conf_info,
+                                                pair_single[n], j+1, k+1,
+                                                true);
+         }
       }
-   }
+   } // End omp parallel
 
    //
    // Sort the interest values in decreasing order
    //
-   n = n_fcst*n_obs;
-   for(j=0; j<(n-1); j++) {
-      for(k=(j+1); k<n; k++) {
+   int n = n_fcst*n_obs;
+   for(int j=0; j<(n-1); j++) {
+      for(int k=(j+1); k<n; k++) {
 
          if(info_singles[j].interest_value < info_singles[k].interest_value) {
 
@@ -2280,7 +2379,7 @@ void ModeFuzzyEngine::do_match_only() {
    // Form the sets
    //
    n = n_fcst*n_obs;
-   for(j=0; j<n; j++) {
+   for(int j=0; j<n; j++) {
 
       if(info_singles[j].interest_value < conf_info.total_interest_thresh)
          continue;
@@ -2312,10 +2411,10 @@ void ModeFuzzyEngine::do_match_only() {
 
    fcst_color.extend(n_fcst);
 
-   for(j=0; j<n_fcst; j++) {
+   for(int j=0; j<n_fcst; j++) {
       fcst_color.add(unmatched_color);
 
-      for(k=0; k<(collection.n_sets); k++) {
+      for(int k=0; k<(collection.n_sets); k++) {
          if(collection.set[k].has_fcst(j+1)) {
             fcst_color[j] = ctable.nearest((k%ctable.n_entries())+1);
             break;
@@ -2325,10 +2424,10 @@ void ModeFuzzyEngine::do_match_only() {
 
    obs_color.extend(n_obs);
 
-   for(j=0; j<n_obs; j++) {
+   for(int j=0; j<n_obs; j++) {
       obs_color.add(unmatched_color);
 
-      for(k=0; k<(collection.n_sets); k++) {
+      for(int k=0; k<(collection.n_sets); k++) {
          if(collection.set[k].has_obs(j+1)) {
             obs_color[j] = ctable.nearest((k%ctable.n_entries())+1);
             break;
@@ -2427,8 +2526,6 @@ void ModeFuzzyEngine::do_obs_clus_splitting() {
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::do_cluster_features() {
-   int j;
-   ShapeData cur_shape;
 
    if(need_fcst_clus_split) do_fcst_clus_splitting();
    if(need_obs_clus_split)  do_obs_clus_splitting();
@@ -2444,46 +2541,65 @@ void ModeFuzzyEngine::do_cluster_features() {
    fcst_cluster.set_size(n_clus);
     obs_cluster.set_size(n_clus);
 
-   for(j=0; j<n_clus; j++) {
-      cur_shape = select(*fcst_clus_split, j+1);
-      fcst_cluster[j].set(*fcst_raw, *fcst_thresh,
-                          *fcst_clus_split, cur_shape,
-                          conf_info.inten_perc_value,
-                          conf_info.Fcst->var_info->is_precipitation());
-      fcst_cluster[j].object_number = j+1;
+#pragma omp parallel default(none) \
+   shared(fcst_raw, fcst_thresh, fcst_clus_split, conf_info) \
+   shared(fcst_cluster, n_clus)
+   {
 
-      cur_shape = select(*obs_clus_split, j+1);
-      obs_cluster[j].set(*obs_raw, *obs_thresh,
-                         *obs_clus_split, cur_shape,
-                         conf_info.inten_perc_value,
-                         conf_info.Obs->var_info->is_precipitation());
-      obs_cluster[j].object_number = j+1;
-   }
+#pragma omp for schedule(static)
+      for(int j=0; j<n_clus; j++) {
+         ShapeData cur_shape = select(*fcst_clus_split, j+1);
+         fcst_cluster[j].set(*fcst_raw, *fcst_thresh,
+                             *fcst_clus_split, cur_shape,
+                             conf_info.inten_perc_value,
+                             conf_info.Fcst->var_info->is_precipitation());
+         fcst_cluster[j].object_number = j+1;
+
+         cur_shape = select(*obs_clus_split, j+1);
+         obs_cluster[j].set(*obs_raw, *obs_thresh,
+                            *obs_clus_split, cur_shape,
+                            conf_info.inten_perc_value,
+                            conf_info.Obs->var_info->is_precipitation());
+         obs_cluster[j].object_number = j+1;
+      }
+   } // End omp parallel
 
    //
    // Do the pair features
    //
    pair_cluster.set_size(n_clus);
 
-   for(j=0; j<n_clus; j++) {
-      pair_cluster[j].set(fcst_cluster[j], obs_cluster[j],
-                          conf_info.max_centroid_dist);
-      pair_cluster[j].pair_number = j+1;
-   }
+#pragma omp parallel default(none) \
+   shared(n_clus, fcst_cluster, obs_cluster, pair_cluster, conf_info)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<n_clus; j++) {
+         pair_cluster[j].set(fcst_cluster[j], obs_cluster[j],
+                             conf_info.max_centroid_dist);
+         pair_cluster[j].pair_number = j+1;
+      }
+   } // End omp parallel
 
    //
    // Calculate the interest values
    //
    info_clus.set_size(n_clus);
 
-   for(j=0; j<n_clus; j++) {
-      info_clus[j].fcst_number    = (j+1);
-      info_clus[j].obs_number     = (j+1);
-      info_clus[j].pair_number    = j;
-      info_clus[j].interest_value = total_interest(conf_info,
-                                       pair_cluster[j], j+1, j+1,
-                                       false);
-   }
+#pragma omp parallel default(none) \
+   shared(n_clus, info_clus, pair_cluster, conf_info)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<n_clus; j++) {
+         info_clus[j].fcst_number    = (j+1);
+         info_clus[j].obs_number     = (j+1);
+         info_clus[j].pair_number    = j;
+         info_clus[j].interest_value = total_interest(conf_info,
+                                          pair_cluster[j], j+1, j+1,
+                                          false);
+      }
+   } // End omp parallel
 
    //
    // Done
@@ -2598,7 +2714,17 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    double term, sum, weight_sum;
    double total;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   int n_threads = 1;
+
+#ifdef _OPENMP
+   n_threads = omp_get_num_threads();
+#endif /* x _OPENMP x */
+
+   // Only print log messages for a single thread
+   bool do_logging = mlog.verbosity_level() >= print_interest_log_level &&
+                     n_threads == 1; 
+
+   if(do_logging) {
 
       ConcatString cs;
       if(is_single) {
@@ -2623,7 +2749,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    if(is_single && p.centroid_dist > mc.max_centroid_dist) {
       total = bad_data_double;
 
-      if(mlog.verbosity_level() >= print_interest_log_level) {
+      if(do_logging) {
          mlog << Debug(print_interest_log_level)
               << "Total Interest = " << total << "\n"
               << "Centroid Distance (" << p.centroid_dist
@@ -2650,7 +2776,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Centroid Distance:\n"
            << "------------------\n"
@@ -2676,7 +2802,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Boundary Distance:\n"
            << "------------------\n"
@@ -2702,7 +2828,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Convex Hull Distance:\n"
            << "---------------------\n"
@@ -2732,7 +2858,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Angle Difference:\n"
            << "-----------------\n"
@@ -2758,7 +2884,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Aspect Ratio Difference:\n"
            << "------------------------\n"
@@ -2784,7 +2910,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Area Ratio:\n"
            << "-----------\n"
@@ -2810,7 +2936,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Intersection/Area Ratio:\n"
            << "------------------------\n"
@@ -2836,7 +2962,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Curvature Ratio:\n"
            << "----------------\n"
@@ -2862,7 +2988,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Complexity Ratio:\n"
            << "-----------------\n"
@@ -2888,7 +3014,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
    sum        += term;
    weight_sum += weight*confidence;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Percentile (" << mc.inten_perc_value
            << "th) Intensity Ratio:\n"
@@ -2909,7 +3035,7 @@ double total_interest(ModeConfInfo &mc, const PairFeature &p,
 
    total = sum/weight_sum;
 
-   if(mlog.verbosity_level() >= print_interest_log_level) {
+   if(do_logging) {
       mlog << Debug(print_interest_log_level)
            << "Total Interest = (sum of terms)/(sum of weights*confidence)\n\n"
            << "               = " << sum << "/" << weight_sum << "\n\n"
@@ -3029,27 +3155,28 @@ void write_engine_stats(ModeFuzzyEngine & eng, const Grid & grid, AsciiTable & a
       eng.conf_info.conf.output_precision());
    at.set_bad_data_value(bad_data_double);    // Set the bad data value
    at.set_bad_data_str(na_str);               // Set the bad data string
-   at.set_delete_trailing_blank_rows(1);      // No trailing blank rows
+   at.set_delete_trailing_blank_rows(true);   // No trailing blank rows
 
    //
-   //  calculate n_valid
+   // Calculate n_valid
    //
+   int n_valid = 0;
+   int nxy = eng.fcst_raw->data.nxy();
 
-int x, y;
+#pragma omp parallel default(none) \
+   shared(nxy, eng, n_valid) \
+   private(j)
+   {
 
-eng.n_valid = 0;
+#pragma omp for schedule(static) \
+                reduction(+: n_valid)
+      for(j=0; j<nxy; j++) {
+         if(!is_bad_data(eng.fcst_raw->data.buf()[j]) &&
+            !is_bad_data(eng.obs_raw->data.buf()[j])) n_valid++;
+      }
+   } // End omp parallel
 
-for (x=0; x<(grid.nx()); ++x)  {
-
-   for (y=0; y<(grid.ny()); ++y)  {
-
-      if ( eng.fcst_raw->is_bad_data(x, y) || eng.obs_raw->is_bad_data(x, y) )  continue;
-
-      ++(eng.n_valid);
-
-   }
-
-}
+   eng.n_valid = n_valid;
 
    //
    // Initialize row count

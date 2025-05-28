@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -163,8 +163,7 @@ void TimeSeries::dump(ostream & out, int depth) const
 {
 
 Indent prefix(depth);
-char junk[256];
-
+ConcatString cs;
 
 out << prefix << "Nelements = " << Nelements << "\n";
 
@@ -174,19 +173,19 @@ int month, day, year, hour, minute, second;
 
 unix_to_mdyhms(TimeStart, month, day, year, hour, minute, second);
 
-snprintf(junk, sizeof(junk), "%s %d, %d   %02d:%02d:%02d", 
+cs.format("%s %d, %d   %02d:%02d:%02d", 
                short_month_name[month], day, year, 
                hour, minute, second);
 
-out << prefix << "TimeStart = " << TimeStart << "  (" << junk << ")\n";
+out << prefix << "TimeStart = " << TimeStart << "  (" << cs << ")\n";
 
 hour   = TimeDelta/3600;
 minute = (TimeDelta%3600)/60;
 second = TimeDelta%60;
 
-snprintf(junk, sizeof(junk), "%02d:%02d:%02d", hour, minute, second);
+cs.format("%02d:%02d:%02d", hour, minute, second);
 
-out << prefix << "TimeDelta = " << TimeDelta << "  (" << junk << ")\n";
+out << prefix << "TimeDelta = " << TimeDelta << "  (" << cs << ")\n";
 
    //
    //  don't print out the values, there's probably a lot of them

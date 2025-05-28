@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,8 +8,8 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef  __VX_WRFMODE_ENGINE_H__
-#define  __VX_WRFMODE_ENGINE_H__
+#ifndef  __SHAPEDATA_ENGINE_H__
+#define  __SHAPEDATA_ENGINE_H__
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -374,7 +374,6 @@ class ModeFuzzyEngine {
       int get_matched_obs(int)    const;
       int get_unmatched_obs(int)  const;
 
-
       SetCollection collection;
 
       ModeDataType data_type;
@@ -412,6 +411,6 @@ extern double aspect_ratio_conf(double);
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#endif   // __VX_WRFMODE_ENGINE_H__
+#endif   // __SHAPEDATA_ENGINE_H__
 
 ///////////////////////////////////////////////////////////////////////////////

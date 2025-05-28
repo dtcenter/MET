@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -160,16 +160,8 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    set_req_name(nstr.c_str());
    set_name(nstr);
 
-   // If there's no level specification, assume (*, *)
-   if(strchr(lstr.c_str(), '(') == nullptr) {
-      Level.set_req_name("*,*");
-      Level.set_name("*,*");
-      Dimension.clear();
-      Dimension.add(vx_data2d_star);
-      Dimension.add(vx_data2d_star);
-   }
-   // Parse the level specification
-   else {
+   // Parse the level dimensions, if specified
+   if(lstr.string().find_first_of("(") != std::string::npos) {
 
       // Initialize the temp string
       tmp_str = lstr;
@@ -190,6 +182,14 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
          // Check for wildcards
          if(strchr(ptr2, '*') != nullptr) Dimension.add(vx_data2d_star);
          else {
+
+            // @value notation not supported in vx_data_nc_met
+            if(*ptr2 == '@') {
+               mlog << Warning << "\nVarInfoNcMet::set_magic() -> "
+                    << "problem parsing \"" << MagicStr << "\" for the vx_data2d_nc_met library.\n"
+                    << "NetCDF dimensions must be specified as 0-based integer indices rather "
+                    << "than using the NetCDF dimension \"@value\" notation.\n\n";
+            }
 
             // Check for a range of levels
             if((ptr3 = strchr(ptr2, '-')) != nullptr) {
@@ -217,8 +217,25 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
          // Set ptr to nullptr for next call to strtok
          ptr = nullptr;
       } // end while
+   }
+   // Otherwise, assume (*,*) level dimensions
+   else {
 
-   } // end else
+      // MET #3087 Set the level name string:
+      //   - If empty or '*' from Point2Grid, set to *,* to indicate gridded output
+      //   - If nonempty, use the input level string to support U/V vector level matching
+      if(lstr.empty() || lstr == "*") {
+         Level.set_req_name("*,*");
+         Level.set_name("*,*");
+      }
+      else {     
+         Level.set_req_name(lstr.c_str());
+         Level.set_name(lstr.c_str());
+      }
+      Dimension.clear();
+      Dimension.add(vx_data2d_star);
+      Dimension.add(vx_data2d_star);
+   }
 
    // Check for "/PROB" to indicate a probability forecast
    if(strstr(MagicStr.c_str(), "/PROB") != nullptr) PFlag = 1;

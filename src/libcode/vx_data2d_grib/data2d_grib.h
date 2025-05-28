@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -102,7 +102,7 @@ class MetGrib1DataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline double      MetGrib1DataFile::operator  () (int x, int y) const { return get(x, y)   ; }
+inline double      MetGrib1DataFile::operator  () (int x, int y) const { return get(x, y);    }
 inline GrdFileType MetGrib1DataFile::file_type ()                const { return FileType_Gb1; }
 
 

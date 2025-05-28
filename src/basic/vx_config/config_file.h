@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -56,7 +56,7 @@ class MetConfig : public Dictionary {
 
       void clear() override;
 
-      void dump(std::ostream &, int = 0) const;
+      void dump(std::ostream &, int = 0) const override;
 
       void debug_dump(int = 0) const;
 

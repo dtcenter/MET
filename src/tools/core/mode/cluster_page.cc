@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -47,7 +47,7 @@ void ModePsFile::do_cluster_page(ModeFuzzyEngine & eng, EngineType eng_type, con
    double dx, dy;
    const double Htab_cen = PageWidth/2.0;
    ConcatString label;
-   char junk[1024];
+   ConcatString cs;
 
    /////////////////////////////////////////////////////////////////
    //
@@ -202,84 +202,84 @@ void ModePsFile::do_cluster_page(ModeFuzzyEngine & eng, EngineType eng_type, con
       Htab = Hmargin;
 
       // Cluster ID
-      snprintf(junk, sizeof(junk), "%d", i+1);
-      t.write_xy1_to_cell(r, c++, 10.0, dy, 0.5, 0.0, junk);
-      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+      cs.format("%d", i+1);
+      t.write_xy1_to_cell(r, c++, 10.0, dy, 0.5, 0.0, cs.c_str());
+      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
       Htab += dx;
 
       // Centroid Distance
-      snprintf(junk, sizeof(junk), "%.2f", eng.pair_cluster[i].centroid_dist);
-      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
-      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+      cs.format("%.2f", eng.pair_cluster[i].centroid_dist);
+      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
+      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
       Htab += dx;
 
       // Angle Difference
-      snprintf(junk, sizeof(junk), "%.2f", eng.pair_cluster[i].angle_diff);
-      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
-      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+      cs.format("%.2f", eng.pair_cluster[i].angle_diff);
+      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
+      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
       Htab += dx;
 
       // Forecast Area
-      snprintf(junk, sizeof(junk), "%i", nint(eng.pair_cluster[i].Fcst[0].area));
-      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
-      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+      cs.format("%i", nint(eng.pair_cluster[i].Fcst[0].area));
+      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
+      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
       Htab += dx;
 
       // Observation Area
-      snprintf(junk, sizeof(junk), "%i", nint(eng.pair_cluster[i].Obs[0].area));
-      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
-      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+      cs.format("%i", nint(eng.pair_cluster[i].Obs[0].area));
+      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
+      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
       Htab += dx;
 
       // Intersection Area
-      snprintf(junk, sizeof(junk), "%i", nint(eng.pair_cluster[i].intersection_area));
-      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
-      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+      cs.format("%i", nint(eng.pair_cluster[i].intersection_area));
+      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
+      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
       Htab += dx;
 
       // Union Area
-      snprintf(junk, sizeof(junk), "%i", nint(eng.pair_cluster[i].union_area));
-      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
-      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+      cs.format("%i", nint(eng.pair_cluster[i].union_area));
+      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
+      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
       Htab += dx;
 
       // Symmetric Difference
-      snprintf(junk, sizeof(junk), "%i", nint(eng.pair_cluster[i].symmetric_diff));
-      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
-      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+      cs.format("%i", nint(eng.pair_cluster[i].symmetric_diff));
+      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
+      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
       Htab += dx;
 
       // Forecast median intensity
-      snprintf(junk, sizeof(junk), "%.2f", eng.pair_cluster[i].Fcst[0].intensity_ptile.p50);
-      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
-      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+      cs.format("%.2f", eng.pair_cluster[i].Fcst[0].intensity_ptile.p50);
+      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
+      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
       Htab += dx;
 
       // Observation median intensity
-      snprintf(junk, sizeof(junk), "%.2f", eng.pair_cluster[i].Obs[0].intensity_ptile.p50);
-      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
-      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+      cs.format("%.2f", eng.pair_cluster[i].Obs[0].intensity_ptile.p50);
+      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
+      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
       Htab += dx;
 
       // Forecast 90th percentile of intensity
-      snprintf(junk, sizeof(junk), "%.2f", eng.pair_cluster[i].Fcst[0].intensity_ptile.p90);
-      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
-      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+      cs.format("%.2f", eng.pair_cluster[i].Fcst[0].intensity_ptile.p90);
+      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
+      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
       Htab += dx;
 
       // Observation median intensity
-      snprintf(junk, sizeof(junk), "%.2f", eng.pair_cluster[i].Obs[0].intensity_ptile.p90);
-      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
-      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, junk);
+      cs.format("%.2f", eng.pair_cluster[i].Obs[0].intensity_ptile.p90);
+      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
+      // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, cs.c_str());
       Htab += dx;
 
       // Total Interest
       if(eng.info_clus[i].interest_value < 0) label = na_str;
       else {
-         snprintf(junk, sizeof(junk), "%.4f", eng.info_clus[i].interest_value);
-         label = junk;
+         cs.format("%.4f", eng.info_clus[i].interest_value);
+         label = cs;
       }
-      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, junk);
+      t.write_xy1_to_cell(r, c++, 40.0, dy, 1.0, 0.0, cs.c_str());
       // write_centered_text(1, 1, Htab, Vtab, 0.0, 0.5, label);
       // Htab += dx;
 

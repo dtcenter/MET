@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -656,7 +656,7 @@ double decode_lat_lon(const unsigned char * p, int n)
 
 int i, parity;
 double answer;
-unsigned char c[n];
+vector<unsigned char> c(n);
 
    //
    //  For all of the lat/lon parameters, the leftmost bit indicates the
@@ -672,8 +672,8 @@ if ( c[0] & 128 ) parity = -1;
 
 c[0] &= 127;
 
-     if ( n == 2 )  answer = (double) 0.001*parity*char2_to_int(c);
-else if ( n == 3 )  answer = (double) 0.001*parity*char3_to_int(c);
+     if ( n == 2 )  answer = (double) 0.001*parity*char2_to_int(c.data());
+else if ( n == 3 )  answer = (double) 0.001*parity*char3_to_int(c.data());
 else                answer = (double) bad_data_float;
 
 return answer;

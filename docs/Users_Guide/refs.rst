@@ -130,6 +130,12 @@ References
 |   a review and proposed framework. *Meteorological Applications*, 15, 51-64.
 |
 
+.. _Ebert-Uphoff-2024:
+
+| Ebert-Uphoff, I.,, 2024: An Investigation of Metrics to Evaluate the Sharpness
+|   in AI-Generated Meteorological Imagery. *Draft version - Jan 26, 2024*
+|
+
 .. _Eckel-2012:
 
 | Eckel, F. A., M.S. Allen, M. C. Sittel, 2012: Estimation of Ambiguity in
@@ -278,7 +284,7 @@ References
 
 .. _North-2022:
 
-| North, R.C.,  M.P. Mittermaier, S.F. Milton, 2022. *Using SEEPS with a*
+| North, R.C., M.P. Mittermaier, S.F. Milton, 2022. *Using SEEPS with a*
 |   TRMM-derived Climatology to Assess Global NWP Precipitation Forecast Skill.
 |   *Monthly Weather Review*, 150, 135-155.
 |   https://doi.org/10.1175/MWR-D-20-0347.1
@@ -343,7 +349,7 @@ References
 
 .. _Skamarock-2012:
 
-| Skamarock, W. C., J. B. Klemp, M. G. Duda, L. D. Fowler, S. Park, and 
+| Skamarock, W. C., J. B. Klemp, M. G. Duda, L. D. Fowler, S. Park, and
 |   T. Ringler, 2012: A Multiscale Nonhydrostatic Atmospheric Model Using
 |   Centroidal Voronoi Tesselations and C-Grid Staggering. *Mon. Wea. Rev.*,
 |   **140**, 3090-3105, doi: https://doi.org/10.1175/MWR-D-11-00215.1.

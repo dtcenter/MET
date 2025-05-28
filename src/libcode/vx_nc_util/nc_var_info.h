@@ -1,7 +1,7 @@
 
 
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -83,14 +83,17 @@ class NcVarInfo {
 
       netCDF::NcDim ** Dims; //  allocated
 
-      int x_slot;    //   starting from zero
-      int y_slot;    //
-      int z_slot;    //   -1 if not defined
-      int t_slot;    //
+      int x_slot;       //   starting from zero
+      int y_slot;       //
+      int z_slot;       //   -1 if not defined
+      int t_slot;       //
 
-      bool x_stag;   // are dimensions staggered
+      bool x_stag;      // are dimensions staggered
       bool y_stag;
       bool z_stag;
+
+      bool x_subgrid;   // are dimensions on a subgrid
+      bool y_subgrid;
 
       bool is_pressure; // is variable on pressure levels
 

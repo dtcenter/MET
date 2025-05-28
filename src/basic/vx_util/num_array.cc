@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -39,18 +39,6 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 
-NumArray::NumArray()
-
-{
-
-   init_from_scratch();
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 NumArray::~NumArray()
 
 {
@@ -66,8 +54,6 @@ NumArray::~NumArray()
 NumArray::NumArray(const NumArray & a)
 
 {
-
-   init_from_scratch();
 
    assign(a);
 
@@ -111,20 +97,6 @@ bool NumArray::operator==(const NumArray & a) const
    }
 
    return status;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void NumArray::init_from_scratch()
-
-{
-
-   clear();
-
-   return;
 
 }
 
@@ -335,7 +307,7 @@ void NumArray::add(double d)
 
 {
 
-   e.push_back(d);
+   e.emplace_back(d);
 
    Sorted = false;
 
@@ -357,7 +329,7 @@ void NumArray::add(const NumArray & a)
 
    for (j=0; j<(a.n_elements()); ++j)  {
 
-      e.push_back(a.e[j]);
+      e.emplace_back(a.e[j]);
 
    }
 
@@ -381,7 +353,7 @@ void NumArray::add_const(double v, int n)
 
    for (j=0; j<n; ++j)  {
 
-      e.push_back(v);
+      e.emplace_back(v);
 
    }
 
@@ -405,7 +377,7 @@ void NumArray::add_seq(int beg, int end)
 
    for (j=beg; j<=end; ++j)  {
 
-      e.push_back(j);
+      e.emplace_back(j);
 
    }
 
@@ -1346,7 +1318,7 @@ ConcatString write_css(const NumArray &na)
 
    ConcatString css;
 
-   for ( int i=0; i<na.n_elements(); ++i ) {
+   for ( int i=0; i<na.n(); ++i ) {
       css << (i == 0 ? "" : ",") << na[i];
    }
 
@@ -1364,8 +1336,8 @@ ConcatString write_css_hhmmss(const NumArray &na)
 
    ConcatString css;
 
-   for ( int i=0; i<na.n_elements(); ++i ) {
-      css << (i == 0 ? "" : ",") << sec_to_hhmmss(na[i]);
+   for ( int i=0; i<na.n(); ++i ) {
+      css << (i == 0 ? "" : ",") << sec_to_hhmmss(nint(na[i]));
    }
 
    return css;
@@ -1384,6 +1356,24 @@ ConcatString write_css(const IntArray &ia)
 
    for ( int i=0; i<ia.n(); ++i ) {
       css << (i == 0 ? "" : ",") << ia[i];
+   }
+
+   return css;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+ConcatString write_css_hhmmss(const IntArray &ia)
+
+{
+
+   ConcatString css;
+
+   for ( int i=0; i<ia.n(); ++i ) {
+      css << (i == 0 ? "" : ",") << sec_to_hhmmss(ia[i]);
    }
 
    return css;

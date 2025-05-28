@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -264,8 +264,9 @@ void process_data_file() {
       exit(1);
    }
 
-   // For python types read the first field to set the grid
-   if(is_python_grdfiletype(ftype)) {
+   // For python types and range/azimuth grids, read the first field to set the grid
+   if(is_python_grdfiletype(ftype) ||
+      fr_mtddf->grid().info().ra) {
       config.read_string(FieldSA[0].c_str());
       vinfo->set_dict(config);
       if(!fr_mtddf->data_plane(*vinfo, fr_dp)) {
@@ -387,31 +388,6 @@ void open_nc(const Grid &grid, ConcatString run_cs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
-
-   // Allocate memory to store data values for each grid point
-   vector<float> data(grid.nx()*grid.ny());
-
-   // Store the data
-   int grid_nx = grid.nx();
-   int grid_ny = grid.ny();
-   for(int x=0; x<grid_nx; x++) {
-      for(int y=0; y<grid_ny; y++) {
-         int n = DefaultTO.two_to_one(grid_nx, grid_ny, x, y);
-         data[n] = (float) dp(x, y);
-      } // end for y
-   } // end for x
-
-   // Write out the data
-   if(!put_nc_data_with_dims(data_var, data.data(), grid.ny(), grid.nx())) {
-      mlog << Error << "\nwrite_nc_data() -> "
-           << "error writing data to the output file.\n\n";
-      exit(1);
-   }
-
-   return;
-}
-
 void write_nc(const DataPlane &dp, const Grid &grid,
               const VarInfo *vinfo, const char *vname) {
 
@@ -427,7 +403,12 @@ void write_nc(const DataPlane &dp, const Grid &grid,
    add_att(&data_var, "_FillValue", bad_data_float);
    write_netcdf_var_times(&data_var, dp);
 
-   write_nc_data(dp, grid, &data_var);
+   // Write out the data
+   if(!put_nc_data_plane_float(&data_var, dp)) {
+      mlog << Error << "\nwrite_nc() -> "
+           << "error writing data to the output file.\n\n";
+      exit(1);
+   }
 
    return;
 }

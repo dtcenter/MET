@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -55,7 +55,7 @@ GridTemplate::GridTemplate(const GridTemplate& rhs) {
 
    for (offset_iter = rhs._offsetList.begin();
         offset_iter != rhs._offsetList.end(); ++offset_iter)
-      _offsetList.push_back(new GridOffset(*offset_iter));
+      _offsetList.emplace_back(new GridOffset(*offset_iter));
 
    _pointInGridBase   = rhs._pointInGridBase;
    _pointInGridNumX   = rhs._pointInGridNumX;
@@ -506,7 +506,7 @@ void GridTemplate::printOffsetList(FILE *stream) {
 void GridTemplate::_addOffset(int x_offset, int y_offset) {
    GridOffset *offset = new GridOffset(x_offset, y_offset);
 
-   _offsetList.push_back(offset);
+   _offsetList.emplace_back(offset);
 
    return;
 }
@@ -558,28 +558,28 @@ void GridTemplate::_setEdgeOffsets() {
    for(m_iterator  = min_x_by_y.begin();
        m_iterator != min_x_by_y.end();
        m_iterator++) {
-      _offsetLftEdge.push_back(m_iterator->second);
+      _offsetLftEdge.emplace_back(m_iterator->second);
    }
 
    // Store max_x_by_y map as _offsetRgtEdge vector
    for(m_iterator  = max_x_by_y.begin();
        m_iterator != max_x_by_y.end();
        m_iterator++) {
-      _offsetRgtEdge.push_back(m_iterator->second);
+      _offsetRgtEdge.emplace_back(m_iterator->second);
    }
 
    // Store max_y_by_x map as _offsetTopEdge vector
    for(m_iterator  = max_y_by_x.begin();
        m_iterator != max_y_by_x.end();
        m_iterator++) {
-      _offsetTopEdge.push_back(m_iterator->second);
+      _offsetTopEdge.emplace_back(m_iterator->second);
    }
 
    // Store min_y_by_x map as _offsetBotEdge vector
    for(m_iterator  = min_y_by_x.begin();
        m_iterator != min_y_by_x.end();
        m_iterator++) {
-      _offsetBotEdge.push_back(m_iterator->second);
+      _offsetBotEdge.emplace_back(m_iterator->second);
    }
 
    return;

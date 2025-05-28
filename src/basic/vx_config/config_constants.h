@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -609,6 +609,8 @@ static const char conf_key_censor_thresh[]     = "censor_thresh";
 static const char conf_key_censor_val[]        = "censor_val";
 static const char conf_key_mpr_column[]        = "mpr_column";
 static const char conf_key_mpr_thresh[]        = "mpr_thresh";
+static const char conf_key_mpr_str_inc[]       = "mpr_str_inc";
+static const char conf_key_mpr_str_exc[]       = "mpr_str_exc";
 static const char conf_key_cnt_thresh[]        = "cnt_thresh";
 static const char conf_key_cnt_logic[]         = "cnt_logic";
 static const char conf_key_cat_thresh[]        = "cat_thresh";
@@ -717,6 +719,7 @@ static const char conf_key_ugrid_metadata_map[]     = "ugrid_metadata_map";
 //
 // Entries to override file metadata 
 //
+
 static const char conf_key_set_attr_name[]        = "set_attr_name";
 static const char conf_key_set_attr_units[]       = "set_attr_units";
 static const char conf_key_set_attr_level[]       = "set_attr_level";
@@ -738,6 +741,7 @@ static const char conf_key_is_prob[]              = "is_prob";
 //
 // Climatology data parameter key names
 //
+
 static const char conf_key_climo_mean[]        = "climo_mean";
 static const char conf_key_climo_mean_field[]  = "climo_mean.field";
 static const char conf_key_climo_stdev[]       = "climo_stdev";
@@ -746,6 +750,7 @@ static const char conf_key_climo_stdev_field[] = "climo_stdev.field";
 //
 // Climatology distribution parameter key names
 //
+
 static const char conf_key_climo_cdf[]          = "climo_cdf";
 static const char conf_key_cdf_bins[]           = "cdf_bins";
 static const char conf_key_center_bins[]        = "center_bins";
@@ -758,6 +763,7 @@ static const char conf_key_hour_interval[]      = "hour_interval";
 //
 // Point-Stat specific parameter key names
 //
+
 static const char conf_key_hira[]               = "hira";
 static const char conf_key_land_mask[]          = "land_mask";
 static const char conf_key_land_mask_flag[]     = "land_mask.flag";
@@ -768,8 +774,16 @@ static const char conf_key_interp_fcst_thresh[] = "interp_fcst_thresh";
 static const char conf_key_point_weight_flag[]  = "point_weight_flag";
 
 //
+// Pair-Stat specific parameter key names
+//
+
+static const char conf_key_fcst_pairs[] = "fcst.pairs";
+static const char conf_key_obs_pairs[]  = "obs.pairs";
+
+//
 // Grid-Stat specific parameter key names
 //
+
 static const char conf_key_nc_pairs_var_name[]   = "nc_pairs_var_name";
 static const char conf_key_nc_pairs_var_suffix[] = "nc_pairs_var_suffix";
 // nc_pairs_var_str is deprecated and replaced by nc_pairs_var_suffix
@@ -857,23 +871,38 @@ static const char conf_val_uniform[]     = "UNIFORM";
 static const char conf_val_beta[]        = "BETA";
 
 //
+// STAT-Analysis and Pair-Stat specific parameter key names
+//
+static const char conf_key_fcst_lead[] = "fcst_lead";
+static const char conf_key_obs_lead[]  = "obs_lead";
+
+static const char conf_key_fcst_valid_beg[]  = "fcst_valid_beg";
+static const char conf_key_fcst_valid_end[]  = "fcst_valid_end";
+static const char conf_key_fcst_valid_inc[]  = "fcst_valid_inc";
+static const char conf_key_fcst_valid_exc[]  = "fcst_valid_exc";
+static const char conf_key_fcst_valid_hour[] = "fcst_valid_hour";
+
+static const char conf_key_obs_valid_beg[]  = "obs_valid_beg";
+static const char conf_key_obs_valid_end[]  = "obs_valid_end";
+static const char conf_key_obs_valid_inc[]  = "obs_valid_inc";
+static const char conf_key_obs_valid_exc[]  = "obs_valid_exc";
+static const char conf_key_obs_valid_hour[] = "obs_valid_hour";
+
+static const char conf_key_fcst_init_beg[]  = "fcst_init_beg";
+static const char conf_key_fcst_init_end[]  = "fcst_init_end";
+static const char conf_key_fcst_init_inc[]  = "fcst_init_inc";
+static const char conf_key_fcst_init_exc[]  = "fcst_init_exc";
+static const char conf_key_fcst_init_hour[] = "fcst_init_hour";
+
+static const char conf_key_obs_init_beg[]  = "obs_init_beg";
+static const char conf_key_obs_init_end[]  = "obs_init_end";
+static const char conf_key_obs_init_inc[]  = "obs_init_inc";
+static const char conf_key_obs_init_exc[]  = "obs_init_exc";
+static const char conf_key_obs_init_hour[] = "obs_init_hour";
+
+//
 // STAT-Analysis specific parameter key names
 //
-
-static const char conf_key_fcst_lead[]           = "fcst_lead";
-static const char conf_key_obs_lead[]            = "obs_lead";
-static const char conf_key_fcst_valid_beg[]      = "fcst_valid_beg";
-static const char conf_key_fcst_valid_end[]      = "fcst_valid_end";
-static const char conf_key_fcst_valid_hour[]     = "fcst_valid_hour";
-static const char conf_key_obs_valid_beg[]       = "obs_valid_beg";
-static const char conf_key_obs_valid_end[]       = "obs_valid_end";
-static const char conf_key_obs_valid_hour[]      = "obs_valid_hour";
-static const char conf_key_fcst_init_beg[]       = "fcst_init_beg";
-static const char conf_key_fcst_init_end[]       = "fcst_init_end";
-static const char conf_key_fcst_init_hour[]      = "fcst_init_hour";
-static const char conf_key_obs_init_beg[]        = "obs_init_beg";
-static const char conf_key_obs_init_end[]        = "obs_init_end";
-static const char conf_key_obs_init_hour[]       = "obs_init_hour";
 static const char conf_key_fcst_var[]            = "fcst_var";
 static const char conf_key_obs_var[]             = "obs_var";
 static const char conf_key_fcst_units[]          = "fcst_units";

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -41,6 +41,8 @@ static const int mjd_ut0 = 40587;   //  mjd of Jan 1, 1970
 
 
 ////////////////////////////////////////////////////////////////////////
+
+extern  unixtime  add_to_unixtime (unixtime u, int sec_per_unit, unixtime time_value, bool no_leap);
 
 extern  unixtime  add_to_unixtime (unixtime u, int sec_per_unit, double time_value, bool no_leap);
 

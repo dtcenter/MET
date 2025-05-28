@@ -518,13 +518,13 @@ Indent prefix(depth);
 
 out << prefix << "Name         = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << prefix << "SpheroidName = ";
 
-if ( SpheroidName.length() > 0 )  out << '\"' << SpheroidName << '\"';
-else                              out << "(nul)\n";
+if ( !SpheroidName.empty() )  out << '\"' << SpheroidName << '\"';
+else                          out << "(nul)\n";
 
 out << '\n';   //  no prefix
 
@@ -553,7 +553,7 @@ ConcatString LaeaGrid::serialize(const char *sep) const
 {
 
 ConcatString a;
-char junk[256];
+ConcatString cs;
 
 a << "Projection: Lambert Azimuthal Equal Area" << sep;
 
@@ -562,11 +562,11 @@ a << "Ny: " << Ny << sep;
 
 a << "SpheroidName: " << SpheroidName << sep;
 
-snprintf(junk, sizeof(junk), "Lat_LL: %.3f", lat_LL);   a << junk << sep;
-snprintf(junk, sizeof(junk), "Lon_LL: %.3f", lon_LL);   a << junk << sep;
+cs.format("Lat_LL: %.3f", lat_LL);   a << cs << sep;
+cs.format("Lon_LL: %.3f", lon_LL);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "Lat_Pole: %.3f", lat_pole);   a << junk << sep;
-snprintf(junk, sizeof(junk), "Lon_Pole: %.3f", lon_pole);   a << junk << sep;
+cs.format("Lat_Pole: %.3f", lat_pole);   a << cs << sep;
+cs.format("Lon_Pole: %.3f", lon_pole);   a << cs << sep;
 
    //
    //  done
@@ -631,9 +631,7 @@ GridRep * LaeaGrid::copy() const
 
 {
 
-LaeaGrid * p = nullptr;
-
-p = new LaeaGrid (Data);
+auto * p = new LaeaGrid (Data);
 
 return p;
 

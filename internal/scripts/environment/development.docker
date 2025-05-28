@@ -8,10 +8,10 @@ export MET_DEVELOPMENT=true
 
 export MET_PYTHON=/usr/local
 export MET_PYTHON_BIN_EXE=${MET_PYTHON}/bin/python3
-export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.10"
-export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.10 -lcrypt -lpthread -ldl -lutil -lm"
+export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.12"
+export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.12 -lcrypt -lpthread -ldl -lutil -lm"
 
-export CFLAGS="-DUNDERSCORE -fPIC -g"
+export CFLAGS="-DUNDERSCORE -fPIC"
 export CXXFLAGS=${CFLAGS}
 
 # Set LDFLAGS to include -rpath settings when compiling MET
@@ -25,8 +25,8 @@ export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
 # Define Rscript to use a version with the ncdf4 package 1.17 or later 
 export MET_TEST_RSCRIPT=/usr/bin/Rscript
 
-# set make arguments to build using multiple jobs
-export MAKE_ARGS="-j 5"
+# Set make arguments to build using multiple jobs
+export MAKE_ARGS="-j"
 
 export TEST_BASE=/met
 export COMPILER=gnu_12.2.0

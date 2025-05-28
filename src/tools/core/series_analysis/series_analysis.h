@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -72,8 +72,10 @@ static const char * total_name = "TOTAL";
 ////////////////////////////////////////////////////////////////////////
 
 // Input files
-static StringArray fcst_files, found_fcst_files;
-static StringArray obs_files, found_obs_files;
+static StringArray fcst_files;
+static StringArray found_fcst_files;
+static StringArray obs_files;
+static StringArray found_obs_files;
 static GrdFileType ftype = FileType_None;
 static GrdFileType otype = FileType_None;
 static ConcatString aggr_file;
@@ -127,8 +129,6 @@ static int n_reads = 1; // Initialize to at least one pass
 
 // Data file factory and input files
 static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile *fcst_mtddf = nullptr;
-static Met2dDataFile *obs_mtddf  = nullptr;
 static MetNcMetDataFile aggr_nc;
 
 // Pointer to the random number generator to be used

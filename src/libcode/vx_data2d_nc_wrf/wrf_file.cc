@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -47,6 +47,10 @@ static const char z_dim_wrf_stag_name  [] = "bottom_top_stag";
 static const char z_dim_wrf_name       [] = "bottom_top";
 static const char z_dim_wrf_pres_name  [] = "num_press_levels_stag";
 static const char z_dim_wrf_z_name     [] = "num_z_levels_stag";
+static const char z_dim_bio_name       [] = "bio_emissions_dimension_stag";
+static const char z_dim_klevs_name     [] = "klevs_for_dvel";
+static const char z_dim_soil_name      [] = "soil_layers_stag";
+static const char z_dim_seed_dim_name  [] = "seed_dim_stag";
 static const string strl_dim_name         = "DateStrLen";
 
 static const char  times_var_name      [] = "Times";
@@ -197,11 +201,11 @@ mlog << Debug(5) << "\n" << method_name
 
 if ( IS_INVALID_NC_P(Nc) )  { close();  return false; }
 
-   //
-   //  grid
-   //
+  //
+  //  grid
+  //
 
-if ( !get_wrf_grid(*Nc, grid) )  { close();  return false; }
+  if ( !get_wrf_grid(*Nc, grid) )  { close();  return false; }
 
    //
    //  dimensions
@@ -215,8 +219,10 @@ for (j=0; j<Ndims; ++j)  {
    c = to_lower(DimNames[j]);
    NcDim dim = get_nc_dim(Nc, DimNames[j]);
 
-   if ( c.compare(t_dim_name) == 0 )  Ntimes = GET_NC_SIZE(dim);
-   if ( c.compare(t_dim_name) == 0 )            Tdim = &dim;
+   if ( c == t_dim_name ){
+     Ntimes = static_cast<int>(GET_NC_SIZE(dim));
+     Tdim = &dim;
+   }
 
 }
 
@@ -344,7 +350,7 @@ void WrfFile::dump(ostream & out, int depth) const
 
 int j, k;
 int month, day, year, hour, minute, second;
-char junk[256];
+ConcatString cs;
 string c;
 Indent prefix(depth);
 Indent p2(depth + 1);
@@ -383,9 +389,9 @@ for (j=0; j<Ntimes; ++j)  {
 
    unix_to_mdyhms(Time[j], month, day, year, hour, minute, second);
 
-   snprintf(junk, sizeof(junk), "%s %d, %d   %2d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   cs.format("%s %d, %d   %2d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
-   out << junk << "\n";
+   out << cs << "\n";
 
 }
 
@@ -395,9 +401,9 @@ out << prefix << "Init Time = ";
 
 unix_to_mdyhms(InitTime, month, day, year, hour, minute, second);
 
-snprintf(junk, sizeof(junk), "%s %d, %d   %2d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+cs.format("%s %d, %d   %2d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
 
-out << junk << "\n";
+out << cs << "\n";
 
 out << prefix << "\n";
 
@@ -407,28 +413,9 @@ for (j=0; j<Nvars; ++j)  {
 
    out << p2 << "Var # " << j << " = " << (Var[j].name) << "  (";
 
-   for (k=0; k<(Var[j].Ndims); ++k)  {
-      c = to_lower(DimNames[k]);
-           if ( c.compare(x_dim_name) == 0 )           out << "X";
-      else if ( c.compare(x_dim_stag_name) == 0 )      out << "X (staggered)";
-      else if ( c.compare(x_dim_subgrid_name) == 0 )   out << "X (subgrid)";
-      else if ( c.compare(y_dim_name) == 0 )           out << "Y";
-      else if ( c.compare(y_dim_stag_name) == 0 )      out << "Y (staggered)";
-      else if ( c.compare(y_dim_subgrid_name) == 0 )   out << "Y (subgrid)";
-      else if ( c.compare(z_dim_p_interp_name) == 0 ||
-                c.compare(z_dim_wrf_interp_name) == 0 ||
-                c.compare(z_dim_wrf_name) == 0 ||
-                c.compare(z_dim_wrf_pres_name) == 0 ||
-                c.compare(z_dim_wrf_z_name) == 0 )     out << "Z";
-      else if ( c.compare(z_dim_wrf_stag_name) == 0 )  out << "Z (staggered)";
-      else if ( Var[j].Dims[k] == Tdim )                  out << 'T';
-      else                                                out << GET_NC_NAME_P(Var[j].Dims[k]);
+  dump_dims(out, j, c);
 
-      if ( k < Var[j].Ndims - 1)  out << ", ";
-
-   }   //  for k
-
-   out << ")\n";
+  out << ")\n";
 
    out << p3 << "Slots (X, Y, Z, T) = (";
 
@@ -452,6 +439,35 @@ for (j=0; j<Nvars; ++j)  {
 out.flush();
 
 return;
+
+}
+
+void WrfFile::dump_dims(ostream& out, int j, string& c) const
+{
+   for (int k =0; k<(Var[j].Ndims); ++k)  {
+      c = to_lower(DimNames[k]);
+      if      ( c == x_dim_name )           out << "X";
+      else if ( c == x_dim_stag_name )      out << "X (staggered)";
+      else if ( c == x_dim_subgrid_name )   out << "X (subgrid)";
+      else if ( c == y_dim_name )           out << "Y";
+      else if ( c == y_dim_stag_name )      out << "Y (staggered)";
+      else if ( c == y_dim_subgrid_name )   out << "Y (subgrid)";
+      else if ( c == z_dim_p_interp_name ||
+                c == z_dim_wrf_interp_name ||
+                c == z_dim_wrf_name ||
+                c == z_dim_wrf_pres_name ||
+                c == z_dim_wrf_z_name ||
+                c == z_dim_bio_name ||
+                c == z_dim_klevs_name ||
+                c == z_dim_soil_name ||
+                c == z_dim_seed_dim_name )  out << "Z";
+      else if ( c == z_dim_wrf_stag_name )  out << "Z (staggered)";
+      else if ( Var[j].Dims[k] == Tdim)     out << 'T';
+      else                                  out << GET_NC_NAME_P(Var[j].Dims[k]);
+
+      if ( k < Var[j].Ndims - 1)  out << ", ";
+
+   }   //  for k
 
 }
 
@@ -568,7 +584,8 @@ return d;
 bool WrfFile::data(NcVar * v, const LongArray & a, DataPlane & plane, double & pressure) const
 
 {
-const char *method_name = "WrfFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> ";
+   const char *method_name = "WrfFile::data(NcVar *, const LongArray &, DataPlane &, double &) const -> ";
+
 if ( !args_ok(a) )  {
 
    mlog << Warning << "\n" << method_name << "bad arguments:\n";
@@ -600,14 +617,9 @@ if (dim_count >= max_wrf_args )  {
 
 }
 
-
-int j, k, count;
-int x, y;
-double value;
 bool found = false;
-NcVarInfo * var = (NcVarInfo *) nullptr;
-NcVarInfo * P   = (NcVarInfo *) nullptr;
-LongArray b = a;
+auto * var = (NcVarInfo *) nullptr;
+auto * P   = (NcVarInfo *) nullptr;
 
 pressure = bad_data_double;
 
@@ -615,9 +627,7 @@ pressure = bad_data_double;
    //  find varinfo's
    //
 
-found = false;
-
-for (j=0; j<Nvars; ++j)  {
+for (int j=0; j<Nvars; ++j)  {
 
    if ( Var[j].var == v )  { found = true;  var = Var + j;  break; }
 
@@ -633,143 +643,48 @@ if ( !found )  {
 }
 
    // check dimensions
-   StringArray varDimNames;
-   get_dim_names(var->var, &varDimNames);
-   string c, z_name;
-   for (k=0; k<(var->Ndims); ++k)  {
-      c = to_lower(varDimNames[k]);
-
-      // X dimension
-      if ( c.compare(x_dim_name) == 0 ||
-           c.compare(x_dim_stag_name) == 0 ||
-           c.compare(x_dim_subgrid_name) == 0) {
-
-         var->x_slot = k;
-
-         // track fields that need to be de-staggered in the X dimension
-         if ( c.compare(x_dim_stag_name) == 0 ) {
-
-            var->x_stag = true;
-
-         }
-
-         // error if unsupported subgrid
-           if ( c.compare(x_dim_subgrid_name) == 0 ) {
-
-              mlog << Error << "\n" << method_name
-                   << "X Dimension \"" << x_dim_subgrid_name << "\" is not supported.\n\n";
-              return false;
-
-           }
-
-      }
-         // Y dimension
-      else if ( c.compare(y_dim_name) == 0 ||
-                c.compare(y_dim_stag_name) == 0 ||
-                c.compare(y_dim_subgrid_name) == 0 ) {
-
-         var->y_slot = k;
-
-         // track fields that need to be de-staggered in the Y dimension
-         if ( c.compare(y_dim_stag_name) == 0 ) {
-
-            var->y_stag = true;
-
-         }
-
-         // error if unsupported subgrid
-           if ( c.compare(y_dim_subgrid_name) == 0 ) {
-
-              mlog << Error << "\n" << method_name
-                   << "Y Dimension \"" << y_dim_subgrid_name << "\" is not supported.\n\n";
-              return false;
-
-           }
-
-      }
-         // Z dimension
-      else if ( c.compare(z_dim_p_interp_name  ) == 0 ||
-                c.compare(z_dim_wrf_interp_name) == 0 ||
-                c.compare(z_dim_wrf_name  ) == 0 ||
-                c.compare(z_dim_wrf_stag_name) == 0 ||
-                c.compare(z_dim_wrf_pres_name) == 0 ||
-                c.compare(z_dim_wrf_z_name ) == 0 ) {
-
-         var->z_slot = k;
-
-         // track fields that are on pressure levels
-         if ( c.compare(z_dim_p_interp_name) == 0 ||
-              c.compare(z_dim_wrf_interp_name) == 0 ||
-              c.compare(z_dim_wrf_pres_name) == 0 ) {
-
-            var->is_pressure = true;
-            z_name = c;
-
-         }
-
-         // track fields that need to be de-staggered in the Z dimension
-         if ( c.compare(z_dim_wrf_stag_name) == 0 ) {
-
-            var->z_stag = true;
-
-         }
-      }
-         // T dimension
-      else if ( c.compare(t_dim_name) == 0 ) {
-
-         var->t_slot = k;
-
-      }
-
-   } // end if k
+   string z_name;
+   if(!parse_dims_for_var(var_name,var, z_name)) {
+      return false;
+   }
 
    bool time_in_pressure = false;
    double pressure_unit_conversion = 1.0;
 
    // if reading var on pressure, find pressure field that is on the same vertical (z) dimension as the var to read
-   if (var->is_pressure) {
+   handle_pressure(var, z_name, P, time_in_pressure, pressure_unit_conversion);
 
-      StringArray varNames;
-      get_var_names(Nc, &varNames);
-
-      for (j = 0; j < Nvars; ++j) {
-         //
-         //  get the pressure variable and store the hPa conversion factor
-         //
-
-         if (varNames[j] == pressure_var_p_interp_name ||
-             varNames[j] == pressure_var_wrf_interp_name ||
-             varNames[j] == pressure_var_wrf_name) {
-
-            varDimNames.clear();
-            get_dim_names(Var[j].var, &varDimNames);
-
-            // check that the z dimension matches the var to read
-            found = false;
-            for(k=0; k< Var[j].Ndims; k++){
-               if(varDimNames[k] == z_name) {
-                  found = true;
-                  break;
-               }
-            }
-
-            if(!found) {
-               continue;
-            }
-
-            // set pressure field
-            P = Var + j;
-
-            if (varNames[j] == pressure_var_wrf_name) {
-
-               time_in_pressure = true;
-
-            }
-            if (strcasecmp(Var[j].units_att.c_str(), pa_units_str) == 0) pressure_unit_conversion = 0.01;
-            else if (strcasecmp(Var[j].units_att.c_str(), hpa_units_str) == 0) pressure_unit_conversion = 1.0;
-         }
-      }
+   if(!check_star_position_and_count(a, var)) {
+      return false;
    }
+
+   setup_dataplane(v, a, plane, dim_count, var);
+
+   //
+   //  get the pressure
+   //
+
+   if ( P && var->z_slot > 0 )  {
+
+      mlog << Debug(3) << "Reading pressure field " << P->name << "\n";
+
+      LongArray c;
+
+      if(time_in_pressure) c.add(a[var->t_slot]);
+   
+      c.add(a[var->z_slot]);
+
+      pressure = data(P->var, c) * pressure_unit_conversion;
+
+   }
+
+   return true;
+
+}
+
+void WrfFile::setup_dataplane(NcVar* v, const LongArray& a, DataPlane& plane, int dim_count, const NcVarInfo* var) const
+{
+   double value;
 
    //
    // set nx and ny based on staggering of dimensions of the variable to read
@@ -778,135 +693,262 @@ if ( !found )  {
    const int Ny = var->y_stag ? grid.ny() + 1 : grid.ny();
 
    //
-   //  check x_slot and y_slot
-   //
-
-if ( var == nullptr || (var->x_slot < 0) || (var->y_slot < 0) )  {
-
-   mlog << Error << "\n" << method_name
-        << "can't find needed dimensions(s) for variable \""
-        << var_name << "\" ... one of the dimensions may be staggered.\n\n";
-
-   return false;
-
-}
-
-   //
-   //  check star positions and count
-   //
-
-count = 0;
-
-for (j=0; j<(a.n_elements()); ++j)  {
-
-   if ( a[j] == vx_data2d_star )  {
-
-      ++count;
-
-      if ( (j != var->x_slot) && (j != var->y_slot) )  {
-
-         mlog << Warning << "\n" << method_name << " star found in bad slot\n\n";
-
-         return false;
-
-      }
-
-   }
-
-}
-
-if ( count != 2 )  {
-
-   mlog << Warning << "\n" << method_name << " bad star count ... " << count << "\n\n";
-
-   return false;
-
-}
-
-   //
-   //  check slots
-   //
-
-const int x_slot = var->x_slot;
-const int y_slot = var->y_slot;
-const int z_slot = var->z_slot;
-
-if ( (x_slot < 0) || (y_slot < 0) )  {
-
-   mlog << Warning << "\n" << method_name << " bad x|y slot\n\n";
-
-   return false;
-
-}
-
-   //
    //  set up the DataPlane object
    //
 
-plane.clear();
-plane.set_size(Nx, Ny);
+   plane.clear();
+   plane.set_size(Nx, Ny);
 
    //
    //  get the data
    //
-vector<double> d(Ny);
+   vector<double> d(Ny);
 
-LongArray offsets;
-LongArray lengths;
+   LongArray offsets;
+   LongArray lengths;
 
-for (int k=0; k<dim_count; k++) {
-  offsets.add((a[k] == vx_data2d_star) ? 0 : a[k]);
-  lengths.add(1);
+   for (int k=0; k<dim_count; k++) {
+      offsets.add((a[k] == vx_data2d_star) ? 0 : a[k]);
+      lengths.add(1);
+   }
+   lengths[var->y_slot] = Ny;
+
+   for (int x=0; x<Nx; ++x)  {
+      offsets[var->x_slot] = x;
+      get_nc_data(v, d.data(), lengths, offsets);
+
+      for (int y=0; y<Ny; ++y)  {
+         value = d[y];
+
+         if (is_bad_data_wrf(value) ) {
+            value = bad_data_double;
+         }
+
+         plane.set(value, x, y);
+
+      } //  for y
+
+   }    //  for x
+
+   // de-stagger the DataPlane if necessary
+   plane.destagger(var->x_stag, var->y_stag);
 }
-lengths[y_slot] = Ny;
 
-int type_id = GET_NC_TYPE_ID_P(v);
-for (x=0; x<Nx; ++x)  {
-   offsets[x_slot] = x;
-   get_nc_data(v, d.data(), lengths, offsets);
+bool WrfFile::check_star_position_and_count(const LongArray& a, const NcVarInfo* var)
+{
+  const char *method_name = "WrfFile::check_star_position_and_count(const LongArray& a, const NcVarInfo* var) const -> ";
+  int count = 0;
+  for (int j =0; j<(a.n_elements()); ++j)  {
 
-   b[x_slot] = x;
+     if ( a[j] == vx_data2d_star )  {
 
-   for (y=0; y<Ny; ++y)  {
-      value = d[y];
+        ++count;
 
-      if (is_bad_data_wrf(value) ) {
-         value = bad_data_double;
+        if ( (j != var->x_slot) && (j != var->y_slot) )  {
+
+           mlog << Warning << "\n" << method_name << " star found in bad slot\n\n";
+
+           return false;
+
+        }
+
+     }
+
+  }
+
+  if ( count != 2 )  {
+
+     mlog << Warning << "\n" << method_name << " bad star count ... " << count << "\n\n";
+
+     return false;
+
+  }
+
+  return true;
+}
+
+void WrfFile::handle_pressure(const NcVarInfo* var, const string& z_name, NcVarInfo*& P,
+                              bool& time_in_pressure, double& pressure_unit_conversion) const
+{
+   if (!var->is_pressure){
+      return;
+   }
+
+   bool found;
+   StringArray varNames;
+   get_var_names(Nc, &varNames);
+   StringArray varDimNames;
+   for (int j = 0; j < Nvars; ++j) {
+      //
+      //  get the pressure variable and store the hPa conversion factor
+      //
+      if (varNames[j] != pressure_var_p_interp_name &&
+          varNames[j] != pressure_var_wrf_interp_name &&
+          varNames[j] != pressure_var_wrf_name) {
+         continue;
       }
 
-      plane.set(value, x, y);
+      varDimNames.clear();
+      get_dim_names(Var[j].var, &varDimNames);
 
-   }   //  for y
+      // check that the z dimension matches the var to read
+      found = false;
+      for(int k=0; k< Var[j].Ndims; k++){
+         if(varDimNames[k] == z_name){
+            found = true;
+            break;
+         }
+      }
 
-}   //  for x
+      if(!found) {
+         continue;
+      }
 
-// de-stagger the DataPlane if necessary
-plane.destagger(var->x_stag, var->y_stag);
+      // set pressure field
+      P = Var + j;
 
-   //
-   //  get the pressure
-   //
+      if (varNames[j] == pressure_var_wrf_name) {
 
-if ( P && z_slot > 0 )  {
+         time_in_pressure = true;
 
-   mlog << Debug(3) << "Reading pressure field " << P->name << "\n";
-
-   LongArray c;
-
-   if(time_in_pressure) c.add(a[var->t_slot]);
-   
-   c.add(a[z_slot]);
-
-   pressure = data(P->var, c) * pressure_unit_conversion;
-
+      }
+      if (strcasecmp(Var[j].units_att.c_str(), pa_units_str) == 0) pressure_unit_conversion = 0.01;
+      else if (strcasecmp(Var[j].units_att.c_str(), hpa_units_str) == 0) pressure_unit_conversion = 1.0;
+   }
 }
 
+bool WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string& z_name)
+{
+   const char *method_name = "WrfFile::parse_dims_for_var(const string& var_name, NcVarInfo* var, string& z_name) const -> ";
+   string c;
+   StringArray varDimNames;
+   get_dim_names(var->var, &varDimNames);
+   for (int k =0; k<(var->Ndims); ++k)  {
+      c = to_lower(varDimNames[k]);
+
+      // X dimension
+      if ( c == x_dim_name || c == x_dim_stag_name || c == x_dim_subgrid_name ) {
+
+         if(!parse_dim_x(var_name, var, c, k)) return false;
+
+      }
+      // Y dimension
+      else if ( c == y_dim_name || c == y_dim_stag_name || c == y_dim_subgrid_name ) {
+
+         parse_dim_y(var, c, k);
+
+      }
+      // Z dimension
+      else if ( c == z_dim_p_interp_name ||
+                c == z_dim_wrf_interp_name ||
+                c == z_dim_wrf_name ||
+                c == z_dim_wrf_stag_name ||
+                c == z_dim_wrf_pres_name ||
+                c == z_dim_wrf_z_name ||
+                c == z_dim_bio_name ||
+                c == z_dim_klevs_name ||
+                c == z_dim_soil_name ||
+                c == z_dim_seed_dim_name) {
+
+         parse_z_dim(var, z_name, c, k);
+
+      }
+      // T dimension
+      else if ( c == t_dim_name ) {
+
+         var->t_slot = k;
+
+      }
+
+   } // end if k
+
    //
-   //  done
+   //  check x_slot and y_slot
    //
 
-return true;
+   if ( var->x_slot < 0 || var->y_slot < 0 )  {
 
+      mlog << Error << "\n" << method_name
+           << "can't find needed dimensions(s) for variable \""
+           << var_name << "\" ... one of the dimensions may be staggered.\n\n";
+
+      return false;
+
+   }
+
+   return true;
+}
+
+void WrfFile::parse_z_dim(NcVarInfo* var, string& z_name, const string& c, int k)
+{
+  var->z_slot = k;
+
+  // track fields that are on pressure levels
+  if ( c == z_dim_p_interp_name ||
+       c == z_dim_wrf_interp_name ||
+       c == z_dim_wrf_pres_name ) {
+
+     var->is_pressure = true;
+     z_name = c;
+
+  }
+
+  // track fields that need to be de-staggered in the Z dimension
+  if ( c == z_dim_wrf_stag_name ) {
+
+     var->z_stag = true;
+
+  }
+}
+
+void WrfFile::parse_dim_y(NcVarInfo* var, const string& c, int k)
+{
+  var->y_slot = k;
+
+  // track fields that need to be de-staggered in the Y dimension
+  if ( c == y_dim_stag_name ) {
+
+     var->y_stag = true;
+
+  }
+
+  // track fields that are on a subgrid
+  if ( c == y_dim_subgrid_name ) {
+     var->y_subgrid = true;
+  }
+}
+
+bool WrfFile::parse_dim_x(const string& var_name, NcVarInfo* var, const string& c, int k)
+{
+  const char *method_name = "WrfFile::parse_dim_x(const string& var_name, NcVarInfo* var, const string& c, int k) -> ";
+  var->x_slot = k;
+
+  // track fields that need to be de-staggered in the X dimension
+  if ( c == x_dim_stag_name ) {
+     var->x_stag = true;
+  }
+
+  // error if env var is set and non-subgrid requested
+  if(getenv("MET_USE_WRF_SUBGRID") != nullptr && c != x_dim_subgrid_name) {
+     mlog << Error << "\n" << method_name
+          << "MET_USE_WRF_SUBGRID is set, but non-subgrid requested for variable "
+          << var_name << "\n\n";
+     return false;
+  }
+
+  // track fields that are on a subgrid
+  if ( c == x_dim_subgrid_name ) {
+     var->x_subgrid = true;
+
+    // error if subgrid field is requested but subgrid grid was not read via env var
+    if(getenv("MET_USE_WRF_SUBGRID") == nullptr) {
+      mlog << Error << "\n" << method_name
+          << "MET_USE_WRF_SUBGRID is not set, but subgrid requested for variable "
+          << var_name << "\n\n";
+      return false;
+    }
+  }
+  return true;
 }
 
 

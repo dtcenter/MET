@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -89,6 +89,8 @@ static netCDF::NcDim range_dim;
 static netCDF::NcDim azimuth_dim;
 static netCDF::NcDim level_dim;
 static netCDF::NcDim track_point_dim;
+static NumArray track_lat;
+static NumArray track_lon;
 
 static std::string range_name;
 static std::string range_units;
@@ -110,14 +112,9 @@ std::vector<double> range_coord;
 std::vector<double> azimuth_coord;
 std::vector<double> level_coord;
 
-std::vector<unixtime> track_valid_time;
-std::vector<double> track_lat;
-std::vector<double> track_lon;
-std::vector<double> track_rmw;
-
 // Variable information
 static std::vector<std::string> data_names;
-static std::vector<int>    data_n_dims;
+static std::vector<int>         data_n_dims;
 static std::vector<std::string> data_long_names;
 static std::vector<std::string> data_units;
 
@@ -129,7 +126,6 @@ static std::vector<DataCube*> data_mins;
 static std::vector<DataCube*> data_maxs;
 
 // Track information
-static TrackInfoArray adeck_tracks;
 static ConcatString adeck_source = "adeck.tmp";
 
 #endif  //  __RMW_ANALYSIS_H__

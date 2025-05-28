@@ -1,15 +1,10 @@
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -27,13 +22,17 @@
 #include "data_plane.h"
 #include "long_array.h"
 #include "nc_var_info.h"
+#include "met_file.hpp"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char nc_met_lat_var_name [] = "lat";
-static const char nc_met_lon_var_name [] = "lon";
+static const std::string nc_met_lat_name      = "lat";
+static const std::string nc_met_lon_name      = "lon";
+static const std::string nc_met_range_name    = "range";
+static const std::string nc_met_azimuth_name  = "azimuth";
+static const std::string nc_met_pressure_name = "pressure";
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -59,7 +58,7 @@ class MetNcFile {
 
       void dump(std::ostream &, int = 0) const;
 
-      netCDF::NcFile * Nc;      //  allocated
+      netCDF::NcFile * Nc;    //  allocated
 
          //
          //  dimensions
@@ -73,6 +72,8 @@ class MetNcFile {
 
       netCDF::NcDim * Xdim;   //  not allocated
       netCDF::NcDim * Ydim;   //  not allocated
+      netCDF::NcDim * Tdim;   //  not allocated
+      netCDF::NcDim * Zdim;   //  not allocated
 
          //
          //  variables
@@ -92,6 +93,8 @@ class MetNcFile {
          //  data
          //
 
+      bool is_range_azimuth() const;
+
       double data(netCDF::NcVar *, const LongArray &) const;
 
       bool data(netCDF::NcVar *, const LongArray &, DataPlane &) const;
@@ -102,16 +105,16 @@ class MetNcFile {
 
 };
 
+////////////////////////////////////////////////////////////////////////
+
+inline bool MetNcFile::is_range_azimuth() const { return grid.is_set() && grid.info().ra; }
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "met_file.hpp"
+extern bool is_ncmet_range_azimuth_file(netCDF::NcFile *);
 
 ////////////////////////////////////////////////////////////////////////
 
 #endif   /*  __MET_FILE_H__  */
 
-
 ////////////////////////////////////////////////////////////////////////
-
-

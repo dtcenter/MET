@@ -1,0 +1,20 @@
+#%Module######################################################################
+##
+##      Model Evaluation Tools
+##
+proc ModulesHelp { } {
+  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v12.1.0
+     *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
+}
+
+prereq intel/2024.2.1
+
+set base /contrib/met/12.1.0
+set ver 12.1.0
+set share $base/share/met
+setenv MET_ROOT $base/$ver/MET-12.1.0
+
+prepend-path PATH $base/bin:$base/external_libs/bin:/mnt/lfs6/HFIP/dtc-hurr/METplus/miniconda/miniconda3/envs/metplus_v6.1_py3.12/bin
+
+setenv MET_PYTHON_EXE /mnt/lfs5/HFIP/dtc-hurr/METplus/miniconda/miniconda3/envs/metplus_v6.1_py3.12/bin/python
+

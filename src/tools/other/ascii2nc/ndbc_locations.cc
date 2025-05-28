@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -105,10 +105,10 @@ bool NdbcLocations::initialize(const string &fName)
 
     // store lower case only, for later comparisons
     std::transform(stationId.begin(), stationId.end(), stationId.begin(), ::tolower);
-    StationId.push_back(stationId);
-    Lat.push_back(lat);
-    Lon.push_back(lon);
-    Elev.push_back(elev);
+    StationId.emplace_back(stationId);
+    Lat.emplace_back(lat);
+    Lon.emplace_back(lon);
+    Elev.emplace_back(elev);
   }
   locFile.close();
   return true;

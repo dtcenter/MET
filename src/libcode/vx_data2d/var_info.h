@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -106,7 +106,7 @@ class VarInfo
          // get stuff
          //
 
-      virtual GrdFileType  file_type() const = 0;
+      virtual GrdFileType file_type() const = 0;
 
       ConcatString magic_str()      const;
       ConcatString magic_time_str() const;

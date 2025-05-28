@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -82,6 +82,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
+#include <array>
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -104,6 +105,10 @@
 
 #include "nc_obs_util.h"
 #include "nc_point_obs_in.h"
+
+#ifdef WITH_PROFILER
+#include "ctrack.hpp"
+#endif
 
 #ifdef WITH_PYTHON
 #include "data2d_nc_met.h"
@@ -193,6 +198,11 @@ int met_main(int argc, char *argv[]) {
 
    // Perform verification
    process_vx();
+
+  // Save the CTRACK metrics 
+  #ifdef WITH_PROFILER
+  ctrack::result_print();
+  #endif
 
    // Close the text files and deallocate memory
    clean_up();
@@ -544,6 +554,9 @@ void process_grid(const Grid &fcst_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_n_vld() {
+   #ifdef WITH_PROFILER
+   CTRACK;
+   #endif
    int i_var, i_ens, j, n_vld, n_ens_inputs;
    DataPlane dp;
    DataPlaneArray dpa;
@@ -700,15 +713,15 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
 
          // Loop through the forecast fields
          for(i=0; i<dpa.n_planes(); i++) {
-            dpa[i] = met_regrid(dpa[i], mtddf->grid(), grid,
-                                info->regrid());
+            dpa.at(i) = met_regrid(dpa[i], mtddf->grid(), grid,
+                                   info->regrid());
          }
       }
 
       // Rescale probabilities from [0, 100] to [0, 1]
       if(info->is_prob()) {
          for(i=0; i<dpa.n_planes(); i++) {
-            rescale_probability(dpa[i]);
+            rescale_probability(dpa.at(i));
          }
       } // end for i
 
@@ -736,6 +749,9 @@ bool get_data_plane_array(const char *infile, GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void process_vx() {
+   #ifdef WITH_PROFILER
+   CTRACK;
+   #endif
 
    // Process masks Grids and Polylines in the config file
    conf_info.process_masks(grid);
@@ -1021,10 +1037,11 @@ void process_point_obs(int i_nc) {
 
    const int buf_size = ((obs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : obs_count);
 
-   int   obs_qty_idx_block[buf_size];
-   float obs_arr_block[buf_size][OBS_ARRAY_LEN];
-   float obs_arr[OBS_ARRAY_LEN], hdr_arr[HDR_ARRAY_LEN];
-   int  hdr_typ_arr[HDR_TYPE_ARR_LEN];
+   vector<int> obs_qty_idx_block(buf_size);
+   vector<std::array<float, OBS_ARRAY_LEN>> obs_arr_block(buf_size);
+   float obs_arr[OBS_ARRAY_LEN];
+   float hdr_arr[HDR_ARRAY_LEN];
+   int   hdr_typ_arr[HDR_TYPE_ARR_LEN];
    ConcatString hdr_typ_str;
    ConcatString hdr_sid_str;
    ConcatString hdr_vld_str;
@@ -1041,11 +1058,14 @@ void process_point_obs(int i_nc) {
 #ifdef WITH_PYTHON
       if (use_python)
          status = met_point_obs->get_point_obs_data()->fill_obs_buf(
-                             buf_size2, i_start, (float *)obs_arr_block, obs_qty_idx_block);
+                             buf_size2, i_start,
+                             (float *) obs_arr_block.data(),
+                             obs_qty_idx_block.data());
       else
 #endif
-         status = nc_point_obs.read_obs_data(buf_size2, i_start, (float *)obs_arr_block,
-                                             obs_qty_idx_block, (char *)0);
+         status = nc_point_obs.read_obs_data(buf_size2, i_start,
+                                             (float *) obs_arr_block.data(),
+                                             obs_qty_idx_block.data(), nullptr);
       if (!status) exit(1);
 
       // Process each observation in the file
@@ -2077,7 +2097,7 @@ void setup_table(AsciiTable &at) {
    at.set_bad_data_str(na_str);
 
    // Don't write out trailing blank rows
-   at.set_delete_trailing_blank_rows(1);
+   at.set_delete_trailing_blank_rows(true);
 
    return;
 }
@@ -2844,7 +2864,7 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\tn_ens ens_file_1 ... ens_file_n | ens_file_list\n"
+        << "\tn_ens file_1 ... file_n | file_list\n"
         << "\tconfig_file\n"
         << "\t[-grid_obs file]\n"
         << "\t[-point_obs file]\n"
@@ -2857,11 +2877,11 @@ void usage() {
         << "\t[-v level]\n"
         << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"n_ens ens_file_1 ... ens_file_n\" is the number "
+        << "\twhere\t\"n_ens file_1 ... file_n\" is the number "
         << "of ensemble members followed by a list of ensemble member "
         << "file names (required).\n"
 
-        << "\t\t\"ens_file_list\" is an ASCII file containing a list "
+        << "\t\t\"file_list\" is an ASCII file containing a list "
         << "of ensemble member file names (required).\n"
 
         << "\t\t\"config_file\" is an EnsembleStatConfig file "

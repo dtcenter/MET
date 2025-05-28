@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -115,6 +115,7 @@
 //   057    07/05/24  Halley Gotway  MET #2924 Support forecast climatology.
 //   058    10/03/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
 //   059    11/15/24  Halley Gotway  MET #3020 SEEPS NetCDF output.
+//   060    05/05/24  Halley Gotway  MET #3145 Add OpenMP.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -130,7 +131,6 @@
 
 #include <netcdf>
 #include "main.h"
-#include "handle_openmp.h"
 
 #include "grid_stat.h"
 
@@ -207,9 +207,6 @@ static void set_ugrid_config(const StringArray &);
 ////////////////////////////////////////////////////////////////////////
 
 int met_main(int argc, char *argv[]) {
-
-   // Set up OpenMP (if enabled)
-   init_openmp();
 
    // Process the command line arguments
    process_command_line(argc, argv);
@@ -352,8 +349,9 @@ void process_command_line(int argc, char **argv) {
 #endif
    }
 
-   // For python types read the first field to set the grid
-   if(is_python_grdfiletype(ftype)) {
+   // For python types and range/azimuth grids, read the first field to set the grid
+   if(is_python_grdfiletype(ftype) ||
+      fcst_mtddf->grid().info().ra) {
       if(!fcst_mtddf->data_plane(*conf_info.vx_opt[0].fcst_info, dp)) {
          mlog << Error << "\nTrouble reading data from forecast file \""
               << fcst_file << "\"\n\n";
@@ -361,7 +359,8 @@ void process_command_line(int argc, char **argv) {
       }
    }
 
-   if(is_python_grdfiletype(otype)) {
+   if(is_python_grdfiletype(otype) ||
+      obs_mtddf->grid().info().ra) {
       if(!obs_mtddf->data_plane(*conf_info.vx_opt[0].obs_info, dp)) {
          mlog << Error << "\nTrouble reading data from observation file \""
               << obs_file << "\"\n\n";
@@ -587,7 +586,7 @@ void setup_table(AsciiTable &at) {
    at.set_bad_data_str(na_str);
 
    // Don't write out trailing blank rows
-   at.set_delete_trailing_blank_rows(1);
+   at.set_delete_trailing_blank_rows(true);
 
    return;
 }
@@ -823,12 +822,11 @@ void process_scores() {
            << (ocsd_dp.is_empty() ? 0 : 1) << " standard deviation field(s).\n";
 
       // Apply MPR threshold filters
-      if(conf_info.vx_opt[i].mpr_sa.n() > 0) {
+      if(conf_info.vx_opt[i].mpr_thr_inc_map.size() > 0) {
          apply_mpr_thresh_mask(fcst_dp, obs_dp,
                                fcmn_dp, fcsd_dp,
                                ocmn_dp, ocsd_dp,
-                               conf_info.vx_opt[i].mpr_sa,
-                               conf_info.vx_opt[i].mpr_ta);
+                               conf_info.vx_opt[i].mpr_thr_inc_map);
       }
 
       // Setup the first pass through the data
@@ -2703,15 +2701,15 @@ void do_nbrcnt(NBRCNTInfo &nbrcnt_info,
 void write_nc(const ConcatString &field_name, const DataPlane &dp,
               int i_vx, const ConcatString &interp_mthd,
               int interp_pnts, FieldType field_type) {
-   int i, x, y, n, n_masks;
-   ConcatString var_name, var_suffix, interp_str, mask_str;
-   ConcatString fcst_name, obs_name, fcst_obs_name;
-   ConcatString fcst_long_name, obs_long_name;
-   ConcatString long_att, level_att, units_att;
-   NcVar nc_var;
-   bool apply_mask;
+   ConcatString var_name;
+   ConcatString long_att;
+   ConcatString level_att;
+   ConcatString units_att;
 
    // Set output forecast and observation names
+   ConcatString fcst_name;
+   ConcatString obs_name;
+   ConcatString fcst_obs_name;
    if(conf_info.vx_opt[i_vx].var_name.length() > 0) {
       fcst_name = obs_name = fcst_obs_name = conf_info.vx_opt[i_vx].var_name;
    }
@@ -2724,22 +2722,26 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    }
 
    // Set output forecast and observation long names
-   fcst_long_name = (conf_info.vx_opt[i_vx].fcst_info->long_name_attr().empty() ?
-                     conf_info.vx_opt[i_vx].fcst_info->name_attr() :
-                     conf_info.vx_opt[i_vx].fcst_info->long_name_attr());
+   ConcatString fcst_long_name =
+                   (conf_info.vx_opt[i_vx].fcst_info->long_name_attr().empty() ?
+                    conf_info.vx_opt[i_vx].fcst_info->name_attr() :
+                    conf_info.vx_opt[i_vx].fcst_info->long_name_attr());
    fcst_long_name << " at " << conf_info.vx_opt[i_vx].fcst_info->level_attr();
 
-   obs_long_name  = (conf_info.vx_opt[i_vx].obs_info->long_name_attr().empty() ?
-                     conf_info.vx_opt[i_vx].obs_info->name_attr() :
-                     conf_info.vx_opt[i_vx].obs_info->long_name_attr());
+   ConcatString obs_long_name =
+                   (conf_info.vx_opt[i_vx].obs_info->long_name_attr().empty() ?
+                    conf_info.vx_opt[i_vx].obs_info->name_attr() :
+                    conf_info.vx_opt[i_vx].obs_info->long_name_attr());
    obs_long_name  << " at " << conf_info.vx_opt[i_vx].obs_info->level_attr();
 
    // Append nc_pairs_var_suffix config file entry
+   ConcatString var_suffix;
    if(conf_info.vx_opt[i_vx].var_suffix.length() > 0) {
       var_suffix << "_" << conf_info.vx_opt[i_vx].var_suffix;
    }
 
    // Append smoothing info for all but nearest neighbor
+   ConcatString interp_str;
    if(interp_pnts > 1 ||
       interp_mthd == interpmthd_to_string(InterpMthd::Gaussian)) {
       interp_str << "_" << interp_mthd << "_" << interp_pnts;
@@ -2753,8 +2755,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    // MET-621: When the nc_pairs flag 'apply_mask'= FALSE in the config
    // file, generate the output NetCDF file for the full domain only.
    // The default behavior is to generate fields for each masking region.
-   apply_mask = conf_info.vx_opt[i_vx].nc_info.do_apply_mask;
-   n_masks    = (apply_mask ? conf_info.vx_opt[i_vx].get_n_mask() : 1);
+   bool apply_mask = conf_info.vx_opt[i_vx].nc_info.do_apply_mask;
+   int  n_masks    = (apply_mask ? conf_info.vx_opt[i_vx].get_n_mask() : 1);
 
    // Allocate memory
    vector<float> data(grid.nxy());
@@ -2764,11 +2766,11 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
    if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
    // Process each of the masking regions
-   for(i=0; i<n_masks; i++) {
+   for(int i=0; i<n_masks; i++) {
 
       // If apply_mask is true, create fields for each masking region.
       // Otherwise create only fields for the FULL domain.
-      mask_str = (apply_mask ? conf_info.vx_opt[i_vx].mask_name[i] : "FULL");
+      ConcatString mask_str = (apply_mask ? conf_info.vx_opt[i_vx].mask_name[i] : "FULL");
 
       // Build the NetCDF variable name
       if(field_name == "FCST") {
@@ -2976,8 +2978,8 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       nc_var_sa.add(var_name);
 
       // Define the variable
-      nc_var = add_var(nc_out, (string) var_name,
-                       ncFloat, lat_dim, lon_dim, deflate_level);
+      NcVar nc_var = add_var(nc_out, var_name.string(), ncFloat,
+                             lat_dim, lon_dim, deflate_level);
 
       // Add variable attributes
       add_var_att_local(&nc_var, "name", nc_var.getName());
@@ -2995,23 +2997,29 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
       MaskPlane * mask_ptr =
          &conf_info.mask_map[conf_info.vx_opt[i_vx].mask_name[i]];
 
+#pragma omp parallel default(none) \
+      shared(grid, DefaultTO, apply_mask, mask_ptr, data, dp, bad_data_float)
+      {
+
       // Store the data
-      for(x=0; x<grid.nx(); x++) {
-         for(y=0; y<grid.ny(); y++) {
+#pragma omp for schedule(static) \
+                collapse(2)
+         for(int x=0; x<grid.nx(); x++) {
+            for(int y=0; y<grid.ny(); y++) {
 
-            n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+               int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
 
-            // Check apply_mask
-            if(!apply_mask ||
-               (apply_mask && mask_ptr->s_is_on(x, y))) {
-               data[n] = dp.get(x, y);
-            }
-            else {
-               data[n] = bad_data_float;
-            }
-
-         } // end for y
-      } // end for x
+               // Check apply_mask
+               if(!apply_mask ||
+                  (apply_mask && mask_ptr->s_is_on(x, y))) {
+                  data[n] = dp.get(x, y);
+               }
+               else {
+                  data[n] = bad_data_float;
+               }
+            } // end for y
+         } // end for x
+      } // End of omp parallel
 
       // Write out the data
       if(!put_nc_data_with_dims(&nc_var, data.data(), grid.ny(), grid.nx())) {
@@ -3031,36 +3039,33 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
 void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
                     int i_vx, const SingleThresh &fcst_st,
                     const SingleThresh &obs_st, int i_mask, int wdth) {
-   int n, x, y;
-   int fcst_flag, obs_flag;
-   ConcatString fcst_var_name, obs_var_name, var_suffix, mask_str;
-   ConcatString fcst_name, obs_name, att_str, mthd_str, nbrhd_str;
-   bool apply_mask;
+   ConcatString fcst_name;
+   ConcatString obs_name;
+   ConcatString att_str;
 
    // Set output forecast and observation names
    if(conf_info.vx_opt[i_vx].var_name.length() > 0) {
       fcst_name = obs_name = conf_info.vx_opt[i_vx].var_name;
    }
    else {
-      fcst_name     << conf_info.vx_opt[i_vx].fcst_info->name_attr() << "_"
-                    << conf_info.vx_opt[i_vx].fcst_info->level_attr();
-      obs_name      << conf_info.vx_opt[i_vx].obs_info->name_attr() << "_"
-                    << conf_info.vx_opt[i_vx].obs_info->level_attr();
+      fcst_name << conf_info.vx_opt[i_vx].fcst_info->name_attr() << "_"
+                << conf_info.vx_opt[i_vx].fcst_info->level_attr();
+      obs_name  << conf_info.vx_opt[i_vx].obs_info->name_attr() << "_"
+                << conf_info.vx_opt[i_vx].obs_info->level_attr();
    }
 
    // Append nc_pairs_var_suffix config file entry
+   ConcatString var_suffix;
    if(conf_info.vx_opt[i_vx].var_suffix.length() > 0) {
       var_suffix << "_" << conf_info.vx_opt[i_vx].var_suffix;
    }
 
    // Store the apply_mask option
-   apply_mask = conf_info.vx_opt[i_vx].nc_info.do_apply_mask;
-
-   NcVar fcst_var;
-   NcVar obs_var;
+   bool apply_mask = conf_info.vx_opt[i_vx].nc_info.do_apply_mask;
 
    // Get the interpolation strings
-   mthd_str = interpmthd_to_string(InterpMthd::Nbrhd);
+   ConcatString mthd_str = interpmthd_to_string(InterpMthd::Nbrhd);
+   ConcatString nbrhd_str;
    if(wdth > 1) nbrhd_str << "_" << mthd_str << "_" << wdth*wdth;
 
    int deflate_level = compress_level;
@@ -3068,21 +3073,23 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
    // If apply_mask is true, create fields for each masking region.
    // Otherwise create only fields for the FULL domain.
-   mask_str = (apply_mask ? conf_info.vx_opt[i_vx].mask_name[i_mask] : "FULL");
+   ConcatString mask_str = (apply_mask ? conf_info.vx_opt[i_vx].mask_name[i_mask] : "FULL");
 
    // Build the forecast variable name
-   fcst_var_name << cs_erase << "FCST_"
+   ConcatString fcst_var_name;
+   fcst_var_name << "FCST_"
                  << fcst_name << var_suffix << "_" << mask_str << "_"
                  << fcst_st.get_abbr_str() << nbrhd_str;
 
    // Build the observation variable name
-   obs_var_name << cs_erase << "OBS_"
+   ConcatString obs_var_name;
+   obs_var_name << "OBS_"
                 << obs_name << var_suffix << "_" << mask_str << "_"
                 << obs_st.get_abbr_str() << nbrhd_str;
 
    // Figure out which fields should be written
-   fcst_flag = !nc_var_sa.has(fcst_var_name);
-   obs_flag  = !nc_var_sa.has(obs_var_name);
+   bool fcst_flag = !nc_var_sa.has(fcst_var_name);
+   bool obs_flag  = !nc_var_sa.has(obs_var_name);
 
    // Check for nothing to do
    if(!fcst_flag && !obs_flag) return;
@@ -3092,10 +3099,12 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    vector<float> obs_data (grid.nxy());
 
    // Add the forecast variable
+   NcVar fcst_var;
+
    if(fcst_flag) {
 
       // Define the forecast variable
-      fcst_var = add_var(nc_out, (string) fcst_var_name, ncFloat,
+      fcst_var = add_var(nc_out, fcst_var_name.string(), ncFloat,
                          lat_dim, lon_dim, deflate_level);
 
       // Add to the list of previously defined variables
@@ -3118,11 +3127,13 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    } // end fcst_flag
 
    // Add the observation variable
+   NcVar obs_var;
+
    if(obs_flag) {
 
       // Define the observation variable
-      obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
-                            lat_dim, lon_dim, deflate_level);
+      obs_var = add_var(nc_out, obs_var_name.string(), ncFloat,
+                        lat_dim, lon_dim, deflate_level);
 
       // Add to the list of previously defined variables
       nc_var_sa.add(obs_var_name);
@@ -3147,24 +3158,32 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    MaskPlane * mask_ptr =
       &conf_info.mask_map[conf_info.vx_opt[i_vx].mask_name[i_mask]];
 
-   // Store the forecast and observation values
-   for(x=0; x<grid.nx(); x++) {
-      for(y=0; y<grid.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(grid, DefaultTO, apply_mask, mask_ptr) \
+   shared(fcst_data, obs_data, fcst_dp, obs_dp, bad_data_float)
+   {
 
-         n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+      // Store the forecast and observation values
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<grid.nx(); x++) {
+         for(int y=0; y<grid.ny(); y++) {
 
-         // Check apply_mask
-         if(!apply_mask ||
-            (apply_mask && mask_ptr->s_is_on(x, y))) {
-             fcst_data[n] = fcst_dp.get(x, y);
-              obs_data[n] =  obs_dp.get(x, y);
-         }
-         else {
-            fcst_data[n] = bad_data_float;
-             obs_data[n] = bad_data_float;
-         }
-      } // end for y
-   } // end for x
+            int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
+
+            // Check apply_mask
+            if(!apply_mask ||
+               (apply_mask && mask_ptr->s_is_on(x, y))) {
+                fcst_data[n] = fcst_dp.get(x, y);
+                 obs_data[n] =  obs_dp.get(x, y);
+            }
+            else {
+               fcst_data[n] = bad_data_float;
+                obs_data[n] = bad_data_float;
+            }
+         } // end for y
+      } // end for x
+   } // End omp parallel
 
    // Write out the forecast field
    if(fcst_flag) {

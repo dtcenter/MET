@@ -461,7 +461,7 @@ fi
 # Enable all compilation options 
 
 AC_ARG_ENABLE(all,
-	  [AS_HELP_STRING([--enable-all], [Enable compilation options --enable-grib2 --enable-python --enable-ugrid --enable-lidar2nc --enable-modis --enable-mode_graphics])],
+	      [AS_HELP_STRING([--enable-all], [Enable compilation options --enable-grib2 --enable-python --enable-ugrid --enable-lidar2nc --enable-modis --enable-mode_graphics, but not --enable-profiler])],
   [case "${enableval}" in
      yes | no ) ENABLE_ALL="${enableval}" ;;
      *) AC_MSG_ERROR(bad value ${enableval} for --enable-all) ;;
@@ -898,6 +898,26 @@ else
   AC_MSG_NOTICE([point_stat will not be compiled])
 fi
 
+# pair_stat
+
+AC_ARG_ENABLE(pair_stat,
+	  [AS_HELP_STRING([--disable-pair_stat], [Disable compilation of pair_stat])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_PAIR_STAT="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --disable-pair_stat) ;;
+   esac],
+  [ENABLE_PAIR_STAT="yes"]
+)
+
+AM_CONDITIONAL([ENABLE_PAIR_STAT], [test "x$ENABLE_PAIR_STAT" = "xyes"])
+
+if test "x$ENABLE_PAIR_STAT" = "xyes"; then
+  AC_DEFINE([ENABLE_PAIR_STAT], [], ["build pair_stat"])
+  AC_MSG_NOTICE([pair_stat will be compiled])
+else
+  AC_MSG_NOTICE([pair_stat will not be compiled])
+fi
+
 # stat_analysis
 
 AC_ARG_ENABLE(stat_analysis,
@@ -1167,6 +1187,27 @@ fi
 AC_SUBST([UGRID_MET_LIBS])
 AC_SUBST([UGRID_DEP_LIBS])
 
+# Profiling component with CTRACK
+
+AC_ARG_ENABLE(profiler,
+	  [AS_HELP_STRING([--enable-profiler], [Enable compilation of profiling support with CTRACK])],
+  [case "${enableval}" in
+     yes | no ) ENABLE_PROFILER="${enableval}" ;;
+     *) AC_MSG_ERROR(bad value ${enableval} for --enable-profiler) ;;
+   esac],
+  [ENABLE_PROFILER="no"]
+)
+
+AM_CONDITIONAL([ENABLE_PROFILER], [test "x$ENABLE_PROFILER" = "xyes"])
+
+if test "x$ENABLE_PROFILER" = "xyes" ; then
+  AC_DEFINE([ENABLE_PROFILER], [], ["build profiling support"])
+  AC_MSG_NOTICE([profiling support will be compiled])
+  CPPFLAGS="${CPPFLAGS} -DWITH_PROFILER"
+else
+  AC_MSG_NOTICE([profiling support will not be compiled])
+fi
+
 ########################################################################
 
 # Check for the MET_DEVELOPMENT environment variable
@@ -1370,6 +1411,7 @@ AC_CONFIG_FILES([Makefile
                  src/libcode/vx_bool_calc/Makefile
                  src/libcode/vx_pointdata_python/Makefile
                  src/libcode/vx_seeps/Makefile
+                 src/libcode/vx_ioda/Makefile
                  src/tools/Makefile
                  src/tools/core/Makefile
                  src/tools/core/ensemble_stat/Makefile
@@ -1378,6 +1420,7 @@ AC_CONFIG_FILES([Makefile
                  src/tools/core/mode_analysis/Makefile
                  src/tools/core/pcp_combine/Makefile
                  src/tools/core/point_stat/Makefile
+                 src/tools/core/pair_stat/Makefile
                  src/tools/core/series_analysis/Makefile
                  src/tools/core/stat_analysis/Makefile
                  src/tools/core/wavelet_stat/Makefile

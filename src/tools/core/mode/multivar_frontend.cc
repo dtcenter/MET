@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,7 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
 
 #include "multivar_frontend.h"
 #include "mode_usage.h"
@@ -18,9 +17,7 @@
 
 using namespace std;
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 extern const char * const program_name;
 
@@ -99,18 +96,18 @@ int MultivarFrontEnd::run(const StringArray & Argv)
    int NCRO = config.n_conv_radii_obs();
 
    if (NCTF != NCTO) {
-      mlog << Error << "\nMultivarFrontEnd::run() ->"
+      mlog << Error << "\nMultivarFrontEnd::run() -> "
            << "all convolution threshold arrays must have the same number of elements\n\n";
       exit ( 1 );
    }
    if (NCRF != NCRO) {
-      mlog << Error << "\nMultivarFrontEnd::run() ->"
+      mlog << Error << "\nMultivarFrontEnd::run() -> "
            << "all convolution radius arrays must have the same number of elements\n\n";
       exit ( 1 );
    }
 
    if ((!config.quilt) && (NCTF != NCRF || NCTO != NCRO)) {
-      mlog << Error << "\nMultivarFrontEnd::run() ->"
+      mlog << Error << "\nMultivarFrontEnd::run() -> "
            << "all convolution radius and threshold arrays must have the same number of elements without quilting\n\n";
       exit ( 1 );
    }
@@ -131,10 +128,10 @@ int MultivarFrontEnd::run(const StringArray & Argv)
             SimpleObjects OO;
             _create_simple_objects(ModeDataType::MvMode_Fcst, "forecast", ir, it, n_fcst_files,
                                    fcst_filenames, fcstInput, f_calc, OF);
-            fcstSimple.push_back(OF);
+            fcstSimple.emplace_back(OF);
             _create_simple_objects(ModeDataType::MvMode_Obs, "obs", ir, it, n_obs_files,
                                    obs_filenames, obsInput, o_calc, OO);
-            obsSimple.push_back(OO);
+            obsSimple.emplace_back(OO);
          }
       }
    }
@@ -144,10 +141,10 @@ int MultivarFrontEnd::run(const StringArray & Argv)
          SimpleObjects OO;
          _create_simple_objects(ModeDataType::MvMode_Fcst, "forecast", ir, ir, n_fcst_files,
                                 fcst_filenames, fcstInput, f_calc, OF);
-         fcstSimple.push_back(OF);
+         fcstSimple.emplace_back(OF);
          _create_simple_objects(ModeDataType::MvMode_Obs, "obs", ir, ir, n_obs_files,
                                 obs_filenames, obsInput, o_calc, OO);
-         obsSimple.push_back(OO);
+         obsSimple.emplace_back(OO);
       }
    }
 
@@ -326,7 +323,7 @@ void MultivarFrontEnd::_setup_inputs()
 
    if ( config.fcst_multivar_logic.empty() )  {
 
-      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() ->"
+      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() -> "
            << "fcst multivar logic not specified in multivar mode!\n\n";
       exit ( 1 );
 
@@ -334,7 +331,7 @@ void MultivarFrontEnd::_setup_inputs()
 
    if ( config.obs_multivar_logic.empty() )  {
 
-      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() ->"
+      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() -> "
            << "obs multivar logic not specified in multivar mode!\n\n";
       exit ( 1 );
 
@@ -351,7 +348,7 @@ void MultivarFrontEnd::_setup_inputs()
    //
    if ( n_fcst_files < 2 && n_obs_files < 2) {
 
-      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() ->"
+      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() -> "
            << "Want at least 2 input files for fcst or obs in multivar mode, neither had 2 or more\n\n";
       exit ( 1 );
    }
@@ -371,10 +368,9 @@ void MultivarFrontEnd::_setup_inputs()
       exit ( 1 );
    }
 
-
    if (config.fcst_multivar_compare_index.n() != config.obs_multivar_compare_index.n()) {
-      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() ->"
-           << " Need equal number of multivar_compare_index entries for obs and fcst\n\n";
+      mlog << Error << "\nMultivarFrontEnd::_setup_inputs() -> "
+           << "Need equal number of multivar_compare_index entries for obs and fcst\n\n";
       exit(1);
    }
 
@@ -384,14 +380,14 @@ void MultivarFrontEnd::_setup_inputs()
       int findex = config.fcst_multivar_compare_index[k];
       int oindex = config.obs_multivar_compare_index[k];
       if (findex <= 0 || findex > n_fcst_files) {
-         mlog << Error << "\nMultivarFrontEnd::_setup_inputs() ->"
-              << " forecast index " << findex
+         mlog << Error << "\nMultivarFrontEnd::_setup_inputs() -> "
+              << "forecast index " << findex
               << " out of range, " << conf_key_fcst_multivar_compare_index << " array\n";
          badIndex = true;
       }
       if (oindex <= 0 || oindex > n_obs_files) {
-         mlog << Error << "\nMultivarFrontEnd::_setup_inputs() ->"
-              << " obs index " << oindex
+         mlog << Error << "\nMultivarFrontEnd::_setup_inputs() -> "
+              << "obs index " << oindex
               << " out of range, " << conf_key_obs_multivar_compare_index << " array\n";
          badIndex = true;
       }
@@ -428,8 +424,8 @@ void MultivarFrontEnd::_set_output_path()
 
       if ( status < 0 )  {
 
-         mlog << Error << "\nMultivarFrontEnd::_set_output_path() ->"
-              << " unable to create output directory \""
+         mlog << Error << "\nMultivarFrontEnd::_set_output_path() -> "
+              << "unable to create output directory \""
               << output_path << "\"\n\n";
 
          exit ( 1 );
@@ -454,7 +450,7 @@ int MultivarFrontEnd::_mkdir(const char *dir) const
          string s = tmp;
          if (s != "." &&
              mkdir(tmp, dir_creation_mode) < 0) {
-            mlog << Error << "\nMultivarFrontEnd::_mkdir() ->"
+            mlog << Error << "\nMultivarFrontEnd::_mkdir() -> "
                  << "Error making " << tmp << "\n";
             return -1;
          }
@@ -466,20 +462,21 @@ int MultivarFrontEnd::_mkdir(const char *dir) const
 
 ////////////////////////////////////////////////////////////////////////
 
-void MultivarFrontEnd::_read_input(const string &name, int index, ModeDataType type,
-                                   GrdFileType f_t, GrdFileType other_t, int shift)
+void MultivarFrontEnd::_read_input(
+                          const string &name, int index,
+                          ModeDataType type, GrdFileType f_t,
+                          GrdFileType other_t, int shift)
 {
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *f = mtddf_factory.new_met_2d_data_file(name.c_str(), f_t);
    if (!f) {
-      mlog << Error << "\nMultivarFrontEnd::_read_input() ->"
-           << "\nTrouble reading fcst file \"" << name << "\"\n\n";
+      mlog << Error << "\nMultivarFrontEnd::_read_input() -> "
+           << "Trouble reading fcst file \"" << name << "\"\n\n";
       exit(1);
    }
-   Grid g = f->grid();
    GrdFileType ft = f->file_type();
 
-   //?
+   // store shift right setting
    f->set_shift_right(shift);
 
    // update config now that we know file type (this sets Fcst to index i)
@@ -488,11 +485,11 @@ void MultivarFrontEnd::_read_input(const string &name, int index, ModeDataType t
    if (type == ModeDataType::MvMode_Fcst) {
       config.process_config_field(ft, other_t, type, index);
       f->data_plane(*(config.Fcst->var_info), dp);
-      fcstInput.push_back(ModeInputData(name, dp, g));
+      fcstInput.emplace_back(ModeInputData(name, dp, f->grid()));
    } else {
       config.process_config_field(other_t, ft, type, index);
       f->data_plane(*(config.Obs->var_info), dp);
-      obsInput.push_back(ModeInputData(name, dp, g));
+      obsInput.emplace_back(ModeInputData(name, dp, f->grid()));
    }         
       
    delete f;
@@ -512,11 +509,12 @@ void MultivarFrontEnd::_create_verif_grid()
 
 ////////////////////////////////////////////////////////////////////////
 
-void MultivarFrontEnd::_create_simple_objects(ModeDataType dtype, const std::string &name,
-                                              int rIndex, int tIndex, int n_files,
-                                              const StringArray &filenames,
-                                              const std::vector<ModeInputData> &input,
-                                              BoolCalc &calc, SimpleObjects &O) const
+void MultivarFrontEnd::_create_simple_objects(
+                          ModeDataType dtype, const std::string &name,
+                          int rIndex, int tIndex, int n_files,
+                          const StringArray &filenames,
+                          const std::vector<ModeInputData> &input,
+                          BoolCalc &calc, SimpleObjects &O) const
 {
    O.init(dtype, rIndex, tIndex);
    for (int j=0; j<n_files; ++j)  {
@@ -527,18 +525,19 @@ void MultivarFrontEnd::_create_simple_objects(ModeDataType dtype, const std::str
       MultiVarData *mvdi = _create_simple_multivar_data(dtype, rIndex, tIndex, j, n_files, 
                                                         filenames[j], input[j]);
       mvdi->print();
-      O._mvd.push_back(mvdi);
+      O._mvd.emplace_back(mvdi);
    }
    O.setSuper(dtype == ModeDataType::MvMode_Fcst, n_files, do_clusters, calc);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-MultiVarData *MultivarFrontEnd::_create_simple_multivar_data(ModeDataType dtype,
-                                                             int rIndex, int tIndex,
-                                                             int j, int n_files,
-                                                             const string &filename,
-                                                             const ModeInputData &input) const
+MultiVarData *MultivarFrontEnd::_create_simple_multivar_data(
+                                   ModeDataType dtype,
+                                   int rIndex, int tIndex,
+                                   int j, int n_files,
+                                   const string &filename,
+                                   const ModeInputData &input) const
 {
    //
    // create simple non merged objects
@@ -560,11 +559,12 @@ MultiVarData *MultivarFrontEnd::_create_simple_multivar_data(ModeDataType dtype,
 
 ////////////////////////////////////////////////////////////////////////
 
-void MultivarFrontEnd::_simple_objects(ModeExecutive::Processing_t p,
-                                       ModeDataType dtype, int rIndex, 
-                                       int tIndex, int j, int n_files,
-                                       const string &filename,
-                                      const ModeInputData &input) const
+void MultivarFrontEnd::_simple_objects(
+                          ModeExecutive::Processing_t p,
+                          ModeDataType dtype, int rIndex, 
+                          int tIndex, int j, int n_files,
+                          const string &filename,
+                          const ModeInputData &input) const
 {
    if (dtype == ModeDataType::MvMode_Fcst) {
       _init_exec(p, filename, "None");
@@ -594,11 +594,11 @@ void MultivarFrontEnd::_simple_mode_algorithm(ModeExecutive::Processing_t p,
 
 ////////////////////////////////////////////////////////////////////////
 
-void
-MultivarFrontEnd::_create_intensity_comparisons(SimpleObjects &fcsts, int findex,
-                                                SimpleObjects &obs, int oindex,
-                                               const string &fcst_filename,
-                                               const string &obs_filename)
+void MultivarFrontEnd::_create_intensity_comparisons(
+                          SimpleObjects &fcsts, int findex,
+                          SimpleObjects &obs, int oindex,
+                          const string &fcst_filename,
+                          const string &obs_filename)
 {
    MultiVarData *mvdf = fcsts._mvd[findex];
    MultiVarData *mvdo = obs._mvd[oindex];
@@ -652,13 +652,13 @@ MultivarFrontEnd::_create_intensity_comparisons(SimpleObjects &fcsts, int findex
 
 ////////////////////////////////////////////////////////////////////////
 
-void
-MultivarFrontEnd::_intensity_compare_mode_algorithm(int rIndexF, int tIndexF, 
-                                                    int rIndexO, int tIndexO,
-                                                    const MultiVarData &mvdf,
-                                                    const MultiVarData &mvdo,
-                                                    const ModeSuperObject &fsuper,
-                                                    const ModeSuperObject &osuper)
+void MultivarFrontEnd::_intensity_compare_mode_algorithm(
+                          int rIndexF, int tIndexF, 
+                          int rIndexO, int tIndexO,
+                          const MultiVarData &mvdf,
+                          const MultiVarData &mvdo,
+                          const ModeSuperObject &fsuper,
+                          const ModeSuperObject &osuper)
 {
    mode_exec->do_conv_thresh_multivar_intensity_compare(rIndexF, tIndexF, rIndexO, tIndexO);
    mode_exec->do_match_merge_multivar(fsuper._merge_sd_split, osuper._merge_sd_split,
@@ -714,11 +714,11 @@ void MultivarFrontEnd::_process_superobjects(SimpleObjects &fcsts, SimpleObjects
 
 ////////////////////////////////////////////////////////////////////////
 
-void
-MultivarFrontEnd::_superobject_mode_algorithm(int rIndexF, int tIndexF,
-                                              int rIndexO, int tIndexO,
-                                              const ModeSuperObject &fsuper,
-                                              const ModeSuperObject &osuper)
+void MultivarFrontEnd::_superobject_mode_algorithm(
+                          int rIndexF, int tIndexF,
+                          int rIndexO, int tIndexO,
+                          const ModeSuperObject &fsuper,
+                          const ModeSuperObject &osuper)
 
 {
    mode_exec->clear_internal_r_index();
@@ -734,9 +734,10 @@ MultivarFrontEnd::_superobject_mode_algorithm(int rIndexF, int tIndexF,
 
 ////////////////////////////////////////////////////////////////////////
 
-void MultivarFrontEnd::_init_exec(ModeExecutive::Processing_t p,
-                                  const string &ffile,
-                                  const string &ofile) const
+void MultivarFrontEnd::_init_exec(
+                          ModeExecutive::Processing_t p,
+                          const string &ffile,
+                          const string &ofile) const
 {
    mlog << Debug(4) << "Running multivar front end for " << ModeExecutive::stype(p) << "\n";
 
@@ -750,4 +751,4 @@ void MultivarFrontEnd::_init_exec(ModeExecutive::Processing_t p,
    mode_exec->out_dir = output_path;
 }
 
-
+////////////////////////////////////////////////////////////////////////

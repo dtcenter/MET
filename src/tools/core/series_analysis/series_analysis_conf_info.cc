@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -80,6 +80,8 @@ void SeriesAnalysisConfInfo::clear() {
    mask_poly_file.clear();
    mask_poly_name.clear();
    mask_area.clear();
+   grad_dx.clear();
+   grad_dy.clear();
    block_size = bad_data_int;
    vld_data_thresh = bad_data_double;
    hss_ec_value = bad_data_double;
@@ -131,14 +133,16 @@ void SeriesAnalysisConfInfo::read_config(const char *default_file_name,
 
 void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
                                             GrdFileType otype) {
-   int i, n;
+   int i;
+   int n;
    ConcatString s;
    StringArray sa;
    ThreshArray cur_ta;
    VarInfoFactory info_factory;
-   Dictionary *fdict = (Dictionary *) nullptr;
-   Dictionary *odict = (Dictionary *) nullptr;
-   Dictionary i_fdict, i_odict;
+   Dictionary *fdict = nullptr;
+   Dictionary *odict = nullptr;
+   Dictionary i_fdict;
+   Dictionary i_odict;
    BootInfo boot_info;
    map<STATLineType,StringArray>::iterator it;
 
@@ -188,6 +192,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    bool do_cnt = (output_stats[STATLineType::sl1l2].n()  +
                   output_stats[STATLineType::sal1l2].n() +
                   output_stats[STATLineType::cnt].n()) > 0;
+   bool do_grad = output_stats[STATLineType::grad].n() > 0;
 
    // Conf: fcst.field and obs.field
    fdict = conf.lookup_array(conf_key_fcst_field);
@@ -339,6 +344,24 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
       }
    } // end for i
 
+   // Parse gradients
+   if(do_grad) {
+
+      // Conf: gradient
+      Dictionary *d = conf.lookup_dictionary(conf_key_gradient);
+      grad_dx = d->lookup_int_array(conf_key_dx);
+      grad_dy = d->lookup_int_array(conf_key_dy);
+
+      // Check for the same length
+      if(grad_dx.n() != grad_dy.n()) {
+         mlog << Error << "\nSeriesAnalysisConfInfo::process_config() -> "
+              << "The gradient dx and dy arrays must have "
+              << "the same length (" << grad_dx.n() << " != "
+              << grad_dy.n() << ").\n\n";
+         exit(1);
+      }
+   }
+
    // Conf: block_size
    block_size = conf.lookup_int(conf_key_block_size);
 
@@ -445,7 +468,8 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void SeriesAnalysisConfInfo::process_masks(const Grid &grid) {
-   MaskPlane mask_grid, mask_poly;
+   MaskPlane mask_grid;
+   MaskPlane mask_poly;
    ConcatString name;
 
    mlog << Debug(2)
@@ -461,7 +485,7 @@ void SeriesAnalysisConfInfo::process_masks(const Grid &grid) {
    mask_poly_file = conf.lookup_string(conf_key_mask_poly);
 
    // Parse out the masking grid
-   if(mask_grid_file.length() > 0) {
+   if(!mask_grid_file.empty()) {
       mlog << Debug(3)
            << "Processing grid mask: " << mask_grid_file << "\n";
       parse_grid_mask(mask_grid_file, grid, mask_grid, mask_grid_name);
@@ -469,7 +493,7 @@ void SeriesAnalysisConfInfo::process_masks(const Grid &grid) {
    }
 
    // Parse out the masking polyline
-   if(mask_poly_file.length() > 0) {
+   if(!mask_poly_file.empty()) {
       mlog << Debug(3)
            << "Processing poly mask: " << mask_poly_file << "\n";
       parse_poly_mask(mask_poly_file, grid, mask_poly, mask_poly_name);

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -18,6 +18,7 @@
 //  000    04/15/05  Halley Gotway
 //  001    01/10/12  Bullock        Ported to new repository
 //  002    11/02/23  Halley Gotway  MET #2724 improve efficiency
+//  003    04/29/25  Halley Gotway  MET #3132 add OpenMP
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -26,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <cmath>
+#include <numeric>
 
 #include "interest.h"
 #include "vx_math.h"
@@ -196,9 +198,6 @@ void SingleFeature::set(const ShapeData &raw_sd, const ShapeData &thresh_sd,
 
 {
 
-   int i;
-   ShapeData cur_split_sd, cur_obj_sd;
-
    clear();
 
    Raw    = &raw_sd;
@@ -265,12 +264,19 @@ void SingleFeature::set(const ShapeData &raw_sd, const ShapeData &thresh_sd,
    // Boundary:
    // Split the mask field and store the boundary for each object.
    //
-   cur_split_sd = split(mask_sd, n_bdy);
+   ShapeData cur_split_sd = split(mask_sd, n_bdy);
    boundary = new Polyline [n_bdy];
-   for(i=0; i<n_bdy; i++) {
-      cur_obj_sd  = select(cur_split_sd, i+1);
-      boundary[i] = cur_obj_sd.single_boundary();
-   }
+
+#pragma omp parallel default(none) \
+   shared(n_bdy, cur_split_sd, boundary)
+   {
+
+#pragma omp for schedule(static)
+      for(int i=0; i<n_bdy; i++) {
+         ShapeData cur_obj_sd  = select(cur_split_sd, i+1);
+         boundary[i] = cur_obj_sd.single_boundary();
+      }
+   } // End omp parallel
 
    //
    // Done
@@ -399,15 +405,11 @@ void PairFeature::set(const SingleFeature &fcst,
 
 {
 
-   int i, j;
-   double d;
-
    clear();
 
    Fcst = &fcst;
    Obs  = &obs;
 
-   int fcst_on, obs_on;
    double dx, dy;
    double a1, a2;
 
@@ -426,9 +428,9 @@ void PairFeature::set(const SingleFeature &fcst,
    // polylines.
    //
    boundary_dist = 1.0e30;
-   for(i=0; i<Obs->n_bdy; i++) {
-      for(j=0; j<Fcst->n_bdy; j++) {
-         d = polyline_dist(Obs->boundary[i], Fcst->boundary[j]);
+   for(int i=0; i<Obs->n_bdy; i++) {
+      for(int j=0; j<Fcst->n_bdy; j++) {
+         double d = polyline_dist(Obs->boundary[i], Fcst->boundary[j]);
          if(d < boundary_dist) boundary_dist = d;
          if(is_eq(boundary_dist, 0.0)) break;
       }
@@ -466,16 +468,24 @@ void PairFeature::set(const SingleFeature &fcst,
    intersection_area = union_area = 0.0;
    symmetric_diff = 0.0;
    int nxy = Fcst->Split->data.nxy();
-   for(i=0; i<nxy; ++i) {
 
-      fcst_on = (nint(Fcst->Split->data.data()[i]) == Fcst->object_number ? 1 : 0);
-      obs_on  = (nint( Obs->Split->data.data()[i]) ==  Obs->object_number ? 1 : 0);
+#pragma omp parallel default(none) \
+   shared(nxy, Fcst, Obs, intersection_area, union_area, symmetric_diff)
+   {
 
-      if(   fcst_on &&  obs_on)   intersection_area++;
-      if(   fcst_on ||  obs_on)   union_area++;
-      if( ( fcst_on && !obs_on) ||
-          (!fcst_on &&  obs_on) ) symmetric_diff++;
-   }
+#pragma omp for schedule(static) \
+                reduction(+: intersection_area, union_area, symmetric_diff)
+      for(int i=0; i<nxy; ++i) {
+
+         bool fcst_on = (nint(Fcst->Split->data.data()[i]) == Fcst->object_number ? true : false);
+         bool obs_on  = (nint( Obs->Split->data.data()[i]) ==  Obs->object_number ? true : false);
+
+         if(   fcst_on &&  obs_on)   intersection_area++;
+         if(   fcst_on ||  obs_on)   union_area++;
+         if( ( fcst_on && !obs_on) ||
+             (!fcst_on &&  obs_on) ) symmetric_diff++;
+      }
+   } // End omp parallel
 
    //
    // Intersection over area
@@ -598,92 +608,60 @@ void get_percentiles(DistributionPercentiles &ptile,
                      const int perc, const bool precip_flag)
 
 {
-   int i, x, y, n_values;
-   int nx, ny;
-   double *v = (double *) nullptr;
-   double *v_tmp = (double *) nullptr;
    const char *method_name = "get_percentiles() -> ";
 
-   nx = raw.data.nx();
-   ny = raw.data.ny();
-
-   v_tmp = new double[nx*ny];
-   if(!v_tmp) {
-      mlog << Error << "\n" << method_name << "memory allocation error, v_tmp\n\n";
-      exit(1);
-   }
+   int nx = raw.data.nx();
+   int ny = raw.data.ny();
 
    //
    // Count values.
    // Only collect precipitation values greater than zero.
    //
-   n_values = 0;
-   for(x=0; x<nx; ++x) {
-      for(y=0; y<ny; ++y) {
+   vector<double> v;
+   v.reserve(nx*ny);
+   for(int x=0; x<nx; ++x) {
+      for(int y=0; y<ny; ++y) {
          if((mask.s_is_on(x, y)) &&
             (raw.is_valid_xy(x, y)) &&
             (!precip_flag || (precip_flag && raw.data(x, y) > 0))) {
-            v_tmp[n_values++] = (double)(raw.data(x, y));
+            v.emplace_back(raw.data(x, y));
          }
       }
    }
 
    //
-   // Allocate memory
-   //
-   v = new double [n_values];
-
-   if(!v) {
-      mlog << Error << "\n" << method_name << "memory allocation error\n\n";
-      exit(1);
-   }
-
-   //
-   // Fill values
-   //
-   for(x=0; x<n_values; ++x)
-      v[x] = v_tmp[x];
-
-   //
    // Sort
    //
-   sort(v, n_values);
+   sort(v.begin(), v.end());
 
    //
    // Get percentiles
    //
-   ptile.p10 = percentile(v, n_values, 0.10);
-   ptile.p25 = percentile(v, n_values, 0.25);
-   ptile.p50 = percentile(v, n_values, 0.50);
-   ptile.p75 = percentile(v, n_values, 0.75);
-   ptile.p90 = percentile(v, n_values, 0.90);
+   auto n_values = (int) v.size();
+   ptile.p10 = percentile(v.data(), n_values, 0.10);
+   ptile.p25 = percentile(v.data(), n_values, 0.25);
+   ptile.p50 = percentile(v.data(), n_values, 0.50);
+   ptile.p75 = percentile(v.data(), n_values, 0.75);
+   ptile.p90 = percentile(v.data(), n_values, 0.90);
 
    //
    // Compute the sum
    //
-   ptile.sum = 0;
-   for(i=0; i<n_values; i++) {
-      ptile.sum += v[i];
-   }
+   ptile.sum = accumulate(v.begin(), v.end(), 0.0);
 
    //
    // User-specified percentile
    //
    if(perc == 101) { // mean
-      ptile.pth = ptile.sum / n_values;
+      ptile.pth = (n_values == 0 ? bad_data_double :
+                                   ptile.sum/n_values);
    }
    else if(perc == 102) { // sum
       ptile.pth = ptile.sum;
    }
    else {
-      ptile.pth = percentile(v, n_values, (double) perc/100.0);
+      ptile.pth = percentile(v.data(), n_values, (double) perc/100.0);
    }
-
-   //
-   // Free memory
-   //
-   if(v_tmp) { delete [] v_tmp;  v_tmp = (double *) nullptr; }
-   if(v) { delete [] v;  v = (double *) nullptr; }
 
    //
    // Done

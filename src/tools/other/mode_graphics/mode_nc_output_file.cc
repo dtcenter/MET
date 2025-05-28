@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -306,34 +306,25 @@ out << "\n";
 if ( f )  {
 
    int month, day, year, hour, minute, second;
-   char junk[512];
+   ConcatString cs;
 
    out << "ValidTime = ";
    unix_to_mdyhms(ValidTime, month, day, year, hour, minute, second);
-   snprintf(junk, sizeof(junk), "%s %d %d  %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
-   out << junk << '\n';
+   cs.format("%s %d %d  %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   out << cs << '\n';
 
    out << "InitTime  = ";
    unix_to_mdyhms(InitTime, month, day, year, hour, minute, second);
-   snprintf(junk, sizeof(junk), "%s %d %d  %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
-   out << junk << '\n';
+   cs.format("%s %d %d  %02d:%02d:%02d", short_month_name[month], day, year, hour, minute, second);
+   out << cs << '\n';
 
    out << "AccumTime = ";
-   snprintf(junk, sizeof(junk), "%02d:%02d:%02d", AccumTime/3600, (AccumTime%3600)/60, AccumTime%60);
-   out << junk << '\n';
+   cs.format("%02d:%02d:%02d", AccumTime/3600, (AccumTime%3600)/60, AccumTime%60);
+   out << cs << '\n';
 
 }
 
-// out << "NFcstObjs  = " << NFcstObjs  << "\n";
-// out << "NObsObjs   = " << NObsObjs   << "\n";
-// 
-// out << "\n";
-// 
-// out << "NFcstClus = " << NFcstClus << "\n";
-// out << "NObsClus  = " << NObsClus  << "\n";
-
 out << "\n";
-
 
 out.flush();
 
@@ -445,32 +436,23 @@ int ModeNcOutputFile::count_objects(NcVar * var) const
 
 {
 
-int x, y, n, k;
-
-n = 0;
-int v[Ny][Nx];
+int n = 0;
+int Nxy = Nx * Ny;
+vector<int> v(Nxy);
 LongArray offsets;  // { 0,  0};
-LongArray lengths;  // {Ny, Nx};   //  NOT (x, y)!
+LongArray lengths;  // {Ny, Nx}; and NOT (x, y)!
 
 offsets.add(0);
 offsets.add(0);
 lengths.add(Ny);
 lengths.add(Nx);
 
-if (get_nc_data(var, (int *)&v, lengths, offsets)) {
-   for (x=0; x<Nx; ++x)  {
-   
-      for (y=0; y<Ny; ++y)  {
-   
-         //k = get_int(var, x, y);
-         k = v[y][x];
-   
-         if ( k > n )  n = k;
-   
-      }
-   
+if (get_nc_data(var, v.data(), lengths, offsets)) {
+   for (int i=0; i<Nxy; ++i)  {
+      if ( v[i] > n )  n = v[i];
    }
 }
+
 return n;
 
 }

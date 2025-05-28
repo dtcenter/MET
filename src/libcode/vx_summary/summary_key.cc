@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -31,7 +31,9 @@ SummaryKey::SummaryKey(const string &header_type,
                        const double lat, const double lon, const double elev,
                        const int var_code,
                        const double height, const double pressure_level,
-                       const string &var_name) :
+                       const string &var_name,
+                       const string &var_units,
+                       const string &var_desc) :
   _headerType(header_type),
   _stationId(station_id),
   _latitude(lat),
@@ -41,7 +43,9 @@ SummaryKey::SummaryKey(const string &header_type,
   hdrIndex(0),
   _height(height),
   _pressureLevel(pressure_level),
-  _varName(var_name)
+  _varName(var_name),
+  _varUnits(var_units),
+  _varDesc(var_desc)
 {
 }
 

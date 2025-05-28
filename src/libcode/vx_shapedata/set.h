@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -20,27 +20,20 @@
 //
 ///////////////////////////////////////////////////////////////////////////////
 
-#ifndef  __VX_WRFMODE_SET_H__
-#define  __VX_WRFMODE_SET_H__
+#ifndef  __SHAPEDATA_SET_H__
+#define  __SHAPEDATA_SET_H__
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-static const int fcst_obs_set_alloc_inc  = 50;
-
+#include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
-
 
 class FcstObsSet {
 
    protected:
 
-      void init_from_scratch();
-
       void assign(const FcstObsSet &);
-
-      void extend(int * &, int & n_alloc, const int n_new);
 
    public:
 
@@ -48,24 +41,17 @@ class FcstObsSet {
          //  data
          //
 
-      int * fcst_number;   //  allocated
-      int * obs_number;    //  allocated
+      std::vector<int> fcst_number;
+      std::vector<int> obs_number;
 
       int n_fcst;
       int n_obs;
-
-      int n_fcst_alloc;
-      int n_obs_alloc;
 
          //
          //  functions
          //
 
-      void     clear();
-      void all_clear();
-
-      void extend_fcst (int);
-      void extend_obs  (int);
+      void clear();
 
       FcstObsSet();
      ~FcstObsSet();
@@ -74,35 +60,27 @@ class FcstObsSet {
 
       void add_pair(int fcst, int obs);
 
-      int has_fcst(int) const;
-      int has_obs(int) const;
+      bool has_fcst(int) const;
+      bool has_obs(int) const;
 
       void add_fcst(int);
       void add_obs(int);
-
 
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 extern FcstObsSet union_fcst_obs_sets(const FcstObsSet &, const FcstObsSet &);
 
-extern int fcst_obs_sets_overlap(const FcstObsSet &, const FcstObsSet &);
+extern bool fcst_obs_sets_overlap(const FcstObsSet &, const FcstObsSet &);
 
 extern std::ostream & operator<<(std::ostream &, const FcstObsSet &);
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
-// static const int max_fcst_obs_sets = 300;
 
 static const int set_alloc_inc = 50;
 
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 class SetCollection {
 
@@ -137,13 +115,13 @@ class SetCollection {
       void     clear();
       void all_clear();
 
-      int merge();
+      bool merge();
 
       int fcst_set_number (int fcst_number) const;
       int  obs_set_number (int obs_number)  const;
 
-      int is_fcst_matched (int fcst_number) const;
-      int  is_obs_matched (int obs_number)  const;
+      bool is_fcst_matched (int fcst_number) const;
+      bool  is_obs_matched (int obs_number)  const;
 
       void merge_two(int, int);
 
@@ -151,23 +129,18 @@ class SetCollection {
 
       void clear_empty_sets();
 
-
       void make_room(const int = 1);
-
 };
 
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 extern std::ostream & operator<<(std::ostream &, const SetCollection &);
-
 
 inline void SetCollection::make_room(const int __n)  { if ( __n > 0 )  extend(n_sets + __n);  return; }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
-#endif   //  __VX_WRFMODE_SET_H__
+#endif   //  __SHAPEDATA_SET_H__
 
 ///////////////////////////////////////////////////////////////////////////////

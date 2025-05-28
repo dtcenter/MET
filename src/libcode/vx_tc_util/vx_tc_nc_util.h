@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -19,7 +19,7 @@
 #include "vx_data2d.h"
 #include "vx_nc_util.h"
 #include "vx_tc_util.h"
-#include "tcrmw_grid.h"
+#include "rng_azi_grid.h"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -56,7 +56,7 @@ extern void def_tc_pressure(netCDF::NcFile*,
     const netCDF::NcDim&, std::set<double>);
 
 extern void def_tc_range_azimuth(netCDF::NcFile*,
-    const netCDF::NcDim&, const netCDF::NcDim&, const TcrmwGrid&, double);
+    const netCDF::NcDim&, const netCDF::NcDim&, const RngAziGrid&, double);
 
 extern void def_tc_init_time(netCDF::NcFile*,
     netCDF::NcVar&, netCDF::NcVar&);
@@ -89,34 +89,31 @@ extern void def_tc_azi_mean_data(netCDF::NcFile*,
     const netCDF::NcDim&, const netCDF::NcDim&,
     netCDF::NcVar&, VarInfo*);
 
-extern void write_tc_init_time(netCDF::NcFile*,
+extern void write_tc_init_time(
     const netCDF::NcVar&, const netCDF::NcVar&,
     const unixtime&);
 
-extern void write_tc_valid_time(netCDF::NcFile*,
+extern void write_tc_valid_time(
     const int&,
     const netCDF::NcVar&, const netCDF::NcVar&,
     const unixtime&);
 
-extern void write_tc_lead_time(netCDF::NcFile*,
+extern void write_tc_lead_time(
     const int&,
     const netCDF::NcVar&, const netCDF::NcVar&,
     const int&);
 
-extern void write_tc_data(netCDF::NcFile*, const TcrmwGrid&,
+extern void write_tc_data(const RngAziGrid&,
     const int&, const netCDF::NcVar&, const double*);
 
-extern void write_tc_data_rev(netCDF::NcFile*, const TcrmwGrid&,
+extern void write_tc_azi_mean_data(const RngAziGrid&,
     const int&, const netCDF::NcVar&, const double*);
 
-extern void write_tc_azi_mean_data(netCDF::NcFile*, const TcrmwGrid&,
-    const int&, const netCDF::NcVar&, const double*);
-
-extern void write_tc_pressure_level_data(netCDF::NcFile*, const TcrmwGrid&,
+extern void write_tc_pressure_level_data(const RngAziGrid&,
     std::map<std::string, int>, const std::string&,
     const int&, const netCDF::NcVar&, const double*);
 
-extern void write_tc_pressure_level_data(netCDF::NcFile*, const TcrmwGrid&,
+extern void write_tc_pressure_level_data(const RngAziGrid&,
     const int&, const int&, const netCDF::NcVar&, const double*);
 
 ////////////////////////////////////////////////////////////////////////

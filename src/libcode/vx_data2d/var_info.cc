@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -898,7 +898,7 @@ void EnsVarInfo::assign(const EnsVarInfo &v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void EnsVarInfo::add_input(InputInfo input) {
-   inputs.push_back(input);
+   inputs.emplace_back(input);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

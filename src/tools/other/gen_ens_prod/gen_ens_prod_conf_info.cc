@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -267,7 +267,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
       // Conf: ensemble_flag
       ens_info->nc_info = parse_nc_info(&i_edict);
 
-      ens_input.push_back(ens_info);
+      ens_input.emplace_back(ens_info);
    } // end for i
 
    // Conf: ens.ens_thresh

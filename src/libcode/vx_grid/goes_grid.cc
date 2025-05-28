@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -224,8 +224,8 @@ Indent prefix(depth);
 
 out << prefix << "Name       = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << '\n';
 
@@ -256,7 +256,6 @@ ConcatString GoesImagerGrid::serialize(const char *sep) const
 {
 
 ConcatString a;
-char junk[256];
 
 a << "Projection: GoesImager" << sep;
 
@@ -341,7 +340,7 @@ GridRep * GoesImagerGrid::copy() const
 
 {
 
-GoesImagerGrid * p = new GoesImagerGrid (Data);
+auto * p = new GoesImagerGrid (Data);
 
 p->Name = Name;
 

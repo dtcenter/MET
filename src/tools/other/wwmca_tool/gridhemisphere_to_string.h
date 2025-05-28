@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -31,26 +31,14 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "concat_string.h"
 #include "wwmca_ref.h"
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void gridhemisphere_to_string(const GridHemisphere, char * out);
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  minimum string length needed to hold output values from
-   //
-   //    the above function ... includes trailing nul
-   //
-
-
-static const int max_enum_gridhemisphere_len = 17;
+extern ConcatString gridhemisphere_to_string(const GridHemisphere);
 
 
 ////////////////////////////////////////////////////////////////////////

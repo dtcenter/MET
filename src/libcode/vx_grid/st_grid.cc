@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -439,8 +439,8 @@ ConcatString junk;
 
 out << prefix << "Name       = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << '\n';   //  no prefix
 
@@ -490,7 +490,7 @@ ConcatString StereographicGrid::serialize(const char *sep) const
 {
 
 ConcatString a;
-char junk[256];
+ConcatString cs;
 
 a << "Projection: Stereographic" << sep;
 
@@ -499,12 +499,12 @@ a << "Ny: " << Ny << sep;
 
 a << "IsNorthHemisphere: " << ( IsNorthHemisphere ? "true" : "false") << sep;
 
-snprintf(junk, sizeof(junk), "Lon_orient: %.3f", Lon_orient);   a << junk << sep;
+cs.format("Lon_orient: %.3f", Lon_orient);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "Bx: %.3f", Bx);   a << junk << sep;
-snprintf(junk, sizeof(junk), "By: %.3f", By);   a << junk << sep;
+cs.format("Bx: %.3f", Bx);   a << cs << sep;
+cs.format("By: %.3f", By);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "Alpha: %.4f", Alpha);   a << junk;
+cs.format("Alpha: %.4f", Alpha);   a << cs;
 
    //
    //  done
@@ -588,7 +588,7 @@ GridRep * StereographicGrid::copy() const
 
 {
 
-StereographicGrid * p = new StereographicGrid (Data);
+auto * p = new StereographicGrid (Data);
 
 p->Name = Name;
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -10,6 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <bits/stdc++.h>
 #include <iostream>
 #include <fstream>
 #include <sys/types.h>
@@ -115,6 +116,8 @@ Delimiter.assign(dataline_default_delim);
 
 File = (LineDataFile *) nullptr;
 
+AllowEmptyColumns = false;
+
 IsHeader = false;
 
 return;
@@ -131,7 +134,6 @@ void DataLine::clear()
 
 Line.clear();
 Items.clear();
-Offset.clear();
 
 LineNumber = 0;
 
@@ -157,8 +159,6 @@ clear();
 Line = a.Line;
 Items = a.Items;
 
-Offset = a.Offset;
-
 N_items = a.N_items;
 
 LineNumber = a.LineNumber;
@@ -179,7 +179,7 @@ void DataLine::dump(ostream & out, int depth) const
 {
 
 int j;
-char junk[256];
+ConcatString cs;
 Indent prefix(depth);
 
 
@@ -194,23 +194,9 @@ if ( N_items == 0 )  { out.flush();  return; }
 
 for (j=0; j<N_items; ++j)  {
 
-   snprintf(junk, sizeof(junk), "Item[%2d]       = \"", j);
+   cs.format("Item[%2d]       = \"", j);
 
-   out << prefix << junk << Items[j] << "\"\n";
-
-   if ( (j%5) == 4 )  out << prefix << '\n';
-
-   out.flush();
-
-}
-
-out << prefix << "\n";
-
-for (j=0; j<N_items; ++j)  {
-
-   snprintf(junk, sizeof(junk), "Offset[%2d]     = ", j);
-
-   out << prefix << junk << Offset[j] << '\n';
+   out << prefix << cs << Items[j] << "\"\n";
 
    if ( (j%5) == 4 )  out << prefix << '\n';
 
@@ -355,15 +341,14 @@ count = 0;
 if ( ! read_single_text_line(ldf) )  { clear();  return 0; }
 
    //
-   //  parse the line with strtok
+   //  parse the line
    //
 
 size_t len, tpos = std::string::npos;
 
 if (0 == Line.find_first_not_of(Delimiter)) { // no leading delimiter
     ++count;
-    Offset.push_back(pos);
-    Items.push_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
+    Items.emplace_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
 }
 while ((tpos = Line.substr(pos).find_first_of(Delimiter)) != std::string::npos)  {
     len = Line.substr(pos+tpos).find_first_not_of(Delimiter);
@@ -372,11 +357,68 @@ while ((tpos = Line.substr(pos).find_first_of(Delimiter)) != std::string::npos) 
     pos += tpos + len;
     
     ++count;
-    Offset.push_back(pos);
-    Items.push_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
+    Items.emplace_back(Line.substr(pos, Line.find_first_of(Delimiter, pos) - pos));
 }
 
 N_items = count;
+
+LineNumber = ldf->last_line_number() + 1;
+
+
+return 1;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int DataLine::read_line_empty_columns(LineDataFile * ldf)
+
+{
+
+clear();
+
+   //
+   //  get a line from the file
+   //
+
+if ( ! read_single_text_line(ldf) )  { clear();  return 0; }
+
+   //
+   //  parse the line
+   //
+
+regex del(Delimiter);
+
+   //
+   // Create a regex_token_iterator to split the string
+   //
+
+sregex_token_iterator it(Line.begin(), Line.end(), del, -1);
+
+   //
+   // End iterator for the regex_token_iterator
+   //
+
+sregex_token_iterator end;
+
+   //
+   // Store each token
+   //
+
+while (it != end) {
+   Items.emplace_back(*it);
+   ++it;
+}
+
+   //
+   // Append empty item if string ends with a delimiter
+   //
+
+if ( Delimiter.find(Line.back()) != string::npos )  Items.emplace_back(""); 
+
+N_items = (int) Items.size();
 
 LineNumber = ldf->last_line_number() + 1;
 
@@ -439,7 +481,6 @@ for( i=0; i<n_wdth; i++ )  {
    //  store the offset to this entry
    //
    start = pos;
-   Offset.push_back(pos);
 
    //
    //  store this entry
@@ -463,7 +504,7 @@ for( i=0; i<n_wdth; i++ )  {
      }
    }
    
-   Items.push_back(Line.substr(start, pos-start));
+   Items.emplace_back(Line.substr(start, pos-start));
 
    //
    //  null terminate the entry
@@ -822,7 +863,8 @@ int status;
 
 do {
 
-   status = a.read_line(this);
+   if ( a.allow_empty_columns() ) status = a.read_line_empty_columns(this);
+   else                           status = a.read_line(this);
 
    if ( !status ) return 0;
 

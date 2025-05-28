@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -74,8 +74,6 @@ bool build_grid_by_grid_string(const ConcatString &grid_str, Grid &grid,
 
 bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
                  DataPlane &wdir2d) {
-   int x, y;
-   double u, v, wdir;
    const int nx = u2d.nx();
    const int ny = u2d.ny();
 
@@ -99,35 +97,41 @@ bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
    wdir2d = u2d;
    wdir2d.set_constant(bad_data_double);
 
-   //
-   // Compute the wind direction
-   //
-   for(x=0; x<nx; x++) {
-      for(y=0; y<ny; y++) {
+#pragma omp parallel default(none) \
+   shared(nx, ny, u2d, v2d, wdir2d)
+   {
 
-         //
-         // Get the U and V components for this grid point
-         //
-         u = u2d.get(x, y);
-         v = v2d.get(x, y);
+      //
+      // Compute the wind direction
+      //
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
 
-         //
-         // Compute wind direction and rescale to [0, 360)
-         //
-         if(is_bad_data(u) || is_bad_data(v)) {
-            wdir = bad_data_double;
-         }
-         else {
-            wdir = rescale_deg(atan2d(-1.0*u, -1.0*v), 0.0, 360.0);
-         }
+            //
+            // Get the U and V components for this grid point
+            //
+            double u = u2d.get(x, y);
+            double v = v2d.get(x, y);
 
-         //
-         // Store the current value
-         //
-         wdir2d.set(wdir, x, y);
+            double wdir = bad_data_double;
 
-      } // end for y
-   } // end for x
+            //
+            // Compute wind direction and rescale to [0, 360)
+            //
+            if(!is_bad_data(u) && !is_bad_data(v)) {
+               wdir = rescale_deg(atan2d(-1.0*u, -1.0*v), 0.0, 360.0);
+            }
+
+            //
+            // Store the current value
+            //
+            wdir2d.set(wdir, x, y);
+
+         } // end for y
+      } // end for x
+   } // End omp parallel
 
    return true;
 }
@@ -136,8 +140,6 @@ bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
 
 bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
                  DataPlane &wind2d) {
-   int x, y;
-   double u, v, wind;
    const int nx = u2d.nx();
    const int ny = u2d.ny();
 
@@ -161,35 +163,41 @@ bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
    wind2d = u2d;
    wind2d.set_constant(bad_data_double);
 
-   //
-   // Compute the wind direction
-   //
-   for(x=0; x<nx; x++) {
-      for(y=0; y<ny; y++) {
+#pragma omp parallel default(none) \
+   shared(nx, ny, u2d, v2d, wind2d)
+   {
 
-         //
-         // Get the U and V components for this grid point
-         //
-         u = u2d.get(x, y);
-         v = v2d.get(x, y);
+      //
+      // Compute the wind direction
+      //
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
 
-         //
-         // Compute wind direction and rescale to [0, 360)
-         //
-         if(is_bad_data(u) || is_bad_data(v)) {
-            wind = bad_data_double;
-         }
-         else {
-            wind = sqrt(u*u + v*v);
-         }
+            //
+            // Get the U and V components for this grid point
+            //
+            double u = u2d.get(x, y);
+            double v = v2d.get(x, y);
 
-         //
-         // Store the current value
-         //
-         wind2d.set(wind, x, y);
+            double wind = bad_data_double;
 
-      } // end for y
-   } // end for x
+            //
+            // Compute wind direction and rescale to [0, 360)
+            //
+            if(!is_bad_data(u) && !is_bad_data(v)) {
+               wind = sqrt(u*u + v*v);
+            }
+
+            //
+            // Store the current value
+            //
+            wind2d.set(wind, x, y);
+
+         } // end for y
+      } // end for x
+   } // End omp parallel
 
    return true;
 }
@@ -198,8 +206,6 @@ bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
 
 void rotate_wdir_grid_to_earth(const DataPlane &wdir2d, const Grid &g,
                                DataPlane &wdir2d_rot) {
-   int x, y;
-   double wdir_deg, wdir_deg_rot, alpha_deg;
    const int nx = wdir2d.nx();
    const int ny = wdir2d.ny();
 
@@ -212,40 +218,45 @@ void rotate_wdir_grid_to_earth(const DataPlane &wdir2d, const Grid &g,
    wdir2d_rot = wdir2d;
    wdir2d_rot.set_constant(bad_data_double);
 
-   //
-   // Rotate the wind direction
-   //
-   for(x=0; x<nx; x++) {
-      for(y=0; y<ny; y++) {
+#pragma omp parallel default(none) \
+   shared(nx, ny, wdir2d, g, wdir2d_rot)
+   {
 
+      //
+      // Rotate the wind direction
+      //
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
 
-         //
-         // Get the wind direction for this grid point
-         //
-         wdir_deg = wdir2d.get(x, y);
+            //
+            // Get the wind direction for this grid point
+            //
+            double wdir_deg = wdir2d.get(x, y);
 
-         //
-         // Compute wind direction and rescale to [0, 360)
-         //
-         if(is_bad_data(wdir_deg)) {
-            wdir_deg_rot = bad_data_double;
-         }
-         else {
+            double wdir_deg_rot = bad_data_double;
 
-            // Get the rotation angle from grid to earth relative
-            alpha_deg = g.rot_grid_to_earth(x, y);
+            //
+            // Compute wind direction and rescale to [0, 360)
+            //
+            if(!is_bad_data(wdir_deg)) {
 
-            // Compute rotated wind direction
-            wdir_deg_rot = rescale_deg(wdir_deg + alpha_deg, 0.0, 360.0);
-         }
+               // Get the rotation angle from grid to earth relative
+               double alpha_deg = g.rot_grid_to_earth(x, y);
 
-         //
-         // Store the current value
-         //
-         wdir2d_rot.set(wdir_deg_rot, x, y);
+               // Compute rotated wind direction
+               wdir_deg_rot = rescale_deg(wdir_deg + alpha_deg, 0.0, 360.0);
+            }
 
-      } // end for y
-   } // end for x
+            //
+            // Store the current value
+            //
+            wdir2d_rot.set(wdir_deg_rot, x, y);
+
+         } // end for y
+      } // end for x
+   } // End omp parallel
 
    return;
 }
@@ -255,8 +266,6 @@ void rotate_wdir_grid_to_earth(const DataPlane &wdir2d, const Grid &g,
 bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
                              const Grid &g,
                              DataPlane &u2d_rot, DataPlane &v2d_rot) {
-   int x, y;
-   double u, v, alpha_deg, u_rot, v_rot;
    const int nx = u2d.nx();
    const int ny = u2d.ny();
 
@@ -282,44 +291,51 @@ bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
    u2d_rot.set_constant(bad_data_double);
    v2d_rot.set_constant(bad_data_double);
 
-   //
-   // Compute rotated U and V
-   //
-   for(x=0; x<nx; x++) {
-      for(y=0; y<ny; y++) {
+#pragma omp parallel default(none) \
+   shared(nx, ny, u2d, v2d, g, u2d_rot, v2d_rot)
+   {
 
-         //
-         // Get the U and V components for this grid point
-         //
-         u = u2d.get(x, y);
-         v = v2d.get(x, y);
+      //
+      // Rotate the wind direction
+      //
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
 
-         //
-         // Compute rotated U and V
-         //
-         if(is_bad_data(u) || is_bad_data(v)) {
-            u_rot = v_rot = bad_data_double;
-         }
-         else {
+            //
+            // Get the U and V components for this grid point
+            //
+            double u = u2d.get(x, y);
+            double v = v2d.get(x, y);
 
-            // Get the rotation angle from grid to earth relative
-            alpha_deg = g.rot_grid_to_earth(x, y);
+            double u_rot = bad_data_double;
+            double v_rot = bad_data_double;
 
-            // Rotate U component
-            u_rot = cosd(alpha_deg)*u + sind(alpha_deg)*v;
+            //
+            // Compute rotated U and V
+            //
+            if(!is_bad_data(u) && !is_bad_data(v)) {
 
-            // Rotate V component
-            v_rot = -1.0*sind(alpha_deg)*u + cosd(alpha_deg)*v;
-         }
+               // Get the rotation angle from grid to earth relative
+               double alpha_deg = g.rot_grid_to_earth(x, y);
 
-         //
-         // Store the current values
-         //
-         u2d_rot.set(u_rot, x, y);
-         v2d_rot.set(v_rot, x, y);
+               // Rotate U component
+               u_rot = cosd(alpha_deg)*u + sind(alpha_deg)*v;
 
-      } // end for y
-   } // end for x
+               // Rotate V component
+               v_rot = -1.0*sind(alpha_deg)*u + cosd(alpha_deg)*v;
+            }
+
+            //
+            // Store the current values
+            //
+            u2d_rot.set(u_rot, x, y);
+            v2d_rot.set(v_rot, x, y);
+
+         } // end for y
+      } // end for x
+   } // End omp parallel
 
    return true;
 }

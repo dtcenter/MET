@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -255,7 +255,7 @@ bool ProbInfoArray::add(const ATCFProbLine &l, double dland, bool check_dup) {
          else {
             ProbRIRWInfo ri;
             ri.add(l, dland, check_dup);
-            ProbRIRW.push_back(ri);
+            ProbRIRW.emplace_back(ri);
             status = true;
          }
          break;
@@ -287,7 +287,7 @@ bool ProbInfoArray::add(const ATCFProbLine &l, double dland, bool check_dup) {
                     << " line with no predicted genesis location.\n";
             }
             else {
-               ProbGen.push_back(gi);
+               ProbGen.emplace_back(gi);
                status = true;
             }
          }
@@ -306,14 +306,14 @@ bool ProbInfoArray::add(const ATCFProbLine &l, double dland, bool check_dup) {
 ////////////////////////////////////////////////////////////////////////
 
 void ProbInfoArray::add(const ProbRIRWInfo &rirw) {
-   ProbRIRW.push_back(rirw);
+   ProbRIRW.emplace_back(rirw);
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void ProbInfoArray::add(const ProbGenInfo &gi) {
-   ProbGen.push_back(gi);
+   ProbGen.emplace_back(gi);
    return;
 }
 

@@ -1,0 +1,20 @@
+#%Module######################################################################
+##
+##      Model Evaluation Tools
+##
+proc ModulesHelp { } {
+  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v12.1.0
+     *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
+}
+
+module unload cray-libsci/24.07.0
+module load intel/2023.2.0
+
+set base /usw/met
+set ver  12.1.0
+set share $base/$ver/share/met
+set lib_base $base/12.1.0
+
+prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/gpfs/f5/esrl/proj-shared/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin
+
+setenv MET_PYTHON_EXE /gpfs/f5/esrl/proj-shared/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin/python

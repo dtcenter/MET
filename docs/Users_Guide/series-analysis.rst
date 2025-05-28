@@ -7,12 +7,12 @@ Series-Analysis Tool
 Introduction
 ============
 
-The Series-Analysis Tool accumulates statistics separately for each horizontal grid location over a series. Often, this series is over time or height, though any type of series is possible. This differs from the Grid-Stat tool in that Grid-Stat verifies all grid locations together as a group. Thus, the Series-Analysis Tool can be used to find verification information specific to certain locations or see how model performance varies over the domain. 
+The Series-Analysis Tool accumulates statistics separately for each horizontal grid location over a series. Often, this series is over time or height, though any type of series is possible. This differs from the Grid-Stat tool in that Grid-Stat verifies all grid locations together as a group. Thus, the Series-Analysis Tool can be used to find verification information specific to certain locations or see how model performance varies over the domain.
 
 Practical Information
 =====================
 
-This Series-Analysis tool performs verification of gridded model fields using matching gridded observation fields. It computes a variety of user-selected statistics. These statistics are a subset of those produced by the Grid-Stat tool, with options for statistic types, thresholds, and conditional verification options as discussed in :numref:`grid-stat`. However, these statistics are computed separately for each grid location and accumulated over some series such as time or height, rather than accumulated over the whole domain for a single time or height as is done by Grid-Stat. 
+This Series-Analysis tool performs verification of gridded model fields using matching gridded observation fields. It computes a variety of user-selected statistics. These statistics are a subset of those produced by the Grid-Stat tool, with options for statistic types, thresholds, and conditional verification options as discussed in :numref:`grid-stat`. However, these statistics are computed separately for each grid location and accumulated over some series such as time or height, rather than accumulated over the whole domain for a single time or height as is done by Grid-Stat.
 
 This tool computes statistics for exactly one series each time it is run. Multiple series may be processed by running the tool multiple times. The length of the series to be processed is determined by the first of the following that is greater than one: the number of forecast fields in the configuration file, the number of observation fields in the configuration file, the number of input forecast files, the number of input observation files. Several examples of defining series are described below.
 
@@ -30,9 +30,9 @@ The usage statement for the Series-Analysis tool is shown below:
 .. code-block:: none
 
   Usage: series_analysis
-         -fcst  file_1 ... file_n | fcst_file_list
-         -obs   file_1 ... file_n | obs_file_list
-         [-both file_1 ... file_n | both_file_list]
+         -fcst  file_1 ... file_n | file_list
+         -obs   file_1 ... file_n | file_list
+         [-both file_1 ... file_n | file_list]
          [-aggr file]
          [-paired]
          -out file
@@ -41,14 +41,14 @@ The usage statement for the Series-Analysis tool is shown below:
          [-v level]
          [-compress level]
 
-series_analysis has four required arguments and accepts several optional ones. 
+series_analysis has four required arguments and accepts several optional ones.
 
 Required Arguments series_stat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-fcst file_1 ... file_n | fcst_file_list** options specify the gridded forecast files or ASCII files containing lists of file names to be used.
+1. The **-fcst file_1 ... file_n | file_list** option specifies the gridded forecast files or ASCII file list of file names to be used, as described in :numref:`ascii_file_lists`.
 
-2. The **-obs file_1 ... file_n | obs_file_list** are the gridded observation files or ASCII files containing lists of file names to be used.
+2. The **-obs file_1 ... file_n | file_list** option specifies the gridded observation files or ASCII file list of file names to be used, as described in :numref:`ascii_file_lists`.
 
 3. The **-out file** is the NetCDF output file containing computed statistics.
 
@@ -57,19 +57,19 @@ Required Arguments series_stat
 Optional Arguments for series_analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-5. To set both the forecast and observations to the same set of files, use the optional -both file_1 ... file_n | both_file_list option to the same set of files. This is useful when reading the NetCDF matched pair output of the Grid-Stat tool which contains both forecast and observation data.
+5. To set both the forecast and observations to the same set of files, use the optional **-both file_1 ... file_n | file_list** option to the same set of files. This is useful when reading the NetCDF matched pair output of the Grid-Stat tool which contains both forecast and observation data.
 
-6. The -aggr option specifies the path to an existing Series-Analysis output file. When computing statistics for the input forecast and observation data, Series-Analysis aggregates the partial sums (SL1L2, SAL1L2 line types) and contingency table counts (CTC, MCTC, and PCT line types) with data provided in the aggregate file. This option enables Series-Analysis to run iteratively and update existing partial sums, counts, and statistics with new data.
+6. The **-aggr** option specifies the path to an existing Series-Analysis output file. When computing statistics for the input forecast and observation data, Series-Analysis aggregates the partial sums (SL1L2, SAL1L2 line types) and contingency table counts (CTC, MCTC, and PCT line types) with data provided in the aggregate file. This option enables Series-Analysis to run iteratively and update existing partial sums, counts, and statistics with new data.
 
-.. note:: When the -aggr option is used, only statistics that are derivable from partial sums and contingency table counts can be requested. Runtimes are generally much slower when aggregating data since it requires many additional NetCDF variables containing the scalar partial sums and contingency table counts to be read and written.
+.. note:: When the **-aggr** option is used, only statistics that are derivable from partial sums and contingency table counts can be requested. Runtimes are generally much slower when aggregating data since it requires many additional NetCDF variables containing the scalar partial sums and contingency table counts to be read and written.
 
-7. The -paired option indicates that the -fcst and -obs file lists are already paired, meaning there is a one-to-one correspondence between the files in those lists. This option affects how missing data is handled. When -paired is not used, missing or incomplete files result in a runtime error with no output file being created. When -paired is used, missing or incomplete files result in a warning with output being created using the available data.
+7. The **-paired** option indicates that the **-fcst** and **-obs** file lists are already paired, meaning there is a one-to-one correspondence between the files in those lists. This option affects how missing data is handled. When **-paired** is not used, missing or incomplete files result in a runtime error with no output file being created. When **-paired** is used, missing or incomplete files result in a warning with output being created using the available data.
 
-8. The -log file outputs log messages to the specified file.
+8. The **-log** file outputs log messages to the specified file.
 
-9. The -v level overrides the default level of logging (2).
+9. The **-v** level overrides the default level of logging (2).
 
-10. The -compress level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+10. The **-compress** level option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the series_analysis calling sequence is shown below:
 
@@ -81,12 +81,12 @@ An example of the series_analysis calling sequence is shown below:
   -config SeriesAnalysisConfig \
   -out    out/my_series_statistics.nc
 
-In this example, the Series-Analysis tool will process the list of forecast and observation files specified in the text file lists into statistics for each grid location using settings specified in the configuration file. Series-Analysis will create an output NetCDF file containing requested statistics. 
+In this example, the Series-Analysis tool will process the list of forecast and observation files specified in the text file lists into statistics for each grid location using settings specified in the configuration file. Series-Analysis will create an output NetCDF file containing requested statistics.
 
 series_analysis Output
 ----------------------
 
-The Series-Analysis tool produces NetCDF files containing output statistics for each grid location from the input files. The details about the output statistics available from each output line type are detailed in Chapter 5 since they are also produced by the Grid-Stat Tool. A subset of these can be produced by this tool, with the most notable exceptions being the wind vector and neighborhood statistics. Users can inventory the contents of the Series-Analysis output files using the ncdump -h command to view header information. Additionally, ncview or the Plot-Data-Plane tool can be used to visualize the output. An example of Series-Analysis output is shown in :numref:`series-analysis_Glibert_precip` below. 
+The Series-Analysis tool produces NetCDF files containing output statistics for each grid location from the input files. The details about the output statistics available from each output line type are detailed in Chapter 5 since they are also produced by the Grid-Stat Tool. A subset of these can be produced by this tool, with the most notable exceptions being the wind vector and neighborhood statistics. Users can inventory the contents of the Series-Analysis output files using the ncdump -h command to view header information. Additionally, ncview or the Plot-Data-Plane tool can be used to visualize the output. An example of Series-Analysis output is shown in :numref:`series-analysis_Glibert_precip` below.
 
 .. _series-analysis_Glibert_precip:
 
@@ -116,6 +116,7 @@ ____________________
   boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
                      rng = "mt19937"; seed = ""; }
   mask           = { grid = [ "FULL" ]; poly = []; }
+  gradient       = { dx = [ 1 ]; dy = [ 1 ]; }
   hss_ec_value   = NA;
   rank_corr_flag = TRUE;
   tmp_dir        = "/tmp";
@@ -139,7 +140,6 @@ ____________________
 
 Ratio of valid matched pairs for the series of values at each grid point required to compute statistics. Set to a lower proportion to allow some missing values. Setting it to 1.0 requires that every data point be valid over the series to compute statistics.
 
-
 ____________________
 
 .. code-block:: none
@@ -157,6 +157,7 @@ ____________________
      pstd   = [];
      pjc    = [];
      prc    = [];
+     grad   = [];
   }
 
 The output_stats array controls the type of output that the Series-Analysis tool generates. Each flag corresponds to an output line type in the STAT file and is used to specify the comma-separated list of statistics to be computed. Use the column names from the tables listed below to specify the statistics. The output flags correspond to the following types of output line types:
@@ -185,4 +186,6 @@ The output_stats array controls the type of output that the Series-Analysis tool
 
 12. PRC for Receiver Operating Characteristic for Probabilistic forecasts (See :numref:`table_PS_format_info_PRC`)
 
-.. note:: When the -input option is used, all partial sum and contingency table count columns are required to aggregate statistics across multiple runs. To facilitate this, the output_stats entries for the CTC, SL1L2, SAL1L2, and PCT line types can be set to "ALL" to indicate that all available columns for those line types should be written.
+13. GRAD for Gradient Statistics (See :numref:`table_GS_format_info_GRAD`)
+
+.. note:: When the -input option is used, all partial sum and contingency table count columns are required to aggregate statistics across multiple runs. To facilitate this, the output_stats entries for the CTC, SL1L2, SAL1L2, PCT, and GRAD line types can be set to "ALL" to indicate that all available columns for those line types should be written.

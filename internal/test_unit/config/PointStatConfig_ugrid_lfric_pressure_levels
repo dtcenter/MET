@@ -1,0 +1,188 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Point-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "FCST";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+// May be set separately in each "field" entry
+//
+regrid = {
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+obs_window = {
+   beg = ${BEG_DS};
+   end = ${END_DS};
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+mpr_column  = [];
+mpr_thresh  = [];
+cnt_thresh  = [ NA ];
+cnt_logic   = UNION;
+wind_thresh = [ NA ];
+wind_logic  = UNION;
+eclv_points = 0.05;
+
+//
+// Forecast and observation fields to be verified
+
+fcst = {
+   sid_inc = [];
+   sid_exc = [];
+   obs_quality_inc  = [];
+   obs_quality_exc  = [];
+
+   file_type = NETCDF_UGRID;
+
+   field = [
+      { name = "u_in_w3"; level = "(21,*)"; set_attr_level = "P500"; },
+      { name = "u_in_w3"; level = "(24,*)"; set_attr_level = "P850"; }
+   ];
+}
+obs = {
+   sid_inc = [];
+   sid_exc = [];
+   obs_quality_inc  = [];
+   obs_quality_exc  = [];
+
+   field = [
+      { name = "UGRD"; level = "P500"; },
+      { name = "UGRD"; level = "P850"; }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+climo_mean = obs;
+climo_mean = {
+   file_name = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+mask = {
+   grid  = [];
+   poly  = [];
+   sid   = [];
+   llpnt = [{ name = "ALLLATLON"; lat_thresh = NA;   lon_thresh = NA; }];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+ci_alpha  = [ 0.05 ];
+
+boot = {
+   interval = PCTILE;
+   rep_prop = 1.0;
+   n_rep    = 200;
+   rng      = "mt19937";
+   seed     = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Interpolation methods
+// May be set separately in each "obs.field" entry
+//
+interp = {
+   vld_thresh = 1.0;
+   shape      = SQUARE;
+
+   type = [
+      {
+         method = NEAREST;
+         width  = 1;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// HiRA verification method
+// May be set separately in each "obs.field" entry
+//
+hira = {
+   flag            = FALSE;
+   width           = [ 2, 3, 4, 5 ];
+   vld_thresh      = 1.0;
+   cov_thresh      = [ ==0.25 ];
+   shape           = SQUARE;
+   prob_cat_thresh = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Threshold for SEEPS p1 (Probability of being dry)
+//
+seeps_p1_thresh = >=0.1&&<=0.85;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+// May be set separately in each "obs.field" entry
+//
+output_flag = {
+   fho    = NONE;
+   ctc    = NONE;
+   cts    = NONE;
+   mctc   = NONE;
+   mcts   = NONE;
+   cnt    = NONE;
+   sl1l2  = NONE;
+   sal1l2 = NONE;
+   vl1l2  = NONE;
+   val1l2 = NONE;
+   vcnt   = NONE;
+   pct    = NONE;
+   pstd   = NONE;
+   pjc    = NONE;
+   prc    = NONE;
+   ecnt   = NONE; // Only for HiRA.
+   orank  = NONE; // Only for HiRA.
+   rps    = NONE; // Only for HiRA.
+   eclv   = NONE;
+   mpr    = STAT;
+   seeps  = NONE;
+   seeps_mpr = NONE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+ugrid_dataset = "lfric_pressure_levels";
+ugrid_max_distance_km = 30;
+//ugrid_coordinates_file = "";
+
+////////////////////////////////////////////////////////////////////////////////
+
+tmp_dir       = "/tmp";
+output_prefix = "${OUTPUT_PREFIX}";
+version       = "V12.1.0";
+
+////////////////////////////////////////////////////////////////////////////////

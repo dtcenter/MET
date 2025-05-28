@@ -9,7 +9,7 @@ Introduction
 
 The Grid-Stat tool functions in much the same way as the Point-Stat tool, except that the verification statistics it calculates are for a matched forecast-observation grid (as opposed to a set of observation points). Neither the forecast nor the observation grid needs to be identical to the final matched grid. If the forecast grid is different from the final matched grid, then forecast values are regridded (interpolated) to the final matched grid. The same procedure is followed for observations. No regridding is necessary if the forecast and observation grids are identical but remains optional. A smoothing operation may be performed on the forecast and observation fields prior to verification. All the matched forecast-observation grid points are used to compute the verification statistics. In addition to traditional verification approaches, the Grid-Stat tool includes Fourier decompositions, gradient statistics, distance metrics, and neighborhood methods, designed to examine forecast performance as a function of spatial scale.
 
-Scientific and statistical aspects of the Grid-Stat tool are briefly described in this section, followed by practical details regarding usage and output from the tool.
+Scientific and statistical aspects of the Grid-Stat tool are briefly described in this section. Practical aspects of the Grid-Stat tool are described in :numref:`grid-stat_practical_info`.
 
 Scientific and Statistical Aspects
 ==================================
@@ -80,7 +80,8 @@ The Stable Equitable Error in Probability Space (SEEPS) was devised for monitori
 
 The capability to calculate the SEEPS has also been added to Grid-Stat. This follows the method described in :ref:`North et al, 2022 <North-2022>`, which uses the TRMM 3B42 v7 gridded satellite product for the climatological values and interpolates the forecast and observed products onto this grid for evaluation. A 24-hour TRMM climatology (valid at 00 UTC) constructed from data over the time period 1998-2015 is supplied with the release. Expansion of the capability to other fields will occur as well vetted examples and funding allow.
 
-The gridded climatology required to compute SEEPS is not distributed as part of the code release and can be downloaded from `Zenodo <https://zenodo.org/records/13121064?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6ImM5NThkNDU4LTEzNDgtNDlmMy05ZjMwLTVkOWQ0MGZjMTFjNyIsImRhdGEiOnt9LCJyYW5kb20iOiI0NzMxYTM3YmNkMWE0MDA4ZWUyMDU4YTdkOTUyMjE4NCJ9.NJZPN0KkouUCQSmB0QjZbfJEOO6d6ZZQ_Me5VLbVaUY4aWQHSqGE4VLmUdLk-uTjN749Wdv92xLYz0aXay5cNw>`. The path to the file needs to be specified using MET_SEEPS_GRID_CLIMO_NAME.
+The gridded climatology required to compute SEEPS is not distributed as part of the code release and can be downloaded from
+`Zenodo <https://zenodo.org/records/13121064>`_. The path to the file needs to be specified using MET_SEEPS_GRID_CLIMO_NAME.
 
 Fourier Decomposition
 ---------------------
@@ -97,6 +98,13 @@ Gradient Statistics
 The S1 score has been in historical use for verification of forecasts, particularly for variables such as pressure and geopotential height. This score compares differences between adjacent grid points in the forecast and observed fields. When the adjacent points in both forecast and observed fields exhibit the same differences, the S1 score will be the perfect value of 0. Larger differences will result in a larger score.
 
 Differences are computed in both of the horizontal grid directions and is not a true mathematical gradient. Because the S1 score focuses on differences only, any bias in the forecast will not be measured. Further, the score depends on the domain and spacing of the grid, so can only be compared on forecasts with identical grids.
+
+As described in :ref:`Ebert-Uphoff et al., 2024 <Ebert-Uphoff-2024>`, statistics based
+on the magnitude of the forecast and observed gradients are also provided. Similiar to
+the S1 score, the root-mean-squared error of the magnitude of the gradients and their
+divergence quantify the similarity in the texture of the fields, with 0 being a perfect
+score. These gradient-based statistics assess the difference in smoothness between the
+two fields but not the accuracy of the forecast.
 
 Distance Maps
 -------------
@@ -155,6 +163,8 @@ Whether or not the forecast from :numref:`grid-stat_fig6` is “good” or not d
 In some cases, a user may be interested in a much higher threshold than :math:`2.1 mmh^{-1}` of the above example. :ref:`Gilleland, 2021 (Fig. 4) <Gilleland-2021>`, for example, shows this same forecast using a threshold of :math:`40 mmh^{-1}`. Only a small area in Mississippi has such extreme rain predicted at this valid time; yet none was observed. Small spatial areas of extreme rain in the observed field, however, did occur in a location far away from Mississippi that was not predicted. Generally, for this type of verification, the Hausdorff metric is a good choice of measure. However, a small choice of :math:`\beta` will provide similar results as the Hausdorff distance (:ref:`Gilleland, 2021 <Gilleland-2021>`). The user should think about the average size of storm areas and multiply this value by the displacement distance  they are comfortable with in order to get a good initial choice for :math:`\beta`, and may have to increase or decrease its value by trial-and-error using one or two example cases from their verification set.
 
 Since :math:`G_\beta` is so sensitive to the choice of :math:`\beta`, which is defined relative to the number of points in the verification domain, :math:`G_\beta` is only computed for the full verification domain. :math:`G_\beta` is reported as a bad data value for any masking region subsets of the full verification domain.
+
+.. _grid-stat_practical_info:
 
 Practical Information
 =====================
@@ -243,7 +253,7 @@ __________________________
 
   model            = "FCST";
   desc             = "NA";
-  obtype           = "ANALYS"; 
+  obtype           = "ANALYS";
   fcst             = { ... }
   obs              = { ... }
   regrid           = { ... }
@@ -263,6 +273,7 @@ __________________________
   eclv_points      = 0.05;
   hss_ec_value     = NA;
   rank_corr_flag   = TRUE;
+  gradient         = { dx = [ 1 ]; dy = [ 1 ]; }
   grid_weight_flag = NONE;
   tmp_dir          = "/tmp";
   output_prefix    = "";
@@ -318,22 +329,6 @@ The available wave numbers start at 0 (the mean across each row of data) and end
 * The **wave_1d_end** entry is an array of integers specifying the last wave number to be included.
 
 _____________________
-
-.. _gradient:
-
-:ref:`gradient <gradient>`
-
-.. code-block:: none
-
-  gradient = {
-     dx = [ 1 ];
-     dy = [ 1 ];
-   }
-
-
-The **gradient** entry is a dictionary which specifies the number and size of gradients to be computed. The **dx** and **dy** entries specify the size of the gradients in grid units in the X and Y dimensions, respectively. **dx** and **dy** are arrays of integers (positive or negative) which must have the same length, and the GRAD output line type will be computed separately for each entry. When computing gradients, the value at the (x, y) grid point is replaced by the value at the (x+dx, y+dy) grid point minus the value at (x, y). This configuration option may be set separately in each **obs.field** entry.
-
-____________________
 
 .. _distance_map:
 
@@ -494,7 +489,7 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
 
 .. _table_GS_header_info_gs_outputs:
 
-.. list-table:: Header information for Grid-Stat STAT output 
+.. list-table:: Header information for Grid-Stat STAT output
   :widths: auto
   :header-rows: 1
 
@@ -832,10 +827,26 @@ The format of the STAT and ASCII output of the Grid-Stat tool are the same as th
   * - 33
     - DX
     - Gradient size in the X-direction
-    - Double
+    - Integer
   * - 34
     - DY
     - Gradient size in the Y-direction
+    - Integer
+  * - 35
+    - FGMAG
+    - Magnitude of the forecast gradient when the X and Y-directions are interpreted as a vector
+    - Double
+  * - 36
+    - OGMAG
+    - Magnitude of the observed gradient when the X and Y-directions are intrepreted as a vector
+    - Double
+  * - 37
+    - MAG_RMSE
+    - Root mean squared difference of the forecast gradient magnitude minus the observed gradient magnitude
+    - Double
+  * - 38
+    - LAPLACE_RMSE
+    - Root mean squared difference of the sum of the forecast X and Y-gradients minus the sum of the observed X and Y-gradients
     - Double
 
 .. _table_GS_format_info_DMAP:
@@ -998,4 +1009,4 @@ The output NetCDF file contains the dimensions and variables shown in :numref:`t
     - Float
 
 
-The STAT output files described for grid_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by grid_stat, please see :numref:`stat-analysis`. 
+The STAT output files described for grid_stat may be used as inputs to the Stat-Analysis tool. For more information on using the Stat-Analysis tool to create stratifications and aggregations of the STAT files produced by grid_stat, please see :numref:`stat-analysis`.

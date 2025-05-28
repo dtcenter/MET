@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1317,7 +1317,7 @@ void Simple_Node::get_simple_nodes(vector<Simple_Node> &v) const
 
 {
 
-v.push_back(*this);
+v.emplace_back(*this);
 
 return;
 

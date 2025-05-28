@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -342,8 +342,8 @@ Indent prefix(depth);
 
 out << prefix << "Name         = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << '\n';
 
@@ -371,11 +371,11 @@ ConcatString GaussianGrid::serialize(const char *sep) const
 {
     
 ConcatString a;
-char junk[256];
+ConcatString cs;
 
 a << "Projection: Gaussian" << sep;
 
-snprintf(junk, sizeof(junk), " Lon_Zero: %.4f", Lon_Zero);   a << junk;
+cs.format(" Lon_Zero: %.4f", Lon_Zero);   a << cs;
 
 a << "Nx: " << Nx << sep;
 a << "Ny: " << Ny;
@@ -457,7 +457,7 @@ GridRep * GaussianGrid::copy() const
 
 {
 
-GaussianGrid * p = new GaussianGrid (Data);
+auto * p = new GaussianGrid (Data);
 
 p->Name = Name;
 

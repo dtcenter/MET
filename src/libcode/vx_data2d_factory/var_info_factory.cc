@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -27,6 +27,7 @@
 #include "var_info_nc_cf.h"
 #include "var_info_nc_met.h"
 #include "var_info_nc_wrf.h"
+#include "var_info_pairs.h"
 #include "var_info_ugrid.h"
 
 #ifdef WITH_PYTHON
@@ -114,6 +115,10 @@ VarInfo * VarInfoFactory::new_var_info(GrdFileType type)
 #else
          ugrid_compile_error(method_name);
 #endif
+
+      case FileType_Pairs:
+         vi = new VarInfoPairs;
+         break;
 
       case FileType_HdfEos:
          mlog << Error << "\n" << method_name

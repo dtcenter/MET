@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -17,6 +17,7 @@
 
 #include <netcdf>
 
+#include "met_file.h"
 #include "get_met_grid.h"
 
 #include "nc_utils.h"
@@ -28,30 +29,37 @@ using namespace netCDF;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static void read_netcdf_grid_v3 (NcFile *, Grid &);
-static void read_netcdf_grid_v2 (NcFile *, Grid &);
+static void read_netcdf_grid_range_azimuth         (NcFile *, Grid &);
+static void read_netcdf_grid_v3                    (NcFile *, Grid &);
+static void read_netcdf_grid_v2                    (const NcFile *, Grid &);
 
-static LatLonData        get_latlon_data           (NcFile *);
-static RotatedLatLonData get_rot_latlon_data       (NcFile *);
-static LambertData       get_lambert_data          (NcFile *);
-static LaeaData          get_laea_data             (NcFile *);
-static StereographicData get_stereographic_data    (NcFile *);
-static MercatorData      get_mercator_data         (NcFile *);
-static GaussianData      get_gaussian_data         (NcFile *);
+static LatLonData        get_latlon_data           (const NcFile *);
+static RotatedLatLonData get_rot_latlon_data       (const NcFile *);
+static LambertData       get_lambert_data          (const NcFile *);
+static RngAziData         get_tcrmw_data            (NcFile *);
+static LaeaData          get_laea_data             (const NcFile *);
+static StereographicData get_stereographic_data    (const NcFile *);
+static MercatorData      get_mercator_data         (const NcFile *);
+static GaussianData      get_gaussian_data         (const NcFile *);
+static RngAziData        get_range_azimuth_data    (const NcFile *);
 static SemiLatLonData    get_semilatlon_data       (NcFile *);
 static void              get_semilatlon_var        (NcFile *, const char *, NumArray &);
 
-static LatLonData        get_latlon_data_v2        (NcFile *);
-static LambertData       get_lambert_data_v2       (NcFile *);
-static StereographicData get_stereographic_data_v2 (NcFile *);
-static MercatorData      get_mercator_data_v2      (NcFile *);
+static LatLonData        get_latlon_data_v2        (const NcFile *);
+static LambertData       get_lambert_data_v2       (const NcFile *);
+static StereographicData get_stereographic_data_v2 (const NcFile *);
+static MercatorData      get_mercator_data_v2      (const NcFile *);
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void read_netcdf_grid(NcFile * f_in, Grid & gr) {
 
+   // Check for range/azimuth grid
+   if(is_ncmet_range_azimuth_file(f_in)) {
+      read_netcdf_grid_range_azimuth(f_in, gr);
+   }
    // Parse the projection information based on the version
-   if(has_att(f_in, string("MET_version"))) {
+   else if(has_att(f_in, string("MET_version"))) {
       read_netcdf_grid_v3(f_in, gr);
    }
    else {
@@ -66,7 +74,19 @@ void read_netcdf_grid(NcFile * f_in, Grid & gr) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void read_netcdf_grid_v3(NcFile * f_in, Grid & gr) {
+static void read_netcdf_grid_range_azimuth(NcFile * f_in, Grid & gr) {
+
+   //
+   // Parse the range/azimuth grid specification
+   //
+   gr.set(get_tcrmw_data(f_in));
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static void read_netcdf_grid_v3(NcFile * f_in, Grid & gr) {
 
    //
    // Parse the grid specification out of the global attributes
@@ -104,6 +124,9 @@ void read_netcdf_grid_v3(NcFile * f_in, Grid & gr) {
                              gaussian_proj_type) == 0 )  {
          gr.set(get_gaussian_data(f_in));
       } else if ( strcasecmp(proj_att_name.c_str(),
+                             range_azimuth_proj_type) == 0 )  {
+         gr.set(get_range_azimuth_data(f_in));
+      } else if ( strcasecmp(proj_att_name.c_str(),
                              semilatlon_proj_type) == 0 )  {
          gr.set(get_semilatlon_data(f_in));
       } else {   // Unsupported projection type
@@ -118,6 +141,7 @@ void read_netcdf_grid_v3(NcFile * f_in, Grid & gr) {
               << laea_proj_type << ", "
               << stereographic_proj_type << ", "
               << gaussian_proj_type << ", "
+              << range_azimuth_proj_type << ", "
               << semilatlon_proj_type << ").\n\n";
 
          exit(1);
@@ -130,7 +154,7 @@ void read_netcdf_grid_v3(NcFile * f_in, Grid & gr) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void read_netcdf_grid_v2(NcFile * f_in, Grid & gr)
+static void read_netcdf_grid_v2(const NcFile * f_in, Grid & gr)
 {
 
    //
@@ -177,20 +201,7 @@ void read_netcdf_grid_v2(NcFile * f_in, Grid & gr)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int has_variable(NcFile *f_in, const char *var_name) {
-   int found;
-
-   //
-   // Initialize to not found
-   //
-   found = (has_var(f_in, var_name) ? 1 : 0);
-
-   return found;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-LatLonData get_latlon_data(NcFile * ncfile) {
+static LatLonData get_latlon_data(const NcFile * ncfile) {
 
    LatLonData data;
 
@@ -223,7 +234,7 @@ LatLonData get_latlon_data(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-RotatedLatLonData get_rot_latlon_data(NcFile * ncfile) {
+static RotatedLatLonData get_rot_latlon_data(const NcFile * ncfile) {
 
    RotatedLatLonData data;
 
@@ -264,7 +275,7 @@ RotatedLatLonData get_rot_latlon_data(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-LambertData get_lambert_data(NcFile * ncfile) {
+static LambertData get_lambert_data(const NcFile * ncfile) {
 
    LambertData data;
    ConcatString att_value;
@@ -321,7 +332,38 @@ LambertData get_lambert_data(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-LaeaData get_laea_data(NcFile * ncfile) {
+static RngAziData get_tcrmw_data(NcFile * ncfile) {
+
+   RngAziData data;
+
+   // Store the grid name
+   data.name = range_azimuth_proj_type;
+
+   // Get dimensions
+   data.range_n   = get_dim_value(ncfile, nc_met_range_name);
+   data.azimuth_n = get_dim_value(ncfile, nc_met_azimuth_name);
+
+   // Get maximum range value
+   NcVar range_var = get_nc_var(ncfile, "range");
+
+   vector<size_t> start;
+   vector<size_t> count;
+   start.emplace_back(0);
+   count.emplace_back(data.range_n);
+   vector<double> range_coord(data.range_n);
+   range_var.getVar(start, count, range_coord.data());
+   data.range_max_km = range_coord.back();
+
+   // Center lat/lon varies and must be reset when reading data
+   data.lat_center = bad_data_double;
+   data.lon_center = bad_data_double; 
+
+   return data;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static LaeaData get_laea_data(const NcFile * ncfile) {
 
    const char * method_name = "get_laea_data() -> ";
 
@@ -381,7 +423,7 @@ LaeaData get_laea_data(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StereographicData get_stereographic_data(NcFile * ncfile) {
+static StereographicData get_stereographic_data(const NcFile * ncfile) {
 
    StereographicData data;
    ConcatString att_value;
@@ -438,7 +480,7 @@ StereographicData get_stereographic_data(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-MercatorData get_mercator_data(NcFile * ncfile) {
+static MercatorData get_mercator_data(const NcFile * ncfile) {
 
    MercatorData data;
 
@@ -472,7 +514,7 @@ MercatorData get_mercator_data(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-LatLonData get_latlon_data_v2(NcFile * ncfile) {
+static LatLonData get_latlon_data_v2(const NcFile * ncfile) {
 
    LatLonData data;
 
@@ -505,7 +547,7 @@ LatLonData get_latlon_data_v2(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-LambertData get_lambert_data_v2(NcFile * ncfile) {
+static LambertData get_lambert_data_v2(const NcFile * ncfile) {
 
    LambertData data;
 
@@ -557,7 +599,7 @@ LambertData get_lambert_data_v2(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-StereographicData get_stereographic_data_v2(NcFile * ncfile) {
+static StereographicData get_stereographic_data_v2(const NcFile * ncfile) {
 
    StereographicData data;
 
@@ -612,7 +654,7 @@ StereographicData get_stereographic_data_v2(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-MercatorData get_mercator_data_v2(NcFile * ncfile) {
+static MercatorData get_mercator_data_v2(const NcFile * ncfile) {
 
    MercatorData data;
 
@@ -647,7 +689,7 @@ MercatorData get_mercator_data_v2(NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-GaussianData get_gaussian_data (NcFile * ncfile) {
+static GaussianData get_gaussian_data(const NcFile * ncfile) {
 
    GaussianData data;
 
@@ -670,7 +712,36 @@ GaussianData get_gaussian_data (NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-SemiLatLonData get_semilatlon_data (NcFile * ncfile) {
+static RngAziData get_range_azimuth_data(const NcFile * ncfile) {
+
+   RngAziData data;
+
+   // Store the grid name
+   data.name = range_azimuth_proj_type;
+
+   // range_n
+   get_global_att(ncfile, string("range_n"), data.range_n);
+
+   // azimuth_n
+   get_global_att(ncfile, string("azimuth_n"), data.azimuth_n);
+
+   // range_max_km
+   get_global_att(ncfile, string("range_max_km"), data.range_max_km);
+
+   // Center Latitude
+   get_global_att(ncfile, string("lat_center"), data.lat_center);
+
+   // Center Longitude
+   get_global_att(ncfile, string("lon_center"), data.lon_center);
+
+   data.dump();
+
+   return data;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+static SemiLatLonData get_semilatlon_data(NcFile * ncfile) {
 
    SemiLatLonData data;
 
@@ -688,7 +759,7 @@ SemiLatLonData get_semilatlon_data (NcFile * ncfile) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void get_semilatlon_var(NcFile *ncfile, const char * var_name, NumArray &out_na)  {
+static void get_semilatlon_var(NcFile *ncfile, const char * var_name, NumArray &out_na)  {
 
    NcVar nc_var = get_var(ncfile, var_name);
 

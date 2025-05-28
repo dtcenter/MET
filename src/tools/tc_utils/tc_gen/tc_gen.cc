@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1909,7 +1909,7 @@ void setup_table(AsciiTable &at) {
    at.set_bad_data_str(na_str);
 
    // Don't write out trailing blank rows
-   at.set_delete_trailing_blank_rows(1);
+   at.set_delete_trailing_blank_rows(true);
 
    return;
 }
@@ -2411,11 +2411,6 @@ void write_nc(GenCTCInfo &gci) {
    unixtime valid_beg = (unixtime) 0;
    unixtime valid_end = (unixtime) 0;
 
-   // Allocate memory
-   int nx = gci.NcOutGrid->nx();
-   int ny = gci.NcOutGrid->ny();
-   vector<float> data(nx*ny, 0.0);
-
    // Loop over vector of output types
    for(i=0; i<n_ncout; i++) {
 
@@ -2502,11 +2497,8 @@ void write_nc(GenCTCInfo &gci) {
       mlog << Debug(4) << "Writing output variable \""
            << var_name << "\".\n";
 
-      int n, x, y;
-      ConcatString cs;
-      NcVar nc_var;
-
       // Otherwise, add to the list of previously defined variables
+      NcVar nc_var;
       nc_var_sa.add(var_name);
 
       // Define the variable
@@ -2522,16 +2514,8 @@ void write_nc(GenCTCInfo &gci) {
       add_att(&nc_var, "valid_beg", unix_to_yyyymmdd_hhmmss(valid_beg));
       add_att(&nc_var, "valid_end", unix_to_yyyymmdd_hhmmss(valid_end));
 
-      // Store the data
-      for(x=0; x<nx; x++) {
-         for(y=0; y<ny; y++) {
-            n = DefaultTO.two_to_one(nx, ny, x, y);
-            data[n] = gci.DpMap[(ncout_str[i])].get(x, y);
-         } // end for y
-      } // end for x
-
       // Write out the data
-      if(!put_nc_data_with_dims(&nc_var, data.data(), ny, nx)) {
+      if(!put_nc_data_plane_float(&nc_var, gci.DpMap[(ncout_str[i])])) {
          mlog << Error << "\nwrite_nc() -> "
               << "error writing NetCDF variable name " << var_name
               << "\n\n";

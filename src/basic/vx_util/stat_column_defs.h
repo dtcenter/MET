@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -249,7 +249,9 @@ static const char * const grad_columns [] = {
    "TOTAL",
    "FGBAR",       "OGBAR",       "MGBAR",
    "EGBAR",       "S1",          "S1_OG",
-   "FGOG_RATIO",  "DX",          "DY"
+   "FGOG_RATIO",  "DX",          "DY",
+   "FGMAG",       "OGMAG",       "MAG_RMSE",
+   "LAPLACE_RMSE"
 };
 
 static const char * const dmap_columns [] = {

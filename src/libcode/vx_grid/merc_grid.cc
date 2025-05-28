@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -457,8 +457,8 @@ Indent prefix(depth);
 
 out << prefix << "Name       = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << '\n';
 
@@ -498,24 +498,24 @@ ConcatString MercatorGrid::serialize(const char *sep) const
 {
 
 ConcatString a;
-char junk[256];
+ConcatString cs;
 
 a << "Projection: Mercator" << sep;
 
 a << "Nx: " << Nx << sep;
 a << "Ny: " << Ny << sep;
 
-snprintf(junk, sizeof(junk), "Lat_LL_radians: %.4f", Lat_LL_radians);   a << junk << sep;
-snprintf(junk, sizeof(junk), "Lon_LL_radians: %.4f", Lon_LL_radians);   a << junk << sep;
+cs.format("Lat_LL_radians: %.4f", Lat_LL_radians);   a << cs << sep;
+cs.format("Lon_LL_radians: %.4f", Lon_LL_radians);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "Lat_UR_radians: %.4f", Lat_UR_radians);   a << junk << sep;
-snprintf(junk, sizeof(junk), "Lon_UR_radians: %.4f", Lon_UR_radians);   a << junk << sep;
+cs.format("Lat_UR_radians: %.4f", Lat_UR_radians);   a << cs << sep;
+cs.format("Lon_UR_radians: %.4f", Lon_UR_radians);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "Mx: %.4f", Mx);   a << junk << sep;
-snprintf(junk, sizeof(junk), "My: %.4f", My);   a << junk << sep;
+cs.format("Mx: %.4f", Mx);   a << cs << sep;
+cs.format("My: %.4f", My);   a << cs << sep;
 
-snprintf(junk, sizeof(junk), "Bx: %.4f", Bx);   a << junk << sep;
-snprintf(junk, sizeof(junk), "By: %.4f", By);   a << junk;
+cs.format("Bx: %.4f", Bx);   a << cs << sep;
+cs.format("By: %.4f", By);   a << cs;
 
    //
    //  done
@@ -595,7 +595,7 @@ GridRep * MercatorGrid::copy() const
 
 {
 
-MercatorGrid * p = new MercatorGrid (Data);
+auto * p = new MercatorGrid (Data);
 
 p->Name = Name;
 

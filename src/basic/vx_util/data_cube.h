@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -19,90 +19,90 @@
 
 class DataCube {
 
-    public:
+   public:
 
-        // Constructors
-        DataCube();
+      // Constructors
+      DataCube();
 
-        DataCube(const DataCube&);
+      DataCube(const DataCube&);
 
-        // Destructor
-        ~DataCube();
+      // Destructor
+      ~DataCube();
 
-        void clear();
+      void clear();
 
-        void erase();
+      void erase();
 
-        // Set methods
-        void set_size(int nx, int ny, int nz);
+      // Set methods
+      void set_size(int nx, int ny, int nz);
 
-        void set(double value, int i, int j, int k);
+      void set(double value, int i, int j, int k);
 
-        void set_constant(double value);
+      void set_constant(double value);
 
-        // Get sizes
-        int nx() const;
-        int ny() const;
-        int nz() const;
+      // Get sizes
+      int nx() const;
+      int ny() const;
+      int nz() const;
 
-        bool shape_equal(const DataCube&);
+      bool shape_equal(const DataCube&);
 
-        void check_shape_equal(const DataCube&);
+      void check_shape_equal(const DataCube&);
 
-        // Index get
-        double get(int i, int j, int k) const;
+      // Index get
+      double get(int i, int j, int k) const;
 
-        // Assignment
-        void assign(const DataCube&);
+      // Assignment
+      void assign(const DataCube&);
 
-        // Arithmetic methods
-        void increment(void);
+      // Arithmetic methods
+      void increment(void);
 
-        void add_assign(const DataCube&);
+      void add_assign(const DataCube&);
 
-        void subtract_assign(const DataCube&);
+      void subtract_assign(const DataCube&);
 
-        void multiply_assign(const DataCube&);
+      void multiply_assign(const DataCube&);
 
-        void divide_assign(int);
+      void divide_assign(int);
 
-        void divide_assign(const DataCube&);
+      void divide_assign(const DataCube&);
 
-        void min_assign(const DataCube&);
+      void min_assign(const DataCube&);
 
-        void max_assign(const DataCube&);
+      void max_assign(const DataCube&);
 
-        void square();
+      void square();
 
-        void square_root();
+      void square_root();
 
-        // Index operator
-        double operator()(int i, int j, int k) const;
+      // Index operator
+      double operator()(int i, int j, int k) const;
 
-        // Assignment operator
-        DataCube& operator=(const DataCube&);
+      // Assignment operator
+      DataCube& operator=(const DataCube&);
 
-        // Arithmetic operators
-        DataCube& operator+=(const DataCube&);
+      // Arithmetic operators
+      DataCube& operator+=(const DataCube&);
 
-        DataCube& operator-=(const DataCube&);
+      DataCube& operator-=(const DataCube&);
 
-        DataCube& operator*=(const DataCube&);
+      DataCube& operator*=(const DataCube&);
 
-        DataCube& operator/=(const DataCube&);
+      DataCube& operator/=(const DataCube&);
 
-        double* data();
+      double* data();
 
-    private:
+   private:
 
-        int Nx;
-        int Ny;
-        int Nz;
-        int Nxyz; // Nx * Ny * Nz
+      int Nx;
+      int Ny;
+      int Nz;
+      int Nxyz; // Nx * Ny * Nz
 
-        std::vector<double> Data;
+      std::vector<double> Data;
 
-        void init_from_scratch();
+      void init_from_scratch();
 };
 
 #endif  /*  __DATA_CUBE_H__  */

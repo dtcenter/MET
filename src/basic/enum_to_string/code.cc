@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -78,7 +78,7 @@ char filename[256];
 char lower[256];
 char upper[256];
 char pound_define[256];
-char junk[256];
+ConcatString cs;
 int len, scope_len, max_len;
 char * len_name = (char *) nullptr;
 
@@ -117,9 +117,9 @@ patch_name(len_name);
 
 if ( do_prefix && (e.u_scope()) )  {
 
-   snprintf(junk, sizeof(junk), "%s_%s", e.u_scope(), e.name());
+   cs.format("%s_%s", e.u_scope(), e.name());
 
-   make_lowercase(junk, lower);
+   make_lowercase(cs.c_str(), lower);
 
 } else {
 
@@ -261,7 +261,7 @@ char filename[256];
 char lower[256];
 char upper[256];
 char pound_define[256];
-char junk[256];
+ConcatString cs;
 int len, scope_len, max_len;
 char * len_name = (char *) nullptr;
 
@@ -288,9 +288,7 @@ len_name = new char [max_len + 40];
 if ( e.scope() )   snprintf(len_name, (max_len + 40), "max_enum_%s_%s_len", e.scope(), e.name());
 else               snprintf(len_name, (max_len + 40), "max_enum_%s_len",   e.name());
 
-
 patch_name(len_name);
-
 
    //
    //  construct output file name
@@ -298,9 +296,9 @@ patch_name(len_name);
 
 if ( do_prefix && (e.u_scope()) )  {
 
-   snprintf(junk, sizeof(junk), "%s_%s", e.u_scope(), e.name());
+   cs.format("%s_%s", e.u_scope(), e.name());
 
-   make_lowercase(junk, lower);
+   make_lowercase(cs.c_str(), lower);
 
 } else {
 
@@ -426,7 +424,7 @@ char L = '\"';
 char R = '\"';
 char filename[256];
 char lower[256];
-char junk[256];
+ConcatString cs;
 
 
 
@@ -438,17 +436,15 @@ if ( do_angle_brackets )  {
 
 }
 
-
    //
    //  construct output file name
    //
 
-
 if ( do_prefix && (e.u_scope()) )  {
 
-   snprintf(junk, sizeof(junk), "%s_%s", e.u_scope(), e.name());
+   cs.format("%s_%s", e.u_scope(), e.name());
 
-   make_lowercase(junk, lower);
+   make_lowercase(cs.c_str(), lower);
 
 } else {
 
@@ -542,7 +538,7 @@ char L = '\"';
 char R = '\"';
 char filename[256];
 char lower[256];
-char junk[256];
+ConcatString cs;
 
 
 
@@ -562,9 +558,9 @@ if ( do_angle_brackets )  {
 
 if ( do_prefix && (e.u_scope()) )  {
 
-   snprintf(junk, sizeof(junk), "%s_%s", e.u_scope(), e.name());
+   cs.format("%s_%s", e.u_scope(), e.name());
 
-   make_lowercase(junk, lower);
+   make_lowercase(cs.c_str(), lower);
 
 } else {
 

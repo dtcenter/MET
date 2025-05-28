@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -14,13 +14,17 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
+#include <netcdf>
+#include <vector>
 
 #include "data2d_nc_met.h"
 #include "get_met_grid.h"
+#include "nc_utils.h"
 #include "vx_math.h"
 #include "vx_log.h"
 
 using namespace std;
+using namespace netCDF;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -120,6 +124,91 @@ void MetNcMetDataFile::dump(ostream & out, int depth) const {
 
 ////////////////////////////////////////////////////////////////////////
 
+void MetNcMetDataFile::set_range_azimuth_grid_center(int i_track_point) {
+
+   if(!MetNc->is_range_azimuth()) return;
+
+   // Get current RngAziData object
+   RngAziData d = *(MetNc->grid.info().ra);
+   d.lat_center = bad_data_double;
+   d.lon_center = bad_data_double;
+
+   // Output with no track point dimension
+   if(i_track_point < 0) {
+
+      // RMW-Analysis writes TrackLat_mean and TrackLon_mean variables
+      if(has_var(MetNc->Nc, "TrackLat_mean") &&
+         has_var(MetNc->Nc, "TrackLon_mean")) {
+         NcVar var_lat = get_nc_var(MetNc->Nc, "TrackLat_mean");
+         var_lat.getVar(&d.lat_center);
+         NcVar var_lon = get_nc_var(MetNc->Nc, "TrackLon_mean");
+         var_lon.getVar(&d.lon_center);
+         d.lon_center *= -1.0;
+      }
+   }
+   // Output with a track point dimension
+   else {
+
+      vector<size_t> start(1, i_track_point);
+      vector<size_t> count(1, 1);
+
+      // TC-RMW writes FullTrackLat and FullTrackLon variables
+      if(has_var(MetNc->Nc, "FullTrackLat") &&
+         has_var(MetNc->Nc, "FullTrackLon")) {
+         NcVar var_lat = get_nc_var(MetNc->Nc, "FullTrackLat");
+         var_lat.getVar(start, count, &d.lat_center);
+         NcVar var_lon = get_nc_var(MetNc->Nc, "FullTrackLon");
+         var_lon.getVar(start, count, &d.lon_center);
+         d.lon_center *= -1.0;
+      }
+      // TC-Diag writes TrackLat and TrackLon variables
+      else if(has_var(MetNc->Nc, "TrackLat") &&
+              has_var(MetNc->Nc, "TrackLon")) {
+         NcVar var_lat = get_nc_var(MetNc->Nc, "TrackLat");
+         var_lat.getVar(start, count, &d.lat_center);
+         NcVar var_lon = get_nc_var(MetNc->Nc, "TrackLon");
+         var_lon.getVar(start, count, &d.lon_center);
+         d.lon_center *= -1.0;
+      }
+   }
+
+   // Reset the range/azimuth grid
+   if(!is_bad_data(d.lat_center) &&
+      !is_bad_data(d.lon_center)) {
+      MetNc->grid.set(d);
+      set_grid(MetNc->grid);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void MetNcMetDataFile::set_range_azimuth_times(int i_track_point, DataPlane &plane) {
+
+   if(!MetNc->is_range_azimuth() || i_track_point < 0) return;
+
+   string ymd_hms_str("19700101_000000");
+   vector<size_t> start(1, i_track_point);
+   vector<size_t> count(1, 1);
+
+   // Initialization time
+   NcVar var_init = get_nc_var(MetNc->Nc, "init_time");
+   var_init.getVar(&ymd_hms_str);
+   plane.set_init(timestring_to_unix(ymd_hms_str.c_str()));
+
+   // Valid time
+   NcVar var_valid = get_nc_var(MetNc->Nc, "valid_time");
+   var_valid.getVar(start, count, &ymd_hms_str);
+   plane.set_valid(timestring_to_unix(ymd_hms_str.c_str()));
+
+   // Lead time
+   int lead_sec;
+   NcVar var_lead = get_nc_var(MetNc->Nc, "lead_time_sec");
+   var_lead.getVar(start, count, &lead_sec);
+   plane.set_lead(lead_sec);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    bool status = false;
    ConcatString req_time_str, data_time_str;
@@ -131,12 +220,12 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
    plane.clear();
 
    // Check for NA in the requested name
-   if( vinfo_nc->req_name() ==  na_str ) {
+   if(vinfo_nc->req_name() == na_str) {
 
       // Store the name of the first data variable
       for(i=0; i<MetNc->Nvars; i++) {
-         if( MetNc->Var[i].name != nc_met_lat_var_name &&
-             MetNc->Var[i].name != nc_met_lon_var_name ) {
+         if( MetNc->Var[i].name != nc_met_lat_name &&
+             MetNc->Var[i].name != nc_met_lon_name ) {
             vinfo_nc->set_req_name(MetNc->Var[i].name.c_str());
             break;
          }
@@ -150,6 +239,15 @@ bool MetNcMetDataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
    // Check that the times match those requested
    if(status) {
+
+      // Update the range/azimuth times and grid location, if possible 
+      if(MetNc->is_range_azimuth()) {
+         auto i_track_point = (int) (info->t_slot >=0 ?
+                                     vinfo_nc->dimension()[info->t_slot] :
+                                     bad_data_int);
+         set_range_azimuth_grid_center(i_track_point);
+         set_range_azimuth_times(i_track_point, plane);
+      } 
 
       // Check that the valid time matches the request
       if(vinfo.valid() > 0 && vinfo.valid() != plane.valid()) {

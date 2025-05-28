@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -165,13 +165,13 @@ ConcatString ConvRecord::date_string() const
 {
 
 int month, day, year, hour, minute, second;
-char junk[256];
+ConcatString cs;
 
 unix_to_mdyhms(date, month, day, year, hour, minute, second);
 
-snprintf(junk, sizeof(junk), "%04d%02d%02d_%02d0000", year, month, day, hour);
+cs.format("%04d%02d%02d_%02d0000", year, month, day, hour);
 
-return ConcatString(junk);
+return cs;
 
 }
 

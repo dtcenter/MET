@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research led(UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -111,6 +111,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
+#include <array>
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -568,7 +569,7 @@ void setup_table(AsciiTable &at) {
    at.set_bad_data_str(na_str);
 
    // Don't write out trailing blank rows
-   at.set_delete_trailing_blank_rows(1);
+   at.set_delete_trailing_blank_rows(true);
 
    return;
 }
@@ -658,15 +659,15 @@ void process_fcst_climo_files() {
 
          // Loop through the forecast fields
          for(j=0; j<fcst_dpa.n_planes(); j++) {
-            fcst_dpa[j] = met_regrid(fcst_dpa[j], fcst_mtddf->grid(), grid,
-                                     fcst_info->regrid());
+            fcst_dpa.at(j) = met_regrid(fcst_dpa[j], fcst_mtddf->grid(), grid,
+                                        fcst_info->regrid());
          }
       }
 
       // Rescale probabilities from [0, 100] to [0, 1]
       if(fcst_info->p_flag()) {
          for(j=0; j<fcst_dpa.n_planes(); j++) {
-            rescale_probability(fcst_dpa[j]);
+            rescale_probability(fcst_dpa.at(j));
          }
       } // end for j
 
@@ -839,8 +840,8 @@ void process_obs_file(int i_nc) {
    if(use_var_id) var_names = met_point_obs->get_var_names();
 
    const int buf_size = (obs_count > BUFFER_SIZE) ? BUFFER_SIZE : obs_count;
-   int   obs_qty_idx_block[buf_size];
-   float obs_arr_block[buf_size][OBS_ARRAY_LEN];
+   vector<int> obs_qty_idx_block(buf_size);
+   vector<std::array<float, OBS_ARRAY_LEN>> obs_arr_block(buf_size);
 
    // Process each observation in the file
    int block_size;
@@ -852,12 +853,14 @@ void process_obs_file(int i_nc) {
 #ifdef WITH_PYTHON
       if (use_python)
          status = met_point_obs->get_point_obs_data()->fill_obs_buf(
-                             block_size, i_block_start_idx, (float *)obs_arr_block, obs_qty_idx_block);
+                             block_size, i_block_start_idx,
+                             (float *)obs_arr_block.data(),
+                             obs_qty_idx_block.data());
       else
 #endif
          status = nc_point_obs.read_obs_data(block_size, i_block_start_idx,
-                                            (float *)obs_arr_block,
-                                            obs_qty_idx_block, (char *)nullptr);
+                                            (float *)obs_arr_block.data(),
+                                            obs_qty_idx_block.data(), nullptr);
       if (!status) exit(1);
 
       int hdr_idx;
@@ -2128,7 +2131,8 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                pd_ptr->typ_sa[k].c_str(),
                pd_ptr->sid_sa[k].c_str(),
                pd_ptr->lat_na[k], pd_ptr->lon_na[k],
-               pd_ptr->x_na[k], pd_ptr->y_na[k], pd_ptr->vld_ta[k],
+               pd_ptr->x_na[k], pd_ptr->y_na[k],
+               nint(pd_ptr->f_lead_na[k]), pd_ptr->vld_ta[k],
                pd_ptr->lvl_na[k], pd_ptr->elv_na[k],
                f_cov, pd_ptr->o_na[k], pd_ptr->o_qc_sa[k].c_str(),
                cpi, pd_ptr->wgt_na[k]);

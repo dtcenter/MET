@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -213,7 +213,7 @@ class VarInfoNcWrf : public VarInfo
          // get stuff
          //
 
-      GrdFileType file_type() const;
+      GrdFileType       file_type()      const;
       const LongArray & dimension()      const;
       int               dimension(int i) const;
       const NumArray  & dim_value()      const;

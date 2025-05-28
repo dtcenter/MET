@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 ////////////////////////////////////////////////////////////////////////
-
-using namespace std;
 
 #include <iostream>
 
@@ -18,8 +16,11 @@ using namespace std;
 
 #include "iabp_handler.h"
 
-const double IabpHandler::IABP_MISSING_VALUE = -999.0;
+using namespace std;
 
+////////////////////////////////////////////////////////////////////////
+
+const double IabpHandler::IABP_MISSING_VALUE = -999.0;
 
 const int IabpHandler::MIN_NUM_HDR_COLS = 8;
 
@@ -29,7 +30,6 @@ static int daysOfMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 static int _lookfor(const DataLine &dl, const string &name);
 static int _lookfor(const DataLine &dl, const string &name, const string &ascii_file, bool &ok);
 static time_t _time(const string &syear, const string &shour, const string &smin, const string &sdoy);
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -69,18 +69,13 @@ bool IabpHandler::isFileType(LineDataFile &ascii_file) const {
       return false;
    }
 
-   string line = dl.get_line();
-   ConcatString cstring(line);
-
-   StringArray tokens = cstring.split(" ");
-   if (tokens[0] != "BuoyID") is_file_type = false;
-   if (tokens[1] != "Year") is_file_type = false;
-   if (tokens[2] != "Hour") is_file_type = false;
-   if (tokens[3] != "Min") is_file_type = false;
-   if (tokens[4] != "DOY") is_file_type = false;
-   if (tokens[5] != "POS_DOY") is_file_type = false;
-   if (tokens[6] != "Lat") is_file_type = false;
-   if (tokens[7] != "Lon") is_file_type = false;
+   // Check expected header column names
+   if (dl[0] != (string) "BuoyID" || dl[1] != (string) "Year"    ||
+       dl[2] != (string) "Hour"   || dl[3] != (string) "Min"     ||
+       dl[4] != (string) "DOY"    || dl[5] != (string) "POS_DOY" ||
+       dl[6] != (string) "Lat"    || dl[7] != (string) "Lon") {
+      is_file_type = false;
+   }
 
    return is_file_type;
 }
@@ -133,7 +128,7 @@ bool IabpHandler::_readObservations(LineDataFile &ascii_file)
       double ts = bad_data_double;
       double ta = bad_data_double;
 
-      if (lat == IABP_MISSING_VALUE || lon == IABP_MISSING_VALUE) {
+      if (is_eq(lat, IABP_MISSING_VALUE) || is_eq(lon, IABP_MISSING_VALUE)) {
          // This is either a rare event or never happens
          mlog << Warning << "\nIabpHandler::_readObservations() -> "
               << "Latitude/longitude has missing value " << IABP_MISSING_VALUE
@@ -146,7 +141,7 @@ bool IabpHandler::_readObservations(LineDataFile &ascii_file)
          // is this the right placeholder for this? To always put it in to the
          // fixed slot of an observation?
          pres = stod(dl[_bpPtr]);
-         if (pres == IABP_MISSING_VALUE) {
+         if (is_eq(pres, IABP_MISSING_VALUE)) {
             pres = bad_data_double;
          }
       }

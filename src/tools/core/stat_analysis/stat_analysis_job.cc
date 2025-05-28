@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -653,7 +653,7 @@ void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
    //
    in_lt  = string_to_statlinetype(job.line_type[0].c_str());
    for(i=0; i<job.out_line_type.n(); i++) {
-      out_lt.push_back(string_to_statlinetype(job.out_line_type[i].c_str()));
+      out_lt.emplace_back(string_to_statlinetype(job.out_line_type[i].c_str()));
    }
 
    //
@@ -4407,7 +4407,7 @@ void setup_table(AsciiTable &at, int n_hdr_cols, int prec) {
    at.set_bad_data_str(na_str);
 
    // Don't write out trailing blank rows
-   at.set_delete_trailing_blank_rows(1);
+   at.set_delete_trailing_blank_rows(true);
 
    return;
 }

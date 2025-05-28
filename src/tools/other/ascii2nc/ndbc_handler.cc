@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -99,20 +99,20 @@ NdbcHandler::NdbcHandler(const string &program_name) :
   // NOTE these will be used as index values in the observations
   // 0 = wind dir, 1 = wind speed, etc.
   //
-  column.push_back(Column(hdr_wind_dir));
-  column.push_back(Column(hdr_wind_speed));
-  column.push_back(Column(hdr_gust_speed));
-  column.push_back(Column(hdr_wave_height));
-  column.push_back(Column(hdr_dominant_wave_period));
-  column.push_back(Column(hdr_average_wave_period));
-  column.push_back(Column(hdr_dominant_wave_direction));
-  column.push_back(Column(hdr_sea_level_pressure));
-  column.push_back(Column(hdr_air_temp));
-  column.push_back(Column(hdr_sea_surface_temp));
-  column.push_back(Column(hdr_dewpoint));
-  column.push_back(Column(hdr_visibility));
-  column.push_back(Column(hdr_pressure_tendency));
-  column.push_back(Column(hdr_tide));
+  column.emplace_back(Column(hdr_wind_dir));
+  column.emplace_back(Column(hdr_wind_speed));
+  column.emplace_back(Column(hdr_gust_speed));
+  column.emplace_back(Column(hdr_wave_height));
+  column.emplace_back(Column(hdr_dominant_wave_period));
+  column.emplace_back(Column(hdr_average_wave_period));
+  column.emplace_back(Column(hdr_dominant_wave_direction));
+  column.emplace_back(Column(hdr_sea_level_pressure));
+  column.emplace_back(Column(hdr_air_temp));
+  column.emplace_back(Column(hdr_sea_surface_temp));
+  column.emplace_back(Column(hdr_dewpoint));
+  column.emplace_back(Column(hdr_visibility));
+  column.emplace_back(Column(hdr_pressure_tendency));
+  column.emplace_back(Column(hdr_tide));
 
   numMissingStations = 0;
 }

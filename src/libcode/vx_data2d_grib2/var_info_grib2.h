@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -161,21 +161,14 @@ inline int         VarInfoGrib2::der_type()   const { return DerType;      }
 inline int         VarInfoGrib2::stat_type()  const { return StatType;     }
 inline int         VarInfoGrib2::perc_val()   const { return PercVal;      }
 
-inline int         VarInfoGrib2::aerosol_type()          const { return AerosolType;         }
-inline int         VarInfoGrib2::aerosol_interval_type() const { return AerosolIntervalType; }
-inline double      VarInfoGrib2::aerosol_size_lower()    const { return AerosolSizeLower;    }
-inline double      VarInfoGrib2::aerosol_size_upper()    const { return AerosolSizeUpper;    }
+inline int    VarInfoGrib2::aerosol_type()          const { return AerosolType;         }
+inline int    VarInfoGrib2::aerosol_interval_type() const { return AerosolIntervalType; }
+inline double VarInfoGrib2::aerosol_size_lower()    const { return AerosolSizeLower;    }
+inline double VarInfoGrib2::aerosol_size_upper()    const { return AerosolSizeUpper;    }
 
-inline int         VarInfoGrib2::n_ipdtmpl()  const { 
-                                    return IPDTmplIndex.n(); }
-inline int         VarInfoGrib2::ipdtmpl_index(int i) const {
-                                    return IPDTmplIndex[i]; }
-inline int         VarInfoGrib2::ipdtmpl_val(int i) const {
-                                    return IPDTmplVal[i]; }
-
-///////////////////////////////////////////////////////////////////////////////
-
-
+inline int VarInfoGrib2::n_ipdtmpl()          const { return IPDTmplIndex.n(); } 
+inline int VarInfoGrib2::ipdtmpl_index(int i) const { return IPDTmplIndex[i];  }
+inline int VarInfoGrib2::ipdtmpl_val(int i)   const { return IPDTmplVal[i];    }
 
 ///////////////////////////////////////////////////////////////////////////////
 

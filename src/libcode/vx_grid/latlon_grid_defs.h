@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -74,7 +74,7 @@ struct RotatedLatLonData {
 ////////////////////////////////////////////////////////////////////////
 
 
-struct TcrmwData {
+struct RngAziData {
 
    const char * name;   //  not allocated
 
@@ -85,6 +85,8 @@ struct TcrmwData {
 
    double lat_center;
    double lon_center;
+
+   void dump() const;
 
 };
 

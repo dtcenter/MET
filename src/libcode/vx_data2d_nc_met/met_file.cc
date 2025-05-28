@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -34,7 +34,7 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const int  max_met_args             = 30;
+static const int max_met_args = 30;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -123,7 +123,10 @@ Ndims = 0;
 
 DimNames.clear();
 
-Xdim = Ydim = (NcDim *) nullptr;
+Xdim = nullptr;
+Ydim = nullptr;
+Tdim = nullptr;
+Zdim = nullptr;
 
 Nvars = 0;
 
@@ -145,80 +148,101 @@ bool MetNcFile::open(const char * filename)
 
 {
 
-int j, k;
-string c;
-long long ill, vll;
-NcVar v;
+   close();
 
+   Nc = open_ncfile(filename);
 
-close();
-
-Nc = open_ncfile(filename);
-
-if ( IS_INVALID_NC_P(Nc) )  { close();  return false; }
+   if ( IS_INVALID_NC_P(Nc) )  { close();  return false; }
 
    //
    //  grid
    //
 
-read_netcdf_grid(Nc, grid);
+   read_netcdf_grid(Nc, grid);
 
    //
    //  dimensions
    //
 
-StringArray gDimNames;
-get_dim_names(Nc, &gDimNames);
+   StringArray gDimNames;
+   get_dim_names(Nc, &gDimNames);
 
-Ndims = gDimNames.n();
+   Ndims = gDimNames.n();
 
-string x_dim_name, y_dim_name;
+   string x_dim_name;
+   string y_dim_name;
+   string t_dim_name;
+   string z_dim_name;
 
    //
    //  semilatlon dimension names
    //
 
-if ( grid.is_set() && grid.info().sl ) {
+   if ( grid.is_set() && grid.info().sl ) {
 
-        if ( gDimNames.has("latlon") )  x_dim_name = "latlon";
-   else if ( gDimNames.has("lon")    )  x_dim_name = "lon";
-   else if ( gDimNames.has("lat")    )  y_dim_name = "lat";
+           if ( gDimNames.has("latlon") )  x_dim_name = "latlon";
+      else if ( gDimNames.has("lon")    )  x_dim_name = "lon";
+      else if ( gDimNames.has("lat")    )  y_dim_name = "lat";
 
-   if ( gDimNames.has("level") ) {
-           if ( x_dim_name.empty() )  x_dim_name = "level";
-      else if ( y_dim_name.empty() )  y_dim_name = "level";
+      if ( gDimNames.has("level") ) {
+              if ( x_dim_name.empty() )  x_dim_name = "level";
+         else if ( y_dim_name.empty() )  y_dim_name = "level";
+      }
+      else if ( gDimNames.has("time") ) {
+              if ( x_dim_name.empty() )  x_dim_name = "time";
+         else if ( y_dim_name.empty() )  y_dim_name = "time";
+      }
+
    }
-   else if ( gDimNames.has("time") ) {
-           if ( x_dim_name.empty() )  x_dim_name = "time";
-      else if ( y_dim_name.empty() )  y_dim_name = "time";
-   }
 
-}
+   //
+   //  range/azimuth dimension names
+   //
+
+   else if ( is_range_azimuth() ) {
+
+      x_dim_name = nc_met_azimuth_name;
+      y_dim_name = nc_met_range_name;
+      z_dim_name = nc_met_pressure_name;
+
+      // Time dimension:
+      //   - TC-Diag writes the track_point dimension
+      //   - TC-RMW writes the time dimension
+      if ( gDimNames.has("track_point") ) t_dim_name = "track_point";
+      else                                t_dim_name = "time";
+
+   }
 
    //
    //  default dimension names
    //
 
-else {
+   else {
 
-   x_dim_name = "lon";
-   y_dim_name = "lat";
+      x_dim_name = "lon";
+      y_dim_name = "lat";
 
-}
-
-
-for (j=0; j<Ndims; ++j)  {
-   c = to_lower(gDimNames[j]);
-   NcDim dim = get_nc_dim(Nc, gDimNames[j]);
-
-   if ( c.compare(x_dim_name) == 0 ) {
-      Xdim = &dim;
-   }
-   if ( c.compare(y_dim_name) == 0 ) {
-      Ydim = &dim;
    }
 
-}
+
+   for (int j=0; j<Ndims; ++j)  {
+      string c = to_lower(gDimNames[j]);
+      NcDim dim = get_nc_dim(Nc, gDimNames[j]);
+
+      if ( c.compare(x_dim_name) == 0 ) {
+         Xdim = &dim;
+      }
+      if ( c.compare(y_dim_name) == 0 ) {
+         Ydim = &dim;
+      }
+      if ( c.compare(t_dim_name) == 0 ) {
+         Tdim = &dim;
+      }
+      if ( c.compare(z_dim_name) == 0 ) {
+         Zdim = &dim;
+      }
+
+   }
 
    //
    //  variables
@@ -229,10 +253,9 @@ for (j=0; j<Ndims; ++j)  {
 
    Var = new NcVarInfo [Nvars];
 
+   for (int j=0; j<Nvars; ++j)  {
 
-   for (j=0; j<Nvars; ++j)  {
-
-      v = get_var(Nc, varNames[j].c_str());
+      NcVar v = get_var(Nc, varNames[j].c_str());
 
       Var[j].var = new NcVar(v);
 
@@ -252,6 +275,8 @@ for (j=0; j<Ndims; ++j)  {
       get_var_units     ( Var[j].var, Var[j].units_att     );
       get_att_accum_time( Var[j],     Var[j].AccumTime     );
 
+      long long ill;
+      long long vll;
       get_att_unixtime( Var[j], init_time_ut_att_name,  ill);
       get_att_unixtime( Var[j], valid_time_ut_att_name, vll);
 
@@ -264,13 +289,15 @@ for (j=0; j<Ndims; ++j)  {
       StringArray dimNames;
       get_dim_names(&v, &dimNames);
 
-      for (k=0; k<dim_count; ++k)  {
-         c = to_lower(dimNames[k]);
+      for (int k=0; k<dim_count; ++k)  {
+         string c = to_lower(dimNames[k]);
          NcDim dim = get_nc_dim(&v, dimNames[k]);
          Var[j].Dims[k] = &dim;
 
          if ( c.compare(x_dim_name) == 0 ) Var[j].x_slot = k;
          if ( c.compare(y_dim_name) == 0 ) Var[j].y_slot = k;
+         if ( c.compare(t_dim_name) == 0 ) Var[j].t_slot = k;
+         if ( c.compare(z_dim_name) == 0 ) Var[j].z_slot = k;
 
       }   //  for k
 
@@ -280,7 +307,7 @@ for (j=0; j<Ndims; ++j)  {
    //  done
    //
 
-return true;
+   return true;
 
 }
 
@@ -320,6 +347,8 @@ out << prefix << "\n";
 
 out << prefix << "Xdim = " << (Xdim ? GET_NC_NAME_P(Xdim) : "(nul)") << "\n";
 out << prefix << "Ydim = " << (Ydim ? GET_NC_NAME_P(Ydim) : "(nul)") << "\n";
+out << prefix << "Tdim = " << (Xdim ? GET_NC_NAME_P(Tdim) : "(nul)") << "\n";
+out << prefix << "Zdim = " << (Ydim ? GET_NC_NAME_P(Zdim) : "(nul)") << "\n";
 
 out << prefix << "\n";
 
@@ -333,6 +362,8 @@ for (j=0; j<Nvars; ++j)  {
 
            if ( Var[j].Dims[k] == Xdim )  out << 'X';
       else if ( Var[j].Dims[k] == Ydim )  out << 'Y';
+      else if ( Var[j].Dims[k] == Tdim )  out << 'T';
+      else if ( Var[j].Dims[k] == Zdim )  out << 'Z';
       else                                out << GET_NC_NAME_P(Var[j].Dims[k]);
 
       if ( k < Var[j].Ndims - 1)  out << ", ";
@@ -663,6 +694,26 @@ NcVarInfo* MetNcFile::find_var_name(const char * var_name) const {
    return nullptr;
 }
 
+////////////////////////////////////////////////////////////////////////
+//
+// Begin code for misc functions
+//
+////////////////////////////////////////////////////////////////////////
+
+bool is_ncmet_range_azimuth_file(NcFile *nc_file) {
+   bool status = false;
+
+   if (!IS_INVALID_NC_P(nc_file)) {
+
+      // Check for range and azimuth coordinate variables
+      status = (has_dim(nc_file, nc_met_range_name.c_str())   &&
+                has_var(nc_file, nc_met_range_name.c_str())   &&
+                has_dim(nc_file, nc_met_azimuth_name.c_str()) &&
+                has_var(nc_file, nc_met_azimuth_name.c_str()));
+   }
+
+   return status;
+}
 
 ////////////////////////////////////////////////////////////////////////
 

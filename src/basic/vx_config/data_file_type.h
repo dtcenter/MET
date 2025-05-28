@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -8,20 +8,16 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef  __DATA_FILE_TYPE_H__
 #define  __DATA_FILE_TYPE_H__
 
-
 ///////////////////////////////////////////////////////////////////////////////
 
+//
+// Enumeration of supported file types
+//
 
-   //
-   // Enumeration of supported gridded file types
-   //
-
-enum GrdFileType
-{
+enum GrdFileType {
 
    FileType_None,           // Default
 
@@ -37,35 +33,26 @@ enum GrdFileType
    FileType_Python_Numpy,   // Python script using numpy array and attributes dictionary
    FileType_Python_Xarray,  // Python script using xarray dataplane
    FileType_UGrid,          // Unstructured grid
+   FileType_Pairs,          // Paired data
 
 };
 
+///////////////////////////////////////////////////////////////////////////////
+
+inline bool is_netcdf_grdfiletype(const GrdFileType _t) {
+   return(_t == FileType_NcMet          ||
+          _t == FileType_General_Netcdf ||
+          _t == FileType_NcWrf          ||
+          _t == FileType_NcPinterp      ||
+          _t == FileType_NcCF);
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-inline bool is_netcdf_grdfiletype(const GrdFileType _t)
-
-{
-
-return ( (_t == FileType_NcMet) || (_t == FileType_General_Netcdf) ||
-         (_t == FileType_NcWrf) || (_t == FileType_NcPinterp) ||
-         (_t == FileType_NcCF) );
-
+inline bool is_python_grdfiletype(const GrdFileType _t) {
+   return(_t == FileType_Python_Xarray ||
+          _t == FileType_Python_Numpy);
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-inline bool is_python_grdfiletype(const GrdFileType _t)
-
-{
-
-return ( (_t == FileType_Python_Xarray) || (_t == FileType_Python_Numpy) );
-
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 

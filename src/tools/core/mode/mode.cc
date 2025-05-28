@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -73,7 +73,6 @@
 #include <sys/types.h>
 
 #include "main.h"
-#include "handle_openmp.h"
 #include "string_array.h"
 #include "mode_usage.h"
 #include "mode_frontend.h"
@@ -133,9 +132,6 @@ int met_main(int argc, char * argv [])
    StringArray Argv;
    string s;
    const char * user_config_filename = 0;
-
-   // Set up OpenMP (if enabled)
-   init_openmp();
 
    for (j=0,n=0; j<argc; ++j)  {
 

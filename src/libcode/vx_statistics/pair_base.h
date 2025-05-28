@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -32,20 +32,35 @@ struct ob_val_t {
    std::string qc;
 };
 
-struct station_values_t {
+struct station_value_base_t {
 
-   void clear();
+   void clear_base();
 
    std::string typ;
    std::string sid;
    double lat;
    double lon;
-   double x;
-   double y;
-   double wgt;
    unixtime ut;
    double lvl;
    double elv;
+};
+
+struct point_pair_t : station_value_base_t {
+
+   void clear();
+
+   int lead;
+   double fval;
+   double oval;
+};
+
+struct station_values_t : station_value_base_t {
+
+   void clear();
+
+   double x;
+   double y;
+   double wgt;
    double fcmn;
    double fcsd;
    double ocmn;
@@ -272,8 +287,15 @@ class VxPairBase {
 
       //////////////////////////////////////////////////////////////////
 
-      StringArray mpr_column;    // Names of MPR columns or diffs of columns
-      ThreshArray mpr_thresh;    // Filtering thresholds for the MPR columns
+      // Mapping of numeric MPR columns or diffs of colums to
+      // inclusion thresholds
+      std::map<ConcatString,ThreshArray> mpr_thr_inc_map;
+
+      // Mapping of string MPR columns to list of inclusion
+      // and exclusion strings
+      std::map<ConcatString,StringArray> mpr_str_inc_map;
+      std::map<ConcatString,StringArray> mpr_str_exc_map;
+
 
       //////////////////////////////////////////////////////////////////
 
@@ -364,7 +386,9 @@ class VxPairBase {
       void set_interp(int i_interp, InterpMthd mthd,
                       int width, GridTemplateFactory::GridTemplates shape);
 
-      void set_mpr_thresh(const StringArray &, const ThreshArray &);
+      void set_mpr_thr_inc_map(const std::map<ConcatString,ThreshArray> &);
+      void set_mpr_str_inc_map(const std::map<ConcatString,StringArray> &);
+      void set_mpr_str_exc_map(const std::map<ConcatString,StringArray> &);
 
       void set_climo_cdf_info_ptr(const ClimoCDFInfo *);
 
@@ -408,6 +432,10 @@ class VxPairBase {
                           double, double, double,
                           double, double, double,
                           const ClimoPntInfo &, double &);
+
+      // Retrieve climo data for this point 
+      ClimoPntInfo get_climo_pnt_info(int, const Grid &gr, double, double,
+                                      double, double, double);
 
       // Member functions for incrementing the counts
       void inc_count(std::vector<int> &, int);

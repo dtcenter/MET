@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -86,14 +86,14 @@ class VarInfoNcCF : public VarInfo
 
 ///////////////////////////////////////////////////////////////////////////////
 
-inline GrdFileType       VarInfoNcCF::file_type()      const { return FileType_NcCF;         }
-inline const LongArray & VarInfoNcCF::dimension()      const { return Dimension;             }
-inline int               VarInfoNcCF::dimension(int i) const { return (int) Dimension[i];    }
-inline int               VarInfoNcCF::n_dimension()    const { return Dimension.n_elements();}
-inline const NumArray  & VarInfoNcCF::dim_value()      const { return Dim_value;             }
-inline double            VarInfoNcCF::dim_value(int i) const { return Dim_value[i];          }
-inline const BoolArray & VarInfoNcCF::is_offset()      const { return Is_offset;             }
-inline bool              VarInfoNcCF::is_offset(int i) const { return Is_offset[i];          }
+inline GrdFileType       VarInfoNcCF::file_type()      const { return FileType_NcCF;          }
+inline const LongArray & VarInfoNcCF::dimension()      const { return Dimension;              }
+inline int               VarInfoNcCF::dimension(int i) const { return (int)Dimension[i];      }
+inline int               VarInfoNcCF::n_dimension()    const { return Dimension.n_elements(); }
+inline const NumArray  & VarInfoNcCF::dim_value()      const { return Dim_value;              }
+inline double            VarInfoNcCF::dim_value(int i) const { return Dim_value[i];           }
+inline const BoolArray & VarInfoNcCF::is_offset()      const { return Is_offset;              }
+inline bool              VarInfoNcCF::is_offset(int i) const { return Is_offset[i];           }
 
 ///////////////////////////////////////////////////////////////////////////////
 

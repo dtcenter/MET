@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -123,7 +123,7 @@ class MetUGridDataFile : public Met2dDataFile {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline GrdFileType MetUGridDataFile::file_type () const { return FileType_UGrid; }
+inline GrdFileType  MetUGridDataFile::file_type()       const { return FileType_UGrid;         }
 inline ConcatString MetUGridDataFile::coordinate_file() const { return _file->coordinate_nc(); }
 
 

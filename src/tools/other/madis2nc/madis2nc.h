@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -134,7 +134,7 @@ static int          rej_sid  = 0;
 // Output NetCDF file
 netCDF::NcFile *f_out = (netCDF::NcFile *) nullptr;
 
-int    processed_count;
+int processed_count = 0;
 
 ////////////////////////////////////////////////////////////////////////
 

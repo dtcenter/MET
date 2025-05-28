@@ -36,7 +36,7 @@ The following sections describe the usage statement, required arguments, and opt
 .. code-block:: none
 
   Usage: tc_diag
-         -data domain tech_id_list [ file_1 ... file_n | data_file_list ]
+         -data domain tech_id_list [ file_1 ... file_n | file_list ]
          -deck file
          -config file
          [-outdir path]
@@ -48,7 +48,7 @@ tc_diag has required arguments and can accept several optional arguments.
 Required Arguments for tc_diag
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **-data domain tech_id_list [ file_1 ... file_n | data_file_list ]** option specifies a domain name, a comma-separated list of ATCF tech ID's, and a list of gridded data files or an ASCII file containing a list of files to be used. Specify **-data** one for each gridded data source.
+1. The **-data domain tech_id_list [ file_1 ... file_n | file_list ]** option specifies a domain name, a comma-separated list of ATCF tech ID's, and a list of gridded data files or an ASCII file containing a list of files to be used, as described in :numref:`ascii_file_lists`. Specify **-data** once for each gridded data source.
 
 2. The **-deck source** option is the ATCF format track data source.
 
@@ -128,7 +128,7 @@ The **domain_info** entry is an array of dictionaries. Each dictionary consists 
 
 The **n_range** entry is an integer specifying the number of equally spaced range intervals in the range-azimuth grid to be used for this data source.
 
-The **n_azimuth** entry is an integer specifying the number of equally spaced azimuth intervals in the range-azimuth grid to be used for this data source. The azimuthal grid spacing is 360 / **n_azimuth** degrees. Azimuths are defined by MET as *degrees clockwise* from due east. However, the TC-Diag Python code expects them as *radians counter-clockwise* from due east. The **tc_diag_driver/post_resample_driver.py** driver script performs the neccessary rotation and conversion operations. 
+The **n_azimuth** entry is an integer specifying the number of equally spaced azimuth intervals in the range-azimuth grid to be used for this data source. The azimuthal grid spacing is 360 / **n_azimuth** degrees. Azimuths are defined by MET as *degrees clockwise* from due east. However, the TC-Diag Python code expects them as *radians counter-clockwise* from due east. The **tc_diag_driver/post_resample_driver.py** driver script performs the neccessary rotation and conversion operations.
 
 The **delta_range_km** entry is a floating point value specifying the spacing of the range rings in kilometers.
 
@@ -328,7 +328,7 @@ When the **nc_diag_flag** configuration entry is set to true, a NetCDF output fi
     - Track point forecast lead time integer number of seconds
     - Integer
   * - {DOMAIN}_domain
-    - NA 
+    - NA
     - Attributes define the range/azimuth grid for the {DOMAIN} domain: **n_range**, **n_azimuth**, **delta_range_km**
     - Integer
   * - Diagnostic values
@@ -342,7 +342,7 @@ When the **nc_rng_azi_flag** configuration entry is set to true, a NetCDF output
 
 The NetCDF range-azimuth output is named using the **output_base_format**, described above, followed by **_cyl_grid_{DOMAIN}.nc**, where **{DOMAIN}** is specified by the **domain** string in each **domain_info** array entry.
 
-This NetCDF file contains a concatenation of the data from the temporary NetCDF files created for each track point. For each track point, TC-Diag creates a temporary NetCDF file and calls Python code to read the cylindrical grid data and compute diagnostics. By default, these temporary NetCDF files are deleted at the end of each run, but if the **nc_rng_azi_flag** is true, the data for each track point is concatenated into a single output file for each track. 
+This NetCDF file contains a concatenation of the data from the temporary NetCDF files created for each track point. For each track point, TC-Diag creates a temporary NetCDF file and calls Python code to read the cylindrical grid data and compute diagnostics. By default, these temporary NetCDF files are deleted at the end of each run, but if the **nc_rng_azi_flag** is true, the data for each track point is concatenated into a single output file for each track.
 
 .. note:: Setting the **MET_KEEP_TEMP_FILE** (:numref:`met_keep_temp_file`) environment variable retains the temporary NetCDF cylindrical grid files for development, testing, and debugging purposes.
 

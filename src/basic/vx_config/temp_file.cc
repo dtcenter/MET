@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -65,7 +65,6 @@ ConcatString make_temp_file_name(const char *prefix, const char *suffix) {
 ////////////////////////////////////////////////////////////////////////
 
 void remove_temp_file(const ConcatString file_name) {
-   int errno;
 
    //
    // Attempt to remove the file and print out any error message

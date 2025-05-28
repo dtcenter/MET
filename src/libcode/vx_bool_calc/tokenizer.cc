@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -228,7 +228,7 @@ else if ( c == negation_char )  {
    tok.set_negation(old_pos);
 
 }
-else if ( c = local_var_char )  {
+else if ( c == local_var_char )  {
 
    k = get_number();
    tok.set_local_var(k, old_pos);

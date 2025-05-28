@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -434,7 +434,7 @@ const ProbRIRWPairInfo & ProbRIRWPairInfoArray::operator[](int n) const {
 
 void ProbRIRWPairInfoArray::add(const ProbRIRWPairInfo &p) {
 
-   Pairs.push_back(p);
+   Pairs.emplace_back(p);
 
    return;
 }
@@ -447,7 +447,7 @@ bool ProbRIRWPairInfoArray::add(const ProbRIRWInfo &p, const TrackInfo &t) {
    // Attempt to set a new pair
    if(!pair.set(p, t)) return false;
 
-   Pairs.push_back(pair);
+   Pairs.emplace_back(pair);
 
    return true;
 }

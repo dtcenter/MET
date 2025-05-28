@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -359,7 +359,7 @@ bool GenShapeInfoArray::add(const GenShapeInfo &gsi, bool check_dup) {
    } // end if
 
    // Store the genesis shape object
-   GenShape.push_back(gsi);
+   GenShape.emplace_back(gsi);
 
    return true;
 }

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1631,8 +1631,6 @@ void SL1L2Info::assign(const SL1L2Info &c) {
 ////////////////////////////////////////////////////////////////////////
 
 void SL1L2Info::set(const PairDataPoint &pd_all) {
-   int i;
-   double f, o, fc, oc, wgt, wgt_sum;
    PairDataPoint pd;
 
    // Check for mismatch
@@ -1654,40 +1652,50 @@ void SL1L2Info::set(const PairDataPoint &pd_all) {
    if(pd.n_obs == 0) return;
 
    // Get the sum of the weights
-   wgt_sum = pd.wgt_na.sum();
+   double wgt_sum = pd.wgt_na.sum();
 
-   // Loop through the pair data and compute sums
-   for(i=0; i<pd.n_obs; i++) {
+#pragma omp parallel default(none) \
+   shared(pd, wgt_sum) \
+   shared(fbar, obar, fobar, ffbar, oobar, smae, scount) \
+   shared(fabar, oabar, foabar, ffabar, ooabar, samae, sacount)
+   {
 
-      f   = pd.f_na[i];
-      o   = pd.o_na[i];
-      fc  = pd.fcmn_na[i];
-      oc  = pd.ocmn_na[i];
-      wgt = pd.wgt_na[i]/wgt_sum;
+      // Loop through the pair data and compute sums
+#pragma omp for schedule(static) \
+                reduction(+: fbar, obar, fobar, ffbar, oobar, smae, scount) \
+                reduction(+: fabar, oabar, foabar, ffabar, ooabar, samae, sacount)
+      for(int i=0; i<pd.n_obs; i++) {
 
-      // Skip bad data values in the forecast or observation fields
-      if(is_bad_data(f) || is_bad_data(o)) continue;
+         double f   = pd.f_na[i];
+         double o   = pd.o_na[i];
+         double fc  = pd.fcmn_na[i];
+         double oc  = pd.ocmn_na[i];
+         double wgt = pd.wgt_na[i]/wgt_sum;
 
-      // SL1L2 sums
-      fbar  += wgt*f;
-      obar  += wgt*o;
-      fobar += wgt*f*o;
-      ffbar += wgt*f*f;
-      oobar += wgt*o*o;
-      smae  += wgt*fabs(f-o);
-      scount++;
+         // Skip bad data values in the forecast or observation fields
+         if(is_bad_data(f) || is_bad_data(o)) continue;
 
-      // SAL1L2 sums
-      if(!is_bad_data(fc) && !is_bad_data(oc)) {
-         fabar  += wgt*(f-fc);
-         oabar  += wgt*(o-oc);
-         foabar += wgt*(f-fc)*(o-oc);
-         ffabar += wgt*(f-fc)*(f-fc);
-         ooabar += wgt*(o-oc)*(o-oc);
-         samae  += wgt*fabs((f-fc)-(o-oc));
-         sacount++;
+         // SL1L2 sums
+         fbar  += wgt*f;
+         obar  += wgt*o;
+         fobar += wgt*f*o;
+         ffbar += wgt*f*f;
+         oobar += wgt*o*o;
+         smae  += wgt*fabs(f-o);
+         scount++;
+
+         // SAL1L2 sums
+         if(!is_bad_data(fc) && !is_bad_data(oc)) {
+            fabar  += wgt*(f-fc);
+            oabar  += wgt*(o-oc);
+            foabar += wgt*(f-fc)*(o-oc);
+            ffabar += wgt*(f-fc)*(f-fc);
+            ooabar += wgt*(o-oc)*(o-oc);
+            samae  += wgt*fabs((f-fc)-(o-oc));
+            sacount++;
+         }
       }
-   }
+   } // End omp parallel
 
    if(scount == 0) {
       mlog << Error << "\nSL1L2Info::set() -> "
@@ -2095,11 +2103,8 @@ void VL1L2Info::assign(const VL1L2Info &c) {
 
 void VL1L2Info::set(const PairDataPoint &pd_u_all,
                     const PairDataPoint &pd_v_all) {
-   int i;
-   double uf, vf, uo, vo, ufc, vfc, uoc, voc, wgt, wgt_sum;
-   double u_diff, v_diff;
-   double d_diff, dir_wgt_sum, dira_wgt_sum;
-   PairDataPoint pd_u, pd_v;
+   PairDataPoint pd_u;
+   PairDataPoint pd_v;
 
    // Initialize
    zero_out();
@@ -2122,88 +2127,103 @@ void VL1L2Info::set(const PairDataPoint &pd_u_all,
    if(pd_u.n_obs == 0) return;
 
    // Get the sum of the weights
-   wgt_sum = pd_u.wgt_na.sum();
+   double wgt_sum = pd_u.wgt_na.sum();
 
    // Initialize the wind direction difference weight sums
    // to handle missing data
-   dir_wgt_sum = dira_wgt_sum = 0.0;
+   double dir_wgt_sum = 0.0;
+   double dira_wgt_sum = 0.0;
 
-   // Loop through the filtered pair data compute partial sums
-   for(i=0; i<pd_u.f_na.n(); i++) {
+#pragma omp parallel default(none) \
+   shared(pd_u, pd_v, wgt_sum) \
+   shared(vcount, uf_bar, vf_bar, uo_bar, vo_bar) \
+   shared(uvfo_bar, uvff_bar, uvoo_bar, f_speed_bar, o_speed_bar) \
+   shared(dcount, dir_wgt_sum, dir_bar, absdir_bar, dir2_bar) \
+   shared(vacount, ufa_bar, vfa_bar, uoa_bar, voa_bar) \
+   shared(uvfoa_bar, uvffa_bar, uvooa_bar, fa_speed_bar, oa_speed_bar) \
+   shared(dacount, dira_wgt_sum, dira_bar, absdira_bar, dira2_bar)
+   {
 
-      // Retrieve the U,V values
-      uf  = pd_u.f_na[i];
-      vf  = pd_v.f_na[i];
-      uo  = pd_u.o_na[i];
-      vo  = pd_v.o_na[i];
-      ufc = pd_u.fcmn_na[i];
-      vfc = pd_v.fcmn_na[i];
-      uoc = pd_u.ocmn_na[i];
-      voc = pd_v.ocmn_na[i];
+      // Loop through the filtered pair data compute partial sums
+#pragma omp for schedule(static) \
+                reduction(+: vcount, uf_bar, vf_bar, uo_bar, vo_bar) \
+                reduction(+: uvfo_bar, uvff_bar, uvoo_bar, f_speed_bar, o_speed_bar) \
+                reduction(+: dcount, dir_wgt_sum, dir_bar, absdir_bar, dir2_bar) \
+                reduction(+: vacount, ufa_bar, vfa_bar, uoa_bar, voa_bar) \
+                reduction(+: uvfoa_bar, uvffa_bar, uvooa_bar, fa_speed_bar, oa_speed_bar) \
+                reduction(+: dacount, dira_wgt_sum, dira_bar, absdira_bar, dira2_bar)
+      for(int i=0; i<pd_u.f_na.n(); i++) {
 
-      u_diff = uf - uo;
-      v_diff = vf - vo;
+         // Retrieve the U,V values
+         double uf  = pd_u.f_na[i];
+         double vf  = pd_v.f_na[i];
+         double uo  = pd_u.o_na[i];
+         double vo  = pd_v.o_na[i];
+         double ufc = pd_u.fcmn_na[i];
+         double vfc = pd_v.fcmn_na[i];
+         double uoc = pd_u.ocmn_na[i];
+         double voc = pd_v.ocmn_na[i];
 
-      wgt = pd_u.wgt_na[i]/wgt_sum;
+         double wgt = pd_u.wgt_na[i]/wgt_sum;
 
-      // VL1L2 sums
-      vcount          += 1;
+         // VL1L2 sums
+         vcount          += 1;
 
-      uf_bar          += wgt*uf;
-      vf_bar          += wgt*vf;
-      uo_bar          += wgt*uo;
-      vo_bar          += wgt*vo;
+         uf_bar          += wgt*uf;
+         vf_bar          += wgt*vf;
+         uo_bar          += wgt*uo;
+         vo_bar          += wgt*vo;
 
-      uvfo_bar        += wgt*(uf*uo + vf*vo);
-      uvff_bar        += wgt*(uf*uf + vf*vf);
-      uvoo_bar        += wgt*(uo*uo + vo*vo);
+         uvfo_bar        += wgt*(uf*uo + vf*vo);
+         uvff_bar        += wgt*(uf*uf + vf*vf);
+         uvoo_bar        += wgt*(uo*uo + vo*vo);
 
-      f_speed_bar     += wgt*sqrt(uf*uf + vf*vf);
-      o_speed_bar     += wgt*sqrt(uo*uo + vo*vo);
+         f_speed_bar     += wgt*sqrt(uf*uf + vf*vf);
+         o_speed_bar     += wgt*sqrt(uo*uo + vo*vo);
 
-      // Compute direction difference
-      d_diff = angle_difference(uf, vf, uo, vo);
+         // Compute direction difference
+         double d_diff = angle_difference(uf, vf, uo, vo);
 
-      // Ignore undefined direction differences
-      if(!is_bad_data(d_diff)) {
-         dcount       += 1;
-         dir_wgt_sum  += pd_u.wgt_na[i];
-         dir_bar      += pd_u.wgt_na[i]*d_diff;
-         absdir_bar   += pd_u.wgt_na[i]*abs(d_diff);
-         dir2_bar     += pd_u.wgt_na[i]*d_diff*d_diff;
-      }
-
-      // VAL1L2 sums
-      if(!is_bad_data(ufc) && !is_bad_data(vfc) &&
-         !is_bad_data(uoc) && !is_bad_data(voc)) {
-         vacount      += 1;
-
-         ufa_bar      += wgt*(uf-ufc);
-         vfa_bar      += wgt*(vf-vfc);
-         uoa_bar      += wgt*(uo-uoc);
-         voa_bar      += wgt*(vo-voc);
-
-         uvfoa_bar    += wgt*((uf-ufc)*(uo-uoc) + (vf-vfc)*(vo-voc));
-         uvffa_bar    += wgt*((uf-ufc)*(uf-ufc) + (vf-vfc)*(vf-vfc));
-         uvooa_bar    += wgt*((uo-uoc)*(uo-uoc) + (vo-voc)*(vo-voc));
-
-         fa_speed_bar += wgt*sqrt((uf-ufc)*(uf-ufc) + (vf-vfc)*(vf-vfc));
-         oa_speed_bar += wgt*sqrt((uo-uoc)*(uo-uoc) + (vo-voc)*(vo-voc));
-
-         // Compute anomalous direction difference
-         d_diff = angle_difference(uf-ufc, vf-vfc, uo-uoc, vo-voc);
-
-         // Ignore undefined anomalous direction differences
+         // Ignore undefined direction differences
          if(!is_bad_data(d_diff)) {
-            dacount      += 1;
-            dira_wgt_sum += pd_u.wgt_na[i];
-            dira_bar     += pd_u.wgt_na[i]*d_diff;
-            absdira_bar  += pd_u.wgt_na[i]*abs(d_diff);
-            dira2_bar    += pd_u.wgt_na[i]*d_diff*d_diff;
+            dcount       += 1;
+            dir_wgt_sum  += pd_u.wgt_na[i];
+            dir_bar      += pd_u.wgt_na[i]*d_diff;
+            absdir_bar   += pd_u.wgt_na[i]*abs(d_diff);
+            dir2_bar     += pd_u.wgt_na[i]*d_diff*d_diff;
          }
-      }
 
-   }  // end for i
+         // VAL1L2 sums
+         if(!is_bad_data(ufc) && !is_bad_data(vfc) &&
+            !is_bad_data(uoc) && !is_bad_data(voc)) {
+            vacount      += 1;
+
+            ufa_bar      += wgt*(uf-ufc);
+            vfa_bar      += wgt*(vf-vfc);
+            uoa_bar      += wgt*(uo-uoc);
+            voa_bar      += wgt*(vo-voc);
+
+            uvfoa_bar    += wgt*((uf-ufc)*(uo-uoc) + (vf-vfc)*(vo-voc));
+            uvffa_bar    += wgt*((uf-ufc)*(uf-ufc) + (vf-vfc)*(vf-vfc));
+            uvooa_bar    += wgt*((uo-uoc)*(uo-uoc) + (vo-voc)*(vo-voc));
+
+            fa_speed_bar += wgt*sqrt((uf-ufc)*(uf-ufc) + (vf-vfc)*(vf-vfc));
+            oa_speed_bar += wgt*sqrt((uo-uoc)*(uo-uoc) + (vo-voc)*(vo-voc));
+
+            // Compute anomalous direction difference
+            d_diff = angle_difference(uf-ufc, vf-vfc, uo-uoc, vo-voc);
+
+            // Ignore undefined anomalous direction differences
+            if(!is_bad_data(d_diff)) {
+               dacount      += 1;
+               dira_wgt_sum += pd_u.wgt_na[i];
+               dira_bar     += pd_u.wgt_na[i]*d_diff;
+               absdira_bar  += pd_u.wgt_na[i]*abs(d_diff);
+               dira2_bar    += pd_u.wgt_na[i]*d_diff*d_diff;
+            }
+         }
+      }  // end for i
+   } // End omp parallel
 
    // Normalize wind direction differences
    if(dir_wgt_sum > 0) {
@@ -3639,6 +3659,10 @@ GRADInfo & GRADInfo::operator=(const GRADInfo &c) {
 GRADInfo & GRADInfo::operator+=(const GRADInfo &c) {
    GRADInfo g_info;
 
+   // Return if nothing to add
+   if(c.total == 0) return *this;
+
+   // Gradient definition must remain constant
    if(dx != c.dx || dy != c.dy) {
       mlog << Error << "\nGRADInfo::operator+=() -> "
            << "the gradient DX (" << dx << " vs " << c.dx
@@ -3656,6 +3680,11 @@ GRADInfo & GRADInfo::operator+=(const GRADInfo &c) {
       g_info.ogbar = (ogbar*total + c.ogbar*c.total) / g_info.total;
       g_info.mgbar = (mgbar*total + c.mgbar*c.total) / g_info.total;
       g_info.egbar = (egbar*total + c.egbar*c.total) / g_info.total;
+ 
+      g_info.fgmag   = (fgmag*total   + c.fgmag*c.total)   / g_info.total;
+      g_info.ogmag   = (ogmag*total   + c.ogmag*c.total)   / g_info.total;
+      g_info.mag_mse = (mag_mse*total + c.mag_mse*c.total) / g_info.total;
+      g_info.lap_mse = (lap_mse*total + c.lap_mse*c.total) / g_info.total;
    }
 
    assign(g_info);
@@ -3676,10 +3705,12 @@ void GRADInfo::init_from_scratch() {
 
 void GRADInfo::clear() {
 
-   dx    = dy    = 0;
-   fgbar = ogbar = 0.0;
-   mgbar = egbar = 0.0;
-   total = 0;
+   total   = 0;
+   dx      = dy      = 0;
+   fgbar   = ogbar   = 0.0;
+   mgbar   = egbar   = 0.0;
+   fgmag   = ogmag   = 0.0;
+   mag_mse = lap_mse = 0.0;
 
    return;
 }
@@ -3690,6 +3721,8 @@ void GRADInfo::assign(const GRADInfo &c) {
 
    clear();
 
+   total = c.total;
+
    // Gradient sizes
    dx = c.dx;
    dy = c.dy;
@@ -3699,7 +3732,12 @@ void GRADInfo::assign(const GRADInfo &c) {
    ogbar = c.ogbar;
    mgbar = c.mgbar;
    egbar = c.egbar;
-   total = c.total;
+
+   // Gradient vector partial sums
+   fgmag = c.fgmag;
+   ogmag = c.ogmag;
+   mag_mse = c.mag_mse;
+   lap_mse = c.lap_mse;
 
    return;
 }
@@ -3751,12 +3789,22 @@ double GRADInfo::fgog_ratio() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+double GRADInfo::magnitude_rmse() const {
+   return square_root(mag_mse);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double GRADInfo::laplace_rmse() const {
+   return square_root(lap_mse);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void GRADInfo::set(int grad_dx, int grad_dy,
                    const NumArray &fgx_na, const NumArray &fgy_na,
                    const NumArray &ogx_na, const NumArray &ogy_na,
                    const NumArray &wgt_na) {
-   int i;
-   double wgt, wgt_sum;
 
    // Check for mismatch
    if(fgx_na.n() != fgy_na.n() ||
@@ -3782,27 +3830,53 @@ void GRADInfo::set(int grad_dx, int grad_dy,
    if(fgx_na.n() == 0) return;
 
    // Get the sum of the weights
-   wgt_sum = wgt_na.sum();
+   double wgt_sum = wgt_na.sum();
 
-   // Loop through the pairs and compute sums
-   for(i=0; i<fgx_na.n(); i++) {
+#pragma omp parallel default(none) \
+   shared(fgx_na, fgy_na, ogx_na, ogy_na, wgt_na, wgt_sum) \
+   shared(fgbar, ogbar, mgbar, egbar) \
+   shared(fgmag, ogmag, mag_mse, lap_mse, total)
+   {
 
-      // Skip bad data
-      if(is_bad_data(fgx_na[i]) || is_bad_data(fgy_na[i]) ||
-         is_bad_data(ogx_na[i]) || is_bad_data(ogy_na[i])) continue;
+      // Loop through the pairs and compute sums
+#pragma omp for schedule(static) \
+                reduction(+: fgbar, ogbar, mgbar, egbar) \
+                reduction(+: fgmag, ogmag, mag_mse, lap_mse, total)
+      for(int i=0; i<fgx_na.n(); i++) {
 
-      // Get current weight
-      wgt = wgt_na[i]/wgt_sum;
+         // Skip bad data
+         if(is_bad_data(fgx_na[i]) || is_bad_data(fgy_na[i]) ||
+            is_bad_data(ogx_na[i]) || is_bad_data(ogy_na[i])) continue;
 
-      // Gradient sums
-      fgbar += wgt * (fabs(fgx_na[i]) + fabs(fgy_na[i]));
-      ogbar += wgt * (fabs(ogx_na[i]) + fabs(ogy_na[i]));
-      mgbar += wgt * (max(fabs(fgx_na[i]), fabs(ogx_na[i])) +
-                      max(fabs(fgy_na[i]), fabs(ogy_na[i])));
-      egbar += wgt * (fabs(fgx_na[i] - ogx_na[i]) +
-                      fabs(fgy_na[i] - ogy_na[i]));
-      total++;
-   }
+         // Get current weight
+         double wgt = wgt_na[i]/wgt_sum;
+
+         // Gradient sums
+         fgbar += wgt * (fabs(fgx_na[i]) + fabs(fgy_na[i]));
+         ogbar += wgt * (fabs(ogx_na[i]) + fabs(ogy_na[i]));
+         mgbar += wgt * (max(fabs(fgx_na[i]), fabs(ogx_na[i])) +
+                         max(fabs(fgy_na[i]), fabs(ogy_na[i])));
+         egbar += wgt * (fabs(fgx_na[i] - ogx_na[i]) +
+                         fabs(fgy_na[i] - ogy_na[i]));
+
+         // Gradient vector magnitude 
+         // Reference:
+         //   Ebert-Uphoff, I.: An Investigation of Metrics to Evaluate the Sharpness in
+         //     AI-Generated Meteorology Imagery
+         //     Draft version, Jan 26, 2024
+
+         double fmag = square_root(fgx_na[i] * fgx_na[i] + fgy_na[i] * fgy_na[i]);
+         double omag = square_root(ogx_na[i] * ogx_na[i] + ogy_na[i] * ogy_na[i]);
+ 
+         // Gradient vector sums
+         fgmag += wgt * fmag;
+         ogmag += wgt * omag;
+         mag_mse += wgt * (fmag - omag)*(fmag - omag);
+         double diff = (fgx_na[i] + fgy_na[i]) - (ogx_na[i] + ogy_na[i]);
+         lap_mse += wgt * (diff * diff);
+         total++;
+      }
+   } // End omp parallel
 
    if(total == 0) {
       mlog << Error << "\nGRADInfo::set() -> "
@@ -3811,6 +3885,72 @@ void GRADInfo::set(int grad_dx, int grad_dy,
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GRADInfo::set_stat(const string &stat_name, double v) {
+
+   // Store the statistic by name
+        if(stat_name == "TOTAL"       ) total   = nint(v);
+   else if(stat_name == "FGBAR"       ) fgbar   = v;
+   else if(stat_name == "OGBAR"       ) ogbar   = v;
+   else if(stat_name == "MGBAR"       ) mgbar   = v;
+   else if(stat_name == "EGBAR"       ) egbar   = v;
+   else if(stat_name == "DX"          ) dx      = nint(v);
+   else if(stat_name == "DY"          ) dy      = nint(v);
+   else if(stat_name == "FGMAG"       ) fgmag   = v;
+   else if(stat_name == "OGMAG"       ) ogmag   = v;
+   else if(stat_name == "MAG_RMSE"    ) mag_mse = v*v;
+   else if(stat_name == "LAPLACE_RMSE") lap_mse = v*v;
+   else if(stat_name == "S1"    ||
+           stat_name == "S1_OG" ||
+           stat_name == "FGOG_RATIO") {
+      // Ignore derived quantities
+   }
+   else {
+      mlog << Error << "\nGRADInfo::set_stat() -> "
+           << "unknown gradient statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double GRADInfo::get_stat(const string &stat_name) const {
+   double v = bad_data_double;
+
+   // Find the statistic by name
+        if(stat_name == "TOTAL"       ) v = (double) total;
+   else if(stat_name == "FGBAR"       ) v = fgbar;
+   else if(stat_name == "OGBAR"       ) v = ogbar;
+   else if(stat_name == "MGBAR"       ) v = mgbar;
+   else if(stat_name == "EGBAR"       ) v = egbar;
+   else if(stat_name == "S1"          ) v = s1();
+   else if(stat_name == "S1_OG"       ) v = s1_og();
+   else if(stat_name == "FGOG_RATIO"  ) v = fgog_ratio();
+   else if(stat_name == "DX"          ) v = (double) dx;
+   else if(stat_name == "DY"          ) v = (double) dy;
+   else if(stat_name == "FGMAG"       ) v = fgmag;
+   else if(stat_name == "OGMAG"       ) v = ogmag;
+   else if(stat_name == "MAG_RMSE"    ) v = magnitude_rmse();
+   else if(stat_name == "LAPLACE_RMSE") v = laplace_rmse();
+   else {
+      mlog << Error << "\nGRADInfo::get_stat() -> "
+           << "unknown gradient statistic name \"" << stat_name
+           << "\"!\n\n";
+      exit(1);
+   }
+
+   // Return bad data for 0 pairs 
+   if(total == 0 && stat_name != "TOTAL") {
+      v = bad_data_double;
+   }
+
+   return v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -4424,22 +4564,18 @@ double compute_ufss(double o_rate) {
 ///////////////////////////////////////////////////////////////////////////////
 
 int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int &ties) {
-   int x, y, n, i;
-   double *data = (double *) 0, v;
-   int *data_loc = (int *) nullptr;
 
    // Arrays to store the raw data values to be ranked, their locations,
    // and their computed ranks.  The ranks are stored as doubles since
    // they can be set to 0.5 in the case of ties.
-   data      = new double [dp.nx()*dp.ny()];
-   data_loc  = new int    [dp.nx()*dp.ny()];
+   vector<double> data(dp.nx()*dp.ny());
+   vector<int> data_loc(dp.nx()*dp.ny());
 
    // Search the input field for valid data and keep track of its location
-   n = 0;
-   for(x=0; x<dp.nx(); x++) {
-      for(y=0; y<dp.ny(); y++) {
-
-         v = dp.get(x, y);
+   int n = 0;
+   for(int x=0; x<dp.nx(); x++) {
+      for(int y=0; y<dp.ny(); y++) {
+         double v = dp.get(x, y);
          if(!is_bad_data(v)) {
             data[n] = v;
             data_loc[n] = dp.two_to_one(x, y);
@@ -4450,20 +4586,18 @@ int compute_rank(const DataPlane &dp, DataPlane &dp_rank, double *data_rank, int
 
    // Compute the rank of the data and store the ranks in the data_rank array
    // Keep track of the number of ties in the ranks
-   ties = do_rank(data, data_rank, n);
+   ties = do_rank(data.data(), data_rank, n);
 
    // Set up the dp_rank object
    dp_rank.set_size(dp.nx(), dp.ny());
 
    // Assign the ranks to the dp_rank field
-   for(i=0; i<n; i++) {
+   for(int i=0; i<n; i++) {
+      int x;
+      int y;
       dp_rank.one_to_two(data_loc[i], x, y);
       dp_rank.set(data_rank[i], x, y);
    }
-
-   // Deallocate memory
-   if(data)      { delete [] data;      data = (double *) nullptr;  }
-   if(data_loc)  { delete [] data_loc;  data_loc = (int *) nullptr; }
 
    return n;
 }

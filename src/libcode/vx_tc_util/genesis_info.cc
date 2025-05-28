@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -93,7 +93,7 @@ GenesisEventInfo parse_conf_genesis_event_info(Dictionary *dict) {
    // Conf: category (optional)
    sa = dict->lookup_string_array(conf_key_category, false);
    for(i=0; i<sa.n(); i++) {
-      info.Category.push_back(string_to_cyclonelevel(sa[i].c_str()));
+      info.Category.emplace_back(string_to_cyclonelevel(sa[i].c_str()));
    }
 
    // Conf: vmax_thresh
@@ -484,7 +484,7 @@ bool GenesisInfoArray::add(const GenesisInfo &gi) {
    }
 
    // Store the genesis object
-   Genesis.push_back(gi);
+   Genesis.emplace_back(gi);
 
    return true;
 }

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -76,7 +76,6 @@ protected:
 
   static const float FILL_VALUE;
 
-
   ///////////////////////
   // Protected members //
   ///////////////////////
@@ -103,6 +102,7 @@ protected:
   bool  use_var_id;
   StringArray obs_names;
   StringArray obs_units;
+  StringArray obs_descs;
 
   bool do_monitor;
   int start_time, end_time;

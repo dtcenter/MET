@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -330,9 +330,8 @@ void TrackPairInfo::add_tcmpr_line(const TCStatLine &l) {
    if(l.type() != TCStatLineType::TCMPR) return;
 
    // Store the input TCMPR line and TCDIAG placeholder
-   TCMPRLine.push_back(l);
-   TCStatLine empty_line;
-   TCDIAGLine.push_back(empty_line);
+   TCMPRLine.emplace_back(l);
+   TCDIAGLine.emplace_back();
 
    // Increment the point and line count
    NPoints++;

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -59,12 +59,12 @@ class IabpHandler : public FileHandler {
 
    public:
 
-      IabpHandler(const string &program_name);
+      IabpHandler(const std::string &program_name);
       virtual ~IabpHandler();
 
       virtual bool isFileType(LineDataFile &ascii_file) const;
 
-      static string getFormatString() { return "iabp"; }
+      static std::string getFormatString() { return "iabp"; }
 
    protected:
 
@@ -101,14 +101,14 @@ class IabpHandler : public FileHandler {
       // depends on which of the optional data types are present in a file
       int _numColumns;
 
-      string _buoyId;
-      time_t _validTime;
-      double _stationLat;
-      double _stationLon;
-      double _stationElv;
-      double _bp;
-      double _ts;
-      double _ta;
+      std::string _buoyId;
+      time_t      _validTime;
+      double      _stationLat;
+      double      _stationLon;
+      double      _stationElv;
+      double      _bp;
+      double      _ts;
+      double      _ta;
 
       ///////////////////////
       // Protected methods
@@ -123,7 +123,8 @@ class IabpHandler : public FileHandler {
       virtual bool _readObservations(LineDataFile &ascii_file);
 
       // compute the time value from inputs
-      time_t _time2(const string &syear, const string &shour, const string &smin, const string &sdoy);
+      time_t _time2(const std::string &syear, const std::string &shour,
+                    const std::string &smin, const std::string &sdoy);
 };
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -27,6 +27,7 @@
 #include "tc_rmw_conf_info.h"
 
 #include <string>
+#include <vector>
 #include <map>
 
 using std::map;
@@ -44,17 +45,17 @@ using std::string;
 //
 ////////////////////////////////////////////////////////////////////////
 
-class TCRMW_WindConverter {
+class TCRMWWindConverter {
 
  private:
 
-  void _free_winds_arrays(void);
+  void _clear_winds_arrays(void);
 
  public:
 
   // Wind arrays are created locally
-  double* _windR;
-  double* _windT;
+  std::vector<double> _windR;
+  std::vector<double> _windT;
 
   // flag when searching input data for U and V data
   bool _foundUInInput;
@@ -75,16 +76,16 @@ class TCRMW_WindConverter {
   map<string, int> _vIndexMap;
 
   // constructor
-  TCRMW_WindConverter(void);
+  TCRMWWindConverter(void);
 
   // destructor
-  ~TCRMW_WindConverter(void);
+  ~TCRMWWindConverter(void);
 
   // return the tangential wind array, computed and stored locally
-  inline const double *get_wind_t_arr(void) const {return _windT;}
+  inline const double *get_wind_t_arr(void) const {return _windT.data();}
 
   // return the radial wind array, computed and stored locally
-  inline const double *get_wind_r_arr(void) const {return _windR;}
+  inline const double *get_wind_r_arr(void) const {return _windR.data();}
 
   // initialize using the configuation
   void init(const TCRMWConfInfo *conf);
@@ -116,7 +117,7 @@ class TCRMW_WindConverter {
                                    const Grid &grid_in,
                                    const Grid &grid_out,
                                    const DataPlane &u_wind_dp,
-                                   const TcrmwGrid &tcrmw_grid);
+                                   const RngAziGrid &tcrmw_grid);
 };
 
 

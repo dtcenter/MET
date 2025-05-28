@@ -8,11 +8,9 @@ MAINTAINERCLEANFILES	= Makefile.in
 
 include ${top_srcdir}/Make-include
 
-# Yacc/lex flags
-# Initialize yystate to 8 to allow for empty configuartion files
+# YACC/LEX flags
 
-AM_YFLAGS	= --defines=config.tab.h -p config ; \
-                  sed -i 's/yystate = 0;/yystate = 8;/g' config.tab.cc
+AM_YFLAGS	= --defines=config.tab.h -p config
 
 # The library
 
@@ -53,16 +51,16 @@ libvx_config_a_CPPFLAGS = ${MET_CPPFLAGS}
 # in a distribution because the enum_to_string utility isn't available.
 
 if ENABLE_DEVELOPMENT
-    configobjecttype_to_string.cc configobjecttype_to_string.h: object_types.h
+configobjecttype_to_string.cc configobjecttype_to_string.h: object_types.h
 	${ENUM_TO_STRING} -concat_string object_types.h
 
-    grdfiletype_to_string.cc grdfiletype_to_string.h: data_file_type.h
+grdfiletype_to_string.cc grdfiletype_to_string.h: data_file_type.h
 	${ENUM_TO_STRING} -concat_string -reverse data_file_type.h
 
-    celltype_to_string.cc celltype_to_string.h: icode.h
+celltype_to_string.cc celltype_to_string.h: icode.h
 	${ENUM_TO_STRING} -concat_string -reverse icode.h
 
-    clean-local:
+clean-local:
 	-rm -r configobjecttype_to_string.cc
 	-rm -r configobjecttype_to_string.h
 	-rm -r grdfiletype_to_string.cc

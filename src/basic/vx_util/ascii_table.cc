@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -928,7 +928,7 @@ void AsciiTable::set_entry(const int r, const int c, const ConcatString &text)
 
 
 int n, k;
-char junk[256];
+ConcatString cs;
 
 n = rc_to_n(r, c);   //  "rc_to_n" does range checking on r and c,
                      //    so we don't need to do that here
@@ -945,8 +945,8 @@ if ( text.empty() )  return;
    //  check for bad data value
    //
 
-snprintf(junk, sizeof(junk), "%.0f", BadDataValue);
-if ( text == junk ) {
+cs.format("%.0f", BadDataValue);
+if ( text == cs ) {
    e[n] = BadDataStr;
 } else {
    e[n] = text;
@@ -980,19 +980,19 @@ void AsciiTable::set_entry(const int r, const int c, const char* text)
 void AsciiTable::set_entry(const int r, const int c, int a)
 
 {
-ConcatString junk;
+ConcatString cs;
 
 if ( fabs(a - BadDataValue) < 0.0001 )  {
    set_entry(r, c, BadDataStr);
    return;
 
 } else if ( DoCommaString )  {
-   ::comma_string(a, junk);
+   ::comma_string(a, cs);
 }  else  {
-  junk.format("%d", a);
+  cs.format("%d", a);
 }
 
-set_entry(r, c, junk);
+set_entry(r, c, cs);
 
 return;
 
@@ -1060,11 +1060,11 @@ void AsciiTable::set_entry(const int r, const int c, char a)
 
 {
 
-ConcatString junk;
+ConcatString cs;
 
-junk = a;
+cs = a;
 
-set_entry(r, c, junk);
+set_entry(r, c, cs);
 
 return;
 

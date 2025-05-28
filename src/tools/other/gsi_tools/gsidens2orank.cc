@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -264,7 +264,7 @@ void process_conv_data(ConvData &d, int i_mem) {
       add_key(key);
 
       // Store the current pair data
-      conv_data.push_back(d);
+      conv_data.emplace_back(d);
 
       // Store the current observation info
       ClimoPntInfo cpi(bad_data_double, bad_data_double,
@@ -424,7 +424,7 @@ void process_rad_data(RadData &d, int i_mem) {
       add_key(key);
 
       // Store the current pair data
-      rad_data.push_back(d);
+      rad_data.emplace_back(d);
 
       // Store the current observation info
       ClimoPntInfo cpi(bad_data_double, bad_data_double,
@@ -838,7 +838,7 @@ void usage() {
         << ") ***\n\n"
 
         << "Usage: " << program_name << "\n"
-        << "\tens_file_1 ... ens_file_n | ens_file_list\n"
+        << "\tfile_1 ... file_n | file_list\n"
         << "\t-out path\n"
         << "\t[-ens_mean path]\n"
         << "\t[-swap]\n"
@@ -849,11 +849,11 @@ void usage() {
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"ens_file_1 ... ens_file_n\" is a list of ensemble "
+        << "\twhere\t\"file_1 ... file_n\" is a list of ensemble "
         << "binary GSI diagnostic files (conventional or radiance) to be "
         << "reformatted (required).\n"
-        << "\t\t\"ens_file_list\" is an ASCII file containing a list of "
-        << "ensemble binary GSI diagnostic files (required).\n"
+        << "\t\t\"file_list\" is an ASCII file containing a list of "
+        << "ensemble binary GSI diagnostic files to be reformatted (required).\n"
         << "\t\t\"-out path\" specifies the name of the output "
         << "\".stat\" file (required).\n"
         << "\t\t\"-ens_mean path\" is the ensemble mean binary GSI "

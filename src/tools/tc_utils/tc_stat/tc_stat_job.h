@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,10 +28,10 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Defaults to be used if not specified by the user
-static const bool         default_column_union = false;
-static const bool         default_water_only   = false;
-static const bool         default_match_points = false;
-static const bool         default_event_equal  = false;
+static const bool         default_tc_column_union = false;
+static const bool         default_water_only      = false;
+static const bool         default_match_points    = false;
+static const bool         default_event_equal     = false;
 
 // Default rapid intensification is an increase of 30 kts over 24 hours
 static const TrackType    default_rirw_track  = TrackType::None;

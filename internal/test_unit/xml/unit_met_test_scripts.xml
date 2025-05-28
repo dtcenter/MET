@@ -2,8 +2,8 @@
 <!DOCTYPE met_test [
   <!ENTITY MET_BASE       "${MET_BASE}">
   <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
-  <!ENTITY MET_DATA       "${MET_BUILD_BASE}/data">
-  <!ENTITY MET_SCRIPTS    "${MET_BUILD_BASE}/scripts">
+  <!ENTITY MET_DATA       "${MET_TEST_BASE}/../../data">
+  <!ENTITY MET_SCRIPTS    "${MET_TEST_BASE}/../../scripts">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
   <!ENTITY OUTPUT_DIR     "${MET_TEST_OUTPUT}/met_test_scripts">
@@ -292,15 +292,19 @@
       -v 2
     </param>
     <output>
-      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_cnt.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_fho.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_ctc.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_cts.txt</stat>
-      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_fho.txt</stat>
-      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_nbrcnt.txt</stat>
-      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_nbrctc.txt</stat>
-      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_nbrcts.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_cnt.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_sl1l2.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_vl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_vcnt.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_eclv.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_nbrctc.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_nbrcts.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_nbrcnt.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_grad.txt</stat>
+      <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_dmap.txt</stat>
       <stat>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V.stat</stat>
       <grid_nc>&OUTPUT_DIR;/grid_stat/grid_stat_120000L_20050807_120000V_pairs.nc</grid_nc>
     </output>

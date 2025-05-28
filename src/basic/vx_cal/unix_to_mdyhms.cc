@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -105,18 +105,17 @@ int month_name_to_m (const char *month_str)
 {
 
 int month = -1;
-int str_len = strlen(month_str);
-char t_month_str[str_len + 1];
 
-for (int idx=0; idx<str_len; idx++) {
-   t_month_str[idx] = (idx==0) ? toupper((char)month_str[idx])
-                               : tolower((char)month_str[idx]);
-}
-t_month_str[str_len] = 0;
+// Convert to camel case
+string t_month_str(month_str);
+transform(t_month_str.begin(), t_month_str.end(),
+          t_month_str.begin(), ::tolower);
+transform(t_month_str.begin(), t_month_str.begin() + 1,
+          t_month_str.begin(), ::toupper);
 
 for (int idx=1; idx<=12; idx++) {
-   if (0 == strcmp(short_month_name[idx], t_month_str)
-       || 0 == strcmp(month_name[idx], t_month_str)) {
+   if (t_month_str == short_month_name[idx] ||
+       t_month_str == month_name[idx]) {
       month = idx;
       break;
    }

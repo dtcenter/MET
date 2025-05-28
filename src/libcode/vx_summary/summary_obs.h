@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -41,7 +41,9 @@ public:
                        const std::string &quality_flag,
                        const int var_code, const double pressure_level_hpa,
                        const double height_m, const double value,
-                       const std::string &var_name = "");
+                       const std::string &var_name = "",
+                       const std::string &var_units = "",
+                       const std::string &var_desc = "");
    std::vector< Observation > getObservations();
    std::vector< Observation > getSummaries();
    long countHeaders();
@@ -49,19 +51,15 @@ public:
    long countHeaders(std::vector< Observation > &obs_vector);
    long countSummaryHeaders();
    time_t getValidTime(const std::string &time_string) const;
-   TimeSummaryInfo getSummaryInfo();
+   TimeSummaryInfo getSummaryInfo() const;
    void setSummaryInfo(const TimeSummaryInfo &summary_info);
-   StringArray getObsNames();
+   StringArray getObsNames() const;
+   StringArray getObsUnits() const;
+   StringArray getObsDescs() const;
 
-
-protected:
+private:
 
   static const float FILL_VALUE;
-
-
-  ///////////////////////
-  // Protected members //
-  ///////////////////////
 
   bool dataSummarized;
   TimeSummaryInfo summaryInfo;
@@ -70,6 +68,10 @@ protected:
   std::vector< Observation > observations;
   std::vector< Observation > summaries;
   StringArray obs_names;
+  StringArray obs_units;
+  StringArray obs_descs;
+
+protected:
 
   ///////////////////////
   // Protected methods //
@@ -251,11 +253,14 @@ public:
 
 };
 
-inline std::vector< Observation > SummaryObs::getObservations() { return observations; }
-inline std::vector< Observation > SummaryObs::getSummaries()    { return summaries;    }
-inline StringArray           SummaryObs::getObsNames()     { return obs_names;    }
-inline void                  SummaryObs::setSummaryInfo(const TimeSummaryInfo &summary_info) { summaryInfo = summary_info;};
-inline TimeSummaryInfo       SummaryObs::getSummaryInfo()  { return summaryInfo;};
+inline std::vector< Observation > SummaryObs::getObservations() { return observations;        }
+inline std::vector< Observation > SummaryObs::getSummaries()    { return summaries;           }
+inline StringArray           SummaryObs::getObsNames() const    { return obs_names;           }
+inline StringArray           SummaryObs::getObsUnits() const    { return obs_units;           }
+inline StringArray           SummaryObs::getObsDescs() const    { return obs_descs;           }
+inline void                  SummaryObs::setSummaryInfo(const TimeSummaryInfo &summary_info)
+                                                                { summaryInfo = summary_info; }
+inline TimeSummaryInfo       SummaryObs::getSummaryInfo() const { return summaryInfo;         }
 
 ////////////////////////////////////////////////////////////////////////
 

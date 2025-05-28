@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -24,6 +24,7 @@
 //   004    05-20-24  Howard Soh     MET #2867 Fix -qc ADP bug.
 //   005    06-24-24  Halley Gotway  MET #2880 Filter obs_quality.
 //   006    10-21-24  Halley Gotway  MET #3000 Reduce warnings.
+//   007    05/07-25  Halley Gotway  MET #3145 Add OpenMP.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -154,7 +155,10 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
                                     const Grid to_grid);
 static void open_nc(const Grid &grid, const ConcatString run_cs);
 static void write_nc(const DataPlane &dp, const Grid &grid,
-                     const VarInfo *vinfo, const char *vname);
+                     const VarInfo *vinfo, const char *vname,
+                     bool add_gaussian_atts = false,
+                     NcFile *in_goes_nc = nullptr,
+                     NcVar *in_var_nc = nullptr);
 static void write_nc_int(const DataPlane &dp, const Grid &grid,
                          const VarInfo *vinfo, const char *vname);
 static void close_nc();
@@ -1108,15 +1112,10 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          tmp_long_name = vname_prob;
          tmp_long_name << dim_string;
          vinfo->set_long_name(tmp_long_name.c_str());
-         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str());
-         if (do_gaussian_filter) {
-            NcVar prob_var = get_var(nc_out, vname_prob.c_str());
-            if (IS_VALID_NC(prob_var)) {
-               add_att(&prob_var, "gaussian_radius", RGInfo.gaussian.radius);
-               add_att(&prob_var, "gaussian_dx", RGInfo.gaussian.dx);
-               add_att(&prob_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
-            }
-         }
+
+         // Write the probability data
+         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
+                  do_gaussian_filter);
 
          tmp_long_name = vname_prob_mask;
          tmp_long_name << dim_string;
@@ -1265,7 +1264,6 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
    int filtered_by_time = 0;
    int time_from_size = 1;
    clock_t start_clock =  clock();
-   bool opt_all_attrs = false;
    Grid fr_grid = fr_mtddf->grid();
    static const char *method_name = "process_point_nccf_file() -> ";
 
@@ -1458,48 +1456,44 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       // Write the regridded data
       write_nc(to_dp, to_grid, vinfo, vname.c_str());
 
-      NcVar to_var = get_nc_var(nc_out, vname.c_str());
-
       bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
       if (has_prob_thresh || do_gaussian_filter) {
          DataPlane prob_dp;
          DataPlane prob_mask_dp;
          ConcatString vname_prob = vname;
          vname_prob << "_prob_" << prob_cat_thresh.get_abbr_str();
-         int nx = to_dp.nx();
-         int ny = to_dp.ny();
-         prob_dp.set_size(nx, ny);
+         prob_dp.set_size(to_dp.nx(), to_dp.ny());
          prob_dp.set_init(to_dp.init());
          prob_dp.set_valid(to_dp.valid());
          prob_dp.set_constant(0);
-         for (int x=0; x<nx; x++) {
-            for (int y=0; y<ny; y++) {
-               auto value = to_dp.get(x, y);
-               if (!is_bad_data(value) &&
-                     ((has_prob_thresh && prob_cat_thresh.check(value))
-                       || (do_gaussian_filter && !has_prob_thresh))) {
-                  prob_dp.set(1, x, y);
+         int nxy = to_dp.nxy();
+
+#pragma omp parallel default(none) \
+         shared(nxy, to_dp, prob_dp) \
+         shared(has_prob_thresh, prob_cat_thresh, do_gaussian_filter)
+         {
+
+#pragma omp for schedule(static)
+            for(int j=0; j<nxy; j++) {
+               double v = to_dp.data()[j];
+               if(is_bad_data(v)) continue;
+               if(( has_prob_thresh && prob_cat_thresh.check(v)) ||
+                  (!has_prob_thresh && do_gaussian_filter)) {
+                  prob_dp.buf()[j] = 1;
                }
             }
+         } // End omp parallel
+
+         if(do_gaussian_filter) {
+            interp_gaussian_dp(prob_dp, RGInfo.gaussian, RGInfo.vld_thresh);
          }
 
-         if (do_gaussian_filter) interp_gaussian_dp(prob_dp, RGInfo.gaussian, RGInfo.vld_thresh);
-         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str());
-         if(IS_VALID_NC(var_data)) {
-            NcVar out_var = get_nc_var(nc_out, vname.c_str());
-            copy_nc_atts(&var_data, &out_var, opt_all_attrs);
-            if (do_gaussian_filter) {
-               NcVar prob_var = get_var(nc_out, vname_prob.c_str());
-               if (IS_VALID_NC(prob_var)) {
-                  add_att(&prob_var, "gaussian_radius", RGInfo.gaussian.radius);
-                  add_att(&prob_var, "gaussian_dx", RGInfo.gaussian.dx);
-                  add_att(&prob_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
-               }
-            }
-         }
+         // Write the probability data
+         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
+                  do_gaussian_filter);
       }
 
-   } // end for i
+   } // end for j 
 
    if( 0 < filtered_by_time ) {
       mlog << Debug(3) << method_name << "Filtered by time: " << filtered_by_time
@@ -1684,68 +1678,20 @@ static void open_nc(const Grid &grid, ConcatString run_cs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_data(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
-
-   // Allocate memory to store data values for each grid point
-   vector<float> data(grid.nx()*grid.ny(), bad_data_float);
-
-   // Store the data
-   int grid_nx = grid.nx();
-   int grid_ny = grid.ny();
-   for(int x=0; x<grid_nx; x++) {
-      for(int y=0; y<grid_ny; y++) {
-         int n = DefaultTO.two_to_one(grid_nx, grid_ny, x, y);
-         data[n] = (float)dp(x, y);
-      } // end for y
-   } // end for x
-
-   // Write out the data
-   if(!put_nc_data_with_dims(data_var, data.data(), grid.ny(), grid.nx())) {
-      mlog << Error << "\nwrite_nc_data() -> "
-           << "error writing data to the output file.\n\n";
-      exit(1);
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void write_nc_data_int(const DataPlane &dp, const Grid &grid, NcVar *data_var) {
-
-   // Allocate memory to store data values for each grid point
-   vector<int> data(grid.nx()*grid.ny(), bad_data_int);
-
-   // Store the data
-   int grid_nx = grid.nx();
-   int grid_ny = grid.ny();
-   for(int x=0; x<grid_nx; x++) {
-      for(int y=0; y<grid_ny; y++) {
-         int n = DefaultTO.two_to_one(grid_nx, grid_ny, x, y);
-         data[n] = (int) dp(x, y);
-      } // end for y
-   } // end for x
-
-   // Write out the data
-   if(!put_nc_data_with_dims(data_var, data.data(), grid.ny(), grid.nx())) {
-      mlog << Error << "\nwrite_nc_data_int() -> "
-           << "error writing data to the output file.\n\n";
-      exit(1);
-   }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 static void write_nc(const DataPlane &dp, const Grid &grid,
-                     const VarInfo *vinfo, const char *vname) {
+                     const VarInfo *vinfo, const char *vname,
+                     bool add_gaussian_atts,
+                     NcFile *in_goes_nc,
+                     NcVar *in_var_nc) {
 
    int deflate_level = compress_level;
-   if (deflate_level < 0) deflate_level = 0;
+   if(deflate_level < 0) deflate_level = 0;
 
+   // Create the output variable
    NcVar data_var = add_var(nc_out, (string)vname, ncFloat,
                             lat_dim, lon_dim, deflate_level);
+
+   // Add standard attributes
    add_att(&data_var, "name", (string)vname);
    add_att(&data_var, "long_name", (string)vinfo->long_name());
    add_att(&data_var, "level", (string)vinfo->level_name());
@@ -1753,7 +1699,32 @@ static void write_nc(const DataPlane &dp, const Grid &grid,
    add_att(&data_var, "_FillValue", bad_data_float);
    write_netcdf_var_times(&data_var, dp);
 
-   write_nc_data(dp, grid, &data_var);
+   // If requested, add global GOES attributes
+   if(in_goes_nc) {
+      for(size_t idx=0; idx<GOES_global_attr_names.size(); idx++) {
+         copy_nc_att(in_goes_nc, &data_var, (string)GOES_global_attr_names[idx]);
+      }
+   }
+
+   // If requested, add input variable attributes
+   if(IS_VALID_NC_P(in_var_nc)) {
+      bool opt_all_attrs = false;
+      copy_nc_atts(in_var_nc, &data_var, opt_all_attrs);
+   }
+
+   // If requested, add gaussian attributes
+   if(add_gaussian_atts) {
+      add_att(&data_var, "gaussian_radius", RGInfo.gaussian.radius);
+      add_att(&data_var, "gaussian_dx", RGInfo.gaussian.dx);
+      add_att(&data_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
+   }
+
+   // Write out the data
+   if(!put_nc_data_plane_float(&data_var, dp)) {
+      mlog << Error << "\nwrite_nc() -> "
+           << "error writing data to the output file.\n\n";
+      exit(1);
+   }
 
    return;
 }
@@ -1775,7 +1746,12 @@ static void write_nc_int(const DataPlane &dp, const Grid &grid,
    add_att(&data_var, "_FillValue", bad_data_int);
    write_netcdf_var_times(&data_var, dp);
 
-   write_nc_data_int(dp, grid, &data_var);
+   // Write out the data
+   if(!put_nc_data_plane_int(&data_var, dp)) {
+      mlog << Error << "\nwrite_nc_int() -> "
+           << "error writing data to the output file.\n\n";
+      exit(1);
+   }
 
    return;
 }
@@ -1790,8 +1766,6 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
                               const Grid fr_grid, const Grid to_grid) {
    DataPlane fr_dp, to_dp;
    ConcatString vname;
-   const size_t global_attr_count = GOES_global_attr_names.size();
-   bool opt_all_attrs = false;
    clock_t start_clock =  clock();
    auto nc_adp = (NcFile *) nullptr;
    static const char *method_name = "process_goes_file() -> ";
@@ -1857,17 +1831,12 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          vname = VarNameSA[i];
       }
 
-      // Write the regridded data
-      write_nc(to_dp, to_grid, vinfo, vname.c_str());
+      // Get the input GOES variable to copy variable attributes
+      NcVar in_goes_var = get_goes_nc_var(nc_in, vinfo->name());
 
-      NcVar to_var = get_nc_var(nc_out, vname.c_str());
-      NcVar var_data = get_goes_nc_var(nc_in, vinfo->name());
-      if(IS_VALID_NC(var_data)) {
-         for (size_t idx=0; idx<global_attr_count; idx++) {
-            copy_nc_att(nc_in, &to_var, (string)GOES_global_attr_names[idx]);
-         }
-         copy_nc_atts(&var_data, &to_var, opt_all_attrs);
-      }
+      // Write the regridded data
+      write_nc(to_dp, to_grid, vinfo, vname.c_str(),
+               false, nc_in, &in_goes_var);
 
       bool has_prob_thresh = !prob_cat_thresh.check(bad_data_double);
       if (has_prob_thresh || do_gaussian_filter) {
@@ -1875,43 +1844,38 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
          DataPlane prob_mask_dp;
          ConcatString vname_prob = vname;
          vname_prob << "_prob_" << prob_cat_thresh.get_abbr_str();
-         int nx = to_dp.nx();
-         int ny = to_dp.ny();
-         prob_dp.set_size(nx, ny);
+         prob_dp.set_size(to_dp.nx(), to_dp.ny());
          prob_dp.set_init(to_dp.init());
          prob_dp.set_valid(to_dp.valid());
          prob_dp.set_constant(0);
-         for (int x=0; x<nx; x++) {
-            for (int y=0; y<ny; y++) {
-               double value = to_dp.get(x, y);
-               if (!is_bad_data(value) &&
-                     ((has_prob_thresh && prob_cat_thresh.check(value))
-                       || (do_gaussian_filter && !has_prob_thresh))) {
-                  prob_dp.set(1, x, y);
+         int nxy = to_dp.nxy();
+
+#pragma omp parallel default(none) \
+         shared(nxy, to_dp, prob_dp) \
+         shared(has_prob_thresh, prob_cat_thresh, do_gaussian_filter)
+         {
+
+#pragma omp for schedule(static)
+            for(int j=0; j<nxy; j++) {
+               double v = to_dp.data()[j];
+               if(is_bad_data(v)) continue;
+               if(( has_prob_thresh && prob_cat_thresh.check(v)) ||
+                  (!has_prob_thresh && do_gaussian_filter)) {
+                  prob_dp.buf()[j] = 1;
                }
             }
+         } // End omp parallel
+
+         if(do_gaussian_filter) {
+            interp_gaussian_dp(prob_dp, RGInfo.gaussian, RGInfo.vld_thresh);
          }
 
-         if (do_gaussian_filter) interp_gaussian_dp(prob_dp, RGInfo.gaussian, RGInfo.vld_thresh);
-         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str());
-         if(IS_VALID_NC(var_data)) {
-            NcVar out_var = get_nc_var(nc_out, vname.c_str());
-            for (size_t idx=0; idx<global_attr_count; idx++) {
-               copy_nc_att(nc_in, &out_var, (string)GOES_global_attr_names[idx]);
-            }
-            copy_nc_atts(&var_data, &out_var, opt_all_attrs);
-            if (do_gaussian_filter) {
-               NcVar prob_var = get_var(nc_out, vname_prob.c_str());
-               if (IS_VALID_NC(prob_var)) {
-                  add_att(&prob_var, "gaussian_radius", RGInfo.gaussian.radius);
-                  add_att(&prob_var, "gaussian_dx", RGInfo.gaussian.dx);
-                  add_att(&prob_var, "trunc_factor", RGInfo.gaussian.trunc_factor);
-               }
-            }
-         }
+         // Write the probability data
+         write_nc(prob_dp, to_grid, vinfo, vname_prob.c_str(),
+                  do_gaussian_filter);
       }
 
-   } // end for i
+   } // end for j 
 
    multimap<string,NcVar> mapVar = GET_NC_VARS_P(nc_in);
    for (const auto &kv : mapVar) {
@@ -2093,8 +2057,8 @@ static void get_grid_mapping_latlon(
    to_grid.xy_to_latlon(0, 0, to_ll_lat, to_ll_lon);
    mlog << Debug(5) << method_name << "to_grid ll corner: (" << to_ll_lon << ", " << to_ll_lat << ")\n";
 
-   //Count the number of cells to be mapped to TO_GRID
-   //Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
+   // Count the number of cells to be mapped to TO_GRID
+   // Following the logic at DataPlane::two_to_one(int x, int y) n = y*Nx + x;
    for (int yIdx=0; yIdx<from_lat_count; yIdx++) {
       int lat_offset = yIdx;
       for (int xIdx=0; xIdx<from_lon_count; xIdx++) {
@@ -2251,8 +2215,8 @@ static unixtime find_valid_time(NcVar time_var) {
    if( IS_VALID_NC(time_var) || get_dim_count(&time_var) < 2) {
       int time_count = get_dim_size(&time_var, 0);
 
-      double time_values [time_count + 1];
-      if (get_nc_data(&time_var, time_values)) {
+      vector<double> time_values(time_count + 2);
+      if (get_nc_data(&time_var, time_values.data())) {
          valid_time = compute_unixtime(&time_var, time_values[0]);
       }
       else {
@@ -3003,7 +2967,7 @@ __attribute__((noreturn)) static void usage() {
         << "to generate gridded data (optional).\n"
 
         << "\t\t\"-goes_qc flags\" specifies a comma-separated list of QC flags, "
-	<< "for example \"0,1\" (optional).\n"
+        << "for example \"0,1\" (optional).\n"
         << "\t\t\tOnly used if grid_mapping is set to \"goes_imager_projection\" "
         << "and the QC variable exists.\n"
 
@@ -3050,10 +3014,8 @@ static void set_adp_gc_values(NcVar var_adp_qc) {
 
    if (get_nc_att_value(&var_adp_qc, (ConcatString)"flag_meanings", att_flag_meanings)) {
       StringArray flag_meanings = to_lower(att_flag_meanings).split(" ");
-      unsigned short flag_values[flag_meanings.n()+128];    /* reserve enough storage */
-      for (int i=0; i<flag_meanings.n(); i++) flag_values[i] = (unsigned short)-1;
-
-      if (get_nc_att_values(&var_adp_qc, att_name_values, flag_values)) {
+      vector<unsigned short> flag_values(flag_meanings.n() + 128, (unsigned short) -1);
+      if (get_nc_att_values(&var_adp_qc, att_name_values, flag_values.data())) {
          int idx;
          if (flag_meanings.has("low_confidence_smoke_detection_qf", idx)) {
             adp_qc_low = (flag_values[idx] >> 2) & 0x03;

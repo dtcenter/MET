@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -88,12 +88,12 @@ class GridTemplate {
       // Access methods
 
       inline void addOffset(const GridOffset &offset) {
-         _offsetList.push_back(new GridOffset(offset.x_offset,
+         _offsetList.emplace_back(new GridOffset(offset.x_offset,
                                               offset.y_offset));
       }
 
       inline void addOffset(const int x_offset, const int y_offset) {
-         _offsetList.push_back(new GridOffset(x_offset, y_offset));
+         _offsetList.emplace_back(new GridOffset(x_offset, y_offset));
       }
 
       int size(void) const {

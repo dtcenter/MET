@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -691,7 +691,7 @@ NcDim ny_dim;
 NcDim nt_dim;
 NcVar data_var ;
 const char format [] = "%.3f";
-char junk[256];
+ConcatString cs;
 
 
    //
@@ -711,13 +711,13 @@ nt_dim = get_nc_dim(&f, nt_dim_name);
 
    //  DataMin, DataMax
 
-snprintf(junk, sizeof(junk), format, DataMin);
+cs.format(format, DataMin);
 
-add_att(&f, min_value_att_name, junk);
+add_att(&f, min_value_att_name, cs.c_str());
 
-snprintf(junk, sizeof(junk), format, DataMax);
+cs.format(format, DataMax);
 
-add_att(&f, max_value_att_name, junk);
+add_att(&f, max_value_att_name, cs.c_str());
 
    //  Spatial_Radius
 

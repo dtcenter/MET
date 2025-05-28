@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -613,22 +613,39 @@ class GRADInfo {
       int dx;
       int dy;
 
-      // Gradient Partial Sums
-      int    total;
-      double fgbar, ogbar, mgbar, egbar;
+      // Number of pairs
+      int total;
+
+      // Gradient Partial sums
+      double fgbar;
+      double ogbar;
+      double mgbar;
+      double egbar;
+
+      // Gradient Vector Partial Sums 
+      double fgmag;
+      double ogmag;
+      double mag_mse;
+      double lap_mse;
 
       // Gradient Statistics
       double s1()         const; // s1         = 100 * egbar / mgbar
       double s1_og()      const; // s1_og      = 100 * egbar / ogbar
       double fgog_ratio() const; // fgog_ratio = fgbar / ogbar
 
-      // Compute sums
+      double magnitude_rmse() const;
+      double laplace_rmse()   const;
+
+      void clear();
+ 
+      // Compute gradient sums
       void set(int grad_dx, int grad_dy,
                const NumArray &fgx_na, const NumArray &fgy_na,
                const NumArray &ogx_na, const NumArray &ogy_na,
                const NumArray &wgt_na);
 
-      void clear();
+      void   set_stat(const std::string &, double);
+      double get_stat(const std::string &) const;
 };
 
 ////////////////////////////////////////////////////////////////////////

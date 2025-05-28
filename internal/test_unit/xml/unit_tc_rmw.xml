@@ -7,6 +7,7 @@
   <!ENTITY CONFIG_DIR     "&TEST_DIR;/config">
   <!ENTITY DATA_DIR       "&INPUT_DIR;/tc_data">
   <!ENTITY DATA_DIR_MODEL "&INPUT_DIR;/model_data">
+  <!ENTITY DATA_DIR_OBS   "&INPUT_DIR;/obs_data">
 ]>
 
 <!-- Requires: None -->
@@ -48,6 +49,116 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_RANGE_AZIMUTH">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo.nc \
+      &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo_2014101412_RH_P850.ps \
+      'name="RH"; level="(4,0,*,*)";'
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo_2014101412_RH_P850.ps</ps>
+    </output>
+  </test>
+
+  <test name="grid_stat_RANGE_AZIMUTH">
+    <exec>&MET_BIN;/grid_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>RANGE_AZIMUTH</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo.nc \
+      &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f024.grb2 \
+      &CONFIG_DIR;/GridStatConfig_range_azimuth \
+      -outdir &OUTPUT_DIR;/tc_rmw -v 1
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V.stat</stat>
+      <grid_nc>&OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_RANGE_AZIMUTH_GRID_STAT_PAIRS">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs.nc \
+      &OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs_OBS_RH_P500.ps \
+      'name="OBS_RH_P500_FULL"; level="(*,*)";' \
+      -title "Observation RH/P500"
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/tc_rmw/grid_stat_RANGE_AZIMUTH_240000L_20141014_120000V_pairs_OBS_RH_P500.ps</ps>
+    </output>
+  </test>
+
+  <test name="series_analysis_RANGE_AZIMUTH">
+    <exec>echo "&DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f000.grb2  \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f006.grb2  \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f012.grb2  \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f018.grb2  \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f024.grb2" \
+                > &OUTPUT_DIR;/tc_rmw/gonzalo_file_list; \
+         &MET_BIN;/series_analysis</exec>
+    <param> \
+      -fcst &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo.nc \
+      -obs &OUTPUT_DIR;/tc_rmw/gonzalo_file_list \
+      -config &CONFIG_DIR;/SeriesAnalysisConfig_range_azimuth \
+      -out &OUTPUT_DIR;/tc_rmw/series_analysis_RANGE_AZIMUTH_hwrf_gonzalo.nc
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/tc_rmw/series_analysis_RANGE_AZIMUTH_hwrf_gonzalo.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="pb2nc_GDAS_RANGE_AZIMUTH">
+    <exec>&MET_BIN;/pb2nc</exec>
+    <env>
+      <pair><name>STATION_ID</name>          <value></value></pair>
+      <pair><name>MASK_GRID</name>           <value>&DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f024.grb2</value></pair>
+      <pair><name>MASK_POLY</name>           <value></value></pair>
+      <pair><name>QUALITY_MARK_THRESH</name> <value>9</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_OBS;/prepbufr/gdas/prepbufr.gdas.20141014.t12z.nr \
+      &OUTPUT_DIR;/tc_rmw/prepbufr.gdas.20141014.t12z.nc \
+      &CONFIG_DIR;/PB2NCConfig \
+      -v 1
+    </param>
+    <output>
+      <point_nc>&OUTPUT_DIR;/tc_rmw/prepbufr.gdas.20141014.t12z.nc</point_nc>
+    </output>
+  </test>
+
+  <test name="plot_point_obs_RANGE_AZIMUTH">
+    <exec>&MET_BIN;/plot_point_obs</exec>
+    <param> \
+      &OUTPUT_DIR;/tc_rmw/prepbufr.gdas.20141014.t12z.nc \
+      &OUTPUT_DIR;/tc_rmw/prepbufr.gdas.20141014.t12z_RANGE_AZIMUTH.ps \
+      -plot_grid &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo.nc \
+      -config &CONFIG_DIR;/PlotPointObsConfig_range_azimuth \
+      -obs_var RH
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/tc_rmw/prepbufr.gdas.20141014.t12z_RANGE_AZIMUTH.ps</ps>
+    </output>
+  </test>
+
+  <test name="point_stat_RANGE_AZIMUTH">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OUTPUT_PREFIX</name> <value>RANGE_AZIMUTH</value></pair>
+    </env>
+    <param> \
+      &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo.nc \
+      &OUTPUT_DIR;/tc_rmw/prepbufr.gdas.20141014.t12z.nc \
+      &CONFIG_DIR;/PointStatConfig_range_azimuth \
+      -outdir &OUTPUT_DIR;/tc_rmw -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/tc_rmw/point_stat_RANGE_AZIMUTH_240000L_20141014_120000V.stat</stat>
     </output>
   </test>
 

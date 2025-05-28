@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -101,7 +101,7 @@ class MetPythonDataFile : public Met2dDataFile {
 
 
 inline double      MetPythonDataFile::operator  () (int x, int y) const { return get(x, y); }
-inline GrdFileType MetPythonDataFile::file_type ()                const { return Type; }
+inline GrdFileType MetPythonDataFile::file_type ()                const { return Type;      }
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -308,7 +308,7 @@ bool PlotPointObsOpt::add(const Observation &obs) {
 
    // Update the set of locations
    n_obs++;
-   if(!has(cur_loc)) locations.push_back(cur_loc);
+   if(!has(cur_loc)) locations.emplace_back(cur_loc);
 
    return true;
 }
@@ -483,6 +483,9 @@ void PlotPointObsConfInfo::process_config(
             exit(1);
          }
 
+	 // Update the grid defintion, as needed for range/azimuth grids
+         grid = met_ptr->grid();
+
          // Regrid, if requested
          if(grid_data_info->regrid().enable) {
             mlog << Debug(1) << "Regridding field "
@@ -525,7 +528,7 @@ void PlotPointObsConfInfo::process_config(
    // Parse each array entry
    for(i=0; i<dict->n_entries(); i++) {
       opt.process_config(*((*dict)[i]->dict_value()));
-      point_opts.push_back(opt);
+      point_opts.emplace_back(opt);
 
       // Check for a colorbar
       if(opt.fill_plot_info.flag && opt.fill_plot_info.colorbar_flag) {

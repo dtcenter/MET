@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -24,6 +24,7 @@
 //   002    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   003    09-12-22  Prestopnik     MET #2227 Remove namespace std and netCDF
 //                                   from header files
+//   004    05-07-25  Halley Gotway  MET #3145 Add OpenMP
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -168,11 +169,6 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_data_file() {
-   DataPlane dp_in, dp_shift;
-   Grid grid;
-   GrdFileType ftype;
-   double fr_x, fr_y, to_x, to_y, dx, dy, v;
-   int x, y;
 
    // Parse the config string
    MetConfig config;
@@ -183,7 +179,7 @@ void process_data_file() {
    if (compress_level < 0) compress_level = config.nc_compression();
 
    // Get the gridded file type from config string, if present
-   ftype = parse_conf_file_type(&config);
+   GrdFileType ftype = parse_conf_file_type(&config);
 
    // Read the input data file
    Met2dDataFileFactory m_factory;
@@ -214,6 +210,7 @@ void process_data_file() {
    vinfo->set_dict(config);
 
    // Get the data plane from the file for this VarInfo object
+   DataPlane dp_in;
    if(!mtddf->data_plane(*vinfo, dp_in)) {
       mlog << Error << "\nprocess_data_file() -> "
            << "trouble getting field \"" << FieldString
@@ -234,7 +231,11 @@ void process_data_file() {
    }
 
    // Compute the shift, converting from degrees east to west
-   grid = mtddf->grid();
+   Grid grid = mtddf->grid();
+   double fr_x;
+   double fr_y;
+   double to_x;
+   double to_y;
    grid.latlon_to_xy(FrLat, -1.0*FrLon, fr_x, fr_y);
    grid.latlon_to_xy(ToLat, -1.0*ToLon, to_x, to_y);
 
@@ -249,8 +250,8 @@ void process_data_file() {
    }
 
    // Compute the shift
-   dx = to_x - fr_x;
-   dy = to_y - fr_y;
+   double dx = to_x - fr_x;
+   double dy = to_y - fr_y;
 
    shift_cs << cs_erase << "Shifting from lat/lon ("
             << FrLat << ", " << FrLon << ") to lat/lon ("
@@ -259,15 +260,24 @@ void process_data_file() {
 
    mlog << Debug(2) << shift_cs << "\n";
 
-   // Shift the data
-   dp_shift = dp_in;
-   for(x=0; x<dp_shift.nx(); x++) {
-      for(y=0; y<dp_shift.ny(); y++) {
-         v = compute_horz_interp(dp_in, x - dx, y - dy, bad_data_double,
-                                 Method, Width, Shape, grid.wrap_lon(), 1.0);
-         dp_shift.set(v, x, y);
-      } // end for y
-   } // end for x
+   DataPlane dp_shift(dp_in);
+
+#pragma omp parallel default(none) \
+   shared(dp_shift, dp_in, dx, dy, grid) \
+   shared(Method, Width, Shape, bad_data_double)
+   {
+
+      // Shift the data
+#pragma omp for schedule(static) \
+                collapse(2)
+      for(int x=0; x<dp_shift.nx(); x++) {
+         for(int y=0; y<dp_shift.ny(); y++) {
+            double v = compute_horz_interp(dp_in, x - dx, y - dy, bad_data_double,
+                                           Method, Width, Shape, grid.wrap_lon(), 1.0);
+            dp_shift.set(v, x, y);
+         } // end for y
+      } // end for x
+   } // End omp parallel
 
    // Write the shifted data
    write_netcdf(dp_shift, grid, vinfo, mtddf->file_type());
@@ -335,19 +345,8 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
    GridTemplateFactory gtf;
    add_att(&data_var, "smoothing_shape", gtf.enum2String(Shape));
 
-   // Allocate memory to store data values for each grid point
-   vector<float> data(grid.nx()*grid.ny());
-
-   // Store the data
-   for(int x=0; x<grid.nx(); x++) {
-      for(int y=0; y<grid.ny(); y++) {
-         int n = DefaultTO.two_to_one(grid.nx(), grid.ny(), x, y);
-         data[n] = (float) dp(x, y);
-      } // end for y
-   } // end for x
-
    // Write out the data
-   if(!put_nc_data_with_dims(&data_var, data.data(), grid.ny(), grid.nx())) {
+   if(!put_nc_data_plane_float(&data_var, dp)) {
       mlog << Error << "\nwrite_nc() -> "
            << "error writing data to the output file.\n\n";
       exit(1);

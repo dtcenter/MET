@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -265,11 +265,11 @@ if ( (n < 0) || (n >= total_predef_fonts) )  {
 
 }
 
-char junk[256];
+ConcatString cs;
 
-snprintf(junk, sizeof(junk), "%02d.afm", n);
+cs.format("%02d.afm", n);
 
-short_afm_name = junk;
+short_afm_name = cs;
 
 full_afm_name << gs_font_dir << '/' << gs_font_dir << '/' << short_afm_name;
 
@@ -521,7 +521,7 @@ void CgFontCollection::add(const CgFont & f)
 
 extend(Nelements + 1);
 
-e.push_back(f);
+e.emplace_back(f);
 
 ++Nelements;
 
@@ -542,7 +542,7 @@ if ( have_it(f) )  return;
 
 extend(Nelements + 1);
 
-e.push_back(f);
+e.emplace_back(f);
 
 ++Nelements;
 

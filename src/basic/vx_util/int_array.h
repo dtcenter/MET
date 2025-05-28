@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -33,6 +33,7 @@ typedef CRC_Array<int> IntArray;
 
 
 extern ConcatString write_css(const IntArray &);
+extern ConcatString write_css_hhmmss(const IntArray &);
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -30,7 +30,7 @@
 //
 ////////////////////////////////////////////////////////////////////////
 
-
+#include <array>
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -57,7 +57,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static void usage();
+[[noreturn]] static void usage();
 static void process_point_obs(const char *);
 static void create_plot();
 static void add_colorbar(PSfile &, const Box &, const ColorTable &);
@@ -141,8 +141,7 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_point_obs(const char *point_obs_filename) {
-   int h, v, i_obs;
+static void process_point_obs(const char *point_obs_filename) {
    const char *method_name = "process_point_obs() -> ";
    const char *method_name_s = "process_point_obs() ";
 
@@ -154,19 +153,18 @@ void process_point_obs(const char *point_obs_filename) {
    bool use_var_id = true;
    bool use_obs_arr = false;
 
-   bool use_python = false;
    MetNcPointObsIn nc_point_obs;
-   MetPointData *met_point_obs = 0;
+   MetPointData *met_point_obs = nullptr;
 
    // Check for python format
    string python_command = point_obs_filename;
    bool use_xarray = (0 == python_command.find(conf_val_python_xarray));
-   use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
+   bool use_python = use_xarray || (0 == python_command.find(conf_val_python_numpy));
 
 #ifdef WITH_PYTHON
    MetPythonPointDataFile met_point_file;
    if (use_python) {
-      int offset = python_command.find("=");
+      size_t offset = python_command.find("=");
       if (offset == std::string::npos) {
          mlog << Error << "\n" << method_name
               << "trouble parsing the python command " << python_command << ".\n\n";
@@ -229,8 +227,8 @@ void process_point_obs(const char *point_obs_filename) {
       met_point_obs = (MetPointData *)&nc_point_obs;
    }
 
-   long nhdr_count = met_point_obs->get_hdr_cnt();
-   long nobs_count = met_point_obs->get_obs_cnt();
+   int nhdr_count = met_point_obs->get_hdr_cnt();
+   int nobs_count = met_point_obs->get_obs_cnt();
 
    mlog << Debug(2) << "Processing " << nobs_count
         << " observations at " << nhdr_count << " locations.\n";
@@ -241,10 +239,10 @@ void process_point_obs(const char *point_obs_filename) {
    int buf_size = (nobs_count > DEF_NC_BUFFER_SIZE) ? DEF_NC_BUFFER_SIZE : nobs_count;
 
    // Allocate space to store the data
-   float hdr_arr[HDR_ARRAY_LEN];
-   float obs_arr[OBS_ARRAY_LEN];
-   int obs_qty_block[buf_size];
-   float obs_arr_block[buf_size][OBS_ARRAY_LEN];
+   array<float, HDR_ARRAY_LEN> hdr_arr;
+   array<float, OBS_ARRAY_LEN> obs_arr;
+   vector<int> obs_qty_block(buf_size);
+   vector<std::array<float, OBS_ARRAY_LEN>> obs_arr_block(buf_size);
 
    use_var_id = met_point_obs->is_using_var_id();
    if(use_var_id) var_list = met_point_obs->get_var_names();
@@ -271,16 +269,21 @@ void process_point_obs(const char *point_obs_filename) {
 #ifdef WITH_PYTHON
       if (use_python)
          status = met_point_obs->get_point_obs_data()->fill_obs_buf(
-                             buf_size2, i_start, (float *)obs_arr_block, obs_qty_block);
+                             buf_size2, i_start,
+                             (float *)obs_arr_block.data(),
+                             obs_qty_block.data());
       else
 #endif
-      status = nc_point_obs.read_obs_data(buf_size2, i_start, (float *)obs_arr_block,
-                                          obs_qty_block, (char *)0);
+      {
+         status = nc_point_obs.read_obs_data(buf_size2, i_start,
+                                             (float *)obs_arr_block.data(),
+                                             obs_qty_block.data(), nullptr);
+      }
       if (!status) exit(1);
 
       for(int i_offset=0; i_offset<buf_size2; i_offset++) {
 
-         i_obs = i_start + i_offset;
+         int i_obs = i_start + i_offset;
          for (int j=0; j<OBS_ARRAY_LEN; j++) {
             obs_arr[j] = obs_arr_block[i_offset][j];
          }
@@ -291,17 +294,19 @@ void process_point_obs(const char *point_obs_filename) {
          obs_qty_str = qty_list[qty_offset];
 
          // Get the header index and variable type for this observation.
-         h = nint(obs_arr[0]);
-         v = nint(obs_arr[1]);
+         int h = nint(obs_arr[0]);
+         int v = nint(obs_arr[1]);
 
          // Read the corresponding header array for this observation
          // - the corresponding header type, header Station ID, and valid time
 #ifdef WITH_PYTHON
          if (use_python)
-            met_point_obs->get_header(h, hdr_arr, hdr_typ_str, hdr_sid_str, hdr_vld_str);
+            met_point_obs->get_header(h, hdr_arr.data(), hdr_typ_str, hdr_sid_str, hdr_vld_str);
          else
 #endif
-            nc_point_obs.get_header(h, hdr_arr, hdr_typ_str, hdr_sid_str, hdr_vld_str);
+         {
+            nc_point_obs.get_header(h, hdr_arr.data(), hdr_typ_str, hdr_sid_str, hdr_vld_str);
+         }
 
          // Store data in an observation object
          Observation cur_obs(
@@ -330,21 +335,23 @@ void process_point_obs(const char *point_obs_filename) {
    if (use_python) met_point_file.close();
    else
 #endif
-   nc_point_obs.close();
+   {
+      nc_point_obs.close();
+   }
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void create_plot() {
-   int i, plot_count, skip_count;
+static void create_plot() {
    PSfile plot;
-   Box grid_bb, page, view, map_box, cbar_box;
-   double lat, lon, grid_x, grid_y, page_x, page_y, mag, size;
+   Box grid_bb;
+   Box page;
+   Box view;
+   Box map_box;
+   Box cbar_box;
    ColorTable ct;
-   vector<PlotPointObsOpt>::iterator it_ppo;
-   vector<LocationInfo>::iterator it_loc;
 
    // Setup the min/max lat/lon Bounding Box for the grid
    grid_bb.set_llwh(0, 0, conf_info.grid.nx(), conf_info.grid.ny());
@@ -374,7 +381,7 @@ void create_plot() {
    // box without distorting the map. e.g. it will either bump the top
    // and bottome of the view box or bump the left and right sides of
    // the view box or both.
-   mag = calc_mag(grid_bb, view);
+   double mag = calc_mag(grid_bb, view);
 
    map_box.set_llwh(
       view.left()   + 0.5*view.width()  - 0.5*mag*grid_bb.width(),
@@ -392,7 +399,7 @@ void create_plot() {
    }
    else {
       cs = get_short_name(nc_file[0].c_str());
-      for(i=1; i<nc_file.n(); i++) {
+      for(int i=1; i<nc_file.n(); i++) {
          cs << ", " << get_short_name(nc_file[i].c_str());
       }
    }
@@ -418,8 +425,8 @@ void create_plot() {
       // Rescale to the actual range of the data
       else if(is_eq(ct.data_min(bad_data_double), 0.0) &&
               is_eq(ct.data_max(bad_data_double), 1.0)) {
-
-         double data_min, data_max;
+         double data_min;
+         double data_max;
          conf_info.grid_data.data_range(data_min, data_max);
          ct.rescale(data_min, data_max, bad_data_double);
       }
@@ -447,13 +454,12 @@ void create_plot() {
    }
 
    // Loop through the options and add a colorbar
-   for(it_ppo = conf_info.point_opts.begin();
-       it_ppo != conf_info.point_opts.end(); it_ppo++) {
+   for(const auto &it_ppo : conf_info.point_opts) {
 
       // Draw a colorbar, if specified
-      if(it_ppo->fill_plot_info.flag &&
-         it_ppo->fill_plot_info.colorbar_flag) {
-         add_colorbar(plot, cbar_box, it_ppo->fill_ctable);
+      if(it_ppo.fill_plot_info.flag &&
+         it_ppo.fill_plot_info.colorbar_flag) {
+         add_colorbar(plot, cbar_box, it_ppo.fill_ctable);
       }
    }
     
@@ -477,21 +483,25 @@ void create_plot() {
    plot.clip();
 
    // Plot the locations for each set of plotting options
-   plot_count = skip_count = 0;
-   for(i = 0, it_ppo = conf_info.point_opts.begin();
-       it_ppo != conf_info.point_opts.end(); it_ppo++) {
+   double grid_x;
+   double grid_y;
+   double page_x;
+   double page_y;
+   int i = 0;
+   int plot_count = 0;
+   int skip_count = 0;
+   for(const auto &it_ppo : conf_info.point_opts) {
 
       mlog << Debug(3) << "For point data group " << ++i
-           << ", plotting " << it_ppo->locations.size()
-           << " locations for " << it_ppo->n_obs << " observations.\n";
+           << ", plotting " << it_ppo.locations.size()
+           << " locations for " << it_ppo.n_obs << " observations.\n";
 
       // Loop over the locations
-      for(it_loc = it_ppo->locations.begin();
-          it_loc != it_ppo->locations.end(); it_loc++) {
+      for(const auto &it_loc : it_ppo.locations) {
 
          // Convert lat/lon to grid x/y
-         lat = (double) it_loc->lat;
-         lon = (double) (-1.0*it_loc->lon);
+         double lat = it_loc.lat;
+         double lon = (-1.0*it_loc.lon);
          conf_info.grid.latlon_to_xy(lat, lon, grid_x, grid_y);
 
          // Track the number of points off the grid
@@ -506,29 +516,29 @@ void create_plot() {
                           page_x, page_y, map_box);
 
          // Get the size of the circle
-         size = it_ppo->dotsize_fx(it_loc->val);
+         double size = it_ppo.dotsize_fx(it_loc.val);
 
          // Draw a circle and fill it
-         if(it_ppo->fill_point) {
-            plot.set_color(it_ppo->fill_plot_info.flag ?
-                           it_ppo->fill_ctable.nearest(it_loc->val) :
-                           it_ppo->fill_color);
+         if(it_ppo.fill_point) {
+            plot.set_color(it_ppo.fill_plot_info.flag ?
+                           it_ppo.fill_ctable.nearest(it_loc.val) :
+                           it_ppo.fill_color);
             plot.circle(page_x, page_y, size, false);
             plot.fill();
          }
         
          // Outline the circle
-         if(it_ppo->outline_point) {
-            plot.setlinewidth(it_ppo->line_width);
-            plot.set_color(it_ppo->line_color);
+         if(it_ppo.outline_point) {
+            plot.setlinewidth(it_ppo.line_width);
+            plot.set_color(it_ppo.line_color);
             plot.circle(page_x, page_y, size, true);
          }
 
          // Dump out the location being plotted
          mlog << Debug(4) << "[" << ++plot_count
               << "] Plotting location [ lat, lon, val ] = [ "
-              << it_loc->lat << ", " << it_loc->lon << ", "
-              << it_loc->val << " ]\n";
+              << it_loc.lat << ", " << it_loc.lon << ", "
+              << it_loc.val << " ]\n";
 
       } // end locations
    } // end point_opts
@@ -548,7 +558,7 @@ void create_plot() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_colorbar(PSfile &plot, const Box &box, const ColorTable &ct) {
+static void add_colorbar(PSfile &plot, const Box &box, const ColorTable &ct) {
 
    // Only plot one colorbar
    if(added_colorbar) {
@@ -559,7 +569,6 @@ void add_colorbar(PSfile &plot, const Box &box, const ColorTable &ct) {
 
    added_colorbar = true;
 
-   double tick_m, val_m, x1, x2, y1;
    ConcatString cs;
 
    plot.comment("drawing colorbar image");
@@ -578,17 +587,17 @@ void add_colorbar(PSfile &plot, const Box &box, const ColorTable &ct) {
    // Annotate the colorbar
    plot.choose_font(11, 8.0);
 
-   tick_m = (box.top() - box.bottom()) / (num_ticks - 1);
-   val_m  = (ct.data_max(bad_data_double) -
-             ct.data_min(bad_data_double)) /
-            (num_ticks - 1);
+   double tick_m = (box.top() - box.bottom()) / (num_ticks - 1);
+   double val_m  = (ct.data_max(bad_data_double) -
+                    ct.data_min(bad_data_double)) /
+                   (num_ticks - 1);
 
    for(int i=0; i<num_ticks; i++) {
 
       // First add some tick marks
-      x1 = box.right();
-      y1 = tick_m * i + box.bottom();
-      x2 = x1 + 5;
+      double x1 = box.right();
+      double y1 = tick_m * i + box.bottom();
+      double x2 = x1 + 5;
 
       plot.line(x1, y1, x2, y1, true);
 
@@ -604,7 +613,7 @@ void add_colorbar(PSfile &plot, const Box &box, const ColorTable &ct) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+[[noreturn]] static void usage() {
 
    cout << "\nUsage: " << program_name << "\n"
         << "\tnc_file\n"
@@ -652,49 +661,49 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray & a) {
+static void set_config(const StringArray & a) {
     config_filename = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_point_obs(const StringArray & a) {
+static void set_point_obs(const StringArray & a) {
    nc_file.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_plot_grid(const StringArray & a) {
+static void set_plot_grid(const StringArray & a) {
    plot_grid_string = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_title(const StringArray & a) {
+static void set_title(const StringArray & a) {
    title_string = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_grib_code(const StringArray & a) {
+static void set_grib_code(const StringArray & a) {
    ivar.add(atoi(a[0].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_obs_var(const StringArray & a) {
+static void set_obs_var(const StringArray & a) {
    svar.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_msg_type(const StringArray & a) {
+static void set_msg_type(const StringArray & a) {
    ityp.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_dotsize(const StringArray & a) {
+static void set_dotsize(const StringArray & a) {
    dotsize = atof(a[0].c_str());
 }
 

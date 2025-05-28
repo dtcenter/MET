@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -87,6 +87,18 @@ assign(a);
 ////////////////////////////////////////////////////////////////////////
 
 
+StringArray::StringArray(const vector<string> & a) : s(a)
+
+{
+
+init_from_scratch();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 StringArray & StringArray::operator=(const StringArray & a)
 
 {
@@ -110,9 +122,7 @@ bool StringArray::operator==(const StringArray & a) const
 
 if ( n() != a.n() )  return false;
 
-int j;
-
-for (j=0; j<n(); ++j)  {
+for (int j=0; j<n(); ++j)  {
 
   if ( s[j] != a.s[j] )  return false;
 
@@ -130,7 +140,7 @@ void StringArray::init_from_scratch()
 
 {
 
-IgnoreCase = 0;
+IgnoreCase = false;
 MaxLength = 0;
 
 clear();
@@ -191,9 +201,7 @@ Indent prefix2(depth + 1);
 out << prefix << "IgnoreCase = " << IgnoreCase << "\n";
 out << prefix << "Sorted     = " << (Sorted ? "true" : "false") << "\n";
 
-int j;
-
-for (j=0; j<n(); ++j)  {
+for (int j=0; j<n(); ++j)  {
 
    out << prefix2 << "Element # " << j << " = \"" << s[j] << "\"\n";
 
@@ -214,7 +222,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-const std::string StringArray::operator[](int len) const
+std::string StringArray::operator[](int len) const
 
 {
 
@@ -251,11 +259,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::add(const std::string text)
+void StringArray::add(const std::string & text)
 
 {
 
-s.push_back(text);
+s.emplace_back(text);
 
 Sorted = false;
 
@@ -267,7 +275,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::add_uniq(const std::string text)
+void StringArray::add_uniq(const std::string & text)
 
 {
 
@@ -277,7 +285,7 @@ void StringArray::add_uniq(const std::string text)
 
 if(!has(text)) {
 
-   s.push_back(text);
+   s.emplace_back(text);
 
    Sorted = false;
 
@@ -323,7 +331,7 @@ for(int i=0; i<a.n(); i++) {
 
    if(!has(a[i])) {
 
-      s.push_back(a[i]);
+      s.emplace_back(a[i]);
 
       Sorted = false;
 
@@ -338,7 +346,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::add_css(const std::string text)
+void StringArray::add_css(const std::string & text)
 
 {
 
@@ -372,13 +380,13 @@ void StringArray::add_css(const std::string text)
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::set(const std::string text)
+void StringArray::set(const std::string & text)
 
 {
 
 s.clear();
 
-s.push_back(text);
+s.emplace_back(text);
 
 // Setting to a single value, by nature it is Sorted
 Sorted = true;
@@ -391,7 +399,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::set(int i, const std::string text)
+void StringArray::set(int i, const std::string & text)
 
 {
 
@@ -447,7 +455,7 @@ void StringArray::insert(int i, const char * text)
 
   }
 
-  s.insert(s.begin()+i, text);
+  s.emplace(s.begin()+i, text);
 
   Sorted = false;
 
@@ -459,7 +467,7 @@ void StringArray::insert(int i, const char * text)
 ////////////////////////////////////////////////////////////////////////
 
 
-bool StringArray::has(const std::string text) const
+bool StringArray::has(const std::string & text) const
 
 {
    bool found = false;
@@ -479,7 +487,7 @@ else {
 ////////////////////////////////////////////////////////////////////////
 
 
-bool StringArray::has(const std::string text, bool forward) const
+bool StringArray::has(const std::string & text, bool forward) const
 
 {
    int index;
@@ -489,7 +497,7 @@ bool StringArray::has(const std::string text, bool forward) const
 ////////////////////////////////////////////////////////////////////////
 
 
-bool StringArray::has(const std::string text, int & index, bool forward) const
+bool StringArray::has(const std::string & text, int & index, bool forward) const
 {
    // This function is now used for either an un-sorted array (Sorted is false)
    // Or for a case-insensitive search (IgnoreCase is true)
@@ -523,7 +531,7 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
          }
       }
       else {
-         count = s.size() - 1;
+         count = (int) s.size() - 1;
          it = s.end();
          for(it--; it != s.begin(); it--, count--) {
             if ( IgnoreCase ) {
@@ -560,7 +568,32 @@ bool StringArray::has(const std::string text, int & index, bool forward) const
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::parse_wsss(const std::string text)
+bool StringArray::all_empty() const
+
+{
+
+bool all_empty = true;
+
+   //
+   // Search for non-empty string
+   //
+
+for(auto &x : s) {
+   if(!x.empty()) {
+      all_empty = false;
+      break;
+   }
+}
+
+return all_empty;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void StringArray::parse_wsss(const std::string & text)
 
 {
 
@@ -574,7 +607,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::parse_css(const std::string text)
+void StringArray::parse_css(const std::string & text)
 
 {
 
@@ -588,7 +621,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void StringArray::parse_delim(const std::string text, const char *delim)
+void StringArray::parse_delim(const std::string & text, const char *delim)
 
 {
 
@@ -600,12 +633,12 @@ void StringArray::parse_delim(const std::string text, const char *delim)
   size_t end = str.find_first_of(delim);
   while (end != string::npos) {
       if (start != end)
-          s.push_back(str.substr(start, end-start).c_str());
+          s.emplace_back(str.substr(start, end-start).c_str());
       start = end + 1;
       end = str.find_first_of(delim, start);
   }
   if (start < str.length())
-      s.push_back(str.substr(start).c_str());
+      s.emplace_back(str.substr(start).c_str());
 
   Sorted = false;
 
@@ -653,9 +686,7 @@ bool StringArray::has_option(int & index) const
 
 index = -1;
 
-int j;
-
-for (j=0; j<n(); ++j)  {
+for (int j=0; j<n(); ++j)  {
 
    if ( s[j][0] == '-' )  {
 
@@ -682,9 +713,7 @@ bool StringArray::reg_exp_match(const char * text) const
 
 if ( n() == 0 || !text )  return false;
 
-int j;
-
- for (j=0; j<n(); ++j)  {
+ for (int j=0; j<n(); ++j)  {
 
    if ( check_reg_exp(s[j].c_str(), text) )  { return true; }
 
@@ -714,7 +743,7 @@ if ( (k < 0) || (k >= n()) )  {
 
 }
 
-return s[k].length();
+return (int) s[k].length();
 
 }
 
@@ -793,7 +822,7 @@ if( regcomp(preg, reg_exp_str, REG_EXTENDED*REG_NOSUB) != 0 ) {
    exit ( 1 );
 }
 
-if( regexec(preg, test_str, 0, 0, 0) == 0 ) { valid = true; }
+if( regexec(preg, test_str, 0, nullptr, 0) == 0 ) { valid = true; }
 
 // Free allocated memory.
 regfree( preg );
@@ -806,13 +835,13 @@ return valid;
 ////////////////////////////////////////////////////////////////////////
 
 
-int lex_comp(const void * a, const void * b)
+static int lex_comp(const void * a, const void * b)
 
 {
 
 int status;
-const char ** ca = (const char **) a;
-const char ** cb = (const char **) b;
+auto ca = (const char **) a;
+auto cb = (const char **) b;
 
 
 status = strcmp(*ca, *cb);

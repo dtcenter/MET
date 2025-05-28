@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -42,7 +42,7 @@ bool compute_swinging_door_slopes(const TimeArray &valid_times,
 
   vector< SDObservation > obs;
   for (int i = 0; i < valid_times.n_elements(); ++i)
-    obs.push_back(SDObservation((time_t)valid_times[i], data_values[i]));
+    obs.emplace_back(SDObservation((time_t)valid_times[i], data_values[i]));
 
   // Calculate the ramps
 
@@ -152,7 +152,7 @@ bool compute_swinging_door_ramps(const vector< SDObservation > &observations,
       // Save the end point of the previous corridor
 
       SDObservation ramp_end(end_time, end_ramp_value);
-      ramps.push_back(pair< SDObservation, SDObservation >(ramp_start, ramp_end));
+      ramps.emplace_back(pair< SDObservation, SDObservation >(ramp_start, ramp_end));
 
       // Save the values for the next corridor
 
@@ -174,7 +174,7 @@ bool compute_swinging_door_ramps(const vector< SDObservation > &observations,
   // doors instead.
 
   SDObservation ramp_end(end_time, end_value);
-  ramps.push_back(pair< SDObservation, SDObservation >(ramp_start, ramp_end));
+  ramps.emplace_back(pair< SDObservation, SDObservation >(ramp_start, ramp_end));
 
   return true;
 }

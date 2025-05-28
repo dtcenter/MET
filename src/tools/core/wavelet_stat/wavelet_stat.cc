@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -40,9 +40,9 @@
 //   015    07/06/22  Howard Soh      METplus-Internal #19 Rename main to met_main
 //   016    10/03/22  Prestopnik      MET #2227 Remove using namespace netCDF from header files
 //   017    01/29/24  Halley Gotway   MET #2801 Configure time difference warnings
+//   018    05/07/25  Halley Gotway   MET #3145 Add OpenMP
 //
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <cstdio>
 #include <cstdlib>
@@ -70,13 +70,10 @@
 using namespace std;
 using namespace netCDF;
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 static const bool use_flate = true;
 static int compress_level = -1;
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -117,8 +114,8 @@ static void add_var_att_local(NcVar *, const char *, const char *);
 
 static void close_out_files();
 
-static double sum_array(double *, int);
-static double mean_array(double *, int);
+static double sum_array(const double *, int);
+static double mean_array(const double *, int);
 
 static void plot_ps_raw(const DataPlane &, const DataPlane &,
                         const DataPlane &, const DataPlane &, int);
@@ -129,12 +126,12 @@ static double compute_percentage(double, double);
 static void set_plot_dims(int, int);
 static void set_xy_bb();
 static void set_dim(Box &, double, double, double);
-static void draw_colorbar(PSfile *, Box &, int, int);
-static void draw_border(PSfile *, Box &);
-static void draw_map(PSfile *, Box &);
-static void draw_tiles(PSfile *, Box &, int, int, int);
-static void render_image(PSfile *, const DataPlane &, Box &, int);
-static void render_tile(PSfile *, const double *, int, int, Box &);
+static void draw_colorbar(PSfile *, const Box &, int, int);
+static void draw_border(PSfile *, const Box &);
+static void draw_map(PSfile *, const Box &);
+static void draw_tiles(PSfile *, const Box &, int, int, int);
+static void render_image(PSfile *, const DataPlane &, const Box &, int);
+static void render_tile(PSfile *, const double *, int, int, const Box &);
 
 static void usage();
 static void set_outdir(const StringArray &);
@@ -164,7 +161,7 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+static void process_command_line(int argc, char **argv) {
    CommandLine cline;
    GrdFileType ftype, otype;
    ConcatString default_config_file;
@@ -234,8 +231,9 @@ void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(ftype, otype);
 
-   // For python types read the first field to set the grid
-   if(is_python_grdfiletype(ftype)) {
+   // For python types and range/azimuth grids, read the first field to set the grid
+   if(is_python_grdfiletype(ftype) ||
+      fcst_mtddf->grid().info().ra) {
       if(!fcst_mtddf->data_plane(*conf_info.fcst_info[0], dp)) {
          mlog << Error << "\nTrouble reading data from forecast file \""
               << fcst_file << "\"\n\n";
@@ -243,7 +241,8 @@ void process_command_line(int argc, char **argv) {
       }
    }
 
-   if(is_python_grdfiletype(otype)) {
+   if(is_python_grdfiletype(otype) ||
+      obs_mtddf->grid().info().ra) {
       if(!obs_mtddf->data_plane(*conf_info.obs_info[0], dp)) {
          mlog << Error << "\nTrouble reading data from observation file \""
               << obs_file << "\"\n\n";
@@ -271,8 +270,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_scores() {
-   int i, j, k;
+static void process_scores() {
    bool status;
    double fcst_fill, obs_fill;
 
@@ -284,7 +282,7 @@ void process_scores() {
    Grid fcst_grid, obs_grid;
 
    // Loop through each of the fields to be verified
-   for(i=0; i<conf_info.get_n_vx(); i++) {
+   for(int i=0; i<conf_info.get_n_vx(); i++) {
 
       // Read the gridded data from the input forecast file
       status = fcst_mtddf->data_plane(*conf_info.fcst_info[i], fcst_dp);
@@ -442,7 +440,7 @@ void process_scores() {
 
       // Allocate memory for ISCInfo objects sized as [n_tile][n_thresh]
       isc_info = new ISCInfo * [conf_info.get_n_tile()];
-      for(j=0; j<conf_info.get_n_tile(); j++) {
+      for(int j=0; j<conf_info.get_n_tile(); j++) {
          isc_info[j] = new ISCInfo [conf_info.fcat_ta[i].n()];
       }
 
@@ -450,7 +448,7 @@ void process_scores() {
       conf_info.set_perc_thresh(fcst_dp, obs_dp);
 
       // Loop through the tiles to be applied
-      for(j=0; j<conf_info.get_n_tile(); j++) {
+      for(int j=0; j<conf_info.get_n_tile(); j++) {
 
          // Set the mask name
          ConcatString mask = (string)"TILE_TOT";
@@ -467,7 +465,7 @@ void process_scores() {
             do_intensity_scale(f_na, o_na, isc_info[j], i, j);
 
             // Write out the ISC statistics
-            for(k=0; k<conf_info.fcat_ta[i].n(); k++) {
+            for(int k=0; k<conf_info.fcat_ta[i].n(); k++) {
 
                // Store the tile definition parameters
                isc_info[j][k].tile_dim = conf_info.get_tile_dim();
@@ -491,7 +489,7 @@ void process_scores() {
          // Set the mask name
          shc.set_mask("TILE_TOT");
 
-         for(j=0; j<conf_info.fcat_ta[i].n(); j++) {
+         for(int j=0; j<conf_info.fcat_ta[i].n(); j++) {
 
             // Set the forecast and observation thresholds
             shc.set_fcst_thresh(conf_info.fcat_ta[i][j]);
@@ -507,7 +505,7 @@ void process_scores() {
       }
 
       // Deallocate memory for ISCInfo objects
-      for(j=0; j<conf_info.get_n_tile(); j++) {
+      for(int j=0; j<conf_info.get_n_tile(); j++) {
          if(isc_info[j]) {
             delete [] isc_info[j];
             isc_info[j] = (ISCInfo *) nullptr;
@@ -527,7 +525,7 @@ void process_scores() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void clean_up() {
+static void clean_up() {
 
    // Close the output files
    close_out_files();
@@ -537,7 +535,7 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_first_pass(const DataPlane &dp) {
+static void setup_first_pass(const DataPlane &dp) {
 
    // Unset the flag
    is_first_pass = false;
@@ -563,7 +561,7 @@ void setup_first_pass(const DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_txt_files(unixtime valid_ut, int lead_sec) {
+static void setup_txt_files(unixtime valid_ut, int lead_sec) {
    ConcatString tmp_str;
 
    // Create output file names for the stat file and optional text files
@@ -632,7 +630,7 @@ void setup_txt_files(unixtime valid_ut, int lead_sec) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_table(AsciiTable &at) {
+static void setup_table(AsciiTable &at) {
 
    // Justify the STAT AsciiTable objects
    justify_stat_cols(at);
@@ -647,15 +645,15 @@ void setup_table(AsciiTable &at) {
    at.set_bad_data_str(na_str);
 
    // Don't write out trailing blank rows
-   at.set_delete_trailing_blank_rows(1);
+   at.set_delete_trailing_blank_rows(true);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int lead_sec) {
-   int i, x, y;
+static void setup_nc_file(const WaveletStatNcOutInfo & nc_info,
+                          unixtime valid_ut, int lead_sec) {
 
    // Create output NetCDF file name
    build_outfile_name(valid_ut, lead_sec, ".nc", out_nc_file);
@@ -694,10 +692,10 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
    x_ll_var = add_var(nc_out, "x_ll", ncInt, tile_dim, deflate_level);
    y_ll_var = add_var(nc_out, "y_ll", ncInt, tile_dim, deflate_level);
 
-   for(i=0; i<conf_info.get_n_tile(); i++) {
+   for(int i=0; i<conf_info.get_n_tile(); i++) {
 
-      x = nint(conf_info.tile_xll[i]);
-      y = nint(conf_info.tile_yll[i]);
+      int x = nint(conf_info.tile_xll[i]);
+      int y = nint(conf_info.tile_yll[i]);
 
       // Write the x_ll value
       if(!put_nc_data(&x_ll_var, &x, 1, i)) {
@@ -723,7 +721,7 @@ void setup_nc_file(const WaveletStatNcOutInfo & nc_info, unixtime valid_ut, int 
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_ps_file(unixtime valid_ut, int lead_sec) {
+static void setup_ps_file(unixtime valid_ut, int lead_sec) {
 
    // Create output PostScript file name
    build_outfile_name(valid_ut, lead_sec, ".ps", out_ps_file);
@@ -745,8 +743,8 @@ void setup_ps_file(unixtime valid_ut, int lead_sec) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void build_outfile_name(unixtime valid_ut, int lead_sec,
-                        const char *suffix, ConcatString &str) {
+static void build_outfile_name(unixtime valid_ut, int lead_sec,
+                               const char *suffix, ConcatString &str) {
 
    //
    // Create output file name
@@ -772,31 +770,38 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 
 ////////////////////////////////////////////////////////////////////////
 
-double get_fill_value(const DataPlane &dp, int i_vx) {
-   int x, y, count;
-   double fill_val, sum;
+static double get_fill_value(const DataPlane &dp, int i_vx) {
+   double fill_val;
 
    //
    // If verifying precipitation, fill bad data points with zero.
-   // Otherwise, fill them with the mean of the valid data.
    //
    if(conf_info.fcst_info[i_vx]->is_precipitation() ||
       conf_info.obs_info[i_vx]->is_precipitation()) {
       fill_val = 0.0;
    }
+   //
+   // Otherwise, fill them with the mean of the valid data.
+   //
    else {
+      int count = 0;
+      double sum = 0.0;
+      int nxy = dp.nxy();
 
-      count = 0;
-      sum = 0.0;
-      for(x=0; x<dp.nx(); x++) {
-         for(y=0; y<dp.ny(); y++) {
+#pragma omp parallel default(none) \
+      shared(nxy, dp, sum, count)
+      {
 
-            if(is_bad_data(dp.get(x, y))) continue;
-
-            sum += dp.get(x, y);
-            count++;
-         } // end for y
-      } // end for x
+#pragma omp for schedule(static) \
+                reduction(+: sum, count)
+         for(int i=0; i<nxy; i++) {
+            double v = dp.data()[i];
+            if(!is_bad_data(v)) {
+               sum += v;
+               count++;
+            }
+         } // end for i
+      } // End omp parallel 
 
       if(count > 0) fill_val = sum/count;
       else          fill_val = 0.0;
@@ -807,25 +812,32 @@ double get_fill_value(const DataPlane &dp, int i_vx) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void fill_bad_data(DataPlane &dp, double fill_val) {
-   int x, y, count;
+static void fill_bad_data(DataPlane &dp, double fill_val) {
 
    //
    // Replace any bad data values with the fill value
    //
-   count = 0;
-   for(x=0; x<dp.nx(); x++) {
-      for(y=0; y<dp.ny(); y++) {
-         if(is_bad_data(dp.get(x, y))) {
-            dp.set(fill_val, x, y);
+   int count = 0;
+   int nxy = dp.nxy();
+
+#pragma omp parallel default(none) \
+   shared(nxy, dp, fill_val, count)
+   {
+
+#pragma omp for schedule(static) \
+                reduction(+: count)
+      for(int i=0; i<nxy; i++ ) {
+         double v = dp.data()[i];
+         if(is_bad_data(v)) {
+            dp.buf()[i] = fill_val;
             count++;
          }
-      } // end for y
-   } // end for x
+      } // end for i 
+   } // Emd omp parallel
 
    if(count > 0) {
-      mlog << "Replaced " << count << " bad data values out of "
-           << dp.nx()*dp.ny()
+      mlog << Debug(2) << "Replaced " << count
+           << " bad data values out of " << nxy
            << " points with fill value of "
            << fill_val << ".\n";
    }
@@ -835,31 +847,35 @@ void fill_bad_data(DataPlane &dp, double fill_val) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void pad_field(DataPlane &dp, double pad_val) {
-   int x, y, in_x, in_y;
+static void pad_field(DataPlane &dp, double pad_val) {
    DataPlane dp_pad;
 
    // Set up the DataPlane object
    dp_pad.set_size(conf_info.get_tile_dim(), conf_info.get_tile_dim());
 
-   // Fill the DataPlane object
-   for(x=0; x<dp_pad.nx(); x++) {
-      for(y=0; y<dp_pad.ny(); y++) {
+#pragma omp parallel default(none) \
+   shared(dp, pad_val, conf_info, dp_pad)
+   {
 
-         // If in the region of valid data
-         if(x >= conf_info.pad_bb.x_ll() && x < conf_info.pad_bb.x_ur() &&
-            y >= conf_info.pad_bb.y_ll() && y < conf_info.pad_bb.y_ur()) {
+      // Fill the DataPlane object
+#pragma omp for schedule(static)
+      for(int x=0; x<dp_pad.nx(); x++) {
+         for(int y=0; y<dp_pad.ny(); y++) {
 
-            in_x = nint(x - conf_info.pad_bb.x_ll());
-            in_y = nint(y - conf_info.pad_bb.y_ll());
-            dp_pad.set(dp.get(in_x, in_y), x, y);
-         }
-         // Else, in the pad
-         else {
-            dp_pad.set(pad_val, x, y);
-         }
-      } // end for y
-   } // end for x
+            // If in the region of valid data
+            if(x >= conf_info.pad_bb.x_ll() && x < conf_info.pad_bb.x_ur() &&
+               y >= conf_info.pad_bb.y_ll() && y < conf_info.pad_bb.y_ur()) {
+               int in_x = nint(x - conf_info.pad_bb.x_ll());
+               int in_y = nint(y - conf_info.pad_bb.y_ll());
+               dp_pad.set(dp.get(in_x, in_y), x, y);
+            }
+            // Else, in the pad
+            else {
+               dp_pad.set(pad_val, x, y);
+            }
+         } // end for y
+      } // end for x
+   } // End omp parallel
 
    dp = dp_pad;
 
@@ -868,10 +884,9 @@ void pad_field(DataPlane &dp, double pad_val) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void get_tile(const DataPlane &fcst_dp, const DataPlane &obs_dp,
-              int i_vx, int i_tile,
-              NumArray &f_na, NumArray &o_na) {
-   int x, y, x_ll, y_ll, x_ur, y_ur;
+static void get_tile(const DataPlane &fcst_dp, const DataPlane &obs_dp,
+                     int i_vx, int i_tile,
+                     NumArray &f_na, NumArray &o_na) {
 
    //
    // Initialize the NumArray objects
@@ -882,10 +897,10 @@ void get_tile(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    //
    // Check the bounds to make sure this is a valid mask
    //
-   x_ll = nint(conf_info.tile_xll[i_tile]);
-   y_ll = nint(conf_info.tile_yll[i_tile]);
-   x_ur = x_ll + conf_info.get_tile_dim();
-   y_ur = y_ll + conf_info.get_tile_dim();
+   int x_ll = nint(conf_info.tile_xll[i_tile]);
+   int y_ll = nint(conf_info.tile_yll[i_tile]);
+   int x_ur = x_ll + conf_info.get_tile_dim();
+   int y_ur = y_ll + conf_info.get_tile_dim();
 
    if(x_ll < 0 || x_ll > fcst_dp.nx() ||
       y_ll < 0 || y_ll > fcst_dp.ny() ||
@@ -908,8 +923,11 @@ void get_tile(const DataPlane &fcst_dp, const DataPlane &obs_dp,
    //
    // Store the pairs in NumArray objects
    //
-   for(y=y_ll; y<y_ur; y++) {
-      for(x=x_ll; x<x_ur; x++) {
+   int npts = (y_ur - y_ll) * (x_ur - x_ll);
+   f_na.extend(npts);
+   o_na.extend(npts);
+   for(int y=y_ll; y<y_ur; y++) {
+      for(int x=x_ll; x<x_ur; x++) {
          f_na.add(fcst_dp.get(x, y));
          o_na.add(obs_dp.get(x, y));
       } // end for x
@@ -920,48 +938,53 @@ void get_tile(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-int get_tile_tot_count() {
-   int x, y, nx, ny, i, count;
+static int get_tile_tot_count() {
 
    // Get grid dimensions
-   nx = grid.nx();
-   ny = grid.ny();
+   int nx = grid.nx();
+   int ny = grid.ny();
 
-   count = 0;
+   int count = 0;
+
+#pragma omp parallel default(none) \
+   shared(nx, ny, conf_info, count)
+   {
 
    // Check each point in the grid
-   for(x=0; x<nx; x++) {
-      for(y=0; y<ny; y++) {
+#pragma omp for schedule(static) \
+                reduction(+: count) \
+                collapse(2)
+      for(int x=0; x<nx; x++) {
+         for(int y=0; y<ny; y++) {
 
-         // Check if the point resides in a tile
-         for(i=0; i<conf_info.get_n_tile(); i++) {
+            // Check if the point resides in a tile
+            for(int i=0; i<conf_info.get_n_tile(); i++) {
 
-            // Check if the current point is inside the current tile
-            if(x >= conf_info.tile_xll[i] && x < conf_info.tile_xll[i] + conf_info.get_tile_dim() &&
-               y >= conf_info.tile_yll[i] && y < conf_info.tile_yll[i] + conf_info.get_tile_dim()) {
-               count++;
-               break;
-            }
-         } // end for i
-      } // end for y
-   } // end for x
+               // Check if the current point is inside the current tile
+               if(x >= conf_info.tile_xll[i] &&
+                  x < conf_info.tile_xll[i] + conf_info.get_tile_dim() &&
+                  y >= conf_info.tile_yll[i] &&
+                  y < conf_info.tile_yll[i] + conf_info.get_tile_dim()) {
+                  count++;
+                  break;
+               }
+            } // end for i
+         } // end for y
+      } // end for x
+   } // End omp parallel
 
    return count;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
-                        ISCInfo *&isc_info, int i_vx, int i_tile) {
-   double mse, fen, oen, mad;
-   int n, ns, n_isc;
-   int bnd, row, col;
-   int i, j, k;
-   ConcatString fcst_thresh_str, obs_thresh_str;
-   bool apply_fcst_thresh, apply_obs_thresh;
+static void do_intensity_scale(const NumArray &f_na,
+                               const NumArray &o_na,
+                               ISCInfo *&isc_info, int i_vx,
+                               int i_tile) {
 
    // Check the NumArray lengths
-   n = f_na.n();
+   int n = f_na.n();
    if(n != o_na.n()) {
       mlog << Error << "\ndo_intensity_scale() -> "
            << "the forecast and observation arrays must have equal "
@@ -980,11 +1003,11 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    }
 
    // Get the number of scales
-   ns = conf_info.get_n_scale();
+   int ns = conf_info.get_n_scale();
 
    // Set up the ISCInfo thresholds and n_scale
-   n_isc = conf_info.fcat_ta[i_vx].n();
-   for(i=0; i<n_isc; i++) {
+   int n_isc = conf_info.fcat_ta[i_vx].n();
+   for(int i=0; i<n_isc; i++) {
       isc_info[i].clear();
       isc_info[i].fthresh = conf_info.fcat_ta[i_vx][i];
       isc_info[i].othresh = conf_info.ocat_ta[i_vx][i];
@@ -1000,25 +1023,32 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
    vector<double> o_scl(n); // Binary field decomposed by scale
    vector<double> diff (n); // Difference field
 
+#pragma omp parallel default(none) \
+   shared(n, f_na, o_na, f_dat, o_dat)
+   {
+
    // Initialize f_dat and o_dat
-   for(i=0; i<n; i++) {
-      f_dat[i] = f_na[i];
-      o_dat[i] = o_na[i];
-   } // end for j
+#pragma omp for schedule(static)
+      for(int i=0; i<n; i++) {
+         f_dat[i] = f_na[i];
+         o_dat[i] = o_na[i];
+      }
+   } // End omp parallel
 
    // Write out the raw fields to NetCDF
-   if( conf_info.nc_info.do_raw || conf_info.nc_info.do_diff ) {
+   if(conf_info.nc_info.do_raw || conf_info.nc_info.do_diff ) {
       write_nc_raw(conf_info.nc_info, f_dat.data(), o_dat.data(), n, i_vx, i_tile);
    }
 
    // Apply each threshold
-   for(i=0; i<conf_info.fcat_ta[i_vx].n(); i++) {
+   for(int i=0; i<conf_info.fcat_ta[i_vx].n(); i++) {
 
       // Initialize to true
-      apply_fcst_thresh = apply_obs_thresh = true;
+      bool apply_fcst_thresh = true;
+      bool apply_obs_thresh = true;
 
-      fcst_thresh_str = isc_info[i].fthresh.get_abbr_str();
-      obs_thresh_str  = isc_info[i].othresh.get_abbr_str();
+      ConcatString fcst_thresh_str(isc_info[i].fthresh.get_abbr_str());
+      ConcatString obs_thresh_str (isc_info[i].othresh.get_abbr_str());
 
       // If the forecast threshold is set to NA skip masking below
       if(isc_info[i].fthresh.get_type() == thresh_na) {
@@ -1038,16 +1068,26 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
            << conf_info.obs_info[i_vx]->magic_str() << " "
            << obs_thresh_str << ".\n";
 
-      // Apply the threshold, if specified
-      for(j=0, mad=bad_data_double; j<n; j++) {
-         f_dat[j] = (apply_fcst_thresh ? isc_info[i].fthresh.check(f_na[j]) : f_na[j]);
-         o_dat[j] = (apply_obs_thresh  ? isc_info[i].othresh.check(o_na[j]) : o_na[j]);
-         diff[j]  = f_dat[j] - o_dat[j];
+      // Initialize
+      double mad = 0.0;
 
-         // Find the maximum absolute difference
-         if(is_bad_data(mad))         mad = fabs(diff[j]);
-         else if(fabs(diff[j]) > mad) mad = fabs(diff[j]);
-      } // end for j
+#pragma omp parallel default(none) \
+      shared(n, i, f_na, o_na, f_dat, o_dat, diff, mad) \
+      shared(apply_fcst_thresh, apply_obs_thresh, isc_info)
+      {
+
+         // Apply the threshold, if specified
+#pragma omp for schedule(static) \
+                reduction(max: mad)
+         for(int j=0; j<n; j++) {
+            f_dat[j] = (apply_fcst_thresh ? isc_info[i].fthresh.check(f_na[j]) : f_na[j]);
+            o_dat[j] = (apply_obs_thresh  ? isc_info[i].othresh.check(o_na[j]) : o_na[j]);
+            diff[j]  = f_dat[j] - o_dat[j];
+
+            // Find the maximum absolute difference
+            if(fabs(diff[j]) > mad) mad = fabs(diff[j]);
+         } // end for j
+      } // End omp parallel
 
       // Compute the contingency table for the binary fields
       compute_cts(f_dat.data(), o_dat.data(), n, isc_info[i]);
@@ -1093,17 +1133,17 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
       // Construct the decomposed forecast and observation images
       // for each scale
-      for(j=0; j<=ns; j++) {
+      for(int j=0; j<=ns; j++) {
 
          // Compute the bound for this scale
-         bnd = nint(pow(2.0, ns-j));
+         int bnd = nint(pow(2.0, ns-j));
 
          // Figure out which coefficients apply to this scale
-         for(k=0; k<n; k++) {
+         for(int k=0; k<n; k++) {
 
             // Compute the row and column for the current point
-            row = k/conf_info.get_tile_dim();
-            col = k%conf_info.get_tile_dim();
+            int row = k/conf_info.get_tile_dim();
+            int col = k%conf_info.get_tile_dim();
 
             if((row <  bnd/2 && col < bnd/2) ||
                 row >= bnd ||
@@ -1129,11 +1169,14 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
                                      conf_info.wvlt_work_ptr);
 
          // Compute the MSE for the decomposed fields
+         double mse;
          compute_mse(f_scl.data(), o_scl.data(), n, mse);
          isc_info[i].mse_scale[j] = mse;
 
          // Compute the energy for the decomposed fields
+         double fen;
          compute_energy(f_scl.data(), n, fen);
+         double oen;
          compute_energy(o_scl.data(), n, oen);
 
          isc_info[i].fen_scale[j] = fen;
@@ -1151,7 +1194,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
          }
 
          // Compute the difference field for this scale
-         for(k=0; k<n; k++) diff[k] = f_scl[k] - o_scl[k];
+         for(int k=0; k<n; k++) diff[k] = f_scl[k] - o_scl[k];
 
          // Write the decomposed difference field for this scale to PostScript
          if(conf_info.ps_plot_flag) {
@@ -1178,7 +1221,7 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
           << "OEN[" << thresh_str << "]\t\t= "
           << isc_info[i].oen << "\n";
 
-      for(j=0; j<=ns; j++) {
+      for(int j=0; j<=ns; j++) {
          msg << "SCALE_" << j+1 << "[" << thresh_str
              << "] MSE, ISC, FEN, OEN = "
              << isc_info[i].mse_scale[j] << ", "
@@ -1205,18 +1248,15 @@ void do_intensity_scale(const NumArray &f_na, const NumArray &o_na,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
-                        ISCInfo &isc_aggr) {
-   int i, j;
-   int fy_oy, fy_on, fn_oy, fn_on;
-   ConcatString fcst_thresh_str, obs_thresh_str;
+static void aggregate_isc_info(ISCInfo **isc_info, int i_vx,
+                               int i_thresh, ISCInfo &isc_aggr) {
 
    // Set up the aggregated ISCInfo object
    isc_aggr = isc_info[0][i_thresh];
    isc_aggr.zero_out();
 
-   fcst_thresh_str = isc_aggr.fthresh.get_abbr_str();
-   obs_thresh_str  = isc_aggr.othresh.get_abbr_str();
+   ConcatString fcst_thresh_str(isc_aggr.fthresh.get_abbr_str());
+   ConcatString obs_thresh_str (isc_aggr.othresh.get_abbr_str());
 
    mlog << Debug(2) << "Aggregating ISC for "
         << conf_info.fcst_info[i_vx]->magic_str() << " " << fcst_thresh_str
@@ -1225,10 +1265,13 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
         << " using " << conf_info.get_n_tile() << " tiles.\n";
 
    // Initialize the Contingency Table counts
-   fy_oy = fy_on = fn_oy = fn_on = 0;
+   int fy_oy = 0;
+   int fy_on = 0;
+   int fn_oy = 0;
+   int fn_on = 0;
 
    // Sum up the other ISCInfo objects
-   for(i=0; i<conf_info.get_n_tile(); i++) {
+   for(int i=0; i<conf_info.get_n_tile(); i++) {
 
       // Increment the contingency table counts
       fy_oy += isc_info[i][i_thresh].cts.fy_oy();
@@ -1242,7 +1285,7 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
       isc_aggr.oen += isc_info[i][i_thresh].oen;
 
       // Sum the MSE, FEN, and OEN values for each scale
-      for(j=0; j<=isc_aggr.n_scale; j++) {
+      for(int j=0; j<=isc_aggr.n_scale; j++) {
          isc_aggr.mse_scale[j] += isc_info[i][i_thresh].mse_scale[j];
          isc_aggr.fen_scale[j] += isc_info[i][i_thresh].fen_scale[j];
          isc_aggr.oen_scale[j] += isc_info[i][i_thresh].oen_scale[j];
@@ -1262,7 +1305,7 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
    isc_aggr.oen /= conf_info.get_n_tile();
 
    // Compute the means for MSE, FEN, and OEN for each scale
-   for(i=0; i<=isc_aggr.n_scale; i++) {
+   for(int i=0; i<=isc_aggr.n_scale; i++) {
       isc_aggr.mse_scale[i] /= conf_info.get_n_tile();
       isc_aggr.fen_scale[i] /= conf_info.get_n_tile();
       isc_aggr.oen_scale[i] /= conf_info.get_n_tile();
@@ -1286,7 +1329,7 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
         << "OEN[" << fcst_thresh_str << ", " << obs_thresh_str << "]\t\t= "
         << isc_aggr.oen << "\n";
 
-   for(j=0; j<=isc_aggr.n_scale; j++) {
+   for(int j=0; j<=isc_aggr.n_scale; j++) {
       msg << "SCALE_" << j+1 << "["
           << fcst_thresh_str<< ", " << obs_thresh_str
           << "] MSE, ISC, FEN, OEN = "
@@ -1320,46 +1363,72 @@ void aggregate_isc_info(ISCInfo **isc_info, int i_vx, int i_thresh,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void compute_cts(const double *f_arr, const double *o_arr, int n,
-                 ISCInfo &isc_info) {
-   int i, f, o;
+static void compute_cts(const double *f_arr, const double *o_arr, int n,
+                        ISCInfo &isc_info) {
+   int fy_oy = 0;
+   int fy_on = 0;
+   int fn_oy = 0;
+   int fn_on = 0;
 
-   // Increment the contingency table counts for each grid point
-   for(i=0; i<n; i++) {
+#pragma omp parallel default(none) \
+   shared(n, fy_oy, fy_on, fn_oy, fn_on) \
+   shared(f_arr, o_arr)
+   {
 
-      if(is_bad_data(f_arr[i]) ||
-         is_bad_data(o_arr[i])) continue;
+      // Increment the contingency table counts for each grid point
+#pragma omp for schedule(static) \
+                reduction(+: fy_oy, fy_on, fn_oy, fn_on)
+      for(int i=0; i<n; i++) {
 
-      f = nint(f_arr[i]);
-      o = nint(o_arr[i]);
+         if(is_bad_data(f_arr[i]) ||
+            is_bad_data(o_arr[i])) continue;
 
-      if(      f &&  o) isc_info.cts.inc_fy_oy();
-      else if( f && !o) isc_info.cts.inc_fy_on();
-      else if(!f &&  o) isc_info.cts.inc_fn_oy();
-      else if(!f && !o) isc_info.cts.inc_fn_on();
+         int f = nint(f_arr[i]);
+         int o = nint(o_arr[i]);
 
-   } // end for i
+         if(      f &&  o) fy_oy++;
+         else if( f && !o) fy_on++;
+         else if(!f &&  o) fn_oy++;
+         else if(!f && !o) fn_on++;
+      } // end for i
+   } // End omp parallel
+
+   // Store the counts
+   isc_info.cts.set_n_pairs(fy_oy + fy_on + fn_oy + fn_on);
+   isc_info.cts.set_fy_oy(fy_oy);
+   isc_info.cts.set_fy_on(fy_on);
+   isc_info.cts.set_fn_oy(fn_oy);
+   isc_info.cts.set_fn_on(fn_on);
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_mse(const double *f, const double *o,
-                 int n, double &mse) {
-   int i, count;
-   double err, sum_sq;
+static void compute_mse(const double *f, const double *o,
+                        int n, double &mse) {
+   int count = 0;
+   double sum_sq = 0.0;
 
-   for(i=0, count=0, sum_sq=0.0; i<n; i++) {
+#pragma omp parallel default(none) \
+   shared(n, f, o) \
+   shared(count, sum_sq)
+   {
 
-      if(is_bad_data(f[i]) ||
-         is_bad_data(o[i])) continue;
+      // Compute partial sums
+#pragma omp for schedule(static) \
+                reduction(+: count, sum_sq)
+      for(int i=0; i<n; i++) {
 
-      err     = f[i] - o[i];
-      sum_sq += err*err;
+         if(is_bad_data(f[i]) ||
+            is_bad_data(o[i])) continue;
 
-      count++;
-   } // end for i
+         double err = f[i] - o[i];
+         sum_sq += err*err;
+
+         count++;
+      } // end for i
+   } // End omp parallel
 
    if(count == 0) mse = bad_data_double;
    else           mse = sum_sq/count;
@@ -1369,18 +1438,27 @@ void compute_mse(const double *f, const double *o,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_energy(const double *arr, int n, double &en) {
-   int i, count;
-   double sum_sq;
+static void compute_energy(const double *arr, int n, double &en) {
+   int count = 0;
+   double sum_sq = 0.0;
 
-   for(i=0, count=0, sum_sq=0.0; i<n; i++) {
+#pragma omp parallel default(none) \
+   shared(n, arr) \
+   shared(count, sum_sq)
+   {
 
-      if(is_bad_data(arr[i])) continue;
+      // Compute partial sums
+#pragma omp for schedule(static) \
+                reduction(+: count, sum_sq)
+      for(int i=0; i<n; i++) {
 
-      sum_sq += arr[i]*arr[i];
+         if(is_bad_data(arr[i])) continue;
 
-      count++;
-   } // end for i
+         sum_sq += arr[i]*arr[i];
+
+         count++;
+      } // end for i
+   } // End omp parallel
 
    if(count == 0) en = bad_data_double;
    else           en = sum_sq/count;
@@ -1390,20 +1468,16 @@ void compute_energy(const double *arr, int n, double &en) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, const double *odata, int n,
-                  int i_vx, int i_tile) {
-   int i, d;
-   float *fcst_data = (float *) nullptr;
-   float *obs_data  = (float *) nullptr;
-   float *diff_data = (float *) nullptr;
+static void write_nc_raw(const WaveletStatNcOutInfo &nc_info,
+                         const double *fdata, const double *odata, int n,
+                         int i_vx, int i_tile) {
    ConcatString fcst_var_name;
    ConcatString obs_var_name;
    ConcatString diff_var_name;
    ConcatString val;
 
    // Build the variable names
-
-   if ( nc_info.do_raw)  {
+   if(nc_info.do_raw) {
       fcst_var_name.format("FCST_%s_%s_%s_%s_RAW",
               conf_info.fcst_info[i_vx]->name_attr().text(),
               conf_info.fcst_info[i_vx]->level_attr().text(),
@@ -1416,32 +1490,34 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
               conf_info.obs_info[i_vx]->level_attr().text());
    }
 
-   if ( nc_info.do_diff )  {
+   if(nc_info.do_diff) {
       diff_var_name.format("DIFF_%s_%s_%s_%s_RAW",
               conf_info.fcst_info[i_vx]->name_attr().text(),
               conf_info.fcst_info[i_vx]->level_attr().text(),
               conf_info.obs_info[i_vx]->name_attr().text(),
               conf_info.obs_info[i_vx]->level_attr().text());
-
    }
 
    // If this is the first tile, define new variables
    if(i_tile == 0) {
 
       // Define the forecast and difference variables
-
       int deflate_level = compress_level;
-      if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
+      if(deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
-      if ( nc_info.do_raw )  {
-         fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat, tile_dim, x_dim, y_dim, deflate_level);
-         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat, tile_dim, x_dim, y_dim, deflate_level);
+      if(nc_info.do_raw) {
+         fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
+                            tile_dim, x_dim, y_dim, deflate_level);
+         obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
+                            tile_dim, x_dim, y_dim, deflate_level);
       }
-      if ( nc_info.do_diff )  diff_var = add_var(nc_out, (string)diff_var_name, ncFloat, tile_dim, x_dim, y_dim, deflate_level);
+      if(nc_info.do_diff) {
+         diff_var = add_var(nc_out, (string)diff_var_name, ncFloat,
+                            tile_dim, x_dim, y_dim, deflate_level);
+      }
 
       // Add variable attributes for the observation field
-
-      if ( nc_info.do_raw )  {
+      if(nc_info.do_raw) {
          add_var_att_local(&obs_var, "type", "Observation");
          add_var_att_local(&obs_var, "name", shc.get_obs_var().c_str());
          val.format("%s at %s",
@@ -1470,10 +1546,9 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
             shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
             shc.get_fcst_valid_beg(), 0);
          add_var_att_local(&fcst_var, "desc", conf_info.desc[i_vx].c_str());
-
       }
 
-      if ( nc_info.do_diff )  {
+      if(nc_info.do_diff) {
 
          // Add variable attributes for the difference field
          add_var_att_local(&diff_var, "type", "Difference (F-O)");
@@ -1500,60 +1575,67 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
             shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
             shc.get_fcst_valid_beg(), 0);
          add_var_att_local(&diff_var, "desc", conf_info.desc[i_vx].c_str());
-
       }
-
    }
    // Otherwise, retrieve the previously defined variables
    else {
-
-      if ( nc_info.do_raw )  {
+      if(nc_info.do_raw) {
          fcst_var = get_var(nc_out, fcst_var_name.c_str());
          obs_var  = get_var(nc_out, obs_var_name.c_str());
       }
-      if ( nc_info.do_diff )  diff_var = get_var(nc_out, diff_var_name.c_str());
-   }
-
-   // Allocate memory for the forecast, observation, and difference
-   // fields
-   if ( nc_info.do_raw )  {
-      fcst_data = new float [n];
-      obs_data  = new float [n];
-   }
-   if ( nc_info.do_diff )  diff_data = new float [n];
-
-   // Store the forecast, observation, and difference fields
-   for(i=0; i<n; i++) {
-
-      if ( nc_info.do_raw && fcst_data != nullptr && obs_data != nullptr)  {
-
-         // Set the forecast data
-         if(fdata == nullptr || is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
-         else                      fcst_data[i] = (float) fdata[i];
-
-         // Set the observation data
-         if(odata == nullptr || is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
-         else                      obs_data[i]  = (float) odata[i];
-
+      if(nc_info.do_diff) {
+         diff_var = get_var(nc_out, diff_var_name.c_str());
       }
+   }
 
-      if ( nc_info.do_diff && fdata != nullptr && odata != nullptr && diff_data != nullptr)  {
+   // Allocate memory for the fcst, obs, and diff data
+   vector<float> fcst_data;
+   vector<float> obs_data;
+   vector<float> diff_data;
+   if(nc_info.do_raw) {
+      fcst_data.resize(n, bad_data_float);
+      obs_data.resize(n, bad_data_float);
+   }
+   if(nc_info.do_diff) {
+      diff_data.resize(n, bad_data_float);
+   }
+
+#pragma omp parallel default(none) \
+   shared(n, nc_info, fdata, odata, fcst_data, obs_data, diff_data)
+   {
+
+      // Store the forecast, observation, and difference fields
+#pragma omp for schedule(static)
+      for(int i=0; i<n; i++) {
+
+         if(nc_info.do_raw) {
+
+            // Set the forecast data
+            if(fdata && !is_bad_data(fdata[i])) {
+               fcst_data[i] = (float) fdata[i];
+            }
+
+            // Set the observation data
+            if(odata && !is_bad_data(odata[i])) {
+               obs_data[i] = (float) odata[i];
+            }
+         }
+
          // Set the difference data
-         if(is_bad_data(fdata[i]) ||
-            is_bad_data(odata[i]))
-            diff_data[i] = bad_data_float;
-         else
+         if(nc_info.do_diff &&
+            fdata && !is_bad_data(fdata[i]) &&
+            odata && !is_bad_data(odata[i])) {
             diff_data[i] = (float) (fdata[i] - odata[i]);
-      }
-
-   } // end for i
+         }
+      } // end for i
+   } // End omp parallel
 
    // Retrieve the tile dimension
-   d = conf_info.get_tile_dim();
+   int d = conf_info.get_tile_dim();
 
    int dim_count = get_dim_count(&fcst_var);
-   long lengths[dim_count];
-   long offsets[dim_count];
+   vector<long> lengths(dim_count);
+   vector<long> offsets(dim_count);
 
    offsets[0] = i_tile;
    offsets[1] = 0;
@@ -1563,9 +1645,11 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    lengths[1] = d;
    lengths[2] = d;
 
-   if ( nc_info.do_raw )  {
+   if(nc_info.do_raw) {
+
       // Write out the forecast field
-      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths, offsets)) {
+      if(!put_nc_data(&fcst_var, fcst_data.data(),
+                      lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the fcst_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1573,54 +1657,44 @@ void write_nc_raw(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       }
 
       // Write out the observation field
-      if(!put_nc_data(&obs_var, &obs_data[0], lengths, offsets)) {
+      if(!put_nc_data(&obs_var, obs_data.data(),
+                      lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_raw() -> "
               << "error with the obs_var->put for field "
               << shc.get_obs_var() << "\n\n";
          exit(1);
       }
-
    }
 
-   if ( nc_info.do_diff )  {
-
-      // Write out the difference field
-      if(!put_nc_data(&diff_var, &diff_data[0], lengths, offsets)) {
-         mlog << Error << "\nwrite_nc_raw() -> "
-              << "error with the diff_var->put for field "
-              << shc.get_fcst_var() << "\n\n";
-         exit(1);
-      }
-
+   // Write out the difference field
+   if(nc_info.do_diff &&
+      !put_nc_data(&diff_var, diff_data.data(),
+                   lengths.data(), offsets.data())) {
+      mlog << Error << "\nwrite_nc_raw() -> "
+           << "error with the diff_var->put for field "
+           << shc.get_fcst_var() << "\n\n";
+      exit(1);
    }
-
-   // Deallocate and clean up
-   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) nullptr; }
-   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) nullptr; }
-   if(diff_data) { delete [] diff_data; diff_data = (float *) nullptr; }
 
    return;
-
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, const double *odata, int n,
-                  int i_vx, int i_tile, int i_scale,
-                  SingleThresh &fcst_st, SingleThresh &obs_st) {
-   int i, d;
-   float *fcst_data = (float *) nullptr;
-   float *obs_data  = (float *) nullptr;
-   float *diff_data = (float *) nullptr;
-   ConcatString fcst_var_name, obs_var_name, diff_var_name;
-   ConcatString fcst_thresh_str, obs_thresh_str;
+static void write_nc_wav(const WaveletStatNcOutInfo &nc_info,
+                         const double *fdata, const double *odata, int n,
+                         int i_vx, int i_tile, int i_scale,
+                         SingleThresh &fcst_st, SingleThresh &obs_st) {
+   ConcatString fcst_var_name;
+   ConcatString obs_var_name;
+   ConcatString diff_var_name;
    ConcatString val;
 
    // Get the string for the threshold applied
-   fcst_thresh_str = fcst_st.get_abbr_str();
-   obs_thresh_str  = obs_st.get_abbr_str();
+   ConcatString fcst_thresh_str(fcst_st.get_abbr_str());
+   ConcatString obs_thresh_str (obs_st.get_abbr_str());
 
-   if ( nc_info.do_raw )  {
+   if(nc_info.do_raw) {
 
       // Build the variable names
       fcst_var_name.format("FCST_%s_%s_%s_%s_%s_%s",
@@ -1639,7 +1713,7 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
               obs_thresh_str.text());
    }
 
-   if ( nc_info.do_diff )  {
+   if(nc_info.do_diff) {
 
       diff_var_name.format("DIFF_%s_%s_%s_%s_%s_%s",
               conf_info.fcst_info[i_vx]->name_attr().text(),
@@ -1648,7 +1722,6 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
               conf_info.obs_info[i_vx]->name_attr().text(),
               conf_info.obs_info[i_vx]->level_attr().text(),
               obs_thresh_str.text());
-
    }
 
    // If this is the binary field, define new variables
@@ -1658,18 +1731,19 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       if (deflate_level < 0) deflate_level = conf_info.get_compression_level();
 
       // Define the forecast and difference variables
-
-      if ( nc_info.do_raw )  {
+      if(nc_info.do_raw) {
          fcst_var = add_var(nc_out, (string)fcst_var_name, ncFloat,
                             tile_dim, scale_dim, x_dim, y_dim, deflate_level);
          obs_var  = add_var(nc_out, (string)obs_var_name,  ncFloat,
                             tile_dim, scale_dim, x_dim, y_dim, deflate_level);
       }
 
-      if ( nc_info.do_diff )  diff_var = add_var(nc_out, (string)diff_var_name, ncFloat,
-                                                 tile_dim, scale_dim, x_dim, y_dim, deflate_level);
+      if(nc_info.do_diff) {
+         diff_var = add_var(nc_out, (string)diff_var_name, ncFloat,
+                            tile_dim, scale_dim, x_dim, y_dim, deflate_level);
+      } 
 
-      if ( nc_info.do_raw )  {
+      if(nc_info.do_raw) {
 
          // Add variable attributes for the observation field
          add_var_att_local(&obs_var, "type", "Observation");
@@ -1706,10 +1780,9 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
             shc.get_fcst_valid_beg() - shc.get_fcst_lead_sec(),
             shc.get_fcst_valid_beg(), 0);
          add_var_att_local(&fcst_var, "desc", conf_info.desc[i_vx].c_str());
-
       }
 
-      if ( nc_info.do_diff )  {
+      if(nc_info.do_diff) {
 
          // Add variable attributes for the difference field
          add_var_att_local(&diff_var, "type", "Difference (F-O)");
@@ -1743,65 +1816,67 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
             shc.get_fcst_valid_beg(), 0);
          add_var_att_local(&diff_var, "desc", conf_info.desc[i_vx].c_str());
       }
-
    }
    // Otherwise, retrieve the previously defined variables
    else {
 
-      if ( nc_info.do_raw )  {
-
+      if(nc_info.do_raw) {
          fcst_var = get_var(nc_out, fcst_var_name.c_str());
          obs_var  = get_var(nc_out, obs_var_name.c_str());
-
       }
-
-      if ( nc_info.do_diff )  diff_var = get_var(nc_out, diff_var_name.c_str());
-
+      if(nc_info.do_diff) {
+         diff_var = get_var(nc_out, diff_var_name.c_str());
+      } 
    }
 
-   // Allocate memory for the forecast, observation, and difference
-   // fields
-
-   if ( nc_info.do_raw )  {
-      fcst_data = new float [n];
-      obs_data  = new float [n];
+   // Allocate memory for the fcst, obs, and diff data
+   vector<float> fcst_data;
+   vector<float> obs_data;
+   vector<float> diff_data;
+   if(nc_info.do_raw) {
+      fcst_data.resize(n, bad_data_float);
+      obs_data.resize(n, bad_data_float);
    }
-   if ( nc_info.do_diff )  diff_data = new float [n];
+   if(nc_info.do_diff) {
+      diff_data.resize(n, bad_data_float);
+   }
 
-   // Store the forecast, observation, and difference fields
-   for(i=0; i<n; i++) {
+#pragma omp parallel default(none) \
+   shared(n, nc_info, fdata, odata, fcst_data, obs_data, diff_data)
+   {
 
-      if ( nc_info.do_raw && fcst_data != nullptr && obs_data != nullptr)  {
+      // Store the forecast, observation, and difference fields
+#pragma omp for schedule(static)
+      for(int i=0; i<n; i++) {
 
-         // Set the forecast data
-         if(fdata == nullptr || is_bad_data(fdata[i])) fcst_data[i] = bad_data_float;
-         else                      fcst_data[i] = (float) fdata[i];
+         if(nc_info.do_raw) {
 
-         // Set the observation data
-         if(odata == nullptr || is_bad_data(odata[i])) obs_data[i]  = bad_data_float;
-         else                      obs_data[i]  = (float) odata[i];
+            // Set the forecast data
+            if(fdata && !is_bad_data(fdata[i])) {
+               fcst_data[i] = (float) fdata[i];
+            }
 
-      }
-
-      if ( nc_info.do_diff && fdata != nullptr && odata != nullptr && diff_data != nullptr)  {
+            // Set the observation data
+            if(odata && !is_bad_data(odata[i])) {
+               obs_data[i] = (float) odata[i];
+            }
+         }
 
          // Set the difference data
-         if(is_bad_data(fdata[i]) ||
-            is_bad_data(odata[i]))
-            diff_data[i] = bad_data_float;
-         else
+         if(nc_info.do_diff &&
+            fdata && !is_bad_data(fdata[i]) &&
+            odata && !is_bad_data(odata[i])) {
             diff_data[i] = (float) (fdata[i] - odata[i]);
-
-      }
-
-   } // end for i
+         }
+      } // end for i
+   } // End omp parallel
 
    // Retrieve the tile dimensions
-   d = conf_info.get_tile_dim();
+   int d = conf_info.get_tile_dim();
 
    int dim_count = get_dim_count(&fcst_var);
-   long lengths[dim_count];
-   long offsets[dim_count];
+   vector<long> lengths(dim_count);
+   vector<long> offsets(dim_count);
 
    offsets[0] = i_tile;
    offsets[1] = i_scale+1;
@@ -1811,10 +1886,12 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
    lengths[1] = 1;
    lengths[2] = d;
    lengths[3] = d;
-   if ( nc_info.do_raw )  {
+
+   if(nc_info.do_raw) {
 
       // Write out the forecast field
-      if(!put_nc_data(&fcst_var, &fcst_data[0], lengths, offsets)) {
+      if(!put_nc_data(&fcst_var, fcst_data.data(),
+                      lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_wav() -> "
               << "error with the fcst_var->put for field "
               << shc.get_fcst_var() << "\n\n";
@@ -1822,39 +1899,32 @@ void write_nc_wav(const WaveletStatNcOutInfo & nc_info, const double *fdata, con
       }
 
       // Write out the observation field
-      if(!put_nc_data(&obs_var, &obs_data[0], lengths, offsets)) {
+      if(!put_nc_data(&obs_var, obs_data.data(),
+                      lengths.data(), offsets.data())) {
          mlog << Error << "\nwrite_nc_wav() -> "
               << "error with the obs_var->put for field "
               << shc.get_obs_var() << "\n\n";
          exit(1);
       }
-
    }
 
-   if ( nc_info.do_diff )  {
-
-
-      // Write out the difference field
-      if(!put_nc_data(&diff_var, &diff_data[0], lengths, offsets)) {
-         mlog << Error << "\nwrite_nc()_wav -> "
-              << "error with the diff_var->put for field "
-              << shc.get_fcst_var() << "\n\n";
-         exit(1);
-      }
-
+   // Write out the difference field
+   if(nc_info.do_diff &&
+      !put_nc_data(&diff_var, diff_data.data(),
+                   lengths.data(), offsets.data())) {
+      mlog << Error << "\nwrite_nc()_wav -> "
+           << "error with the diff_var->put for field "
+           << shc.get_fcst_var() << "\n\n";
+      exit(1);
    }
-
-   // Deallocate and clean up
-   if(fcst_data) { delete [] fcst_data; fcst_data = (float *) nullptr; }
-   if(obs_data)  { delete [] obs_data;  obs_data  = (float *) nullptr; }
-   if(diff_data) { delete [] diff_data; diff_data = (float *) nullptr; }
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att_local(NcVar *var, const char *att_name, const char *att_value) {
+static void add_var_att_local(NcVar *var, const char *att_name,
+                              const char *att_value) {
 
    if(att_value) add_att(var, att_name, att_value);
    else          add_att(var, att_name, na_str);
@@ -1864,7 +1934,7 @@ void add_var_att_local(NcVar *var, const char *att_name, const char *att_value) 
 
 ////////////////////////////////////////////////////////////////////////
 
-void close_out_files() {
+static void close_out_files() {
 
    // Write out the contents of the STAT AsciiTable and
    // close the STAT output files
@@ -1907,22 +1977,20 @@ void close_out_files() {
 
 ////////////////////////////////////////////////////////////////////////
 
-double sum_array(double *d, int n) {
-   int i;
-   double sum;
+static double sum_array(const double *d, int n) {
+   double sum = 0.0;
 
-   for(i=0, sum=0.0; i<n; i++) sum += d[i];
+   for(int i=0; i<n; i++) sum += d[i];
 
    return sum;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-double mean_array(double *d, int n) {
-   int i;
-   double sum;
+static double mean_array(const double *d, int n) {
+   double sum = 0.0;
 
-   for(i=0, sum=0.0; i<n; i++) sum += d[i];
+   for(int i=0; i<n; i++) sum += d[i];
 
    return (sum/n);
 }
@@ -1933,19 +2001,11 @@ double mean_array(double *d, int n) {
 //
 ////////////////////////////////////////////////////////////////////////
 
-void plot_ps_raw(const DataPlane &fcst_dp,
-                 const DataPlane &obs_dp,
-                 const DataPlane &fcst_dp_fill,
-                 const DataPlane &obs_dp_fill,
-                 int i_vx) {
-   ConcatString label;
-   ConcatString tmp_str;
-   ConcatString fcst_str, fcst_short_str;
-   ConcatString obs_str, obs_short_str;
-   double v_tab, h_tab_a, h_tab_b;
-   double data_min, data_max;
-   int i, mon, day, yr, hr, minute, sec;
-   Box dim;
+static void plot_ps_raw(const DataPlane &fcst_dp,
+                        const DataPlane &obs_dp,
+                        const DataPlane &fcst_dp_fill,
+                        const DataPlane &obs_dp_fill,
+                        int i_vx) {
 
    //
    // Compute the min and max data values across both raw fields for use
@@ -1976,6 +2036,7 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    //
    // Load the raw forecast color table
    //
+   ConcatString tmp_str;
    tmp_str = replace_path(conf_info.fcst_raw_pi.color_table.c_str());
    mlog << Debug(2) << "Loading forecast raw color table: " << tmp_str << "\n";
    fcst_ct.read(tmp_str.c_str());
@@ -1998,8 +2059,8 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    // Compute the min and max data values across both raw fields for use
    // in setting up the color table
    //
-   data_min = raw_plot_min;
-   data_max = raw_plot_max;
+   double data_min = raw_plot_min;
+   double data_max = raw_plot_max;
 
    //
    // If the forecast and observation fields are the same and if the range
@@ -2072,6 +2133,7 @@ void plot_ps_raw(const DataPlane &fcst_dp,
 
    ps_out->pagenumber(n_page);
 
+   ConcatString label;
    label.format("Wavelet-Stat: %s vs %s",
                 conf_info.fcst_info[i_vx]->magic_str().text(),
                 conf_info.obs_info[i_vx]->magic_str().text());
@@ -2079,10 +2141,10 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    ps_out->choose_font(31, 24.0);
    ps_out->write_centered_text(1, 1, h_tab_cen, 752.0, 0.5, 0.5, label.c_str());
 
-   fcst_str       = "Forecast";
-   fcst_short_str = "Fcst";
-   obs_str        = "Observation";
-   obs_short_str  = "Obs";
+   ConcatString fcst_str("Forecast");
+   ConcatString fcst_short_str("Fcst");
+   ConcatString obs_str("Observation");
+   ConcatString obs_short_str("Obs");
 
    ps_out->choose_font(31, 18.0);
    ps_out->write_centered_text(1, 1, h_tab_1, 727.0, 0.5, 0.5,
@@ -2096,6 +2158,7 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    //
    ////////////////////////////////////////////////////////////////////////////
 
+   Box dim;
    set_dim(dim, v_tab_1, v_tab_1 + sm_plot_height, h_tab_1);
    render_image(ps_out, fcst_dp, dim, 1);
    draw_map(ps_out, dim);
@@ -2160,9 +2223,9 @@ void plot_ps_raw(const DataPlane &fcst_dp,
 
    ps_out->choose_font(31, 12.0);
 
-   v_tab = v_tab_2 - 1.0*plot_text_sep;
-   h_tab_a = h_tab_1 - 0.5*dim.width();
-   h_tab_b = h_tab_a + 5.0*plot_text_sep;
+   double v_tab   = v_tab_2 - 1.0*plot_text_sep;
+   double h_tab_a = h_tab_1 - 0.5*dim.width();
+   double h_tab_b = h_tab_a + 5.0*plot_text_sep;
 
    //
    // Model Name
@@ -2177,6 +2240,13 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    // Blank line
    //
    v_tab -= plot_text_sep;
+
+   int mon;
+   int day;
+   int yr;
+   int hr;
+   int minute;
+   int sec;
 
    //
    // Initialization Time
@@ -2259,7 +2329,7 @@ void plot_ps_raw(const DataPlane &fcst_dp,
    //
    ps_out->write_centered_text(1, 1, h_tab_a, v_tab, 0.0, 0.5,
                                "Tile Corner:");
-   for(i=0; i<conf_info.get_n_tile(); i++) {
+   for(int i=0; i<conf_info.get_n_tile(); i++) {
       label.format("(%i, %i) ",
               nint(conf_info.tile_xll[i]),
               nint(conf_info.tile_yll[i]));
@@ -2298,10 +2368,10 @@ void plot_ps_raw(const DataPlane &fcst_dp,
 
 ////////////////////////////////////////////////////////////////////////
 
-void plot_ps_wvlt(const double *diff, double mad,
-                  int n, int i_vx, int i_tile,
-                  ISCInfo &isc_info,
-                  int i_scale, int n_scale) {
+static void plot_ps_wvlt(const double *diff, double mad,
+                         int n, int i_vx, int i_tile,
+                         ISCInfo &isc_info,
+                         int i_scale, int n_scale) {
    ConcatString label;
    ConcatString fcst_thresh_str, obs_thresh_str;
    Box dim;
@@ -2506,7 +2576,7 @@ void plot_ps_wvlt(const double *diff, double mad,
 
 ////////////////////////////////////////////////////////////////////////
 
-double compute_percentage(double num, double den) {
+static double compute_percentage(double num, double den) {
    double percentage;
 
    if(is_bad_data(num) || is_bad_data(den) || is_eq(den, 0.0)) {
@@ -2521,7 +2591,7 @@ double compute_percentage(double num, double den) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_plot_dims(int nx, int ny) {
+static void set_plot_dims(int nx, int ny) {
    double grid_ar, plot_ar, w;
 
    w = full_pane_bb.width();
@@ -2556,25 +2626,20 @@ void set_plot_dims(int nx, int ny) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_xy_bb() {
+static void set_xy_bb() {
 
    //
    // Check if padding was performed
    //
    if(!is_eq(conf_info.pad_bb.x_ll(), 0.0) &&
       !is_eq(conf_info.pad_bb.y_ll(), 0.0)) {
-
       double x_ll = 0 - conf_info.pad_bb.x_ll();
       double y_ll = 0 - conf_info.pad_bb.y_ll();
-
-      xy_bb.set_lrbt ( x_ll, x_ll + conf_info.get_tile_dim(),
-                       y_ll, y_ll + conf_info.get_tile_dim() );
-
+      xy_bb.set_lrbt(x_ll, x_ll + conf_info.get_tile_dim(),
+                     y_ll, y_ll + conf_info.get_tile_dim());
    }
    else {
-
       xy_bb.set_lrbt(0, grid.nx(), 0, grid.ny());
-
    }
 
    return;
@@ -2582,20 +2647,9 @@ void set_xy_bb() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_dim(Box &dim, double y_ll, double y_ur, double x_cen) {
-   double width;
+static void set_dim(Box &dim, double y_ll, double y_ur, double x_cen) {
 
-   /*
-   dim.y_ll   = y_ll;
-   dim.y_ur   = y_ur;
-   dim.height = dim.y_ur - dim.y_ll;
-   mag        = dim.height/xy_bb.height;
-   dim.width  = mag*xy_bb.width;
-   dim.x_ll   = x_cen - 0.5*dim.width;
-   dim.x_ur   = x_cen + 0.5*dim.width;
-   */
-
-   width = ( (y_ur - y_ll) / xy_bb.height() ) * xy_bb.width();
+   double width = ((y_ur - y_ll)/xy_bb.height()) * xy_bb.width();
    dim.set_lrbt(x_cen - 0.5*width, x_cen + 0.5*width, y_ll, y_ur);
 
    return;
@@ -2603,16 +2657,12 @@ void set_dim(Box &dim, double y_ll, double y_ur, double x_cen) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
-   int i;
-   char label[max_str_len];
-   double bar_width, bar_height, x_ll, y_ll, step, v;
-   ColorTable *ct_ptr = (ColorTable *) nullptr;
-   Color c;
+static void draw_colorbar(PSfile *p, const Box &dim, int fcst, int raw) {
 
    //
    // Set up the pointer to the appropriate colortable
    //
+   const ColorTable *ct_ptr = nullptr;
    if     (raw == 1 && fcst == 1) ct_ptr = &fcst_ct;
    else if(raw == 1 && fcst == 0) ct_ptr = &obs_ct;
    else                           ct_ptr = &wvlt_ct;
@@ -2621,25 +2671,25 @@ void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
    // Draw colorbar in the bottom-right corner of the Bounding Box
    //
 
-   if ( use_flate )  p->begin_flate();
+   if(use_flate) p->begin_flate();
 
    p->gsave();
    p->setlinewidth(l_width);
    p->choose_font(28, 8.0);
 
-   bar_width = h_margin;
-   bar_height = (dim.y_ur() - dim.y_ll())/(n_color_bars + 1);
+   double bar_width = h_margin;
+   double bar_height = (dim.y_ur() - dim.y_ll())/(n_color_bars + 1);
 
-   x_ll = dim.x_ur();
-   y_ll = dim.y_ll();
+   double x_ll = dim.x_ur();
+   double y_ll = dim.y_ll();
 
-   step = (ct_ptr->data_max(bad_data_double)
-           - ct_ptr->data_min(bad_data_double))/n_color_bars;
-   v = ct_ptr->data_min(bad_data_double);
+   double step = (ct_ptr->data_max(bad_data_double) -
+                 ct_ptr->data_min(bad_data_double))/n_color_bars;
+   double v = ct_ptr->data_min(bad_data_double);
 
-   for(i=0; i<=n_color_bars; i++) {
+   for(int i=0; i<=n_color_bars; i++) {
 
-     c = ct_ptr->nearest(v);
+     Color c = ct_ptr->nearest(v);
 
      //
      // Color box
@@ -2668,9 +2718,10 @@ void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
      //
      // Add text
      //
-     snprintf(label, sizeof(label), "%.1f", v);
+     ConcatString label;
+     label.format("%.1f", v);
      p->write_centered_text(2, 1,  x_ll + 0.5*bar_width,
-                            y_ll + 0.5*bar_height, 0.5, 0.5, label);
+                            y_ll + 0.5*bar_height, 0.5, 0.5, label.c_str());
 
      v    += step;
      y_ll += bar_height;
@@ -2678,14 +2729,14 @@ void draw_colorbar(PSfile *p, Box &dim, int fcst, int raw) {
 
    p->grestore();
 
-   if ( use_flate )  p->end_flate();
+   if(use_flate) p->end_flate();
 
   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void draw_border(PSfile *p, Box &dim) {
+static void draw_border(PSfile *p, const Box &dim) {
 
    p->gsave();
    p->setlinewidth(l_width);
@@ -2703,34 +2754,31 @@ void draw_border(PSfile *p, Box &dim) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void draw_map(PSfile *p, Box &dim) {
+static void draw_map(PSfile *p, const Box &dim) {
 
-   if ( use_flate )  p->begin_flate();
+   if(use_flate) p->begin_flate();
 
    p->gsave();
    p->setlinewidth(l_width);
    draw_map(grid, xy_bb, *p, dim, &conf_info.conf);
    p->grestore();
 
-   if ( use_flate )  p->end_flate();
+   if(use_flate) p->end_flate();
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void draw_tiles(PSfile *p, Box &dim,
-                int tile_start, int tile_end, int label_flag) {
-   int i;
-   double page_x, page_y;
-   char label[128];
-   Box tile_bb;
-   double bb_x, bb_y;
+static void draw_tiles(PSfile *p, const Box &dim,
+                       int tile_start, int tile_end, int label_flag) {
 
    p->gsave();
 
    // Loop through the tiles to be applied
-   for(i=tile_start; i<=tile_end; i++) {
+   for(int i=tile_start; i<=tile_end; i++) {
+
+      Box tile_bb;
 
       // If padding was performed, the tile is the size of the domain
       if(conf_info.grid_decomp_flag == GridDecompType::Pad) {
@@ -2738,6 +2786,9 @@ void draw_tiles(PSfile *p, Box &dim,
       }
       // Find the lower-left and upper-right corners of the tile
       else {
+
+         double bb_x;
+         double bb_y;
 
          // Compute the page x/y coordinates for this tile
          gridxy_to_pagexy(grid, xy_bb,
@@ -2781,16 +2832,17 @@ void draw_tiles(PSfile *p, Box &dim,
          // Plot the tile number in the center
          p->setlinewidth(0.0);
 
-         page_x = (tile_bb.x_ll() + tile_bb.x_ur())/2.0,
-         page_y = (tile_bb.y_ll() + tile_bb.y_ur())/2.0,
+         double page_x = (tile_bb.x_ll() + tile_bb.x_ur())/2.0;
+         double page_y = (tile_bb.y_ll() + tile_bb.y_ur())/2.0;
 
          p->choose_font(28, 20.0);
-         snprintf(label, sizeof(label), "%i", i+1);
-         p->write_centered_text(2, 1, page_x, page_y, 0.5, 0.5, label);
+         ConcatString label;
+         label.format("%i", i+1);
+         p->write_centered_text(2, 1, page_x, page_y, 0.5, 0.5, label.c_str());
 
          // Draw outline in black
          p->setrgbcolor(0.0, 0.0, 0.0);
-         p->write_centered_text(2, 0, page_x, page_y, 0.5, 0.5, label);
+         p->write_centered_text(2, 0, page_x, page_y, 0.5, 0.5, label.c_str());
       } // end if
    } // end for
 
@@ -2801,19 +2853,18 @@ void draw_tiles(PSfile *p, Box &dim,
 
 ////////////////////////////////////////////////////////////////////////
 
-void render_image(PSfile *p, const DataPlane &dp, Box &dim, int fcst) {
+static void render_image(PSfile *p, const DataPlane &dp, const Box &dim,
+                         int fcst) {
    RenderInfo render_info;
    Ppm ppm_image;
-   int x, y, grid_x, grid_y;
-   double mag;
-   Color c;
-   Color *c_fill_ptr = (Color *) nullptr;
-   ColorTable *ct_ptr = (ColorTable *) nullptr;
 
    //
    // Set up pointers to the appropriate colortable and fill color
    // values.
    //
+   const ColorTable *ct_ptr = (ColorTable *) nullptr;
+   const Color *c_fill_ptr = (Color *) nullptr;
+
    if(fcst == 1) {
       ct_ptr     = &fcst_ct;
       c_fill_ptr = &c_fcst_fill;
@@ -2834,13 +2885,11 @@ void render_image(PSfile *p, const DataPlane &dp, Box &dim, int fcst) {
    if(nint(xy_bb.width())  == dp.nx() &&
       nint(xy_bb.height()) == dp.ny()) {
 
-      for(x=0; x<dp.nx(); x++) {
-         for(y=0; y<dp.ny(); y++) {
+      for(int x=0; x<dp.nx(); x++) {
+         for(int y=0; y<dp.ny(); y++) {
 
-            if(is_bad_data(dp.get(x, y)))
-               c = *c_fill_ptr;
-            else
-               c = ct_ptr->nearest(dp.get(x, y));
+            Color c = (is_bad_data(dp.get(x, y)) ?
+                       *c_fill_ptr : ct_ptr->nearest(dp.get(x, y)));
 
             ppm_image.putxy(c, x, y);
          }
@@ -2851,36 +2900,34 @@ void render_image(PSfile *p, const DataPlane &dp, Box &dim, int fcst) {
    //
    else {
 
-      for(x=nint(xy_bb.x_ll()); x<xy_bb.x_ur(); x++) {
-         for(y=nint(xy_bb.y_ll()); y<xy_bb.y_ur(); y++) {
+      for(int x=nint(xy_bb.x_ll()); x<xy_bb.x_ur(); x++) {
+         for(int y=nint(xy_bb.y_ll()); y<xy_bb.y_ur(); y++) {
 
             //
             // Compute grid relative x, y values
             //
-            grid_x = nint(x + xy_bb.x_ll());
-            grid_y = nint(y + xy_bb.y_ll());
+            int grid_x = nint(x + xy_bb.x_ll());
+            int grid_y = nint(y + xy_bb.y_ll());
 
             if(grid_x < 0 || grid_x >= dp.nx() ||
                grid_y < 0 || grid_y >= dp.ny()) continue;
 
-            if(is_bad_data(dp.get(grid_x, grid_y)))
-               c = *c_fill_ptr;
-            else
-               c = ct_ptr->nearest(dp.get(grid_x, grid_y));
+            Color c = (is_bad_data(dp.get(grid_x, grid_y)) ?
+                       *c_fill_ptr : ct_ptr->nearest(dp.get(grid_x, grid_y)));
 
             ppm_image.putxy(c, x, y);
          }
       }
    }
 
-   mag = (dim.x_ur() - dim.x_ll())/xy_bb.width();
+   double mag = (dim.x_ur() - dim.x_ll())/xy_bb.width();
 
    render_info.set_ll(dim.x_ll(), dim.y_ll());
    render_info.set_mag(mag);
    render_info.set_color();
 
-   if ( use_flate )  render_info.add_filter(FlateEncode);
-   else              render_info.add_filter(RunLengthEncode);
+   if(use_flate) render_info.add_filter(FlateEncode);
+   else          render_info.add_filter(RunLengthEncode);
 
    render_info.add_filter(ASCII85Encode);
    render(*p, ppm_image, render_info);
@@ -2890,49 +2937,42 @@ void render_image(PSfile *p, const DataPlane &dp, Box &dim, int fcst) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void render_tile(PSfile *p, const double *data, int n, int i_tile,
-                 Box &dim) {
+static void render_tile(PSfile *p, const double *data, int n,
+                        int i_tile, const Box &dim) {
    RenderInfo render_info;
    Ppm ppm_image;
-   int i, x, y;
-   double mag;
-   Color c;
-   Color *c_fill_ptr = (Color *) nullptr;
-   ColorTable *ct_ptr = (ColorTable *) nullptr;
 
    //
    // Set up pointers to the appropriate colortable and fill color
    // values.
    //
-   ct_ptr = &wvlt_ct;
-   c_fill_ptr = &c_wvlt_fill;
+   const ColorTable *ct_ptr = &wvlt_ct;
+   const Color *c_fill_ptr = &c_wvlt_fill;
 
    //
    // Convert the DataPlane object to PPM
    //
    ppm_image.set_size_xy((int) xy_bb.width(), (int) xy_bb.height());
 
-   for(i=0; i<n; i++) {
+   for(int i=0; i<n; i++) {
 
-      x = nint(conf_info.tile_xll[i_tile] + i%conf_info.get_tile_dim());
-      y = nint(conf_info.tile_yll[i_tile] + i/conf_info.get_tile_dim());
+      Color c = (is_bad_data(data[i]) ?
+                 *c_fill_ptr : ct_ptr->nearest(data[i]));
 
-      if(is_bad_data(data[i]))
-         c = *c_fill_ptr;
-      else
-         c = ct_ptr->nearest(data[i]);
+      int x = nint(conf_info.tile_xll[i_tile] + i%conf_info.get_tile_dim());
+      int y = nint(conf_info.tile_yll[i_tile] + i/conf_info.get_tile_dim());
 
       ppm_image.putxy(c, x, y);
    }
 
-   mag = (dim.x_ur() - dim.x_ll())/xy_bb.width();
+   double mag = (dim.x_ur() - dim.x_ll())/xy_bb.width();
 
    render_info.set_ll(dim.x_ll(), dim.y_ll());
    render_info.set_mag(mag);
    render_info.set_color();
 
-   if ( use_flate )  render_info.add_filter(FlateEncode);
-   else              render_info.add_filter(RunLengthEncode);
+   if(use_flate) render_info.add_filter(FlateEncode);
+   else          render_info.add_filter(RunLengthEncode);
 
    render_info.add_filter(ASCII85Encode);
    render(*p, ppm_image, render_info);
@@ -2942,7 +2982,7 @@ void render_tile(PSfile *p, const double *data, int n, int i_tile,
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+static void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -2982,14 +3022,14 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_outdir(const StringArray & a)
+static void set_outdir(const StringArray & a)
 {
    out_dir = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a)
+static void set_compress(const StringArray & a)
 {
    compress_level = atoi(a[0].c_str());
 }

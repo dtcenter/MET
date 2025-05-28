@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -326,8 +326,8 @@ Indent prefix(depth);
 
 out << prefix << "Name   = ";
 
-if ( Name.length() > 0 )  out << '\"' << Name << '\"';
-else                      out << "(nul)\n";
+if ( !Name.empty() )  out << '\"' << Name << '\"';
+else                  out << "(nul)\n";
 
 out << '\n';
 
@@ -455,7 +455,7 @@ GridRep * SemiLatLonGrid::copy() const
 
 {
 
-SemiLatLonGrid * p = new SemiLatLonGrid (Data);
+auto * p = new SemiLatLonGrid (Data);
 
 p->Name = Name;
 

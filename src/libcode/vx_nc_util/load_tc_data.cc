@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -43,8 +43,8 @@ void load_tc_dland(const ConcatString &dland_file, Grid &grid,
 
    // Find the first non-lat/lon variable
    for(i=0; i<MetNc.Nvars; i++) {
-      if(strcmp(MetNc.Var[i].name.c_str(), nc_met_lat_var_name) != 0 &&
-         strcmp(MetNc.Var[i].name.c_str(), nc_met_lon_var_name) != 0)
+      if(strcmp(MetNc.Var[i].name.c_str(), nc_met_lat_name.c_str()) != 0 &&
+         strcmp(MetNc.Var[i].name.c_str(), nc_met_lon_name.c_str()) != 0)
          break;
    }
 

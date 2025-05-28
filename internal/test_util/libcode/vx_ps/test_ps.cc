@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -24,8 +24,6 @@ static const double v_margin = 72.0;   //  border margins
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -35,6 +33,8 @@ using namespace std;
 #include "vx_ps.h"
 #include "documentmedia_to_string.h"
 #include "documentorientation_to_string.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

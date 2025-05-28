@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -31,12 +31,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-
 #include <netcdf>
-
-#ifdef _OPENMP
-  #include "omp.h"
-#endif
 
 #include "main.h"
 #include "tc_diag.h"
@@ -114,7 +109,7 @@ static void write_tc_times(NcFile *, const NcDim &,
                            const TrackInfo *,
                            const TrackPoint *);
 
-static void compute_lat_lon(TcrmwGrid&, double *, double *);
+static void compute_lat_lon(RngAziGrid&, double *, double *);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -152,14 +147,14 @@ void usage() {
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
         << "Usage: " << program_name << "\n"
-        << "\t-data domain tech_id_list [ file_1 ... file_n | data_file_list ]\n"
+        << "\t-data domain tech_id_list [ file_1 ... file_n | file_list ]\n"
         << "\t-deck file\n"
         << "\t-config file\n"
         << "\t[-outdir path]\n"
         << "\t[-log file]\n"
         << "\t[-v level]\n\n"
 
-        << "\twhere\t\"-data domain tech_id_list [ file_1 ... file_n | data_file_list ]\"\n"
+        << "\twhere\t\"-data domain tech_id_list [ file_1 ... file_n | file_list ]\"\n"
 
         << "\t\t\tSpecifies a domain name, a comma-separated list of ATCF tech ID's,\n"
         << "\t\t\tand a list of gridded data files or an ASCII file containing\n"
@@ -825,7 +820,7 @@ void write_tc_times(NcFile *nc_out, const NcDim &vld_dim,
 
    // Define and write the track initialization time
    def_tc_init_time(nc_out, init_str_var, init_ut_var);
-   write_tc_init_time(nc_out, init_str_var, init_ut_var,
+   write_tc_init_time(init_str_var, init_ut_var,
                       trk_ptr->init());
 
    // Define valid and lead times
@@ -834,17 +829,17 @@ void write_tc_times(NcFile *nc_out, const NcDim &vld_dim,
 
    // Write valid and lead times for a single point
    if(pnt_ptr) {
-      write_tc_valid_time(nc_out, 0, vld_str_var, vld_ut_var,
+      write_tc_valid_time(0, vld_str_var, vld_ut_var,
                           pnt_ptr->valid());
-      write_tc_lead_time(nc_out, 0, lead_str_var, lead_sec_var,
+      write_tc_lead_time(0, lead_str_var, lead_sec_var,
                          pnt_ptr->lead());
    }
    // Write valid and lead times for all track points
    else {
       for(int i_pnt=0; i_pnt<trk_ptr->n_points(); i_pnt++) {
-         write_tc_valid_time(nc_out, i_pnt, vld_str_var, vld_ut_var,
+         write_tc_valid_time(i_pnt, vld_str_var, vld_ut_var,
                              (*trk_ptr)[i_pnt].valid());
-         write_tc_lead_time(nc_out, i_pnt, lead_str_var, lead_sec_var,
+         write_tc_lead_time(i_pnt, lead_str_var, lead_sec_var,
                             (*trk_ptr)[i_pnt].lead());
       }
    }
@@ -854,7 +849,7 @@ void write_tc_times(NcFile *nc_out, const NcDim &vld_dim,
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_lat_lon(TcrmwGrid& grid,
+void compute_lat_lon(RngAziGrid& grid,
                      double *lat_arr, double *lon_arr) {
 
    // Compute lat and lon coordinate arrays
@@ -862,7 +857,7 @@ void compute_lat_lon(TcrmwGrid& grid,
       for(int ia=0; ia<grid.azimuth_n(); ia++) {
          double lat, lon;
          int i = ir * grid.azimuth_n() + ia;
-         grid.range_azi_to_latlon(
+         grid.rng_azi_to_latlon(
             ir * grid.range_delta_km(),
             ia * grid.azimuth_delta_deg(),
             lat, lon);
@@ -988,7 +983,7 @@ void process_fields(const TrackInfoArray &tracks,
       // Make a local VarInfo copy to store the valid time
       vi = vi_factory.new_copy(di.var_info_ptr[i]);
       vi->set_valid(vld_ut);
-      vi_list.push_back(vi);
+      vi_list.emplace_back(vi);
    }
 
    // Read all data at the same time if they are all in the same file
@@ -1017,7 +1012,7 @@ void process_fields(const TrackInfoArray &tracks,
          if(!status) dp.clear();
 
          // Append current DataPlane to the vector
-         dp_list.push_back(dp);
+         dp_list.emplace_back(dp);
 
       } // end for i
    }
@@ -1140,7 +1135,7 @@ void process_out_files(const TrackInfoArray& tracks) {
             }
 
             // Update list of domain-specific temp files
-            domain_tmp_file_list.push_back(&tmp_file_map[tmp_key]);
+            domain_tmp_file_list.emplace_back(&tmp_file_map[tmp_key]);
 
             // Store the diagnostics for each track point
             out_file_map[out_key].add_tmp_file_info(tmp_file_map[tmp_key],
@@ -1302,7 +1297,7 @@ void copy_time_vars(NcFile *to_nc, NcFile *from_nc, int i_time) {
       if(!has_var(to_nc, var_names[i].c_str())) {
          vector<NcDim> dims;
          for(j=0; j<dim_names.n(); j++) {
-            dims.push_back(get_nc_dim(to_nc, dim_names[j]));
+            dims.emplace_back(get_nc_dim(to_nc, dim_names[j]));
          }
          NcVar new_var = to_nc->addVar(var_names[i], ncDouble, dims);
          copy_nc_atts(&from_var, &new_var);
@@ -1318,15 +1313,15 @@ void copy_time_vars(NcFile *to_nc, NcFile *from_nc, int i_time) {
 
       for(j=0; j<dim_names.n(); j++) {
          if(dim_names[j] == "time") {
-            offsets.push_back(i_time);
-            counts.push_back(1);
+            offsets.emplace_back(i_time);
+            counts.emplace_back(1);
          }
          else {
-            offsets.push_back(0);
+            offsets.emplace_back(0);
             NcDim cur_dim = get_nc_dim(to_nc, dim_names[j]);
             int dim_size = get_dim_size(&cur_dim);
             buf_size *= dim_size;
-            counts.push_back(dim_size);
+            counts.emplace_back(dim_size);
          }
       }
 
@@ -1532,7 +1527,7 @@ void OutFileInfo::add_diag_data(const vector<string> &k_src,
       if(diag_list.n() > 0 && !diag_list.has(*it)) continue;
 
       // Store this key
-      if(add_keys) k_dst.push_back(*it);
+      if(add_keys) k_dst.emplace_back(*it);
 
       // Add new destination map entry, if needed
       if(m_dst.count(*it) == 0) {
@@ -1716,10 +1711,10 @@ void OutFileInfo::write_nc_domain_info(const DomainInfo &di) {
    vector<NcDim> dims;
 
    vector<size_t> offsets;
-   offsets.push_back(0);
+   offsets.emplace_back(0);
 
    vector<size_t> counts;
-   counts.push_back(1);
+   counts.emplace_back(1);
 
    ConcatString name(di.domain);
    name << "_domain";
@@ -1749,13 +1744,13 @@ void OutFileInfo::write_nc_diag_vals(const string &name,
 
    // Setup dimensions
    vector<NcDim> dims;
-   dims.push_back(vld_dim);
+   dims.emplace_back(vld_dim);
 
    vector<size_t> offsets;
-   offsets.push_back(0);
+   offsets.emplace_back(0);
 
    vector<size_t> counts;
-   counts.push_back(get_dim_size(&vld_dim));
+   counts.emplace_back(get_dim_size(&vld_dim));
 
    // Define new variable
    NcVar diag_var = nc_diag_out->addVar(name, ncDouble, dims);
@@ -1785,16 +1780,16 @@ void OutFileInfo::write_nc_diag_prs_vals(const string &name,
 
    // Setup dimensions
    vector<NcDim> dims;
-   dims.push_back(vld_dim);
-   dims.push_back(prs_dim);
+   dims.emplace_back(vld_dim);
+   dims.emplace_back(prs_dim);
 
    vector<size_t> offsets;
-   offsets.push_back(0);
-   offsets.push_back(0);
+   offsets.emplace_back(0);
+   offsets.emplace_back(0);
 
    vector<size_t> counts;
-   counts.push_back(get_dim_size(&vld_dim));
-   counts.push_back(get_dim_size(&prs_dim));
+   counts.emplace_back(get_dim_size(&vld_dim));
+   counts.emplace_back(get_dim_size(&prs_dim));
 
    // Add variable attributes
    NcVar diag_var = nc_diag_out->addVar(name, ncDouble, dims);
@@ -2155,7 +2150,7 @@ void TmpFileInfo::clear() {
    pressure_levels.clear();
 
    grid_out.clear();
-   ra_grid.clear();
+   ra_grid.clear_rng_azi();
 
    domain.clear();
 
@@ -2190,7 +2185,7 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    write_netcdf_global(tmp_out, tmp_file.c_str(), program_name);
 
    // Define latitude and longitude arrays
-   TcrmwData d = di.data;
+   RngAziData d = di.data;
    int nra = d.range_n * d.azimuth_n;
    vector<double> lat_arr(nra);
    vector<double> lon_arr(nra);
@@ -2204,7 +2199,7 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
 
    // Instantiate the grid
    grid_out.set(d);
-   ra_grid.set_from_data(d);
+   ra_grid.set_from_rng_azi_data(d);
 
    mlog << Debug(3)
         << "Defining cylindrical coordinates for (Lat, Lon) = ("
@@ -2259,8 +2254,8 @@ void TmpFileInfo::setup_nc_file(const DomainInfo &di,
    compute_lat_lon(ra_grid, lat_arr.data(), lon_arr.data());
 
    // Write coordinate arrays
-   write_tc_data(tmp_out, ra_grid, 0, lat_var, lat_arr.data());
-   write_tc_data(tmp_out, ra_grid, 0, lon_var, lon_arr.data());
+   write_tc_data(ra_grid, 0, lat_var, lat_arr.data());
+   write_tc_data(ra_grid, 0, lon_var, lon_arr.data());
 
    // Write track point values
    write_tc_track_point(tmp_out, vld_dim, *pnt_ptr);
@@ -2295,10 +2290,10 @@ void TmpFileInfo::write_nc_data(const VarInfo *vi, const DataPlane &dp_in,
 
    // Setup dimensions
    vector<NcDim> dims;
-   dims.push_back(vld_dim);
-   if(is_prs) dims.push_back(prs_dim);
-   dims.push_back(rng_dim);
-   dims.push_back(azi_dim);
+   dims.emplace_back(vld_dim);
+   if(is_prs) dims.emplace_back(prs_dim);
+   dims.emplace_back(rng_dim);
+   dims.emplace_back(azi_dim);
 
    // Create the output variable name
    ConcatString var_name;
@@ -2328,13 +2323,13 @@ void TmpFileInfo::write_nc_data(const VarInfo *vi, const DataPlane &dp_in,
          if(is_eq(vi->level().lower(), *it)) break;
       }
 
-      write_tc_pressure_level_data(tmp_out, ra_grid,
+      write_tc_pressure_level_data(ra_grid,
          0, i_level, cur_var, dp_out.data());
    }
    // Write single level data
    else {
-      write_tc_data_rev(tmp_out, ra_grid,
-         0, cur_var, dp_out.data());
+      write_tc_data(ra_grid, 0,
+         cur_var, dp_out.data());
    }
 
    return;

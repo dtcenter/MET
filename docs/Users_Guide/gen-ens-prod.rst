@@ -47,7 +47,7 @@ The usage statement for the Ensemble Stat tool is shown below:
 .. code-block:: none
 
   Usage: gen_ens_prod
-         -ens file_1 ... file_n | ens_file_list
+         -ens file_1 ... file_n | file_list
          -out file
          -config file
          [-ctrl file]
@@ -59,13 +59,11 @@ gen_ens_prod has three required arguments and accepts several optional ones.
 Required Arguments gen_ens_prod
 -------------------------------
 
-1. The **-ens file_1 ... file_n** option specifies the ensemble member file names. This argument is not required when ensemble files are specified in the **ens_file_list**, detailed below.
+1. The **-ens file_1 ... file_n | file_list** option specifies the ensemble member files or ASCII file list of file names to be used, as described in :numref:`ascii_file_lists`.
 
-2. The **ens_file_list** option is an ASCII file containing a list of ensemble member file names. This is not required when a file list is included on the command line, as described above.
+2. The **-out file** option specifies the NetCDF output file name to be written.
 
-3. The **-out file** option specifies the NetCDF output file name to be written.
-
-4. The **-config file** option is a **GenEnsProdConfig** file containing the desired configuration settings.
+3. The **-config file** option is a **GenEnsProdConfig** file containing the desired configuration settings.
 
 Optional Arguments for gen_ens_prod
 -----------------------------------
@@ -175,7 +173,7 @@ Each value in the array will replace the text **MET_ENS_MEMBER_ID**.
     ];
   }
 
-This replacement behavior can also be applied to climatology file name entry, in the 
+This replacement behavior can also be applied to climatology file name entry, in the
 climo_mean and climo_stdev dictionaries.
 
 .. code-block:: none
@@ -183,8 +181,8 @@ climo_mean and climo_stdev dictionaries.
   climo_mean = {
      file_name = ["/path/to/file/memberMET_ENS_MEMBER_ID-mean.nc"];
      }
-     
-This substitution method can only be used if **ens_member_ids** has at least one entry 
+
+This substitution method can only be used if **ens_member_ids** has at least one entry
 and the **normalize** option is set to **CLIMO_ANOM** or **CLIMO_STD_ANOM**.
 
 **control_id** is a string that is substituted in the same way as the **ens_member_ids** values
@@ -251,7 +249,7 @@ If **ensemble_flag.nmep** is set to TRUE, NMEP output is created for each combin
 _____________________
 
 .. code-block:: none
-		
+
   ensemble_flag = {
     latlon    = TRUE;
 	 mean      = TRUE;

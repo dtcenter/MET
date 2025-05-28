@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -26,11 +26,12 @@ extern "C" {
 
 }
 
+#include "python_pointdata.hpp"
+
 
 ////////////////////////////////////////////////////////////////////////
 
 static const char python_key_nhdr           [] = "nhdr";
-//static const char python_key_npbhdr         [] = "npbhdr";
 static const char python_use_var_id         [] = "use_var_id";
 static const char numpy_array_hdr_typ       [] = "hdr_typ"; // message type IDs
 static const char numpy_array_hdr_sid       [] = "hdr_sid"; // station IDs
@@ -61,19 +62,13 @@ static const int point_data_debug_level = 10;
 ////////////////////////////////////////////////////////////////////////
 
 
-extern bool python_point_data(const char * script_name, int script_argc,
-                              char ** script_argv, MetPointDataPython &met_pd_out,
+extern bool python_point_data(const ConcatString &python_command,
+                              MetPointDataPython &met_pd_out,
                               MaskFilters *filters);
 
-//extern bool python_point_data(const char *python_command, const bool use_xarray,
-//                              MetPointData & po_out);
-extern void print_met_data(MetPointObsData *obs_data, MetPointHeader *header_data,
+extern void print_met_data(const MetPointObsData *obs_data, const MetPointHeader *header_data,
                            const char *caller, int debug_level=point_data_debug_level);
 
-
-////////////////////////////////////////////////////////////////////////
-
-#include "python_pointdata.hpp"
 
 ////////////////////////////////////////////////////////////////////////
 

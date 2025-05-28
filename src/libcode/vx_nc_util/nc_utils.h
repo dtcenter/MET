@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -23,6 +23,7 @@
 #include "long_array.h"
 #include "num_array.h"
 #include "nc_var_info.h"
+#include "data_plane.h"
 
 #include "nc_utils.hpp"
 
@@ -225,6 +226,7 @@ extern bool get_nc_data(netCDF::NcVar *, uchar  *data, bool allow_conversion=fal
 extern bool get_nc_data(netCDF::NcVar *, float  *data);
 extern bool get_nc_data(netCDF::NcVar *, double *data);
 extern bool get_nc_data(netCDF::NcVar *, time_t *data);
+extern bool get_nc_data(netCDF::NcVar *, unixtime *data);
 extern bool get_nc_data(netCDF::NcVar *, unsigned short *data);
 
 extern bool get_nc_data(netCDF::NcVar *, int    *data, const LongArray &curs);
@@ -285,6 +287,9 @@ extern bool put_nc_data_with_dims(netCDF::NcVar *, const double *data, const int
 extern bool put_nc_data_with_dims(netCDF::NcVar *, const double *data, const long len0,
                                   const long len1=0, const long len2=0);
 
+extern bool put_nc_data_plane_int(netCDF::NcVar *, const DataPlane &);
+extern bool put_nc_data_plane_float(netCDF::NcVar *, const DataPlane &);
+
 extern netCDF::NcGroup  get_nc_group(netCDF::NcFile *, const char *group_name);     // continue even though not exists
 
 extern netCDF::NcVar    get_var(netCDF::NcFile *, const char *var_name);    // exit if exists but invalid
@@ -332,6 +337,9 @@ extern netCDF::NcVar  get_nc_var_lon(const netCDF::NcFile *nc);
 extern netCDF::NcVar  get_nc_var_time(const netCDF::NcFile *nc);
 extern int    get_index_at_nc_data(netCDF::NcVar *var, double value, const std::string dim_name, bool is_time=false);
 extern netCDF::NcFile* open_ncfile(const char * nc_name, bool write = false);
+
+// Moved from nc_cf_file.cc
+extern unixtime get_init_time(netCDF::NcFile *nc_file);
 
 extern unixtime get_reference_unixtime(netCDF::NcVar *time_var, int &sec_per_unit,
                                        bool &no_leap_year);

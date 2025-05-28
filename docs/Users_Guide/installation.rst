@@ -70,8 +70,8 @@ verification use and compiler language:
   library for interfacing between Fortran and C
   (**Not required for most compilers**)
 
-Users can take advantage of the compilation script to download and install all of the 
-libraries automatically, both required and conditionally required 
+Users can take advantage of the compilation script to download and install all of the
+libraries automatically, both required and conditionally required
 :ref:`compile_script_install`.
 
 .. _suggested_external_utiliites:
@@ -85,7 +85,7 @@ They are not required for MET to function, but depending on the user’s intende
 * `copygb utility <http://www.cpc.ncep.noaa.gov/products/wesley/copygb.html>`_
   for re-gridding GRIB version 1 data
 * `wgrib2 utility <https://www.cpc.ncep.noaa.gov/products/wesley/wgrib2/>`_
-  for re-gridding GRIB version 2 data  
+  for re-gridding GRIB version 2 data
 * `Integrated Data Viewer (IDV) <http://www.unidata.ucar.edu/software/idv>`_
   for displaying gridded data, including GRIB and NetCDF
 * `ncview utility <http://meteora.ucsd.edu/~pierce/ncview_home_page.html>`_
@@ -104,17 +104,17 @@ before running the script and some optional environment variables, both of
 which are described below. The script relies on a **tar_files.tgz** file, which
 contains all of the required and optional library packages for MET but not
 MET itself. A separate command will be used to pull down the latest version of
-MET in **tar_files.tgz** 
+MET in **tar_files.tgz**
 format from GitHub, which the script will then install.
 
 To begin, create and change to a directory where the latest version of MET will be
-installed. Assuming that the following guidance uses “/d1” as the parent directory, 
-a suggested format is a path to a “met” directory, followed by the version number 
-subdirectory (e.g. */d1/met/12.0.0*). 
+installed. Assuming that the following guidance uses “/d1” as the parent directory,
+a suggested format is a path to a “met” directory, followed by the version number
+subdirectory (e.g. */d1/met/12.0.0*).
 Next, download the
 `compile_MET_all.sh <https://raw.githubusercontent.com/dtcenter/MET/main_v12.0/internal/scripts/installation/compile_MET_all.sh>`_
-script and 
-`tar_files.tgz <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz>`_ 
+script and
+`tar_files.tgz <https://dtcenter.ucar.edu/dfiles/code/METplus/MET/installation/tar_files.tgz>`_
 file and place both of these files in the
 new directory. These files are available either
 through using the hyperlinks provided or by entering the following commands in
@@ -160,8 +160,8 @@ Environment Variables to Run Script
 -----------------------------------
 
 Before running the compilation script, there are five environment variables
-that are required: 
-**TEST_BASE**, **COMPILER**, **MET_SUBDIR**, **MET_TARBALL**, and **USE_MODULES**.  
+that are required:
+**TEST_BASE**, **COMPILER**, **MET_SUBDIR**, **MET_TARBALL**, and **USE_MODULES**.
 
 If compiling support for Python embedding, the script will need the following
 additional environment variables: **MET_PYTHON**, **MET_PYTHON_CC**, and
@@ -173,7 +173,7 @@ environment variables is in an environment configuration file
 (for example, **install_met_env.<machine_name>**). An example environment
 configuration file to start with (**install_met_env.generic_gnu**),
 as well as the environment configuration files used on HPCs at NCAR and NOAA,
-can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ in the 
+can be found in the `MET GitHub repository <https://github.com/dtcenter/MET>`_ in the
 `scripts/installation/config <https://github.com/dtcenter/MET/tree/main_v12.0/internal/scripts/installation/config>`_
 directory.
 
@@ -196,42 +196,42 @@ Environment Variable Descriptions
 .. dropdown:: REQUIRED
 
     **TEST_BASE** – Format is */d1/met/12.0.0*. This is the MET
-    installation directory that was created 
+    installation directory that was created
     the beginning of, :numref:`compile_script_install` and contains the
-    **compile_MET_all.sh** script, **tar_files.tgz**, 
+    **compile_MET_all.sh** script, **tar_files.tgz**,
     and the *tar_files* directory from the untar command.
 
-    **COMPILER** – Format is *compiler_version* (e.g. gnu_8.3.0). For the GNU family of compilers, 
-    use “gnu”; for the Intel family of compilers, use “intel”, "intel-classic", 
-    “intel-oneapi”, “ics”, “ips”, or “PrgEnv-intel”, 
-    depending on the system. If using an Intel compiler, users that have also 
-    set the **USE_MODULES** environment variable to TRUE should review the additional 
-    information below for proper configuration file setup. In the past, support was 
-    provided for the PGI family of compilers through “pgi”. However, this compiler 
-    option is no longer actively tested. 
+    **COMPILER** – Format is *compiler_version* (e.g. gnu_8.3.0). For the GNU family of compilers,
+    use “gnu”; for the Intel family of compilers, use “intel”, "intel-classic",
+    “intel-oneapi”, “ics”, “ips”, or “PrgEnv-intel”,
+    depending on the system. If using an Intel compiler, users that have also
+    set the **USE_MODULES** environment variable to TRUE should review the additional
+    information below for proper configuration file setup. In the past, support was
+    provided for the PGI family of compilers through “pgi”. However, this compiler
+    option is no longer actively tested.
 
-    **MET_SUBDIR** – Format is */d1/met/12.0.0*. This is the location where the top-level MET 
+    **MET_SUBDIR** – Format is */d1/met/12.0.0*. This is the location where the top-level MET
     subdirectory will
     be installed and is often set equivalent to **TEST_BASE** (e.g. ${TEST_BASE}).
 
     **MET_TARBALL** – Format is *v12.0.0.tar.gz*. This is the name of the downloaded MET tarball.
 
-    **USE_MODULES** – Format is *TRUE* or *FALSE*. Set to FALSE if using a machine that does not use 
-    modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on 
+    **USE_MODULES** – Format is *TRUE* or *FALSE*. Set to FALSE if using a machine that does not use
+    modulefiles; set to TRUE if using a machine that does use modulefiles. For more information on
     modulefiles, visit the `Wikipedia page <https://en.wikipedia.org/wiki/Environment_Modules_(software)>`_.
-    If the **USE_MODULES** setting is set to true and the compiler is an Intel compiler, please 
+    If the **USE_MODULES** setting is set to true and the compiler is an Intel compiler, please
     review the additional information below for proper configuration file setup.
 
-    **PYTHON_MODULE** -  Format is *PythonModuleName_version* (e.g. python_3.10.4). This environment variable 
-    is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load 
+    **PYTHON_MODULE** -  Format is *PythonModuleName_version* (e.g. python_3.10.4). This environment variable
+    is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load
     followed by an underscore and version number. For example, setting
-    **PYTHON_MODULE** =python_3.10.4 
+    **PYTHON_MODULE** =python_3.10.4
     will cause the script to run "module load python/3.10.4".
 
-.. dropdown:: ADDITIONAL SETTINGS FOR INTEL COMPILER USERS WITH THE USE_MODULES SETTING 
+.. dropdown:: ADDITIONAL SETTINGS FOR INTEL COMPILER USERS WITH THE USE_MODULES SETTING
 
-    It is necessary for the user to specify (in the install_met_env.<machine> config file) the 
-    following environment variables if using the Intel compilers: 
+    It is necessary for the user to specify (in the install_met_env.<machine> config file) the
+    following environment variables if using the Intel compilers:
 
     | For non-oneAPI Intel compilers:
     |
@@ -243,19 +243,19 @@ Environment Variable Descriptions
 
 
     | For oneAPI Intel compilers:
-    | 
+    |
     | export FC=ifx
     | export F77=ifx
     | export F90=ifx
     | export CC=icx
     | export CXX=icpx
 
-    This is due to the machines allowing users to load a module but not setting these environment 
-    variables as expected, leading to failed installations. For user convenience, additional 
-    generic configuration files have been created that include these settings. Users with a 
-    classic Intel compiler are encouraged to use the install_met_env.generic_intel_classic 
-    configuration file, and users with a oneAPI Intel compiler should use the 
-    install_met_env.generic_intel_oneapi configuration file. 
+    This is due to the machines allowing users to load a module but not setting these environment
+    variables as expected, leading to failed installations. For user convenience, additional
+    generic configuration files have been created that include these settings. Users with a
+    classic Intel compiler are encouraged to use the install_met_env.generic_intel_classic
+    configuration file, and users with a oneAPI Intel compiler should use the
+    install_met_env.generic_intel_oneapi configuration file.
 
 .. dropdown:: REQUIRED, IF COMPILING PYTHON EMBEDDING
 
@@ -265,24 +265,24 @@ Environment Variable Descriptions
 
     **MET_PYTHON_CC** - Format is -I followed by the directory containing
     the Python include files (e.g. -I/usr/local/python3/include/python3.10).
-    This information may be obtained by 
+    This information may be obtained by
     running :code:`python3-config --cflags`;
-    however, this command can, on certain systems, 
+    however, this command can, on certain systems,
     provide too much information.
 
     **MET_PYTHON_LD** - Format is -L followed by the directory containing
-    the Python library 
+    the Python library
     files then a space, then -l followed by the necessary Python
-    libraries to link to 
+    libraries to link to
     (e.g. -L/usr/local/python3/lib/\\ -lpython3.10\\
-    -lpthread\\ -ldl\\ -lutil\\ -lm). 
+    -lpthread\\ -ldl\\ -lutil\\ -lm).
     The backslashes are necessary in the example shown because of
-    the spaces, which will be 
+    the spaces, which will be
     recognized as the end of the value unless preceded by the “\\”
-    character. Alternatively, 
-    a user can provide the value in quotations 
+    character. Alternatively,
+    a user can provide the value in quotations
     (e.g. export MET_PYTHON_LD="-L/usr/local/python3/lib/
-    -lpython3.10 -lpthread -ldl -lutil -lm"). 
+    -lpython3.10 -lpthread -ldl -lutil -lm").
     This information may be obtained by running
     :code:`python3-config --ldflags --embed`; however,
     this command can, on certain systems, provide too much information.
@@ -290,17 +290,17 @@ Environment Variable Descriptions
 .. dropdown:: OPTIONAL
 
     **export MAKE_ARGS="-j #"** – If there is a need to install external
-    libraries, or to attempt 
+    libraries, or to attempt
     to speed up the MET compilation process, this environmental
-    setting can be added to the 
+    setting can be added to the
     environment configuration file. Replace the # with the number
-    of cores to use 
+    of cores to use
     (as an integer) or simply specify "export MAKE_ARGS=-j"
-    with no integer argument to 
+    with no integer argument to
     start as many processes in parallel as possible. Note that Docker
-    has trouble compiling 
+    has trouble compiling
     without a specified value of cores to use.  The automated MET
-    testing scripts in the 
+    testing scripts in the
     Docker environment have been successful with a value of
     5 (e.g. export MAKE_ARGS=”-j 5”).
 
@@ -315,17 +315,17 @@ External Library Handling in compile_MET_all.sh
 .. dropdown:: IF THE USER WANTS TO HAVE THE COMPILATION SCRIPT COMPILE THE LIBRARY DEPENDENCIES
 
     The **compile_MET_all.sh** script will compile and install MET and its
-    :ref:`required_external_libraries_to_build_MET`, if needed. 
-    Note that if these libraries are already installed somewhere on the system, 
-    MET will call and use the libraries that were installed by the script. 
+    :ref:`required_external_libraries_to_build_MET`, if needed.
+    Note that if these libraries are already installed somewhere on the system,
+    MET will call and use the libraries that were installed by the script.
 
 .. dropdown:: IF THE USER ALREADY HAS THE LIBRARY DEPENDENCIES INSTALLED
 
-    If the required external library dependencies have already been installed and don’t 
-    need to be reinstalled, or if compiling MET on a machine that uses modulefiles and 
-    the user would like to make use of the existing dependent libraries on that machine, 
-    there are more environment variables that need to be set to let MET know where those 
-    library and header files are. The following environment variables need to be added 
+    If the required external library dependencies have already been installed and don’t
+    need to be reinstalled, or if compiling MET on a machine that uses modulefiles and
+    the user would like to make use of the existing dependent libraries on that machine,
+    there are more environment variables that need to be set to let MET know where those
+    library and header files are. The following environment variables need to be added
     to the environment configuration file:
 
     +-------------------+--------------------------------+------------------------------+
@@ -345,7 +345,7 @@ External Library Handling in compile_MET_all.sh
     +-------------------+--------------------------------+------------------------------+
     | *Optional*        | :code:`--enable-all` or        | MET_GRIB2CLIB,               |
     |                   |                                |                              |
-    | GRIB2             | :code:`--enable-grib2`         | MET_GRIB2CINC,               |        
+    | GRIB2             | :code:`--enable-grib2`         | MET_GRIB2CINC,               |
     |                   |                                |                              |
     | Support           |                                | GRIB2CLIB_NAME,              |
     |                   |                                |                              |
@@ -385,42 +385,48 @@ External Library Handling in compile_MET_all.sh
     |                   |                                |                              |
     | Support           |                                |                              |
     +-------------------+--------------------------------+------------------------------+
-  	  
+    | *Optional*        | :code:`--enable-profiler`      |                              |
+    |                   |                                |                              |
+    | Profiler          |                                |                              |
+    |                   |                                |                              |
+    | Support           |                                |                              |
+    +-------------------+--------------------------------+------------------------------+
+
     Generally speaking, for each library there is a set of three
-    environment variables that can  
-    describe the locations: 
+    environment variables that can
+    describe the locations:
     **$MET_<lib>**, **$MET_<lib>INC** and **$MET_<lib>LIB**.
 
-    The $MET_<lib> environment variable can be used if the external library is 
-    installed such that there is a main directory which has a subdirectory called 
+    The $MET_<lib> environment variable can be used if the external library is
+    installed such that there is a main directory which has a subdirectory called
     *lib* containing the library files and another subdirectory called *include*
     containing the include files.
 
-    Alternatively, the $MET_<lib>INC and $MET_<lib>LIB environment variables are used if the 
-    library and include files for an external library are installed in separate locations. 
-    In this case, both environment variables must be specified and the associated 
+    Alternatively, the $MET_<lib>INC and $MET_<lib>LIB environment variables are used if the
+    library and include files for an external library are installed in separate locations.
+    In this case, both environment variables must be specified and the associated
     $MET_<lib> variable will be ignored.
 
 .. dropdown:: FINAL NOTE ON EXTERNAL LIBRARIES
 
-    For users wishing to run the Plot-MODE-Field tool, the Ghostscript 
-    `font data <http://sourceforge.net/projects/gs-fonts>`_ must be 
-    downloaded and the **MET_FONT_DIR** environment variable in the 
+    For users wishing to run the Plot-MODE-Field tool, the Ghostscript
+    `font data <http://sourceforge.net/projects/gs-fonts>`_ must be
+    downloaded and the **MET_FONT_DIR** environment variable in the
     **install_met_env.<machine_name>** file should point to the directory containing those fonts.
 
 Executing the compile_MET_all.sh script
 ---------------------------------------
 
-With the proper files downloaded and the environment configuration file set to the 
-particular system’s needs, MET is ready for installation. The screenshot below shows the 
-contents of the installation directory followed by the tar_files subdirectory at 
+With the proper files downloaded and the environment configuration file set to the
+particular system’s needs, MET is ready for installation. The screenshot below shows the
+contents of the installation directory followed by the tar_files subdirectory at
 this step on the machine ‘hera’.
 
 .. code-block:: ini
 
   /contrib/met/12.0.0$ ls
   compile_MET_all.sh  install_met_env.hera  tar_files
-  
+
   /contrib/met/12.0.0$ ls tar_files
   HDF-EOS2.16v1.00.tar.Z         eckit-1.24.4.tar.gz            netcdf-4.7.4.tar.gz
   HDF4.2r3.tar.gz                freetype-2.11.0.tar.gz         netcdf-cxx4-4.3.1.tar.gz
@@ -452,36 +458,36 @@ To confirm that MET was installed successfully, run the following command from t
   grep -i error MET-12.0.0/met.make_test.log
 
 If no errors are returned, the installation was successful.
-Due to the highly variable nature of hardware systems, users may encounter issues during 
-the installation process that result in MET not being installed. If this occurs please 
-first recheck that the location of all the necessary data files and scripts is correct. 
-Next, recheck the environment variables in the environment configuration file and 
-ensure there are no spelling errors or improperly set variables. 
+Due to the highly variable nature of hardware systems, users may encounter issues during
+the installation process that result in MET not being installed. If this occurs please
+first recheck that the location of all the necessary data files and scripts is correct.
+Next, recheck the environment variables in the environment configuration file and
+ensure there are no spelling errors or improperly set variables.
 After these checks are complete, run the script again.
 
-If there are still errors, users still have options to obtain a successful 
-MET installation. Check the `FAQ section of the User’s Guide on topics relevant to installation <https://met.readthedocs.io/en/latest/Users_Guide/appendixA.html#met-won-t-compile>`_. 
-Next, review previously asked questions on the installation topic in 
-`GitHub Discussions <https://github.com/dtcenter/METplus/discussions/categories/installation>`_. 
-Users are welcome to post any questions they might have that have not been asked. 
-Finally, consider one of the remaining installation methods for MET, 
+If there are still errors, users still have options to obtain a successful
+MET installation. Check the `FAQ section of the User’s Guide on topics relevant to installation <https://met.readthedocs.io/en/latest/Users_Guide/appendixA.html#met-won-t-compile>`_.
+Next, review previously asked questions on the installation topic in
+`GitHub Discussions <https://github.com/dtcenter/METplus/discussions/categories/installation>`_.
+Users are welcome to post any questions they might have that have not been asked.
+Finally, consider one of the remaining installation methods for MET,
 as these may prove more successful.
 
 Using Docker for Running MET
 ============================
 
-Docker is a system that seeks to eliminate some of the complexities associated with 
-downloading various software and any library dependencies it might have by allowing 
-users to run inside a preset container. Instead of using a hard copy of an application, 
-Docker allows users to pull images of the application and run those within the 
-Docker environment. This is beneficial to both developers (who no longer have to 
-design with every possible system environment in mind) and users (who can skip tracking 
+Docker is a system that seeks to eliminate some of the complexities associated with
+downloading various software and any library dependencies it might have by allowing
+users to run inside a preset container. Instead of using a hard copy of an application,
+Docker allows users to pull images of the application and run those within the
+Docker environment. This is beneficial to both developers (who no longer have to
+design with every possible system environment in mind) and users (who can skip tracking
 down system environment settings and meet with success faster) alike.
 
-MET has numerous version images for Docker users and continues to be released as 
-images at the same interval as system releases. While the advantages of Docker can 
-make it an appealing installation route for first time users, it does require 
-privileged user access that will result in an unsuccessful installation if not 
+MET has numerous version images for Docker users and continues to be released as
+images at the same interval as system releases. While the advantages of Docker can
+make it an appealing installation route for first time users, it does require
+privileged user access that will result in an unsuccessful installation if not
 available. Please ensure the user has high system access
 (e.g. admin access) before attempting this method.
 
@@ -512,12 +518,12 @@ MET version number, for example:
 Omitting the
 version number will result in an error due to Docker’s behavior
 of attempting to retrieve an image with the “latest” tag, which
-MET no longer uses. 
+MET no longer uses.
 
 Running the Docker version of MET
 ---------------------------------
 
-All that is left to do is launch a shell in the Docker container. 
+All that is left to do is launch a shell in the Docker container.
 This is accomplished with the command:
 
 .. code-block:: ini
@@ -525,21 +531,21 @@ This is accomplished with the command:
   docker run -it --rm dtcenter/met /bin/bash
 
 Note that the "--rm" command was added to automatically remove the
-container created 
-from the image once exiting Docker. Simply remove this command if the 
+container created
+from the image once exiting Docker. Simply remove this command if the
 container should persist after exiting. If there is an error
 during this run command, try adding the latest MET version number
 the same way the latest image of MET was pulled:
 
 .. code-block:: ini
 
-  docker run -it --rm dtcenter/met:12.0.0 /bin/bash 
+  docker run -it --rm dtcenter/met:12.0.0 /bin/bash
 
 If the  usage MET via Docker images was successful, it is highly
-recommended to move on 
+recommended to move on
 to using the METplus wrappers of the tools, which have their own
-Docker image. 
-Instructions for obtaining that image are in the 
+Docker image.
+Instructions for obtaining that image are in the
 `METplus Wrappers User's Guide <https://metplus.readthedocs.io/en/latest/Users_Guide/getting_started.html#metplus-in-docker>`_.
 
 Using Apptainer for Running MET
@@ -550,7 +556,7 @@ complexities associated with downloading various library dependencies and
 runs inside a preset container. Apptainer is incredibly flexible and was
 designed to function on High Performance Computing (HPC) systems. It can
 utilize Container Library and Docker images, meaning users can benefit
-from the Docker images that already exist for MET. 
+from the Docker images that already exist for MET.
 
 Perhaps the biggest benefit of using Apptainer (aside from its agnostic
 platform availability) is its nonrequirement of root permissions. This can
@@ -604,7 +610,7 @@ be used otherwise the instance will continue to run in the background:
 
 .. code-block:: ini
 
-  singularity instance stop /path/to/container/met-12.0.0.sif met-12.0.0  
+  singularity instance stop /path/to/container/met-12.0.0.sif met-12.0.0
 
 Now that MET is successfully installed, it is highly recommended to
 next install the METplus wrappers to take full advantage of

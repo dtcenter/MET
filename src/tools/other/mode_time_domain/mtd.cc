@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -915,13 +915,13 @@ cout << "\n*** Model Evaluation Tools (MET" << met_version
      << "\twhere\t\"-fcst file_1 ... file_n\" are the gridded "
      << "forecast files to be used (required).\n"
 
-     << "\t\t\"-fcst fcst_file_list\" is an ASCII file containing "
+     << "\t\t\"-fcst file_list\" is an ASCII file containing "
      << "a list of gridded forecast files to be used (required).\n"
 
      << "\t\t\"-obs  file_1 ... file_n\" are the gridded "
      << "observation files to be used (required).\n"
 
-     << "\t\t\"-obs  obs_file_list\" is an ASCII file containing "
+     << "\t\t\"-obs  file_list\" is an ASCII file containing "
      << "a list of gridded observation files to be used (required).\n"
 
      << "\t\t\"-single\" instead of \"-fcst\" and \"-obs\" to run on "
@@ -1023,8 +1023,7 @@ ConcatString make_output_prefix(const MtdConfigInfo & config, unixtime start_tim
 
 ConcatString prefix;
 int year, month, day, hour, minute, second;
-char junk[256];
-
+ConcatString cs;
 
 prefix << cs_erase << default_prefix << '_';
 
@@ -1032,11 +1031,9 @@ if ( config.output_prefix.nonempty() )  prefix << config.output_prefix << '_';
 
 unix_to_mdyhms(start_time, month, day, year, hour, minute, second);
 
-snprintf(junk, sizeof(junk), "%04d%02d%02d_%02d%02d%02dV", year, month, day, hour, minute, second);
+cs.format("%04d%02d%02d_%02d%02d%02dV", year, month, day, hour, minute, second);
 
-prefix << junk;
-
-
+prefix << cs;
 
 return prefix;
 

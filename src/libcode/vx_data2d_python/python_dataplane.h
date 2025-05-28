@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -16,24 +16,23 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-static const char xarray_dataarray_name [] = "met_data";
-
-static const char numpy_array_name      [] = "met_data";
-static const char numpy_dict_name       [] = "attrs";
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 #include "data_plane.h"
 #include "var_info_python.h"
-
 
 extern "C" {
 
 #include "Python.h"
 
 }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static const char xarray_dataarray_name [] = "met_data";
+
+static const char numpy_array_name      [] = "met_data";
+static const char numpy_dict_name       [] = "attrs";
 
 
 ////////////////////////////////////////////////////////////////////////

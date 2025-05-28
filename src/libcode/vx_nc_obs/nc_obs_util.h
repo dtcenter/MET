@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2024
+// ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -133,7 +133,7 @@ struct NetcdfObsVars {
    void create_dimensions(netCDF::NcFile *f_out);
    void create_hdr_vars (netCDF::NcFile *f_out, const int hdr_count);
    void create_obs_vars (netCDF::NcFile *f_out);
-   void create_obs_name_vars (netCDF::NcFile *f_out, const int var_count, const int unit_count);
+   void create_obs_name_vars (netCDF::NcFile *f_out, const int var_count, const int unit_count, const int desc_count);
    void create_table_vars (netCDF::NcFile *f_out, MetPointHeader &hdr_data, NcDataBuffer &data_buffer);
    void create_pb_hdrs (netCDF::NcFile *f_out, const int hdr_count);
    netCDF::NcDim create_var_obs_var (netCDF::NcFile *f_out, int var_count);

@@ -2,18 +2,16 @@
 
 # Check that required unit test environment variables are set
 if [[ -z "${MET_BASE}"       ||
-      -z "${MET_BUILD_BASE}" ||
       -z "${MET_TEST_BASE}"  ||
       -z "${MET_TEST_INPUT}" ||
       -z "${MET_TEST_OUTPUT}" ]]; then
   echo
   echo "ERROR: Required environment variable(s) unset:"
-  echo "ERROR: \${MET_BASE}, \${MET_BUILD_BASE}, \${MET_TEST_BASE}, \${MET_TEST_INPUT}, \${MET_TEST_OUTPUT}"
+  echo "ERROR: \${MET_BASE}, \${MET_TEST_BASE}, \${MET_TEST_INPUT}, \${MET_TEST_OUTPUT}"
   echo
   exit
 else
   echo "export MET_BASE=${MET_BASE}"
-  echo "export MET_BUILD_BASE=${MET_BUILD_BASE}"
   echo "export MET_TEST_BASE=${MET_TEST_BASE}"
   echo "export MET_TEST_INPUT=${MET_TEST_INPUT}"
   echo "export MET_TEST_OUTPUT=${MET_TEST_OUTPUT}"
@@ -33,7 +31,6 @@ done
 # Unit test script
 UNIT=${MET_TEST_BASE}/python/unit.py
 
-# Unit test XML
 UNIT_XML="unit_ascii2nc.xml \
           unit_ascii2nc_indy.xml \
           unit_madis2nc.xml \
@@ -43,9 +40,11 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_gen_vx_mask.xml \
           unit_gen_ens_prod.xml \
           unit_pcp_combine.xml \
+          unit_regrid.xml \
           unit_wwmca_regrid.xml \
           unit_point_stat.xml \
           unit_stat_analysis_ps.xml \
+          unit_pair_stat.xml \
           unit_duplicate_flag.xml \
           unit_obs_summary.xml \
           unit_grid_stat.xml \
@@ -78,7 +77,6 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_ref_config_lead_48.xml \
           unit_ref_config.xml \
           unit_mode_graphics.xml \
-          unit_regrid.xml \
           unit_gsi_tools.xml \
           unit_aeronet.xml \
           unit_shift_data_plane.xml \
@@ -89,6 +87,7 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_climatology_mixed.xml \
           unit_grib_tables.xml \
           unit_grid_weight.xml \
+          unit_point_weight.xml \
           unit_netcdf.xml \
           unit_hira.xml \
           unit_interp_shape.xml \
@@ -100,9 +99,8 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_perc_thresh.xml \
           unit_gaussian.xml \
           unit_grid_diag.xml \
-          unit_quality_filter.xml"
-
-UNIT_XML="${UNIT_XML} unit_ugrid.xml"
+          unit_quality_filter.xml \
+          unit_ugrid.xml"
 
 # Run each unit test
 for CUR_XML in ${UNIT_XML}; do
