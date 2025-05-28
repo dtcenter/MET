@@ -34,23 +34,23 @@ class MetNcCFDataFile : public Met2dDataFile {
       MetNcCFDataFile(const MetNcCFDataFile &);
       MetNcCFDataFile & operator=(const MetNcCFDataFile &);
 
-      int add_data_planes_by_time(VarInfo &vinfo, LevelInfo &level,
+      int add_data_planes_by_time(VarInfo &vinfo, const LevelInfo &level,
                                   DataPlaneArray &plane_array);
-      int add_data_planes_by_z(VarInfo &vinfo, LevelInfo &level,
+      int add_data_planes_by_z(VarInfo &vinfo, const LevelInfo &level,
                                DataPlaneArray &plane_array);
       LongArray collect_time_offsets(VarInfo &vinfo);
       LongArray collect_z_offsets(VarInfo &vinfo);
-      long convert_time_to_offset(long time_value);
-      long convert_z_to_offset(double z_value, std::string z_dim_name);
-      bool data_plane(VarInfo &, DataPlane &, LongArray &dimension);
+      long convert_time_to_offset(unixtime time_value);
+      long convert_z_to_offset(double z_value, const std::string z_dim_name);
+      bool data_plane(VarInfo &, DataPlane &, const LongArray &dimension);
       void error_message(const bool is_dim_time, const int error_code,
                          const double _lower, const double _upper,
                          const long _value, const ConcatString &var_name,
-                         const std::string &method_name);
+                         const std::string &method_name) const;
       NcVarInfo *find_first_data_var();
-      int find_time_offset(VarInfo &vinfo, NcVarInfo *data_var);
-      int find_z_offset(VarInfo &vinfo, NcVarInfo *data_var);
-      NcVarInfo *get_data_var(VarInfo &vinfo);
+      long find_time_offset(VarInfo &vinfo, const NcVarInfo *data_var);
+      long find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var);
+      NcVarInfo *get_data_var(const VarInfo &vinfo) const;
       std::string get_z_dim_name(NcVarInfo *data_var);
       void nccf_init_from_scratch();
 
