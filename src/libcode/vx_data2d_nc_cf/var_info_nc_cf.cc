@@ -229,7 +229,6 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                      check_dim_offset(ptr2);
                      check_dim_offset(ptr3);
                   }
-
                   Level.set_lower(as_offset ? atoi(ptr2) : atof(ptr2));
                   Level.set_upper(as_offset ? atoi(ptr3) : atof(ptr3));
 
@@ -248,7 +247,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                   exit(1);
                }
                else {
-                  int increment = 1;
+                  int increment = 0;
                   // Store the dimension of the range and limits
                   *ptr3++ = 0;
                   char *ptr_inc = strchr(ptr3, ':');
@@ -331,12 +330,6 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                      level = vx_data2d_dim_by_value;
                      level_value = atof(ptr2);
                   }
-               }
-               else if (is_datestring(ptr2)) {
-                  unixtime unix_time = timestring_to_unix(ptr2);
-                  level = vx_data2d_dim_by_value;
-                  level_value = (double) unix_time;
-                  as_offset = false;
                }
                else {
                   mlog << Error << "\n" << method_name
