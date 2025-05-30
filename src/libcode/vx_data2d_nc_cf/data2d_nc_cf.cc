@@ -163,7 +163,7 @@ int MetNcCFDataFile::add_data_planes_by_time(VarInfo &vinfo, const LevelInfo &le
                                              DataPlaneArray &plane_array) {
    int n_rec = 0;
    const auto *vinfo_nc = (VarInfoNcCF *)&vinfo;
-   NcVarInfo *data_var = get_data_var(vinfo);
+   const NcVarInfo *data_var = get_data_var(vinfo);
    LongArray dimension = vinfo_nc->dimension();
    static const string method_name
          = "MetNcCFDataFile::add_data_planes_by_time() -> ";
@@ -718,7 +718,7 @@ LongArray MetNcCFDataFile::collect_z_offsets(VarInfo &vinfo) {
       }
    }
    else {    // a single match
-      NcVarInfo *data_var = _file->find_var_name(vinfo_nc->req_name().c_str());
+      const NcVarInfo *data_var = _file->find_var_name(vinfo_nc->req_name().c_str());
       if (z_as_value) dim_offset = convert_z_to_offset(vinfo_nc->dim_value(tmp_z_slot),
                                                        get_z_dim_name(data_var));
 
@@ -950,7 +950,7 @@ long MetNcCFDataFile::find_time_offset(VarInfo &vinfo, const NcVarInfo *data_var
 
 ////////////////////////////////////////////////////////////////////////
 
-long MetNcCFDataFile::find_z_offset(VarInfo &vinfo, NcVarInfo *data_var) {
+long MetNcCFDataFile::find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var) {
    static const string method_name
          = "MetNcCFDataFile::find_z_offset() -> ";
 
