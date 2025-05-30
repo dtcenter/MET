@@ -711,11 +711,9 @@ LongArray MetNcCFDataFile::collect_z_offsets(VarInfo &vinfo) {
          }
 
          int missing_count = missing_z.n_elements();
-         if (0 < missing_count) {
-            for (int idx = 0; idx<missing_count; idx++) {
-               mlog << Warning << method_name << "Not exist z \""
-                    << missing_z[idx] << "\".\n";
-            }
+         for (int idx = 0; idx<missing_count; idx++) {
+            mlog << Warning << method_name << "Not exist z \""
+                 << missing_z[idx] << "\".\n";
          }
       }
    }
@@ -903,47 +901,47 @@ void MetNcCFDataFile::error_message(const bool is_dim_time, const int error_code
 
 ////////////////////////////////////////////////////////////////////////
 
-long MetNcCFDataFile::find_time_offset(VarInfo &vinfo, const NcVarInfo *data_var) {
+long MetNcCFDataFile::find_time_offset(VarInfo &vinfo, const NcVarInfo *data_var) const {
    static const string method_name
          = "MetNcCFDataFile::find_time_offset() -> ";
 
    long time_offset = -1;
    int t_slot = data_var->t_slot;
-   if(0 <= t_slot) {
-      auto vinfo_nc = (VarInfoNcCF *)&vinfo;
-      time_offset = vinfo_nc->dimension(t_slot);
+   if(0 > t_slot) return time_offset;
 
-      int time_cnt = _file->ValidTime.n();
-      long time_threshold_cnt = 10000000;
-      if (time_offset == range_flag) time_offset = cur_time_index;  // from data_plane_array()
-      else if (!vinfo_nc->is_offset(t_slot)) {
-         auto time_value = (unixtime)vinfo_nc->dim_value(t_slot);
-         time_offset = convert_time_to_offset(time_value);
-         if ((0 > time_offset) || (time_offset >= time_cnt)) {
-            if (time_value > time_threshold_cnt)  // from time string (yyyymmdd_hh)
-               mlog << Warning << "\n" << method_name << "the requested time "
-                    << unix_to_yyyymmdd_hhmmss(time_value) << " for \""
-                    << vinfo.req_name() << "\" variable does not exist ("
-                    << unix_to_yyyymmdd_hhmmss(_file->ValidTime[0]) << " and "
-                    << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_cnt-1]) << ").\n\n";
-            else
-               mlog << Warning << "\n" << method_name << "the requested time value "
-                    << time_value << " for \"" << vinfo.req_name() << "\" variable "
-                    << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
+   auto vinfo_nc = (VarInfoNcCF *)&vinfo;
+   time_offset = vinfo_nc->dimension(t_slot);
 
-            return time_offset;
-         }
-      }
-      else if (time_offset >= time_threshold_cnt) {
-         time_offset = convert_time_to_offset(time_offset);
-      }
-
+   int time_cnt = _file->ValidTime.n();
+   const long time_threshold_cnt = 10000000;
+   if (time_offset == range_flag) time_offset = cur_time_index;  // from data_plane_array()
+   else if (!vinfo_nc->is_offset(t_slot)) {
+      auto time_value = (unixtime)vinfo_nc->dim_value(t_slot);
+      time_offset = convert_time_to_offset((double)time_value);
       if ((0 > time_offset) || (time_offset >= time_cnt)) {
-         mlog << Error << "\n" << method_name << "the requested time offset "
-              << time_offset << " for \"" << vinfo.req_name() << "\" variable "
-              << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
+         if (time_value > time_threshold_cnt)  // from time string (yyyymmdd_hh)
+            mlog << Warning << "\n" << method_name << "the requested time "
+                 << unix_to_yyyymmdd_hhmmss(time_value) << " for \""
+                 << vinfo.req_name() << "\" variable does not exist ("
+                 << unix_to_yyyymmdd_hhmmss(_file->ValidTime[0]) << " and "
+                 << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_cnt-1]) << ").\n\n";
+         else
+            mlog << Warning << "\n" << method_name << "the requested time value "
+                 << time_value << " for \"" << vinfo.req_name() << "\" variable "
+                 << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
+
          return time_offset;
       }
+   }
+   else if (time_offset >= time_threshold_cnt) {
+      time_offset = convert_time_to_offset((double)time_offset);
+   }
+
+   if ((0 > time_offset) || (time_offset >= time_cnt)) {
+      mlog << Error << "\n" << method_name << "the requested time offset "
+           << time_offset << " for \"" << vinfo.req_name() << "\" variable "
+           << "is out of range (between 0 and " << (time_cnt-1) << ").\n\n";
+      return time_offset;
    }
 
    return time_offset;
@@ -1007,7 +1005,7 @@ NcVarInfo *MetNcCFDataFile::get_data_var(VarInfo &vinfo) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-string MetNcCFDataFile::get_z_dim_name(NcVarInfo *data_var) const {
+string MetNcCFDataFile::get_z_dim_name(const NcVarInfo *data_var) const {
    string z_dim_name;
    if (0 <= data_var->z_slot) {
       NcDim z_dim = get_nc_dim(data_var->var, data_var->z_slot);
