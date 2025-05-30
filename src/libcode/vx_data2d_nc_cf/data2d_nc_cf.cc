@@ -278,7 +278,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       = "MetNcCFDataFile::data_plane(VarInfo &, DataPlane &) -> ";
 
   LongArray dimension = vinfo_nc->dimension();
-  NcVarInfo *data_var = get_data_var(vinfo);
+  const NcVarInfo *data_var = get_data_var(vinfo);
   if (nullptr != data_var) {
     int time_dim_slot = data_var->t_slot;
     int zdim_slot = data_var->z_slot;
