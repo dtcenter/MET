@@ -197,7 +197,7 @@ int MetNcCFDataFile::add_data_planes_by_time(VarInfo &vinfo, const LevelInfo &le
                n_rec++;
                if (mlog.verbosity_level() >= nc_cf_debug_level) {
                   mlog << Debug(nc_cf_debug_level) << method_name << "time: "
-                       << unix_to_yyyymmdd_hhmmss(_file->ValidTime[time_idx])
+                       << unix_to_yyyymmdd_hhmmss(_file->ValidTime[(int)time_idx])
                        << " from index " << time_idx << "\n";
                }
             }
@@ -222,7 +222,7 @@ int MetNcCFDataFile::add_data_planes_by_z(VarInfo &vinfo, const LevelInfo &level
    if(0 <= t_slot) {
       if(!vinfo_nc->is_offset(t_slot)
           || vx_data2d_dim_by_value == vinfo_nc->dimension(t_slot)) {
-         dimension[t_slot] = convert_time_to_offset((unixtime)vinfo_nc->dim_value(t_slot));
+         dimension[t_slot] = convert_time_to_offset(vinfo_nc->dim_value(t_slot));
       }
       if(range_flag == dimension[t_slot]) {
          mlog << Warning << "\n" << method_name
@@ -277,19 +277,12 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
   static const string method_name
       = "MetNcCFDataFile::data_plane(VarInfo &, DataPlane &) -> ";
 
-  int zdim_slot = bad_data_int;
-  int time_dim_slot = bad_data_int;
-  long org_time_offset = bad_data_int;
-  long org_z_offset = bad_data_int;
-  NumArray dim_value = vinfo_nc->dim_value();
   LongArray dimension = vinfo_nc->dimension();
-  BoolArray is_offset = vinfo_nc->is_offset();
-
   NcVarInfo *data_var = get_data_var(vinfo);
   if (nullptr != data_var) {
-    time_dim_slot = data_var->t_slot;
-    zdim_slot = data_var->z_slot;
-    for (int idx=0; idx<is_offset.n(); idx++) {
+    int time_dim_slot = data_var->t_slot;
+    int zdim_slot = data_var->z_slot;
+    for (int idx=0; idx<dimension.n_elements(); idx++) {
       long dim_offset = dimension[idx];
       if (dim_offset == vx_data2d_star) continue;
       if (idx == time_dim_slot) {
@@ -300,7 +293,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       }
       else {
          mlog << Warning << "\n" << method_name << "the unknown dimensionwith the value "
-              << dim_value[idx] << " for \"" << vinfo.req_name() << "\" variable.\n\n";
+              << vinfo_nc->dim_value(idx) << " for \"" << vinfo.req_name() << "\" variable.\n\n";
       }
     }
   }
@@ -337,56 +330,53 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const LongArr
 
   // Check that the times match those requested
 
-  if (status)
-  {
-    // Check that the valid time matches the request
+  if(status) {
+    if(vinfo.valid() > 0) {
+      // Check that the valid time and matches the request
+      if (vinfo.valid() != plane.valid()) {
+        // Compute time strings
 
-    if (vinfo.valid() > 0 && vinfo.valid() != plane.valid())
-    {
-      // Compute time strings
+        ConcatString req_time_str  = unix_to_yyyymmdd_hhmmss(vinfo.valid());
+        ConcatString data_time_str = unix_to_yyyymmdd_hhmmss(plane.valid());
 
-      ConcatString req_time_str  = unix_to_yyyymmdd_hhmmss(vinfo.valid());
-      ConcatString data_time_str = unix_to_yyyymmdd_hhmmss(plane.valid());
+        mlog << Warning << "\n" << method_name
+             << "for \"" << vinfo.req_name() << "\" variable, the valid "
+             << "time does not match the requested valid time: ("
+             << data_time_str << " != " << req_time_str << ")\n\n";
+        // set status false;
+      }
 
-      mlog << Warning << "\n" << method_name
-           << "for \"" << vinfo.req_name() << "\" variable, the valid "
-           << "time does not match the requested valid time: ("
-           << data_time_str << " != " << req_time_str << ")\n\n";
-      status = false;
-    }
+      // Check that the lead time matches the request
+      if (vinfo.lead() != plane.lead()) {
+        // Compute time strings
 
-    // Check that the lead time matches the request
+        ConcatString req_time_str  = sec_to_hhmmss(vinfo.lead());
+        ConcatString data_time_str = sec_to_hhmmss(plane.lead());
 
-    if (vinfo.lead() > 0 && vinfo.lead() != plane.lead())
-    {
-      // Compute time strings
-
-      ConcatString req_time_str  = sec_to_hhmmss(vinfo.lead());
-      ConcatString data_time_str = sec_to_hhmmss(plane.lead());
-
-      mlog << Warning << "\n" << method_name
-           << "for \"" << vinfo.req_name() << "\" variable, the lead "
-           << "time does not match the requested lead time: ("
-           << data_time_str << " != " << req_time_str << ")\n\n";
-      status = false;
+        mlog << Warning << "\n" << method_name
+             << "for \"" << vinfo.req_name() << "\" variable, the lead "
+             << "time does not match the requested lead time: ("
+             << data_time_str << " != " << req_time_str << ")\n\n";
+        // set status false;
+      }
     }
 
     status = process_data_plane(&vinfo, plane);
 
     // Set the VarInfo object's name, long_name, level, and units strings
 
-    if (info->name_att.length() > 0)
+    if (!info->name_att.empty())
       vinfo.set_name(info->name_att);
     else
       vinfo.set_name(info->name);
 
-    if (info->long_name_att.length() > 0)
+    if (!info->long_name_att.empty())
       vinfo.set_long_name(info->long_name_att.c_str());
 
-    if (info->level_att.length() > 0)
+    if (!info->level_att.empty())
       vinfo.set_level_name(info->level_att.c_str());
 
-    if (info->units_att.length() > 0)
+    if (!info->units_att.empty())
       vinfo.set_units(info->units_att.c_str());
   }
 
@@ -409,7 +399,7 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    // Initialize
    plane_array.clear();
 
-   VarInfoNcCF *vinfo_nc = (VarInfoNcCF *)&vinfo;
+   auto vinfo_nc = (VarInfoNcCF *)&vinfo;
    const NcVarInfo *data_var = get_data_var(vinfo);
    int t_dim_slot = data_var->t_slot;
    int z_dim_slot = data_var->z_slot;
@@ -435,14 +425,12 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
 ////////////////////////////////////////////////////////////////////////
 
 LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
-   int n_rec = 0;
-   bool status = false;
    auto vinfo_nc = (VarInfoNcCF *)&vinfo;
    static const string method_name
          = "MetNcCFDataFile::collect_time_offsets(VarInfo &) -> ";
 
    LongArray time_offsets;
-   NcVarInfo *info = _file->find_var_name(vinfo_nc->req_name().c_str());
+   const NcVarInfo *info = _file->find_var_name(vinfo_nc->req_name().c_str());
 
    // Check for variable not found
    if(!info) {
@@ -515,7 +503,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
                }
             }
             else {
-               auto next_time = (unixtime)(time_lower + time_inc);
+               auto next_time = time_lower + time_inc;
                if (found_lower) time_offsets.add(first_idx);
                for (int idx=next_offset; idx<time_dim_size; idx++) {
                   if (_file->ValidTime[idx] > time_upper) break;
@@ -543,14 +531,14 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
             }
          }
          else if (time_lower < time_dim_size) {      // index, not values
-            int inc_offset = (time_inc <= 0) ? 1 : time_inc;
-            int max_time_offset = time_upper;
+            int inc_offset = (time_inc <= 0) ? 1 : (int)time_inc;
+            auto max_time_offset = (int)time_upper;
             if (max_time_offset >= time_dim_size) {
                max_time_offset = time_dim_size - 1;
                mlog << Debug(7) << method_name
                     << "Ignored index above dimension size (" << time_dim_size << ")\n";
             }
-            for (int idx=(int)time_lower; idx<=max_time_offset; idx+=inc_offset) {
+            for (auto idx=(int)time_lower; idx<=max_time_offset; idx+=inc_offset) {
                time_offsets.add(idx);
                mlog << Debug(9) << method_name << " added index " << idx << "\n";
             }
@@ -566,7 +554,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
    else {    // a single match
       if (time_as_value
           || vx_data2d_dim_by_value == dim_offset) {
-         dim_offset = convert_time_to_offset((unixtime)vinfo_nc->dim_value(tmp_time_dim_slot));
+         dim_offset = convert_time_to_offset(vinfo_nc->dim_value(tmp_time_dim_slot));
       }
       if (dim_offset >= time_dim_size) error_code = error_code_out_of_index;
       else if (0 <= time_dim_slot) time_offsets.add(dim_offset);
@@ -592,7 +580,7 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
    // Handling error code
    if (error_code > error_code_no_error) {
       long time_value = (time_as_value ? dim_offset : -1);
-      error_message(true, error_code, time_lower, time_upper,
+      error_message(true, error_code, (double)time_lower, (double)time_upper,
                     time_value, vinfo_nc->req_name(), method_name);
       exit(1);
    }
@@ -694,7 +682,7 @@ LongArray MetNcCFDataFile::collect_z_offsets(VarInfo &vinfo) {
                   }
                   else { // next_z < _file->vlevels[idx]
                      while (next_z < _file->vlevels[idx]) {
-                        missing_z.add(next_z);
+                        missing_z.add((unixtime)next_z);
                         next_z += z_inc;
                      }
                      if (_file->vlevels[idx] == next_z) {
@@ -716,7 +704,7 @@ LongArray MetNcCFDataFile::collect_z_offsets(VarInfo &vinfo) {
                mlog << Debug(7) << method_name
                     << "Ignored index above dimension size (" << z_dim_size << ")\n";
             }
-            for (int idx=(int)z_lower; idx<=max_z_offset; idx+=inc_offset) {
+            for (auto idx=(int)z_lower; idx<=max_z_offset; idx+=inc_offset) {
                z_offsets.add(idx);
                mlog << Debug(9) << method_name << " added index " << idx << "\n";
             }
@@ -771,7 +759,7 @@ LongArray MetNcCFDataFile::collect_z_offsets(VarInfo &vinfo) {
 
 ////////////////////////////////////////////////////////////////////////
 
-long MetNcCFDataFile::convert_time_to_offset(unixtime time_value) {
+long MetNcCFDataFile::convert_time_to_offset(double time_value) const {
    bool found = false;
    bool found_value = false;
    long time_offset = bad_data_int;
@@ -814,7 +802,7 @@ long MetNcCFDataFile::convert_time_to_offset(unixtime time_value) {
 
 ////////////////////////////////////////////////////////////////////////
 
-long MetNcCFDataFile::convert_z_to_offset(double z_value, const string z_dim_name) {
+long MetNcCFDataFile::convert_z_to_offset(double z_value, const string &z_dim_name) {
    bool found = false;
    long z_offset = bad_data_int;
    int dim_size = _file->vlevels.n();
@@ -929,7 +917,7 @@ long MetNcCFDataFile::find_time_offset(VarInfo &vinfo, const NcVarInfo *data_var
       long time_threshold_cnt = 10000000;
       if (time_offset == range_flag) time_offset = cur_time_index;  // from data_plane_array()
       else if (!vinfo_nc->is_offset(t_slot)) {
-         double time_value = vinfo_nc->dim_value(t_slot);
+         auto time_value = (unixtime)vinfo_nc->dim_value(t_slot);
          time_offset = convert_time_to_offset(time_value);
          if ((0 > time_offset) || (time_offset >= time_cnt)) {
             if (time_value > time_threshold_cnt)  // from time string (yyyymmdd_hh)

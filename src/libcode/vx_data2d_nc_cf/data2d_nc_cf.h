@@ -40,8 +40,8 @@ class MetNcCFDataFile : public Met2dDataFile {
                                DataPlaneArray &plane_array);
       LongArray collect_time_offsets(VarInfo &vinfo);
       LongArray collect_z_offsets(VarInfo &vinfo);
-      long convert_time_to_offset(unixtime time_value);
-      long convert_z_to_offset(double z_value, const std::string z_dim_name);
+      long convert_time_to_offset(double time_value) const;
+      long convert_z_to_offset(double z_value, const std::string &z_dim_name);
       bool data_plane(VarInfo &, DataPlane &, const LongArray &dimension);
       void error_message(const bool is_dim_time, const int error_code,
                          const double _lower, const double _upper,
