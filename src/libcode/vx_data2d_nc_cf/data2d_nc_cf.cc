@@ -31,10 +31,9 @@ static const int error_code_no_dim              =   1;
 static const int error_code_no_matching_value   =   2;  // no matching value
 static const int error_code_no_matching_values  =   3;  // no matching values
 static const int error_code_no_matching_offsets =   4;  // no matching offsets
-static const int error_code_out_of_index        =   5;
-static const int error_code_empty               =   6;
-static const int error_code_bad_increment       =   7;
-static const int error_code_bad_offset          =   8;
+static const int error_code_empty               =   5;
+static const int error_code_bad_increment       =   6;
+static const int error_code_out_of_index        =   7;
 static const int error_code_unknown             = 999;
 
 static const int nc_cf_debug_level              =   7;
@@ -894,7 +893,7 @@ void MetNcCFDataFile::error_message(const bool is_dim_time, const int error_code
    else if (error_code == error_code_bad_increment) {
       log_msg << "was configured with bad increment";
    }
-   else if (error_code == error_code_bad_offset) {
+   else if (error_code == error_code_out_of_index) {
       log_msg << "was configured with the bad " << dim_name << " offset"
               << " (0 <= offset < " << dim_size << ")";
    }
