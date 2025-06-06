@@ -26,15 +26,14 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const int error_code_no_error            =   0;
-static const int error_code_no_dim              =   1;
-static const int error_code_no_matching_value   =   2;  // no matching value
-static const int error_code_no_matching_values  =   3;  // no matching values
-static const int error_code_no_matching_offsets =   4;  // no matching offsets
-static const int error_code_out_of_index        =   5;
-static const int error_code_empty               =   6;
-static const int error_code_bad_increment       =   7;
-static const int error_code_bad_offset          =   8;
+static const int error_code_no_error                = 0;
+static const int error_code_no_time_dim             = 1;
+static const int error_code_missing_time_value      = 2;
+static const int error_code_missing_time_values     = 3;
+static const int error_code_missing_time_offsets    = 4;
+static const int error_code_empty_times             = 5;
+static const int error_code_bad_increment           = 6;
+static const int error_code_out_of_index            = 7;
 static const int error_code_unknown             = 999;
 
 static const int nc_cf_debug_level              =   7;
