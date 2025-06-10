@@ -10,7 +10,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-#include <bits/stdc++.h>
+#include <regex>
 #include <iostream>
 #include <fstream>
 #include <sys/types.h>
