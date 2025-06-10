@@ -22,27 +22,27 @@ data = {
 //
 // Model
 //
-model = "";
-
-//
-// Basin
-//
-basin = "";
-
-//
-// Storm name
-//
-storm_name = "";
+model = [];
 
 //
 // Storm identifier
 //
-storm_id = "";
+storm_id = [];
+
+//
+// Basin
+//
+basin = [];
 
 //
 // Cyclone number
 //
-cyclone = "";
+cyclone = [];
+
+//
+// Storm name
+//
+storm_name = [];
 
 //
 // Initialization model time window
