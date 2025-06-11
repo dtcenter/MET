@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
 #include <dirent.h>
 #include <iostream>
 #include <unistd.h>
@@ -23,7 +22,6 @@
 #include "vx_log.h"
 
 using namespace std;
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -63,8 +61,18 @@ void RMWAnalysisConfInfo::clear() {
    Basin.clear();
    Cyclone.clear();
    StormName.clear();
+
    InitBeg = InitEnd = (unixtime) 0;
+   InitInc.clear();
+   InitExc.clear();
+   InitHour.clear();
+
+   Lead.clear();
+
    ValidBeg = ValidEnd = (unixtime) 0;
+   ValidInc.clear();
+   ValidExc.clear();
+   ValidHour.clear();
 
    InitMaskName.clear();
    InitPolyMask.clear();
@@ -75,6 +83,10 @@ void RMWAnalysisConfInfo::clear() {
    ValidPolyMask.clear();
    ValidGridMask.clear();
    ValidAreaMask.clear();
+
+   Category.clear();
+   ColumnThreshMap.clear();
+   InitThreshMap.clear();
 
    // Clear data_info
    if(data_info) {
@@ -113,11 +125,11 @@ void RMWAnalysisConfInfo::read_config(const char* default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void RMWAnalysisConfInfo::process_config() {
-
    VarInfoFactory info_factory;
    Dictionary *fdict = (Dictionary *) nullptr;
    ConcatString poly_file;
    GrdFileType ftype = FileType_NcCF;
+   StringArray sa;
 
    // Conf: Version
    Version = Conf.lookup_string(conf_key_version);
@@ -142,9 +154,53 @@ void RMWAnalysisConfInfo::process_config() {
    InitBeg = Conf.lookup_unixtime(conf_key_init_beg);
    InitEnd = Conf.lookup_unixtime(conf_key_init_end);
 
+   // Conf: InitInc
+   sa = Conf.lookup_string_array(conf_key_init_inc);
+   for(int i=0; i<sa.n(); i++) {
+      InitInc.add(timestring_to_unix(sa[i].c_str()));
+   }
+
+   // Conf: InitExc
+   sa = Conf.lookup_string_array(conf_key_init_exc);
+   for(int i=0; i<sa.n(); i++) {
+      InitExc.add(timestring_to_unix(sa[i].c_str()));
+   }
+
+   // Conf: InitHour
+   sa = Conf.lookup_string_array(conf_key_init_hour);
+   for(int i=0; i<sa.n(); i++) {
+      InitHour.add(timestring_to_sec(sa[i].c_str()));
+   }
+
+   // Conf: Lead
+   sa = Conf.lookup_string_array(conf_key_lead);
+   for(int i=0; i<sa.n(); i++) {
+      Lead.add(timestring_to_sec(sa[i].c_str()));
+   }
+
    // Conf: ValidBeg, ValidEnd
    ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
    ValidEnd = Conf.lookup_unixtime(conf_key_valid_end);
+
+   // Conf: ValidInc
+   sa = Conf.lookup_string_array(conf_key_valid_inc);
+   for(int i=0; i<sa.n(); i++) {
+      ValidInc.add(timestring_to_unix(sa[i].c_str()));
+   }
+
+   // Conf: ValidExc
+   sa = Conf.lookup_string_array(conf_key_valid_exc);
+   for(int i=0; i<sa.n(); i++) {
+      ValidExc.add(timestring_to_unix(sa[i].c_str()));
+   }
+
+   // Conf: ValidHour
+   sa = Conf.lookup_string_array(conf_key_valid_hour);
+   for(int i=0; i<sa.n(); i++) {
+      ValidHour.add(timestring_to_sec(sa[i].c_str()));
+   }
+
+// JHG, define a parse_conf_time_array and parse_conf_sec_array utility and call it from here and TC-Stat
 
    // Conf: InitMask
    if(nonempty(Conf.lookup_string(conf_key_init_mask).c_str())) {
@@ -164,12 +220,24 @@ void RMWAnalysisConfInfo::process_config() {
                      ValidAreaMask, ValidMaskName);
    }
 
+   // Conf: Category
+   Category = Conf.lookup_string_array(conf_key_category);
+
+   // Conf: ColumnThreshName, ColumnThreshVal
+   ColumnThreshMap = parse_conf_thresh_map(&Conf,
+                        conf_key_column_thresh_name,
+                        conf_key_column_thresh_val);
+
+   // Conf: InitThreshName, InitThreshVal
+   InitThreshMap = parse_conf_thresh_map(&Conf,
+                      conf_key_init_thresh_name,
+                      conf_key_init_thresh_val);
+
    // Conf: data.field
    fdict = Conf.lookup_array(conf_key_data_field);
 
    // Determine number of fields (name/level)
    n_data = parse_conf_n_vx(fdict);
-
 
    // Check for empty data settings
    if(n_data == 0) {
