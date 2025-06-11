@@ -766,10 +766,6 @@ void process_prob_files(const StringArray &files,
 
 bool is_keeper(const ATCFLineBase * line) {
    bool keep = true;
-   int m, d, y, h, mm, s;
-
-   // Decompose warning time
-   unix_to_mdyhms(line->warning_time(), m, d, y, h, mm, s);
 
    // Check model
    if(conf_info.Model.n() > 0 &&
@@ -805,7 +801,7 @@ bool is_keeper(const ATCFLineBase * line) {
 
    // Initialization hour
    else if(conf_info.InitHour.n() > 0 &&
-           !conf_info.InitHour.has(hms_to_sec(h, mm, s)))
+           !conf_info.InitHour.has(line->warning_hour()))
       keep = false;
 
    // Valid time include/exclude
