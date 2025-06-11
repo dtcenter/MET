@@ -17,6 +17,7 @@
 //   ----  ----      ----           -----------
 //   000   02-11-20  Fillmore       Initial definition
 //   001   04-18-25  Halley Gotway  MET #3132 OpenMP
+//   002   06-11-25  Halley Gotway  MET #3168 Handle bad data
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -272,7 +273,7 @@ void DataCube::divide_assign(int denom) {
 
 #pragma omp for schedule(static)
       for(int n = 0; n < Nxyz; n++) {
-         if(denom == 0 || is_bad_data(Data[n])) {
+         if(is_bad_data(Data[n]) || denom == 0) {
             Data[n] = bad_data_double;
          }
          else {
@@ -296,7 +297,13 @@ void DataCube::divide_assign(const DataCube& other) {
 
 #pragma omp for schedule(static)
       for(int n = 0; n < Nxyz; n++) {
-         Data[n] /= other.Data[n];
+         if(is_bad_data(Data[n]) || is_bad_data(other.Data[n]) ||
+            is_eq(other.Data[n], 0.0)) {
+            Data[n] = bad_data_double;
+         }
+         else {
+            Data[n] /= other.Data[n];
+         }
       }
    } // End omp parallel
 
@@ -380,7 +387,10 @@ void DataCube::square_root() {
 
 #pragma omp for schedule(static)
       for(int n = 0; n < Nxyz; n++) {
-         if(!is_bad_data(Data[n])) {
+         if(is_bad_data(Data[n]) || Data[n] < 0) {
+            Data[n] = bad_data_double;
+         }
+	 else {
             Data[n] = sqrt(Data[n]);
          }
       }
