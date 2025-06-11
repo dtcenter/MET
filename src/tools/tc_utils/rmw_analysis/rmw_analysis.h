@@ -118,11 +118,11 @@ static std::vector<std::string> data_long_names;
 static std::vector<std::string> data_units;
 
 // Variable data
-static std::vector<DataCube*> data_counts;
-static std::vector<DataCube*> data_means;
-static std::vector<DataCube*> data_stdevs;
-static std::vector<DataCube*> data_mins;
-static std::vector<DataCube*> data_maxs;
+static std::vector<DataCube> data_counts;
+static std::vector<DataCube> data_means;
+static std::vector<DataCube> data_stdevs;
+static std::vector<DataCube> data_mins;
+static std::vector<DataCube> data_maxs;
 
 // Track information
 static ConcatString adeck_source = "adeck.tmp";
