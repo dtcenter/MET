@@ -197,12 +197,17 @@ void DataCube::add_assign(const DataCube& other) {
    this->check_shape_equal(other);
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxyz, other)
+   shared(Data, Nxyz, other, bad_data_double)
    {
 
 #pragma omp for schedule(static)
       for(int n = 0; n < Nxyz; n++) {
-         Data[n] += other.Data[n];
+         if(is_bad_data(Data[n]) || is_bad_data(other.Data[n])) {
+            Data[n] = bad_data_double;
+         }
+         else {
+            Data[n] += other.Data[n];
+         }
       }
    } // End omp parallel
 
@@ -216,12 +221,17 @@ void DataCube::subtract_assign(const DataCube& other) {
    this->check_shape_equal(other);
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxyz, other)
+   shared(Data, Nxyz, other, bad_data_double)
    {
 
 #pragma omp for schedule(static)
       for(int n = 0; n < Nxyz; n++) {
-         Data[n] -= other.Data[n];
+         if(is_bad_data(Data[n]) || is_bad_data(other.Data[n])) {
+            Data[n] = bad_data_double;
+         }
+         else {
+            Data[n] -= other.Data[n];
+         } 
       }
    } // End omp parallel
 
@@ -235,12 +245,17 @@ void DataCube::multiply_assign(const DataCube& other) {
    this->check_shape_equal(other);
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxyz, other)
+   shared(Data, Nxyz, other, bad_data_double)
    {
 
 #pragma omp for schedule(static)
       for(int n = 0; n < Nxyz; n++) {
-         Data[n] *= other.Data[n];
+         if(is_bad_data(Data[n]) || is_bad_data(other.Data[n])) {
+            Data[n] = bad_data_double;
+         }
+         else {
+            Data[n] *= other.Data[n];
+         }
       }
    } // End omp parallel
 
@@ -252,12 +267,17 @@ void DataCube::multiply_assign(const DataCube& other) {
 void DataCube::divide_assign(int denom) {
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxyz, denom)
+   shared(Data, Nxyz, denom, bad_data_double)
    {
 
 #pragma omp for schedule(static)
       for(int n = 0; n < Nxyz; n++) {
-         Data[n] = Data[n] / denom;
+         if(denom == 0 || is_bad_data(Data[n])) {
+            Data[n] = bad_data_double;
+         }
+         else {
+            Data[n] /= denom;
+         }
       }
    } // End omp parallel
 
@@ -271,7 +291,7 @@ void DataCube::divide_assign(const DataCube& other) {
    this->check_shape_equal(other);
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxyz, other)
+   shared(Data, Nxyz, other, bad_data_double)
    {
 
 #pragma omp for schedule(static)
@@ -290,12 +310,17 @@ void DataCube::min_assign(const DataCube& other) {
    this->check_shape_equal(other);
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxyz, other)
+   shared(Data, Nxyz, other, bad_data_double)
    {
 
 #pragma omp for schedule(static)
       for(int n = 0; n < Nxyz; n++) {
-         Data[n] = min(Data[n], other.Data[n]);
+         if(is_bad_data(Data[n]) || is_bad_data(other.Data[n])) {
+            Data[n] = bad_data_double;
+         }
+         else {
+            Data[n] = min(Data[n], other.Data[n]);
+         }
       }
    } // End omp parallel
 
@@ -309,12 +334,17 @@ void DataCube::max_assign(const DataCube& other) {
    this->check_shape_equal(other);
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxyz, other)
+   shared(Data, Nxyz, other, bad_data_double)
    {
 
 #pragma omp for schedule(static)
       for(int n = 0; n < Nxyz; n++) {
-         Data[n] = max(Data[n], other.Data[n]);
+         if(is_bad_data(Data[n]) || is_bad_data(other.Data[n])) {
+            Data[n] = bad_data_double;
+         }
+         else {
+            Data[n] = max(Data[n], other.Data[n]);
+         }
       }
    } // End omp parallel
 
@@ -331,7 +361,9 @@ void DataCube::square() {
 
 #pragma omp for schedule(static)
       for(int n = 0; n < Nxyz; n++) {
-         Data[n] = Data[n] * Data[n];
+         if(!is_bad_data(Data[n])) {
+            Data[n] *= Data[n];
+         }
       }
    } // End omp parallel
 
@@ -348,7 +380,9 @@ void DataCube::square_root() {
 
 #pragma omp for schedule(static)
       for(int n = 0; n < Nxyz; n++) {
-         Data[n] = sqrt(Data[n]);
+         if(!is_bad_data(Data[n])) {
+            Data[n] = sqrt(Data[n]);
+         }
       }
    } // End omp parallel
 
