@@ -6,7 +6,6 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-
 #include <cstdio>
 #include <cstdlib>
 #include <ctype.h>
@@ -42,10 +41,9 @@ static void process_data_files();
 static void normalize_stats();
 static void write_stats();
 static void clean_up();
-static void parse_track_file(const ConcatString&, TrackInfoArray&);
-static bool is_keeper(const ATCFLineBase*);
-static void filter_tracks(TrackInfoArray&);
-static void read_nc_tracks(TrackInfoArray &);
+static bool is_keeper(const TrackInfo &, int);
+static TrackInfo read_nc_track();
+static TrackInfo parse_track_file(const ConcatString&);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -154,7 +152,7 @@ static void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 static void set_data_files(const StringArray& a) {
-   data_files = a;
+   data_files.add(a);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -192,11 +190,11 @@ static void setup() {
    get_dim(nc_in, "azimuth", n_azimuth, true);
    azimuth_dim = get_nc_dim(nc_in, "azimuth");
 
-   if (get_dim(nc_in, "height", n_level)) {
+   if(get_dim(nc_in, "height", n_level)) {
       mlog << Debug(3) << "Found height vertical dimension.\n";
       level_dim = get_nc_dim(nc_in, "height");
       level_name = "height";
-   } else if (get_dim(nc_in, "pressure", n_level)) {
+   } else if(get_dim(nc_in, "pressure", n_level)) {
       mlog << Debug(3) << "Found pressure vertical dimension.\n";
       level_dim = get_nc_dim(nc_in, "pressure");
       level_name = "pressure";
@@ -254,7 +252,8 @@ static void setup() {
    // Initialize statistical data cube lists
    for(int i_var = 0; i_var < data_names.size(); i_var++) {
 
-      if (data_n_dims[i_var] == 2) {
+      if(data_n_dims[i_var] == 2) {
+
          // Size data cubes
          DataCube* data_count_2d = new DataCube();
          DataCube* data_mean_2d = new DataCube();
@@ -280,7 +279,8 @@ static void setup() {
          data_mins.emplace_back(data_min_2d);
          data_maxs.emplace_back(data_max_2d);
       }
-      if (data_n_dims[i_var] == 3) {
+      if(data_n_dims[i_var] == 3) {
+
          // Size data cubes
          DataCube* data_count_3d = new DataCube();
          DataCube* data_mean_3d = new DataCube();
@@ -345,40 +345,56 @@ static void process_data_files() {
    count_3d.emplace_back(n_range);
    count_3d.emplace_back(n_azimuth);
 
-   for(int i_file = 0; i_file < data_files.n_elements(); i_file++) {
+   // Loop over the input files
+   for(int i_file = 0; i_file < data_files.n(); i_file++) {
 
       // Open current data file
       nc_in = open_ncfile(data_files[i_file].c_str());
       if(!nc_in) {
          mlog << Error << "\n" << method_name
               << "unable to open data file \""
-              << data_files[0] << "\"\n\n";
+              << data_files[i_file] << "\"\n\n";
          exit(1);
       }
 
+      // Get the track point dimension
       get_dim(nc_in, "track_point", n_track_point, true);
-      track_point_dim = get_nc_dim(nc_in, "track_point");
-
-      mlog << Debug(2) << "Found " << n_track_point << " track points in: "
-           << data_files[i_file] << "\n";
 
       // Read track information
-      TrackInfoArray tracks;
-      read_nc_tracks(tracks);
+      TrackInfo cur_track(read_nc_track());
 
-      // Filter tracks
-      filter_tracks(tracks);
-
-      // No work to do without a track
-      if (tracks.n() == 0) return;
-
-      // Store track point locations
-      for(int i_track = 0; i_track < tracks.n(); i_track++) {
-         for(int i_point = 0; i_point < tracks[i_track].n_points(); i_point++) {
-            track_lat.add(tracks[i_track][i_point].lat());
-            track_lon.add(tracks[i_track][i_point].lon());
-         }
+      // The number of track points should match
+      if(n_track_point != cur_track.n_points()) {
+         mlog << Error << "\n" << method_name
+              << "the track dimension (" << n_track_point
+              << ") does not match the number of track points ("
+              << cur_track.n_points() << ") in file \"" << data_files[i_file]
+              << "\"!\n\n";
+         exit(1);
       }
+
+      // Determine which track points to use
+      BoolArray keep_track_point;
+      int n_keep = 0;
+      for(int i_point = 0; i_point < cur_track.n_points(); i_point++) {
+
+         // Check filtering options
+         if(is_keeper(cur_track, i_point)) {
+            n_keep++;
+            keep_track_point.add(true);
+
+            // Store track point locations
+            track_lat.add(cur_track[i_point].lat());
+            track_lon.add(cur_track[i_point].lon());
+         }
+         else {
+            keep_track_point.add(false);
+         }
+      } // end for i_point
+
+      mlog << Debug(2) << "Processing data for " << n_keep << " of "
+           << n_track_point << " track points in: " << data_files[i_file]
+           << "\n";
 
       // Loop over variables to be processed 
       for(int i_var = 0; i_var < data_names.size(); i_var++) {
@@ -390,7 +406,10 @@ static void process_data_files() {
          // Loop over track points
          for(int i_point = 0; i_point < n_track_point; i_point++) {
 
-            if (data_n_dims[i_var] == 2) {
+            // Skip track points filered out
+            if(!keep_track_point[i_point]) continue;
+
+            if(data_n_dims[i_var] == 2) {
                mlog << Debug(4) << "Processing 2D " << data_names[i_var]
                     << " for track point " << i_point + 1 << ".\n";
                start_2d[0] = (size_t) i_point;
@@ -405,7 +424,7 @@ static void process_data_files() {
                data_mins[i_var]->min_assign(data_2d);
                data_maxs[i_var]->max_assign(data_2d);
             }
-            if (data_n_dims[i_var] == 3) {
+	    else if(data_n_dims[i_var] == 3) {
                mlog << Debug(4) << "Processing 3D " << data_names[i_var]
                     << " for track point " << i_point + 1 << ".\n";
                start_3d[0] = (size_t) i_point;
@@ -420,9 +439,9 @@ static void process_data_files() {
                data_mins[i_var]->min_assign(data_3d);
                data_maxs[i_var]->max_assign(data_3d);
             }
-         } // end loop over track points
-      } // end loop over variables
-   } // end loop over files
+         } // end for i_point
+      } // end for i_var
+   } // end for i_file
 
    return;
 }
@@ -442,7 +461,7 @@ static void normalize_stats() {
       data_mean_sq.square();
       data_stdevs[i_var]->subtract_assign(data_mean_sq);
       data_stdevs[i_var]->square_root();
-   }
+   } // end for i_var
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -485,9 +504,7 @@ static void write_stats() {
    count_range.emplace_back(n_range);
    count_azimuth.emplace_back(n_azimuth);
 
-   for (int r = 0; r < n_range; r++) {
-      range_coord[r] = r;
-   }
+   for(int r = 0; r < n_range; r++) range_coord[r] = r;
 
    range_var.putVar(offset, count_range, range_coord.data());
    add_att(&range_var, "units", "RMW");
@@ -516,13 +533,14 @@ static void write_stats() {
    count_3d.emplace_back(n_azimuth);
 
    for(int i_var = 0; i_var < data_names.size(); i_var++) {
-      if (data_n_dims[i_var] == 2) {
+      if(data_n_dims[i_var] == 2) {
          NcVar var_mean = nc_out->addVar(
             data_names[i_var] + "_mean",
             ncDouble, dims_2d);
          add_att(&var_mean, "long_name",
             data_long_names[i_var] + " Mean");
          add_att(&var_mean, "units", data_units[i_var]);
+         add_att(&var_mean, "_FillValue", bad_data_double);
          var_mean.putVar(offset_2d, count_2d,
             data_means[i_var]->data());
 
@@ -532,6 +550,7 @@ static void write_stats() {
          add_att(&var_stdev, "long_name",
             data_long_names[i_var] + " Standard Deviation");
          add_att(&var_stdev, "units", data_units[i_var]);
+         add_att(&var_stdev, "_FillValue", bad_data_double);
          var_stdev.putVar(offset_2d, count_2d,
             data_stdevs[i_var]->data());
 
@@ -541,6 +560,7 @@ static void write_stats() {
          add_att(&var_min, "long_name",
             data_long_names[i_var] + " Minimum");
          add_att(&var_min, "units", data_units[i_var]);
+         add_att(&var_min, "_FillValue", bad_data_double);
          var_min.putVar(offset_2d, count_2d,
             data_mins[i_var]->data());
 
@@ -550,17 +570,19 @@ static void write_stats() {
          add_att(&var_max, "long_name",
             data_long_names[i_var] + " Maximum");
          add_att(&var_max, "units", data_units[i_var]);
+         add_att(&var_max, "_FillValue", bad_data_double);
          var_max.putVar(offset_2d, count_2d,
             data_maxs[i_var]->data());
       }
 
-      if (data_n_dims[i_var] == 3) {
+      else if(data_n_dims[i_var] == 3) {
          NcVar var_mean = nc_out->addVar(
             data_names[i_var] + "_mean",
             ncDouble, dims_3d);
          add_att(&var_mean, "long_name",
             data_long_names[i_var] + " Mean");
          add_att(&var_mean, "units", data_units[i_var]);
+         add_att(&var_mean, "_FillValue", bad_data_double);
          var_mean.putVar(offset_3d, count_3d,
             data_means[i_var]->data());
 
@@ -570,6 +592,7 @@ static void write_stats() {
          add_att(&var_stdev, "long_name",
             data_long_names[i_var] + " Standard Deviation");
          add_att(&var_stdev, "units", data_units[i_var]);
+         add_att(&var_stdev, "_FillValue", bad_data_double);
          var_stdev.putVar(offset_3d, count_3d,
             data_stdevs[i_var]->data());
 
@@ -579,6 +602,7 @@ static void write_stats() {
          add_att(&var_min, "long_name",
             data_long_names[i_var] + " Minimum");
          add_att(&var_min, "units", data_units[i_var]);
+         add_att(&var_min, "_FillValue", bad_data_double);
          var_min.putVar(offset_3d, count_3d,
             data_mins[i_var]->data());
 
@@ -588,16 +612,24 @@ static void write_stats() {
          add_att(&var_max, "long_name",
             data_long_names[i_var] + " Maximum");
          add_att(&var_max, "units", data_units[i_var]);
+         add_att(&var_max, "_FillValue", bad_data_double);
          var_max.putVar(offset_3d, count_3d,
             data_maxs[i_var]->data());
       }
-   }
+   } // end for i_var
+
+   // Add the number of track points
+   NcVar npoints_var = nc_out->addVar("TrackPoint_count", ncInt);
+   add_att(&npoints_var, "long_name", "Number of Track Points");
+   int n_points = track_lat.n();
+   npoints_var.putVar(&n_points);
 
    // Add the average track point latitude
    NcVar lat_var = nc_out->addVar("TrackLat_mean", ncDouble);
    add_att(&lat_var, "long_name", "Track Point Latitude Mean");
    add_att(&lat_var, "units", "degrees_north");
    add_att(&lat_var, "standard_name", "latitude_track");
+   add_att(&lat_var, "_FillValue", bad_data_double);
    double lat_mean = track_lat.mean();
    lat_var.putVar(&lat_mean);
 
@@ -606,6 +638,7 @@ static void write_stats() {
    add_att(&lon_var, "long_name", "Track Point Longitude Mean");
    add_att(&lon_var, "units", "degrees_east");
    add_att(&lon_var, "standard_name", "longitude_track");
+   add_att(&lon_var, "_FillValue", bad_data_double);
    double lon_mean = track_lon.mean();
    lon_var.putVar(&lon_mean);
 
@@ -626,92 +659,83 @@ static void clean_up() {
 }
 
 ////////////////////////////////////////////////////////////////////////
-
-static void parse_track_file(const ConcatString& filename,
-                             TrackInfoArray& tracks) {
-   const char *method_name = "process_track_file() -> ";
-
-   // Initialize
-   tracks.clear();
-
-   // Open the file
-   LineDataFile f;
-   if(!f.open(filename.c_str())) {
-      mlog << Error << "\n" << method_name
-          << "unable to open track file \""
-          << filename << "\"\n\n";
-      exit(1);
-   }
-
-   // Initialize counts
-   int cur_read = 0;
-   int cur_add = 0;
-
-   // Read each line in the file
-   ATCFTrackLine line;
-   while(f >> line) {
-
-      // Increment the line counts
-      cur_read++;
-
-      if(!is_keeper(&line)) continue;
-
-      // Attempt to add the current line to the TrackInfoArray
-      if(tracks.add(line, false, false)) {
-         cur_add++;
-      }
-   } // End while loop over lines
-
-   // Close the file
-   f.close();
-
-   // Dump out the track information
-   mlog << Debug(3)
-       << "Read " << tracks.n() << " track(s).\n";
-
-   remove(adeck_source.c_str());
-
-   return;
-}
-
+//
+// Check if the ATCFLineBase should be kept. Only check those columns
+// that remain constant across the entire track:
+//    model, storm id, basin, cyclone, and timing information
+//
 ////////////////////////////////////////////////////////////////////////
 
-static bool is_keeper(const ATCFLineBase* line) {
+static bool is_keeper(const TrackInfo &t, int i_point) {
    bool keep = true;
 
    // Check model
-   if(conf_info.Model.n_elements() > 1 &&
-      !conf_info.Model.has(line->technique()))
+   if(conf_info.Model.n() > 0 &&
+      !conf_info.Model.has(t.technique()))
       keep = false;
 
    // Check storm id
-   else if(conf_info.StormId.n_elements() > 1 &&
-           !has_storm_id(conf_info.StormId, line->basin(),
-                         line->cyclone_number(), line->warning_time()))
+   else if(conf_info.StormId.n() > 0 &&
+           !conf_info.StormId.has(t.storm_id()))
       keep = false;
 
    // Check basin
-   else if(conf_info.Basin.n_elements() > 1 &&
-           !conf_info.Basin.has(line->basin()))
+   else if(conf_info.Basin.n() > 0 &&
+           !conf_info.Basin.has(t.basin()))
       keep = false;
 
    // Check cyclone
-   else if(conf_info.Cyclone.n_elements() > 1 &&
-           !conf_info.Cyclone.has(line->cyclone_number()))
+   else if(conf_info.Cyclone.n() > 0 &&
+           !conf_info.Cyclone.has(t.cyclone()))
       keep = false;
 
    // Initialization time window
-   else if((conf_info.InitBeg > 1 &&
-            conf_info.InitBeg > line->warning_time()) ||
-           (conf_info.InitEnd > 1 &&
-            conf_info.InitEnd < line->warning_time()))
+   else if((conf_info.InitBeg > 0 &&
+            conf_info.InitBeg > t.init()) ||
+           (conf_info.InitEnd > 0 &&
+            conf_info.InitEnd < t.init()))
+// JHG, add this support
+//           (conf_info.InitInc.n() > 0 &&
+//            !conf_info.InitInc.has(t.init())) ||
+//           (conf_info.InitExc.n() > 0 &&
+//            conf_info.InitExc.has(t.init())))
       keep = false;
 
+   // Initialization hour
+//   else if((conf_info.InitHour.n() > 0 &&
+//            !conf_info.InitHour.has(t.init_hour())))
+//      keep = false;
+
+   // Valid time window
+   else if((conf_info.ValidBeg > 0 &&
+            conf_info.ValidBeg > t[i_point].valid()) ||
+           (conf_info.ValidEnd > 0 &&
+            conf_info.ValidEnd < t[i_point].valid()))
+// JHG, add this support
+//           (conf_info.ValidInc.n() > 0 &&
+//            !conf_info.ValidInc.has(t[i_point].valid())) ||
+//           (conf_info.ValidExc.n() > 0 &&
+//            conf_info.ValidExc.has(t[i_point].valid()))))
+      keep = false;
+
+   // Valid hour
+//   else if((conf_info.ValidHour.n() > 0 &&
+//            !conf_info.ValidHour.has(t[i_point].valid_hour())))
+//      keep = false;
+
+   // Return the keep status
    return keep;
 }
 
 ////////////////////////////////////////////////////////////////////////
-
+//
+// Check if the parsed track should be kept. Filter by items that can
+// vary from line to line:
+//    storm_name, valid time window, required lead times, initialization
+//    and valid masking regions
+//
+////////////////////////////////////////////////////////////////////////
+/* JHG
 static void filter_tracks(TrackInfoArray& tracks) {
 
    TrackInfoArray t = tracks;
@@ -721,6 +745,7 @@ static void filter_tracks(TrackInfoArray& tracks) {
 
    // Loop over tracks
    for(int i = 0; i < t.n(); i++) {
+
       // Valid time window
       if((conf_info.ValidBeg > 0 &&
           conf_info.ValidBeg > t[i].valid_min()) ||
@@ -739,10 +764,10 @@ static void filter_tracks(TrackInfoArray& tracks) {
       tracks.add(t[i]);
    }
 }
-
+*/
 ////////////////////////////////////////////////////////////////////////
 
-static void read_nc_tracks(TrackInfoArray &tracks) {
+static TrackInfo read_nc_track() {
 
    mlog << Debug(3) << "Temporary track file: "
         << adeck_source << "\n";
@@ -777,7 +802,43 @@ static void read_nc_tracks(TrackInfoArray &tracks) {
    }
    f.close();
 
-   parse_track_file(adeck_source, tracks);
+   return parse_track_file(adeck_source);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static TrackInfo parse_track_file(const ConcatString& filename) {
+   const char *method_name = "process_track_file() -> ";
+
+   // Open the file
+   LineDataFile f;
+   if(!f.open(filename.c_str())) {
+      mlog << Error << "\n" << method_name
+          << "unable to open track file \""
+          << filename << "\"\n\n";
+      exit(1);
+   }
+
+   // Parse the track lines
+   ATCFTrackLine line;
+   TrackInfoArray tracks;
+   while(f >> line) tracks.add(line, false, false);
+
+   // Close the file
+   f.close();
+
+   // Remove the temporary file
+   remove(filename.c_str());
+
+   // Should be exactly one track
+   if(tracks.n() != 1) {
+       mlog << Error << "\n" << method_name
+            << "expected exactly one track but found "
+            << tracks.n() << "!\n\n";
+       exit(1);
+   }
+
+   return(tracks[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
