@@ -114,6 +114,7 @@ class ATCFLineBase : public DataLine {
       ConcatString  basin           () const;
       ConcatString  cyclone_number  () const;
       unixtime      warning_time    () const;
+      int           warning_hour    () const;
       int           technique_number() const; // or minutes for best track
       ConcatString  technique       () const;
 
