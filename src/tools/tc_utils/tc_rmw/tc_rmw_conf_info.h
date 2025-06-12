@@ -44,8 +44,8 @@ class TCRMWConfInfo {
         unixtime     InitInc;
         unixtime     ValidBeg, ValidEnd;
         TimeArray    ValidInc, ValidExc;
-        NumArray     ValidHour;
-        NumArray     LeadTime;
+        IntArray     ValidHour;
+        IntArray     LeadTime;
 
         // Range/Azimuth information
         int    n_range;
