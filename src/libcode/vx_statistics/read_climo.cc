@@ -170,7 +170,10 @@ DataPlaneArray read_climo_data_plane_array(Dictionary *dict,
                   nint(hour_interval * sec_per_hour));
 
    // Check if file_type was specified
-   GrdFileType ctype = parse_conf_file_type(&i_dict);
+   // MET #3179 Only parse from the current dictionary rather than
+   //           searching the fcst or obs parent which can cause
+   //           unexpected behavior. 
+   GrdFileType ctype = parse_conf_file_type(&i_dict, false);
 
    // Search the files for the requested records
    for(int i=0; i<climo_files.n(); i++) {

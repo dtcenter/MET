@@ -35,7 +35,8 @@ extern ConcatString    parse_conf_string(
                           Dictionary *dict,
                           const char *,
                           bool check_empty=true);
-extern GrdFileType     parse_conf_file_type(Dictionary *dict);
+extern GrdFileType     parse_conf_file_type(Dictionary *dict,
+                          bool search_parent=default_dictionary_search_parent);
 extern std::map<STATLineType,STATOutputType>
                        parse_conf_output_flag(
                           Dictionary *dict,
