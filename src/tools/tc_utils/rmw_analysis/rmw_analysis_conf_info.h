@@ -49,7 +49,7 @@ class RMWAnalysisConfInfo {
        TimeArray InitInc;
        TimeArray InitExc;
        IntArray  InitHour;
-       IntArray  Lead;
+       IntArray  LeadTime;
        unixtime  ValidBeg;
        unixtime  ValidEnd;
        TimeArray ValidInc;
@@ -90,14 +90,6 @@ class RMWAnalysisConfInfo {
 
        int get_n_data() const;
 };
-
-// JHG:
-// Not included here is filtering by:
-// - watch/warning status
-// - distance to land
-// - points relative to landfall
-// - rirw status
-// These are potential enhancements.
 
 ////////////////////////////////////////////////////////////////////////
 

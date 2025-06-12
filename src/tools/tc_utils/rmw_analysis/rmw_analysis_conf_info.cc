@@ -67,7 +67,7 @@ void RMWAnalysisConfInfo::clear() {
    InitExc.clear();
    InitHour.clear();
 
-   Lead.clear();
+   LeadTime.clear();
 
    ValidBeg = ValidEnd = (unixtime) 0;
    ValidInc.clear();
@@ -162,7 +162,7 @@ void RMWAnalysisConfInfo::process_config() {
    InitHour = Conf.lookup_seconds_array(conf_key_init_hour);
 
    // Conf: Lead
-   Lead = Conf.lookup_seconds_array(conf_key_lead);
+   LeadTime = Conf.lookup_seconds_array(conf_key_lead);
 
    // Conf: ValidBeg, ValidEnd
    ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
