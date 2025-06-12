@@ -48,13 +48,13 @@ class RMWAnalysisConfInfo {
        unixtime  InitEnd;
        TimeArray InitInc;
        TimeArray InitExc;
-       NumArray  InitHour;
-       NumArray  Lead;
+       IntArray  InitHour;
+       IntArray  Lead;
        unixtime  ValidBeg;
        unixtime  ValidEnd;
        TimeArray ValidInc;
        TimeArray ValidExc;
-       NumArray  ValidHour;
+       IntArray  ValidHour;
 
        // Polyline masking regions
        ConcatString InitMaskName;

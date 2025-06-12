@@ -127,9 +127,7 @@ void RMWAnalysisConfInfo::read_config(const char* default_file_name,
 void RMWAnalysisConfInfo::process_config() {
    VarInfoFactory info_factory;
    Dictionary *fdict = (Dictionary *) nullptr;
-   ConcatString poly_file;
    GrdFileType ftype = FileType_NcCF;
-   StringArray sa;
 
    // Conf: Version
    Version = Conf.lookup_string(conf_key_version);
@@ -155,69 +153,46 @@ void RMWAnalysisConfInfo::process_config() {
    InitEnd = Conf.lookup_unixtime(conf_key_init_end);
 
    // Conf: InitInc
-   sa = Conf.lookup_string_array(conf_key_init_inc);
-   for(int i=0; i<sa.n(); i++) {
-      InitInc.add(timestring_to_unix(sa[i].c_str()));
-   }
+   InitInc = Conf.lookup_unixtime_array(conf_key_init_inc);
 
    // Conf: InitExc
-   sa = Conf.lookup_string_array(conf_key_init_exc);
-   for(int i=0; i<sa.n(); i++) {
-      InitExc.add(timestring_to_unix(sa[i].c_str()));
-   }
+   InitExc = Conf.lookup_unixtime_array(conf_key_init_exc);
 
    // Conf: InitHour
-   sa = Conf.lookup_string_array(conf_key_init_hour);
-   for(int i=0; i<sa.n(); i++) {
-      InitHour.add(timestring_to_sec(sa[i].c_str()));
-   }
+   InitHour = Conf.lookup_seconds_array(conf_key_init_hour);
 
    // Conf: Lead
-   sa = Conf.lookup_string_array(conf_key_lead);
-   for(int i=0; i<sa.n(); i++) {
-      Lead.add(timestring_to_sec(sa[i].c_str()));
-   }
+   Lead = Conf.lookup_seconds_array(conf_key_lead);
 
    // Conf: ValidBeg, ValidEnd
    ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
    ValidEnd = Conf.lookup_unixtime(conf_key_valid_end);
 
    // Conf: ValidInc
-   sa = Conf.lookup_string_array(conf_key_valid_inc);
-   for(int i=0; i<sa.n(); i++) {
-      ValidInc.add(timestring_to_unix(sa[i].c_str()));
-   }
+   ValidInc = Conf.lookup_unixtime_array(conf_key_valid_inc);
 
    // Conf: ValidExc
-   sa = Conf.lookup_string_array(conf_key_valid_exc);
-   for(int i=0; i<sa.n(); i++) {
-      ValidExc.add(timestring_to_unix(sa[i].c_str()));
-   }
+   ValidExc = Conf.lookup_unixtime_array(conf_key_valid_exc);
 
    // Conf: ValidHour
-   sa = Conf.lookup_string_array(conf_key_valid_hour);
-   for(int i=0; i<sa.n(); i++) {
-      ValidHour.add(timestring_to_sec(sa[i].c_str()));
-   }
-
-// JHG, define a parse_conf_time_array and parse_conf_sec_array utility and call it from here and TC-Stat
+   ValidHour = Conf.lookup_seconds_array(conf_key_valid_hour);
 
    // Conf: InitMask
    if(nonempty(Conf.lookup_string(conf_key_init_mask).c_str())) {
-      poly_file = replace_path(Conf.lookup_string(conf_key_init_mask));
+      ConcatString poly_file(replace_path(Conf.lookup_string(conf_key_init_mask)));
       mlog << Debug(2)
-          << "Init Points Masking File: " << poly_file << "\n";
+           << "Init Points Masking File: " << poly_file << "\n";
       parse_poly_mask(poly_file, InitPolyMask, InitGridMask,
-                     InitAreaMask, InitMaskName);
+                      InitAreaMask, InitMaskName);
    }
 
    // Conf: ValidMask
    if(nonempty(Conf.lookup_string(conf_key_valid_mask).c_str())) {
-      poly_file = replace_path(Conf.lookup_string(conf_key_valid_mask));
+      ConcatString poly_file(replace_path(Conf.lookup_string(conf_key_valid_mask)));
       mlog << Debug(2)
-          << "Valid Point Masking File: " << poly_file << "\n";
+           << "Valid Point Masking File: " << poly_file << "\n";
       parse_poly_mask(poly_file, ValidPolyMask, ValidGridMask,
-                     ValidAreaMask, ValidMaskName);
+                      ValidAreaMask, ValidMaskName);
    }
 
    // Conf: Category
@@ -242,7 +217,7 @@ void RMWAnalysisConfInfo::process_config() {
    // Check for empty data settings
    if(n_data == 0) {
       mlog << Error << "\nRMWAnalysisConfInfo::process_config() -> "
-          << "data may not be empty.\n\n";
+           << "data may not be empty.\n\n";
       exit(1);
    }
 
