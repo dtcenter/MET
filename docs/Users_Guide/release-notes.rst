@@ -9,7 +9,7 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
-MET Version 12.1.0-rc1 Release Notes (20250521)
+MET Version 12.1.0-rc1 Release Notes (20250522)
 -----------------------------------------------
 
   .. dropdown:: Bugfixes
@@ -18,6 +18,8 @@ MET Version 12.1.0-rc1 Release Notes (20250521)
        (`#3112 <https://github.com/dtcenter/MET/issues/3112>`_).
      * Bugfix: Refine the MET GRIB2 library logic to find a single GRIB2 table match rather multiple ones
        (`#3107 <https://github.com/dtcenter/MET/issues/3107>`_).
+     * Bugfix: Fix MET-12.1.0-rc1 Intel compilation warnings and errors
+       (`#3165 <https://github.com/dtcenter/MET/issues/3165>`_).
 
   .. dropdown:: Enhancements
 

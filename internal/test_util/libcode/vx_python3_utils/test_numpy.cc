@@ -11,8 +11,6 @@ static const char variable_name  [] = "data";
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -23,6 +21,8 @@ using namespace std;
 #include "python3_util.h"
 #include "python3_script.h"
 #include "python3_numpy.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

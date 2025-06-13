@@ -33,8 +33,6 @@ static const double correct_dec =     -(  7.0 + 47.0/60.0 +  1.740/3600.0 );   /
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -42,6 +40,8 @@ using namespace std;
 #include <cmath>
 
 #include "solar.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -10,9 +10,12 @@ include ${top_srcdir}/Make-include
 
 # Test programs
 
-noinst_PROGRAMS = test_grid_area \
-	search_3d_kdtree \
+noinst_PROGRAMS = test_grid_area
+
+if ENABLE_UGRID
+noinst_PROGRAMS += search_3d_kdtree \
 	search_3d_kdtree_api
+endif
 
 test_grid_area_SOURCES = test_grid_area.cc
 test_grid_area_CPPFLAGS = ${MET_CPPFLAGS}

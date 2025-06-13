@@ -30,8 +30,6 @@ static const double angle_target = 20.0;   //  degrees
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -42,6 +40,8 @@ using namespace std;
 #include "interest_calc.h"
 #include "3d_att_single_array.h"
 #include "mtd_txt_output.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////
