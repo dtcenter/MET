@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+import datetime as dt
 import os
 import shutil
 import sys
@@ -41,13 +42,19 @@ def comp_dir(truth_dir, output_dir, debug=True, save_diff=True):
 
     """
 
+    start_time = dt.datetime.now()
     print('******************************')
     print("Comparing output to truth data")
     diff_files = compare_dir(truth_dir, output_dir,
                              debug=debug,
                              save_diff=save_diff)
     
+    end_time = dt.datetime.now()
+    runtime = end_time - start_time
+    print(f"\ntime elapsed: {runtime}")
+    
     return diff_files
+    
 
 def copy_diff_files(diff_files, truth_dir, output_dir, diff_dir=''):
     """

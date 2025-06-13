@@ -9,7 +9,7 @@ export VERSION_EXT=.v6.1     #Note: this comes from METplus/.github/jobs/docker_
 DOCKERHUB_TAG=dtcenter/metplus-envs:diff${VERSION_EXT}
 
 # METplus branch to use for diff testing script
-METPLUS_BRANCH=develop
+METPLUS_BRANCH=feature_2999_improve_diffs_for_met_tests   #revert to develop
 
 # Get truth output data
 ${GITHUB_WORKSPACE}/.github/jobs/get_test_truth_data.sh ${TRUTH_DATA_VERSION}
