@@ -1003,7 +1003,7 @@ long MetNcCFDataFile::find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var) {
             }
          }
          if (z_offset >= 0) {
-            mlog << Debug(1) << method_name << "the lowerest level ["
+            mlog << Debug(1) << method_name << "the lowest level ["
                  << z_offset << "] was selected between " << z_lower
                  << " and " << z_upper << "\n";
          }
