@@ -345,7 +345,7 @@ StringArray parse_conf_string_array(Dictionary *dict, const char *conf_key, cons
 
 ///////////////////////////////////////////////////////////////////////////////
 
-GrdFileType parse_conf_file_type(Dictionary *dict) {
+GrdFileType parse_conf_file_type(Dictionary *dict, bool search_parent) {
    GrdFileType t = FileType_None;
    int v;
 
@@ -356,7 +356,7 @@ GrdFileType parse_conf_file_type(Dictionary *dict) {
    }
 
    // Get the integer flag value for the current entry
-   v = dict->lookup_int(conf_key_file_type, false);
+   v = dict->lookup_int(conf_key_file_type, false, false, search_parent);
 
    if(dict->last_lookup_status()) {
       // Convert integer to enumerated GrdFileType
