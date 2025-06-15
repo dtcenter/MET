@@ -84,7 +84,7 @@ def copy_diff_files(diff_files, truth_dir, output_dir, diff_dir=''):
         diff_dir = os.path.join(output_dir, 'diff')
 
     for n, (truth_file, out_file, _, diff_file) in enumerate(diff_files):
-        print(f"\n[{n}]", end="")
+        print(f"\n[{n+1}]", end="")
         if truth_file:
             copy_to_diff_dir(
                 file_path=truth_file, 
