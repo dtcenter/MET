@@ -939,8 +939,8 @@ long MetNcCFDataFile::find_time_offset(VarInfo &vinfo, const NcVarInfo *data_var
             else {
                mlog << Debug(1) << method_name << "the time ["
                     << time_offset << "] was selected between "
-                    << unix_to_yyyymmdd_hhmmss(t_lower)
-                    << " and " << unix_to_yyyymmdd_hhmmss(t_upper) << "\n";
+                    << unix_to_yyyymmdd_hhmmss((unixtime)t_lower)
+                    << " and " << unix_to_yyyymmdd_hhmmss((unixtime)t_upper) << "\n";
             }
          }
       }
@@ -993,7 +993,7 @@ long MetNcCFDataFile::find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var) {
          double z_lower = level.lower();
          double z_upper = level.upper();
          if (vinfo_nc->is_offset(z_slot)) {
-            z_offset = z_lower;
+            z_offset = (long)z_lower;
          }
          else {
             z_offset = convert_z_to_offset(z_lower, get_z_dim_name(data_var));
