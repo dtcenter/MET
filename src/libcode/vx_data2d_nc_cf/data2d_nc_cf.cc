@@ -920,10 +920,10 @@ long MetNcCFDataFile::find_time_offset(VarInfo &vinfo, const NcVarInfo *data_var
          double t_lower = level.lower();
          double t_upper = level.upper();
          if (vinfo_nc->is_offset(t_slot)) {
-            time_offset = t_lower;
+            time_offset = (long)t_lower;
          }
          else {
-            time_value = t_lower;
+            time_value = (long)t_lower;
             time_offset = convert_time_to_offset(t_lower);
             if (time_offset < 0) {
                LongArray time_offsets = collect_time_offsets(vinfo);
