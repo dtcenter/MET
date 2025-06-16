@@ -45,22 +45,50 @@ cyclone = [];
 storm_name = [];
 
 //
-// Initialization model time window
+// Initialization time 
 //
 init_beg = "";
 init_end = "";
+init_inc = [];
+init_exc = [];
 
 //
-// Valid model time window
+// Valid time
 //
 valid_beg = "";
 valid_end = "";
+valid_inc = [];
+valid_exc = [];
+
+//
+// Initialization, valid, and lead hours
+//
+init_hour  = [];
+valid_hour = [];
+lead       = [];
 
 //
 // lat/lon polylines defining masking regions
 //
 init_mask  = "";
 valid_mask = "";
+
+//
+// Cyclone level category
+//
+category = [];
+
+//
+// Stratify track points by thresholding ATCF columns
+//
+column_thresh_name = [];
+column_thresh_val  = [];
+
+//
+// Stratify track by thresholding ATCF columns for the initial time
+//
+init_thresh_name = [];
+init_thresh_val  = [];
 
 ////////////////////////////////////////////////////////////////////////////////
 
