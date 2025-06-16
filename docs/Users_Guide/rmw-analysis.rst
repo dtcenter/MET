@@ -106,7 +106,7 @@ ____________________
 
 The NetCDF output from TC-RMW contains ATCF-formatted storm track information in the :code:`TrackLines` variable. The RMW-Analysis tool parses that track information and applies the filtering criteria listed above. Filtering is only applied for configuration entries that are non-empty lists or strings. The corresponding gridded data is only used for track points that meet all specified filtering criteria.
 
-The :code:`column_thresh_name` and :code:`init_thresh_name` arrays specify the names of ATCF columns whose values should be checked. The former applies to each individual track point while the latter applies to the initial track point (i.e. lead time equals 0). Only values from select ATCF columns (LAT, LON, VMAX, MSLP, POUTER, ROUTER, RMW, GUSTS, EYE, DIR, and SPEED) can be thresholded numerically with these options to filter the input data processed. 
+The :code:`column_thresh_name` and :code:`init_thresh_name` arrays specify the names of ATCF columns whose values should be checked. The former applies to each individual track point while the latter applies to the initial track point (i.e. lead time equals 0). If the filtering criteria is not satisfied for the initial time, the entire track is discarded. Only values from select ATCF columns (LAT, LON, VMAX, MSLP, POUTER, ROUTER, RMW, GUSTS, EYE, DIR, and SPEED) can be thresholded numerically with these options to filter the input data processed. 
 
 These configuration options are described in :numref:`config_options_tc`.
 
