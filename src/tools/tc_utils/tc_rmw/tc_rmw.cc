@@ -290,7 +290,7 @@ void process_tracks(TrackInfoArray& tracks) {
 
 ////////////////////////////////////////////////////////////////////////
 // Automated Tropical Cyclone Forecasting System
-// https://www.nrlmry.navy.mil/atcf_web/docs/ATCF-FAQ.html
+// https://science.nrlmry.navy.mil/atcf/docs/ATCF-FAQ.html
 
 void get_atcf_files(const StringArray& source,
                     const StringArray& model_suffix,

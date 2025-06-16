@@ -54,7 +54,7 @@ init_end = "";
 // Valid model time window
 //
 valid_beg = "";
-valid_end = "";
+valid_end = "20161001_00";
 
 //
 // lat/lon polylines defining masking regions

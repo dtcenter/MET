@@ -14,10 +14,10 @@
 ////////////////////////////////////////////////////////////////////////
 //
 // Best Track file format information:
-//    http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
+//   https://science.nrlmry.navy.mil/atcf/docs/database/new/abrdeck.html
 //
 // EDeck file format information:
-//    https://www.nrlmry.navy.mil/atcf_web/docs/database/new/edeck.txt
+//   https://science.nrlmry.navy.mil/atcf/docs/database/new/edeck.html
 //
 ////////////////////////////////////////////////////////////////////////
 
