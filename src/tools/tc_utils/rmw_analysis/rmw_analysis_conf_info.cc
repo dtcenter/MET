@@ -18,6 +18,7 @@
 
 #include "rmw_analysis_conf_info.h"
 
+#include "track_point.h"
 #include "apply_mask.h"
 #include "vx_log.h"
 
@@ -203,10 +204,34 @@ void RMWAnalysisConfInfo::process_config() {
                         conf_key_column_thresh_name,
                         conf_key_column_thresh_val);
 
+   // Validate column names
+   for(const auto &m : ColumnThreshMap) {
+      string upper_name(to_upper(m.first));
+      if(find(atcf_column_vals.begin(), atcf_column_vals.end(),
+              upper_name) == atcf_column_vals.end()) {
+         mlog << Error << "\nRMWAnalysisConfInfo::process_config() -> "
+              << "unsupported ATCF column name (" << m.first << ") requested in \""
+              << conf_key_column_thresh_name << "\".\n\n";
+         exit(1);
+      }
+   }
+
    // Conf: InitThreshName, InitThreshVal
    InitThreshMap = parse_conf_thresh_map(&Conf,
                       conf_key_init_thresh_name,
                       conf_key_init_thresh_val);
+
+   // Validate column names
+   for(const auto &m : InitThreshMap) {
+      string upper_name(to_upper(m.first));
+      if(find(atcf_column_vals.begin(), atcf_column_vals.end(),
+              upper_name) == atcf_column_vals.end()) {
+         mlog << Error << "\nRMWAnalysisConfInfo::process_config() -> "
+              << "unsupported ATCF column name (" << m.first << ") requested in \""
+              << conf_key_init_thresh_name << "\".\n\n";
+         exit(1);
+      }
+   }
 
    // Conf: data.field
    fdict = Conf.lookup_array(conf_key_data_field);

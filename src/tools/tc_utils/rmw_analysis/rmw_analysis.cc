@@ -21,6 +21,7 @@
 #include "main.h"
 #include "rmw_analysis.h"
 
+#include "vx_statistics.h"
 #include "vx_nc_util.h"
 #include "vx_tc_util.h"
 #include "vx_util.h"
@@ -40,7 +41,8 @@ static void setup();
 static void process_data_files();
 static void normalize_stats();
 static void write_stats();
-static bool is_keeper(const TrackInfo &, int);
+static bool is_keeper_track(const TrackInfo &);
+static bool is_keeper_point(const TrackPoint &);
 static TrackInfo read_nc_track();
 static TrackInfo parse_track_file(const ConcatString&);
 
@@ -358,24 +360,28 @@ static void process_data_files() {
          exit(1);
       }
 
-      // Determine which track points to use
-      BoolArray keep_track_point;
+      // Determine which track points to use 
+      vector<bool> keep_track_point(n_track_point, false);
       int n_keep = 0;
-      for(int i_point = 0; i_point < cur_track.n_points(); i_point++) {
 
-         // Check filtering options
-         if(is_keeper(cur_track, i_point)) {
-            n_keep++;
-            keep_track_point.add(true);
+      // Check the entire track
+      if(is_keeper_track(cur_track)) {
 
-            // Store track point locations
-            track_lat.add(cur_track[i_point].lat());
-            track_lon.add(cur_track[i_point].lon());
-         }
-         else {
-            keep_track_point.add(false);
-         }
-      } // end for i_point
+         // Check each track point
+         for(int i_point = 0; i_point < n_track_point; i_point++) {
+
+            if(is_keeper_point(cur_track[i_point])) {
+
+               // Update the keep status
+               keep_track_point[i_point] = true;
+               n_keep++;
+
+               // Store track point locations
+               track_lat.add(cur_track[i_point].lat());
+               track_lon.add(cur_track[i_point].lon());
+            }
+         } // end for i_point
+      }
 
       mlog << Debug(2) << "Processing data for " << n_keep << " of "
            << n_track_point << " track points in: " << data_files[i_file]
@@ -646,68 +652,90 @@ static void write_stats() {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Check if the ATCFLineBase should be kept. Only check those columns
-// that remain constant across the entire track:
-//    model, storm id, basin, cyclone, and timing information
+// Check if the track should be kept by checking items that remain
+// constant across all track points:
+//    model, storm id, basin, cyclone, storm name, and init time
 //
 ////////////////////////////////////////////////////////////////////////
 
-static bool is_keeper(const TrackInfo &t, int i_point) {
+static bool is_keeper_track(const TrackInfo &t) {
    bool keep = true;
 
-   // Check model
+   // Conf: Model
    if(conf_info.Model.n() > 0 &&
       !conf_info.Model.has(t.technique()))
       keep = false;
 
-   // Check storm id
+   // Conf: Storm ID
    else if(conf_info.StormId.n() > 0 &&
            !conf_info.StormId.has(t.storm_id()))
       keep = false;
 
-   // Check basin
+   // Conf: Basin
    else if(conf_info.Basin.n() > 0 &&
            !conf_info.Basin.has(t.basin()))
       keep = false;
 
-   // Check cyclone
+   // Conf: Cyclone
    else if(conf_info.Cyclone.n() > 0 &&
            !conf_info.Cyclone.has(t.cyclone()))
       keep = false;
 
-   // Initialization time window
+   // Conf: Storm Name
+   else if(conf_info.StormName.n() > 0 &&
+           !conf_info.StormName.has(t.storm_name()))
+      keep = false;
+
+   // Conf: Initialization time
    else if((conf_info.InitBeg > 0 &&
             conf_info.InitBeg > t.init()) ||
            (conf_info.InitEnd > 0 &&
-            conf_info.InitEnd < t.init()))
-// JHG, add this support
-//           (conf_info.InitInc.n() > 0 &&
-//            !conf_info.InitInc.has(t.init())) ||
-//           (conf_info.InitExc.n() > 0 &&
-//            conf_info.InitExc.has(t.init())))
+            conf_info.InitEnd < t.init()) ||
+           (conf_info.InitInc.n() > 0 &&
+            !conf_info.InitInc.has(t.init())) ||
+           (conf_info.InitExc.n() > 0 &&
+            conf_info.InitExc.has(t.init())))
       keep = false;
 
-   // Initialization hour
-//   else if((conf_info.InitHour.n() > 0 &&
-//            !conf_info.InitHour.has(t.init_hour())))
-//      keep = false;
-
-   // Valid time window
-   else if((conf_info.ValidBeg > 0 &&
-            conf_info.ValidBeg > t[i_point].valid()) ||
-           (conf_info.ValidEnd > 0 &&
-            conf_info.ValidEnd < t[i_point].valid()))
-// JHG, add this support
-//           (conf_info.ValidInc.n() > 0 &&
-//            !conf_info.ValidInc.has(t[i_point].valid())) ||
-//           (conf_info.ValidExc.n() > 0 &&
-//            conf_info.ValidExc.has(t[i_point].valid()))))
+   // Conf: Initialization hour
+   else if(conf_info.InitHour.n() > 0 &&
+           !conf_info.InitHour.has(t.init_hour()))
       keep = false;
 
-   // Valid hour
-//   else if((conf_info.ValidHour.n() > 0 &&
-//            !conf_info.ValidHour.has(t[i_point].valid_hour())))
-//      keep = false;
+   // Conf: InitMask and InitThreshMap
+   else if(conf_info.InitMaskName.nonempty() ||
+           !conf_info.InitThreshMap.empty()) {
+
+      // Get the initialization index
+      int i_init = t.lead_index(0);
+
+      // Check for bad data
+      if(i_init < 0 || i_init > t.n_points()) {
+         keep = false;
+      }
+      else {
+
+         // Conf: InitMask
+         if(!check_masks(conf_info.InitPolyMask,
+                         conf_info.InitGridMask,
+                         conf_info.InitAreaMask,
+                         t[i_init].lat(), t[i_init].lon()))
+            keep = false;
+
+         // Conf: InitThreshMap
+         for(const auto &m : conf_info.InitThreshMap) {
+
+            // Get the value
+            double val = t[i_init].get_atcf_val(m.first);
+
+            // Check the threshold
+            if(!m.second.check_dbl(val)) {
+               keep = false;
+               break;
+            }
+         } 
+      }
+   }
 
    // Return the keep status
    return keep;
@@ -715,42 +743,65 @@ static bool is_keeper(const TrackInfo &t, int i_point) {
 
 ////////////////////////////////////////////////////////////////////////
 //
-// Check if the parsed track should be kept. Filter by items that can
-// vary from line to line:
-//    storm_name, valid time window, required lead times, initialization
-//    and valid masking regions
+// Check if the point should be kept by checking items that can change
+// across track points:
+//    model, storm id, basin, cyclone, and initialization time
 //
 ////////////////////////////////////////////////////////////////////////
-/* JHG
-static void filter_tracks(TrackInfoArray& tracks) {
 
-   TrackInfoArray t = tracks;
+static bool is_keeper_point(const TrackPoint &p) {
+   bool keep = true;
 
-   // Initialize
-   tracks.clear();
+   // Conf: Lead time
+   if(conf_info.LeadTime.n() > 0 &&
+      !conf_info.LeadTime.has(p.lead()))
+      keep = false;
 
-   // Loop over tracks
-   for(int i = 0; i < t.n(); i++) {
+   // Conf: Valid time
+   if((conf_info.ValidBeg > 0 &&
+       conf_info.ValidBeg > p.valid()) ||
+      (conf_info.ValidEnd > 0 &&
+       conf_info.ValidEnd < p.valid()) ||
+      (conf_info.ValidInc.n() > 0 &&
+       !conf_info.ValidInc.has(p.valid())) ||
+      (conf_info.ValidExc.n() > 0 &&
+       conf_info.ValidExc.has(p.valid())))
+      keep = false;
 
-      // Valid time window
-      if((conf_info.ValidBeg > 0 &&
-          conf_info.ValidBeg > t[i].valid_min()) ||
-         (conf_info.ValidEnd > 0 &&
-          conf_info.ValidEnd < t[i].valid_max())) {
-          mlog << Debug(4)
-              << "Discarding track " << i+1
-              << " for falling outside the "
-              << "valid time window: "
-              << unix_to_yyyymmdd_hhmmss(t[i].valid_min()) << " to "
-              << unix_to_yyyymmdd_hhmmss(t[i].valid_max()) << "\n";
-         continue;
+   // Conf: Valid hour
+   else if(conf_info.ValidHour.n() > 0 &&
+           !conf_info.ValidHour.has(p.valid_hour()))
+      keep = false;
+
+   // Conf: ValidMask
+   if(!check_masks(conf_info.ValidPolyMask,
+                   conf_info.ValidGridMask,
+                   conf_info.ValidAreaMask,
+                   p.lat(), p.lon()))
+      keep = false;
+
+   // Conf: Category (e.g. CycloneLevel) 
+   else if(conf_info.Category.n() > 0 &&
+           !conf_info.Category.has(cyclonelevel_to_string(p.level())))
+      keep = false;
+
+   // Conf: ColumnThreshMap
+   for(const auto &m : conf_info.ColumnThreshMap) {
+
+      // Get the value
+      double val = p.get_atcf_val(m.first);
+
+      // Check the threshold
+      if(!m.second.check_dbl(val)) {
+         keep = false;
+         break;
       }
-
-      // Retain track
-      tracks.add(t[i]);
    }
+
+   // Return the keep status
+   return keep;
 }
-*/
+
 ////////////////////////////////////////////////////////////////////////
 
 static TrackInfo read_nc_track() {

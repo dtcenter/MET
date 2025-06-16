@@ -28,7 +28,7 @@ static const int WindIntensity[] = { 34, 50, 64 };
 static const int NWinds = sizeof(WindIntensity)/sizeof(*WindIntensity);
 
 // ATCF columns that can be filtered
-static std::vector<std::string> atcf_column_vals = {
+static const std::vector<std::string> atcf_column_vals = {
    "LAT",    "LON", "VMAX",  "MSLP", "POUTER",
    "ROUTER", "RMW", "GUSTS", "EYE",  "DIR",
    "SPEED" };
