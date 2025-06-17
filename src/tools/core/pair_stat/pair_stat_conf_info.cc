@@ -555,7 +555,7 @@ bool PairStatConfInfo::get_vflag() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairStatConfInfo::add_mpr_line(const STATLine &l) {
+bool PairStatConfInfo::add_mpr_line(STATLine l) {
    bool keep = false;
 
    // Attempt to add line to each verification task
@@ -593,6 +593,7 @@ void PairStatVxOpt::clear() {
    // Initialize values
    vx_pd.clear();
    vx_hdr.clear();
+   convert_censor_flag = false;
 
    fcat_ta.clear();
    ocat_ta.clear();
@@ -716,6 +717,14 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    // Set the VarInfo objects
    vx_pd.fcst_info->set_dict(fdict);
    vx_pd.obs_info->set_dict(odict);
+
+   // Set the conversion and/or censoring flag
+   if(vx_pd.fcst_info->ConvertFx.is_set()      ||
+      vx_pd.fcst_info->censor_thresh().n() > 0 ||
+      vx_pd.obs_info->ConvertFx.is_set()       ||
+      vx_pd.obs_info->censor_thresh().n()  > 0) {
+      convert_censor_flag = true;
+   }
 
    // Dump the contents of the current VarInfo
    if(mlog.verbosity_level() >= 5) {
@@ -1384,8 +1393,11 @@ bool PairStatVxOpt::is_keeper_obs_init_time(const unixtime beg_ut,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
+bool PairStatVxOpt::add_mpr_line(STATLine l) {
    bool keep = false;
+
+   // Apply conversion and censoring logic
+   if(convert_censor_flag) apply_convert_censor(l);
 
    // Check filtering options
    if(is_keeper_mpr(l)) {
@@ -1481,8 +1493,11 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
+bool PairStatVxOpt::add_ioda_pair(point_pair_t p) {
    bool keep = false;
+
+   // Apply conversion and censoring logic
+   if(convert_censor_flag) apply_convert_censor(p);
 
    // Check filtering options
    if(is_keeper_ioda(p)) {
@@ -1545,6 +1560,60 @@ bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
    return keep;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void PairStatVxOpt::apply_convert_censor(STATLine &l) {
+
+   // Apply logic to the forecast and observation values
+   double fval = atof(l.get_item("FCST"));
+   apply_convert_censor(vx_pd.fcst_info, fval);
+
+   double oval = atof(l.get_item("OBS"));
+   apply_convert_censor(vx_pd.obs_info, oval);
+
+   // Store the result
+   l.set_item(l.get_offset("FCST"), to_string(fval));
+   l.set_item(l.get_offset("OBS"),  to_string(oval));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairStatVxOpt::apply_convert_censor(point_pair_t &p) {
+
+   // Apply logic to the forecast and observation values
+   apply_convert_censor(vx_pd.fcst_info, p.fval);
+   apply_convert_censor(vx_pd.obs_info,  p.oval);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairStatVxOpt::apply_convert_censor(const VarInfo *var_info,
+                                         double &v) {
+   // Check for null
+   if(!var_info) return;
+
+   // Apply conversion logic
+   if(var_info->ConvertFx.is_set()) {
+     v = var_info->ConvertFx(v);
+   }
+
+   // Apply censoring logic
+   for(int i=0; i<var_info->censor_thresh().n(); i++) {
+
+      // Break out after the first match
+      if(var_info->censor_thresh()[i].check(v)) {
+         v = var_info->censor_val()[i];
+         break;
+      }
+   }
+
+   return;
+}
+ 
 ////////////////////////////////////////////////////////////////////////
 //
 // Begin utility functions
