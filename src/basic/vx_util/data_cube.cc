@@ -390,7 +390,7 @@ void DataCube::square_root() {
          if(is_bad_data(Data[n]) || Data[n] < 0) {
             Data[n] = bad_data_double;
          }
-	 else {
+         else {
             Data[n] = sqrt(Data[n]);
          }
       }
