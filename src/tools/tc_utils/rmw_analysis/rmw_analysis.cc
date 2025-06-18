@@ -726,7 +726,7 @@ static bool is_keeper_track(const TrackInfo &t) {
            !conf_info.InitHour.has(t.init_hour())) {
       mlog << Debug(3)
            << "Discard track based on initialization hour ("
-           << t.init_hour() << ").\n"; 
+           << sec_to_timestring(t.init_hour()) << ").\n"; 
       keep = false;
    }
 
@@ -796,7 +796,7 @@ static bool is_keeper_point(const TrackPoint &p) {
       !conf_info.LeadTime.has(p.lead())) {
       mlog << Debug(3)
            << "Discard track point based on lead time ("
-           << p.lead() << ").\n";
+           << sec_to_timestring(p.lead()) << ").\n";
       keep = false;
    }
 
@@ -820,7 +820,7 @@ static bool is_keeper_point(const TrackPoint &p) {
            !conf_info.ValidHour.has(p.valid_hour())) {
       mlog << Debug(3)
            << "Discard track point based on valid hour ("
-           << p.valid_hour() << ").\n";
+           << sec_to_timestring(p.valid_hour()) << ").\n";
       keep = false;
    }
 
