@@ -663,28 +663,48 @@ static bool is_keeper_track(const TrackInfo &t) {
 
    // Conf: Model
    if(conf_info.Model.n() > 0 &&
-      !conf_info.Model.has(t.technique()))
+      !conf_info.Model.has(t.technique())) {
+      mlog << Debug(3)
+           << "Discard track based on model ("
+           << t.technique() << ").\n"; 
       keep = false;
+   }
 
    // Conf: Storm ID
    else if(conf_info.StormId.n() > 0 &&
-           !conf_info.StormId.has(t.storm_id()))
+           !conf_info.StormId.has(t.storm_id())) {
+      mlog << Debug(3)
+           << "Discard track based on storm ID ("
+           << t.storm_id() << ").\n"; 
       keep = false;
+   }
 
    // Conf: Basin
    else if(conf_info.Basin.n() > 0 &&
-           !conf_info.Basin.has(t.basin()))
+           !conf_info.Basin.has(t.basin())) {
+      mlog << Debug(3)
+           << "Discard track based on basin ("
+           << t.basin() << ").\n"; 
       keep = false;
+   }
 
    // Conf: Cyclone
    else if(conf_info.Cyclone.n() > 0 &&
-           !conf_info.Cyclone.has(t.cyclone()))
+           !conf_info.Cyclone.has(t.cyclone())) {
+      mlog << Debug(3)
+           << "Discard track based on cyclone ("
+           << t.technique() << ").\n"; 
       keep = false;
+   }
 
    // Conf: Storm Name
    else if(conf_info.StormName.n() > 0 &&
-           !conf_info.StormName.has(t.storm_name()))
+           !conf_info.StormName.has(t.storm_name())) {
+      mlog << Debug(3)
+           << "Discard track based on storm name ("
+           << t.storm_name() << ").\n"; 
       keep = false;
+   }
 
    // Conf: Initialization time
    else if((conf_info.InitBeg > 0 &&
@@ -694,16 +714,25 @@ static bool is_keeper_track(const TrackInfo &t) {
            (conf_info.InitInc.n() > 0 &&
             !conf_info.InitInc.has(t.init())) ||
            (conf_info.InitExc.n() > 0 &&
-            conf_info.InitExc.has(t.init())))
+            conf_info.InitExc.has(t.init()))) {
+      mlog << Debug(3)
+           << "Discard track based on initialization time ("
+           << unix_to_yyyymmdd_hhmmss(t.init()) << ").\n"; 
       keep = false;
+   }
 
    // Conf: Initialization hour
    else if(conf_info.InitHour.n() > 0 &&
-           !conf_info.InitHour.has(t.init_hour()))
+           !conf_info.InitHour.has(t.init_hour())) {
+      mlog << Debug(3)
+           << "Discard track based on initialization hour ("
+           << t.init_hour() << ").\n"; 
       keep = false;
+   }
 
    // Conf: InitMask and InitThreshMap
-   else if(conf_info.InitMaskName.nonempty() ||
+   else if(conf_info.InitPolyMask.n_points() > 0 ||
+           conf_info.InitMaskName.nonempty() ||
            !conf_info.InitThreshMap.empty()) {
 
       // Get the initialization index
@@ -711,6 +740,9 @@ static bool is_keeper_track(const TrackInfo &t) {
 
       // Check for bad data
       if(i_init < 0 || i_init > t.n_points()) {
+         mlog << Debug(3)
+              << "Discard track since no initialization "
+              << "track point exists.\n";
          keep = false;
       }
       else {
@@ -719,8 +751,12 @@ static bool is_keeper_track(const TrackInfo &t) {
          if(!check_masks(conf_info.InitPolyMask,
                          conf_info.InitGridMask,
                          conf_info.InitAreaMask,
-                         t[i_init].lat(), t[i_init].lon()))
+                         t[i_init].lat(), t[i_init].lon())) {
+            mlog << Debug(3)
+                 << "Discard track based on initialization location ("
+                 << t[i_init].lat() << ", " << t[i_init].lon() << ").\n";
             keep = false;
+         }
 
          // Conf: InitThreshMap
          for(const auto &m : conf_info.InitThreshMap) {
@@ -730,6 +766,9 @@ static bool is_keeper_track(const TrackInfo &t) {
 
             // Check the threshold
             if(!m.second.check_dbl(val)) {
+               mlog << Debug(3)
+                    << "Discard track based on initialization thresholding ("
+                    << m.first << " = " << val << ").\n";
                keep = false;
                break;
             }
@@ -754,8 +793,12 @@ static bool is_keeper_point(const TrackPoint &p) {
 
    // Conf: Lead time
    if(conf_info.LeadTime.n() > 0 &&
-      !conf_info.LeadTime.has(p.lead()))
+      !conf_info.LeadTime.has(p.lead())) {
+      mlog << Debug(3)
+           << "Discard track point based on lead time ("
+           << p.lead() << ").\n";
       keep = false;
+   }
 
    // Conf: Valid time
    if((conf_info.ValidBeg > 0 &&
@@ -765,25 +808,41 @@ static bool is_keeper_point(const TrackPoint &p) {
       (conf_info.ValidInc.n() > 0 &&
        !conf_info.ValidInc.has(p.valid())) ||
       (conf_info.ValidExc.n() > 0 &&
-       conf_info.ValidExc.has(p.valid())))
+       conf_info.ValidExc.has(p.valid()))) {
+      mlog << Debug(3)
+           << "Discard track point based on valid time ("
+           << unix_to_yyyymmdd_hhmmss(p.valid()) << ").\n";
       keep = false;
+   }
 
    // Conf: Valid hour
    else if(conf_info.ValidHour.n() > 0 &&
-           !conf_info.ValidHour.has(p.valid_hour()))
+           !conf_info.ValidHour.has(p.valid_hour())) {
+      mlog << Debug(3)
+           << "Discard track point based on valid hour ("
+           << p.valid_hour() << ").\n";
       keep = false;
+   }
 
    // Conf: ValidMask
    if(!check_masks(conf_info.ValidPolyMask,
                    conf_info.ValidGridMask,
                    conf_info.ValidAreaMask,
-                   p.lat(), p.lon()))
+                   p.lat(), p.lon())) {
+      mlog << Debug(3)
+           << "Discard track point based on valid location ("
+           << p.lat() << ", " << p.lon() << ").\n";
       keep = false;
+   }
 
    // Conf: Category (e.g. CycloneLevel) 
    else if(conf_info.Category.n() > 0 &&
-           !conf_info.Category.has(cyclonelevel_to_string(p.level())))
+           !conf_info.Category.has(cyclonelevel_to_string(p.level()))) {
+      mlog << Debug(3)
+           << "Discard track point based on category ("
+           << cyclonelevel_to_string(p.level()) << ").\n";
       keep = false;
+   }
 
    // Conf: ColumnThreshMap
    for(const auto &m : conf_info.ColumnThreshMap) {
@@ -793,6 +852,9 @@ static bool is_keeper_point(const TrackPoint &p) {
 
       // Check the threshold
       if(!m.second.check_dbl(val)) {
+         mlog << Debug(3)
+              << "Discard track point based on column thresholding ("
+              << m.first << " = " << val << ").\n";
          keep = false;
          break;
       }
