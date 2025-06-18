@@ -746,7 +746,7 @@ double TrackPoint::get_diag_val(const StringArray &diag_names, const string cur_
 
 ////////////////////////////////////////////////////////////////////////
 
-double TrackPoint::get_atcf_val(const string atcf_name) const {
+double TrackPoint::get_atcf_val(const string &atcf_name) const {
    double val = bad_data_double;
 
    // Convert search string to uppercase

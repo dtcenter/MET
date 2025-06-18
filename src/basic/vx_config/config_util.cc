@@ -1238,19 +1238,19 @@ map<ConcatString,UserFunc_1Arg> parse_conf_key_convert_map(
 
 map<ConcatString,ThreshArray> parse_conf_thresh_map(
       Dictionary *dict,
-      const char *conf_key_name,
-      const char *conf_key_val) {
+      const char *conf_key_map_name,
+      const char *conf_key_map_val) {
    const char *method_name = "parse_conf_thresh_map() -> ";
    map<ConcatString,ThreshArray> m;
    
-   StringArray sa(dict->lookup_string_array(conf_key_name));
-   ThreshArray ta(dict->lookup_thresh_array(conf_key_val));
+   StringArray sa(dict->lookup_string_array(conf_key_map_name));
+   ThreshArray ta(dict->lookup_thresh_array(conf_key_map_val));
 
    // Check that they are the same length
    if(sa.n() != ta.n()) {
       mlog << Error << "\n" << method_name
-           << "the \"" << conf_key_name << "\" and \""
-           << conf_key_val
+           << "the \"" << conf_key_map_name << "\" and \""
+           << conf_key_map_val
            << "\" entries must have the same length.\n\n";
       exit(1);
    }
@@ -1274,18 +1274,19 @@ map<ConcatString,ThreshArray> parse_conf_thresh_map(
 
 map<ConcatString,StringArray> parse_conf_string_map(
       Dictionary *dict,
-      const char *conf_key_name,
-      const char *conf_key_val) {
+      const char *conf_key_map_name,
+      const char *conf_key_map_val) {
    const char *method_name = "parse_conf_string_map() -> ";
    map<ConcatString,StringArray> m;
    
-   StringArray sa_name(dict->lookup_string_array(conf_key_name));
-   StringArray sa_val (dict->lookup_string_array(conf_key_val));
+   StringArray sa_name(dict->lookup_string_array(conf_key_map_name));
+   StringArray sa_val (dict->lookup_string_array(conf_key_map_val));
 
    // Check that they are the same length
    if(sa_name.n() != sa_val.n()) {
       mlog << Error << "\n" << method_name
-           << "the \"" << conf_key_name << "\" and \""
+           << "the \"" << conf_key_map_name << "\" and \""
+           << conf_key_map_val
            << "\" entries must have the same length.\n\n";
       exit(1);
    }
@@ -1297,7 +1298,7 @@ map<ConcatString,StringArray> parse_conf_string_map(
       }
       else {
          StringArray sa_val_new;
-         sa_val_new.set_ignore_case(1);
+         sa_val_new.set_ignore_case(true);
          sa_val_new.add(sa_val[i]);
          m.insert(pair<ConcatString,StringArray>(sa_name[i], sa_val_new));
       }
