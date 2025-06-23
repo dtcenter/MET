@@ -1014,12 +1014,12 @@ long MetNcCFDataFile::find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var) {
       double z_value = vinfo_nc->dim_value(z_slot);
       z_offset = convert_z_to_offset(z_value, get_z_dim_name(data_var));
       if ((0 > z_offset) || (z_offset >= z_cnt)) {
-         mlog << Warning << "\n" << method_name << "the requested vlevel "
+         mlog << Error << "\n" << method_name << "the requested vlevel "
               << z_value << " for \""
               << vinfo.req_name() << "\" variable does not exist ("
               << _file->vlevels[0] << " and "
               << _file->vlevels[z_cnt-1] << ").\n\n";
-         return z_offset;
+         exit(1);
       }
    }
 
@@ -1027,7 +1027,7 @@ long MetNcCFDataFile::find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var) {
       mlog << Error << "\n" << method_name << "the requested vlevel offset "
            << z_offset << " for \"" << vinfo.req_name() << "\" variable "
            << "is out of range (between 0 and " << (z_cnt-1) << ").\n\n";
-      return z_offset;
+      exit(1);
    }
 
    return z_offset;
@@ -1049,7 +1049,7 @@ NcVarInfo *MetNcCFDataFile::get_data_var(VarInfo &vinfo) {
    return data_var;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 
 string MetNcCFDataFile::get_z_dim_name(const NcVarInfo *data_var) const {
    string z_dim_name;
@@ -1060,7 +1060,7 @@ string MetNcCFDataFile::get_z_dim_name(const NcVarInfo *data_var) const {
    return z_dim_name;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 
 int MetNcCFDataFile::index(VarInfo &vinfo){
 
@@ -1074,5 +1074,4 @@ int MetNcCFDataFile::index(VarInfo &vinfo){
    return 0;
 }
 
-//////////////////////////////////
-
+/////////////////////////////////////////////////////////////////////////
