@@ -116,6 +116,7 @@ if ( !f_in )  return false;
 
 string s;
 f_in >> s;
+f_in.close();
 
 ConcatString list_str(file_list_str);
 
