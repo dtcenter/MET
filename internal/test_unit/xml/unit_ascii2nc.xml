@@ -177,45 +177,9 @@
   <test name="ascii2nc_ndbc">
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
-    -format ndbc_standard  \
-    &DATA_DIR_OBS;/ndbc/13001.txt  \
-    &DATA_DIR_OBS;/ndbc/13002.txt \
-    &DATA_DIR_OBS;/ndbc/13008.txt \
-    &DATA_DIR_OBS;/ndbc/13009.txt \
-    &DATA_DIR_OBS;/ndbc/14040.txt \
-    &DATA_DIR_OBS;/ndbc/14043.txt \
-    &DATA_DIR_OBS;/ndbc/15001.txt \
-    &DATA_DIR_OBS;/ndbc/15002.txt \
-    &DATA_DIR_OBS;/ndbc/15006.txt \
-    &DATA_DIR_OBS;/ndbc/28401.txt \
-    &DATA_DIR_OBS;/ndbc/31001.txt \
-    &DATA_DIR_OBS;/ndbc/31003.txt \
-    &DATA_DIR_OBS;/ndbc/31004.txt \
-    &DATA_DIR_OBS;/ndbc/31005.txt \
-    &DATA_DIR_OBS;/ndbc/31006.txt \
-    &DATA_DIR_OBS;/ndbc/31007.txt \
-    &DATA_DIR_OBS;/ndbc/32ST0.txt\
-    &DATA_DIR_OBS;/ndbc/51000.txt \
-    &DATA_DIR_OBS;/ndbc/51001.txt \
-    &DATA_DIR_OBS;/ndbc/51002.txt \
-    &DATA_DIR_OBS;/ndbc/51003.txt \
-    &DATA_DIR_OBS;/ndbc/51004.txt \
-    &DATA_DIR_OBS;/ndbc/51101.txt \
-    &DATA_DIR_OBS;/ndbc/51201.txt \
-    &DATA_DIR_OBS;/ndbc/51202.txt \
-    &DATA_DIR_OBS;/ndbc/51205.txt \
-    &DATA_DIR_OBS;/ndbc/51206.txt \
-    &DATA_DIR_OBS;/ndbc/51207.txt \
-    &DATA_DIR_OBS;/ndbc/51208.txt \
-    &DATA_DIR_OBS;/ndbc/51209.txt \
-    &DATA_DIR_OBS;/ndbc/51211.txt \
-    &DATA_DIR_OBS;/ndbc/51212.txt \
-    &DATA_DIR_OBS;/ndbc/51213.txt \
-    &DATA_DIR_OBS;/ndbc/51WH0.txt \
-    &DATA_DIR_OBS;/ndbc/52200.txt \
-    &DATA_DIR_OBS;/ndbc/52202.txt\
-    &DATA_DIR_OBS;/ndbc/52211.txt \
-    &DATA_DIR_OBS;/ndbc/52212.txt \
+    -format ndbc_standard \
+    -inputrx '.txt$' \
+    &DATA_DIR_OBS;/ndbc \
     &OUTPUT_DIR;/ascii2nc/ndbc.nc
     </param>
     <output>
@@ -226,8 +190,9 @@
   <test name="ascii2nc_ismn_SNOTEL">
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
-    -format ismn  \
-    &DATA_DIR_OBS;/ismn/SNOTEL/*/*.stm \
+    -format ismn \
+    -inputrx '.stm$' \
+    &DATA_DIR_OBS;/ismn/SNOTEL \
     &OUTPUT_DIR;/ascii2nc/ismn_SNOTEL_20220924_20220927.nc
     </param>
     <output>
@@ -241,7 +206,7 @@
     -format iabp \
     -valid_beg 20140101 -valid_end 20140201 \
     &DATA_DIR_OBS;/iabp/090629.dat \
-    &DATA_DIR_OBS;/iabp/109320.dat  \
+    &DATA_DIR_OBS;/iabp/109320.dat \
     &DATA_DIR_OBS;/iabp/109499.dat \
     &OUTPUT_DIR;/ascii2nc/iabp_20140101_20140201.nc
     </param>
@@ -251,17 +216,20 @@
   </test>
 
   <test name="ascii2nc_uscrn">
-    <exec>&MET_BIN;/ascii2nc</exec>
+    <exec>echo "file_list" \
+                &DATA_DIR_OBS;/uscrn/monthly01/CRNM0102-CO_Boulder_14_W.txt \
+                &DATA_DIR_OBS;/uscrn/daily01/2024/CRND0103-2024-CO_Boulder_14_W.txt \
+                &DATA_DIR_OBS;/uscrn/hourly02/2024/CRNH0203-2024-CO_Boulder_14_W.txt \
+                &DATA_DIR_OBS;/uscrn/subhourly01/2024/CRNS0101-05-2024-CO_Boulder_14_W.txt \
+                &DATA_DIR_OBS;/uscrn/soil/soilanom01/CRNSSM0101-CO_Boulder_14_W.csv \
+                &DATA_DIR_OBS;/uscrn/drought01/CRNDI0101-CO_Boulder_14_W.csv \
+                &DATA_DIR_OBS;/uscrn/heat01/CRNHE0101-CO_Boulder_14_W.csv" \
+                > &OUTPUT_DIR;/ascii2nc/USCRN_Boulder_file_list; \
+          &MET_BIN;/ascii2nc</exec>
     <param> \
     -format uscrn \
     -valid_beg 20240801 -valid_end 20240801 \
-    &DATA_DIR_OBS;/uscrn/monthly01/CRNM0102-CO_Boulder_14_W.txt \
-    &DATA_DIR_OBS;/uscrn/daily01/2024/CRND0103-2024-CO_Boulder_14_W.txt \
-    &DATA_DIR_OBS;/uscrn/hourly02/2024/CRNH0203-2024-CO_Boulder_14_W.txt \
-    &DATA_DIR_OBS;/uscrn/subhourly01/2024/CRNS0101-05-2024-CO_Boulder_14_W.txt \
-    &DATA_DIR_OBS;/uscrn/soil/soilanom01/CRNSSM0101-CO_Boulder_14_W.csv \
-    &DATA_DIR_OBS;/uscrn/drought01/CRNDI0101-CO_Boulder_14_W.csv \
-    &DATA_DIR_OBS;/uscrn/heat01/CRNHE0101-CO_Boulder_14_W.csv \
+    &OUTPUT_DIR;/ascii2nc/USCRN_Boulder_file_list \
     &OUTPUT_DIR;/ascii2nc/USCRN_Boulder_20240801.nc
     </param>
     <output>
