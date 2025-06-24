@@ -53,9 +53,6 @@
 // Program name
 static const char* program_name = "rmw_analysis";
 
-// ATCF file suffix
-static const char* atcf_suffix = ".dat";
-
 // Default configuration file name
 static const char* default_config_filename =
     "MET_BASE/config/RMWAnalysisConfig_default";
