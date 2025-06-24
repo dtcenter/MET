@@ -33,6 +33,13 @@ bool is_regular_file(const char *path) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool is_directory(const char *path) {
+   struct stat path_stat;
+   return (!stat(path, &path_stat) && S_ISDIR(path_stat.st_mode));
+}
+
+////////////////////////////////////////////////////////////////////////
 //
 // Does replace(met_base_str, MET_BASE) on the output string, first
 // checking the MET_BASE environment variable.
