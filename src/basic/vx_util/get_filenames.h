@@ -25,15 +25,18 @@
 
 
 extern StringArray get_filenames(const StringArray & search_dir_list,
-                      const char * prefix, const char * suffix,
+                      const char * regex1, const char * regex2,
                       bool check_regular = false);
 
 extern StringArray get_filenames(const ConcatString & search_dir,
-                      const char * prefix, const char * suffix,
+                      const char * regex1, const char * regex2,
                       bool check_regular = false);
 
 extern StringArray get_filenames_from_dir(const char * directory_path,
-                      const char * prefix, const char * suffix);
+                      const char * regex1, const char * regex2);
+
+extern bool        check_filename_regex(const char * path,
+                      const char * regex1, const char * regex2);
 
 extern bool        check_prefix_suffix(const char * path,
                       const char * prefix, const char * suffix);
