@@ -425,13 +425,13 @@ FileHandler *create_file_handler(const ASCIIFormat format,
       #ifdef ENABLE_PYTHON
       case ASCIIFormat::Python: {
          setup_wrapper_path();
-         ph = new PythonHandler(program_name, ascii_filename.text());
+         ph = new PythonHandler(program_name);
          return (FileHandler *) ph;
       }
       #endif
 
       default: {
-        return determine_ascii_format(ascii_filename);
+         return determine_ascii_format(ascii_filename);
       }
    }
 }

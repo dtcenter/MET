@@ -57,29 +57,6 @@ PythonHandler::PythonHandler(const string &program_name) : FileHandler(program_n
 
 use_tmp_ascii = false;
 
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-PythonHandler::PythonHandler(const char * program_name, const char * ascii_filename) : FileHandler(program_name)
-
-{
-
-ConcatString s = ascii_filename;
-StringArray a = s.split(" ");
-
-
-user_script_filename = a[0];
-
-for (int j=1; j<(a.n()); ++j)  {   //  j starts at one here, not zero
-
-   user_script_args.add(a[j]);
-
-}
-
-use_tmp_ascii = false;
 
 const char * c = getenv(user_python_path_env);
 
@@ -90,7 +67,6 @@ if ( c )  {
    user_path_to_python = c;
 
 }
-
 
 return;
 
@@ -223,9 +199,26 @@ bool PythonHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_
 {
 
 bool status = false;
+bool do_reload = false;
 
-if ( use_tmp_ascii )  status = do_tmp_ascii ();
-else                  status = do_straight ();
+// Process each input
+for(auto &ascii_filename : ascii_filename_list) {
+
+   // Store the python script name
+   StringArray sa = ascii_filename.split(" ");
+   user_script_filename = sa[0];
+
+   // Store the python script arguments (starts at one, not zero)
+   user_script_args.clear();
+   for(int i=1; i<sa.n(); i++) user_script_args.add(sa[i]);
+
+   // Execute teh python script
+   if(use_tmp_ascii) status = do_tmp_ascii(ascii_filename);
+   else              status = do_straight(ascii_filename, do_reload);
+
+   // Need to reload the module after the first run
+   do_reload = true;
+}
 
 return status;
 
@@ -235,7 +228,8 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PythonHandler::do_straight()
+bool PythonHandler::do_straight(const ConcatString &ascii_filename,
+                                bool do_reload)
 
 {
 
@@ -267,7 +261,15 @@ script->reset_argv(user_script_filename.text(), user_script_args);
    //  import the user's script as a module
    //
 
-PyObject * m = PyImport_Import(PyUnicode_FromString(user_base.text()));
+PyObject * module_obj = PyImport_ImportModule(user_base.text());
+
+   //
+   //  if needed, reload the module
+   //
+
+if ( do_reload )  {
+   module_obj = PyImport_ReloadModule (module_obj);
+}
 
 if ( PyErr_Occurred() )  {
 
@@ -286,7 +288,7 @@ if ( PyErr_Occurred() )  {
    //    for the module
    //
 
-Python3_Dict md (m);
+Python3_Dict md (module_obj);
 
    //
    //  get the variable containing the
@@ -316,7 +318,7 @@ return true;
    //                  [ user_script args ... ]
    //
 
-bool PythonHandler::do_tmp_ascii()
+bool PythonHandler::do_tmp_ascii(const ConcatString &ascii_filename)
 
 {
 
