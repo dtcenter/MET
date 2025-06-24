@@ -101,7 +101,7 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
       return false;
     }
 
-    mlog << Debug(3)
+    mlog << Debug(2)
          << "Reading File: " << *ascii_filename << "\n";
  
     // Read the observations
@@ -118,7 +118,7 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
     ascii_file.close();
   }
 
-   mlog << Debug(2) << "Total number of "
+   mlog << Debug(3) << "Total number of "
         << num_observations_in_range << " observations kept and " 
         << num_observations_out_of_range << " rejected.\n";
 
@@ -131,8 +131,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
 {
 
   // List the number of rejected observations.
-
-  mlog << Debug(2)
+  mlog << Debug(3)
        << "Rejected " << filters.get_grid_mask_cnt()
        << " observations off the masking grid.\n"
        << "Rejected " << filters.get_area_mask_cnt() + filters.get_poly_mask_cnt()
@@ -152,7 +151,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
     mlog << Warning << "\nZero observations retained!\n\n";
   }
 
-  mlog << Debug(2) << "Processing observations for " << _nhdr
+  mlog << Debug(3) << "Processing observations for " << _nhdr
        << " headers.\n";
 
   // Open the netCDF file.  This can't be done until after we process the
