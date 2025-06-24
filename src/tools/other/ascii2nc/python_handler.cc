@@ -241,8 +241,8 @@ bool PythonHandler::do_straight()
 
 ConcatString command, user_base;
 
-mlog << Debug(3)
-     << "Running user's python script ("
+mlog << Debug(2)
+     << "Running python script ("
      << user_script_filename << ").\n";
 
 user_base = user_script_filename.basename();
@@ -328,9 +328,10 @@ ConcatString tmp_ascii_path;
 const char * tmp_dir = 0;
 int status;
 
-mlog << Debug(3) << "Calling " << user_path_to_python
-     << " to run user's python script (" << user_script_filename
-     << ").\n";
+mlog << Debug(2)
+     << "Running python script ("
+     << user_script_filename << ") with "
+     << user_path_to_python << ".\n";
 
 tmp_dir = getenv ("MET_TMP_DIR");
 

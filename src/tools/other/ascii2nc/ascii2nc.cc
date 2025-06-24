@@ -335,8 +335,9 @@ StringArray get_input_files(const ConcatString &input) {
    else if(is_ascii_file_list(input.c_str())) {
       sa.add(parse_ascii_file_list(input.c_str()));
    }
-   // Store regular files
-   else if(is_regular_file(input.c_str())) {
+   // Store python inputs and regular files
+   if(ascii_format == ASCIIFormat::Python ||
+      is_regular_file(input.c_str())) {
       sa.add(input);
    }
 
@@ -345,7 +346,8 @@ StringArray get_input_files(const ConcatString &input) {
 
 ////////////////////////////////////////////////////////////////////////
 
-FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &ascii_filename) {
+FileHandler *create_file_handler(const ASCIIFormat format,
+                                 const ConcatString &ascii_filename) {
 
    #ifdef ENABLE_PYTHON
    PythonHandler * ph = 0;
@@ -604,7 +606,7 @@ void usage() {
 
    cout << "\nUsage: "
         << program_name << "\n"
-        << "\tinput1 ... inputn | input_list\n"
+        << "\tinput1 ... inputn\n"
         << "\tnetcdf_file\n"
         << "\t[-inputrx reg_exp]\n"
         << "\t[-format type]\n"
@@ -618,20 +620,17 @@ void usage() {
         << "\t[-valid_end time]\n"
         << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"input1 ... inputn | input_list\" defines one "
-        << "or more formatted ASCII observation files to be converted "
-        << "to NetCDF format (required).\n"
-        << "\t\t   Inputs can be defined directly on the command line "
-        << "or using an ASCII file list.\n"
-        << "\t\t   Each input is the path to a file or a top-level "
-        << "directory to be recursively searched.\n"
+        << "\twhere\t\"input1 ... inputn\" defines one or more sources "
+        << "of formatted ASCII observation files (required).\n"
+        << "\t\t   Each input is the path to a file, an ASCII file list, "
+        << "or a top-level directory to be recursively searched.\n"
 
         << "\t\t\"netcdf_file\" indicates the name of the output "
         << "NetCDF file to be written (required).\n"
 
         << "\t\t\"-inputrx reg_exp\" overrides the default regular "
-        << "expression for input file naming convention ("
-        << default_reg_exp << ") (optional).\n"
+        << "expression (" << default_reg_exp << ") when searching "
+        << "directories for input files (optional).\n"
 
         << "\t\t\"-format type\" may be set to one of the following types (optional).\n"
 	<< "\t\t   "
