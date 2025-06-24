@@ -51,6 +51,7 @@
 //   022    10/07/22  Dave Albo      MET #2276 Add NDBC buoy data
 //   023    11/28/23  Halley Gotway  MET #2701 Add ISMN soil moisture data
 //   024    01/06/25  Halley Gotway  MET #1019 Add USCRN quality controlled data
+//   025    06/23/25  Halley Gotway  MET #3148 Search input directories
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -71,6 +72,7 @@
 #include "data2d_factory.h"
 #include "mask_poly.h"
 #include "apply_mask.h"
+#include "parse_file_list.h"
 #include "vx_grid.h"
 #include "vx_nc_util.h"
 #include "vx_util.h"
@@ -102,7 +104,7 @@ using namespace std;
 
 // Constants
 static const char *program_name = "ascii2nc";
-
+static const char *default_reg_exp = ".*";
 static const char *DEFAULT_CONFIG_FILENAME =
   "MET_BASE/config/Ascii2NcConfig_default";
 
@@ -133,6 +135,7 @@ static ASCIIFormat ascii_format = ASCIIFormat::None;
 // Variables for command line arguments
 static vector<ConcatString> asfile_list;
 static ConcatString ncfile;
+static ConcatString input_reg_exp(default_reg_exp);
 
 static ConcatString config_filename(replace_path(DEFAULT_CONFIG_FILENAME));
 static Ascii2NcConfInfo config_info;
@@ -150,11 +153,13 @@ static int compress_level = -1;
 
 ////////////////////////////////////////////////////////////////////////
 
+static StringArray get_input_files(const ConcatString &);
 static FileHandler *create_file_handler(const ASCIIFormat,
                                         const ConcatString &);
 static FileHandler *determine_ascii_format(const ConcatString &);
 
 static void usage();
+static void set_inputrx(const StringArray &);
 static void set_format(const StringArray &);
 static void set_config(const StringArray &);
 static void set_mask_grid(const StringArray &);
@@ -192,6 +197,7 @@ int met_main(int argc, char *argv[]) {
    //
    // Add the options function calls
    //
+   cline.add(set_inputrx,        "-inputrx",   1);
    cline.add(set_format,         "-format",    1);
    cline.add(set_config,         "-config",    1);
    cline.add(set_mask_grid,      "-mask_grid", 1);
@@ -213,10 +219,27 @@ int met_main(int argc, char *argv[]) {
    if(cline.n() < 2) { usage(); return 0; }
 
    //
-   // Store the input ASCII file name and the output NetCDF file name
+   // Store the input ASCII file names
    //
-   for (int i = 0; i < cline.n() - 1; ++i)
-     asfile_list.emplace_back((string)cline[i]);
+   for(int i=0; i<cline.n()-1; i++) {
+      StringArray cur_files(get_input_files(cline[i]));
+      for(int j=0; j<cur_files.n(); j++) {
+         asfile_list.emplace_back(cur_files[j]);
+      }
+   }
+
+   //
+   // Check for at last one input file
+   //
+   if(asfile_list.empty()) {
+      mlog << Error << "\nmet_main() -> "
+           << "No input files found!\n\n";
+      exit(1);
+   }
+
+   //
+   // Store the output NetCDF file name
+   //
    ncfile = cline[cline.n() - 1];
 
    //
@@ -297,6 +320,27 @@ int met_main(int argc, char *argv[]) {
 
 const string get_tool_name() {
    return program_name;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+StringArray get_input_files(const ConcatString &input) {
+   StringArray sa;
+
+   // Search input directories
+   if(is_directory(input.c_str())) {
+      sa.add(get_filenames(input, nullptr, input_reg_exp.c_str()));
+   }
+   // Process ASCII file list
+   else if(is_ascii_file_list(input.c_str())) {
+      sa.add(parse_ascii_file_list(input.c_str()));
+   }
+   // Store regular files
+   else if(is_regular_file(input.c_str())) {
+      sa.add(input);
+   }
+
+   return sa;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -560,8 +604,9 @@ void usage() {
 
    cout << "\nUsage: "
         << program_name << "\n"
-        << "\tascii_file1 [ascii_file2 ... ascii_filen]\n"
+        << "\tinput1 ... inputn | input_list\n"
         << "\tnetcdf_file\n"
+        << "\t[-inputrx reg_exp]\n"
         << "\t[-format type]\n"
         << "\t[-config file]\n"
         << "\t[-mask_grid string]\n"
@@ -573,12 +618,20 @@ void usage() {
         << "\t[-valid_end time]\n"
         << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"ascii_file\" is the formatted ASCII "
-        << "observation file to be converted to NetCDF format "
-        << "(required).\n"
+        << "\twhere\t\"input1 ... inputn | input_list\" defines one "
+        << "or more formatted ASCII observation files to be converted "
+        << "to NetCDF format (required).\n"
+        << "\t\t   Inputs can be defined directly on the command line "
+        << "or using an ASCII file list.\n"
+        << "\t\t   Each input is the path to a file or a top-level "
+        << "directory to be recursively searched.\n"
 
         << "\t\t\"netcdf_file\" indicates the name of the output "
         << "NetCDF file to be written (required).\n"
+
+        << "\t\t\"-inputrx reg_exp\" overrides the default regular "
+        << "expression for input file naming convention ("
+        << default_reg_exp << ") (optional).\n"
 
         << "\t\t\"-format type\" may be set to one of the following types (optional).\n"
 	<< "\t\t   "
@@ -652,6 +705,12 @@ void usage() {
 
         << flush;
 
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void set_inputrx(const StringArray & a) {
+   input_reg_exp = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
