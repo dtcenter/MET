@@ -556,7 +556,7 @@ void get_atcf_files(const StringArray &path,
    for(i=0; i<path.n(); i++) {
       cur_path.clear();
       cur_path.add(path[i]);
-      cur_files = get_filenames(cur_path, nullptr, atcf_suffix);
+      cur_files = get_filenames(cur_path, nullptr, atcf_reg_exp);
 
       for(j=0; j<cur_files.n(); j++) {
          files.add(cur_files[j]);
@@ -1046,7 +1046,7 @@ void process_diags(TrackInfoArray &tracks) {
    for(i=0; i<diag_source.n(); i++) {
 
       // Process the current diagnostic source
-      cur_files = get_filenames(diag_path[i], nullptr, atcf_suffix);
+      cur_files = get_filenames(diag_path[i], nullptr, atcf_reg_exp);
 
       mlog << Debug(2)
            << "Processing " << cur_files.n() << " "

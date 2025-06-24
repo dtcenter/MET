@@ -56,6 +56,7 @@ static const char * program_name = "tc_pairs";
 
 // ATCF file suffix
 static const char * atcf_suffix = ".dat";
+static const char * atcf_reg_exp = ".dat$";
 
 // Default configuration file name
 static const char * default_config_filename =
