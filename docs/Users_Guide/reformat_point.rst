@@ -509,6 +509,7 @@ Once the ASCII point observations have been formatted as expected, the ASCII fil
   Usage: ascii2nc
          input1 ... inputn
          netcdf_file
+         [-inputrx reg_exp]
          [-format type]
          [-config file]
          [-valid_beg time]
