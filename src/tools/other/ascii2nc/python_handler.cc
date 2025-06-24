@@ -213,8 +213,8 @@ for(auto &ascii_filename : ascii_filename_list) {
    for(int i=1; i<sa.n(); i++) user_script_args.add(sa[i]);
 
    // Execute teh python script
-   if(use_tmp_ascii) status = do_tmp_ascii(ascii_filename);
-   else              status = do_straight(ascii_filename, do_reload);
+   if(use_tmp_ascii) status = do_tmp_ascii();
+   else              status = do_straight(do_reload);
 
    // Need to reload the module after the first run
    do_reload = true;
@@ -228,8 +228,7 @@ return status;
 ////////////////////////////////////////////////////////////////////////
 
 
-bool PythonHandler::do_straight(const ConcatString &ascii_filename,
-                                bool do_reload)
+bool PythonHandler::do_straight(bool do_reload)
 
 {
 
@@ -318,7 +317,7 @@ return true;
    //                  [ user_script args ... ]
    //
 
-bool PythonHandler::do_tmp_ascii(const ConcatString &ascii_filename)
+bool PythonHandler::do_tmp_ascii()
 
 {
 

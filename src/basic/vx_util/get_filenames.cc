@@ -216,11 +216,9 @@ while ( (entry = readdir(directory)) != nullptr )  {
 
       b.clear();
 
-   } else if ( S_ISREG(sbuf.st_mode) )  {
-
-      if ( check_filename_regex(entry->d_name, regex1, regex2) )  {
-         a.add(entry_path);
-      }
+   } else if ( S_ISREG(sbuf.st_mode) &&
+               check_filename_regex(entry->d_name, regex1, regex2) )  {
+      a.add(entry_path);
 
    }
 

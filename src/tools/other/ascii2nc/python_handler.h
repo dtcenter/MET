@@ -68,10 +68,10 @@ class PythonHandler : public FileHandler
       virtual bool readAsciiFiles(const std::vector< ConcatString > &ascii_filename_list);
 
          // Run compiled python interpreter
-      bool do_straight (const ConcatString &ascii_filename, bool do_reload);
+      bool do_straight(bool do_reload);
 
          // Run user-defined MET_PYTHON_EXE
-      bool do_tmp_ascii(const ConcatString &ascii_filename);
+      bool do_tmp_ascii();
 
       void load_python_obs(PyObject *);   //  python object is list of lists
 

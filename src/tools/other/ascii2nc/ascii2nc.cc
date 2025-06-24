@@ -324,7 +324,7 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
-StringArray get_input_files(const ConcatString &input) {
+static StringArray get_input_files(const ConcatString &input) {
    StringArray sa;
 
    // Search input directories
@@ -346,8 +346,8 @@ StringArray get_input_files(const ConcatString &input) {
 
 ////////////////////////////////////////////////////////////////////////
 
-FileHandler *create_file_handler(const ASCIIFormat format,
-                                 const ConcatString &ascii_filename) {
+static FileHandler *create_file_handler(const ASCIIFormat format,
+                                        const ConcatString &ascii_filename) {
 
    #ifdef ENABLE_PYTHON
    PythonHandler * ph = 0;
@@ -438,7 +438,7 @@ FileHandler *create_file_handler(const ASCIIFormat format,
 
 ////////////////////////////////////////////////////////////////////////
 
-FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
+static FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    //
    // Use the contents of the file to try to guess its format.
@@ -602,7 +602,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+static void usage() {
 
    cout << "\nUsage: "
         << program_name << "\n"
@@ -708,13 +708,13 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_inputrx(const StringArray & a) {
+static void set_inputrx(const StringArray & a) {
    input_reg_exp = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_format(const StringArray & a) {
+static void set_format(const StringArray & a) {
 
    if(MetHandler::getFormatString() == a[0]) {
       ascii_format = ASCIIFormat::MET;
@@ -774,13 +774,13 @@ void set_format(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray & a) {
+static void set_config(const StringArray & a) {
    config_filename = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_mask_grid(const StringArray & a) {
+static void set_mask_grid(const StringArray & a) {
 
    // List the grid masking file
    mlog << Debug(1)
@@ -796,7 +796,7 @@ void set_mask_grid(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_mask_poly(const StringArray & a) {
+static void set_mask_poly(const StringArray & a) {
    ConcatString mask_name;
 
    // List the poly masking file
@@ -825,7 +825,7 @@ void set_mask_poly(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_mask_sid(const StringArray & a) {
+static void set_mask_sid(const StringArray & a) {
 
    // List the station ID mask
    mlog << Debug(1)
@@ -842,27 +842,25 @@ void set_mask_sid(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_valid_beg_time(const StringArray & a)
-{
+static void set_valid_beg_time(const StringArray & a) {
    valid_beg_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_valid_end_time(const StringArray & a)
-{
+static void set_valid_end_time(const StringArray & a) {
    valid_end_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+static void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_wrapper_path() {
+static void setup_wrapper_path() {
 
    #ifdef ENABLE_PYTHON
    ConcatString command;
