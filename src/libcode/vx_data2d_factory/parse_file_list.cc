@@ -85,6 +85,46 @@ return out_list;
 
 
 ////////////////////////////////////////////////////////////////////////
+//
+// Return true Check for the file_list keyword
+//
+////////////////////////////////////////////////////////////////////////
+
+
+bool is_ascii_file_list(const char * path)
+
+{
+
+   //
+   //  If the input is not a regular file, return false
+   //
+
+if ( !is_regular_file(path) )  return false;
+
+   //
+   //  Open the input ascii file
+   //
+
+ifstream f_in;
+met_open(f_in, path);
+
+if ( !f_in )  return false;
+
+   //
+   //  Check for the file_list keyword
+   //
+
+string s;
+f_in >> s;
+
+ConcatString list_str(file_list_str);
+
+return list_str.comparecase(s.c_str()) == 0;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
 
 
 StringArray parse_ascii_file_list(const char * path)
