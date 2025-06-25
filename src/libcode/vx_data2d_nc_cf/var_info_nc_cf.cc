@@ -228,7 +228,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
                      check_dim_offset(ptr2);
                      check_dim_offset(ptr3);
                   }
-                  else if (*ptr3 == '@') ptr3++;    // to support @vlevel1-@vlevel12
+                  else if (*ptr3 == '@') ptr3++;    // to support @vlevel1-@vlevel2
                   Level.set_lower(as_offset ? atoi(ptr2) : atof(ptr2));
                   Level.set_upper(as_offset ? atoi(ptr3) : atof(ptr3));
 
