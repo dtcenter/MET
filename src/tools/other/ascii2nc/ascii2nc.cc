@@ -336,8 +336,8 @@ static StringArray get_input_files(const ConcatString &input) {
       sa.add(parse_ascii_file_list(input.c_str()));
    }
    // Store python inputs and regular files
-   if(ascii_format == ASCIIFormat::Python ||
-      is_regular_file(input.c_str())) {
+   else if(ascii_format == ASCIIFormat::Python ||
+           is_regular_file(input.c_str())) {
       sa.add(input);
    }
 
