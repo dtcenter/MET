@@ -442,10 +442,10 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
          // Get the observation
          string obs_str(dl[col._offset]);
 
-	 // Check for empty string
-	 if(obs_str.empty()) continue;
+         // Check for empty string
+         if(obs_str.empty()) continue;
 
-	 // Check for bad data value
+         // Check for bad data value
          double obs_val = stod(obs_str);
          if(USCRNBadDataInput.has(obs_val)) continue; 
 
@@ -460,7 +460,7 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
             _stationLat, _stationLon, bad_data_double,
             qc_str, -1, bad_data_double,
             bad_data_double, obs_val,
-	    col._name, col._units, col._desc));
+            col._name, col._units, col._desc));
       }
    } // end while
 

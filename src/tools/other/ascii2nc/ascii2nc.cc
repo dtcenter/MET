@@ -633,7 +633,7 @@ static void usage() {
         << "directories for input files (optional).\n"
 
         << "\t\t\"-format type\" may be set to one of the following types (optional).\n"
-	<< "\t\t   "
+        << "\t\t   "
         << MetHandler::getFormatString() << ", "
         << LittleRHandler::getFormatString() << ", "
         << SurfradHandler::getFormatString() << ", "
