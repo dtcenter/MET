@@ -26,7 +26,7 @@ export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
 export MET_TEST_RSCRIPT=/usr/bin/Rscript
 
 # Set make arguments to build using multiple jobs
-export MAKE_ARGS="-j"
+export MAKE_ARGS="-j 5"
 
 export TEST_BASE=/met
 export COMPILER=gnu_12.2.0
