@@ -3,9 +3,6 @@
 source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 source ${GITHUB_WORKSPACE}/.github/jobs/test_env_vars.sh
 
-# METplus branch to use for diff testing script
-METPLUS_BRANCH=develop
-
 # Get truth output data
 ${GITHUB_WORKSPACE}/.github/jobs/get_test_truth_data.sh ${TRUTH_DATA_VERSION}
 
@@ -30,11 +27,13 @@ mkdir -p ${LOCAL_LOG_DIR}
 mkdir -p ${LOCAL_DIFF_DIR}
 mkdir -p ${LOCAL_METPLUS_DIR}
 
+# METplus branch to use for diff testing script
+METPLUS_BRANCH=develop
+
 # Clone METplus into runner
 time_command git clone --single-branch --branch ${METPLUS_BRANCH} https://github.com/dtcenter/METplus ${LOCAL_METPLUS_DIR}
 
 # Docker image to use for running diffs
-#export VERSION_EXT=.v6.1     #Note: this comes from METplus/.github/jobs/docker_utils.py
 export VERSION_EXT=$(${GITHUB_WORKSPACE}/.github/jobs/get_diff_docker_version.py)
 DOCKERHUB_TAG=dtcenter/metplus-envs:diff${VERSION_EXT}
 
@@ -56,8 +55,6 @@ if [ $? != 0 ]; then
 fi
 
 if [ "$(ls -A ${LOCAL_DIFF_DIR})" ]; then
-  # cat ${LOCAL_LOG_DIR}/copy_diff_files.log
-
   echo "ERROR: Differences exist in the output"
 
   # only exit non-zero (job fails) if not updating truth data
