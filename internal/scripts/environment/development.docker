@@ -43,8 +43,8 @@ export COMPILE_HDFEOS=1
 export COMPILE_FREETYPE=1
 export COMPILE_CAIRO=1
 
-export SQLITE_INCLUDE_DIR=/usr/include
-export SQLITE_LIB_DIR=/usr/lib/x86_64-linux-gnu
+export SQLITE_INCLUDE_DIR=$(pkg-config --variable=includedir sqlite3)
+export SQLITE_LIB_DIR=$(pkg-config --variable=libdir sqlite3)
 
 export BUFRLIB_NAME="-lbufr_4"
 export GRIB2CLIB_NAME="-lg2c"
