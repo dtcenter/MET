@@ -45,6 +45,10 @@ export LDFLAGS="${LDFLAGS} -L${JASPER}/lib -Wl,-rpath,${MET_ATLAS}/lib -Wl,-rpat
 export MET_TEST_INPUT=${MET_PROJ_DIR}/MET_test_data/unit_test
 export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
 
+# Path to METplus, used for diff tests
+# *** confirm this is right / change to what it should be ***
+export METPLUS_DIR=${MET_PROJ_DIR}/MET_regression/MET-develop
+
 # Define Rscript to use a version with the ncdf4 package 1.17 or later 
 export MET_TEST_RSCRIPT=/nrit/ral/R-4.4.0/bin/Rscript
 

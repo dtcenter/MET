@@ -22,8 +22,8 @@ def comp_dir(truth_dir, output_dir, debug=True, save_diff=True):
     Compare test output between two MET versions.
     
     Essentially a wrapper for compare_dir function from METplus diff_util.
-    Runs compare_dir on test and ref directories. If differences are found,
-    copies relevant files into a new diff directory.
+    Runs compare_dir on test and ref directories. Returns list of info about
+    any files with differences.
 
     Parameters
     -----------
@@ -158,6 +158,7 @@ if __name__ == "__main__":
                         help='if present, copy diff files into this directory')
     
     # the args below are not currently supported (legacy options from comp_dir.R)
+    #   keeping as placeholders, if desired later
     # parser.add_argument('-v', default=1, choices=[0,1,2,3],
     #                     help='indicates verbosity level (0-3), default 1 (not currently supported)')
     # parser.add_argument('-hist', default=0, choices=[0,1],
