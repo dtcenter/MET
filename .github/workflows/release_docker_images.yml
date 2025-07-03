@@ -54,7 +54,7 @@ jobs:
           MET_CONFIG_OPTS: '--enable-all'
 
       - name: Push Docker Image
-        run: .github/jobs/push_docker_image.sh
+        run: .github/jobs/push_release_docker_image.sh
         env:
           SOURCE_BRANCH: ${{ matrix.version }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
