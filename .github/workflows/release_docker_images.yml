@@ -47,11 +47,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Create directories to store output
+        run: mkdir -p ${RUNNER_WORKSPACE}/logs
+
       - name: Build Release Docker Image
         run: .github/jobs/build_release_docker_image.sh
         env:
           SOURCE_BRANCH: ${{ matrix.version }}
           MET_CONFIG_OPTS: '--enable-all'
+
+      - name: Copy all build log files into logs directory
+        if: always()
+        run: cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
 
       - name: Push Docker Image
         run: .github/jobs/push_release_docker_image.sh
@@ -60,3 +67,10 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Upload logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs_compile
+          path: ${{ runner.workspace }}/logs
+          if-no-files-found: ignore
