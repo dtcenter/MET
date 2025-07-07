@@ -4,7 +4,8 @@ source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
 DOCKERHUB_TAG=$(get_dockerhub_tag)
 
-DOCKERFILE_PATH=${GITHUB_WORKSPACE}/internal/scripts/docker/Dockerfile
+# Checked out by release-docker-images.yml workflow 
+DOCKERFILE_PATH=${GITHUB_WORKSPACE}/Dockerfile
 
 CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_release.log
 

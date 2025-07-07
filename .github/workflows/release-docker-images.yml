@@ -56,8 +56,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.version }}
+          sparse-checkout: internal/scripts/docker/Dockerfile
+          sparse-checkout-cone-mode: false
 
       - name: Create directories to store output
         run: mkdir -p ${RUNNER_WORKSPACE}/logs
