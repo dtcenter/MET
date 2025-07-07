@@ -566,6 +566,7 @@ static const char conf_key_init_time[]         = "init_time";  // YYYYMMDD[_HH[M
 static const char conf_key_valid_time[]        = "valid_time"; // YYYYMMDD[_HH[MMSS]]
 static const char conf_key_lead_time[]         = "lead_time";  // HH[MMSS]
 static const char conf_key_name[]              = "name";
+static const char conf_key_grib_code_map[]     = "grib_code_map";
 static const char conf_key_GRIB1_ptv[]         = "GRIB1_ptv";
 static const char conf_key_GRIB1_center[]      = "GRIB1_center";
 static const char conf_key_GRIB1_subcenter[]   = "GRIB1_subcenter";
