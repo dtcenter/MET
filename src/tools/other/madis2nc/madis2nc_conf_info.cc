@@ -54,6 +54,16 @@ void Madis2NcConfInfo::init_from_scratch()
 void Madis2NcConfInfo::clear()
 {
    _version.clear();
+   grib_code_map.clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString Madis2NcConfInfo::get_grib_var_name(const int grib_code) {
+   ConcatString grib_code_str;
+   grib_code_str << grib_code;
+   ConcatString grib_var_name = grib_code_map[grib_code_str];
+   return grib_var_name;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -87,6 +97,9 @@ void Madis2NcConfInfo::process_config()
   
   _version = parse_conf_version(&_conf);
   check_met_version(_version.c_str());
+
+  // Conf: grib_code_map
+  grib_code_map = parse_conf_key_value_map(&_conf, conf_key_grib_code_map);
 
   _timeSummaryInfo = parse_conf_time_summary(&_conf);
   

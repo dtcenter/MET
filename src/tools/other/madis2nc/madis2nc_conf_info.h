@@ -28,7 +28,9 @@ public:
   ~Madis2NcConfInfo();
 
   void read_config(const std::string &default_filename,
-		   const std::string &user_filename);
+                   const std::string &user_filename);
+
+  ConcatString get_grib_var_name(const int grib_code);
 
   TimeSummaryInfo getSummaryInfo() const
   {
@@ -52,12 +54,15 @@ protected:
   ConcatString _version;
   TimeSummaryInfo _timeSummaryInfo;
 
+  std::map<ConcatString,ConcatString> grib_code_map;
+
   ///////////////////////
   // Protected methods //
   ///////////////////////
 
   void clear();
   void init_from_scratch();
+
   void process_config();
 
 };
