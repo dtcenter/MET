@@ -44,7 +44,7 @@
 #include <dirent.h>
 #include <fstream>
 #include <math.h>
-#include <regex.h>
+#include <regex>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -77,6 +77,12 @@ static MetNcPointObsOut nc_point_obs;
 static vector< Observation > obs_vector;
 static vector< ConcatString > md_files;
 
+static std::map<int,int> grib_code_to_var_idx_map;
+static StringArray var_names;
+static StringArray var_units;
+static StringArray var_descs;
+
+
 ////////////////////////////////////////////////////////////////////////
 
 static void initialize();
@@ -105,7 +111,6 @@ static int process_obs(const int gc, const float conversion,
                        const ConcatString &station_id,
                        const time_t valid_time, const double latitude,
                        const double longitude, const double elevation);
-//static void write_qty(char &qty);
 
 static MadisType get_madis_type(NcFile *&f_in);
 static void      convert_wind_wdir_to_u_v(float wind, float wdir,
@@ -159,11 +164,10 @@ int met_main(int argc, char *argv[]) {
    int nhdr = nc_point_obs.get_obs_index();
 
    if (conf_info.getSummaryInfo().flag) {
-      int summmary_hdr_cnt = 0;
       TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();
       summary_obs->summarizeObs(summaryInfo);
       summary_obs->setSummaryInfo(summaryInfo);
-      summmary_hdr_cnt = summary_obs->countSummaryHeaders();
+      int summmary_hdr_cnt = (int)summary_obs->countSummaryHeaders();
       if (save_summary_only)
          nhdr = summmary_hdr_cnt;
       else
@@ -171,8 +175,7 @@ int met_main(int argc, char *argv[]) {
    }
    setup_netcdf_out(nhdr);
 
-   StringArray obs_names, descs, units;
-   nc_point_obs.write_to_netcdf(obs_names, units, descs);
+   nc_point_obs.write_to_netcdf(var_names, var_units, var_descs);
 
    //
    // Deallocate memory and clean up
@@ -190,13 +193,18 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void initialize() {
+static void initialize() {
 
    mdfile.clear();
    ncfile.clear();
    mask_sid.clear();
    qc_dd_sa.clear();
    lvl_dim_sa.clear();
+   grib_code_to_var_idx_map.clear();
+   var_names.clear();
+   var_units.clear();
+   var_descs.clear();
+
    i_obs    = 0;
    rej_fill = 0;
    rej_qc   = 0;
@@ -355,11 +363,16 @@ void process_madis_file(const char *madis_file) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void clean_up() {
+static void clean_up() {
 
    if (summary_obs) delete summary_obs;
    
    nc_point_obs.close();
+
+   grib_code_to_var_idx_map.clear();
+   var_names.clear();
+   var_units.clear();
+   var_descs.clear();
 
    //
    // Close the output NetCDF file
@@ -393,16 +406,16 @@ void setup_netcdf_out(int nhdr) {
       exit(1);
    }
 
-   bool use_var_id = false;
-   int obs_cnt, hdr_cnt;
+   int hdr_cnt;
+   int obs_cnt;
+   bool use_var_id = true;
    nc_point_obs.set_netcdf(f_out, true);
    nc_point_obs.set_using_var_id(use_var_id);
 
    NetcdfObsVars *obs_vars = nc_point_obs.get_obs_vars();
    obs_vars->deflate_level = compress_level;
 
-   //obs_vars.reset(use_var_id);
-   obs_vars->obs_cnt = obs_vector.size();
+   obs_vars->obs_cnt = (int)obs_vector.size();
    mlog << Debug(5) << "setup_netcdf_out() nhdr:\t" << nhdr
         << "\tobs_cnt:\t" << obs_vars->obs_cnt << "\n";
 
@@ -469,7 +482,7 @@ static bool get_filtered_nc_data_2d(NcVar var, int *data, const LongArray &dim,
    bool status = false;
    const char *method_name = "get_filtered_nc_data_2d(int) ";
 
-   if (data_len <= 0) data_len = dim[0] * dim[1];
+   if (data_len <= 0) data_len = (int)(dim[0] * dim[1]);
    for (int offset=0; offset<data_len; offset++) {
       data[offset] = bad_data_int;
    }
@@ -513,7 +526,7 @@ static bool get_filtered_nc_data_2d(NcVar var, float *data, const LongArray &dim
    bool status = false;
    const char *method_name = "get_filtered_nc_data_2d(float) ";
 
-   if (data_len <= 0) data_len = dim[0] * dim[1];
+   if (data_len <= 0) data_len = (int)(dim[0] * dim[1]);
    for (int offset=0; offset<data_len; offset++) {
       data[offset] = bad_data_float;
    }
@@ -625,15 +638,35 @@ int process_obs(const int in_gc, const float conversion,
    //
    // Store the GRIB code
    //
-   obs_arr[1] = in_gc;
+   obs_arr[1] = (float)in_gc;
 
    //
    // Check for bad data and apply conversion factor
    //
    if(!is_bad_data(obs_arr[4])) {
-      char  var_name[max_str_len];
-      snprintf(var_name, sizeof(var_name), "GRIB_%d", (int) obs_arr[1]);
 
+      int var_index = -1;
+      ConcatString var_name;
+
+      if (grib_code_to_var_idx_map.count(in_gc) == 0) {
+         var_index = grib_code_to_var_idx_map.size();
+         grib_code_to_var_idx_map[in_gc] = var_index;
+         var_name = conf_info.get_grib_var_name(in_gc);
+         if (var_name.empty()) {
+            mlog << Error
+                 << "\nThe variable name for the GRIB code " << in_gc << " was not configured."
+                 << " Please use -config option and add the real variable name"
+                 << " into the madis2nc configuration file\n\n";
+            exit(2);
+         }
+         var_names.add(var_name);
+      }
+      else {
+         var_index = grib_code_to_var_idx_map.at(in_gc);
+         var_name = var_names[var_index];
+      }
+
+      obs_arr[1] = (float)var_index;
       obs_arr[4] *= conversion;
 
       ConcatString qty_str;
@@ -641,15 +674,15 @@ int process_obs(const int in_gc, const float conversion,
       else            qty_str << qty;
       qty_str.replace(" ", "_", false);
 
-      Observation obs = Observation(
+      auto obs = Observation(
             header_type.text(),
             station_id.text(),
             valid_time,
             latitude, longitude, elevation,
             qty_str.text(),
-            in_gc,
+            var_index,
             obs_arr[2], obs_arr[3], obs_arr[4],
-            var_name);
+            var_name.c_str());
 
       obs_vector.emplace_back(obs);
       if (do_summary) summary_obs->addObservationObj(obs);
@@ -707,7 +740,8 @@ bool check_masks(double lat, double lon, const char *sid) {
    // Check grid masking.
    //
    if(mask_grid.nx() > 0 || mask_grid.ny() > 0) {
-      double grid_x, grid_y;
+      double grid_x;
+      double grid_y;
       mask_grid.latlon_to_xy(lat, -1.0*lon, grid_x, grid_y);
       if(grid_x < 0 || grid_x >= mask_grid.nx() ||
          grid_y < 0 || grid_y >= mask_grid.ny()) {
@@ -729,21 +763,17 @@ bool check_masks(double lat, double lon, const char *sid) {
    //
    // Check polyline masking.
    //
-   if(mask_poly.n_points() > 0) {
-      if(!mask_poly.latlon_is_inside_dege(lat, lon)) {
-         rej_poly++;
-         return false;
-      }
+   if((mask_poly.n_points() > 0) && !mask_poly.latlon_is_inside_dege(lat, lon)) {
+      rej_poly++;
+      return false;
    }
 
    //
    // Check station ID masking.
    //
-   if(mask_sid.n_elements() > 0) {
-      if(!mask_sid.has(sid)) {
-         rej_sid++;
-         return false;
-      }
+   if((mask_sid.n_elements() > 0) && !mask_sid.has(sid)) {
+      rej_sid++;
+      return false;
    }
 
    return true;
@@ -751,7 +781,10 @@ bool check_masks(double lat, double lon, const char *sid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void print_rej_counts() {
+void print_rej_counts(int processed_count) {
+
+   mlog << Debug(4)
+        << "Processed observations\t\t= " << processed_count << "\n";
 
    mlog << Debug(2)
         << "Rejected recs based on masking grid\t\t= " << rej_grid << "\n"
@@ -768,15 +801,24 @@ void print_rej_counts() {
 
 void process_madis_metar(NcFile *&f_in) {
    int nhdr;
-   long i_hdr, i_hdr_s;
-   int hdr_typ_len, hdr_sid_len, i_idx;
+   long i_hdr;
+   int hdr_sid_len;
+   int hdr_typ_len;
    double tmp_dbl;
    time_t hdr_vld;
-   ConcatString hdr_typ, hdr_sid;
-   float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
-   float wdir, wind, ugrd, vgrd;
+   ConcatString hdr_sid;
+   ConcatString hdr_typ;
+   float conversion;
+   float hdr_arr[HDR_ARRAY_LEN];
+   float obs_arr[OBS_ARRAY_LEN];
+   float wdir;
+   float wind;
+   float ugrd;
+   float vgrd;
+   float rd;
    int count = 0;
-   StringArray missing_vars, missing_qty_vars;
+   StringArray missing_qty_vars;
+   StringArray missing_vars;
    const char *method_name = "process_madis_metar() ";
 
    //
@@ -903,8 +945,9 @@ void process_madis_metar(NcFile *&f_in) {
    //
    // Loop through each record and get the header data.
    //
-   for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
-      int buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
+   for(int i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
+      int buf_size = (my_rec_end - i_hdr_s);
+      if(buf_size > BUFFER_SIZE) buf_size = BUFFER_SIZE;
       dim[0] = buf_size;
       cur[0] = i_hdr_s;
 
@@ -987,7 +1030,7 @@ void process_madis_metar(NcFile *&f_in) {
       dim[1] = hdr_sid_len;
       get_nc_data(&in_hdr_sid_var, hdr_sid_arr.data(), dim, cur);
 
-      for (i_idx=0; i_idx<buf_size; i_idx++) {
+      for (int i_idx=0; i_idx<buf_size; i_idx++) {
 
          //
          // Mapping of NetCDF variable names from input to output:
@@ -1162,8 +1205,7 @@ void process_madis_metar(NcFile *&f_in) {
 
    } // end for i_hdr
 
-   print_rej_counts();
-   mlog << Debug(5) << "    Added " << processed_count << "data\n";
+   print_rej_counts(processed_count);
 
    //
    // Cleanup
@@ -1177,17 +1219,24 @@ void process_madis_metar(NcFile *&f_in) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_madis_raob(NcFile *&f_in) {
-   int nhdr, nlvl, i_lvl;
-   long i_hdr, i_hdr_s;
+   int nhdr;
+   int nlvl;
    int hdr_sid_len;
    double tmp_dbl;
    char qty;
    time_t hdr_vld;
-   ConcatString hdr_typ, hdr_sid;
-   float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
-   float wdir, wind, ugrd, vgrd;
+   ConcatString hdr_sid;
+   ConcatString hdr_typ;
+   float conversion;
+   float hdr_arr[HDR_ARRAY_LEN];
+   float obs_arr[OBS_ARRAY_LEN];
+   float wdir;
+   float wind;
+   float ugrd;
+   float vgrd;
    int count = 0;
-   StringArray missing_vars, missing_qty_vars;
+   StringArray missing_qty_vars;
+   StringArray missing_vars;
    const char *method_name = "process_madis_raob() ";
 
    int maxlvl_manLevel;
@@ -1384,8 +1433,9 @@ void process_madis_raob(NcFile *&f_in) {
    //
    // Loop through each record and get the header data.
    //
-   for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
-      int buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
+   for(int i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
+      int buf_size = (my_rec_end - i_hdr_s);
+      if(buf_size > BUFFER_SIZE) buf_size = BUFFER_SIZE;
 
       vector<int> nlvl_manLevel(buf_size);
       vector<int> nlvl_sigTLevel(buf_size);
@@ -1548,7 +1598,7 @@ void process_madis_raob(NcFile *&f_in) {
          //
 
          count = 0;
-         i_hdr = i_hdr_s + i_idx;
+         int i_hdr = i_hdr_s + i_idx;
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
 
          //
@@ -1593,7 +1643,7 @@ void process_madis_raob(NcFile *&f_in) {
          // Loop through the mandatory levels
          //
          nlvl = nlvl_manLevel[i_idx];
-         for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+         for(int i_lvl=0; i_lvl<nlvl; i_lvl++) {
 
             mlog << Debug(3) << "  Mandatory Level: " << i_lvl << "\n";
 
@@ -1675,7 +1725,7 @@ void process_madis_raob(NcFile *&f_in) {
          // Loop through the significant levels wrt T
          //
          nlvl = nlvl_sigTLevel[i_idx];
-         for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+         for(int i_lvl=0; i_lvl<nlvl; i_lvl++) {
 
             mlog << Debug(3) << "  Significant T Level: " << i_lvl << "\n";
 
@@ -1715,7 +1765,7 @@ void process_madis_raob(NcFile *&f_in) {
          // Loop through the significant levels wrt W
          //
          nlvl = nlvl_sigWLevel[i_idx];
-         for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+         for(int i_lvl=0; i_lvl<nlvl; i_lvl++) {
 
             mlog << Debug(3) << "  Significant W Level: " << i_lvl << "\n";
 
@@ -1773,7 +1823,7 @@ void process_madis_raob(NcFile *&f_in) {
          // Loop through the significant levels wrt W-by-P
          //
          nlvl = nlvl_sigPresWLevel[i_idx];
-         for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+         for(int i_lvl=0; i_lvl<nlvl; i_lvl++) {
 
             mlog << Debug(3) << "  Significant W-by-P Level: " << i_lvl << "\n";
 
@@ -1831,7 +1881,7 @@ void process_madis_raob(NcFile *&f_in) {
          // Loop through the tropopause levels
          //
          nlvl = nlvl_mTropNum[i_idx];
-         for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+         for(int i_lvl=0; i_lvl<nlvl; i_lvl++) {
 
             mlog << Debug(3) << "  Tropopause Level: " << i_lvl << "\n";
 
@@ -1901,7 +1951,7 @@ void process_madis_raob(NcFile *&f_in) {
          // Loop through the maximum wind levels
          //
          nlvl = nlvl_mWndNum[i_idx];
-         for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+         for(int i_lvl=0; i_lvl<nlvl; i_lvl++) {
 
             mlog << Debug(3) << "  Maximum Wind Level: " << i_lvl << "\n";
 
@@ -1960,7 +2010,7 @@ void process_madis_raob(NcFile *&f_in) {
 
    } // end for i_hdr
 
-   print_rej_counts();
+   print_rej_counts(processed_count);
 
    //
    // Cleanup
@@ -1974,16 +2024,20 @@ void process_madis_raob(NcFile *&f_in) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_madis_profiler(NcFile *&f_in) {
-   int nhdr, nlvl, i_lvl;
-   long i_hdr, i_hdr_s;
+   int nhdr;
+   int nlvl;
    int hdr_sid_len;
    double tmp_dbl;
    time_t hdr_vld;
-   ConcatString hdr_typ, hdr_sid;
-   float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
+   ConcatString hdr_sid;
+   ConcatString hdr_typ;
+   float conversion;
+   float hdr_arr[HDR_ARRAY_LEN];
+   float obs_arr[OBS_ARRAY_LEN];
    float pressure;
    int count = 0;
-   StringArray missing_vars, missing_qty_vars;
+   StringArray missing_qty_vars;
+   StringArray missing_vars;
    const char *method_name = "process_madis_profiler() ";
 
    //
@@ -2041,7 +2095,6 @@ void process_madis_profiler(NcFile *&f_in) {
    //
    // Setup the output NetCDF file
    //
-   //setup_netcdf_out(nhdr);
 
    mlog << Debug(2) << "Processing PROFILER recs\t\t= " << my_rec_end - rec_beg << "\n";
 
@@ -2056,7 +2109,6 @@ void process_madis_profiler(NcFile *&f_in) {
    LongArray cur;    // NetCDF API checks dimension for 2D or 3D
    LongArray dim;    // NetCDF API checks dimension for 2D or 3D
 
-   //int[] hdr_lat_arr = new int[BUFFER_SIZE];
    int hdr_idx = 0;
    processed_count = 0;
    cur.add(0);
@@ -2073,7 +2125,7 @@ void process_madis_profiler(NcFile *&f_in) {
    //
    // Loop through each record and get the header data.
    //
-   for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
+   for(int i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
       int buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
       vector<float> hdr_lat_arr(buf_size);
       vector<float> hdr_lon_arr(buf_size);
@@ -2125,7 +2177,7 @@ void process_madis_profiler(NcFile *&f_in) {
          //
 
          count = 0;
-         i_hdr = i_hdr_s + i_idx;
+         int i_hdr = i_hdr_s + i_idx;
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
 
          //
@@ -2168,7 +2220,7 @@ void process_madis_profiler(NcFile *&f_in) {
          //
          // Loop through the mandatory levels
          //
-         for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+         for(int i_lvl=0; i_lvl<nlvl; i_lvl++) {
 
             mlog << Debug(3) << "  Level: " << i_lvl << "\n";
 
@@ -2204,7 +2256,7 @@ void process_madis_profiler(NcFile *&f_in) {
 
    } // end for i_hdr
 
-   print_rej_counts();
+   print_rej_counts(processed_count);
 
    //
    // Cleanup
@@ -2219,15 +2271,18 @@ void process_madis_profiler(NcFile *&f_in) {
 
 void process_madis_maritime(NcFile *&f_in) {
    int nhdr;
-   long i_hdr, i_hdr_s;
    int hdr_sid_len;
    double tmp_dbl;
    time_t hdr_vld;
-   ConcatString hdr_typ, hdr_sid;
-   float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
+   ConcatString hdr_sid;
+   ConcatString hdr_typ;
+   float conversion;
+   float hdr_arr[HDR_ARRAY_LEN];
+   float obs_arr[OBS_ARRAY_LEN];
    float pressure;
    int count = 0;
-   StringArray missing_vars, missing_qty_vars;
+   StringArray missing_qty_vars;
+   StringArray missing_vars;
    const char *method_name = "process_madis_maritime() ";
 
    //
@@ -2354,8 +2409,9 @@ void process_madis_maritime(NcFile *&f_in) {
    //
    // Loop through each record and get the header data.
    //
-   for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
-      int buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
+   for(int i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
+      int buf_size = (my_rec_end - i_hdr_s);
+      if (buf_size > BUFFER_SIZE) buf_size = BUFFER_SIZE;
       vector<float> hdr_lat_arr(buf_size);
       vector<float> hdr_lon_arr(buf_size);
       vector<float> hdr_elv_arr(buf_size);
@@ -2439,7 +2495,7 @@ void process_madis_maritime(NcFile *&f_in) {
          //
 
          count = 0;
-         i_hdr = i_hdr_s + i_idx;
+         int i_hdr = i_hdr_s + i_idx;
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
 
          //
@@ -2573,8 +2629,7 @@ void process_madis_maritime(NcFile *&f_in) {
 
    } // end for i_hdr
 
-   print_rej_counts();
-   mlog << Debug(5) << "    Added " << processed_count << "data\n";
+   print_rej_counts(processed_count);
 
    //
    // Cleanup
@@ -2588,15 +2643,21 @@ void process_madis_maritime(NcFile *&f_in) {
 
 void process_madis_mesonet(NcFile *&f_in) {
    int nhdr;
-   long i_hdr, i_hdr_s;
    int hdr_sid_len;
    double tmp_dbl;
    time_t hdr_vld;
-   ConcatString hdr_typ, hdr_sid;
-   float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
-   float wdir, wind, ugrd, vgrd;
+   ConcatString hdr_typ;
+   ConcatString hdr_sid;
+   float conversion;
+   float hdr_arr[HDR_ARRAY_LEN];
+   float obs_arr[OBS_ARRAY_LEN];
+   float wdir;
+   float wind;
+   float ugrd;
+   float vgrd;
    int count = 0;
-   StringArray missing_vars, missing_qty_vars;
+   StringArray missing_qty_vars;
+   StringArray missing_vars;
    const char *method_name = "process_madis_mesonet() ";
 
    //
@@ -2757,8 +2818,9 @@ void process_madis_mesonet(NcFile *&f_in) {
    //
    // Loop through each record and get the header data.
    //
-   for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
-      int buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
+   for(int i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
+      int buf_size = (int)(my_rec_end - i_hdr_s);
+      if(buf_size > BUFFER_SIZE) buf_size = BUFFER_SIZE;
       vector<float> hdr_lat_arr(buf_size);
       vector<float> hdr_lon_arr(buf_size);
       vector<float> hdr_elv_arr(buf_size);
@@ -2889,7 +2951,7 @@ void process_madis_mesonet(NcFile *&f_in) {
          //
 
          count = 0;
-         i_hdr = i_hdr_s + i_idx;
+         int i_hdr = i_hdr_s + i_idx;
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
 
          //
@@ -3111,18 +3173,16 @@ void process_madis_mesonet(NcFile *&f_in) {
 
          // Write V-component of 10m wind
          obs_arr[4] = vgrd;
-         //count += process_obs(34, conversion, obs_arr, qty, in_windSpeed10_var,
-         //            hdr_typ, hdr_sid, hdr_vld,
-         //            hdr_arr[0], hdr_arr[1], hdr_arr[2]);
-         process_obs(34, conversion, obs_arr, qty, in_windSpeed10_var,
-                     hdr_typ, hdr_sid, hdr_vld,
-                     hdr_arr[0], hdr_arr[1], hdr_arr[2]);
+         count += process_obs(34, conversion, obs_arr, qty, in_windSpeed10_var,
+                              hdr_typ, hdr_sid, hdr_vld,
+                              hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
       }
 
    } // end for i
 
-   print_rej_counts();
+
+   print_rej_counts(count);
 
    //
    // Cleanup
@@ -3136,16 +3196,28 @@ void process_madis_mesonet(NcFile *&f_in) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_madis_acarsProfiles(NcFile *&f_in) {
-   int nhdr, nlvl,nlvl1, i_lvl, maxLevels;
-   long i_hdr, i_cnt, i_hdr_s;
+   int nhdr;
+   int nlvl;
+   int nlvl1;
+   int maxLevels;
+   long i_cnt;
    int hdr_sid_len;
    int buf_size;
-   double tmp_dbl, tmp_dbl2, tmp_dbl1;
+   double tmp_dbl;
+   double tmp_dbl2;
+   double tmp_dbl1;
    char qty;
    time_t hdr_vld;
-   ConcatString hdr_typ, hdr_sid;
-   float hdr_arr[HDR_ARRAY_LEN], obs_arr[OBS_ARRAY_LEN], conversion;
-   float pressure, wdir, wind, ugrd, vgrd;
+   ConcatString hdr_typ;
+   ConcatString hdr_sid;
+   float conversion;
+   float hdr_arr[HDR_ARRAY_LEN];
+   float obs_arr[OBS_ARRAY_LEN];
+   float pressure;
+   float wdir;
+   float wind;
+   float ugrd;
+   float vgrd;
    int count = 0;
    StringArray missing_vars, missing_qty_vars;
    const char * method_name = "process_madis_acarsProfiles() -> ";
@@ -3245,7 +3317,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    dim[0] = buf_size;
    get_nc_data(&in_var, levels.data(), buf_size, cur[0]);
    if (IS_VALID_NC(in_nLevelsQty_var)) get_nc_data(&in_nLevelsQty_var, levelsQty.data(), buf_size, cur[0]);
-   for(i_hdr=0; i_hdr<buf_size; i_hdr++) {
+   for(int i_hdr=0; i_hdr<buf_size; i_hdr++) {
       nlvl1 += levels[i_hdr];
    }
 
@@ -3265,8 +3337,9 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
    //
    // Loop through each record and get the header data.
    //
-   for(i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
-      buf_size = ((my_rec_end - i_hdr_s) > BUFFER_SIZE) ? BUFFER_SIZE: (my_rec_end - i_hdr_s);
+   for(int i_hdr_s=rec_beg; i_hdr_s<my_rec_end; i_hdr_s+=BUFFER_SIZE) {
+      buf_size = (int)(my_rec_end - i_hdr_s);
+      if (buf_size > BUFFER_SIZE) buf_size = BUFFER_SIZE;
 
       vector<double> tmp_dbl_arr(buf_size);
       vector<float> hdr_lat_arr(buf_size * maxLevels);
@@ -3319,7 +3392,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       hdr_typ = "AIRCFT";
 
       for (int i_idx=0; i_idx<buf_size; i_idx++) {
-         i_hdr = i_hdr_s + i_idx;
+         int i_hdr = i_hdr_s + i_idx;
          mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
 
          //
@@ -3345,12 +3418,12 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
                  << ") at nLevels variable can not exceed dimension maxLevels (" << maxLevels<< ")\n\n";
             nlvl = maxLevels;
          }
-         obs_arr[2] = levels[i_idx];
+         obs_arr[2] = (float)levels[i_idx];
 
          //
          // Loop through each level of each track
          //
-         for(i_lvl=0; i_lvl<nlvl; i_lvl++) {
+         for(int i_lvl=0; i_lvl<nlvl; i_lvl++) {
 
             count = 0;
             i_cnt++;
@@ -3409,7 +3482,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
             // Compute the pressure (hPa) from altitude data
             // Equation obtained from http://www.srh.noaa.gov/
             //
-            pressure = 1013.25*pow((1-2.25577e-5*obs_arr[3]),5.25588);
+            pressure = (float)1013.25*pow((1-2.25577e-5*obs_arr[3]),5.25588);
 
             //
             // Replace number of Levels to Pressure values in Observation Array
@@ -3454,7 +3527,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
 
             // Write V-component of wind
             obs_arr[4] = vgrd;
-            process_obs(34, conversion, obs_arr, qty, in_windSpeed_var,
+            count += process_obs(34, conversion, obs_arr, qty, in_windSpeed_var,
                         hdr_typ, hdr_sid, hdr_vld,
                         hdr_arr[0], hdr_arr[1], hdr_arr[2]);
 
@@ -3462,7 +3535,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
       }
    } // end for i_hdr
 
-   print_rej_counts();
+   print_rej_counts(count);
 
    //
    // Cleanup
@@ -3475,7 +3548,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+static void usage() {
 
    cout << "\nUsage: "
         << program_name << "\n"
@@ -3547,7 +3620,7 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_type(const StringArray & a)
+static void set_type(const StringArray & a)
 {
    //
    // Parse the MADIS type
@@ -3580,7 +3653,7 @@ void set_type(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_qc_dd(const StringArray & a)
+static void set_qc_dd(const StringArray & a)
 {
    //
    // Parse the list of QC flags to be used
@@ -3590,7 +3663,7 @@ void set_qc_dd(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_lvl_dim(const StringArray & a)
+static void set_lvl_dim(const StringArray & a)
 {
    //
    // Parse the list vertical level dimensions to be processed
@@ -3600,21 +3673,21 @@ void set_lvl_dim(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_rec_beg(const StringArray & a)
+static void set_rec_beg(const StringArray & a)
 {
    rec_beg = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_rec_end(const StringArray & a)
+static void set_rec_end(const StringArray & a)
 {
    rec_end = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_mask_grid(const StringArray & a) {
+static void set_mask_grid(const StringArray & a) {
 
    // List the grid masking file
    mlog << Debug(1)
@@ -3630,7 +3703,7 @@ void set_mask_grid(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_mask_poly(const StringArray & a) {
+static void set_mask_poly(const StringArray & a) {
    ConcatString mask_name;
 
    // List the poly masking file
@@ -3659,7 +3732,7 @@ void set_mask_poly(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_mask_sid(const StringArray & a) {
+static void set_mask_sid(const StringArray & a) {
 
    // List the station ID mask
    mlog << Debug(1)
@@ -3676,13 +3749,13 @@ void set_mask_sid(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+static void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray & a) {
+static void set_config(const StringArray & a) {
    config_filename = a[0];
 }
 
