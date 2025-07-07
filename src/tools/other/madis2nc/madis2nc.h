@@ -68,11 +68,11 @@ enum class MadisType {
 };
 
 // Constants
-static const char *program_name = "madis2nc";
-static const char *DEFAULT_CONFIG_FILENAME =
+constexpr char program_name[] = "madis2nc";
+constexpr char DEFAULT_CONFIG_FILENAME[] =
   "MET_BASE/config/Madis2NcConfig_default";
 
-static const float fill_value   = -9999.f;
+constexpr float fill_value   = -9999.f;
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -80,12 +80,12 @@ static const float fill_value   = -9999.f;
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const char *metar_str         = "METAR";
-static const char *raob_str          = "RAOB";
-static const char *profiler_str      = "PROFILER";
-static const char *maritime_str      = "MARITIME";
-static const char *mesonet_str       = "MESONET";
-static const char *acarsProfiles_str = "ACARSPROFILES";
+constexpr char metar_str[]         = "METAR";
+constexpr char raob_str[]          = "RAOB";
+constexpr char profiler_str[]      = "PROFILER";
+constexpr char maritime_str[]      = "MARITIME";
+constexpr char mesonet_str[]       = "MESONET";
+constexpr char acarsProfiles_str[] = "ACARSPROFILES";
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -93,7 +93,7 @@ static const char *acarsProfiles_str = "ACARSPROFILES";
 //
 ////////////////////////////////////////////////////////////////////////
 
-static const char *in_recNum_str        = "recNum";
+constexpr char in_recNum_str[]     = "recNum";
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -132,7 +132,7 @@ static int          rej_sid  = 0;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-netCDF::NcFile *f_out = (netCDF::NcFile *) nullptr;
+auto f_out = (netCDF::NcFile *) nullptr;
 
 int processed_count = 0;
 
