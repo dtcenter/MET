@@ -1,0 +1,41 @@
+module load intel-oneapi-compilers/2025.1.1
+module load cmake/3.30.2
+
+export FC=ifx
+export F77=ifx
+export F90=ifx
+export CC=icx
+export CXX=icpx
+
+export PATH=/scratch3/BMC/dtc/METplus/miniconda/miniconda3/envs/metplus_v6.1_py3.12/bin:${PATH}
+export TEST_BASE=/contrib/met/12.1.0
+export COMPILER=intel-oneapi-compilers_2025.1.1
+export MET_SUBDIR=${TEST_BASE}
+export MET_TARBALL=v12.1.0.tar.gz
+export USE_MODULES=TRUE
+export MET_PYTHON=/scratch3/BMC/dtc/METplus/miniconda/miniconda3/envs/metplus_v6.1_py3.12
+export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.12
+export MET_PYTHON_LD="-L${MET_PYTHON}/lib/python3.12/config-3.12-x86_64-linux-gnu -L${MET_PYTHON}/lib -lpython3.12 -lpthread -ldl  -lutil -lm"
+export ADDTL_DIR=/usr/lib64
+export EXTERNAL_LIBS=${TEST_BASE}/external_libs/
+#export COMPILE_ECKIT=1
+#export COMPILE_ATLAS=1
+export MET_PROJ=${EXTERNAL_LIBS}
+export MET_NETCDF=${EXTERNAL_LIBS}
+export MET_GSL=${EXTERNAL_LIBS}
+export MET_BUFRLIB=${EXTERNAL_LIBS}
+export BUFRLIB_NAME=-lbufr_4
+export MET_HDF5=${EXTERNAL_LIBS}
+export MET_GRIB2CLIB=${EXTERNAL_LIBS}/lib
+export MET_GRIB2CINC=${EXTERNAL_LIBS}/include
+export GRIB2CLIB_NAME=-lg2c
+export LIB_JASPER=${EXTERNAL_LIBS}/lib
+export LIB_LIBPNG=${EXTERNAL_LIBS}/lib
+export LIB_Z=${EXTERNAL_LIBS}/lib
+export TIFF_INCLUDE_DIR=${EXTERNAL_LIBS}/include
+export TIFF_LIB_DIR=${EXTERNAL_LIBS}/lib
+export SQLITE_INCLUDE_DIR=${EXTERNAL_LIBS}/include
+export SQLITE_LIB_DIR=${EXTERNAL_LIBS}/lib
+export MAKE_ARGS="-j 5"
+#export SKIP_MET=true
+
