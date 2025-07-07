@@ -6,7 +6,7 @@ DOCKERHUB_TAG=$(get_dockerhub_tag)
 
 DOCKERFILE_PATH=${GITHUB_WORKSPACE}/internal/scripts/docker/Dockerfile
 
-CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_release_${SOURCE_BRANCH}.log
+CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build_release.log
 
 time_command docker build -t ${DOCKERHUB_TAG} \
     --build-arg SOURCE_BRANCH \

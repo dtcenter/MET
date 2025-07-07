@@ -13,3 +13,10 @@ fi
 echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
 
 time_command docker push ${DOCKERHUB_TAG}
+
+# push X.Y-latest for vX.Y.Z versions
+if [[ "${UPDATE_LATEST}" == "true" && "${SOURCE_BRANCH}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then  
+    LATEST_TAG=$(echo ${SOURCE_BRANCH} | sed 's/^v//g' | cut -f1,2 -d'.')-latest
+    time_command docker tag ${DOCKERHUB_TAG} ${DOCKERHUB_REPO}:${LATEST_TAG}
+    time_command docker push ${DOCKERHUB_REPO}:${LATEST_TAG}
+fi

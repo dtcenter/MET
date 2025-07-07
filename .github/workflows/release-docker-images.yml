@@ -11,6 +11,11 @@ on:
         default: '"v12.0.2"'
         required: true
         type: string
+      update_latest:
+        description: 'For official "vX.Y.Z" versions, update the corresponding "X.Y-latest" images.'
+        default: false 
+        required: true
+        type: boolean
   schedule:
     - cron: "30 03 * * *"
 
@@ -24,18 +29,23 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.get-versions.outputs.matrix }}
+      update_latest: ${{ steps.get-versions.outputs.update_latest }}
     steps:
       - name: Get versions to build 
         id: get-versions
         run: |
           if [[ ${{ github.event_name }} == 'schedule' ]]; then
             version_list="\"v12.0.2\""
+            update_latest="true"
           elif [[ ${{ github.event_name }} == 'workflow_dispatch' ]]; then
             version_list=${{ toJSON(inputs.release_version) }}
+            update_latest=${{ toJSON(inputs.update_latest) }}
           else
             version_list=\"${{ toJSON(github.ref_name) }}\"
+            update_latest="true"
           fi
           echo "matrix={\"version\": [ ${version_list} ]}" >> $GITHUB_OUTPUT
+          echo "update_latest=${update_latest}" >> $GITHUB_OUTPUT
 
   build_and_push:
     name: Build and Push Images
@@ -46,6 +56,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.version }}
 
       - name: Create directories to store output
         run: mkdir -p ${RUNNER_WORKSPACE}/logs
@@ -64,6 +76,7 @@ jobs:
         run: .github/jobs/push_release_docker_image.sh
         env:
           SOURCE_BRANCH: ${{ matrix.version }}
+          UPDATE_LATEST: ${{ fromJSON(needs.define-matrix.outputs.update_latest) }}
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
@@ -71,6 +84,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs_compile
+          name: logs_${{ matrix.version }}
           path: ${{ runner.workspace }}/logs
           if-no-files-found: ignore
