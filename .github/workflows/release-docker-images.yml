@@ -60,7 +60,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ matrix.version }}
-          path: 'docker'
+          path: ${{ matrix.version }}
           sparse-checkout: internal/scripts/docker/Dockerfile
           sparse-checkout-cone-mode: false
 
