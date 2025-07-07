@@ -46,7 +46,7 @@ export MET_TEST_INPUT=${MET_PROJ_DIR}/MET_test_data/unit_test
 export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
 
 # Path to METplus, used for diff tests
-export METPLUS_DIR=/home/met_test/METplus
+export METPLUS_DIR=${MET_PROJ_DIR}/MET_regression/METplus-develop
 
 # Define Rscript to use a version with the ncdf4 package 1.17 or later 
 export MET_TEST_RSCRIPT=/nrit/ral/R-4.4.0/bin/Rscript
@@ -57,7 +57,7 @@ export MET_TEST_MET_PYTHON_EXE=${MET_PYTHON_BIN_EXE}
 # This is a cron script -- create the shell environment for this job
 # - NCO is for ncdiff
 # - NetCDF is for ncdump.
-export PATH="/nrit/ral/nco/bin:/nrit/ral/netcdf4/bin:\
+export PATH="${MET_PYTHON}/bin:/nrit/ral/nco/bin:/nrit/ral/netcdf4/bin:\
              /nrit/ral/sbin:/nrit/ral/bin:/usr/sbin:\
              /usr/bin:/sbin:/bin:/usr/bin/X11:/opt/bin:$PATH"
 
