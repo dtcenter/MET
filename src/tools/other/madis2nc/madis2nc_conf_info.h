@@ -31,6 +31,7 @@ public:
                    const std::string &user_filename);
 
   ConcatString get_grib_var_name(const int grib_code);
+  ConcatString get_grib_var_unit(const int grib_code);
 
   TimeSummaryInfo getSummaryInfo() const
   {
@@ -54,7 +55,8 @@ protected:
   ConcatString _version;
   TimeSummaryInfo _timeSummaryInfo;
 
-  std::map<ConcatString,ConcatString> grib_code_map;
+  std::map<ConcatString,ConcatString> grib_name_map;
+  std::map<ConcatString,ConcatString> grib_unit_map;
 
   ///////////////////////
   // Protected methods //
