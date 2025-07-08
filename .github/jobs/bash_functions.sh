@@ -27,7 +27,8 @@ function time_command {
 }
 
 # utility function to construct the DockerHub tag name to be used,
-# replacing slashes with underscores in the branch name
+# replacing slashes with underscores in the branch name, and
+# omitting the leading 'v' from the DockerHub version
 
 function get_dockerhub_tag {
   echo ${DOCKERHUB_REPO}:$(echo ${SOURCE_BRANCH} | sed 's%/%_%g' | sed 's%^v%%g' )
