@@ -1,0 +1,94 @@
+name: Create Docker images for release
+
+on:
+  push:
+    tags:
+      - v*
+  workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Comma-separated list of versions to build, e.g. "v12.0.2","v12.1.0"'
+        default: '"v12.0.2"'
+        required: true
+        type: string
+      update_latest:
+        description: 'For official "vX.Y.Z" versions, update the corresponding "X.Y-latest" images.'
+        default: false 
+        required: true
+        type: boolean
+  schedule:
+    - cron: "30 03 * * 0"
+
+env:
+  DOCKERHUB_REPO: dtcenter/met
+
+jobs:
+
+  define-matrix:
+    name: Define Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.get-versions.outputs.matrix }}
+      update_latest: ${{ steps.get-versions.outputs.update_latest }}
+    steps:
+      - name: Get versions to build 
+        id: get-versions
+        run: |
+          if [[ ${{ github.event_name }} == 'schedule' ]]; then
+            version_list="\"v12.0.2\""
+            update_latest="true"
+          elif [[ ${{ github.event_name }} == 'workflow_dispatch' ]]; then
+            version_list=${{ toJSON(inputs.release_version) }}
+            update_latest=${{ toJSON(inputs.update_latest) }}
+          else
+            version_list=\"${{ toJSON(github.ref_name) }}\"
+            update_latest="true"
+          fi
+          echo "matrix={\"version\": [ ${version_list} ]}" >> $GITHUB_OUTPUT
+          echo "update_latest=${update_latest}" >> $GITHUB_OUTPUT
+
+  build_and_push:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    needs: define-matrix
+    strategy:
+      matrix: ${{ fromJSON(needs.define-matrix.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.version }}
+          path: ${{ matrix.version }}
+          sparse-checkout: internal/scripts/docker/Dockerfile
+          sparse-checkout-cone-mode: false
+
+      - name: Create directories to store output
+        run: mkdir -p ${RUNNER_WORKSPACE}/logs
+
+      - name: Build Release Docker Image
+        run: .github/jobs/build_release_docker_image.sh
+        env:
+          SOURCE_BRANCH: ${{ matrix.version }}
+          MET_CONFIG_OPTS: '--enable-all'
+
+      - name: Copy all build log files into logs directory
+        if: always()
+        run: cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
+
+      - name: Push Docker Image
+        run: .github/jobs/push_release_docker_image.sh
+        env:
+          SOURCE_BRANCH: ${{ matrix.version }}
+          UPDATE_LATEST: ${{ fromJSON(needs.define-matrix.outputs.update_latest) }}
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Upload logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs_${{ matrix.version }}
+          path: ${{ runner.workspace }}/logs
+          if-no-files-found: ignore
