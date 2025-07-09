@@ -61,18 +61,14 @@ void Madis2NcConfInfo::clear()
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString Madis2NcConfInfo::get_grib_var_name(const int grib_code) {
-   ConcatString grib_code_str;
-   grib_code_str << grib_code;
-   ConcatString grib_var_name = grib_name_map[grib_code_str];
+   ConcatString grib_var_name = grib_name_map[grib_code];
    return grib_var_name;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 ConcatString Madis2NcConfInfo::get_grib_var_unit(const int grib_code) {
-   ConcatString grib_code_str;
-   grib_code_str << grib_code;
-   ConcatString grib_var_name = grib_unit_map[grib_code_str];
+   ConcatString grib_var_name = grib_unit_map[grib_code];
    return grib_var_name;
 }
 
@@ -104,13 +100,16 @@ void Madis2NcConfInfo::read_config(const string &default_filename,
 
 void Madis2NcConfInfo::process_config()
 {
-  
+
   _version = parse_conf_version(&_conf);
   check_met_version(_version.c_str());
 
-  // Conf: grib_name_map & grib_unit_map
-  grib_name_map = parse_conf_key_value_map(&_conf, conf_key_grib_name_map);
-  grib_unit_map = parse_conf_key_value_map(&_conf, conf_key_grib_unit_map);
+  // Conf: grib_var_map
+  for (const auto& pair : parse_conf_key_values_map(&_conf, conf_key_grib_var_map)) {
+    int grib_code = atoi(pair.first.c_str());
+    grib_name_map[grib_code] = pair.second[0];
+    grib_unit_map[grib_code] = pair.second[1];
+  }
 
   _timeSummaryInfo = parse_conf_time_summary(&_conf);
   

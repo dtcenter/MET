@@ -55,8 +55,8 @@ protected:
   ConcatString _version;
   TimeSummaryInfo _timeSummaryInfo;
 
-  std::map<ConcatString,ConcatString> grib_name_map;
-  std::map<ConcatString,ConcatString> grib_unit_map;
+  std::map<int,ConcatString> grib_name_map;
+  std::map<int,ConcatString> grib_unit_map;
 
   ///////////////////////
   // Protected methods //
