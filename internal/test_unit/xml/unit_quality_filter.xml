@@ -17,6 +17,29 @@
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
 
+  <test name="point_stat_QTY_INC_EXC_MADIS">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>OBS_QUALITY_INC_SFC</name> <value>"8"</value></pair>
+      <pair><name>OBS_QUALITY_INC_UPA</name> <value>"2"</value></pair>
+      <pair><name>OBS_QUALITY_EXC_SFC</name> <value>"9"</value></pair>
+      <pair><name>OBS_QUALITY_EXC_UPA</name> <value>"9"</value></pair>
+      <pair><name>OUTPUT_PREFIX</name>       <value>QTY_INC_EXC_MADIS</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.nc \
+      &CONFIG_DIR;/PointStatConfig_qty_inc_exc \
+      -outdir &OUTPUT_DIR;/quality_filter -v 3
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/quality_filter/point_stat_QTY_INC_EXC_MADIS_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/quality_filter/point_stat_QTY_INC_EXC_MADIS_120000L_20120409_120000V_ctc.txt</stat>
+      <stat>&OUTPUT_DIR;/quality_filter/point_stat_QTY_INC_EXC_MADIS_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/quality_filter/point_stat_QTY_INC_EXC_MADIS_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
   <test name="point_stat_QTY_INC_EXC_PB">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
@@ -31,7 +54,7 @@
       &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
       &CONFIG_DIR;/PointStatConfig_qty_inc_exc \
       -outdir &OUTPUT_DIR;/quality_filter -v 3
-    </param>   
+    </param>
     <output>
       <stat>&OUTPUT_DIR;/quality_filter/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/quality_filter/point_stat_QTY_INC_EXC_PB_120000L_20120409_120000V_ctc.txt</stat>
@@ -55,7 +78,7 @@
       &CONFIG_DIR;/EnsembleStatConfig_qty_inc_exc \
       -point_obs &OUTPUT_DIR;/madis2nc/metar_2012040912_F000.nc \
       -outdir &OUTPUT_DIR;/quality_filter -v 3
-    </param>   
+    </param>
     <output>
       <stat>&OUTPUT_DIR;/quality_filter/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/quality_filter/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_ecnt.txt</stat>
@@ -63,5 +86,5 @@
       <stat>&OUTPUT_DIR;/quality_filter/ensemble_stat_QTY_INC_EXC_MADIS_VGS_20120409_120000V_orank.txt</stat>
     </output>
   </test>
-  
+
 </met_test>
