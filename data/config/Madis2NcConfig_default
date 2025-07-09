@@ -10,52 +10,32 @@
 // The parameters listed below are used to summarize the MADIS data read in
 //
 
-grib_name_map = [
-   { key = "1"  ;      val = "PRES";   },   // Station Pressure
-   { key = "2"  ;      val = "PRMSL";  },   // Sea Level Pressure
-   { key = "7"  ;      val = "HGT";    },   // Height
-   { key = "11" ;      val = "TMP";    },   // Temperature
-   { key = "15" ;      val = "TMAX";   },   // Maximum Temperature
-   { key = "16" ;      val = "TMIN";   },   // Minimum Temperature
-   { key = "17" ;      val = "DPT";    },   // Dewpoint
-   { key = "20" ;      val = "VISIB";  },   // Visibility
-   { key = "31" ;      val = "WDIR";   },   // Wind Direction
-   { key = "32" ;      val = "WIND";   },   // Wind Speed
-   { key = "33" ;      val = "UGRD";   },   // Write U-component of wind
-   { key = "34" ;      val = "VGRD";   },   // Write V-component of wind
-   { key = "52" ;      val = "RH";     },   // Relative Humidity
-   { key = "54" ;      val = "PWAT";   },   // Precipitable Water
-   { key = "59" ;      val = "PRATE";  },   // Precipitation Rate
-   { key = "61" ;      val = "APCP";   },   // Precipitation
-   { key = "66" ;      val = "SNOD";   },   // Snow Cover
-   { key = "80" ;      val = "WTMP";   },   // Sea Surface Temperature
-   { key = "85" ;      val = "TSOIL";  },   // Soil Temperature
-   { key = "180";      val = "GUST";   },   // Wind Gust
-   { key = "250";      val = "SWHR";   }    // Solar Radiation
-];
-
-grib_unit_map = [
-   { key = "1"  ;      val = "Pa";       }, // Station Pressure
-   { key = "2"  ;      val = "Pa";       }, // Sea Level Pressure
-   { key = "7"  ;      val = "gpm";      }, // Height
-   { key = "11" ;      val = "K";        }, // Temperature
-   { key = "15" ;      val = "K";        }, // Maximum Temperature
-   { key = "16" ;      val = "K";        }, // Minimum Temperature
-   { key = "17" ;      val = "K";        }, // Dewpoint
-   { key = "20" ;      val = "W/m^2";    }, // Visibility
-   { key = "31" ;      val = "deg";      }, // Wind Direction
-   { key = "32" ;      val = "m/s";      }, // Wind Speed
-   { key = "33" ;      val = "m/s";      }, // Write U-component of wind
-   { key = "34" ;      val = "m/s";      }, // Write V-component of wind
-   { key = "52" ;      val = "%";        }, // Relative Humidity
-   { key = "54" ;      val = "kg/m^2";   }, // Precipitable Water
-   { key = "59" ;      val = "kg/m^2/s"; }, // Precipitation Rate
-   { key = "61" ;      val = "kg/m^2";   }, // Precipitation
-   { key = "66" ;      val = "m";        }, // Snow Cover
-   { key = "80" ;      val = "K";        }, // Sea Surface Temperature
-   { key = "85" ;      val = "K";        }, // Soil Temperature
-   { key = "180";      val = "m/s";      }, // Wind Gust
-   { key = "250";      val = "K/s";      }  // Solar Radiation
+//
+// Mapping from GRIB code to the variable name and units.
+// The first value is the variable name and the second value is the units.
+//
+grib_var_map = [
+   { key = "1"  ;   val =  "PRES,Pa"      ; },  // Station Pressure
+   { key = "2"  ;   val = "PRMSL,Pa"      ; },  // Sea Level Pressure
+   { key = "7"  ;   val =   "HGT,gpm"     ; },  // Height
+   { key = "11" ;   val =   "TMP,K"       ; },  // Temperature
+   { key = "15" ;   val =  "TMAX,K"       ; },  // Maximum Temperature
+   { key = "16" ;   val =  "TMIN,K"       ; },  // Minimum Temperature
+   { key = "17" ;   val =   "DPT,K"       ; },  // Dewpoint
+   { key = "20" ;   val = "VISIB,W/m^2"   ; },  // Visibility
+   { key = "31" ;   val =  "WDIR,deg"     ; },  // Wind Direction
+   { key = "32" ;   val =  "WIND,m/s"     ; },  // Wind Speed
+   { key = "33" ;   val =  "UGRD,m/s"     ; },  // Write U-component of wind
+   { key = "34" ;   val =  "VGRD,m/s"     ; },  // Write V-component of wind
+   { key = "52" ;   val =    "RH,%"       ; },  // Relative Humidity
+   { key = "54" ;   val =  "PWAT,kg/m^2"  ; },  // Precipitable Water
+   { key = "59" ;   val = "PRATE,kg/m^2/s"; },  // Precipitation Rate
+   { key = "61" ;   val =  "APCP,kg/m^2"  ; },  // Precipitation
+   { key = "66" ;   val =  "SNOD,m"       ; },  // Snow Cover
+   { key = "80" ;   val =  "WTMP,K"       ; },  // Sea Surface Temperature
+   { key = "85" ;   val = "TSOIL,K"       ; },  // Soil Temperature
+   { key = "180";   val =  "GUST,m/s"     ; },  // Wind Gust
+   { key = "250";   val =  "SWHR,K/s"     ; }   // Solar Radiation
 ];
 
 //
