@@ -390,9 +390,9 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
 
    // Check for a match
    if(_format == USCRNFormat::None) {
-      mlog << Error << "\nUscrnHandler::_readObservataions() -> "
+      mlog << Warning << "\nUscrnHandler::_readObservataions() -> "
            << "unknown USCRN format for file \""
-           << ascii_file.filename() << "\"!\n\n";
+           << ascii_file.filename() << "\"\n\n";
       return false; 
    }
 
@@ -415,12 +415,12 @@ bool UscrnHandler::_readObservations(LineDataFile &ascii_file) {
 
       // Check the expected number of columns
       if(dl.n_items() != USCRNFormatMap.at(_format)._nCols) {
-         mlog << Error << "\nUscrnHandler::_readObservations() -> "
+         mlog << Warning << "\nUscrnHandler::_readObservations() -> "
               << "unexpected number of columns ("
               << dl.n_items() << " != " << USCRNFormatMap.at(_format)._nCols
               << ") on line number " << dl.line_number()
               << " of USCRN file \"" << ascii_file.filename()
-              << "\"!\n\n";
+              << "\"\n\n";
          return false;
       }
 
@@ -497,10 +497,10 @@ time_t UscrnHandler::_getUscrnValidTime(const DataLine &dl) const {
       date_str = date_str.substr(0, 8);
    }
    else {
-      mlog << Error << "\nUscrnHandler::_getUscrnValidTime() -> "
+      mlog << Warning << "\nUscrnHandler::_getUscrnValidTime() -> "
            << "unexpected date format (" << date_str
-           << ") on line number " << dl.line_number() << "!\n\n";
-      exit(1);
+           << ") on line number " << dl.line_number() << "\n\n";
+      return 0;
    }
 
    // Parse time components
