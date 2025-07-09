@@ -229,7 +229,7 @@ int met_main(int argc, char *argv[]) {
    }
 
    //
-   // Check for at last one input file
+   // Check for at least one input file
    //
    if(asfile_list.empty()) {
       mlog << Error << "\nmet_main() -> "
@@ -293,9 +293,8 @@ int met_main(int argc, char *argv[]) {
    // Read the input files
    //
    if(!file_handler->readAsciiFiles(asfile_list)) {
-      mlog << Error << "\n" << program_name << " -> "
-           << "encountered an error while reading input files!\n\n";
-      return 1;
+      mlog << Warning << "\n" << program_name << " -> "
+           << "encountered error(s) while reading input files!\n\n";
    }
 
    //
@@ -335,9 +334,8 @@ static StringArray get_input_files(const ConcatString &input) {
    else if(is_ascii_file_list(input.c_str())) {
       sa.add(parse_ascii_file_list(input.c_str()));
    }
-   // Store python inputs and regular files
-   else if(ascii_format == ASCIIFormat::Python ||
-           is_regular_file(input.c_str())) {
+   // Store file names and python inputs
+   else {
       sa.add(input);
    }
 

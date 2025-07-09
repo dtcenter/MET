@@ -108,7 +108,7 @@ bool IsmnHandler::_readObservations(LineDataFile &ascii_file) {
 
       // Make sure that the line contains the correct number of tokens
       if(dl.n_items() != NUM_OBS_COLS) {
-         mlog << Error << "\nIsmnHandler::_readObservations() -> "
+         mlog << Warning << "\nIsmnHandler::_readObservations() -> "
               << "unexpected number of columns (" << dl.n_items()
               << " != " << NUM_OBS_COLS << ") on line number "
               << dl.line_number() << " of ISMN file \""
@@ -201,7 +201,7 @@ bool IsmnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
 
    // Validate the file name
    if(sa.n() < 4) {
-      mlog << Error << "\nIsmnHandler::_readHeaderInfo() -> "
+      mlog << Warning << "\nIsmnHandler::_readHeaderInfo() -> "
            << "unexpected ISMN file name \"" << ascii_file.filename()
            << "\"!\n\n";
       return false;
@@ -209,7 +209,7 @@ bool IsmnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
 
    // Validate the variable name
    if(IsmnObsVarMap.count(sa[3]) == 0) {
-      mlog << Error << "\nIsmnHandler::_readHeaderInfo() -> "
+      mlog << Warning << "\nIsmnHandler::_readHeaderInfo() -> "
            << "unexpected variable name (" << sa[3]
            << ") found in ISMN file name \"" << ascii_file.filename()
            << "\"!\n\n";
@@ -228,7 +228,7 @@ bool IsmnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
 
    // Check the minimum number of header columns
    if(dl.n_items() < MIN_NUM_HDR_COLS) {
-      mlog << Error << "\nIsmnHandler::_readHeaderInfo() -> "
+      mlog << Warning << "\nIsmnHandler::_readHeaderInfo() -> "
            << "unexpected number of header columns ("
            << dl.n_items() << " < " << MIN_NUM_HDR_COLS
            << ") in ISMN file \"" << ascii_file.filename()

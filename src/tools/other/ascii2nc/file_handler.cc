@@ -72,8 +72,7 @@ FileHandler::~FileHandler()
 
 ////////////////////////////////////////////////////////////////////////
 
-bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_list)
-{
+bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_list) {
   nc_point_obs.init_buffer();
 
   // Loop through the ASCII files, reading in the observations.  At the end of
@@ -85,28 +84,29 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
   num_observations_in_range = 0;
   num_observations_out_of_range = 0;
 
-  for (vector< ConcatString >::const_iterator ascii_filename = ascii_filename_list.begin();
-       ascii_filename != ascii_filename_list.end(); ++ascii_filename)
-  {
-    // Open the input ASCII observation file
+  for(vector< ConcatString >::const_iterator ascii_filename = ascii_filename_list.begin();
+      ascii_filename != ascii_filename_list.end(); ++ascii_filename) {
 
+    // Open the input ASCII observation file
     LineDataFile ascii_file;
 
-    if (!ascii_file.open((*ascii_filename).c_str()))
-    {
-      mlog << Error << "\nFileHandler::readAsciiFiles() -> "
+    if(!ascii_file.open((*ascii_filename).c_str())) {
+      mlog << Warning << "\nFileHandler::readAsciiFiles() -> "
            << "can't open input ASCII file \"" << *ascii_filename
            << "\" for reading\n\n";
-
-      return false;
+      continue;
     }
 
     mlog << Debug(2)
          << "Reading File: " << *ascii_filename << "\n";
  
     // Read the observations
-    if (!_readObservations(ascii_file))
-      return false;
+    if(!_readObservations(ascii_file)) {
+      mlog << Warning << "\nFileHandler::readAsciiFiles() -> "
+           << "can't read observations from input ASCII file \""
+           << *ascii_filename << "\"\n\n";
+      continue;
+    }
 
     mlog << Debug(3)
          << "  Running total of "
@@ -114,7 +114,6 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
          << num_observations_out_of_range << " rejected.\n";
 
     // Close the file
-
     ascii_file.close();
   }
 
