@@ -64,6 +64,7 @@ void PointStatConfInfo::clear() {
    // Initialize values
    model.clear();
    grib_codes_set = false;
+   var_units_set = false;
    land_mask.clear();
    topo_dp.clear();
    topo_use_obs_thresh.clear();
@@ -330,11 +331,10 @@ void PointStatConfInfo::process_grib_codes() {
         << "observations are specified as GRIB codes.\n";
 
    Dictionary *odict = conf.lookup_array(conf_key_obs_field);
-   Dictionary i_odict;
 
    // Add the GRIB code by parsing each observation dictionary
    for(int i=0; i<n_vx; i++) {
-      i_odict = parse_conf_i_vx_dict(odict, i);
+      Dictionary i_odict = parse_conf_i_vx_dict(odict, i);
       vx_opt[i].vx_pd.obs_info->add_grib_code(i_odict);
    }
 
@@ -564,6 +564,34 @@ void PointStatConfInfo::process_geog(const Grid &grid,
       }
       vx_opt[i].vx_pd.set_sfc_info(sfc_info);
    }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PointStatConfInfo::process_var_units(const StringArray &var_names,
+                                          const StringArray &var_units) {
+
+   // Only needs to be set once
+   if(var_units_set) return;
+
+   mlog << Debug(3) << "Processing each \"" << conf_key_obs_field
+        << "\" name as a GRIB code abbreviation since the point "
+        << "observations are specified as GRIB codes.\n";
+
+   int idx;
+   auto odict = conf.lookup_array(conf_key_obs_field);
+
+   // Add the GRIB code by parsing each observation dictionary
+   for(int i=0; i<n_vx; i++) {
+      Dictionary i_odict = parse_conf_i_vx_dict(odict, i);
+      ConcatString field_name = i_odict.lookup_string(conf_key_name, false);
+      if (var_names.has(field_name, idx)) vx_opt[i].vx_pd.obs_info->set_units(var_units[idx].c_str());
+   }
+
+   // Flag to prevent processing more than once
+   var_units_set = true;
 
    return;
 }

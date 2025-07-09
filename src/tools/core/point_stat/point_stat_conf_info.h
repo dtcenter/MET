@@ -226,6 +226,7 @@ class PointStatConfInfo {
 
       PointStatVxOpt * vx_opt;              // Array of vx task options [n_vx] (allocated)
       bool             grib_codes_set;
+      bool             var_units_set;
 
       // Land/sea mask and topography info for data filtering
       MaskPlane    land_mask;
@@ -277,6 +278,7 @@ class PointStatConfInfo {
       void process_flags();
       void process_masks(const Grid &);
       void process_geog(const Grid &, const char *);
+      void process_var_units(const StringArray &var_names, const StringArray &var_units);
       void set_vx_pd();
 
       // Dump out the counts

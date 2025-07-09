@@ -214,6 +214,7 @@ class EnsembleStatConfInfo {
 
       EnsembleStatVxOpt  * vx_opt;          // Array of vx task options [n_vx] (allocated)
       bool                 grib_codes_set;
+      bool                 var_units_set;
 
       double               vld_ens_thresh;  // Required ratio of valid input files
       double               vld_data_thresh; // Required ratio of valid data for each point
@@ -250,6 +251,7 @@ class EnsembleStatConfInfo {
       void process_grib_codes();
       void process_flags ();
       void process_masks (const Grid &);
+      void process_var_units(const StringArray &var_names, const StringArray &var_units);
       void set_vx_pd     (const IntArray &, int);
 
       // Dump out the counts
