@@ -208,6 +208,13 @@ bool NcPointObsData::read_obs_data_table_lookups(NetcdfObsVars obs_vars, bool st
                  << "trouble getting data of " << nc_var_obs_var << "\n\n";
          }
       }
+      if (IS_VALID_NC(obs_vars.unit_var)) {
+         if (!get_nc_data_to_array(&obs_vars.unit_var, &var_units)) {
+            succeed = false;
+            mlog << Error << "\n" << method_name
+                 << "trouble getting data of " << nc_var_unit << "\n\n";
+         }
+      }
       if (IS_VALID_NC(obs_vars.obs_qty_tbl_var)) {
          if (!get_nc_data_to_array(&obs_vars.obs_qty_tbl_var, &qty_names)) {
             succeed = false;
