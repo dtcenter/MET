@@ -112,7 +112,7 @@ bool IsmnHandler::_readObservations(LineDataFile &ascii_file) {
               << "unexpected number of columns (" << dl.n_items()
               << " != " << NUM_OBS_COLS << ") on line number "
               << dl.line_number() << " of ISMN file \""
-              << ascii_file.filename() << "\"!\n\n";
+              << ascii_file.filename() << "\"\n\n";
          return false;
       }
 
@@ -203,7 +203,7 @@ bool IsmnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
    if(sa.n() < 4) {
       mlog << Warning << "\nIsmnHandler::_readHeaderInfo() -> "
            << "unexpected ISMN file name \"" << ascii_file.filename()
-           << "\"!\n\n";
+           << "\"\n\n";
       return false;
    }
 
@@ -212,7 +212,7 @@ bool IsmnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
       mlog << Warning << "\nIsmnHandler::_readHeaderInfo() -> "
            << "unexpected variable name (" << sa[3]
            << ") found in ISMN file name \"" << ascii_file.filename()
-           << "\"!\n\n";
+           << "\"\n\n";
       return false;
    }
 
@@ -232,7 +232,7 @@ bool IsmnHandler::_readHeaderInfo(LineDataFile &ascii_file) {
            << "unexpected number of header columns ("
            << dl.n_items() << " < " << MIN_NUM_HDR_COLS
            << ") in ISMN file \"" << ascii_file.filename()
-           << "\"!\n\n";
+           << "\"\n\n";
       return false;
    }
 
