@@ -824,7 +824,11 @@ void process_obs_file(int i_nc) {
 #endif
 
    // Perform GRIB table lookups, if needed
-   if(!use_var_id) conf_info.process_grib_codes();
+   if(use_var_id) {
+      conf_info.process_var_units(nc_point_obs.get_var_names(),
+                                  nc_point_obs.get_var_units());
+   }
+   else conf_info.process_grib_codes();
    is_vgrd = is_ugrd = false;
 
    int hdr_count = met_point_obs->get_hdr_cnt();

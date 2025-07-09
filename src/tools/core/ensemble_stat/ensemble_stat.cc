@@ -975,7 +975,7 @@ void process_point_obs(int i_nc) {
    bool use_arr_vars = false;
    bool use_python = false;
    MetNcPointObsIn nc_point_obs;
-   MetPointData *met_point_obs = 0;
+   MetPointData *met_point_obs = nullptr;
 
    // Check for python format
    string python_command = point_obs_file_list[i_nc];
@@ -1026,7 +1026,11 @@ void process_point_obs(int i_nc) {
 #endif
 
    // Perform GRIB table lookups, if needed
-   if(!use_var_id) conf_info.process_grib_codes();
+   if(use_var_id) {
+      conf_info.process_var_units(nc_point_obs.get_var_names(),
+                                  nc_point_obs.get_var_units());
+   }
+   else conf_info.process_grib_codes();
 
    int hdr_count = met_point_obs->get_hdr_cnt();
    int obs_count = met_point_obs->get_obs_cnt();
