@@ -71,6 +71,11 @@ extern std::map<ConcatString,ConcatString>
                           Dictionary *dict,
                           const char *conf_key_map_name,
                           const char *caller=nullptr);
+extern std::map<ConcatString,StringArray>
+                       parse_conf_key_values_map(
+                          Dictionary *dict,
+                          const char *conf_key_map_name,
+                          const char *caller=nullptr);
 extern void            parse_add_conf_key_value_map(
                           Dictionary *dict,
                           const char *conf_key_map_name,
