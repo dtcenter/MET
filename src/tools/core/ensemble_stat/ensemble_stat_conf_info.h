@@ -144,9 +144,9 @@ class EnsembleStatVxOpt {
 
       void process_config(GrdFileType, Dictionary &,
                           GrdFileType, Dictionary &,
-                          gsl_rng *, bool, bool,
-                          StringArray, StringArray *,
-                          bool, ConcatString);
+                          gsl_rng *, bool,
+                          StringArray &, StringArray *,
+                          bool, ConcatString &);
       void parse_nc_info(Dictionary &);
       void set_vx_pd(EnsembleStatConfInfo *, int);
 

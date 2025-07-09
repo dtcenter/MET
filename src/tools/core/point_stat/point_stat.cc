@@ -224,14 +224,13 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return "point_stat";
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
-   int i;
+static void process_command_line(int argc, char **argv) {
    CommandLine cline;
    GrdFileType ftype;
    ConcatString default_config_file;
@@ -320,17 +319,17 @@ void process_command_line(int argc, char **argv) {
    if (FileType_UGrid == ftype) {
 #ifdef WITH_UGRID
       ConcatString ugrid_dataset = conf_info.ugrid_dataset;
-      if (0 < ugrid_dataset.length()) {
+      if (!ugrid_dataset.empty()) {
          double max_distance_km = conf_info.ugrid_max_distance_km;
          ConcatString ugrid_nc = conf_info.ugrid_nc;
          ConcatString ugrid_map_config_filename = conf_info.ugrid_map_config;
-         MetUGridDataFile *ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
+         auto ugrid_mtddf = (MetUGridDataFile *)fcst_mtddf;
 
          ugrid_mtddf->set_ugrid_configs(ugrid_dataset, max_distance_km,
                                         ugrid_map_config_filename);
-         if (0 == ugrid_nc.length() || ugrid_nc == "NA") {
+         if (ugrid_nc.empty() || ugrid_nc == "NA") {
             ConcatString coordinate_file = ugrid_mtddf->coordinate_file();
-            ugrid_nc = (0 < coordinate_file.length()) ? coordinate_file : fcst_file;
+            ugrid_nc = (!coordinate_file.empty()) ? coordinate_file : fcst_file;
          }
          ugrid_mtddf->open_metadata(ugrid_nc.c_str());
          mlog << Debug(9) << method_name
@@ -356,7 +355,7 @@ void process_command_line(int argc, char **argv) {
    mlog << Debug(1)
         << "Forecast File: " << fcst_file << "\n";
 
-   for(i=0; i<obs_file.n(); i++) {
+   for(int i=0; i<obs_file.n(); i++) {
       mlog << Debug(1)
            << "Observation File: " << obs_file[i] << "\n";
    }
@@ -366,7 +365,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
+static void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
 
    // Unset the flag
    is_first_pass = false;
@@ -393,9 +392,15 @@ void setup_first_pass(const DataPlane &dp, const Grid &data_grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_txt_files() {
-   int max_col, max_prob_col, max_mctc_col, max_orank_col;
-   int n_prob, n_cat, n_eclv, n_ens;
+static void setup_txt_files() {
+   int n_cat;
+   int n_eclv;
+   int n_ens;
+   int n_prob;
+   int max_col;
+   int max_mctc_col;
+   int max_orank_col;
+   int max_prob_col;
    ConcatString base_name;
 
    // Create output file names for the stat file and optional text files
@@ -440,7 +445,7 @@ void setup_txt_files() {
    setup_table(stat_at);
 
    // Write the text header row
-   write_header_row((const char **) 0, 0, 1, stat_at, 0, 0);
+   write_header_row((const char **)nullptr, 0, 1, stat_at, 0, 0);
 
    // Initialize the row index to 1 to account for the header
    i_stat_row = 1;
@@ -554,7 +559,7 @@ void setup_txt_files() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_table(AsciiTable &at) {
+static void setup_table(AsciiTable &at) {
 
    // Justify the STAT AsciiTable objects
    justify_stat_cols(at);
@@ -576,8 +581,8 @@ void setup_table(AsciiTable &at) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void build_outfile_name(unixtime valid_ut, int lead_sec,
-                        const char *suffix, ConcatString &str) {
+static void build_outfile_name(unixtime valid_ut, int lead_sec,
+                               const char *suffix, ConcatString &str) {
 
    //
    // Create output file name
@@ -603,13 +608,16 @@ void build_outfile_name(unixtime valid_ut, int lead_sec,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_fcst_climo_files() {
-   int j;
+static void process_fcst_climo_files() {
    int n_fcst;
    DataPlaneArray fcst_dpa;
-   DataPlaneArray fcmn_dpa, fcsd_dpa;
-   DataPlaneArray ocmn_dpa, ocsd_dpa;
-   unixtime file_ut, beg_ut, end_ut;
+   DataPlaneArray fcmn_dpa;
+   DataPlaneArray fcsd_dpa;
+   DataPlaneArray ocmn_dpa;
+   DataPlaneArray ocsd_dpa;
+   unixtime beg_ut;
+   unixtime end_ut;
+   unixtime file_ut;
 
    // Loop through each of the fields to be verified and extract
    // the forecast and climatological fields for verification
@@ -658,7 +666,7 @@ void process_fcst_climo_files() {
               << fcst_info->regrid().get_str() << ".\n";
 
          // Loop through the forecast fields
-         for(j=0; j<fcst_dpa.n_planes(); j++) {
+         for(int j=0; j<fcst_dpa.n_planes(); j++) {
             fcst_dpa.at(j) = met_regrid(fcst_dpa[j], fcst_mtddf->grid(), grid,
                                         fcst_info->regrid());
          }
@@ -666,7 +674,7 @@ void process_fcst_climo_files() {
 
       // Rescale probabilities from [0, 100] to [0, 1]
       if(fcst_info->p_flag()) {
-         for(j=0; j<fcst_dpa.n_planes(); j++) {
+         for(int j=0; j<fcst_dpa.n_planes(); j++) {
             rescale_probability(fcst_dpa.at(j));
          }
       } // end for j
@@ -748,21 +756,22 @@ void process_fcst_climo_files() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_obs_file(int i_nc) {
-   int j, i_obs;
-   float obs_arr[OBS_ARRAY_LEN], hdr_arr[HDR_ARRAY_LEN];
+static void process_obs_file(int i_nc) {
+   int i_obs;
+   float hdr_arr[HDR_ARRAY_LEN];
+   float obs_arr[OBS_ARRAY_LEN];
    float prev_obs_arr[OBS_ARRAY_LEN];
    ConcatString hdr_typ_str;
    ConcatString hdr_sid_str;
    ConcatString hdr_vld_str;
    ConcatString obs_qty_str;
    unixtime hdr_ut;
-   NcFile *obs_in = (NcFile *) nullptr;
    const char *method_name = "process_obs_file() -> ";
 
    // Set flags for vectors
    bool vflag = conf_info.get_vflag();
-   bool is_ugrd, is_vgrd;
+   bool is_ugrd;
+   bool is_vgrd;
 
    // Open the observation file as a NetCDF file.
    // The observation file must be in NetCDF format as the
@@ -867,11 +876,10 @@ void process_obs_file(int i_nc) {
                                             obs_qty_idx_block.data(), nullptr);
       if (!status) exit(1);
 
-      int hdr_idx;
       for(int i_block_idx=0; i_block_idx<block_size; i_block_idx++) {
          i_obs = i_block_start_idx + i_block_idx;
 
-         for (j=0; j<OBS_ARRAY_LEN; j++) {
+         for (int j=0; j<OBS_ARRAY_LEN; j++) {
             obs_arr[j] = obs_arr_block[i_block_idx][j];
          }
 
@@ -924,7 +932,7 @@ void process_obs_file(int i_nc) {
          // previous.  If vector winds are to be computed, UGRD
          // must be followed by VGRD
          if(vflag && is_ugrd) {
-            for(j=0; j<4; j++) prev_obs_arr[j] = obs_arr[j];
+            for(int j=0; j<4; j++) prev_obs_arr[j] = obs_arr[j];
          }
 
          // If the current observation is VGRD and vector
@@ -949,7 +957,7 @@ void process_obs_file(int i_nc) {
 
          // Check each conf_info.vx_pd object to see if this observation
          // should be added
-         for(j=0; j<conf_info.get_n_vx(); j++) {
+         for(int j=0; j<conf_info.get_n_vx(); j++) {
 
             // Check for no forecast fields
             if(conf_info.vx_opt[j].vx_pd.fcst_dpa.n_planes() == 0) continue;
@@ -971,22 +979,23 @@ void process_obs_file(int i_nc) {
    if (use_python) met_point_file.close();
    else
 #endif
-   nc_point_obs.close();
+   {
+      nc_point_obs.close();
+   }
 
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_scores() {
-   int n_cat, n_wind;
+static void process_scores() {
    ConcatString cs;
 
    // Initialize pointers
-   PairDataPoint *pd_ptr     = (PairDataPoint *) nullptr;
-   CTSInfo       *cts_info   = (CTSInfo *)       nullptr;
    MCTSInfo       mcts_info;
-   VL1L2Info     *vl1l2_info = (VL1L2Info *)     nullptr;
+   auto pd_ptr     = (PairDataPoint *) nullptr;
+   auto cts_info   = (CTSInfo *)       nullptr;
+   auto vl1l2_info = (VL1L2Info *)     nullptr;
 
    mlog << Debug(2)
         << "\n" << sep_str << "\n\n";
@@ -995,8 +1004,8 @@ void process_scores() {
    setup_txt_files();
 
    // Store the maximum number of each threshold type
-   n_cat  = conf_info.get_max_n_cat_thresh();
-   n_wind = conf_info.get_max_n_wind_thresh();
+   int n_cat  = conf_info.get_max_n_cat_thresh();
+   int n_wind = conf_info.get_max_n_wind_thresh();
 
    // Allocate space for output statistics types
    cts_info   = new CTSInfo   [n_cat];
@@ -1399,8 +1408,8 @@ void process_scores() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
-   int i, j, n_cat;
+static void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
+   int n_cat;
 
    mlog << Debug(2)
         << "Computing Categorical Statistics.\n";
@@ -1409,13 +1418,13 @@ void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
    // Set up the CTSInfo thresholds and alpha values
    //
    n_cat = conf_info.vx_opt[i_vx].fcat_ta.n();
-   for(i=0; i<n_cat; i++) {
+   for(int i=0; i<n_cat; i++) {
       cts_info[i].cts.set_ec_value(conf_info.vx_opt[i_vx].hss_ec_value);
       cts_info[i].fthresh = conf_info.vx_opt[i_vx].fcat_ta[i];
       cts_info[i].othresh = conf_info.vx_opt[i_vx].ocat_ta[i];
       cts_info[i].allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
 
-      for(j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
+      for(int j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
          cts_info[i].alpha[j] = conf_info.vx_opt[i_vx].ci_alpha[j];
       }
    }
@@ -1452,8 +1461,7 @@ void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_mcts(MCTSInfo &mcts_info, int i_vx, const PairDataPoint *pd_ptr) {
-   int i;
+static void do_mcts(MCTSInfo &mcts_info, int i_vx, const PairDataPoint *pd_ptr) {
 
    mlog << Debug(2)
         << "Computing Multi-Category Statistics.\n";
@@ -1467,7 +1475,7 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, const PairDataPoint *pd_ptr) {
    mcts_info.set_othresh(conf_info.vx_opt[i_vx].ocat_ta);
    mcts_info.allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
 
-   for(i=0; i<conf_info.vx_opt[i_vx].get_n_ci_alpha(); i++) {
+   for(int i=0; i<conf_info.vx_opt[i_vx].get_n_ci_alpha(); i++) {
       mcts_info.alpha[i] = conf_info.vx_opt[i_vx].ci_alpha[i];
    }
 
@@ -1503,11 +1511,12 @@ void do_mcts(MCTSInfo &mcts_info, int i_vx, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
-   int i, j, k, n_bin;
-   PairDataPoint pd_thr, pd;
-   SL1L2Info *sl1l2_info = (SL1L2Info *) nullptr;
-   CNTInfo   *cnt_info   = (CNTInfo *)   nullptr;
+static void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
+   int n_bin;
+   PairDataPoint pd;
+   PairDataPoint pd_thr;
+   auto sl1l2_info = (SL1L2Info *) nullptr;
+   auto cnt_info   = (CNTInfo *)   nullptr;
 
    mlog << Debug(2)
         << "Computing Scalar Partial Sums and Continuous Statistics.\n";
@@ -1534,7 +1543,7 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    sl1l2_info = new SL1L2Info [n_bin];
 
    // Process each continuous filtering threshold
-   for(i=0; i<vx_opt.fcnt_ta.n(); i++) {
+   for(int i=0; i<vx_opt.fcnt_ta.n(); i++) {
 
       // Apply continuous filtering thresholds to subset pairs
       pd_thr = pd_ptr->subset_pairs_cnt_thresh(vx_opt.fcnt_ta[i],
@@ -1545,7 +1554,7 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
       if(pd_thr.n_obs == 0) continue;
 
       // Process the climo CDF bins
-      for(j=0; j<n_bin; j++) {
+      for(int j=0; j<n_bin; j++) {
 
          // Initialize
          if(do_sl1l2) sl1l2_info[j].clear();
@@ -1603,7 +1612,7 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
             // Setup the CNTInfo alpha values
             cnt_info[j].allocate_n_alpha(vx_opt.get_n_ci_alpha());
-            for(k=0; k<vx_opt.get_n_ci_alpha(); k++) {
+            for(int k=0; k<vx_opt.get_n_ci_alpha(); k++) {
                cnt_info[j].alpha[k] = vx_opt.ci_alpha[k];
             }
 
@@ -1693,9 +1702,8 @@ void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_vl1l2(VL1L2Info *&v_info, int i_vx,
-              const PairDataPoint *pd_u_ptr, const PairDataPoint *pd_v_ptr) {
-   int i, j;
+static void do_vl1l2(VL1L2Info *&v_info, int i_vx,
+                     const PairDataPoint *pd_u_ptr, const PairDataPoint *pd_v_ptr) {
 
    mlog << Debug(2)
         << "Computing Vector Partial Sums and Continuous Vector Statistics.\n";
@@ -1714,7 +1722,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
    //
    // Set all of the VL1L2Info objects
    //
-   for(i=0; i<conf_info.vx_opt[i_vx].fwind_ta.n(); i++) {
+   for(int i=0; i<conf_info.vx_opt[i_vx].fwind_ta.n(); i++) {
 
       //
       // Store thresholds
@@ -1725,7 +1733,7 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
       v_info[i].logic   = conf_info.vx_opt[i_vx].wind_logic;
       v_info[i].allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
 
-      for(j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
+      for(int j=0; j<conf_info.vx_opt[i_vx].get_n_ci_alpha(); j++) {
          v_info[i].alpha[j] = conf_info.vx_opt[i_vx].ci_alpha[j];
       }
 
@@ -1741,10 +1749,9 @@ void do_vl1l2(VL1L2Info *&v_info, int i_vx,
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
-   int i, j, k, n_bin;
+static void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
+   int n_bin;
    PairDataPoint pd;
-   PCTInfo *pct_info = (PCTInfo *) nullptr;
 
    mlog << Debug(2)
         << "Computing Probabilistic Statistics.\n";
@@ -1760,13 +1767,13 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
    }
 
    // Allocate memory
-   pct_info = new PCTInfo [n_bin];
+   auto pct_info = new PCTInfo [n_bin];
 
    // Process each probabilistic observation threshold
-   for(i=0; i<vx_opt.ocat_ta.n(); i++) {
+   for(int i=0; i<vx_opt.ocat_ta.n(); i++) {
 
       // Process the climo CDF bins
-      for(j=0; j<n_bin; j++) {
+      for(int j=0; j<n_bin; j++) {
 
          // Initialize
          pct_info[j].clear();
@@ -1781,7 +1788,7 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
          pct_info[j].othresh = vx_opt.ocat_ta[i];
          pct_info[j].allocate_n_alpha(vx_opt.get_n_ci_alpha());
 
-         for(k=0; k<vx_opt.get_n_ci_alpha(); k++) {
+         for(int k=0; k<vx_opt.get_n_ci_alpha(); k++) {
             pct_info[j].alpha[k] = vx_opt.ci_alpha[k];
          }
 
@@ -1862,9 +1869,11 @@ void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
+static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
    PairDataEnsemble hira_pd;
-   int i, j, k, lvl_blw, lvl_abv;
+   int k;
+   int lvl_abv;
+   int lvl_blw;
    NumArray f_ens;
 
    // Set flag for specific humidity
@@ -1875,7 +1884,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
                        conf_info.vx_opt[i_vx].hira_info.shape);
 
    // Loop over the HiRA widths
-   for(i=0; i<conf_info.vx_opt[i_vx].hira_info.width.n(); i++) {
+   for(int i=0; i<conf_info.vx_opt[i_vx].hira_info.width.n(); i++) {
 
       shc.set_interp_wdth(conf_info.vx_opt[i_vx].hira_info.width[i]);
 
@@ -1898,7 +1907,7 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
       f_ens.extend(gt->size());
 
       // Process each observation point
-      for(j=0; j<pd_ptr->n_obs; j++) {
+      for(int j=0; j<pd_ptr->n_obs; j++) {
 
          // Determine the forecast level values
          find_vert_lvl(conf_info.vx_opt[i_vx].vx_pd.fcst_dpa,
@@ -2052,10 +2061,12 @@ void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
+static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
    PairDataPoint hira_pd;
-   int i, j, k, lvl_blw, lvl_abv;
-   double f_cov, ocmn_cov;
+   int lvl_abv;
+   int lvl_blw;
+   double f_cov;
+   double ocmn_cov;
    NumArray ocmn_cov_na;
    SingleThresh cat_thresh;
    PCTInfo pct_info;
@@ -2063,20 +2074,20 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
    // Set flag for specific humidity
    bool spfh_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_specific_humidity() &&
                     conf_info.vx_opt[i_vx].vx_pd.obs_info->is_specific_humidity();
-   bool precip_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_precipitation() &&
-                      conf_info.vx_opt[i_vx].vx_pd.obs_info->is_precipitation();
+   //bool precip_flag = conf_info.vx_opt[i_vx].vx_pd.fcst_info->is_precipitation() &&
+   //                   conf_info.vx_opt[i_vx].vx_pd.obs_info->is_precipitation();
 
    shc.set_interp_mthd(InterpMthd::Nbrhd,
                        conf_info.vx_opt[i_vx].hira_info.shape);
 
    // Loop over categorical thresholds and HiRA widths
-   for(i=0; i<conf_info.vx_opt[i_vx].fcat_ta.n(); i++) {
+   for(int i=0; i<conf_info.vx_opt[i_vx].fcat_ta.n(); i++) {
 
       cat_thresh = conf_info.vx_opt[i_vx].fcat_ta[i];
 
       shc.set_cov_thresh(cat_thresh);
 
-      for(j=0; j<conf_info.vx_opt[i_vx].hira_info.width.n(); j++) {
+      for(int j=0; j<conf_info.vx_opt[i_vx].hira_info.width.n(); j++) {
 
          shc.set_interp_wdth(conf_info.vx_opt[i_vx].hira_info.width[j]);
 
@@ -2087,7 +2098,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
          // Loop through matched pairs and replace the forecast value
          // with the HiRA fractional coverage.
-         for(k=0; k<pd_ptr->n_obs; k++) {
+         for(int k=0; k<pd_ptr->n_obs; k++) {
 
             // Store climo data
             ClimoPntInfo cpi(pd_ptr->fcmn_na[k], pd_ptr->fcsd_na[k],
@@ -2163,7 +2174,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
          pct_info.othresh = conf_info.vx_opt[i_vx].ocat_ta[i];
          pct_info.allocate_n_alpha(conf_info.vx_opt[i_vx].get_n_ci_alpha());
 
-         for(k=0; k<conf_info.vx_opt[i_vx].get_n_ci_alpha(); k++) {
+         for(int k=0; k<conf_info.vx_opt[i_vx].get_n_ci_alpha(); k++) {
             pct_info.alpha[k] = conf_info.vx_opt[i_vx].ci_alpha[k];
          }
 
@@ -2237,8 +2248,7 @@ void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void finish_txt_files() {
-   int i;
+static void finish_txt_files() {
 
    // Write out the contents of the STAT AsciiTable and
    // close the STAT output files
@@ -2248,16 +2258,14 @@ void finish_txt_files() {
    }
 
    // Finish up each of the optional text files
-   for(i=0; i<n_txt; i++) {
+   for(int i=0; i<n_txt; i++) {
 
       // Only write the table if requested in the config file
-      if(conf_info.output_flag[i] == STATOutputType::Both) {
-
+      if(conf_info.output_flag[i] == STATOutputType::Both
          // Write the AsciiTable to a file
-         if(txt_out[i]) {
-            *txt_out[i] << txt_at[i];
-            close_txt_file(txt_out[i], txt_file[i].c_str());
-         }
+            && txt_out[i]) {
+         *txt_out[i] << txt_at[i];
+         close_txt_file(txt_out[i], txt_file[i].c_str());
       }
    }
 
@@ -2266,7 +2274,7 @@ void finish_txt_files() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void clean_up() {
+static void clean_up() {
 
    // Close the output text files that were open for writing
    finish_txt_files();
@@ -2282,7 +2290,7 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+static void usage() {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -2339,7 +2347,7 @@ void usage() {
 ////////////////////////////////////////////////////////////////////////
 
 #ifdef WITH_UGRID
-void set_ugrid_config(const StringArray & a)
+static void set_ugrid_config(const StringArray & a)
 {
    ugrid_config_files.add(a[0]);
 }
@@ -2347,35 +2355,35 @@ void set_ugrid_config(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_point_obs(const StringArray & a)
+static void set_point_obs(const StringArray & a)
 {
    obs_file.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_ncfile(const StringArray & a)
+static void set_ncfile(const StringArray & a)
 {
    obs_file.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_obs_valid_beg_time(const StringArray & a)
+static void set_obs_valid_beg_time(const StringArray & a)
 {
    obs_valid_beg_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_obs_valid_end_time(const StringArray & a)
+static void set_obs_valid_end_time(const StringArray & a)
 {
    obs_valid_end_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_outdir(const StringArray & a)
+static void set_outdir(const StringArray & a)
 {
    out_dir = a[0];
 }

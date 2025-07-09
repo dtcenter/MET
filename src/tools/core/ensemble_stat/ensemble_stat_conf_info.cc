@@ -60,7 +60,6 @@ void EnsembleStatConfInfo::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::clear() {
-   int i;
 
    // Initialize values
    model.clear();
@@ -82,7 +81,7 @@ void EnsembleStatConfInfo::clear() {
    // Deallocate memory for the random number generator
    if(rng_ptr) rng_free(rng_ptr);
 
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
+   for(int i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    nc_info.clear();
 
@@ -120,21 +119,17 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
                                           bool grid_vx, bool point_vx,
                                           StringArray * ens_files,
                                           bool use_ctrl) {
-   int i, j, n_ens_files;
-   VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
-   Dictionary *fdict = (Dictionary *) nullptr;
-   Dictionary *odict  = (Dictionary *) nullptr;
-   Dictionary i_fdict, i_odict;
-   InterpMthd mthd;
+   auto fdict = (Dictionary *) nullptr;
+   auto odict  = (Dictionary *) nullptr;
+   Dictionary i_fdict;
+   Dictionary i_odict;
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
 
    // Initialize
    clear();
-
-   n_ens_files = ens_files->n();
 
    // Unset MET_ENS_MEMBER_ID in case it is set by the user
    unsetenv(met_ens_member_id);
@@ -149,7 +144,8 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    obtype = parse_conf_string(&conf, conf_key_obtype, grid_vx);
 
    // Conf: rng_type and rng_seed
-   ConcatString rng_type, rng_seed;
+   ConcatString rng_type;
+   ConcatString rng_seed;
    rng_type = conf.lookup_string(conf_key_rng_type);
    rng_seed = conf.lookup_string(conf_key_rng_seed);
 
@@ -274,7 +270,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    check_climo_n_vx(odict, n_vx);
 
    // Parse settings for each verification task
-   for(i=0,max_hira_size=0; i<n_vx; i++) {
+   for(int i=0,max_hira_size=0; i<n_vx; i++) {
 
       // Get the current dictionaries
       i_fdict = parse_conf_i_vx_dict(fdict, i);
@@ -282,7 +278,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
       // Process the options for this verification task
       vx_opt[i].process_config(etype, i_fdict, otype, i_odict,
-                               rng_ptr, grid_vx, point_vx, ens_member_ids,
+                               rng_ptr, point_vx, ens_member_ids,
                                ens_files, use_ctrl, control_id);
 
       // For no point verification, store obtype as the message type
@@ -292,7 +288,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
       }
 
       // Track the maximum HiRA size
-      for(j=0; j<vx_opt[i].interp_info.n_interp; j++) {
+      for(int j=0; j<vx_opt[i].interp_info.n_interp; j++) {
          if(string_to_interpmthd(vx_opt[i].interp_info.method[j].c_str()) == InterpMthd::HiRA) {
             GridTemplateFactory gtf;
             GridTemplate* gt = gtf.buildGT(vx_opt[i].interp_info.shape,
@@ -338,18 +334,17 @@ void EnsembleStatConfInfo::process_grib_codes() {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::process_flags() {
-   int i, j;
    bool output_ascii_flag = false;
 
    // Initialize
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
+   for(int i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
    nc_info.set_all_false();
 
    // Loop over the verification tasks
-   for(i=0; i<n_vx; i++) {
+   for(int i=0; i<n_vx; i++) {
 
       // Summary of output_flag settings
-      for(j=0; j<n_txt; j++) {
+      for(int j=0; j<n_txt; j++) {
          if(vx_opt[i].output_flag[j] == STATOutputType::Both) {
             output_flag[j] = STATOutputType::Both;
             output_ascii_flag = true;
@@ -384,7 +379,6 @@ void EnsembleStatConfInfo::process_flags() {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatConfInfo::process_masks(const Grid &grid) {
-   int i, j;
    MaskPlane mp;
    ConcatString name;
 
@@ -402,14 +396,14 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
    mask_sid_map.clear();
 
    // Process the masks for each vx task
-   for(i=0; i<n_vx; i++) {
+   for(int i=0; i<n_vx; i++) {
 
       // Initialize
       vx_opt[i].mask_name.clear();
       vx_opt[i].mask_name_area.clear();
 
       // Parse the masking grids
-      for(j=0; j<vx_opt[i].mask_grid.n(); j++) {
+      for(int j=0; j<vx_opt[i].mask_grid.n(); j++) {
 
          // Process new grid masks
          if(grid_map.count(vx_opt[i].mask_grid[j]) == 0) {
@@ -428,7 +422,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the masking polylines
-      for(j=0; j<vx_opt[i].mask_poly.n(); j++) {
+      for(int j=0; j<vx_opt[i].mask_poly.n(); j++) {
 
          // Process new poly mask
          if(poly_map.count(vx_opt[i].mask_poly[j]) == 0) {
@@ -447,7 +441,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the masking station ID's
-      for(j=0; j<vx_opt[i].mask_sid.n(); j++) {
+      for(int j=0; j<vx_opt[i].mask_sid.n(); j++) {
 
          // Process new station ID mask
          if(sid_map.count(vx_opt[i].mask_sid[j]) == 0) {
@@ -465,7 +459,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the Lat/Lon point masks
-      for(j=0; j<(int) vx_opt[i].mask_llpnt.size(); j++) {
+      for(int j=0; j<(int) vx_opt[i].mask_llpnt.size(); j++) {
 
          // Process new point masks -- no real work to do
          if(point_map.count(vx_opt[i].mask_llpnt[j].name) == 0) {
@@ -525,10 +519,10 @@ void EnsembleStatConfInfo::process_var_units(const StringArray &var_names,
 ////////////////////////////////////////////////////////////////////////
 
 int EnsembleStatConfInfo::n_txt_row(int i_txt_row) const {
-   int i, n;
+   int n = 0;
 
    // Loop over the tasks and sum the line counts for this line type
-   for(i=0, n=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
+   for(int i=0; i<n_vx; i++) n += vx_opt[i].n_txt_row(i_txt_row);
 
    return n;
 }
@@ -536,10 +530,10 @@ int EnsembleStatConfInfo::n_txt_row(int i_txt_row) const {
 ////////////////////////////////////////////////////////////////////////
 
 int EnsembleStatConfInfo::n_stat_row() const {
-   int i, n;
+   int n = 0;
 
    // Loop over the line types and sum the line counts
-   for(i=0, n=0; i<n_txt; i++) n += n_txt_row(i);
+   for(int i=0; i<n_txt; i++) n += n_txt_row(i);
 
    return n;
 }
@@ -547,9 +541,9 @@ int EnsembleStatConfInfo::n_stat_row() const {
 ////////////////////////////////////////////////////////////////////////
 
 int EnsembleStatConfInfo::get_max_n_prob_cat_thresh() const {
-   int i, n;
+   int n = 0;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_prob_cat_thresh());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_prob_cat_thresh());
 
    return n;
 }
@@ -557,9 +551,9 @@ int EnsembleStatConfInfo::get_max_n_prob_cat_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int EnsembleStatConfInfo::get_max_n_prob_pct_thresh() const {
-   int i, n;
+   int n = 0;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_prob_pct_thresh());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_prob_pct_thresh());
 
    return n;
 }
@@ -567,9 +561,9 @@ int EnsembleStatConfInfo::get_max_n_prob_pct_thresh() const {
 ////////////////////////////////////////////////////////////////////////
 
 int EnsembleStatConfInfo::get_max_n_eclv_points() const {
-   int i, n;
+   int n = 0;
 
-   for(i=0,n=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
+   for(int i=0; i<n_vx; i++) n = max(n, vx_opt[i].get_n_eclv_points());
 
    return n;
 }
@@ -621,7 +615,6 @@ void EnsembleStatVxOpt::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatVxOpt::clear() {
-   int i;
 
    // Initialize values
    vx_pd.clear();
@@ -656,7 +649,7 @@ void EnsembleStatVxOpt::clear() {
    skip_const = false;
    obs_error.clear();
 
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
+   for(int i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    nc_info.clear();
 
@@ -667,11 +660,10 @@ void EnsembleStatVxOpt::clear() {
 
 void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
                                        GrdFileType otype, Dictionary &odict,
-                                       gsl_rng *rng_ptr, bool grid_vx, bool point_vx,
-                                       StringArray ens_member_ids,
+                                       gsl_rng *rng_ptr, bool point_vx,
+                                       StringArray &ens_member_ids,
                                        StringArray * ens_files,
-                                       bool use_ctrl, ConcatString control_id) {
-   int i, j;
+                                       bool use_ctrl, ConcatString &control_id) {
    VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *dict;
@@ -685,13 +677,13 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    vx_pd.ens_info = new EnsVarInfo();
 
    // Loop over ensemble member IDs to substitute
-   for(i=0; i<ens_member_ids.n(); i++) {
+   for(int i=0; i<ens_member_ids.n(); i++) {
 
       // set environment variable for ens member ID
       setenv(met_ens_member_id, ens_member_ids[i].c_str(), 1);
 
       // Allocate new VarInfo object
-      next_var = info_factory.new_var_info(ftype);
+      next_var = VarInfoFactory::new_var_info(ftype);
 
       // Set the current dictionary
       next_var->set_dict(fdict);
@@ -707,7 +699,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       // Add InputInfo to fcst info list for each ensemble file provided
       // set var_info to nullptr to note first VarInfo should be used
       int last_member_index = ens_files->n() - (use_ctrl ? 1 : 0);
-      for(j=1; j<last_member_index; j++) {
+      for(int j=1; j<last_member_index; j++) {
          input_info.var_info = nullptr;
          input_info.file_index = j;
          input_info.file_list = ens_files;
@@ -722,7 +714,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
       setenv(met_ens_member_id, control_id.c_str(), 1);
 
       // Allocate new VarInfo object
-      next_var = info_factory.new_var_info(ftype);
+      next_var = VarInfoFactory::new_var_info(ftype);
 
       // Set the current dictionary
       next_var->set_dict(fdict);
@@ -734,7 +726,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    }
 
    // Allocate new VarInfo object for obs
-   vx_pd.obs_info = info_factory.new_var_info(otype);
+   vx_pd.obs_info = VarInfoFactory::new_var_info(otype);
 
    // Set the VarInfo objects
    vx_pd.obs_info->set_dict(odict);
@@ -809,7 +801,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    parse_nc_info(odict);
 
    // Populate the output_flag array with map values
-   for(i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
+   for(int i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
 
    // Conf: ssvar_bin_size
    ssvar_bin_size = odict.lookup_double(conf_key_ssvar_bin);
@@ -890,9 +882,7 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatVxOpt::parse_nc_info(Dictionary &odict) {
-   const DictionaryEntry * e = (const DictionaryEntry *) nullptr;
-
-   e = odict.lookup(conf_key_nc_orank_flag);
+   const DictionaryEntry *e = odict.lookup(conf_key_nc_orank_flag);
 
    if(!e) {
       mlog << Error
@@ -905,9 +895,8 @@ void EnsembleStatVxOpt::parse_nc_info(Dictionary &odict) {
    const ConfigObjectType type = e->type();
 
    if(type == BooleanType) {
-      bool value = e->b_value();
 
-      if(!value) nc_info.set_all_false();
+      if(!e->b_value()) nc_info.set_all_false();
 
       return;
    }
@@ -938,7 +927,6 @@ void EnsembleStatVxOpt::parse_nc_info(Dictionary &odict) {
 ////////////////////////////////////////////////////////////////////////
 
 void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_index) {
-   int i, j, n;
    int n_msg_typ = msg_typ.n();
    int n_mask    = mask_name.n();
    int n_interp  = interp_info.n_interp;
@@ -984,7 +972,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
    vx_pd.set_msg_typ_sfc(conf_info->msg_typ_sfc);
 
    // Define the verifying message type name and values
-   for(i=0; i<n_msg_typ; i++) {
+   for(int i=0; i<n_msg_typ; i++) {
       vx_pd.set_msg_typ(i, msg_typ[i].c_str());
       sa = conf_info->msg_typ_group_map[msg_typ[i]];
       if(sa.n() == 0) sa.add(msg_typ[i]);
@@ -994,34 +982,34 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
    // Define the masking information: grid, poly, sid
 
    // Define the grid masks
-   for(i=0; i<mask_grid.n(); i++) {
-      n = i;
+   for(int i=0; i<mask_grid.n(); i++) {
+      int n = i;
       vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the poly masks
-   for(i=0; i<mask_poly.n(); i++) {
-      n = i + mask_grid.n();
+   for(int i=0; i<mask_poly.n(); i++) {
+      int n = i + mask_grid.n();
       vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the station ID masks
-   for(i=0; i<mask_sid.n(); i++) {
-      n = i + mask_grid.n() + mask_poly.n();
+   for(int i=0; i<mask_sid.n(); i++) {
+      int n = i + mask_grid.n() + mask_poly.n();
       vx_pd.set_mask_sid(n, mask_name[n].c_str(),
                          &(conf_info->mask_sid_map[mask_name[n]]));
    }
 
    // Define the Lat/Lon point masks
-   for(i=0; i<(int) mask_llpnt.size(); i++) {
-      n = i + mask_grid.n() + mask_poly.n() + mask_sid.n();
+   for(int i=0; i<(int) mask_llpnt.size(); i++) {
+      int n = i + mask_grid.n() + mask_poly.n() + mask_sid.n();
       vx_pd.set_mask_llpnt(n, mask_name[n].c_str(), &mask_llpnt[i]);
    }
 
    // Define the interpolation methods
-   for(i=0; i<interp_info.n_interp; i++) {
+   for(int i=0; i<interp_info.n_interp; i++) {
       vx_pd.set_interp(i, interp_info.method[i].c_str(), interp_info.width[i],
                        interp_info.shape);
       vx_pd.set_interp_thresh(interp_info.vld_thresh);

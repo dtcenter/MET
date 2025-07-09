@@ -137,10 +137,12 @@ void PointStatConfInfo::read_ugrid_configs(StringArray ugrid_config_names, const
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatConfInfo::process_config(GrdFileType ftype) {
-   int i, j, n_fvx, n_ovx;
-   Dictionary *fdict = (Dictionary *) nullptr;
-   Dictionary *odict = (Dictionary *) nullptr;
-   Dictionary i_fdict, i_odict;
+   int n_fvx;
+   int n_ovx;
+   auto fdict = (Dictionary *) nullptr;
+   auto odict = (Dictionary *) nullptr;
+   Dictionary i_fdict;
+   Dictionary i_odict;
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
@@ -217,7 +219,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
    seeps_climo_name = conf.lookup_string(conf_key_seeps_point_climo_name, false);
 
    // Parse settings for each verification task
-   for(i=0; i<n_vx; i++) {
+   for(int i=0; i<n_vx; i++) {
 
       // Get the current dictionaries
       i_fdict = parse_conf_i_vx_dict(fdict, i);
@@ -237,14 +239,14 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
       output_flag[i_val1l2] != STATOutputType::None ||
       output_flag[i_vcnt]   != STATOutputType::None) {
 
-      for(i=0; i<n_vx; i++) {
+      for(int i=0; i<n_vx; i++) {
 
          // Process u-wind
          if(vx_opt[i].vx_pd.fcst_info->is_u_wind() &&
             vx_opt[i].vx_pd.obs_info->is_u_wind()) {
 
             // Search for corresponding v-wind
-            for(j=0; j<n_vx; j++) {
+            for(int j=0; j<n_vx; j++) {
                if(vx_opt[j].vx_pd.fcst_info->is_v_wind() &&
                   vx_opt[j].vx_pd.obs_info->is_v_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
@@ -281,7 +283,7 @@ void PointStatConfInfo::process_config(GrdFileType ftype) {
                  vx_opt[i].vx_pd.obs_info->is_v_wind()) {
 
             // Search for corresponding u-wind
-            for(j=0; j<n_vx; j++) {
+            for(int j=0; j<n_vx; j++) {
                if(vx_opt[j].vx_pd.fcst_info->is_u_wind() &&
                   vx_opt[j].vx_pd.obs_info->is_u_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
@@ -347,17 +349,16 @@ void PointStatConfInfo::process_grib_codes() {
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatConfInfo::process_flags() {
-   int i, j;
    bool output_ascii_flag = false;
 
    // Initialize
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
+   for(int i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    // Loop over the verification tasks
-   for(i=0; i<n_vx; i++) {
+   for(int i=0; i<n_vx; i++) {
 
       // Summary of output_flag settings
-      for(j=0; j<n_txt; j++) {
+      for(int j=0; j<n_txt; j++) {
 
          if(vx_opt[i].output_flag[j] == STATOutputType::Both) {
             output_flag[j] = STATOutputType::Both;
@@ -385,7 +386,6 @@ void PointStatConfInfo::process_flags() {
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatConfInfo::process_masks(const Grid &grid) {
-   int i, j;
    MaskPlane mp;
    ConcatString name;
 
@@ -403,13 +403,13 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
    mask_sid_map.clear();
 
    // Process the masks for each vx task
-   for(i=0; i<n_vx; i++) {
+   for(int i=0; i<n_vx; i++) {
 
       // Initialize
       vx_opt[i].mask_name.clear();
 
       // Parse the masking grids
-      for(j=0; j<vx_opt[i].mask_grid.n(); j++) {
+      for(int j=0; j<vx_opt[i].mask_grid.n(); j++) {
 
          // Process new grid masks
          if(grid_map.count(vx_opt[i].mask_grid[j]) == 0) {
@@ -427,7 +427,7 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the masking polylines
-      for(j=0; j<vx_opt[i].mask_poly.n(); j++) {
+      for(int j=0; j<vx_opt[i].mask_poly.n(); j++) {
 
          // Process new poly mask
          if(poly_map.count(vx_opt[i].mask_poly[j]) == 0) {
@@ -445,7 +445,7 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the masking station ID's
-      for(j=0; j<vx_opt[i].mask_sid.n(); j++) {
+      for(int j=0; j<vx_opt[i].mask_sid.n(); j++) {
 
          // Process new station ID mask
          if(sid_map.count(vx_opt[i].mask_sid[j]) == 0) {
@@ -463,7 +463,7 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the Lat/Lon point masks
-      for(j=0; j<(int) vx_opt[i].mask_llpnt.size(); j++) {
+      for(int j=0; j<(int) vx_opt[i].mask_llpnt.size(); j++) {
 
          // Process new point masks -- no real work to do
          if(point_map.count(vx_opt[i].mask_llpnt[j].name) == 0) {
@@ -490,14 +490,14 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
 
 void PointStatConfInfo::process_geog(const Grid &grid,
                                      const char *fcst_file) {
-   int i;
-   bool land, topo;
+   bool land = false;
+   bool topo = false;
    Dictionary *dict;
    DataPlane geog_dp;
    SurfaceInfo sfc_info;
 
    // Loop over the verification tasks and check flags
-   for(i=0, land = topo = false; i<n_vx; i++) {
+   for(int i=0; i<n_vx; i++) {
 
       // Set to true if requested by any sub-task
       if(vx_opt[i].land_flag) land = true;
@@ -546,7 +546,7 @@ void PointStatConfInfo::process_geog(const Grid &grid,
    }
 
    // Loop over the verification tasks and set the geography info
-   for(i=0; i<n_vx; i++) {
+   for(int i=0; i<n_vx; i++) {
       sfc_info.clear();
       if(vx_opt[i].land_flag) {
          sfc_info.land_ptr = &land_mask;
@@ -764,7 +764,6 @@ void PointStatVxOpt::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatVxOpt::clear() {
-   int i;
 
    // Initialize values
    vx_pd.clear();
@@ -813,7 +812,7 @@ void PointStatVxOpt::clear() {
    obs_summary = ObsSummary::None;
    obs_perc = bad_data_int;
 
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
+   for(int i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    return;
 }
@@ -869,7 +868,6 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
 void PointStatVxOpt::process_config(GrdFileType ftype,
         Dictionary &fdict, Dictionary &odict) {
    int n;
-   VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *dict;
 
@@ -877,7 +875,7 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    clear();
 
    // Allocate new VarInfo objects
-   vx_pd.set_fcst_info(info_factory.new_var_info(ftype));
+   vx_pd.set_fcst_info(VarInfoFactory::new_var_info(ftype));
    vx_pd.set_obs_info(new VarInfoGrib);
 
    // Set the VarInfo objects
@@ -1093,7 +1091,7 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
-   int i, n;
+   int n;
    int n_msg_typ = msg_typ.n();
    int n_mask    = mask_name.n();
    int n_interp  = interp_info.n_interp;
@@ -1170,7 +1168,7 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    }
 
    // Define the verifying message type name and values
-   for(i=0; i<n_msg_typ; i++) {
+   for(int i=0; i<n_msg_typ; i++) {
       vx_pd.set_msg_typ(i, msg_typ[i].c_str());
       sa = conf_info->msg_typ_group_map[msg_typ[i]];
       if(sa.n() == 0) sa.add(msg_typ[i]);
@@ -1180,34 +1178,34 @@ void PointStatVxOpt::set_vx_pd(PointStatConfInfo *conf_info) {
    // Define the masking information: grid, poly, sid, point
 
    // Define the grid masks
-   for(i=0; i<mask_grid.n(); i++) {
+   for(int i=0; i<mask_grid.n(); i++) {
       n = i;
       vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the poly masks
-   for(i=0; i<mask_poly.n(); i++) {
+   for(int i=0; i<mask_poly.n(); i++) {
       n = i + mask_grid.n();
       vx_pd.set_mask_area(n, mask_name[n].c_str(),
                           &(conf_info->mask_area_map[mask_name[n]]));
    }
 
    // Define the station ID masks
-   for(i=0; i<mask_sid.n(); i++) {
+   for(int i=0; i<mask_sid.n(); i++) {
       n = i + mask_grid.n() + mask_poly.n();
       vx_pd.set_mask_sid(n, mask_name[n].c_str(),
                          &(conf_info->mask_sid_map[mask_name[n]]));
    }
 
    // Define the Lat/Lon point masks
-   for(i=0; i<(int) mask_llpnt.size(); i++) {
+   for(int i=0; i<(int) mask_llpnt.size(); i++) {
       n = i + mask_grid.n() + mask_poly.n() + mask_sid.n();
       vx_pd.set_mask_llpnt(n, mask_name[n].c_str(), &mask_llpnt[i]);
    }
 
    // Define the interpolation methods
-   for(i=0; i<n_interp; i++) {
+   for(int i=0; i<n_interp; i++) {
       vx_pd.set_interp(i, interp_info.method[i].c_str(), interp_info.width[i],
                        interp_info.shape);
       vx_pd.set_interp_thresh(interp_info.vld_thresh);

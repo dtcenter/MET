@@ -80,7 +80,6 @@ static vector< ConcatString > md_files;
 static std::map<int,int> grib_code_to_var_idx_map;
 static StringArray var_names;
 static StringArray var_units;
-static StringArray var_descs;
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -584,7 +583,7 @@ void check_quality_control_flag(int &value, const char qty, const char *var_name
       rej_qc++;
    }
 
-   mlog << Debug(3)  << "    [" << (is_bad_data(value) ? "REJECT" : "ACCEPT") << "] " << var_name
+   mlog << Debug(4)  << "    [" << (is_bad_data(value) ? "REJECT" : "ACCEPT") << "] " << var_name
         << ": value = " << value
         << ", qc = " << dd_str
         << "\n";
@@ -612,7 +611,7 @@ void check_quality_control_flag(float &value, const char qty, const char *var_na
       rej_qc++;
    }
 
-   mlog << Debug(3)  << "    [" << (is_bad_data(value) ? "REJECT" : "ACCEPT") << "] " << var_name
+   mlog << Debug(4)  << "    [" << (is_bad_data(value) ? "REJECT" : "ACCEPT") << "] " << var_name
         << ": value = " << value
         << ", qc = " << dd_str
         << "\n";
@@ -627,6 +626,7 @@ int process_obs(const int in_gc, const float conversion,
                 const time_t valid_time, const double latitude,
                 const double longitude, const double elevation) {
    int cur_processed_count = 0;
+   const string method_name = "process_obs() ";
 
    //
    // Check that the input variable contains valid data.
@@ -647,6 +647,7 @@ int process_obs(const int in_gc, const float conversion,
 
       int var_index = -1;
       ConcatString var_name;
+      ConcatString var_unit;
 
       if (grib_code_to_var_idx_map.count(in_gc) == 0) {
          var_index = (int)grib_code_to_var_idx_map.size();
@@ -659,8 +660,12 @@ int process_obs(const int in_gc, const float conversion,
                  << " into the madis2nc configuration file\n\n";
             exit(2);
          }
+         var_unit = conf_info.get_grib_var_unit(in_gc);
          var_names.add(var_name);
-         var_units.add(conf_info.get_grib_var_unit(in_gc));
+         var_units.add(var_unit);
+         mlog << Debug(3)
+              << method_name << "the GRIB code " << in_gc << " to \""
+              << var_name << "\" and \"" << var_unit << "\"\n";
       }
       else {
          var_index = grib_code_to_var_idx_map.at(in_gc);
@@ -1046,7 +1051,7 @@ void process_madis_metar(NcFile *&f_in) {
          count = 0;
          i_hdr = i_hdr_s + i_idx;
 
-         mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
+         mlog << Debug(4) << "Record Number: " << i_hdr << "\n";
 
          //
          // Use cur to index into the NetCDF variables.
@@ -1599,7 +1604,7 @@ void process_madis_raob(NcFile *&f_in) {
 
          count = 0;
          int i_hdr = i_hdr_s + i_idx;
-         mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
+         mlog << Debug(4) << "Record Number: " << i_hdr << "\n";
 
          //
          // Use cur to index into the NetCDF variables.
@@ -2178,7 +2183,7 @@ void process_madis_profiler(NcFile *&f_in) {
 
          count = 0;
          int i_hdr = i_hdr_s + i_idx;
-         mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
+         mlog << Debug(4) << "Record Number: " << i_hdr << "\n";
 
          //
          // Process the latitude, longitude, and elevation.
@@ -2496,7 +2501,7 @@ void process_madis_maritime(NcFile *&f_in) {
 
          count = 0;
          int i_hdr = i_hdr_s + i_idx;
-         mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
+         mlog << Debug(4) << "Record Number: " << i_hdr << "\n";
 
          //
          // Use cur to index into the NetCDF variables.
@@ -2952,7 +2957,7 @@ void process_madis_mesonet(NcFile *&f_in) {
 
          count = 0;
          int i_hdr = i_hdr_s + i_idx;
-         mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
+         mlog << Debug(4) << "Record Number: " << i_hdr << "\n";
 
          //
          // Use cur to index into the NetCDF variables.
@@ -3393,7 +3398,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
 
       for (int i_idx=0; i_idx<buf_size; i_idx++) {
          int i_hdr = i_hdr_s + i_idx;
-         mlog << Debug(3) << "Record Number: " << i_hdr << "\n";
+         mlog << Debug(4) << "Record Number: " << i_hdr << "\n";
 
          //
          // Process the station i.e. airport name.
