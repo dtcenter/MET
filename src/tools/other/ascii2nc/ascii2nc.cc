@@ -156,7 +156,8 @@ static int compress_level = -1;
 static StringArray get_input_files(const ConcatString &);
 static FileHandler *create_file_handler(const ASCIIFormat,
                                         const ConcatString &);
-static FileHandler *determine_ascii_format(const ConcatString &);
+static FileHandler *determine_ascii_format(const ConcatString &,
+                                           ConcatString &);
 
 static void usage();
 static void set_inputrx(const StringArray &);
@@ -429,14 +430,21 @@ static FileHandler *create_file_handler(const ASCIIFormat format,
       #endif
 
       default: {
-         return determine_ascii_format(ascii_filename);
+         ConcatString format_string;
+         FileHandler *guess = determine_ascii_format(ascii_filename,
+                                                     format_string);
+         mlog << Debug(2) << "Applying \"-format " << format_string
+              << "\" to read input files. Specify the \"-format\" "
+              << "option to override this default setting.\n";
+	 return guess;
       }
    }
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-static FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
+static FileHandler *determine_ascii_format(const ConcatString &ascii_filename,
+                                           ConcatString &format_string) {
 
    //
    // Use the contents of the file to try to guess its format.
@@ -464,11 +472,11 @@ static FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(iabp_file->isFileType(f_in)) {
      f_in.close();
+     format_string = IabpHandler::getFormatString();
      return((FileHandler *) iabp_file);
    }
 
    delete iabp_file;
-
 
    //
    // See if this is a MET file.
@@ -478,6 +486,7 @@ static FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if (met_file->isFileType(f_in)) {
      f_in.close();
+     format_string = MetHandler::getFormatString();
      return (FileHandler *) met_file;
    }
 
@@ -491,6 +500,7 @@ static FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if (little_r_file->isFileType(f_in)) {
      f_in.close();
+     format_string = LittleRHandler::getFormatString();
      return (FileHandler *) little_r_file;
    }
 
@@ -504,6 +514,7 @@ static FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if (surfrad_file->isFileType(f_in)) {
      f_in.close();
+     format_string = SurfradHandler::getFormatString();
      return (FileHandler *) surfrad_file;
    }
 
@@ -517,6 +528,7 @@ static FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(wwsis_file->isFileType(f_in)) {
      f_in.close();
+     format_string = WwsisHandler::getFormatString();
      return (FileHandler *) wwsis_file;
    }
 
@@ -530,6 +542,7 @@ static FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(aeronet_file->isFileType(f_in)) {
      f_in.close();
+     format_string = AeronetHandler::getFormatString();
      return (FileHandler *) aeronet_file;
    }
 
@@ -543,6 +556,7 @@ static FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(airnow_file->isFileType(f_in)) {
      f_in.close();
+     format_string = AirnowHandler::getFormatStringDailyV2();
      return (FileHandler *) airnow_file;
    }
 
@@ -556,6 +570,7 @@ static FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(ndbc_file->isFileType(f_in)) {
      f_in.close();
+     format_string = NdbcHandler::getFormatStringStandard();
      return (FileHandler *) ndbc_file;
    }
 
@@ -569,6 +584,7 @@ static FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(ismn_file->isFileType(f_in)) {
      f_in.close();
+     format_string = IsmnHandler::getFormatString();
      return (FileHandler *) ismn_file;
    }
 
@@ -582,6 +598,7 @@ static FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(uscrn_file->isFileType(f_in)) {
      f_in.close();
+     format_string = UscrnHandler::getFormatString();
      return (FileHandler *) uscrn_file;
    }
 
