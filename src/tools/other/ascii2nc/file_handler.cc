@@ -83,9 +83,14 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
   //
   num_observations_in_range = 0;
   num_observations_out_of_range = 0;
+  int num_files = 0;
+  int num_files_good = 0;
 
   for(vector< ConcatString >::const_iterator ascii_filename = ascii_filename_list.begin();
       ascii_filename != ascii_filename_list.end(); ++ascii_filename) {
+
+    // Increment the file counter
+    num_files++;
 
     // Open the input ASCII observation file
     LineDataFile ascii_file;
@@ -108,6 +113,9 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
       continue;
     }
 
+    // Increment the good file counter
+    num_files_good++;
+
     mlog << Debug(3)
          << "  Running total of "
          << num_observations_in_range << " observations kept and "
@@ -117,9 +125,12 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
     ascii_file.close();
   }
 
-   mlog << Debug(3) << "Total number of "
-        << num_observations_in_range << " observations kept and " 
-        << num_observations_out_of_range << " rejected.\n";
+  mlog << Debug(2) << "Successfully read observations from "
+       << num_files_good << " of " << num_files << " input files.\n";
+
+  mlog << Debug(3) << "Total number of "
+       << num_observations_in_range << " observations kept and " 
+       << num_observations_out_of_range << " rejected.\n";
 
   return true;
 }
