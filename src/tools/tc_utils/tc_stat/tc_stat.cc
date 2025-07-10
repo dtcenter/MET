@@ -151,7 +151,9 @@ void process_command_line(int argc, char **argv) {
 void process_search_dirs() {
 
    // Retrieve the file lists
-   tcst_files = get_filenames(tcst_source, nullptr, tc_stat_file_ext);
+   ConcatString reg_exp_str(tc_stat_file_ext);
+   reg_exp_str << "$";
+   tcst_files = get_filenames(tcst_source, nullptr, reg_exp_str.c_str());
 
    // Check for matching files
    if(tcst_files.n_elements() == 0) {

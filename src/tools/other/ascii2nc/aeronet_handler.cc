@@ -284,13 +284,13 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
   bool ready_to_process = true;
   if (format_version == 3) {
     if (lat_idx < 0) {
-      mlog << Error << "\n" << method_name << "Can not find header column \""
+      mlog << Warning << "\n" << method_name << "Can not find header column \""
            << lat_col1 << "\" or \"" << lat_col2
            << "\". Skip the input \"" << ascii_file.filename() << "\"\n\n";
       ready_to_process = false;
     }
     else if (lon_idx < 0) {
-      mlog << Error << "\n" << method_name << "Can not find header column \""
+      mlog << Warning << "\n" << method_name << "Can not find header column \""
            << lon_col1 << "\". or \"" << lon_col2
            << "\". Skip the input \"" << ascii_file.filename() << "\"\n\n";
       ready_to_process = false;
@@ -336,7 +336,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
     {
       bad_line_count++;
       if (format_version != 3) {
-        mlog << Error << "\n" << method_name
+        mlog << Warning << "\n" << method_name
              << "line number " << data_line.line_number()
              << " does not have the correct number of columns " << data_line.n_items()
              << " (" << column_cnt << "). Stop processing \""
@@ -344,7 +344,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
         return false;
       }
       else if (data_line.n_items() < column_cnt) {
-        mlog << Error << "\n" << method_name
+        mlog << Warning << "\n" << method_name
              << "line number " << data_line.line_number()
              << " does not have the correct number of columns " << data_line.n_items()
              << " (" << column_cnt << "). Stop processing \""
@@ -365,7 +365,7 @@ bool AeronetHandler::_readObservations(LineDataFile &ascii_file)
       if (format_version == 3) {
         // Check the stationId
         if (sid_idx >= 0 && _stationId != data_line[sid_idx] && _stationId != SITE_MISSING) {
-          mlog << Error << "\n" << method_name
+          mlog << Warning << "\n" << method_name
                << "The header and data columns don't match."
                << " The station ID from data column (" << data_line[sid_idx] << ") at " << sid_idx
                << " is different from " << _stationId
@@ -560,8 +560,8 @@ time_t AeronetHandler::_getValidTime(const DataLine &data_line, int date_offset)
       if (0 < month && month <= 12) date_yyyymmm = true;
     }
     if (!date_yyyymmm) {
-      mlog << Error << "\nAeronetHandler::_getValidTime -> "
-           << "Not supported date: \"" << date_string << "\".\n\n";
+      mlog << Warning << "\nAeronetHandler::_getValidTime -> "
+           << "Unsupported date format: \"" << date_string << "\".\n\n";
       return 0;
     }
   }
@@ -632,7 +632,7 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
   if (!(ascii_file >> data_line))
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "error reading station id line from input ASCII file \""
          << ascii_file.filename() << "\"\n\n";
 
@@ -645,7 +645,7 @@ bool AeronetHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
   if (data_line.n_items() != NUM_HDR_COLS)
   {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "AERONET file has incorrect number of columns ("
          << data_line.n_items() << ") in header line\n\n";
     return false;

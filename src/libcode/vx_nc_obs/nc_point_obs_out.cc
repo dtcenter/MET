@@ -59,7 +59,7 @@ bool MetNcPointObsOut::add_header(const char *hdr_typ, const char *hdr_sid,
 {
    bool added = false;
    bool new_vld = false;
-   const char *method_name = "MetNcPointObsOut::add_header() ";
+   const char *method_name = "MetNcPointObsOut::add_header() -> ";
 
    // Can't filter duplicated one because header index was
    // assigned before checking
@@ -99,7 +99,7 @@ bool MetNcPointObsOut::add_header_prepbufr(const int pb_report_type,
                                            const int instrument_type)
 {
    bool added = true;
-   const char *method_name = "add_header_prepbufr() ";
+   const char *method_name = "add_header_prepbufr() -> ";
    // Can't filter duplicated one because header index was
    // assigned before checking
    header_data.prpt_typ_array.add(pb_report_type);
@@ -165,7 +165,7 @@ void MetNcPointObsOut::create_pb_hdrs(int pb_hdr_count) {
 // If raw_hdr_cnt is greater than 0, skip updating header index for obs.
 
 void MetNcPointObsOut::get_dim_counts(int *obs_cnt, int *hdr_cnt) {
-   string method_name = "get_dim_counts() ";
+   string method_name = "get_dim_counts() -> ";
    SummaryObs *summary_obs = out_data.summary_obs;
    bool do_summary = out_data.summary_info.flag;
 
@@ -207,8 +207,7 @@ void MetNcPointObsOut::get_dim_counts(int *obs_cnt, int *hdr_cnt) {
 ////////////////////////////////////////////////////////////////////////
 
 void MetNcPointObsOut::init_buffer() {
-
-   const char *method_name = "MetNcPointObsOut::init_buffer()";
+   const char *method_name_s = "MetNcPointObsOut::init_buffer()";
    const char *not_defined = "NotDefined";
 
    data_buffer.obs_data_idx    = 0;
@@ -218,11 +217,11 @@ void MetNcPointObsOut::init_buffer() {
    data_buffer.pb_hdr_data_offset = 0;
 
    m_strncpy(data_buffer.prev_hdr_typ_buf, not_defined,
-             HEADER_STR_LEN2, method_name, "data_buffer.prev_hdr_typ_buf");
+             HEADER_STR_LEN2, method_name_s, "data_buffer.prev_hdr_typ_buf");
    m_strncpy(data_buffer.prev_hdr_sid_buf, not_defined,
-             HEADER_STR_LEN2, method_name, "data_buffer.prev_hdr_sid_buf");
+             HEADER_STR_LEN2, method_name_s, "data_buffer.prev_hdr_sid_buf");
    m_strncpy(data_buffer.prev_hdr_vld_buf, not_defined,
-             HEADER_STR_LEN, method_name, "data_buffer.prev_hdr_vld_buf");
+             HEADER_STR_LEN, method_name_s, "data_buffer.prev_hdr_vld_buf");
 
    for (int index=0; index<HDR_ARRAY_LEN; index++)
       data_buffer.prev_hdr_arr_buf[index] = 0.0;
@@ -236,7 +235,7 @@ void MetNcPointObsOut::init_buffer() {
 
 bool MetNcPointObsOut::init_netcdf(int obs_count, int hdr_count,
                                    string program_name) {
-   string method_name = "init_netcdf() ";
+   string method_name = "init_netcdf() -> ";
 
    if (reset_hdr_buffer) {
       bool hdr_cnt = get_hdr_index();
@@ -323,9 +322,9 @@ void MetNcPointObsOut::set_using_var_id(bool using_var_id) {
 void MetNcPointObsOut::write_arr_headers() {
    int cur_hdr_idx = data_buffer.cur_hdr_idx;
    int buf_size = (cur_hdr_idx > OBS_BUFFER_SIZE) ? OBS_BUFFER_SIZE : cur_hdr_idx;
-   const string method_name = "  write_arr_headers()";
+   const string method_name = "  write_arr_headers() -> ";
    
-   mlog << Debug(5) << method_name << "  hdr_count: " << cur_hdr_idx
+   mlog << Debug(5) << method_name << "hdr_count: " << cur_hdr_idx
         << ", typ_idx_array: " << header_data.typ_idx_array.n_elements()
         << ", sid_idx_array: " << header_data.sid_idx_array.n_elements()
         << ", vld_idx_array: " << header_data.vld_idx_array.n_elements()
@@ -392,7 +391,7 @@ void MetNcPointObsOut::write_header(const char *hdr_typ, const char *hdr_sid,
    int hdr_index;
    bool new_vld = false;
    int hdr_data_idx = data_buffer.hdr_data_idx;
-   const char *method_name = "MetNcPointObsOut::write_header";
+   const char *method_name = "MetNcPointObsOut::write_header() -> ";
 
    // Message type
    if (!header_data.typ_array.has(hdr_typ, hdr_index, false)) {
@@ -482,7 +481,7 @@ void MetNcPointObsOut::write_observation(const float obs_arr[OBS_ARRAY_LEN],
 
 void MetNcPointObsOut::write_obs_data()
 {
-   string method_name = "write_obs_data() ";
+   string method_name = "  write_obs_data() -> ";
    bool do_summary = out_data.summary_info.flag;
    bool do_save_raw_data = out_data.summary_info.raw_data;
    bool do_header = (out_data.processed_hdr_cnt == 0);
@@ -520,7 +519,7 @@ int MetNcPointObsOut::write_obs_data(const vector< Observation > observations,
    int prev_hdr_idx = -1;
    ConcatString obs_qty;
    int headerOffset = data_buffer.cur_hdr_idx;
-   const string method_name = "  write_obs_data()";
+   const string method_name = "  write_obs_data() -> ";
 
    int obs_buf_size = observations.size();
    if (obs_buf_size > OBS_BUFFER_SIZE) obs_buf_size = OBS_BUFFER_SIZE;
@@ -528,7 +527,7 @@ int MetNcPointObsOut::write_obs_data(const vector< Observation > observations,
    float obs_arr[OBS_ARRAY_LEN];
    bool header_to_vector = IS_INVALID_NC(obs_vars.hdr_arr_var)
          || IS_INVALID_NC(obs_vars.hdr_lat_var);
-   mlog << Debug(5) << method_name << "  obs_count: " << obs_buf_size
+   mlog << Debug(5) << method_name << "obs_count: " << obs_buf_size
         << "  do_header: " << do_header
         << "  header_to_vector: " << header_to_vector << "\n";
    for (vector< Observation >::const_iterator obs = observations.begin();
@@ -538,7 +537,7 @@ int MetNcPointObsOut::write_obs_data(const vector< Observation > observations,
       
       if (do_header) {
          if (obs->getHeaderIndex() != prev_hdr_idx) {
-            mlog << Debug(9) << method_name << "  obs->getHeaderIndex(): "
+            mlog << Debug(9) << method_name << "obs->getHeaderIndex(): "
                  << obs->getHeaderIndex() << " at obs " << data_buffer.processed_count << "\n";
             prev_hdr_idx = obs->getHeaderIndex();
             if (header_to_vector) {
@@ -587,7 +586,7 @@ int MetNcPointObsOut::write_obs_data(const vector< Observation > observations,
 
 bool MetNcPointObsOut::write_to_netcdf(StringArray obs_names, StringArray obs_units,
                                        StringArray obs_descs) {
-   const char *method_name = "  write_to_netcdf() ";
+   const char *method_name = "  write_to_netcdf() -> ";
 
    write_obs_data();
    obs_vars.create_table_vars(obs_nc, header_data, data_buffer);

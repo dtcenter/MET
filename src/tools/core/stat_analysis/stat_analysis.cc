@@ -456,7 +456,9 @@ void process_search_dirs() {
    //
    // Get the list of stat files in the search directories
    //
-   files = get_filenames(search_dirs, nullptr, stat_file_ext);
+   ConcatString reg_exp_str(stat_file_ext);
+   reg_exp_str << "$";
+   files = get_filenames(search_dirs, nullptr, reg_exp_str.c_str());
 
    n = files.n_elements();
 

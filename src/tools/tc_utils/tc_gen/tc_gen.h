@@ -46,13 +46,10 @@
 static const char * program_name = "tc_gen";
 
 // ATCF genesis file name regular expression 
-static const char * atcf_gen_reg_exp = "atcf_gen";
-
-// ATCF file name regular expression 
-static const char * atcf_reg_exp = ".dat";
+static const char * atcf_gen_reg_exp = "atcf_gen$";
 
 // Genesis shapefile regular expression
-static const char * gen_shp_reg_exp = "gtwo_areas.*.shp";
+static const char * gen_shp_reg_exp = "gtwo_areas.*.shp$";
 
 // Default configuration file name
 static const char * default_config_filename =

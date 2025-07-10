@@ -149,7 +149,7 @@ bool LittleRHandler::_readObservations(LineDataFile &ascii_file)
 
     if (!check_reg_exp(lr_rpt_reg_exp, data_line[4]))
     {
-      mlog << Error << "\nLittleRHandler::_readObservations() -> "
+      mlog << Warning << "\nLittleRHandler::_readObservations() -> "
            << "the fifth entry of the little_r report on line "
            << data_line.line_number()
            << " does not match the regular expression \""

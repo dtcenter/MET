@@ -41,7 +41,7 @@ static const char file_list_str [] = "file_list";
 
 
 StringArray get_filenames(const StringArray & search_dir_list,
-                          const char * prefix, const char * suffix,
+                          const char * regex1, const char * regex2,
                           bool check_regular)
 
 {
@@ -77,7 +77,8 @@ for (j=0; j<N; ++j)  {
    }
    else {
 
-      a.add(get_filenames(string(search_dir_list[j]), prefix, suffix, check_regular));
+      a.add(get_filenames(string(search_dir_list[j]),
+                          regex1, regex2, check_regular));
 
    }
 
@@ -91,7 +92,7 @@ return a;
 
 
 StringArray get_filenames(const ConcatString & search_dir,
-                          const char * prefix, const char * suffix,
+                          const char * regex1, const char * regex2,
                           bool check_regular)
 
 {
@@ -115,7 +116,7 @@ if ( S_ISDIR(sbuf.st_mode) )  {
    //  to make the order consistent across platforms
    //
 
-   b = get_filenames_from_dir(search_dir.c_str(), prefix, suffix);
+   b = get_filenames_from_dir(search_dir.c_str(), regex1, regex2);
 
    b.sort();
 
@@ -127,7 +128,7 @@ if ( S_ISDIR(sbuf.st_mode) )  {
 
    //
    //  process regular files and, if requested, enforce that the
-   //  prefix and suffix match
+   //  regular expressions match
    //
 
    if ( check_regular ) {
@@ -140,7 +141,7 @@ if ( S_ISDIR(sbuf.st_mode) )  {
      if ( !ptr )  ptr = search_dir.c_str();
       else         ++ptr;
 
-      if ( check_prefix_suffix(ptr, prefix, suffix) )  {
+      if ( check_filename_regex(ptr, regex1, regex2) )  {
          a.add(search_dir);
       }
 
@@ -160,8 +161,8 @@ return a;
 
 
 StringArray get_filenames_from_dir(const char * directory_path,
-                                   const char * prefix,
-                                   const char * suffix)
+                                   const char * regex1,
+                                   const char * regex2)
 
 {
 
@@ -207,7 +208,7 @@ while ( (entry = readdir(directory)) != nullptr )  {
 
    if ( S_ISDIR(sbuf.st_mode) )  {
 
-      b = get_filenames_from_dir(entry_path, prefix, suffix);
+      b = get_filenames_from_dir(entry_path, regex1, regex2);
 
       b.sort();
 
@@ -215,11 +216,9 @@ while ( (entry = readdir(directory)) != nullptr )  {
 
       b.clear();
 
-   } else if ( S_ISREG(sbuf.st_mode) )  {
-
-      if ( check_prefix_suffix(entry->d_name, prefix, suffix) )  {
-         a.add(entry_path);
-      }
+   } else if ( S_ISREG(sbuf.st_mode) &&
+               check_filename_regex(entry->d_name, regex1, regex2) )  {
+      a.add(entry_path);
 
    }
 
@@ -239,39 +238,46 @@ return a;
 ////////////////////////////////////////////////////////////////////////
 
 
+bool check_filename_regex(const char * path,
+                          const char * regex1, const char * regex2)
+
+{
+
+bool keep = true;
+
+   //
+   //  check the regular expressions
+   //
+
+if ( keep && regex1 )  keep = check_reg_exp(regex1, path);
+
+if ( keep && regex2 )  keep = check_reg_exp(regex2, path);
+
+return keep;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 bool check_prefix_suffix(const char * path,
                          const char * prefix, const char * suffix)
 
 {
 
-ConcatString regex;
-bool keep = true;
+ConcatString regex1;
+ConcatString regex2;
 
    //
-   //  check the prefix
+   //  build the regular expressions
    //
 
-if ( keep && prefix ) {
+if ( prefix )  regex1 << "^" << prefix;
 
-   regex << cs_erase << "^" << prefix;
+if ( suffix )  regex2 << suffix << "$";
 
-   keep = check_reg_exp(regex.c_str(), path);
-
-}
-
-   //
-   //  check the suffix
-   //
-
-if ( keep && suffix ) {
-
-   regex << cs_erase << suffix << "$";
-
-   keep = check_reg_exp(regex.c_str(), path);
-
-}
-
-return keep;
+return check_filename_regex(path, regex1.c_str(), regex2.c_str());
 
 }
 

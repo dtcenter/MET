@@ -89,7 +89,7 @@ NdbcHandler::NdbcHandler(const string &program_name) :
 
   // read in and parse the locations file
   if (!locations.initialize(locationsFileName)) {
-    mlog << Error << "\nCannot initialize NDBC station loations file: "
+    mlog << Error << "\nCannot initialize NDBC station locations file: "
          << locationsFileName << "\n\n";
     exit(1);
   }
