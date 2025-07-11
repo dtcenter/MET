@@ -1718,7 +1718,7 @@ ShapeData select(const ShapeData &id, int n) {
    shared(id, d, n, nxy)
    {
 
-#pragma for schedule(static)
+#pragma omp for schedule(static)
       for(int j=0; j<nxy; j++) {
          int obj_id = nint(id.data.data()[j]);
          if(obj_id == n) d.data.buf()[j] = 1;

@@ -9,6 +9,62 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.1.0-rc1 Release Notes (20250522)
+-----------------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * Bugfix: Fix the MET NetCDF library to support variables with more that 4 dimensions
+       (`#3112 <https://github.com/dtcenter/MET/issues/3112>`_).
+     * Bugfix: Refine the MET GRIB2 library logic to find a single GRIB2 table match rather multiple ones
+       (`#3107 <https://github.com/dtcenter/MET/issues/3107>`_).
+     * Bugfix: Fix MET-12.1.0-rc1 Intel compilation warnings and errors
+       (`#3165 <https://github.com/dtcenter/MET/issues/3165>`_).
+
+  .. dropdown:: Enhancements
+
+     * Enhance MET library code to support reading WRF subgrid files
+       (`#2794 <https://github.com/dtcenter/MET/issues/2794>`_).
+     * Enhance MET library code to support additional vertical level types in WRF files
+       (`#2818 <https://github.com/dtcenter/MET/issues/2818>`_).
+     * Enhance multivariate MODE to support Python embedding inputs
+       (`#2940 <https://github.com/dtcenter/MET/issues/2940>`_).
+
+     * **Add support for the CTRACK benchmarking tool and instrument the Ensemble-Stat tool to report metrics**
+       (`#3065 <https://github.com/dtcenter/MET/issues/3065>`_).
+
+       * Enhance the benchmarking logic to support multiple runs and instrument the Grid-Diag tool to report metrics
+         (`#3109 <https://github.com/dtcenter/MET/issues/3109>`_).
+       * Add the :code:`--enable-profiler` configuration option to make the compilation of CTRACK support optional
+         (`#3125 <https://github.com/dtcenter/MET/issues/3125>`_).
+ 
+     * **Enhance the MET tools to fully support writing gridded range/azimuth data to NetCDF output files**
+       (`#3096 <https://github.com/dtcenter/MET/issues/3096>`_).
+     * Enhance PB2NC to write unit and description strings for derived variables
+       (`#3099 <https://github.com/dtcenter/MET/issues/3099>`_).
+ 
+     * Resolve Python deprecation warnings introduced during the switch to Python 3.12
+       (`#3106 <https://github.com/dtcenter/MET/issues/3106>`_).
+ 
+     * **Enhance MET using OpenMP parallelization in both the library and application code**
+       (`#3120 <https://github.com/dtcenter/MET/issues/3120>`_).
+
+       * Apply OpenMP to the vx_regrid library and initialize OpenMP for all applications
+         (`#3131 <https://github.com/dtcenter/MET/issues/3131>`_).
+       * Apply OpenMP to the vx_util library
+         (`#3132 <https://github.com/dtcenter/MET/issues/3132>`_).
+       * Apply OpenMP to remaining MET library code
+         (`#3134 <https://github.com/dtcenter/MET/issues/3134>`_).
+       * Apply OpenMP to parallelize loops over grid dimensions in MET Applications
+         (`#3140 <https://github.com/dtcenter/MET/issues/3140>`_).
+       * Apply OpenMP to parallelize loops over grid dimensions in the remaining MET applications
+         (`#3145 <https://github.com/dtcenter/MET/issues/3145>`_).
+
+  .. dropdown:: Documentation
+
+     * Enhance the MET User's Guide by adding linkable sub-sections to the configuration file overview chapters
+       (`#3149 <https://github.com/dtcenter/MET/issues/3149>`_).
+
 MET Version 12.1.0-beta2 Release Notes (20250401)
 -------------------------------------------------
 
@@ -16,11 +72,11 @@ MET Version 12.1.0-beta2 Release Notes (20250401)
 
      * Bugfix: Fix incorrect polar stereographic projection handling for sea ice dataset
        (`#3023 <https://github.com/dtcenter/MET/issues/3023>`_).
-     * Bugfix: Fix the PARUSR BUFRLIB failure when PB2NC is compiled with `-O2` optimization
+     * Bugfix: Fix the PARUSR BUFRLIB failure when PB2NC is compiled with :code:`-O2` optimization
        (`#3054 <https://github.com/dtcenter/MET/issues/3054>`_).
      * Bugfix: Fix memory management issues by replacing variable length arrays with STL vectors and arrays
        (`#3075 <https://github.com/dtcenter/MET/issues/3075>`_).
-     * Bugfix: Fix intermittent configuration string parsing `yyerror` failure
+     * Bugfix: Fix intermittent configuration string parsing :code:`yyerror` failure
        (`#3077 <https://github.com/dtcenter/MET/issues/3077>`_).
      * Bugfix: Fix compilation script logic for successful dependent library compilations
        (`#3092 <https://github.com/dtcenter/MET/issues/3092>`_).
@@ -141,6 +197,9 @@ MET Version 12.1.0 Upgrade Instructions
 
      * Grid-Stat writes the updated GRAD line type output.
      * Series-Analysis adds gradient statistic variables to its NetCDF output, if requested.
+ 
+   * TC-RMW and RMW-Analysis add standard global attributes for FileOrigins, MET_version, and MET_tool.
+   * RMW-Analysis adds TrackLat_mean and TrackLon_mean variables to report the average track location.
 
 .. dropdown:: Output data changes
 
@@ -160,4 +219,20 @@ MET Version 12.1.0 Upgrade Instructions
 
    Recommendations when upgrading to MET version 12.1.0:
 
-   * None
+   * Users are *strongly encouraged* to **set the OMP_NUM_THREADS environment variable**, as described in
+     :numref:`omp_num_threads`, to take advantage of the dramatic increase in OpenMP use, from 2 
+     parallelized loops in version 12.0.0 to 151 in 12.1.0. The parallelization primarily targets more
+     efficient looping over grid dimensions. Users should expect improvements in runtimes, particularly
+     when processing dense grids with a large number of threads. If not set, look for log messages with
+     advice on how to set it.
+
+   * The **range/azimuth grids** created by the TC-RMW, RMW-Analysis, and TC-Diag tools and described in
+     :numref:`range/azimuth_grid` are now fully supported in MET. For example, Point-Stat, Grid-Stat
+     and Series-Analysis can read range/azimuth inputs, define matched pairs, and compute statistics.
+     Verifying gridded analysis on regular grids can be automatically regridded on the fly to match the
+     range/azimuth grid of the model data, or vice-versa.
+
+   * The addition of the **CTRACK** benchmarking tool is intended as a developer utility to help identify
+     bottlenecks and track runtime efficiency improvements. It is disabled by default at compilation time
+     and users, in general, should NOT use the :code:`--enable-profiler` configuration option to enable it. 
+

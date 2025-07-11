@@ -166,7 +166,7 @@ bool SurfradHandler::_readObservations(LineDataFile &ascii_file)
 
      if (data_line.n_items() != NUM_OBS_COLS)
      {
-       mlog << Error << "\nSurfradHandler::_readObservations() -> "
+       mlog << Warning << "\nSurfradHandler::_readObservations() -> "
             << "line number " << data_line.line_number()
             << " does not have the correct number of columns  ("
             << NUM_OBS_COLS << ").\n\n";
@@ -458,7 +458,7 @@ bool SurfradHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
   if (!(ascii_file >> data_line))
   {
-    mlog << Error << "\nSurfradHandler::_readHeaderInfo() -> "
+    mlog << Warning << "\nSurfradHandler::_readHeaderInfo() -> "
          << "error reading station id line from input ASCII file \""
          << ascii_file.filename() << "\"\n\n";
 
@@ -478,7 +478,7 @@ bool SurfradHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
   if (!(ascii_file >> data_line))
   {
-    mlog << Error << "\nSurfradHandler::_readHeaderInfo() -> "
+    mlog << Warning << "\nSurfradHandler::_readHeaderInfo() -> "
          << "error reading location line from input ASCII file \""
          << ascii_file.filename() << "\"\n\n";
 
@@ -487,7 +487,7 @@ bool SurfradHandler::_readHeaderInfo(LineDataFile &ascii_file)
   
   if (data_line.n_items() != NUM_HDR_COLS)
   {
-    mlog << Error << "\nSurfradHandler::_readHeaderInfo() -> "
+    mlog << Warning << "\nSurfradHandler::_readHeaderInfo() -> "
          << "SURFRAD file has incorrect number of columns ("
          << data_line.n_items() << ") in header line\n\n";
     return false;

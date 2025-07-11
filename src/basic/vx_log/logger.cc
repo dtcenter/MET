@@ -5,17 +5,14 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
-using namespace std;
-
-
 //////////////////////////////////////////////////////////////////
 
 
 #include <cstdio>
 
 #include "logger.h"
+
+using namespace std;
 
 
 //////////////////////////////////////////////////////////////////

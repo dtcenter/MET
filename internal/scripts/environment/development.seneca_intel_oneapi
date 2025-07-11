@@ -74,7 +74,7 @@ export MET_TEST_MET_PYTHON_EXE=${MET_PYTHON_BIN_EXE}
 # This is a cron script -- create the shell environment for this job
 # - NCO is for ncdiff
 # - NetCDF is for ncdump.
-export PATH="/nrit/ral/nco/bin:/nrit/ral/netcdf4/bin:\
+export PATH="${MET_PYTHON}/bin:/nrit/ral/nco/bin:/nrit/ral/netcdf4/bin:\
              /nrit/ral/sbin:/nrit/ral/bin:/usr/sbin:\
              /usr/bin:/sbin:/bin:/usr/bin/X11:/opt/bin:$PATH"
 

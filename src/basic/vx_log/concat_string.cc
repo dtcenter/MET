@@ -282,7 +282,7 @@ void ConcatString::set_precision(int k)
    if (Precision != k) {
       Precision = k;
       FloatFormat  = "%%.";
-      FloatFormat += Precision + "f";
+      FloatFormat += to_string(Precision) + "f";
    }
 
    return;

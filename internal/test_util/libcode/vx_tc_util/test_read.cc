@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -17,6 +15,8 @@ using namespace std;
 
 #include "vx_util.h"
 #include "vx_tc_util.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

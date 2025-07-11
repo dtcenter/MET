@@ -1,9 +1,10 @@
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-using namespace std;
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
+// ** Copyright UCAR (c) 1992 - 2025
+// ** University Corporation for Atmospheric Research (UCAR)
+// ** National Center for Atmospheric Research (NCAR)
+// ** Research Applications Lab (RAL)
+// ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
+// *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -30,6 +31,9 @@ extern "C" {
 
 #include "python3_util.h"
 #include "python3_script.h"
+
+using namespace std;
+
 
 
 ////////////////////////////////////////////////////////////////////////

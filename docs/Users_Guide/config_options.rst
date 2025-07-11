@@ -423,6 +423,8 @@ The following lines consist of 8 integers followed by 3 strings.
 References:
 | `NCEP WMO GRIB2 Documentation <http://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc>`_
 
+.. _omp_num_threads:
+
 OMP_NUM_THREADS
 ---------------
 

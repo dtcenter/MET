@@ -948,10 +948,18 @@ export MET_FONT_DIR=${TEST_BASE}/fonts
 echo "MET Configuration settings..."
 printenv | egrep "^MET_" | sed -r 's/^/export /g'
 echo "LDFLAGS = ${LDFLAGS}"
+
 export OPT_ARGS=''
+
 if [[ $COMPILER_FAMILY == "pgi" ]]; then
-  export OPT_ARGS="${OPT_ARGS} FFLAGS=-lpgf90"
+  OPT_ARGS+=" FFLAGS=-lpgf90"
 fi
+
+if [[ -n "$DISABLE_OPENMP" ]]; then
+  OPT_ARGS+=" --disable-openmp"
+fi
+
+export OPT_ARGS
 
 configure_cmd="./configure --prefix=${MET_INSTALL_DIR} --bindir=${BIN_DIR_PATH}"
 configure_cmd="${configure_cmd} BUFRLIB_NAME=${BUFRLIB_NAME}"
