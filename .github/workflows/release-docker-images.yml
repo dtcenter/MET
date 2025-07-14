@@ -90,7 +90,7 @@ jobs:
         run: |
           .github/jobs/scan_docker_image.sh
         env:
-          GITHUB_NAME: ${{ matrix.version }}
+          SOURCE_BRANCH: ${{ matrix.version }}
 
       - name: Push Docker Image
         run: |
