@@ -33,3 +33,18 @@ function time_command {
 function get_dockerhub_tag {
   echo ${DOCKERHUB_REPO}:$(echo ${SOURCE_BRANCH} | sed 's%/%_%g' | sed 's%^v%%g' )
 }
+
+# utility function to scan a Docker image for vulnerabilities
+function cve_scan_image {
+  echo "Scanning image $1"
+  CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
+  time_command grype $1
+  CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
+  N_CRITICAL=`grep "Critical" ${CMD_LOGFILE} | wc -l`
+  if [ ${N_CRITICAL} -gt 0 ]; then
+    echo "WARNING: Found ${N_CRITICAL} CVEs for image $1 in ${CMD_LOGFILE}"
+    echo
+    egrep "SEVERITY|Critical" ${CMD_LOGFILE}
+    echo
+  fi
+}
