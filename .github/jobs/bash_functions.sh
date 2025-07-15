@@ -34,7 +34,7 @@ function get_dockerhub_tag {
   echo ${DOCKERHUB_REPO}:$(echo ${SOURCE_BRANCH} | sed 's%/%_%g' | sed 's%^v%%g' )
 }
 
-# utilty function to scan a Docker image for vulnerabilities
+# utility function to scan a Docker image for vulnerabilities
 function cve_scan_image {
   echo "Scanning image $1"
   CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
