@@ -572,6 +572,7 @@ void PointStatConfInfo::process_geog(const Grid &grid,
 
 void PointStatConfInfo::process_var_units(const StringArray &var_names,
                                           const StringArray &var_units) {
+   const string method_name = "PointStatConfInfo::process_var_units() -> ";
 
    // Only needs to be set once
    if(var_units_set) return;
@@ -580,18 +581,30 @@ void PointStatConfInfo::process_var_units(const StringArray &var_names,
         << "\" name as a GRIB code abbreviation since the point "
         << "observations are specified as GRIB codes.\n";
 
-   int idx;
-   auto odict = conf.lookup_array(conf_key_obs_field);
+   if(var_names.n() == var_units.n()) {
+      auto odict = conf.lookup_array(conf_key_obs_field);
 
-   // Add the GRIB code by parsing each observation dictionary
-   for(int i=0; i<n_vx; i++) {
-      Dictionary i_odict = parse_conf_i_vx_dict(odict, i);
-      ConcatString field_name = i_odict.lookup_string(conf_key_name, false);
-      if (var_names.has(field_name, idx)) vx_opt[i].vx_pd.obs_info->set_units(var_units[idx].c_str());
+      // Add the GRIB code by parsing each observation dictionary
+      for(int i=0; i<n_vx; i++) {
+         int idx;
+         Dictionary i_odict = parse_conf_i_vx_dict(odict, i);
+         ConcatString field_name = i_odict.lookup_string(conf_key_name, false);
+         if (var_names.has(field_name, idx)) vx_opt[i].vx_pd.obs_info->set_units(var_units[idx].c_str());
+      }
+
+      // Flag to prevent processing more than once
+      var_units_set = true;
    }
-
-   // Flag to prevent processing more than once
-   var_units_set = true;
+   else if(0 == var_units.n()) {
+      mlog << Warning << "\n" << method_name
+           << "units are not configured because of no var_units\n\n";
+   }
+   else{
+      mlog << Warning << "\n" << method_name
+           << "units are not configured because var_units are missing"
+           << "var_names (" << var_names.n() << ") != var_units ("
+           << var_units.n() << ")\n\n";
+   }
 
    return;
 }

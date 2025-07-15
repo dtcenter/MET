@@ -124,6 +124,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    auto odict  = (Dictionary *) nullptr;
    Dictionary i_fdict;
    Dictionary i_odict;
+   const char *method_name = "EnsembleStatConfInfo::process_config() -> ";
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
@@ -188,7 +189,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
       // Only a single file should be provided if using ens_member_ids
       if(ens_files->n() > 1) {
-         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+         mlog << Error << "\n" << method_name
               << "the \"" << conf_key_ens_member_ids << "\" "
               << "must be empty if more than one file is provided.\n\n";
          exit(1);
@@ -196,7 +197,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
       // The control ID must be set when the control file is specified
       if(control_id.empty() && use_ctrl) {
-         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+         mlog << Error << "\n" << method_name
               << "the control_id must be set if processing a single input "
               << "file with the -ctrl option\n\n";
          exit(1);
@@ -204,7 +205,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
       // If control ID is set, it cannot be found in ens_member_ids
       if(!control_id.empty() && ens_member_ids.has(control_id)) {
-         mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+         mlog << Error << "\n" << method_name
               << "control_id (" << control_id << ") must not be found "
               << "in ens_member_ids\n\n";
          exit(1);
@@ -216,7 +217,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Conf: ens, print warning if present
    if(conf.lookup_dictionary(conf_key_ens, false, false)) {
-      mlog << Warning << "\nEnsembleStatConfInfo::process_config() -> "
+      mlog << Warning << "\n" << method_name
            << "support for ensemble product generation with the \"ens\" "
            << "dictionary has moved to the Gen-Ens-Prod tool." << "\n\n";
    }
@@ -226,7 +227,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Check that the valid ensemble threshold is between 0 and 1.
    if(vld_ens_thresh < 0.0 || vld_ens_thresh > 1.0) {
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\n" << method_name
            << "The \"" << conf_key_fcst_ens_thresh << "\" parameter ("
            << vld_ens_thresh << ") must be set between 0 and 1.\n\n";
       exit(1);
@@ -237,7 +238,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Check that the valid data threshold is between 0 and 1.
    if(vld_data_thresh < 0.0 || vld_data_thresh > 1.0) {
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\n" << method_name
            << "The \"" << conf_key_fcst_vld_thresh << "\" parameter ("
            << vld_data_thresh << ") must be set between 0 and 1.\n\n";
       exit(1);
@@ -253,7 +254,7 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
 
    // Check for a valid number of verification tasks
    if(n_fvx == 0 || n_fvx != n_ovx) {
-      mlog << Error << "\nEnsembleStatConfInfo::process_config() -> "
+      mlog << Error << "\n" << method_name
            << "The number of \"" << conf_key_obs_field << "\" entries ("
            << n_ovx << ") must be greater than zero and match "
            << "the number of \"" << conf_key_fcst_field << "\" entries ("
@@ -493,6 +494,7 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 
 void EnsembleStatConfInfo::process_var_units(const StringArray &var_names,
                                              const StringArray &var_units) {
+   const string method_name = "EnsembleStatConfInfo::process_var_units() -> ";
 
    // Only needs to be set once
    if(var_units_set) return;
@@ -501,18 +503,30 @@ void EnsembleStatConfInfo::process_var_units(const StringArray &var_names,
         << "\" name as a GRIB code abbreviation since the point "
         << "observations are specified as GRIB codes.\n";
 
-   int idx;
-   auto odict = conf.lookup_array(conf_key_obs_field);
+   if(var_names.n() == var_units.n()) {
+      auto odict = conf.lookup_array(conf_key_obs_field);
 
-   // Add the GRIB code by parsing each observation dictionary
-   for(int i=0; i<n_vx; i++) {
-      Dictionary i_odict = parse_conf_i_vx_dict(odict, i);
-      ConcatString field_name = i_odict.lookup_string(conf_key_name, false);
-      if (var_names.has(field_name, idx)) vx_opt[i].vx_pd.obs_info->set_units(var_units[idx].c_str());
+      // Add the GRIB code by parsing each observation dictionary
+      for(int i=0; i<n_vx; i++) {
+         int idx;
+         Dictionary i_odict = parse_conf_i_vx_dict(odict, i);
+         ConcatString field_name = i_odict.lookup_string(conf_key_name, false);
+         if (var_names.has(field_name, idx)) vx_opt[i].vx_pd.obs_info->set_units(var_units[idx].c_str());
+      }
+
+      // Flag to prevent processing more than once
+      var_units_set = true;
    }
-
-   // Flag to prevent processing more than once
-   var_units_set = true;
+   else if(0 == var_units.n()) {
+      mlog << Warning << "\n" << method_name
+           << "units are not configured because of no var_units\n\n";
+   }
+   else{
+      mlog << Warning << "\n" << method_name
+           << "units are not configured because var_units are missing"
+           << "var_names (" << var_names.n() << ") != var_units ("
+           << var_units.n() << ")\n\n";
+   }
 
    return;
 }
