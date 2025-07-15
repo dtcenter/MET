@@ -80,6 +80,7 @@ static vector< ConcatString > md_files;
 static std::map<int,int> grib_code_to_var_idx_map;
 static StringArray var_names;
 static StringArray var_units;
+static StringArray var_descs;
 
 
 ////////////////////////////////////////////////////////////////////////
