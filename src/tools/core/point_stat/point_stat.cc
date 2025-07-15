@@ -1871,7 +1871,6 @@ static void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
 
 static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
    PairDataEnsemble hira_pd;
-   int k;
    int lvl_abv;
    int lvl_blw;
    NumArray f_ens;
@@ -1948,7 +1947,7 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
 
          // Store the ensemble mean and member values
          hira_pd.mn_na.add(f_ens.mean());
-         for(k=0; k<f_ens.n(); k++) {
+         for(int k=0; k<f_ens.n(); k++) {
             hira_pd.add_ens(k, f_ens[k]);
             hira_pd.add_ens_var_sums(hira_pd.n_obs-1, f_ens[k]);
          }

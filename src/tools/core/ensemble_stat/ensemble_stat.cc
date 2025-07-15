@@ -1915,7 +1915,7 @@ static void setup_nc_file(const char *suffix) {
 static void setup_txt_files() {
    int  n;
    int  n_eclv;
-   int  n_phist_bin;
+   int  n_phist_bin = 0;
    int  n_prob;
    int  max_col;
    int  max_n_ens;
@@ -1938,7 +1938,7 @@ static void setup_txt_files() {
    n_eclv = conf_info.get_max_n_eclv_points();
 
    // Compute the number of PHIST bins
-   for(int i=n_phist_bin=0; i<conf_info.get_n_vx(); i++) {
+   for(int i=0; i<conf_info.get_n_vx(); i++) {
       n = ceil(1.0 / conf_info.vx_opt[i].vx_pd.pd[0].phist_bin_size);
       n_phist_bin = (n > n_phist_bin ? n : n_phist_bin);
    }
