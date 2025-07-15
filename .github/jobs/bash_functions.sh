@@ -42,7 +42,7 @@ function cve_scan_image {
   CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
   N_CRITICAL=`grep "Critical" ${CMD_LOGFILE} | wc -l`
   if [ ${N_CRITICAL} -gt 0 ]; then
-    echo "WARNING: Found ${N_CRITICAL} CVEs for image $1 in ${CMD_LOGFILE}"
+    echo "WARNING: Found ${N_CRITICAL} Critical CVEs for image $1 in ${CMD_LOGFILE}"
     echo
     egrep "SEVERITY|Critical" ${CMD_LOGFILE}
     echo
