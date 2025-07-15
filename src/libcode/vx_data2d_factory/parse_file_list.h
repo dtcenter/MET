@@ -27,6 +27,8 @@
 
 extern StringArray parse_file_list(const StringArray&);
 
+extern bool is_ascii_file_list(const char * path);
+
 extern StringArray parse_ascii_file_list(const char * path);
 
 extern GrdFileType parse_file_list_type(const StringArray&);

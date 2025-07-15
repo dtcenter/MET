@@ -215,7 +215,7 @@ bool AirnowHandler::_readObservations(LineDataFile &ascii_file)
     column_cnt = NUM_COLS_HOURLY;
   }
   else {
-    mlog << Error << method_name
+    mlog << Warning << method_name
          << "format value=" << format_version << " expect "
          << AIRNOW_FORMAT_VERSION_DAILYV2 << " or " << AIRNOW_FORMAT_VERSION_HOURLYAQOBS
          << " or " << AIRNOW_FORMAT_VERSION_HOURLY << "\n\n";
@@ -266,7 +266,7 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
   // Make sure that the line contains the correct number of tokens
   //
   if (data_line.n_items() != column_cnt) {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "line number " << data_line.line_number()
          << " does not have the correct number of columns " << data_line.n_items()
          << " (" << column_cnt << "). Skipping this line in \""
@@ -276,7 +276,7 @@ bool AirnowHandler::_parseObservationLineStandard(DataLine &data_line,
 
   time_t valid_time = _getValidTime(data_line);
   if (valid_time == 0) {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "line number " << data_line.line_number()
          << " time could not be parsed, skipping this line in \""
          << filename << "\".\n\n";
@@ -403,7 +403,7 @@ bool AirnowHandler::_parseObservationLineAqobs(const string &data_line,
   }
 
   if ((int)tokens.size()  != column_cnt) {
-    mlog << Error << "\nAirnowHandler" << method_name
+    mlog << Warning << "\n" << method_name
          << "line number " << lineNumber
          << " does not have the correct number of columns " << tokens.size()
          << " (" << column_cnt << "). Skipping this line in \""
@@ -413,7 +413,7 @@ bool AirnowHandler::_parseObservationLineAqobs(const string &data_line,
   }
   time_t valid_time = _getValidTime(tokens);
   if (valid_time == 0) {
-    mlog << Error << "\n" << method_name
+    mlog << Warning << "\n" << method_name
          << "line number " << lineNumber
          << " time could not be parsed, skipping this line in \""
          << filename << "\".\n\n";
@@ -479,7 +479,7 @@ bool AirnowHandler::_determineFileType(LineDataFile &ascii_file)
     return true;
   }
   format_version = AIRNOW_FORMAT_VERSION_UNKNOWN;
-  mlog << Error << "\nAirnowHandler::_determineFileType -> "
+  mlog << Warning << "\nAirnowHandler::_determineFileType -> "
        << "Unknown file type\n\n";
   return false;
 }
@@ -543,8 +543,8 @@ time_t AirnowHandler::_getValidTime(const DataLine &data_line) const
   //
   // Pull out the date information
   //
-  if (datePtr  < 0) {
-    mlog << Error << "\nAirnowHandler::_getValidTime -> "
+  if (datePtr < 0) {
+    mlog << Warning << "\nAirnowHandler::_getValidTime -> "
          << "Date column pointer is not set\n\n";
     return 0;
   }
@@ -565,8 +565,8 @@ time_t AirnowHandler::_getValidTime(const vector<string> &data_line) const
   //
   // Pull out the date information
   //
-  if (datePtr  < 0) {
-    mlog << Error << "\nAirnowHandler::_getValidTime -> "
+  if (datePtr < 0) {
+    mlog << Warning << "\nAirnowHandler::_getValidTime -> "
          << "Date column pointer is not set\n\n";
     return 0;
   }
@@ -590,7 +590,7 @@ time_t AirnowHandler::_getValidTime(const string &dateStr, const string &timeStr
   ConcatString date_string(dateStr);
   StringArray dateTokens = date_string.split("/");
   if (1 == dateTokens.n()) {
-    mlog << Error << "\nAirnowHandler::_getValidTime -> "
+    mlog << Warning << "\nAirnowHandler::_getValidTime -> "
          << "Not supported date: \"" << date_string << "\".\n\n";
     return 0;
   }
@@ -624,7 +624,7 @@ time_t AirnowHandler::_getValidTime(const string &dateStr, const string &timeStr
       min = timeTokens[1];
       sec = timeTokens[2];
     } else {
-      mlog << Error << "\nAirnowHandler::_getValidTime -> "
+      mlog << Warning << "\nAirnowHandler::_getValidTime -> "
            << "Not supported time: \"" << time_string << "\".\n\n";
       return 0;
     }
@@ -753,7 +753,7 @@ bool AirnowHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
   if (!(ascii_file >> data_line))
     {
-      mlog << Error << "\nAirnowHandler::_readHeaderInfo() -> "
+      mlog << Warning << "\nAirnowHandler::_readHeaderInfo() -> "
            << "error reading header line from input ASCII file \""
            << ascii_file.filename() << "\"\n\n";
       return false;
@@ -764,7 +764,7 @@ bool AirnowHandler::_readHeaderInfo(LineDataFile &ascii_file)
   //
 
   if (data_line.n_items() != NUM_COLS_HOURLYAQOBS) {
-    mlog << Error << "\nAirnowHandler::_readHeaderInfo() -> "
+    mlog << Warning << "\nAirnowHandler::_readHeaderInfo() -> "
          << "AIRNOW file has incorrect number of columns ("
          << data_line.n_items() << ") in header line\n\n";
     return false;
@@ -836,7 +836,7 @@ bool AirnowHandler::_readHeaderInfo(LineDataFile &ascii_file)
         so2UnitPtr = i;
       }
     } else {
-      mlog << Error << "\nAirnowHandler::_readHeaderInfo() -> "
+      mlog << Warning << "\nAirnowHandler::_readHeaderInfo() -> "
            << "AIRNOW file has unknown header item " << s << "\n\n";
       status = false;
     }
@@ -915,7 +915,7 @@ int AirnowHandler::_getVarIndex(const string &var_name, const string &units)
          mlog << Warning << "\nAirnowHandler::_getVarIndex() -> "
               << "the units for observation variable \"" << var_name
               << "\" changed from \"" << obs_units[var_index]
-              << "\" to \"" << units << "\"!\n\n";
+              << "\" to \"" << units << "\"\n\n";
       }
    }
    // add new variable name and units

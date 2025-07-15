@@ -42,7 +42,6 @@ class PythonHandler : public FileHandler
    public:
 
       PythonHandler(const std::string &program_name);
-      PythonHandler(const char * program_name, const char * ascii_filename);
       virtual ~PythonHandler();
 
       bool isFileType(LineDataFile &ascii_file) const;
@@ -68,8 +67,11 @@ class PythonHandler : public FileHandler
 
       virtual bool readAsciiFiles(const std::vector< ConcatString > &ascii_filename_list);
 
-      bool do_straight ();  //  run compiled python interpreter
-      bool do_tmp_ascii();  //  run user-defined MET_PYTHON_EXE
+         // Run compiled python interpreter
+      bool do_straight(bool do_reload);
+
+         // Run user-defined MET_PYTHON_EXE
+      bool do_tmp_ascii();
 
       void load_python_obs(PyObject *);   //  python object is list of lists
 
