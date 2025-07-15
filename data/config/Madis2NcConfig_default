@@ -12,7 +12,8 @@
 
 //
 // Mapping from GRIB code to the variable name and units.
-// The first value is the variable name and the second value is the units.
+// Each key is a GRIB code, and the corresponding value is a pair:
+// the first element is the variable name, and the second is the unit
 //
 grib_var_map = [
    { key = "1"  ;   val =  "PRES,Pa"      ; },  // Station Pressure
