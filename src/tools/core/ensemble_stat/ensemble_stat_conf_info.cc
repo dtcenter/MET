@@ -269,8 +269,9 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    check_climo_n_vx(fdict, n_vx);
    check_climo_n_vx(odict, n_vx);
 
+   max_hira_size = 0;
    // Parse settings for each verification task
-   for(int i=0,max_hira_size=0; i<n_vx; i++) {
+   for(int i=0; i<n_vx; i++) {
 
       // Get the current dictionaries
       i_fdict = parse_conf_i_vx_dict(fdict, i);
