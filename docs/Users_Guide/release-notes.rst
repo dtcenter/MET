@@ -9,6 +9,27 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.0.3 Release Notes (20250721)
+-------------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * **Address Critical CVEs from Grype scans of the Docker images**
+       (`METplus-Internal#61 <https://github.com/dtcenter/METplus-Internal/issues/61>`_).
+     * Fix compilation script logic for successful dependent library compilations
+       (`#3092 <https://github.com/dtcenter/MET/issues/3092>`_).
+     * Fix ASCII2NC failure for tab-delimited input files
+       (`#3095 <https://github.com/dtcenter/MET/issues/3095>`_).
+     * Refine the MET GRIB2 library logic to find a single GRIB2 table match rather than multiple ones 
+       (`#3107 <https://github.com/dtcenter/MET/issues/3107>`_).
+     * Fix the MET NetCDF library to support variables with more that 4 dimensions
+       (`#3112 <https://github.com/dtcenter/MET/issues/3112>`_).
+
+  .. dropdown:: Enhancements
+
+     * Add CVE scanning to the release-docker-images.yml workflow
+       (`#3198 <https://github.com/dtcenter/MET/issues/3198>`_).
+
 MET Version 12.0.2 Release Notes (20250214)
 -------------------------------------------
 

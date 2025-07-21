@@ -69,18 +69,13 @@ bool IabpHandler::isFileType(LineDataFile &ascii_file) const {
       return false;
    }
 
-   string line = dl.get_line();
-   ConcatString cstring(line);
-
-   StringArray tokens = cstring.split(" ");
-   if (tokens[0] != "BuoyID") is_file_type = false;
-   if (tokens[1] != "Year") is_file_type = false;
-   if (tokens[2] != "Hour") is_file_type = false;
-   if (tokens[3] != "Min") is_file_type = false;
-   if (tokens[4] != "DOY") is_file_type = false;
-   if (tokens[5] != "POS_DOY") is_file_type = false;
-   if (tokens[6] != "Lat") is_file_type = false;
-   if (tokens[7] != "Lon") is_file_type = false;
+   // Check expected header column names
+   if (dl[0] != (string) "BuoyID" || dl[1] != (string) "Year"    ||
+       dl[2] != (string) "Hour"   || dl[3] != (string) "Min"     ||
+       dl[4] != (string) "DOY"    || dl[5] != (string) "POS_DOY" ||
+       dl[6] != (string) "Lat"    || dl[7] != (string) "Lon") {
+      is_file_type = false;
+   }
 
    return is_file_type;
 }
@@ -133,7 +128,7 @@ bool IabpHandler::_readObservations(LineDataFile &ascii_file)
       double ts = bad_data_double;
       double ta = bad_data_double;
 
-      if (lat == IABP_MISSING_VALUE || lon == IABP_MISSING_VALUE) {
+      if (is_eq(lat, IABP_MISSING_VALUE) || is_eq(lon, IABP_MISSING_VALUE)) {
          // This is either a rare event or never happens
          mlog << Warning << "\nIabpHandler::_readObservations() -> "
               << "Latitude/longitude has missing value " << IABP_MISSING_VALUE
@@ -146,7 +141,7 @@ bool IabpHandler::_readObservations(LineDataFile &ascii_file)
          // is this the right placeholder for this? To always put it in to the
          // fixed slot of an observation?
          pres = stod(dl[_bpPtr]);
-         if (pres == IABP_MISSING_VALUE) {
+         if (is_eq(pres, IABP_MISSING_VALUE)) {
             pres = bad_data_double;
          }
       }

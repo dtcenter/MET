@@ -1401,11 +1401,10 @@ void NcCfFile::read_netcdf_grid()
   // grids, but with how the gridded information is used in MET, I'm making the
   // assumption that all fields are on the same grid.
 
-  bool ignore;
   int max_dim = 0;
   NcVar *data_var = nullptr;
-  NcVar *tmp_data_var = nullptr;
   IntArray var_index_list;
+  static const string method_name = "NcCfFile::read_netcdf_grid() -> ";
 
   for (int i = 0; i < Nvars; ++i)
   {
@@ -1416,36 +1415,29 @@ void NcCfFile::read_netcdf_grid()
     // A gridded data variable can have anywhere from 2 to 4 dimensions (the
     // fourth being time).  Any other variables can be ignored
 
-    int num_dims = get_dim_count(var);
+    int num_dims = Var[i].Ndims;
 
-    if (num_dims < 2 || num_dims > 4)
-      continue;
+    if (num_dims < 2) continue;
 
     // Skip the latitude and longitude variables, if they are present
 
     ConcatString std_name;
     bool has_standard_name = get_var_standard_name(var, std_name);
 
-    ignore = false;
-    if (has_standard_name) {
-      if (std_name == "" || std_name == "latitude"
-          || std_name == "longitude" || std_name == "time") {
-        ignore = true;
-      }
+    if (has_standard_name &&
+        (std_name == "" || std_name == "latitude"
+         || std_name == "longitude" || std_name == "time")) {
+      continue;
     }
-    if (ignore) continue;
 
     if (max_dim < num_dims) max_dim = num_dims;
 
     if (has_att(var, coordinates_att_name)) {
       data_var = var;
       break;
-
     }
 
     // If we get here, this should be a gridded data variable
-    if (tmp_data_var == nullptr) tmp_data_var = var;
-    if (!has_standard_name) continue;   // Skip if no standard name
     var_index_list.add(i);
 
   } /* endfor - i */
@@ -1454,20 +1446,21 @@ void NcCfFile::read_netcdf_grid()
   {
     for (int i = 0; i < var_index_list.n(); ++i)
     {
-      // Get a pointer to the variable
-      NcVar *var = Var[i].var;
-
+      int var_i = var_index_list[i];
       // Exclude with less dimensions
-      if (get_dim_count(var) < max_dim) continue;
-
-      // If we get here, this should be a gridded data variable
-      data_var = var;
-      break;
+      if (max_dim <= Var[var_i].Ndims) {
+        data_var = Var[var_i].var;
+        break;
+      }
 
     } /* endfor - i */
   }
 
-  if (data_var == nullptr) data_var = tmp_data_var;
+  if (data_var == nullptr) {
+    mlog << Error << "\n" << method_name
+         << "The data variable was not identified to find dimensions.\n\n";
+    exit(1);
+  }
 
   // Pull the grid projection from the variable information.  First, look for
   // a grid_mapping attribute.
