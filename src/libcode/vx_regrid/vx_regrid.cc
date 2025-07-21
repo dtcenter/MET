@@ -157,6 +157,11 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
    vector<double> to_data_sum(to_grid.nxy(), 0.0);
    vector<double> wt_data_sum(to_grid.nxy(), 0.0);
 
+   //
+   // MET #3206 Reduction of vectors needed to prevent data races
+   //           when updating to_data values 
+   //
+
 #pragma omp declare reduction(vec_dbl_plus : vector<double> :             \
                               transform(omp_out.begin(), omp_out.end(),   \
                                          omp_in.begin(), omp_out.begin(), \
