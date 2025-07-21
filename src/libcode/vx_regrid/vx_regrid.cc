@@ -145,8 +145,6 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
                                    const Grid & from_grid,
                                    const Grid & to_grid,
                                    const RegridInfo & info) {
-   DataPlane to_data;
-   DataPlane wt_data;
 
    //
    //  The interpolation width and shape do not apply here.  The output
@@ -155,27 +153,33 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
    //  weights are determined by the area of the from_grid boxes.
    //
 
+   DataPlane to_data;
+   vector<double> to_data_sum(to_grid.nxy(), 0.0);
+   vector<double> wt_data_sum(to_grid.nxy(), 0.0);
+
+#pragma omp declare reduction(vec_dbl_plus : vector<double> :             \
+                              transform(omp_out.begin(), omp_out.end(),   \
+                                         omp_in.begin(), omp_out.begin(), \
+                                        plus<double>()))                  \
+                    initializer(omp_priv = decltype(omp_orig)(omp_orig.size()))
+
 #pragma omp parallel default(none) \
-   shared(from_data, from_grid, to_grid, info, to_data, wt_data) \
+   shared(from_data, from_grid, to_grid, info, to_data) \
+   shared(to_data_sum, wt_data_sum) \
    shared(bad_data_double)
    { 
 
 #pragma omp single
       {
          // Set the size and timinig info
-         to_data.set_size (to_grid.nx(), to_grid.ny());
-         wt_data.set_size (to_grid.nx(), to_grid.ny());
+         to_data.set_size (to_grid.nx(), to_grid.ny(), 0.0);
          to_data.set_times(from_data);
-
-         // Initialize the values
-         to_data.set_constant(0.0);
-         wt_data.set_constant(0.0);
-
       }
 
-      // loop over the from grid to accumulate sums and area weights
+      // Loop over the from grid to accumulate sums and area weights
 #pragma omp for schedule(static) \
-                collapse(2)
+                collapse(2) \
+                reduction(vec_dbl_plus : to_data_sum, wt_data_sum)
       for(int xf=0; xf<(from_grid.nx()); xf++) {
          for(int yf=0; yf<(from_grid.ny()); yf++) {
 
@@ -199,25 +203,28 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
                if(is_bad_data(value = from_data(xf, yf))) continue;
                double weight = from_grid.calc_area(xf, yf);
 
-               to_data.set(to_data(xt, yt) + value*weight, xt, yt);
-               wt_data.set(wt_data(xt, yt) + weight,       xt, yt);
+               int n = to_data.two_to_one(xt, yt);
+               to_data_sum[n] += value*weight;
+               wt_data_sum[n] += weight;
             }
          } // for yf
       } // for xf
 
-      // loop over the to grid to compute the area weighted average
-#pragma omp for schedule(static) \
-                collapse(2)
-      for(int xt=0; xt<(to_grid.nx()); xt++) {
-         for(int yt=0; yt<(to_grid.ny()); yt++) {
-            if(is_eq(wt_data(xt, yt), 0.0)) {
-               to_data.set(bad_data_double, xt, yt);
-            }
-            else {
-               to_data.set(to_data(xt, yt) / wt_data(xt, yt), xt, yt);
-            }
-         } // for yt
-      } // for xt
+      // Loop over the to grid to compute the area weighted average
+#pragma omp for schedule(static)
+      for(int n=0; n<to_data_sum.size(); n++) {
+
+         int xt;
+         int yt;
+         to_data.one_to_two(n, xt, yt);
+
+         if(is_eq(wt_data_sum[n], 0.0)) {
+            to_data.set(bad_data_double, xt, yt);
+         }
+         else {
+            to_data.set(to_data_sum[n] / wt_data_sum[n], xt, yt);
+         }
+      } // for n
    } // End of omp parallel
 
    return to_data;
