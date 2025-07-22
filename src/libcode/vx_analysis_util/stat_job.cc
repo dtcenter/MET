@@ -2740,10 +2740,9 @@ ConcatString STATAnalysisJob::get_jobstring() const {
    // out_wind_logic
    if(job_type == STATJobType::aggr_stat &&
       line_type.has(stat_mpr_str) &&
-      out_line_type.has(stat_wdir_str) &&
       (out_fcst_wind_thresh.get_type() != thresh_na ||
        out_obs_wind_thresh.get_type()  != thresh_na)) {
-      js << "-out_wind_logic " << setlogic_to_string(out_cnt_logic) << " ";
+      js << "-out_wind_logic " << setlogic_to_string(out_wind_logic) << " ";
    }
 
    // Jobs which use out_alpha
