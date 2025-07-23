@@ -2041,6 +2041,25 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          aggr.vl1l2_info += v_info;
 
          //
+         // For WDIR output, skip zero length vector with undefined direction.
+         // For other output (e.g. VL1L1 and VCNT), use all vector pairs.
+         //
+         if(job.out_line_type.has(stat_wdir_str) &&
+            (is_eq(it->second.pd_u.f_na[i], 0.0) &&
+             is_eq(it->second.pd_v.f_na[i], 0.0)) ||
+            (is_eq(it->second.pd_u.o_na[i], 0.0) &&
+             is_eq(it->second.pd_v.o_na[i], 0.0))) {
+            mlog << Debug(4) << "aggr_mpr_wind_lines() -> "
+                 << "for WDIR output, skip pair with angle not defined for zero forecast ("
+                 << it->second.pd_u.f_na[i] << ", " << it->second.pd_v.f_na[i]
+                 << ") or observation ("
+                 << it->second.pd_u.o_na[i] << ", " << it->second.pd_v.o_na[i]
+                 << ") vector for header:\n"
+                 << it->second.hdr_sa[i] << "\n";
+            continue;
+         }
+
+         //
          // Convert to and append unit vectors
          //
          ClimoPntInfo cpi;
