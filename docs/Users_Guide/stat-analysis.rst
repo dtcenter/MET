@@ -258,6 +258,8 @@ Once the appropriate lines have been generated for each verification time of int
 
 2. For the "AGGR_WDIR" line, the input VL1L2 lines are first aggregated into a single line of partial sums where the weight for each line is determined by the number of points it represents. From this aggregated line, the mean forecast wind direction, observation wind direction, and the associated error are computed and written out.
 
+Note that wind direction is undefined for zero length vectors. Any inputs with zero length forecast or observation vectors are automatically excluded from the "ROW_MEAN_WDIR" output line since the direction error is also undefined. However, those inputs are included in the aggregated statistics in the "AGGR_WDIR" output line. For this reason, the "TOTAL" column value, indicating the number of inputs used, may larger in "AGGR_WDIR" than "ROW_MEAN_WDIR", from which zero length vectors have been excluded. Users can also specify the "-out_wind_thresh gt0 -out_wind_logic INTERSECTION" job command options to explicitly exclude all pairs containing zero length vectors from the analysis. In that case, the "ROW_MEAN_WDIR" and "AGGR_WDIR" "TOTAL" column values would match.
+
 Practical Information
 =====================
 
