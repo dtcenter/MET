@@ -1751,7 +1751,6 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
                          int &n_in, int &n_out) {
    STATLine line;
    AggrWindInfo aggr;
-   VL1L2Info v_info;
    MPRData cur;
    ConcatString hdr;
    map<ConcatString, AggrWindInfo>::iterator it;
@@ -2012,6 +2011,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
          //
          // Keep running partial sums of matches
          //
+         VL1L2Info v_info;
          v_info.vcount      = 1;
          v_info.uf_bar      = it->second.pd_u.f_na[i];
          v_info.vf_bar      = it->second.pd_v.f_na[i];
@@ -2032,6 +2032,9 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
                             it->second.pd_u.f_na[i], it->second.pd_v.f_na[i],
                             it->second.pd_u.o_na[i], it->second.pd_v.o_na[i]);
 
+         //
+         // Store the direction difference sums
+         //
          if(!is_bad_data(d_diff)) {
             v_info.dcount     = 1;
             v_info.dir_bar    = d_diff;
