@@ -43,6 +43,7 @@
 //                                      ECNT statistics.
 //   020    06/14/24  Halley Gotway   MET #2911 Call apply_set_hdr_opts().
 //   021    07/05/24  Halley Gotway   MET #2924 Support forecast climatology.
+//   022    07/23/24  Halley Gotway   MET #3210 Restore WDIR zero vector filtering.
 //
 ////////////////////////////////////////////////////////////////////////
 
