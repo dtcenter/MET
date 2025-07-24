@@ -32,8 +32,6 @@ static const double values [Nr][Nc] = {
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
@@ -41,6 +39,8 @@ using namespace std;
 
 #include "vx_log.h"
 #include "vx_util.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

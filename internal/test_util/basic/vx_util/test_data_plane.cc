@@ -19,14 +19,14 @@ static const double test_value = 333.33333;
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cmath>
 
 #include "vx_util.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

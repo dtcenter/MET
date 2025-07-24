@@ -16,8 +16,6 @@ static const bool debug = false;
 ////////////////////////////////////////////////////////////////////////
 
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -29,6 +27,8 @@ using namespace std;
 #include "config_file.h"
 #include "config_constants.h"
 #include "threshold.h"
+
+using namespace std;
 
 
 ////////////////////////////////////////////////////////////////////////

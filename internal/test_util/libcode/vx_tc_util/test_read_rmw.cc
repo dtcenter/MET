@@ -7,8 +7,6 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 ////////////////////////////////////////////////////////////////////////
 
-using namespace std;
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
@@ -22,6 +20,8 @@ using namespace netCDF;
 #include "vx_nc_util.h"
 #include "vx_tc_util.h"
 #include "vx_tc_nc_util.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 

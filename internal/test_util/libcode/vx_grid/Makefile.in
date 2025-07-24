@@ -88,8 +88,10 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = test_grid_area$(EXEEXT) search_3d_kdtree$(EXEEXT) \
-	search_3d_kdtree_api$(EXEEXT)
+noinst_PROGRAMS = test_grid_area$(EXEEXT) $(am__EXEEXT_1)
+@ENABLE_UGRID_TRUE@am__append_1 = search_3d_kdtree \
+@ENABLE_UGRID_TRUE@	search_3d_kdtree_api
+
 subdir = internal/test_util/libcode/vx_grid
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -100,6 +102,8 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+@ENABLE_UGRID_TRUE@am__EXEEXT_1 = search_3d_kdtree$(EXEEXT) \
+@ENABLE_UGRID_TRUE@	search_3d_kdtree_api$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am_search_3d_kdtree_OBJECTS =  \
 	search_3d_kdtree-search_3d_kdtree.$(OBJEXT)
