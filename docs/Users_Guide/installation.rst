@@ -222,11 +222,11 @@ Environment Variable Descriptions
     If the **USE_MODULES** setting is set to true and the compiler is an Intel compiler, please
     review the additional information below for proper configuration file setup.
 
-    **PYTHON_MODULE** -  Format is *PythonModuleName_version* (e.g. python_3.10.4). This environment variable
+    **PYTHON_MODULE** -  Format is *PythonModuleName_version* (e.g. python_3.12.11). This environment variable
     is only required if **USE_MODULES** = TRUE. To set properly, list the Python module to load
     followed by an underscore and version number. For example, setting
-    **PYTHON_MODULE** =python_3.10.4
-    will cause the script to run "module load python/3.10.4".
+    **PYTHON_MODULE** =python_3.12.11
+    will cause the script to run "module load python/3.12.11".
 
 .. dropdown:: ADDITIONAL SETTINGS FOR INTEL COMPILER USERS WITH THE USE_MODULES SETTING
 
@@ -264,7 +264,7 @@ Environment Variable Descriptions
     containing the bin, include, lib, and share directories for Python.
 
     **MET_PYTHON_CC** - Format is -I followed by the directory containing
-    the Python include files (e.g. -I/usr/local/python3/include/python3.10).
+    the Python include files (e.g. -I/usr/local/python3/include/python3.12).
     This information may be obtained by
     running :code:`python3-config --cflags`;
     however, this command can, on certain systems,
@@ -274,7 +274,7 @@ Environment Variable Descriptions
     the Python library
     files then a space, then -l followed by the necessary Python
     libraries to link to
-    (e.g. -L/usr/local/python3/lib/\\ -lpython3.10\\
+    (e.g. -L/usr/local/python3/lib/\\ -lpython3.12\\
     -lpthread\\ -ldl\\ -lutil\\ -lm).
     The backslashes are necessary in the example shown because of
     the spaces, which will be
@@ -282,7 +282,7 @@ Environment Variable Descriptions
     character. Alternatively,
     a user can provide the value in quotations
     (e.g. export MET_PYTHON_LD="-L/usr/local/python3/lib/
-    -lpython3.10 -lpthread -ldl -lutil -lm").
+    -lpython3.12 -lpthread -ldl -lutil -lm").
     This information may be obtained by running
     :code:`python3-config --ldflags --embed`; however,
     this command can, on certain systems, provide too much information.
