@@ -30,8 +30,7 @@ volumes_from="--volumes-from met_truth"
 # run unit test script inside Docker, mount MET output and truth data
 # set MET_REPO_DIR env var in Docker to mounted directory
 cmd="\${MET_REPO_DIR}/.github/jobs/run_diff_tests.sh"
-time_command docker run ${volumes_from} ${mount_args} ${DOCKERHUB_TAG} bash -c \"${cmd}\"
-if [ $? != 0 ]; then
+if ! time_command docker run ${volumes_from} ${mount_args} ${DOCKERHUB_TAG} bash -c \"${cmd}\"; then
   exit 1
 fi
 

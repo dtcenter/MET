@@ -24,17 +24,18 @@ fi
 
 echo SONAR_REFERENCE_BRANCH=${SONAR_REFERENCE_BRANCH}
 
-time_command docker build -t ${DOCKERHUB_TAG} \
-    --build-arg MET_BASE_REPO \
-    --build-arg MET_BASE_TAG \
-    --build-arg SOURCE_BRANCH \
-    --build-arg SONAR_SCANNER_VERSION \
-    --build-arg SONAR_HOST_URL \
-    --build-arg SONAR_TOKEN \
-    --build-arg SONAR_REFERENCE_BRANCH \
-    -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}
-if [ $? != 0 ]; then
+if ! time_command docker build -t ${DOCKERHUB_TAG} \
+     --build-arg MET_BASE_REPO \
+     --build-arg MET_BASE_TAG \
+     --build-arg SOURCE_BRANCH \
+     --build-arg SONAR_SCANNER_VERSION \
+     --build-arg SONAR_HOST_URL \
+     --build-arg SONAR_TOKEN \
+     --build-arg SONAR_REFERENCE_BRANCH \
+     -f $DOCKERFILE_PATH ${GITHUB_WORKSPACE}; then
+  echo "::group::${CMD_LOGFILE}"
   cat ${CMD_LOGFILE}
+  echo "::endgroup::"
   exit 1
 fi
 
