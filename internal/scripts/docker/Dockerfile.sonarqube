@@ -51,9 +51,9 @@ RUN if [ "x${SONAR_REFERENCE_BRANCH}" = "x" ]; then \
       echo "Build Argument SONAR_REFERENCE_BRANCH=${SONAR_REFERENCE_BRANCH}"; \
     fi
 
-ENV MET_GIT_NAME ${SOURCE_BRANCH}
-ENV MET_REPO_DIR /met/MET-${MET_GIT_NAME}
-ENV MET_GIT_URL  https://github.com/dtcenter/MET
+ENV MET_GIT_NAME=${SOURCE_BRANCH}
+ENV MET_REPO_DIR=/met/MET-${MET_GIT_NAME}
+ENV MET_GIT_URL=https://github.com/dtcenter/MET
 
 #
 # Download and install the Sonar software.
