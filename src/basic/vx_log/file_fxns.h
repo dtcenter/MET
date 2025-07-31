@@ -31,6 +31,8 @@ static const char met_base_str[] = "MET_BASE";
 
 extern bool         is_regular_file(const char * path);
 
+extern bool         is_directory(const char * path);
+
 extern ConcatString replace_path(const ConcatString path);
 
 extern ConcatString replace_path(const char * path);

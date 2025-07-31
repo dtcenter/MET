@@ -1,5 +1,5 @@
 ARG MET_BASE_REPO=met-base
-ARG MET_BASE_TAG=v3.4
+ARG MET_BASE_TAG=3.4-latest
 
 FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_TAG}
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
@@ -19,10 +19,10 @@ RUN if [ "x${SOURCE_BRANCH}" = "x" ]; then \
       echo "Build Argument SOURCE_BRANCH=${SOURCE_BRANCH}"; \
     fi
 
-ENV MET_GIT_NAME    ${SOURCE_BRANCH}
-ENV MET_REPO_DIR    /met/MET-${MET_GIT_NAME}
-ENV MET_GIT_URL     https://github.com/dtcenter/MET
-ENV MET_DEVELOPMENT true
+ENV MET_GIT_NAME=${SOURCE_BRANCH}
+ENV MET_REPO_DIR=/met/MET-${MET_GIT_NAME}
+ENV MET_GIT_URL=https://github.com/dtcenter/MET
+ENV MET_DEVELOPMENT=true
 
 #
 # Update the OS, as needed.

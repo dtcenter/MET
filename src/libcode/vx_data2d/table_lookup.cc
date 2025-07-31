@@ -544,7 +544,7 @@ TableFlatFile::TableFlatFile(int) {
 
    path = replace_path(table_data_dir);
 
-   filtered_file_names = get_filenames(path, "grib1", ".txt", true);
+   filtered_file_names = get_filenames(path, "^grib1", ".txt$", true);
 
    //
    //  read the default grib1 table file, expanding MET_BASE
@@ -565,7 +565,7 @@ TableFlatFile::TableFlatFile(int) {
 
    filtered_file_names.clear();
 
-   filtered_file_names = get_filenames(path, "grib2", ".txt", true);
+   filtered_file_names = get_filenames(path, "^grib2", ".txt$", true);
 
    for (int i = 0; i < filtered_file_names.n_elements(); i++)
    {
@@ -599,7 +599,11 @@ void TableFlatFile::readUserGribTables(const char * table_type) {
 
    if(!path.empty()) {
 
-      filtered_file_names = get_filenames(path, table_type, ".txt", true);
+      ConcatString prefix_reg_exp;
+      prefix_reg_exp << "^" << table_type;
+
+      filtered_file_names = get_filenames(path, prefix_reg_exp.c_str(),
+                                          ".txt$", true);
 
       for (int i = 0; i < filtered_file_names.n_elements(); i++) {
 

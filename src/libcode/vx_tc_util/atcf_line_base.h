@@ -29,6 +29,11 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+static const char *atcf_suffix  = ".dat";
+static const char *atcf_reg_exp = ".dat$";
+
+////////////////////////////////////////////////////////////////////////
+
 enum class ATCFLineType {
    Track,    // Track and intensity line type (numeric)
    GenTrack, // Genesis Track and intensity line type (numeric)
