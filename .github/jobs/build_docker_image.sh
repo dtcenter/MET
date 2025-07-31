@@ -4,7 +4,13 @@ source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 
 DOCKERHUB_TAG=$(get_dockerhub_tag)
 
-DOCKERFILE_PATH=${GITHUB_WORKSPACE}/internal/scripts/docker/Dockerfile.copy
+# For the release-docker-images.yml workflow
+DOCKERFILE_PATH=${GITHUB_WORKSPACE}/${SOURCE_BRANCH}/internal/scripts/docker/Dockerfile
+
+# For the testing.yml workflow
+if [[ ! -f "${DOCKERFILE_PATH}" ]]; then
+  DOCKERFILE_PATH=${GITHUB_WORKSPACE}/internal/scripts/docker/Dockerfile.copy
+fi
 
 CMD_LOGFILE=${GITHUB_WORKSPACE}/docker_build.log
 
