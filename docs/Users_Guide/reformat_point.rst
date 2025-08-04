@@ -618,7 +618,7 @@ ascii2nc Output
 
 The NetCDF output of the ASCII2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
 
-"obs_vid" variable is replaced with "obs_gc" when the GRIB code is given instead of the variable names. In this case, the global variable "use_var_id" does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
+"obs_vid" variable is replaced with "obs_gc" when the GRIB code is given instead of the variable names. In this case, the global attribute "use_var_id" does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
 
 MADIS2NC Tool
 =============
@@ -714,12 +714,45 @@ _____________________
 
 The **time_summary** dictionary is described in :numref:`pb2nc configuration file`.
 
+_____________________
+
+.. code-block:: none
+
+   grib_var_map = [
+      { key = "1"  ;   val =  "PRES,Pa"      ; },  // Station Pressure
+      { key = "2"  ;   val = "PRMSL,Pa"      ; },  // Sea Level Pressure
+      { key = "7"  ;   val =   "HGT,gpm"     ; },  // Height
+      { key = "11" ;   val =   "TMP,K"       ; },  // Temperature
+      { key = "15" ;   val =  "TMAX,K"       ; },  // Maximum Temperature
+      { key = "16" ;   val =  "TMIN,K"       ; },  // Minimum Temperature
+      { key = "17" ;   val =   "DPT,K"       ; },  // Dewpoint
+      { key = "20" ;   val = "VISIB,W/m^2"   ; },  // Visibility
+      { key = "31" ;   val =  "WDIR,deg"     ; },  // Wind Direction
+      { key = "32" ;   val =  "WIND,m/s"     ; },  // Wind Speed
+      { key = "33" ;   val =  "UGRD,m/s"     ; },  // Write U-component of wind
+      { key = "34" ;   val =  "VGRD,m/s"     ; },  // Write V-component of wind
+      { key = "52" ;   val =    "RH,%"       ; },  // Relative Humidity
+      { key = "54" ;   val =  "PWAT,kg/m^2"  ; },  // Precipitable Water
+      { key = "59" ;   val = "PRATE,kg/m^2/s"; },  // Precipitation Rate
+      { key = "61" ;   val =  "APCP,kg/m^2"  ; },  // Precipitation
+      { key = "66" ;   val =  "SNOD,m"       ; },  // Snow Cover
+      { key = "80" ;   val =  "WTMP,K"       ; },  // Sea Surface Temperature
+      { key = "85" ;   val = "TSOIL,K"       ; },  // Soil Temperature
+      { key = "180";   val =  "GUST,m/s"     ; },  // Wind Gust
+      { key = "250";   val =  "SWHR,K/s"     ; }   // Solar Radiation
+   ];
+
+The GRIB code mappings for variable names and units are defined in the **grib_var_map** dictionary within **Madis2NcConfig_default**. In this mapping, each key is a GRIB code, and the corresponding value is a pair: the first element is the variable name, and the second is the unit.
+
 madis2nc Output
 ---------------
 
 The NetCDF output of the MADIS2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
 
-"obs_vid" variable is replaced with "obs_gc" when the GRIB code is given instead of the variable names. In this case, the global variable "use_var_id" does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
+"obs_vid" variable is replaced with "obs_gc" when the GRIB code is given instead of the variable names. In this case, the global attribute "use_var_id" does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
+
+Starting from MET version 12.2.0, the GRIB codes were replaced with variable names which are defined in the **grib_var_map** dictionary within **Madis2NcConfig_default**.
+
 
 LIDAR2NC Tool
 =============

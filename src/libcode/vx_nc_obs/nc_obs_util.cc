@@ -116,7 +116,7 @@ bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
          missing_vars.add(nc_var_obs_lvl);
       }
       else {
-         if (!get_nc_data(&obs_vars.obs_lvl_var, obs_lvls.data())) { 
+         if (!get_nc_data(&obs_vars.obs_lvl_var, obs_lvls.data())) {
             succeed = false;
             failed_vars.add(nc_var_obs_lvl);
          }
@@ -187,33 +187,33 @@ bool NcPointObsData::read_obs_data_table_lookups(NetcdfObsVars obs_vars, bool st
 
    clear_strings();
 
-   if (!IS_INVALID_NC(obs_vars.obs_arr_var)) {
-      if (IS_VALID_NC(obs_vars.obs_qty_var)) {
-         if (!get_nc_data_to_array(&obs_vars.obs_qty_var, &qty_names)) {
-            succeed = false;
-            mlog << Error << "\n" << method_name
-                 << "trouble getting data of " << nc_var_obs_qty << "\n\n";
-         }
-      }
-      else {
+   if (!IS_INVALID_NC(obs_vars.obs_arr_var)) {  // old MET point version
+      if (IS_INVALID_NC(obs_vars.obs_qty_var)) {
          mlog << Error << "\n" << method_name
               << "missing the variable " << nc_var_obs_qty << "\n\n";
       }
+      else if (!get_nc_data_to_array(&obs_vars.obs_qty_var, &qty_names)) {
+         succeed = false;
+         mlog << Error << "\n" << method_name
+              << "trouble getting data of " << nc_var_obs_qty << "\n\n";
+      }
    }
    else {
-      if (IS_VALID_NC(obs_vars.obs_var)) {
-         if (!get_nc_data_to_array(&obs_vars.obs_var, &var_names)) {
-            succeed = false;
-            mlog << Error << "\n" << method_name
-                 << "trouble getting data of " << nc_var_obs_var << "\n\n";
-         }
+      if (IS_VALID_NC(obs_vars.obs_var) && !get_nc_data_to_array(&obs_vars.obs_var, &var_names)) {
+         succeed = false;
+         mlog << Error << "\n" << method_name
+              << "trouble getting data of " << nc_var_obs_var << "\n\n";
       }
-      if (IS_VALID_NC(obs_vars.obs_qty_tbl_var)) {
-         if (!get_nc_data_to_array(&obs_vars.obs_qty_tbl_var, &qty_names)) {
-            succeed = false;
-            mlog << Error << "\n" << method_name
-                 << "trouble getting data of " << nc_var_obs_qty_tbl << "\n\n";
-         }
+      if (IS_VALID_NC(obs_vars.unit_var) && !get_nc_data_to_array(&obs_vars.unit_var, &var_units)) {
+         succeed = false;
+         mlog << Error << "\n" << method_name
+              << "trouble getting data of " << nc_var_unit << "\n\n";
+      }
+      if (IS_VALID_NC(obs_vars.obs_qty_tbl_var)
+          && !get_nc_data_to_array(&obs_vars.obs_qty_tbl_var, &qty_names)) {
+         succeed = false;
+         mlog << Error << "\n" << method_name
+              << "trouble getting data of " << nc_var_obs_qty_tbl << "\n\n";
       }
    }
 
