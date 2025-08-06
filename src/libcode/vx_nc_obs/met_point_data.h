@@ -70,6 +70,7 @@ struct MetPointObsData {
    std::vector<float> obs_vals;
    std::vector<float> obs_arr;       // nobs * 5
    StringArray var_names;
+   StringArray var_units;
    StringArray qty_names;
    
    MetPointObsData();
@@ -122,6 +123,7 @@ class MetPointData {
       MetPointObsData *get_point_obs_data();
       StringArray get_qty_data();
       StringArray get_var_names();
+      StringArray get_var_units();
 
       bool is_same_obs_values(const float obs_arr1[OBS_ARRAY_LEN], const float obs_arr2[OBS_ARRAY_LEN]);
       bool is_using_var_id() const;
@@ -167,6 +169,7 @@ inline int MetPointData::get_obs_cnt() { return nobs; }
 inline MetPointObsData *MetPointData::get_point_obs_data() { return obs_data; }
 inline StringArray MetPointData::get_qty_data() { return obs_data->qty_names; }
 inline StringArray MetPointData::get_var_names() { return obs_data->var_names; }
+inline StringArray MetPointData::get_var_units() { return obs_data->var_units; }
 inline bool MetPointData::is_using_var_id() const { return use_var_id; }
 inline void MetPointData::set_grib_code_or_var_index(float obs_arr[OBS_ARRAY_LEN], int grib_code) { obs_arr[1] = grib_code; }
 inline void MetPointDataPython::set_use_var_id(bool new_use_var_id) { use_var_id = new_use_var_id; }
