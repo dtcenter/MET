@@ -43,7 +43,7 @@ static const char validate_dataplane   [] = "met.dataplane";   // NO ".py" suffi
 ////////////////////////////////////////////////////////////////////////
 
 
-static bool met_python_dataplane(const char* user_script_name,
+static bool met_python_dataplane(const char *user_script_name,
                                  const StringArray &user_script_args,
                                  const bool use_xarray, DataPlane &met_dp_out,
                                  Grid &met_grid_out, VarInfoPython &vinfo);
@@ -284,12 +284,12 @@ ConcatString path;
 path << tmp_dir << '/'
      << tmp_py_base_name;
 
-ConcatString tmp_nc_path(make_temp_file_name(path.text(), nullptr));
+ConcatString tmp_file_name(make_temp_file_name(path.text(), nullptr));
 
 ConcatString command;
 command << user_ppath                    << ' '    //  user's path to python
         << replace_path(write_tmp_py)    << ' '    //  write_tmp_nc.py
-        << tmp_nc_path                   << ' '    //  tmp_nc output filename
+        << tmp_file_name                 << ' '    //  temporary output filename
         << user_script_name;                       //  user's script name
 
 for (int j=1; j<user_script_args.n(); ++j)  {   //  j starts at one, here
@@ -340,7 +340,7 @@ StringArray sa;
 sa.add(validate_dataplane); // Kludge to use PyConfig_SetArgv
 sa.add(validate_dataplane);
 sa.add(replace_path(read_tmp_py));
-sa.add(tmp_nc_path);
+sa.add(tmp_file_name);
 
    //
    //  set the global python arguments
@@ -349,7 +349,7 @@ sa.add(tmp_nc_path);
 if ( user_script_args.n() > 0 && ! GP.set_args(sa, method_name) )  return false;
 
 mlog << Debug(4) << "Reading temporary Python dataplane file: "
-     << tmp_nc_path << "\n";
+     << tmp_file_name << "\n";
 
    //
    //  import the python wrapper script as a module
@@ -430,7 +430,7 @@ dataplane_from_numpy_array(np, attrs_dict_obj, met_dp_out, met_grid_out, vinfo);
    //  cleanup
    //
 
-remove_temp_file(tmp_nc_path);
+remove_temp_file(tmp_file_name);
 
    //
    //  done

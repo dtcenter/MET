@@ -27,24 +27,26 @@ extern GlobalPython GP;   //  this needs external linkage
 
 ////////////////////////////////////////////////////////////////////////
 
-
 static const char *user_ppath    = nullptr;
 static const char write_tmp_nc[] = "MET_BASE/python/pyembed/write_tmp_point_nc.py";
 static const char read_tmp_nc [] = "pyembed.read_tmp_point_nc";   //  NO ".py" suffix
 
 ////////////////////////////////////////////////////////////////////////
 
+static bool user_python_point_data(const char *user_script_name,
+                                   const StringArray &user_script_args,
+                                   MetPointDataPython &met_pd_out,
+                                   MaskFilters *filters);
 
-static bool tmp_nc_point_obs(const char *script_name, const StringArray &user_script_argv,
-                             MetPointDataPython &met_pd_out, MaskFilters *filters);
+static bool met_python_point_data(const char *user_script_name,
+                                  const StringArray &user_script_args,
+                                  MetPointDataPython &met_pd_out,
+                                  MaskFilters *filters);
 
-static bool straight_python_point_data(const char *script_name,
-                                       StringArray &user_script,
-                                       MetPointDataPython &met_pd_out,
-                                       MaskFilters *filters);
-
-bool process_point_data(PyObject *module_obj, MetPointDataPython &met_pd_out);
-bool process_point_data_list(PyObject *python_obj, MetPointDataPython &met_pd_out,
+bool process_point_data(PyObject *module_obj,
+                        MetPointDataPython &met_pd_out);
+bool process_point_data_list(PyObject *python_obj,
+                             MetPointDataPython &met_pd_out,
                              MaskFilters *filters);
 
 ////////////////////////////////////////////////////////////////////////
@@ -118,9 +120,7 @@ void check_obs_data(MetPointObsData *obs_data, bool use_var_id, const char *call
 
 ////////////////////////////////////////////////////////////////////////
 
-
-PyObject *get_python_object(PyObject *module_obj, const char *python_var_name)
-{
+PyObject *get_python_object(PyObject *module_obj, const char *python_var_name) {
 
    //
    //   get the namespace for the module (as a dictionary)
@@ -137,12 +137,11 @@ PyObject *get_python_object(PyObject *module_obj, const char *python_var_name)
    return python_met_point_data;
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 static void set_str_array_from_python(PyObject *python_data, const char *python_key, StringArray *out) {
    const char *method_name = "set_met_array_from_python(StringArray *) -> ";
+
    PyObject *str_array_obj = PyDict_GetItemString (python_data, python_key);
    if (str_array_obj) {
       pointdata_from_str_array(str_array_obj, out);
@@ -156,75 +155,72 @@ static void set_str_array_from_python(PyObject *python_data, const char *python_
    }
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
 bool python_point_data(const ConcatString &python_command,
-                       MetPointDataPython &met_pd_out, MaskFilters *filters) {
+                       MetPointDataPython &met_pd_out,
+                       MaskFilters *filters) {
 
-bool status = false;
+   if(user_ppath == nullptr) user_ppath = getenv(user_python_path_env);
 
-if(user_ppath == nullptr) user_ppath = getenv(user_python_path_env);
+   StringArray sa = python_command.split(" ");
+   ConcatString user_script_name(sa[0]);
+   user_script_name.chomp(".py");   // remove possible ".py" suffix
 
-StringArray sa = python_command.split(" ");
+   bool status = false;
+   if(user_ppath != nullptr) {    // use temporary output
+      status = user_python_point_data(user_script_name.c_str(), sa,
+                                      met_pd_out, filters);
+   }
+   else {
+      status = met_python_point_data(user_script_name.c_str(), sa,
+                                     met_pd_out, filters);
+   }
 
-ConcatString script_name(sa[0]);
-script_name.chomp(".py");   //  remove possible ".py" suffix from script filename
-
-if(user_ppath != nullptr) {    // use temporary output
-   status = tmp_nc_point_obs(script_name.c_str(), sa, met_pd_out, filters);
-}
-else {
-   status = straight_python_point_data(script_name.c_str(), sa, met_pd_out, filters);
-}
-
-return status;
-
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool process_point_data(PyObject *python_met_point_data,
-                        MetPointDataPython &met_pd_out)
-{
+                        MetPointDataPython &met_pd_out) {
 
-const char *method_name = "process_point_data -> ";
-const char *method_name_s = "process_point_data()";
+   const char *method_name = "process_point_data -> ";
+   const char *method_name_s = "process_point_data()";
 
    //
    //  get handles to the objects of interest from the module_dict
    //
 
-PyObject *python_value = PyDict_GetItemString (python_met_point_data, python_use_var_id);
+   PyObject *python_value = PyDict_GetItemString (python_met_point_data, python_use_var_id);
 
-bool use_var_id = pyobject_as_bool(python_value);
-met_pd_out.set_use_var_id(use_var_id);
-mlog << Debug(9) << method_name << "use_var_id: \"" << use_var_id
-     << "\" from python.  is_using_var_id(): " << met_pd_out.is_using_var_id() << "\n";
+   bool use_var_id = pyobject_as_bool(python_value);
+   met_pd_out.set_use_var_id(use_var_id);
+   mlog << Debug(9) << method_name << "use_var_id: \"" << use_var_id
+        << "\" from python.  is_using_var_id(): " << met_pd_out.is_using_var_id() << "\n";
 
-python_value = PyDict_GetItemString (python_met_point_data, python_key_nhdr);
+   python_value = PyDict_GetItemString (python_met_point_data, python_key_nhdr);
 
-int int_value = pyobject_as_int(python_value);
-if (int_value == 0) {
-   mlog << Error << "\n" << method_name
-        << "The header is empty. Please check if python input exists\n\n";
-   exit (1);
-}
-met_pd_out.set_hdr_cnt(int_value);
+   int int_value = pyobject_as_int(python_value);
+   if (int_value == 0) {
+      mlog << Error << "\n" << method_name
+           << "The header is empty. Please check if python input exists\n\n";
+      exit (1);
+   }
+   met_pd_out.set_hdr_cnt(int_value);
 
-python_value = PyDict_GetItemString (python_met_point_data, python_key_nobs);
-int_value = pyobject_as_int(python_value);
-if (int_value == 0) {
-   mlog << Error << "\n" << method_name
-        << "The point observation data is empty. Please check if python input is processed properly\n\n";
-   exit (1);
-}
+   python_value = PyDict_GetItemString (python_met_point_data, python_key_nobs);
+   int_value = pyobject_as_int(python_value);
+   if (int_value == 0) {
+      mlog << Error << "\n" << method_name
+           << "The point observation data is empty. Please check if python input is processed properly\n\n";
+      exit (1);
+   }
 
-met_pd_out.allocate(int_value);
+   met_pd_out.allocate(int_value);
 
-MetPointObsData *obs_data = met_pd_out.get_point_obs_data();
-MetPointHeader *header_data = met_pd_out.get_header_data();
+   MetPointObsData *obs_data = met_pd_out.get_point_obs_data();
+   MetPointHeader *header_data = met_pd_out.get_header_data();
 
    //  look up the data array variable name from the dictionary
 
@@ -266,17 +262,15 @@ MetPointHeader *header_data = met_pd_out.get_header_data();
    //  done
    //
 
-return true;
-
+   return true;
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 
-bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &met_pd_out,
-                             MaskFilters *filters)
-{
-
+bool process_point_data_list(PyObject *python_point_data,
+                             MetPointDataPython &met_pd_out,
+                             MaskFilters *filters) {
    Observation obs;
    int vid;
    int qid;
@@ -427,313 +421,275 @@ bool process_point_data_list(PyObject *python_point_data, MetPointDataPython &me
    //
 
    return true;
-
 }
-
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool straight_python_point_data(const char *script_name,
-                                       StringArray &user_script,
-                                       MetPointDataPython &met_pd_out,
-                                       MaskFilters *filters)
-{
+static bool met_python_point_data(const char *user_script_name,
+                                  const StringArray &user_script_args,
+                                  MetPointDataPython &met_pd_out,
+                                  MaskFilters *filters) {
 
-const char *method_name = "straight_python_point_data -> ";
+   const char *method_name = "met_python_point_data -> ";
 
-ConcatString cs        (script_name);
-ConcatString user_dir  (cs.dirname());
-ConcatString user_base (cs.basename());
-
-user_script.insert(0, script_name);     // Kludge to use PyConfig_SetArgv
-
-Wchar_Argv wa;
-wa.set(user_script);
+   mlog << Debug(3) << "Running MET compile time Python instance ("
+        << MET_PYTHON_BIN_EXE << ") to run user's Python script ("
+        << user_script_name << ").\n";
 
    //
    //  if the global python object has already been initialized,
    //  we need to reload the module
    //
 
-bool do_reload = GP.is_initialized;
+   bool do_reload = GP.is_initialized;
 
-GP.initialize();
+   GP.initialize();
 
    //
    //   start up the python interpreter
    //
 
-if ( PyErr_Occurred() )  {
+   if ( PyErr_Occurred() )  {
 
-   PyErr_Print();
+      PyErr_Print();
 
-   mlog << Warning << "\n" << method_name
-        << "an error occurred initializing python\n\n";
+      mlog << Warning << "\n" << method_name
+           << "an error occurred initializing python\n\n";
 
-   return false;
+      return false;
 
-}
-
-
-mlog << Debug(3) << "Running MET compile time python instance ("
-     << MET_PYTHON_BIN_EXE << ") to run user's python script ("
-     << script_name << ").\n";
+   }
 
    //
    //  set the arguments
    //
 
-run_python_string("import os");
-run_python_string("import sys");
-
-ConcatString command;
-
-command << cs_erase
-        << "sys.path.append(\""
-        << user_dir
-        << "\")";
-
-run_python_string(command.text());
+   StringArray sa;
+   sa.add(user_script_name);     // Kludge to use PyConfig_SetArgv
+   sa.add(user_script_args);
 
    //
    //  set the global python arguments
    //
 
-if ( wa.wargc() > 0 && ! GP.set_args(wa, method_name) )  return false;
+   if ( user_script_args.n() > 0 && ! GP.set_args(sa, method_name) )  return false;
 
    //
    //  import the python script as a module
    //
 
-PyObject *module_obj = PyImport_ImportModule (user_base.c_str());
+   PyObject *module_obj = PyImport_ImportModule (user_script_name);
 
    //
    //  if needed, reload the module
    //
 
-if ( do_reload )  {
+   if ( do_reload )  {
 
-   module_obj = PyImport_ReloadModule (module_obj);
+      module_obj = PyImport_ReloadModule (module_obj);
 
-}
-
-if ( PyErr_Occurred() )  {
-
-   PyErr_Print();
-
-   mlog << Warning << "\n" << method_name
-        << "an error occurred importing module \""
-        << script_name << "\"\n\n";
-
-   return false;
-
-}
-
-if ( ! module_obj )  {
-
-   mlog << Warning << "\n" << method_name
-        << "error running python script \""
-        << script_name << "\"\n\n";
-
-   return false;
-
-}
-
-bool result = false;
-PyObject *met_point_data = get_python_object(module_obj, tmp_point_var_name);
-if ( met_point_data && met_point_data != &_Py_NoneStruct) {
-   result = process_point_data(met_point_data, met_pd_out);
-}
-else {
-   PyObject *point_data = get_python_object(module_obj, tmp_point_data);
-   if ( point_data && point_data != &_Py_NoneStruct)
-      result = process_point_data_list(point_data, met_pd_out, filters);
-   else {
-      mlog << Warning << "\n" << method_name
-           << "no \"" << tmp_point_var_name << "\" and \""
-           << tmp_point_data << "\" from "
-           << script_name << "\"\n\n";
    }
-}
 
-return result;
-}
+   if ( PyErr_Occurred() )  {
 
+      PyErr_Print();
+
+      mlog << Warning << "\n" << method_name
+           << "an error occurred importing module \""
+           << user_script_name << "\"\n\n";
+
+      return false;
+
+   }
+
+   if ( ! module_obj )  {
+
+      mlog << Warning << "\n" << method_name
+           << "error running python script \""
+           << user_script_name << "\"\n\n";
+
+      return false;
+
+   }
+
+   bool result = false;
+   PyObject *met_point_data = get_python_object(module_obj, tmp_point_var_name);
+   if ( met_point_data && met_point_data != &_Py_NoneStruct) {
+      result = process_point_data(met_point_data, met_pd_out);
+   }
+   else {
+      PyObject *point_data = get_python_object(module_obj, tmp_point_data);
+      if ( point_data && point_data != &_Py_NoneStruct)
+         result = process_point_data_list(point_data, met_pd_out, filters);
+      else {
+         mlog << Warning << "\n" << method_name
+              << "no \"" << tmp_point_var_name << "\" and \""
+              << tmp_point_data << "\" from "
+              << user_script_name << "\"\n\n";
+      }
+   }
+
+   return result;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
+static bool user_python_point_data(const char *user_script_name,
+                                   const StringArray &user_script_args,
+                                   MetPointDataPython &met_pd_out,
+                                   MaskFilters *filters) {
 
-static bool tmp_nc_point_obs(const char *script_name,
-                             const StringArray &user_script_argv,
-                             MetPointDataPython &met_pd_out,
-                             MaskFilters *filters)
-{
+   const char *method_name = "user_python_point_data() -> ";
 
-ConcatString command;
-ConcatString path;
-const char *method_name = "tmp_nc_point_obs() -> ";
+   mlog << Debug(3) << "Running user-specified Python instance (MET_PYTHON_EXE="
+        << user_ppath << ") to run user's Python script ("
+        << user_script_name << ").\n";
+
+
+   const char *tmp_dir = getenv("MET_TMP_DIR");
+   if(!tmp_dir) tmp_dir = default_tmp_dir;
+
+   ConcatString path;
+   path << tmp_dir << '/'
+        << tmp_py_base_name;
+
+   ConcatString tmp_file_name(make_temp_file_name(path.text(), nullptr));
+
+   ConcatString command;
+   command << user_ppath                    << ' '    // user's path to python
+           << replace_path(write_tmp_nc)    << ' '    // write_tmp_nc.py
+           << tmp_file_name                 << ' '    // temporary output filename
+           << user_script_name;                       // user's script name
+
+   for (int j=1; j<user_script_args.n(); ++j)  {   //  j starts at one, here
+      command << ' ' << user_script_args[j];
+   }
+
+   mlog << Debug(4) << "Writing temporary Python point data file:\n\t"
+        << command << "\n";
+
+   int status = system(command.text());
+
+   if ( status )  {
+
+      mlog << Error << "\n" << method_name
+           << "command \"" << command.text() << "\" failed ... status = "
+           << status << "\n\n";
+
+      exit ( 1 );
+
+   }
 
    //
    //  if the global python object has already been initialized,
    //  we need to reload the module
    //
 
-bool do_reload = GP.is_initialized;
+   bool do_reload = GP.is_initialized;
 
-GP.initialize();
+   GP.initialize();
 
    //
-   //   start up the python interpreter
+   //  start up the python interpreter
    //
 
-if ( PyErr_Occurred() )  {
+   if ( PyErr_Occurred() )  {
 
-   PyErr_Print();
+      PyErr_Print();
 
-   mlog << Warning << "\n" << method_name
-        << "an error occurred initializing python\n\n";
+      mlog << Warning << "\n" << method_name
+           << "an error occurred initializing python\n\n";
 
-   return false;
+      return false;
 
-}
-
-run_python_string("import sys");
-command << cs_erase
-        << "sys.path.append(\""
-        << replace_path(python_dir)
-        << "\")";
-run_python_string(command.text());
-mlog << Debug(3) << method_name << "added python path ("
-     << replace_path(python_dir) << ") to python interpreter\n";
-
-mlog << Debug(3) << "Running user-specified python instance (MET_PYTHON_EXE=" << user_ppath
-     << ") to run user's python script (" << script_name << ").\n";
-
-
-const char *tmp_dir = getenv("MET_TMP_DIR");
-if(!tmp_dir) tmp_dir = default_tmp_dir;
-
-path << cs_erase
-     << tmp_dir << '/'
-     << tmp_py_base_name;
-
-ConcatString tmp_nc_path = make_temp_file_name(path.text(), nullptr);
-
-command << cs_erase
-        << user_ppath                    << ' '    // user's path to python
-        << replace_path(write_tmp_nc)    << ' '    // write_tmp_nc.py
-        << tmp_nc_path                   << ' '    // tmp_nc output filename
-        << script_name;                            // user's script name
-
-for (int j=1; j<user_script_argv.n(); ++j)  {   //  j starts at one, here
-   command << ' ' << user_script_argv[j];
-}
-
-mlog << Debug(4) << "Writing temporary Python point data file:\n\t"
-     << command << "\n";
-
-int status = system(command.text());
-
-if ( status )  {
-
-   mlog << Error << "\n" << method_name
-        << "command \"" << command.text() << "\" failed ... status = "
-        << status << "\n\n";
-
-   exit ( 1 );
-
-}
+   }
 
    //
    //  set the arguments
    //
 
-StringArray a;
-a.add(read_tmp_nc);
-a.add(read_tmp_nc); // Kludge to use PyConfig_SetArgv
-a.add(tmp_nc_path);
-
-Wchar_Argv wa;
-wa.set(a);
+   StringArray sa;
+   sa.add(read_tmp_nc); // Kludge to use PyConfig_SetArgv
+   sa.add(read_tmp_nc);
+   sa.add(tmp_file_name);
 
    //
    //  set the global python arguments
    //
 
-if ( ! GP.set_args(wa, method_name) )  return false;
+   if ( ! GP.set_args(sa, method_name) )  return false;
 
-mlog << Debug(4) << "Reading temporary Python point data file: "
-     << tmp_nc_path << "\n";
+   mlog << Debug(4) << "Reading temporary Python point data file: "
+        << tmp_file_name << "\n";
 
    //
    //  import the python wrapper script as a module
    //
 
-path = get_short_name(read_tmp_nc);
+   path = get_short_name(read_tmp_nc);
 
-PyObject *module_obj = PyImport_ImportModule (path.text());
+   PyObject *module_obj = PyImport_ImportModule (path.text());
 
    //
    //  if needed, reload the module
    //
 
-if(do_reload) {
+   if(do_reload) {
 
-   module_obj = PyImport_ReloadModule (module_obj);
+      module_obj = PyImport_ReloadModule (module_obj);
 
-}
+   }
 
-if(PyErr_Occurred()) {
+   if(PyErr_Occurred()) {
 
-   PyErr_Print();
+      PyErr_Print();
 
-   mlog << Warning << "\n" << method_name
-        << "an error occurred importing module "
-        << '\"' << path << "\"\n\n";
+      mlog << Warning << "\n" << method_name
+           << "an error occurred importing module "
+           << '\"' << path << "\"\n\n";
 
-   return false;
+      return false;
 
-}
+   }
 
-if(!module_obj) {
+   if(!module_obj) {
 
-   mlog << Warning << "\n" << method_name
-        << "error running python script\n\n";
+      mlog << Warning << "\n" << method_name
+           << "error running python script\n\n";
 
-   return false;
+      return false;
 
-}
-
-   //
-   //  read the tmp_nc file
-   //
+   }
 
    //
-   //   get the namespace for the module (as a dictionary)
+   //  read the temporary file
+   //
+
+   //
+   //  get the namespace for the module (as a dictionary)
    //
 
 
-PyObject *met_point_data = get_python_object(module_obj, tmp_point_var_name);
-if(met_point_data) {
-   process_point_data(met_point_data, met_pd_out);
-}
-else {
-   PyObject *point_data = get_python_object(module_obj, tmp_point_data);
-   process_point_data_list(point_data, met_pd_out, filters);
-}
+   PyObject *met_point_data = get_python_object(module_obj, tmp_point_var_name);
+   if(met_point_data) {
+      process_point_data(met_point_data, met_pd_out);
+   }
+   else {
+      PyObject *point_data = get_python_object(module_obj, tmp_point_data);
+      process_point_data_list(point_data, met_pd_out, filters);
+   }
 
    //
    //  cleanup
    //
 
-remove_temp_file(tmp_nc_path);
+   remove_temp_file(tmp_file_name);
 
    //
    //  done
    //
 
-return true;
-
+   return true;
 }
 
 
