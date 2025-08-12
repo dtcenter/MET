@@ -466,6 +466,7 @@ static bool met_python_point_data(const char *user_script_name,
 
    StringArray sa;
    sa.add(user_script_name);     // Kludge to use PyConfig_SetArgv
+   sa.add(user_script_name);
    sa.add(user_script_args);
 
    //
