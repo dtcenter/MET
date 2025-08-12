@@ -143,17 +143,13 @@ static bool straight_python_tc_diag(const ConcatString &diag_script,
       run_python_string(command.text());
    }
 
+   // Set the global python arguments
    if(arg_sa.n() > 0) {
-      PyStatus p_status = PyConfig_SetArgv(&GP.config, wa.wargc(), wa.wargv());
-      if (PyStatus_Exception(p_status)) {
-         PyConfig_Clear(&GP.config);
+      if(!GP.set_args(wa)) {
          mlog << Warning << "\n" << method_name
               << "error setting python arguments\n\n";
          return false;
       }
-
-      // Initialize Python interpreter
-      Py_InitializeFromConfig(&GP.config);
    }
 
    // Import the python script as a module
@@ -258,16 +254,12 @@ static bool user_python_tc_diag(const ConcatString &diag_script,
    a.add(tmp_file_name);
    wa.set(a);
 
-   PyStatus p_status = PyConfig_SetArgv(&GP.config, wa.wargc(), wa.wargv());
-   if (PyStatus_Exception(p_status)) {
-      PyConfig_Clear(&GP.config);
+   // Set the global python arguments
+   if(!GP.set_args(wa)) {
       mlog << Warning << "\n" << method_name
            << "error setting python arguments\n\n";
       return false;
    }
-
-   // Initialize Python interpreter
-   Py_InitializeFromConfig(&GP.config);
 
    mlog << Debug(4) << "Reading temporary Python diagnostics data file: "
         << tmp_file_name << "\n";
