@@ -43,7 +43,7 @@ class GlobalPython {
      ~GlobalPython();
 
       void initialize();
-      bool set_args(const Wchar_Argv &);
+      bool set_args(const Wchar_Argv &, const char *);
       void finalize();
 
       PyConfig config;
@@ -106,7 +106,7 @@ return;
 /////////////////////////////
 
 
-inline bool GlobalPython::set_args(const Wchar_Argv &wa)
+inline bool GlobalPython::set_args(const Wchar_Argv &wa, const char *caller)
 { 
 
    //
@@ -116,6 +116,8 @@ inline bool GlobalPython::set_args(const Wchar_Argv &wa)
 PyStatus p_status = PyConfig_SetArgv(&(this->config), wa.wargc(), wa.wargv());
 if (PyStatus_Exception(p_status)) {
    PyConfig_Clear(&(this->config));
+   mlog << Warning << "\n" << caller 
+        << "error setting python arguments\n\n";
    return false;
 }
 

@@ -499,13 +499,7 @@ run_python_string(command.text());
    //  set the global python arguments
    //
 
-if ( wa.wargc() > 0 )  {
-   if ( ! GP.set_args(wa) ) {
-      mlog << Warning << "\n" << method_name
-           << "error setting python arguments\n\n";
-      return false;
-   }
-}
+if ( wa.wargc() > 0 && ! GP.set_args(wa, method_name) )  return false;
 
    //
    //  import the python script as a module
@@ -666,11 +660,7 @@ wa.set(a);
    //  set the global python arguments
    //
 
-if ( ! GP.set_args(wa) ) {
-   mlog << Warning << "\n" << method_name
-        << "error setting python arguments\n\n";
-   return false;
-}
+if ( ! GP.set_args(wa, method_name) )  return false;
 
 mlog << Debug(4) << "Reading temporary Python point data file: "
      << tmp_nc_path << "\n";

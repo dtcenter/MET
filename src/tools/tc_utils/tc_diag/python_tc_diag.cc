@@ -144,13 +144,7 @@ static bool straight_python_tc_diag(const ConcatString &diag_script,
    }
 
    // Set the global python arguments
-   if(arg_sa.n() > 0) {
-      if(!GP.set_args(wa)) {
-         mlog << Warning << "\n" << method_name
-              << "error setting python arguments\n\n";
-         return false;
-      }
-   }
+   if(arg_sa.n() > 0 && !GP.set_args(wa, method_name)) return false;
 
    // Import the python script as a module
    ConcatString script_base = script_name.basename();
@@ -255,11 +249,7 @@ static bool user_python_tc_diag(const ConcatString &diag_script,
    wa.set(a);
 
    // Set the global python arguments
-   if(!GP.set_args(wa)) {
-      mlog << Warning << "\n" << method_name
-           << "error setting python arguments\n\n";
-      return false;
-   }
+   if(!GP.set_args(wa, method_name)) return false;
 
    mlog << Debug(4) << "Reading temporary Python diagnostics data file: "
         << tmp_file_name << "\n";
