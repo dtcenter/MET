@@ -63,7 +63,7 @@ inline void GlobalPython::initialize()
 
 if ( ! is_initialized )  {
 
-   mlog << Debug(3) << "Initializing MET compile time python instance: " << MET_PYTHON_BIN_EXE << "\n";
+   mlog << Debug(3) << "Initializing MET compile time Python instance: " << MET_PYTHON_BIN_EXE << "\n";
 
    wchar_t *python_path = Py_DecodeLocale(MET_PYTHON_BIN_EXE, nullptr);
    PyConfig_InitPythonConfig(&config);

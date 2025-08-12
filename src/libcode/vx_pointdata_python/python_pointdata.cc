@@ -446,7 +446,7 @@ static bool met_python_point_data(const char *user_script_name,
    GP.initialize();
 
    //
-   //   start up the python interpreter
+   //  start up the python interpreter
    //
 
    if ( PyErr_Occurred() )  {
@@ -465,9 +465,12 @@ static bool met_python_point_data(const char *user_script_name,
    //
 
    StringArray sa;
-   sa.add(user_script_name);     // Kludge to use PyConfig_SetArgv
+   sa.add(user_script_name); // Kludge to use PyConfig_SetArgv
    sa.add(user_script_name);
-   sa.add(user_script_args);
+
+   for (int j=1; j<user_script_args.n(); ++j)  {   //  j starts at one, here
+      sa.add(user_script_args[j]);
+   }
 
    //
    //  set the global python arguments
@@ -479,7 +482,11 @@ static bool met_python_point_data(const char *user_script_name,
    //  import the python script as a module
    //
 
-   PyObject *module_obj = PyImport_ImportModule (user_script_name);
+   ConcatString script_name(user_script_args[0]);
+   ConcatString script_base(script_name.basename());
+   script_base.chomp(".py");
+
+   PyObject *module_obj = PyImport_ImportModule (script_base.c_str());
 
    //
    //  if needed, reload the module
