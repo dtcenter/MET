@@ -127,7 +127,7 @@ bool do_reload = GP.is_initialized;
 GP.initialize();
 
    //
-   //   start up the python interpreter
+   //  start up the python interpreter
    //
 
 if ( PyErr_Occurred() )  {
@@ -276,6 +276,7 @@ mlog << Debug(3) << "Running user-specified Python instance (MET_PYTHON_EXE="
      << user_ppath << ") to run user's Python script ("
      << user_script_name << ").\n";
 
+// Create a temp file
 const char *tmp_dir = getenv ("MET_TMP_DIR");
 
 if ( ! tmp_dir ) tmp_dir = default_tmp_dir;

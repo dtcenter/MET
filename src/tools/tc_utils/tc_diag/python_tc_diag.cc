@@ -42,7 +42,7 @@ static const char comments_item_name      [] = "comments";
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool straight_python_tc_diag(
+static bool met_python_tc_diag(
                const ConcatString &script_name,
                TmpFileInfo &tmp_info);
 
@@ -82,7 +82,7 @@ bool python_tc_diag(const ConcatString &script_name, TmpFileInfo &tmp_info) {
    }
    // Use compiled python instance
    else {
-      status = straight_python_tc_diag(script_name, tmp_info);
+      status = met_python_tc_diag(script_name, tmp_info);
    }
 
    return status;
@@ -90,26 +90,20 @@ bool python_tc_diag(const ConcatString &script_name, TmpFileInfo &tmp_info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static bool straight_python_tc_diag(const ConcatString &diag_script,
-                                    TmpFileInfo &tmp_info) {
-   const char *method_name = "straight_python_tc_diag() -> ";
+static bool met_python_tc_diag(const ConcatString &diag_script,
+                               TmpFileInfo &tmp_info) {
+   const char *method_name = "met_python_tc_diag() -> ";
 
-   mlog << Debug(3) << "Running MET compile time python instance ("
+   mlog << Debug(3) << "Running MET compile time Python instance ("
         << MET_PYTHON_BIN_EXE << ") to run Python diagnostics script ("
         << diag_script << " " << tmp_info.tmp_file << ").\n";
-
-   // Prepare arguments
-   StringArray arg_sa = diag_script.split(" ");
-   arg_sa.add(tmp_info.tmp_file);
-   arg_sa.insert(0, arg_sa[0].c_str()); // Kludge with PyConfig_SetArgv
-   Wchar_Argv wa;
-   wa.set(arg_sa);
 
    // Reload the module if GP has already been initialized
    bool do_reload = GP.is_initialized;
 
    GP.initialize();
 
+   // Start up the python interpreter
    if(PyErr_Occurred()) {
       PyErr_Print();
       mlog << Warning << "\n" << method_name
@@ -118,33 +112,21 @@ static bool straight_python_tc_diag(const ConcatString &diag_script,
    }
 
    // Set the arguments
-   run_python_string("import os");
-   run_python_string("import sys");
+   StringArray sa = diag_script.split(" ");
+   ConcatString script_name(sa[0]);
+   sa.add(script_name); // Kludge with PyConfig_SetArgv
+   sa.add(script_name);
+   sa.add(tmp_info.tmp_file);
 
    // Add the tc_diag python directory to the path
    ConcatString command;
-   ConcatString tc_diag_dir(replace_path(python_tc_diag_dir));
-
-   command << cs_erase
-           << "sys.path.append(\""
-           << tc_diag_dir
+   command << "import sys; sys.path.append(\""
+           << replace_path(python_tc_diag_dir)
            << "\")";
    run_python_string(command.text());
 
-   // Add the directory of the script to the path, if needed
-   ConcatString script_name = arg_sa[0];
-
-   if(tc_diag_dir != script_name.dirname()) {
-
-      command << cs_erase
-              << "sys.path.append(\""
-              << script_name.dirname()
-              << "\");";
-      run_python_string(command.text());
-   }
-
    // Set the global python arguments
-   if(arg_sa.n() > 0 && !GP.set_args(wa, method_name)) return false;
+   if(sa.n() > 0 && !GP.set_args(sa, method_name)) return false;
 
    // Import the python script as a module
    ConcatString script_base = script_name.basename();
@@ -181,11 +163,8 @@ static bool straight_python_tc_diag(const ConcatString &diag_script,
 static bool user_python_tc_diag(const ConcatString &diag_script,
                                 TmpFileInfo &tmp_info) {
    const char *method_name = "user_python_tc_diag() -> ";
-   ConcatString command;
-   ConcatString path;
-   Wchar_Argv wa;
 
-   mlog << Debug(3) << "Running user-specified python instance (MET_PYTHON_EXE="
+   mlog << Debug(3) << "Running user-specified Python instance (MET_PYTHON_EXE="
         << user_ppath << ") to run Python diagnostics script ("
         << diag_script << " " << tmp_info.tmp_file << ").\n";
 
@@ -193,17 +172,17 @@ static bool user_python_tc_diag(const ConcatString &diag_script,
    const char *tmp_dir = getenv ("MET_TMP_DIR");
    if(!tmp_dir) tmp_dir = default_tmp_dir;
 
-   path << cs_erase
-        << tmp_dir << '/'
+   ConcatString path;
+   path << tmp_dir << '/'
         << tmp_diag_base_name;
 
-   ConcatString tmp_file_name = make_temp_file_name(path.text(), nullptr);
+   ConcatString tmp_file_name(make_temp_file_name(path.text(), nullptr));
 
    // Construct the system command
-   command << cs_erase
-           << user_ppath                   << ' ' // user's path to python
+   ConcatString command;
+   command << user_ppath                   << ' ' // user's path to python
            << replace_path(write_tmp_diag) << ' ' // write_tmp_diag.py
-           << tmp_file_name                << ' ' // tmp output filename
+           << tmp_file_name                << ' ' // temporary output filename
            << diag_script                  << ' ' // python diagnostics script
            << tmp_info.tmp_file;                  // cylindrical coordinates tmp nc filename
 
@@ -233,23 +212,14 @@ static bool user_python_tc_diag(const ConcatString &diag_script,
       return false;
    }
 
-   run_python_string("import sys");
-   command << cs_erase
-           << "sys.path.append(\""
-           << replace_path(python_dir)
-           << "\")";
-   run_python_string(command.text());
-   mlog << Debug(3) << method_name << "added python path ("
-        << replace_path(python_dir) << ") to python interpreter\n";
-
    // Set the arguments
-   StringArray a;
-   a.add(read_tmp_diag);
-   a.add(tmp_file_name);
-   wa.set(a);
+   StringArray sa;
+   sa.add(read_tmp_diag); // Kludge to use PyConfig_SetArgv
+   sa.add(read_tmp_diag);
+   sa.add(tmp_file_name);
 
    // Set the global python arguments
-   if(!GP.set_args(wa, method_name)) return false;
+   if(!GP.set_args(sa, method_name)) return false;
 
    mlog << Debug(4) << "Reading temporary Python diagnostics data file: "
         << tmp_file_name << "\n";

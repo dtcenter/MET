@@ -545,6 +545,9 @@ static bool user_python_point_data(const char *user_script_name,
         << user_ppath << ") to run user's Python script ("
         << user_script_name << ").\n";
 
+   //
+   //  create a temp file
+   //
 
    const char *tmp_dir = getenv("MET_TMP_DIR");
    if(!tmp_dir) tmp_dir = default_tmp_dir;
