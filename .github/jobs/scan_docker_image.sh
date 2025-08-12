@@ -5,4 +5,7 @@ source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
 DOCKERHUB_TAG=$(get_dockerhub_tag)
 
 # Scan the image
-cve_scan_image ${DOCKERHUB_TAG}
+if ! cve_scan_image ${DOCKERHUB_TAG}; then
+  echo "ERROR: Critical CVEs found!"
+  exit 1
+fi

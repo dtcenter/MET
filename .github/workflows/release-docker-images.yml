@@ -9,13 +9,13 @@ on:
   workflow_dispatch:
     inputs:
       release_version:
-        description: 'Comma-separated list of versions to build, e.g. "v12.0.2","v12.1.0"'
+        description: 'Comma-separated list of versions to build, e.g. "v12.0.3","v12.1.0"'
         default: '"v12.1.0"'
         required: true
         type: string
       update_latest:
         description: 'For "vX.Y.Z" versions, update the corresponding "X.Y-latest" images.'
-        default: false 
+        default: false
         required: true
         type: boolean
 
@@ -38,7 +38,7 @@ jobs:
         id: get-versions
         run: |
           if [[ ${{ github.event_name }} == 'schedule' ]]; then
-            version_list="\"v12.0.2\",\"v12.1.0\""
+            version_list="\"v12.0.3\",\"v12.1.0\""
             update_latest="true"
           elif [[ ${{ github.event_name }} == 'workflow_dispatch' ]]; then
             version_list=${{ toJSON(inputs.release_version) }}
@@ -98,8 +98,8 @@ jobs:
         env:
           SOURCE_BRANCH: ${{ matrix.version }}
           UPDATE_LATEST: ${{ fromJSON(needs.define-matrix.outputs.update_latest) }}
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKER_USERNAME: 'dtcenter'
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Copy log files into logs directory
         if: always()

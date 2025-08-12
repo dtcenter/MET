@@ -10,13 +10,13 @@ function time_command {
   local error
   # pipe output to log file if set
   if [ "x$CMD_LOGFILE" == "x" ]; then
-      "$@"
-      error=$?
+    "$@"
+    error=$?
   else
-      echo "Logging to ${CMD_LOGFILE}"
-      "$@" &>> $CMD_LOGFILE
-      error=$?
-      unset CMD_LOGFILE
+    echo "Logging to ${CMD_LOGFILE}"
+    "$@" &>> $CMD_LOGFILE
+    error=$?
+    unset CMD_LOGFILE
   fi
 
   local duration=$(( SECONDS - start_seconds ))
@@ -42,11 +42,26 @@ function cve_scan_image {
   CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
   time_command grype $1
   CMD_LOGFILE="${GITHUB_WORKSPACE}/CVE_Scan_`echo $1 | sed 's%[/,:]%_%g'`.log"
-  N_CRITICAL=`grep "Critical" ${CMD_LOGFILE} | wc -l`
+
+  # print CVE counts
+  cve_summary="Found $(grep -E " Critical | High | Medium | Low | Negligible " $CMD_LOGFILE | wc -l) CVEs for image $1: "
+  for status in Critical High Medium Low Negligible; do
+    if [[ $status != "Critical" ]]; then
+      cve_summary+=", "
+    fi
+    cve_summary+="$(grep $status $CMD_LOGFILE | wc -l) ${status}"
+  done
+  echo $cve_summary
+
+  # print critical CVEs
+  N_CRITICAL=`grep " Critical " ${CMD_LOGFILE} | wc -l`
   if [ ${N_CRITICAL} -gt 0 ]; then
     echo "WARNING: Found ${N_CRITICAL} Critical CVEs for image $1 in ${CMD_LOGFILE}"
     echo
     egrep "SEVERITY|Critical" ${CMD_LOGFILE}
     echo
+    return 1
   fi
+
+  return 0
 }
