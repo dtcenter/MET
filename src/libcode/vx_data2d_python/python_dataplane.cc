@@ -199,13 +199,7 @@ run_python_string(command.text());
    //  set the global python arguments
    //
 
-if ( user_script_argc > 0 )  {
-   if ( ! GP.set_args(wa) ) {
-      mlog << Warning << "\n" << method_name
-           << "error setting python arguments\n\n";
-      return false;
-   }
-}
+if ( user_script_argc > 0 && ! GP.set_args(wa, method_name) )  return false;
 
    //
    //  import the python script as a module
@@ -408,13 +402,7 @@ wa.set(a);
    //  set the global python arguments
    //
 
-if ( user_script_argc > 0 )  {
-   if ( ! GP.set_args(wa) ) {
-      mlog << Warning << "\n" << method_name
-           << "error setting python arguments\n\n";
-      return false;
-   }
-}
+if ( user_script_argc > 0 && ! GP.set_args(wa, method_name) )  return false;
 
 mlog << Debug(4) << "Reading temporary Python dataplane file: "
      << tmp_nc_path << "\n";
