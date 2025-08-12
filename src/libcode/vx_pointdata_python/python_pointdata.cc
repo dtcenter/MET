@@ -495,17 +495,16 @@ command << cs_erase
 
 run_python_string(command.text());
 
+   //
+   //  set the global python arguments
+   //
+
 if ( wa.wargc() > 0 )  {
-   PyStatus p_status = PyConfig_SetArgv(&GP.config, wa.wargc(), wa.wargv());
-   if (PyStatus_Exception(p_status)) {
-      PyConfig_Clear(&GP.config);
+   if ( ! GP.set_args(wa) ) {
       mlog << Warning << "\n" << method_name
            << "error setting python arguments\n\n";
       return false;
    }
-
-   // Initialize Python interpreter
-   Py_InitializeFromConfig(&GP.config);
 }
 
    //
@@ -663,16 +662,15 @@ a.add(tmp_nc_path);
 Wchar_Argv wa;
 wa.set(a);
 
-PyStatus p_status = PyConfig_SetArgv(&GP.config, wa.wargc(), wa.wargv());
-if (PyStatus_Exception(p_status)) {
-   PyConfig_Clear(&GP.config);
+   //
+   //  set the global python arguments
+   //
+
+if ( ! GP.set_args(wa) ) {
    mlog << Warning << "\n" << method_name
         << "error setting python arguments\n\n";
    return false;
 }
-
-// Initialize Python interpreter
-Py_InitializeFromConfig(&GP.config);
 
 mlog << Debug(4) << "Reading temporary Python point data file: "
      << tmp_nc_path << "\n";

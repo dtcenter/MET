@@ -143,13 +143,13 @@ auto script_argv = new char *[script_argc];
 
 char a_var_name[512+1];
 script_argv[0] = m_strcpy2(validate_dataplane, method_name, validate_dataplane);
-if (argc_extra>1) script_argv[1] = m_strcpy2(validate_dataplane, method_name, validate_dataplane);    //Kludge with PyConfig_SetArgv
+if (argc_extra>1) script_argv[1] = m_strcpy2(validate_dataplane, method_name, validate_dataplane);    // Kludge with PyConfig_SetArgv
 for (int i=0; i<user_script_argc; i++ )  {
    snprintf(a_var_name, 512, "python_argv[%d]", i);
    script_argv[i+argc_extra] = m_strcpy2(user_script_argv[i], method_name, a_var_name);
 }
 
-mlog << Debug(3) << "prepaing python arguments: script_argc=" << script_argc<< ".\n";
+mlog << Debug(3) << "preparing python arguments: script_argc=" << script_argc<< ".\n";
 
 Wchar_Argv wa;
 wa.set(script_argc, script_argv);
@@ -195,19 +195,16 @@ command << cs_erase
 
 run_python_string(command.text());
 
-if ( user_script_argc > 0 )  {
+   //
+   //  set the global python arguments
+   //
 
-   PyStatus p_status = PyConfig_SetArgv(&GP.config, wa.wargc(), wa.wargv());
-   if (PyStatus_Exception(p_status)) {
-      PyConfig_Clear(&GP.config);
+if ( user_script_argc > 0 )  {
+   if ( ! GP.set_args(wa) ) {
       mlog << Warning << "\n" << method_name
            << "error setting python arguments\n\n";
       return false;
    }
-
-   // Initialize Python interpreter
-   Py_InitializeFromConfig(&GP.config);
-
 }
 
    //
@@ -407,16 +404,17 @@ a.add(tmp_nc_path);
 
 wa.set(a);
 
-PyStatus p_status = PyConfig_SetArgv(&GP.config, wa.wargc(), wa.wargv());
-if (PyStatus_Exception(p_status)) {
-   PyConfig_Clear(&GP.config);
-   mlog << Warning << "\n" << method_name
-        << "error setting python arguments\n\n";
-   return false;
-}
+   //
+   //  set the global python arguments
+   //
 
-// Initialize Python interpreter
-Py_InitializeFromConfig(&GP.config);
+if ( user_script_argc > 0 )  {
+   if ( ! GP.set_args(wa) ) {
+      mlog << Warning << "\n" << method_name
+           << "error setting python arguments\n\n";
+      return false;
+   }
+}
 
 mlog << Debug(4) << "Reading temporary Python dataplane file: "
      << tmp_nc_path << "\n";

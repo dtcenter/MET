@@ -26,6 +26,7 @@ extern "C" {
 ////////////////////////////////////////////////////////////////////////
 
 
+#include "wchar_argv.h"
 #include "python3_util.h"
 #include "concat_string.h"
 #include "vx_log.h"
@@ -42,6 +43,7 @@ class GlobalPython {
      ~GlobalPython();
 
       void initialize();
+      bool set_args(const Wchar_Argv &);
       void finalize();
 
       PyConfig config;
@@ -97,6 +99,54 @@ if ( ! is_initialized )  {
 }
 
 return;
+
+}
+
+
+/////////////////////////////
+
+
+inline bool GlobalPython::set_args(const Wchar_Argv &wa)
+{ 
+
+   //
+   //  add arguments to Python configuration
+   //
+
+PyStatus p_status = PyConfig_SetArgv(&(this->config), wa.wargc(), wa.wargv());
+if (PyStatus_Exception(p_status)) {
+   PyConfig_Clear(&(this->config));
+   return false;
+}
+
+   //
+   //  MET #3219 store the current Python system path
+   //  since it is reset by the Python 3.10 version
+   //  of Py_InitializeFromConfig()
+   //
+
+PyObject *sys_path_obj = PySys_GetObject("path");
+StringArray sys_path_sa(pyobject_as_string_array(sys_path_obj));
+
+   //
+   //  re-initialize Python interpreter with arguments set 
+   //
+
+Py_InitializeFromConfig(&(this->config));
+
+   //
+   //  MET #3219 restore the Python system path from above
+   //
+
+ConcatString command;
+command << "import os; import sys; ";
+command << "sys.path.clear(); ";
+for(int i=0; i<sys_path_sa.n(); i++) {
+   command << "sys.path.append(\"" << sys_path_sa[i] << "\"); ";
+}
+run_python_string(command.c_str());
+
+return true;
 
 }
 
