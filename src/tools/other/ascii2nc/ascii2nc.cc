@@ -886,7 +886,7 @@ static void setup_wrapper_path() {
 
    command << cs_erase
            << "sys.path.append(\""
-           << replace_path(wrappers_dir)
+           << replace_path(pyembed_dir)
            << "\")";
 
    run_python_string(command.text());

@@ -56,7 +56,7 @@ inline GlobalPython::GlobalPython()   { is_initialized = false; };
 inline GlobalPython::~GlobalPython()  { is_initialized = false; };
 
 
-/////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 
 inline void GlobalPython::initialize()
@@ -80,7 +80,7 @@ if ( ! is_initialized )  {
    is_initialized = true;
 
    //
-   //  add wrappers directory to the path
+   //  add MET-specific python directories to the path
    //
 
    run_python_string("import sys");
@@ -89,7 +89,7 @@ if ( ! is_initialized )  {
 
    command << cs_erase
            << "sys.path.append(\""
-           << replace_path(wrappers_dir)
+           << replace_path(pyembed_dir)
            << "\");"
            << "sys.path.append(\""
            << replace_path(python_dir)
@@ -104,7 +104,7 @@ return;
 }
 
 
-/////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 
 inline bool GlobalPython::set_args(const Wchar_Argv &wa, const char *caller)
@@ -154,10 +154,11 @@ return true;
 }
 
 
-/////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 
-inline bool GlobalPython::set_args(const StringArray &args, const char *caller)
+inline bool GlobalPython::set_args(const StringArray &args,
+                                   const char *caller)
 { 
 
 Wchar_Argv wa;
@@ -182,7 +183,7 @@ return set_args(wa, caller);
 }
 
 
-/////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 
 inline void GlobalPython::finalize()
@@ -201,7 +202,7 @@ return;
 }
 
 
-/////////////////////////////
+////////////////////////////////////////////////////////////////////////
 
 
 extern GlobalPython GP;
