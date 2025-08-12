@@ -44,6 +44,7 @@ class GlobalPython {
 
       void initialize();
       bool set_args(const Wchar_Argv &, const char *);
+      bool set_args(const StringArray &, const char *);
       void finalize();
 
       PyConfig config;
@@ -149,6 +150,34 @@ for(int i=0; i<sys_path_sa.n(); i++) {
 run_python_string(command.c_str());
 
 return true;
+
+}
+
+
+/////////////////////////////
+
+
+inline bool GlobalPython::set_args(const StringArray &args, const char *caller)
+{ 
+
+Wchar_Argv wa;
+wa.set(args);
+
+   //
+   //  append script location to the Python system path
+   //
+
+if(args.n() > 0) {
+
+   ConcatString script_name(args[0]);
+
+   ConcatString command;
+   command << "import sys; sys.path.append(\""
+           << script_name.dirname() << "\");";
+   run_python_string(command.c_str());
+}
+
+return set_args(wa, caller);
 
 }
 

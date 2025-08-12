@@ -151,10 +151,6 @@ bool MetPythonDataFile::open(const char * cur_command)
 
 close();
 
-ConcatString full_path, file_name;
-int i, file_argc;
-char **file_argv = (char **) nullptr; // allocated
-StringArray sa;
 const char *method_name = "MetPythonDataFile::open() ";
 
    //
@@ -164,31 +160,14 @@ const char *method_name = "MetPythonDataFile::open() ";
 PythonCommand = cur_command;
 
    //
-   //  parse and store argc and argv
-   //
-
-sa = PythonCommand.split(" ");
-
-file_argc = sa.n_elements();
-
-if ( file_argc > 0 )  {
-   file_argv = new char * [ file_argc ];
-   char a_var_name[512+1];
-
-   for ( i=0; i<sa.n_elements(); i++ )  {
-      int buf_len = sa[i].length();
-      snprintf(a_var_name, 512, "file_argv[%d]", i);
-      file_argv[i] = m_strcpy2(sa[i].c_str(), method_name, a_var_name);
-   }
-}
-
-   //
    //  Build the path and store the file name
    //
 
-full_path = sa[0];
+StringArray sa = PythonCommand.split(" ");
 
-file_name = full_path;
+ConcatString full_path(sa[0]);
+
+ConcatString file_name(full_path);
 
 file_name.chomp(".py");   //  remove possible ".py" suffix from script filename
 
@@ -216,7 +195,7 @@ Filename = file_name;
 
 Raw_Grid = new Grid;
 
-bool status = python_dataplane(file_name.c_str(), file_argc, file_argv,
+bool status = python_dataplane(file_name.c_str(), sa,
                                use_xarray, Plane, *Raw_Grid, VInfo);
 
 Dest_Grid = new Grid;
@@ -224,17 +203,6 @@ Dest_Grid = new Grid;
 (*Dest_Grid) = (*Raw_Grid);
 
 if ( ShiftRight != 0 )  Plane.shift_right(ShiftRight);
-
-   //
-   //  cleanup
-   //
-
-if ( file_argv )  {
-   for ( i=1; i<file_argc; i++ )  {
-      if ( file_argv[i] )  { delete [] file_argv[i]; file_argv[i] = (char *) nullptr; }
-   }
-   delete [] file_argv; file_argv = (char **) nullptr;
-}
 
    //
    //  done

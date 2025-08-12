@@ -39,7 +39,7 @@ static const char numpy_dict_name       [] = "attrs";
 
 
 extern bool python_dataplane(const char * script_name,
-                             int script_argc, char **script_argv,
+                             const StringArray & script_args,
                              const bool use_xarray,
                              DataPlane & dp_out, Grid & g_out,
                              VarInfoPython &vinfo);
