@@ -114,8 +114,7 @@ static bool met_python_tc_diag(const ConcatString &diag_script,
    // Set the arguments
    StringArray sa = diag_script.split(" ");
    ConcatString script_name(sa[0]);
-   sa.add(script_name); // Kludge with PyConfig_SetArgv
-   sa.add(script_name);
+   sa.insert(0, script_name.c_str()); // Kludge with PyConfig_SetArgv
    sa.add(tmp_info.tmp_file);
 
    // Add the tc_diag python directory to the path
