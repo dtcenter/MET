@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
 #include <dirent.h>
 #include <iostream>
 #include <unistd.h>
@@ -19,11 +18,11 @@
 
 #include "rmw_analysis_conf_info.h"
 
+#include "track_point.h"
 #include "apply_mask.h"
 #include "vx_log.h"
 
 using namespace std;
-
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -63,8 +62,18 @@ void RMWAnalysisConfInfo::clear() {
    Basin.clear();
    Cyclone.clear();
    StormName.clear();
+
    InitBeg = InitEnd = (unixtime) 0;
+   InitInc.clear();
+   InitExc.clear();
+   InitHour.clear();
+
+   LeadTime.clear();
+
    ValidBeg = ValidEnd = (unixtime) 0;
+   ValidInc.clear();
+   ValidExc.clear();
+   ValidHour.clear();
 
    InitMaskName.clear();
    InitPolyMask.clear();
@@ -75,6 +84,10 @@ void RMWAnalysisConfInfo::clear() {
    ValidPolyMask.clear();
    ValidGridMask.clear();
    ValidAreaMask.clear();
+
+   Category.clear();
+   ColumnThreshMap.clear();
+   InitThreshMap.clear();
 
    // Clear data_info
    if(data_info) {
@@ -113,10 +126,8 @@ void RMWAnalysisConfInfo::read_config(const char* default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void RMWAnalysisConfInfo::process_config() {
-
    VarInfoFactory info_factory;
    Dictionary *fdict = (Dictionary *) nullptr;
-   ConcatString poly_file;
    GrdFileType ftype = FileType_NcCF;
 
    // Conf: Version
@@ -142,26 +153,84 @@ void RMWAnalysisConfInfo::process_config() {
    InitBeg = Conf.lookup_unixtime(conf_key_init_beg);
    InitEnd = Conf.lookup_unixtime(conf_key_init_end);
 
+   // Conf: InitInc
+   InitInc = Conf.lookup_unixtime_array(conf_key_init_inc);
+
+   // Conf: InitExc
+   InitExc = Conf.lookup_unixtime_array(conf_key_init_exc);
+
+   // Conf: InitHour
+   InitHour = Conf.lookup_seconds_array(conf_key_init_hour);
+
+   // Conf: Lead
+   LeadTime = Conf.lookup_seconds_array(conf_key_lead);
+
    // Conf: ValidBeg, ValidEnd
    ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
    ValidEnd = Conf.lookup_unixtime(conf_key_valid_end);
 
+   // Conf: ValidInc
+   ValidInc = Conf.lookup_unixtime_array(conf_key_valid_inc);
+
+   // Conf: ValidExc
+   ValidExc = Conf.lookup_unixtime_array(conf_key_valid_exc);
+
+   // Conf: ValidHour
+   ValidHour = Conf.lookup_seconds_array(conf_key_valid_hour);
+
    // Conf: InitMask
    if(nonempty(Conf.lookup_string(conf_key_init_mask).c_str())) {
-      poly_file = replace_path(Conf.lookup_string(conf_key_init_mask));
+      ConcatString poly_file(replace_path(Conf.lookup_string(conf_key_init_mask)));
       mlog << Debug(2)
-          << "Init Points Masking File: " << poly_file << "\n";
+           << "Init Points Masking File: " << poly_file << "\n";
       parse_poly_mask(poly_file, InitPolyMask, InitGridMask,
-                     InitAreaMask, InitMaskName);
+                      InitAreaMask, InitMaskName);
    }
 
    // Conf: ValidMask
    if(nonempty(Conf.lookup_string(conf_key_valid_mask).c_str())) {
-      poly_file = replace_path(Conf.lookup_string(conf_key_valid_mask));
+      ConcatString poly_file(replace_path(Conf.lookup_string(conf_key_valid_mask)));
       mlog << Debug(2)
-          << "Valid Point Masking File: " << poly_file << "\n";
+           << "Valid Point Masking File: " << poly_file << "\n";
       parse_poly_mask(poly_file, ValidPolyMask, ValidGridMask,
-                     ValidAreaMask, ValidMaskName);
+                      ValidAreaMask, ValidMaskName);
+   }
+
+   // Conf: Category
+   Category = Conf.lookup_string_array(conf_key_category);
+
+   // Conf: ColumnThreshName, ColumnThreshVal
+   ColumnThreshMap = parse_conf_thresh_map(&Conf,
+                        conf_key_column_thresh_name,
+                        conf_key_column_thresh_val);
+
+   // Validate column names
+   for(const auto &m : ColumnThreshMap) {
+      string upper_name(to_upper(m.first));
+      if(find(atcf_column_vals.begin(), atcf_column_vals.end(),
+              upper_name) == atcf_column_vals.end()) {
+         mlog << Error << "\nRMWAnalysisConfInfo::process_config() -> "
+              << "unsupported ATCF column name (" << m.first << ") requested in \""
+              << conf_key_column_thresh_name << "\".\n\n";
+         exit(1);
+      }
+   }
+
+   // Conf: InitThreshName, InitThreshVal
+   InitThreshMap = parse_conf_thresh_map(&Conf,
+                      conf_key_init_thresh_name,
+                      conf_key_init_thresh_val);
+
+   // Validate column names
+   for(const auto &m : InitThreshMap) {
+      string upper_name(to_upper(m.first));
+      if(find(atcf_column_vals.begin(), atcf_column_vals.end(),
+              upper_name) == atcf_column_vals.end()) {
+         mlog << Error << "\nRMWAnalysisConfInfo::process_config() -> "
+              << "unsupported ATCF column name (" << m.first << ") requested in \""
+              << conf_key_init_thresh_name << "\".\n\n";
+         exit(1);
+      }
    }
 
    // Conf: data.field
@@ -170,11 +239,10 @@ void RMWAnalysisConfInfo::process_config() {
    // Determine number of fields (name/level)
    n_data = parse_conf_n_vx(fdict);
 
-
    // Check for empty data settings
    if(n_data == 0) {
       mlog << Error << "\nRMWAnalysisConfInfo::process_config() -> "
-          << "data may not be empty.\n\n";
+           << "data may not be empty.\n\n";
       exit(1);
    }
 

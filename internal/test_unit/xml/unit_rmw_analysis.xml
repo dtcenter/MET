@@ -26,4 +26,17 @@
     </output>
   </test>
 
+  <test name="rmw_analysis_filter_options">
+    <exec>&MET_BIN;/rmw_analysis</exec>
+    <param> \
+      -config &CONFIG_DIR;/RMWAnalysisConfig_filters \
+      -data &OUTPUT_DIR;/tc_rmw/tc_rmw_pressure_lev_out.nc \
+      -out &OUTPUT_DIR;/rmw_analysis/rmw_analysis_out_filters.nc \
+      -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/rmw_analysis/rmw_analysis_out_filters.nc</grid_nc>
+    </output>
+  </test>
+
 </met_test>

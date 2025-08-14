@@ -26,53 +26,69 @@ class RMWAnalysisConfInfo {
 
     private:
 
-        void init_from_scratch();
+       void init_from_scratch();
 
-        // Number of forecast fields
-        int n_data;
+       // Number of forecast fields
+       int n_data;
 
     public:
 
-        // RMWAnalysis configuration object
-        MetConfig Conf;
+       // RMWAnalysis configuration object
+       MetConfig Conf;
 
-        // Track filtering criteria
-        StringArray Model;     // List of model names
-        StringArray StormId;   // List of storm ids
-        StringArray Basin;     // List of basin names
-        StringArray Cyclone;   // List of cyclone numbers
-        StringArray StormName; // List of storm names
+       // Track filtering criteria
+       StringArray Model;     // List of model names
+       StringArray StormId;   // List of storm ids
+       StringArray Basin;     // List of basin names
+       StringArray Cyclone;   // List of cyclone numbers
+       StringArray StormName; // List of storm names
 
-        // Timing information
-        unixtime  InitBeg, InitEnd;
-        unixtime  ValidBeg, ValidEnd;
+       // Timing information
+       unixtime  InitBeg;
+       unixtime  InitEnd;
+       TimeArray InitInc;
+       TimeArray InitExc;
+       IntArray  InitHour;
+       IntArray  LeadTime;
+       unixtime  ValidBeg;
+       unixtime  ValidEnd;
+       TimeArray ValidInc;
+       TimeArray ValidExc;
+       IntArray  ValidHour;
 
-        // Polyline masking regions
-        ConcatString InitMaskName;
-        MaskPoly     InitPolyMask;
-        Grid         InitGridMask;
-        MaskPlane    InitAreaMask;
+       // Polyline masking regions
+       ConcatString InitMaskName;
+       MaskPoly     InitPolyMask;
+       Grid         InitGridMask;
+       MaskPlane    InitAreaMask;
 
-        ConcatString ValidMaskName;
-        MaskPoly     ValidPolyMask;
-        Grid         ValidGridMask;
-        MaskPlane    ValidAreaMask;
+       ConcatString ValidMaskName;
+       MaskPoly     ValidPolyMask;
+       Grid         ValidGridMask;
+       MaskPlane    ValidAreaMask;
 
-        // Variable information
-        VarInfo** data_info;
+       // Storm category
+       StringArray Category;
 
-        // Config file version
-        ConcatString Version;
+       // Numeric ATCF column thresholds
+       std::map<ConcatString,ThreshArray> ColumnThreshMap;
+       std::map<ConcatString,ThreshArray> InitThreshMap;
 
-        RMWAnalysisConfInfo();
-        ~RMWAnalysisConfInfo();
+       // Variable information
+       VarInfo** data_info;
 
-        void clear();
+       // Config file version
+       ConcatString Version;
 
-        void read_config(const char *, const char *);
-        void process_config();
+       RMWAnalysisConfInfo();
+       ~RMWAnalysisConfInfo();
 
-        int get_n_data() const;
+       void clear();
+
+       void read_config(const char *, const char *);
+       void process_config();
+
+       int get_n_data() const;
 };
 
 ////////////////////////////////////////////////////////////////////////

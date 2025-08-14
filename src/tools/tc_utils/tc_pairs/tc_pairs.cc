@@ -64,6 +64,7 @@
 #include "main.h"
 #include "tc_pairs.h"
 
+#include "vx_statistics.h"
 #include "vx_nc_util.h"
 #include "vx_tc_util.h"
 #include "vx_grid.h"
@@ -138,9 +139,6 @@ static void   filter_tracks        (TrackInfoArray &);
 static void   filter_probs         (ProbInfoArray &);
 static void   process_diags        (TrackInfoArray &);
 
-static bool   check_masks          (const MaskPoly &, const Grid &,
-                                    const MaskPlane &,
-                                    double lat, double lon);
 static void   derive_interp12      (TrackInfoArray &);
 static int    derive_consensus     (TrackInfoArray &);
 static int    derive_lag           (TrackInfoArray &);
@@ -766,10 +764,6 @@ void process_prob_files(const StringArray &files,
 
 bool is_keeper(const ATCFLineBase * line) {
    bool keep = true;
-   int m, d, y, h, mm, s;
-
-   // Decompose warning time
-   unix_to_mdyhms(line->warning_time(), m, d, y, h, mm, s);
 
    // Check model
    if(conf_info.Model.n() > 0 &&
@@ -805,7 +799,7 @@ bool is_keeper(const ATCFLineBase * line) {
 
    // Initialization hour
    else if(conf_info.InitHour.n() > 0 &&
-           !conf_info.InitHour.has(hms_to_sec(h, mm, s)))
+           !conf_info.InitHour.has(line->warning_hour()))
       keep = false;
 
    // Valid time include/exclude
@@ -1104,44 +1098,6 @@ void process_diags(TrackInfoArray &tracks) {
    }
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-bool check_masks(const MaskPoly &mask_poly, const Grid &mask_grid,
-                 const MaskPlane &mask_area, double lat, double lon) {
-   double grid_x, grid_y;
-
-   //
-   // Check polyline masking
-   //
-   if(mask_poly.n_points() > 0) {
-      if(!mask_poly.latlon_is_inside_dege(lat, lon)) {
-         return false;
-      }
-   }
-
-   //
-   // Check grid masking
-   //
-   if(mask_grid.nx() > 0 || mask_grid.ny() > 0) {
-      mask_grid.latlon_to_xy(lat, -1.0*lon, grid_x, grid_y);
-      if(grid_x < 0 || grid_x >= mask_grid.nx() ||
-         grid_y < 0 || grid_y >= mask_grid.ny()) {
-         return false;
-      }
-
-      //
-      // Check area mask
-      //
-      if(mask_area.nx() > 0 || mask_area.ny() > 0) {
-         if(!mask_area.s_is_on(nint(grid_x), nint(grid_y))) {
-            return false;
-         }
-      }
-   }
-
-   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////

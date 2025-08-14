@@ -85,7 +85,6 @@ static netCDF::NcFile* nc_out = (netCDF::NcFile*) nullptr;
 static netCDF::NcDim range_dim;
 static netCDF::NcDim azimuth_dim;
 static netCDF::NcDim level_dim;
-static netCDF::NcDim track_point_dim;
 static NumArray track_lat;
 static NumArray track_lon;
 
@@ -116,11 +115,11 @@ static std::vector<std::string> data_long_names;
 static std::vector<std::string> data_units;
 
 // Variable data
-static std::vector<DataCube*> data_counts;
-static std::vector<DataCube*> data_means;
-static std::vector<DataCube*> data_stdevs;
-static std::vector<DataCube*> data_mins;
-static std::vector<DataCube*> data_maxs;
+static std::vector<DataCube> data_counts;
+static std::vector<DataCube> data_means;
+static std::vector<DataCube> data_stdevs;
+static std::vector<DataCube> data_mins;
+static std::vector<DataCube> data_maxs;
 
 // Track information
 static ConcatString adeck_source = "adeck.tmp";

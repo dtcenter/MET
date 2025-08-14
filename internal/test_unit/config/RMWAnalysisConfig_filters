@@ -22,22 +22,22 @@ data = {
 //
 // Model
 //
-model = [];
+model = [ "fv3" ];
 
 //
 // Storm identifier
 //
-storm_id = [];
+storm_id = [ "AL142016" ];
 
 //
 // Basin
 //
-basin = [];
+basin = [ "AL" ];
 
 //
 // Cyclone number
 //
-cyclone = [];
+cyclone = [ "14" ];
 
 //
 // Storm name
@@ -47,31 +47,31 @@ storm_name = [];
 //
 // Initialization time 
 //
-init_beg = "";
-init_end = "";
-init_inc = [];
-init_exc = [];
+init_beg = "20160929_00";
+init_end = "20160929_00";
+init_inc = [ "20160929_00" ];
+init_exc = [ "20160929_06" ];
 
 //
 // Valid time
 //
-valid_beg = "";
-valid_end = "";
-valid_inc = [];
-valid_exc = [];
+valid_beg = "20161004_21";
+valid_end = "20161005_03";
+valid_inc = [ "20161004_21", "20161005_00", "20161005_03" ];
+valid_exc = [ "20161005_06" ];
 
 //
 // Initialization, valid, and lead hours
 //
-init_hour  = [];
-valid_hour = [];
-lead       = [];
+init_hour  = [ "00" ];
+valid_hour = [ "21", "00", "03" ];
+lead       = [ "141", "144", "147" ];
 
 //
 // lat/lon polylines defining masking regions
 //
 init_mask  = "";
-valid_mask = "";
+valid_mask = "MET_BASE/tc_data/dland_global_tenth_degree.nc";
 
 //
 // Cyclone level category
@@ -81,8 +81,8 @@ category = [];
 //
 // Stratify track points by thresholding ATCF columns
 //
-column_thresh_name = [];
-column_thresh_val  = [];
+column_thresh_name = [ "MSLP" ];
+column_thresh_val  = [ <975 ];
 
 //
 // Stratify track by thresholding ATCF columns for the initial time

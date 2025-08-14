@@ -189,13 +189,16 @@ For example:
 init_mask, valid_mask
 ^^^^^^^^^^^^^^^^^^^^^
 
-Specify lat/lon polylines defining masking regions to be applied.
-Tracks whose initial location falls within init_mask will be used.
-Tracks for which all locations fall within valid_mask will be used.
+Specify spatial masking regions to be applied. These masks can be specified as lat/lon polyline files,
+the NetCDF output of the gen_vx_mask tool, or any gridded data file directly supported by MET.
+Tracks whose initial location (i.e. lead time of 0) falls within the "init_mask" region will be used.
+Generally, tracks for which all locations fall within the "valid_mask" region will be used.
+However, in RMW-Analysis, only data for track points falling inside the "valid_mask" region will be used.
 
 For example:
 
 | init_mask  = "MET_BASE/poly/EAST.poly";
+| valid_mask = "/path/to/gen_vx_mask_output.nc";
 
 .. code-block:: none
 

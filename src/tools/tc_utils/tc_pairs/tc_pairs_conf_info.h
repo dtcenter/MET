@@ -72,8 +72,8 @@ class TCPairsConfInfo {
       unixtime  InitBeg, InitEnd;
       TimeArray InitInc;
       TimeArray InitExc;
-      NumArray  InitHour;
-      NumArray  LeadReq;
+      IntArray  InitHour;
+      IntArray  LeadReq;
       unixtime  ValidBeg, ValidEnd;
       TimeArray ValidInc;
       TimeArray ValidExc;
@@ -101,7 +101,7 @@ class TCPairsConfInfo {
       ConsensusInfo *Consensus; // Consensus model definition
 
       // Time-lagged track definition
-      NumArray LagTime;
+      IntArray LagTime;
 
       // CLIPER/SHIFOR baseline model definition along with BEST
       // and operational technique names

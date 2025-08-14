@@ -57,6 +57,9 @@ extern void apply_poly_mask_latlon(const MaskPoly &, const Grid &,
 extern DataPlane parse_geog_data(Dictionary *dict, const Grid &grid,
                                  const char *);
 
+extern bool check_masks(const MaskPoly &, const Grid &,
+                        const MaskPlane &, double, double);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __APPLY_MASK_H__
