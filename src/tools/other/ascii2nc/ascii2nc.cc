@@ -170,7 +170,7 @@ static void set_compress(const StringArray &);
 static void set_valid_beg_time(const StringArray &);
 static void set_valid_end_time(const StringArray &);
 
-static void setup_wrapper_path();
+static void setup_python();
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -423,7 +423,7 @@ static FileHandler *create_file_handler(const ASCIIFormat format,
       }
       #ifdef ENABLE_PYTHON
       case ASCIIFormat::Python: {
-         setup_wrapper_path();
+         setup_python();
          ph = new PythonHandler(program_name);
          return (FileHandler *) ph;
       }
@@ -875,21 +875,10 @@ static void set_compress(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void setup_wrapper_path() {
+static void setup_python() {
 
    #ifdef ENABLE_PYTHON
-   ConcatString command;
-
    GP.initialize();
-
-   run_python_string("import sys");
-
-   command << cs_erase
-           << "sys.path.append(\""
-           << replace_path(wrappers_dir)
-           << "\")";
-
-   run_python_string(command.text());
    #endif
 
    return;
