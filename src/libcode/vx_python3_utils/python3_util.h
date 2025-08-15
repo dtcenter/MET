@@ -30,9 +30,9 @@ extern "C" {
 
 static const char user_python_path_env [] = "MET_PYTHON_EXE";
 
-static const char wrappers_dir         [] = "MET_BASE/wrappers";
-
 static const char python_dir           [] = "MET_BASE/python";
+
+static const char pyembed_dir          [] = "MET_BASE/python/pyembed";
 
 static const char tmp_py_base_name     [] = "tmp_met_data";
 

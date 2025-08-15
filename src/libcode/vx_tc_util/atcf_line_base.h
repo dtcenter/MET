@@ -14,10 +14,10 @@
 ////////////////////////////////////////////////////////////////////////
 //
 // Best Track file format information:
-//    http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
+//   https://science.nrlmry.navy.mil/atcf/docs/database/new/abrdeck.html
 //
 // EDeck file format information:
-//    https://www.nrlmry.navy.mil/atcf_web/docs/database/new/edeck.txt
+//   https://science.nrlmry.navy.mil/atcf/docs/database/new/edeck.html
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -119,6 +119,7 @@ class ATCFLineBase : public DataLine {
       ConcatString  basin           () const;
       ConcatString  cyclone_number  () const;
       unixtime      warning_time    () const;
+      int           warning_hour    () const;
       int           technique_number() const; // or minutes for best track
       ConcatString  technique       () const;
 

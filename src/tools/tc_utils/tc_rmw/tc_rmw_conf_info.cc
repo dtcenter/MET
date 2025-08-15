@@ -120,8 +120,6 @@ void TCRMWConfInfo::read_config(const char* default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void TCRMWConfInfo::process_config(GrdFileType ftype) {
-    int i;
-    StringArray sa;
     VarInfoFactory info_factory;
     Dictionary *fdict = (Dictionary *) nullptr;
 
@@ -148,25 +146,16 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     ValidEnd = Conf.lookup_unixtime(conf_key_valid_end);
 
     // Conf: valid_inc
-    sa = Conf.lookup_string_array(conf_key_valid_inc);
-    for(i=0; i<sa.n(); i++)
-       ValidInc.add(timestring_to_unix(sa[i].c_str()));
+    ValidInc = Conf.lookup_unixtime_array(conf_key_valid_inc);
 
     // Conf: valid_exc
-    sa = Conf.lookup_string_array(conf_key_valid_exc);
-    for(i=0; i<sa.n(); i++)
-       ValidExc.add(timestring_to_unix(sa[i].c_str()));
+    ValidExc = Conf.lookup_unixtime_array(conf_key_valid_exc);
 
     // Conf: valid_hour
-    sa = Conf.lookup_string_array(conf_key_valid_hour);
-    for(i=0; i<sa.n(); i++)
-       ValidHour.add(timestring_to_sec(sa[i].c_str()));
+    ValidHour = Conf.lookup_seconds_array(conf_key_valid_hour);
 
     // Conf: lead
-    sa = Conf.lookup_string_array(conf_key_lead);
-    for(i=0; i<sa.n(); i++) {
-       LeadTime.add(timestring_to_sec(sa[i].c_str()));
-    }
+    LeadTime = Conf.lookup_seconds_array(conf_key_lead);
 
     // Conf: n_range
     n_range = Conf.lookup_int(conf_key_n_range);
@@ -217,12 +206,12 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     data_info = new VarInfo*[n_data];
 
     // Initialize pointers
-    for(i=0; i<n_data; i++) {
+    for(int i=0; i<n_data; i++) {
         data_info[i] = (VarInfo*) nullptr;
     }
 
     // Parse data field information
-    for(i=0; i<n_data; i++) {
+    for(int i=0; i<n_data; i++) {
 
         // Allocate new VarInfo objects
         data_info[i] = info_factory.new_var_info(ftype);

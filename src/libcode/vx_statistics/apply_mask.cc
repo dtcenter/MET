@@ -672,3 +672,41 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+bool check_masks(const MaskPoly &mask_poly, const Grid &mask_grid,
+                 const MaskPlane &mask_area, double lat, double lon) {
+
+   //
+   // Check polyline masking
+   //
+   if(mask_poly.n_points() > 0 &&
+      !mask_poly.latlon_is_inside_dege(lat, lon)) {
+      return false;
+   }
+
+   //
+   // Check grid masking
+   //
+   if(mask_grid.nxy()) {
+      double grid_x;
+      double grid_y;
+ 
+      mask_grid.latlon_to_xy(lat, -1.0*lon, grid_x, grid_y);
+      if(grid_x < 0 || grid_x >= mask_grid.nx() ||
+         grid_y < 0 || grid_y >= mask_grid.ny()) {
+         return false;
+      }
+
+      //
+      // Check area mask
+      //
+      if(!mask_area.is_empty() &&
+         !mask_area.s_is_on(nint(grid_x), nint(grid_y))) {
+         return false;
+      }
+   }
+
+   return true;
+}
+
+////////////////////////////////////////////////////////////////////////

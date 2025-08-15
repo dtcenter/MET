@@ -23,6 +23,8 @@ After processing all valid times and all corresponding track points, the compute
 
 The default Python diagnostics scripts included with the MET release provide the standard set of CIRA diagnostics. However, users can copy/modify the logic in those scripts as they see fit to refine and/or add to the diagnostics computed.
 
+.. note:: The Python diagnostics library in MET uses SciPy to compute certain diagnostics on a cylindrical grid, including wind shear, tangential winds, vorticity, and divergence. If SciPy is available in the version of Python that is run, those diagnostics will be computed. If SciPy is missing, TC-Diag will still run, but a fill value will be written for them.
+
 .. _tc-diag_practical_info:
 
 Practical Information

@@ -23,17 +23,6 @@
 
 using namespace std;
 
-
-////////////////////////////////////////////////////////////////////////
-
-// Functions for parsing config entries
-static void parse_conf_thresh_map(MetConfig &,
-               const char *, const char *,
-               map<ConcatString,ThreshArray> &);
-static void parse_conf_string_map(MetConfig &,
-               const char *, const char *,
-               map<ConcatString,StringArray> &);
-
 ////////////////////////////////////////////////////////////////////////
 //
 //  Code for class TCStatConfInfo
@@ -185,44 +174,44 @@ void TCStatConfInfo::process_config() {
    Filter.TrackWatchWarn = Conf.lookup_string_array(conf_key_track_watch_warn);
 
    // Conf: TCStatJob::ColumnThreshName, TCStatJob::ColumnThreshVal
-   parse_conf_thresh_map(Conf,
-                         conf_key_column_thresh_name, conf_key_column_thresh_val,
-                         Filter.ColumnThreshMap);
+   Filter.ColumnThreshMap = parse_conf_thresh_map(&Conf,
+                               conf_key_column_thresh_name,
+                               conf_key_column_thresh_val);
 
    // Conf: TCStatJob::ColumnStrIncName, TCStatJob::ColumnStrIncVal
-   parse_conf_string_map(Conf,
-                         conf_key_column_str_name, conf_key_column_str_val,
-                         Filter.ColumnStrIncMap);
+   Filter.ColumnStrIncMap = parse_conf_string_map(&Conf,
+                               conf_key_column_str_name,
+                               conf_key_column_str_val);
 
    // Conf: TCStatJob::ColumnStrExcName, TCStatJob::ColumnStrExcVal
-   parse_conf_string_map(Conf,
-                         conf_key_column_str_exc_name, conf_key_column_str_exc_val,
-                         Filter.ColumnStrExcMap);
+   Filter.ColumnStrExcMap = parse_conf_string_map(&Conf,
+                               conf_key_column_str_exc_name,
+                               conf_key_column_str_exc_val);
 
    // Conf: TCStatJob::InitThreshName, TCStatJob::InitThreshVal
-   parse_conf_thresh_map(Conf,
-                         conf_key_init_thresh_name, conf_key_init_thresh_val,
-                         Filter.InitThreshMap);
+   Filter.InitThreshMap = parse_conf_thresh_map(&Conf,
+                             conf_key_init_thresh_name,
+                             conf_key_init_thresh_val);
 
    // Conf: TCStatJob::InitStrIncName, TCStatJob::InitStrIncVal
-   parse_conf_string_map(Conf,
-                         conf_key_init_str_name, conf_key_init_str_val,
-                         Filter.InitStrIncMap);
+   Filter.InitStrIncMap = parse_conf_string_map(&Conf,
+                             conf_key_init_str_name,
+                             conf_key_init_str_val);
 
    // Conf: TCStatJob::InitStrExcName, TCStatJob::InitStrExcVal
-   parse_conf_string_map(Conf,
-                         conf_key_init_str_exc_name, conf_key_init_str_exc_val,
-                         Filter.InitStrExcMap);
+   Filter.InitStrExcMap = parse_conf_string_map(&Conf,
+                             conf_key_init_str_exc_name,
+                             conf_key_init_str_exc_val);
 
    // Conf: TCStatJob::DiagThreshName, TCStatJob::DiagThreshVal
-   parse_conf_thresh_map(Conf,
-                         conf_key_diag_thresh_name, conf_key_diag_thresh_val,
-                         Filter.DiagThreshMap);
+   Filter.DiagThreshMap = parse_conf_thresh_map(&Conf,
+                             conf_key_diag_thresh_name,
+                             conf_key_diag_thresh_val);
 
    // Conf: TCStatJob::InitDiagThreshName, TCStatJob::InitDiagThreshVal
-   parse_conf_thresh_map(Conf,
-                         conf_key_init_diag_thresh_name, conf_key_init_diag_thresh_val,
-                         Filter.InitDiagThreshMap);
+   Filter.InitDiagThreshMap = parse_conf_thresh_map(&Conf,
+                                 conf_key_init_diag_thresh_name,
+                                 conf_key_init_diag_thresh_val);
 
    // Conf: TCStatJob::WaterOnly
    Filter.WaterOnly = Conf.lookup_bool(conf_key_water_only);
@@ -266,76 +255,6 @@ void TCStatConfInfo::process_config() {
            << "must specify at least one entry in \"jobs\".\n\n";
       exit(1);
    }
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void parse_conf_thresh_map(MetConfig &conf,
-                           const char *conf_key_name, const char *conf_key_val,
-                           map<ConcatString,ThreshArray> &m) {
-   StringArray sa;
-   ThreshArray ta_val, ta_new;
-   
-   sa     = conf.lookup_string_array(conf_key_name);
-   ta_val = conf.lookup_thresh_array(conf_key_val);
-
-   // Check that they are the same length
-   if(sa.n() != ta_val.n()) {
-      mlog << Error
-           << "\nTCStatConfInfo::parse_conf_thresh_map() -> "
-           << "the \"" << conf_key_name << "\" and \"" << conf_key_val << "\" "
-           << "entries must have the same length.\n\n";
-      exit(1);
-   }
-
-   // Add entries to the map
-   for(int i=0; i<sa.n(); i++) {
-      if(m.count(sa[i]) > 0) {
-         m[sa[i]].add(ta_val[i]);
-      }
-      else {
-         ta_new.clear();
-         ta_new.add(ta_val[i]);
-         m.insert(pair<ConcatString,ThreshArray>(sa[i], ta_new));
-      }
-   } // end for i
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void parse_conf_string_map(MetConfig &conf,
-                           const char *conf_key_name, const char *conf_key_val,
-                           map<ConcatString,StringArray> &m) {
-   StringArray sa, sa_val, sa_new;
-   
-   sa     = conf.lookup_string_array(conf_key_name);
-   sa_val = conf.lookup_string_array(conf_key_val);
-
-   // Check that they are the same length
-   if(sa.n() != sa_val.n()) {
-      mlog << Error
-           << "\nTCStatConfInfo::parse_conf_string_map() -> "
-           << "the \"" << conf_key_name << "\" and \"" << conf_key_val << "\" "
-           << "entries must have the same length.\n\n";
-      exit(1);
-   }
-
-   // Add entries to the map
-   for(int i=0; i<sa.n(); i++) {
-      if(m.count(sa[i]) > 0) {
-         m[sa[i]].add(sa_val[i]);
-      }
-      else {
-         sa_new.clear();
-         sa_new.set_ignore_case(1);
-         sa_new.add(sa_val[i]);
-         m.insert(pair<ConcatString,StringArray>(sa[i], sa_new));
-      }
-   } // end for i
 
    return;
 }

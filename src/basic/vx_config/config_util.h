@@ -100,6 +100,16 @@ extern std::map<ConcatString,UserFunc_1Arg>
                           Dictionary *dict,
                           const char *conf_key_map_name,
                           const char *caller=nullptr);
+extern std::map<ConcatString,ThreshArray>
+                       parse_conf_thresh_map(
+                          Dictionary *dict,
+                          const char *conf_key_map_name,
+                          const char *conf_key_map_val);
+extern std::map<ConcatString,StringArray>
+                       parse_conf_string_map(
+                          Dictionary *dict,
+                          const char *conf_key_map_name,
+                          const char *conf_key_map_val);
 extern BootInfo        parse_conf_boot(Dictionary *dict);
 extern RegridInfo      parse_conf_regrid(
                           Dictionary *dict,

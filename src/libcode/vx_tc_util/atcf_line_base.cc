@@ -266,6 +266,12 @@ unixtime ATCFLineBase::warning_time() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+int ATCFLineBase::warning_hour() const {
+   return warning_time()%sec_per_day;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int ATCFLineBase::technique_number() const {
    return parse_int(get_item(TechniqueNumberOffset).c_str());
 }
