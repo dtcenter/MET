@@ -38,6 +38,7 @@ void SurfaceInfo::clear() {
    topo_ptr = (DataPlane *) nullptr;
    topo_use_obs_thresh.clear();
    topo_interp_fcst_thresh.clear();
+   topo_correct_field = FieldType::None;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -914,7 +915,7 @@ double compute_sfc_interp(const DataPlane &dp,
 
    MaskPlane sfc_mask = compute_sfc_mask(*gt, x, y, sfc_info, is_land_obs, obs_elv);
 
-   // Compute the interpolated value for the fields above and below
+   // Compute the interpolated value
    switch(mthd) {
 
       case InterpMthd::Min:         // Minimum

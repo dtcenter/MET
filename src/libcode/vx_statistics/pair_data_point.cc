@@ -552,8 +552,9 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
 
    // Check topo
    double hdr_elv = hdr_arr[2];
+   double topo_elv = bad_data_double;
    if(!is_keeper_topo(pnt_obs_str.c_str(), gr, obs_x, obs_y,
-                      hdr_typ_str, hdr_elv)) return;
+                      hdr_typ_str, hdr_elv, topo_elv)) return;
 
    // Check level
    double obs_lvl = obs_arr[2];
@@ -612,6 +613,14 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                                obs_x, obs_y, hdr_elv,
                                obs_v, obs_lvl, obs_hgt,
                                cpi, fcst_v)) continue;
+
+            // MET #3174 Apply orographic correction
+            if(sfc_info.topo_ptr &&
+               sfc_info.topo_correct_field != FieldType::None &&
+               msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
+               correct_topo(sfc_info.topo_correct_field,
+                            topo_elv, hdr_elv, fcst_v, obs_v);
+            } 
 
             // Check matched pair filtering options
             ConcatString reason_cs;

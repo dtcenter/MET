@@ -69,6 +69,7 @@ void PointStatConfInfo::clear() {
    topo_dp.clear();
    topo_use_obs_thresh.clear();
    topo_interp_fcst_thresh.clear();
+   topo_correct_field = FieldType::None;
    msg_typ_group_map.clear();
    obtype_as_group_val_flag = false;
    mask_area_map.clear();
@@ -533,6 +534,15 @@ void PointStatConfInfo::process_geog(const Grid &grid,
       topo_dp                 = parse_geog_data(dict, grid, fcst_file);
       topo_use_obs_thresh     = dict->lookup_thresh(conf_key_use_obs_thresh);
       topo_interp_fcst_thresh = dict->lookup_thresh(conf_key_interp_fcst_thresh);
+      topo_correct_field      = int_to_fieldtype(dict->lookup_int(conf_key_correct_field));
+
+      // Conf: topo_correct_field
+      if(topo_correct_field == FieldType::Both) {
+         mlog << Error << "\nPointStatConfInfo::process_geog() -> "
+              << "\"" << conf_key_correct_field << "\" cannot be set to \""
+              << fieldtype_to_string(FieldType::Both) << "\".\n\n";
+         exit(1);
+      }
 
       // Conf: message_type_group_map for SURFACE
       if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
@@ -558,6 +568,7 @@ void PointStatConfInfo::process_geog(const Grid &grid,
          sfc_info.topo_ptr = &topo_dp;
          sfc_info.topo_use_obs_thresh = topo_use_obs_thresh;
          sfc_info.topo_interp_fcst_thresh = topo_interp_fcst_thresh;
+         sfc_info.topo_correct_field = topo_correct_field;
       }
       else {
          sfc_info.topo_ptr = nullptr;

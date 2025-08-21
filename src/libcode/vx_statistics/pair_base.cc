@@ -1790,28 +1790,28 @@ bool VxPairBase::is_keeper_grd(
 bool VxPairBase::is_keeper_topo(
         const char *pnt_obs_str, const Grid &gr,
         double obs_x, double obs_y,
-        const char *hdr_typ_str, double hdr_elv) {
+        const char *hdr_typ_str, double hdr_elv, double &topo_elv) {
    bool keep = true;
 
    // Check for a large topography difference
    if(sfc_info.topo_ptr && msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
 
       // Interpolate model topography to observation location
-      double topo = compute_horz_interp(
-                       *sfc_info.topo_ptr, obs_x, obs_y, hdr_elv,
-                       InterpMthd::Bilin, 2,
-                       GridTemplateFactory::GridTemplates::Square,
-                       gr.wrap_lon(), 1.0);
+      topo_elv = compute_horz_interp(
+                    *sfc_info.topo_ptr, obs_x, obs_y, hdr_elv,
+                    InterpMthd::Bilin, 2,
+                    GridTemplateFactory::GridTemplates::Square,
+                    gr.wrap_lon(), 1.0);
 
       // Skip bad topography values
-      if(is_bad_data(hdr_elv) || is_bad_data(topo)) {
+      if(is_bad_data(hdr_elv) || is_bad_data(topo_elv)) {
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
                  << "For " << fcst_info->magic_str() << " versus "
                  << obs_info->magic_str() << ", skipping observation "
                  << "due to bad topography values where observation elevation = "
-                 << hdr_elv << " and model topography = " << topo << ":\n"
+                 << hdr_elv << " and model topography = " << topo_elv << ":\n"
                  << pnt_obs_str << "\n";
          }
 
@@ -1820,15 +1820,15 @@ bool VxPairBase::is_keeper_topo(
       }
 
       // Check the topography difference threshold
-      else if(!sfc_info.topo_use_obs_thresh.check(topo - hdr_elv)) {
+      else if(!sfc_info.topo_use_obs_thresh.check(topo_elv - hdr_elv)) {
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
                  << "For " << fcst_info->magic_str() << " versus "
                  << obs_info->magic_str() << ", skipping observation "
                  << "due to topography difference where observation elevation ("
-                 << hdr_elv << ") minus model topography (" << topo << ") = "
-                 << topo - hdr_elv << " is not "
+                 << hdr_elv << ") minus model topography (" << topo_elv << ") = "
+                 << topo_elv - hdr_elv << " is not "
                  << sfc_info.topo_use_obs_thresh.get_str() << ":\n"
                  << pnt_obs_str << "\n";
          }
@@ -2078,8 +2078,8 @@ bool VxPairBase::is_keeper_fcst(
         const char *pnt_obs_str,
         int i_msg_typ, int i_mask, int i_interp,
         const char *hdr_typ_str, const Grid &gr,
-        double obs_x, double obs_y, double hdr_elv,
-        double obs_v, double obs_lvl, double obs_hgt,
+        double obs_x, double obs_y, double obs_v,
+        double hdr_elv, double obs_lvl, double obs_hgt,
         const ClimoPntInfo &cpi, double &fcst_v) {
    bool keep = true;
 
@@ -2147,6 +2147,22 @@ bool VxPairBase::is_keeper_fcst(
    }
 
    return keep;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairBase::correct_topo(const FieldType &field,
+                              double fcst_elv, double obs_elv,
+                              double &fcst_v, double &obs_v) {
+   //
+   // JHG work here to:
+   // - apply the correction with useful log messages
+   // - figure out which correction to apply based on data type
+   // - also call this from pair_data_ensemble.cc
+   // - add unit tests
+   // 
+
+   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

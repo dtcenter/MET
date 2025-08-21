@@ -1219,8 +1219,9 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
 
    // Check topo
    double hdr_elv = hdr_arr[2];
+   double topo_elv = bad_data_double;
    if(!is_keeper_topo(pnt_obs_str.c_str(), gr, obs_x, obs_y,
-                      hdr_typ_str, hdr_elv)) return;
+                      hdr_typ_str, hdr_elv, topo_elv)) return;
 
    // Check level
    double obs_lvl = obs_arr[2];

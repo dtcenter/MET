@@ -418,7 +418,7 @@ class VxPairBase {
                          double &, double &);
       bool is_keeper_topo(const char *, const Grid &,
                           double, double,
-                          const char *, double);
+                          const char *, double, double &);
       bool is_keeper_lvl(const char *, const char *, double, double);
       bool is_keeper_typ(const char *, int, const char *);
       bool is_keeper_mask(const char *, int, int, int, int,
@@ -432,6 +432,9 @@ class VxPairBase {
                           double, double, double,
                           double, double, double,
                           const ClimoPntInfo &, double &);
+
+      void correct_topo(const FieldType &, double, double,
+                        double &, double &);
 
       // Retrieve climo data for this point 
       ClimoPntInfo get_climo_pnt_info(int, const Grid &gr, double, double,

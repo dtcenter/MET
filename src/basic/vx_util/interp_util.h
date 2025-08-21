@@ -27,6 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "data_plane.h"
+#include "field_type.h"
 #include "interp_mthd.h"
 #include "GridTemplate.h"
 #include "config_gaussian.h"
@@ -47,6 +48,7 @@ struct SurfaceInfo {
    DataPlane   * topo_ptr;     // Pointer to model topography (not allocated)
    SingleThresh  topo_use_obs_thresh;
    SingleThresh  topo_interp_fcst_thresh;
+   FieldType     topo_correct_field;
 
    SurfaceInfo();
 

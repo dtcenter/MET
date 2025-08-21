@@ -17,6 +17,7 @@
 #include "gsl_randist.h"
 #include "config_gaussian.h"
 #include "config_funcs.h"
+#include "field_type.h"
 #include "interp_mthd.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -29,19 +30,6 @@ enum class STATOutputType {
    None, // Do not output this line type
    Stat, // Write output to the .stat file
    Both  // Write output to .stat and .txt files
-};
-
-////////////////////////////////////////////////////////////////////////
-
-//
-// Enumeration for field type configuration parameters
-//
-
-enum class FieldType {
-   None, // Default
-   Fcst, // Apply to forecast field
-   Obs,  // Apply to observation field
-   Both  // Apply to both forecast and observation field
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -772,6 +760,7 @@ static const char conf_key_topo_mask[]          = "topo_mask";
 static const char conf_key_topo_mask_flag[]     = "topo_mask.flag";
 static const char conf_key_use_obs_thresh[]     = "use_obs_thresh";
 static const char conf_key_interp_fcst_thresh[] = "interp_fcst_thresh";
+static const char conf_key_correct_field[]      = "correct_field";
 static const char conf_key_point_weight_flag[]  = "point_weight_flag";
 
 //
