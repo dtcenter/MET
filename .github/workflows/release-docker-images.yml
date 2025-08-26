@@ -55,6 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: define-matrix
     strategy:
+      fail-fast: false
       matrix: ${{ fromJSON(needs.define-matrix.outputs.matrix) }}
 
     steps:
