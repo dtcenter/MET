@@ -9,6 +9,14 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.1.1 Release Notes (20250827)
+-------------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * Python embedding does not work for MET version 12.1.0 with Python version 3.10
+       (`#3219 <https://github.com/dtcenter/MET/issues/3219>`_).
+
 MET Version 12.1.0 Release Notes (20250730)
 -------------------------------------------
 
