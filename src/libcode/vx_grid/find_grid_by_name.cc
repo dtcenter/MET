@@ -120,6 +120,22 @@ for (j=0; j<n_ncep_latlon_grids; ++j)  {
 }
 
    //
+   //  try misc latlon grids
+   //
+
+for (j=0; j<n_misc_latlon_grids; ++j)  {
+
+   if ( strcmp(name, misc_latlon_grids[j].name) == 0 )  {
+
+      i.set( misc_latlon_grids[j] );
+
+      return true;
+
+   }
+
+}
+
+   //
    //  try ncep stereographic grids
    //
 

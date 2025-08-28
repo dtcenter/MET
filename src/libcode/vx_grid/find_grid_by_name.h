@@ -146,6 +146,23 @@ static const int n_ncep_latlon_grids = sizeof(ncep_latlon_grids)/sizeof(*ncep_la
 
 
    //
+   //  misc Lat/Lon grids
+   //
+
+static const LatLonData misc_latlon_grids [] = {
+
+   { "CBS2p5", -90.0, -0.0, 2.5, 2.5,  73, 144 },
+   { "CBS1p5", -90.0, -0.0, 1.5, 1.5, 121, 240 },
+
+};
+
+static const int n_misc_latlon_grids = sizeof(misc_latlon_grids)/sizeof(*misc_latlon_grids);
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
    //  NCEP Stereographic grids
    //
 
