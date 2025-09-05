@@ -65,7 +65,7 @@ jobs:
           SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}
           WD_REFERENCE_BRANCH: ${{ github.event.inputs.reference_branch }}
           SONAR_SCANNER_VERSION: 5.0.1.3006
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: SonarQube Quality Gate check
@@ -75,7 +75,7 @@ jobs:
           scanMetadataReportFile: /tmp/scannerwork/report-task.txt
         timeout-minutes: 5
         env:
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+          SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Copy log files into logs directory
