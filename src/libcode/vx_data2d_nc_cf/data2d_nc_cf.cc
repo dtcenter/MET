@@ -281,6 +281,10 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
   if (nullptr != data_var) {
     int time_dim_slot = data_var->t_slot;
     int zdim_slot = data_var->z_slot;
+
+    // set vlevels if needed
+    _file->set_vlevels(data_var);
+
     for (int idx=0; idx<dimension.n_elements(); idx++) {
       long dim_offset = dimension[idx];
       if (dim_offset == vx_data2d_star) continue;
@@ -291,8 +295,10 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
         dimension[idx] = long(find_z_offset(vinfo, data_var));
       }
       else {
-         mlog << Warning << "\n" << method_name << "the unknown dimensionwith the value "
-              << vinfo_nc->dim_value(idx) << " for \"" << vinfo.req_name() << "\" variable.\n\n";
+         mlog << Debug(7) << method_name << "parsing generic dimension " << idx
+              << " for \"" << vinfo.req_name() << "\" variable.\n\n";
+
+         dimension[idx] = long(find_generic_offset(vinfo, data_var, idx));
       }
     }
   }
@@ -398,11 +404,15 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    // Initialize
    plane_array.clear();
 
+
    auto vinfo_nc = (VarInfoNcCF *)&vinfo;
    const NcVarInfo *data_var = get_data_var(vinfo);
    int t_dim_slot = data_var->t_slot;
    int z_dim_slot = data_var->z_slot;
    LongArray dimension = vinfo_nc->dimension();
+
+   // set vlevels if needed
+   _file->set_vlevels(data_var);
 
    LevelInfo level = vinfo.level();
    cur_time_index = cur_z_index = 0;
@@ -799,37 +809,45 @@ long MetNcCFDataFile::convert_time_to_offset(double time_value) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-long MetNcCFDataFile::convert_z_to_offset(double z_value, const string &z_dim_name) {
+long MetNcCFDataFile::convert_generic_to_offset(double value, const string &dim_name, vector<double> values) {
    bool found = false;
-   long z_offset = bad_data_int;
-   int dim_size = _file->vlevels.n();
+   long offset = bad_data_int;
    static const string method_name
-         = "MetNcCFDataFile::convert_z_to_offset() -> ";
+         = "MetNcCFDataFile::convert_generic_to_offset() -> ";
+
+   // get the length of the dimension variable
+   int dim_size = static_cast<int>(values.size());
 
    for (int idx=0; idx<dim_size; idx++) {
-      if (is_eq(_file->vlevels[idx], z_value)) {
+      if (is_eq(values[idx], value)) {
          found = true;
-         z_offset = idx;
+         offset = idx;
          break;
       }
    }
 
    // Log the dimension value to index conversion
-   if(z_offset != (long) bad_data_int) {
+   if(offset != (long) bad_data_int) {
       mlog << Debug(7) << method_name << "Found \""
-           << z_dim_name << "\" dimension value of \"" << z_value
-           << "\" at dimension index " << z_offset << ".\n";
+           << dim_name << "\" dimension value of \"" << value
+           << "\" at dimension index " << offset << ".\n";
    }
 
-   if (!found && 0 < z_dim_name.length()) {
-      NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var, z_dim_name, _file->Nvars);
+   if (!found && 0 < dim_name.length()) {
+      NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var, dim_name, _file->Nvars);
       if (var_info) {
-         long new_offset = get_index_at_nc_data(var_info->var, z_value, z_dim_name);
-         if (new_offset != bad_data_int) z_offset = new_offset;
+         long new_offset = get_index_at_nc_data(var_info->var, value, dim_name);
+         if (new_offset != bad_data_int) offset = new_offset;
       }
    }
 
-   return z_offset;
+   return offset;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+long MetNcCFDataFile::convert_z_to_offset(double z_value, const string &z_dim_name) {
+   return convert_generic_to_offset(z_value, z_dim_name, _file->vlevels.vals());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1033,6 +1051,50 @@ long MetNcCFDataFile::find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var) {
    return z_offset;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+long MetNcCFDataFile::find_generic_offset(VarInfo &vinfo, const NcVarInfo *data_var, int index) {
+   static const string method_name
+                           = "MetNcCFDataFile::find_generic_offset() -> ";
+
+   auto vinfo_nc = (VarInfoNcCF *)&vinfo;
+   long offset = vinfo_nc->dimension(index);
+   string dim_name = get_dim_name(data_var, index);
+   NcVarInfo* dim_var_info = _file->find_var_by_dim_name(dim_name.c_str());
+
+   int dim_size = get_data_size(dim_var_info->var);
+   vector<double> values(dim_size);
+
+   if( !get_nc_data(dim_var_info->var, values.data()) ) {
+      mlog << Error << "\n" << method_name << "failed to get data from " << dim_name << "\n\n";
+      exit(1);
+   }
+
+   if (offset == range_flag) {
+      mlog << Warning << "\n" << method_name << "range is not supported for "
+           << offset << " dimension for generic \"" << vinfo.req_name() << "\" variable\n\n";
+   }
+   else if (!vinfo_nc->is_offset(index)) {
+      double value = vinfo_nc->dim_value(index);
+      offset = convert_generic_to_offset(value, dim_name, values);
+      if (offset < 0) {
+         mlog << Error << "\n" << method_name << "the requested value "
+              << value << " for \""
+              << vinfo.req_name() << "\" variable does not exist\n\n";
+         exit(1);
+      }
+   }
+
+   if (offset < 0 || offset >= dim_size) {
+      mlog << Error << "\n" << method_name << "the requested offset "
+           << offset << " for \"" << vinfo.req_name() << "\" variable "
+           << "is out of range (between 0 and " << (dim_size-1) << ").\n\n";
+      exit(1);
+   }
+
+   return offset;
+}
+
 /////////////////////////////////////////////////////////////////////////
 
 NcVarInfo *MetNcCFDataFile::get_data_var(VarInfo &vinfo) {
@@ -1051,13 +1113,19 @@ NcVarInfo *MetNcCFDataFile::get_data_var(VarInfo &vinfo) {
 
 /////////////////////////////////////////////////////////////////////////
 
-string MetNcCFDataFile::get_z_dim_name(const NcVarInfo *data_var) const {
-   string z_dim_name;
-   if (0 <= data_var->z_slot) {
-      NcDim z_dim = get_nc_dim(data_var->var, data_var->z_slot);
-      if (IS_VALID_NC(z_dim)) z_dim_name = GET_NC_NAME(z_dim);
+string MetNcCFDataFile::get_dim_name(const NcVarInfo *data_var, int index) const {
+   string dim_name;
+   if (index >= 0) {
+      NcDim dim = get_nc_dim(data_var->var, index);
+      if (IS_VALID_NC(dim)) dim_name = GET_NC_NAME(dim);
    }
-   return z_dim_name;
+   return dim_name;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+string MetNcCFDataFile::get_z_dim_name(const NcVarInfo *data_var) const {
+   return get_dim_name(data_var, data_var->z_slot);
 }
 
 /////////////////////////////////////////////////////////////////////////

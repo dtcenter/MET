@@ -117,6 +117,8 @@ class NcCfFile {
       NcVarInfo* find_var_name(const char * var_name) const;
       NcVarInfo* find_var_by_dim_name(const char *dim_name) const;
 
+      void set_vlevels(const NcVarInfo* var);
+
    private:
 
       static const double DELTA_TOLERANCE;
@@ -194,6 +196,8 @@ class NcCfFile {
       LatLonData get_data_from_lat_lon_vars(netCDF::NcVar *lat_var, netCDF::NcVar *lon_var,
                                             const long lat_counts, const long lon_counts,
                                             bool &swap_to_north);
+
+      bool is_z_dim(const ConcatString& dim_name) const;
 };
 
 

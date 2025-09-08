@@ -213,7 +213,6 @@ bool NcCfFile::open(const char * filepath)
   // Pull out the variables
 
   int max_dim_count = 0;
-  auto z_var = (NcVar *)nullptr;
   auto valid_time_var = (NcVar *)nullptr;
   ConcatString att_value;
 
@@ -243,9 +242,6 @@ bool NcCfFile::open(const char * filepath)
         valid_time_var = Var[j].var;
         _time_var_info = &Var[j];
       }
-      else if ( "Z" == att_value ||  "z" == att_value ) {
-        z_var = Var[j].var;
-      }
     }
 
     if (get_var_standard_name(Var[j].var, att_value)) {
@@ -255,8 +251,6 @@ bool NcCfFile::open(const char * filepath)
       }
       else if( "latitude" == att_value ) _latVar = Var[j].var;
       else if( "longitude" == att_value ) _lonVar = Var[j].var;
-      else if( ("air_pressure" == att_value || "height" == att_value)
-               && (nullptr==z_var && 1==Var[j].Ndims)) z_var = Var[j].var;
     }
     if ( Var[j].name == "time" && (valid_time_var == nullptr)) {
       valid_time_var = Var[j].var;
@@ -435,8 +429,9 @@ bool NcCfFile::open(const char * filepath)
       else if ((dim && (dim == _tDim)) || dim_name == t_dim_name || t_dims.has(dim_name)) {
          Var[j].t_slot = k;
       }
-      else if (z_dims.has(dim_name)) {
+      else if (z_dims.has(dim_name) || is_z_dim(dim_name)) {
          Var[j].z_slot = k;
+         z_dims.add(dim_name);
       }
       else if (dim_count == max_dim_count) {
          const NcVarInfo *info = find_var_by_dim_name(dim_name.c_str());
@@ -451,47 +446,45 @@ bool NcCfFile::open(const char * filepath)
             else if (is_nc_unit_longitude(info->units_att.c_str())) {
                Var[j].x_slot = k;
             }
-            else {
-               Var[j].z_slot = k;
-               z_dims.add(dim_name);
-               if (z_dim_name.empty()) z_dim_name = dim_name;
-            }
          }
       }
     }
   }   //  for j
 
-  // Find the vertical level variable from dimension name if not found
-  if (IS_INVALID_NC_P(z_var) && !z_dim_name.empty()) {
-    NcVarInfo *info = find_var_by_dim_name(z_dim_name.c_str());
-    if (info) z_var = info->var;
-  }
-
   mlog << Debug(5) << method_name << "coordinate variables:"
        << " x=" << (IS_VALID_NC_P(_xCoordVar) ? GET_NC_NAME_P(_xCoordVar) : "N/A")
        << ", y=" << (IS_VALID_NC_P(_yCoordVar) ? GET_NC_NAME_P(_yCoordVar) : "N/A")
-       << ", z=" << (IS_VALID_NC_P(z_var) ? GET_NC_NAME_P(z_var) : "N/A")
        << ", t=" << (IS_VALID_NC_P(valid_time_var) ? GET_NC_NAME_P(valid_time_var) : "N/A")
        << "\n";
-
-  // Pull out the vertical levels
-  if (IS_VALID_NC_P(z_var)) {
-
-    int z_count = get_data_size(z_var);
-    vector<double> z_values(z_count);
-
-    if( get_nc_data(z_var, z_values.data()) ) {
-      for(int i=0; i<z_count; i++) {
-        vlevels.add(z_values[i]);
-      }
-    }
-  }
 
   //  done
 
   return true;
 }
 
+bool NcCfFile::is_z_dim(const ConcatString& dim_name) const
+{
+  NcVarInfo *info = find_var_by_dim_name(dim_name.c_str());
+  if(!info) {
+    return false;
+  }
+
+  ConcatString att_value;
+
+  // if the dimension variable has an axis attribute of Z, return true
+  if (get_var_axis(info->var, att_value)
+      && ( "Z" == att_value ||  "z" == att_value )) {
+    return true;
+  }
+
+  // if the standard name is air_pressure or height, return true
+  if (get_var_standard_name(info->var, att_value)
+      && ("air_pressure" == att_value || "height" == att_value)) {
+    return true;
+  }
+
+  return false;
+}
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1079,6 +1072,45 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
        << get_exe_duration(start_clock) << " seconds\n";
 
   return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void NcCfFile::set_vlevels(const NcVarInfo* var)
+{
+  // get vertical levels for this variable if needed
+
+  // if z_slot is not set, then no vertical levels are needed
+  if(var->z_slot < 0) {
+    return;
+  }
+
+  // if vlevels has already been populated, then no need to do it again
+  if(vlevels.n_elements() > 0) {
+    return;
+  }
+
+  // get the dimension name at z_slot and find the variable
+  auto z_var = (NcVar *)nullptr;
+  const string z_dim_name = var->var->getDim(var->z_slot).getName();
+  NcVarInfo* info = find_var_by_dim_name(z_dim_name.c_str());
+  if(info) {
+    z_var = info->var;
+  }
+
+  // Pull out the vertical levels
+  if (IS_VALID_NC_P(z_var)) {
+
+    int z_count = get_data_size(z_var);
+    vector<double> z_values(z_count);
+
+    if( get_nc_data(z_var, z_values.data()) ) {
+      for(int i=0; i<z_count; i++) {
+        vlevels.add(z_values[i]);
+      }
+    }
+  }
+
 }
 
 
