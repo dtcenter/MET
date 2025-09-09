@@ -404,7 +404,6 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    // Initialize
    plane_array.clear();
 
-
    auto vinfo_nc = (VarInfoNcCF *)&vinfo;
    const NcVarInfo *data_var = get_data_var(vinfo);
    int t_dim_slot = data_var->t_slot;
@@ -810,10 +809,9 @@ long MetNcCFDataFile::convert_time_to_offset(double time_value) const {
 ////////////////////////////////////////////////////////////////////////
 
 long MetNcCFDataFile::convert_generic_to_offset(double value, const string &dim_name, vector<double> values) {
-   bool found = false;
-   long offset = bad_data_int;
-   static const string method_name
-         = "MetNcCFDataFile::convert_generic_to_offset() -> ";
+  static const string method_name = "MetNcCFDataFile::convert_generic_to_offset() -> ";
+  bool found = false;
+  long offset = bad_data_int;
 
    // get the length of the dimension variable
    int dim_size = static_cast<int>(values.size());
@@ -1054,8 +1052,7 @@ long MetNcCFDataFile::find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var) {
 ////////////////////////////////////////////////////////////////////////
 
 long MetNcCFDataFile::find_generic_offset(VarInfo &vinfo, const NcVarInfo *data_var, int index) {
-   static const string method_name
-                           = "MetNcCFDataFile::find_generic_offset() -> ";
+   static const string method_name = "MetNcCFDataFile::find_generic_offset() -> ";
 
    auto vinfo_nc = (VarInfoNcCF *)&vinfo;
    long offset = vinfo_nc->dimension(index);
