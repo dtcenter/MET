@@ -115,7 +115,7 @@ jobs:
     needs: [job_control]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     steps:
-      - uses: dtcenter/metplus-action-data-update@v3
+      - uses: dtcenter/metplus-action-data-update@v4
         with:
           docker_name: 'dtcenter'
           docker_pass: ${{ secrets.DOCKER_TOKEN }}
