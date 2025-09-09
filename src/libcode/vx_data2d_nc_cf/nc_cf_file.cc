@@ -464,6 +464,10 @@ bool NcCfFile::open(const char * filepath)
 
 bool NcCfFile::is_z_dim(const ConcatString& dim_name) const
 {
+  // Check to see if the dimension is a vertical dimension. Using CF conventions and legacy behavior.
+  // See: https://cfconventions.org/cf-conventions/cf-conventions.html#vertical-coordinate
+
+  // get dimension variable
   NcVarInfo *info = find_var_by_dim_name(dim_name.c_str());
   if(!info) {
     return false;
@@ -471,18 +475,42 @@ bool NcCfFile::is_z_dim(const ConcatString& dim_name) const
 
   ConcatString att_value;
 
-  // if the dimension variable has an axis attribute of Z, return true
-  if (get_var_axis(info->var, att_value)
-      && ( "Z" == att_value ||  "z" == att_value )) {
+  // check units attribute
+  if (get_var_units(info->var, att_value)) {
+
+    // units must be set to be considered a vertical dimension
+    if ( att_value.empty() ) {
+      return false;
+    }
+
+    // check if units are one of the acceptable vertical units
+    if ( att_value == "bar" || att_value == "bars" ||
+        att_value == "millibar" || att_value == "millibars" ||
+        att_value == "decibar" || att_value == "decibars" ||
+        att_value == "atmosphere" || att_value == "atmospheres" ||
+        att_value == "atm" || att_value == "atms" ||
+        att_value == "pascal" || att_value == "pascals" ||
+        att_value == "Pa" || att_value == "hPa" ||
+        att_value == "meter" || att_value == "meters" ||
+        att_value == "metre" || att_value == "metres" ||
+        att_value == "m" || att_value == "km" ||
+        att_value == "kilometer" || att_value == "kilometers" ) {
+      return true;
+    }
+  }
+
+  // if the axis attribute is Z (case-insensitive), return true
+  if (get_var_axis(info->var, att_value) && to_lower(att_value) == "z" ) {
     return true;
   }
 
-  // if the standard name is air_pressure or height, return true
+  // if the standard_name is air_pressure or height (legacy support), return true
   if (get_var_standard_name(info->var, att_value)
       && ("air_pressure" == att_value || "height" == att_value)) {
     return true;
   }
 
+  // otherwise, we can't determine if this is a vertical dimension
   return false;
 }
 
