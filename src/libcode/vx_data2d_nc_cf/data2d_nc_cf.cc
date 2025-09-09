@@ -809,18 +809,23 @@ long MetNcCFDataFile::convert_time_to_offset(double time_value) const {
 ////////////////////////////////////////////////////////////////////////
 
 long MetNcCFDataFile::convert_generic_to_offset(double value, const string &dim_name, vector<double> values) {
-  static const string method_name = "MetNcCFDataFile::convert_generic_to_offset() -> ";
-  bool found = false;
-  long offset = bad_data_int;
+   static const string method_name = "MetNcCFDataFile::convert_generic_to_offset() -> ";
+   long offset = bad_data_int;
 
-   // get the length of the dimension variable
+   // search for the value in the array of values
    int dim_size = static_cast<int>(values.size());
-
    for (int idx=0; idx<dim_size; idx++) {
       if (is_eq(values[idx], value)) {
-         found = true;
          offset = idx;
          break;
+      }
+   }
+
+   if (offset == (long) bad_data_int && !dim_name.empty()) {
+      NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var, dim_name, _file->Nvars);
+      if (var_info) {
+         long new_offset = get_index_at_nc_data(var_info->var, value, dim_name);
+         if (new_offset != bad_data_int) offset = new_offset;
       }
    }
 
@@ -831,15 +836,7 @@ long MetNcCFDataFile::convert_generic_to_offset(double value, const string &dim_
            << "\" at dimension index " << offset << ".\n";
    }
 
-   if (!found && 0 < dim_name.length()) {
-      NcVarInfo *var_info = find_var_info_by_dim_name(_file->Var, dim_name, _file->Nvars);
-      if (var_info) {
-         long new_offset = get_index_at_nc_data(var_info->var, value, dim_name);
-         if (new_offset != bad_data_int) offset = new_offset;
-      }
-   }
-
-   return offset;
+  return offset;
 }
 
 ////////////////////////////////////////////////////////////////////////
