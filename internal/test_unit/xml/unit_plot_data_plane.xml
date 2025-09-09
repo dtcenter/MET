@@ -738,4 +738,32 @@
       <ps>&OUTPUT_DIR;/plot_data_plane/nccf_t2m_5_dimension_var.ps</ps>
     </output>
   </test>
+
+  <test name="plot_data_plane_credit_on_level">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/credit/pred_2025-08-07T12Z_012.nc \
+      &OUTPUT_DIR;/plot_data_plane/credit_Q.ps \
+      'name="Q"; level="(0,@70,*,*)";' \
+      -title "specific humidity - on level dimension" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/credit_Q.ps</ps>
+    </output>
+  </test>
+
+  <test name="plot_data_plane_credit_on_pressure">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/credit/pred_2025-08-07T12Z_012.nc \
+      &OUTPUT_DIR;/plot_data_plane/credit_Q_PRES.ps \
+      'name="Q_PRES"; level="(0,@850,*,*)";' \
+      -title "specific humidity - on pressure dimension" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/credit_Q_PRES.ps</ps>
+    </output>
+  </test>
 </met_test>
