@@ -163,6 +163,7 @@ int MetNcCFDataFile::add_data_planes_by_time(VarInfo &vinfo, const LevelInfo &le
    int n_rec = 0;
    const auto *vinfo_nc = (VarInfoNcCF *)&vinfo;
    const NcVarInfo *data_var = get_data_var(vinfo);
+   if (nullptr == data_var) return 0;
    LongArray dimension = vinfo_nc->dimension();
    static const string method_name
          = "MetNcCFDataFile::add_data_planes_by_time() -> ";
@@ -213,6 +214,7 @@ int MetNcCFDataFile::add_data_planes_by_z(VarInfo &vinfo, const LevelInfo &level
    int n_rec = 0;
    const auto *vinfo_nc = (VarInfoNcCF *)&vinfo;
    const NcVarInfo *data_var = get_data_var(vinfo);
+   if (nullptr == data_var) return 0;
    LongArray dimension = vinfo_nc->dimension();
    static const string method_name
          = "MetNcCFDataFile::add_data_planes_by_z() -> ";
@@ -406,6 +408,7 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
 
    auto vinfo_nc = (VarInfoNcCF *)&vinfo;
    NcVarInfo *data_var = get_data_var(vinfo);
+   if (nullptr == data_var) return 0;
    int t_dim_slot = data_var->t_slot;
    int z_dim_slot = data_var->z_slot;
    LongArray dimension = vinfo_nc->dimension();
@@ -1099,7 +1102,9 @@ NcVarInfo *MetNcCFDataFile::get_data_var(VarInfo &vinfo) {
    if(vinfo.req_name() == na_str) {
       // Store the name of the first data variable
       data_var = find_first_data_var();
-      vinfo.set_req_name(data_var->name.c_str());
+      if (nullptr != data_var) {
+         vinfo.set_req_name(data_var->name.c_str());
+      }
    }
    else data_var = _file->find_var_name(vinfo.req_name().c_str());
 
