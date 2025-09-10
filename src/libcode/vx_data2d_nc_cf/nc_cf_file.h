@@ -36,6 +36,24 @@
 static const char nccf_lat_var_name [] = "lat";
 static const char nccf_lon_var_name [] = "lon";
 
+// acceptable units of vertical dimension variables
+// (lower-case and excluding plural versions)
+static const std::vector<std::string> acceptable_vertical_units = {
+    "bar",
+    "millibar",
+    "decibar",
+    "atmosphere",
+    "atm",
+    "pascal",
+    "pa",
+    "hpa",
+    "meter",
+    "metre",
+    "m",
+    "km",
+    "kilometer"
+};
+
 
 ////////////////////////////////////////////////////////////////////////
 

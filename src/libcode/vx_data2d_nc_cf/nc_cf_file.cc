@@ -473,28 +473,11 @@ bool NcCfFile::is_z_dim(const ConcatString& dim_name) const
       return false;
     }
 
-    // Define acceptable vertical unit names (singular forms)
-    static const vector<string> vertical_units = {
-        "bar",
-        "millibar",
-        "decibar",
-        "atmosphere",
-        "atm",
-        "pascal",
-        "pa",
-        "hpa",
-        "meter",
-        "metre",
-        "m",
-        "km",
-        "kilometer"
-    };
-
     // Convert to lowercase for case-insensitive comparison
     string unit_lower = to_lower(att_value.c_str());
 
     // Check if units match any of the acceptable vertical units (including plurals)
-    for (const string& unit : vertical_units) {
+    for (const string& unit : acceptable_vertical_units) {
       if (unit_lower == unit || unit_lower == unit + "s") {
         return true;
       }
