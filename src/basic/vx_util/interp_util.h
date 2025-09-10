@@ -48,7 +48,8 @@ struct SurfaceInfo {
    DataPlane   * topo_ptr;     // Pointer to model topography (not allocated)
    SingleThresh  topo_use_obs_thresh;
    SingleThresh  topo_interp_fcst_thresh;
-   FieldType     topo_correct_field;
+   FieldType     topo_apply_correction;
+   double        topo_lapse_rate;
 
    SurfaceInfo();
 

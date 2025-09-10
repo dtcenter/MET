@@ -760,7 +760,8 @@ static const char conf_key_topo_mask[]          = "topo_mask";
 static const char conf_key_topo_mask_flag[]     = "topo_mask.flag";
 static const char conf_key_use_obs_thresh[]     = "use_obs_thresh";
 static const char conf_key_interp_fcst_thresh[] = "interp_fcst_thresh";
-static const char conf_key_correct_field[]      = "correct_field";
+static const char conf_key_apply_correction[]   = "apply_correction";
+static const char conf_key_lapse_rate[]         = "lapse_rate";
 static const char conf_key_point_weight_flag[]  = "point_weight_flag";
 
 //

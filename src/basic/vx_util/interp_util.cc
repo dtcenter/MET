@@ -38,7 +38,8 @@ void SurfaceInfo::clear() {
    topo_ptr = (DataPlane *) nullptr;
    topo_use_obs_thresh.clear();
    topo_interp_fcst_thresh.clear();
-   topo_correct_field = FieldType::None;
+   topo_apply_correction = FieldType::None;
+   topo_lapse_rate = bad_data_double;
 }
 
 ////////////////////////////////////////////////////////////////////////

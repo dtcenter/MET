@@ -69,7 +69,8 @@ void PointStatConfInfo::clear() {
    topo_dp.clear();
    topo_use_obs_thresh.clear();
    topo_interp_fcst_thresh.clear();
-   topo_correct_field = FieldType::None;
+   topo_apply_correction = FieldType::None;
+   topo_lapse_rate = bad_data_double;
    msg_typ_group_map.clear();
    obtype_as_group_val_flag = false;
    mask_area_map.clear();
@@ -534,12 +535,13 @@ void PointStatConfInfo::process_geog(const Grid &grid,
       topo_dp                 = parse_geog_data(dict, grid, fcst_file);
       topo_use_obs_thresh     = dict->lookup_thresh(conf_key_use_obs_thresh);
       topo_interp_fcst_thresh = dict->lookup_thresh(conf_key_interp_fcst_thresh);
-      topo_correct_field      = int_to_fieldtype(dict->lookup_int(conf_key_correct_field));
+      topo_apply_correction   = int_to_fieldtype(dict->lookup_int(conf_key_apply_correction));
+      topo_lapse_rate         = dict->lookup_double(conf_key_lapse_rate);
 
-      // Conf: topo_correct_field
-      if(topo_correct_field == FieldType::Both) {
+      // Conf: topo_apply_correction
+      if(topo_apply_correction == FieldType::Both) {
          mlog << Error << "\nPointStatConfInfo::process_geog() -> "
-              << "\"" << conf_key_correct_field << "\" cannot be set to \""
+              << "\"" << conf_key_apply_correction << "\" cannot be set to \""
               << fieldtype_to_string(FieldType::Both) << "\".\n\n";
          exit(1);
       }
@@ -568,7 +570,8 @@ void PointStatConfInfo::process_geog(const Grid &grid,
          sfc_info.topo_ptr = &topo_dp;
          sfc_info.topo_use_obs_thresh = topo_use_obs_thresh;
          sfc_info.topo_interp_fcst_thresh = topo_interp_fcst_thresh;
-         sfc_info.topo_correct_field = topo_correct_field;
+         sfc_info.topo_apply_correction = topo_apply_correction;
+         sfc_info.topo_lapse_rate = topo_lapse_rate;
       }
       else {
          sfc_info.topo_ptr = nullptr;

@@ -233,7 +233,8 @@ class PointStatConfInfo {
       DataPlane    topo_dp;
       SingleThresh topo_use_obs_thresh;
       SingleThresh topo_interp_fcst_thresh;
-      FieldType    topo_correct_field;
+      FieldType    topo_apply_correction;
+      double       topo_lapse_rate;
 
       // Message type groups that should be processed together
       std::map<ConcatString,StringArray> msg_typ_group_map;
