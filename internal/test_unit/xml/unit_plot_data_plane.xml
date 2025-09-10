@@ -766,4 +766,18 @@
       <ps>&OUTPUT_DIR;/plot_data_plane/credit_Q_PRES.ps</ps>
     </output>
   </test>
+
+  <test name="plot_data_plane_credit_on_height_agl">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/credit/pred_2025-08-07T12Z_012.nc \
+      &OUTPUT_DIR;/plot_data_plane/credit_Q_HEIGHT.ps \
+      'name="Q_HEIGHT"; level="(0,@4000,*,*)";' \
+      -title "specific humidity - on height_agl dimension" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/credit_Q_HEIGHT.ps</ps>
+    </output>
+  </test>
 </met_test>
