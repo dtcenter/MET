@@ -1340,6 +1340,10 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
    // Set flag for specific humidity
    bool spfh_flag = fcst_info->is_specific_humidity() &&
                     obs_info->is_specific_humidity();
+   bool temp_flag = true;   
+// TODO: Add support for this
+// bool temp_flag  = fcst_info->is_temperature() &&
+//                   obs_info->is_temperature();
 
    // Loop through all the PairDataEnsemble objects and interpolate
    for(auto it = pd.begin(); it != pd.end(); it++) {
@@ -1404,12 +1408,43 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
             ClimoPntInfo cpi(it->fcmn_na[i_obs], it->fcsd_na[i_obs],
                              it->ocmn_na[i_obs], it->ocsd_na[i_obs]);
 
-            fcst_na.add(compute_interp(fcst_dpa,
-               it->x_na[i_obs], it->y_na[i_obs], it->o_na[i_obs], &cpi,
-               it->interp_mthd, it->interp_wdth, it->interp_shape,
-               gr.wrap_lon(), interp_thresh, spfh_flag,
-               fcst_info->level().type(),
-               to_lvl, lvl_blw, lvl_abv));
+            double fcst_v = compute_interp(fcst_dpa,
+                               it->x_na[i_obs], it->y_na[i_obs], it->o_na[i_obs], &cpi,
+                               it->interp_mthd, it->interp_wdth, it->interp_shape,
+                               gr.wrap_lon(), interp_thresh, spfh_flag,
+                               fcst_info->level().type(),
+                               to_lvl, lvl_blw, lvl_abv);
+
+            // MET #3174 Apply orographic correction to surface temperature
+            if(sfc_info.topo_ptr &&
+               sfc_info.topo_apply_correction != FieldType::None &&
+               temp_flag &&
+               msg_typ_sfc.reg_exp_match(it->typ_sa[i_obs].c_str())) {
+
+               // Only correct the observations once
+               if(sfc_info.topo_apply_correction == FieldType::Obs &&
+                  member != 0) break;
+
+               // Interpolate model topography to observation location
+               double topo_elv = compute_horz_interp(
+                                    *sfc_info.topo_ptr, it->x_na[i_obs], it->y_na[i_obs], it->elv_na[i_obs],
+                                    InterpMthd::Bilin, 2,
+                                    GridTemplateFactory::GridTemplates::Square,
+                                    gr.wrap_lon(), 1.0);
+
+               double obs_v = it->o_na[i_obs];
+               correct_topo(sfc_info.topo_apply_correction,
+                            sfc_info.topo_lapse_rate,
+                            topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
+
+               // Store the corrected observation value
+               if(sfc_info.topo_apply_correction == FieldType::Obs) {
+                  it->o_na.set(i_obs, obs_v);
+               }
+            }
+
+            // Store the result 
+            fcst_na.add(fcst_v);
          }
 
          // Store the single ensemble value or HiRA neighborhood

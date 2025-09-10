@@ -564,6 +564,10 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Set flags
    bool spfh_flag   = fcst_info->is_specific_humidity() &&
                       obs_info->is_specific_humidity();
+   bool temp_flag   = true;
+// TODO: Add support for this
+//   bool temp_flag = fcst_info->is_temperature() &&
+//                    obs_info->is_temperature();
    bool precip_flag = fcst_info->is_precipitation() &&
                       obs_info->is_precipitation();
    int precip_interval = fcst_dpa[0].accum();
@@ -614,11 +618,13 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                                obs_v, obs_lvl, obs_hgt,
                                cpi, fcst_v)) continue;
 
-            // MET #3174 Apply orographic correction
+            // MET #3174 Apply orographic correction to surface temperature
             if(sfc_info.topo_ptr &&
-               sfc_info.topo_correct_field != FieldType::None &&
+               sfc_info.topo_apply_correction != FieldType::None &&
+               temp_flag &&
                msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
-               correct_topo(sfc_info.topo_correct_field,
+               correct_topo(sfc_info.topo_apply_correction,
+                            sfc_info.topo_lapse_rate,
                             topo_elv, hdr_elv, fcst_v, obs_v);
             } 
 
