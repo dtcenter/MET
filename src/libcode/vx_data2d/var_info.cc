@@ -882,7 +882,7 @@ bool VarInfo::is_wind_direction() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfo::is_prob() {
+bool VarInfo::is_prob() const {
 
    //
    // Check set_attr entry

@@ -70,6 +70,7 @@ class VarInfoNcMet : public VarInfo
 
       bool is_precipitation()     const;
       bool is_specific_humidity() const;
+      bool is_temperature()       const;
       bool is_u_wind()            const;
       bool is_v_wind()            const;
       bool is_wind_speed()        const;

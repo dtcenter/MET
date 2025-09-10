@@ -57,7 +57,7 @@ MB_to_PA(p)  = HPA_to_PA(p);
 ////////////////////////////////////////////////////////////////////////////////
 
 DRY_LAPSE_RATE_K_per_M    = 0.0098;
-DRY_LAPSE_RATE_K_per_FT   = DRY_LAPSE_RATE_K_PER_M / M_to_FT(1);
+DRY_LAPSE_RATE_K_per_FT   = DRY_LAPSE_RATE_K_per_M / M_to_FT(1);
 MOIST_LAPSE_RATE_K_per_M  = 0.0055;
 MOIST_LAPSE_RATE_K_per_FT = MOIST_LAPSE_RATE_K_per_M / M_to_FT(1);
 

@@ -28,6 +28,7 @@ static const std::string wdir_abbr_str      = "WDIR";
 
 //
 // List of GRIB1 precipitation variable names
+//   https://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //
 static const char *grib_precipitation_abbr[] = {
    "PWAT",    // Code  54, Precipitable water, kg/m^2
@@ -62,6 +63,7 @@ static const int n_grib_precipitation_abbr =
 
 //
 // List of GRIB1 specific humidity abbreviations
+//   https://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //
 static const char *grib_specific_humidity_abbr[] = {
    "SPFH",  // Code  51, Specific humidity, kg/kgSpecific humidity, kg kg-1
@@ -76,6 +78,30 @@ static const char *grib_specific_humidity_abbr[] = {
 static const int n_grib_specific_humidity_abbr =
                      sizeof(grib_specific_humidity_abbr)/
                     sizeof(*grib_specific_humidity_abbr);
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// List of GRIB1 temperature abbreviations
+//   https://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
+//
+static const char *grib_temperature_abbr[] = {
+   "TMP",  // Code 11, Temperature, K
+   "VTMP", // Code 12, Virtual temperature, K
+   "POT",  // Code 13, Potential temperature, K
+   "EPOT"  // Code 14, Pseudo-adiabatic potential temperature, K
+   "TMAX"  // Code 15, Maximum temperature, K
+   "TMIN"  // Code 16, Minimum tempearture, K
+   "DPT"   // Code 17, Dew point temperature, K
+   "DEPR"  // Code 18, Dew point depression, K
+};
+
+//
+// Number of GRIB1 temperature abbreviations
+//
+static const int n_grib_temperature_abbr =
+                     sizeof(grib_temperature_abbr)/
+                    sizeof(*grib_temperature_abbr);
 
 ////////////////////////////////////////////////////////////////////////
 //
