@@ -75,6 +75,7 @@ class VarInfo
 
       int           SetAttrIsPrecipitation;
       int           SetAttrIsSpecificHumidity;
+      int           SetAttrIsTemperature;
       int           SetAttrIsUWind;
       int           SetAttrIsVWind;
       int           SetAttrIsGridRelative;
@@ -201,13 +202,14 @@ class VarInfo
          // do stuff
          //
 
-      virtual bool is_precipitation()     const = 0;
-      virtual bool is_specific_humidity() const = 0;
-      virtual bool is_u_wind()            const = 0;
-      virtual bool is_v_wind()            const = 0;
-      virtual bool is_wind_speed()        const = 0;
-      virtual bool is_wind_direction()    const = 0;
-              bool is_prob();
+      bool is_precipitation() const;
+      bool is_specific_humidity() const;
+      bool is_temperature() const;
+      bool is_u_wind() const;
+      bool is_v_wind() const;
+      bool is_wind_speed() const;
+      bool is_wind_direction() const;
+      bool is_prob() const;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

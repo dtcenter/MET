@@ -133,6 +133,7 @@ void VarInfo::assign(const VarInfo &v) {
 
    SetAttrIsPrecipitation = v.SetAttrIsPrecipitation;
    SetAttrIsSpecificHumidity = v.SetAttrIsSpecificHumidity;
+   SetAttrIsTemperature = v.SetAttrIsTemperature;
    SetAttrIsUWind = v.SetAttrIsUWind;
    SetAttrIsVWind = v.SetAttrIsVWind;
    SetAttrIsGridRelative = v.SetAttrIsGridRelative;
@@ -194,6 +195,7 @@ void VarInfo::clear() {
 
    SetAttrIsPrecipitation = bad_data_int;
    SetAttrIsSpecificHumidity = bad_data_int;
+   SetAttrIsTemperature = bad_data_int;
    SetAttrIsUWind = bad_data_int;
    SetAttrIsVWind = bad_data_int;
    SetAttrIsGridRelative = bad_data_int;
@@ -571,6 +573,8 @@ void VarInfo::set_dict(Dictionary &dict) {
       parse_set_attr_flag(dict, conf_key_is_precipitation);
    SetAttrIsSpecificHumidity =
       parse_set_attr_flag(dict, conf_key_is_specific_humidity);
+   SetAttrIsTemperature =
+      parse_set_attr_flag(dict, conf_key_is_temperature);
    SetAttrIsUWind =
       parse_set_attr_flag(dict, conf_key_is_u_wind);
    SetAttrIsVWind =
@@ -769,6 +773,111 @@ void VarInfo::set_prob_info_grib(ConcatString prob_name, double thresh_lo, doubl
    set_name     ( field_name );
    set_req_name ( field_name.c_str() );
 
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_precipitation() const {
+   bool status = false;
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsPrecipitation)) {
+      status = (SetAttrIsPrecipitation != 0);
+   }
+
+   return status;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_specific_humidity() const {
+   bool status = false;
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsSpecificHumidity)) {
+      status = (SetAttrIsSpecificHumidity != 0);
+   }
+
+   return status;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_temperature() const {
+   bool status = false;
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsTemperature)) {
+      status = (SetAttrIsTemperature != 0);
+   }
+
+   return status;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_u_wind() const {
+   bool status = false;
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsUWind)) {
+      status = (SetAttrIsUWind != 0);
+   }
+
+   return status;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_v_wind() const {
+   bool status = false;
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsVWind)) {
+      status = (SetAttrIsVWind != 0);
+   }
+
+   return status;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_wind_speed() const {
+   bool status = false;
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsWindSpeed)) {
+      status = (SetAttrIsWindSpeed != 0);
+   }
+
+   return status;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_wind_direction() const {
+   bool status = false;
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsWindDirection)) {
+      status = (SetAttrIsWindDirection != 0);
+   }
+
+   return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
