@@ -183,8 +183,9 @@ land_mask = {
 // For the observations kept, when interpolating forecast data to the
 // observation location, only use forecast grid points where the topo - station
 // difference meets the interp_fcst_thresh threshold.
-// For matched pairs, the apply_correction setting applies orographic corrections
-// to the forecast value (FCST), observation value (OBS), or neither (NONE).
+// For surface temperature, the apply_correction setting applies the specified
+// orographic correction to the forecast value (FCST), observation value (OBS),
+// or neither (NONE).
 // topo_mask.flag may be set separately in each "obs.field" entry.
 //
 topo_mask = {
@@ -195,6 +196,7 @@ topo_mask = {
    use_obs_thresh     = ge-100&&le100;
    interp_fcst_thresh = ge-50&&le50;
    apply_correction   = NONE;
+   lapse_rate         = DRY_LAPSE_RATE_K_per_M;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
