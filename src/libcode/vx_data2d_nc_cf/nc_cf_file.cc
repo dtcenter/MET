@@ -473,19 +473,31 @@ bool NcCfFile::is_z_dim(const ConcatString& dim_name) const
       return false;
     }
 
-    // check if units are one of the acceptable vertical units
-    if ( att_value == "bar" || att_value == "bars" ||
-        att_value == "millibar" || att_value == "millibars" ||
-        att_value == "decibar" || att_value == "decibars" ||
-        att_value == "atmosphere" || att_value == "atmospheres" ||
-        att_value == "atm" || att_value == "atms" ||
-        att_value == "pascal" || att_value == "pascals" ||
-        att_value == "Pa" || att_value == "hPa" ||
-        att_value == "meter" || att_value == "meters" ||
-        att_value == "metre" || att_value == "metres" ||
-        att_value == "m" || att_value == "km" ||
-        att_value == "kilometer" || att_value == "kilometers" ) {
-      return true;
+    // Define acceptable vertical unit names (singular forms)
+    static const vector<string> vertical_units = {
+        "bar",
+        "millibar",
+        "decibar",
+        "atmosphere",
+        "atm",
+        "pascal",
+        "pa",
+        "hpa",
+        "meter",
+        "metre",
+        "m",
+        "km",
+        "kilometer"
+    };
+
+    // Convert to lowercase for case-insensitive comparison
+    string unit_lower = to_lower(att_value.c_str());
+
+    // Check if units match any of the acceptable vertical units (including plurals)
+    for (const string& unit : vertical_units) {
+      if (unit_lower == unit || unit_lower == unit + "s") {
+        return true;
+      }
     }
   }
 
