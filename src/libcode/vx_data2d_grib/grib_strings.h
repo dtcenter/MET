@@ -219,6 +219,8 @@ ConcatString get_grib_code_name(int, int);
 ConcatString get_grib_code_unit(int, int);
 ConcatString get_grib_code_abbr(int, int);
 
+bool is_grib_code_abbr_match(const ConcatString &, int);
+
 ConcatString get_grib_level_name(int);
 ConcatString get_grib_level_abbr(int);
 ConcatString get_grib_level_str(int, unsigned char *);
@@ -234,10 +236,6 @@ int str_to_prob_info(const char *, double &, double &, int);
 void get_grib_code_list(int, int, int &, const GribCodeData *&);
 ConcatString get_grib_code_list_str(int, int, int);
 ConcatString get_grib_level_list_str(int, int);
-
-///////////////////////////////////////////////////////////////////////////////
-
-
 
 ////////////////////////////////////////////////////////////////////////
 
