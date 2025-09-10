@@ -81,6 +81,12 @@ jobs:
       - name: Create directories to store output
         run: mkdir -p ${RUNNER_WORKSPACE}/logs
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
       - name: Compile MET in Docker
         run: .github/jobs/build_docker_image.sh
         env:
@@ -115,6 +121,11 @@ jobs:
     needs: [job_control]
     if: ${{ needs.job_control.outputs.run_unit_tests == 'true' }}
     steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
       - uses: dtcenter/metplus-action-data-update@v4
         with:
           docker_name: ${{ vars.DOCKER_USERNAME }}
