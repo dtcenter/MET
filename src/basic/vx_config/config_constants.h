@@ -720,6 +720,7 @@ static const char conf_key_set_attr_lead[]        = "set_attr_lead";
 static const char conf_key_set_attr_accum[]       = "set_attr_accum";
 static const char conf_key_is_precipitation[]     = "is_precipitation";
 static const char conf_key_is_specific_humidity[] = "is_specific_humidity";
+static const char conf_key_is_temperature[]       = "is_temperature";
 static const char conf_key_is_u_wind[]            = "is_u_wind";
 static const char conf_key_is_v_wind[]            = "is_v_wind";
 static const char conf_key_is_grid_relative[]     = "is_grid_relative";
