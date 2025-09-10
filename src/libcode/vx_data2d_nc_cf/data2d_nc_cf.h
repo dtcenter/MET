@@ -43,7 +43,7 @@ class MetNcCFDataFile : public Met2dDataFile {
 
       long convert_generic_to_offset(double value, const std::string& dim_name, std::vector<double> values);
       long convert_time_to_offset(double time_value) const;
-      long convert_z_to_offset(double z_value, const std::string &z_dim_name);
+      long convert_z_to_offset(double z_value, const NcVarInfo* data_var);
       bool data_plane(VarInfo &, DataPlane &, const LongArray &dimension);
       void error_message(const bool is_dim_time, const int error_code,
                          const double _lower, const double _upper,

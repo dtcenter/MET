@@ -172,7 +172,7 @@ int MetNcCFDataFile::add_data_planes_by_time(VarInfo &vinfo, const LevelInfo &le
       if (!vinfo_nc->is_offset(z_slot)
           || vx_data2d_dim_by_value == dimension[z_slot]) {
          dimension[z_slot] = convert_z_to_offset(vinfo_nc->dim_value(z_slot),
-                                                      get_z_dim_name(data_var));
+                                                      data_var);
       }
       if(range_flag == dimension[z_slot]) {
          mlog << Warning << "\n" << method_name << "vertical level at dim["
@@ -234,7 +234,7 @@ int MetNcCFDataFile::add_data_planes_by_z(VarInfo &vinfo, const LevelInfo &level
       DataPlane plane;
       double z_lower = level.lower();
       double z_upper = level.upper();
-      auto z_cnt = _file->vlevels.n();
+      auto z_cnt = data_var->vlevels.n();
       LongArray z_offsets = collect_z_offsets(vinfo);
       for (int idx=0; idx<z_offsets.n_elements(); idx++) {
          auto z_idx = (int)z_offsets[idx];
@@ -246,7 +246,7 @@ int MetNcCFDataFile::add_data_planes_by_z(VarInfo &vinfo, const LevelInfo &level
             }
             if (mlog.verbosity_level() >= nc_cf_debug_level) {
                mlog << Debug(nc_cf_debug_level) << method_name << "z: "
-                    << _file->vlevels[z_idx]
+                    << data_var->vlevels[z_idx]
                     << " from index " << z_idx << "\n";
             }
          }
@@ -277,7 +277,7 @@ bool MetNcCFDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       = "MetNcCFDataFile::data_plane(VarInfo &, DataPlane &) -> ";
 
   LongArray dimension = vinfo_nc->dimension();
-  const NcVarInfo *data_var = get_data_var(vinfo);
+  NcVarInfo *data_var = get_data_var(vinfo);
   if (nullptr != data_var) {
     int time_dim_slot = data_var->t_slot;
     int zdim_slot = data_var->z_slot;
@@ -405,7 +405,7 @@ int MetNcCFDataFile::data_plane_array(VarInfo &vinfo,
    plane_array.clear();
 
    auto vinfo_nc = (VarInfoNcCF *)&vinfo;
-   const NcVarInfo *data_var = get_data_var(vinfo);
+   NcVarInfo *data_var = get_data_var(vinfo);
    int t_dim_slot = data_var->t_slot;
    int z_dim_slot = data_var->z_slot;
    LongArray dimension = vinfo_nc->dimension();
@@ -616,7 +616,7 @@ LongArray MetNcCFDataFile::collect_z_offsets(VarInfo &vinfo) {
    }
 
    int z_slot = info->z_slot;
-   int z_dim_size = _file->vlevels.n_elements();
+   int z_dim_size = info->vlevels.n_elements();
    if (0 < z_dim_size && z_slot < 0) {
       // The z dimension does not exist at the variable and the z
       // variable exists. Stop z slicing and set the z offset to 0.
@@ -653,11 +653,11 @@ LongArray MetNcCFDataFile::collect_z_offsets(VarInfo &vinfo) {
             int next_offset = -1;
             // Skip z lower than z_lower
             for (int idx=0; idx<z_dim_size; idx++) {
-               if(_file->vlevels[idx] < z_lower) continue;
-               if(_file->vlevels[idx] == z_lower) found_lower = true;
-               if(_file->vlevels[idx] <= z_upper) {
+               if(info->vlevels[idx] < z_lower) continue;
+               if(info->vlevels[idx] == z_lower) found_lower = true;
+               if(info->vlevels[idx] <= z_upper) {
                   mlog << Debug(9) << method_name << " found the first z "
-                       << _file->vlevels[idx] << " lower: ["
+                       << info->vlevels[idx] << " lower: ["
                        << z_lower << "]\n";
                   first_idx = idx;
                   next_offset = idx + 1;
@@ -669,34 +669,34 @@ LongArray MetNcCFDataFile::collect_z_offsets(VarInfo &vinfo) {
             else if(0 == z_inc) {   // no increment configuration
                z_offsets.add(first_idx);
                for (int idx=next_offset; idx<z_dim_size; idx++) {
-                  if(_file->vlevels[idx] < z_lower     // in case of not sorted
-                     || _file->vlevels[idx] > z_upper) continue;
+                  if(info->vlevels[idx] < z_lower     // in case of not sorted
+                     || info->vlevels[idx] > z_upper) continue;
                   z_offsets.add(idx);
                   mlog << Debug(9) << method_name << " found the z "
-                       << _file->vlevels[idx] << "\n";
+                       << info->vlevels[idx] << "\n";
                }
             }
             else {
                double next_z = z_lower + z_inc;
                if (found_lower) z_offsets.add(first_idx);
                for (int idx=next_offset; idx<z_dim_size; idx++) {
-                  if (_file->vlevels[idx] > z_upper) break;
-                  if (_file->vlevels[idx] < next_z) continue;
-                  if (_file->vlevels[idx] == next_z) {
+                  if (info->vlevels[idx] > z_upper) break;
+                  if (info->vlevels[idx] < next_z) continue;
+                  if (info->vlevels[idx] == next_z) {
                      z_offsets.add(idx);
                      mlog << Debug(9) << method_name << " found the z "
-                          << _file->vlevels[idx] << " index=" << idx << "\n";
+                          << info->vlevels[idx] << " index=" << idx << "\n";
                      next_z += z_inc;
                   }
-                  else { // next_z < _file->vlevels[idx]
-                     while (next_z < _file->vlevels[idx]) {
+                  else { // next_z < info->vlevels[idx]
+                     while (next_z < info->vlevels[idx]) {
                         missing_z.add((unixtime)next_z);
                         next_z += z_inc;
                      }
-                     if (_file->vlevels[idx] == next_z) {
+                     if (info->vlevels[idx] == next_z) {
                         z_offsets.add(idx);
                         mlog << Debug(9) << method_name << " found the z "
-                             << _file->vlevels[idx] << " index=" << idx << "\n";
+                             << info->vlevels[idx] << " index=" << idx << "\n";
                         next_z += z_inc;
                      }
                   }
@@ -728,7 +728,7 @@ LongArray MetNcCFDataFile::collect_z_offsets(VarInfo &vinfo) {
    else {    // a single match
       const NcVarInfo *data_var = _file->find_var_name(vinfo_nc->req_name().c_str());
       if (z_as_value) dim_offset = convert_z_to_offset(vinfo_nc->dim_value(tmp_z_slot),
-                                                       get_z_dim_name(data_var));
+                                                       data_var);
 
       if (0 <= z_slot && dim_offset < z_dim_size)
          z_offsets.add(dim_offset);
@@ -739,8 +739,8 @@ LongArray MetNcCFDataFile::collect_z_offsets(VarInfo &vinfo) {
    if (0 < z_count)
       mlog << Debug(7) << method_name << "Found " << z_count
            << (z_count==1 ? " vlevel" : " vlevels") << " between "
-           << _file->vlevels[0] << " and "
-           << _file->vlevels[z_dim_size-1] << "\n";
+           << info->vlevels[0] << " and "
+           << info->vlevels[z_dim_size-1] << "\n";
    else {
       mlog << Warning << method_name << "Not found vlevel out of "
            << z_dim_size << ".\n";
@@ -841,8 +841,8 @@ long MetNcCFDataFile::convert_generic_to_offset(double value, const string &dim_
 
 ////////////////////////////////////////////////////////////////////////
 
-long MetNcCFDataFile::convert_z_to_offset(double z_value, const string &z_dim_name) {
-   return convert_generic_to_offset(z_value, z_dim_name, _file->vlevels.vals());
+long MetNcCFDataFile::convert_z_to_offset(double z_value, const NcVarInfo* data_var) {
+  return convert_generic_to_offset(z_value, get_z_dim_name(data_var), data_var->vlevels.vals());
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -853,7 +853,8 @@ void MetNcCFDataFile::error_message(const bool is_dim_time, const int error_code
                                     const string &method_name) const {
    // Handling error code
    ConcatString log_msg;
-   const int dim_size = is_dim_time ? _file->ValidTime.n() : _file->vlevels.n();
+   NcVarInfo* info = _file->find_var_name(var_name.c_str());
+   const int dim_size = is_dim_time ? _file->ValidTime.n() : info->vlevels.n();
    const char *dim_name = is_dim_time ? "time" : "vlevel";
 
    log_msg << "variable \"" << var_name << "\" ";
@@ -873,8 +874,8 @@ void MetNcCFDataFile::error_message(const bool is_dim_time, const int error_code
       else {
          log_msg << "does not have the matching " << dim_name << " ranges between "
                  << _lower << " and " << _upper
-                 << " from [" << _file->vlevels.min() << " and "
-                 << _file->vlevels.max() << "]";
+                 << " from [" << info->vlevels.min() << " and "
+                 << info->vlevels.max() << "]";
       }
    }
    else if (error_code == error_code_no_matching_offsets) {
@@ -901,8 +902,8 @@ void MetNcCFDataFile::error_message(const bool is_dim_time, const int error_code
       }
       else {
          log_msg << "does not have the matching " << dim_name
-                 << (int)_value << " [" << _file->vlevels.min() << " and "
-                 << _file->vlevels.max() << "]";
+                 << (int)_value << " [" << info->vlevels.min() << " and "
+                 << info->vlevels.max() << "]";
       }
    }
    else {
@@ -999,7 +1000,7 @@ long MetNcCFDataFile::find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var) {
    auto vinfo_nc = (VarInfoNcCF *)&vinfo;
    z_offset = vinfo_nc->dimension(z_slot);
 
-   int z_cnt = _file->vlevels.n();
+   int z_cnt = data_var->vlevels.n();
    if (z_offset == range_flag) {
       if (cur_z_index < 0) { // cur_z_index is not initialized
          LevelInfo level = vinfo.level();
@@ -1009,7 +1010,7 @@ long MetNcCFDataFile::find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var) {
             z_offset = (long)z_lower;
          }
          else {
-            z_offset = convert_z_to_offset(z_lower, get_z_dim_name(data_var));
+            z_offset = convert_z_to_offset(z_lower, data_var);
             if (z_offset < 0) {
                LongArray z_offsets = collect_z_offsets(vinfo);
                if(0 <z_offsets.n_elements()) z_offset = z_offsets[0];
@@ -1025,13 +1026,13 @@ long MetNcCFDataFile::find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var) {
    }
    else if (!vinfo_nc->is_offset(z_slot)) {
       double z_value = vinfo_nc->dim_value(z_slot);
-      z_offset = convert_z_to_offset(z_value, get_z_dim_name(data_var));
+      z_offset = convert_z_to_offset(z_value, data_var);
       if ((0 > z_offset) || (z_offset >= z_cnt)) {
          mlog << Error << "\n" << method_name << "the requested vlevel "
               << z_value << " for \""
               << vinfo.req_name() << "\" variable does not exist ("
-              << _file->vlevels[0] << " and "
-              << _file->vlevels[z_cnt-1] << ").\n\n";
+              << data_var->vlevels[0] << " and "
+              << data_var->vlevels[z_cnt-1] << ").\n\n";
          exit(1);
       }
    }

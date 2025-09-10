@@ -97,7 +97,6 @@ class NcCfFile {
 
       TimeArray ValidTime;
       NumArray raw_times;
-      NumArray vlevels;
 
       unixtime  InitTime;
       unixtime  AccumTime;
@@ -135,7 +134,7 @@ class NcCfFile {
       NcVarInfo* find_var_name(const char * var_name) const;
       NcVarInfo* find_var_by_dim_name(const char *dim_name) const;
 
-      void set_vlevels(const NcVarInfo* var);
+      void set_vlevels(NcVarInfo* var);
 
    private:
 

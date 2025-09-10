@@ -157,7 +157,6 @@ void NcCfFile::close()
 
   ValidTime.clear();
   raw_times.clear();
-  vlevels.clear();
   InitTime = (unixtime)0;
   AccumTime = (unixtime)0;
 
@@ -1089,7 +1088,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
 ////////////////////////////////////////////////////////////////////////
 
-void NcCfFile::set_vlevels(const NcVarInfo* var)
+void NcCfFile::set_vlevels(NcVarInfo* var)
 {
   // get vertical levels for this variable if needed
 
@@ -1099,7 +1098,7 @@ void NcCfFile::set_vlevels(const NcVarInfo* var)
   }
 
   // if vlevels has already been populated, then no need to do it again
-  if(vlevels.n_elements() > 0) {
+  if(var->vlevels.n_elements() > 0) {
     return;
   }
 
@@ -1119,7 +1118,7 @@ void NcCfFile::set_vlevels(const NcVarInfo* var)
 
     if( get_nc_data(z_var, z_values.data()) ) {
       for(int i=0; i<z_count; i++) {
-        vlevels.add(z_values[i]);
+        var->vlevels.add(z_values[i]);
       }
     }
   }
