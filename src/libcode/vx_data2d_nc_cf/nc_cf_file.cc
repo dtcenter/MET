@@ -179,16 +179,6 @@ bool NcCfFile::open(const char * filepath)
 
   close();
 
-  // Change the error behavior of the netCDF C++ API by creating an
-  // NcError object. Until it is destroyed, this NcError object will
-  // ensure that the netCDF C++ API silently returns error codes
-  // on any failure, and leaves any other error handling to the
-  // calling program. In the case of this example, we just exit with
-  // an NC_ERR error code.
-
-  // FIXME: Commented out with NetCDF4 enabling
-  // NcError err(NcError::silent_nonfatal);
-
   // Open the file
   _ncFile = open_ncfile(filepath);
 
