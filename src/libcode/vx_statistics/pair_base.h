@@ -433,8 +433,8 @@ class VxPairBase {
                           double, double, double,
                           const ClimoPntInfo &, double &);
 
-      void correct_topo(const FieldType &, double, double,
-                        double &, double &);
+      void correct_topo(const FieldType &, const double,
+                        double, double, double &, double &);
 
       // Retrieve climo data for this point 
       ClimoPntInfo get_climo_pnt_info(int, const Grid &gr, double, double,

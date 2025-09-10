@@ -2151,16 +2151,47 @@ bool VxPairBase::is_keeper_fcst(
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::correct_topo(const FieldType &field,
+void VxPairBase::correct_topo(const FieldType &field, const double lr,
                               double fcst_elv, double obs_elv,
                               double &fcst_v, double &obs_v) {
-   //
-   // JHG work here to:
-   // - apply the correction with useful log messages
-   // - figure out which correction to apply based on data type
-   // - also call this from pair_data_ensemble.cc
-   // - add unit tests
-   // 
+   const char *method_name = "PairBase::correct_topo() -> ";
+
+   // Check for no work to be done
+   if(field != FieldType::Fcst && field != FieldType::Obs) return;
+
+   // Check for valid data
+   if(is_bad_data(fcst_elv) || is_bad_data(obs_elv) ||
+      is_bad_data(fcst_v)   || is_bad_data(obs_v)) {
+      mlog << Warning << "\n" << method_name
+           << "skipping orographic correction due to bad "
+           << "(fcst, obs) elevation (" << fcst_elv << ", "
+           << obs_elv << ") or data (" << fcst_v << ", "
+           << obs_v << ") values.\n\n";
+   }
+
+   // Apply correction
+   double orig_v;
+   double corr_v;
+   if(field == FieldType::Fcst) {
+      orig_v = fcst_v;
+      corr_v = (fcst_elv - obs_elv) * lr + fcst_v;
+      fcst_v = corr_v;
+   }
+   else {
+      orig_v = obs_v;
+      corr_v = (obs_elv - fcst_elv) * lr + obs_v;
+      obs_v = corr_v;
+   }
+
+   // Log the orographic correction
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << "Applying lapse rate (" << lr
+           << " to correct the " << fieldtype_to_string(field)
+           << " value from " << orig_v << " to " << corr_v 
+           << " for forecast (" << fcst_elv << ") minus observation ("
+           << obs_elv << ") topography difference of "
+           << fcst_elv - obs_elv << ".\n";
+   }
 
    return;
 }
