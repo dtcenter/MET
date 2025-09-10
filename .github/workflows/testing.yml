@@ -117,7 +117,7 @@ jobs:
     steps:
       - uses: dtcenter/metplus-action-data-update@v4
         with:
-          docker_name: 'dtcenter'
+          docker_name: ${{ vars.DOCKER_USERNAME }}
           docker_pass: ${{ secrets.DOCKER_TOKEN }}
           repo_name: ${{ github.repository }}
           data_prefix: unit_test
@@ -475,5 +475,5 @@ jobs:
         run: .github/jobs/create_docker_truth.sh
         env:
           TRUTH_DATA_VERSION: ${{ needs.job_control.outputs.truth_data_version }}
-          DOCKER_USERNAME: 'dtcenter'
+          DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}

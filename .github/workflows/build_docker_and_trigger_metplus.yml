@@ -36,7 +36,7 @@ jobs:
         run: .github/jobs/push_docker_image.sh
         env:
           SOURCE_BRANCH: ${{ steps.get_branch_name.outputs.branch_name }}-lite
-          DOCKER_USERNAME: 'dtcenter'
+          DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
 
   trigger_metplus:

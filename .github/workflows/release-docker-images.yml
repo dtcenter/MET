@@ -99,7 +99,7 @@ jobs:
         env:
           SOURCE_BRANCH: ${{ matrix.version }}
           UPDATE_LATEST: ${{ fromJSON(needs.define-matrix.outputs.update_latest) }}
-          DOCKER_USERNAME: 'dtcenter'
+          DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Copy log files into logs directory
