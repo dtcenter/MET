@@ -171,7 +171,6 @@ void NcCfFile::close()
 
 bool NcCfFile::open(const char * filepath)
 {
-  unixtime ut;
   const char *method_name = "NcCfFile::open() -> ";
 
   // Close any open files and clear out the associated members
@@ -205,61 +204,91 @@ bool NcCfFile::open(const char * filepath)
   auto valid_time_var = (NcVar *)nullptr;
   ConcatString att_value;
 
-  StringArray varNames;
-  Nvars = get_var_names(_ncFile, &varNames);
-  Var = new NcVarInfo [Nvars];
-
-  for (int j=0; j<Nvars; ++j)  {
-    NcVar v = get_var(_ncFile, varNames[j].c_str());
-
-    Var[j].var = new NcVar(v);
-
-    Var[j].name = GET_NC_NAME(v).c_str();
-
-    int dim_count = GET_NC_DIM_COUNT(v);
-    Var[j].Ndims = dim_count;
-    if (dim_count > max_dim_count) max_dim_count = dim_count;
-
-    Var[j].Dims = new NcDim * [dim_count];
-
-    //  parse the variable attributes
-    get_att_str( Var[j], long_name_att_name, Var[j].long_name_att );
-    get_att_str( Var[j], units_att_name,     Var[j].units_att     );
-
-    if (get_var_axis(Var[j].var, att_value)) {
-      if ( "T" == att_value ||  "time" == att_value ) {
-        valid_time_var = Var[j].var;
-        _time_var_info = &Var[j];
-      }
-    }
-
-    if (get_var_standard_name(Var[j].var, att_value)) {
-      if ( "time" == att_value ) {
-        valid_time_var = Var[j].var;
-        _time_var_info = &Var[j];
-      }
-      else if( "latitude" == att_value ) _latVar = Var[j].var;
-      else if( "longitude" == att_value ) _lonVar = Var[j].var;
-    }
-    if ( Var[j].name == "time" && (valid_time_var == nullptr)) {
-      valid_time_var = Var[j].var;
-      _time_var_info = &Var[j];
-    }
-  }   //  for j
-
-  if (nullptr == _time_var_info) {
-    for (int j=0; j<Nvars; ++j)  {
-      if (is_nc_unit_time(Var[j].units_att.c_str())) {
-        valid_time_var = Var[j].var;
-        _time_var_info = &Var[j];
-        break;
-      }
-    }
-  }   //  for j
-
+  parse_vars_from_file(att_value, max_dim_count, valid_time_var);
 
   // Pull out the valid and init times
+  parse_times_from_file(filepath, method_name, valid_time_var);
+
+  // Pull out the grid.  This must be done after pulling out the dimension
+  // and variable information since this information is used to pull out the
+  // grid.  This call sets the _xDim and _yDim pointers.
+
+  read_netcdf_grid();
+
+  // Now go back through the variables and use _xDim, _yDim, and _tDim
+  // to set the slots.
+  // Should be called after read_netcdf_grid() is called
+
+  set_var_slots(max_dim_count);
+
+  mlog << Debug(5) << method_name << "coordinate variables:"
+       << " x=" << (IS_VALID_NC_P(_xCoordVar) ? GET_NC_NAME_P(_xCoordVar) : "N/A")
+       << ", y=" << (IS_VALID_NC_P(_yCoordVar) ? GET_NC_NAME_P(_yCoordVar) : "N/A")
+       << ", t=" << (IS_VALID_NC_P(valid_time_var) ? GET_NC_NAME_P(valid_time_var) : "N/A")
+       << "\n";
+
+  //  done
+
+  return true;
+}
+void NcCfFile::set_var_slots(int max_dim_count)
+{
+  string      z_dim_name;
+  StringArray z_dims;
+  StringArray t_dims;
+  StringArray dimNames;
+  string      var_x_dim_name;
+  string      var_y_dim_name;
+  if (IS_VALID_NC_P(_xDim)) var_x_dim_name = GET_NC_NAME_P(_xDim);
+  if (IS_VALID_NC_P(_yDim)) var_y_dim_name = GET_NC_NAME_P(_yDim);
+  for (int j=0; j< Nvars; ++j) {
+
+    int dim_count = Var[j].Ndims;
+    const NcVar *v = Var[j].var;
+
+    dimNames.clear();
+    get_dim_names(v, &dimNames);
+
+    for (int k=0; k<dim_count; ++k)  {
+      const NcDim *dim = Var[j].Dims[k];
+      const ConcatString dim_name = dimNames[k];
+      if      ((dim && dim == _xDim) || dim_name == var_x_dim_name || dim_name == x_dim_var_name) {
+        Var[j].x_slot = k;
+      }
+      else if ((dim && dim == _yDim) || dim_name == var_y_dim_name || dim_name == y_dim_var_name) {
+        Var[j].y_slot = k;
+      }
+      else if ((dim && (dim == _tDim)) || dim_name == t_dim_name || t_dims.has(dim_name)) {
+        Var[j].t_slot = k;
+      }
+      else if (z_dims.has(dim_name) || is_z_dim(dim_name)) {
+        Var[j].z_slot = k;
+         z_dims.add(dim_name);
+      }
+      else if (dim_count == max_dim_count) {
+         const NcVarInfo *info = find_var_by_dim_name(dim_name.c_str());
+         if (info) {
+            if (is_nc_unit_time(info->units_att.c_str())) {
+              Var[j].t_slot = k;
+               t_dims.add(dim_name);
+            }
+            else if (is_nc_unit_latitude(info->units_att.c_str())) {
+              Var[j].y_slot = k;
+            }
+            else if (is_nc_unit_longitude(info->units_att.c_str())) {
+              Var[j].x_slot = k;
+            }
+         }
+      }
+    }
+  }   //  for j
+
+}
+
+void NcCfFile::parse_times_from_file(const char* filepath, const char* method_name, NcVar* valid_time_var)
+{
   ConcatString units;
+  unixtime ut;
   if (IS_INVALID_NC_P(valid_time_var))
   {
 
@@ -280,90 +309,7 @@ bool NcCfFile::open(const char * filepath)
   }
   else
   {
-    int sec_per_unit;
-
-    // Store the dimension for the time variable as the time dimension
-    int time_dim_count = get_dim_count(valid_time_var);
-    if (time_dim_count == 1) {
-       NcDim tDim = get_nc_dim(valid_time_var, 0);
-       if (IS_VALID_NC(tDim)) {
-         _tDim = new NcDim(tDim);
-         t_dim_name = GET_NC_NAME(tDim).c_str();
-       }
-    }
-
-    // Parse the units for the time variable.
-    ut = sec_per_unit = 0;
-    if (get_var_units(valid_time_var, units)) {
-      if (units.empty()) {
-         mlog << Warning << "\n" << method_name
-              << "the \"time\" variable must contain a \"units\" attribute. "
-              << "Using valid time of 0\n\n";
-      }
-      else {
-         mlog << Debug(4) << method_name
-              << "parsing units for the time variable \"" << units << "\"\n";
-         parse_cf_time_string(units.c_str(), ut, sec_per_unit);
-      }
-    }
-
-    NcVar bounds_time_var;
-    auto nc_time_var = (NcVar *)nullptr;
-    bool use_bounds_var = false;
-    ConcatString bounds_var_name;
-    nc_time_var = valid_time_var;
-    NcVarAtt *bounds_att = get_nc_att(valid_time_var, bounds_att_name, false);
-    if (get_att_value_chars(bounds_att, bounds_var_name)) {
-      bounds_time_var = get_nc_var(_ncFile, bounds_var_name.c_str());
-      use_bounds_var = IS_VALID_NC(bounds_time_var);
-      if (use_bounds_var) {
-        nc_time_var = &bounds_time_var;
-        mlog << Debug(3) << method_name
-             << "read time from the bounds variable \"" << bounds_var_name << "\"\n";
-      }
-    }
-    if (bounds_att) delete bounds_att;
-
-    // Determine the number of times present.
-    int n_times = get_data_size(valid_time_var);
-    int tim_buf_size = n_times;
-    if (use_bounds_var) tim_buf_size *= 2;
-    vector<double> time_values(tim_buf_size);
-
-    if( get_nc_data(nc_time_var, time_values.data()) ) {
-      bool no_leap_year = get_att_no_leap_year(valid_time_var);
-      if( time_dim_count > 1 ) {
-        double latest_time = bad_data_double;
-        for(int i=0; i<n_times; i++) {
-          if( latest_time < time_values[i] ) latest_time = time_values[i];
-        }
-        ValidTime.add(add_to_unixtime(ut, sec_per_unit, latest_time, no_leap_year));
-        raw_times.add(latest_time);
-      }
-      else {
-        if (use_bounds_var) {
-          double bounds_diff;
-          for(int i=0; i<n_times; i++) {
-            ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i*2+1], no_leap_year));
-            raw_times.add(time_values[i*2+1]);
-            bounds_diff = time_values[i*2+1] - time_values[i*2];
-            if (abs(bounds_diff - nint(bounds_diff)) < TIME_EPSILON) {
-              AccumTime = (unixtime)(sec_per_unit * nint(bounds_diff));
-            }
-            else {
-              AccumTime = (unixtime)(sec_per_unit * bounds_diff);
-            }
-          }
-        }
-        else {
-          for(int i=0; i<n_times; i++) {
-            ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i], no_leap_year));
-            raw_times.add(time_values[i]);
-          }
-        }
-      }
-    }
-    else ValidTime.add(0);  //Initialize
+    parse_valid_time_var(method_name, valid_time_var, units);
   }
 
   InitTime = get_init_time(_ncFile);
@@ -379,76 +325,153 @@ bool NcCfFile::open(const char * filepath)
             << "get InitTime (" << unix_to_yyyymmdd_hhmmss(InitTime) << ") from the file name.\n";
     }
   }
+}
 
-  // Pull out the grid.  This must be done after pulling out the dimension
-  // and variable information since this information is used to pull out the
-  // grid.  This call sets the _xDim and _yDim pointers.
+void NcCfFile::parse_valid_time_var(const char* method_name, NcVar* valid_time_var, ConcatString& units)
+{
+  int sec_per_unit;
 
-  read_netcdf_grid();
+  // Store the dimension for the time variable as the time dimension
+  int time_dim_count = get_dim_count(valid_time_var);
+  if (time_dim_count == 1) {
+     NcDim tDim = get_nc_dim(valid_time_var, 0);
+     if (IS_VALID_NC(tDim)) {
+       _tDim      = new NcDim(tDim);
+       t_dim_name = GET_NC_NAME(tDim).c_str();
+     }
+  }
 
-  // Now go back through the variables and use _xDim, _yDim, and _tDim
-  // to set the slots.
-  // Should be called after read_netcdf_grid() is called
+  // Parse the units for the time variable.
+  unixtime ut = 0;
+  sec_per_unit = 0;
+  if (get_var_units(valid_time_var, units)) {
+    if (units.empty()) {
+       mlog << Warning << "\n" << method_name
+            << "the \"time\" variable must contain a \"units\" attribute. "
+            << "Using valid time of 0\n\n";
+    }
+    else {
+       mlog << Debug(4) << method_name
+            << "parsing units for the time variable \"" << units << "\"\n";
+       parse_cf_time_string(units.c_str(), ut, sec_per_unit);
+    }
+  }
 
-  string z_dim_name;
-  StringArray z_dims;
-  StringArray t_dims;
-  StringArray dimNames;
-  string var_x_dim_name;
-  string var_y_dim_name;
-  if (IS_VALID_NC_P(_xDim)) var_x_dim_name = GET_NC_NAME_P(_xDim);
-  if (IS_VALID_NC_P(_yDim)) var_y_dim_name = GET_NC_NAME_P(_yDim);
-  for (int j=0; j<Nvars; ++j) {
+  NcVar bounds_time_var;
+  auto nc_time_var = (NcVar *)nullptr;
+  bool use_bounds_var = false;
+  ConcatString bounds_var_name;
+  nc_time_var = valid_time_var;
+  NcVarAtt *bounds_att = get_nc_att(valid_time_var, bounds_att_name, false);
+  if (get_att_value_chars(bounds_att, bounds_var_name)) {
+    bounds_time_var = get_nc_var(_ncFile, bounds_var_name.c_str());
+    use_bounds_var = IS_VALID_NC(bounds_time_var);
+    if (use_bounds_var) {
+      nc_time_var = &bounds_time_var;
+      mlog << Debug(3) << method_name
+           << "read time from the bounds variable \"" << bounds_var_name << "\"\n";
+    }
+  }
+  delete bounds_att;
 
-    int dim_count = Var[j].Ndims;
-    const NcVar *v = Var[j].var;
+  // Determine the number of times present.
+  int n_times = get_data_size(valid_time_var);
+  int tim_buf_size = n_times;
+  if (use_bounds_var) tim_buf_size *= 2;
+  vector<double> time_values(tim_buf_size);
 
-    dimNames.clear();
-    get_dim_names(v, &dimNames);
+  // add valid time of 0 if time values cannot be read
+  if( !get_nc_data(nc_time_var, time_values.data()) ){
+    ValidTime.add(0);  //Initialize
+    return;
+  }
 
-    for (int k=0; k<dim_count; ++k)  {
-      const NcDim *dim = Var[j].Dims[k];
-      const ConcatString dim_name = dimNames[k];
-      if      ((dim && dim == _xDim) || dim_name == var_x_dim_name || dim_name == x_dim_var_name) {
-         Var[j].x_slot = k;
+  bool no_leap_year = get_att_no_leap_year(valid_time_var);
+  if( time_dim_count > 1 ) {
+    double latest_time = bad_data_double;
+    for(int i=0; i<n_times; i++) {
+      if( latest_time < time_values[i] ) latest_time = time_values[i];
+    }
+    ValidTime.add(add_to_unixtime(ut, sec_per_unit, latest_time, no_leap_year));
+    raw_times.add(latest_time);
+    return;
+  }
+
+  if (!use_bounds_var) {
+    for(int i=0; i<n_times; i++) {
+      ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i], no_leap_year));
+      raw_times.add(time_values[i]);
+    }
+    return;
+  }
+
+  // if use_bounds_var is true
+  double bounds_diff;
+  for(int i=0; i<n_times; i++) {
+    ValidTime.add(add_to_unixtime(ut, sec_per_unit, time_values[i*2+1], no_leap_year));
+    raw_times.add(time_values[i*2+1]);
+    bounds_diff = time_values[i*2+1] - time_values[i*2];
+    if (abs(bounds_diff - nint(bounds_diff)) < TIME_EPSILON) {
+      AccumTime = (unixtime)(sec_per_unit * nint(bounds_diff));
+    }
+    else {
+      AccumTime = (unixtime)(sec_per_unit * bounds_diff);
+    }
+  }
+}
+
+void NcCfFile::parse_vars_from_file(ConcatString& att_value, int& max_dim_count,
+                                    NcVar*& valid_time_var)
+{
+  StringArray varNames;
+  Nvars = get_var_names(_ncFile, &varNames);
+  Var = new NcVarInfo [Nvars];
+
+  for (int j =0; j< Nvars; ++j)  {
+    NcVar v = get_var(_ncFile, varNames[j].c_str());
+
+    Var[j].var = new NcVar(v);
+
+    Var[j].name = GET_NC_NAME(v).c_str();
+
+    int dim_count = GET_NC_DIM_COUNT(v);
+    Var[j].Ndims = dim_count;
+    if (dim_count > max_dim_count) max_dim_count = dim_count;
+
+    Var[j].Dims = new NcDim * [dim_count];
+
+    //  parse the variable attributes
+    get_att_str(Var[j], long_name_att_name, Var[j].long_name_att );
+    get_att_str(Var[j], units_att_name, Var[j].units_att     );
+
+    if (get_var_axis(Var[j].var, att_value) && ( "T" == att_value ||  "time" == att_value ) ) {
+        valid_time_var = Var[j].var;
+        _time_var_info = &Var[j];
+    }
+
+    if (get_var_standard_name(Var[j].var, att_value)) {
+      if ( "time" == att_value ) {
+        valid_time_var = Var[j].var;
+        _time_var_info = &Var[j];
       }
-      else if ((dim && dim == _yDim) || dim_name == var_y_dim_name || dim_name == y_dim_var_name) {
-         Var[j].y_slot = k;
-      }
-      else if ((dim && (dim == _tDim)) || dim_name == t_dim_name || t_dims.has(dim_name)) {
-         Var[j].t_slot = k;
-      }
-      else if (z_dims.has(dim_name) || is_z_dim(dim_name)) {
-         Var[j].z_slot = k;
-         z_dims.add(dim_name);
-      }
-      else if (dim_count == max_dim_count) {
-         const NcVarInfo *info = find_var_by_dim_name(dim_name.c_str());
-         if (info) {
-            if (is_nc_unit_time(info->units_att.c_str())) {
-               Var[j].t_slot = k;
-               t_dims.add(dim_name);
-            }
-            else if (is_nc_unit_latitude(info->units_att.c_str())) {
-               Var[j].y_slot = k;
-            }
-            else if (is_nc_unit_longitude(info->units_att.c_str())) {
-               Var[j].x_slot = k;
-            }
-         }
-      }
+      else if( "latitude" == att_value ) _latVar = Var[j].var;
+      else if( "longitude" == att_value ) _lonVar = Var[j].var;
+    }
+    if ( Var[j].name == "time" && (valid_time_var == nullptr)) {
+      valid_time_var = Var[j].var;
+      _time_var_info = &Var[j];
     }
   }   //  for j
 
-  mlog << Debug(5) << method_name << "coordinate variables:"
-       << " x=" << (IS_VALID_NC_P(_xCoordVar) ? GET_NC_NAME_P(_xCoordVar) : "N/A")
-       << ", y=" << (IS_VALID_NC_P(_yCoordVar) ? GET_NC_NAME_P(_yCoordVar) : "N/A")
-       << ", t=" << (IS_VALID_NC_P(valid_time_var) ? GET_NC_NAME_P(valid_time_var) : "N/A")
-       << "\n";
-
-  //  done
-
-  return true;
+  if (nullptr == _time_var_info) {
+    for (int j=0; j< Nvars; ++j)  {
+      if (is_nc_unit_time(Var[j].units_att.c_str())) {
+        valid_time_var = Var[j].var;
+        _time_var_info = &Var[j];
+        break;
+      }
+    } //  for j
+  }
 }
 
 bool NcCfFile::is_z_dim(const ConcatString& dim_name) const

@@ -215,6 +215,10 @@ class NcCfFile {
                                             bool &swap_to_north);
 
       bool is_z_dim(const ConcatString& dim_name) const;
+  void parse_vars_from_file(ConcatString& att_value, int& max_dim_count, netCDF::NcVar*& valid_time_var);
+  void parse_times_from_file(const char* filepath, const char* method_name, netCDF::NcVar* valid_time_var);
+  void set_var_slots(int max_dim_count);
+  void parse_valid_time_var(const char* method_name, netCDF::NcVar* valid_time_var, ConcatString& units);
 };
 
 
