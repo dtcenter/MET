@@ -457,7 +457,7 @@ bool NcCfFile::is_z_dim(const ConcatString& dim_name) const
   // See: https://cfconventions.org/cf-conventions/cf-conventions.html#vertical-coordinate
 
   // get dimension variable
-  NcVarInfo *info = find_var_by_dim_name(dim_name.c_str());
+  const NcVarInfo *info = find_var_by_dim_name(dim_name.c_str());
   if(!info) {
     return false;
   }

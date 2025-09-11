@@ -862,7 +862,7 @@ void MetNcCFDataFile::error_message(const bool is_dim_time, const int error_code
                                     const string &method_name) const {
    // Handling error code
    ConcatString log_msg;
-   NcVarInfo* info = _file->find_var_name(var_name.c_str());
+   const NcVarInfo* info = _file->find_var_name(var_name.c_str());
    const int dim_size = is_dim_time ? _file->ValidTime.n() : info->vlevels.n();
    const char *dim_name = is_dim_time ? "time" : "vlevel";
 
