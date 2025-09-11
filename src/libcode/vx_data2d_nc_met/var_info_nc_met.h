@@ -38,19 +38,19 @@ class VarInfoNcMet : public VarInfo
 
    public:
       VarInfoNcMet();
-      ~VarInfoNcMet();
+      ~VarInfoNcMet() override;
       VarInfoNcMet(const VarInfoNcMet &);
       VarInfoNcMet & operator=(const VarInfoNcMet &);
-      virtual VarInfo *clone() const;
+      virtual VarInfo *clone() const override;
 
-      void dump(std::ostream &) const;
+      void dump(std::ostream &) const override;
       void clear();
 
          //
          // get stuff
          //
 
-      GrdFileType file_type()             const;
+      GrdFileType file_type()             const override;
       const       LongArray & dimension() const;
       int         dimension(int i)        const;
       int         n_dimension()           const;
@@ -59,8 +59,8 @@ class VarInfoNcMet : public VarInfo
          // set stuff
          //
 
-      void set_magic(const ConcatString &, const ConcatString &);
-      void set_dict(Dictionary &s);
+      void set_magic(const ConcatString &, const ConcatString &) override;
+      void set_dict(Dictionary &s) override;
 
       void add_dimension(int dim);
 
@@ -68,13 +68,13 @@ class VarInfoNcMet : public VarInfo
          // do stuff
          //
 
-      bool is_precipitation()     const;
-      bool is_specific_humidity() const;
-      bool is_temperature()       const;
-      bool is_u_wind()            const;
-      bool is_v_wind()            const;
-      bool is_wind_speed()        const;
-      bool is_wind_direction()    const;
+      bool is_precipitation()     const override;
+      bool is_specific_humidity() const override;
+      bool is_temperature()       const override;
+      bool is_u_wind()            const override;
+      bool is_v_wind()            const override;
+      bool is_wind_speed()        const override;
+      bool is_wind_direction()    const override;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

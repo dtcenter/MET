@@ -69,19 +69,19 @@ class VarInfoGrib2 : public VarInfo
 
    public:
       VarInfoGrib2();
-      ~VarInfoGrib2();
+      ~VarInfoGrib2() override;
       VarInfoGrib2(const VarInfoGrib2 &);
       VarInfoGrib2 & operator=(const VarInfoGrib2 &);
-      VarInfo *clone() const;
+      VarInfo *clone() const override;
 
-      void dump(std::ostream &) const;
+      void dump(std::ostream &) const override;
       void clear();
 
          //
          // get stuff
          //
 
-      GrdFileType file_type()   const;
+      GrdFileType file_type()   const override;
       int         record()      const;
       int         discipline()  const;
       int         m_table()     const;
@@ -108,7 +108,7 @@ class VarInfoGrib2 : public VarInfo
          // set stuff
          //
 
-      void set_dict(Dictionary &);
+      void set_dict(Dictionary &) override;
 
       void set_record(int);
       void set_discipline(int);
@@ -133,13 +133,13 @@ class VarInfoGrib2 : public VarInfo
          // do stuff
          //
 
-      bool is_precipitation()     const;
-      bool is_specific_humidity() const;
-      bool is_temperature()       const;
-      bool is_u_wind()            const;
-      bool is_v_wind()            const;
-      bool is_wind_speed()        const;
-      bool is_wind_direction()    const;
+      bool is_precipitation()     const override;
+      bool is_specific_humidity() const override;
+      bool is_temperature()       const override;
+      bool is_u_wind()            const override;
+      bool is_v_wind()            const override;
+      bool is_wind_speed()        const override;
+      bool is_wind_direction()    const override;
 
       static LevelType g2_lty_to_level_type(int lt);
       static double    g2_time_range_unit_to_sec(int ind);
