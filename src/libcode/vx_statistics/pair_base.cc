@@ -2174,19 +2174,19 @@ void VxPairBase::correct_topo(const FieldType &field, const double lr,
    double corr_v;
    if(field == FieldType::Fcst) {
       orig_v = fcst_v;
-      corr_v = (fcst_elv - obs_elv) * lr + fcst_v;
+      corr_v = fcst_v + (fcst_elv - obs_elv) * lr;
       fcst_v = corr_v;
    }
    else {
       orig_v = obs_v;
-      corr_v = (obs_elv - fcst_elv) * lr + obs_v;
+      corr_v = obs_v + (obs_elv - fcst_elv) * lr;
       obs_v = corr_v;
    }
 
    // Log the orographic correction
    if(mlog.verbosity_level() >= 4) {
       mlog << Debug(4) << "Applying lapse rate (" << lr
-           << " to correct the " << fieldtype_to_string(field)
+           << ") to correct the " << fieldtype_to_string(field)
            << " value from " << orig_v << " to " << corr_v 
            << " for forecast (" << fcst_elv << ") minus observation ("
            << obs_elv << ") topography difference of "
