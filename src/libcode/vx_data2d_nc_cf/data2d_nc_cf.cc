@@ -816,7 +816,7 @@ long MetNcCFDataFile::convert_generic_to_offset(double value, const string &dim_
    long offset = bad_data_int;
 
    // search for the value in the array of values
-   int dim_size = static_cast<int>(values.size());
+   auto dim_size = static_cast<int>(values.size());
    for (int idx=0; idx<dim_size; idx++) {
       if (is_eq(values[idx], value)) {
          offset = idx;

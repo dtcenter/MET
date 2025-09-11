@@ -1088,7 +1088,7 @@ bool NcCfFile::getData(NcVar * v, const LongArray & a, DataPlane & plane) const
 
 ////////////////////////////////////////////////////////////////////////
 
-void NcCfFile::set_vlevels(NcVarInfo* var)
+void NcCfFile::set_vlevels(NcVarInfo* var) const
 {
   // get vertical levels for this variable if needed
 
