@@ -516,8 +516,12 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
             else {
                auto next_time = time_lower + time_inc;
                if (found_lower) time_offsets.add(first_idx);
-               for (int idx=next_offset; idx<time_dim_size; idx++) {
-                  if (_file->ValidTime[idx] > time_upper) break;
+               bool should_break = false;
+               for (int idx=next_offset; idx<time_dim_size && !should_break; idx++) {
+                  if (_file->ValidTime[idx] > time_upper) {
+                    should_break = true;
+                    continue;
+                  }
                   if (_file->ValidTime[idx] < next_time) continue;
                   if (_file->ValidTime[idx] == next_time) {
                      time_offsets.add(idx);
@@ -537,7 +541,9 @@ LongArray MetNcCFDataFile::collect_time_offsets(VarInfo &vinfo) {
                         next_time += time_inc;
                      }
                   }
-                  if (next_time > time_upper) break;
+                  if (next_time > time_upper) {
+                    should_break = true;
+                  }
                }
             }
          }
