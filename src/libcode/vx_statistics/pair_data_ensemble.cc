@@ -1340,10 +1340,8 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
    // Set flag for specific humidity
    bool spfh_flag = fcst_info->is_specific_humidity() &&
                     obs_info->is_specific_humidity();
-   bool temp_flag = true;   
-// TODO: Add support for this
-// bool temp_flag  = fcst_info->is_temperature() &&
-//                   obs_info->is_temperature();
+   bool temp_flag = fcst_info->is_temperature() &&
+                     obs_info->is_temperature();
 
    // Loop through all the PairDataEnsemble objects and interpolate
    for(auto it = pd.begin(); it != pd.end(); it++) {

@@ -564,10 +564,8 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Set flags
    bool spfh_flag   = fcst_info->is_specific_humidity() &&
                       obs_info->is_specific_humidity();
-   bool temp_flag   = true;
-// TODO: Add support for this
-//   bool temp_flag = fcst_info->is_temperature() &&
-//                    obs_info->is_temperature();
+   bool temp_flag   = fcst_info->is_temperature() &&
+                      obs_info->is_temperature();
    bool precip_flag = fcst_info->is_precipitation() &&
                       obs_info->is_precipitation();
    int precip_interval = fcst_dpa[0].accum();
