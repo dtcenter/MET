@@ -2078,8 +2078,8 @@ bool VxPairBase::is_keeper_fcst(
         const char *pnt_obs_str,
         int i_msg_typ, int i_mask, int i_interp,
         const char *hdr_typ_str, const Grid &gr,
-        double obs_x, double obs_y, double obs_v,
-        double hdr_elv, double obs_lvl, double obs_hgt,
+        double obs_x, double obs_y, double hdr_elv,
+        double obs_v, double obs_lvl, double obs_hgt,
         const ClimoPntInfo &cpi, double &fcst_v) {
    bool keep = true;
 
