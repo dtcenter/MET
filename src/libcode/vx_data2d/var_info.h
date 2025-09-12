@@ -75,7 +75,6 @@ class VarInfo
 
       int           SetAttrIsPrecipitation;
       int           SetAttrIsSpecificHumidity;
-      int           SetAttrIsTemperature;
       int           SetAttrIsUWind;
       int           SetAttrIsVWind;
       int           SetAttrIsGridRelative;

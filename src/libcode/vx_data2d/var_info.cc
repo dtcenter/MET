@@ -133,7 +133,6 @@ void VarInfo::assign(const VarInfo &v) {
 
    SetAttrIsPrecipitation = v.SetAttrIsPrecipitation;
    SetAttrIsSpecificHumidity = v.SetAttrIsSpecificHumidity;
-   SetAttrIsTemperature = v.SetAttrIsTemperature;
    SetAttrIsUWind = v.SetAttrIsUWind;
    SetAttrIsVWind = v.SetAttrIsVWind;
    SetAttrIsGridRelative = v.SetAttrIsGridRelative;
@@ -195,7 +194,6 @@ void VarInfo::clear() {
 
    SetAttrIsPrecipitation = bad_data_int;
    SetAttrIsSpecificHumidity = bad_data_int;
-   SetAttrIsTemperature = bad_data_int;
    SetAttrIsUWind = bad_data_int;
    SetAttrIsVWind = bad_data_int;
    SetAttrIsGridRelative = bad_data_int;
@@ -573,8 +571,6 @@ void VarInfo::set_dict(Dictionary &dict) {
       parse_set_attr_flag(dict, conf_key_is_precipitation);
    SetAttrIsSpecificHumidity =
       parse_set_attr_flag(dict, conf_key_is_specific_humidity);
-   SetAttrIsTemperature =
-      parse_set_attr_flag(dict, conf_key_is_temperature);
    SetAttrIsUWind =
       parse_set_attr_flag(dict, conf_key_is_u_wind);
    SetAttrIsVWind =

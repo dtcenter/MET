@@ -720,7 +720,6 @@ static const char conf_key_set_attr_lead[]        = "set_attr_lead";
 static const char conf_key_set_attr_accum[]       = "set_attr_accum";
 static const char conf_key_is_precipitation[]     = "is_precipitation";
 static const char conf_key_is_specific_humidity[] = "is_specific_humidity";
-static const char conf_key_is_temperature[]       = "is_temperature";
 static const char conf_key_is_u_wind[]            = "is_u_wind";
 static const char conf_key_is_v_wind[]            = "is_v_wind";
 static const char conf_key_is_grid_relative[]     = "is_grid_relative";
@@ -751,18 +750,27 @@ static const char conf_key_day_interval[]       = "day_interval";
 static const char conf_key_hour_interval[]      = "hour_interval";
 
 //
+// Topography parameter key names 
+//
+
+static const char conf_key_land_mask[]                    = "land_mask";
+static const char conf_key_land_mask_flag[]               = "land_mask.flag";
+static const char conf_key_topo_mask[]                    = "topo_mask";
+static const char conf_key_topo_mask_flag[]               = "topo_mask.flag";
+static const char conf_key_topo_mask_use_obs_thresh[]     = "topo_mask.use_obs_thresh";
+static const char conf_key_topo_mask_interp_fcst_thresh[] = "topo_mask.interp_fcst_thresh";
+static const char conf_key_lapse_rate_correction_apply_to = "lapse_rate_correction.apply_to"; 
+static const char conf_key_lapse_rate_correction_value    = "lapse_rate_correction.value"; 
+static const char conf_key_msl_agl_conversion_apply_to    = "msl_agl_conversion.apply_to";
+static const char conf_key_msl_agl_conversion_apply_from  = "msl_agl_conversion.apply_from";
+static const char conf_key_msl_agl_conversion_thresh      = "msl_agl_conversion.thresh";
+static const char conf_key_msl_agl_conversion_msl_to_agl  = "msl_agl_conversion.msl_to_agl";
+
+//
 // Point-Stat specific parameter key names
 //
 
 static const char conf_key_hira[]               = "hira";
-static const char conf_key_land_mask[]          = "land_mask";
-static const char conf_key_land_mask_flag[]     = "land_mask.flag";
-static const char conf_key_topo_mask[]          = "topo_mask";
-static const char conf_key_topo_mask_flag[]     = "topo_mask.flag";
-static const char conf_key_use_obs_thresh[]     = "use_obs_thresh";
-static const char conf_key_interp_fcst_thresh[] = "interp_fcst_thresh";
-static const char conf_key_apply_correction[]   = "apply_correction";
-static const char conf_key_lapse_rate[]         = "lapse_rate";
 static const char conf_key_point_weight_flag[]  = "point_weight_flag";
 
 //
