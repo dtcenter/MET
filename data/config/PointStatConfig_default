@@ -166,7 +166,7 @@ climo_cdf = {
 // Land/Sea mask
 // For LANDSF message types, only use forecast grid points where land = TRUE.
 // For WATERSF message types, only use forecast grid points where land = FALSE.
-// land_mask.flag may be set separately in each "obs.field" entry.
+// "land_mask.flag" may be set separately in each "obs.field" entry.
 //
 land_mask = {
    flag      = FALSE;
@@ -178,15 +178,14 @@ land_mask = {
 
 //
 // Topography
-// For SURFACE message types, only use observations where the topo - station
-// elevation difference meets the use_obs_thresh threshold.
-// For the observations kept, when interpolating forecast data to the
-// observation location, only use forecast grid points where the topo - station
-// difference meets the interp_fcst_thresh threshold.
-// For surface temperature, the apply_correction setting applies the specified
-// orographic correction to the forecast value (FCST), observation value (OBS),
-// or neither (NONE).
-// topo_mask.flag may be set separately in each "obs.field" entry.
+//   For SURFACE message types, only use observations where the topo - station
+//   elevation difference meets the "use_obs_thresh" threshold.
+//   For the observations kept, when interpolating forecast data to the
+//   observation location, only use forecast grid points where topo - station
+//   meets the "interp_fcst_thresh" threshold.
+//   "topo_mask.flag", "topo_mask.use_obs_thresh", and
+//   "topo_mask.interp_fcst_thresh" may be set separately in each "obs.field"
+//   entry.
 //
 topo_mask = {
    flag               = FALSE;
@@ -195,8 +194,40 @@ topo_mask = {
    regrid             = { method = BILIN; width = 2; }
    use_obs_thresh     = ge-100&&le100;
    interp_fcst_thresh = ge-50&&le50;
-   apply_correction   = NONE;
-   lapse_rate         = DRY_LAPSE_RATE_K_per_M;
+}
+
+//
+// Lapse Rate Correction
+//   For SURFACE message types of temperature, use the topo - station elevation
+//   difference to apply a standard lapse rate correction "value".
+//   Set "apply_to" to apply the correction to the forecast (FCST), observation
+//   (OBS), or neither (NONE).
+//   May be set separately in each "obs.field" entry
+//
+lapse_rate_correction = {
+  apply_to = NONE;   // Can be NONE, FCST, or OBS, but not BOTH
+  value    = DRY_LAPSE_RATE_K_per_M; // Numeric
+}
+
+//
+// MSL AGL Conversion
+//   For SURFACE message types of height, use the topo or station elevation to 
+//   convert between mean sea level (MSL) and above ground level (AGL) heights.
+//   Set "apply_to" to convert the forecast (FCST), observation (OBS), neither
+//   (NONE), or both (BOTH) value(s).
+//   Set "apply_from" to use the topo (FCST), station elevation (OBS), or both
+//   (BOTH) as the height conversion source.
+/    If "apply_to = apply_from = BOTH", the topo corrects the forecast and
+//   station elevation corrects the observation.
+//   Only convert values that meet the "thresh" filtering threshold.
+//   Set "msl_to_agl" to "TRUE" or "FALSE" to add or subtract the correction.
+//   May be set separately in each "obs.field" entry
+//
+msl_agl_conversion = {
+  apply_to   = NONE; // Can be NONE, FCST, OBS, or BOTH
+  apply_from = OBS;  // Can be FCST, OBS, or BOTH (error out if NONE, error out if apply_from == BOTH && apply_to != BOTH)
+  thresh     = NA;   // NA to apply to all values or ne99999 to define a range
+  msl_to_agl = TRUE; // TRUE: MSL to AGL, FALSE: AGL to MSL
 }
 
 ////////////////////////////////////////////////////////////////////////////////
