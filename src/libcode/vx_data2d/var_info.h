@@ -204,7 +204,6 @@ class VarInfo
 
       virtual bool is_precipitation()     const;
       virtual bool is_specific_humidity() const;
-      virtual bool is_temperature()       const;
       virtual bool is_u_wind()            const;
       virtual bool is_v_wind()            const;
       virtual bool is_wind_speed()        const;

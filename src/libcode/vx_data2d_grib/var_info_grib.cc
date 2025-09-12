@@ -397,32 +397,6 @@ bool VarInfoGrib::is_specific_humidity() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfoGrib::is_temperature() const {
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsTemperature)) {
-      return(SetAttrIsTemperature != 0);
-   }
-
-   //
-   // The ReqName member contains the requested GRIB code abbreviation.
-   // Check to see if it matches the GRIB temperature abbreviations.
-   //
-   bool status = false;
-   for(int i=0; i<n_grib_temperature_abbr; i++) {
-      if(ReqName == grib_temperature_abbr[i]) {
-         status = true;
-         break;
-      }
-   }
-
-   return status;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 bool VarInfoGrib::is_u_wind() const {
 
    //

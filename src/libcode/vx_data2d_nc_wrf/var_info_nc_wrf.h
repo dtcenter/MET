@@ -93,33 +93,6 @@ static const int n_pinterp_specific_humidity_names =
 ///////////////////////////////////////////////////////////////////////////////
 
 //
-// List of Pinterp temperature variable names
-// Taken from the WRF version 3.2 Registry.EM file
-//
-
-static const char *pinterp_temperature_names[] = {
-   "TEMPERATURE",   // Sensible Temperature, K
-   "potential_t",   // Potential Temperature, K
-   "TT",            // Temperature
-   "SKINTEMP",      // Skin Temperature
-   "T2",            // 2M Temperature
-   "T_PL",          // Temperature on pressure levels
-   "T_ZL",          // Temperature on height levels
-   "TD_PL",         // Dew point temperature on pressure levels
-   "TD_ZL"          // Dew point temperature on height levels
-};
-
-//
-// Number of Pinterp specific humidity variable names
-//
-
-static const int n_pinterp_temperature_names =
-                     sizeof(pinterp_temperature_names)/
-                    sizeof(*pinterp_temperature_names);
-
-///////////////////////////////////////////////////////////////////////////////
-
-//
 // List of U-component of wind variable names
 // Taken from the WRF version 3.2 Registry.EM file
 //
@@ -265,7 +238,6 @@ class VarInfoNcWrf : public VarInfo
 
       bool is_precipitation()     const override;
       bool is_specific_humidity() const override;
-      bool is_temperature()       const override;
       bool is_u_wind()            const override;
       bool is_v_wind()            const override;
       bool is_wind_speed()        const override;

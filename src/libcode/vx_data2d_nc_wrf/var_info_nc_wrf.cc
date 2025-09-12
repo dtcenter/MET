@@ -338,26 +338,6 @@ bool VarInfoNcWrf::is_specific_humidity() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfoNcWrf::is_temperature() const {
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsTemperature)) {
-      return(SetAttrIsTemperature != 0);
-   }
-
-   //
-   // Check to see if the VarInfo name matches any of expected Pinterp
-   // temperature variables.
-   //
-   return has_prefix(pinterp_temperature_names,
-                     n_pinterp_temperature_names,
-                     Name.c_str());
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 bool VarInfoNcWrf::is_u_wind() const {
 
    //

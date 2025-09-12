@@ -807,21 +807,6 @@ bool VarInfo::is_specific_humidity() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfo::is_temperature() const {
-   bool status = false;
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsTemperature)) {
-      status = (SetAttrIsTemperature != 0);
-   }
-
-   return status;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 bool VarInfo::is_u_wind() const {
    bool status = false;
 

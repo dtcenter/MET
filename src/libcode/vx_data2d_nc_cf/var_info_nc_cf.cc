@@ -418,26 +418,6 @@ bool VarInfoNcCF::is_specific_humidity() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfoNcCF::is_temperature() const {
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsTemperature)) {
-      return(SetAttrIsTemperature != 0);
-   }
-
-   //
-   // Check to see if the VarInfo name begins with the GRIB code abbreviation
-   // for any temperature variables.
-   //
-   return has_prefix(grib_temperature_abbr,
-                     n_grib_temperature_abbr,
-                     Name.c_str());
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 bool VarInfoNcCF::is_u_wind() const {
 
    //

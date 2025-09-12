@@ -514,34 +514,6 @@ bool VarInfoGrib2::is_specific_humidity() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfoGrib2::is_temperature() const {
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsTemperature)) {
-      return(SetAttrIsTemperature != 0);
-   }
-
-   //
-   // Reference:
-   //   https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-2-0-0.shtml
-   //
-   return Discipline == 0 &&
-          ParmCat    == 0 &&
-          (Parm      == 0 || // TMP
-           Parm      == 1 || // VTMP
-           Parm      == 2 || // POT
-           Parm      == 3 || // EPOT
-           Parm      == 4 || // TMAX
-           Parm      == 5 || // TMIN
-           Parm      == 6 || // DPT
-           Parm      == 7    // DEPR
-          );
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 bool VarInfoGrib2::is_u_wind() const {
 
    //
