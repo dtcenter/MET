@@ -44,16 +44,37 @@ static const int dw_mean_pow = 2;
 //
 
 struct SurfaceInfo {
-   MaskPlane   * land_ptr;     // Pointer to land/sea mask (not allocated)
-   DataPlane   * topo_ptr;     // Pointer to model topography (not allocated)
-   SingleThresh  topo_use_obs_thresh;
-   SingleThresh  topo_interp_fcst_thresh;
-   FieldType     topo_apply_correction;
-   double        topo_lapse_rate;
+
+   // Pointer to land/sea mask (not allocated)
+   bool          land_flag;
+   MaskPlane *   land_ptr;
+
+   // Pointer to model topography (not allocated)
+   bool          topo_flag;
+   DataPlane *   topo_ptr;
+
+   // Filter observations based on topography difference
+   SingleThresh  topo_mask_use_obs_thresh;
+
+   // Filter model points based on topography difference
+   SingleThresh  topo_mask_interp_fcst_thresh;
+
+   // Lapse rate correction options for surface temperatures
+   FieldType     lapse_rate_correction_apply_to;
+   double        lapse_rate_correction_value;
+
+   // MSL/AGL conversion options for heights
+   FieldType     msl_agl_conversion_apply_to;
+   FieldType     msl_agl_conversion_apply_from;
+   SingleThresh  msl_agl_conversion_thresh;
+   bool          msl_agl_conversion_msl_to_agl;
 
    SurfaceInfo();
 
    void clear();
+
+   bool need_land() const;
+   bool need_topo() const;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

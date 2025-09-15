@@ -1340,8 +1340,6 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
    // Set flag for specific humidity
    bool spfh_flag = fcst_info->is_specific_humidity() &&
                     obs_info->is_specific_humidity();
-   bool temp_flag = fcst_info->is_temperature() &&
-                     obs_info->is_temperature();
 
    // Loop through all the PairDataEnsemble objects and interpolate
    for(auto it = pd.begin(); it != pd.end(); it++) {
@@ -1415,12 +1413,11 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
 
             // MET #3174 Apply orographic correction to surface temperature
             if(sfc_info.topo_ptr &&
-               sfc_info.topo_apply_correction != FieldType::None &&
-               temp_flag &&
+               sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
                msg_typ_sfc.reg_exp_match(it->typ_sa[i_obs].c_str())) {
 
                // Only correct the observations once
-               if(sfc_info.topo_apply_correction == FieldType::Obs &&
+               if(sfc_info.lapse_rate_correction_apply_to == FieldType::Obs &&
                   member != 0) break;
 
                // Interpolate model topography to observation location
@@ -1431,12 +1428,12 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                                     gr.wrap_lon(), 1.0);
 
                double obs_v = it->o_na[i_obs];
-               correct_topo(sfc_info.topo_apply_correction,
-                            sfc_info.topo_lapse_rate,
+               correct_topo(sfc_info.lapse_rate_correction_apply_to,
+                            sfc_info.lapse_rate_correction_value,
                             topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
 
                // Store the corrected observation value
-               if(sfc_info.topo_apply_correction == FieldType::Obs) {
+               if(sfc_info.lapse_rate_correction_apply_to == FieldType::Obs) {
                   it->o_na.set(i_obs, obs_v);
                }
             }

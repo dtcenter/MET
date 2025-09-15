@@ -1820,7 +1820,7 @@ bool VxPairBase::is_keeper_topo(
       }
 
       // Check the topography difference threshold
-      else if(!sfc_info.topo_use_obs_thresh.check(topo_elv - hdr_elv)) {
+      else if(!sfc_info.topo_mask_use_obs_thresh.check(topo_elv - hdr_elv)) {
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
@@ -1829,7 +1829,7 @@ bool VxPairBase::is_keeper_topo(
                  << "due to topography difference where observation elevation ("
                  << hdr_elv << ") minus model topography (" << topo_elv << ") = "
                  << topo_elv - hdr_elv << " is not "
-                 << sfc_info.topo_use_obs_thresh.get_str() << ":\n"
+                 << sfc_info.topo_mask_use_obs_thresh.get_str() << ":\n"
                  << pnt_obs_str << "\n";
          }
 

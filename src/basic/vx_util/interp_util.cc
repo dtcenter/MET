@@ -34,18 +34,39 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 void SurfaceInfo::clear() {
+   land_flag = false;
    land_ptr = (MaskPlane *) nullptr;
+   topo_flag = false;
    topo_ptr = (DataPlane *) nullptr;
-   topo_use_obs_thresh.clear();
-   topo_interp_fcst_thresh.clear();
-   topo_apply_correction = FieldType::None;
-   topo_lapse_rate = bad_data_double;
+   topo_mask_use_obs_thresh.clear();
+   topo_mask_interp_fcst_thresh.clear();
+   lapse_rate_correction_apply_to = FieldType::None;
+   lapse_rate_correction_value = bad_data_double;
+   msl_agl_conversion_apply_to = FieldType::None;
+   msl_agl_conversion_apply_from = FieldType::None;
+   msl_agl_conversion_thresh.clear();
+   msl_agl_conversion_msl_to_agl = false;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 SurfaceInfo::SurfaceInfo() {
    clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool SurfaceInfo::need_land() const {
+   return land_flag == true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool SurfaceInfo::need_topo() const {
+   return topo_flag == true ||
+          lapse_rate_correction_apply_to != FieldType::None ||
+          (msl_agl_conversion_apply_to   != FieldType::None &&
+           msl_agl_conversion_apply_from != FieldType::Obs);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1033,7 +1054,7 @@ MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
       // Check the topo mask
       if(sfc_info.topo_ptr) {
          double topo_grid = sfc_info.topo_ptr->get(gp->x, gp->y);
-         topo_ok = sfc_info.topo_interp_fcst_thresh.check(topo_grid - obs_elv);
+         topo_ok = sfc_info.topo_mask_interp_fcst_thresh.check(topo_grid - obs_elv);
       }
       else {
          topo_ok = true;
