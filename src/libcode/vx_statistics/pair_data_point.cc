@@ -614,14 +614,19 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                                obs_v, obs_lvl, obs_hgt,
                                cpi, fcst_v)) continue;
 
-            // MET #3174 Apply orographic correction to surface temperature
+            // MET #3174 Apply lapse rate correction to surface temperature
             if(sfc_info.topo_ptr &&
-               sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
-               msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
-               correct_topo(sfc_info.lapse_rate_correction_apply_to,
-                            sfc_info.lapse_rate_correction_value,
-                            topo_elv, hdr_elv, fcst_v, obs_v);
-            } 
+               msg_typ_sfc.reg_exp_match(hdr_typ_str) &&
+               sfc_info.lapse_rate_correction_apply_to != FieldType::None) {
+               correct_lapse_rate(topo_elv, hdr_elv, fcst_v, obs_v);
+            }
+
+            // MET #3174 Apply MSL/AGL conversion to heights
+            if(sfc_info.topo_ptr &&
+               msg_typ_sfc.reg_exp_match(hdr_typ_str) &&
+               sfc_info.msl_agl_conversion_apply_to != FieldType::None) { 
+               convert_msl_agl(topo_elv, hdr_elv, fcst_v, obs_v);
+            }
 
             // Check matched pair filtering options
             ConcatString reason_cs;

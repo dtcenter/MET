@@ -1411,7 +1411,9 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                                fcst_info->level().type(),
                                to_lvl, lvl_blw, lvl_abv);
 
-            // MET #3174 Apply orographic correction to surface temperature
+// JHG, add msl/agl logic
+
+            // MET #3174 Apply lapse rate correction to surface temperature
             if(sfc_info.topo_ptr &&
                sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
                msg_typ_sfc.reg_exp_match(it->typ_sa[i_obs].c_str())) {
@@ -1428,9 +1430,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                                     gr.wrap_lon(), 1.0);
 
                double obs_v = it->o_na[i_obs];
-               correct_topo(sfc_info.lapse_rate_correction_apply_to,
-                            sfc_info.lapse_rate_correction_value,
-                            topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
+               correct_lapse_rate(topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
 
                // Store the corrected observation value
                if(sfc_info.lapse_rate_correction_apply_to == FieldType::Obs) {

@@ -396,8 +396,6 @@ class VxPairBase {
       void set_msg_typ_lnd(const StringArray &);
       void set_msg_typ_wtr(const StringArray &);
 
-      void set_sfc_info(const SurfaceInfo &);
-
       int  get_n_pair() const;
 
       void set_duplicate_flag(DuplicateType duplicate_flag);
@@ -433,8 +431,9 @@ class VxPairBase {
                           double, double, double,
                           const ClimoPntInfo &, double &);
 
-      void correct_topo(const FieldType &, const double,
-                        double, double, double &, double &);
+      void correct_lapse_rate(double, double, double &, double &);
+
+      void convert_msl_agl(double, double, double &, double &);
 
       // Retrieve climo data for this point 
       ClimoPntInfo get_climo_pnt_info(int, const Grid &gr, double, double,

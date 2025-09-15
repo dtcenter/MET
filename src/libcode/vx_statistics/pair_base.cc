@@ -1502,15 +1502,6 @@ void VxPairBase::set_msg_typ_wtr(const StringArray &sa) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::set_sfc_info(const SurfaceInfo &si) {
-
-   sfc_info = si;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 int VxPairBase::get_n_pair() const {
 
    if(n_vx == 0) {
@@ -2151,46 +2142,125 @@ bool VxPairBase::is_keeper_fcst(
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::correct_topo(const FieldType &field, const double lr,
-                              double fcst_elv, double obs_elv,
-                              double &fcst_v, double &obs_v) {
-   const char *method_name = "PairBase::correct_topo() -> ";
+void VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
+                                    double &fcst_v, double &obs_v) {
+   const char *method_name = "PairBase::correct_lapse_rate() -> ";
 
    // Check for no work to be done
-   if(field != FieldType::Fcst && field != FieldType::Obs) return;
+   if(sfc_info.lapse_rate_correction_apply_to != FieldType::Fcst &&
+      sfc_info.lapse_rate_correction_apply_to != FieldType::Obs) return;
 
    // Check for valid data
    if(is_bad_data(fcst_elv) || is_bad_data(obs_elv) ||
-      is_bad_data(fcst_v)   || is_bad_data(obs_v)) {
+      is_bad_data(fcst_v) || is_bad_data(obs_v) ||
+      is_bad_data(sfc_info.lapse_rate_correction_value)) { 
       mlog << Warning << "\n" << method_name
-           << "skipping orographic correction due to bad "
+           << "skipping lapse rate correction due to bad "
            << "(fcst, obs) elevation (" << fcst_elv << ", "
-           << obs_elv << ") or data (" << fcst_v << ", "
-           << obs_v << ") values.\n\n";
+           << obs_elv << "), data (" << fcst_v << ", "
+           << obs_v << "), or lapse rate ("
+           << sfc_info.lapse_rate_correction_value << ") values.\n\n";
    }
 
    // Apply correction
    double orig_v;
    double corr_v;
-   if(field == FieldType::Fcst) {
+   if(sfc_info.lapse_rate_correction_apply_to == FieldType::Fcst) {
       orig_v = fcst_v;
-      corr_v = fcst_v + (fcst_elv - obs_elv) * lr;
+      corr_v = fcst_v + (fcst_elv - obs_elv) * sfc_info.lapse_rate_correction_value;
       fcst_v = corr_v;
    }
    else {
       orig_v = obs_v;
-      corr_v = obs_v + (obs_elv - fcst_elv) * lr;
+      corr_v = obs_v + (obs_elv - fcst_elv) * sfc_info.lapse_rate_correction_value;
       obs_v = corr_v;
    }
 
-   // Log the orographic correction
+   // Log the lapse rate correction
    if(mlog.verbosity_level() >= 4) {
-      mlog << Debug(4) << "Applying lapse rate (" << lr
-           << ") to correct the " << fieldtype_to_string(field)
+      mlog << Debug(4) << "Applying lapse rate (" << sfc_info.lapse_rate_correction_value 
+           << ") to correct the " << fieldtype_to_string(sfc_info.lapse_rate_correction_apply_to)
            << " value from " << orig_v << " to " << corr_v 
            << " for forecast (" << fcst_elv << ") minus observation ("
            << obs_elv << ") topography difference of "
            << fcst_elv - obs_elv << ".\n";
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
+                                 double &fcst_v, double &obs_v) {
+   const char *method_name = "PairBase::convert_msl_agl() -> ";
+
+   // Check for no work to be done
+   if(sfc_info.msl_agl_conversion_apply_to   == FieldType::None || 
+      sfc_info.msl_agl_conversion_apply_from == FieldType::None) return;
+
+   // Apply forecast conversion
+   double orig_f = fcst_v;
+   double corr_f = 0.0;
+   if(sfc_info.msl_agl_conversion_apply_to == FieldType::Fcst ||
+      sfc_info.msl_agl_conversion_apply_to == FieldType::Both) {
+      if(sfc_info.msl_agl_conversion_apply_from == FieldType::Fcst ||
+         sfc_info.msl_agl_conversion_apply_from == FieldType::Both) {
+         corr_f = fcst_elv;
+      }
+      else {
+         corr_f = obs_elv;
+      }
+   }
+
+   // Apply observation conversion
+   double orig_o = obs_v;
+   double corr_o = 0.0;
+   if(sfc_info.msl_agl_conversion_apply_to == FieldType::Obs ||
+      sfc_info.msl_agl_conversion_apply_to == FieldType::Both) {
+      if(sfc_info.msl_agl_conversion_apply_from == FieldType::Obs ||
+         sfc_info.msl_agl_conversion_apply_from == FieldType::Both) {
+         corr_o = obs_elv;
+      }
+      else {
+         corr_o = fcst_elv;
+      }
+   }
+
+   // Check for valid data
+   if(is_bad_data(fcst_v) || is_bad_data(obs_v) ||
+      is_bad_data(corr_f) || is_bad_data(corr_o)) {
+      mlog << Warning << "\n" << method_name
+           << "skipping msl/agl conversion due to bad "
+           << "(fcst, obs) elevation (" << fcst_elv << ", "
+           << obs_elv << ") or data (" << fcst_v << ", "
+           << obs_v << ") values.\n\n";
+   }
+
+   // MSL to AGL
+   if(sfc_info.msl_agl_conversion_msl_to_agl) {
+      fcst_v -= corr_f;
+      obs_v  -= corr_o;
+   }
+   // AGL to MSL
+   else {
+      fcst_v += corr_f;
+      obs_v  += corr_o;
+   }
+
+   // Log the MSL/AGL conversion
+   if(mlog.verbosity_level() >= 4) {
+      mlog << Debug(4) << "Converting "
+           << (sfc_info.msl_agl_conversion_msl_to_agl ?
+               "MSL to AGL" : "AGL to MSL")
+           << " using "
+           << fieldtype_to_string(sfc_info.msl_agl_conversion_apply_from)
+           << " elevation to correct "
+           << fieldtype_to_string(sfc_info.msl_agl_conversion_apply_to)
+           << " height values from (fcst, obs) (" << orig_f << ", "
+           << orig_o << ") to (" << fcst_v << ", " << obs_v
+           << ") for (fcst, obs) elevations (" << fcst_elv
+           << ", " << obs_elv << ").\n";
    }
 
    return;
