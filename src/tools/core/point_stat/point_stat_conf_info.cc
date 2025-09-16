@@ -853,9 +853,9 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
                           v.vx_pd.obs_info->req_level_name()) ||
       !(beg_ds         == v.beg_ds        ) ||
       !(end_ds         == v.end_ds        ) ||
-      !(  vx_pd.sfc_info.land_flag !=
+      !(  vx_pd.sfc_info.land_flag ==
         v.vx_pd.sfc_info.land_flag        ) ||
-      !(  vx_pd.sfc_info.topo_flag !=
+      !(  vx_pd.sfc_info.topo_flag ==
         v.vx_pd.sfc_info.topo_flag        ) ||
       !(mask_grid      == v.mask_grid     ) ||
       !(mask_poly      == v.mask_poly     ) ||
