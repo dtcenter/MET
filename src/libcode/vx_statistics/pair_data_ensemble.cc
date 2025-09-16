@@ -1411,16 +1411,16 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                                fcst_info->level().type(),
                                to_lvl, lvl_blw, lvl_abv);
 
-// JHG, add msl/agl logic
-
-            // MET #3174 Apply lapse rate correction to surface temperature
+            // Apply topography options
             if(sfc_info.topo_ptr &&
-               sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
-               msg_typ_sfc.reg_exp_match(it->typ_sa[i_obs].c_str())) {
+               msg_typ_sfc.reg_exp_match(it->typ_sa[i_obs].c_str()) &&
+               (sfc_info.lapse_rate_correction_apply_to != FieldType::None || 
+                sfc_info.msl_agl_conversion_apply_to != FieldType::None)) {
 
-               // Only correct the observations once
-               if(sfc_info.lapse_rate_correction_apply_to == FieldType::Obs &&
-                  member != 0) break;
+               // Only modify the observations once
+               if(member != 0 &&
+                  (sfc_info.lapse_rate_correction_apply_to == FieldType::Obs ||
+                   sfc_info.msl_agl_conversion_apply_to == FieldType::Obs)) break;
 
                // Interpolate model topography to observation location
                double topo_elv = compute_horz_interp(
@@ -1430,15 +1430,25 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                                     gr.wrap_lon(), 1.0);
 
                double obs_v = it->o_na[i_obs];
-               correct_lapse_rate(topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
 
-               // Store the corrected observation value
-               if(sfc_info.lapse_rate_correction_apply_to == FieldType::Obs) {
+               // MET #3174 Apply lapse rate temperature correction
+               if(sfc_info.lapse_rate_correction_apply_to != FieldType::None) {
+                  correct_lapse_rate(topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
+               }
+
+               // MET #3174 Apply MSL/AGL height conversion
+               if(sfc_info.msl_agl_conversion_apply_to != FieldType::None) {
+                  convert_msl_agl(topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
+               }
+
+               // Store the modified observation
+               if(sfc_info.lapse_rate_correction_apply_to == FieldType::Obs ||
+                  sfc_info.msl_agl_conversion_apply_to == FieldType::Obs) {
                   it->o_na.set(i_obs, obs_v);
                }
             }
 
-            // Store the result 
+            // Store the forecast value
             fcst_na.add(fcst_v);
          }
 

@@ -2178,12 +2178,13 @@ void VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
 
    // Log the lapse rate correction
    if(mlog.verbosity_level() >= 4) {
-      mlog << Debug(4) << "Applying lapse rate (" << sfc_info.lapse_rate_correction_value 
-           << ") to correct the " << fieldtype_to_string(sfc_info.lapse_rate_correction_apply_to)
-           << " value from " << orig_v << " to " << corr_v 
+      mlog << Debug(4) << "Correcting the "
+           << fieldtype_to_string(sfc_info.lapse_rate_correction_apply_to)
+           << " temperature from " << orig_v << " to " << corr_v 
            << " for forecast (" << fcst_elv << ") minus observation ("
-           << obs_elv << ") topography difference of "
-           << fcst_elv - obs_elv << ".\n";
+           << obs_elv << ") elevation difference of "
+           << fcst_elv - obs_elv << " and lapse rate "
+           << sfc_info.lapse_rate_correction_value << ".\n";
    }
 
    return;
@@ -2237,12 +2238,12 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
            << obs_v << ") values.\n\n";
    }
 
-   // MSL to AGL
+   // Convert MSL to AGL
    if(sfc_info.msl_agl_conversion_msl_to_agl) {
       fcst_v -= corr_f;
       obs_v  -= corr_o;
    }
-   // AGL to MSL
+   // Convert AGL to MSL
    else {
       fcst_v += corr_f;
       obs_v  += corr_o;
@@ -2255,9 +2256,9 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
                "MSL to AGL" : "AGL to MSL")
            << " using "
            << fieldtype_to_string(sfc_info.msl_agl_conversion_apply_from)
-           << " elevation to correct "
+           << " elevations to modify "
            << fieldtype_to_string(sfc_info.msl_agl_conversion_apply_to)
-           << " height values from (fcst, obs) (" << orig_f << ", "
+           << " heights from (fcst, obs) (" << orig_f << ", "
            << orig_o << ") to (" << fcst_v << ", " << obs_v
            << ") for (fcst, obs) elevations (" << fcst_elv
            << ", " << obs_elv << ").\n";
