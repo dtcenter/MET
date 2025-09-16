@@ -2178,12 +2178,13 @@ void VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
 
    // Log the lapse rate correction
    if(mlog.verbosity_level() >= 4) {
-      mlog << Debug(4) << "Correcting the "
+      mlog << Debug(4)
+           << "Correcting the "
            << fieldtype_to_string(sfc_info.lapse_rate_correction_apply_to)
            << " temperature from " << orig_v << " to " << corr_v 
            << " for forecast (" << fcst_elv << ") minus observation ("
            << obs_elv << ") elevation difference of "
-           << fcst_elv - obs_elv << " and lapse rate "
+           << fcst_elv - obs_elv << " and lapse rate value of "
            << sfc_info.lapse_rate_correction_value << ".\n";
    }
 
@@ -2203,8 +2204,9 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
    // Apply forecast conversion
    double orig_f = fcst_v;
    double corr_f = 0.0;
-   if(sfc_info.msl_agl_conversion_apply_to == FieldType::Fcst ||
-      sfc_info.msl_agl_conversion_apply_to == FieldType::Both) {
+   if(sfc_info.msl_agl_conversion.thresh.check(fcst_v) &&
+      (sfc_info.msl_agl_conversion_apply_to == FieldType::Fcst ||
+       sfc_info.msl_agl_conversion_apply_to == FieldType::Both)) {
       if(sfc_info.msl_agl_conversion_apply_from == FieldType::Fcst ||
          sfc_info.msl_agl_conversion_apply_from == FieldType::Both) {
          corr_f = fcst_elv;
@@ -2217,8 +2219,9 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
    // Apply observation conversion
    double orig_o = obs_v;
    double corr_o = 0.0;
-   if(sfc_info.msl_agl_conversion_apply_to == FieldType::Obs ||
-      sfc_info.msl_agl_conversion_apply_to == FieldType::Both) {
+   if(sfc_info.msl_agl_conversion.thresh.check(fcst_v) &&
+      (sfc_info.msl_agl_conversion_apply_to == FieldType::Obs ||
+       sfc_info.msl_agl_conversion_apply_to == FieldType::Both)) {
       if(sfc_info.msl_agl_conversion_apply_from == FieldType::Obs ||
          sfc_info.msl_agl_conversion_apply_from == FieldType::Both) {
          corr_o = obs_elv;
@@ -2251,7 +2254,8 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
 
    // Log the MSL/AGL conversion
    if(mlog.verbosity_level() >= 4) {
-      mlog << Debug(4) << "Converting "
+      mlog << Debug(4)
+           << "Converting "
            << (sfc_info.msl_agl_conversion_msl_to_agl ?
                "MSL to AGL" : "AGL to MSL")
            << " using "
@@ -2261,7 +2265,8 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
            << " heights from (fcst, obs) (" << orig_f << ", "
            << orig_o << ") to (" << fcst_v << ", " << obs_v
            << ") for (fcst, obs) elevations (" << fcst_elv
-           << ", " << obs_elv << ").\n";
+           << ", " << obs_elv << ") and filtering threshold "
+           << sfc_info.msl_agl_conversion_thresh.get_str() << ".\n";
    }
 
    return;
