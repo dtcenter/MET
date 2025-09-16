@@ -504,6 +504,9 @@ void PointStatConfInfo::process_geog(const Grid &grid,
    mlog << Debug(2)
         << "Processing geography data.\n";
 
+   StringArray input_files;
+   input_files.add(fcst_file);
+
    // Process the geography info for each verification task
    for(int i=0; i<n_vx; i++) {
 
@@ -513,7 +516,7 @@ void PointStatConfInfo::process_geog(const Grid &grid,
          // Read the land mask data, if needed
          if(land_mask.is_empty()) {
             Dictionary *dict = conf.lookup_dictionary(conf_key_land_mask);
-            DataPlane geog_dp(parse_geog_data(dict, grid, fcst_file));
+            DataPlane geog_dp(parse_geog_data(dict, grid, input_files));
             geog_dp.threshold(dict->lookup_thresh(conf_key_thresh));
             land_mask = geog_dp.mask_plane();
 
@@ -540,7 +543,7 @@ void PointStatConfInfo::process_geog(const Grid &grid,
          // Read the topo data, if needed
          if(topo_dp.is_empty()) {
             Dictionary *dict = conf.lookup_dictionary(conf_key_topo_mask);
-            topo_dp = parse_geog_data(dict, grid, fcst_file);
+            topo_dp = parse_geog_data(dict, grid, input_files);
 
             // Conf: message_type_group_map for SURFACE
             if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
@@ -1022,9 +1025,6 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
    }
 
    // Conf: land_mask, topo_mask, lapse_rate_correction, msl_agl_conversion
-   // Conf: land_mask, topo_mask, lapse_rate_correction, msl_agl_conversion
-   vx_pd.sfc_info = parse_conf_surface_info(&odict);
-
    vx_pd.sfc_info = parse_conf_surface_info(&odict);
 
    // Conf: mask_grid

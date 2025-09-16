@@ -2204,7 +2204,7 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
    // Apply forecast conversion
    double orig_f = fcst_v;
    double corr_f = 0.0;
-   if(sfc_info.msl_agl_conversion.thresh.check(fcst_v) &&
+   if(sfc_info.msl_agl_conversion_thresh.check(fcst_v) &&
       (sfc_info.msl_agl_conversion_apply_to == FieldType::Fcst ||
        sfc_info.msl_agl_conversion_apply_to == FieldType::Both)) {
       if(sfc_info.msl_agl_conversion_apply_from == FieldType::Fcst ||
@@ -2219,7 +2219,7 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
    // Apply observation conversion
    double orig_o = obs_v;
    double corr_o = 0.0;
-   if(sfc_info.msl_agl_conversion.thresh.check(fcst_v) &&
+   if(sfc_info.msl_agl_conversion_thresh.check(fcst_v) &&
       (sfc_info.msl_agl_conversion_apply_to == FieldType::Obs ||
        sfc_info.msl_agl_conversion_apply_to == FieldType::Both)) {
       if(sfc_info.msl_agl_conversion_apply_from == FieldType::Obs ||

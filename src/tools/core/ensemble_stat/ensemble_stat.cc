@@ -754,6 +754,9 @@ static void process_vx() {
    // Process masks Grids and Polylines in the config file
    conf_info.process_masks(grid);
 
+   // Process the geography data
+   conf_info.process_geog(grid, ens_file_list);
+
    // Determine the index of the control member in list of data values
    int ctrl_data_index = (is_bad_data(ctrl_file_index) ?
                           bad_data_int : ens_file_vld.sum()-1);

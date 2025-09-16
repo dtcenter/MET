@@ -582,14 +582,14 @@ void apply_poly_mask_latlon(const MaskPoly &poly, const Grid &grid, DataPlane &d
 ///////////////////////////////////////////////////////////////////////////////
 
 DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
-                          const char *fcst_file) {
-   DataPlane dp;
-   StringArray geog_files;
-   RegridInfo regrid_info;
-   GrdFileType ftype;
-   Dictionary *field_dict = (Dictionary *) nullptr;
-   bool found = false;
-   int i;
+                          const StringArray &input_files) {
+
+   // Check for null pointer
+   if(!dict) {
+      mlog << Error << "\nparse_geog_data() -> "
+           << "null pointer!\n\n";
+      exit(1);
+   }
 
    Met2dDataFileFactory mtddf_factory;
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
@@ -597,28 +597,25 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
    VarInfoFactory info_factory;
    VarInfo *info = (VarInfo *) nullptr;
 
-   if(!dict) {
-      mlog << Error << "\nparse_geog_data() -> "
-           << "null pointer!\n\n";
-         exit(1);
-   }
-
    // Parse the file names and append the forecast file
-   geog_files = dict->lookup_string_array(conf_key_file_name, false);
-   geog_files.add(fcst_file);
+   StringArray geog_files(dict->lookup_string_array(conf_key_file_name, false));
+   geog_files.add(input_files);
 
    // Parse the field
-   if(!(field_dict = dict->lookup_dictionary(conf_key_field))) {
+   Dictionary *field_dict = dict->lookup_dictionary(conf_key_field);
+   if(!field_dict) {
       mlog << Error << "\nparse_geog_data() -> "
            << "error parsing \"" << conf_key_field << "\" dictionary.\n\n";
-           exit(1);
+      exit(1);
    }
 
    // Check for specified file type
-   ftype = parse_conf_file_type(field_dict);
+   GrdFileType ftype = parse_conf_file_type(field_dict);
 
    // Search each input file for a match
-   for(i=0; !found && i<geog_files.n(); i++) {
+   bool found = false;
+   DataPlane dp;
+   for(int i=0; !found && i<geog_files.n(); i++) {
 
       // Allocate memory for data file
       if(!(mtddf = mtddf_factory.new_met_2d_data_file(geog_files[i].c_str(), ftype))) {
@@ -643,7 +640,7 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
 
          // Regrid, if needed
          if(!(mtddf->grid() == vx_grid)) {
-            regrid_info = parse_conf_regrid(dict);
+            RegridInfo regrid_info(parse_conf_regrid(dict));
             mlog << Debug(2)
                  << "Regridding geography mask data " << info->magic_str()
                  << " to the verification grid using "
