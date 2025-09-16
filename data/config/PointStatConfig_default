@@ -217,7 +217,7 @@ lapse_rate_correction = {
 //   (NONE), or both (BOTH) value(s).
 //   Set "apply_from" to use the topo (FCST), station elevation (OBS), or both
 //   (BOTH) as the height conversion source.
-/    If "apply_to = apply_from = BOTH", the topo corrects the forecast and
+//    If "apply_to = apply_from = BOTH", the topo corrects the forecast and
 //   station elevation corrects the observation.
 //   Only convert values that meet the "thresh" filtering threshold.
 //   Set "msl_to_agl" to "TRUE" or "FALSE" to add or subtract the correction.
