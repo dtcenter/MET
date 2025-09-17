@@ -2209,8 +2209,8 @@ void VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
    }
 
    // Log the lapse rate correction
-   if(mlog.verbosity_level() >= 4) {
-      mlog << Debug(4)
+   if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+      mlog << Debug(REJECT_DEBUG_LEVEL)
            << "Correcting the "
            << fieldtype_to_string(sfc_info.lapse_rate_correction_apply_to)
            << " temperature from " << orig_v << " to " << corr_v 
@@ -2285,8 +2285,8 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
    }
 
    // Log the MSL/AGL conversion
-   if(mlog.verbosity_level() >= 4) {
-      mlog << Debug(4)
+   if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+      mlog << Debug(REJECT_DEBUG_LEVEL)
            << "Converting "
            << (sfc_info.msl_agl_conversion_msl_to_agl ?
                "MSL to AGL" : "AGL to MSL")
