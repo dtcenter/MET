@@ -2293,12 +2293,13 @@ topo minus station elevation difference meets the "use_obs_thresh" threshold
 entry. For the observations kept, when interpolating forecast data to the
 observation location, only use forecast grid points where the topo minus station
 difference meets the "interp_fcst_thresh" threshold entry.  If the "file_name"
-is left empty, the topography data is assumed to exist in the input forecast file.
+is left empty, the topography data is assumed to exist in the input forecast file(s).
 Otherwise, the specified file(s) are searched for the data specified in the "field"
 entry. The "regrid" settings specify how this field should be regridded to
 the verification domain.
 
-The "topo_mask.flag" entry may be set separately in each "obs.field" entry.
+The "topo_mask.flag", "topo_mask.use_obs_thresh", and "topo_mask.interp_fcst_thresh"
+entries can be set separately in each "obs.field" entry.
 
 .. code-block:: none
 
@@ -2309,6 +2310,68 @@ The "topo_mask.flag" entry may be set separately in each "obs.field" entry.
      regrid             = { method = BILIN; width = 2; }
      use_obs_thresh     = ge-100&&le100;
      interp_fcst_thresh = ge-50&&le50;
+  }
+
+lapse_rate_correction
+---------------------
+
+The "lapse_rate_correction" dictionary defines how model topography data should be
+used to correct forecast or observation surface temperature values.
+The model topography data specified in the "topo_mask" dictionary is also used
+for this correction.
+The "apply_to" option can be set to "NONE" (default) to disable this correction
+logic, "FCST" to correct the forecast value, or "OBS" to correct the observation
+value, but not "BOTH".
+When enabled, the "message_type_group_map" dictionary must contain an entry for
+"SURFACE". This correction is only applied when the verifying point observation
+message type appears in the "SURFACE" entry.
+The "value" entry is a constant number that defines the lapse rate for correcting
+temperatures based on the difference of the model topography and station elevation.
+Note that the lapse rate value depends on the units temperature and elevation and
+the user is responsibile for defining it appropriately.
+The default dry lapse rate value, for temperature in kelvin and height in meters, is
+defined in "ConfigConstants."
+
+All "lapse_rate_correction" entries can be set separately in each "obs.field" entry.
+
+.. code-block:: none
+
+  lapse_rate_correction = {
+    apply_to = NONE;
+    value    = DRY_LAPSE_RATE_K_per_M;
+  }
+
+msl_agl_conversion
+------------------
+
+The "msl_agl_conversion" dictionary defines how model topography data should be
+used to convert forecast and/or observation heights between mean-sea-level (MSL) and
+above-ground-level (AGL).
+The model topography data specified in the "topo_mask" dictionary is also used
+for this conversion.
+The "apply_to" option can be set to "NONE" (default) to disable this conversion
+logic, "FCST" to convert the forecast value, "OBS" to convert the observation
+value, or "BOTH" to convert both the forecast and observation values.
+The "apply_from" option can be set to "FCST" to convert using the model topography
+elevation, "OBS" to convert using the station elevation, or "BOTH" to convert the
+forecast value using the model topography elevation and convert the observation
+value using the station elevation.
+When enabled, the "message_type_group_map" dictionary must contain an entry for
+"SURFACE". This correction is only applied when the verifying point observation
+message type appears in the "SURFACE" entry.
+The "msl_to_agl" entry is a boolean. When "TRUE", the elevation correction is
+subtracted from the height value to convert from MSL to AGL. When "FALSE", the
+elevation correction is added to the height value to convert from AGL to MSL.
+
+All "msl_agl_conversion" entries can be set separately in each "obs.field" entry.
+
+.. code-block:: none
+
+  msl_agl_conversion = {
+    apply_to   = NONE;
+    apply_from = OBS;
+    thresh     = NA;
+    msl_to_agl = TRUE;
   }
 
 hira

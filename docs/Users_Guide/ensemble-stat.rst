@@ -158,33 +158,37 @@ ____________________
 
 .. code-block:: none
 
-  model            = "FCST";
-  desc             = "NA";
-  obtype           = "ANALYS";
-  regrid           = { ... }
-  climo_mean       = { ... }
-  climo_stdev      = { ... }
-  climo_cdf        = { ... }
-  obs_window       = { beg = -5400; end =  5400; }
-  mask             = { grid = [ "FULL" ]; poly = []; sid = []; }
-  ci_alpha         = [ 0.05 ];
-  interp           = { field = BOTH; vld_thresh = 1.0; shape = SQUARE;
-                       type = [ { method = NEAREST; width = 1; } ]; }
-  eclv_points      = [];
-  sid_inc          = [];
-  sid_exc          = [];
-  duplicate_flag   = NONE;
-  obs_quality_inc  = [];
-  obs_quality_exc  = [];
-  obs_summary      = NONE;
-  obs_perc_value   = 50;
-  message_type_group_map = [...];
+  model                    = "FCST";
+  desc                     = "NA";
+  obtype                   = "ANALYS";
+  regrid                   = { ... }
+  climo_mean               = { ... }
+  climo_stdev              = { ... }
+  climo_cdf                = { ... }
+  land_mask                = { ... }
+  topo_mask                = { ... }
+  lapse_rate_correction    = { ... }
+  msl_agl_conversion       = { ... }
+  obs_window               = { ... }
+  mask                     = { grid = [ "FULL" ];
+                               poly = [];
+                               sid = []; }
+  ci_alpha                 = [ 0.05 ];
+  interp                   = { ... }
+  eclv_points              = [];
+  sid_inc                  = [];
+  sid_exc                  = [];
+  duplicate_flag           = NONE;
+  obs_quality_inc          = [];
+  obs_quality_exc          = [];
+  obs_summary              = NONE;
+  obs_perc_value           = 50;
+  message_type_group_map   = [...];
   obtype_as_group_val_flag = FALSE;
-  grid_weight_flag = NONE;
-  point_weight_flag = NONE;
-  output_prefix    = "";
-  version          = "VN.N";
-
+  grid_weight_flag         = NONE;
+  point_weight_flag        = NONE;
+  output_prefix            = "";
+  version                  = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
 
