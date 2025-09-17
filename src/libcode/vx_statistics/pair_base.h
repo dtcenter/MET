@@ -40,6 +40,7 @@ struct station_value_base_t {
    std::string sid;
    double lat;
    double lon;
+   double sta_elv;
    unixtime ut;
    double lvl;
    double elv;
@@ -126,14 +127,15 @@ class PairBase {
       NumArray    ocdf_na; // Observation climatology cumulative distribution function [n_obs]
 
       // Point Observation Information
-      StringArray typ_sa;  // Message type [n_obs]
-      StringArray sid_sa;  // Station ID [n_obs]
-      NumArray    lat_na;  // Latitude [n_obs]
-      NumArray    lon_na;  // Longitude [n_obs]
-      TimeArray   vld_ta;  // Valid time [n_obs]
-      NumArray    lvl_na;  // Level [n_obs]
-      NumArray    elv_na;  // Elevation [n_obs]
-      StringArray o_qc_sa; // Observation quality control [n_obs]
+      StringArray typ_sa;     // Message type [n_obs]
+      StringArray sid_sa;     // Station ID [n_obs]
+      NumArray    lat_na;     // Latitude [n_obs]
+      NumArray    lon_na;     // Longitude [n_obs]
+      NumArray    sta_elv_na; // Station Elevation [n_obs]
+      TimeArray   vld_ta;     // Valid time [n_obs]
+      NumArray    lvl_na;     // Level [n_obs]
+      NumArray    elv_na;     // Height (msl or agl) [n_obs]
+      StringArray o_qc_sa;    // Observation quality control [n_obs]
 
       int         n_obs;   // Number of observations
       unixtime    fcst_ut; // Forecast valid time
@@ -174,8 +176,9 @@ class PairBase {
       void set_obs_summary(ObsSummary s);
       void set_obs_perc_value(int i);
 
-      int  has_obs_rec(const char *, double, double, double, double,
-                       double, double, int &);
+      int  has_obs_rec(const char *,
+                       double, double, double,
+                       double, double, double, double, int &);
 
       ob_val_t compute_nearest(std::string sng_key);
       ob_val_t compute_min(std::string sng_key);
@@ -186,12 +189,12 @@ class PairBase {
       ob_val_t compute_percentile(std::string sng_key, int perc);
 
       bool add_point_obs(const char *, const char *,
-                         double, double, double, double,
+                         double, double, double, double, double,
                          unixtime, double, double, double, const char *,
                          const ClimoPntInfo &, double);
 
       void set_point_obs(int, const char *, const char *,
-                         double, double, double, double,
+                         double, double, double, double, double,
                          unixtime, double, double, double,
                          const char *, const ClimoPntInfo &, double);
 

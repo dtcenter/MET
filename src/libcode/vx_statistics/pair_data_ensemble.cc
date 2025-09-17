@@ -1305,7 +1305,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
             // Weight is from the nearest grid point
             int n = three_to_one(i_msg_typ, i_mask, i_interp);
             if(!pd[n].add_point_obs(hdr_typ_str, hdr_sid_str,
-                  hdr_lat, hdr_lon, obs_x, obs_y,
+                  hdr_lat, hdr_lon, hdr_elv, obs_x, obs_y,
                   hdr_ut, obs_lvl, obs_hgt,
                   obs_v, obs_qty, cpi, default_weight)) {
 
@@ -1405,11 +1405,9 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                              it->ocmn_na[i_obs], it->ocsd_na[i_obs]);
 
 	    // Compute the forecast value
-            // TODO: Switch from using the observation height to using
-            //       the station elevation
-            double fcst_v = compute_fcst_value((PairBase *) this,
+            double fcst_v = compute_fcst_value((PairBase *) &(*it),
                                it->typ_sa[i_obs].c_str(), gr,
-                               it->x_na[i_obs], it->y_na[i_obs], it->elv_na[i_obs],
+                               it->x_na[i_obs], it->y_na[i_obs], it->sta_elv_na[i_obs],
                                it->o_na[i_obs], it->lvl_na[i_obs], it->elv_na[i_obs],
                                cpi);
 
@@ -1426,7 +1424,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
 
                // Interpolate model topography to observation location
                double topo_elv = compute_horz_interp(*sfc_info.topo_ptr,
-                                    it->x_na[i_obs], it->y_na[i_obs], it->elv_na[i_obs],
+                                    it->x_na[i_obs], it->y_na[i_obs], it->sta_elv_na[i_obs],
                                     InterpMthd::Bilin, 2,
                                     GridTemplateFactory::GridTemplates::Square,
                                     gr.wrap_lon(), 1.0);
@@ -1435,12 +1433,12 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
 
                // MET #3174 Apply lapse rate temperature correction
                if(sfc_info.lapse_rate_correction_apply_to != FieldType::None) {
-                  correct_lapse_rate(topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
+                  correct_lapse_rate(topo_elv, it->sta_elv_na[i_obs], fcst_v, obs_v);
                }
 
                // MET #3174 Apply MSL/AGL height conversion
                if(sfc_info.msl_agl_conversion_apply_to != FieldType::None) {
-                  convert_msl_agl(topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
+                  convert_msl_agl(topo_elv, it->sta_elv_na[i_obs], fcst_v, obs_v);
                }
 
                // Store the modified observation

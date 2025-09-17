@@ -1457,7 +1457,7 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
          if(vx_pd.pd[i_mask].add_point_pair(
                l.obtype(),
                l.get_item("OBS_SID"),
-               obs_lat, obs_lon,
+               obs_lat, obs_lon, obs_elv,
                bad_data_double, bad_data_double,
                timestring_to_sec(l.get_item("FCST_LEAD")),
                timestring_to_unix(l.get_item("OBS_VALID_BEG")),
@@ -1527,7 +1527,7 @@ bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
 	 // - Convert pressure from Pa to HPa
          if(vx_pd.pd[i_mask].add_point_pair(
                p.typ.c_str(), p.sid.c_str(),
-               obs_lat, obs_lon,
+               obs_lat, obs_lon, obs_elv,
                bad_data_double, bad_data_double,
                p.lead, p.ut, obs_lvl, obs_elv,
                p.fval, obs_val, na_str, cpi, 1.0)) {

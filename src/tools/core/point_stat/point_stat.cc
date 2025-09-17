@@ -1940,7 +1940,7 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          // Store the observation value
          hira_pd.add_point_obs(
             pd_ptr->typ_sa[j].c_str(), pd_ptr->sid_sa[j].c_str(),
-            pd_ptr->lat_na[j], pd_ptr->lon_na[j],
+            pd_ptr->lat_na[j], pd_ptr->lon_na[j], pd_ptr->sta_elv_na[j],
             pd_ptr->x_na[j], pd_ptr->y_na[j], pd_ptr->vld_ta[j],
             pd_ptr->lvl_na[j], pd_ptr->elv_na[j],
             pd_ptr->o_na[j], pd_ptr->o_qc_sa[j].c_str(),
@@ -2146,6 +2146,7 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                pd_ptr->typ_sa[k].c_str(),
                pd_ptr->sid_sa[k].c_str(),
                pd_ptr->lat_na[k], pd_ptr->lon_na[k],
+               pd_ptr->sta_elv_na[k],
                pd_ptr->x_na[k], pd_ptr->y_na[k],
                nint(pd_ptr->f_lead_na[k]), pd_ptr->vld_ta[k],
                pd_ptr->lvl_na[k], pd_ptr->elv_na[k],
