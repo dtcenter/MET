@@ -107,6 +107,54 @@ climo_mean = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
+// Land/Sea mask options
+// "flag" may be set separately in each "obs.field" entry.
+//
+land_mask = {
+   flag      = FALSE;
+   file_name = [];
+   field     = { name = "LAND"; level = "L0"; }
+   regrid    = { method = NEAREST; width = 1; }
+   thresh    = eq1;
+}
+
+//
+// Topography options for surface verification
+// "flag", "use_obs_thresh", and "interp_fcst_thresh"
+// may be set separately in each "obs.field" entry
+//
+topo_mask = {
+   flag               = FALSE;
+   file_name          = [];
+   field              = { name = "TOPO"; level = "L0"; }
+   regrid             = { method = BILIN; width = 2; }
+   use_obs_thresh     = ge-100&&le100;
+   interp_fcst_thresh = ge-50&&le50;
+}
+
+//
+// Lapse rate correction for surface temperature
+// May be set separately in each "obs.field" entry
+//
+lapse_rate_correction = {
+  apply_to = NONE;
+  value    = DRY_LAPSE_RATE_K_per_M;
+}
+
+//
+// MSL/AGL conversion for height
+// May be set separately in each "obs.field" entry
+//
+msl_agl_conversion = {
+  apply_to   = NONE;
+  apply_from = OBS;
+  thresh     = NA;
+  msl_to_agl = TRUE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
 // Point observation time window
 //
 obs_window = {
