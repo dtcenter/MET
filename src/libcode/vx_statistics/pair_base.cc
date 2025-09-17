@@ -43,7 +43,7 @@ void station_value_base_t::clear_base() {
    typ.clear();
    sid.clear();
    lat = lon = bad_data_double;
-   sta_elv = bad_data_double;
+   elv = bad_data_double;
    ut = (unixtime) 0;
    lvl = hgt = bad_data_double;
 }
@@ -133,7 +133,7 @@ void PairBase::clear() {
    sid_sa.clear();
    lat_na.clear();
    lon_na.clear();
-   sta_elv_na.clear();
+   elv_na.clear();
    vld_ta.clear();
    lvl_na.clear();
    hgt_na.clear();
@@ -186,7 +186,7 @@ void PairBase::erase() {
    sid_sa.clear();  // no erase option
    lat_na.erase();
    lon_na.erase();
-   sta_elv_na.erase();
+   elv_na.erase();
    vld_ta.erase();
    lvl_na.erase();
    hgt_na.erase();
@@ -224,7 +224,7 @@ void PairBase::extend(int n) {
    if(IsPointVx) {
       lat_na.extend(n);
       lon_na.extend(n);
-      sta_elv_na.extend(n);
+      elv_na.extend(n);
       vld_ta.extend(n);
       lvl_na.extend(n);
       hgt_na.extend(n);
@@ -371,7 +371,7 @@ void PairBase::set_obs_perc_value(int i) {
 ////////////////////////////////////////////////////////////////////////
 
 int PairBase::has_obs_rec(const char *sid,
-                          double lat, double lon, double sta_elv,
+                          double lat, double lon, double elv,
                           double x, double y, double lvl, double hgt,
                           int &i_obs) {
    int i, status = 0;
@@ -389,7 +389,7 @@ int PairBase::has_obs_rec(const char *sid,
       if(sid_sa[i] == sid &&
          is_eq(lat_na[i], lat) &&
          is_eq(lon_na[i], lon) &&
-         is_eq(sta_elv_na[i], sta_elv) &&
+         is_eq(elv_na[i], elv) &&
          is_eq(lvl_na[i], lvl) &&
          is_eq(hgt_na[i], hgt)) {
          status = 1;
@@ -460,7 +460,7 @@ void PairBase::compute_climo_cdf() {
 ////////////////////////////////////////////////////////////////////////
 
 bool PairBase::add_point_obs(const char *typ, const char *sid,
-                             double lat, double lon, double sta_elv,
+                             double lat, double lon, double elv,
                              double x, double y,
                              unixtime ut, double lvl, double hgt,
                              double o, const char *qc,
@@ -513,7 +513,7 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
       val.sid = string(sid);
       val.lat = lat;
       val.lon = lon;
-      val.sta_elv = sta_elv; 
+      val.elv = elv; 
       val.x   = x;
       val.y   = y;
       val.wgt = wgt;
@@ -536,7 +536,7 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
       sid_sa.add(sid);
       lat_na.add(lat);
       lon_na.add(lon);
-      sta_elv_na.add(sta_elv);
+      elv_na.add(elv);
       x_na.add(x);
       y_na.add(y);
       wgt_na.add(wgt);
@@ -558,7 +558,7 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
 ////////////////////////////////////////////////////////////////////////
 
 void PairBase::set_point_obs(int i_obs, const char *typ, const char *sid,
-                             double lat, double lon, double sta_elv,
+                             double lat, double lon, double elv,
                              double x, double y,
                              unixtime ut, double lvl, double hgt,
                              double o, const char *qc,
@@ -576,7 +576,7 @@ void PairBase::set_point_obs(int i_obs, const char *typ, const char *sid,
    sid_sa.set(i_obs, sid);
    lat_na.set(i_obs, lat);
    lon_na.set(i_obs, lon);
-   sta_elv_na.set(i_obs, sta_elv);
+   elv_na.set(i_obs, elv);
    x_na.set(i_obs, x);
    y_na.set(i_obs, y);
    wgt_na.set(i_obs, wgt);
@@ -796,7 +796,7 @@ void PairBase::calc_obs_summary(){
       sid_sa.add    (svt->sid.c_str());
       lat_na.add    (svt->lat);
       lon_na.add    (svt->lon);
-      sta_elv_na.add(svt->sta_elv);
+      elv_na.add    (svt->elv);
       x_na.add      (svt->x);
       y_na.add      (svt->y);
       wgt_na.add    (svt->wgt);

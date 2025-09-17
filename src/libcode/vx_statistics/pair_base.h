@@ -40,7 +40,7 @@ struct station_value_base_t {
    std::string sid;
    double lat;
    double lon;
-   double sta_elv;
+   double elv;
    unixtime ut;
    double lvl;
    double hgt;
@@ -127,15 +127,15 @@ class PairBase {
       NumArray    ocdf_na; // Observation climatology cumulative distribution function [n_obs]
 
       // Point Observation Information
-      StringArray typ_sa;     // Message type [n_obs]
-      StringArray sid_sa;     // Station ID [n_obs]
-      NumArray    lat_na;     // Latitude [n_obs]
-      NumArray    lon_na;     // Longitude [n_obs]
-      NumArray    sta_elv_na; // Station Elevation [n_obs]
-      TimeArray   vld_ta;     // Valid time [n_obs]
-      NumArray    lvl_na;     // Level [n_obs]
-      NumArray    hgt_na;     // Height (msl or agl) [n_obs]
-      StringArray o_qc_sa;    // Observation quality control [n_obs]
+      StringArray typ_sa;  // Message type [n_obs]
+      StringArray sid_sa;  // Station ID [n_obs]
+      NumArray    lat_na;  // Latitude [n_obs]
+      NumArray    lon_na;  // Longitude [n_obs]
+      NumArray    elv_na;  // Station Elevation [n_obs]
+      TimeArray   vld_ta;  // Valid time [n_obs]
+      NumArray    lvl_na;  // Level [n_obs]
+      NumArray    hgt_na;  // Height (msl or agl) [n_obs]
+      StringArray o_qc_sa; // Observation quality control [n_obs]
 
       int         n_obs;   // Number of observations
       unixtime    fcst_ut; // Forecast valid time

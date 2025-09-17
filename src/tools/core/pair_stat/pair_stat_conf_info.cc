@@ -1390,8 +1390,9 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
    // Check filtering options
    if(is_keeper_mpr(l)) {
 
-      // Store values, using OBS_ELV for both the station
-      // elevation and the observation height
+      // Store values
+      // Use OBS_ELV for both the station elevation and
+      // the observation height
       double obs_lat = atof(l.get_item("OBS_LAT"));
       double obs_lon = -1.0*atof(l.get_item("OBS_LON"));
       double obs_elv = atof(l.get_item("OBS_ELV"));
@@ -1493,7 +1494,7 @@ bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
       // Store values
       double obs_lat = p.lat;
       double obs_lon = rescale_lon(-1.0*p.lon);
-      double obs_elv = p.sta_elv;
+      double obs_elv = p.elv;
       double obs_val = p.oval;
       double obs_lvl = (is_bad_data(p.lvl) ? bad_data_double : p.lvl/100.0);
       double obs_hgt = p.hgt;

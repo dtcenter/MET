@@ -220,7 +220,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    sid_sa         = pd.sid_sa;
    lat_na         = pd.lat_na;
    lon_na         = pd.lon_na;
-   sta_elv_na     = pd.sta_elv_na;
+   elv_na         = pd.elv_na;
    x_na           = pd.x_na;
    y_na           = pd.y_na;
    wgt_na         = pd.wgt_na;
@@ -1408,7 +1408,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
 	    // Compute the forecast value
             double fcst_v = compute_fcst_value((PairBase *) &(*it),
                                it->typ_sa[i_obs].c_str(), gr,
-                               it->x_na[i_obs], it->y_na[i_obs], it->sta_elv_na[i_obs],
+                               it->x_na[i_obs], it->y_na[i_obs], it->elv_na[i_obs],
                                it->o_na[i_obs], it->lvl_na[i_obs], it->hgt_na[i_obs],
                                cpi);
 
@@ -1425,7 +1425,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
 
                // Interpolate model topography to observation location
                double topo_elv = compute_horz_interp(*sfc_info.topo_ptr,
-                                    it->x_na[i_obs], it->y_na[i_obs], it->sta_elv_na[i_obs],
+                                    it->x_na[i_obs], it->y_na[i_obs], it->elv_na[i_obs],
                                     InterpMthd::Bilin, 2,
                                     GridTemplateFactory::GridTemplates::Square,
                                     gr.wrap_lon(), 1.0);
@@ -1434,12 +1434,12 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
 
                // MET #3174 Apply lapse rate temperature correction
                if(sfc_info.lapse_rate_correction_apply_to != FieldType::None) {
-                  correct_lapse_rate(topo_elv, it->sta_elv_na[i_obs], fcst_v, obs_v);
+                  correct_lapse_rate(topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
                }
 
                // MET #3174 Apply MSL/AGL height conversion
                if(sfc_info.msl_agl_conversion_apply_to != FieldType::None) {
-                  convert_msl_agl(topo_elv, it->sta_elv_na[i_obs], fcst_v, obs_v);
+                  convert_msl_agl(topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
                }
 
                // Store the modified observation

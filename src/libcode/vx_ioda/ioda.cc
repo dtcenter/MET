@@ -276,7 +276,7 @@ vector<point_pair_t> *IODAReader::get_point_pairs(
       point_pairs[i].sid  = (station_ids[i].empty() ? na_str : station_ids[i]);
       point_pairs[i].lat  = lat_arr[i];
       point_pairs[i].lon  = lon_arr[i];
-      point_pairs[i].sta_elv = elv_arr[i];
+      point_pairs[i].elv  = elv_arr[i];
       point_pairs[i].ut   = vld_arr[i];
       point_pairs[i].lvl  = obs_pres_arr[i];
       point_pairs[i].hgt  = obs_hght_arr[i];
