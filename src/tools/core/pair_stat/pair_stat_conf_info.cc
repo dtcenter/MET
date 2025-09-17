@@ -1405,7 +1405,8 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
          double obs_x;
          double obs_y;
          grid_climo.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
-         cpi = vx_pd.get_climo_pnt_info(0, grid_climo, obs_x, obs_y,
+         cpi = vx_pd.get_climo_pnt_info(vx_pd.pb_ptr[0],
+                                        grid_climo, obs_x, obs_y,
                                         obs_val, obs_lvl, obs_elv);
       }
       // Otherwise, parse from the input line
@@ -1500,7 +1501,8 @@ bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
          double obs_x;
          double obs_y;
          grid_climo.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
-         cpi = vx_pd.get_climo_pnt_info(0, grid_climo, obs_x, obs_y,
+         cpi = vx_pd.get_climo_pnt_info(vx_pd.pb_ptr[0],
+                                        grid_climo, obs_x, obs_y,
                                         obs_val, obs_lvl, obs_elv);
       }
 

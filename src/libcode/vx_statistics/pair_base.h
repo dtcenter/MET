@@ -422,21 +422,28 @@ class VxPairBase {
       bool is_keeper_mask(const char *, int, int, int, int,
                           const char *, double, double);
       bool is_keeper_climo(const char *, int, int, int,
-                           const Grid &gr, double, double,
+                           const Grid &, double, double,
                            double, double, double,
                            ClimoPntInfo &);
       bool is_keeper_fcst(const char *, int, int, int,
-                          const char *, const Grid &gr,
+                          const char *, const Grid &,
                           double, double, double,
                           double, double, double,
                           const ClimoPntInfo &, double &);
+
+      double compute_fcst_value(const PairBase *,
+                                const char *, const Grid &,
+                                double, double, double,
+                                double, double, double,
+                                const ClimoPntInfo &);
 
       void correct_lapse_rate(double, double, double &, double &);
 
       void convert_msl_agl(double, double, double &, double &);
 
       // Retrieve climo data for this point 
-      ClimoPntInfo get_climo_pnt_info(int, const Grid &gr, double, double,
+      ClimoPntInfo get_climo_pnt_info(const PairBase *,
+                                      const Grid &, double, double,
                                       double, double, double);
 
       // Member functions for incrementing the counts

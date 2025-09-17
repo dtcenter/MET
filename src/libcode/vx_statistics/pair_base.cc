@@ -2001,7 +2001,7 @@ bool VxPairBase::is_keeper_climo(
    int n = three_to_one(i_msg_typ, i_mask, i_interp);
 
    // Get the climo data for this point
-   cpi = get_climo_pnt_info(n, gr, obs_x, obs_y,
+   cpi = get_climo_pnt_info(pb_ptr[n], gr, obs_x, obs_y,
                             obs_v, obs_lvl, obs_hgt);
 
    // Forecast climatology mean
@@ -2076,48 +2076,10 @@ bool VxPairBase::is_keeper_fcst(
 
    int n = three_to_one(i_msg_typ, i_mask, i_interp);
 
-   // For surface verification, apply land/sea and topo masks
-   if((sfc_info.land_ptr || sfc_info.topo_ptr) &&
-      (msg_typ_sfc.reg_exp_match(hdr_typ_str))) {
-
-      bool is_land = msg_typ_lnd.has(hdr_typ_str);
-
-      // Check for a single forecast DataPlane
-      if(fcst_dpa.n_planes() != 1) {
-         mlog << Error << "\nVxPairBase::is_keeper_fcst() -> "
-              << "unexpected number of forecast levels ("
-              << fcst_dpa.n_planes()
-              << ") for surface verification! Set \"land_mask.flag\" and "
-              << "\"topo_mask.flag\" to false to disable this check.\n\n";
-         exit(1);
-      }
-
-      fcst_v = compute_sfc_interp(fcst_dpa[0], obs_x, obs_y, hdr_elv, obs_v,
-                  pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                  pb_ptr[n]->interp_shape, gr.wrap_lon(),
-                  interp_thresh, sfc_info, is_land);
-   }
-   // Otherwise, compute interpolated value
-   else {
-
-      bool spfh_flag = fcst_info->is_specific_humidity() &&
-                       obs_info->is_specific_humidity();
-
-      // Compute the interpolated forecast value using the
-      // observation pressure level or height
-      double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
-                       obs_lvl : obs_hgt);
-      int lvl_blw, lvl_abv;
-
-      find_vert_lvl(fcst_dpa, to_lvl, lvl_blw, lvl_abv);
-
-      fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v, &cpi,
-                  pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                  pb_ptr[n]->interp_shape, gr.wrap_lon(),
-                  interp_thresh, spfh_flag,
-                  fcst_info->level().type(),
-                  to_lvl, lvl_blw, lvl_abv);
-   }
+   // Compute the forecast value
+   fcst_v = compute_fcst_value(pb_ptr[n], hdr_typ_str, gr,
+                               obs_x, obs_y, hdr_elv,
+                               obs_v, obs_lvl, obs_hgt, cpi);
 
    // Check for bad data
    if(is_bad_data(fcst_v)) {
@@ -2138,6 +2100,64 @@ bool VxPairBase::is_keeper_fcst(
    }
 
    return keep;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+double VxPairBase::compute_fcst_value(
+          const PairBase *pb, const char *hdr_typ_str, const Grid &gr,
+          double obs_x, double obs_y, double hdr_elv,
+          double obs_v, double obs_lvl, double obs_hgt,
+          const ClimoPntInfo &cpi) {
+   const char *method_name = "PairBase::compute_fcst_value() -> ";
+   double fcst_v = bad_data_double;
+
+   // For surface verification, apply land/sea and topo masks
+   if((sfc_info.land_ptr || sfc_info.topo_ptr) &&
+      (msg_typ_sfc.reg_exp_match(hdr_typ_str))) {
+
+      bool is_land = msg_typ_lnd.has(hdr_typ_str);
+
+      // Check for a single forecast DataPlane
+      if(fcst_dpa.n_planes() != 1) {
+         mlog << Error << "\n" << method_name
+              << "unexpected number of forecast levels ("
+              << fcst_dpa.n_planes()
+              << ") for surface verification! Set \"land_mask.flag\" and "
+              << "\"topo_mask.flag\" to false to disable this check.\n\n";
+         exit(1);
+      }
+
+      fcst_v = compute_sfc_interp(fcst_dpa[0],
+                  obs_x, obs_y, hdr_elv, obs_v,
+                  pb->interp_mthd, pb->interp_wdth,
+                  pb->interp_shape, gr.wrap_lon(),
+                  interp_thresh, sfc_info, is_land);
+   }
+   // Otherwise, compute interpolated value
+   else {
+
+      bool spfh_flag = fcst_info->is_specific_humidity() &&
+                       obs_info->is_specific_humidity();
+
+      // Compute the interpolated forecast value using the
+      // observation pressure level or height
+      double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
+                       obs_lvl : obs_hgt);
+
+      int lvl_blw, lvl_abv;
+      find_vert_lvl(fcst_dpa, to_lvl, lvl_blw, lvl_abv);
+
+      fcst_v = compute_interp(fcst_dpa,
+                  obs_x, obs_y, obs_v, &cpi,
+                  pb->interp_mthd, pb->interp_wdth,
+                  pb->interp_shape, gr.wrap_lon(),
+                  interp_thresh, spfh_flag,
+                  fcst_info->level().type(),
+                  to_lvl, lvl_blw, lvl_abv);
+   }
+
+   return fcst_v;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2275,7 +2295,7 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
 ////////////////////////////////////////////////////////////////////////
 
 ClimoPntInfo VxPairBase::get_climo_pnt_info(
-        int n, const Grid &gr, double obs_x, double obs_y,
+        const PairBase *pb, const Grid &gr, double obs_x, double obs_y,
         double obs_v, double obs_lvl, double obs_hgt) {
    ClimoPntInfo cpi;
 
@@ -2296,8 +2316,8 @@ ClimoPntInfo VxPairBase::get_climo_pnt_info(
       find_vert_lvl(fcmn_dpa, to_lvl, lvl_blw, lvl_abv);
 
       cpi.fcmn = compute_interp(fcmn_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    pb->interp_mthd, pb->interp_wdth,
+                    pb->interp_shape, gr.wrap_lon(),
                     interp_thresh, spfh_flag,
                     fcst_info->level().type(),
                     to_lvl, lvl_blw, lvl_abv);
@@ -2309,8 +2329,8 @@ ClimoPntInfo VxPairBase::get_climo_pnt_info(
       find_vert_lvl(ocmn_dpa, to_lvl, lvl_blw, lvl_abv);
 
       cpi.ocmn = compute_interp(ocmn_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    pb->interp_mthd, pb->interp_wdth,
+                    pb->interp_shape, gr.wrap_lon(),
                     interp_thresh, spfh_flag,
                     fcst_info->level().type(),
                     to_lvl, lvl_blw, lvl_abv);
@@ -2319,12 +2339,12 @@ ClimoPntInfo VxPairBase::get_climo_pnt_info(
    // Check for valid interpolation options
    if((fcsd_dpa.n_planes() > 0                      ||
        ocsd_dpa.n_planes() > 0)                     &&
-      (pb_ptr[n]->interp_mthd == InterpMthd::Min    ||
-       pb_ptr[n]->interp_mthd == InterpMthd::Max    ||
-       pb_ptr[n]->interp_mthd == InterpMthd::Median ||
-       pb_ptr[n]->interp_mthd == InterpMthd::Best)) {
+      (pb->interp_mthd == InterpMthd::Min    ||
+       pb->interp_mthd == InterpMthd::Max    ||
+       pb->interp_mthd == InterpMthd::Median ||
+       pb->interp_mthd == InterpMthd::Best)) {
       mlog << Warning << "\nVxPairBase::get_climo_pnt_info() -> "
-           << "applying the " << interpmthd_to_string(pb_ptr[n]->interp_mthd)
+           << "applying the " << interpmthd_to_string(pb->interp_mthd)
            << " interpolation method to climatological spread "
            << "may cause unexpected results.\n\n";
    }
@@ -2335,8 +2355,8 @@ ClimoPntInfo VxPairBase::get_climo_pnt_info(
       find_vert_lvl(fcsd_dpa, to_lvl, lvl_blw, lvl_abv);
 
       cpi.fcsd = compute_interp(fcsd_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    pb->interp_mthd, pb->interp_wdth,
+                    pb->interp_shape, gr.wrap_lon(),
                     interp_thresh, spfh_flag,
                     fcst_info->level().type(),
                     to_lvl, lvl_blw, lvl_abv);
@@ -2348,8 +2368,8 @@ ClimoPntInfo VxPairBase::get_climo_pnt_info(
       find_vert_lvl(ocsd_dpa, to_lvl, lvl_blw, lvl_abv);
 
       cpi.ocsd = compute_interp(ocsd_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    pb->interp_mthd, pb->interp_wdth,
+                    pb->interp_shape, gr.wrap_lon(),
                     interp_thresh, spfh_flag,
                     fcst_info->level().type(),
                     to_lvl, lvl_blw, lvl_abv);

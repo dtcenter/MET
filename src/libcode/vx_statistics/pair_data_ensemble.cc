@@ -1215,8 +1215,6 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    double obs_x, obs_y;
    if(!is_keeper_grd(pnt_obs_str.c_str(), gr, hdr_lat, hdr_lon, obs_x, obs_y)) return;
 
-   // TODO: Add topography filtering to Ensemble-Stat
-
    // Check topo
    double hdr_elv = hdr_arr[2];
    double topo_elv = bad_data_double;
@@ -1390,6 +1388,8 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
             // Otherwise, retrieve all the neighborhood values
             // using a valid threshold of 0
             else {
+               // TODO: Consider whether the land/sea mask or topo info
+               //       should be used when gathering HiRA neighborhood values
                get_interp_points(fcst_dpa,
                   it->x_na[i_obs], it->y_na[i_obs],
                   it->interp_mthd, it->interp_wdth, it->interp_shape,
@@ -1404,12 +1404,14 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
             ClimoPntInfo cpi(it->fcmn_na[i_obs], it->fcsd_na[i_obs],
                              it->ocmn_na[i_obs], it->ocsd_na[i_obs]);
 
-            double fcst_v = compute_interp(fcst_dpa,
-                               it->x_na[i_obs], it->y_na[i_obs], it->o_na[i_obs], &cpi,
-                               it->interp_mthd, it->interp_wdth, it->interp_shape,
-                               gr.wrap_lon(), interp_thresh, spfh_flag,
-                               fcst_info->level().type(),
-                               to_lvl, lvl_blw, lvl_abv);
+	    // Compute the forecast value
+            // TODO: Switch from using the observation height to using
+            //       the station elevation
+            double fcst_v = compute_fcst_value((PairBase *) this,
+                               it->typ_sa[i_obs].c_str(), gr,
+                               it->x_na[i_obs], it->y_na[i_obs], it->elv_na[i_obs],
+                               it->o_na[i_obs], it->lvl_na[i_obs], it->elv_na[i_obs],
+                               cpi);
 
             // Apply topography options
             if(sfc_info.topo_ptr &&
@@ -1423,8 +1425,8 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                    sfc_info.msl_agl_conversion_apply_to == FieldType::Obs)) break;
 
                // Interpolate model topography to observation location
-               double topo_elv = compute_horz_interp(
-                                    *sfc_info.topo_ptr, it->x_na[i_obs], it->y_na[i_obs], it->elv_na[i_obs],
+               double topo_elv = compute_horz_interp(*sfc_info.topo_ptr,
+                                    it->x_na[i_obs], it->y_na[i_obs], it->elv_na[i_obs],
                                     InterpMthd::Bilin, 2,
                                     GridTemplateFactory::GridTemplates::Square,
                                     gr.wrap_lon(), 1.0);
