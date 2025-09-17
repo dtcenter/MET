@@ -43,7 +43,7 @@ struct station_value_base_t {
    double sta_elv;
    unixtime ut;
    double lvl;
-   double elv;
+   double hgt;
 };
 
 struct point_pair_t : station_value_base_t {
@@ -134,7 +134,7 @@ class PairBase {
       NumArray    sta_elv_na; // Station Elevation [n_obs]
       TimeArray   vld_ta;     // Valid time [n_obs]
       NumArray    lvl_na;     // Level [n_obs]
-      NumArray    elv_na;     // Height (msl or agl) [n_obs]
+      NumArray    hgt_na;     // Height (msl or agl) [n_obs]
       StringArray o_qc_sa;    // Observation quality control [n_obs]
 
       int         n_obs;   // Number of observations

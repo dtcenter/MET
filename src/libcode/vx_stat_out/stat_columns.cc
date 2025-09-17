@@ -4155,8 +4155,8 @@ void write_mpr_cols(const PairDataPoint *pd_ptr, int i,
    at.set_entry(r, c+5,  // Level
       pd_ptr->lvl_na[i]);
 
-   at.set_entry(r, c+6,  // Elevation
-      pd_ptr->elv_na[i]);
+   at.set_entry(r, c+6,  // Height 
+      pd_ptr->hgt_na[i]);
 
    at.set_entry(r, c+7,  // Forecast Value
       pd_ptr->f_na[i]);
@@ -4581,8 +4581,8 @@ void write_orank_cols(const PairDataEnsemble *pd_ptr, int i,
    at.set_entry(r, c+5,  // Level
       pd_ptr->lvl_na[i]);
 
-   at.set_entry(r, c+6,  // Elevation
-      pd_ptr->elv_na[i]);
+   at.set_entry(r, c+6,  // Height 
+      pd_ptr->hgt_na[i]);
 
    at.set_entry(r, c+7,  // Observation Value
       pd_ptr->o_na[i]);

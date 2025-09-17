@@ -43,8 +43,9 @@ void station_value_base_t::clear_base() {
    typ.clear();
    sid.clear();
    lat = lon = bad_data_double;
+   sta_elv = bad_data_double;
    ut = (unixtime) 0;
-   lvl = elv = bad_data_double;
+   lvl = hgt = bad_data_double;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -135,7 +136,7 @@ void PairBase::clear() {
    sta_elv_na.clear();
    vld_ta.clear();
    lvl_na.clear();
-   elv_na.clear();
+   hgt_na.clear();
    o_qc_sa.clear();
 
    n_obs = 0;
@@ -188,7 +189,7 @@ void PairBase::erase() {
    sta_elv_na.erase();
    vld_ta.erase();
    lvl_na.erase();
-   elv_na.erase();
+   hgt_na.erase();
    o_qc_sa.clear(); // no erase option
 
    n_obs = 0;
@@ -226,7 +227,7 @@ void PairBase::extend(int n) {
       sta_elv_na.extend(n);
       vld_ta.extend(n);
       lvl_na.extend(n);
-      elv_na.extend(n);
+      hgt_na.extend(n);
    }
 
    return;
@@ -371,7 +372,7 @@ void PairBase::set_obs_perc_value(int i) {
 
 int PairBase::has_obs_rec(const char *sid,
                           double lat, double lon, double sta_elv,
-                          double x, double y, double lvl, double elv,
+                          double x, double y, double lvl, double hgt,
                           int &i_obs) {
    int i, status = 0;
 
@@ -390,7 +391,7 @@ int PairBase::has_obs_rec(const char *sid,
          is_eq(lon_na[i], lon) &&
          is_eq(sta_elv_na[i], sta_elv) &&
          is_eq(lvl_na[i], lvl) &&
-         is_eq(elv_na[i], elv)) {
+         is_eq(hgt_na[i], hgt)) {
          status = 1;
          i_obs = i;
          break;
@@ -461,7 +462,7 @@ void PairBase::compute_climo_cdf() {
 bool PairBase::add_point_obs(const char *typ, const char *sid,
                              double lat, double lon, double sta_elv,
                              double x, double y,
-                             unixtime ut, double lvl, double elv,
+                             unixtime ut, double lvl, double hgt,
                              double o, const char *qc,
                              const ClimoPntInfo &cpi, double wgt) {
 
@@ -484,7 +485,7 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
                        lat,         //  lat
                        lon,         //  lon
                        lvl,         //  level
-                       elv).text(); //  elevation
+                       hgt).text(); //  height
 
    //  add a single value reporting string to the reporting map
    ob_val_t ob_val;
@@ -512,12 +513,13 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
       val.sid = string(sid);
       val.lat = lat;
       val.lon = lon;
+      val.sta_elv = sta_elv; 
       val.x   = x;
       val.y   = y;
       val.wgt = wgt;
       val.ut  = fcst_ut;
       val.lvl = lvl;
-      val.elv = elv;
+      val.hgt = hgt;
       val.fcmn = cpi.fcmn;
       val.fcsd = cpi.fcsd;
       val.ocmn = cpi.ocmn;
@@ -540,7 +542,7 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
       wgt_na.add(wgt);
       vld_ta.add(ut);
       lvl_na.add(lvl);
-      elv_na.add(elv);
+      hgt_na.add(hgt);
       o_na.add(o);
       o_qc_sa.add(qc);
       add_climo(o, cpi);
@@ -558,7 +560,7 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
 void PairBase::set_point_obs(int i_obs, const char *typ, const char *sid,
                              double lat, double lon, double sta_elv,
                              double x, double y,
-                             unixtime ut, double lvl, double elv,
+                             unixtime ut, double lvl, double hgt,
                              double o, const char *qc,
                              const ClimoPntInfo &cpi,
                              double wgt) {
@@ -580,7 +582,7 @@ void PairBase::set_point_obs(int i_obs, const char *typ, const char *sid,
    wgt_na.set(i_obs, wgt);
    vld_ta.set(i_obs, ut);
    lvl_na.set(i_obs, lvl);
-   elv_na.set(i_obs, elv);
+   hgt_na.set(i_obs, hgt);
    o_na.set(i_obs, o);
    o_qc_sa.set(i_obs, qc);
    set_climo(i_obs, o, cpi);
@@ -800,7 +802,7 @@ void PairBase::calc_obs_summary(){
       wgt_na.add    (svt->wgt);
       vld_ta.add    (ob.ut);
       lvl_na.add    (svt->lvl);
-      elv_na.add    (svt->elv);
+      hgt_na.add    (svt->hgt);
       o_na.add      (ob.val);
       o_qc_sa.add   (ob.qc.c_str());
       ClimoPntInfo cpi(svt->fcmn, svt->fcsd,

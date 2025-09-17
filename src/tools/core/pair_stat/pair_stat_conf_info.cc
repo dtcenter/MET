@@ -1390,12 +1390,14 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
    // Check filtering options
    if(is_keeper_mpr(l)) {
 
-      // Store values
+      // Store values, using OBS_ELV for both the station
+      // elevation and the observation height
       double obs_lat = atof(l.get_item("OBS_LAT"));
       double obs_lon = -1.0*atof(l.get_item("OBS_LON"));
+      double obs_elv = atof(l.get_item("OBS_ELV"));
       double obs_val = atof(l.get_item("OBS"));
       double obs_lvl = atof(l.get_item("OBS_LVL"));
-      double obs_elv = atof(l.get_item("OBS_ELV"));
+      double obs_hgt = atof(l.get_item("OBS_ELV"));
 
       // Climo data for this pair
       ClimoPntInfo cpi;
@@ -1407,7 +1409,7 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
          grid_climo.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
          cpi = vx_pd.get_climo_pnt_info(vx_pd.pb_ptr[0],
                                         grid_climo, obs_x, obs_y,
-                                        obs_val, obs_lvl, obs_elv);
+                                        obs_val, obs_lvl, obs_hgt);
       }
       // Otherwise, parse from the input line
       else {
@@ -1461,7 +1463,7 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
                bad_data_double, bad_data_double,
                timestring_to_sec(l.get_item("FCST_LEAD")),
                timestring_to_unix(l.get_item("OBS_VALID_BEG")),
-               obs_lvl, obs_elv,
+               obs_lvl, obs_hgt,
                atof(l.get_item("FCST")),
                obs_val,
                l.get_item("OBS_QC"),
@@ -1491,9 +1493,10 @@ bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
       // Store values
       double obs_lat = p.lat;
       double obs_lon = rescale_lon(-1.0*p.lon);
+      double obs_elv = p.sta_elv;
       double obs_val = p.oval;
       double obs_lvl = (is_bad_data(p.lvl) ? bad_data_double : p.lvl/100.0);
-      double obs_elv = p.elv;
+      double obs_hgt = p.hgt;
 
       // Parse climo data from the config file
       ClimoPntInfo cpi;
@@ -1503,7 +1506,7 @@ bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
          grid_climo.latlon_to_xy(obs_lat, obs_lon, obs_x, obs_y);
          cpi = vx_pd.get_climo_pnt_info(vx_pd.pb_ptr[0],
                                         grid_climo, obs_x, obs_y,
-                                        obs_val, obs_lvl, obs_elv);
+                                        obs_val, obs_lvl, obs_hgt);
       }
 
       // Attempt to add to each masking region
@@ -1529,7 +1532,7 @@ bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
                p.typ.c_str(), p.sid.c_str(),
                obs_lat, obs_lon, obs_elv,
                bad_data_double, bad_data_double,
-               p.lead, p.ut, obs_lvl, obs_elv,
+               p.lead, p.ut, obs_lvl, obs_hgt,
                p.fval, obs_val, na_str, cpi, 1.0)) {
 
             // Using this pair for at least one masking region
@@ -1620,7 +1623,7 @@ static double get_ioda_mpr_val(const string &mpr_col,
       val = p.lvl/100.0;
    }
    else if(mpr_col == "OBS_ELV") {
-      val = p.elv;
+      val = p.hgt;
    }
    else if(mpr_col == "FCST") {
       val = p.fval;

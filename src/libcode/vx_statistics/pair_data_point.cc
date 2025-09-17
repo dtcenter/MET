@@ -163,7 +163,7 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
                pd.lat_na[i], pd.lon_na[i], pd.sta_elv_na[i],
                pd.x_na[i], pd.y_na[i],
                nint(pd.f_lead_na[i]), pd.vld_ta[i],
-               pd.lvl_na[i], pd.elv_na[i],
+               pd.lvl_na[i], pd.hgt_na[i],
                pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
                cpi, pd.wgt_na[i])) {
             if(i < pd.seeps_mpr.size()) set_seeps_score(seeps_mpr[i], i);
@@ -185,12 +185,12 @@ bool PairDataPoint::add_point_pair(const char *typ, const char *sid,
                                    double lat, double lon, double sta_elv,
                                    double x, double y,
                                    int sec, unixtime ut,
-                                   double lvl, double elv,
+                                   double lvl, double hgt,
                                    double f, double o, const char *qc,
                                    const ClimoPntInfo &cpi, double wgt) {
 
    if(!add_point_obs(typ, sid, lat, lon, sta_elv,
-                     x, y, ut, lvl, elv, o, qc,
+                     x, y, ut, lvl, hgt, o, qc,
                      cpi, wgt)) return false;
 
    f_na.add(f);
@@ -247,7 +247,7 @@ void PairDataPoint::set_point_pair(int i_obs,
                                    double lat, double lon, double sta_elv,
                                    double x, double y,
                                    int sec, unixtime ut,
-                                   double lvl, double elv,
+                                   double lvl, double hgt,
                                    double f, double o, const char *qc,
                                    const ClimoPntInfo &cpi,
                                    double wgt, const SeepsScore *seeps) {
@@ -260,7 +260,7 @@ void PairDataPoint::set_point_pair(int i_obs,
    }
 
    set_point_obs(i_obs, typ, sid, lat, lon, sta_elv,
-                 x, y, ut, lvl, elv,
+                 x, y, ut, lvl, hgt,
                  o, qc, cpi, wgt);
 
    f_na.set(i_obs, f);
@@ -397,7 +397,7 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
                          lat_na[i], lon_na[i], sta_elv_na[i],
                          x_na[i], y_na[i],
                          nint(f_lead_na[i]), vld_ta[i],
-                         lvl_na[i], elv_na[i],
+                         lvl_na[i], hgt_na[i],
                          f_na[i], o_na[i], o_qc_sa[i].c_str(),
                          cpi, wgt_na[i])) {
                out_pd.set_seeps_score(seeps_mpr[i], i);
@@ -1022,14 +1022,14 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
                         pd_u.lat_na[i], pd_u.lon_na[i], pd_u.sta_elv_na[i],
                         pd_u.x_na[i], pd_u.y_na[i],
                         nint(pd_u.f_lead_na[i]), pd_u.vld_ta[i],
-                        pd_u.lvl_na[i], pd_u.elv_na[i],
+                        pd_u.lvl_na[i], pd_u.hgt_na[i],
                         pd_u.f_na[i], pd_u.o_na[i], pd_u.o_qc_sa[i].c_str(),
                         u_cpi, pd_u.wgt_na[i]);
             out_pd_v.add_point_pair(pd_v.typ_sa[i].c_str(), pd_v.sid_sa[i].c_str(),
                         pd_v.lat_na[i], pd_v.lon_na[i], pd_v.sta_elv_na[i],
                         pd_v.x_na[i], pd_v.y_na[i],
                         nint(pd_v.f_lead_na[i]), pd_v.vld_ta[i],
-                        pd_v.lvl_na[i], pd_v.elv_na[i],
+                        pd_v.lvl_na[i], pd_v.hgt_na[i],
                         pd_v.f_na[i], pd_v.o_na[i], pd_v.o_qc_sa[i].c_str(),
                         v_cpi, pd_v.wgt_na[i]);
          }
@@ -1100,7 +1100,7 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
                       pd.lat_na[i], pd.lon_na[i], pd.sta_elv_na[i],
                       pd.x_na[i], pd.y_na[i],
                       nint(pd.f_lead_na[i]), pd.vld_ta[i],
-                      pd.lvl_na[i], pd.elv_na[i],
+                      pd.lvl_na[i], pd.hgt_na[i],
                       pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
                       cpi, pd.wgt_na[i]);
          }

@@ -220,12 +220,13 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    sid_sa         = pd.sid_sa;
    lat_na         = pd.lat_na;
    lon_na         = pd.lon_na;
+   sta_elv_na     = pd.sta_elv_na;
    x_na           = pd.x_na;
    y_na           = pd.y_na;
    wgt_na         = pd.wgt_na;
    vld_ta         = pd.vld_ta;
    lvl_na         = pd.lvl_na;
-   elv_na         = pd.elv_na;
+   hgt_na         = pd.hgt_na;
    o_na           = pd.o_na;
    o_qc_sa        = pd.o_qc_sa;
 
@@ -1363,7 +1364,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
 
          // Interpolate using the observation pressure level or height
          double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
-                          it->lvl_na[i_obs] : it->elv_na[i_obs]);
+                          it->lvl_na[i_obs] : it->hgt_na[i_obs]);
          int lvl_blw, lvl_abv;
 
          // For a single forecast field
@@ -1408,7 +1409,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
             double fcst_v = compute_fcst_value((PairBase *) &(*it),
                                it->typ_sa[i_obs].c_str(), gr,
                                it->x_na[i_obs], it->y_na[i_obs], it->sta_elv_na[i_obs],
-                               it->o_na[i_obs], it->lvl_na[i_obs], it->elv_na[i_obs],
+                               it->o_na[i_obs], it->lvl_na[i_obs], it->hgt_na[i_obs],
                                cpi);
 
             // Apply topography options

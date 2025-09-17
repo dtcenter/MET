@@ -617,7 +617,7 @@ void write_orank_row_conv(AsciiTable &at, int row, int i_obs) {
    at.set_entry(row, col++, ens_pd.lat_na[i_obs]);     // OBS_LAT
    at.set_entry(row, col++, ens_pd.lon_na[i_obs]);     // OBS_LON
    at.set_entry(row, col++, ens_pd.lvl_na[i_obs]);     // OBS_LVL
-   at.set_entry(row, col++, ens_pd.elv_na[i_obs]);     // OBS_ELV
+   at.set_entry(row, col++, ens_pd.hgt_na[i_obs]);     // OBS_ELV
 
    at.set_entry(row, col++, ens_pd.o_na[i_obs]);       // OBS
    at.set_entry(row, col++, ens_pd.pit_na[i_obs]);     // PIT
@@ -685,7 +685,7 @@ void write_orank_row_rad(AsciiTable &at, int row, int i_obs) {
    at.set_entry(row, col++, ens_pd.lat_na[i_obs]);     // OBS_LAT
    at.set_entry(row, col++, ens_pd.lon_na[i_obs]);     // OBS_LON
    at.set_entry(row, col++, bad_data_double);          // OBS_LVL
-   at.set_entry(row, col++, ens_pd.elv_na[i_obs]);     // OBS_ELV
+   at.set_entry(row, col++, ens_pd.hgt_na[i_obs]);     // OBS_ELV
 
    at.set_entry(row, col++, ens_pd.o_na[i_obs]);       // OBS
    at.set_entry(row, col++, ens_pd.pit_na[i_obs]);     // PIT
