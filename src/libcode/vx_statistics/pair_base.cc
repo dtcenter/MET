@@ -1796,15 +1796,18 @@ bool VxPairBase::is_keeper_topo(
         const char *hdr_typ_str, double hdr_elv, double &topo_elv) {
    bool keep = true;
 
-   // Check for a large topography difference
-   if(sfc_info.topo_ptr && msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
-
-      // Interpolate model topography to observation location
+   // Interpolate model topography to observation location
+   if(sfc_info.topo_ptr) {
       topo_elv = compute_horz_interp(
                     *sfc_info.topo_ptr, obs_x, obs_y, hdr_elv,
                     InterpMthd::Bilin, 2,
                     GridTemplateFactory::GridTemplates::Square,
                     gr.wrap_lon(), 1.0);
+   }
+
+   // Check for a large topography difference
+   if(sfc_info.topo_flag &&
+      msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
 
       // Skip bad topography values
       if(is_bad_data(hdr_elv) || is_bad_data(topo_elv)) {
@@ -2125,7 +2128,7 @@ double VxPairBase::compute_fcst_value(
    double fcst_v = bad_data_double;
 
    // For surface verification, apply land/sea and topo masks
-   if((sfc_info.land_ptr || sfc_info.topo_ptr) &&
+   if((sfc_info.land_flag || sfc_info.topo_flag) &&
       (msg_typ_sfc.reg_exp_match(hdr_typ_str))) {
 
       bool is_land = msg_typ_lnd.has(hdr_typ_str);
@@ -2192,6 +2195,7 @@ void VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
            << obs_elv << "), data (" << fcst_v << ", "
            << obs_v << "), or lapse rate ("
            << sfc_info.lapse_rate_correction_value << ") values.\n\n";
+      return;
    }
 
    // Apply correction
@@ -2209,8 +2213,8 @@ void VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
    }
 
    // Log the lapse rate correction
-   if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-      mlog << Debug(REJECT_DEBUG_LEVEL)
+   if(mlog.verbosity_level() >= CORRECTION_DEBUG_LEVEL) {
+      mlog << Debug(CORRECTION_DEBUG_LEVEL)
            << "Correcting the "
            << fieldtype_to_string(sfc_info.lapse_rate_correction_apply_to)
            << " temperature from " << orig_v << " to " << corr_v 
@@ -2271,6 +2275,7 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
            << "(fcst, obs) elevation (" << fcst_elv << ", "
            << obs_elv << ") or data (" << fcst_v << ", "
            << obs_v << ") values.\n\n";
+      return;
    }
 
    // Convert MSL to AGL
@@ -2285,8 +2290,8 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
    }
 
    // Log the MSL/AGL conversion
-   if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
-      mlog << Debug(REJECT_DEBUG_LEVEL)
+   if(mlog.verbosity_level() >= CORRECTION_DEBUG_LEVEL) {
+      mlog << Debug(CORRECTION_DEBUG_LEVEL)
            << "Converting "
            << (sfc_info.msl_agl_conversion_msl_to_agl ?
                "MSL to AGL" : "AGL to MSL")
