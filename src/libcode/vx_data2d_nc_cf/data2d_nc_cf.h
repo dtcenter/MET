@@ -40,17 +40,21 @@ class MetNcCFDataFile : public Met2dDataFile {
                                DataPlaneArray &plane_array);
       LongArray collect_time_offsets(VarInfo &vinfo);
       LongArray collect_z_offsets(VarInfo &vinfo);
+
+      long convert_generic_to_offset(double value, const std::string& dim_name, std::vector<double> values);
       long convert_time_to_offset(double time_value) const;
-      long convert_z_to_offset(double z_value, const std::string &z_dim_name);
+      long convert_z_to_offset(double z_value, const NcVarInfo* data_var);
       bool data_plane(VarInfo &, DataPlane &, const LongArray &dimension);
       void error_message(const bool is_dim_time, const int error_code,
                          const double _lower, const double _upper,
                          const long _value, const ConcatString &var_name,
                          const std::string &method_name) const;
       NcVarInfo *find_first_data_var();
+      long find_generic_offset(VarInfo& vinfo, const NcVarInfo* data_var, int index);
       long find_time_offset(VarInfo &vinfo, const NcVarInfo *data_var);
       long find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var);
       NcVarInfo *get_data_var(VarInfo &vinfo);
+      std::string get_dim_name(const NcVarInfo* data_var, int index) const;
       std::string get_z_dim_name(const NcVarInfo *data_var) const;
       void nccf_init_from_scratch();
 
@@ -117,7 +121,6 @@ class MetNcCFDataFile : public Met2dDataFile {
 
       Grid build_grid_from_lat_lon_vars(netCDF::NcVar *lat_var, netCDF::NcVar *lon_var,
                                         const long lat_counts, const long lon_counts);
-
 };
 
 
