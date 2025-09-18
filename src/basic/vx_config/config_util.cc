@@ -2586,12 +2586,13 @@ SurfaceInfo parse_conf_surface_info(Dictionary *dict) {
    sfc_info.msl_agl_conversion_apply_from = int_to_fieldtype(dict->lookup_int(conf_key_msl_agl_conversion_apply_from));
 
    // Check for invalid combinations
-   if((sfc_info.msl_agl_conversion_apply_to   != FieldType::None &&
-       sfc_info.msl_agl_conversion_apply_from == FieldType::None) ||
-      (sfc_info.msl_agl_conversion_apply_to   == FieldType::Both &&
-       sfc_info.msl_agl_conversion_apply_from != FieldType::Both)) {
+   if((sfc_info.msl_agl_conversion_apply_to    != FieldType::None  &&
+       sfc_info.msl_agl_conversion_apply_from  == FieldType::None) ||
+      ((sfc_info.msl_agl_conversion_apply_to   == FieldType::Both  ||
+        sfc_info.msl_agl_conversion_apply_from == FieldType::Both) &&
+       (sfc_info.msl_agl_conversion_apply_to   != sfc_info.msl_agl_conversion_apply_from))) {
       mlog << Error << "\n" << method_name
-           << " when \"" << conf_key_msl_agl_conversion_apply_to
+           << "when \"" << conf_key_msl_agl_conversion_apply_to
            << " = " << fieldtype_to_string(sfc_info.msl_agl_conversion_apply_to)
            << "\", \"" << conf_key_msl_agl_conversion_apply_from
            << "\" cannot be set to \""
