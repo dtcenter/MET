@@ -1413,15 +1413,14 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                                cpi);
 
             // Apply topography options
-            if(sfc_info.topo_ptr &&
-               msg_typ_sfc.reg_exp_match(it->typ_sa[i_obs].c_str()) &&
-               (sfc_info.lapse_rate_correction_apply_to != FieldType::None || 
-                sfc_info.msl_agl_conversion_apply_to != FieldType::None)) {
+            if((sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
+                msg_typ_sfc.reg_exp_match(it->typ_sa[i_obs].c_str())) ||
+               sfc_info.msl_agl_conversion_apply_to != FieldType::None) {
 
-               // Only modify the observations once
+               // Check if the observations have already been updated
                if(member != 0 &&
                   (sfc_info.lapse_rate_correction_apply_to == FieldType::Obs ||
-                   sfc_info.msl_agl_conversion_apply_to == FieldType::Obs)) break;
+                   sfc_info.msl_agl_conversion_apply_to    == FieldType::Obs)) break;
 
                // Interpolate model topography to observation location
                double topo_elv = compute_horz_interp(*sfc_info.topo_ptr,
@@ -1432,21 +1431,19 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
 
                double obs_v = it->o_na[i_obs];
 
-               // MET #3174 Apply lapse rate temperature correction
+               // MET #3174 Apply lapse rate surface temperature correction
                if(sfc_info.lapse_rate_correction_apply_to != FieldType::None) {
                   correct_lapse_rate(topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
                }
 
                // MET #3174 Apply MSL/AGL height conversion
                if(sfc_info.msl_agl_conversion_apply_to != FieldType::None) {
-                  convert_msl_agl(topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
+                  convert_msl_agl(topo_elv, it->elv_na[i_obs], fcst_v, obs_v,
+                                  member == 0);
                }
 
-               // Store the modified observation
-               if(sfc_info.lapse_rate_correction_apply_to == FieldType::Obs ||
-                  sfc_info.msl_agl_conversion_apply_to == FieldType::Obs) {
-                  it->o_na.set(i_obs, obs_v);
-               }
+               // Store the modified observation, but only for the first member
+               if(member == 0) it->o_na.set(i_obs, obs_v);
             }
 
             // Store the forecast value

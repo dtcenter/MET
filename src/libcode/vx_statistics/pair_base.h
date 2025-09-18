@@ -443,7 +443,8 @@ class VxPairBase {
 
       void correct_lapse_rate(double, double, double &, double &);
 
-      void convert_msl_agl(double, double, double &, double &);
+      void convert_msl_agl(double, double, double &, double &,
+                           bool update_obs = true);
 
       // Retrieve climo data for this point 
       ClimoPntInfo get_climo_pnt_info(const PairBase *,

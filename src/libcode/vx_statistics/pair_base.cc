@@ -2187,7 +2187,7 @@ void VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
 
    // Check for valid data
    if(is_bad_data(fcst_elv) || is_bad_data(obs_elv) ||
-      is_bad_data(fcst_v) || is_bad_data(obs_v) ||
+      is_bad_data(fcst_v)   || is_bad_data(obs_v)   ||
       is_bad_data(sfc_info.lapse_rate_correction_value)) { 
       mlog << Warning << "\n" << method_name
            << "skipping lapse rate correction due to bad "
@@ -2230,7 +2230,8 @@ void VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
-                                 double &fcst_v, double &obs_v) {
+                                 double &fcst_v, double &obs_v,
+                                 bool update_obs) {
    const char *method_name = "PairBase::convert_msl_agl() -> ";
 
    // Check for no work to be done
@@ -2255,7 +2256,8 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
    // Apply observation conversion
    double orig_o = obs_v;
    double corr_o = 0.0;
-   if(sfc_info.msl_agl_conversion_thresh.check(fcst_v) &&
+   if(update_obs &&
+      sfc_info.msl_agl_conversion_thresh.check(fcst_v) &&
       (sfc_info.msl_agl_conversion_apply_to == FieldType::Obs ||
        sfc_info.msl_agl_conversion_apply_to == FieldType::Both)) {
       if(sfc_info.msl_agl_conversion_apply_from == FieldType::Obs ||
