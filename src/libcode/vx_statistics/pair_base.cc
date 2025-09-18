@@ -2257,7 +2257,7 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
    double orig_o = obs_v;
    double corr_o = 0.0;
    if(update_obs &&
-      sfc_info.msl_agl_conversion_thresh.check(fcst_o) &&
+      sfc_info.msl_agl_conversion_thresh.check(obs_v) &&
       (sfc_info.msl_agl_conversion_apply_to == FieldType::Obs ||
        sfc_info.msl_agl_conversion_apply_to == FieldType::Both)) {
       if(sfc_info.msl_agl_conversion_apply_from == FieldType::Obs ||
