@@ -2326,7 +2326,8 @@ When enabled, the "message_type_group_map" dictionary must contain an entry for
 "SURFACE". This correction is only applied when the verifying point observation
 message type appears in the "SURFACE" entry.
 The "value" entry is a constant number that defines the lapse rate for correcting
-temperatures based on the difference of the model topography and station elevation.
+temperatures based on the difference of the model topography height and station
+elevation.
 Note that the lapse rate value depends on the units temperature and elevation and
 the user is responsibile for defining it appropriately.
 The default dry lapse rate value, for temperature in kelvin and height in meters, is
@@ -2344,21 +2345,23 @@ All "lapse_rate_correction" entries can be set separately in each "obs.field" en
 msl_agl_conversion
 ------------------
 
-The "msl_agl_conversion" dictionary defines how model topography data should be
-used to convert forecast and/or observation heights between mean-sea-level (MSL) and
-above-ground-level (AGL).
+The "msl_agl_conversion" dictionary defines how model topography heights and/or
+observation station elevations should be used to convert forecast and/or observation
+heights between mean-sea-level (MSL) and above-ground-level (AGL).
 The model topography data specified in the "topo_mask" dictionary is also used
 for this conversion.
 The "apply_to" option can be set to "NONE" (default) to disable this conversion
 logic, "FCST" to convert the forecast value, "OBS" to convert the observation
 value, or "BOTH" to convert both the forecast and observation values.
 The "apply_from" option can be set to "FCST" to convert using the model topography
-elevation, "OBS" to convert using the station elevation, or "BOTH" to convert the
-forecast value using the model topography elevation and convert the observation
+height, "OBS" to convert using the station elevation, or "BOTH" to convert the
+forecast value using the model topography height and convert the observation
 value using the station elevation.
-When enabled, the "message_type_group_map" dictionary must contain an entry for
-"SURFACE". This correction is only applied when the verifying point observation
-message type appears in the "SURFACE" entry.
+The "thresh" option specifies the valid range of values to be converted. Values not
+meeting this threshold criteria are left unchanged. The default threshold of "NA"
+always evaulates to true, but it can be set to avoid converting flag values. For example,
+set "thresh = ne99999;" to avoid converting a cloud base height flag value of 99999
+which may indicate clear sky.
 The "msl_to_agl" entry is a boolean. When "TRUE", the elevation correction is
 subtracted from the height value to convert from MSL to AGL. When "FALSE", the
 elevation correction is added to the height value to convert from AGL to MSL.
