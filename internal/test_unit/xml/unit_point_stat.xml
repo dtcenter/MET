@@ -486,9 +486,9 @@
   <test name="point_stat_LAND_TOPO_MASK">
     <exec>&MET_BIN;/point_stat</exec>
     <env>
-      <pair><name>GEOG_FILE</name>      <value>"&DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib"</value></pair>
-      <pair><name>CLIMO_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
-      <pair><name>OUTPUT_PREFIX</name>  <value>LAND_TOPO_MASK</value></pair>
+      <pair><name>GEOG_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib"</value></pair>
+      <pair><name>CLIMO_FILE</name>    <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>LAND_TOPO_MASK</value></pair>
     </env>
     <param> \
       &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
@@ -500,6 +500,26 @@
       <stat>&OUTPUT_DIR;/point_stat/point_stat_LAND_TOPO_MASK_120000L_20120409_120000V.stat</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_LAND_TOPO_MASK_120000L_20120409_120000V_sl1l2.txt</stat>
       <stat>&OUTPUT_DIR;/point_stat/point_stat_LAND_TOPO_MASK_120000L_20120409_120000V_mpr.txt</stat>
+    </output>
+  </test>
+
+  <test name="point_stat_LAPSE_RATE_MSL_AGL">
+    <exec>&MET_BIN;/point_stat</exec>
+    <env>
+      <pair><name>GEOG_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib"</value></pair>
+      <pair><name>CLIMO_FILE</name>    <value>"&DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F012_gNam.grib"</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>LAPSE_RATE_MSL_AGL</value></pair>
+    </env>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib \
+      &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      &CONFIG_DIR;/PointStatConfig_LAPSE_RATE_MSL_AGL \
+      -outdir &OUTPUT_DIR;/point_stat -v 2 
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_LAPSE_RATE_MSL_AGL_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_LAPSE_RATE_MSL_AGL_120000L_20120409_120000V_sl1l2.txt</stat>
+      <stat>&OUTPUT_DIR;/point_stat/point_stat_LAPSE_RATE_MSL_AGL_120000L_20120409_120000V_mpr.txt</stat>
     </output>
   </test>
 
