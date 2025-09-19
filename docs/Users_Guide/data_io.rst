@@ -61,6 +61,8 @@ The MET tools use following attributes and variables for input "`CF Compliant Ne
 
 6. (Optional) the "`forecast_reference_time <https://cfconventions.org/cf-conventions/cf-conventions.html#scalar-coordinate-variables>`_" variable for init_time.
 
+7. (Optional) the "`vertical coordinate <https://cfconventions.org/cf-conventions/cf-conventions.html#vertical-coordinate>`_" variable must include a supported units attribute to allow range selection.
+
 MET processes the CF-Compliant gridded NetCDF files with the projection information. The CF-Compliant NetCDF is defined by the global attribute "Conventions" whose value begins with "CF-" ("CF-<Version_number>"). The global attribute "Conventions" is mandatory. MET accepts the variation of this attribute ("conventions" and "CONVENTIONS"). The value should be started with "CF-" and followed by the version number. MET accepts the attribute value that begins with "CF " ("CF" and a space instead of a hyphen) or "COARDS".
 
 The grid mapping variable contains the projection information. The grid mapping variable can be found by looking at the variable attribute "grid_mapping" from the data variables. The "standard_name" attribute is used to filter out the coordinate variables like time, latitude, and longitude variables. The value of the "grid_mapping" attribute is the name of the grid mapping variable. Four projections are supported with grid mapping variables: latitude_longitude, lambert_conformal_conic, polar_stereographic, and geostationary. In case of the latitude_longitude projection, the latitude and longitude variable names should be the same as the dimension names and the "units" attribute should be valid.

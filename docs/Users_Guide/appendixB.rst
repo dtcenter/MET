@@ -133,17 +133,17 @@ For a Semi Lat/Lon grid, no grid specification string is supported. This grid ty
 
 Statistics can be computed from data on Semi Lat/Lon grids but only when all data resides on the same Semi Lat/Lon grid. Two Semi Lat/Lon grids are equal when their lats, lons, levels, and times arrays match. No functionality is provided to regrid Semi Lat/Lon data. The MET tools can plot Semi Lat/Lon data, however no map data is overlaid since these grids lack two spatial dimensions.
 
-Grids
-=====
+Named Grids
+===========
 
-The majority of NCEP's pre-defined grids that reside on one of the projections listed above are implemented in MET. The user may specify one of these NCEP grids in the configuration files as "GNNN" where NNN is the 3-digit NCEP grid number. Defining a new masking grid in MET would involve modifying the vx_data_grids library and recompiling.
+The majority of NCEP's predefined grids that reside on one of the projections listed above are implemented in MET. The user can specify one of these NCEP grids in the configuration files as "GNNN", where NNN is the 3-digit NCEP grid number. A small number of other grids are also predefined in the :code:`find_grid_by_name.h` header file in MET's :code:`vx_grid` library. New named grids can be added to that header file but MET must be recompiled for that change to take effect.
 
 Please see `NCEP's website for a description and plot of these predefined grids <http://www.nco.ncep.noaa.gov/pmb/docs/on388/tableb.html>`_.
 
 Polylines for NCEP Regions
 ==========================
 
-Many of NCEP's pre-defined verification regions are implemented in MET as lat/lon polyline files. The user may specify one of these NCEP verification regions in the configuration files by pointing to the lat/lon polyline file in the installed *share/met/poly* directory. Users may also easily define their own lat/lon polyline files.
+Many of NCEP's predefined verification regions are implemented in MET as lat/lon polyline files. The user may specify one of these NCEP verification regions in the configuration files by pointing to the lat/lon polyline file in the installed *share/met/poly* directory. Users may also easily define their own lat/lon polyline files.
 
 See `NCEP's website for a description and plot of these predefined verification regions <http://www.emc.ncep.noaa.gov/mmb/research/nearsfc/nearsfc.verf.html>`_.
 
