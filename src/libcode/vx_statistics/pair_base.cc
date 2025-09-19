@@ -1767,9 +1767,9 @@ bool VxPairBase::is_keeper_topo(
    if(sfc_info.topo_ptr) {
       topo_elv = compute_horz_interp(
                     *sfc_info.topo_ptr, obs_x, obs_y, hdr_elv,
-                    InterpMthd::Bilin, 2,
-                    GridTemplateFactory::GridTemplates::Square,
-                    gr.wrap_lon(), 1.0);
+                    pb_ptr[0]->interp_mthd, pb_ptr[0]->interp_wdth,
+                    pb_ptr[0]->interp_shape,
+                    gr.wrap_lon(), interp_thresh);
    }
 
    // Check for a large topography difference

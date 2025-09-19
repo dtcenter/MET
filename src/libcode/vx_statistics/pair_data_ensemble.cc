@@ -1413,21 +1413,19 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                                cpi);
 
             // Apply topography options
-            if((sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
-                msg_typ_sfc.reg_exp_match(it->typ_sa[i_obs].c_str())) ||
-               sfc_info.msl_agl_conversion_apply_to != FieldType::None) {
-
-               // Check if the observations have already been updated
-               if(member != 0 &&
-                  (sfc_info.lapse_rate_correction_apply_to == FieldType::Obs ||
-                   sfc_info.msl_agl_conversion_apply_to    == FieldType::Obs)) break;
+            if(!is_bad_data(fcst_v) &&
+               ((sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
+                 msg_typ_sfc.reg_exp_match(it->typ_sa[i_obs].c_str())) ||
+                 sfc_info.msl_agl_conversion_apply_to != FieldType::None)) {
 
                // Interpolate model topography to observation location
-               double topo_elv = compute_horz_interp(*sfc_info.topo_ptr,
-                                    it->x_na[i_obs], it->y_na[i_obs], it->elv_na[i_obs],
-                                    InterpMthd::Bilin, 2,
-                                    GridTemplateFactory::GridTemplates::Square,
-                                    gr.wrap_lon(), 1.0);
+               double topo_elv = bad_data_double;
+               if(sfc_info.topo_ptr) {
+                  topo_elv = compute_horz_interp(*sfc_info.topo_ptr,
+                                it->x_na[i_obs], it->y_na[i_obs], it->elv_na[i_obs],
+                                it->interp_mthd, it->interp_wdth, it->interp_shape,
+                                gr.wrap_lon(), interp_thresh);
+               }
 
                double obs_v = it->o_na[i_obs];
 
