@@ -330,7 +330,7 @@
     </output>
   </test>
 
-  <!--  Compute RPS line type using probabilistic inputs. -->
+  <!--  Compute RPS line type using probabilistic inputs.  -->
 
   <test name="ensemble_stat_RPS_CLIMO_BIN_PROB">
     <exec>&MET_BIN;/ensemble_stat</exec>
@@ -347,6 +347,60 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_RPS_CLIMO_BIN_PROB_20210101_000000V.stat</stat>
+    </output>
+  </test>
+
+  <!--  Demonstrate land_mask and topo_mask options.  -->
+
+  <test name="ensemble_stat_LAND_TOPO_MASK">
+    <exec>&MET_BIN;/ensemble_stat</exec>
+    <env>
+      <pair><name>GEOG_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib"</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>LAND_TOPO_MASK</value></pair>
+    </env>
+    <param> \
+      6 \
+      &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F024.grib \
+      &DATA_DIR_MODEL;/grib1/arw-fer-gep5/arw-fer-gep5_2012040912_F024.grib \
+      &DATA_DIR_MODEL;/grib1/arw-sch-gep2/arw-sch-gep2_2012040912_F024.grib \
+      &DATA_DIR_MODEL;/grib1/arw-sch-gep6/arw-sch-gep6_2012040912_F024.grib \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep3/arw-tom-gep3_2012040912_F024.grib \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep7/arw-tom-gep7_2012040912_F024.grib \
+      &CONFIG_DIR;/EnsembleStatConfig_LAND_TOPO_MASK \
+      -point_obs &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      -outdir &OUTPUT_DIR;/ensemble_stat -v 2 
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_LAND_TOPO_MASK_20120410_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_LAND_TOPO_MASK_20120410_120000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_LAND_TOPO_MASK_20120410_120000V_orank.txt</stat>
+    </output>
+  </test>
+
+  <!--  Demonstrate lapse_rate_correction and msl_agl_conversion options.  -->
+
+  <test name="ensemble_stat_LAPSE_RATE_MSL_AGL">
+    <exec>&MET_BIN;/ensemble_stat</exec>
+    <env>
+      <pair><name>GEOG_FILE</name>     <value>"&DATA_DIR_MODEL;/grib1/nam/nam_2012040900_F012.grib"</value></pair>
+      <pair><name>OUTPUT_PREFIX</name> <value>LAPSE_RATE_MSL_AGL</value></pair>
+    </env>
+    <param> \
+      6 \
+      &DATA_DIR_MODEL;/grib1/arw-fer-gep1/arw-fer-gep1_2012040912_F012.grib \
+      &DATA_DIR_MODEL;/grib1/arw-fer-gep5/arw-fer-gep5_2012040912_F012.grib \
+      &DATA_DIR_MODEL;/grib1/arw-sch-gep2/arw-sch-gep2_2012040912_F012.grib \
+      &DATA_DIR_MODEL;/grib1/arw-sch-gep6/arw-sch-gep6_2012040912_F012.grib \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep3/arw-tom-gep3_2012040912_F012.grib \
+      &DATA_DIR_MODEL;/grib1/arw-tom-gep7/arw-tom-gep7_2012040912_F012.grib \
+      &CONFIG_DIR;/EnsembleStatConfig_LAPSE_RATE_MSL_AGL \
+      -point_obs &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      -outdir &OUTPUT_DIR;/ensemble_stat -v 2 
+    </param>
+    <output>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_LAPSE_RATE_MSL_AGL_120000L_20120409_120000V.stat</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_LAPSE_RATE_MSL_AGL_120000L_20120409_120000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_LAPSE_RATE_MSL_AGL_120000L_20120409_120000V_orank.txt</stat>
     </output>
   </test>
 

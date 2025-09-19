@@ -57,11 +57,11 @@ fcst = {
         topo_mask = { flag = TRUE;  };
         land_mask = { flag = FALSE; }; },
       {      desc = "TOPO_FALSE_LAND_TRUE";
-        topo_mask = { flag = FALSE;  };
-        land_mask = { flag = TRUE; }; },
+        topo_mask = { flag = FALSE; };
+        land_mask = { flag = TRUE;  }; },
       {      desc = "TOPO_TRUE_LAND_TRUE";
         topo_mask = { flag = TRUE;  };
-        land_mask = { flag = TRUE; }; }
+        land_mask = { flag = TRUE;  }; }
    ];
 
 }

@@ -106,7 +106,7 @@ climo_mean = {
 
 //
 // Land/Sea mask options
-// "flag" may be set separately in each "obs.field" entry.
+// "flag" may be set separately in each "obs.field" entry
 //
 land_mask = {
    flag      = FALSE;

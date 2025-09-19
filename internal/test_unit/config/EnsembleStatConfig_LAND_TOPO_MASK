@@ -66,14 +66,28 @@ eclv_points = 0.05;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   ens_thresh = 1.0;
-   vld_thresh = 1.0;
+   ens_thresh      = 0.75;
+   vld_thresh      = 1.0;
+   obs_quality_inc = [];
+   obs_quality_exc = [];
+
+   name         = "TMP";
+   level        = "Z2";
+   message_type = [ "ADPSFC", "SFCSHP" ];
 
    field = [
-      {
-         name  = "APCP";
-         level = [ "A03" ];
-      }
+      {      desc = "TOPO_FALSE_LAND_FALSE";
+        topo_mask = { flag = FALSE; };
+        land_mask = { flag = FALSE; }; },
+      {      desc = "TOPO_TRUE_LAND_FALSE";
+        topo_mask = { flag = TRUE;  };
+        land_mask = { flag = FALSE; }; },
+      {      desc = "TOPO_FALSE_LAND_TRUE";
+        topo_mask = { flag = FALSE; };
+        land_mask = { flag = TRUE;  }; },
+      {      desc = "TOPO_TRUE_LAND_TRUE";
+        topo_mask = { flag = TRUE;  };
+        land_mask = { flag = TRUE;  }; }
    ];
 }
 obs = fcst;
@@ -84,7 +98,7 @@ obs = fcst;
 // Point observation filtering options
 // May be set separately in each "obs.field" entry
 //
-message_type    = [ "ADPUPA" ];
+message_type    = [];
 sid_inc         = [];
 sid_exc         = [];
 obs_thresh      = [ NA ];
@@ -101,26 +115,32 @@ skip_const      = FALSE;
 // May be set separately in each "obs.field" entry
 //
 obs_error = {
-   flag             = FALSE;   // TRUE or FALSE
-   dist_type        = NONE;    // Distribution type
-   dist_parm        = [];      // Distribution parameters
-   inst_bias_scale  = 1.0;     // Instrument bias scale adjustment
-   inst_bias_offset = 0.0;     // Instrument bias offset adjustment
-   min              = NA;      // Valid range of data
+   flag             = FALSE;
+   dist_type        = NONE;
+   dist_parm        = [];
+   inst_bias_scale  = 1.0;
+   inst_bias_offset = 0.0;
+   min              = NA;
    max              = NA;
 }
 
+////////////////////////////////////////////////////////////////////////////////
+
 //
-// Mapping of message type group name to comma-separated list of values
+// Mapping of message type group name to comma-separated list of values.
 //
 message_type_group_map = [
    { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
    { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
    { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
-   { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
+   { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      },
+   { key = "LANDSF";  val = "ADPSFC,MSONET";                      },
+   { key = "WATERSF"; val = "SFCSHP";                             }
 ];
 
 obtype_as_group_val_flag = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
 
 //
 // Ensemble bin sizes
@@ -132,44 +152,11 @@ ens_phist_bin_size = 0.05;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology mean data
-// May be set separately in the "fcst" and "obs" dictionaries
+// Point observation time window
 //
-climo_mean = {
-
-   file_name = [];
-   field     = [];
-
-   regrid = {
-      method     = NEAREST;
-      width      = 1;
-      vld_thresh = 0.5;
-      shape      = SQUARE;
-   }
-
-   time_interp_method = DW_MEAN;
-   day_interval       = 31;
-   hour_interval      = 6;
-}
-
-//
-// Climatology standard deviation data
-// May be set separately in the "fcst" and "obs" dictionaries
-//
-climo_stdev = climo_mean;
-climo_stdev = {
-   file_name = [];
-}
-
-//
-// Climatology distribution settings
-// May be set separately in each "obs.field" entry
-//
-climo_cdf = {
-   cdf_bins    = 10;
-   center_bins = FALSE;
-   write_bins  = TRUE;
-   direct_prob = FALSE;
+obs_window = {
+   beg = -18000000;
+   end =  18000000;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -180,7 +167,7 @@ climo_cdf = {
 //
 land_mask = {
    flag      = FALSE;
-   file_name = [];
+   file_name = [ ${GEOG_FILE} ];
    field     = { name = "LAND"; level = "L0"; }
    regrid    = { method = NEAREST; width = 1; }
    thresh    = eq1;
@@ -193,9 +180,9 @@ land_mask = {
 //
 topo_mask = {
    flag               = FALSE;
-   file_name          = [];
-   field              = { name = "TOPO"; level = "L0"; }
-   regrid             = { method = BILIN; width = 2; }
+   file_name          = [ ${GEOG_FILE} ];
+   field              = { name = "HGT"; level = "Z0"; }
+   regrid             = { method = NEAREST; width = 1; }
    use_obs_thresh     = ge-100&&le100;
    interp_fcst_thresh = ge-50&&le50;
 }
@@ -218,16 +205,6 @@ msl_agl_conversion = {
   apply_from = OBS;
   thresh     = NA;
   msl_to_agl = TRUE;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Point observation time window
-//
-obs_window = {
-   beg = -5400;
-   end =  5400;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -261,8 +238,8 @@ interp = {
 
    type = [
       {
-         method = NEAREST;
-         width  = 1;
+         method = BILIN;
+         width  = 2;
       }
    ];
 }
@@ -274,11 +251,11 @@ interp = {
 // May be set separately in each "obs.field" entry
 //
 output_flag = {
-   ecnt  = NONE;
+   ecnt  = BOTH;
    rps   = NONE;
    rhist = NONE;
    phist = NONE;
-   orank = NONE;
+   orank = BOTH;
    ssvar = NONE;
    relp  = NONE;
    pct   = NONE;
@@ -294,15 +271,7 @@ output_flag = {
 // Gridded verification output types
 // May be set separately in each "obs.field" entry
 //
-nc_orank_flag = {
-   latlon    = TRUE;
-   mean      = TRUE;
-   raw       = TRUE;
-   rank      = TRUE;
-   pit       = TRUE;
-   vld_count = TRUE;
-   weight    = FALSE;
-}
+nc_orank_flag = FALSE;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -311,7 +280,7 @@ nc_orank_flag = {
 //
 rng = {
    type = "mt19937";
-   seed = "";
+   seed = "1";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -319,7 +288,7 @@ rng = {
 grid_weight_flag  = NONE;
 point_weight_flag = NONE;
 
-output_prefix = "";
+output_prefix = "${OUTPUT_PREFIX}";
 version       = "V12.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////
