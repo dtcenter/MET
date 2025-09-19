@@ -359,8 +359,8 @@ bool VarInfoGrib::is_precipitation() const {
    // Check to see if it matches the GRIB precipitation abbreviations.
    //
    bool status = false;
-   for(int i=0; i<n_grib_precipitation_abbr; i++) {
-      if(ReqName ==  grib_precipitation_abbr[i]) {
+   for(auto abbr : grib_precipitation_abbr) {
+      if(ReqName == abbr) {
          status = true;
          break;
       }
@@ -385,8 +385,8 @@ bool VarInfoGrib::is_specific_humidity() const {
    // Check to see if it matches the GRIB specific humidity abbreviations.
    //
    bool status = false;
-   for(int i=0; i<n_grib_specific_humidity_abbr; i++) {
-      if(ReqName == grib_specific_humidity_abbr[i]) {
+   for(auto abbr : grib_specific_humidity_abbr) {
+      if(ReqName == abbr) {
          status = true;
          break;
       }

@@ -177,10 +177,6 @@ class PairBase {
       void set_obs_summary(ObsSummary s);
       void set_obs_perc_value(int i);
 
-      int  has_obs_rec(const char *,
-                       double, double, double,
-                       double, double, double, double, int &);
-
       ob_val_t compute_nearest(std::string sng_key);
       ob_val_t compute_min(std::string sng_key);
       ob_val_t compute_max(std::string sng_key);
@@ -439,12 +435,12 @@ class VxPairBase {
                                 const char *, const Grid &,
                                 double, double, double,
                                 double, double, double,
-                                const ClimoPntInfo &);
+                                const ClimoPntInfo &) const;
 
-      void correct_lapse_rate(double, double, double &, double &);
+      void correct_lapse_rate(double, double, double &, double &) const;
 
       void convert_msl_agl(double, double, double &, double &,
-                           bool update_obs = true);
+                           bool update_obs = true) const;
 
       // Retrieve climo data for this point 
       ClimoPntInfo get_climo_pnt_info(const PairBase *,

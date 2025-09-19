@@ -1389,8 +1389,8 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
             // Otherwise, retrieve all the neighborhood values
             // using a valid threshold of 0
             else {
-               // TODO: Consider whether the land/sea mask or topo info
-               //       should be used when gathering HiRA neighborhood values
+               // Note that land_mask and topo_mask settings do not
+	       // impact the HiRA neighborhood values selected
                get_interp_points(fcst_dpa,
                   it->x_na[i_obs], it->y_na[i_obs],
                   it->interp_mthd, it->interp_wdth, it->interp_shape,

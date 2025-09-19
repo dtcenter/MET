@@ -615,7 +615,7 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
    // Search each input file for a match
    bool found = false;
    DataPlane dp;
-   for(int i=0; !found && i<geog_files.n(); i++) {
+   for(int i=0; i<geog_files.n(); i++) {
 
       // Allocate memory for data file
       if(!(mtddf = mtddf_factory.new_met_2d_data_file(geog_files[i].c_str(), ftype))) {
@@ -657,6 +657,8 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
       // Deallocate memory
       if(mtddf) { delete mtddf; mtddf = (Met2dDataFile *) nullptr; }
       if(info)  { delete info;  info  = (VarInfo       *) nullptr; }
+
+      if(found) break;
    }
 
    if(!found) {

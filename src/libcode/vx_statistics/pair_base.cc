@@ -370,39 +370,6 @@ void PairBase::set_obs_perc_value(int i) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int PairBase::has_obs_rec(const char *sid,
-                          double lat, double lon, double elv,
-                          double x, double y, double lvl, double hgt,
-                          int &i_obs) {
-   int i, status = 0;
-
-   //
-   // Only valid for point data
-   //
-   if(!IsPointVx) return false;
-
-   //
-   // Check for an existing record of this observation
-   //
-   for(i=0, i_obs=-1; i<n_obs; i++) {
-
-      if(sid_sa[i] == sid &&
-         is_eq(lat_na[i], lat) &&
-         is_eq(lon_na[i], lon) &&
-         is_eq(elv_na[i], elv) &&
-         is_eq(lvl_na[i], lvl) &&
-         is_eq(hgt_na[i], hgt)) {
-         status = 1;
-         i_obs = i;
-         break;
-      }
-   } // end for
-
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void PairBase::add_climo(double obs,
                          const ClimoPntInfo &cpi) {
 
@@ -2123,7 +2090,7 @@ double VxPairBase::compute_fcst_value(
           const PairBase *pb, const char *hdr_typ_str, const Grid &gr,
           double obs_x, double obs_y, double hdr_elv,
           double obs_v, double obs_lvl, double obs_hgt,
-          const ClimoPntInfo &cpi) {
+          const ClimoPntInfo &cpi) const {
    const char *method_name = "PairBase::compute_fcst_value() -> ";
    double fcst_v = bad_data_double;
 
@@ -2160,7 +2127,8 @@ double VxPairBase::compute_fcst_value(
       double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                        obs_lvl : obs_hgt);
 
-      int lvl_blw, lvl_abv;
+      int lvl_blw;
+      int lvl_abv;
       find_vert_lvl(fcst_dpa, to_lvl, lvl_blw, lvl_abv);
 
       fcst_v = compute_interp(fcst_dpa,
@@ -2178,7 +2146,7 @@ double VxPairBase::compute_fcst_value(
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
-                                    double &fcst_v, double &obs_v) {
+                                    double &fcst_v, double &obs_v) const {
    const char *method_name = "PairBase::correct_lapse_rate() -> ";
 
    // Check for no work to be done
@@ -2231,7 +2199,7 @@ void VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
 
 void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
                                  double &fcst_v, double &obs_v,
-                                 bool update_obs) {
+                                 bool update_obs) const {
    const char *method_name = "PairBase::convert_msl_agl() -> ";
 
    // Check for no work to be done
