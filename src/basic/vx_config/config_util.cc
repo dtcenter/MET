@@ -2558,6 +2558,13 @@ SurfaceInfo parse_conf_surface_info(Dictionary *dict) {
    // Conf: topo_mask.flag
    sfc_info.topo_flag = dict->lookup_bool(conf_key_topo_mask_flag);
 
+   // Conf: topo_mask.interp
+   InterpInfo interp_info = parse_conf_interp(dict, conf_key_topo_mask_interp);
+   sfc_info.topo_interp_mthd = string_to_interpmthd(interp_info.method[0].c_str());
+   sfc_info.topo_interp_wdth = interp_info.width[0];
+   sfc_info.topo_interp_shape = interp_info.shape;
+   sfc_info.topo_interp_vld_thresh = interp_info.vld_thresh;
+
    // Conf: topo_mask.use_obs_thresh
    sfc_info.topo_mask_use_obs_thresh = dict->lookup_thresh(conf_key_topo_mask_use_obs_thresh);
 

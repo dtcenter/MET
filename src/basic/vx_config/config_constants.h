@@ -757,6 +757,7 @@ static const char conf_key_land_mask[]                      = "land_mask";
 static const char conf_key_land_mask_flag[]                 = "land_mask.flag";
 static const char conf_key_topo_mask[]                      = "topo_mask";
 static const char conf_key_topo_mask_flag[]                 = "topo_mask.flag";
+static const char conf_key_topo_mask_interp[]               = "topo_mask.interp";
 static const char conf_key_topo_mask_use_obs_thresh[]       = "topo_mask.use_obs_thresh";
 static const char conf_key_topo_mask_interp_fcst_thresh[]   = "topo_mask.interp_fcst_thresh";
 static const char conf_key_lapse_rate_correction_apply_to[] = "lapse_rate_correction.apply_to";

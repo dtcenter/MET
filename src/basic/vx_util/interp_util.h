@@ -53,6 +53,12 @@ struct SurfaceInfo {
    bool          topo_flag;
    DataPlane *   topo_ptr;
 
+   // Topography interpolation options
+   InterpMthd    topo_interp_mthd;
+   int           topo_interp_wdth;
+   GridTemplateFactory::GridTemplates topo_interp_shape;
+   double        topo_interp_vld_thresh;
+
    // Filter observations based on topography difference
    SingleThresh  topo_mask_use_obs_thresh;
 

@@ -184,6 +184,7 @@ topo_mask = {
    file_name          = [];
    field              = { name = "TOPO"; level = "L0"; }
    regrid             = { method = BILIN; width = 2; }
+   interp             = { method = BILIN; width = 2; }
    use_obs_thresh     = ge-100&&le100;
    interp_fcst_thresh = ge-50&&le50;
 }

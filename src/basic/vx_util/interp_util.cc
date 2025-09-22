@@ -38,6 +38,10 @@ void SurfaceInfo::clear() {
    land_ptr = (MaskPlane *) nullptr;
    topo_flag = false;
    topo_ptr = (DataPlane *) nullptr;
+   topo_interp_mthd = InterpMthd::None;
+   topo_interp_wdth = 0;
+   topo_interp_shape = GridTemplateFactory::GridTemplates::None;
+   topo_interp_vld_thresh = bad_data_double;
    topo_mask_use_obs_thresh.clear();
    topo_mask_interp_fcst_thresh.clear();
    lapse_rate_correction_apply_to = FieldType::None;

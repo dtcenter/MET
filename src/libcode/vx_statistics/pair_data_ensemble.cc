@@ -1421,10 +1421,14 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                // Interpolate model topography to observation location
                double topo_elv = bad_data_double;
                if(sfc_info.topo_ptr) {
-                  topo_elv = compute_horz_interp(*sfc_info.topo_ptr,
+                  topo_elv = compute_horz_interp(
+                                *sfc_info.topo_ptr,
                                 it->x_na[i_obs], it->y_na[i_obs], it->elv_na[i_obs],
-                                it->interp_mthd, it->interp_wdth, it->interp_shape,
-                                gr.wrap_lon(), interp_thresh);
+                                sfc_info.topo_interp_mthd,
+                                sfc_info.topo_interp_wdth,
+                                sfc_info.topo_interp_shape,
+                                gr.wrap_lon(),
+                                sfc_info.topo_interp_vld_thresh);
                }
 
                double obs_v = it->o_na[i_obs];
