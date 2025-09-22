@@ -2296,7 +2296,8 @@ difference meets the "interp_fcst_thresh" threshold entry.  If the "file_name"
 is left empty, the topography data is assumed to exist in the input forecast file(s).
 Otherwise, the specified file(s) are searched for the data specified in the "field"
 entry. The "regrid" settings specify how this field should be regridded to
-the verification domain.
+the verification domain. The "interp" settings specify how this field should be
+interpolated to point observation locations.
 
 The "topo_mask.flag", "topo_mask.use_obs_thresh", and "topo_mask.interp_fcst_thresh"
 entries can be set separately in each "obs.field" entry.
@@ -2308,6 +2309,7 @@ entries can be set separately in each "obs.field" entry.
      file_name          = [];
      field              = { name = "TOPO"; level = "L0"; }
      regrid             = { method = BILIN; width = 2; }
+     interp             = { method = BILIN; width = 2; }
      use_obs_thresh     = ge-100&&le100;
      interp_fcst_thresh = ge-50&&le50;
   }
