@@ -399,7 +399,7 @@
     </param>
     <output>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_LAPSE_RATE_MSL_AGL_20120409_120000V.stat</stat>
-      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_LAPSE_RATE_MSL_AGL_20120409_12000V_ecnt.txt</stat>
+      <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_LAPSE_RATE_MSL_AGL_20120409_120000V_ecnt.txt</stat>
       <stat>&OUTPUT_DIR;/ensemble_stat/ensemble_stat_LAPSE_RATE_MSL_AGL_20120409_120000V_orank.txt</stat>
     </output>
   </test>
