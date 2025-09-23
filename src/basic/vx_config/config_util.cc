@@ -2558,45 +2558,6 @@ SurfaceInfo parse_conf_surface_info(Dictionary *dict) {
    // Conf: topo_mask.flag
    sfc_info.topo_flag = dict->lookup_bool(conf_key_topo_mask_flag);
 
-   // Conf: topo_mask.interp
-   Dictionary *interp_dict = dict->lookup_dictionary(conf_key_topo_mask_interp);
-
-   // Conf: topo_mask.interp.method
-   if(interp_dict->lookup(conf_key_method, false)) {
-      sfc_info.topo_interp_mthd = int_to_interpmthd(interp_dict->lookup_int(conf_key_method));
-   }
-   // Use global default
-   else {
-      sfc_info.topo_interp_mthd = InterpMthd::Bilin;
-   }
-
-   // Conf: topo_mask.interp.width
-   if(interp_dict->lookup(conf_key_width, false)) {
-      sfc_info.topo_interp_wdth = interp_dict->lookup_int(conf_key_width);
-   }
-   // Use global default
-   else {
-      sfc_info.topo_interp_wdth = 2;
-   }
-
-   // Conf: topo_mask.interp.shape
-   if(interp_dict->lookup(conf_key_shape, false)) {
-      sfc_info.topo_interp_shape = int_to_gridtemplate(interp_dict->lookup_int(conf_key_shape));
-   }
-   // Use global default
-   else {
-      sfc_info.topo_interp_shape = GridTemplateFactory::GridTemplates::Square;
-   }
-
-   // Conf: topo_mask.interp.vld_thresh
-   if(interp_dict->lookup(conf_key_vld_thresh, false)) {
-      sfc_info.topo_interp_vld_thresh = interp_dict->lookup_double(conf_key_vld_thresh);
-   }
-   // Use global default
-   else {
-      sfc_info.topo_interp_vld_thresh = default_vld_thresh;
-   }
-
    // Conf: topo_mask.use_obs_thresh
    sfc_info.topo_mask_use_obs_thresh = dict->lookup_thresh(conf_key_topo_mask_use_obs_thresh);
 
@@ -3262,7 +3223,7 @@ SetLogic check_setlogic(SetLogic t1, SetLogic t2) {
    SetLogic t = SetLogic::None;
 
    // If not equal, select the non-default logic type
-        if(t1 == t2)            t = t1;
+        if(t1 == t2)             t = t1;
    else if(t1 == SetLogic::None) t = t2;
    else if(t2 == SetLogic::None) t = t1;
    // If not equal and both non-default, error out

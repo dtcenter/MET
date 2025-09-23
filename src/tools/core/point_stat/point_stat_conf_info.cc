@@ -558,6 +558,31 @@ void PointStatConfInfo::process_geog(const Grid &grid,
 
          // Store pointer to the topo data
          vx_opt[i].vx_pd.sfc_info.topo_ptr = &topo_dp;
+
+         // Conf: topo_mask.interp
+         Dictionary *interp_dict = conf.lookup_dictionary(conf_key_topo_mask_interp);
+
+         // Conf: topo_mask.interp.method (required)
+         vx_opt[i].vx_pd.sfc_info.topo_interp_mthd = int_to_interpmthd(interp_dict->lookup_int(conf_key_method));
+
+         // Conf: topo_mask.interp.width (required)
+         vx_opt[i].vx_pd.sfc_info.topo_interp_wdth = interp_dict->lookup_int(conf_key_width);
+
+         // Conf: topo_mask.interp.shape (optional)
+         if(interp_dict->lookup(conf_key_shape, false)) {
+            vx_opt[i].vx_pd.sfc_info.topo_interp_shape = int_to_gridtemplate(interp_dict->lookup_int(conf_key_shape));
+         }
+         else {
+            vx_opt[i].vx_pd.sfc_info.topo_interp_shape = GridTemplateFactory::GridTemplates::Square;
+         }
+
+         // Conf: topo_mask.interp.vld_thresh (optional)
+	 if(interp_dict->lookup(conf_key_vld_thresh, false)) {
+            vx_opt[i].vx_pd.sfc_info.topo_interp_vld_thresh = interp_dict->lookup_double(conf_key_vld_thresh);
+         }
+         else {
+            vx_opt[i].vx_pd.sfc_info.topo_interp_vld_thresh = 1.0;
+         }
       }
    }
 
