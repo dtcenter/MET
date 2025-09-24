@@ -122,9 +122,6 @@ class PointStatVxOpt {
       ThreshArray     owind_ta;           // Array for obs wind speed thresholds
       SetLogic        wind_logic;         // Array of wind speed field logic
 
-      bool            land_flag;          // Flag for land/sea mask filtering
-      bool            topo_flag;          // Flag for topography filtering
-
       StringArray     mask_grid;          // Masking grid strings
       StringArray     mask_poly;          // Masking polyline strings
       StringArray     mask_sid;           // Masking station ID's
@@ -228,11 +225,9 @@ class PointStatConfInfo {
       bool             grib_codes_set;
       bool             var_units_set;
 
-      // Land/sea mask and topography info for data filtering
-      MaskPlane    land_mask;
-      DataPlane    topo_dp;
-      SingleThresh topo_use_obs_thresh;
-      SingleThresh topo_interp_fcst_thresh;
+      // Land/sea mask and topography data
+      MaskPlane land_mask;
+      DataPlane topo_dp;
 
       // Message type groups that should be processed together
       std::map<ConcatString,StringArray> msg_typ_group_map;

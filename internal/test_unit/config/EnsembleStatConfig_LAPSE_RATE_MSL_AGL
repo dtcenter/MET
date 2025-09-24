@@ -66,14 +66,42 @@ eclv_points = 0.05;
 // Forecast and observation fields to be verified
 //
 fcst = {
-   ens_thresh = 1.0;
-   vld_thresh = 1.0;
+   ens_thresh      = 0.75;
+   vld_thresh      = 1.0;
+   obs_quality_inc = [];
+   obs_quality_exc = [];
 
    field = [
-      {
-         name  = "APCP";
-         level = [ "A03" ];
-      }
+
+      { name = "TMP"; level = "Z2"; message_type = "ADPSFC";
+        desc = "LAPSE_RATE_APPLY_TO_NONE"; },
+
+      { name = "TMP"; level = "Z2"; message_type = "ADPSFC";
+        desc = "LAPSE_RATE_APPLY_TO_FCST";
+        lapse_rate_correction = { apply_to = FCST; }; },
+
+      { name = "TMP"; level = "Z2"; message_type = "ADPSFC";
+        desc = "LAPSE_RATE_APPLY_TO_OBS";
+        lapse_rate_correction = { apply_to = OBS; }; },
+
+      { name = "HGT"; level = "P500"; message_type = "ADPUPA";
+        desc = "MSL_TO_AGL_APPLY_FROM_NONE_TO_NONE"; },
+
+      { name = "HGT"; level = "P500"; message_type = "ADPUPA";
+        desc = "MSL_TO_AGL_APPLY_FROM_OBS_TO_OBS";
+        msl_agl_conversion = { apply_from = OBS; apply_to = OBS; }; },
+
+      { name = "HGT"; level = "P500"; message_type = "ADPUPA";
+        desc = "MSL_TO_AGL_APPLY_FROM_FCST_TO_FCST";
+        msl_agl_conversion = { apply_from = FCST; apply_to = FCST; }; },
+
+      { name = "HGT"; level = "P500"; message_type = "ADPUPA";
+        desc = "MSL_TO_AGL_APPLY_FROM_BOTH_TO_BOTH";
+        msl_agl_conversion = { apply_from = BOTH; apply_to = BOTH; }; },
+
+      { name = "HGT"; level = "P500"; message_type = "ADPUPA";
+        desc = "AGL_TO_MSL_APPLY_FROM_BOTH_TO_BOTH";
+        msl_agl_conversion = { apply_from = BOTH; apply_to = BOTH; msl_to_agl = FALSE; }; }
    ];
 }
 obs = fcst;
@@ -84,8 +112,9 @@ obs = fcst;
 // Point observation filtering options
 // May be set separately in each "obs.field" entry
 //
-message_type    = [ "ADPUPA" ];
-sid_inc         = [];
+message_type    = [];
+sid_inc         = [ "K9L2",  "KAAT",  "KACV",  "KAJO",  "KAPC", 
+                    "72293", "72388", "72393", "72489", "72493" ];
 sid_exc         = [];
 obs_thresh      = [ NA ];
 obs_quality_inc = [];
@@ -101,14 +130,16 @@ skip_const      = FALSE;
 // May be set separately in each "obs.field" entry
 //
 obs_error = {
-   flag             = FALSE;   // TRUE or FALSE
-   dist_type        = NONE;    // Distribution type
-   dist_parm        = [];      // Distribution parameters
-   inst_bias_scale  = 1.0;     // Instrument bias scale adjustment
-   inst_bias_offset = 0.0;     // Instrument bias offset adjustment
-   min              = NA;      // Valid range of data
+   flag             = FALSE;
+   dist_type        = NONE;
+   dist_parm        = [];
+   inst_bias_scale  = 1.0;
+   inst_bias_offset = 0.0;
+   min              = NA;
    max              = NA;
 }
+
+////////////////////////////////////////////////////////////////////////////////
 
 //
 // Mapping of message type group name to comma-separated list of values
@@ -122,6 +153,8 @@ message_type_group_map = [
 
 obtype_as_group_val_flag = FALSE;
 
+////////////////////////////////////////////////////////////////////////////////
+
 //
 // Ensemble bin sizes
 // May be set separately in each "obs.field" entry
@@ -132,44 +165,11 @@ ens_phist_bin_size = 0.05;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Climatology mean data
-// May be set separately in the "fcst" and "obs" dictionaries
+// Point observation time window
 //
-climo_mean = {
-
-   file_name = [];
-   field     = [];
-
-   regrid = {
-      method     = NEAREST;
-      width      = 1;
-      vld_thresh = 0.5;
-      shape      = SQUARE;
-   }
-
-   time_interp_method = DW_MEAN;
-   day_interval       = 31;
-   hour_interval      = 6;
-}
-
-//
-// Climatology standard deviation data
-// May be set separately in the "fcst" and "obs" dictionaries
-//
-climo_stdev = climo_mean;
-climo_stdev = {
-   file_name = [];
-}
-
-//
-// Climatology distribution settings
-// May be set separately in each "obs.field" entry
-//
-climo_cdf = {
-   cdf_bins    = 10;
-   center_bins = FALSE;
-   write_bins  = TRUE;
-   direct_prob = FALSE;
+obs_window = {
+   beg = -5400;
+   end =  5400;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -180,7 +180,7 @@ climo_cdf = {
 //
 land_mask = {
    flag      = FALSE;
-   file_name = [];
+   file_name = [ ${GEOG_FILE} ];
    field     = { name = "LAND"; level = "L0"; }
    regrid    = { method = NEAREST; width = 1; }
    thresh    = eq1;
@@ -193,8 +193,8 @@ land_mask = {
 //
 topo_mask = {
    flag               = FALSE;
-   file_name          = [];
-   field              = { name = "TOPO"; level = "L0"; }
+   file_name          = [ ${GEOG_FILE} ];
+   field              = { name = "HGT"; level = "Z0"; }
    regrid             = { method = BILIN; width = 2; }
    interp             = { method = BILIN; width = 2; }
    use_obs_thresh     = ge-100&&le100;
@@ -219,16 +219,6 @@ msl_agl_conversion = {
   apply_from = OBS;
   thresh     = NA;
   msl_to_agl = TRUE;
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-//
-// Point observation time window
-//
-obs_window = {
-   beg = -5400;
-   end =  5400;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -262,8 +252,8 @@ interp = {
 
    type = [
       {
-         method = NEAREST;
-         width  = 1;
+         method = BILIN;
+         width  = 2;
       }
    ];
 }
@@ -275,11 +265,11 @@ interp = {
 // May be set separately in each "obs.field" entry
 //
 output_flag = {
-   ecnt  = NONE;
+   ecnt  = BOTH;
    rps   = NONE;
    rhist = NONE;
    phist = NONE;
-   orank = NONE;
+   orank = BOTH;
    ssvar = NONE;
    relp  = NONE;
    pct   = NONE;
@@ -295,15 +285,7 @@ output_flag = {
 // Gridded verification output types
 // May be set separately in each "obs.field" entry
 //
-nc_orank_flag = {
-   latlon    = TRUE;
-   mean      = TRUE;
-   raw       = TRUE;
-   rank      = TRUE;
-   pit       = TRUE;
-   vld_count = TRUE;
-   weight    = FALSE;
-}
+nc_orank_flag = FALSE;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -312,7 +294,7 @@ nc_orank_flag = {
 //
 rng = {
    type = "mt19937";
-   seed = "";
+   seed = "1";
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -320,7 +302,7 @@ rng = {
 grid_weight_flag  = NONE;
 point_weight_flag = NONE;
 
-output_prefix = "";
+output_prefix = "${OUTPUT_PREFIX}";
 version       = "V12.1.0";
 
 ////////////////////////////////////////////////////////////////////////////////

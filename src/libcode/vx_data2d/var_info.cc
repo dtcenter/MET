@@ -773,7 +773,97 @@ void VarInfo::set_prob_info_grib(ConcatString prob_name, double thresh_lo, doubl
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfo::is_prob() {
+bool VarInfo::is_precipitation() const {
+   bool status = false;
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsPrecipitation)) {
+      status = (SetAttrIsPrecipitation != 0);
+   }
+
+   return status;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_specific_humidity() const {
+   bool status = false;
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsSpecificHumidity)) {
+      status = (SetAttrIsSpecificHumidity != 0);
+   }
+
+   return status;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_u_wind() const {
+   bool status = false;
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsUWind)) {
+      status = (SetAttrIsUWind != 0);
+   }
+
+   return status;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_v_wind() const {
+   bool status = false;
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsVWind)) {
+      status = (SetAttrIsVWind != 0);
+   }
+
+   return status;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_wind_speed() const {
+   bool status = false;
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsWindSpeed)) {
+      status = (SetAttrIsWindSpeed != 0);
+   }
+
+   return status;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_wind_direction() const {
+   bool status = false;
+
+   //
+   // Check set_attrs entry
+   //
+   if(!is_bad_data(SetAttrIsWindDirection)) {
+      status = (SetAttrIsWindDirection != 0);
+   }
+
+   return status;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::is_prob() const {
 
    //
    // Check set_attr entry

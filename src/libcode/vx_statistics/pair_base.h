@@ -23,6 +23,7 @@
 ////////////////////////////////////////////////////////////////////////
 
 static const int REJECT_DEBUG_LEVEL = 9;
+static const int CORRECTION_DEBUG_LEVEL = 8;
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -40,9 +41,10 @@ struct station_value_base_t {
    std::string sid;
    double lat;
    double lon;
+   double elv;
    unixtime ut;
    double lvl;
-   double elv;
+   double hgt;
 };
 
 struct point_pair_t : station_value_base_t {
@@ -130,9 +132,10 @@ class PairBase {
       StringArray sid_sa;  // Station ID [n_obs]
       NumArray    lat_na;  // Latitude [n_obs]
       NumArray    lon_na;  // Longitude [n_obs]
+      NumArray    elv_na;  // Station Elevation [n_obs]
       TimeArray   vld_ta;  // Valid time [n_obs]
       NumArray    lvl_na;  // Level [n_obs]
-      NumArray    elv_na;  // Elevation [n_obs]
+      NumArray    hgt_na;  // Height (msl or agl) [n_obs]
       StringArray o_qc_sa; // Observation quality control [n_obs]
 
       int         n_obs;   // Number of observations
@@ -174,9 +177,6 @@ class PairBase {
       void set_obs_summary(ObsSummary s);
       void set_obs_perc_value(int i);
 
-      int  has_obs_rec(const char *, double, double, double, double,
-                       double, double, int &);
-
       ob_val_t compute_nearest(std::string sng_key);
       ob_val_t compute_min(std::string sng_key);
       ob_val_t compute_max(std::string sng_key);
@@ -186,12 +186,12 @@ class PairBase {
       ob_val_t compute_percentile(std::string sng_key, int perc);
 
       bool add_point_obs(const char *, const char *,
-                         double, double, double, double,
+                         double, double, double, double, double,
                          unixtime, double, double, double, const char *,
                          const ClimoPntInfo &, double);
 
       void set_point_obs(int, const char *, const char *,
-                         double, double, double, double,
+                         double, double, double, double, double,
                          unixtime, double, double, double,
                          const char *, const ClimoPntInfo &, double);
 
@@ -396,8 +396,6 @@ class VxPairBase {
       void set_msg_typ_lnd(const StringArray &);
       void set_msg_typ_wtr(const StringArray &);
 
-      void set_sfc_info(const SurfaceInfo &);
-
       int  get_n_pair() const;
 
       void set_duplicate_flag(DuplicateType duplicate_flag);
@@ -418,23 +416,35 @@ class VxPairBase {
                          double &, double &);
       bool is_keeper_topo(const char *, const Grid &,
                           double, double,
-                          const char *, double);
+                          const char *, double, double &);
       bool is_keeper_lvl(const char *, const char *, double, double);
       bool is_keeper_typ(const char *, int, const char *);
       bool is_keeper_mask(const char *, int, int, int, int,
                           const char *, double, double);
       bool is_keeper_climo(const char *, int, int, int,
-                           const Grid &gr, double, double,
+                           const Grid &, double, double,
                            double, double, double,
                            ClimoPntInfo &);
       bool is_keeper_fcst(const char *, int, int, int,
-                          const char *, const Grid &gr,
+                          const char *, const Grid &,
                           double, double, double,
                           double, double, double,
                           const ClimoPntInfo &, double &);
 
+      double compute_fcst_value(const PairBase *,
+                                const char *, const Grid &,
+                                double, double, double,
+                                double, double, double,
+                                const ClimoPntInfo &) const;
+
+      void correct_lapse_rate(double, double, double &, double &) const;
+
+      void convert_msl_agl(double, double, double &, double &,
+                           bool update_obs = true) const;
+
       // Retrieve climo data for this point 
-      ClimoPntInfo get_climo_pnt_info(int, const Grid &gr, double, double,
+      ClimoPntInfo get_climo_pnt_info(const PairBase *,
+                                      const Grid &, double, double,
                                       double, double, double);
 
       // Member functions for incrementing the counts

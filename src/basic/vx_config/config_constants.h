@@ -17,6 +17,7 @@
 #include "gsl_randist.h"
 #include "config_gaussian.h"
 #include "config_funcs.h"
+#include "field_type.h"
 #include "interp_mthd.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -29,19 +30,6 @@ enum class STATOutputType {
    None, // Do not output this line type
    Stat, // Write output to the .stat file
    Both  // Write output to .stat and .txt files
-};
-
-////////////////////////////////////////////////////////////////////////
-
-//
-// Enumeration for field type configuration parameters
-//
-
-enum class FieldType {
-   None, // Default
-   Fcst, // Apply to forecast field
-   Obs,  // Apply to observation field
-   Both  // Apply to both forecast and observation field
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -762,16 +750,28 @@ static const char conf_key_day_interval[]       = "day_interval";
 static const char conf_key_hour_interval[]      = "hour_interval";
 
 //
+// Topography parameter key names 
+//
+
+static const char conf_key_land_mask[]                      = "land_mask";
+static const char conf_key_land_mask_flag[]                 = "land_mask.flag";
+static const char conf_key_topo_mask[]                      = "topo_mask";
+static const char conf_key_topo_mask_flag[]                 = "topo_mask.flag";
+static const char conf_key_topo_mask_interp[]               = "topo_mask.interp";
+static const char conf_key_topo_mask_use_obs_thresh[]       = "topo_mask.use_obs_thresh";
+static const char conf_key_topo_mask_interp_fcst_thresh[]   = "topo_mask.interp_fcst_thresh";
+static const char conf_key_lapse_rate_correction_apply_to[] = "lapse_rate_correction.apply_to";
+static const char conf_key_lapse_rate_correction_value[]    = "lapse_rate_correction.value";
+static const char conf_key_msl_agl_conversion_apply_to[]    = "msl_agl_conversion.apply_to";
+static const char conf_key_msl_agl_conversion_apply_from[]  = "msl_agl_conversion.apply_from";
+static const char conf_key_msl_agl_conversion_thresh[]      = "msl_agl_conversion.thresh";
+static const char conf_key_msl_agl_conversion_msl_to_agl[]  = "msl_agl_conversion.msl_to_agl";
+
+//
 // Point-Stat specific parameter key names
 //
 
 static const char conf_key_hira[]               = "hira";
-static const char conf_key_land_mask[]          = "land_mask";
-static const char conf_key_land_mask_flag[]     = "land_mask.flag";
-static const char conf_key_topo_mask[]          = "topo_mask";
-static const char conf_key_topo_mask_flag[]     = "topo_mask.flag";
-static const char conf_key_use_obs_thresh[]     = "use_obs_thresh";
-static const char conf_key_interp_fcst_thresh[] = "interp_fcst_thresh";
 static const char conf_key_point_weight_flag[]  = "point_weight_flag";
 
 //

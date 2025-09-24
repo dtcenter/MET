@@ -220,12 +220,13 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
    sid_sa         = pd.sid_sa;
    lat_na         = pd.lat_na;
    lon_na         = pd.lon_na;
+   elv_na         = pd.elv_na;
    x_na           = pd.x_na;
    y_na           = pd.y_na;
    wgt_na         = pd.wgt_na;
    vld_ta         = pd.vld_ta;
    lvl_na         = pd.lvl_na;
-   elv_na         = pd.elv_na;
+   hgt_na         = pd.hgt_na;
    o_na           = pd.o_na;
    o_qc_sa        = pd.o_qc_sa;
 
@@ -1215,12 +1216,11 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    double obs_x, obs_y;
    if(!is_keeper_grd(pnt_obs_str.c_str(), gr, hdr_lat, hdr_lon, obs_x, obs_y)) return;
 
-   // TODO: Add topography filtering to Ensemble-Stat
-
    // Check topo
    double hdr_elv = hdr_arr[2];
+   double topo_elv = bad_data_double;
    if(!is_keeper_topo(pnt_obs_str.c_str(), gr, obs_x, obs_y,
-                      hdr_typ_str, hdr_elv)) return;
+                      hdr_typ_str, hdr_elv, topo_elv)) return;
 
    // Check level
    double obs_lvl = obs_arr[2];
@@ -1306,7 +1306,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
             // Weight is from the nearest grid point
             int n = three_to_one(i_msg_typ, i_mask, i_interp);
             if(!pd[n].add_point_obs(hdr_typ_str, hdr_sid_str,
-                  hdr_lat, hdr_lon, obs_x, obs_y,
+                  hdr_lat, hdr_lon, hdr_elv, obs_x, obs_y,
                   hdr_ut, obs_lvl, obs_hgt,
                   obs_v, obs_qty, cpi, default_weight)) {
 
@@ -1364,7 +1364,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
 
          // Interpolate using the observation pressure level or height
          double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
-                          it->lvl_na[i_obs] : it->elv_na[i_obs]);
+                          it->lvl_na[i_obs] : it->hgt_na[i_obs]);
          int lvl_blw, lvl_abv;
 
          // For a single forecast field
@@ -1389,6 +1389,8 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
             // Otherwise, retrieve all the neighborhood values
             // using a valid threshold of 0
             else {
+               // Note that land_mask and topo_mask settings do not
+	       // impact the HiRA neighborhood values selected
                get_interp_points(fcst_dpa,
                   it->x_na[i_obs], it->y_na[i_obs],
                   it->interp_mthd, it->interp_wdth, it->interp_shape,
@@ -1403,12 +1405,51 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
             ClimoPntInfo cpi(it->fcmn_na[i_obs], it->fcsd_na[i_obs],
                              it->ocmn_na[i_obs], it->ocsd_na[i_obs]);
 
-            fcst_na.add(compute_interp(fcst_dpa,
-               it->x_na[i_obs], it->y_na[i_obs], it->o_na[i_obs], &cpi,
-               it->interp_mthd, it->interp_wdth, it->interp_shape,
-               gr.wrap_lon(), interp_thresh, spfh_flag,
-               fcst_info->level().type(),
-               to_lvl, lvl_blw, lvl_abv));
+	    // Compute the forecast value
+            double fcst_v = compute_fcst_value((PairBase *) &(*it),
+                               it->typ_sa[i_obs].c_str(), gr,
+                               it->x_na[i_obs], it->y_na[i_obs], it->elv_na[i_obs],
+                               it->o_na[i_obs], it->lvl_na[i_obs], it->hgt_na[i_obs],
+                               cpi);
+
+            // Apply topography options
+            if(!is_bad_data(fcst_v) &&
+               ((sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
+                 msg_typ_sfc.reg_exp_match(it->typ_sa[i_obs].c_str())) ||
+                 sfc_info.msl_agl_conversion_apply_to != FieldType::None)) {
+
+               // Interpolate model topography to observation location
+               double topo_elv = bad_data_double;
+               if(sfc_info.topo_ptr) {
+                  topo_elv = compute_horz_interp(
+                                *sfc_info.topo_ptr,
+                                it->x_na[i_obs], it->y_na[i_obs], it->elv_na[i_obs],
+                                sfc_info.topo_interp_mthd,
+                                sfc_info.topo_interp_wdth,
+                                sfc_info.topo_interp_shape,
+                                gr.wrap_lon(),
+                                sfc_info.topo_interp_vld_thresh);
+               }
+
+               double obs_v = it->o_na[i_obs];
+
+               // MET #3174 Apply lapse rate surface temperature correction
+               if(sfc_info.lapse_rate_correction_apply_to != FieldType::None) {
+                  correct_lapse_rate(topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
+               }
+
+               // MET #3174 Apply MSL/AGL height conversion
+               if(sfc_info.msl_agl_conversion_apply_to != FieldType::None) {
+                  convert_msl_agl(topo_elv, it->elv_na[i_obs], fcst_v, obs_v,
+                                  member == 0);
+               }
+
+               // Store the modified observation, but only for the first member
+               if(member == 0) it->o_na.set(i_obs, obs_v);
+            }
+
+            // Store the forecast value
+            fcst_na.add(fcst_v);
          }
 
          // Store the single ensemble value or HiRA neighborhood

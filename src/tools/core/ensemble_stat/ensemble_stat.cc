@@ -79,6 +79,7 @@
 //   046    10/08/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
 //   047    10/14/24  Halley Gotway  MET #2279 Add point_weight_flag option.
 //   048    10/15/24  Halley Gotway  MET #2893 Write individual pair OBTYPE.
+//   049    09/11/25  Halley Gotway  MET #3174 Orographic corrections.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -753,6 +754,9 @@ static void process_vx() {
 
    // Process masks Grids and Polylines in the config file
    conf_info.process_masks(grid);
+
+   // Process the geography data
+   conf_info.process_geog(grid, ens_file_list);
 
    // Determine the index of the control member in list of data values
    int ctrl_data_index = (is_bad_data(ctrl_file_index) ?

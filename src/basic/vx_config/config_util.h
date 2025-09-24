@@ -139,6 +139,8 @@ extern double          parse_conf_ugrid_max_distance_km(Dictionary *dict);
 extern void            parse_add_conf_ugrid_metadata_map(
                           Dictionary *dict,
                           std::map<ConcatString,StringArray> *m);
+extern SurfaceInfo     parse_conf_surface_info(Dictionary *dict);
+extern void            parse_conf_topo_mask_interp(Dictionary *dict, SurfaceInfo &);
 
 extern void         check_mask_names(const StringArray &);
 

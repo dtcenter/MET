@@ -68,6 +68,8 @@ void EnsembleStatConfInfo::clear() {
    obtype.clear();
    vld_ens_thresh = bad_data_double;
    vld_data_thresh = bad_data_double;
+   land_mask.clear();
+   topo_dp.clear();
    msg_typ_group_map.clear();
    obtype_as_group_val_flag = false;
    msg_typ_sfc.clear();
@@ -492,6 +494,86 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 
 ////////////////////////////////////////////////////////////////////////
 
+void EnsembleStatConfInfo::process_geog(const Grid &grid,
+                                        const StringArray &input_files) {
+   const string method_name = "EnsembleStatConfInfo::process_geog() -> ";
+   bool land = false;
+   bool topo = false;
+
+   // Check if the input land and topo fields are needed
+   for(int i=0; i<n_vx; i++) {
+      if(vx_opt[i].vx_pd.sfc_info.need_land()) land = true;
+      if(vx_opt[i].vx_pd.sfc_info.need_topo()) topo = true;
+   }
+
+   // Check for no work to do
+   if(!land && !topo) return;
+
+   mlog << Debug(2)
+        << "Processing geography data.\n";
+
+   // Process the geography info for each verification task
+   for(int i=0; i<n_vx; i++) {
+
+      // Conf: land_mask
+      if(vx_opt[i].vx_pd.sfc_info.need_land()) {
+
+         // Read the land mask data, if needed
+         if(land_mask.is_empty()) {
+            Dictionary *dict = conf.lookup_dictionary(conf_key_land_mask);
+            DataPlane geog_dp(parse_geog_data(dict, grid, input_files));
+            geog_dp.threshold(dict->lookup_thresh(conf_key_thresh));
+            land_mask = geog_dp.mask_plane();
+
+            // Conf: message_type_group_map for LANDSF and WATERSF
+            if(msg_typ_group_map.count((string)landsf_msg_typ_group_str) == 0 ||
+               msg_typ_group_map.count((string)watersf_msg_typ_group_str) == 0 ) {
+               mlog << Error << "\n" << method_name
+                    << "when \"" << conf_key_land_mask_flag << "\" is true, \""
+                    << conf_key_message_type_group_map
+                    << "\" must contain entries for \""
+                    << landsf_msg_typ_group_str << "\" and \""
+                    << watersf_msg_typ_group_str << "\".\n\n";
+               exit(1);
+            }
+         }
+
+         // Store pointer to the land mask data
+         vx_opt[i].vx_pd.sfc_info.land_ptr = &land_mask;
+      }
+
+      // Conf: topo_mask
+      if(vx_opt[i].vx_pd.sfc_info.need_topo()) {
+
+         // Read the topo data, if needed
+         if(topo_dp.is_empty()) {
+            Dictionary *dict = conf.lookup_dictionary(conf_key_topo_mask);
+            topo_dp = parse_geog_data(dict, grid, input_files);
+
+            // Conf: message_type_group_map for SURFACE
+            if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
+               mlog << Error << "\n" << method_name
+                    << "when \"" << conf_key_topo_mask_flag << "\" is true, \""
+                    << conf_key_message_type_group_map
+                    << "\" must contain an entry for \""
+                    << surface_msg_typ_group_str << "\".\n\n";
+               exit(1);
+            }
+         }
+
+         // Store pointer to the topo data
+         vx_opt[i].vx_pd.sfc_info.topo_ptr = &topo_dp;
+
+         // Conf: topo_mask.interp
+         parse_conf_topo_mask_interp(&conf, vx_opt[i].vx_pd.sfc_info);
+      }
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void EnsembleStatConfInfo::process_var_units(const StringArray &var_names,
                                              const StringArray &var_units) {
    const string method_name = "EnsembleStatConfInfo::process_var_units() -> ";
@@ -777,6 +859,9 @@ void EnsembleStatVxOpt::process_config(GrdFileType ftype, Dictionary &fdict,
    // Conf: beg_ds and end_ds
    dict = odict.lookup_dictionary(conf_key_obs_window);
    parse_conf_range_int(dict, beg_ds, end_ds);
+
+   // Conf: land_mask, topo_mask, lapse_rate_correction, msl_agl_conversion
+   vx_pd.sfc_info = parse_conf_surface_info(&odict);
 
    // Conf: mask_grid
    mask_grid = odict.lookup_string_array(conf_key_mask_grid);

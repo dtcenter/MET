@@ -93,6 +93,28 @@ ConcatString get_grib_code_abbr(int grib_code, int ptv)
 
 ///////////////////////////////////////////////////////////////////////////////
 
+bool is_grib_code_abbr_match(const ConcatString &str, int grib_code)
+
+{
+
+   ConcatString abbr_str;
+   bool match = false;
+
+   if(str.empty()) return false;
+
+   // Use the default GRIB1 parameter table version number 2
+   abbr_str = get_grib_code_abbr(grib_code, 2);
+
+   // Consider it a match if the search string begins with the GRIB code
+   // abbreviation, ignoring case.
+   if(str.comparecase(0, abbr_str.length(), abbr_str.c_str()) == 0) match = true;
+
+   return match;
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 ConcatString get_grib_level_list_str(int k, int grib_level)
 
 {
