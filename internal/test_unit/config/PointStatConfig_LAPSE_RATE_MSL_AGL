@@ -58,7 +58,7 @@ fcst = {
         lapse_rate_correction = { apply_to = OBS; }; },
 
       { name = "HGT"; level = "P500"; message_type = "ADPUPA";
-        desc = "MSL_AGL_APPLY_FROM_NONE_TO_NONE"; },
+        desc = "MSL_TO_AGL_APPLY_FROM_NONE_TO_NONE"; },
 
       { name = "HGT"; level = "P500"; message_type = "ADPUPA";
         desc = "MSL_TO_AGL_APPLY_FROM_OBS_TO_OBS";

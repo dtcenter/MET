@@ -2624,6 +2624,39 @@ SurfaceInfo parse_conf_surface_info(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void parse_conf_topo_mask_interp(Dictionary *dict, SurfaceInfo &sfc_info) {
+   const char *method_name = "parse_conf_topo_mask_interp() -> ";
+
+   // Conf: topo_mask.interp
+   Dictionary *interp_dict = dict->lookup_dictionary(conf_key_topo_mask_interp);
+
+   // Conf: topo_mask.interp.method (required)
+   sfc_info.topo_interp_mthd = int_to_interpmthd(interp_dict->lookup_int(conf_key_method));
+
+   // Conf: topo_mask.interp.width (required)
+   sfc_info.topo_interp_wdth = interp_dict->lookup_int(conf_key_width);
+
+   // Conf: topo_mask.interp.shape (optional)
+   if(interp_dict->lookup(conf_key_shape, false)) {
+      sfc_info.topo_interp_shape = int_to_gridtemplate(interp_dict->lookup_int(conf_key_shape));
+   }
+   else {
+      sfc_info.topo_interp_shape = GridTemplateFactory::GridTemplates::Square;
+   }
+
+   // Conf: topo_mask.interp.vld_thresh (optional)
+   if(interp_dict->lookup(conf_key_vld_thresh, false)) {
+      sfc_info.topo_interp_vld_thresh = interp_dict->lookup_double(conf_key_vld_thresh);
+   }
+   else {
+      sfc_info.topo_interp_vld_thresh = default_vld_thresh;
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void PlotInfo::clear() {
    flag = true; // enabled by default
    color_table.clear();
