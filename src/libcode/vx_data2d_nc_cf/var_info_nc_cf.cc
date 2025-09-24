@@ -34,7 +34,6 @@ using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 
-static bool is_grib_code_abbr_match(const ConcatString &, int);
 static void check_dim_offset(const char *);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -477,28 +476,6 @@ bool VarInfoNcCF::is_wind_direction() const {
 //
 // Begin miscellaneous utility functions
 //
-///////////////////////////////////////////////////////////////////////////////
-
-static bool is_grib_code_abbr_match(const ConcatString &str, int grib_code) {
-   ConcatString abbr_str;
-   bool match = false;
-
-   if(str.empty()) return false;
-
-   //
-   // Use the default GRIB1 parameter table version number 2
-   //
-   abbr_str = get_grib_code_abbr(grib_code, 2);
-
-   //
-   // Consider it a match if the search string begins with the GRIB code
-   // abbreviation, ignoring case.
-   //
-   if(strncasecmp(str.c_str(), abbr_str.c_str(), abbr_str.length()) == 0) match = true;
-
-   return match;
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 static void check_dim_offset(const char *ptr) {

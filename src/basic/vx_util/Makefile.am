@@ -25,6 +25,7 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                comma_string.cc comma_string.h \
                conversions.cc conversions.h \
                data_line.cc data_line.h \
+               field_type.h \
                grib_constants.cc grib_constants.h \
                is_number.cc is_number.h \
                crc_array.h \

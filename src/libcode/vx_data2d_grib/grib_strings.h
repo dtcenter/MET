@@ -28,6 +28,7 @@ static const std::string wdir_abbr_str      = "WDIR";
 
 //
 // List of GRIB1 precipitation variable names
+//   https://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //
 static const char *grib_precipitation_abbr[] = {
    "PWAT",    // Code  54, Precipitable water, kg/m^2
@@ -62,6 +63,7 @@ static const int n_grib_precipitation_abbr =
 
 //
 // List of GRIB1 specific humidity abbreviations
+//   https://www.nco.ncep.noaa.gov/pmb/docs/on388/table2.html
 //
 static const char *grib_specific_humidity_abbr[] = {
    "SPFH",  // Code  51, Specific humidity, kg/kgSpecific humidity, kg kg-1
@@ -219,6 +221,8 @@ ConcatString get_grib_code_name(int, int);
 ConcatString get_grib_code_unit(int, int);
 ConcatString get_grib_code_abbr(int, int);
 
+bool is_grib_code_abbr_match(const ConcatString &, int);
+
 ConcatString get_grib_level_name(int);
 ConcatString get_grib_level_abbr(int);
 ConcatString get_grib_level_str(int, unsigned char *);
@@ -234,10 +238,6 @@ int str_to_prob_info(const char *, double &, double &, int);
 void get_grib_code_list(int, int, int &, const GribCodeData *&);
 ConcatString get_grib_code_list_str(int, int, int);
 ConcatString get_grib_level_list_str(int, int);
-
-///////////////////////////////////////////////////////////////////////////////
-
-
 
 ////////////////////////////////////////////////////////////////////////
 

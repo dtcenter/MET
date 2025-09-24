@@ -43,8 +43,9 @@ void station_value_base_t::clear_base() {
    typ.clear();
    sid.clear();
    lat = lon = bad_data_double;
+   elv = bad_data_double;
    ut = (unixtime) 0;
-   lvl = elv = bad_data_double;
+   lvl = hgt = bad_data_double;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -132,9 +133,10 @@ void PairBase::clear() {
    sid_sa.clear();
    lat_na.clear();
    lon_na.clear();
+   elv_na.clear();
    vld_ta.clear();
    lvl_na.clear();
-   elv_na.clear();
+   hgt_na.clear();
    o_qc_sa.clear();
 
    n_obs = 0;
@@ -184,9 +186,10 @@ void PairBase::erase() {
    sid_sa.clear();  // no erase option
    lat_na.erase();
    lon_na.erase();
+   elv_na.erase();
    vld_ta.erase();
    lvl_na.erase();
-   elv_na.erase();
+   hgt_na.erase();
    o_qc_sa.clear(); // no erase option
 
    n_obs = 0;
@@ -221,9 +224,10 @@ void PairBase::extend(int n) {
    if(IsPointVx) {
       lat_na.extend(n);
       lon_na.extend(n);
+      elv_na.extend(n);
       vld_ta.extend(n);
       lvl_na.extend(n);
-      elv_na.extend(n);
+      hgt_na.extend(n);
    }
 
    return;
@@ -366,37 +370,6 @@ void PairBase::set_obs_perc_value(int i) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int PairBase::has_obs_rec(const char *sid, double lat, double lon,
-                          double x, double y, double lvl, double elv,
-                          int &i_obs) {
-   int i, status = 0;
-
-   //
-   // Only valid for point data
-   //
-   if(!IsPointVx) return false;
-
-   //
-   // Check for an existing record of this observation
-   //
-   for(i=0, i_obs=-1; i<n_obs; i++) {
-
-      if(sid_sa[i] == sid &&
-         is_eq(lat_na[i], lat) &&
-         is_eq(lon_na[i], lon) &&
-         is_eq(lvl_na[i], lvl) &&
-         is_eq(elv_na[i], elv)) {
-         status = 1;
-         i_obs = i;
-         break;
-      }
-   } // end for
-
-   return status;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void PairBase::add_climo(double obs,
                          const ClimoPntInfo &cpi) {
 
@@ -454,8 +427,9 @@ void PairBase::compute_climo_cdf() {
 ////////////////////////////////////////////////////////////////////////
 
 bool PairBase::add_point_obs(const char *typ, const char *sid,
-                             double lat, double lon, double x, double y,
-                             unixtime ut, double lvl, double elv,
+                             double lat, double lon, double elv,
+                             double x, double y,
+                             unixtime ut, double lvl, double hgt,
                              double o, const char *qc,
                              const ClimoPntInfo &cpi, double wgt) {
 
@@ -478,7 +452,7 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
                        lat,         //  lat
                        lon,         //  lon
                        lvl,         //  level
-                       elv).text(); //  elevation
+                       hgt).text(); //  height
 
    //  add a single value reporting string to the reporting map
    ob_val_t ob_val;
@@ -506,12 +480,13 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
       val.sid = string(sid);
       val.lat = lat;
       val.lon = lon;
+      val.elv = elv; 
       val.x   = x;
       val.y   = y;
       val.wgt = wgt;
       val.ut  = fcst_ut;
       val.lvl = lvl;
-      val.elv = elv;
+      val.hgt = hgt;
       val.fcmn = cpi.fcmn;
       val.fcsd = cpi.fcsd;
       val.ocmn = cpi.ocmn;
@@ -528,12 +503,13 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
       sid_sa.add(sid);
       lat_na.add(lat);
       lon_na.add(lon);
+      elv_na.add(elv);
       x_na.add(x);
       y_na.add(y);
       wgt_na.add(wgt);
       vld_ta.add(ut);
       lvl_na.add(lvl);
-      elv_na.add(elv);
+      hgt_na.add(hgt);
       o_na.add(o);
       o_qc_sa.add(qc);
       add_climo(o, cpi);
@@ -549,8 +525,9 @@ bool PairBase::add_point_obs(const char *typ, const char *sid,
 ////////////////////////////////////////////////////////////////////////
 
 void PairBase::set_point_obs(int i_obs, const char *typ, const char *sid,
-                             double lat, double lon, double x, double y,
-                             unixtime ut, double lvl, double elv,
+                             double lat, double lon, double elv,
+                             double x, double y,
+                             unixtime ut, double lvl, double hgt,
                              double o, const char *qc,
                              const ClimoPntInfo &cpi,
                              double wgt) {
@@ -566,12 +543,13 @@ void PairBase::set_point_obs(int i_obs, const char *typ, const char *sid,
    sid_sa.set(i_obs, sid);
    lat_na.set(i_obs, lat);
    lon_na.set(i_obs, lon);
+   elv_na.set(i_obs, elv);
    x_na.set(i_obs, x);
    y_na.set(i_obs, y);
    wgt_na.set(i_obs, wgt);
    vld_ta.set(i_obs, ut);
    lvl_na.set(i_obs, lvl);
-   elv_na.set(i_obs, elv);
+   hgt_na.set(i_obs, hgt);
    o_na.set(i_obs, o);
    o_qc_sa.set(i_obs, qc);
    set_climo(i_obs, o, cpi);
@@ -785,12 +763,13 @@ void PairBase::calc_obs_summary(){
       sid_sa.add    (svt->sid.c_str());
       lat_na.add    (svt->lat);
       lon_na.add    (svt->lon);
+      elv_na.add    (svt->elv);
       x_na.add      (svt->x);
       y_na.add      (svt->y);
       wgt_na.add    (svt->wgt);
       vld_ta.add    (ob.ut);
       lvl_na.add    (svt->lvl);
-      elv_na.add    (svt->elv);
+      hgt_na.add    (svt->hgt);
       o_na.add      (ob.val);
       o_qc_sa.add   (ob.qc.c_str());
       ClimoPntInfo cpi(svt->fcmn, svt->fcsd,
@@ -1502,15 +1481,6 @@ void VxPairBase::set_msg_typ_wtr(const StringArray &sa) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::set_sfc_info(const SurfaceInfo &si) {
-
-   sfc_info = si;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
 int VxPairBase::get_n_pair() const {
 
    if(n_vx == 0) {
@@ -1790,28 +1760,33 @@ bool VxPairBase::is_keeper_grd(
 bool VxPairBase::is_keeper_topo(
         const char *pnt_obs_str, const Grid &gr,
         double obs_x, double obs_y,
-        const char *hdr_typ_str, double hdr_elv) {
+        const char *hdr_typ_str, double hdr_elv, double &topo_elv) {
    bool keep = true;
 
-   // Check for a large topography difference
-   if(sfc_info.topo_ptr && msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
+   // Interpolate model topography to observation location
+   if(sfc_info.topo_ptr) {
+      topo_elv = compute_horz_interp(
+                    *sfc_info.topo_ptr, obs_x, obs_y, hdr_elv,
+                    sfc_info.topo_interp_mthd,
+                    sfc_info.topo_interp_wdth,
+                    sfc_info.topo_interp_shape,
+                    gr.wrap_lon(),
+                    sfc_info.topo_interp_vld_thresh);
+   }
 
-      // Interpolate model topography to observation location
-      double topo = compute_horz_interp(
-                       *sfc_info.topo_ptr, obs_x, obs_y, hdr_elv,
-                       InterpMthd::Bilin, 2,
-                       GridTemplateFactory::GridTemplates::Square,
-                       gr.wrap_lon(), 1.0);
+   // Check for a large topography difference
+   if(sfc_info.topo_flag &&
+      msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
 
       // Skip bad topography values
-      if(is_bad_data(hdr_elv) || is_bad_data(topo)) {
+      if(is_bad_data(hdr_elv) || is_bad_data(topo_elv)) {
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
                  << "For " << fcst_info->magic_str() << " versus "
                  << obs_info->magic_str() << ", skipping observation "
                  << "due to bad topography values where observation elevation = "
-                 << hdr_elv << " and model topography = " << topo << ":\n"
+                 << hdr_elv << " and model topography = " << topo_elv << ":\n"
                  << pnt_obs_str << "\n";
          }
 
@@ -1820,16 +1795,16 @@ bool VxPairBase::is_keeper_topo(
       }
 
       // Check the topography difference threshold
-      else if(!sfc_info.topo_use_obs_thresh.check(topo - hdr_elv)) {
+      else if(!sfc_info.topo_mask_use_obs_thresh.check(topo_elv - hdr_elv)) {
 
          if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
             mlog << Debug(REJECT_DEBUG_LEVEL)
                  << "For " << fcst_info->magic_str() << " versus "
                  << obs_info->magic_str() << ", skipping observation "
                  << "due to topography difference where observation elevation ("
-                 << hdr_elv << ") minus model topography (" << topo << ") = "
-                 << topo - hdr_elv << " is not "
-                 << sfc_info.topo_use_obs_thresh.get_str() << ":\n"
+                 << hdr_elv << ") minus model topography (" << topo_elv << ") = "
+                 << topo_elv - hdr_elv << " is not "
+                 << sfc_info.topo_mask_use_obs_thresh.get_str() << ":\n"
                  << pnt_obs_str << "\n";
          }
 
@@ -2010,7 +1985,7 @@ bool VxPairBase::is_keeper_climo(
    int n = three_to_one(i_msg_typ, i_mask, i_interp);
 
    // Get the climo data for this point
-   cpi = get_climo_pnt_info(n, gr, obs_x, obs_y,
+   cpi = get_climo_pnt_info(pb_ptr[n], gr, obs_x, obs_y,
                             obs_v, obs_lvl, obs_hgt);
 
    // Forecast climatology mean
@@ -2085,48 +2060,10 @@ bool VxPairBase::is_keeper_fcst(
 
    int n = three_to_one(i_msg_typ, i_mask, i_interp);
 
-   // For surface verification, apply land/sea and topo masks
-   if((sfc_info.land_ptr || sfc_info.topo_ptr) &&
-      (msg_typ_sfc.reg_exp_match(hdr_typ_str))) {
-
-      bool is_land = msg_typ_lnd.has(hdr_typ_str);
-
-      // Check for a single forecast DataPlane
-      if(fcst_dpa.n_planes() != 1) {
-         mlog << Error << "\nVxPairBase::is_keeper_fcst() -> "
-              << "unexpected number of forecast levels ("
-              << fcst_dpa.n_planes()
-              << ") for surface verification! Set \"land_mask.flag\" and "
-              << "\"topo_mask.flag\" to false to disable this check.\n\n";
-         exit(1);
-      }
-
-      fcst_v = compute_sfc_interp(fcst_dpa[0], obs_x, obs_y, hdr_elv, obs_v,
-                  pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                  pb_ptr[n]->interp_shape, gr.wrap_lon(),
-                  interp_thresh, sfc_info, is_land);
-   }
-   // Otherwise, compute interpolated value
-   else {
-
-      bool spfh_flag = fcst_info->is_specific_humidity() &&
-                       obs_info->is_specific_humidity();
-
-      // Compute the interpolated forecast value using the
-      // observation pressure level or height
-      double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
-                       obs_lvl : obs_hgt);
-      int lvl_blw, lvl_abv;
-
-      find_vert_lvl(fcst_dpa, to_lvl, lvl_blw, lvl_abv);
-
-      fcst_v = compute_interp(fcst_dpa, obs_x, obs_y, obs_v, &cpi,
-                  pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                  pb_ptr[n]->interp_shape, gr.wrap_lon(),
-                  interp_thresh, spfh_flag,
-                  fcst_info->level().type(),
-                  to_lvl, lvl_blw, lvl_abv);
-   }
+   // Compute the forecast value
+   fcst_v = compute_fcst_value(pb_ptr[n], hdr_typ_str, gr,
+                               obs_x, obs_y, hdr_elv,
+                               obs_v, obs_lvl, obs_hgt, cpi);
 
    // Check for bad data
    if(is_bad_data(fcst_v)) {
@@ -2151,8 +2088,203 @@ bool VxPairBase::is_keeper_fcst(
 
 ////////////////////////////////////////////////////////////////////////
 
+double VxPairBase::compute_fcst_value(
+          const PairBase *pb, const char *hdr_typ_str, const Grid &gr,
+          double obs_x, double obs_y, double hdr_elv,
+          double obs_v, double obs_lvl, double obs_hgt,
+          const ClimoPntInfo &cpi) const {
+   const char *method_name = "PairBase::compute_fcst_value() -> ";
+   double fcst_v = bad_data_double;
+
+   // For surface verification, apply land/sea and topo masks
+   if((sfc_info.land_flag || sfc_info.topo_flag) &&
+      (msg_typ_sfc.reg_exp_match(hdr_typ_str))) {
+
+      bool is_land = msg_typ_lnd.has(hdr_typ_str);
+
+      // Check for a single forecast DataPlane
+      if(fcst_dpa.n_planes() != 1) {
+         mlog << Error << "\n" << method_name
+              << "unexpected number of forecast levels ("
+              << fcst_dpa.n_planes()
+              << ") for surface verification! Set \"land_mask.flag\" and "
+              << "\"topo_mask.flag\" to false to disable this check.\n\n";
+         exit(1);
+      }
+
+      fcst_v = compute_sfc_interp(fcst_dpa[0],
+                  obs_x, obs_y, hdr_elv, obs_v,
+                  pb->interp_mthd, pb->interp_wdth,
+                  pb->interp_shape, gr.wrap_lon(),
+                  interp_thresh, sfc_info, is_land);
+   }
+   // Otherwise, compute interpolated value
+   else {
+
+      bool spfh_flag = fcst_info->is_specific_humidity() &&
+                       obs_info->is_specific_humidity();
+
+      // Compute the interpolated forecast value using the
+      // observation pressure level or height
+      double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
+                       obs_lvl : obs_hgt);
+
+      int lvl_blw;
+      int lvl_abv;
+      find_vert_lvl(fcst_dpa, to_lvl, lvl_blw, lvl_abv);
+
+      fcst_v = compute_interp(fcst_dpa,
+                  obs_x, obs_y, obs_v, &cpi,
+                  pb->interp_mthd, pb->interp_wdth,
+                  pb->interp_shape, gr.wrap_lon(),
+                  interp_thresh, spfh_flag,
+                  fcst_info->level().type(),
+                  to_lvl, lvl_blw, lvl_abv);
+   }
+
+   return fcst_v;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
+                                    double &fcst_v, double &obs_v) const {
+   const char *method_name = "PairBase::correct_lapse_rate() -> ";
+
+   // Check for no work to be done
+   if(sfc_info.lapse_rate_correction_apply_to != FieldType::Fcst &&
+      sfc_info.lapse_rate_correction_apply_to != FieldType::Obs) return;
+
+   // Check for valid data
+   if(is_bad_data(fcst_elv) || is_bad_data(obs_elv) ||
+      is_bad_data(fcst_v)   || is_bad_data(obs_v)   ||
+      is_bad_data(sfc_info.lapse_rate_correction_value)) { 
+      mlog << Warning << "\n" << method_name
+           << "skipping lapse rate correction due to bad "
+           << "(fcst, obs) elevation (" << fcst_elv << ", "
+           << obs_elv << "), data (" << fcst_v << ", "
+           << obs_v << "), or lapse rate ("
+           << sfc_info.lapse_rate_correction_value << ") values.\n\n";
+      return;
+   }
+
+   // Apply correction
+   double orig_v;
+   double corr_v;
+   if(sfc_info.lapse_rate_correction_apply_to == FieldType::Fcst) {
+      orig_v = fcst_v;
+      corr_v = fcst_v + (fcst_elv - obs_elv) * sfc_info.lapse_rate_correction_value;
+      fcst_v = corr_v;
+   }
+   else {
+      orig_v = obs_v;
+      corr_v = obs_v + (obs_elv - fcst_elv) * sfc_info.lapse_rate_correction_value;
+      obs_v = corr_v;
+   }
+
+   // Log the lapse rate correction
+   if(mlog.verbosity_level() >= CORRECTION_DEBUG_LEVEL) {
+      mlog << Debug(CORRECTION_DEBUG_LEVEL)
+           << "Correcting the "
+           << fieldtype_to_string(sfc_info.lapse_rate_correction_apply_to)
+           << " temperature from " << orig_v << " to " << corr_v 
+           << " for forecast (" << fcst_elv << ") minus observation ("
+           << obs_elv << ") elevation difference of "
+           << fcst_elv - obs_elv << " and lapse rate value of "
+           << sfc_info.lapse_rate_correction_value << ".\n";
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
+                                 double &fcst_v, double &obs_v,
+                                 bool update_obs) const {
+   const char *method_name = "PairBase::convert_msl_agl() -> ";
+
+   // Check for no work to be done
+   if(sfc_info.msl_agl_conversion_apply_to   == FieldType::None || 
+      sfc_info.msl_agl_conversion_apply_from == FieldType::None) return;
+
+   // Apply forecast conversion
+   double orig_f = fcst_v;
+   double corr_f = 0.0;
+   if(sfc_info.msl_agl_conversion_thresh.check(fcst_v) &&
+      (sfc_info.msl_agl_conversion_apply_to == FieldType::Fcst ||
+       sfc_info.msl_agl_conversion_apply_to == FieldType::Both)) {
+      if(sfc_info.msl_agl_conversion_apply_from == FieldType::Fcst ||
+         sfc_info.msl_agl_conversion_apply_from == FieldType::Both) {
+         corr_f = fcst_elv;
+      }
+      else {
+         corr_f = obs_elv;
+      }
+   }
+
+   // Apply observation conversion
+   double orig_o = obs_v;
+   double corr_o = 0.0;
+   if(update_obs &&
+      sfc_info.msl_agl_conversion_thresh.check(obs_v) &&
+      (sfc_info.msl_agl_conversion_apply_to == FieldType::Obs ||
+       sfc_info.msl_agl_conversion_apply_to == FieldType::Both)) {
+      if(sfc_info.msl_agl_conversion_apply_from == FieldType::Obs ||
+         sfc_info.msl_agl_conversion_apply_from == FieldType::Both) {
+         corr_o = obs_elv;
+      }
+      else {
+         corr_o = fcst_elv;
+      }
+   }
+
+   // Check for valid data
+   if(is_bad_data(fcst_v) || is_bad_data(obs_v) ||
+      is_bad_data(corr_f) || is_bad_data(corr_o)) {
+      mlog << Warning << "\n" << method_name
+           << "skipping msl/agl conversion due to bad "
+           << "(fcst, obs) elevation (" << fcst_elv << ", "
+           << obs_elv << ") or data (" << fcst_v << ", "
+           << obs_v << ") values.\n\n";
+      return;
+   }
+
+   // Convert MSL to AGL
+   if(sfc_info.msl_agl_conversion_msl_to_agl) {
+      fcst_v -= corr_f;
+      obs_v  -= corr_o;
+   }
+   // Convert AGL to MSL
+   else {
+      fcst_v += corr_f;
+      obs_v  += corr_o;
+   }
+
+   // Log the MSL/AGL conversion
+   if(mlog.verbosity_level() >= CORRECTION_DEBUG_LEVEL) {
+      mlog << Debug(CORRECTION_DEBUG_LEVEL)
+           << "Converting "
+           << (sfc_info.msl_agl_conversion_msl_to_agl ?
+               "MSL to AGL" : "AGL to MSL")
+           << " using "
+           << fieldtype_to_string(sfc_info.msl_agl_conversion_apply_from)
+           << " elevations to modify "
+           << fieldtype_to_string(sfc_info.msl_agl_conversion_apply_to)
+           << " heights from (fcst, obs) (" << orig_f << ", "
+           << orig_o << ") to (" << fcst_v << ", " << obs_v
+           << ") for (fcst, obs) elevations (" << fcst_elv
+           << ", " << obs_elv << ") and filtering threshold "
+           << sfc_info.msl_agl_conversion_thresh.get_str() << ".\n";
+   }
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 ClimoPntInfo VxPairBase::get_climo_pnt_info(
-        int n, const Grid &gr, double obs_x, double obs_y,
+        const PairBase *pb, const Grid &gr, double obs_x, double obs_y,
         double obs_v, double obs_lvl, double obs_hgt) {
    ClimoPntInfo cpi;
 
@@ -2173,8 +2305,8 @@ ClimoPntInfo VxPairBase::get_climo_pnt_info(
       find_vert_lvl(fcmn_dpa, to_lvl, lvl_blw, lvl_abv);
 
       cpi.fcmn = compute_interp(fcmn_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    pb->interp_mthd, pb->interp_wdth,
+                    pb->interp_shape, gr.wrap_lon(),
                     interp_thresh, spfh_flag,
                     fcst_info->level().type(),
                     to_lvl, lvl_blw, lvl_abv);
@@ -2186,8 +2318,8 @@ ClimoPntInfo VxPairBase::get_climo_pnt_info(
       find_vert_lvl(ocmn_dpa, to_lvl, lvl_blw, lvl_abv);
 
       cpi.ocmn = compute_interp(ocmn_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    pb->interp_mthd, pb->interp_wdth,
+                    pb->interp_shape, gr.wrap_lon(),
                     interp_thresh, spfh_flag,
                     fcst_info->level().type(),
                     to_lvl, lvl_blw, lvl_abv);
@@ -2196,12 +2328,12 @@ ClimoPntInfo VxPairBase::get_climo_pnt_info(
    // Check for valid interpolation options
    if((fcsd_dpa.n_planes() > 0                      ||
        ocsd_dpa.n_planes() > 0)                     &&
-      (pb_ptr[n]->interp_mthd == InterpMthd::Min    ||
-       pb_ptr[n]->interp_mthd == InterpMthd::Max    ||
-       pb_ptr[n]->interp_mthd == InterpMthd::Median ||
-       pb_ptr[n]->interp_mthd == InterpMthd::Best)) {
+      (pb->interp_mthd == InterpMthd::Min    ||
+       pb->interp_mthd == InterpMthd::Max    ||
+       pb->interp_mthd == InterpMthd::Median ||
+       pb->interp_mthd == InterpMthd::Best)) {
       mlog << Warning << "\nVxPairBase::get_climo_pnt_info() -> "
-           << "applying the " << interpmthd_to_string(pb_ptr[n]->interp_mthd)
+           << "applying the " << interpmthd_to_string(pb->interp_mthd)
            << " interpolation method to climatological spread "
            << "may cause unexpected results.\n\n";
    }
@@ -2212,8 +2344,8 @@ ClimoPntInfo VxPairBase::get_climo_pnt_info(
       find_vert_lvl(fcsd_dpa, to_lvl, lvl_blw, lvl_abv);
 
       cpi.fcsd = compute_interp(fcsd_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    pb->interp_mthd, pb->interp_wdth,
+                    pb->interp_shape, gr.wrap_lon(),
                     interp_thresh, spfh_flag,
                     fcst_info->level().type(),
                     to_lvl, lvl_blw, lvl_abv);
@@ -2225,8 +2357,8 @@ ClimoPntInfo VxPairBase::get_climo_pnt_info(
       find_vert_lvl(ocsd_dpa, to_lvl, lvl_blw, lvl_abv);
 
       cpi.ocsd = compute_interp(ocsd_dpa, obs_x, obs_y, obs_v, nullptr,
-                    pb_ptr[n]->interp_mthd, pb_ptr[n]->interp_wdth,
-                    pb_ptr[n]->interp_shape, gr.wrap_lon(),
+                    pb->interp_mthd, pb->interp_wdth,
+                    pb->interp_shape, gr.wrap_lon(),
                     interp_thresh, spfh_flag,
                     fcst_info->level().type(),
                     to_lvl, lvl_blw, lvl_abv);

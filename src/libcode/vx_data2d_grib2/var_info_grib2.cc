@@ -478,14 +478,17 @@ bool VarInfoGrib2::is_precipitation() const {
       return(SetAttrIsPrecipitation != 0);
    }
 
+   //
+   // Reference:
+   //   https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-2-0-1.shtml
+   //
    return Discipline == 0 &&
           ParmCat    == 1 &&
-          (
-             Parm == 3  ||       //  PWAT
-             Parm == 7  ||       //  PRATE
-             Parm == 8  ||       //  APCP
-             Parm == 9  ||       //  NCPCP
-             Parm == 10          //  ACPCP
+          (Parm      == 3  || //  PWAT
+           Parm      == 7  || //  PRATE
+           Parm      == 8  || //  APCP
+           Parm      == 9  || //  NCPCP
+           Parm      == 10    //  ACPCP
           );
 }
 
@@ -500,9 +503,13 @@ bool VarInfoGrib2::is_specific_humidity() const {
       return(SetAttrIsSpecificHumidity != 0);
    }
 
+   //
+   // Reference:
+   //   https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-2-0-1.shtml
+   //
    return Discipline == 0 &&
           ParmCat    == 1 &&
-          Parm       == 0;
+          Parm       == 0; // SPFH
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -516,10 +523,15 @@ bool VarInfoGrib2::is_u_wind() const {
       return(SetAttrIsUWind != 0);
    }
 
-   return(ReqName == ugrd_abbr_str ||
+   //
+   // Reference:
+   //   https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-2-0-2.shtml
+   //
+   return ReqName == ugrd_abbr_str ||
           (Discipline == 0 &&
            ParmCat    == 2 &&
-           Parm       == 2));
+           Parm       == 2 // UGRD 
+          );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -533,10 +545,15 @@ bool VarInfoGrib2::is_v_wind() const {
       return(SetAttrIsVWind != 0);
    }
 
-   return(ReqName == vgrd_abbr_str ||
+   //
+   // Reference:
+   //   https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-2-0-2.shtml
+   //
+   return ReqName == vgrd_abbr_str ||
           (Discipline == 0 &&
            ParmCat    == 2 &&
-           Parm       == 3));
+           Parm       == 3 // VGRD
+          );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -550,10 +567,15 @@ bool VarInfoGrib2::is_wind_speed() const {
       return(SetAttrIsWindSpeed != 0);
    }
 
-   return(ReqName == wind_abbr_str ||
+   //
+   // Reference:
+   //   https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-2-0-2.shtml
+   //
+   return ReqName == wind_abbr_str ||
           (Discipline == 0 &&
            ParmCat    == 2 &&
-           Parm       == 1));
+           Parm       == 1 // WIND
+          );
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -567,10 +589,15 @@ bool VarInfoGrib2::is_wind_direction() const {
       return(SetAttrIsWindDirection != 0);
    }
 
-   return(ReqName == wdir_abbr_str ||
+   //
+   // Reference:
+   //   https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table4-2-0-2.shtml
+   //
+   return ReqName == wdir_abbr_str ||
           (Discipline == 0 &&
            ParmCat    == 2 &&
-           Parm       == 0));
+           Parm       == 0 // WDIR
+          );
 }
 
 ////////////////////////////////////////////////////////////////////////

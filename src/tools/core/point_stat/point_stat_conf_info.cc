@@ -67,8 +67,6 @@ void PointStatConfInfo::clear() {
    var_units_set = false;
    land_mask.clear();
    topo_dp.clear();
-   topo_use_obs_thresh.clear();
-   topo_interp_fcst_thresh.clear();
    msg_typ_group_map.clear();
    obtype_as_group_val_flag = false;
    mask_area_map.clear();
@@ -490,79 +488,80 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
 
 void PointStatConfInfo::process_geog(const Grid &grid,
                                      const char *fcst_file) {
+   const string method_name = "PointStatConfInfo::process_geog() -> ";
    bool land = false;
    bool topo = false;
-   Dictionary *dict;
-   DataPlane geog_dp;
-   SurfaceInfo sfc_info;
 
-   // Loop over the verification tasks and check flags
+   // Check if the input land and topo fields are needed
    for(int i=0; i<n_vx; i++) {
-
-      // Set to true if requested by any sub-task
-      if(vx_opt[i].land_flag) land = true;
-      if(vx_opt[i].topo_flag) topo = true;
+      if(vx_opt[i].vx_pd.sfc_info.need_land()) land = true;
+      if(vx_opt[i].vx_pd.sfc_info.need_topo()) topo = true;
    }
+
+   // Check for no work to do
+   if(!land && !topo) return;
 
    mlog << Debug(2)
         << "Processing geography data.\n";
 
-   // Conf: land
-   if(land) {
-      dict      = conf.lookup_dictionary(conf_key_land_mask);
-      geog_dp   = parse_geog_data(dict, grid, fcst_file);
-      geog_dp.threshold(dict->lookup_thresh(conf_key_thresh));
-      land_mask = geog_dp.mask_plane();
+   StringArray input_files;
+   input_files.add(fcst_file);
 
-      // Conf: message_type_group_map for LANDSF and WATERSF
-      if(msg_typ_group_map.count((string)landsf_msg_typ_group_str) == 0 ||
-         msg_typ_group_map.count((string)watersf_msg_typ_group_str) == 0 ) {
-         mlog << Error << "\nPointStatConfInfo::process_geog() -> "
-              << "when \"" << conf_key_land_mask_flag << "\" is true, \""
-              << conf_key_message_type_group_map
-              << "\" must contain entries for \""
-              << landsf_msg_typ_group_str << "\" and \""
-              << watersf_msg_typ_group_str << "\".\n\n";
-         exit(1);
-      }
-   }
-
-   // Conf: topo
-   if(topo) {
-      dict                    = conf.lookup_dictionary(conf_key_topo_mask);
-      topo_dp                 = parse_geog_data(dict, grid, fcst_file);
-      topo_use_obs_thresh     = dict->lookup_thresh(conf_key_use_obs_thresh);
-      topo_interp_fcst_thresh = dict->lookup_thresh(conf_key_interp_fcst_thresh);
-
-      // Conf: message_type_group_map for SURFACE
-      if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
-         mlog << Error << "\nPointStatConfInfo::process_geog() -> "
-              << "when \"" << conf_key_topo_mask_flag << "\" is true, \""
-              << conf_key_message_type_group_map
-              << "\" must contain an entry for \""
-              << surface_msg_typ_group_str << "\".\n\n";
-         exit(1);
-      }
-   }
-
-   // Loop over the verification tasks and set the geography info
+   // Process the geography info for each verification task
    for(int i=0; i<n_vx; i++) {
-      sfc_info.clear();
-      if(vx_opt[i].land_flag) {
-         sfc_info.land_ptr = &land_mask;
+
+      // Conf: land_mask
+      if(vx_opt[i].vx_pd.sfc_info.need_land()) {
+
+         // Read the land mask data, if needed
+         if(land_mask.is_empty()) {
+            Dictionary *dict = conf.lookup_dictionary(conf_key_land_mask);
+            DataPlane geog_dp(parse_geog_data(dict, grid, input_files));
+            geog_dp.threshold(dict->lookup_thresh(conf_key_thresh));
+            land_mask = geog_dp.mask_plane();
+
+            // Conf: message_type_group_map for LANDSF and WATERSF
+            if(msg_typ_group_map.count((string)landsf_msg_typ_group_str) == 0 ||
+               msg_typ_group_map.count((string)watersf_msg_typ_group_str) == 0 ) {
+               mlog << Error << "\n" << method_name
+                    << "when \"" << conf_key_land_mask_flag << "\" is true, \""
+                    << conf_key_message_type_group_map
+                    << "\" must contain entries for \""
+                    << landsf_msg_typ_group_str << "\" and \""
+                    << watersf_msg_typ_group_str << "\".\n\n";
+               exit(1);
+            }
+         }
+
+         // Store pointer to the land mask data
+         vx_opt[i].vx_pd.sfc_info.land_ptr = &land_mask;
       }
-      else {
-         sfc_info.land_ptr = nullptr;
+
+      // Conf: topo_mask
+      if(vx_opt[i].vx_pd.sfc_info.need_topo()) {
+
+         // Read the topo data, if needed
+         if(topo_dp.is_empty()) {
+            Dictionary *dict = conf.lookup_dictionary(conf_key_topo_mask);
+            topo_dp = parse_geog_data(dict, grid, input_files);
+
+            // Conf: message_type_group_map for SURFACE
+            if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
+               mlog << Error << "\n" << method_name
+                    << "when \"" << conf_key_topo_mask_flag << "\" is true, \""
+                    << conf_key_message_type_group_map
+                    << "\" must contain an entry for \""
+                    << surface_msg_typ_group_str << "\".\n\n";
+               exit(1);
+            }
+         }
+
+         // Store pointer to the topo data
+         vx_opt[i].vx_pd.sfc_info.topo_ptr = &topo_dp;
+
+         // Conf: topo_mask.interp
+         parse_conf_topo_mask_interp(&conf, vx_opt[i].vx_pd.sfc_info);
       }
-      if(vx_opt[i].topo_flag) {
-         sfc_info.topo_ptr = &topo_dp;
-         sfc_info.topo_use_obs_thresh = topo_use_obs_thresh;
-         sfc_info.topo_interp_fcst_thresh = topo_interp_fcst_thresh;
-      }
-      else {
-         sfc_info.topo_ptr = nullptr;
-      }
-      vx_opt[i].vx_pd.set_sfc_info(sfc_info);
    }
 
    return;
@@ -794,9 +793,6 @@ void PointStatVxOpt::clear() {
    owind_ta.clear();
    wind_logic = SetLogic::None;
 
-   land_flag = false;
-   topo_flag = false;
-
    mask_grid.clear();
    mask_poly.clear();
    mask_sid.clear();
@@ -860,8 +856,10 @@ bool PointStatVxOpt::is_uv_match(const PointStatVxOpt &v) const {
                           v.vx_pd.obs_info->req_level_name()) ||
       !(beg_ds         == v.beg_ds        ) ||
       !(end_ds         == v.end_ds        ) ||
-      !(land_flag      == v.land_flag     ) ||
-      !(topo_flag      == v.topo_flag     ) ||
+      !(  vx_pd.sfc_info.land_flag ==
+        v.vx_pd.sfc_info.land_flag        ) ||
+      !(  vx_pd.sfc_info.topo_flag ==
+        v.vx_pd.sfc_info.topo_flag        ) ||
       !(mask_grid      == v.mask_grid     ) ||
       !(mask_poly      == v.mask_poly     ) ||
       !(mask_sid       == v.mask_sid      ) ||
@@ -1029,11 +1027,8 @@ void PointStatVxOpt::process_config(GrdFileType ftype,
       check_mctc_thresh(ocat_ta);
    }
 
-   // Conf: land.flag
-   land_flag = odict.lookup_bool(conf_key_land_mask_flag);
-
-   // Conf: topo.flag
-   topo_flag = odict.lookup_bool(conf_key_topo_mask_flag);
+   // Conf: land_mask, topo_mask, lapse_rate_correction, msl_agl_conversion
+   vx_pd.sfc_info = parse_conf_surface_info(&odict);
 
    // Conf: mask_grid
    mask_grid = odict.lookup_string_array(conf_key_mask_grid);

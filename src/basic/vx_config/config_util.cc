@@ -2536,9 +2536,126 @@ void parse_add_conf_ugrid_metadata_map(Dictionary *dict, map<ConcatString,String
                                  "parse_add_conf_ugrid_metadata_map");
 }
 
+///////////////////////////////////////////////////////////////////////////////
+
+SurfaceInfo parse_conf_surface_info(Dictionary *dict) {
+   const char *method_name = "parse_conf_surface_info() -> ";
+
+   // Check for nullptr
+   if(!dict) {
+      mlog << Error << "\n" << method_name
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   SurfaceInfo sfc_info;
+
+   // Note that land_ptr and topo_ptr are set by the application code
+
+   // Conf: land_mask.flag
+   sfc_info.land_flag = dict->lookup_bool(conf_key_land_mask_flag);
+
+   // Conf: topo_mask.flag
+   sfc_info.topo_flag = dict->lookup_bool(conf_key_topo_mask_flag);
+
+   // Conf: topo_mask.use_obs_thresh
+   sfc_info.topo_mask_use_obs_thresh = dict->lookup_thresh(conf_key_topo_mask_use_obs_thresh);
+
+   // Conf: topo_mask.interp_fcst_thresh
+   sfc_info.topo_mask_interp_fcst_thresh = dict->lookup_thresh(conf_key_topo_mask_interp_fcst_thresh);
+
+   // Conf: lapse_rate_correction.apply_to
+   sfc_info.lapse_rate_correction_apply_to = int_to_fieldtype(dict->lookup_int(conf_key_lapse_rate_correction_apply_to));
+
+   // Check for invalid options 
+   if(sfc_info.lapse_rate_correction_apply_to == FieldType::Both) {
+      mlog << Error << "\n" << method_name
+           << "\"" << conf_key_lapse_rate_correction_apply_to
+           << "\" cannot be set to \""
+           << fieldtype_to_string(FieldType::Both) << "\".\n\n";
+      exit(1);
+   }
+
+   // Conf: lapse_rate_correction.value
+   sfc_info.lapse_rate_correction_value = dict->lookup_double(conf_key_lapse_rate_correction_value);
+ 
+   // Conf: msl_agl_conversion.apply_to
+   sfc_info.msl_agl_conversion_apply_to = int_to_fieldtype(dict->lookup_int(conf_key_msl_agl_conversion_apply_to));
+
+   // Conf: msl_agl_conversion.apply_from
+   sfc_info.msl_agl_conversion_apply_from = int_to_fieldtype(dict->lookup_int(conf_key_msl_agl_conversion_apply_from));
+
+   // Check for invalid combinations
+   if((sfc_info.msl_agl_conversion_apply_to    != FieldType::None  &&
+       sfc_info.msl_agl_conversion_apply_from  == FieldType::None) ||
+      ((sfc_info.msl_agl_conversion_apply_to   == FieldType::Both  ||
+        sfc_info.msl_agl_conversion_apply_from == FieldType::Both) &&
+       (sfc_info.msl_agl_conversion_apply_to   != sfc_info.msl_agl_conversion_apply_from))) {
+      mlog << Error << "\n" << method_name
+           << "when \"" << conf_key_msl_agl_conversion_apply_to
+           << " = " << fieldtype_to_string(sfc_info.msl_agl_conversion_apply_to)
+           << "\", \"" << conf_key_msl_agl_conversion_apply_from
+           << "\" cannot be set to \""
+           << fieldtype_to_string(sfc_info.msl_agl_conversion_apply_from)
+           << "\".\n\n";
+      exit(1);
+   }
+
+   // Conf: msl_agl_conversion.thresh
+   sfc_info.msl_agl_conversion_thresh = dict->lookup_thresh(conf_key_msl_agl_conversion_thresh);
+
+   // Conf: msl_agl_conversion.msl_to_agl
+   sfc_info.msl_agl_conversion_msl_to_agl = dict->lookup_bool(conf_key_msl_agl_conversion_msl_to_agl);
+
+   // Check for invalid combination
+   if(sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
+      sfc_info.msl_agl_conversion_apply_to    != FieldType::None) {
+      mlog << Error << "\n" << method_name
+           << "cannot request both \"" << conf_key_lapse_rate_correction_apply_to
+           << " = " << fieldtype_to_string(sfc_info.lapse_rate_correction_apply_to)
+           << "\" and \"" << conf_key_msl_agl_conversion_apply_to
+           << " = " << fieldtype_to_string(sfc_info.msl_agl_conversion_apply_to)
+           << "\" for the same verification task.\n\n";
+      exit(1);
+   }
+
+   return sfc_info;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void parse_conf_topo_mask_interp(Dictionary *dict, SurfaceInfo &sfc_info) {
+   const char *method_name = "parse_conf_topo_mask_interp() -> ";
+
+   // Conf: topo_mask.interp
+   Dictionary *interp_dict = dict->lookup_dictionary(conf_key_topo_mask_interp);
+
+   // Conf: topo_mask.interp.method (required)
+   sfc_info.topo_interp_mthd = int_to_interpmthd(interp_dict->lookup_int(conf_key_method));
+
+   // Conf: topo_mask.interp.width (required)
+   sfc_info.topo_interp_wdth = interp_dict->lookup_int(conf_key_width);
+
+   // Conf: topo_mask.interp.shape (optional)
+   if(interp_dict->lookup(conf_key_shape, false)) {
+      sfc_info.topo_interp_shape = int_to_gridtemplate(interp_dict->lookup_int(conf_key_shape));
+   }
+   else {
+      sfc_info.topo_interp_shape = GridTemplateFactory::GridTemplates::Square;
+   }
+
+   // Conf: topo_mask.interp.vld_thresh (optional)
+   if(interp_dict->lookup(conf_key_vld_thresh, false)) {
+      sfc_info.topo_interp_vld_thresh = interp_dict->lookup_double(conf_key_vld_thresh);
+   }
+   else {
+      sfc_info.topo_interp_vld_thresh = default_vld_thresh;
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 void PlotInfo::clear() {
    flag = true; // enabled by default
@@ -3139,7 +3256,7 @@ SetLogic check_setlogic(SetLogic t1, SetLogic t2) {
    SetLogic t = SetLogic::None;
 
    // If not equal, select the non-default logic type
-        if(t1 == t2)            t = t1;
+        if(t1 == t2)             t = t1;
    else if(t1 == SetLogic::None) t = t2;
    else if(t2 == SetLogic::None) t = t1;
    // If not equal and both non-default, error out

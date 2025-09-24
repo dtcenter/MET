@@ -346,8 +346,6 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib::is_precipitation() const {
-   int i;
-   bool status = false;
 
    //
    // Check set_attrs entry
@@ -360,8 +358,9 @@ bool VarInfoGrib::is_precipitation() const {
    // The ReqName member contains the requested GRIB code abbreviation.
    // Check to see if it matches the GRIB precipitation abbreviations.
    //
-   for(i=0; i<n_grib_precipitation_abbr; i++) {
-      if( ReqName ==  grib_precipitation_abbr[i] ) {
+   bool status = false;
+   for(auto abbr : grib_precipitation_abbr) {
+      if(ReqName == abbr) {
          status = true;
          break;
       }
@@ -373,8 +372,6 @@ bool VarInfoGrib::is_precipitation() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib::is_specific_humidity() const {
-   int i;
-   bool status = false;
 
    //
    // Check set_attrs entry
@@ -384,11 +381,12 @@ bool VarInfoGrib::is_specific_humidity() const {
    }
 
    //
-   // The ReqName meber contains the requested GRIB code abbreviation.
+   // The ReqName member contains the requested GRIB code abbreviation.
    // Check to see if it matches the GRIB specific humidity abbreviations.
    //
-   for(i=0; i<n_grib_specific_humidity_abbr; i++) {
-      if( ReqName == grib_specific_humidity_abbr[i] ) {
+   bool status = false;
+   for(auto abbr : grib_specific_humidity_abbr) {
+      if(ReqName == abbr) {
          status = true;
          break;
       }
@@ -408,7 +406,8 @@ bool VarInfoGrib::is_u_wind() const {
       return(SetAttrIsUWind != 0);
    }
 
-   return(Code == ugrd_grib_code || ReqName == ugrd_abbr_str);
+   return Code == ugrd_grib_code ||
+          ReqName == ugrd_abbr_str;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -422,7 +421,8 @@ bool VarInfoGrib::is_v_wind() const {
       return(SetAttrIsVWind != 0);
    }
 
-   return(Code == vgrd_grib_code || ReqName == vgrd_abbr_str);
+   return Code == vgrd_grib_code ||
+          ReqName == vgrd_abbr_str;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -436,7 +436,8 @@ bool VarInfoGrib::is_wind_speed() const {
       return(SetAttrIsWindSpeed != 0);
    }
 
-   return(Code == wind_grib_code || ReqName == wind_abbr_str);
+   return Code == wind_grib_code ||
+          ReqName == wind_abbr_str;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -450,7 +451,8 @@ bool VarInfoGrib::is_wind_direction() const {
       return(SetAttrIsWindDirection != 0);
    }
 
-   return(Code == wdir_grib_code || ReqName == wdir_abbr_str);
+   return Code == wdir_grib_code ||
+          ReqName == wdir_abbr_str;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

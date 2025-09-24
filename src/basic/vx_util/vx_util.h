@@ -30,6 +30,7 @@
 #include "data_plane.h"
 #include "data_cube.h"
 #include "data_plane_util.h"
+#include "field_type.h"
 #include "file_exists.h"
 #include "file_size.h"
 #include "file_linecount.h"

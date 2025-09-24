@@ -42,19 +42,19 @@ class VarInfoUGrid : public VarInfo
 
    public:
       VarInfoUGrid();
-      ~VarInfoUGrid();
+      ~VarInfoUGrid() override;
       VarInfoUGrid(const VarInfoUGrid &);
       VarInfoUGrid & operator=(const VarInfoUGrid &);
-      VarInfo *clone() const;
+      VarInfo *clone() const override;
 
-      void dump(std::ostream &) const;
+      void dump(std::ostream &) const override;
       void clear();
 
       //
       // get stuff
       //
 
-      GrdFileType       file_type()      const;
+      GrdFileType       file_type()      const override;
       const LongArray & dimension()      const;
       int               dimension(int i) const;
       const NumArray  & dim_value()      const;
@@ -67,8 +67,8 @@ class VarInfoUGrid : public VarInfo
       // set stuff
       //
 
-      void set_magic(const ConcatString &, const ConcatString &);
-      void set_dict(Dictionary &s);
+      void set_magic(const ConcatString &, const ConcatString &) override;
+      void set_dict(Dictionary &s) override;
 
       void add_dimension(int dim, bool as_offset=true, double dim_value=bad_data_double);
 
@@ -76,12 +76,12 @@ class VarInfoUGrid : public VarInfo
       // do stuff
       //
 
-      bool is_precipitation()     const;
-      bool is_specific_humidity() const;
-      bool is_u_wind()            const;
-      bool is_v_wind()            const;
-      bool is_wind_speed()        const;
-      bool is_wind_direction()    const;
+      bool is_precipitation()     const override;
+      bool is_specific_humidity() const override;
+      bool is_u_wind()            const override;
+      bool is_v_wind()            const override;
+      bool is_wind_speed()        const override;
+      bool is_wind_direction()    const override;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -27,6 +27,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "data_plane.h"
+#include "field_type.h"
 #include "interp_mthd.h"
 #include "GridTemplate.h"
 #include "config_gaussian.h"
@@ -43,14 +44,43 @@ static const int dw_mean_pow = 2;
 //
 
 struct SurfaceInfo {
-   MaskPlane   * land_ptr;     // Pointer to land/sea mask (not allocated)
-   DataPlane   * topo_ptr;     // Pointer to model topography (not allocated)
-   SingleThresh  topo_use_obs_thresh;
-   SingleThresh  topo_interp_fcst_thresh;
+
+   // Pointer to land/sea mask (not allocated)
+   bool          land_flag;
+   MaskPlane *   land_ptr;
+
+   // Pointer to model topography (not allocated)
+   bool          topo_flag;
+   DataPlane *   topo_ptr;
+
+   // Topography interpolation options
+   InterpMthd    topo_interp_mthd;
+   int           topo_interp_wdth;
+   GridTemplateFactory::GridTemplates topo_interp_shape;
+   double        topo_interp_vld_thresh;
+
+   // Filter observations based on topography difference
+   SingleThresh  topo_mask_use_obs_thresh;
+
+   // Filter model points based on topography difference
+   SingleThresh  topo_mask_interp_fcst_thresh;
+
+   // Lapse rate correction options for surface temperatures
+   FieldType     lapse_rate_correction_apply_to;
+   double        lapse_rate_correction_value;
+
+   // MSL/AGL conversion options for heights
+   FieldType     msl_agl_conversion_apply_to;
+   FieldType     msl_agl_conversion_apply_from;
+   SingleThresh  msl_agl_conversion_thresh;
+   bool          msl_agl_conversion_msl_to_agl;
 
    SurfaceInfo();
 
    void clear();
+
+   bool need_land() const;
+   bool need_topo() const;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -108,6 +108,7 @@
 //   056    10/08/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
 //   057    10/14/24  Halley Gotway  MET #2279 Add point_weight_flag option.
 //   058    10/15/24  Halley Gotway  MET #2893 Write individual pair OBTYPE.
+//   069    09/11/25  Halley Gotway  MET #3174 Orographic corrections.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -147,9 +148,6 @@
 
 using namespace std;
 using namespace netCDF;
-
-////////////////////////////////////////////////////////////////////////
-
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -1939,9 +1937,9 @@ static void do_hira_ens(int i_vx, const PairDataPoint *pd_ptr) {
          // Store the observation value
          hira_pd.add_point_obs(
             pd_ptr->typ_sa[j].c_str(), pd_ptr->sid_sa[j].c_str(),
-            pd_ptr->lat_na[j], pd_ptr->lon_na[j],
+            pd_ptr->lat_na[j], pd_ptr->lon_na[j], pd_ptr->elv_na[j],
             pd_ptr->x_na[j], pd_ptr->y_na[j], pd_ptr->vld_ta[j],
-            pd_ptr->lvl_na[j], pd_ptr->elv_na[j],
+            pd_ptr->lvl_na[j], pd_ptr->hgt_na[j],
             pd_ptr->o_na[j], pd_ptr->o_qc_sa[j].c_str(),
             cpi, pd_ptr->wgt_na[j]);
 
@@ -2145,9 +2143,10 @@ static void do_hira_prob(int i_vx, const PairDataPoint *pd_ptr) {
                pd_ptr->typ_sa[k].c_str(),
                pd_ptr->sid_sa[k].c_str(),
                pd_ptr->lat_na[k], pd_ptr->lon_na[k],
+               pd_ptr->elv_na[k],
                pd_ptr->x_na[k], pd_ptr->y_na[k],
                nint(pd_ptr->f_lead_na[k]), pd_ptr->vld_ta[k],
-               pd_ptr->lvl_na[k], pd_ptr->elv_na[k],
+               pd_ptr->lvl_na[k], pd_ptr->hgt_na[k],
                f_cov, pd_ptr->o_na[k], pd_ptr->o_qc_sa[k].c_str(),
                cpi, pd_ptr->wgt_na[k]);
          } // end for k

@@ -34,16 +34,43 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 void SurfaceInfo::clear() {
+   land_flag = false;
    land_ptr = (MaskPlane *) nullptr;
+   topo_flag = false;
    topo_ptr = (DataPlane *) nullptr;
-   topo_use_obs_thresh.clear();
-   topo_interp_fcst_thresh.clear();
+   topo_interp_mthd = InterpMthd::None;
+   topo_interp_wdth = 0;
+   topo_interp_shape = GridTemplateFactory::GridTemplates::None;
+   topo_interp_vld_thresh = bad_data_double;
+   topo_mask_use_obs_thresh.clear();
+   topo_mask_interp_fcst_thresh.clear();
+   lapse_rate_correction_apply_to = FieldType::None;
+   lapse_rate_correction_value = bad_data_double;
+   msl_agl_conversion_apply_to = FieldType::None;
+   msl_agl_conversion_apply_from = FieldType::None;
+   msl_agl_conversion_thresh.clear();
+   msl_agl_conversion_msl_to_agl = false;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 SurfaceInfo::SurfaceInfo() {
    clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool SurfaceInfo::need_land() const {
+   return land_flag == true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool SurfaceInfo::need_topo() const {
+   return topo_flag == true ||
+          lapse_rate_correction_apply_to != FieldType::None ||
+          (msl_agl_conversion_apply_to   != FieldType::None &&
+           msl_agl_conversion_apply_from != FieldType::Obs);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -914,7 +941,7 @@ double compute_sfc_interp(const DataPlane &dp,
 
    MaskPlane sfc_mask = compute_sfc_mask(*gt, x, y, sfc_info, is_land_obs, obs_elv);
 
-   // Compute the interpolated value for the fields above and below
+   // Compute the interpolated value
    switch(mthd) {
 
       case InterpMthd::Min:         // Minimum
@@ -1031,7 +1058,7 @@ MaskPlane compute_sfc_mask(const GridTemplate &gt, int x, int y,
       // Check the topo mask
       if(sfc_info.topo_ptr) {
          double topo_grid = sfc_info.topo_ptr->get(gp->x, gp->y);
-         topo_ok = sfc_info.topo_interp_fcst_thresh.check(topo_grid - obs_elv);
+         topo_ok = sfc_info.topo_mask_interp_fcst_thresh.check(topo_grid - obs_elv);
       }
       else {
          topo_ok = true;

@@ -336,39 +336,43 @@ ________________________
 
 .. code-block:: none
 
-  model          = "FCST";
-  desc           = "NA";
-  regrid         = { ... }
-  climo_mean     = { ... }
-  climo_stdev    = { ... }
-  climo_cdf      = { ... }
-  obs_window     = { beg = -5400; end =  5400; }
-  mask           = { grid = [ "FULL" ]; poly = []; sid = []; }
-  ci_alpha       = [ 0.05 ];
-  boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
-                     rng = "mt19937"; seed = ""; }
-  interp         = { vld_thresh = 1.0; shape = SQUARE;
-                     type = [ { method = NEAREST; width = 1; } ]; }
-  censor_thresh  = [];
-  censor_val     = [];
-  mpr_column     = [];
-  mpr_thresh     = [];
-  eclv_points    = 0.05;
-  hss_ec_value   = NA;
-  rank_corr_flag = TRUE;
-  sid_inc        = [];
-  sid_exc        = [];
-  duplicate_flag = NONE;
-  obs_quality_inc  = [];
-  obs_quality_exc  = [];
-  obs_summary    = NONE;
-  obs_perc_value = 50;
-  message_type_group_map = [...];
+  model                    = "FCST";
+  desc                     = "NA";
+  regrid                   = { ... }
+  climo_mean               = { ... }
+  climo_stdev              = { ... }
+  climo_cdf                = { ... }
+  land_mask                = { ... }
+  topo_mask                = { ... }
+  lapse_rate_correction    = { ... }
+  msl_agl_conversion       = { ... }
+  obs_window               = { ... }
+  mask                     = { grid = [ "FULL" ];
+                               poly = [];
+                               sid = []; }
+  ci_alpha                 = [ 0.05 ];
+  boot                     = { ... }
+  interp                   = { ... }
+  censor_thresh            = [];
+  censor_val               = [];
+  mpr_column               = [];
+  mpr_thresh               = [];
+  eclv_points              = 0.05;
+  hss_ec_value             = NA;
+  rank_corr_flag           = TRUE;
+  sid_inc                  = [];
+  sid_exc                  = [];
+  duplicate_flag           = NONE;
+  obs_quality_inc          = [];
+  obs_quality_exc          = [];
+  obs_summary              = NONE;
+  obs_perc_value           = 50;
+  message_type_group_map   = [ ... ];
   obtype_as_group_val_flag = FALSE;
-  point_weight_flag = NONE;
-  tmp_dir        = "/tmp";
-  output_prefix  = "";
-  version        = "VN.N";
+  point_weight_flag        = NONE;
+  tmp_dir                  = "/tmp";
+  output_prefix            = "";
+  version                  = "VN.N";
 
 The configuration options listed above are common to multiple MET tools and are described in :numref:`config_options`.
 
@@ -380,36 +384,7 @@ The **obs** dictionary looks very similar to the **fcst** dictionary. When the f
 
 The **message_type** entry, defined in the **obs** dictionary, contains a comma-separated list of the message types to use for verification. At least one entry must be provided. The Point-Stat tool performs verification using observations for one message type at a time. See `Table 1.a Current Table A Entries in PREPBUFR mnemonic table <https://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_1.htm>`_ for a list of the possible types. If using **obs = fcst;**, it can be defined in the forecast dictionary and the copied into the observation dictionary.
 
-______________________
-
-.. code-block:: none
-
-  land_mask = {
-     flag      = FALSE;
-     file_name = [];
-     field     = { name = "LAND"; level = "L0"; }
-     regrid    = { method = NEAREST; width = 1; }
-     thresh = eq1;
-  }
-
-The **land_mask** dictionary defines the land/sea mask field which is used when verifying at the surface. For point observations whose message type appears in the **LANDSF** entry of the **message_type_group_map** setting, only use forecast grid points where land = TRUE. For point observations whose message type appears in the **WATERSF** entry of the **message_type_group_map** setting, only use forecast grid points where land = FALSE. The **flag** entry enables/disables this logic. If the **file_name** is left empty, then the land/sea is assumed to exist in the input forecast file. Otherwise, the specified file(s) are searched for the data specified in the **field** entry. The **regrid** settings specify how this field should be regridded to the verification domain. Lastly, the **thresh** entry is the threshold which defines land (threshold is true) and water (threshold is false).
-
-__________________________
-
-.. code-block:: none
-
-  topo_mask = {
-     flag               = FALSE;
-     file_name          = [];
-     field              = { name = "TOPO"; level = "L0"; }
-     regrid             = { method = BILIN; width = 2; }
-     use_obs_thresh     = ge-100&&le100;
-     interp_fcst_thresh = ge-50&&le50;
-  }
-
-The **topo_mask** dictionary defines the model topography field which is used when verifying at the surface. This logic is applied to point observations whose message type appears in the **SURFACE** entry of the **message_type_group_map** setting. Only use point observations where the topo - station elevation difference meets the **use_obs_thresh** threshold entry. For the observations kept, when interpolating forecast data to the observation location, only use forecast grid points where the topo - station difference meets the **interp_fcst_thresh** threshold entry. The **flag** entry enables/disables this logic. If the **file_name** is left empty, then the topography data is assumed to exist in the input forecast file. Otherwise, the specified file(s) are searched for the data specified in the **field** entry. The **regrid** settings specify how this field should be regridded to the verification domain.
-
-____________________________
+________________________
 
 .. code-block:: none
 
