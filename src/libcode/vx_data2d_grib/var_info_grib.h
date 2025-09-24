@@ -64,19 +64,19 @@ class VarInfoGrib : public VarInfo
 
    public:
       VarInfoGrib();
-      ~VarInfoGrib();
+      ~VarInfoGrib() override;
       VarInfoGrib(const VarInfoGrib &);
       VarInfoGrib & operator=(const VarInfoGrib &);
-      VarInfo *clone() const;
+      VarInfo *clone() const override;
 
-      void dump(std::ostream &) const;
+      void dump(std::ostream &) const override;
       void clear();
 
          //
          // get stuff
          //
 
-      GrdFileType file_type() const;
+      GrdFileType file_type() const override;
       int         ptv()       const;
       int         code()      const;
       int         lvl_type()  const;
@@ -90,8 +90,8 @@ class VarInfoGrib : public VarInfo
          // set stuff
          //
 
-      void set_dict(Dictionary &);
-      void add_grib_code(Dictionary &);
+      void set_dict(Dictionary &) override;
+      void add_grib_code(Dictionary &) override;
 
       void set_ptv(int);
       void set_code(int);
@@ -106,12 +106,12 @@ class VarInfoGrib : public VarInfo
          // do stuff
          //
 
-      bool is_precipitation()     const;
-      bool is_specific_humidity() const;
-      bool is_u_wind()            const;
-      bool is_v_wind()            const;
-      bool is_wind_speed()        const;
-      bool is_wind_direction()    const;
+      bool is_precipitation()     const override;
+      bool is_specific_humidity() const override;
+      bool is_u_wind()            const override;
+      bool is_v_wind()            const override;
+      bool is_wind_speed()        const override;
+      bool is_wind_direction()    const override;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

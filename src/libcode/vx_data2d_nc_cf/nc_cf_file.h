@@ -36,6 +36,24 @@
 static const char nccf_lat_var_name [] = "lat";
 static const char nccf_lon_var_name [] = "lon";
 
+// acceptable units of vertical dimension variables
+// (lower-case and excluding plural versions)
+static const std::vector<std::string> acceptable_vertical_units = {
+    "bar",
+    "millibar",
+    "decibar",
+    "atmosphere",
+    "atm",
+    "pascal",
+    "pa",
+    "hpa",
+    "meter",
+    "metre",
+    "m",
+    "km",
+    "kilometer"
+};
+
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -79,7 +97,6 @@ class NcCfFile {
 
       TimeArray ValidTime;
       NumArray raw_times;
-      NumArray vlevels;
 
       unixtime  InitTime;
       unixtime  AccumTime;
@@ -106,8 +123,6 @@ class NcCfFile {
          //  data
          //
 
-      double getData(netCDF::NcVar *, const LongArray &) const;
-
       bool getData(netCDF::NcVar *, const LongArray &, DataPlane &) const;
 
       bool getData(const char *, const LongArray &, DataPlane &, NcVarInfo *&) const;
@@ -118,6 +133,8 @@ class NcCfFile {
                                         const long lat_counts, const long lon_counts);
       NcVarInfo* find_var_name(const char * var_name) const;
       NcVarInfo* find_var_by_dim_name(const char *dim_name) const;
+
+      void set_vlevels(NcVarInfo* var) const;
 
    private:
 
@@ -196,6 +213,12 @@ class NcCfFile {
       LatLonData get_data_from_lat_lon_vars(netCDF::NcVar *lat_var, netCDF::NcVar *lon_var,
                                             const long lat_counts, const long lon_counts,
                                             bool &swap_to_north);
+
+      bool is_z_dim(const ConcatString& dim_name) const;
+  void parse_vars_from_file(ConcatString& att_value, int& max_dim_count, netCDF::NcVar*& valid_time_var);
+  void parse_times_from_file(const char* filepath, const char* method_name, netCDF::NcVar* valid_time_var);
+  void set_var_slots(int max_dim_count);
+  void parse_valid_time_var(const char* method_name, netCDF::NcVar* valid_time_var, ConcatString& units);
 };
 
 

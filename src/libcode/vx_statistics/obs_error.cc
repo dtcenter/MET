@@ -472,7 +472,7 @@ void ObsErrorTable::initialize() {
    }
 
    // Search for file input file names
-   file_names = get_filenames(path, "obs_error", ".txt", true);
+   file_names = get_filenames(path, "^obs_error", ".txt$", true);
 
    for(int i=0; i<file_names.n(); i++) {
 

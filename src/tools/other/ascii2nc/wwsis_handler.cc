@@ -180,7 +180,7 @@ bool WwsisHandler::_readObservations(LineDataFile &ascii_file)
   time_t valid_time = _initValidTime(ascii_file.short_filename());
   if (valid_time == 0)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "cannot extract beginning valid time from file name: "
          << ascii_file.short_filename() << ".\n\n";
     return false;
@@ -194,7 +194,7 @@ bool WwsisHandler::_readObservations(LineDataFile &ascii_file)
 
     if (data_line.n_items() != 1)
     {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Warning << "\n" << method_name << " -> "
            << "line number " << data_line.line_number()
            << " does not have the correct number of columns  (1).\n\n";
       return false;
@@ -240,7 +240,7 @@ bool WwsisHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
   if (!(ascii_file >> data_line))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "error reading header line from input ASCII file \""
          << ascii_file.filename() << "\"\n\n";
 
@@ -251,7 +251,7 @@ bool WwsisHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
   if (!(ascii_file >> data_line))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "error reading station id line from input ASCII file \""
          << ascii_file.filename() << "\"\n\n";
 
@@ -262,7 +262,7 @@ bool WwsisHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
   if (data_line.n_items() != 9)
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "error reading station id line from input ASCII file \""
          << ascii_file.filename() << "\"\n\n";
 
@@ -284,7 +284,7 @@ bool WwsisHandler::_readHeaderInfo(LineDataFile &ascii_file)
 
   if (!(ascii_file >> data_line))
   {
-    mlog << Error << "\n" << method_name << " -> "
+    mlog << Warning << "\n" << method_name << " -> "
          << "error reading \"ac\" from input ASCII file \""
          << ascii_file.filename() << "\"\n\n";
 

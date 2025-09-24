@@ -507,8 +507,9 @@ Once the ASCII point observations have been formatted as expected, the ASCII fil
 .. code-block:: none
 
   Usage: ascii2nc
-         ascii_file1 [ascii_file2 ... ascii_filen]
+         input1 ... inputn
          netcdf_file
+         [-inputrx reg_exp]
          [-format type]
          [-config file]
          [-valid_beg time]
@@ -525,32 +526,40 @@ ascii2nc has two required arguments and can take several optional ones.
 Required Arguments for ascii2nc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. The **ascii_file** argument is the ASCII point observation file(s) to be processed. If using Python embedding with "-format python" provides a quoted string containing the Python script to be run followed by any command line arguments that script takes.
+1. The **input1 .. inputn** argument defines one or more sources of formatted ASCII point observation files to be processed. Each input is the path to:
+
+   - a regular file
+   - an ASCII file list, as described in :numref:`ascii_file_lists`
+   - a top-level diretory to be recursively searched for files matching the **-inputrx reg_exp**, described below
+
+If using Python embedding with the **-format python** option, specify inputs as quoted strings containing the Python script to be run followed by any command line arguments for that script.
 
 2. The **netcdf_file** argument is the NetCDF output file to be written.
 
 Optional Arguments for ascii2nc
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-3. The **-format type** option may be set to "met_point", "little_r", "surfrad", "wwsis", "airnowhourlyaqobs", "airnowhourly", "airnowdaily_v2", "ndbc_standard", "ismn", "iabp", "aeronet", "aeronetv2", "aeronetv3", "uscrn", or "python". If passing in ISIS data, use the "surfrad" format flag.
+3. The **-inputrx reg_exp** option overrides the default regular expression (.*) when searching directories for input files. Only files matching this regular expression will be processed.
 
-4. The **-config file** option is the configuration file for generating time summaries.
+4. The **-format type** option may be set to "met_point", "little_r", "surfrad", "wwsis", "airnowhourlyaqobs", "airnowhourly", "airnowdaily_v2", "ndbc_standard", "ismn", "iabp", "aeronet", "aeronetv2", "aeronetv3", "uscrn", or "python". If passing in ISIS data, use the "surfrad" format flag.
 
-5. The **-valid_beg** time option in YYYYMMDD[_HH[MMSS]] format sets the beginning of the retention time window.
+5. The **-config file** option is the configuration file for generating time summaries.
 
-6. The **-valid_end** time option in YYYYMMDD[_HH[MMSS]] format sets the end of the retention time window.
+6. The **-valid_beg** time option in YYYYMMDD[_HH[MMSS]] format sets the beginning of the retention time window.
 
-7. The **-mask_grid** string option is a named grid or a gridded data file to filter the point observations spatially.
+7. The **-valid_end** time option in YYYYMMDD[_HH[MMSS]] format sets the end of the retention time window.
 
-8. The **-mask_poly** file option is a polyline masking file to filter the point observations spatially.
+8. The **-mask_grid** string option is a named grid or a gridded data file to filter the point observations spatially.
 
-9. The **-mask_sid** file|list option is a station ID masking file or a comma-separated list of station ID's to filter the point observations spatially. See the description of the "sid" entry in :numref:`config_options`.
+9. The **-mask_poly** file option is a polyline masking file to filter the point observations spatially.
 
-10. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
+10. The **-mask_sid** file|list option is a station ID masking file or a comma-separated list of station ID's to filter the point observations spatially. See the description of the "sid" entry in :numref:`config_options`.
 
-11. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+11. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-12. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+12. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
+
+13. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 An example of the ascii2nc calling sequence is shown below:
 
@@ -609,7 +618,7 @@ ascii2nc Output
 
 The NetCDF output of the ASCII2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
 
-"obs_vid" variable is replaced with "obs_gc" when the GRIB code is given instead of the variable names. In this case, the global variable "use_var_id" does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
+"obs_vid" variable is replaced with "obs_gc" when the GRIB code is given instead of the variable names. In this case, the global attribute "use_var_id" does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
 
 MADIS2NC Tool
 =============
@@ -705,12 +714,45 @@ _____________________
 
 The **time_summary** dictionary is described in :numref:`pb2nc configuration file`.
 
+_____________________
+
+.. code-block:: none
+
+   grib_var_map = [
+      { key = "1"  ;   val =  "PRES,Pa"      ; },  // Station Pressure
+      { key = "2"  ;   val = "PRMSL,Pa"      ; },  // Sea Level Pressure
+      { key = "7"  ;   val =   "HGT,gpm"     ; },  // Height
+      { key = "11" ;   val =   "TMP,K"       ; },  // Temperature
+      { key = "15" ;   val =  "TMAX,K"       ; },  // Maximum Temperature
+      { key = "16" ;   val =  "TMIN,K"       ; },  // Minimum Temperature
+      { key = "17" ;   val =   "DPT,K"       ; },  // Dewpoint
+      { key = "20" ;   val = "VISIB,W/m^2"   ; },  // Visibility
+      { key = "31" ;   val =  "WDIR,deg"     ; },  // Wind Direction
+      { key = "32" ;   val =  "WIND,m/s"     ; },  // Wind Speed
+      { key = "33" ;   val =  "UGRD,m/s"     ; },  // Write U-component of wind
+      { key = "34" ;   val =  "VGRD,m/s"     ; },  // Write V-component of wind
+      { key = "52" ;   val =    "RH,%"       ; },  // Relative Humidity
+      { key = "54" ;   val =  "PWAT,kg/m^2"  ; },  // Precipitable Water
+      { key = "59" ;   val = "PRATE,kg/m^2/s"; },  // Precipitation Rate
+      { key = "61" ;   val =  "APCP,kg/m^2"  ; },  // Precipitation
+      { key = "66" ;   val =  "SNOD,m"       ; },  // Snow Cover
+      { key = "80" ;   val =  "WTMP,K"       ; },  // Sea Surface Temperature
+      { key = "85" ;   val = "TSOIL,K"       ; },  // Soil Temperature
+      { key = "180";   val =  "GUST,m/s"     ; },  // Wind Gust
+      { key = "250";   val =  "SWHR,K/s"     ; }   // Solar Radiation
+   ];
+
+The GRIB code mappings for variable names and units are defined in the **grib_var_map** dictionary within **Madis2NcConfig_default**. In this mapping, each key is a GRIB code, and the corresponding value is a pair: the first element is the variable name, and the second is the unit.
+
 madis2nc Output
 ---------------
 
 The NetCDF output of the MADIS2NC tool is structured in the same way as the output of the PB2NC tool described in :numref:`pb2nc output`.
 
-"obs_vid" variable is replaced with "obs_gc" when the GRIB code is given instead of the variable names. In this case, the global variable "use_var_id" does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
+"obs_vid" variable is replaced with "obs_gc" when the GRIB code is given instead of the variable names. In this case, the global attribute "use_var_id" does not exist or set to false (use_var_id = "false" ;). Three variables (obs_var, obs_units, and obs_desc) related with variable names are not added.
+
+Starting from MET version 12.2.0, the GRIB codes were replaced with variable names which are defined in the **grib_var_map** dictionary within **Madis2NcConfig_default**.
+
 
 LIDAR2NC Tool
 =============

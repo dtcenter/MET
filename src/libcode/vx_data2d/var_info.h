@@ -201,13 +201,13 @@ class VarInfo
          // do stuff
          //
 
-      virtual bool is_precipitation()     const = 0;
-      virtual bool is_specific_humidity() const = 0;
-      virtual bool is_u_wind()            const = 0;
-      virtual bool is_v_wind()            const = 0;
-      virtual bool is_wind_speed()        const = 0;
-      virtual bool is_wind_direction()    const = 0;
-              bool is_prob();
+      virtual bool is_precipitation()     const;
+      virtual bool is_specific_humidity() const;
+      virtual bool is_u_wind()            const;
+      virtual bool is_v_wind()            const;
+      virtual bool is_wind_speed()        const;
+      virtual bool is_wind_direction()    const;
+              bool is_prob()              const;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

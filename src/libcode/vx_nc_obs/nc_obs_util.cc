@@ -82,7 +82,7 @@ NcPointObsData::NcPointObsData()
 
 bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
    bool succeed = true;
-   const char* method_name = "NcPointObsData::read_obs_data_numbers()";
+   const char* method_name = "NcPointObsData::read_obs_data_numbers() -> ";
 
    clear_numbers();
    obs_cnt = obs_vars.obs_cnt;
@@ -116,7 +116,7 @@ bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
          missing_vars.add(nc_var_obs_lvl);
       }
       else {
-         if (!get_nc_data(&obs_vars.obs_lvl_var, obs_lvls.data())) { 
+         if (!get_nc_data(&obs_vars.obs_lvl_var, obs_lvls.data())) {
             succeed = false;
             failed_vars.add(nc_var_obs_lvl);
          }
@@ -183,37 +183,37 @@ bool NcPointObsData::read_obs_data_numbers(NetcdfObsVars obs_vars, bool stop) {
 
 bool NcPointObsData::read_obs_data_table_lookups(NetcdfObsVars obs_vars, bool stop) {
    bool succeed = true;
-   const char* method_name = "NcPointObsData::read_obs_data_table_lookups()";
+   const char* method_name = "NcPointObsData::read_obs_data_table_lookups() -> ";
 
    clear_strings();
 
-   if (!IS_INVALID_NC(obs_vars.obs_arr_var)) {
-      if (IS_VALID_NC(obs_vars.obs_qty_var)) {
-         if (!get_nc_data_to_array(&obs_vars.obs_qty_var, &qty_names)) {
-            succeed = false;
-            mlog << Error << "\n" << method_name
-                 << "trouble getting data of " << nc_var_obs_qty << "\n\n";
-         }
-      }
-      else {
+   if (!IS_INVALID_NC(obs_vars.obs_arr_var)) {  // old MET point version
+      if (IS_INVALID_NC(obs_vars.obs_qty_var)) {
          mlog << Error << "\n" << method_name
               << "missing the variable " << nc_var_obs_qty << "\n\n";
       }
+      else if (!get_nc_data_to_array(&obs_vars.obs_qty_var, &qty_names)) {
+         succeed = false;
+         mlog << Error << "\n" << method_name
+              << "trouble getting data of " << nc_var_obs_qty << "\n\n";
+      }
    }
    else {
-      if (IS_VALID_NC(obs_vars.obs_var)) {
-         if (!get_nc_data_to_array(&obs_vars.obs_var, &var_names)) {
-            succeed = false;
-            mlog << Error << "\n" << method_name
-                 << "trouble getting data of " << nc_var_obs_var << "\n\n";
-         }
+      if (IS_VALID_NC(obs_vars.obs_var) && !get_nc_data_to_array(&obs_vars.obs_var, &var_names)) {
+         succeed = false;
+         mlog << Error << "\n" << method_name
+              << "trouble getting data of " << nc_var_obs_var << "\n\n";
       }
-      if (IS_VALID_NC(obs_vars.obs_qty_tbl_var)) {
-         if (!get_nc_data_to_array(&obs_vars.obs_qty_tbl_var, &qty_names)) {
-            succeed = false;
-            mlog << Error << "\n" << method_name
-                 << "trouble getting data of " << nc_var_obs_qty_tbl << "\n\n";
-         }
+      if (IS_VALID_NC(obs_vars.unit_var) && !get_nc_data_to_array(&obs_vars.unit_var, &var_units)) {
+         succeed = false;
+         mlog << Error << "\n" << method_name
+              << "trouble getting data of " << nc_var_unit << "\n\n";
+      }
+      if (IS_VALID_NC(obs_vars.obs_qty_tbl_var)
+          && !get_nc_data_to_array(&obs_vars.obs_qty_tbl_var, &qty_names)) {
+         succeed = false;
+         mlog << Error << "\n" << method_name
+              << "trouble getting data of " << nc_var_obs_qty_tbl << "\n\n";
       }
    }
 
@@ -233,8 +233,8 @@ NetcdfObsVars::NetcdfObsVars()
 ///////////////////////////////////////////////////////////////////////////////
 
 void NetcdfObsVars::create_dimensions(NcFile *f_out) {
-   const string method_name = "  create_dimensions()";
-   mlog << Debug(7) << method_name << "  is called" << "\n";
+   const string method_name = "  create_dimensions() -> ";
+   mlog << Debug(7) << method_name << "is called" << "\n";
    // Define netCDF dimensions
    if (IS_INVALID_NC(strl_dim))   strl_dim = add_dim(f_out, nc_dim_mxstr,  HEADER_STR_LEN);
    if (IS_INVALID_NC(strl2_dim)) strl2_dim = add_dim(f_out, nc_dim_mxstr2, HEADER_STR_LEN2);
@@ -251,8 +251,8 @@ void NetcdfObsVars::create_dimensions(NcFile *f_out) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void NetcdfObsVars::create_hdr_vars (NcFile *f_out, const int hdr_count) {
-   const string method_name = "  create_hdr_vars()";
-   mlog << Debug(7) << method_name << "  hdr_count: " << hdr_count << "\n";
+   const string method_name = "  create_hdr_vars() -> ";
+   mlog << Debug(7) << method_name << "hdr_count: " << hdr_count << "\n";
 
    // Define netCDF dimensions
    hdr_cnt = hdr_count;
@@ -294,7 +294,7 @@ void NetcdfObsVars::create_hdr_vars (NcFile *f_out, const int hdr_count) {
 
 void NetcdfObsVars::create_obs_vars (NcFile *f_out) {
    const char *long_name_str;
-   const string method_name = "  create_obs_vars()";
+   const string method_name = "  create_obs_vars() -> ";
 
    // Define netCDF dimensions
    create_dimensions(f_out);
@@ -344,7 +344,7 @@ void NetcdfObsVars::create_obs_vars (NcFile *f_out) {
 
 void NetcdfObsVars::create_obs_name_vars (NcFile *f_out, const int var_count,
                                           const int unit_count, const int desc_count) {
-   const string method_name = "  create_other_vars()";
+   const string method_name = "  create_other_vars() -> ";
 
    if (var_count > 0) {
       NcDim var_dim = create_var_obs_var(f_out, var_count);
@@ -362,8 +362,8 @@ void NetcdfObsVars::create_obs_name_vars (NcFile *f_out, const int var_count,
 ////////////////////////////////////////////////////////////////////////
 
 void NetcdfObsVars::create_pb_hdrs (NcFile *f_out, const int hdr_count) {
-   const string method_name = "  create_pb_hdrs()";
-   mlog << Debug(7) << method_name << "  hdr_count: " << hdr_count << "\n";
+   const string method_name = "  create_pb_hdrs() -> ";
+   mlog << Debug(7) << method_name << "hdr_count: " << hdr_count << "\n";
 
    // Define netCDF dimensions
    if (IS_INVALID_NC(pb_hdr_dim)) pb_hdr_dim = add_dim(f_out, nc_dim_npbhdr, hdr_count);
@@ -384,7 +384,7 @@ void NetcdfObsVars::create_pb_hdrs (NcFile *f_out, const int hdr_count) {
 
 void NetcdfObsVars::create_table_vars (NcFile *f_out, MetPointHeader &hdr_data,
                                        NcDataBuffer &data_buffer) {
-   const string method_name = "  create_table_vars()";
+   const string method_name = "  create_table_vars() -> ";
 
    // Define netCDF dimensions
    NcDim hdr_typ_dim = add_dim(f_out, nc_dim_nhdr_typ, hdr_data.typ_array.n_elements());
@@ -421,7 +421,7 @@ NcDim NetcdfObsVars::create_var_obs_var (NcFile *f_out, int var_count) {
 
 bool NetcdfObsVars::is_valid(bool exit_on_error) {
    bool valid = true;
-   const char* method_name = "NetcdfObsVars::is_valid()";
+   const char* method_name = "NetcdfObsVars::is_valid() -> ";
 
    StringArray missing_dims;
    StringArray missing_vars;
@@ -439,7 +439,7 @@ bool NetcdfObsVars::is_valid(bool exit_on_error) {
    if (0 < missing_dims.n()) {
       valid = false;
       for (int idx=0; idx<missing_dims.n() ;idx++) {
-         mlog << Error << "\n" << method_name << " -> "
+         mlog << Error << "\n" << method_name
               << "can not find the dimension\"" << missing_dims[idx] << "\".\n\n";
       }
    }
@@ -447,7 +447,7 @@ bool NetcdfObsVars::is_valid(bool exit_on_error) {
    if (0 < missing_vars.n()) {
       valid = false;
       for (int idx=0; idx<missing_vars.n() ;idx++) {
-         mlog << Error << "\n" << method_name << " -> "
+         mlog << Error << "\n" << method_name
               << "can't read \"" << missing_vars[idx]
               << "\" variable from the netCDF file\n\n";
       }
@@ -1015,7 +1015,7 @@ void NetcdfObsVars::write_header_to_nc(NcDataBuffer &data_buf,
    bool is_prepbufr = is_pb || attr_pb2nc;
    long offsets[2] = { data_buf.hdr_data_offset, 0 };
    long lengths[1] = { buf_size } ;
-   const string method_name = "  NetcdfObsVars::write_header_to_nc() ";
+   const string method_name = "  NetcdfObsVars::write_header_to_nc() -> ";
 
    ConcatString log_message;
    if (is_prepbufr) {
@@ -1025,14 +1025,14 @@ void NetcdfObsVars::write_header_to_nc(NcDataBuffer &data_buf,
       log_message.add(str_format("%i", raw_hdr_cnt));
    }
 
-   mlog << Debug(7) << method_name << " buf_size: " << buf_size
+   mlog << Debug(7) << method_name << "buf_size: " << buf_size
         << "  is_prepbufr: " << is_prepbufr << ", hdr_data_offset: "
         << data_buf.hdr_data_offset << log_message << "\n";
 
    //lengths[1] = HEADER_STR_LEN2;
    dim_size = get_dim_size(&hdr_typ_var, 0);
    if ((0 < dim_size) &&(dim_size < lengths[0])) {
-      mlog << Error << "\n" << method_name << " mismatching dimensions: allocated="
+      mlog << Error << "\n" << method_name << "mismatching dimensions: allocated="
            << dim_size << ", data size=" << lengths[0] << " (hdr_typ)\n\n";
       exit(1);
    }
@@ -1056,7 +1056,7 @@ void NetcdfObsVars::write_header_to_nc(NcDataBuffer &data_buf,
    // Write the header array which consists of the following: LAT LON ELV
    dim_size = get_dim_size(&hdr_lat_var, 0);
    if ((0 < dim_size) &&(dim_size < lengths[0])) {
-      mlog << Error << "\n" << method_name << " mismatching dimensions: allocated="
+      mlog << Error << "\n" << method_name << "mismatching dimensions: allocated="
            << dim_size << ", data size=" << lengths[0] << " (hdr_lat)\n\n";
       exit(1);
    }
@@ -1139,20 +1139,20 @@ void NetcdfObsVars::write_obs_buffer(NcDataBuffer &data_buffer, const int buf_si
 {
    long offsets[2] = { data_buffer.obs_data_offset, 0 };
    long lengths[1] = { buf_size} ;
-   const string method_name = "  write_obs_buffer()";
+   const string method_name = "  write_obs_buffer() -> ";
 
-   mlog << Debug(7) << method_name << " offset: "
+   mlog << Debug(7) << method_name << "offset: "
         << offsets[0] << ", " << offsets[1] << "  buf_size: " << buf_size << "\n";
    mlog << Debug(7) << "       obs_qty_var:  " << GET_NC_NAME(obs_qty_var) << "\n";
 
    if(!put_nc_data((NcVar *)&obs_qty_var, (int*)data_buffer.qty_idx_buf, lengths, offsets)) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Error << "\n" << method_name
            << "error writing the quality flag to the "
            << "netCDF file\n\n";
       exit(1);
    }
    if(!put_nc_data((NcVar *)&obs_hid_var, (int*)data_buffer.obs_hid_buf, lengths, offsets)) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Error << "\n" << method_name
            << "error writing the observation header index array to the "
            << "netCDF file\n\n";
       exit(1);
@@ -1162,26 +1162,26 @@ void NetcdfObsVars::write_obs_buffer(NcDataBuffer &data_buffer, const int buf_si
          ? put_nc_data((NcVar *)&obs_vid_var, (int*)data_buffer.obs_vid_buf, lengths, offsets)
          : put_nc_data((NcVar *)&obs_gc_var,  (int*)data_buffer.obs_vid_buf, lengths, offsets);
    if(!result) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Error << "\n" << method_name
            << "error writing the observation "
            << (use_var_id ? "variable_index" : "grib_code")
            << " array to the netCDF file\n\n";
       exit(1);
    }
    if(!put_nc_data((NcVar *)&obs_lvl_var, (float*)data_buffer.obs_lvl_buf, lengths, offsets)) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Error << "\n" << method_name
            << "error writing the observation level array to the "
            << "netCDF file\n\n";
       exit(1);
    }
    if(!put_nc_data((NcVar *)&obs_hgt_var, (float*)data_buffer.obs_hgt_buf, lengths, offsets)) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Error << "\n" << method_name
            << "error writing the observation hight array to the "
            << "netCDF file\n\n";
       exit(1);
    }
    if(!put_nc_data((NcVar *)&obs_val_var, (float*)data_buffer.obs_val_buf, lengths, offsets)) {
-      mlog << Error << "\n" << method_name << " -> "
+      mlog << Error << "\n" << method_name
            << "error writing the observation data array to the "
            << "netCDF file\n\n";
       exit(1);
@@ -1224,7 +1224,7 @@ long count_nc_headers(vector< Observation > &observations)
    double prev_latitude = bad_data_double;
    double prev_longitude = bad_data_double;
    double prev_elevation = bad_data_double;
-   const string method_name = "  count_nc_headers()";
+   const string method_name = "  count_nc_headers() -> ";
 
    for (vector< Observation >::iterator obs = observations.begin();
         obs != observations.end(); ++obs)
@@ -1276,7 +1276,8 @@ bool is_using_var_id(NcFile *nc_file) {
 
 int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_len)
 {
-   const string method_name = "  write_nc_string_array() ";
+   const string method_name = "  write_nc_string_array() -> ";
+   const string method_name_s = "write_nc_string_array()";
    int data_count = strArray.n_elements();
    int max_buf_size = (1024 * 8);
    int buf_size = (data_count > max_buf_size ? max_buf_size : data_count);
@@ -1284,7 +1285,7 @@ int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_le
    long offsets[2] = { 0, 0 };
    long lengths[2] = { buf_size, str_len } ;
 
-   mlog << Debug(7) << method_name << " " << GET_NC_NAME_P(ncVar)
+   mlog << Debug(7) << method_name << GET_NC_NAME_P(ncVar)
         << "  data count: " << data_count << "\n";
 
    int buf_index = 0;
@@ -1297,17 +1298,17 @@ int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_le
       len_n = string_data.length();
       len_p = strnlen(&data_buf.data()[buf_index], str_len);
       if (len_n > str_len) len_n = str_len;
-      m_strncpy(&data_buf.data()[buf_index], string_data.c_str(), len_n, method_name.c_str());
+      m_strncpy(&data_buf.data()[buf_index], string_data.c_str(), len_n, method_name_s.c_str());
       for (int idx=len_n; idx<len_p; idx++)
          data_buf.data()[buf_index + idx] = 0;  // erase previous data
 
       buf_index += str_len;
       if (buf_index >= (buf_size * str_len)) {
-         mlog << Debug(7) << method_name << " save to NetCDF. index: " << index
+         mlog << Debug(7) << method_name << "save to NetCDF. index: " << index
               << "  buf_index: " << buf_index << "  offsets: "
               << offsets[0] << " lengths: " << lengths[0] << "\n";
          if(!put_nc_data(ncVar, data_buf.data(), lengths, offsets)) {
-            mlog << Error << "\n" << method_name << "-> "
+            mlog << Error << "\n" << method_name
                  << "error writing the variable " << GET_NC_NAME_P(ncVar)
                  << " to the netCDF file\n\n";
             exit(1);
@@ -1319,10 +1320,10 @@ int write_nc_string_array (NcVar *ncVar, StringArray &strArray, const int str_le
 
    if (buf_index > 0) {
       lengths[0] = (data_count <= max_buf_size) ? data_count : (data_count % buf_size);
-      mlog << Debug(7) << method_name << " Save to NetCDF. offsets: " << offsets[0]
+      mlog << Debug(7) << method_name << "Save to NetCDF. offsets: " << offsets[0]
            << " lengths: " << lengths[0] << "\n";
       if(!put_nc_data(ncVar, data_buf.data(), lengths, offsets)) {
-         mlog << Error << "\n" << method_name << "-> "
+         mlog << Error << "\n" << method_name
               << "error writing the variable " << GET_NC_NAME_P(ncVar)
               << " to the netCDF file\n\n";
          exit(1);

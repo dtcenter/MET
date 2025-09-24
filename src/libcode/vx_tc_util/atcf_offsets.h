@@ -29,7 +29,7 @@ static const int LonTenthsOffset       = 7;
 
 //
 // Offsets specific to the ADECK and BDECK track lines
-//   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/abrdeck.html
+//   https://science.nrlmry.navy.mil/atcf/docs/database/new/abrdeck.html
 // Offsets for columns common to ATCFLineType::Track and ATCFLineType::GenTrack
 //
 
@@ -96,7 +96,7 @@ static const int GenMax700VortOffset     = 30;
 
 //
 // Offsets specific to the EDECK probability lines
-//   http://www.nrlmry.navy.mil/atcf_web/docs/database/new/edeck.txt
+//   https://science.nrlmry.navy.mil/atcf/docs/database/new/edeck.txt
 //
 
 static const int ProbOffset            = 8;  // probability of event (0-100)

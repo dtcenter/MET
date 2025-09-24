@@ -51,6 +51,7 @@
 //   022    10/07/22  Dave Albo      MET #2276 Add NDBC buoy data
 //   023    11/28/23  Halley Gotway  MET #2701 Add ISMN soil moisture data
 //   024    01/06/25  Halley Gotway  MET #1019 Add USCRN quality controlled data
+//   025    06/23/25  Halley Gotway  MET #3148 Search input directories
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -71,6 +72,7 @@
 #include "data2d_factory.h"
 #include "mask_poly.h"
 #include "apply_mask.h"
+#include "parse_file_list.h"
 #include "vx_grid.h"
 #include "vx_nc_util.h"
 #include "vx_util.h"
@@ -102,7 +104,7 @@ using namespace std;
 
 // Constants
 static const char *program_name = "ascii2nc";
-
+static const char *default_reg_exp = ".*";
 static const char *DEFAULT_CONFIG_FILENAME =
   "MET_BASE/config/Ascii2NcConfig_default";
 
@@ -133,6 +135,7 @@ static ASCIIFormat ascii_format = ASCIIFormat::None;
 // Variables for command line arguments
 static vector<ConcatString> asfile_list;
 static ConcatString ncfile;
+static ConcatString input_reg_exp(default_reg_exp);
 
 static ConcatString config_filename(replace_path(DEFAULT_CONFIG_FILENAME));
 static Ascii2NcConfInfo config_info;
@@ -150,11 +153,14 @@ static int compress_level = -1;
 
 ////////////////////////////////////////////////////////////////////////
 
+static StringArray get_input_files(const ConcatString &);
 static FileHandler *create_file_handler(const ASCIIFormat,
                                         const ConcatString &);
-static FileHandler *determine_ascii_format(const ConcatString &);
+static FileHandler *determine_ascii_format(const ConcatString &,
+                                           ConcatString &);
 
 static void usage();
+static void set_inputrx(const StringArray &);
 static void set_format(const StringArray &);
 static void set_config(const StringArray &);
 static void set_mask_grid(const StringArray &);
@@ -164,7 +170,7 @@ static void set_compress(const StringArray &);
 static void set_valid_beg_time(const StringArray &);
 static void set_valid_end_time(const StringArray &);
 
-static void setup_wrapper_path();
+static void setup_python();
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -192,6 +198,7 @@ int met_main(int argc, char *argv[]) {
    //
    // Add the options function calls
    //
+   cline.add(set_inputrx,        "-inputrx",   1);
    cline.add(set_format,         "-format",    1);
    cline.add(set_config,         "-config",    1);
    cline.add(set_mask_grid,      "-mask_grid", 1);
@@ -213,10 +220,27 @@ int met_main(int argc, char *argv[]) {
    if(cline.n() < 2) { usage(); return 0; }
 
    //
-   // Store the input ASCII file name and the output NetCDF file name
+   // Store the input ASCII file names
    //
-   for (int i = 0; i < cline.n() - 1; ++i)
-     asfile_list.emplace_back((string)cline[i]);
+   for(int i=0; i<cline.n()-1; i++) {
+      StringArray cur_files(get_input_files(cline[i]));
+      for(int j=0; j<cur_files.n(); j++) {
+         asfile_list.emplace_back(cur_files[j]);
+      }
+   }
+
+   //
+   // Check for at least one input file
+   //
+   if(asfile_list.empty()) {
+      mlog << Error << "\nmet_main() -> "
+           << "No input files found!\n\n";
+      exit(1);
+   }
+
+   //
+   // Store the output NetCDF file name
+   //
    ncfile = cline[cline.n() - 1];
 
    //
@@ -270,9 +294,8 @@ int met_main(int argc, char *argv[]) {
    // Read the input files
    //
    if(!file_handler->readAsciiFiles(asfile_list)) {
-      mlog << Error << "\n" << program_name << " -> "
-           << "encountered an error while reading input files!\n\n";
-      return 1;
+      mlog << Warning << "\n" << program_name << " -> "
+           << "encountered error(s) while reading input files!\n\n";
    }
 
    //
@@ -301,7 +324,29 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
-FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &ascii_filename) {
+static StringArray get_input_files(const ConcatString &input) {
+   StringArray sa;
+
+   // Search input directories
+   if(is_directory(input.c_str())) {
+      sa.add(get_filenames(input, nullptr, input_reg_exp.c_str()));
+   }
+   // Process ASCII file list
+   else if(is_ascii_file_list(input.c_str())) {
+      sa.add(parse_ascii_file_list(input.c_str()));
+   }
+   // Store file names and python inputs
+   else {
+      sa.add(input);
+   }
+
+   return sa;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static FileHandler *create_file_handler(const ASCIIFormat format,
+                                        const ConcatString &ascii_filename) {
 
    #ifdef ENABLE_PYTHON
    PythonHandler * ph = 0;
@@ -378,21 +423,28 @@ FileHandler *create_file_handler(const ASCIIFormat format, const ConcatString &a
       }
       #ifdef ENABLE_PYTHON
       case ASCIIFormat::Python: {
-         setup_wrapper_path();
-         ph = new PythonHandler(program_name, ascii_filename.text());
+         setup_python();
+         ph = new PythonHandler(program_name);
          return (FileHandler *) ph;
       }
       #endif
 
       default: {
-        return determine_ascii_format(ascii_filename);
+         ConcatString format_string;
+         FileHandler *guess = determine_ascii_format(ascii_filename,
+                                                     format_string);
+         mlog << Debug(2) << "Applying \"-format " << format_string
+              << "\" to read input files. Specify the \"-format\" "
+              << "option to override this default setting.\n";
+	 return guess;
       }
    }
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
+static FileHandler *determine_ascii_format(const ConcatString &ascii_filename,
+                                           ConcatString &format_string) {
 
    //
    // Use the contents of the file to try to guess its format.
@@ -420,11 +472,11 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(iabp_file->isFileType(f_in)) {
      f_in.close();
+     format_string = IabpHandler::getFormatString();
      return((FileHandler *) iabp_file);
    }
 
    delete iabp_file;
-
 
    //
    // See if this is a MET file.
@@ -434,6 +486,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if (met_file->isFileType(f_in)) {
      f_in.close();
+     format_string = MetHandler::getFormatString();
      return (FileHandler *) met_file;
    }
 
@@ -447,6 +500,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if (little_r_file->isFileType(f_in)) {
      f_in.close();
+     format_string = LittleRHandler::getFormatString();
      return (FileHandler *) little_r_file;
    }
 
@@ -460,6 +514,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if (surfrad_file->isFileType(f_in)) {
      f_in.close();
+     format_string = SurfradHandler::getFormatString();
      return (FileHandler *) surfrad_file;
    }
 
@@ -473,6 +528,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(wwsis_file->isFileType(f_in)) {
      f_in.close();
+     format_string = WwsisHandler::getFormatString();
      return (FileHandler *) wwsis_file;
    }
 
@@ -486,6 +542,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(aeronet_file->isFileType(f_in)) {
      f_in.close();
+     format_string = AeronetHandler::getFormatString();
      return (FileHandler *) aeronet_file;
    }
 
@@ -499,6 +556,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(airnow_file->isFileType(f_in)) {
      f_in.close();
+     format_string = AirnowHandler::getFormatStringDailyV2();
      return (FileHandler *) airnow_file;
    }
 
@@ -512,6 +570,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(ndbc_file->isFileType(f_in)) {
      f_in.close();
+     format_string = NdbcHandler::getFormatStringStandard();
      return (FileHandler *) ndbc_file;
    }
 
@@ -525,6 +584,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(ismn_file->isFileType(f_in)) {
      f_in.close();
+     format_string = IsmnHandler::getFormatString();
      return (FileHandler *) ismn_file;
    }
 
@@ -538,6 +598,7 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
    if(uscrn_file->isFileType(f_in)) {
      f_in.close();
+     format_string = UscrnHandler::getFormatString();
      return (FileHandler *) uscrn_file;
    }
 
@@ -556,12 +617,13 @@ FileHandler *determine_ascii_format(const ConcatString &ascii_filename) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+static void usage() {
 
    cout << "\nUsage: "
         << program_name << "\n"
-        << "\tascii_file1 [ascii_file2 ... ascii_filen]\n"
+        << "\tinput1 ... inputn\n"
         << "\tnetcdf_file\n"
+        << "\t[-inputrx reg_exp]\n"
         << "\t[-format type]\n"
         << "\t[-config file]\n"
         << "\t[-mask_grid string]\n"
@@ -573,15 +635,20 @@ void usage() {
         << "\t[-valid_end time]\n"
         << "\t[-compress level]\n\n"
 
-        << "\twhere\t\"ascii_file\" is the formatted ASCII "
-        << "observation file to be converted to NetCDF format "
-        << "(required).\n"
+        << "\twhere\t\"input1 ... inputn\" defines one or more sources "
+        << "of formatted ASCII observation files (required).\n"
+        << "\t\t   Each input is the path to a file, an ASCII file list, "
+        << "or a top-level directory to be recursively searched.\n"
 
         << "\t\t\"netcdf_file\" indicates the name of the output "
         << "NetCDF file to be written (required).\n"
 
+        << "\t\t\"-inputrx reg_exp\" overrides the default regular "
+        << "expression (" << default_reg_exp << ") when searching "
+        << "directories for input files (optional).\n"
+
         << "\t\t\"-format type\" may be set to one of the following types (optional).\n"
-	<< "\t\t   "
+        << "\t\t   "
         << MetHandler::getFormatString() << ", "
         << LittleRHandler::getFormatString() << ", "
         << SurfradHandler::getFormatString() << ", "
@@ -656,7 +723,13 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_format(const StringArray & a) {
+static void set_inputrx(const StringArray & a) {
+   input_reg_exp = a[0];
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void set_format(const StringArray & a) {
 
    if(MetHandler::getFormatString() == a[0]) {
       ascii_format = ASCIIFormat::MET;
@@ -716,13 +789,13 @@ void set_format(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray & a) {
+static void set_config(const StringArray & a) {
    config_filename = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_mask_grid(const StringArray & a) {
+static void set_mask_grid(const StringArray & a) {
 
    // List the grid masking file
    mlog << Debug(1)
@@ -738,7 +811,7 @@ void set_mask_grid(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_mask_poly(const StringArray & a) {
+static void set_mask_poly(const StringArray & a) {
    ConcatString mask_name;
 
    // List the poly masking file
@@ -767,7 +840,7 @@ void set_mask_poly(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_mask_sid(const StringArray & a) {
+static void set_mask_sid(const StringArray & a) {
 
    // List the station ID mask
    mlog << Debug(1)
@@ -784,41 +857,28 @@ void set_mask_sid(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_valid_beg_time(const StringArray & a)
-{
+static void set_valid_beg_time(const StringArray & a) {
    valid_beg_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_valid_end_time(const StringArray & a)
-{
+static void set_valid_end_time(const StringArray & a) {
    valid_end_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+static void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_wrapper_path() {
+static void setup_python() {
 
    #ifdef ENABLE_PYTHON
-   ConcatString command;
-
    GP.initialize();
-
-   run_python_string("import sys");
-
-   command << cs_erase
-           << "sys.path.append(\""
-           << replace_path(wrappers_dir)
-           << "\")";
-
-   run_python_string(command.text());
    #endif
 
    return;

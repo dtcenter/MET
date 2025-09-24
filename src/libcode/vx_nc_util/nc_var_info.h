@@ -97,6 +97,8 @@ class NcVarInfo {
 
       bool is_pressure; // is variable on pressure levels
 
+      NumArray vlevels; // vertical levels
+
 };
 
 ////////////////////////////////////////////////////////////////////////

@@ -97,11 +97,11 @@ bool IabpHandler::_readObservations(LineDataFile &ascii_file)
 
       // Make sure that the line contains the correct number of tokens
       if(dl.n_items() != _numColumns) {
-         mlog << Error << "\nIabpHandler::_readObervations() -> "
+         mlog << Warning << "\nIabpHandler::_readObervations() -> "
               << "unexpected number of columns (" << dl.n_items()
               << " != " << _numColumns << ") on line number "
               << dl.line_number() << " of IABP file \""
-              << ascii_file.filename() << "\"!\n\n";
+              << ascii_file.filename() << "\"\n\n";
          return false;
       }
 
@@ -189,7 +189,7 @@ bool IabpHandler::_readHeaderInfo(LineDataFile &ascii_file) {
    DataLine dl;
    if (!(ascii_file >> dl))
    {
-      mlog << Error << "\nIabpHandler::_readHeaderInfo() -> "
+      mlog << Warning << "\nIabpHandler::_readHeaderInfo() -> "
            << "error reading header line from input ASCII file \""
            << ascii_file.filename() << "\"\n\n";
       return false;
@@ -197,11 +197,11 @@ bool IabpHandler::_readHeaderInfo(LineDataFile &ascii_file) {
       
    // Check the minimum number of header columns
    if(dl.n_items() < MIN_NUM_HDR_COLS) {
-      mlog << Error << "\nIabpHandler::_readHeaderInfo() -> "
+      mlog << Warning << "\nIabpHandler::_readHeaderInfo() -> "
            << "unexpected number of header columns ("
            << dl.n_items() << " < " << MIN_NUM_HDR_COLS
            << ") in IABP file \"" << ascii_file.filename()
-           << "\"!\n\n";
+           << "\"\n\n";
       return false;
    }
 

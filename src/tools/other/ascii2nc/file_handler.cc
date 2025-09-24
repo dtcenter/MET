@@ -72,8 +72,7 @@ FileHandler::~FileHandler()
 
 ////////////////////////////////////////////////////////////////////////
 
-bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_list)
-{
+bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_list) {
   nc_point_obs.init_buffer();
 
   // Loop through the ASCII files, reading in the observations.  At the end of
@@ -84,29 +83,38 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
   //
   num_observations_in_range = 0;
   num_observations_out_of_range = 0;
+  int num_files = 0;
+  int num_files_good = 0;
 
-  for (vector< ConcatString >::const_iterator ascii_filename = ascii_filename_list.begin();
-       ascii_filename != ascii_filename_list.end(); ++ascii_filename)
-  {
+  for(vector< ConcatString >::const_iterator ascii_filename = ascii_filename_list.begin();
+      ascii_filename != ascii_filename_list.end(); ++ascii_filename) {
+
+    // Increment the file counter
+    num_files++;
+
     // Open the input ASCII observation file
-
     LineDataFile ascii_file;
 
-    if (!ascii_file.open((*ascii_filename).c_str()))
-    {
-      mlog << Error << "\nFileHandler::readAsciiFiles() -> "
+    if(!ascii_file.open((*ascii_filename).c_str())) {
+      mlog << Warning << "\nFileHandler::readAsciiFiles() -> "
            << "can't open input ASCII file \"" << *ascii_filename
            << "\" for reading\n\n";
-
-      return false;
+      continue;
     }
 
-    mlog << Debug(3)
+    mlog << Debug(2)
          << "Reading File: " << *ascii_filename << "\n";
  
     // Read the observations
-    if (!_readObservations(ascii_file))
-      return false;
+    if(!_readObservations(ascii_file)) {
+      mlog << Warning << "\nFileHandler::readAsciiFiles() -> "
+           << "can't read observations from input ASCII file \""
+           << *ascii_filename << "\"\n\n";
+      continue;
+    }
+
+    // Increment the good file counter
+    num_files_good++;
 
     mlog << Debug(3)
          << "  Running total of "
@@ -114,13 +122,15 @@ bool FileHandler::readAsciiFiles(const vector< ConcatString > &ascii_filename_li
          << num_observations_out_of_range << " rejected.\n";
 
     // Close the file
-
     ascii_file.close();
   }
 
-   mlog << Debug(2) << "Total number of "
-        << num_observations_in_range << " observations kept and " 
-        << num_observations_out_of_range << " rejected.\n";
+  mlog << Debug(2) << "Successfully read observations from "
+       << num_files_good << " of " << num_files << " input files.\n";
+
+  mlog << Debug(3) << "Total number of "
+       << num_observations_in_range << " observations kept and " 
+       << num_observations_out_of_range << " rejected.\n";
 
   return true;
 }
@@ -131,8 +141,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
 {
 
   // List the number of rejected observations.
-
-  mlog << Debug(2)
+  mlog << Debug(3)
        << "Rejected " << filters.get_grid_mask_cnt()
        << " observations off the masking grid.\n"
        << "Rejected " << filters.get_area_mask_cnt() + filters.get_poly_mask_cnt()
@@ -152,7 +161,7 @@ bool FileHandler::writeNetcdfFile(const string &nc_filename)
     mlog << Warning << "\nZero observations retained!\n\n";
   }
 
-  mlog << Debug(2) << "Processing observations for " << _nhdr
+  mlog << Debug(3) << "Processing observations for " << _nhdr
        << " headers.\n";
 
   // Open the netCDF file.  This can't be done until after we process the

@@ -269,7 +269,8 @@ void process_conv_data(ConvData &d, int i_mem) {
       // Store the current observation info
       ClimoPntInfo cpi(bad_data_double, bad_data_double,
                        bad_data_double, bad_data_double);
-      ens_pd.add_point_obs(d.obtype.c_str(), d.sid.c_str(), d.lat, d.lon,
+      ens_pd.add_point_obs(d.obtype.c_str(), d.sid.c_str(),
+                d.lat, d.lon, d.elv,
                 bad_data_double, bad_data_double, d.obs_ut, d.prs,
                 d.elv, d.obs, na_str, cpi, default_weight);
 
@@ -429,7 +430,8 @@ void process_rad_data(RadData &d, int i_mem) {
       // Store the current observation info
       ClimoPntInfo cpi(bad_data_double, bad_data_double,
                        bad_data_double, bad_data_double);
-      ens_pd.add_point_obs(na_str, na_str, d.lat, d.lon,
+      ens_pd.add_point_obs(na_str, na_str,
+                d.lat, d.lon, d.elv,
                 bad_data_double, bad_data_double, d.obs_ut,
                 bad_data_double, d.elv, d.obs, na_str,
                 cpi, default_weight);
@@ -615,7 +617,7 @@ void write_orank_row_conv(AsciiTable &at, int row, int i_obs) {
    at.set_entry(row, col++, ens_pd.lat_na[i_obs]);     // OBS_LAT
    at.set_entry(row, col++, ens_pd.lon_na[i_obs]);     // OBS_LON
    at.set_entry(row, col++, ens_pd.lvl_na[i_obs]);     // OBS_LVL
-   at.set_entry(row, col++, ens_pd.elv_na[i_obs]);     // OBS_ELV
+   at.set_entry(row, col++, ens_pd.hgt_na[i_obs]);     // OBS_ELV
 
    at.set_entry(row, col++, ens_pd.o_na[i_obs]);       // OBS
    at.set_entry(row, col++, ens_pd.pit_na[i_obs]);     // PIT
@@ -683,7 +685,7 @@ void write_orank_row_rad(AsciiTable &at, int row, int i_obs) {
    at.set_entry(row, col++, ens_pd.lat_na[i_obs]);     // OBS_LAT
    at.set_entry(row, col++, ens_pd.lon_na[i_obs]);     // OBS_LON
    at.set_entry(row, col++, bad_data_double);          // OBS_LVL
-   at.set_entry(row, col++, ens_pd.elv_na[i_obs]);     // OBS_ELV
+   at.set_entry(row, col++, ens_pd.hgt_na[i_obs]);     // OBS_ELV
 
    at.set_entry(row, col++, ens_pd.o_na[i_obs]);       // OBS
    at.set_entry(row, col++, ens_pd.pit_na[i_obs]);     // PIT

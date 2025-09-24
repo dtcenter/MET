@@ -27,6 +27,12 @@
 static const int WindIntensity[] = { 34, 50, 64 };
 static const int NWinds = sizeof(WindIntensity)/sizeof(*WindIntensity);
 
+// ATCF columns that can be filtered
+static const std::vector<std::string> atcf_column_vals = {
+   "LAT",    "LON", "VMAX",  "MSLP", "POUTER",
+   "ROUTER", "RMW", "GUSTS", "EYE",  "DIR",
+   "SPEED" };
+
 ////////////////////////////////////////////////////////////////////////
 
 class QuadInfo {
@@ -54,9 +60,9 @@ class QuadInfo {
 
       void clear();
 
-      void         dump(std::ostream &, int = 0)  const;
-      ConcatString serialize()               const;
-      ConcatString serialize_r(int, int = 0) const;
+      void         dump(std::ostream &, int = 0) const;
+      ConcatString serialize()                   const;
+      ConcatString serialize_r(int, int = 0)     const;
 
          //
          //  set stuff
@@ -267,6 +273,7 @@ class TrackPoint {
       void clear_diag_value();
       void add_diag_value(double);
       double get_diag_val(const StringArray &, const std::string) const;
+      double get_atcf_val(const std::string &) const;
    
 };
 

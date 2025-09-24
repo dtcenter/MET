@@ -57,11 +57,11 @@ fcst = {
         topo_mask = { flag = TRUE;  };
         land_mask = { flag = FALSE; }; },
       {      desc = "TOPO_FALSE_LAND_TRUE";
-        topo_mask = { flag = FALSE;  };
-        land_mask = { flag = TRUE; }; },
+        topo_mask = { flag = FALSE; };
+        land_mask = { flag = TRUE;  }; },
       {      desc = "TOPO_TRUE_LAND_TRUE";
         topo_mask = { flag = TRUE;  };
-        land_mask = { flag = TRUE; }; }
+        land_mask = { flag = TRUE;  }; }
    ];
 
 }
@@ -111,6 +111,7 @@ topo_mask = {
    file_name          = [ ${GEOG_FILE} ];
    field              = { name = "HGT"; level = "Z0"; }
    regrid             = { method = BILIN; width = 2; }
+   interp             = { method = BILIN; width = 2; }
    use_obs_thresh     = ge-100&&le100;
    interp_fcst_thresh = ge-50&&le50;
 }

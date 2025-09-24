@@ -138,10 +138,8 @@ climo_cdf = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Land/Sea mask
-// For LANDSF message types, only use forecast grid points where land = TRUE.
-// For WATERSF message types, only use forecast grid points where land = FALSE.
-// land_mask.flag may be set separately in each "obs.field" entry.
+// Land/Sea mask options
+// "flag" may be set separately in each "obs.field" entry.
 //
 land_mask = {
    flag      = FALSE;
@@ -152,13 +150,9 @@ land_mask = {
 }
 
 //
-// Topography
-// For SURFACE message types, only use observations where the topo - station
-// elevation difference meets the use_obs_thresh threshold.
-// For the observations kept, when interpolating forecast data to the
-// observation location, only use forecast grid points where the topo - station
-// difference meets the interp_fcst_thresh threshold.
-// topo_mask.flag may be set separately in each "obs.field" entry.
+// Topography options for surface verification
+// "flag", "use_obs_thresh", and "interp_fcst_thresh"
+// may be set separately in each "obs.field" entry
 //
 topo_mask = {
    flag               = FALSE;
@@ -167,6 +161,26 @@ topo_mask = {
    regrid             = { method = BILIN; width = 2; }
    use_obs_thresh     = ge-100&&le100;
    interp_fcst_thresh = ge-50&&le50;
+}
+
+//
+// Lapse rate correction for surface temperature
+// May be set separately in each "obs.field" entry
+//
+lapse_rate_correction = {
+  apply_to = NONE;
+  value    = DRY_LAPSE_RATE_K_per_M;
+}
+
+//
+// MSL/AGL conversion for height
+// May be set separately in each "obs.field" entry
+//
+msl_agl_conversion = {
+  apply_to   = NONE;
+  apply_from = OBS;
+  thresh     = NA;
+  msl_to_agl = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -31,21 +31,40 @@ class MetNcCFDataFile : public Met2dDataFile {
 
    private:
 
-      void nccf_init_from_scratch();
-      NcVarInfo *find_first_data_var();
-      long convert_time_to_offset(long time_value);
-      long convert_value_to_offset(double z_value, std::string z_dim_name);
-      LongArray collect_time_offsets(VarInfo &vinfo);
-
       MetNcCFDataFile(const MetNcCFDataFile &);
       MetNcCFDataFile & operator=(const MetNcCFDataFile &);
+
+      int add_data_planes_by_time(VarInfo &vinfo, const LevelInfo &level,
+                                  DataPlaneArray &plane_array);
+      int add_data_planes_by_z(VarInfo &vinfo, const LevelInfo &level,
+                               DataPlaneArray &plane_array);
+      LongArray collect_time_offsets(VarInfo &vinfo);
+      LongArray collect_z_offsets(VarInfo &vinfo);
+
+      long convert_generic_to_offset(double value, const std::string& dim_name, std::vector<double> values);
+      long convert_time_to_offset(double time_value) const;
+      long convert_z_to_offset(double z_value, const NcVarInfo* data_var);
+      bool data_plane(VarInfo &, DataPlane &, const LongArray &dimension);
+      void error_message(const bool is_dim_time, const int error_code,
+                         const double _lower, const double _upper,
+                         const long _value, const ConcatString &var_name,
+                         const std::string &method_name) const;
+      NcVarInfo *find_first_data_var();
+      long find_generic_offset(VarInfo& vinfo, const NcVarInfo* data_var, int index);
+      long find_time_offset(VarInfo &vinfo, const NcVarInfo *data_var);
+      long find_z_offset(VarInfo &vinfo, const NcVarInfo *data_var);
+      NcVarInfo *get_data_var(VarInfo &vinfo);
+      std::string get_dim_name(const NcVarInfo* data_var, int index) const;
+      std::string get_z_dim_name(const NcVarInfo *data_var) const;
+      void nccf_init_from_scratch();
 
       //
       //  NetCDF file
       //
-      
-      NcCfFile * _file;    //  allocated
-      long _cur_time_index; // current time index to get the data plane (for array of data_plane)
+
+      NcCfFile *_file;          // allocated
+      long cur_time_index;      // current time index to get the data plane (for array of data_plane)
+      long cur_z_index;         // current vlevel index to get the data plane (for array of data_plane)
 
    public:
 
@@ -54,21 +73,19 @@ class MetNcCFDataFile : public Met2dDataFile {
 
       virtual int nx() const
       {
-         if (_file == 0)
-            return 0;
-    
+         if (_file == nullptr) return 0;
+
          return _file->getNx();
       }
-      
+
 
       virtual int ny() const
       {
-         if (_file == 0)
-            return 0;
-    
+         if (_file == nullptr) return 0;
+
          return _file->getNy();
       }
-      
+
 
       //
       //  set stuff
@@ -104,7 +121,6 @@ class MetNcCFDataFile : public Met2dDataFile {
 
       Grid build_grid_from_lat_lon_vars(netCDF::NcVar *lat_var, netCDF::NcVar *lon_var,
                                         const long lat_counts, const long lon_counts);
-
 };
 
 

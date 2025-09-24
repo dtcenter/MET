@@ -71,6 +71,11 @@ extern std::map<ConcatString,ConcatString>
                           Dictionary *dict,
                           const char *conf_key_map_name,
                           const char *caller=nullptr);
+extern std::map<ConcatString,StringArray>
+                       parse_conf_key_values_map(
+                          Dictionary *dict,
+                          const char *conf_key_map_name,
+                          const char *caller=nullptr);
 extern void            parse_add_conf_key_value_map(
                           Dictionary *dict,
                           const char *conf_key_map_name,
@@ -95,6 +100,16 @@ extern std::map<ConcatString,UserFunc_1Arg>
                           Dictionary *dict,
                           const char *conf_key_map_name,
                           const char *caller=nullptr);
+extern std::map<ConcatString,ThreshArray>
+                       parse_conf_thresh_map(
+                          Dictionary *dict,
+                          const char *conf_key_map_name,
+                          const char *conf_key_map_val);
+extern std::map<ConcatString,StringArray>
+                       parse_conf_string_map(
+                          Dictionary *dict,
+                          const char *conf_key_map_name,
+                          const char *conf_key_map_val);
 extern BootInfo        parse_conf_boot(Dictionary *dict);
 extern RegridInfo      parse_conf_regrid(
                           Dictionary *dict,
@@ -124,6 +139,8 @@ extern double          parse_conf_ugrid_max_distance_km(Dictionary *dict);
 extern void            parse_add_conf_ugrid_metadata_map(
                           Dictionary *dict,
                           std::map<ConcatString,StringArray> *m);
+extern SurfaceInfo     parse_conf_surface_info(Dictionary *dict);
+extern void            parse_conf_topo_mask_interp(Dictionary *dict, SurfaceInfo &);
 
 extern void         check_mask_names(const StringArray &);
 

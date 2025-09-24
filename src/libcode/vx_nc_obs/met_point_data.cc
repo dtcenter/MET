@@ -222,6 +222,7 @@ void MetPointObsData::assign(MetPointObsData &o) {
    obs_hgts = o.obs_hgts;
    obs_vals = o.obs_vals;
    var_names = o.var_names;
+   var_units = o.var_units;
    qty_names = o.qty_names;
 }
 
@@ -250,6 +251,7 @@ void MetPointObsData::clear_numbers() {
 
 void MetPointObsData::clear_strings() {
    var_names.clear();
+   var_units.clear();
    qty_names.clear();
 }
 

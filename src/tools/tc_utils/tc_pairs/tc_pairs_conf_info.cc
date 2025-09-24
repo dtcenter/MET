@@ -138,9 +138,6 @@ void TCPairsConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void TCPairsConfInfo::process_config() {
-   int i, j;
-   StringArray sa;
-   ConcatString poly_file;
    Dictionary *dict = (Dictionary *) nullptr;
 
    // Conf: Version
@@ -170,48 +167,33 @@ void TCPairsConfInfo::process_config() {
    InitEnd = Conf.lookup_unixtime(conf_key_init_end);
 
    // Conf: InitInc
-   sa = Conf.lookup_string_array(conf_key_init_inc);
-   for(i=0; i<sa.n(); i++)
-      InitInc.add(timestring_to_unix(sa[i].c_str()));
+   InitInc = Conf.lookup_unixtime_array(conf_key_init_inc);
 
    // Conf: InitExc
-   sa = Conf.lookup_string_array(conf_key_init_exc);
-   for(i=0; i<sa.n(); i++)
-      InitExc.add(timestring_to_unix(sa[i].c_str()));
+   InitExc = Conf.lookup_unixtime_array(conf_key_init_exc);
 
    // Conf: InitHour
-   sa = Conf.lookup_string_array(conf_key_init_hour);
-   for(i=0; i<sa.n(); i++)
-      InitHour.add(timestring_to_sec(sa[i].c_str()));
+   InitHour = Conf.lookup_seconds_array(conf_key_init_hour);
 
    // Conf: ValidBeg, ValidEnd
    ValidBeg = Conf.lookup_unixtime(conf_key_valid_beg);
    ValidEnd = Conf.lookup_unixtime(conf_key_valid_end);
 
    // Conf: ValidInc
-   sa = Conf.lookup_string_array(conf_key_valid_inc);
-   for(i=0; i<sa.n(); i++)
-      ValidInc.add(timestring_to_unix(sa[i].c_str()));
+   ValidInc = Conf.lookup_unixtime_array(conf_key_valid_inc);
 
    // Conf: ValidExc
-   sa = Conf.lookup_string_array(conf_key_valid_exc);
-   for(i=0; i<sa.n(); i++)
-      ValidExc.add(timestring_to_unix(sa[i].c_str()));
+   ValidExc = Conf.lookup_unixtime_array(conf_key_valid_exc);
 
    // Conf: WriteValid
-   sa = Conf.lookup_string_array(conf_key_write_valid);
-   for(i=0; i<sa.n(); i++)
-      WriteValid.add(timestring_to_unix(sa[i].c_str()));
+   WriteValid = Conf.lookup_unixtime_array(conf_key_write_valid);
 
    // Conf: LeadReq
-   sa = Conf.lookup_string_array(conf_key_lead_req);
-   for(i=0; i<sa.n(); i++){
-      LeadReq.add(timestring_to_sec(sa[i].c_str()));
-   }
+   LeadReq = Conf.lookup_seconds_array(conf_key_lead_req);
 
    // Conf: InitMask
    if(nonempty(Conf.lookup_string(conf_key_init_mask).c_str())) {
-      poly_file = replace_path(Conf.lookup_string(conf_key_init_mask));
+      ConcatString poly_file(replace_path(Conf.lookup_string(conf_key_init_mask)));
       mlog << Debug(2) << "Init Points Masking File: " << poly_file << "\n";
       parse_poly_mask(poly_file, InitPolyMask, InitGridMask,
                       InitAreaMask, InitMaskName);
@@ -219,7 +201,7 @@ void TCPairsConfInfo::process_config() {
 
    // Conf: ValidMask
    if(nonempty(Conf.lookup_string(conf_key_valid_mask).c_str())) {
-      poly_file = replace_path(Conf.lookup_string(conf_key_valid_mask));
+      ConcatString poly_file(replace_path(Conf.lookup_string(conf_key_valid_mask)));
       mlog << Debug(2) << "Valid Point Masking File: " << poly_file << "\n";
       parse_poly_mask(poly_file, ValidPolyMask, ValidGridMask,
                       ValidAreaMask, ValidMaskName);
@@ -239,7 +221,7 @@ void TCPairsConfInfo::process_config() {
    Consensus  = new ConsensusInfo [NConsensus];
 
    // Loop over the consensus entries
-   for(i=0; i<NConsensus; i++) {
+   for(int i=0; i<NConsensus; i++) {
 
       // Conf: Consensus: name, members, required (error if missing)
       Consensus[i].Name         = (*dict)[i]->dict_value()->lookup_string(conf_key_name);
@@ -248,7 +230,7 @@ void TCPairsConfInfo::process_config() {
 
       // If ConsRequired is empty, default to false.
       if(Consensus[i].ConsRequired.n() == 0) {
-         for(j=0; j<Consensus[i].Members.n(); j++) {
+         for(int j=0; j<Consensus[i].Members.n(); j++) {
             Consensus[i].ConsRequired.add(false);
          }
       }
@@ -274,7 +256,7 @@ void TCPairsConfInfo::process_config() {
 
       // If DiagRequired is empty, default to false.
       if(Consensus[i].DiagRequired.n() == 0) {
-         for(j=0; j<Consensus[i].Members.n(); j++) {
+         for(int j=0; j<Consensus[i].Members.n(); j++) {
             Consensus[i].DiagRequired.add(false);
          }
       }
@@ -312,10 +294,7 @@ void TCPairsConfInfo::process_config() {
    }
 
    // Conf: LagTime
-   sa = Conf.lookup_string_array(conf_key_lag_time);
-   for(i=0; i<sa.n(); i++) {
-      LagTime.add(timestring_to_sec(sa[i].c_str()));
-   }
+   LagTime = Conf.lookup_seconds_array(conf_key_lag_time);
 
    // Conf: BestTechnique
    BestTechnique = Conf.lookup_string_array(conf_key_best_technique);
@@ -446,7 +425,6 @@ void parse_conf_diag_info_map(Dictionary *dict, map<ConcatString,DiagInfo> &sour
 
 void parse_conf_diag_convert_map(Dictionary *dict,
         map< ConcatString,map<ConcatString,UserFunc_1Arg> > &source_map) {
-   int i, j;
    Dictionary *map_dict = (Dictionary *) nullptr;
    map<ConcatString,UserFunc_1Arg> cur_map;
    ConcatString diag_source, key;
@@ -465,7 +443,7 @@ void parse_conf_diag_convert_map(Dictionary *dict,
    map_dict = dict->lookup_array(conf_key_diag_convert_map);
 
    // Loop through the array entries
-   for(i=0; i<map_dict->n_entries(); i++) {
+   for(int i=0; i<map_dict->n_entries(); i++) {
 
       // Initialize the current map
       cur_map.clear();
@@ -485,7 +463,7 @@ void parse_conf_diag_convert_map(Dictionary *dict,
       }
 
       // Add entry to the current map for each string
-      for(j=0; j<sa.n(); j++) {
+      for(int j=0; j<sa.n(); j++) {
          cur_map.insert(pair<ConcatString,UserFunc_1Arg>(sa[j],fx));
       }
 

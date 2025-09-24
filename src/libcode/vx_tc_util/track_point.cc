@@ -745,3 +745,28 @@ double TrackPoint::get_diag_val(const StringArray &diag_names, const string cur_
 }
 
 ////////////////////////////////////////////////////////////////////////
+
+double TrackPoint::get_atcf_val(const string &atcf_name) const {
+   double val = bad_data_double;
+
+   // Convert search string to uppercase
+   string s(to_upper(atcf_name));
+
+   // Get the named value
+        if(s == "LAT")    val = Lat;
+   else if(s == "LON")    val = Lon;
+   else if(s == "VMAX")   val = Vmax;
+   else if(s == "MSLP")   val = MSLP;
+   else if(s == "POUTER") val = RadP;
+   else if(s == "ROUTER") val = RRP;
+   else if(s == "RMW")    val = MRD;
+   else if(s == "GUSTS")  val = Gusts;
+   else if(s == "EYE")    val = Eye;
+   else if(s == "DIR")    val = Direction;
+   else if(s == "SPEED")  val = Speed;
+
+   return val;
+}
+
+////////////////////////////////////////////////////////////////////////
+

@@ -156,6 +156,8 @@ x_stag = y_stag = z_stag = x_subgrid = y_subgrid = false;
 
 is_pressure = false;
 
+vlevels.clear();
+
    //
    //  done
    //

@@ -88,7 +88,6 @@ if [ "$FAILURE" == "1" ]; then
 fi
 
 # Run the directory comparison tool on the output from the unit tests
-export MET_BASE=$(pwd)/MET-${2}/share/met
 export MET_TEST_BASE=$(pwd)/MET-${2}/internal/test_unit
-echo "DIFFING: ${MET_TEST_BASE}/bin/comp_dir.sh MET-${1}/test_output MET-${2}/test_output"
-run_command "${MET_TEST_BASE}/bin/comp_dir.sh MET-${1}/test_output MET-${2}/test_output"
+echo "DIFFING: ${MET_TEST_BASE}/python/comp_dir.py MET-${1}/test_output MET-${2}/test_output"
+run_command "${MET_TEST_BASE}/python/comp_dir.py MET-${1}/test_output MET-${2}/test_output"

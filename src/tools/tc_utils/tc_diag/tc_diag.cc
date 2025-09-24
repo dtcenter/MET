@@ -328,7 +328,7 @@ void process_tracks(TrackInfoArray& tracks) {
 ////////////////////////////////////////////////////////////////////////
 //
 // Automated Tropical cyclone Forecasting System
-// https://www.nrlmry.navy.mil/atcf_web/docs/ATCF-FAQ.html
+// https://science.nrlmry.navy.mil/atcf/docs/ATCF-FAQ.html
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -353,7 +353,7 @@ void get_atcf_files(const StringArray& source,
    for(int i = 0; i < source.n(); i++) {
       cur_source.clear();
       cur_source.add(source[i]);
-      cur_files = get_filenames(cur_source, NULL, atcf_suffix);
+      cur_files = get_filenames(cur_source, nullptr, atcf_reg_exp);
 
       for(int j = 0; j < cur_files.n(); j++) {
          files.add(cur_files[j]);

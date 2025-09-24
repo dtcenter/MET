@@ -1,0 +1,295 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Ensemble-Stat configuration file.
+//
+// For additional information, please see the MET User's Guide.
+//
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Output model name to be written
+//
+model = "FCST";
+
+//
+// Output description to be written
+// May be set separately in each "obs.field" entry
+//
+desc = "NA";
+
+//
+// Output observation type to be written
+//
+obtype = "ANALYS";
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification grid
+//
+regrid = {
+   to_grid    = NONE;
+   method     = NEAREST;
+   width      = 1;
+   vld_thresh = 0.5;
+   shape      = SQUARE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// IDs for ensemble members
+// Only set if processing a single file with all ensembles
+//
+ens_member_ids = [];
+control_id = "";
+
+//
+// May be set separately in each "fcst.field" and "obs.field" entry
+//
+censor_thresh = [];
+censor_val    = [];
+prob_cat_thresh = [];
+
+//
+// May be set separately in each "fcst.field" entry
+//
+prob_pct_thresh = [ ==0.25 ];
+
+//
+// May be set separately in each "obs.field" entry
+//
+nc_var_str  = "";
+eclv_points = 0.05;
+
+//
+// Forecast and observation fields to be verified
+//
+fcst = {
+   ens_thresh      = 0.75;
+   vld_thresh      = 1.0;
+   obs_quality_inc = [];
+   obs_quality_exc = [];
+
+   name         = "TMP";
+   level        = "Z2";
+   message_type = [ "ADPSFC", "SFCSHP" ];
+
+   field = [
+      {      desc = "TOPO_FALSE_LAND_FALSE";
+        topo_mask = { flag = FALSE; };
+        land_mask = { flag = FALSE; }; },
+      {      desc = "TOPO_TRUE_LAND_FALSE";
+        topo_mask = { flag = TRUE;  };
+        land_mask = { flag = FALSE; }; },
+      {      desc = "TOPO_FALSE_LAND_TRUE";
+        topo_mask = { flag = FALSE; };
+        land_mask = { flag = TRUE;  }; },
+      {      desc = "TOPO_TRUE_LAND_TRUE";
+        topo_mask = { flag = TRUE;  };
+        land_mask = { flag = TRUE;  }; }
+   ];
+}
+obs = fcst;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation filtering options
+// May be set separately in each "obs.field" entry
+//
+message_type    = [];
+sid_inc         = [];
+sid_exc         = [];
+obs_thresh      = [ NA ];
+obs_quality_inc = [];
+obs_quality_exc = [];
+duplicate_flag  = NONE;
+obs_summary     = NONE;
+obs_perc_value  = 50;
+skip_const      = FALSE;
+
+//
+// Observation error options
+// Set dist_type to NONE to use the observation error table instead
+// May be set separately in each "obs.field" entry
+//
+obs_error = {
+   flag             = FALSE;
+   dist_type        = NONE;
+   dist_parm        = [];
+   inst_bias_scale  = 1.0;
+   inst_bias_offset = 0.0;
+   min              = NA;
+   max              = NA;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Mapping of message type group name to comma-separated list of values.
+//
+message_type_group_map = [
+   { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
+   { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
+   { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
+   { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      },
+   { key = "LANDSF";  val = "ADPSFC,MSONET";                      },
+   { key = "WATERSF"; val = "SFCSHP";                             }
+];
+
+obtype_as_group_val_flag = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Ensemble bin sizes
+// May be set separately in each "obs.field" entry
+//
+ens_ssvar_bin_size = 1.0;
+ens_phist_bin_size = 0.05;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Point observation time window
+//
+obs_window = {
+   beg = -5400;
+   end =  5400;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Land/Sea mask options
+// "flag" may be set separately in each "obs.field" entry
+//
+land_mask = {
+   flag      = FALSE;
+   file_name = [ ${GEOG_FILE} ];
+   field     = { name = "LAND"; level = "L0"; }
+   regrid    = { method = NEAREST; width = 1; }
+   thresh    = eq1;
+}
+
+//
+// Topography options for surface verification
+// "flag", "use_obs_thresh", and "interp_fcst_thresh"
+// may be set separately in each "obs.field" entry
+//
+topo_mask = {
+   flag               = FALSE;
+   file_name          = [ ${GEOG_FILE} ];
+   field              = { name = "HGT"; level = "Z0"; }
+   regrid             = { method = BILIN; width = 2; }
+   interp             = { method = BILIN; width = 2; }
+   use_obs_thresh     = ge-100&&le100;
+   interp_fcst_thresh = ge-50&&le50;
+}
+
+//
+// Lapse rate correction for surface temperature
+// May be set separately in each "obs.field" entry
+//
+lapse_rate_correction = {
+  apply_to = NONE;
+  value    = DRY_LAPSE_RATE_K_per_M;
+}
+
+//
+// MSL/AGL conversion for height
+// May be set separately in each "obs.field" entry
+//
+msl_agl_conversion = {
+  apply_to   = NONE;
+  apply_from = OBS;
+  thresh     = NA;
+  msl_to_agl = TRUE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Verification masking regions
+//
+mask = {
+   grid  = [ "FULL" ];
+   poly  = [];
+   sid   = [];
+   llpnt = [];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Confidence interval settings
+//
+ci_alpha  = [ 0.05 ];
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Interpolation methods
+//
+interp = {
+   field      = BOTH;
+   vld_thresh = 1.0;
+   shape      = SQUARE;
+
+   type = [
+      {
+         method = BILIN;
+         width  = 2;
+      }
+   ];
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Statistical output types
+// May be set separately in each "obs.field" entry
+//
+output_flag = {
+   ecnt  = BOTH;
+   rps   = NONE;
+   rhist = NONE;
+   phist = NONE;
+   orank = BOTH;
+   ssvar = NONE;
+   relp  = NONE;
+   pct   = NONE;
+   pstd  = NONE;
+   pjc   = NONE;
+   prc   = NONE;
+   eclv  = NONE;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Gridded verification output types
+// May be set separately in each "obs.field" entry
+//
+nc_orank_flag = FALSE;
+
+////////////////////////////////////////////////////////////////////////////////
+
+//
+// Random number generator
+//
+rng = {
+   type = "mt19937";
+   seed = "1";
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+grid_weight_flag  = NONE;
+point_weight_flag = NONE;
+
+output_prefix = "${OUTPUT_PREFIX}";
+version       = "V12.1.0";
+
+////////////////////////////////////////////////////////////////////////////////
