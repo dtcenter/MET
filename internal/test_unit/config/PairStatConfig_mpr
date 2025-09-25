@@ -38,6 +38,17 @@ fcst = {
       level       = "P850-700";
       mpr_str_inc = [ { key = "VX_MASK"; val = "DTC165,DTC166"; },
                       { key = "OBTYPE";  val = "ADPUPA";        } ];
+    },
+    {
+      name        = "TMP";
+      level       = "P850-700";
+      mpr_str_inc = [ { key = "VX_MASK"; val = "DTC165,DTC166"; },
+                      { key = "OBTYPE";  val = "ADPUPA";        } ];
+      desc           = "CELSIUS_GT_0";
+      set_attr_units = "C";
+      convert(x)     = K_to_C(x);
+      censor_thresh  = le0;
+      censor_val     = -9999;
     } 
   ];
 }
@@ -47,7 +58,8 @@ obs = fcst;
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Forecast and observation data censoring, thresholding, and filtering options
+// Forecast and observation data conversion, censoring, thresholding, and
+// filtering options
 // May be set separately in each "fcst.pairs" or "obs.pairs" entry
 //
 censor_thresh = [];
