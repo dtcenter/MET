@@ -170,6 +170,7 @@ _________________________
 
 .. code-block:: none
 
+  convert(x)    = ...
   censor_thresh = [];
   censor_val    = [];
   cat_thresh    = [ NA ];
