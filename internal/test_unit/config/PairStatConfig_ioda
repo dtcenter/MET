@@ -64,7 +64,8 @@ obs = {
 ////////////////////////////////////////////////////////////////////////////////
 
 //
-// Forecast and observation data censoring, thresholding, and filtering options
+// Forecast and observation data conversion, censoring, thresholding, and
+// filtering options
 // May be set separately in each "fcst.pairs" or "obs.pairs" entry
 //
 censor_thresh = [];
