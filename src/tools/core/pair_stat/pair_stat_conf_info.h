@@ -244,9 +244,9 @@ class PairStatVxOpt {
       bool add_ioda_pair(point_pair_t);
 
       // Apply conversion and censoring logic
-      void apply_convert_censor(STATLine &);
-      void apply_convert_censor(point_pair_t &);
-      void apply_convert_censor(const VarInfo *, double &);
+      void apply_convert_censor(STATLine &) const;
+      void apply_convert_censor(point_pair_t &) const;
+      void apply_convert_censor(const VarInfo *, double &) const;
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -334,7 +334,7 @@ class PairStatConfInfo {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int PairStatConfInfo::get_n_vx() const { return(n_vx); }
+inline int PairStatConfInfo::get_n_vx() const { return n_vx; }
 
 ////////////////////////////////////////////////////////////////////////
 
