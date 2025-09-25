@@ -741,7 +741,6 @@ static void process_scores() {
       // Update header columns
       store_hdr_col_val("DESC", vx.vx_pd.desc, hdr_cols, hdr_vals);
 
-
       // Store masking region as the only "case" information
       StringArray case_cols;
       case_cols.add("VX_MASK");
