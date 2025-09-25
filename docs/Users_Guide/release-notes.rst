@@ -9,7 +9,7 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
-MET Version 12.2.0-rc1 Release Notes (20250925)
+MET Version 12.2.0-rc1 Release Notes (20250926)
 -----------------------------------------------
 
   .. dropdown:: Enhancements
