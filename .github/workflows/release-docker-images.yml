@@ -90,6 +90,8 @@ jobs:
           source ${GITHUB_WORKSPACE}/.github/jobs/bash_functions.sh
           DOCKERHUB_TAG=$(get_dockerhub_tag)
           echo "DOCKERHUB_TAG=${DOCKERHUB_TAG}" >> $GITHUB_OUTPUT
+        env:
+          SOURCE_BRANCH: ${{ matrix.version }}
 
       - name: Scan Docker Images
         id: security-scan
