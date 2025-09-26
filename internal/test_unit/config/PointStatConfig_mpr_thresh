@@ -229,6 +229,6 @@ point_weight_flag = NONE;
 
 tmp_dir       = "/tmp";
 output_prefix = "${OUTPUT_PREFIX}";
-version       = "V12.1.0";
+version       = "V12.2.0";
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -9,148 +9,56 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
-MET Version 12.1.0-rc1 Release Notes (20250522)
+MET Version 12.2.0-rc1 Release Notes (20250926)
 -----------------------------------------------
 
-  .. dropdown:: Bugfixes
-
-     * Bugfix: Fix the MET NetCDF library to support variables with more that 4 dimensions
-       (`#3112 <https://github.com/dtcenter/MET/issues/3112>`_).
-     * Bugfix: Refine the MET GRIB2 library logic to find a single GRIB2 table match rather multiple ones
-       (`#3107 <https://github.com/dtcenter/MET/issues/3107>`_).
-     * Bugfix: Fix MET-12.1.0-rc1 Intel compilation warnings and errors
-       (`#3165 <https://github.com/dtcenter/MET/issues/3165>`_).
-
   .. dropdown:: Enhancements
 
-     * Enhance MET library code to support reading WRF subgrid files
-       (`#2794 <https://github.com/dtcenter/MET/issues/2794>`_).
-     * Enhance MET library code to support additional vertical level types in WRF files
-       (`#2818 <https://github.com/dtcenter/MET/issues/2818>`_).
-     * Enhance multivariate MODE to support Python embedding inputs
-       (`#2940 <https://github.com/dtcenter/MET/issues/2940>`_).
-
-     * **Add support for the CTRACK benchmarking tool and instrument the Ensemble-Stat tool to report metrics**
-       (`#3065 <https://github.com/dtcenter/MET/issues/3065>`_).
-
-       * Enhance the benchmarking logic to support multiple runs and instrument the Grid-Diag tool to report metrics
-         (`#3109 <https://github.com/dtcenter/MET/issues/3109>`_).
-       * Add the :code:`--enable-profiler` configuration option to make the compilation of CTRACK support optional
-         (`#3125 <https://github.com/dtcenter/MET/issues/3125>`_).
- 
-     * **Enhance the MET tools to fully support writing gridded range/azimuth data to NetCDF output files**
-       (`#3096 <https://github.com/dtcenter/MET/issues/3096>`_).
-     * Enhance PB2NC to write unit and description strings for derived variables
-       (`#3099 <https://github.com/dtcenter/MET/issues/3099>`_).
- 
-     * Resolve Python deprecation warnings introduced during the switch to Python 3.12
-       (`#3106 <https://github.com/dtcenter/MET/issues/3106>`_).
- 
-     * **Enhance MET using OpenMP parallelization in both the library and application code**
-       (`#3120 <https://github.com/dtcenter/MET/issues/3120>`_).
-
-       * Apply OpenMP to the vx_regrid library and initialize OpenMP for all applications
-         (`#3131 <https://github.com/dtcenter/MET/issues/3131>`_).
-       * Apply OpenMP to the vx_util library
-         (`#3132 <https://github.com/dtcenter/MET/issues/3132>`_).
-       * Apply OpenMP to remaining MET library code
-         (`#3134 <https://github.com/dtcenter/MET/issues/3134>`_).
-       * Apply OpenMP to parallelize loops over grid dimensions in MET Applications
-         (`#3140 <https://github.com/dtcenter/MET/issues/3140>`_).
-       * Apply OpenMP to parallelize loops over grid dimensions in the remaining MET applications
-         (`#3145 <https://github.com/dtcenter/MET/issues/3145>`_).
-
-  .. dropdown:: Documentation
-
-     * Enhance the MET User's Guide by adding linkable sub-sections to the configuration file overview chapters
-       (`#3149 <https://github.com/dtcenter/MET/issues/3149>`_).
-
-MET Version 12.1.0-beta2 Release Notes (20250401)
--------------------------------------------------
+     * Extend time range support with NetCDF-CF files
+       (`#2836 <https://github.com/dtcenter/MET/issues/2836>`_).
+     * Enhance ASCII2NC to recursively search input directories for specific file types for use with ISMN data
+       (`#3148 <https://github.com/dtcenter/MET/issues/3148>`_).
+     * Enhance RMW-Analysis to filter individual track points rather than entire tracks
+       (`#3168 <https://github.com/dtcenter/MET/issues/3168>`_).
+     * Enhance madis2nc so that it writes variable names
+       (`#3172 <https://github.com/dtcenter/MET/issues/3172>`_).
+     * **Enhance Point-Stat and Ensemble-Stat to apply orographic corrections when verifying surface temperatures and heights (e.g. cloud base) against point observations**
+       (`#3174 <https://github.com/dtcenter/MET/issues/3174>`_).
+     * Enhance Pair-Stat to support data censoring and conversion configuration options
+       (`#3186 <https://github.com/dtcenter/MET/issues/3186>`_).
+     * Add CVE scanning to the release-docker-images.yml workflow
+       (`#3198 <https://github.com/dtcenter/MET/issues/3198>`_).
+     * **Support multiple vertical level variables for CF NetCDF input**
+       (`#3226 <https://github.com/dtcenter/MET/issues/3226>`_).
+     * Add new pre-defined grid definitions to support the computation of CBS scores
+       (`#3232 <https://github.com/dtcenter/MET/issues/3232>`_).
 
   .. dropdown:: Bugfixes
 
-     * Bugfix: Fix incorrect polar stereographic projection handling for sea ice dataset
-       (`#3023 <https://github.com/dtcenter/MET/issues/3023>`_).
-     * Bugfix: Fix the PARUSR BUFRLIB failure when PB2NC is compiled with :code:`-O2` optimization
-       (`#3054 <https://github.com/dtcenter/MET/issues/3054>`_).
-     * Bugfix: Fix memory management issues by replacing variable length arrays with STL vectors and arrays
-       (`#3075 <https://github.com/dtcenter/MET/issues/3075>`_).
-     * Bugfix: Fix intermittent configuration string parsing :code:`yyerror` failure
-       (`#3077 <https://github.com/dtcenter/MET/issues/3077>`_).
-     * Bugfix: Fix compilation script logic for successful dependent library compilations
-       (`#3092 <https://github.com/dtcenter/MET/issues/3092>`_).
-     * Bugfix: Fix ASCII2NC failure for tab-delimited input files
-       (`#3095 <https://github.com/dtcenter/MET/issues/3095>`_).
-
-  .. dropdown:: Enhancements
-
-     * **Enhance Pair-Stat to support IODA and Python inputs and support temporal filtering**
-       (`#3059 <https://github.com/dtcenter/MET/issues/3059>`_).
-     * **Enhance the MET statistics tools to read and process range/azimuth data from the TC-RMW and RMW-Analysis tools**
-       (`#3064 <https://github.com/dtcenter/MET/issues/3064>`_).
-     * Refine the vector level matching logic when reading NetCDF output generated by other MET tools
-       (`#3087 <https://github.com/dtcenter/MET/issues/3087>`_).
-     * Update references to the Gulf of America
-       (`#3098 <https://github.com/dtcenter/MET/issues/3098>`_).
-
-  .. dropdown:: Documentation
-
-     * Enhance the MET User's Guide to better describe ASCII file lists
-       (`#3066 <https://github.com/dtcenter/MET/issues/3066>`_).
-     * Documentation: Use subprojects in Read The Docs
-       (`METplus#2771 <https://github.com/dtcenter/METplus/issues/2771>`_ and
-       `PR MET#3113 <https://github.com/dtcenter/MET/issues/3113>`_).
-
-  .. dropdown:: METbaseimage testing environment
-
-     * Update the METbaseimage to use Python 3.12.0
-       (`METbaseimage#30 <https://github.com/dtcenter/METbaseimage/issues/30>`_,
-       `PR MET#3091 <https://github.com/dtcenter/MET/pull/3091>`_, and
-       `PR MET#3105 <https://github.com/dtcenter/MET/pull/3105>`_)
-
-MET Version 12.1.0-beta1 Release Notes (20250124)
--------------------------------------------------
-
-  .. dropdown:: Bugfixes
-
-     * Bugfix: Fix Grid-Stat segfault when SEEPS is the only NetCDF output type requested
-       (`#3020 <https://github.com/dtcenter/MET/issues/3020>`_).
-
-  .. dropdown:: Enhancements
-
-     * Enhance ASCII2NC to read USCRN point observations
-       (`#1019 <https://github.com/dtcenter/MET/issues/1019>`_).
-     * Enhance Multivariate MODE to support multiple convolution radii and thresholds
-       (`#2709 <https://github.com/dtcenter/MET/issues/2709>`_).
-     * Enhance Gen-Vx-Mask to support a new local solar time masking region option
-       (`#2966 <https://github.com/dtcenter/MET/issues/2966>`_).
-     * **Create a new Pair-Stat tool to compute statistics for already paired forecast and observation data**
-       (`#3006 <https://github.com/dtcenter/MET/issues/3006>`_).
-     * Develop a class that supports reading both FCST and OBS from a IODA file to use with the new Pair-Stat tool
-       (`#3007 <https://github.com/dtcenter/MET/issues/3007>`_).
-     * Enhance the Grid-Stat GRAD line type with additional gradient vector-based statistics to measure sharpness
-       (`#3024 <https://github.com/dtcenter/MET/issues/3024>`_).
-     * Enhance Series-Analysis to compute statistics from the GRAD line type
-       (`#3030 <https://github.com/dtcenter/MET/issues/3030>`_).
-     * Improve MET library logging for NetCDF level dimension matches
-       (`#3038 <https://github.com/dtcenter/MET/issues/3038>`_).
-     * Enhance the unstructured grid library to correctly parse the LFRic model initialization time
-       (`#3056 <https://github.com/dtcenter/MET/issues/3056>`_).
-
-  .. dropdown:: Documentation
-
-     * Update the MET User's Guide to specify the data types in each output line type table
-       (`#3032 <https://github.com/dtcenter/MET/issues/3032>`_).
+     * Bugfix: Fix compilation on non-GCC compilers by replacing #include <bits/stdc++.h>
+       (`#3175 <https://github.com/dtcenter/MET/issues/3175>`_).
+     * Bugfix: Fix the AW_MEAN regridding method when OMP_NUM_THREADS is set very large
+       (`#3206 <https://github.com/dtcenter/MET/issues/3206>`_).
+     * Bugfix: Fix STAT-Analysis handling of zero-length vectors when aggregating MPR inputs and writing WDIR or VCNT outputs
+       (`#3210 <https://github.com/dtcenter/MET/issues/3210>`_).
+     * Bugfix: Python embedding does not work for MET version 12.1.0 with Python version 3.10
+       (`#3219 <https://github.com/dtcenter/MET/issues/3219>`_).
+     * Bugfix: Fix segfault when reading climatological data from a CF-compliant NetCDF file fails
+       (`#3235 <https://github.com/dtcenter/MET/issues/3235>`_).
 
   .. dropdown:: Repository, build, and test
 
-     * Create a new test utility to search a 3D cloud of points for the nearest neighbor to a specified (lat, lon, elev) location
-       (`#3012 <https://github.com/dtcenter/MET/issues/3012>`_).
-     * Create a new development environment file for Seneca for the Intel oneAPI compilers
-       (`#3047 <https://github.com/dtcenter/MET/issues/3047>`_).
-     * Decouple the MET unit tests from the MET installation location
-       (`#3051 <https://github.com/dtcenter/MET/issues/3051>`_).
+     * Switch MET's R-based differencing logic over to using the Python-based METplus implementation
+       (`#2718 <https://github.com/dtcenter/MET/issues/2718>`_).
+
+  .. dropdown:: METbaseimage testing environment
+
+     * Add logic to regenerate previously tagged versions based on a schedule
+       (`METbaseimage#18 <https://github.com/dtcenter/METbaseimage/issues/18>`_).
+     * Add a new GHA development workflow and enhance workflows to scan Docker images for CVEs #33
+       (`METbaseimage#33 <https://github.com/dtcenter/METbaseimage/issues/33>`_).
+     * METbaseimage: Address Critical CVEs from Grype scans of the Docker images
+       (`METplus-Internal#61 <https://github.com/dtcenter/METplus-Internal/issues/61>`_).
 
 MET Upgrade Instructions
 ========================
@@ -184,19 +92,19 @@ MET Version 12.2.0 Upgrade Instructions
      * Adds new **msl_agl_correction** configuration dictionary to convert between
        height values defined relative to mean-sea-level or above-ground-level.
 
-.. dropdown:: Output format changes
+.. dropdown:: Output format changes - NONE
 
    MET version 12.2.0 adds or modifies the following output file formats:
 
    * None
 
-.. dropdown:: Output data changes
+.. dropdown:: Output data changes - NONE
 
    MET version 12.2.0 modifies existing output data values in the following ways:
 
    * None
 
-.. dropdown:: Additional upgrade instructions
+.. dropdown:: Additional upgrade instructions - NONE
 
    Recommendations when upgrading to MET version 12.2.0:
 

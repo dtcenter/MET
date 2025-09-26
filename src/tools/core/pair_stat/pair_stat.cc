@@ -22,6 +22,7 @@
 //   000    11/07/24  Halley Gotway  MET #3006 New
 //   001    03/10/25  Halley Gotway  MET #3059 Add ioda, python, and
 //                                   climo support
+//   002    09/25/25  Halley Gotway  MET #3186 Censoring and conversion
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -739,7 +740,6 @@ static void process_scores() {
 
       // Update header columns
       store_hdr_col_val("DESC", vx.vx_pd.desc, hdr_cols, hdr_vals);
-
 
       // Store masking region as the only "case" information
       StringArray case_cols;

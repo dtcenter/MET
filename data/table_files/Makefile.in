@@ -310,6 +310,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 tablefilesdir = $(pkgdatadir)/table_files
 tablefiles_DATA = \
+	met_header_columns_V12.2.txt \
 	met_header_columns_V12.1.txt \
 	met_header_columns_V12.0.txt \
 	met_header_columns_V11.1.txt \

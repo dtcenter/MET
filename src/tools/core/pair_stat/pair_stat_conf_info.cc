@@ -136,10 +136,10 @@ void PairStatConfInfo::read_config(const StringArray &sa) {
 ////////////////////////////////////////////////////////////////////////
 
 void PairStatConfInfo::process_config(PairsFormat ftype) {
-   int i, j, n_fvx, n_ovx;
-   Dictionary *fdict = (Dictionary *) nullptr;
-   Dictionary *odict = (Dictionary *) nullptr;
-   Dictionary i_fdict, i_odict;
+   Dictionary *fdict = nullptr;
+   Dictionary *odict = nullptr;
+   Dictionary i_fdict;
+   Dictionary i_odict;
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
@@ -164,8 +164,8 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
    odict = conf.lookup_array(conf_key_obs_pairs);
 
    // Determine the number of fields (name/level) to be verified
-   n_fvx = parse_conf_n_vx(fdict);
-   n_ovx = parse_conf_n_vx(odict);
+   int n_fvx = parse_conf_n_vx(fdict);
+   int n_ovx = parse_conf_n_vx(odict);
 
    // Check for a valid number of verification tasks
    if(n_fvx == 0 || n_fvx != n_ovx) {
@@ -192,7 +192,7 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
    seeps_climo_name = conf.lookup_string(conf_key_seeps_point_climo_name, false);
 
    // Parse settings for each verification task
-   for(i=0; i<n_vx; i++) {
+   for(int i=0; i<n_vx; i++) {
 
       // Get the current dictionaries
       i_fdict = parse_conf_i_vx_dict(fdict, i);
@@ -212,14 +212,14 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
       output_flag[i_val1l2] != STATOutputType::None ||
       output_flag[i_vcnt]   != STATOutputType::None) {
 
-      for(i=0; i<n_vx; i++) {
+      for(int i=0; i<n_vx; i++) {
 
          // Process u-wind
          if(vx_opt[i].vx_pd.fcst_info->is_u_wind() &&
             vx_opt[i].vx_pd.obs_info->is_u_wind()) {
 
             // Search for corresponding v-wind
-            for(j=0; j<n_vx; j++) {
+            for(int j=0; j<n_vx; j++) {
                if(vx_opt[j].vx_pd.fcst_info->is_v_wind() &&
                   vx_opt[j].vx_pd.obs_info->is_v_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
@@ -256,7 +256,7 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
                  vx_opt[i].vx_pd.obs_info->is_v_wind()) {
 
             // Search for corresponding u-wind
-            for(j=0; j<n_vx; j++) {
+            for(int j=0; j<n_vx; j++) {
                if(vx_opt[j].vx_pd.fcst_info->is_u_wind() &&
                   vx_opt[j].vx_pd.obs_info->is_u_wind()  &&
                   vx_opt[i].is_uv_match(vx_opt[j])) {
@@ -297,17 +297,16 @@ void PairStatConfInfo::process_config(PairsFormat ftype) {
 ////////////////////////////////////////////////////////////////////////
 
 void PairStatConfInfo::process_flags() {
-   int i, j;
    bool output_ascii_flag = false;
 
    // Initialize
-   for(i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
+   for(int i=0; i<n_txt; i++) output_flag[i] = STATOutputType::None;
 
    // Loop over the verification tasks
-   for(i=0; i<n_vx; i++) {
+   for(int i=0; i<n_vx; i++) {
 
       // Summary of output_flag settings
-      for(j=0; j<n_txt; j++) {
+      for(int j=0; j<n_txt; j++) {
 
          if(vx_opt[i].output_flag[j] == STATOutputType::Both) {
             output_flag[j] = STATOutputType::Both;
@@ -555,7 +554,7 @@ bool PairStatConfInfo::get_vflag() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairStatConfInfo::add_mpr_line(const STATLine &l) {
+bool PairStatConfInfo::add_mpr_line(STATLine l) {
    bool keep = false;
 
    // Attempt to add line to each verification task
@@ -593,6 +592,7 @@ void PairStatVxOpt::clear() {
    // Initialize values
    vx_pd.clear();
    vx_hdr.clear();
+   convert_censor_flag = false;
 
    fcat_ta.clear();
    ocat_ta.clear();
@@ -700,22 +700,26 @@ bool PairStatVxOpt::is_uv_match(const PairStatVxOpt &v) const {
 
 void PairStatVxOpt::process_config(PairsFormat ftype,
         Dictionary &fdict, Dictionary &odict) {
-   int n;
-   VarInfoFactory info_factory;
-   map<STATLineType,STATOutputType>output_map;
-   Dictionary *dict;
    const char *method_name = "PairStatVxOpt::process_config() -> ";
 
    // Initialize
    clear();
 
    // Allocate new VarInfo objects
-   vx_pd.set_fcst_info(info_factory.new_var_info(FileType_Pairs));
-   vx_pd.set_obs_info(info_factory.new_var_info(FileType_Pairs));
+   vx_pd.set_fcst_info(VarInfoFactory::new_var_info(FileType_Pairs));
+   vx_pd.set_obs_info(VarInfoFactory::new_var_info(FileType_Pairs));
 
    // Set the VarInfo objects
    vx_pd.fcst_info->set_dict(fdict);
    vx_pd.obs_info->set_dict(odict);
+
+   // Set the conversion and/or censoring flag
+   if(vx_pd.fcst_info->ConvertFx.is_set()      ||
+      vx_pd.fcst_info->censor_thresh().n() > 0 ||
+      vx_pd.obs_info->ConvertFx.is_set()       ||
+      vx_pd.obs_info->censor_thresh().n()  > 0) {
+      convert_censor_flag = true;
+   }
 
    // Dump the contents of the current VarInfo
    if(mlog.verbosity_level() >= 5) {
@@ -743,7 +747,8 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    }
 
    // Conf: output_flag
-   output_map = parse_conf_output_flag(&odict, txt_file_type, n_txt);
+   map<STATLineType,STATOutputType> output_map = 
+      parse_conf_output_flag(&odict, txt_file_type, n_txt);
 
    // Populate the output_flag array with map values
    for(int i=0; i<n_txt; i++) output_flag[i] = output_map[txt_file_type[i]];
@@ -791,9 +796,9 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    for(int i=0; i<mpr_sa.n(); i++) {
       if(mpr_thr_inc_map.count(mpr_sa[i]) == 0) {
          ThreshArray ta;
-         mpr_thr_inc_map[(mpr_sa[i])] = ta;
+         mpr_thr_inc_map[mpr_sa[i]] = ta;
       }
-      mpr_thr_inc_map[(mpr_sa[i])].add(mpr_ta[i]);
+      mpr_thr_inc_map[mpr_sa[i]].add(mpr_ta[i]);
    }
 
    // Conf: mpr_str_inc
@@ -888,7 +893,7 @@ void PairStatVxOpt::process_config(PairsFormat ftype,
    }
 
    // Add default continuous thresholds until the counts match
-   n = max(fcnt_ta.n(), ocnt_ta.n());
+   int n = max(fcnt_ta.n(), ocnt_ta.n());
    while(fcnt_ta.n() < n) fcnt_ta.add(na_str);
    while(ocnt_ta.n() < n) ocnt_ta.add(na_str);
 
@@ -1384,8 +1389,11 @@ bool PairStatVxOpt::is_keeper_obs_init_time(const unixtime beg_ut,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
+bool PairStatVxOpt::add_mpr_line(STATLine l) {
    bool keep = false;
+
+   // Apply conversion and censoring logic
+   if(convert_censor_flag) apply_convert_censor(l);
 
    // Check filtering options
    if(is_keeper_mpr(l)) {
@@ -1485,8 +1493,11 @@ bool PairStatVxOpt::add_mpr_line(const STATLine &l) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
+bool PairStatVxOpt::add_ioda_pair(point_pair_t p) {
    bool keep = false;
+
+   // Apply conversion and censoring logic
+   if(convert_censor_flag) apply_convert_censor(p);
 
    // Check filtering options
    if(is_keeper_ioda(p)) {
@@ -1551,6 +1562,60 @@ bool PairStatVxOpt::add_ioda_pair(const point_pair_t &p) {
    return keep;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+void PairStatVxOpt::apply_convert_censor(STATLine &l) const {
+
+   // Apply logic to the forecast and observation values
+   double fval = atof(l.get_item("FCST"));
+   apply_convert_censor(vx_pd.fcst_info, fval);
+
+   double oval = atof(l.get_item("OBS"));
+   apply_convert_censor(vx_pd.obs_info, oval);
+
+   // Store the result
+   l.set_item(l.get_offset("FCST"), to_string(fval));
+   l.set_item(l.get_offset("OBS"),  to_string(oval));
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairStatVxOpt::apply_convert_censor(point_pair_t &p) const {
+
+   // Apply logic to the forecast and observation values
+   apply_convert_censor(vx_pd.fcst_info, p.fval);
+   apply_convert_censor(vx_pd.obs_info,  p.oval);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void PairStatVxOpt::apply_convert_censor(const VarInfo *var_info,
+                                         double &v) const {
+   // Check for null
+   if(!var_info) return;
+
+   // Apply conversion logic
+   if(var_info->ConvertFx.is_set()) {
+     v = var_info->ConvertFx(v);
+   }
+
+   // Apply censoring logic
+   for(int i=0; i<var_info->censor_thresh().n(); i++) {
+
+      // Break out after the first match
+      if(var_info->censor_thresh()[i].check(v)) {
+         v = var_info->censor_val()[i];
+         break;
+      }
+   }
+
+   return;
+}
+ 
 ////////////////////////////////////////////////////////////////////////
 //
 // Begin utility functions

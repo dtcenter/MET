@@ -308,6 +308,6 @@ grid_weight_flag = NONE;
 
 tmp_dir       = "/tmp";
 output_prefix = "GRIB_lvl_typ_val";
-version       = "V12.1.0";
+version       = "V12.2.0";
 
 ////////////////////////////////////////////////////////////////////////////////
