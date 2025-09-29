@@ -9,6 +9,14 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.0.4 Release Notes (20250929)
+-------------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * Fix STAT-Analysis handling of zero-length vectors when aggregating MPR inputs and writing WDIR or VCNT outputs
+       (`#3210 <https://github.com/dtcenter/MET/issues/3210>`_).
+
 MET Version 12.0.3 Release Notes (20250721)
 -------------------------------------------
 
