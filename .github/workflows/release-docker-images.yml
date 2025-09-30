@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
     inputs:
       release_version:
-        description: 'Comma-separated list of versions to build, e.g. "v12.0.3"'
-        default: '"v12.0.3"'
+        description: 'Comma-separated list of versions to build, e.g. "v12.0.4"'
+        default: '"v12.0.4"'
         required: true
         type: string
       update_latest:
