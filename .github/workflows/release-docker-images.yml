@@ -58,14 +58,16 @@ jobs:
           IFS=',' read -a version_array <<< ${version_string}
           matrix="{\"version\": ["
           for version in "${version_array[@]}"; do
+            echo "version = $version"
             if [[ "$version" =~ "^v[0-9]+.[0-9]+$" ]]; then
-              matrix+=$(${GITHUB_WORKSPACE}/metplus/component_versions.py -v ${version} -i MET -o MET)
+              matrix+=\"$(${GITHUB_WORKSPACE}/metplus/component_versions.py -v ${version} -i MET -o MET)\"
             else
-              matrix+=${version}
+              matrix+=\"${version}\"
             fi
             if [[ "$version" != "$version_array[-1]" ]]; then
               matrix+=","
             fi
+            echo "matrix = $matrix"
           done
           matrix+="]}"
           echo "matrix=${matrix}"
