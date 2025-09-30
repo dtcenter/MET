@@ -14,7 +14,7 @@ on:
         required: true
         type: string
       update_latest:
-        description: 'For "vX.Y.Z" versions, update the corresponding "X.Y-latest" images.'
+        description: 'Update the corresponding "X.Y-latest" images.'
         default: false
         required: true
         type: boolean
@@ -52,17 +52,16 @@ jobs:
             version_string=${{ toJSON(inputs.release_version) }}
             update_latest=${{ toJSON(inputs.update_latest) }}
           else
-            version_string=\"${{ toJSON(github.ref_name) }}\"
+            version_string=${{ toJSON(github.ref_name) }}
             update_latest="true"
           fi
-          # Replace vX.Y with latest vX.Y.Z, as needed
           IFS=',' read -a version_array <<< ${version_string}
           matrix="{\"version\": ["
           for version in "${version_array[@]}"; do
-            if [[ "$version" =~ "^v[0-9]+.[0-9]+.[0-9]+$" ]]; then
-              matrix+=${version}
+            if [[ "$version" =~ "^v[0-9]+.[0-9]+$" ]]; then
+              matrix+=$(${GITHUB_WORKSPACE}/metplus/component_versions.py -v ${version} -i MET -o MET)
             else
-              matrix+=$(${GITHUB_WORKSPACE}/metplus/component_versions.py -v ${version} -o MET)
+              matrix+=${version}
             fi
             if [[ "$version" != "$version_array[-1]" ]]; then
               matrix+=","
