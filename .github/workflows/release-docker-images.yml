@@ -39,7 +39,6 @@ jobs:
         with:
           repository: 'dtcenter/metplus'
           ref: 'develop'
-          path: 'develop'
           sparse-checkout: metplus/component_versions.py
           sparse-checkout-cone-mode: false
 
@@ -47,23 +46,23 @@ jobs:
         id: get-versions
         run: |
           if [[ ${{ github.event_name }} == 'schedule' ]]; then
-            version_list="v12.0,v12.1"
+            version_string="v12.0,v12.1"
             update_latest="true"
           elif [[ ${{ github.event_name }} == 'workflow_dispatch' ]]; then
-            version_list=${{ toJSON(inputs.release_version) }}
+            version_string=${{ toJSON(inputs.release_version) }}
             update_latest=${{ toJSON(inputs.update_latest) }}
           else
-            version_list=\"${{ toJSON(github.ref_name) }}\"
+            version_string=\"${{ toJSON(github.ref_name) }}\"
             update_latest="true"
           fi
           # Replace vX.Y with latest vX.Y.Z, as needed
-          IFS=',' read -a version_array <<< $version_list
+          IFS=',' read -a version_array <<< ${version_string}
           matrix="{\"version\": ["
           for version in "${version_array[@]}"; do
             if [[ "$version" =~ "^v[0-9]+.[0-9]+.[0-9]+$" ]]; then
               matrix+=${version}
             else
-              matrix+=$("${GITHUB_WORKSPACE}"/metplus/component_versions.py -v ${version} -i MET -o MET)
+              matrix+=$(${GITHUB_WORKSPACE}/metplus/component_versions.py -v ${version} -o MET)
             fi
             if [[ "$version" != "$version_array[-1]" ]]; then
               matrix+=","
