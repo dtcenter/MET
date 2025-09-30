@@ -14,7 +14,7 @@ on:
         required: true
         type: string
       update_latest:
-        description: 'Update the corresponding "X.Y-latest" images.'
+        description: 'Update "X.Y-latest" images.'
         default: false
         required: true
         type: boolean
@@ -59,13 +59,12 @@ jobs:
           matrix="{\"version\": ["
           for version in "${version_array[@]}"; do
             echo "version = $version"
-            if [[ "$version" =~ "^v[0-9]+.[0-9]+$" ]]; then
-              matrix+=\"$(${GITHUB_WORKSPACE}/metplus/component_versions.py -v ${version} -i MET -o MET)\"
+            if [[ "${version}" =~ "^v[0-9]+.[0-9]+$" ]]; then
+              echo "Expanding version..."
+              matrix+=\"$(${GITHUB_WORKSPACE}/metplus/component_versions.py -v ${version} -i MET -o MET)\",
             else
-              matrix+=\"${version}\"
-            fi
-            if [[ "$version" != "$version_array[-1]" ]]; then
-              matrix+=","
+              echo "Not expanding version..."
+              matrix+=\"${version}\",
             fi
             echo "matrix = $matrix"
           done
