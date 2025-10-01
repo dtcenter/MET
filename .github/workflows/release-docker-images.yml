@@ -58,18 +58,13 @@ jobs:
           IFS=',' read -r -a version_array <<< "${version_string}"
           matrix="{\"version\": ["
           for version in "${version_array[@]}"; do
-            echo "version = $version"
             if [[ ${version} =~ ^v[0-9]+.[0-9]+$ ]]; then
-              echo "Expanding version..."
               matrix+=\"$(${GITHUB_WORKSPACE}/metplus/component_versions.py -v ${version} -i MET -o MET)\",
             else
-              echo "Not expanding version..."
               matrix+=\"${version}\",
             fi
-            echo "matrix = $matrix"
           done
           matrix+="]}"
-          echo "matrix=${matrix}"
           echo "matrix=${matrix}" >> $GITHUB_OUTPUT
           echo "update_latest=${update_latest}" >> $GITHUB_OUTPUT
 
