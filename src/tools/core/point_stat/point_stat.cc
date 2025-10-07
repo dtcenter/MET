@@ -1755,8 +1755,8 @@ static void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
            << "Applying " << n_bin << " climatology bins.\n";
    }
 
-   // Allocate memory
-   auto pct_info = new PCTInfo [n_bin];
+   // Allocate storage 
+   vector<PCTInfo> pct_info(n_bin);
 
    // Process each probabilistic observation threshold
    for(int i=0; i<vx_opt.ocat_ta.n(); i++) {
@@ -1837,7 +1837,7 @@ static void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
       if(n_bin > 1) {
 
          PCTInfo pct_mean;
-         compute_pct_mean(pct_info, n_bin, pct_mean);
+         compute_pct_mean(pct_info.data(), n_bin, pct_mean);
 
          // Write out PSTD
          if(vx_opt.output_flag[i_pstd] != STATOutputType::None) {
