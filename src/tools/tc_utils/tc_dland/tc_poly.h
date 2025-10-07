@@ -83,10 +83,9 @@ class TCPolyArray {
 
       void extend(int, bool exact = true);
 
-      TCPoly * Poly;
-      int      NPolys;
-      int      NAlloc;
-      double   CheckDist;
+      std::vector<TCPoly> Poly;
+
+      double CheckDist;
 
    public:
 
@@ -110,7 +109,7 @@ class TCPolyArray {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TCPolyArray::n_polys() const { return NPolys; }
+inline int TCPolyArray::n_polys() const { return Poly.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 
