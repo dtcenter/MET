@@ -308,8 +308,6 @@ void ColorTable::init_from_scratch()
 
 {
 
-Entry = (CtableEntry *) nullptr;
-
 clear();
 
 return;
@@ -323,12 +321,6 @@ return;
 void ColorTable::clear()
 
 {
-
-if ( Entry )  { delete [] Entry;  Entry = (CtableEntry *) nullptr; }
-
-Nentries = 0;
-
-Nalloc = 0;
 
 int j;
 
@@ -356,24 +348,15 @@ void ColorTable::assign(const ColorTable & c)
 
 clear();
 
-extend(c.Nentries);
+extend(c.n_entries());
 
-int j;
+Entry = c.Entry;
 
-Nentries = c.Nentries;
-
-for (j=0; j<Nentries; ++j)  {
-
-   Entry[j] = c.Entry[j];
-
-}
-
-for (j=0; j<fudge_size; ++j)  {
+for (int j=0; j<fudge_size; ++j)  {
 
    fudge[j] = c.fudge[j];
 
 }
-
 
 Gamma = c.Gamma;
 
@@ -395,30 +378,24 @@ Color color;
 
 double t = ( is_bad_data(t_in) ? bad_data_double : t_in );
 
-if ( Nentries == 0 )  return black;
+if ( Entry.empty() )  return black;
 
 if ( t <= Entry[0].value_low() )  return Entry[0].color();
 
-if ( t >= Entry[Nentries - 1].value_high() )  return Entry[Nentries - 1].color();
+if ( t >= Entry.back().value_high() )  return Entry.back().color();
 
-int j;
-double vlo, vhi;
-double d1, d2, dist, min_dist;
-
-
-min_dist = fabs(t - Entry[0].value_low());
+double min_dist = fabs(t - Entry[0].value_low());
 
 color = Entry[0].color();
 
+for (auto e : Entry) {
 
-for (j=0; j<Nentries; ++j)  {
-
-   vlo = Entry[j].value_low();
-   vhi = Entry[j].value_high();
+   double vlo = e.value_low();
+   double vhi = e.value_high();
 
    if ( (t >= vlo) && (t <= vhi) )  {   //  direct hit
 
-      color = Entry[j].color();
+      color = e.color();
 
       fudge_color(color);
 
@@ -426,14 +403,14 @@ for (j=0; j<Nentries; ++j)  {
 
    }
 
-   d1 = fabs(t - vlo);
-   d2 = fabs(t - vhi);
+   double d1 = fabs(t - vlo);
+   double d2 = fabs(t - vhi);
 
-   dist = ( (d1 < d2) ? d1 : d2 );
+   double dist = ( (d1 < d2) ? d1 : d2 );
 
    if ( dist < min_dist )  {
 
-      color = Entry[j].color();
+      color = e.color();
 
       min_dist = dist;
 
@@ -441,9 +418,7 @@ for (j=0; j<Nentries; ++j)  {
 
 }
 
-
 fudge_color(color);
-
 
 return color;
 
@@ -465,7 +440,7 @@ double z = ( is_bad_data(z_in) ? bad_data_double : z_in );
    //  check for empty colortable
    //
 
-if ( Nentries == 0 )  return color;
+if ( Entry.empty() )  return color;
 
    //
    //  check if value outside range
@@ -473,26 +448,20 @@ if ( Nentries == 0 )  return color;
 
 if ( z <= Entry[0].value_low() )  return Entry[0].color();
 
-if ( z >= Entry[Nentries - 1].value_high() )  return Entry[Nentries - 1].color();
-
-
-int j, k;
-double vlo, vhi;
-double t;
-
+if ( z >= Entry.back().value_high() )  return Entry.back().color();
 
    //
    //  check for direct hits
    //
 
-for (j=0; j<Nentries; ++j)  {
+for (auto e : Entry) {
 
-   vlo = Entry[j].value_low();
-   vhi = Entry[j].value_high();
+   double vlo = e.value_low();
+   double vhi = e.value_high();
 
    if ( (z >= vlo) && (z <= vhi) )  {   //  direct hit
 
-      color = Entry[j].color();
+      color = e.color();
 
       fudge_color(color);
 
@@ -506,16 +475,16 @@ for (j=0; j<Nentries; ++j)  {
    //  must be in-between
    //
 
-for (j=0; j<(Nentries - 1); ++j)  {
+for (int j=0; j<(Entry.size() - 1); ++j)  {
 
-   k = j + 1;
+   int k = j + 1;
 
-   vlo = Entry[j].value_high();
-   vhi = Entry[k].value_low();
+   double vlo = Entry[j].value_high();
+   double vhi = Entry[k].value_low();
 
    if ( (z >= vlo) && (z <= vhi) )  {
 
-      t = (z - vlo)/(vhi - vlo);
+      double t = (z - vlo)/(vhi - vlo);
 
       color = blend_colors(Entry[j].color(), Entry[k].color(), t);
 
@@ -628,16 +597,9 @@ if ( !out )  {
 
 }
 
-
-for (j=0; j<Nentries; ++j)  {
-
-   out << Entry[j];
-
-}
-
+for (auto e : Entry) out << e;
 
 out.close();
-
 
 return 1;
 
@@ -651,12 +613,9 @@ void ColorTable::fudge_color(Color & c) const
 
 {
 
-unsigned char r, g, b;
-
-
-r = fudge[c.red()];
-g = fudge[c.green()];
-b = fudge[c.blue()];
+unsigned char r = fudge[c.red()];
+unsigned char g = fudge[c.green()];
+unsigned char b = fudge[c.blue()];
 
 c.set_rgb(r, g, b);
 
@@ -674,8 +633,8 @@ void ColorTable::set_gamma(double g)
 
 if ( g <= 0.0 )  {
 
-   mlog << Error << "\nvoid ColorTable::set_gamma(double) -> bad gamma value ... "
-        << g << "\n\n";
+   mlog << Error << "\nvoid ColorTable::set_gamma(double) -> "
+        << "bad gamma value ... " << g << "\n\n";
 
    exit ( 1 );
 
@@ -684,23 +643,18 @@ if ( g <= 0.0 )  {
 Gamma = g;
 
 const double exponent = 1.0/Gamma;
-int j, k;
-double x, y;
 
-for (j=0; j<fudge_size; ++j)  {
+for (int j=0; j<fudge_size; ++j)  {
 
-   x = ((double) j)/255.0;
+   double x = ((double) j)/255.0;
 
-   y = pow(x, exponent);
+   double y = pow(x, exponent);
 
-   k = nint(255.0*y);
+   int k = nint(255.0*y);
 
    fudge[j] = (unsigned char) k;
 
 }
-
-
-
 
 return;
 
@@ -714,20 +668,15 @@ void ColorTable::set_gray()
 
 {
 
-int j;
-Color c;
+for (auto e : Entry) {
 
-
-for (j=0; j<Nentries; ++j)  {
-
-   c = Entry[j].color();
+   Color c = e.color();
 
    c.to_gray();
 
-   Entry[j].set_color(c);
+   e.set_color(c);
 
 }
-
 
 return;
 
@@ -741,18 +690,13 @@ void ColorTable::tint(const Color & c, double t)
 
 {
 
-int j;
-Color cc;
+for (auto e : Entry) {
 
+   Color cc = blend_colors(e.color(), c, t);
 
-for (j=0; j<Nentries; ++j)  {
-
-   cc = blend_colors(Entry[j].color(), c, t);
-
-   Entry[j].set_color(cc);
+   e.set_color(cc);
 
 }
-
 
 return;
 
@@ -771,21 +715,15 @@ Indent prefix (indent_depth);
 
 out << prefix << "Colortable dump ... \n";
 out << prefix << "Gamma     = " << Gamma    << "\n";
-out << prefix << "# entries = " << Nentries << "\n";
-out << prefix << "# alloc   = " << Nalloc   << "\n";
+out << prefix << "# entries = " << Entry.size() << "\n";
 
-int j;
-
-for (j=0; j<Nentries; ++j)  {
+for (int j=0; j<Entry.size(); ++j)  {
 
    out << prefix << "Entry # " << j << " ...\n";
 
    Entry[j].dump(out, indent_depth + 1);
 
 }
-
-
-
 
 return;
 
@@ -799,47 +737,15 @@ void ColorTable::extend(int n)
 
 {
 
-if ( Nalloc >= n )  return;
+if ( Entry.capacity() >= n )  return;
 
-int j;
-CtableEntry * u = (CtableEntry *) nullptr;
-
-j = n/ctable_alloc_inc;
+int j = n/ctable_alloc_inc;
 
 if ( n%ctable_alloc_inc )  ++j;
 
 n = j*ctable_alloc_inc;
 
-u = new CtableEntry [n];
-
-if ( !u )  {
-
-   mlog << Error << "\nColorTable::extend(int) -> memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-if ( Entry )  {
-
-   for (j=0; j<Nentries; ++j)  {
-
-      u[j] = Entry[j];
-
-   }
-
-   delete [] Entry;   Entry = (CtableEntry *) nullptr;
-
-}
-
-Entry = u;   u = (CtableEntry *) nullptr;
-
-
-   //
-   //  done
-   //
-
-Nalloc = n;
+Entry.reserve(n);
 
 return;
 
@@ -853,10 +759,9 @@ void ColorTable::add_entry(const CtableEntry & ce)
 
 {
 
-extend(Nentries + 1);
+extend(Entry.size() + 1);
 
-Entry[Nentries++] = ce;
-
+Entry.emplace_back(ce);
 
 return;
 
@@ -870,10 +775,7 @@ void ColorTable::sort()
 
 {
 
-if ( Nentries <= 1 )  return;
-
-int j, k;
-CtableEntry ce;
+if ( Entry.size() <= 1 )  return;
 
    //
    //  simple bubble sort - colortables
@@ -881,13 +783,13 @@ CtableEntry ce;
    //     don't usually have very many entries
    //
 
-for (j=0; j<(Nentries - 1); ++j)  {
+for (int j=0; j<(Entry.size() - 1); ++j)  {
 
-   for (k=(j + 1); k<Nentries; ++k)  {
+   for (int k=(j + 1); k<Entry.size(); ++k)  {
 
       if ( Entry[j].value_low() > Entry[k].value_low() )  {
 
-         ce = Entry[j];
+         CtableEntry ce = Entry[j];
 
          Entry[j] = Entry[k];
 
@@ -898,8 +800,6 @@ for (j=0; j<(Nentries - 1); ++j)  {
    }   //  for k
 
 }   //  for j
-
-
 
 return;
 
@@ -913,9 +813,10 @@ CtableEntry ColorTable::operator[](int n) const
 
 {
 
-if ( (n < 0) || (n >= Nentries) )  {
+if ( (n < 0) || (n >= Entry.size()) )  {
 
-   mlog << Error << "\nCtableEntry ColorTable::operator[](int) const  -> range check error\n\n";
+   mlog << Error << "\nCtableEntry ColorTable::operator[](int) const -> "
+        << "range check error\n\n";
 
    exit ( 1 );
 
@@ -933,13 +834,9 @@ double ColorTable::data_min() const
 
 {
 
-if ( Nentries == 0 )  return 0.0;
+if ( Entry.empty() == 0 )  return 0.0;
 
-double v;
-
-v = Entry[0].value_low();
-
-return v;
+return Entry[0].value_low();
 
 }
 
@@ -956,18 +853,15 @@ double ColorTable::data_min(double bad_data_value) const
 
 {
 
-if ( Nentries == 0 )  return 0.0;
+if ( Entry.empty() )  return 0.0;
 
-double v_low;
-int i;
+double v_low = 1.0e30;
 
-v_low = 1.0e30;
+for(auto e : Entry) {
 
-for(i=0; i<Nentries; i++) {
-
-   if(Entry[i].value_low() < v_low &&
-      !is_eq(Entry[i].value_low(), bad_data_value))
-      v_low = Entry[i].value_low();
+   if(e.value_low() < v_low &&
+      !is_eq(e.value_low(), bad_data_value))
+      v_low = e.value_low();
 }
 
 return v_low;
@@ -982,13 +876,9 @@ double ColorTable::data_max() const
 
 {
 
-if ( Nentries == 0 )  return 0.0;
+if ( Entry.empty() )  return 0.0;
 
-double v;
-
-v = Entry[Nentries - 1].value_high();
-
-return v;
+return Entry.back().value_high();
 
 }
 
@@ -1005,18 +895,15 @@ double ColorTable::data_max(double bad_data_value) const
 
 {
 
-if ( Nentries == 0 )  return 0.0;
+if ( Entry.empty() )  return 0.0;
 
-double v_high;
-int i;
+double v_high = -1.0e30;
 
-v_high = -1.0e30;
+for(auto e : Entry) {
 
-for(i=0; i<Nentries; i++) {
-
-   if(Entry[i].value_high() > v_high &&
-      !is_eq(Entry[i].value_high(), bad_data_value))
-      v_high = Entry[i].value_high();
+   if(e.value_high() > v_high &&
+      !is_eq(e.value_high(), bad_data_value))
+      v_high = e.value_high();
 }
 
 return v_high;
@@ -1036,11 +923,7 @@ void ColorTable::rescale(double new_min, double new_max, double bad_data_value)
 
 {
 
-int i;
-double old_m, old_b, new_m, new_b;
-double v_lo, v_hi, old_v_lo, old_v_hi, new_v_lo, new_v_hi;
-
-if(Nentries <= 0) {
+if(Entry.size() <= 0) {
 
    mlog << Error << "\nCtableEntry ColorTable::rescale(double, double, double) -> "
         << "the colortable must be non-empty to call rescale.\n\n";
@@ -1049,43 +932,44 @@ if(Nentries <= 0) {
 
 }
 
-old_b = data_min(bad_data_value);
-old_m = data_max(bad_data_value) - data_min(bad_data_value);
+double old_b = data_min(bad_data_value);
+double old_m = data_max(bad_data_value) - data_min(bad_data_value);
 
-new_b = new_min;
-new_m = new_max - new_min;
+double new_b = new_min;
+double new_m = new_max - new_min;
 
-for(i=0; i<Nentries; i++) {
+for(auto e : Entry) {
 
-old_v_lo = Entry[i].value_low();
-old_v_hi = Entry[i].value_high();
+   double old_v_lo = e.value_low();
+   double old_v_hi = e.value_high();
 
-//
-// Check old low value for bad data or scale the old value to a
-// [0, 1] range and convert to the new range
-//
-if(is_eq(old_v_lo, bad_data_value)) {
-   new_v_lo = bad_data_value;
-}
-else {
-   v_lo = (old_v_lo - old_b)/old_m;
-   new_v_lo = v_lo*new_m + new_b;
-}
+   //
+   // Check old low value for bad data or scale the old value to a
+   // [0, 1] range and convert to the new range
+   //
+   double new_v_lo;
+   if(is_eq(old_v_lo, bad_data_value)) {
+      new_v_lo = bad_data_value;
+   }
+   else {
+      double v_lo = (old_v_lo - old_b)/old_m;
+      new_v_lo = v_lo*new_m + new_b;
+   }
 
-//
-// Check old hi value for bad data or scale the old value to a
-// [0, 1] range and convert to the new range
-//
-if(is_eq(old_v_hi, bad_data_value)) {
-   new_v_hi = bad_data_value;
-}
-else {
-   v_hi = (old_v_hi - old_b)/old_m;
-   new_v_hi = v_hi*new_m + new_b;
-}
+   //
+   // Check old hi value for bad data or scale the old value to a
+   // [0, 1] range and convert to the new range
+   //
+   double new_v_hi;
+   if(is_eq(old_v_hi, bad_data_value)) {
+      new_v_hi = bad_data_value;
+   }
+   else {
+      double v_hi = (old_v_hi - old_b)/old_m;
+      new_v_hi = v_hi*new_m + new_b;
+   }
 
-Entry[i].set_values(new_v_lo, new_v_hi);
-
+   e.set_values(new_v_lo, new_v_hi);
 }
 
 //

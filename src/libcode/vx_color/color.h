@@ -218,12 +218,7 @@ class ColorTable {
 
       void extend(int);
 
-
-      CtableEntry * Entry;
-
-      int Nentries;
-
-      int Nalloc;
+      std::vector<CtableEntry> Entry;
 
       double Gamma;
 
@@ -282,7 +277,7 @@ class ColorTable {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int     ColorTable::n_entries()   const { return Nentries; }
+inline int     ColorTable::n_entries()   const { return Entry.size(); }
 
 inline double  ColorTable::gamma()       const { return Gamma; }
 
