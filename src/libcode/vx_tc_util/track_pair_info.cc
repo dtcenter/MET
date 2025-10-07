@@ -932,8 +932,6 @@ TrackPairInfoArray & TrackPairInfoArray::operator=(const TrackPairInfoArray & t)
 
 void TrackPairInfoArray::init_from_scratch() {
 
-   Pair = (TrackPairInfo *) nullptr;
-
    clear();
 
    return;
@@ -943,8 +941,7 @@ void TrackPairInfoArray::init_from_scratch() {
 
 void TrackPairInfoArray::clear() {
 
-   if(Pair) { delete [] Pair; Pair = (TrackPairInfo *) nullptr; }
-   NPairs = NAlloc = 0;
+   Pair.clear();
 
    return;
 }
@@ -953,12 +950,10 @@ void TrackPairInfoArray::clear() {
 
 void TrackPairInfoArray::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
-   int i;
 
-   out << prefix << "NPairs = " << NPairs << "\n";
-   out << prefix << "NAlloc = " << NAlloc << "\n";
+   out << prefix << "NPairs = " << Pair.size() << "\n";
 
-   for(i=0; i<NPairs; i++) {
+   for(int i=0; i<Pair.size(); i++) {
       out << prefix << "TrackPairInfo[" << i+1 << "]:" << "\n";
       Pair[i].dump(out, indent_depth+1);
    }
@@ -975,8 +970,7 @@ ConcatString TrackPairInfoArray::serialize() const {
    ConcatString s;
 
    s << "TrackPairInfoArray: "
-     << "NPairs = " << NPairs
-     << ", NAlloc = " << NAlloc;
+     << "NPairs = " << (int) Pair.size();
 
    return s;
 
@@ -987,12 +981,12 @@ ConcatString TrackPairInfoArray::serialize() const {
 ConcatString TrackPairInfoArray::serialize_r(int indent_depth) const {
    Indent prefix(indent_depth);
    ConcatString s;
-   int i;
 
    s << prefix << serialize() << ", Pairs:\n";
 
-   for(i=0; i<NPairs; i++)
+   for(int i=0; i<Pair.size(); i++) {
       s << Pair[i].serialize_r(i+1, indent_depth+1);
+   }
 
    return s;
 
@@ -1001,17 +995,14 @@ ConcatString TrackPairInfoArray::serialize_r(int indent_depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 void TrackPairInfoArray::assign(const TrackPairInfoArray &t) {
-   int i;
 
    clear();
 
-   if(t.NPairs == 0) return;
+   if(t.n_pairs() == 0) return;
 
-   extend(t.NPairs);
+   extend(t.n_pairs());
 
-   for(i=0; i<t.NPairs; i++) Pair[i] = t.Pair[i];
-
-   NPairs = t.NPairs;
+   for(int i=0; i<t.n_pairs(); i++) Pair[i] = t.Pair[i];
 
    return;
 }
@@ -1019,40 +1010,18 @@ void TrackPairInfoArray::assign(const TrackPairInfoArray &t) {
 ////////////////////////////////////////////////////////////////////////
 
 void TrackPairInfoArray::extend(int n, bool exact) {
-   int j, k;
-   TrackPairInfo *new_info = (TrackPairInfo *) nullptr;
 
-   // Check if enough memory is already allocated
-   if(NAlloc >= n) return;
+   // Check if enough memory is already reserved 
+   if(Pair.capacity() >= n) return;
 
    // Compute the allocation size
    if(!exact) {
-      k = n/TrackPairInfoAllocInc;
+      int k = n/TrackPairInfoAllocInc;
       if(n%TrackPairInfoAllocInc) k++;
       n = k*TrackPairInfoAllocInc;
    }
 
-   // Allocate a new TrackPairInfo array of the required length
-   new_info = new TrackPairInfo [n];
-
-   if(!new_info) {
-      mlog << Error << "\nTrackPairInfoArray::extend(int, bool) -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
-
-   // Copy the array contents and delete the old one
-   if(Pair) {
-      for(j=0; j<NPairs; j++) new_info[j] = Pair[j];
-      delete [] Pair;  Pair = (TrackPairInfo *) nullptr;
-   }
-
-   // Point to the new array
-   Pair     = new_info;
-   new_info = (TrackPairInfo *) nullptr;
-
-   // Store the allocated length
-   NAlloc = n;
+   Pair.reserve(n);
 
    return;
 }
@@ -1062,7 +1031,7 @@ void TrackPairInfoArray::extend(int n, bool exact) {
 const TrackPairInfo & TrackPairInfoArray::operator[](int n) const {
 
    // Check range
-   if((n < 0) || (n >= NPairs)) {
+   if((n < 0) || (n >= Pair.size())) {
       mlog << Error << "\nTrackPairInfoArray::operator[](int) -> "
            << "range check error for index value " << n << "\n\n";
       exit(1);
@@ -1074,9 +1043,9 @@ const TrackPairInfo & TrackPairInfoArray::operator[](int n) const {
 ////////////////////////////////////////////////////////////////////////
 
 int TrackPairInfoArray::n_points() const {
-   int i, n;
 
-   for(i=0,n=0; i<NPairs; i++) n += Pair[i].adeck().n_points();
+   int n = 0;
+   for(auto p : Pair) n += p.adeck().n_points();
 
    return n;
 }
@@ -1084,10 +1053,10 @@ int TrackPairInfoArray::n_points() const {
 ////////////////////////////////////////////////////////////////////////
 
 int TrackPairInfoArray::max_n_diag() const {
-   int i, n;
 
-   for(i=0,n=0; i<NPairs; i++) {
-      if(Pair[i].adeck().n_diag() > n) n = Pair[i].adeck().n_diag();
+   int n = 0;
+   for(auto p : Pair) {
+      if(p.adeck().n_diag() > n) n = p.adeck().n_diag();
    }
 
    return n;
@@ -1097,8 +1066,8 @@ int TrackPairInfoArray::max_n_diag() const {
 
 void TrackPairInfoArray::add(const TrackPairInfo &p) {
 
-   extend(NPairs + 1, false);
-   Pair[NPairs++] = p;
+   extend(Pair.size() + 1, false);
+   Pair.emplace_back(p);
 
    return;
 }
@@ -1108,10 +1077,8 @@ void TrackPairInfoArray::add(const TrackPairInfo &p) {
 void TrackPairInfoArray::add_watch_warn(const ConcatString &ww_sid,
                                         WatchWarnType ww_type,
                                         unixtime ww_ut) {
-   int i;
 
-   // Loop through the track pairs
-   for(i=0; i<NPairs; i++) Pair[i].add_watch_warn(ww_sid, ww_type, ww_ut);
+   for(auto p : Pair) p.add_watch_warn(ww_sid, ww_type, ww_ut);
 
    return;
 }
@@ -1124,15 +1091,14 @@ void TrackPairInfoArray::subset_write_valid(const TimeArray &ta) {
    if(ta.n() == 0) return;
 
    // Check each point for requested valid times
-   int i, j, keep;
-   for(i=0; i<NPairs; i++) {
-      for(j=0; j<Pair[i].n_points(); j++) {
-         keep = (ta.has(Pair[i].valid(j)) ? 1 : 0);
-         Pair[i].set_keep(j, keep);
+   for(auto p : Pair) {
+      for(int i=0; i<p.n_points(); i++) {
+         int keep = (ta.has(p.valid(i)) ? 1 : 0);
+         p.set_keep(i, keep);
       }
 
       // Subset the track
-      Pair[i] = Pair[i].keep_subset();
+      p = p.keep_subset();
    }
 
    return;
