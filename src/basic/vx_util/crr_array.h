@@ -35,14 +35,9 @@ class CRR_Array {
 
       void assign(const CRR_Array <T>  &);
 
-
-      int Nelements;
-
-      int Nalloc;
+      std::vector<T> e;
 
       int AllocInc;
-
-      T * e;
 
    public:
 
@@ -80,7 +75,7 @@ class CRR_Array {
          //  get stuff
          //
 
-      int n() const { return ( Nelements ); }
+      int n() const { return e.size(); }
 
          //
          //  do stuff
@@ -110,8 +105,6 @@ void CRR_Array<T>::init_from_scratch()
 
 {
 
-e = (T *) nullptr;
-
 AllocInc = 25;   //  default value
 
 clear();
@@ -130,16 +123,9 @@ void CRR_Array<T>::clear()
 
 {
 
-if ( e )  { delete [] e;  e = (T *) nullptr; }
+e.clear();
 
-
-
-Nelements = 0;
-
-Nalloc = 0;
-
-// AllocInc = 25;   //  don't reset AllocInc
-
+// don't reset AllocInc
 
 return;
 
@@ -147,7 +133,6 @@ return;
 
 
 ////////////////////////////////////////////////////////////////////////
-
 
 template <typename T>
 
@@ -157,9 +142,7 @@ void CRR_Array<T>::assign(const CRR_Array<T> & a)
 
 clear();
 
-if ( a.n() == 0 )  return;
-
-add(a);
+e = a.e;
 
 return;
 
@@ -175,7 +158,7 @@ void CRR_Array<T>::extend(int N, bool exact)
 
 {
 
-if ( N <= Nalloc )  return;
+if ( N <= e.size() )  return;
 
 if ( ! exact )  {
 
@@ -183,31 +166,7 @@ if ( ! exact )  {
 
 }
 
-int j;
-T * u = new T [N];
-
-if ( !u )  {
-
-   mlog << Error << "\nCRR_Array::extend(int, bool) -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
-
-for(j=0; j<Nelements; ++j)  {
-
-   u[j] = e[j];
-
-}
-
-if ( e )  { delete [] e;  e = (T *) nullptr; }
-
-e = u;
-
-u = (T *) nullptr;
-
-Nalloc = N;
+e.reserve(N);
 
 return;
 
@@ -223,18 +182,13 @@ void CRR_Array<T>::extend(int N, const T _value)
 
 {
 
-if ( N <= Nalloc )  return;
-
-const int n_old  = Nalloc;
+if ( N <= e.size() )  return;
 
 extend(N);
 
-int j;
+const int n_old = e.size();
 
-for (j=n_old; j<Nalloc; ++j)  e[j] = _value;
-
-
-
+for (int j=n_old; j<N; ++j) e.emplace_back(_value);
 
 return;
 
@@ -250,9 +204,7 @@ void CRR_Array<T>::set_all(const T _value)
 
 {
 
-int j;
-
-for (j=0; j<Nelements; ++j)  e[j] = _value;
+for (auto cur : e) cur = _value;
 
 return;
 
@@ -268,9 +220,7 @@ void CRR_Array<T>::set_size(int N)
 
 {
 
-extend(N);
-
-if ( N > Nelements )  Nelements = N;
+e.resize(N);
 
 return;
 
@@ -288,21 +238,16 @@ void CRR_Array<T>::dump(std::ostream & out, int depth) const
 
 Indent prefix(depth);
 
-out << prefix << "Nelements = " << Nelements << "\n";
-out << prefix << "Nalloc    = " << Nalloc    << "\n";
-out << prefix << "AllocInc  = " << AllocInc  << "\n";
+out << prefix << "Nelements = " << e.size() << "\n";
+out << prefix << "AllocInc  = " << AllocInc << "\n";
 
-
-int j;
-
-for(j=0; j<Nelements; ++j)  {
+for(int j=0; j<e.size(); ++j)  {
 
    out << prefix << "Element # " << j << " ... \n";
 
    e[j].dump(out, depth + 1);
 
 }
-
 
 out.flush();
 
@@ -348,7 +293,7 @@ void CRR_Array<T>::add(const T & a)
 
 extend(Nelements + 1, false);
 
-e[Nelements++] = a;
+e.emplace_back(a);
 
 return;
 
@@ -368,11 +313,7 @@ int j;
 
 extend(Nelements + a.n());
 
-for (j=0; j<(a.n()); ++j)  {
-
-   add(a[j]);
-
-}
+for (auto cur : a.e) e.add(cur);
 
 return;
 
@@ -388,7 +329,7 @@ T & CRR_Array<T>::operator[](int N) const
 
 {
 
-if ( (N < 0) || (N >= Nelements) )  {
+if ( (N < 0) || (N >= e.size()) )  {
 
    mlog << Error << "\nCRR_Array::operator[](int) -> "
         << "range check error ... " << N << "\n\n";
