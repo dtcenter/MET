@@ -166,13 +166,13 @@ static void process_fcst_climo_files();
 static void process_obs_file(int);
 static void process_scores();
 
-static void do_cts       (CTSInfo   *&, int, const PairDataPoint *);
-static void do_mcts      (MCTSInfo   &, int, const PairDataPoint *);
-static void do_cnt_sl1l2 (const PointStatVxOpt &, const PairDataPoint *);
-static void do_vl1l2     (VL1L2Info *&, int, const PairDataPoint *, const PairDataPoint *);
-static void do_pct       (const PointStatVxOpt &, const PairDataPoint *);
-static void do_hira_ens  (              int, const PairDataPoint *);
-static void do_hira_prob (              int, const PairDataPoint *);
+static void do_cts       (vector<CTSInfo> &,   int, const PairDataPoint *);
+static void do_mcts      (MCTSInfo   &,        int, const PairDataPoint *);
+static void do_cnt_sl1l2 (const PointStatVxOpt &,   const PairDataPoint *);
+static void do_vl1l2     (vector<VL1L2Info> &, int, const PairDataPoint *, const PairDataPoint *);
+static void do_pct       (const PointStatVxOpt &,   const PairDataPoint *);
+static void do_hira_ens  (                     int, const PairDataPoint *);
+static void do_hira_prob (                     int, const PairDataPoint *);
 
 static void finish_txt_files();
 
@@ -990,10 +990,8 @@ static void process_scores() {
    ConcatString cs;
 
    // Initialize pointers
-   MCTSInfo       mcts_info;
-   auto pd_ptr     = (PairDataPoint *) nullptr;
-   auto cts_info   = (CTSInfo *)       nullptr;
-   auto vl1l2_info = (VL1L2Info *)     nullptr;
+   MCTSInfo mcts_info;
+   auto pd_ptr = (PairDataPoint *) nullptr;
 
    mlog << Debug(2)
         << "\n" << sep_str << "\n\n";
@@ -1005,9 +1003,9 @@ static void process_scores() {
    int n_cat  = conf_info.get_max_n_cat_thresh();
    int n_wind = conf_info.get_max_n_wind_thresh();
 
-   // Allocate space for output statistics types
-   cts_info   = new CTSInfo   [n_cat];
-   vl1l2_info = new VL1L2Info [n_wind];
+   // Allocate storage
+   vector<CTSInfo> cts_info(n_cat);
+   vector<VL1L2Info> vl1l2_info(n_wind);
 
    // Compute scores for each PairData object and write output
    for(int i_vx=0; i_vx<conf_info.get_n_vx(); i_vx++) {
@@ -1171,7 +1169,7 @@ static void process_scores() {
                    conf_info.vx_opt[i_vx].output_flag[i_eclv] != STATOutputType::None)) {
 
                   // Initialize
-                  for(int i_cat=0; i_cat<n_cat; i_cat++) cts_info[i_cat].clear();
+                  for(auto c : cts_info) c.clear();
 
                   // Compute CTS Info
                   do_cts(cts_info, i_vx, pd_ptr);
@@ -1269,7 +1267,7 @@ static void process_scores() {
                   shc.set_obs_var(ugrd_vgrd_abbr_str);
 
                   // Initialize
-                  for(int i_wind=0; i_wind<n_wind; i_wind++) vl1l2_info[i_wind].clear();
+                  for(auto v : vl1l2_info) v.clear();
 
                   // Get the index of the matching u-component
                   int u_vx = conf_info.vx_opt[i_vx].vx_pd.fcst_info->uv_index();
@@ -1397,16 +1395,13 @@ static void process_scores() {
 
    } // end for i_vx
 
-   // Deallocate memory
-   if(cts_info)   { delete [] cts_info;   cts_info   = (CTSInfo *)   nullptr; }
-   if(vl1l2_info) { delete [] vl1l2_info; vl1l2_info = (VL1L2Info *) nullptr; }
-
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-static void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
+static void do_cts(vector<CTSInfo> &cts_info, int i_vx,
+                   const PairDataPoint *pd_ptr) {
    int n_cat;
 
    mlog << Debug(2)
@@ -1436,10 +1431,11 @@ static void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
    // Compute the stats, normal confidence intervals, and bootstrap
    // bootstrap confidence intervals
    //
+   CTSInfo *cts_info_ptr = cts_info.data();
    if(conf_info.vx_opt[i_vx].boot_info.interval == BootIntervalType::BCA) {
       compute_cts_stats_ci_bca(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
-         cts_info, n_cat,
+         cts_info_ptr, n_cat,
          conf_info.vx_opt[i_vx].output_flag[i_cts] != STATOutputType::None,
          conf_info.vx_opt[i_vx].rank_corr_flag,
          conf_info.tmp_dir.c_str());
@@ -1448,7 +1444,7 @@ static void do_cts(CTSInfo *&cts_info, int i_vx, const PairDataPoint *pd_ptr) {
       compute_cts_stats_ci_perc(rng_ptr, *pd_ptr,
          conf_info.vx_opt[i_vx].boot_info.n_rep,
          conf_info.vx_opt[i_vx].boot_info.rep_prop,
-         cts_info, n_cat,
+         cts_info_ptr, n_cat,
          conf_info.vx_opt[i_vx].output_flag[i_cts] != STATOutputType::None,
          conf_info.vx_opt[i_vx].rank_corr_flag,
          conf_info.tmp_dir.c_str());
@@ -1513,8 +1509,6 @@ static void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_p
    int n_bin;
    PairDataPoint pd;
    PairDataPoint pd_thr;
-   auto sl1l2_info = (SL1L2Info *) nullptr;
-   auto cnt_info   = (CNTInfo *)   nullptr;
 
    mlog << Debug(2)
         << "Computing Scalar Partial Sums and Continuous Statistics.\n";
@@ -1536,9 +1530,9 @@ static void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_p
    bool precip_flag = (vx_opt.vx_pd.fcst_info->is_precipitation() &&
                        vx_opt.vx_pd.obs_info->is_precipitation());
 
-   // Allocate memory
-   cnt_info   = new CNTInfo   [n_bin];
-   sl1l2_info = new SL1L2Info [n_bin];
+   // Create storage
+   vector<CNTInfo> cnt_info(n_bin);
+   vector<SL1L2Info> sl1l2_info(n_bin);
 
    // Process each continuous filtering threshold
    for(int i=0; i<vx_opt.fcnt_ta.n(); i++) {
@@ -1650,7 +1644,7 @@ static void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_p
             vx_opt.output_flag[i_sal1l2] != STATOutputType::None) {
 
             SL1L2Info sl1l2_mean;
-            compute_sl1l2_mean(sl1l2_info, n_bin, sl1l2_mean);
+            compute_sl1l2_mean(sl1l2_info.data(), n_bin, sl1l2_mean);
 
             // Write out SL1L2
             if(vx_opt.output_flag[i_sl1l2]  != STATOutputType::None &&
@@ -1677,7 +1671,7 @@ static void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_p
          if(vx_opt.output_flag[i_cnt] != STATOutputType::None) {
 
             CNTInfo cnt_mean;
-            compute_cnt_mean(cnt_info, n_bin, cnt_mean);
+            compute_cnt_mean(cnt_info.data(), n_bin, cnt_mean);
 
             if(cnt_mean.n > 0) {
 
@@ -1691,17 +1685,14 @@ static void do_cnt_sl1l2(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_p
 
    } // end for i (fcnt_ta)
 
-   // Dealloate memory
-   if(sl1l2_info) { delete [] sl1l2_info; sl1l2_info = (SL1L2Info *) nullptr; }
-   if(cnt_info)   { delete [] cnt_info;   cnt_info   = (CNTInfo *)   nullptr;  }
-
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-static void do_vl1l2(VL1L2Info *&v_info, int i_vx,
-                     const PairDataPoint *pd_u_ptr, const PairDataPoint *pd_v_ptr) {
+static void do_vl1l2(vector<VL1L2Info> &v_info, int i_vx,
+                     const PairDataPoint *pd_u_ptr,
+                     const PairDataPoint *pd_v_ptr) {
 
    mlog << Debug(2)
         << "Computing Vector Partial Sums and Continuous Vector Statistics.\n";
@@ -1858,9 +1849,6 @@ static void do_pct(const PointStatVxOpt &vx_opt, const PairDataPoint *pd_ptr) {
       } // end if n_bin > 1
 
    } // end for i (ocnt_ta)
-
-   // Dealloate memory
-   if(pct_info) { delete [] pct_info; pct_info = (PCTInfo *) nullptr; }
 
    return;
 }
