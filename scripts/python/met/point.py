@@ -755,7 +755,7 @@ class met_point_tools(met_base_tools):
             sep=sep,
             keep_default_na=keep_default_na,
             names=['typ', 'sid', 'vld', 'lat', 'lon', 'elv', 'var', 'lvl', 'hgt', 'qc', 'obs'],
-            dtype={'typ':'string', 'sid':'string', 'vld':'string', 'var':'string', 'qc':'string'}).values.tolist()
+            dtype={'typ':'string', 'sid':'string', 'vld':'string', 'var':'string', 'qc':'string'}).to_numpy().tolist()
       return ascii_point_data
 
 

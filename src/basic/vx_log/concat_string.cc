@@ -155,6 +155,8 @@ ConcatString & ConcatString::operator=(const char c)
 
 void ConcatString::init_from_scratch()
 {
+   Precision = bad_data_int;
+
    set_precision(concat_string_default_precision);
 }
 
