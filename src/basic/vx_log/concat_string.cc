@@ -155,7 +155,8 @@ ConcatString & ConcatString::operator=(const char c)
 
 void ConcatString::init_from_scratch()
 {
-   Precision = bad_data_int;
+   // MET #3253 Initialize to fix SonarQube reliability issue
+   Precision = 0;
 
    set_precision(concat_string_default_precision);
 }
