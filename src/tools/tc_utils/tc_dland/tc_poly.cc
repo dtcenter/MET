@@ -238,7 +238,8 @@ TCPoly TCPolyArray::operator[](int n) const {
 
 void TCPolyArray::add(const TCPoly & p) {
 
-   Poly.extend(Poly.size() + 1, false);
+   extend(Poly.size() + 1, false);
+
    Poly.emplace_back(p);
 
    return;
