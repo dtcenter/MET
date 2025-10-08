@@ -548,7 +548,9 @@ void IdentifierArray::add(const Identifier & id)
 
 extend(Nelements + 1);
 
-i[Nelements++] = id;
+i[Nelements] = id;
+
+Nelements++;
 
 return;
 
@@ -650,8 +652,9 @@ if ( has(text) )  {
 
 extend(Nelements + 1);
 
-i[Nelements++].set(text);
+i[Nelements].set(text);
 
+Nelements++;
 
    //
    //  done
