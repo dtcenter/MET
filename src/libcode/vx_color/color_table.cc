@@ -332,7 +332,7 @@ for (j=0; j<fudge_size; ++j)  {
 
 Gamma = 1.0;
 
-rescale_flag = 0;
+RescaleFlag = false;
 
 return;
 
@@ -360,7 +360,7 @@ for (int j=0; j<fudge_size; ++j)  {
 
 Gamma = c.Gamma;
 
-rescale_flag = c.rescale_flag;
+RescaleFlag = c.RescaleFlag;
 
 return;
 
@@ -388,7 +388,7 @@ double min_dist = fabs(t - Entry[0].value_low());
 
 color = Entry[0].color();
 
-for (auto e : Entry) {
+for (const auto e : Entry) {
 
    double vlo = e.value_low();
    double vhi = e.value_high();
@@ -454,7 +454,7 @@ if ( z >= Entry.back().value_high() )  return Entry.back().color();
    //  check for direct hits
    //
 
-for (auto e : Entry) {
+for (const auto e : Entry) {
 
    double vlo = e.value_low();
    double vhi = e.value_high();
@@ -597,7 +597,7 @@ if ( !out )  {
 
 }
 
-for (auto e : Entry) out << e;
+for (const auto e : Entry) out << e;
 
 out.close();
 
@@ -759,7 +759,7 @@ void ColorTable::add_entry(const CtableEntry & ce)
 
 {
 
-extend(Entry.size() + 1);
+extend((int) Entry.size() + 1);
 
 Entry.emplace_back(ce);
 
@@ -857,7 +857,7 @@ if ( Entry.empty() )  return 0.0;
 
 double v_low = 1.0e30;
 
-for(auto e : Entry) {
+for(const auto e : Entry) {
 
    if(e.value_low() < v_low &&
       !is_eq(e.value_low(), bad_data_value))
@@ -899,7 +899,7 @@ if ( Entry.empty() )  return 0.0;
 
 double v_high = -1.0e30;
 
-for(auto e : Entry) {
+for(const auto e : Entry) {
 
    if(e.value_high() > v_high &&
       !is_eq(e.value_high(), bad_data_value))
@@ -973,9 +973,9 @@ for(auto e : Entry) {
 }
 
 //
-// Set the rescale_flag to indicate that the colortable was rescaled
+// Set flag to indicate that the colortable was rescaled
 //
-rescale_flag = 1;
+RescaleFlag = true;
 
 return;
 

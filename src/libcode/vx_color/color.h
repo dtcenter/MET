@@ -224,15 +224,14 @@ class ColorTable {
 
       unsigned char fudge[fudge_size];
 
+      bool RescaleFlag;
 
    public:
-
 
       ColorTable();
      ~ColorTable();
       ColorTable(const ColorTable &);
       ColorTable & operator=(const ColorTable &);
-
 
       void clear();
 
@@ -250,7 +249,6 @@ class ColorTable {
 
       void sort();   //  sort in increasing order of data value
 
-
       Color nearest(double) const;
 
       Color interp(double) const;
@@ -258,6 +256,8 @@ class ColorTable {
       int n_entries() const;
 
       double gamma() const;
+
+      bool rescale_flag() const;
 
       void dump(std::ostream &, int depth = 0) const;
 
@@ -269,17 +269,17 @@ class ColorTable {
       double data_max(double) const;
 
       void rescale(double, double, double);
-
-      int rescale_flag;
 };
 
 
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int     ColorTable::n_entries()   const { return Entry.size(); }
+inline int    ColorTable::n_entries()    const { return (int) Entry.size(); }
 
-inline double  ColorTable::gamma()       const { return Gamma; }
+inline double ColorTable::gamma()        const { return Gamma; }
+
+inline bool   ColorTable::rescale_flag() const { return RescaleFlag; }
 
 
 ////////////////////////////////////////////////////////////////////////
