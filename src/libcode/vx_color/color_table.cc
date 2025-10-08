@@ -388,7 +388,7 @@ double min_dist = fabs(t - Entry[0].value_low());
 
 color = Entry[0].color();
 
-for (const auto e : Entry) {
+for (const auto &e : Entry) {
 
    double vlo = e.value_low();
    double vhi = e.value_high();
@@ -454,7 +454,7 @@ if ( z >= Entry.back().value_high() )  return Entry.back().color();
    //  check for direct hits
    //
 
-for (const auto e : Entry) {
+for (const auto &e : Entry) {
 
    double vlo = e.value_low();
    double vhi = e.value_high();
@@ -597,7 +597,7 @@ if ( !out )  {
 
 }
 
-for (const auto e : Entry) out << e;
+for (const auto &e : Entry) out << e;
 
 out.close();
 
@@ -857,7 +857,7 @@ if ( Entry.empty() )  return 0.0;
 
 double v_low = 1.0e30;
 
-for(const auto e : Entry) {
+for(const auto &e : Entry) {
 
    if(e.value_low() < v_low &&
       !is_eq(e.value_low(), bad_data_value))
@@ -899,7 +899,7 @@ if ( Entry.empty() )  return 0.0;
 
 double v_high = -1.0e30;
 
-for(const auto e : Entry) {
+for(const auto &e : Entry) {
 
    if(e.value_high() > v_high &&
       !is_eq(e.value_high(), bad_data_value))

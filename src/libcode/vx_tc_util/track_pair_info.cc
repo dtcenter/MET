@@ -1045,7 +1045,7 @@ const TrackPairInfo & TrackPairInfoArray::operator[](int n) const {
 int TrackPairInfoArray::n_points() const {
 
    int n = 0;
-   for(const auto p : Pair) n += p.adeck().n_points();
+   for(const auto &p : Pair) n += p.adeck().n_points();
 
    return n;
 }
@@ -1055,7 +1055,7 @@ int TrackPairInfoArray::n_points() const {
 int TrackPairInfoArray::max_n_diag() const {
 
    int n = 0;
-   for(const auto p : Pair) {
+   for(const auto &p : Pair) {
       if(p.adeck().n_diag() > n) n = p.adeck().n_diag();
    }
 

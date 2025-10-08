@@ -279,7 +279,7 @@ void TCPolyArray::set_check_dist() {
  
    // Compute the distance from the polyline centroid to the north
    // and south poles.
-   for(const auto p : Poly) {
+   for(const auto &p : Poly) {
       dnp.add(gc_dist(p.LatCen, p.LonCen,  90.0, 0.0));
       dsp.add(gc_dist(p.LatCen, p.LonCen, -90.0, 0.0));
    }
