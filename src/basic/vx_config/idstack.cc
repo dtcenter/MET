@@ -380,7 +380,7 @@ if ( has(text) )  {
 
 extend((int) i.size() + 1);
 
-i.emplace_back(string(text));
+i.emplace_back(text);
 
    //
    //  done
