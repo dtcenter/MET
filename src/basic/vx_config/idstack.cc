@@ -286,7 +286,7 @@ void IdentifierArray::add(const string & s)
 
 {
 
-extend(i.size() + 1);
+extend((int) i.size() + 1);
 
 i.emplace_back(s);
 
@@ -330,9 +330,9 @@ bool IdentifierArray::has(const char * text) const
 
 {
 
-for (int j=0; j<i.size(); ++j)  {
+for (const auto &j : i) {
 
-   if ( i[j].compare(text) == 0 )  return true;
+   if ( j.compare(text) == 0 )  return true;
 
 }
 
@@ -378,11 +378,9 @@ if ( has(text) )  {
 
 }
 
-extend(i.size() + 1);
+extend((int) i.size() + 1);
 
-string s(text);
-
-i.emplace_back(s);
+i.emplace_back(string(text));
 
    //
    //  done
