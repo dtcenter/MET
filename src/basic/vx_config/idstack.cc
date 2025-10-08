@@ -1,8 +1,4 @@
-
-
 ////////////////////////////////////////////////////////////////////////
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -10,10 +6,7 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 ////////////////////////////////////////////////////////////////////////
-
 
 #include <iostream>
 #include <unistd.h>
@@ -25,157 +18,15 @@
 
 using namespace std;
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 static const int id_array_jump = 30;
 
-
 ////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for class Identifier
-   //
-
-
+//
+//  Code for class IdentifierQueue
+//
 ////////////////////////////////////////////////////////////////////////
-
-
-Identifier::Identifier()
-
-{
-
-init_from_scratch();
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-Identifier::~Identifier()
-
-{
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-Identifier::Identifier(const Identifier & i)
-
-{
-
-init_from_scratch();
-
-assign(i);
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-Identifier & Identifier::operator=(const Identifier & i)
-
-{
-
-if ( this == &i )  return *this;
-
-assign(i);
-
-return *this;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void Identifier::init_from_scratch()
-
-{
-
-clear();
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void Identifier::assign(const Identifier & i)
-
-{
-
-clear();
-
-name = i.name;
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void Identifier::clear()
-
-{
-
-name.clear();
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void Identifier::set(const char * text)
-
-{
-
-clear();
-
-name.assign(text);
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-void Identifier::dump(ostream & out, int indent_depth) const
-
-{
-
-Indent prefix(indent_depth);
-
-out << prefix << "\"" << name << "\"\n";
-
-return;
-
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-   //
-   //  Code for class IdentifierQueue
-   //
-
-
-////////////////////////////////////////////////////////////////////////
-
 
 IdentifierQueue::IdentifierQueue()
 
@@ -185,9 +36,7 @@ init_from_scratch();
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 IdentifierQueue::~IdentifierQueue()
 
@@ -197,9 +46,7 @@ clear();
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 IdentifierQueue::IdentifierQueue(const IdentifierQueue & iq)
 
@@ -211,9 +58,7 @@ assign(iq);
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 IdentifierQueue & IdentifierQueue::operator=(const IdentifierQueue & iq)
 
@@ -227,9 +72,7 @@ return *this;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void IdentifierQueue::init_from_scratch()
 
@@ -239,9 +82,7 @@ return;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void IdentifierQueue::clear()
 
@@ -271,7 +112,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void IdentifierQueue::push(const Identifier & id)
+void IdentifierQueue::push(const string & id)
 
 {
 
@@ -285,23 +126,24 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-Identifier IdentifierQueue::pop()
+string IdentifierQueue::pop()
 
 {
 
 if ( i.empty() )  {
 
-   cerr << "\n\n  IdentifierQueue::pop() -> queue empty!\n\n";
+   cerr << "\nIdentifierQueue::pop() -> "
+        << "queue empty!\n\n";
 
    exit ( 1 );
 
 }
 
-Identifier id = i[0];
+string s = i[0];
 
 i.erase(i.begin());
 
-return id;
+return s;
 
 }
 
@@ -321,7 +163,7 @@ IdentifierArray::IdentifierArray()
 
 {
 
-init_from_scratch();
+clear();
 
 }
 
@@ -337,23 +179,19 @@ clear();
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 IdentifierArray::IdentifierArray(const IdentifierArray & a)
 
 {
 
-init_from_scratch();
+clear();
 
 assign(a);
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 IdentifierArray & IdentifierArray::operator=(const IdentifierArray & a)
 
@@ -367,9 +205,7 @@ return *this;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void IdentifierArray::init_from_scratch()
 
@@ -381,9 +217,7 @@ return;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void IdentifierArray::clear()
 
@@ -395,9 +229,7 @@ return;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void IdentifierArray::assign(const IdentifierArray & a)
 
@@ -411,9 +243,7 @@ return;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void IdentifierArray::extend(int n)
 
@@ -431,11 +261,9 @@ return;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-const Identifier & IdentifierArray::operator[](int k) const
+const string & IdentifierArray::operator[](int k) const
 
 {
 
@@ -448,30 +276,25 @@ if ( (k < 0) || (k >= i.size()) )  {
 
 }
 
-
 return i[k];
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-void IdentifierArray::add(const Identifier & id)
+void IdentifierArray::add(const string & s)
 
 {
 
 extend(i.size() + 1);
 
-i.emplace_back(id);
+i.emplace_back(s);
 
 return;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void IdentifierArray::dump(ostream & out, int indent_depth) const
 
@@ -479,13 +302,15 @@ void IdentifierArray::dump(ostream & out, int indent_depth) const
 
 Indent prefix(indent_depth);
 
+Indent prefix2(indent_depth + 1);
+
 out << prefix << "Nelements = " << i.size() << "\n";
 
 for (int j=0; j<i.size(); ++j)  {
 
    out << "Element # " << j << " ...\n";
 
-   i[j].dump(out, indent_depth + 1);
+   out << prefix2 << "\"" << i[j] << "\"\n";
 
 }
 
@@ -499,9 +324,7 @@ return;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 bool IdentifierArray::has(const char * text) const
 
@@ -509,7 +332,7 @@ bool IdentifierArray::has(const char * text) const
 
 for (int j=0; j<i.size(); ++j)  {
 
-   if ( i[j].name.compare(text) == 0 )  return true;
+   if ( i[j].compare(text) == 0 )  return true;
 
 }
 
@@ -517,9 +340,7 @@ return false;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 bool IdentifierArray::has(const char * text, int & index) const
 
@@ -529,7 +350,7 @@ index = -1;
 
 for (int j=0; j<i.size(); ++j)  {
 
-   if ( i[j].name.compare(text) == 0 )  { index = j; return true; }
+   if ( i[j].compare(text) == 0 )  { index = j; return true; }
 
 }
 
@@ -537,9 +358,7 @@ return false;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
 
 void IdentifierArray::add(const char * text)
 
@@ -561,11 +380,9 @@ if ( has(text) )  {
 
 extend(i.size() + 1);
 
-Identifier id;
+string s(text);
 
-id.set(text);
-
-i.emplace_back(id);
+i.emplace_back(s);
 
    //
    //  done
@@ -575,6 +392,4 @@ return;
 
 }
 
-
 ////////////////////////////////////////////////////////////////////////
-
