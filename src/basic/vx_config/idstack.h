@@ -20,7 +20,9 @@
 ////////////////////////////////////////////////////////////////////////
 
 
+#include <array>
 #include <string>
+#include <vector>
 
 #include "indent.h"
 
@@ -62,12 +64,6 @@ class Identifier {
 ////////////////////////////////////////////////////////////////////////
 
 
-static const int max_id_queue_size = 30;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
 class IdentifierQueue {
 
    private:
@@ -76,9 +72,7 @@ class IdentifierQueue {
 
       void assign(const IdentifierQueue &);
 
-      int Nelements;
-
-      Identifier * i[max_id_queue_size];
+      std::vector<Identifier> i;
 
    public:
 
@@ -101,7 +95,7 @@ class IdentifierQueue {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int IdentifierQueue::n_elements() const { return Nelements; }
+inline int IdentifierQueue::n_elements() const { return (int) i.size(); }
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -117,12 +111,7 @@ class IdentifierArray {
 
       void extend(int);
 
-
-      int Nelements;
-
-      int Nalloc;
-
-      Identifier * i;
+      std::vector<Identifier> i;
 
    public:
 
@@ -153,7 +142,7 @@ class IdentifierArray {
 ////////////////////////////////////////////////////////////////////////
 
 
-inline int IdentifierArray::n_elements() const { return Nelements; }
+inline int IdentifierArray::n_elements() const { return (int) i.size(); }
 
 
 ////////////////////////////////////////////////////////////////////////
