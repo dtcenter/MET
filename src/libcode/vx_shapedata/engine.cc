@@ -234,15 +234,9 @@ void ModeFuzzyEngine::set_grid(const Grid *g) {
 ///////////////////////////////////////////////////////////////////////
 
 void ModeFuzzyEngine::clear_colors() {
-   int j;
 
-   for(j=0; j<(fcst_color.n()); j++) {
-      fcst_color[j] = unmatched_color;
-   }
-
-   for(j=0; j<(obs_color.n()); j++) {
-      obs_color[j]  = unmatched_color;
-   }
+   for(auto &c : fcst_color) c = unmatched_color;
+   for(auto &c :  obs_color) c = unmatched_color;
 
    return;
 }
@@ -1102,7 +1096,7 @@ void ModeFuzzyEngine::do_no_match() {
    //
    // Do the single features
    //
-   fcst_single.set_size(n_fcst);
+   fcst_single.resize(n_fcst);
 
 #pragma omp parallel default(none) \
    shared(fcst_raw, fcst_thresh, fcst_split, conf_info) \
@@ -1120,7 +1114,7 @@ void ModeFuzzyEngine::do_no_match() {
       }
    } // End omp parallel
 
-   obs_single.set_size(n_obs);
+   obs_single.resize(n_obs);
 
 #pragma omp parallel default(none) \
    shared(obs_raw, obs_thresh, obs_split, conf_info) \
@@ -1141,7 +1135,7 @@ void ModeFuzzyEngine::do_no_match() {
    //
    // Set all interest values to zero
    //
-   info_singles.set_size(n_fcst*n_obs);
+   info_singles.resize(n_fcst*n_obs);
 
 #pragma omp parallel default(none) \
    shared(n_fcst, n_obs, info_singles, conf_info)
@@ -1171,13 +1165,11 @@ void ModeFuzzyEngine::do_no_match() {
    //
    // Assign the (unmatched) colors
    //
-   fcst_color.extend(n_fcst);
+   fcst_color.resize(n_fcst);
+   for(auto &c : fcst_color) c = unmatched_color;
 
-   for(int j=0; j<n_fcst; j++) fcst_color.add(unmatched_color);
-
-   obs_color.extend(n_obs);
-
-   for(int j=0; j<n_obs; j++) obs_color.add(unmatched_color);
+   obs_color.resize(n_obs);
+   for(auto &c : obs_color) c = unmatched_color;
 
    //
    // Done
@@ -1199,7 +1191,7 @@ void ModeFuzzyEngine::do_match_merge() {
    //
    // Do the single features
    //
-   fcst_single.set_size(n_fcst);
+   fcst_single.resize(n_fcst);
 
 #pragma omp parallel default(none) \
    shared(fcst_raw, fcst_thresh, fcst_split, conf_info) \
@@ -1217,7 +1209,7 @@ void ModeFuzzyEngine::do_match_merge() {
       }
    } // End omp parallel
 
-   obs_single.set_size(n_obs);
+   obs_single.resize(n_obs);
 
 #pragma omp parallel default(none) \
    shared(obs_raw, obs_thresh, obs_split, conf_info) \
@@ -1238,7 +1230,7 @@ void ModeFuzzyEngine::do_match_merge() {
    //
    // Do the pair features
    //
-   pair_single.set_size(n_fcst*n_obs);
+   pair_single.resize(n_fcst*n_obs);
 
 #pragma omp parallel default(none) \
    shared(n_fcst, n_obs, fcst_single, obs_single, conf_info)
@@ -1261,7 +1253,7 @@ void ModeFuzzyEngine::do_match_merge() {
    //
    // Calculate the interest values
    //
-   info_singles.set_size(n_fcst*n_obs);
+   info_singles.resize(n_fcst*n_obs);
 
 #pragma omp parallel default(none) \
    shared(n_fcst, n_obs, info_singles, conf_info)
@@ -1328,10 +1320,10 @@ void ModeFuzzyEngine::do_match_merge() {
            << ") ... reusing some colors!\n\n";
    }
 
-   fcst_color.extend(n_fcst);
+   fcst_color.resize(n_fcst);
 
    for(int j=0; j<n_fcst; j++) {
-      fcst_color.add(unmatched_color);
+      fcst_color[j] = unmatched_color;
 
       for(int k=0; k<(collection.n_sets); k++) {
 
@@ -1342,10 +1334,10 @@ void ModeFuzzyEngine::do_match_merge() {
       }
    }
 
-   obs_color.extend(n_obs);
+   obs_color.resize(n_obs);
 
    for(int j=0; j<n_obs; j++) {
-      obs_color.add(unmatched_color);
+      obs_color[j] = unmatched_color;
 
       for(int k=0; k<(collection.n_sets); k++) {
 
@@ -2082,7 +2074,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    //
    // Do the single features
    //
-   fcst_single.set_size(n_fcst);
+   fcst_single.resize(n_fcst);
 
 #pragma omp parallel default(none) \
    shared(fcst_raw, fcst_thresh, fcst_split, conf_info) \
@@ -2100,7 +2092,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
       }
    } // End omp parallel
 
-   obs_single.set_size(n_obs);
+   obs_single.resize(n_obs);
 
 #pragma omp parallel default(none) \
    shared(obs_raw, obs_thresh, obs_split, conf_info) \
@@ -2121,7 +2113,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    //
    // Do the pair features
    //
-   pair_single.set_size(n_fcst*n_obs);
+   pair_single.resize(n_fcst*n_obs);
 
 #pragma omp parallel default(none) \
    shared(n_fcst, n_obs, fcst_single, obs_single, conf_info)
@@ -2144,7 +2136,7 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
    //
    // Calculate the interest values
    //
-   info_singles.set_size(n_fcst*n_obs);
+   info_singles.resize(n_fcst*n_obs);
 
 #pragma omp parallel default(none) \
    shared(n_fcst, n_obs, info_singles, conf_info)
@@ -2219,10 +2211,10 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
            << ") ... reusing some colors!\n\n";
    }
 
-   fcst_color.extend(n_fcst);
+   fcst_color.resize(n_fcst);
 
    for(int j=0; j<n_fcst; j++) {
-      fcst_color.add(unmatched_color);
+      fcst_color[j] = unmatched_color;
 
       for(int k=0; k<(collection.n_sets); k++) {
 
@@ -2234,10 +2226,10 @@ void ModeFuzzyEngine::do_match_fcst_merge() {
 
    }
 
-   obs_color.extend(n_obs);
+   obs_color.resize(n_obs);
 
    for(int j=0; j<n_obs; j++) {
-      obs_color.add(unmatched_color);
+      obs_color[j] = unmatched_color;
 
       for(int k=0; k<(collection.n_sets); k++) {
 
@@ -2273,7 +2265,7 @@ void ModeFuzzyEngine::do_match_only() {
    //
    // Do the single features
    //
-   fcst_single.set_size(n_fcst);
+   fcst_single.resize(n_fcst);
 
 #pragma omp parallel default(none) \
    shared(fcst_raw, fcst_thresh, fcst_split, conf_info) \
@@ -2291,7 +2283,7 @@ void ModeFuzzyEngine::do_match_only() {
       }
    } // End omp parallel
 
-   obs_single.set_size(n_obs);
+   obs_single.resize(n_obs);
 
 #pragma omp parallel default(none) \
    shared(obs_raw, obs_thresh, obs_split, conf_info) \
@@ -2312,7 +2304,7 @@ void ModeFuzzyEngine::do_match_only() {
    //
    // Do the pair features
    //
-   pair_single.set_size(n_fcst*n_obs);
+   pair_single.resize(n_fcst*n_obs);
 
 #pragma omp parallel default(none) \
    shared(n_fcst, n_obs, fcst_single, obs_single, conf_info)
@@ -2335,7 +2327,7 @@ void ModeFuzzyEngine::do_match_only() {
    //
    // Calculate the interest values
    //
-   info_singles.set_size(n_fcst*n_obs);
+   info_singles.resize(n_fcst*n_obs);
 
 #pragma omp parallel default(none) \
    shared(n_fcst, n_obs, info_singles, conf_info)
@@ -2409,10 +2401,10 @@ void ModeFuzzyEngine::do_match_only() {
            << ") ... reusing some colors!\n\n";
    }
 
-   fcst_color.extend(n_fcst);
+   fcst_color.resize(n_fcst);
 
    for(int j=0; j<n_fcst; j++) {
-      fcst_color.add(unmatched_color);
+      fcst_color[j] = unmatched_color;
 
       for(int k=0; k<(collection.n_sets); k++) {
          if(collection.set[k].has_fcst(j+1)) {
@@ -2422,10 +2414,10 @@ void ModeFuzzyEngine::do_match_only() {
       }
    }
 
-   obs_color.extend(n_obs);
+   obs_color.resize(n_obs);
 
    for(int j=0; j<n_obs; j++) {
-      obs_color.add(unmatched_color);
+      obs_color[j] = unmatched_color;
 
       for(int k=0; k<(collection.n_sets); k++) {
          if(collection.set[k].has_obs(j+1)) {
@@ -2538,8 +2530,8 @@ void ModeFuzzyEngine::do_cluster_features() {
    //
    // Do the single features for clusters
    //
-   fcst_cluster.set_size(n_clus);
-    obs_cluster.set_size(n_clus);
+   fcst_cluster.resize(n_clus);
+    obs_cluster.resize(n_clus);
 
 #pragma omp parallel default(none) \
    shared(fcst_raw, fcst_thresh, fcst_clus_split, conf_info) \
@@ -2567,7 +2559,7 @@ void ModeFuzzyEngine::do_cluster_features() {
    //
    // Do the pair features
    //
-   pair_cluster.set_size(n_clus);
+   pair_cluster.resize(n_clus);
 
 #pragma omp parallel default(none) \
    shared(n_clus, fcst_cluster, obs_cluster, pair_cluster, conf_info)
@@ -2584,7 +2576,7 @@ void ModeFuzzyEngine::do_cluster_features() {
    //
    // Calculate the interest values
    //
-   info_clus.set_size(n_clus);
+   info_clus.resize(n_clus);
 
 #pragma omp parallel default(none) \
    shared(n_clus, info_clus, pair_cluster, conf_info)
@@ -2619,9 +2611,8 @@ void ModeFuzzyEngine::set_data_type(ModeDataType type)
 ///////////////////////////////////////////////////////////////////////
 
 int ModeFuzzyEngine::get_info_index(int pair_n) const {
-   int i;
 
-   for(i=0; i<(info_singles.n()); i++) {
+   for(int i=0; i<info_singles.size(); i++) {
 
       if(info_singles[i].pair_number == pair_n) return i;
 

@@ -1,6 +1,4 @@
 ////////////////////////////////////////////////////////////////////////
-
-
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 // ** Copyright UCAR (c) 1992 - 2025
 // ** University Corporation for Atmospheric Research (UCAR)
@@ -8,65 +6,19 @@
 // ** Research Applications Lab (RAL)
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-
-
 ////////////////////////////////////////////////////////////////////////
-
 
 #ifndef  __ID_STACK_H__
 #define  __ID_STACK_H__
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
 #include <string>
+#include <vector>
 
 #include "indent.h"
 
 ////////////////////////////////////////////////////////////////////////
-
-
-static const int max_id_size = 128;
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-class Identifier {
-
-   private:
-
-      void init_from_scratch();
-
-      void assign(const Identifier &);
-
-   public:
-
-      Identifier();
-     ~Identifier();
-      Identifier(const Identifier &);
-      Identifier & operator=(const Identifier &);
-
-      std::string name;
-
-      void clear();
-
-      void set(const char *);
-
-      void dump(std::ostream &, int depth = 0) const;
-
-};
-
-
-////////////////////////////////////////////////////////////////////////
-
-
-static const int max_id_queue_size = 30;
-
-
-////////////////////////////////////////////////////////////////////////
-
 
 class IdentifierQueue {
 
@@ -76,9 +28,7 @@ class IdentifierQueue {
 
       void assign(const IdentifierQueue &);
 
-      int Nelements;
-
-      Identifier * i[max_id_queue_size];
+      std::vector<std::string> i;
 
    public:
 
@@ -87,9 +37,9 @@ class IdentifierQueue {
       IdentifierQueue(const IdentifierQueue &);
       IdentifierQueue & operator=(const IdentifierQueue &);
 
-      void push(const Identifier &);
+      void push(const std::string &);
 
-      Identifier pop();
+      std::string pop();
 
       int n_elements() const;
 
@@ -97,32 +47,23 @@ class IdentifierQueue {
 
 };
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-inline int IdentifierQueue::n_elements() const { return Nelements; }
-
+inline int IdentifierQueue::n_elements() const { return (int) i.size(); }
 
 ////////////////////////////////////////////////////////////////////////
-
 
 class IdentifierArray {
 
    private:
 
-      void init_from_scratch();
+      void init_from_scratch(); 
 
       void assign(const IdentifierArray &);
 
       void extend(int);
 
-
-      int Nelements;
-
-      int Nalloc;
-
-      Identifier * i;
+      std::vector<std::string> i;
 
    public:
 
@@ -137,9 +78,9 @@ class IdentifierArray {
 
       void add(const char *);
 
-      const Identifier & operator[](int) const;
+      const std::string & operator[](int) const;
 
-      void add(const Identifier &);
+      void add(const std::string &);
 
       void dump(std::ostream &, int depth = 0) const;
 
@@ -149,22 +90,13 @@ class IdentifierArray {
 
 };
 
-
 ////////////////////////////////////////////////////////////////////////
 
-
-inline int IdentifierArray::n_elements() const { return Nelements; }
-
+inline int IdentifierArray::n_elements() const { return (int) i.size(); }
 
 ////////////////////////////////////////////////////////////////////////
-
 
 #endif   /*  __ID_STACK_H__  */
 
-
 ////////////////////////////////////////////////////////////////////////
-
-
-
-
 
