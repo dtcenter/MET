@@ -322,15 +322,15 @@ void ColorTable::clear()
 
 {
 
-int j;
+Entry.clear();
 
-for (j=0; j<fudge_size; ++j)  {
+Gamma = 1.0;
+
+for (int j=0; j<fudge_size; ++j)  {
 
    fudge[j] = (unsigned char) j;
 
 }
-
-Gamma = 1.0;
 
 RescaleFlag = false;
 
@@ -352,13 +352,13 @@ extend(c.n_entries());
 
 Entry = c.Entry;
 
+Gamma = c.Gamma;
+
 for (int j=0; j<fudge_size; ++j)  {
 
    fudge[j] = c.fudge[j];
 
 }
-
-Gamma = c.Gamma;
 
 RescaleFlag = c.RescaleFlag;
 
