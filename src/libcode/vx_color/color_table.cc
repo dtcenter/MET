@@ -668,7 +668,7 @@ void ColorTable::set_gray()
 
 {
 
-for (auto e : Entry) {
+for (auto &e : Entry) {
 
    Color c = e.color();
 
@@ -690,7 +690,7 @@ void ColorTable::tint(const Color & c, double t)
 
 {
 
-for (auto e : Entry) {
+for (auto &e : Entry) {
 
    Color cc = blend_colors(e.color(), c, t);
 
@@ -938,7 +938,7 @@ double old_m = data_max(bad_data_value) - data_min(bad_data_value);
 double new_b = new_min;
 double new_m = new_max - new_min;
 
-for(auto e : Entry) {
+for(auto &e : Entry) {
 
    double old_v_lo = e.value_low();
    double old_v_hi = e.value_high();

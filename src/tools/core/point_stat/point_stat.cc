@@ -1169,7 +1169,7 @@ static void process_scores() {
                    conf_info.vx_opt[i_vx].output_flag[i_eclv] != STATOutputType::None)) {
 
                   // Initialize
-                  for(auto c : cts_info) c.clear();
+                  for(auto &c : cts_info) c.clear();
 
                   // Compute CTS Info
                   do_cts(cts_info, i_vx, pd_ptr);
@@ -1267,7 +1267,7 @@ static void process_scores() {
                   shc.set_obs_var(ugrd_vgrd_abbr_str);
 
                   // Initialize
-                  for(auto v : vl1l2_info) v.clear();
+                  for(auto &v : vl1l2_info) v.clear();
 
                   // Get the index of the matching u-component
                   int u_vx = conf_info.vx_opt[i_vx].vx_pd.fcst_info->uv_index();

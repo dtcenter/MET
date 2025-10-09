@@ -235,8 +235,8 @@ void ModeFuzzyEngine::set_grid(const Grid *g) {
 
 void ModeFuzzyEngine::clear_colors() {
 
-   for(auto c : fcst_color) c = unmatched_color;
-   for(auto c :  obs_color) c = unmatched_color;
+   for(auto &c : fcst_color) c = unmatched_color;
+   for(auto &c :  obs_color) c = unmatched_color;
 
    return;
 }
@@ -1166,10 +1166,10 @@ void ModeFuzzyEngine::do_no_match() {
    // Assign the (unmatched) colors
    //
    fcst_color.resize(n_fcst);
-   for(auto c : fcst_color) c = unmatched_color;
+   for(auto &c : fcst_color) c = unmatched_color;
 
    obs_color.resize(n_obs);
-   for(auto c : obs_color) c = unmatched_color;
+   for(auto &c : obs_color) c = unmatched_color;
 
    //
    // Done

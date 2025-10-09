@@ -1078,7 +1078,7 @@ void TrackPairInfoArray::add_watch_warn(const ConcatString &ww_sid,
                                         WatchWarnType ww_type,
                                         unixtime ww_ut) {
 
-   for(auto p : Pair) p.add_watch_warn(ww_sid, ww_type, ww_ut);
+   for(auto &p : Pair) p.add_watch_warn(ww_sid, ww_type, ww_ut);
 
    return;
 }
@@ -1091,7 +1091,7 @@ void TrackPairInfoArray::subset_write_valid(const TimeArray &ta) {
    if(ta.n() == 0) return;
 
    // Check each point for requested valid times
-   for(auto p : Pair) {
+   for(auto &p : Pair) {
       for(int i=0; i<p.n_points(); i++) {
          int keep = (ta.has(p.valid(i)) ? 1 : 0);
          p.set_keep(i, keep);
