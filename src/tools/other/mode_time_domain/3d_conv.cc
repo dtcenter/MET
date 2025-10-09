@@ -225,7 +225,6 @@ double value;
 MtdFloatFile out;
 double min_conv_value;
 double max_conv_value;
-auto conv_data = (double *) nullptr;
 DataHandle handle;
 
 const int time_radius = time_end - time_beg + 1;
@@ -252,17 +251,7 @@ ok_sum_plane_buf = new bool   [Nxy];
 
 handle.set_size(Nx, Ny, time_radius);
 
-conv_data = new double [Nxyz];
-for (int k=0; k<Nxyz; k++) conv_data[k] = bad_data_double;
-
-if ( !conv_data )  {
-
-   mlog << Error << "\nMtdFloatFile::convolve(const int, const int, const int) const: process() -> "
-        << "memory allocation error\n\n";
-
-   exit ( 1 );
-
-}
+vector<double> conv_data(Nxyz, bad_data_double);
 
    //
    //  get the min/max convolved data values
@@ -277,7 +266,7 @@ for (int t=0; t<Nt; ++t)  {
 
    n = mtd_three_to_one(Nx, Ny, Nt, 0, 0, t);
 
-   p = conv_data + n;
+   p = conv_data.data() + n;
 
    load_handle(handle, *this, t, time_beg, time_end);
 
@@ -407,8 +396,6 @@ for (int x=0; x<Nx; ++x)  {
    //
    //  done
    //
-
-if ( conv_data )  { delete [] conv_data;  conv_data = (double *) nullptr; }
 
 if (    sum_plane_buf )  { delete []    sum_plane_buf;     sum_plane_buf = nullptr; }
 if ( ok_sum_plane_buf )  { delete [] ok_sum_plane_buf;  ok_sum_plane_buf = nullptr; }

@@ -170,8 +170,6 @@ TCPolyArray & TCPolyArray::operator=(const TCPolyArray & a) {
 
 void TCPolyArray::init_from_scratch() {
 
-   Poly = (TCPoly *) nullptr;
-
    clear();
 
    return;
@@ -181,9 +179,7 @@ void TCPolyArray::init_from_scratch() {
 
 void TCPolyArray::clear() {
 
-   if(Poly) { delete [] Poly;  Poly = (TCPoly *) nullptr; }
-   
-   NPolys = NAlloc = 0;
+   Poly.clear();
 
    CheckDist = bad_data_double;
 
@@ -193,17 +189,15 @@ void TCPolyArray::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void TCPolyArray::assign(const TCPolyArray & a) {
-   int i;
 
    clear();
 
-   if(a.NPolys == 0) return;
+   if(a.n_polys() == 0) return;
 
-   extend(a.NPolys);
+   extend(a.n_polys());
 
-   for(i=0; i<(a.NPolys); i++) Poly[i] = a.Poly[i];
+   for(int i=0; i<a.n_polys(); i++) Poly[i] = a.Poly[i];
 
-   NPolys = a.NPolys;
    CheckDist = a.CheckDist;
 
    return;
@@ -212,9 +206,6 @@ void TCPolyArray::assign(const TCPolyArray & a) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCPolyArray::extend(int n, bool exact) {
-   int i;
-
-   if(NAlloc >= n) return;
 
    if(!exact) {
       int k = n/tc_poly_array_alloc_inc;
@@ -224,24 +215,7 @@ void TCPolyArray::extend(int n, bool exact) {
       n = k*tc_poly_array_alloc_inc;
    }
 
-   TCPoly * p = (TCPoly *) nullptr;
-
-   p = new TCPoly [n];
-
-   if(!p) {
-      mlog << Error << "\nvoid TCPolyArray::extend(int, bool) -> "
-           << "memory allocation error\n\n";
-      exit(1);
-   }
-
-   if(Poly) {
-      for(i=0; i<NPolys; i++) p[i] = Poly[i];
-      delete [] Poly; Poly = (TCPoly *) nullptr;
-   }
-
-   Poly = p; p = (TCPoly *) nullptr;
-
-   NAlloc = n;
+   Poly.reserve(n);
 
    return;
 }
@@ -250,7 +224,7 @@ void TCPolyArray::extend(int n, bool exact) {
 
 TCPoly TCPolyArray::operator[](int n) const {
 
-   if(n < 0 || n >= NPolys) {
+   if(n < 0 || n >= Poly.size()) {
       mlog << Error << "\nTCPolyArray::operator[](int) const -> "
            << "range check error\n\n";
       exit(1);
@@ -263,9 +237,9 @@ TCPoly TCPolyArray::operator[](int n) const {
 
 void TCPolyArray::add(const TCPoly & p) {
 
-   extend(NPolys + 1, false);
-   
-   Poly[NPolys++] = p;
+   extend((int) Poly.size() + 1, false);
+
+   Poly.emplace_back(p);
 
    return;
 }
@@ -275,8 +249,7 @@ void TCPolyArray::add(const TCPoly & p) {
 bool TCPolyArray::add_file(const char *filename) {
    ifstream in;
    TCPoly p;
-   int n = 0;
-   
+
    // Open the input file
    in.open(filename);
 
@@ -288,6 +261,7 @@ bool TCPolyArray::add_file(const char *filename) {
    }
    
    // Parse the TC Polylines
+   int n = 0;
    while(in >> p) { add(p); n++; }
    
    mlog << Debug(3)
@@ -300,14 +274,14 @@ bool TCPolyArray::add_file(const char *filename) {
 ////////////////////////////////////////////////////////////////////////
 
 void TCPolyArray::set_check_dist() {
-   int i;
-   NumArray dsp, dnp;
+   NumArray dnp;
+   NumArray dsp;
  
    // Compute the distance from the polyline centroid to the north
    // and south poles.
-   for(i=0; i<NPolys; i++) {
-      dnp.add(gc_dist(Poly[i].LatCen, Poly[i].LonCen,  90.0, 0.0));
-      dsp.add(gc_dist(Poly[i].LatCen, Poly[i].LonCen, -90.0, 0.0));
+   for(const auto &p : Poly) {
+      dnp.add(gc_dist(p.LatCen, p.LonCen,  90.0, 0.0));
+      dsp.add(gc_dist(p.LatCen, p.LonCen, -90.0, 0.0));
    }
    
    // Find the maximum of the minimum distances to each pole.
@@ -323,20 +297,19 @@ void TCPolyArray::set_check_dist() {
 ////////////////////////////////////////////////////////////////////////
 
 double TCPolyArray::min_dist(double lat, double lon, int &imin) const {
-   int i;
-   double dcur, dmin, dcen;
    
    // Loop through the polylines
-   for(i=0, dmin=bad_data_double; i<NPolys; i++) {
+   double dmin = bad_data_double;
+   for(int i=0; i<Poly.size(); i++) {
 
       // Skip polylines whose centroids are too far away
       if(!is_bad_data(CheckDist)) {
-         dcen = gc_dist(Poly[i].LatCen, Poly[i].LonCen, lat, lon);
+         double dcen = gc_dist(Poly[i].LatCen, Poly[i].LonCen, lat, lon);
          if(dcen > CheckDist) continue;
       }
 
       // Get the minimum distance to the current polyline
-      dcur = Poly[i].min_dist(lat, lon);
+      double dcur = Poly[i].min_dist(lat, lon);
 
       // Keep track of the array minimum
       if(is_bad_data(dmin)) { dmin = dcur; imin = i; }
