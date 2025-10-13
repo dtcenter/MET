@@ -2582,13 +2582,13 @@ SurfaceInfo parse_conf_surface_info(Dictionary *dict) {
    // Check for a valid lapse rate value
    if(sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
       is_bad_data(sfc_info.lapse_rate_correction_value)) {
+      ConcatString config_const(replace_path(config_const_filename));
       mlog << Error << "\n" << method_name
            << "when \"" << conf_key_lapse_rate_correction_apply_to
            << " = " << fieldtype_to_string(sfc_info.lapse_rate_correction_apply_to)
            << "\", \"" << conf_key_lapse_rate_correction_value
            << "\" must be set to a valid lapse rate value.\n"
-           << "See options in " << replace_path(config_const_filename)
-           << ".\n\n";
+           << "See recommended values in: " << config_const << "\n\n";
       exit(1);
    }
  
