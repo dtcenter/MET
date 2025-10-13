@@ -201,11 +201,12 @@ topo_mask = {
 
 //
 // Lapse rate correction for surface temperature
+// "value" must be defined when "apply_to != NONE"
 // May be set separately in each "obs.field" entry
 //
 lapse_rate_correction = {
   apply_to = NONE;
-  value    = DRY_LAPSE_RATE_K_per_M;
+  value    = NA;
 }
 
 //
