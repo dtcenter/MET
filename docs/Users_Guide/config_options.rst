@@ -2330,7 +2330,7 @@ message type appears in the "SURFACE" entry.
 The "value" entry is a constant number that defines the lapse rate for correcting
 temperatures based on the difference of the model topography height and station
 elevation. By default, "value" is set to bad data and must be explicitly defined
-when "apply_to != NONE".
+when "apply_to" is not set to NONE.
 The environmental lapse rate values for 2-meter temperature and dewpoint temperature
 used by the World Meteorological Organization (WMO) can be found in "ConfigConstants".
 
