@@ -434,7 +434,7 @@ if ( mlog.verbosity_level() >= 4 ) {
 
    mlog << Debug(4) << "\n"
         << "Grid information:\n   "
-        << Dest_Grid->serialize("\n   ") << "\n";
+        << (Dest_Grid ? Dest_Grid->serialize("\n   ") : "(nul)") << "\n";
 
    double min_v, max_v;
    dp.data_range(min_v, max_v);
