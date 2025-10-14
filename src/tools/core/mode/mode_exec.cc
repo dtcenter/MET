@@ -184,10 +184,9 @@ void ModeExecutive::init_traditional(int n_files)
       exit(1);
    }
 
-   const int shift = engine.conf_info.shift_right;
-
-   fcst_mtddf->set_shift_right(shift);
-   obs_mtddf->set_shift_right(shift);
+   // Store the shift right setting
+   fcst_mtddf->set_shift_right(engine.conf_info.shift_right);
+   obs_mtddf->set_shift_right(engine.conf_info.shift_right);
 
    // List the input files
    mlog << Debug(1)

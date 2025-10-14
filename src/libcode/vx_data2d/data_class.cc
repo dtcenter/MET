@@ -235,8 +235,6 @@ void Met2dDataFile::set_shift_right(int N)
 
 ShiftRight = N;
 
-if ( Dest_Grid )  Dest_Grid->shift_right(ShiftRight);
-
 return;
 
 }
@@ -368,23 +366,6 @@ bool Met2dDataFile::process_data_plane(VarInfo *vinfo, DataPlane &dp)
 if ( ! vinfo )  return false;
 
    //
-   // Check for no valid input data
-   //
-
-if ( dp.is_all_bad_data() )  {
-
-   mlog << Warning << "\nThe field \"" << vinfo->magic_str()
-        << "\" contains no valid data!\n\n";
-
-}
-
-   //
-   // Apply shift to the right logic
-   //
-
-if ( ShiftRight != 0 )  dp.shift_right(ShiftRight);
-
-   //
    // Apply conversion logic
    //
 
@@ -395,6 +376,17 @@ dp.convert(vinfo->ConvertFx);
    //
 
 dp.censor(vinfo->censor_thresh(), vinfo->censor_val());
+
+   //
+   // Check for no valid input data
+   //
+
+if ( dp.is_all_bad_data() )  {
+
+   mlog << Warning << "\nThe field \"" << vinfo->magic_str()
+        << "\" contains no valid data!\n\n";
+
+}
 
    //
    // Update the metadata, if requested
@@ -409,6 +401,18 @@ set_attrs(vinfo, dp);
 if ( vinfo->grid_attr().nxy() > 0 )  {
 
    set_grid(vinfo->grid_attr());
+
+}
+
+   //
+   // Apply shift to the right logic
+   //
+
+if ( ShiftRight != 0 )  {
+
+   if ( Dest_Grid )  Dest_Grid->shift_right(ShiftRight);
+
+   dp.shift_right(ShiftRight);
 
 }
 
