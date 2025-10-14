@@ -2329,11 +2329,18 @@ When enabled, the "message_type_group_map" dictionary must contain an entry for
 message type appears in the "SURFACE" entry.
 The "value" entry is a constant number that defines the lapse rate for correcting
 temperatures based on the difference of the model topography height and station
-elevation.
-Note that the lapse rate value depends on the units temperature and elevation and
-the user is responsibile for defining it appropriately.
-The default dry lapse rate value, for temperature in kelvin and height in meters, is
-defined in "ConfigConstants."
+elevation. By default, "value" is set to bad data and must be explicitly defined
+when "apply_to" is not set to NONE.
+The environmental lapse rate values for 2-meter temperature and dewpoint temperature
+used by the World Meteorological Organization (WMO) can be found in "ConfigConstants".
+
+.. code-block:: none
+
+  WMO_TMP2M_LAPSE_RATE_K_per_M = 0.0065;
+  WMO_DPT2M_LAPSE_RATE_K_per_M = 0.0012;
+
+Note that the lapse rate value depends on the units of temperature and elevation
+and the user is responsibile for defining it appropriately.
 
 All "lapse_rate_correction" entries can be set separately in each "obs.field" entry.
 
@@ -2341,7 +2348,7 @@ All "lapse_rate_correction" entries can be set separately in each "obs.field" en
 
   lapse_rate_correction = {
     apply_to = NONE;
-    value    = DRY_LAPSE_RATE_K_per_M;
+    value    = NA;
   }
 
 msl_agl_conversion
