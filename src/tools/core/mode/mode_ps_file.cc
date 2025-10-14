@@ -981,7 +981,7 @@ void ModePsFile::draw_colorbar(bool fcst)
          // has been rescaled
          //
 
-         if ( ctable.rescale_flag )   snprintf(label, sizeof(label), "%.2f", ctable[i].value_low());
+         if ( ctable.rescale_flag() ) snprintf(label, sizeof(label), "%.2f", ctable[i].value_low());
          else                         snprintf(label, sizeof(label), "%g",   ctable[i].value_low());
 
          write_centered_text(2, 1,  x_ll + bar_width + 2.0, y_ll, 0.0, 0.5, label);
