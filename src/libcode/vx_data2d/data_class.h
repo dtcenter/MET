@@ -97,6 +97,7 @@ class Met2dDataFile : public Met2dData {
       ConcatString Filename;
 
       int ShiftRight;
+      bool GridShifted;
 
    public:
 

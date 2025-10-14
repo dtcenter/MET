@@ -110,7 +110,8 @@ void Met2dDataFile::mtddf_init_from_scratch()
 Raw_Grid  = (Grid *) nullptr;
 Dest_Grid = (Grid *) nullptr;
 
-ShiftRight = 0;
+ShiftRight  = 0;
+GridShifted = false;
 
 return;
 
@@ -129,7 +130,8 @@ if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = (Grid *) nullptr; }
 
 Filename.clear();
 
-ShiftRight = 0;
+ShiftRight  = 0;
+GridShifted = false;
 
 return;
 
@@ -172,6 +174,7 @@ if ( Dest_Grid )  {
 } else out << "(nul)\n";
 
 out << prefix << "ShiftRight = " << ShiftRight << '\n';
+out << prefix << "GridShifted = " << bool_to_string(GridShifted) << '\n';
 
    //
    //  done
@@ -410,8 +413,15 @@ if ( vinfo->grid_attr().nxy() > 0 )  {
 
 if ( ShiftRight != 0 )  {
 
-   if ( Dest_Grid )  Dest_Grid->shift_right(ShiftRight);
+   // Shift the grid, but only once
+   if ( Dest_Grid && !GridShifted )  {
 
+      Dest_Grid->shift_right(ShiftRight);
+      GridShifted = true;
+
+   }
+
+   // Shift the data
    dp.shift_right(ShiftRight);
 
 }
