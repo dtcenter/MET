@@ -207,7 +207,7 @@ topo_mask = {
 //
 lapse_rate_correction = {
   apply_to = NONE;
-  value    = DRY_LAPSE_RATE_K_per_M;
+  value    = NA;
 }
 
 //

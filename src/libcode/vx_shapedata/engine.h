@@ -24,11 +24,7 @@
 #include "vx_color.h"
 #include "vx_grid.h"
 
-#include "crr_array.h"
-
-
 ///////////////////////////////////////////////////////////////////////////////
-
 
 struct InterestInfo {
    int    fcst_number;
@@ -36,19 +32,6 @@ struct InterestInfo {
    int    pair_number;
    double interest_value;
 };
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-
-typedef CRR_Array<Color>         ColorArray;
-
-typedef CRR_Array<InterestInfo>  InterestInfoArray;
-
-typedef CRR_Array<SingleFeature> SingleFeatureArray;
-
-typedef CRR_Array<PairFeature>   PairFeatureArray;
-
 
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -348,23 +331,23 @@ class ModeFuzzyEngine {
 
       int n_valid;   //  # of data points where both fcst and obs have valid data
 
-      SingleFeatureArray fcst_single;
-      SingleFeatureArray obs_single;
+      std::vector<SingleFeature> fcst_single;
+      std::vector<SingleFeature> obs_single;
 
-      PairFeatureArray pair_single;
+      std::vector<PairFeature> pair_single;
 
-      SingleFeatureArray fcst_cluster;
-      SingleFeatureArray obs_cluster;
+      std::vector<SingleFeature> fcst_cluster;
+      std::vector<SingleFeature> obs_cluster;
 
-      PairFeatureArray pair_cluster;
+      std::vector<PairFeature> pair_cluster;
 
-      ColorArray fcst_color;
-      ColorArray obs_color;
+      std::vector<Color> fcst_color;
+      std::vector<Color> obs_color;
 
       ColorTable ctable;
 
-      InterestInfoArray info_singles;
-      InterestInfoArray info_clus;
+      std::vector<InterestInfo> info_singles;
+      std::vector<InterestInfo> info_clus;
 
       int get_info_index(int) const;
 

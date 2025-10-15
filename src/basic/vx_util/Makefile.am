@@ -29,7 +29,6 @@ libvx_util_a_SOURCES = ascii_table.cc ascii_table.h \
                grib_constants.cc grib_constants.h \
                is_number.cc is_number.h \
                crc_array.h \
-               crr_array.h \
                ncrr_array.h \
                int_array.h \
                two_d_array.h \
