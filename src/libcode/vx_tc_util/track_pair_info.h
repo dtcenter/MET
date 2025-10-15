@@ -184,9 +184,7 @@ class TrackPairInfoArray {
       void assign(const TrackPairInfoArray &);
       void extend(int, bool exact = true);
 
-      TrackPairInfo *Pair;
-      int            NPairs;
-      int            NAlloc;
+      std::vector<TrackPairInfo> Pair;
 
    public:
 
@@ -225,7 +223,7 @@ class TrackPairInfoArray {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TrackPairInfoArray::n_pairs() const { return(NPairs); }
+inline int TrackPairInfoArray::n_pairs() const { return (int) Pair.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 

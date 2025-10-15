@@ -14,7 +14,7 @@ class mpr_data():
       if col_last == 0:
           maj_vrs = pd.read_csv(input_file, header=header, sep=sep,
                                 skiprows=skiprows, usecols=range(0, 1),
-                                dtype=dtype, nrows=1).values[0][0]
+                                dtype=dtype, nrows=1).to_numpy()[0][0]
 
           # The number of MPR columns vary by MET version
           if int(maj_vrs.strip("V").split(".")[0]) < 12:
@@ -26,7 +26,7 @@ class mpr_data():
                              keep_default_na=keep_default_na,
                              skiprows=skiprows,
                              usecols=range(col_start,col_last+1),
-                             dtype=dtype).values.tolist()
+                             dtype=dtype).to_numpy().tolist()
 
       return mpr_data
 

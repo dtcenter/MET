@@ -2185,7 +2185,8 @@ void VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
    // Log the lapse rate correction
    if(mlog.verbosity_level() >= CORRECTION_DEBUG_LEVEL) {
       mlog << Debug(CORRECTION_DEBUG_LEVEL)
-           << "Correcting the "
+           << "For " << fcst_info->magic_str() << " versus "
+           << obs_info->magic_str() << ", correcting the "
            << fieldtype_to_string(sfc_info.lapse_rate_correction_apply_to)
            << " temperature from " << orig_v << " to " << corr_v 
            << " for forecast (" << fcst_elv << ") minus observation ("
@@ -2243,7 +2244,9 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
    if(is_bad_data(fcst_v) || is_bad_data(obs_v) ||
       is_bad_data(corr_f) || is_bad_data(corr_o)) {
       mlog << Warning << "\n" << method_name
-           << "skipping msl/agl conversion due to bad "
+           << "For " << fcst_info->magic_str() << " versus "
+           << obs_info->magic_str()
+           << ", skipping msl/agl conversion due to bad "
            << "(fcst, obs) elevation (" << fcst_elv << ", "
            << obs_elv << ") or data (" << fcst_v << ", "
            << obs_v << ") values.\n\n";
@@ -2264,7 +2267,8 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
    // Log the MSL/AGL conversion
    if(mlog.verbosity_level() >= CORRECTION_DEBUG_LEVEL) {
       mlog << Debug(CORRECTION_DEBUG_LEVEL)
-           << "Converting "
+           << "For " << fcst_info->magic_str() << " versus "
+           << obs_info->magic_str() << ", converting "
            << (sfc_info.msl_agl_conversion_msl_to_agl ?
                "MSL to AGL" : "AGL to MSL")
            << " using "

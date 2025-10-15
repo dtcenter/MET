@@ -2578,6 +2578,19 @@ SurfaceInfo parse_conf_surface_info(Dictionary *dict) {
 
    // Conf: lapse_rate_correction.value
    sfc_info.lapse_rate_correction_value = dict->lookup_double(conf_key_lapse_rate_correction_value);
+
+   // Check for a valid lapse rate value
+   if(sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
+      is_bad_data(sfc_info.lapse_rate_correction_value)) {
+      ConcatString config_const(replace_path(config_const_filename));
+      mlog << Error << "\n" << method_name
+           << "when \"" << conf_key_lapse_rate_correction_apply_to
+           << " = " << fieldtype_to_string(sfc_info.lapse_rate_correction_apply_to)
+           << "\", \"" << conf_key_lapse_rate_correction_value
+           << "\" must be set to a valid lapse rate value.\n"
+           << "See recommended values in: " << config_const << "\n\n";
+      exit(1);
+   }
  
    // Conf: msl_agl_conversion.apply_to
    sfc_info.msl_agl_conversion_apply_to = int_to_fieldtype(dict->lookup_int(conf_key_msl_agl_conversion_apply_to));

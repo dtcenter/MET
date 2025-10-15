@@ -154,7 +154,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Free disk space
-        run: .github/jobs/free_disk_space.sh
+        uses: dtcenter/metplus-action-free-disk-space@v1
 
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
@@ -194,7 +194,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Free disk space
-        run: .github/jobs/free_disk_space.sh
+        uses: dtcenter/metplus-action-free-disk-space@v1
 
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
@@ -236,7 +236,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Free disk space
-        run: .github/jobs/free_disk_space.sh
+        uses: dtcenter/metplus-action-free-disk-space@v1
 
       - name: Run Unit Tests in Docker
         run: .github/jobs/run_unit_docker.sh
@@ -274,7 +274,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Free disk space
-        run: .github/jobs/free_disk_space.sh
+        uses: dtcenter/metplus-action-free-disk-space@v1
 
       - name: Download ref_config_leads output from artifact
         uses: actions/download-artifact@v4
@@ -329,7 +329,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Free disk space
-        run: .github/jobs/free_disk_space.sh
+        uses: dtcenter/metplus-action-free-disk-space@v1
 
       - name: Download 1a output from artifact
         uses: actions/download-artifact@v4
@@ -382,7 +382,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Free disk space
-        run: .github/jobs/free_disk_space.sh
+        uses: dtcenter/metplus-action-free-disk-space@v1
 
       - name: Download 1a output from artifact
         uses: actions/download-artifact@v4
@@ -473,7 +473,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Free disk space
-        run: .github/jobs/free_disk_space.sh
+        uses: dtcenter/metplus-action-free-disk-space@v1
 
       - name: Download data from previous jobs
         uses: actions/download-artifact@v4
