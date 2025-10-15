@@ -41,8 +41,6 @@ class Met2dData {
 
       void mtdd_init_from_scratch();
 
-      // void assign(const Met2dData &);   //  don't allow this
-
    public:
 
       Met2dData();
@@ -85,7 +83,7 @@ class Met2dDataFile : public Met2dData {
 
       void mtddf_init_from_scratch();
 
-      // void assign(const Met2dDataFile &);   //  don't allow this
+      bool GridShifted;
 
    protected:
 
@@ -97,16 +95,15 @@ class Met2dDataFile : public Met2dData {
       ConcatString Filename;
 
       int ShiftRight;
-      bool GridShifted;
 
    public:
 
       Met2dDataFile();
-      virtual ~Met2dDataFile();
+      ~Met2dDataFile() override;
 
       void mtddf_clear();
 
-      virtual void dump(std::ostream &, int depth = 0) const = 0;   //  dump grid and filename, etc., not data
+      void dump(std::ostream &, int depth = 0) const override = 0;   //  dump grid and filename, etc., not data
 
          //
          //  set stuff
@@ -121,11 +118,11 @@ class Met2dDataFile : public Met2dData {
 
       virtual const char * filename() const;
 
-      virtual const Grid & grid     () const;
+      const Grid & grid() const override;
       virtual const Grid & raw_grid () const;
 
-      virtual int nx() const;
-      virtual int ny() const;
+      int nx() const override;
+      int ny() const override;
 
       virtual int raw_nx() const;
       virtual int raw_ny() const;
