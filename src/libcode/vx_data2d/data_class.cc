@@ -436,7 +436,8 @@ if ( mlog.verbosity_level() >= 4 ) {
         << "Grid information:\n   "
         << (Dest_Grid ? Dest_Grid->serialize("\n   ") : "(nul)") << "\n";
 
-   double min_v, max_v;
+   double min_v;
+   double max_v;
    dp.data_range(min_v, max_v);
    mlog << Debug(4) << "\n"
         << "Data plane information:\n"
