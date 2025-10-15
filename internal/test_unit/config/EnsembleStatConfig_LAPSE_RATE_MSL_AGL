@@ -78,11 +78,11 @@ fcst = {
 
       { name = "TMP"; level = "Z2"; message_type = "ADPSFC";
         desc = "LAPSE_RATE_APPLY_TO_FCST";
-        lapse_rate_correction = { apply_to = FCST; }; },
+        lapse_rate_correction = { apply_to = FCST; value = WMO_TMP2M_LAPSE_RATE_K_per_M; }; },
 
       { name = "TMP"; level = "Z2"; message_type = "ADPSFC";
         desc = "LAPSE_RATE_APPLY_TO_OBS";
-        lapse_rate_correction = { apply_to = OBS; }; },
+        lapse_rate_correction = { apply_to = OBS; value = WMO_TMP2M_LAPSE_RATE_K_per_M; }; },
 
       { name = "HGT"; level = "P500"; message_type = "ADPUPA";
         desc = "MSL_TO_AGL_APPLY_FROM_NONE_TO_NONE"; },
@@ -207,7 +207,7 @@ topo_mask = {
 //
 lapse_rate_correction = {
   apply_to = NONE;
-  value    = DRY_LAPSE_RATE_K_per_M;
+  value    = NA;
 }
 
 //
