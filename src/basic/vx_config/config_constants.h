@@ -753,26 +753,31 @@ static const char conf_key_hour_interval[]      = "hour_interval";
 // Topography parameter key names 
 //
 
-static const char conf_key_land_mask[]                      = "land_mask";
-static const char conf_key_land_mask_flag[]                 = "land_mask.flag";
-static const char conf_key_topo_mask[]                      = "topo_mask";
-static const char conf_key_topo_mask_flag[]                 = "topo_mask.flag";
-static const char conf_key_topo_mask_interp[]               = "topo_mask.interp";
-static const char conf_key_topo_mask_use_obs_thresh[]       = "topo_mask.use_obs_thresh";
-static const char conf_key_topo_mask_interp_fcst_thresh[]   = "topo_mask.interp_fcst_thresh";
-static const char conf_key_lapse_rate_correction_apply_to[] = "lapse_rate_correction.apply_to";
-static const char conf_key_lapse_rate_correction_value[]    = "lapse_rate_correction.value";
-static const char conf_key_msl_agl_conversion_apply_to[]    = "msl_agl_conversion.apply_to";
-static const char conf_key_msl_agl_conversion_apply_from[]  = "msl_agl_conversion.apply_from";
-static const char conf_key_msl_agl_conversion_thresh[]      = "msl_agl_conversion.thresh";
-static const char conf_key_msl_agl_conversion_msl_to_agl[]  = "msl_agl_conversion.msl_to_agl";
+static const char conf_key_land_mask[]      = "land_mask";
+static const char conf_key_land_mask_flag[] = "land_mask.flag";
+
+static const char conf_key_topo_mask[]                    = "topo_mask";
+static const char conf_key_topo_mask_flag[]               = "topo_mask.flag";
+static const char conf_key_topo_mask_interp[]             = "topo_mask.interp";
+static const char conf_key_topo_mask_use_obs_thresh[]     = "topo_mask.use_obs_thresh";
+static const char conf_key_topo_mask_interp_fcst_thresh[] = "topo_mask.interp_fcst_thresh";
+
+static const char conf_key_lapse_rate_correction_apply_to[]     = "lapse_rate_correction.apply_to";
+static const char conf_key_lapse_rate_correction_value[]        = "lapse_rate_correction.value";
+static const char conf_key_lapse_rate_correction_skip_missing[] = "lapse_rate_correction.skip_missing";
+
+static const char conf_key_msl_agl_conversion_apply_to[]     = "msl_agl_conversion.apply_to";
+static const char conf_key_msl_agl_conversion_apply_from[]   = "msl_agl_conversion.apply_from";
+static const char conf_key_msl_agl_conversion_thresh[]       = "msl_agl_conversion.thresh";
+static const char conf_key_msl_agl_conversion_msl_to_agl[]   = "msl_agl_conversion.msl_to_agl";
+static const char conf_key_msl_agl_conversion_skip_missing[] = "msl_agl_conversion.skip_missing";
 
 //
 // Point-Stat specific parameter key names
 //
 
-static const char conf_key_hira[]               = "hira";
-static const char conf_key_point_weight_flag[]  = "point_weight_flag";
+static const char conf_key_hira[]              = "hira";
+static const char conf_key_point_weight_flag[] = "point_weight_flag";
 
 //
 // Pair-Stat specific parameter key names
