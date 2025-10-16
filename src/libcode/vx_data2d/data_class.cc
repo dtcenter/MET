@@ -110,7 +110,8 @@ void Met2dDataFile::mtddf_init_from_scratch()
 Raw_Grid  = (Grid *) nullptr;
 Dest_Grid = (Grid *) nullptr;
 
-ShiftRight = 0;
+ShiftRight  = 0;
+GridShifted = false;
 
 return;
 
@@ -129,7 +130,8 @@ if ( Dest_Grid )  { delete Dest_Grid;  Dest_Grid = (Grid *) nullptr; }
 
 Filename.clear();
 
-ShiftRight = 0;
+ShiftRight  = 0;
+GridShifted = false;
 
 return;
 
@@ -172,6 +174,7 @@ if ( Dest_Grid )  {
 } else out << "(nul)\n";
 
 out << prefix << "ShiftRight = " << ShiftRight << '\n';
+out << prefix << "GridShifted = " << bool_to_string(GridShifted) << '\n';
 
    //
    //  done
@@ -234,8 +237,6 @@ void Met2dDataFile::set_shift_right(int N)
 {
 
 ShiftRight = N;
-
-if ( Dest_Grid )  Dest_Grid->shift_right(ShiftRight);
 
 return;
 
@@ -368,23 +369,6 @@ bool Met2dDataFile::process_data_plane(VarInfo *vinfo, DataPlane &dp)
 if ( ! vinfo )  return false;
 
    //
-   // Check for no valid input data
-   //
-
-if ( dp.is_all_bad_data() )  {
-
-   mlog << Warning << "\nThe field \"" << vinfo->magic_str()
-        << "\" contains no valid data!\n\n";
-
-}
-
-   //
-   // Apply shift to the right logic
-   //
-
-if ( ShiftRight != 0 )  dp.shift_right(ShiftRight);
-
-   //
    // Apply conversion logic
    //
 
@@ -395,6 +379,17 @@ dp.convert(vinfo->ConvertFx);
    //
 
 dp.censor(vinfo->censor_thresh(), vinfo->censor_val());
+
+   //
+   // Check for no valid input data
+   //
+
+if ( dp.is_all_bad_data() )  {
+
+   mlog << Warning << "\nThe field \"" << vinfo->magic_str()
+        << "\" contains no valid data!\n\n";
+
+}
 
    //
    // Update the metadata, if requested
@@ -413,6 +408,25 @@ if ( vinfo->grid_attr().nxy() > 0 )  {
 }
 
    //
+   // Apply shift to the right logic
+   //
+
+if ( ShiftRight != 0 )  {
+
+   // Shift the grid, but only once
+   if ( Dest_Grid && !GridShifted )  {
+
+      Dest_Grid->shift_right(ShiftRight);
+      GridShifted = true;
+
+   }
+
+   // Shift the data
+   dp.shift_right(ShiftRight);
+
+}
+
+   //
    // Print the grid information and data summary
    //
 
@@ -420,9 +434,10 @@ if ( mlog.verbosity_level() >= 4 ) {
 
    mlog << Debug(4) << "\n"
         << "Grid information:\n   "
-        << Dest_Grid->serialize("\n   ") << "\n";
+        << (Dest_Grid ? Dest_Grid->serialize("\n   ") : "(nul)") << "\n";
 
-   double min_v, max_v;
+   double min_v;
+   double max_v;
    dp.data_range(min_v, max_v);
    mlog << Debug(4) << "\n"
         << "Data plane information:\n"
