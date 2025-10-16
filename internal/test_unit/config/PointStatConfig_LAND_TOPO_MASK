@@ -121,8 +121,9 @@ topo_mask = {
 // May be set separately in each "obs.field" entry
 //
 lapse_rate_correction = {
-  apply_to = NONE;
-  value    = NA;
+  apply_to     = NONE;
+  value        = NA;
+  skip_missing = TRUE;
 }
 
 //
@@ -130,10 +131,11 @@ lapse_rate_correction = {
 // May be set separately in each "obs.field" entry
 //
 msl_agl_conversion = {
-  apply_to   = NONE;
-  apply_from = OBS;
-  thresh     = NA;
-  msl_to_agl = TRUE;
+  apply_to     = NONE;
+  apply_from   = OBS;
+  thresh       = NA;
+  msl_to_agl   = TRUE;
+  skip_missing = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
