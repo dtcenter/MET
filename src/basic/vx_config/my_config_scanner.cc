@@ -437,6 +437,8 @@ bool char_ok(int c)
 
 {
 
+if ( c < 0 || c > 255 )  return false;
+
 const int k = char_class[c];
 
 if ( k == char_class_digit )  return true;
