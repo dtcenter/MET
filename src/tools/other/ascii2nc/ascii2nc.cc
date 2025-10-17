@@ -52,6 +52,8 @@
 //   023    11/28/23  Halley Gotway  MET #2701 Add ISMN soil moisture data
 //   024    01/06/25  Halley Gotway  MET #1019 Add USCRN quality controlled data
 //   025    06/23/25  Halley Gotway  MET #3148 Search input directories
+//   026    10/17/25  Halley Gotway  MET #3266 Fix IABP/ISMN infinite loops
+//                                   for empty input files
 //
 ////////////////////////////////////////////////////////////////////////
 
