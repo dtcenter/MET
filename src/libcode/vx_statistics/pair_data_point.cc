@@ -619,12 +619,20 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
             // MET #3174 Apply lapse rate surface temperature correction
             if(sfc_info.lapse_rate_correction_apply_to != FieldType::None ||
                msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
-               correct_lapse_rate(topo_elv, hdr_elv, fcst_v, obs_v);
+               if(!correct_lapse_rate(topo_elv, hdr_elv, fcst_v, obs_v) &&
+                  sfc_info.lapse_rate_correction_skip_missing) {
+                  inc_count(rej_mpr, i_msg_typ, i_mask, i_interp);
+                  continue;
+               }
             }
 
             // MET #3174 Apply MSL/AGL height conversion
             if(sfc_info.msl_agl_conversion_apply_to != FieldType::None) {
-               convert_msl_agl(topo_elv, hdr_elv, fcst_v, obs_v);
+               if(!convert_msl_agl(topo_elv, hdr_elv, fcst_v, obs_v) &&
+                  sfc_info.msl_agl_conversion_skip_missing) {
+                  inc_count(rej_mpr, i_msg_typ, i_mask, i_interp);
+                  continue;
+               }
             }
 
             // Check matched pair filtering options
