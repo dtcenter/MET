@@ -56,7 +56,7 @@
     </output>
   </test>
 
-    <test name="ascii2nc_GAGE_24hr_badfile">
+  <test name="ascii2nc_GAGE_24hr_badfile">
     <exec>&MET_BIN;/ascii2nc</exec>
     <retval>1</retval>
     <param> \
@@ -177,10 +177,10 @@
   <test name="ascii2nc_ndbc">
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
-    -format ndbc_standard \
-    -inputrx '.txt$' \
-    &DATA_DIR_OBS;/ndbc \
-    &OUTPUT_DIR;/ascii2nc/ndbc.nc
+      -format ndbc_standard \
+      -inputrx '.txt$' \
+      &DATA_DIR_OBS;/ndbc \
+      &OUTPUT_DIR;/ascii2nc/ndbc.nc
     </param>
     <output>
       <point_nc>&OUTPUT_DIR;/ascii2nc/ndbc.nc</point_nc>
@@ -190,10 +190,10 @@
   <test name="ascii2nc_ismn_SNOTEL">
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
-    -format ismn \
-    -inputrx '.stm$' \
-    &DATA_DIR_OBS;/ismn/SNOTEL \
-    &OUTPUT_DIR;/ascii2nc/ismn_SNOTEL_20220924_20220927.nc
+      -format ismn \
+      -inputrx '.stm$' \
+      &DATA_DIR_OBS;/ismn/SNOTEL \
+      &OUTPUT_DIR;/ascii2nc/ismn_SNOTEL_20220924_20220927.nc
     </param>
     <output>
       <point_nc>&OUTPUT_DIR;/ascii2nc/ismn_SNOTEL_20220924_20220927.nc</point_nc>
@@ -203,12 +203,12 @@
   <test name="ascii2nc_iabp">
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
-    -format iabp \
-    -valid_beg 20140101 -valid_end 20140201 \
-    &DATA_DIR_OBS;/iabp/090629.dat \
-    &DATA_DIR_OBS;/iabp/109320.dat \
-    &DATA_DIR_OBS;/iabp/109499.dat \
-    &OUTPUT_DIR;/ascii2nc/iabp_20140101_20140201.nc
+      -format iabp \
+      -valid_beg 20140101 -valid_end 20140201 \
+      &DATA_DIR_OBS;/iabp/090629.dat \
+      &DATA_DIR_OBS;/iabp/109320.dat \
+      &DATA_DIR_OBS;/iabp/109499.dat \
+      &OUTPUT_DIR;/ascii2nc/iabp_20140101_20140201.nc
     </param>
     <output>
       <point_nc>&OUTPUT_DIR;/ascii2nc/iabp_20140101_20140201.nc</point_nc>
@@ -227,14 +227,26 @@
                 > &OUTPUT_DIR;/ascii2nc/USCRN_Boulder_file_list; \
           &MET_BIN;/ascii2nc</exec>
     <param> \
-    -format uscrn \
-    -valid_beg 20240801 -valid_end 20240801 \
-    &OUTPUT_DIR;/ascii2nc/USCRN_Boulder_file_list \
-    &OUTPUT_DIR;/ascii2nc/USCRN_Boulder_20240801.nc
+      -format uscrn \
+      -valid_beg 20240801 -valid_end 20240801 \
+      &OUTPUT_DIR;/ascii2nc/USCRN_Boulder_file_list \
+      &OUTPUT_DIR;/ascii2nc/USCRN_Boulder_20240801.nc
     </param>
     <output>
       <point_nc>&OUTPUT_DIR;/ascii2nc/USCRN_Boulder_20240801.nc</point_nc>
     </output>
   </test>
+
+  <test name="ascii2nc_empty_input">
+    <exec>touch &OUTPUT_DIR;/ascii2nc/empty.txt; \
+          &MET_BIN;/ascii2nc</exec>
+    <retval>1</retval>
+    <param> \
+      &OUTPUT_DIR;/ascii2nc/empty.txt \
+      &OUTPUT_DIR;/ascii2nc/empty.nc
+    </param>
+    <output>
+    </output>
+  </test>  
 
 </met_test>
