@@ -62,7 +62,9 @@ bool IabpHandler::isFileType(LineDataFile &ascii_file) const {
 
    // Read the header line
    DataLine dl;
-   while(dl.n_items() == 0) ascii_file >> dl;
+   while(ascii_file >> dl) {
+      if(dl.n_items() > 0) break;
+   }
 
    // Check the minimum number of header columns
    if(dl.n_items() < MIN_NUM_HDR_COLS) {
