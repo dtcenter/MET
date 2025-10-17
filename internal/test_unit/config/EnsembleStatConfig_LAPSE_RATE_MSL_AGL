@@ -113,8 +113,9 @@ obs = fcst;
 // May be set separately in each "obs.field" entry
 //
 message_type    = [];
-sid_inc         = [ "K9L2",  "KAAT",  "KACV",  "KAJO",  "KAPC", 
-                    "72293", "72388", "72393", "72489", "72493" ];
+sid_inc         = [ "K9L2",  "KAAT",  "KACV",  "KAJO",  "KAPC",
+                    "72293", "72388", "72393", "72489", "72493",
+                    "KMUO_BAD_HEIGHT" ];
 sid_exc         = [];
 obs_thresh      = [ NA ];
 obs_quality_inc = [];
@@ -206,9 +207,8 @@ topo_mask = {
 // May be set separately in each "obs.field" entry
 //
 lapse_rate_correction = {
-  apply_to     = NONE;
-  value        = NA;
-  skip_missing = TRUE;
+  apply_to = NONE;
+  value    = NA;
 }
 
 //
@@ -216,11 +216,10 @@ lapse_rate_correction = {
 // May be set separately in each "obs.field" entry
 //
 msl_agl_conversion = {
-  apply_to     = NONE;
-  apply_from   = OBS;
-  thresh       = NA;
-  msl_to_agl   = TRUE;
-  skip_missing = TRUE;
+  apply_to   = NONE;
+  apply_from = OBS;
+  thresh     = NA;
+  msl_to_agl = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

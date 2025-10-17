@@ -46,12 +46,10 @@ void SurfaceInfo::clear() {
    topo_mask_interp_fcst_thresh.clear();
    lapse_rate_correction_apply_to = FieldType::None;
    lapse_rate_correction_value = bad_data_double;
-   lapse_rate_correction_skip_missing = false;
    msl_agl_conversion_apply_to = FieldType::None;
    msl_agl_conversion_apply_from = FieldType::None;
    msl_agl_conversion_thresh.clear();
    msl_agl_conversion_msl_to_agl = false;
-   msl_agl_conversion_skip_missing = false;
 }
 
 ////////////////////////////////////////////////////////////////////////

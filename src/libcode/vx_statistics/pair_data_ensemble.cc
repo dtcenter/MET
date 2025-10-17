@@ -1434,14 +1434,22 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                double obs_v = it->o_na[i_obs];
 
                // MET #3174 Apply lapse rate surface temperature correction
-               if(sfc_info.lapse_rate_correction_apply_to != FieldType::None) {
-                  correct_lapse_rate(topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
+               if(sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
+                  msg_typ_sfc.reg_exp_match(it->typ_sa[i_obs].c_str()) && 
+                  !correct_lapse_rate(topo_elv, it->elv_na[i_obs], fcst_v, obs_v)) {
+                     
+                  // Skip by resetting to bad data
+                  fcst_v = bad_data_double;
+                  obs_v  = bad_data_double;
                }
 
                // MET #3174 Apply MSL/AGL height conversion
-               if(sfc_info.msl_agl_conversion_apply_to != FieldType::None) {
-                  convert_msl_agl(topo_elv, it->elv_na[i_obs], fcst_v, obs_v,
-                                  member == 0);
+               if(sfc_info.msl_agl_conversion_apply_to != FieldType::None &&
+                  !convert_msl_agl(topo_elv, it->elv_na[i_obs], fcst_v, obs_v, member == 0)) {
+
+                  // Skip by resetting to bad data
+                  fcst_v = bad_data_double;
+                  obs_v  = bad_data_double;
                }
 
                // Store the modified observation, but only for the first member

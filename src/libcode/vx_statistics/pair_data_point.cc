@@ -617,22 +617,18 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                                cpi, fcst_v)) continue;
 
             // MET #3174 Apply lapse rate surface temperature correction
-            if(sfc_info.lapse_rate_correction_apply_to != FieldType::None ||
-               msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
-               if(!correct_lapse_rate(topo_elv, hdr_elv, fcst_v, obs_v) &&
-                  sfc_info.lapse_rate_correction_skip_missing) {
-                  inc_count(rej_mpr, i_msg_typ, i_mask, i_interp);
-                  continue;
-               }
+            if(sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
+               msg_typ_sfc.reg_exp_match(hdr_typ_str) &&
+               !correct_lapse_rate(topo_elv, hdr_elv, fcst_v, obs_v)) {
+               inc_count(rej_mpr, i_msg_typ, i_mask, i_interp);
+               continue;
             }
 
             // MET #3174 Apply MSL/AGL height conversion
-            if(sfc_info.msl_agl_conversion_apply_to != FieldType::None) {
-               if(!convert_msl_agl(topo_elv, hdr_elv, fcst_v, obs_v) &&
-                  sfc_info.msl_agl_conversion_skip_missing) {
-                  inc_count(rej_mpr, i_msg_typ, i_mask, i_interp);
-                  continue;
-               }
+            if(sfc_info.msl_agl_conversion_apply_to != FieldType::None &&
+               !convert_msl_agl(topo_elv, hdr_elv, fcst_v, obs_v)) {
+               inc_count(rej_mpr, i_msg_typ, i_mask, i_interp);
+               continue;
             }
 
             // Check matched pair filtering options
@@ -695,9 +691,6 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                     << interpmthd_to_string(pd[n].interp_mthd) << "("
                     << pd[n].interp_wdth * pd[n].interp_wdth
                     << "), using observation:\n"
-                    << pnt_obs_str << "\n";
-            }
-
          } // end for i_interp
       } // end for i_mask
    } // end for i_msg_typ
@@ -1113,6 +1106,9 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
          else {
             out_pd.add_grid_pair(pd.f_na[i], pd.o_na[i], cpi, pd.wgt_na[i]);
          }
+      }
+   } // end for
+
       }
    } // end for
 

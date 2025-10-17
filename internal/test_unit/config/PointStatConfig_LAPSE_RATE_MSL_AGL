@@ -50,10 +50,6 @@ fcst = {
         desc = "LAPSE_RATE_APPLY_TO_NONE"; },
 
       { name = "TMP"; level = "Z2"; message_type = "ADPSFC";
-        desc = "LAPSE_RATE_APPLY_TO_FCST_NO_SKIP";
-        lapse_rate_correction = { apply_to = FCST; value = WMO_TMP2M_LAPSE_RATE_K_per_M; skip_missing = FALSE; }; },
-
-      { name = "TMP"; level = "Z2"; message_type = "ADPSFC";
         desc = "LAPSE_RATE_APPLY_TO_FCST";
         lapse_rate_correction = { apply_to = FCST; value = WMO_TMP2M_LAPSE_RATE_K_per_M; }; },
 
@@ -151,9 +147,8 @@ topo_mask = {
 // May be set separately in each "obs.field" entry
 //
 lapse_rate_correction = {
-  apply_to     = NONE;
-  value        = NA;
-  skip_missing = TRUE;
+  apply_to = NONE;
+  value    = NA;
 }
 
 //
@@ -161,11 +156,10 @@ lapse_rate_correction = {
 // May be set separately in each "obs.field" entry
 //
 msl_agl_conversion = {
-  apply_to     = NONE;
-  apply_from   = OBS;
-  thresh       = NA;
-  msl_to_agl   = TRUE;
-  skip_missing = TRUE;
+  apply_to   = NONE;
+  apply_from = OBS;
+  thresh     = NA;
+  msl_to_agl = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

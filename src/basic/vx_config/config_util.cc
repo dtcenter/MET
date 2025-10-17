@@ -2591,9 +2591,6 @@ SurfaceInfo parse_conf_surface_info(Dictionary *dict) {
            << "See recommended values in: " << config_const << "\n\n";
       exit(1);
    }
-
-   // Conf: lapse_rate_correction.skip_missing
-   sfc_info.lapse_rate_correction_skip_missing = dict->lookup_bool(conf_key_lapse_rate_correction_skip_missing);
  
    // Conf: msl_agl_conversion.apply_to
    sfc_info.msl_agl_conversion_apply_to = int_to_fieldtype(dict->lookup_int(conf_key_msl_agl_conversion_apply_to));
@@ -2634,9 +2631,6 @@ SurfaceInfo parse_conf_surface_info(Dictionary *dict) {
            << "\" for the same verification task.\n\n";
       exit(1);
    }
-
-   // Conf: msl_agl_conversion.skip_missing
-   sfc_info.msl_agl_conversion_skip_missing = dict->lookup_bool(conf_key_msl_agl_conversion_skip_missing);
 
    return sfc_info;
 }

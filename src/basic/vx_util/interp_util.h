@@ -68,14 +68,12 @@ struct SurfaceInfo {
    // Lapse rate correction options for surface temperatures
    FieldType     lapse_rate_correction_apply_to;
    double        lapse_rate_correction_value;
-   bool          lapse_rate_correction_skip_missing;
 
    // MSL/AGL conversion options for heights
    FieldType     msl_agl_conversion_apply_to;
    FieldType     msl_agl_conversion_apply_from;
    SingleThresh  msl_agl_conversion_thresh;
    bool          msl_agl_conversion_msl_to_agl;
-   bool          msl_agl_conversion_skip_missing;
 
    SurfaceInfo();
 
