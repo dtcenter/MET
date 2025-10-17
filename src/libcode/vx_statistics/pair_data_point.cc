@@ -691,6 +691,9 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                     << interpmthd_to_string(pd[n].interp_mthd) << "("
                     << pd[n].interp_wdth * pd[n].interp_wdth
                     << "), using observation:\n"
+                    << pnt_obs_str << "\n";
+            }
+
          } // end for i_interp
       } // end for i_mask
    } // end for i_msg_typ
@@ -1106,9 +1109,6 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
          else {
             out_pd.add_grid_pair(pd.f_na[i], pd.o_na[i], cpi, pd.wgt_na[i]);
          }
-      }
-   } // end for
-
       }
    } // end for
 

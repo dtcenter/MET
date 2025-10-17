@@ -1435,9 +1435,9 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
 
                // MET #3174 Apply lapse rate surface temperature correction
                if(sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
-                  msg_typ_sfc.reg_exp_match(it->typ_sa[i_obs].c_str()) && 
+                  msg_typ_sfc.reg_exp_match(it->typ_sa[i_obs].c_str()) &&
                   !correct_lapse_rate(topo_elv, it->elv_na[i_obs], fcst_v, obs_v)) {
-                     
+
                   // Skip by resetting to bad data
                   fcst_v = bad_data_double;
                   obs_v  = bad_data_double;
