@@ -16,6 +16,5 @@ set share $base/$ver/share/met
 set lib_base $base/12.1.0
 setenv MET_ROOT $base/$ver
 
-prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/scratch1/BMC/dtc/miniconda/miniconda3/envs/metplus_v6.1_py3.12/bin
+prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/scratch3/BMC/dtc/METplus/miniconda/miniconda3/envs/metplus_v6.1_py3.12/bin
 
-setenv MET_PYTHON_EXE /scratch1/BMC/dtc/miniconda/miniconda3/envs/metplus_v6.1_py3.12/bin/python

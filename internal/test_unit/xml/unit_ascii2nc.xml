@@ -269,4 +269,16 @@
     </output>
   </test>
 
+  <test name="ascii2nc_empty_input">
+    <exec>touch &OUTPUT_DIR;/ascii2nc/empty.txt; \
+          &MET_BIN;/ascii2nc</exec>
+    <retval>1</retval>
+    <param> \
+      &OUTPUT_DIR;/ascii2nc/empty.txt \
+      &OUTPUT_DIR;/ascii2nc/empty.nc
+    </param>
+    <output>
+    </output>
+  </test>
+
 </met_test>
