@@ -437,9 +437,9 @@ class VxPairBase {
                                 double, double, double,
                                 const ClimoPntInfo &) const;
 
-      void correct_lapse_rate(double, double, double &, double &) const;
+      bool correct_lapse_rate(double, double, double &, double &) const;
 
-      void convert_msl_agl(double, double, double &, double &,
+      bool convert_msl_agl(double, double, double &, double &,
                            bool update_obs = true) const;
 
       // Retrieve climo data for this point 
