@@ -2334,7 +2334,7 @@ when "apply_to" is not set to NONE.
 The lapse rate correction fails when the model topography or observation height
 values are bad data. The "skip_missing" entry is a boolean. When "TRUE", matched
 pairs with bad model topography or observation height values are excluded from the
-analysis. When "FALSE", all matched pairs are used, regardless of bad data.
+analysis. When "FALSE", all matched pairs are used.
 The environmental lapse rate values for 2-meter temperature and dewpoint temperature
 used by the World Meteorological Organization (WMO) can be found in "ConfigConstants".
 
@@ -2382,7 +2382,7 @@ elevation correction is added to the height value to convert from AGL to MSL.
 The MSL/AGL conversion fails when the model topography or observation height
 values are bad data. The "skip_missing" entry is a boolean. When "TRUE", matched
 pairs with bad model topography or observation height values are excluded from the
-analysis. When "FALSE", all matched pairs are used, regardless of bad data.
+analysis. When "FALSE", all matched pairs are used.
 
 All "msl_agl_conversion" entries can be set separately in each "obs.field" entry.
 
