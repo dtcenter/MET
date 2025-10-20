@@ -462,10 +462,10 @@ VxPairDataPoint & VxPairDataPoint::operator=(const VxPairDataPoint &vx_pd) {
 
 void VxPairDataPoint::init_from_scratch() {
 
-   VxPairBase::init_from_scratch();
-
    fcst_info = (VarInfo *) nullptr;
    obs_info  = (VarInfo *) nullptr;
+
+   VxPairBase::init_from_scratch();
 
    clear();
 

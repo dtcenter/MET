@@ -1013,10 +1013,10 @@ VxPairDataEnsemble & VxPairDataEnsemble::operator=(const VxPairDataEnsemble &vx_
 
 void VxPairDataEnsemble::init_from_scratch() {
 
-   VxPairBase::init_from_scratch();
-
    ens_info = (EnsVarInfo *) nullptr;
    obs_info = (VarInfo *)    nullptr;
+
+   VxPairBase::init_from_scratch();
 
    clear();
 
