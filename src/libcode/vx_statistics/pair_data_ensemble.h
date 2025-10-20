@@ -65,13 +65,13 @@ class PairDataEnsemble : public PairBase {
    public:
 
       PairDataEnsemble();
-      ~PairDataEnsemble();
+      ~PairDataEnsemble() override;
       PairDataEnsemble(const PairDataEnsemble &);
       PairDataEnsemble & operator=(const PairDataEnsemble &);
 
       //////////////////////////////////////////////////////////////////
 
-      // ObsErrorEntry points [n_obs]
+      // Observation error entries [n_obs]
       ObsErrorEntryPtrArray obs_error_entry;
       bool                  obs_error_flag;
 
@@ -140,9 +140,9 @@ class PairDataEnsemble : public PairBase {
 
       //////////////////////////////////////////////////////////////////
 
-      void clear();
+      void clear() override;
 
-      void extend(int);
+      void extend(int) override;
 
       bool has_obs_error() const;
 
@@ -202,10 +202,10 @@ class VxPairDataEnsemble : public VxPairBase {
 
       //////////////////////////////////////////////////////////////////
 
-      void clear();
+      void clear() override;
 
       void set_ens_info(const EnsVarInfo *);
-      void set_size(int, int, int);
+      void set_size(int, int, int) override;
 
       // Call set_ens_size before add_ens
       void set_ens_size(int n);
@@ -215,10 +215,10 @@ class VxPairDataEnsemble : public VxPairBase {
       void set_ctrl_index(int);
       void set_skip_const(bool);
 
-      void add_point_obs(float *, int *, const char *, const char *,
-                         unixtime, const char *, float *, const Grid &,
-                         const char *);
-      void add_ens(int, bool mn, Grid &);
+      void add_point_obs(const float *, const int *, const char *,
+                         const char *, unixtime, const char *,
+                         const float *, const Grid &, const char *);
+      void add_ens(int, bool mn, const Grid &);
 };
 
 ////////////////////////////////////////////////////////////////////////
