@@ -405,9 +405,10 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    }
 
    // Compute the rank for each observation
+   n_pair = 0;
    int n_skip_const = 0;
    int n_skip_vld = 0;
-   for(int i=0, n_pair=0; i<o_na.n(); i++) {
+   for(int i=0; i<o_na.n(); i++) {
 
       // Initialize
       cur_ens.erase();
