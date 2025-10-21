@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE met_test [
+  <!ENTITY MET_BASE       "${MET_BASE}">
   <!ENTITY MET_BIN        "${MET_BASE}/../../bin">
   <!ENTITY TEST_DIR       "${MET_TEST_BASE}">
   <!ENTITY INPUT_DIR      "${MET_TEST_INPUT}">
@@ -395,6 +396,7 @@
       &DATA_DIR_MODEL;/grib1/arw-tom-gep7/arw-tom-gep7_2012040900_F012.grib \
       &CONFIG_DIR;/EnsembleStatConfig_LAPSE_RATE_MSL_AGL \
       -point_obs &OUTPUT_DIR;/pb2nc/gdas1.20120409.t12z.prepbufr.nc \
+      -point_obs 'PYTHON_NUMPY=&MET_BASE;/python/examples/read_ascii_point.py &DATA_DIR_OBS;/ascii/sample_ascii_KMUO_BAD_ELEVATION.txt' \
       -outdir &OUTPUT_DIR;/ensemble_stat -v 2 
     </param>
     <output>
