@@ -167,7 +167,7 @@ msl_agl_conversion = {
 mask = {
    grid  = [];
    poly  = [];
-   sid   = [ "SID_LIST:71109,71203,71600,71603,71815" ];
+   sid   = [ "SID_LIST:71109,71203,71600,71603,71815,CYKO" ];
    llpnt = [];
 }
 

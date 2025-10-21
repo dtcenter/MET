@@ -113,8 +113,9 @@ obs = fcst;
 // May be set separately in each "obs.field" entry
 //
 message_type    = [];
-sid_inc         = [ "K9L2",  "KAAT",  "KACV",  "KAJO",  "KAPC", 
-                    "72293", "72388", "72393", "72489", "72493" ];
+sid_inc         = [ "K9L2",  "KAAT",  "KACV",  "KAJO",  "KAPC",
+                    "72293", "72388", "72393", "72489", "72493",
+                    "KMUO_BAD_ELEVATION" ];
 sid_exc         = [];
 obs_thresh      = [ NA ];
 obs_quality_inc = [];
