@@ -1,6 +1,6 @@
        SUBROUTINE CALCAPE(ivirt,itype,T,Q,P,p1d,t1d,q1d,PINT,LMH,
      *    IMM,JMM,LMM,CAPE,CINS,
-     *    PLCL,PEQL,slindx)
+     *    PLCL,PEQL,slindx) BIND(C)
 C
 C PROGRAM: CALCAPE
 C PROGRAMMER: PERRY C. SHAFRAN
@@ -36,60 +36,90 @@ C
 C PARAMETERS (TAKEN FROM ETAPOST VERSION, CONSTANTS FROM BOLTON (MWR, 1980))
 C
 C----------------------------------------------------------------------
-      PARAMETER (IM=1,JM=1,LM=200,LP1=LM+1)
-                             P A R A M E T E R
-     & (H10E5=100000.E0
-     &, EPSQ=2.E-12
-     &, G=9.8E0,CP=1004.6E0,CAPA=0.28589641E0,ROG=287.04/G)
-C----------------------------------------------------------------------
-                             P A R A M E T E R
-     & (ITB=076,JTB=134,ITBQ=152,JTBQ=440)
-c     PARAMETER (DPBND=0.E2,
-c    & ELIVW=2.72E6,ELOCP=ELIVW/CP)
-      parameter (ELIVW=2.72E6,ELOCP=ELIVW/CP)
-C     
-C     DECLARE VARIABLES.
-C     
-      INTEGER IEQL(IM,JM)
-      INTEGER LCL(IM,JM)
-C     
-      REAL  P1D(IM,JM),T1D(IM,JM),Q1D(IM,JM)
-      REAL  CAPE(IM,JM),CINS(IM,JM)
-      REAL  PLCL(IM,JM),PEQL(IM,JM)
-      REAL  TPAR(IM,JM,LM)
+      USE ISO_C_BINDING
+      implicit none
 
-                             D I M E N S I O N
-     & P  (IM,JM,LM),PINT  (IM,JM,LM+1)
-     &,T(IM,JM,LM),Q(IM,JM,LM),tv(im,jm,lm)
-     &,LMH  (IM,JM)
-                             D I M E N S I O N
-     & QS0 (JTB),SQS (JTB),THE0  (ITB),STHE  (ITB)
-     &,                    THE0Q(ITBQ),STHEQ(ITBQ)
-     &,PTBL  (ITB,JTB),TTBL  (JTB,ITB),TTBLQ(JTBQ,ITBQ)
-C
-                             D I M E N S I O N
-     & IPTB  (IM,JM),ITHTB (IM,JM)
-     &,PP    (IM,JM)
-     &,QQ    (IM,JM)
-     &,PSP   (IM,JM),THESP (IM,JM)
-     &,ILRES (IM*JM),JLRES (IM*JM),IHRES (IM*JM),JHRES (IM*JM)
-     &,APE   (IM,JM,LM)
-C
-C
-      DATA ITABL/0/,THL/210./,PLQ/70000./,PTT/2500./
-C
-      SAVE PTBL,TTBL,RDQ,RDTH,RDP,RDTHE,PL,THL,QS0,SQS,STHE,THE0,
-     &TTBLQ,RDPQ,RDTHEQ,PLQ,STHEQ,THE0Q
+      integer, parameter :: NLEV=256
+      integer, parameter :: IM=1, JM=1, LM=200, LP1=LM+1
+
+      ! Inputs: upto NLEV=256. MZBL <= NLEV
+      integer, intent(in) :: ivirt, itype
+      integer, intent(in) :: IMM, JMM, LMM
+      integer, intent(in) :: LMH(IM,JM)
+      real(C_DOUBLE), intent(in) :: T(IM,JM,LM), P(IM,JM,LM)
+      real(C_DOUBLE), intent(in) :: p1d(IM,JM), t1d(IM,JM)
+      real(C_DOUBLE), intent(in) :: PINT(IM,JM,LM+1)
+
+      ! Outputs
+      real(C_DOUBLE), intent(out) :: CAPE(IM,JM), CINS(IM,JM)
+      real(C_DOUBLE), intent(out) :: PLCL(IM,JM), PEQL(IM,JM)
+      real(C_DOUBLE), intent(out) :: slindx
+
+      real(C_DOUBLE), intent(inout) :: Q(IM,JM,LM)
+      real(C_DOUBLE), intent(inout) :: q1d(IM,JM)
+
+      ! Parameters (converted from old PARAMETER statements)
+      real(C_DOUBLE), parameter :: H10E5 = 100000.0d0
+      real(C_DOUBLE), parameter :: EPSQ  = 2.0d-12
+      real(C_DOUBLE), parameter :: G     = 9.8d0
+      real(C_DOUBLE), parameter :: CP    = 1004.6d0
+      real(C_DOUBLE), parameter :: CAPA  = 0.28589641d0
+      real(C_DOUBLE), parameter :: ROG   = 287.04d0/G
+      integer, parameter :: ITB=76, JTB=134, ITBQ=152
+     &                     ,JTBQ=440     ! ITB=076,JTB=134,ITBQ=152,JTBQ=440
+      real(C_DOUBLE), parameter :: ELIVW = 2.72d6
+      real(C_DOUBLE), parameter :: ELOCP  = ELIVW/CP
+      real(C_DOUBLE), parameter :: PLQ=70000., THL=210., PTT=2500.
+
+      ! Arguments
+
+      ! Local vars
+      integer :: IEQL(IM,JM)
+      integer :: LCL(IM,JM)
+      real(C_DOUBLE) :: TPAR(IM,JM,LM)
+      real(C_DOUBLE) :: tv(IM,JM,LM)
+      integer :: IPTB(IM,JM), ITHTB(IM,JM)
+      real(C_DOUBLE) :: PP(IM,JM), QQ(IM,JM)
+      integer :: ILRES(IM*JM), JLRES(IM*JM), IHRES(IM*JM), JHRES(IM*JM)
+      real(C_DOUBLE) :: APE(IM,JM,LM)
+      real(C_DOUBLE) :: PSP(IM,JM), THESP(IM,JM)
+      real(C_DOUBLE) :: PL
+      real(C_DOUBLE) :: RDQ, RDTH, RDP, RDTHE
+      real(C_DOUBLE), dimension(JTB) :: QS0, SQS
+      real(C_DOUBLE), dimension(ITB) :: THE0, STHE
+      real(C_DOUBLE), dimension(ITBQ) :: THE0Q, STHEQ
+      real(C_DOUBLE), dimension(ITB,JTB) :: PTBL, TTBL
+      real(C_DOUBLE), dimension(JTBQ,ITBQ) :: TTBLQ
+      real(C_DOUBLE) :: dpbnd
+      integer :: I, J, L, KB, N, KNUML, KNUMH, IEQK, LCLK
+      integer :: IVI
+      integer :: ITTBK, IQ, IPTBK, ITHTBK
+      integer :: IMJM, IT, KBMAX
+      real(C_DOUBLE) :: TBTK, QBTK, APEBTK, TTHBTK, TTHK, BQS00K, SQS00K
+      real(C_DOUBLE) :: BQS10K, SQS10K, BQK, SQK, TQK
+      real(C_DOUBLE) :: P00K, P10K, P01K, P11K, TPSPK, APESPK, TTHESK
+      real(C_DOUBLE) :: PKL, PSFCK, TTHBK
+      real(C_DOUBLE) :: DP, PRESK, DZKL, THETAP, THETAA
+      real(C_DOUBLE) :: esatp, eps, oneps, qsatp, tvp
+      real(C_DOUBLE) :: TTH, QQtmp
+      real(C_DOUBLE) :: APESTS, LMHK, RDPQ, RDTHEQ, FPVSNEW
+      integer :: KBcount
+
+      ! Tables and state that are filled once in original code via TABLE1/TABLEQ
+      logical, save :: ITABL = .FALSE.
+
 C-----------------------------------------------------------------------
 C
 C   SET UP LOOKUP TABLE
 C
-      IF (ITABL.EQ.0) THEN
+      ! Initialization of saved table variables: call TABLE1 and TABLEQ once
+      IF (.not. ITABL) THEN
        CALL TABLE1(PTBL,TTBL,PTT,
      &     RDQ,RDTH,RDP,RDTHE,PL,THL,QS0,SQS,STHE,THE0)
        CALL TABLEQ(TTBLQ,RDPQ,RDTHEQ,PLQ,THL,STHEQ,THE0Q)
-       ITABL=1
+       ITABL = .TRUE.
       ENDIF
+
       IMJM=IM*JM
 C-----------------------------------------------------------------------
 C     
@@ -130,8 +160,10 @@ c     print*,'itype=',itype
          CINS(I,J) = 0.0
          THESP(I,J)= 0.0
          IEQL(I,J) = LM+1
-         
+
          LCL(I,J)=0
+         PLCL(I,J) = 0.0
+         PEQL(I,J) = 0.0
        ENDDO
       ENDDO
       DO L=1,LM
@@ -141,7 +173,7 @@ c     print*,'itype=',itype
           IF (L.LE.LMH(I,J)) THEN
             APESTS=P(I,J,L)
             APE(I,J,L)=(H10E5/APESTS)**CAPA
-            IF(Q(I,J,L).LT.EPSQ)Q(I,J,L)=EPSQ
+            IF(Q(I,J,L).LT.EPSQ) Q(I,J,L)=EPSQ
           ENDIF
         ENDDO
        ENDDO
@@ -154,7 +186,7 @@ C     ARE DUMMY ARRAYS.
       if(itype.eq.2) then
        do j=1,jm
        do i=1,im
-        q1d(i,j)=amin1(amax1(1.e-12,q1d(i,j)),99999.0)
+        q1d(i,j)=min(max(1.e-12,q1d(i,j)),99999.0)
        enddo
        enddo
       endif
@@ -165,79 +197,82 @@ C-------FOR ITYPE=2-----------------------------------------------------
 C---------FIND THETA E LAYER OF GIVEN T1D, Q1D, P1D---------------------
 C--------------TRIAL MAXIMUM BUOYANCY LEVEL VARIABLES-------------------
       DO KB=1,LMM
-c      IF (ITYPE.EQ.1.OR.KB.EQ.1) THEN
+!      IF (ITYPE.EQ.1.OR.KB.EQ.1) THEN
        IF (ITYPE.EQ.1.OR.(ITYPE.EQ.2.AND.KB.EQ.1)) THEN
         DO J=1,JM
-        DO I=1,IM
-         LMHK   =LMH(I,J)
-         PSFCK  =P(I,J,LMHK)
-         PKL = P(I,J,KB)
-c        IF (ITYPE.EQ.2.OR.(PKL.GE.PSFCK-DPBND.AND.PKL.LE.PSFCK)) THEN
-         IF (ITYPE.EQ.2.OR.
-     *      (ITYPE.EQ.1.AND.(PKL.GE.PSFCK-DPBND.AND.PKL.LE.PSFCK)))THEN
-          IF (ITYPE.EQ.1) THEN
-            TBTK   =T(I,J,KB)
-            QBTK   =Q(I,J,KB)
-            APEBTK =APE(I,J,KB)
-          ELSE
-            PKL    =P1D(I,J)
-            TBTK   =T1D(I,J)
-            QBTK   =Q1D(I,J)
-            APEBTK =(H10E5/PKL)**CAPA
-          ENDIF
+         DO I=1,IM
+          LMHK   =LMH(I,J)
+          if (LMHK < 1 .OR. LMHK < LMM) then
+           print*,'Invalid LMHK: ', LMHK, ' KB=',LMM
+          endif
+          PSFCK  =P(I,J,LMHK)
+          PKL = P(I,J,KB)
+!         IF (ITYPE.EQ.2.OR.(PKL.GE.PSFCK-DPBND.AND.PKL.LE.PSFCK)) THEN
+          IF (ITYPE.EQ.2.OR.
+     *       (ITYPE.EQ.1.AND.(PKL.GE.PSFCK-DPBND.AND.PKL.LE.PSFCK)))THEN
+           IF (ITYPE.EQ.1) THEN
+             TBTK   =T(I,J,KB)
+             QBTK   =Q(I,J,KB)
+             APEBTK =APE(I,J,KB)
+           ELSE
+             PKL    =P1D(I,J)
+             TBTK   =T1D(I,J)
+             QBTK   =Q1D(I,J)
+             APEBTK =(H10E5/PKL)**CAPA
+           ENDIF
 C--------------SCALING POTENTIAL TEMPERATURE & TABLE INDEX--------------
-          TTHBTK =TBTK*APEBTK
-          TTHK   =(TTHBTK-THL)*RDTH
-          QQ  (I,J)=TTHK-AINT(TTHK)
-          ITTBK  =INT(TTHK)+1
+           TTHBTK =TBTK*APEBTK
+           TTHK   =(TTHBTK-THL)*RDTH
+           QQ  (I,J)=TTHK-AINT(TTHK)
+           ITTBK  =INT(TTHK)+1
 C--------------KEEPING INDICES WITHIN THE TABLE-------------------------
-          IF(ITTBK.LT.1)    THEN
-            ITTBK  =1
-            QQ  (I,J)=0.0
-          ENDIF
-          IF(ITTBK.GE.JTB)  THEN
-            ITTBK  =JTB-1
-            QQ  (I,J)=0.0
-          ENDIF
+           IF(ITTBK.LT.1)    THEN
+             ITTBK  =1
+             QQ  (I,J)=0.0
+           ENDIF
+           IF(ITTBK.GE.JTB)  THEN
+             ITTBK  =JTB-1
+             QQ  (I,J)=0.0
+           ENDIF
 C--------------BASE AND SCALING FACTOR FOR SPEC. HUMIDITY---------------
-          BQS00K=QS0(ITTBK)
-          SQS00K=SQS(ITTBK)
-          BQS10K=QS0(ITTBK+1)
-          SQS10K=SQS(ITTBK+1)
+           BQS00K=QS0(ITTBK)
+           SQS00K=SQS(ITTBK)
+           BQS10K=QS0(ITTBK+1)
+           SQS10K=SQS(ITTBK+1)
 C--------------SCALING SPEC. HUMIDITY & TABLE INDEX---------------------
-          BQK    =(BQS10K-BQS00K)*QQ(I,J)+BQS00K
-          SQK    =(SQS10K-SQS00K)*QQ(I,J)+SQS00K
-          TQK    =(QBTK-BQK)/SQK*RDQ
-          PP  (I,J)=TQK-AINT(TQK)
-          IQ     =INT(TQK)+1
+           BQK    =(BQS10K-BQS00K)*QQ(I,J)+BQS00K
+           SQK    =(SQS10K-SQS00K)*QQ(I,J)+SQS00K
+           TQK    =(QBTK-BQK)/SQK*RDQ
+           PP  (I,J)=TQK-AINT(TQK)
+           IQ     =INT(TQK)+1
 C--------------KEEPING INDICES WITHIN THE TABLE-------------------------
-          IF(IQ.LT.1)    THEN
-            IQ     =1
-            PP  (I,J)=0.0
-          ENDIF
-          IF(IQ.GE.ITB)  THEN
-            IQ     =ITB-1
-            PP  (I,J)=0.0
-          ENDIF
+           IF(IQ.LT.1)    THEN
+             IQ     =1
+             PP  (I,J)=0.0
+           ENDIF
+           IF(IQ.GE.ITB)  THEN
+             IQ     =ITB-1
+             PP  (I,J)=0.0
+           ENDIF
 C--------------SATURATION PRESSURE AT FOUR SURROUNDING TABLE PTS.-------
-          IT=ITTBK
-          P00K=PTBL(IQ  ,IT  )
-          P10K=PTBL(IQ+1,IT  )
-          P01K=PTBL(IQ  ,IT+1)
-          P11K=PTBL(IQ+1,IT+1)
+           IT=ITTBK
+           P00K=PTBL(IQ  ,IT  )
+           P10K=PTBL(IQ+1,IT  )
+           P01K=PTBL(IQ  ,IT+1)
+           P11K=PTBL(IQ+1,IT+1)
 C--------------SATURATION POINT VARIABLES AT THE BOTTOM-----------------
-          TPSPK=P00K+(P10K-P00K)*PP(I,J)+(P01K-P00K)*QQ(I,J)
-     2      +(P00K-P10K-P01K+P11K)*PP(I,J)*QQ(I,J)
-          APESPK=(H10E5/TPSPK)**CAPA
-          TTHESK=TTHBTK*EXP(ELOCP*QBTK*APESPK/TTHBTK)
+           TPSPK=P00K+(P10K-P00K)*PP(I,J)+(P01K-P00K)*QQ(I,J)
+     2       +(P00K-P10K-P01K+P11K)*PP(I,J)*QQ(I,J)
+           APESPK=(H10E5/TPSPK)**CAPA
+           TTHESK=TTHBTK*EXP(ELOCP*QBTK*APESPK/TTHBTK)
 C--------------CHECK FOR MAXIMUM THETA E--------------------------------
-C     2 PTBL(IQ+1  ,IT  ),PTBL(IQ  ,IT+1  ),PTBL(IQ+1  ,IT+1  )
-          IF(TTHESK.GT.THESP(I,J))    THEN
-            PSP  (I,J)=TPSPK
-            THESP(I,J)=TTHESK
+C     2  PTBL(IQ+1  ,IT  ),PTBL(IQ  ,IT+1  ),PTBL(IQ+1  ,IT+1  )
+           IF(TTHESK.GT.THESP(I,J))    THEN
+             PSP  (I,J)=TPSPK
+             THESP(I,J)=TTHESK
+           ENDIF
           ENDIF
-         ENDIF
-        ENDDO
+         ENDDO
         ENDDO
        ENDIF
       ENDDO
@@ -287,9 +322,9 @@ C***  COMPUTE PARCEL TEMPERATURE ALONG MOIST ADIABAT FOR PRESSURE<PLQ
 C**
         IF(KNUML.GT.0)THEN
          CALL TTBLEX(TPAR(1,1,L),TTBL,IM,JM,IMJM,ITB,JTB 
-     &,             KNUML,ILRES,JLRES
-     1,             P(1,1,L),PL,QQ,PP,RDP,THE0,STHE
-     2,             RDTHE,THESP,IPTB,ITHTB)
+     &              ,KNUML,ILRES,JLRES
+     1              ,P(1,1,L),PL,QQ,PP,RDP,THE0,STHE
+     2              ,RDTHE,THESP,IPTB,ITHTB)
         ENDIF
 
 C***
@@ -357,9 +392,9 @@ C          print*,'virtual thetap=',thetap
 C          print*,'virtual thetaa=',thetaa
            endif
            IF (THETAP.LT.THETAA)
-     &      CINS(I,J)=CINS(I,J)+G*(ALOG(THETAP)-ALOG(THETAA))*DZKL
+     &      CINS(I,J)=CINS(I,J)+G*(LOG(THETAP)-LOG(THETAA))*DZKL
            IF (THETAP.GT.THETAA)
-     &      CAPE(I,J)=CAPE(I,J)+G*(ALOG(THETAP)-ALOG(THETAA))*DZKL
+     &      CAPE(I,J)=CAPE(I,J)+G*(LOG(THETAP)-LOG(THETAA))*DZKL
          ENDDO
         ENDDO
        ENDDO
@@ -372,8 +407,8 @@ C     LIMIT OF 0.0 ON CINS.
 C
       DO J = 1,JM
       DO I = 1,IM
-         CAPE(I,J) = AMAX1(0.0,CAPE(I,J))
-         CINS(I,J) = AMIN1(CINS(I,J),0.0)
+         CAPE(I,J) = MAX(0.0,CAPE(I,J))
+         CINS(I,J) = MIN(CINS(I,J),0.0)
       ENDDO
       ENDDO
 c     if(itype.eq.2) print*,'CAPE,CINS=',CAPE,CINS
@@ -396,25 +431,37 @@ C     END OF ROUTINE.
 C     
       RETURN
       END
-      SUBROUTINE TABLE1(PTBL,TTBL,PT
-     &,                RDQ,RDTH,RDP,RDTHE,PL,THL,QS0,SQS,STHE,THE0)
+      SUBROUTINE TABLE1(PTBL,TTBL,PT,RDQ,RDTH,RDP
+     &                 ,RDTHE,PL,THL,QS0,SQS,STHE,THE0)
 C     ******************************************************************
 C     *                                                                *
 C     *    GENERATE VALUES FOR LOOK-UP TABLES USED IN CONVECTION       *
 C     *                                                                *
 C     ******************************************************************
-                             P A R A M E T E R
-     & (ITB=076,JTB=134)
-                             P A R A M E T E R
-     & (THH=365.,PH=105000.
-     &, PQ0=379.90516,A1=610.78,A2=17.2693882,A3=273.16,A4=35.86
-     &, R=287.04,CP=1004.6,ELIWV=2.683E6,EPS=1.E-9)
-                             D I M E N S I O N
-     &  PTBL  (ITB,JTB),TTBL  (JTB,ITB),QSOLD (JTB),POLD  (JTB)
-     &, QS0   (JTB),SQS   (JTB),QSNEW (JTB)
-     &, Y2P   (JTB),APP   (JTB),AQP   (JTB),PNEW  (JTB)
-     &, TOLD  (JTB),THEOLD(JTB),THE0  (ITB),STHE  (ITB)
-     &, Y2T   (JTB),THENEW(JTB),APT   (JTB),AQT   (JTB),TNEW  (JTB)
+      USE ISO_C_BINDING
+      implicit none
+      integer, parameter :: ITB = 76, JTB = 134
+      real(C_DOUBLE), intent(in) :: PT, THL
+      real(C_DOUBLE), intent(out) :: PTBL(ITB,JTB), TTBL(JTB,ITB)
+      real(C_DOUBLE), intent(out) :: RDQ, RDTH, RDP, RDTHE
+!      real(C_DOUBLE), intent(out) :: PL_out
+      real(C_DOUBLE), intent(out) :: QS0(JTB), SQS(JTB)
+      real(C_DOUBLE), intent(out) :: STHE(ITB), THE0(ITB)
+
+      integer :: K, KTHM, KPM, KTHM1, KPM1, KP, KTH
+      real(C_DOUBLE) :: APE, DP, DQS, DTH, DTHE, P, PL, QS0K, QS
+      real(C_DOUBLE) :: SQSK, STHEK, TH, THE0K
+      real(C_DOUBLE), dimension(JTB) :: QSOLD, POLD, QSNEW, PNEW
+     &                                 ,APP, AQP, TOLD, TNEW
+     &                                 ,THEOLD, THENEW
+      real(C_DOUBLE), dimension(JTB) :: Y2P, Y2T, APT, AQT
+      ! A1=610.78
+      real(C_DOUBLE), parameter :: THH=365., PH=105000.
+     &                            ,PQ0=379.90516,A2=17.2693882
+     &                            ,A3=273.16,A4=35.86
+     &                            ,R=287.04,CP=1004.6
+     &                            ,ELIWV=2.683E6,EPS=1.E-9
+
 C--------------COARSE LOOK-UP TABLE FOR SATURATION POINT----------------
       KTHM=JTB
       KPM=ITB
@@ -435,23 +482,24 @@ C-----------------------------------------------------------------------
       DO 500 KTH=1,KTHM
        TH=TH+DTH
        P=PL-DP
-       DO 510 KP=1,KPM
+       DO KP=1,KPM
         P=P+DP
         APE=(100000./P)**(R/CP)
         QSOLD(KP)=PQ0/P*EXP(A2*(TH-A3*APE)/(TH-A4*APE))
- 510    POLD(KP)=P
+        POLD(KP)=P
+       ENDDO
 C      
        QS0K=QSOLD(1)
        SQSK=QSOLD(KPM)-QSOLD(1)
        QSOLD(1  )=0.
        QSOLD(KPM)=1.
 C      
-       DO 520 KP=2,KPM1
+       DO KP=2,KPM1
         QSOLD(KP)=(QSOLD(KP)-QS0K)/SQSK
 C      
         IF((QSOLD(KP)-QSOLD(KP-1)).LT.EPS) QSOLD(KP)=QSOLD(KP-1)+EPS
 C      
- 520   CONTINUE
+       ENDDO
 C      
        QS0(KTH)=QS0K
        SQS(KTH)=SQSK
@@ -460,42 +508,45 @@ C-----------------------------------------------------------------------
        QSNEW(KPM)=1.
        DQS=1./REAL(KPM-1)
 C      
-       DO 530 KP=2,KPM1
- 530    QSNEW(KP)=QSNEW(KP-1)+DQS
+       DO KP=2,KPM1
+        QSNEW(KP)=QSNEW(KP-1)+DQS
+       ENDDO
 C      
        Y2P(1   )=0.
        Y2P(KPM )=0.
 C      
        CALL SPLINE(JTB,KPM,QSOLD,POLD,Y2P,KPM,QSNEW,PNEW,APP,AQP)
 C      
-       DO 540 KP=1,KPM
- 540    PTBL(KP,KTH)=PNEW(KP)
+       DO KP=1,KPM
+        PTBL(KP,KTH)=PNEW(KP)
+       ENDDO
 C-----------------------------------------------------------------------
  500  CONTINUE
 C--------------COARSE LOOK-UP TABLE FOR T(P) FROM CONSTANT THE----------
       P=PL-DP
-      DO 550 KP=1,KPM
+      DO KP=1,KPM
        P=P+DP
        TH=THL-DTH
-       DO 560 KTH=1,KTHM
+       DO KTH=1,KTHM
         TH=TH+DTH
         APE=(100000./P)**(R/CP)
         QS=PQ0/P*EXP(A2*(TH-A3*APE)/(TH-A4*APE))
         TOLD(KTH)=TH/APE
- 560    THEOLD(KTH)=TH*EXP(ELIWV*QS/(CP*TOLD(KTH)))
+        THEOLD(KTH)=TH*EXP(ELIWV*QS/(CP*TOLD(KTH)))
+       ENDDO
 C
        THE0K=THEOLD(1)
        STHEK=THEOLD(KTHM)-THEOLD(1)
        THEOLD(1   )=0.
        THEOLD(KTHM)=1.
 C
-       DO 570 KTH=2,KTHM1
+       DO KTH=2,KTHM1
         THEOLD(KTH)=(THEOLD(KTH)-THE0K)/STHEK
 C
         IF((THEOLD(KTH)-THEOLD(KTH-1)).LT.EPS)
      1      THEOLD(KTH)=THEOLD(KTH-1)  +  EPS
 C
- 570   CONTINUE
+       ENDDO
 C
        THE0(KP)=THE0K
        STHE(KP)=STHEK
@@ -505,18 +556,21 @@ C-----------------------------------------------------------------------
        DTHE=1./REAL(KTHM-1)
        RDTHE=1./DTHE
 C      
-       DO 580 KTH=2,KTHM1
- 580    THENEW(KTH)=THENEW(KTH-1)+DTHE
+       DO KTH=2,KTHM1
+        THENEW(KTH)=THENEW(KTH-1)+DTHE
+       ENDDO
 C      
        Y2T(1   )=0.
        Y2T(KTHM)=0.
 C      
        CALL SPLINE(JTB,KTHM,THEOLD,TOLD,Y2T,KTHM,THENEW,TNEW,APT,AQT)
 C      
-       DO 590 KTH=1,KTHM
- 590    TTBL(KTH,KP)=TNEW(KTH)
+       DO KTH=1,KTHM
+        TTBL(KTH,KP)=TNEW(KTH)
+       ENDDO
 C-----------------------------------------------------------------------
- 550  CONTINUE
+      ENDDO
+
 C
       RETURN
       END
@@ -529,16 +583,29 @@ C     *        GENERATE VALUES FOR FINER LOOK-UP TABLES USED           *
 C     *                       IN CONVECTION                            *
 C     *                                                                *
 C     ******************************************************************
-                             P A R A M E T E R
-     & (ITB=152,JTB=440)
-                             P A R A M E T E R
-     & (THH=325.,PH=105000.
-     &, PQ0=379.90516,A1=610.78,A2=17.2693882,A3=273.16,A4=35.86
-     &, R=287.04,CP=1004.6,ELIWV=2.683E6,EPS=1.E-9)
-                             D I M E N S I O N
-     &  TTBLQ (JTB,ITB)
-     &, TOLD  (JTB),THEOLD(JTB),THE0  (ITB),STHE  (ITB)
-     &, Y2T   (JTB),THENEW(JTB),APT   (JTB),AQT   (JTB),TNEW  (JTB)
+      USE ISO_C_BINDING
+      implicit none
+
+      integer, parameter :: ITB = 152, JTB = 440
+      real(C_DOUBLE), intent(in)  :: PL, THL
+      real(C_DOUBLE), intent(out) :: TTBLQ(JTB,ITB)
+      real(C_DOUBLE), intent(out) :: RDP, RDTHE
+      real(C_DOUBLE), intent(out) :: STHE(ITB), THE0(ITB)
+
+      integer :: KTHM, KPM, KTHM1, KPM1
+      integer :: K, KP, KTH
+
+      real(C_DOUBLE), parameter :: THH=325.,PH=105000.
+     &                            ,PQ0=379.90516,A1=610.78
+     &                            ,A2=17.2693882,A3=273.16
+     &                            ,A4=35.86, R=287.04
+     &                            ,CP=1004.6,ELIWV=2.683E6
+     &                            ,EPS=1.E-9
+      real(C_DOUBLE) :: DTH, DP, TH, P
+      real(C_DOUBLE), dimension(JTB) :: APT, AQT, Y2T
+      real(C_DOUBLE), dimension(JTB) :: TOLD, THEOLD, THENEW, TNEW
+      real(C_DOUBLE) :: QS, APE, THE0K, STHEK, DTHE
+
 C--------------COARSE LOOK-UP TABLE FOR SATURATION POINT----------------
       KTHM=JTB
       KPM=ITB
@@ -612,61 +679,88 @@ C     *                    THE APPROPRIATE TTBL                        *
 C     *                                                                *
 C     ******************************************************************
 C----------------------------------------------------------------------
-      PARAMETER(IM=1,JM=1,LM=50,IMXJM=IM*JM)
-                             D I M E N S I O N
-     1 TREF(IM,JM),TTBL(JTB,ITB),IARR(IMXJM),JARR(IMXJM)
-     2,PIJL(IM,JM),QQ(IM,JM),PP(IM,JM),THE0(ITB)
-     3,STHE(ITB),THESP(IM,JM),IPTB(IM,JM),ITHTB(IM,JM)
+      USE ISO_C_BINDING
+      implicit none
+
+      integer, PARAMETER :: IM=1,JM=1,LM=50,IMXJM=IM*JM
+
+      integer, intent(in) :: IMM, JMM, IMJM, ITB, JTB, KNUM
+      integer, intent(in) :: IARR(IMXJM), JARR(IMXJM)
+      real(C_DOUBLE), intent(in) :: PIJL(IM,JM)
+      real(C_DOUBLE), intent(in) :: TTBL(JTB,ITB)
+      real(C_DOUBLE), intent(in) :: THE0(ITB), STHE(ITB), RDTHE
+      real(C_DOUBLE), intent(in) :: THESP(IM,JM)
+      real(C_DOUBLE), intent(in) :: PL, RDP
+
+      real(C_DOUBLE), intent(out) :: TREF(IM,JM)
+      real(C_DOUBLE), intent(out) :: QQ(IM,JM), PP(IM,JM)
+      integer,   intent(out) :: IPTB(IM,JM), ITHTB(IM,JM)
+
+      ! Locals
+      integer :: KK, I, J
+      integer :: IPTBK, ITHTBK, ITH, IP
+      real(C_DOUBLE) :: PK, TPK
+      real(C_DOUBLE) :: BTHE00K, STHE00K, BTHE10K, STHE10K
+      real(C_DOUBLE) :: BTHK, STHK, TTHK
+      real(C_DOUBLE) :: T00K, T10K, T01K, T11K
+
+      ! Initialize outputs in case some indices are not processed
+      TREF = 0.0d0
+      QQ   = 0.0d0
+      PP   = 0.0d0
+      IPTB = 1
+      ITHTB= 1
+
 C-----------------------------------------------------------------------
-      DO 500 KK=1,KNUM
+      DO KK=1,KNUM
 C--------------SCALING PRESSURE & TT TABLE INDEX------------------------
-      I=IARR(KK)
-      J=JARR(KK)
-      PK=PIJL(I,J)
-      TPK=(PK-PL)*RDP
-      QQ(I,J)=TPK-AINT(TPK)
-      IPTB(I,J)=INT(TPK)+1
+       I=IARR(KK)
+       J=JARR(KK)
+       PK=PIJL(I,J)             ! source pressure for this parcel
+       TPK=(PK-PL)*RDP          ! map pressure to table index coordinate
+       QQ(I,J)=TPK-AINT(TPK)    ! fractional part for interpolation in the PTBL direction
+       IPTB(I,J)=INT(TPK)+1
 C--------------KEEPING INDICES WITHIN THE TABLE-------------------------
-      IF(IPTB(I,J).LT.1)THEN
-        IPTB(I,J)=1
-        QQ(I,J)=0.
-      ENDIF
-      IF(IPTB(I,J).GE.ITB)THEN
-        IPTB(I,J)=ITB-1
-        QQ(I,J)=0.
-      ENDIF
+       IF(IPTB(I,J).LT.1)THEN
+         IPTB(I,J)=1
+         QQ(I,J)=0.
+       ENDIF
+       IF(IPTB(I,J).GE.ITB)THEN
+         IPTB(I,J)=ITB-1
+         QQ(I,J)=0.
+       ENDIF
 C--------------BASE AND SCALING FACTOR FOR THE--------------------------
-      IPTBK=IPTB(I,J)
-      BTHE00K=THE0(IPTBK)
-      STHE00K=STHE(IPTBK)
-      BTHE10K=THE0(IPTBK+1)
-      STHE10K=STHE(IPTBK+1)
+       IPTBK=IPTB(I,J)
+       BTHE00K=THE0(IPTBK)
+       STHE00K=STHE(IPTBK)
+       BTHE10K=THE0(IPTBK+1)
+       STHE10K=STHE(IPTBK+1)
 C--------------SCALING THE & TT TABLE INDEX-----------------------------
-      BTHK=(BTHE10K-BTHE00K)*QQ(I,J)+BTHE00K
-      STHK=(STHE10K-STHE00K)*QQ(I,J)+STHE00K
-      TTHK=(THESP(I,J)-BTHK)/STHK*RDTHE
-      PP(I,J)=TTHK-AINT(TTHK)
-      ITHTB(I,J)=INT(TTHK)+1
+       BTHK=(BTHE10K-BTHE00K)*QQ(I,J)+BTHE00K
+       STHK=(STHE10K-STHE00K)*QQ(I,J)+STHE00K
+       TTHK=(THESP(I,J)-BTHK)/STHK*RDTHE
+       PP(I,J)=TTHK-AINT(TTHK)
+       ITHTB(I,J)=INT(TTHK)+1
 C--------------KEEPING INDICES WITHIN THE TABLE-------------------------
-      IF(ITHTB(I,J).LT.1)THEN
-        ITHTB(I,J)=1
-        PP(I,J)=0.
-      ENDIF
-      IF(ITHTB(I,J).GE.JTB)THEN
-        ITHTB(I,J)=JTB-1
-        PP(I,J)=0.
-      ENDIF
+       IF(ITHTB(I,J).LT.1)THEN
+         ITHTB(I,J)=1
+         PP(I,J)=0.
+       ENDIF
+       IF(ITHTB(I,J).GE.JTB)THEN
+         ITHTB(I,J)=JTB-1
+         PP(I,J)=0.
+       ENDIF
 C--------------TEMPERATURE AT FOUR SURROUNDING TT TABLE PTS.------------
-      ITH=ITHTB(I,J)
-      IP=IPTB(I,J)
-      T00K=TTBL(ITH  ,IP  )
-      T10K=TTBL(ITH+1,IP  )
-      T01K=TTBL(ITH  ,IP+1)
-      T11K=TTBL(ITH+1,IP+1)
+       ITH=ITHTB(I,J)
+       IP=IPTB(I,J)
+       T00K=TTBL(ITH  ,IP  )
+       T10K=TTBL(ITH+1,IP  )
+       T01K=TTBL(ITH  ,IP+1)
+       T11K=TTBL(ITH+1,IP+1)
 C--------------PARCEL TEMPERATURE-------------------------------------
-      TREF(I,J)=(T00K+(T10K-T00K)*PP(I,J)+(T01K-T00K)*QQ(I,J)
-     2         +(T00K-T10K-T01K+T11K)*PP(I,J)*QQ(I,J))
-  500 CONTINUE
+       TREF(I,J)=(T00K+(T10K-T00K)*PP(I,J)+(T01K-T00K)*QQ(I,J)
+     2          +(T00K-T10K-T01K+T11K)*PP(I,J)*QQ(I,J))
+      enddo
 C
       RETURN
       END
@@ -697,9 +791,21 @@ C     *  YNEW - THE VALUES OF THE FUNCTION TO BE CALCULATED.           *
 C     *  P, Q - AUXILIARY VECTORS OF THE LENGTH NOLD-2.                *
 C     *                                                                *
 C     ******************************************************************
-                             D I M E N S I O N
-     & XOLD(JTB),YOLD(JTB),Y2(JTB),P(JTB),Q(JTB)
-     &,XNEW(JTB),YNEW(JTB)
+       USE ISO_C_BINDING
+       implicit none
+       integer, intent(in) :: JTB, NOLD, NNEW
+       real(C_DOUBLE), intent(in) :: XOLD(JTB), YOLD(JTB)
+       real(C_DOUBLE), intent(inout) :: Y2(JTB)
+       real(C_DOUBLE), intent(in) :: XNEW(JTB)
+       real(C_DOUBLE), intent(out) :: YNEW(JTB)
+       real(C_DOUBLE), intent(inout) :: P(JTB), Q(JTB)
+
+       integer :: i, k, k1, k2, kidx, kold, kp
+       integer :: lastInterval, NOLDM1
+       real(C_DOUBLE) :: dxl, dxr, dydxl, dydxr, rtdxc, dx, rdx
+       real(C_DOUBLE) :: dx_c, den, ak, bk, ck, x, XK, xsq
+       real(C_DOUBLE) :: Y2K, Y2KP1
+
 C-----------------------------------------------------------------------
       NOLDM1=NOLD-1
 C
@@ -720,8 +826,8 @@ C
       DYDXL=DYDXR
       DXR=XOLD(K+1)-XOLD(K)
       DYDXR=(YOLD(K+1)-YOLD(K))/DXR
-      DXC=DXL+DXR
-      DEN=1./(DXL*Q(K-2)+DXC+DXC)
+      DX_C=DXL+DXR
+      DEN=1./(DXL*Q(K-2)+DX_C+DX_C)
 C
       P(K-1)= DEN*(6.*(DYDXR-DYDXL)-DXL*P(K-2))
       Q(K-1)=-DEN*DXR
@@ -780,28 +886,40 @@ C     2 YOLD(NOLD),YNEW(NNEW)
       RETURN
       END
 
-      function fpvsnew(t)
+      function fpvsnew(t) result(fpvs)
+      USE ISO_C_BINDING
+      implicit none
+      real(C_DOUBLE), intent(in) :: t
+      real(C_DOUBLE) :: fpvs
 
-      integer nxpvs
-      real con_ttp,con_psat,con_cvap,con_cliq,con_hvap,con_rv,con_csol,con_hfus,
-     *     tliq,tice,dldtl,heatl,xponal,xponbl,dldti,heati,xponai,xponbi
+      ! Constants from original routine
+      integer, parameter :: nxpvs = 7501
+      real(C_DOUBLE), parameter :: con_ttp=2.7316e+2, con_psat=6.1078e+2
+     &                            ,con_cvap=1.8460e+3
+     &                            ,con_cliq=4.1855e+3
+     &                            ,con_hvap=2.5000e+6
+     &                            ,con_rv=4.6150e+2
+     &                            ,con_csol=2.1060e+3
+     &                            ,con_hfus=3.3358e+5
+      real(C_DOUBLE) :: tliq, tice, dldtl, heatl, dldti, heati
+      real(C_DOUBLE) :: xponal, xponbl, xponai, xponbi
+      real(C_DOUBLE) :: tr, w, pvl, pvi
+      real(C_DOUBLE) :: xmin, xmax, xinc, c2xpvs, c1xpvs
+      real(C_DOUBLE), allocatable :: tbpvs(:)
+      integer :: jx
+      real(C_DOUBLE) :: x, xp1, xj
 
-      real tr,w,pvl,pvi
-      real fpvsnew
-      real t
-      integer jx
-      real xj,x,tbpvs(7501),xp1
-      real xmin,xmax,xinc,c2xpvs,c1xpvs
+C      real con_ttp,con_psat,con_cvap,con_cliq,con_hvap,con_rv,con_csol,con_hfus,
+C     *     tliq,tice,dldtl,heatl,xponal,xponbl,dldti,heati,xponai,xponbi
 
-      nxpvs=7501
-      con_ttp=2.7316e+2
-      con_psat=6.1078e+2
-      con_cvap=1.8460e+3
-      con_cliq=4.1855e+3
-      con_hvap=2.5000e+6
-      con_rv=4.6150e+2
-      con_csol=2.1060e+3
-      con_hfus=3.3358e+5
+C      real tr,w,pvl,pvi
+C      real fpvsnew
+C      real t
+C      integer jx
+C      real xj,x,tbpvs(7501),xp1
+C      real xmin,xmax,xinc,c2xpvs,c1xpvs
+
+      allocate(tbpvs(nxpvs))
 
       tliq=con_ttp
       tice=con_ttp-20.0
@@ -839,7 +957,6 @@ c    xj=min(max(c1xpvs+c2xpvs*t,1.0),real(nxpvs,krealfp))
 
       xp1=xmin+(jx-1+1)*xinc
 
-
       tr=con_ttp/xp1
       if(xp1.ge.tliq) then
         tbpvs(jx+1)=con_psat*(tr**xponal)*exp(xponbl*(1.-tr))
@@ -852,5 +969,6 @@ c    xj=min(max(c1xpvs+c2xpvs*t,1.0),real(nxpvs,krealfp))
         tbpvs(jx+1)=w*pvl+(1.-w)*pvi
       endif
 
-      fpvsnew=tbpvs(jx)+(xj-jx)*(tbpvs(jx+1)-tbpvs(jx))
+      fpvs=tbpvs(jx)+(xj-jx)*(tbpvs(jx+1)-tbpvs(jx))
+      deallocate(tbpvs)
       end 
