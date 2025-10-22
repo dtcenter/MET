@@ -87,7 +87,7 @@ static void set_field_str(const StringArray & a);
 static void set_var_name(const StringArray & a);
 static void my_memcpy(void * to, unsigned char * & from, int n_bytes);
 
-static void usage(int exit_code);
+static void usage(int exit_code=1);
 
 ////////////////////////////////////////////////////////////////////////
 
