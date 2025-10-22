@@ -343,22 +343,22 @@ static NcFile *f_out      = (NcFile *) nullptr;
 ////////////////////////////////////////////////////////////////////////
 
 extern "C" {
-   void numpbmsg(int *, int *);
+   void numpbmsg_(int *, int *);
    void numpbmsg_new_(const char *, int *, int *);
    void openpb_(const char *, int *);
-   void closepb(int *);
-   void readpb(int *, int *, int *, double[mxr8pm],
+   void closepb_(int *);
+   void readpb_(int *, int *, int *, double[mxr8pm],
                 double[mxr8vt][mxr8vn][mxr8lv][mxr8pm], int *);
-   void readpb_hdr (int *,int *,double[mxr8pm]);
+   void readpb_hdr_ (int *,int *,double[mxr8pm]);
    void ireadns_  (int *, char *, int *);
    void readpbevt_(int *, int *, int *, double[mxr8vn][mxr8lv][mxr8pm],
                    char[mxr8lv*mxr8pm], int *, int *);
-   void readpbint(int *, int *, int *, double[mxr8lv][mxr8pm],
+   void readpbint_(int *, int *, int *, double[mxr8lv][mxr8pm],
                    char[mxr8lv*mxr8pm], int *, int *);
-   void dumppb(const char *, int *, const char *, int *,
+   void dumppb_(const char *, int *, const char *, int *,
                 const char *, int *, int *);
-   void dump_tbl(const char *, int *, const char *, int *);
-   int  get_tmin(int *, int *);
+   void dump_tbl_(const char *, int *, const char *, int *);
+   int  get_tmin_(int *, int *);
    void calcape(const int *, const int *, double [MAX_CAPE_LEVEL], double [MAX_CAPE_LEVEL],
                 double [MAX_CAPE_LEVEL],double *, double *, double *, double [MAX_CAPE_LEVEL+1],
                 const int *, const int *, const int *, const int *,
@@ -462,7 +462,7 @@ void dump_pb_data(
    }
 
    check_fortran_file_id(unit, method_name);
-   dumppb(blk_file.c_str(), &unit, dump_dir.c_str(), &len1,
+   dumppb_(blk_file.c_str(), &unit, dump_dir.c_str(), &len1,
            prefix.c_str(), &len2, msg_typ_ret);
 }
 
@@ -695,8 +695,8 @@ ConcatString save_bufr_table_to_file(const char *blk_file, int _file_id) {
    len = tbl_filename.length();
    check_fortran_file_id(_file_id, method_name);
    openpb_(blk_file, &_file_id);
-   dump_tbl(blk_file, &_file_id, tbl_filename.c_str(), &len);
-   closepb(&_file_id);
+   dump_tbl_(blk_file, &_file_id, tbl_filename.c_str(), &len);
+   closepb_(&_file_id);
 
    return tbl_filename;
 }
@@ -990,7 +990,7 @@ void process_pbfile(int i_pb) {
    openpb_(blk_file.c_str(), &unit);
 
    // Compute the number of PrepBufr records in the current file.
-   numpbmsg(&unit, &npbmsg);
+   numpbmsg_(&unit, &npbmsg);
    npbmsg_total = npbmsg;
 
    // Use the number of records requested by the user if there
@@ -1134,7 +1134,7 @@ void process_pbfile(int i_pb) {
 
       // Get the next PrepBufr message (header only)
       ireadns_(&unit, hdr_typ, &i_date);
-      readpb_hdr(&unit, &i_ret, hdr);
+      readpb_hdr_(&unit, &i_ret, hdr);
       hdr_typ[max_str_len-1] = 0;
 
       snprintf(time_str, sizeof(time_str), "%.10i", i_date);
@@ -1147,7 +1147,7 @@ void process_pbfile(int i_pb) {
 
          // Get minutes offset by calling IUPVS01(unit, "MINU")
          // It's not changed per message
-         get_tmin(&unit, &cycle_minute);
+         get_tmin_(&unit, &cycle_minute);
          if (cycle_minute != missing_cycle_minute) adjusted_file_ut += (cycle_minute * 60);
 
          mlog << Debug(2) << (is_prepbufr ? "PrepBufr" : "Bufr")
@@ -1202,7 +1202,7 @@ void process_pbfile(int i_pb) {
 
          //Read header (station id, lat, lon, ele, time)
          tmp_str = bufr_hdrs;
-         readpbint(&unit, &i_ret, &nlev, bufr_obs, (char*)bufr_hdr_names.c_str(),
+         readpbint_(&unit, &i_ret, &nlev, bufr_obs, (char*)bufr_hdr_names.c_str(),
                     &bufr_hdr_length, &req_hdr_level );
 
          // Copy sid, lat, lon, and dhr
@@ -1365,7 +1365,7 @@ void process_pbfile(int i_pb) {
       }
 
       // Get the next PrepBufr message
-      readpb(&unit, &i_ret, &nlev, hdr, evns, &nlev_max_req);
+      readpb_(&unit, &i_ret, &nlev, hdr, evns, &nlev_max_req);
 
       int max_buf = sizeof(modified_hdr_typ);
       // Special handling for "AIRNOW" and "ANOWPM"
@@ -1828,7 +1828,7 @@ void process_pbfile(int i_pb) {
               }
             }
             tmp_len = m_strlen(airnow_aux_vars);
-            readpbint(&unit, &tmp_ret, &tmp_nlev, bufr_obs_extra,
+            readpbint_(&unit, &tmp_ret, &tmp_nlev, bufr_obs_extra,
                        (char *)airnow_aux_vars, &tmp_len, &nlev_max_req);
          }
          bool isDegC;
@@ -1865,7 +1865,7 @@ void process_pbfile(int i_pb) {
                }
             }
 
-            readpbint(&unit, &i_ret, &nlev2, bufr_obs,
+            readpbint_(&unit, &i_ret, &nlev2, bufr_obs,
                        (char*)var_name.c_str(), &var_name_len, &nlev_max_req);
             if (0 >= nlev2) continue;
 
@@ -2117,7 +2117,7 @@ void process_pbfile(int i_pb) {
    }
 
    // Close the PREPBUFR file
-   closepb(&unit);
+   closepb_(&unit);
 
    // Delete the temporary blocked file
    remove_temp_file(blk_file);
@@ -2273,7 +2273,7 @@ void process_pbfile_metadata(int i_pb) {
 
          m_strncpy(tmp_str, prepbufr_hdrs_str, sizeof(tmp_str), method_name, "tmp_str1");
          length = m_strlen(tmp_str);
-         readpbint(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
+         readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
          is_prepbufr_hdr = (0 < nlev);
          if (is_prepbufr_hdr) {
             for (index=0; index<4; index++) {
@@ -2296,7 +2296,7 @@ void process_pbfile_metadata(int i_pb) {
             var_name = default_sid_name;
             m_strncpy(tmp_str, bufr_avail_sid_names, sizeof(tmp_str), method_name, "tmp_str2");
             length = m_strlen(tmp_str);
-            readpbint(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
+            readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
             if (0 < nlev) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(bufr_avail_sid_names);
@@ -2313,7 +2313,7 @@ void process_pbfile_metadata(int i_pb) {
 
             m_strncpy(tmp_str, bufr_avail_latlon_names, sizeof(tmp_str), method_name, "tmp_str3");
             length = m_strlen(tmp_str);
-            readpbint(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
+            readpbint_(&unit, &i_ret, &nlev, bufr_obs, tmp_str, &length, &hdr_level );
             if (0 < nlev) {
                tmp_hdr_array.clear();
                tmp_hdr_array.parse_wsss(bufr_avail_latlon_names);
@@ -2440,7 +2440,7 @@ void process_pbfile_metadata(int i_pb) {
          ConcatString var_name = unchecked_var_list[vIdx];
          int var_name_len = var_name.length();
 
-         readpbint(&unit, &i_ret, &nlev2, bufr_obs, (char*)var_name.c_str(), &var_name_len, &nlev_max_req);
+         readpbint_(&unit, &i_ret, &nlev2, bufr_obs, (char*)var_name.c_str(), &var_name_len, &nlev_max_req);
          if (0 >= nlev2) continue;
 
          // Search through the vertical levels
@@ -2514,7 +2514,7 @@ void process_pbfile_metadata(int i_pb) {
    }
 
    // Close the PREPBUFR file
-   closepb(&unit);
+   closepb_(&unit);
 
    // Delete the temporary blocked file
    remove_temp_file(blk_file);
