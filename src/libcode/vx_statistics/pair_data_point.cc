@@ -122,7 +122,7 @@ void PairDataPoint::extend(int n) {
 
    f_na.extend(n);
    f_lead_na.extend(n);
-   for (int idx=seeps_mpr.size(); idx<n; idx++) {
+   for (auto idx = (int) seeps_mpr.size(); idx<n; idx++) {
       seeps_mpr.emplace_back(nullptr);
    }
 
@@ -132,7 +132,6 @@ void PairDataPoint::extend(int n) {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataPoint::assign(const PairDataPoint &pd) {
-   int i;
 
    clear();
 
@@ -153,7 +152,7 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
    // Handle point data
    if(pd.is_point_vx()) {
 
-      for(i=0; i<pd.n_obs; i++) {
+      for(int i=0; i<pd.n_obs; i++) {
 
          // Store climo data
          ClimoPntInfo cpi(pd.fcmn_na[i], pd.fcsd_na[i],
@@ -165,8 +164,9 @@ void PairDataPoint::assign(const PairDataPoint &pd) {
                nint(pd.f_lead_na[i]), pd.vld_ta[i],
                pd.lvl_na[i], pd.hgt_na[i],
                pd.f_na[i], pd.o_na[i], pd.o_qc_sa[i].c_str(),
-               cpi, pd.wgt_na[i])) {
-            if(i < pd.seeps_mpr.size()) set_seeps_score(seeps_mpr[i], i);
+               cpi, pd.wgt_na[i]) &&
+            i < pd.seeps_mpr.size()) {
+            set_seeps_score(seeps_mpr[i], i);
          }
       }
    }
@@ -218,7 +218,7 @@ void PairDataPoint::set_seeps_thresh(const SingleThresh &p1_thresh) {
 
 void PairDataPoint::set_seeps_score(SeepsScore *seeps, int index) {
    if (seeps) {
-      int seeps_count = seeps_mpr.size();
+      auto seeps_count = (int) seeps_mpr.size();
       if(index < 0) index = seeps_count - 1;
       if(index < seeps_count) {
          if (seeps) {
@@ -328,9 +328,13 @@ static int seeps_debug_level = 9;
 
 SeepsScore *PairDataPoint::compute_seeps(const char *sid, double f,
                                          double o, unixtime ut) {
-   SeepsScore *seeps = 0;
-   int month, day, year, hour, minute, second;
-
+   SeepsScore *seeps = nullptr;
+   int month;
+   int day;
+   int year;
+   int hour;
+   int minute;
+   int second;
    int sid_no = atoi(sid);
    if (sid_no && seeps_climo) {
       unix_to_mdyhms(ut, month, day, year, hour, minute, second);
@@ -360,7 +364,6 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
       return *this;
    }
 
-   int i;
    PairDataPoint out_pd;
 
    // Allocate memory for output pairs
@@ -374,7 +377,7 @@ PairDataPoint PairDataPoint::subset_pairs_cnt_thresh(
    bool wgt_flag  = set_climo_flag(f_na, wgt_na);
 
    // Loop over the pairs
-   for(i=0; i<n_obs; i++) {
+   for(int i=0; i<n_obs; i++) {
 
       // Check for bad data
       if(is_bad_data(f_na[i])                   ||
@@ -459,10 +462,10 @@ VxPairDataPoint & VxPairDataPoint::operator=(const VxPairDataPoint &vx_pd) {
 
 void VxPairDataPoint::init_from_scratch() {
 
-   VxPairBase::init_from_scratch();
-
    fcst_info = (VarInfo *) nullptr;
    obs_info  = (VarInfo *) nullptr;
+
+   VxPairBase::init_from_scratch();
 
    clear();
 
@@ -515,10 +518,14 @@ void VxPairDataPoint::set_size(int types, int masks, int interps) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
-                                    const char *hdr_sid_str, unixtime hdr_ut,
-                                    const char *obs_qty, float *obs_arr,
-                                    const Grid &gr, const char *var_name) {
+void VxPairDataPoint::add_point_obs(const float *hdr_arr,
+                                    const char *hdr_typ_str,
+                                    const char *hdr_sid_str,
+                                    unixtime hdr_ut,
+                                    const char *obs_qty,
+                                    const float *obs_arr,
+                                    const Grid &gr,
+                                    const char *var_name) {
 
    // Increment the number of tries count
    n_try++;
@@ -549,7 +556,8 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    // Check location
    double hdr_lat = hdr_arr[0];
    double hdr_lon = hdr_arr[1];
-   double obs_x, obs_y;
+   double obs_x;
+   double obs_y;
    if(!is_keeper_grd(pnt_obs_str.c_str(), gr, hdr_lat, hdr_lon, obs_x, obs_y)) return;
 
    // Check topo
@@ -564,13 +572,10 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
    if(!is_keeper_lvl(pnt_obs_str.c_str(), hdr_typ_str, obs_lvl, obs_hgt)) return;
 
    // Set flags
-   bool spfh_flag   = fcst_info->is_specific_humidity() &&
-                      obs_info->is_specific_humidity();
    bool precip_flag = fcst_info->is_precipitation() &&
                       obs_info->is_precipitation();
    int precip_interval = fcst_dpa[0].accum();
 
-   bool has_seeps = false;
    SeepsScore *seeps = nullptr;
 
    // When verifying a vertical level forecast against a surface message
@@ -617,14 +622,18 @@ void VxPairDataPoint::add_point_obs(float *hdr_arr, const char *hdr_typ_str,
                                cpi, fcst_v)) continue;
 
             // MET #3174 Apply lapse rate surface temperature correction
-            if(sfc_info.lapse_rate_correction_apply_to != FieldType::None ||
-               msg_typ_sfc.reg_exp_match(hdr_typ_str)) {
-               correct_lapse_rate(topo_elv, hdr_elv, fcst_v, obs_v);
+            if(sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
+               msg_typ_sfc.reg_exp_match(hdr_typ_str) &&
+               !correct_lapse_rate(topo_elv, hdr_elv, fcst_v, obs_v)) {
+               inc_count(rej_mpr, i_msg_typ, i_mask, i_interp);
+               continue;
             }
 
             // MET #3174 Apply MSL/AGL height conversion
-            if(sfc_info.msl_agl_conversion_apply_to != FieldType::None) {
-               convert_msl_agl(topo_elv, hdr_elv, fcst_v, obs_v);
+            if(sfc_info.msl_agl_conversion_apply_to != FieldType::None &&
+               !convert_msl_agl(topo_elv, hdr_elv, fcst_v, obs_v)) {
+               inc_count(rej_mpr, i_msg_typ, i_mask, i_interp);
+               continue;
             }
 
             // Check matched pair filtering options
@@ -776,13 +785,14 @@ bool check_mpr_thresh(double f, double o, const ClimoPntInfo &cpi,
    if(reason_ptr) reason_ptr->erase();
 
    // Check arrays
-   if(m.size() == 0) return true;
+   if(m.empty()) return true;
 
    bool keep = true;
    bool absv = false;
    StringArray sa;
    ConcatString cs;
-   double v, v_cur;
+   double v;
+   double v_cur;
 
    // Loop over all the map entries
    for(const auto &col : m) {
@@ -877,7 +887,7 @@ void apply_mpr_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
                            const map<ConcatString,ThreshArray> &m) {
 
    // Check for no work to be done
-   if(m.size()  == 0) return;
+   if(m.empty()) return;
 
    int  nxy = fcst_dp.nx() * fcst_dp.ny();
    int  n_skip = 0;
@@ -949,8 +959,9 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
       return;
    }
 
-   int i;
-   double fcst_wind, obs_wind, wgt;
+   double fcst_wind;
+   double obs_wind;
+   double wgt;
 
    // Initialize and allocate memory for output pairs
    out_pd_u.erase();
@@ -971,7 +982,7 @@ void subset_wind_pairs(const PairDataPoint &pd_u, const PairDataPoint &pd_v,
    bool wgt_flag  = set_climo_flag(pd_u.f_na, pd_u.wgt_na);
 
    // Loop over the pairs
-   for(i=0; i<pd_u.n_obs; i++) {
+   for(int i=0; i<pd_u.n_obs; i++) {
       
       wgt = (wgt_flag ? pd_u.wgt_na[i] : default_weight);
 
@@ -1058,7 +1069,6 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
    // Check for no work to be done
    if(ta.n() == 0) return pd;
 
-   int i;
    PairDataPoint out_pd;
 
    // Allocate memory for output pairs
@@ -1072,7 +1082,7 @@ PairDataPoint subset_climo_cdf_bin(const PairDataPoint &pd,
    bool wgt_flag  = set_climo_flag(pd.f_na, pd.wgt_na);
 
    // Loop over the pairs
-   for(i=0; i<pd.n_obs; i++) {
+   for(int i=0; i<pd.n_obs; i++) {
 
       // Check for bad data
       if(is_bad_data(pd.f_na[i])                   ||

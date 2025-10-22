@@ -83,14 +83,13 @@ void PairDataEnsemble::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataEnsemble::clear() {
-   int i;
 
    PairBase::clear();
 
    obs_error_entry.clear();
    obs_error_flag = false;
 
-   for(i=0; i<n_ens; i++) e_na[i].clear();
+   for(int i=0; i<n_ens; i++) e_na[i].clear();
    if(e_na) { delete [] e_na; e_na = (NumArray *) nullptr; }
 
    v_na.clear();
@@ -158,7 +157,6 @@ void PairDataEnsemble::clear() {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataEnsemble::extend(int n) {
-   int i;
 
    // Allocate memory for the number of observations.
    // Only applies to arrays sized by n_obs which does not include:
@@ -168,7 +166,7 @@ void PairDataEnsemble::extend(int n) {
 
    obs_error_entry.extend(n);
 
-   for(i=0; i<n_ens; i++) e_na[i].extend(n);
+   for(int i=0; i<n_ens; i++) e_na[i].extend(n);
 
    v_na.extend               (n);
    r_na.extend               (n);
@@ -202,7 +200,6 @@ void PairDataEnsemble::extend(int n) {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
-   int i;
 
    clear();
 
@@ -282,10 +279,10 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    if(pd.ssvar_bins){
       ssvar_bins = new SSVARInfo[pd.ssvar_bins[0].n_bin];
-      for(i=0; i < pd.ssvar_bins[0].n_bin; i++){
+      for(int i=0; i < pd.ssvar_bins[0].n_bin; i++){
          ssvar_bins[i] = pd.ssvar_bins[i];
       }
-   } else ssvar_bins = 0;
+   } else ssvar_bins = nullptr;
 
    ssvar_bin_size = pd.ssvar_bin_size;
    phist_bin_size = pd.phist_bin_size;
@@ -304,7 +301,7 @@ void PairDataEnsemble::assign(const PairDataEnsemble &pd) {
 
    set_ens_size(pd.n_ens);
 
-   for(i=0; i<n_ens; i++) e_na[i] = pd.e_na[i];
+   for(int i=0; i<n_ens; i++) e_na[i] = pd.e_na[i];
 
    obs_error_entry = pd.obs_error_entry;
    obs_error_flag  = pd.obs_error_flag;
@@ -365,7 +362,7 @@ void PairDataEnsemble::add_obs_error_entry(ObsErrorEntry *e) {
 
    obs_error_entry.add(e);
 
-   if(e != 0) obs_error_flag = true;
+   if(e) obs_error_flag = true;
 
    return;
 }
@@ -373,10 +370,13 @@ void PairDataEnsemble::add_obs_error_entry(ObsErrorEntry *e) {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
-   int i, j, k, n_vld, n_bel, n_tie;
-   int n_skip_const, n_skip_vld;
-   NumArray src_na, dest_na, cur_ens, cur_clm;
-   double mean, stdev, var_unperturbed, var_perturbed;
+   NumArray src_na;
+   NumArray dest_na;
+   NumArray cur_ens;
+   NumArray cur_clm;
+   double mean;
+   double stdev;
+   double var_unperturbed;
 
    // Check if the ranks have already been computed
    if(r_na.n() == o_na.n()) return;
@@ -405,13 +405,19 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
    }
 
    // Compute the rank for each observation
-   for(i=0, n_pair=0, n_skip_const=0, n_skip_vld=0; i<o_na.n(); i++) {
+   n_pair = 0;
+   int n_skip_const = 0;
+   int n_skip_vld = 0;
+   for(int i=0; i<o_na.n(); i++) {
 
       // Initialize
       cur_ens.erase();
 
       // Compute the number of ensemble values above and below the observation
-      for(j=0, n_vld = n_bel = n_tie = 0; j<n_ens; j++) {
+      int n_vld = 0;
+      int n_bel = 0;
+      int n_tie = 0;
+      for(int j=0; j<n_ens; j++) {
 
          // Skip bad data
          if(e_na[j].n() > i && !is_bad_data(e_na[j][i])) {
@@ -474,21 +480,22 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
       else {
 
          // Compute the variance of the unperturbed ensemble members
-         var_unperturbed = compute_variance(esum_na[i], esumsq_na[i], esumn_na[i]);
+         var_unperturbed = compute_variance(esum_na[i], esumsq_na[i], nint(esumn_na[i]));
          var_na.add(var_unperturbed);
 
          // Process the observation error information
-         ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
+         const ObsErrorEntry * e = (has_obs_error() ? obs_error_entry[i] : 0);
          if(e) {
 
             // Get observation error variance
             double oerr_var = e->variance();
 
             // Compute the observation error log scores
-            double v_conv, v_corr;
+            double v_conv;
+            double v_corr;
             compute_obs_error_log_scores(
-               compute_mean(esum_na[i], esumn_na[i]),
-               compute_stdev(esum_na[i], esumsq_na[i], esumn_na[i]),
+               compute_mean(esum_na[i], nint(esumn_na[i])),
+               compute_stdev(esum_na[i], esumsq_na[i], nint(esumn_na[i])),
                o_na[i], oerr_var,
                v_conv, v_corr);
             ign_conv_oerr_na.add(v_conv);
@@ -528,7 +535,7 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
             // Initialize
             dest_na.clear();
             src_na.clear();
-            for(k=n_bel+1; k<=n_bel+n_tie+1; k++) src_na.add(k);
+            for(int k=n_bel+1; k<=n_bel+n_tie+1; k++) src_na.add(k);
 
             // Randomly choose one of the ranks
             ran_choose(rng_ptr, src_na, dest_na, 1);
@@ -561,8 +568,10 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
          pit_na.add(compute_ens_pit(o_na[i], mean, stdev));
 
          // Compute the Bias Ratio terms 
-         int n_ge_obs, n_lt_obs;
-         double me_ge_obs, me_lt_obs;
+         int n_ge_obs;
+         int n_lt_obs;
+         double me_ge_obs;
+         double me_lt_obs;
          compute_bias_ratio_terms(
             o_na[i], cur_ens,
             n_ge_obs, me_ge_obs,
@@ -594,20 +603,19 @@ void PairDataEnsemble::compute_pair_vals(const gsl_rng *rng_ptr) {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataEnsemble::compute_rhist() {
-   int i, rank;
 
    // Clear the ranked histogram
    rhist_na.clear();
 
    // Initialize the histogram counts to 0
-   for(i=0; i<=n_ens; i++) rhist_na.add(0);
+   for(int i=0; i<=n_ens; i++) rhist_na.add(0);
 
    // The compute_pair_vals() routine should have already been called.
    // Loop through the ranks and populate the histogram.
-   for(i=0; i<r_na.n(); i++) {
+   for(int i=0; i<r_na.n(); i++) {
 
       // Get the current rank
-      rank = nint(r_na[i]);
+      int rank = nint(r_na[i]);
 
       // Increment the histogram counts
       if(!is_bad_data(rank)) rhist_na.set(rank-1, rhist_na[rank-1]+1);
@@ -620,8 +628,6 @@ void PairDataEnsemble::compute_rhist() {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataEnsemble::compute_relp() {
-   int i, j, n;
-   double d, min_d;
    NumArray min_ens;
 
    // Clear the RELP histogram
@@ -631,18 +637,19 @@ void PairDataEnsemble::compute_relp() {
    min_ens.extend(n_ens);
 
    // Initialize counts to 0
-   for(i=0; i<n_ens; i++) relp_na.add(0);
+   for(int i=0; i<n_ens; i++) relp_na.add(0);
 
    // Loop through the observations and update the counts
-   for(i=0; i<o_na.n(); i++) {
+   for(int i=0; i<o_na.n(); i++) {
 
       if(skip_ba[i]) continue;
 
       // Search for the minimum difference
-      for(j=0, min_d=1.0e10; j<n_ens; j++) {
+      double min_d = 1.0e10;
+      for(int j=0; j<n_ens; j++) {
 
          // Absolute value of the difference
-         d = abs(e_na[j][i] - o_na[i]);
+         double d = abs(e_na[j][i] - o_na[i]);
 
          // Store the closest member
          if(d < min_d) {
@@ -657,8 +664,9 @@ void PairDataEnsemble::compute_relp() {
       } // end for j
 
       // Increment fractional RELP counts for each closest member
-      for(j=0, n=min_ens.n(); j<n; j++) {
-         relp_na.set(min_ens[j], relp_na[(min_ens[j])] + (double) 1.0/n);
+      for(int j=0, n=min_ens.n(); j<n; j++) {
+         int k = nint(min_ens[j]);
+         relp_na.set(k, relp_na[k] + 1.0/n);
       }
 
    } // end for i
@@ -669,17 +677,16 @@ void PairDataEnsemble::compute_relp() {
 ////////////////////////////////////////////////////////////////////////
 
 void PairDataEnsemble::compute_phist() {
-   int i, bin;
 
    // Clear the PIT histogram
    phist_na.clear();
 
    // Initialize the histogram counts to 0
-   for(i=0; i<ceil(1.0/phist_bin_size); i++) phist_na.add(0);
+   for(int i=0; i<ceil(1.0/phist_bin_size); i++) phist_na.add(0);
 
    // The compute_pair_vals() routine should have already been called.
    // Loop through the PIT values and populate the histogram.
-   for(i=0; i<pit_na.n(); i++) {
+   for(int i=0; i<pit_na.n(); i++) {
 
       if(skip_ba[i] || is_bad_data(pit_na[i])) continue;
 
@@ -691,8 +698,8 @@ void PairDataEnsemble::compute_phist() {
       }
 
       // Determine the bin
-      bin = (is_eq(pit_na[i], 1.0) ?
-             phist_na.n() - 1 : floor(pit_na[i]/phist_bin_size));
+      int bin = (is_eq(pit_na[i], 1.0) ?
+                phist_na.n() - 1 : (int) floor(pit_na[i]/phist_bin_size));
 
       // Increment the histogram counts
       phist_na.set(bin, phist_na[bin]+1);
@@ -712,7 +719,8 @@ struct ssvar_bin_comp {
 };
 
 void PairDataEnsemble::compute_ssvar() {
-   int i, j;
+   int i;
+   int j;
    double var;
    ssvar_bin_map bins;
    NumArray cur;
@@ -763,7 +771,7 @@ void PairDataEnsemble::compute_ssvar() {
 
       // Determine the bin for the current point and add it to the list
       // Bins are defined starting at 0 and are left-closed, right-open
-      j = floor(pt.var/ssvar_bin_size);
+      j = (int) floor(pt.var/ssvar_bin_size);
       string ssvar_min = str_format("%.5e", j*ssvar_bin_size).contents();
       if( !bins.count(ssvar_min) ){
          ssvar_pt_list pts;
@@ -787,10 +795,10 @@ void PairDataEnsemble::compute_ssvar() {
 
    // Sort the bins
    set<string,ssvar_bin_comp> sorted_bins;
-   for(auto &x : bins) sorted_bins.insert(x.first);
+   for(const auto &x : bins) sorted_bins.insert(x.first);
 
    // Report the number of bins built
-   int n_bin = sorted_bins.size();
+   auto n_bin = (int) sorted_bins.size();
    mlog << Debug(4) << "PairDataEnsemble::compute_ssvar() - "
         << "Built " << n_bin << " variance spread/skill bins from "
         << o_na.n() << " observations\n";
@@ -801,12 +809,17 @@ void PairDataEnsemble::compute_ssvar() {
    // Build a list of SSVARInfo objects
    ssvar_bins = new SSVARInfo[n_bin];
    i=0;
-   for( set<string>::iterator set_it = sorted_bins.begin();
-        set_it != sorted_bins.end(); set_it++, i++ ){
+   for(auto set_it = sorted_bins.begin();
+       set_it != sorted_bins.end(); set_it++, i++){
 
       ssvar_pt_list* pts = &( bins[*set_it] );
       var = 0;
-      double f = 0, o = 0, fo = 0, ff = 0, oo = 0, w = 0;
+      double f  = 0.0;
+      double o  = 0.0;
+      double fo = 0.0;
+      double ff = 0.0;
+      double oo = 0.0;
+      double w  = 0.0;
 
       for(j=0; j < (int)pts->size(); j++){
          var += (*pts)[j].w * (*pts)[j].var;
@@ -820,13 +833,13 @@ void PairDataEnsemble::compute_ssvar() {
 
       ssvar_bins[i].n_bin    = n_bin;
       ssvar_bins[i].bin_i    = i;
-      ssvar_bins[i].bin_n    = pts->size();
+      ssvar_bins[i].bin_n    = (int) pts->size();
 
       ssvar_bins[i].var_min  = atof( (*set_it).data() );
       ssvar_bins[i].var_max  = ssvar_bins[i].var_min + ssvar_bin_size;
       ssvar_bins[i].var_mean = var / w;
 
-      ssvar_bins[i].sl1l2_info.scount = pts->size();
+      ssvar_bins[i].sl1l2_info.scount = (int) pts->size();
       ssvar_bins[i].sl1l2_info.fbar   = f  / w;
       ssvar_bins[i].sl1l2_info.obar   = o  / w;
       ssvar_bins[i].sl1l2_info.fobar  = fo / w;
@@ -865,7 +878,6 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
    // Check for no work to be done
    if(ot.get_type() == thresh_na) return *this;
 
-   int i, j;
    PairDataEnsemble pd;
 
    // Set the ensemble size and allocate memory
@@ -884,7 +896,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
    bool wgt_flag  = set_climo_flag(o_na, wgt_na);
 
    // Loop over the pairs
-   for(i=0; i<n_obs; i++) {
+   for(int i=0; i<n_obs; i++) {
 
       // Store climo data
       ClimoPntInfo cpi(fcmn_na[i], fcsd_na[i], ocmn_na[i], ocsd_na[i]);
@@ -946,7 +958,7 @@ PairDataEnsemble PairDataEnsemble::subset_pairs_obs_thresh(const SingleThresh &o
       pd.mn_na.add(mn_na[i]);
       pd.mn_oerr_na.add(mn_oerr_na[i]);
 
-      for(j=0; j<n_ens; j++) pd.e_na[j].add(e_na[j][i]);
+      for(int j=0; j<n_ens; j++) pd.e_na[j].add(e_na[j][i]);
 
       // Increment counters
       pd.n_obs++;
@@ -1002,10 +1014,10 @@ VxPairDataEnsemble & VxPairDataEnsemble::operator=(const VxPairDataEnsemble &vx_
 
 void VxPairDataEnsemble::init_from_scratch() {
 
-   VxPairBase::init_from_scratch();
-
    ens_info = (EnsVarInfo *) nullptr;
    obs_info = (VarInfo *)    nullptr;
+
+   VxPairBase::init_from_scratch();
 
    clear();
 
@@ -1051,7 +1063,6 @@ void VxPairDataEnsemble::assign(const VxPairDataEnsemble &vx_pd) {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairDataEnsemble::set_ens_info(const EnsVarInfo *info) {
-   VarInfoFactory f;
 
    // Deallocate, if necessary
    if(ens_info) { delete ens_info; ens_info = (EnsVarInfo *) nullptr; }
@@ -1094,9 +1105,9 @@ void VxPairDataEnsemble::set_ens_size(int n) {
       // Handle HiRA neighborhoods
       if(it->interp_mthd == InterpMthd::HiRA) {
          GridTemplateFactory gtf;
-         GridTemplate* gt = gtf.buildGT(it->interp_shape,
-                                        it->interp_wdth,
-                                        false);
+         const GridTemplate* gt = gtf.buildGT(it->interp_shape,
+                                              it->interp_wdth,
+                                              false);
          it->set_ens_size(n*gt->size());
       }
       else {
@@ -1166,12 +1177,15 @@ void VxPairDataEnsemble::set_skip_const(bool tf) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
+void VxPairDataEnsemble::add_point_obs(const float *hdr_arr,
+                                       const int *hdr_typ_arr,
                                        const char *hdr_typ_str,
                                        const char *hdr_sid_str,
                                        unixtime hdr_ut,
-                                       const char *obs_qty, float *obs_arr,
-                                       const Grid &gr, const char *var_name) {
+                                       const char *obs_qty,
+                                       const float *obs_arr,
+                                       const Grid &gr,
+                                       const char *var_name) {
 
    // Check the observation VarInfo file type
    if(obs_info->file_type() != FileType_Gb1) {
@@ -1180,9 +1194,6 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
            << "VarInfo type must be GRIB.\n\n";
       exit(1);
    }
-
-   // Create VarInfoGrib pointer
-   VarInfoGrib *obs_info_grib = (VarInfoGrib *) obs_info;
 
    // Increment the number of tries count
    n_try++;
@@ -1213,7 +1224,8 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
    // Check location
    double hdr_lat = hdr_arr[0];
    double hdr_lon = hdr_arr[1];
-   double obs_x, obs_y;
+   double obs_x;
+   double obs_y;
    if(!is_keeper_grd(pnt_obs_str.c_str(), gr, hdr_lat, hdr_lon, obs_x, obs_y)) return;
 
    // Check topo
@@ -1235,12 +1247,8 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
       obs_lvl = bad_data_double;
    }
 
-   // Set flags
-   bool spfh_flag = fcst_info->is_specific_humidity() &&
-                    obs_info->is_specific_humidity();
-
    // Store pointer to ObsErrorEntry
-   ObsErrorEntry *oerr_ptr = (ObsErrorEntry *) nullptr;
+   ObsErrorEntry *oerr_ptr = nullptr;
    if(obs_error_info->flag) {
 
       // Use config file setting, if specified
@@ -1334,7 +1342,7 @@ void VxPairDataEnsemble::add_point_obs(float *hdr_arr, int *hdr_typ_arr,
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
+void VxPairDataEnsemble::add_ens(int member, bool mn, const Grid &gr) {
 
    // Set flag for specific humidity
    bool spfh_flag = fcst_info->is_specific_humidity() &&
@@ -1365,7 +1373,8 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
          // Interpolate using the observation pressure level or height
          double to_lvl = (fcst_info->level().type() == LevelType_Pres ?
                           it->lvl_na[i_obs] : it->hgt_na[i_obs]);
-         int lvl_blw, lvl_abv;
+         int lvl_blw;
+         int lvl_abv;
 
          // For a single forecast field
          if(fcst_dpa.n_planes() == 1) {
@@ -1434,14 +1443,22 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, Grid &gr) {
                double obs_v = it->o_na[i_obs];
 
                // MET #3174 Apply lapse rate surface temperature correction
-               if(sfc_info.lapse_rate_correction_apply_to != FieldType::None) {
-                  correct_lapse_rate(topo_elv, it->elv_na[i_obs], fcst_v, obs_v);
+               if(sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
+                  msg_typ_sfc.reg_exp_match(it->typ_sa[i_obs].c_str()) &&
+                  !correct_lapse_rate(topo_elv, it->elv_na[i_obs], fcst_v, obs_v)) {
+
+                  // Skip by resetting to bad data
+                  fcst_v = bad_data_double;
+                  obs_v  = bad_data_double;
                }
 
                // MET #3174 Apply MSL/AGL height conversion
-               if(sfc_info.msl_agl_conversion_apply_to != FieldType::None) {
-                  convert_msl_agl(topo_elv, it->elv_na[i_obs], fcst_v, obs_v,
-                                  member == 0);
+               if(sfc_info.msl_agl_conversion_apply_to != FieldType::None &&
+                  !convert_msl_agl(topo_elv, it->elv_na[i_obs], fcst_v, obs_v, member == 0)) {
+
+                  // Skip by resetting to bad data
+                  fcst_v = bad_data_double;
+                  obs_v  = bad_data_double;
                }
 
                // Store the modified observation, but only for the first member
@@ -1550,13 +1567,13 @@ double compute_crps_emp(double obs, const NumArray &ens_na) {
 ////////////////////////////////////////////////////////////////////////
 
 double compute_crps_gaus(double obs, double m, double s) {
-   double v, z;
+   double v;
 
    if(is_bad_data(m) || is_bad_data(s) || is_eq(s, 0.0)) {
       v = bad_data_double;
    }
    else {
-      z = (obs - m)/s;
+      double z = (obs - m)/s;
       v = s*(z*(2.0*znorm(z) - 1) + 2.0*dnorm(z) - 1.0/sqrt(pi));
    }
 

@@ -2147,25 +2147,30 @@ double VxPairBase::compute_fcst_value(
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
+bool VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
                                     double &fcst_v, double &obs_v) const {
    const char *method_name = "PairBase::correct_lapse_rate() -> ";
 
    // Check for no work to be done
    if(sfc_info.lapse_rate_correction_apply_to != FieldType::Fcst &&
-      sfc_info.lapse_rate_correction_apply_to != FieldType::Obs) return;
+      sfc_info.lapse_rate_correction_apply_to != FieldType::Obs) return true;
 
    // Check for valid data
    if(is_bad_data(fcst_elv) || is_bad_data(obs_elv) ||
       is_bad_data(fcst_v)   || is_bad_data(obs_v)   ||
       is_bad_data(sfc_info.lapse_rate_correction_value)) { 
-      mlog << Warning << "\n" << method_name
-           << "skipping lapse rate correction due to bad "
-           << "(fcst, obs) elevation (" << fcst_elv << ", "
-           << obs_elv << "), data (" << fcst_v << ", "
-           << obs_v << "), or lapse rate ("
-           << sfc_info.lapse_rate_correction_value << ") values.\n\n";
-      return;
+
+      if(mlog.verbosity_level() >= CORRECTION_DEBUG_LEVEL) {
+         mlog << Debug(CORRECTION_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping lapse rate correction "
+              << "due to bad (fcst, obs) elevation (" << fcst_elv << ", "
+              << obs_elv << "), data (" << fcst_v << ", "
+              << obs_v << "), or lapse rate ("
+              << sfc_info.lapse_rate_correction_value << ") values.\n";
+      }
+
+      return false;
    }
 
    // Apply correction
@@ -2195,19 +2200,19 @@ void VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
            << sfc_info.lapse_rate_correction_value << ".\n";
    }
 
-   return;
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
+bool VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
                                  double &fcst_v, double &obs_v,
                                  bool update_obs) const {
    const char *method_name = "PairBase::convert_msl_agl() -> ";
 
    // Check for no work to be done
    if(sfc_info.msl_agl_conversion_apply_to   == FieldType::None || 
-      sfc_info.msl_agl_conversion_apply_from == FieldType::None) return;
+      sfc_info.msl_agl_conversion_apply_from == FieldType::None) return true;
 
    // Apply forecast conversion
    double orig_f = fcst_v;
@@ -2243,14 +2248,17 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
    // Check for valid data
    if(is_bad_data(fcst_v) || is_bad_data(obs_v) ||
       is_bad_data(corr_f) || is_bad_data(corr_o)) {
-      mlog << Warning << "\n" << method_name
-           << "For " << fcst_info->magic_str() << " versus "
-           << obs_info->magic_str()
-           << ", skipping msl/agl conversion due to bad "
-           << "(fcst, obs) elevation (" << fcst_elv << ", "
-           << obs_elv << ") or data (" << fcst_v << ", "
-           << obs_v << ") values.\n\n";
-      return;
+
+      if(mlog.verbosity_level() >= CORRECTION_DEBUG_LEVEL) {
+         mlog << Debug(CORRECTION_DEBUG_LEVEL)
+              << "For " << fcst_info->magic_str() << " versus "
+              << obs_info->magic_str() << ", skipping msl/agl conversion "
+              << "due to bad (fcst, obs) elevation (" << fcst_elv << ", "
+              << obs_elv << ") or data (" << fcst_v << ", "
+              << obs_v << ") values.\n";
+      }
+
+      return false;
    }
 
    // Convert MSL to AGL
@@ -2282,7 +2290,7 @@ void VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
            << sfc_info.msl_agl_conversion_thresh.get_str() << ".\n";
    }
 
-   return;
+   return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
