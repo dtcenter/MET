@@ -1053,7 +1053,7 @@ static bool get_obs_data_double(NcFile *f_in, const ConcatString &var_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void usage(int exit_code) {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"

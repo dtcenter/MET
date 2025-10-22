@@ -190,7 +190,7 @@ bool run_algorithm(const vector< SDObservation > &observations,
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int exit_code)
+__attribute__((noreturn)) static void usage(int exit_code)
 {
   cout << "\nUsage: "
        << program_name << "\n"

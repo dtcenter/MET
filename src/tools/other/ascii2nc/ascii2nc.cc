@@ -619,7 +619,7 @@ static FileHandler *determine_ascii_format(const ConcatString &ascii_filename,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void usage(int exit_code) {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\nUsage: "
         << program_name << "\n"

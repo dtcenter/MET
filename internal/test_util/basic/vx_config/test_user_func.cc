@@ -198,16 +198,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage(int exit_code)
+__attribute__((noreturn)) void usage(int exit_code)
 
 {
 
 cerr << "\n\n   usage:  " << program_name << " config_file [ config_file2 ... ] : function_name arg1 [arg2 ...]\n\n";
 
 exit ( exit_code );
-
-
-return;
 
 }
 

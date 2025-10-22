@@ -891,7 +891,7 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage(int exit_code)
+__attribute__((noreturn)) static void usage(int exit_code)
 
 {
 

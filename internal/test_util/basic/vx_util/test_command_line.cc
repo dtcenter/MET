@@ -129,15 +129,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage(int exit_code)
+__attribute__((noreturn)) static void usage(int exit_code)
 
 {
 
 mlog << Error << "\nusage:  " << program_name << " [ -xyz x y z ] [ -verbose ] file_list\n\n";
 
 exit ( exit_code );
-
-return;
 
 }
 

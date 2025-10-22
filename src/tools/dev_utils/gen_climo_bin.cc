@@ -441,7 +441,7 @@ void set_var_name  (const StringArray & a) { var_name   = a[0];       return; }
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int exit_code) {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"

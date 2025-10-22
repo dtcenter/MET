@@ -834,7 +834,7 @@ void check_dbl(double d1, double d2, const char *col, const ConcatString &key) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int exit_code) {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"

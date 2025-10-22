@@ -87,7 +87,7 @@ int main(int argc, char * argv []) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int exit_code) {
+__attribute__((noreturn)) void usage(int exit_code) {
 
    mlog << Error
         << "\nUsage: " << program_name << "\n"
@@ -98,8 +98,6 @@ void usage(int exit_code) {
         << "\t[-name   str]\n"
         << "\t[-offset beg [end]]\n\n";
    exit(exit_code);
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////

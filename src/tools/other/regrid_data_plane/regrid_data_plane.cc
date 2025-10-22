@@ -431,7 +431,7 @@ void close_nc() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int exit_code) {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    GridTemplateFactory gtf;
    cout << "\n*** Model Evaluation Tools (MET" << met_version

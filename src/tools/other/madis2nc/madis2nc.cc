@@ -3554,7 +3554,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void usage(int exit_code) {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\nUsage: "
         << program_name << "\n"

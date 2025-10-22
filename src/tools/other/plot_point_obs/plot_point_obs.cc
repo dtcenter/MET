@@ -57,7 +57,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-[[noreturn]] static void usage(int exit_code=1);
+static void usage(int exit_code=1);
 static void process_point_obs(const char *);
 static void create_plot();
 static void add_colorbar(PSfile &, const Box &, const ColorTable &);
@@ -613,7 +613,7 @@ static void add_colorbar(PSfile &plot, const Box &box, const ColorTable &ct) {
 
 ////////////////////////////////////////////////////////////////////////
 
-[[noreturn]] static void usage(int exit_code) {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\nUsage: " << program_name << "\n"
         << "\tnc_file\n"

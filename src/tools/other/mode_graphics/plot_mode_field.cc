@@ -597,7 +597,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void usage(int exit_code)
+__attribute__((noreturn)) static void usage(int exit_code)
 
 {
 

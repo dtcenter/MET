@@ -77,13 +77,11 @@ void set_test(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage(int exit_code) {
+__attribute__((noreturn)) void usage(int exit_code) {
    mlog << Error
         << "\nusage:  " << program_name
         << " -regex string -test string\n\n";
    exit(exit_code);
-
-   return;
 }
 
 ////////////////////////////////////////////////////////////////////////
