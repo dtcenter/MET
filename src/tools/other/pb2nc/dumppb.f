@@ -7,7 +7,7 @@ C*      ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 C*      *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
         SUBROUTINE DUMPPB ( PBFILE, FID, OUTDIR, LEN1,
-     +                      PREFIX, LEN2, FLAG ) BIND(C)
+     +                      PREFIX, LEN2, FLAG )
 C*
         INCLUDE   'readpb.prm'
 C*
@@ -327,7 +327,7 @@ C*
         RETURN
         END SUBROUTINE READPBDUMP
 
-        SUBROUTINE DUMP_TBL( PBFILE, FID, TBL_NAME, LEN1 ) BIND(C)
+        SUBROUTINE DUMP_TBL( PBFILE, FID, TBL_NAME, LEN1 )
 C*
         INCLUDE   'readpb.prm'
 C*

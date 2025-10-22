@@ -9,7 +9,6 @@ C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
 
         SUBROUTINE READPB (lunit,iret,cnlev,chdr,cevns,reqlev )
-     &                    BIND(C)
 C
 C*      This subroutine will read and combine the mass and wind subsets
 C*      of the next station report in the prepbufr file.  It is styled
@@ -151,7 +150,7 @@ C
         END SUBROUTINE READPB
 
 
-        SUBROUTINE READPB_HDR (lunit,iret,chdr) BIND(C)
+        SUBROUTINE READPB_HDR (lunit,iret,chdr)
 C
 C*      This subroutine will read the header information of the next
 C*      station report in the prepbufr file.  It is styled after function
@@ -203,7 +202,6 @@ C
         END SUBROUTINE READPB_HDR
 
         SUBROUTINE READPBINT (lunit,iret,cnlev,cobs,ostr,olen,reqlev)
-     &                        BIND(C)
 C
 C*      This subroutine will read and combine the mass and wind subsets
 C*      of the next station report in the prepbufr file.  It is styled
@@ -284,7 +282,6 @@ C
 
 
         SUBROUTINE READPBEVT(lunit,iret,cnlev,cobs,ostr,olen,reqlev)
-     &                       BIND(C)
 C
 C*      This subroutine will read and combine the mass and wind subsets
 C*      of the next station report in the prepbufr file.  It is styled

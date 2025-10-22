@@ -6,7 +6,7 @@ C*      ** Research Applications Lab (RAL)
 C*      ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 C*      *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-        SUBROUTINE NUMPBMSG ( FID, NMSG ) BIND(C)
+        SUBROUTINE NUMPBMSG ( FID, NMSG )
 C*
         INCLUDE    'readpb.prm'
 C*
@@ -56,7 +56,7 @@ C*
         END SUBROUTINE NUMPBMSG_NEW
 
 
-        SUBROUTINE GET_TMIN ( FID, TMIN ) BIND(C)
+        SUBROUTINE GET_TMIN ( FID, TMIN )
 C*
         INTEGER, INTENT(IN)  :: FID
         INTEGER, INTENT(OUT) :: TMIN
