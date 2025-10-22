@@ -38,7 +38,7 @@ class PairDataPoint : public PairBase {
    public:
 
       PairDataPoint();
-      ~PairDataPoint();
+      ~PairDataPoint() override;
       PairDataPoint(const PairDataPoint &);
       PairDataPoint & operator=(const PairDataPoint &);
 
@@ -52,10 +52,10 @@ class PairDataPoint : public PairBase {
 
       //////////////////////////////////////////////////////////////////
 
-      void clear();
-      void erase();
+      void clear() override;
+      void erase() override;
 
-      void extend(int);
+      void extend(int) override;
 
       bool add_point_pair(const char *, const char *,
                           double, double, double, double, double,
@@ -118,16 +118,16 @@ class VxPairDataPoint : public VxPairBase {
 
       //////////////////////////////////////////////////////////////////
 
-      void clear();
+      void clear() override;
 
-      void set_size(int, int, int);
+      void set_size(int, int, int) override;
 
       void load_seeps_climo(const ConcatString &seeps_climo_name);
       void set_seeps_thresh(const SingleThresh &p1_thresh);
 
-      void add_point_obs(float *, const char *, const char *, unixtime,
-                         const char *, float *, const Grid &,
-                         const char *);
+      void add_point_obs(const float *, const char *, const char *,
+                         unixtime, const char *, const float *,
+                         const Grid &, const char *);
 };
 
 
@@ -143,7 +143,7 @@ extern bool check_fo_thresh(double, double, const ClimoPntInfo &,
 
 extern bool check_mpr_thresh(double, double, const ClimoPntInfo &,
                         const std::map<ConcatString,ThreshArray> &,
-                        ConcatString * = 0);
+                        ConcatString * = nullptr);
 
 extern double get_mpr_column_value(double, double, const ClimoPntInfo &,
                         const char *);
@@ -155,7 +155,7 @@ extern void apply_mpr_thresh_mask(DataPlane &, DataPlane &,
 
 extern bool check_seeps_thresh(double, double,
                         const StringArray &, const ThreshArray &,
-                        ConcatString * = 0);
+                        ConcatString * = nullptr);
 
 extern double get_seeps_column_value(double, double,
                         const char *);

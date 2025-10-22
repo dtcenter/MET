@@ -2331,6 +2331,10 @@ The "value" entry is a constant number that defines the lapse rate for correctin
 temperatures based on the difference of the model topography height and station
 elevation. By default, "value" is set to bad data and must be explicitly defined
 when "apply_to" is not set to NONE.
+The lapse rate correction fails when the model topography or observation height
+values are bad data and that matched pair is excluded from the computation of
+statistics.
+
 The environmental lapse rate values for 2-meter temperature and dewpoint temperature
 used by the World Meteorological Organization (WMO) can be found in "ConfigConstants".
 
@@ -2350,6 +2354,9 @@ All "lapse_rate_correction" entries can be set separately in each "obs.field" en
     apply_to = NONE;
     value    = NA;
   }
+
+Run with verbosity level 8 or higher (:code:`-v 8`) to see detailed log messages
+about lapse rate corrections.
 
 msl_agl_conversion
 ------------------
@@ -2374,6 +2381,9 @@ which may indicate clear sky.
 The "msl_to_agl" entry is a boolean. When "TRUE", the elevation correction is
 subtracted from the height value to convert from MSL to AGL. When "FALSE", the
 elevation correction is added to the height value to convert from AGL to MSL.
+The MSL/AGL conversion fails when the model topography or observation height
+values are bad data and that matched pair is excluded from the computation of
+statistics.
 
 All "msl_agl_conversion" entries can be set separately in each "obs.field" entry.
 
@@ -2385,6 +2395,9 @@ All "msl_agl_conversion" entries can be set separately in each "obs.field" entry
     thresh     = NA;
     msl_to_agl = TRUE;
   }
+
+Run with verbosity level 8 or higher (:code:`-v 8`) to see detailed log messages
+about MSL/AGL conversions.
 
 hira
 ----

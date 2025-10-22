@@ -150,10 +150,10 @@ class PairBase {
 
       //////////////////////////////////////////////////////////////////
 
-      void clear();
-      void erase();
+      virtual void clear();
+      virtual void erase();
 
-      void extend(int); // Allocate memory for expected size
+      virtual void extend(int); // Allocate memory for expected size
 
       bool is_point_vx() const;
 
@@ -343,7 +343,7 @@ class VxPairBase {
 
       //////////////////////////////////////////////////////////////////
 
-      void clear();
+      virtual void clear();
 
       int three_to_one(int, int, int) const;
 
@@ -373,7 +373,7 @@ class VxPairBase {
       void set_obs_qty_exc_filt(const StringArray &);
 
       // Call set_size before set_msg_typ, set_mask_area, and set_interp
-      void set_size(int, int, int);
+      virtual void set_size(int, int, int);
 
       void set_msg_typ(int, const char *);
       void set_msg_typ_vals(int, const StringArray &);
@@ -437,9 +437,9 @@ class VxPairBase {
                                 double, double, double,
                                 const ClimoPntInfo &) const;
 
-      void correct_lapse_rate(double, double, double &, double &) const;
+      bool correct_lapse_rate(double, double, double &, double &) const;
 
-      void convert_msl_agl(double, double, double &, double &,
+      bool convert_msl_agl(double, double, double &, double &,
                            bool update_obs = true) const;
 
       // Retrieve climo data for this point 
