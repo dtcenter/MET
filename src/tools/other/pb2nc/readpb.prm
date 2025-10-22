@@ -1,42 +1,34 @@
-       REAL*8    R8BFMS
-       PARAMETER ( R8BFMS = 10.0E10 )
-C*                                   "Missing" value for BUFR data
-C*
-       PARAMETER ( MXR8PM = 10 )
-C*                                   Maximum number of BUFR parameters
-C*
-       PARAMETER ( MXR8LV_T = 31 )
-       PARAMETER ( MXR8LV_S = 255 )
-       PARAMETER ( MXR8LV_M = 511 )
-       PARAMETER ( MXR8LV = 1023 )
-C*                                   Maximum number of BUFR levels
-C*
-       PARAMETER ( MXR8VN = 10 )
-C*                                   Maximum number of BUFR event sequences
-C*
-       PARAMETER ( MXR8VT = 6 )
-C*                                   Maximum number of BUFR variable types
-C*
-       PARAMETER ( MXSTRL = 80 )
-C*                                   Maximum size of a string
-C*
-       INTEGER   FILEMXSTRL
-       PARAMETER ( FILEMXSTRL = 512 )
-C*                                   Maximum length of a file name
-C*
-       REAL*8    hdr ( MXR8PM ),
-     +           evns_t ( MXR8PM, MXR8LV_T, MXR8VN, MXR8VT ),
-     +           obse_t ( MXR8PM, MXR8LV_T, MXR8VN ),
-     +           obsi_t ( MXR8PM, MXR8LV_T ),
-     +           evns_s ( MXR8PM, MXR8LV_S, MXR8VN, MXR8VT ),
-     +           obse_s ( MXR8PM, MXR8LV_S, MXR8VN ),
-     +           obsi_s ( MXR8PM, MXR8LV_S ),
-     +           evns_m ( MXR8PM, MXR8LV_M, MXR8VN, MXR8VT ),
-     +           obse_m ( MXR8PM, MXR8LV_M, MXR8VN ),
-     +           obsi_m ( MXR8PM, MXR8LV_M ),
-     +           evns ( MXR8PM, MXR8LV, MXR8VN, MXR8VT ),
-     +           obse ( MXR8PM, MXR8LV, MXR8VN ),
-     +           obsi ( MXR8PM, MXR8LV )
-C*
-       COMMON    / PREPBC / hdr, evns, obse, onsi, nlev
-C*
+       use iso_fortran_env, only: dp => real64
+
+       REAL(DP), PARAMETER :: R8BFMS = 10.0E10 ! "Missing" value for BUFR data
+!
+       INTEGER, PARAMETER :: MXR8PM = 10    ! Maximum number of BUFR parameters
+!
+!      Maximum number of BUFR levels (tiny, small, medium)
+       INTEGER, PARAMETER :: MXR8LV_T = 31
+       INTEGER, PARAMETER :: MXR8LV_S = 255
+       INTEGER, PARAMETER :: MXR8LV_M = 511
+       INTEGER, PARAMETER :: MXR8LV = 1023
+!
+       INTEGER, PARAMETER :: MXR8VN = 10    ! Maximum number of BUFR event sequences
+       INTEGER, PARAMETER :: MXR8VT = 6     ! Maximum number of BUFR variable types
+       INTEGER, PARAMETER :: MXSTRL = 80    ! Maximum size of a string
+       INTEGER, PARAMETER :: FILEMXSTRL = 512   ! Maximum length of a file name
+!
+       readpb.prm  :: nlev
+
+       REAL(dp) :: hdr (MXR8PM)
+       REAL(dp) :: evns (MXR8PM, MXR8LV, MXR8VN, MXR8VT)
+       REAL(dp) :: obse (MXR8PM, MXR8LV, MXR8VN)
+       REAL(dp) :: obsi (MXR8PM, MXR8LV)
+
+       REAL(dp) :: evns_t (MXR8PM, MXR8LV_T, MXR8VN, MXR8VT)
+       REAL(dp) :: obse_t (MXR8PM, MXR8LV_T, MXR8VN)
+       REAL(dp) :: obsi_t (MXR8PM, MXR8LV_T)
+       REAL(dp) :: evns_s (MXR8PM, MXR8LV_S, MXR8VN, MXR8VT)
+       REAL(dp) :: obse_s (MXR8PM, MXR8LV_S, MXR8VN)
+       REAL(dp) :: obsi_s (MXR8PM, MXR8LV_S)
+       REAL(dp) :: evns_m (MXR8PM, MXR8LV_M, MXR8VN, MXR8VT)
+       REAL(dp) :: obse_m (MXR8PM, MXR8LV_M, MXR8VN)
+       REAL(dp) :: obsi_m (MXR8PM, MXR8LV_M)
+!

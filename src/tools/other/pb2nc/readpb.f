@@ -7,7 +7,9 @@ C*      ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 C*      *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
+
         SUBROUTINE READPB (lunit,iret,cnlev,chdr,cevns,reqlev )
+     &                    BIND(C)
 C
 C*      This subroutine will read and combine the mass and wind subsets
 C*      of the next station report in the prepbufr file.  It is styled
@@ -47,42 +49,36 @@ C*      iret =  0 - normal return
 C*           =  1 - the station report within COMMON /PREPBC/ contains the
 C*                  last available subset from within the prepbufr file
 C*           = -1 - there are no more subsets available from within the
-C*                  prepbufr file        
+C*                  prepbufr file
+C*
 C*
         INCLUDE       'readpb.prm'
+
+        integer, intent(in) :: lunit, reqlev
+        integer, intent(out) :: iret, cnlev
+        REAL*8, intent(out) :: chdr(MXR8PM)
+        REAL*8, intent(out) :: cevns(MXR8PM, MXR8LV, MXR8VN, MXR8VT)
+
+        INTEGER :: max_lvl
+        INTEGER :: ii, jj, kk, lv, jret
+        LOGICAL :: small_buf, medium_buf, tiny_buf
 C*
-        INTEGER       cnlev, max_lvl, reqlev
-        REAL*8        chdr ( MXR8PM )
-        REAL*8        cevns ( MXR8PM, MXR8LV, MXR8VN, MXR8VT )
-        LOGICAL       small_buf, medium_buf, tiny_buf
+        CHARACTER(len=MXSTRL) :: head
+        CHARACTER(len=MXSTRL), dimension(MXR8VT) :: ostr =
+     &      [ 'POB PQM PPC PRC PFC PAN CAT'
+     &       ,'QOB QQM QPC QRC QFC QAN CAT'
+     &       ,'TOB TQM TPC TRC TFC TAN CAT'
+     &       ,'ZOB ZQM ZPC ZRC ZFC ZAN CAT'
+     &       ,'UOB WQM WPC WRC UFC UAN CAT'
+     &       ,'VOB WQM WPC WRC VFC VAN CAT' ]
 C*
-        CHARACTER*(MXSTRL) head
-     +          / 'SID XOB YOB DHR ELV TYP T29 ITP' /
+!        REAL*8      r8sid, r8sid2
 C*
-        CHARACTER*(MXSTRL) ostr ( MXR8VT )
-     +         / 'POB PQM PPC PRC PFC PAN CAT',
-     +            'QOB QQM QPC QRC QFC QAN CAT',
-     +            'TOB TQM TPC TRC TFC TAN CAT',
-     +            'ZOB ZQM ZPC ZRC ZFC ZAN CAT',
-     +            'UOB WQM WPC WRC UFC UAN CAT',
-     +            'VOB WQM WPC WRC VFC VAN CAT' /
-C*
-        REAL*8      r8sid, r8sid2
-C*
-        CHARACTER*8 csid, csid2
-C*
-        EQUIVALENCE ( r8sid, csid ), ( r8sid2, csid2 )
+!        CHARACTER*8 csid, csid2
 C*
 C-----------------------------------------------------------------------
         iret = 0
-C*
-C*      IREADNS should be called by the caller to advance the subset pointer to the next subset.
-C*
-C*      Read the HDR and EVNS data for the subset that is currently
-C*      being pointed to.
-C*
-        CALL UFBINT  ( lunit, hdr, MXR8PM, 1, jret, head )
-C
+        head = 'SID XOB YOB DHR ELV TYP T29 ITP'
         tiny_buf = .FALSE.
         small_buf = .FALSE.
         medium_buf = .FALSE.
@@ -93,6 +89,14 @@ C
         ELSE IF (reqlev .LE. MXR8LV_M) THEN
            medium_buf = .TRUE.
         END IF
+C*
+C*      IREADNS should be called by the caller to advance the subset pointer to the next subset.
+C*
+C*      Read the HDR and EVNS data for the subset that is currently
+C*      being pointed to.
+C*
+        CALL UFBINT  ( lunit, hdr, MXR8PM, 1, jret, head )
+C
         DO ii = 1, MXR8VT
            IF (small_buf) THEN
               CALL UFBEVN  ( lunit, evns_s ( 1, 1, 1, ii ), MXR8PM,
@@ -109,15 +113,17 @@ C
            END IF
         END DO
 C
-C*      Prior to returning, copy the contents COMMON block PREPBC into 
+C*      Prior to returning, copy the contents COMMON block PREPBC into
 C*      variables passed to the subroutine.
 C
-   20   cnlev = nlev
-C
+        cnlev = nlev
+
+        ! Copy header
         DO ii = 1, MXR8PM
            chdr ( ii ) = hdr ( ii )
         END DO
-C
+
+        ! Copy event data into cevns
         DO lv = 1, nlev
            DO kk = 1, MXR8VT
               DO jj = 1, MXR8VN
@@ -135,17 +141,17 @@ C
               END DO
            END DO
         END DO
-        IF (cnlev .NE. nlev) THEN
+        IF (cnlev /= nlev) THEN
            PRINT *,'   === WARN === at READPB, '
      *            ,'The vertical level was overridden!!!'
      *            ,cnlev, ' should be ', nlev
         END IF
 C
         RETURN
-        END
+        END SUBROUTINE READPB
 
-        
-        SUBROUTINE READPB_HDR (lunit,iret,chdr)
+
+        SUBROUTINE READPB_HDR (lunit,iret,chdr) BIND(C)
 C
 C*      This subroutine will read the header information of the next
 C*      station report in the prepbufr file.  It is styled after function
@@ -164,17 +170,20 @@ C*      iret =  0 - normal return
 C*           =  1 - the station report within COMMON /PREPBC/ contains the
 C*                  last available subset from within the prepbufr file
 C*           = -1 - there are no more subsets available from within the
-C*                  prepbufr file        
+C*                  prepbufr file
 C*
         INCLUDE       'readpb.prm'
-C*
-        REAL*8        chdr ( MXR8PM )
-C*
-        CHARACTER*(MXSTRL) head
-     +          / 'SID XOB YOB DHR ELV TYP T29 ITP' /
+
+        integer, intent(in) :: lunit
+        integer, intent(out) :: iret
+        real*8, intent(out) :: chdr(MXR8PM)
+
+        character(len=MXSTRL) :: head
+        integer :: ii, jret
 C*
 C-----------------------------------------------------------------------
         iret = 0
+        head = 'SID XOB YOB DHR ELV TYP T29 ITP'
 C*
 C*      IREADNS should be called by the caller to advance the subset
 C*      pointer to the next subset.
@@ -183,7 +192,7 @@ C*      Read the HDR data for the subset that is currently being pointed to.
 C*
         CALL UFBINT  ( lunit, hdr, MXR8PM, 1, jret, head )
 C
-C*      Prior to returning, copy the contents COMMON block PREPBC into 
+C*      Prior to returning, copy the contents COMMON block PREPBC into
 C*      variables passed to the subroutine.
 C
         DO ii = 1, MXR8PM
@@ -191,9 +200,10 @@ C
         END DO
 
         RETURN
-        END
-        
+        END SUBROUTINE READPB_HDR
+
         SUBROUTINE READPBINT (lunit,iret,cnlev,cobs,ostr,olen,reqlev)
+     &                        BIND(C)
 C
 C*      This subroutine will read and combine the mass and wind subsets
 C*      of the next station report in the prepbufr file.  It is styled
@@ -216,25 +226,26 @@ C*      iret =  0 - normal return
 C*           =  1 - the station report within COMMON /PREPBC/ contains the
 C*                  last available subset from within the prepbufr file
 C*           = -1 - there are no more subsets available from within the
-C*                  prepbufr file        
+C*                  prepbufr file
 C*
         INCLUDE       'readpb.prm'
-C*
-        INTEGER       cnlev, olen, reqlev, max_nlev
-        REAL*8        cobs ( MXR8PM, MXR8LV )
-        LOGICAL       small_buf, medium_buf, tiny_buf
-C*
-        CHARACTER*(MXSTRL) ostr
+
+        integer, intent(in) :: lunit, olen, reqlev
+        integer, intent(out) :: iret, cnlev
+        real*8, intent(out) :: cobs(MXR8PM, MXR8LV)
+        character(len=*), intent(in) :: ostr    ! CHARACTER*(MXSTRL) ostr
+        logical :: small_buf, medium_buf, tiny_buf
+        integer :: lv, ii, max_nlev
 C*
 C-----------------------------------------------------------------------
         iret = 0
+        tiny_buf = .FALSE.
+        small_buf = .FALSE.
+        medium_buf = .FALSE.
 C*
 C*      Read the HDR and EVNS data for the subset that is currently
 C*      being pointed to.
 C*
-        tiny_buf = .FALSE.
-        small_buf = .FALSE.
-        medium_buf = .FALSE.
         IF (reqlev .LE. MXR8LV_T) THEN
            tiny_buf = .TRUE.
            CALL UFBINT(lunit,obsi_t,MXR8PM,MXR8LV_T,nlev,ostr(1:olen))
@@ -248,12 +259,10 @@ C*
            CALL UFBINT(lunit,obsi,MXR8PM,MXR8LV,nlev,ostr(1:olen))
         END IF
 C
-C
-C*      Prior to returning, copy the contents COMMON block PREPBC into 
+C*      Prior to returning, copy the contents COMMON block PREPBC into
 C*      variables passed to the subroutine.
 C
-   20   cnlev = nlev
-C
+        cnlev = nlev
         max_nlev = nlev
         if (max_nlev .GT. reqlev) max_nlev = reqlev
         DO lv = 1, max_nlev
@@ -271,10 +280,11 @@ C
         END DO
 C
         RETURN
-        END
-        
-        
+        END SUBROUTINE READPBINT
+
+
         SUBROUTINE READPBEVT(lunit,iret,cnlev,cobs,ostr,olen,reqlev)
+     &                       BIND(C)
 C
 C*      This subroutine will read and combine the mass and wind subsets
 C*      of the next station report in the prepbufr file.  It is styled
@@ -314,25 +324,26 @@ C*      iret =  0 - normal return
 C*           =  1 - the station report within COMMON /PREPBC/ contains the
 C*                  last available subset from within the prepbufr file
 C*           = -1 - there are no more subsets available from within the
-C*                  prepbufr file        
+C*                  prepbufr file
 C*
         INCLUDE       'readpb.prm'
-C*
-        INTEGER       cnlev, olen, reqlev, max_nlev
-        REAL*8        cobs ( MXR8PM, MXR8LV, MXR8VN )
-        LOGICAL       small_buf, medium_buf, tiny_buf
-C*
-        CHARACTER*(MXSTRL) ostr
+
+        integer, intent(in) :: lunit, olen, reqlev
+        integer, intent(out) :: iret, cnlev
+        real*8, intent(out) :: cobs(MXR8PM, MXR8LV, MXR8VN)
+        character(len=*), intent(in) :: ostr    ! CHARACTER*(MXSTRL) ostr
+        logical :: small_buf, medium_buf, tiny_buf
+        integer :: jj, lv, ii, max_nlev
 C*
 C-----------------------------------------------------------------------
         iret = 0
+        tiny_buf = .FALSE.
+        small_buf = .FALSE.
+        medium_buf = .FALSE.
 C*
 C*      Read the one obs data for the subset that is currently
 C*      being pointed to.
 C*
-        tiny_buf = .FALSE.
-        small_buf = .FALSE.
-        medium_buf = .FALSE.
         IF (reqlev .LE. MXR8LV_T) THEN
           tiny_buf = .TRUE.
           CALL UFBEVN(lunit,obse_t,MXR8PM,MXR8LV_T,MXR8VN,nlev,
@@ -349,11 +360,10 @@ C*
           CALL UFBEVN(lunit,obse,MXR8PM,MXR8LV,MXR8VN,nlev,ostr(1:olen))
         END IF
 C
-C*      Prior to returning, copy the contents COMMON block PREPBC into 
+C*      Prior to returning, copy the contents COMMON block PREPBC into
 C*      variables passed to the subroutine.
 C
-   20   cnlev = nlev
-C
+        cnlev = nlev
         max_nlev = nlev
         if (max_nlev .GT. reqlev) max_nlev = reqlev
         DO jj = 1, MXR8VN
@@ -378,5 +388,5 @@ C
      *            ,cnlev, ' should be ', nlev
         END IF
         RETURN
-        END
-        
+        END SUBROUTINE READPBEVT
+

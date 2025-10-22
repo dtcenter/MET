@@ -6,7 +6,7 @@ C*      ** Research Applications Lab (RAL)
 C*      ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 C*      *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
-        SUBROUTINE CLOSEPB ( FID )
+        SUBROUTINE CLOSEPB ( FID ) BIND(C)
 C*
         INCLUDE    'readpb.prm'
 C*
