@@ -66,7 +66,7 @@ static ConcatString config_filename;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void usage();
+static void usage(int exit_code=1);
 
 static void set_nh_filename (const StringArray &);
 static void set_sh_filename (const StringArray &);
@@ -181,7 +181,7 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage()
+void usage(int exit_code)
 
 {
 
@@ -210,7 +210,7 @@ cout << "\nUsage: " << program_name << "\n"
      << "\t\t\"-compress level\" overrides the compression level of NetCDF variable (optional).\n\n";
 
 
-exit ( 1 );
+exit ( exit_code );
 
 }
 

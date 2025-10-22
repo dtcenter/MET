@@ -83,7 +83,7 @@ static ConcatString local_config_filename;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void usage();
+static void usage(int exit_code=1);
 
 static void set_fcst      (const StringArray &);
 static void set_obs       (const StringArray &);
@@ -891,7 +891,7 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage()
+void usage(int exit_code)
 
 {
 
@@ -939,7 +939,7 @@ cout << "\n*** Model Evaluation Tools (MET" << met_version
      << "\t\t\"-v level\" overrides the default level of logging ("
      << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
-exit ( 1 );
+exit ( exit_code );
 
 }
 

@@ -51,7 +51,7 @@ static CommandLine cline;
 
 static void set_do_dump(const StringArray &);
 
-static void usage();
+static void usage(int exit_code=1);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -198,13 +198,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage()
+void usage(int exit_code)
 
 {
 
 cerr << "\n\n   usage:  " << program_name << " config_file [ config_file2 ... ] : function_name arg1 [arg2 ...]\n\n";
 
-exit ( 1 );
+exit ( exit_code );
 
 
 return;

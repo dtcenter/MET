@@ -191,7 +191,7 @@ static void close_nc();
 static ConcatString parse_config_str(const char *);
 static bool is_timestring(const char *);
 
-[[noreturn]] static void usage();
+[[noreturn]] static void usage(int exit_code=1);
 static void set_sum(const StringArray &);
 static void set_add(const StringArray &);
 static void set_subtract(const StringArray &);
@@ -1652,7 +1652,7 @@ static bool is_timestring(const char * text) {
 
 ////////////////////////////////////////////////////////////////////////
 
-[[noreturn]] static void usage() {
+[[noreturn]] static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -1772,7 +1772,7 @@ static bool is_timestring(const char * text) {
 
         << "\n" << flush;
 
-   exit(1);
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

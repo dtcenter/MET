@@ -57,7 +57,7 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-static void usage();
+static void usage(int exit_code=1);
 static void process_command_line(int, char**);
 static void get_file_type();
 
@@ -142,7 +142,7 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -176,7 +176,7 @@ void usage() {
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
-   exit(1);
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -20,7 +20,7 @@ using namespace std;
 
 ////////////////////////////////////////////////////////////////////////
 
-static void usage();
+static void usage(int exit_code=1);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -87,7 +87,7 @@ int main(int argc, char * argv []) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+void usage(int exit_code) {
 
    mlog << Error
         << "\nUsage: " << program_name << "\n"
@@ -97,7 +97,7 @@ void usage() {
         << "\t[-dim    n]\n"
         << "\t[-name   str]\n"
         << "\t[-offset beg [end]]\n\n";
-   exit(1);
+   exit(exit_code);
 
    return;
 }

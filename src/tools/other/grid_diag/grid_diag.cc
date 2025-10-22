@@ -70,7 +70,7 @@ static void clean_up();
 
 static Met2dDataFile *get_mtddf(const StringArray &, const int);
 
-static void usage();
+static void usage(int exit_code=1);
 static void set_data_files(const StringArray &);
 static void set_out_file(const StringArray &);
 static void set_config_file(const StringArray &);
@@ -821,7 +821,7 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -858,7 +858,7 @@ void usage() {
 
         << flush;
 
-   exit(1);
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

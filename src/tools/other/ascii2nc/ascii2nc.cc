@@ -161,7 +161,7 @@ static FileHandler *create_file_handler(const ASCIIFormat,
 static FileHandler *determine_ascii_format(const ConcatString &,
                                            ConcatString &);
 
-static void usage();
+static void usage(int exit_code=1);
 static void set_inputrx(const StringArray &);
 static void set_format(const StringArray &);
 static void set_config(const StringArray &);
@@ -182,7 +182,7 @@ int met_main(int argc, char *argv[]) {
    //
    // Check for zero arguments
    //
-   if(argc == 1) { usage(); return 0; }
+   if(argc == 1) usage();
 
    // Initialize time range
    valid_beg_ut = valid_end_ut = (unixtime) 0;
@@ -219,7 +219,7 @@ int met_main(int argc, char *argv[]) {
    // Check for error. There should be at least two arguments left:
    // the ascii input filenames and the netCDF output filename
    //
-   if(cline.n() < 2) { usage(); return 0; }
+   if(cline.n() < 2) usage();
 
    //
    // Store the input ASCII file names
@@ -619,7 +619,7 @@ static FileHandler *determine_ascii_format(const ConcatString &ascii_filename,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void usage() {
+static void usage(int exit_code) {
 
    cout << "\nUsage: "
         << program_name << "\n"
@@ -721,6 +721,7 @@ static void usage() {
 
         << flush;
 
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

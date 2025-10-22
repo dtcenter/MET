@@ -68,7 +68,7 @@ static string station_id_arg;
 static bool process_file();
 static bool run_algorithm(const vector< SDObservation > &obs,
                           vector< SDObservation > &compressed_obs);
-static void usage();
+static void usage(int exit_code=1);
 static bool write_observations(const vector< SDObservation > &observations,
                                const string &file_path);
 static bool write_ramps(const vector< SDObservation > &observations,
@@ -190,7 +190,7 @@ bool run_algorithm(const vector< SDObservation > &observations,
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage()
+void usage(int exit_code)
 {
   cout << "\nUsage: "
        << program_name << "\n"
@@ -217,7 +217,7 @@ void usage()
 
        << flush;
 
-  exit(1);
+  exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -156,7 +156,7 @@ static void   process_watch_warn   (TrackPairInfoArray &);
 static void   write_tracks         (const TrackPairInfoArray &);
 static void   write_prob_rirw      (const ProbRIRWPairInfoArray &);
 static void   setup_table          (AsciiTable &);
-static void   usage                ();
+static void   usage                (int exit_code=1);
 static void   set_adeck            (const StringArray &);
 static void   set_edeck            (const StringArray &);
 static void   set_bdeck            (const StringArray &);
@@ -2227,7 +2227,7 @@ void setup_table(AsciiTable &at) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -2279,7 +2279,7 @@ void usage() {
         << "may include \"suffix=string\" to modify the model names "
         << "from that path.\n\n";
 
-   exit(1);
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -133,6 +133,14 @@ int met_main(int argc, char * argv [])
    string s;
    const char * user_config_filename = 0;
 
+   //
+   // MET #3278 parse global command line options
+   //
+   CommandLine cline;
+   cline.set(argc, argv);
+   cline.set_usage(both_usage);
+   cline.parse();
+
    for (j=0,n=0; j<argc; ++j)  {
 
       //

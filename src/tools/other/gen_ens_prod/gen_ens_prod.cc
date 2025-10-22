@@ -84,7 +84,7 @@ static void add_var_att_local(GenEnsProdVarInfo *, NcVar *, bool is_int,
                               const DataPlane &, const char *, const char *);
 
 static void clean_up();
-static void usage();
+static void usage(int exit_code=1);
 
 static void set_ens_files  (const StringArray &);
 static void set_out_file   (const StringArray &);
@@ -1297,7 +1297,7 @@ static void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void usage() {
+static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -1331,7 +1331,7 @@ static void usage() {
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n\n";
 
-   exit (1);
+   exit (exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

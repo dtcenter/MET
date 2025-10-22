@@ -56,7 +56,7 @@ using namespace std;
 static void   process_command_line(int, char **);
 static void   process_search_dirs ();
 static void   process_jobs        ();
-static void   usage               ();
+static void   usage               (int exit_code=1);
 static void   set_lookin          (const StringArray &);
 static void   set_out             (const StringArray &);
 static void   set_config          (const StringArray &);
@@ -315,7 +315,7 @@ void close_out_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
              << ") ***\n\n"
@@ -352,7 +352,7 @@ void usage() {
 
         << flush;
 
-   exit(1);
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

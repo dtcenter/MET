@@ -55,7 +55,7 @@ static int table_number = 0;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void usage();
+static void usage(int exit_code=1);
 
 static void set_table_number(const StringArray &);
 
@@ -113,13 +113,13 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage()
+void usage(int exit_code)
 
 {
 
 cerr << "\n\n   usage: " << program_name << " nceptab_source_file.c [ more such files ...]\n\n";
 
-exit ( 1 );
+exit ( exit_code );
 
 }
 

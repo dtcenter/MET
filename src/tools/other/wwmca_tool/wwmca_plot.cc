@@ -90,7 +90,7 @@ static double scale;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void usage();
+static void usage(int exit_code=1);
 
 static void set_outdir(const StringArray &);
 
@@ -178,7 +178,7 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage()
+void usage(int exit_code)
 
 {
 
@@ -199,7 +199,7 @@ cout << "\nUsage: " << program_name << "\n"
      << "\t\t\"wwmca_cloud_pct_file_list\" is a list of one or "
      << "more wwmca cloud percent files to plot.\n\n";
 
-exit ( 1 );
+exit ( exit_code );
 
 }
 

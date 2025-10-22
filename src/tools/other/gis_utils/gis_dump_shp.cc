@@ -61,7 +61,7 @@ static CommandLine cline;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void usage();
+static void usage(int exit_code=1);
 
 static void set_header_only(const StringArray &);
 
@@ -164,14 +164,14 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage()
+void usage(int exit_code)
 
 {
 
 mlog << Error 
      << "\n\n  usage:  " << program_name << " [ -h ] shp_filename\n\n";
 
-exit ( 1 );
+exit ( exit_code );
 
 }
 

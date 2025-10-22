@@ -124,7 +124,7 @@ static void process_madis_maritime(NcFile *&f_in);
 static void process_madis_mesonet(NcFile *&f_in);
 static void process_madis_acarsProfiles(NcFile *&f_in);
 
-static void usage();
+static void usage(int exit_code=1);
 static void set_type(const StringArray &);
 static void set_qc_dd(const StringArray &);
 static void set_lvl_dim(const StringArray &);
@@ -3554,7 +3554,7 @@ void process_madis_acarsProfiles(NcFile *&f_in) {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void usage() {
+static void usage(int exit_code) {
 
    cout << "\nUsage: "
         << program_name << "\n"
@@ -3621,7 +3621,7 @@ static void usage() {
 
         << flush;
 
-   exit (1);
+   exit (exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

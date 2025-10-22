@@ -63,7 +63,7 @@ static bool output_info = true;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void usage();
+static void usage(int exit_code=1);
 
 static void set_top_dir(const StringArray &);
 static void set_copyright_notice_filename(const StringArray &);
@@ -164,13 +164,13 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage()
+void usage(int exit_code)
 {
    mlog << Error << "\nUsage: " << program_name << "\n"
         << "          -dir DirectoryPath\n"
         << "          [-notice CopyrightNoticeFilename ]\n"
         << "          [-quiet ]\n\n";
-   exit (1);
+   exit (exit_code);
 
 }
 

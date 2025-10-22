@@ -73,7 +73,7 @@ static void set_offset    (const StringArray &);
 static void set_fillvalue (const StringArray &);
 static void set_compress  (const StringArray &);
 
-static void usage();
+static void usage(int exit_code=1);
 
 static void get_grid();
 
@@ -223,7 +223,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage()
+void usage(int exit_code)
 
 {
 
@@ -255,7 +255,7 @@ cout << "\n"
 
      << "\n";
 
-exit ( 1 );
+exit ( exit_code );
 
 }
 

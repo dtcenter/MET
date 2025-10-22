@@ -146,7 +146,7 @@ static bool keep_message_type(const char *);
 static bool keep_station_id(const char *);
 static bool keep_valid_time(const unixtime, const unixtime, const unixtime);
 
-static void usage();
+static void usage(int exit_code=1);
 static void set_compress(const StringArray &);
 static void set_config(const StringArray &);
 static void set_ioda_files(const StringArray &);
@@ -1053,7 +1053,7 @@ static bool get_obs_data_double(NcFile *f_in, const ConcatString &var_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void usage() {
+static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -1108,7 +1108,7 @@ static void usage() {
 
         << flush;
 
-   exit(1);
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

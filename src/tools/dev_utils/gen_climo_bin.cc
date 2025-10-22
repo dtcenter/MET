@@ -87,7 +87,7 @@ static void set_field_str(const StringArray & a);
 static void set_var_name(const StringArray & a);
 static void my_memcpy(void * to, unsigned char * & from, int n_bytes);
 
-static void usage();
+static void usage(int exit_code);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -441,7 +441,7 @@ void set_var_name  (const StringArray & a) { var_name   = a[0];       return; }
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -471,7 +471,7 @@ void usage() {
         << "\tNOTE: Either \"-bin\" or \"-mean\", \"-stdev\", and \"-field\" must be specified.\n\n"
         << flush;
 
-   exit(1);
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

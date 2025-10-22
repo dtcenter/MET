@@ -81,7 +81,7 @@ static double PlotRangeMax = 0.0;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
-static void usage();
+static void usage(int exit_code=1);
 static void set_colortable_name(const StringArray &);
 static void set_plot_range(const StringArray &);
 static void set_title_string(const StringArray &);
@@ -287,7 +287,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -328,7 +328,7 @@ void usage() {
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
-   exit(1);
+   exit(exit_code);
 
 }
 
