@@ -15,7 +15,7 @@
        INTEGER, PARAMETER :: MXSTRL = 80    ! Maximum size of a string
        INTEGER, PARAMETER :: FILEMXSTRL = 512   ! Maximum length of a file name
 !
-       readpb.prm  :: nlev
+       INTEGER  :: nlev
 
        REAL(dp) :: hdr (MXR8PM)
        REAL(dp) :: evns (MXR8PM, MXR8LV, MXR8VN, MXR8VT)
