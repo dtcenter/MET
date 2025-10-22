@@ -139,6 +139,7 @@ int met_main(int argc, char * argv [])
    CommandLine cline;
    cline.set(argc, argv);
    cline.set_usage(both_usage);
+   cline.allow_unrecognized_switches();
    cline.parse();
 
    for (j=0,n=0; j<argc; ++j)  {
