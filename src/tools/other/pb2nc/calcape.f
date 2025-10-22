@@ -102,8 +102,8 @@ C----------------------------------------------------------------------
       real(C_DOUBLE) :: DP, PRESK, DZKL, THETAP, THETAA
       real(C_DOUBLE) :: esatp, eps, oneps, qsatp, tvp
       real(C_DOUBLE) :: TTH, QQtmp
-      real(C_DOUBLE) :: APESTS, LMHK, RDPQ, RDTHEQ, FPVSNEW
-      integer :: KBcount
+      real(C_DOUBLE) :: APESTS, RDPQ, RDTHEQ, FPVSNEW
+      integer :: KBcount, LMHK
 
       ! Tables and state that are filled once in original code via TABLE1/TABLEQ
       logical, save :: ITABL = .FALSE.
@@ -202,9 +202,6 @@ C--------------TRIAL MAXIMUM BUOYANCY LEVEL VARIABLES-------------------
         DO J=1,JM
          DO I=1,IM
           LMHK   =LMH(I,J)
-          if (LMHK < 1 .OR. LMHK < LMM) then
-           print*,'Invalid LMHK: ', LMHK, ' KB=',LMM
-          endif
           PSFCK  =P(I,J,LMHK)
           PKL = P(I,J,KB)
 !         IF (ITYPE.EQ.2.OR.(PKL.GE.PSFCK-DPBND.AND.PKL.LE.PSFCK)) THEN
