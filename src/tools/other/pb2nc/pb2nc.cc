@@ -118,11 +118,11 @@ struct derive_var_cfg {
 // Constants
 //
 
-static const char * default_config_filename = "MET_BASE/config/PB2NCConfig_default";
+constexpr char default_config_filename[] = "MET_BASE/config/PB2NCConfig_default";
 
-static const char *program_name = "pb2nc";
-static const char *not_assigned = "not_assigned";
-static const char *tmp_pb2nc_base = "tmp_pb2nc_blk";
+constexpr char program_name[] = "pb2nc";
+constexpr char not_assigned[] = "not_assigned";
+constexpr char tmp_pb2nc_base[] = "tmp_pb2nc_blk";
 
 constexpr double fill_value   = -9999.;
 constexpr int missing_cycle_minute = -1;
@@ -172,25 +172,25 @@ const std::array<int, n_derive_gc> derive_gc = {
 constexpr int MAX_CAPE_VALUE = 10000;
 constexpr int MAX_CAPE_LEVEL = 200;
 constexpr int CAPE_INPUT_VARS = 3;
-static double cape_data_pres[MAX_CAPE_LEVEL];
-static double cape_data_temp[MAX_CAPE_LEVEL];
-static double cape_data_spfh[MAX_CAPE_LEVEL];
-static double static_dummy_200[MAX_CAPE_LEVEL];
-static double static_dummy_201[MAX_CAPE_LEVEL+1];
+static std::array<double, MAX_CAPE_LEVEL> cape_data_pres;
+static std::array<double, MAX_CAPE_LEVEL> cape_data_temp;
+static std::array<double, MAX_CAPE_LEVEL> cape_data_spfh;
+static std::array<double, MAX_CAPE_LEVEL> static_dummy_200;
+static std::array<double, MAX_CAPE_LEVEL+1> static_dummy_201;
 
 //#define ROG             287.04
 constexpr int MAX_PBL         = 10000;
 constexpr int MAX_PBL_LEVEL   = 256;
 constexpr int PBL_DEBUG_LEVEL = 8;
-static bool IGNORE_Q_PBL = true;
-static bool IGNORE_Z_PBL = true;
-static bool USE_LOG_INTERPOLATION = true;
-static double pbl_data_pres[MAX_PBL_LEVEL];  // mb
-static double pbl_data_temp[MAX_PBL_LEVEL];  // Kelvin
-static double pbl_data_spfh[MAX_PBL_LEVEL];  // ? / 1,000,000
-static double pbl_data_hgt[MAX_PBL_LEVEL];
-static double pbl_data_ugrd[MAX_PBL_LEVEL];
-static double pbl_data_vgrd[MAX_PBL_LEVEL];
+constexpr bool IGNORE_Q_PBL = true;
+constexpr bool IGNORE_Z_PBL = true;
+constexpr bool USE_LOG_INTERPOLATION = true;
+static std::array<double, MAX_PBL_LEVEL> pbl_data_pres;     // mb
+static std::array<double, MAX_PBL_LEVEL> pbl_data_temp;     // Kelvin
+static std::array<double, MAX_PBL_LEVEL> pbl_data_spfh;     // ? / 1,000,000
+static std::array<double, MAX_PBL_LEVEL> pbl_data_hgt ;
+static std::array<double, MAX_PBL_LEVEL> pbl_data_ugrd;
+static std::array<double, MAX_PBL_LEVEL> pbl_data_vgrd;
 
 // PREPBUFR VIRTMP program code
 constexpr double virtmp_prog_code = 8.0;
@@ -240,7 +240,7 @@ static bool save_summary_only = false;
 ////////////////////////////////////////////////////////////////////////
 
 // Shared memory defined in the PREPBC common block in readpb.prm
-static double hdr[mxr8pm];
+static std::array<double, mxr8pm> hdr;
 static double evns[mxr8vt][mxr8vn][mxr8lv][mxr8pm];
 static int    nlev;
 
@@ -254,29 +254,29 @@ constexpr int BUFR_UNIT_LEN = 25;
 constexpr int BUFR_SEQUENCE_START = 13;
 constexpr int BUFR_SEQUENCE_LEN = 66;
 
-static const char *prepbufr_p_event = "POB PQM PPC PRC PFC PAN CAT";
-static const char *prepbufr_q_event = "QOB QQM QPC QRC QFC QAN CAT";
-static const char *prepbufr_t_event = "TOB TQM TPC TRC TFC TAN CAT";
-static const char *prepbufr_z_event = "ZOB ZQM ZPC ZRC ZFC ZAN CAT";
-static const char *prepbufr_u_event = "UOB WQM WPC WRC UFC UAN CAT";
-static const char *prepbufr_v_event = "VOB WQM WPC WRC VFC VAN CAT";
+constexpr char prepbufr_p_event[] = "POB PQM PPC PRC PFC PAN CAT";
+constexpr char prepbufr_q_event[] = "QOB QQM QPC QRC QFC QAN CAT";
+constexpr char prepbufr_t_event[] = "TOB TQM TPC TRC TFC TAN CAT";
+constexpr char prepbufr_z_event[] = "ZOB ZQM ZPC ZRC ZFC ZAN CAT";
+constexpr char prepbufr_u_event[] = "UOB WQM WPC WRC UFC UAN CAT";
+constexpr char prepbufr_v_event[] = "VOB WQM WPC WRC VFC VAN CAT";
 
-static const char *prepbufr_hdrs_str = "SID XOB YOB DHR ELV TYP T29 ITP";
+constexpr char prepbufr_hdrs_str[] = "SID XOB YOB DHR ELV TYP T29 ITP";
 
-static const char *default_sid_name = "SID";
-static const char *default_lat_name = "YOB";
-static const char *default_lon_name = "XOB";
-static const char *default_ymd_name = "YEAR MNTH DAYS";
-static const char *default_hms_name = "HOUR MINU SECO";
+constexpr char default_sid_name[] = "SID";
+constexpr char default_lat_name[] = "YOB";
+constexpr char default_lon_name[] = "XOB";
+constexpr char default_ymd_name[] = "YEAR MNTH DAYS";
+constexpr char default_hms_name[] = "HOUR MINU SECO";
 
 static const char *airnow_aux_vars = "TPHR QCIND";
 
 // Pick the latter one if exists multiple variables
-static const char *bufr_avail_sid_names = "SID SAID RPID";
-static const char *bufr_avail_latlon_names = "XOB CLON CLONH YOB CLAT CLATH";
-static const char *derived_mlcape = "D_MLCAPE";
-static const char *derived_cape = "D_CAPE";
-static const char *derived_pbl  = "D_PBL";
+constexpr char bufr_avail_sid_names[] = "SID SAID RPID";
+constexpr char bufr_avail_latlon_names[] = "XOB CLON CLONH YOB CLAT CLATH";
+constexpr char derived_mlcape[] = "D_MLCAPE";
+constexpr char derived_cape[] = "D_CAPE";
+constexpr char derived_pbl[]  = "D_PBL";
 constexpr double MLCAPE_INTERVAL = 3000.;
 
 // Derived variable metadata maps
@@ -382,9 +382,9 @@ static void   write_netcdf_hdr_data();
 static void   clean_up();
 
 static void addObservation(const double *obs_arr, const ConcatString &hdr_typ,
-      const ConcatString &hdr_sid, const time_t hdr_vld,
-      const double hdr_lat, const double hdr_lon, const double hdr_elv,
-      const double quality_mark, const int buf_size);
+                const ConcatString &hdr_sid, const time_t hdr_vld,
+                const double hdr_lat, const double hdr_lon, const double hdr_elv,
+                const double quality_mark, const int buf_size);
 
 static int    get_event_index(int, int, int);
 static int    get_event_index_temp(int, int, int);
@@ -400,9 +400,9 @@ static bool   keep_instrument_type(int);
 static bool   keep_bufr_obs_index(int);
 static bool   keep_level_category(int);
 
-static double  derive_grib_code(int, double *, double *, double, double&);
+static double derive_grib_code(int, double *, double *, double, double&);
 
-static int    combine_tqz_and_uv(map<double, double*>, map<double, double*>,
+static int    combine_tqz_and_uv(map<double, double*> &, map<double, double*> &,
                                  vector<double *> &);
 static double compute_pbl(map<double, double*> pqtzuv_map_tq,
                           map<double, double*> pqtzuv_map_uv);
@@ -412,19 +412,21 @@ static bool   insert_pbl(double *obs_arr, const double pbl_value, const int pbl_
                          const double hdr_lat, const double hdr_lon,
                          const double hdr_elv, const time_t hdr_vld_ut,
                          const ConcatString &hdr_typ, const ConcatString &hdr_sid);
-static int    interpolate_by_pressure(int length, double *pres_data, double *var_data);
-static void   interpolate_pqtzuv(double*, double*, double*);
+static int    interpolate_by_pressure(int length, const double *pres_data,
+                                      double *var_data);
+static void   interpolate_pqtzuv(const double*, double*, const double*);
 static bool   is_valid_pb_data(double pb_value);
 static void   check_fortran_file_id(const int unit, const char *method_name);
-static void   log_merged_tqz_uv(map<double, double*> pqtzuv_map_tq,
-                                map<double, double*> pqtzuv_map_uv,
+static void   log_merged_tqz_uv(map<double, double*> &pqtzuv_map_tq,
+                                map<double, double*> &pqtzuv_map_uv,
                                 map<double, double*> &pqtzuv_map_merged,
                                 const char *method_name);
 static void   log_pbl_input(int pbl_level, const char *method_name);
-static void   log_tqz_and_uv(map<double, double*> pqtzuv_map_tq,
-                             map<double, double*> pqtzuv_map_uv,
+static void   log_tqz_and_uv(map<double, double*> &pqtzuv_map_tq,
+                             map<double, double*> &pqtzuv_map_uv,
                              const char *method_name);
-static void   merge_records(double *first_pqtzuv, map<double, double*> pqtzuv_map_pivot,
+static void   merge_records(double *first_pqtzuv,
+                            map<double, double*> pqtzuv_map_pivot,
                             map<double, double*> pqtzuv_map_aux,
                             map<double, double*> &pqtzuv_map_merged);
 
@@ -892,13 +894,38 @@ void open_netcdf() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_pbfile(int i_pb) {
-   int npbmsg, npbmsg_total, unit, yr, mon, day, hr, min, sec;
-   int i, i_msg, n_file_obs, i_ret, i_date, n_hdr_obs;
-   int rej_typ, rej_sid, rej_vld, rej_grid, rej_poly;
-   int rej_elv, rej_pb_rpt, rej_in_rpt, rej_itp, rej_nobs;
-   int lv, ev, ev_temp, kk;
+// New helper: moved the bulk of the prior process_pbfile loop into this function
+static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
+                                    int i_pb, const ConcatString &blk_file)
+{
+   // This function contains the main message processing logic previously
+   // embedded inline in process_pbfile(). It was extracted to improve
+   // readability and reduce the length of process_pbfile().
+   //
+   // Note: This function uses many globals and static helpers defined
+   // elsewhere in this file to preserve existing behavior.
+
+   int i;
+   int i_date;
+   int i_msg;
+   int i_ret;
+   int ev;
+   int ev_temp;
+   int kk;
+   int lv;
    int n_derived_obs;
+   int n_file_obs;
+   int n_hdr_obs;
+   int rej_elv;
+   int rej_grid;
+   int rej_in_rpt;
+   int rej_itp;
+   int rej_nobs;
+   int rej_pb_rpt;
+   int rej_poly;
+   int rej_sid;
+   int rej_typ;
+   int rej_vld;
 
    double x;
    double y;
@@ -906,12 +933,15 @@ void process_pbfile(int i_pb) {
    int cycle_minute;
    unixtime file_ut;
    unixtime adjusted_file_ut;
-   unixtime msg_ut, beg_ut, end_ut;
-   unixtime min_msg_ut, max_msg_ut;
+   unixtime beg_ut;
+   unixtime end_ut;
+   unixtime msg_ut;
+   unixtime max_msg_ut;
+   unixtime min_msg_ut;
 
    file_ut = beg_ut = end_ut = (unixtime) 0;
 
-   ConcatString file_name, blk_prefix, blk_file, log_message;
+   ConcatString file_name, blk_prefix, log_message;
    ConcatString prefix;
    char     time_str[max_str_len];
    ConcatString  start_time_str, end_time_str;
@@ -945,9 +975,6 @@ void process_pbfile(int i_pb) {
                            conf_info.area_mask.ny() > 0);
    bool apply_poly_mask = (conf_info.poly_mask.n_points() > 0);
 
-   // List the PrepBufr file being processed
-   mlog << Debug(1) << "Processing Bufr File:\t" << pbfile[i_pb]<< "\n";
-
    // Initialize
    filtered_times.clear();
    min_msg_ut = max_msg_ut = (unixtime) 0;
@@ -957,58 +984,15 @@ void process_pbfile(int i_pb) {
    // Set the file name for the PrepBufr file
    file_name << pbfile[i_pb];
 
-   // Build the temporary block file name
-   blk_prefix << conf_info.tmp_dir << "/" << tmp_pb2nc_base;
-   blk_file = make_temp_file_name(blk_prefix.c_str(), nullptr);
+   mlog << Debug(3) << "Blocking Bufr file to:\t" << blk_file << "\n";
 
-   mlog << Debug(1) << "Blocking Bufr file to:\t" << blk_file << "\n";
-
-   // Assume that the input PrepBufr file is unblocked.
-   // Block the PrepBufr file and open it for reading.
-   pblock(file_name.c_str(), blk_file.c_str(), Action::block);
-
-   // Dump the contents of the PrepBufr file to ASCII files
-   if(dump_flag) {
-
-      // Check for multiple PrepBufr files
-      if(pbfile.n() > 1) {
-         mlog << Error << "\n" << method_name
-              << "the \"-dump\" and \"-pbfile\" options may not be "
-              << "used together.  Only one Bufr file may be dump "
-              << "to ASCII at a time.\n\n";
-         exit(1);
-      }
-
-      unit = dump_unit+i_pb;
-      prefix = get_short_name(pbfile[i_pb].c_str());
-      dump_pb_data((dump_unit+i_pb), prefix, blk_file, method_name_s);
-   }
-
-   // Open the blocked temp PrepBufr file for reading
-   unit = file_unit + i_pb;
-   check_fortran_file_id(unit, method_name_s);
-   openpb_(blk_file.c_str(), &unit);
-
-   // Compute the number of PrepBufr records in the current file.
-   numpbmsg_(&unit, &npbmsg);
-   npbmsg_total = npbmsg;
-
-   // Use the number of records requested by the user if there
-   // are enough present.
-   if(nmsg > 0 && nmsg < npbmsg) {
-      npbmsg = (nmsg_percent > 0 && nmsg_percent <= 100)
-            ? (npbmsg * nmsg_percent / 100) : nmsg;
-   }
+   // Assume that the input PrepBufr file is blocked and opened by caller
 
    // Check for zero messages to process
    if(npbmsg <= 0 || npbmsg_total <= 0) {
       mlog << Warning << "\n" << method_name
            << "No Bufr messages to process in file: "
            << pbfile[i_pb] << "\n\n";
-
-      // Delete the temporary blocked file
-      remove_temp_file(blk_file);
-
       return;
    }
 
@@ -1018,7 +1002,6 @@ void process_pbfile(int i_pb) {
    rej_typ = rej_sid    = rej_vld    = rej_grid = rej_poly = 0;
    rej_elv = rej_pb_rpt = rej_in_rpt = rej_itp  = rej_nobs = 0;
 
-   //processed_count = 0;
    int buf_nlev;
    bool showed_progress = false;
    bool is_prepbufr = is_prepbufr_file(&event_names);
@@ -1134,7 +1117,7 @@ void process_pbfile(int i_pb) {
 
       // Get the next PrepBufr message (header only)
       ireadns_(&unit, hdr_typ, &i_date);
-      readpb_hdr_(&unit, &i_ret, hdr);
+      readpb_hdr_(&unit, &i_ret, hdr.data());
       hdr_typ[max_str_len-1] = 0;
 
       snprintf(time_str, sizeof(time_str), "%.10i", i_date);
@@ -1212,6 +1195,13 @@ void process_pbfile(int i_pb) {
 
          // Update hdr[3] and file_ut for obs_time
          if (bufr_obs[0][3] > r8bfms) {
+            int yr;
+            int mon;
+            int day;
+            int hr;
+            int min;
+            int sec;
+
             hdr[3] = 0;
             yr  = nint(bufr_obs[0][4]);
             mon = nint(bufr_obs[0][5]);
@@ -1365,7 +1355,7 @@ void process_pbfile(int i_pb) {
       }
 
       // Get the next PrepBufr message
-      readpb_(&unit, &i_ret, &nlev, hdr, evns, &nlev_max_req);
+      readpb_(&unit, &i_ret, &nlev, hdr.data(), evns, &nlev_max_req);
 
       int max_buf = sizeof(modified_hdr_typ);
       // Special handling for "AIRNOW" and "ANOWPM"
@@ -1739,10 +1729,11 @@ void process_pbfile(int i_pb) {
             if (cal_cape) {
                ivirt = 1;
                itype = 1;
-               calcape(&ivirt,&itype, cape_data_temp, cape_data_spfh, cape_data_pres,
-                        &p1d,&t1d,&q1d, static_dummy_201,
-                        &cape_level, &IMM,&JMM, &cape_level,
-                        &cape_val, &cin_val, &PLCL, &PEQL, static_dummy_200);
+               calcape(&ivirt,&itype, cape_data_temp.data(),
+                       cape_data_spfh.data(), cape_data_pres.data(),
+                       &p1d,&t1d,&q1d, static_dummy_201.data(),
+                       &cape_level, &IMM,&JMM, &cape_level,
+                       &cape_val, &cin_val, &PLCL, &PEQL, static_dummy_200.data());
 
                if(mlog.verbosity_level() >= 7) {
                   mlog << Debug(7) << method_name
@@ -1787,10 +1778,1328 @@ void process_pbfile(int i_pb) {
                p1d = cape_data_pres[cape_level-2];
                t1d = cape_data_temp[cape_level-2];
                q1d = cape_data_spfh[cape_level-2];
-               calcape(&ivirt,&itype, cape_data_temp, cape_data_spfh, cape_data_pres,
-                        &p1d,&t1d,&q1d, static_dummy_201,
-                        &cape_level, &IMM,&JMM, &cape_level,
-                        &mlcape_val, &cin_val, &PLCL, &PEQL, static_dummy_200);
+               calcape(&ivirt,&itype, cape_data_temp.data(),
+                       cape_data_spfh.data(), cape_data_pres.data(),
+                       &p1d,&t1d,&q1d, static_dummy_201.data(),
+                       &cape_level, &IMM,&JMM, &cape_level,
+                       &mlcape_val, &cin_val, &PLCL, &PEQL, static_dummy_200.data());
+               if (mlcape_val > MAX_CAPE_VALUE) {
+                  mlcape_cnt_too_big++;
+                  mlog << Debug(5) << method_name
+                       << " Ignored ML_cape: " << mlcape_val << " cape_level: "
+                       << cape_level << "\n";
+               }
+               else if (mlcape_val >= 0) {
+                  obs_arr[1] = mlcape_code;
+                  obs_arr[2] = cape_p;
+                  obs_arr[3] = cape_h;
+                  obs_arr[4] = mlcape_val; // observation value
+                  addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+                                 hdr_lat, hdr_lon, hdr_elv, cape_qm,
+                                 OBS_BUFFER_SIZE);
+                  mlcape_count++;
+                  n_derived_obs++;
+                  if (is_eq(mlcape_val, 0.)) mlcape_cnt_zero_values++;
+               }
+               else mlcape_cnt_missing_values++;
+            }
+         }
+         else if (1 < buf_nlev) cape_cnt_no_levels++;
+         else cape_cnt_surface_msgs++;
+      }
+
+      {
+         quality_mark = bad_data_int;
+         ConcatString quality_mark_str;
+
+         if (is_airnow) {
+            int tmp_ret, tmp_nlev, tmp_len;
+            for (int index1=0; index1<mxr8lv; index1++) {
+              for (int index2=0; index2<mxr8pm; index2++) {
+                 bufr_obs_extra[index1][index2] = bad_data_double;
+              }
+            }
+            tmp_len = m_strlen(airnow_aux_vars);
+            readpbint_(&unit, &tmp_ret, &tmp_nlev, bufr_obs_extra,
+                       (char *)airnow_aux_vars, &tmp_len, &nlev_max_req);
+         }
+         bool isDegC;
+         bool isMgKg;
+         bool isMilliBar;
+         int var_index;
+         int n_other_file_obs  = 0;
+         int n_other_total_obs = 0;
+         int n_other_hdr_obs   = 0;
+         int var_count = bufr_obs_name_arr.n();
+         for (int vIdx=0; vIdx<var_count; vIdx++) {
+            int nlev2;
+            ConcatString var_name;
+            int var_name_len;
+            var_name = bufr_obs_name_arr[vIdx];
+            var_name_len = var_name.length();
+            if (is_prepbufr &&
+                  (prepbufr_vars.has(var_name, false)
+                   || prepbufr_event_members.has(var_name)
+                   || prepbufr_derive_vars.has(var_name))) continue;
+
+            isDegC = false;
+            isMgKg = false;
+            isMilliBar = false;
+            if (var_names.has(var_name, var_index, false)) {
+               if ("DEG C" == var_units[var_index]) {
+                  isDegC = true;
+               }
+               else if ("MB" == var_units[var_index]) {
+                  isMilliBar = true;
+               }
+               else if ("MG/KG" == var_units[var_index]) {
+                  isMgKg = true;
+               }
+            }
+
+            readpbint_(&unit, &i_ret, &nlev2, bufr_obs,
+                       (char*)var_name.c_str(), &var_name_len, &nlev_max_req);
+            if (0 >= nlev2) continue;
+
+            buf_nlev = nlev2;
+            if (nlev2 > mxr8lv) {
+               buf_nlev = mxr8lv;
+               if (!variables_big_nlevels.has(var_name, false)) {
+                  mlog << Warning << "\n" << method_name
+                       << "Too many vertical levels (" << nlev2
+                       << ") for " << var_name
+                       << ". Ignored the vertical levels above " << mxr8lv << ".\n\n";
+                  variables_big_nlevels.add(var_name);
+               }
+            }
+            mlog << Debug(10) << "var: " << var_name << " nlev2: " << nlev2
+                 << ", vIdx: " << vIdx << ", obs_data_idx: "
+                 << nc_point_obs.get_obs_index() << ", nlev: " << nlev << "\n";
+            // Search through the vertical levels
+            for(lv=0; lv<buf_nlev; lv++) {
+               // If the observation vertical level is not within the
+               // specified valid range, continue to the next vertical level
+               if((lv+1) < conf_info.beg_level) continue;
+               if((lv+1) > conf_info.end_level) break;
+
+               // If the pressure level is not valid, continue to the next level
+               if (is_prepbufr) {
+                  if ((lv >= nlev) || is_eq(bufr_pres_lv[lv], fill_value)) continue;
+               }
+
+               if (bufr_obs[lv][0] > r8bfms) continue;
+               mlog << Debug(10) << " value:   bufr_obs[" << lv << "][0]: " << bufr_obs[lv][0] << "\n";
+
+               obs_arr[1] = (double)vIdx;        // BUFR variable index
+               obs_arr[4] = bufr_obs[lv][0];    // observation value
+               if(!is_eq(obs_arr[4], fill_value)) {
+                  // Convert pressure from millibars to pascals
+                  if (isMilliBar) {
+                     obs_arr[4] *= pa_per_mb;
+                  }
+                  // Convert specific humidity from mg/kg to kg/kg
+                  else if(isMgKg) {
+                     obs_arr[4] *= kg_per_mg;
+                  }
+                  // Convert temperature from celcius to kelvin
+                  else if(isDegC) {
+                     obs_arr[4] += c_to_k;
+                  }
+               }
+
+               if (is_airnow) {
+                  obs_arr[2]   = abs(bufr_obs_extra[lv][0] * 3600);  // hour to second
+                  obs_arr[3]   = 0;                                  // AIRNOW obs at surface
+                  quality_mark = bufr_obs_extra[lv][1];
+                  // Convert a special number (1e+11) to NA at addObservation
+                  if(conf_info.quality_mark_thresh < quality_mark) continue;
+               }
+               else {
+                  // Retain the pressure in hPa for each observation record
+                  obs_arr[2] = bufr_pres_lv[lv];
+                  obs_arr[3] = bufr_msl_lv[lv];
+                  if (is_eq(obs_arr[2], fill_value) && is_eq(obs_arr[3], fill_value) && 0 < nlev2) {
+                     obs_arr[2] = lv;
+                     obs_arr[3] = lv;
+                  }
+               }
+
+               addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+                     hdr_lat, hdr_lon, hdr_elv, quality_mark, OBS_BUFFER_SIZE);
+
+               // Increment the current and total observations counts
+               n_other_file_obs++;
+               n_other_total_obs++;
+
+               // Increment the number of obs counter for this header
+               n_other_hdr_obs++;
+            }
+         }
+         n_hdr_obs += n_other_hdr_obs;
+         n_file_obs += n_other_file_obs;
+         n_total_obs += n_other_total_obs;
+      }
+
+      if (do_pbl) {
+         is_same_header = (prev_hdr_vld_ut == hdr_vld_ut)
+               && is_eq(prev_hdr_lat, hdr_lat)
+               && is_eq(prev_hdr_lon, hdr_lon)
+               && is_eq(prev_hdr_elv, hdr_elv)
+               && 0 == strcmp(prev_hdr_typ, hdr_typ)
+               && 0 == strcmp(prev_hdr_sid, hdr_sid.c_str());
+         has_pbl_data = (pqtzuv_map_tq.size() > 0 && pqtzuv_map_uv.size() > 0);
+         if (is_same_header && has_pbl_data) {
+            double pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
+
+            if (insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
+                           hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid)) n_derived_obs++;
+
+            for(vector<double *>::iterator it = pqtzuv_list.begin();
+                it != pqtzuv_list.end(); ++it) {
+               delete *it;
+            }
+            pqtzuv_list.clear();
+            pqtzuv_map_tq.clear();
+            pqtzuv_map_uv.clear();
+            pbl_qm = bad_data_double;
+         }
+         prev_hdr_vld_ut = hdr_vld_ut;
+         prev_hdr_lat = hdr_lat;
+         prev_hdr_lon = hdr_lon;
+         prev_hdr_elv = hdr_elv;
+         m_strncpy(prev_hdr_typ, hdr_typ, m_strlen(not_assigned), method_name_s, "prev_hdr_typ");
+         m_strncpy(prev_hdr_sid, hdr_sid.c_str(), m_strlen(not_assigned), method_name_s, "prev_hdr_sid");
+      }
+
+      // If the number of observations for this header is non-zero,
+      // store the header data and increment the PrepBufr record
+      // counter
+      if(n_hdr_obs > 0) {
+         nc_point_obs.add_header(modified_hdr_typ, hdr_sid.c_str(), hdr_vld_ut,
+                             hdr_lat, hdr_lon, hdr_elv);
+         if (is_prepbufr) {
+            nc_point_obs.add_header_prepbufr(pb_report_type, in_report_type, instrument_type);
+         }
+
+         i_msg++;
+      }
+      else {
+         rej_nobs++;
+      }
+   } // end for i_read
+
+   has_pbl_data = (pqtzuv_map_tq.size() > 0 || pqtzuv_map_uv.size() > 0);
+   if (do_pbl && has_pbl_data) {
+      double pbl_value = compute_pbl(pqtzuv_map_tq, pqtzuv_map_uv);
+      if (insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
+                     hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid)) n_derived_obs++;
+
+      for(vector<double *>::iterator it = pqtzuv_list.begin();
+          it != pqtzuv_list.end(); ++it) {
+         delete *it;
+      }
+      pqtzuv_list.clear();
+      pqtzuv_map_tq.clear();
+      pqtzuv_map_uv.clear();
+   }
+
+   if(showed_progress) {
+      log_message = "100% ";
+      if(mlog.verbosity_level() >= debug_level_for_performance) {
+         end_t = clock();
+         log_message << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds";
+      }
+      cout << log_message << "\n";
+   }
+
+   // Log information about multiple message reference times
+   if(unique_msg_ut.n() > 1) {
+
+      ConcatString msg_cs;
+      msg_cs << "Found " << unique_msg_ut.n() << " unique "
+             << (is_prepbufr ? "PrepBufr" : "Bufr")
+             << " message reference time(s) from "
+             << unix_to_yyyymmdd_hhmmss(unique_msg_ut.min()) << " to "
+             << unix_to_yyyymmdd_hhmmss(unique_msg_ut.max()) << ".\n";
+
+      // Print warning if the time window was not defined on the command line
+      if(valid_beg_ut == (unixtime) 0 &&
+         valid_end_ut == (unixtime) 0) {
+         mlog << Warning << "\n" << method_name
+              << msg_cs << "\n"
+              << R"(Set the "-valid_beg" and/or "-valid_end" )"
+              << "command line options to define the retention "
+              << "time window.\n\n";
+      }
+      else {
+         mlog << Debug(3) << msg_cs;
+      }
+   }
+   nc_point_obs.write_observation();
+
+   mlog << Debug(2)
+        << "Messages processed\t\t\t= " << npbmsg << "\n"
+        << "Rejected based on message type\t\t= "
+        << rej_typ << "\n"
+        << "Rejected based on station id\t\t= "
+        << rej_sid << "\n"
+        << "Rejected based on valid time\t\t= "
+        << rej_vld << "\n"
+        << "Rejected based on masking grid\t\t= "
+        << rej_grid << "\n"
+        << "Rejected based on masking polygon\t= "
+        << rej_poly << "\n"
+        << "Rejected based on elevation\t\t= "
+        << rej_elv << "\n"
+        << "Rejected based on pb report type\t= "
+        << rej_pb_rpt << "\n"
+        << "Rejected based on input report type\t= "
+        << rej_in_rpt << "\n"
+        << "Rejected based on instrument type\t= "
+        << rej_itp << "\n"
+        << "Rejected based on zero observations\t= "
+        << rej_nobs << "\n"
+        << "Messages retained\t\t\t= "
+        << i_msg << "\n"
+        << "Observations retained or derived\t= "
+        << (n_file_obs + n_derived_obs) << "\n";
+
+   if (cal_cape) {
+      mlog << Debug(3) << "\nDerived CAPE = " << cape_count
+           << "\tZero = " << cape_cnt_zero_values
+           << "\n\tnot derived: No cape inputs = " << cape_cnt_no_levels
+           << "\tNo vertical levels = " << cape_cnt_surface_msgs
+           << "\n\tfiltered: " << cape_cnt_missing_values << ", "
+           << cape_cnt_too_big
+           << "\n";
+   }
+   if (cal_mlcape) {
+      mlog << Debug(3) << "\nDerived MLCAPE = " << mlcape_count
+           << "\tZero = " << mlcape_cnt_zero_values
+           << "\n\tnot derived: No cape inputs = " << cape_cnt_no_levels
+           << "\tNo vertical levels = " << cape_cnt_surface_msgs
+           << "\n\tfiltered: " << mlcape_cnt_missing_values << ", "
+           << mlcape_cnt_too_big
+           << "\n";
+   }
+
+
+   if (npbmsg == rej_vld && 0 < rej_vld) {
+      mlog << Warning << "\n" << method_name
+           << "All messages were filtered out by valid time.\n"
+           << "\tPlease adjust time range with \"-valid_beg\" and \"-valid_end\".\n"
+           << "\tmin/max obs time from BUFR file: " << min_time_str
+           << " and " << max_time_str << ".\n"
+           << "\ttime range: " << start_time_str << " and " << end_time_str << ".\n";
+   }
+   else {
+      mlog << Debug(2) << "Finished processing input observations between "
+           << unix_to_yyyymmdd_hhmmss(min_msg_ut) << " and "
+           << unix_to_yyyymmdd_hhmmss(max_msg_ut) << ".\n";
+
+      int debug_level = 5;
+      if(mlog.verbosity_level() >= debug_level) {
+         log_message = "Filtered time:";
+         for (kk=0; kk<filtered_times.n();kk++) {
+            log_message.add((0 == (kk % 3)) ? "\n\t" : "  ");
+            log_message.add(unix_to_yyyymmdd_hhmmss(filtered_times[kk]));
+         }
+         mlog << Debug(debug_level) << log_message << "\n";
+      }
+   }
+
+   // Close the PREPBUFR file
+   closepb_(&unit);
+
+   // Delete the temporary blocked file
+   remove_temp_file(blk_file);
+   if(mlog.verbosity_level() >= debug_level_for_performance) {
+      method_end = clock();
+      cout << " PERF: " << method_name_s << " "
+           << (method_end-method_start)/double(CLOCKS_PER_SEC)
+           << " seconds\n";
+   }
+
+   if(i_msg <= 0) {
+      if (n_derived_obs > 0)
+         mlog << Debug(3) << method_name
+              << "Saved the derived variables only. No " << (is_prepbufr ? "PrepBufr" : "Bufr")
+              << " messages retained from file: "
+              << pbfile[i_pb] << "\n";
+      else mlog << Warning << "\n" << method_name
+                << "No " << (is_prepbufr ? "PrepBufr" : "Bufr")
+                << " messages retained from file: "
+                << pbfile[i_pb] << "\n\n";
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_pbfile(int i_pb) {
+   int npbmsg, npbmsg_total, unit, yr, mon, day, hr, min, sec;
+   const char *method_name_s = "process_pbfile()";
+   const char *method_name = "process_pbfile() -> ";
+
+   ConcatString file_name, blk_prefix, blk_file;
+
+   // List the PrepBufr file being processed
+   mlog << Debug(1) << "Processing Bufr File:\t" << pbfile[i_pb]<< "\n";
+
+   // Set the file name for the PrepBufr file
+   file_name << pbfile[i_pb];
+
+   // Build the temporary block file name
+   blk_prefix << conf_info.tmp_dir << "/" << tmp_pb2nc_base;
+   blk_file = make_temp_file_name(blk_prefix.c_str(), nullptr);
+
+   mlog << Debug(1) << "Blocking Bufr file to:\t" << blk_file << "\n";
+
+   // Assume that the input PrepBufr file is unblocked.
+   // Block the PrepBufr file and open it for reading.
+   pblock(file_name.c_str(), blk_file.c_str(), Action::block);
+
+   // Dump the contents of the PrepBufr file to ASCII files
+   if(dump_flag) {
+
+      // Check for multiple PrepBufr files
+      if(pbfile.n() > 1) {
+         mlog << Error << "\n" << method_name
+              << "the \"-dump\" and \"-pbfile\" options may not be "
+              << "used together.  Only one Bufr file may be dump "
+              << "to ASCII at a time.\n\n";
+         exit(1);
+      }
+
+      unit = dump_unit+i_pb;
+      ConcatString prefix = get_short_name(pbfile[i_pb].c_str());
+      dump_pb_data((dump_unit+i_pb), prefix, blk_file, method_name_s);
+   }
+
+   // Open the blocked temp PrepBufr file for reading
+   unit = file_unit + i_pb;
+   check_fortran_file_id(unit, method_name_s);
+   openpb_(blk_file.c_str(), &unit);
+
+   // Compute the number of PrepBufr records in the current file.
+   numpbmsg_(&unit, &npbmsg);
+   npbmsg_total = npbmsg;
+
+   // Use the number of records requested by the user if there
+   // are enough present.
+   if(nmsg > 0 && nmsg < npbmsg) {
+      npbmsg = (nmsg_percent > 0 && nmsg_percent <= 100)
+            ? (npbmsg * nmsg_percent / 100) : nmsg;
+   }
+
+   // Delegate the detailed message processing to the extracted helper
+   process_pbfile_messages(unit, npbmsg, npbmsg_total, i_pb, blk_file);
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_pbfile_org(int i_pb) {
+   int npbmsg, npbmsg_total, unit, yr, mon, day, hr, min, sec;
+   int i, i_msg, n_file_obs, i_ret, i_date, n_hdr_obs;
+   int rej_typ, rej_sid, rej_vld, rej_grid, rej_poly;
+   int rej_elv, rej_pb_rpt, rej_in_rpt, rej_itp, rej_nobs;
+   int lv, ev, ev_temp, kk;
+   int n_derived_obs;
+
+   double x;
+   double y;
+
+   int cycle_minute;
+   unixtime file_ut;
+   unixtime adjusted_file_ut;
+   unixtime msg_ut, beg_ut, end_ut;
+   unixtime min_msg_ut, max_msg_ut;
+
+   file_ut = beg_ut = end_ut = (unixtime) 0;
+
+   ConcatString file_name, blk_prefix, blk_file, log_message;
+   ConcatString prefix;
+   char     time_str[max_str_len];
+   ConcatString  start_time_str, end_time_str;
+   char     min_time_str[max_str_len], max_time_str[max_str_len];
+
+   char     hdr_typ[max_str_len];
+   ConcatString hdr_sid;
+   char     modified_hdr_typ[max_str_len];
+   double   hdr_lat = bad_data_double;
+   double   hdr_lon = bad_data_double;
+   double   hdr_elv = bad_data_double;
+   double   pb_report_type, in_report_type, instrument_type;
+   unixtime hdr_vld_ut = (unixtime) 0;
+
+   double   quality_mark, dl_category;
+   double   obs_arr[OBS_ARRAY_LEN];
+   double   pqtzuv[mxr8vt], pqtzuv_qty[mxr8vt];
+
+   const int debug_level_for_performance = 3;
+   clock_t start_t, end_t, method_start, method_end;
+   start_t = end_t = method_start = method_end = clock();
+
+   IntArray unique_msg_ut;
+   StringArray variables_big_nlevels;
+   static const char *method_name_s = "process_pbfile()";
+   static const char *method_name = "process_pbfile() -> ";
+
+   bool apply_grid_mask = (conf_info.grid_mask.nx() > 0 &&
+                           conf_info.grid_mask.ny() > 0);
+   bool apply_area_mask = (conf_info.area_mask.nx() > 0 &&
+                           conf_info.area_mask.ny() > 0);
+   bool apply_poly_mask = (conf_info.poly_mask.n_points() > 0);
+
+   // List the PrepBufr file being processed
+   mlog << Debug(1) << "Processing Bufr File:\t" << pbfile[i_pb]<< "\n";
+
+   // Initialize
+   filtered_times.clear();
+   min_msg_ut = max_msg_ut = (unixtime) 0;
+   min_time_str[0] = '\0';
+   max_time_str[0] = '\0';
+
+   // Set the file name for the PrepBufr file
+   file_name << pbfile[i_pb];
+
+   // Build the temporary block file name
+   blk_prefix << conf_info.tmp_dir << "/" << tmp_pb2nc_base;
+   blk_file = make_temp_file_name(blk_prefix.c_str(), nullptr);
+
+   mlog << Debug(1) << "Blocking Bufr file to:\t" << blk_file << "\n";
+
+   // Assume that the input PrepBufr file is unblocked.
+   // Block the PrepBufr file and open it for reading.
+   pblock(file_name.c_str(), blk_file.c_str(), Action::block);
+
+   // Dump the contents of the PrepBufr file to ASCII files
+   if(dump_flag) {
+
+      // Check for multiple PrepBufr files
+      if(pbfile.n() > 1) {
+         mlog << Error << "\n" << method_name
+              << "the \"-dump\" and \"-pbfile\" options may not be "
+              << "used together.  Only one Bufr file may be dump "
+              << "to ASCII at a time.\n\n";
+         exit(1);
+      }
+
+      unit = dump_unit+i_pb;
+      prefix = get_short_name(pbfile[i_pb].c_str());
+      dump_pb_data((dump_unit+i_pb), prefix, blk_file, method_name_s);
+   }
+
+   // Open the blocked temp PrepBufr file for reading
+   unit = file_unit + i_pb;
+   check_fortran_file_id(unit, method_name_s);
+   openpb_(blk_file.c_str(), &unit);
+
+   // Compute the number of PrepBufr records in the current file.
+   numpbmsg_(&unit, &npbmsg);
+   npbmsg_total = npbmsg;
+
+   // Use the number of records requested by the user if there
+   // are enough present.
+   if(nmsg > 0 && nmsg < npbmsg) {
+      npbmsg = (nmsg_percent > 0 && nmsg_percent <= 100)
+            ? (npbmsg * nmsg_percent / 100) : nmsg;
+   }
+
+   // Check for zero messages to process
+   if(npbmsg <= 0 || npbmsg_total <= 0) {
+      mlog << Warning << "\n" << method_name
+           << "No Bufr messages to process in file: "
+           << pbfile[i_pb] << "\n\n";
+
+      // Delete the temporary blocked file
+      remove_temp_file(blk_file);
+
+      return;
+   }
+
+   // Initialize counts
+   n_derived_obs = n_file_obs = 0;
+   i_ret   = i_msg      = 0;
+   rej_typ = rej_sid    = rej_vld    = rej_grid = rej_poly = 0;
+   rej_elv = rej_pb_rpt = rej_in_rpt = rej_itp  = rej_nobs = 0;
+
+   //processed_count = 0;
+   int buf_nlev;
+   bool showed_progress = false;
+   bool is_prepbufr = is_prepbufr_file(&event_names);
+   if(mlog.verbosity_level() >= debug_level_for_performance) {
+      end_t = clock();
+      mlog << Debug(debug_level_for_performance) << " PERF: " << method_name_s << " "
+           << (end_t-start_t)/double(CLOCKS_PER_SEC)
+           << " seconds for preparing\n";
+      start_t = clock();
+   }
+
+   log_message = (is_prepbufr ? " PrepBufr" : " Bufr");
+   log_message.add(" messages");
+   if (npbmsg != npbmsg_total) {
+      log_message << " (out of " << unixtime_to_string(npbmsg_total) << ")";
+   }
+   mlog << Debug(2) << "Processing " << npbmsg << log_message << "...\n";
+
+   int nlev_max_req = mxr8lv;
+   if (0 < conf_info.end_level && conf_info.end_level < mxr8lv) {
+      nlev_max_req = (int)conf_info.end_level;
+      mlog << Debug(4) << "Request up to " << nlev_max_req << " vertical levels\n";
+   }
+
+   int grib_code;
+   int bufr_var_index;
+   map<ConcatString, ConcatString> message_type_map = conf_info.getMessageTypeMap();
+
+   int bin_count = nint(npbmsg/20.0);
+   int bufr_hdr_length = bufr_hdrs.length();
+   ConcatString bufr_hdr_names;
+   bufr_hdr_names = bufr_hdrs.text();
+
+   // To compute CAPE
+   int ivirt = 1;   // 0: regular thetap and thetaa
+                    // 1: virtual thetap and thetaa
+   int itype = 1;   // itype 1: where a parcel is lifted from the ground
+                    // itype 2: Where the "best cape" in a number of parcels
+   int cape_code = -1;
+   int mlcape_code = -1;
+   double p1d,t1d,q1d;
+   int IMM, JMM;
+   int cape_level, cape_count, cape_cnt_too_big, cape_cnt_surface_msgs;
+   int cape_cnt_no_levels, cape_cnt_missing_values, cape_cnt_zero_values;
+   int mlcape_count, mlcape_cnt_too_big;
+   int mlcape_cnt_missing_values, mlcape_cnt_zero_values;
+   double cape_p, cape_h;
+   double cape_qm = bad_data_double;
+
+   // To compute PBL
+   int pbl_code = -1;
+   double pbl_p, pbl_h;
+   double pbl_qm = bad_data_double;
+
+   bool has_pbl_data;
+   bool do_pbl = false;
+   bool cal_pbl = bufr_obs_name_arr.has(derived_pbl, pbl_code, false);
+   bool cal_cape = bufr_obs_name_arr.has(derived_cape, cape_code, false);
+   bool cal_mlcape = bufr_obs_name_arr.has(derived_mlcape, mlcape_code, false);
+
+   bool     is_same_header;
+   auto     prev_hdr_vld_ut = (unixtime) 0;
+   char     prev_hdr_typ[max_str_len], prev_hdr_sid[max_str_len];
+   double   prev_hdr_lat, prev_hdr_lon, prev_hdr_elv;
+   map<double, double*> pqtzuv_map_tq;
+   map<double, double*> pqtzuv_map_uv;
+   vector<double*> pqtzuv_list;
+
+   // Initialize
+   prev_hdr_lat = prev_hdr_lon = prev_hdr_elv = bad_data_double;
+   cape_level = cape_count = cape_cnt_too_big = cape_cnt_surface_msgs = 0;
+   cape_cnt_no_levels = cape_cnt_missing_values = cape_cnt_zero_values = 0;
+   mlcape_count = mlcape_cnt_too_big = 0;
+   mlcape_cnt_missing_values = mlcape_cnt_zero_values = 0;
+
+   if (cal_pbl) {
+      prev_hdr_vld_ut = -1;
+      m_strncpy(prev_hdr_typ, not_assigned, m_strlen(not_assigned), method_name_s, "prev_hdr_typ");
+      m_strncpy(prev_hdr_sid, not_assigned, m_strlen(not_assigned), method_name_s, "prev_hdr_sid");
+   }
+
+   IMM = JMM =1;
+   p1d = t1d = q1d = (double)r8bfms * 10;
+   cape_h = pbl_h = 0;
+   cape_p = pbl_p = bad_data_double;
+
+   cycle_minute = missing_cycle_minute;     // initialize
+
+   // Check the number of variables to be derived from:
+   //   P, Q, T, Z, U, V
+   if (n_derive_gc > bufr_derive_cfgs.size()) {
+      mlog << Debug(3) << method_name
+           << "No observation variables requested to be derived ("
+           << bufr_derive_cfgs.size() << ").\n";
+   }
+
+   for (int idx=0; idx<OBS_ARRAY_LEN; idx++) obs_arr[idx] = 0;
+
+   // Loop through the PrepBufr messages from the input file
+   for(int i_read=0; i_read<npbmsg && i_ret == 0; i_read++) {
+
+      if(mlog.verbosity_level() > 0) {
+         if(bin_count > 0 && (i_read+1)%bin_count == 0) {
+            cout << nint((double) (i_read+1)/npbmsg*100.0) << "% " << flush;
+            showed_progress = true;
+            if(mlog.verbosity_level() >= debug_level_for_performance) {
+               end_t = clock();
+               cout << (end_t-start_t)/double(CLOCKS_PER_SEC) << " seconds\n";
+               start_t = clock();
+            }
+         }
+      }
+
+      // Get the next PrepBufr message (header only)
+      ireadns_(&unit, hdr_typ, &i_date);
+      readpb_hdr_(&unit, &i_ret, hdr.data());
+      hdr_typ[max_str_len-1] = 0;
+
+      snprintf(time_str, sizeof(time_str), "%.10i", i_date);
+      msg_ut = yyyymmddhh_to_unix(time_str);
+
+      // Check to make sure that the message time hasn't changed
+      // from one PrepBufr message to the next
+      if(file_ut == (unixtime) 0) {
+         adjusted_file_ut = file_ut = msg_ut;
+
+         // Get minutes offset by calling IUPVS01(unit, "MINU")
+         // It's not changed per message
+         get_tmin_(&unit, &cycle_minute);
+         if (cycle_minute != missing_cycle_minute) adjusted_file_ut += (cycle_minute * 60);
+
+         mlog << Debug(2) << (is_prepbufr ? "PrepBufr" : "Bufr")
+              << " Time Center:\t\t" << unix_to_yyyymmdd_hhmmss(adjusted_file_ut)
+              << "\n";
+
+         // Check if valid_beg_ut and valid_end_ut were set on the
+         // command line.  If so, use them.  If not, use beg_ds and
+         // end_ds.
+         if(valid_beg_ut != (unixtime) 0 ||
+            valid_end_ut != (unixtime) 0) {
+            beg_ut = valid_beg_ut;
+            end_ut = valid_end_ut;
+         }
+         else {
+            beg_ut = adjusted_file_ut + conf_info.beg_ds;
+            end_ut = adjusted_file_ut + conf_info.end_ds;
+         }
+
+         if(beg_ut != (unixtime) 0) {
+            unix_to_yyyymmdd_hhmmss(beg_ut, start_time_str);
+         }
+         else {
+            start_time_str = "NO_BEG_TIME";
+         }
+
+         if(end_ut != (unixtime) 0) {
+            unix_to_yyyymmdd_hhmmss(end_ut, end_time_str);
+         }
+         else {
+            end_time_str = "NO_END_TIME";
+         }
+
+         mlog << Debug(2) << "Searching Time Window:\t\t" << start_time_str
+              << " to " << end_time_str << "\n";
+
+      }
+
+      // Keep track of the unique message reference times,
+      // searching from newest to oldest
+      unique_msg_ut.add_uniq(msg_ut, false);
+
+      // Add minutes by calling IUPVS01(unit, "MINU")
+      if (cycle_minute != missing_cycle_minute) {
+         msg_ut += cycle_minute * 60;
+      }
+
+      if (!is_prepbufr) {
+         int index;
+         int req_hdr_level = 1;
+         ConcatString tmp_str;
+
+         //Read header (station id, lat, lon, ele, time)
+         tmp_str = bufr_hdrs;
+         readpbint_(&unit, &i_ret, &nlev, bufr_obs, (char*)bufr_hdr_names.c_str(),
+                    &bufr_hdr_length, &req_hdr_level );
+
+         // Copy sid, lat, lon, and dhr
+         for (index=0; index<4; index++) {
+            hdr[index] = bufr_obs[0][index];
+         }
+
+         // Update hdr[3] and file_ut for obs_time
+         if (bufr_obs[0][3] > r8bfms) {
+            hdr[3] = 0;
+            yr  = nint(bufr_obs[0][4]);
+            mon = nint(bufr_obs[0][5]);
+            day = nint(bufr_obs[0][6]);
+            hr  = nint(bufr_obs[0][7]);
+            min = nint(bufr_obs[0][8]);
+            sec = nint(bufr_obs[0][9]);
+            if (hr  > r8bfms) hr = 0;
+            if (min > r8bfms) min = 0;
+            if (sec > r8bfms || sec < 0) sec = 0;
+            msg_ut = mdyhms_to_unix(mon, day, yr, hr, min, sec);
+            mlog << Debug(7) << "Bufr obs_time:\t"
+                 << unix_to_yyyymmdd_hhmmss(msg_ut) << "\n\n";
+            for (index=0; index<mxr8lv; index++) {
+               bufr_pres_lv[index] = fill_value;
+               bufr_msl_lv[index]  = fill_value;
+            }
+         }
+      }
+
+      // Null terminate the message type string
+      cleanup_hdr_typ(hdr_typ, is_prepbufr);
+
+      // If the message type is not listed in the configuration
+      // file and it is not the case that all message types should be
+      // retained, continue to the next PrepBufr message
+      if(!keep_message_type(hdr_typ)) {
+         rej_typ++;
+         continue;
+      }
+
+      // Convert the SID to a string, then
+      // crop to 8 characters and remove whitespace
+      dbl2str(&hdr[0], hdr_sid);
+      hdr_sid = hdr_sid.string().substr(0, mxr8nm);
+      hdr_sid.ws_strip();
+
+      // If the station id is not listed in the configuration
+      // file and it is not the case that all station ids should be
+      // retained, continue to the next PrepBufr message
+      if(!keep_station_id(hdr_sid.c_str())) {
+         rej_sid++;
+         continue;
+      }
+
+      // Read the header array elements which consists of:
+      //    LON LAT DHR ELV TYP T29 ITP
+
+      // Longitude
+      if(hdr[1] > r8bfms) hdr_lon     = fill_value;
+      else                hdr_lon     = hdr[1];
+
+      // Latitude
+      if(hdr[2] > r8bfms) hdr_lat     = fill_value;
+      else                hdr_lat     = hdr[2];
+
+      // Elevation
+      if(hdr[4] > r8bfms) hdr_elv     = fill_value;
+      else                hdr_elv     = hdr[4];
+
+      // PrepBufr Report Type
+      if(hdr[5] > r8bfms) pb_report_type  = fill_value;
+      else                pb_report_type  = hdr[5];
+
+      // Input Report Type
+      if(hdr[6] > r8bfms) in_report_type  = fill_value;
+      else                in_report_type  = hdr[6];
+
+      // Instrument Type
+      if(hdr[7] > r8bfms) instrument_type = fill_value;
+      else                instrument_type = hdr[7];
+
+      // Compute the valid time and check if it is within the
+      // specified valid range
+      hdr_vld_ut = msg_ut + (unixtime)nint(hdr[3]*sec_per_hour);
+      if (0 == min_msg_ut || min_msg_ut > hdr_vld_ut) {
+         min_msg_ut = hdr_vld_ut;
+      }
+      if (max_msg_ut < hdr_vld_ut) {
+         max_msg_ut = hdr_vld_ut;
+      }
+      if(!keep_valid_time(hdr_vld_ut, beg_ut, end_ut)) {
+         if (!filtered_times.has(hdr_vld_ut, false)) {
+            filtered_times.add(hdr_vld_ut);
+         }
+         rej_vld++;
+         continue;
+      }
+
+      // Rescale the longitude value from 0 to 360 -> -180 to 180
+      hdr_lon = rescale_lon(hdr_lon);
+
+      // If the lat/lon for the PrepBufr message is not on the
+      // grid_mask, continue to the next PrepBufr message
+      if(apply_grid_mask) {
+         conf_info.grid_mask.latlon_to_xy(hdr_lat, (-1.0*hdr_lon), x, y);
+         if(x < 0 || x >= conf_info.grid_mask.nx() ||
+            y < 0 || y >= conf_info.grid_mask.ny()) {
+            rej_grid++;
+            continue;
+         }
+
+         // Include the area mask rejection counts with the polyline since
+         // it is specified using the mask.poly config option.
+         if(apply_area_mask && !conf_info.area_mask.s_is_on(nint(x), nint(y))) {
+            rej_poly++;
+            continue;
+         }
+      }
+
+      // If the lat/lon for the PrepBufr message is not inside the mask
+      // polyline continue to the next PrepBufr message.  Multiply by
+      // -1 to convert from degrees_east to degrees_west
+      if(apply_poly_mask &&
+         !conf_info.poly_mask.latlon_is_inside_dege(hdr_lat, hdr_lon)) {
+         rej_poly++;
+         continue;
+      }
+
+      // Check if the message elevation is within the specified range.
+      // Missing data values for elevation are retained.
+      if (!is_eq(hdr_elv, fill_value) &&
+         (hdr_elv < conf_info.beg_elev ||
+          hdr_elv > conf_info.end_elev) ) {
+         rej_elv++;
+         continue;
+      }
+
+      // If the PrepBufr report type is not listed in the configuration
+      // file and it is not the case that all PrepBufr report types
+      // should be retained, continue to the next PrepBufr message.
+      if(!keep_pb_report_type(nint(pb_report_type))) {
+         rej_pb_rpt++;
+         continue;
+      }
+
+      // If the input report type is not listed in the configuration
+      // file and it is not the case that all input report types
+      // should be retained, continue to the next PrepBufr message.
+      if(!keep_in_report_type(nint(in_report_type))) {
+         rej_in_rpt++;
+         continue;
+      }
+
+      // If the instrument type is not listed in the configuration
+      // file, and it is not the case that all instrument types
+      // should be retained, continue to the next PrepBufr message.
+      if(!keep_instrument_type(nint(instrument_type))) {
+         rej_itp++;
+         continue;
+      }
+
+      // Get the next PrepBufr message
+      readpb_(&unit, &i_ret, &nlev, hdr.data(), evns, &nlev_max_req);
+
+      int max_buf = sizeof(modified_hdr_typ);
+      // Special handling for "AIRNOW" and "ANOWPM"
+      bool is_airnow = (0 == strcmp("AIRNOW", hdr_typ) ||
+                        0 == strcmp("ANOWPM", hdr_typ));
+
+      if (0 < message_type_map.count((string)hdr_typ)) {
+         ConcatString mappedMessageType = message_type_map[(string)hdr_typ];
+         mlog << Debug(6) << "\n" << method_name
+              << "Switching report type \"" << hdr_typ
+              << "\" to message type \"" << mappedMessageType << "\".\n";
+         if (mappedMessageType.length() > HEADER_STR_LEN) max_buf = HEADER_STR_LEN;
+         m_strncpy(modified_hdr_typ, mappedMessageType.c_str(), max_buf, method_name_s, "modified_hdr_typ1");
+      }
+      else {
+         m_strncpy(modified_hdr_typ, hdr_typ, sizeof(modified_hdr_typ), method_name_s, "modified_hdr_typ2");
+      }
+      if (max_buf >= max_str_len) max_buf--;
+      modified_hdr_typ[max_buf] = '\0';
+
+      // Search through the observation values and store them as:
+      //    HDR_ID GC LVL HGT OB
+
+      // Store the index to the header data
+      obs_arr[0] = (double) nc_point_obs.get_hdr_index();
+
+      buf_nlev = nlev;
+      if (nlev > mxr8lv) {
+         buf_nlev = mxr8lv;
+         for(kk=0; kk<mxr8vt; kk++) {
+            if (!variables_big_nlevels.has(bufr_obs_name_arr[kk], false)) {
+               mlog << Warning << "\n" << method_name
+                    << "Too many vertical levels (" << nlev
+                    << ") for " << bufr_obs_name_arr[kk]
+                    << "). Ignored the vertical levels above " << mxr8lv << ".\n\n";
+               variables_big_nlevels.add(bufr_obs_name_arr[kk]);
+            }
+         }
+      }
+
+      // Initialize for CAPE and PBL
+      if (cal_cape || cal_mlcape) {
+         cape_level = 0;
+         cape_qm = bad_data_double;
+      }
+
+      do_pbl = cal_pbl && 0 == strcmp("ADPUPA", hdr_typ);
+
+      // Search through the vertical levels
+      for(lv=0, n_hdr_obs = 0; lv<buf_nlev; lv++) {
+
+         // If the observation vertical level is not within the
+         // specified valid range, continue to the next vertical
+         // level
+         if(lv+1 < conf_info.beg_level) continue;
+         if(lv+1 > conf_info.end_level) break;
+
+         // Get the pressure level for this set of observations.
+         // If not valid, continue to the next level
+         if(evns[0][0][lv][0] > r8bfms) {
+            bufr_pres_lv[lv] = fill_value;
+            bufr_msl_lv[lv]  = fill_value;
+            continue;
+         }
+         else {
+
+            // Get the event index to be used for the pressure
+            // observation
+            ev = get_event_index(conf_info.event_stack_flag, 0, lv);
+
+            // Retain the pressure in hPa for each observation record
+            obs_arr[2] = evns[0][ev][lv][0];
+
+            // Get the event index to be used for the height
+            // observation
+            ev = get_event_index(conf_info.event_stack_flag, 3, lv);
+
+            // Retain the vertical height for each observation record
+            if(evns[3][ev][lv][0] > r8bfms) {
+               obs_arr[3] = fill_value;
+            }
+            else {
+               // Convert from geopotential height to MSL
+               obs_arr[3] = convert_gpm_to_msl(evns[3][ev][lv][0],
+                                               hdr_lat);
+            }
+            bufr_pres_lv[lv] = obs_arr[2];
+            bufr_msl_lv[lv]  = obs_arr[3];
+         }
+
+         // Initialize the P, Q, T, Z, U, V variables
+         for(i=0; i<mxr8vt; i++){
+            pqtzuv[i]     = fill_value;
+            pqtzuv_qty[i] = fill_value;
+         }
+
+         int cape_member_cnt = 0;
+         // Index through the variable types 'P, Q, T, Z, U, V'
+         for(kk=0; kk<mxr8vt; kk++) {
+
+            // Convert the observation variable index to the
+            // corresponding grib code and store as the second element
+            // of obs_arr
+            grib_code = var_gc[kk];
+            bufr_var_index = bufr_var_code[kk];
+            obs_arr[1] = (double)bufr_var_index;
+
+            // Get the event index to be used based on the contents of
+            // the event stack flag
+            ev = get_event_index(conf_info.event_stack_flag, kk, lv);
+
+            // Apply special logic to avoid virtual temperature observations
+            if(kk == 2) {
+
+               ev_temp = get_event_index_temp(conf_info.event_stack_flag, kk, lv);
+
+               // Check for bad data
+               if(is_bad_data(ev_temp)) {
+
+                  mlog << Debug(8)
+                       << "For " << hdr_typ << ", station id " << hdr_sid
+                       << ", pressure " << obs_arr[2] << " mb, and height "
+                       << obs_arr[3] << " msl, skipping virtual temperature observation ("
+                       << evns[kk][ev][lv][0] << " C) with program code "
+                       << evns[kk][ev][lv][2] << " and reason code "
+                       << evns[kk][ev][lv][3] << ".\n";
+                  continue;
+               }
+
+               // Check for the event index changing
+               else if(ev != ev_temp) {
+                  mlog << Debug(8) << "For " << hdr_typ << ", station id "
+                       << hdr_sid << ", pressure " << obs_arr[2] << " mb, and height "
+                       << obs_arr[3] << " msl, selected sensible temperature ("
+                       << evns[kk][ev_temp][lv][0]
+                       << " C) from event index " << ev_temp
+                       << " instead of virtual temperature ("
+                       << evns[kk][ev][lv][0]
+                       << " C) from event index " << ev << ".\n";
+                  ev = ev_temp;
+               }
+            }
+
+            // If the observation value or the quality mark is not
+            // valid, continue to the next variable type
+            if(evns[kk][ev][lv][0] > r8bfms ||
+               evns[kk][ev][lv][1] > r8bfms) {
+               continue;
+            }
+            // Get the actual observation value and quality mark
+            else {
+               obs_arr[4]   = (double) evns[kk][ev][lv][0];
+               quality_mark = (double) evns[kk][ev][lv][1];
+            }
+
+            // If the quality mark is greater than than the quality
+            // mark threshold in the configuration file
+            // continue to the next observation event
+            if(conf_info.quality_mark_thresh < quality_mark) continue;
+
+            // Retrieve the data level category from the top of the
+            // event stack: ev = 0
+            if(evns[kk][0][lv][6] > r8bfms) {
+               dl_category = fill_value;
+            }
+            else {
+               dl_category = (double) evns[kk][0][lv][6];
+            }
+
+            if(!is_eq(obs_arr[4], fill_value)) {
+               // Convert pressure from millibars to pascals
+               bool is_cape_input = false;
+               if(grib_code == pres_grib_code) {
+                  obs_arr[4] *= pa_per_mb;
+               }
+               // Convert specific humidity from mg/kg to kg/kg
+               else if(grib_code == spfh_grib_code) {
+                  obs_arr[4] *= kg_per_mg;
+               }
+               // Convert temperature from celcius to kelvin
+               else if(grib_code == tmp_grib_code) {
+                  obs_arr[4] += c_to_k;
+               }
+
+               if (cal_cape || cal_mlcape) {
+                  if(grib_code == pres_grib_code) {
+                     is_cape_input = true;
+                     if (cape_level < MAX_CAPE_LEVEL) cape_data_pres[cape_level] = obs_arr[4];
+                     cape_member_cnt++;
+                  }
+                  else if(grib_code == spfh_grib_code) {
+                     is_cape_input = true;
+                     if (cape_level < MAX_CAPE_LEVEL) cape_data_spfh[cape_level] = obs_arr[4];
+                     cape_member_cnt++;
+                  }
+                  else if(grib_code == tmp_grib_code) {
+                     is_cape_input = true;
+                     if (cape_level < MAX_CAPE_LEVEL) cape_data_temp[cape_level] = obs_arr[4];
+                     cape_member_cnt++;
+                  }
+
+                  // Track the maximum quality mark for CAPE components
+                  if (is_cape_input && (is_bad_data(cape_qm) || quality_mark > cape_qm)) {
+                     cape_qm = quality_mark;
+                  }
+               }
+
+               // Track the maximum quality mark for PBL components
+               if (do_pbl && (is_bad_data(pbl_qm) || quality_mark > pbl_qm)) {
+                  pbl_qm = quality_mark;
+               }
+            }
+
+            // If the data level category is not listed in the
+            // configuration file and it is not the case that
+            // all data level categories should be retained,
+            // continue to the next event
+            if(!keep_level_category(nint(dl_category))) continue;
+
+            // Store the observation values from which other
+            // variables may be derived
+            pqtzuv[kk]     = obs_arr[4];
+            pqtzuv_qty[kk] = quality_mark;
+
+            // If the grib code corrsponding to the observation
+            // variable is not listed in the configuration file
+            // continue to the next observation variable
+            if(!keep_bufr_obs_index(bufr_var_index)) continue;
+
+            addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+                  hdr_lat, hdr_lon, hdr_elv, quality_mark,
+                  OBS_BUFFER_SIZE);
+
+            // Increment the current and total observations counts
+            n_file_obs++;
+            n_total_obs++;
+
+            // Increment the number of obs counter for this header
+            n_hdr_obs++;
+         } // end for kk
+
+         // Reset obs_arr[1] and obs_arr[4] to fill_value
+         obs_arr[1] = fill_value; // grib code
+         obs_arr[4] = fill_value; // observation value
+
+         // Derive quantities which can be derived from
+         // P, Q, T, Z, U, V
+         if (n_derive_gc <= bufr_derive_cfgs.size()) {
+            for(i=0; i<n_derive_gc; i++) {
+
+               bufr_var_index = bufr_derive_cfgs[i].var_index;
+               if(keep_bufr_obs_index(bufr_var_index)) {
+
+                  // Only derive PRMSL for surface message
+                  if(derive_gc[i] == prmsl_grib_code &&
+                     !conf_info.surface_message_types.has(hdr_typ, false))
+                     continue;
+
+                  // Store the grib code to be derived
+                  obs_arr[1] = (double)bufr_var_index;
+
+                  // Derive the value for the grib code
+                  obs_arr[4] = derive_grib_code(derive_gc[i], pqtzuv,
+                                                pqtzuv_qty, hdr_lat,
+                                                quality_mark);
+
+                  if(is_eq(obs_arr[4], fill_value)) continue;
+
+                  addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+                        hdr_lat, hdr_lon, hdr_elv, quality_mark,
+                        OBS_BUFFER_SIZE);
+
+                  // Increment the current and total observations counts
+                  n_total_obs++;
+                  n_derived_obs++;
+
+                  // Increment the number of obs counter for this header
+                  n_hdr_obs++;
+               }
+            } // end for i
+         }
+
+         if (cal_cape || cal_mlcape) {
+            if (cape_member_cnt >= 3) cape_level++;
+         }
+
+         if (do_pbl) {
+            bool excluded = true;
+            // Excludes a record if the pressure value is not valid
+            if (is_valid_pb_data(pqtzuv[0]) && pqtzuv[0] > 0) {
+               bool has_uv = is_valid_pb_data(pqtzuv[4]) && is_valid_pb_data(pqtzuv[5]);
+               bool has_tq = is_valid_pb_data(pqtzuv[2]) &&
+                            (IGNORE_Q_PBL || is_valid_pb_data(pqtzuv[1])) &&
+                            (IGNORE_Z_PBL || is_valid_pb_data(pqtzuv[3]));
+               if (has_tq || has_uv) {
+                  // Allocated memory is deleted after all observations are processed
+                  auto tmp_pqtzuv = new double [mxr8vt];
+
+                  for(kk=0; kk<mxr8vt; kk++) tmp_pqtzuv[kk] = pqtzuv[kk];
+
+                  if (has_uv) pqtzuv_map_uv[pqtzuv[0]] = tmp_pqtzuv;
+                  if (has_tq) pqtzuv_map_tq[pqtzuv[0]] = tmp_pqtzuv;
+                  pqtzuv_list.emplace_back(tmp_pqtzuv);
+                  excluded = false;
+               }
+            }
+            if (excluded) {
+               mlog << Debug(5) << method_name
+                    << " PBL: excluded " << lv << "-th level record:"
+                    << " P=" << pqtzuv[0] << " T=" << pqtzuv[2]
+                    << ", U=" << pqtzuv[4] << ", V=" << pqtzuv[5]
+                    << ", Q=" << pqtzuv[1] << ", Z=" << pqtzuv[3]
+                    << " valid_time: " << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
+                    << " " << hdr_typ << " " << hdr_sid << "\n";
+            }
+         }
+      } // end for lv
+
+      if (cal_cape || cal_mlcape) {
+         if (1 < cape_level) {
+            bool reverse_levels;
+            double cape_val, cin_val, PLCL,PEQL;
+
+            cape_val = bad_data_double;
+            cin_val  = bad_data_double;
+
+            if (cape_level > MAX_CAPE_LEVEL) cape_level = MAX_CAPE_LEVEL;
+            reverse_levels = (cape_data_pres[0] > cape_data_pres[cape_level-1]);
+            if (reverse_levels) {
+               int buf_idx;
+               double swap_value;
+               mlog << Debug(5) << method_name << " Reverse levels\n";
+               mlog << Debug(7) << method_name << "   pres[0]: " << cape_data_pres[0]
+                    << ", pres[" << (cape_level-1) << "]: "
+                    << cape_data_pres[cape_level-1] << "\n";
+               for (int idx=0; idx<(cape_level+1)/2; idx++) {
+                  buf_idx = cape_level - idx - 1;
+                  swap_value = cape_data_pres[idx];
+                  cape_data_pres[idx] = cape_data_pres[buf_idx];
+                  cape_data_pres[buf_idx] = swap_value;
+
+                  swap_value = cape_data_temp[idx];
+                  cape_data_temp[idx] = cape_data_temp[buf_idx];
+                  cape_data_temp[buf_idx] = swap_value;
+
+                  swap_value = cape_data_spfh[idx];
+                  cape_data_spfh[idx] = cape_data_spfh[buf_idx];
+                  cape_data_spfh[buf_idx] = swap_value;
+               }
+            }
+            if (cape_level < MAX_CAPE_LEVEL) {
+               cape_data_pres[cape_level] = cape_data_pres[cape_level-1];
+               cape_data_temp[cape_level] = cape_data_temp[cape_level-1];
+               cape_data_spfh[cape_level] = cape_data_spfh[cape_level-1];
+               for (int idx=cape_level+1; idx<MAX_CAPE_LEVEL; idx++) {
+                  cape_data_pres[idx] = (double)r8bfms * 10;
+                  cape_data_temp[idx] = (double)r8bfms * 10;
+                  cape_data_spfh[idx] = (double)r8bfms * 10;
+               }
+            }
+
+            if(mlog.verbosity_level() >= 7) {
+               mlog << Debug(7) << method_name << " index,P,T,Q to compute CAPE from "
+                    << i_read << "-th message\n" ;
+               for (int idx=0; idx<cape_level; idx++) {
+                  mlog << Debug(7) << method_name  << "   " << idx << ", " << cape_data_pres[idx]
+                       << ", " << cape_data_temp[idx] << ", " << cape_data_spfh[idx] << "\n";
+               }
+            }
+
+            if (cal_cape) {
+               ivirt = 1;
+               itype = 1;
+               calcape(&ivirt,&itype, cape_data_temp.data(),
+                       cape_data_spfh.data(), cape_data_pres.data(),
+                       &p1d,&t1d,&q1d, static_dummy_201.data(),
+                       &cape_level, &IMM,&JMM, &cape_level,
+                       &cape_val, &cin_val, &PLCL, &PEQL, static_dummy_200.data());
+
+               if(mlog.verbosity_level() >= 7) {
+                  mlog << Debug(7) << method_name
+                       << " calcape(" << ivirt << "," << itype << ") cape_val: "
+                       << cape_val << " cape_level: " << cape_level
+                       << ", cin_val: " << cin_val
+                       << ", PLCL: " << PLCL << ", PEQL: " << PEQL
+                       << "   lat: " << hdr_lat << ", lon: " << hdr_lon
+                       << " valid_time: " << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
+                       << " " << hdr_typ << " " << hdr_sid
+                       << "\n\n" ;
+               }
+
+               if (cape_val > MAX_CAPE_VALUE) {
+                  cape_cnt_too_big++;
+                  mlog << Debug(5) << method_name
+                       << " Ignored cape_value: " << cape_val << " cape_level: " << cape_level
+                       << ", cin_val: " << cin_val
+                       << ", PLCL: " << PLCL << ", PEQL: " << PEQL << "\n";
+               }
+               else if (cape_val >= 0) {
+                  obs_arr[1] = cape_code;
+                  obs_arr[2] = cape_p;
+                  obs_arr[3] = cape_h;
+                  obs_arr[4] = cape_val; // observation value
+                  addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
+                                 hdr_lat, hdr_lon, hdr_elv, cape_qm,
+                                 OBS_BUFFER_SIZE);
+                  cape_count++;
+                  n_derived_obs++;
+                  if (is_eq(cape_val, 0.)) cape_cnt_zero_values++;
+               }
+               else cape_cnt_missing_values++;
+            }
+
+            if (cal_mlcape) {
+               double mlcape_val =  bad_data_double;
+
+               ivirt = 1;
+               itype = 2;
+               // The second last seems to be better than the average of last two or three
+               p1d = cape_data_pres[cape_level-2];
+               t1d = cape_data_temp[cape_level-2];
+               q1d = cape_data_spfh[cape_level-2];
+               calcape(&ivirt,&itype, cape_data_temp.data(),
+                       cape_data_spfh.data(), cape_data_pres.data(),
+                       &p1d,&t1d,&q1d, static_dummy_201.data(),
+                       &cape_level, &IMM,&JMM, &cape_level,
+                       &mlcape_val, &cin_val, &PLCL, &PEQL, static_dummy_200.data());
                if (mlcape_val > MAX_CAPE_VALUE) {
                   mlcape_cnt_too_big++;
                   mlog << Debug(5) << method_name
@@ -2979,8 +4288,9 @@ void copy_pqtzuv(double *to_pqtzuv, double *from_pqtzuv, bool copy_all) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int combine_tqz_and_uv(map<double, double*> pqtzuv_map_tq,
-      map<double, double*> pqtzuv_map_uv, vector<double *> &pqtzuv_merged_array) {
+static int combine_tqz_and_uv(map<double, double*> &pqtzuv_map_tq,
+                              map<double, double*> &pqtzuv_map_uv,
+                              vector<double *> &pqtzuv_merged_array) {
    static const char *method_name = "combine_tqz_and_uv() ";
    int tq_count = pqtzuv_map_tq.size();
    int uv_count = pqtzuv_map_uv.size();
@@ -3193,7 +4503,7 @@ double compute_pbl(map<double, double*> pqtzuv_map_tq,
                         pbl_data_ugrd[index] = pqtzuv[4];
                         pbl_data_vgrd[index] = pqtzuv[5];
                         mlog << Debug(6) << method_name << "Force to add "
-                          << pres_level << " into " << index << "\n";
+                             << pres_level << " into " << index << "\n";
                         vector_idx--;
                         found = true;
                         break;
@@ -3217,11 +4527,13 @@ double compute_pbl(map<double, double*> pqtzuv_map_tq,
          }
 
          if (hgt_cnt < pbl_level) {
-            hgt_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_hgt);
+            hgt_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres.data(),
+                                               pbl_data_hgt.data());
             mlog << Debug(6) << method_name << "interpolate Z (HGT)\n";
          }
          if (spfh_cnt < pbl_level) {
-            spfh_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres, pbl_data_spfh);
+            spfh_cnt += interpolate_by_pressure(pbl_level, pbl_data_pres.data(),
+                                                pbl_data_spfh.data());
             mlog << Debug(6) << method_name << "interpolate Q (SPFH)\n";
          }
 
@@ -3235,8 +4547,9 @@ double compute_pbl(map<double, double*> pqtzuv_map_tq,
             }
 
             //SUBROUTINE CALPBL(T,Q,P,Z,U,V,MZBL,HPBL,jpbl)
-            calpbl(pbl_data_temp, pbl_data_spfh, pbl_data_pres, pbl_data_hgt,
-                    pbl_data_ugrd, pbl_data_vgrd, &mzbl, &hpbl, &jpbl);
+            calpbl(pbl_data_temp.data(), pbl_data_spfh.data(),
+                   pbl_data_pres.data(), pbl_data_hgt.data(),
+                   pbl_data_ugrd.data(), pbl_data_vgrd.data(), &mzbl, &hpbl, &jpbl);
             if (!is_valid_pb_data(hpbl))
                mlog << Debug(5) << method_name << " fail to compute PBL. TQ records: "
                     << tq_count << " UV records: " << uv_count << " merged records: "
@@ -3251,11 +4564,11 @@ double compute_pbl(map<double, double*> pqtzuv_map_tq,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool insert_pbl(double *obs_arr, const double pbl_value, const int pbl_code,
-                const double pbl_p, const double pbl_h, const double pbl_qm,
-                const double hdr_lat, const double hdr_lon,
-                const double hdr_elv, const time_t hdr_vld_ut,
-                const ConcatString &hdr_typ, const ConcatString &hdr_sid) {
+static bool insert_pbl(double *obs_arr, const double pbl_value, const int pbl_code,
+                       const double pbl_p, const double pbl_h, const double pbl_qm,
+                       const double hdr_lat, const double hdr_lon,
+                       const double hdr_elv, const time_t hdr_vld_ut,
+                       const ConcatString &hdr_typ, const ConcatString &hdr_sid) {
    bool added = false;
    ConcatString hdr_info;
    hdr_info << unix_to_yyyymmdd_hhmmss(hdr_vld_ut)
@@ -3293,29 +4606,29 @@ bool insert_pbl(double *obs_arr, const double pbl_value, const int pbl_code,
 
 ////////////////////////////////////////////////////////////////////////
 
-int interpolate_by_pressure(int length, double *pres_data, double *var_data) {
-   int idx, idx2, idx_start, idx_end;
+static int interpolate_by_pressure(int length, const double *pres_data,
+                                   double *var_data) {
+   int idx_start;
    int count_interpolated;
    bool skip_missing;
    static const char *method_name = "interpolate_by_pressure() ";
 
    idx_start = -1;
-   //idx_end = length;
    skip_missing = false;
    count_interpolated = 0;
-   for (idx=0; idx<length; idx++) {
+   for (int idx=0; idx<length; idx++) {
       if (is_bad_data(var_data[idx])) {
          skip_missing = true;
       }
       else {
          if (skip_missing) {
-            idx_end = idx;
+            int idx_end = idx;
             if (idx_start >= 0) {
                mlog << Debug(7) << method_name << " index between "
                     << idx_start <<" and " << idx_end <<", data between "
                     << var_data[idx_start] << " and " << var_data[idx_end] << "\n";
                double data_diff = var_data[idx_end] - var_data[idx_start];
-               for (idx2 = idx_start+1; idx2<idx_end; idx2++) {
+               for (int idx2 = idx_start+1; idx2<idx_end; idx2++) {
                   if (!is_eq(pres_data[idx_end], pres_data[idx_start])) {
                      double pres_ratio = (pres_data[idx2] - pres_data[idx_start])
                            / (pres_data[idx_end] - pres_data[idx_start]);
@@ -3345,7 +4658,8 @@ int interpolate_by_pressure(int length, double *pres_data, double *var_data) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void interpolate_pqtzuv(double *prev_pqtzuv, double *cur_pqtzuv, double *next_pqtzuv) {
+static void interpolate_pqtzuv(const double *prev_pqtzuv, double *cur_pqtzuv,
+                               const double *next_pqtzuv) {
    static const char *method_name = "interpolate_pqtzuv() ";
 
    if ((nint(prev_pqtzuv[0]) == nint(cur_pqtzuv[0]))
@@ -3392,7 +4706,7 @@ static bool is_valid_pb_data(double pb_value) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void check_fortran_file_id(const int unit, const char *method_name) {
+static void check_fortran_file_id(const int unit, const char *method_name) {
    if (unit > MAX_FORTRAN_FILE_ID || unit < MIN_FORTRAN_FILE_ID) {
       mlog << Error << "\n" << method_name << " -> "
            << "Invalid file ID [" << unit << "] between 1 and 99.\n\n";
@@ -3402,13 +4716,18 @@ void check_fortran_file_id(const int unit, const char *method_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void merge_records(double *first_pqtzuv, map<double, double*> pqtzuv_map_pivot,
-      map<double, double*> pqtzuv_map_aux, map<double, double*> &pqtzuv_map_merged) {
+static void merge_records(double *first_pqtzuv,
+                          map<double, double*> pqtzuv_map_pivot,
+                          map<double, double*> pqtzuv_map_aux,
+                          map<double, double*> &pqtzuv_map_merged) {
 
    double cur_pres;
-   double *cur_pqtzuv, *next_pqtzuv, *prev_pqtzuv;
+   double *cur_pqtzuv;
+   double *next_pqtzuv;
+   double *prev_pqtzuv;
    double *pqtzuv_merged;
-   map<double,double*>::iterator it_pivot, it_aux;
+   map<double,double*>::iterator it_aux;
+   map<double,double*>::iterator it_pivot;
    static const char *method_name = "merge_records() ";
 
    double first_pres = first_pqtzuv[0];
@@ -3427,24 +4746,24 @@ void merge_records(double *first_pqtzuv, map<double, double*> pqtzuv_map_pivot,
       if (it_pivot->first < it_aux->first) {
          break;
       }
-      prev_pqtzuv = (double *)it_aux->second;
+      prev_pqtzuv = it_aux->second;
    }
    for (; it_pivot!=pqtzuv_map_pivot.end(); ++it_pivot) {
-      cur_pres = (double)it_pivot->first;
+      cur_pres = it_pivot->first;
       // Skip if already merged
       if (0 < pqtzuv_map_merged.count(cur_pres)) {
          mlog << Debug(9) << method_name << cur_pres << ": merged already\n";
          continue;
       }
 
-      cur_pqtzuv = (double *)it_pivot->second;
+      cur_pqtzuv = it_pivot->second;
       pqtzuv_merged = new double[mxr8vt];
       copy_pqtzuv(pqtzuv_merged, cur_pqtzuv);
       // Advance aux record if necessary
       if (prev_pqtzuv[0] < cur_pres) {
          for (; it_aux!=pqtzuv_map_aux.end(); ++it_aux) {
             if (it_aux->first > cur_pres) break;
-            prev_pqtzuv = (double *)it_aux->second;
+            prev_pqtzuv = it_aux->second;
          }
          //Stop if no more aux records
          if (it_aux == pqtzuv_map_aux.end()) {
@@ -3465,7 +4784,7 @@ void merge_records(double *first_pqtzuv, map<double, double*> pqtzuv_map_pivot,
          copy_pqtzuv(pqtzuv_merged, prev_pqtzuv, false);
       }
       else {
-         next_pqtzuv = (double *)it_aux->second;
+         next_pqtzuv = it_aux->second;
          interpolate_pqtzuv(prev_pqtzuv, pqtzuv_merged, next_pqtzuv);
       }
       mlog << Debug(9) << method_name << "Added " << cur_pres << "\n";
@@ -3475,8 +4794,9 @@ void merge_records(double *first_pqtzuv, map<double, double*> pqtzuv_map_pivot,
 
 ////////////////////////////////////////////////////////////////////////
 
-void log_tqz_and_uv(map<double, double*> pqtzuv_map_tq,
-                    map<double, double*> pqtzuv_map_uv, const char *method_name) {
+static void log_tqz_and_uv(map<double, double*> &pqtzuv_map_tq,
+                           map<double, double*> &pqtzuv_map_uv,
+                           const char *method_name) {
    int offset;
    ConcatString buf;
    StringArray log_array;
@@ -3507,20 +4827,21 @@ void log_tqz_and_uv(map<double, double*> pqtzuv_map_tq,
    offset = 0;
    for (int idx=log_array.n()-1; idx>=0; idx--) {
       mlog << Debug(PBL_DEBUG_LEVEL) << method_name << " UV record: "
-           << offset++ << "\t" << log_array[idx] << "\n";
+           << offset << "\t" << log_array[idx] << "\n";
+      offset++;
    }
    log_array.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void log_merged_tqz_uv(map<double, double*> pqtzuv_map_tq,
-                       map<double, double*> pqtzuv_map_uv,
-                       map<double, double*> &pqtzuv_map_merged,
-                       const char *method_name) {
+static void log_merged_tqz_uv(map<double, double*> &pqtzuv_map_tq,
+                              map<double, double*> &pqtzuv_map_uv,
+                              map<double, double*> &pqtzuv_map_merged,
+                              const char *method_name) {
    ConcatString buf;
    StringArray log_array;
-   for (map<double,double*>::iterator it=pqtzuv_map_merged.begin();
+   for (auto it=pqtzuv_map_merged.begin();
          it!=pqtzuv_map_merged.end(); ++it) {
       double *pqtzuv = it->second;
       buf.clear();
@@ -3540,14 +4861,15 @@ void log_merged_tqz_uv(map<double, double*> pqtzuv_map_tq,
    int offset = 0;
    for (int idx=log_array.n()-1; idx>=0; idx--) {
       mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "    merged: "
-           << offset++ << "\t" << log_array[idx] << "\n";
+           << offset << "\t" << log_array[idx] << "\n";
+      offset++;
    }
    log_array.clear();
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void log_pbl_input(int pbl_level, const char *method_name) {
+static void log_pbl_input(int pbl_level, const char *method_name) {
    ConcatString buf;
    StringArray log_array;
    int vlevels = pbl_level;
@@ -3567,7 +4889,8 @@ void log_pbl_input(int pbl_level, const char *method_name) {
         << "input to calpbl (buffer): index, P, Q, T, Z, U, V\n";
    for (int idx=log_array.n()-1; idx>=0; idx--) {
       mlog << Debug(PBL_DEBUG_LEVEL) << method_name << "  "
-           << offset++ << "\t" << log_array[idx] << "\n";
+           << offset << "\t" << log_array[idx] << "\n";
+      offset++;
    }
    log_array.clear();
 }
@@ -3644,41 +4967,39 @@ void usage() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_pbfile(const StringArray & a)
+static void set_pbfile(const StringArray & a)
 {
    pbfile.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_valid_beg_time(const StringArray & a)
+static void set_valid_beg_time(const StringArray & a)
 {
    valid_beg_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_valid_end_time(const StringArray & a)
+static void set_valid_end_time(const StringArray & a)
 {
    valid_end_ut = timestring_to_unix(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_nmsg(const StringArray & a)
+static void set_nmsg(const StringArray & a)
 {
    nmsg = atoi(a[0].c_str());
-   int tmp_len = a[0].length();
-   if (1 < tmp_len) {
-      if (a[0][tmp_len-1] == '%') {
-         nmsg_percent = nmsg;
-      }
+   auto tmp_len = a[0].length();
+   if (1 < tmp_len && a[0][tmp_len-1] == '%') {
+      nmsg_percent = nmsg;
    }
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_dump_path(const StringArray & a)
+static void set_dump_path(const StringArray & a)
 {
    dump_flag = true;
    dump_dir = a[0];
@@ -3686,14 +5007,14 @@ void set_dump_path(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_collect_metadata(const StringArray & a)
+static void set_collect_metadata(const StringArray & a)
 {
    collect_metadata = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_target_variables(const StringArray & a)
+static void set_target_variables(const StringArray & a)
 {
    if ("_all_" == a[0]) {
       do_all_vars = true;
@@ -3707,7 +5028,7 @@ void set_target_variables(const StringArray & a)
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+static void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
 
