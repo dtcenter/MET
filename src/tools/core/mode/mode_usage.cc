@@ -36,7 +36,7 @@ static void print_multivar_usage();
 ////////////////////////////////////////////////////////////////////////
 
 
-__attribute__((noreturn)) static void both_usage(int exit_code)
+__attribute__((noreturn)) void both_usage(int exit_code)
 
 {
 
@@ -61,7 +61,7 @@ __attribute__((noreturn)) static void both_usage(int exit_code)
 ////////////////////////////////////////////////////////////////////////
 
 
-__attribute__((noreturn)) static void singlevar_usage(int exit_code)
+__attribute__((noreturn)) void singlevar_usage(int exit_code)
 
 {
 
@@ -76,7 +76,7 @@ __attribute__((noreturn)) static void singlevar_usage(int exit_code)
 ////////////////////////////////////////////////////////////////////////
 
 
-__attribute__((noreturn)) static void multivar_usage(int exit_code)
+__attribute__((noreturn)) void multivar_usage(int exit_code)
 
 {
 
