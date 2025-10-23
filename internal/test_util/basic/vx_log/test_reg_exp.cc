@@ -24,7 +24,7 @@ using namespace std;
 static void set_regex (const StringArray &);
 static void set_test  (const StringArray &);
 
-static void usage();
+static void usage(int exit_code=1);
 
 static ConcatString RegexCS;
 static ConcatString TestCS;
@@ -77,13 +77,11 @@ void set_test(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+__attribute__((noreturn)) void usage(int exit_code) {
    mlog << Error
         << "\nusage:  " << program_name
         << " -regex string -test string\n\n";
-   exit(1);
-
-   return;
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -166,7 +166,7 @@ static void set_pair_dims(vector<PairDataPoint> &, int, int);
 
 static void clean_up();
 
-static void usage();
+static void usage(int exit_code=1);
 static void set_fcst_files(const StringArray &);
 static void set_obs_files(const StringArray &);
 static void set_both_files(const StringArray &);
@@ -2617,7 +2617,7 @@ static void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-__attribute__((noreturn)) static void usage() {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -2683,7 +2683,7 @@ __attribute__((noreturn)) static void usage() {
         << R"("-compress level" overrides the compression level of NetCDF variable ()"
         << conf_info.get_compression_level() << ") (optional).\n\n" << flush;
 
-   exit(1);
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

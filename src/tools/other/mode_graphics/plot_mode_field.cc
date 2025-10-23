@@ -157,7 +157,7 @@ static ConcatString config_filename;   //  no default ... must be set on command
 ////////////////////////////////////////////////////////////////////////
 
 
-static void usage();
+static void usage(int exit_code=1);
 
 static void set_config    (const StringArray &);
 
@@ -597,7 +597,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void usage()
+__attribute__((noreturn)) static void usage(int exit_code)
 
 {
 
@@ -630,7 +630,7 @@ cout << "\n*** Model Evaluation Tools (MET" << met_version
      << "\t\t\"-v level\" overrides the default level of logging ("
      << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
- exit (1);
+ exit (exit_code);
 }
 
 

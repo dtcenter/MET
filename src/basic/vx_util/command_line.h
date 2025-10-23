@@ -34,7 +34,7 @@ static const char log_option       [] = "-log";
 
 typedef void (*CLSetFunction)(const StringArray &);   //  command-line set function
 
-typedef void (*UsageFunction)();   //  usage function
+typedef void (*UsageFunction)(int);   //  usage function
 
 
 ////////////////////////////////////////////////////////////////////////

@@ -57,7 +57,7 @@ static void write_mpr_row_rad (AsciiTable &at, int row, const RadData  &d);
 
 static bool is_dup(const char *);
 
-static void usage();
+static void usage(int exit_code=1);
 static void set_swap(const StringArray &);
 static void set_no_check_dup(const StringArray &);
 static void set_channel(const StringArray &);
@@ -523,7 +523,7 @@ bool is_dup(const char *key) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -559,7 +559,7 @@ void usage() {
         << mlog.verbosity_level() << ") (optional).\n\n"
         << flush;
 
-   exit (1);
+   exit (exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////
