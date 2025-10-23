@@ -88,7 +88,8 @@ MET is the statistical component of the larger METplus system for which user sup
 
 .. note::
 
-  **-help** and **-version** command line options are available for all of the MET tools. Typing the name of the tool with no command line options also produces the usage statement.
+  **-help** and **-version** command line options are available for all of the MET tools, and the command returns a good status of 0.
+  Typing the name of the tool with no command line options also produces the usage statement, although the command returns a non-zero status of 1.
 
 Fortify and SonarQube
 =====================

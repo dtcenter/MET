@@ -90,7 +90,7 @@ static int compress_level = -1;
 ////////////////////////////////////////////////////////////////////////
 
 
-static void usage();
+static void usage(int exit_code=1);
 
 static void set_outfile   (const StringArray &);
 static void set_compress  (const StringArray &);
@@ -161,7 +161,7 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
 cout << "\nUsage: "
      << program_name << "\n"
@@ -187,7 +187,7 @@ cout << "\nUsage: "
 
      << flush;
 
-exit (1);
+exit (exit_code);
 
 }
 

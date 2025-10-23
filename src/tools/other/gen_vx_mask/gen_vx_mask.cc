@@ -1772,7 +1772,7 @@ const char * masktype_to_description(const MaskType t) {
 
 ////////////////////////////////////////////////////////////////////////
 
-__attribute__((noreturn)) static void usage() {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -1892,7 +1892,7 @@ __attribute__((noreturn)) static void usage() {
 
         << flush;
 
-   exit (1);
+   exit (exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

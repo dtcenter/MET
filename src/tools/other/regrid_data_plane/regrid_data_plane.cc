@@ -92,7 +92,7 @@ static void open_nc(const Grid &grid, const ConcatString run_cs);
 static void write_nc(const DataPlane &dp, const Grid &grid,
                      const VarInfo *vinfo, const char *vname);
 static void close_nc();
-static void usage();
+static void usage(int exit_code=1);
 static void set_field(const StringArray &);
 static void set_method(const StringArray &);
 static void set_shape(const StringArray &);
@@ -431,7 +431,7 @@ void close_nc() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    GridTemplateFactory gtf;
    cout << "\n*** Model Evaluation Tools (MET" << met_version
@@ -515,7 +515,7 @@ void usage() {
         << "\t\t\"-compress level\" overrides the compression level of "
         << "NetCDF variable (optional).\n\n" << flush;
 
-   exit(1);
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

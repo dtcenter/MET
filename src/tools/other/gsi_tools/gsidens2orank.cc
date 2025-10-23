@@ -66,7 +66,7 @@ static bool has_key(const ConcatString &key, int & index);
 static void check_int(int i1, int i2, const char *col, const ConcatString &key);
 static void check_dbl(double d1, double d2, const char *col, const ConcatString &key);
 
-static void usage();
+static void usage(int exit_code=1);
 static void set_out(const StringArray &);
 static void set_ens_mean(const StringArray &);
 static void set_swap(const StringArray &);
@@ -834,7 +834,7 @@ void check_dbl(double d1, double d2, const char *col, const ConcatString &key) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -876,7 +876,7 @@ void usage() {
         << mlog.verbosity_level() << ") (optional).\n\n"
         << flush;
 
-   exit (1);
+   exit (exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

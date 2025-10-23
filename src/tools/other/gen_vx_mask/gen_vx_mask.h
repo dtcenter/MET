@@ -157,7 +157,7 @@ static void      apply_lat_lon_mask(DataPlane &dp);
 static DataPlane combine(const DataPlane &dp_data,
                     const DataPlane &dp_mask, SetLogic);
 static void      write_netcdf(const DataPlane &dp);
-static void      usage();
+static void      usage(int exit_code=1);
 static void      set_type(const StringArray &);
 static void      set_input_field(const StringArray &);
 static void      set_mask_field(const StringArray &);

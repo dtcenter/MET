@@ -148,7 +148,7 @@ static void   finish_txt_files     ();
 
 static ConcatString string_to_basin_abbr(ConcatString);
 
-static void   usage                ();
+static void   usage                (int exit_code=1);
 static void   set_source           (const StringArray &, const char *,
                                     StringArray &, StringArray &);
 static void   set_genesis          (const StringArray &);
@@ -2570,7 +2570,7 @@ ConcatString string_to_basin_abbr(ConcatString cs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -2619,7 +2619,7 @@ void usage() {
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n\n";
 
-   exit(1);
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

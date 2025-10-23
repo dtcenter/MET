@@ -81,7 +81,7 @@ static ofstream * outfile  = (ofstream *) nullptr;
 
 static void parse_command_line(int, char **);
 
-static void usage();
+static void usage(int exit_code=1);
 
 static void set_lookin_path(const StringArray &);
 static void set_summary_jobtype(const StringArray &);
@@ -330,7 +330,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage()
+__attribute__((noreturn)) static void usage(int exit_code)
 
 {
 
@@ -390,7 +390,7 @@ cout << "\n*** Model Evaluation Tools (MET" << met_version
 
 mode_atts_usage(cout);
 
-exit (1);
+exit (exit_code);
 
 }
 
