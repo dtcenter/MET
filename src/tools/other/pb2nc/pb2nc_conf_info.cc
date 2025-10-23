@@ -31,9 +31,9 @@ using namespace std;
 
 map<ConcatString,ConcatString> parse_conf_obs_bufr_map(Dictionary *dict) {
 
-   const char *key_name = (0 != dict->lookup_array(conf_key_obs_prepbufr_map, false, false))
+   const char *key_name = (nullptr != dict->lookup_array(conf_key_obs_prepbufr_map, false, false))
                           ? conf_key_obs_prepbufr_map : conf_key_old_prepbufr_map;
-   map<ConcatString,ConcatString> m = parse_conf_key_value_map(dict, (const char *)key_name);
+   map<ConcatString,ConcatString> m = parse_conf_key_value_map(dict, key_name);
    parse_add_conf_key_value_map(dict, conf_key_obs_bufr_map, &m);
    return m;
 }
@@ -107,19 +107,19 @@ void PB2NCConfInfo::read_config(const char *default_file_name,
 
    // Read the default config file
    conf.read(default_file_name);
-   if (0 != conf.lookup_array(conf_key_old_prepbufr_map, false, false)) {
+   if (nullptr != conf.lookup_array(conf_key_old_prepbufr_map, false, false)) {
       warning_code = 1;
       bad_file_names = default_file_name;
-      if (0 != conf.lookup_array(conf_key_obs_prepbufr_map, false, false)) use_bad_one = false;
+      if (nullptr != conf.lookup_array(conf_key_obs_prepbufr_map, false, false)) use_bad_one = false;
    }
 
    // Read the user-specified config file
    conf.read(user_file_name);
-   if (0 != conf.lookup_array(conf_key_old_prepbufr_map, false, false)) {
+   if (nullptr != conf.lookup_array(conf_key_old_prepbufr_map, false, false)) {
       warning_code = 2;
       if (0 < bad_file_names.length()) bad_file_names += " and ";
       bad_file_names += user_file_name;
-      if (0 != conf.lookup_array(conf_key_obs_prepbufr_map, false, false)) use_bad_one = false;
+      if (nullptr != conf.lookup_array(conf_key_obs_prepbufr_map, false, false)) use_bad_one = false;
    }
 
    if (0 < warning_code) {
@@ -145,7 +145,7 @@ void PB2NCConfInfo::process_config() {
    ConcatString s;
    ConcatString mask_name;
    StringArray sa;
-   Dictionary *dict = (Dictionary *) nullptr;
+   auto dict = (Dictionary *) nullptr;
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
