@@ -86,7 +86,7 @@ static const char * python_target_string = "python";
 
 static void parse_command_line(int &argc, char **argv);
 static void sanity_check();
-static void usage();
+static void usage(int exit_code=1);
 static void set_lookin_path(const StringArray &);
 static void set_out_filename(const StringArray &);
 static void set_tmp_dir(const StringArray &);
@@ -746,7 +746,7 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -787,7 +787,7 @@ void usage() {
 
         << flush;
 
-   exit (1);
+   exit (exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

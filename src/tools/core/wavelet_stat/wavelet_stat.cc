@@ -133,7 +133,7 @@ static void draw_tiles(PSfile *, const Box &, int, int, int);
 static void render_image(PSfile *, const DataPlane &, const Box &, int);
 static void render_tile(PSfile *, const double *, int, int, const Box &);
 
-static void usage();
+static void usage(int exit_code=1);
 static void set_outdir(const StringArray &);
 static void set_compress(const StringArray &);
 
@@ -2982,7 +2982,7 @@ static void render_tile(PSfile *p, const double *data, int n,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void usage() {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -3017,7 +3017,7 @@ static void usage() {
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
         << conf_info.get_compression_level() << ") (optional).\n\n" << flush;
 
-   exit(1);
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

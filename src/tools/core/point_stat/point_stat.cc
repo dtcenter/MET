@@ -178,7 +178,7 @@ static void finish_txt_files();
 
 static void clean_up();
 
-static void usage();
+static void usage(int exit_code=1);
 static void set_point_obs(const StringArray &);
 static void set_ncfile(const StringArray &);
 static void set_obs_valid_beg_time(const StringArray &);
@@ -2276,7 +2276,7 @@ static void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-static void usage() {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -2327,7 +2327,7 @@ static void usage() {
         << "\t\t\"-v level\" overrides the default level of logging ("
         << mlog.verbosity_level() << ") (optional).\n\n" << flush;
 
-   exit (1);
+   exit (exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

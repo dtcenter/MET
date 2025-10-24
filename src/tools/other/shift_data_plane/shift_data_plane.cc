@@ -87,7 +87,7 @@ static void process_command_line(int, char **);
 static void process_data_file();
 static void write_netcdf(const DataPlane &dp, const Grid &grid,
                          const VarInfo *vinfo, const GrdFileType& ftype);
-static void usage();
+static void usage(int exit_code=1);
 static void set_from(const StringArray &);
 static void set_to(const StringArray &);
 static void set_method(const StringArray &);
@@ -366,7 +366,7 @@ void write_netcdf(const DataPlane &dp, const Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -418,7 +418,7 @@ void usage() {
 
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable (optional).\n\n" << flush;
 
-   exit(1);
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

@@ -430,7 +430,7 @@ static void   merge_records(double *first_pqtzuv,
                             map<double, double*> pqtzuv_map_aux,
                             map<double, double*> &pqtzuv_map_merged);
 
-static void   usage();
+static void   usage(int exit_code=1);
 static void   set_pbfile(const StringArray &);
 static void   set_valid_beg_time(const StringArray &);
 static void   set_valid_end_time(const StringArray &);
@@ -4897,7 +4897,7 @@ static void log_pbl_input(int pbl_level, const char *method_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -4962,7 +4962,7 @@ void usage() {
 
         << flush;
 
-   exit (1);
+   exit (exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

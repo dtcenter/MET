@@ -43,7 +43,7 @@ static unsigned char buf[buf_size];
 ////////////////////////////////////////////////////////////////////////
 
 
-static void usage();
+static void usage(int exit_code=1);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -55,12 +55,21 @@ int met_main(int argc, char * argv [])
 
 program_name = get_short_name(argv[0]);
 
-if ( argc != 2 )  usage();
+CommandLine cline;
+
+cline.set(argc, argv);
+
+cline.set_usage(usage);
+
+cline.parse();
+
+if ( cline.n() != 1 )  usage();
+
+ConcatString input_filename = (string)cline[0];
 
 int fd = -1;
 int j;
 size_t n_read, bytes;
-ConcatString input_filename = (string)argv[1];
 DbfHeader h;
 DbfSubRecord sr;
 
@@ -168,14 +177,14 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage()
+__attribute__((noreturn)) static void usage(int exit_code)
 
 {
 
 mlog << Error
      << "\n\n  usage:  " << program_name << " dbf_filename\n\n";
 
-exit ( 1 );
+exit ( exit_code );
 
 }
 
