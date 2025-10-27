@@ -1456,7 +1456,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, const Grid &gr) {
                // MET #3174 Apply MSL/AGL height conversion
                if(sfc_info.msl_agl_conversion_apply_to != FieldType::None &&
                   (msg_typ_mslagl.n() == 0 ||
-                   msg_typ_mslgagl.reg_exp_match(it->typ_sa[i_obs].c_str())) &&
+                   msg_typ_mslagl.reg_exp_match(it->typ_sa[i_obs].c_str())) &&
                   !convert_msl_agl(topo_elv, it->elv_na[i_obs], fcst_v, obs_v, member == 0)) {
 
                   // Skip by resetting to bad data

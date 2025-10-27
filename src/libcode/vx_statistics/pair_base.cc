@@ -1463,27 +1463,27 @@ void VxPairBase::set_msg_typ_groups(const map<ConcatString,StringArray> &m) {
 
    // Surface message types
    cs = surface_msg_typ_group_str;
-   if(m.count(cs) > 0) msg_typ_sfc = m[cs];
+   if(m.count(cs) > 0) msg_typ_sfc = m.at(cs);
    else                msg_typ_sfc.parse_css(default_msg_typ_group_surface);
 
    // Land surface message types
    cs = landsf_msg_typ_group_str;
-   if(m.count(cs) > 0) msg_typ_lnd = m[cs];
+   if(m.count(cs) > 0) msg_typ_lnd = m.at(cs);
    else                msg_typ_lnd.parse_css(default_msg_typ_group_landsf);
 
    // Water surface message types
    cs = watersf_msg_typ_group_str;
-   if(m.count(cs) > 0) msg_typ_wtr = m[cs];
+   if(m.count(cs) > 0) msg_typ_wtr = m.at(cs);
    else                msg_typ_wtr.parse_css(default_msg_typ_group_watersf);
 
    // Lapse rate correction message types
    cs = lapsert_msg_typ_group_str;
-   if(m.count(cs) > 0) msg_typ_lapsert = m[cs];
+   if(m.count(cs) > 0) msg_typ_lapsert = m.at(cs);
    else                msg_typ_lapsert.parse_css(default_msg_typ_group_lapsert);
 
    // MSL/AGL conversion message types
    cs = mslagl_msg_typ_group_str;
-   if(m.count(cs) > 0) msg_typ_mslagl = m[cs];
+   if(m.count(cs) > 0) msg_typ_mslagl = m.at(cs);
    else                msg_typ_mslagl.parse_css(default_msg_typ_group_mslagl);
 
    return;
