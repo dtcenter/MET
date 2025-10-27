@@ -667,11 +667,27 @@ message_type_group_map
 The "message_type_group_map" entry is an array of dictionaries, each
 containing a "key" string and "val" string. This defines a mapping of
 message type group names to a comma-separated list of values. This map is
-defined in the config files for PB2NC, Point-Stat, or Ensemble-Stat. Modify
-this map to define sets of message types that should be processed together as
-a group. The "SURFACE" entry defines message types for which surface verification
-logic should be applied. If not defined, the default values listed below are
-used.
+defined in the config files for PB2NC, IODA2NC, Point-Stat, and Ensemble-Stat.
+Modify this map to define sets of message types that should be processed
+together as a group.
+
+Beyond defining groups of message types, the following entries have special meaning:
+
+  * The "SURFACE" entry defines message types for which surface verification
+    logic should be applied.
+
+  * The "LANDSF" and "WATERSF" entries differentiate between point observations
+    over land and water, as described in "land_mask" below.
+
+  * The "LAPSERT" entry defines the message types for which surface temperature
+    lapse rate correction logic should be applied, as described in
+    "lapse_rate_correction" below.
+
+  * The "MSLAGL" entry defines the message types for which MSL/AGL height
+    conversion logic should be applied, as described in "msl_agl_conversion"
+    below.
+
+If not defined, the default values listed below are used.
 
 .. code-block:: none
 
@@ -679,7 +695,11 @@ used.
      { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET";               },
      { key = "ANYAIR";  val = "AIRCAR,AIRCFT";                      },
      { key = "ANYSFC";  val = "ADPSFC,SFCSHP,ADPUPA,PROFLR,MSONET"; },
-     { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      }
+     { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      },
+     { key = "LANDSF";  val = "ADPSFC,MSONET";                      },
+     { key = "WATERSF"; val = "SFCSHP";                             },
+     { key = "LAPSERT"; val = "ADPSFC,MSONET";                      },
+     { key = "MSLAGL";  val = "";                                   }
   ];
 
 obtype_as_group_val_flag
@@ -2258,17 +2278,31 @@ land_mask
 
 The "land_mask" dictionary defines the land/sea mask field used when
 verifying at the surface. The "flag" entry enables/disables this logic.
-When enabled, the "message_type_group_map" dictionary must contain entries
-for "LANDSF" and "WATERSF". For point observations whose message type
-appears in the "LANDSF" entry, only use forecast grid points where land =
-TRUE. For point observations whose message type appears in the "WATERSF"
-entry, only use forecast grid points where land = FALSE. If the "file_name"
-entry is left empty, the land/sea is assumed to exist in the input forecast
-file. Otherwise, the specified file(s) are searched for the data specified
-in the "field" entry. The "regrid" settings specify how this field should be
-regridded to the verification domain. Lastly, the "thresh" entry is the
-threshold which defines land (threshold is true) and water (threshold is false).
+If the "file_name" entry is empty, the land/sea mask field is assumed
+to exist in the input forecast file. Otherwise, the specified file(s)
+are searched for the data specified in the "field" entry.
+The "regrid" settings specify how this field should be regridded to the
+verification domain. Lastly, the "thresh" entry is the threshold which
+defines land (threshold is true) and water (threshold is false).
 
+The "message_type_group_map" dictionary entries for "LANDSF" and "WATERSF" specify
+comma-separated lists of message types whose observations exist on land or water,
+respectively. For point observations whose message type appears in the "LANDSF"
+entry, only interpolate using forecast grid points where land = TRUE. For point
+observations whose message type appears in the "WATERSF" entry, only interpolate
+using forecast grids points where land = FALSE. By default, "ADPSFC" and "MSONET"
+message types exist over land while the "SFCSHP" message type exists over water.
+
+.. code-block:: none
+
+  message_type_group_map = [
+    ...
+    { key = "LANDSF";  val = "ADPSFC,MSONET"; },
+    { key = "WATERSF"; val = "SFCSHP";        },
+    ...
+  ];
+
+The "topo_mask.flag", "topo_mask.use_obs_thresh", and "topo_mask.interp_fcst_thresh"
 The "land_mask.flag" entry may be set separately in each "obs.field" entry.
 
 .. code-block:: none
@@ -2286,11 +2320,9 @@ topo_mask
 
 The "topo_mask" dictionary defines the model topography field used when
 verifying at the surface. The flag entry enables/disables this logic.
-When enabled, the "message_type_group_map" dictionary must contain an entry
-for "SURFACE". This logic is applied to point observations whose message type
-appears in the "SURFACE" entry. Only use point observations where the
-topo minus station elevation difference meets the "use_obs_thresh" threshold
-entry. For the observations kept, when interpolating forecast data to the
+Only use point observations where the model topography minus station elevation
+elevation difference meets the "use_obs_thresh" threshold entry.
+For the observations kept, when interpolating forecast data to the
 observation location, only use forecast grid points where the topo minus station
 difference meets the "interp_fcst_thresh" threshold entry.  If the "file_name"
 is left empty, the topography data is assumed to exist in the input forecast file(s).
@@ -2298,6 +2330,20 @@ Otherwise, the specified file(s) are searched for the data specified in the "fie
 entry. The "regrid" settings specify how this field should be regridded to
 the verification domain. The "interp" settings specify how this field should be
 interpolated to point observation locations.
+
+The "message_type_group_map" dictionary entry for "SURFACE" specifies a comma-separated
+list of message types whose observations exist at the surface. The topography filtering
+logic is only applied to observations whose message type appears in this list.
+By default, the topography filtering logic is applied to observations for message types
+"ADPSFC", "SFCSHP", and "MSONET".
+
+.. code-block:: none
+
+  message_type_group_map = [
+    ...
+    { key = "SURFACE"; val = "ADPSFC,SFCSHP,MSONET"; },
+    ...
+  ];
 
 The "topo_mask.flag", "topo_mask.use_obs_thresh", and "topo_mask.interp_fcst_thresh"
 entries can be set separately in each "obs.field" entry.
