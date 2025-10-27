@@ -2324,9 +2324,9 @@ for this correction.
 The "apply_to" option can be set to "NONE" (default) to disable this correction
 logic, "FCST" to correct the forecast value, or "OBS" to correct the observation
 value, but not "BOTH".
-When enabled, the "message_type_group_map" dictionary must contain an entry for
-"SURFACE". This correction is only applied when the verifying point observation
-message type appears in the "SURFACE" entry.
+The "message_type_group_map" dictionary entry for "LAPSERT" specifies a comma-separated
+list of message types for which this correction should be enabled. If set to an
+empty string, the correction will be applied for all message types.
 The "value" entry is a constant number that defines the lapse rate for correcting
 temperatures based on the difference of the model topography height and station
 elevation. By default, "value" is set to bad data and must be explicitly defined
@@ -2373,6 +2373,9 @@ The "apply_from" option can be set to "FCST" to convert using the model topograp
 height, "OBS" to convert using the station elevation, or "BOTH" to convert the
 forecast value using the model topography height and convert the observation
 value using the station elevation.
+The "message_type_group_map" dictionary entry for "MSLAGL" specifies a comma-separated
+list of message types for which this conversion should be enabled. If set to an
+empty string, the conversion will be applied for all message types.
 The "thresh" option specifies the valid range of values to be converted. Values not
 meeting this threshold criteria are left unchanged. The default threshold of "NA"
 always evaulates to true, but it can be set to avoid converting flag values. For example,
