@@ -2324,9 +2324,6 @@ for this correction.
 The "apply_to" option can be set to "NONE" (default) to disable this correction
 logic, "FCST" to correct the forecast value, or "OBS" to correct the observation
 value, but not "BOTH".
-The "message_type_group_map" dictionary entry for "LAPSERT" specifies a comma-separated
-list of message types for which this correction should be enabled. If set to an
-empty string, the correction will be applied for all message types.
 The "value" entry is a constant number that defines the lapse rate for correcting
 temperatures based on the difference of the model topography height and station
 elevation. By default, "value" is set to bad data and must be explicitly defined
@@ -2334,6 +2331,19 @@ when "apply_to" is not set to NONE.
 The lapse rate correction fails when the model topography or observation height
 values are bad data and that matched pair is excluded from the computation of
 statistics.
+
+The "message_type_group_map" dictionary entry for "LAPSERT" specifies a comma-separated
+list of message types for which this correction should be applied. By default, the
+correction logic is applied to observations for message types "ADPSFC" and "MSONET".
+If set to an empty list, the correction would be applied for all message types.
+
+.. code-block:: none
+
+  message_type_group_map = [
+    ...
+    { key = "LAPSERT"; val = "ADPSFC,MSONET"; },
+    ...
+  ];
 
 The environmental lapse rate values for 2-meter temperature and dewpoint temperature
 used by the World Meteorological Organization (WMO) can be found in "ConfigConstants".
@@ -2373,9 +2383,6 @@ The "apply_from" option can be set to "FCST" to convert using the model topograp
 height, "OBS" to convert using the station elevation, or "BOTH" to convert the
 forecast value using the model topography height and convert the observation
 value using the station elevation.
-The "message_type_group_map" dictionary entry for "MSLAGL" specifies a comma-separated
-list of message types for which this conversion should be enabled. If set to an
-empty string, the conversion will be applied for all message types.
 The "thresh" option specifies the valid range of values to be converted. Values not
 meeting this threshold criteria are left unchanged. The default threshold of "NA"
 always evaulates to true, but it can be set to avoid converting flag values. For example,
@@ -2387,6 +2394,19 @@ elevation correction is added to the height value to convert from AGL to MSL.
 The MSL/AGL conversion fails when the model topography or observation height
 values are bad data and that matched pair is excluded from the computation of
 statistics.
+
+The "message_type_group_map" dictionary entry for "MSLAGL" specifies a comma-separated
+list of message types for which this conversion should be applied. By default, the
+conversion logic is applied to observations for message types since it is set to an
+empty list.
+
+.. code-block:: none
+
+  message_type_group_map = [
+    ...
+    { key = "MSLAGL"; val = ""; },
+    ...
+  ];
 
 All "msl_agl_conversion" entries can be set separately in each "obs.field" entry.
 
