@@ -20,6 +20,29 @@
   <test_dir>&TEST_DIR;</test_dir>
   <exit_on_fail>true</exit_on_fail>
 
+  <!-- MET #3278 no arguments returns bad status of 1 -->
+
+  <test name="ascii2nc_NO_ARGS">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <retval>1</retval>
+    <param>
+    </param>
+    <output>
+    </output>
+  </test>
+
+  <!-- MET #3278 -help returns good status of 0 -->
+
+  <test name="ascii2nc_USAGE">
+    <exec>&MET_BIN;/ascii2nc</exec>
+    <retval>0</retval>
+    <param> \
+      -help
+    </param>
+    <output>
+    </output>
+  </test>
+
   <test name="ascii2nc_MET_POINT_TAB_DELIM">
     <exec>&MET_BIN;/ascii2nc</exec>
     <param> \
@@ -247,6 +270,6 @@
     </param>
     <output>
     </output>
-  </test>  
+  </test>
 
 </met_test>

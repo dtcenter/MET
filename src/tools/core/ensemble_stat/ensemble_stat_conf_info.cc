@@ -167,15 +167,6 @@ void EnsembleStatConfInfo::process_config(GrdFileType etype,
    // Conf: message_type_group_map
    msg_typ_group_map = parse_conf_message_type_group_map(&conf);
 
-   // Conf: message_type_group_map(SURFACE)
-   ConcatString cs = surface_msg_typ_group_str;
-   if(msg_typ_group_map.count(cs) > 0) {
-      msg_typ_sfc = msg_typ_group_map[cs];
-   }
-   else {
-      msg_typ_sfc.parse_css(default_msg_typ_group_surface);
-   }
-
    // Conf: obtype_as_group_val_flag
    obtype_as_group_val_flag =
       conf.lookup_bool(conf_key_obtype_as_group_val_flag);
@@ -524,18 +515,6 @@ void EnsembleStatConfInfo::process_geog(const Grid &grid,
             DataPlane geog_dp(parse_geog_data(dict, grid, input_files));
             geog_dp.threshold(dict->lookup_thresh(conf_key_thresh));
             land_mask = geog_dp.mask_plane();
-
-            // Conf: message_type_group_map for LANDSF and WATERSF
-            if(msg_typ_group_map.count((string)landsf_msg_typ_group_str) == 0 ||
-               msg_typ_group_map.count((string)watersf_msg_typ_group_str) == 0 ) {
-               mlog << Error << "\n" << method_name
-                    << "when \"" << conf_key_land_mask_flag << "\" is true, \""
-                    << conf_key_message_type_group_map
-                    << "\" must contain entries for \""
-                    << landsf_msg_typ_group_str << "\" and \""
-                    << watersf_msg_typ_group_str << "\".\n\n";
-               exit(1);
-            }
          }
 
          // Store pointer to the land mask data
@@ -549,16 +528,6 @@ void EnsembleStatConfInfo::process_geog(const Grid &grid,
          if(topo_dp.is_empty()) {
             Dictionary *dict = conf.lookup_dictionary(conf_key_topo_mask);
             topo_dp = parse_geog_data(dict, grid, input_files);
-
-            // Conf: message_type_group_map for SURFACE
-            if(msg_typ_group_map.count((string)surface_msg_typ_group_str) == 0) {
-               mlog << Error << "\n" << method_name
-                    << "when \"" << conf_key_topo_mask_flag << "\" is true, \""
-                    << conf_key_message_type_group_map
-                    << "\" must contain an entry for \""
-                    << surface_msg_typ_group_str << "\".\n\n";
-               exit(1);
-            }
          }
 
          // Store pointer to the topo data
@@ -1069,7 +1038,7 @@ void EnsembleStatVxOpt::set_vx_pd(EnsembleStatConfInfo *conf_info, int ctrl_inde
    vx_pd.set_climo_cdf_info_ptr(&cdf_info);
 
    // Store the list of surface message types
-   vx_pd.set_msg_typ_sfc(conf_info->msg_typ_sfc);
+   vx_pd.set_msg_typ_groups(conf_info->msg_typ_group_map);
 
    // Define the verifying message type name and values
    for(int i=0; i<n_msg_typ; i++) {

@@ -84,7 +84,7 @@ static const char sq = '\'';   //  single quote
 ////////////////////////////////////////////////////////////////////////
 
 
-static void usage();
+static void usage(int exit_code=1);
 
 static void set_outdir         (const StringArray &);
 static void set_separate_files (const StringArray &);
@@ -196,7 +196,7 @@ const string get_tool_name() {
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage()
+__attribute__((noreturn)) static void usage(int exit_code)
 
 {
 
@@ -204,7 +204,7 @@ cerr << "\nusage: " << program_name << ' '
      << "[-outdir path] [-separate_files] "
      << "shp_file shx_file dbf_file country_field admin_field\n\n";
 
-exit ( 1 );
+exit ( exit_code );
 
 }
 

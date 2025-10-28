@@ -839,7 +839,11 @@ void CommandLine::do_help() const
 
 {
 
-if ( Usage )  Usage();
+   //
+   //  MET #3278 print usage with good exit status
+   //
+
+if ( Usage )  Usage(0);
 else {
 
    mlog << Error << "\n" << ProgramName
@@ -888,7 +892,11 @@ version_file = replace_path("MET_BASE/version.txt");
 
 cout << "\n";
 
-exit ( 1 );
+   //
+   //  MET #3278 print version with good exit status
+   //
+
+exit(0);
 
 }
 
@@ -984,7 +992,7 @@ while ( (j = next_option(index)) >= 0 )  {
 
       mlog << Error << "\n" << ProgramName << ": unrecognized command-line switch: \"" << args[j] << "\"\n\n";
 
-      if ( Usage )  Usage();
+      if ( Usage )  Usage(1);
 
       exit ( 1 );
 

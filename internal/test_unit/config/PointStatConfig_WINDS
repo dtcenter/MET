@@ -49,6 +49,8 @@ message_type_group_map = [
    { key = "ONLYSF";  val = "ADPSFC,SFCSHP";                      },
    { key = "LANDSF";  val = "ADPSFC,MSONET";                      },
    { key = "WATERSF"; val = "SFCSHP";                             },
+   { key = "LAPSERT"; val = "ADPSFC,MSONET";                      },
+   { key = "MSLAGL";  val = "";                                   },
    { key = "USERSF";  val = "ADPSFC,SFCSHP";                      }
 ];
 

@@ -195,7 +195,7 @@ static void finish_txt_files();
 
 static void clean_up();
 
-static void usage();
+static void usage(int exit_code=1);
 static void set_outdir(const StringArray &);
 static void set_compress(const StringArray &);
 static bool read_data_plane(VarInfo *info, DataPlane &dp, Met2dDataFile *mtddf,
@@ -3278,7 +3278,7 @@ void clean_up() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
         << ") ***\n\n"
@@ -3321,7 +3321,7 @@ void usage() {
         << "\t\t\"-compress level\" overrides the compression level of NetCDF variable ("
         << conf_info.get_compression_level() << ") (optional).\n\n" << flush;
 
-   exit(1);
+   exit(exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////
