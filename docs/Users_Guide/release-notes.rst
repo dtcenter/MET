@@ -32,7 +32,7 @@ MET Version 12.2.0-rc2 Release Notes (20251029)
 
      * Confirm that the METplus difference logic handles MTD output file
        (`#977 <https://github.com/dtcenter/MET/issues/977>`_).
-     * Enhance the 'Create Release Docker Images' METplus workflows to determine and build the most recent bugfix versions
+     * Enhance the "Create Release Docker Images" METplus workflows to determine and build the most recent bugfix versions
        (`METplus-Internal#64 <https://github.com/dtcenter/METplus-Internal/issues/64>`_).
 
 MET Version 12.2.0-rc1 Release Notes (20250926)
