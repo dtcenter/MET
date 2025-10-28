@@ -982,6 +982,8 @@ void VxPairBase::clear() {
    msg_typ_sfc.clear();
    msg_typ_lnd.clear();
    msg_typ_wtr.clear();
+   msg_typ_lapsert.clear();
+   msg_typ_mslagl.clear();
 
    sfc_info.clear();
 
@@ -1048,9 +1050,11 @@ void VxPairBase::assign(const VxPairBase &vx_pb) {
    mpr_str_inc_map = vx_pb.mpr_str_inc_map;
    mpr_str_exc_map = vx_pb.mpr_str_exc_map;
 
-   msg_typ_sfc = vx_pb.msg_typ_sfc;
-   msg_typ_lnd = vx_pb.msg_typ_lnd;
-   msg_typ_wtr = vx_pb.msg_typ_wtr;
+   msg_typ_sfc     = vx_pb.msg_typ_sfc;
+   msg_typ_lnd     = vx_pb.msg_typ_lnd;
+   msg_typ_wtr     = vx_pb.msg_typ_wtr;
+   msg_typ_lapsert = vx_pb.msg_typ_lapsert;
+   msg_typ_mslagl  = vx_pb.msg_typ_mslagl;
 
    sfc_info = vx_pb.sfc_info;
 
@@ -1454,27 +1458,33 @@ void VxPairBase::set_climo_cdf_info_ptr(const ClimoCDFInfo *info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void VxPairBase::set_msg_typ_sfc(const StringArray &sa) {
+void VxPairBase::set_msg_typ_groups(const map<ConcatString,StringArray> &m) {
+   ConcatString cs;
 
-   msg_typ_sfc = sa;
+   // Surface message types
+   cs = surface_msg_typ_group_str;
+   if(m.count(cs) > 0) msg_typ_sfc = m.at(cs);
+   else                msg_typ_sfc.parse_css(default_msg_typ_group_surface);
 
-   return;
-}
+   // Land surface message types
+   cs = landsf_msg_typ_group_str;
+   if(m.count(cs) > 0) msg_typ_lnd = m.at(cs);
+   else                msg_typ_lnd.parse_css(default_msg_typ_group_landsf);
 
-////////////////////////////////////////////////////////////////////////
+   // Water surface message types
+   cs = watersf_msg_typ_group_str;
+   if(m.count(cs) > 0) msg_typ_wtr = m.at(cs);
+   else                msg_typ_wtr.parse_css(default_msg_typ_group_watersf);
 
-void VxPairBase::set_msg_typ_lnd(const StringArray &sa) {
+   // Lapse rate correction message types
+   cs = lapsert_msg_typ_group_str;
+   if(m.count(cs) > 0) msg_typ_lapsert = m.at(cs);
+   else                msg_typ_lapsert.parse_css(default_msg_typ_group_lapsert);
 
-   msg_typ_lnd = sa;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void VxPairBase::set_msg_typ_wtr(const StringArray &sa) {
-
-   msg_typ_wtr = sa;
+   // MSL/AGL conversion message types
+   cs = mslagl_msg_typ_group_str;
+   if(m.count(cs) > 0) msg_typ_mslagl = m.at(cs);
+   else                msg_typ_mslagl.parse_css(default_msg_typ_group_mslagl);
 
    return;
 }

@@ -85,11 +85,15 @@ static const int n_vld_msg_typ =
 static const char surface_msg_typ_group_str [] = "SURFACE"; // Surface message type group
 static const char landsf_msg_typ_group_str  [] = "LANDSF";  // Surface land message type group
 static const char watersf_msg_typ_group_str [] = "WATERSF"; // Surface water message type group
+static const char lapsert_msg_typ_group_str [] = "LAPSERT"; // Lapse rate correction message type group
+static const char mslagl_msg_typ_group_str  [] = "MSLAGL";  // MSL/AGL conversion message type groupe
 
 // Default message type group values
 static const char default_msg_typ_group_surface [] = "ADPSFC,SFCSHP,MSONET";
 static const char default_msg_typ_group_landsf  [] = "ADPSFC,MSONET";
 static const char default_msg_typ_group_watersf [] = "SFCSHP";
+static const char default_msg_typ_group_lapsert [] = "ADPSFC,MSONET";
+static const char default_msg_typ_group_mslagl  [] = "";    // Convert all types
 
 // Commonly used regular expressions
 static const char yyyymmdd_hhmmss_reg_exp[] =
