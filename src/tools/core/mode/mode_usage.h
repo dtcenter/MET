@@ -17,11 +17,11 @@
 ////////////////////////////////////////////////////////////////////////
 
 
-extern void both_usage();
+extern void both_usage(int exit_code=1);
 
-extern void singlevar_usage();
+extern void singlevar_usage(int exit_code=1);
 
-extern void multivar_usage();
+extern void multivar_usage(int exit_code=1);
 
 
 ////////////////////////////////////////////////////////////////////////

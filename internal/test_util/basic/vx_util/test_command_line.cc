@@ -27,7 +27,7 @@ using namespace std;
 static void set_xyz     (const StringArray &);
 static void set_verbose (const StringArray &);
 
-static void usage();
+static void usage(int exit_code=1);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -129,15 +129,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void usage()
+__attribute__((noreturn)) static void usage(int exit_code)
 
 {
 
 mlog << Error << "\nusage:  " << program_name << " [ -xyz x y z ] [ -verbose ] file_list\n\n";
 
-exit ( 1 );
-
-return;
+exit ( exit_code );
 
 }
 

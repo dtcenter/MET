@@ -95,7 +95,7 @@ static int compress_level = -1;
 static void process_command_line(int, char **);
 static void process_land_data();
 static void process_distances();
-static void usage();
+static void usage(int exit_code=1);
 static void set_grid(const StringArray &);
 static void set_noll(const StringArray &);
 static void set_land(const StringArray &);
@@ -307,7 +307,7 @@ void process_distances() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void usage() {
+__attribute__((noreturn)) static void usage(int exit_code) {
 
    cout << "\n*** Model Evaluation Tools (MET" << met_version
              << ") ***\n\n"
@@ -345,7 +345,7 @@ void usage() {
 
         << flush;
 
-   exit (1);
+   exit (exit_code);
 }
 
 ////////////////////////////////////////////////////////////////////////

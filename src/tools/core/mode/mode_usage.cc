@@ -28,11 +28,15 @@ extern const char * const program_name;
 
 extern ModeExecutive mode_exec;
 
+static void print_singlevar_usage();
+
+static void print_multivar_usage();
+
 
 ////////////////////////////////////////////////////////////////////////
 
 
-void both_usage()
+__attribute__((noreturn)) void both_usage(int exit_code)
 
 {
 
@@ -42,14 +46,14 @@ void both_usage()
    cout << "Single Variable MODE:\n"
       "=====================\n";
 
-   singlevar_usage();
+   print_singlevar_usage();
 
    cout << "Multi Variable MODE:\n"
         << "====================\n";
 
-   multivar_usage();
+   print_multivar_usage();
 
-   exit ( 1 );
+   exit ( exit_code );
 
 }
 
@@ -57,7 +61,36 @@ void both_usage()
 ////////////////////////////////////////////////////////////////////////
 
 
-void singlevar_usage()
+__attribute__((noreturn)) void singlevar_usage(int exit_code)
+
+{
+
+   print_singlevar_usage();
+
+   exit ( exit_code );
+
+}
+
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+__attribute__((noreturn)) void multivar_usage(int exit_code)
+
+{
+
+   print_multivar_usage();
+
+   exit ( exit_code );
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static void print_singlevar_usage()
 
 {
 
@@ -110,7 +143,7 @@ void singlevar_usage()
 ////////////////////////////////////////////////////////////////////////
 
 
-void multivar_usage()
+static void print_multivar_usage()
 
 {
 
@@ -152,3 +185,4 @@ void multivar_usage()
 
 
 ////////////////////////////////////////////////////////////////////////
+
