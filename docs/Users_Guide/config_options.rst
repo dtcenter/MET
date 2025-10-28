@@ -2443,7 +2443,7 @@ statistics.
 
 The "message_type_group_map" dictionary entry for "MSLAGL" specifies a comma-separated
 list of message types for which this conversion should be applied. By default, the
-conversion logic is applied to observations for message types since it is set to an
+conversion logic is applied to observations for all message types since it is set to an
 empty list.
 
 .. code-block:: none
