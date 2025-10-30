@@ -623,7 +623,8 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
 
             // MET #3174 Apply lapse rate surface temperature correction
             if(sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
-               msg_typ_sfc.reg_exp_match(hdr_typ_str) &&
+               (msg_typ_lapsert.all_empty() ||
+                msg_typ_lapsert.reg_exp_match(hdr_typ_str)) &&
                !correct_lapse_rate(topo_elv, hdr_elv, fcst_v, obs_v)) {
                inc_count(rej_mpr, i_msg_typ, i_mask, i_interp);
                continue;
@@ -631,6 +632,8 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
 
             // MET #3174 Apply MSL/AGL height conversion
             if(sfc_info.msl_agl_conversion_apply_to != FieldType::None &&
+               (msg_typ_mslagl.all_empty() ||
+                msg_typ_mslagl.reg_exp_match(hdr_typ_str)) &&
                !convert_msl_agl(topo_elv, hdr_elv, fcst_v, obs_v)) {
                inc_count(rej_mpr, i_msg_typ, i_mask, i_interp);
                continue;

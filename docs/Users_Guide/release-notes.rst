@@ -9,6 +9,32 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.2.0-rc2 Release Notes (20251029)
+-----------------------------------------------
+
+  .. dropdown:: Enhancements
+
+     * Refine default lapse rates for orographic corrections
+       (`#3258 <https://github.com/dtcenter/MET/issues/3258>`_).
+     * Refine handling of missing data for orographic corrections
+       (`#3270 <https://github.com/dtcenter/MET/issues/3270>`_).
+     * Enhance the MET tools to return consistent exit codes
+       (`#3278 <https://github.com/dtcenter/MET/issues/3278>`_).
+
+  .. dropdown:: Bugfixes
+
+     * Update the logic to apply "set_attr_grid" before "ShiftRight"
+       (`#3255 <https://github.com/dtcenter/MET/issues/3255>`_).
+     * Fix ASCII2NC hang when run with an empty input file
+       (`#3266 <https://github.com/dtcenter/MET/issues/3266>`_).
+
+  .. dropdown:: Repository, build, and test
+
+     * Confirm that the METplus difference logic handles MTD output file
+       (`#977 <https://github.com/dtcenter/MET/issues/977>`_).
+     * Enhance the "Create Release Docker Images" METplus workflows to determine and build the most recent bugfix versions
+       (`METplus-Internal#64 <https://github.com/dtcenter/METplus-Internal/issues/64>`_).
+
 MET Version 12.2.0-rc1 Release Notes (20250926)
 -----------------------------------------------
 
