@@ -2157,7 +2157,9 @@ double VxPairBase::compute_fcst_value(
 
 ////////////////////////////////////////////////////////////////////////
 
-bool VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
+bool VxPairBase::correct_lapse_rate(const char *pnt_obs_str,
+                                    const char *obs_sid_str,
+                                    double fcst_elv, double obs_elv,
                                     double &fcst_v, double &obs_v) const {
    const char *method_name = "PairBase::correct_lapse_rate() -> ";
 
@@ -2170,14 +2172,17 @@ bool VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
       is_bad_data(fcst_v)   || is_bad_data(obs_v)   ||
       is_bad_data(sfc_info.lapse_rate_correction_value)) { 
 
-      if(mlog.verbosity_level() >= CORRECTION_DEBUG_LEVEL) {
-         mlog << Debug(CORRECTION_DEBUG_LEVEL)
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
               << "For " << fcst_info->magic_str() << " versus "
               << obs_info->magic_str() << ", skipping lapse rate correction "
               << "due to bad (fcst, obs) elevation (" << fcst_elv << ", "
               << obs_elv << "), data (" << fcst_v << ", "
               << obs_v << "), or lapse rate ("
-              << sfc_info.lapse_rate_correction_value << ") values.\n";
+              << sfc_info.lapse_rate_correction_value << ") values"
+              << (pnt_obs_str ? ":\n" : ".")
+              << (pnt_obs_str ? pnt_obs_str : "")
+              << "\n";
       }
 
       return false;
@@ -2200,8 +2205,8 @@ bool VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
    // Log the lapse rate correction
    if(mlog.verbosity_level() >= CORRECTION_DEBUG_LEVEL) {
       mlog << Debug(CORRECTION_DEBUG_LEVEL)
-           << "For " << fcst_info->magic_str() << " versus "
-           << obs_info->magic_str() << ", correcting the "
+           << "For station " << obs_sid_str << ", " << fcst_info->magic_str()
+           << " versus " << obs_info->magic_str() << ", correcting the "
            << fieldtype_to_string(sfc_info.lapse_rate_correction_apply_to)
            << " temperature from " << orig_v << " to " << corr_v 
            << " for forecast (" << fcst_elv << ") minus observation ("
@@ -2215,7 +2220,9 @@ bool VxPairBase::correct_lapse_rate(double fcst_elv, double obs_elv,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
+bool VxPairBase::convert_msl_agl(const char *pnt_obs_str,
+                                 const char *obs_sid_str,
+                                 double fcst_elv, double obs_elv,
                                  double &fcst_v, double &obs_v,
                                  bool update_obs) const {
    const char *method_name = "PairBase::convert_msl_agl() -> ";
@@ -2259,13 +2266,16 @@ bool VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
    if(is_bad_data(fcst_v) || is_bad_data(obs_v) ||
       is_bad_data(corr_f) || is_bad_data(corr_o)) {
 
-      if(mlog.verbosity_level() >= CORRECTION_DEBUG_LEVEL) {
-         mlog << Debug(CORRECTION_DEBUG_LEVEL)
+      if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         mlog << Debug(REJECT_DEBUG_LEVEL)
               << "For " << fcst_info->magic_str() << " versus "
               << obs_info->magic_str() << ", skipping msl/agl conversion "
               << "due to bad (fcst, obs) elevation (" << fcst_elv << ", "
               << obs_elv << ") or data (" << fcst_v << ", "
-              << obs_v << ") values.\n";
+              << obs_v << ") values"
+              << (pnt_obs_str ? ":\n" : ".")
+              << (pnt_obs_str ? pnt_obs_str : "")
+              << "\n";
       }
 
       return false;
@@ -2285,8 +2295,8 @@ bool VxPairBase::convert_msl_agl(double fcst_elv, double obs_elv,
    // Log the MSL/AGL conversion
    if(mlog.verbosity_level() >= CORRECTION_DEBUG_LEVEL) {
       mlog << Debug(CORRECTION_DEBUG_LEVEL)
-           << "For " << fcst_info->magic_str() << " versus "
-           << obs_info->magic_str() << ", converting "
+           << "For station " << obs_sid_str << ", " << fcst_info->magic_str()
+           << " versus " << obs_info->magic_str() << ", converting "
            << (sfc_info.msl_agl_conversion_msl_to_agl ?
                "MSL to AGL" : "AGL to MSL")
            << " using "
