@@ -2173,16 +2173,16 @@ bool VxPairBase::correct_lapse_rate(const char *pnt_obs_str,
       is_bad_data(sfc_info.lapse_rate_correction_value)) { 
 
       if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         ConcatString cs;
+         if(pnt_obs_str) cs << ":\n" << pnt_obs_str << "\n";
+         else            cs << ".\n";
          mlog << Debug(REJECT_DEBUG_LEVEL)
               << "For " << fcst_info->magic_str() << " versus "
               << obs_info->magic_str() << ", skipping lapse rate correction "
               << "due to bad (fcst, obs) elevation (" << fcst_elv << ", "
               << obs_elv << "), data (" << fcst_v << ", "
               << obs_v << "), or lapse rate ("
-              << sfc_info.lapse_rate_correction_value << ") values"
-              << (pnt_obs_str ? ":\n" : ".")
-              << (pnt_obs_str ? pnt_obs_str : "")
-              << "\n";
+              << sfc_info.lapse_rate_correction_value << ") values" << cs;
       }
 
       return false;
@@ -2267,15 +2267,15 @@ bool VxPairBase::convert_msl_agl(const char *pnt_obs_str,
       is_bad_data(corr_f) || is_bad_data(corr_o)) {
 
       if(mlog.verbosity_level() >= REJECT_DEBUG_LEVEL) {
+         ConcatString cs;
+         if(pnt_obs_str) cs << ":\n" << pnt_obs_str << "\n";
+         else            cs << ".\n";
          mlog << Debug(REJECT_DEBUG_LEVEL)
               << "For " << fcst_info->magic_str() << " versus "
               << obs_info->magic_str() << ", skipping msl/agl conversion "
               << "due to bad (fcst, obs) elevation (" << fcst_elv << ", "
               << obs_elv << ") or data (" << fcst_v << ", "
-              << obs_v << ") values"
-              << (pnt_obs_str ? ":\n" : ".")
-              << (pnt_obs_str ? pnt_obs_str : "")
-              << "\n";
+              << obs_v << ") values" << cs;
       }
 
       return false;

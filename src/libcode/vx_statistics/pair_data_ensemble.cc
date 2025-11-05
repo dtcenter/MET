@@ -1443,8 +1443,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, const Grid &gr) {
                double obs_v = it->o_na[i_obs];
 
                // MET #3174 Apply lapse rate surface temperature correction
-               if((sfc_info.lapse_rate_correction_apply_to == FieldType::Fcst ||
-                   (sfc_info.lapse_rate_correction_apply_to == FieldType::Obs && member == 0)) &&
+               if(sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
                   (msg_typ_lapsert.all_empty() ||
                    msg_typ_lapsert.reg_exp_match(it->typ_sa[i_obs].c_str())) &&
                   !correct_lapse_rate(nullptr, it->sid_sa[i_obs].c_str(),
@@ -1456,9 +1455,7 @@ void VxPairDataEnsemble::add_ens(int member, bool mn, const Grid &gr) {
                }
 
                // MET #3174 Apply MSL/AGL height conversion
-               if((sfc_info.msl_agl_conversion_apply_to == FieldType::Fcst ||
-                   sfc_info.msl_agl_conversion_apply_to == FieldType::Both ||
-                   (sfc_info.msl_agl_conversion_apply_to == FieldType::Obs && member == 0)) &&
+               if(sfc_info.msl_agl_conversion_apply_to != FieldType::None &&
                   (msg_typ_mslagl.all_empty() ||
                    msg_typ_mslagl.reg_exp_match(it->typ_sa[i_obs].c_str())) &&
                   !convert_msl_agl(nullptr, it->sid_sa[i_obs].c_str(),
