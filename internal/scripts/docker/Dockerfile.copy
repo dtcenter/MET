@@ -55,10 +55,6 @@ RUN cd ${MET_REPO_DIR} \
 
 ENTRYPOINT ["/usr/local/bin/user-entrypoint.sh"]
 
-# Switch to non-root user
-
-USER metplus_user
-
 # Set working directory to the user home directory
 
 WORKDIR /home/metplus_user

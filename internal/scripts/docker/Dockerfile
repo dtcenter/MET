@@ -48,10 +48,6 @@ RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
 
 ENTRYPOINT ["/usr/local/bin/user-entrypoint.sh"]
 
-# Switch to non-root user
-
-USER metplus_user
-
 # Set working directory to the user workspace
 
 WORKDIR /home/metplus_user
