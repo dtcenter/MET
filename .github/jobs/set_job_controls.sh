@@ -6,7 +6,7 @@ run_unit_tests=false
 run_diff=false
 run_update_truth=false
 met_base_repo=met-base-dev
-met_base_tag=feature_main_v3.4_pip
+met_base_tag=feature_51_non_root
 input_data_version=develop
 truth_data_version=develop
 
