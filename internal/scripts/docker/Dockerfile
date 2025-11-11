@@ -43,3 +43,19 @@ RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \
  && cd ${MET_REPO_DIR} \
  && git checkout ${MET_GIT_NAME} \
  && internal/scripts/docker/build_met_docker.sh
+
+# run entrypoint script to set uid and gid for metplus_user to running user's values
+
+ENTRYPOINT ["/usr/local/bin/user-entrypoint.sh"]
+
+# Switch to non-root user
+
+USER metplus_user
+
+# Set working directory to the user workspace
+
+WORKDIR /home/metplus_user
+
+# run bash if no command is specified
+
+CMD ["bash"]

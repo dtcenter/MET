@@ -31,7 +31,13 @@ export TESTS_TO_RUN=$TESTS
 
 # run unit test script inside Docker, mount MET input and truth data
 cmd="\${MET_REPO_DIR}/.github/jobs/run_unit_tests.sh"
-time_command docker run -e TESTS_TO_RUN ${volumes_from} ${mount_args} ${DOCKERHUB_TAG} bash -c \"${cmd}\"
+time_command docker run \
+  -e TESTS_TO_RUN \
+  -e USER_ID=$(id -u) \
+  -e GROUP_ID=$(id -g) \
+  ${volumes_from} ${mount_args} \
+  ${DOCKERHUB_TAG} \
+  bash -c \"${cmd}\"
 if [ $? != 0 ]; then
   exit 1
 fi

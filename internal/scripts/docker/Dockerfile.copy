@@ -51,3 +51,18 @@ RUN if [ ! -e "${MET_REPO_DIR}/configure.ac" ]; then \
 RUN cd ${MET_REPO_DIR} \
  && internal/scripts/docker/build_met_docker.sh
 
+# run entrypoint script to set uid and gid for metplus_user to running user's values
+
+ENTRYPOINT ["/usr/local/bin/user-entrypoint.sh"]
+
+# Switch to non-root user
+
+USER metplus_user
+
+# Set working directory to the user home directory
+
+WORKDIR /home/metplus_user
+
+# run bash if no command is specified
+
+CMD ["bash"]
