@@ -683,7 +683,7 @@ void PairBase::print_obs_summary() const {
            << "Computed " << obssummary_to_string(obs_summary, obs_perc_value)
            << " of " << (int) svt.obs.size()
            << " observations = " << svt.summary_val
-           << " for [lat:lon:level:elevation] = ["
+           << " for [lat:lon:level:height] = ["
            << map_key[i] << "]\n";
 
       //  parse and print the point obs information for the current key
