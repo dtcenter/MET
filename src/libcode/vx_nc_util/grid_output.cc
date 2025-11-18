@@ -646,7 +646,7 @@ ConcatString cs;
 double t;
 const LaeaData & data = *(info.la);
 
-ncfile->putAtt("Projection", "Lambert Azimuthal Equal Area");
+ncfile->putAtt("Projection", laea_proj_type);
 
 ncfile->putAtt("spheroid_name", data.spheroid_name);
 

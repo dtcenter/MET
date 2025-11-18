@@ -364,6 +364,18 @@ return a;
 ////////////////////////////////////////////////////////////////////////
 
 
+bool Python3_Dict::has(const char * key) const
+
+{
+
+return PyDict_GetItemString(Object, key) != 0;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void Python3_Dict::dump(std::ostream & out, int depth) const
 
 {

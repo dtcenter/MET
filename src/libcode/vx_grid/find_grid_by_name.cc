@@ -36,9 +36,9 @@ static bool parse_mercator_grid(const StringArray &, Grid &);
 
 static bool parse_gaussian_grid(const StringArray &, Grid &);
 
-static bool parse_rngazi_grid(const StringArray &, Grid &);
-
 static bool parse_laea_grid(const StringArray &, Grid &);
+
+static bool parse_rngazi_grid(const StringArray &, Grid &);
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -259,6 +259,7 @@ else if ( strcasecmp(grid_strings[0].c_str(), "rotlatlon") == 0 )  status = pars
 else if ( strcasecmp(grid_strings[0].c_str(), "stereo")    == 0 )  status = parse_stereographic_grid(grid_strings, g);
 else if ( strcasecmp(grid_strings[0].c_str(), "mercator")  == 0 )  status = parse_mercator_grid(grid_strings, g);
 else if ( strcasecmp(grid_strings[0].c_str(), "gaussian")  == 0 )  status = parse_gaussian_grid(grid_strings, g);
+else if ( strcasecmp(grid_strings[0].c_str(), "laea")      == 0 )  status = parse_laea_grid(grid_strings, g);
 else if ( strcasecmp(grid_strings[0].c_str(), "rngazi")    == 0 )  status = parse_rngazi_grid(grid_strings, g);
 else                                                               status = false;
 
@@ -832,6 +833,80 @@ if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
    //  done
    //
 
+
+return true;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+static bool parse_laea_grid(const StringArray &grid_strings, Grid & g)
+
+{
+
+Grid * ToGrid = nullptr;
+
+LaeaData ldata;
+
+const int N = grid_strings.n();
+
+if ( (N < 10) || (N > 11) )  {
+
+   mlog << Error << "\nparse_laea_grid() -> "
+        << "lambert azimuthal equal area grid spec should have 10 or 11 entries ("
+        << N << ")\n\n";
+
+   exit ( 1 );
+
+}
+
+   //
+   //  populate the struct
+   //
+
+ldata.name = "To (laea)";
+
+ldata.nx = atoi(grid_strings[1].c_str());
+ldata.ny = atoi(grid_strings[2].c_str());
+
+ldata.lat_first = atof(grid_strings[3].c_str());
+ldata.lon_first = atof(grid_strings[4].c_str());
+
+ldata.central_lon = atof(grid_strings[5].c_str());
+
+ldata.dx_km = atof(grid_strings[6].c_str());
+ldata.dy_km = atof(grid_strings[7].c_str());
+
+ldata.standard_lat = atof(grid_strings[8].c_str());
+
+if ( N == 10 )  {
+   ldata.radius_km            = atof(grid_strings[9].c_str());
+   ldata.equatorial_radius_km = 0;
+   ldata.polar_radius_km      = 0;
+   ldata.is_sphere            = true;
+}
+else {
+   ldata.radius_km            = 0;
+   ldata.equatorial_radius_km = atof(grid_strings[9].c_str());
+   ldata.polar_radius_km      = atof(grid_strings[10].c_str());
+}
+
+if ( !west_longitude_positive )  {
+
+   ldata.lon_first   *= -1.0;
+   ldata.central_lon *= -1.0;
+
+}
+
+g.set(ldata);
+
+if ( ldata.name )  { delete [] ldata.name; ldata.name = (const char *) nullptr; }
+
+   //
+   // done
+   //
 
 return true;
 
