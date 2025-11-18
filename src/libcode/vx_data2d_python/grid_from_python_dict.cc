@@ -499,6 +499,11 @@ data.lon_first = rescale_lon(dict.lookup_double("lon_first"));
 data.standard_lat = dict.lookup_double("standard_lat");
 data.central_lon  = rescale_lon(dict.lookup_double("central_lon"));
 
+if ( dict.has("spheroid_name") ) {
+   s = dict.lookup_string("spheroid_name");
+   strncpy(data.spheroid_name, s.c_str(), s.length());
+}
+
 if ( dict.has("radius_km") ) {
    data.radius_km            = dict.lookup_double("radius_km");
    data.equatorial_radius_km = 0;
