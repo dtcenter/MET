@@ -76,7 +76,7 @@ clear();
 ////////////////////////////////////////////////////////////////////////
 
 
-Python3_Dict::Python3_Dict(const Python3_Dict &)
+__attribute__((noreturn)) Python3_Dict::Python3_Dict(const Python3_Dict &)
 
 {
 
@@ -91,7 +91,7 @@ exit ( 1 );
 ////////////////////////////////////////////////////////////////////////
 
 
-Python3_Dict & Python3_Dict::operator=(const Python3_Dict &)
+__attribute__((noreturn)) Python3_Dict & Python3_Dict::operator=(const Python3_Dict &)
 
 {
 
@@ -110,7 +110,7 @@ void Python3_Dict::init_from_scratch()
 
 {
 
-Object = 0;
+Object = nullptr;
 
 clear();
 
@@ -126,7 +126,7 @@ void Python3_Dict::clear()
 
 {
 
-Object = 0;  //  don't deallocate
+Object = nullptr;  //  don't deallocate
 
 Size = 0;
 
@@ -143,7 +143,7 @@ int Python3_Dict::lookup_int(const char * key) const
 {
 
 int k;
-PyObject * a = 0;
+PyObject * a = nullptr;
 
 a = PyDict_GetItemString(Object, key);
 
@@ -188,7 +188,7 @@ double Python3_Dict::lookup_double(const char * key) const
 {
 
 double t;
-PyObject * a = 0;
+PyObject * a = nullptr;
 
 a = PyDict_GetItemString(Object, key);
 
@@ -225,7 +225,7 @@ ConcatString Python3_Dict::lookup_string(const char * key, bool error_out) const
 {
 
 ConcatString s;
-PyObject * a = 0;
+PyObject * a = nullptr;
 
 a = PyDict_GetItemString(Object, key);
 
@@ -270,7 +270,7 @@ PyObject * Python3_Dict::lookup_item(const char * key) const
 
 {
 
-PyObject * a = 0;
+PyObject * a = nullptr;
 
 a = PyDict_GetItemString(Object, key);
 
@@ -295,7 +295,7 @@ PyObject * Python3_Dict::lookup_dict(const char * key) const
 
 {
 
-PyObject * a = 0;
+PyObject * a = nullptr;
 
 a = PyDict_GetItemString(Object, key);
 
@@ -330,7 +330,7 @@ PyObject * Python3_Dict::lookup_list(const char * key) const
 
 {
 
-PyObject * a = 0;
+PyObject * a = nullptr;
 
 
 a = PyDict_GetItemString(Object, key);
@@ -368,7 +368,7 @@ bool Python3_Dict::has(const char * key) const
 
 {
 
-return PyDict_GetItemString(Object, key) != 0;
+return PyDict_GetItemString(Object, key) != nullptr;
 
 }
 
@@ -432,7 +432,7 @@ if ( ! PyDict_Check(_obj) )  {
 }
 
 
-Size = PyDict_Size (_obj);
+Size = (int) PyDict_Size (_obj);
 
 Object = _obj;
 
@@ -478,11 +478,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void dump_dict(std::ostream & out, PyObject * obj, int depth)
+static void dump_dict(std::ostream & out, PyObject * obj, int depth)
 
 {
 
-int j, n;
+int j;
 ConcatString tab;
 
 for (j=0; j<depth; ++j)  tab << "|  ";
@@ -491,19 +491,18 @@ for (j=0; j<depth; ++j)  tab << "|  ";
    //   get the size of the array
    //
 
-n = PyDict_Size (obj);
+int n = (int) PyDict_Size (obj);
 
 out << tab << "Dictionary size = " << n << "\n";
 
-PyObject * key   = 0;
-PyObject * value = 0;
-int status;
+PyObject * key   = nullptr;
+PyObject * value = nullptr;
 long pos;
 
 j = pos = 0;
 
 
-while ( (status = PyDict_Next (obj, &pos, &key, &value)) != 0 )  {
+while ( PyDict_Next (obj, &pos, &key, &value) != 0 )  {
 
    out << tab << "\n";
 
@@ -540,7 +539,7 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
 
-void dump_dict_value(std::ostream & out, PyObject * value, int depth)
+static void dump_dict_value(std::ostream & out, PyObject * value, int depth)
 
 {
 
