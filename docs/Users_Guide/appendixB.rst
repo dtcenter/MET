@@ -56,7 +56,14 @@ As an example of specifying a Lambert grid, suppose you have a northern hemisphe
 Lambert Azimuthal Equal Area Grid
 ---------------------------------
 
-For a Lambert Azimuthal Equal Area grid, grid specification strings are not supported.
+To specify a Lambert Azimuthal Equal Area grid, the syntax is
+
+.. code-block:: none
+
+  laea Nx Ny lat_first lon_first central_lon Dx_km Dy_km standard_lat equatorial_radius_km [ polar_radius_km ]
+
+Here, **Nx** and **Ny** are the number of point in, respectively, the **x** and **y** grid directions. **lat_first** and **lon_first** are the latitude and longitude, in degrees, of the lower left point of the grid. **central_lon** is the orientation longitude of the grid. **Dx_km** and **Dy_km** are the grid resolution in the **x** and **y** directions, both in kilometers. **standard_lat** is the stardard parallel of the Lambert projection. **equatorial_radius_km** is the radius of the Earth at the equator in kilometers. For an elliptical earth, **polar_radius_km** is the radius of the Earth at the poles in kilometers. If both are provided, an elliptical Earth is assumed. If only **equatorial_radius_km** is provided, a spherical Earth is assumed.
+
 
 Polar Stereographic Grid
 ------------------------
