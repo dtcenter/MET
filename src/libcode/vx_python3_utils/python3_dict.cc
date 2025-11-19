@@ -491,7 +491,7 @@ for (j=0; j<depth; ++j)  tab << "|  ";
    //   get the size of the array
    //
 
-int n = (int) PyDict_Size (obj);
+auto n = (int) PyDict_Size (obj);
 
 out << tab << "Dictionary size = " << n << "\n";
 
