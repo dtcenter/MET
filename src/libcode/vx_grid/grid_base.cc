@@ -246,6 +246,62 @@ mlog << Debug(grid_debug_level)
 ////////////////////////////////////////////////////////////////////////
 
 
+void LaeaData::clear()
+
+{
+
+name                 = nullptr;
+spheroid_name.clear();
+radius_km            = bad_data_double;
+equatorial_radius_km = bad_data_double;
+polar_radius_km      = bad_data_double;
+lat_first            = bad_data_double;
+lon_first            = bad_data_double;
+standard_lat         = bad_data_double;
+central_lon          = bad_data_double;
+dx_km                = bad_data_double;
+dy_km                = bad_data_double;
+nx                   = bad_data_int;
+ny                   = bad_data_int;
+is_sphere            = false;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+LaeaData & LaeaData::operator=(const LaeaData &a) noexcept
+
+{
+
+if(this != &a) {
+   name                 = a.name;
+   spheroid_name        = a.spheroid_name;
+   radius_km            = a.radius_km;
+   equatorial_radius_km = a.equatorial_radius_km;
+   polar_radius_km      = a.polar_radius_km;
+   lat_first            = a.lat_first;
+   lon_first            = a.lon_first;
+   standard_lat         = a.standard_lat;
+   central_lon          = a.central_lon;
+   dx_km                = a.dx_km;
+   dy_km                = a.dy_km;
+   nx                   = a.nx;
+   ny                   = a.ny;
+   is_sphere            = a.is_sphere;
+}
+
+return *this;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 void LaeaData::dump() const
 
 {

@@ -75,7 +75,6 @@ LaeaGrid::LaeaGrid(const LaeaData & data)
 
 clear();
 
-memset(&Data, 0, sizeof(Data));
 Data = data;
 
 lat_LL = data.lat_first;
@@ -225,7 +224,7 @@ lon_LR = 0.0;
 
 lat_pole = 0.0;
 
-memset(&Data, 0, sizeof(Data));
+Data.clear();
 
 return;
 

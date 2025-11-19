@@ -88,6 +88,9 @@ struct LaeaData {
 
    bool is_sphere;                //  spherical earth, or ellipsoidal?
 
+   void clear();
+   LaeaData &operator=(const LaeaData &a) noexcept;
+
    void dump() const;
 
 };
