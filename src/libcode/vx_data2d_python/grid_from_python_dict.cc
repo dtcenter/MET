@@ -91,19 +91,19 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
    //
-   //  name                            (string)
+   //  name                            string
    //
-   //  hemisphere                      (string: "N" or "S")
+   //  hemisphere                      string: "N" or "S"
    //
-   //  scale_lat_1, scale_lat_2        (double)
+   //  scale_lat_1, scale_lat_2        double
    //
-   //  lat_pin, lon_pin, x_pin, y_pin  (double)
+   //  lat_pin, lon_pin, x_pin, y_pin  double
    //
-   //  lon_orient                      (double)
+   //  lon_orient                      double
    //
-   //  d_km, r_km                      (double)
+   //  d_km, r_km                      double
    //
-   //  nx, ny                          (int)
+   //  nx, ny                          int
    //
 
 static void get_lc_grid     (const Python3_Dict & dict, Grid & g)
@@ -165,19 +165,19 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
    //
-   //  name                             (string)
+   //  name                             string
    //
-   //  hemisphere                       (string: "N" or "S")
+   //  hemisphere                       string: "N" or "S"
    //
-   //  scale_lat                        (double)
+   //  scale_lat                        double
    //
-   //  lat_pin, lon_pin, x_pin, y_pin   (double)
+   //  lat_pin, lon_pin, x_pin, y_pin   double
    //
-   //  lon_orient                       (double)
+   //  lon_orient                       double
    //
-   //  d_km, r_km                       (double)
+   //  d_km, r_km                       double
    //
-   //  nx, ny                           (int)
+   //  nx, ny                           int
    //
 
 
@@ -243,17 +243,17 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
    //
-   //  name        (string)
+   //  name        string
    //
-   //  lat_ll      (double)
+   //  lat_ll      double
    //
-   //  lon_ll      (double)
+   //  lon_ll      double
    //
-   //  lat_ur      (double)
+   //  lat_ur      double
    //
-   //  lon_ur      (double)
+   //  lon_ur      double
    //
-   //  nx, ny      (int)
+   //  nx, ny      int
    //
 
 static void get_merc_grid   (const Python3_Dict & dict, Grid & g)
@@ -301,13 +301,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
    //
-   // name                    (string)
+   //  name                  string
    //
-   // lat_ll, lon_ll          (double)
+   //  lat_ll, lon_ll        double
    //
-   // delta_lat, delta_lon    (double)
+   //  delta_lat, delta_lon  double
    //
-   // Nlat, Nlon              (int)
+   //  Nlat, Nlon            int
    //
 
 static void get_latlon_grid (const Python3_Dict & dict, Grid & g)
@@ -352,17 +352,17 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
    //
-   // name                                      (string)
+   //  name                                      string
    //
-   // rot_lat_ll, rot_lon_ll                    (double)
+   //  rot_lat_ll, rot_lon_ll                    double
    //
-   // delta_rot_lat, delta_rot_lon              (double)
+   //  delta_rot_lat, delta_rot_lon              double
    //
-   // Nlat, Nlon                                (int)
+   //  Nlat, Nlon                                int
    //
-   // true_lat_south_pole, true_lon_south_pole  (double)
+   //  true_lat_south_pole, true_lon_south_pole  double
    //
-   // aux_rotation                              (double)
+   //  aux_rotation                              double
    //
 
 static void get_rotated_latlon_grid (const Python3_Dict & dict, Grid & g)
@@ -413,11 +413,11 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
    //
-   // name      (string)
+   //  name      string
    //
-   // lon_zero  (double)
+   //  lon_zero  double
    //
-   // nx, ny    (int)
+   //  nx, ny    int
    //
 
 static void get_gaussian_grid (const Python3_Dict & dict, Grid & g)
@@ -457,29 +457,29 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
    //
-   //  name                 (string)
+   //  name                  string
    //
-   //  spheroid_name        (string)
+   //  spheroid_name         string
    //
-   //  radius_km            (double) for spherical earth
+   //  radius_km             double, for spherical earth
    //
-   //  equatorial_radius_km (double) for elliptical earth
+   //  equatorial_radius_km  double, for elliptical earth
    //
-   //  polar_radius_km      (double) for elliptical earth 
+   //  polar_radius_km       double, for elliptical earth 
    //
-   //  lat_first            (double)
+   //  lat_first             double
    //
-   //  lon_first            (double)
+   //  lon_first             double
    //
-   //  standard_lat         (double)
+   //  standard_lat          double
    //
-   //  central_lon          (double)
+   //  central_lon           double
    //
-   //  dx_km, dy_km         (double)
+   //  dx_km, dy_km          double
    //
-   //  nx, ny               (integer)
+   //  nx, ny                int
    //
-   //  is_sphere            (boolean)
+   //  is_sphere             bool
    //
 
 static void get_laea_grid (const Python3_Dict & dict, Grid & g)
@@ -545,13 +545,13 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
    //
-   // name                   (string)
+   //  name                   string
    //
-   // range_n, azimuth_n     (int)
+   //  range_n, azimuth_n     int
    //
-   // range_max_km           (double)
+   //  range_max_km           double
    //
-   // lat_center, lon_center (double)
+   //  lat_center, lon_center double
    //
 
 static void get_range_azimuth_grid (const Python3_Dict & dict, Grid & g)
@@ -595,15 +595,15 @@ return;
 ////////////////////////////////////////////////////////////////////////
 
    //
-   //  name        (string)
+   //  name        string
    //
-   //  lats        (array of double)
+   //  lats        array of double
    //
-   //  lons        (array of double)
+   //  lons        array of double
    //
-   //  levels      (array of double)
+   //  levels      array of double
    //
-   //  times       (array of double)
+   //  times       array of double
    //
 
 static void get_semilatlon_grid   (const Python3_Dict & dict, Grid & g)
@@ -691,7 +691,7 @@ static void set_string(const char * & dest, const ConcatString & src)
 
 {
 
-char * s = 0;
+char * s = nullptr;
 const int L = src.length();
 
 s = new char [1 + L];
