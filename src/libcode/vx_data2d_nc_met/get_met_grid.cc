@@ -375,7 +375,7 @@ static LaeaData get_laea_data(const NcFile * ncfile) {
 
    // Spheroid name
    get_global_att(ncfile, string("spheroid_name"), att_value);
-   m_strncpy(data.spheroid_name, att_value.c_str(), att_value.length(), method_name);
+   data.spheroid_name = att_value;
 
    // Grid spacing in km
    get_global_att(ncfile, string("radius_km"), data.radius_km);

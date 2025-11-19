@@ -868,7 +868,7 @@ if ( (N < 10) || (N > 11) )  {
 
 ldata.name = "To (laea)";
 
-m_strncpy(ldata.spheroid_name, "Undefined", m_strlen("Undefined"), "parse_laea_grid()");
+ldata.spheroid_name = "Undefined";
 
 ldata.nx = atoi(grid_strings[1].c_str());
 ldata.ny = atoi(grid_strings[2].c_str());

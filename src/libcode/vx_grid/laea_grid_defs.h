@@ -67,7 +67,7 @@ struct LaeaData {
 
    const char * name;             //  not allocated
 
-   char spheroid_name[max_str_len];
+   std::string spheroid_name;
 
    double radius_km;              //  for spherical Earth
 

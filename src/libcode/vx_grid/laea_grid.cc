@@ -93,8 +93,7 @@ Ny = data.ny;
 
 geoid.set_ab(data.equatorial_radius_km, data.polar_radius_km);
 
-string s = data.spheroid_name;
-geoid.set_name(s.c_str());
+geoid.set_name(data.spheroid_name.c_str());
 
 aff.set_mb(1.0/(data.dx_km), 0.0, 0.0, 1.0/(data.dy_km), 0.0, 0.0);
 
@@ -164,7 +163,7 @@ if ( fabs((nc.semi_major_axis_km - nc.semi_minor_axis_km)/(nc.semi_major_axis_km
 
 geoid.set_ab(Data.equatorial_radius_km, Data.polar_radius_km);
 
-m_strncpy(Data.spheroid_name, "Undefined", m_strlen("Undefined"), method_name);
+Data.spheroid_name = "Undefined";
 
 geoid.set_name("Undefined");
 
