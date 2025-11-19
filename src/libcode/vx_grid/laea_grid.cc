@@ -90,7 +90,12 @@ SpheroidName = data.spheroid_name;
 Nx = data.nx;
 Ny = data.ny;
 
-geoid.set_ab(data.equatorial_radius_km, data.polar_radius_km);
+if(data.is_sphere) { 
+   geoid.set_ab(data.radius_km, data.radius_km);
+}
+else {
+   geoid.set_ab(data.equatorial_radius_km, data.polar_radius_km);
+}
 
 geoid.set_name(data.spheroid_name.c_str());
 
