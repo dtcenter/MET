@@ -757,7 +757,12 @@ LaeaData * D = nullptr;
 
 D = new LaeaData;
 
-memcpy(D, &data, sizeof(data));
+   //
+   //  deep copy instead of memcpy because the struct
+   //  contains an std::string
+   //
+
+*D = data;
 
 la = D;  D = nullptr;
 
