@@ -868,6 +868,8 @@ if ( (N < 10) || (N > 11) )  {
 
 ldata.name = "To (laea)";
 
+m_strncpy(ldata.spheroid_name, "Undefined", m_strlen("Undefined"), "parse_laea_grid()");
+
 ldata.nx = atoi(grid_strings[1].c_str());
 ldata.ny = atoi(grid_strings[2].c_str());
 
@@ -891,6 +893,7 @@ else {
    ldata.radius_km            = 0;
    ldata.equatorial_radius_km = atof(grid_strings[9].c_str());
    ldata.polar_radius_km      = atof(grid_strings[10].c_str());
+   ldata.is_sphere            = false;
 }
 
 if ( !west_longitude_positive )  {
@@ -900,9 +903,11 @@ if ( !west_longitude_positive )  {
 
 }
 
-g.set(ldata);
+ToGrid = new Grid ( ldata );
 
-if ( ldata.name )  { delete [] ldata.name; ldata.name = (const char *) nullptr; }
+g = *ToGrid;
+
+if ( ToGrid )  { delete ToGrid; ToGrid = (Grid *) nullptr; }
 
    //
    // done
