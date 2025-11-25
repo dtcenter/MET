@@ -299,11 +299,13 @@ class VxPairBase {
 
       //////////////////////////////////////////////////////////////////
 
-      StringArray msg_typ_sfc;   // List of surface message types
-      StringArray msg_typ_lnd;   // List of surface land message types
-      StringArray msg_typ_wtr;   // List of surface water message types
+      StringArray msg_typ_sfc;     // Surface message types
+      StringArray msg_typ_lnd;     // Surface land message types
+      StringArray msg_typ_wtr;     // Surface water message types
+      StringArray msg_typ_lapsert; // Lapse rate correction message types
+      StringArray msg_typ_mslagl;  // MSL/AGL conversion message types
 
-      SurfaceInfo sfc_info;      // Land/sea mask and topography info
+      SurfaceInfo sfc_info;        // Land/sea mask and topography info
 
       //////////////////////////////////////////////////////////////////
 
@@ -392,9 +394,7 @@ class VxPairBase {
 
       void set_climo_cdf_info_ptr(const ClimoCDFInfo *);
 
-      void set_msg_typ_sfc(const StringArray &);
-      void set_msg_typ_lnd(const StringArray &);
-      void set_msg_typ_wtr(const StringArray &);
+      void set_msg_typ_groups(const std::map<ConcatString,StringArray> &);
 
       int  get_n_pair() const;
 
@@ -437,9 +437,13 @@ class VxPairBase {
                                 double, double, double,
                                 const ClimoPntInfo &) const;
 
-      bool correct_lapse_rate(double, double, double &, double &) const;
+      bool correct_lapse_rate(const char *, const char *,
+                              double, double,
+                              double &, double &) const;
 
-      bool convert_msl_agl(double, double, double &, double &,
+      bool convert_msl_agl(const char *, const char *,
+                           double, double,
+                           double &, double &,
                            bool update_obs = true) const;
 
       // Retrieve climo data for this point 

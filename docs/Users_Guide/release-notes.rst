@@ -9,8 +9,8 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
-MET Version 12.2.0-rc1 Release Notes (20250926)
------------------------------------------------
+MET Version 12.2.0 Release Notes (20251113)
+-------------------------------------------
 
   .. dropdown:: Enhancements
 
@@ -32,6 +32,12 @@ MET Version 12.2.0-rc1 Release Notes (20250926)
        (`#3226 <https://github.com/dtcenter/MET/issues/3226>`_).
      * Add new pre-defined grid definitions to support the computation of CBS scores
        (`#3232 <https://github.com/dtcenter/MET/issues/3232>`_).
+     * Refine default lapse rates for orographic corrections
+       (`#3258 <https://github.com/dtcenter/MET/issues/3258>`_).
+     * Refine handling of missing data for orographic corrections
+       (`#3270 <https://github.com/dtcenter/MET/issues/3270>`_).
+     * Enhance the MET tools to return consistent exit codes
+       (`#3278 <https://github.com/dtcenter/MET/issues/3278>`_).
 
   .. dropdown:: Bugfixes
 
@@ -45,9 +51,15 @@ MET Version 12.2.0-rc1 Release Notes (20250926)
        (`#3219 <https://github.com/dtcenter/MET/issues/3219>`_).
      * Bugfix: Fix segfault when reading climatological data from a CF-compliant NetCDF file fails
        (`#3235 <https://github.com/dtcenter/MET/issues/3235>`_).
+     * Update the logic to apply "set_attr_grid" before "ShiftRight"
+       (`#3255 <https://github.com/dtcenter/MET/issues/3255>`_).
+     * Fix ASCII2NC hang when run with an empty input file
+       (`#3266 <https://github.com/dtcenter/MET/issues/3266>`_).
 
   .. dropdown:: Repository, build, and test
 
+     * Confirm that the METplus difference logic handles MTD output file
+       (`#977 <https://github.com/dtcenter/MET/issues/977>`_).
      * Switch MET's R-based differencing logic over to using the Python-based METplus implementation
        (`#2718 <https://github.com/dtcenter/MET/issues/2718>`_).
 
@@ -59,6 +71,8 @@ MET Version 12.2.0-rc1 Release Notes (20250926)
        (`METbaseimage#33 <https://github.com/dtcenter/METbaseimage/issues/33>`_).
      * METbaseimage: Address Critical CVEs from Grype scans of the Docker images
        (`METplus-Internal#61 <https://github.com/dtcenter/METplus-Internal/issues/61>`_).
+     * Enhance the "Create Release Docker Images" METplus workflows to determine and build the most recent bugfix versions
+       (`METplus-Internal#64 <https://github.com/dtcenter/METplus-Internal/issues/64>`_).
 
 MET Upgrade Instructions
 ========================
