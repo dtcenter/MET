@@ -74,6 +74,7 @@ class Python3_Dict {
       PyObject *    lookup_dict (const char * key) const;
       PyObject *    lookup_list (const char * key) const;
 
+      bool          has (const char * key) const;
 };
 
 
