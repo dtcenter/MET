@@ -234,6 +234,19 @@ When specified as a dictionary, the contents of the **grid** entry vary based up
   • d_km, r_km                     (double)
   • nx, ny                         (int)
 
+• **Lambert Azimuthal Equal Area** grid dictionary entries:
+
+  • type                           ("Lambert Azimuthal Equal Area")
+  • name                           (string)
+  • spheroid_name (optional)       (string)
+  • radius_km or                   (double)
+    equatorial_radius_km, polar_radius_km
+  • lat_first, lon_first           (double)
+  • standard_lat                   (double)
+  • central_lon                    (double)
+  • dx_km, dy_km                   (double)
+  • nx, ny                         (int)
+
 • **Polar Stereographic** grid dictionary entries:
 
   • type                           ("Polar Stereographic")

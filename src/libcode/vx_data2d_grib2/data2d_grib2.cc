@@ -1328,8 +1328,8 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
 
       //  build an LaeaData struct with the projection information
       LaeaData laea;
-      laea.name           = laea_proj_type;
-      m_strncpy(laea.spheroid_name, "Grib template",m_strlen("Grib template"), method_name);
+      laea.name          = laea_proj_type;
+      laea.spheroid_name = "Grib template";
 
       //  earth shape
       //  Reference: https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_table3-2.shtml

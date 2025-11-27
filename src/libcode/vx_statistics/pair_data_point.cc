@@ -550,8 +550,8 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
    if(!is_keeper_vld(pnt_obs_str.c_str(), hdr_ut)) return;
 
    // Check observation value
-   double obs_v = obs_arr[4];
-   if(!is_keeper_obs(pnt_obs_str.c_str(), obs_v)) return;
+   double orig_obs_v = obs_arr[4];
+   if(!is_keeper_obs(pnt_obs_str.c_str(), orig_obs_v)) return;
 
    // Check location
    double hdr_lat = hdr_arr[0];
@@ -605,6 +605,9 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
          // Loop through the interpolation methods
          for(int i_interp=0; i_interp<n_interp; i_interp++) {
 
+            // Store observation value
+            double obs_v = orig_obs_v;
+
             // Check climatology values
             ClimoPntInfo cpi;
             if(!is_keeper_climo(pnt_obs_str.c_str(),
@@ -625,7 +628,8 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
             if(sfc_info.lapse_rate_correction_apply_to != FieldType::None &&
                (msg_typ_lapsert.all_empty() ||
                 msg_typ_lapsert.reg_exp_match(hdr_typ_str)) &&
-               !correct_lapse_rate(topo_elv, hdr_elv, fcst_v, obs_v)) {
+               !correct_lapse_rate(pnt_obs_str.c_str(), hdr_sid_str,
+                                   topo_elv, hdr_elv, fcst_v, obs_v)) {
                inc_count(rej_mpr, i_msg_typ, i_mask, i_interp);
                continue;
             }
@@ -634,7 +638,8 @@ void VxPairDataPoint::add_point_obs(const float *hdr_arr,
             if(sfc_info.msl_agl_conversion_apply_to != FieldType::None &&
                (msg_typ_mslagl.all_empty() ||
                 msg_typ_mslagl.reg_exp_match(hdr_typ_str)) &&
-               !convert_msl_agl(topo_elv, hdr_elv, fcst_v, obs_v)) {
+               !convert_msl_agl(pnt_obs_str.c_str(), hdr_sid_str,
+                                topo_elv, hdr_elv, fcst_v, obs_v)) {
                inc_count(rej_mpr, i_msg_typ, i_mask, i_interp);
                continue;
             }
