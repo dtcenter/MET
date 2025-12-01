@@ -960,6 +960,232 @@ return 1;
 
 
    //
+   //  Code for class LineDataFiles
+   //
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+LineDataFiles::LineDataFiles()
+
+{
+
+init_from_scratch();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+LineDataFiles::~LineDataFiles()
+
+{
+
+clear();
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+LineDataFiles::LineDataFiles(const LineDataFiles &j)
+
+{
+
+init_from_scratch();
+
+assign(j);
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+LineDataFiles & LineDataFiles::operator=(const LineDataFiles &j)
+
+{
+
+if(this == &j) return *this;
+
+assign(j);
+
+return *this;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void LineDataFiles::init_from_scratch()
+
+{
+
+clear();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void LineDataFiles::clear()
+
+{
+
+close();
+
+Filenames.clear();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void LineDataFiles::assign(const LineDataFiles &j)
+
+{
+
+clear();
+
+Filenames = j.Filenames;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void LineDataFiles::add(const char * path)
+
+{
+
+Filenames.emplace_back(path);
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+bool LineDataFiles::open()
+
+{
+
+close();
+
+   //
+   // check for at least one file to read
+   //
+
+if ( Filenames.empty() )  {
+
+   mlog << Warning << "\nLineDataFiles::open() -> "
+        << "no files to open\n\n";
+
+   return false;
+
+}
+
+   //
+   // open the first file for reading
+   //
+
+CurFileNumber = 0;
+
+if ( !CurLDF.open(Filenames[CurFileNumber].c_str()) )  return false;
+
+return true;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void LineDataFiles::close()
+
+{
+
+CurLDF.close();
+
+CurFileNumber = -1;
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void LineDataFiles::rewind()
+
+{
+
+open();
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+int LineDataFiles::operator>>(DataLine & a)
+
+{
+
+   // Check the status of the current file
+
+if ( !CurLDF.ok() )  {
+
+   // Increment the file index
+   CurFileNumber++;
+
+   // Check for the last file
+   if ( CurFileNumber == Filenames.size() )  return false;
+
+   // Open the next file
+   CurLDF.close();
+
+   if( !CurLDF.open(Filenames[CurFileNumber].c_str()) ) {
+      mlog << Error << "\nLineDataFiles::operator>>(DataLine &) -> "
+           << "can't open file \"" << Filenames[CurFileNumber]
+           << "\" for reading\n\n";
+      exit ( 1 );
+   }
+
+   // List file being read
+   mlog << Debug(3) << "Reading file " << CurFileNumber + 1
+        << " of " << Filenames.size() << ": " << Filenames[CurFileNumber]
+        << "\n";
+
+} // end if
+
+return CurLDF >> a;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+   //
    //  Code for misc functions
    //
 
