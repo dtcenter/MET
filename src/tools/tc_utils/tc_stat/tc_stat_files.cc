@@ -69,13 +69,13 @@ void TCStatFiles::add_files(const StringArray &files) {
 
 bool TCStatFiles::operator>>(TrackPairInfo &pair) {
    TCStatLine line;
-   bool status;
+   bool status = false;
 
    // Initialize
    pair.clear();
 
    // Read lines to the end of the track or file
-   while((status = (*this >> line))) {
+   while(*this >> line) {
 
       // Skip header and non-TCMPR/TCDIAG lines
       if(line.is_header() ||
@@ -97,30 +97,34 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
             }
          }
 
+         status = true;
+
          break;
       }
    } // end while
 
-   return true;
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
    TCStatLine line;
-   bool status;
+   bool status = false;
 
    // Initialize
    pair.clear();
 
-   // Read next line
-   while((status = (*this >> line))) {
+   // Read lines to the end of the pair or file 
+   while(*this >> line) {
 
       // Skip header and non-PROBRIRW lines
       if(line.is_header() || line.type() != TCStatLineType::ProbRIRW) continue;
 
       // Add the current point
       pair.set(line);
+
+      status = true;
 
       break;
 
@@ -132,13 +136,15 @@ bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
 ////////////////////////////////////////////////////////////////////////
 
 bool TCStatFiles::operator>>(TCStatLine &line) {
-   bool status;
+   bool status = false;
 
    // Read next line
-   while((status = (*this >> line))) {
+   while(LineDataFiles::operator>>(line)) {
 
       // Skip header and invalid line types
       if(line.is_header() || line.type() == TCStatLineType::None) continue;
+
+      status = true;
 
       break;
 
