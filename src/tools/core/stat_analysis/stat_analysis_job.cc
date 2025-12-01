@@ -45,6 +45,7 @@
 //   022    05/28/21  Halley Gotway   Add MCTS HSS_EC output.
 //   023    11/10/22  Halley Gotway   MET #2339 Add SEEPS and SEEPS_MPR
 //                                      line types.
+//   024    12/01/25  Halley Gotway   MET #2698 Refine temp file usage.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -156,14 +157,17 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &job) {
 void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
             int n_job, const ConcatString &tmp_dir,
             const ConcatString &tmp_path, ofstream *sa_out) {
-   LineDataFile f;
+   LineDataFiles f;
    int n_in, n_out;
    gsl_rng *rng_ptr = (gsl_rng *) nullptr;
+
+   // Add the temp file location
+   f.add(tmp_path.c_str());
 
    //
    // Open up the temp file for reading the intermediate STAT line data
    //
-   if(!f.open(tmp_path.c_str())) {
+   if(!f.open()) {
       mlog << Error << "\ndo_job() -> "
            << "can't open the temporary file \"" << tmp_path
            << "\" for reading!\n\n";
@@ -291,7 +295,7 @@ void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_job_filter(const ConcatString &jobstring, LineDataFile &f,
+void do_job_filter(const ConcatString &jobstring, LineDataFiles &f,
                    STATAnalysisJob &job, int &n_in, int &n_out,
                    ofstream *sa_out) {
    ConcatString out_line;
@@ -349,7 +353,7 @@ void do_job_filter(const ConcatString &jobstring, LineDataFile &f,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
+void do_job_summary(const ConcatString &jobstring, LineDataFiles &f,
                     STATAnalysisJob &job, int &n_in, int &n_out,
                     ofstream *sa_out, gsl_rng *rng_ptr) {
    map<ConcatString, AggrSummaryInfo> summary_map;
@@ -407,7 +411,7 @@ void do_job_summary(const ConcatString &jobstring, LineDataFile &f,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
+void do_job_aggr(const ConcatString &jobstring, LineDataFiles &f,
                  STATAnalysisJob &job, int &n_in, int &n_out,
                  ofstream *sa_out) {
    STATLine line;
@@ -610,7 +614,7 @@ void do_job_aggr(const ConcatString &jobstring, LineDataFile &f,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_job_aggr_stat(const ConcatString &jobstring, LineDataFile &f,
+void do_job_aggr_stat(const ConcatString &jobstring, LineDataFiles &f,
                       STATAnalysisJob &job, int &n_in, int &n_out,
                       ofstream *sa_out, const ConcatString &tmp_dir,
                       gsl_rng *rng_ptr) {
@@ -4222,7 +4226,7 @@ void write_job_ss_index(STATAnalysisJob &job,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
+void do_job_ss_index(const ConcatString &jobstring, LineDataFiles &f,
                      STATAnalysisJob &job, int &n_in, int &n_out,
                      ofstream *sa_out) {
    map<ConcatString, AggrSSIndexInfo> ssidx_map;
@@ -4272,7 +4276,7 @@ void do_job_ss_index(const ConcatString &jobstring, LineDataFile &f,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void do_job_ramp(const ConcatString &jobstring, LineDataFile &f,
+void do_job_ramp(const ConcatString &jobstring, LineDataFiles &f,
                  STATAnalysisJob &job, int &n_in, int &n_out,
                  ofstream *sa_out) {
    STATLine line;
