@@ -91,14 +91,14 @@ static void set_lookin_path(const StringArray &);
 static void set_out_filename(const StringArray &);
 static void set_tmp_dir(const StringArray &);
 static void set_config_file(const StringArray &);
-static void process_search_dirs();
+
+static StringArray process_search_dirs(bool);
+#ifdef WITH_PYTHON
+static StringArray process_python(const STATAnalysisJob &);
+#endif
 static void process_stat_file(const char *, const STATAnalysisJob &, int &, int &);
 
-#ifdef WITH_PYTHON
-static void process_python(const STATAnalysisJob &);
-#endif
-
-static void process_job(const char *, int);
+static void process_job(const char *, int, const StringArray &);
 static void clean_up();
 
 //
@@ -108,14 +108,12 @@ static void set_config(const char *);
 static void set_search_dir(const char *);
 static void set_out_file(const char *);
 
-static void open_temps();
-
+static void open_temp_file();
 
 ////////////////////////////////////////////////////////////////////////
 
 int met_main(int argc, char * argv []) {
    int i;
-   StringArray jobs_sa;
    ConcatString default_config_file;
 
    //
@@ -178,14 +176,33 @@ int met_main(int argc, char * argv []) {
            << default_job.get_jobstring() << "\"\n";
 
       //
+      // Get the jobs to be run
+      //
+      StringArray jobs_sa;
+
+      if(default_job.job_type != STATJobType::None) {
+         jobs_sa.add(command_line_job_options);
+      }
+      else if(config_file.length() > 0) {
+         jobs_sa = conf.lookup_string_array(conf_key_jobs);
+      }
+      else {
+         mlog << Error << "\nmain() -> "
+              << "at least one job must be specified on the command line "
+              << "with \"-job\" or in a configuration file with \"-config\"!\n\n";
+         throw 1;
+      }
+
+      //
       // Process the STAT files found in the search directories.
       //
+      StringArray job_input_files;
 #ifdef WITH_PYTHON
-      if ( using_python )  {
-         process_python(default_job);
+      if(using_python) {
+         job_input_files = process_python(default_job);
       } else {
 #endif
-         process_search_dirs();
+         job_input_files = process_search_dirs(jobs_sa.n() > 1);
 #ifdef WITH_PYTHON
       }
 #endif
@@ -194,7 +211,7 @@ int met_main(int argc, char * argv []) {
       // If a job was specified on the command line, run it.
       //
       if(default_job.job_type != STATJobType::None) {
-         process_job(command_line_job_options.c_str(), 1);
+         process_job(command_line_job_options.c_str(), 1, job_input_files);
       }
       //
       // Or process config file jobs.
@@ -211,18 +228,9 @@ int met_main(int argc, char * argv []) {
             throw 1;
          }
 
-         for(i=0; i<jobs_sa.n_elements(); i++) {
-            process_job(jobs_sa[i].c_str(), i+1);
+         for(i=0; i<jobs_sa.n(); i++) {
+            process_job(jobs_sa[i].c_str(), i+1, job_input_files);
          }
-      }
-      //
-      // At least one job must be defined.
-      //
-      else {
-         mlog << Error << "\nmain() -> "
-              << "at least one job must be specified on the command line "
-              << "with \"-job\" or in a configuration file with \"-config\"!\n\n";
-         throw 1;
       }
    }
    catch(int j) { // Catch errors
@@ -445,29 +453,26 @@ void set_out_file(const char *path) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_search_dirs() {
-   int n, i, j, max_len, n_read, n_keep;
-
-   //
-   // Initialize
-   //
-   n_read = n_keep = 0;
+StringArray process_search_dirs(bool do_temp_file) {
 
    //
    // Get the list of stat files in the search directories
    //
    ConcatString reg_exp_str(stat_file_ext);
    reg_exp_str << "$";
-   files = get_filenames(search_dirs, nullptr, reg_exp_str.c_str());
+   input_files = get_filenames(search_dirs, nullptr, reg_exp_str.c_str());
 
-   n = files.n_elements();
-
-   if(n == 0) {
+   if(input_files.n() == 0) {
       mlog << Error << "\nprocess_search_dirs() -> "
            << "no STAT files found in the directories specified!\n\n";
 
       throw 1;
    }
+
+   //
+   // Return full list of input files
+   //
+   if(!do_temp_file) return input_files;
 
    //
    // Apply the GO Index or CBS Index filtering criteria.
@@ -507,35 +512,41 @@ void process_search_dirs() {
    //
    // Open up the temp file for storing the intermediate STAT line data
    //
-   open_temps();
+   open_temp_file();
 
    //
    // Go through each input file
    //
-   max_len = 0;
+   int max_len = 0;
 
-   for(i=0; i<n; i++)  {
-     j = files[i].length();
+   for(int i=0; i<input_files.n(); i++)  {
+      int j = input_files[i].length();
       if(j > max_len) max_len = j;
    }
    max_len += 3;
 
-   mlog << Debug(2) << "Processing " << n << " STAT files.\n";
+   mlog << Debug(2) << "Processing " << input_files.n() << " STAT files.\n";
 
-   for(i=0; i<n; i++) {
+   //
+   // Initialize counters
+   //
+   int n_read = 0;
+   int n_keep = 0;
+
+   for(int i=0; i<input_files.n(); i++) {
       if(mlog.verbosity_level() > 2) {
 
-         mlog << Debug(3) << "Processing STAT file \"" << files[i] << "\" ";
+         mlog << Debug(3) << "Processing STAT file \"" << input_files[i] << "\" ";
 
-         for(j=files[i].length(); j<max_len; j++) mlog << '.';
+         for(int j=input_files[i].length(); j<max_len; j++) mlog << '.';
 
-         mlog << " " << i+1 << " of " << n << "\n";
+         mlog << " " << i+1 << " of " << input_files.n() << "\n";
 
          if((i%5) == 4) mlog << '\n';
 
       }
 
-      process_stat_file(files[i].c_str(), default_job, n_read, n_keep);
+      process_stat_file(input_files[i].c_str(), default_job, n_read, n_keep);
    }
 
    mlog << Debug(2) << "STAT Lines read     = " << n_read << "\n";
@@ -543,7 +554,13 @@ void process_search_dirs() {
 
    tmp_out.close();
 
-   return;
+   //
+   // Return path to temp file
+   //
+   StringArray sa;
+   sa.add(tmp_path);
+
+   return sa;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -591,59 +608,44 @@ void process_stat_file(const char *filename, const STATAnalysisJob &job, int &n_
 
 #ifdef WITH_PYTHON
 
-void process_python(const STATAnalysisJob & job)
+StringArray process_python(const STATAnalysisJob & job) {
 
-{
+   PyLineDataFile *pldf = new PyLineDataFile;
 
-int j = 0;
-STATLine line;
-LineDataFile * f = 0;
-PyLineDataFile * pldf = 0;
-
-pldf = new PyLineDataFile;
-
-if ( ! pldf->open(user_script_path.c_str(), user_script_args) )  {
-
-   mlog << Error << "\nprocess_python() -> "
-        << "unable to open user script file \""
-        << user_script_path << "\"\n\n";
-
-   throw 1;
-
-}
-
-f = pldf;
-
-open_temps();
-
-while((*f) >> line) {
-
-      //
-      // Continue if the line is not a valid STAT line.
-      //
-
-   if(line.type() == STATLineType::none) continue;
-
-      //
-      // Pass header lines through to the output
-      //
-
-   if(line.is_header() || job.is_keeper(line)) {
-
-      tmp_out << line;
+   if(!pldf->open(user_script_path.c_str(), user_script_args)) {
+      mlog << Error << "\nprocess_python() -> "
+           << "unable to open user script file \""
+           << user_script_path << "\"\n\n";
+      throw 1;
    }
 
-}   // while
+   LineDataFile *f = pldf;
+
+   open_temp_file();
+
+   STATLine line;
+   while((*f) >> line) {
+
+      // Continue if the line is not a valid STAT line.
+      if(line.type() == STATLineType::none) continue;
+
+      // Pass header lines through to the output
+      if(line.is_header() || job.is_keeper(line)) tmp_out << line;
+
+   } // while
 
    //
    //  done
    //
 
-f->close();
+   f->close();
 
-if(pldf) { delete pldf; pldf = (PyLineDataFile *) nullptr; }
+   if(pldf) { delete pldf; pldf = (PyLineDataFile *) nullptr; }
 
-return;
+   StringArray sa;
+   sa.add(tmp_path);
+
+   return sa;
 
 }
 
@@ -651,7 +653,8 @@ return;
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_job(const char * jobstring, int n_job) {
+void process_job(const char * jobstring, int n_job,
+                 const StringArray &job_input_files) {
    STATAnalysisJob job;
    ConcatString full_jobstring;
 
@@ -727,7 +730,7 @@ void process_job(const char * jobstring, int n_job) {
    //
    // Do the job
    //
-   do_job(full_jobstring, job, n_job, tmp_dir, tmp_path, sa_out);
+   do_job(full_jobstring, job_input_files, job, n_job, tmp_dir, sa_out);
 
    return;
 }
@@ -860,10 +863,7 @@ void set_config_file(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-
-void open_temps()
-
-{
+void open_temp_file() {
 
    //
    // If the tmp_dir has not already been set on the command line,
@@ -885,17 +885,15 @@ void open_temps()
    //
    tmp_out.open(tmp_path.c_str());
    if(!tmp_out) {
-      mlog << Error << "\nopen_temps() -> "
+      mlog << Error << "\nopen_temp_file() -> "
            << "can't open the temporary file \"" << tmp_path
            << "\" for writing!\n\n";
 
       throw 1;
    }
 
-
-return;
+   return;
 
 }
-
 
 ////////////////////////////////////////////////////////////////////////

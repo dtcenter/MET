@@ -51,8 +51,8 @@
 
 extern void set_job_from_config(MetConfig &, STATAnalysisJob &);
 
-extern void do_job(const ConcatString &, STATAnalysisJob &, int,
-               const ConcatString &, const ConcatString &,
+extern void do_job(const ConcatString &, const StringArray &,
+               STATAnalysisJob &, int, const ConcatString &,
                std::ofstream *);
 
 extern void do_job_filter(const ConcatString &, LineDataFiles &,

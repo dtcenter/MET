@@ -257,6 +257,8 @@ class LineDataFiles {
       void clear();
 
       void add(const char *);
+      void add(const std::string &);
+      void add(const std::vector<std::string> &);
 
       bool open();
 

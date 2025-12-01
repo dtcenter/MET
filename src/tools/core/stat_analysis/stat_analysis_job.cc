@@ -154,23 +154,23 @@ void set_job_from_config(MetConfig &c, STATAnalysisJob &job) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void do_job(const ConcatString &jobstring, STATAnalysisJob &job,
-            int n_job, const ConcatString &tmp_dir,
-            const ConcatString &tmp_path, ofstream *sa_out) {
+void do_job(const ConcatString &jobstring, const StringArray &in_files,
+            STATAnalysisJob &job, int n_job,
+            const ConcatString &tmp_dir, ofstream *sa_out) {
    LineDataFiles f;
    int n_in, n_out;
    gsl_rng *rng_ptr = (gsl_rng *) nullptr;
 
-   // Add the temp file location
-   f.add(tmp_path.c_str());
+   // Add the input files
+   f.add(in_files.s);
 
    //
-   // Open up the temp file for reading the intermediate STAT line data
+   // Open the input files
    //
    if(!f.open()) {
       mlog << Error << "\ndo_job() -> "
-           << "can't open the temporary file \"" << tmp_path
-           << "\" for reading!\n\n";
+           << "can't open the " << in_files.n()
+           << " input files for reading!\n\n";
       throw 1;
    }
 

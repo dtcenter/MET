@@ -66,7 +66,7 @@ static const char * cbs_index_config_file =
 
 // Search directories and the corresponding files set with -lookin
 static StringArray search_dirs;
-static StringArray files;
+static StringArray input_files;
 
 // Output file set with -out
 static ConcatString out_file;
