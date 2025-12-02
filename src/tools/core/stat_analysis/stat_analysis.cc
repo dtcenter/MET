@@ -475,41 +475,6 @@ StringArray process_search_dirs(bool do_temp_file) {
    if(!do_temp_file) return input_files;
 
    //
-   // Apply the GO Index or CBS Index filtering criteria.
-   //
-   if(default_job.job_type == STATJobType::go_index ||
-      default_job.job_type == STATJobType::cbs_index) {
-
-      MetConfig ss_index_conf;
-      STATAnalysisJob ss_index_job;
-
-      ConcatString config_file =
-         (default_job.job_type == STATJobType::go_index ?
-          replace_path(go_index_config_file) :
-          replace_path(cbs_index_config_file));
-
-      mlog << Debug(1) << "Skill Score Index Config File: "
-           << config_file << "\n";
-
-      //
-      // Read the config files for the constants and the skill score index.
-      //
-      ss_index_conf.read(replace_path(config_const_filename).c_str());
-      ss_index_conf.read(config_file.c_str());
-
-      //
-      // Parse the Skill Score Index config file into the search job.
-      //
-      ss_index_job.set_job_type(default_job.job_type);
-      set_job_from_config(ss_index_conf, ss_index_job);
-
-      //
-      // Amend the default job with Skill Score Index filtering criteria.
-      //
-      default_job.parse_job_command(ss_index_job.get_jobstring().c_str());
-   }
-
-   //
    // Open up the temp file for storing the intermediate STAT line data
    //
    open_temp_file();
