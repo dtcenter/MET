@@ -479,17 +479,6 @@ StringArray process_search_dirs(bool do_temp_file) {
    //
    open_temp_file();
 
-   //
-   // Go through each input file
-   //
-   int max_len = 0;
-
-   for(int i=0; i<input_files.n(); i++)  {
-      int j = input_files[i].length();
-      if(j > max_len) max_len = j;
-   }
-   max_len += 3;
-
    mlog << Debug(2) << "Processing " << input_files.n() << " STAT files.\n";
 
    //
@@ -498,20 +487,14 @@ StringArray process_search_dirs(bool do_temp_file) {
    int n_read = 0;
    int n_keep = 0;
 
+   //
+   // Filter input data into a temp file
+   //
    for(int i=0; i<input_files.n(); i++) {
-      if(mlog.verbosity_level() > 2) {
-
-         mlog << Debug(3) << "Processing STAT file \"" << input_files[i] << "\" ";
-
-         for(int j=input_files[i].length(); j<max_len; j++) mlog << '.';
-
-         mlog << " " << i+1 << " of " << input_files.n() << "\n";
-
-         if((i%5) == 4) mlog << '\n';
-
-      }
-
-      process_stat_file(input_files[i].c_str(), default_job, n_read, n_keep);
+      mlog << Debug(3) << "Reading file " << i+1 << " of "
+           << input_files.n() << ": " << input_files[i] << "\n";
+      process_stat_file(input_files[i].c_str(), default_job,
+                        n_read, n_keep);
    }
 
    mlog << Debug(2) << "STAT Lines read     = " << n_read << "\n";
@@ -520,7 +503,7 @@ StringArray process_search_dirs(bool do_temp_file) {
    tmp_out.close();
 
    //
-   // Return path to temp file
+   // Return path to the temp file
    //
    StringArray sa;
    sa.add(tmp_path);
@@ -530,8 +513,8 @@ StringArray process_search_dirs(bool do_temp_file) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_stat_file(const char *filename, const STATAnalysisJob &job, int &n_read, int &n_keep) {
-
+void process_stat_file(const char *filename, const STATAnalysisJob &job,
+                       int &n_read, int &n_keep) {
    STATLine line;
    LineDataFile f;
 
@@ -638,7 +621,7 @@ void process_job(const char * jobstring, int n_job,
    //
    if(jobstring != command_line_job_options) {
       mlog << Debug(4)
-           << "\nAmending Job " << n_job << " with options: \""
+           << "\nAmending job " << n_job << " with options: \""
            << jobstring << "\"\n";
       job.parse_job_command(jobstring);
    }
@@ -673,7 +656,7 @@ void process_job(const char * jobstring, int n_job,
       // Amend the current job with Skill Score Index filtering criteria.
       //
       mlog << Debug(4)
-           << "\nAmending Job " << n_job << " with Skill Score Index configuration file: "
+           << "\nAmending job " << n_job << " with Skill Score Index configuration file: "
            << config_file << "\n";
       job.parse_job_command(ss_index_job.get_jobstring().c_str());
    }
@@ -682,7 +665,7 @@ void process_job(const char * jobstring, int n_job,
    // Override with any command line options
    //
    mlog << Debug(4)
-        << "\nAmending Job " << n_job << " with command line options: \""
+        << "\nAmending job " << n_job << " with command line options: \""
         << command_line_job_options << "\"\n";
    job.parse_job_command(command_line_job_options.c_str());
 
