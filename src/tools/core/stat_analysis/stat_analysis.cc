@@ -155,7 +155,7 @@ int met_main(int argc, char * argv []) {
    // Write out the default job
    //
    mlog << Debug(4)
-        << "Default Job from the config file: \""
+        << "Default job from the config file: \""
         << default_job.get_jobstring() << "\"\n";
 
    //
@@ -605,23 +605,20 @@ void process_job(const char * jobstring, int n_job,
    STATAnalysisJob job;
    ConcatString full_jobstring;
 
-   mlog << Debug(4) << "process_job(jobstring): "
-        << jobstring << "\n";
-
    //
    // Initialize to the default job
    //
    mlog << Debug(4)
-        << "\nInitializing Job " << n_job << " to default job: \""
+        << "\nInitializing job " << n_job << " to default job: \""
         << default_job.get_jobstring() << "\"\n";
    job = default_job;
 
    //
-   // Parse the job command line options
+   // Parse the job command options
    //
    if(jobstring != command_line_job_options) {
       mlog << Debug(4)
-           << "\nAmending job " << n_job << " with options: \""
+           << "Amending job " << n_job << " with options: \""
            << jobstring << "\"\n";
       job.parse_job_command(jobstring);
    }
@@ -656,7 +653,7 @@ void process_job(const char * jobstring, int n_job,
       // Amend the current job with Skill Score Index filtering criteria.
       //
       mlog << Debug(4)
-           << "\nAmending job " << n_job << " with Skill Score Index configuration file: "
+           << "Amending job " << n_job << " with Skill Score Index configuration file: "
            << config_file << "\n";
       job.parse_job_command(ss_index_job.get_jobstring().c_str());
    }
@@ -665,7 +662,7 @@ void process_job(const char * jobstring, int n_job,
    // Override with any command line options
    //
    mlog << Debug(4)
-        << "\nAmending job " << n_job << " with command line options: \""
+        << "Amending job " << n_job << " with command line options: \""
         << command_line_job_options << "\"\n";
    job.parse_job_command(command_line_job_options.c_str());
 
