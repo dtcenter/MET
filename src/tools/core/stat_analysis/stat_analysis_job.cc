@@ -161,18 +161,10 @@ void do_job(const ConcatString &jobstring, const StringArray &in_files,
    int n_in, n_out;
    gsl_rng *rng_ptr = (gsl_rng *) nullptr;
 
-   // Add the input files
+   //
+   // Store the input files
+   //
    f.add(in_files.s);
-
-   //
-   // Open the input files
-   //
-   if(!f.open()) {
-      mlog << Error << "\ndo_job() -> "
-           << "can't open the " << in_files.n()
-           << " input files for reading!\n\n";
-      throw 1;
-   }
 
    //
    // Initialize n_in and n_out to keep track of the number of lines
@@ -180,7 +172,7 @@ void do_job(const ConcatString &jobstring, const StringArray &in_files,
    //
    n_in = n_out = 0;
 
-   mlog << Debug(2) << "\nProcessing Job " << n_job << ": "
+   mlog << Debug(2) << "\nProcessing job " << n_job << ": "
         << jobstring << "\n";
 
    //
@@ -204,7 +196,7 @@ void do_job(const ConcatString &jobstring, const StringArray &in_files,
    //
    // Print warning for by_column option
    //
-   if(job.by_column.n() > 0              &&
+   if(job.by_column.n() > 0                  &&
       job.job_type != STATJobType::summary   &&
       job.job_type != STATJobType::aggr      &&
       job.job_type != STATJobType::aggr_stat &&

@@ -543,7 +543,6 @@ void process_stat_file(const char *filename, const STATAnalysisJob &job, int &n_
       throw 1;
    }
 
-
    while(f >> line) {
 
       //
