@@ -1134,7 +1134,20 @@ if ( Filenames.empty() )  {
 
 CurFileNumber = 0;
 
-if ( !CurLDF.open(Filenames[CurFileNumber].c_str()) )  return false;
+if( !CurLDF.open(Filenames[CurFileNumber].c_str()) ) {
+   mlog << Error << "\nLineDataFiles::operator>>(DataLine &) -> "
+        << "can't open file \"" << Filenames[CurFileNumber]
+        << "\" for reading\n\n";
+   exit ( 1 );
+}
+
+   //
+   // list file being read
+   //
+
+mlog << Debug(3) << "Reading file " << CurFileNumber + 1
+     << " of " << Filenames.size() << ": " << Filenames[CurFileNumber]
+     << "\n";
 
 return true;
 
@@ -1177,6 +1190,10 @@ return;
 int LineDataFiles::operator>>(DataLine & a)
 
 {
+
+   // Open the first file, if needed
+
+if ( CurFileNumber < 0 )  open();
 
    // Attempt to read from the current file
 
