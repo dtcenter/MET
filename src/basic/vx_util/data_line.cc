@@ -1178,15 +1178,19 @@ int LineDataFiles::operator>>(DataLine & a)
 
 {
 
-   // Check the status of the current file
+   // Attempt to read from the current file
 
-if ( !CurLDF.ok() )  {
+int status = CurLDF >> a;
+
+   // Check read status
+
+if ( !status && !CurLDF.ok() )  {
 
    // Increment the file index
    CurFileNumber++;
 
    // Check for the last file
-   if ( CurFileNumber == Filenames.size() )  return false;
+   if ( CurFileNumber == Filenames.size() )  return 0;
 
    // Open the next file
    CurLDF.close();
@@ -1203,9 +1207,12 @@ if ( !CurLDF.ok() )  {
         << " of " << Filenames.size() << ": " << Filenames[CurFileNumber]
         << "\n";
 
+   // Read the next line
+   status = CurLDF >> a;
+
 } // end if
 
-return CurLDF >> a;
+return status;
 
 }
 
