@@ -14,10 +14,10 @@ export F90=ifort
 export CC=icc
 export CXX=icpc
 
-export TEST_BASE=/usw/met/12.1.0
+export TEST_BASE=/usw/met/12.2.0
 export COMPILER=intel_2023.2.0
 export MET_SUBDIR=${TEST_BASE}
-export MET_TARBALL=v12.1.0.tar.gz
+export MET_TARBALL=v12.2.0.tar.gz
 export USE_MODULES=TRUE
 export MET_PYTHON=/gpfs/f5/esrl/proj-shared/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v5.1_py3.10/
 export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.10

@@ -6,10 +6,10 @@ export F90=ifx
 export CC=icx
 export CXX=icpx
 
-export TEST_BASE=/work2/06612/tg859120/frontera/MET/12.1.0
+export TEST_BASE=/work2/06612/tg859120/frontera/MET/12.2.0
 export COMPILER=intel_23.1.0
 export MET_SUBDIR=${TEST_BASE}/
-export MET_TARBALL=v12.1.0.tar.gz
+export MET_TARBALL=v12.2.0.tar.gz
 export USE_MODULES=TRUE
 export MET_PYTHON=/work2/06612/tg859120/frontera/miniconda/miniconda3/envs/metplus_v5.1_py3.10
 export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.10
