@@ -202,7 +202,8 @@ int met_main(int argc, char * argv []) {
          job_input_files = process_python(default_job);
       } else {
 #endif
-         job_input_files = process_search_dirs(jobs_sa.n() > 1);
+         job_input_files = process_search_dirs(jobs_sa.n() > 1 &&
+                                               default_job.has_common_filters());
 #ifdef WITH_PYTHON
       }
 #endif
