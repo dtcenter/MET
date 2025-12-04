@@ -113,7 +113,6 @@ static void open_temp_file();
 ////////////////////////////////////////////////////////////////////////
 
 int met_main(int argc, char * argv []) {
-   int i;
    ConcatString default_config_file;
 
    //
@@ -183,7 +182,7 @@ int met_main(int argc, char * argv []) {
       if(default_job.job_type != STATJobType::None) {
          jobs_sa.add(command_line_job_options);
       }
-      else if(config_file.length() > 0) {
+      else if(!config_file.empty()) {
          jobs_sa = conf.lookup_string_array(conf_key_jobs);
       }
       else {
@@ -229,7 +228,7 @@ int met_main(int argc, char * argv []) {
             throw 1;
          }
 
-         for(i=0; i<jobs_sa.n(); i++) {
+         for(int i=0; i<jobs_sa.n(); i++) {
             process_job(jobs_sa[i].c_str(), i+1, job_input_files);
          }
       }
@@ -260,7 +259,7 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void parse_command_line(int &argc, char **argv) {
+static void parse_command_line(int &argc, char **argv) {
    CommandLine cline;
    int i;
 
@@ -338,7 +337,7 @@ void parse_command_line(int &argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void sanity_check() {
+static void sanity_check() {
    unixtime ut_beg, ut_end;
 
    //
@@ -411,7 +410,7 @@ void sanity_check() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const char *path) {
+static void set_config(const char *path) {
 
    config_file = path;
 
@@ -420,7 +419,7 @@ void set_config(const char *path) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_search_dir(const char *path) {
+static void set_search_dir(const char *path) {
 
    search_dirs.add(path);
 
@@ -429,7 +428,7 @@ void set_search_dir(const char *path) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out_file(const char *path) {
+static void set_out_file(const char *path) {
 
    out_file = path;
 
@@ -454,7 +453,7 @@ void set_out_file(const char *path) {
 
 ////////////////////////////////////////////////////////////////////////
 
-StringArray process_search_dirs(bool do_temp_file) {
+static StringArray process_search_dirs(bool do_temp_file) {
 
    //
    // Get the list of stat files in the search directories
@@ -514,7 +513,7 @@ StringArray process_search_dirs(bool do_temp_file) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_stat_file(const char *filename, const STATAnalysisJob &job,
+static void process_stat_file(const char *filename, const STATAnalysisJob &job,
                        int &n_read, int &n_keep) {
    STATLine line;
    LineDataFile f;
@@ -556,9 +555,9 @@ void process_stat_file(const char *filename, const STATAnalysisJob &job,
 
 #ifdef WITH_PYTHON
 
-StringArray process_python(const STATAnalysisJob & job) {
+static StringArray process_python(const STATAnalysisJob & job) {
 
-   PyLineDataFile *pldf = new PyLineDataFile;
+   auto *pldf = new PyLineDataFile;
 
    if(!pldf->open(user_script_path.c_str(), user_script_args)) {
       mlog << Error << "\nprocess_python() -> "
@@ -601,7 +600,7 @@ StringArray process_python(const STATAnalysisJob & job) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_job(const char * jobstring, int n_job,
+static void process_job(const char * jobstring, int n_job,
                  const StringArray &job_input_files) {
    STATAnalysisJob job;
    ConcatString full_jobstring;
@@ -682,7 +681,7 @@ void process_job(const char * jobstring, int n_job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void clean_up() {
+static void clean_up() {
 
    //
    // Delete the temp file if it exists
@@ -740,7 +739,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_lookin_path(const StringArray & a)
+static void set_lookin_path(const StringArray & a)
 
 {
 
@@ -776,13 +775,13 @@ if ( strcmp(a[0].c_str(), python_target_string) == 0 )  {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out_filename(const StringArray & a) {
+static void set_out_filename(const StringArray & a) {
    set_out_file(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_tmp_dir(const StringArray & a) {
+static void set_tmp_dir(const StringArray & a) {
    tmp_dir << a[0];
    DIR * dp = 0;
 
@@ -802,13 +801,13 @@ void set_tmp_dir(const StringArray & a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config_file(const StringArray & a) {
+static void set_config_file(const StringArray & a) {
    set_config(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void open_temp_file() {
+static void open_temp_file() {
 
    //
    // If the tmp_dir has not already been set on the command line,
