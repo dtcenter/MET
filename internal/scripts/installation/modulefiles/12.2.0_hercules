@@ -15,6 +15,6 @@ set share $base/$ver/share/met
 set lib_base $base/12.2.0
 setenv MET_ROOT $base/$ver/MET-12.2.0
 
-prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/work/noaa/ovp/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin
+prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/work/noaa/ovp/miniconda/miniconda3/envs/metplus_v6.1_py3.12/bin
 
-setenv MET_PYTHON_EXE /work/noaa/ovp/miniconda/miniconda3/envs/metplus_v5.1_py3.10/bin/python
+#setenv MET_PYTHON_EXE /work/noaa/ovp/miniconda/miniconda3/envs/metplus_v6.1_py3.12/bin/python
