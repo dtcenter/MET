@@ -825,6 +825,11 @@ static void open_temp_file() {
    tmp_path = make_temp_file_name(tmp_file.c_str(), nullptr);
 
    //
+   // Print temp file location
+   //
+   mlog << Debug(4) << "Writing temp file: " << tmp_path << "\n";
+
+   //
    // Open the temp file
    //
    tmp_out.open(tmp_path.c_str());
