@@ -36,7 +36,7 @@ static void read_netcdf_grid_v2                    (const NcFile *, Grid &);
 static LatLonData        get_latlon_data           (const NcFile *);
 static RotatedLatLonData get_rot_latlon_data       (const NcFile *);
 static LambertData       get_lambert_data          (const NcFile *);
-static RngAziData         get_tcrmw_data            (NcFile *);
+static RngAziData        get_tcrmw_data            (NcFile *);
 static LaeaData          get_laea_data             (const NcFile *);
 static StereographicData get_stereographic_data    (const NcFile *);
 static MercatorData      get_mercator_data         (const NcFile *);
@@ -375,7 +375,7 @@ static LaeaData get_laea_data(const NcFile * ncfile) {
 
    // Spheroid name
    get_global_att(ncfile, string("spheroid_name"), att_value);
-   m_strncpy(data.spheroid_name, att_value.c_str(), att_value.length(), method_name);
+   data.spheroid_name = att_value;
 
    // Grid spacing in km
    get_global_att(ncfile, string("radius_km"), data.radius_km);

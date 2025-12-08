@@ -126,6 +126,23 @@
     </output>
   </test>
 
+  <!-- Regrid using LAEA grid specification string -->
+
+  <test name="regrid_data_plane_GFS_LAEA_GRID_SPEC">
+    <exec>&MET_BIN;/regrid_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/grib1/gfs/gfs_2012040900_F036.grib \
+      "laea 1042 970 44.517153 -17.117129 -2.5 2 2 54.9 6378.137 6356.752314" \
+      &OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_LAEA_GRID_SPEC.nc \
+      -field 'name="TMP"; level="P500";' \
+      -method BILIN -width 2 \
+      -v 1
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/regrid/regrid_data_plane_GFS_TO_LAEA_GRID_SPEC.nc</grid_nc>
+    </output>
+  </test>
+
   <test name="regrid_data_plane_GFS_ROTLATLON_GRID_SPEC">
     <exec>&MET_BIN;/regrid_data_plane</exec>
     <param> \

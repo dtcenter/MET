@@ -698,4 +698,21 @@
     </output>
   </test>
 
+  <test name="python_plot_data_plane_LAEA">
+    <env>
+      <pair><name>INPUT_FILE</name> <value>&DATA_DIR_PYTHON;/letter.txt</value></pair>
+    </env>
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      PYTHON_NUMPY \
+      &OUTPUT_DIR;/python/letter_numpy_LAEA_grid.ps \
+      'name = "&DATA_DIR_PYTHON;/read_ascii_numpy_LAEA_grid.py";' \
+      -plot_range 0.0 255.0 \
+      -title "Lambert Azimuthal Equal Area Grid"
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/python/letter_numpy_LAEA_grid.ps</ps>
+    </output>
+  </test>
+
 </met_test>
