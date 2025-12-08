@@ -16,5 +16,5 @@ setenv MET_ROOT $base/$ver/MET-12.2.0
 
 prepend-path PATH $base/bin:$base/external_libs/bin:/mnt/lfs6/HFIP/dtc-hurr/METplus/miniconda/miniconda3/envs/metplus_v6.1_py3.12/bin
 
-setenv MET_PYTHON_EXE /mnt/lfs5/HFIP/dtc-hurr/METplus/miniconda/miniconda3/envs/metplus_v6.1_py3.12/bin/python
+#setenv MET_PYTHON_EXE /mnt/lfs5/HFIP/dtc-hurr/METplus/miniconda/miniconda3/envs/metplus_v6.1_py3.12/bin/python
 
