@@ -66,7 +66,7 @@ C----------------------------------------------------------------------
       real(C_DOUBLE), parameter :: CAPA  = 0.28589641d0
       real(C_DOUBLE), parameter :: ROG   = 287.04d0/G
       integer, parameter :: ITB=76, JTB=134, ITBQ=152
-     &                     ,JTBQ=440     ! ITB=076,JTB=134,ITBQ=152,JTBQ=440
+     &                     ,JTBQ=440
       real(C_DOUBLE), parameter :: ELIVW = 2.72d6
       real(C_DOUBLE), parameter :: ELOCP  = ELIVW/CP
       real(C_DOUBLE), parameter :: PLQ=70000., THL=210., PTT=2500.
@@ -83,13 +83,15 @@ C----------------------------------------------------------------------
       integer :: ILRES(IM*JM), JLRES(IM*JM), IHRES(IM*JM), JHRES(IM*JM)
       real(C_DOUBLE) :: APE(IM,JM,LM)
       real(C_DOUBLE) :: PSP(IM,JM), THESP(IM,JM)
-      real(C_DOUBLE) :: PL
-      real(C_DOUBLE) :: RDQ, RDTH, RDP, RDTHE
-      real(C_DOUBLE), dimension(JTB) :: QS0, SQS
-      real(C_DOUBLE), dimension(ITB) :: THE0, STHE
-      real(C_DOUBLE), dimension(ITBQ) :: THE0Q, STHEQ
-      real(C_DOUBLE), dimension(ITB,JTB) :: PTBL, TTBL
-      real(C_DOUBLE), dimension(JTBQ,ITBQ) :: TTBLQ
+
+      real(C_DOUBLE), save :: PL
+      real(C_DOUBLE), save :: RDQ, RDTH, RDP, RDTHE
+      real(C_DOUBLE), dimension(JTB), save :: QS0, SQS
+      real(C_DOUBLE), dimension(ITB), save :: THE0, STHE
+      real(C_DOUBLE), dimension(ITBQ), save :: THE0Q, STHEQ
+      real(C_DOUBLE), dimension(ITB,JTB), save :: PTBL, TTBL
+      real(C_DOUBLE), dimension(JTBQ,ITBQ), save :: TTBLQ
+      real(C_DOUBLE), save :: RDPQ, RDTHEQ
       real(C_DOUBLE) :: dpbnd
       integer :: I, J, L, KB, N, KNUML, KNUMH, IEQK, LCLK
       integer :: IVI
@@ -99,10 +101,10 @@ C----------------------------------------------------------------------
       real(C_DOUBLE) :: BQS10K, SQS10K, BQK, SQK, TQK
       real(C_DOUBLE) :: P00K, P10K, P01K, P11K, TPSPK, APESPK, TTHESK
       real(C_DOUBLE) :: PKL, PSFCK, TTHBK
-      real(C_DOUBLE) :: DP, PRESK, DZKL, THETAP, THETAA
+      real(C_DOUBLE) :: DP, PRESK, DZKL, THETAP, THETAA, DELTA
       real(C_DOUBLE) :: esatp, eps, oneps, qsatp, tvp
       real(C_DOUBLE) :: TTH, QQtmp
-      real(C_DOUBLE) :: APESTS, RDPQ, RDTHEQ, FPVSNEW
+      real(C_DOUBLE) :: APESTS, FPVSNEW
       integer :: KBcount, LMHK
 
       ! Tables and state that are filled once in original code via TABLE1/TABLEQ
@@ -114,8 +116,8 @@ C   SET UP LOOKUP TABLE
 C
       ! Initialization of saved table variables: call TABLE1 and TABLEQ once
       IF (.not. ITABL) THEN
-       CALL TABLE1(PTBL,TTBL,PTT,
-     &     RDQ,RDTH,RDP,RDTHE,PL,THL,QS0,SQS,STHE,THE0)
+       CALL TABLE1(PTBL,TTBL,PTT,RDQ,RDTH,RDP
+     &            ,RDTHE,PL,THL,QS0,SQS,STHE,THE0)
        CALL TABLEQ(TTBLQ,RDPQ,RDTHEQ,PLQ,THL,STHEQ,THE0Q)
        ITABL = .TRUE.
       ENDIF
@@ -153,7 +155,7 @@ c     ITYPE=1
       elseif(itype.eq.2) then
         dpbnd=0.
       endif
-c     print*,'itype=',itype
+c      print*,'itype=',itype
       DO J = 1,JM
        DO I = 1,IM
          CAPE(I,J) = 0.0
@@ -276,19 +278,19 @@ C     2  PTBL(IQ+1  ,IT  ),PTBL(IQ  ,IT+1  ),PTBL(IQ+1  ,IT+1  )
 C-----CHOOSE LAYER DIRECTLY BELOW PSP AS LCL AND------------------------
 C-----ENSURE THAT THE LCL IS ABOVE GROUND.------------------------------
 C-------(IN SOME RARE CASES FOR ITYPE=2, IT IS NOT)---------------------
-        DO L=1,LM
-         DO J=1,JM
-          DO I=1,IM
-            IF (L.LT.LMH(I,J)) THEN
-             PKL = P(I,J,L)
-             IF (PKL.LT.PSP(I,J)) THEN
-              LCL(I,J)=L+1
-              PLCL(I,J)=P(I,J,L+1)
-             ENDIF
-            ENDIF
-          ENDDO
-         ENDDO
+      DO L=1,LM
+       DO J=1,JM
+        DO I=1,IM
+          IF (L.LT.LMH(I,J)) THEN
+           PKL = P(I,J,L)
+           IF (PKL.LT.PSP(I,J)) THEN
+            LCL(I,J)=L+1
+            PLCL(I,J)=P(I,J,L+1)
+           ENDIF
+          ENDIF
         ENDDO
+       ENDDO
+      ENDDO
 c      print*,'after LCL array'
 C-----------------------------------------------------------------------
 C---------FIND TEMP OF PARCEL LIFTED ALONG MOIST ADIABAT (TPAR)---------
@@ -355,6 +357,8 @@ C-----------------------------------------------------------------------
  30   CONTINUE
 C------------COMPUTE CAPE AND CINS--------------------------------------
 c       print*,'Get to computing CAPE and CINS'
+       eps=18.015/28.964
+       oneps=1.-eps
        DO J=1,JM
         DO I=1,IM
          LCLK=LCL(I,J)
@@ -372,30 +376,35 @@ c          print*,'q(i,j,l)=',q(i,j,l)
 c          DP=PINT(I,J,L+1)-PINT(I,J,L)
            DZKL=T(I,J,L)*(Q(I,J,L)*0.608+1.0)*ROG*DP/PRESK
            if(ivirt.eq.0) then
-           THETAP=TPAR(I,J,L)*(H10E5/PRESK)**CAPA
-           THETAA=T(I,J,L)*(H10E5/PRESK)**CAPA
-c          print*,'regular thetap=',thetap
-c          print*,'regular thetaa=',thetaa
+             THETAP=TPAR(I,J,L)*(H10E5/PRESK)**CAPA
+             THETAA=T(I,J,L)*(H10E5/PRESK)**CAPA
+c            print*,'regular thetap=',thetap
+c            print*,'regular thetaa=',thetaa
            elseif(ivirt.eq.1) then
-           esatp=fpvsnew(tpar(i,j,l))
-           eps=18.015/28.964
-           oneps=1.-eps
-           qsatp=eps*esatp/(presk-esatp*oneps)
-           tvp=tpar(i,j,l)*(1+0.608*qsatp)
-           thetap=tvp*(h10e5/presk)**capa
-           tv(i,j,l)=t(i,j,l)*(1+0.608*q(i,j,l))
-           thetaa=tv(i,j,l)*(h10e5/presk)**capa 
-C          print*,'virtual thetap=',thetap
-C          print*,'virtual thetaa=',thetaa
+             esatp=fpvsnew(tpar(i,j,l))
+             qsatp=eps*esatp/(presk-esatp*oneps)
+             tvp=tpar(i,j,l)*(1+0.608*qsatp)
+             thetap=tvp*(h10e5/presk)**capa
+             tv(i,j,l)=t(i,j,l)*(1+0.608*q(i,j,l))
+             thetaa=tv(i,j,l)*(h10e5/presk)**capa
+c            print*,'virtual thetap=',thetap
+c            print*,'virtual thetaa=',thetaa
            endif
-           IF (THETAP.LT.THETAA)
-     &      CINS(I,J)=CINS(I,J)+G*(LOG(THETAP)-LOG(THETAA))*DZKL
-           IF (THETAP.GT.THETAA)
-     &      CAPE(I,J)=CAPE(I,J)+G*(LOG(THETAP)-LOG(THETAA))*DZKL
+           IF (THETAP.NE.THETAA) THEN
+            DELTA = G*(LOG(THETAP)-LOG(THETAA))*DZKL
+            IF (THETAP.LT.THETAA) THEN
+             CINS(I,J)=CINS(I,J)+DELTA
+c             print 200,'===== calcape add to CINS ',DELTA
+            ELSE
+             CAPE(I,J)=CAPE(I,J)+DELTA
+c             print 200,'===== calcape add to CAPE ',DELTA
+            ENDIF
+           ENDIF
          ENDDO
         ENDDO
        ENDDO
 
+200    FORMAT (A,F10.4)
 c      print*,'after computing CAPE'
       
 C    
@@ -441,12 +450,12 @@ C     ******************************************************************
       real(C_DOUBLE), intent(in) :: PT, THL
       real(C_DOUBLE), intent(out) :: PTBL(ITB,JTB), TTBL(JTB,ITB)
       real(C_DOUBLE), intent(out) :: RDQ, RDTH, RDP, RDTHE
-!      real(C_DOUBLE), intent(out) :: PL_out
+      real(C_DOUBLE), intent(out) :: PL
       real(C_DOUBLE), intent(out) :: QS0(JTB), SQS(JTB)
       real(C_DOUBLE), intent(out) :: STHE(ITB), THE0(ITB)
 
       integer :: K, KTHM, KPM, KTHM1, KPM1, KP, KTH
-      real(C_DOUBLE) :: APE, DP, DQS, DTH, DTHE, P, PL, QS0K, QS
+      real(C_DOUBLE) :: APE, DP, DQS, DTH, DTHE, P, QS0K, QS
       real(C_DOUBLE) :: SQSK, STHEK, TH, THE0K
       real(C_DOUBLE), dimension(JTB) :: QSOLD, POLD, QSNEW, PNEW
      &                                 ,APP, AQP, TOLD, TNEW
@@ -476,7 +485,7 @@ C
 C
       TH=THL-DTH
 C-----------------------------------------------------------------------
-      DO 500 KTH=1,KTHM
+      DO KTH=1,KTHM
        TH=TH+DTH
        P=PL-DP
        DO KP=1,KPM
@@ -518,7 +527,7 @@ C
         PTBL(KP,KTH)=PNEW(KP)
        ENDDO
 C-----------------------------------------------------------------------
- 500  CONTINUE
+      ENDDO
 C--------------COARSE LOOK-UP TABLE FOR T(P) FROM CONSTANT THE----------
       P=PL-DP
       DO KP=1,KPM
@@ -585,7 +594,7 @@ C     ******************************************************************
 
       integer, parameter :: ITB = 152, JTB = 440
       real(C_DOUBLE), intent(in)  :: PL, THL
-      real(C_DOUBLE), intent(out) :: TTBLQ(JTB,ITB)
+      real(C_DOUBLE), intent(out) :: TTBLQ(JTB, ITB)
       real(C_DOUBLE), intent(out) :: RDP, RDTHE
       real(C_DOUBLE), intent(out) :: STHE(ITB), THE0(ITB)
 
@@ -616,52 +625,52 @@ C
       TH=THL-DTH
 C--------------COARSE LOOK-UP TABLE FOR T(P) FROM CONSTANT THE----------
       P=PL-DP
-              DO 550 KP=1,KPM
+      DO KP=1,KPM
           P=P+DP
           TH=THL-DTH
-          DO 560 KTH=1,KTHM
-      TH=TH+DTH
-      APE=(100000./P)**(R/CP)
-      QS=PQ0/P*EXP(A2*(TH-A3*APE)/(TH-A4*APE))
-      TOLD(KTH)=TH/APE
-      THEOLD(KTH)=TH*EXP(ELIWV*QS/(CP*TOLD(KTH)))
- 560  CONTINUE
+       DO KTH=1,KTHM
+        TH=TH+DTH
+        APE=(100000./P)**(R/CP)
+        QS=PQ0/P*EXP(A2*(TH-A3*APE)/(TH-A4*APE))
+        TOLD(KTH)=TH/APE
+        THEOLD(KTH)=TH*EXP(ELIWV*QS/(CP*TOLD(KTH)))
+       ENDDO
 C
-      THE0K=THEOLD(1)
-      STHEK=THEOLD(KTHM)-THEOLD(1)
-      THEOLD(1   )=0.
-      THEOLD(KTHM)=1.
+       THE0K=THEOLD(1)
+       STHEK=THEOLD(KTHM)-THEOLD(1)
+       THEOLD(1   )=0.
+       THEOLD(KTHM)=1.
 C
-          DO 570 KTH=2,KTHM1
-      THEOLD(KTH)=(THEOLD(KTH)-THE0K)/STHEK
+       DO KTH=2,KTHM1
+        THEOLD(KTH)=(THEOLD(KTH)-THE0K)/STHEK
 C
-      IF((THEOLD(KTH)-THEOLD(KTH-1)).LT.EPS)
-     1    THEOLD(KTH)=THEOLD(KTH-1)  +  EPS
+        IF((THEOLD(KTH)-THEOLD(KTH-1)).LT.EPS)
+     1      THEOLD(KTH)=THEOLD(KTH-1)  +  EPS
 C
- 570  CONTINUE
+       ENDDO
 C
-      THE0(KP)=THE0K
-      STHE(KP)=STHEK
+       THE0(KP)=THE0K
+       STHE(KP)=STHEK
 C-----------------------------------------------------------------------
-      THENEW(1  )=0.
-      THENEW(KTHM)=1.
-      DTHE=1./REAL(KTHM-1)
-      RDTHE=1./DTHE
+       THENEW(1  )=0.
+       THENEW(KTHM)=1.
+       DTHE=1./REAL(KTHM-1)
+       RDTHE=1./DTHE
 C
-      DO 580 KTH=2,KTHM1
-       THENEW(KTH)=THENEW(KTH-1)+DTHE
- 580  CONTINUE
+       DO KTH=2,KTHM1
+        THENEW(KTH)=THENEW(KTH-1)+DTHE
+       ENDDO
 C
-      Y2T(1   )=0.
-      Y2T(KTHM)=0.
+       Y2T(1   )=0.
+       Y2T(KTHM)=0.
 C
-      CALL SPLINE(JTB,KTHM,THEOLD,TOLD,Y2T,KTHM,THENEW,TNEW,APT,AQT)
+       CALL SPLINE(JTB,KTHM,THEOLD,TOLD,Y2T,KTHM,THENEW,TNEW,APT,AQT)
 C
-      DO 590 KTH=1,KTHM
-       TTBLQ(KTH,KP)=TNEW(KTH)
- 590  CONTINUE
+       DO KTH=1,KTHM
+        TTBLQ(KTH,KP)=TNEW(KTH)
+       ENDDO
 C-----------------------------------------------------------------------
- 550  CONTINUE
+      ENDDO
 C
       RETURN
       END
