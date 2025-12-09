@@ -25,6 +25,7 @@
 //   005    04-09-20  Halley Gotway  Add convert and censor options.
 //   006    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
 //   007    09-29-22  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
+//   008    12-08-25  Halley Gotway  MET #3293 Fix set_attr_grid.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -254,8 +255,7 @@ void process_data_file() {
 
    // Setup the VarInfo request object
    VarInfoFactory v_factory;
-   VarInfo *vinfo;
-   vinfo = v_factory.new_var_info(ftype);
+   VarInfo *vinfo = v_factory.new_var_info(ftype);
 
    if(!vinfo) {
       mlog << Error << "\nprocess_data_file() -> "
@@ -263,18 +263,11 @@ void process_data_file() {
            << "\"\n\n";
       exit(1);
    }
+   config.read_string(FieldSA[0].c_str());
+   vinfo->set_dict(config);
 
-   // For python types and range/azimuth grids, read the first field to set the grid
-   if(is_python_grdfiletype(ftype) ||
-      fr_mtddf->grid().info().ra) {
-      config.read_string(FieldSA[0].c_str());
-      vinfo->set_dict(config);
-      if(!fr_mtddf->data_plane(*vinfo, fr_dp)) {
-         mlog << Error << "\nTrouble reading data from file \""
-              << InputFilename << "\"\n\n";
-         exit(1);
-      }
-   }
+   // Update the input grid, if needed
+   update_mtddf_grid(fr_mtddf, vinfo);
 
    fr_grid = fr_mtddf->grid();
    mlog << Debug(2) << "Input grid: " << fr_grid.serialize() << "\n";
