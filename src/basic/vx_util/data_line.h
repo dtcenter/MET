@@ -233,6 +233,61 @@ inline const StringArray & LineDataFile::header() const { return Header; }
 ////////////////////////////////////////////////////////////////////////
 
 
+class LineDataFiles {
+
+   protected:
+
+      void init_from_scratch();
+
+      void assign(const LineDataFiles &);
+
+      std::vector<std::string> Filenames;
+
+      int CurFileNumber;
+
+      LineDataFile CurLDF;
+
+   public:
+
+      LineDataFiles();
+      virtual ~LineDataFiles();
+      LineDataFiles(const LineDataFiles &);
+      LineDataFiles & operator=(const LineDataFiles &);
+
+      void clear();
+
+      void add(const char *);
+      void add(const std::string &);
+      void add(const std::vector<std::string> &);
+
+      bool open();
+
+      void close();
+
+      void rewind();
+
+      virtual int operator>>(DataLine &);
+
+      int current_file_number() const;
+
+      const char * current_filename() const;
+
+};
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+inline int          LineDataFiles::current_file_number() const { return CurFileNumber; }
+
+inline const char * LineDataFiles::current_filename()    const { return ( CurFileNumber >= 0 ?
+                                                                          Filenames[CurFileNumber].c_str() :
+                                                                          nullptr ); }
+
+
+////////////////////////////////////////////////////////////////////////
+
+
 extern std::ostream & operator<<(std::ostream &, const DataLine &);
 
 

@@ -44,6 +44,7 @@
 //   020    06/14/24  Halley Gotway   MET #2911 Call apply_set_hdr_opts().
 //   021    07/05/24  Halley Gotway   MET #2924 Support forecast climatology.
 //   022    07/23/24  Halley Gotway   MET #3210 Restore WDIR zero vector filtering.
+//   023    12/01/25  Halley Gotway   MET #2698 Refine temp file usage.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -160,7 +161,7 @@ void AggrTimeSeriesInfo::sort() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_summary_lines(LineDataFiles &f, STATAnalysisJob &job,
                         map<ConcatString, AggrSummaryInfo> &m,
                         int &n_in, int &n_out) {
    STATLine line;
@@ -382,7 +383,7 @@ void aggr_summary_lines(LineDataFile &f, STATAnalysisJob &job,
 //
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_ctc_lines(LineDataFiles &f, STATAnalysisJob &job,
                     map<ConcatString, AggrCTCInfo> &m,
                     int &n_in, int &n_out) {
    STATLine line;
@@ -585,7 +586,7 @@ void aggr_ctc_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_mctc_lines(LineDataFiles &f, STATAnalysisJob &job,
                      map<ConcatString, AggrMCTCInfo> &m,
                      int &n_in, int &n_out) {
    STATLine line;
@@ -764,7 +765,7 @@ void aggr_mctc_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_pct_lines(LineDataFiles &f, STATAnalysisJob &job,
                     map<ConcatString, AggrPCTInfo> &m,
                     int &n_in, int &n_out) {
    STATLine line;
@@ -923,7 +924,7 @@ void aggr_pct_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_psum_lines(LineDataFiles &f, STATAnalysisJob &job,
                      map<ConcatString, AggrPSumInfo> &m,
                      int &n_in, int &n_out) {
    STATLine line;
@@ -1125,7 +1126,7 @@ void aggr_psum_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_grad_lines(LineDataFiles &f, STATAnalysisJob &job,
                       map<ConcatString, AggrGRADInfo> &m,
                       int &n_in, int &n_out) {
    STATLine line;
@@ -1214,7 +1215,7 @@ void aggr_grad_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_wind_lines(LineDataFiles &f, STATAnalysisJob &job,
                      map<ConcatString, AggrWindInfo> &m,
                      int &n_in, int &n_out) {
    STATLine line;
@@ -1321,7 +1322,7 @@ void aggr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_mpr_wind_lines(LineDataFiles &f, STATAnalysisJob &job,
                          map<ConcatString, AggrWindInfo> &m,
                          int &n_in, int &n_out) {
    STATLine line;
@@ -1666,7 +1667,7 @@ void aggr_mpr_wind_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_mpr_lines(LineDataFiles &f, STATAnalysisJob &job,
                     map<ConcatString, AggrMPRInfo> &m,
                     int &n_in, int &n_out) {
    STATLine line;
@@ -1794,7 +1795,7 @@ void aggr_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
+void aggr_isc_lines(LineDataFiles &f, STATAnalysisJob &job,
                     map<ConcatString, AggrISCInfo> &m,
                     int &n_in, int &n_out) {
    STATLine line;
@@ -1807,7 +1808,7 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
    //
    // Process the STAT lines
    //
-   while(ldf >> line) {
+   while(f >> line) {
 
       if(line.is_header()) continue;
 
@@ -2052,7 +2053,7 @@ void aggr_isc_lines(LineDataFile &ldf, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_ecnt_lines(LineDataFiles &f, STATAnalysisJob &job,
                      map<ConcatString, AggrENSInfo> &m,
                      int &n_in, int &n_out) {
    STATLine line;
@@ -2198,7 +2199,7 @@ void aggr_ecnt_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_rps_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_rps_lines(LineDataFiles &f, STATAnalysisJob &job,
                     map<ConcatString, AggrRPSInfo> &m,
                     int &n_in, int &n_out) {
    STATLine line;
@@ -2291,7 +2292,7 @@ void aggr_rps_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_rhist_lines(LineDataFiles &f, STATAnalysisJob &job,
                       map<ConcatString, AggrENSInfo> &m,
                       int &n_in, int &n_out) {
    STATLine line;
@@ -2379,7 +2380,7 @@ void aggr_rhist_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_phist_lines(LineDataFiles &f, STATAnalysisJob &job,
                       map<ConcatString, AggrENSInfo> &m,
                       int &n_in, int &n_out) {
    STATLine line;
@@ -2468,9 +2469,9 @@ void aggr_phist_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &job,
-                      map<ConcatString, AggrENSInfo> &m,
-                      int &n_in, int &n_out) {
+void aggr_relp_lines(LineDataFiles &f, STATAnalysisJob &job,
+                     map<ConcatString, AggrENSInfo> &m,
+                     int &n_in, int &n_out) {
    STATLine line;
    AggrENSInfo aggr;
    RELPData cur;
@@ -2556,7 +2557,7 @@ void aggr_relp_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_orank_lines(LineDataFiles &f, STATAnalysisJob &job,
                       map<ConcatString, AggrENSInfo> &m,
                       int &n_in, int &n_out) {
    STATLine line;
@@ -2750,7 +2751,7 @@ void aggr_orank_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_ssvar_lines(LineDataFiles &f, STATAnalysisJob &job,
                       map<ConcatString, AggrSSVARInfo> &m,
                       int &n_in, int &n_out) {
    STATLine line;
@@ -2858,7 +2859,7 @@ void aggr_ssvar_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_seeps_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_seeps_lines(LineDataFiles &f, STATAnalysisJob &job,
                       map<ConcatString, AggrSEEPSInfo> &m,
                       int &n_in, int &n_out) {
    STATLine line;
@@ -2943,7 +2944,7 @@ void aggr_seeps_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_seeps_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_seeps_mpr_lines(LineDataFiles &f, STATAnalysisJob &job,
                           map<ConcatString, AggrSEEPSMPRInfo> &m,
                           int &n_in, int &n_out) {
    STATLine line;
@@ -3038,7 +3039,7 @@ void aggr_seeps_mpr_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &job,
+void aggr_time_series_lines(LineDataFiles &f, STATAnalysisJob &job,
                             map<ConcatString, AggrTimeSeriesInfo> &m,
                             int &n_in, int &n_out) {
    STATLine line;
@@ -3142,7 +3143,7 @@ void aggr_time_series_lines(LineDataFile &f, STATAnalysisJob &job,
 
 ////////////////////////////////////////////////////////////////////////
 
-void aggr_ss_index(LineDataFile &f, STATAnalysisJob &job,
+void aggr_ss_index(LineDataFiles &f, STATAnalysisJob &job,
                    map<ConcatString, AggrSSIndexInfo> &m,
                    int &n_in, int &n_out) {
    STATLine line;
