@@ -2895,6 +2895,47 @@ ConcatString STATAnalysisJob::get_jobstring() const {
 
 ////////////////////////////////////////////////////////////////////////
 
+bool STATAnalysisJob::has_common_filters() const {
+
+   //
+   // Return whether top-level filtering options are set
+   //
+
+   return(model.n()           > 0 ||
+          desc.n()            > 0 ||
+          fcst_lead.n()       > 0 ||
+          obs_lead.n()        > 0 ||
+          fcst_valid_beg      > 0 ||
+          fcst_valid_end      > 0 ||
+          fcst_valid_hour.n() > 0 ||
+          obs_valid_beg       > 0 ||
+          obs_valid_end       > 0 ||
+          obs_valid_hour.n()  > 0 ||
+          fcst_init_beg       > 0 ||
+          fcst_init_end       > 0 ||
+          fcst_init_hour.n()  > 0 ||
+          obs_init_beg        > 0 ||
+          obs_init_end        > 0 ||
+          obs_init_hour.n()   > 0 ||
+          fcst_var.n()        > 0 ||
+          obs_var.n()         > 0 ||
+          fcst_units.n()      > 0 ||
+          obs_units.n()       > 0 ||
+          fcst_lev.n()        > 0 ||
+          obs_lev.n()         > 0 ||
+          obtype.n()          > 0 ||
+          vx_mask.n()         > 0 ||
+          interp_mthd.n()     > 0 ||
+          interp_pnts.n()     > 0 ||
+          fcst_thresh.n()     > 0 ||
+          obs_thresh.n()      > 0 ||
+          cov_thresh.n()      > 0 ||
+          alpha.n()           > 0 ||
+          line_type.n()       > 0);
+}
+
+////////////////////////////////////////////////////////////////////////
+
 int STATAnalysisJob::is_in_mask_grid(double lat, double lon) const {
    double grid_x, grid_y;
 

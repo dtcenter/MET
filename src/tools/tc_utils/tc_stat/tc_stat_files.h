@@ -23,19 +23,7 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-class TCStatFiles {
-
-   private:
-
-      void init_from_scratch();
-
-      void assign(const TCStatFiles &);
-
-      StringArray FileList;
-
-      int CurFile;
-
-      LineDataFile CurLDF;
+class TCStatFiles : public LineDataFiles {
 
    public:
 
@@ -44,11 +32,7 @@ class TCStatFiles {
       TCStatFiles(const TCStatFiles &);
       TCStatFiles & operator=(const TCStatFiles &);
 
-      void clear();
-
       void add_files(const StringArray &);
-
-      void rewind();
 
       bool operator>>(TrackPairInfo    &);
       bool operator>>(ProbRIRWPairInfo &);

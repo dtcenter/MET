@@ -24,7 +24,8 @@
 //   006    10/09/17  Halley Gotway   Add aggregate GRAD lines.
 //   007    03/01/18  Halley Gotway   Update summary job type.
 //   008    01/24/20  Halley Gotway   Add aggregate RPS lines.
-//   009    09/28/22  Prestopnik      MET #2227 Remove namespace std
+//   009    09/28/22  Prestopnik      MET #2227 Remove namespace std.
+//   010    12/01/25  Halley Gotway   MET #2698 Refine temp file usage.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -50,27 +51,27 @@
 
 extern void set_job_from_config(MetConfig &, STATAnalysisJob &);
 
-extern void do_job(const ConcatString &, STATAnalysisJob &, int,
-               const ConcatString &, const ConcatString &,
+extern void do_job(const ConcatString &, const StringArray &,
+               STATAnalysisJob &, int, const ConcatString &,
                std::ofstream *);
 
-extern void do_job_filter(const ConcatString &, LineDataFile &,
+extern void do_job_filter(const ConcatString &, LineDataFiles &,
                STATAnalysisJob &, int &, int &, std::ofstream *);
 
-extern void do_job_summary(const ConcatString &, LineDataFile &,
+extern void do_job_summary(const ConcatString &, LineDataFiles &,
                STATAnalysisJob &, int &, int &, std::ofstream *, gsl_rng *);
 
-extern void do_job_aggr(const ConcatString &, LineDataFile &,
+extern void do_job_aggr(const ConcatString &, LineDataFiles &,
                STATAnalysisJob &, int &, int &, std::ofstream *);
 
-extern void do_job_aggr_stat(const ConcatString &, LineDataFile &,
+extern void do_job_aggr_stat(const ConcatString &, LineDataFiles &,
                STATAnalysisJob &, int &, int &, std::ofstream *,
                const ConcatString &, gsl_rng *);
 
-extern void do_job_ss_index(const ConcatString &, LineDataFile &,
+extern void do_job_ss_index(const ConcatString &, LineDataFiles &,
                STATAnalysisJob &, int &, int &, std::ofstream *);
 
-extern void do_job_ramp(const ConcatString &, LineDataFile &,
+extern void do_job_ramp(const ConcatString &, LineDataFiles &,
                STATAnalysisJob &, int &, int &, std::ofstream *);
 
 ////////////////////////////////////////////////////////////////////////
@@ -157,7 +158,7 @@ extern void write_line     (const ConcatString &, std::ofstream *);
 
 ////////////////////////////////////////////////////////////////////////
 
-extern void compute_ss_index(LineDataFile &, STATAnalysisJob &,
+extern void compute_ss_index(LineDataFiles &, STATAnalysisJob &,
                AggrSSIndexInfo &, int &, int &);
 
 extern void write_case_cols(const ConcatString &, AsciiTable &,
