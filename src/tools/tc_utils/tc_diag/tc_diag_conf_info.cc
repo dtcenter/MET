@@ -304,7 +304,7 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
       Dictionary i_dict = parse_conf_i_vx_dict(dict, i);
 
       // Conf: field.name and field.level
-      VarInfo *vi = vi_factory.new_var_info(file_type);
+      VarInfo *vi = vi_factory.VarInfoFactory::new_var_info(file_type);
       vi->set_dict(i_dict);
       var_info.emplace_back(vi);
 

@@ -241,8 +241,8 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
       // Allocate new VarInfo objects
 
-   fcst_info = info_factory.new_var_info(ftype);
-   obs_info  = info_factory.new_var_info(otype);
+   fcst_info = info_factory.VarInfoFactory::new_var_info(ftype);
+   obs_info  = info_factory.VarInfoFactory::new_var_info(otype);
 
       // Set the dictionaries
 

@@ -1090,7 +1090,7 @@ void VxPairBase::copy_var_info(const VarInfo *info, VarInfo *&copy) {
    if(copy) { delete copy; copy = (VarInfo *) nullptr; }
 
    // Perform a deep copy
-   copy = f.new_var_info(info->file_type());
+   copy = f.VarInfoFactory::new_var_info(info->file_type());
    *copy = *info;
 
    return;

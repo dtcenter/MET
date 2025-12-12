@@ -197,7 +197,7 @@ void process_data_file() {
    // Read data from the input file
    VarInfoFactory v_factory;
    VarInfo *vinfo;
-   vinfo = v_factory.new_var_info(mtddf->file_type());
+   vinfo = v_factory.VarInfoFactory::new_var_info(mtddf->file_type());
 
    if(!vinfo) {
       mlog << Error << "\nprocess_data_file() -> "

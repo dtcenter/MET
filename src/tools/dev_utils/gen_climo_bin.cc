@@ -374,7 +374,7 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
    }
 
    // Instantiate VarInfo object from the factory
-   vi_ptr = v_factory.new_var_info(mtddf_ptr->file_type());
+   vi_ptr = v_factory.VarInfoFactory::new_var_info(mtddf_ptr->file_type());
    if(!vi_ptr) {
       mlog << Error << "\n" << program_name
            << " -> unable to determine filetype of \"" << file

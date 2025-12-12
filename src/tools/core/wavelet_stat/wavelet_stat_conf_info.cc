@@ -210,8 +210,8 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    for(i=0; i<n_vx; i++) {
 
       // Allocate new VarInfo objects
-      fcst_info[i] = info_factory.new_var_info(ftype);
-      obs_info[i]  = info_factory.new_var_info(otype);
+      fcst_info[i] = info_factory.VarInfoFactory::new_var_info(ftype);
+      obs_info[i]  = info_factory.VarInfoFactory::new_var_info(otype);
 
       // Get the current dictionaries
       i_fdict = parse_conf_i_vx_dict(fcst_dict, i);

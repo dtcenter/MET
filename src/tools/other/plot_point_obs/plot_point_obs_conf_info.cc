@@ -469,7 +469,7 @@ void PlotPointObsConfInfo::process_config(
 
          // Allocate and set the VarInfo object
          VarInfoFactory v_factory;
-         grid_data_info = v_factory.new_var_info(met_ptr->file_type());
+         grid_data_info = v_factory.VarInfoFactory::new_var_info(met_ptr->file_type());
          i_fdict = parse_conf_i_vx_dict(fdict, 0);
          grid_data_info->set_dict(i_fdict);
 

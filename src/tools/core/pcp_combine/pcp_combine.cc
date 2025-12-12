@@ -795,7 +795,7 @@ static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          // Create a VarInfo object from the data file.
          //
-         cur_var = var_fac.new_var_info(mtddf->file_type());
+         cur_var = var_fac.VarInfoFactory::new_var_info(mtddf->file_type());
          if(!cur_var) {
             delete mtddf;  mtddf = nullptr;
             mlog << Warning << "search_pcp_dir() -> "
@@ -1348,7 +1348,7 @@ static bool get_field(const char *filename,
    // Build a VarInfo object.
    //
    if(status) {
-      cur_var = var_fac.new_var_info(mtddf->file_type());
+      cur_var = var_fac.VarInfoFactory::new_var_info(mtddf->file_type());
       if(!cur_var) {
          mlog << Warning << "\n" << method_name
               << "unable to determine filetype of \"" << filename
@@ -1392,7 +1392,7 @@ static bool get_field(const char *filename,
       grid = mtddf->grid();
 
       if(!var_info) {
-         var_info = var_fac.new_var_info(mtddf->file_type());
+         var_info = var_fac.VarInfoFactory::new_var_info(mtddf->file_type());
          *var_info = *cur_var;
       }
    }

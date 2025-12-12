@@ -209,7 +209,7 @@ dict = _dict;
 
 conf = _conf;
 
-var_info = info_factory.new_var_info(type);
+var_info = info_factory.VarInfoFactory::new_var_info(type);
 
 if ( _multivar )  {
 

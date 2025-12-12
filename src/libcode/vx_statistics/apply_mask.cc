@@ -451,7 +451,7 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    mask_grid = mtddf->grid();
 
    // Create a new VarInfo object
-   info = info_factory.new_var_info(mtddf->file_type());
+   info = info_factory.VarInfoFactory::new_var_info(mtddf->file_type());
 
    // Set up the VarInfo object
    info->set_dict(config);
@@ -626,7 +626,7 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
       }
 
       // Parse the variable name and level
-      info = info_factory.new_var_info(mtddf->file_type());
+      info = info_factory.VarInfoFactory::new_var_info(mtddf->file_type());
       info->set_dict(*field_dict);
 
       // Read the data

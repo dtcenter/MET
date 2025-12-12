@@ -151,7 +151,7 @@ int met_main(int argc, char * argv[]) {
       exit(1);
    }
 
-   var_ptr = v_factory.new_var_info(met_ptr->file_type());
+   var_ptr = v_factory.VarInfoFactory::new_var_info(met_ptr->file_type());
 
    if(!var_ptr) {
       mlog << Error << "\n" << program_name << " -> unable to determine filetype of \""

@@ -259,7 +259,7 @@ void RMWAnalysisConfInfo::process_config() {
    for(int i = 0; i < n_data; i++) {
 
       // Allocate new VarInfo objects
-      data_info[i] = info_factory.new_var_info(ftype);
+      data_info[i] = info_factory.VarInfoFactory::new_var_info(ftype);
 
       // Get current dictionary
       Dictionary i_fdict = parse_conf_i_vx_dict(fdict, i);

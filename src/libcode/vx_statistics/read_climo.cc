@@ -222,7 +222,7 @@ static void read_climo_file(const char *climo_file, GrdFileType ctype,
    }
 
    // Parse the variable name and level
-   info = info_factory.new_var_info(mtddf->file_type());
+   info = info_factory.VarInfoFactory::new_var_info(mtddf->file_type());
    info->set_default_regrid(regrid_default);
    info->set_dict(*dict);
 
