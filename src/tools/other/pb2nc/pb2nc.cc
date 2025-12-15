@@ -1042,18 +1042,30 @@ static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
                     // itype 2: Where the "best cape" in a number of parcels
    int cape_code = -1;
    int mlcape_code = -1;
-   double p1d,t1d,q1d;
-   int IMM, JMM;
-   int cape_level, cape_count, cape_cnt_too_big, cape_cnt_surface_msgs;
-   int cape_cnt_no_levels, cape_cnt_missing_values, cape_cnt_zero_values;
-   int mlcape_count, mlcape_cnt_too_big;
-   int mlcape_cnt_missing_values, mlcape_cnt_zero_values;
-   double cape_p, cape_h;
+   double p1d;
+   double q1d;
+   double t1d;
+   int IMM;
+   int JMM;
+   int cape_level;
+   int cape_count;
+   int cape_cnt_too_big;
+   int cape_cnt_surface_msgs;
+   int cape_cnt_no_levels;
+   int cape_cnt_missing_values;
+   int cape_cnt_zero_values;
+   int mlcape_count;
+   int mlcape_cnt_too_big;
+   int mlcape_cnt_missing_values;
+   int mlcape_cnt_zero_values;
+   double cape_h;
+   double cape_p;
    double cape_qm = bad_data_double;
 
    // To compute PBL
    int pbl_code = -1;
-   double pbl_p, pbl_h;
+   double pbl_h;
+   double pbl_p;
    double pbl_qm = bad_data_double;
 
    bool has_pbl_data;
@@ -1084,7 +1096,7 @@ static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
    }
 
    IMM = JMM =1;
-   p1d = t1d = q1d = (double)r8bfms * 10;
+   p1d = t1d = q1d = r8bfms * 10;
    cape_h = pbl_h = 0;
    cape_p = pbl_p = bad_data_double;
 
@@ -1507,8 +1519,8 @@ static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
             }
             // Get the actual observation value and quality mark
             else {
-               obs_arr[4]   = (double) evns[kk][ev][lv][0];
-               quality_mark = (double) evns[kk][ev][lv][1];
+               obs_arr[4]   = evns[kk][ev][lv][0];
+               quality_mark = evns[kk][ev][lv][1];
             }
 
             // If the quality mark is greater than than the quality
@@ -1522,7 +1534,7 @@ static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
                dl_category = fill_value;
             }
             else {
-               dl_category = (double) evns[kk][0][lv][6];
+               dl_category = evns[kk][0][lv][6];
             }
 
             if(!is_eq(obs_arr[4], fill_value)) {
@@ -1675,7 +1687,10 @@ static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
       if (cal_cape || cal_mlcape) {
          if (1 < cape_level) {
             bool reverse_levels;
-            double cape_val, cin_val, PLCL,PEQL;
+            double cape_val;
+            double cin_va;
+            double PLCL;
+            double PEQL;
 
             cape_val = bad_data_double;
             cin_val  = bad_data_double;
@@ -1709,9 +1724,9 @@ static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
                cape_data_temp[cape_level] = cape_data_temp[cape_level-1];
                cape_data_spfh[cape_level] = cape_data_spfh[cape_level-1];
                for (int idx=cape_level+1; idx<MAX_CAPE_LEVEL; idx++) {
-                  cape_data_pres[idx] = (double)r8bfms * 10;
-                  cape_data_temp[idx] = (double)r8bfms * 10;
-                  cape_data_spfh[idx] = (double)r8bfms * 10;
+                  cape_data_pres[idx] = r8bfms * 10;
+                  cape_data_temp[idx] = r8bfms * 10;
+                  cape_data_spfh[idx] = r8bfms * 10;
                }
             }
 
@@ -1950,7 +1965,7 @@ static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
             if (insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                            hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid)) n_derived_obs++;
 
-            for(vector<double *>::iterator it = pqtzuv_list.begin();
+            for(auto it = pqtzuv_list.begin();
                 it != pqtzuv_list.end(); ++it) {
                delete *it;
             }
@@ -1990,7 +2005,7 @@ static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
       if (insert_pbl(obs_arr, pbl_value, pbl_code, pbl_p, pbl_h, pbl_qm,
                      hdr_lat, hdr_lon, hdr_elv, hdr_vld_ut, hdr_typ, hdr_sid)) n_derived_obs++;
 
-      for(vector<double *>::iterator it = pqtzuv_list.begin();
+      for(auto it = pqtzuv_list.begin();
           it != pqtzuv_list.end(); ++it) {
          delete *it;
       }
@@ -2131,12 +2146,16 @@ static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_pbfile(int i_pb) {
-   int npbmsg, npbmsg_total, unit, yr, mon, day, hr, min, sec;
+static void process_pbfile(int i_pb) {
+   int npbmsg;
+   int npbmsg_total;
+   int unit;
    const char *method_name_s = "process_pbfile()";
    const char *method_name = "process_pbfile() -> ";
 
-   ConcatString file_name, blk_prefix, blk_file;
+   ConcatString blk_file;
+   ConcatString blk_prefix;
+   ConcatString file_name;
 
    // List the PrepBufr file being processed
    mlog << Debug(1) << "Processing Bufr File:\t" << pbfile[i_pb]<< "\n";
@@ -2285,7 +2304,7 @@ void process_pbfile_metadata(int i_pb) {
    StringArray unchecked_var_list;
    if (check_all) {
       for(int i=0; i<tableB_vars.n(); i++) {
-         if (!headers.has(tableB_vars[i]) && check_all) {
+         if (!headers.has(tableB_vars[i])) {
             unchecked_var_list.add(tableB_vars[i]);
          }
       }
@@ -3154,7 +3173,7 @@ static int combine_tqz_and_uv(map<double, double*> &pqtzuv_map_tq,
       }
       for (it=pqtzuv_map_merged.begin();
           it!=pqtzuv_map_merged.end(); ++it) {
-        double *new_pqtzuv = new double[mxr8vt];
+        auto new_pqtzuv = new double[mxr8vt];
         for (int i=0; i<mxr8vt; i++) new_pqtzuv[i] = it->second[i];
         pqtzuv_merged_array.emplace_back(new_pqtzuv);
       }
