@@ -109,6 +109,7 @@ C----------------------------------------------------------------------
 
       ! Tables and state that are filled once in original code via TABLE1/TABLEQ
       logical, save :: ITABL = .FALSE.
+      logical, save :: DEBUG_PRINT = .FALSE.
 
 C-----------------------------------------------------------------------
 C
@@ -120,15 +121,28 @@ C
      &            ,RDTHE,PL,THL,QS0,SQS,STHE,THE0)
        CALL TABLEQ(TTBLQ,RDPQ,RDTHEQ,PLQ,THL,STHEQ,THE0Q)
        ITABL = .TRUE.
+
+       CALL IS_DEBUG_ENABLED(DEBUG_PRINT)
+       IF (DEBUG_PRINT) THEN
+        print*, 'DEBUG init by calling TABLE1: PTT,PL,RDTHE='
+     &         ,PTT,PL,RDTHE
+        print*, "DEBUG init by calling TABLEQ: RDP,RDPQ="
+     &         ,ITABL,RDP,RDPQ
+       ENDIF
+      ENDIF
+      IF (DEBUG_PRINT) THEN
+       print*, 'DEBUG saved PTT,PL,RDTHE=',PTT,PL,RDTHE
+       print*, 'DEBUG saved RDP,RDPQ=',RDP,RDPQ
+       print*, 'DEBUG saved ITABL=',ITABL
       ENDIF
 
       IMJM=IM*JM
 C-----------------------------------------------------------------------
-C     
+C
 C
 C**************************************************************
 C     START CALCAPE HERE.
-C     
+C
 C
 C     COMPUTE CAPE/CINS
 C
@@ -144,11 +158,11 @@ C             DZ IS THE THICKNESS OF THE LAYER
 C
 C         USING LCL AS LEVEL DIRECTLY BELOW SATURATION POINT
 C         AND EQ LEVEL IS THE HIGHEST POSITIVELY BUOYANT LEVEL.
-C  
+C
 C         IEQL = EQ LEVEL
 C
 C     INITIALIZE CAPE AND CINS ARRAYS
-C 
+C
 c     ITYPE=1
       if(itype.eq.1) then
         dpbnd=10.E2
@@ -181,8 +195,8 @@ c      print*,'itype=',itype
        ENDDO
       ENDDO
 c     print*,'after APE array'
-C     
-C     NOTE THAT FOR TYPE 1 CAPE/CINS ARRAYS P1D, T1D, Q1D 
+C
+C     NOTE THAT FOR TYPE 1 CAPE/CINS ARRAYS P1D, T1D, Q1D
 C     ARE DUMMY ARRAYS.
 
       if(itype.eq.2) then
@@ -192,7 +206,7 @@ C     ARE DUMMY ARRAYS.
        enddo
        enddo
       endif
-C     
+C
 C-------FOR ITYPE=1-----------------------------------------------------
 C---------FIND MAXIMUM THETA E LAYER IN LOWEST DPBND ABOVE GROUND-------
 C-------FOR ITYPE=2-----------------------------------------------------
@@ -320,10 +334,14 @@ C***
 C***  COMPUTE PARCEL TEMPERATURE ALONG MOIST ADIABAT FOR PRESSURE<PLQ
 C**
         IF(KNUML.GT.0)THEN
-         CALL TTBLEX(TPAR(1,1,L),TTBL,IM,JM,IMJM,ITB,JTB 
+         CALL TTBLEX(TPAR(1,1,L),TTBL,IM,JM,IMJM,ITB,JTB
      &              ,KNUML,ILRES,JLRES
      1              ,P(1,1,L),PL,QQ,PP,RDP,THE0,STHE
      2              ,RDTHE,THESP,IPTB,ITHTB)
+         IF (DEBUG_PRINT) THEN
+          print 100, 'DEBUG PRESSURE<PLQ KNUML.GT.0  IVI=', IVI
+     &        ,' KNUML=',KNUML,' TPAR(1,1,',L,')=',TPAR(1,1,L)
+         ENDIF
         ENDIF
 
 C***
@@ -334,7 +352,12 @@ C**
      &,             KNUMH,IHRES,JHRES
      1,             P(1,1,L),PLQ,QQ,PP,RDPQ,THE0Q,STHEQ
      2,             RDTHEQ,THESP,IPTB,ITHTB)
+         IF (DEBUG_PRINT) THEN
+          print 100, 'DEBUG PRESSURE<PLQ KNUMH.GT.0  IVI=', IVI
+     &        ,' KNUMH=',KNUMH,' TPAR(1,1,',L,')=',TPAR(1,1,L)
+         ENDIF
         ENDIF
+100     FORMAT (A,3(I3,A),F12.6)
 
 C------------SEARCH FOR EQ LEVEL----------------------------------------
        DO N=1,KNUMH
@@ -359,6 +382,10 @@ C------------COMPUTE CAPE AND CINS--------------------------------------
 c       print*,'Get to computing CAPE and CINS'
        eps=18.015/28.964
        oneps=1.-eps
+       IF (DEBUG_PRINT) THEN
+         print*,'DEBUG calcape start IEQK,LCLK,CAPE(I,J)=',
+     &    IEQK,LCLK,CAPE(I,J)
+       ENDIF
        DO J=1,JM
         DO I=1,IM
          LCLK=LCL(I,J)
@@ -376,38 +403,62 @@ c          print*,'q(i,j,l)=',q(i,j,l)
 c          DP=PINT(I,J,L+1)-PINT(I,J,L)
            DZKL=T(I,J,L)*(Q(I,J,L)*0.608+1.0)*ROG*DP/PRESK
            if(ivirt.eq.0) then
-             THETAP=TPAR(I,J,L)*(H10E5/PRESK)**CAPA
-             THETAA=T(I,J,L)*(H10E5/PRESK)**CAPA
-c            print*,'regular thetap=',thetap
-c            print*,'regular thetaa=',thetaa
+            THETAP=TPAR(I,J,L)*(H10E5/PRESK)**CAPA
+            THETAA=T(I,J,L)*(H10E5/PRESK)**CAPA
+            IF (DEBUG_PRINT) THEN
+             print*,'regular thetap=',thetap
+             print*,'regular thetaa=',thetaa
+            ENDIF
            elseif(ivirt.eq.1) then
-             esatp=fpvsnew(tpar(i,j,l))
-             qsatp=eps*esatp/(presk-esatp*oneps)
-             tvp=tpar(i,j,l)*(1+0.608*qsatp)
-             thetap=tvp*(h10e5/presk)**capa
-             tv(i,j,l)=t(i,j,l)*(1+0.608*q(i,j,l))
-             thetaa=tv(i,j,l)*(h10e5/presk)**capa
-c            print*,'virtual thetap=',thetap
-c            print*,'virtual thetaa=',thetaa
+            esatp=fpvsnew(tpar(i,j,l))
+            IF (DEBUG_PRINT) THEN
+             print*,' === tpar(l) fpvsnew=', tpar(i,j,l), esatp
+            ENDIF
+            qsatp=eps*esatp/(presk-esatp*oneps)
+            tvp=tpar(i,j,l)*(1+0.608*qsatp)
+            thetap=tvp*(h10e5/presk)**capa
+            tv(i,j,l)=t(i,j,l)*(1+0.608*q(i,j,l))
+            thetaa=tv(i,j,l)*(h10e5/presk)**capa
+            IF (DEBUG_PRINT) THEN
+             print*,'virtual thetap=',thetap
+             print*,'virtual thetaa=',thetaa
+            ENDIF
            endif
            IF (THETAP.NE.THETAA) THEN
             DELTA = G*(LOG(THETAP)-LOG(THETAA))*DZKL
             IF (THETAP.LT.THETAA) THEN
              CINS(I,J)=CINS(I,J)+DELTA
-c             print 200,'===== calcape add to CINS ',DELTA
+             IF (DEBUG_PRINT) THEN
+              print 200,'DEBUG calcape add to CINS ',DELTA,' L=',L
+             ENDIF
             ELSE
              CAPE(I,J)=CAPE(I,J)+DELTA
-c             print 200,'===== calcape add to CAPE ',DELTA
+             IF (DEBUG_PRINT) THEN
+              print 200,'DEBUG calcape add to CAPE ',DELTA,' L=',L
+             ENDIF
+            ENDIF
+            IF (DEBUG_PRINT) THEN
+             print *, 'DEBUG tpar(l),qsatp=',tpar(i,j,l),qsatp
+             print *, 'DEBUG tvp,presk,capa=',tvp,presk,capa
             ENDIF
            ENDIF
-         ENDDO
+           IF (DEBUG_PRINT) THEN
+        print 210,'DEBUG calcape (L),THETAP,THETAA,DZKL,CAPE='
+     &           ,L,THETAP,THETAA,DZKL,CAPE(I,J)
+           ENDIF
+          ENDDO
+         IF (DEBUG_PRINT) THEN
+          print 220,'DEBUG calcape end   IEQK,LCLK=',IEQK,LCLK,CAPE(I,J)
+         ENDIF
         ENDDO
        ENDDO
 
-200    FORMAT (A,F10.4)
+200    FORMAT (A,F10.4,A,I3)
+210    FORMAT (A,I3,4F12.6)
+220    FORMAT (A,2(X,I3),2X,F12.6)
 c      print*,'after computing CAPE'
-      
-C    
+
+C
 C     ENFORCE LOWER LIMIT OF 0.0 ON CAPE AND UPPER
 C     LIMIT OF 0.0 ON CINS.
 C
@@ -419,7 +470,7 @@ C
       ENDDO
 c     if(itype.eq.2) print*,'CAPE,CINS=',CAPE,CINS
 c
-c  Now calculate the lifted index, which is simply the difference 
+c  Now calculate the lifted index, which is simply the difference
 c  between the ambient temperature and the parcel temperature at 500 mb.
 c
       do l=1,lmm
@@ -432,9 +483,9 @@ c
           enddo
          enddo
       enddo
-C     
+C
 C     END OF ROUTINE.
-C     
+C
       RETURN
       END
       SUBROUTINE TABLE1(PTBL,TTBL,PT,RDQ,RDTH,RDP
@@ -467,12 +518,14 @@ C     ******************************************************************
      &                            ,A3=273.16,A4=35.86
      &                            ,R=287.04,CP=1004.6
      &                            ,ELIWV=2.683E6,EPS=1.E-9
+      logical :: DEBUG_PRINT = .FALSE.
 
 C--------------COARSE LOOK-UP TABLE FOR SATURATION POINT----------------
       KTHM=JTB
       KPM=ITB
       KTHM1=KTHM-1
       KPM1=KPM-1
+      CALL IS_DEBUG_ENABLED(DEBUG_PRINT)
 C
       PL=PT
 C
@@ -482,6 +535,12 @@ C
       RDTH=1./DTH
       RDP=1./DP
       RDQ=KPM-1
+
+      DTHE=1./REAL(KTHM-1)
+      RDTHE=1./DTHE
+      IF (DEBUG_PRINT) THEN
+       print *,'In TABLE1: KTHM,DTHE,RDTHE=',KTHM,DTHE,RDTHE
+      ENDIF
 C
       TH=THL-DTH
 C-----------------------------------------------------------------------
@@ -494,35 +553,35 @@ C-----------------------------------------------------------------------
         QSOLD(KP)=PQ0/P*EXP(A2*(TH-A3*APE)/(TH-A4*APE))
         POLD(KP)=P
        ENDDO
-C      
+C
        QS0K=QSOLD(1)
        SQSK=QSOLD(KPM)-QSOLD(1)
        QSOLD(1  )=0.
        QSOLD(KPM)=1.
-C      
+C
        DO KP=2,KPM1
         QSOLD(KP)=(QSOLD(KP)-QS0K)/SQSK
-C      
+C
         IF((QSOLD(KP)-QSOLD(KP-1)).LT.EPS) QSOLD(KP)=QSOLD(KP-1)+EPS
-C      
+C
        ENDDO
-C      
+C
        QS0(KTH)=QS0K
        SQS(KTH)=SQSK
 C-----------------------------------------------------------------------
        QSNEW(1  )=0.
        QSNEW(KPM)=1.
        DQS=1./REAL(KPM-1)
-C      
+C
        DO KP=2,KPM1
         QSNEW(KP)=QSNEW(KP-1)+DQS
        ENDDO
-C      
+C
        Y2P(1   )=0.
        Y2P(KPM )=0.
-C      
+C
        CALL SPLINE(JTB,KPM,QSOLD,POLD,Y2P,KPM,QSNEW,PNEW,APP,AQP)
-C      
+C
        DO KP=1,KPM
         PTBL(KP,KTH)=PNEW(KP)
        ENDDO
@@ -559,18 +618,16 @@ C
 C-----------------------------------------------------------------------
        THENEW(1  )=0.
        THENEW(KTHM)=1.
-       DTHE=1./REAL(KTHM-1)
-       RDTHE=1./DTHE
-C      
+C
        DO KTH=2,KTHM1
         THENEW(KTH)=THENEW(KTH-1)+DTHE
        ENDDO
-C      
+C
        Y2T(1   )=0.
        Y2T(KTHM)=0.
-C      
+C
        CALL SPLINE(JTB,KTHM,THEOLD,TOLD,Y2T,KTHM,THENEW,TNEW,APT,AQT)
-C      
+C
        DO KTH=1,KTHM
         TTBL(KTH,KP)=TNEW(KTH)
        ENDDO
@@ -611,6 +668,7 @@ C     ******************************************************************
       real(C_DOUBLE), dimension(JTB) :: APT, AQT, Y2T
       real(C_DOUBLE), dimension(JTB) :: TOLD, THEOLD, THENEW, TNEW
       real(C_DOUBLE) :: QS, APE, THE0K, STHEK, DTHE
+      logical :: DEBUG_PRINT = .FALSE.
 
 C--------------COARSE LOOK-UP TABLE FOR SATURATION POINT----------------
       KTHM=JTB
@@ -623,6 +681,13 @@ C
 C
       RDP=1./DP
       TH=THL-DTH
+      CALL IS_DEBUG_ENABLED(DEBUG_PRINT)
+
+      IF(DEBUG_PRINT) THEN
+       print*, 'DEBUG in TABLEQ PH,PL,KPM=',PH,PL,KPM
+       print*, 'DEBUG in TABLEQ PH,PL,KPM=',PH,PL,KPM
+       print*, 'DEBUG in TABLEQ RDP,DP=', RDP,DP
+      ENDIF
 C--------------COARSE LOOK-UP TABLE FOR T(P) FROM CONSTANT THE----------
       P=PL-DP
       DO KP=1,KPM
@@ -709,6 +774,7 @@ C----------------------------------------------------------------------
       real(C_DOUBLE) :: BTHE00K, STHE00K, BTHE10K, STHE10K
       real(C_DOUBLE) :: BTHK, STHK, TTHK
       real(C_DOUBLE) :: T00K, T10K, T01K, T11K
+      logical :: DEBUG_PRINT = .FALSE.
 
       ! Initialize outputs in case some indices are not processed
       TREF = 0.0d0
@@ -717,6 +783,11 @@ C----------------------------------------------------------------------
       IPTB = 1
       ITHTB= 1
 
+      CALL IS_DEBUG_ENABLED(DEBUG_PRINT)
+
+      IF(DEBUG_PRINT) THEN
+       print*,'DEBUG in TTBLEX in PL, RDP = ',PL, RDP
+      ENDIF
 C-----------------------------------------------------------------------
       DO KK=1,KNUM
 C--------------SCALING PRESSURE & TT TABLE INDEX------------------------
@@ -746,6 +817,11 @@ C--------------SCALING THE & TT TABLE INDEX-----------------------------
        STHK=(STHE10K-STHE00K)*QQ(I,J)+STHE00K
        TTHK=(THESP(I,J)-BTHK)/STHK*RDTHE
        PP(I,J)=TTHK-AINT(TTHK)
+       IF (DEBUG_PRINT) THEN
+        print *, 'DEBUG TTHK=(THESP-BTHK)/STHK*RDTHE='
+     &         ,TTHK,THESP(I,J),BTHK,STHK,RDTHE
+        print *, 'DEBUG PP=TTHK-AINT(TTHK)=',PP(I,J),TTHK,TTHK
+       ENDIF
        ITHTB(I,J)=INT(TTHK)+1
 C--------------KEEPING INDICES WITHIN THE TABLE-------------------------
        IF(ITHTB(I,J).LT.1)THEN
@@ -766,6 +842,19 @@ C--------------TEMPERATURE AT FOUR SURROUNDING TT TABLE PTS.------------
 C--------------PARCEL TEMPERATURE-------------------------------------
        TREF(I,J)=(T00K+(T10K-T00K)*PP(I,J)+(T01K-T00K)*QQ(I,J)
      2          +(T00K-T10K-T01K+T11K)*PP(I,J)*QQ(I,J))
+      if (DEBUG_PRINT) THEN
+       print*,'DEBUG TTBLEX in PIJL(IM,JM)   ',PIJL(IM,JM)
+       print*,'DEBUG TTBLEX in TTBL(JTB,ITB) ',TTBL(JTB,ITB)
+       print*,'DEBUG TTBLEX in THE0(ITB)     ',THE0(ITB)
+       print*,'DEBUG TTBLEX in RDTHE         ',RDTHE
+       print*,'DEBUG TTBLEX in THESP(IM,JM)  ',THESP(IM,JM)
+       print*,'DEBUG TTBLEX in PL, RDP       ',PL, RDP
+       print*,'DEBUG TTBLEX out TREF(IM,JM)  ',TREF(IM,JM)
+       print*,'DEBUG TTBLEX out QQ(IM,JM)    ',QQ(IM,JM)
+       print*,'DEBUG TTBLEX out PP(IM,JM)    ',PP(IM,JM)
+       print*,'DEBUG TTBLEX TREF,T00K,T10K,T01K,T11K,PP(I,J),QQ(I,J)=',
+     &   TREF(I,J),T00K,T10K,T01K,T11K,PP(I,J),QQ(I,J)
+       ENDIF
       enddo
 C
       RETURN
@@ -892,6 +981,28 @@ C     2 YOLD(NOLD),YNEW(NNEW)
       RETURN
       END
 
+C&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+C&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
+      SUBROUTINE IS_DEBUG_ENABLED(DEBUG_STATUS)
+        implicit none
+        logical, intent(out) :: DEBUG_STATUS
+        character(len=256) :: env_value
+        integer :: env_length, env_status
+
+        DEBUG_STATUS = .FALSE.
+        CALL GET_ENVIRONMENT_VARIABLE(NAME="MET_DEBUG", VALUE=env_value,
+     &          LENGTH=env_length, STATUS=env_status)
+        IF (env_status == 0) THEN
+          IF (env_value(1:env_length) == "TRUE") THEN
+            DEBUG_STATUS = .TRUE.
+          ENDIF
+        ENDIF
+      END SUBROUTINE IS_DEBUG_ENABLED
+
+C&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+C&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
+
       function fpvsnew(t) result(fpvs)
       USE ISO_C_BINDING
       implicit none
@@ -914,16 +1025,9 @@ C     2 YOLD(NOLD),YNEW(NNEW)
       real(C_DOUBLE), allocatable :: tbpvs(:)
       integer :: jx
       real(C_DOUBLE) :: x, xp1, xj
+      logical :: DEBUG_PRINT = .FALSE.
 
-C      real con_ttp,con_psat,con_cvap,con_cliq,con_hvap,con_rv,con_csol,con_hfus,
-C     *     tliq,tice,dldtl,heatl,xponal,xponbl,dldti,heati,xponai,xponbi
-
-C      real tr,w,pvl,pvi
-C      real fpvsnew
-C      real t
-C      integer jx
-C      real xj,x,tbpvs(7501),xp1
-C      real xmin,xmax,xinc,c2xpvs,c1xpvs
+      CALL IS_DEBUG_ENABLED(DEBUG_PRINT)
 
       allocate(tbpvs(nxpvs))
 
@@ -977,4 +1081,9 @@ c    xj=min(max(c1xpvs+c2xpvs*t,1.0),real(nxpvs,krealfp))
 
       fpvs=tbpvs(jx)+(xj-jx)*(tbpvs(jx+1)-tbpvs(jx))
       deallocate(tbpvs)
-      end 
+
+      CALL IS_DEBUG_ENABLED(DEBUG_PRINT)
+      IF (DEBUG_PRINT) THEN
+       print*,'DEBUG fpvsnew fpvs & t=',fpvs, t
+      ENDIF
+      end
