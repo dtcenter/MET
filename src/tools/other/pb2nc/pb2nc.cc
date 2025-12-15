@@ -1688,7 +1688,7 @@ static void process_pbfile_messages(int unit, int npbmsg, int npbmsg_total,
          if (1 < cape_level) {
             bool reverse_levels;
             double cape_val;
-            double cin_va;
+            double cin_val;
             double PLCL;
             double PEQL;
 
