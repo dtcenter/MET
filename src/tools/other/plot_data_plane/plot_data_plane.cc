@@ -92,10 +92,6 @@ int met_main(int argc, char * argv[]) {
 
    program_name = get_short_name(argv[0]);
 
-   Met2dDataFile * met_ptr = (Met2dDataFile * ) nullptr;
-   Met2dDataFileFactory m_factory;
-   VarInfo * var_ptr = (VarInfo * ) nullptr;
-   VarInfoFactory v_factory;
    DataPlane data_plane;
    Grid grid;
    GrdFileType ftype;
@@ -136,8 +132,8 @@ int met_main(int argc, char * argv[]) {
    // instantiate the Met2dDataFile object using the data_2d_factory
    // and the VarInfo object using the var_info_factory
    //
-   mlog << Debug(1)  << "Opening data file: " << InputFilename << "\n";
-   met_ptr = m_factory.new_met_2d_data_file(InputFilename.c_str(), ftype);
+   mlog << Debug(1) << "Opening data file: " << InputFilename << "\n";
+   auto met_ptr = Met2dDataFileFactory::new_met_2d_data_file(InputFilename.c_str(), ftype);
 
    if(!met_ptr) {
       mlog << Error << "\n" << program_name << " -> file \""
@@ -151,7 +147,7 @@ int met_main(int argc, char * argv[]) {
       exit(1);
    }
 
-   var_ptr = v_factory.VarInfoFactory::new_var_info(met_ptr->file_type());
+   auto var_ptr = VarInfoFactory::new_var_info(met_ptr->file_type());
 
    if(!var_ptr) {
       mlog << Error << "\n" << program_name << " -> unable to determine filetype of \""

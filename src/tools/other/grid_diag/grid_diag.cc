@@ -763,8 +763,8 @@ void write_joint_histograms(void) {
 
 Met2dDataFile *get_mtddf(const StringArray &file_list,
                        const int i_field) {
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
-   Dictionary *dict = (Dictionary *) nullptr;
+   Met2dDataFile *mtddf = nullptr;
+   Dictionary *dict = nullptr;
    Dictionary i_dict;
    GrdFileType file_type;
    int i;
@@ -791,7 +791,7 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
    }
 
    // Read first valid file
-   if(!(mtddf = mtddf_factory.new_met_2d_data_file(
+   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(
                    file_list[i].c_str(), file_type))) {
       mlog << Error << "\nget_mtddf() -> "
            << "trouble reading data file \""

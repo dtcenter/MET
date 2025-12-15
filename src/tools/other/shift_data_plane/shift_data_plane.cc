@@ -181,12 +181,8 @@ void process_data_file() {
    // Get the gridded file type from config string, if present
    GrdFileType ftype = parse_conf_file_type(&config);
 
-   // Read the input data file
-   Met2dDataFileFactory m_factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
-
-   mlog << Debug(1)  << "Reading input file: " << InputFilename << "\n";
-   mtddf = m_factory.new_met_2d_data_file(InputFilename.c_str(), ftype);
+   mlog << Debug(1) << "Reading input file: " << InputFilename << "\n";
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(InputFilename.c_str(), ftype);
 
    if(!mtddf) {
       mlog << Error << "\nprocess_data_file() -> "
@@ -195,9 +191,7 @@ void process_data_file() {
    }
 
    // Read data from the input file
-   VarInfoFactory v_factory;
-   VarInfo *vinfo;
-   vinfo = v_factory.VarInfoFactory::new_var_info(mtddf->file_type());
+   auto vinfo = VarInfoFactory::new_var_info(mtddf->file_type());
 
    if(!vinfo) {
       mlog << Error << "\nprocess_data_file() -> "

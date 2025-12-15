@@ -126,7 +126,6 @@ void RMWAnalysisConfInfo::read_config(const char* default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void RMWAnalysisConfInfo::process_config() {
-   VarInfoFactory info_factory;
    Dictionary *fdict = (Dictionary *) nullptr;
    GrdFileType ftype = FileType_NcCF;
 
@@ -259,7 +258,7 @@ void RMWAnalysisConfInfo::process_config() {
    for(int i = 0; i < n_data; i++) {
 
       // Allocate new VarInfo objects
-      data_info[i] = info_factory.VarInfoFactory::new_var_info(ftype);
+      data_info[i] = VarInfoFactory::new_var_info(ftype);
 
       // Get current dictionary
       Dictionary i_fdict = parse_conf_i_vx_dict(fdict, i);

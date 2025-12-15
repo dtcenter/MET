@@ -658,7 +658,6 @@ void GridStatVxOpt::process_config(
         GrdFileType ftype, Dictionary &fdict,
         GrdFileType otype, Dictionary &odict) {
    int i, n;
-   VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    InterpMthd mthd;
 
@@ -666,8 +665,8 @@ void GridStatVxOpt::process_config(
    clear();
 
    // Allocate new VarInfo objects
-   fcst_info = info_factory.VarInfoFactory::new_var_info(ftype);
-   obs_info  = info_factory.VarInfoFactory::new_var_info(otype);
+   fcst_info = VarInfoFactory::new_var_info(ftype);
+   obs_info  = VarInfoFactory::new_var_info(otype);
 
    // Set the top-level regrid as the default 
    RegridInfo regrid_info = parse_conf_regrid(fdict.parent());

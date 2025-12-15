@@ -200,11 +200,7 @@ static void read_climo_file(const char *climo_file, GrdFileType ctype,
                             const RegridInfo &regrid_default,
                             DataPlaneArray &dpa, const char *desc) {
 
-   Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
-
-   VarInfoFactory info_factory;
-   VarInfo *info = (VarInfo *) nullptr;
+   Met2dDataFile *mtddf = nullptr;
 
    DataPlaneArray clm_dpa;
    DataPlane dp;
@@ -214,7 +210,7 @@ static void read_climo_file(const char *climo_file, GrdFileType ctype,
    ConcatString clm_ut_cs;
 
    // Allocate memory for data file
-   if(!(mtddf = mtddf_factory.new_met_2d_data_file(climo_file, ctype))) {
+   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(climo_file, ctype))) {
       mlog << Warning << "\nread_climo_file() -> "
            << "Trouble reading climatology file "
            << climo_file << "\n\n";
@@ -222,7 +218,7 @@ static void read_climo_file(const char *climo_file, GrdFileType ctype,
    }
 
    // Parse the variable name and level
-   info = info_factory.VarInfoFactory::new_var_info(mtddf->file_type());
+   auto info = VarInfoFactory::new_var_info(mtddf->file_type());
    info->set_default_regrid(regrid_default);
    info->set_dict(*dict);
 

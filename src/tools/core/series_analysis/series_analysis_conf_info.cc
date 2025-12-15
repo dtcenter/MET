@@ -138,7 +138,6 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    ConcatString s;
    StringArray sa;
    ThreshArray cur_ta;
-   VarInfoFactory info_factory;
    Dictionary *fdict = nullptr;
    Dictionary *odict = nullptr;
    Dictionary i_fdict;
@@ -241,7 +240,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    for(i=0; i<n_fcst; i++) {
 
       // Allocate new VarInfo objects
-      fcst_info[i] = info_factory.VarInfoFactory::new_var_info(ftype);
+      fcst_info[i] = VarInfoFactory::new_var_info(ftype);
 
       // Get the current dictionaries
       i_fdict = parse_conf_i_vx_dict(fdict, i);
@@ -291,7 +290,7 @@ void SeriesAnalysisConfInfo::process_config(GrdFileType ftype,
    for(i=0; i<n_obs; i++) {
 
       // Allocate new VarInfo objects
-      obs_info[i] = info_factory.VarInfoFactory::new_var_info(otype);
+      obs_info[i] = VarInfoFactory::new_var_info(otype);
 
       // Get the current dictionaries
       i_odict = parse_conf_i_vx_dict(odict, i);

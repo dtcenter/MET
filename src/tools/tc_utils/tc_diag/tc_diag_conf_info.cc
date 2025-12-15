@@ -229,7 +229,6 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
    int i, j;
    StringArray sa;
    Dictionary *dict = (Dictionary *) nullptr;
-   VarInfoFactory vi_factory;
 
    // Conf: version
    check_met_version(conf.lookup_string(conf_key_version).c_str());
@@ -304,7 +303,7 @@ void TCDiagConfInfo::process_config(GrdFileType file_type,
       Dictionary i_dict = parse_conf_i_vx_dict(dict, i);
 
       // Conf: field.name and field.level
-      VarInfo *vi = vi_factory.VarInfoFactory::new_var_info(file_type);
+      auto vi = VarInfoFactory::new_var_info(file_type);
       vi->set_dict(i_dict);
       var_info.emplace_back(vi);
 

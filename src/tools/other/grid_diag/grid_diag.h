@@ -105,9 +105,8 @@ static StringArray nc_var_sa;
 // Grid variables
 static Grid grid;
 
-// Data file factory and input files
-static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile *data_mtddf = (Met2dDataFile *) nullptr;
+// Input files
+static Met2dDataFile *data_mtddf = nullptr;
 
 // Variable min/max values
 std::vector<double> var_mins;

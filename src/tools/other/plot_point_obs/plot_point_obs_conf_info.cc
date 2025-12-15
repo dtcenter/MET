@@ -407,12 +407,11 @@ void PlotPointObsConfInfo::read_config(const char *user_file_name) {
 
 void PlotPointObsConfInfo::process_config(
                               const char *plot_grid_string) {
-   Dictionary  *dict = (Dictionary *) nullptr;
-   Dictionary *fdict = (Dictionary *) nullptr;
+   Dictionary  *dict = nullptr;
+   Dictionary *fdict = nullptr;
    Dictionary i_fdict;
    StringArray sa;
-   Met2dDataFileFactory m_factory;
-   Met2dDataFile *met_ptr = (Met2dDataFile *) nullptr;
+   Met2dDataFile *met_ptr = nullptr;
    PlotPointObsOpt opt;
    int i, n_vx;
 
@@ -451,7 +450,7 @@ void PlotPointObsConfInfo::process_config(
               << plot_grid_string << "\".\n";
 
          // Open the data file
-         if(!(met_ptr = m_factory.new_met_2d_data_file(
+         if(!(met_ptr = Met2dDataFileFactory::new_met_2d_data_file(
                            plot_grid_string, ftype))) {
             mlog << Error
                  << "\nPlotPointObsConfInfo::process_config() -> "
@@ -468,8 +467,7 @@ void PlotPointObsConfInfo::process_config(
       if(n_vx > 0 && met_ptr) {
 
          // Allocate and set the VarInfo object
-         VarInfoFactory v_factory;
-         grid_data_info = v_factory.VarInfoFactory::new_var_info(met_ptr->file_type());
+         grid_data_info = VarInfoFactory::new_var_info(met_ptr->file_type());
          i_fdict = parse_conf_i_vx_dict(fdict, 0);
          grid_data_info->set_dict(i_fdict);
 
