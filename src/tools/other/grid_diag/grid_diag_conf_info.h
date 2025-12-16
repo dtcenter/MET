@@ -27,6 +27,24 @@
 
 ////////////////////////////////////////////////////////////////////////
 
+struct GridDiagNcOutInfo {
+
+   bool do_hist1d;
+   bool do_hist2d;
+   bool do_info_theory;
+
+   GridDiagNcOutInfo();
+
+   void clear();   // sets everything to true
+
+   bool all_false() const;
+
+   void set_all_false();
+   void set_all_true();
+};
+
+////////////////////////////////////////////////////////////////////////
+
 class GridDiagConfInfo {
 
    private:
@@ -43,13 +61,13 @@ class GridDiagConfInfo {
       ConcatString version;        // Config file version
       ConcatString desc;           // Data description
 
-      VarInfo ** data_info;        // Pointer array for data VarInfo [n_data]
+      std::vector<VarInfo *> data_info; // VarInfo pointer array
 
-      ConcatString mask_grid_file; // Path for masking grid area
-      ConcatString mask_grid_name; // Name of masking grid area
-      ConcatString mask_poly_file; // Path for masking poly area
-      ConcatString mask_poly_name; // Name of masking poly area
-      MaskPlane    mask_area;
+      // Masking region names and MaskPlanes
+      StringArray mask_name;
+      std::map<std::string,MaskPlane> mask_map;
+
+      GridDiagNcOutInfo nc_info;   // Output NetCDF file contents
 
       GridDiagConfInfo();
       ~GridDiagConfInfo();
@@ -59,15 +77,18 @@ class GridDiagConfInfo {
       void read_config(const char *, const char *);
       void set_n_data();
       void process_config(std::vector<GrdFileType>);
+      void parse_output_flag();
       void process_masks(const Grid &);
 
+      int get_n_mask() const;
       int get_n_data() const;
       int get_compression_level();
 };
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int GridDiagConfInfo::get_n_data() const { return(n_data); }
+inline int GridDiagConfInfo::get_n_mask() const { return mask_name.n(); }
+inline int GridDiagConfInfo::get_n_data() const { return n_data; }
 inline int GridDiagConfInfo::get_compression_level() { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////

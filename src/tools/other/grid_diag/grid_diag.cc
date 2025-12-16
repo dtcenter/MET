@@ -105,6 +105,7 @@ int met_main(int argc, char *argv[]) {
    #ifdef WITH_PROFILER
    ctrack::result_print();
    #endif 
+
    // Close files and deallocate memory
    clean_up();
 
@@ -273,85 +274,87 @@ void process_series(void) {
       // Process the 1d histograms
       for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
-        i_var_str << cs_erase << "VAR" << i_var+1;
+         i_var_str << cs_erase << "VAR" << i_var+1;
 
-        VarInfo *data_info = conf_info.data_info[i_var];
+         VarInfo *data_info = conf_info.data_info[i_var];
 
-        // Check for separate data files for each field
-        if(data_files.size() > 1) {
-           cur_files = &data_files[i_var];
-           cur_ftype = &file_types[i_var];
-        }
-        else {
-           cur_files = &data_files[0];
-           cur_ftype = &file_types[0];
-        }
+         // Check for separate data files for each field
+         if(data_files.size() > 1) {
+            cur_files = &data_files[i_var];
+            cur_ftype = &file_types[i_var];
+         }
+         else {
+            cur_files = &data_files[0];
+            cur_ftype = &file_types[0];
+         }
 
-        mlog << Debug(2)
-             << "Reading field " << data_info->magic_str_attr()
-             << " data from file: " << (*cur_files)[i_series]
-             << "\n";
+         mlog << Debug(2)
+              << "Reading field " << data_info->magic_str_attr()
+              << " data from file: " << (*cur_files)[i_series]
+              << "\n";
 
-        get_series_entry(i_series, data_info, *cur_files, *cur_ftype,
-                         data_dp[i_var], cur_grid);
+         get_series_entry(i_series, data_info, *cur_files, *cur_ftype,
+                          data_dp[i_var], cur_grid);
 
-        // Regrid, if necessary
-        if(!(cur_grid == grid)) {
-           mlog << Debug(2)
-                << "Regridding field " << data_info->magic_str_attr()
-                << " to the verification grid using "
-                << data_info->regrid().get_str() << ".\n";
-           data_dp[i_var] = met_regrid(data_dp[i_var],
-                                       cur_grid, grid,
-                                       data_info->regrid());
-        }
+         // Regrid, if necessary
+         if(!(cur_grid == grid)) {
+            mlog << Debug(2)
+                 << "Regridding field " << data_info->magic_str_attr()
+                 << " to the verification grid using "
+                 << data_info->regrid().get_str() << ".\n";
+            data_dp[i_var] = met_regrid(data_dp[i_var],
+                                        cur_grid, grid,
+                                        data_info->regrid());
+         }
 
-        // Initialize time ranges
-        if(i_series == 0 && i_var == 0) {
-           init_beg  = init_end  = data_dp[i_var].init();
-           valid_beg = valid_end = data_dp[i_var].valid();
-           lead_beg  = lead_end  = data_dp[i_var].lead();
-        }
-        // Update time ranges
-        else {
-           if(data_dp[i_var].init() < init_beg) {
-              init_beg  = data_dp[i_var].init();
-           }
-           if(data_dp[i_var].init() > init_end) {
-              init_end  = data_dp[i_var].init();
-           }
-           if(data_dp[i_var].valid() < valid_beg) {
-              valid_beg = data_dp[i_var].valid();
-           }
-           if(data_dp[i_var].valid() > valid_end) {
-              valid_end = data_dp[i_var].valid();
-           }
-           if(data_dp[i_var].lead() < lead_beg) {
-              lead_beg  = data_dp[i_var].lead();
-           }
-           if(data_dp[i_var].lead() > lead_end) {
-              lead_end  = data_dp[i_var].lead();
-           }
-        }
+         // Initialize time ranges
+         if(i_series == 0 && i_var == 0) {
+            init_beg  = init_end  = data_dp[i_var].init();
+            valid_beg = valid_end = data_dp[i_var].valid();
+            lead_beg  = lead_end  = data_dp[i_var].lead();
+         }
+         // Update time ranges
+         else {
+            if(data_dp[i_var].init() < init_beg) {
+               init_beg  = data_dp[i_var].init();
+            }
+            if(data_dp[i_var].init() > init_end) {
+               init_end  = data_dp[i_var].init();
+            }
+            if(data_dp[i_var].valid() < valid_beg) {
+               valid_beg = data_dp[i_var].valid();
+            }
+            if(data_dp[i_var].valid() > valid_end) {
+               valid_end = data_dp[i_var].valid();
+            }
+            if(data_dp[i_var].lead() < lead_beg) {
+               lead_beg  = data_dp[i_var].lead();
+            }
+            if(data_dp[i_var].lead() > lead_end) {
+               lead_end  = data_dp[i_var].lead();
+            }
+         }
 
-        // Apply the mask before updating the data ranges
-        apply_mask(data_dp[i_var], conf_info.mask_area);
+         // TODO: Add logic for handling multiple masks
 
-        // Update the range of the data values
-        data_dp[i_var].data_range(min, max);
-        if(is_bad_data(var_mins[i_var]) || min < var_mins[i_var]) {
-           var_mins[i_var] = min;
-        }
-        if(is_bad_data(var_maxs[i_var]) || max > var_maxs[i_var]) {
-           var_maxs[i_var] = max;
-        }
+         // Apply the mask before updating the data ranges
+         apply_mask(data_dp[i_var], conf_info.mask_map[0]);
 
-        // Update partial sums
-        update_pdf(bin_mins[i_var_str][0],
-                   bin_deltas[i_var_str],
-                   histograms[i_var_str],
-                   data_dp[i_var], conf_info.mask_area);
-     } // end for i_var
+         // Update the range of the data values
+         data_dp[i_var].data_range(min, max);
+         if(is_bad_data(var_mins[i_var]) || min < var_mins[i_var]) {
+            var_mins[i_var] = min;
+         }
+         if(is_bad_data(var_maxs[i_var]) || max > var_maxs[i_var]) {
+            var_maxs[i_var] = max;
+         }
+
+         // Update partial sums
+         update_pdf(bin_mins[i_var_str][0],
+                    bin_deltas[i_var_str],
+                    histograms[i_var_str],
+                    data_dp[i_var], conf_info.mask_map[0]);
+      } // end for i_var
 
      // Process the 2d joint histograms
      for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
@@ -377,7 +380,7 @@ void process_series(void) {
                             bin_deltas[j_var_str],
                             joint_histograms[ij_var_str],
                             data_dp[i_var], data_dp[j_var],
-                            conf_info.mask_area);
+                            conf_info.mask_map[0]);
        } // end for j_var
      } // end for i_var
    } // end for i_series
@@ -521,12 +524,7 @@ void setup_nc_file(void) {
    // Add global attributes
    write_netcdf_global(nc_out, out_file.c_str(), program_name,
                        nullptr, nullptr, conf_info.desc.c_str());
-   add_att(nc_out, "mask_grid", (conf_info.mask_grid_name.nonempty() ?
-                                 (string)conf_info.mask_grid_name :
-                                 na_str));
-   add_att(nc_out, "mask_poly", (conf_info.mask_poly_name.nonempty() ?
-                                 (string)conf_info.mask_poly_name :
-                                 na_str));
+   add_att(nc_out, "mask_name", conf_info.mask_name[0]);
 
    // Add time range information to the global attributes
    add_att(nc_out, "init_beg",  (string)unix_to_yyyymmdd_hhmmss(init_beg));
@@ -538,7 +536,7 @@ void setup_nc_file(void) {
 
    // Write the grid size, mask size, and series length
    write_nc_var_int("grid_size", "number of grid points", grid.nxy());
-   write_nc_var_int("mask_size", "number of mask points", conf_info.mask_area.count());
+   write_nc_var_int("mask_size", "number of mask points", conf_info.mask_map[0].count());
    write_nc_var_int("n_series", "length of series", n_series);
 
    // Compression level

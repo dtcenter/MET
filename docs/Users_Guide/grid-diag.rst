@@ -68,7 +68,7 @@ _____________________
   regrid        = { ... }
   censor_thresh = [];
   censor_val    = [];
-  mask          = { grid = ""; poly = ""; }
+  mask          = { grid = []; poly = []; }
   version       = "VN.N";
 
 The configuration options listed above are common to many MET tools and are described in :numref:`config_options`.
@@ -98,9 +98,33 @@ The **name** and **level** entries in the **data** dictionary define the data to
 
 Grid-Diag prints a warning message if the actual range of data values falls outside the range defined for that variable in the configuration file. Any data values less than the configured range are counted in the first bin, while values greater than the configured range are counted in the last bin.
 
+_____________________
+
+.. code-block:: none
+
+   output_flag = {
+      histogram_1d = TRUE;
+      histogram_2d = TRUE;
+      info_theory  = FALSE;
+   }
+
+The **output_flag** dictionary controls the type of output that the Grid-Diag tool generates. Each flag should be set to **TRUE** or **FALSE** to enable the computation and writing of one or more variables to the output NetCDF file, as described below:
+
+1. **histogram_1d** for 1-dimensional histograms for each **data.field** entry, including minimum, maxmimum, and midpoint values for each histogram bin.
+
+2. **histogram_2d** for 2-dimensional histograms for each pair of **data.field** entries, including minimum, maxmimum, and midpoint values for each histogram bin.
+
+3. **info_theory** for information threory metrics, including entropy for each **data.field** entry and mutual information for each pair of entries.
+ 
 grid_diag Output File
 ---------------------
 
-The NetCDF file has a dimension for each of the specified data variable and level combinations, e.g. APCP_L0 and PWAT_L0. The bin minimum, midpoint, and maximum values are indicated with an _min, _mid, or _max appended to the variable/level.
+The NetCDF file has dimensions for the number of masking regions and one for each of the specified data variable and level combinations, e.g. APCP_L0 and PWAT_L0. If histogram output is requested, the bin minimum, midpoint, and maximum values are indicated with an _min, _mid, or _max appended to the variable/level. 
 
-For each variable/level combination in the data dictionary, a corresponding histogram will be written to the NetCDF output file. For example, hist_APCP_L0 and hist_PWAT_L0 are the counts of all data values falling within the bin. Data values below the minimum or above the maximum are included in the lowest and highest bins, respectively. A warning message is printed when the range of the data falls outside the range defined in the configuration file. In addition to 1D histograms, 2D histograms for all variable/level pairs are written. For example, hist_APCP_L0_PWAT_L0 is the joint histogram for those two variables/levels. The output variables for grid_size, mask_size, and n_series specify the number of points in the grid, the number of grid points in the mask, and the number of files that were processed, respectively. The range of the initialization, valid, and lead times processed is written to the global attributes.
+If 1-dimensional histograms are requested, a corresponding **hist_** variable is written for each variable/level in the data dictionary. For example, hist_APCP_L0 and hist_PWAT_L0 are the counts of all data values falling within the bin. Data values below the minimum or above the maximum are included in the lowest and highest bins, respectively. A warning message is printed when the range of the data falls outside the range defined in the configuration file.
+
+If 2-dimensional historgrams are requested, a corresponding **hist_** varible is written for each combination of variable/level entries in the data dictionary. For example, hist_APCP_L0_PWAT_L0 is the joint histogram for those two variables/levels.
+
+All histogram variables, as well as the **mask_size** variable, include a dimension based on the number of masking regions requested.
+
+The output variables for **grid_size** and **n_series** specify the number of points in the grid and the number of files that were processed, respectively. The range of the initialization, valid, and lead times processed is written to the global attributes.
