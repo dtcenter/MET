@@ -405,7 +405,8 @@ void NumArray::add_css(const char *text)
 
    for (j=0; j<sa.n_elements(); j++)  {
 
-      add(atof(sa[j].c_str()));
+      if (sa[j] == na_string) add(bad_data_double);
+      else                    add(atof(sa[j].c_str()));
 
    }
 
