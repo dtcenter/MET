@@ -114,7 +114,7 @@ static ConcatString OutputFilename;
 static ConcatString adp_filename;
 static ConcatString config_filename;
 static PointToGridConfInfo conf_info;
-static NumArray DefValNA;
+static NumArray DefaultValueNA;
 static StringArray FieldSA;
 static RegridInfo RGInfo;
 static StringArray VarNameSA;
@@ -339,16 +339,16 @@ static void process_command_line(int argc, char **argv) {
    }
 
    // Process the default value setting
-   if(DefValNA.n() == 0) {
-      DefValNA.add_const(bad_data_double, FieldSA.n());
+   if(DefaultValueNA.n() == 0) {
+      DefaultValueNA.add_const(bad_data_double, FieldSA.n());
    }
-   else if(DefValNA.n() == 1) {
-      if(FieldSA.n() > 1) DefValNA.add_const(DefValNA[0], FieldSA.n() - 1);
+   else if(DefaultValueNA.n() == 1) {
+      if(FieldSA.n() > 1) DefaultValueNA.add_const(DefaultValueNA[0], FieldSA.n() - 1);
    }
-   else if(DefValNA.n() != FieldSA.n()) {
+   else if(DefaultValueNA.n() != FieldSA.n()) {
       mlog << Error << "\nprocess_command_line() -> "
            << "The -default_value option must define a single default value "
-           << "or one for each -field option (" << DefValNA.n() << " != "
+           << "or one for each -field option (" << DefaultValueNA.n() << " != "
            << FieldSA.n() << ")!\n\n";
       usage();
    }
@@ -1016,7 +1016,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          double from_max_value = -10e10;
 
          // Initialize counter and output fields
-         to_dp.set_constant(DefValNA[i]);
+         to_dp.set_constant(DefaultValueNA[i]);
          cnt_dp.set_constant(0);
          mask_dp.set_constant(0);
          if (has_prob_thresh || do_gaussian_filter) {
@@ -1445,7 +1445,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       to_dp.erase();
       to_dp.set_init(valid_time);
       to_dp.set_valid(valid_time);
-      to_dp.set_constant(DefValNA[i]);
+      to_dp.set_constant(DefaultValueNA[i]);
       regrid_nc_variable(nc_in, fr_mtddf, vinfo, fr_dp, to_dp, to_grid,
                          (var_cell_mapping.size() > 0 ?
                           var_cell_mapping.data() :
@@ -1825,7 +1825,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       to_dp.erase();
       to_dp.set_init(valid_time);
       to_dp.set_valid(valid_time);
-      to_dp.set_constant(DefValNA[i]);
+      to_dp.set_constant(DefaultValueNA[i]);
       regrid_goes_variable(nc_in, vinfo, fr_dp, to_dp,
                            fr_grid, to_grid, cellMapping.data(), nc_adp);
 
@@ -3066,7 +3066,7 @@ static void set_field(const StringArray &a) {
 ////////////////////////////////////////////////////////////////////////
 
 static void set_default_value(const StringArray &a) {
-   DefValNA.add_css(a[0].c_str());
+   DefaultValueNA.add_css(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
