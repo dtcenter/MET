@@ -1025,7 +1025,6 @@ The usage statement for the Point2Grid tool is shown below:
          output_filename
          -field string
          [-config file]
-         [-default_value n]
          [-goes_qc flags]
          [-adp adp_filename]
          [-method type]
@@ -1056,29 +1055,27 @@ Optional Arguments for point2grid
 
 5. The **-config** file option is the configuration file to be used.
 
-6. The **-default_value n** option specifies a single default output value or a comma-separated list of default output values for each field. The default is bad data (NA).
+6. The **-goes_qc** flags option specifies a comma-separated list of quality control (QC) flags, for example "0,1". Only used if grid_mapping is set to "goes_imager_projection" and the QC variable exists. Note that the older **-qc** option name is also supported.
 
-7. The **-goes_qc** flags option specifies a comma-separated list of quality control (QC) flags, for example "0,1". Only used if grid_mapping is set to "goes_imager_projection" and the QC variable exists. Note that the older **-qc** option name is also supported.
+7. The **-adp adp_filename** option provides an additional Aerosol Detection Product (ADP) information on aerosols, dust, and smoke. This option is ignored if the requested variable is not GOES AOD ("AOD_Dust" or "AOD_Smoke"). The gridded data is filtered by the presence of dust/smoke. If -goes_qc options are given, it's applied to QC of dust/smoke, too (First filtering with AOD QC values and the second filtering with dust/smoke QC values).
 
-9. The **-adp adp_filename** option provides an additional Aerosol Detection Product (ADP) information on aerosols, dust, and smoke. This option is ignored if the requested variable is not GOES AOD ("AOD_Dust" or "AOD_Smoke"). The gridded data is filtered by the presence of dust/smoke. If -goes_qc options are given, it's applied to QC of dust/smoke, too (First filtering with AOD QC values and the second filtering with dust/smoke QC values).
+8. The **-method type** option specifies the regridding method. The default method is UW_MEAN.
 
-9. The **-method type** option specifies the regridding method. The default method is UW_MEAN.
+9. The **-gaussian_dx n** option specifies the distance interval for Gaussian smoothing. The default is 81.271 km. Only used if the method is GAUSSIAN or MAXGAUSS.
 
-10. The **-gaussian_dx n** option specifies the distance interval for Gaussian smoothing. The default is 81.271 km. Only used if the method is GAUSSIAN or MAXGAUSS.
+10. The **-gaussian_radius** n option specifies the radius of influence for Gaussian interpolation. The default is 120. Only used if the method is GAUSSIAN or MAXGAUSS.
 
-11. The **-gaussian_radius n** option specifies the radius of influence for Gaussian interpolation. The default is 120. Only used if the method is GAUSSIAN or MAXGAUSS.
+11. The **-prob_cat_thresh string** option sets the threshold to compute the probability of occurrence. The default is set to disabled. This option is relevant when calculating practically perfect forecasts.
 
-12. The **-prob_cat_thresh string** option sets the threshold to compute the probability of occurrence. The default is set to disabled. This option is relevant when calculating practically perfect forecasts.
+12. The **-vld_thresh n** option sets the required ratio of valid data for regridding. The default is 0.5.
 
-13. The **-vld_thresh n** option sets the required ratio of valid data for regridding. The default is 0.5.
+13. The **-name list** option specifies a comma-separated list of output variable names for each field specified.
 
-14. The **-name list** option specifies a comma-separated list of output variable names for each field specified.
+14. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
 
-15. The **-log file** option directs output and errors to the specified log file. All messages will be written to that file as well as standard out and error. Thus, users can save the messages without having to redirect the output on the command line. The default behavior is no log file.
+15. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
 
-16. The **-v level** option indicates the desired level of verbosity. The value of "level" will override the default setting of 2. Setting the verbosity to 0 will make the tool run with no log messages, while increasing the verbosity above 1 will increase the amount of logging.
-
-17. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
+16. The **-compress level** option indicates the desired level of compression (deflate level) for NetCDF variables. The valid level is between 0 and 9. The value of "level" will override the default setting of 0 from the configuration file or the environment variable MET_NC_COMPRESS. Setting the compression level to 0 will make no compression for the NetCDF output. Lower number is for fast compression and higher number is for better compression.
 
 Only 4 interpolation methods are applied to the field variables; MIN/MAX/MEDIAN/UW_MEAN. The GAUSSIAN method is applied to the probability variable only. Unlike regrad_data_plane, MAX method is applied to the file variable and Gaussian method to the probability variable with the MAXGAUSS method. If the probability variable is not requested, MAXGAUSS method is the same as MAX method.
 
