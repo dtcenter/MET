@@ -2987,7 +2987,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
 
         << "\t\t\"-default_value n\" specifies a single default output value or "
         << "a comma-separated list of default output values for each field (default: "
-        << na_str << ", optional).\n"
+        << bad_data_double << ", optional).\n"
 
         << "\t\t\"-goes_qc flags\" specifies a comma-separated list of QC flags, "
         << "for example \"0,1\" (optional).\n"

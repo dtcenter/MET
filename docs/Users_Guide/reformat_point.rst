@@ -1056,7 +1056,7 @@ Optional Arguments for point2grid
 
 5. The **-config** file option is the configuration file to be used.
 
-6. The **-default_value n** option specifies a single default output value or a comma-separated list of default output values for each field. The default is bad data (NA).
+6. The **-default_value n** option specifies a single default output value or a comma-separated list of default output values for each field. The default is bad data (-9999).
 
 7. The **-goes_qc** flags option specifies a comma-separated list of quality control (QC) flags, for example "0,1". Only used if grid_mapping is set to "goes_imager_projection" and the QC variable exists. Note that the older **-qc** option name is also supported.
 
