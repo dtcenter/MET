@@ -63,6 +63,7 @@
 //   021    01/30/25  Halley Gotway  MET #3054 Fix PARUSR BUFRLIB error
 //   022    05/14/25  Halley Gotway  MET #3099 Write units and descriptions
 //                                   for derived variables
+//   023    12/22/25  Halley Gotway  MET #3307 Quality mark threshold type
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -1521,10 +1522,9 @@ void process_pbfile(int i_pb) {
                quality_mark = (float) evns[kk][ev][lv][1];
             }
 
-            // If the quality mark is greater than than the quality
-            // mark threshold in the configuration file
+	    // If the quality mark threshold criteria is not met,
             // continue to the next observation event
-            if(conf_info.quality_mark_thresh < quality_mark) continue;
+            if(!conf_info.quality_mark_thresh.check(quality_mark)) continue;
 
             // Retrieve the data level category from the top of the
             // event stack: ev = 0
@@ -1920,7 +1920,7 @@ void process_pbfile(int i_pb) {
                   obs_arr[3]   = 0;                                  // AIRNOW obs at surface
                   quality_mark = bufr_obs_extra[lv][1];
                   // Convert a special number (1e+11) to NA at addObservation
-                  if(conf_info.quality_mark_thresh < quality_mark) continue;
+                  if(!conf_info.quality_mark_thresh.check(quality_mark)) continue;
                }
                else {
                   // Retain the pressure in hPa for each observation record
