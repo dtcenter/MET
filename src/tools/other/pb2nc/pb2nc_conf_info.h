@@ -52,7 +52,7 @@ class PB2NCConfInfo {
       double       end_level;
       NumArray     level_category;      // Level categories to be retained
       StringArray  obs_bufr_var;        // BUFR variiable names for the observation type
-      SingleThresh quality_mark_thresh; // Quality marks to be retained
+      int          quality_mark_thresh; // Quality marks to be retained
       bool         event_stack_flag;    // True for top, false for bottom
       ConcatString tmp_dir;             // Directory for temporary files
       ConcatString version;             // Config file version

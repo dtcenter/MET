@@ -253,10 +253,10 @@ _____________________
 
 .. code-block:: none
 
-   quality_mark_thresh = <=2;
+   quality_mark_thresh = 2;
 
 
-Each observation has an integer quality mark value associated with it. The **quality_mark_thresh** is used to stratify which quality marks will be retained. By default, observations with quality marks less than or equal to 2 will be kept. This can be specified as a threshold string or as an integer defining the maximum allowable quality mark value. Earlier versions of MET only supported the integer setting.
+Each observation has a quality mark value associated with it. The **quality_mark_thresh** is used to stratify out which quality marks will be retained. The value shown above indicates that only observations with quality marks less than or equal to 2 will be retained.
 
 _____________________
 
