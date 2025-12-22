@@ -101,7 +101,10 @@ MET Version 13.0.0 Upgrade Instructions
 
    MET version 13.0.0 adds, modifies, or removes the following configuration options:
 
-   * None
+   * The PB2NC "quality_mark_thresh" configuration file option can now be set as a threshold
+     string or integer, as before. For example, for GDAS surface observations, consider using
+     `quality_mark_thresh = <=2||==9;` to retain high quality surface observations (1 and 2)
+     plus those ignored by the data assimilation system (9).
 
 .. dropdown:: Output format changes - NONE
 
