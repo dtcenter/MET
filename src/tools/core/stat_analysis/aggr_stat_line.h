@@ -29,7 +29,8 @@
 //   010    04/25/18  Halley Gotway   Add ECNT line type.
 //   011    04/01/19  Fillmore        Add FCST and OBS units.
 //   012    01/24/20  Halley Gotway   Add aggregate RPS lines.
-//   013    09/28/22  Prestopnik      MET #2227 Remove namespace std
+//   013    09/28/22  Prestopnik      MET #2227 Remove namespace std.
+//   014    12/01/25  Halley Gotway   MET #2698 Refine temp file usage.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -186,107 +187,107 @@ struct AggrTimeSeriesInfo {
 ////////////////////////////////////////////////////////////////////////
 
 extern void aggr_summary_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrSummaryInfo> &,
                int &, int &);
 
 extern void aggr_ctc_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrCTCInfo> &,
                int &, int &);
 
 extern void aggr_mctc_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrMCTCInfo> &,
                int &, int &);
 
 extern void aggr_pct_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrPCTInfo> &,
                int &, int &);
 
 extern void aggr_psum_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrPSumInfo> &,
                int &, int &);
 
 extern void aggr_grad_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrGRADInfo> &,
                int &, int &);
 
 extern void aggr_wind_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrWindInfo> &,
                int &, int &);
 
 extern void aggr_mpr_wind_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrWindInfo> &,
                int &, int &);
 
 extern void aggr_mpr_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrMPRInfo> &,
                int &, int &);
 
 extern void aggr_isc_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrISCInfo> &,
                int &, int &);
 
 extern void aggr_ecnt_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrENSInfo> &,
                int &, int &);
 
 extern void aggr_rps_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrRPSInfo> &,
                int &, int &);
 
 extern void aggr_rhist_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrENSInfo> &,
                int &, int &);
 
 extern void aggr_phist_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrENSInfo> &,
                int &, int &);
 
 extern void aggr_relp_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrENSInfo> &,
                int &, int &);
 
 extern void aggr_orank_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrENSInfo> &,
                int &, int &);
 
 extern void aggr_ssvar_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrSSVARInfo> &,
                int &, int &);
 
 extern void aggr_seeps_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrSEEPSInfo> &,
                int &, int &);
 
 extern void aggr_seeps_mpr_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrSEEPSMPRInfo> &,
                int &, int &);
 
 extern void aggr_time_series_lines(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrTimeSeriesInfo> &,
                int &, int &);
 
 extern void aggr_ss_index(
-               LineDataFile &, STATAnalysisJob &,
+               LineDataFiles &, STATAnalysisJob &,
                std::map<ConcatString, AggrSSIndexInfo> &,
                int &, int &);
 

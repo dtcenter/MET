@@ -24,7 +24,8 @@
 //   004    05-20-24  Howard Soh     MET #2867 Fix -qc ADP bug.
 //   005    06-24-24  Halley Gotway  MET #2880 Filter obs_quality.
 //   006    10-21-24  Halley Gotway  MET #3000 Reduce warnings.
-//   007    05/07-25  Halley Gotway  MET #3145 Add OpenMP.
+//   007    05-07-25  Halley Gotway  MET #3145 Add OpenMP.
+//   008    12-16-25  Halley Gotway  MET #3297 Add -default_value.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -113,6 +114,7 @@ static ConcatString OutputFilename;
 static ConcatString adp_filename;
 static ConcatString config_filename;
 static PointToGridConfInfo conf_info;
+static NumArray DefaultValueNA;
 static StringArray FieldSA;
 static RegridInfo RGInfo;
 static StringArray VarNameSA;
@@ -164,6 +166,7 @@ static void write_nc_int(const DataPlane &dp, const Grid &grid,
 static void close_nc();
 static void usage(int exit_code=1);
 static void set_field(const StringArray &);
+static void set_default_value(const StringArray &);
 static void set_method(const StringArray &);
 static void set_prob_cat_thresh(const StringArray &);
 static void set_vld_thresh(const StringArray &);
@@ -273,6 +276,7 @@ static void process_command_line(int argc, char **argv) {
 
    // Add the options function calls
    cline.add(set_field,           "-field",           1);
+   cline.add(set_default_value,   "-default_value",   1);
    cline.add(set_method,          "-method",          1);
    cline.add(set_vld_thresh,      "-vld_thresh",      1);
    cline.add(set_name,            "-name",            1);
@@ -331,6 +335,21 @@ static void process_command_line(int argc, char **argv) {
    if(FieldSA.n() < 1) {
       mlog << Error << "\nprocess_command_line() -> "
            << "The -field option must be used at least once!\n\n";
+      usage();
+   }
+
+   // Process the default value setting
+   if(DefaultValueNA.n() == 0) {
+      DefaultValueNA.add_const(bad_data_double, FieldSA.n());
+   }
+   else if(DefaultValueNA.n() == 1) {
+      if(FieldSA.n() > 1) DefaultValueNA.add_const(DefaultValueNA[0], FieldSA.n() - 1);
+   }
+   else if(DefaultValueNA.n() != FieldSA.n()) {
+      mlog << Error << "\nprocess_command_line() -> "
+           << "The -default_value option must define a single default value "
+           << "or one for each -field option (" << DefaultValueNA.n() << " != "
+           << FieldSA.n() << ")!\n\n";
       usage();
    }
 
@@ -772,7 +791,6 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
    int nx = to_grid.nx();
    int ny = to_grid.ny();
    to_dp.set_size(nx, ny);
-   to_dp.set_constant(bad_data_double);
    cnt_dp.set_size(nx, ny);
    cnt_dp.set_constant(0);
    mask_dp.set_size(nx, ny);
@@ -998,7 +1016,7 @@ void process_point_met_data(MetPointData *met_point_obs, MetConfig &config, VarI
          double from_max_value = -10e10;
 
          // Initialize counter and output fields
-         to_dp.set_constant(bad_data_double);
+         to_dp.set_constant(DefaultValueNA[i]);
          cnt_dp.set_constant(0);
          mask_dp.set_constant(0);
          if (has_prob_thresh || do_gaussian_filter) {
@@ -1427,6 +1445,7 @@ static void process_point_nccf_file(NcFile *nc_in, MetConfig &config,
       to_dp.erase();
       to_dp.set_init(valid_time);
       to_dp.set_valid(valid_time);
+      to_dp.set_constant(DefaultValueNA[i]);
       regrid_nc_variable(nc_in, fr_mtddf, vinfo, fr_dp, to_dp, to_grid,
                          (var_cell_mapping.size() > 0 ?
                           var_cell_mapping.data() :
@@ -1564,7 +1583,6 @@ static void regrid_nc_variable(NcFile *nc_in, Met2dDataFile *fr_mtddf,
    int to_lon_cnt = to_grid.nx();
 
    missing_cnt = non_missing_cnt = 0;
-   to_dp.set_constant(bad_data_double);
 
    for (int xIdx=0; xIdx<to_lon_cnt; xIdx++) {
       for (int yIdx=0; yIdx<to_lat_cnt; yIdx++) {
@@ -1807,6 +1825,7 @@ static void process_goes_file(NcFile *nc_in, MetConfig &config, VarInfo *vinfo,
       to_dp.erase();
       to_dp.set_init(valid_time);
       to_dp.set_valid(valid_time);
+      to_dp.set_constant(DefaultValueNA[i]);
       regrid_goes_variable(nc_in, vinfo, fr_dp, to_dp,
                            fr_grid, to_grid, cellMapping.data(), nc_adp);
 
@@ -2640,7 +2659,6 @@ static void regrid_goes_variable(NcFile *nc_in, const VarInfo *vinfo,
    std::set<GOES_QC> aod_qc_flags = prepare_qoes_qc_array();
 
    missing_count = non_missing_count = 0;
-   to_dp.set_constant(bad_data_double);
 
    int shift_bits = 2;
    if (is_dust_only) shift_bits += 2;
@@ -2938,6 +2956,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
         << "\toutput_filename\n"
         << "\t-field string\n"
         << "\t[-config file]\n"
+        << "\t[-default_value n]\n"
         << "\t[-goes_qc flags]\n"
         << "\t[-adp adp_filename]\n"
         << "\t[-method type]\n"
@@ -2965,6 +2984,10 @@ __attribute__((noreturn)) static void usage(int exit_code) {
 
         << "\t\t\"-config file\" uses the specified configuration file "
         << "to generate gridded data (optional).\n"
+
+        << "\t\t\"-default_value n\" specifies a single default output value or "
+        << "a comma-separated list of default output values for each field (default: "
+        << na_str << ", optional).\n"
 
         << "\t\t\"-goes_qc flags\" specifies a comma-separated list of QC flags, "
         << "for example \"0,1\" (optional).\n"
@@ -3038,6 +3061,12 @@ static void set_adp_gc_values(NcVar var_adp_qc) {
 
 static void set_field(const StringArray &a) {
    FieldSA.add(a[0]);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void set_default_value(const StringArray &a) {
+   DefaultValueNA.add_css(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////

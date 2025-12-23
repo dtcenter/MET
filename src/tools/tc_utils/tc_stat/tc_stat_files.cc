@@ -58,110 +58,24 @@ TCStatFiles::TCStatFiles(const TCStatFiles &j) {
 
 ////////////////////////////////////////////////////////////////////////
 
-TCStatFiles & TCStatFiles::operator=(const TCStatFiles &j) {
-
-   if(this == &j) return *this;
-
-   assign(j);
-
-   return *this;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCStatFiles::init_from_scratch() {
-
-   clear();
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCStatFiles::clear() {
-
-   FileList.clear();
-
-   CurFile = -1;
-
-   CurLDF.close();
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void TCStatFiles::assign(const TCStatFiles & j) {
-
-   clear();
-
-   FileList = j.FileList;
-
-   rewind();
-
-   return;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-
 void TCStatFiles::add_files(const StringArray &files) {
 
-   FileList.add(files);
+   for(int i=0; i<files.n(); i++) add(files[i].c_str());
 
    return;
 }
-
-////////////////////////////////////////////////////////////////////////
-
-void TCStatFiles::rewind() {
-
-   CurFile = -1;
-
-   CurLDF.close();
-
-   return;
-}
-
 
 ////////////////////////////////////////////////////////////////////////
 
 bool TCStatFiles::operator>>(TrackPairInfo &pair) {
    TCStatLine line;
+   bool status = false;
 
    // Initialize
    pair.clear();
 
-   // Check the status of the current file
-   if(!CurLDF.ok()) {
-
-      // Increment the file index
-      CurFile++;
-
-      // Check for the last file
-      if(CurFile == FileList.n()) return false;
-      else {
-
-         // Open the next file for reading
-         CurLDF.close();
-         if(!(CurLDF.open(FileList[CurFile].c_str()))) {
-            mlog << Error << "\nTCStatFiles::operator>>(TrackPairInfo &) -> "
-                 << "can't open file \"" << FileList[CurFile]
-                 << "\" for reading\n\n";
-            exit(1);
-         }
-
-         // List file being read
-         mlog << Debug(3)
-              << "Reading file " << CurFile+1 << " of "
-              << FileList.n() << ": " << FileList[CurFile]
-              << "\n";
-
-      } // end else
-   } // end if
-
    // Read lines to the end of the track or file
-   while(CurLDF >> line) {
+   while(*this >> line) {
 
       // Skip header and non-TCMPR/TCDIAG lines
       if(line.is_header() ||
@@ -183,58 +97,34 @@ bool TCStatFiles::operator>>(TrackPairInfo &pair) {
             }
          }
 
+         status = true;
+
          break;
       }
    } // end while
 
-   return true;
+   return status;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
    TCStatLine line;
-   bool status;
+   bool status = false;
 
    // Initialize
    pair.clear();
 
-   // Check the status of the current file
-   if(!CurLDF.ok()) {
-
-      // Increment the file index
-      CurFile++;
-
-      // Check for the last file
-      if(CurFile == FileList.n()) return false;
-      else {
-
-         // Open the next file for reading
-         CurLDF.close();
-         if(!(CurLDF.open(FileList[CurFile].c_str()))) {
-            mlog << Error << "\nTCStatFiles::operator>>(ProbRIRWPairInfo &) -> "
-                 << "can't open file \"" << FileList[CurFile]
-                 << "\" for reading\n\n";
-            exit(1);
-         }
-
-         // List file being read
-         mlog << Debug(3)
-              << "Reading file " << CurFile+1 << " of "
-              << FileList.n() << ": " << FileList[CurFile]
-              << "\n";
-
-      } // end else
-   } // end if
-
-   // Read next line
-   while((status = (CurLDF >> line))) {
+   // Read lines to the end of the pair or file 
+   while(*this >> line) {
 
       // Skip header and non-PROBRIRW lines
       if(line.is_header() || line.type() != TCStatLineType::ProbRIRW) continue;
 
       // Add the current point
       pair.set(line);
+
+      status = true;
 
       break;
 
@@ -246,41 +136,15 @@ bool TCStatFiles::operator>>(ProbRIRWPairInfo &pair) {
 ////////////////////////////////////////////////////////////////////////
 
 bool TCStatFiles::operator>>(TCStatLine &line) {
-   bool status;
-
-   // Check the status of the current file
-   if(!CurLDF.ok()) {
-
-      // Increment the file index
-      CurFile++;
-
-      // Check for the last file
-      if(CurFile == FileList.n()) return false;
-      else {
-
-         // Open the next file for reading
-         CurLDF.close();
-         if(!(CurLDF.open(FileList[CurFile].c_str()))) {
-            mlog << Error << "\nTCStatFiles::operator>>(TCStatLine &) -> "
-                 << "can't open file \"" << FileList[CurFile]
-                 << "\" for reading\n\n";
-            exit(1);
-         }
-
-         // List file being read
-         mlog << Debug(3)
-              << "Reading file " << CurFile+1 << " of "
-              << FileList.n() << ": " << FileList[CurFile]
-              << "\n";
-
-      } // end else
-   } // end if
+   bool status = false;
 
    // Read next line
-   while((status = (CurLDF >> line))) {
+   while(LineDataFiles::operator>>(line)) {
 
       // Skip header and invalid line types
       if(line.is_header() || line.type() == TCStatLineType::None) continue;
+
+      status = true;
 
       break;
 
@@ -290,3 +154,4 @@ bool TCStatFiles::operator>>(TCStatLine &line) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+
