@@ -108,20 +108,24 @@ or one or more jobs can be specified in an optional configuration
 file. When a configuration file is provided, any filtering options
 specified are applied to all entries in the :code:`jobs` array.
 
-Rather than reading all of the input data for each job, Stat-Analysis
-reads all the input data once, applies any common filtering options,
-and writes the result to a temporary file.
+If Stat-Analysis is run with a configuration file that specifies
+more than one analysis job and the user defines top-level filtering 
+criteria common to all jobs, then Stat-Analysis writes a temporary
+file. Applying the common filters up front and writing the result
+to a temporary file may be more efficient than parsing all of the
+input data for each job.
 
-* :code:`tmp_stat_analysis_{PID}`: Stat-Analysis reads all of the
-  input data, applies common filtering logic, and writes the result
-  to this temporary file. All of the specified jobs read data from
+* :code:`tmp_stat_analysis_{PID}`: If warranted, Stat-Analysis reads
+  all input data, applies common filtering logic, and writes the
+  result to this temporary file. All of analysis jobs read data from
   this temporary file, apply any additional job-specific filtering
   criteria, and perform the requested operation.
 
 .. note::
-   Consider revising the logic to only use a temp file when actually
-   necessary, when multiple jobs are specified along with non-empty
-   common filtering logic.
+   Earlier versions of Stat-Analysis always wrote a temporary file
+   regardless of the number of jobs and filtering criteria. That
+   logic has been refined to only use temporary files when they may
+   increase efficiency.
 
 .. _tmp_files_python_embedding:
 

@@ -161,6 +161,8 @@ class STATAnalysisJob {
 
       ConcatString get_jobstring() const;
 
+      bool has_common_filters() const;
+
       //
       // Job Type
       //
