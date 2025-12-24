@@ -10,9 +10,10 @@ C*      *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 C*
         INCLUDE    'readpb.prm'
 C*
-        INTEGER    FID, FID2
-        INTEGER    NMSG
-        REAL*8     R8ARR(1, 1)
+        INTEGER, INTENT(IN)  :: FID
+        INTEGER, INTENT(OUT) :: NMSG
+        INTEGER :: FID2
+        REAL(dp), DIMENSION(1,1) :: R8ARR
 C*
 C-----------------------------------------------------------------------
 C*
@@ -22,42 +23,50 @@ C*
         FID2 = -FID
         CALL UFBTAB  ( FID2, R8ARR, 1, 1, NMSG, ' ' )
 C*
-        END
+        END SUBROUTINE NUMPBMSG
 
 
         SUBROUTINE NUMPBMSG_NEW ( PBFILE, FID, NMSG )
 C*
         INCLUDE    'readpb.prm'
 C*
-        CHARACTER  PBFILE*(FILEMXSTRL)
-        INTEGER    FID, FID2
-        INTEGER    NMSG
-        REAL*8     R8ARR(1, 1)
+        CHARACTER(LEN=FILEMXSTRL), INTENT(IN) :: PBFILE
+        INTEGER, INTENT(IN)  :: FID
+        INTEGER, INTENT(OUT) :: NMSG
+        INTEGER :: FID2
+        REAL(dp), DIMENSION(1,1) :: R8ARR
+        INTEGER :: IOS
 C*
 C-----------------------------------------------------------------------
 C*
 C*      Call UFBTAB to figure out how many messages the PrepBufr file
 C*      attached to FID contains
 C*
-        OPEN  ( UNIT = FID, FILE = PBFILE, FORM = 'UNFORMATTED' )
+        OPEN  ( UNIT = FID, FILE = PBFILE, FORM = 'UNFORMATTED',
+     &          ACTION='READ', IOSTAT=ios )
+        IF (ios /= 0) THEN
+           ! Could not open file; return NMSG = 0 to indicate failure/no messages
+           NMSG = 0
+           RETURN
+        ENDIF
         FID2 = -FID
         CALL UFBTAB  ( FID2, R8ARR, 1, 1, NMSG, ' ' )
         CLOSE ( UNIT = FID )
 C*
-        END
+        END SUBROUTINE NUMPBMSG_NEW
 
 
         SUBROUTINE GET_TMIN ( FID, TMIN )
 C*
-        INTEGER    FID, TMIN
+        INTEGER, INTENT(IN)  :: FID
+        INTEGER, INTENT(OUT) :: TMIN
 C*
 C-----------------------------------------------------------------------
 C*
 C*      Call UFBTAB to figure out how many messages the PrepBufr file
 C*      attached to FID contains
 C*
-        FID2 = -FID
         TMIN = IUPVS01(FID,'MINU')
 C*
-        END
-        
+        END SUBROUTINE GET_TMIN
+

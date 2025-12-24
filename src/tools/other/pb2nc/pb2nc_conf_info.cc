@@ -31,9 +31,9 @@ using namespace std;
 
 map<ConcatString,ConcatString> parse_conf_obs_bufr_map(Dictionary *dict) {
 
-   const char *key_name = (0 != dict->lookup_array(conf_key_obs_prepbufr_map, false, false))
+   const char *key_name = (nullptr != dict->lookup_array(conf_key_obs_prepbufr_map, false, false))
                           ? conf_key_obs_prepbufr_map : conf_key_old_prepbufr_map;
-   map<ConcatString,ConcatString> m = parse_conf_key_value_map(dict, (const char *)key_name);
+   map<ConcatString,ConcatString> m = parse_conf_key_value_map(dict, key_name);
    parse_add_conf_key_value_map(dict, conf_key_obs_bufr_map, &m);
    return m;
 }
@@ -83,7 +83,7 @@ void PB2NCConfInfo::clear() {
    beg_level = end_level = bad_data_double;
    level_category.clear();
    obs_bufr_var.clear();
-   quality_mark_thresh = bad_data_int;
+   quality_mark_thresh.clear();
    event_stack_flag = false;
    tmp_dir.clear();
    version.clear();
@@ -107,19 +107,19 @@ void PB2NCConfInfo::read_config(const char *default_file_name,
 
    // Read the default config file
    conf.read(default_file_name);
-   if (0 != conf.lookup_array(conf_key_old_prepbufr_map, false, false)) {
+   if (nullptr != conf.lookup_array(conf_key_old_prepbufr_map, false, false)) {
       warning_code = 1;
       bad_file_names = default_file_name;
-      if (0 != conf.lookup_array(conf_key_obs_prepbufr_map, false, false)) use_bad_one = false;
+      if (nullptr != conf.lookup_array(conf_key_obs_prepbufr_map, false, false)) use_bad_one = false;
    }
 
    // Read the user-specified config file
    conf.read(user_file_name);
-   if (0 != conf.lookup_array(conf_key_old_prepbufr_map, false, false)) {
+   if (nullptr != conf.lookup_array(conf_key_old_prepbufr_map, false, false)) {
       warning_code = 2;
       if (0 < bad_file_names.length()) bad_file_names += " and ";
       bad_file_names += user_file_name;
-      if (0 != conf.lookup_array(conf_key_obs_prepbufr_map, false, false)) use_bad_one = false;
+      if (nullptr != conf.lookup_array(conf_key_obs_prepbufr_map, false, false)) use_bad_one = false;
    }
 
    if (0 < warning_code) {
@@ -145,7 +145,7 @@ void PB2NCConfInfo::process_config() {
    ConcatString s;
    ConcatString mask_name;
    StringArray sa;
-   Dictionary *dict = (Dictionary *) nullptr;
+   auto dict = (Dictionary *) nullptr;
 
    // Dump the contents of the config file
    if(mlog.verbosity_level() >= 5) conf.dump(cout);
@@ -248,14 +248,30 @@ void PB2NCConfInfo::process_config() {
    for(i=0; i<sa.n_elements(); i++) obs_bufr_var.add(sa[i]);
 
    // Conf: quality_mark_thresh
-   quality_mark_thresh = conf.lookup_int(conf_key_quality_mark_thresh);
+   quality_mark_thresh = conf.lookup_thresh(conf_key_quality_mark_thresh, false, false);
 
-   // Check the value
-   if(quality_mark_thresh < 0 || quality_mark_thresh > 15) {
-      mlog << Warning << "\nPB2NCConfInfo::process_config() -> "
-           << "the \"" << conf_key_quality_mark_thresh
-           << "\" entry (" << quality_mark_thresh
-           << ") should be set between 0 and 15.\n\n";
+   // MET#3307 backward compatible to also support integer lookup
+   if(!conf.last_lookup_status()) {
+      auto quality_mark_thresh_int = conf.lookup_int(conf_key_quality_mark_thresh, false);
+
+      // Check lookup status
+      if(!conf.last_lookup_status()) {
+         mlog << Error << "\nPB2NCConfInfo::process_config() -> "
+              << "\"" << conf_key_quality_mark_thresh
+              << "\" must be set as a threshold or an integer upper limit.\n\n";
+         exit(1);
+      }
+
+      // Check the value
+      if(quality_mark_thresh_int < 0 || quality_mark_thresh_int > 15) {
+         mlog << Warning << "\nPB2NCConfInfo::process_config() -> "
+              << "the \"" << conf_key_quality_mark_thresh
+              << "\" entry (" << quality_mark_thresh_int
+              << ") should be set as a threshold or an integer between 0 and 15.\n\n";
+      }
+
+      // Store as a <=n threshold
+      quality_mark_thresh.set(quality_mark_thresh_int, ThreshType::thresh_le);
    }
 
    // Conf: event_stack_flag
