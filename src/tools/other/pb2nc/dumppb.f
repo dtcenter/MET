@@ -11,33 +11,40 @@ C*      *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 C*
         INCLUDE   'readpb.prm'
 C*
-        PARAMETER ( NFILO = 18 )
-C*
-        CHARACTER PBFILE* ( FILEMXSTRL )
-        INTEGER   FID
-        CHARACTER OUTDIR* ( FILEMXSTRL )
-        INTEGER   LEN1
-        CHARACTER PREFIX* ( FILEMXSTRL )
-        INTEGER   LEN2
-        INTEGER   FLAG    ( NFILO )
-        CHARACTER outstg* ( MXSTRL ), subset*8
-C*
+        INTEGER, PARAMETER :: NFILO = 18
+
+        ! -- Arguments
+        CHARACTER(LEN=*), intent(in) :: PBFILE
+        INTEGER,          intent(in) :: FID
+        CHARACTER(LEN=*), intent(in) :: OUTDIR
+        INTEGER,          intent(in) :: LEN1
+        CHARACTER(LEN=*), intent(in) :: PREFIX
+        INTEGER,          intent(in) :: LEN2
+        INTEGER,          intent(in) :: FLAG(NFILO)
+
+        ! -- Local variables
+        CHARACTER(LEN=MXSTRL) :: outstg
+        CHARACTER(LEN=8)      :: subset
+        INTEGER               :: idate, ierrpb
+        INTEGER               :: ii, iuno, kk, jj, mm, lv
+        LOGICAL               :: found
+
+        ! initialize var and iunso and FILO consistent with original
         CHARACTER var ( MXR8VT )
      +          /'P','Q','T','Z','U','V'/
-C*
+
         INTEGER iunso ( NFILO )
      +          /   51,   52,   53,   54,   55,
      +              56,   57,   58,   59,   60,
      +              61,   62,   63,   64,   65,
      +              66,   67,   68  /
 C*
-        CHARACTER*6 FILO ( NFILO )
+        CHARACTER(LEN=6) FILO ( NFILO )
      +          / 'ADPUPA', 'AIRCAR', 'AIRCFT', 'ADPSFC', 'ERS1DA',
      +            'GOESND', 'GPSIPW', 'MSONET', 'PROFLR', 'QKSWND',
      +            'RASSDA', 'SATEMP', 'SATWND', 'SFCBOG', 'SFCSHP',
      +            'SPSSMI', 'SYNDAT', 'VADWND' /
 
-        LOGICAL     found
 C-----------------------------------------------------------------------
 C
 C*      Open the output files.
@@ -72,7 +79,7 @@ C
      +            ( FLAG ( ii )  .eq. 1 ) )  THEN
                 found = .true.
                 iuno = iunso ( ii )
-            ELSE 
+            ELSE
                 ii = ii + 1
             END IF
         END DO
@@ -119,7 +126,8 @@ C
         CLOSE  ( UNIT = FID )
 C
         RETURN
-        END
+        END SUBROUTINE DUMPPB
+
 C-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
         SUBROUTINE READPBDUMP  ( lunit, subset, idate, iret )
@@ -166,40 +174,44 @@ C*                  prepbufr file
 C*
         INCLUDE       'readpb.prm'
 C*
-        CHARACTER*(*) subset
-C*
-        CHARACTER*(MXSTRL) head
-     +          / 'SID XOB YOB DHR ELV TYP T29 ITP' /
-C*
-        CHARACTER*(MXSTRL) ostr ( MXR8VT )
+! -- Arguments
+        INTEGER, INTENT(IN)          :: lunit
+        CHARACTER(LEN=*), INTENT(OUT):: subset
+        INTEGER, INTENT(OUT)         :: idate
+        INTEGER, INTENT(OUT)         :: iret
+
+! -- Local (and shared via include) arrays and temporaries
+        CHARACTER(LEN=MXSTRL) :: head
+        CHARACTER(LEN=MXSTRL) :: ostr(MXR8VT)
+        REAL(KIND=8)          :: hdr2(MXR8PM)
+        REAL(KIND=8)          :: evns2(MXR8PM, MXR8LV, MXR8VN, MXR8VT)
+        REAL(KIND=8)          :: r8sid, r8sid2, pob1, pob2
+        CHARACTER(LEN=8)      :: csid, csid2, subst2
+        LOGICAL               :: match
+        INTEGER               :: ii, lv, lv2, kk, jj
+        INTEGER               :: idate2, jret
+        INTEGER               :: nlev2
+
+        DATA head / 'SID XOB YOB DHR ELV TYP T29 ITP' /
+        DATA ostr
      +          / 'POB PQM PPC PRC PFC PAN CAT',
      +            'QOB QQM QPC QRC QFC QAN CAT',
      +            'TOB TQM TPC TRC TFC TAN CAT',
      +            'ZOB ZQM ZPC ZRC ZFC ZAN CAT',
      +            'UOB WQM WPC WRC UFC UAN CAT',
      +            'VOB WQM WPC WRC VFC VAN CAT'  /
-C*
-        REAL*8       hdr2 ( MXR8PM ),
-     +               evns2 ( MXR8PM, MXR8LV, MXR8VN, MXR8VT )
-C*
-        REAL*8       r8sid, r8sid2, pob1, pob2
-C*
-        CHARACTER*8  csid, csid2, subst2
-C*
-        LOGICAL      match / .true. /
-C*
-        EQUIVALENCE ( r8sid, csid ), ( r8sid2, csid2 )
-C*
-        SAVE        match, subst2, idate2
+
+        SAVE match, subst2, idate2
 C-----------------------------------------------------------------------
         iret = 0
+        match = .TRUE.
 C*
 C*      If the previous call to this subroutine did not yield matching
 C*      mass and wind subsets, then IREADNS is already pointing at an
 C*      unmatched subset.  Otherwise, call IREADNS to advance the subset
 C*      pointer to the next subset.
 C*
-        IF  ( match )  THEN
+        IF ( match )  THEN
            IF  ( IREADNS  ( lunit, subset, idate ) .ne. 0 )  THEN
               iret = -1
               RETURN
@@ -221,11 +233,11 @@ C
 C*      Now, advance the subset pointer to the following subset and
 C*      read its HDR data.
 C
-        IF  ( IREADNS  ( lunit, subset, idate ) .ne. 0 )  THEN
+        IF ( IREADNS ( lunit, subset, idate ) .ne. 0 )  THEN
            iret = 1
            RETURN
         END IF
-        CALL UFBINT  ( lunit, hdr2, MXR8PM, 1, jret, head )
+        CALL UFBINT ( lunit, hdr2, MXR8PM, 1, jret, head )
 C
 C*      Check whether these two subsets have identical SID, YOB, XOB,
 C*      ELV, and DHR values.  If so, then they are matching mass and
@@ -253,7 +265,7 @@ C
         END DO
 C
 C*      Read the EVNS data for the second of the two matching subsets.
-C 
+C
         DO ii = 1, MXR8VT
            CALL UFBEVN  ( lunit, evns2 ( 1, 1, 1, ii ), MXR8PM, MXR8LV,
      +                    MXR8VN, nlev2, ostr (ii) )
@@ -313,18 +325,19 @@ C
         END DO
 C*
         RETURN
-        END
+        END SUBROUTINE READPBDUMP
 
         SUBROUTINE DUMP_TBL( PBFILE, FID, TBL_NAME, LEN1 )
 C*
         INCLUDE   'readpb.prm'
 C*
-        CHARACTER PBFILE* ( FILEMXSTRL )
-        CHARACTER TBL_NAME* ( FILEMXSTRL )
-        INTEGER   LEN1
-C*
-        INTEGER   TID, FID
-        LOGICAL     found
+        CHARACTER(LEN=*), INTENT(IN) :: PBFILE
+        INTEGER, INTENT(IN)          :: FID
+        CHARACTER(LEN=*), INTENT(IN) :: TBL_NAME
+        INTEGER, INTENT(IN)          :: LEN1
+
+        INTEGER :: TID
+        LOGICAL :: found
 C-----------------------------------------------------------------------
 C
 C*      Open the output files.
@@ -345,5 +358,5 @@ C
         CLOSE  ( UNIT = TID )
 C
         RETURN
-        END
-        
+        END SUBROUTINE DUMP_TBL
+
