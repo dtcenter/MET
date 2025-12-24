@@ -716,7 +716,7 @@ if [ $COMPILE_ATLAS -eq 1 ]; then
   cd ${LIB_DIR}/atlas/atlas*
   echo "cd `pwd`"
   run_cmd "mkdir build; cd build"
-  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR} > $(pwd)/atlas.cmake.log 2>&1"
+  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR} -DENABLE_TESSELATION=OFF > $(pwd)/atlas.cmake.log 2>&1"
   run_cmd "make ${MAKE_ARGS} > $(pwd)/atlas.make.log 2>&1"
   run_cmd "make ${MAKE_ARGS} install > $(pwd)/atlas.make_install.log 2>&1"
 

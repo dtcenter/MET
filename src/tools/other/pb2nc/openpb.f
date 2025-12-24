@@ -10,15 +10,16 @@ C*      *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 C*
         INCLUDE    'readpb.prm'
 C*
-        CHARACTER  PBFILE*(FILEMXSTRL)
-        INTEGER    FID
+        CHARACTER(len=FILEMXSTRL), INTENT(IN) :: PBFILE
+        INTEGER, INTENT(IN)                   :: FID
 C*
 C-----------------------------------------------------------------------
 C*
 C*      Open the input file.
 C*
-        OPEN  ( UNIT = FID, FILE = PBFILE, FORM = 'UNFORMATTED' )
+        OPEN  ( UNIT = FID, FILE = PBFILE, FORM = 'UNFORMATTED',
+     &          ACTION='read' )
         CALL OPENBF  ( FID, 'IN', FID )
         CALL DATELEN  ( 10 )
 C*
-        END
+        END SUBROUTINE OPENPB
