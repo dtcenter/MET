@@ -1,4 +1,5 @@
-       SUBROUTINE CALPBL(T,Q,P,Z,U,V,MZBL,HPBL,jpbl)
+       SUBROUTINE CALPBL(T,Q,P,Z,U,V,MZBL,HPBL,jpbl) BIND(C)
+C     &            BIND(C)
 C
 C --------------------------------------------------------------------
 C  ATMOSPHERIC BOUNDARY-LAYER HEIGHT CALCULATION
@@ -51,17 +52,45 @@ C                     1=1ST MODEL LEVEL (=SURFACE=0M)
 C                     2=2ND MODEL LEVEL (=1ST ATMOS LEVEL, E.G. 20M)
 C                     3=3RD MODEL LEVEL (=2ND ATMOS LEVEL), ETC
 C --------------------------------------------------------------------
-                             P A R A M E T E R
-     & (H10E5=100000.E0
-     &, EPSQ=2.E-12
-     &, G=9.8E0,CP=1004.6E0,CAPA=0.28589641E0,ROG=287.04/G)
-        PARAMETER (NLEV=256)
-        DIMENSION Z(NLEV),U(NLEV),V(NLEV),TH(NLEV),Q(NLEV),
-     &            P(NLEV),T(NLEV)
+        USE ISO_C_BINDING
+        implicit none
 
-        DATA BETA,GRAV,WMIN,RICR /100.,9.806,0.01,0.25/
-c==     DATA BETA,GRAV,WMIN,RICR /100.,9.806,0.01,1.00/
+        integer, parameter :: NLEV=256
 
+        ! Inputs: upto NLEV=256. MZBL <= NLEV
+        real(C_DOUBLE), intent(in) :: T(NLEV)   ! temperature (K) at model levels
+        real(C_DOUBLE), intent(in) :: Q(NLEV)   ! specific humidity (kg/kg)
+        real(C_DOUBLE), intent(in) :: P(NLEV)   ! pressure (Pa)
+        real(C_DOUBLE), intent(in) :: Z(NLEV)   ! height (m)
+        real(C_DOUBLE), intent(in) :: U(NLEV)   ! u-component (m/s)
+        real(C_DOUBLE), intent(in) :: V(NLEV)   ! v-component (m/s)
+        integer,        intent(in) :: MZBL      ! top model level index
+
+        ! Outputs
+        real(C_DOUBLE), intent(out) :: HPBL   ! atmospheric boundary-layer depth (m)
+        integer,        intent(out) :: JPBL   ! boundary-layer top level index
+
+        ! Local parameters and variables
+        real(C_DOUBLE), parameter :: H10E5 = 100000.0   ! 1.0E5
+        real(C_DOUBLE), parameter :: EPSQ  = 2.0E-12
+        real(C_DOUBLE), parameter :: GVAL  = 9.8
+        real(C_DOUBLE), parameter :: CP    = 1004.6
+        real(C_DOUBLE), parameter :: CAPA  = 0.28589641
+        real(C_DOUBLE), parameter :: ROG   = 287.04 / GVAL
+
+        real(C_DOUBLE), parameter :: BETA = 100.0
+        real(C_DOUBLE), parameter :: GRAV = 9.806
+        real(C_DOUBLE), parameter :: WMIN = 0.01
+        real(C_DOUBLE), parameter :: RICR = 0.25
+        ! (RICR=1.0 for coarse vertical resolution; original had that commented)
+
+        real(C_DOUBLE), allocatable :: TH(:)
+        integer :: k, LVL, LVLP, LVL3
+        real(C_DOUBLE) :: HEATV, RIB, RIBP, RIF
+        real(C_DOUBLE) :: TH2V, THVL, WIND2, WIND, USTAR, WDL2
+
+        allocate(TH(nlev))
+        ! Compute potential temperature for all levels
         do k=1,nlev
         th(k)=t(k)*(H10E5/p(k))**capa
         enddo
@@ -72,10 +101,8 @@ C  (TH2V) AND WIND SPEED (WINDL), AND SURFACE VIRTUAL HEAT FLUX
 C  (HEATV) AND FLUX RICHARDSON NUMBER (RIF).  SET THE PREVIOUS BULK
 C  RICHARDSON NUMBER (RIBP) EQUAL TO THE FLUX RICHARDSON NUMBER (RIF).
 C --------------------------------------------------------------------
-c==     TH2V  = TH(2)*(1.+0.608*Q(2))
-        TH2V  = TH(1)*(1.+0.608*Q(1))
-c==     WIND2 = U(2)**2+V(2)**2
-        WIND2 = U(1)**2+V(1)**2
+        TH2V  = TH(1)*(1.+0.608*Q(1))   ! TH2V  = TH(2)*(1.+0.608*Q(2))
+        WIND2 = U(1)**2+V(1)**2         ! WIND2 = U(2)**2+V(2)**2
         WIND  = SQRT(WIND2)
 c       HEATV = HEAT*(1.+0.608*Q(2))+0.608*TH(2)*EVAP
 c       RIF   = -GRAV*Z(2)/(TH2V*WIND)*HEATV*PR/(USTAR**2)
@@ -91,19 +118,15 @@ C  NUMBER (RICR) THEN THE BOUNDARY-LAYER DEPTH IS THE LOWEST MODEL
 C  LEVEL IN THE ATMOSPHERE (E.G. 20 M).
 C --------------------------------------------------------------------
         IF (RIF .GT. RICR) THEN
-c==       HPBL=Z(2)
-c==       JPBL=2
-          HPBL=Z(1)
-          JPBL=1
+          HPBL=Z(1)     ! HPBL=Z(2)
+          JPBL=1        ! JPBL=2
         ELSE
 C --------------------------------------------------------------------
 C  BOUNDARY-LAYER DEPTH HIGHER THAN LOWEST MODEL LEVEL IN THE
 C  ATMOSPHERE.  USE BULK RICHARDSON NUMBER FOR HIGHER LAYERS.
 C --------------------------------------------------------------------
-c==       LVLP=2
-c==       LVL3=3
-          LVLP=1
-          LVL3=2
+          LVLP=1    ! LVLP=2
+          LVL3=2    ! LVL3=3
           DO 100 LVL=LVL3,MZBL
             THVL = TH(LVL)*(1.+0.608*Q(LVL))
 C  FOLLOWING TROEN AND MAHRT (1986):
@@ -129,6 +152,7 @@ C  FOLLOWING VOGELEZANG AND HOLTSLAG (1996):
 C              HBPL = Z(2) + Z(LVLP) + (Z(LVL)-Z(LVLP))*(RICR-RIBP)/
 C     .          (RIB-RIBP)
 c-            HPBL = Z(1) + Z(LVLP) + (Z(LVL)-Z(LVLP))*(RICR-RIBP)/
+c-     .          (RIB-RIBP)
               HPBL = Z(LVLP) + (Z(LVL)-Z(LVLP))*(RICR-RIBP)/
      .          (RIB-RIBP)
               JPBL = LVL
@@ -154,5 +178,6 @@ C --------------------------------------------------------------------
 
         ENDIF
 
- 999    RETURN
+ 999    deallocate(TH)
+        RETURN
         END
