@@ -387,6 +387,7 @@ class VxPairBase {
                       GridTemplateFactory::GridTemplates shape);
       void set_interp(int i_interp, InterpMthd mthd,
                       int width, GridTemplateFactory::GridTemplates shape);
+      bool has_geog_match() const;
 
       void set_mpr_thr_inc_map(const std::map<ConcatString,ThreshArray> &);
       void set_mpr_str_inc_map(const std::map<ConcatString,StringArray> &);

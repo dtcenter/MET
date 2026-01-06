@@ -1422,6 +1422,22 @@ void VxPairBase::set_interp(int i_interp,
 
 ////////////////////////////////////////////////////////////////////////
 
+bool VxPairBase::has_geog_match() const {
+   bool status = false;
+
+   // Search for a match
+   for(auto &x : pb_ptr) {
+      if(x->interp_mthd == InterpMthd::Geog_Match) {
+         status = true;
+         break;
+      }
+   }
+
+   return status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void VxPairBase::set_mpr_thr_inc_map(const map<ConcatString,ThreshArray> &m) {
 
    mpr_thr_inc_map = m;
