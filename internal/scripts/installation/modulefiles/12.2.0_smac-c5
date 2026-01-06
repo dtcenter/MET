@@ -1,0 +1,23 @@
+#%Module######################################################################
+##
+##      Model Evaluation Tools
+##
+proc ModulesHelp { } {
+  puts stderr "Sets up the paths and environment variables to use the Model Evaluation Tools v12.2.0
+     *** For help see the official MET webpage at http://www.dtcenter.org/met/users ***"
+}
+
+module load compiler-rt/2024.0.1
+module load tbb/2021.11
+module load oclfpga/2024.0.0
+module load compiler/2024.0.1
+module load mkl/2024.0
+module load mpi/2021.11
+
+set base /atec/opt/atectest/MET
+set ver  12.2.0
+set share $base/$ver/share/met
+set lib_base $base/12.2.0
+setenv MET_ROOT $base/$ver
+
+prepend-path PATH $base/$ver/bin:$lib_base/external_libs/bin:/atec/opt/atectest/METplus/miniconda/miniconda3/envs/metplus_v6.1_py3.12/bin
