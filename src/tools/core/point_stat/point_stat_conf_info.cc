@@ -497,7 +497,9 @@ void PointStatConfInfo::process_geog(const Grid &grid,
    for(int i=0; i<n_vx; i++) {
       if(vx_opt[i].vx_pd.sfc_info.need_land()) land = true;
       if(vx_opt[i].vx_pd.sfc_info.need_topo()) topo = true;
-      if(vx_opt[i].vx_pd.has_geog_match())     geog_match = true;
+      if(vx_opt[i].interp_info.method.has(interpmthd_geog_match_str)) {
+         geog_match = true;
+      }
    }
 
    // MET #3285 validate the GEOG_MATCH interpolation method
@@ -506,8 +508,8 @@ void PointStatConfInfo::process_geog(const Grid &grid,
            << "requesting the \"" << interpmthd_geog_match_str
            << "\" interpolation method with the \""
            << conf_key_land_mask << "\" and \"" << conf_key_topo_mask
-           << "\" dictionaries disabled results in the \""
-           << interpmthd_nearest_str << "\" being applied.\n\n";
+           << "\" dictionaries disabled produces the same result as the \""
+           << interpmthd_nearest_str << "\" interpolation method.\n\n";
    }
 
    // Check for no work to do
