@@ -272,8 +272,8 @@ void GridDiagConfInfo::process_masks(const Grid &grid) {
    // Conf: mask.poly
    StringArray mask_poly_sa(conf.lookup_string_array(conf_key_mask_poly));
 
-   // Check the number of masking regions
-   if(mask_grid_sa.n() + mask_poly_sa.n() == 0) {
+   // Check for all masking regions being empty 
+   if(mask_grid_sa.all_empty() && mask_poly_sa.all_empty()) {
       mlog << Debug(3)
            << "Adding the \"" << full_domain_str << "\" domain since "
            << "no grid or polyline masking regions were specified.\n";
@@ -282,7 +282,9 @@ void GridDiagConfInfo::process_masks(const Grid &grid) {
 
    // Parse the masking grids
    for(int i=0; i<mask_grid_sa.n(); i++) {
+      if(mask_grid_sa[i].empty()) continue;
       parse_grid_mask(mask_grid_sa[i], grid, mp, name);
+      mask_name.add(name);
       mask_map[name] = mp;
       mlog << Debug(3)
            << "Processing grid mask \"" << mask_grid_sa[i]
@@ -292,7 +294,9 @@ void GridDiagConfInfo::process_masks(const Grid &grid) {
 
    // Parse the masking polyline
    for(int i=0; i<mask_poly_sa.n(); i++) {
+      if(mask_poly_sa[i].empty()) continue;
       parse_poly_mask(mask_poly_sa[i], grid, mp, name);
+      mask_name.add(name);
       mask_map[name] = mp;
       mlog << Debug(3)
            << "Processing poly mask \"" << mask_poly_sa[i]
