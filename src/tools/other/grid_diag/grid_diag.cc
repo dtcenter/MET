@@ -257,7 +257,6 @@ void process_series(void) {
    StringArray *cur_files;
    GrdFileType *cur_ftype;
    Grid cur_grid;
-   string cur_mask(conf_info.mask_name[0]);
 
    // List the lengths of the series options
    mlog << Debug(1)
@@ -340,7 +339,7 @@ void process_series(void) {
          // TODO: Add logic for handling multiple masks
 
          // Apply the mask before updating the data ranges
-         apply_mask(data_dp[i_var], conf_info.mask_map[cur_mask]);
+         apply_mask(data_dp[i_var], conf_info.mask_mp[0]);
 
          // Update the range of the data values
          data_dp[i_var].data_range(min, max);
@@ -355,7 +354,7 @@ void process_series(void) {
          update_pdf(bin_mins[i_var_str][0],
                     bin_deltas[i_var_str],
                     histograms[i_var_str],
-                    data_dp[i_var], conf_info.mask_map[cur_mask]);
+                    data_dp[i_var], conf_info.mask_mp[0]);
       } // end for i_var
 
      // Process the 2d joint histograms
@@ -385,7 +384,7 @@ void process_series(void) {
                             bin_deltas[j_var_str],
                             joint_histograms[ij_var_str],
                             data_dp[i_var], data_dp[j_var],
-                            conf_info.mask_map[cur_mask]);
+                            conf_info.mask_mp[0]);
        } // end for j_var
      } // end for i_var
    } // end for i_series
@@ -544,7 +543,7 @@ void setup_nc_file(void) {
    // Write the grid size, mask size, and series length
    write_nc_var_int("grid_size", "number of grid points", grid.nxy());
    write_nc_var_int("mask_size", "number of mask points",
-                    conf_info.mask_map[conf_info.mask_name[0]].count());
+                    conf_info.mask_mp[0].count());
    write_nc_var_int("n_series", "length of series", n_series);
 
    // Compression level

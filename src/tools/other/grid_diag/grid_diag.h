@@ -132,7 +132,6 @@ static unixtime valid_end = (unixtime) 0;
 static int      lead_beg  = bad_data_int;
 static int      lead_end  = bad_data_int;
 
-
 #endif  //  __GRID_DIAG_H__
 
 ////////////////////////////////////////////////////////////////////////

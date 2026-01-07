@@ -105,7 +105,7 @@ void GridDiagConfInfo::clear() {
    // Initialize values
    desc.clear();
    mask_name.clear();
-   mask_map.clear();
+   mask_mp.clear();
    version.clear();
 
    // Clear data_info
@@ -285,7 +285,7 @@ void GridDiagConfInfo::process_masks(const Grid &grid) {
       if(mask_grid_sa[i].empty()) continue;
       parse_grid_mask(mask_grid_sa[i], grid, mp, name);
       mask_name.add(name);
-      mask_map[name] = mp;
+      mask_mp.emplace_back(mp);
       mlog << Debug(3)
            << "Processing grid mask \"" << mask_grid_sa[i]
            << "\" which includes " << mp.count() << " of the "
@@ -297,7 +297,7 @@ void GridDiagConfInfo::process_masks(const Grid &grid) {
       if(mask_poly_sa[i].empty()) continue;
       parse_poly_mask(mask_poly_sa[i], grid, mp, name);
       mask_name.add(name);
-      mask_map[name] = mp;
+      mask_mp.emplace_back(mp);
       mlog << Debug(3)
            << "Processing poly mask \"" << mask_poly_sa[i]
            << "\" which includes " << mp.count() << " of the "
@@ -306,7 +306,7 @@ void GridDiagConfInfo::process_masks(const Grid &grid) {
 
    // Report the number of masks
    mlog << Debug(3)
-        << "Applying " << (int) mask_map.size() << " masking regions.\n";
+        << "Applying " << (int) mask_mp.size() << " masking regions.\n";
 
    return;
 }

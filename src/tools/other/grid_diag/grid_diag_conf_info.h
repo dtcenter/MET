@@ -65,7 +65,7 @@ class GridDiagConfInfo {
 
       // Masking region names and MaskPlanes
       StringArray mask_name;
-      std::map<std::string,MaskPlane> mask_map;
+      std::vector<MaskPlane> mask_mp;
 
       GridDiagNcOutInfo nc_info;   // Output NetCDF file contents
 
