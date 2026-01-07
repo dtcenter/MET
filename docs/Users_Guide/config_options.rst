@@ -2253,7 +2253,7 @@ applied to the points in the box:
 .. note::
 
   Requesting the GEOG_MATCH interpolation method without providing any
-  land/sea mask (e.g. "land_mask.flag = FALSE") and topography data (e.g.
+  land/sea mask (e.g. "land_mask.flag = FALSE") or topography data (e.g.
   "topo_mask.flag = FALSE") results in a warning message. Without input
   geography data, GEOG_MATCH produces the same result as NEAREST.
 
