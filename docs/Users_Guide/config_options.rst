@@ -2250,10 +2250,12 @@ applied to the points in the box:
   * HIRA        for all neighborhood points to define a spatial
     ensemble (only in Ensemble-Stat)
 
-  The BUDGET, FORCE, GAUSSIAN, and MAXGAUSS methods are not valid for
-  interpolating to point locations. For grid-to-grid comparisons, the
-  only valid smoothing methods are MIN, MAX, MEDIAN, UW_MEAN, and
-  GAUSSIAN, and MAXGAUSS.
+.. note::
+
+  Requesting the GEOG_MATCH interpolation method without providing any
+  land/sea mask (e.g. "land_mask.flag = FALSE") or topography data (e.g.
+  "topo_mask.flag = FALSE") results in a warning message. Without input
+  geography data, GEOG_MATCH produces the same result as NEAREST.
 
 If multiple "method" and "width" options are specified, all possible
 permutations of their values are applied.
