@@ -115,11 +115,11 @@ The **output_flag** dictionary controls the type of output that the Grid-Diag to
 2. **histogram_2d** for 2-dimensional histograms for each pair of **data.field** entries, including minimum, maxmimum, and midpoint values for each histogram bin.
 
 3. **info_theory** for information threory metrics, including entropy for each **data.field** entry and mutual information for each pair of entries.
- 
+
 grid_diag Output File
 ---------------------
 
-The NetCDF file has dimensions for the number of masking regions and one for each of the specified data variable and level combinations, e.g. APCP_L0 and PWAT_L0. If histogram output is requested, the bin minimum, midpoint, and maximum values are indicated with an _min, _mid, or _max appended to the variable/level. 
+The NetCDF file has dimensions for the number of masking regions and one for each of the specified data variable and level combinations, e.g. APCP_L0 and PWAT_L0. If histogram output is requested, the bin minimum, midpoint, and maximum values are indicated with an _min, _mid, or _max appended to the variable/level.
 
 If 1-dimensional histograms are requested, a corresponding **hist_** variable is written for each variable/level in the data dictionary. For example, hist_APCP_L0 and hist_PWAT_L0 are the counts of all data values falling within the bin. Data values below the minimum or above the maximum are included in the lowest and highest bins, respectively. A warning message is printed when the range of the data falls outside the range defined in the configuration file.
 
