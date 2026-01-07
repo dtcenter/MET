@@ -61,7 +61,7 @@ class GridDiagConfInfo {
       ConcatString version;        // Config file version
       ConcatString desc;           // Data description
 
-      std::vector<VarInfo *> data_info; // VarInfo pointer array
+      std::vector<VarInfo *> data_info; // VarInfo pointer array [n_data]
 
       // Masking region names and MaskPlanes
       StringArray mask_name;

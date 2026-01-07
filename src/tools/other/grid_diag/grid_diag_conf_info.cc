@@ -138,10 +138,9 @@ void GridDiagConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void GridDiagConfInfo::set_n_data() {
-   Dictionary *dict = (Dictionary *) nullptr;
 
    // Conf: data.field
-   dict = conf.lookup_array(conf_key_data_field);
+   auto dict = conf.lookup_array(conf_key_data_field);
 
    // Determine the number of fields (name/level) to be processed
    n_data = parse_conf_n_vx(dict);
