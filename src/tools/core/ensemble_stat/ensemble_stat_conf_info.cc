@@ -500,7 +500,7 @@ void EnsembleStatConfInfo::process_geog(const Grid &grid,
          geog_match = true;
       }
    }
- 
+
    // MET #3285 validate the GEOG_MATCH interpolation method
    if(geog_match && !land && !topo) {
       mlog << Warning << "\nEnsembleStatVxOpt::process_geog() -> "
