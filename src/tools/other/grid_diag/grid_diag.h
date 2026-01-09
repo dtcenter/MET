@@ -112,21 +112,15 @@ static Met2dDataFile *data_mtddf = (Met2dDataFile *) nullptr;
 // Struct to store diagnostic info for each field and masking region
 struct DiagInfo {
 
-   // Input data info
-   int var_id;
-   ConcatString var_name; 
-   double var_min;
-   double var_max;
-
-   // Mask info (JHG, can probably delete)
-   ConcatString mask_name;
-   MaskPlane   *mask_mp; // not allocated
-
    // Histogram bins
    std::vector<double> bin_min;
    std::vector<double> bin_max;
    std::vector<double> bin_mid;
    double bin_delta;
+
+   // Input data info
+   double var_min;
+   double var_max;
 
    // Single and joint histograms 
    std::vector<long long> hist1d;
