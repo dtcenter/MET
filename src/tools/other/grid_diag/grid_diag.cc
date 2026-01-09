@@ -62,12 +62,14 @@ static void setup_diag_info(void);
 static void process_series(void);
 static void process_hist1d(const vector<DataPlane> &);
 static void process_hist2d(const vector<DataPlane> &);
+static void process_info_theory(void);
 static void setup_nc_file(void);
 static void write_nc_var_int(const char *, const char *, int);
 static void add_var_att_local(NcVar *, const char *, const ConcatString);
 static void write_hist_bins(void);
 static void write_hist1d(void);
 static void write_hist2d(void);
+static void write_info_theory(void);
 static void clean_up();
 
 static Met2dDataFile *get_mtddf(const StringArray &, const int);
@@ -95,14 +97,16 @@ int met_main(int argc, char *argv[]) {
    setup_nc_file();
 
    // Write histogram bins
-   if(conf_info.nc_info.do_hist1d ||
-      conf_info.nc_info.do_hist2d) write_hist_bins();
+   write_hist_bins();
 
    // Write 1D variable histograms
    if(conf_info.nc_info.do_hist1d) write_hist1d();
 
    // Write 2D joint variable histograms
    if(conf_info.nc_info.do_hist2d) write_hist2d();
+
+   // Write information theory output
+   if(conf_info.nc_info.do_info_theory) write_info_theory();
 
    // Write benchmarking metrics
    #ifdef WITH_PROFILER
@@ -320,7 +324,9 @@ void setup_diag_info(void) {
          diag_info[i_var][i_mask].var_max   = bad_data_double;
          diag_info[i_var][i_mask].hist1d    = hist1d;
          diag_info[i_var][i_mask].hist2d    = hist2d;
+         diag_info[i_var][i_mask].entropy   = 0;
       } // end for i_mask
+
    } // end for i_var
 }
 
@@ -415,6 +421,10 @@ void process_series(void) {
       if(conf_info.nc_info.do_hist2d) process_hist2d(data_dp);
 
    } // end for i_series
+
+   // Process information theory
+   if(conf_info.nc_info.do_info_theory) process_info_theory();
+
 }
       
 ////////////////////////////////////////////////////////////////////////
@@ -505,6 +515,64 @@ void process_hist2d(const vector<DataPlane> &data_dp) {
          } // end for i_mask
       } // end for j_var
    } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void process_info_theory() {
+
+   // Compute Shannon entropy for the 1D histograms
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      // Loop over the masks
+      for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
+
+         DiagInfo *i_diag = &diag_info[i_var][i_mask];
+
+         // Initialize
+         i_diag->entropy = 0.0;
+
+         // Sum of histogram 
+         long long hist1d_sum = 0;
+         for(const auto &x : i_diag->hist1d) hist1d_sum += x;
+
+         // Accumulate entropy for each bin
+         for(const auto &x : i_diag->hist1d) {
+            auto p_x = (double) x / hist1d_sum;
+            if(p_x > 0) i_diag->entropy -= p_x * log2(p_x);
+         }
+      } // end for i_mask
+   } // end for i_var
+
+   /* TODO: Add mutual information here 
+        //! Return mutual information between vars along dims varIDs==0 and varIDs==1
+        /*! Set other varIDs of dims to be ignored to -1
+        double mutualInfo(TVector<int>& vIDs){
+            if(vIDs.Size() != nDims){
+                cerr << "varIDs argument must be of size = total dimensionality = " << nDims << endl;
+                cerr << "Skipping this call" << endl;
+                return 0.;
+            }
+
+            TVector<int> varIDs;
+            normalizeBounds(varIDs, vIDs);
+
+            // computer probabilities given the var IDs
+            TMatrix<double> p_xy;
+            computeJointProbs(p_xy,varIDs);
+
+            //cout << "From mutualInfo"<< endl << p_xy << endl;
+
+            double mi = 0.0;
+            // parse through each unique data point
+            for (int i = 1; i <= p_xy.ColumnSize(); i++)
+            {
+                mi += p_xy[i][3]*log2(p_xy[i][3]/(p_xy[i][1]*p_xy[i][2]));
+                //cout << "from mi = " << p_xy[i][3]*log2(p_xy[i][3]/(p_xy[i][1]*p_xy[i][2])) << endl;
+            }
+            return mi;
+        }
+   */
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -756,6 +824,43 @@ void write_hist2d(void) {
 
          } // end for i_mask
       } // end for j_var
+   } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_info_theory(void) {
+
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      VarInfo  *i_data = conf_info.data_info[i_var];
+
+      // Set variable NetCDF name
+      ConcatString ent_name("entropy_");
+      ent_name << i_data->name_attr() << "_" << i_data->level_attr();
+
+      if(multiple_data_sources && !unique_variable_names) {
+         ent_name << "_VAR" << i_var+1;
+      }
+
+      // Write a coordinate variable using the bin midpoint
+      NcVar ent_var = add_var(nc_out, ent_name, ncFloat,
+                              mask_dim, deflate_level);
+
+      // Add variable attributes
+      ConcatString cs;
+      cs << cs_erase << "Entropy value of " << ent_name;
+      add_var_att_local(&ent_var, "long_name", cs);
+
+      // Store the entroy values
+      vector<double> ent_data(conf_info.get_n_mask());
+      for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
+         ent_data[i_mask] = diag_info[i_var][i_mask].entropy;
+      }
+
+      // Write entropy data for the current variable
+      ent_var.putVar(ent_data.data());
+
    } // end for i_var
 }
 

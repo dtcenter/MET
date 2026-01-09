@@ -60,10 +60,8 @@ data = {
 // Geographic masking regions
 //
 mask = {
-   grid = [ "FULL" ];
-   poly = [ "MET_BASE/poly/CONUS.poly",
-            "MET_BASE/poly/EAST.poly",
-            "MET_BASE/poly/WEST.poly" ];
+   grid = [ "FULL", "DTC165", "DTC166" ];
+   poly = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -71,11 +69,7 @@ mask = {
 //
 // Diagnostic output types
 //
-output_flag = {
-   histogram_1d = TRUE;
-   histogram_2d = TRUE;
-   info_theory  = FALSE;
-}
+output_flag = TRUE;
 
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -125,6 +125,9 @@ struct DiagInfo {
    // Single and joint histograms 
    std::vector<long long> hist1d;
    std::map<int, std::vector<long long> > hist2d;
+
+   // Information theory
+   double entropy;
 };
 
 // DiagInfo objects [n_data][n_mask]
