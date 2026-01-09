@@ -268,16 +268,16 @@ void setup_diag_info(void) {
       // Find bin ranges
       VarInfo *i_data = conf_info.data_info[i_var];
       NumArray range(i_data->range());
-      int n_bins_i = i_data->n_bins();
+      int i_n_bins = i_data->n_bins();
       double var_min = range[0];
       double var_max = range[1];
-      double bin_delta = (var_max - var_min) / n_bins_i;
+      double bin_delta = (var_max - var_min) / i_n_bins;
 
       // Compute bin values
-      vector<double> bin_min(n_bins_i);
-      vector<double> bin_max(n_bins_i);
-      vector<double> bin_mid(n_bins_i);
-      for(int i_bin=0; i_bin < n_bins_i; i_bin++) {
+      vector<double> bin_min(i_n_bins);
+      vector<double> bin_max(i_n_bins);
+      vector<double> bin_mid(i_n_bins);
+      for(int i_bin=0; i_bin < i_n_bins; i_bin++) {
          bin_min[i_bin] = var_min + bin_delta * i_bin;
          bin_max[i_bin] = var_min + bin_delta * (i_bin + 1);
          bin_mid[i_bin] = var_min + bin_delta * (i_bin + 0.5);
@@ -286,10 +286,10 @@ void setup_diag_info(void) {
       // 1D histogram
       mlog << Debug(2)
            << "Initializing " << i_data->magic_str_attr()
-           << " histogram with " << n_bins_i << " bins from "
+           << " histogram with " << i_n_bins << " bins from "
            << var_min << " to " << var_max << ".\n";
       vector<long long> hist1d;
-      init_pdf(n_bins_i, hist1d);
+      init_pdf(i_n_bins, hist1d);
 
       // Keep track of unique output variable names
       if(nc_var_sa.has(i_data->magic_str_attr())) unique_variable_names = false;
@@ -299,15 +299,15 @@ void setup_diag_info(void) {
       map<int, vector<long long> > hist2d; 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
          VarInfo *j_data = conf_info.data_info[j_var];
-         int n_bins_j = j_data->n_bins();
+         int j_n_bins = j_data->n_bins();
 
          mlog << Debug(2)
               << "Initializing " << i_data->magic_str_attr() << "_"
               << j_data->magic_str_attr() << " joint histogram with "
-              << n_bins_i << " x " << n_bins_j << " bins.\n";
+              << i_n_bins << " x " << j_n_bins << " bins.\n";
 
          hist2d[j_var] = vector<long long>();
-         init_joint_pdf(n_bins_i, n_bins_j, hist2d[j_var]);
+         init_joint_pdf(i_n_bins, j_n_bins, hist2d[j_var]);
       }
 
       // Initialize diagnostic info for each mask
