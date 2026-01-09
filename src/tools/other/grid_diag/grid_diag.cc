@@ -60,9 +60,12 @@ using namespace netCDF;
 static void process_command_line(int, char **);
 static void setup_diag_info(void);
 static void process_series(void);
+static void process_hist1d(const vector<DataPlane> &);
+static void process_hist2d(const vector<DataPlane> &);
 static void setup_nc_file(void);
 static void write_nc_var_int(const char *, const char *, int);
 static void add_var_att_local(NcVar *, const char *, const ConcatString);
+static void write_hist_bins(void);
 static void write_hist1d(void);
 static void write_hist2d(void);
 static void clean_up();
@@ -91,11 +94,15 @@ int met_main(int argc, char *argv[]) {
    // Setup netcdf output
    setup_nc_file();
 
+   // Write histogram bins
+   if(conf_info.nc_info.do_hist1d ||
+      conf_info.nc_info.do_hist2d) write_hist_bins();
+
    // Write 1D variable histograms
-   write_hist1d();
+   if(conf_info.nc_info.do_hist1d) write_hist1d();
 
    // Write 2D joint variable histograms
-   write_hist2d();
+   if(conf_info.nc_info.do_hist2d) write_hist2d();
 
    // Write benchmarking metrics
    #ifdef WITH_PROFILER
@@ -183,7 +190,7 @@ void process_command_line(int argc, char **argv) {
    }
 
    // Process the input data file lists
-   for(int i=0; i<data_files.size(); i++) {
+   for(int i=0; i < data_files.size(); i++) {
 
       // Parse the data file list
       data_files[i] = parse_file_list(data_files[i]);
@@ -256,7 +263,7 @@ void setup_diag_info(void) {
    for(auto &info : diag_info) info.resize(conf_info.get_n_mask());
 
    // Loop over variables
-   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       // Find bin ranges
       VarInfo *data_i = conf_info.data_info[i_var];
@@ -270,7 +277,7 @@ void setup_diag_info(void) {
       vector<double> bin_min(n_bins_i);
       vector<double> bin_max(n_bins_i);
       vector<double> bin_mid(n_bins_i);
-      for(int i_bin=0; i_bin<n_bins_i; i_bin++) {
+      for(int i_bin=0; i_bin < n_bins_i; i_bin++) {
          bin_min[i_bin] = var_min + bin_delta * i_bin;
          bin_max[i_bin] = var_min + bin_delta * (i_bin + 1);
          bin_mid[i_bin] = var_min + bin_delta * (i_bin + 0.5);
@@ -290,7 +297,7 @@ void setup_diag_info(void) {
 
       // 2D histograms
       map<int, vector<long long> > hist2d; 
-      for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
+      for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
          VarInfo *data_j = conf_info.data_info[j_var];
          int n_bins_j = data_j->n_bins();
 
@@ -304,7 +311,7 @@ void setup_diag_info(void) {
       }
 
       // Initialize diagnostic info for each mask
-      for(int i_mask=0; i_mask<conf_info.get_n_mask(); i_mask++) {
+      for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
          diag_info[i_var][i_mask].bin_min   = bin_min;
          diag_info[i_var][i_mask].bin_max   = bin_max;
          diag_info[i_var][i_mask].bin_mid   = bin_mid;
@@ -331,15 +338,15 @@ void process_series(void) {
        << " from " << n_series << " input file(s).\n";
 
    // Loop over the input files
-   for(int i_series=0; i_series<n_series; i_series++) {
+   for(int i_series=0; i_series < n_series; i_series++) {
 
       // List the lengths of the series options
       mlog << Debug(2)
            << "Processing series entry " << i_series+1 << " of "
            << n_series << ".\n";
 
-      // Process the 1D histograms
-      for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+      // Read the input data for this series entry
+      for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
          VarInfo *data_i = conf_info.data_info[i_var];
 
@@ -399,70 +406,50 @@ void process_series(void) {
                lead_end  = data_dp[i_var].lead();
             }
          }
-
-         // Loop over the masks
-         for(int i_mask=0; i_mask<conf_info.get_n_mask(); i_mask++) {
-
-            DiagInfo *diag_i = &diag_info[i_var][i_mask];
-
-            // Apply the mask before updating the data ranges
-            DataPlane dp(data_dp[i_var]);
-            apply_mask(dp, conf_info.mask_mp[i_mask]);
-            double min;
-            double max;
-            dp.data_range(min, max);
-            if(is_bad_data(diag_i->var_min) || min < diag_i->var_min) {
-               diag_i->var_min = min;
-            }
-            if(is_bad_data(diag_i->var_max) || max > diag_i->var_max) {
-               diag_i->var_max = max;
-            }
-
-            // Update 1D histogram counts
-            update_pdf(diag_i->bin_min[0],
-                       diag_i->bin_delta,
-                       diag_i->hist1d,
-                       data_dp[i_var],
-                       conf_info.mask_mp[i_mask]);
-
-         } // end for i_mask
       } // end for i_var
 
-      // Process the 2D joint histograms
-      for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+      // Process the 1D histograms
+      if(conf_info.nc_info.do_hist1d) process_hist1d(data_dp);
 
-         VarInfo *data_i = conf_info.data_info[i_var];
+      // Process the 2D histograms
+      if(conf_info.nc_info.do_hist2d) process_hist2d(data_dp);
 
-         for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
-
-            VarInfo *data_j = conf_info.data_info[j_var];
-
-            for(int i_mask=0; i_mask<conf_info.get_n_mask(); i_mask++) {
-
-               DiagInfo *diag_i = &diag_info[i_var][i_mask];
-               DiagInfo *diag_j = &diag_info[j_var][i_mask];
-
-               // Update 2D histogram counts
-               update_joint_pdf(data_i->n_bins(),
-                                data_j->n_bins(),
-                                diag_i->bin_min[0],
-                                diag_j->bin_min[0],
-                                diag_i->bin_delta,
-                                diag_j->bin_delta,
-                                diag_i->hist2d[j_var],
-                                data_dp[i_var], data_dp[j_var],
-                                conf_info.mask_mp[i_mask]);
-            } // end for i_mask
-         } // end for j_var
-      } // end for i_var
    } // end for i_series
+}
+      
+////////////////////////////////////////////////////////////////////////
 
-   // Report the ranges of values for each field
-   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
-      for(int i_mask=0; i_mask<conf_info.get_n_mask(); i_mask++) {
+void process_hist1d(const vector<DataPlane> &data_dp) {
 
-         VarInfo  *data_i = conf_info.data_info[i_var];
+   // Update the 1D histogram counts
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      VarInfo *data_i = conf_info.data_info[i_var];
+
+      // Loop over the masks
+      for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
+
          DiagInfo *diag_i = &diag_info[i_var][i_mask];
+
+         // Apply the mask before updating the data ranges
+         DataPlane dp(data_dp[i_var]);
+         apply_mask(dp, conf_info.mask_mp[i_mask]);
+         double min;
+         double max;
+         dp.data_range(min, max);
+         if(is_bad_data(diag_i->var_min) || min < diag_i->var_min) {
+            diag_i->var_min = min;
+         }
+         if(is_bad_data(diag_i->var_max) || max > diag_i->var_max) {
+            diag_i->var_max = max;
+         }
+
+         // Update 1D histogram counts
+         update_pdf(diag_i->bin_min[0],
+                    diag_i->bin_delta,
+                    diag_i->hist1d,
+                    data_dp[i_var],
+                    conf_info.mask_mp[i_mask]);
 
          mlog << Debug(2)
               << "Processed " << data_i->magic_str_attr()
@@ -472,10 +459,10 @@ void process_series(void) {
               << data_i->range()[0] << ", "
               << data_i->range()[1] << ").\n";
 
-         // Print warning if outside range
+         // Compare input data and bin ranges 
          if(diag_i->var_min < data_i->range()[0] ||
             diag_i->var_max > data_i->range()[1]) {
-            mlog << Warning << "\nprocess_series() -> "
+            mlog << Warning << "\nprocess_hist1d() -> "
                  << "the range of the " << data_i->magic_str_attr()
                  << " data over region " << conf_info.mask_name[i_mask]
                  << " (" << diag_i->var_min << ", " << diag_i->var_max
@@ -485,14 +472,44 @@ void process_series(void) {
          }
       } // end for i_mask
    } // end for i_var
+}
 
-   return;
+////////////////////////////////////////////////////////////////////////
+
+void process_hist2d(const vector<DataPlane> &data_dp) {
+
+   // Process the 2D joint histograms
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      VarInfo *data_i = conf_info.data_info[i_var];
+
+      for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
+
+         VarInfo *data_j = conf_info.data_info[j_var];
+
+         for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
+
+            DiagInfo *diag_i = &diag_info[i_var][i_mask];
+            DiagInfo *diag_j = &diag_info[j_var][i_mask];
+
+            // Update 2D histogram counts
+            update_joint_pdf(data_i->n_bins(),
+                             data_j->n_bins(),
+                             diag_i->bin_min[0],
+                             diag_j->bin_min[0],
+                             diag_i->bin_delta,
+                             diag_j->bin_delta,
+                             diag_i->hist2d[j_var],
+                             data_dp[i_var], data_dp[j_var],
+                             conf_info.mask_mp[i_mask]);
+         } // end for i_mask
+      } // end for j_var
+   } // end for i_var
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void setup_nc_file(void) {
-   ConcatString cs;
 
    // Create NetCDF file
    nc_out = open_ncfile(out_file.c_str(), true);
@@ -521,12 +538,12 @@ void setup_nc_file(void) {
    write_nc_var_int("n_series", "length of series", n_series);
 
    // Compression level
-   int deflate_level = compress_level;
+   deflate_level = compress_level;
    if(deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
 
    // Create the mask dimension
-   NcDim mask_dim = add_dim(nc_out, "mask",
-                            (long) conf_info.get_n_mask());
+   mask_dim = add_dim(nc_out, "mask",
+                      (long) conf_info.get_n_mask());
 
    // Create the mask name variable
    NcVar mask_name_var = add_var(nc_out, "mask_name", ncString, mask_dim, deflate_level);
@@ -539,7 +556,7 @@ void setup_nc_file(void) {
    // Write the mask names and sizes
    vector<size_t> offsets(1);
    vector<size_t> counts(1);
-   for(int i_mask=0; i_mask<conf_info.get_n_mask(); i_mask++) {
+   for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
       offsets[0] = i_mask;
       counts[0] = 1;
       string mask_name(conf_info.mask_name[i_mask]);
@@ -547,8 +564,37 @@ void setup_nc_file(void) {
       int mask_size = conf_info.mask_mp[i_mask].count();
       mask_size_var.putVar(offsets, counts, &mask_size);
    }
+}
 
-   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+////////////////////////////////////////////////////////////////////////
+
+void write_nc_var_int(const char *var_name, const char *long_name,
+                      int n) {
+
+   // Add the variable
+   NcVar var = add_var(nc_out, var_name, ncInt64);
+   add_att(&var, "long_name", long_name);
+
+   if(!put_nc_data(&var, &n)) {
+      mlog << Error << "\nwrite_nc_int() -> "
+           << "error writing the \"" << long_name << "\" variable.\n\n";
+      exit(1);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void add_var_att_local(NcVar *var, const char *att_name,
+                       const ConcatString att_value) {
+   if(att_value.nonempty()) add_att(var, att_name, att_value.c_str());
+   else                     add_att(var, att_name, na_str);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void write_hist_bins(void) {
+
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       VarInfo  *data_i = conf_info.data_info[i_var];
       DiagInfo *diag_i = &diag_info[i_var][0];
@@ -581,6 +627,7 @@ void setup_nc_file(void) {
                               var_dim, deflate_level);
 
       // Add variable attributes
+      ConcatString cs;
       cs << cs_erase << "Minimum value of " << var_name << " bin";
       add_var_att_local(&var_min, "long_name", cs);
       add_var_att_local(&var_min, "units", data_i->units_attr());
@@ -599,95 +646,6 @@ void setup_nc_file(void) {
       var_mid.putVar(diag_i->bin_mid.data());
 
    } // end for i_var
-
-   // Define histograms
-   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
-
-      VarInfo *data_i = conf_info.data_info[i_var];
-
-      // Set variable NetCDF name
-      ConcatString var_name;
-      var_name << data_i->name_attr() << "_" << data_i->level_attr();
-
-      if(multiple_data_sources && !unique_variable_names) {
-         var_name << "_VAR" << i_var+1;
-      }
-
-      ConcatString hist_name("hist_");
-      hist_name << var_name;
-      vector<NcDim> dims(2);
-      dims[0] = mask_dim;
-      dims[1] = data_var_dims[i_var];
-      NcVar hist_var = add_var(nc_out, hist_name, ncInt64, dims,
-                               deflate_level);
-      hist1d_vars.emplace_back(hist_var);
-
-      // Add variable attributes
-      cs << cs_erase << "Histogram of " << var_name << " values";
-      add_var_att_local(&hist_var, "long_name", cs);
-   }
-
-   // Define joint histograms
-   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
-
-      VarInfo *data_i = conf_info.data_info[i_var];
-
-      for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
-
-         VarInfo *data_j = conf_info.data_info[j_var];
-
-         ConcatString hist_name("hist_");
-         hist_name << data_i->name_attr() << "_" << data_i->level_attr();
-
-         if(multiple_data_sources && !unique_variable_names) {
-            hist_name << "_VAR" << i_var+1;
-         }
-
-         hist_name << "_" << data_j->name_attr() << "_" << data_j->level_attr();
-
-         if(multiple_data_sources && !unique_variable_names) {
-            hist_name << "_VAR" << j_var+1;
-         }
-
-         vector<NcDim> dims(3);
-         dims[0] = mask_dim;
-         dims[1] = data_var_dims[i_var];
-         dims[2] = data_var_dims[j_var];
-
-         NcVar hist_var = add_var(nc_out, hist_name, ncInt64, dims,
-                                  deflate_level);
-         hist2d_vars.emplace_back(hist_var);
-
-         // Add variable attributes
-         cs << cs_erase
-            << "Joint histogram of " << hist_name << " values";
-         add_var_att_local(&hist_var, "long_name", cs);
-      } // end  for j_var
-   } // end for i_var
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void write_nc_var_int(const char *var_name, const char *long_name,
-                      int n) {
-
-   // Add the variable
-   NcVar var = add_var(nc_out, var_name, ncInt64);
-   add_att(&var, "long_name", long_name);
-
-   if(!put_nc_data(&var, &n)) {
-      mlog << Error << "\nwrite_nc_int() -> "
-           << "error writing the \"" << long_name << "\" variable.\n\n";
-      exit(1);
-   }
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void add_var_att_local(NcVar *var, const char *att_name,
-                       const ConcatString att_value) {
-   if(att_value.nonempty()) add_att(var, att_name, att_value.c_str());
-   else                     add_att(var, att_name, na_str);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -696,13 +654,35 @@ void write_hist1d(void) {
    vector<size_t> offsets(2);
    vector<size_t> counts(2);
 
-   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+   // Define and write 1D histograms
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       VarInfo *data_i = conf_info.data_info[i_var];
 
-      for(int i_mask=0; i_mask<conf_info.get_n_mask(); i_mask++) {
+      // Define NetCDF variable name
+      ConcatString var_name;
+      var_name << data_i->name_attr() << "_" << data_i->level_attr();
 
-         NcVar hist_var = hist1d_vars[i_var];
+      if(multiple_data_sources && !unique_variable_names) {
+         var_name << "_VAR" << i_var+1;
+      }
+
+      // Create NetCDF variable
+      ConcatString hist_name("hist_");
+      hist_name << var_name;
+      vector<NcDim> dims(2);
+      dims[0] = mask_dim;
+      dims[1] = data_var_dims[i_var];
+      NcVar hist_var = add_var(nc_out, hist_name, ncInt64, dims,
+                               deflate_level);
+
+      // Add variable attributes
+      ConcatString cs;
+      cs << cs_erase << "Histogram of " << var_name << " values";
+      add_var_att_local(&hist_var, "long_name", cs);
+
+      // Write 1D histogram for each mask
+      for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
 
          long long *hist = diag_info[i_var][i_mask].hist1d.data();
 
@@ -723,19 +703,45 @@ void write_hist2d(void) {
    vector<size_t> offsets(3);
    vector<size_t> counts(3);
 
-   int i_hist=0;
-   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+   // Define and write 2D joint histograms
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       VarInfo *data_i = conf_info.data_info[i_var];
 
-      for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
+      for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
          VarInfo *data_j = conf_info.data_info[j_var];
 
-         NcVar hist_var = hist2d_vars[i_hist];
+         // Define NetCDF variable name
+	 ConcatString hist_name("hist_");
+         hist_name << data_i->name_attr() << "_" << data_i->level_attr();
+
+         if(multiple_data_sources && !unique_variable_names) {
+            hist_name << "_VAR" << i_var+1;
+         }
+
+         hist_name << "_" << data_j->name_attr() << "_" << data_j->level_attr();
+
+         if(multiple_data_sources && !unique_variable_names) {
+            hist_name << "_VAR" << j_var+1;
+         }
+
+         // Create NetCDF variable
+         vector<NcDim> dims(3);
+         dims[0] = mask_dim;
+         dims[1] = data_var_dims[i_var];
+         dims[2] = data_var_dims[j_var];
+         NcVar hist_var = add_var(nc_out, hist_name, ncInt64, dims,
+                                  deflate_level);
+
+         // Add variable attributes
+         ConcatString cs;
+         cs << cs_erase
+            << "Joint histogram of " << hist_name << " values";
+         add_var_att_local(&hist_var, "long_name", cs);
 
          // Write 2D histogram for each mask
-         for(int i_mask=0; i_mask<conf_info.get_n_mask(); i_mask++) {
+         for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
 
             long long *hist = diag_info[i_var][i_mask].hist2d[j_var].data();
 
@@ -747,12 +753,9 @@ void write_hist2d(void) {
             counts[2]  = data_j->n_bins();
 
             hist_var.putVar(offsets, counts, hist);
-         }
 
-         // Increment histogram counter
-         i_hist++;
-
-      } // end  for j_var
+         } // end for i_mask
+      } // end for j_var
    } // end for i_var
 }
 
@@ -776,7 +779,7 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
    file_type = parse_conf_file_type(&i_dict);
 
    // Find the first file that actually exists
-   for(i=0; i<file_list.n(); i++) {
+   for(i=0; i < file_list.n(); i++) {
       if(file_exists(file_list[i].c_str())) break;
    }
 

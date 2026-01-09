@@ -119,12 +119,13 @@ The **output_flag** dictionary controls the type of output that the Grid-Diag to
 grid_diag Output File
 ---------------------
 
-The NetCDF file has dimensions for the number of masking regions and one for each of the specified data variable and level combinations, e.g. APCP_L0 and PWAT_L0. If histogram output is requested, the bin minimum, midpoint, and maximum values are indicated with an _min, _mid, or _max appended to the variable/level.
-
-If 1-dimensional histograms are requested, a corresponding **hist_** variable is written for each variable/level in the data dictionary. For example, hist_APCP_L0 and hist_PWAT_L0 are the counts of all data values falling within the bin. Data values below the minimum or above the maximum are included in the lowest and highest bins, respectively. A warning message is printed when the range of the data falls outside the range defined in the configuration file.
-
-If 2-dimensional historgrams are requested, a corresponding **hist_** varible is written for each combination of variable/level entries in the data dictionary. For example, hist_APCP_L0_PWAT_L0 is the joint histogram for those two variables/levels.
-
-All histogram variables, as well as the **mask_size** variable, include a dimension based on the number of masking regions requested.
+The NetCDF file has dimensions for the number of masking regions and one for each of the specified data variable and level combinations, e.g. APCP_L0 and PWAT_L0. If histogram output is requested, the bin minimum and maximum values are indicated with an _min or _max appended to the variable/level. For each variable and level combination, a coordinate variable is written to indicate the midpoint value for each histogram bin.
 
 The output variables for **grid_size** and **n_series** specify the number of points in the grid and the number of files that were processed, respectively. The range of the initialization, valid, and lead times processed is written to the global attributes.
+
+The **mask_name** and **mask_size** variables have dimensions based on the number of masking regions and indicate the name of each masking region and the number of grid points it includes, respectively.
+
+If 1-dimensional histograms are requested, a corresponding **hist_** variable is written for each variable/level in the data dictionary. This variable has dimensions for the number of masking regions and for the number of bins specified in the data dictionary. For example, hist_APCP_L0 and hist_PWAT_L0 are the counts of all data values falling within each bin for a given spatial masking region. Data values below the minimum or above the maximum are included in the lowest and highest bins, respectively. A warning message is printed when the range of the data falls outside the range defined in the configuration file.
+
+If 2-dimensional historgrams are requested, a corresponding **hist_** varible is written for each combination of variable/level entries in the data dictionary. This variable has dimensions for the number of masking regions and for the number of bins specified for the two data dictionary entries. For example, hist_APCP_L0_PWAT_L0 is the joint histogram for those two variables/levels for a given spatial masking region.
+
