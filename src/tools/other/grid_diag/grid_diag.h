@@ -87,8 +87,8 @@ static GridDiagConfInfo conf_info;
 // Output NetCDF file
 static netCDF::NcFile *nc_out = (netCDF::NcFile *) nullptr;
 std::vector<netCDF::NcDim> data_var_dims;
-std::vector<netCDF::NcVar> hist_vars;
-std::vector<netCDF::NcVar> joint_hist_vars;
+std::vector<netCDF::NcVar> hist1d_vars;
+std::vector<netCDF::NcVar> hist2d_vars;
 
 static bool multiple_data_sources = false;
 static bool unique_variable_names = true;
@@ -109,17 +109,32 @@ static Grid grid;
 static Met2dDataFileFactory mtddf_factory;
 static Met2dDataFile *data_mtddf = (Met2dDataFile *) nullptr;
 
-// Variable min/max values
-std::vector<double> var_mins;
-std::vector<double> var_maxs;
+// Struct to store diagnostic info for each field and masking region
+struct DiagInfo {
 
-// Variable histogram map
-std::map<ConcatString, std::vector<long long> > histograms;
-std::map<ConcatString, std::vector<long long> > joint_histograms;
-std::map<ConcatString, std::vector<double> > bin_mins;
-std::map<ConcatString, std::vector<double> > bin_maxs;
-std::map<ConcatString, std::vector<double> > bin_mids;
-std::map<ConcatString, double> bin_deltas;
+   // Input data info
+   int var_id;
+   ConcatString var_name; 
+   double var_min;
+   double var_max;
+
+   // Mask info (JHG, can probably delete)
+   ConcatString mask_name;
+   MaskPlane   *mask_mp; // not allocated
+
+   // Histogram bins
+   std::vector<double> bin_min;
+   std::vector<double> bin_max;
+   std::vector<double> bin_mid;
+   double bin_delta;
+
+   // Single and joint histograms 
+   std::vector<long long> hist1d;
+   std::map<int, std::vector<long long> > hist2d;
+};
+
+// DiagInfo objects [n_data][n_mask]
+std::vector<std::vector<DiagInfo> > diag_info; 
 
 // Series length
 static int n_series = bad_data_int;

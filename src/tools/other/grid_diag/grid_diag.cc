@@ -58,15 +58,13 @@ using namespace netCDF;
 ////////////////////////////////////////////////////////////////////////
 
 static void process_command_line(int, char **);
+static void setup_diag_info(void);
 static void process_series(void);
-
-static void setup_histograms(void);
-static void setup_joint_histograms(void);
 static void setup_nc_file(void);
 static void write_nc_var_int(const char *, const char *, int);
 static void add_var_att_local(NcVar *, const char *, const ConcatString);
-static void write_histograms(void);
-static void write_joint_histograms(void);
+static void write_hist1d(void);
+static void write_hist2d(void);
 static void clean_up();
 
 static Met2dDataFile *get_mtddf(const StringArray &, const int);
@@ -84,11 +82,8 @@ int met_main(int argc, char *argv[]) {
    // Process the command line arguments
    process_command_line(argc, argv);
 
-   // Setup variable histograms
-   setup_histograms();
-
-   // Setup joint variable histograms
-   setup_joint_histograms();
+   // Setup diagnostic info
+   setup_diag_info();
 
    // Process series
    process_series();
@@ -96,11 +91,11 @@ int met_main(int argc, char *argv[]) {
    // Setup netcdf output
    setup_nc_file();
 
-   // Write variable histograms
-   write_histograms();
+   // Write 1D variable histograms
+   write_hist1d();
 
-   // Write joint variable histograms
-   write_joint_histograms();
+   // Write 2D joint variable histograms
+   write_hist2d();
 
    // Write benchmarking metrics
    #ifdef WITH_PROFILER
@@ -251,9 +246,85 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
+void setup_diag_info(void) {
+   #ifdef WITH_PROFILER
+   CTRACK;
+   #endif
+
+   // Resize based on the number of variables and masks
+   diag_info.resize(conf_info.get_n_data());
+   for(auto &info : diag_info) info.resize(conf_info.get_n_mask());
+
+   // Loop over variables
+   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+
+      // Find bin ranges
+      VarInfo *data_i = conf_info.data_info[i_var];
+      NumArray range(data_i->range());
+      int n_bins_i = data_i->n_bins();
+      double var_min = range[0];
+      double var_max = range[1];
+      double bin_delta = (var_max - var_min) / n_bins_i;
+
+      // Compute bin values
+      vector<double> bin_min(n_bins_i);
+      vector<double> bin_max(n_bins_i);
+      vector<double> bin_mid(n_bins_i);
+      for(int i_bin=0; i_bin<n_bins_i; i_bin++) {
+         bin_min[i_bin] = var_min + bin_delta * i_bin;
+         bin_max[i_bin] = var_min + bin_delta * (i_bin + 1);
+         bin_mid[i_bin] = var_min + bin_delta * (i_bin + 0.5);
+      }
+
+      // 1D histogram
+      mlog << Debug(2)
+           << "Initializing " << data_i->magic_str_attr()
+           << " histogram with " << n_bins_i << " bins from "
+           << var_min << " to " << var_max << ".\n";
+      vector<long long> hist1d;
+      init_pdf(n_bins_i, hist1d);
+
+      // Keep track of unique output variable names
+      if(nc_var_sa.has(data_i->magic_str_attr())) unique_variable_names = false;
+      nc_var_sa.add(data_i->magic_str_attr());
+
+      // 2D histograms
+      map<int, vector<long long> > hist2d; 
+      for(int j_var=0; j_var<i_var; j_var++) {
+         VarInfo *data_j = conf_info.data_info[j_var];
+         int n_bins_j = data_j->n_bins();
+
+         mlog << Debug(2)
+              << "Initializing " << data_i->magic_str_attr() << "_"
+              << data_j->magic_str_attr() << " joint histogram with "
+              << n_bins_i << " x " << n_bins_j << " bins.\n";
+
+         hist2d[j_var] = vector<long long>();
+         init_joint_pdf(n_bins_i, n_bins_j, hist2d[j_var]);
+      }
+
+      // Initialize diagnostic info for each mask
+      for(int i_mask=0; i_mask<conf_info.get_n_mask(); i_mask++) {
+         diag_info[i_var][i_mask].var_id    = i_var;
+         diag_info[i_var][i_mask].var_name  = data_i->magic_str_attr();
+         diag_info[i_var][i_mask].var_min   = bad_data_double;
+         diag_info[i_var][i_mask].var_max   = bad_data_double;
+         diag_info[i_var][i_mask].mask_name = conf_info.mask_name[i_mask];
+         diag_info[i_var][i_mask].mask_mp   = &conf_info.mask_mp[i_mask];
+         diag_info[i_var][i_mask].bin_min   = bin_min;
+         diag_info[i_var][i_mask].bin_max   = bin_max;
+         diag_info[i_var][i_mask].bin_mid   = bin_mid;
+         diag_info[i_var][i_mask].bin_delta = bin_delta;
+         diag_info[i_var][i_mask].hist1d    = hist1d;
+         diag_info[i_var][i_mask].hist2d    = hist2d;
+      } // end for i_mask
+   } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+
 void process_series(void) {
    vector<DataPlane> data_dp(conf_info.get_n_data());
-   double min, max;
    StringArray *cur_files;
    GrdFileType *cur_ftype;
    Grid cur_grid;
@@ -274,10 +345,7 @@ void process_series(void) {
       // Process the 1d histograms
       for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
-         ConcatString i_var_str;
-         i_var_str << "VAR" << i_var+1;
-
-         VarInfo *data_info = conf_info.data_info[i_var];
+         VarInfo *data_i = conf_info.data_info[i_var];
 
          // Check for separate data files for each field
          if(data_files.size() > 1) {
@@ -290,22 +358,22 @@ void process_series(void) {
          }
 
          mlog << Debug(2)
-              << "Reading field " << data_info->magic_str_attr()
+              << "Reading field " << data_i->magic_str_attr()
               << " data from file: " << (*cur_files)[i_series]
               << "\n";
 
-         get_series_entry(i_series, data_info, *cur_files, *cur_ftype,
+         get_series_entry(i_series, data_i, *cur_files, *cur_ftype,
                           data_dp[i_var], cur_grid);
 
          // Regrid, if necessary
          if(!(cur_grid == grid)) {
             mlog << Debug(2)
-                 << "Regridding field " << data_info->magic_str_attr()
+                 << "Regridding field " << data_i->magic_str_attr()
                  << " to the verification grid using "
-                 << data_info->regrid().get_str() << ".\n";
+                 << data_i->regrid().get_str() << ".\n";
             data_dp[i_var] = met_regrid(data_dp[i_var],
                                         cur_grid, grid,
-                                        data_info->regrid());
+                                        data_i->regrid());
          }
 
          // Initialize time ranges
@@ -336,180 +404,82 @@ void process_series(void) {
             }
          }
 
-         // TODO: Add logic for handling multiple masks
+         // Loop over the masks
+         for(int i_mask=0; i_mask<conf_info.get_n_mask(); i_mask++) {
 
-         // Apply the mask before updating the data ranges
-         apply_mask(data_dp[i_var], conf_info.mask_mp[0]);
+            DiagInfo *diag_i = &diag_info[i_var][i_mask];
 
-         // Update the range of the data values
-         data_dp[i_var].data_range(min, max);
-         if(is_bad_data(var_mins[i_var]) || min < var_mins[i_var]) {
-            var_mins[i_var] = min;
-         }
-         if(is_bad_data(var_maxs[i_var]) || max > var_maxs[i_var]) {
-            var_maxs[i_var] = max;
-         }
+            // Apply the mask before updating the data ranges
+            DataPlane dp(data_dp[i_var]);
+            apply_mask(dp, conf_info.mask_mp[i_mask]);
+            double min;
+            double max;
+            dp.data_range(min, max);
+            if(is_bad_data(diag_i->var_min) || min < diag_i->var_min) {
+               diag_i->var_min = min;
+            }
+            if(is_bad_data(diag_i->var_max) || max > diag_i->var_max) {
+               diag_i->var_max = max;
+            }
 
-         // Update partial sums
-         update_pdf(bin_mins[i_var_str][0],
-                    bin_deltas[i_var_str],
-                    histograms[i_var_str],
-                    data_dp[i_var], conf_info.mask_mp[0]);
+            // Update 1d histogram 
+            update_pdf(diag_i->bin_min[0],
+                       diag_i->bin_delta,
+                       diag_i->hist1d,
+                       data_dp[i_var],
+                       conf_info.mask_mp[i_mask]);
+
+            // Process the 2d joint histograms
+            for(int j_var=0; j_var<i_var; j_var++) {
+
+               VarInfo  *data_j = conf_info.data_info[j_var];
+               DiagInfo *diag_j = &diag_info[j_var][i_mask];
+
+               // Update joint partial sums
+               update_joint_pdf(data_i->n_bins(),
+                                data_j->n_bins(),
+                                diag_i->bin_min[0],
+                                diag_j->bin_min[0],
+                                diag_i->bin_delta,
+                                diag_j->bin_delta,
+                                diag_i->hist2d[j_var],
+                                data_dp[i_var], data_dp[j_var],
+                                conf_info.mask_mp[i_mask]);
+            } // end for j_var
+         } // end for i_mask
       } // end for i_var
-
-     // Process the 2d joint histograms
-     for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
-
-        ConcatString i_var_str;
-        i_var_str << "VAR" << i_var+1;
-
-        VarInfo *data_info = conf_info.data_info[i_var];
-
-        for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
-
-           ConcatString j_var_str;
-           j_var_str << "VAR" << j_var+1;
-
-           VarInfo *joint_info = conf_info.data_info[j_var];
-
-           ConcatString ij_var_str;
-           ij_var_str << i_var_str << "_" << j_var_str;
-
-           // Update joint partial sums
-           update_joint_pdf(data_info->n_bins(),
-                            joint_info->n_bins(),
-                            bin_mins[i_var_str][0],
-                            bin_mins[j_var_str][0],
-                            bin_deltas[i_var_str],
-                            bin_deltas[j_var_str],
-                            joint_histograms[ij_var_str],
-                            data_dp[i_var], data_dp[j_var],
-                            conf_info.mask_mp[0]);
-       } // end for j_var
-     } // end for i_var
    } // end for i_series
 
    // Report the ranges of values for each field
    for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+      for(int i_mask=0; i_mask<conf_info.get_n_mask(); i_mask++) {
 
-      VarInfo *data_info = conf_info.data_info[i_var];
+         VarInfo  *data_i = conf_info.data_info[i_var];
+         DiagInfo *diag_i = &diag_info[i_var][i_mask];
 
-      mlog << Debug(2)
-           << "Processed " << data_info->magic_str_attr()
-           << " data with range (" << var_mins[i_var] << ", "
-           << var_maxs[i_var] << ") into bins with range ("
-           << data_info->range()[0] << ", "
-           << data_info->range()[1] << ").\n";
+         mlog << Debug(2)
+              << "Processed " << data_i->magic_str_attr()
+              << " data over region " << diag_i->mask_name
+              << " with range (" << diag_i->var_min << ", "
+              << diag_i->var_max << ") into bins with range ("
+              << data_i->range()[0] << ", "
+              << data_i->range()[1] << ").\n";
 
-      if(var_mins[i_var] < data_info->range()[0] ||
-         var_maxs[i_var] > data_info->range()[1]) {
-         mlog << Warning << "\nprocess_series() -> "
-              << "the range of the " << data_info->magic_str_attr()
-              << " data (" << var_mins[i_var] << ", " << var_maxs[i_var]
-              << ") falls outside the configuration file range ("
-              << data_info->range()[0] << ", "
-              << data_info->range()[1] << ")!\n\n";
-      }
+         // Print warning if outside range
+         if(diag_i->var_min < data_i->range()[0] ||
+            diag_i->var_max > data_i->range()[1]) {
+            mlog << Warning << "\nprocess_series() -> "
+                 << "the range of the " << data_i->magic_str_attr()
+                 << " data over region " << diag_i->mask_name
+                 << " (" << diag_i->var_min << ", " << diag_i->var_max
+                 << ") falls outside the configuration file range ("
+                 << data_i->range()[0] << ", "
+                 << data_i->range()[1] << ")!\n\n";
+         }
+      } // end for i_mask
    } // end for i_var
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void setup_histograms(void) {
-   #ifdef WITH_PROFILER
-   CTRACK;
-   #endif
-
-   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
-
-      ConcatString i_var_str;
-      i_var_str << "VAR" << i_var+1;
-
-      VarInfo *data_info = conf_info.data_info[i_var];
-
-      // Initialize variable min and max values
-      var_mins.emplace_back(bad_data_double);
-      var_maxs.emplace_back(bad_data_double);
-
-      // Find bin ranges
-      NumArray range = data_info->range();
-      int n_bins = data_info->n_bins();
-      double min = range[0];
-      double max = range[1];
-      double delta = (max - min) / n_bins;
-
-      // Compute bin values
-      vector<double> bin_min;
-      vector<double> bin_max;
-      vector<double> bin_mid;
-      bin_min.clear();
-      bin_max.clear();
-      bin_mid.clear();
-      for(int k=0; k<n_bins; k++) {
-         bin_min.emplace_back(min + delta * k);
-         bin_max.emplace_back(min + delta * (k + 1));
-         bin_mid.emplace_back(min + delta * (k + 0.5));
-      }
-
-      bin_mins[i_var_str] = bin_min;
-      bin_maxs[i_var_str] = bin_max;
-      bin_mids[i_var_str] = bin_mid;
-      bin_deltas[i_var_str] = delta;
-
-      // Initialize histograms
-      mlog << Debug(2)
-           << "Initializing " << data_info->magic_str_attr()
-           << " histogram with " << n_bins << " bins from "
-           << min << " to " << max << ".\n";
-
-      histograms[i_var_str] = vector<long long>();
-      init_pdf(n_bins, histograms[i_var_str]);
-
-      // Keep track of unique output variable names
-      if(nc_var_sa.has( data_info->magic_str_attr() )) unique_variable_names = false;
-      nc_var_sa.add(data_info->magic_str_attr());
-
-   } // for i_var
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void setup_joint_histograms(void) {
-   #ifdef WITH_PROFILER
-   CTRACK;
-   #endif
-
-   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
-
-      ConcatString i_var_str;
-      i_var_str << "VAR" << i_var+1;
-
-      VarInfo *data_info = conf_info.data_info[i_var];
-      int n_bins = data_info->n_bins();
-
-      for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
-
-         ConcatString j_var_str;
-         j_var_str << "VAR" << j_var+1;
-
-         VarInfo *joint_info = conf_info.data_info[j_var];
-         int n_joint_bins = joint_info->n_bins();
-
-	 ConcatString ij_var_str;
-         ij_var_str << i_var_str << "_" << j_var_str;
-
-         mlog << Debug(2)
-              << "Initializing " << data_info->magic_str_attr() << "_"
-              << joint_info->magic_str_attr() << " joint histogram with "
-              << n_bins << " x " << n_joint_bins << " bins.\n";
-         joint_histograms[ij_var_str] = vector<long long>();
-
-         init_joint_pdf(n_bins, n_joint_bins,
-                        joint_histograms[ij_var_str]);
-      } // end  for j_var
-   } // end for i_var
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -530,7 +500,6 @@ void setup_nc_file(void) {
    // Add global attributes
    write_netcdf_global(nc_out, out_file.c_str(), program_name,
                        nullptr, nullptr, conf_info.desc.c_str());
-   add_att(nc_out, "mask_name", conf_info.mask_name[0]);
 
    // Add time range information to the global attributes
    add_att(nc_out, "init_beg",  (string)unix_to_yyyymmdd_hhmmss(init_beg));
@@ -540,36 +509,54 @@ void setup_nc_file(void) {
    add_att(nc_out, "lead_beg",  (string)sec_to_hhmmss(lead_beg));
    add_att(nc_out, "lead_end",  (string)sec_to_hhmmss(lead_end));
 
-   // Write the grid size, mask size, and series length
+   // Write the grid size and series length
    write_nc_var_int("grid_size", "number of grid points", grid.nxy());
-   write_nc_var_int("mask_size", "number of mask points",
-                    conf_info.mask_mp[0].count());
    write_nc_var_int("n_series", "length of series", n_series);
 
    // Compression level
    int deflate_level = compress_level;
    if(deflate_level < 0) deflate_level = conf_info.conf.nc_compression();
 
-   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+   // Create the mask dimension
+   NcDim mask_dim = add_dim(nc_out, "mask",
+                            (long) conf_info.get_n_mask());
 
-      ConcatString i_var_str;
-      i_var_str << "VAR" << i_var+1;
+   // Create the mask name variable
+   NcVar mask_name_var = add_var(nc_out, "mask", ncString, mask_dim, deflate_level);
+   add_att(&mask_name_var, "long_name", "name of masking region");
 
-      VarInfo *data_info = conf_info.data_info[i_var];
+   // Create the mask size variable
+   NcVar mask_size_var = add_var(nc_out, "mask_size", ncInt64, mask_dim, deflate_level);
+   add_att(&mask_size_var, "long_name", "number of mask points");
+
+   // Write the mask names and sizes
+   vector<size_t> offsets(1);
+   vector<size_t> counts(1);
+   for(int i_mask=0; i_mask<conf_info.get_n_mask(); i_mask++) {
+      offsets[0] = i_mask;
+      counts[0] = 1;
+      string mask_name(conf_info.mask_name[i_mask]);
+      mask_name_var.putVar(offsets, counts, &mask_name);
+      int mask_size = conf_info.mask_mp[i_mask].count();
+      mask_size_var.putVar(offsets, counts, &mask_size);
+   }
+
+   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
+
+      VarInfo  *data_i = conf_info.data_info[i_var];
+      DiagInfo *diag_i = &diag_info[i_var][0];
 
       // Set variable NetCDF name
-      ConcatString var_name = data_info->name_attr();
-      var_name.add("_");
-      var_name.add(data_info->level_attr());
+      ConcatString var_name = data_i->name_attr();
+      var_name << "_" << data_i->level_attr();
 
       if(multiple_data_sources && !unique_variable_names) {
-         var_name.add("_");
-         var_name.add(i_var_str);
+         var_name << "_VAR" << i_var+1;
       }
 
       // Define histogram dimensions
       NcDim var_dim = add_dim(nc_out, var_name,
-                              (long) data_info->n_bins());
+                              (long) data_i->n_bins());
       data_var_dims.emplace_back(var_dim);
       
       // Define histogram bins
@@ -579,56 +566,54 @@ void setup_nc_file(void) {
       var_min_name.add("_min");
       var_max_name.add("_max");
       var_mid_name.add("_mid");
-      NcVar var_min = add_var(nc_out, var_min_name, ncFloat, var_dim,
-                              deflate_level);
-      NcVar var_max = add_var(nc_out, var_max_name, ncFloat, var_dim,
-                              deflate_level);
-      NcVar var_mid = add_var(nc_out, var_mid_name, ncFloat, var_dim,
-                              deflate_level);
+      NcVar var_min = add_var(nc_out, var_min_name, ncFloat,
+                              var_dim, deflate_level);
+      NcVar var_max = add_var(nc_out, var_max_name, ncFloat,
+                              var_dim, deflate_level);
+      NcVar var_mid = add_var(nc_out, var_mid_name, ncFloat,
+                              var_dim, deflate_level);
 
       // Add variable attributes
       cs << cs_erase << "Minimum value of " << var_name << " bin";
       add_var_att_local(&var_min, "long_name", cs);
-      add_var_att_local(&var_min, "units", data_info->units_attr());
+      add_var_att_local(&var_min, "units", data_i->units_attr());
 
       cs << cs_erase << "Maximum value of " << var_name << " bin";
       add_var_att_local(&var_max, "long_name", cs);
-      add_var_att_local(&var_max, "units", data_info->units_attr());
+      add_var_att_local(&var_max, "units", data_i->units_attr());
 
       cs << cs_erase << "Midpoint value of " << var_name << " bin";
       add_var_att_local(&var_mid, "long_name", cs);
-      add_var_att_local(&var_mid, "units", data_info->units_attr());
+      add_var_att_local(&var_mid, "units", data_i->units_attr());
 
-      // Write bin values
-      var_min.putVar(bin_mins[i_var_str].data());
-      var_max.putVar(bin_maxs[i_var_str].data());
-      var_mid.putVar(bin_mids[i_var_str].data());
-   }
+      // Write bin values for the current variable
+      var_min.putVar(diag_i->bin_min.data());
+      var_max.putVar(diag_i->bin_max.data());
+      var_mid.putVar(diag_i->bin_mid.data());
+
+   } // end for i_var
 
    // Define histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      ConcatString i_var_str;
-      i_var_str << "VAR" << i_var+1;
-
-      VarInfo *data_info = conf_info.data_info[i_var];
+      VarInfo *data_i = conf_info.data_info[i_var];
 
       // Set variable NetCDF name
-      ConcatString var_name = data_info->name_attr();
-      var_name.add("_");
-      var_name.add(data_info->level_attr());
+      ConcatString var_name;
+      var_name << data_i->name_attr() << "_" << data_i->level_attr();
 
       if(multiple_data_sources && !unique_variable_names) {
-         var_name.add("_");
-         var_name.add(i_var_str);
+         var_name << "_VAR" << i_var+1;
       }
 
       ConcatString hist_name("hist_");
-      hist_name.add(var_name);
-      NcDim var_dim = data_var_dims[i_var];
-      NcVar hist_var = add_var(nc_out, hist_name, ncInt64, var_dim,
+      hist_name << var_name;
+      vector<NcDim> dims(2);
+      dims[0] = mask_dim;
+      dims[1] = data_var_dims[i_var];
+      NcVar hist_var = add_var(nc_out, hist_name, ncInt64, dims,
                                deflate_level);
-      hist_vars.emplace_back(hist_var);
+      hist1d_vars.emplace_back(hist_var);
 
       // Add variable attributes
       cs << cs_erase << "Histogram of " << var_name << " values";
@@ -638,48 +623,33 @@ void setup_nc_file(void) {
    // Define joint histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      ConcatString i_var_str;
-      i_var_str << "VAR" << i_var+1;
+      VarInfo *data_i = conf_info.data_info[i_var];
 
-      VarInfo *data_info = conf_info.data_info[i_var];
+      for(int j_var=0; j_var<i_var; j_var++) {
 
-      for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
-
-         ConcatString j_var_str;
-         j_var_str << "VAR" << j_var+1;
-
-         VarInfo *joint_info = conf_info.data_info[j_var];
+         VarInfo *data_j = conf_info.data_info[j_var];
 
          ConcatString hist_name("hist_");
-         hist_name.add(data_info->name_attr());
-         hist_name.add("_");
-         hist_name.add(data_info->level_attr());
+         hist_name << data_i->name_attr() << "_" << data_i->level_attr();
 
          if(multiple_data_sources && !unique_variable_names) {
-            hist_name.add("_");
-            hist_name.add(i_var_str);
+            hist_name << "_VAR" << i_var+1;
          }
 
-         hist_name.add("_");
-         hist_name.add(joint_info->name_attr());
-         hist_name.add("_");
-         hist_name.add(joint_info->level_attr());
+         hist_name << "_" << data_j->name_attr() << "_" << data_j->level_attr();
 
          if(multiple_data_sources && !unique_variable_names) {
-            hist_name.add("_");
-            hist_name.add(j_var_str);
+            hist_name << "_VAR" << j_var+1;
          }
 
-         NcDim var_dim = data_var_dims[i_var];
-         NcDim joint_dim = data_var_dims[j_var];
-         vector<NcDim> dims;
-         dims.clear();
-         dims.emplace_back(var_dim);
-         dims.emplace_back(joint_dim);
+         vector<NcDim> dims(3);
+         dims[0] = mask_dim;
+         dims[1] = data_var_dims[i_var];
+         dims[2] = data_var_dims[j_var];
 
          NcVar hist_var = add_var(nc_out, hist_name, ncInt64, dims,
                                   deflate_level);
-         joint_hist_vars.emplace_back(hist_var);
+         hist2d_vars.emplace_back(hist_var);
 
          // Add variable attributes
          cs << cs_erase
@@ -715,54 +685,65 @@ void add_var_att_local(NcVar *var, const char *att_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_histograms(void) {
+void write_hist1d(void) {
+   vector<size_t> offsets(2);
+   vector<size_t> counts(2);
 
-   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+   for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
-      ConcatString i_var_str;
-      i_var_str << "VAR" << i_var+1;
+      VarInfo *data_i = conf_info.data_info[i_var];
 
-      VarInfo *data_info = conf_info.data_info[i_var];
-      NcVar hist_var = hist_vars[i_var];
+      for(int i_mask=0; i_mask<conf_info.get_n_mask(); i_mask++) {
 
-      long long *hist = histograms[i_var_str].data();
+         NcVar hist_var = hist1d_vars[i_var];
 
-      hist_var.putVar(hist);
-   }
+         long long *hist = diag_info[i_var][i_mask].hist1d.data();
+
+         offsets[0] = i_mask;
+         offsets[1] = 0;
+         counts[0]  = 1;
+         counts[1]  = data_i->n_bins();
+
+         hist_var.putVar(offsets, counts, hist);
+
+      } // end for i_mask
+   } // end for i_var
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_joint_histograms(void) {
-   vector<size_t> offsets;
-   vector<size_t> counts;
+void write_hist2d(void) {
+   vector<size_t> offsets(3);
+   vector<size_t> counts(3);
 
    int i_hist=0;
    for(int i_var=0; i_var<conf_info.get_n_data(); i_var++) {
 
-      VarInfo *data_info = conf_info.data_info[i_var];
+      VarInfo *data_i = conf_info.data_info[i_var];
 
-      for(int j_var=i_var+1; j_var<conf_info.get_n_data(); j_var++) {
+      for(int j_var=0; j_var<i_var; j_var++) {
 
-         VarInfo *joint_info = conf_info.data_info[j_var];
+         VarInfo *data_j = conf_info.data_info[j_var];
+         NcVar hist_var = hist2d_vars[i_hist];
 
-         ConcatString ij_var_str;
-         ij_var_str << "VAR" << i_var+1 << "_"
-                    << "VAR" << j_var+1;
+         // Write 2D histogram for each mask
+         for(int i_mask=0; i_mask<conf_info.get_n_mask(); i_mask++) {
 
-         long long *hist = joint_histograms[ij_var_str].data();
+            long long *hist = diag_info[i_var][i_mask].hist2d[j_var].data();
 
-         offsets.clear();
-         counts.clear();
-         offsets.emplace_back(0);
-         offsets.emplace_back(0);
-         counts.emplace_back(data_info->n_bins());
-         counts.emplace_back(joint_info->n_bins());
+            offsets[0] = i_mask;
+            offsets[1] = 0;
+            offsets[2] = 0;
+            counts[0]  = 1;
+            counts[1]  = data_i->n_bins();
+            counts[2]  = data_j->n_bins();
 
-         NcVar hist_var = joint_hist_vars[i_hist];
-         hist_var.putVar(offsets, counts, hist);
+            hist_var.putVar(offsets, counts, hist);
+         }
 
+         // Increment histogram counter
          i_hist++;
+
       } // end  for j_var
    } // end for i_var
 }
