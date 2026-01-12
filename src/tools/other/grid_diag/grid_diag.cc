@@ -544,35 +544,65 @@ void process_info_theory() {
       } // end for i_mask
    } // end for i_var
 
-   /* TODO: Add mutual information here 
-        //! Return mutual information between vars along dims varIDs==0 and varIDs==1
-        /*! Set other varIDs of dims to be ignored to -1
-        double mutualInfo(TVector<int>& vIDs){
-            if(vIDs.Size() != nDims){
-                cerr << "varIDs argument must be of size = total dimensionality = " << nDims << endl;
-                cerr << "Skipping this call" << endl;
-                return 0.;
-            }
+   // Compute mutual information for the 2D histograms
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-            TVector<int> varIDs;
-            normalizeBounds(varIDs, vIDs);
+      VarInfo *i_data = conf_info.data_info[i_var];
 
-            // computer probabilities given the var IDs
-            TMatrix<double> p_xy;
-            computeJointProbs(p_xy,varIDs);
+      for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-            //cout << "From mutualInfo"<< endl << p_xy << endl;
+         VarInfo *j_data = conf_info.data_info[j_var];
 
-            double mi = 0.0;
-            // parse through each unique data point
-            for (int i = 1; i <= p_xy.ColumnSize(); i++)
-            {
-                mi += p_xy[i][3]*log2(p_xy[i][3]/(p_xy[i][1]*p_xy[i][2]));
-                //cout << "from mi = " << p_xy[i][3]*log2(p_xy[i][3]/(p_xy[i][1]*p_xy[i][2])) << endl;
-            }
-            return mi;
-        }
-   */
+         for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
+
+            DiagInfo *i_diag = &diag_info[i_var][i_mask];
+
+            // Initialize
+            i_diag->mutual_information = 0.0;
+
+            // 2D histogram sums 
+            long long hist2d_ij_sum = 0;
+            vector<long long> hist2d_i_sum(i_data->n_bins(), 0);
+            vector<long long> hist2d_j_sum(j_data->n_bins(), 0);
+
+            for(int i=0; i<i_data->n_bins(); i++) {
+               for(int j=0; j<j_data->n_bins(); j++) {
+
+                  int n = DefaultTO.two_to_one(
+                             i_data->n_bins(), j_data->n_bins(),
+                             i, j);
+
+                  // Increment sums
+                  hist2d_ij_sum   += i_diag->hist2d[j_var][n];
+                  hist2d_i_sum[i] += i_diag->hist2d[j_var][n];
+                  hist2d_j_sum[j] += i_diag->hist2d[j_var][n];
+
+               } // end for j
+            } // end for i
+
+            // Compute probabilities and acccumulate mutual information
+            for(int i=0; i<i_data->n_bins(); i++) {
+
+               auto p_i = (double) hist2d_i_sum[i] / hist2d_ij_sum;
+
+               for(int j=0; j<j_data->n_bins(); j++) {
+
+                  auto p_j = (double) hist2d_j_sum[j] / hist2d_ij_sum;
+
+                  int n = DefaultTO.two_to_one(
+                             i_data->n_bins(), j_data->n_bins(),
+                             i, j);
+
+                  auto p_ij = (double) i_diag->hist2d[j_var][n] / hist2d_ij_sum;
+
+                  // Accumulate mutual information terms
+                  if(p_ij > 0) i_diag->mutual_information += p_ij * log2(p_ij/(p_i*p_j));
+
+               } // end for j
+            } // end for i
+         } // end for i_mask
+      } // end for j_var
+   } // end for i_var
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -833,33 +863,43 @@ void write_info_theory(void) {
 
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      VarInfo  *i_data = conf_info.data_info[i_var];
+      VarInfo *i_data = conf_info.data_info[i_var];
 
-      // Set variable NetCDF name
-      ConcatString ent_name("entropy_");
-      ent_name << i_data->name_attr() << "_" << i_data->level_attr();
+      // Set variable NetCDF names
+      ConcatString en_name("entropy_");
+      ConcatString mi_name("mutual_information_");
+      en_name << i_data->name_attr() << "_" << i_data->level_attr();
+      mi_name << i_data->name_attr() << "_" << i_data->level_attr();
 
       if(multiple_data_sources && !unique_variable_names) {
-         ent_name << "_VAR" << i_var+1;
+         en_name << "_VAR" << i_var+1;
+         mi_name << "_VAR" << i_var+1;
       }
 
-      // Write a coordinate variable using the bin midpoint
-      NcVar ent_var = add_var(nc_out, ent_name, ncFloat,
-                              mask_dim, deflate_level);
+      // Create NetCDF variables
+      NcVar en_var = add_var(nc_out, en_name, ncFloat,
+                             mask_dim, deflate_level);
+      NcVar mi_var = add_var(nc_out, mi_name, ncFloat,
+                             mask_dim, deflate_level);
 
       // Add variable attributes
       ConcatString cs;
-      cs << cs_erase << "Entropy value of " << ent_name;
-      add_var_att_local(&ent_var, "long_name", cs);
+      cs << cs_erase << "Entropy value of " << en_name;
+      add_var_att_local(&en_var, "long_name", cs);
+      cs << cs_erase << "Mutual information value of " << mi_name;
+      add_var_att_local(&mi_var, "long_name", cs);
 
-      // Store the entroy values
-      vector<double> ent_data(conf_info.get_n_mask());
+      // Store the data
+      vector<double> en_data(conf_info.get_n_mask());
+      vector<double> mi_data(conf_info.get_n_mask());
       for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
-         ent_data[i_mask] = diag_info[i_var][i_mask].entropy;
+         en_data[i_mask] = diag_info[i_var][i_mask].entropy;
+         mi_data[i_mask] = diag_info[i_var][i_mask].mutual_information;
       }
 
-      // Write entropy data for the current variable
-      ent_var.putVar(ent_data.data());
+      // Write the data
+      en_var.putVar(en_data.data());
+      mi_var.putVar(mi_data.data());
 
    } // end for i_var
 }

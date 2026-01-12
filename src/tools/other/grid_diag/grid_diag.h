@@ -128,6 +128,7 @@ struct DiagInfo {
 
    // Information theory
    double entropy;
+   double mutual_information;
 };
 
 // DiagInfo objects [n_data][n_mask]
