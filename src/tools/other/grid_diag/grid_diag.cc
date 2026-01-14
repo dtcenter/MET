@@ -64,6 +64,7 @@ static void process_hist1d(const vector<DataPlane> &);
 static void process_hist2d(const vector<DataPlane> &);
 static void process_info_theory(void);
 static void setup_nc_file(void);
+static ConcatString get_nc_var_str(const VarInfo *, int);
 static void write_nc_var_int(const char *, const char *, int);
 static void add_var_att_local(NcVar *, const char *, const ConcatString);
 static void write_hist_bins(void);
@@ -415,10 +416,10 @@ void process_series(void) {
       } // end for i_var
 
       // Process the 1D histograms
-      if(conf_info.nc_info.do_hist1d) process_hist1d(data_dp);
+      process_hist1d(data_dp);
 
       // Process the 2D histograms
-      if(conf_info.nc_info.do_hist2d) process_hist2d(data_dp);
+      process_hist2d(data_dp);
 
    } // end for i_series
 
@@ -541,6 +542,7 @@ void process_info_theory() {
             auto p_x = (double) x / hist1d_sum;
             if(p_x > 0) i_diag->entropy -= p_x * log2(p_x);
          }
+
       } // end for i_mask
    } // end for i_var
 
@@ -558,7 +560,7 @@ void process_info_theory() {
             DiagInfo *i_diag = &diag_info[i_var][i_mask];
 
             // Initialize
-            i_diag->mutual_information = 0.0;
+            i_diag->mutual_information[j_var] = 0.0;
 
             // 2D histogram sums 
             long long hist2d_ij_sum = 0;
@@ -596,13 +598,33 @@ void process_info_theory() {
                   auto p_ij = (double) i_diag->hist2d[j_var][n] / hist2d_ij_sum;
 
                   // Accumulate mutual information terms
-                  if(p_ij > 0) i_diag->mutual_information += p_ij * log2(p_ij/(p_i*p_j));
+                  if(p_ij > 0) {
+                     i_diag->mutual_information[j_var] +=
+                        p_ij * log2(p_ij/(p_i*p_j));
+                  }
 
                } // end for j
             } // end for i
          } // end for i_mask
       } // end for j_var
    } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+
+ConcatString get_nc_var_str(const VarInfo *info, int index) {
+   ConcatString cs;
+
+   if(!info) return cs;
+
+   // Append the NetCDF name and level
+   cs << info->name_attr() << "_" << info->level_attr();
+
+   if(multiple_data_sources && !unique_variable_names) {
+      cs << "_VAR" << index;
+   }
+
+   return cs;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -697,44 +719,39 @@ void write_hist_bins(void) {
       VarInfo  *i_data = conf_info.data_info[i_var];
       DiagInfo *i_diag = &diag_info[i_var][0];
 
-      // Set variable NetCDF name
-      ConcatString var_name = i_data->name_attr();
-      var_name << "_" << i_data->level_attr();
+      // Define NetCDF variable name
+      ConcatString var_str(get_nc_var_str(i_data, i_var+1));
 
-      if(multiple_data_sources && !unique_variable_names) {
-         var_name << "_VAR" << i_var+1;
-      }
-
-      // Define histogram dimensions
-      NcDim var_dim = add_dim(nc_out, var_name,
+      // Define NetCDF dimensions
+      NcDim var_dim = add_dim(nc_out, var_str,
                               (long) i_data->n_bins());
       data_var_dims.emplace_back(var_dim);
       
-      // Define histogram bins
-      ConcatString var_min_name = var_name;
-      ConcatString var_max_name = var_name;
-      var_min_name.add("_min");
-      var_max_name.add("_max");
-      NcVar var_min = add_var(nc_out, var_min_name, ncFloat,
+      // Create NetCDF variable
+      ConcatString min_var_name(var_str);
+      ConcatString max_var_name(var_str);
+      min_var_name.add("_min");
+      max_var_name.add("_max");
+      NcVar var_min = add_var(nc_out, min_var_name, ncFloat,
                               var_dim, deflate_level);
-      NcVar var_max = add_var(nc_out, var_max_name, ncFloat,
+      NcVar var_max = add_var(nc_out, max_var_name, ncFloat,
                               var_dim, deflate_level);
 
       // Write a coordinate variable using the bin midpoint
-      NcVar var_mid = add_var(nc_out, var_name, ncFloat,
+      NcVar var_mid = add_var(nc_out, var_str, ncFloat,
                               var_dim, deflate_level);
 
       // Add variable attributes
       ConcatString cs;
-      cs << cs_erase << "Minimum value of " << var_name << " bin";
+      cs << cs_erase << "Minimum value of " << var_str << " bin";
       add_var_att_local(&var_min, "long_name", cs);
       add_var_att_local(&var_min, "units", i_data->units_attr());
 
-      cs << cs_erase << "Maximum value of " << var_name << " bin";
+      cs << cs_erase << "Maximum value of " << var_str << " bin";
       add_var_att_local(&var_max, "long_name", cs);
       add_var_att_local(&var_max, "units", i_data->units_attr());
 
-      cs << cs_erase << "Midpoint value of " << var_name << " bin";
+      cs << cs_erase << "Midpoint value of " << var_str << " bin";
       add_var_att_local(&var_mid, "long_name", cs);
       add_var_att_local(&var_mid, "units", i_data->units_attr());
 
@@ -758,26 +775,21 @@ void write_hist1d(void) {
       VarInfo *i_data = conf_info.data_info[i_var];
 
       // Define NetCDF variable name
-      ConcatString var_name;
-      var_name << i_data->name_attr() << "_" << i_data->level_attr();
-
-      if(multiple_data_sources && !unique_variable_names) {
-         var_name << "_VAR" << i_var+1;
-      }
+      ConcatString var_str(get_nc_var_str(i_data, i_var+1));
+      ConcatString var_name("hist_");
+      var_name << var_str;
 
       // Create NetCDF variable
-      ConcatString hist_name("hist_");
-      hist_name << var_name;
       vector<NcDim> dims(2);
       dims[0] = mask_dim;
       dims[1] = data_var_dims[i_var];
-      NcVar hist_var = add_var(nc_out, hist_name, ncInt64, dims,
-                               deflate_level);
+      NcVar var = add_var(nc_out, var_name, ncInt64, dims,
+                          deflate_level);
 
       // Add variable attributes
       ConcatString cs;
-      cs << cs_erase << "Histogram of " << var_name << " values";
-      add_var_att_local(&hist_var, "long_name", cs);
+      cs << "Histogram of " << var_str << " values";
+      add_var_att_local(&var, "long_name", cs);
 
       // Write 1D histogram for each mask
       for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
@@ -789,7 +801,7 @@ void write_hist1d(void) {
          counts[0]  = 1;
          counts[1]  = i_data->n_bins();
 
-         hist_var.putVar(offsets, counts, hist);
+         var.putVar(offsets, counts, hist);
 
       } // end for i_mask
    } // end for i_var
@@ -811,32 +823,24 @@ void write_hist2d(void) {
          VarInfo *j_data = conf_info.data_info[j_var];
 
          // Define NetCDF variable name
-	 ConcatString hist_name("hist_");
-         hist_name << i_data->name_attr() << "_" << i_data->level_attr();
-
-         if(multiple_data_sources && !unique_variable_names) {
-            hist_name << "_VAR" << i_var+1;
-         }
-
-         hist_name << "_" << j_data->name_attr() << "_" << j_data->level_attr();
-
-         if(multiple_data_sources && !unique_variable_names) {
-            hist_name << "_VAR" << j_var+1;
-         }
+         ConcatString var_str;
+         var_str << get_nc_var_str(i_data, i_var+1) << "_"
+                 << get_nc_var_str(j_data, j_var+1);
+	 ConcatString var_name("hist_");
+         var_name << var_str;
 
          // Create NetCDF variable
          vector<NcDim> dims(3);
          dims[0] = mask_dim;
          dims[1] = data_var_dims[i_var];
          dims[2] = data_var_dims[j_var];
-         NcVar hist_var = add_var(nc_out, hist_name, ncInt64, dims,
-                                  deflate_level);
+         NcVar var = add_var(nc_out, var_name, ncInt64, dims,
+                             deflate_level);
 
          // Add variable attributes
          ConcatString cs;
-         cs << cs_erase
-            << "Joint histogram of " << hist_name << " values";
-         add_var_att_local(&hist_var, "long_name", cs);
+         cs << "Joint histogram of " << var_str << " values";
+         add_var_att_local(&var, "long_name", cs);
 
          // Write 2D histogram for each mask
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
@@ -850,7 +854,7 @@ void write_hist2d(void) {
             counts[1]  = i_data->n_bins();
             counts[2]  = j_data->n_bins();
 
-            hist_var.putVar(offsets, counts, hist);
+            var.putVar(offsets, counts, hist);
 
          } // end for i_mask
       } // end for j_var
@@ -861,46 +865,71 @@ void write_hist2d(void) {
 
 void write_info_theory(void) {
 
+   // Write entropy for each 1D histogram
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       VarInfo *i_data = conf_info.data_info[i_var];
 
-      // Set variable NetCDF names
-      ConcatString en_name("entropy_");
-      ConcatString mi_name("mutual_information_");
-      en_name << i_data->name_attr() << "_" << i_data->level_attr();
-      mi_name << i_data->name_attr() << "_" << i_data->level_attr();
+      // Define NetCDF variable name
+      ConcatString var_str(get_nc_var_str(i_data, i_var+1));
+      ConcatString var_name("entropy_");
+      var_name << var_str;
 
-      if(multiple_data_sources && !unique_variable_names) {
-         en_name << "_VAR" << i_var+1;
-         mi_name << "_VAR" << i_var+1;
-      }
-
-      // Create NetCDF variables
-      NcVar en_var = add_var(nc_out, en_name, ncFloat,
-                             mask_dim, deflate_level);
-      NcVar mi_var = add_var(nc_out, mi_name, ncFloat,
-                             mask_dim, deflate_level);
+      // Create NetCDF variable
+      NcVar var = add_var(nc_out, var_name, ncFloat,
+                          mask_dim, deflate_level);
 
       // Add variable attributes
       ConcatString cs;
-      cs << cs_erase << "Entropy value of " << en_name;
-      add_var_att_local(&en_var, "long_name", cs);
-      cs << cs_erase << "Mutual information value of " << mi_name;
-      add_var_att_local(&mi_var, "long_name", cs);
+      cs << "Entropy value for " << var_str;
+      add_var_att_local(&var, "long_name", cs);
 
       // Store the data
-      vector<double> en_data(conf_info.get_n_mask());
-      vector<double> mi_data(conf_info.get_n_mask());
+      vector<double> data(conf_info.get_n_mask());
       for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
-         en_data[i_mask] = diag_info[i_var][i_mask].entropy;
-         mi_data[i_mask] = diag_info[i_var][i_mask].mutual_information;
+         data[i_mask] = diag_info[i_var][i_mask].entropy;
       }
 
       // Write the data
-      en_var.putVar(en_data.data());
-      mi_var.putVar(mi_data.data());
+      var.putVar(data.data());
 
+   } // end for i_var
+
+   // Write mutual information for each 2D joint histogram
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      VarInfo *i_data = conf_info.data_info[i_var];
+
+      for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
+
+         VarInfo *j_data = conf_info.data_info[j_var];
+
+         // Define NetCDF variable name
+         ConcatString var_str;
+         var_str << get_nc_var_str(i_data, i_var+1) << "_"
+                 << get_nc_var_str(j_data, j_var+1);
+	 ConcatString var_name("mutual_information_");
+         var_name << var_str;
+
+         // Create NetCDF variable
+         NcVar var = add_var(nc_out, var_name, ncFloat,
+                             mask_dim, deflate_level);
+
+         // Add variable attributes
+         ConcatString cs;
+         cs << "Mutual information value for " << var_str;
+         add_var_att_local(&var, "long_name", cs);
+
+         // Store the data
+         vector<double> data(conf_info.get_n_mask());
+         for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
+            data[i_mask] = diag_info[i_var][i_mask].mutual_information[j_var];
+         }
+
+         // Write the data
+         var.putVar(data.data());
+
+      } // end for j_var
    } // end for i_var
 }
 

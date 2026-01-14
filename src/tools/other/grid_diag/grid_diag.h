@@ -128,7 +128,7 @@ struct DiagInfo {
 
    // Information theory
    double entropy;
-   double mutual_information;
+   std::map<int, double> mutual_information;
 };
 
 // DiagInfo objects [n_data][n_mask]
