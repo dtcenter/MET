@@ -15,7 +15,7 @@
 
 //
 // Struct to store Gaussian interpolation and regridding options
-// Defaults chosen to mimic Hazardous Weather Testbed settings.
+// Defaults chosen to mimic Hazardous Weather Testbed settings
 //
 static const double default_trunc_factor = 3.5;
 static const double default_gaussian_dx = 81.271;
@@ -24,21 +24,21 @@ static const double default_gaussian_radius = 120.0;
 struct GaussianInfo {
 
    // Inputs
-   double   dx;             // delta distance of the target gerid for Gaussian
-   double   radius;         // radius of influence for Gaussian
-   double   trunc_factor;   // truncation factor
+   double dx;           // delta distance of the target grid for Gaussian
+   double radius;       // radius of influence for Gaussian
+   double trunc_factor; // truncation factor
 
    // Derived from above inputs
-   int      max_r;          // max distance for the gaussian weights
-   int      weight_cnt;     // the count of the valid weights (>0)
-   double   weight_sum;     // the sum of the weights
-   double   *weights;       // 2D for gaussian weight (2*max_r+1) by (2*max_r+1)
+   int                 max_r;      // max distance for the gaussian weights
+   int                 weight_cnt; // the count of the valid weights (>0)
+   double              weight_sum; // the sum of the weights
+   std::vector<double> weights;    // 2D for gaussian weight (2*max_r+1) by (2*max_r+1)
 
    GaussianInfo();
    void     clear();
    void     compute();
    int      compute_max_r();
-   void     validate();     // Ensure that required inputs are accordant
+   void     validate();      // Ensure that required inputs are accordant
 };
 
 ////////////////////////////////////////////////////////////////////////

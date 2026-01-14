@@ -542,9 +542,10 @@ void interp_gaussian_dp(DataPlane &dp, const GaussianInfo &gaussian, double t) {
    DataPlane d_dp;
    DataPlane g_dp;
    
-   if (max_r <= 0 || gaussian.weights == (double *)0) {
+   if(max_r <= 0 || gaussian.weights.empty()) {
       mlog << Error << "\ninterp_gaussian_dp() -> "
-           << "the gaussian weights were not computed (max_r: " << max_r << ").\n\n";
+           << "the gaussian weights were not computed (max_r: "
+           << max_r << ").\n\n";
       exit(1);
    }
    

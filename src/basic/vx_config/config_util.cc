@@ -35,9 +35,7 @@ static MetConfig conf_const(replace_path(config_const_filename).c_str());
 ///////////////////////////////////////////////////////////////////////////////
 
 
-GaussianInfo::GaussianInfo()
-: weights(nullptr)
-{
+GaussianInfo::GaussianInfo() {
    clear();
 }
 
@@ -45,10 +43,7 @@ GaussianInfo::GaussianInfo()
 
 void GaussianInfo::clear() {
    weight_sum = 0.0;
-   if (weights) {
-      delete weights;
-      weights = (double *)nullptr;
-   }
+   weights.clear();
    max_r = weight_cnt = 0;
    radius = dx = bad_data_double;
    trunc_factor = default_trunc_factor;
@@ -69,8 +64,6 @@ int GaussianInfo::compute_max_r() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void GaussianInfo::compute() {
-   double weight;
-   double distance_sq;
    const double g_sigma = radius / dx;
    const double g_sigma_sq = g_sigma * g_sigma;
    const double f_sigma_exp_divider = (2 * g_sigma_sq);
@@ -78,19 +71,19 @@ void GaussianInfo::compute() {
    const double max_r_sq = pow((g_sigma * trunc_factor), 2);
 
    validate();
-   if (0 < max_r && weights) delete weights;
+   if(max_r > 0) weights.clear();
    compute_max_r();
 
    int index = 0;
    int g_nx = max_r * 2 + 1;
    weight_cnt = 0;
    weight_sum = 0.0;
-   weights = new double[g_nx*g_nx];
+   weights.resize(g_nx*g_nx, 0.0);
    for(int idx_x=-max_r; idx_x<=max_r; idx_x++) {
       for(int idx_y=-max_r; idx_y<=max_r; idx_y++) {
-         weight = 0.0;
-         distance_sq = (double)idx_x*idx_x + idx_y*idx_y;
-         if (distance_sq <= max_r_sq) {
+         double weight = 0.0;
+         double distance_sq = (double) idx_x*idx_x + idx_y*idx_y;
+         if(distance_sq <= max_r_sq) {
             weight_cnt++;
             weight = exp(-distance_sq / f_sigma_exp_divider) / f_sigma_divider;
             weight_sum += weight;
