@@ -42,6 +42,7 @@ struct GenEnsProdNcOutInfo {
    bool do_freq;
    bool do_nep;
    bool do_nmep;
+   bool do_eas;
    bool do_climo;
    bool do_climo_cdp;
 
@@ -88,6 +89,7 @@ class GenEnsProdConfInfo {
 
       NbrhdInfo            nbrhd_prob;      // Neighborhood probability definition
       InterpInfo           nmep_smooth;     // Neighborhood maximum smoothing information
+      NbrhdInfo            eas_prob;        // Nieghborhood ensemble agreement scale probability definition
 
       double               vld_ens_thresh;  // Required ratio of valid input files
       double               vld_data_thresh; // Required ratio of valid data for each point

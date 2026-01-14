@@ -235,7 +235,7 @@ struct TimeSummaryInfo {
   double      vld_thresh;  // Valid data time window threshold
   int         vld_freq;    // Expected observation frequency in seconds
                            //   used to compute the ratio of valid data.
-  TimeSummaryInfo & operator=(const TimeSummaryInfo &a) noexcept;   // SoanrQube findings
+  TimeSummaryInfo & operator=(const TimeSummaryInfo &a) noexcept;   // SonarQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -264,7 +264,7 @@ struct BootInfo {
    ConcatString     seed;     // RNG seed value
 
    void             clear();
-   BootInfo &       operator=(const BootInfo &a) noexcept;  // SoanrQube findings
+   BootInfo &       operator=(const BootInfo &a) noexcept;  // SonarQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -316,7 +316,7 @@ struct RegridInfo {
    void clear();
    void validate();        // ensure that width and method are accordant
    void validate_point();  // ensure that width and method are accordant
-   RegridInfo &operator=(const RegridInfo &a) noexcept; // SoanrQube findings
+   RegridInfo &operator=(const RegridInfo &a) noexcept; // SonarQube findings
    ConcatString get_str() const;
 };
 
@@ -336,7 +336,7 @@ struct ClimoCDFInfo {
    ClimoCDFInfo();
    void clear();
    void set_cdf_ta(int, bool &); // Construct equally-likely thresholds
-   ClimoCDFInfo &operator=(const ClimoCDFInfo &a) noexcept; // SoanrQube findings
+   ClimoCDFInfo &operator=(const ClimoCDFInfo &a) noexcept; // SonarQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -353,7 +353,24 @@ struct NbrhdInfo {
    GridTemplateFactory::GridTemplates shape; // Neighborhood shape
 
    void        clear();
-   NbrhdInfo  &operator=(const NbrhdInfo &a) noexcept;  // SoanrQube findings
+   NbrhdInfo  &operator=(const NbrhdInfo &a) noexcept;  // SonarQube findings
+};
+
+////////////////////////////////////////////////////////////////////////
+
+//
+// Struct to store ensemble agreement scale neighborhood information
+//
+
+struct EASProbInfo {
+   IntArray     width;      // Neighborhood widths
+   double       vld_thresh; // Valid data neighborhood threshold
+   double       alpha;      // Similarity criteria threshold
+   GaussianInfo gaussian;   // Gaussian smoothing
+   GridTemplateFactory::GridTemplates shape; // Neighborhood shape
+
+   void        clear();
+   EASProbInfo  &operator=(const EASProbInfo &a) noexcept;  // SonarQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -372,7 +389,7 @@ struct HiRAInfo {
 
    HiRAInfo();
    void clear();
-   HiRAInfo &operator=(const HiRAInfo &a) noexcept; // SoanrQube findings
+   HiRAInfo &operator=(const HiRAInfo &a) noexcept; // SonarQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -825,6 +842,7 @@ static const char conf_key_fcst_vld_thresh[]  = "fcst.vld_thresh";
 static const char conf_key_nc_var_str[]       = "nc_var_str";
 static const char conf_key_nbrhd_prob[]       = "nbrhd_prob";
 static const char conf_key_nmep_smooth[]      = "nmep_smooth";
+static const char conf_key_eas_prob[]         = "eas_prob";
 static const char conf_key_skip_const[]       = "skip_const";
 static const char conf_key_rng_type[]         = "rng.type";
 static const char conf_key_rng_seed[]         = "rng.seed";
@@ -862,6 +880,7 @@ static const char conf_key_vld_count_flag[] = "vld_count";
 static const char conf_key_frequency_flag[] = "frequency";
 static const char conf_key_nep_flag[]       = "nep";
 static const char conf_key_nmep_flag[]      = "nmep";
+static const char conf_key_eas_flag[]       = "eas";
 
 // Distribution options
 static const char conf_val_normal[]      = "NORMAL";

@@ -91,6 +91,18 @@ nmep_smooth = {
    ];
 }
 
+//
+// Ensemble agreement scale probability method
+//
+eas_prob = {
+   width           = [ 5, 10, 15, 20, 25 ];
+   shape           = CIRCLE;
+   vld_thresh      = 0.0;
+   alpha           = 0.1;
+   gaussian_dx     = 81.27;
+   gaussian_radius = 20;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -140,6 +152,7 @@ ensemble_flag = {
    frequency = TRUE;
    nep       = FALSE;
    nmep      = FALSE;
+   eas       = FALSE;
    climo     = FALSE;
    climo_cdp = FALSE;
 }

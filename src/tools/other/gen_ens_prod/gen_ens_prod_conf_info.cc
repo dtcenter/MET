@@ -71,6 +71,7 @@ void GenEnsProdConfInfo::clear() {
    cdf_info.clear();
    nbrhd_prob.clear();
    nmep_smooth.clear();
+   eas_prob.clear();
    vld_ens_thresh = bad_data_double;
    vld_data_thresh = bad_data_double;
    version.clear();
@@ -325,6 +326,9 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
       }
    } // end for i
 
+   // Conf: eas_prob
+   eas_prob = parse_conf_nbrhd(edict, conf_key_eas_prob);
+
    return;
 }
 
@@ -375,6 +379,7 @@ GenEnsProdNcOutInfo GenEnsProdConfInfo::parse_nc_info(Dictionary *dict) {
       cur.do_freq      = d->lookup_bool(conf_key_frequency_flag);
       cur.do_nep       = d->lookup_bool(conf_key_nep_flag);
       cur.do_nmep      = d->lookup_bool(conf_key_nmep_flag);
+      cur.do_eas       = d->lookup_bool(conf_key_eas_flag);
       cur.do_climo     = d->lookup_bool(conf_key_climo_flag);
       cur.do_climo_cdp = d->lookup_bool(conf_key_climo_cdp_flag);
    }
@@ -405,10 +410,10 @@ void GenEnsProdNcOutInfo::clear() {
 
 bool GenEnsProdNcOutInfo::all_false() const {
 
-   bool status = do_latlon || do_mean || do_stdev || do_minus ||
-                 do_plus   || do_min  || do_max   || do_range ||
-                 do_vld    || do_freq || do_nep   || do_nmep  ||
-                 do_climo  || do_climo_cdp;
+   bool status = do_latlon || do_mean  || do_stdev || do_minus ||
+                 do_plus   || do_min   || do_max   || do_range ||
+                 do_vld    || do_freq  || do_nep   || do_nmep  ||
+                 do_eas    || do_climo || do_climo_cdp;
 
    return !status;
 }
@@ -429,6 +434,7 @@ void GenEnsProdNcOutInfo::set_all_false() {
    do_freq      = false;
    do_nep       = false;
    do_nmep      = false;
+   do_eas       = false;
    do_climo     = false;
    do_climo_cdp = false;
 
@@ -451,6 +457,7 @@ void GenEnsProdNcOutInfo::set_all_true() {
    do_freq      = true;
    do_nep       = true;
    do_nmep      = true;
+   do_eas       = true;
    do_climo     = true;
    do_climo_cdp = true;
 
