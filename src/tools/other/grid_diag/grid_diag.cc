@@ -71,7 +71,7 @@ static void write_hist_bins(void);
 static void write_hist1d(void);
 static void write_hist2d(void);
 static void write_info_theory(void);
-static void clean_up();
+static void clean_up(void);
 
 static Met2dDataFile *get_mtddf(const StringArray &, const int);
 
@@ -122,7 +122,7 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+static void process_command_line(int argc, char **argv) {
    CommandLine cline;
    ConcatString default_config_file;
    Grid data_grid;
@@ -258,7 +258,7 @@ const string get_tool_name() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_diag_info(void) {
+static void setup_diag_info(void) {
    #ifdef WITH_PROFILER
    CTRACK;
    #endif
@@ -271,7 +271,7 @@ void setup_diag_info(void) {
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       // Find bin ranges
-      VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_data = conf_info.data_info[i_var];
       NumArray range(i_data->range());
       int i_n_bins = i_data->n_bins();
       double var_min = range[0];
@@ -303,7 +303,9 @@ void setup_diag_info(void) {
       // 2D histograms
       map<int, vector<long long> > hist2d; 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
-         VarInfo *j_data = conf_info.data_info[j_var];
+
+         const VarInfo *j_data = conf_info.data_info[j_var];
+
          int j_n_bins = j_data->n_bins();
 
          mlog << Debug(2)
@@ -333,7 +335,7 @@ void setup_diag_info(void) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_series(void) {
+static void process_series(void) {
    vector<DataPlane> data_dp(conf_info.get_n_data());
    StringArray *cur_files;
    GrdFileType *cur_ftype;
@@ -430,12 +432,12 @@ void process_series(void) {
       
 ////////////////////////////////////////////////////////////////////////
 
-void process_hist1d(const vector<DataPlane> &data_dp) {
+static void process_hist1d(const vector<DataPlane> &data_dp) {
 
    // Update the 1D histogram counts
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_data = conf_info.data_info[i_var];
 
       // Loop over the masks
       for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
@@ -487,16 +489,16 @@ void process_hist1d(const vector<DataPlane> &data_dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_hist2d(const vector<DataPlane> &data_dp) {
+static void process_hist2d(const vector<DataPlane> &data_dp) {
 
    // Process the 2D joint histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_data = conf_info.data_info[i_var];
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         VarInfo *j_data = conf_info.data_info[j_var];
+         const VarInfo *j_data = conf_info.data_info[j_var];
 
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
 
@@ -520,7 +522,7 @@ void process_hist2d(const vector<DataPlane> &data_dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_info_theory() {
+static void process_info_theory() {
 
    // Compute Shannon entropy for the 1D histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
@@ -539,7 +541,7 @@ void process_info_theory() {
 
          // Accumulate entropy for each bin
          for(const auto &x : i_diag->hist1d) {
-            auto p_x = (double) x / hist1d_sum;
+            auto p_x = (double) x / (double) hist1d_sum;
             if(p_x > 0) i_diag->entropy -= p_x * log2(p_x);
          }
 
@@ -549,11 +551,11 @@ void process_info_theory() {
    // Compute mutual information for the 2D histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_data = conf_info.data_info[i_var];
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         VarInfo *j_data = conf_info.data_info[j_var];
+         const VarInfo *j_data = conf_info.data_info[j_var];
 
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
 
@@ -585,17 +587,17 @@ void process_info_theory() {
             // Compute probabilities and acccumulate mutual information
             for(int i=0; i<i_data->n_bins(); i++) {
 
-               auto p_i = (double) hist2d_i_sum[i] / hist2d_ij_sum;
+               auto p_i = (double) hist2d_i_sum[i] / (double) hist2d_ij_sum;
 
                for(int j=0; j<j_data->n_bins(); j++) {
 
-                  auto p_j = (double) hist2d_j_sum[j] / hist2d_ij_sum;
+                  auto p_j = (double) hist2d_j_sum[j] / (double) hist2d_ij_sum;
 
                   int n = DefaultTO.two_to_one(
                              i_data->n_bins(), j_data->n_bins(),
                              i, j);
 
-                  auto p_ij = (double) i_diag->hist2d[j_var][n] / hist2d_ij_sum;
+                  auto p_ij = (double) i_diag->hist2d[j_var][n] / (double) hist2d_ij_sum;
 
                   // Accumulate mutual information terms
                   if(p_ij > 0) {
@@ -629,7 +631,7 @@ ConcatString get_nc_var_str(const VarInfo *info, int index) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file(void) {
+static void setup_nc_file(void) {
 
    // Create NetCDF file
    nc_out = open_ncfile(out_file.c_str(), true);
@@ -688,8 +690,8 @@ void setup_nc_file(void) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc_var_int(const char *var_name, const char *long_name,
-                      int n) {
+static void write_nc_var_int(const char *var_name,
+                             const char *long_name, int n) {
 
    // Add the variable
    NcVar var = add_var(nc_out, var_name, ncInt64);
@@ -704,19 +706,19 @@ void write_nc_var_int(const char *var_name, const char *long_name,
 
 ////////////////////////////////////////////////////////////////////////
 
-void add_var_att_local(NcVar *var, const char *att_name,
-                       const ConcatString att_value) {
+static void add_var_att_local(NcVar *var, const char *att_name,
+                              const ConcatString att_value) {
    if(att_value.nonempty()) add_att(var, att_name, att_value.c_str());
    else                     add_att(var, att_name, na_str);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_hist_bins(void) {
+static void write_hist_bins(void) {
 
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      VarInfo  *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_data = conf_info.data_info[i_var];
       DiagInfo *i_diag = &diag_info[i_var][0];
 
       // Define NetCDF variable name
@@ -765,14 +767,14 @@ void write_hist_bins(void) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_hist1d(void) {
+static void write_hist1d(void) {
    vector<size_t> offsets(2);
    vector<size_t> counts(2);
 
    // Define and write 1D histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_data = conf_info.data_info[i_var];
 
       // Define NetCDF variable name
       ConcatString var_str(get_nc_var_str(i_data, i_var+1));
@@ -809,18 +811,18 @@ void write_hist1d(void) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_hist2d(void) {
+static void write_hist2d(void) {
    vector<size_t> offsets(3);
    vector<size_t> counts(3);
 
    // Define and write 2D joint histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_data = conf_info.data_info[i_var];
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         VarInfo *j_data = conf_info.data_info[j_var];
+         const VarInfo *j_data = conf_info.data_info[j_var];
 
          // Define NetCDF variable name
          ConcatString var_str;
@@ -863,12 +865,12 @@ void write_hist2d(void) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_info_theory(void) {
+static void write_info_theory(void) {
 
    // Write entropy for each 1D histogram
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_data = conf_info.data_info[i_var];
 
       // Define NetCDF variable name
       ConcatString var_str(get_nc_var_str(i_data, i_var+1));
@@ -898,11 +900,11 @@ void write_info_theory(void) {
    // Write mutual information for each 2D joint histogram
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
-      VarInfo *i_data = conf_info.data_info[i_var];
+      const VarInfo *i_data = conf_info.data_info[i_var];
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
-         VarInfo *j_data = conf_info.data_info[j_var];
+         const VarInfo *j_data = conf_info.data_info[j_var];
 
          // Define NetCDF variable name
          ConcatString var_str;
@@ -935,8 +937,8 @@ void write_info_theory(void) {
 
 ////////////////////////////////////////////////////////////////////////
 
-Met2dDataFile *get_mtddf(const StringArray &file_list,
-                       const int i_field) {
+static Met2dDataFile *get_mtddf(const StringArray &file_list,
+                                const int i_field) {
    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
    Dictionary *dict = (Dictionary *) nullptr;
    Dictionary i_dict;
@@ -978,7 +980,7 @@ Met2dDataFile *get_mtddf(const StringArray &file_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-void clean_up() {
+static void clean_up(void) {
 
    // Close the output NetCDF file
    if(nc_out) {
@@ -1037,26 +1039,26 @@ __attribute__((noreturn)) static void usage(int exit_code) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_data_files(const StringArray & a) {
+static void set_data_files(const StringArray & a) {
    data_files.emplace_back(a);
    if(data_files.size() > 0) multiple_data_sources = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out_file(const StringArray & a) {
+static void set_out_file(const StringArray & a) {
    out_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config_file(const StringArray & a) {
+static void set_config_file(const StringArray & a) {
    config_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+static void set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
 
