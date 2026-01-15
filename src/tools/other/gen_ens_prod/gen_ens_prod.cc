@@ -22,6 +22,7 @@
 //   005    10/03/22  Prestopnik     MET #2227 Remove using namespace std and netCDF from header files
 //   006    04/29/24  Halley Gotway  MET #2870 Ignore MISSING keyword.
 //   007    05/07/25  Halley Gotway  MET #3145 Add OpenMP.
+//   008    01/14/26  Halley Gotway  MET #3294 Add EAS probabilities.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -202,12 +203,12 @@ static void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(etype, &ens_files, ctrl_file.nonempty());
 
-   // Allocate arrays to store threshold counts
-   thresh_cnt_na       = new NumArray   [conf_info.get_max_n_cat()];
-   thresh_nbrhd_cnt_na = new NumArray * [conf_info.get_max_n_cat()];
+   // Resize vectors to store threshold counts
+   thresh_cnt_na.resize(conf_info.get_max_n_cat());
+   thresh_nbrhd_cnt_na.resize(conf_info.get_max_n_cat());
 
    for(int i=0; i<conf_info.get_max_n_cat(); i++) {
-      thresh_nbrhd_cnt_na[i] = new NumArray [conf_info.get_n_nbrhd()];
+      thresh_nbrhd_cnt_na[i].resize(conf_info.get_n_nbrhd());
    }
 
    // List the input ensemble files
@@ -1272,25 +1273,9 @@ static void clean_up() {
    // Close the output NetCDF file
    if(nc_out) { delete nc_out; nc_out = (NcFile *) nullptr; }
 
-   // Deallocate threshold count arrays
-   if(thresh_cnt_na) {
-      for(i=0; i<conf_info.get_max_n_cat(); i++) {
-         thresh_cnt_na[i].clear();
-      }
-      delete [] thresh_cnt_na;
-      thresh_cnt_na = (NumArray *) nullptr;
-   }
-   if(thresh_nbrhd_cnt_na) {
-      for(i=0; i<conf_info.get_max_n_cat(); i++) {
-         for(j=0; j<conf_info.get_n_nbrhd(); j++) {
-            thresh_nbrhd_cnt_na[i][j].clear();
-         }
-         delete [] thresh_nbrhd_cnt_na[i];
-         thresh_nbrhd_cnt_na[i] = (NumArray *) nullptr;
-      }
-      delete [] thresh_nbrhd_cnt_na;
-      thresh_nbrhd_cnt_na = (NumArray **) nullptr;
-   }
+   // Clear the threshold count arrays
+   thresh_cnt_na.clear();
+   thresh_nbrhd_cnt_na.clear();
 
    return;
 }

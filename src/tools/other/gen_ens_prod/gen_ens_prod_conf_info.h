@@ -89,7 +89,7 @@ class GenEnsProdConfInfo {
 
       NbrhdInfo            nbrhd_prob;      // Neighborhood probability definition
       InterpInfo           nmep_smooth;     // Neighborhood maximum smoothing information
-      NbrhdInfo            eas_prob;        // Nieghborhood ensemble agreement scale probability definition
+      EASProbInfo          eas_prob;        // Neighborhood ensemble agreement scale probability definition
 
       double               vld_ens_thresh;  // Required ratio of valid input files
       double               vld_data_thresh; // Required ratio of valid data for each point

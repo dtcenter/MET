@@ -327,7 +327,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
    } // end for i
 
    // Conf: eas_prob
-   eas_prob = parse_conf_nbrhd(edict, conf_key_eas_prob);
+   eas_prob = parse_conf_eas_prob(edict);
 
    return;
 }

@@ -104,8 +104,8 @@ static Met2dDataFileFactory mtddf_factory;
 // Arrays to store running sums and counts
 static NumArray cnt_na, min_na, max_na, sum_na;
 static NumArray stdev_cnt_na, stdev_sum_na, stdev_ssq_na;
-static NumArray *thresh_cnt_na = (NumArray *) nullptr; // [n_thresh]
-static NumArray **thresh_nbrhd_cnt_na = (NumArray **) nullptr; // [n_thresh][n_nbrhd]
+static std::vector<NumArray> thresh_cnt_na; // [n_thresh]
+static std::vector<std::vector<NumArray> > thresh_nbrhd_cnt_na; // [n_thresh][n_nbrhd]
 
 ////////////////////////////////////////////////////////////////////////
 

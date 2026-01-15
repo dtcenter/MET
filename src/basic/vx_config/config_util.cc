@@ -2162,10 +2162,11 @@ EASProbInfo &EASProbInfo::operator=(const EASProbInfo &a) noexcept {
 ///////////////////////////////////////////////////////////////////////////////
 
 EASProbInfo parse_conf_eas_prob(Dictionary *dict) {
+   const char *method_name = "parse_conf_eas_prob() -> ";
    EASProbInfo info;
 
    if(!dict) {
-      mlog << Error << "\nparse_conf_eas_prob() -> "
+      mlog << Error << "\n" << method_name
            << "empty dictionary!\n\n";
       exit(1);
    }
@@ -2178,7 +2179,7 @@ EASProbInfo parse_conf_eas_prob(Dictionary *dict) {
 
    // Check that the interpolation threshold is between 0 and 1.
    if(info.vld_thresh < 0.0 || info.vld_thresh > 1.0) {
-      mlog << Error << "\nparse_conf_eas_prob() -> "
+      mlog << Error << "\n" << method_name
            << "The \"" << conf_key_eas_prob << "." << conf_key_vld_thresh
            << "\" parameter (" << info.vld_thresh
            << ") must be set between 0 and 1.\n\n";
@@ -2190,7 +2191,7 @@ EASProbInfo parse_conf_eas_prob(Dictionary *dict) {
 
    // Check for at least two widths
    if(info.width.n() < 2) {
-      mlog << Error << "\nparse_conf_eas_prob() -> "
+      mlog << Error << "\n" << method_name
            << "At least two \"" << conf_key_eas_prob << "." << conf_key_width
            << "\" values are required.\n\n";
       exit(1);
@@ -2201,7 +2202,7 @@ EASProbInfo parse_conf_eas_prob(Dictionary *dict) {
 
       // Must be odd
       if(info.width[i] < 1 || info.width[i]%2 == 0) {
-         mlog << Error << "\nparse_conf_eas_prob() -> "
+         mlog << Error << "\n" << method_name
               << "The \"" << conf_key_eas_prob << "." << conf_key_width
               << "\" values must be odd and greater than or equal to 1 ("
               << info.width[i] << ").\n\n";
@@ -2210,7 +2211,7 @@ EASProbInfo parse_conf_eas_prob(Dictionary *dict) {
 
       // Must be monotonically increasing
       if(i > 0 && info.width[i-1] >= info.width[i]) {
-         mlog << Error << "\nparse_conf_eas_prob() -> "
+         mlog << Error << "\n" << method_name
               << "The \"" << conf_key_eas_prob << "." << conf_key_width
               << "\" values must be monotonically increasing ("
               << info.width[i-1] << " >= " << info.width[i] << ").\n\n";
