@@ -51,8 +51,6 @@ class GridDiagConfInfo {
 
       void init_from_scratch();
 
-      int n_data; // Number of data fields
-
    public:
 
       // Grid Diagnostics configuration object
@@ -88,7 +86,7 @@ class GridDiagConfInfo {
 ////////////////////////////////////////////////////////////////////////
 
 inline int GridDiagConfInfo::get_n_mask() const { return mask_name.n(); }
-inline int GridDiagConfInfo::get_n_data() const { return n_data; }
+inline int GridDiagConfInfo::get_n_data() const { return (int) data_info.size(); }
 inline int GridDiagConfInfo::get_compression_level() { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////

@@ -113,7 +113,6 @@ void GridDiagConfInfo::clear() {
       if(info) { delete info; info = nullptr; }
    }
    data_info.clear();
-   n_data = 0;
 
    return;
 }
@@ -143,7 +142,7 @@ void GridDiagConfInfo::set_n_data() {
    auto dict = conf.lookup_array(conf_key_data_field);
 
    // Determine the number of fields (name/level) to be processed
-   n_data = parse_conf_n_vx(dict);
+   int n_data = parse_conf_n_vx(dict);
 
    // Check for empty data
    if(n_data == 0) {
@@ -151,6 +150,9 @@ void GridDiagConfInfo::set_n_data() {
           << "the \"data.field\" array can't be empty!\n\n";
       exit(1);
    }
+
+   // Allocate space based on the number of verification tasks
+   data_info.resize(n_data, nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -173,11 +175,8 @@ void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
    // Conf: data.field
    Dictionary *dict = conf.lookup_array(conf_key_data_field);
 
-   // Allocate space based on the number of verification tasks
-   data_info.resize(n_data, nullptr);
-
    // Parse the data field information
-   for(int i=0; i<n_data; i++) {
+   for(int i=0; i<(int) data_info.size(); i++) {
 
       // Determine the file type
       file_type = (file_types.size() > 1 ?

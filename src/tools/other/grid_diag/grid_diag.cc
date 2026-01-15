@@ -66,7 +66,7 @@ static void process_info_theory(void);
 static void setup_nc_file(void);
 static ConcatString get_nc_var_str(const VarInfo *, int);
 static void write_nc_var_int(const char *, const char *, int);
-static void add_var_att_local(NcVar *, const char *, const ConcatString);
+static void add_var_att_local(NcVar *, const char *, const ConcatString &);
 static void write_hist_bins(void);
 static void write_hist1d(void);
 static void write_hist2d(void);
@@ -149,19 +149,19 @@ static void process_command_line(int argc, char **argv) {
    if(cline.n() != 0) usage();
 
    // Check that the required arguments have been set
-   if(data_files.size() == 0) {
+   if(data_files.empty()) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the data file list must be set using the "
            << "\"-data\" option.\n\n";
       exit(1);
    }
-   if(config_file.length() == 0) {
+   if(config_file.empty()) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the configuration file must be set using the "
            << "\"-config\" option.\n\n";
       exit(1);
    }
-   if(out_file.length() == 0) {
+   if(out_file.empty()) {
       mlog << Error << "\nprocess_command_line() -> "
            << "the output NetCDF file must be set using the "
            << "\"-out\" option.\n\n";
@@ -252,7 +252,7 @@ static void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return "grid_diag";
 }
 
@@ -337,8 +337,8 @@ static void setup_diag_info(void) {
 
 static void process_series(void) {
    vector<DataPlane> data_dp(conf_info.get_n_data());
-   StringArray *cur_files;
-   GrdFileType *cur_ftype;
+   const StringArray *cur_files;
+   const GrdFileType *cur_ftype;
    Grid cur_grid;
 
    // List the lengths of the series options
@@ -614,7 +614,7 @@ static void process_info_theory() {
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString get_nc_var_str(const VarInfo *info, int index) {
+static ConcatString get_nc_var_str(const VarInfo *info, int index) {
    ConcatString cs;
 
    if(!info) return cs;
@@ -707,7 +707,7 @@ static void write_nc_var_int(const char *var_name,
 ////////////////////////////////////////////////////////////////////////
 
 static void add_var_att_local(NcVar *var, const char *att_name,
-                              const ConcatString att_value) {
+                              const ConcatString &att_value) {
    if(att_value.nonempty()) add_att(var, att_name, att_value.c_str());
    else                     add_att(var, att_name, na_str);
 }
@@ -796,7 +796,7 @@ static void write_hist1d(void) {
       // Write 1D histogram for each mask
       for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
 
-         long long *hist = diag_info[i_var][i_mask].hist1d.data();
+         const long long *hist = diag_info[i_var][i_mask].hist1d.data();
 
          offsets[0] = i_mask;
          offsets[1] = 0;
@@ -847,7 +847,7 @@ static void write_hist2d(void) {
          // Write 2D histogram for each mask
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
 
-            long long *hist = diag_info[i_var][i_mask].hist2d[j_var].data();
+            const long long *hist = diag_info[i_var][i_mask].hist2d[j_var].data();
 
             offsets[0] = i_mask;
             offsets[1] = 0;
@@ -939,8 +939,8 @@ static void write_info_theory(void) {
 
 static Met2dDataFile *get_mtddf(const StringArray &file_list,
                                 const int i_field) {
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
-   Dictionary *dict = (Dictionary *) nullptr;
+   Met2dDataFile *mtddf = nullptr;
+   Dictionary *dict = nullptr;
    Dictionary i_dict;
    GrdFileType file_type;
    int i;
@@ -1041,7 +1041,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
 
 static void set_data_files(const StringArray & a) {
    data_files.emplace_back(a);
-   if(data_files.size() > 0) multiple_data_sources = true;
+   if(!data_files.empty()) multiple_data_sources = true;
 }
 
 ////////////////////////////////////////////////////////////////////////
