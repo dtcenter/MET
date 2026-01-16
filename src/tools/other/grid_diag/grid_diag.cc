@@ -572,9 +572,7 @@ static void process_info_theory() {
             for(int i=0; i<i_data->n_bins(); i++) {
                for(int j=0; j<j_data->n_bins(); j++) {
 
-                  int n = DefaultTO.two_to_one(
-                             i_data->n_bins(), j_data->n_bins(),
-                             i, j);
+		  int n = i * j_data->n_bins() + j;
 
                   // Increment sums
                   hist2d_ij_sum   += i_diag->hist2d[j_var][n];
@@ -593,9 +591,7 @@ static void process_info_theory() {
 
                   auto p_j = (double) hist2d_j_sum[j] / (double) hist2d_ij_sum;
 
-                  int n = DefaultTO.two_to_one(
-                             i_data->n_bins(), j_data->n_bins(),
-                             i, j);
+		  int n = i * j_data->n_bins() + j;
 
                   auto p_ij = (double) i_diag->hist2d[j_var][n] / (double) hist2d_ij_sum;
 
