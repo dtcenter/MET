@@ -7,7 +7,9 @@ Grid-Diag Tool
 Introduction
 ============
 
-The Grid-Diag tool creates histograms (probability distributions when normalized) for an arbitrary collection of data fields and levels. Joint histograms will be created for all possible pairs of variables. Masks can be used to subset the data fields spatially. The histograms are accumulated over a time series of input data files, similar to Series-Analysis.
+The Grid-Diag tool creates histograms (probability distributions when normalized) for an arbitrary collection of data fields and levels. Joint histograms will be created for all possible pairs of variables. If no masking region is specified to subset the data fields spatially, then all points in the input domain are used. An arbitrary number of masking regions can be specified and output is created for each one. The histograms are accumulated over all of the input data files. Typically this is tool is run with a time series of input data files, similar to Series-Analysis.
+
+The Grid-Diag tool also uses the histograms to derive information theory statistics. Entropy is derived from each 1-dimensional histogram, and mutual information is derived from each 2-dimensional joint histogram. These statistics are defined using log base 2, rather than the natural logarithm which is also commonly used.
 
 Practical Information
 =====================
@@ -127,7 +129,7 @@ The **mask_name** and **mask_size** variables have dimensions based on the numbe
 
 If 1-dimensional histograms are requested, a corresponding **hist_** variable is written for each variable/level in the data dictionary. This variable has dimensions for the number of masking regions and for the number of bins specified in the data dictionary. For example, hist_APCP_L0 and hist_PWAT_L0 are the counts of all data values falling within each bin for a given spatial masking region. Data values below the minimum or above the maximum are included in the lowest and highest bins, respectively. A warning message is printed when the range of the data falls outside the range defined in the configuration file.
 
-If 2-dimensional historgrams are requested, a corresponding **hist_** variable is written for each combination of variable/level entries in the data dictionary. This variable has dimensions for the number of masking regions and for the number of bins specified for the two data dictionary entries. For example, hist_APCP_L0_PWAT_L0 is the joint histogram for those two variables/levels for a given spatial masking region.
+If 2-dimensional joint historgrams are requested, a corresponding **hist_** variable is written for each combination of variable/level entries in the data dictionary. This variable has dimensions for the number of masking regions and for the number of bins specified for the two data dictionary entries. For example, hist_APCP_L0_PWAT_L0 is the joint histogram for those two variables/levels for a given spatial masking region.
 
-If mutual information is requested, a corresponding **entropy_** variable is written for each variable/level in the data dictionary. This variable has one dimension for the number of masking regions and contains the Shannon entropy values computed for the 1-dimensional histograms for each masking region.
+If information theory output is requested, **entropy_** and **mutual_information_** variables are written. Shannon entropy is derived from each 1-dimensional histogram, and mutual information is derived from each 2-dimensional joint histogram. These variables have one dimension for the number of masking regions and are computed using log base 2 rather than the natural logarithm. As such, their units are specified as "bits" rather than "nats".
 

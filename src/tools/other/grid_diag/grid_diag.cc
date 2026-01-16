@@ -862,6 +862,7 @@ static void write_hist2d(void) {
 ////////////////////////////////////////////////////////////////////////
 
 static void write_info_theory(void) {
+   ConcatString units_cs("bits");
 
    // Write entropy for each 1D histogram
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
@@ -881,6 +882,7 @@ static void write_info_theory(void) {
       ConcatString cs;
       cs << "Entropy value for " << var_str;
       add_var_att_local(&var, "long_name", cs);
+      add_var_att_local(&var, "units", units_cs);
 
       // Store the data
       vector<double> data(conf_info.get_n_mask());
@@ -917,6 +919,7 @@ static void write_info_theory(void) {
          ConcatString cs;
          cs << "Mutual information value for " << var_str;
          add_var_att_local(&var, "long_name", cs);
+         add_var_att_local(&var, "units", units_cs);
 
          // Store the data
          vector<double> data(conf_info.get_n_mask());
