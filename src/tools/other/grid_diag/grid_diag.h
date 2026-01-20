@@ -128,6 +128,7 @@ struct DiagInfo {
 
    // Information theory
    double entropy;
+   std::map<int, double> joint_entropy;
    std::map<int, double> mutual_information;
 };
 

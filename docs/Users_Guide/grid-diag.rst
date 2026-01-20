@@ -116,7 +116,7 @@ The **output_flag** dictionary controls the type of output that the Grid-Diag to
 
 2. **histogram_2d** for 2-dimensional histograms for each pair of **data.field** entries, including minimum, maxmimum, and midpoint values for each histogram bin.
 
-3. **info_theory** for information threory metrics, including entropy for each **data.field** entry and mutual information for each pair of entries.
+3. **info_theory** for information threory metrics, including entropy for each **data.field** entry and mutual information and joint entropy for each pair of entries.
 
 grid_diag Output File
 ---------------------
@@ -131,5 +131,5 @@ If 1-dimensional histograms are requested, a corresponding **hist_** variable is
 
 If 2-dimensional joint historgrams are requested, a corresponding **hist_** variable is written for each combination of variable/level entries in the data dictionary. This variable has dimensions for the number of masking regions and for the number of bins specified for the two data dictionary entries. For example, hist_APCP_L0_PWAT_L0 is the joint histogram for those two variables/levels for a given spatial masking region.
 
-If information theory output is requested, **entropy_** and **mutual_information_** variables are written. Shannon entropy is derived from each 1-dimensional histogram, and mutual information is derived from each 2-dimensional joint histogram. These variables have one dimension for the number of masking regions and are computed using log base 2 rather than the natural logarithm. As such, their units are specified as "bits" rather than "nats".
+If information theory output is requested, **entropy_**, **joint_entropy_**, and **mutual_information_** variables are written. Shannon entropy is derived from each 1-dimensional histogram, while joint entropy and mutual information are derived from each 2-dimensional joint histogram. These variables have one dimension for the number of masking regions and are computed using log base 2 rather than the natural logarithm. As such, their units are specified in the output as "bits" rather than "nats".
 

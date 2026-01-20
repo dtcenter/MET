@@ -548,7 +548,7 @@ static void process_info_theory() {
       } // end for i_mask
    } // end for i_var
 
-   // Compute mutual information for the 2D histograms
+   // Compute joint entropy and mutual information for the 2D histograms
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       const VarInfo *i_data = conf_info.data_info[i_var];
@@ -562,6 +562,7 @@ static void process_info_theory() {
             DiagInfo *i_diag = &diag_info[i_var][i_mask];
 
             // Initialize
+            i_diag->joint_entropy[j_var] = 0.0;
             i_diag->mutual_information[j_var] = 0.0;
 
             // 2D histogram sums 
@@ -595,8 +596,10 @@ static void process_info_theory() {
 
                   auto p_ij = (double) i_diag->hist2d[j_var][n] / (double) hist2d_ij_sum;
 
-                  // Accumulate mutual information terms
+                  // Accumulate joint entropy mutual information terms
                   if(p_ij > 0) {
+                     i_diag->joint_entropy[j_var] -=
+                        p_ij * log2(p_ij);
                      i_diag->mutual_information[j_var] +=
                         p_ij * log2(p_ij/(p_i*p_j));
                   }
@@ -895,7 +898,7 @@ static void write_info_theory(void) {
 
    } // end for i_var
 
-   // Write mutual information for each 2D joint histogram
+   // Write joint entropy and mutual information for each 2D joint histogram
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       const VarInfo *i_data = conf_info.data_info[i_var];
@@ -904,31 +907,42 @@ static void write_info_theory(void) {
 
          const VarInfo *j_data = conf_info.data_info[j_var];
 
-         // Define NetCDF variable name
          ConcatString var_str;
          var_str << get_nc_var_str(i_data, i_var+1) << "_"
                  << get_nc_var_str(j_data, j_var+1);
-	 ConcatString var_name("mutual_information_");
-         var_name << var_str;
 
-         // Create NetCDF variable
-         NcVar var = add_var(nc_out, var_name, ncFloat,
-                             mask_dim, deflate_level);
+         // Define NetCDF variable names
+	 ConcatString je_var_name("joint_entropy_");
+         je_var_name << var_str;
+         ConcatString mi_var_name("mutual_information_");
+         mi_var_name << var_str;
+
+         // Create NetCDF variables
+         NcVar je_var = add_var(nc_out, je_var_name, ncFloat,
+                                mask_dim, deflate_level);
+         NcVar mi_var = add_var(nc_out, mi_var_name, ncFloat,
+                                mask_dim, deflate_level);
 
          // Add variable attributes
          ConcatString cs;
-         cs << "Mutual information value for " << var_str;
-         add_var_att_local(&var, "long_name", cs);
-         add_var_att_local(&var, "units", units_cs);
+         cs << "Joint entropy value for " << var_str;
+         add_var_att_local(&je_var, "long_name", cs);
+         add_var_att_local(&je_var, "units", units_cs);
+         cs << cs_erase << "Mutual information value for " << var_str;
+         add_var_att_local(&mi_var, "long_name", cs);
+         add_var_att_local(&mi_var, "units", units_cs);
 
          // Store the data
-         vector<double> data(conf_info.get_n_mask());
+         vector<double> je_data(conf_info.get_n_mask());
+         vector<double> mi_data(conf_info.get_n_mask());
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
-            data[i_mask] = diag_info[i_var][i_mask].mutual_information[j_var];
+            je_data[i_mask] = diag_info[i_var][i_mask].joint_entropy[j_var];
+            mi_data[i_mask] = diag_info[i_var][i_mask].mutual_information[j_var];
          }
 
          // Write the data
-         var.putVar(data.data());
+         je_var.putVar(je_data.data());
+         mi_var.putVar(mi_data.data());
 
       } // end for j_var
    } // end for i_var
