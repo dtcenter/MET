@@ -184,18 +184,19 @@ else
 fi
 
 # Constants
+# Read compile options from config file (with defaults if not set)
+COMPILE_ZLIB=${COMPILE_ZLIB:-0}
+COMPILE_LIBPNG=${COMPILE_LIBPNG:-0}
+COMPILE_JASPER=${COMPILE_JASPER:-0}
+COMPILE_JPEG=${COMPILE_JPEG:-0}
+COMPILE_G2CLIB=${COMPILE_G2CLIB:-0}
+
 if [[ -z ${MET_GRIB2CLIB} ]] && [[ -z ${MET_GRIB2C} ]]; then
   COMPILE_ZLIB=1
   COMPILE_LIBPNG=1
   COMPILE_JASPER=1
   COMPILE_JPEG=1
   COMPILE_G2CLIB=1
-else
-  COMPILE_ZLIB=0
-  COMPILE_LIBPNG=0
-  COMPILE_JASPER=0
-  COMPILE_JPEG=0
-  COMPILE_G2CLIB=0
 fi
 
 if [ -z ${MET_BUFRLIB} ]; then COMPILE_BUFRLIB=1; else COMPILE_BUFRLIB=0; fi
@@ -716,7 +717,7 @@ if [ $COMPILE_ATLAS -eq 1 ]; then
   cd ${LIB_DIR}/atlas/atlas*
   echo "cd `pwd`"
   run_cmd "mkdir build; cd build"
-  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR} > $(pwd)/atlas.cmake.log 2>&1"
+  run_cmd "cmake ../ -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_PREFIX_PATH=${LIB_DIR} -DENABLE_TESSELATION=OFF > $(pwd)/atlas.cmake.log 2>&1"
   run_cmd "make ${MAKE_ARGS} > $(pwd)/atlas.make.log 2>&1"
   run_cmd "make ${MAKE_ARGS} install > $(pwd)/atlas.make_install.log 2>&1"
 
@@ -969,11 +970,17 @@ if [[ ! -z ${MET_FREETYPEINC} && ! -z ${MET_FREETYPELIB} && \
   configure_cmd="${configure_cmd} --enable-mode_graphics"
 fi
 
-if [[ ! -z $MET_ECKIT && ! -z $MET_ATLAS ]]; then
+if [[ ( ! -z $MET_ECKIT && ! -z $MET_ATLAS ) || \
+      ( ! -z $MET_ATLASINC && ! -z $MET_ATLASLIB && ! -z $MET_ECKIT ) || \
+      ( ! -z $MET_ECKITINC && ! -z $MET_ECKITLIB && ! -z $MET_ATLAS ) || \
+      ( ! -z $MET_ATLASINC && ! -z $MET_ATLASLIB && ! -z $MET_ECKITINC && ! -z $MET_ECKITLIB ) ]]; then
   configure_cmd="${configure_cmd} --enable-ugrid"
 fi
 
-if [[ ! -z $MET_HDF && ! -z $MET_HDFEOS ]]; then
+if [[ ( ! -z $MET_HDF && ! -z $MET_HDFEOS ) || \
+      ( ! -z $MET_HDFEOSINC && ! -z $MET_HDFEOSLIB && ! -z $MET_HDF ) || \
+      ( ! -z $MET_HDFINC && ! -z $MET_HDFLIB && ! -z $MET_HDFEOS ) || \
+      ( ! -z $MET_HDFEOSINC && ! -z $MET_HDFEOSLIB && ! -z $MET_HDFINC && ! -z $MET_HDFLIB ) ]]; then
   configure_cmd="${configure_cmd} --enable-modis --enable-lidar2nc"
 fi
 
