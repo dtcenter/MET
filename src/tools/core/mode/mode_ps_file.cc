@@ -311,23 +311,34 @@ void ModePsFile::set_xy_box()
    // Compute the x/y bounding box for valid data in each field
    //
 
-   double L, R, B, T;
-   Box fcst_xy_bb, obs_xy_bb;
-
-   fcst_xy_bb = valid_xy_bb(Engine->fcst_raw, *grid);
-   obs_xy_bb = valid_xy_bb(Engine->obs_raw,  *grid);
+   Box fcst_xy_bb = valid_xy_bb(Engine->fcst_raw, *grid);
+   Box obs_xy_bb = valid_xy_bb(Engine->obs_raw,  *grid);
 
    //
-   // Compute the x/y bounding box as the union of the
-   // fcst and obs x/y bounding boxes
+   // MET #3286: Update the bounding box logic to handle all
+   //            missing data in one or both input fields
    //
 
-   L = min(fcst_xy_bb.left(),   obs_xy_bb.left());
-   B = min(fcst_xy_bb.bottom(), obs_xy_bb.bottom());
-   R = max(fcst_xy_bb.right(),  obs_xy_bb.right());
-   T = max(fcst_xy_bb.top(),    obs_xy_bb.top());
-
-   XY_box.set_lrbt(L, R, B, T);
+   // Compute the union of the forecast and observation bounding boxes
+   if(!fcst_xy_bb.is_empty() && !obs_xy_bb.is_empty()) {
+      double L = min(fcst_xy_bb.left(),   obs_xy_bb.left());
+      double B = min(fcst_xy_bb.bottom(), obs_xy_bb.bottom());
+      double R = max(fcst_xy_bb.right(),  obs_xy_bb.right());
+      double T = max(fcst_xy_bb.top(),    obs_xy_bb.top());
+      XY_box.set_lrbt(L, R, B, T);
+   }
+   // Use the forecast bounding box
+   else if(!fcst_xy_bb.is_empty()) {
+      XY_box = fcst_xy_bb;
+   }
+   // Use the observation bounding box
+   else if(!obs_xy_bb.is_empty()) {
+      XY_box = obs_xy_bb;
+   }
+   // Otherwise, use the full domain
+   else {
+      XY_box.set_llwh(0.0, 0.0, grid->nx(), grid->ny());
+   }
 
    //
    //  done
@@ -1302,29 +1313,34 @@ Box valid_xy_bb(const ShapeData * wd_ptr, const Grid & grid)
    Box bb;
 
    //
-   // Initialize the x/y bounding box
+   // Initialize the x/y bounding box and counter
    //
 
    int L = grid.nx();
    int B = grid.ny();
    int R = 0;
    int T = 0;
+   int N = 0;
 
    const int data_nx = wd_ptr->data.nx();
    const int data_ny = wd_ptr->data.ny();
 
 #pragma omp parallel default(none) \
    shared(data_nx, data_ny, wd_ptr) \
-   shared(L, B, R, T)
+   shared(L, B, R, T, N)
    {
 
 #pragma omp for schedule(static) \
                 reduction(min: L, B) \
                 reduction(max: R, T) \
+                reduction(+: N) \
                 collapse(2)
       for(int x=0; x<data_nx; x++) {
          for(int y=0; y<data_ny; y++) {
             if(wd_ptr->is_valid_xy(x, y)) {
+
+               // Increment counter
+               N++;
 
                if(x < L) L = x;
                if(x > R) R = x;
@@ -1337,7 +1353,7 @@ Box valid_xy_bb(const ShapeData * wd_ptr, const Grid & grid)
       } // for x 
    } // End omp parallel
 
-   bb.set_lrbt(L, R, B, T);
+   if(N > 0) bb.set_lrbt(L, R, B, T);
 
    return bb;
 
