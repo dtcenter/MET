@@ -19,7 +19,7 @@ static void _mask_super(const string &name, int nx, int ny,
                         DataPlane &data) {
 
    if(nx != data.nx() || ny != data.ny()) {
-      mlog << Error << "\nModeSuperObject::mask_data_super() -> " << name 
+      mlog << Error << "\nModeSuperObject::_mask_super() -> " << name 
            << " :dimensions don't match " << nx << " " <<  ny 
            << "    " << data.nx() << " " << data.ny() << "\n\n";
       exit(1);
@@ -59,7 +59,7 @@ static void _mask(const string &name, int nx, int ny,
                   const BoolPlane &bp, DataPlane &data) {
 
    if(nx != data.nx() || ny != data.ny()) {
-      mlog << Error << "\nModeSuperObject::mask_data() -> " << name 
+      mlog << Error << "\nModeSuperObject::_mask() -> " << name 
            << " :dimensions don't match " << nx << " " <<  ny 
            << "    " << data.nx() << " " << data.ny() << "\n\n";
       exit(1);
