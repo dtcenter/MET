@@ -448,13 +448,13 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
 
       } // end for j
 
-      // Check that at least one verification masking region is provided
-      if(vx_opt[i].mask_name.n_elements() == 0) {
-         mlog << Error << "\nGridStatConfInfo::process_masks() -> "
-              << "At least one grid or polyline verification masking "
-              << "region must be provided for verification task number "
-              << i+1 << ".\n\n";
-         exit(1);
+      // MET #3298 Add FULL grid, if needed
+      if(vx_opt[i].mask_name.n() == 0) {
+         mlog << Debug(3) << "Adding grid = " << full_domain_str
+              << " since no masking regions were specified.\n";
+         parse_grid_mask(full_domain_str, grid, mp, name);
+         grid_map[full_domain_str] = name;
+         mask_map[name] = mp;
       }
 
       // Check for unique mask names
