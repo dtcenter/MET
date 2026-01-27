@@ -426,9 +426,18 @@ void PairStatConfInfo::process_masks() {
 
       } // end for i 
 
+      // MET #3298 Add FULL grid, if needed
+      if(vx.get_n_mask() == 0) {
+         mlog << Debug(3) << "Adding grid = " << full_domain_str
+              << " since no masking regions were specified.\n";
+         parse_grid_mask(full_domain_str, grid_mask, mp, name);
+         grid_map[full_domain_str] = name;
+         mask_area_map[name] = mp;
+         vx.mask_name.add(full_domain_str);
+      }
+
       // Check for unique mask names
       check_mask_names(vx.mask_name);
-
    }
 
    return;
