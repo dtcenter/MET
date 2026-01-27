@@ -124,7 +124,7 @@ MET Version 13.0.0 Upgrade Instructions
 
      * Existing histogram variables are modified to include the "mask" dimension.
 
-     * New information theory variables are added for "entropy" and "mutual_information".
+     * New information theory variables are added for "entropy", "joint_entropy", and "mutual_information".
 
 .. dropdown:: Output data changes - NONE
 

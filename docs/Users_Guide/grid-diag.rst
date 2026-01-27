@@ -7,9 +7,9 @@ Grid-Diag Tool
 Introduction
 ============
 
-The Grid-Diag tool creates histograms (probability distributions when normalized) for an arbitrary collection of data fields and levels. Joint histograms will be created for all possible pairs of variables. If no masking region is specified to subset the data fields spatially, then all points in the input domain are used. An arbitrary number of masking regions can be specified and output is created for each one. The histograms are accumulated over all of the input data files. Typically this is tool is run with a time series of input data files, similar to Series-Analysis.
+The Grid-Diag tool creates histograms (probability distributions when normalized) for an arbitrary collection of data fields and levels. Joint histograms are created for all possible pairs of variables. If no masking region is specified to subset the data fields spatially, then all points in the input domain are used. However, an arbitrary number of masking regions can be specified and output is created for each one. The histograms are accumulated over all of the input data files. Typically this tool is run with a time series of input data files, similar to Series-Analysis.
 
-The Grid-Diag tool also uses the histograms to derive information theory statistics. Entropy is derived from each 1-dimensional histogram, and mutual information is derived from each 2-dimensional joint histogram. These statistics are defined using log base 2, rather than the natural logarithm which is also commonly used.
+The Grid-Diag tool also uses the histograms to derive information theory statistics. Entropy is derived from each 1-dimensional histogram, and joint entropy and mutual information are derived from each 2-dimensional joint histogram. These statistics are defined using log base 2, rather than the natural logarithm which is also commonly used.
 
 Practical Information
 =====================
@@ -116,7 +116,7 @@ The **output_flag** dictionary controls the type of output that the Grid-Diag to
 
 2. **histogram_2d** for 2-dimensional histograms for each pair of **data.field** entries, including minimum, maxmimum, and midpoint values for each histogram bin.
 
-3. **info_theory** for information threory metrics, including entropy for each **data.field** entry and mutual information and joint entropy for each pair of entries.
+3. **info_theory** for information theory metrics, including entropy for each **data.field** entry and mutual information and joint entropy for each pair of entries.
 
 grid_diag Output File
 ---------------------
