@@ -412,8 +412,15 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
       // Initialize
       vx_opt[i].mask_name.clear();
 
+      // MET #3298 Add the FULL grid, if needed
+      if(vx_opt[i].mask_grid.n() + vx_opt[i].mask_poly.n() == 0) {
+         mlog << Debug(3) << "Adding grid = " << full_domain_str
+              << " since no masking regions were specified.\n";
+         vx_opt[i].mask_grid.add(full_domain_str);
+      }
+
       // Parse the masking grids
-      for(int j=0; j<vx_opt[i].mask_grid.n_elements(); j++) {
+      for(int j=0; j<vx_opt[i].mask_grid.n(); j++) {
 
          // Process new grid masks
          if(grid_map.count(vx_opt[i].mask_grid[j]) == 0) {
@@ -431,7 +438,7 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the masking polylines
-      for(int j=0; j<vx_opt[i].mask_poly.n_elements(); j++) {
+      for(int j=0; j<vx_opt[i].mask_poly.n(); j++) {
 
          // Process new poly mask
          if(poly_map.count(vx_opt[i].mask_poly[j]) == 0) {
@@ -447,15 +454,6 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
          vx_opt[i].mask_name.add(poly_map[vx_opt[i].mask_poly[j]]);
 
       } // end for j
-
-      // MET #3298 Add FULL grid, if needed
-      if(vx_opt[i].mask_name.n() == 0) {
-         mlog << Debug(3) << "Adding grid = " << full_domain_str
-              << " since no masking regions were specified.\n";
-         parse_grid_mask(full_domain_str, grid, mp, name);
-         grid_map[full_domain_str] = name;
-         mask_map[name] = mp;
-      }
 
       // Check for unique mask names
       check_mask_names(vx_opt[i].mask_name);
