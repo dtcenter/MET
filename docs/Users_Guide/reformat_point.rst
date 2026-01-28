@@ -255,7 +255,6 @@ _____________________
 
    quality_mark_thresh = <=2;
 
-
 Each observation has an integer quality mark value associated with it. The **quality_mark_thresh** is used to stratify which quality marks will be retained. By default, observations with quality marks less than or equal to 2 will be kept. This can be specified as a threshold string (e.g. :code:`<=2||==9` for less than or equal to 2 or exactly equal to 9) or as an integer defining the maximum allowable quality mark value. Earlier versions of MET only supported the integer setting.
 
 _____________________
@@ -954,10 +953,14 @@ _____________________
    elevation_range        = { ... };
    level_range            = { ... };
    obs_var                = [];
-   quality_mark_thresh    = ==0;
+   quality_mark_thresh    = NA;
    time_summary           = { ... }
 
 The configuration options listed above are supported by other point observation pre-processing tools and are described in :numref:`pb2nc configuration file`.
+
+.. note::
+
+   Note that setting "quality_mark_thresh" as "NA" always evaluates to true. So by default, IODA2NC performs no filtering of observations by their quality mark.
 
 _____________________
 

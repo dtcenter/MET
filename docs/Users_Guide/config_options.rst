@@ -4304,8 +4304,8 @@ See `Code table for observation quality markers <http://www.emc.ncep.noaa.gov/mm
    In earlier versions of MET, "quality_mark_thresh" was defined as an
    integer where observations with quality marks LESS THAN OR EQUAL TO it
    were included and quality marks GREATER THAN it were excluded. For
-   backward compatibility, setting this entry as an integer "N" results in a
-   "<=N" threshold being defined.
+   backward compatibility, setting this entry as an integer "N" results in
+   a "<=N" threshold being defined.
 
 event_stack_flag
 ^^^^^^^^^^^^^^^^
