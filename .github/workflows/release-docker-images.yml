@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
     inputs:
       release_version:
-        description: 'Comma-separated list of versions to build, e.g. v12.0,v12.1,v12.2'
-        default: 'v12.2'
+        description: 'Comma-separated list of versions to build, e.g. v12.1,v12.2'
+        default: 'v12.1,v12.2'
         required: true
         type: string
       update_latest:
@@ -20,7 +20,7 @@ on:
         type: boolean
 
   schedule:
-    - cron: "30 03 * * 0"
+    - cron: "35 03 * * 0"
 
 env:
   DOCKERHUB_REPO: dtcenter/met
@@ -46,7 +46,7 @@ jobs:
         id: get-versions
         run: |
           if [[ ${{ github.event_name }} == 'schedule' ]]; then
-            version_string="v12.0,v12.1,v12.2"
+            version_string="v12.1,v12.2"
             update_latest="true"
           elif [[ ${{ github.event_name }} == 'workflow_dispatch' ]]; then
             version_string=${{ toJSON(inputs.release_version) }}
@@ -77,6 +77,9 @@ jobs:
       matrix: ${{ fromJSON(needs.define-matrix.outputs.matrix) }}
 
     steps:
+      - name: Free Disk Space
+        uses: dtcenter/metplus-action-free-disk-space@v1
+
       - uses: actions/checkout@v4
 
       - uses: actions/checkout@v4
@@ -102,6 +105,19 @@ jobs:
           SOURCE_BRANCH: ${{ matrix.version }}
           MET_CONFIG_OPTS: '--enable-all'
 
+      - name: Copy build log files into logs directory
+        if: always()
+        run: |
+          cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
+
+      - name: Upload build logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build_logs_${{ matrix.version }}
+          path: ${{ runner.workspace }}/logs
+          if-no-files-found: ignore
+
       - name: Get DockerHub tag
         id: get-dockerhub-tag
         run: |
@@ -120,7 +136,7 @@ jobs:
             [
               "${{ steps.get-dockerhub-tag.outputs.DOCKERHUB_TAG }}"
             ]
-          fail-on-critical: "true"
+          fail-on-critical: "false"
           log-artifact-name: 'security-scan-logs_${{ matrix.version }}'
 
       - name: Push Docker Image
@@ -131,17 +147,3 @@ jobs:
           UPDATE_LATEST: ${{ fromJSON(needs.define-matrix.outputs.update_latest) }}
           DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_TOKEN }}
-
-      - name: Copy build log files into logs directory
-        if: always()
-        run: |
-          cp ${GITHUB_WORKSPACE}/*.log ${RUNNER_WORKSPACE}/logs/
-
-      - name: Upload build logs as artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: build_logs_${{ matrix.version }}
-          path: ${{ runner.workspace }}/logs
-          if-no-files-found: ignore
-

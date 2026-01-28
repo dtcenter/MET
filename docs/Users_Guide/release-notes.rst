@@ -106,11 +106,25 @@ MET Version 13.0.0 Upgrade Instructions
      `quality_mark_thresh = <=2||==9;` to retain high quality surface observations (1 and 2)
      plus those ignored by the data assimilation system (9).
 
+   * GridDiag configuration file
+
+     * The "mask.grid" and "mask.poly" entries have changed from strings to arrays of strings
+       to support the processing of multiple masking regions.
+
+     * The new "output_flag" entry is a dictionary specifying the desired output types.
+
 .. dropdown:: Output format changes - NONE
 
    MET version 12.2.0 adds or modifies the following output file formats:
 
-   * None
+   * GridDiag output format
+
+     * The new "mask" dimension, "mask_name" variable, and "mask_size" variable are added
+       to support the processing of mulitple masking regions.
+
+     * Existing histogram variables are modified to include the "mask" dimension.
+
+     * New information theory variables are added for "entropy", "joint_entropy", and "mutual_information".
 
 .. dropdown:: Output data changes - NONE
 
