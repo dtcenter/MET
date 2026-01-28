@@ -4289,16 +4289,23 @@ abbreviations to the output.
 quality_mark_thresh
 ^^^^^^^^^^^^^^^^^^^
 
-The "quality_mark_thresh" entry specifies the maximum quality mark value
-to be retained. Observations with a quality mark LESS THAN OR EQUAL TO
-this threshold will be retained, while observations with a quality mark
-GREATER THAN this threshold will be discarded.
+The "quality_mark_thresh" entry specifies a threshold to filter observations
+based on their quality mark value. Only those observations whose quality
+mark value meets this threshold criteria will be used.
 
 See `Code table for observation quality markers <http://www.emc.ncep.noaa.gov/mmb/data_processing/prepbufr.doc/table_7.htm>`_
 
 .. code-block:: none
 
-  quality_mark_thresh = 2;
+  quality_mark_thresh = <=2;
+
+.. note::
+
+   In earlier versions of MET, "quality_mark_thresh" was defined as an
+   integer where observations with quality marks LESS THAN OR EQUAL TO it
+   were included and quality marks GREATER THAN it were excluded. For
+   backward compatibility, setting this entry as an integer "N" results in a
+   "<=N" threshold being defined.
 
 event_stack_flag
 ^^^^^^^^^^^^^^^^

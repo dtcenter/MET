@@ -954,7 +954,7 @@ _____________________
    elevation_range        = { ... };
    level_range            = { ... };
    obs_var                = [];
-   quality_mark_thresh    = 0;
+   quality_mark_thresh    = ==0;
    time_summary           = { ... }
 
 The configuration options listed above are supported by other point observation pre-processing tools and are described in :numref:`pb2nc configuration file`.
