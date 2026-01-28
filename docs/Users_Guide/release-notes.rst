@@ -106,6 +106,11 @@ MET Version 13.0.0 Upgrade Instructions
      `quality_mark_thresh = <=2||==9;` to retain high quality surface observations (1 and 2)
      plus those ignored by the data assimilation system (9).
 
+   * Setting the mask grid to "FULL" has been removed from the default configuration files for
+     Point-Stat, Grid-Stat, Pair-Stat, and Ensemble-Stat to produce more intuitive behavior.
+     However, if no spatial masking region is requested in the configuration file, then the
+     "FULL" grid will automatically be added, as noted in :numref:`config_options-mask`.
+
 .. dropdown:: Output format changes - NONE
 
    MET version 12.2.0 adds or modifies the following output file formats:
