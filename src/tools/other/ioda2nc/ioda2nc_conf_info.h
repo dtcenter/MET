@@ -50,7 +50,7 @@ class IODA2NCConfInfo : public IODADataConfInfo {
       double       beg_level;           // Range of level values to be retained
       double       end_level;
       StringArray  obs_var;             // IODA variable names
-      int          quality_mark_thresh; // Quality marks to be retained
+      SingleThresh quality_mark_thresh; // Quality marks to be retained
       ConcatString version;             // Config file version
 
       std::map<ConcatString,ConcatString> message_type_map;
