@@ -357,12 +357,8 @@ void PairStatConfInfo::process_masks() {
       vx.mask_name.clear();
 
       // MET #3298 Add the FULL grid, if needed
-      if(vx.mask_grid.n() + vx.mask_poly.n() +
-         vx.mask_sid.n() + (int) vx.mask_llpnt.size() == 0) {
-         mlog << Debug(3) << "Adding grid = " << full_domain_str
-              << " since no masking regions were specified.\n";
-         vx.mask_grid.add(full_domain_str);
-      }
+      check_full_grid_mask(vx.mask_grid, &vx.mask_poly,
+                           &vx.mask_sid, &vx.mask_llpnt);
 
       // Parse the masking grids
       for(int i=0; i<vx.mask_grid.n(); i++) {

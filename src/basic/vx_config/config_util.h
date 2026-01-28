@@ -142,6 +142,9 @@ extern void            parse_add_conf_ugrid_metadata_map(
 extern SurfaceInfo     parse_conf_surface_info(Dictionary *dict);
 extern void            parse_conf_topo_mask_interp(Dictionary *dict, SurfaceInfo &);
 
+extern void         check_full_grid_mask(StringArray &, const StringArray *,
+                                         const StringArray *,
+                                         const std::vector<MaskLatLon> *);
 extern void         check_mask_names(const StringArray &);
 
 extern void         check_climo_n_vx(Dictionary *dict, const int);

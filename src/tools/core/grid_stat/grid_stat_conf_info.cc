@@ -413,11 +413,8 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
       vx_opt[i].mask_name.clear();
 
       // MET #3298 Add the FULL grid, if needed
-      if(vx_opt[i].mask_grid.n() + vx_opt[i].mask_poly.n() == 0) {
-         mlog << Debug(3) << "Adding grid = " << full_domain_str
-              << " since no masking regions were specified.\n";
-         vx_opt[i].mask_grid.add(full_domain_str);
-      }
+      check_full_grid_mask(vx_opt[i].mask_grid, &vx_opt[i].mask_poly,
+                           nullptr, nullptr);
 
       // Parse the masking grids
       for(int j=0; j<vx_opt[i].mask_grid.n(); j++) {
