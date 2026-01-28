@@ -825,7 +825,6 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
 ///////////////////////////////////////////////////////////////////////////////
 
 SingleThresh parse_conf_quality_mark_thresh(Dictionary *dict) {
-   SingleThresh st;
    const char *method_name = "parse_conf_quality_mark_thresh() -> ";
 
    SingleThresh st = dict->lookup_thresh(conf_key_quality_mark_thresh,
@@ -846,16 +845,16 @@ SingleThresh parse_conf_quality_mark_thresh(Dictionary *dict) {
       // Check the value
       if(qm_int < 0 || qm_int > 15) {
          mlog << Warning << "\n" << method_name
-              << "the \"" << conf_key_quality_mark_thresh
-              << "\" entry (" << quality_mark_thresh_int
-              << ") should be set as a threshold or an integer between 0 and 15.\n\n";
+              << "the \"" << conf_key_quality_mark_thresh << "\" entry ("
+              << qm_int << ") should be set as a threshold or an integer "
+              << "between 0 and 15.\n\n";
       }
 
       // Store as a <=n threshold
       st.set(qm_int, ThreshType::thresh_le);
    }
 
-   return qm;
+   return st;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
