@@ -908,7 +908,7 @@ smoothing. The default is 120. Ignored if not Gaussian method.
 .. note::
   The "gaussian_dx" and "gaussian_radius" settings must be in the same
   units, such as kilometers or degress. Their ratio
-  (sigma = gaussian_radius / gaussian_dx) determines the Guassian weighting
+  (sigma = gaussian_radius / gaussian_dx) determines the Gaussian weighting
   function.
 
 convert, censor_thresh, and censor_val
