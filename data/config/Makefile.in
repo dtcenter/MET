@@ -333,7 +333,6 @@ config_DATA = \
 	TCGenConfig_default \
 	WaveletStatConfig_default \
 	WWMCARegridConfig_default \
-	PlotModeFieldConfig_default \
 	Point2GridConfig_default \
 	UGridConfig_lfric \
 	UGridConfig_lfric_pressure_levels \

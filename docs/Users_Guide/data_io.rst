@@ -182,7 +182,7 @@ MET uses NetCDF as an intermediate file format. The MET tools which write gridde
 Output Data Formats
 ===================
 
-The MET package currently produces output in the following basic file formats: STAT files, ASCII files, NetCDF files, PostScript plots, and png plots from the Plot-Mode-Field utility.
+The MET package currently produces output in the following basic file formats: STAT files, ASCII files, NetCDF files, and PostScript plots.
 
 The STAT format consists of tabular ASCII data that can be easily read by many analysis tools and software packages. MET produces STAT output for the Grid-Stat, Point-Stat, Ensemble-Stat, Wavelet-Stat, and TC-Gen tools. STAT is a specialized ASCII format containing one record on each line. However, a single STAT file will typically contain multiple line types. Several header columns at the beginning of each line remain the same for each line type. However, the remaining columns after the header change for each line type. STAT files can be difficult for a human to read as the quantities represented for many columns of data change from line to line.
 
@@ -196,7 +196,7 @@ Many of the tools generate gridded NetCDF output. Generally, this output acts as
 
 The MODE, Wavelet-Stat and plotting tools produce PostScript plots summarizing the spatial approach used in the verification. The PostScript plots are generated using internal libraries and do not depend on an external plotting package. The MODE plots contain several summary pages at the beginning, but the total number of pages will depend on the merging options chosen. Additional pages will be created if merging is performed using the double thresholding or fuzzy engine merging techniques for the forecast and observation fields. The number of pages in the Wavelet-Stat plots depend on the number of masking tiles used and the dimension of those tiles. The first summary page is followed by plots for the wavelet decomposition of the forecast and observation fields. The generation of these PostScript output files can be disabled using command line options.
 
-Users can use the optional plotting utilities Plot-Data-Plane, Plot-Point-Obs, and Plot-Mode-Field to produce graphics showing forecast, observation, and MODE object files.
+Users can use the optional plotting utilities Plot-Data-Plane and Plot-Point-Obs to produce graphics showing forecast and observation data.
 
 .. _Data format summary:
 
@@ -391,12 +391,6 @@ The following is a summary of the input and output formats for each of the tools
     * **Input**: One gridded data file to be plotted.
 
     * **Output**: One postscript file containing a plot of the requested field.
-
-#. **Plot-MODE-Field Tool**
-
-    * **Input**: One or more MODE output files to be used for plotting and one configuration file.
-
-    * **Output**: One PNG file with the requested MODE objects plotted. Options for objects include raw, simple or cluster and forecast or observed objects.
 
 #. **GIS-Util Tools**
 
