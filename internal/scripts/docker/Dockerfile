@@ -35,7 +35,7 @@ RUN apt update
 WORKDIR /met
 
 #
-# Download and install MET and GhostScript fonts.
+# Download and install MET.
 # Delete the MET source code for tagged releases matching "v"*.
 #
 RUN echo "Checking out MET ${MET_GIT_NAME} from ${MET_GIT_URL}" \

@@ -203,7 +203,6 @@ sub-directory, or the MET Online Tutorial:
    - pb2nc
    - pcp_combine
    - plot_data_plane
-   - plot_mode_field
    - plot_point_obs
    - point2grid
    - point_stat
