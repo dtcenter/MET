@@ -333,7 +333,7 @@ static SummaryObs *summary_obs;
 
 ////////////////////////////////////////////////////////////////////////
 
-static int         n_total_obs;    // Running total of observations
+static int n_total_obs;    // Running total of observations
 static vector< Observation > observations;
 
 //
@@ -517,8 +517,8 @@ int met_main(int argc, char *argv[]) {
       }
 
       mlog << Debug(2)
-           << "\nTotal Observations retained or derived\t= " << n_total_obs << "\n";
-
+           << "\nTotal Observations retained or derived\t= "
+           << n_total_obs << "\n";
 
       if (do_summary) {
          TimeSummaryInfo summaryInfo = conf_info.getSummaryInfo();

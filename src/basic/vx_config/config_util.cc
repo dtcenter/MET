@@ -824,6 +824,41 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+SingleThresh parse_conf_quality_mark_thresh(Dictionary *dict) {
+   const char *method_name = "parse_conf_quality_mark_thresh() -> ";
+
+   SingleThresh st = dict->lookup_thresh(conf_key_quality_mark_thresh,
+                                         false, false);
+
+   // MET#3307 backward compatible to also support integer lookup
+   if(!dict->last_lookup_status()) {
+      auto qm_int = dict->lookup_int(conf_key_quality_mark_thresh, false);
+
+      // Check lookup status
+      if(!dict->last_lookup_status()) {
+         mlog << Error << "\n" << method_name
+              << "\"" << conf_key_quality_mark_thresh
+              << "\" must be set as a threshold or an integer upper limit.\n\n";
+         exit(1);
+      }
+
+      // Check the value
+      if(qm_int < 0 || qm_int > 15) {
+         mlog << Warning << "\n" << method_name
+              << "the \"" << conf_key_quality_mark_thresh << "\" entry ("
+              << qm_int << ") should be set as a threshold or an integer "
+              << "between 0 and 15.\n\n";
+      }
+
+      // Store as a <=n threshold
+      st.set(qm_int, ThreshType::thresh_le);
+   }
+
+   return st;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 StringArray parse_conf_obs_qty_inc(Dictionary *dict) {
    StringArray sa;
    const char *method_name = "parse_conf_obs_qty_inc() -> ";
