@@ -78,7 +78,7 @@ obs = {
 // Verification masking regions
 //
 mask = {
-   grid = [ "FULL" ];
+   grid = [];
    poly = [];
 
 }

@@ -108,8 +108,8 @@ climo_stdev = {
 // Verification masking regions
 //
 mask = {
-   grid = [ "FULL" ];
-   poly = [ ];
+   grid = [];
+   poly = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

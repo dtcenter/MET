@@ -397,6 +397,10 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
       vx_opt[i].mask_name.clear();
       vx_opt[i].mask_name_area.clear();
 
+      // MET #3298 Add the FULL grid, if needed
+      check_full_grid_mask(vx_opt[i].mask_grid, &vx_opt[i].mask_poly,
+                           &vx_opt[i].mask_sid, &vx_opt[i].mask_llpnt);
+
       // Parse the masking grids
       for(int j=0; j<vx_opt[i].mask_grid.n(); j++) {
 
@@ -469,14 +473,8 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 
       } // end for j
 
-      // Check that at least one verification masking region is provided
-      if(vx_opt[i].mask_name.n() == 0) {
-         mlog << Error << "\nEnsembleStatConfInfo::process_masks() -> "
-              << "At least one grid, polyline or station ID masking "
-              << "region must be provided for verification task number "
-              << i+1 << ".\n\n";
-         exit(1);
-      }
+      // Check for unique mask names
+      check_mask_names(vx_opt[i].mask_name);
 
    } // end for i
 
@@ -490,11 +488,25 @@ void EnsembleStatConfInfo::process_geog(const Grid &grid,
    const string method_name = "EnsembleStatConfInfo::process_geog() -> ";
    bool land = false;
    bool topo = false;
+   bool geog_match = false;
 
    // Check if the input land and topo fields are needed
    for(int i=0; i<n_vx; i++) {
       if(vx_opt[i].vx_pd.sfc_info.need_land()) land = true;
       if(vx_opt[i].vx_pd.sfc_info.need_topo()) topo = true;
+      if(vx_opt[i].interp_info.method.has(interpmthd_geog_match_str)) {
+         geog_match = true;
+      }
+   }
+
+   // MET #3285 validate the GEOG_MATCH interpolation method
+   if(geog_match && !land && !topo) {
+      mlog << Warning << "\nEnsembleStatVxOpt::process_geog() -> "
+           << "requesting the \"" << interpmthd_geog_match_str
+           << "\" interpolation method with the \""
+           << conf_key_land_mask << "\" and \"" << conf_key_topo_mask
+           << "\" dictionaries disabled produces the same result as the \""
+           << interpmthd_nearest_str << "\" interpolation method.\n\n";
    }
 
    // Check for no work to do

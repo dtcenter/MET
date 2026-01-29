@@ -85,10 +85,10 @@ static GridDiagConfInfo conf_info;
 ////////////////////////////////////////////////////////////////////////
 
 // Output NetCDF file
-static netCDF::NcFile *nc_out = (netCDF::NcFile *) nullptr;
+static netCDF::NcFile *nc_out = nullptr;
+netCDF::NcDim mask_dim;
 std::vector<netCDF::NcDim> data_var_dims;
-std::vector<netCDF::NcVar> hist_vars;
-std::vector<netCDF::NcVar> joint_hist_vars;
+int deflate_level;
 
 static bool multiple_data_sources = false;
 static bool unique_variable_names = true;
@@ -108,17 +108,31 @@ static Grid grid;
 // Input files
 static Met2dDataFile *data_mtddf = nullptr;
 
-// Variable min/max values
-std::vector<double> var_mins;
-std::vector<double> var_maxs;
+// Struct to store diagnostic info for each field and masking region
+struct DiagInfo {
 
-// Variable histogram map
-std::map<ConcatString, std::vector<long long> > histograms;
-std::map<ConcatString, std::vector<long long> > joint_histograms;
-std::map<ConcatString, std::vector<double> > bin_mins;
-std::map<ConcatString, std::vector<double> > bin_maxs;
-std::map<ConcatString, std::vector<double> > bin_mids;
-std::map<ConcatString, double> bin_deltas;
+   // Histogram bins
+   std::vector<double> bin_min;
+   std::vector<double> bin_max;
+   std::vector<double> bin_mid;
+   double bin_delta;
+
+   // Input data info
+   double var_min;
+   double var_max;
+
+   // Single and joint histograms 
+   std::vector<long long> hist1d;
+   std::map<int, std::vector<long long> > hist2d;
+
+   // Information theory
+   double entropy;
+   std::map<int, double> joint_entropy;
+   std::map<int, double> mutual_information;
+};
+
+// DiagInfo objects [n_data][n_mask]
+std::vector<std::vector<DiagInfo> > diag_info; 
 
 // Series length
 static int n_series = bad_data_int;
@@ -130,7 +144,6 @@ static unixtime valid_beg = (unixtime) 0;
 static unixtime valid_end = (unixtime) 0;
 static int      lead_beg  = bad_data_int;
 static int      lead_end  = bad_data_int;
-
 
 #endif  //  __GRID_DIAG_H__
 

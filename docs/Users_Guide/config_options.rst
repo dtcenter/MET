@@ -908,7 +908,7 @@ smoothing. The default is 120. Ignored if not Gaussian method.
 .. note::
   The "gaussian_dx" and "gaussian_radius" settings must be in the same
   units, such as kilometers or degress. Their ratio
-  (sigma = gaussian_radius / gaussian_dx) determines the Guassian weighting
+  (sigma = gaussian_radius / gaussian_dx) determines the Gaussian weighting
   function.
 
 convert, censor_thresh, and censor_val
@@ -1906,8 +1906,16 @@ mask
 The "mask" entry is a dictionary that specifies the verification masking
 regions to be used when computing statistics. Each mask defines a
 geographic extent, and any matched pairs falling inside that area will be
-used in the computation of statistics. Masking regions may be specified
-in the following ways:
+used in the computation of statistics.
+
+.. note::
+
+   Masking regions can be defined in a variety of ways, described below.
+   However, if no geographic masking regions are specified, the MET tools
+   automatically set "grid" equal to "FULL" to verify all data in the
+   entire input domain.
+
+Masking regions may be specified in the following ways:
 
 grid
 ^^^^
@@ -2250,10 +2258,12 @@ applied to the points in the box:
   * HIRA        for all neighborhood points to define a spatial
     ensemble (only in Ensemble-Stat)
 
-  The BUDGET, FORCE, GAUSSIAN, and MAXGAUSS methods are not valid for
-  interpolating to point locations. For grid-to-grid comparisons, the
-  only valid smoothing methods are MIN, MAX, MEDIAN, UW_MEAN, and
-  GAUSSIAN, and MAXGAUSS.
+.. note::
+
+  Requesting the GEOG_MATCH interpolation method without providing any
+  land/sea mask (e.g. "land_mask.flag = FALSE") or topography data (e.g.
+  "topo_mask.flag = FALSE") results in a warning message. Without input
+  geography data, GEOG_MATCH produces the same result as NEAREST.
 
 If multiple "method" and "width" options are specified, all possible
 permutations of their values are applied.

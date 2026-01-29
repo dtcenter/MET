@@ -2840,6 +2840,28 @@ void parse_conf_range_double(Dictionary *dict, double &beg, double &end) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void check_full_grid_mask(StringArray &grids, const StringArray *polys,
+                          const StringArray *sids,
+                          const std::vector<MaskLatLon> *llpnts) {
+   int n_mask = grids.n();
+
+   // Count the number of masking regions
+   if(polys)  n_mask += polys->n();
+   if(sids)   n_mask += sids->n();
+   if(llpnts) n_mask += (int) llpnts->size();
+
+   // MET #3298 Add the FULL grid if no other masks are defined
+   if(n_mask == 0) {
+      mlog << Debug(3) << "Adding grid = " << full_domain_str
+           << " since no masking regions were specified.\n";
+      grids.add(full_domain_str);
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void check_mask_names(const StringArray &sa) {
    StringArray sa_uniq = sa.uniq();
 
