@@ -141,7 +141,7 @@ sub-directory, or the MET Online Tutorial:
   --enable and --disable options for each of the MET tools.
 
   By default, compilation of GRIB2 support, Python support, the MODIS-Regrid
-  tool, the Lidar2NC tool,and MODE-Graphics are disabled.
+  tool, and the Lidar2NC tool are disabled.
   Use the following options to enable them:
 
   --enable-grib2
