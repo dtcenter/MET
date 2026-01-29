@@ -94,11 +94,10 @@ Grid parse_grid_string(const char *grid_str) {
       mlog << Debug(3) << "Use the grid defined by file \""
            << grid_str << "\".\n";
 
-      Met2dDataFileFactory m_factory;
-      Met2dDataFile *met_ptr = (Met2dDataFile *) nullptr;
+      Met2dDataFile *met_ptr = nullptr;
 
       // Open the data file
-      if(!(met_ptr = m_factory.new_met_2d_data_file(grid_str))) {
+      if(!(met_ptr = Met2dDataFileFactory::new_met_2d_data_file(grid_str))) {
          mlog << Error << "\nparse_grid_string() -> "
               << "can't open file \"" << grid_str
               << "\"\n\n";
@@ -230,11 +229,10 @@ void parse_grid_mask(const ConcatString &mask_grid_str, Grid &grid) {
            << "Use the grid defined by file \""
            << mask_grid_str << "\".\n";
 
-      Met2dDataFileFactory mtddf_factory;
-      Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
+      Met2dDataFile *mtddf = nullptr;
 
       // Attempt to open the data file
-      if(!(mtddf = mtddf_factory.new_met_2d_data_file(
+      if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(
                       replace_path(mask_grid_str.c_str()).c_str()))) {
          mlog << Error << "\nparse_grid_mask() -> "
               << "can't open file \"" << mask_grid_str << "\"\n\n";
@@ -429,16 +427,8 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    // Parse the requested file type
    GrdFileType type = parse_conf_file_type(&config);
 
-   // 2D Data file
-   Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
-
-   // VarInfo object
-   VarInfoFactory info_factory;
-   VarInfo *info = (VarInfo *) nullptr;
-
    // Open the data file
-   mtddf = mtddf_factory.new_met_2d_data_file(file_name.c_str(), type);
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(file_name.c_str(), type);
 
    // If data file pointer is nullptr, assume a lat/lon polyline file
    if(!mtddf) {
@@ -451,7 +441,7 @@ void parse_poly_2d_data_mask(const ConcatString &mask_poly_str,
    mask_grid = mtddf->grid();
 
    // Create a new VarInfo object
-   info = info_factory.new_var_info(mtddf->file_type());
+   auto info = VarInfoFactory::new_var_info(mtddf->file_type());
 
    // Set up the VarInfo object
    info->set_dict(config);
@@ -591,11 +581,7 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
       exit(1);
    }
 
-   Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
-
-   VarInfoFactory info_factory;
-   VarInfo *info = (VarInfo *) nullptr;
+   Met2dDataFile *mtddf = nullptr;
 
    // Parse the file names and append the forecast file
    StringArray geog_files(dict->lookup_string_array(conf_key_file_name, false));
@@ -618,7 +604,7 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
    for(int i=0; i<geog_files.n(); i++) {
 
       // Allocate memory for data file
-      if(!(mtddf = mtddf_factory.new_met_2d_data_file(geog_files[i].c_str(), ftype))) {
+      if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(geog_files[i].c_str(), ftype))) {
          mlog << Error << "\nparse_geog_data() -> "
               << "Trouble reading geography mask file \""
               << geog_files[i] << "\"\n\n";
@@ -626,7 +612,7 @@ DataPlane parse_geog_data(Dictionary *dict, const Grid &vx_grid,
       }
 
       // Parse the variable name and level
-      info = info_factory.new_var_info(mtddf->file_type());
+      auto info = VarInfoFactory::new_var_info(mtddf->file_type());
       info->set_dict(*field_dict);
 
       // Read the data
