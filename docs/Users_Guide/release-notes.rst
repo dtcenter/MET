@@ -102,9 +102,17 @@ MET Version 13.0.0 Upgrade Instructions
    MET version 13.0.0 adds, modifies, or removes the following configuration options:
 
    * The PB2NC and IODA2NC "quality_mark_thresh" configuration file option can now be set as a
-     threshold string or integer, as before. For example, when processing GDAS surface observations,
-     with PB2NC, consider using `quality_mark_thresh = <=2||==9;` to retain high quality surface
-     observations (1 and 2) plus those ignored by the data assimilation system (9).
+     threshold string or integer, as before.
+     
+     * When processing GDAS surface observations with PB2NC, consider setting
+       `quality_mark_thresh = <=2||==9;` to retain high quality surface observations
+       (1 and 2) plus those ignored by the data assimilation system (9).
+
+     * While IODA2NC did previously set `quality_mark_thresh = 0;` in the configuration file,
+       it was not actually applied by IODA2NC and no quality mark filtering was performed.
+       Changing the default to `quality_mark_thresh = NA;`, which always evaluates to true,
+       maintains that earlier default behavior. However, changing this setting now applies
+       the expected filtering logic.
 
    * GridDiag configuration file
 
