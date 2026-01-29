@@ -76,7 +76,6 @@ UNIT_XML="unit_ascii2nc.xml \
           unit_ref_config_lead_36.xml \
           unit_ref_config_lead_48.xml \
           unit_ref_config.xml \
-          unit_mode_graphics.xml \
           unit_gsi_tools.xml \
           unit_aeronet.xml \
           unit_shift_data_plane.xml \

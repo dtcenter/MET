@@ -65,7 +65,6 @@ export F77=${F77_COMPILER}
 run_command "./configure --prefix=`pwd` \
             --enable-grib2 \
             --enable-modis \
-            --enable-mode_graphics \
             --enable-lidar2nc \
             --enable-python \
             --enable-ugrid"
