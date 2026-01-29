@@ -162,12 +162,11 @@ static bool is_first_pass = true;
 static DataPlane wgt_dp;
 
 // Data file factory and input files
-static Met2dDataFileFactory mtddf_factory;
-static Met2dDataFile *fcst_mtddf = (Met2dDataFile *) nullptr;
-static Met2dDataFile *obs_mtddf  = (Met2dDataFile *) nullptr;
+static Met2dDataFile *fcst_mtddf = nullptr;
+static Met2dDataFile *obs_mtddf  = nullptr;
 
 // Pointer to the random number generator to be used
-static gsl_rng *rng_ptr = (gsl_rng *) nullptr;
+static gsl_rng *rng_ptr = nullptr;
 
 // Strings to be output in the STAT and optional text files
 static StatHdrColumns shc;

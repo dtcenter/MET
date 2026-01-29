@@ -206,7 +206,6 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
 {
 
-   VarInfoFactory info_factory;
    Dictionary *fcst_dict = (Dictionary *) nullptr;
    Dictionary *obs_dict  = (Dictionary *) nullptr;
    Dictionary *dict      = (Dictionary *) nullptr;
@@ -241,8 +240,8 @@ void MtdConfigInfo::process_config(GrdFileType ftype, GrdFileType otype)
 
       // Allocate new VarInfo objects
 
-   fcst_info = info_factory.new_var_info(ftype);
-   obs_info  = info_factory.new_var_info(otype);
+   fcst_info = VarInfoFactory::new_var_info(ftype);
+   obs_info  = VarInfoFactory::new_var_info(otype);
 
       // Set the dictionaries
 

@@ -82,9 +82,6 @@ bool get_series_entry(int i_series, VarInfo* data_info,
 bool read_single_entry(VarInfo* info, const ConcatString& filename,
         const GrdFileType type, DataPlane& dp, Grid& grid) {
 
-   Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile* mtddf = (Met2dDataFile*) nullptr;
-
    // Check that file exists
    if(!file_exists(filename.c_str())) {
       mlog << Warning << "\nread_single_entry() -> "
@@ -93,7 +90,7 @@ bool read_single_entry(VarInfo* info, const ConcatString& filename,
    }
 
    // Open data file
-   mtddf = mtddf_factory.new_met_2d_data_file(filename.c_str(), type);
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(filename.c_str(), type);
 
    // Attempt to read gridded data
    bool found = mtddf->data_plane(*info, dp);
@@ -164,9 +161,6 @@ bool get_series_entries(int i_series, vector<VarInfo*> &vi_list,
 bool read_all_entries(vector<VarInfo*> &vi_list, const ConcatString &filename,
         const GrdFileType type, vector<DataPlane> &dp_list, Grid &grid) {
 
-   Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile* mtddf = (Met2dDataFile*) nullptr;
-
    // Check that file exists
    if(!file_exists(filename.c_str())) {
       mlog << Warning << "\nread_all_entries() -> "
@@ -175,7 +169,7 @@ bool read_all_entries(vector<VarInfo*> &vi_list, const ConcatString &filename,
    }
 
    // Open data file
-   mtddf = mtddf_factory.new_met_2d_data_file(filename.c_str(), type);
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(filename.c_str(), type);
 
    // Attempt to read gridded data
    int n_valid = mtddf->data_planes(vi_list, dp_list);

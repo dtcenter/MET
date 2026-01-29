@@ -1906,8 +1906,16 @@ mask
 The "mask" entry is a dictionary that specifies the verification masking
 regions to be used when computing statistics. Each mask defines a
 geographic extent, and any matched pairs falling inside that area will be
-used in the computation of statistics. Masking regions may be specified
-in the following ways:
+used in the computation of statistics.
+
+.. note::
+
+   Masking regions can be defined in a variety of ways, described below.
+   However, if no geographic masking regions are specified, the MET tools
+   automatically set "grid" equal to "FULL" to verify all data in the
+   entire input domain.
+
+Masking regions may be specified in the following ways:
 
 grid
 ^^^^

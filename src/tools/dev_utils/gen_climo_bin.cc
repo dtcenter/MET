@@ -334,11 +334,8 @@ void write_nc_bin(const DataPlane &dp, int i_cdf, double cdf_y) {
 
 void get_field(const char *file, const char *config_str, DataPlane &dp) {
    GrdFileType ftype;
-   Met2dDataFile * mtddf_ptr = (Met2dDataFile * ) nullptr;
-   Met2dDataFileFactory m_factory;
-   VarInfo * vi_ptr = (VarInfo * ) nullptr;
-   VarInfoFactory v_factory;
-   double dmin, dmax;
+   double dmin;
+   double dmax;
 
    // Parse the config string
    MetConfig config;
@@ -350,7 +347,7 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
 
    // Instantiate Met2dDataFile object from the factory
    mlog << Debug(1)  << "Opening data file: " << file << "\n";
-   mtddf_ptr = m_factory.new_met_2d_data_file(file, ftype);
+   auto mtddf_ptr = Met2dDataFileFactory::new_met_2d_data_file(file, ftype);
    if(!mtddf_ptr) {
       mlog << Error << "\n" << program_name
            << " -> file \"" << file << "\" not a valid data file\n\n";
@@ -374,7 +371,7 @@ void get_field(const char *file, const char *config_str, DataPlane &dp) {
    }
 
    // Instantiate VarInfo object from the factory
-   vi_ptr = v_factory.new_var_info(mtddf_ptr->file_type());
+   auto vi_ptr = VarInfoFactory::new_var_info(mtddf_ptr->file_type());
    if(!vi_ptr) {
       mlog << Error << "\n" << program_name
            << " -> unable to determine filetype of \"" << file

@@ -980,7 +980,7 @@ static Met2dDataFile *get_mtddf(const StringArray &file_list,
    }
 
    // Read first valid file
-   if(!(mtddf = mtddf_factory.new_met_2d_data_file(
+   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(
                    file_list[i].c_str(), file_type))) {
       mlog << Error << "\nget_mtddf() -> "
            << "trouble reading data file \""

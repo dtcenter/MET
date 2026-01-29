@@ -356,6 +356,10 @@ void PairStatConfInfo::process_masks() {
       // Initialize
       vx.mask_name.clear();
 
+      // MET #3298 Add the FULL grid, if needed
+      check_full_grid_mask(vx.mask_grid, &vx.mask_poly,
+                           &vx.mask_sid, &vx.mask_llpnt);
+
       // Parse the masking grids
       for(int i=0; i<vx.mask_grid.n(); i++) {
 

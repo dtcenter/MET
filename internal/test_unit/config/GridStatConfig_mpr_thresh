@@ -137,7 +137,7 @@ climo_cdf = {
 // Verification masking regions
 //
 mask = {
-   grid = [ "FULL" ];
+   grid = [];
    poly = [];
 }
 

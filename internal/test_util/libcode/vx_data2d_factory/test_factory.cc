@@ -32,13 +32,9 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-   // Factory objects
-   Met2dDataFileFactory mtddf_factory;
-   VarInfoFactory       vinfo_factory;
-
    // Pointers for the current objects
-   Met2dDataFile * mtddf_cur = (Met2dDataFile *) 0;
-   VarInfo       * vinfo_cur = (VarInfo       *) 0;
+   Met2dDataFile * mtddf_cur = nullptr;
+   VarInfo       * vinfo_cur = nullptr; 
 
    // DataPlane objects for storing the data
    DataPlane plane;
@@ -63,8 +59,8 @@ int main(int argc, char *argv[]) {
    in_file_name << argv[1];
 
    // Create an instance of this file type
-   mtddf_cur = mtddf_factory.new_met_2d_data_file(in_file_name.c_str());
-   if(mtddf_cur == (Met2dDataFile *) 0) {
+   mtddf_cur = Met2dDataFileFactory::new_met_2d_data_file(in_file_name.c_str());
+   if(!mtddf_cur) {
       mlog << "\n\n  test_factory() -> "
            << "trouble reading input file \"" << in_file_name << "\"\n\n";
       exit(1);
@@ -77,7 +73,7 @@ int main(int argc, char *argv[]) {
    mtddf_cur->dump(cout);
 
    // Create a VarInfo object based on the gridded data file type
-   vinfo_cur = vinfo_factory.new_var_info(mtddf_cur->file_type());
+   vinfo_cur = VarInfoFactory::new_var_info(mtddf_cur->file_type());
 
    mlog << Debug(1) << "\nCALLING: vinfo_cur->VarInfo::dump(cout);\n";
    vinfo_cur->VarInfo::dump(cout);

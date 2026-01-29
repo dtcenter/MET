@@ -25,6 +25,8 @@
 
 extern GrdFileType grd_file_type(const char * filename);
 
+extern void update_mtddf_grid(Met2dDataFile *, VarInfo *);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 

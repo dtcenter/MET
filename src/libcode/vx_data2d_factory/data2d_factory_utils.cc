@@ -181,3 +181,36 @@ return FileType_None;
 ////////////////////////////////////////////////////////////////////////
 
 
+void update_mtddf_grid(Met2dDataFile *mtddf, VarInfo *vinfo)
+
+{
+
+   //
+   // Read the requested data to define the grid for Python and
+   // range/azimuth inputs and when set_attr_grid is specified
+   //
+
+if ( is_python_grdfiletype(mtddf->file_type()) ||
+     mtddf->grid().info().ra                   ||
+     vinfo->grid_attr().is_set() )  {
+
+   DataPlane dp;
+
+   if( !mtddf->data_plane(*vinfo, dp) )  {
+
+      mlog << Error << "\nupdate_mtddf_grid() -> "
+           << "Trouble reading \"" << vinfo->magic_str()
+           << " \"data from input file \""
+           << mtddf->filename() << "\"\n\n";
+      exit(1);
+
+   }
+
+}
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
