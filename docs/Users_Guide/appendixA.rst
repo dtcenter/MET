@@ -1760,9 +1760,8 @@ Q. What graphical features does MET provide?
   .. dropdown:: Answer
 
      MET provides some :ref:`plotting and graphics support<plotting>`.
-     The plotting
-     tools, including plot_point_obs, plot_data_plane, and plot_mode_field, can
-     help users visualize the data.
+     The plotting tools, including plot_point_obs and plot_data_plane, can help
+     users visualize the data.
 
      MET is intended to be a set of command line tools for evaluating forecast
      quality. So, the development effort is focused on providing the latest,

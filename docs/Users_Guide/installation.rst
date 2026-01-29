@@ -62,10 +62,6 @@ verification use and compiler language:
   library if compiling the MODIS-Regrid or lidar2nc tool
 * `HDF-EOS2 <http://www.hdfeos.org/software/library.php#HDF-EOS2>`__
   library if compiling the MODIS-Regrid or lidar2nc tool
-* `Cairo <http://cairographics.org/releases>`_
-  library if compiling the MODE-Graphics tool
-* `FreeType <http://www.freetype.org/download.html>`_
-  library if compiling the MODE-Graphics tool
 * `f2c <http://www.netlib.org/f2c>`_
   library for interfacing between Fortran and C
   (**Not required for most compilers**)
@@ -379,12 +375,6 @@ External Library Handling in compile_MET_all.sh
     |                   |                                |                              |
     | Support           |                                |                              |
     +-------------------+--------------------------------+------------------------------+
-    | *Optional*        | :code:`--enable-all` or        | MET_CAIRO,                   |
-    |                   |                                |                              |
-    | MODE Graphics     | :code:`--enable-mode_graphics` | MET_FREETYPE                 |
-    |                   |                                |                              |
-    | Support           |                                |                              |
-    +-------------------+--------------------------------+------------------------------+
     | *Optional*        | :code:`--enable-profiler`      |                              |
     |                   |                                |                              |
     | Profiler          |                                |                              |
@@ -407,13 +397,6 @@ External Library Handling in compile_MET_all.sh
     In this case, both environment variables must be specified and the associated
     $MET_<lib> variable will be ignored.
 
-.. dropdown:: FINAL NOTE ON EXTERNAL LIBRARIES
-
-    For users wishing to run the Plot-MODE-Field tool, the Ghostscript
-    `font data <http://sourceforge.net/projects/gs-fonts>`_ must be
-    downloaded and the **MET_FONT_DIR** environment variable in the
-    **install_met_env.<machine_name>** file should point to the directory containing those fonts.
-
 Executing the compile_MET_all.sh script
 ---------------------------------------
 
@@ -428,15 +411,12 @@ this step on the machine ‘hera’.
   compile_MET_all.sh  install_met_env.hera  tar_files
 
   /contrib/met/12.2.0$ ls tar_files
-  HDF-EOS2.16v1.00.tar.Z         eckit-1.24.4.tar.gz            netcdf-4.7.4.tar.gz
-  HDF4.2r3.tar.gz                freetype-2.11.0.tar.gz         netcdf-cxx4-4.3.1.tar.gz
-  atlas-0.30.0.tar.gz            g2clib-1.6.4.tar.gz            pixman-0.40.0.tar.gz
-  atlas-0.35.0.tar.gz            gsl-1.11.tar.gz                proj-7.1.0.tar.gz
-  bufr_v11.6.0.tar.gz            gsl-2.7.1.tar.gz               sqlite-autoconf-3430100.tar.gz
-  cairo-1.16.0.tar.xz            hdf5-1.12.2.tar.gz             tiff-4.6.0.tar.gz
-  ecbuild-3.5.0.tar.gz           jasper-2.0.25.tar.gz           zlib-1.2.11.tar.gz
-  ecbuild-3.7.0.tar.gz           jpegsrc.v9e.tar.gz
-  eckit-1.20.2.tar.gz            libpng-1.6.37.tar.gz
+  atlas-0.30.0.tar.gz   eckit-1.24.4.tar.gz  HDF-EOS2.16v1.00.tar.Z    proj-7.1.0.tar.gz
+  atlas-0.35.0.tar.gz   g2clib-1.6.4.tar.gz  jasper-2.0.25.tar.gz      sqlite-autoconf-3430100.tar.gz
+  bufr_v11.6.0.tar.gz   gsl-1.11.tar.gz      jpegsrc.v9e.tar.gz        tiff-4.6.0.tar.gz
+  ecbuild-3.5.0.tar.gz  gsl-2.7.1.tar.gz     libpng-1.6.37.tar.gz      zlib-1.2.11.tar.gz
+  ecbuild-3.7.0.tar.gz  HDF4.2r3.tar.gz      netcdf-4.7.4.tar.gz
+  eckit-1.20.2.tar.gz   hdf5-1.12.2.tar.gz   netcdf-cxx4-4.3.1.tar.gz
 
 Simply enter the following into the terminal to execute the script:
 
