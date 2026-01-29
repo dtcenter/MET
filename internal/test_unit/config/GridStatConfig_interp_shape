@@ -69,8 +69,8 @@ obs = fcst;
 // Verification masking regions
 //
 mask = {
-   grid = [ "FULL" ];
-   poly = [ ];
+   grid = [];
+   poly = [];
 }
 
 ////////////////////////////////////////////////////////////////////////////////

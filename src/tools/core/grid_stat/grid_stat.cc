@@ -116,6 +116,7 @@
 //   058    10/03/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
 //   059    11/15/24  Halley Gotway  MET #3020 SEEPS NetCDF output.
 //   060    05/05/24  Halley Gotway  MET #3145 Add OpenMP.
+//   061    01/27/26  Halley Gotway  MET #3298 Add the FULL grid, if needed
 //
 ////////////////////////////////////////////////////////////////////////
 

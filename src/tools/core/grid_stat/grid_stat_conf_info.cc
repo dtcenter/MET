@@ -412,8 +412,12 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
       // Initialize
       vx_opt[i].mask_name.clear();
 
+      // MET #3298 Add the FULL grid, if needed
+      check_full_grid_mask(vx_opt[i].mask_grid, &vx_opt[i].mask_poly,
+                           nullptr, nullptr);
+
       // Parse the masking grids
-      for(int j=0; j<vx_opt[i].mask_grid.n_elements(); j++) {
+      for(int j=0; j<vx_opt[i].mask_grid.n(); j++) {
 
          // Process new grid masks
          if(grid_map.count(vx_opt[i].mask_grid[j]) == 0) {
@@ -431,7 +435,7 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
       } // end for j
 
       // Parse the masking polylines
-      for(int j=0; j<vx_opt[i].mask_poly.n_elements(); j++) {
+      for(int j=0; j<vx_opt[i].mask_poly.n(); j++) {
 
          // Process new poly mask
          if(poly_map.count(vx_opt[i].mask_poly[j]) == 0) {
@@ -447,15 +451,6 @@ void GridStatConfInfo::process_masks(const Grid &grid) {
          vx_opt[i].mask_name.add(poly_map[vx_opt[i].mask_poly[j]]);
 
       } // end for j
-
-      // Check that at least one verification masking region is provided
-      if(vx_opt[i].mask_name.n_elements() == 0) {
-         mlog << Error << "\nGridStatConfInfo::process_masks() -> "
-              << "At least one grid or polyline verification masking "
-              << "region must be provided for verification task number "
-              << i+1 << ".\n\n";
-         exit(1);
-      }
 
       // Check for unique mask names
       check_mask_names(vx_opt[i].mask_name);

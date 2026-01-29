@@ -153,7 +153,7 @@ climo_cdf = {
 // May be set separately in each "obs.pairs" entry
 //
 mask = {
-   grid  = [ "FULL" ];
+   grid  = [];
    poly  = [];
    sid   = [];
    llpnt = [];
