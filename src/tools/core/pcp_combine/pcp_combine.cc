@@ -777,15 +777,10 @@ static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          cur_file << cs_erase << cur_dir << '/' << dirp->d_name;
 
-         Met2dDataFileFactory factory;
-         Met2dDataFile * mtddf;
-         VarInfoFactory var_fac;
-         VarInfo * cur_var;
-
          //
          // Create a data file object.
          //
-         mtddf = factory.new_met_2d_data_file(cur_file.c_str());
+         auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(cur_file.c_str());
          if(!mtddf) {
             mlog << Warning << "search_pcp_dir() -> "
                  << "can't open data file \"" << cur_file << "\"\n";
@@ -795,7 +790,7 @@ static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          // Create a VarInfo object from the data file.
          //
-         cur_var = var_fac.new_var_info(mtddf->file_type());
+         auto cur_var = VarInfoFactory::new_var_info(mtddf->file_type());
          if(!cur_var) {
             delete mtddf;  mtddf = nullptr;
             mlog << Warning << "search_pcp_dir() -> "
@@ -1287,10 +1282,8 @@ static bool get_field(const char *filename,
                       Grid & grid,
                       DataPlane & plane,
                       bool error_out) {
-   Met2dDataFileFactory factory;
    Met2dDataFile *mtddf = nullptr;
    GrdFileType ftype;
-   VarInfoFactory var_fac;
    VarInfo *cur_var = nullptr;
    const char *method_name = "get_field() -> ";
 
@@ -1336,7 +1329,7 @@ static bool get_field(const char *filename,
    // Open the data file.
    //
    if(status) {
-      mtddf = factory.new_met_2d_data_file(filename, ftype);
+      mtddf = Met2dDataFileFactory::new_met_2d_data_file(filename, ftype);
       if(!mtddf) {
          mlog << Warning << "\n" << method_name
               << "can't open data file \"" << filename << "\"\n\n";
@@ -1348,7 +1341,7 @@ static bool get_field(const char *filename,
    // Build a VarInfo object.
    //
    if(status) {
-      cur_var = var_fac.new_var_info(mtddf->file_type());
+      cur_var = VarInfoFactory::new_var_info(mtddf->file_type());
       if(!cur_var) {
          mlog << Warning << "\n" << method_name
               << "unable to determine filetype of \"" << filename
@@ -1392,7 +1385,7 @@ static bool get_field(const char *filename,
       grid = mtddf->grid();
 
       if(!var_info) {
-         var_info = var_fac.new_var_info(mtddf->file_type());
+         var_info = VarInfoFactory::new_var_info(mtddf->file_type());
          *var_info = *cur_var;
       }
    }

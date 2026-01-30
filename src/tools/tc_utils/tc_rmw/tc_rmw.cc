@@ -213,8 +213,7 @@ void process_command_line(int argc, char **argv) {
 GrdFileType get_file_type(const StringArray &file_list,
                           const GrdFileType in_ftype) {
     int i;
-    Met2dDataFileFactory mtddf_factory;
-    Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
+    Met2dDataFile *mtddf = nullptr;
     GrdFileType out_ftype;
 
     // Find the first file that actually exists
@@ -229,7 +228,7 @@ GrdFileType get_file_type(const StringArray &file_list,
     }
 
     // Read first valid file
-    if(!(mtddf = mtddf_factory.new_met_2d_data_file(file_list[i].c_str(), in_ftype))) {
+    if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(file_list[i].c_str(), in_ftype))) {
         mlog << Error << "\nTrouble reading data file \""
              << file_list[i] << "\"\n\n";
         exit(1);

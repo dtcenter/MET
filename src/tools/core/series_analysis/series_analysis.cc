@@ -453,7 +453,7 @@ static GrdFileType get_mtddf_file_type(const StringArray &file_list,
 
    // Read first valid file
    Met2dDataFile *mtddf = nullptr;
-   if(!(mtddf = mtddf_factory.new_met_2d_data_file(file_list[i].c_str(), type))) {
+   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(file_list[i].c_str(), type))) {
       mlog << Error << "\nTrouble reading data file: "
            << file_list[i] << "\n\n";
       exit(1);
@@ -741,7 +741,7 @@ static bool read_single_entry(VarInfo *info, const ConcatString &cur_file,
    }
 
    // Open the data file
-   Met2dDataFile * mtddf = mtddf_factory.new_met_2d_data_file(cur_file.c_str(), type);
+   auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(cur_file.c_str(), type);
 
    // Attempt to read the gridded data from the current file
    bool found = mtddf->data_plane(*info, dp);

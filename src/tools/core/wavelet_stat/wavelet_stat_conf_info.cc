@@ -137,7 +137,6 @@ void WaveletStatConfInfo::read_config(const char *default_file_name,
 void WaveletStatConfInfo::process_config(GrdFileType ftype,
                                          GrdFileType otype) {
    int i, j, n;
-   VarInfoFactory info_factory;
    map<STATLineType,STATOutputType>output_map;
    Dictionary *fcst_dict = (Dictionary *) nullptr;
    Dictionary *obs_dict  = (Dictionary *) nullptr;
@@ -210,8 +209,8 @@ void WaveletStatConfInfo::process_config(GrdFileType ftype,
    for(i=0; i<n_vx; i++) {
 
       // Allocate new VarInfo objects
-      fcst_info[i] = info_factory.new_var_info(ftype);
-      obs_info[i]  = info_factory.new_var_info(otype);
+      fcst_info[i] = VarInfoFactory::new_var_info(ftype);
+      obs_info[i]  = VarInfoFactory::new_var_info(otype);
 
       // Get the current dictionaries
       i_fdict = parse_conf_i_vx_dict(fcst_dict, i);

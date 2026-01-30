@@ -80,6 +80,7 @@
 //   047    10/14/24  Halley Gotway  MET #2279 Add point_weight_flag option.
 //   048    10/15/24  Halley Gotway  MET #2893 Write individual pair OBTYPE.
 //   049    09/11/25  Halley Gotway  MET #3174 Orographic corrections.
+//   050    01/27/26  Halley Gotway  MET #3298 Add the FULL grid, if needed
 //
 ////////////////////////////////////////////////////////////////////////
 

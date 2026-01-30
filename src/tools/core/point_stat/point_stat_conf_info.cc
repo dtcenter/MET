@@ -406,6 +406,10 @@ void PointStatConfInfo::process_masks(const Grid &grid) {
       // Initialize
       vx_opt[i].mask_name.clear();
 
+      // MET #3298 Add the FULL grid, if needed
+      check_full_grid_mask(vx_opt[i].mask_grid, &vx_opt[i].mask_poly,
+                           &vx_opt[i].mask_sid, &vx_opt[i].mask_llpnt);
+
       // Parse the masking grids
       for(int j=0; j<vx_opt[i].mask_grid.n(); j++) {
 
