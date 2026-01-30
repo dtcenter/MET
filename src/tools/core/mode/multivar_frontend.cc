@@ -169,7 +169,7 @@ int MultivarFrontEnd::run(const StringArray & Argv)
       // special case of just superobject statistics, no comparisons configured
 
       if (config.fcst_multivar_compare_index.n() <= 0) {
-         _process_superobjects(fcstSimple[fi], obsSimple[oi]);
+         _create_superobject_comparison(fcstSimple[fi], obsSimple[oi]);
       }
    }
    
@@ -600,18 +600,18 @@ void MultivarFrontEnd::_create_intensity_comparisons(
                           const string &fcst_filename,
                           const string &obs_filename)
 {
+   // this debug statement assumes fcsts and obs have same conv radius and thresh indices
+   // which is currently required
+   mlog << Debug(1) << "\n" << sep
+        << "\nRunning mvmode intensity comparisons conv_radius[" << fcsts._rIndex+1
+        << "] conv_thresh[" << fcsts._tIndex+1 << "]\n" << sep << "\n";
+
    MultiVarData *mvdf = fcsts._mvd[findex];
    MultiVarData *mvdo = obs._mvd[oindex];
    
    // mask the input data to be valid only inside the simple super objects
    fcsts._super.mask_data_simple("Fcst", *mvdf);
    obs._super.mask_data_simple("Obs", *mvdo);
-
-   // this debug statement assumes fcsts and obs have same conv radius and thresh indices
-   // which is currently required
-   mlog << Debug(1) << "\n" << sep
-        << "\nRunning mvmode intensity comparisons conv_radius[" << fcsts._rIndex+1
-        << "] conv_thresh[" << fcsts._tIndex+1 << "]\n" << sep << "\n";
 
    _init_exec(ModeExecutive::MULTIVAR_INTENSITY, fcst_filename, obs_filename);
    mode_exec->init_multivar_intensities(config);
@@ -673,7 +673,7 @@ void MultivarFrontEnd::_intensity_compare_mode_algorithm(
 
 ////////////////////////////////////////////////////////////////////////
 
-void MultivarFrontEnd::_process_superobjects(SimpleObjects &fcsts, SimpleObjects &obs)
+void MultivarFrontEnd::_create_superobject_comparison(SimpleObjects &fcsts, SimpleObjects &obs)
 {
    mlog << Debug(1) << "\n" << sep
         << "\nRunning mvmode superobject analysis conv_radius[" << fcsts._rIndex+1
@@ -681,9 +681,8 @@ void MultivarFrontEnd::_process_superobjects(SimpleObjects &fcsts, SimpleObjects
 
    const MultiVarData *mvdf = fcsts._mvd[0];
    const MultiVarData *mvdo = obs._mvd[0];
-   
-   // set the data to 0 inside superobjects and missing everywhere else
 
+   // set the data to 0 inside superobjects and missing everywhere else
    fcsts._super.mask_data_super("FcstSimple", *mvdf);
    obs._super.mask_data_super("ObsSimple", *mvdo);
 
@@ -694,7 +693,7 @@ void MultivarFrontEnd::_process_superobjects(SimpleObjects &fcsts, SimpleObjects
    if ((fcsts._super._hasUnion || obs._super._hasUnion) &&
        (conf.Fcst->merge_flag == MergeType::Thresh ||
         conf.Obs->merge_flag == MergeType::Thresh)) {
-      mlog << Warning << "\nModeFrontEnd::_process_superobjects() -> "
+      mlog << Warning << "\nModeFrontEnd::_create_superobject_comparison() -> "
            << "Logic includes union '||' along with 'merge_flag=THRESH' "
            << ". This can lead to bad results\n\n";
    }

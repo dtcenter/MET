@@ -69,7 +69,7 @@ private:
                                           const MultiVarData &mvdf, const MultiVarData &mvdo,
                                           const ModeSuperObject &fsuper, const ModeSuperObject &osuper);
 
-   void _process_superobjects(SimpleObjects &fcsts, SimpleObjects &obs);
+   void _create_superobject_comparison(SimpleObjects &fcsts, SimpleObjects &obs);
    void _superobject_mode_algorithm(int rIndexF, int tIndexF, int rIndexO, int tIndexO,
                                     const ModeSuperObject &fsuper, const ModeSuperObject &osuper);
 
