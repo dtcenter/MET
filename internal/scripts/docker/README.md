@@ -20,9 +20,8 @@ image for the base compilation environment for MET from the
 [dtcenter/met-base](https://hub.docker.com/repository/docker/dtcenter/met-base)
 DockerHub repository. It uses `Dockerfile`, which checks out MET from GitHub,
 compiles the specified branch or tag from source, sets a working directory,
-downloads and installs GhostScript fonts, and deletes the MET source code for
-tagged releases matching "v"*.  Tagged versions of the MET Docker image are
-available in the
+and deletes the MET source code for tagged releases matching "v"*.
+Tagged versions of the MET Docker image are available in the
 [dtcenter/met](https://hub.docker.com/repository/docker/dtcenter/met-base)
 DockerHub repository.  
 ```
@@ -43,8 +42,7 @@ GitHub repository. (See the
 file for more information on manually creating the Docker image for the base
 compilation environment.) This example uses `Dockerfile.copy`, which compiles
 MET using the specified branch or tag from local source code, sets a working
-directory, downloads and installs GhostScript fonts, and deletes the MET
-source code for tagged releases matching "v"*. 
+directory, and deletes the MET source for tagged releases matching "v"*.
 ```
 docker build -t dtcenter/met:${TAG_NAME} --build-arg SOURCE_BRANCH=${BRANCH_NAME} -f internal/scripts/docker/Dockerfile.copy .
 docker push dtcenter/met:${TAG_NAME}
