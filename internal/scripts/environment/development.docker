@@ -20,7 +20,6 @@ export LDFLAGS="${LDFLAGS} -Wl,-rpath,/usr/local/lib:/usr/lib64"
 
 # Variables required to run MET
 export MET_TEST_INPUT=${MET_PROJ_DIR}/MET_test_data/unit_test
-export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
 
 # Define Rscript to use a version with the ncdf4 package 1.17 or later 
 export MET_TEST_RSCRIPT=/usr/bin/Rscript
@@ -40,8 +39,6 @@ export COMPILE_ECKIT=1
 export COMPILE_ATLAS=1
 export COMPILE_HDF=1
 export COMPILE_HDFEOS=1
-export COMPILE_FREETYPE=1
-export COMPILE_CAIRO=1
 
 export SQLITE_INCLUDE_DIR=$(pkg-config --variable=includedir sqlite3)
 export SQLITE_LIB_DIR=$(pkg-config --variable=libdir sqlite3)

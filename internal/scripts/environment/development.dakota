@@ -16,10 +16,6 @@ export MET_BUFR=${MET_DST}
 export MET_GRIB2C=${MET_DST}
 export MET_GSLINC=/usr/include/gsl
 export MET_GSLLIB=/usr/lib
-export MET_CAIROINC=/usr/include/cairo
-export MET_CAIROLIB=/usr/lib
-export MET_FREETYPEINC=/usr/include/freetype2
-export MET_FREETYPELIB=/usr/lib
 
 # For Python 3 in met-9.0
 export MET_PYTHON="/var/autofs/mnt/linux-amd64/debian/stretch/local/met-python3"
@@ -37,7 +33,6 @@ export LDFLAGS="${LDFLAGS} -Wl,-rpath,${MET_HDFLIB}:${MET_HDF5}/lib:${MET_PYTHON
 
 # Variables required to run MET
 export MET_TEST_INPUT=${MET_PROJ_DIR}/MET_test_data/unit_test
-export MET_FONT_DIR=${MET_TEST_INPUT}/fonts
 
 # This is a cron script -- create the shell environment for this job
 export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:\

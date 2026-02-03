@@ -139,7 +139,7 @@ Overview of Steps for Performing Benchmarking
 
            .. code-block:: ini
 
-              ./configure --prefix=`pwd` --enable-grib2 --enable-modis --enable-mode_graphics --enable-lidar2nc --enable-python --enable-ugrid --enable-profiler
+              ./configure --prefix=`pwd` --enable-grib2 --enable-modis --enable-lidar2nc --enable-python --enable-ugrid --enable-profiler
 
                or
 
