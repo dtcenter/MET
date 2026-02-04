@@ -38,6 +38,7 @@ class SimpleObjects {
    int _tIndex;            /**< Convolution threshold index */
    std::vector<MultiVarData *> _mvd;  /**< The data from each input */
    ModeSuperObject _super;   /**< The superobject created from the data */
+
 };
 
 #endif   /*  __MODE_FRONT_END_H__  */
