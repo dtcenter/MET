@@ -104,7 +104,7 @@ time_command ./configure \
   GRIB2CLIB_NAME=${GRIB2CLIB_NAME} \
   --enable-all \
   MET_CXX_STANDARD=11 \
-  CPPFLAGS="-I/usr/local/include -I/usr/local/include/freetype2 -I/usr/local/include/cairo" \
+  CPPFLAGS="-I/usr/local/include" \
   LIBS="-ltirpc"
 
 # Run make clean

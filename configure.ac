@@ -391,77 +391,13 @@ if (test -n "$MET_HDFEOSLIB"); then
 fi
 
 #
-# Look for the Cairo library
-#
-
-# Configure the variables. The help text will appear if the user uses "configure --help".
-
-AC_ARG_VAR([MET_CAIRO], [Where cairo lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them. Cairo is only needed if you are building the mode_graphics utility.])
-AC_ARG_VAR([MET_CAIROINC], [Where cairo include files are located. Use if the libraries and include files are not under the same main cairo directory. If used, MET_CAIROLIB must also be defined and MET_CAIRO will be ignored.])
-AC_ARG_VAR([MET_CAIROLIB], [Where cairo libraries are located. Use if the libraries and include files are not under the same main cairo directory. If used, MET_CAIROINC must also be defined and MET_CAIRO will be ignored.])
-
-# Ensure that both or neither are specified.
-
-if (test -n "$MET_CAIROLIB" && test -z "$MET_CAIROINC"); then
-  AC_MSG_ERROR([MET_CAIROLIB environment variable set, but MET_CAIROINC not set. If one of these variables is set, then both must be set.])
-elif (test -n "$MET_CAIROINC" && test -z "$MET_CAIROLIB"); then
-  AC_MSG_ERROR([MET_CAIROINC environment variable set, but MET_CAIROLIB not set. If one of these variables is set, then both must be set.])
-fi
-
-# Use the main Cairo directory if individual locations were not specified.
-
-if (test -n "$MET_CAIRO" && test -z "$MET_CAIROLIB"); then
-  MET_CAIROINC='${MET_CAIRO}/include'
-  MET_CAIROLIB='${MET_CAIRO}/lib'
-fi
-
-# AC_SUBST command line variables.
-
-if (test -n "$MET_CAIROLIB"); then
-  CPPFLAGS="${CPPFLAGS} -I${MET_CAIROINC}"
-  LDFLAGS="${LDFLAGS} -L${MET_CAIROLIB}"
-fi
-
-#
-# Look for the Freetype library
-#
-
-# Configure the variables. The help text will appear if the user uses "configure --help".
-
-AC_ARG_VAR([MET_FREETYPE], [Where freetype lib and include subdirectories are located. If they are installed in /usr/local, you don't have to specify them. Freetype is only needed if you are building the mode_graphics utility.])
-AC_ARG_VAR([MET_FREETYPEINC], [Where freetype include files are located. Use if the libraries and include files are not under the same main freetype directory. If used, MET_FREETYPELIB must also be defined and MET_FREETYPE will be ignored.])
-AC_ARG_VAR([MET_FREETYPELIB], [Where freetype libraries are located. Use if the libraries and include files are not under the same main freetype directory. If used, MET_FREETYPEINC must also be defined and MET_FREETYPE will be ignored.])
-
-# Ensure that both or neither are specified.
-
-if (test -n "$MET_FREETYPELIB" && test -z "$MET_FREETYPEINC"); then
-  AC_MSG_ERROR([MET_FREETYPELIB environment variable set, but MET_FREETYPEINC not set. If one of these variables is set, then both must be set.])
-elif (test -n "$MET_FREETYPEINC" && test -z "$MET_FREETYPELIB"); then
-  AC_MSG_ERROR([MET_FREETYPEINC environment variable set, but MET_FREETYPELIB not set. If one of these variables is set, then both must be set.])
-fi
-
-# Use the main Freetype directory if individual locations were not specified.
-
-if (test -z "$MET_FREETYPELIB" && test -n "$MET_FREETYPE"); then
-  MET_FREETYPEINC='${MET_FREETYPE}/include'
-  MET_FREETYPELIB='${MET_FREETYPE}/lib'
-fi
-
-# AC_SUBST command line variables.
-
-if (test -n "$MET_FREETYPELIB"); then
-  CPPFLAGS="${CPPFLAGS} -I${MET_FREETYPEINC}"
-  LDFLAGS="${LDFLAGS} -L${MET_FREETYPELIB}"
-fi
-
-#
 # Process any enable flags specified by the user
 #
 
 # Enable all compilation options 
 
 AC_ARG_ENABLE(all,
-	      [AS_HELP_STRING([--enable-all], [Enable compilation options --enable-grib2 --enable-python --enable-ugrid --enable-lidar2nc --enable-modis --enable-mode_graphics, but not --enable-profiler])],
+	      [AS_HELP_STRING([--enable-all], [Enable compilation options --enable-grib2 --enable-python --enable-ugrid --enable-lidar2nc --enable-modis, but not --enable-profiler])],
   [case "${enableval}" in
      yes | no ) ENABLE_ALL="${enableval}" ;;
      *) AC_MSG_ERROR(bad value ${enableval} for --enable-all) ;;
@@ -1018,26 +954,6 @@ else
   AC_MSG_NOTICE([modis will not be compiled])
 fi
 
-# mode_graphics
-
-AC_ARG_ENABLE(mode_graphics,
-	  [AS_HELP_STRING([--enable-mode_graphics], [Enable compilation of mode_graphics])],
-  [case "${enableval}" in
-     yes | no ) ENABLE_MODE_GRAPHICS="${enableval}" ;;
-     *) AC_MSG_ERROR(bad value ${enableval} for --enable-mode_graphics) ;;
-   esac],
-  [ENABLE_MODE_GRAPHICS="no"]
-)
-
-AM_CONDITIONAL([ENABLE_MODE_GRAPHICS], [test "x$ENABLE_MODE_GRAPHICS" = "xyes" || test "x$ENABLE_ALL" = "xyes"])
-
-if test "x$ENABLE_MODE_GRAPHICS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
-  AC_DEFINE([ENABLE_MODE_GRAPHICS], [], ["build mode_graphics"])
-  AC_MSG_NOTICE([mode_graphics will be compiled])
-else
-  AC_MSG_NOTICE([mode_graphics will not be compiled])
-fi
-
 # mode_time_domain
 
 AC_ARG_ENABLE(mode_time_domain,
@@ -1320,19 +1236,6 @@ AC_CHECK_FUNCS([dup2 floor gethostname memset mkdir pow regcomp select setenv sq
 #          ])
 #fi
 
-#if test "x$ENABLE_MODE_GRAPHICS" = "xyes"; then
-#  AC_CHECK_LIB(cairo, hdf_close, [], [
-#          echo "Error! Couldn't find the Cairo library."
-#          echo "Check your MET_CAIRO environment variable settings and try again."
-#          exit -1
-#          ])
-#  AC_CHECK_LIB(freetype, hdf_close, [], [
-#          echo "Error! Couldn't find the FreeType library."
-#          echo "Check your MET_FREETYPE environment variable settings and try again."
-#          exit -1
-#          ])
-#fi
-
 # Create configured files
 
 AC_CONFIG_FILES([Makefile
@@ -1432,7 +1335,6 @@ AC_CONFIG_FILES([Makefile
                  src/tools/other/gis_utils/Makefile
                  src/tools/other/ioda2nc/Makefile
                  src/tools/other/madis2nc/Makefile
-                 src/tools/other/mode_graphics/Makefile
                  src/tools/other/modis_regrid/Makefile
                  src/tools/other/pb2nc/Makefile
                  src/tools/other/plot_data_plane/Makefile

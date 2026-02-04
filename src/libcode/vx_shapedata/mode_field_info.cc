@@ -197,8 +197,6 @@ void Mode_Field_Info::set (const bool _multivar, int _index, Dictionary * _dict,
 
 {
 
-VarInfoFactory info_factory;
-
 if ( do_clear )  clear();
 
 Multivar = _multivar;
@@ -209,7 +207,7 @@ dict = _dict;
 
 conf = _conf;
 
-var_info = info_factory.new_var_info(type);
+var_info = VarInfoFactory::new_var_info(type);
 
 if ( _multivar )  {
 

@@ -62,10 +62,6 @@ if ENABLE_MODIS
   SUBDIRS += modis_regrid
 endif
 
-if ENABLE_MODE_GRAPHICS
-  SUBDIRS += mode_graphics
-endif
-
 if ENABLE_MODE_TIME_DOMAIN
   SUBDIRS += mode_time_domain
 endif

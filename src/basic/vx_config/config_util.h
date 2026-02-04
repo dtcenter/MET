@@ -60,6 +60,7 @@ extern MaskSID         parse_sid_mask(const ConcatString &);
 extern StringArray     parse_sid_mask_as_list(const ConcatString &);
 extern std::vector<MaskLatLon>
                        parse_conf_llpnt_mask(Dictionary *dict);
+extern SingleThresh    parse_conf_quality_mark_thresh(Dictionary *dict);
 extern StringArray     parse_conf_obs_qty_inc(Dictionary *dict);
 extern StringArray     parse_conf_obs_qty_exc(Dictionary *dict);
 extern NumArray        parse_conf_ci_alpha(Dictionary *dict);
@@ -142,6 +143,9 @@ extern void            parse_add_conf_ugrid_metadata_map(
 extern SurfaceInfo     parse_conf_surface_info(Dictionary *dict);
 extern void            parse_conf_topo_mask_interp(Dictionary *dict, SurfaceInfo &);
 
+extern void         check_full_grid_mask(StringArray &, const StringArray *,
+                                         const StringArray *,
+                                         const std::vector<MaskLatLon> *);
 extern void         check_mask_names(const StringArray &);
 
 extern void         check_climo_n_vx(Dictionary *dict, const int);

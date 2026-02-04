@@ -128,7 +128,6 @@ static Grid grid;
 static int n_reads = 1; // Initialize to at least one pass
 
 // Data file factory and input files
-static Met2dDataFileFactory mtddf_factory;
 static MetNcMetDataFile aggr_nc;
 
 // Pointer to the random number generator to be used

@@ -467,8 +467,7 @@ void MultivarFrontEnd::_read_input(
                           ModeDataType type, GrdFileType f_t,
                           GrdFileType other_t, int shift)
 {
-   Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *f = mtddf_factory.new_met_2d_data_file(name.c_str(), f_t);
+   auto f = Met2dDataFileFactory::new_met_2d_data_file(name.c_str(), f_t);
    if (!f) {
       mlog << Error << "\nMultivarFrontEnd::_read_input() -> "
            << "Trouble reading fcst file \"" << name << "\"\n\n";

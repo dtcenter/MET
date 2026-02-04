@@ -26,7 +26,7 @@ echo "Configuring MET ${MET_GIT_NAME} and appending to log file ${LOG_FILE}"
 ./configure \
   BUFRLIB_NAME=${BUFRLIB_NAME} GRIB2CLIB_NAME=${GRIB2CLIB_NAME} \
   ${MET_CONFIG_OPTS} \
-  CPPFLAGS="-I/usr/local/include -I/usr/local/include/freetype2 -I/usr/local/include/cairo" \
+  CPPFLAGS="-I/usr/local/include" \
   LIBS="-ltirpc" >> ${LOG_FILE} 2>&1
 if [ $? != 0 ]; then
   cat ${LOG_FILE}

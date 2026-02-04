@@ -79,7 +79,6 @@ MET_INSTALL_DIR=`pwd`
 echo "Running configure to create the Makefiles"
 ./configure --prefix=$MET_INSTALL_DIR \
             --enable-grib2 \
-            --enable-mode_graphics \
             --enable-modis \
             --enable-lidar2nc \
             --enable-python  > /dev/null

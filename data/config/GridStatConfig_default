@@ -122,7 +122,7 @@ climo_cdf = {
 // May be set separately in each "obs.field" entry
 //
 mask = {
-   grid = [ "FULL" ];
+   grid = [];
    poly = [];
 }
 
