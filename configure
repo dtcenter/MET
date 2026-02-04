@@ -701,8 +701,6 @@ ENABLE_TC_UTILS_FALSE
 ENABLE_TC_UTILS_TRUE
 ENABLE_MODE_TIME_DOMAIN_FALSE
 ENABLE_MODE_TIME_DOMAIN_TRUE
-ENABLE_MODE_GRAPHICS_FALSE
-ENABLE_MODE_GRAPHICS_TRUE
 ENABLE_MODIS_FALSE
 ENABLE_MODIS_TRUE
 ENABLE_WWMCA_FALSE
@@ -759,12 +757,6 @@ ENABLE_BLOCK4_FALSE
 ENABLE_BLOCK4_TRUE
 ENABLE_ALL_FALSE
 ENABLE_ALL_TRUE
-MET_FREETYPELIB
-MET_FREETYPEINC
-MET_FREETYPE
-MET_CAIROLIB
-MET_CAIROINC
-MET_CAIRO
 MET_HDFEOSLIB
 MET_HDFEOSINC
 MET_HDFEOS
@@ -923,7 +915,6 @@ enable_wavelet_stat
 enable_series_analysis
 enable_wwmca
 enable_modis
-enable_mode_graphics
 enable_mode_time_domain
 enable_tc_utils
 enable_gsi_tools
@@ -975,12 +966,6 @@ MET_HDFLIB
 MET_HDFEOS
 MET_HDFEOSINC
 MET_HDFEOSLIB
-MET_CAIRO
-MET_CAIROINC
-MET_CAIROLIB
-MET_FREETYPE
-MET_FREETYPEINC
-MET_FREETYPELIB
 YACC
 YFLAGS
 CXX
@@ -1624,8 +1609,7 @@ Optional Features:
                           speeds up one-time build
   --enable-all            Enable compilation options --enable-grib2
                           --enable-python --enable-ugrid --enable-lidar2nc
-                          --enable-modis --enable-mode_graphics, but not
-                          --enable-profiler
+                          --enable-modis, but not --enable-profiler
   --disable-block4        Disable use of BLOCK4 in the compilation. Use this
                           if you have trouble using PrepBufr files.
   --enable-static_linking Enable static linking of the applications
@@ -1659,7 +1643,6 @@ Optional Features:
                           Disable compilation of series_analysis
   --disable-wwmca         Disable compilation of wwmca
   --enable-modis          Enable compilation of modis
-  --enable-mode_graphics  Enable compilation of mode_graphics
   --disable-mode_time_domain
                           Disable compilation of mode_time_domain
   --disable-tc_utils      Disable compilation of tc_utils
@@ -1807,35 +1790,6 @@ Some influential environment variables:
               libraries and include files are not under the same main hdfeos
               directory. If used, MET_HDFEOSINC must also be defined and
               MET_HDFEOS will be ignored.
-  MET_CAIRO   Where cairo lib and include subdirectories are located. If they
-              are installed in /usr/local, you don't have to specify them.
-              Cairo is only needed if you are building the mode_graphics
-              utility.
-  MET_CAIROINC
-              Where cairo include files are located. Use if the libraries and
-              include files are not under the same main cairo directory. If
-              used, MET_CAIROLIB must also be defined and MET_CAIRO will be
-              ignored.
-  MET_CAIROLIB
-              Where cairo libraries are located. Use if the libraries and
-              include files are not under the same main cairo directory. If
-              used, MET_CAIROINC must also be defined and MET_CAIRO will be
-              ignored.
-  MET_FREETYPE
-              Where freetype lib and include subdirectories are located. If
-              they are installed in /usr/local, you don't have to specify
-              them. Freetype is only needed if you are building the
-              mode_graphics utility.
-  MET_FREETYPEINC
-              Where freetype include files are located. Use if the libraries
-              and include files are not under the same main freetype
-              directory. If used, MET_FREETYPELIB must also be defined and
-              MET_FREETYPE will be ignored.
-  MET_FREETYPELIB
-              Where freetype libraries are located. Use if the libraries and
-              include files are not under the same main freetype directory. If
-              used, MET_FREETYPEINC must also be defined and MET_FREETYPE will
-              be ignored.
   YACC        The `Yet Another Compiler Compiler' implementation to use.
               Defaults to the first program found out of: `bison -y', `byacc',
               `yacc'.
@@ -5717,70 +5671,6 @@ if (test -n "$MET_HDFEOSLIB"); then
 fi
 
 #
-# Look for the Cairo library
-#
-
-# Configure the variables. The help text will appear if the user uses "configure --help".
-
-
-
-
-
-# Ensure that both or neither are specified.
-
-if (test -n "$MET_CAIROLIB" && test -z "$MET_CAIROINC"); then
-  as_fn_error $? "MET_CAIROLIB environment variable set, but MET_CAIROINC not set. If one of these variables is set, then both must be set." "$LINENO" 5
-elif (test -n "$MET_CAIROINC" && test -z "$MET_CAIROLIB"); then
-  as_fn_error $? "MET_CAIROINC environment variable set, but MET_CAIROLIB not set. If one of these variables is set, then both must be set." "$LINENO" 5
-fi
-
-# Use the main Cairo directory if individual locations were not specified.
-
-if (test -n "$MET_CAIRO" && test -z "$MET_CAIROLIB"); then
-  MET_CAIROINC='${MET_CAIRO}/include'
-  MET_CAIROLIB='${MET_CAIRO}/lib'
-fi
-
-# AC_SUBST command line variables.
-
-if (test -n "$MET_CAIROLIB"); then
-  CPPFLAGS="${CPPFLAGS} -I${MET_CAIROINC}"
-  LDFLAGS="${LDFLAGS} -L${MET_CAIROLIB}"
-fi
-
-#
-# Look for the Freetype library
-#
-
-# Configure the variables. The help text will appear if the user uses "configure --help".
-
-
-
-
-
-# Ensure that both or neither are specified.
-
-if (test -n "$MET_FREETYPELIB" && test -z "$MET_FREETYPEINC"); then
-  as_fn_error $? "MET_FREETYPELIB environment variable set, but MET_FREETYPEINC not set. If one of these variables is set, then both must be set." "$LINENO" 5
-elif (test -n "$MET_FREETYPEINC" && test -z "$MET_FREETYPELIB"); then
-  as_fn_error $? "MET_FREETYPEINC environment variable set, but MET_FREETYPELIB not set. If one of these variables is set, then both must be set." "$LINENO" 5
-fi
-
-# Use the main Freetype directory if individual locations were not specified.
-
-if (test -z "$MET_FREETYPELIB" && test -n "$MET_FREETYPE"); then
-  MET_FREETYPEINC='${MET_FREETYPE}/include'
-  MET_FREETYPELIB='${MET_FREETYPE}/lib'
-fi
-
-# AC_SUBST command line variables.
-
-if (test -n "$MET_FREETYPELIB"); then
-  CPPFLAGS="${CPPFLAGS} -I${MET_FREETYPEINC}"
-  LDFLAGS="${LDFLAGS} -L${MET_FREETYPELIB}"
-fi
-
-#
 # Process any enable flags specified by the user
 #
 
@@ -6755,41 +6645,6 @@ printf "%s\n" "$as_me: modis will be compiled" >&6;}
 else
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: modis will not be compiled" >&5
 printf "%s\n" "$as_me: modis will not be compiled" >&6;}
-fi
-
-# mode_graphics
-
-# Check whether --enable-mode_graphics was given.
-if test ${enable_mode_graphics+y}
-then :
-  enableval=$enable_mode_graphics; case "${enableval}" in
-     yes | no ) ENABLE_MODE_GRAPHICS="${enableval}" ;;
-     *) as_fn_error $? "bad value ${enableval} for --enable-mode_graphics" "$LINENO" 5 ;;
-   esac
-else $as_nop
-  ENABLE_MODE_GRAPHICS="no"
-
-fi
-
-
- if test "x$ENABLE_MODE_GRAPHICS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
-  ENABLE_MODE_GRAPHICS_TRUE=
-  ENABLE_MODE_GRAPHICS_FALSE='#'
-else
-  ENABLE_MODE_GRAPHICS_TRUE='#'
-  ENABLE_MODE_GRAPHICS_FALSE=
-fi
-
-
-if test "x$ENABLE_MODE_GRAPHICS" = "xyes" || test "x$ENABLE_ALL" = "xyes"; then
-
-printf "%s\n" "#define ENABLE_MODE_GRAPHICS /**/" >>confdefs.h
-
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: mode_graphics will be compiled" >&5
-printf "%s\n" "$as_me: mode_graphics will be compiled" >&6;}
-else
-  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: mode_graphics will not be compiled" >&5
-printf "%s\n" "$as_me: mode_graphics will not be compiled" >&6;}
 fi
 
 # mode_time_domain
@@ -10223,22 +10078,9 @@ fi
 #          ])
 #fi
 
-#if test "x$ENABLE_MODE_GRAPHICS" = "xyes"; then
-#  AC_CHECK_LIB(cairo, hdf_close, [], [
-#          echo "Error! Couldn't find the Cairo library."
-#          echo "Check your MET_CAIRO environment variable settings and try again."
-#          exit -1
-#          ])
-#  AC_CHECK_LIB(freetype, hdf_close, [], [
-#          echo "Error! Couldn't find the FreeType library."
-#          echo "Check your MET_FREETYPE environment variable settings and try again."
-#          exit -1
-#          ])
-#fi
-
 # Create configured files
 
-ac_config_files="$ac_config_files Makefile scripts/Rscripts/Makefile scripts/Rscripts/include/Makefile scripts/python/Makefile scripts/python/examples/Makefile scripts/python/met/Makefile scripts/python/pyembed/Makefile scripts/python/utility/Makefile scripts/python/tc_diag/Makefile scripts/python/tc_diag/atcf_tools/Makefile scripts/python/tc_diag/config/Makefile scripts/python/tc_diag/diag_lib/Makefile scripts/python/tc_diag/tc_diag_driver/Makefile data/Makefile data/climo/Makefile data/climo/seeps/Makefile data/colortables/Makefile data/colortables/NCL_colortables/Makefile data/config/Makefile data/map/Makefile data/map/admin_by_country/Makefile data/poly/Makefile data/poly/HMT_masks/Makefile data/poly/NCEP_masks/Makefile data/ps/Makefile data/table_files/Makefile data/tc_data/Makefile src/Makefile src/basic/Makefile src/basic/enum_to_string/Makefile src/basic/vx_cal/Makefile src/basic/vx_config/Makefile src/basic/vx_log/Makefile src/basic/vx_math/Makefile src/basic/vx_util/Makefile src/basic/vx_util_math/Makefile src/libcode/Makefile src/libcode/vx_afm/Makefile src/libcode/vx_analysis_util/Makefile src/libcode/vx_color/Makefile src/libcode/vx_data2d/Makefile src/libcode/vx_data2d_factory/Makefile src/libcode/vx_data2d_grib/Makefile src/libcode/vx_data2d_grib2/Makefile src/libcode/vx_data2d_nc_met/Makefile src/libcode/vx_data2d_nc_wrf/Makefile src/libcode/vx_data2d_nc_cf/Makefile src/libcode/vx_data2d_ugrid/Makefile src/libcode/vx_geodesy/Makefile src/libcode/vx_gis/Makefile src/libcode/vx_gnomon/Makefile src/libcode/vx_grid/Makefile src/libcode/vx_gsl_prob/Makefile src/libcode/vx_nav/Makefile src/libcode/vx_solar/Makefile src/libcode/vx_nc_obs/Makefile src/libcode/vx_nc_util/Makefile src/libcode/vx_pb_util/Makefile src/libcode/vx_plot_util/Makefile src/libcode/vx_ps/Makefile src/libcode/vx_pxm/Makefile src/libcode/vx_render/Makefile src/libcode/vx_shapedata/Makefile src/libcode/vx_stat_out/Makefile src/libcode/vx_statistics/Makefile src/libcode/vx_time_series/Makefile src/libcode/vx_physics/Makefile src/libcode/vx_series_data/Makefile src/libcode/vx_regrid/Makefile src/libcode/vx_tc_util/Makefile src/libcode/vx_summary/Makefile src/libcode/vx_python3_utils/Makefile src/libcode/vx_data2d_python/Makefile src/libcode/vx_bool_calc/Makefile src/libcode/vx_pointdata_python/Makefile src/libcode/vx_seeps/Makefile src/libcode/vx_ioda/Makefile src/tools/Makefile src/tools/core/Makefile src/tools/core/ensemble_stat/Makefile src/tools/core/grid_stat/Makefile src/tools/core/mode/Makefile src/tools/core/mode_analysis/Makefile src/tools/core/pcp_combine/Makefile src/tools/core/point_stat/Makefile src/tools/core/pair_stat/Makefile src/tools/core/series_analysis/Makefile src/tools/core/stat_analysis/Makefile src/tools/core/wavelet_stat/Makefile src/tools/other/Makefile src/tools/other/ascii2nc/Makefile src/tools/other/lidar2nc/Makefile src/tools/other/gen_ens_prod/Makefile src/tools/other/gen_vx_mask/Makefile src/tools/other/gis_utils/Makefile src/tools/other/ioda2nc/Makefile src/tools/other/madis2nc/Makefile src/tools/other/mode_graphics/Makefile src/tools/other/modis_regrid/Makefile src/tools/other/pb2nc/Makefile src/tools/other/plot_data_plane/Makefile src/tools/other/plot_point_obs/Makefile src/tools/other/wwmca_tool/Makefile src/tools/other/gsi_tools/Makefile src/tools/other/regrid_data_plane/Makefile src/tools/other/point2grid/Makefile src/tools/other/shift_data_plane/Makefile src/tools/other/mode_time_domain/Makefile src/tools/other/grid_diag/Makefile src/tools/tc_utils/Makefile src/tools/tc_utils/tc_dland/Makefile src/tools/tc_utils/tc_pairs/Makefile src/tools/tc_utils/tc_stat/Makefile src/tools/tc_utils/tc_gen/Makefile src/tools/tc_utils/rmw_analysis/Makefile src/tools/tc_utils/tc_rmw/Makefile src/tools/tc_utils/tc_diag/Makefile"
+ac_config_files="$ac_config_files Makefile scripts/Rscripts/Makefile scripts/Rscripts/include/Makefile scripts/python/Makefile scripts/python/examples/Makefile scripts/python/met/Makefile scripts/python/pyembed/Makefile scripts/python/utility/Makefile scripts/python/tc_diag/Makefile scripts/python/tc_diag/atcf_tools/Makefile scripts/python/tc_diag/config/Makefile scripts/python/tc_diag/diag_lib/Makefile scripts/python/tc_diag/tc_diag_driver/Makefile data/Makefile data/climo/Makefile data/climo/seeps/Makefile data/colortables/Makefile data/colortables/NCL_colortables/Makefile data/config/Makefile data/map/Makefile data/map/admin_by_country/Makefile data/poly/Makefile data/poly/HMT_masks/Makefile data/poly/NCEP_masks/Makefile data/ps/Makefile data/table_files/Makefile data/tc_data/Makefile src/Makefile src/basic/Makefile src/basic/enum_to_string/Makefile src/basic/vx_cal/Makefile src/basic/vx_config/Makefile src/basic/vx_log/Makefile src/basic/vx_math/Makefile src/basic/vx_util/Makefile src/basic/vx_util_math/Makefile src/libcode/Makefile src/libcode/vx_afm/Makefile src/libcode/vx_analysis_util/Makefile src/libcode/vx_color/Makefile src/libcode/vx_data2d/Makefile src/libcode/vx_data2d_factory/Makefile src/libcode/vx_data2d_grib/Makefile src/libcode/vx_data2d_grib2/Makefile src/libcode/vx_data2d_nc_met/Makefile src/libcode/vx_data2d_nc_wrf/Makefile src/libcode/vx_data2d_nc_cf/Makefile src/libcode/vx_data2d_ugrid/Makefile src/libcode/vx_geodesy/Makefile src/libcode/vx_gis/Makefile src/libcode/vx_gnomon/Makefile src/libcode/vx_grid/Makefile src/libcode/vx_gsl_prob/Makefile src/libcode/vx_nav/Makefile src/libcode/vx_solar/Makefile src/libcode/vx_nc_obs/Makefile src/libcode/vx_nc_util/Makefile src/libcode/vx_pb_util/Makefile src/libcode/vx_plot_util/Makefile src/libcode/vx_ps/Makefile src/libcode/vx_pxm/Makefile src/libcode/vx_render/Makefile src/libcode/vx_shapedata/Makefile src/libcode/vx_stat_out/Makefile src/libcode/vx_statistics/Makefile src/libcode/vx_time_series/Makefile src/libcode/vx_physics/Makefile src/libcode/vx_series_data/Makefile src/libcode/vx_regrid/Makefile src/libcode/vx_tc_util/Makefile src/libcode/vx_summary/Makefile src/libcode/vx_python3_utils/Makefile src/libcode/vx_data2d_python/Makefile src/libcode/vx_bool_calc/Makefile src/libcode/vx_pointdata_python/Makefile src/libcode/vx_seeps/Makefile src/libcode/vx_ioda/Makefile src/tools/Makefile src/tools/core/Makefile src/tools/core/ensemble_stat/Makefile src/tools/core/grid_stat/Makefile src/tools/core/mode/Makefile src/tools/core/mode_analysis/Makefile src/tools/core/pcp_combine/Makefile src/tools/core/point_stat/Makefile src/tools/core/pair_stat/Makefile src/tools/core/series_analysis/Makefile src/tools/core/stat_analysis/Makefile src/tools/core/wavelet_stat/Makefile src/tools/other/Makefile src/tools/other/ascii2nc/Makefile src/tools/other/lidar2nc/Makefile src/tools/other/gen_ens_prod/Makefile src/tools/other/gen_vx_mask/Makefile src/tools/other/gis_utils/Makefile src/tools/other/ioda2nc/Makefile src/tools/other/madis2nc/Makefile src/tools/other/modis_regrid/Makefile src/tools/other/pb2nc/Makefile src/tools/other/plot_data_plane/Makefile src/tools/other/plot_point_obs/Makefile src/tools/other/wwmca_tool/Makefile src/tools/other/gsi_tools/Makefile src/tools/other/regrid_data_plane/Makefile src/tools/other/point2grid/Makefile src/tools/other/shift_data_plane/Makefile src/tools/other/mode_time_domain/Makefile src/tools/other/grid_diag/Makefile src/tools/tc_utils/Makefile src/tools/tc_utils/tc_dland/Makefile src/tools/tc_utils/tc_pairs/Makefile src/tools/tc_utils/tc_stat/Makefile src/tools/tc_utils/tc_gen/Makefile src/tools/tc_utils/rmw_analysis/Makefile src/tools/tc_utils/tc_rmw/Makefile src/tools/tc_utils/tc_diag/Makefile"
 
 
 if test -n "$MET_DEVELOPMENT"; then
@@ -10493,10 +10335,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_MODIS_TRUE}" && test -z "${ENABLE_MODIS_FALSE}"; then
   as_fn_error $? "conditional \"ENABLE_MODIS\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${ENABLE_MODE_GRAPHICS_TRUE}" && test -z "${ENABLE_MODE_GRAPHICS_FALSE}"; then
-  as_fn_error $? "conditional \"ENABLE_MODE_GRAPHICS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ENABLE_MODE_TIME_DOMAIN_TRUE}" && test -z "${ENABLE_MODE_TIME_DOMAIN_FALSE}"; then
@@ -11230,7 +11068,6 @@ do
     "src/tools/other/gis_utils/Makefile") CONFIG_FILES="$CONFIG_FILES src/tools/other/gis_utils/Makefile" ;;
     "src/tools/other/ioda2nc/Makefile") CONFIG_FILES="$CONFIG_FILES src/tools/other/ioda2nc/Makefile" ;;
     "src/tools/other/madis2nc/Makefile") CONFIG_FILES="$CONFIG_FILES src/tools/other/madis2nc/Makefile" ;;
-    "src/tools/other/mode_graphics/Makefile") CONFIG_FILES="$CONFIG_FILES src/tools/other/mode_graphics/Makefile" ;;
     "src/tools/other/modis_regrid/Makefile") CONFIG_FILES="$CONFIG_FILES src/tools/other/modis_regrid/Makefile" ;;
     "src/tools/other/pb2nc/Makefile") CONFIG_FILES="$CONFIG_FILES src/tools/other/pb2nc/Makefile" ;;
     "src/tools/other/plot_data_plane/Makefile") CONFIG_FILES="$CONFIG_FILES src/tools/other/plot_data_plane/Makefile" ;;

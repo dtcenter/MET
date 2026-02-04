@@ -21,10 +21,11 @@
   <test name="ioda2nc_mask_sid_list">
     <exec>&MET_BIN;/ioda2nc</exec>
     <env>
-      <pair><name>STATION_ID</name>   <value>"KEKA"</value></pair>
-      <pair><name>MASK_GRID</name>    <value></value></pair>
-      <pair><name>MASK_POLY</name>    <value></value></pair>
-      <pair><name>MESSAGE_TYPE</name> <value></value></pair>
+      <pair><name>STATION_ID</name>          <value>"KEKA"</value></pair>
+      <pair><name>MASK_GRID</name>           <value></value></pair>
+      <pair><name>MASK_POLY</name>           <value></value></pair>
+      <pair><name>MESSAGE_TYPE</name>        <value></value></pair>
+      <pair><name>QUALITY_MARK_THRESH</name> <value>NA</value></pair>
     </env>
     <param> \
       &DATA_DIR_OBS;/ioda/ioda.NC001007.2020031012.nc \
@@ -65,10 +66,11 @@
   <test name="ioda2nc_same_input">
     <exec>&MET_BIN;/ioda2nc</exec>
     <env>
-      <pair><name>STATION_ID</name>   <value>"KEKA"</value></pair>
-      <pair><name>MASK_GRID</name>    <value></value></pair>
-      <pair><name>MASK_POLY</name>    <value></value></pair>
-      <pair><name>MESSAGE_TYPE</name> <value></value></pair>
+      <pair><name>STATION_ID</name>          <value>"KEKA"</value></pair>
+      <pair><name>MASK_GRID</name>           <value></value></pair>
+      <pair><name>MASK_POLY</name>           <value></value></pair>
+      <pair><name>MESSAGE_TYPE</name>        <value></value></pair>
+      <pair><name>QUALITY_MARK_THRESH</name> <value>NA</value></pair>
     </env>
     <param> \
       &DATA_DIR_OBS;/ioda/ioda.NC001007.2020031012.nc \
@@ -85,10 +87,11 @@
   <test name="ioda2nc_int_datetime">
     <exec>&MET_BIN;/ioda2nc</exec>
     <env>
-      <pair><name>STATION_ID</name>   <value></value></pair>
-      <pair><name>MASK_GRID</name>    <value></value></pair>
-      <pair><name>MASK_POLY</name>    <value></value></pair>
-      <pair><name>MESSAGE_TYPE</name> <value></value></pair>
+      <pair><name>STATION_ID</name>          <value></value></pair>
+      <pair><name>MASK_GRID</name>           <value></value></pair>
+      <pair><name>MASK_POLY</name>           <value></value></pair>
+      <pair><name>MESSAGE_TYPE</name>        <value></value></pair>
+      <pair><name>QUALITY_MARK_THRESH</name> <value>le64</value></pair>
     </env>
     <param> \
       &DATA_DIR_OBS;/ioda/jopa_satwind_20210701T1200Z_out_0000_reduced.nc4 \
@@ -104,10 +107,11 @@
   <test name="ioda2nc_v2_string_sid">
     <exec>&MET_BIN;/ioda2nc</exec>
     <env>
-      <pair><name>STATION_ID</name>   <value></value></pair>
-      <pair><name>MASK_GRID</name>    <value></value></pair>
-      <pair><name>MASK_POLY</name>    <value></value></pair>
-      <pair><name>MESSAGE_TYPE</name> <value></value></pair>
+      <pair><name>STATION_ID</name>          <value></value></pair>
+      <pair><name>MASK_GRID</name>           <value></value></pair>
+      <pair><name>MASK_POLY</name>           <value></value></pair>
+      <pair><name>MESSAGE_TYPE</name>        <value></value></pair>
+      <pair><name>QUALITY_MARK_THRESH</name> <value>NA</value></pair>
     </env>
     <param> \
       &DATA_DIR_OBS;/ioda/2021081612_sonde_small.nc \

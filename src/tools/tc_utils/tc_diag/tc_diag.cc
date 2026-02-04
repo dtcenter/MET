@@ -241,8 +241,7 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void get_file_type() {
-   Met2dDataFileFactory mtddf_factory;
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
+   Met2dDataFile *mtddf = nullptr;
    int i;
 
    // Build one long list of input data files
@@ -270,7 +269,7 @@ void get_file_type() {
    }
 
    // Read first valid file
-   if(!(mtddf = mtddf_factory.new_met_2d_data_file(
+   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(
                    file_list[i].c_str(), conf_file_type))) {
        mlog << Error << "\nget_file_type() -> "
             << "Trouble reading data file \""

@@ -31,14 +31,6 @@ void init_pdf(int n, vector<long long>& pdf) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void init_pdf(double min, double max, double delta,
-              vector<long long>& pdf) {
-   int n = (max - min) / delta;
-   pdf.insert(pdf.end(), n, 0);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void init_joint_pdf(int n_A, int n_B, vector<long long>& pdf) {
    pdf.insert(pdf.end(), n_A * n_B, 0);
 }

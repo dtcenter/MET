@@ -407,7 +407,9 @@ void apply_mask(const DataPlane &in, const MaskPlane &mask,
    if((in.nx() != mask.nx() || in.ny() != mask.ny()) &&
        in.nx() != 0         && in.ny() != 0) {
       mlog << Error << "\napply_mask() -> "
-           << "grid dimensions do not match\n\n";
+           << "grid dimensions do not match ("
+           << in.nx() << ", " << in.ny() << ") != ("
+           << mask.nx() << ", " << mask.ny() << ")!\n\n";
       exit(1);
    }
 
@@ -439,7 +441,9 @@ void apply_mask(DataPlane &in, const MaskPlane &mask) {
 
    if(in.nx() != mask.nx() || in.ny() != mask.ny()) {
       mlog << Error << "\napply_mask() -> "
-           << "grid dimensions do not match\n\n";
+           << "grid dimensions do not match ("
+           << in.nx() << ", " << in.ny() << ") != ("
+           << mask.nx() << ", " << mask.ny() << ")!\n\n";
       exit(1);
    }
 
@@ -470,7 +474,9 @@ void apply_mask(MaskPlane &in, const MaskPlane &mask) {
 
    if(in.nx() != mask.nx() || in.ny() != mask.ny() ) {
       mlog << Error << "\napply_mask() -> "
-           << "grid dimensions do not match\n\n";
+           << "grid dimensions do not match ("
+           << in.nx() << ", " << in.ny() << ") != ("
+           << mask.nx() << ", " << mask.ny() << ")!\n\n";
       exit(1);
    }
 
@@ -499,7 +505,9 @@ void mask_bad_data(DataPlane &dp, const DataPlane &mask_dp, double v) {
 
    if(dp.nx() != mask_dp.nx() || dp.ny() != mask_dp.ny()) {
       mlog << Error << "\nmask_bad_data() -> "
-           << "grid dimensions do not match\n\n";
+           << "grid dimensions do not match ("
+           << dp.nx() << ", " << dp.ny() << ") != ("
+           << mask_dp.nx() << ", " << mask_dp.ny() << ")!\n\n";
       exit(1);
    }
 
@@ -530,7 +538,9 @@ void mask_bad_data(MaskPlane &mp, const DataPlane &dp) {
 
    if(mp.nx() != dp.nx() || mp.ny() != dp.ny()) {
       mlog << Error << "\nmask_bad_data() -> "
-           << "grid dimensions do not match\n\n";
+           << "grid dimensions do not match ("
+           << mp.nx() << ", " << mp.ny() << ") != ("
+           << dp.nx() << ", " << dp.ny() << ")!\n\n";
       exit(1);
    }
 
@@ -558,7 +568,9 @@ DataPlane subtract(const DataPlane &dp1, const DataPlane &dp2) {
 
    if(dp1.nx() != dp2.nx() || dp1.ny() != dp2.ny()) {
       mlog << Error << "\nsubtract() -> "
-           << "grid dimensions do not match\n\n";
+           << "grid dimensions do not match ("
+           << dp1.nx() << ", " << dp1.ny() << ") != ("
+           << dp2.nx() << ", " << dp2.ny() << ")!\n\n";
       exit(1);
    }
 
@@ -592,7 +604,10 @@ DataPlane normal_cdf(const DataPlane &dp, const DataPlane &mn,
    if(dp.nx() != mn.nx() || dp.ny() != mn.ny() ||
       dp.nx() != sd.nx() || dp.ny() != sd.ny()) {
       mlog << Error << "\nnormal_cdf() -> "
-           << "grid dimensions do not match\n\n";
+           << "grid dimensions do not match ("
+           << dp.nx() << ", " << dp.ny() << ") != ("
+           << mn.nx() << ", " << mn.ny() << ") or ("
+           << sd.nx() << ", " << sd.ny() << ")!\n\n";
       exit(1);
    }
 
@@ -631,7 +646,9 @@ DataPlane normal_cdf_inv(const double area, const DataPlane &mn,
    // Check grid dimensions
    if(mn.nx() != sd.nx() || mn.ny() != sd.ny()) {
       mlog << Error << "\nnormal_cdf_inv() -> "
-           << "grid dimensions do not match\n\n";
+           << "grid dimensions do not match ("
+           << mn.nx() << ", " << mn.ny() << ") != ("
+           << sd.nx() << ", " << sd.ny() << ")!\n\n";
       exit(1);
    }
 

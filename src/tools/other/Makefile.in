@@ -98,13 +98,12 @@ host_triplet = @host@
 @ENABLE_PB2NC_TRUE@am__append_9 = pb2nc
 @ENABLE_WWMCA_TRUE@am__append_10 = wwmca_tool
 @ENABLE_MODIS_TRUE@am__append_11 = modis_regrid
-@ENABLE_MODE_GRAPHICS_TRUE@am__append_12 = mode_graphics
-@ENABLE_MODE_TIME_DOMAIN_TRUE@am__append_13 = mode_time_domain
-@ENABLE_GSI_TOOLS_TRUE@am__append_14 = gsi_tools
-@ENABLE_REGRID_DATA_PLANE_TRUE@am__append_15 = regrid_data_plane
-@ENABLE_POINT2GRID_TRUE@am__append_16 = point2grid
-@ENABLE_SHIFT_DATA_PLANE_TRUE@am__append_17 = shift_data_plane
-@ENABLE_IODA2NC_TRUE@am__append_18 = ioda2nc
+@ENABLE_MODE_TIME_DOMAIN_TRUE@am__append_12 = mode_time_domain
+@ENABLE_GSI_TOOLS_TRUE@am__append_13 = gsi_tools
+@ENABLE_REGRID_DATA_PLANE_TRUE@am__append_14 = regrid_data_plane
+@ENABLE_POINT2GRID_TRUE@am__append_15 = point2grid
+@ENABLE_SHIFT_DATA_PLANE_TRUE@am__append_16 = shift_data_plane
+@ENABLE_IODA2NC_TRUE@am__append_17 = ioda2nc
 subdir = src/tools/other
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -169,9 +168,8 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 DIST_SUBDIRS = gis_utils gen_ens_prod gen_vx_mask plot_data_plane \
 	plot_point_obs ascii2nc lidar2nc madis2nc pb2nc wwmca_tool \
-	modis_regrid mode_graphics mode_time_domain gsi_tools \
-	regrid_data_plane point2grid shift_data_plane ioda2nc \
-	grid_diag
+	modis_regrid mode_time_domain gsi_tools regrid_data_plane \
+	point2grid shift_data_plane ioda2nc grid_diag
 am__DIST_COMMON = $(srcdir)/Makefile.in
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 am__relativize = \
@@ -249,16 +247,10 @@ MET_ATLASINC = @MET_ATLASINC@
 MET_ATLASLIB = @MET_ATLASLIB@
 MET_BUFR = @MET_BUFR@
 MET_BUFRLIB = @MET_BUFRLIB@
-MET_CAIRO = @MET_CAIRO@
-MET_CAIROINC = @MET_CAIROINC@
-MET_CAIROLIB = @MET_CAIROLIB@
 MET_CXX_STANDARD = @MET_CXX_STANDARD@
 MET_ECKIT = @MET_ECKIT@
 MET_ECKITINC = @MET_ECKITINC@
 MET_ECKITLIB = @MET_ECKITLIB@
-MET_FREETYPE = @MET_FREETYPE@
-MET_FREETYPEINC = @MET_FREETYPEINC@
-MET_FREETYPELIB = @MET_FREETYPELIB@
 MET_GRIB2C = @MET_GRIB2C@
 MET_GRIB2CINC = @MET_GRIB2CINC@
 MET_GRIB2CLIB = @MET_GRIB2CLIB@
@@ -363,7 +355,7 @@ SUBDIRS = $(am__append_1) $(am__append_2) $(am__append_3) \
 	$(am__append_7) $(am__append_8) $(am__append_9) \
 	$(am__append_10) $(am__append_11) $(am__append_12) \
 	$(am__append_13) $(am__append_14) $(am__append_15) \
-	$(am__append_16) $(am__append_17) $(am__append_18) grid_diag
+	$(am__append_16) $(am__append_17) grid_diag
 MAINTAINERCLEANFILES = Makefile.in
 all: all-recursive
 

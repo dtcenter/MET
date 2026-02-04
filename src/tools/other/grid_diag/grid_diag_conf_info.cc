@@ -8,7 +8,6 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-
 #include <dirent.h>
 #include <iostream>
 #include <unistd.h>
@@ -24,6 +23,55 @@
 
 using namespace std;
 
+////////////////////////////////////////////////////////////////////////
+//
+//  Code for struct GridDiagNcOutInfo
+//
+////////////////////////////////////////////////////////////////////////
+
+GridDiagNcOutInfo::GridDiagNcOutInfo() {
+   clear();
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GridDiagNcOutInfo::clear() {
+
+   set_all_true();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool GridDiagNcOutInfo::all_false() const {
+
+   bool status = do_hist1d || do_hist2d || do_info_theory;
+
+   return !status;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GridDiagNcOutInfo::set_all_false() {
+
+   do_hist1d      = false;
+   do_hist2d      = false;
+   do_info_theory = false;
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GridDiagNcOutInfo::set_all_true() {
+
+   do_hist1d      = true;
+   do_hist2d      = true;
+   do_info_theory = true;
+
+   return;
+}
 
 ////////////////////////////////////////////////////////////////////////
 //
@@ -45,9 +93,6 @@ GridDiagConfInfo::~GridDiagConfInfo() {
 
 void GridDiagConfInfo::init_from_scratch() {
 
-   // Initialize pointers
-   data_info = (VarInfo **) nullptr;
-
    clear();
 
    return;
@@ -59,26 +104,15 @@ void GridDiagConfInfo::clear() {
 
    // Initialize values
    desc.clear();
-   mask_grid_file.clear();
-   mask_grid_name.clear();
-   mask_poly_file.clear();
-   mask_poly_name.clear();
-   mask_area.clear();
+   mask_name.clear();
+   mask_mp.clear();
    version.clear();
 
    // Clear data_info
-   if(data_info) {
-      for(int i=0; i<n_data; i++)
-        if(data_info[i]) {
-           delete data_info[i];
-           data_info[i] = (VarInfo *) nullptr;
-        }
-      delete data_info;
-      data_info = (VarInfo **) nullptr;
+   for(auto &info : data_info) {
+      if(info) { delete info; info = nullptr; }
    }
-
-   // Reset counts
-   n_data = 0;
+   data_info.clear();
 
    return;
 }
@@ -103,13 +137,12 @@ void GridDiagConfInfo::read_config(const char *default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void GridDiagConfInfo::set_n_data() {
-   Dictionary *dict = (Dictionary *) nullptr;
 
    // Conf: data.field
-   dict = conf.lookup_array(conf_key_data_field);
+   auto dict = conf.lookup_array(conf_key_data_field);
 
    // Determine the number of fields (name/level) to be processed
-   n_data = parse_conf_n_vx(dict);
+   int n_data = parse_conf_n_vx(dict);
 
    // Check for empty data
    if(n_data == 0) {
@@ -117,6 +150,9 @@ void GridDiagConfInfo::set_n_data() {
           << "the \"data.field\" array can't be empty!\n\n";
       exit(1);
    }
+
+   // Allocate space based on the number of verification tasks
+   data_info.resize(n_data, nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -124,8 +160,6 @@ void GridDiagConfInfo::set_n_data() {
 void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
    ConcatString s;
    StringArray sa;
-   VarInfoFactory info_factory;
-   Dictionary *dict = (Dictionary *) nullptr;
    Dictionary i_dict;
    GrdFileType file_type;
 
@@ -139,23 +173,17 @@ void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
    desc = parse_conf_string(&conf, conf_key_desc);
 
    // Conf: data.field
-   dict = conf.lookup_array(conf_key_data_field);
-
-   // Allocate space based on the number of verification tasks
-   data_info = new VarInfo * [n_data];
-
-   // Initialize pointers
-   for(int i=0; i<n_data; i++) data_info[i] = (VarInfo *) nullptr;
+   Dictionary *dict = conf.lookup_array(conf_key_data_field);
 
    // Parse the data field information
-   for(int i=0; i<n_data; i++) {
+   for(int i=0; i<(int) data_info.size(); i++) {
 
       // Determine the file type
       file_type = (file_types.size() > 1 ?
                    file_types[i] : file_types[0]);
 
       // Allocate new VarInfo objects
-      data_info[i] = info_factory.new_var_info(file_type);
+      data_info[i] = VarInfoFactory::new_var_info(file_type);
 
       // Get the current dictionaries
       i_dict = parse_conf_i_vx_dict(dict, i);
@@ -183,47 +211,101 @@ void GridDiagConfInfo::process_config(vector<GrdFileType> file_types) {
 
    } // end for i
 
+   // Conf: output_flag
+   parse_output_flag();
+
+   return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void GridDiagConfInfo::parse_output_flag() {
+
+   // Lookup the output_flag dictionary 
+   auto e = conf.lookup(conf_key_output_flag);
+
+   if(!e) {
+      mlog << Error << "\nGridDiagConfInfo::parse_output_flag() -> "
+           << "lookup failed for key \"" << conf_key_output_flag
+           << "\"\n\n";
+      exit(1);
+   }
+
+   // Process as boolean
+   if(e->type() == BooleanType) {
+      if(e->b_value()) nc_info.set_all_true();
+      else             nc_info.set_all_false();
+      return;
+   }
+
+   // Otherwise, it should be a dictionary
+   if(e->type() != DictionaryType) {
+      mlog << Error << "\nGridDiagConfInfo::parse_output_flag() -> "
+           << "bad type (" << configobjecttype_to_string(e->type())
+           << ") for key \"" << conf_key_output_flag << "\"\n\n";
+      exit(1);
+   }
+
+   // Parse the various entries
+   auto d = e->dict_value();
+
+   nc_info.do_hist1d      = d->lookup_bool(conf_key_hist1d_flag);
+   nc_info.do_hist2d      = d->lookup_bool(conf_key_hist2d_flag);
+   nc_info.do_info_theory = d->lookup_bool(conf_key_info_theory_flag);
+
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 void GridDiagConfInfo::process_masks(const Grid &grid) {
-   MaskPlane mask_grid, mask_poly;
+   MaskPlane mp;
    ConcatString name;
 
    mlog << Debug(2)
         << "Processing masking regions.\n";
 
-   // Initialize the mask to all points on
-   mask_area.set_size(grid.nx(), grid.ny(), true);
-
    // Conf: mask.grid
-   mask_grid_file = conf.lookup_string(conf_key_mask_grid);
+   StringArray mask_grid_sa(conf.lookup_string_array(conf_key_mask_grid));
 
    // Conf: mask.poly
-   mask_poly_file = conf.lookup_string(conf_key_mask_poly);
+   StringArray mask_poly_sa(conf.lookup_string_array(conf_key_mask_poly));
 
-   // Parse the masking grid
-   if(mask_grid_file.length() > 0) {
+   // Check for all masking regions being empty 
+   if(mask_grid_sa.all_empty() && mask_poly_sa.all_empty()) {
       mlog << Debug(3)
-           << "Processing grid mask: " << mask_grid_file << "\n";
-      parse_grid_mask(mask_grid_file, grid, mask_grid, mask_grid_name);
-      apply_mask(mask_area, mask_grid);
+           << "Adding the \"" << full_domain_str << "\" domain since "
+           << "no grid or polyline masking regions were specified.\n";
+      mask_grid_sa.add(full_domain_str);
+   }
+
+   // Parse the masking grids
+   for(int i=0; i<mask_grid_sa.n(); i++) {
+      if(mask_grid_sa[i].empty()) continue;
+      parse_grid_mask(mask_grid_sa[i], grid, mp, name);
+      mask_name.add(name);
+      mask_mp.emplace_back(mp);
+      mlog << Debug(3)
+           << "Processing grid mask \"" << mask_grid_sa[i]
+           << "\" which includes " << mp.count() << " of the "
+           << grid.nxy() << " grid points.\n";
    }
 
    // Parse the masking polyline
-   if(mask_poly_file.length() > 0) {
+   for(int i=0; i<mask_poly_sa.n(); i++) {
+      if(mask_poly_sa[i].empty()) continue;
+      parse_poly_mask(mask_poly_sa[i], grid, mp, name);
+      mask_name.add(name);
+      mask_mp.emplace_back(mp);
       mlog << Debug(3)
-           << "Processing poly mask: " << mask_poly_file << "\n";
-      parse_poly_mask(mask_poly_file, grid, mask_poly, mask_poly_name);
-      apply_mask(mask_area, mask_poly);
+           << "Processing poly mask \"" << mask_poly_sa[i]
+           << "\" which includes " << mp.count() << " of the "
+           << grid.nxy() << " grid points.\n";
    }
 
-   // Report the size of the mask
+   // Report the number of masks
    mlog << Debug(3)
-        << "Including " << mask_area.count() << " of the " << grid.nxy()
-        << " grid points in the analysis.\n";
+        << "Applying " << (int) mask_mp.size() << " masking regions.\n";
 
    return;
 }

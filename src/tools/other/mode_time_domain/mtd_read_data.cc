@@ -45,8 +45,6 @@ if ( filenames.n() < 2 )  {
 }
 
 int j, k;
-Met2dDataFile * data_2d_file = 0;
-Met2dDataFileFactory factory;
 DataPlane plane;
 vector<unixtime> valid_times;
    //
@@ -58,7 +56,7 @@ for (j=0; j<(filenames.n()); ++j)  {
    mlog << Debug(2) << method_name
         << "processing file: " << filenames[j] << "\n";
 
-   data_2d_file = factory.new_met_2d_data_file(filenames[j].c_str(), varinfo.file_type());
+   auto data_2d_file = Met2dDataFileFactory::new_met_2d_data_file(filenames[j].c_str(), varinfo.file_type());
 
    if ( ! data_2d_file->data_plane(varinfo, plane) )  {
 

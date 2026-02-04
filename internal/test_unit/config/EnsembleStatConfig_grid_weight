@@ -160,7 +160,7 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid  = [ "FULL" ];
+   grid  = [];
    poly  = [];
    sid   = [];
    llpnt = [];
