@@ -231,6 +231,6 @@ grid_weight_flag = ${GRID_WEIGHT};
 
 tmp_dir       = "/tmp";
 output_prefix = "${OUTPUT_PREFIX}";
-version       = "V12.2.0";
+version       = "V13.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////
