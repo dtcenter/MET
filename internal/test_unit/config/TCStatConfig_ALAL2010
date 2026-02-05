@@ -214,8 +214,3 @@ jobs = [
    "-job rirw                  -rirw_window 12   -rirw_thresh <=-15 -out_line_type CTC,CTS,MPR",
    "-job rirw                  -rirw_window 12   -rirw_thresh <=-15 -out_line_type CTC,CTS -by amodel -set_hdr DESC AMODEL -out_stat ${MET_TEST_OUTPUT}/tc_stat/ALAL2010_rirw.stat"
 ];
-
-//
-// Indicate a version number for the contents of this configuration file.
-// The value should generally not be modified.
-//

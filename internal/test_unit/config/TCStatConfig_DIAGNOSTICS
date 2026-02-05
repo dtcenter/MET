@@ -218,8 +218,3 @@ jobs = [
    "-job summary -diag_thresh TPW  ge60 -column TK_ERR -by AMODEL",
    "-job summary -init_diag_thresh DTL lt325 -amodel OFCL -column TK_ERR -by AMODEL,LEAD"
 ];
-
-//
-// Indicate a version number for the contents of this configuration file.
-// The value should generally not be modified.
-//
