@@ -9,70 +9,38 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
-MET Version 12.2.0 Release Notes (20251113)
--------------------------------------------
+MET Version 13.0.0-beta1 Release Notes (20260205)
+-------------------------------------------------
 
   .. dropdown:: Enhancements
 
-     * Extend time range support with NetCDF-CF files
-       (`#2836 <https://github.com/dtcenter/MET/issues/2836>`_).
-     * Enhance ASCII2NC to recursively search input directories for specific file types for use with ISMN data
-       (`#3148 <https://github.com/dtcenter/MET/issues/3148>`_).
-     * Enhance RMW-Analysis to filter individual track points rather than entire tracks
-       (`#3168 <https://github.com/dtcenter/MET/issues/3168>`_).
-     * Enhance madis2nc so that it writes variable names
-       (`#3172 <https://github.com/dtcenter/MET/issues/3172>`_).
-     * **Enhance Point-Stat and Ensemble-Stat to apply orographic corrections when verifying surface temperatures and heights (e.g. cloud base) against point observations**
-       (`#3174 <https://github.com/dtcenter/MET/issues/3174>`_).
-     * Enhance Pair-Stat to support data censoring and conversion configuration options
-       (`#3186 <https://github.com/dtcenter/MET/issues/3186>`_).
-     * Add CVE scanning to the release-docker-images.yml workflow
-       (`#3198 <https://github.com/dtcenter/MET/issues/3198>`_).
-     * **Support multiple vertical level variables for CF NetCDF input**
-       (`#3226 <https://github.com/dtcenter/MET/issues/3226>`_).
-     * Add new pre-defined grid definitions to support the computation of CBS scores
-       (`#3232 <https://github.com/dtcenter/MET/issues/3232>`_).
-     * Refine default lapse rates for orographic corrections
-       (`#3258 <https://github.com/dtcenter/MET/issues/3258>`_).
-     * Refine handling of missing data for orographic corrections
-       (`#3270 <https://github.com/dtcenter/MET/issues/3270>`_).
-     * Enhance the MET tools to return consistent exit codes
-       (`#3278 <https://github.com/dtcenter/MET/issues/3278>`_).
+     * Minimize the use of temporary files in Stat-Analysis (`#2698 <https://github.com/dtcenter/MET/issues/2698>`_).
+     * Resolve runtime differences for different GNU/Intel optimization levels for PBL heights in PB2NC (`#3110 <https://github.com/dtcenter/MET/issues/3110>`_).
+     * **Enhance Grid-Diag to compute mutual information** (`#3171 <https://github.com/dtcenter/MET/issues/3171>`_).
+     * Enhance MET Python embedding and grid specification strings to support LAEA grids (`#3230 <https://github.com/dtcenter/MET/issues/3230>`_).
+     * Resolve several SonarQube Reliability issues in MET's develop branch (`#3253 <https://github.com/dtcenter/MET/issues/3253>`_).
+     * Refine handling of missing data for orographic corrections (`#3270 <https://github.com/dtcenter/MET/issues/3270>`_).
+     * Enhance the MET tools to return consistent exit codes (`#3278 <https://github.com/dtcenter/MET/issues/3278>`_).
+     * Enhance the "GEOG_MATCH" interpolation method to print a WARNING about missing topography and land/sea mask inputs (`#3285 <https://github.com/dtcenter/MET/issues/3285>`_).
+     * Enhance Point2Grid to make the default output value configurable (`#3297 <https://github.com/dtcenter/MET/issues/3297>`_).
+     * **Refine the logic for setting the default masking "FULL" grid in the MET tools** (`#3298 <https://github.com/dtcenter/MET/issues/3298>`_).
+     * Enhance PB2NC and IODA2NC to set the "quality_mark_thresh" configuration option as an actual threshold (`#3307 <https://github.com/dtcenter/MET/issues/3307>`_).
 
   .. dropdown:: Bugfixes
 
-     * Bugfix: Fix compilation on non-GCC compilers by replacing #include <bits/stdc++.h>
-       (`#3175 <https://github.com/dtcenter/MET/issues/3175>`_).
-     * Bugfix: Fix the AW_MEAN regridding method when OMP_NUM_THREADS is set very large
-       (`#3206 <https://github.com/dtcenter/MET/issues/3206>`_).
-     * Bugfix: Fix STAT-Analysis handling of zero-length vectors when aggregating MPR inputs and writing WDIR or VCNT outputs
-       (`#3210 <https://github.com/dtcenter/MET/issues/3210>`_).
-     * Bugfix: Python embedding does not work for MET version 12.1.0 with Python version 3.10
-       (`#3219 <https://github.com/dtcenter/MET/issues/3219>`_).
-     * Bugfix: Fix segfault when reading climatological data from a CF-compliant NetCDF file fails
-       (`#3235 <https://github.com/dtcenter/MET/issues/3235>`_).
-     * Update the logic to apply "set_attr_grid" before "ShiftRight"
-       (`#3255 <https://github.com/dtcenter/MET/issues/3255>`_).
-     * Fix ASCII2NC hang when run with an empty input file
-       (`#3266 <https://github.com/dtcenter/MET/issues/3266>`_).
+     * Fix the logic to apply "set_attr_grid" before "ShiftRight" (`#3255 <https://github.com/dtcenter/MET/issues/3255>`_).
+     * Fix ASCII2NC hang when run with an empty input file (`#3266 <https://github.com/dtcenter/MET/issues/3266>`_).
+     * Fix support for the "set_attr_grid" config option when defining the verification domain (`#3293 <https://github.com/dtcenter/MET/issues/3293>`_).
+     * Fix dependency checks and compile flag defaults in compile_MET_all.sh (`#3317 <https://github.com/dtcenter/MET/issues/3317>`_).
 
   .. dropdown:: Repository, build, and test
 
-     * Confirm that the METplus difference logic handles MTD output file
-       (`#977 <https://github.com/dtcenter/MET/issues/977>`_).
-     * Switch MET's R-based differencing logic over to using the Python-based METplus implementation
-       (`#2718 <https://github.com/dtcenter/MET/issues/2718>`_).
+     * Deprecate and remove the "--enable-mode-graphics" configuration option and corresponding "plot_mode_field" utility (`#3322 <https://github.com/dtcenter/MET/issues/3322>`_).
 
   .. dropdown:: METbaseimage testing environment
 
-     * Add logic to regenerate previously tagged versions based on a schedule
-       (`METbaseimage#18 <https://github.com/dtcenter/METbaseimage/issues/18>`_).
-     * Add a new GHA development workflow and enhance workflows to scan Docker images for CVEs #33
-       (`METbaseimage#33 <https://github.com/dtcenter/METbaseimage/issues/33>`_).
-     * METbaseimage: Address Critical CVEs from Grype scans of the Docker images
-       (`METplus-Internal#61 <https://github.com/dtcenter/METplus-Internal/issues/61>`_).
-     * Enhance the "Create Release Docker Images" METplus workflows to determine and build the most recent bugfix versions
-       (`METplus-Internal#64 <https://github.com/dtcenter/METplus-Internal/issues/64>`_).
+     * Replace deprecated pip install arguments (`METbaseimage #47 <https://github.com/dtcenter/METbaseimage/issues/47>`_).
+     * Create new hardened and streamlined base image for METviewer (`METbaseimage #52 <https://github.com/dtcenter/METbaseimage/issues/52>`_).
 
 MET Upgrade Instructions
 ========================
@@ -139,7 +107,7 @@ MET Version 13.0.0 Upgrade Instructions
 
 .. dropdown:: Output format changes - NONE
 
-   MET version 12.2.0 adds or modifies the following output file formats:
+   MET version 13.0.0 adds or modifies the following output file formats:
 
    * Grid-Diag output format
 
@@ -152,12 +120,12 @@ MET Version 13.0.0 Upgrade Instructions
 
 .. dropdown:: Output data changes - NONE
 
-   MET version 12.2.0 modifies existing output data values in the following ways:
+   MET version 13.0.0 modifies existing output data values in the following ways:
 
    * None
 
 .. dropdown:: Additional upgrade instructions - NONE
 
-   Recommendations when upgrading to MET version 12.2.0:
+   Recommendations when upgrading to MET version 13.0.0:
 
    * None
