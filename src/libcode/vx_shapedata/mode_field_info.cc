@@ -377,6 +377,10 @@ void Mode_Field_Info::set_merge_thresh_by_index (int k)
 
 {
 
+// MET #3286: Only set the merge threshold when actually needed
+
+if ( !need_merge_thresh() ) return;
+
 if ( (k < 0) || (k >= merge_thresh_array.n_elements()) )  {
 
    mlog << Error << "\nMode_Field_Info::set_merge_thresh_by_index(int) -> "

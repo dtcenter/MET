@@ -107,6 +107,8 @@ class Box {
       double width () const;
       double height () const;
 
+      bool is_empty() const;
+
          //
          //  do stuff
          //
@@ -143,6 +145,9 @@ inline double Box::y_ur () const { return Top; }
 
 inline double Box::width () const { return ( Right - Left ); }
 inline double Box::height () const { return ( Top - Bottom ); }
+
+inline bool   Box::is_empty() const { return ( Left == 0 && Right == 0 &&
+                                               Bottom == 0 && Top == 0 ); }
 
 
 ////////////////////////////////////////////////////////////////////////
