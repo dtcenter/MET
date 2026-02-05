@@ -209,6 +209,5 @@ grid_weight_flag  = NONE;
 point_weight_flag = ${POINT_WEIGHT};
 
 output_prefix = "${OUTPUT_PREFIX}";
-version       = "V13.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

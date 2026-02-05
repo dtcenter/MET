@@ -153,6 +153,5 @@ point_weight_flag = NONE;
 
 tmp_dir       = "/tmp";
 output_prefix = "${OUTPUT_PREFIX}";
-version       = "V13.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

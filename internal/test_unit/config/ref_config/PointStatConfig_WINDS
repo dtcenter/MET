@@ -180,6 +180,5 @@ point_weight_flag = NONE;
 
 tmp_dir       = "/tmp";
 output_prefix = "${MODEL}_F${FCST_TIME}_WINDS";
-version       = "V13.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////
