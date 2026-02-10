@@ -46,7 +46,8 @@ void GridDiagNcOutInfo::clear() {
 
 bool GridDiagNcOutInfo::all_false() const {
 
-   bool status = do_hist1d || do_hist2d || do_info_theory;
+   bool status = do_hist1d      || do_hist2d ||
+                 do_info_theory || do_power_spectrum;
 
    return !status;
 }
@@ -55,9 +56,10 @@ bool GridDiagNcOutInfo::all_false() const {
 
 void GridDiagNcOutInfo::set_all_false() {
 
-   do_hist1d      = false;
-   do_hist2d      = false;
-   do_info_theory = false;
+   do_hist1d         = false;
+   do_hist2d         = false;
+   do_info_theory    = false;
+   do_power_spectrum = false;
 
    return;
 }
@@ -66,9 +68,10 @@ void GridDiagNcOutInfo::set_all_false() {
 
 void GridDiagNcOutInfo::set_all_true() {
 
-   do_hist1d      = true;
-   do_hist2d      = true;
-   do_info_theory = true;
+   do_hist1d         = true;
+   do_hist2d         = true;
+   do_info_theory    = true;
+   do_power_spectrum = true;
 
    return;
 }
@@ -249,9 +252,10 @@ void GridDiagConfInfo::parse_output_flag() {
    // Parse the various entries
    auto d = e->dict_value();
 
-   nc_info.do_hist1d      = d->lookup_bool(conf_key_hist1d_flag);
-   nc_info.do_hist2d      = d->lookup_bool(conf_key_hist2d_flag);
-   nc_info.do_info_theory = d->lookup_bool(conf_key_info_theory_flag);
+   nc_info.do_hist1d         = d->lookup_bool(conf_key_hist1d_flag);
+   nc_info.do_hist2d         = d->lookup_bool(conf_key_hist2d_flag);
+   nc_info.do_info_theory    = d->lookup_bool(conf_key_info_theory_flag);
+   nc_info.do_power_spectrum = d->lookup_bool(conf_key_power_spectrum_flag);
 
    return;
 }

@@ -32,6 +32,7 @@ struct GridDiagNcOutInfo {
    bool do_hist1d;
    bool do_hist2d;
    bool do_info_theory;
+   bool do_power_spectrum;
 
    GridDiagNcOutInfo();
 

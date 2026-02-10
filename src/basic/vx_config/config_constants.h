@@ -875,9 +875,10 @@ static const char conf_val_beta[]        = "BETA";
 // Grid-Diag specific parameter key names
 //
 
-static const char conf_key_hist1d_flag[]      = "histogram_1d";
-static const char conf_key_hist2d_flag[]      = "histogram_2d";
-static const char conf_key_info_theory_flag[] = "info_theory";
+static const char conf_key_hist1d_flag[]         = "histogram_1d";
+static const char conf_key_hist2d_flag[]         = "histogram_2d";
+static const char conf_key_info_theory_flag[]    = "info_theory";
+static const char conf_key_power_spectrum_flag[] = "power_spectrum";
 
 //
 // STAT-Analysis and Pair-Stat specific parameter key names

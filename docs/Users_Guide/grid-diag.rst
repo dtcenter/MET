@@ -105,9 +105,10 @@ _____________________
 .. code-block:: none
 
    output_flag = {
-      histogram_1d = TRUE;
-      histogram_2d = TRUE;
-      info_theory  = FALSE;
+      histogram_1d   = TRUE;
+      histogram_2d   = TRUE;
+      info_theory    = FALSE;
+      power_spectrum = FALSE;
    }
 
 The **output_flag** dictionary controls the type of output that the Grid-Diag tool generates. Each flag should be set to **TRUE** or **FALSE** to enable the computation and writing of one or more variables to the output NetCDF file, as described below:
@@ -117,6 +118,8 @@ The **output_flag** dictionary controls the type of output that the Grid-Diag to
 2. **histogram_2d** for 2-dimensional histograms for each pair of **data.field** entries, including minimum, maxmimum, and midpoint values for each histogram bin.
 
 3. **info_theory** for information theory metrics, including entropy for each **data.field** entry and mutual information and joint entropy for each pair of entries.
+
+4. **power_spectrum** for power spectrum output.
 
 grid_diag Output File
 ---------------------
