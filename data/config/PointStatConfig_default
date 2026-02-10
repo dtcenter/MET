@@ -229,7 +229,7 @@ obs_window = {
 // May be set separately in each "obs.field" entry
 //
 mask = {
-   grid  = [ "FULL" ];
+   grid  = [];
    poly  = [];
    sid   = [];
    llpnt = [];
@@ -328,6 +328,6 @@ point_weight_flag = NONE;
  
 tmp_dir       = "/tmp";
 output_prefix = "";
-version       = "V12.2.0";
+version       = "V13.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

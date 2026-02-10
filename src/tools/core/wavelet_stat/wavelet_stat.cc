@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -41,6 +41,7 @@
 //   016    10/03/22  Prestopnik      MET #2227 Remove using namespace netCDF from header files
 //   017    01/29/24  Halley Gotway   MET #2801 Configure time difference warnings
 //   018    05/07/25  Halley Gotway   MET #3145 Add OpenMP
+//   019    12/08/25  Halley Gotway   MET #3293 Fix set_attr_grid.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -165,7 +166,6 @@ static void process_command_line(int argc, char **argv) {
    CommandLine cline;
    GrdFileType ftype, otype;
    ConcatString default_config_file;
-   DataPlane dp;
 
    // Set the default output directory
    out_dir = replace_path(default_out_dir);
@@ -211,14 +211,14 @@ static void process_command_line(int argc, char **argv) {
    otype = parse_conf_file_type(conf_info.conf.lookup_dictionary(conf_key_obs));
 
    // Read forecast file
-   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
+   if(!(fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype))) {
       mlog << Error << "\nTrouble reading forecast file \""
            << fcst_file << "\"\n\n";
       exit(1);
    }
 
    // Read observation file
-   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file.c_str(), otype))) {
+   if(!(obs_mtddf = Met2dDataFileFactory::new_met_2d_data_file(obs_file.c_str(), otype))) {
       mlog << Error << "\nTrouble reading observation file \""
            << obs_file << "\"\n\n";
       exit(1);
@@ -231,24 +231,9 @@ static void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(ftype, otype);
 
-   // For python types and range/azimuth grids, read the first field to set the grid
-   if(is_python_grdfiletype(ftype) ||
-      fcst_mtddf->grid().info().ra) {
-      if(!fcst_mtddf->data_plane(*conf_info.fcst_info[0], dp)) {
-         mlog << Error << "\nTrouble reading data from forecast file \""
-              << fcst_file << "\"\n\n";
-         exit(1);
-      }
-   }
-
-   if(is_python_grdfiletype(otype) ||
-      obs_mtddf->grid().info().ra) {
-      if(!obs_mtddf->data_plane(*conf_info.obs_info[0], dp)) {
-         mlog << Error << "\nTrouble reading data from observation file \""
-              << obs_file << "\"\n\n";
-         exit(1);
-      }
-   }
+   // Update the input grid, if needed
+   update_mtddf_grid(fcst_mtddf, conf_info.fcst_info[0]);
+   update_mtddf_grid(obs_mtddf, conf_info.obs_info[0]);
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.fcst_info[0]->regrid(),

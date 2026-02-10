@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -66,7 +66,7 @@ void IODA2NCConfInfo::clear() {
    poly_mask.clear();
    beg_elev = end_elev = bad_data_double;
    beg_level = end_level = bad_data_double;
-   quality_mark_thresh = bad_data_int;
+   quality_mark_thresh.clear();
    version.clear();
    obs_var.clear();
    message_type_map.clear();
@@ -159,15 +159,7 @@ void IODA2NCConfInfo::process_config() {
    timeSummaryInfo = parse_conf_time_summary(&conf);
 
    // Conf: quality_mark_thresh
-   quality_mark_thresh = conf.lookup_int(conf_key_quality_mark_thresh);
-
-   // Check the value
-   if(quality_mark_thresh < 0 || quality_mark_thresh > 15) {
-      mlog << Warning << "\nIODA2NCConfInfo::process_config() -> "
-           << "the \"" << conf_key_quality_mark_thresh
-           << "\" entry (" << quality_mark_thresh
-           << ") should be set between 0 and 15.\n\n";
-   }
+   quality_mark_thresh = parse_conf_quality_mark_thresh(&conf);
 
    // Conf: message_type_map
    message_type_map = parse_conf_message_type_map(&conf);

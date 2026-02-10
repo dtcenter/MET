@@ -265,7 +265,6 @@ shift_right = 0;   //  grid squares
 ////////////////////////////////////////////////////////////////////////////////
 
 //${METPLUS_OUTPUT_PREFIX}
-//version        = "V10.0";
 
 //tmp_dir = "${MET_TMP_DIR}";
 tmp_dir = "/tmp";

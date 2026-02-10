@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -658,10 +658,10 @@ static void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
 static bool get_data_plane(const char *infile, GrdFileType ftype,
                            VarInfo *info, DataPlane &dp) {
    bool found;
-   Met2dDataFile *mtddf = (Met2dDataFile *) nullptr;
+   Met2dDataFile *mtddf = nullptr;
 
    // Read the current ensemble file
-   if(!(mtddf = mtddf_factory.new_met_2d_data_file(infile, ftype))) {
+   if(!(mtddf = Met2dDataFileFactory::new_met_2d_data_file(infile, ftype))) {
       mlog << Error << "\nget_data_plane() -> "
            << "trouble reading file \"" << infile << "\"\n\n";
       exit(1);

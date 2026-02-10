@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1084,13 +1084,12 @@ void VxPairBase::assign(const VxPairBase &vx_pb) {
 ////////////////////////////////////////////////////////////////////////
 
 void VxPairBase::copy_var_info(const VarInfo *info, VarInfo *&copy) {
-   VarInfoFactory f;
 
    // Deallocate, if necessary
    if(copy) { delete copy; copy = (VarInfo *) nullptr; }
 
    // Perform a deep copy
-   copy = f.new_var_info(info->file_type());
+   copy = VarInfoFactory::new_var_info(info->file_type());
    *copy = *info;
 
    return;

@@ -69,7 +69,7 @@ obs = fcst;
 // Verification masking regions
 //
 mask = {
-   grid = [ "FULL" ];
+   grid = [];
    poly = [];
 }
 
@@ -211,6 +211,5 @@ grid_weight_flag = NONE;
 
 tmp_dir       = "/tmp";
 output_prefix = "${OUTPUT_PREFIX}";
-version       = "V12.2.0";
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -397,6 +397,10 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
       vx_opt[i].mask_name.clear();
       vx_opt[i].mask_name_area.clear();
 
+      // MET #3298 Add the FULL grid, if needed
+      check_full_grid_mask(vx_opt[i].mask_grid, &vx_opt[i].mask_poly,
+                           &vx_opt[i].mask_sid, &vx_opt[i].mask_llpnt);
+
       // Parse the masking grids
       for(int j=0; j<vx_opt[i].mask_grid.n(); j++) {
 
@@ -469,14 +473,8 @@ void EnsembleStatConfInfo::process_masks(const Grid &grid) {
 
       } // end for j
 
-      // Check that at least one verification masking region is provided
-      if(vx_opt[i].mask_name.n() == 0) {
-         mlog << Error << "\nEnsembleStatConfInfo::process_masks() -> "
-              << "At least one grid, polyline or station ID masking "
-              << "region must be provided for verification task number "
-              << i+1 << ".\n\n";
-         exit(1);
-      }
+      // Check for unique mask names
+      check_mask_names(vx_opt[i].mask_name);
 
    } // end for i
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -358,7 +358,7 @@ static void process_command_line(int argc, char **argv) {
       MetConfig config;
       ConcatString vname;
       StringArray var_names;
-      VarInfo *vinfo = VarInfoFactory::new_var_info(FileType_NcMet);
+      auto vinfo = VarInfoFactory::new_var_info(FileType_NcMet);
       for(int i=0; i<FieldSA.n(); i++) {
          vinfo->clear();
          // Populate the VarInfo object using the config string
@@ -465,7 +465,7 @@ static void process_data_file() {
    ftype = fr_mtddf->file_type();
 
    // Setup the VarInfo request object
-   VarInfo *vinfo = VarInfoFactory::new_var_info(ftype);
+   auto vinfo = VarInfoFactory::new_var_info(ftype);
 
    if(!vinfo) {
       mlog << Error << "\n" << method_name

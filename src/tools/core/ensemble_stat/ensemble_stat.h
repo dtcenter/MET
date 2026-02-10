@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -155,9 +155,6 @@ static int nxy = 0;
 
 // Weight for each grid point
 static DataPlane wgt_dp;
-
-// Data file factory and input files
-static Met2dDataFileFactory mtddf_factory;
 
 // Strings to be output in the STAT and optional text files
 static StatHdrColumns shc;

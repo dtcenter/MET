@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -146,8 +146,6 @@ void ModeExecutive::init_traditional(int n_files)
 
 {
 
-   Met2dDataFileFactory mtddf_factory;
-
    R_index = T_index = 0;
 
    conf_read();
@@ -158,14 +156,14 @@ void ModeExecutive::init_traditional(int n_files)
 
 
    // Read observation file
-   if(!(obs_mtddf = mtddf_factory.new_met_2d_data_file(obs_file.c_str(), otype))) {
+   if(!(obs_mtddf = Met2dDataFileFactory::new_met_2d_data_file(obs_file.c_str(), otype))) {
       mlog << Error << "\nTrouble reading observation file \""
            << obs_file << "\"\n\n";
       exit(1);
    }
 
    // Read forecast file
-   if(!(fcst_mtddf = mtddf_factory.new_met_2d_data_file(fcst_file.c_str(), ftype))) {
+   if(!(fcst_mtddf = Met2dDataFileFactory::new_met_2d_data_file(fcst_file.c_str(), ftype))) {
       mlog << Error << "\nTrouble reading forecast file \""
            << fcst_file << "\"\n\n";
       exit(1);
@@ -2719,8 +2717,8 @@ static void nc_add_string(NcFile * f, const char * text, const char * var_name, 
 
    if ( ! put_nc_data(&var, t) )  {
 
-      mlog << Error
-           << " nc_add_string() -> unable to add string variable \"" << t << "\"\n\n";
+      mlog << Error << "\nnc_add_string() -> "
+           << "unable to add string variable \"" << t << "\"\n\n";
 
       exit ( 1 );
 

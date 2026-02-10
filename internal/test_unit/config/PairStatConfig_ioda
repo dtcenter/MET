@@ -174,7 +174,7 @@ climo_cdf = {
 // May be set separately in each "obs.pairs" entry
 //
 mask = {
-   grid  = [ "FULL" ];
+   grid  = [];
    poly  = [];
    sid   = [];
    llpnt = [];
@@ -236,6 +236,5 @@ output_flag = {
 point_weight_flag = NONE;
 
 tmp_dir = "/tmp";
-version = "V12.0.0";
 
 ////////////////////////////////////////////////////////////////////////////////

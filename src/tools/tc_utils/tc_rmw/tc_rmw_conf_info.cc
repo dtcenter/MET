@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -120,7 +120,6 @@ void TCRMWConfInfo::read_config(const char* default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void TCRMWConfInfo::process_config(GrdFileType ftype) {
-    VarInfoFactory info_factory;
     Dictionary *fdict = (Dictionary *) nullptr;
 
     // Conf: version
@@ -214,7 +213,7 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
     for(int i=0; i<n_data; i++) {
 
         // Allocate new VarInfo objects
-        data_info[i] = info_factory.new_var_info(ftype);
+        data_info[i] = VarInfoFactory::new_var_info(ftype);
 
         // Get current dictionary
         Dictionary i_fdict = parse_conf_i_vx_dict(fdict, i);

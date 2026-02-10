@@ -332,6 +332,5 @@ grid_weight_flag  = NONE;
 point_weight_flag = NONE;
 
 output_prefix = "";
-version       = "V12.2.0";
 
 ////////////////////////////////////////////////////////////////////////////////

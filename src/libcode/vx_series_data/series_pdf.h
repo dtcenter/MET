@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -28,14 +28,6 @@
 
 void init_pdf(
     int n,
-    std::vector<long long>& pdf);
-
-////////////////////////////////////////////////////////////////////////
-
-void init_pdf(
-    double min,
-    double max,
-    double delta,
     std::vector<long long>& pdf);
 
 ////////////////////////////////////////////////////////////////////////

@@ -211,9 +211,3 @@ basin_map = [
    { key = "AB"; val = "IO"; },
    { key = "BB"; val = "IO"; }
 ];
-
-//
-// Indicate a version number for the contents of this configuration file.
-// The value should generally not be modified.
-//
-version = "V12.2.0";

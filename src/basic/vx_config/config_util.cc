@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -813,6 +813,41 @@ vector<MaskLatLon> parse_conf_llpnt_mask(Dictionary *dict) {
    }
 
    return v;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+SingleThresh parse_conf_quality_mark_thresh(Dictionary *dict) {
+   const char *method_name = "parse_conf_quality_mark_thresh() -> ";
+
+   SingleThresh st = dict->lookup_thresh(conf_key_quality_mark_thresh,
+                                         false, false);
+
+   // MET#3307 backward compatible to also support integer lookup
+   if(!dict->last_lookup_status()) {
+      auto qm_int = dict->lookup_int(conf_key_quality_mark_thresh, false);
+
+      // Check lookup status
+      if(!dict->last_lookup_status()) {
+         mlog << Error << "\n" << method_name
+              << "\"" << conf_key_quality_mark_thresh
+              << "\" must be set as a threshold or an integer upper limit.\n\n";
+         exit(1);
+      }
+
+      // Check the value
+      if(qm_int < 0 || qm_int > 15) {
+         mlog << Warning << "\n" << method_name
+              << "the \"" << conf_key_quality_mark_thresh << "\" entry ("
+              << qm_int << ") should be set as a threshold or an integer "
+              << "between 0 and 15.\n\n";
+      }
+
+      // Store as a <=n threshold
+      st.set(qm_int, ThreshType::thresh_le);
+   }
+
+   return st;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2927,6 +2962,28 @@ void parse_conf_range_double(Dictionary *dict, double &beg, double &end) {
            << "the ending value (" << end
            << ") must be >= the beginning value (" << beg << ").\n\n";
       exit(1);
+   }
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+void check_full_grid_mask(StringArray &grids, const StringArray *polys,
+                          const StringArray *sids,
+                          const std::vector<MaskLatLon> *llpnts) {
+   int n_mask = grids.n();
+
+   // Count the number of masking regions
+   if(polys)  n_mask += polys->n();
+   if(sids)   n_mask += sids->n();
+   if(llpnts) n_mask += (int) llpnts->size();
+
+   // MET #3298 Add the FULL grid if no other masks are defined
+   if(n_mask == 0) {
+      mlog << Debug(3) << "Adding grid = " << full_domain_str
+           << " since no masking regions were specified.\n";
+      grids.add(full_domain_str);
    }
 
    return;

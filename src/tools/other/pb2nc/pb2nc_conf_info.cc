@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -248,31 +248,7 @@ void PB2NCConfInfo::process_config() {
    for(i=0; i<sa.n_elements(); i++) obs_bufr_var.add(sa[i]);
 
    // Conf: quality_mark_thresh
-   quality_mark_thresh = conf.lookup_thresh(conf_key_quality_mark_thresh, false, false);
-
-   // MET#3307 backward compatible to also support integer lookup
-   if(!conf.last_lookup_status()) {
-      auto quality_mark_thresh_int = conf.lookup_int(conf_key_quality_mark_thresh, false);
-
-      // Check lookup status
-      if(!conf.last_lookup_status()) {
-         mlog << Error << "\nPB2NCConfInfo::process_config() -> "
-              << "\"" << conf_key_quality_mark_thresh
-              << "\" must be set as a threshold or an integer upper limit.\n\n";
-         exit(1);
-      }
-
-      // Check the value
-      if(quality_mark_thresh_int < 0 || quality_mark_thresh_int > 15) {
-         mlog << Warning << "\nPB2NCConfInfo::process_config() -> "
-              << "the \"" << conf_key_quality_mark_thresh
-              << "\" entry (" << quality_mark_thresh_int
-              << ") should be set as a threshold or an integer between 0 and 15.\n\n";
-      }
-
-      // Store as a <=n threshold
-      quality_mark_thresh.set(quality_mark_thresh_int, ThreshType::thresh_le);
-   }
+   quality_mark_thresh = parse_conf_quality_mark_thresh(&conf);
 
    // Conf: event_stack_flag
    event_stack_flag = conf.lookup_bool(conf_key_event_stack_flag);

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -19,9 +19,10 @@
 //
 //   Mod#   Date      Name           Description
 //   ----   ----      ----           -----------
-//   000    07-21-20  Howard Soh     New
-//   001    07-06-22  Howard Soh     METplus-Internal #19 Rename main to met_main
-//   002    09-29-22  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
+//   000    07/21/20  Howard Soh     New
+//   001    07/06/22  Howard Soh     METplus-Internal #19 Rename main to met_main
+//   002    09/29/22  Prestopnik     MET #2227 Remove namespace std and netCDF from header files
+//   003    12/22/25  Halley Gotway  MET #3307 Quality mark threshold type
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -350,19 +351,7 @@ static void open_netcdf_output() {
 ////////////////////////////////////////////////////////////////////////
 
 static void process_ioda_file(int i_pb) {
-   int npbmsg;
-   int npbmsg_total;
    int idx;
-   int i_msg;
-   int n_file_obs;
-   int n_hdr_obs;
-   int rej_typ;
-   int rej_sid;
-   int rej_vld;
-   int rej_grid;
-   int rej_poly;
-   int rej_elv;
-   int rej_nobs;
    double x;
    double y;
 
@@ -454,8 +443,8 @@ static void process_ioda_file(int i_pb) {
    int nstring = ioda_reader.nstring;
 
    // Compute the number of IODA records in the current file.
-
-   npbmsg_total = npbmsg = nlocs;
+   int npbmsg = nlocs;
+   int npbmsg_total = nlocs;
 
    // Use the number of records requested by the user if there
    // are enough present.
@@ -509,9 +498,16 @@ static void process_ioda_file(int i_pb) {
    }
 
    // Initialize counts
-   n_file_obs = i_msg = 0;
-   rej_typ = rej_sid  = rej_vld    = rej_grid = rej_poly = 0;
-   rej_elv = rej_nobs = 0;
+   int rej_typ = 0;
+   int rej_sid = 0;
+   int rej_vld = 0;
+   int rej_grid = 0;
+   int rej_poly = 0;
+   int rej_elv = 0;
+   int rej_qty = 0;
+   int rej_nobs = 0;
+   int n_file_obs = 0;
+   int i_msg = 0;
 
    bool showed_progress = false;
    if(mlog.verbosity_level() >= debug_level_for_performance) {
@@ -706,7 +702,7 @@ static void process_ioda_file(int i_pb) {
 
       // Store the index to the header data
       obs_arr[0] = (double)nc_point_obs.get_hdr_index();
-      n_hdr_obs = 0;
+      int n_hdr_obs = 0;
       for(idx=0; idx<v_obs_data.size(); idx++ ) {
          int var_idx = 0;
          if (!obs_var_names.has(raw_var_names[idx], var_idx)) {
@@ -719,8 +715,17 @@ static void process_ioda_file(int i_pb) {
          obs_arr[2] = ioda_reader.obs_pres_arr[i_read];
          obs_arr[3] = ioda_reader.obs_hght_arr[i_read];
          obs_arr[4] = v_obs_data[idx][i_read];
+
+         // Check the quality mark threshold criteria
+         auto quality_mark = (double) v_qc_data[idx][i_read];
+         if(!conf_info.quality_mark_thresh.check(quality_mark)) {
+            rej_qty++;
+            continue;
+         }
+
+	 // Add the observation
          addObservation(obs_arr, (string)hdr_typ, (string)hdr_sid, hdr_vld_ut,
-               hdr_lat, hdr_lon, hdr_elv, (double)v_qc_data[idx][i_read]);
+               hdr_lat, hdr_lon, hdr_elv, quality_mark);
 
          // Increment the current and total observations counts
          n_file_obs++;
@@ -768,6 +773,8 @@ static void process_ioda_file(int i_pb) {
         << rej_poly << "\n"
         << "Rejected based on elevation\t\t= "
         << rej_elv << "\n"
+        << "Rejected based on quality mark\t\t= "
+        << rej_qty << "\n"
         << "Rejected based on zero observations\t= "
         << rej_nobs << "\n"
         << "Total Records retained\t\t\t= "

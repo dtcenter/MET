@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -889,6 +889,14 @@ static const char conf_val_chisquared[]  = "CHISQUARED";
 static const char conf_val_gamma[]       = "GAMMA";
 static const char conf_val_uniform[]     = "UNIFORM";
 static const char conf_val_beta[]        = "BETA";
+
+//
+// Grid-Diag specific parameter key names
+//
+
+static const char conf_key_hist1d_flag[]      = "histogram_1d";
+static const char conf_key_hist2d_flag[]      = "histogram_2d";
+static const char conf_key_info_theory_flag[] = "info_theory";
 
 //
 // STAT-Analysis and Pair-Stat specific parameter key names

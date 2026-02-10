@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -271,11 +271,8 @@ void get_grid()
    //  stole this code from plot_data_plane.cc
    //
 
-Met2dDataFile * met_ptr = (Met2dDataFile * ) nullptr;
-Met2dDataFileFactory m_factory;
-
-mlog << Debug(1)  << "Opening data file: " << grid_data_file << "\n";
-met_ptr = m_factory.new_met_2d_data_file(grid_data_file.c_str());
+mlog << Debug(1) << "Opening data file: " << grid_data_file << "\n";
+auto met_ptr = Met2dDataFileFactory::new_met_2d_data_file(grid_data_file.c_str());
 
 if ( !met_ptr ) {
 
@@ -290,7 +287,7 @@ grid = met_ptr->grid();
    //  done
    //
 
-delete met_ptr;   met_ptr = (Met2dDataFile *) nullptr;
+delete met_ptr;   met_ptr = nullptr;
 
 return;
 

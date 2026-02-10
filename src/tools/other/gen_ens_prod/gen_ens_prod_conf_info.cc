@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -104,7 +104,6 @@ void GenEnsProdConfInfo::read_config(const ConcatString default_file_name,
 
 void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_files, bool use_ctrl) {
    int i, j;
-   VarInfoFactory info_factory;
    Dictionary *edict = (Dictionary *) nullptr;
    Dictionary i_edict;
    InterpMthd mthd;
@@ -199,7 +198,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
          setenv(met_ens_member_id, ens_member_ids[j].c_str(), 1);
 
          // Allocate new VarInfo object
-         next_var = info_factory.new_var_info(etype);
+         next_var = VarInfoFactory::new_var_info(etype);
 
          // Set the current dictionary
          next_var->set_dict(i_edict);
@@ -238,7 +237,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
          setenv(met_ens_member_id, control_id.c_str(), 1);
 
          // Allocate new VarInfo object
-         next_var = info_factory.new_var_info(etype);
+         next_var = VarInfoFactory::new_var_info(etype);
 
          // Set the current dictionary
          next_var->set_dict(i_edict);

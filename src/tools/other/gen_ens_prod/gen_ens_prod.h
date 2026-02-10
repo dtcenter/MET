@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -97,9 +97,6 @@ static StringArray nc_ens_var_sa;
 // Grid variables
 static Grid grid;
 static int nxy = 0;
-
-// Data file factory and input files
-static Met2dDataFileFactory mtddf_factory;
 
 // Arrays to store running sums and counts
 static NumArray cnt_na, min_na, max_na, sum_na;

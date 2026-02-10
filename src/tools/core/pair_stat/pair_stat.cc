@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research led(UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -23,6 +23,7 @@
 //   001    03/10/25  Halley Gotway  MET #3059 Add ioda, python, and
 //                                   climo support
 //   002    09/25/25  Halley Gotway  MET #3186 Censoring and conversion
+//   003    01/27/26  Halley Gotway  MET #3298 Add the FULL grid, if needed
 //
 ////////////////////////////////////////////////////////////////////////
 

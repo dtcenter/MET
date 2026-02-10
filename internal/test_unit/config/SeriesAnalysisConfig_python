@@ -164,6 +164,5 @@ output_stats = {
 hss_ec_value   = NA;
 rank_corr_flag = FALSE;
 tmp_dir        = "/tmp";
-version        = "V12.2.0";
 
 ////////////////////////////////////////////////////////////////////////////////

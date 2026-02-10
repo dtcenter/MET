@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -466,8 +466,8 @@ static void get_data_plane(const ConcatString &file_name,
    }
 
    // Attempt to open the data file
-   Met2dDataFile *mtddf_ptr = Met2dDataFileFactory::new_met_2d_data_file(
-                                file_name.c_str(), ftype);
+   auto mtddf_ptr = Met2dDataFileFactory::new_met_2d_data_file(
+                       file_name.c_str(), ftype);
    if(!mtddf_ptr) {
       mlog << Error << "\nget_data_plane() -> "
            << "can't open input file \"" << file_name << "\"\n\n";
@@ -486,7 +486,7 @@ static void get_data_plane(const ConcatString &file_name,
    if(!local_cs.empty()) {
 
       // Allocate new VarInfo object
-      VarInfo *vi_ptr = VarInfoFactory::new_var_info(mtddf_ptr->file_type());
+      auto vi_ptr = VarInfoFactory::new_var_info(mtddf_ptr->file_type());
       if(!vi_ptr) {
          mlog << Error << "\nget_data_plane() -> "
               << "can't allocate new VarInfo pointer.\n\n";

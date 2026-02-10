@@ -160,7 +160,7 @@ obs_window = {
 // Verification masking regions
 //
 mask = {
-   grid  = [ "FULL" ];
+   grid  = [];
    poly  = [];
    sid   = [];
    llpnt = [];
@@ -244,6 +244,5 @@ grid_weight_flag  = ${GRID_WEIGHT};
 point_weight_flag = NONE;
 
 output_prefix = "${OUTPUT_PREFIX}";
-version       = "V12.2.0";
 
 ////////////////////////////////////////////////////////////////////////////////
