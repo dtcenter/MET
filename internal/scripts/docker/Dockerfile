@@ -1,5 +1,5 @@
-ARG MET_BASE_REPO=met-base
-ARG MET_BASE_TAG=3.4-latest
+ARG MET_BASE_REPO=met-base-dev
+ARG MET_BASE_TAG=feature_61_main_v3.4_python314
 
 FROM dtcenter/${MET_BASE_REPO}:${MET_BASE_TAG}
 MAINTAINER John Halley Gotway <johnhg@ucar.edu>
