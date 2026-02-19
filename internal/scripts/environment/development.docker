@@ -6,11 +6,6 @@ MET_PROJ_DIR=`ls -1d /met/MET*`
 # Variables required to build MET
 export MET_DEVELOPMENT=true
 
-export MET_PYTHON=/usr/local
-export MET_PYTHON_BIN_EXE=${MET_PYTHON}/bin/python3
-export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.14"
-export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.14 -ldl -lm"
-
 export CFLAGS="-DUNDERSCORE -fPIC"
 export CXXFLAGS=${CFLAGS}
 
