@@ -127,7 +127,7 @@ jobs:
           username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - uses: dtcenter/metplus-action-data-update@v5
+      - uses: dtcenter/metplus-action-data-update@v6
         with:
           docker_name: ${{ vars.DOCKER_USERNAME }}
           docker_pass: ${{ secrets.DOCKER_TOKEN }}
