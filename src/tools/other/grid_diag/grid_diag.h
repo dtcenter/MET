@@ -87,6 +87,7 @@ static GridDiagConfInfo conf_info;
 // Output NetCDF file
 static netCDF::NcFile *nc_out = nullptr;
 netCDF::NcDim mask_dim;
+netCDF::NcDim wavenumber_dim;
 std::vector<netCDF::NcDim> data_var_dims;
 int deflate_level;
 
@@ -129,6 +130,10 @@ struct DiagInfo {
    double entropy;
    std::map<int, double> joint_entropy;
    std::map<int, double> mutual_information;
+
+   // Power spectrum
+   std::vector<double> energy;
+   std::map<int, std::vector<double> > error_energy;
 };
 
 // DiagInfo objects [n_data][n_mask]

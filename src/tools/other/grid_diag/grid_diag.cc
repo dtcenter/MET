@@ -22,6 +22,7 @@
 //   005    10/03/22  Prestopnik      MET #2227 Remove using namespace std and netCDF from header files
 //   006    10/26/22  Linden          MET #2232 Refine the Grid-Diag output variable names when specifying two input data sources
 //   007    01/07/26  Halley Gotway   MET #3171 Multiple masks and information theory
+//   008    02/12/26  Halley Gotway   MET #3304 Power spectrum
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -62,6 +63,7 @@ static void setup_diag_info(void);
 static void process_series(void);
 static void process_hist1d(const vector<DataPlane> &);
 static void process_hist2d(const vector<DataPlane> &);
+static void process_power_spectrum(const vector<DataPlane> &);
 static void process_info_theory(void);
 static void setup_nc_file(void);
 static ConcatString get_nc_var_str(const VarInfo *, int);
@@ -71,6 +73,7 @@ static void write_hist_bins(void);
 static void write_hist1d(void);
 static void write_hist2d(void);
 static void write_info_theory(void);
+static void write_power_spectrum(void);
 static void clean_up(void);
 
 static Met2dDataFile *get_mtddf(const StringArray &, const int);
@@ -108,6 +111,9 @@ int met_main(int argc, char *argv[]) {
 
    // Write information theory output
    if(conf_info.nc_info.do_info_theory) write_info_theory();
+
+   // Write power spectrum output
+   if(conf_info.nc_info.do_power_spectrum) write_power_spectrum();
 
    // Write benchmarking metrics
    #ifdef WITH_PROFILER
@@ -423,6 +429,9 @@ static void process_series(void) {
       // Process the 2D histograms
       process_hist2d(data_dp);
 
+      // Process the power spectrum
+      process_power_spectrum(data_dp);
+
    } // end for i_series
 
    // Process information theory
@@ -515,6 +524,29 @@ static void process_hist2d(const vector<DataPlane> &data_dp) {
                              i_diag->hist2d[j_var],
                              data_dp[i_var], data_dp[j_var],
                              conf_info.mask_mp[i_mask]);
+         } // end for i_mask
+      } // end for j_var
+   } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void process_power_spectrum(const vector<DataPlane> &data_dp) {
+   size_t n_wave = min(grid.nx(), grid.ny());
+
+   // Process the power spectrum
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
+
+         for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
+
+            DiagInfo *i_diag = &diag_info[i_var][i_mask];
+
+	    // JHG work here
+	    if(i_diag->energy.empty())       i_diag->energy.resize(n_wave, 0.0);
+	    if(i_diag->error_energy.empty()) i_diag->error_energy[j_var].resize(n_wave, 0.0);
+
          } // end for i_mask
       } // end for j_var
    } // end for i_var
@@ -684,6 +716,12 @@ static void setup_nc_file(void) {
       mask_name_var.putVar(offsets, counts, &mask_name);
       int mask_size = conf_info.mask_mp[i_mask].count();
       mask_size_var.putVar(offsets, counts, &mask_size);
+   }
+
+   // Add the power spectra dimension
+   if(conf_info.nc_info.do_power_spectrum) {
+      wavenumber_dim = add_dim(nc_out, "wavenumber",
+                               (long) min(grid.nx(), grid.ny()));
    }
 }
 
@@ -944,6 +982,85 @@ static void write_info_theory(void) {
          je_var.putVar(je_data.data());
          mi_var.putVar(mi_data.data());
 
+      } // end for j_var
+   } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void write_power_spectrum(void) {
+   ConcatString units_cs("JHG");
+   vector<size_t> offsets = { 0, 0 };
+   vector<size_t> counts  = { 0, wavenumber_dim.getSize() };
+
+   // NetCDF dimensions remain constant across all variables
+   vector<NcDim> dims(2);
+   dims[0] = mask_dim;
+   dims[1] = wavenumber_dim;
+
+   // Define and write engery power spectrum
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      const VarInfo *i_data = conf_info.data_info[i_var];
+
+      // Define NetCDF variable name
+      ConcatString var_str(get_nc_var_str(i_data, i_var+1));
+      ConcatString var_name("energy_");
+      var_name << var_str;
+
+      // Create NetCDF variable
+      NcVar var = add_var(nc_out, var_name, ncFloat, dims,
+                          deflate_level);
+
+      // Add variable attributes
+      ConcatString cs;
+      cs << "Kinetic energy power spectrum for " << var_str;
+      add_var_att_local(&var, "long_name", cs);
+      add_var_att_local(&var, "units", units_cs);
+
+      // Write power spectrum for each mask
+      for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
+
+         const double *energy = diag_info[i_var][i_mask].energy.data();
+         offsets[0] = i_mask;
+         var.putVar(offsets, counts, energy);
+
+      } // end for i_mask
+   } // end for i_var
+
+   // Define and write error energy power spectrum
+   for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
+
+      const VarInfo *i_data = conf_info.data_info[i_var];
+
+      for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
+
+         const VarInfo *j_data = conf_info.data_info[j_var];
+
+         // Define NetCDF variable name
+         ConcatString var_str;
+         var_str << get_nc_var_str(i_data, i_var+1) << "_"
+                 << get_nc_var_str(j_data, j_var+1);
+	 ConcatString var_name("error_energy_");
+         var_name << var_str;
+
+         // Create NetCDF variable
+         NcVar var = add_var(nc_out, var_name, ncFloat, dims,
+                             deflate_level);
+
+         // Add variable attributes
+         ConcatString cs;
+         cs << "Kinetic error energy power spectrum for " << var_str << " values";
+         add_var_att_local(&var, "long_name", cs);
+
+         // Write power spectrum for each mask
+         for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
+
+            const double *energy = diag_info[i_var][i_mask].error_energy[j_var].data();
+            offsets[0] = i_mask;
+            var.putVar(offsets, counts, energy);
+
+         } // end for i_mask
       } // end for j_var
    } // end for i_var
 }
