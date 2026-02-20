@@ -63,7 +63,7 @@ If the UGRID dataset is supported by MET, then this item is set to the string id
 ugrid_max_distance_km
 ---------------------
 
-For PointStat, this is the distance from each UGRID cell center that PointStat will search outward to collect observations to use for verification. The default is 0 km, which by default will use the closest observation to the UGRID cell for verification. For GridStat, this is the distance from each forecast grid point to search for observation grid cells to include when interpolating to the forecast grid point locations. Currently, only the nearest point observation or gridded observation cell is used. See `Unstructured Grid Limitations`_ for additional details about interpolation when using GridStat.
+For PointStat, this is the maximum allowable distance in kilometers for a point observation to be matched to the nearest UGRID cell center. If left unspecified, each point observation will be matched to the closest UGRID cell, regardless of how far apart they are. If no UGRID cells are within the specified distance, the observation will be not used for verification. For GridStat, this is the distance from each forecast grid point to search for observation grid cells to include when interpolating to the forecast grid point locations. Currently, only the nearest point observation or gridded observation cell is used. See `Unstructured Grid Limitations`_ for additional details about interpolation when using GridStat.
 
 ugrid_coordinates_file
 ----------------------
