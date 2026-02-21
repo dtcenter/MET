@@ -24,7 +24,7 @@ ugrid_metadata_map = [
 //
 // Unstructured grid maximum search distance
 //
-ugrid_max_distance_km = 30;
+ugrid_max_distance_km = NA;
 
 ////////////////////////////////////////////////////////////////////////////////
 
