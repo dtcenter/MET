@@ -68,8 +68,14 @@ static void process_error_energy(const vector<DataPlane> &);
 static void process_info_theory(void);
 static void setup_nc_file(void);
 static ConcatString get_nc_var_str(const VarInfo *, int);
+static ConcatString get_nc_att_str(const ConcatString &,
+                                   const ConcatString &);
 static void write_nc_var_int(const char *, const char *, int);
-static void add_var_att_local(NcVar *, const char *, const ConcatString &);
+static void add_var_data_atts(NcVar *, const ConcatString &,
+                              const ConcatString &,
+                              const ConcatString &);
+static void add_var_att_local(NcVar *, const char *,
+                              const ConcatString &);
 static void write_hist_bins(void);
 static void write_hist1d(void);
 static void write_hist2d(void);
@@ -695,6 +701,21 @@ static ConcatString get_nc_var_str(const VarInfo *info, int index) {
 
 ////////////////////////////////////////////////////////////////////////
 
+static ConcatString get_nc_att_str(const ConcatString &cs1,
+                                   const ConcatString &cs2) {
+
+   // Return one if equal
+   if(cs1 == cs2) return cs1;
+
+   // Otherwise, include both strings
+   ConcatString cs(cs1);
+   cs << " and " << cs2;
+
+   return cs;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 static void setup_nc_file(void) {
 
    // Create NetCDF file
@@ -776,6 +797,21 @@ static void write_nc_var_int(const char *var_name,
 
 ////////////////////////////////////////////////////////////////////////
 
+static void add_var_data_atts(NcVar *var,
+                              const ConcatString &long_name_cs,
+                              const ConcatString &level_cs,
+                              const ConcatString &units_cs) {
+
+   // Add variable attributes for long_name, level, and units
+   if(var) {
+      add_var_att_local(var, "long_name", long_name_cs);
+      add_var_att_local(var, "level", level_cs);
+      add_var_att_local(var, "units", units_cs);
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
 static void add_var_att_local(NcVar *var, const char *att_name,
                               const ConcatString &att_value) {
    if(att_value.nonempty()) add_att(var, att_name, att_value.c_str());
@@ -816,16 +852,11 @@ static void write_hist_bins(void) {
       // Add variable attributes
       ConcatString cs;
       cs << cs_erase << "Minimum value of " << var_str << " bin";
-      add_var_att_local(&var_min, "long_name", cs);
-      add_var_att_local(&var_min, "units", i_data->units_attr());
-
+      add_var_data_atts(&var_min, cs, i_data->level_attr(), i_data->units_attr());
       cs << cs_erase << "Maximum value of " << var_str << " bin";
-      add_var_att_local(&var_max, "long_name", cs);
-      add_var_att_local(&var_max, "units", i_data->units_attr());
-
+      add_var_data_atts(&var_max, cs, i_data->level_attr(), i_data->units_attr());
       cs << cs_erase << "Midpoint value of " << var_str << " bin";
-      add_var_att_local(&var_mid, "long_name", cs);
-      add_var_att_local(&var_mid, "units", i_data->units_attr());
+      add_var_data_atts(&var_mid, cs, i_data->level_attr(), i_data->units_attr());
 
       // Write bin values for the current variable
       var_min.putVar(i_diag->bin_min.data());
@@ -861,7 +892,7 @@ static void write_hist1d(void) {
       // Add variable attributes
       ConcatString cs;
       cs << "Histogram of " << var_str << " values";
-      add_var_att_local(&var, "long_name", cs);
+      add_var_data_atts(&var, cs, i_data->level_attr(), i_data->units_attr());
 
       // Write 1D histogram for each mask
       for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
@@ -912,7 +943,11 @@ static void write_hist2d(void) {
          // Add variable attributes
          ConcatString cs;
          cs << "Joint histogram of " << var_str << " values";
-         add_var_att_local(&var, "long_name", cs);
+         add_var_data_atts(&var, cs,
+                           get_nc_att_str(i_data->level_attr(),
+                                          j_data->level_attr()),
+                           get_nc_att_str(i_data->units_attr(),
+                                          j_data->units_attr()));
 
          // Write 2D histogram for each mask
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
@@ -955,8 +990,7 @@ static void write_info_theory(void) {
       // Add variable attributes
       ConcatString cs;
       cs << "Entropy value for " << var_str;
-      add_var_att_local(&var, "long_name", cs);
-      add_var_att_local(&var, "units", units_cs);
+      add_var_data_atts(&var, cs, i_data->level_attr(), units_cs);
 
       // Store the data
       vector<double> data(conf_info.get_n_mask());
@@ -994,14 +1028,16 @@ static void write_info_theory(void) {
          NcVar mi_var = add_var(nc_out, mi_var_name, ncFloat,
                                 mask_dim, deflate_level);
 
+         // Level attribute
+         ConcatString level_cs(get_nc_att_str(i_data->level_attr(),
+                                              j_data->level_attr()));
+
          // Add variable attributes
          ConcatString cs;
          cs << "Joint entropy value for " << var_str;
-         add_var_att_local(&je_var, "long_name", cs);
-         add_var_att_local(&je_var, "units", units_cs);
+         add_var_data_atts(&je_var, cs, level_cs, units_cs);
          cs << cs_erase << "Mutual information value for " << var_str;
-         add_var_att_local(&mi_var, "long_name", cs);
-         add_var_att_local(&mi_var, "units", units_cs);
+         add_var_data_atts(&mi_var, cs, level_cs, units_cs);
 
          // Store the data
          vector<double> je_data(conf_info.get_n_mask());
@@ -1022,7 +1058,6 @@ static void write_info_theory(void) {
 ////////////////////////////////////////////////////////////////////////
 
 static void write_energy(void) {
-   ConcatString units_cs("JHG");
    vector<size_t> offsets = { 0, 0 };
    vector<size_t> counts  = { 0, wavenumber_dim.getSize() };
 
@@ -1046,8 +1081,7 @@ static void write_energy(void) {
       // Add variable attributes
       ConcatString cs;
       cs << "Kinetic energy power spectrum for " << var_str;
-      add_var_att_local(&var, "long_name", cs);
-      add_var_att_local(&var, "units", units_cs);
+      add_var_data_atts(&var, cs, i_data->level_attr(), i_data->units_attr());
 
       // Write power spectrum for each mask
       for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
@@ -1063,7 +1097,6 @@ static void write_energy(void) {
 ////////////////////////////////////////////////////////////////////////
 
 static void write_error_energy(void) {
-   ConcatString units_cs("JHG");
    vector<size_t> offsets = { 0, 0 };
    vector<size_t> counts  = { 0, wavenumber_dim.getSize() };
 
@@ -1090,10 +1123,19 @@ static void write_error_energy(void) {
          NcVar var = add_var(nc_out, var_name, ncFloat, dims,
                              deflate_level);
 
+         // Level attribute
+         ConcatString level_cs(get_nc_att_str(i_data->level_attr(),
+                                              j_data->level_attr()));
+
+         // Units attribute
+         ConcatString units_cs(get_nc_att_str(i_data->units_attr(),
+                                              j_data->units_attr()));
+
          // Add variable attributes
          ConcatString cs;
-         cs << "Kinetic error energy power spectrum for " << var_str << " values";
-         add_var_att_local(&var, "long_name", cs);
+         cs << "Kinetic error energy power spectrum for "
+            << var_str << " values";
+         add_var_data_atts(&var, cs, level_cs, units_cs);
 
          // Write power spectrum for each mask
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
