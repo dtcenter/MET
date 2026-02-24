@@ -11,6 +11,7 @@
 
 
 #include <iostream>
+#include <regex>
 #include <string>
 #include <sstream>
 #include <assert.h> 
@@ -494,22 +495,16 @@ double NdbcHandler::_extractDouble(const DataLine &data_line, int ptr) const
   // should be missing, based on documentation here:
   //     https://www.ndbc.noaa.gov/measdes.shtml
   // which suggests 'anything with only 9s is missing data'
+
+  // MET #3342 Use a regular expression to match a wider variety of
+  //           missing data values
   if (c == "MM" ||
-      c == "99" ||     c == "99.0" ||
-      c == "999" ||    c == "999.0" ||
-      c == "9999" ||   c == "9999.0" ||
-      c == "99999" ||  c == "99999.0" ||
-      c == "999999" || c == "999999.0" ||
-      c == "9999999" ||c == "9999999.0" ||
-      c == "-99" ||     c == "-99.0" ||
-      c == "-999" ||    c == "-999.0" ||
-      c == "-9999" ||   c == "-9999.0" ||
-      c == "-99999" ||  c == "-99999.0" ||
-      c == "-999999" || c == "-999999.0" ||
-      c == "-9999999" ||c == "-9999999.0")  {
+      regex_match(c, regex("^[-]*99[9]*$|^[-]*99[9]*\\.[0]*$"))) {
     return bad_data_double;
   }
 
-  double value = atof(c.c_str());
+  double value = stod(c);
   return value;
 }
+
+////////////////////////////////////////////////////////////////////////
