@@ -21,6 +21,11 @@ ugrid_metadata_map = [
    { key = "time";      val = "time_instant"; }
 ];
 
+//
+// Unstructured grid maximum search distance
+//
+ugrid_max_distance_km = NA;
+
 ////////////////////////////////////////////////////////////////////////////////
 
 version = "V12.2.0";
