@@ -695,7 +695,6 @@ void MetGrib2DataFile::read_grib2_record_list() {
    g2int numfields;
    int idx = 0;
    int rec_num = 1;
-   int cnt = 0;
 
    //  read all the records into the record list, pulling grid information from the first
    while( 0 <= (offset_next = read_grib2_record(offset, 0, 1, gfld, numfields)) ){
@@ -1591,15 +1590,16 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
    //  find the next record and read the info, return -1 if fail
    seekgb(FileGrib2, offset, 32000, &lskip, &lgrib);
    if(lgrib == 0) {
-      ConcatString cause_str;
-      if (sizeof(g2int) == 4) {
-         cause_str = " (due to 2 GB input size limit by the external library)";
+      if (lskip < offset) {
+         ConcatString cause_str = "";
+         if (sizeof(g2int) == 4) cause_str = " (input file size exceeds the 2 GB limit of the external library)";
+         mlog << Warning << "\n" << method_name
+              << "Stop reading GRIB records" << cause_str << "\n";
+         mlog << Warning << method_name
+              << "technical detail: seekgb offset=" << offset << ", lskip=" << lskip
+              << ", sizeof(g2int)=" << sizeof(g2int)
+              << "\n\n";
       }
-      mlog << Warning << "\n" << method_name
-           << "Stop reading GRIB records" << cause_str << "\n";
-      mlog << Warning << "\n" << method_name
-           << "technical detail: seekgb offset=" << offset << ", sizeof(g2int)=" << sizeof(g2int)
-           << "\n\n";
 
       //  reset to default out of memory handler
       set_new_handler(oom);
@@ -1607,14 +1607,13 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
    }
 
    //  allocate memory to store the record
-   auto cgrib = new unsigned char[lgrib];
+   vector<unsigned char> cgrib(lgrib);
    fseek(FileGrib2, lskip, SEEK_SET);
-   fread(cgrib, sizeof(unsigned char), lgrib, FileGrib2);
+   fread(cgrib.data(), sizeof(unsigned char), lgrib, FileGrib2);
 
-   if(g2_info(cgrib, listsec0.data(), listsec1.data(), &numfields, &numlocal)) {
+   if(g2_info(cgrib.data(), listsec0.data(), listsec1.data(), &numfields, &numlocal)) {
       mlog << Warning << "\n" << method_name
            << "Stop reading GRIB records due to a failure when calling g2_info\n\n";
-      if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) nullptr; }
 
       //  reset to default out of memory handler
       set_new_handler(oom);
@@ -1622,10 +1621,9 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
    }
 
    //  read the specified field in the record
-   g2_getfld(cgrib, ifld, unpack, 1, &gfld);
+   g2_getfld(cgrib.data(), ifld, unpack, 1, &gfld);
 
    //  cleanup
-   if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) nullptr; }
 
    //  reset to default out of memory handler
    set_new_handler(oom);
@@ -1638,8 +1636,8 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
 
 ConcatString MetGrib2DataFile::build_magic(const Grib2Record *rec){
    ConcatString lvl;
-   int lvl_val1 = (int)rec->LvlVal1;
-   int lvl_val2 = (int)rec->LvlVal2;
+   auto lvl_val1 = (int)rec->LvlVal1;
+   auto lvl_val2 = (int)rec->LvlVal2;
    switch( VarInfoGrib2::g2_lty_to_level_type(rec->LvlTyp) ){
       case LevelType_Accum:
          lvl = "A";
