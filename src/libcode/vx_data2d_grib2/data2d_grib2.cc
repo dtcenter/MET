@@ -109,7 +109,7 @@ bool MetGrib2DataFile::open(const char * _filename) {
 
    if( 1 > RecList.size() ) read_grib2_record_list();
 
-   bool status = ( 0 < RecList.size() );
+   bool status = ! RecList.empty();
    if( !status ){
       mlog << Warning << "\nGRIB2 records not found in input file '"
            << Filename << "'\n\n";
@@ -151,10 +151,11 @@ void MetGrib2DataFile::dump(ostream & out, int depth) const {
 bool MetGrib2DataFile::data_plane(VarInfo &vinfo, DataPlane &plane) {
 
    //  narrow the vinfo pointer
-   VarInfoGrib2* vinfo_g2 = (VarInfoGrib2*)(&vinfo);
+   auto vinfo_g2 = (VarInfoGrib2*)(&vinfo);
 
    //  search the list of records for matches
-   vector<Grib2Record*> listMatch, listMatchRange;
+   vector<Grib2Record*> listMatch;
+   vector<Grib2Record*> listMatchRange;
    find_record_matches(vinfo_g2, listMatch, listMatchRange);
 
    //  if no matches were found, check for derived records
@@ -245,10 +246,12 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
    plane_array.clear();
 
    //  narrow the vinfo pointer
-   VarInfoGrib2* vinfo_g2 = (VarInfoGrib2*)(&vinfo);
+   auto vinfo_g2 = (VarInfoGrib2*)(&vinfo);
 
    //  search the list of records for matches
-   vector<Grib2Record*> listMatchExact, listMatchRange, listRead;
+   vector<Grib2Record*> listMatchExact;
+   vector<Grib2Record*> listMatchRange;
+   vector<Grib2Record*> listRead;
    find_record_matches(vinfo_g2, listMatchExact, listMatchRange);
 
    //  if multiple exact matches were found, use the first one
@@ -289,7 +292,7 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
    }
 
    //  otherwise, if range matches were found, use them
-   else if( 0 < listMatchRange.size() ){
+   else if( ! listMatchRange.empty() ){
 
       ConcatString msg;
       for(size_t i=0; i < listMatchRange.size(); i++) {
@@ -328,9 +331,7 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
 
    //  read the matched data planes into a data plane array
    int num_read = 0;
-   for( vector<Grib2Record*>::iterator it = listRead.begin();
-       it < listRead.end();
-       it++ ) {
+   for( auto it = listRead.begin(); it < listRead.end(); it++ ) {
 
       //  read the data plane for the current record
       DataPlane plane;
@@ -357,7 +358,7 @@ int MetGrib2DataFile::data_plane_array(VarInfo &vinfo,
 
 ////////////////////////////////////////////////////////////////////////
 
-void MetGrib2DataFile::find_record_matches(VarInfoGrib2* vinfo,
+void MetGrib2DataFile::find_record_matches(const VarInfoGrib2* vinfo,
                                            vector<Grib2Record*> &listMatchExact,
                                            vector<Grib2Record*> &listMatchRange) {
 
@@ -372,9 +373,10 @@ void MetGrib2DataFile::find_record_matches(VarInfoGrib2* vinfo,
    double lvl1 = vinfo->level().lower();
    double lvl2 = vinfo->level().upper();
 
-   int vinfo_ens_type=bad_data_int, vinfo_ens_number=bad_data_int;
+   int vinfo_ens_type=bad_data_int;
+   int vinfo_ens_number=bad_data_int;
    ConcatString vinfo_ens = vinfo->ens();
-   if( vinfo_ens.length() > 0){
+   if( vinfo_ens.nonempty()){
       if( vinfo_ens == conf_key_grib_ens_hi_res_ctl ){
          vinfo_ens_type = 0;
          vinfo_ens_number = 0;
@@ -388,7 +390,7 @@ void MetGrib2DataFile::find_record_matches(VarInfoGrib2* vinfo,
          } else if ( sign == '-' ) {
             vinfo_ens_type = 2;
          }
-         char* ens_number_str  = new char[vinfo_ens.length()  ];
+         auto ens_number_str  = new char[vinfo_ens.length()  ];
          m_strncpy(ens_number_str, vinfo_ens.text()+1, (size_t) vinfo_ens.length(), method_name);
          ens_number_str[vinfo_ens.length()-1] = (char) 0;
 
@@ -408,9 +410,7 @@ void MetGrib2DataFile::find_record_matches(VarInfoGrib2* vinfo,
    }
 
    //  check each record for a match against the VarInfo
-   for( vector<Grib2Record*>::iterator it = RecList.begin();
-        it < RecList.end();
-        it++ ) {
+   for( auto it = RecList.begin(); it < RecList.end(); it++ ) {
 
       bool rec_match_ex = false;
       bool rec_match_rn = false;
@@ -445,9 +445,9 @@ void MetGrib2DataFile::find_record_matches(VarInfoGrib2* vinfo,
 
       //  test ipdtmpl array values
       if(vinfo->n_ipdtmpl() > 0) {
-         int i, j;
+         int j;
          bool skip = false;
-         for(i=0; i<vinfo->n_ipdtmpl(); i++) {
+         for(int i=0; i<vinfo->n_ipdtmpl(); i++) {
             j = vinfo->ipdtmpl_index(i);
             if(j >= (*it)->IPDTmpl.n() ||
               (j < (*it)->IPDTmpl.n() &&
@@ -520,7 +520,7 @@ void MetGrib2DataFile::find_record_matches(VarInfoGrib2* vinfo,
          }
 
          //  pressure or vertical level type
-         else if( vinfo_lty == vinfo->g2_lty_to_level_type((*it)->LvlTyp) ){
+         else if( vinfo_lty == VarInfoGrib2::g2_lty_to_level_type((*it)->LvlTyp) ){
             if( LevelType_Pres == vinfo_lty ){
                rec_lvl1 /= 100;
                rec_lvl2 /= 100;
@@ -579,7 +579,7 @@ void MetGrib2DataFile::find_record_matches(VarInfoGrib2* vinfo,
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlane MetGrib2DataFile::check_uv_rotation(VarInfoGrib2 *vinfo, Grib2Record *rec, DataPlane plane){
+DataPlane MetGrib2DataFile::check_uv_rotation(const VarInfoGrib2 *vinfo, Grib2Record *rec, DataPlane plane){
 
    //  check that the field is present in the pair map
    string parm_name = vinfo->name().text();
@@ -609,7 +609,10 @@ DataPlane MetGrib2DataFile::check_uv_rotation(VarInfoGrib2 *vinfo, Grib2Record *
         << rec_pair->RecNum << " field " << rec_pair->FieldNum << "\n";
 
    //  rotate the winds
-   DataPlane u2d, v2d, u2d_rot, v2d_rot;
+   DataPlane u2d;
+   DataPlane v2d;
+   DataPlane u2d_rot;
+   DataPlane v2d_rot;
    if( 'U' == parm_name.at(0) ){ u2d = plane;  v2d = plane_pair; }
    else                        { v2d = plane;  u2d = plane_pair; }
    rotate_uv_grid_to_earth(u2d, v2d, *Raw_Grid, u2d_rot, v2d_rot);
@@ -621,7 +624,7 @@ DataPlane MetGrib2DataFile::check_uv_rotation(VarInfoGrib2 *vinfo, Grib2Record *
 
 ////////////////////////////////////////////////////////////////////////
 
-DataPlaneArray MetGrib2DataFile::check_derived( VarInfoGrib2 *vinfo ){
+DataPlaneArray MetGrib2DataFile::check_derived( const VarInfoGrib2 *vinfo ){
    DataPlaneArray array_ret;
 
    //  if the requested field cannot be derived, bail
@@ -687,9 +690,12 @@ DataPlaneArray MetGrib2DataFile::check_derived( VarInfoGrib2 *vinfo ){
 
 void MetGrib2DataFile::read_grib2_record_list() {
    gribfield  *gfld;
-   long offset = 0, offset_next;
+   long offset = 0;
+   long offset_next;
    g2int numfields;
-   int idx = 0, rec_num = 1;
+   int idx = 0;
+   int rec_num = 1;
+   int cnt = 0;
 
    //  read all the records into the record list, pulling grid information from the first
    while( 0 <= (offset_next = read_grib2_record(offset, 0, 1, gfld, numfields)) ){
@@ -726,7 +732,7 @@ void MetGrib2DataFile::read_grib2_record_list() {
          }
 
          //  store the record information
-         Grib2Record *rec = new Grib2Record;
+         auto rec = new Grib2Record;
          rec->ByteOffset   = offset;
          rec->Index        = idx++;
          rec->NumFields    = (int)numfields;
@@ -880,7 +886,8 @@ void MetGrib2DataFile::read_grib2_record_list() {
          } else {
 
             //  determine the index for the time unit and forecast time
-            int i_time_unit, i_fcst_time;
+            int i_fcst_time;
+            int i_time_unit;
             switch(gfld->ipdtnum){
 
                //  https://www.nco.ncep.noaa.gov/pmb/docs/grib2/grib2_doc/grib2_temp4-48.shtml
@@ -986,7 +993,8 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
 
    const char * method_name = "MetGrib2DataFile::read_grib2_grid() -> ";
 
-   double d, r_km;
+   double d;
+   double r_km;
    int ResCompFlag;
    char hem = 0;
 
@@ -1132,7 +1140,8 @@ void MetGrib2DataFile::read_grib2_grid(gribfield *gfld) {
          //  location of (rotated) south pole
          //
 
-      double s_lat, s_lon;
+      double s_lat;
+      double s_lon;
 
       s_lat = (t[19])*angle_factor;
 
@@ -1451,8 +1460,9 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
    gribfield *gfld;
    g2int numfields;
    const int max_miss = 2;
-   float v, v_miss[max_miss];
-   int n_miss, i;
+   float v;
+   array<float,max_miss> v_miss;
+   int n_miss;
    if( -1 == read_grib2_record(rec->ByteOffset, 1, rec->FieldNum, gfld,
                                numfields) ){
       mlog << Error
@@ -1481,7 +1491,7 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
    plane.set_size(n_x, n_y);
 
    //  get the missing data value(s), if specified
-   g2_miss(gfld, v_miss, &n_miss);
+   g2_miss(gfld, v_miss.data(), &n_miss);
    int miss_count = n_miss;
    if(miss_count > max_miss) {
       miss_count = max_miss;
@@ -1518,7 +1528,7 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
               (float)gfld->fld[idx_data] : bad_data_float);
 
          //  check missing data values, if specified
-         for(i=0; i < miss_count; i++) {
+         for(int i=0; i < miss_count; i++) {
             if(is_eq(v, v_miss[i])) { v = bad_data_float; break; }
          }
 
@@ -1534,7 +1544,8 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
    plane.set_accum ( rec->Accum     );
 
    //  print a report
-   double plane_min, plane_max;
+   double plane_max;
+   double plane_min;
    plane.data_range(plane_min, plane_max);
    mlog << Debug(4) << "\n"
         << "Data plane information:\n"
@@ -1545,7 +1556,7 @@ bool MetGrib2DataFile::read_grib2_record_data_plane(Grib2Record *rec,
         << "      lead time: " << sec_to_hhmmss(rec->LeadTime)  << "\n"
         << "      init time: " << unix_to_yyyymmdd_hhmmss(rec->InitTime)  << "\n"
         << "    bitmap flag: " << gfld->ibmap << "\n";
-   for(i=0; i < miss_count; i++) {
+   for(int i=0; i < miss_count; i++) {
       mlog << Debug(4)
            << " missing val(" << i+1 << "): " << v_miss[i] << "\n";
    }
@@ -1562,6 +1573,8 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
                                          g2int ifld, gribfield* &gfld,
                                          g2int &numfields) {
 
+   const char * method_name = "MetGrib2DataFile::read_grib2_record() -> ";
+
    //  the following code was lifted and modified from:
    //  http://www.nco.ncep.noaa.gov/pmb/docs/grib2/download/g2clib.documentation
 
@@ -1569,19 +1582,42 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
    set_new_handler(oom_grib2);
 
    //  g2c fields
-   g2int listsec0[3], listsec1[13], numlocal, lskip, lgrib;
+   g2int lgrib;
+   g2int lskip;
+   g2int numlocal;
+   array<g2int,3> listsec0;
+   array<g2int,13> listsec1;
 
    //  find the next record and read the info, return -1 if fail
    seekgb(FileGrib2, offset, 32000, &lskip, &lgrib);
-   if(lgrib == 0) return -1;
+   if(lgrib == 0) {
+      ConcatString cause_str;
+      if (sizeof(g2int) == 4) {
+         cause_str = " (due to 2 GB input size limit by the external library)";
+      }
+      mlog << Warning << "\n" << method_name
+           << "Stop reading GRIB records" << cause_str << "\n";
+      mlog << Warning << "\n" << method_name
+           << "technical detail: seekgb offset=" << offset << ", sizeof(g2int)=" << sizeof(g2int)
+           << "\n\n";
+
+      //  reset to default out of memory handler
+      set_new_handler(oom);
+      return -1;
+   }
 
    //  allocate memory to store the record
-   unsigned char * cgrib = new unsigned char[lgrib];
+   auto cgrib = new unsigned char[lgrib];
    fseek(FileGrib2, lskip, SEEK_SET);
    fread(cgrib, sizeof(unsigned char), lgrib, FileGrib2);
 
-   if(g2_info(cgrib, listsec0, listsec1, &numfields, &numlocal)) {
+   if(g2_info(cgrib, listsec0.data(), listsec1.data(), &numfields, &numlocal)) {
+      mlog << Warning << "\n" << method_name
+           << "Stop reading GRIB records due to a failure when calling g2_info\n\n";
       if(cgrib) { delete [] cgrib; cgrib = (unsigned char *) nullptr; }
+
+      //  reset to default out of memory handler
+      set_new_handler(oom);
       return -1;
    }
 
@@ -1600,9 +1636,10 @@ long MetGrib2DataFile::read_grib2_record(long offset, g2int unpack,
 
 ////////////////////////////////////////////////////////////////////////
 
-ConcatString MetGrib2DataFile::build_magic(Grib2Record *rec){
+ConcatString MetGrib2DataFile::build_magic(const Grib2Record *rec){
    ConcatString lvl;
-   int lvl_val1 = (int)rec->LvlVal1, lvl_val2 = (int)rec->LvlVal2;
+   int lvl_val1 = (int)rec->LvlVal1;
+   int lvl_val2 = (int)rec->LvlVal2;
    switch( VarInfoGrib2::g2_lty_to_level_type(rec->LvlTyp) ){
       case LevelType_Accum:
          lvl = "A";
@@ -1635,7 +1672,8 @@ ConcatString MetGrib2DataFile::build_magic(Grib2Record *rec){
 ////////////////////////////////////////////////////////////////////////
 
 int MetGrib2DataFile::index( VarInfo &vinfo ){
-   vector<Grib2Record*> listMatchExact, listMatchRange;
+   vector<Grib2Record*> listMatchExact;
+   vector<Grib2Record*> listMatchRange;
    find_record_matches((VarInfoGrib2*)(&vinfo), listMatchExact, listMatchRange);
    return 1 > listMatchExact.size() ? -1 : listMatchExact[0]->Index;
 }
