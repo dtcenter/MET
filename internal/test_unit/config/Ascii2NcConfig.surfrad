@@ -46,8 +46,3 @@ time_summary = {
   vld_thresh = 0.0;
 }
 
-//
-// Indicate a version number for the contents of this configuration file.
-// The value should generally not be modified.
-//
-version = "V12.2.0";

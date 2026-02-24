@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -376,6 +376,10 @@ return;
 void Mode_Field_Info::set_merge_thresh_by_index (int k)
 
 {
+
+// MET #3286: Only set the merge threshold when actually needed
+
+if ( !need_merge_thresh() ) return;
 
 if ( (k < 0) || (k >= merge_thresh_array.n_elements()) )  {
 

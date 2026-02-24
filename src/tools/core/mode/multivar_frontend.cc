@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -609,7 +609,7 @@ void MultivarFrontEnd::_create_intensity_comparisons(
    // this debug statement assumes fcsts and obs have same conv radius and thresh indices
    // which is currently required
    mlog << Debug(1) << "\n" << sep
-        << "\nRunning mvmode intensity comparisions conv_radius[" << fcsts._rIndex+1
+        << "\nRunning mvmode intensity comparisons conv_radius[" << fcsts._rIndex+1
         << "] conv_thresh[" << fcsts._tIndex+1 << "]\n" << sep << "\n";
 
    _init_exec(ModeExecutive::MULTIVAR_INTENSITY, fcst_filename, obs_filename);
@@ -624,14 +624,14 @@ void MultivarFrontEnd::_create_intensity_comparisons(
    conf.Fcst->var_info->set_units(mvdf->_units.c_str());
    if (fcsts._super._hasUnion && conf.Fcst->merge_flag == MergeType::Thresh) {
       mlog << Warning << "\nModeFrontEnd::_create_intensity_comparisons() -> "
-           << "Logic includes union '||' along with  'merge_flag=THRESH' "
+           << "Logic includes union '||' along with 'merge_flag=THRESH' "
            << ". This can lead to bad results\n\n";
    }
    conf.Obs->var_info->set_level_name(mvdo->_level.c_str());
    conf.Obs->var_info->set_units(mvdo->_units.c_str());
    if (obs._super._hasUnion && conf.Obs->merge_flag == MergeType::Thresh) {
       mlog << Warning << "\nModeFrontEnd::_create_intensity_comparisons() -> "
-           << "Logic includes union '||' along with  'merge_flag=THRESH' "
+           << "Logic includes union '||' along with 'merge_flag=THRESH' "
            << ". This can lead to bad results\n\n";
    }
        
@@ -694,7 +694,7 @@ void MultivarFrontEnd::_process_superobjects(SimpleObjects &fcsts, SimpleObjects
        (conf.Fcst->merge_flag == MergeType::Thresh ||
         conf.Obs->merge_flag == MergeType::Thresh)) {
       mlog << Warning << "\nModeFrontEnd::_process_superobjects() -> "
-           << "Logic includes union '||' along with  'merge_flag=THRESH' "
+           << "Logic includes union '||' along with 'merge_flag=THRESH' "
            << ". This can lead to bad results\n\n";
    }
        

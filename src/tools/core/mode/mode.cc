@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -58,6 +58,7 @@
 //   021    06/09/23  Albo           Major changes for multivariate mode
 //   022    11/02/23  Halley Gotway  MET #2724 add OpenMP to convolution
 //   023    12/27/23  Albo           MET #2745 more unit tests, read data one time, percentile thresholding
+//   024    02/04/26  Halley Gotway  MET #3286 multivariate MODE config options
 //
 ////////////////////////////////////////////////////////////////////////
 

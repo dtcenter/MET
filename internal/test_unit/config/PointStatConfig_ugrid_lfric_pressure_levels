@@ -183,6 +183,5 @@ ugrid_max_distance_km = 30;
 
 tmp_dir       = "/tmp";
 output_prefix = "${OUTPUT_PREFIX}";
-version       = "V12.2.0";
 
 ////////////////////////////////////////////////////////////////////////////////

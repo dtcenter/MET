@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -1498,13 +1498,12 @@ void ModeConfInfo::set_fcst_conv_thresh_by_index(int k)
 void ModeConfInfo::set_merge_thresh_by_index(int k)
 {
    if ( data_type != ModeDataType::MvMode_Fcst &&
-        Obs->need_merge_thresh() ) set_obs_merge_thresh_by_index  (k);
+        Obs->need_merge_thresh() ) set_obs_merge_thresh_by_index (k);
    if ( data_type != ModeDataType::MvMode_Obs &&
         Fcst->need_merge_thresh() ) set_fcst_merge_thresh_by_index (k);
 }   
 
 ////////////////////////////////////////////////////////////////////////
-
 
 void ModeConfInfo::set_fcst_merge_thresh_by_index(int k)
 
@@ -1516,13 +1515,10 @@ void ModeConfInfo::set_fcst_merge_thresh_by_index(int k)
            << "software is set for obs data not fcst\n\n";
       exit (1);
    }
+
    Fcst->set_merge_thresh_by_index(k);
    return;
-
 }
-
-
-
 
 ////////////////////////////////////////////////////////////////////////
 

@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -54,6 +54,7 @@
 //   025    06/23/25  Halley Gotway  MET #3148 Search input directories
 //   026    10/17/25  Halley Gotway  MET #3266 Fix IABP/ISMN infinite loops
 //                                   for empty input files
+//   027    02/18/26  Halley Gotway  MET #3342 Fix NDBC bad data
 //
 ////////////////////////////////////////////////////////////////////////
 

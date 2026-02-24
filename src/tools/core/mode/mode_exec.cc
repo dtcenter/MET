@@ -1,5 +1,5 @@
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
-// ** Copyright UCAR (c) 1992 - 2025
+// ** Copyright UCAR (c) 1992 - 2026
 // ** University Corporation for Atmospheric Research (UCAR)
 // ** National Center for Atmospheric Research (NCAR)
 // ** Research Applications Lab (RAL)
@@ -2717,8 +2717,8 @@ static void nc_add_string(NcFile * f, const char * text, const char * var_name, 
 
    if ( ! put_nc_data(&var, t) )  {
 
-      mlog << Error
-           << " nc_add_string() -> unable to add string variable \"" << t << "\"\n\n";
+      mlog << Error << "\nnc_add_string() -> "
+           << "unable to add string variable \"" << t << "\"\n\n";
 
       exit ( 1 );
 
