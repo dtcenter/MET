@@ -9,6 +9,30 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.1.2 Release Notes (20260226)
+-------------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * Fix segfault when reading climatological data from a CF-compliant NetCDF file fails
+       (`#3235 <https://github.com/dtcenter/MET/issues/3235>`_).
+     * Fix the logic to apply "set_attr_grid" before "ShiftRight"
+       (`#3255 <https://github.com/dtcenter/MET/issues/3255>`_).
+     * Fix ASCII2NC hang when run with an empty input file
+       (`#3266 <https://github.com/dtcenter/MET/issues/3266>`_).
+     * Fix ASCII2NC to handle a wider range of NDBC bad data values
+       (`#3342 <https://github.com/dtcenter/MET/issues/3342>`_).
+
+  .. dropdown:: METbaseimage testing environment
+
+     * Update the METbaseimage to use Python 3.14
+       (`METbaseimage#61 <https://github.com/dtcenter/METbaseimage/issues/61>`_).
+
+  .. note:: MET version 12.1.2 is built upon METbaseimage version 3.4.9 in which the
+            Python version was upgraded from 3.12 to 3.14. This change only impacts
+            MET's Docker development and testing environment. MET version 12.1.2 should
+            continue working well with Python version 3.12.
+
 MET Version 12.1.1 Release Notes (20250827)
 -------------------------------------------
 
