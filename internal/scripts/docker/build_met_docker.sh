@@ -16,6 +16,25 @@ if [ -z ${MET_CONFIG_OPTS+x} ]; then
   echo "Setting MET_CONFIG_OPTS=${MET_CONFIG_OPTS} to compile all available options."
 fi
 
+# Check that required MET_PYTHON environment variables
+# have been set by METbaseimage
+if [[ -z "${MET_PYTHON}"         ||
+      -z "${MET_PYTHON_BIN_EXE}" ||
+      -z "${MET_PYTHON_CC}"      ||
+      -z "${MET_PYTHON_LD}" ]]; then
+  echo
+  echo "ERROR: Required Python environment variable(s) unset:"
+  echo "ERROR: \${MET_PYTHON}, \${MET_PYTHON_BIN_EXE}, \${MET_PYTHON_CC}, \${MET_PYTHON_LD}"
+  echo
+  exit 1
+else
+  echo "Using Python environment:"
+  echo "MET_PYTHON=${MET_PYTHON}"
+  echo "MET_PYTHON_BIN_EXE=${MET_PYTHON_BIN_EXE}"
+  echo "MET_PYTHON_CC=${MET_PYTHON_CC}"
+  echo "MET_PYTHON_LD=${MET_PYTHON_LD}"
+fi
+
 # Create log directory
 mkdir -p /met/logs
 
