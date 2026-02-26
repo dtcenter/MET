@@ -790,7 +790,7 @@ static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          //
          // Create a data file object.
          //
-         auto mtddf = factory.new_met_2d_data_file(cur_file.c_str(), ftype);
+         auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(cur_file.c_str(), ftype);
          if(!mtddf) {
             mlog << Warning << "search_pcp_dir() -> "
                  << "can't open data file \"" << cur_file << "\"\n";
