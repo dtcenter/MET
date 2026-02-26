@@ -214,16 +214,21 @@ void process_command_line(int argc, char **argv) {
 ////////////////////////////////////////////////////////////////////////
 
 void process_data_file() {
-   DataPlane fr_dp, to_dp;
-   Grid fr_grid, to_grid;
+   int field_count;
+   DataPlane fr_dp;
+   DataPlane to_dp;
+   Grid fr_grid;
+   Grid to_grid;
    GrdFileType ftype;
-   double dmin, dmax;
-   ConcatString run_cs, vname;
+   double dmax;
+   double dmin;
+   ConcatString run_cs;
+   ConcatString vname;
    //Variables for GOES
    unixtime valid_time = 0;
    bool opt_all_attrs = false;
-   NcFile *nc_in = (NcFile *) nullptr;
-   static const char *method_name = "process_data_file() ";
+   auto nc_in = (NcFile *) nullptr;
+   static const char *method_name = "process_data_file() -> ";
 
    // Initialize configuration object
    MetConfig config;
@@ -241,7 +246,7 @@ void process_data_file() {
    auto fr_mtddf = Met2dDataFileFactory::new_met_2d_data_file(InputFilename.c_str(), ftype);
 
    if(!fr_mtddf) {
-      mlog << Error << "\nprocess_data_file() -> "
+      mlog << Error << "\n" << method_name
            << "\"" << InputFilename << "\" not a valid data file\n\n";
       exit(1);
    }
@@ -253,13 +258,26 @@ void process_data_file() {
    auto vinfo = VarInfoFactory::new_var_info(ftype);
 
    if(!vinfo) {
-      mlog << Error << "\nprocess_data_file() -> "
+      mlog << Error << "\n" << method_name
            << "unable to determine file type of \"" << InputFilename
            << "\"\n\n";
       exit(1);
    }
-   config.read_string(FieldSA[0].c_str());
-   vinfo->set_dict(config);
+
+   field_count = 0;
+   for(int i=0; i<FieldSA.n_elements(); i++) {
+      config.read_string(FieldSA[0].c_str());
+      if (vinfo->set_dict(config, false)) {
+         field_count++;
+         break;
+      }
+   }
+
+   if (field_count == 0) {
+      mlog << Error << "\n" << method_name
+           << "unable to get the input grid due to no matching fields\n\n";
+      exit(1);
+   }
 
    // Update the input grid, if needed
    update_mtddf_grid(fr_mtddf, vinfo);
@@ -284,6 +302,7 @@ void process_data_file() {
    // Open the output file
    open_nc(to_grid, run_cs);
 
+   field_count = 0;
    // Loop through the requested fields
    for(int i=0; i<FieldSA.n_elements(); i++) {
 
@@ -292,17 +311,18 @@ void process_data_file() {
 
       // Populate the VarInfo object using the config string
       config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      if (!vinfo->set_dict(config, false)) continue;
 
       // Get the data plane from the file for this VarInfo object
       if(!fr_mtddf->data_plane(*vinfo, fr_dp)) {
-         mlog << Error << "\nprocess_data_file() -> trouble getting field \""
+         mlog << Warning << "\n" << method_name << "trouble getting field \""
               << FieldSA[i] << "\" from file \"" << InputFilename << "\"\n\n";
-         exit(1);
+         continue;
       }
 
       // Regrid the data plane
       to_dp = met_regrid(fr_dp, fr_grid, to_grid, RGInfo);
+      field_count++;
 
       // List range of data values
       if(mlog.verbosity_level() >= 2) {
@@ -333,10 +353,20 @@ void process_data_file() {
 
    } // end for i
 
+   if (field_count == 0) {
+      mlog << Warning << "\n" << method_name
+           << "\nNo available fileds\n\n";
+   }
+   else if (field_count < FieldSA.n_elements()) {
+      mlog << Debug(1) << method_name
+           << field_count << " fields were proessed (out of "
+           << FieldSA.n_elements() << " fields)\n";
+   }
+
    // Close the output file
    close_nc();
 
-   delete nc_in;  nc_in  = 0;
+   delete nc_in;  nc_in  = nullptr;
 
    // Clean up
    if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) nullptr; }
