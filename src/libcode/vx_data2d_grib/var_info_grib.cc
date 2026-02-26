@@ -277,7 +277,7 @@ void VarInfoGrib::add_grib_code (Dictionary &dict)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoGrib::set_dict(Dictionary & dict) {
+bool VarInfoGrib::set_dict(Dictionary & dict, bool do_exit) {
 
    VarInfo::set_dict(dict);
 
@@ -313,7 +313,7 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
 
    //  check for a probability dictionary setting
    Dictionary* dict_prob;
-   if(nullptr == (dict_prob = dict.lookup_dictionary(conf_key_prob, false, false))) return;
+   if(nullptr == (dict_prob = dict.lookup_dictionary(conf_key_prob, false, false))) return true;
 
    //  gather information from the prob dictionary
    ConcatString prob_name = dict_prob->lookup_string(conf_key_name);
@@ -329,10 +329,18 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
 
    //  look up the probability field abbreviation
    if( !GribTable.lookup_grib1(prob_name.c_str(), field_ptv, field_code, tab, tab_match) ){
-      mlog << Error << "\nVarInfoGrib::set_dict() -> "
-           << "unrecognized GRIB1 probability field abbreviation '"
-           << prob_name << "'\n\n";
-      exit(1);
+      ConcatString msg;
+      msg << "\nVarInfoGrib::set_dict() -> "
+          << "unrecognized GRIB1 probability field abbreviation '"
+          << prob_name << "'\n\n";
+      if (do_exit) {
+         mlog << Error << msg;
+         exit(1);
+      }
+      else {
+         mlog << Warning << msg;
+         return false;
+      }
    }
 
    set_p_flag  ( true      );
@@ -341,6 +349,7 @@ void VarInfoGrib::set_dict(Dictionary & dict) {
 
    set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 
+   return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

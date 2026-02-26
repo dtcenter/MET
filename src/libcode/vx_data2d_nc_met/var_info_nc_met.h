@@ -60,7 +60,7 @@ class VarInfoNcMet : public VarInfo
          //
 
       void set_magic(const ConcatString &, const ConcatString &) override;
-      void set_dict(Dictionary &s) override;
+      bool set_dict(Dictionary &s, bool do_exit=true) override;
 
       void add_dimension(int dim);
 

@@ -158,7 +158,7 @@ class VarInfo
          //
 
       virtual void set_magic(const ConcatString &, const ConcatString &);
-      virtual void set_dict(Dictionary &);
+      virtual bool set_dict(Dictionary &, bool do_exit=true);
       virtual void add_grib_code(Dictionary &);
 
       void set_req_name(const char *);

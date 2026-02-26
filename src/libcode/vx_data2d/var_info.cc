@@ -481,7 +481,7 @@ ConcatString VarInfo::magic_str_attr() const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfo::set_dict(Dictionary &dict) {
+bool VarInfo::set_dict(Dictionary &dict, bool do_exit) {
    ThreshArray ta;
    NumArray na;
    ConcatString s;
@@ -523,12 +523,20 @@ void VarInfo::set_dict(Dictionary &dict) {
 
    // Check for equal number of censor thresholds and values
    if(ta.n_elements() != na.n_elements()) {
-      mlog << Error << "\nVarInfo::set_dict() -> "
-           << "The number of censor thresholds in \""
-           << conf_key_censor_thresh << "\" (" << ta.n_elements()
-           << ") must match the number of replacement values in \""
-           << conf_key_censor_val << "\" (" << na.n_elements() << ").\n\n";
-      exit(1);
+      ConcatString msg;
+      msg << "\nVarInfo::set_dict() -> "
+          << "The number of censor thresholds in \""
+          << conf_key_censor_thresh << "\" (" << ta.n_elements()
+          << ") must match the number of replacement values in \""
+          << conf_key_censor_val << "\" (" << na.n_elements() << ").\n\n";
+      if (do_exit) {
+         mlog << Error << msg;
+         exit(1);
+      }
+      else {
+         mlog << Warning << msg;
+         return false;
+      }
    }
 
    // Parse n_bins, if present
@@ -591,15 +599,23 @@ void VarInfo::set_dict(Dictionary &dict) {
    if(SetAttrIsWindSpeed     == 1) n++;
    if(SetAttrIsWindDirection == 1) n++;
    if(n > 1) {
-      mlog << Error << "\nVarInfo::set_dict() -> "
-           << "At most one wind attribute flag ("
-           << conf_key_is_u_wind << ", " << conf_key_is_v_wind << ", "
-           << conf_key_is_wind_speed << ", " << conf_key_is_wind_direction
-           << ") can be set to true for each field.\n\n";
-      exit(1);
+      ConcatString msg;
+      msg << "\nVarInfo::set_dict() -> "
+          << "At most one wind attribute flag ("
+          << conf_key_is_u_wind << ", " << conf_key_is_v_wind << ", "
+          << conf_key_is_wind_speed << ", " << conf_key_is_wind_direction
+          << ") can be set to true for each field.\n\n";
+      if (do_exit) {
+         mlog << Error << msg;
+         exit(1);
+      }
+      else {
+         mlog << Warning << msg;
+         return false;
+      }
    }
 
-   return;
+   return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

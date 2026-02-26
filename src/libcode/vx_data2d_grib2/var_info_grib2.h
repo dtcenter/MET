@@ -108,7 +108,7 @@ class VarInfoGrib2 : public VarInfo
          // set stuff
          //
 
-      void set_dict(Dictionary &) override;
+      bool set_dict(Dictionary &, bool do_exit=true) override;
 
       void set_record(int);
       void set_discipline(int);

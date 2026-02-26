@@ -48,7 +48,7 @@ class VarInfoPairs : public VarInfo {
          // set stuff
          //
 
-      void set_dict(Dictionary &);
+      bool set_dict(Dictionary &, bool do_exit=true);
 
          //
          // do stuff

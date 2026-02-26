@@ -320,7 +320,7 @@ void VarInfoGrib2::set_ipdtmpl_val(const IntArray &v) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoGrib2::set_dict(Dictionary & dict) {
+bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
 
    VarInfo::set_dict(dict);
 
@@ -353,12 +353,20 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
 
    //  arrays must have the same length
    if(IPDTmplIndex.n() != IPDTmplVal.n()) {
-      mlog << Error << "\nVarInfoGrib2::set_dict() -> "
-           << "the number of \"" << conf_key_GRIB2_ipdtmpl_index
-           << "\" entries (" << IPDTmplIndex.n()
-           << ") must match the number of \"" << conf_key_GRIB2_ipdtmpl_val
-           << "\" entries (" << IPDTmplVal.n() << ")!\n\n";
-      exit(1);
+      ConcatString msg;
+      msg << "\nVarInfoGrib2::set_dict() -> "
+          << "the number of \"" << conf_key_GRIB2_ipdtmpl_index
+          << "\" entries (" << IPDTmplIndex.n()
+          << ") must match the number of \"" << conf_key_GRIB2_ipdtmpl_val
+          << "\" entries (" << IPDTmplVal.n() << ")!\n\n";
+      if (do_exit) {
+         mlog << Error << msg;
+         exit(1);
+      }
+      else {
+         mlog << Warning << msg;
+         return false;
+      }
    }
 
    //  if the name is specified, use it
@@ -371,12 +379,19 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       if( !GribTable.lookup_grib2(field_name.c_str(), field_disc, field_parm_cat, field_parm, mtab, cntr, ltab,
                                   tab, tab_match) &&
           field_name != "PROB" ){
-         mlog << Error << "\nVarInfoGrib2::set_dict() -> "
-              << "unrecognized GRIB2 field abbreviation '" << field_name
-              << "'\n\n";
-         exit(1);
+         ConcatString msg;
+         msg << "\nVarInfoGrib2::set_dict() -> "
+             << "unrecognized GRIB2 field abbreviation '" << field_name
+             << "'\n\n";
+         if (do_exit) {
+            mlog << Error << msg;
+            exit(1);
+         }
+         else {
+            mlog << Warning << msg;
+            return false;
+         }
       }
-
    }
 
    //  if the field name is not specified, look for and use indexes
@@ -386,23 +401,39 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
       if( bad_data_int == field_disc ||
           bad_data_int == field_parm_cat ||
           bad_data_int == field_parm ){
-         mlog << Error << "\nVarInfoGrib2::set_dict() -> "
-              << "either name or GRIB2_disc, GRIB2_parm_cat and GRIB2_parm "
-              << "must be specified in field information\n\n";
-         exit(1);
+         ConcatString msg;
+         msg << "\nVarInfoGrib2::set_dict() -> "
+             << "either name or GRIB2_disc, GRIB2_parm_cat and GRIB2_parm "
+             << "must be specified in field information\n\n";
+         if (do_exit) {
+            mlog << Error << msg;
+            exit(1);
+         }
+         else {
+            mlog << Warning << msg;
+            return false;
+         }
       }
 
       //  use the specified indexes to look up the field name
       if( !GribTable.lookup_grib2(field_disc, field_parm_cat,
                                   field_parm, mtab, cntr, ltab, tab) ){
-         mlog << Error << "\nVarInfoGrib2::set_dict() -> "
-              << "no parameter found with matching "
-              << "GRIB2_disc ("     << field_disc     << ") "
-              << "GRIB2_parm_cat (" << field_parm_cat << ") "
-              << "GRIB2_parm ("     << field_parm     << "). "
-              << "Use the MET_GRIB_TABLES environment variable to "
-              << "define custom GRIB tables.\n\n";
-         exit(1);
+         ConcatString msg;
+         msg << "\nVarInfoGrib2::set_dict() -> "
+             << "no parameter found with matching "
+             << "GRIB2_disc ("     << field_disc     << ") "
+             << "GRIB2_parm_cat (" << field_parm_cat << ") "
+             << "GRIB2_parm ("     << field_parm     << "). "
+             << "Use the MET_GRIB_TABLES environment variable to "
+             << "define custom GRIB tables.\n\n";
+         if (do_exit) {
+            mlog << Error << msg;
+            exit(1);
+         }
+         else {
+            mlog << Warning << msg;
+            return false;
+         }
       }
 
       //  use the lookup parameter name
@@ -428,15 +459,23 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    set_record(Level.type() == LevelType_RecNumber ? nint(Level.lower()) : -1);
 
    //  if the field is not probabilistic, work is done
-   if(field_name != "PROB") return;
+   if(field_name != "PROB") return true;
 
    //  check for a probability dictionary setting
    Dictionary* dict_prob;
    if(nullptr == (dict_prob = dict.lookup_dictionary(conf_key_prob, false, false))){
-      mlog << Error << "\nVarInfoGrib2::set_dict() -> "
-           << "if the field name is set to \"PROB\", then a prob dictionary "
-           << "must be defined\n\n";
-      exit(1);
+      ConcatString msg;
+      msg << "\nVarInfoGrib2::set_dict() -> "
+          << "if the field name is set to \"PROB\", then a prob dictionary "
+          << "must be defined\n\n";
+      if (do_exit) {
+         mlog << Error << msg;
+         exit(1);
+      }
+      else {
+         mlog << Warning << msg;
+         return false;
+      }
    }
 
    //  gather information from the prob dictionary
@@ -450,10 +489,18 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
    //  look up the probability field abbreviation
    if(!GribTable.lookup_grib2(prob_name.c_str(), field_disc, field_parm_cat,
                               field_parm, mtab, cntr, ltab, tab, tab_match)){
-      mlog << Error << "\nVarInfoGrib2::set_dict() -> "
-           << "unrecognized GRIB2 probability field abbreviation '"
-           << prob_name << "'\n\n";
-      exit(1);
+      ConcatString msg;
+      msg << "\nVarInfoGrib2::set_dict() -> "
+          << "unrecognized GRIB2 probability field abbreviation '"
+          << prob_name << "'\n\n";
+      if (do_exit) {
+         mlog << Error << msg;
+         exit(1);
+      }
+      else {
+         mlog << Warning << msg;
+         return false;
+      }
    }
 
    set_discipline ( tab.index_a );
@@ -465,6 +512,7 @@ void VarInfoGrib2::set_dict(Dictionary & dict) {
 
    set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 
+   return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
