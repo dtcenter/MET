@@ -25,7 +25,7 @@ MET Version 12.1.2 Release Notes (20260226)
 
   .. dropdown:: METbaseimage testing environment
 
-     * Update the METbaseimage to use Python 3.14
+     * Update METbaseimage to Python 3.14
        (`METbaseimage#61 <https://github.com/dtcenter/METbaseimage/issues/61>`_).
 
   .. note:: MET version 12.1.2 is built upon METbaseimage version 3.4.9 in which the
