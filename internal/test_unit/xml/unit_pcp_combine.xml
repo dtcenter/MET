@@ -73,6 +73,22 @@
     </output>
   </test>
 
+  <!-- MET #3353 sum command with bad file type returns bad status of 1 -->
+  <!--           the input files are acually GRIB1, not GRIB2           -->
+
+  <test name="pcp_combine_sum_BAD_FILE_TYPE">
+    <exec>&MET_BIN;/pcp_combine</exec>
+    <retval>1</retval>
+    <param> \
+      20120409_00 3 20120409_18 18 \
+      &OUTPUT_DIR;/pcp_combine/nam_2012040900_F018_APCP18.nc \
+      -pcpdir &DATA_DIR_MODEL;/grib1/nam \
+      -field 'name="APCP"; level="A3"; file_type=GRIB2;'
+    </param>
+    <output>
+    </output>
+  </test>
+
   <!--                                    -->
   <!--  pcp_combine -add                  -->
   <!--                                    -->
