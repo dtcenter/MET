@@ -20,6 +20,8 @@ MET Version 12.2.1 Release Notes (20260227)
        (`#3317 <https://github.com/dtcenter/MET/issues/3317>`_).
      * Fix ASCII2NC to handle a wider range of NDBC bad data values
        (`#3342 <https://github.com/dtcenter/MET/issues/3342>`_).
+     * Fix support for the "file_type" option in the PCP-Combine "sum" command
+       (`#3353 <https://github.com/dtcenter/MET/issues/3353>`_).
 
   .. dropdown:: METbaseimage testing environment
 
