@@ -9,6 +9,28 @@ When applicable, release notes are followed by the GitHub issue number which des
 enhancement, or new feature (`MET GitHub issues <https://github.com/dtcenter/MET/issues>`_).
 Important issues are listed **in bold** for emphasis.
 
+MET Version 12.2.1 Release Notes (20260227)
+-------------------------------------------
+
+  .. dropdown:: Bugfixes
+
+     * Fix support for the "set_attr_grid" config option when defining the verification domain
+       (`#3293 <https://github.com/dtcenter/MET/issues/3293>`_).
+     * Fix dependency checks and compile flag defaults in "compile_MET_all.sh"
+       (`#3317 <https://github.com/dtcenter/MET/issues/3317>`_).
+     * Fix ASCII2NC to handle a wider range of NDBC bad data values
+       (`#3342 <https://github.com/dtcenter/MET/issues/3342>`_).
+
+  .. dropdown:: METbaseimage testing environment
+
+     * Update METbaseimage to Python 3.14
+       (`METbaseimage#61 <https://github.com/dtcenter/METbaseimage/issues/61>`_).
+
+  .. note:: MET version 12.2.1 is built upon METbaseimage version 3.4.9 in which the
+            Python version was upgraded from 3.12 to 3.14. This change only impacts
+            MET's Docker development and testing environment. MET version 12.1.2 should
+            continue working well with Python version 3.12.
+
 MET Version 12.2.0 Release Notes (20251113)
 -------------------------------------------
 
