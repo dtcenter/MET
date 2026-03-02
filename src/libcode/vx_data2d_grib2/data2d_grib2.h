@@ -97,7 +97,7 @@ class MetGrib2DataFile : public Met2dDataFile {
       //
 
 
-      void find_record_matches( VarInfoGrib2* vinfo,
+      void find_record_matches( const VarInfoGrib2* vinfo,
                                 std::vector<Grib2Record*> &listMatchExact,
                                 std::vector<Grib2Record*> &listMatchRange
                               );
@@ -111,12 +111,12 @@ class MetGrib2DataFile : public Met2dDataFile {
 
       void read_grib2_record_list();
 
-      DataPlane check_uv_rotation( VarInfoGrib2 *vinfo,
+      DataPlane check_uv_rotation( const VarInfoGrib2 *vinfo,
                                    Grib2Record *rec,
                                    DataPlane plane
                                  );
 
-      DataPlaneArray check_derived( VarInfoGrib2 *vinfo );
+      DataPlaneArray check_derived( const VarInfoGrib2 *vinfo );
 
 
    public:
@@ -156,7 +156,7 @@ class MetGrib2DataFile : public Met2dDataFile {
 
       void dump(std::ostream &, int = 0) const;
 
-      static ConcatString build_magic(Grib2Record *rec);
+      static ConcatString build_magic(const Grib2Record *rec);
 
 };
 
