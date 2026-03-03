@@ -89,8 +89,8 @@ static NcDim  lon_dim ;
 
 static void process_command_line(int, char **);
 static void process_data_file();
-static void open_nc(const Grid &grid, const ConcatString run_cs);
-static void write_nc(const DataPlane &dp, const Grid &grid,
+static void open_nc(const Grid &grid, const ConcatString &run_cs);
+static void write_nc(const DataPlane &dp,
                      const VarInfo *vinfo, const char *vname);
 static void close_nc();
 static void usage(int exit_code=1);
@@ -124,18 +124,13 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return "regrid_data_plane";
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void initialize() {
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void process_command_line(int argc, char **argv) {
+void static process_command_line(int argc, char **argv) {
    CommandLine cline;
 
    // Set default regridding options
@@ -213,7 +208,7 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_data_file() {
+void static process_data_file() {
    int field_count;
    DataPlane fr_dp;
    DataPlane to_dp;
@@ -225,8 +220,6 @@ void process_data_file() {
    ConcatString run_cs;
    ConcatString vname;
    //Variables for GOES
-   unixtime valid_time = 0;
-   bool opt_all_attrs = false;
    auto nc_in = (NcFile *) nullptr;
    static const char *method_name = "process_data_file() -> ";
 
@@ -349,7 +342,7 @@ void process_data_file() {
       }
 
       // Write the regridded data
-      write_nc(to_dp, to_grid, vinfo, vname.c_str());
+      write_nc(to_dp, vinfo, vname.c_str());
 
    } // end for i
 
@@ -377,7 +370,7 @@ void process_data_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void open_nc(const Grid &grid, ConcatString run_cs) {
+void static open_nc(const Grid &grid, const ConcatString &run_cs) {
 
    // Create output file
    nc_out = open_ncfile(OutputFilename.c_str(), true);
@@ -406,8 +399,8 @@ void open_nc(const Grid &grid, ConcatString run_cs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc(const DataPlane &dp, const Grid &grid,
-              const VarInfo *vinfo, const char *vname) {
+void static write_nc(const DataPlane &dp, const VarInfo *vinfo,
+                     const char *vname) {
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = 0;
@@ -433,7 +426,7 @@ void write_nc(const DataPlane &dp, const Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void close_nc() {
+void static close_nc() {
 
    // Clean up
    if(nc_out) {
@@ -538,44 +531,44 @@ __attribute__((noreturn)) static void usage(int exit_code) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_field(const StringArray &a) {
+void static set_field(const StringArray &a) {
    FieldSA.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_method(const StringArray &a) {
+void static set_method(const StringArray &a) {
    RGInfo.method = string_to_interpmthd(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_gaussian_dx(const StringArray &a) {
+void static set_gaussian_dx(const StringArray &a) {
    RGInfo.gaussian.dx = atof(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
-void set_width(const StringArray &a) {
+void static set_width(const StringArray &a) {
    RGInfo.width = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_gaussian_radius(const StringArray &a) {
+void static set_gaussian_radius(const StringArray &a) {
    RGInfo.gaussian.radius = atof(a[0].c_str());
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_shape(const StringArray &a) {
+void static set_shape(const StringArray &a) {
    GridTemplateFactory gtf;
    RGInfo.shape = gtf.string2Enum(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_vld_thresh(const StringArray &a) {
+void static set_vld_thresh(const StringArray &a) {
    RGInfo.vld_thresh = atof(a[0].c_str());
    if(RGInfo.vld_thresh > 1 || RGInfo.vld_thresh < 0) {
       mlog << Error << "\nset_vld_thresh() -> "
@@ -587,7 +580,7 @@ void set_vld_thresh(const StringArray &a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_convert(const StringArray &a) {
+void static set_convert(const StringArray &a) {
 
    // Can only be used once
    if(RGInfo.convert_fx.is_set()) {
@@ -604,20 +597,20 @@ void set_convert(const StringArray &a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_censor(const StringArray &a) {
+void static set_censor(const StringArray &a) {
    RGInfo.censor_thresh.add(a[0].c_str());
    RGInfo.censor_val.add(atof(a[1].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_name(const StringArray & a) {
+void static set_name(const StringArray & a) {
    VarNameSA.add_css(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+void static set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
 
