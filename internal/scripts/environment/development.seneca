@@ -14,7 +14,7 @@ export MET_HDFINC=${MET_DST}/hdf4-4.2.16-2/include/hdf
 export MET_HDFLIB=${MET_DST}/hdf4-4.2.16-2/lib
 export MET_HDFEOS=${MET_DST}/hdf-eos2-3.0
 export MET_BUFR=${MET_DST}/nceplibs-1.4.0/bufr-12.0.1
-export MET_GRIB2C=${MET_DST}/nceplibs-1.4.0/g2c-1.6.2
+export MET_GRIB2C=${MET_DST}/nceplibs-1.4.0/g2c-1.6.4
 export MET_GSLINC=/usr/include
 export MET_GSLLIB=/usr/lib/x86_64-linux-gnu
 export MET_ATLAS=${MET_DST}/atlas-0.30.0
@@ -27,8 +27,8 @@ export MET_PYTHON_BIN_EXE=${MET_PYTHON}/bin/python3.12
 export MET_PYTHON_CC="-I${MET_PYTHON}/include/python3.12"
 export MET_PYTHON_LD="-L${MET_PYTHON}/lib -lpython3.12 -lcrypt -lpthread -ldl -lutil -lm"
 
-# -D__64BIT__ is required because we've compiled libgrib2c.a with that flag
-export CFLAGS="-DUNDERSCORE -fPIC -D__64BIT__ -g"
+# -D__64BIT__ is disabled after MET-11.1 (was required because of libgrib2c.a with that flag)
+export CFLAGS="-DUNDERSCORE -fPIC -g"
 export CXXFLAGS=${CFLAGS}
 
 # Set LDFLAGS to include -rpath settings when compiling MET

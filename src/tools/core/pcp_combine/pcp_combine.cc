@@ -80,6 +80,7 @@
 //   026    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings.
 //   027    05/09/24  Halley Gotway  MET #2883 Allow missing input files.
 //   028    04/30/25  Prestopnik     MET #3120 Add OpenMP 
+//   029    02/26/26  Halley Gotway  MET #3353 Support file_type for sum
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -778,9 +779,18 @@ static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          cur_file << cs_erase << cur_dir << '/' << dirp->d_name;
 
          //
+         // MET #3353: Parse the file type from the field string, if present.
+         //
+         GrdFileType ftype = FileType_None;
+         if(field_string.nonempty()) {
+            config.read_string(field_string.c_str());
+            ftype = parse_conf_file_type(&config);
+         }
+
+         //
          // Create a data file object.
          //
-         auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(cur_file.c_str());
+         auto mtddf = Met2dDataFileFactory::new_met_2d_data_file(cur_file.c_str(), ftype);
          if(!mtddf) {
             mlog << Warning << "search_pcp_dir() -> "
                  << "can't open data file \"" << cur_file << "\"\n";
