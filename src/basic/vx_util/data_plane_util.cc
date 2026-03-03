@@ -844,3 +844,45 @@ DataPlane distance_map(const DataPlane &dp) {
 
 ////////////////////////////////////////////////////////////////////////
 
+extern vector<double> radial_energy(const DataPlane &dp) {
+
+   // Check for empty input
+   if(dp.is_empty()) {
+      mlog << Error << "\nradial_energy() -> "
+           << "empty input!\n\n";
+      exit(1);
+   }
+
+   // Define the number of bins as the smaller dimension
+   int nx = dp.nx();
+   int ny = dp.ny();
+   int n_bins = min(nx, ny);
+   vector<double> re(n_bins, 0.0);
+
+   // Maximum euclidean distance from (0,0)
+   double max_dist = sqrt((nx-1)*(nx-1) + (ny-1)*(ny-1));
+
+   // Accumulate the radial energy for each bin
+   for(int x=0; x<nx; x++) {
+      for(int y=0; y<ny; y++) {
+
+         // Energy is the square of coefficient
+         double energy = dp(x,y)*dp(x,y);
+
+         // Euclidean distance from (0,0)
+         double dist = sqrt(x*x + y*y);
+
+         // Map distance to a bin index [0, n_bins - 1]
+         auto bin = (int)((dist / max_dist) * (n_bins - 1));
+
+	 // Accumulate energy for each bin
+         if(bin < n_bins) re[bin] += energy;
+
+      } // end for y
+   } // end for x
+
+   return re;
+}
+
+////////////////////////////////////////////////////////////////////////
+

@@ -65,8 +65,8 @@ mask = {
 output_flag = {
    histogram_1d   = TRUE;
    histogram_2d   = TRUE;
-   info_theory    = FALSE;
-   power_spectrum = FALSE;
+   info_theory    = TRUE;
+   power_spectrum = TRUE;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

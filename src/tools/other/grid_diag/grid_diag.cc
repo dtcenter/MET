@@ -65,6 +65,8 @@ static void process_hist1d(const vector<DataPlane> &);
 static void process_hist2d(const vector<DataPlane> &);
 static void process_energy(const vector<DataPlane> &);
 static void process_error_energy(const vector<DataPlane> &);
+static void accumulate(vector<double> &, const vector<double> &);
+static DataPlane dct_typeII(const DataPlane &);
 static void process_info_theory(void);
 static void setup_nc_file(void);
 static ConcatString get_nc_var_str(const VarInfo *, int);
@@ -546,7 +548,6 @@ static void process_hist2d(const vector<DataPlane> &data_dp) {
 ////////////////////////////////////////////////////////////////////////
 
 static void process_energy(const vector<DataPlane> &data_dp) {
-   size_t n_wave = min(grid.nx(), grid.ny());
 
    // Process the power spectrum
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
@@ -555,11 +556,15 @@ static void process_energy(const vector<DataPlane> &data_dp) {
 
          DiagInfo *i_diag = &diag_info[i_var][i_mask];
 
-         // Energy decomposition
-	 if(i_diag->energy.empty()) {
-            i_diag->energy.resize(n_wave, 0.0);
-         }
-	 // JHG work here
+         // Apply the mask before updating the data ranges
+         DataPlane mask_dp(data_dp[i_var]);
+         apply_mask(mask_dp, conf_info.mask_mp[i_mask]);
+
+         // Apply the discrete cosine transform
+         DataPlane dct_dp(dct_typeII(mask_dp));
+
+         // Sum the radial energy
+         accumulate(i_diag->energy, radial_energy(dct_dp));
 
       } // end for i_mask
    } // end for i_var
@@ -568,27 +573,65 @@ static void process_energy(const vector<DataPlane> &data_dp) {
 ////////////////////////////////////////////////////////////////////////
 
 static void process_error_energy(const vector<DataPlane> &data_dp) {
-   size_t n_wave = min(grid.nx(), grid.ny());
 
    // Process the power spectrum
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
 
       for(int j_var=i_var+1; j_var < conf_info.get_n_data(); j_var++) {
 
+         // Compute difference field
+         DataPlane diff_dp(subtract(data_dp[i_var], data_dp[j_var]));
+
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
 
             DiagInfo *i_diag = &diag_info[i_var][i_mask];
 
-            // Error energy decomposition
-	    if(multiple_data_sources) {
-               if(i_diag->error_energy.empty()) {
-                  i_diag->error_energy[j_var].resize(n_wave, 0.0);
-               }
-	       // JHG work here
-            }
+            // Apply the mask before updating the data ranges
+            DataPlane mask_dp(diff_dp);
+            apply_mask(mask_dp, conf_info.mask_mp[i_mask]);
+
+            // Apply the discrete cosine transform
+            DataPlane dct_dp(dct_typeII(mask_dp));
+
+            // Sum the radial energy
+            accumulate(i_diag->error_energy[j_var],
+                       radial_energy(dct_dp));
+
          } // end for i_mask
       } // end for j_var
    } // end for i_var
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void accumulate(vector<double> &sum, const vector<double> &cur) {
+
+   // Initialize the sum if needed
+   if(sum.empty()) {
+      sum = cur;
+   }
+   // Otherwise, accumulate values
+   else {
+
+      // Must be the same size
+      if(sum.size() != cur.size()) {
+         mlog << Error << "\naccumulate() -> "
+              << "vector lenghts do not match (" << sum.size()
+              << " != " << cur.size() << ")!\n\n";
+         exit(1);
+      }
+
+      // Increment each element 
+      for(int i=0; i<sum.size(); i++) sum[i] += cur[i];
+   }
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static DataPlane dct_typeII(const DataPlane &dp) {
+   DataPlane dct_dp(dp);
+   dct_typeII_2d(dct_dp.buf().data(), dct_dp.nx(), dct_dp.ny());
+   return dct_dp;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1059,7 +1102,7 @@ static void write_info_theory(void) {
 
 static void write_energy(void) {
    vector<size_t> offsets = { 0, 0 };
-   vector<size_t> counts  = { 0, wavenumber_dim.getSize() };
+   vector<size_t> counts  = { 1, wavenumber_dim.getSize() };
 
    // NetCDF dimensions remain constant across all variables
    vector<NcDim> dims = { mask_dim, wavenumber_dim };
@@ -1086,9 +1129,14 @@ static void write_energy(void) {
       // Write power spectrum for each mask
       for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
 
-         const double *energy = diag_info[i_var][i_mask].energy.data();
+         DiagInfo *i_diag = &diag_info[i_var][i_mask];
+
+         // Divide sums by the series length
+         for(auto &x : i_diag->energy) x /= n_series;
+
+         // Write the mean energy
          offsets[0] = i_mask;
-         var.putVar(offsets, counts, energy);
+         var.putVar(offsets, counts, i_diag->energy.data());
 
       } // end for i_mask
    } // end for i_var
@@ -1098,7 +1146,7 @@ static void write_energy(void) {
 
 static void write_error_energy(void) {
    vector<size_t> offsets = { 0, 0 };
-   vector<size_t> counts  = { 0, wavenumber_dim.getSize() };
+   vector<size_t> counts  = { 1, wavenumber_dim.getSize() };
 
    // NetCDF dimensions remain constant across all variables
    vector<NcDim> dims = { mask_dim, wavenumber_dim };
@@ -1140,9 +1188,14 @@ static void write_error_energy(void) {
          // Write power spectrum for each mask
          for(int i_mask=0; i_mask < conf_info.get_n_mask(); i_mask++) {
 
-            const double *energy = diag_info[i_var][i_mask].error_energy[j_var].data();
+            DiagInfo *i_diag = &diag_info[i_var][i_mask];
+
+            // Divide sums by the series length
+            for(auto &x : i_diag->error_energy[j_var]) x /= n_series;
+
+            // Write the mean error energy
             offsets[0] = i_mask;
-            var.putVar(offsets, counts, energy);
+            var.putVar(offsets, counts, i_diag->error_energy[j_var].data());
 
          } // end for i_mask
       } // end for j_var

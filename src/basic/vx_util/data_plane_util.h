@@ -77,6 +77,8 @@ extern DataPlane gradient(const DataPlane &, int dim, int delta);
 
 extern DataPlane distance_map(const DataPlane &);
 
+extern std::vector<double> radial_energy(const DataPlane &);
+
 ////////////////////////////////////////////////////////////////////////
 
 #endif   //  __DATA_PLANE_UTIL__

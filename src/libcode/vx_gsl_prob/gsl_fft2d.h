@@ -6,23 +6,25 @@
 // ** P.O.Box 3000, Boulder, Colorado, 80307-3000, USA
 // *=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 
+////////////////////////////////////////////////////////////////////////
+
+#ifndef  __MET_GSL_FFT2D_H__
+#define  __MET_GSL_FFT2D_H__
 
 ////////////////////////////////////////////////////////////////////////
 
-#ifndef  __VX_GSL_PROB_H__
-#define  __VX_GSL_PROB_H__
+#include <vector>
+
+#include "vx_util.h"
+#include "gsl/gsl_fft_real.h"
 
 ////////////////////////////////////////////////////////////////////////
 
-#include "gsl_cdf.h"
-#include "gsl_bvn.h"
-#include "gsl_fft2d.h"
-#include "gsl_randist.h"
-#include "gsl_statistics.h"
-#include "gsl_wavelet2d.h"
+extern void dct_typeII_2d(double *data, int nrow, int ncol);
 
 ////////////////////////////////////////////////////////////////////////
 
-#endif   /*  __VX_GSL_PROB_H__  */
+#endif   /*  __MET_GSL_FFT2D_H__  */
 
 ////////////////////////////////////////////////////////////////////////
+
