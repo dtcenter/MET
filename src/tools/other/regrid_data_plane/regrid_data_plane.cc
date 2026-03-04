@@ -352,8 +352,8 @@ void static process_data_file() {
    }
    else if (field_count < FieldSA.n_elements()) {
       mlog << Debug(1) << method_name
-           << field_count << " fields were proessed (out of "
-           << FieldSA.n_elements() << " fields)\n";
+           << field_count << " fields (out of " << FieldSA.n_elements()
+           << ") were processed\n";
    }
 
    // Close the output file
