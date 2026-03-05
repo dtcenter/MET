@@ -333,14 +333,8 @@ bool VarInfoGrib::set_dict(Dictionary & dict, bool do_exit) {
       msg << "\nVarInfoGrib::set_dict() -> "
           << "unrecognized GRIB1 probability field abbreviation '"
           << prob_name << "'\n\n";
-      if (do_exit) {
-         mlog << Error << msg;
-         exit(1);
-      }
-      else {
-         mlog << Warning << msg;
-         return false;
-      }
+      handle_config_error(msg, do_exit);
+      return false;
    }
 
    set_p_flag  ( true      );

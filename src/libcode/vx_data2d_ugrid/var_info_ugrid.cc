@@ -305,14 +305,8 @@ bool VarInfoUGrid::set_dict(Dictionary &dict, bool do_exit){
       msg << "\n" << method_name
           << "Multiple vertical levels ("
           << cfg_level  << ") for UGrid are not supported\n\n";
-      if (do_exit) {
-         mlog << Error << msg;
-         exit(1);
-      }
-      else {
-         mlog << Warning << msg;
-         return false;
-      }
+      handle_config_error(msg, do_exit);
+      return false;
    }
 
    set_req_name(cfg_name.c_str());
