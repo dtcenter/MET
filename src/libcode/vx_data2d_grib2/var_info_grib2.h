@@ -23,6 +23,7 @@
 #include "vx_util.h"
 #include "var_info.h"
 #include "data_file_type.h"
+#include "vx_data2d.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -66,6 +67,16 @@ class VarInfoGrib2 : public VarInfo
 
       void init_from_scratch();
       void assign(const VarInfoGrib2 &);
+      void parse_and_set_grib2_filters(Dictionary &dict);
+      bool parse_and_set_prob_field(Dictionary &dict, int mtab, int cntr,
+                                    int ltab, Grib2TableEntry &tab,
+                                    int &tab_match, bool do_exit);
+      bool resolve_field_name(Dictionary & dict, ConcatString &field_name,
+                              int &field_disc, int &field_parm_cat,
+                              int &field_parm, Grib2TableEntry &tab,
+                              int &tab_match, int mtab, int cntr, int ltab,
+                              bool do_exit);
+      bool validate_ipdtmpl_arrays(Dictionary &dict, bool do_exit);
 
    public:
       VarInfoGrib2();
@@ -166,7 +177,7 @@ inline int    VarInfoGrib2::aerosol_interval_type() const { return AerosolInterv
 inline double VarInfoGrib2::aerosol_size_lower()    const { return AerosolSizeLower;    }
 inline double VarInfoGrib2::aerosol_size_upper()    const { return AerosolSizeUpper;    }
 
-inline int VarInfoGrib2::n_ipdtmpl()          const { return IPDTmplIndex.n(); } 
+inline int VarInfoGrib2::n_ipdtmpl()          const { return IPDTmplIndex.n(); }
 inline int VarInfoGrib2::ipdtmpl_index(int i) const { return IPDTmplIndex[i];  }
 inline int VarInfoGrib2::ipdtmpl_val(int i)   const { return IPDTmplVal[i];    }
 
