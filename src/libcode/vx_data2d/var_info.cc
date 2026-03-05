@@ -267,6 +267,19 @@ ConcatString VarInfo::magic_time_str() const {
    return cs;
 }
 
+////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::handle_config_error(const ConcatString &msg, bool do_exit) {
+   if (do_exit) {
+      mlog << Error << msg;
+      exit(1);
+   }
+   else {
+      mlog << Warning << msg;
+      return false;
+   }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfo::set_req_name(const char *str) {
@@ -487,6 +500,7 @@ bool VarInfo::set_dict(Dictionary &dict, bool do_exit) {
    ConcatString s;
    bool b;
    int n;
+   const char *method_name = "VarInfo::set_dict(Dictionary &dict) -> ";
 
    // Set init time, if present
    s = dict.lookup_string(conf_key_init_time, false);
@@ -522,22 +536,7 @@ bool VarInfo::set_dict(Dictionary &dict, bool do_exit) {
    if(dict.last_lookup_status()) set_censor_val(na);
 
    // Check for equal number of censor thresholds and values
-   if(ta.n_elements() != na.n_elements()) {
-      ConcatString msg;
-      msg << "\nVarInfo::set_dict() -> "
-          << "The number of censor thresholds in \""
-          << conf_key_censor_thresh << "\" (" << ta.n_elements()
-          << ") must match the number of replacement values in \""
-          << conf_key_censor_val << "\" (" << na.n_elements() << ").\n\n";
-      if (do_exit) {
-         mlog << Error << msg;
-         exit(1);
-      }
-      else {
-         mlog << Warning << msg;
-         return false;
-      }
-   }
+   if (!validate_censor_arrays(ta, na, do_exit, method_name)) return false;
 
    // Parse n_bins, if present
    n = dict.lookup_int(conf_key_n_bins, false);
@@ -562,7 +561,7 @@ bool VarInfo::set_dict(Dictionary &dict, bool do_exit) {
 
    // Parse set_attr grid
    s = parse_set_attr_string(dict, conf_key_set_attr_grid);
-   build_grid_by_grid_string(s, SetAttrGrid, "VarInfo::set_dict(Dictionary &dict) ->");
+   build_grid_by_grid_string(s, SetAttrGrid, method_name);
 
    // Parse set_attr times
    s = parse_set_attr_string(dict, conf_key_set_attr_init);
@@ -593,29 +592,9 @@ bool VarInfo::set_dict(Dictionary &dict, bool do_exit) {
       parse_set_attr_flag(dict, conf_key_is_prob);
 
    // At most one wind attribute flag can be set
-   n = 0;
-   if(SetAttrIsUWind         == 1) n++;
-   if(SetAttrIsVWind         == 1) n++;
-   if(SetAttrIsWindSpeed     == 1) n++;
-   if(SetAttrIsWindDirection == 1) n++;
-   if(n > 1) {
-      ConcatString msg;
-      msg << "\nVarInfo::set_dict() -> "
-          << "At most one wind attribute flag ("
-          << conf_key_is_u_wind << ", " << conf_key_is_v_wind << ", "
-          << conf_key_is_wind_speed << ", " << conf_key_is_wind_direction
-          << ") can be set to true for each field.\n\n";
-      if (do_exit) {
-         mlog << Error << msg;
-         exit(1);
-      }
-      else {
-         mlog << Warning << msg;
-         return false;
-      }
-   }
+   bool status = validate_wind_attributes(do_exit, method_name);
 
-   return true;
+   return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -889,6 +868,47 @@ bool VarInfo::is_prob() const {
    }
 
    return(PFlag && !PAsScalar);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::validate_censor_arrays(const ThreshArray &ta, const NumArray &na,
+                                     bool do_exit, const char *caller_name) {
+   // Check for equal number of censor thresholds and values
+   if(ta.n_elements() != na.n_elements()) {
+      ConcatString msg;
+      msg << "\n" << (caller_name == nullptr ? "" : caller_name)
+          << "The number of censor thresholds in \""
+          << conf_key_censor_thresh << "\" (" << ta.n_elements()
+          << ") must match the number of replacement values in \""
+          << conf_key_censor_val << "\" (" << na.n_elements() << ").\n\n";
+      handle_config_error(msg, do_exit);
+      return false;
+   }
+   return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+bool VarInfo::validate_wind_attributes(bool do_exit, const char *caller_name) {
+   // At most one wind attribute flag can be set
+   int n = 0;
+   if(SetAttrIsUWind         == 1) n++;
+   if(SetAttrIsVWind         == 1) n++;
+   if(SetAttrIsWindSpeed     == 1) n++;
+   if(SetAttrIsWindDirection == 1) n++;
+
+   if(n > 1) {
+      ConcatString msg;
+      msg << "\n" << (caller_name == nullptr ? "" : caller_name)
+          << "At most one wind attribute flag ("
+          << conf_key_is_u_wind << ", " << conf_key_is_v_wind << ", "
+          << conf_key_is_wind_speed << ", " << conf_key_is_wind_direction
+          << ") can be set to true for each field.\n\n";
+      handle_config_error(msg, do_exit);
+      return false;
+   }
+   return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
