@@ -1963,7 +1963,7 @@ void ModeExecutive::write_obj_netcdf(const ModeNcOutInfo & info)
    }
 
 #pragma omp parallel default(none) \
-   shared(grid, info, DefaultTO, unmatched_id, bad_data_int) \
+   shared(grid, info, DefaultTO) \
    shared(fcst_raw_data, obs_raw_data) \
    shared(fcst_obj_raw_data, fcst_obj_data) \
    shared(obs_obj_raw_data, obs_obj_data) \

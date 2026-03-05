@@ -2977,7 +2977,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          &conf_info.mask_map[conf_info.vx_opt[i_vx].mask_name[i]];
 
 #pragma omp parallel default(none) \
-      shared(grid, DefaultTO, apply_mask, mask_ptr, data, dp, bad_data_float)
+      shared(grid, DefaultTO, apply_mask, mask_ptr, data, dp)
       {
 
       // Store the data
@@ -3139,7 +3139,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
 #pragma omp parallel default(none) \
    shared(grid, DefaultTO, apply_mask, mask_ptr) \
-   shared(fcst_data, obs_data, fcst_dp, obs_dp, bad_data_float)
+   shared(fcst_data, obs_data, fcst_dp, obs_dp)
    {
 
       // Store the forecast and observation values

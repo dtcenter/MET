@@ -620,8 +620,7 @@ static void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
 #pragma omp parallel default(none) \
    shared(nxy, emn_dp, esd_dp) \
    shared(emn_cnt, emn_sum) \
-   shared(esd_cnt, esd_sum, esd_ssq) \
-   shared(bad_data_double)
+   shared(esd_cnt, esd_sum, esd_ssq)
    {      
 
 #pragma omp for schedule(static)
@@ -861,7 +860,7 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
    double t = conf_info.vld_data_thresh;
 
 #pragma omp parallel default(none) \
-   shared(ens_vld, n_ens_vld, t, bad_data_float) \
+   shared(ens_vld, n_ens_vld, t) \
    shared(ens_mean, ens_stdev, ens_minus, ens_plus, ens_min, ens_max, ens_range) \
    shared(sum_na, cnt_na, min_na, max_na, stdev_sum_na, stdev_ssq_na, stdev_cnt_na)
    {

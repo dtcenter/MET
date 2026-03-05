@@ -264,7 +264,7 @@ void process_data_file() {
 
 #pragma omp parallel default(none) \
    shared(dp_shift, dp_in, dx, dy, grid) \
-   shared(Method, Width, Shape, bad_data_double)
+   shared(Method, Width, Shape)
    {
 
       // Shift the data

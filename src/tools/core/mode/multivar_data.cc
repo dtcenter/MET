@@ -334,7 +334,7 @@ static void populate_bool_plane(const string &name, const int * buf,
    int nyes=0;
 
 #pragma omp parallel default(none) \
-   shared(nx, ny, buf, nyes, bp_out)
+   shared(buf, nyes, bp_out)
    {
 
 #pragma omp for schedule(static) \

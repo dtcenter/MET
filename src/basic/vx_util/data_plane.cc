@@ -466,7 +466,7 @@ int DataPlane::n_good_data() const {
    int n = 0;
 
 #pragma omp parallel default(none) \
-   shared(Data, n)
+   shared(n)
    {
 
       // Count number of good data values
@@ -653,7 +653,7 @@ void DataPlane::standard_anomaly(const DataPlane &mn,
 void DataPlane::replace_bad_data(const double value) {
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxy, value)
+   shared(Data, Nxy)
    {
 
 #pragma omp for schedule(static)
@@ -757,7 +757,7 @@ void DataPlane::data_range(double & data_min, double & data_max) const {
    data_max = -1.0e30;
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxy, data_min, data_max)
+   shared(data_min, data_max)
    {
 
 #pragma omp for schedule(static) \
@@ -791,7 +791,7 @@ MaskPlane DataPlane::mask_plane() const {
    mp.set_size(Nx, Ny);
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxy, mp)
+   shared(mp)
    {
 
 #pragma omp for schedule(static)
@@ -965,7 +965,7 @@ bool DataPlane::fitwav_1d(const int start_wave, const int end_wave) {
    vector<double> S(Nx);
 
 #pragma omp parallel default(none) \
-shared(Nx, Ny, mnw, start_wave, end_wave, C, S)
+shared(Nx, Ny, C, S)
    {
 
 #pragma omp for schedule(static)
@@ -1096,7 +1096,7 @@ DataPlaneArray & DataPlaneArray::operator+=(const DataPlaneArray &d) {
 DataPlaneArray & DataPlaneArray::operator/=(const double v) {
 
 #pragma omp parallel default(none) \
-   shared(Nplanes, Plane, v)
+   shared(Nplanes, Plane)
    {
 
 #pragma omp for schedule(static)
