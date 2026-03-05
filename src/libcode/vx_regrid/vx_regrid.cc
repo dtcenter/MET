@@ -170,8 +170,7 @@ DataPlane met_regrid_area_weighted(const DataPlane & from_data,
 
 #pragma omp parallel default(none) \
    shared(from_data, from_grid, to_grid, info, to_data) \
-   shared(to_data_sum, wt_data_sum) \
-   shared(bad_data_double)
+   shared(to_data_sum, wt_data_sum)
    { 
 
 #pragma omp single

@@ -1204,7 +1204,7 @@ static void do_derive_command() {
          der_dp = max_dp;
 
 #pragma omp parallel default(none) \
-   shared(nxy, max_dp, min_dp, bad_data_double, der_dp)
+   shared(nxy, max_dp, min_dp, der_dp)
          {
 
 #pragma omp for schedule(static)
@@ -1226,7 +1226,7 @@ static void do_derive_command() {
          der_dp = sum_dp;
 
 #pragma omp parallel default(none) \
-   shared(nxy, sum_dp, vld_dp, bad_data_double, der_dp)
+   shared(nxy, sum_dp, vld_dp, der_dp)
          {
 
 #pragma omp for schedule(static)
@@ -1249,7 +1249,7 @@ static void do_derive_command() {
          der_dp = sum_dp;
 
 #pragma omp parallel default(none) \
-   shared(nxy, sum_dp, sum_sq_dp, vld_dp, bad_data_double, der_dp) \
+   shared(nxy, sum_dp, sum_sq_dp, vld_dp, der_dp) \
    private(v)
          {
 

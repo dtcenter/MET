@@ -60,7 +60,7 @@ void boolplane_to_pgm(const BoolPlane & in, Pgm & out) {
    out.all_white();
 
 #pragma omp parallel default(none) \
-   shared(out, in, black, white)
+   shared(out, in)
    {
 
 #pragma omp for schedule(static) \
