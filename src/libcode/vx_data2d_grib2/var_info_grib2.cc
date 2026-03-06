@@ -400,7 +400,7 @@ void VarInfoGrib2::parse_and_set_grib2_filters(Dictionary &dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfoGrib2::validate_ipdtmpl_arrays(Dictionary &dict, bool do_exit) {
+bool VarInfoGrib2::validate_ipdtmpl_arrays(bool do_exit) {
    const char *method_name = "VarInfoGrib2::validate_ipdtmpl_arrays() -> ";
    //  arrays must have the same length
    if(IPDTmplIndex.n() != IPDTmplVal.n()) {
