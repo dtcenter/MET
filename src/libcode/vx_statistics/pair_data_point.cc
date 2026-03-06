@@ -904,7 +904,7 @@ void apply_mpr_thresh_mask(DataPlane &fcst_dp, DataPlane &obs_dp,
    bool ocmn_flag = !(ocmn_dp.is_empty());
    bool ocsd_flag = !(ocsd_dp.is_empty());
 
-#pragma omp parallel default(none)                                \
+#pragma omp parallel default(shared)                              \
    shared(fcst_dp, obs_dp, fcmn_dp, fcsd_dp, ocmn_dp, ocsd_dp, m) \
    shared(nxy, n_skip, fcmn_flag, fcsd_flag, ocmn_flag, ocsd_flag)
    {

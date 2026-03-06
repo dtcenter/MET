@@ -114,7 +114,7 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    // For nearest neighbor, no work to do.
    if(width == 1 && mthd == InterpMthd::Nearest) return;
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(mlog, Error, dp, smooth_dp) \
    shared(mthd, width, wrap_lon, t, gaussian) \
    private(v)
@@ -660,7 +660,7 @@ DataPlane normal_cdf_inv(const double area, const DataPlane &mn,
       exit(1);
    }
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(mn, sd, cdf_inv)
    {
 

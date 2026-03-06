@@ -263,7 +263,7 @@ double ShapeData::area_thresh(const ShapeData *raw_ptr,
    const int nxy = data.nxy();
 
    // Number of points inside the object that meet the threshold criteria
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(raw_ptr, obj_thresh, cur_area)
    {
 
@@ -1332,7 +1332,7 @@ void ShapeData::threshold(SingleThresh t) {
    //
    const int nxy = data.nxy();
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(t, data)
    {
 
@@ -1354,7 +1354,7 @@ void ShapeData::set_to_1_or_0() {
 
    const int nxy = data.nxy();
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(data)
    {
 
@@ -1421,7 +1421,7 @@ void ShapeData::threshold_attr(const map<ConcatString,ThreshArray> &attr_map,
    // Zero out discarded shapes
    const int nxy = data.nxy();
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(keep_object, sd_split, data)
    {
 
@@ -1459,7 +1459,7 @@ void ShapeData::threshold_area(SingleThresh t) {
    //
    const int nxy = data.nxy();
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(t, area_object, sd_split, data)
    {
 
@@ -1543,7 +1543,7 @@ void ShapeData::threshold_intensity(const ShapeData *sd_ptr, int perc,
    //
    const int nxy = data.nxy();
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(t, inten_object, sd_split, data)
    {
 
@@ -1714,7 +1714,7 @@ ShapeData select(const ShapeData &id, int n) {
    ShapeData d(id);
    const int nxy = id.data.nxy();
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(id, d, n)
    {
 
@@ -1737,7 +1737,7 @@ void ShapeData::filter(SingleThresh t) {
 
    const int nxy = data.nxy();
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(t, data)
    {
 

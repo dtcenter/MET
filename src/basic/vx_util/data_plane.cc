@@ -652,7 +652,7 @@ void DataPlane::standard_anomaly(const DataPlane &mn,
 
 void DataPlane::replace_bad_data(const double value) {
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(Data, Nxy)
    {
 
@@ -964,7 +964,7 @@ bool DataPlane::fitwav_1d(const int start_wave, const int end_wave) {
    vector<double> C(Nx);
    vector<double> S(Nx);
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
 shared(Nx, Ny, C, S)
    {
 
@@ -1095,7 +1095,7 @@ DataPlaneArray & DataPlaneArray::operator+=(const DataPlaneArray &d) {
 
 DataPlaneArray & DataPlaneArray::operator/=(const double v) {
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(Nplanes, Plane)
    {
 
