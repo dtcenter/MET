@@ -141,7 +141,7 @@ static void populate_bool_plane(const int * buf, const int nx, const int ny, Boo
 
    int nyes = 0.0;
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(buf, nyes, bp_out)
    {
 

@@ -59,7 +59,7 @@ void boolplane_to_pgm(const BoolPlane & in, Pgm & out) {
    out.set_size_xy(in.nx(), in.ny());
    out.all_white();
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(out, in)
    {
 
