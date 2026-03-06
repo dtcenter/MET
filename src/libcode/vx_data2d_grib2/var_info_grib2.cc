@@ -31,6 +31,7 @@
 #include "vx_math.h"
 #include "vx_log.h"
 #include "vx_util.h"
+#include "vx_data2d.h"
 #include "vx_config.h"
 
 using namespace std;
@@ -320,67 +321,20 @@ void VarInfoGrib2::set_ipdtmpl_val(const IntArray &v) {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
-   const char *method_name = "VarInfoGrib2::set_dict() -> ";
 
    VarInfo::set_dict(dict);
 
-   // Parse GRIB2 filters and field lookup variables
-   ConcatString field_name;
-   ConcatString ens_str = dict.lookup_string(conf_key_GRIB_ens, false);
-   int field_disc, field_parm_cat, field_parm;
-   int cntr = dict.lookup_int(conf_key_GRIB2_cntr, false);
-   int ltab = dict.lookup_int(conf_key_GRIB2_ltab, false);
-   int mtab = dict.lookup_int(conf_key_GRIB2_mtab, false);
-
-   // Parse and set GRIB2 filters
-   parse_and_set_grib2_filters(dict);
-
-   // Validate IPDTmpl arrays
-   if(!validate_ipdtmpl_arrays(dict, do_exit)) {
-      return false;
-   }
-
-   // Parse field name from dictionary
-   field_name = dict.lookup_string(conf_key_name, false);
-
    int tab_match = -1;
    Grib2TableEntry tab;
-   // Resolve field name and indices
-   if(!resolve_field_name(dict, field_name, field_disc, field_parm_cat, field_parm,
-                          tab, tab_match, mtab, cntr, ltab, do_exit)) {
-      return false;
-   }
+   ConcatString field_name = dict.lookup_string(conf_key_name,            false);
+   ConcatString ens_str    = dict.lookup_string(conf_key_GRIB_ens,        false);
+   int field_disc          = dict.lookup_int   (conf_key_GRIB2_disc,      false);
+   int field_parm_cat      = dict.lookup_int   (conf_key_GRIB2_parm_cat,  false);
+   int field_parm          = dict.lookup_int   (conf_key_GRIB2_parm,      false);
+   int cntr                = dict.lookup_int   (conf_key_GRIB2_cntr,      false);
+   int ltab                = dict.lookup_int   (conf_key_GRIB2_ltab,      false);
+   int mtab                = dict.lookup_int   (conf_key_GRIB2_mtab,      false);
 
-   // Set ensemble and field information
-   set_ens(ens_str.c_str());
-   set_name(field_name);
-   set_req_name(field_name.c_str());
-
-   if(field_name != "PROB") {
-      set_discipline(tab.index_a);
-      set_parm_cat(tab.index_b);
-      set_parm(tab.index_c);
-      set_units(tab.units.c_str());
-      set_long_name(tab.full_name.c_str());
-   }
-
-   // Set level information and record
-   set_level_info_grib(dict);
-   set_record(Level.type() == LevelType_RecNumber ? nint(Level.lower()) : -1);
-
-   // Parse probability field if applicable
-   if(field_name != "PROB") return true;
-
-   if(!parse_and_set_prob_field(dict, mtab, cntr, ltab, tab, tab_match, do_exit)) {
-      return false;
-   }
-
-   return true;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void VarInfoGrib2::parse_and_set_grib2_filters(Dictionary &dict) {
    //  user-specified GRIB2 record filters
    PDTmpl                  = dict.lookup_int   (conf_key_GRIB2_pdt,       false);
    Process                 = dict.lookup_int   (conf_key_GRIB2_process,   false);
@@ -396,136 +350,123 @@ void VarInfoGrib2::parse_and_set_grib2_filters(Dictionary &dict) {
 
    IPDTmplIndex = dict.lookup_int_array(conf_key_GRIB2_ipdtmpl_index, false);
    IPDTmplVal   = dict.lookup_int_array(conf_key_GRIB2_ipdtmpl_val,   false);
-}
 
-///////////////////////////////////////////////////////////////////////////////
-
-bool VarInfoGrib2::validate_ipdtmpl_arrays(bool do_exit) {
-   const char *method_name = "VarInfoGrib2::validate_ipdtmpl_arrays() -> ";
    //  arrays must have the same length
    if(IPDTmplIndex.n() != IPDTmplVal.n()) {
       ConcatString msg;
-      msg << "\n" << method_name
+      msg << "\nVarInfoGrib2::set_dict() -> "
           << "the number of \"" << conf_key_GRIB2_ipdtmpl_index
           << "\" entries (" << IPDTmplIndex.n()
           << ") must match the number of \"" << conf_key_GRIB2_ipdtmpl_val
           << "\" entries (" << IPDTmplVal.n() << ")!\n\n";
       handle_config_error(msg, do_exit);
-      return false;
    }
-   return true;
-}
 
-///////////////////////////////////////////////////////////////////////////////
+   //  if the name is specified, use it
+   if( !field_name.empty() ){
 
-bool VarInfoGrib2::resolve_field_name(Dictionary &dict, ConcatString &field_name,
-                                      int &field_disc, int &field_parm_cat,
-                                      int &field_parm, Grib2TableEntry &tab,
-                                      int &tab_match, int mtab, int cntr, int ltab,
-                                      bool do_exit) {
-   const char *method_name = "VarInfoGrib2::resolve_field_name() -> ";
+      set_name( field_name );
+      set_req_name( field_name.c_str() );
 
-   // look up the name in the grib tables
-   field_disc = dict.lookup_int(conf_key_GRIB2_disc, false);
-   field_parm_cat = dict.lookup_int(conf_key_GRIB2_parm_cat, false);
-   field_parm = dict.lookup_int(conf_key_GRIB2_parm, false);
-
-   // if the name is specified, use it
-   if(!field_name.empty()) {
-      set_name(field_name);
-      set_req_name(field_name.c_str());
-
-      if(!GribTable.lookup_grib2(field_name.c_str(), field_disc, field_parm_cat, field_parm,
-                                 mtab, cntr, ltab, tab, tab_match) &&
-         field_name != "PROB") {
+      //  look up the name in the grib tables
+      if( !GribTable.lookup_grib2(field_name.c_str(), field_disc, field_parm_cat, field_parm, mtab, cntr, ltab,
+                                  tab, tab_match) &&
+          field_name != "PROB" ){
          ConcatString msg;
-         msg << "\n" << method_name
+         msg << "\nVarInfoGrib2::set_dict() -> "
              << "unrecognized GRIB2 field abbreviation '" << field_name
              << "'\n\n";
          handle_config_error(msg, do_exit);
-         return false;
       }
-      return true;
    }
 
-   // if the field name is not specified, look for and use indexes
+   //  if the field name is not specified, look for and use indexes
+   else {
 
-   // if either the field name or the indices are specified, bail
-   if(bad_data_int == field_disc ||
-      bad_data_int == field_parm_cat ||
-      bad_data_int == field_parm) {
-      ConcatString msg;
-      msg << "\n" << method_name
-          << "either name or GRIB2_disc, GRIB2_parm_cat and GRIB2_parm "
-          << "must be specified in field information\n\n";
-      handle_config_error(msg, do_exit);
-      return false;
+      //  if either the field name or the indices are specified, bail
+      if( bad_data_int == field_disc ||
+          bad_data_int == field_parm_cat ||
+          bad_data_int == field_parm ){
+         ConcatString msg;
+         msg << "\nVarInfoGrib2::set_dict() -> "
+             << "either name or GRIB2_disc, GRIB2_parm_cat and GRIB2_parm "
+             << "must be specified in field information\n\n";
+         handle_config_error(msg, do_exit);
+      }
+
+      //  use the specified indexes to look up the field name
+      if( !GribTable.lookup_grib2(field_disc, field_parm_cat,
+                                  field_parm, mtab, cntr, ltab, tab) ){
+         ConcatString msg;
+         msg << "\nVarInfoGrib2::set_dict() -> "
+             << "no parameter found with matching "
+             << "GRIB2_disc ("     << field_disc     << ") "
+             << "GRIB2_parm_cat (" << field_parm_cat << ") "
+             << "GRIB2_parm ("     << field_parm     << "). "
+             << "Use the MET_GRIB_TABLES environment variable to "
+             << "define custom GRIB tables.\n\n";
+         handle_config_error(msg, do_exit);
+      }
+
+      //  use the lookup parameter name
+      field_name = tab.parm_name;
    }
 
-   // use the specified indexes to look up the field name
-   if(!GribTable.lookup_grib2(field_disc, field_parm_cat,
-                              field_parm, mtab, cntr, ltab, tab)) {
-      ConcatString msg;
-      msg << "\n" << method_name
-          << "no parameter found with matching "
-          << "GRIB2_disc ("     << field_disc     << ") "
-          << "GRIB2_parm_cat (" << field_parm_cat << ") "
-          << "GRIB2_parm ("     << field_parm     << "). "
-          << "Use the MET_GRIB_TABLES environment variable to "
-          << "define custom GRIB tables.\n\n";
-      handle_config_error(msg, do_exit);
-      return false;
+   set_ens          (ens_str.c_str());
+   //  set the matched parameter lookup information
+   set_name         ( field_name    );
+   set_req_name     ( field_name.c_str()    );
+   if( field_name != "PROB" ){
+      set_discipline( tab.index_a   );
+      set_parm_cat  ( tab.index_b   );
+      set_parm      ( tab.index_c   );
+      set_units     ( tab.units.c_str()     );
+      set_long_name ( tab.full_name.c_str() );
    }
 
-   // use the lookup parameter name
-   field_name = tab.parm_name;
-   return true;
-}
+   //  call the parent to set the level information
+   set_level_info_grib(dict);
 
-///////////////////////////////////////////////////////////////////////////////
+   //  if the level type is a record number, set the data member
+   set_record(Level.type() == LevelType_RecNumber ? nint(Level.lower()) : -1);
 
-bool VarInfoGrib2::parse_and_set_prob_field(Dictionary &dict, int mtab, int cntr,
-                                            int ltab, Grib2TableEntry &tab,
-                                            int &tab_match, bool do_exit) {
-   const char *method_name = "VarInfoGrib2::parse_and_set_prob_field() -> ";
+   //  if the field is not probabilistic, work is done
+   if(field_name != "PROB") return true;
 
-   // check for a probability dictionary setting
-   Dictionary* dict_prob = dict.lookup_dictionary(conf_key_prob, false, false);
-   if(nullptr == dict_prob) {
+   //  check for a probability dictionary setting
+   Dictionary* dict_prob;
+   if(nullptr == (dict_prob = dict.lookup_dictionary(conf_key_prob, false, false))){
       ConcatString msg;
-      msg << "\n" << method_name
+      msg << "\nVarInfoGrib2::set_dict() -> "
           << "if the field name is set to \"PROB\", then a prob dictionary "
           << "must be defined\n\n";
       handle_config_error(msg, do_exit);
-      return false;
    }
 
-   // gather information from the prob dictionary
+   //  gather information from the prob dictionary
    ConcatString prob_name = dict_prob->lookup_string(conf_key_name);
-   int field_disc = dict_prob->lookup_int(conf_key_GRIB2_disc, false);
-   int field_parm_cat = dict_prob->lookup_int(conf_key_GRIB2_parm_cat, false);
-   int field_parm = dict_prob->lookup_int(conf_key_GRIB2_parm, false);
-   double thresh_lo = dict_prob->lookup_double(conf_key_thresh_lo, false);
-   double thresh_hi = dict_prob->lookup_double(conf_key_thresh_hi, false);
+   field_disc       = dict_prob->lookup_int   (conf_key_GRIB2_disc,     false);
+   field_parm_cat   = dict_prob->lookup_int   (conf_key_GRIB2_parm_cat, false);
+   field_parm       = dict_prob->lookup_int   (conf_key_GRIB2_parm,     false);
+   double thresh_lo = dict_prob->lookup_double(conf_key_thresh_lo,      false);
+   double thresh_hi = dict_prob->lookup_double(conf_key_thresh_hi,      false);
 
-   // look up the probability field abbreviation
+   //  look up the probability field abbreviation
    if(!GribTable.lookup_grib2(prob_name.c_str(), field_disc, field_parm_cat,
-                              field_parm, mtab, cntr, ltab, tab, tab_match)) {
+                              field_parm, mtab, cntr, ltab, tab, tab_match)){
       ConcatString msg;
-      msg << "\n" << method_name
+      msg << "\nVarInfoGrib2::set_dict() -> "
           << "unrecognized GRIB2 probability field abbreviation '"
           << prob_name << "'\n\n";
       handle_config_error(msg, do_exit);
-      return false;
    }
 
-   // Set probability field attributes
-   set_discipline(tab.index_a);
-   set_parm_cat(tab.index_b);
-   set_parm(tab.index_c);
-   set_p_flag(true);
-   set_p_units(tab.units.c_str());
-   set_units("%");
+   set_discipline ( tab.index_a );
+   set_parm_cat   ( tab.index_b );
+   set_parm       ( tab.index_c );
+   set_p_flag     ( true        );
+   set_p_units    ( tab.units.c_str() );
+   set_units      ( "%" );
 
    set_prob_info_grib(prob_name, thresh_lo, thresh_hi);
 
