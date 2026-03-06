@@ -23,7 +23,6 @@
 #include "vx_util.h"
 #include "var_info.h"
 #include "data_file_type.h"
-#include "vx_data2d.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -67,16 +66,6 @@ class VarInfoGrib2 : public VarInfo
 
       void init_from_scratch();
       void assign(const VarInfoGrib2 &);
-      void parse_and_set_grib2_filters(Dictionary &dict);
-      bool parse_and_set_prob_field(Dictionary &dict, int mtab, int cntr,
-                                    int ltab, Grib2TableEntry &tab,
-                                    int &tab_match, bool do_exit);
-      bool resolve_field_name(Dictionary & dict, ConcatString &field_name,
-                              int &field_disc, int &field_parm_cat,
-                              int &field_parm, Grib2TableEntry &tab,
-                              int &tab_match, int mtab, int cntr, int ltab,
-                              bool do_exit);
-      bool validate_ipdtmpl_arrays(Dictionary &dict, bool do_exit);
 
    public:
       VarInfoGrib2();
