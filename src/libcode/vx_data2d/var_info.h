@@ -84,7 +84,7 @@ class VarInfo
 
       void init_from_scratch();
       void assign(const VarInfo &);
-      bool handle_config_error(const ConcatString &msg, bool do_exit);
+      bool handle_config_error(const ConcatString &msg, bool do_exit) const;
       bool validate_censor_arrays(const ThreshArray &ta, const NumArray &na,
                                   bool do_exit, const char *caller_name=nullptr);
       bool validate_wind_attributes(bool do_exit, const char *caller_name=nullptr);

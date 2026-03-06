@@ -269,7 +269,7 @@ ConcatString VarInfo::magic_time_str() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool VarInfo::handle_config_error(const ConcatString &msg, bool do_exit) {
+bool VarInfo::handle_config_error(const ConcatString &msg, bool do_exit) const {
    if (do_exit) {
       mlog << Error << msg;
       exit(1);
