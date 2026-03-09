@@ -57,7 +57,7 @@ class VarInfoPython : public VarInfo
          //
 
       void set_file_type(const GrdFileType);
-      void set_dict(Dictionary &);
+      bool set_dict(Dictionary &, bool do_exit=true) override;
 
          //
          // do stuff

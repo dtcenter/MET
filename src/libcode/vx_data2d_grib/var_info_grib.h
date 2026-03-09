@@ -90,7 +90,7 @@ class VarInfoGrib : public VarInfo
          // set stuff
          //
 
-      void set_dict(Dictionary &) override;
+      bool set_dict(Dictionary &, bool do_exit=true) override;
       void add_grib_code(Dictionary &) override;
 
       void set_ptv(int);
