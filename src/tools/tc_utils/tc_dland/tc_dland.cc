@@ -256,7 +256,7 @@ void process_distances() {
         << " points in grid (" << grid.serialize() << ")...\n";
 
 #pragma omp parallel default(none) \
-   shared(DefaultTO, grid, dland, land_array, nautical_miles_per_km)
+   shared(DefaultTO, grid, dland, land_array)
    {
 
       // Loop over the grid and compute the distance to land for each point   

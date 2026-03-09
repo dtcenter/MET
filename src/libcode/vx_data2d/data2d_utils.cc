@@ -97,8 +97,8 @@ bool derive_wdir(const DataPlane &u2d, const DataPlane &v2d,
    wdir2d = u2d;
    wdir2d.set_constant(bad_data_double);
 
-#pragma omp parallel default(none) \
-   shared(nx, ny, u2d, v2d, wdir2d)
+#pragma omp parallel default(shared) \
+   shared(u2d, v2d, wdir2d)
    {
 
       //
@@ -163,8 +163,8 @@ bool derive_wind(const DataPlane &u2d, const DataPlane &v2d,
    wind2d = u2d;
    wind2d.set_constant(bad_data_double);
 
-#pragma omp parallel default(none) \
-   shared(nx, ny, u2d, v2d, wind2d)
+#pragma omp parallel default(shared) \
+   shared(u2d, v2d, wind2d)
    {
 
       //
@@ -218,8 +218,8 @@ void rotate_wdir_grid_to_earth(const DataPlane &wdir2d, const Grid &g,
    wdir2d_rot = wdir2d;
    wdir2d_rot.set_constant(bad_data_double);
 
-#pragma omp parallel default(none) \
-   shared(nx, ny, wdir2d, g, wdir2d_rot)
+#pragma omp parallel default(shared) \
+   shared(wdir2d, g, wdir2d_rot)
    {
 
       //
@@ -291,8 +291,8 @@ bool rotate_uv_grid_to_earth(const DataPlane &u2d, const DataPlane &v2d,
    u2d_rot.set_constant(bad_data_double);
    v2d_rot.set_constant(bad_data_double);
 
-#pragma omp parallel default(none) \
-   shared(nx, ny, u2d, v2d, g, u2d_rot, v2d_rot)
+#pragma omp parallel default(shared) \
+   shared(u2d, v2d, g, u2d_rot, v2d_rot)
    {
 
       //

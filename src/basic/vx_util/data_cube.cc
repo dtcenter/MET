@@ -198,7 +198,7 @@ void DataCube::add_assign(const DataCube& other) {
    this->check_shape_equal(other);
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxyz, other, bad_data_double)
+   shared(Data, Nxyz, other)
    {
 
 #pragma omp for schedule(static)
@@ -222,7 +222,7 @@ void DataCube::subtract_assign(const DataCube& other) {
    this->check_shape_equal(other);
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxyz, other, bad_data_double)
+   shared(Data, Nxyz, other)
    {
 
 #pragma omp for schedule(static)
@@ -246,7 +246,7 @@ void DataCube::multiply_assign(const DataCube& other) {
    this->check_shape_equal(other);
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxyz, other, bad_data_double)
+   shared(Data, Nxyz, other)
    {
 
 #pragma omp for schedule(static)
@@ -268,7 +268,7 @@ void DataCube::multiply_assign(const DataCube& other) {
 void DataCube::divide_assign(int denom) {
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxyz, denom, bad_data_double)
+   shared(Data, Nxyz, denom)
    {
 
 #pragma omp for schedule(static)
@@ -292,7 +292,7 @@ void DataCube::divide_assign(const DataCube& other) {
    this->check_shape_equal(other);
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxyz, other, bad_data_double)
+   shared(Data, Nxyz, other)
    {
 
 #pragma omp for schedule(static)
@@ -317,7 +317,7 @@ void DataCube::min_assign(const DataCube& other) {
    this->check_shape_equal(other);
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxyz, other, bad_data_double)
+   shared(Data, Nxyz, other)
    {
 
 #pragma omp for schedule(static)
@@ -341,7 +341,7 @@ void DataCube::max_assign(const DataCube& other) {
    this->check_shape_equal(other);
 
 #pragma omp parallel default(none) \
-   shared(Data, Nxyz, other, bad_data_double)
+   shared(Data, Nxyz, other)
    {
 
 #pragma omp for schedule(static)
