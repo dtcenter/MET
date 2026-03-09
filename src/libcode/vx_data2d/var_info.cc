@@ -873,7 +873,7 @@ bool VarInfo::is_prob() const {
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::validate_censor_arrays(const ThreshArray &ta, const NumArray &na,
-                                     bool do_exit, const char *caller_name) {
+                                     bool do_exit, const char *caller_name) const {
    // Check for equal number of censor thresholds and values
    if(ta.n_elements() != na.n_elements()) {
       ConcatString msg;
@@ -890,7 +890,7 @@ bool VarInfo::validate_censor_arrays(const ThreshArray &ta, const NumArray &na,
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool VarInfo::validate_wind_attributes(bool do_exit, const char *caller_name) {
+bool VarInfo::validate_wind_attributes(bool do_exit, const char *caller_name) const {
    // At most one wind attribute flag can be set
    int n = 0;
    if(SetAttrIsUWind         == 1) n++;
