@@ -441,6 +441,7 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
           << "if the field name is set to \"PROB\", then a prob dictionary "
           << "must be defined\n\n";
       handle_config_error(msg, do_exit);
+      return false;
    }
 
    //  gather information from the prob dictionary
@@ -459,6 +460,7 @@ bool VarInfoGrib2::set_dict(Dictionary & dict, bool do_exit) {
           << "unrecognized GRIB2 probability field abbreviation '"
           << prob_name << "'\n\n";
       handle_config_error(msg, do_exit);
+      return false;
    }
 
    set_discipline ( tab.index_a );
