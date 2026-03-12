@@ -1492,7 +1492,7 @@ void compute_ecnt_mean(const ECNTInfo *ecnt_info, int n,
 ////////////////////////////////////////////////////////////////////////
 
 void compute_aggregated_seeps(const PairDataPoint *pd, SeepsAggScore *seeps_agg) {
-   static const char *method_name = "compute_seeps_agg() -> ";
+   static const char *method_name = "compute_aggregated_seeps() -> ";
 
    //
    // Check that the forecast and observation arrays of the same length
@@ -1848,35 +1848,6 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
 
 }
 
-////////////////////////////////////////////////////////////////////////
-// IDL code:
-//
-// my_pi = 3.1415926
-// r0 = density_radius*my_pi/180
-// lat =  reform(float(data_geo(0,*)))
-// lon =  reform( ((float(data_geo(1,*)+360.) mod 360.)))
-// n = n_elements(lat)
-// lat = lat * my_pi / 180
-// slat = sin(lat)
-// clat = cos(lat)
-// lon = lon * my_pi / 180
-// slon = sin(lon)
-// clon = cos(lon)
-// r=(clat#transpose(clat))*(slon#transpose(slon)) + (clon#transpose(clon))*(slat#transpose(slat))
-// r=r*((r lt 1.) and (r gt -1.)) + (r ge 1.) - (r le -1.)
-// r=acos(r)
-// if r0 gt 0.0 then r = exp( -(r / r0) ^ 2) * ( r le 4. * r0) else r = (r*0.) + 1
-// r=sum(r,1)
-//
-// SUM function (not built-in)
-// PRINT, array2
-// ; PV-WAVE prints the following:
-// ; 0.00000      1.00000
-// ; 2.00000      3.00000
-// PRINT, SUM(array2, 0)
-// ; PV-WAVE prints: 1.00000      5.00000
-// PRINT, SUM(array2, 1)
-// ; PV-WAVE prints: 2.00000      4.00000
 ////////////////////////////////////////////////////////////////////////
 
 void compute_seeps_density_vector(const PairDataPoint *pd, SeepsAggScore *seeps,
