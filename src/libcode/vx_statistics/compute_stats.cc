@@ -1699,9 +1699,11 @@ void compute_aggregated_seeps_grid(const DataPlane &fcst_dp, const DataPlane &ob
    double obs_sum = 0.0;
    double fcst_sum = 0.0;
 
-   seeps_dp.set_size(nx, ny);
-   seeps_dp_fcat.set_size(nx, ny);
-   seeps_dp_ocat.set_size(nx, ny);
+   // MET #3362: Initialize dimensions and timing info
+   seeps_dp = fcst_dp;
+   seeps_dp.set_constant(0.0);
+   seeps_dp_fcat = seeps_dp;
+   seeps_dp_ocat = seeps_dp;
 
    seeps_agg->clear();
    mlog << Debug(9) << method_name
