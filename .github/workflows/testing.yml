@@ -458,7 +458,7 @@ jobs:
     if: ${{ always() }}
     steps:
       - name: Upload merged logs as artifact
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact/merge@v7
         with:
           name: logs
           pattern: logs_*
