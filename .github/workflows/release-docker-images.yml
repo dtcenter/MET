@@ -130,7 +130,7 @@ jobs:
       - name: Scan Docker Images
         id: security-scan
         continue-on-error: false
-        uses: dtcenter/metplus-action-scan-docker-images@v1
+        uses: dtcenter/metplus-action-scan-docker-images@v2
         with:
           images: |
             [
