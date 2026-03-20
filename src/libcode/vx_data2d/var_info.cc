@@ -502,6 +502,9 @@ bool VarInfo::set_dict(Dictionary &dict, bool do_exit) {
    int n;
    const char *method_name = "VarInfo::set_dict(Dictionary &dict) -> ";
 
+   // Parse and set name/level attributes (common logic)
+   parse_and_set_name_level(dict);
+
    // Set init time, if present
    s = dict.lookup_string(conf_key_init_time, false);
    if(dict.last_lookup_status()) set_init(timestring_to_unix(s.c_str()));
@@ -868,6 +871,22 @@ bool VarInfo::is_prob() const {
    }
 
    return(PFlag && !PAsScalar);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Helper to parse and set name/level attributes from dictionary
+
+void VarInfo::parse_and_set_name_level(Dictionary &dict) {
+   ConcatString nstr = dict.lookup_string(conf_key_name, false);
+   ConcatString lstr = dict.lookup_string(conf_key_level, false);
+   if(nstr.nonempty()) {
+      set_name(nstr);
+      set_req_name(nstr.c_str());
+   }
+   if(lstr.nonempty()) {
+      Level.set_name(lstr.c_str());
+      Level.set_req_name(lstr.c_str());
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

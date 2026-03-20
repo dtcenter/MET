@@ -367,12 +367,8 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
 
 bool VarInfoNcCF::set_dict(Dictionary &dict, bool do_exit){
 
-   bool status = VarInfo::set_dict(dict,do_exit);
-
-   set_magic(dict.lookup_string("name"),
-             dict.lookup_string("level"));
-   set_req_name(dict.lookup_string("name").c_str());
-
+   bool status = VarInfo::set_dict(dict, do_exit);
+   set_magic(Name, Level.name());
    return status;
 }
 

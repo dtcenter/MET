@@ -285,31 +285,27 @@ void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr)
 
 bool VarInfoUGrid::set_dict(Dictionary &dict, bool do_exit){
 
-   char lvl_type = ' ';
-   ConcatString cfg_name = dict.lookup_string("name");
-   ConcatString cfg_level = dict.lookup_string("level");
    const char * method_name = "VarInfoUGrid::set_dict() -> ";
-
-   bool status = VarInfo::set_dict(dict);
-
-   if (cfg_level.length() > 0) lvl_type = cfg_level.char_at(0);
+   bool status = VarInfo::set_dict(dict, do_exit);
+   char lvl_type = ' ';
+   if (Level.name().length() > 0) lvl_type = Level.name().char_at(0);
    if (lvl_type == 'A' || lvl_type == 'Z' || lvl_type == 'P' ||
        lvl_type == 'R' || lvl_type == 'L') {
       set_level_info_grib(dict);
-      VarInfo::set_magic(cfg_name, cfg_level);
+      VarInfo::set_magic(Name, Level.name());
    }
-   else set_magic(cfg_name, cfg_level);
+   else set_magic(Name, Level.name());
 
    if (Level.lower() != Level.upper()) {
       ConcatString msg;
       msg << "\n" << method_name
           << "Multiple vertical levels ("
-          << cfg_level  << ") for UGrid are not supported\n\n";
+          << Level.name()  << ") for UGrid are not supported\n\n";
       handle_config_error(msg, do_exit);
       return false;
    }
 
-   set_req_name(cfg_name.c_str());
+   set_req_name(Name.c_str());
 
    return status;
 }
