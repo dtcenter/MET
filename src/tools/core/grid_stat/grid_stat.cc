@@ -116,6 +116,7 @@
 //   058    10/03/24  Halley Gotway  MET #2887 Compute weighted contingency tables.
 //   059    11/15/24  Halley Gotway  MET #3020 SEEPS NetCDF output.
 //   060    05/05/24  Halley Gotway  MET #3145 Add OpenMP.
+//   061    12/08/25  Halley Gotway  MET #3293 Fix set_attr_grid.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -147,13 +148,7 @@
 using namespace std;
 using namespace netCDF;
 
-
 ////////////////////////////////////////////////////////////////////////
-
-
-
-////////////////////////////////////////////////////////////////////////
-
 
 static void process_command_line(int, char **);
 static void setup_first_pass    (const DataPlane &);
@@ -233,7 +228,6 @@ void process_command_line(int argc, char **argv) {
    CommandLine cline;
    GrdFileType ftype, otype;
    ConcatString default_config_file;
-   DataPlane dp;
    const char *method_name = "process_command_line() -> ";
 
    // Set the default output directory
@@ -349,24 +343,9 @@ void process_command_line(int argc, char **argv) {
 #endif
    }
 
-   // For python types and range/azimuth grids, read the first field to set the grid
-   if(is_python_grdfiletype(ftype) ||
-      fcst_mtddf->grid().info().ra) {
-      if(!fcst_mtddf->data_plane(*conf_info.vx_opt[0].fcst_info, dp)) {
-         mlog << Error << "\nTrouble reading data from forecast file \""
-              << fcst_file << "\"\n\n";
-         exit(1);
-      }
-   }
-
-   if(is_python_grdfiletype(otype) ||
-      obs_mtddf->grid().info().ra) {
-      if(!obs_mtddf->data_plane(*conf_info.vx_opt[0].obs_info, dp)) {
-         mlog << Error << "\nTrouble reading data from observation file \""
-              << obs_file << "\"\n\n";
-         exit(1);
-      }
-   }
+   // Update the input grid, if needed
+   update_mtddf_grid(fcst_mtddf, conf_info.vx_opt[0].fcst_info);
+   update_mtddf_grid(obs_mtddf, conf_info.vx_opt[0].obs_info);
 
    // Determine the verification grid
    grid = parse_vx_grid(conf_info.vx_opt[0].fcst_info->regrid(),
@@ -2998,7 +2977,7 @@ void write_nc(const ConcatString &field_name, const DataPlane &dp,
          &conf_info.mask_map[conf_info.vx_opt[i_vx].mask_name[i]];
 
 #pragma omp parallel default(none) \
-      shared(grid, DefaultTO, apply_mask, mask_ptr, data, dp, bad_data_float)
+      shared(grid, DefaultTO, apply_mask, mask_ptr, data, dp)
       {
 
       // Store the data
@@ -3160,7 +3139,7 @@ void write_nbrhd_nc(const DataPlane &fcst_dp, const DataPlane &obs_dp,
 
 #pragma omp parallel default(none) \
    shared(grid, DefaultTO, apply_mask, mask_ptr) \
-   shared(fcst_data, obs_data, fcst_dp, obs_dp, bad_data_float)
+   shared(fcst_data, obs_data, fcst_dp, obs_dp)
    {
 
       // Store the forecast and observation values

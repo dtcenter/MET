@@ -1313,8 +1313,8 @@ Box valid_xy_bb(const ShapeData * wd_ptr, const Grid & grid)
    const int data_nx = wd_ptr->data.nx();
    const int data_ny = wd_ptr->data.ny();
 
-#pragma omp parallel default(none) \
-   shared(data_nx, data_ny, wd_ptr) \
+#pragma omp parallel default(shared) \
+   shared(wd_ptr) \
    shared(L, B, R, T)
    {
 

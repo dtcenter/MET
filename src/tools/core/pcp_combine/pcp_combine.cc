@@ -80,6 +80,7 @@
 //   026    01/29/24  Halley Gotway  MET #2801 Configure time difference warnings.
 //   027    05/09/24  Halley Gotway  MET #2883 Allow missing input files.
 //   028    04/30/25  Prestopnik     MET #3120 Add OpenMP 
+//   029    02/26/26  Halley Gotway  MET #3353 Support file_type for sum
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -783,9 +784,18 @@ static int search_pcp_dir(const char *cur_dir, const unixtime cur_ut,
          VarInfo * cur_var;
 
          //
+         // MET #3353: Parse the file type from the field string, if present.
+         //
+         GrdFileType ftype = FileType_None;
+         if(field_string.nonempty()) {
+            config.read_string(field_string.c_str());
+            ftype = parse_conf_file_type(&config);
+         }
+
+         //
          // Create a data file object.
          //
-         mtddf = factory.new_met_2d_data_file(cur_file.c_str());
+         mtddf = factory.new_met_2d_data_file(cur_file.c_str(), ftype);
          if(!mtddf) {
             mlog << Warning << "search_pcp_dir() -> "
                  << "can't open data file \"" << cur_file << "\"\n";
@@ -1199,7 +1209,7 @@ static void do_derive_command() {
          der_dp = max_dp;
 
 #pragma omp parallel default(none) \
-   shared(nxy, max_dp, min_dp, bad_data_double, der_dp)
+   shared(nxy, max_dp, min_dp, der_dp)
          {
 
 #pragma omp for schedule(static)
@@ -1221,7 +1231,7 @@ static void do_derive_command() {
          der_dp = sum_dp;
 
 #pragma omp parallel default(none) \
-   shared(nxy, sum_dp, vld_dp, bad_data_double, der_dp)
+   shared(nxy, sum_dp, vld_dp, der_dp)
          {
 
 #pragma omp for schedule(static)
@@ -1244,7 +1254,7 @@ static void do_derive_command() {
          der_dp = sum_dp;
 
 #pragma omp parallel default(none) \
-   shared(nxy, sum_dp, sum_sq_dp, vld_dp, bad_data_double, der_dp) \
+   shared(nxy, sum_dp, sum_sq_dp, vld_dp, der_dp) \
    private(v)
          {
 

@@ -124,8 +124,8 @@ void parse_grid_weight(const Grid &grid, const GridWeightType t,
    wgt_dp.clear();
    wgt_dp.set_size(grid.nx(), grid.ny());
 
-#pragma omp parallel default(none) \
-   shared(grid, t, wgt_dp)
+#pragma omp parallel default(shared) \
+   shared(grid, wgt_dp)
    {
 
    // Compute weight for each grid point
