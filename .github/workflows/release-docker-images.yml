@@ -35,7 +35,7 @@ jobs:
       update_latest: ${{ steps.get-versions.outputs.update_latest }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           repository: 'dtcenter/metplus'
           ref: 'develop'
@@ -80,9 +80,9 @@ jobs:
       - name: Free Disk Space
         uses: dtcenter/metplus-action-free-disk-space@v1
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ matrix.version }}
           path: ${{ matrix.version }}
@@ -93,7 +93,7 @@ jobs:
         run: mkdir -p ${RUNNER_WORKSPACE}/logs
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
@@ -112,7 +112,7 @@ jobs:
 
       - name: Upload build logs as artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: build_logs_${{ matrix.version }}
           path: ${{ runner.workspace }}/logs
@@ -130,7 +130,7 @@ jobs:
       - name: Scan Docker Images
         id: security-scan
         continue-on-error: false
-        uses: dtcenter/metplus-action-scan-docker-images@v1
+        uses: dtcenter/metplus-action-scan-docker-images@v2
         with:
           images: |
             [
