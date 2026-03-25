@@ -89,8 +89,8 @@ static NcDim  lon_dim ;
 
 static void process_command_line(int, char **);
 static void process_data_file();
-static void open_nc(const Grid &grid, const ConcatString run_cs);
-static void write_nc(const DataPlane &dp, const Grid &grid,
+static void open_nc(const Grid &grid, const ConcatString &run_cs);
+static void write_nc(const DataPlane &dp,
                      const VarInfo *vinfo, const char *vname);
 static void close_nc();
 static void usage(int exit_code=1);
@@ -124,18 +124,13 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return "regrid_data_plane";
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void initialize() {
-}
-
-////////////////////////////////////////////////////////////////////////
-
-void process_command_line(int argc, char **argv) {
+void static process_command_line(int argc, char **argv) {
    CommandLine cline;
 
    // Set default regridding options
@@ -213,17 +208,20 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_data_file() {
-   DataPlane fr_dp, to_dp;
-   Grid fr_grid, to_grid;
+void static process_data_file() {
+   int field_count;
+   DataPlane fr_dp;
+   DataPlane to_dp;
+   Grid fr_grid;
+   Grid to_grid;
    GrdFileType ftype;
-   double dmin, dmax;
-   ConcatString run_cs, vname;
+   double dmax;
+   double dmin;
+   ConcatString run_cs;
+   ConcatString vname;
    //Variables for GOES
-   unixtime valid_time = 0;
-   bool opt_all_attrs = false;
-   NcFile *nc_in = (NcFile *) nullptr;
-   static const char *method_name = "process_data_file() ";
+   auto nc_in = (NcFile *) nullptr;
+   static const char *method_name = "process_data_file() -> ";
 
    // Initialize configuration object
    MetConfig config;
@@ -241,7 +239,7 @@ void process_data_file() {
    auto fr_mtddf = Met2dDataFileFactory::new_met_2d_data_file(InputFilename.c_str(), ftype);
 
    if(!fr_mtddf) {
-      mlog << Error << "\nprocess_data_file() -> "
+      mlog << Error << "\n" << method_name
            << "\"" << InputFilename << "\" not a valid data file\n\n";
       exit(1);
    }
@@ -253,13 +251,26 @@ void process_data_file() {
    auto vinfo = VarInfoFactory::new_var_info(ftype);
 
    if(!vinfo) {
-      mlog << Error << "\nprocess_data_file() -> "
+      mlog << Error << "\n" << method_name
            << "unable to determine file type of \"" << InputFilename
            << "\"\n\n";
       exit(1);
    }
-   config.read_string(FieldSA[0].c_str());
-   vinfo->set_dict(config);
+
+   field_count = 0;
+   for(int i=0; i<FieldSA.n_elements(); i++) {
+      config.read_string(FieldSA[0].c_str());
+      if (vinfo->set_dict(config, false)) {
+         field_count++;
+         break;
+      }
+   }
+
+   if (field_count == 0) {
+      mlog << Error << "\n" << method_name
+           << "unable to get the input grid due to no matching fields\n\n";
+      exit(1);
+   }
 
    // Update the input grid, if needed
    update_mtddf_grid(fr_mtddf, vinfo);
@@ -284,6 +295,7 @@ void process_data_file() {
    // Open the output file
    open_nc(to_grid, run_cs);
 
+   field_count = 0;
    // Loop through the requested fields
    for(int i=0; i<FieldSA.n_elements(); i++) {
 
@@ -292,17 +304,18 @@ void process_data_file() {
 
       // Populate the VarInfo object using the config string
       config.read_string(FieldSA[i].c_str());
-      vinfo->set_dict(config);
+      if (!vinfo->set_dict(config, false)) continue;
 
       // Get the data plane from the file for this VarInfo object
       if(!fr_mtddf->data_plane(*vinfo, fr_dp)) {
-         mlog << Error << "\nprocess_data_file() -> trouble getting field \""
+         mlog << Warning << "\n" << method_name << "trouble getting field \""
               << FieldSA[i] << "\" from file \"" << InputFilename << "\"\n\n";
-         exit(1);
+         continue;
       }
 
       // Regrid the data plane
       to_dp = met_regrid(fr_dp, fr_grid, to_grid, RGInfo);
+      field_count++;
 
       // List range of data values
       if(mlog.verbosity_level() >= 2) {
@@ -329,14 +342,24 @@ void process_data_file() {
       }
 
       // Write the regridded data
-      write_nc(to_dp, to_grid, vinfo, vname.c_str());
+      write_nc(to_dp, vinfo, vname.c_str());
 
    } // end for i
+
+   if (field_count == 0) {
+      mlog << Warning << "\n" << method_name
+           << "\nNo available fileds\n\n";
+   }
+   else if (field_count < FieldSA.n_elements()) {
+      mlog << Debug(1) << method_name
+           << field_count << " fields (out of " << FieldSA.n_elements()
+           << ") were processed\n";
+   }
 
    // Close the output file
    close_nc();
 
-   delete nc_in;  nc_in  = 0;
+   delete nc_in;  nc_in  = nullptr;
 
    // Clean up
    if(fr_mtddf) { delete fr_mtddf; fr_mtddf = (Met2dDataFile *) nullptr; }
@@ -347,7 +370,7 @@ void process_data_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void open_nc(const Grid &grid, ConcatString run_cs) {
+void static open_nc(const Grid &grid, const ConcatString &run_cs) {
 
    // Create output file
    nc_out = open_ncfile(OutputFilename.c_str(), true);
@@ -376,8 +399,8 @@ void open_nc(const Grid &grid, ConcatString run_cs) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void write_nc(const DataPlane &dp, const Grid &grid,
-              const VarInfo *vinfo, const char *vname) {
+void static write_nc(const DataPlane &dp, const VarInfo *vinfo,
+                     const char *vname) {
 
    int deflate_level = compress_level;
    if (deflate_level < 0) deflate_level = 0;
@@ -403,7 +426,7 @@ void write_nc(const DataPlane &dp, const Grid &grid,
 
 ////////////////////////////////////////////////////////////////////////
 
-void close_nc() {
+void static close_nc() {
 
    // Clean up
    if(nc_out) {
@@ -508,44 +531,44 @@ __attribute__((noreturn)) static void usage(int exit_code) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_field(const StringArray &a) {
+void static set_field(const StringArray &a) {
    FieldSA.add(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_method(const StringArray &a) {
+void static set_method(const StringArray &a) {
    RGInfo.method = string_to_interpmthd(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_gaussian_dx(const StringArray &a) {
+void static set_gaussian_dx(const StringArray &a) {
    RGInfo.gaussian.dx = atof(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
-void set_width(const StringArray &a) {
+void static set_width(const StringArray &a) {
    RGInfo.width = atoi(a[0].c_str());
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_gaussian_radius(const StringArray &a) {
+void static set_gaussian_radius(const StringArray &a) {
    RGInfo.gaussian.radius = atof(a[0].c_str());
 }
 
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_shape(const StringArray &a) {
+void static set_shape(const StringArray &a) {
    GridTemplateFactory gtf;
    RGInfo.shape = gtf.string2Enum(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_vld_thresh(const StringArray &a) {
+void static set_vld_thresh(const StringArray &a) {
    RGInfo.vld_thresh = atof(a[0].c_str());
    if(RGInfo.vld_thresh > 1 || RGInfo.vld_thresh < 0) {
       mlog << Error << "\nset_vld_thresh() -> "
@@ -557,7 +580,7 @@ void set_vld_thresh(const StringArray &a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_convert(const StringArray &a) {
+void static set_convert(const StringArray &a) {
 
    // Can only be used once
    if(RGInfo.convert_fx.is_set()) {
@@ -574,20 +597,20 @@ void set_convert(const StringArray &a) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_censor(const StringArray &a) {
+void static set_censor(const StringArray &a) {
    RGInfo.censor_thresh.add(a[0].c_str());
    RGInfo.censor_val.add(atof(a[1].c_str()));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_name(const StringArray & a) {
+void static set_name(const StringArray & a) {
    VarNameSA.add_css(a[0]);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_compress(const StringArray & a) {
+void static set_compress(const StringArray & a) {
    compress_level = atoi(a[0].c_str());
 }
 

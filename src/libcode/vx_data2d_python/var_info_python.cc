@@ -156,9 +156,9 @@ void VarInfoPython::set_file_type(const GrdFileType t) {
 ///////////////////////////////////////////////////////////////////////////////
 
 
-void VarInfoPython::set_dict(Dictionary & dict) {
+bool VarInfoPython::set_dict(Dictionary & dict, bool do_exit) {
 
-   VarInfo::set_dict(dict);
+   bool status = VarInfo::set_dict(dict);
 
    //
    //  the "name" entry is required and specifies the python command to be run
@@ -180,7 +180,7 @@ void VarInfoPython::set_dict(Dictionary & dict) {
 
    MagicStr << cs_erase << "PYTHON";
 
-   return;
+   return status;
 }
 
 

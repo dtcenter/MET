@@ -108,7 +108,7 @@ class VarInfoGrib2 : public VarInfo
          // set stuff
          //
 
-      void set_dict(Dictionary &) override;
+      bool set_dict(Dictionary &, bool do_exit=true) override;
 
       void set_record(int);
       void set_discipline(int);
@@ -166,7 +166,7 @@ inline int    VarInfoGrib2::aerosol_interval_type() const { return AerosolInterv
 inline double VarInfoGrib2::aerosol_size_lower()    const { return AerosolSizeLower;    }
 inline double VarInfoGrib2::aerosol_size_upper()    const { return AerosolSizeUpper;    }
 
-inline int VarInfoGrib2::n_ipdtmpl()          const { return IPDTmplIndex.n(); } 
+inline int VarInfoGrib2::n_ipdtmpl()          const { return IPDTmplIndex.n(); }
 inline int VarInfoGrib2::ipdtmpl_index(int i) const { return IPDTmplIndex[i];  }
 inline int VarInfoGrib2::ipdtmpl_val(int i)   const { return IPDTmplVal[i];    }
 
