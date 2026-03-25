@@ -67,7 +67,19 @@ fcst = {
       }
    ];
 }
-obs = fcst;
+obs = {
+   field = [
+      {
+         name = "precipitation_amount";
+         level = [ "(*,*)" ];
+         is_precipitation = TRUE;
+         set_attr_init = "20211201_00";
+         set_attr_valid = "20211202_00";
+         set_attr_accum = "24";
+      }
+   ];
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 

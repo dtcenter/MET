@@ -114,9 +114,9 @@ void smooth_field(const DataPlane &dp, DataPlane &smooth_dp,
    // For nearest neighbor, no work to do.
    if(width == 1 && mthd == InterpMthd::Nearest) return;
 
-#pragma omp parallel default(none) \
+#pragma omp parallel default(shared) \
    shared(mlog, Error, dp, smooth_dp) \
-   shared(mthd, width, shape, wrap_lon, t, gaussian) \
+   shared(mthd, width, wrap_lon, t, gaussian) \
    private(v)
    {
 
@@ -450,7 +450,7 @@ void apply_mask(DataPlane &in, const MaskPlane &mask) {
    int Nxy = mask.nx() * mask.ny();
 
 #pragma omp parallel default(none) \
-   shared(in, mask, Nxy, bad_data_double)
+   shared(in, mask, Nxy)
    {
 
 #pragma omp for schedule(static)
@@ -575,7 +575,7 @@ DataPlane subtract(const DataPlane &dp1, const DataPlane &dp2) {
    }
 
 #pragma omp parallel default(none) \
-   shared(dp1, dp2, diff, bad_data_double)
+   shared(dp1, dp2, diff)
    {
 
 #pragma omp for schedule(static) \
@@ -612,7 +612,7 @@ DataPlane normal_cdf(const DataPlane &dp, const DataPlane &mn,
    }
 
 #pragma omp parallel default(none) \
-   shared(dp, mn, sd, cdf, bad_data_double)
+   shared(dp, mn, sd, cdf)
    {
 
    // Compute the normal CDF for each grid point
@@ -660,8 +660,8 @@ DataPlane normal_cdf_inv(const double area, const DataPlane &mn,
       exit(1);
    }
 
-#pragma omp parallel default(none) \
-   shared(area, mn, sd, cdf_inv, bad_data_double)
+#pragma omp parallel default(shared) \
+   shared(mn, sd, cdf_inv)
    {
 
    // Compute the inverse of the normal CDF for each grid point
@@ -700,7 +700,7 @@ DataPlane gradient(const DataPlane &dp, int dim, int delta) {
    grad_dp.set_constant(bad_data_double);
 
 #pragma omp parallel default(none) \
-   shared(dp, dim, delta, grad_dp, bad_data_double)
+   shared(dp, dim, delta, grad_dp)
    {
 
       // Compute the gradient for each grid point

@@ -68,7 +68,7 @@ class VarInfoUGrid : public VarInfo
       //
 
       void set_magic(const ConcatString &, const ConcatString &) override;
-      void set_dict(Dictionary &s) override;
+      bool set_dict(Dictionary &s, bool do_exit=true) override;
 
       void add_dimension(int dim, bool as_offset=true, double dim_value=bad_data_double);
 

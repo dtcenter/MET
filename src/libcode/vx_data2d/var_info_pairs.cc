@@ -127,9 +127,9 @@ void VarInfoPairs::dump(ostream &out) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoPairs::set_dict(Dictionary & dict) {
+bool VarInfoPairs::set_dict(Dictionary & dict, bool do_exit) {
 
-   VarInfo::set_dict(dict);
+   bool status = VarInfo::set_dict(dict, do_exit);
 
    //
    // Parse the required name and optional level strings
@@ -144,7 +144,7 @@ void VarInfoPairs::set_dict(Dictionary & dict) {
 
    VarInfo::set_magic(nstr, lstr);
 
-   return;
+   return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
