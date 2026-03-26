@@ -227,7 +227,7 @@ class VarInfoNcWrf : public VarInfo
          //
 
       void set_magic(const ConcatString &, const ConcatString &) override;
-      void set_dict(Dictionary &) override;
+      bool set_dict(Dictionary &, bool do_exit=true) override;
 
       void add_dimension(int dim, bool as_index=true, double dim_value=bad_data_double);
       void set_dimension(int i_dim, int dim);

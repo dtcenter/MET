@@ -365,15 +365,15 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcCF::set_dict(Dictionary &dict){
+bool VarInfoNcCF::set_dict(Dictionary &dict, bool do_exit){
 
-   VarInfo::set_dict(dict);
+   bool status = VarInfo::set_dict(dict,do_exit);
 
    set_magic(dict.lookup_string("name"),
              dict.lookup_string("level"));
    set_req_name(dict.lookup_string("name").c_str());
 
-   return;
+   return status;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

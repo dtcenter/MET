@@ -115,7 +115,7 @@ ____________________
   ci_alpha       = [ 0.05 ];
   boot           = { interval = PCTILE; rep_prop = 1.0; n_rep = 1000;
                      rng = "mt19937"; seed = ""; }
-  mask           = { grid = [ "FULL" ]; poly = []; }
+  mask           = { grid = ""; poly = ""; }
   gradient       = { dx = [ 1 ]; dy = [ 1 ]; }
   hss_ec_value   = NA;
   rank_corr_flag = TRUE;

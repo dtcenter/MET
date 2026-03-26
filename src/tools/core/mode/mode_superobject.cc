@@ -185,8 +185,7 @@ ModeSuperObject::ModeSuperObject(bool isFcst, int n_files, bool do_clusters,
    _simple_sd    = ShapeData(*(mvd[0]->_simple->_sd));
    auto merge_sd = ShapeData(*(mvd[0]->_simple->_sd));
 
-#pragma omp parallel default(none) \
-   shared(nx, ny, bad_data_double) \
+#pragma omp parallel default(shared) \
    shared(_simple_result, _simple_sd) \
    shared(merge_result, merge_sd)
    {

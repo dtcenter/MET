@@ -84,6 +84,10 @@ class VarInfo
 
       void init_from_scratch();
       void assign(const VarInfo &);
+      bool handle_config_error(const ConcatString &msg, bool do_exit) const;
+      bool validate_censor_arrays(const ThreshArray &ta, const NumArray &na,
+                                  bool do_exit, const char *caller_name=nullptr) const;
+      bool validate_wind_attributes(bool do_exit, const char *caller_name=nullptr) const;
 
    public:
 
@@ -158,7 +162,7 @@ class VarInfo
          //
 
       virtual void set_magic(const ConcatString &, const ConcatString &);
-      virtual void set_dict(Dictionary &);
+      virtual bool set_dict(Dictionary &, bool do_exit=true);
       virtual void add_grib_code(Dictionary &);
 
       void set_req_name(const char *);
