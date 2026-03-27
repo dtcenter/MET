@@ -149,12 +149,8 @@ void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    char *ptr3 = (char *) nullptr;
    char *save_ptr = (char *) nullptr;
 
-   // Store the magic string
-   VarInfo::set_magic(nstr, lstr);
-
-   // Set the requested name and default output name
-   set_req_name(nstr.c_str());
-   set_name(nstr);
+   // Store the magic string and set names using shared utility
+   set_magic_common(nstr, lstr);
 
    // Parse the level dimensions, if specified
    if(lstr.string().find_first_of("(") != std::string::npos) {

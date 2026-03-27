@@ -800,7 +800,7 @@ LongArray MetUGridDataFile::collect_vertical_offsets(VarInfo &vinfo) {
 
 ////////////////////////////////////////////////////////////////////////
 
-long MetUGridDataFile::convert_time_to_offset(long time_value) {
+long MetUGridDataFile::convert_time_to_offset(double time_value) const {
    bool found = false;
    bool found_value = false;
    long time_offset = bad_data_int;
@@ -890,7 +890,7 @@ int MetUGridDataFile::extract_vlevels(ConcatString var_name_base, const char *va
 ////////////////////////////////////////////////////////////////////////
 
 
-long MetUGridDataFile::get_time_offset(long time_value, const long time_cnt,
+long MetUGridDataFile::get_time_offset(double time_value, const long time_cnt,
                                        const char *var_name, const string caller) {
    const long time_threshold_cnt = 10000000;
    long time_offset = convert_time_to_offset(time_value);

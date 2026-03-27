@@ -160,12 +160,8 @@ void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    ConcatString tmp_str;
    const char *method_name = "VarInfoUGrid::set_magic() -> ";
 
-   // Store the magic string
-   VarInfo::set_magic(nstr, lstr);
-
-   // Set the requested name and default output name
-   set_req_name(nstr.c_str());
-   set_name(nstr);
+   // Store the magic string and set names using shared utility
+   set_magic_common(nstr, lstr);
 
    // If there's no level specification, assume (*, *)
    if(0 == lstr.length() || strchr(lstr.c_str(), '(') == nullptr) {

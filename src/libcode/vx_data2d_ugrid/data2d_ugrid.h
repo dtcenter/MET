@@ -33,11 +33,11 @@ class MetUGridDataFile : public Met2dDataFile {
 
       void ugrid_init_from_scratch();
       //NcVarInfo *find_first_data_var();
-      long convert_time_to_offset(long time_value);
+      long convert_time_to_offset(double time_value) const;
       //long convert_value_to_offset(double z_value, std::string z_dim_name);
       LongArray collect_time_offsets(VarInfo &vinfo);
       //LongArray collect_vertical_offsets(VarInfo &vinfo);
-      long get_time_offset(long time_value, const long time_cnt,
+      long get_time_offset(double time_value, const long time_cnt,
                            const char *var_name, const std::string caller);
 
       MetUGridDataFile(const MetUGridDataFile &);

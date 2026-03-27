@@ -481,6 +481,29 @@ void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void VarInfo::set_magic_common(const ConcatString &nstr, const ConcatString &lstr) {
+   // Check for embedded whitespace
+   if((unsigned int) nstr.length() != strcspn(nstr.c_str(), " \t") ||
+      (unsigned int) lstr.length() != strcspn(lstr.c_str(), " \t")) {
+      mlog << Error << "\nnetcdf_set_magic_util::set_magic_common() -> "
+           << "embedded whitespace found in the name \"" << nstr
+           << "\" or level \"" << lstr << "\" string.\n\n";
+      exit(1);
+   }
+   // Format as {name}/{level} or {name}{level}
+   if(lstr.nonempty() && lstr[0] != '(') {
+      MagicStr << cs_erase << nstr << "/" << lstr;
+   }
+   else {
+      MagicStr << cs_erase << nstr << lstr;
+   }
+   set_req_name(nstr.c_str());
+   set_name(nstr);
+   // Derived classes should handle level/dimension specifics and units/long_name if needed
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 ConcatString VarInfo::magic_str_attr() const {
    ConcatString mstr(name_attr());
    ConcatString lstr(level_attr());

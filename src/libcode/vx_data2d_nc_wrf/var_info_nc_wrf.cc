@@ -166,12 +166,8 @@ void VarInfoNcWrf::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    char *save_ptr = (char *) nullptr;
    const char *method_name = "VarInfoNcWrf::set_magic() -> ";
 
-   // Store the magic string
-   VarInfo::set_magic(nstr, lstr);
-
-   // Set the requested name and default output name
-   set_req_name(nstr.c_str());
-   set_name(nstr);
+   // Store the magic string and set names using shared utility
+   set_magic_common(nstr, lstr);
 
    // If there's no level specification, assume (0,*,*)
    if(strchr(lstr.c_str(), '(') == nullptr) {
