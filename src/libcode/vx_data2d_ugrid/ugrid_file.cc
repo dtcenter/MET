@@ -98,6 +98,7 @@ void UGridFile::init_from_scratch()
   _tDim = (NcDim *)nullptr;
   _latVar = (NcVar *)nullptr;
   _lonVar = (NcVar *)nullptr;
+  z_var_name.clear();
   metadata_map.clear();
   max_distance_km = bad_data_double;
 
@@ -274,7 +275,10 @@ bool UGridFile::open_metadata(const char * filepath)
     }
     else if (lat_names.has(Var[j].name)) _latVar = Var[j].var;
     else if (lon_names.has(Var[j].name)) _lonVar = Var[j].var;
-    else if (z_names.has(Var[j].name)) z_var = Var[j].var;
+    else if (z_names.has(Var[j].name)) {
+       z_var = Var[j].var;
+       z_var_name = Var[j].name;
+    }
   }
 
   get_var_names(_ncMetaFile, &var_names);

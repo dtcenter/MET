@@ -89,6 +89,7 @@ class UGridFile {
 
       NcVarInfo *Var;    //  allocated
       std::array<NcVarInfo, UG_META_VAR_COUNT>MetaVar;
+      ConcatString z_var_name;
 
          //
          //  Grid
