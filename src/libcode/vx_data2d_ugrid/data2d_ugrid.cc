@@ -221,6 +221,8 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, NcVarInfo *d
    bool status = false;
    const long time_cnt = (long)_file->ValidTime.n();
    VarInfoUGrid *vinfo_nc = (VarInfoUGrid *)&vinfo;
+   static const string method_name_s
+         = "MetUGridDataFile::data_plane() -> ";
    static const string method_name
          = "MetUGridDataFile::data_plane(VarInfo &, DataPlane &, NcVarInfo *) -> ";
 
@@ -284,10 +286,16 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, NcVarInfo *d
             long z_cnt = (long)get_dim_size(_file->get_vert_dim());
             long z_offset = dim_offset;
             if (z_offset == range_flag) z_offset = _cur_vert_index;   // from data_plane_array()
-            //else if (!is_offset[idx]) {
-            //  // convert the value to index for slicing
-            //  z_offset = convert_value_to_offset(dim_value[idx], z_dim_name);
-            //}
+            else if (!is_offset[idx]) {
+               // convert the value to index for slicing
+               z_offset = get_vertical_offset(dim_value[idx]);
+               if (z_offset < 0) {
+                  mlog << Error << "\n" <<  method_name_s
+                       << "the vertical level value (" << dim_value[idx]
+                       << ") does not exist at the " << _file->z_var_name << " variable\n\n";
+                  exit(1);
+               }
+            }
             if ((z_offset >= 0) && (z_offset < z_cnt)) {
               dimension[idx] = long(z_offset);
             }
@@ -889,7 +897,6 @@ int MetUGridDataFile::extract_vlevels(ConcatString var_name_base, const char *va
 
 ////////////////////////////////////////////////////////////////////////
 
-
 long MetUGridDataFile::get_time_offset(double time_value, const long time_cnt,
                                        const char *var_name, const string caller) {
    const long time_threshold_cnt = 10000000;
@@ -908,6 +915,19 @@ long MetUGridDataFile::get_time_offset(double time_value, const long time_cnt,
       time_offset = -1;
    }
    return time_offset;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+long MetUGridDataFile::get_vertical_offset(double z_value) {
+   long virt_offset = -1;
+   for (int idx = 0; idx<_file->vlevels.n(); idx++) {
+      if (is_eq(z_value, _file->vlevels[idx])) {
+         virt_offset = idx;
+         break;
+      }
+   }
+   return virt_offset;
 }
 
 ////////////////////////////////////////////////////////////////////////

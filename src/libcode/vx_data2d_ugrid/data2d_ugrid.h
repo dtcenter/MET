@@ -39,6 +39,7 @@ class MetUGridDataFile : public Met2dDataFile {
       //LongArray collect_vertical_offsets(VarInfo &vinfo);
       long get_time_offset(double time_value, const long time_cnt,
                            const char *var_name, const std::string caller);
+      long get_vertical_offset(double z_value);
 
       MetUGridDataFile(const MetUGridDataFile &);
       MetUGridDataFile & operator=(const MetUGridDataFile &);
