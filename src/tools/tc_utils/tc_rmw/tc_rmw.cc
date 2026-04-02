@@ -372,7 +372,7 @@ void process_track_files(const StringArray& files,
             if(!is_keeper(&line)) continue;
 
             // Attempt to add current line to TrackInfoArray
-            if(tracks.add(line, true, false)) {
+            if(tracks.add(line, true, true)) {
                 cur_add++;
                 tot_add++;
             }
