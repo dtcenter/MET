@@ -77,8 +77,11 @@ DataPlane & DataPlane::operator=(const DataPlane &d) {
 DataPlane & DataPlane::operator+=(const DataPlane &d) {
    const char *method_name = "DataPlane::operator+=(const DataPlane &) -> ";
 
+   // If empty, initialize to the size of the input
+   if(Data.empty()) set_size(d.Nx, d.Ny, 0.0);
+
    // Check for matching dimensions
-   if(Nx != d.Nx || Ny != d.Ny) {
+   else if(Nx != d.Nx || Ny != d.Ny) {
       mlog << Error << "\n" << method_name
            << "the dimensions do not match: ("
            << Nx << ", " << Ny << ") != ("
