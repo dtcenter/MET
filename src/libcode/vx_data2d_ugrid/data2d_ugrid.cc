@@ -79,79 +79,70 @@ MetUGridDataFile & MetUGridDataFile::operator=(const MetUGridDataFile &) {
 }
 
 ////////////////////////////////////////////////////////////////////////
+// Private cleanup helper
 
-void MetUGridDataFile::ugrid_init_from_scratch() {
-
-   _file = (UGridFile *) nullptr;
+void MetUGridDataFile::cleanup() {
+   if(_file) { delete _file; _file = nullptr; }
    _cur_time_index = -1;
    _cur_vert_index = -1;
+   Filename.clear();
+   meta_filename.clear();
+   if (Raw_Grid) { delete Raw_Grid; Raw_Grid = nullptr; }
+   if (Dest_Grid) { delete Dest_Grid; Dest_Grid = nullptr; }
+}
 
+////////////////////////////////////////////////////////////////////////
+// Private error helper
+
+bool MetUGridDataFile::fail_with_error(const std::string &msg) {
+   mlog << Error << msg;
    close();
+   return false;
+}
 
+////////////////////////////////////////////////////////////////////////
+
+void MetUGridDataFile::ugrid_init_from_scratch() {
+   cleanup();
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+
 void MetUGridDataFile::close() {
-
-   if(_file) { delete _file; _file = (UGridFile *) nullptr; }
-
+   cleanup();
    return;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 bool MetUGridDataFile::open(const char * _filename) {
-
    close();
-
    _file = new UGridFile;
-
    if(!_file->open(_filename)) {
-      mlog << Error << "\nMetUGridDataFile::open(const char *) -> "
-           << "unable to open NetCDF file \"" << _filename << "\"\n\n";
-      close();
-
-      return false;
+      return fail_with_error("\nMetUGridDataFile::open(const char *) -> unable to open NetCDF file \"" + std::string(_filename) + "\"\n\n");
    }
-
    Filename = _filename;
-
    return true;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
+
 bool MetUGridDataFile::open_metadata(const char * _filename) {
    const char *method_name = "MetUGridDataFile::open_metadata(const char *) -> ";
-
-   if (! _file) {
-      mlog << Error << "\n" << method_name
-           << "UGridFile is not initiated to handle \"" << _filename << "\"\n\n";
-      close();
-      return false;
+   if (!_file) {
+      return fail_with_error(std::string("\n") + method_name + "UGridFile is not initiated to handle \"" + _filename + "\"\n\n");
    }
-
    if (!_file->open_metadata(_filename)) {
-      mlog << Error << "\n" << method_name
-           << "unable to open NetCDF file \"" << _filename << "\"\n\n";
-      close();
-      return false ;
+      return fail_with_error(std::string("\n") + method_name + "unable to open NetCDF file \"" + _filename + "\"\n\n");
    }
-
    meta_filename = _filename;
-
    Raw_Grid = new Grid;
-
    (*Raw_Grid) = _file->grid;
-   //Raw_Grid->set(*_file->grid.info().us);
-
    Dest_Grid = new Grid;
-
    (*Dest_Grid) = (*Raw_Grid);
-   //Dest_Grid->set(*_file->grid.info().us);
-
    return true;
 }
 
@@ -221,10 +212,9 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane, const NcVarI
    bool status = false;
    const long time_cnt = (long)_file->ValidTime.n();
    VarInfoUGrid *vinfo_nc = (VarInfoUGrid *)&vinfo;
-   static const string method_name_s
-         = "MetUGridDataFile::data_plane() -> ";
+   static const string method_name_s = "MetUGridDataFile::data_plane() -> ";
    static const string method_name
-         = "MetUGridDataFile::data_plane(VarInfo &, DataPlane &, NcVarInfo *) -> ";
+         = "MetUGridDataFile::data_plane(VarInfo &, DataPlane &, const NcVarInfo *) -> ";
 
    // Initialize the data plane
 
@@ -679,6 +669,12 @@ int MetUGridDataFile::extract_vlevels(ConcatString &var_name_base, const char *v
    num_mat = regex_apply(name_pattern.c_str(), 4, var_name, mat);
    if (2 < num_mat) vlevel = atoi(mat[2]);
 
+   if (mat) {
+      for (int i = 0; i < num_mat; ++i) {
+          delete[] mat[i];   // free each row
+      }
+      delete[] mat;          // free the array of pointers
+   };
    return vlevel;
 }
 

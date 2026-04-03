@@ -72,6 +72,7 @@ UGridFile::UGridFile()
 
 ////////////////////////////////////////////////////////////////////////
 
+
 UGridFile::~UGridFile()
 {
   close();
@@ -79,33 +80,68 @@ UGridFile::~UGridFile()
 
 
 ////////////////////////////////////////////////////////////////////////
+// Private cleanup helper to free all dynamic allocations
 
+void UGridFile::cleanup() {
+  // Delete NcFile pointers
+  if (_ncFile) {
+    delete _ncFile;
+    _ncFile = nullptr;
+  }
+  if (_ncMetaFile) {
+    delete _ncMetaFile;
+    _ncMetaFile = nullptr;
+  }
+
+  // Delete NcDim pointers
+  if (_faceDim) { delete _faceDim; _faceDim = nullptr; }
+  if (_edgeDim) { delete _edgeDim; _edgeDim = nullptr; }
+  if (_nodeDim) { delete _nodeDim; _nodeDim = nullptr; }
+  if (_virtDim) { delete _virtDim; _virtDim = nullptr; }
+  if (_tDim)    { delete _tDim;    _tDim    = nullptr; }
+
+  // Delete NcVar pointers
+  if (_latVar) { delete _latVar; _latVar = nullptr; }
+  if (_lonVar) { delete _lonVar; _lonVar = nullptr; }
+
+  // Delete Var array and its Dims arrays
+  if (Var) {
+    for (int j = 0; j < Nvars; ++j) {
+      if (Var[j].var) { delete Var[j].var; Var[j].var = nullptr; }
+      if (Var[j].Dims) { delete[] Var[j].Dims; Var[j].Dims = nullptr; }
+    }
+    delete[] Var;
+    Var = nullptr;
+  }
+  Nvars = 0;
+
+  // Delete MetaVar Dims arrays
+  for (int j = 0; j < UG_META_VAR_COUNT; ++j) {
+    if (MetaVar[j].var) { delete MetaVar[j].var; MetaVar[j].var = nullptr; }
+    if (MetaVar[j].Dims) { delete[] MetaVar[j].Dims; MetaVar[j].Dims = nullptr; }
+  }
+
+  // Clear other members
+  _numDims = 0;
+  _dimNames.clear();
+  metadata_map.clear();
+  metadata_names.clear();
+  z_var_name.clear();
+  max_distance_km = bad_data_double;
+  ValidTime.clear();
+  raw_times.clear();
+  vlevels.clear();
+  InitTime = (unixtime)0;
+  AccumTime = (unixtime)0;
+  face_count = 0;
+  _time_var_info = nullptr;
+}
+
+////////////////////////////////////////////////////////////////////////
 
 void UGridFile::init_from_scratch()
-
 {
-  // Initialize the pointers
-
-  _ncFile = (NcFile *) nullptr;
-  _ncMetaFile = (NcFile *) nullptr;
-  Var = (NcVarInfo *) nullptr;
-  _time_var_info = (NcVarInfo *)nullptr;
-
-  _faceDim = (NcDim *)nullptr;
-  _edgeDim = (NcDim *)nullptr;
-  _nodeDim = (NcDim *)nullptr;
-  _virtDim = (NcDim *)nullptr;
-  _tDim = (NcDim *)nullptr;
-  _latVar = (NcVar *)nullptr;
-  _lonVar = (NcVar *)nullptr;
-  z_var_name.clear();
-  metadata_map.clear();
-  max_distance_km = bad_data_double;
-
-  // Close any existing file
-
-  close();
-
+  cleanup();
   return;
 }
 
@@ -115,50 +151,7 @@ void UGridFile::init_from_scratch()
 
 void UGridFile::close()
 {
-
-  // Reclaim the file pointer
-
-  if (_ncFile) {
-    delete _ncFile;
-    _ncFile = (NcFile *)nullptr;
-  }
-
-  if (_ncMetaFile) {
-    delete _ncMetaFile;
-    _ncMetaFile = (NcFile *)nullptr;
-  }
-
-  // Reclaim the dimension pointers
-
-  _numDims = 0;
-
-  _dimNames.clear();
-  metadata_map.clear();
-  metadata_names.clear();
-
-  _faceDim = _edgeDim = _tDim = (NcDim *)nullptr;
-
-  // Reclaim the variable pointers
-
-  if (Var) {
-    delete [] Var;
-    Var = (NcVarInfo *)nullptr;
-  }
-
-  Nvars = 0;
-
-  // Reset the time values
-
-  ValidTime.clear();
-  raw_times.clear();
-  vlevels.clear();
-  InitTime = (unixtime)0;
-  AccumTime = (unixtime)0;
-
-  face_count = 0;
-
-  //  done
-
+  cleanup();
   return;
 }
 
