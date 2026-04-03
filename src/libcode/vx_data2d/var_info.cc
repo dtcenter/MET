@@ -485,7 +485,7 @@ void VarInfo::set_magic_common(const ConcatString &nstr, const ConcatString &lst
    // Check for embedded whitespace
    if((unsigned int) nstr.length() != strcspn(nstr.c_str(), " \t") ||
       (unsigned int) lstr.length() != strcspn(lstr.c_str(), " \t")) {
-      mlog << Error << "\nnetcdf_set_magic_util::set_magic_common() -> "
+      mlog << Error << "\nVarInfo::set_magic_common() -> "
            << "embedded whitespace found in the name \"" << nstr
            << "\" or level \"" << lstr << "\" string.\n\n";
       exit(1);
