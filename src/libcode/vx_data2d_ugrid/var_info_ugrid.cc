@@ -162,7 +162,7 @@ void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    set_magic_common(nstr, lstr);
 
    // If there's no level specification, assume (*, *)
-   if(lstr.empty() || strchr(lstr.c_str(), '(') == nullptr) {
+   if(lstr.empty() || lstr.find(int('(')) < 0) {
       Level.set_req_name("0,*");
       Level.set_name("0,*");
       clear_dimension();

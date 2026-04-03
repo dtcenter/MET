@@ -189,7 +189,7 @@ bool MetUGridDataFile::data_plane(VarInfo &vinfo, DataPlane &plane)
       long lvl_upper = level.upper();
       vector<NcVarInfo *> vinfo_list;
       if (_file->find_nc_vinfo_list(req_name.c_str(), vinfo_list)) {
-         for (NcVarInfo *nc_var_info : vinfo_list) {
+         for (const NcVarInfo *nc_var_info : vinfo_list) {
             int vlevel = extract_vlevels(req_name, nc_var_info->name.c_str());
             if (vlevel >= lvl_lower && vlevel <= lvl_upper) {
                vinfo.set_req_name(nc_var_info->name.c_str());
@@ -335,7 +335,7 @@ int MetUGridDataFile::data_plane_array(VarInfo &vinfo,
       if (nullptr == data_vinfo) {
          vector<NcVarInfo *> vinfo_list;
          if (_file->find_nc_vinfo_list(req_name.c_str(), vinfo_list)) {
-            for (NcVarInfo *nc_var_info : vinfo_list) {
+            for (const NcVarInfo *nc_var_info : vinfo_list) {
                int vlevel = extract_vlevels(req_name, nc_var_info->name.c_str());
                if (vlevel >= lvl_lower && vlevel <= lvl_upper) {
                   vinfo.set_req_name(nc_var_info->name.c_str());
@@ -468,9 +468,9 @@ LongArray MetUGridDataFile::collect_time_offsets(VarInfo &vinfo) const {
             long next_time;
             next_time = time_lower + time_inc;
             for (idx=next_offset; idx<time_dim_size; idx++) {
-               if (_file->ValidTime[idx] > time_upper
-                   || _file->ValidTime[idx] < next_time) continue;
-               else if (_file->ValidTime[idx] == next_time) {
+               if (_file->ValidTime[idx] > time_upper) break;
+               if (_file->ValidTime[idx] < next_time) continue;
+               if (_file->ValidTime[idx] == next_time) {
                   time_offsets.add(idx);
                   mlog << Debug(9) << method_name << " found the time "
                        << unix_to_yyyymmdd_hhmmss(_file->ValidTime[idx]) << "\n";
@@ -811,7 +811,7 @@ bool MetUGridDataFile::read_data_plane(ConcatString var_name, VarInfo &vinfo,
 
 void MetUGridDataFile::set_ugrid_configs(const ConcatString dataset_name,
                                          double max_distance_km,
-                                         const ConcatString map_config_filename) {
+                                         const ConcatString &map_config_filename) {
    _file->set_dataset(dataset_name);
    if (! map_config_filename.empty()) {
       _file->set_map_config_file(map_config_filename);

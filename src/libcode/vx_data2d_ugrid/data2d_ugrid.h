@@ -109,7 +109,7 @@ class MetUGridDataFile : public Met2dDataFile {
       bool open_metadata(const char * filename);
       ConcatString coordinate_file() const;
       void set_ugrid_configs(const ConcatString dataset_name, double max_distance_km,
-                             const ConcatString map_config_filename);
+                             const ConcatString &map_config_filename);
 
       void close ();
 
