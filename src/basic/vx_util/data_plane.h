@@ -56,6 +56,7 @@ class DataPlane {
       DataPlane();
      ~DataPlane();
       DataPlane(const DataPlane &);
+      DataPlane(const int nx, const int ny, const double v = 0);
       DataPlane & operator=(const DataPlane &);
       DataPlane & operator+=(const DataPlane &);
       DataPlane & operator/=(const double);

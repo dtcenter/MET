@@ -63,6 +63,15 @@ DataPlane::DataPlane(const DataPlane &d) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+DataPlane::DataPlane(const int nx, const int ny, const double v) {
+
+   init_from_scratch();
+
+   set_size(nx, ny, v);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 DataPlane & DataPlane::operator=(const DataPlane &d) {
 
    if(this == &d) return *this;
