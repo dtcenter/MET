@@ -2254,6 +2254,12 @@ EASProbInfo parse_conf_eas_prob(Dictionary *dict) {
       }
    }
 
+   // Conf: shape
+   int v = eas_dict->lookup_int(conf_key_shape, false);
+   info.shape = (eas_dict->last_lookup_status() ?
+                 int_to_gridtemplate(v) :
+                 GridTemplateFactory::GridTemplates::Square);
+
    // Conf: alpha
    info.alpha = eas_dict->lookup_double(conf_key_alpha);
 
@@ -2266,7 +2272,7 @@ EASProbInfo parse_conf_eas_prob(Dictionary *dict) {
          exit(1);
    }
 
-   // Conf: gaussian dx and radius
+   // Conf: gaussian dx
    double conf_value = eas_dict->lookup_double(conf_key_gaussian_dx, false);
    info.gaussian.dx = (is_bad_data(conf_value) ?
                        default_gaussian_dx :
@@ -2277,12 +2283,6 @@ EASProbInfo parse_conf_eas_prob(Dictionary *dict) {
    info.gaussian.radius = (is_bad_data(conf_value) ?
                            default_gaussian_radius :
                            conf_value);
-
-   // Conf: shape
-   int v = eas_dict->lookup_int(conf_key_shape, false);
-   info.shape = (eas_dict->last_lookup_status() ?
-                 int_to_gridtemplate(v) :
-                 GridTemplateFactory::GridTemplates::Square);
 
    return info;
 }

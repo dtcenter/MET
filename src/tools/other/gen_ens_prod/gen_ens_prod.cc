@@ -1203,11 +1203,16 @@ static void write_eas_nc(GenEnsProdVarInfo *ens_info,
                   i_eas+1 == n_eas) {
                   eas_width_dp.buf()[i] = conf_info.eas_prob.width[i_eas];
                   eas_prob_dp.buf()[i]  = frac_mean_dp[i_eas].const_buf()[i];
-                  continue;
+                  break;
                }
             } // end for i_eas
          } // end for i
       } // End omp parallel
+
+      // Compute Gaussian weights
+      if(conf_info.eas_prob.gaussian.weights.empty()) {
+         conf_info.eas_prob.gaussian.compute();
+      }
 
       // Apply the Gaussian smoother
       DataPlane eas_smooth_dp(eas_prob_dp);
@@ -1216,19 +1221,21 @@ static void write_eas_nc(GenEnsProdVarInfo *ens_info,
                          conf_info.eas_prob.vld_thresh);
 
       // Write EAS widths
-      write_ens_data_plane(ens_info, eas_width_dp, ens_dp,
-                           "EAS_WIDTH",
-                           "Ensemble agreement scale widths");
+      ConcatString thr_cs(ens_info->cat_ta[i_thr].get_abbr_str());
+      ConcatString type_cs;
+      type_cs << "ENS_EAS_WIDTH_" << thr_cs;
+      write_ens_data_plane(ens_info, eas_width_dp, ens_dp, type_cs.c_str(),
+                           "Ensemble Agreement Scale Width");
 
       // Write raw EAS probabilities
-      write_ens_data_plane(ens_info, eas_prob_dp, ens_dp,
-                           "EAS_RAW_PROB",
-                           "Ensemble agreement scale raw probabilities");
+      type_cs << cs_erase << "ENS_EAS_RAW_" << thr_cs;
+      write_ens_data_plane(ens_info, eas_prob_dp, ens_dp, type_cs.c_str(),
+                           "Ensemble Agreement Scale Raw Probability");
 
       // Write smoothed EAS probabilities
-      write_ens_data_plane(ens_info, eas_smooth_dp, ens_dp,
-                           "EAS_PROB",
-                           "Ensemble agreement scale probabilities");
+      type_cs << cs_erase << "ENS_EAS_" << thr_cs;
+      write_ens_data_plane(ens_info, eas_smooth_dp, ens_dp, type_cs.c_str(),
+                           "Ensemble Agreement Scale Probability");
 
    } // end for i_thr
 }
