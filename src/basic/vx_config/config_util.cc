@@ -2254,6 +2254,18 @@ EASProbInfo parse_conf_eas_prob(Dictionary *dict) {
       }
    }
 
+   // Conf: alpha
+   info.alpha = eas_dict->lookup_double(conf_key_alpha);
+
+   // Must be between 0 and 1
+   if(info.alpha <= 0 || info.alpha >= 1) {
+      mlog << Error << "\nparse_conf_eas_prob() -> "
+           << "EAS alpha value ("
+           << info.alpha << ") must be greater than 0 "
+           << "and less than 1.\n\n";
+         exit(1);
+   }
+
    // Conf: gaussian dx and radius
    double conf_value = eas_dict->lookup_double(conf_key_gaussian_dx, false);
    info.gaussian.dx = (is_bad_data(conf_value) ?
