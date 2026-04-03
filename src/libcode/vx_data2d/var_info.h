@@ -87,6 +87,9 @@ class VarInfo
       bool handle_config_error(const ConcatString &msg, bool do_exit) const;
       void parse_and_set_name_level(Dictionary &dict);
       void set_magic_common(const ConcatString &nstr, const ConcatString &lstr);
+   private:
+      void set_magic_helper(const ConcatString &nstr, const ConcatString &lstr);
+      bool is_flag_set(int flag) const;
       bool validate_censor_arrays(const ThreshArray &ta, const NumArray &na,
                                   bool do_exit, const char *caller_name=nullptr) const;
       bool validate_wind_attributes(bool do_exit, const char *caller_name=nullptr) const;

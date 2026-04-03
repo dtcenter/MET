@@ -458,8 +458,23 @@ void VarInfo::set_regrid(const RegridInfo &ri) {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
+   set_magic_helper(nstr, lstr);
+   return;
+}
 
-   // Check for embedded whitespace
+///////////////////////////////////////////////////////////////////////////////
+
+void VarInfo::set_magic_common(const ConcatString &nstr, const ConcatString &lstr) {
+   set_magic_helper(nstr, lstr);
+   set_req_name(nstr.c_str());
+   set_name(nstr);
+   // Derived classes should handle level/dimension specifics and units/long_name if needed
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Private helper to set MagicStr with whitespace check and formatting
+
+void VarInfo::set_magic_helper(const ConcatString &nstr, const ConcatString &lstr) {
    if((unsigned int) nstr.length() != strcspn(nstr.c_str(), " \t") ||
       (unsigned int) lstr.length() != strcspn(lstr.c_str(), " \t")) {
       mlog << Error << "\nVarInfo::set_magic() -> "
@@ -467,39 +482,12 @@ void VarInfo::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
            << "\" or level \"" << lstr << "\" string.\n\n";
       exit(1);
    }
-
-   // Format as {name}/{level} or {name}{level}
    if(lstr.nonempty() && lstr[0] != '(') {
       MagicStr << cs_erase << nstr << "/" << lstr;
    }
    else {
       MagicStr << cs_erase << nstr << lstr;
    }
-
-   return;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-void VarInfo::set_magic_common(const ConcatString &nstr, const ConcatString &lstr) {
-   // Check for embedded whitespace
-   if((unsigned int) nstr.length() != strcspn(nstr.c_str(), " \t") ||
-      (unsigned int) lstr.length() != strcspn(lstr.c_str(), " \t")) {
-      mlog << Error << "\nVarInfo::set_magic_common() -> "
-           << "embedded whitespace found in the name \"" << nstr
-           << "\" or level \"" << lstr << "\" string.\n\n";
-      exit(1);
-   }
-   // Format as {name}/{level} or {name}{level}
-   if(lstr.nonempty() && lstr[0] != '(') {
-      MagicStr << cs_erase << nstr << "/" << lstr;
-   }
-   else {
-      MagicStr << cs_erase << nstr << lstr;
-   }
-   set_req_name(nstr.c_str());
-   set_name(nstr);
-   // Derived classes should handle level/dimension specifics and units/long_name if needed
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -793,93 +781,46 @@ void VarInfo::set_prob_info_grib(ConcatString prob_name, double thresh_lo, doubl
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Private helper for is_X methods
+
+bool VarInfo::is_flag_set(int flag) const {
+   return (!is_bad_data(flag)) ? (flag != 0) : false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_precipitation() const {
-   bool status = false;
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsPrecipitation)) {
-      status = (SetAttrIsPrecipitation != 0);
-   }
-
-   return status;
+   return is_flag_set(SetAttrIsPrecipitation);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_specific_humidity() const {
-   bool status = false;
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsSpecificHumidity)) {
-      status = (SetAttrIsSpecificHumidity != 0);
-   }
-
-   return status;
+   return is_flag_set(SetAttrIsSpecificHumidity);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_u_wind() const {
-   bool status = false;
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsUWind)) {
-      status = (SetAttrIsUWind != 0);
-   }
-
-   return status;
+   return is_flag_set(SetAttrIsUWind);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_v_wind() const {
-   bool status = false;
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsVWind)) {
-      status = (SetAttrIsVWind != 0);
-   }
-
-   return status;
+   return is_flag_set(SetAttrIsVWind);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_wind_speed() const {
-   bool status = false;
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsWindSpeed)) {
-      status = (SetAttrIsWindSpeed != 0);
-   }
-
-   return status;
+   return is_flag_set(SetAttrIsWindSpeed);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_wind_direction() const {
-   bool status = false;
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsWindDirection)) {
-      status = (SetAttrIsWindDirection != 0);
-   }
-
-   return status;
+   return is_flag_set(SetAttrIsWindDirection);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
