@@ -95,7 +95,7 @@ nmep_smooth = {
 // Ensemble agreement scale probability method
 //
 eas_prob = {
-   width           = [ 5, 15, 25, 35 ];
+   width           = [ 3, 5, 7, 9, 11, 13, 15 ];
    shape           = CIRCLE;
    vld_thresh      = 0.0;
    alpha           = 0.1;
