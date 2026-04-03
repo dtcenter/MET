@@ -155,6 +155,7 @@ class UGridFile {
       //double *_lon;
 
       void init_from_scratch();
+      void cleanup();
 
       UGridFile(const UGridFile &);
       UGridFile & operator=(const UGridFile &);
@@ -164,6 +165,7 @@ class UGridFile {
       // Read the grid information from the netCDF file and fill in the
       // grid member with that information.
 
+      void cleanup();
       std::string find_metadata_name(std::string &key, StringArray &available_names);
       StringArray get_metadata_names(const std::string &key);
       void read_config(const ConcatString &config_filename);
