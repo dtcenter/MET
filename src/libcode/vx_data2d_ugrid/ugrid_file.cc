@@ -168,7 +168,6 @@ void UGridFile::close()
 
 bool UGridFile::open(const char * filepath)
 {
-  //const char *method_name = "UGridFile::open() -> ";
 
   // Close any open files and clear out the associated members
   close();
@@ -929,11 +928,11 @@ void UGridFile::read_netcdf_grid()
     exit(1);
   }
 
-  if (get_var_units(_latVar, units_value) && units_value == "rad" || units_value == "radian") {
+  if (get_var_units(_latVar, units_value) && (units_value == "rad" || units_value == "radian")) {
     mlog << Debug(6) << method_name << "convert  " << units_value << " to degree for lat\n";
     for (int idx=0; idx<face_count; idx++) _lat[idx] /= rad_per_deg;
   }
-  if (get_var_units(_lonVar, units_value) && units_value == "rad" || units_value == "radian") {
+  if (get_var_units(_lonVar, units_value) && (units_value == "rad" || units_value == "radian")) {
     mlog << Debug(6) << method_name << "  convert " << units_value << " to degree for lon\n";
     for (int idx=0; idx<face_count; idx++) _lon[idx] /= rad_per_deg;
   }
