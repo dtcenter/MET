@@ -109,6 +109,7 @@ class GenEnsProdConfInfo {
       int get_n_var()     const;
       int get_max_n_cat() const;
       int get_n_nbrhd()   const;
+      int get_n_eas()     const;
       int get_compression_level();
 };
 
@@ -117,6 +118,7 @@ class GenEnsProdConfInfo {
 inline int GenEnsProdConfInfo::get_n_var()       const { return n_var;                 }
 inline int GenEnsProdConfInfo::get_max_n_cat()   const { return max_n_cat;             }
 inline int GenEnsProdConfInfo::get_n_nbrhd()     const { return nbrhd_prob.width.n();  }
+inline int GenEnsProdConfInfo::get_n_eas()       const { return eas_prob.width.n();    }
 inline int GenEnsProdConfInfo::get_compression_level() { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////
