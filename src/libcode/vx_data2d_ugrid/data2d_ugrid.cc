@@ -79,19 +79,6 @@ MetUGridDataFile & MetUGridDataFile::operator=(const MetUGridDataFile &) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Private cleanup helper
-
-void MetUGridDataFile::cleanup() {
-   if(_file) { delete _file; _file = nullptr; }
-   _cur_time_index = -1;
-   _cur_vert_index = -1;
-   Filename.clear();
-   meta_filename.clear();
-   if (Raw_Grid) { delete Raw_Grid; Raw_Grid = nullptr; }
-   if (Dest_Grid) { delete Dest_Grid; Dest_Grid = nullptr; }
-}
-
-////////////////////////////////////////////////////////////////////////
 // Private error helper
 
 bool MetUGridDataFile::fail_with_error(const std::string &msg) {
@@ -103,7 +90,13 @@ bool MetUGridDataFile::fail_with_error(const std::string &msg) {
 ////////////////////////////////////////////////////////////////////////
 
 void MetUGridDataFile::ugrid_init_from_scratch() {
-   cleanup();
+   if(_file) { delete _file; _file = nullptr; }
+   _cur_time_index = -1;
+   _cur_vert_index = -1;
+   Filename.clear();
+   meta_filename.clear();
+   if (Raw_Grid) { delete Raw_Grid; Raw_Grid = nullptr; }
+   if (Dest_Grid) { delete Dest_Grid; Dest_Grid = nullptr; }
    return;
 }
 
@@ -111,7 +104,7 @@ void MetUGridDataFile::ugrid_init_from_scratch() {
 
 
 void MetUGridDataFile::close() {
-   cleanup();
+   ugrid_init_from_scratch();
    return;
 }
 
@@ -674,7 +667,7 @@ int MetUGridDataFile::extract_vlevels(ConcatString &var_name_base, const char *v
           delete[] mat[i];   // free each row
       }
       delete[] mat;          // free the array of pointers
-   };
+   }
    return vlevel;
 }
 
@@ -805,7 +798,7 @@ bool MetUGridDataFile::read_data_plane(ConcatString var_name, VarInfo &vinfo,
 
 ////////////////////////////////////////////////////////////////////////
 
-void MetUGridDataFile::set_ugrid_configs(const ConcatString dataset_name,
+void MetUGridDataFile::set_ugrid_configs(const ConcatString &dataset_name,
                                          double max_distance_km,
                                          const ConcatString &map_config_filename) {
    _file->set_dataset(dataset_name);

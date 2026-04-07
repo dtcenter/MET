@@ -32,7 +32,6 @@ class MetUGridDataFile : public Met2dDataFile {
    private:
 
       void ugrid_init_from_scratch();
-      void cleanup();
       long convert_time_to_offset(double time_value) const;
       LongArray collect_time_offsets(VarInfo &vinfo) const;
       bool fail_with_error(const std::string &msg);
@@ -110,7 +109,7 @@ class MetUGridDataFile : public Met2dDataFile {
       bool open  (const char * filename);
       bool open_metadata(const char * filename);
       ConcatString coordinate_file() const;
-      void set_ugrid_configs(const ConcatString dataset_name, double max_distance_km,
+      void set_ugrid_configs(const ConcatString &dataset_name, double max_distance_km,
                              const ConcatString &map_config_filename);
 
       void close ();
