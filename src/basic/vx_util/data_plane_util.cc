@@ -256,7 +256,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
          mlog << Error << "\nfractional_coverage() -> "
            << "forecast climatology mean dimension ("
            << fcmn->nx() << ", " << fcmn->ny()
-           << ") does not match the data dimenion ("
+           << ") does not match the data dimension ("
            << dp.nx() << ", " << dp.ny() << ")!\n\n";
          exit(1);
       }
@@ -264,7 +264,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
          mlog << Error << "\nfractional_coverage() -> "
            << "forecast climatology standard deviation dimension ("
            << fcsd->nx() << ", " << fcsd->ny()
-           << ") does not match the data dimenion ("
+           << ") does not match the data dimension ("
            << dp.nx() << ", " << dp.ny() << ")!\n\n";
          exit(1);
       }
@@ -272,7 +272,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
          mlog << Error << "\nfractional_coverage() -> "
            << "observation climatology mean dimension ("
            << ocmn->nx() << ", " << ocmn->ny()
-           << ") does not match the data dimenion ("
+           << ") does not match the data dimension ("
            << dp.nx() << ", " << dp.ny() << ")!\n\n";
          exit(1);
       }
@@ -280,7 +280,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
          mlog << Error << "\nfractional_coverage() -> "
            << "observation climatology standard deviation dimension ("
            << ocsd->nx() << ", " << ocsd->ny()
-           << ") does not match the data dimenion ("
+           << ") does not match the data dimension ("
            << dp.nx() << ", " << dp.ny() << ")!\n\n";
          exit(1);
       }
@@ -392,55 +392,6 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
    } // End of omp parallel
 
    return;
-}
-
-////////////////////////////////////////////////////////////////////////
-//
-// Compute the fractional distance for the ensemble agreement scale
-// (EAS) approach.
-//
-////////////////////////////////////////////////////////////////////////
-
-DataPlane fractional_distance(const DataPlane &dp1,
-                              const DataPlane &dp2) {
-
-   // Dimensions must be non-zero and match
-   if(dp1.nx() != dp2.nx() || dp1.ny() != dp2.ny() ||
-      dp1.nx() == 0        || dp1.ny() == 0) {
-      mlog << Error << "\nfractional_distance() -> "
-           << "grid dimensions are zero or do not match ("
-           << dp1.nx() << ", " << dp1.ny() << ") != ("
-           << dp2.nx() << ", " << dp2.ny() << ")!\n\n";
-      exit(1);
-   }
-
-   // Initialize the fractional coverage distance field
-   DataPlane dist_dp;
-   dist_dp.set_size(dp1.nx(), dp1.ny());
-
-   // Initialize the NumArray object
-#pragma omp parallel default(none) \
-   shared(dp1, dp2, dist_dp)
-   {
-
-      // Compute the fractional coverage distance
-#pragma omp for schedule(static)
-      for(int i=0; i<dist_dp.nxy(); i++) {
-         double v1 = dp1.const_buf()[i];
-         double v2 = dp2.const_buf()[i];
-         if(is_bad_data(v1) || is_bad_data(v2)) {
-            dist_dp.buf()[i] = bad_data_double;
-         }
-	 else if(is_eq(v1, 0.0) || is_eq(v2, 0.0)) {
-            dist_dp.buf()[i] = 1.0;
-         }
-         else {
-            dist_dp.buf()[i] = ((v1 - v2)*(v1 - v2))/(v1*v1 + v2*v2);
-         }
-      }
-   } // End of omp parallel
-
-   return dist_dp;
 }
 
 ////////////////////////////////////////////////////////////////////////

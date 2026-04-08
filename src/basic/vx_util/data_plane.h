@@ -117,6 +117,8 @@ class DataPlane {
          //
 
       void threshold(const SingleThresh &);
+      void threshold(const SingleThresh &,
+                     const DataPlane *cmn, const DataPlane *csd);
       void convert  (const UserFunc_1Arg &);
       void censor   (const ThreshArray &, const NumArray &);
 

@@ -57,9 +57,6 @@ extern void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
                const DataPlane *ocmn, const DataPlane *ocsd,
                double vld_t);
 
-extern DataPlane fractional_distance(const DataPlane &dp1,
-                                     const DataPlane &dp2);
-
 extern void apply_mask(const DataPlane &, const MaskPlane &, NumArray &);
 extern void apply_mask(DataPlane &, const MaskPlane &);
 extern void apply_mask(MaskPlane &, const MaskPlane &);

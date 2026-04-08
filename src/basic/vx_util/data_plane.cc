@@ -529,6 +529,65 @@ void DataPlane::threshold(const SingleThresh &st) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void DataPlane::threshold(const SingleThresh &st,
+                          const DataPlane *cmn, const DataPlane *csd) {
+   const char *method_name = "DataPlane::threshold() -> ";
+
+   // Check climatology data
+   bool use_climo = false;
+   if(cmn && !cmn->is_empty() &&
+      csd && !csd->is_empty()) use_climo = true;
+
+   // Check climatology dimensions
+   if(use_climo) {
+
+      // Check dimensions
+      if(cmn->nx() != Nx || cmn->ny() != Ny) {
+         mlog << Error << "\n" << method_name
+           << "climatology mean dimension ("
+           << cmn->nx() << ", " << cmn->ny()
+           << ") does not match the data dimension ("
+           << Nx << ", " << Ny << ")!\n\n";
+         exit(1);
+      }
+      if(csd->nx() != Nx || csd->ny() != Ny) {
+         mlog << Error << "\n" << method_name
+           << "climatology standard deviation dimension ("
+           << csd->nx() << ", " << csd->ny()
+           << ") does not match the data dimension ("
+           << Nx << ", " << Ny << ")!\n\n";
+         exit(1);
+      }
+   }
+
+   //
+   // Loop through the data and apply the threshold to all valid values
+   //   1.0 if it meets the threshold criteria
+   //   0.0 if it does not
+   //
+
+#pragma omp parallel default(none) \
+   shared(Data, Nxy, st, use_climo, cmn, csd)
+   {
+
+#pragma omp for schedule(static)
+      for(int j=0; j<Nxy; ++j) {
+         if(is_bad_data(Data[j])) continue;
+         ClimoPntInfo cpi;
+         if(use_climo) {
+            cpi.set(cmn->const_buf()[j], csd->const_buf()[j],
+                    cmn->const_buf()[j], csd->const_buf()[j]);
+	 }
+         if(st.check(Data[j], &cpi)) Data[j] = 1.0;
+         else                        Data[j] = 0.0;
+      }
+   } // End omp parallel
+
+   return;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 void DataPlane::convert(const UserFunc_1Arg &convert_fx) {
 
    if(!convert_fx.is_set()) return;

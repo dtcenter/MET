@@ -103,7 +103,7 @@ static NumArray cnt_na, min_na, max_na, sum_na;
 static NumArray stdev_cnt_na, stdev_sum_na, stdev_ssq_na;
 static std::vector<NumArray> thresh_cnt_na; // [n_thresh]
 static std::vector<std::vector<NumArray> > thresh_nbrhd_cnt_na; // [n_thresh][n_nbrhd]
-static std::vector<std::vector<std::vector<DataPlane> > > thresh_eas_frac_dp; // [n_thresh][n_eas][n_ens]
+static std::vector<DataPlane> ens_eas_dp; // [n_ens]
 
 ////////////////////////////////////////////////////////////////////////
 
