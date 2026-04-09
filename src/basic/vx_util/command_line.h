@@ -211,6 +211,8 @@ class CommandLine {
 
       void parse();
 
+      void parse_mlog();
+
       void add(CLSetFunction, const std::string & text, int n_args);   //  n_args not including switch
 
 };

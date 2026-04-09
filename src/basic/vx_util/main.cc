@@ -31,6 +31,7 @@
 //   000    07-06-22  Soh           New
 //   001    09-06-22  Prestopnik    MET #2227 Remove namespace std from header files
 //   002    04-17-25  Halley Gotway MET #3120 Initialize OpenMP
+//   003    04-09-26  Halley Gotway MET #3294 Create logfile before logging output
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -41,6 +42,7 @@
 #include "handle_openmp.h"
 #include "concat_string.h"
 #include "memory.h"
+#include "command_line.h"
 #include "logger.h"
 #include "util_constants.h"
 #ifdef WITH_PROFILER
@@ -70,6 +72,7 @@ void do_post_process();
 void do_pre_process(int argc, char *argv[]);
 void set_handlers();
 void set_user_id();
+void setup_mlog(int argc, char **argv);
 void store_arguments(int argc, char **argv);
 void tidy_and_exit(int signal);
 
@@ -98,6 +101,8 @@ void do_pre_process(int argc, char *argv[]) {
    #ifdef WITH_PROFILER
    CTRACK;
    #endif 
+
+   setup_mlog(argc, argv);
 
    store_arguments(argc, argv);
 
@@ -183,6 +188,14 @@ void set_user_id() {
    struct passwd *pw;
    pw = getpwuid (met_user_id);
    if (pw) met_user_name = string(pw->pw_name);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+void setup_mlog(int argc, char **argv) {
+   CommandLine cline;
+   cline.set(argc, argv);
+   cline.parse_mlog();
 }
 
 ////////////////////////////////////////////////////////////////////////
