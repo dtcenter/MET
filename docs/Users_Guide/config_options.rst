@@ -3164,6 +3164,37 @@ combination of the categorical threshold (cat_thresh), neighborhood width
      ];
   }
 
+eas_prob
+^^^^^^^^
+
+The eas_prob dictionary defines the options for the ensemble agreement scale
+probability method. The neighborhood shape is a :code:`SQUARE` or :code:`CIRCLE`
+centered on the current point, and the width array specifies the candidate
+neighborhood sizes to be considered. Each width specifies the width of the
+square or radius of the circle as an odd integer. The vld_thresh entry is a
+number between 0 and 1 specifying the required ratio of valid data in the
+neighborhood for an output value to be computed. The alpha entry is number
+between 0 and 1 specifying the EAS distance criteria. For each grid point,
+the smallest width for which the distance criteria is satisfied is used.
+If the distance criteria is never satisfied, the largest width is used.
+
+The gaussian_dx and gaussian_radius entries define the Gaussian smoother
+which is applied to be raw EAS probabilities.
+
+If ensemble_flag.eas is set to TRUE, EAS output is created for each
+categorical threshold (cat_thresh) specified.
+
+.. code-block:: none
+
+  eas_prob = {
+     width           = [ 3, 5, 7, 9, 11, 13, 15 ];
+     shape           = CIRCLE;
+     vld_thresh      = 0.0;
+     alpha           = 0.5;
+     gaussian_dx     = 81.27;
+     gaussian_radius = 120;
+  }
+
 ensemble_flag
 ^^^^^^^^^^^^^
 
@@ -3194,16 +3225,16 @@ which ensemble products should be generated:
 
 * "nmep" for the neighborhood maximum ensemble probability
 
-* "rank" to write the rank for the gridded observation field to separate
-  NetCDF output file.
+* "eas" for the ensemble agreement scale probability
 
-* "weight" to write the grid weights specified in grid_weight_flag to the
-  rank NetCDF output file.
+* "climo" for climatological mean and standard deviation fields
+
+* "climo_cdp" for climatological distribution percentile threshold values
 
 .. code-block:: none
 
   ensemble_flag = {
-    latlon     = TRUE;
+     latlon    = TRUE;
      mean      = TRUE;
      stdev     = TRUE;
      minus     = TRUE;
@@ -3215,8 +3246,9 @@ which ensemble products should be generated:
      frequency = TRUE;
      nep       = FALSE;
      nmep      = FALSE;
-     rank      = TRUE;
-     weight    = FALSE;
+     eas       = FALSE;
+     climo     = FALSE;
+     climo_cdp = FALSE;
   }
 
 EnsembleStatConfig_default
