@@ -15,9 +15,10 @@ using namespace std;
 ////////////////////////////////////////////////////////////////////////
 
 static double compute_eas_dist(const std::vector<DataPlane> &,
-                               GridTemplate *, double, int, int, double &);
+                               const GridTemplate *, double, int, int,
+                               double &);
 static double compute_frac_cov(const DataPlane &,
-                               GridTemplate *, double, int, int);
+                               const GridTemplate *, double, int, int);
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -37,20 +38,20 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
    width_dp.set_size(grid.nx(), grid.ny());
    prob_dp.set_size(grid.nx(), grid.ny());
 
-   // Build GridTemplate for each EAS width
-   GridTemplateFactory gtf;
-   vector<GridTemplate *> eas_gt;
-   for(int i_eas=0; i_eas<n_eas; i_eas++) {
-      eas_gt.emplace_back(gtf.buildGT(eas_info.shape,
-                                      eas_info.width[i_eas],
-                                      grid.wrap_lon()));
-   }
-
    // Process each grid point
 #pragma omp parallel default(none) \
    shared(thresh_dp, width_dp, prob_dp) \
-   shared(grid, n_eas, eas_gt, eas_info)
+   shared(grid, n_eas, eas_info)
    {
+
+      // Build GridTemplate for each EAS width
+      GridTemplateFactory gtf;
+      vector<GridTemplate *> eas_gt;
+      for(int i_eas=0; i_eas<n_eas; i_eas++) {
+         eas_gt.emplace_back(gtf.buildGT(eas_info.shape,
+                                         eas_info.width[i_eas],
+                                         grid.wrap_lon()));
+      }
 
 #pragma omp for schedule(static) \
                 collapse(2)
@@ -61,14 +62,15 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
             for(int i_eas=0; i_eas<n_eas; i_eas++) {
 
                double frac_cov_mean;
-               double dist_mean = compute_eas_dist(thresh_dp, eas_gt[i_eas],
+               double dist_mean = compute_eas_dist(thresh_dp,
+                                     eas_gt[i_eas],
                                      eas_info.vld_thresh,
                                      x, y, frac_cov_mean);
 
                // Check for bad data
                if(is_bad_data(dist_mean)) {
-                  width_dp.set(x, y, bad_data_double);
-                  prob_dp.set(x, y, bad_data_double);
+                  width_dp.set(bad_data_double, x, y);
+                  prob_dp.set(bad_data_double, x, y);
                   break;
                }
                // Check for average distance less than alpha or the last width
@@ -78,13 +80,14 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
                   prob_dp.set(frac_cov_mean, x, y);
                   break;
                }
-            } // end for eas_gt
+            } // end for i_eas
          } // end for y
       } // end for x
-   } // end of omp parallel
 
-   // Clean up
-   for(auto &gt : eas_gt) delete gt;
+      // Clean up
+      for(auto &gt : eas_gt) delete gt;
+
+   } // end of omp parallel
 
    // Apply the Gaussian smoother
    smooth_dp = prob_dp; 
@@ -96,7 +99,7 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
 ////////////////////////////////////////////////////////////////////////
 
 static double compute_eas_dist(const std::vector<DataPlane> &thresh_dp,
-                               GridTemplate *gt, double vld_t,
+                               const GridTemplate *gt, double vld_t,
                                int x, int y,
                                double &frac_cov_mean) {
    NumArray frac_cov;
@@ -145,7 +148,7 @@ static double compute_eas_dist(const std::vector<DataPlane> &thresh_dp,
 ////////////////////////////////////////////////////////////////////////
 
 static double compute_frac_cov(const DataPlane &dp,
-                               GridTemplate *gt, double vld_t,
+                               const GridTemplate *gt, double vld_t,
                                int x, int y) {
 
    // Initialize counts

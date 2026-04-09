@@ -1125,7 +1125,7 @@ static void write_eas_nc(GenEnsProdVarInfo *ens_info,
    // Loop through each categorical threshold
    for(int i_thr=0; i_thr<n_thr; i_thr++) {
 
-      mlog << Debug(3) << "Computing ensemble agreemnent scale field "
+      mlog << Debug(3) << "Computing ensemble agreement scale field "
            << "using the " << ens_info->cat_ta[i_thr].get_str()
            << " threshold and " << conf_info.get_n_eas()
            << " candidate widths (" << write_css(conf_info.eas_prob.width)
