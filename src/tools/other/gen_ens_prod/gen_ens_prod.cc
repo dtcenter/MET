@@ -41,6 +41,7 @@
 
 #include "main.h"
 #include "gen_ens_prod.h"
+#include "compute_eas.h"
 
 #include "vx_nc_util.h"
 #include "vx_data2d_nc_met.h"
@@ -73,12 +74,6 @@ static void write_ens_nc(GenEnsProdVarInfo *, int, const DataPlane &,
                          const DataPlane &, const DataPlane &);
 static void write_eas_nc(GenEnsProdVarInfo *, const DataPlane &,
                          const DataPlane &, const DataPlane &);
-static void compute_eas(const std::vector<DataPlane> &,
-                        DataPlane &, DataPlane &);
-static double compute_eas_dist(const std::vector<DataPlane> &,
-                               GridTemplate *, double, int, int, double &);
-static double compute_frac_cov(const DataPlane &,
-                               GridTemplate *, double, int, int);
 static void write_ens_var_float(GenEnsProdVarInfo *, const float *,
                                 const DataPlane &,
                                 const char *, const char *);
@@ -1137,28 +1132,24 @@ static void write_eas_nc(GenEnsProdVarInfo *ens_info,
            << ").\n";
 
       // Apply threshold to convert to bitmap
-      vector<DataPlane> ens_thr_dp;
+      vector<DataPlane> ens_thresh_dp;
       for(const auto &x : ens_eas_dp) {
          DataPlane dp(x);
          dp.threshold(ens_info->cat_ta[i_thr], &cmn_dp, &csd_dp);
-         ens_thr_dp.emplace_back(dp);
+         ens_thresh_dp.emplace_back(dp);
       }
-
-      // Compute EAS width and raw probabilities
-      DataPlane eas_width_dp;
-      DataPlane eas_prob_dp;
-      compute_eas(ens_thr_dp, eas_width_dp, eas_prob_dp);
 
       // Compute Gaussian weights
       if(conf_info.eas_prob.gaussian.weights.empty()) {
          conf_info.eas_prob.gaussian.compute();
       }
 
-      // Apply the Gaussian smoother
-      DataPlane eas_smooth_dp(eas_prob_dp);
-      interp_gaussian_dp(eas_smooth_dp,
-                         conf_info.eas_prob.gaussian,
-                         conf_info.eas_prob.vld_thresh);
+      // Compute EAS probabilities
+      DataPlane eas_width_dp;
+      DataPlane eas_prob_dp;
+      DataPlane eas_smooth_dp;
+      compute_eas(ens_thresh_dp, conf_info.eas_prob, grid,
+                  eas_width_dp, eas_prob_dp, eas_smooth_dp);
 
       // Write EAS widths
       ConcatString thr_cs(ens_info->cat_ta[i_thr].get_abbr_str());
@@ -1178,148 +1169,6 @@ static void write_eas_nc(GenEnsProdVarInfo *ens_info,
                            "Ensemble Agreement Scale Probability");
 
    } // end for i_thr
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static void compute_eas(const std::vector<DataPlane> &thr_dp,
-                        DataPlane &width_dp, DataPlane &prob_dp) {
-
-   const int n_eas = (int) conf_info.get_n_eas();
-
-   // Initialize output
-   width_dp.set_size(grid.nx(), grid.ny());
-   prob_dp.set_size(grid.nx(), grid.ny());
-
-   // Create GridTemplate for each EAS width
-   GridTemplateFactory gtf;
-   vector<GridTemplate *> eas_gt;
-   for(int i_eas=0; i_eas<n_eas; i_eas++) {
-      eas_gt.emplace_back(gtf.buildGT(conf_info.eas_prob.shape,
-                                      conf_info.eas_prob.width[i_eas],
-                                      grid.wrap_lon()));
-   }
-
-   // Process each grid point
-#pragma omp parallel default(none) \
-   shared(grid, thr_dp, width_dp, prob_dp, n_eas, eas_gt, conf_info)
-   {
-
-#pragma omp for schedule(static) \
-                collapse(2)
-      for(int x=0; x<grid.nx(); x++) {
-         for(int y=0; y<grid.ny(); y++) {
-
-            // Loop over candidate EAS widths
-            for(int i_eas=0; i_eas<n_eas; i_eas++) {
-
-               double frac_cov_mean;
-               double dist_mean = compute_eas_dist(thr_dp, eas_gt[i_eas],
-                                     conf_info.eas_prob.vld_thresh,
-                                     x, y, frac_cov_mean);
-
-               // Check for bad data
-               if(is_bad_data(dist_mean)) {
-                  width_dp.set(x, y, bad_data_double);
-                  prob_dp.set(x, y, bad_data_double);
-                  break;
-               }
-               // Check for average distance less than alpha or the last width
-               else if(dist_mean <= conf_info.eas_prob.alpha ||
-                       i_eas+1 == n_eas) {
-                  width_dp.set((double) eas_gt[i_eas]->getWidth(), x, y);
-                  prob_dp.set(frac_cov_mean, x, y);
-                  break;
-               }
-            } // end for eas_gt
-         } // end for y
-      } // end for x
-   } // end of omp parallel
-
-   // Clean up
-   for(auto &gt : eas_gt) delete gt;
-
-   return;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static double compute_eas_dist(const std::vector<DataPlane> &thr_dp,
-                               GridTemplate *gt, double vld_t,
-                               int x, int y,
-                               double &frac_cov_mean) {
-   NumArray frac_cov;
-   frac_cov.extend((int) thr_dp.size());
-
-   // Compute fractional coverage for each ensemble member
-   for(auto &dp : thr_dp) {
-      frac_cov.add(compute_frac_cov(dp, gt, vld_t, x, y));
-   }
-
-   // Compute the average fractional coverage distance
-   int n_dist = 0;
-   double dist_sum = 0.0;
-   for(int i=0; i<frac_cov.n(); i++) {
-      for(int j=i+1; j<frac_cov.n(); j++) {
-
-         double v1 = frac_cov.buf()[i];
-         double v2 = frac_cov.buf()[j];
-
-         // Check for bad data
-         if(is_bad_data(v1) || is_bad_data(v2)) continue;
-
-         // Increment distance sum
-         if(is_eq(v1, 0.0) || is_eq(v2, 0.0)) {
-            dist_sum += 1.0;
-         }
-         else {
-            dist_sum += ((v1 - v2)*(v1 - v2))/(v1*v1 + v2*v2);
-         }
-
-         // Increment distance counter
-         n_dist++;
-
-      } // end for j
-   } // end for i
-
-   // Compute the mean fractional coverage
-   frac_cov_mean = frac_cov.mean();
-
-   // Compute the mean fractional coverage distance
-   double dist_mean = (n_dist > 0 ? dist_sum/n_dist : bad_data_double);
-
-   return dist_mean;
-}
-
-////////////////////////////////////////////////////////////////////////
-
-static double compute_frac_cov(const DataPlane &dp,
-                               GridTemplate *gt, double vld_t,
-                               int x, int y) {
-
-   // Initialize counts
-   int n_vld = 0;
-   double sum = 0.0;
-
-   // Sum the neighborhood points
-   for(GridPoint *gp = gt->getFirstInGrid(x, y, dp.nx(), dp.ny());
-       gp != nullptr;
-       gp = gt->getNextInGrid()) {
-
-      double v = dp.get(gp->x, gp->y);
-      if(!is_bad_data(v)) {
-         n_vld++;
-         sum += v;
-      }
-   }
-
-   // Check for enough valid data and compute fractional coverage
-   double frac_cov = bad_data_double;
-   if((double) (n_vld)/gt->size() >= vld_t && n_vld != 0) {
-      frac_cov = sum/n_vld;
-   }
-
-   return frac_cov;
 }
 
 ////////////////////////////////////////////////////////////////////////
