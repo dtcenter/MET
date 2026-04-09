@@ -39,6 +39,14 @@ References
 |   extended-range forecasts. *Journal of Climate*, 4, 733-742.
 |
 
+.. _Blake-2018:
+
+| Blake, B., et al. 2018: An Adaptive Approach for the Calculation of Ensemble
+|   Gridpoint Probabilities.
+|   *Weather and Forecasting*, 33 (4), 1063 - 1080. 
+|   doi: https://doi.org/10.1175/WAF-D-18-0035.1
+|
+
 .. _Bradley-2008:
 
 | Bradley, A.A., S.S. Schwartz, and T. Hashino, 2008: Sampling Uncertainty
