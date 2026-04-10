@@ -235,7 +235,11 @@ struct TimeSummaryInfo {
   double      vld_thresh;  // Valid data time window threshold
   int         vld_freq;    // Expected observation frequency in seconds
                            //   used to compute the ratio of valid data.
-  TimeSummaryInfo & operator=(const TimeSummaryInfo &a) noexcept;   // SonarQube findings
+
+  TimeSummaryInfo() {}
+  ~TimeSummaryInfo() {}
+  TimeSummaryInfo(TimeSummaryInfo const &i) { *this = i; }
+  TimeSummaryInfo &operator=(const TimeSummaryInfo &a) noexcept;   // SonarQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -263,8 +267,11 @@ struct BootInfo {
    ConcatString     rng;      // GSL random number generator
    ConcatString     seed;     // RNG seed value
 
-   void             clear();
-   BootInfo &       operator=(const BootInfo &a) noexcept;  // SonarQube findings
+   BootInfo() { clear(); }
+   ~BootInfo() { clear(); }
+   BootInfo(BootInfo const &i) { *this = i; }
+   BootInfo &operator=(const BootInfo &a) noexcept;  // SonarQube findings
+   void clear();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -282,10 +289,13 @@ struct InterpInfo {
    GaussianInfo gaussian;  // Gaussian smoothing
    GridTemplateFactory::GridTemplates shape; // Interpolation shape
 
-   void        clear();
-   void        validate(); // Ensure that width and method are accordant
-   bool        operator==(const InterpInfo &) const;
+   InterpInfo() { clear(); }
+   ~InterpInfo() { clear(); }
+   InterpInfo(InterpInfo const &i) { *this = i; }
    InterpInfo &operator=(const InterpInfo &a) noexcept; // SonarQube findings
+   bool operator==(const InterpInfo &) const;
+   void clear();
+   void validate(); // Ensure that width and method are accordant
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -304,7 +314,6 @@ struct RegridInfo {
    int          width;      // Regridding width
    GaussianInfo gaussian;   // Gaussian smoothing
    GridTemplateFactory::GridTemplates shape; // Interpolation shape
-   RegridInfo();
 
    // Process the regridded data
    UserFunc_1Arg convert_fx;    // Conversion function
@@ -313,10 +322,13 @@ struct RegridInfo {
 
    void * hook;            // not allocated
 
+   RegridInfo() { clear(); }
+   ~RegridInfo() { clear(); }
+   RegridInfo(RegridInfo const &i) { *this = i; }
+   RegridInfo &operator=(const RegridInfo &a) noexcept; // SonarQube findings
    void clear();
    void validate();        // ensure that width and method are accordant
    void validate_point();  // ensure that width and method are accordant
-   RegridInfo &operator=(const RegridInfo &a) noexcept; // SonarQube findings
    ConcatString get_str() const;
 };
 
@@ -333,10 +345,12 @@ struct ClimoCDFInfo {
    bool        write_bins;  // Flag for writing the individual bins
    bool        direct_prob; // Flag for the direct computation of probs
 
-   ClimoCDFInfo();
+   ClimoCDFInfo() { clear(); }
+   ~ClimoCDFInfo() { clear(); }
+   ClimoCDFInfo(ClimoCDFInfo const &i) { *this = i; }
+   ClimoCDFInfo &operator=(const ClimoCDFInfo &a) noexcept; // SonarQube findings
    void clear();
    void set_cdf_ta(int, bool &); // Construct equally-likely thresholds
-   ClimoCDFInfo &operator=(const ClimoCDFInfo &a) noexcept; // SonarQube findings
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -352,8 +366,11 @@ struct NbrhdInfo {
    ThreshArray cov_ta;     // Fractional coverage thresholds
    GridTemplateFactory::GridTemplates shape; // Neighborhood shape
 
-   void        clear();
-   NbrhdInfo  &operator=(const NbrhdInfo &a) noexcept;  // SonarQube findings
+   NbrhdInfo() { clear(); }
+   ~NbrhdInfo() { clear(); }
+   NbrhdInfo(NbrhdInfo const &i) { *this = i; }
+   NbrhdInfo &operator=(const NbrhdInfo &a) noexcept;  // SonarQube findings
+   void clear();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -369,7 +386,7 @@ struct EASProbInfo {
    GaussianInfo gaussian;   // Gaussian smoothing
    GridTemplateFactory::GridTemplates shape; // Neighborhood shape
 
-   EASProbInfo()  { clear(); }
+   EASProbInfo() { clear(); }
    ~EASProbInfo() { clear(); }
    EASProbInfo(EASProbInfo const &i) { *this = i; }
    EASProbInfo &operator=(const EASProbInfo &a) noexcept;  // SonarQube findings
@@ -390,9 +407,11 @@ struct HiRAInfo {
    ThreshArray prob_cat_ta; // Categorical thresholds defining probabilities
    GridTemplateFactory::GridTemplates shape; // Area shape
 
-   HiRAInfo();
-   void clear();
+   HiRAInfo() { clear(); }
+   ~HiRAInfo() { clear(); }
+   HiRAInfo(HiRAInfo const &i) { *this = i; }
    HiRAInfo &operator=(const HiRAInfo &a) noexcept; // SonarQube findings
+   void clear();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -408,8 +427,11 @@ struct PlotInfo {
    double       plot_max;         // Maximum plot value
    bool         colorbar_flag;    // Turn on/off plotting the colorbar
 
-   void clear();
+   PlotInfo() { clear(); }
+   ~PlotInfo() { clear(); }
+   PlotInfo(PlotInfo const &i) { *this = i; }
    PlotInfo &operator=(const PlotInfo &a) noexcept;
+   void clear();
 };
 
 ////////////////////////////////////////////////////////////////////////
@@ -423,9 +445,12 @@ struct MaskLatLon {
    SingleThresh lat_thresh; // Threshold for latitudes
    SingleThresh lon_thresh; // Threshold for longitudes
 
-   void         clear();
-   bool         operator==(const MaskLatLon &) const;
-   MaskLatLon  &operator=(const MaskLatLon &a) noexcept;
+   MaskLatLon() { clear(); }
+   ~MaskLatLon() { clear(); }
+   MaskLatLon(MaskLatLon const &i) { *this = i; }
+   MaskLatLon &operator=(const MaskLatLon &a) noexcept;
+   bool operator==(const MaskLatLon &) const;
+   void clear();
 };
 
 ////////////////////////////////////////////////////////////////////////

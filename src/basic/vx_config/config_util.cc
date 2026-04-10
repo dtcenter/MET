@@ -34,9 +34,17 @@ static MetConfig conf_const(replace_path(config_const_filename).c_str());
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-GaussianInfo::GaussianInfo() {
-   clear();
+GaussianInfo &GaussianInfo::operator=(const GaussianInfo &a) noexcept {
+   if(this != &a) {
+      weight_sum = a.weight_sum;
+      weights = a.weights;
+      max_r = a.max_r;
+      weight_cnt = a.weight_cnt;
+      radius = a.radius;
+      dx = a.dx; 
+      trunc_factor = a.trunc_factor;
+   }
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -126,12 +134,6 @@ void RegridInfo::clear() {
    convert_fx.clear();
    censor_thresh.clear();
    censor_val.clear();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-RegridInfo::RegridInfo() {
-   clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1900,12 +1902,6 @@ void ClimoCDFInfo::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ClimoCDFInfo::ClimoCDFInfo() {
-   clear();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 void ClimoCDFInfo::set_cdf_ta(int n_bin, bool &center) {
 
    // Must be greater than 0
@@ -2310,13 +2306,6 @@ HiRAInfo &HiRAInfo::operator=(const HiRAInfo &a) noexcept {
       shape = a.shape;
    }
    return *this;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-HiRAInfo::HiRAInfo() {
-   clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -34,11 +34,14 @@ struct GaussianInfo {
    double              weight_sum; // the sum of the weights
    std::vector<double> weights;    // 2D for gaussian weight (2*max_r+1) by (2*max_r+1)
 
-   GaussianInfo();
-   void     clear();
-   void     compute();
-   int      compute_max_r();
-   void     validate();      // Ensure that required inputs are accordant
+   GaussianInfo() { clear(); }
+   ~GaussianInfo() { clear(); }
+   GaussianInfo(GaussianInfo const &i) { *this = i; }
+   GaussianInfo &operator=(const GaussianInfo &a) noexcept;
+   void clear();
+   void compute();
+   int compute_max_r();
+   void validate();      // Ensure that required inputs are accordant
 };
 
 ////////////////////////////////////////////////////////////////////////
