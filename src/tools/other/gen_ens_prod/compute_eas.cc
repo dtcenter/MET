@@ -25,9 +25,8 @@ static double compute_frac_cov(const DataPlane &,
 extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
                         const EASProbInfo &eas_info,
                         const Grid &grid,
-                        DataPlane &width_dp,
                         DataPlane &prob_dp,
-                        DataPlane &smooth_dp) {
+                        DataPlane &width_dp) {
 
    // Check for empty input
    if(thresh_dp.empty()) return;
@@ -35,12 +34,12 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
    const int n_eas = eas_info.width.n();
 
    // Initialize output
-   width_dp.set_size(grid.nx(), grid.ny());
    prob_dp.set_size(grid.nx(), grid.ny());
+   width_dp.set_size(grid.nx(), grid.ny());
 
    // Process each grid point
 #pragma omp parallel default(none) \
-   shared(thresh_dp, width_dp, prob_dp) \
+   shared(thresh_dp, prob_dp, width_dp) \
    shared(grid, n_eas, eas_info)
    {
 
@@ -74,15 +73,15 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
 
             // Check for bad data
             if(is_bad_data(dist_mean)) {
-               width_dp.set(bad_data_double, x, y);
                prob_dp.set(bad_data_double, x, y);
+               width_dp.set(bad_data_double, x, y);
                use_cur_eas = true;
             }
             // Check for average distance less than alpha or the last width
             else if(dist_mean <= eas_info.alpha ||
                     i_eas+1 == n_eas) {
-               width_dp.set((double) eas_gt[i_eas]->getWidth(), x, y);
                prob_dp.set(frac_cov_mean, x, y);
+               width_dp.set((double) eas_gt[i_eas]->getWidth(), x, y);
                use_cur_eas = true;
             }
 
@@ -98,8 +97,7 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
    } // end of omp parallel
 
    // Apply the Gaussian smoother
-   smooth_dp = prob_dp; 
-   interp_gaussian_dp(smooth_dp, eas_info.gaussian, eas_info.vld_thresh);
+   interp_gaussian_dp(prob_dp, eas_info.gaussian, eas_info.vld_thresh);
 
    return;
 }

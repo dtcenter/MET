@@ -43,6 +43,7 @@ struct GenEnsProdNcOutInfo {
    bool do_nep;
    bool do_nmep;
    bool do_eas;
+   bool do_eas_width;
    bool do_climo;
    bool do_climo_cdp;
 

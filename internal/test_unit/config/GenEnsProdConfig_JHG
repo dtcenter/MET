@@ -48,15 +48,14 @@ ens = {
    ens_thresh = 0.80;
    vld_thresh = 1.0;
 
-   name  = "TMP";
-   level = "Z2";
-
    field = [
-      { normalize  = NONE;                                          },
-      { normalize  = CLIMO_ANOM;     nc_var_str = "CLIMO_ANOM";     }, 
-      { normalize  = CLIMO_STD_ANOM; nc_var_str = "CLIMO_STD_ANOM"; },
-      { normalize  = FCST_ANOM;      nc_var_str = "FCST_ANOM";      },
-      { normalize  = FCST_STD_ANOM;  nc_var_str = "FCST_STD_ANOM";  }
+      {
+         name          = "REFC";
+         level         = [ "L0" ];
+         cat_thresh    = [ >=25.0 ];
+         GRIB1_ptv     = 129;
+         ensemble_flag = TRUE;
+      } 
    ];
 }
 
@@ -98,7 +97,7 @@ nmep_smooth = {
 // Ensemble agreement scale probability method
 //
 eas_prob = {
-   width           = [ 3, 5, 7, 9, 11, 13, 15 ];
+   width           = [ 3, 5, 7, 9, 11, 13, 15, 17, 19, 21 ];
    shape           = CIRCLE;
    vld_thresh      = 0.0;
    alpha           = 0.5;
@@ -145,15 +144,15 @@ ensemble_flag = {
    stdev     = TRUE;
    minus     = FALSE;
    plus      = FALSE;
-   min       = TRUE;
-   max       = TRUE;
+   min       = FALSE;
+   max       = FALSE;
    range     = FALSE;
    vld_count = FALSE;
-   frequency = FALSE;
-   nep       = FALSE;
-   nmep      = FALSE;
-   eas       = FALSE;
-   eas_width = FALSE;
+   frequency = TRUE;
+   nep       = TRUE;
+   nmep      = TRUE;
+   eas       = TRUE;
+   eas_width = TRUE;
    climo     = TRUE;
    climo_cdp = TRUE;
 }

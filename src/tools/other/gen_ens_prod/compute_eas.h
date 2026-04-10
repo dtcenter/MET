@@ -23,7 +23,7 @@
 
 extern void compute_eas(const std::vector<DataPlane> &,
                         const EASProbInfo &, const Grid &,
-                        DataPlane &, DataPlane &, DataPlane &);
+                        DataPlane &, DataPlane &);
 
 ////////////////////////////////////////////////////////////////////////
 

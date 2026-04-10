@@ -162,6 +162,7 @@ ensemble_flag = {
    nep       = FALSE;
    nmep      = FALSE;
    eas       = FALSE;
+   eas_width = FALSE;
    climo     = FALSE;
    climo_cdp = FALSE;
 }

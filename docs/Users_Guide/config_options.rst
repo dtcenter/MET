@@ -3181,8 +3181,9 @@ If the distance criteria is never satisfied, the largest width is used.
 The gaussian_dx and gaussian_radius entries define the Gaussian smoother
 which is applied to be raw EAS probabilities.
 
-If ensemble_flag.eas is set to TRUE, EAS output is created for each
-categorical threshold (cat_thresh) specified.
+If ensemble_flag.eas is set to TRUE, EAS probabilities are written for each
+categorical threshold (cat_thresh) specified. If ensemble_flag.eas_width is
+set to TRUE, the widths chosen to compute EAS are written for each threshold.
 
 .. code-block:: none
 
@@ -3227,6 +3228,8 @@ which ensemble products should be generated:
 
 * "eas" for the ensemble agreement scale probability
 
+* "eas_width" for the ensemble agreement scale widths chosen
+
 * "climo" for climatological mean and standard deviation fields
 
 * "climo_cdp" for climatological distribution percentile threshold values
@@ -3247,6 +3250,7 @@ which ensemble products should be generated:
      nep       = FALSE;
      nmep      = FALSE;
      eas       = FALSE;
+     eas_width = FALSE;
      climo     = FALSE;
      climo_cdp = FALSE;
   }

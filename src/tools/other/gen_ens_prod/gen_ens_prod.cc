@@ -729,7 +729,7 @@ static void clear_counts(const GenEnsProdVarInfo *ens_info) {
    }
 
    // Store ensemble data for EAS
-   if(ens_info->nc_info.do_eas) ens_eas_dp.clear();
+   ens_eas_dp.clear();
 
    return;
 }
@@ -813,7 +813,9 @@ static void track_counts(const GenEnsProdVarInfo *ens_info,
    } // end if do_nmep
 
    // Store ensemble data for EAS
-   if(ens_info->nc_info.do_eas) ens_eas_dp.emplace_back(ens_dp);
+   if(ens_info->nc_info.do_eas || ens_info->nc_info.do_eas_width) {
+      ens_eas_dp.emplace_back(ens_dp);
+   }
 
    return;
 }
@@ -1061,7 +1063,9 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
    } // end if do_nmep
 
    // Compute and store EAS fractional coverage fields
-   if(ens_info->nc_info.do_eas) write_eas_nc(ens_info, ens_dp, cmn_dp, csd_dp);
+   if(ens_info->nc_info.do_eas || ens_info->nc_info.do_eas_width) {
+      write_eas_nc(ens_info, ens_dp, cmn_dp, csd_dp);
+   }
 
    // Write the climo mean field, if requested
    if(ens_info->nc_info.do_climo && !cmn_dp.is_empty()) {
@@ -1145,29 +1149,27 @@ static void write_eas_nc(GenEnsProdVarInfo *ens_info,
       }
 
       // Compute EAS probabilities
-      DataPlane eas_width_dp;
       DataPlane eas_prob_dp;
-      DataPlane eas_smooth_dp;
+      DataPlane eas_width_dp;
       compute_eas(ens_thresh_dp, conf_info.eas_prob, grid,
-                  eas_width_dp, eas_prob_dp, eas_smooth_dp);
+                  eas_prob_dp, eas_width_dp);
+
+      ConcatString type_cs;
+      ConcatString thr_cs(ens_info->cat_ta[i_thr].get_abbr_str());
+
+      // Write EAS probabilities
+      if(ens_info->nc_info.do_eas) {
+         type_cs << cs_erase << "ENS_EAS_" << thr_cs;
+         write_ens_data_plane(ens_info, eas_prob_dp, ens_dp, type_cs.c_str(),
+                              "Ensemble Agreement Scale Probability");
+      }
 
       // Write EAS widths
-      ConcatString thr_cs(ens_info->cat_ta[i_thr].get_abbr_str());
-      ConcatString type_cs;
-      type_cs << "ENS_EAS_WIDTH_" << thr_cs;
-      write_ens_data_plane(ens_info, eas_width_dp, ens_dp, type_cs.c_str(),
-                           "Ensemble Agreement Scale Width");
-
-      // Write raw EAS probabilities
-      type_cs << cs_erase << "ENS_EAS_RAW_" << thr_cs;
-      write_ens_data_plane(ens_info, eas_prob_dp, ens_dp, type_cs.c_str(),
-                           "Ensemble Agreement Scale Raw Probability");
-
-      // Write smoothed EAS probabilities
-      type_cs << cs_erase << "ENS_EAS_" << thr_cs;
-      write_ens_data_plane(ens_info, eas_smooth_dp, ens_dp, type_cs.c_str(),
-                           "Ensemble Agreement Scale Probability");
-
+      if(ens_info->nc_info.do_eas_width) {
+         type_cs << cs_erase << "ENS_EAS_WIDTH_" << thr_cs;
+         write_ens_data_plane(ens_info, eas_width_dp, ens_dp, type_cs.c_str(),
+                              "Ensemble Agreement Scale Width");
+      }
    } // end for i_thr
 }
 

@@ -167,6 +167,7 @@ ensemble_flag = {
    nep       = TRUE;
    nmep      = TRUE;
    eas       = TRUE;
+   eas_width = TRUE;
    climo     = TRUE;
    climo_cdp = TRUE;
 }

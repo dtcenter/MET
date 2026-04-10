@@ -25,7 +25,7 @@ The ensemble relative frequency is the simplest method for turning a set of dete
 
 The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble probability (NMEP) methods are described in :ref:`Schwartz and Sobash (2017) <Schwartz-2017>`. They are an extension of the ensemble relative frequencies described above. The NEP value is computed by averaging the relative frequency of the event within the neighborhood over all ensemble members. The NMEP value is computed as the fraction of ensemble members for which the event is occurring somewhere within the surrounding neighborhood. The NMEP output is typically smoothed using a Gaussian kernel filter. The neighborhood sizes and smoothing options can be customized in the configuration file.
 
-The ensemble agreement scale (EAS) probability method is described in :ref:`Blake et al. (2018) <Blake-2018>`. It is an extension of the neighborhood probability methods described above. Rather than applying a single neighborhood size over the entire grid, a list of candidate sizes is provided. For each grid point, the smallest neighborhood size that satisfies the ensemble distance criteria is chosen. If the distance criteria is never satisfied, the largest size is used. For each grid point and neighborhood size, the fractional coverage value is computed for each ensemble member, and the average distance between all possible ensemble member pairs is computed. The criteria is satisfied when the average distance is less than or equal to the user-specified value of alpha. The raw EAS value is the mean of the ensemble members' fractional coverage values for the chosen neighborhood size. A Gaussian smoother is applied to the raw EAS values to produce the final EAS probabilities.
+The ensemble agreement scale (EAS) probability method is described in :ref:`Blake et al. (2018) <Blake-2018>`. It is an extension of the neighborhood probability methods described above. Rather than applying a single neighborhood size over the entire grid, a list of candidate sizes is provided. For each grid point, the smallest neighborhood size that satisfies the ensemble distance criteria is chosen. If the distance criteria is never satisfied, the largest size is used. For each grid point and neighborhood size, the fractional coverage value is computed for each ensemble member, and the average distance between all possible ensemble member pairs is computed. The criteria is satisfied when the average distance is less than or equal to the user-specified value of alpha. The raw EAS value is the mean of the ensemble members' fractional coverage values for the chosen neighborhood size. A Gaussian smoother is applied to the raw EAS values to produce the final EAS probabilities. The EAS derivation options can be customized in the configuration file.
 
 The Gen-Ens-Prod tool writes the gridded relative frequencies, NEP, NMEP, and EAS fields to a NetCDF output file. Probabilistic verification methods can then be applied to those fields by evaluating them with the Grid-Stat and/or Point-Stat tools.
 
@@ -263,9 +263,9 @@ _____________________
 
 The **eas_prob** dictionary defines the options for the Ensemble Agreement Scale (EAS) probability method.
 
-The **shape** is a **SQUARE** or **CIRCLE** centered on the current point, and the **width** array specifies the width of the square or diameter of the circle as an odd integer. The **vld_thresh** entry is a number between 0 and 1 specifying the required ratio of valid data in the neighborhood for an output value to be computed. **alpha** is a number between 0 and 1 that defines the EAS distance criteria. **guassian_dx** and **gaussian_radius** define the Gaussian smoother that is applied to the raw EAS probability values.
+The **shape** is a **SQUARE** or **CIRCLE** centered on the current point, and the **width** array specifies the candidate widths of the square or diameter of the circle as an odd integer. The **vld_thresh** entry is a number between 0 and 1 specifying the required ratio of valid data in the neighborhood for an output value to be computed. **alpha** is a number between 0 and 1 that defines the EAS distance criteria. **guassian_dx** and **gaussian_radius** define the Gaussian smoother that is applied to the raw EAS probability values.
 
-If **ensemble_flag.eas** is set to TRUE, EAS output is created for each categorical threshold (**cat_thresh**) specified.
+If **ensemble_flag.eas** or **ensemble_flag.eas_width** is set to TRUE, the EAS algorithm is run for each categorical threshold (**cat_thresh**) specified. The **eas** and **eas_width** flags control the writing of the EAS probabilities and widths chosen, respectively.
 
 _____________________
 
@@ -285,6 +285,7 @@ _____________________
      nep       = FALSE;
      nmep      = FALSE;
      eas       = FALSE;    
+     eas_width = FALSE;
      climo     = FALSE;
      climo_cdp = FALSE;
   }

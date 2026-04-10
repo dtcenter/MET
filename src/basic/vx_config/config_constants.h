@@ -910,6 +910,7 @@ static const char conf_key_frequency_flag[] = "frequency";
 static const char conf_key_nep_flag[]       = "nep";
 static const char conf_key_nmep_flag[]      = "nmep";
 static const char conf_key_eas_flag[]       = "eas";
+static const char conf_key_eas_width_flag[] = "eas_width";
 
 // Distribution options
 static const char conf_val_normal[]      = "NORMAL";
