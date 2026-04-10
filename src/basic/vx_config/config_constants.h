@@ -369,6 +369,7 @@ struct EASProbInfo {
    GaussianInfo gaussian;   // Gaussian smoothing
    GridTemplateFactory::GridTemplates shape; // Neighborhood shape
 
+   ~EASProbInfo() { clear(); }
    void         clear();
    EASProbInfo &operator=(const EASProbInfo &a) noexcept;  // SonarQube findings
 };

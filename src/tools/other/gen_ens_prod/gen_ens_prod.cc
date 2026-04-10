@@ -65,7 +65,7 @@ static void get_climo_mean_stdev(GenEnsProdVarInfo *, int,
 static void get_ens_mean_stdev(GenEnsProdVarInfo *, DataPlane &, DataPlane &);
 static bool get_data_plane(const char *, GrdFileType, VarInfo *, DataPlane &);
 
-static void clear_counts(GenEnsProdVarInfo *);
+static void clear_counts(const GenEnsProdVarInfo *);
 static void track_counts(const GenEnsProdVarInfo *, const DataPlane &,
                          bool, const DataPlane &, const DataPlane &);
 
@@ -348,7 +348,7 @@ static void process_ensemble() {
             need_reset = false;
 
             // Reset the running sums and counts
-            clear_counts((*var_it));
+            clear_counts(*var_it);
 
             // Read climatology data for this field
             get_climo_mean_stdev((*var_it), i_var,
@@ -710,7 +710,7 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
 
 ////////////////////////////////////////////////////////////////////////
 
-static void clear_counts(GenEnsProdVarInfo *ens_info) {
+static void clear_counts(const GenEnsProdVarInfo *ens_info) {
 
    cnt_na.set_const(0.0, nxy);
    min_na.set_const(bad_data_double, nxy);

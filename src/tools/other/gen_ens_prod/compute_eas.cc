@@ -53,36 +53,44 @@ extern void compute_eas(const std::vector<DataPlane> &thresh_dp,
                                          grid.wrap_lon()));
       }
 
-#pragma omp for schedule(static) \
-                collapse(2)
-      for(int x=0; x<grid.nx(); x++) {
-         for(int y=0; y<grid.ny(); y++) {
+      // Loop over grid points
+#pragma omp for schedule(static)
+      for(int i=0; i<grid.nxy(); i++) {
 
-            // Loop over candidate EAS widths
-            for(int i_eas=0; i_eas<n_eas; i_eas++) {
+         int x;
+         int y;
+         width_dp.one_to_two(i, x, y);
 
-               double frac_cov_mean;
-               double dist_mean = compute_eas_dist(thresh_dp,
-                                     eas_gt[i_eas],
-                                     eas_info.vld_thresh,
-                                     x, y, frac_cov_mean);
+         // Loop over candidate EAS widths
+         for(int i_eas=0; i_eas<n_eas; i_eas++) {
 
-               // Check for bad data
-               if(is_bad_data(dist_mean)) {
-                  width_dp.set(bad_data_double, x, y);
-                  prob_dp.set(bad_data_double, x, y);
-                  break;
-               }
-               // Check for average distance less than alpha or the last width
-               else if(dist_mean <= eas_info.alpha ||
-                       i_eas+1 == n_eas) {
-                  width_dp.set((double) eas_gt[i_eas]->getWidth(), x, y);
-                  prob_dp.set(frac_cov_mean, x, y);
-                  break;
-               }
-            } // end for i_eas
-         } // end for y
-      } // end for x
+            double frac_cov_mean;
+            double dist_mean = compute_eas_dist(thresh_dp,
+                                  eas_gt[i_eas],
+                                  eas_info.vld_thresh,
+                                  x, y, frac_cov_mean);
+
+            bool use_cur_eas = false;
+
+            // Check for bad data
+            if(is_bad_data(dist_mean)) {
+               width_dp.set(bad_data_double, x, y);
+               prob_dp.set(bad_data_double, x, y);
+               use_cur_eas = true;
+            }
+            // Check for average distance less than alpha or the last width
+            else if(dist_mean <= eas_info.alpha ||
+                    i_eas+1 == n_eas) {
+               width_dp.set((double) eas_gt[i_eas]->getWidth(), x, y);
+               prob_dp.set(frac_cov_mean, x, y);
+               use_cur_eas = true;
+            }
+
+            // Break out of the EAS loop
+            if(use_cur_eas) break;
+
+         } // end for i_eas
+      } // end for i
 
       // Clean up
       for(auto &gt : eas_gt) delete gt;
@@ -156,7 +164,7 @@ static double compute_frac_cov(const DataPlane &dp,
    double sum = 0.0;
 
    // Sum the neighborhood points
-   for(GridPoint *gp = gt->getFirstInGrid(x, y, dp.nx(), dp.ny());
+   for(const GridPoint *gp = gt->getFirstInGrid(x, y, dp.nx(), dp.ny());
        gp != nullptr;
        gp = gt->getNextInGrid()) {
 
