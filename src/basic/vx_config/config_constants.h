@@ -236,10 +236,11 @@ struct TimeSummaryInfo {
   int         vld_freq;    // Expected observation frequency in seconds
                            //   used to compute the ratio of valid data.
 
-  TimeSummaryInfo() {}
-  ~TimeSummaryInfo() {}
+  TimeSummaryInfo() { clear(); }
+  ~TimeSummaryInfo() { clear(); }
   TimeSummaryInfo(TimeSummaryInfo const &i) { *this = i; }
   TimeSummaryInfo &operator=(const TimeSummaryInfo &a) noexcept;   // SonarQube findings
+  void clear();
 };
 
 ////////////////////////////////////////////////////////////////////////

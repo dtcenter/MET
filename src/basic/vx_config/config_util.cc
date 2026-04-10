@@ -1360,6 +1360,24 @@ TimeSummaryInfo &TimeSummaryInfo::operator=(const TimeSummaryInfo &a) noexcept {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void TimeSummaryInfo::clear() {
+   flag = false;
+   raw_data = false;
+   beg = bad_data_int;
+   end = bad_data_int;
+   step = bad_data_int;
+   width_beg = bad_data_int;
+   width_end = bad_data_int;
+   width = bad_data_int;
+   grib_code.clear();
+   obs_var.clear();
+   type.clear();
+   vld_thresh = bad_data_double;
+   vld_freq = bad_data_int;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 BootInfo & BootInfo::operator=(const BootInfo &a) noexcept {
    if(this != &a) {
      interval = a.interval;
