@@ -32,13 +32,12 @@ class MetUGridDataFile : public Met2dDataFile {
    private:
 
       void ugrid_init_from_scratch();
-      //NcVarInfo *find_first_data_var();
-      long convert_time_to_offset(long time_value);
-      //long convert_value_to_offset(double z_value, std::string z_dim_name);
-      LongArray collect_time_offsets(VarInfo &vinfo);
-      //LongArray collect_vertical_offsets(VarInfo &vinfo);
-      long get_time_offset(long time_value, const long time_cnt,
-                           const char *var_name, const std::string caller);
+      long convert_time_to_offset(double time_value) const;
+      LongArray collect_time_offsets(VarInfo &vinfo) const;
+      bool fail_with_error(const char *method_name, const std::string &msg);
+      long get_time_offset(double time_value, const long time_cnt,
+                           const char *var_name, const std::string caller) const;
+      long get_vertical_offset(double z_value) const;
 
       MetUGridDataFile(const MetUGridDataFile &);
       MetUGridDataFile & operator=(const MetUGridDataFile &);
@@ -88,7 +87,7 @@ class MetUGridDataFile : public Met2dDataFile {
       //  retrieve the first matching data plane
 
       bool data_plane(VarInfo &, DataPlane &);
-      bool data_plane(VarInfo &, DataPlane &, NcVarInfo *);
+      bool data_plane(VarInfo &, DataPlane &, const NcVarInfo *);
 
       //  retrieve all matching data planes
 
@@ -96,7 +95,7 @@ class MetUGridDataFile : public Met2dDataFile {
 
       //  retrieve the index of the first matching record
 
-      int extract_vlevels(ConcatString var_name_base, const char *var_name);
+      int extract_vlevels(ConcatString &var_name_base, const char *var_name);
 
       int index(VarInfo &);
 
@@ -110,8 +109,8 @@ class MetUGridDataFile : public Met2dDataFile {
       bool open  (const char * filename);
       bool open_metadata(const char * filename);
       ConcatString coordinate_file() const;
-      void set_ugrid_configs(ConcatString dataset_name, double max_distance_km,
-                             ConcatString map_config_filename);
+      void set_ugrid_configs(const ConcatString dataset_name, double max_distance_km,
+                             const ConcatString map_config_filename);
 
       void close ();
 
