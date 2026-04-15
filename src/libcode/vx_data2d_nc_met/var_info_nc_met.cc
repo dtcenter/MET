@@ -135,7 +135,7 @@ void VarInfoNcMet::dump(ostream &out) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcMet::add_dimension(int dim) {
+void VarInfoNcMet::add_dimension(long dim) {
    Dimension.add(dim);
    return;
 }
@@ -144,10 +144,10 @@ void VarInfoNcMet::add_dimension(int dim) {
 
 void VarInfoNcMet::set_magic(const ConcatString &nstr, const ConcatString &lstr) {
    ConcatString tmp_str;
-   char *ptr = (char *) nullptr;
-   char *ptr2 = (char *) nullptr;
-   char *ptr3 = (char *) nullptr;
-   char *save_ptr = (char *) nullptr;
+   auto ptr = (char *) nullptr;
+   auto ptr2 = (char *) nullptr;
+   auto ptr3 = (char *) nullptr;
+   auto save_ptr = (char *) nullptr;
 
    // Store the magic string
    VarInfo::set_magic(nstr, lstr);

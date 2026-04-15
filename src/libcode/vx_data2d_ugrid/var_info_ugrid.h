@@ -56,7 +56,7 @@ class VarInfoUGrid : public VarInfo
 
       GrdFileType       file_type()      const override;
       const LongArray & dimension()      const;
-      int               dimension(int i) const;
+      long              dimension(int i) const;
       const NumArray  & dim_value()      const;
       double            dim_value(int i) const;
       const BoolArray & is_offset()      const;
@@ -70,7 +70,7 @@ class VarInfoUGrid : public VarInfo
       void set_magic(const ConcatString &, const ConcatString &) override;
       bool set_dict(Dictionary &s, bool do_exit=true) override;
 
-      void add_dimension(int dim, bool as_offset=true, double dim_value=bad_data_double);
+      void add_dimension(long dim, bool as_offset=true, double dim_value=bad_data_double);
 
       //
       // do stuff
@@ -88,7 +88,7 @@ class VarInfoUGrid : public VarInfo
 
 inline GrdFileType       VarInfoUGrid::file_type()      const { return FileType_UGrid;         }
 inline const LongArray & VarInfoUGrid::dimension()      const { return Dimension;              }
-inline int               VarInfoUGrid::dimension(int i) const { return Dimension[i];           }
+inline king              VarInfoUGrid::dimension(int i) const { return Dimension[i];           }
 inline int               VarInfoUGrid::n_dimension()    const { return Dimension.n_elements(); }
 inline const NumArray  & VarInfoUGrid::dim_value()      const { return Dim_value;              }
 inline double            VarInfoUGrid::dim_value(int i) const { return Dim_value[i];           }

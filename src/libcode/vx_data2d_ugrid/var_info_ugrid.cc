@@ -145,7 +145,7 @@ void VarInfoUGrid::dump(ostream &out) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoUGrid::add_dimension(int dim, bool as_offset, double dim_value) {
+void VarInfoUGrid::add_dimension(long dim, bool as_offset, double dim_value) {
    Dimension.add(dim);
    Is_offset.add(as_offset);
    Dim_value.add(dim_value);
