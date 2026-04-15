@@ -12,7 +12,6 @@ module load libpng/1.6.37
 module load gsl/2.7
 module load g2c/2.2.0
 module load proj/7.1.0
-module use /apps/dev/modulefiles
 module load fckit/0.13.2
 module load atlas/0.44.1
 module load eckit/1.28.3
