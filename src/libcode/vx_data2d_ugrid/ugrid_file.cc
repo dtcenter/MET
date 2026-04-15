@@ -35,9 +35,9 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-constexpr const char def_user_config[] = "UGridConfig_user";
-constexpr const char def_config_prefix[] = "UGridConfig_";
-constexpr const char def_config_prefix2[] = "MET_BASE/config/UGridConfig_";
+constexpr char def_user_config[] = "UGridConfig_user";
+constexpr char def_config_prefix[] = "UGridConfig_";
+constexpr char def_config_prefix2[] = "MET_BASE/config/UGridConfig_";
 
 array<string, UG_DIM_COUNT> DIM_KEYS = {
       "dim_face", "dim_node", "dim_edge", "dim_time", "dim_vert"
@@ -50,8 +50,6 @@ array<string, UG_META_VAR_COUNT> COORD_VAR_KEYS = {
 
 static double get_nc_var_att_double(const NcVar *nc_var, const char *att_name,
                                     bool is_required=true);
-
-#define USE_BUFFER  1
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -179,11 +177,26 @@ void UGridFile::close()
 
 
 ////////////////////////////////////////////////////////////////////////
+// Helper: Assign dimension from metadata
+
+void UGridFile::assign_dim_from_metadata(netCDF::NcFile* ncFile, netCDF::NcDim*& dim_ptr,
+                                         const std::string& key, const StringArray& dim_names) {
+  std::string meta_name = find_metadata_name(key, dim_names);
+  if (!meta_name.empty()) {
+    NcDim dim = get_nc_dim(ncFile, meta_name);
+    dim_ptr = new NcDim(dim);
+  }
+  else {
+    mlog << Debug(7) << "UGridFile::assign_dim_from_metadata() "
+         << "dimension for " << key << " does not exist\n";
+  }
+}
+
+////////////////////////////////////////////////////////////////////////
 
 
 bool UGridFile::open(const char * filepath)
 {
-  const char *method_name = "UGridFile::open() -> ";
 
   // Close any open files and clear out the associated members
   close();
@@ -217,63 +230,38 @@ bool UGridFile::open_metadata(const char * filepath)
   }
 
   NcDim dim;
-  string meta_name;
-  string time_dim_name;
-  string vert_dim_name;
   StringArray dim_names;
-  StringArray meta_names;
-
   get_dim_names(_ncMetaFile, &dim_names);
 
   // Face (cell) dimension
-  meta_name = find_metadata_name(DIM_KEYS[0], dim_names);
-  if (0 < meta_name.length()) {
-    dim = get_nc_dim(_ncMetaFile, meta_name);
-    face_count = get_dim_size(&dim);
-    _faceDim = new NcDim(dim);
-    NcDim face_dim = get_nc_dim(_ncFile, meta_name);
-    int data_face_count = get_dim_size(&face_dim);
-    if (face_count != data_face_count) {
-      mlog << Error << "\n" << method_name
-           << meta_name << " dimension is different: data file = "
-           << data_face_count << ", coordinates file = " << face_count << "\n\n";
-      exit(1);
+  assign_dim_from_metadata(_ncFile, _faceDim, DIM_KEYS[0], dim_names);
+  if (IS_VALID_NC_P(_faceDim)) {
+    string meta_name = find_metadata_name(DIM_KEYS[0], dim_names);
+    if (!meta_name.empty()) {
+      face_count = get_dim_size(_faceDim);
+      NcDim face_dim = get_nc_dim(_ncFile, meta_name);
+      int data_face_count = get_dim_size(&face_dim);
+      if (face_count != data_face_count) {
+        mlog << Error << "\n" << method_name
+             << meta_name << " dimension is different: data file = "
+             << data_face_count << ", coordinates file = " << face_count << "\n\n";
+        exit(1);
+      }
     }
   }
 
-  // Node (vertex) dimension
-  meta_name = find_metadata_name(DIM_KEYS[1], dim_names);
-  if (0 < meta_name.length()) {
-    dim = get_nc_dim(_ncMetaFile, meta_name);
-    _nodeDim = new NcDim(dim);
-  }
-
-  // Edge dimension
-  meta_name = find_metadata_name(DIM_KEYS[2], dim_names);
-  if (0 < meta_name.length()) {
-    dim = get_nc_dim(_ncMetaFile, meta_name);
-    _edgeDim = new NcDim(dim);
-  }
-
-  // Time dimension
-  time_dim_name = find_metadata_name(DIM_KEYS[3], dim_names);
-  if (0 < time_dim_name.length()) {
-    dim = get_nc_dim(_ncMetaFile, time_dim_name.c_str());
-    _tDim = new NcDim(dim);
-  }
-
-  // Vertical dimension
-  vert_dim_name = find_metadata_name(DIM_KEYS[4], dim_names);
-  if (0 < vert_dim_name.length()) {
-    dim = get_nc_dim(_ncMetaFile, vert_dim_name.c_str());
-    _virtDim = new NcDim(dim);
-  }
+  assign_dim_from_metadata(_ncFile, _nodeDim, DIM_KEYS[1], dim_names);  // Node (vertex) dimension
+  assign_dim_from_metadata(_ncFile, _edgeDim, DIM_KEYS[2], dim_names);  // Edge dimension
+  assign_dim_from_metadata(_ncFile, _tDim, DIM_KEYS[3], dim_names);     // Time dimension
+  assign_dim_from_metadata(_ncFile, _virtDim, DIM_KEYS[4], dim_names);  // Vertical dimension
 
   int max_dim_count = 0;
   StringArray var_names;
   ConcatString att_value;
-  NcVar *z_var = (NcVar *)nullptr;
-  NcVar *valid_time_var = (NcVar *)nullptr;
+  auto z_var = (NcVar *)nullptr;
+  auto valid_time_var = (NcVar *)nullptr;
+  string time_dim_name = find_metadata_name(DIM_KEYS[3], dim_names);
+  string vert_dim_name = find_metadata_name(DIM_KEYS[4], dim_names);
 
   StringArray time_names = get_metadata_names(COORD_VAR_KEYS[0]);
   StringArray lat_names = get_metadata_names(COORD_VAR_KEYS[1]);
@@ -294,7 +282,7 @@ bool UGridFile::open_metadata(const char * filepath)
 
   get_var_names(_ncMetaFile, &var_names);
   for (int j=0; j<COORD_VAR_KEYS.size(); j++) {
-    meta_name = find_metadata_name(COORD_VAR_KEYS[j], var_names);
+    string meta_name = find_metadata_name(COORD_VAR_KEYS[j], var_names);
     if (0 < meta_name.length()) {
       NcVar v = get_var(_ncMetaFile, meta_name.c_str());
 
@@ -429,13 +417,13 @@ bool UGridFile::open_metadata(const char * filepath)
   for (int j=0; j<Nvars; ++j) {
 
     int dim_count = Var[j].Ndims;
-    NcVar *v = Var[j].var;
+    const NcVar *v = Var[j].var;
 
     dimNames.clear();
     get_dim_names(v, &dimNames);
 
     for (int k=0; k<dim_count; ++k)  {
-      NcDim *dim_p = Var[j].Dims[k];
+      const NcDim *dim_p = Var[j].Dims[k];
       const ConcatString dim_name = dimNames[k];
       if ((nullptr != dim_p && dim_p == _tDim) || dim_name == time_dim_name) {
          Var[j].t_slot = k;
@@ -447,7 +435,7 @@ bool UGridFile::open_metadata(const char * filepath)
   }   //  for j
 
   // Find the vertical level variable from dimension name if not found
-  if (IS_INVALID_NC_P(z_var) && (0 < vert_dim_name.length())) {
+  if (IS_INVALID_NC_P(z_var) && (!vert_dim_name.empty())) {
     NcVarInfo *info = find_var_by_dim_name(vert_dim_name.c_str());
     if (info) z_var = info->var;
   }
@@ -561,7 +549,7 @@ void UGridFile::dump(ostream & out, int depth) const
 
 ////////////////////////////////////////////////////////////////////////
 
-std::string UGridFile::find_metadata_name(std::string &key, StringArray &available_names) {
+std::string UGridFile::find_metadata_name(const std::string &key, const StringArray &available_names) {
   string meta_name = "";
   StringArray meta_names = get_metadata_names(key);
 
