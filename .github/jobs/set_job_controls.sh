@@ -127,6 +127,11 @@ if [ "$run_unit_tests" == "true" ]; then
 
 fi
 
+# if met_base_tag has been changed to a branch (not starting with a number), then add -dev to met_base_repo
+if [[ ! $met_base_tag =~ ^[0-9] ]]; then
+  met_base_repo=${met_base_repo}-dev
+fi
+
 echo "run_compile=${run_compile}" >> $GITHUB_OUTPUT
 echo "run_push=${run_push}" >> $GITHUB_OUTPUT
 echo "run_unit_tests=${run_unit_tests}" >> $GITHUB_OUTPUT
