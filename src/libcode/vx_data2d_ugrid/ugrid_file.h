@@ -48,8 +48,8 @@ class UGridFile {
       bool get_var_info();
 
       ConcatString coordinate_nc();
-      void set_dataset(ConcatString _dataset_name);
-      void set_map_config_file(ConcatString filename);
+      void set_dataset(const ConcatString &_dataset_name);
+      void set_map_config_file(const ConcatString &filename);
       void set_max_distance_km(double max_distance);
 
       void close();
@@ -89,6 +89,7 @@ class UGridFile {
 
       NcVarInfo *Var;    //  allocated
       std::array<NcVarInfo, UG_META_VAR_COUNT>MetaVar;
+      ConcatString z_var_name;
 
          //
          //  Grid
@@ -131,8 +132,6 @@ class UGridFile {
 
       int _numDims;
 
-      //std::array<netCDF::NcDim *, UG_DIM_COUNT> _dims;   //  allocated
-
       StringArray _dimNames;
 
       // Pointers to the X/Y and time dimensions and the associated coordinate
@@ -150,8 +149,6 @@ class UGridFile {
       NcVarInfo *_time_var_info;
 
       int face_count;
-      //double *_lat;
-      //double *_lon;
 
       void init_from_scratch();
 
@@ -164,8 +161,8 @@ class UGridFile {
       // grid member with that information.
 
       std::string find_metadata_name(std::string &key, StringArray &available_names);
-      StringArray get_metadata_names(std::string &key);
-      void read_config(ConcatString config_filename);
+      StringArray get_metadata_names(const std::string &key);
+      void read_config(const ConcatString &config_filename);
       void read_netcdf_grid();
 
 };
