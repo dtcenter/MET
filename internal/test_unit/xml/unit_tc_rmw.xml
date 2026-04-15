@@ -21,7 +21,9 @@
     <exec>&MET_BIN;/tc_rmw</exec>
     <param> \
       -deck &DATA_DIR;/adeck/aal142016_short.dat \
-      -data &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f141 &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f144 &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f147 \
+      -data &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f141 \
+            &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f144 \
+            &DATA_DIR_MODEL;/grib2/gfs_fv3/gfs.t00z.pgrb2.0p25.f147 \
       -config &CONFIG_DIR;/TCRMWConfig_pressure_lev_out \
       -out &OUTPUT_DIR;/tc_rmw/tc_rmw_pressure_lev_out.nc \
       -v 2
@@ -32,13 +34,16 @@
   </test>
 
   <test name="tc_rmw_GONZALO">
-    <exec>echo "&DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f000.grb2  \
-                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f006.grb2  \
-                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f012.grb2  \
-                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f018.grb2  \
+    <exec>echo "&DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f000.grb2 \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f006.grb2 \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f012.grb2 \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f018.grb2 \
                 &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f024.grb2" \
                 > &OUTPUT_DIR;/tc_rmw/gonzalo_file_list; \
           &MET_BIN;/tc_rmw</exec>
+    <env>
+      <pair><name>MODEL</name> <value>HCLT</value></pair>
+    </env>
     <param> \
       -deck &DATA_DIR;/adeck/aal142016_short.dat \
       -deck &DATA_DIR;/adeck/gonzalo08l.2014101312.trak.hwrf.atcfunix \
@@ -49,6 +54,29 @@
     </param>
     <output>
       <grid_nc>&OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo.nc</grid_nc>
+    </output>
+  </test>
+
+  <test name="tc_rmw_GONZALO_BDECK">
+    <exec>echo "&DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f000.grb2 \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f006.grb2 \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f012.grb2 \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f018.grb2 \
+                &DATA_DIR_MODEL;/grib2/hwrf_gonzalo/gonzalo08l.subset.2014101312.hwrfprs.core.0p02.f024.grb2" \
+                > &OUTPUT_DIR;/tc_rmw/gonzalo_file_list; \
+          &MET_BIN;/tc_rmw</exec>
+    <env>
+      <pair><name>MODEL</name> <value>BEST</value></pair>
+    </env>
+    <param> \
+      -deck &DATA_DIR;/bdeck/bal082014.dat \
+      -data &OUTPUT_DIR;/tc_rmw/gonzalo_file_list \
+      -config &CONFIG_DIR;/TCRMWConfig_gonzalo \
+      -out &OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo_bdeck.nc \
+      -v 2
+    </param>
+    <output>
+      <grid_nc>&OUTPUT_DIR;/tc_rmw/tc_rmw_hwrf_gonzalo_bdeck.nc</grid_nc>
     </output>
   </test>
 
