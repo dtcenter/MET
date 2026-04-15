@@ -36,7 +36,7 @@ class MetUGridDataFile : public Met2dDataFile {
       LongArray collect_time_offsets(VarInfo &vinfo) const;
       bool fail_with_error(const char *method_name, const std::string &msg);
       long get_time_offset(double time_value, const long time_cnt,
-                           const char *var_name, const std::string caller) const;
+                           const char *var_name, const std::string &caller) const;
       long get_vertical_offset(double z_value) const;
 
       MetUGridDataFile(const MetUGridDataFile &);
@@ -95,7 +95,7 @@ class MetUGridDataFile : public Met2dDataFile {
 
       //  retrieve the index of the first matching record
 
-      int extract_vlevels(ConcatString &var_name_base, const char *var_name);
+      int extract_vlevels(const ConcatString &var_name_base, const char *var_name);
 
       int index(VarInfo &);
 
@@ -109,8 +109,8 @@ class MetUGridDataFile : public Met2dDataFile {
       bool open  (const char * filename);
       bool open_metadata(const char * filename);
       ConcatString coordinate_file() const;
-      void set_ugrid_configs(const ConcatString dataset_name, double max_distance_km,
-                             const ConcatString map_config_filename);
+      void set_ugrid_configs(const ConcatString &dataset_name, double max_distance_km,
+                             const ConcatString &map_config_filename);
 
       void close ();
 

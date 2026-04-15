@@ -667,7 +667,7 @@ long MetUGridDataFile::convert_value_to_offset(double z_value, string z_dim_name
 
 ////////////////////////////////////////////////////////////////////////
 
-int MetUGridDataFile::extract_vlevels(ConcatString &var_name_base, const char *var_name) {
+int MetUGridDataFile::extract_vlevels(const ConcatString &var_name_base, const char *var_name) {
    int num_mat = 0;
    char** mat = nullptr;
    int vlevel = bad_data_int;
@@ -691,7 +691,7 @@ int MetUGridDataFile::extract_vlevels(ConcatString &var_name_base, const char *v
 
 
 long MetUGridDataFile::get_time_offset(double time_value, const long time_cnt,
-                                       const char *var_name, const string caller) const {
+                                       const char *var_name, const string &caller) const {
    const long time_threshold_cnt = 10000000;
    long time_offset = convert_time_to_offset(time_value);
    if ((0 > time_offset) || (time_offset >= time_cnt)) {
@@ -814,9 +814,9 @@ bool MetUGridDataFile::read_data_plane(ConcatString var_name, VarInfo &vinfo,
 
 ////////////////////////////////////////////////////////////////////////
 
-void MetUGridDataFile::set_ugrid_configs(const ConcatString dataset_name,
+void MetUGridDataFile::set_ugrid_configs(const ConcatString &dataset_name,
                                          double max_distance_km,
-                                         const ConcatString map_config_filename) {
+                                         const ConcatString &map_config_filename) {
    _file->set_dataset(dataset_name);
    if (!map_config_filename.empty()) {
       _file->set_map_config_file(map_config_filename);
