@@ -267,7 +267,7 @@ void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    } // end else
 
    // Check for "/PROB" to indicate a probability forecast
-   if (strstr(MagicStr.c_str(), "/PROB") != nullptr) PFlag = 1;
+   if (strstr(MagicStr.c_str(), "/PROB") != nullptr) PFlag = true;
 
    // Set the long name
    tmp_str.format("%s(%s)", req_name().text(), Level.req_name().text());
