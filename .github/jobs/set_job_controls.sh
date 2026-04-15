@@ -6,7 +6,7 @@ run_unit_tests=false
 run_diff=false
 run_update_truth=false
 met_base_repo=met-base
-met_base_tag=3.4-latest
+met_base_tag=feature_61_main_v3.5_py314
 input_data_version=develop
 truth_data_version=develop
 
