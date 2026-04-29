@@ -812,6 +812,9 @@ void process_fields(const TrackInfoArray& tracks) {
 
     } // end for i_point
 
+    mlog << Debug(2) << "Found data for " << track_keep.n_points()
+         << " of " << track.n_points() << " points.\n";
+
     // Write the track points that were used
     write_tc_track_lines  (nc_out, track_keep);
     write_tc_track_lat_lon(nc_out, track_point_dim, track_keep);
