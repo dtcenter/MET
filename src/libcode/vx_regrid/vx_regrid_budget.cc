@@ -32,7 +32,7 @@ DataPlane met_regrid_budget(const DataPlane & from_data,
    const double delta = 1.0/N;
 
 #pragma omp parallel default(none) \
-   shared(from_data, from_grid, to_grid, info, to_data) \
+   shared(from_data, from_grid, to_grid, info, to_data, delta) \
    private(count, value, sum)
    {
 
