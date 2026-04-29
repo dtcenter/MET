@@ -46,6 +46,7 @@ class TCRMWConfInfo {
         TimeArray    ValidInc, ValidExc;
         IntArray     ValidHour;
         IntArray     LeadTime;
+        StringArray  BestTechnique;
 
         // Range/Azimuth information
         int    n_range;
