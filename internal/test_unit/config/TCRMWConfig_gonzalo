@@ -51,7 +51,7 @@ init_inc = "";
 //
 valid_beg = "";
 valid_end = "";
-valid_inc = [ "20141013_12", "20141013_18", "20141014_00", "20141014_06", "20141014_12" ];
+valid_inc = [ ${VALID_INC} ];
 valid_exc = [];
 
 //
@@ -59,6 +59,11 @@ valid_exc = [];
 //
 valid_hour = [];
 lead       = [];
+
+//
+// Define BEST track names.
+//
+best_technique = [ "BEST" ];
 
 ////////////////////////////////////////////////////////////////////////////////
 
