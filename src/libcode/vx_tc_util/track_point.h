@@ -185,6 +185,9 @@ class TrackPoint {
       // Diagnostic values
       NumArray      DiagVal;
 
+      // Input ATCF Track Lines
+      StringArray   TrackLines;
+
    public:
 
       TrackPoint();
@@ -262,6 +265,7 @@ class TrackPoint {
 
       int              n_diag()        const;
       double           diag_val(int)   const;
+      StringArray      track_lines()   const;
    
          //
          //  do stuff
@@ -269,6 +273,7 @@ class TrackPoint {
 
       void set_wind(int, const QuadInfo &);
       bool set(const ATCFTrackLine &);
+      bool has(const ATCFTrackLine &);
       bool is_match(const ATCFTrackLine &) const;
       void clear_diag_value();
       void add_diag_value(double);
@@ -328,6 +333,7 @@ inline double        TrackPoint::track_stdev()  const { return TrackStdev;  }
 inline double        TrackPoint::v_max_stdev()  const { return VmaxStdev;   }
 inline double        TrackPoint::mslp_stdev()   const { return MSLPStdev;   }
 inline int           TrackPoint::n_diag()       const { return DiagVal.n(); }
+inline StringArray   TrackPoint::track_lines()  const { return TrackLines;  }
 
 ////////////////////////////////////////////////////////////////////////
 

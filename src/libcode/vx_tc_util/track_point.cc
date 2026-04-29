@@ -460,6 +460,7 @@ void TrackPoint::clear() {
    MSLPStdev   = bad_data_double;
 
    DiagVal.clear();
+   TrackLines.clear();
 
    // Call clear for each Wind object and then set intensity value
    for(i=0; i<NWinds; i++) {
@@ -476,24 +477,25 @@ void TrackPoint::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
    int i;
 
-   out << prefix << "ValidTime = " << (ValidTime > 0 ? unix_to_yyyymmdd_hhmmss(ValidTime).text() : na_str) << "\n";
-   out << prefix << "LeadTime  = " << (!is_bad_data(LeadTime) ? sec_to_hhmmss(LeadTime).text() : na_str) << "\n";
-   out << prefix << "Lat       = " << Lat << "\n";
-   out << prefix << "Lon       = " << Lon << "\n";
-   out << prefix << "Vmax      = " << Vmax << "\n";
-   out << prefix << "MSLP      = " << MSLP << "\n";
-   out << prefix << "Level     = " << cyclonelevel_to_string(Level) << "\n";
-   out << prefix << "RadP      = " << RadP << "\n";
-   out << prefix << "RRP       = " << RRP << "\n";
-   out << prefix << "MRD       = " << MRD << "\n";
-   out << prefix << "Gusts     = " << Gusts << "\n";
-   out << prefix << "Eye       = " << Eye << "\n";
-   out << prefix << "Direction = " << Direction << "\n";
-   out << prefix << "Speed     = " << Speed << "\n";
-   out << prefix << "Depth     = " << systemsdepth_to_string(Depth) << "\n";
-   out << prefix << "WarmCore  = " << bool_to_string(WarmCore) << "\n";
-   out << prefix << "WatchWarn = " << watchwarntype_to_string(WatchWarn);
-   out << prefix << "NDiag     = " << DiagVal.n() << "\n";
+   out << prefix << "ValidTime   = " << (ValidTime > 0 ? unix_to_yyyymmdd_hhmmss(ValidTime).text() : na_str) << "\n";
+   out << prefix << "LeadTime    = " << (!is_bad_data(LeadTime) ? sec_to_hhmmss(LeadTime).text() : na_str) << "\n";
+   out << prefix << "Lat         = " << Lat << "\n";
+   out << prefix << "Lon         = " << Lon << "\n";
+   out << prefix << "Vmax        = " << Vmax << "\n";
+   out << prefix << "MSLP        = " << MSLP << "\n";
+   out << prefix << "Level       = " << cyclonelevel_to_string(Level) << "\n";
+   out << prefix << "RadP        = " << RadP << "\n";
+   out << prefix << "RRP         = " << RRP << "\n";
+   out << prefix << "MRD         = " << MRD << "\n";
+   out << prefix << "Gusts       = " << Gusts << "\n";
+   out << prefix << "Eye         = " << Eye << "\n";
+   out << prefix << "Direction   = " << Direction << "\n";
+   out << prefix << "Speed       = " << Speed << "\n";
+   out << prefix << "Depth       = " << systemsdepth_to_string(Depth) << "\n";
+   out << prefix << "WarmCore    = " << bool_to_string(WarmCore) << "\n";
+   out << prefix << "WatchWarn   = " << watchwarntype_to_string(WatchWarn);
+   out << prefix << "NDiag       = " << DiagVal.n() << "\n";
+   out << prefix << "NTrackLines = " << TrackLines.n() << "\n";
 
    out << prefix << "NumMembers  = " << NumMembers << "\n";
    out << prefix << "TrackSpread = " << TrackSpread << "\n";
@@ -539,7 +541,8 @@ ConcatString TrackPoint::serialize() const {
      << ", TrackStdev = " << TrackStdev
      << ", VmaxStdev = " << VmaxStdev      
      << ", MSLPStdev = " << MSLPStdev
-     << ", NDiag = " << DiagVal.n();
+     << ", NDiag = " << DiagVal.n()
+     << ", NTrackLines = " << TrackLines.n();
 
    return s;
 }
@@ -592,7 +595,8 @@ void TrackPoint::assign(const TrackPoint &t) {
    VmaxStdev   = t.VmaxStdev;
    MSLPStdev   = t.MSLPStdev;
 
-   DiagVal = t.DiagVal;
+   DiagVal    = t.DiagVal;
+   TrackLines = t.TrackLines;
 
    for(i=0; i<NWinds; i++) Wind[i] = t.Wind[i];
 
@@ -671,7 +675,16 @@ bool TrackPoint::set(const ATCFTrackLine &l) {
    // Attempt to set each WindInfo object with ATCFTrackLine
    for(i=0; i<NWinds; i++) Wind[i].set_wind(l);
 
+   // Store the track line
+   TrackLines.add(l.get_line());
+
    return true;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TrackPoint::has(const ATCFTrackLine &l) {
+   return TrackLines.has(l.get_line());
 }
 
 ////////////////////////////////////////////////////////////////////////

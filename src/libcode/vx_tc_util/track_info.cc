@@ -95,7 +95,6 @@ void TrackInfo::clear() {
    TrackSource.clear();
    FieldSource.clear();
    DiagName.clear();
-   TrackLines.clear();
 
    clear_points();
 
@@ -140,7 +139,6 @@ void TrackInfo::dump(ostream &out, int indent_depth) const {
    out << prefix << "NDiag           = " << DiagName.n() << "\n";
    out << prefix << "NPoints         = " << NPoints << "\n";
    out << prefix << "NAlloc          = " << NAlloc << "\n";
-   out << prefix << "NTrackLines     = " << TrackLines.n() << "\n";
 
    for(i=0; i<NPoints; i++) {
       out << prefix << "TrackPoint[" << i+1 << "]:" << "\n";
@@ -180,8 +178,7 @@ ConcatString TrackInfo::serialize() const {
      << ", FieldSource = " << FieldSource.contents()
      << ", NDiag = " << DiagName.n()
      << ", NPoints = " << NPoints
-     << ", NAlloc = " << NAlloc
-     << ", NTrackLines = " << TrackLines.n();
+     << ", NAlloc = " << NAlloc;
 
    return s;
 
@@ -230,7 +227,6 @@ void TrackInfo::assign(const TrackInfo &t) {
    TrackSource     = t.TrackSource;
    FieldSource     = t.FieldSource;
    DiagName        = t.DiagName;
-   TrackLines      = t.TrackLines;
 
    if(t.NPoints == 0) return;
 
@@ -402,12 +398,6 @@ int TrackInfo::warm_core_dur() const {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string TrackInfo::diag_name(int i) const {
-   return(i>=0 && i<DiagName.n() ? DiagName[i] : na_str);
-}
-
-////////////////////////////////////////////////////////////////////////
-
 int TrackInfo::valid_inc() const {
    int i;
    NumArray ut_inc;
@@ -418,6 +408,20 @@ int TrackInfo::valid_inc() const {
 
    // Return the most common spacing
    return nint(ut_inc.mode());
+}
+
+////////////////////////////////////////////////////////////////////////
+
+const string TrackInfo::diag_name(int i) const {
+   return(i>=0 && i<DiagName.n() ? DiagName[i] : na_str);
+}
+
+////////////////////////////////////////////////////////////////////////
+
+StringArray TrackInfo::track_lines() const {
+   StringArray sa;
+   for(int i=0; i<NPoints; i++) sa.add(Point[i].track_lines());
+   return sa;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -509,9 +513,6 @@ bool TrackInfo::add(const ATCFTrackLine &l, bool check_dup, bool check_anly) {
       if(MaxWarmCore == (unixtime) 0 || l.valid() > MaxWarmCore)
          MaxWarmCore = l.valid();
    }
-
-   // Store the ATCFTrackLine that was just added
-   if(check_dup) TrackLines.add(l.get_line());
 
    return status;
 }
@@ -625,7 +626,17 @@ void TrackInfo::add_uniq_diag_name(const string diag_name) {
 ////////////////////////////////////////////////////////////////////////
 
 bool TrackInfo::has(const ATCFTrackLine &l) const {
-   return TrackLines.has(l.get_line());
+   bool found = false;
+
+   // Check if the TrackInfo data matches
+   for(int i=NPoints-1; i>=0; i--) {
+      if(Point[i].has(l)) {
+         found = true;
+         break;
+      }
+   }
+
+   return found;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -914,17 +925,15 @@ bool TrackInfoArray::add(const ATCFTrackLine &l, bool check_dup, bool check_anly
 
 bool TrackInfoArray::has(const ATCFTrackLine &l) const {
    bool found = false;
-   int i;
 
    // Check if the TrackInfo data matches
-   for(i=Track.size()-1; i>=0; i--) {
+   for(int i=Track.size()-1; i>=0; i--) {
       if(Track[i].has(l)) {
          found = true;
          break;
       }
    }
 
-   // Return whether the TrackInfo matches
    return found;
 }
 

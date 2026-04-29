@@ -81,9 +81,6 @@ class TrackInfo {
       int          NPoints;
       int          NAlloc;
 
-      // Input ATCF Track Lines
-      StringArray  TrackLines;
-
    public:
 
       TrackInfo();
@@ -220,8 +217,6 @@ inline const ConcatString & TrackInfo::track_source()     const { return TrackSo
 inline const ConcatString & TrackInfo::field_source()     const { return FieldSource;  }
 inline int                  TrackInfo::n_diag()           const { return DiagName.n(); }
 inline const StringArray &  TrackInfo::diag_name()        const { return DiagName;     }
-
-inline StringArray          TrackInfo::track_lines()      const { return TrackLines;   }
 
 ////////////////////////////////////////////////////////////////////////
 //
