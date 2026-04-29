@@ -734,7 +734,8 @@ void process_fields(const TrackInfoArray& tracks) {
             data_info->set_valid(valid_time);
 
             // Find data for this track point or continue
-            if(get_series_entry(i_point, data_info, data_files,
+            if(get_series_entry(track_keep.n_points(),
+                                data_info, data_files,
                                 ftype, data_dp, grid_in,
                                 false, false)) {
                 n_var_found++;
@@ -757,7 +758,8 @@ void process_fields(const TrackInfoArray& tracks) {
                  << "), regrid range (" << dmin_rgd << ", " << dmax_rgd << ")\n";
 
             // if this is "U", setup everything for matching "V" and compute the radial/tangential
-            if(wind_converter.compute_winds_if_input_is_u(i_point, sname, slevel, valid_time, data_files, ftype,
+            if(wind_converter.compute_winds_if_input_is_u(track_keep.n_points(),
+                   sname, slevel, valid_time, data_files, ftype,
                    grid_in, grid_out, data_dp, rng_azi_grid)) {
                 write_tc_pressure_level_data(rng_azi_grid,
                     pressure_level_indices, data_info->level_attr(), track_keep.n_points(),
