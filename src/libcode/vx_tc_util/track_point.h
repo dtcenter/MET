@@ -25,7 +25,7 @@
 
 // Define the wind intensity levels to be handled
 static const std::vector<int> WindIntensity = { 34, 50, 64 };
-static const int NWinds = 3;
+static const int NWinds = (int) WindIntensity.size();
 
 // ATCF columns that can be filtered
 static const std::vector<std::string> atcf_column_vals = {
@@ -173,7 +173,7 @@ class TrackPoint {
       bool WarmCore;
 
       // Wind Radii
-      QuadInfo      Wind[NWinds];
+      std::vector<QuadInfo> Wind = std::vector<QuadInfo>(NWinds);
 
       // Consensus track variables
       int           NumMembers; 
