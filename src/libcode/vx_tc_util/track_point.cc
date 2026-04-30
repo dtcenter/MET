@@ -362,7 +362,6 @@ TrackPoint & TrackPoint::operator=(const TrackPoint &p) {
 ////////////////////////////////////////////////////////////////////////
 
 TrackPoint & TrackPoint::operator+=(const TrackPoint &p) {
-   int i;
 
    // Check valid time
    if(ValidTime == (unixtime) 0) ValidTime = p.valid();
@@ -414,7 +413,7 @@ TrackPoint & TrackPoint::operator+=(const TrackPoint &p) {
    MSLPStdev   = bad_data_double;
    
    // Increment wind quadrants
-   for(i=0; i<NWinds; i++) Wind[i] += p[i];
+   for(int i=0; i<NWinds; i++) Wind[i] += p[i];
 
    return *this;
 }
@@ -431,7 +430,6 @@ void TrackPoint::init_from_scratch() {
 ////////////////////////////////////////////////////////////////////////
 
 void TrackPoint::clear() {
-   int i;
 
    IsSet     = false;
 
@@ -463,7 +461,7 @@ void TrackPoint::clear() {
    TrackLines.clear();
 
    // Call clear for each Wind object and then set intensity value
-   for(i=0; i<NWinds; i++) {
+   for(int i=0; i<NWinds; i++) {
       Wind[i].clear();
       Wind[i].set_intensity(WindIntensity[i]);
    }
@@ -475,7 +473,6 @@ void TrackPoint::clear() {
 
 void TrackPoint::dump(ostream &out, int indent_depth) const {
    Indent prefix(indent_depth);
-   int i;
 
    out << prefix << "ValidTime   = " << (ValidTime > 0 ? unix_to_yyyymmdd_hhmmss(ValidTime).text() : na_str) << "\n";
    out << prefix << "LeadTime    = " << (!is_bad_data(LeadTime) ? sec_to_hhmmss(LeadTime).text() : na_str) << "\n";
@@ -503,7 +500,7 @@ void TrackPoint::dump(ostream &out, int indent_depth) const {
    out << prefix << "VmaxStdev   = " << VmaxStdev << "\n";
    out << prefix << "MSLPStdev   = " << MSLPStdev << "\n";
    
-   for(i=0; i<NWinds; i++) {
+   for(int i=0; i<NWinds; i++) {
       out << prefix << "Wind[" << i+1 << "]:" << "\n";
       Wind[i].dump(out, indent_depth+1);
    }
@@ -552,11 +549,10 @@ ConcatString TrackPoint::serialize() const {
 ConcatString TrackPoint::serialize_r(int n, int indent_depth) const {
    Indent prefix(indent_depth);
    ConcatString s;
-   int i;
 
    s << prefix << "[" << n << "] " << serialize() << ", Winds:\n";
 
-   for(i=0; i<NWinds; i++)
+   for(int i=0; i<NWinds; i++)
       s << Wind[i].serialize_r(i+1, indent_depth+1) << "\n";
 
    return s;
@@ -565,7 +561,6 @@ ConcatString TrackPoint::serialize_r(int n, int indent_depth) const {
 ////////////////////////////////////////////////////////////////////////
 
 void TrackPoint::assign(const TrackPoint &t) {
-   int i;
 
    clear();
 
@@ -598,7 +593,7 @@ void TrackPoint::assign(const TrackPoint &t) {
    DiagVal    = t.DiagVal;
    TrackLines = t.TrackLines;
 
-   for(i=0; i<NWinds; i++) Wind[i] = t.Wind[i];
+   Wind       = t.Wind;
 
    return;
 }
@@ -667,13 +662,12 @@ double TrackPoint::diag_val(int i) const {
 ////////////////////////////////////////////////////////////////////////
 
 bool TrackPoint::set(const ATCFTrackLine &l, bool check_dup) {
-   int i;
 
    // Initialize TrackPoint with ATCFTrackLine, if necessary
    if(!IsSet) initialize(l);
 
    // Attempt to set each WindInfo object with ATCFTrackLine
-   for(i=0; i<NWinds; i++) Wind[i].set_wind(l);
+   for(int i=0; i<NWinds; i++) Wind[i].set_wind(l);
 
    // Store the track line
    if(check_dup) TrackLines.add(l.get_line());
