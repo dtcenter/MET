@@ -150,7 +150,7 @@ void VarInfoNcCF::dump(ostream &out) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcCF::add_dimension(int dim, bool as_offset, double dim_value) {
+void VarInfoNcCF::add_dimension(long dim, bool as_offset, double dim_value) {
    Dimension.add(dim);
    Is_offset.add(as_offset);
    Dim_value.add(dim_value);
@@ -314,7 +314,7 @@ void VarInfoNcCF::set_magic(const ConcatString &nstr, const ConcatString &lstr) 
             }
             else {
                // Single level
-               int level = 0;
+               long level = 0;
                double level_value = bad_data_double;
                if (is_datestring(ptr2)) {
                   unixtime unix_time = timestring_to_unix(ptr2);

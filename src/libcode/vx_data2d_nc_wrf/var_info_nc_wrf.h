@@ -215,7 +215,7 @@ class VarInfoNcWrf : public VarInfo
 
       GrdFileType       file_type()      const override;
       const LongArray & dimension()      const;
-      int               dimension(int i) const;
+      long              dimension(int i) const;
       const NumArray  & dim_value()      const;
       double            dim_value(int i) const;
       const BoolArray & is_offset()      const;
@@ -229,8 +229,8 @@ class VarInfoNcWrf : public VarInfo
       void set_magic(const ConcatString &, const ConcatString &) override;
       bool set_dict(Dictionary &, bool do_exit=true) override;
 
-      void add_dimension(int dim, bool as_index=true, double dim_value=bad_data_double);
-      void set_dimension(int i_dim, int dim);
+      void add_dimension(long dim, bool as_index=true, double dim_value=bad_data_double);
+      void set_dimension(int i_dim, long dim);
 
          //
          // do stuff
@@ -249,7 +249,7 @@ class VarInfoNcWrf : public VarInfo
 
 inline GrdFileType       VarInfoNcWrf::file_type()      const { return FileType_NcWrf;         }
 inline const LongArray & VarInfoNcWrf::dimension()      const { return Dimension;              }
-inline int               VarInfoNcWrf::dimension(int i) const { return Dimension[i];           }
+inline long              VarInfoNcWrf::dimension(int i) const { return Dimension[i];           }
 inline int               VarInfoNcWrf::n_dimension()    const { return Dimension.n_elements(); }
 inline const NumArray  & VarInfoNcWrf::dim_value()      const { return Dim_value;              }
 inline double            VarInfoNcWrf::dim_value(int i) const { return Dim_value[i];           }
