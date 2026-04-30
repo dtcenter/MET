@@ -744,8 +744,8 @@ void TrackPoint::add_diag_value(double val) {
 
 ////////////////////////////////////////////////////////////////////////
 
-double TrackPoint::get_diag_val(const StringArray &diag_names, const string cur_diag_name) const {
-
+double TrackPoint::get_diag_val(const StringArray &diag_names,
+                                const string &cur_diag_name) const {
    int i;
    double diag_val;
    

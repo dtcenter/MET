@@ -277,7 +277,7 @@ class TrackPoint {
       bool is_match(const ATCFTrackLine &) const;
       void clear_diag_value();
       void add_diag_value(double);
-      double get_diag_val(const StringArray &, const std::string) const;
+      double get_diag_val(const StringArray &, const std::string &) const;
       double get_atcf_val(const std::string &) const;
    
 };
