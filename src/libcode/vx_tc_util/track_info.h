@@ -259,7 +259,7 @@ class TrackInfoArray {
       bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
       bool has(const ATCFTrackLine &) const;
       bool erase_storm_id(const ConcatString &);
-      int  add_diag_data(DiagFile &, const StringArray &);
+      int  add_diag_data(const DiagFile &, const StringArray &);
 
          //
          //  get stuff

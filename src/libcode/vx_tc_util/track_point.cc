@@ -666,7 +666,7 @@ double TrackPoint::diag_val(int i) const {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackPoint::set(const ATCFTrackLine &l) {
+bool TrackPoint::set(const ATCFTrackLine &l, bool check_dup) {
    int i;
 
    // Initialize TrackPoint with ATCFTrackLine, if necessary
@@ -676,7 +676,7 @@ bool TrackPoint::set(const ATCFTrackLine &l) {
    for(i=0; i<NWinds; i++) Wind[i].set_wind(l);
 
    // Store the track line
-   TrackLines.add(l.get_line());
+   if(check_dup) TrackLines.add(l.get_line());
 
    return true;
 }

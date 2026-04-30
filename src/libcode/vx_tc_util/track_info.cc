@@ -384,14 +384,14 @@ void TrackInfo::set_storm_id() {
 
 int TrackInfo::duration() const {
    return(MaxValidTime == 0 || MinValidTime == 0 ? bad_data_int :
-          (int) MaxValidTime - MinValidTime);
+          (int) (MaxValidTime - MinValidTime));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
 int TrackInfo::warm_core_dur() const {
    return(MaxWarmCore == 0 || MinWarmCore == 0 ? bad_data_int :
-          (int) MaxWarmCore - MinWarmCore);
+          (int) (MaxWarmCore - MinWarmCore));
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -483,7 +483,7 @@ bool TrackInfo::add(const ATCFTrackLine &l, bool check_dup, bool check_anly) {
    for(int i=NPoints-1; i>=0; i--) {
       if(Point[i].is_match(l)) {
          found = true;
-         status = Point[i].set(l);
+         status = Point[i].set(l, check_dup);
          break;
       }
    }
@@ -491,7 +491,7 @@ bool TrackInfo::add(const ATCFTrackLine &l, bool check_dup, bool check_anly) {
    // Otherwise, create a new point
    if(!found) {
       extend(NPoints + 1, false);
-      status = Point[NPoints++].set(l);
+      status = Point[NPoints++].set(l, check_dup);
    }
 
    // Check the valid time range
@@ -648,17 +648,15 @@ bool TrackInfo::is_match(const ATCFTrackLine &l) {
 
    // Check for an analysis track where the technique number matches,
    // the lead time remains zero, and the valid time changes.
-   if(CheckAnly && !IsBestTrack && !IsAnlyTrack && NPoints > 0) {
+   if(CheckAnly && !IsBestTrack && !IsAnlyTrack && NPoints > 0 &&
+      TechniqueNumber          == l.technique_number() &&
+      Point[NPoints-1].lead()  == 0 &&
+      l.lead()                 == 0 &&
+      Point[NPoints-1].valid() != l.valid()) {
 
-      if(TechniqueNumber          == l.technique_number() &&
-         Point[NPoints-1].lead()  == 0 &&
-         l.lead()                 == 0 &&
-         Point[NPoints-1].valid() != l.valid()) {
-
-         // Set analysis track flag and reset InitTime to 0.
-         IsAnlyTrack = true;
-         InitTime    = (unixtime) 0;
-      }
+      // Set analysis track flag and reset InitTime to 0.
+      IsAnlyTrack = true;
+      InitTime    = (unixtime) 0;
    }
 
    // Apply matching logic for BEST and analysis tracks
@@ -946,7 +944,8 @@ bool TrackInfoArray::erase_storm_id(const ConcatString &s) {
 
 ////////////////////////////////////////////////////////////////////////
 
-int TrackInfoArray::add_diag_data(DiagFile &diag_file, const StringArray &diag_name) {
+int TrackInfoArray::add_diag_data(const DiagFile &diag_file,
+                                  const StringArray &diag_name) {
    int n_match = 0;
 
    // Set the names for each track

@@ -24,8 +24,8 @@
 ////////////////////////////////////////////////////////////////////////
 
 // Define the wind intensity levels to be handled
-static const int WindIntensity[] = { 34, 50, 64 };
-static const int NWinds = sizeof(WindIntensity)/sizeof(*WindIntensity);
+static const std::vector<int> WindIntensity = { 34, 50, 64 };
+static const int NWinds = 3;
 
 // ATCF columns that can be filtered
 static const std::vector<std::string> atcf_column_vals = {
@@ -271,7 +271,7 @@ class TrackPoint {
          //  do stuff
          //
 
-      bool set(const ATCFTrackLine &);
+      bool set(const ATCFTrackLine &, bool check_dup = false);
       void set_wind(int, const QuadInfo &);
       bool has(const ATCFTrackLine &) const;
       bool is_match(const ATCFTrackLine &) const;
