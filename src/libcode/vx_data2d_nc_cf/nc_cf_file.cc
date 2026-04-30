@@ -1912,6 +1912,20 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
     return;
   }
 
+  // false_easting, optional
+
+  double false_east = get_nc_var_att_double(
+    grid_mapping_var, "false_easting", false);
+
+  if(is_bad_data(false_east)) false_east = 0.0;
+
+  // false_northing, optional
+
+  double false_north = get_nc_var_att_double(
+    grid_mapping_var, "false_northing", false);
+
+  if(is_bad_data(false_north)) false_north = 0.0;
+
   // Look for the x/y dimensions and x/y coordinate variables
   find_xy_vars(method_name);
 
@@ -1987,10 +2001,11 @@ void NcCfFile::get_grid_mapping_lambert_conformal_conic(const NcVar *grid_mappin
 
   get_nc_data(_yCoordVar, y_values.data());
 
-  // Unit conversion
+  // MET #3374 Support false easting and northing offsets
+  // Unit conversion and false northing and easting offsets
 
-  for (int i = 0; i<x_counts; ++i) x_values[i] *= x_coord_to_m_cf;
-  for (int i = 0; i<y_counts; ++i) y_values[i] *= y_coord_to_m_cf;
+  for (int i = 0; i<x_counts; ++i) x_values[i] = x_values[i] * x_coord_to_m_cf - false_east;
+  for (int i = 0; i<y_counts; ++i) y_values[i] = y_values[i] * y_coord_to_m_cf - false_north;
 
   // Calculate dx and dy assuming they are constant.  MET requires that dx be
   // equal to dy
