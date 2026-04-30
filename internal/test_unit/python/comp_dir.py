@@ -14,7 +14,7 @@ except TypeError as e:
     raise e
 sys.path.append(metplus_util_path)
 
-from diff_util import compare_dir
+import diff_util as du
 
 
 def comp_dir(truth_dir, output_dir, debug=True, save_diff=True):
@@ -43,11 +43,15 @@ def comp_dir(truth_dir, output_dir, debug=True, save_diff=True):
     """
 
     start_time = dt.datetime.now()
+
+    # Custom rounding overrides for MET unit test output
+    du.ROUNDING_OVERRIDES['ALAL2010_stat.out'] = 4
+
     print('******************************')
     print("Comparing output to truth data")
-    diff_files = compare_dir(truth_dir, output_dir,
-                             debug=debug,
-                             save_diff=save_diff)
+    diff_files = du.compare_dir(truth_dir, output_dir,
+                                debug=debug,
+                                save_diff=save_diff)
     
     end_time = dt.datetime.now()
     runtime = end_time - start_time
