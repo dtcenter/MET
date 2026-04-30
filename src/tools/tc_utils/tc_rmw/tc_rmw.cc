@@ -341,6 +341,12 @@ void process_track_files(const StringArray& files,
     // Initialize counts
     tot_read = tot_add = 0;
 
+    // Set metadata pointer
+    StringArray BestTechnique;
+    BestTechnique.add("BEST");
+    BestTechnique.set_ignore_case(true);
+    line.set_best_technique(&BestTechnique);
+
     // Process input ATCF files
     for(int i = 0; i < files.n(); i++) {
 
