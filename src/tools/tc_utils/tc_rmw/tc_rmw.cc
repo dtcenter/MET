@@ -740,7 +740,7 @@ void process_fields(const TrackInfoArray& tracks) {
                                 false, false)) {
                 n_var_found++;
             }
-	    else {
+            else {
                 continue;
             }
 
