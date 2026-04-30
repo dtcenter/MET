@@ -271,9 +271,9 @@ class TrackPoint {
          //  do stuff
          //
 
-      void set_wind(int, const QuadInfo &);
       bool set(const ATCFTrackLine &);
-      bool has(const ATCFTrackLine &);
+      void set_wind(int, const QuadInfo &);
+      bool has(const ATCFTrackLine &) const;
       bool is_match(const ATCFTrackLine &) const;
       void clear_diag_value();
       void add_diag_value(double);

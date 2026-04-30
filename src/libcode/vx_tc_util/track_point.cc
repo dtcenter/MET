@@ -683,12 +683,6 @@ bool TrackPoint::set(const ATCFTrackLine &l) {
 
 ////////////////////////////////////////////////////////////////////////
 
-bool TrackPoint::has(const ATCFTrackLine &l) {
-   return TrackLines.has(l.get_line());
-}
-
-////////////////////////////////////////////////////////////////////////
-
 void TrackPoint::set_wind(int n, const QuadInfo &w) {
 
    // Check the range
@@ -702,6 +696,12 @@ void TrackPoint::set_wind(int n, const QuadInfo &w) {
    Wind[n] = w;
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+bool TrackPoint::has(const ATCFTrackLine &l) const {
+   return TrackLines.has(l.get_line());
 }
 
 ////////////////////////////////////////////////////////////////////////
