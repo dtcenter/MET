@@ -121,7 +121,7 @@ void TCRMWConfInfo::read_config(const char* default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void TCRMWConfInfo::process_config(GrdFileType ftype) {
-    Dictionary *fdict = (Dictionary *) nullptr;
+    auto fdict = (Dictionary *) nullptr;
 
     // Conf: version
     check_met_version(Conf.lookup_string(conf_key_version).c_str());

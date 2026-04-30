@@ -106,7 +106,7 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return "tc_rmw";
 }
 
@@ -148,7 +148,7 @@ __attribute__((noreturn)) static void usage(int exit_code) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_command_line(int argc, char **argv) {
+static void process_command_line(int argc, char **argv) {
     CommandLine cline;
     ConcatString default_config_file;
 
@@ -211,8 +211,8 @@ void process_command_line(int argc, char **argv) {
 
 ////////////////////////////////////////////////////////////////////////
 
-GrdFileType get_file_type(const StringArray &file_list,
-                          const GrdFileType in_ftype) {
+static GrdFileType get_file_type(const StringArray &file_list,
+                                 const GrdFileType in_ftype) {
     int i;
     Met2dDataFile *mtddf = nullptr;
     GrdFileType out_ftype;
@@ -246,13 +246,14 @@ GrdFileType get_file_type(const StringArray &file_list,
 
 ////////////////////////////////////////////////////////////////////////
 
-bool file_is_ok(const ConcatString &file_name, const GrdFileType t) {
+static bool file_is_ok(const ConcatString &file_name,
+                       const GrdFileType t) {
     return(file_exists(file_name.c_str()) || is_python_grdfiletype(t));
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_rmw() {
+static void process_rmw() {
 
     // Process the track data
     TrackInfoArray tracks;
@@ -268,8 +269,9 @@ void process_rmw() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_tracks(TrackInfoArray& tracks) {
-    StringArray files, files_model_suffix;
+static void process_tracks(TrackInfoArray& tracks) {
+    StringArray files;
+    StringArray files_model_suffix;
 
     // Initialize
     tracks.clear();
@@ -288,12 +290,13 @@ void process_tracks(TrackInfoArray& tracks) {
 // Automated Tropical Cyclone Forecasting System
 // https://science.nrlmry.navy.mil/atcf/docs/ATCF-FAQ.html
 
-void get_atcf_files(const StringArray& source,
-                    const StringArray& model_suffix,
-                    StringArray& files,
-                    StringArray& files_model_suffix) {
+static void get_atcf_files(const StringArray& source,
+                           const StringArray& model_suffix,
+                           StringArray& files,
+                           StringArray& files_model_suffix) {
 
-    StringArray cur_source, cur_files;
+    StringArray cur_source;
+    StringArray cur_files;
 
     if(source.n() != model_suffix.n()) {
         mlog << Error << "\nget_atcf_files() -> "
@@ -322,9 +325,9 @@ void get_atcf_files(const StringArray& source,
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_track_files(const StringArray& files,
-                         const StringArray& model_suffix,
-                         TrackInfoArray& tracks) {
+static void process_track_files(const StringArray& files,
+                                const StringArray& model_suffix,
+                                TrackInfoArray& tracks) {
     LineDataFile f;
     ConcatString cs;
     ATCFTrackLine line;
@@ -414,7 +417,7 @@ void process_track_files(const StringArray& files,
 //
 ////////////////////////////////////////////////////////////////////////
 
-bool is_keeper(const ATCFLineBase * line) {
+static bool is_keeper(const ATCFLineBase * line) {
    bool keep = true;
    ConcatString cs;
 
@@ -492,22 +495,22 @@ bool is_keeper(const ATCFLineBase * line) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_deck(const StringArray& a) {
+static void set_deck(const StringArray& a) {
     set_atcf_source(a, deck_source, deck_model_suffix);
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_atcf_source(const StringArray& a,
-                     StringArray& source,
-                     StringArray& model_suffix) {
+static void set_atcf_source(const StringArray& a,
+                            StringArray& source,
+                            StringArray& model_suffix) {
     StringArray sa;
-    ConcatString cs, suffix;
+    ConcatString suffix;
 
     // Check for optional suffix sub-argument
     for(int i = 0; i < a.n(); i++) {
         if(a[i] == "suffix") {
-            cs = a[i];
+            ConcatString cs(a[i]);
             sa = cs.split("=");
             if(sa.n() != 2) {
                 mlog << Error << "\nset_atcf_source() -> "
@@ -522,7 +525,7 @@ void set_atcf_source(const StringArray& a,
 
     // Parse remaining sources
     for(int i = 0; i < a.n(); i++) {
-        if( a[i] == "suffix" ) continue;
+        if(a[i] == "suffix") continue;
         source.add(a[i]);
         model_suffix.add(suffix);
     }
@@ -530,25 +533,25 @@ void set_atcf_source(const StringArray& a,
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_data_files(const StringArray& a) {
+static void set_data_files(const StringArray& a) {
     data_files = a;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_config(const StringArray& a) {
+static void set_config(const StringArray& a) {
     config_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void set_out(const StringArray& a) {
+static void set_out(const StringArray& a) {
     out_file = a[0];
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_grid() {
+static void setup_grid() {
 
     rng_azi_data.name = "TCRMW";
     rng_azi_data.range_n = conf_info.n_range;
@@ -567,8 +570,8 @@ void setup_grid() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void setup_nc_file() {
-    VarInfo* data_info = (VarInfo*) nullptr;
+static void setup_nc_file() {
+    const VarInfo* data_info = nullptr;
 
     // Create NetCDF file
     nc_out = open_ncfile(out_file.c_str(), true);
@@ -640,7 +643,7 @@ void setup_nc_file() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void compute_lat_lon(vector<double> &lats, vector<double> &lons) {
+static void compute_lat_lon(vector<double> &lats, vector<double> &lons) {
 
     // Set the size
     int nxy = rng_azi_grid.range_n() * rng_azi_grid.azimuth_n();
@@ -650,7 +653,8 @@ void compute_lat_lon(vector<double> &lats, vector<double> &lons) {
     // Compute lat and lon coordinate arrays
     for(int ir = 0; ir < rng_azi_grid.range_n(); ir++) {
         for(int ia = 0; ia < rng_azi_grid.azimuth_n(); ia++) {
-            double lat, lon;
+            double lat;
+            double lon;
             int i = ir * rng_azi_grid.azimuth_n() + ia;
             rng_azi_grid.rng_azi_to_latlon(
                 ir * rng_azi_grid.range_delta_km(),
@@ -664,8 +668,8 @@ void compute_lat_lon(vector<double> &lats, vector<double> &lons) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void process_fields(const TrackInfoArray& tracks) {
-    VarInfo *data_info = (VarInfo *) nullptr;
+static void process_fields(const TrackInfoArray& tracks) {
+    VarInfo *data_info = nullptr;
     DataPlane data_dp;
 
     // Take only first track
