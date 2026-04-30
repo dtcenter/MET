@@ -153,7 +153,7 @@ class TrackInfo {
       const ConcatString & field_source()     const;
       int                  n_diag()           const;
       const StringArray &  diag_name()        const;
-      const std::string    diag_name(int)     const;
+            std::string    diag_name(int)     const;
 
       StringArray          track_lines()      const;
 
@@ -164,9 +164,9 @@ class TrackInfo {
       void add(const TrackPoint &);
       bool add(const ATCFTrackLine &, bool check_dup = false, bool check_anly = false);
       void add_watch_warn(const ConcatString &, WatchWarnType, unixtime);
-      bool add_diag_data(DiagFile &, const StringArray &);
+      bool add_diag_data(const DiagFile &, const StringArray &);
       void add_diag_value(int, double);
-      void add_uniq_diag_name(const std::string);
+      void add_uniq_diag_name(const std::string &);
       
       bool has(const ATCFTrackLine &) const;
 
@@ -232,8 +232,6 @@ class TrackInfoArray {
                               const StringArray &, const int,
                               const bool);
 
-   private:
-
       void init_from_scratch();
       void assign(const TrackInfoArray &);
 
@@ -274,7 +272,7 @@ class TrackInfoArray {
 
 ////////////////////////////////////////////////////////////////////////
 
-inline int TrackInfoArray::n() const { return Track.size(); }
+inline int TrackInfoArray::n() const { return (int) Track.size(); }
 
 ////////////////////////////////////////////////////////////////////////
 
