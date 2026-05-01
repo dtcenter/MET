@@ -47,9 +47,9 @@ class UGridFile {
       bool open_metadata(const char *filename);
       bool get_var_info();
 
-      ConcatString coordinate_nc();
-      void set_dataset(ConcatString _dataset_name);
-      void set_map_config_file(ConcatString filename);
+      ConcatString coordinate_nc() const;
+      void set_dataset(const ConcatString &_dataset_name);
+      void set_map_config_file(const ConcatString &filename);
       void set_max_distance_km(double max_distance);
 
       void close();
@@ -89,6 +89,7 @@ class UGridFile {
 
       NcVarInfo *Var;    //  allocated
       std::array<NcVarInfo, UG_META_VAR_COUNT>MetaVar;
+      ConcatString z_var_name;
 
          //
          //  Grid
@@ -131,8 +132,6 @@ class UGridFile {
 
       int _numDims;
 
-      //std::array<netCDF::NcDim *, UG_DIM_COUNT> _dims;   //  allocated
-
       StringArray _dimNames;
 
       // Pointers to the X/Y and time dimensions and the associated coordinate
@@ -150,8 +149,6 @@ class UGridFile {
       NcVarInfo *_time_var_info;
 
       int face_count;
-      //double *_lat;
-      //double *_lon;
 
       void init_from_scratch();
 
@@ -163,9 +160,12 @@ class UGridFile {
       // Read the grid information from the netCDF file and fill in the
       // grid member with that information.
 
-      std::string find_metadata_name(std::string &key, StringArray &available_names);
-      StringArray get_metadata_names(std::string &key);
-      void read_config(ConcatString config_filename);
+      void assign_dim_from_metadata(netCDF::NcFile* ncFile, netCDF::NcDim*& dim_ptr,
+                                    const std::string& key, const StringArray& dim_names);
+
+      std::string find_metadata_name(const std::string &key, const StringArray &available_names);
+      StringArray get_metadata_names(const std::string &key);
+      void read_config(const ConcatString &config_filename);
       void read_netcdf_grid();
 
 };
@@ -174,7 +174,7 @@ class UGridFile {
 ////////////////////////////////////////////////////////////////////////
 
 inline netCDF::NcDim *UGridFile::get_vert_dim() const { return _virtDim; }
-inline ConcatString UGridFile::coordinate_nc() { return coordinate_file; }
+inline ConcatString UGridFile::coordinate_nc() const { return coordinate_file; }
 
 ////////////////////////////////////////////////////////////////////////
 

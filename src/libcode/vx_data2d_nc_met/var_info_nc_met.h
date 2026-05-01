@@ -52,7 +52,7 @@ class VarInfoNcMet : public VarInfo
 
       GrdFileType file_type()             const override;
       const       LongArray & dimension() const;
-      int         dimension(int i)        const;
+      long        dimension(int i)        const;
       int         n_dimension()           const;
 
          //
@@ -62,7 +62,7 @@ class VarInfoNcMet : public VarInfo
       void set_magic(const ConcatString &, const ConcatString &) override;
       bool set_dict(Dictionary &s, bool do_exit=true) override;
 
-      void add_dimension(int dim);
+      void add_dimension(long dim);
 
          //
          // do stuff
@@ -80,7 +80,7 @@ class VarInfoNcMet : public VarInfo
 
 inline GrdFileType       VarInfoNcMet::file_type()      const { return FileType_NcMet;         }
 inline const LongArray & VarInfoNcMet::dimension()      const { return Dimension;              }
-inline int               VarInfoNcMet::dimension(int i) const { return Dimension[i];           }
+inline long              VarInfoNcMet::dimension(int i) const { return Dimension[i];           }
 inline int               VarInfoNcMet::n_dimension()    const { return Dimension.n_elements(); }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -343,6 +343,20 @@
     </output>
   </test>
 
+  <test name="plot_data_plane_NCCF_lc_false_easting_northing">
+    <exec>&MET_BIN;/plot_data_plane</exec>
+    <param> \
+      &DATA_DIR_MODEL;/nccf/rsdsghi_NAM-12_MPI-ESM1-2-LR_historical_r1i1p1f1_CORNELL_WRF461T-SN_v1-r1_1hr_196001010000.nc \
+      &OUTPUT_DIR;/plot_data_plane/plot_data_plane_NCCF_lc_false_easting_northing.ps \
+      'name="rsdsghi"; level="(0,*,*)";' \
+      -title "Lambert Conformal False Easting and False Northing" \
+      -v 1
+    </param>
+    <output>
+      <ps>&OUTPUT_DIR;/plot_data_plane/plot_data_plane_NCCF_lc_false_easting_northing.ps</ps>
+    </output>
+  </test>
+
   <test name="plot_data_plane_TRMM_3B42_3hourly_nc">
     <exec>&MET_BIN;/plot_data_plane</exec>
     <param> \

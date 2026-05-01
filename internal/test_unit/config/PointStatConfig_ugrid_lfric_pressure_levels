@@ -59,7 +59,7 @@ fcst = {
 
    field = [
       { name = "u_in_w3"; level = "(21,*)"; set_attr_level = "P500"; },
-      { name = "u_in_w3"; level = "(24,*)"; set_attr_level = "P850"; }
+      { name = "u_in_w3"; level = "(@850,*)"; set_attr_level = "P850"; }
    ];
 }
 obs = {
