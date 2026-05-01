@@ -180,7 +180,8 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
    }
 
    // Parse the ensemble field information
-   for(int i=0,max_n_cat=0; i<n_var; i++) {
+   max_n_cat = 0;
+   for(int i=0; i<n_var; i++) {
       
       auto ens_info = new GenEnsProdVarInfo();
 
