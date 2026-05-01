@@ -741,7 +741,7 @@ static void track_counts(const GenEnsProdVarInfo *ens_info,
 
    // Ensemble thresholds
    const int n_thr = ens_info->cat_ta.n();
-   SingleThresh *thr_buf = ens_info->cat_ta.buf();
+   const SingleThresh *thr_buf = ens_info->cat_ta.buf();
 
    // Increment counts for each grid point
    for(int i=0; i<nxy; i++) {
@@ -853,7 +853,6 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                          const DataPlane &ens_dp,
                          const DataPlane &cmn_dp,
                          const DataPlane &csd_dp) {
-   char type_str[max_str_len];
 
    // Allocate memory for storing ensemble data
    vector<float> ens_mean  (nxy);
@@ -984,9 +983,9 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
 
          // Write ensemble relative frequency
          if(ens_info->nc_info.do_freq) {
-            snprintf(type_str, sizeof(type_str), "ENS_FREQ_%s",
-                     ens_info->cat_ta[i].get_abbr_str().contents().c_str());
-            write_ens_data_plane(ens_info, prob_dp, ens_dp, type_str,
+            ConcatString type_str("ENS_FREQ_");
+            type_str << ens_info->cat_ta[i].get_abbr_str().contents().c_str();
+            write_ens_data_plane(ens_info, prob_dp, ens_dp, type_str.c_str(),
                                  "Ensemble Relative Frequency");
          }
 
@@ -1003,11 +1002,11 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                                      conf_info.nbrhd_prob.vld_thresh, info));
 
                // Write neighborhood ensemble probability
-               snprintf(type_str, sizeof(type_str), "ENS_NEP_%s_%s%i",
-                        ens_info->cat_ta[i].get_abbr_str().contents().c_str(),
-                        interpmthd_to_string(InterpMthd::Nbrhd).c_str(),
-                        conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j]);
-               write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str,
+               ConcatString type_str("ENS_NEP_");
+               type_str << ens_info->cat_ta[i].get_abbr_str().contents().c_str() << "_"
+                        << interpmthd_to_string(InterpMthd::Nbrhd).c_str()
+                        << conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j];
+               write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str.c_str(),
                                     "Neighborhood Ensemble Probability");
             } // end for k
          } // end if do_nep
@@ -1047,13 +1046,13 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                                      conf_info.nmep_smooth.gaussian));
 
                // Write neighborhood maximum ensemble probability
-               snprintf(type_str, sizeof(type_str), "ENS_NMEP_%s_%s%i_%s%i",
-                        ens_info->cat_ta[i].get_abbr_str().contents().c_str(),
-                        interpmthd_to_string(InterpMthd::Nbrhd).c_str(),
-                        conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j],
-                        conf_info.nmep_smooth.method[k].c_str(),
-                        conf_info.nmep_smooth.width[k]*conf_info.nmep_smooth.width[k]);
-               write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str,
+               ConcatString type_str("ENS_NMEP_");
+               type_str << ens_info->cat_ta[i].get_abbr_str().contents().c_str() << "_"
+                        << interpmthd_to_string(InterpMthd::Nbrhd).c_str()
+                        << conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j] << "_"
+                        << conf_info.nmep_smooth.method[k].c_str()
+                        << conf_info.nmep_smooth.width[k]*conf_info.nmep_smooth.width[k];
+               write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str.c_str(),
                                     "Neighborhood Maximum Ensemble Probability");
             } // end for k
          } // end for j
@@ -1092,19 +1091,19 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
          if(n.ptype() == perc_thresh_fcst_climo_dist &&
             !is_eq(n.pvalue(), 0.0) &&
             !is_eq(n.pvalue(), 100.0)) {
-            snprintf(type_str, sizeof(type_str), "CLIMO_FCDP%i",
-                     nint(n.pvalue()));
+            ConcatString type_str("CLIMO_FCDP");
+            type_str << nint(n.pvalue());
             cdp_dp = normal_cdf_inv(n.pvalue()/100.0, cmn_dp, csd_dp);
-            write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
+            write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str.c_str(),
                                  "Forecast climatology distribution percentile");
          }
          else if(n.ptype() == perc_thresh_obs_climo_dist &&
                  !is_eq(n.pvalue(), 0.0) &&
                  !is_eq(n.pvalue(), 100.0)) {
-            snprintf(type_str, sizeof(type_str), "CLIMO_OCDP%i",
-                     nint(n.pvalue()));
+            ConcatString type_str("CLIMO_OCDP");
+            type_str << nint(n.pvalue());
             cdp_dp = normal_cdf_inv(n.pvalue()/100.0, cmn_dp, csd_dp);
-            write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
+            write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str.c_str(),
                                  "Observation climatology distribution percentile");
          }
       } // end for
