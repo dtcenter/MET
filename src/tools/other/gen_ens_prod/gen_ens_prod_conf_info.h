@@ -101,10 +101,10 @@ class GenEnsProdConfInfo {
 
       void clear();
 
-      void read_config   (const ConcatString, const ConcatString);
+      void read_config   (const ConcatString &, const ConcatString &);
       void process_config(GrdFileType, StringArray *, bool);
 
-      GenEnsProdNcOutInfo parse_nc_info(Dictionary *);
+      GenEnsProdNcOutInfo parse_nc_info(Dictionary *) const;
 
       // Accessor functions
       int get_n_var()     const;

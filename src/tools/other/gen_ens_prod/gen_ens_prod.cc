@@ -113,7 +113,7 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return "gen_ens_prod";
 }
 
@@ -163,13 +163,13 @@ static void process_command_line(int argc, char **argv) {
            << "\"-ens\" option.\n\n";
       exit(1);
    }
-   if(out_file.length() == 0) {
+   if(out_file.empty()) {
       mlog << Error << "\n" << method_name
            << "the output file must be set using the "
            << "\"-out\" option.\n\n";
       exit(1);
    }
-   if(config_file.length() == 0) {
+   if(config_file.empty()) {
       mlog << Error << "\n" << method_name
            << "the configuration file must be set using the "
            << "\"-config\" option.\n\n";
@@ -280,48 +280,47 @@ static void process_grid(const Grid &fcst_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 static void process_ensemble() {
-   int i_var, i_ens, n_ens_vld, n_ens_inputs;
-   bool need_reset, set_climo_ens_mem_id;
-   DataPlane ens_dp, ctrl_dp;
-   DataPlane cmn_dp, csd_dp;
-   DataPlane emn_dp, esd_dp;
+   DataPlane ens_dp;
+   DataPlane ctrl_dp;
+   DataPlane cmn_dp;
+   DataPlane csd_dp;
+   DataPlane emn_dp;
+   DataPlane esd_dp;
    unixtime max_init_ut = bad_data_ll;
-   VarInfo *var_info;
-   ConcatString cs, ens_file;
 
    // Loop through each of the ensemble fields to be processed
    vector<GenEnsProdVarInfo*>::const_iterator var_it = conf_info.ens_input.begin();
-   for(i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
+   for(int i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
 
       // Need to reinitialize counts and sums for each ensemble field
-      need_reset = true;
+      bool need_reset = true;
 
       // When normalizing relative to climatology with MET_ENS_MEMBER_ID set,
       // read climatology separately for each member
-      set_climo_ens_mem_id =
+      bool set_climo_ens_mem_id =
          (conf_info.ens_member_ids.n() > 1) &&
          ((*var_it)->normalize == NormalizeType::ClimoAnom ||
           (*var_it)->normalize == NormalizeType::ClimoStdAnom);
 
       // Print out the normalization flag
-      cs << cs_erase;
+      ConcatString cs;
       if((*var_it)->normalize != NormalizeType::None) {
          cs << " with normalize = "
             << normalizetype_to_string((*var_it)->normalize);
       }
       cs << "\n";
 
-      var_info = (*var_it)->get_var_info();
       mlog << Debug(2) << "\n" << sep_str << "\n\n"
            << "Processing ensemble field: "
            << (*var_it)->raw_magic_str << cs;
 
-      n_ens_inputs = (*var_it)->inputs_n();
-      for(i_ens=n_ens_vld=0; i_ens < n_ens_inputs; i_ens++) {
+      int n_ens_inputs = (*var_it)->inputs_n();
+      int n_ens_vld = 0;
+      for(int i_ens=0; i_ens < n_ens_inputs; i_ens++) {
 
          // Get file and VarInfo to process
-         ens_file = (*var_it)->get_file(i_ens);
-         var_info = (*var_it)->get_var_info(i_ens);
+         ConcatString ens_file((*var_it)->get_file(i_ens));
+         auto var_info = (*var_it)->get_var_info(i_ens);
 
          // Skip bad data files
          if(!ens_file_vld[(*var_it)->get_file_index(i_ens)]) continue;
@@ -498,7 +497,6 @@ static void get_climo_mean_stdev(GenEnsProdVarInfo *ens_info, int i_var,
 static void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
                                DataPlane &emn_dp, DataPlane &esd_dp) {
    VarInfo *var_info;
-   ConcatString ens_file;
    DataPlane ens_dp;
 
    // Check for null pointer
@@ -529,7 +527,7 @@ static void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
    for(int i_ens=0; i_ens<ens_info->inputs_n(); i_ens++) {
 
       // Get file and VarInfo to process
-      ens_file = ens_info->get_file(i_ens);
+      ConcatString ens_file(ens_info->get_file(i_ens));
       var_info = ens_info->get_var_info(i_ens);
 
       // Skip bad data files
@@ -583,7 +581,7 @@ static void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
 
    // Read ensemble control member data, if provided
    if(ctrl_file.nonempty()) {
-      VarInfo *var_info = ens_info->get_ctrl(0);
+      var_info = ens_info->get_ctrl(0);
 
       // Error out if missing
       if(!get_data_plane(ctrl_file.c_str(), etype,
@@ -676,7 +674,7 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
       if(nxy == 0) process_grid(mtddf->grid());
 
       // Create the output file, if necessary
-      if(nc_out == (NcFile *) 0) setup_nc_file();
+      if(nc_out == nullptr) setup_nc_file();
 
       // Regrid, if requested and necessary
       if(!(mtddf->grid() == grid)) {
@@ -884,7 +882,7 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
          ens_vld[i] = nint(cnt_na[i]);
 
          // Check for too much missing data
-         if((double) (cnt_na[i]/n_ens_vld) < t) {
+         if((cnt_na[i]/n_ens_vld) < t) {
             ens_mean[i]  = bad_data_float;
             ens_stdev[i] = bad_data_float;
             ens_minus[i] = bad_data_float;
@@ -898,12 +896,12 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
             // Compute ensemble summary
             ens_mean[i]  = (float) (sum_na[i]/cnt_na[i]);
             ens_stdev[i] = (float) compute_stdev(stdev_sum_na[i], stdev_ssq_na[i], nint(stdev_cnt_na[i]));
-            ens_minus[i] = (float) ens_mean[i] - ens_stdev[i];
-            ens_plus[i]  = (float) ens_mean[i] + ens_stdev[i];
+            ens_minus[i] =         ens_mean[i] - ens_stdev[i];
+            ens_plus[i]  =         ens_mean[i] + ens_stdev[i];
             ens_min[i]   = (float) min_na[i];
             ens_max[i]   = (float) max_na[i];
             ens_range[i] = (is_eq(max_na[i], min_na[i]) ?
-                            0.0 : (float) max_na[i] - min_na[i]);
+                            0.0 : (float) (max_na[i] - min_na[i]));
          }
       } // end for i
    } // End omp parallel
@@ -979,9 +977,9 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
 
          // Compute the ensemble relative frequency
          for(int j=0; j<cnt_na.n(); j++) {
-            prob_dp.buf()[j] = ((double) (cnt_na[j]/n_ens_vld) < t ?
+            prob_dp.buf()[j] = ((cnt_na[j]/n_ens_vld) < t ?
                                 bad_data_double :
-                                (double) (thresh_cnt_na[i][j]/cnt_na[j]));
+                                (thresh_cnt_na[i][j]/cnt_na[j]));
          }
 
          // Write ensemble relative frequency
@@ -1033,9 +1031,9 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
 
             // Compute the neighborhood maximum ensemble probability
             for(int k=0; k<cnt_na.n(); k++) {
-               prob_dp.buf()[k] = ((double) (cnt_na[k]/n_ens_vld) < t ?
+               prob_dp.buf()[k] = ((cnt_na[k]/n_ens_vld) < t ?
                                    bad_data_double :
-                                   (double) (thresh_nbrhd_cnt_na[i][j][k]/cnt_na[k]));
+                                   (thresh_nbrhd_cnt_na[i][j][k]/cnt_na[k]));
             }
 
             // Loop through the requested NMEP smoothers
@@ -1090,27 +1088,26 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
       ens_info->cat_ta.get_simple_nodes(simp);
 
       // Process all CDP thresholds except 0 and 100
-      for(vector<Simple_Node>::iterator it = simp.begin();
-          it != simp.end(); it++) {
-         if(it->ptype() == perc_thresh_fcst_climo_dist &&
-            !is_eq(it->pvalue(), 0.0) &&
-            !is_eq(it->pvalue(), 100.0)) {
+      for(const auto &n : simp) {
+         if(n.ptype() == perc_thresh_fcst_climo_dist &&
+            !is_eq(n.pvalue(), 0.0) &&
+            !is_eq(n.pvalue(), 100.0)) {
             snprintf(type_str, sizeof(type_str), "CLIMO_FCDP%i",
-                     nint(it->pvalue()));
-            cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
+                     nint(n.pvalue()));
+            cdp_dp = normal_cdf_inv(n.pvalue()/100.0, cmn_dp, csd_dp);
             write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
                                  "Forecast climatology distribution percentile");
          }
-         else if(it->ptype() == perc_thresh_obs_climo_dist &&
-                 !is_eq(it->pvalue(), 0.0) &&
-                 !is_eq(it->pvalue(), 100.0)) {
+         else if(n.ptype() == perc_thresh_obs_climo_dist &&
+                 !is_eq(n.pvalue(), 0.0) &&
+                 !is_eq(n.pvalue(), 100.0)) {
             snprintf(type_str, sizeof(type_str), "CLIMO_OCDP%i",
-                     nint(it->pvalue()));
-            cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
+                     nint(n.pvalue()));
+            cdp_dp = normal_cdf_inv(n.pvalue()/100.0, cmn_dp, csd_dp);
             write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
                                  "Observation climatology distribution percentile");
          }
-      } // end for it
+      } // end for
    }
 
    return;
@@ -1180,16 +1177,15 @@ static void write_ens_var_float(GenEnsProdVarInfo *ens_info,
                                 const DataPlane &dp,
                                 const char *type_str,
                                 const char *long_name_str) {
-   NcVar ens_var;
-   ConcatString ens_var_name, var_str, name_str, cs;
 
    // Append nc_var_str config file entry, if specified
-   cs = ens_info->nc_var_str;
-   if(cs.length() > 0) var_str << "_" << cs;
+   ConcatString var_str;
+   ConcatString cs(ens_info->nc_var_str);
+   if(!cs.empty()) var_str << "_" << cs;
 
    // Construct the variable name
-   ens_var_name << cs_erase
-                << ens_info->get_var_info()->name_attr() << "_"
+   ConcatString ens_var_name;
+   ens_var_name << ens_info->get_var_info()->name_attr() << "_"
                 << ens_info->get_var_info()->level_attr()
                 << var_str << "_" << type_str;
 
@@ -1199,13 +1195,15 @@ static void write_ens_var_float(GenEnsProdVarInfo *ens_info,
    // Otherwise, add to the list of previously defined variables
    nc_ens_var_sa.add(ens_var_name);
 
-   ens_var = add_var(nc_out, (string)ens_var_name, ncFloat, lat_dim, lon_dim);
+   auto ens_var = add_var(nc_out, (string) ens_var_name,
+                          ncFloat, lat_dim, lon_dim);
 
    //
    // Construct the variable name attribute
    // For the ensemble mean, just use the variable name.
    // For all other fields, append the field type.
    //
+   ConcatString name_str;
    if(strcmp(type_str, "ENS_MEAN") == 0) {
       name_str << cs_erase
                << ens_info->get_var_info()->name_attr();
@@ -1238,16 +1236,15 @@ static void write_ens_var_int(GenEnsProdVarInfo *ens_info,
                               const DataPlane &dp,
                               const char *type_str,
                               const char *long_name_str) {
-   NcVar ens_var;
-   ConcatString ens_var_name, var_str, name_str, cs;
 
    // Append nc_var_str config file entry, if specified
-   cs = ens_info->nc_var_str;
-   if(cs.length() > 0) var_str << "_" << cs;
+   ConcatString var_str;
+   ConcatString cs(ens_info->nc_var_str);
+   if(!cs.empty()) var_str << "_" << cs;
 
    // Construct the variable name
-   ens_var_name << cs_erase
-                << ens_info->get_var_info()->name_attr() << "_"
+   ConcatString ens_var_name;
+   ens_var_name << ens_info->get_var_info()->name_attr() << "_"
                 << ens_info->get_var_info()->level_attr()
                 << var_str << "_" << type_str;
 
@@ -1258,11 +1255,12 @@ static void write_ens_var_int(GenEnsProdVarInfo *ens_info,
    nc_ens_var_sa.add(ens_var_name);
 
    int deflate_level = conf_info.get_compression_level();
-   ens_var = add_var(nc_out, (string)ens_var_name, ncInt, lat_dim, lon_dim, deflate_level);
+   auto ens_var = add_var(nc_out, (string) ens_var_name,
+                          ncInt, lat_dim, lon_dim, deflate_level);
 
    // Construct the variable name attribute
-   name_str << cs_erase
-            << ens_info->get_var_info()->name_attr() << "_"
+   ConcatString name_str;
+   name_str << ens_info->get_var_info()->name_attr() << "_"
             << type_str;
 
    // Add the variable attributes
@@ -1308,7 +1306,7 @@ static void add_var_att_local(GenEnsProdVarInfo *ens_info,
                               const char *name_str,
                               const char *long_name_str) {
    ConcatString att_str;
-   VarInfo *info = ens_info->get_var_info();
+   const VarInfo *info = ens_info->get_var_info();
 
    // Construct the long name
    att_str << cs_erase
@@ -1334,7 +1332,6 @@ static void add_var_att_local(GenEnsProdVarInfo *ens_info,
 ////////////////////////////////////////////////////////////////////////
 
 static void clean_up() {
-   int i, j;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 

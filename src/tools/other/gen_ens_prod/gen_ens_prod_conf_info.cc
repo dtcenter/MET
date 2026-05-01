@@ -85,8 +85,8 @@ void GenEnsProdConfInfo::clear() {
 
 ////////////////////////////////////////////////////////////////////////
 
-void GenEnsProdConfInfo::read_config(const ConcatString default_file_name,
-                                     const ConcatString user_file_name) {
+void GenEnsProdConfInfo::read_config(const ConcatString &default_file_name,
+                                     const ConcatString &user_file_name) {
 
    // Read the config file constants
    conf.read(replace_path(config_const_filename).c_str());
@@ -103,11 +103,10 @@ void GenEnsProdConfInfo::read_config(const ConcatString default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_files, bool use_ctrl) {
-   int i, j;
-   Dictionary *edict = (Dictionary *) nullptr;
+   Dictionary *edict = nullptr;
    Dictionary i_edict;
    InterpMthd mthd;
-   VarInfo * next_var;
+   VarInfo *next_var;
 
    int n_ens_files = ens_files->n();
 
@@ -181,9 +180,9 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
    }
 
    // Parse the ensemble field information
-   for(i=0,max_n_cat=0; i<n_var; i++) {
+   for(int i=0,max_n_cat=0; i<n_var; i++) {
       
-      GenEnsProdVarInfo * ens_info = new GenEnsProdVarInfo();
+      auto ens_info = new GenEnsProdVarInfo();
 
       // Get the current dictionary
       i_edict = parse_conf_i_vx_dict(edict, i);
@@ -192,7 +191,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
       ens_info->raw_magic_str = raw_magic_str(i_edict, etype);
 
       // Loop over ensemble member IDs to substitute
-      for(j=0; j<ens_member_ids.n(); j++) {
+      for(int j=0; j<ens_member_ids.n(); j++) {
 
          // set environment variable for ens member ID
          setenv(met_ens_member_id, ens_member_ids[j].c_str(), 1);
@@ -299,7 +298,7 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
    nmep_smooth = parse_conf_interp(edict, conf_key_nmep_smooth);
 
    // Loop through the neighborhood probability smoothing options
-   for(i=0; i<nmep_smooth.n_interp; i++) {
+   for(int i=0; i<nmep_smooth.n_interp; i++) {
 
       mthd = string_to_interpmthd(nmep_smooth.method[i].c_str());
 
@@ -333,15 +332,14 @@ void GenEnsProdConfInfo::process_config(GrdFileType etype, StringArray * ens_fil
 
 ////////////////////////////////////////////////////////////////////////
 
-GenEnsProdNcOutInfo GenEnsProdConfInfo::parse_nc_info(Dictionary *dict) {
+GenEnsProdNcOutInfo GenEnsProdConfInfo::parse_nc_info(Dictionary *dict) const {
    GenEnsProdNcOutInfo cur;
 
    // Parse the ensemble flag
    const DictionaryEntry *e = dict->lookup(conf_key_ensemble_flag);
 
    if(!e) {
-      mlog << Error
-           << "\nGenEnsProdConfInfo::parse_nc_info() -> "
+      mlog << Error << "\nGenEnsProdConfInfo::parse_nc_info() -> "
            << "lookup failed for key \"" << conf_key_ensemble_flag
            << "\"\n\n";
       exit(1);
