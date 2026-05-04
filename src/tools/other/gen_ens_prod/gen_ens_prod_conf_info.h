@@ -42,6 +42,8 @@ struct GenEnsProdNcOutInfo {
    bool do_freq;
    bool do_nep;
    bool do_nmep;
+   bool do_eas;
+   bool do_eas_width;
    bool do_climo;
    bool do_climo_cdp;
 
@@ -88,6 +90,7 @@ class GenEnsProdConfInfo {
 
       NbrhdInfo            nbrhd_prob;      // Neighborhood probability definition
       InterpInfo           nmep_smooth;     // Neighborhood maximum smoothing information
+      EASProbInfo          eas_prob;        // Neighborhood ensemble agreement scale probability definition
 
       double               vld_ens_thresh;  // Required ratio of valid input files
       double               vld_data_thresh; // Required ratio of valid data for each point
@@ -98,15 +101,16 @@ class GenEnsProdConfInfo {
 
       void clear();
 
-      void read_config   (const ConcatString, const ConcatString);
+      void read_config   (const ConcatString &, const ConcatString &);
       void process_config(GrdFileType, StringArray *, bool);
 
-      GenEnsProdNcOutInfo parse_nc_info(Dictionary *);
+      GenEnsProdNcOutInfo parse_nc_info(Dictionary *) const;
 
       // Accessor functions
       int get_n_var()     const;
       int get_max_n_cat() const;
       int get_n_nbrhd()   const;
+      int get_n_eas()     const;
       int get_compression_level();
 };
 
@@ -115,6 +119,7 @@ class GenEnsProdConfInfo {
 inline int GenEnsProdConfInfo::get_n_var()       const { return n_var;                 }
 inline int GenEnsProdConfInfo::get_max_n_cat()   const { return max_n_cat;             }
 inline int GenEnsProdConfInfo::get_n_nbrhd()     const { return nbrhd_prob.width.n();  }
+inline int GenEnsProdConfInfo::get_n_eas()       const { return eas_prob.width.n();    }
 inline int GenEnsProdConfInfo::get_compression_level() { return conf.nc_compression(); }
 
 ////////////////////////////////////////////////////////////////////////

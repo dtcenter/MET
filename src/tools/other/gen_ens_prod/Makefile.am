@@ -12,7 +12,8 @@ include ${top_srcdir}/Make-include
 
 bin_PROGRAMS    = gen_ens_prod
 gen_ens_prod_SOURCES = gen_ens_prod.cc \
-	gen_ens_prod_conf_info.cc
+	gen_ens_prod_conf_info.cc \
+	compute_eas.cc
 gen_ens_prod_CPPFLAGS = ${MET_CPPFLAGS}
 gen_ens_prod_LDFLAGS = ${MET_LDFLAGS}
 gen_ens_prod_LDADD = -lvx_stat_out \
@@ -47,4 +48,5 @@ gen_ens_prod_LDADD = -lvx_stat_out \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = gen_ens_prod.h \
+	compute_eas.h \
 	gen_ens_prod_conf_info.h
