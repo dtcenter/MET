@@ -39,7 +39,7 @@
 # PROJ (with dependency SQLITE >= 3.11), GSL, BUFRLIB, 
 # GRIB2C (with dependencies Z, PNG, AEC, JASPER, JPEG), HDF5, NETCDF (C and CXX), 
 # HDF4 (optional for MODIS-Regrid and lidar2nc), and HDFEOS (optional for
-# MODIS-Regrid and lidar2nc)..
+# MODIS-Regrid and lidar2nc).
 #
 # If these libraries have already been installed and don't need to be
 # reinstalled or if you are compiling on a machine that uses modulefiles
