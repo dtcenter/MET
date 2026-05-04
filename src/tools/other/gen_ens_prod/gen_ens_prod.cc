@@ -22,6 +22,7 @@
 //   005    10/03/22  Prestopnik     MET #2227 Remove using namespace std and netCDF from header files
 //   006    04/29/24  Halley Gotway  MET #2870 Ignore MISSING keyword.
 //   007    05/07/25  Halley Gotway  MET #3145 Add OpenMP.
+//   008    01/14/26  Halley Gotway  MET #3294 Add EAS probabilities.
 //
 ////////////////////////////////////////////////////////////////////////
 
@@ -40,6 +41,7 @@
 
 #include "main.h"
 #include "gen_ens_prod.h"
+#include "compute_eas.h"
 
 #include "vx_nc_util.h"
 #include "vx_data2d_nc_met.h"
@@ -69,6 +71,8 @@ static void track_counts(const GenEnsProdVarInfo *, const DataPlane &,
 
 static void setup_nc_file();
 static void write_ens_nc(GenEnsProdVarInfo *, int, const DataPlane &,
+                         const DataPlane &, const DataPlane &);
+static void write_eas_nc(GenEnsProdVarInfo *, const DataPlane &,
                          const DataPlane &, const DataPlane &);
 static void write_ens_var_float(GenEnsProdVarInfo *, const float *,
                                 const DataPlane &,
@@ -109,7 +113,7 @@ int met_main(int argc, char *argv[]) {
 
 ////////////////////////////////////////////////////////////////////////
 
-const string get_tool_name() {
+string get_tool_name() {
    return "gen_ens_prod";
 }
 
@@ -159,13 +163,13 @@ static void process_command_line(int argc, char **argv) {
            << "\"-ens\" option.\n\n";
       exit(1);
    }
-   if(out_file.length() == 0) {
+   if(out_file.empty()) {
       mlog << Error << "\n" << method_name
            << "the output file must be set using the "
            << "\"-out\" option.\n\n";
       exit(1);
    }
-   if(config_file.length() == 0) {
+   if(config_file.empty()) {
       mlog << Error << "\n" << method_name
            << "the configuration file must be set using the "
            << "\"-config\" option.\n\n";
@@ -202,12 +206,12 @@ static void process_command_line(int argc, char **argv) {
    // Process the configuration
    conf_info.process_config(etype, &ens_files, ctrl_file.nonempty());
 
-   // Allocate arrays to store threshold counts
-   thresh_cnt_na       = new NumArray   [conf_info.get_max_n_cat()];
-   thresh_nbrhd_cnt_na = new NumArray * [conf_info.get_max_n_cat()];
+   // Resize vectors to store threshold counts
+   thresh_cnt_na.resize(conf_info.get_max_n_cat());
+   thresh_nbrhd_cnt_na.resize(conf_info.get_max_n_cat());
 
    for(int i=0; i<conf_info.get_max_n_cat(); i++) {
-      thresh_nbrhd_cnt_na[i] = new NumArray [conf_info.get_n_nbrhd()];
+      thresh_nbrhd_cnt_na[i].resize(conf_info.get_n_nbrhd());
    }
 
    // List the input ensemble files
@@ -276,48 +280,47 @@ static void process_grid(const Grid &fcst_grid) {
 ////////////////////////////////////////////////////////////////////////
 
 static void process_ensemble() {
-   int i_var, i_ens, n_ens_vld, n_ens_inputs;
-   bool need_reset, set_climo_ens_mem_id;
-   DataPlane ens_dp, ctrl_dp;
-   DataPlane cmn_dp, csd_dp;
-   DataPlane emn_dp, esd_dp;
+   DataPlane ens_dp;
+   DataPlane ctrl_dp;
+   DataPlane cmn_dp;
+   DataPlane csd_dp;
+   DataPlane emn_dp;
+   DataPlane esd_dp;
    unixtime max_init_ut = bad_data_ll;
-   VarInfo *var_info;
-   ConcatString cs, ens_file;
 
    // Loop through each of the ensemble fields to be processed
    vector<GenEnsProdVarInfo*>::const_iterator var_it = conf_info.ens_input.begin();
-   for(i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
+   for(int i_var=0; var_it != conf_info.ens_input.end(); var_it++, i_var++) {
 
       // Need to reinitialize counts and sums for each ensemble field
-      need_reset = true;
+      bool need_reset = true;
 
       // When normalizing relative to climatology with MET_ENS_MEMBER_ID set,
       // read climatology separately for each member
-      set_climo_ens_mem_id =
+      bool set_climo_ens_mem_id =
          (conf_info.ens_member_ids.n() > 1) &&
          ((*var_it)->normalize == NormalizeType::ClimoAnom ||
           (*var_it)->normalize == NormalizeType::ClimoStdAnom);
 
       // Print out the normalization flag
-      cs << cs_erase;
+      ConcatString cs;
       if((*var_it)->normalize != NormalizeType::None) {
          cs << " with normalize = "
             << normalizetype_to_string((*var_it)->normalize);
       }
       cs << "\n";
 
-      var_info = (*var_it)->get_var_info();
       mlog << Debug(2) << "\n" << sep_str << "\n\n"
            << "Processing ensemble field: "
            << (*var_it)->raw_magic_str << cs;
 
-      n_ens_inputs = (*var_it)->inputs_n();
-      for(i_ens=n_ens_vld=0; i_ens < n_ens_inputs; i_ens++) {
+      int n_ens_inputs = (*var_it)->inputs_n();
+      int n_ens_vld = 0;
+      for(int i_ens=0; i_ens < n_ens_inputs; i_ens++) {
 
          // Get file and VarInfo to process
-         ens_file = (*var_it)->get_file(i_ens);
-         var_info = (*var_it)->get_var_info(i_ens);
+         ConcatString ens_file((*var_it)->get_file(i_ens));
+         auto var_info = (*var_it)->get_var_info(i_ens);
 
          // Skip bad data files
          if(!ens_file_vld[(*var_it)->get_file_index(i_ens)]) continue;
@@ -494,7 +497,6 @@ static void get_climo_mean_stdev(GenEnsProdVarInfo *ens_info, int i_var,
 static void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
                                DataPlane &emn_dp, DataPlane &esd_dp) {
    VarInfo *var_info;
-   ConcatString ens_file;
    DataPlane ens_dp;
 
    // Check for null pointer
@@ -525,7 +527,7 @@ static void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
    for(int i_ens=0; i_ens<ens_info->inputs_n(); i_ens++) {
 
       // Get file and VarInfo to process
-      ens_file = ens_info->get_file(i_ens);
+      ConcatString ens_file(ens_info->get_file(i_ens));
       var_info = ens_info->get_var_info(i_ens);
 
       // Skip bad data files
@@ -579,7 +581,7 @@ static void get_ens_mean_stdev(GenEnsProdVarInfo *ens_info,
 
    // Read ensemble control member data, if provided
    if(ctrl_file.nonempty()) {
-      VarInfo *var_info = ens_info->get_ctrl(0);
+      var_info = ens_info->get_ctrl(0);
 
       // Error out if missing
       if(!get_data_plane(ctrl_file.c_str(), etype,
@@ -672,7 +674,7 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
       if(nxy == 0) process_grid(mtddf->grid());
 
       // Create the output file, if necessary
-      if(nc_out == (NcFile *) 0) setup_nc_file();
+      if(nc_out == nullptr) setup_nc_file();
 
       // Regrid, if requested and necessary
       if(!(mtddf->grid() == grid)) {
@@ -707,7 +709,6 @@ static bool get_data_plane(const char *infile, GrdFileType ftype,
 ////////////////////////////////////////////////////////////////////////
 
 static void clear_counts() {
-   int i, j;
 
    cnt_na.set_const(0.0, nxy);
    min_na.set_const(bad_data_double, nxy);
@@ -718,12 +719,15 @@ static void clear_counts() {
    stdev_sum_na.set_const(0.0, nxy);
    stdev_ssq_na.set_const(0.0, nxy);
 
-   for(i=0; i<conf_info.get_max_n_cat(); i++) {
+   for(int i=0; i<conf_info.get_max_n_cat(); i++) {
       thresh_cnt_na[i].set_const(0.0, nxy);
-      for(j=0; j<conf_info.get_n_nbrhd(); j++) {
+      for(int j=0; j<conf_info.get_n_nbrhd(); j++) {
          thresh_nbrhd_cnt_na[i][j].set_const(0.0, nxy);
       }
    }
+
+   // Store ensemble data for EAS
+   ens_eas_dp.clear();
 
    return;
 }
@@ -737,7 +741,7 @@ static void track_counts(const GenEnsProdVarInfo *ens_info,
 
    // Ensemble thresholds
    const int n_thr = ens_info->cat_ta.n();
-   SingleThresh *thr_buf = ens_info->cat_ta.buf();
+   const SingleThresh *thr_buf = ens_info->cat_ta.buf();
 
    // Increment counts for each grid point
    for(int i=0; i<nxy; i++) {
@@ -806,6 +810,11 @@ static void track_counts(const GenEnsProdVarInfo *ens_info,
       } // end for i
    } // end if do_nmep
 
+   // Store ensemble data for EAS
+   if(ens_info->nc_info.do_eas || ens_info->nc_info.do_eas_width) {
+      ens_eas_dp.emplace_back(ens_dp);
+   }
+
    return;
 }
 
@@ -844,7 +853,6 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                          const DataPlane &ens_dp,
                          const DataPlane &cmn_dp,
                          const DataPlane &csd_dp) {
-   char type_str[max_str_len];
 
    // Allocate memory for storing ensemble data
    vector<float> ens_mean  (nxy);
@@ -873,7 +881,7 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
          ens_vld[i] = nint(cnt_na[i]);
 
          // Check for too much missing data
-         if((double) (cnt_na[i]/n_ens_vld) < t) {
+         if((cnt_na[i]/n_ens_vld) < t) {
             ens_mean[i]  = bad_data_float;
             ens_stdev[i] = bad_data_float;
             ens_minus[i] = bad_data_float;
@@ -887,12 +895,12 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
             // Compute ensemble summary
             ens_mean[i]  = (float) (sum_na[i]/cnt_na[i]);
             ens_stdev[i] = (float) compute_stdev(stdev_sum_na[i], stdev_ssq_na[i], nint(stdev_cnt_na[i]));
-            ens_minus[i] = (float) ens_mean[i] - ens_stdev[i];
-            ens_plus[i]  = (float) ens_mean[i] + ens_stdev[i];
+            ens_minus[i] =         ens_mean[i] - ens_stdev[i];
+            ens_plus[i]  =         ens_mean[i] + ens_stdev[i];
             ens_min[i]   = (float) min_na[i];
             ens_max[i]   = (float) max_na[i];
             ens_range[i] = (is_eq(max_na[i], min_na[i]) ?
-                            0.0 : (float) max_na[i] - min_na[i]);
+                            0.0 : (float) (max_na[i] - min_na[i]));
          }
       } // end for i
    } // End omp parallel
@@ -968,16 +976,16 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
 
          // Compute the ensemble relative frequency
          for(int j=0; j<cnt_na.n(); j++) {
-            prob_dp.buf()[j] = ((double) (cnt_na[j]/n_ens_vld) < t ?
+            prob_dp.buf()[j] = ((cnt_na[j]/n_ens_vld) < t ?
                                 bad_data_double :
-                                (double) (thresh_cnt_na[i][j]/cnt_na[j]));
+                                (thresh_cnt_na[i][j]/cnt_na[j]));
          }
 
          // Write ensemble relative frequency
          if(ens_info->nc_info.do_freq) {
-            snprintf(type_str, sizeof(type_str), "ENS_FREQ_%s",
-                     ens_info->cat_ta[i].get_abbr_str().contents().c_str());
-            write_ens_data_plane(ens_info, prob_dp, ens_dp, type_str,
+            ConcatString type_str("ENS_FREQ_");
+            type_str << ens_info->cat_ta[i].get_abbr_str().contents().c_str();
+            write_ens_data_plane(ens_info, prob_dp, ens_dp, type_str.c_str(),
                                  "Ensemble Relative Frequency");
          }
 
@@ -994,11 +1002,11 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                                      conf_info.nbrhd_prob.vld_thresh, info));
 
                // Write neighborhood ensemble probability
-               snprintf(type_str, sizeof(type_str), "ENS_NEP_%s_%s%i",
-                        ens_info->cat_ta[i].get_abbr_str().contents().c_str(),
-                        interpmthd_to_string(InterpMthd::Nbrhd).c_str(),
-                        conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j]);
-               write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str,
+               ConcatString type_str("ENS_NEP_");
+               type_str << ens_info->cat_ta[i].get_abbr_str().contents().c_str() << "_"
+                        << interpmthd_to_string(InterpMthd::Nbrhd).c_str()
+                        << conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j];
+               write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str.c_str(),
                                     "Neighborhood Ensemble Probability");
             } // end for k
          } // end if do_nep
@@ -1022,9 +1030,9 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
 
             // Compute the neighborhood maximum ensemble probability
             for(int k=0; k<cnt_na.n(); k++) {
-               prob_dp.buf()[k] = ((double) (cnt_na[k]/n_ens_vld) < t ?
+               prob_dp.buf()[k] = ((cnt_na[k]/n_ens_vld) < t ?
                                    bad_data_double :
-                                   (double) (thresh_nbrhd_cnt_na[i][j][k]/cnt_na[k]));
+                                   (thresh_nbrhd_cnt_na[i][j][k]/cnt_na[k]));
             }
 
             // Loop through the requested NMEP smoothers
@@ -1038,18 +1046,23 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
                                      conf_info.nmep_smooth.gaussian));
 
                // Write neighborhood maximum ensemble probability
-               snprintf(type_str, sizeof(type_str), "ENS_NMEP_%s_%s%i_%s%i",
-                        ens_info->cat_ta[i].get_abbr_str().contents().c_str(),
-                        interpmthd_to_string(InterpMthd::Nbrhd).c_str(),
-                        conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j],
-                        conf_info.nmep_smooth.method[k].c_str(),
-                        conf_info.nmep_smooth.width[k]*conf_info.nmep_smooth.width[k]);
-               write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str,
+               ConcatString type_str("ENS_NMEP_");
+               type_str << ens_info->cat_ta[i].get_abbr_str().contents().c_str() << "_"
+                        << interpmthd_to_string(InterpMthd::Nbrhd).c_str()
+                        << conf_info.nbrhd_prob.width[j]*conf_info.nbrhd_prob.width[j] << "_"
+                        << conf_info.nmep_smooth.method[k].c_str()
+                        << conf_info.nmep_smooth.width[k]*conf_info.nmep_smooth.width[k];
+               write_ens_data_plane(ens_info, nbrhd_dp, ens_dp, type_str.c_str(),
                                     "Neighborhood Maximum Ensemble Probability");
             } // end for k
          } // end for j
       } // end for i
-   } // end if do_nep
+   } // end if do_nmep
+
+   // Compute and store EAS fractional coverage fields
+   if(ens_info->nc_info.do_eas || ens_info->nc_info.do_eas_width) {
+      write_eas_nc(ens_info, ens_dp, cmn_dp, csd_dp);
+   }
 
    // Write the climo mean field, if requested
    if(ens_info->nc_info.do_climo && !cmn_dp.is_empty()) {
@@ -1074,30 +1087,86 @@ static void write_ens_nc(GenEnsProdVarInfo *ens_info, int n_ens_vld,
       ens_info->cat_ta.get_simple_nodes(simp);
 
       // Process all CDP thresholds except 0 and 100
-      for(vector<Simple_Node>::iterator it = simp.begin();
-          it != simp.end(); it++) {
-         if(it->ptype() == perc_thresh_fcst_climo_dist &&
-            !is_eq(it->pvalue(), 0.0) &&
-            !is_eq(it->pvalue(), 100.0)) {
-            snprintf(type_str, sizeof(type_str), "CLIMO_FCDP%i",
-                     nint(it->pvalue()));
-            cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
-            write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
+      for(const auto &n : simp) {
+         if(n.ptype() == perc_thresh_fcst_climo_dist &&
+            !is_eq(n.pvalue(), 0.0) &&
+            !is_eq(n.pvalue(), 100.0)) {
+            ConcatString type_str("CLIMO_FCDP");
+            type_str << nint(n.pvalue());
+            cdp_dp = normal_cdf_inv(n.pvalue()/100.0, cmn_dp, csd_dp);
+            write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str.c_str(),
                                  "Forecast climatology distribution percentile");
          }
-         else if(it->ptype() == perc_thresh_obs_climo_dist &&
-                 !is_eq(it->pvalue(), 0.0) &&
-                 !is_eq(it->pvalue(), 100.0)) {
-            snprintf(type_str, sizeof(type_str), "CLIMO_OCDP%i",
-                     nint(it->pvalue()));
-            cdp_dp = normal_cdf_inv(it->pvalue()/100.0, cmn_dp, csd_dp);
-            write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str,
+         else if(n.ptype() == perc_thresh_obs_climo_dist &&
+                 !is_eq(n.pvalue(), 0.0) &&
+                 !is_eq(n.pvalue(), 100.0)) {
+            ConcatString type_str("CLIMO_OCDP");
+            type_str << nint(n.pvalue());
+            cdp_dp = normal_cdf_inv(n.pvalue()/100.0, cmn_dp, csd_dp);
+            write_ens_data_plane(ens_info, cdp_dp, ens_dp, type_str.c_str(),
                                  "Observation climatology distribution percentile");
          }
-      } // end for it
+      } // end for
    }
 
    return;
+}
+
+////////////////////////////////////////////////////////////////////////
+
+static void write_eas_nc(GenEnsProdVarInfo *ens_info,
+                         const DataPlane &ens_dp,
+                         const DataPlane &cmn_dp,
+                         const DataPlane &csd_dp) {
+
+   // Number of categorical thresholds
+   const int n_thr = ens_info->cat_ta.n();
+
+   // Loop through each categorical threshold
+   for(int i_thr=0; i_thr<n_thr; i_thr++) {
+
+      mlog << Debug(3) << "Computing ensemble agreement scale field "
+           << "using the " << ens_info->cat_ta[i_thr].get_str()
+           << " threshold and " << conf_info.get_n_eas()
+           << " candidate widths (" << write_css(conf_info.eas_prob.width)
+           << ").\n";
+
+      // Apply threshold to convert to bitmap
+      vector<DataPlane> ens_thresh_dp;
+      for(const auto &x : ens_eas_dp) {
+         DataPlane dp(x);
+         dp.threshold(ens_info->cat_ta[i_thr], &cmn_dp, &csd_dp);
+         ens_thresh_dp.emplace_back(dp);
+      }
+
+      // Compute Gaussian weights
+      if(conf_info.eas_prob.gaussian.weights.empty()) {
+         conf_info.eas_prob.gaussian.compute();
+      }
+
+      // Compute EAS probabilities
+      DataPlane eas_prob_dp;
+      DataPlane eas_width_dp;
+      compute_eas(ens_thresh_dp, conf_info.eas_prob, grid,
+                  eas_prob_dp, eas_width_dp);
+
+      ConcatString type_cs;
+      ConcatString thr_cs(ens_info->cat_ta[i_thr].get_abbr_str());
+
+      // Write EAS probabilities
+      if(ens_info->nc_info.do_eas) {
+         type_cs << cs_erase << "ENS_EAS_" << thr_cs;
+         write_ens_data_plane(ens_info, eas_prob_dp, ens_dp, type_cs.c_str(),
+                              "Ensemble Agreement Scale Probability");
+      }
+
+      // Write EAS widths
+      if(ens_info->nc_info.do_eas_width) {
+         type_cs << cs_erase << "ENS_EAS_WIDTH_" << thr_cs;
+         write_ens_data_plane(ens_info, eas_width_dp, ens_dp, type_cs.c_str(),
+                              "Ensemble Agreement Scale Width");
+      }
+   } // end for i_thr
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1107,16 +1176,15 @@ static void write_ens_var_float(GenEnsProdVarInfo *ens_info,
                                 const DataPlane &dp,
                                 const char *type_str,
                                 const char *long_name_str) {
-   NcVar ens_var;
-   ConcatString ens_var_name, var_str, name_str, cs;
 
    // Append nc_var_str config file entry, if specified
-   cs = ens_info->nc_var_str;
-   if(cs.length() > 0) var_str << "_" << cs;
+   ConcatString var_str;
+   ConcatString cs(ens_info->nc_var_str);
+   if(!cs.empty()) var_str << "_" << cs;
 
    // Construct the variable name
-   ens_var_name << cs_erase
-                << ens_info->get_var_info()->name_attr() << "_"
+   ConcatString ens_var_name;
+   ens_var_name << ens_info->get_var_info()->name_attr() << "_"
                 << ens_info->get_var_info()->level_attr()
                 << var_str << "_" << type_str;
 
@@ -1126,13 +1194,15 @@ static void write_ens_var_float(GenEnsProdVarInfo *ens_info,
    // Otherwise, add to the list of previously defined variables
    nc_ens_var_sa.add(ens_var_name);
 
-   ens_var = add_var(nc_out, (string)ens_var_name, ncFloat, lat_dim, lon_dim);
+   auto ens_var = add_var(nc_out, (string) ens_var_name,
+                          ncFloat, lat_dim, lon_dim);
 
    //
    // Construct the variable name attribute
    // For the ensemble mean, just use the variable name.
    // For all other fields, append the field type.
    //
+   ConcatString name_str;
    if(strcmp(type_str, "ENS_MEAN") == 0) {
       name_str << cs_erase
                << ens_info->get_var_info()->name_attr();
@@ -1165,16 +1235,15 @@ static void write_ens_var_int(GenEnsProdVarInfo *ens_info,
                               const DataPlane &dp,
                               const char *type_str,
                               const char *long_name_str) {
-   NcVar ens_var;
-   ConcatString ens_var_name, var_str, name_str, cs;
 
    // Append nc_var_str config file entry, if specified
-   cs = ens_info->nc_var_str;
-   if(cs.length() > 0) var_str << "_" << cs;
+   ConcatString var_str;
+   ConcatString cs(ens_info->nc_var_str);
+   if(!cs.empty()) var_str << "_" << cs;
 
    // Construct the variable name
-   ens_var_name << cs_erase
-                << ens_info->get_var_info()->name_attr() << "_"
+   ConcatString ens_var_name;
+   ens_var_name << ens_info->get_var_info()->name_attr() << "_"
                 << ens_info->get_var_info()->level_attr()
                 << var_str << "_" << type_str;
 
@@ -1185,11 +1254,12 @@ static void write_ens_var_int(GenEnsProdVarInfo *ens_info,
    nc_ens_var_sa.add(ens_var_name);
 
    int deflate_level = conf_info.get_compression_level();
-   ens_var = add_var(nc_out, (string)ens_var_name, ncInt, lat_dim, lon_dim, deflate_level);
+   auto ens_var = add_var(nc_out, (string) ens_var_name,
+                          ncInt, lat_dim, lon_dim, deflate_level);
 
    // Construct the variable name attribute
-   name_str << cs_erase
-            << ens_info->get_var_info()->name_attr() << "_"
+   ConcatString name_str;
+   name_str << ens_info->get_var_info()->name_attr() << "_"
             << type_str;
 
    // Add the variable attributes
@@ -1235,7 +1305,7 @@ static void add_var_att_local(GenEnsProdVarInfo *ens_info,
                               const char *name_str,
                               const char *long_name_str) {
    ConcatString att_str;
-   VarInfo *info = ens_info->get_var_info();
+   const VarInfo *info = ens_info->get_var_info();
 
    // Construct the long name
    att_str << cs_erase
@@ -1261,7 +1331,6 @@ static void add_var_att_local(GenEnsProdVarInfo *ens_info,
 ////////////////////////////////////////////////////////////////////////
 
 static void clean_up() {
-   int i, j;
 
    mlog << Debug(2) << "\n" << sep_str << "\n\n";
 
@@ -1271,25 +1340,10 @@ static void clean_up() {
    // Close the output NetCDF file
    if(nc_out) { delete nc_out; nc_out = (NcFile *) nullptr; }
 
-   // Deallocate threshold count arrays
-   if(thresh_cnt_na) {
-      for(i=0; i<conf_info.get_max_n_cat(); i++) {
-         thresh_cnt_na[i].clear();
-      }
-      delete [] thresh_cnt_na;
-      thresh_cnt_na = (NumArray *) nullptr;
-   }
-   if(thresh_nbrhd_cnt_na) {
-      for(i=0; i<conf_info.get_max_n_cat(); i++) {
-         for(j=0; j<conf_info.get_n_nbrhd(); j++) {
-            thresh_nbrhd_cnt_na[i][j].clear();
-         }
-         delete [] thresh_nbrhd_cnt_na[i];
-         thresh_nbrhd_cnt_na[i] = (NumArray *) nullptr;
-      }
-      delete [] thresh_nbrhd_cnt_na;
-      thresh_nbrhd_cnt_na = (NumArray **) nullptr;
-   }
+   // Clear the threshold count arrays
+   thresh_cnt_na.clear();
+   thresh_nbrhd_cnt_na.clear();
+   ens_eas_dp.clear();
 
    return;
 }

@@ -256,7 +256,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
          mlog << Error << "\nfractional_coverage() -> "
            << "forecast climatology mean dimension ("
            << fcmn->nx() << ", " << fcmn->ny()
-           << ") does not match the data dimenion ("
+           << ") does not match the data dimension ("
            << dp.nx() << ", " << dp.ny() << ")!\n\n";
          exit(1);
       }
@@ -264,7 +264,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
          mlog << Error << "\nfractional_coverage() -> "
            << "forecast climatology standard deviation dimension ("
            << fcsd->nx() << ", " << fcsd->ny()
-           << ") does not match the data dimenion ("
+           << ") does not match the data dimension ("
            << dp.nx() << ", " << dp.ny() << ")!\n\n";
          exit(1);
       }
@@ -272,7 +272,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
          mlog << Error << "\nfractional_coverage() -> "
            << "observation climatology mean dimension ("
            << ocmn->nx() << ", " << ocmn->ny()
-           << ") does not match the data dimenion ("
+           << ") does not match the data dimension ("
            << dp.nx() << ", " << dp.ny() << ")!\n\n";
          exit(1);
       }
@@ -280,7 +280,7 @@ void fractional_coverage(const DataPlane &dp, DataPlane &frac_dp,
          mlog << Error << "\nfractional_coverage() -> "
            << "observation climatology standard deviation dimension ("
            << ocsd->nx() << ", " << ocsd->ny()
-           << ") does not match the data dimenion ("
+           << ") does not match the data dimension ("
            << dp.nx() << ", " << dp.ny() << ")!\n\n";
          exit(1);
       }

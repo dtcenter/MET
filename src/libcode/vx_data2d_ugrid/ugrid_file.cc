@@ -35,9 +35,9 @@ using namespace netCDF;
 
 ////////////////////////////////////////////////////////////////////////
 
-static const char *def_user_config = "UGridConfig_user";
-static const char *def_config_prefix = "UGridConfig_";
-static const char *def_config_prefix2 = "MET_BASE/config/UGridConfig_";
+constexpr char def_user_config[] = "UGridConfig_user";
+constexpr char def_config_prefix[] = "UGridConfig_";
+constexpr char def_config_prefix2[] = "MET_BASE/config/UGridConfig_";
 
 array<string, UG_DIM_COUNT> DIM_KEYS = {
       "dim_face", "dim_node", "dim_edge", "dim_time", "dim_vert"
@@ -50,8 +50,6 @@ array<string, UG_META_VAR_COUNT> COORD_VAR_KEYS = {
 
 static double get_nc_var_att_double(const NcVar *nc_var, const char *att_name,
                                     bool is_required=true);
-
-#define USE_BUFFER  1
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -98,8 +96,6 @@ void UGridFile::init_from_scratch()
   _tDim = (NcDim *)nullptr;
   _latVar = (NcVar *)nullptr;
   _lonVar = (NcVar *)nullptr;
-  metadata_map.clear();
-  max_distance_km = bad_data_double;
 
   // Close any existing file
 
@@ -119,12 +115,12 @@ void UGridFile::close()
 
   if (_ncFile) {
     delete _ncFile;
-    _ncFile = (NcFile *)nullptr;
+    _ncFile = nullptr;
   }
 
   if (_ncMetaFile) {
     delete _ncMetaFile;
-    _ncMetaFile = (NcFile *)nullptr;
+    _ncMetaFile = nullptr;
   }
 
   // Reclaim the dimension pointers
@@ -140,11 +136,29 @@ void UGridFile::close()
   // Reclaim the variable pointers
 
   if (Var) {
+    for (int j = 0; j < Nvars; ++j) {
+      if (Var[j].var) { delete Var[j].var; Var[j].var = nullptr; }
+      if (Var[j].Dims) { delete[] Var[j].Dims; Var[j].Dims = nullptr; }
+    }
     delete [] Var;
     Var = (NcVarInfo *)nullptr;
   }
 
   Nvars = 0;
+
+  // Delete MetaVar Dims arrays
+  for (int j = 0; j < UG_META_VAR_COUNT; ++j) {
+    if (MetaVar[j].var) { delete MetaVar[j].var; MetaVar[j].var = nullptr; }
+    if (MetaVar[j].Dims) { delete[] MetaVar[j].Dims; MetaVar[j].Dims = nullptr; }
+  }
+
+  // Clear other members
+  _numDims = 0;
+  _dimNames.clear();
+  metadata_map.clear();
+  metadata_names.clear();
+  z_var_name.clear();
+  max_distance_km = bad_data_double;
 
   // Reset the time values
 
@@ -163,18 +177,29 @@ void UGridFile::close()
 
 
 ////////////////////////////////////////////////////////////////////////
+// Helper: Assign dimension from metadata
+
+void UGridFile::assign_dim_from_metadata(netCDF::NcFile* ncFile, netCDF::NcDim*& dim_ptr,
+                                         const std::string& key, const StringArray& dim_names) {
+  std::string meta_name = find_metadata_name(key, dim_names);
+  if (!meta_name.empty()) {
+    NcDim dim = get_nc_dim(ncFile, meta_name);
+    dim_ptr = new NcDim(dim);
+  }
+  else {
+    mlog << Debug(7) << "UGridFile::assign_dim_from_metadata() "
+         << "dimension for " << key << " does not exist\n";
+  }
+}
+
+////////////////////////////////////////////////////////////////////////
 
 
 bool UGridFile::open(const char * filepath)
 {
-  const char *method_name = "UGridFile::open() -> ";
 
   // Close any open files and clear out the associated members
   close();
-  if (_ncFile) {
-    delete _ncFile;
-    _ncFile = (NcFile *) nullptr;
-  }
 
   // Open the file
   _ncFile = open_ncfile(filepath);
@@ -205,63 +230,38 @@ bool UGridFile::open_metadata(const char * filepath)
   }
 
   NcDim dim;
-  string meta_name;
-  string time_dim_name;
-  string vert_dim_name;
   StringArray dim_names;
-  StringArray meta_names;
-
   get_dim_names(_ncMetaFile, &dim_names);
 
   // Face (cell) dimension
-  meta_name = find_metadata_name(DIM_KEYS[0], dim_names);
-  if (0 < meta_name.length()) {
-    dim = get_nc_dim(_ncMetaFile, meta_name.c_str());
-    face_count = get_dim_size(&dim);
-    _faceDim = new NcDim(dim);
-    NcDim face_dim = get_nc_dim(_ncFile, meta_name.c_str());
-    int data_face_count = get_dim_size(&face_dim);
-    if (face_count != data_face_count) {
-      mlog << Error << "\n" << method_name
-           << meta_name << " dimension is different: data file = "
-           << data_face_count << ", coordinates file = " << face_count << "\n\n";
-      exit(1);
+  assign_dim_from_metadata(_ncFile, _faceDim, DIM_KEYS[0], dim_names);
+  if (IS_VALID_NC_P(_faceDim)) {
+    string meta_name = find_metadata_name(DIM_KEYS[0], dim_names);
+    if (!meta_name.empty()) {
+      face_count = get_dim_size(_faceDim);
+      NcDim face_dim = get_nc_dim(_ncFile, meta_name);
+      int data_face_count = get_dim_size(&face_dim);
+      if (face_count != data_face_count) {
+        mlog << Error << "\n" << method_name
+             << meta_name << " dimension is different: data file = "
+             << data_face_count << ", coordinates file = " << face_count << "\n\n";
+        exit(1);
+      }
     }
   }
 
-  // Node (vertex) dimension
-  meta_name = find_metadata_name(DIM_KEYS[1], dim_names);
-  if (0 < meta_name.length()) {
-    dim = get_nc_dim(_ncMetaFile, meta_name.c_str());
-    _nodeDim = new NcDim(dim);
-  }
-
-  // Edge dimension
-  meta_name = find_metadata_name(DIM_KEYS[2], dim_names);
-  if (0 < meta_name.length()) {
-    dim = get_nc_dim(_ncMetaFile, meta_name.c_str());
-    _edgeDim = new NcDim(dim);
-  }
-
-  // Time dimension
-  time_dim_name = find_metadata_name(DIM_KEYS[3], dim_names);
-  if (0 < time_dim_name.length()) {
-    dim = get_nc_dim(_ncMetaFile, time_dim_name.c_str());
-    _tDim = new NcDim(dim);
-  }
-
-  // Vertical dimension
-  vert_dim_name = find_metadata_name(DIM_KEYS[4], dim_names);
-  if (0 < vert_dim_name.length()) {
-    dim = get_nc_dim(_ncMetaFile, vert_dim_name.c_str());
-    _virtDim = new NcDim(dim);
-  }
+  assign_dim_from_metadata(_ncFile, _nodeDim, DIM_KEYS[1], dim_names);  // Node (vertex) dimension
+  assign_dim_from_metadata(_ncFile, _edgeDim, DIM_KEYS[2], dim_names);  // Edge dimension
+  assign_dim_from_metadata(_ncFile, _tDim, DIM_KEYS[3], dim_names);     // Time dimension
+  assign_dim_from_metadata(_ncFile, _virtDim, DIM_KEYS[4], dim_names);  // Vertical dimension
 
   int max_dim_count = 0;
   StringArray var_names;
   ConcatString att_value;
-  NcVar *z_var = (NcVar *)nullptr;
-  NcVar *valid_time_var = (NcVar *)nullptr;
+  auto z_var = (NcVar *)nullptr;
+  auto valid_time_var = (NcVar *)nullptr;
+  string time_dim_name = find_metadata_name(DIM_KEYS[3], dim_names);
+  string vert_dim_name = find_metadata_name(DIM_KEYS[4], dim_names);
 
   StringArray time_names = get_metadata_names(COORD_VAR_KEYS[0]);
   StringArray lat_names = get_metadata_names(COORD_VAR_KEYS[1]);
@@ -274,12 +274,15 @@ bool UGridFile::open_metadata(const char * filepath)
     }
     else if (lat_names.has(Var[j].name)) _latVar = Var[j].var;
     else if (lon_names.has(Var[j].name)) _lonVar = Var[j].var;
-    else if (z_names.has(Var[j].name)) z_var = Var[j].var;
+    else if (z_names.has(Var[j].name)) {
+      z_var = Var[j].var;
+      z_var_name = Var[j].name;
+    }
   }
 
   get_var_names(_ncMetaFile, &var_names);
   for (int j=0; j<COORD_VAR_KEYS.size(); j++) {
-    meta_name = find_metadata_name(COORD_VAR_KEYS[j], var_names);
+    string meta_name = find_metadata_name(COORD_VAR_KEYS[j], var_names);
     if (0 < meta_name.length()) {
       NcVar v = get_var(_ncMetaFile, meta_name.c_str());
 
@@ -333,7 +336,7 @@ bool UGridFile::open_metadata(const char * filepath)
     // Parse the units for the time variable.
     ut = sec_per_unit = 0;
     if (get_var_units(valid_time_var, units) && (time_dim_count < 2)) {
-      if (units.length() == 0) {
+      if (units.empty()) {
          mlog << Warning << "\n" << method_name
               << "the \"time\" variable must contain a \"units\" attribute. "
               << "Using valid time of 0\n\n";
@@ -347,7 +350,7 @@ bool UGridFile::open_metadata(const char * filepath)
 
     // Determine the number of times present.
     int n_times = IS_VALID_NC_P(_tDim) ? get_dim_size(_tDim)
-                                       : (int) get_data_size(valid_time_var);
+                                       : get_data_size(valid_time_var);
     int tim_buf_size = n_times;
     vector<double> time_values(tim_buf_size);
     if(2 == time_dim_count) {
@@ -414,13 +417,13 @@ bool UGridFile::open_metadata(const char * filepath)
   for (int j=0; j<Nvars; ++j) {
 
     int dim_count = Var[j].Ndims;
-    NcVar *v = Var[j].var;
+    const NcVar *v = Var[j].var;
 
     dimNames.clear();
     get_dim_names(v, &dimNames);
 
     for (int k=0; k<dim_count; ++k)  {
-      NcDim *dim_p = Var[j].Dims[k];
+      const NcDim *dim_p = Var[j].Dims[k];
       const ConcatString dim_name = dimNames[k];
       if ((nullptr != dim_p && dim_p == _tDim) || dim_name == time_dim_name) {
          Var[j].t_slot = k;
@@ -432,7 +435,7 @@ bool UGridFile::open_metadata(const char * filepath)
   }   //  for j
 
   // Find the vertical level variable from dimension name if not found
-  if (IS_INVALID_NC_P(z_var) && (0 < vert_dim_name.length())) {
+  if (IS_INVALID_NC_P(z_var) && (!vert_dim_name.empty())) {
     NcVarInfo *info = find_var_by_dim_name(vert_dim_name.c_str());
     if (info) z_var = info->var;
   }
@@ -440,7 +443,7 @@ bool UGridFile::open_metadata(const char * filepath)
   // Pull out the vertical levels
   if (IS_VALID_NC_P(z_var)) {
 
-    int z_count = (int) get_data_size(z_var);
+    int z_count = get_data_size(z_var);
     vector<double> z_values(z_count);
 
     if( get_nc_data(z_var, z_values.data()) ) {
@@ -482,7 +485,12 @@ void UGridFile::dump(ostream & out, int depth) const
 
   out << prefix << "Init Time = ";
 
-  int month, day, year, hour, minute, second;
+  int month;
+  int day;
+  int year;
+  int hour;
+  int minute;
+  int second;
 
   unix_to_mdyhms(InitTime, month, day, year, hour, minute, second);
 
@@ -541,7 +549,7 @@ void UGridFile::dump(ostream & out, int depth) const
 
 ////////////////////////////////////////////////////////////////////////
 
-std::string UGridFile::find_metadata_name(std::string &key, StringArray &available_names) {
+std::string UGridFile::find_metadata_name(const std::string &key, const StringArray &available_names) {
   string meta_name = "";
   StringArray meta_names = get_metadata_names(key);
 
@@ -578,9 +586,6 @@ NcVarInfo* UGridFile::find_var_by_dim_name(const char *dim_name) const
     //StringArray dimNames;
     for (int i=0; i<Nvars; i++) {
       if (1 == Var[i].Ndims) {
-        //dimNames.clear();
-        //get_dim_names(Var[j].var, &dimNames);
-        //if (dimNames[i] == dim_name) {
         NcDim dim = get_nc_dim(Var[i].var, 0);
         if (GET_NC_NAME(dim) == dim_name) {
           var = &Var[i];
@@ -603,7 +608,7 @@ bool UGridFile::find_nc_vinfo_list(const char *var_name,
   for (int i = 0; i < Nvars; i++) {
     if (Var[i].name.startswith(var_name)) vinfo_list.emplace_back(&Var[i]);
   }
-  return vinfo_list.size() > 0;
+  return !vinfo_list.empty();
 }
 
 
@@ -622,7 +627,6 @@ double UGridFile::getData(NcVar * var, const LongArray & a) const
   double fill_value;
   get_var_fill_value(var, fill_value);
 
-  //status = get_nc_data(var, &d, a);
   status = get_nc_data(var, a);
 
   if (!status)
@@ -800,7 +804,7 @@ bool UGridFile::getData(const char *var_name,
 ////////////////////////////////////////////////////////////////////////
 
 
-StringArray UGridFile::get_metadata_names(std::string &key) {
+StringArray UGridFile::get_metadata_names(const std::string &key) {
   StringArray empty;
   auto search = metadata_map.find(key);
   return search == metadata_map.end() ? empty : metadata_map[key];
@@ -862,7 +866,7 @@ int UGridFile::lead_time() const
 ////////////////////////////////////////////////////////////////////////
 
 
-void UGridFile::read_config(ConcatString config_filename) {
+void UGridFile::read_config(const ConcatString &config_filename) {
   const char *method_name = "UGridFile::read_config() ";
   double conf_value;
   ConcatString conf_value_s;
@@ -876,11 +880,11 @@ void UGridFile::read_config(ConcatString config_filename) {
   conf_value = parse_conf_ugrid_max_distance_km(&conf);
   if (!is_eq(conf_value, bad_data_double)) max_distance_km = conf_value;
   conf_value_s = parse_conf_ugrid_coordinates_file(&conf);
-  if (0 < conf_value_s.length()) coordinate_file = conf_value_s;
+  if (!conf_value_s.empty()) coordinate_file = conf_value_s;
   parse_add_conf_ugrid_metadata_map(&conf, &metadata_map);
 
   metadata_names.clear();
-  for (std::map<ConcatString,StringArray>::iterator it=metadata_map.begin();
+  for (auto it=metadata_map.begin();
        it!=metadata_map.end(); ++it) {
     metadata_names.add(it->second);
   }
@@ -925,17 +929,15 @@ void UGridFile::read_netcdf_grid()
     exit(1);
   }
 
-  if (get_var_units(_latVar, units_value)) {
-    if (units_value == "rad" || units_value == "radian") {
-      mlog << Debug(6) << method_name << "convert  " << units_value << " to degree for lat\n";
-      for (int idx=0; idx<face_count; idx++) _lat[idx] /= rad_per_deg;
-    }
+  if (get_var_units(_latVar, units_value) &&
+      (units_value == "rad" || units_value == "radian")) {
+    mlog << Debug(6) << method_name << "convert  " << units_value << " to degree for lat\n";
+    for (int idx=0; idx<face_count; idx++) _lat[idx] /= rad_per_deg;
   }
-  if (get_var_units(_lonVar, units_value)) {
-    if (units_value == "rad" || units_value == "radian") {
-      mlog << Debug(6) << method_name << "  convert " << units_value << " to degree for lon\n";
-      for (int idx=0; idx<face_count; idx++) _lon[idx] /= rad_per_deg;
-    }
+  if (get_var_units(_lonVar, units_value) &&
+      (units_value == "rad" || units_value == "radian")) {
+    mlog << Debug(6) << method_name << "  convert " << units_value << " to degree for lon\n";
+    for (int idx=0; idx<face_count; idx++) _lon[idx] /= rad_per_deg;
   }
 
   // Convert longitude from degrees east to west
@@ -954,12 +956,12 @@ void UGridFile::read_netcdf_grid()
 
 ////////////////////////////////////////////////////////////////////////
 
-void UGridFile::set_dataset(ConcatString _dataset_name) {
+void UGridFile::set_dataset(const ConcatString &_dataset_name) {
 
   ConcatString ugrid_config_name;
   const string method_name = "UGridFile::set_dataset() ";
 
-  if (0 == _dataset_name.length()) {
+  if (_dataset_name.empty()) {
     mlog << Error << "\n" << method_name
          << "The \"" << conf_key_ugrid_dataset
          << "\" is not defined at the configuration file.\n\n";
@@ -993,7 +995,7 @@ void UGridFile::set_dataset(ConcatString _dataset_name) {
 
 ////////////////////////////////////////////////////////////////////////
 
-void UGridFile::set_map_config_file(ConcatString filename) {
+void UGridFile::set_map_config_file(const ConcatString &filename) {
 
   if (file_exists(filename.c_str())) {
     read_config(filename.c_str());

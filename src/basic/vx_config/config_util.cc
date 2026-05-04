@@ -34,21 +34,24 @@ static MetConfig conf_const(replace_path(config_const_filename).c_str());
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
-GaussianInfo::GaussianInfo()
-: weights(nullptr)
-{
-   clear();
+GaussianInfo &GaussianInfo::operator=(const GaussianInfo &a) noexcept {
+   if(this != &a) {
+      weight_sum = a.weight_sum;
+      weights = a.weights;
+      max_r = a.max_r;
+      weight_cnt = a.weight_cnt;
+      radius = a.radius;
+      dx = a.dx; 
+      trunc_factor = a.trunc_factor;
+   }
+   return *this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 void GaussianInfo::clear() {
    weight_sum = 0.0;
-   if (weights) {
-      delete weights;
-      weights = (double *)nullptr;
-   }
+   weights.clear();
    max_r = weight_cnt = 0;
    radius = dx = bad_data_double;
    trunc_factor = default_trunc_factor;
@@ -69,8 +72,6 @@ int GaussianInfo::compute_max_r() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void GaussianInfo::compute() {
-   double weight;
-   double distance_sq;
    const double g_sigma = radius / dx;
    const double g_sigma_sq = g_sigma * g_sigma;
    const double f_sigma_exp_divider = (2 * g_sigma_sq);
@@ -78,19 +79,19 @@ void GaussianInfo::compute() {
    const double max_r_sq = pow((g_sigma * trunc_factor), 2);
 
    validate();
-   if (0 < max_r && weights) delete weights;
+   if(max_r > 0) weights.clear();
    compute_max_r();
 
    int index = 0;
    int g_nx = max_r * 2 + 1;
    weight_cnt = 0;
    weight_sum = 0.0;
-   weights = new double[g_nx*g_nx];
+   weights.resize(g_nx*g_nx, 0.0);
    for(int idx_x=-max_r; idx_x<=max_r; idx_x++) {
       for(int idx_y=-max_r; idx_y<=max_r; idx_y++) {
-         weight = 0.0;
-         distance_sq = (double)idx_x*idx_x + idx_y*idx_y;
-         if (distance_sq <= max_r_sq) {
+         double weight = 0.0;
+         double distance_sq = (double) idx_x*idx_x + idx_y*idx_y;
+         if(distance_sq <= max_r_sq) {
             weight_cnt++;
             weight = exp(-distance_sq / f_sigma_exp_divider) / f_sigma_divider;
             weight_sum += weight;
@@ -133,12 +134,6 @@ void RegridInfo::clear() {
    convert_fx.clear();
    censor_thresh.clear();
    censor_val.clear();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
-RegridInfo::RegridInfo() {
-   clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -249,7 +244,7 @@ void RegridInfo::validate_point() {
 ///////////////////////////////////////////////////////////////////////////////
 
 RegridInfo &RegridInfo::operator=(const RegridInfo &a) noexcept {
-   if ( this != &a ) {
+   if(this != &a) {
       enable = a.enable;
       field = a.field;
       vld_thresh = a.vld_thresh;
@@ -763,7 +758,7 @@ bool MaskLatLon::operator==(const MaskLatLon &v) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 MaskLatLon &MaskLatLon::operator=(const MaskLatLon &a) noexcept {
-   if ( this != &a ) {
+   if(this != &a) {
       name = a.name;
       lat_thresh = a.lat_thresh;
       lon_thresh = a.lon_thresh;
@@ -1345,7 +1340,7 @@ map<ConcatString,StringArray> parse_conf_string_map(
 ///////////////////////////////////////////////////////////////////////////////
 
 TimeSummaryInfo &TimeSummaryInfo::operator=(const TimeSummaryInfo &a) noexcept {
-   if ( this != &a ) {
+   if(this != &a) {
       flag = a.flag;
       raw_data = a.raw_data;
       beg = a.beg;
@@ -1365,8 +1360,26 @@ TimeSummaryInfo &TimeSummaryInfo::operator=(const TimeSummaryInfo &a) noexcept {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void TimeSummaryInfo::clear() {
+   flag = false;
+   raw_data = false;
+   beg = bad_data_int;
+   end = bad_data_int;
+   step = bad_data_int;
+   width_beg = bad_data_int;
+   width_end = bad_data_int;
+   width = bad_data_int;
+   grib_code.clear();
+   obs_var.clear();
+   type.clear();
+   vld_thresh = bad_data_double;
+   vld_freq = bad_data_int;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 BootInfo & BootInfo::operator=(const BootInfo &a) noexcept {
-   if ( this != &a ) {
+   if(this != &a) {
      interval = a.interval;
      rep_prop = a.rep_prop;
      n_rep = a.n_rep;
@@ -1737,7 +1750,7 @@ bool InterpInfo::operator==(const InterpInfo &v) const {
 ///////////////////////////////////////////////////////////////////////////////
 
 InterpInfo & InterpInfo::operator=(const InterpInfo &a) noexcept {
-   if ( this != &a ) {
+   if(this != &a) {
       field = a.field;
       vld_thresh = a.vld_thresh;
       n_interp = a.n_interp;
@@ -1907,12 +1920,6 @@ void ClimoCDFInfo::clear() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-ClimoCDFInfo::ClimoCDFInfo() {
-   clear();
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 void ClimoCDFInfo::set_cdf_ta(int n_bin, bool &center) {
 
    // Must be greater than 0
@@ -1972,7 +1979,7 @@ void ClimoCDFInfo::set_cdf_ta(int n_bin, bool &center) {
 ///////////////////////////////////////////////////////////////////////////////
 
 ClimoCDFInfo &ClimoCDFInfo::operator=(const ClimoCDFInfo &a) noexcept {
-   if ( this != &a ) {
+   if(this != &a) {
       flag = a.flag;
       n_bin = a.n_bin;
       cdf_ta = a.cdf_ta;
@@ -2065,7 +2072,6 @@ ClimoCDFInfo parse_conf_climo_cdf(Dictionary *dict) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-
 void NbrhdInfo::clear() {
    field = FieldType::None;
    vld_thresh = bad_data_double;
@@ -2077,7 +2083,7 @@ void NbrhdInfo::clear() {
 ///////////////////////////////////////////////////////////////////////////////
 
 NbrhdInfo &NbrhdInfo::operator=(const NbrhdInfo &a) noexcept {
-   if ( this != &a ) {
+   if(this != &a) {
       field = a.field;
       vld_thresh = a.vld_thresh;
       width = a.width;
@@ -2086,7 +2092,6 @@ NbrhdInfo &NbrhdInfo::operator=(const NbrhdInfo &a) noexcept {
    }
    return *this;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -2182,6 +2187,121 @@ NbrhdInfo parse_conf_nbrhd(Dictionary *dict, const char *conf_key) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+void EASProbInfo::clear() {
+   width.clear();
+   vld_thresh = bad_data_double;
+   alpha = bad_data_double;
+   gaussian.clear();
+   shape = GridTemplateFactory::GridTemplates::None;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+EASProbInfo &EASProbInfo::operator=(const EASProbInfo &a) noexcept {
+   if(this != &a) {
+      width = a.width;
+      vld_thresh = a.vld_thresh;
+      alpha = a.alpha;
+      gaussian = a.gaussian;
+      shape = a.shape;
+   }
+   return *this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+EASProbInfo parse_conf_eas_prob(Dictionary *dict) {
+   const char *method_name = "parse_conf_eas_prob() -> ";
+   EASProbInfo info;
+
+   if(!dict) {
+      mlog << Error << "\n" << method_name
+           << "empty dictionary!\n\n";
+      exit(1);
+   }
+
+   // Conf: eas_prob
+   Dictionary *eas_dict = dict->lookup_dictionary(conf_key_eas_prob);
+
+   // Conf: vld_thresh
+   info.vld_thresh = eas_dict->lookup_double(conf_key_vld_thresh);
+
+   // Check that the interpolation threshold is between 0 and 1.
+   if(info.vld_thresh < 0.0 || info.vld_thresh > 1.0) {
+      mlog << Error << "\n" << method_name
+           << "The \"" << conf_key_eas_prob << "." << conf_key_vld_thresh
+           << "\" parameter (" << info.vld_thresh
+           << ") must be set between 0 and 1.\n\n";
+      exit(1);
+   }
+
+   // Conf: width
+   info.width = eas_dict->lookup_num_array(conf_key_width);
+
+   // Check for at least two widths
+   if(info.width.n() < 2) {
+      mlog << Error << "\n" << method_name
+           << "At least two \"" << conf_key_eas_prob << "." << conf_key_width
+           << "\" values are required.\n\n";
+      exit(1);
+   }
+
+   // Validate widths
+   for(int i=0; i<info.width.n(); i++) {
+
+      // Must be odd
+      if(info.width[i] < 1 || info.width[i]%2 == 0) {
+         mlog << Error << "\n" << method_name
+              << "The \"" << conf_key_eas_prob << "." << conf_key_width
+              << "\" values must be odd and greater than or equal to 1 ("
+              << info.width[i] << ").\n\n";
+         exit(1);
+      }
+
+      // Must be monotonically increasing
+      if(i > 0 && info.width[i-1] >= info.width[i]) {
+         mlog << Error << "\n" << method_name
+              << "The \"" << conf_key_eas_prob << "." << conf_key_width
+              << "\" values must be monotonically increasing ("
+              << info.width[i-1] << " >= " << info.width[i] << ").\n\n";
+         exit(1);
+      }
+   }
+
+   // Conf: shape
+   int v = eas_dict->lookup_int(conf_key_shape, false);
+   info.shape = (eas_dict->last_lookup_status() ?
+                 int_to_gridtemplate(v) :
+                 GridTemplateFactory::GridTemplates::Square);
+
+   // Conf: alpha
+   info.alpha = eas_dict->lookup_double(conf_key_alpha);
+
+   // Must be between 0 and 1
+   if(info.alpha <= 0 || info.alpha >= 1) {
+      mlog << Error << "\nparse_conf_eas_prob() -> "
+           << "EAS alpha value ("
+           << info.alpha << ") must be greater than 0 "
+           << "and less than 1.\n\n";
+         exit(1);
+   }
+
+   // Conf: gaussian dx
+   double conf_value = eas_dict->lookup_double(conf_key_gaussian_dx, false);
+   info.gaussian.dx = (is_bad_data(conf_value) ?
+                       default_gaussian_dx :
+                       conf_value);
+
+   // Conf: gaussian radius
+   conf_value = eas_dict->lookup_double(conf_key_gaussian_radius, false);
+   info.gaussian.radius = (is_bad_data(conf_value) ?
+                           default_gaussian_radius :
+                           conf_value);
+
+   return info;
+}
+
+///////////////////////////////////////////////////////////////////////////////
 
 void HiRAInfo::clear() {
    flag = false;
@@ -2195,7 +2315,7 @@ void HiRAInfo::clear() {
 ///////////////////////////////////////////////////////////////////////////////
 
 HiRAInfo &HiRAInfo::operator=(const HiRAInfo &a) noexcept {
-   if ( this != &a ) {
+   if(this != &a) {
       flag = a.flag;
       width = a.width;
       vld_thresh = a.vld_thresh;
@@ -2204,13 +2324,6 @@ HiRAInfo &HiRAInfo::operator=(const HiRAInfo &a) noexcept {
       shape = a.shape;
    }
    return *this;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-
-HiRAInfo::HiRAInfo() {
-   clear();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2716,7 +2829,7 @@ void PlotInfo::clear() {
 ///////////////////////////////////////////////////////////////////////////////
 
 PlotInfo &PlotInfo::operator=(const PlotInfo &a) noexcept {
-   if ( this != &a ) {
+   if(this != &a) {
       flag = a.flag;
       color_table = a.color_table;
       plot_min = a.plot_min;

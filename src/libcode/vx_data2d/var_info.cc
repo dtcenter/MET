@@ -768,92 +768,44 @@ void VarInfo::set_prob_info_grib(ConcatString prob_name, double thresh_lo, doubl
 
 ///////////////////////////////////////////////////////////////////////////////
 
+bool VarInfo::is_flag_set(int flag) const {
+   return (!is_bad_data(flag)) ? (flag != 0) : false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 bool VarInfo::is_precipitation() const {
-   bool status = false;
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsPrecipitation)) {
-      status = (SetAttrIsPrecipitation != 0);
-   }
-
-   return status;
+   return is_flag_set(SetAttrIsPrecipitation);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_specific_humidity() const {
-   bool status = false;
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsSpecificHumidity)) {
-      status = (SetAttrIsSpecificHumidity != 0);
-   }
-
-   return status;
+   return is_flag_set(SetAttrIsSpecificHumidity);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_u_wind() const {
-   bool status = false;
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsUWind)) {
-      status = (SetAttrIsUWind != 0);
-   }
-
-   return status;
+   return is_flag_set(SetAttrIsUWind);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_v_wind() const {
-   bool status = false;
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsVWind)) {
-      status = (SetAttrIsVWind != 0);
-   }
-
-   return status;
+   return is_flag_set(SetAttrIsVWind);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_wind_speed() const {
-   bool status = false;
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsWindSpeed)) {
-      status = (SetAttrIsWindSpeed != 0);
-   }
-
-   return status;
+   return is_flag_set(SetAttrIsWindSpeed);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 bool VarInfo::is_wind_direction() const {
-   bool status = false;
-
-   //
-   // Check set_attrs entry
-   //
-   if(!is_bad_data(SetAttrIsWindDirection)) {
-      status = (SetAttrIsWindDirection != 0);
-   }
-
-   return status;
+   return is_flag_set(SetAttrIsWindDirection);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -868,6 +820,22 @@ bool VarInfo::is_prob() const {
    }
 
    return(PFlag && !PAsScalar);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Helper to parse and set name/level attributes from dictionary
+
+void VarInfo::parse_and_set_name_level(Dictionary &dict) {
+   ConcatString nstr = dict.lookup_string(conf_key_name, false);
+   ConcatString lstr = dict.lookup_string(conf_key_level, false);
+   if(nstr.nonempty()) {
+      set_name(nstr);
+      set_req_name(nstr.c_str());
+   }
+   if(lstr.nonempty()) {
+      Level.set_name(lstr.c_str());
+      Level.set_req_name(lstr.c_str());
+   }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

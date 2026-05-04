@@ -99,10 +99,16 @@ static Grid grid;
 static int nxy = 0;
 
 // Arrays to store running sums and counts
-static NumArray cnt_na, min_na, max_na, sum_na;
-static NumArray stdev_cnt_na, stdev_sum_na, stdev_ssq_na;
-static NumArray *thresh_cnt_na = (NumArray *) nullptr; // [n_thresh]
-static NumArray **thresh_nbrhd_cnt_na = (NumArray **) nullptr; // [n_thresh][n_nbrhd]
+static NumArray cnt_na;
+static NumArray min_na;
+static NumArray max_na;
+static NumArray sum_na;
+static NumArray stdev_cnt_na;
+static NumArray stdev_sum_na;
+static NumArray stdev_ssq_na;
+static std::vector<NumArray> thresh_cnt_na; // [n_thresh]
+static std::vector<std::vector<NumArray> > thresh_nbrhd_cnt_na; // [n_thresh][n_nbrhd]
+static std::vector<DataPlane> ens_eas_dp; // [n_ens]
 
 ////////////////////////////////////////////////////////////////////////
 

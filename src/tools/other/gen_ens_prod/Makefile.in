@@ -102,7 +102,8 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_gen_ens_prod_OBJECTS = gen_ens_prod-gen_ens_prod.$(OBJEXT) \
-	gen_ens_prod-gen_ens_prod_conf_info.$(OBJEXT)
+	gen_ens_prod-gen_ens_prod_conf_info.$(OBJEXT) \
+	gen_ens_prod-compute_eas.$(OBJEXT)
 gen_ens_prod_OBJECTS = $(am_gen_ens_prod_OBJECTS)
 am__DEPENDENCIES_1 =
 gen_ens_prod_DEPENDENCIES = $(am__DEPENDENCIES_1) \
@@ -126,7 +127,8 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/gen_ens_prod-gen_ens_prod.Po \
+am__depfiles_remade = ./$(DEPDIR)/gen_ens_prod-compute_eas.Po \
+	./$(DEPDIR)/gen_ens_prod-gen_ens_prod.Po \
 	./$(DEPDIR)/gen_ens_prod-gen_ens_prod_conf_info.Po
 am__mv = mv -f
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -327,7 +329,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 MAINTAINERCLEANFILES = Makefile.in
 gen_ens_prod_SOURCES = gen_ens_prod.cc \
-	gen_ens_prod_conf_info.cc
+	gen_ens_prod_conf_info.cc \
+	compute_eas.cc
 
 gen_ens_prod_CPPFLAGS = ${MET_CPPFLAGS}
 gen_ens_prod_LDFLAGS = ${MET_LDFLAGS}
@@ -363,6 +366,7 @@ gen_ens_prod_LDADD = -lvx_stat_out \
 	-lm -lproj -lnetcdf_c++4 -lnetcdf -lgsl -lgslcblas
 
 EXTRA_DIST = gen_ens_prod.h \
+	compute_eas.h \
 	gen_ens_prod_conf_info.h
 
 all: all-am
@@ -451,6 +455,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_ens_prod-compute_eas.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_ens_prod-gen_ens_prod.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gen_ens_prod-gen_ens_prod_conf_info.Po@am__quote@ # am--include-marker
 
@@ -501,6 +506,20 @@ gen_ens_prod-gen_ens_prod_conf_info.obj: gen_ens_prod_conf_info.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='gen_ens_prod_conf_info.cc' object='gen_ens_prod-gen_ens_prod_conf_info.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_ens_prod_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gen_ens_prod-gen_ens_prod_conf_info.obj `if test -f 'gen_ens_prod_conf_info.cc'; then $(CYGPATH_W) 'gen_ens_prod_conf_info.cc'; else $(CYGPATH_W) '$(srcdir)/gen_ens_prod_conf_info.cc'; fi`
+
+gen_ens_prod-compute_eas.o: compute_eas.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_ens_prod_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gen_ens_prod-compute_eas.o -MD -MP -MF $(DEPDIR)/gen_ens_prod-compute_eas.Tpo -c -o gen_ens_prod-compute_eas.o `test -f 'compute_eas.cc' || echo '$(srcdir)/'`compute_eas.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_ens_prod-compute_eas.Tpo $(DEPDIR)/gen_ens_prod-compute_eas.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='compute_eas.cc' object='gen_ens_prod-compute_eas.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_ens_prod_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gen_ens_prod-compute_eas.o `test -f 'compute_eas.cc' || echo '$(srcdir)/'`compute_eas.cc
+
+gen_ens_prod-compute_eas.obj: compute_eas.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_ens_prod_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT gen_ens_prod-compute_eas.obj -MD -MP -MF $(DEPDIR)/gen_ens_prod-compute_eas.Tpo -c -o gen_ens_prod-compute_eas.obj `if test -f 'compute_eas.cc'; then $(CYGPATH_W) 'compute_eas.cc'; else $(CYGPATH_W) '$(srcdir)/compute_eas.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/gen_ens_prod-compute_eas.Tpo $(DEPDIR)/gen_ens_prod-compute_eas.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='compute_eas.cc' object='gen_ens_prod-compute_eas.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(gen_ens_prod_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o gen_ens_prod-compute_eas.obj `if test -f 'compute_eas.cc'; then $(CYGPATH_W) 'compute_eas.cc'; else $(CYGPATH_W) '$(srcdir)/compute_eas.cc'; fi`
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -629,7 +648,8 @@ clean: clean-am
 clean-am: clean-binPROGRAMS clean-generic mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/gen_ens_prod-gen_ens_prod.Po
+		-rm -f ./$(DEPDIR)/gen_ens_prod-compute_eas.Po
+	-rm -f ./$(DEPDIR)/gen_ens_prod-gen_ens_prod.Po
 	-rm -f ./$(DEPDIR)/gen_ens_prod-gen_ens_prod_conf_info.Po
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
@@ -676,7 +696,8 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/gen_ens_prod-gen_ens_prod.Po
+		-rm -f ./$(DEPDIR)/gen_ens_prod-compute_eas.Po
+	-rm -f ./$(DEPDIR)/gen_ens_prod-gen_ens_prod.Po
 	-rm -f ./$(DEPDIR)/gen_ens_prod-gen_ens_prod_conf_info.Po
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
