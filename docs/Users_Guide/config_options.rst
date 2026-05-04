@@ -3167,11 +3167,11 @@ combination of the categorical threshold (cat_thresh), neighborhood width
 eas_prob
 ^^^^^^^^
 
-The eas_prob dictionary defines the options for the ensemble agreement scale
+The eas_prob dictionary defines the options for the ensemble agreement scale (EAS)
 probability method. The neighborhood shape is a :code:`SQUARE` or :code:`CIRCLE`
 centered on the current point, and the width array specifies the candidate
 neighborhood sizes to be considered. Each width specifies the width of the
-square or radius of the circle as an odd integer. The vld_thresh entry is a
+square or diameter of the circle as an odd integer. The vld_thresh entry is a
 number between 0 and 1 specifying the required ratio of valid data in the
 neighborhood for an output value to be computed. The alpha entry is number
 between 0 and 1 specifying the EAS distance criteria. For each grid point,
