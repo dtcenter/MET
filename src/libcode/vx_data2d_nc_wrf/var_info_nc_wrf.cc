@@ -135,7 +135,7 @@ void VarInfoNcWrf::dump(ostream &out) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcWrf::add_dimension(int dim, bool as_offset, double dim_value) {
+void VarInfoNcWrf::add_dimension(long dim, bool as_offset, double dim_value) {
    Dimension.add(dim);
    Is_offset.add(as_offset);
    Dim_value.add(dim_value);
@@ -151,7 +151,7 @@ void VarInfoNcWrf::clear_dimension() {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoNcWrf::set_dimension(int i_dim, int dim) {
+void VarInfoNcWrf::set_dimension(int i_dim, long dim) {
    Dimension[i_dim] = dim;
    return;
 }
@@ -231,7 +231,7 @@ void VarInfoNcWrf::set_magic(const ConcatString &nstr, const ConcatString &lstr)
             }
             // Single level
             else {
-               int level = 0;
+               long level = 0;
                double level_value = bad_data_double;
                if (is_datestring(ptr2)) {
                   unixtime unix_time = timestring_to_unix(ptr2);

@@ -25,7 +25,9 @@ The ensemble relative frequency is the simplest method for turning a set of dete
 
 The neighborhood ensemble probability (NEP) and neighborhood maximum ensemble probability (NMEP) methods are described in :ref:`Schwartz and Sobash (2017) <Schwartz-2017>`. They are an extension of the ensemble relative frequencies described above. The NEP value is computed by averaging the relative frequency of the event within the neighborhood over all ensemble members. The NMEP value is computed as the fraction of ensemble members for which the event is occurring somewhere within the surrounding neighborhood. The NMEP output is typically smoothed using a Gaussian kernel filter. The neighborhood sizes and smoothing options can be customized in the configuration file.
 
-The Gen-Ens-Prod tool writes the gridded relative frequencies, NEP, and NMEP fields to a NetCDF output file. Probabilistic verification methods can then be applied to those fields by evaluating them with the Grid-Stat and/or Point-Stat tools.
+The ensemble agreement scale (EAS) probability method is described in :ref:`Blake et al. (2018) <Blake-2018>`. It is an extension of the neighborhood probability methods described above. Rather than applying a single neighborhood size over the entire grid, a list of candidate sizes is provided. For each grid point, the smallest neighborhood size that satisfies the ensemble distance criteria is chosen. If the distance criteria is never satisfied, the largest size is used. For each grid point and neighborhood size, the fractional coverage value is computed for each ensemble member, and the average distance between all possible ensemble member pairs is computed. The criteria is satisfied when the average distance is less than or equal to the user-specified value of alpha. The raw EAS value is the mean of the ensemble members' fractional coverage values for the chosen neighborhood size. A Gaussian smoother is applied to the raw EAS values to produce the final EAS probabilities. The EAS derivation options can be customized in the configuration file.
+
+The Gen-Ens-Prod tool writes the gridded relative frequencies, NEP, NMEP, and EAS fields to a NetCDF output file. Probabilistic verification methods can then be applied to those fields by evaluating them with the Grid-Stat and/or Point-Stat tools.
 
 Climatology Data
 ----------------
@@ -250,21 +252,42 @@ _____________________
 
 .. code-block:: none
 
+  eas_prob = {
+     width           = [ 3, 5, 7, 9, 11, 13, 15 ];
+     shape           = CIRCLE;
+     vld_thresh      = 0.0;
+     alpha           = 0.5;
+     gaussian_dx     = 81.27;
+     gaussian_radius = 120;
+  }
+
+The **eas_prob** dictionary defines the options for the Ensemble Agreement Scale (EAS) probability method.
+
+The **shape** is a **SQUARE** or **CIRCLE** centered on the current point, and the **width** array specifies the candidate widths of the square or diameter of the circle as an odd integer. The **vld_thresh** entry is a number between 0 and 1 specifying the required ratio of valid data in the neighborhood for an output value to be computed. **alpha** is a number between 0 and 1 that defines the EAS distance criteria. **guassian_dx** and **gaussian_radius** define the Gaussian smoother that is applied to the raw EAS probability values.
+
+If **ensemble_flag.eas** or **ensemble_flag.eas_width** is set to TRUE, the EAS algorithm is run for each categorical threshold (**cat_thresh**) specified. The **eas** and **eas_width** flags control the writing of the EAS probabilities and widths chosen, respectively.
+
+_____________________
+
+.. code-block:: none
+
   ensemble_flag = {
-    latlon    = TRUE;
-	 mean      = TRUE;
-	 stdev     = TRUE;
-	 minus     = TRUE;
-	 plus      = TRUE;
-	 min       = TRUE;
-	 max       = TRUE;
-	 range     = TRUE;
-	 vld_count = TRUE;
-	 frequency = TRUE;
-	 nep       = FALSE;
-	 nmep      = FALSE;
-	 climo     = FALSE;
-	 climo_cdp = FALSE;
+     latlon    = TRUE;
+     mean      = TRUE;
+     stdev     = TRUE;
+     minus     = TRUE;
+     plus      = TRUE;
+     min       = TRUE;
+     max       = TRUE;
+     range     = TRUE;
+     vld_count = TRUE;
+     frequency = TRUE;
+     nep       = FALSE;
+     nmep      = FALSE;
+     eas       = FALSE;    
+     eas_width = FALSE;
+     climo     = FALSE;
+     climo_cdp = FALSE;
   }
 
 The **ensemble_flag** specifies which derived ensemble fields should be calculated and output. Setting the flag to TRUE produces output of the specified field, while FALSE produces no output for that field type. The flags correspond to the following output line types:
@@ -293,9 +316,11 @@ The **ensemble_flag** specifies which derived ensemble fields should be calculat
 
 12. Neighborhood Maximum Ensemble Probability for each categorical threshold (**cat_thresh**), neighborhood width (**nbrhd_prob.width**), and smoothing method (**nmep_smooth.type**) specified
 
-13. Climatology mean (**climo_mean**) and standard deviation (**climo_stdev**) data regridded to the model domain
+13. Ensemble Agreement Scale Probability for each categorical threshold (**cat_thresh**) specified
 
-14. Climatological Distribution Percentile field for each FCDP or OCDP threshold specified
+14. Climatology mean (**climo_mean**) and standard deviation (**climo_stdev**) data regridded to the model domain
+
+15. Climatological Distribution Percentile field for each FCDP or OCDP threshold specified
 
 gen_ens_prod Output
 -------------------

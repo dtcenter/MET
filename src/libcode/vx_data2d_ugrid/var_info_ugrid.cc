@@ -74,7 +74,7 @@ VarInfoUGrid & VarInfoUGrid::operator=(const VarInfoUGrid &f) {
 
 VarInfo *VarInfoUGrid::clone() const {
 
-   VarInfoUGrid *ret = new VarInfoUGrid(*this);
+   auto ret = new VarInfoUGrid(*this);
 
    return (VarInfo *)ret;
 }
@@ -94,14 +94,13 @@ void VarInfoUGrid::init_from_scratch() {
 ///////////////////////////////////////////////////////////////////////////////
 
 void VarInfoUGrid::assign(const VarInfoUGrid &v) {
-   int i;
 
    // First call the parent's assign
    VarInfo::assign(v);
 
    // Copy
    clear_dimension();
-   for(i=0; i<v.n_dimension(); i++) {
+   for(int i=0; i<v.n_dimension(); i++) {
       add_dimension(v.dimension(i), v.is_offset(i), v.dim_value(i));
    }
 
@@ -116,7 +115,6 @@ void VarInfoUGrid::clear() {
    VarInfo::clear();
 
    // Initialize
-//   clear_dimension();
 
    return;
 }
@@ -147,7 +145,7 @@ void VarInfoUGrid::dump(ostream &out) const {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void VarInfoUGrid::add_dimension(int dim, bool as_offset, double dim_value) {
+void VarInfoUGrid::add_dimension(long dim, bool as_offset, double dim_value) {
    Dimension.add(dim);
    Is_offset.add(as_offset);
    Dim_value.add(dim_value);
@@ -168,7 +166,7 @@ void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    set_name(nstr);
 
    // If there's no level specification, assume (*, *)
-   if(0 == lstr.length() || strchr(lstr.c_str(), '(') == nullptr) {
+   if(lstr.empty() || strchr(lstr.c_str(), '(') == nullptr) {
       Level.set_req_name("0,*");
       Level.set_name("0,*");
       clear_dimension();
@@ -269,7 +267,7 @@ void VarInfoUGrid::set_magic(const ConcatString &nstr, const ConcatString &lstr)
    } // end else
 
    // Check for "/PROB" to indicate a probability forecast
-   if (strstr(MagicStr.c_str(), "/PROB") != nullptr) PFlag = 1;
+   if (strstr(MagicStr.c_str(), "/PROB") != nullptr) PFlag = true;
 
    // Set the long name
    tmp_str.format("%s(%s)", req_name().text(), Level.req_name().text());
@@ -292,7 +290,7 @@ bool VarInfoUGrid::set_dict(Dictionary &dict, bool do_exit){
 
    bool status = VarInfo::set_dict(dict);
 
-   if (cfg_level.length() > 0) lvl_type = cfg_level.char_at(0);
+   if (!cfg_level.empty()) lvl_type = cfg_level.char_at(0);
    if (lvl_type == 'A' || lvl_type == 'Z' || lvl_type == 'P' ||
        lvl_type == 'R' || lvl_type == 'L') {
       set_level_info_grib(dict);

@@ -945,7 +945,15 @@ args.has(log_option, i_arg, false);
 
 if ( i_arg >= 0 )  {
 
-   mlog.open_log_file(args[i_arg+1]);
+   //
+   //  check if already opened by parse_mlog()
+   //
+   if ( !mlog.is_open() ) {
+
+      mlog.open_log_file(args[i_arg+1]);
+
+   }
+
    args.shift_down(i_arg, 2);
 
 }
@@ -1029,6 +1037,26 @@ while ( (j = next_option(index)) >= 0 )  {
    //
    //  done
    //
+
+return;
+
+}
+
+
+////////////////////////////////////////////////////////////////////////
+
+
+void CommandLine::parse_mlog()
+
+{
+
+   //
+   //  parse only the -v and -log options
+   //
+
+do_verbosity();
+
+do_log();
 
 return;
 
