@@ -555,7 +555,7 @@ if [[ $COMPILE_LIBPNG -eq 1 && $HOST != ys* ]]; then
 fi
 
 # Compile LIBAEC
-if [ $COMPILE_ZLIB -eq 1 ]; then
+if [ $COMPILE_LIBAEC -eq 1 ]; then
   echo
   echo "Compiling LIBAEC at `date`"
   mkdir -p ${LIB_DIR}/libaec
