@@ -87,7 +87,7 @@ static GridDiagConfInfo conf_info;
 // Output NetCDF file
 static netCDF::NcFile *nc_out = nullptr;
 netCDF::NcDim mask_dim;
-netCDF::NcDim wavenumber_dim;
+netCDF::NcDim energy_dim;
 std::vector<netCDF::NcDim> data_var_dims;
 int deflate_level;
 

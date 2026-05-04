@@ -817,8 +817,8 @@ static void setup_nc_file(void) {
 
    // Add the power spectra dimension
    if(conf_info.nc_info.do_power_spectrum) {
-      wavenumber_dim = add_dim(nc_out, "wavenumber",
-                               (long) min(grid.nx(), grid.ny()));
+      energy_dim = add_dim(nc_out, "energy",
+                           (long) min(grid.nx(), grid.ny()));
    }
 }
 
@@ -1102,10 +1102,10 @@ static void write_info_theory(void) {
 
 static void write_energy(void) {
    vector<size_t> offsets = { 0, 0 };
-   vector<size_t> counts  = { 1, wavenumber_dim.getSize() };
+   vector<size_t> counts  = { 1, energy_dim.getSize() };
 
    // NetCDF dimensions remain constant across all variables
-   vector<NcDim> dims = { mask_dim, wavenumber_dim };
+   vector<NcDim> dims = { mask_dim, energy_dim };
 
    // Define and write engery power spectrum
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {
@@ -1146,10 +1146,10 @@ static void write_energy(void) {
 
 static void write_error_energy(void) {
    vector<size_t> offsets = { 0, 0 };
-   vector<size_t> counts  = { 1, wavenumber_dim.getSize() };
+   vector<size_t> counts  = { 1, energy_dim.getSize() };
 
    // NetCDF dimensions remain constant across all variables
-   vector<NcDim> dims = { mask_dim, wavenumber_dim };
+   vector<NcDim> dims = { mask_dim, energy_dim };
 
    // Define and write error energy power spectrum
    for(int i_var=0; i_var < conf_info.get_n_data(); i_var++) {

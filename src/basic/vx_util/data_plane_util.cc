@@ -875,7 +875,7 @@ extern vector<double> radial_energy(const DataPlane &dp) {
          // Map distance to a bin index [0, n_bins - 1]
          auto bin = (int)((dist / max_dist) * (n_bins - 1));
 
-	 // Accumulate energy for each bin
+         // Accumulate energy for each bin
          if(bin < n_bins) re[bin] += energy;
 
       } // end for y
