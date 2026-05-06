@@ -26,7 +26,7 @@ class dataplane(met_base):
 
    KEEP_XARRAY = True
    class_name = "dataplane"
-   IS_DEBUG_ENABLED = None
+   DEBUG_ENABLED = None
 
    ATTR_USER_FILL_VALUE = 'user_fill_value'
 
@@ -69,7 +69,7 @@ class dataplane(met_base):
       for attr_key, attr_value in attrs.items():
         if not isinstance(attr_value, ( np.generic, str, list, dict, int, float, bool ) ):
            met_base.error_message(f"Found non serializable object {type(attr_value)}: {attr_key} = {attr_value}")
-           has_non_serializable - True
+           has_non_serializable = True
       return has_non_serializable
 
    @staticmethod
@@ -97,9 +97,9 @@ class dataplane(met_base):
 
    @staticmethod
    def is_debug_enabled():
-      if dataplane.IS_DEBUG_ENABLED is None:
-         dataplane.IS_DEBUG_ENABLED = met_base_tools.is_debug_enabled("dataplane")
-      return dataplane.IS_DEBUG_ENABLED
+      if dataplane.DEBUG_ENABLED is None:
+         dataplane.DEBUG_ENABLED = met_base_tools.is_debug_enabled("dataplane")
+      return dataplane.DEBUG_ENABLED
 
    @staticmethod
    def is_integer(a_data):
@@ -287,7 +287,7 @@ class dataplane(met_base):
       if dataplane.is_debug_enabled():
          met_base.log_message("Save to a temporary NetCDF file (dataplane)")
 
-      attrs = dataplane.get_attrs(met_in)
+      met_info['attrs'] = dataplane.get_attrs(met_in)
 
       # write NetCDF file
       ds = nc.Dataset(netcdf_filename, 'w')
