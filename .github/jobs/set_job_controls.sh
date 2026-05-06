@@ -5,8 +5,8 @@ run_push=false
 run_unit_tests=false
 run_diff=false
 run_update_truth=false
-met_base_repo=met-base
-met_base_tag=3.4-latest
+met_base_repo=met-base-dev
+met_base_tag=feature_test_main_v3.4_met_python_fix
 input_data_version=develop
 truth_data_version=develop
 
@@ -122,7 +122,7 @@ fi
 # if running unit tests, use unit_test MET base image and push image
 if [ "$run_unit_tests" == "true" ]; then
 
-  met_base_repo=met-base-unit-test
+  met_base_repo=met-base-unit-test-dev
   run_push=true
 
 fi
