@@ -29,8 +29,6 @@ def get_nc_point_obs():
 # The argements nc_group(dataset) and nc_var should not be None
 class met_point_nc_tools(met_point_tools):
 
-   #met_missing = -99999999.
-
    @staticmethod
    def get_num_array(nc_group, var_name):
       nc_var = nc_group.variables.get(var_name, None)
