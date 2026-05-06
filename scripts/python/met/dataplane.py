@@ -63,13 +63,14 @@ class dataplane(met_base):
        sys.argv = argv_org  # restore sys.argv
        return met_in
 
+   #Return True if there is no non serialiable objects in attrs
    @staticmethod
    def check_attrs(attrs):
-      has_non_serializable = False
+      has_non_serializable = True
       for attr_key, attr_value in attrs.items():
         if not isinstance(attr_value, ( np.generic, str, list, dict, int, float, bool ) ):
            met_base.error_message(f"Found non serializable object {type(attr_value)}: {attr_key} = {attr_value}")
-           has_non_serializable = True
+           has_non_serializable = False
       return has_non_serializable
 
    @staticmethod
