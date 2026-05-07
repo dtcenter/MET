@@ -17,12 +17,12 @@ import numpy as np
 from netCDF4 import Dataset
 
 def usage():
-    print(f'Usage: python3 print_nc2ascii.py MET_point_obs_nc <--hide-header> <--use-comma> <--out=out_filename>')
-    print(f'            MET_point_obs_nc: NetCDF filename to read (required)')
-    print(f'                --add-header: to add the header (optional, default: not included)')
-    print(f'                 --use-comma: use the "comma" as separator for comma separated output (optional, default: use spaces)"')
-    print(f'          --out=out_filename: save the text into the file (optional, default: display to the screen)"')
-    print(f'       Note: <> indicates optional arguments')
+    print('Usage: python3 print_nc2ascii.py MET_point_obs_nc <--hide-header> <--use-comma> <--out=out_filename>')
+    print('            MET_point_obs_nc: NetCDF filename to read (required)')
+    print('                --add-header: to add the header (optional, default: not included)')
+    print('                 --use-comma: use the "comma" as separator for comma separated output (optional, default: use spaces)"')
+    print('          --out=out_filename: save the text into the file (optional, default: display to the screen)"')
+    print('       Note: <> indicates optional arguments')
 
 def create_parser_options(parser):
     parser.add_option("--add-header", "--add_header", dest="add_header",
@@ -108,9 +108,9 @@ class met_nc_point_obs():
 
         if show_header:
             if use_comma:
-                self.out_data(out_handler, f'#msg_type,station_id,valid_time,lat,lon,elv,var_name/gc,level,height,qty,value')
+                self.out_data(out_handler, '#msg_type,station_id,valid_time,lat,lon,elv,var_name/gc,level,height,qty,value')
             else:
-                self.out_data(out_handler, f'#msg_type s_id valid_time  lat  lon  elv  var_name/gc  level  height  qty  value')
+                self.out_data(out_handler, '#msg_type s_id valid_time  lat  lon  elv  var_name/gc  level  height  qty  value')
 
         for obs_data in [list(i) for i in zip(obs_vid, obs_lvl, obs_hgt, obs_qty, obs_val, self.obs_hid)]:
             header_arr = headers[obs_data[-1]]
