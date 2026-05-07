@@ -69,6 +69,7 @@ void TCRMWConfInfo::clear() {
     ValidExc.clear();
     ValidHour.clear();
     LeadTime.clear();
+    BestTechnique.clear();
 
     n_range        = bad_data_int;
     n_azimuth      = bad_data_int;
@@ -120,7 +121,7 @@ void TCRMWConfInfo::read_config(const char* default_file_name,
 ////////////////////////////////////////////////////////////////////////
 
 void TCRMWConfInfo::process_config(GrdFileType ftype) {
-    Dictionary *fdict = (Dictionary *) nullptr;
+    auto fdict = (Dictionary *) nullptr;
 
     // Conf: version
     check_met_version(Conf.lookup_string(conf_key_version).c_str());
@@ -155,6 +156,10 @@ void TCRMWConfInfo::process_config(GrdFileType ftype) {
 
     // Conf: lead
     LeadTime = Conf.lookup_seconds_array(conf_key_lead);
+
+    // Conf: BestTechnique
+    BestTechnique = Conf.lookup_string_array(conf_key_best_technique);
+    BestTechnique.set_ignore_case(true);
 
     // Conf: n_range
     n_range = Conf.lookup_int(conf_key_n_range);
