@@ -25,7 +25,7 @@ export MET_SUBDIR=${TEST_BASE}
 # Required
 # The name of the met tarbal usually downloaded with version from dtcenter.org and includes a version
 #  example - v11.1.0.tar.gz
-export MET_TARBALL=v12.1.0.tar.gz
+export MET_TARBALL=v13.0.0.tar.gz
 
 # Required
 # Specify if machine useds modules for loading software
@@ -63,6 +63,7 @@ export MAKE_ARGS="-j 5"
 #export BUFRLIB_NAME=-lbufr_4
 #export LIB_JASPER=${EXTERNAL_LIBS}/lib
 #export LIB_LIBPNG=${EXTERNAL_LIBS}/lib
+#export LiB_LIBAEC=${EXTERNAL_LIBS}/lib
 #export LIB_Z=${EXTERNAL_LIBS}/lib
 #export MET_GRIB2CLIB=${EXTERNAL_LIBS}/lib
 #export MET_GRIB2CINC=${EXTERNAL_LIBS}/include

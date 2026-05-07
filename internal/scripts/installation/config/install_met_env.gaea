@@ -5,6 +5,7 @@
 # A recommended workaround to this issue is to either module unload cray-libsci or use another intel compiler.
 
 module unload cray-libsci/24.07.0
+#Upgrade compiler version and check cmake version
 module load intel/2023.2.0
 module load cmake/3.23.1
 
@@ -14,14 +15,14 @@ export F90=ifort
 export CC=icc
 export CXX=icpc
 
-export TEST_BASE=/usw/met/12.1.0
+export TEST_BASE=/usw/met/13.0.0
 export COMPILER=intel_2023.2.0
 export MET_SUBDIR=${TEST_BASE}
-export MET_TARBALL=v12.1.0.tar.gz
+export MET_TARBALL=v13.0.0.tar.gz
 export USE_MODULES=TRUE
-export MET_PYTHON=/gpfs/f5/esrl/proj-shared/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v5.1_py3.10/
-export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.10
-export MET_PYTHON_LD=-L${MET_PYTHON}/lib/python3.10/config-3.10-x86_64-linux-gnu\ -L${MET_PYTHON}/lib\ -lpython3.10\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lm
+export MET_PYTHON=/gpfs/f5/esrl/proj-shared/Julie.Prestopnik/projects/miniconda/miniconda3/envs/metplus_v6.1_py3.12/
+export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.12
+export MET_PYTHON_LD=-L${MET_PYTHON}/lib/python3.12/config-3.10-x86_64-linux-gnu\ -L${MET_PYTHON}/lib\ -lpython3.12\ -lcrypt\ -lpthread\ -ldl\ -lutil\ -lm
 export EXTERNAL_LIBS=${TEST_BASE}/external_libs
 COMPILE_ATLAS=1
 COMPILE_ECKIT=1
@@ -38,6 +39,7 @@ COMPILE_ECKIT=1
 #export GRIB2CLIB_NAME=-lg2c
 #export LIB_JASPER=${EXTERNAL_LIBS}/lib
 #export LIB_LIBPNG=${EXTERNAL_LIBS}/lib
+#export LIB_LIBAEC=${EXTERNAL_LIBS}/lib
 #export LIB_Z=${EXTERNAL_LIBS}/lib
 #export TIFF_INCLUDE_DIR=${EXTERNAL_LIBS}/include
 #export TIFF_LIB_DIR=${EXTERNAL_LIBS}/lib

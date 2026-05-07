@@ -1,20 +1,20 @@
 module reset
-module use /apps/dev/modulefiles/
-module load ve/evs/2.0_py312
+module use /apps/dev/lmodules/intel/19.1.3.304
+module load ve/evs/2.1
 module use /apps/ops/para/libs/modulefiles/compiler/intel/19.1.3.304
 module load netcdf/4.7.4
 module load hdf5/1.10.6
-module load bufr/11.6.0
+# NOTE: WCOSS2 will use bufr/12.3.0, which was unavailable on Acorn for testing
+module load bufr/12.1.0
 module load zlib/1.2.11
 module load jasper/2.0.25
 module load libpng/1.6.37
 module load gsl/2.7
-module load g2c/1.6.4
+module load g2c/2.2.0
 module load proj/7.1.0
-module use /apps/dev/modulefiles
-module load fckit/0.11.0
-module load atlas/0.35.0
-module load eckit/1.24.4
+module load fckit/0.13.2
+module load atlas/0.44.1
+module load eckit/1.28.3
 
 export FC=ifort
 export F77=ifort
@@ -26,34 +26,28 @@ export LIB_DIR=${TEST_BASE}/external_libs
 export BIN_DIR_PATH=${TEST_BASE}/bin
 export COMPILER=intel_19.1.3.304
 export MET_SUBDIR=${TEST_BASE}
-export MET_TARBALL=v12.1.0-rc1.tar.gz
+export MET_TARBALL=v13.0.0.tar.gz
 export USE_MODULES=TRUE
 export ADDTL_DIR=/apps/spack/gettext/0.21/intel/19.1.3.304/at2kdo4edvuhyzrt5g6zhwrdb7bdui4s/lib64
-export PYTHON_MODULE=python_3.12.0
-export MET_PYTHON=/apps/spack/python/3.12.0/intel/19.1.3.304/r7ia355o3tnbbmfexnp3bcsyl2r4ai47
+export MET_PYTHON=/apps/dev/ve/intel/19.1.3.304/python/3.12.0/evs/2.1
 export MET_PYTHON_LIB=${MET_PYTHON}/lib
-export MET_PYTHON_CC=-I${MET_PYTHON}/include/python3.12
-export MET_PYTHON_LD=-L${MET_PYTHON_LIB}\ -lpython3.12\ -lcrypt\ -lintl\ -ldl\ -lutil\ -lm\ -lm
+export MET_PYTHON_CC=-I$(python -c "import sysconfig; print(sysconfig.get_path('include'))")
+export MET_PYTHON_LD=-L${MET_PYTHON_LIB}\ -lpython3.12\ -lintl\ -pthread\ -ldl\ -lutil\ -lm
 export MET_NETCDF=/apps/prod/hpc-stack/intel-19.1.3.304/netcdf/4.7.4
-# JY export MET_HDF5=/apps/prod/hpc-stack/intel-19.1.3.304/hdf5/1.10.6
 export MET_HDF5=${HDF5_ROOT}
-export MET_BUFRLIB=/apps/ops/prod/libs/intel/19.1.3.304/bufr/11.6.0/lib64
-# JY export MET_GRIB2CLIB=/apps/ops/prod/libs/intel/19.1.3.304/g2c/1.6.4/lib64
-# JY export MET_GRIB2CINC=/apps/ops/prod/libs/intel/19.1.3.304/g2c/1.6.4/include
+export MET_BUFRLIB=/apps/ops/prod/libs/intel/19.1.3.304/bufr/12.1.0/lib64
 export MET_GRIB2CLIB=${g2c_ROOT}/lib64
 export MET_GRIB2CINC=${G2C_INC}
 export MET_GSL=/apps/spack/gsl/2.7/intel/19.1.3.304/xks7dxbowrdxhjck5zxc4rompopocevb
 export MET_PROJ=/apps/spack/proj/7.1.0/intel/19.1.3.304/cjbmc7tacv5qcfatslqmcrzo5kb4raaq
-export MET_ATLASLIB=/apps/dev/atlas/install-0.35.0/lib64
-export MET_ATLASINC=/apps/dev/atlas/install-0.35.0/include/atlas
-export MET_ECKITLIB=/apps/dev/eckit/install-1.24.4/lib64
-export MET_ECKITINC=/apps/dev/eckit/install-1.24.4/include/eckit
+export MET_ATLASLIB=/apps/prod/atlas/install-0.44.1/lib64
+export MET_ATLASINC=/apps/prod/atlas/install-0.44.1/include/atlas
+export MET_ECKITLIB=/apps/prod/eckit/install-1.28.3/lib64
+export MET_ECKITINC=/apps/prod/eckit/install-1.28.3/include/eckit
 export BUFRLIB_NAME=-lbufr_4
 export GRIB2CLIB_NAME=-lg2c
-# JY export LIB_JASPER=/apps/spack/jasper/2.0.25/intel/19.1.3.304/sjib74krrorkyczqpqah4tvewmlnqdx4/lib64
 export LIB_JASPER=${JASPER_LIBDIR}
-# JY export LIB_LIBPNG=/apps/spack/libpng/1.6.37/intel/19.1.3.304/4ohkronuhlyherusoszzrmur5ewvlwzh/lib
 export LIB_LIBPNG=${LIBPNG_LIBDIR}
-# JY export LIB_Z=/apps/spack/zlib/1.2.11/intel/19.1.3.304/hjotqkckeoyt6j6tibalwzrlfljcjtdh/lib
+export LIB_LIBAEC=${LIBAEC_LIBDIR}
 export LIB_Z=${ZLIB_LIBDIR}
 export MAKE_ARGS=-j

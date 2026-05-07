@@ -42,10 +42,13 @@ class TCRMWConfInfo {
         ConcatString Basin;
         ConcatString Cyclone;
         unixtime     InitInc;
-        unixtime     ValidBeg, ValidEnd;
-        TimeArray    ValidInc, ValidExc;
+        unixtime     ValidBeg;
+        unixtime     ValidEnd;
+        TimeArray    ValidInc;
+        TimeArray    ValidExc;
         IntArray     ValidHour;
         IntArray     LeadTime;
+        StringArray  BestTechnique;
 
         // Range/Azimuth information
         int    n_range;
