@@ -35,6 +35,7 @@ export COMPILE_ECKIT=1
 export COMPILE_ATLAS=1
 export COMPILE_HDF=1
 export COMPILE_HDFEOS=1
+export COMPILE_SQLITE=1
 export COMPILE_ZLIB=1
 
 export BUFRLIB_NAME="-lbufr_4"
