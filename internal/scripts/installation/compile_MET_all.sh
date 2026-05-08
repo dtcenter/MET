@@ -514,7 +514,7 @@ if [ $COMPILE_BUFRLIB -eq 1 ]; then
   echo "cd `pwd`"
   run_cmd "mkdir build"
   export BUILD_DIR=${SOURCE_DIR}/build
-  run_cmd "cmake -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_BUILD_TYPE=Debug > $(pwd)/bufr.cmake.log 2>&1"
+  run_cmd "cmake -H${SOURCE_DIR} -B${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${LIB_DIR} -DCMAKE_BUILD_TYPE=Debug -DBUILD_UTILS=OFF > $(pwd)/bufr.cmake.log 2>&1"
   run_cmd "cd ${BUILD_DIR}"
   run_cmd "make ${MAKE_ARGS} > $(pwd)/bufr.make.log 2>&1"
   run_cmd "ctest > $(pwd)/bufr.ctest.log 2>&1"
